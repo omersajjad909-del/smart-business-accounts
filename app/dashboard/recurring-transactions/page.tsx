@@ -8,6 +8,7 @@ import { useEffect, useState } from "react";
 import { getCurrentUser } from "@/lib/auth";
 import { hasPermission } from "@/lib/hasPermission";
 import { PERMISSIONS } from "@/lib/permissions";
+import { useResponsive } from "@/hooks/useResponsive";
 
 type RecurringTransaction = {
   id: string;
@@ -24,6 +25,7 @@ type RecurringTransaction = {
 };
 
 export default function RecurringTransactionsPage() {
+  const { isMobile } = useResponsive();
   const [transactions, setTransactions] = useState<RecurringTransaction[]>([]);
   const [loading, setLoading] = useState(false);
   const [showForm, setShowForm] = useState(false);

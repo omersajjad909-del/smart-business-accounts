@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { getCurrentUser } from "@/lib/auth";
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Legend } from "recharts";
+import { useResponsive } from "@/hooks/useResponsive";
 
 const ff = "'Outfit','Inter',sans-serif";
 function fmt(n: number) { return n.toLocaleString("en-US", { minimumFractionDigits: 0, maximumFractionDigits: 0 }); }
@@ -12,6 +13,7 @@ type GroupBy = "category" | "costCenter";
 const COLORS = ["#6366f1","#f87171","#fbbf24","#34d399","#38bdf8","#a78bfa","#f97316","#ec4899"];
 
 export default function ExpenseBreakdownPage() {
+  const { isMobile } = useResponsive();
   const user = getCurrentUser();
   const [data,    setData]    = useState<ExpRow[]>([]);
   const [loading, setLoading] = useState(true);
@@ -45,7 +47,7 @@ export default function ExpenseBreakdownPage() {
   ];
 
   return (
-    <div style={{ padding: "24px 28px", fontFamily: ff, color: "var(--text-primary)", maxWidth: 1200 }}>
+    <div style={{ padding: isMobile ? "13px 13px" : "24px 28px", fontFamily: ff, color: "var(--text-primary)", maxWidth: 1200 }}>
 
       {/* Header */}
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 24, flexWrap: "wrap", gap: 12 }}>
@@ -73,24 +75,24 @@ export default function ExpenseBreakdownPage() {
       </div>
 
       {/* Summary cards */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 14, marginBottom: 20 }}>
+      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(3,1fr)", gap: 14, marginBottom: 20 }}>
         {[
           { label: "Total Expenses", value: `${cur} ${fmt(total)}`, color: "#f87171", bg: "rgba(248,113,113,.07)", border: "rgba(248,113,113,.2)" },
           { label: "Top Item", value: data[0]?.category || "—", color: "#6366f1", bg: "rgba(99,102,241,.07)", border: "rgba(99,102,241,.2)" },
           { label: "Categories", value: String(data.length), color: "#34d399", bg: "rgba(52,211,153,.07)", border: "rgba(52,211,153,.2)" },
         ].map(c => (
-          <div key={c.label} style={{ borderRadius: 12, padding: "14px 18px", background: c.bg, border: `1px solid ${c.border}` }}>
+          <div key={c.label} style={{ borderRadius: 12, padding: isMobile ? "12px 10px" : "14px 18px", background: c.bg, border: `1px solid ${c.border}` }}>
             <div style={{ fontSize: 11, color: "var(--text-muted)", fontWeight: 700, textTransform: "uppercase", letterSpacing: ".06em", marginBottom: 6 }}>{c.label}</div>
             <div style={{ fontSize: 18, fontWeight: 900, color: c.color, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{c.value}</div>
           </div>
         ))}
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 300px", gap: 20, marginBottom: 20 }}>
+      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 300px", gap: 20, marginBottom: 20 }}>
 
         {/* Table */}
         <div style={{ background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 14, overflow: "hidden" }}>
-          <div style={{ padding: "14px 18px", borderBottom: "1px solid var(--border)", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          <div style={{ padding: isMobile ? "12px 10px" : "14px 18px", borderBottom: "1px solid var(--border)", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
             <span style={{ fontSize: 13, fontWeight: 700 }}>
               Breakdown — {groupBy === "costCenter" ? "Cost Centers" : "Categories"}
             </span>

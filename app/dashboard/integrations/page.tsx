@@ -1,6 +1,7 @@
 "use client";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { useResponsive } from "@/hooks/useResponsive";
 
 const FONT = "'Outfit','Inter',sans-serif";
 
@@ -72,6 +73,7 @@ const INTEGRATIONS: IntegrationItem[] = [
 ];
 
 export default function IntegrationsPage() {
+  const { isMobile } = useResponsive();
   const [apiKeyCount, setApiKeyCount] = useState<number | null>(null);
   const [bankCount,   setBankCount]   = useState<number | null>(null);
   const [ssoEnabled,  setSsoEnabled]  = useState<boolean | null>(null);
@@ -166,7 +168,7 @@ export default function IntegrationsPage() {
   ].filter(Boolean).length;
 
   return (
-    <div style={{ padding: "32px 28px", fontFamily: FONT, color: "var(--text-primary)", minHeight: "100vh", background: "var(--app-bg)" }}>
+    <div style={{ padding: isMobile ? "18px 13px" : "32px 28px", fontFamily: FONT, color: "var(--text-primary)", minHeight: "100vh", background: "var(--app-bg)" }}>
 
       {/* Header */}
       <div style={{ marginBottom: 28 }}>
@@ -177,13 +179,13 @@ export default function IntegrationsPage() {
       </div>
 
       {/* Summary strip */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 12, marginBottom: 28 }}>
+      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(3,1fr)", gap: 12, marginBottom: 28 }}>
         {[
           { icon: "🔌", label: "Connected", value: `${connected} / 4`, color: connected > 0 ? "#34d399" : "#6b7280", bg: connected > 0 ? "rgba(52,211,153,.08)" : "rgba(107,114,128,.06)", border: connected > 0 ? "rgba(52,211,153,.2)" : "rgba(107,114,128,.15)" },
           { icon: "🔗", label: "API Keys Active", value: apiKeyCount === null ? "…" : String(apiKeyCount), color: "#6366f1", bg: "rgba(99,102,241,.08)", border: "rgba(99,102,241,.2)" },
           { icon: "🏦", label: "Bank Accounts Linked", value: bankCount === null ? "…" : String(bankCount), color: "#38bdf8", bg: "rgba(56,189,248,.08)", border: "rgba(56,189,248,.2)" },
         ].map(s => (
-          <div key={s.label} style={{ padding: "14px 18px", borderRadius: 12, background: s.bg, border: `1px solid ${s.border}`, display: "flex", alignItems: "center", gap: 12 }}>
+          <div key={s.label} style={{ padding: isMobile ? "12px 10px" : "14px 18px", borderRadius: 12, background: s.bg, border: `1px solid ${s.border}`, display: "flex", alignItems: "center", gap: 12 }}>
             <span style={{ fontSize: 22 }}>{s.icon}</span>
             <div>
               <div style={{ fontSize: 11, color: "var(--text-muted)", fontWeight: 700, textTransform: "uppercase", letterSpacing: ".06em" }}>{s.label}</div>

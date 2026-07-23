@@ -3,6 +3,7 @@ import { fmtDate } from "@/lib/dateUtils";
 
 import { useState, useMemo, useEffect } from "react";
 import { useBusinessRecords, BusinessRecord } from "@/lib/useBusinessRecords";
+import { useResponsive } from "@/hooks/useResponsive";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -80,7 +81,7 @@ function KpiCard({ label, value, sub }: { label: string; value: string | number;
       background: "var(--panel-bg)",
       border: "1px solid var(--border)",
       borderRadius: 12,
-      padding: "20px 24px",
+      padding: isMobile ? "12px 11px" : "20px 24px",
       display: "flex",
       flexDirection: "column",
       gap: 4,
@@ -123,6 +124,7 @@ function MiniStat({ label, value }: { label: string; value: string | number }) {
 // ─── Main Page ────────────────────────────────────────────────────────────────
 
 export default function WarehousesPage() {
+  const { isMobile } = useResponsive();
   const { records: whRecords, loading: whLoading, create: whCreate, setStatus: whSetStatus } =
     useBusinessRecords("warehouse");
   const { records: txRecords, loading: txLoading, create: txCreate } =
@@ -274,7 +276,7 @@ export default function WarehousesPage() {
     <div style={{
       fontFamily: "'Outfit','Inter',sans-serif",
       color: "var(--text-primary)",
-      padding: "32px 28px",
+      padding: isMobile ? "16px" : "32px" 28px",
       minHeight: "100vh",
       background: "var(--app-bg)",
     }}>
@@ -345,7 +347,7 @@ export default function WarehousesPage() {
               background: "var(--panel-bg)",
               border: "1px solid var(--border)",
               borderRadius: 14,
-              padding: "20px 22px",
+              padding: isMobile ? "12px 10px" : "20px 22px",
               display: "flex",
               flexDirection: "column",
               gap: 14,
@@ -379,7 +381,7 @@ export default function WarehousesPage() {
               {/* Mini stats */}
               <div style={{
                 display: "grid",
-                gridTemplateColumns: "1fr 1fr 1fr",
+                gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr 1fr",
                 gap: 8,
                 background: "var(--app-bg)",
                 borderRadius: 10,
@@ -461,7 +463,7 @@ export default function WarehousesPage() {
         background: "var(--panel-bg)",
         border: "1px solid var(--border)",
         borderRadius: 14,
-        padding: "22px 24px",
+        padding: isMobile ? "12px 11px" : "22px 24px",
       }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 18, flexWrap: "wrap", gap: 10 }}>
           <div>

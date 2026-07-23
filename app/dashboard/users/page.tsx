@@ -5,6 +5,7 @@ import toast from "react-hot-toast";
 import { getCurrentUser } from "@/lib/auth";
 import { PERMISSIONS } from "@/lib/permissions";
 import { DEPARTMENTS, DESIGNATIONS, fmtDept } from "@/lib/hrCatalog";
+import { useResponsive } from "@/hooks/useResponsive";
 
 const ff = "'Outfit','Inter',sans-serif";
 
@@ -99,6 +100,7 @@ function groupPerms(perms: string[]) {
 
 /* ═══════════════ MAIN COMPONENT ═══════════════ */
 export default function TeamAndPermissionsPage() {
+  const { isMobile } = useResponsive();
   const [me,      setMe]      = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [tab,     setTab]     = useState<"team" | "invite" | "permissions" | "shift">("team");
@@ -330,7 +332,7 @@ export default function TeamAndPermissionsPage() {
 
   /* ── access denied ── */
   if (!loading && me?.role !== "ADMIN") return (
-    <div style={{ padding: "40px 28px", fontFamily: ff }}>
+    <div style={{ padding: isMobile ? "22px 13px" : "40px 28px", fontFamily: ff }}>
       <div style={{ padding: 32, borderRadius: 16, background: "rgba(248,113,113,.07)", border: "1px solid rgba(248,113,113,.25)", textAlign: "center", color: "#f87171" }}>
         <div style={{ fontSize: 32, marginBottom: 12 }}>🔒</div>
         <div style={{ fontSize: 18, fontWeight: 800, marginBottom: 6 }}>Access Denied</div>
@@ -373,14 +375,14 @@ export default function TeamAndPermissionsPage() {
       </div>
 
       {/* ── Stats ── */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 12, marginBottom: 24 }}>
+      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 12, marginBottom: 24 }}>
         {[
           { label: "Total Users",  value: users.length, color: "#818cf8" },
           { label: "Active",        value: activeCount,  color: "#34d399" },
           { label: "Admins",        value: adminCount,   color: "#f87171" },
           { label: "Shifts Active", value: shiftOnCount, color: "#f59e0b" },
         ].map(s => (
-          <div key={s.label} style={{ padding: "14px 18px", borderRadius: 14, background: "rgba(255,255,255,.03)", border: `1px solid ${s.color}20` }}>
+          <div key={s.label} style={{ padding: isMobile ? "12px 10px" : "14px 18px", borderRadius: 14, background: "rgba(255,255,255,.03)", border: `1px solid ${s.color}20` }}>
             <div style={{ fontSize: 26, fontWeight: 900, color: s.color, lineHeight: 1 }}>{s.value}</div>
             <div style={{ fontSize: 11, color: "#475569", fontWeight: 700, marginTop: 4 }}>{s.label}</div>
           </div>
@@ -530,7 +532,7 @@ export default function TeamAndPermissionsPage() {
                 </div>
               )}
               {/* ── Also add as Employee (opt-in) ── */}
-              <div style={{ marginBottom: 16, padding: "14px 16px", borderRadius: 10, background: invAddEmployee ? "rgba(34,197,94,.06)" : "rgba(255,255,255,.02)", border: `1px solid ${invAddEmployee ? "rgba(34,197,94,.28)" : "rgba(255,255,255,.07)"}`, transition: "all .15s" }}>
+              <div style={{ marginBottom: 16, padding: isMobile ? "12px 10px" : "14px 16px", borderRadius: 10, background: invAddEmployee ? "rgba(34,197,94,.06)" : "rgba(255,255,255,.02)", border: `1px solid ${invAddEmployee ? "rgba(34,197,94,.28)" : "rgba(255,255,255,.07)"}`, transition: "all .15s" }}>
                 <label style={{ display: "flex", alignItems: "flex-start", gap: 10, cursor: "pointer" }}>
                   <input
                     type="checkbox"
@@ -609,7 +611,7 @@ export default function TeamAndPermissionsPage() {
               </button>
             </form>
           </div>
-          <div style={{ marginTop: 12, padding: "14px 18px", borderRadius: 12, background: "rgba(255,255,255,.02)", border: "1px solid rgba(255,255,255,.06)", display: "flex", gap: 12, alignItems: "flex-start" }}>
+          <div style={{ marginTop: 12, padding: isMobile ? "12px 10px" : "14px 18px", borderRadius: 12, background: "rgba(255,255,255,.02)", border: "1px solid rgba(255,255,255,.06)", display: "flex", gap: 12, alignItems: "flex-start" }}>
             <span style={{ fontSize: 16, flexShrink: 0 }}>ℹ️</span>
             <div style={{ fontSize: 12, color: "#475569", lineHeight: 1.7 }}>
               Invited member will receive an email with a link to set their password and join your workspace. You can change their role anytime from the <strong style={{ color: "#818cf8" }}>Team Members</strong> tab.
@@ -620,7 +622,7 @@ export default function TeamAndPermissionsPage() {
 
       {/* ══════════════ TAB: PERMISSIONS ══════════════ */}
       {tab === "permissions" && (
-        <div style={{ display: "grid", gridTemplateColumns: "220px 1fr", gap: 16, alignItems: "start" }}>
+        <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "220px 1fr", gap: 16, alignItems: "start" }}>
           {/* Role sidebar */}
           <div style={{ background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)", borderRadius: 14, padding: "14px 10px", position: "sticky", top: 16 }}>
             <div style={{ fontSize: 10, fontWeight: 800, color: "#334155", letterSpacing: ".1em", textTransform: "uppercase", marginBottom: 10, paddingLeft: 8 }}>Roles</div>
@@ -639,7 +641,7 @@ export default function TeamAndPermissionsPage() {
           </div>
 
           {/* Permissions panel */}
-          <div style={{ background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)", borderRadius: 14, padding: "20px 22px" }}>
+          <div style={{ background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)", borderRadius: 14, padding: isMobile ? "12px 10px" : "20px 22px" }}>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 18, flexWrap: "wrap", gap: 10 }}>
               <div>
                 <div style={{ fontSize: 16, fontWeight: 800, color: roleMeta(selRole).color }}>{selRole.replace(/_/g, " ")}</div>
@@ -709,7 +711,7 @@ export default function TeamAndPermissionsPage() {
                 return (
                   <div key={u.id} style={{ background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)", borderRadius: 14, overflow: "hidden" }}>
                     {/* Card header */}
-                    <div onClick={() => setShiftExpanded(isOpen ? null : u.id)} style={{ display: "flex", alignItems: "center", gap: 14, padding: "14px 18px", cursor: "pointer", background: isOpen ? "rgba(99,102,241,.05)" : "transparent", transition: "background .12s" }}>
+                    <div onClick={() => setShiftExpanded(isOpen ? null : u.id)} style={{ display: "flex", alignItems: "center", gap: 14, padding: isMobile ? "12px 10px" : "14px 18px", cursor: "pointer", background: isOpen ? "rgba(99,102,241,.05)" : "transparent", transition: "background .12s" }}>
                       <div style={{ width: 38, height: 38, borderRadius: "50%", background: rm.bg, border: `1px solid ${rm.border}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, fontWeight: 800, color: rm.color, flexShrink: 0 }}>
                         {u.name?.[0]?.toUpperCase() || "?"}
                       </div>
@@ -769,7 +771,7 @@ export default function TeamAndPermissionsPage() {
                             </div>
 
                             {/* Times grid */}
-                            <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 12, paddingTop: 14 }}>
+                            <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 12, paddingTop: 14 }}>
                               {([
                                 { label: "Start Time",             key: "startTime",    type: "" },
                                 { label: "End Time",               key: "endTime",      type: "" },
@@ -850,7 +852,7 @@ export default function TeamAndPermissionsPage() {
         <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.6)", backdropFilter: "blur(5px)", zIndex: 1000, display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}
           onClick={e => { if (e.target === e.currentTarget) setModal(false); }}>
           <div style={{ background: "#0f172a", border: "1px solid rgba(255,255,255,.1)", borderRadius: 20, width: "100%", maxWidth: 560, maxHeight: "90vh", overflowY: "auto", boxShadow: "0 40px 100px rgba(0,0,0,.5)" }}>
-            <div style={{ padding: "20px 24px", borderBottom: "1px solid rgba(255,255,255,.07)", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+            <div style={{ padding: isMobile ? "12px 11px" : "20px 24px", borderBottom: "1px solid rgba(255,255,255,.07)", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
               <div>
                 <div style={{ fontSize: 17, fontWeight: 900 }}>{editing ? "✏️ Edit User" : "➕ Add New User"}</div>
                 <div style={{ fontSize: 12, color: "#475569", marginTop: 2 }}>{editing ? "Update user details and branch access" : "Create a new team member account"}</div>
@@ -858,7 +860,7 @@ export default function TeamAndPermissionsPage() {
               <button onClick={() => setModal(false)} style={{ width: 30, height: 30, borderRadius: "50%", border: "1px solid rgba(255,255,255,.1)", background: "rgba(255,255,255,.05)", color: "#475569", cursor: "pointer", fontSize: 16, display: "flex", alignItems: "center", justifyContent: "center", fontFamily: ff }}>×</button>
             </div>
 
-            <form onSubmit={saveUser} style={{ padding: "22px 24px", display: "flex", flexDirection: "column", gap: 16 }}>
+            <form onSubmit={saveUser} style={{ padding: isMobile ? "12px 11px" : "22px 24px", display: "flex", flexDirection: "column", gap: 16 }}>
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
                 <div>
                   <label style={lbl}>Full Name</label>

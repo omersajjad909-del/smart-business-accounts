@@ -3,12 +3,14 @@
 import { useMemo, useState } from "react";
 import { useBusinessRecords } from "@/lib/useBusinessRecords";
 import { mapFinishedGoodsRecord, mapQualityCheckRecord } from "../_shared";
+import { useResponsive } from "@/hooks/useResponsive";
 
 const ff = "'Outfit','Inter',sans-serif";
 const bg = "rgba(255,255,255,0.03)";
 const border = "rgba(255,255,255,0.07)";
 
 export default function ManufacturingQualityPage() {
+  const { isMobile } = useResponsive();
   const qualityStore = useBusinessRecords("quality_check");
   const finishedGoodsStore = useBusinessRecords("finished_good_batch");
   const [showModal, setShowModal] = useState(false);
@@ -49,7 +51,7 @@ export default function ManufacturingQualityPage() {
   }
 
   return (
-    <div style={{ padding: "28px 32px", fontFamily: ff, color: "#fff", minHeight: "100vh" }}>
+    <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", fontFamily: ff, color: "#fff", minHeight: "100vh" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 28 }}>
         <div>
           <h1 style={{ fontSize: 22, fontWeight: 800, margin: "0 0 4px" }}>Quality Control</h1>
@@ -60,14 +62,14 @@ export default function ManufacturingQualityPage() {
         </button>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 12, marginBottom: 24 }}>
+      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 12, marginBottom: 24 }}>
         {[
           { label: "Checks", value: checks.length, color: "#a855f7" },
           { label: "Passed", value: checks.filter((item) => item.result === "passed").length, color: "#22c55e" },
           { label: "Rejected", value: checks.filter((item) => item.result === "rejected").length, color: "#ef4444" },
           { label: "Finished Goods Tracked", value: finishedGoods.length, color: "#38bdf8" },
         ].map((card) => (
-          <div key={card.label} style={{ background: bg, border: `1px solid ${border}`, borderRadius: 14, padding: "18px 20px" }}>
+          <div key={card.label} style={{ background: bg, border: `1px solid ${border}`, borderRadius: 14, padding: isMobile ? "12px 10px" : "18px 20px" }}>
             <div style={{ fontSize: 12, color: "rgba(255,255,255,.5)", marginBottom: 6 }}>{card.label}</div>
             <div style={{ fontSize: 22, fontWeight: 800, color: card.color }}>{card.value}</div>
           </div>
@@ -89,12 +91,12 @@ export default function ManufacturingQualityPage() {
             <tbody>
               {checks.map((check) => (
                 <tr key={check.id}>
-                  <td style={{ padding: "14px 16px", borderBottom: "1px solid rgba(255,255,255,.05)", color: "rgba(255,255,255,.55)" }}>{check.inspectionNo}</td>
-                  <td style={{ padding: "14px 16px", borderBottom: "1px solid rgba(255,255,255,.05)", fontWeight: 700 }}>{check.itemName}</td>
-                  <td style={{ padding: "14px 16px", borderBottom: "1px solid rgba(255,255,255,.05)" }}>{check.stage}</td>
-                  <td style={{ padding: "14px 16px", borderBottom: "1px solid rgba(255,255,255,.05)" }}>{check.inspector || "Not assigned"}</td>
-                  <td style={{ padding: "14px 16px", borderBottom: "1px solid rgba(255,255,255,.05)" }}>{check.checkedDate}</td>
-                  <td style={{ padding: "14px 16px", borderBottom: "1px solid rgba(255,255,255,.05)" }}>
+                  <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.05)", color: "rgba(255,255,255,.55)" }}>{check.inspectionNo}</td>
+                  <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.05)", fontWeight: 700 }}>{check.itemName}</td>
+                  <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.05)" }}>{check.stage}</td>
+                  <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.05)" }}>{check.inspector || "Not assigned"}</td>
+                  <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.05)" }}>{check.checkedDate}</td>
+                  <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.05)" }}>
                     <span style={{ display: "inline-block", background: check.result === "passed" ? "rgba(34,197,94,.15)" : check.result === "rejected" ? "rgba(239,68,68,.15)" : "rgba(245,158,11,.15)", color: check.result === "passed" ? "#22c55e" : check.result === "rejected" ? "#ef4444" : "#f59e0b", borderRadius: 999, padding: "4px 10px", fontSize: 11, fontWeight: 700 }}>
                       {check.result.toUpperCase()}
                     </span>

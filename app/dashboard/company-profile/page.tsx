@@ -8,6 +8,7 @@ import { CURRENCY_LABEL, SUPPORTED_CURRENCIES, currencyByCountry } from "@/lib/c
 import Link from "next/link";
 import ImageAdjusterModal from "@/components/ImageAdjusterModal";
 import { dispatchCompanyProfileUpdated, dispatchUserProfileUpdated } from "@/lib/dashboardProfileEvents";
+import { useResponsive } from "@/hooks/useResponsive";
 
 type CompanyData = {
   id: string;
@@ -57,6 +58,7 @@ const PLAN_META: Record<string, { color: string; bg: string; border: string; ico
 const CURRENCIES = [...SUPPORTED_CURRENCIES];
 
 export default function CompanyProfilePage() {
+  const { isMobile } = useResponsive();
   const currentUser = getCurrentUser();
   const isAdmin = currentUser?.role === "ADMIN";
 
@@ -466,7 +468,7 @@ export default function CompanyProfilePage() {
         {editing && isAdmin && (
           <div>
             <div style={{ height: "1px", background: "var(--border)", marginBottom: "20px" }} />
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "14px", marginBottom: "16px" }}>
+            <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr 1fr", gap: "14px", marginBottom: "16px" }}>
               <div>
                 <label style={fieldLabel}>Company Name</label>
                 <input
@@ -547,7 +549,7 @@ export default function CompanyProfilePage() {
       </div>
 
       {/* ── QUICK STATS ROW ── */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "12px", marginBottom: "16px" }}>
+      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: "12px", marginBottom: "16px" }}>
         {[
           { label: "Team Members", value: userCount, icon: "👥", color: "#6366f1" },
           { label: "Branches", value: branches.length, sub: `${activeBranches} active`, icon: "🏢", color: "#0891b2" },
@@ -560,7 +562,7 @@ export default function CompanyProfilePage() {
               background: "var(--panel-bg)",
               border: "1px solid var(--border)",
               borderRadius: "12px",
-              padding: "18px 20px",
+              padding: isMobile ? "12px 10px" : "18px 20px",
               display: "flex",
               flexDirection: "column",
               gap: "6px",
@@ -809,7 +811,7 @@ export default function CompanyProfilePage() {
               <div
                 key={branch.id}
                 style={{
-                  padding: "14px 16px",
+                  padding: isMobile ? "12px 10px" : "14px 16px",
                   borderRadius: "10px",
                   background: "var(--app-bg)",
                   border: "1px solid var(--border)",

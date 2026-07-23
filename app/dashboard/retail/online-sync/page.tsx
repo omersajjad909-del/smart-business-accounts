@@ -3,6 +3,7 @@ import { useState, useMemo } from "react";
 import { useBusinessRecords } from "@/lib/useBusinessRecords";
 import { confirmToast } from "@/lib/toast-feedback";
 import toast from "react-hot-toast";
+import { useResponsive } from "@/hooks/useResponsive";
 
 const F = "'Outfit','Inter',sans-serif";
 const BG = "rgba(255,255,255,0.03)";
@@ -34,6 +35,7 @@ const BLANK = {
 };
 
 export default function OnlineSyncPage() {
+  const { isMobile } = useResponsive();
   const { records, loading, create, update, remove, setStatus } = useBusinessRecords("online_store_sync");
   const [showModal, setShowModal] = useState(false);
   const [editId, setEditId]       = useState<string | null>(null);
@@ -103,7 +105,7 @@ export default function OnlineSyncPage() {
   const totalProducts = stores.reduce((a, s) => a + s.productCount, 0);
 
   return (
-    <div style={{ fontFamily: F, minHeight: "100vh", padding: "28px 24px", color: "var(--text-primary)" }}>
+    <div style={{ fontFamily: F, minHeight: "100vh", padding: isMobile ? "15px 11px" : "28px 24px", color: "var(--text-primary)" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 24 }}>
         <div>
           <h1 style={{ fontSize: 22, fontWeight: 800, margin: 0 }}>Online Store Sync</h1>
@@ -117,14 +119,14 @@ export default function OnlineSyncPage() {
       </div>
 
       {/* KPI row */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 12, marginBottom: 24 }}>
+      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 12, marginBottom: 24 }}>
         {[
           { label: "Stores Connected", value: stores.length,  color: "#a78bfa" },
           { label: "Active Syncs",     value: totalActive,    color: "#10b981" },
           { label: "Products Synced",  value: totalProducts,  color: "#38bdf8" },
           { label: "Orders Today",     value: totalOrders,    color: "#fbbf24" },
         ].map(k => (
-          <div key={k.label} style={{ background: BG, border: `1px solid ${BD}`, borderRadius: 14, padding: "16px 18px" }}>
+          <div key={k.label} style={{ background: BG, border: `1px solid ${BD}`, borderRadius: 14, padding: isMobile ? "12px 10px" : "16px 18px" }}>
             <div style={{ fontSize: 11, color: "var(--text-muted)", fontWeight: 600, marginBottom: 6, textTransform: "uppercase", letterSpacing: .5 }}>{k.label}</div>
             <div style={{ fontSize: 26, fontWeight: 800, color: k.color }}>{k.value}</div>
           </div>

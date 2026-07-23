@@ -5,11 +5,13 @@ import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { DateInput } from "@/app/dashboard/reports/_components/DateInput";
 import { getCurrentUser } from "@/lib/auth";
+import { useResponsive } from "@/hooks/useResponsive";
 
 const todayStr = () => new Date().toISOString().slice(0, 10);
 const fmtN = (n: number) => Math.abs(n).toLocaleString(undefined, { minimumFractionDigits:2, maximumFractionDigits:2 });
 
 export default function BalanceSheetPage() {
+  const { isMobile } = useResponsive();
   const router  = useRouter();
   const dateRef = useRef<HTMLInputElement>(null);
   const [showModal,     setShowModal]     = useState(true);
@@ -116,7 +118,7 @@ export default function BalanceSheetPage() {
           {data && !loading && (
             <>
               {/* Report header */}
-              <div style={{ border:"1px solid rgba(255,255,255,.08)", borderRadius:16, padding:"28px 32px", marginBottom:20, background:"linear-gradient(135deg,rgba(59,130,246,.1),rgba(37,99,235,.05))" }}>
+              <div style={{ border:"1px solid rgba(255,255,255,.08)", borderRadius:16, padding: isMobile ? "15px 14px" : "28px 32px", marginBottom:20, background:"linear-gradient(135deg,rgba(59,130,246,.1),rgba(37,99,235,.05))" }}>
                 <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", flexWrap:"wrap", gap:12 }}>
                   <div>
                     <div style={{ fontSize:22, fontWeight:900, color:"white", letterSpacing:"-.5px" }}>{companyName}</div>
@@ -144,7 +146,7 @@ export default function BalanceSheetPage() {
                     </tr></thead>
                     <tbody>
                       {!data.assets || data.assets.length === 0 ? (
-                        <tr><td colSpan={2} style={{ padding:"24px 16px", textAlign:"center", color:"rgba(255,255,255,.3)", fontSize:13 }}>No assets found</td></tr>
+                        <tr><td colSpan={2} style={{ padding: isMobile ? "13px 10px" : "24px 16px", textAlign:"center", color:"rgba(255,255,255,.3)", fontSize:13 }}>No assets found</td></tr>
                       ) : data.assets.map((a: any, i: number) => (
                         <tr key={i} style={{ borderBottom:"1px solid rgba(255,255,255,.04)" }}>
                           <td style={td}>{a.name}</td>
@@ -206,7 +208,7 @@ export default function BalanceSheetPage() {
 
               {/* Balanced indicator */}
               <div style={{
-                padding:"18px 24px", borderRadius:14, textAlign:"center", fontSize:16, fontWeight:800, textTransform:"uppercase", letterSpacing:".04em",
+                padding: isMobile ? "12px 11px" : "18px 24px", borderRadius:14, textAlign:"center", fontSize:16, fontWeight:800, textTransform:"uppercase", letterSpacing:".04em",
                 background: data.isBalanced ? "rgba(52,211,153,.1)" : "rgba(239,68,68,.1)",
                 border: `2px solid ${data.isBalanced ? "rgba(52,211,153,.35)" : "rgba(239,68,68,.35)"}`,
                 color: data.isBalanced ? "#34d399" : "#f87171",

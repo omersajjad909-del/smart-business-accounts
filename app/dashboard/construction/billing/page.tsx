@@ -5,6 +5,7 @@ import toast from "react-hot-toast";
 import { useMemo, useState } from "react";
 import { useBusinessRecords } from "@/lib/useBusinessRecords";
 import {
+import { useResponsive } from "@/hooks/useResponsive";
   constructionBg,
   constructionBorder,
   constructionFont,
@@ -16,6 +17,7 @@ import {
 } from "../_shared";
 
 export default function ConstructionBillingPage() {
+  const { isMobile } = useResponsive();
   const billingStore = useBusinessRecords("construction_billing");
   const projectStore = useBusinessRecords("construction_project");
   const boqStore = useBusinessRecords("construction_boq");
@@ -80,7 +82,7 @@ export default function ConstructionBillingPage() {
   }
 
   return (
-    <div style={{ minHeight: "100vh", padding: "28px 32px", color: "#fff", fontFamily: constructionFont }}>
+    <div style={{ minHeight: "100vh", padding: isMobile ? "15px 14px" : "28px 32px", color: "#fff", fontFamily: constructionFont }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24, gap: 16, flexWrap: "wrap" }}>
         <div>
           <h1 style={{ margin: "0 0 6px", fontSize: 24, fontWeight: 800 }}>Progress Billing</h1>
@@ -89,14 +91,14 @@ export default function ConstructionBillingPage() {
         <button onClick={() => setShowModal(true)} style={{ padding: "10px 18px", borderRadius: 10, border: "none", background: "#f97316", color: "#fff", fontWeight: 700, cursor: "pointer" }}>New Bill</button>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4,minmax(0,1fr))", gap: 12, marginBottom: 18 }}>
+      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,minmax(0,1fr))", gap: 12, marginBottom: 18 }}>
         {[
           { label: "Draft Bills", value: billings.filter((row) => row.status === "draft").length, color: "#f59e0b" },
           { label: "Approved", value: billings.filter((row) => row.status === "approved").length, color: "#818cf8" },
           { label: "Paid Value", value: `Rs. ${billings.filter((row) => row.status === "paid").reduce((sum, row) => sum + row.certifiedValue, 0).toLocaleString()}`, color: "#34d399" },
           { label: "Pending Value", value: `Rs. ${billings.filter((row) => row.status !== "paid").reduce((sum, row) => sum + row.certifiedValue, 0).toLocaleString()}`, color: "#f87171" },
         ].map((card) => (
-          <div key={card.label} style={{ background: constructionBg, border: `1px solid ${constructionBorder}`, borderRadius: 12, padding: "18px 20px" }}>
+          <div key={card.label} style={{ background: constructionBg, border: `1px solid ${constructionBorder}`, borderRadius: 12, padding: isMobile ? "12px 10px" : "18px 20px" }}>
             <div style={{ fontSize: 12, color: constructionMuted, marginBottom: 8 }}>{card.label}</div>
             <div style={{ fontSize: 20, fontWeight: 800, color: card.color }}>{card.value}</div>
           </div>
@@ -113,15 +115,15 @@ export default function ConstructionBillingPage() {
           <tbody>
             {billings.map((row) => (
               <tr key={row.id}>
-                <td style={{ padding: "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)", fontWeight: 700 }}>{row.project}</td>
-                <td style={{ padding: "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)" }}>{row.invoiceNo}</td>
-                <td style={{ padding: "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)" }}>{row.client}</td>
-                <td style={{ padding: "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)" }}>{row.site}</td>
-                <td style={{ padding: "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)", color: "#60a5fa" }}>{row.progress}%</td>
-                <td style={{ padding: "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)", color: "#34d399" }}>Rs. {row.certifiedValue.toLocaleString()}</td>
-                <td style={{ padding: "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)" }}>{row.date}</td>
-                <td style={{ padding: "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)" }}>{row.status}</td>
-                <td style={{ padding: "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)" }}>
+                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)", fontWeight: 700 }}>{row.project}</td>
+                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)" }}>{row.invoiceNo}</td>
+                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)" }}>{row.client}</td>
+                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)" }}>{row.site}</td>
+                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)", color: "#60a5fa" }}>{row.progress}%</td>
+                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)", color: "#34d399" }}>Rs. {row.certifiedValue.toLocaleString()}</td>
+                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)" }}>{row.date}</td>
+                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)" }}>{row.status}</td>
+                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)" }}>
                   <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
                     {row.status === "draft" && <button onClick={() => advance(row.id, "submitted")} style={{ padding: "5px 10px", borderRadius: 6, background: "rgba(245,158,11,.15)", border: "1px solid rgba(245,158,11,.3)", color: "#f59e0b", cursor: "pointer" }}>Submit</button>}
                     {row.status === "submitted" && <button onClick={() => advance(row.id, "approved")} style={{ padding: "5px 10px", borderRadius: 6, background: "rgba(129,140,248,.15)", border: "1px solid rgba(129,140,248,.3)", color: "#a5b4fc", cursor: "pointer" }}>Approve</button>}

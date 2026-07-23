@@ -1,6 +1,7 @@
 "use client";
 import { useMemo, useState } from "react";
 import { useBusinessRecords, BusinessRecord } from "@/lib/useBusinessRecords";
+import { useResponsive } from "@/hooks/useResponsive";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -551,7 +552,7 @@ function BillOfLadingModal({ ship, onClose }: { ship: Shipment; onClose: () => v
             </div>
 
             {/* Vessel / Route */}
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 0, border: "1px solid #ccc", marginBottom: 16 }}>
+            <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 0, border: "1px solid #ccc", marginBottom: 16 }}>
               {[
                 ["Mode of Transport", ship.mode],
                 ["Port of Loading", ship.originPort],
@@ -602,7 +603,7 @@ function BillOfLadingModal({ ship, onClose }: { ship: Shipment; onClose: () => v
             {ship.notes && <div style={{ border: "1px solid #ccc", padding: "10px 14px", marginBottom: 16, fontSize: 11, color: "#444" }}><b>Notes:</b> {ship.notes}</div>}
 
             {/* Signatures */}
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 20, marginTop: 32 }}>
+            <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr 1fr", gap: 20, marginTop: 32 }}>
               {["Shipper's Signature", "Carrier's Signature", "Consignee's Signature"].map(s => (
                 <div key={s}>
                   <div style={{ borderTop: "1px solid #000", paddingTop: 8, fontSize: 11, color: "#555" }}>{s}</div>
@@ -624,6 +625,7 @@ function BillOfLadingModal({ ship, onClose }: { ship: Shipment; onClose: () => v
 // ─── Main Page ────────────────────────────────────────────────────────────────
 
 export default function ShipmentsPage() {
+  const { isMobile } = useResponsive();
   const { records, loading, create, update } = useBusinessRecords("shipment");
 
   const [activeTab,  setActiveTab]  = useState("ALL");
@@ -709,12 +711,12 @@ export default function ShipmentsPage() {
 
   const kpiCard: React.CSSProperties = {
     ...panel,
-    padding:    "18px 20px",
+    padding: isMobile ? "12px 10px" : "18px 20px",
     textAlign:  "center",
   };
 
   return (
-    <div style={{ fontFamily: font, color: "var(--text-primary)", padding: 24, minHeight: "100vh", background: "var(--app-bg)" }}>
+    <div style={{ fontFamily: font, color: "var(--text-primary)", padding: isMobile ? "12px" : "24px", minHeight: "100vh", background: "var(--app-bg)" }}>
 
       {/* Header */}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 24 }}>

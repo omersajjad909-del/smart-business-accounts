@@ -3,6 +3,7 @@ import { confirmToast, alertToast } from "@/lib/toast-feedback";
 
 import { useMemo, useState } from "react";
 import { useBusinessRecords, type BusinessRecord } from "@/lib/useBusinessRecords";
+import { useResponsive } from "@/hooks/useResponsive";
 
 type FormField = {
   key: string;
@@ -92,6 +93,7 @@ export function BusinessRecordWorkspace({
     [defaultValues, fields],
   );
 
+  const { isMobile } = useResponsive();
   const { records, loading, create, remove, setStatus, refetch } = useBusinessRecords(category);
   const [form, setForm] = useState<Record<string, string>>(initialForm);
   const [search, setSearch] = useState("");
@@ -160,7 +162,7 @@ export function BusinessRecordWorkspace({
   }
 
   return (
-    <div style={{ padding: "28px 32px", fontFamily: shellFont, color: "#e2e8f0" }}>
+    <div style={{ padding: isMobile ? "16px" : "28px 32px", fontFamily: shellFont, color: "#e2e8f0" }}>
       <div style={{ display: "flex", justifyContent: "space-between", gap: 20, flexWrap: "wrap", marginBottom: 24 }}>
         <div>
           <h1 style={{ margin: "0 0 6px", fontSize: 24, fontWeight: 800, color: "white" }}>{title}</h1>
@@ -215,7 +217,7 @@ export function BusinessRecordWorkspace({
         ))}
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "340px 1fr", gap: 16, alignItems: "start" }}>
+      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "340px 1fr", gap: 16, alignItems: "start" }}>
         <form onSubmit={handleCreate} style={{ background: panelBg, border: `1px solid ${panelBorder}`, borderRadius: 16, padding: 20 }}>
           <div style={{ fontSize: 15, fontWeight: 700, color: "white", marginBottom: 14 }}>Create Record</div>
           <div style={{ display: "grid", gap: 12 }}>

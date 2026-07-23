@@ -3,10 +3,12 @@
 import { useMemo, useState } from "react";
 import { useBusinessRecords } from "@/lib/useBusinessRecords";
 import { mapBatchRecords, pharmacyBg, pharmacyBorder, pharmacyFont, pharmacyMuted, todayIso } from "../_shared";
+import { useResponsive } from "@/hooks/useResponsive";
 
 const initialForm = { medicine: "", batchNo: "", supplier: "", quantity: 0, costPerUnit: 0, expiryDate: "", receivedDate: todayIso() };
 
 export default function PharmacyBatchesPage() {
+  const { isMobile } = useResponsive();
   const { records, loading, create, update } = useBusinessRecords("drug_batch");
   const [showModal, setShowModal] = useState(false);
   const [error, setError] = useState("");
@@ -43,7 +45,7 @@ export default function PharmacyBatchesPage() {
   }
 
   return (
-    <div style={{ minHeight: "100vh", padding: "28px 32px", color: "#fff", fontFamily: pharmacyFont }}>
+    <div style={{ minHeight: "100vh", padding: isMobile ? "15px 14px" : "28px 32px", color: "#fff", fontFamily: pharmacyFont }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24 }}>
         <div>
           <h1 style={{ margin: "0 0 6px", fontSize: 22, fontWeight: 800 }}>Batch Control</h1>
@@ -62,15 +64,15 @@ export default function PharmacyBatchesPage() {
           <tbody>
             {batches.map((row) => (
               <tr key={row.id}>
-                <td style={{ padding: "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)", fontWeight: 700 }}>{row.medicine}</td>
-                <td style={{ padding: "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)" }}>{row.batchNo}</td>
-                <td style={{ padding: "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)", color: pharmacyMuted }}>{row.supplier || "-"}</td>
-                <td style={{ padding: "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)" }}>{row.quantity}</td>
-                <td style={{ padding: "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)" }}>Rs. {row.costPerUnit.toLocaleString()}</td>
-                <td style={{ padding: "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)" }}>{row.receivedDate}</td>
-                <td style={{ padding: "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)" }}>{row.expiryDate}</td>
-                <td style={{ padding: "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)" }}>{row.status}</td>
-                <td style={{ padding: "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)" }}>
+                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)", fontWeight: 700 }}>{row.medicine}</td>
+                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)" }}>{row.batchNo}</td>
+                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)", color: pharmacyMuted }}>{row.supplier || "-"}</td>
+                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)" }}>{row.quantity}</td>
+                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)" }}>Rs. {row.costPerUnit.toLocaleString()}</td>
+                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)" }}>{row.receivedDate}</td>
+                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)" }}>{row.expiryDate}</td>
+                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)" }}>{row.status}</td>
+                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)" }}>
                   {row.status === "active" && <button onClick={() => update(row.id, { status: "closed" })} style={{ padding: "5px 10px", background: "rgba(248,113,113,.14)", border: "1px solid rgba(248,113,113,.28)", color: "#f87171", borderRadius: 6, fontSize: 11, cursor: "pointer" }}>Close</button>}
                 </td>
               </tr>

@@ -4,6 +4,7 @@ import { FormEvent, useEffect, useState } from "react";
 import ImageAdjusterModal from "@/components/ImageAdjusterModal";
 import { dispatchUserProfileUpdated } from "@/lib/dashboardProfileEvents";
 import { getCurrentUser, updateStoredUser } from "@/lib/auth";
+import { useResponsive } from "@/hooks/useResponsive";
 
 type ProfileResponse = {
   id?: string;
@@ -60,6 +61,7 @@ function Alert({ msg, type }: { msg: string; type: "error" | "success" }) {
 }
 
 export default function AccountSettingsPage() {
+  const { isMobile } = useResponsive();
   const currentUser = getCurrentUser();
   const isAdmin = currentUser?.role === "ADMIN";
 
@@ -421,7 +423,7 @@ export default function AccountSettingsPage() {
             {emailStep === "otp" && (
               <form onSubmit={handleEmailVerify}>
                 <div style={{ display: "grid", gap: 14 }}>
-                  <div style={{ padding: "14px 16px", borderRadius: 12, background: "rgba(99,102,241,.1)", border: "1px solid rgba(99,102,241,.25)", fontSize: 13, color: "#c7d2fe", lineHeight: 1.6 }}>
+                  <div style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderRadius: 12, background: "rgba(99,102,241,.1)", border: "1px solid rgba(99,102,241,.25)", fontSize: 13, color: "#c7d2fe", lineHeight: 1.6 }}>
                     A 6-digit OTP has been sent to your <strong>current email</strong> <strong>{maskedNewEmail}</strong>. It will expire in 15 minutes.
                   </div>
                   <label>

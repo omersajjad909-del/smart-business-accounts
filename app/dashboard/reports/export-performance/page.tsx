@@ -2,6 +2,7 @@
 import { useState, useMemo, useEffect } from "react";
 import DateInput from "@/app/dashboard/reports/_components/DateInput";
 import { getCurrentUser } from "@/lib/auth";
+import { useResponsive } from "@/hooks/useResponsive";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -51,13 +52,13 @@ interface ProductPerf {
 const FONT = "'Outfit','Inter',sans-serif";
 
 const s = {
-  page:   { fontFamily: FONT, color: "var(--text-primary)", padding: "28px 24px", minHeight: "100vh", background: "var(--app-bg)" },
+  page:   { fontFamily: FONT, color: "var(--text-primary)", padding: isMobile ? "17px 12px" : "28px 24px", minHeight: "100vh", background: "var(--app-bg)" },
   panel:  { background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 14, padding: 20 },
-  inp:    { background: "rgba(255,255,255,.05)", border: "1px solid var(--border)", borderRadius: 8, padding: "8px 12px", color: "var(--text-primary)", fontFamily: FONT, fontSize: 13, boxSizing: "border-box" as const, outline: "none" },
-  th:     { padding: "10px 13px", textAlign: "left" as const, fontSize: 11, color: "var(--text-muted)", fontWeight: 600, textTransform: "uppercase" as const, letterSpacing: "0.06em", whiteSpace: "nowrap" as const, borderBottom: "1px solid var(--border)" },
-  td:     { padding: "11px 13px", fontSize: 12, color: "var(--text-primary)", borderBottom: "1px solid var(--border)", verticalAlign: "middle" as const },
-  kpi:    { background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 12, padding: "18px 20px" },
-  tabBtn: (active: boolean, color = "#10b981") => ({ background: active ? color : "rgba(255,255,255,.06)", border: `1px solid ${active ? color : "var(--border)"}`, borderRadius: 8, padding: "7px 16px", color: active ? "#fff" : "var(--text-muted)", fontFamily: FONT, cursor: "pointer", fontSize: 12, fontWeight: 600 }),
+  inp:    { background: "rgba(255,255,255,.05)", border: "1px solid var(--border)", borderRadius: 8, padding: isMobile ? "8px 8px" : "8px 12px", color: "var(--text-primary)", fontFamily: FONT, fontSize: 13, boxSizing: "border-box" as const, outline: "none" },
+  th:     { padding: isMobile ? "8px 8px" : "10px 13px", textAlign: "left" as const, fontSize: 11, color: "var(--text-muted)", fontWeight: 600, textTransform: "uppercase" as const, letterSpacing: "0.06em", whiteSpace: "nowrap" as const, borderBottom: "1px solid var(--border)" },
+  td:     { padding: isMobile ? "8px 8px" : "11px 13px", fontSize: 12, color: "var(--text-primary)", borderBottom: "1px solid var(--border)", verticalAlign: "middle" as const },
+  kpi:    { background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 12, padding: isMobile ? "11px 10px" : "18px 20px" },
+  tabBtn: (active: boolean, color = "#10b981") => ({ background: active ? color : "rgba(255,255,255,.06)", border: `1px solid ${active ? color : "var(--border)"}`, borderRadius: 8, padding: isMobile ? "8px 8px" : "7px 16px", color: active ? "#fff" : "var(--text-muted)", fontFamily: FONT, cursor: "pointer", fontSize: 12, fontWeight: 600 }),
 };
 
 const fmt = (n: number) => `$${n.toLocaleString("en-US", { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
@@ -87,6 +88,7 @@ function authHeaders(): Record<string, string> {
 // ─── Main Page ────────────────────────────────────────────────────────────────
 
 export default function ExportPerformancePage() {
+  const { isMobile } = useResponsive();
   const today    = new Date().toISOString().split("T")[0];
   const yearStart = `${new Date().getFullYear()}-01-01`;
 
@@ -260,12 +262,12 @@ export default function ExportPerformancePage() {
         <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
           {activeTab === "detail" && (
             <select value={countryFilter} onChange={e => setCountryFilter(e.target.value)}
-              style={{ ...s.inp, width: "auto", padding: "7px 12px", fontSize: 12 }}>
+              style={{ ...s.inp, width: "auto", padding: isMobile ? "8px 8px" : "7px 12px", fontSize: 12 }}>
               {allCountries.map(c => <option key={c} value={c}>{c === "ALL" ? "All Countries" : c}</option>)}
             </select>
           )}
           <input placeholder="Search…" value={search} onChange={e => setSearch(e.target.value)}
-            style={{ ...s.inp, width: 220, padding: "7px 12px" }} />
+            style={{ ...s.inp, width: 220, padding: isMobile ? "8px 8px" : "7px 12px" }} />
         </div>
       </div>
 
@@ -361,7 +363,7 @@ export default function ExportPerformancePage() {
                     >
                       <td style={{ ...s.td, color: "var(--text-muted)", width: 36 }}>{i + 1}</td>
                       <td style={{ ...s.td, fontWeight: 700 }}>{p.product}</td>
-                      <td style={s.td}><span style={{ background: "rgba(167,139,250,.12)", color: "#a78bfa", border: "1px solid rgba(167,139,250,.3)", borderRadius: 6, padding: "2px 8px", fontSize: 11 }}>{p.hsCode}</span></td>
+                      <td style={s.td}><span style={{ background: "rgba(167,139,250,.12)", color: "#a78bfa", border: "1px solid rgba(167,139,250,.3)", borderRadius: 6, padding: isMobile ? "8px 8px" : "2px 8px", fontSize: 11 }}>{p.hsCode}</span></td>
                       <td style={{ ...s.td, minWidth: 200 }}>{buildBar(p.revenue, maxProductRev, "#a78bfa")}</td>
                       <td style={{ ...s.td, textAlign: "right" }}>
                         {kpis.total > 0 ? ((p.revenue / kpis.total) * 100).toFixed(1) : 0}%
@@ -401,12 +403,12 @@ export default function ExportPerformancePage() {
                         <td style={{ ...s.td, fontWeight: 600 }}>{r.customer}</td>
                         <td style={s.td}>{r.country}</td>
                         <td style={s.td}>{r.product}</td>
-                        <td style={s.td}><span style={{ background: "rgba(167,139,250,.12)", color: "#a78bfa", border: "1px solid rgba(167,139,250,.3)", borderRadius: 6, padding: "2px 7px", fontSize: 11 }}>{r.hsCode}</span></td>
+                        <td style={s.td}><span style={{ background: "rgba(167,139,250,.12)", color: "#a78bfa", border: "1px solid rgba(167,139,250,.3)", borderRadius: 6, padding: isMobile ? "8px 8px" : "2px 7px", fontSize: 11 }}>{r.hsCode}</span></td>
                         <td style={{ ...s.td, textAlign: "right" }}>{r.qty.toLocaleString()} {r.unit}</td>
                         <td style={s.td}>{r.currency}</td>
                         <td style={{ ...s.td, textAlign: "right", fontWeight: 700, color: "#4ade80" }}>{fmt(r.amountUsd)}</td>
                         <td style={s.td}>{r.shipmentRef}</td>
-                        <td style={s.td}><span style={{ background: "rgba(74,222,128,.1)", color: "#4ade80", border: "1px solid rgba(74,222,128,.25)", borderRadius: 6, padding: "2px 8px", fontSize: 11, fontWeight: 700 }}>{r.status}</span></td>
+                        <td style={s.td}><span style={{ background: "rgba(74,222,128,.1)", color: "#4ade80", border: "1px solid rgba(74,222,128,.25)", borderRadius: 6, padding: isMobile ? "8px 8px" : "2px 8px", fontSize: 11, fontWeight: 700 }}>{r.status}</span></td>
                       </tr>
                     ))}
                   </tbody>

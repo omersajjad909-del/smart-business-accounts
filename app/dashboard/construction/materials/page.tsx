@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { useBusinessRecords } from "@/lib/useBusinessRecords";
 import {
+import { useResponsive } from "@/hooks/useResponsive";
   constructionBg,
   constructionBorder,
   constructionFont,
@@ -13,6 +14,7 @@ import {
 } from "../_shared";
 
 export default function ConstructionMaterialsPage() {
+  const { isMobile } = useResponsive();
   const materialStore = useBusinessRecords("construction_material");
   const siteStore = useBusinessRecords("construction_site");
   const projectStore = useBusinessRecords("construction_project");
@@ -67,15 +69,15 @@ export default function ConstructionMaterialsPage() {
   }
 
   return (
-    <div style={{ padding: "28px 32px", fontFamily: constructionFont, color: "#fff", minHeight: "100vh" }}>
+    <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", fontFamily: constructionFont, color: "#fff", minHeight: "100vh" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 28 }}>
         <div><h1 style={{ fontSize: 22, fontWeight: 800, margin: "0 0 4px" }}>Construction Materials</h1><p style={{ fontSize: 13, color: constructionMuted, margin: 0 }}>Track site-issued materials and procurement exposure.</p></div>
         <button onClick={() => setShowModal(true)} style={{ padding: "10px 20px", borderRadius: 10, border: "none", background: "#f97316", color: "white", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>Add Material</button>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 12, marginBottom: 28 }}>
+      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(3,1fr)", gap: 12, marginBottom: 28 }}>
         {[{ label: "Total Materials", val: materials.length, color: "#f97316" }, { label: "Total Value", val: `Rs. ${totalValue.toLocaleString()}`, color: "#34d399" }, { label: "Suppliers", val: new Set(materials.map((m) => m.supplier).filter(Boolean)).size, color: "#818cf8" }].map((s) => (
-          <div key={s.label} style={{ background: constructionBg, border: `1px solid ${constructionBorder}`, borderRadius: 12, padding: "20px 24px" }}><div style={{ fontSize: 13, color: "rgba(255,255,255,.5)", marginBottom: 6 }}>{s.label}</div><div style={{ fontSize: 22, fontWeight: 700, color: s.color }}>{s.val}</div></div>
+          <div key={s.label} style={{ background: constructionBg, border: `1px solid ${constructionBorder}`, borderRadius: 12, padding: isMobile ? "12px 11px" : "20px 24px" }}><div style={{ fontSize: 13, color: "rgba(255,255,255,.5)", marginBottom: 6 }}>{s.label}</div><div style={{ fontSize: 22, fontWeight: 700, color: s.color }}>{s.val}</div></div>
         ))}
       </div>
 
@@ -89,14 +91,14 @@ export default function ConstructionMaterialsPage() {
           <tbody>
             {materials.map((m) => (
               <tr key={m.id}>
-                <td style={{ padding: "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)", fontWeight: 600 }}>{m.name}</td>
-                <td style={{ padding: "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)", fontSize: 13 }}>{m.unit}</td>
-                <td style={{ padding: "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)", fontWeight: 600 }}>{m.quantity}</td>
-                <td style={{ padding: "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)" }}>Rs. {m.unitCost.toLocaleString()}</td>
-                <td style={{ padding: "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)", color: "#34d399", fontWeight: 600 }}>Rs. {(m.quantity * m.unitCost).toLocaleString()}</td>
-                <td style={{ padding: "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)", fontSize: 13, color: "rgba(255,255,255,.5)" }}>{m.supplier || "—"}</td>
-                <td style={{ padding: "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)", fontSize: 13, color: "rgba(255,255,255,.5)" }}>{m.site}</td>
-                <td style={{ padding: "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)", fontSize: 13, color: "#fdba74" }}>{m.project || "—"}</td>
+                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)", fontWeight: 600 }}>{m.name}</td>
+                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)", fontSize: 13 }}>{m.unit}</td>
+                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)", fontWeight: 600 }}>{m.quantity}</td>
+                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)" }}>Rs. {m.unitCost.toLocaleString()}</td>
+                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)", color: "#34d399", fontWeight: 600 }}>Rs. {(m.quantity * m.unitCost).toLocaleString()}</td>
+                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)", fontSize: 13, color: "rgba(255,255,255,.5)" }}>{m.supplier || "—"}</td>
+                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)", fontSize: 13, color: "rgba(255,255,255,.5)" }}>{m.site}</td>
+                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)", fontSize: 13, color: "#fdba74" }}>{m.project || "—"}</td>
               </tr>
             ))}
             {!loading && materials.length === 0 && <tr><td colSpan={8} style={{ padding: 40, textAlign: "center", color: "rgba(255,255,255,.25)" }}>No materials yet.</td></tr>}

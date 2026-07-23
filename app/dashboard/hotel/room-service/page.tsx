@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import { useBusinessRecords } from "@/lib/useBusinessRecords";
+import { useResponsive } from "@/hooks/useResponsive";
 
 const ff = "'Outfit','Inter',sans-serif";
 const bg = "rgba(255,255,255,0.03)";
@@ -8,6 +9,7 @@ const border = "rgba(255,255,255,0.07)";
 const STATUS_COLOR: Record<string, string> = { pending: "#f59e0b", preparing: "#3b82f6", delivered: "#34d399", cancelled: "#6b7280" };
 
 export default function RoomServicePage() {
+  const { isMobile } = useResponsive();
   const { records, loading, create, update } = useBusinessRecords("room_service_order");
   const reservationStore = useBusinessRecords("hotel_reservation");
   const [showModal, setShowModal] = useState(false);
@@ -47,15 +49,15 @@ export default function RoomServicePage() {
   }
 
   return (
-    <div style={{ padding: "28px 32px", fontFamily: ff, color: "#fff", minHeight: "100vh" }}>
+    <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", fontFamily: ff, color: "#fff", minHeight: "100vh" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 28 }}>
         <div><h1 style={{ fontSize: 22, fontWeight: 800, margin: "0 0 4px" }}>🍽️ Room Service</h1><p style={{ fontSize: 13, color: "rgba(255,255,255,.4)", margin: 0 }}>Manage room service orders</p></div>
         <button onClick={() => setShowModal(true)} style={{ padding: "10px 20px", borderRadius: 10, border: "none", background: "#f97316", color: "white", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>+ New Order</button>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 12, marginBottom: 28 }}>
+      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 12, marginBottom: 28 }}>
         {[{ label: "Total Orders", val: orders.length, color: "#f97316" }, { label: "Pending", val: orders.filter(o => o.status === "pending").length, color: "#f59e0b" }, { label: "Preparing", val: orders.filter(o => o.status === "preparing").length, color: "#3b82f6" }, { label: "Revenue", val: `Rs. ${totalRevenue.toLocaleString()}`, color: "#34d399" }].map(s => (
-          <div key={s.label} style={{ background: bg, border: `1px solid ${border}`, borderRadius: 12, padding: "20px 24px" }}><div style={{ fontSize: 13, color: "rgba(255,255,255,.5)", marginBottom: 6 }}>{s.label}</div><div style={{ fontSize: 20, fontWeight: 700, color: s.color }}>{s.val}</div></div>
+          <div key={s.label} style={{ background: bg, border: `1px solid ${border}`, borderRadius: 12, padding: isMobile ? "12px 11px" : "20px 24px" }}><div style={{ fontSize: 13, color: "rgba(255,255,255,.5)", marginBottom: 6 }}>{s.label}</div><div style={{ fontSize: 20, fontWeight: 700, color: s.color }}>{s.val}</div></div>
         ))}
       </div>
 
@@ -63,7 +65,7 @@ export default function RoomServicePage() {
 
       <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
         {orders.map(o => (
-          <div key={o.id} style={{ background: bg, border: `1px solid ${border}`, borderRadius: 10, padding: "14px 20px", display: "flex", alignItems: "center", gap: 16 }}>
+          <div key={o.id} style={{ background: bg, border: `1px solid ${border}`, borderRadius: 10, padding: isMobile ? "12px 10px" : "14px 20px", display: "flex", alignItems: "center", gap: 16 }}>
             <div style={{ flex: 1 }}>
               <div style={{ display: "flex", gap: 10, alignItems: "center", marginBottom: 4 }}>
                 <span style={{ fontWeight: 700 }}>Room {o.room}</span>

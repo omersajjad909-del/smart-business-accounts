@@ -12,6 +12,7 @@ import dynamic from "next/dynamic";
 import { getCurrentUser } from "@/lib/auth";
 
 import { QRCodeSVG } from "qrcode.react";
+import { useResponsive } from "@/hooks/useResponsive";
 
 type Supplier = { id: string; name: string; partyType: string };
 
@@ -844,11 +845,11 @@ const [searchTerm, setSearchTerm] = useState("");
 
       {/* ── QUERY MODE FORM ── */}
       {piQueryMode && (
-        <div style={{ background: "rgba(250,204,21,.04)", border: "2px solid rgba(250,204,21,.3)", borderRadius: 14, padding: "22px 28px", marginBottom: 24, marginInline: 28 }}>
+        <div style={{ background: "rgba(250,204,21,.04)", border: "2px solid rgba(250,204,21,.3)", borderRadius: 14, padding: isMobile ? "12px 13px" : "22px 28px", marginBottom: 24, marginInline: 28 }}>
           <div style={{ marginBottom: 14 }}>
             <span style={{ fontSize: 12, color: "rgba(250,204,21,.7)" }}>Enter criteria — leave blank to get all. Use <b style={{ color: "#facc15" }}>&gt;</b>, <b style={{ color: "#facc15" }}>&lt;</b>, <b style={{ color: "#facc15" }}>&gt;=</b> for date range.</span>
           </div>
-          <div style={{ display: "grid", gridTemplateColumns: "180px 240px 1fr", gap: 16, marginBottom: 20 }}>
+          <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "180px 240px 1fr", gap: 16, marginBottom: 20 }}>
             <div>
               <div style={{ fontSize: 10, color: "rgba(250,204,21,.6)", fontWeight: 700, marginBottom: 5, textTransform: "uppercase" as const, letterSpacing: 0.5 }}>Invoice #</div>
               <input autoFocus value={piQueryInvNo} onChange={e => setPiQueryInvNo(e.target.value)} placeholder="PI-1 or blank…"
@@ -881,7 +882,7 @@ const [searchTerm, setSearchTerm] = useState("");
       {/* ── LIST VIEW ── */}
       {showList && (
         <div style={{ background: PANEL, border: `1px solid ${BORDER}`, borderRadius: 14, overflow: "hidden", marginInline: isMobile ? 8 : 28, marginBottom: 24 }}>
-          <div style={{ padding: "14px 18px", borderBottom: `1px solid ${BORDER}`, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
+          <div style={{ padding: isMobile ? "12px 10px" : "14px 18px", borderBottom: `1px solid ${BORDER}`, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
             <div style={{ fontWeight: 700, fontSize: 14 }}>All Purchase Invoices</div>
             <input value={searchTerm} onChange={e => setSearchTerm(e.target.value)} placeholder="Search by invoice #, supplier…" style={{ ...inp({ width: 260, padding: "7px 12px", fontSize: 12.5 }) }} />
           </div>
@@ -896,7 +897,7 @@ const [searchTerm, setSearchTerm] = useState("");
               </thead>
               <tbody>
                 {filteredInvoices.length === 0 ? (
-                  <tr><td colSpan={6} style={{ padding: "40px 16px", textAlign: "center", color: MUTED }}>No invoices found</td></tr>
+                  <tr><td colSpan={6} style={{ padding: isMobile ? "22px 10px" : "40px 16px", textAlign: "center", color: MUTED }}>No invoices found</td></tr>
                 ) : filteredInvoices.map(inv => (
                   <tr key={inv.id} style={{ borderTop: `1px solid ${BORDER}` }}
                     onMouseEnter={e => (e.currentTarget.style.background = "rgba(99,102,241,.03)")}
@@ -1230,7 +1231,7 @@ const [searchTerm, setSearchTerm] = useState("");
                     </div>
 
                     {/* Line items */}
-                    <div style={{ padding: "14px 16px", display: "flex", flexDirection: "column", gap: 9 }}>
+                    <div style={{ padding: isMobile ? "12px 10px" : "14px 16px", display: "flex", flexDirection: "column", gap: 9 }}>
                       <div style={{ display: "flex", justifyContent: "space-between", fontSize: 13 }}>
                         <span style={{ color: MUTED }}>Subtotal</span>
                         <span style={{ fontWeight: 600 }}>{cur} {subtotal.toLocaleString()}</span>
@@ -1463,6 +1464,7 @@ const [searchTerm, setSearchTerm] = useState("");
 }
 
 export default function PurchaseInvoicePage() {
+  const { isMobile } = useResponsive();
   return (
     <Suspense fallback={<div className="p-4 text-center">Loading Invoice...</div>}>
       <PurchaseInvoiceContent />

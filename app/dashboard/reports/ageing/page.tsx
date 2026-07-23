@@ -4,6 +4,7 @@ import { useEffect, useRef, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { DateInput } from "@/app/dashboard/reports/_components/DateInput";
 import { getCurrentUser } from "@/lib/auth";
+import { useResponsive } from "@/hooks/useResponsive";
 
 interface Party { id: string; name: string; partyType: string; code?: string; }
 interface AgeingRow { numType:string; date:string; narration:string; billAmount:number; billBalance:number; days:number; totalBalance:number; }
@@ -18,6 +19,7 @@ function getHeaders(): Record<string, string> {
 }
 
 export default function AgeingReportPage() {
+  const { isMobile } = useResponsive();
   const router     = useRouter();
   const dateRef    = useRef<HTMLInputElement>(null);
   const partyRef   = useRef<HTMLInputElement>(null);
@@ -175,7 +177,7 @@ export default function AgeingReportPage() {
           </div>
 
           {/* Report info bar */}
-          <div style={{ background:"linear-gradient(135deg,rgba(245,158,11,.1),rgba(239,68,68,.06))", border:"1px solid rgba(245,158,11,.2)", borderRadius:14, padding:"16px 20px", marginBottom:20, display:"flex", gap:24, flexWrap:"wrap", alignItems:"center" }}>
+          <div style={{ background:"linear-gradient(135deg,rgba(245,158,11,.1),rgba(239,68,68,.06))", border:"1px solid rgba(245,158,11,.2)", borderRadius:14, padding: isMobile ? "12px 10px" : "16px 20px", marginBottom:20, display:"flex", gap:24, flexWrap:"wrap", alignItems:"center" }}>
             <div><div style={{ fontSize:10, fontWeight:700, color:"rgba(255,255,255,.35)", textTransform:"uppercase", letterSpacing:".08em" }}>Party</div><div style={{ fontSize:15, fontWeight:800, color:"#fbbf24", marginTop:3 }}>{partyName}</div></div>
             <div><div style={{ fontSize:10, fontWeight:700, color:"rgba(255,255,255,.35)", textTransform:"uppercase", letterSpacing:".08em" }}>Type</div><div style={{ fontSize:14, fontWeight:700, color:"rgba(255,255,255,.7)", marginTop:3, textTransform:"capitalize" }}>{type}</div></div>
             <div><div style={{ fontSize:10, fontWeight:700, color:"rgba(255,255,255,.35)", textTransform:"uppercase", letterSpacing:".08em" }}>As On</div><div style={{ fontSize:14, fontWeight:700, color:"rgba(255,255,255,.7)", marginTop:3 }}>{asOnDate}</div></div>
@@ -201,7 +203,7 @@ export default function AgeingReportPage() {
                   </thead>
                   <tbody>
                     {data.length === 0 ? (
-                      <tr><td colSpan={7} style={{ padding:"40px 14px", textAlign:"center", color:"rgba(255,255,255,.2)", fontSize:13 }}>No outstanding bills found</td></tr>
+                      <tr><td colSpan={7} style={{ padding: isMobile ? "22px 10px" : "40px 14px", textAlign:"center", color:"rgba(255,255,255,.2)", fontSize:13 }}>No outstanding bills found</td></tr>
                     ) : data.map((r, i) => {
                       const dayColor = r.days>90?"#f87171":r.days>60?"#fb923c":r.days>30?"#fbbf24":"rgba(255,255,255,.7)";
                       return (

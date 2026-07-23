@@ -4,6 +4,7 @@ import toast from "react-hot-toast";
 import { useEffect, useState } from "react";
 import { getCurrentUser } from "@/lib/auth";
 import ImageUpload from "@/components/ImageUpload";
+import { useResponsive } from "@/hooks/useResponsive";
 
 // ── Design tokens ─────────────────────────────────────────────────────────────
 const FONT   = "'Outfit','Inter',sans-serif";
@@ -44,6 +45,7 @@ type Item = {
 
 // ── Page ──────────────────────────────────────────────────────────────────────
 export default function ItemsNewPage() {
+  const { isMobile } = useResponsive();
   const user = getCurrentUser();
 
   const [items,       setItems]       = useState<Item[]>([]);
@@ -148,7 +150,7 @@ export default function ItemsNewPage() {
       </div>
 
       {/* ── Form ── */}
-      <div style={{ background:PANEL, border:`1px solid ${BORDER}`, borderRadius:16, padding:"22px 24px", marginBottom:28 }}>
+      <div style={{ background:PANEL, border:`1px solid ${BORDER}`, borderRadius:16, padding: isMobile ? "12px 11px" : "22px 24px", marginBottom:28 }}>
         <div style={{ fontSize:12, fontWeight:700, color:MUTED, textTransform:"uppercase", letterSpacing:".08em", marginBottom:16 }}>
           {editingId ? "✏️ Edit Item" : "➕ Add New Item"}
         </div>
@@ -211,7 +213,7 @@ export default function ItemsNewPage() {
         </div>
 
         {/* Row 2: Sale Rate + Purchase Rate + Tax % + Min Stock */}
-        <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr 1fr 1fr", gap:12, marginBottom:12 }}>
+        <div style={{ display:"grid", gridTemplateColumns: isMobile ? "1fr 1fr" : "1fr 1fr 1fr 1fr", gap:12, marginBottom:12 }}>
           <div>
             <div style={{ fontSize:11, color:MUTED, marginBottom:5 }}>Sale Rate (Rs.)</div>
             <input style={INPUT} type="number" placeholder="0" value={rate} onChange={e=>setRate(e.target.value)} />

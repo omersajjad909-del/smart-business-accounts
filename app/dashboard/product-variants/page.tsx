@@ -2,6 +2,7 @@
 import toast from "react-hot-toast";
 import { useState, useMemo } from "react";
 import { useBusinessRecords } from "@/lib/useBusinessRecords";
+import { useResponsive } from "@/hooks/useResponsive";
 
 const ff = "'Outfit','Inter',sans-serif";
 const ACCENT = "#e879f9";
@@ -28,6 +29,7 @@ type VariantGroup = {
 };
 
 export default function ProductVariantsPage() {
+  const { isMobile } = useResponsive();
   const { records, loading, create, update, remove } = useBusinessRecords("variant_group");
   const [showModal, setShowModal] = useState(false);
   const [form, setForm]           = useState({ product: "", attribute: "", customAttr: "", values: "" });
@@ -71,7 +73,7 @@ export default function ProductVariantsPage() {
   const td: React.CSSProperties = { padding: "13px 14px", fontSize: 13, borderBottom: `1px solid ${BORDER}` };
 
   return (
-    <div style={{ padding: "28px 32px", fontFamily: ff, color: "#fff", minHeight: "100vh" }}>
+    <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", fontFamily: ff, color: "#fff", minHeight: "100vh" }}>
 
       {/* Header */}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 28 }}>
@@ -85,14 +87,14 @@ export default function ProductVariantsPage() {
       </div>
 
       {/* KPIs */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 12, marginBottom: 24 }}>
+      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 12, marginBottom: 24 }}>
         {[
           { label: "Products with Variants", value: totalProducts, color: ACCENT },
           { label: "Variant Groups",          value: activeGroups,  color: "#818cf8" },
           { label: "Total Variant Values",    value: totalVariants, color: "#34d399" },
           { label: "Attribute Types",         value: new Set(groups.map(g => g.attribute)).size, color: "#fbbf24" },
         ].map(k => (
-          <div key={k.label} style={{ background: BG, border: `1px solid ${BORDER}`, borderRadius: 12, padding: "18px 20px" }}>
+          <div key={k.label} style={{ background: BG, border: `1px solid ${BORDER}`, borderRadius: 12, padding: isMobile ? "12px 10px" : "18px 20px" }}>
             <div style={{ fontSize: 12, color: MUTED, marginBottom: 6 }}>{k.label}</div>
             <div style={{ fontSize: 24, fontWeight: 800, color: k.color }}>{k.value}</div>
           </div>
@@ -100,7 +102,7 @@ export default function ProductVariantsPage() {
       </div>
 
       {/* Preset Attributes Info */}
-      <div style={{ background: "rgba(232,121,249,.06)", border: "1px solid rgba(232,121,249,.15)", borderRadius: 12, padding: "14px 18px", marginBottom: 24, display: "flex", gap: 14, alignItems: "flex-start" }}>
+      <div style={{ background: "rgba(232,121,249,.06)", border: "1px solid rgba(232,121,249,.15)", borderRadius: 12, padding: isMobile ? "12px 10px" : "14px 18px", marginBottom: 24, display: "flex", gap: 14, alignItems: "flex-start" }}>
         <span style={{ fontSize: 20 }}>💡</span>
         <div>
           <div style={{ fontSize: 13, fontWeight: 700, color: ACCENT, marginBottom: 4 }}>Built-in Attribute Presets</div>

@@ -3,6 +3,7 @@
 import toast from "react-hot-toast";
 import { useState } from "react";
 import { useBusinessRecords } from "@/lib/useBusinessRecords";
+import { useResponsive } from "@/hooks/useResponsive";
 
 const ff = "'Outfit','Inter',sans-serif";
 const bg = "rgba(255,255,255,0.03)";
@@ -10,6 +11,7 @@ const border = "rgba(255,255,255,0.07)";
 const STATUS_COLOR: Record<string, string> = { checked_in: "#34d399", checked_out: "#6b7280", reserved: "#818cf8" };
 
 export default function FrontDeskPage() {
+  const { isMobile } = useResponsive();
   const { records, loading, create, update } = useBusinessRecords("hotel_reservation");
   const roomStore = useBusinessRecords("hotel_room");
   const [showModal, setShowModal] = useState(false);
@@ -57,15 +59,15 @@ export default function FrontDeskPage() {
   }
 
   return (
-    <div style={{ padding: "28px 32px", fontFamily: ff, color: "#fff", minHeight: "100vh" }}>
+    <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", fontFamily: ff, color: "#fff", minHeight: "100vh" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 28 }}>
         <div><h1 style={{ fontSize: 22, fontWeight: 800, margin: "0 0 4px" }}>🏁 Front Desk</h1><p style={{ fontSize: 13, color: "rgba(255,255,255,.4)", margin: 0 }}>Manage check-ins, check-outs, and reservations</p></div>
         <button onClick={() => setShowModal(true)} style={{ padding: "10px 20px", borderRadius: 10, border: "none", background: "#f97316", color: "white", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>+ New Reservation</button>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 12, marginBottom: 28 }}>
+      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(3,1fr)", gap: 12, marginBottom: 28 }}>
         {[{ label: "Total Reservations", val: reservations.length, color: "#f97316" }, { label: "Checked In", val: checkedIn, color: "#34d399" }, { label: "Reserved", val: reservations.filter(r => r.status === "reserved").length, color: "#818cf8" }].map(s => (
-          <div key={s.label} style={{ background: bg, border: `1px solid ${border}`, borderRadius: 12, padding: "20px 24px" }}><div style={{ fontSize: 13, color: "rgba(255,255,255,.5)", marginBottom: 6 }}>{s.label}</div><div style={{ fontSize: 22, fontWeight: 700, color: s.color }}>{s.val}</div></div>
+          <div key={s.label} style={{ background: bg, border: `1px solid ${border}`, borderRadius: 12, padding: isMobile ? "12px 11px" : "20px 24px" }}><div style={{ fontSize: 13, color: "rgba(255,255,255,.5)", marginBottom: 6 }}>{s.label}</div><div style={{ fontSize: 22, fontWeight: 700, color: s.color }}>{s.val}</div></div>
         ))}
       </div>
 
@@ -79,16 +81,16 @@ export default function FrontDeskPage() {
           <tbody>
             {reservations.map(r => (
               <tr key={r.id}>
-                <td style={{ padding: "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)", fontWeight: 600 }}>{r.guest}</td>
-                <td style={{ padding: "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)" }}>{r.room}</td>
-                <td style={{ padding: "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)", fontSize: 12 }}>{r.checkIn}</td>
-                <td style={{ padding: "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)", fontSize: 12 }}>{r.checkOut}</td>
-                <td style={{ padding: "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)", fontSize: 13 }}>{r.phone}</td>
-                <td style={{ padding: "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)", fontSize: 13 }}>{r.adults}A {r.children > 0 ? `${r.children}C` : ""}</td>
-                <td style={{ padding: "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)" }}>
+                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)", fontWeight: 600 }}>{r.guest}</td>
+                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)" }}>{r.room}</td>
+                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)", fontSize: 12 }}>{r.checkIn}</td>
+                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)", fontSize: 12 }}>{r.checkOut}</td>
+                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)", fontSize: 13 }}>{r.phone}</td>
+                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)", fontSize: 13 }}>{r.adults}A {r.children > 0 ? `${r.children}C` : ""}</td>
+                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)" }}>
                   <span style={{ display: "inline-block", background: `${STATUS_COLOR[r.status]}20`, color: STATUS_COLOR[r.status], borderRadius: 6, padding: "2px 8px", fontSize: 11, fontWeight: 600 }}>{r.status.replace("_", " ")}</span>
                 </td>
-                <td style={{ padding: "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)" }}>
+                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)" }}>
                   {r.status === "reserved" && <button onClick={async () => {
                     const room = rooms.find(roomRow => roomRow.number === r.room);
                     if (!room || room.status === "maintenance") {

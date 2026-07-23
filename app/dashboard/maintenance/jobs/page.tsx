@@ -2,6 +2,7 @@
 import { fmtDate } from "@/lib/dateUtils";
 import { useState } from "react";
 import { useBusinessRecords, BusinessRecord } from "@/lib/useBusinessRecords";
+import { useResponsive } from "@/hooks/useResponsive";
 
 const PRIORITIES = ["Low", "Medium", "High", "Urgent"] as const;
 const STATUSES   = ["Pending", "In-Progress", "Completed", "Cancelled"] as const;
@@ -19,13 +20,13 @@ const EMPTY = {
 };
 
 const S = {
-  page: { padding: "28px 32px", fontFamily: "'Outfit','Inter',sans-serif", color: "var(--text-primary)", minHeight: "100vh", background: "var(--app-bg)" } as React.CSSProperties,
+  page: { padding: isMobile ? "15px 14px" : "28px 32px", fontFamily: "'Outfit','Inter',sans-serif", color: "var(--text-primary)", minHeight: "100vh", background: "var(--app-bg)" } as React.CSSProperties,
   header: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24 } as React.CSSProperties,
   h1: { margin: 0, fontSize: 24, fontWeight: 700 } as React.CSSProperties,
   sub: { margin: "4px 0 0", color: "var(--text-muted)", fontSize: 14 } as React.CSSProperties,
   addBtn: { padding: "10px 20px", borderRadius: 10, border: "none", background: "#6366f1", color: "#fff", fontFamily: "'Outfit','Inter',sans-serif", fontSize: 14, fontWeight: 600, cursor: "pointer" } as React.CSSProperties,
-  kpiGrid: { display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 16, marginBottom: 28 } as React.CSSProperties,
-  kpiCard: { background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 14, padding: "20px 24px" } as React.CSSProperties,
+  kpiGrid: { display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 16, marginBottom: 28 } as React.CSSProperties,
+  kpiCard: { background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 14, padding: isMobile ? "12px 11px" : "20px 24px" } as React.CSSProperties,
   kpiLabel: { fontSize: 13, color: "var(--text-muted)", marginBottom: 8 } as React.CSSProperties,
   searchBar: { padding: "8px 12px", borderRadius: 8, border: "1px solid var(--border)", background: "var(--app-bg)", color: "var(--text-primary)", fontFamily: "'Outfit','Inter',sans-serif", fontSize: 14, width: 340, marginBottom: 16 } as React.CSSProperties,
   tableWrap: { background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 14, overflow: "hidden" } as React.CSSProperties,
@@ -37,7 +38,7 @@ const S = {
   label: { fontSize: 13, color: "var(--text-muted)", marginBottom: 4, display: "block" } as React.CSSProperties,
   inp: { width: "100%", padding: "8px 12px", borderRadius: 8, border: "1px solid var(--border)", background: "var(--app-bg)", color: "var(--text-primary)", fontFamily: "'Outfit','Inter',sans-serif", fontSize: 14, boxSizing: "border-box" as const },
   grid2: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 } as React.CSSProperties,
-  grid3: { display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 16, marginTop: 16 } as React.CSSProperties,
+  grid3: { display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr 1fr", gap: 16, marginTop: 16 } as React.CSSProperties,
   cancelBtn: { padding: "9px 20px", borderRadius: 9, border: "1px solid var(--border)", background: "transparent", color: "var(--text-primary)", fontSize: 14, cursor: "pointer", fontFamily: "'Outfit','Inter',sans-serif" } as React.CSSProperties,
   saveBtn: { padding: "9px 20px", borderRadius: 9, border: "none", background: "#6366f1", color: "#fff", fontSize: 14, fontWeight: 600, cursor: "pointer", fontFamily: "'Outfit','Inter',sans-serif" } as React.CSSProperties,
   editBtn: { marginRight: 8, padding: "5px 12px", borderRadius: 7, border: "1px solid var(--border)", background: "transparent", color: "var(--text-primary)", fontSize: 12, cursor: "pointer" } as React.CSSProperties,
@@ -54,6 +55,7 @@ function badge(label: string, colorMap: Record<string, string>) {
 }
 
 export default function MaintenanceJobsPage() {
+  const { isMobile } = useResponsive();
   const { records, loading, create, update, remove } = useBusinessRecords("maintenance_job");
   const [showModal, setShowModal] = useState(false);
   const [editing, setEditing]   = useState<string | null>(null);

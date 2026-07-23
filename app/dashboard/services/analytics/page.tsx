@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import {
+import { useResponsive } from "@/hooks/useResponsive";
   ServicesControlCenter,
   fetchJson,
   serviceBg,
@@ -32,7 +33,7 @@ const emptyState: ServicesControlCenter = {
 
 function Metric({ title, value, note, color }: { title: string; value: string; note: string; color: string }) {
   return (
-    <div style={{ background: serviceBg, border: `1px solid ${serviceBorder}`, borderRadius: 18, padding: "20px 22px" }}>
+    <div style={{ background: serviceBg, border: `1px solid ${serviceBorder}`, borderRadius: 18, padding: isMobile ? "12px 10px" : "20px 22px" }}>
       <div style={{ fontSize: 12, color: serviceMuted, marginBottom: 8, textTransform: "uppercase", letterSpacing: ".06em" }}>{title}</div>
       <div style={{ fontSize: 26, fontWeight: 900, color }}>{value}</div>
       <div style={{ fontSize: 12, color: serviceMuted, marginTop: 6 }}>{note}</div>
@@ -41,6 +42,7 @@ function Metric({ title, value, note, color }: { title: string; value: string; n
 }
 
 export default function ServicesAnalyticsPage() {
+  const { isMobile } = useResponsive();
   const [data, setData] = useState(emptyState);
 
   useEffect(() => {
@@ -67,7 +69,7 @@ export default function ServicesAnalyticsPage() {
   }, [data.timesheets]);
 
   return (
-    <div style={{ padding: "28px 32px", minHeight: "100vh", color: "#fff", fontFamily: serviceFont }}>
+    <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", minHeight: "100vh", color: "#fff", fontFamily: serviceFont }}>
       <div style={{ marginBottom: 24 }}>
         <div style={{ fontSize: 12, color: "#86efac", fontWeight: 700, letterSpacing: ".08em", textTransform: "uppercase", marginBottom: 10 }}>Services Analytics</div>
         <h1 style={{ fontSize: 30, fontWeight: 900, margin: "0 0 10px" }}>Pipeline, billables, aur delivery pressure</h1>
@@ -76,7 +78,7 @@ export default function ServicesAnalyticsPage() {
         </p>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4, minmax(0,1fr))", gap: 14, marginBottom: 24 }}>
+      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,minmax(0,1fr))", gap: 14, marginBottom: 24 }}>
         <Metric title="Billable Value" value={`Rs. ${data.summary.billableValue.toLocaleString()}`} note={`${data.summary.billableHours} tracked billable hours`} color="#34d399" />
         <Metric title="Active Projects" value={String(data.summary.activeProjects)} note={`${data.summary.completedProjects} projects closed`} color="#60a5fa" />
         <Metric title="Delivery Pressure" value={String(data.summary.overdueDeliveries)} note="Overdue milestone commitments" color="#f87171" />

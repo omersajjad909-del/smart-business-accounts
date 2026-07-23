@@ -4,6 +4,7 @@ import { useBusinessRecords } from "@/lib/useBusinessRecords";
 import { confirmToast } from "@/lib/toast-feedback";
 import toast from "react-hot-toast";
 import { DateInput } from "@/app/dashboard/reports/_components/DateInput";
+import { useResponsive } from "@/hooks/useResponsive";
 
 const F = "'Outfit','Inter',sans-serif";
 const BG = "rgba(255,255,255,0.03)";
@@ -34,6 +35,7 @@ const BLANK_SUP  = { name: "", email: "", phone: "", category: "", creditDays: 3
 const BLANK_ORD  = { supplierId: "", items: "", qty: "", amount: 0, expectedDate: "", notes: "" };
 
 export default function SupplierPortalPage() {
+  const { isMobile } = useResponsive();
   const suppliers = useBusinessRecords("portal_supplier");
   const orders    = useBusinessRecords("portal_order");
   const [view, setView]             = useState<"suppliers" | "orders">("suppliers");
@@ -136,7 +138,7 @@ export default function SupplierPortalPage() {
   const totalSpend  = orderList.filter(o => o.status === "RECEIVED").reduce((a, o) => a + o.amount, 0);
 
   return (
-    <div style={{ fontFamily: F, minHeight: "100vh", padding: "28px 24px", color: "var(--text-primary)" }}>
+    <div style={{ fontFamily: F, minHeight: "100vh", padding: isMobile ? "15px 11px" : "28px 24px", color: "var(--text-primary)" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 24 }}>
         <div>
           <h1 style={{ fontSize: 22, fontWeight: 800, margin: 0 }}>Supplier Portal</h1>
@@ -155,14 +157,14 @@ export default function SupplierPortalPage() {
       </div>
 
       {/* KPIs */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 12, marginBottom: 24 }}>
+      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 12, marginBottom: 24 }}>
         {[
           { label: "Total Suppliers",  value: supplierList.length, color: "#a78bfa" },
           { label: "Active Portal",    value: activeCount,         color: "#10b981" },
           { label: "Pending Orders",   value: pendingOrds,         color: "#f59e0b" },
           { label: "Total Received",   value: `Rs. ${(totalSpend/1000).toFixed(0)}K`, color: "#38bdf8" },
         ].map(k => (
-          <div key={k.label} style={{ background: BG, border: `1px solid ${BD}`, borderRadius: 14, padding: "16px 18px" }}>
+          <div key={k.label} style={{ background: BG, border: `1px solid ${BD}`, borderRadius: 14, padding: isMobile ? "12px 10px" : "16px 18px" }}>
             <div style={{ fontSize: 11, color: "var(--text-muted)", fontWeight: 600, marginBottom: 6, textTransform: "uppercase", letterSpacing: .5 }}>{k.label}</div>
             <div style={{ fontSize: 22, fontWeight: 800, color: k.color }}>{k.value}</div>
           </div>

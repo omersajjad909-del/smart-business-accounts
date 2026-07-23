@@ -3,12 +3,14 @@
 import { useMemo, useState } from "react";
 import { useBusinessRecords } from "@/lib/useBusinessRecords";
 import { mapBomRecord, mapRawMaterialRecord } from "../_shared";
+import { useResponsive } from "@/hooks/useResponsive";
 
 const ff = "'Outfit','Inter',sans-serif";
 const bg = "rgba(255,255,255,0.03)";
 const border = "rgba(255,255,255,0.07)";
 
 export default function RawMaterialsPage() {
+  const { isMobile } = useResponsive();
   const rawStore = useBusinessRecords("raw_material");
   const bomStore = useBusinessRecords("bom");
   const [showModal, setShowModal] = useState(false);
@@ -50,7 +52,7 @@ export default function RawMaterialsPage() {
   }
 
   return (
-    <div style={{ padding: "28px 32px", fontFamily: ff, color: "#fff", minHeight: "100vh" }}>
+    <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", fontFamily: ff, color: "#fff", minHeight: "100vh" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 26 }}>
         <div>
           <h1 style={{ fontSize: 22, fontWeight: 800, margin: "0 0 4px" }}>Raw Materials</h1>
@@ -61,14 +63,14 @@ export default function RawMaterialsPage() {
         </button>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 12, marginBottom: 20 }}>
+      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 12, marginBottom: 20 }}>
         {[
           { label: "Total Materials", value: materials.length, color: "#f97316" },
           { label: "Low Stock", value: materials.filter((item) => item.isLow).length, color: "#ef4444" },
           { label: "Inventory Value", value: `Rs. ${totalValue.toLocaleString()}`, color: "#22c55e" },
           { label: "Suppliers", value: new Set(materials.map((item) => item.supplier).filter(Boolean)).size, color: "#38bdf8" },
         ].map((card) => (
-          <div key={card.label} style={{ background: bg, border: `1px solid ${border}`, borderRadius: 14, padding: "18px 20px" }}>
+          <div key={card.label} style={{ background: bg, border: `1px solid ${border}`, borderRadius: 14, padding: isMobile ? "12px 10px" : "18px 20px" }}>
             <div style={{ fontSize: 12, color: "rgba(255,255,255,.48)", marginBottom: 6 }}>{card.label}</div>
             <div style={{ fontSize: 21, fontWeight: 800, color: card.color }}>{card.value}</div>
           </div>
@@ -92,14 +94,14 @@ export default function RawMaterialsPage() {
                 const usageCount = boms.filter((bom) => bom.materials.some((item) => item.toLowerCase() === material.name.toLowerCase())).length;
                 return (
                   <tr key={material.id}>
-                    <td style={{ padding: "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)", fontWeight: 700 }}>{material.name}</td>
-                    <td style={{ padding: "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)" }}>{material.unit}</td>
-                    <td style={{ padding: "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)", color: material.isLow ? "#ef4444" : "#fff", fontWeight: material.isLow ? 700 : 400 }}>{material.currentStock}</td>
-                    <td style={{ padding: "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)", color: "rgba(255,255,255,.55)" }}>{material.minStock}</td>
-                    <td style={{ padding: "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)" }}>Rs. {material.unitCost.toLocaleString()}</td>
-                    <td style={{ padding: "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)", color: "#22c55e", fontWeight: 700 }}>Rs. {(material.currentStock * material.unitCost).toLocaleString()}</td>
-                    <td style={{ padding: "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)", color: "rgba(255,255,255,.55)" }}>{material.supplier || "N/A"}</td>
-                    <td style={{ padding: "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)" }}>{usageCount}</td>
+                    <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)", fontWeight: 700 }}>{material.name}</td>
+                    <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)" }}>{material.unit}</td>
+                    <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)", color: material.isLow ? "#ef4444" : "#fff", fontWeight: material.isLow ? 700 : 400 }}>{material.currentStock}</td>
+                    <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)", color: "rgba(255,255,255,.55)" }}>{material.minStock}</td>
+                    <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)" }}>Rs. {material.unitCost.toLocaleString()}</td>
+                    <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)", color: "#22c55e", fontWeight: 700 }}>Rs. {(material.currentStock * material.unitCost).toLocaleString()}</td>
+                    <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)", color: "rgba(255,255,255,.55)" }}>{material.supplier || "N/A"}</td>
+                    <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)" }}>{usageCount}</td>
                   </tr>
                 );
               })}

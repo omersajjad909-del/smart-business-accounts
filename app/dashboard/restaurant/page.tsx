@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { RestaurantControlCenter, fetchJson, restaurantBg, restaurantBorder, restaurantFont, restaurantMuted } from "./_shared";
+import { useResponsive } from "@/hooks/useResponsive";
 
 const emptyState: RestaurantControlCenter = {
   summary: { menuItems: 0, activeTables: 0, occupiedTables: 0, kitchenOrders: 0, readyOrders: 0, openOrders: 0, salesValue: 0, avgRecipeMargin: 0, reservations: 0, cancellationRate: 0 },
@@ -15,6 +16,7 @@ const emptyState: RestaurantControlCenter = {
 };
 
 export default function RestaurantOverviewPage() {
+  const { isMobile } = useResponsive();
   const [data, setData] = useState(emptyState);
 
   useEffect(() => {
@@ -22,7 +24,7 @@ export default function RestaurantOverviewPage() {
   }, []);
 
   return (
-    <div style={{ padding: "28px 32px", color: "#fff", fontFamily: restaurantFont, minHeight: "100vh" }}>
+    <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", color: "#fff", fontFamily: restaurantFont, minHeight: "100vh" }}>
       <div style={{ marginBottom: 26 }}>
         <h1 style={{ fontSize: 24, fontWeight: 800, margin: "0 0 6px" }}>Restaurant Command Center</h1>
         <p style={{ fontSize: 13, color: restaurantMuted, margin: 0 }}>
@@ -44,14 +46,14 @@ export default function RestaurantOverviewPage() {
         ))}
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4,minmax(0,1fr))", gap: 12, marginBottom: 24 }}>
+      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,minmax(0,1fr))", gap: 12, marginBottom: 24 }}>
         {[
           { label: "Menu Items", value: data.summary.menuItems, color: "#f87171" },
           { label: "Active Tables", value: data.summary.activeTables, color: "#38bdf8" },
           { label: "Open Kitchen Orders", value: data.summary.kitchenOrders, color: "#f59e0b" },
           { label: "Avg Recipe Margin", value: `${data.summary.avgRecipeMargin}%`, color: "#34d399" },
         ].map((card) => (
-          <div key={card.label} style={{ background: restaurantBg, border: `1px solid ${restaurantBorder}`, borderRadius: 14, padding: "18px 20px" }}>
+          <div key={card.label} style={{ background: restaurantBg, border: `1px solid ${restaurantBorder}`, borderRadius: 14, padding: isMobile ? "12px 10px" : "18px 20px" }}>
             <div style={{ fontSize: 12, color: restaurantMuted, marginBottom: 8 }}>{card.label}</div>
             <div style={{ fontSize: 24, fontWeight: 800, color: card.color }}>{card.value}</div>
           </div>

@@ -2,6 +2,7 @@
 import { useState, useMemo } from "react";
 import { useBusinessRecords, BusinessRecord } from "@/lib/useBusinessRecords";
 import DateInput from "@/app/dashboard/reports/_components/DateInput";
+import { useResponsive } from "@/hooks/useResponsive";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -34,7 +35,7 @@ const FONT = "'Outfit','Inter',sans-serif";
 const ACCENT = "#14b8a6";
 
 const s = {
-  page:  { fontFamily: FONT, color: "var(--text-primary)", padding: "28px 24px", minHeight: "100vh", background: "var(--app-bg)" },
+  page:  { fontFamily: FONT, color: "var(--text-primary)", padding: isMobile ? "15px 11px" : "28px 24px", minHeight: "100vh", background: "var(--app-bg)" },
   panel: { background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 14 },
   inp:   { background: "rgba(255,255,255,.05)", border: "1px solid var(--border)", borderRadius: 8, padding: "9px 13px", color: "var(--text-primary)", fontFamily: FONT, fontSize: 13, width: "100%", boxSizing: "border-box" as const, outline: "none" },
   label: { fontSize: 12, color: "var(--text-muted)", display: "block", marginBottom: 5, fontWeight: 500 } as React.CSSProperties,
@@ -67,6 +68,7 @@ function mapRecord(r: BusinessRecord): StockMovementRecord {
 // ─── Main Page ────────────────────────────────────────────────────────────────
 
 export default function StockMovementsPage() {
+  const { isMobile } = useResponsive();
   const { records, loading, create, update, remove } = useBusinessRecords("stock_movement");
   const [activeTab, setActiveTab] = useState<MovementType | "ALL">("ALL");
   const [showForm, setShowForm] = useState(false);
@@ -130,14 +132,14 @@ export default function StockMovementsPage() {
       </div>
 
       {/* KPIs */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 14, marginBottom: 24 }}>
+      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 14, marginBottom: 24 }}>
         {[
           { label: "Total Units In",    value: kpis.totalIn,      color: "#4ade80" },
           { label: "Total Units Out",   value: kpis.totalOut,     color: "#f87171" },
           { label: "Adjustments",       value: kpis.adjustments,  color: "#fbbf24" },
           { label: "Today's Movements", value: kpis.today,        color: "#60a5fa" },
         ].map(k => (
-          <div key={k.label} style={{ ...s.panel, padding: "18px 20px" }}>
+          <div key={k.label} style={{ ...s.panel, padding: isMobile ? "12px 10px" : "18px 20px" }}>
             <div style={{ fontSize: 11, color: "var(--text-muted)", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 6 }}>{k.label}</div>
             <div style={{ fontSize: 26, fontWeight: 800, color: k.color }}>{k.value}</div>
           </div>
@@ -154,7 +156,7 @@ export default function StockMovementsPage() {
             <button onClick={() => setShowForm(false)} style={s.btn("rgba(255,255,255,.08)", true)}>✕ Close</button>
           </div>
 
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 14, marginBottom: 14 }}>
+          <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr 1fr", gap: 14, marginBottom: 14 }}>
             <div><label style={s.label}>Movement No</label>
               <input value={form.movementNo} onChange={e => sf("movementNo", e.target.value)} style={s.inp} /></div>
             <div><label style={s.label}>Date</label>
@@ -165,7 +167,7 @@ export default function StockMovementsPage() {
               </select></div>
           </div>
 
-          <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr 1fr", gap: 14, marginBottom: 14 }}>
+          <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr 1fr" : "2fr 1fr 1fr 1fr", gap: 14, marginBottom: 14 }}>
             <div><label style={s.label}>Item / Product *</label>
               <input value={form.itemName} onChange={e => sf("itemName", e.target.value)} style={s.inp} placeholder="Product or SKU name" /></div>
             <div><label style={s.label}>Quantity *</label>

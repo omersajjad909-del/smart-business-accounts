@@ -3,8 +3,10 @@
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { fetchJson, tradeBg, tradeBorder, tradeFont, tradeMuted, type TradeControlCenter } from "./_shared";
+import { useResponsive } from "@/hooks/useResponsive";
 
 export default function TradeOverviewPage() {
+  const { isMobile } = useResponsive();
   const [data, setData] = useState<TradeControlCenter>({
     summary: {
       shipmentCount: 0,
@@ -54,7 +56,7 @@ export default function TradeOverviewPage() {
   const rebates = data.rebates;
 
   return (
-    <div style={{ minHeight: "100vh", padding: "28px 32px", color: "var(--text-primary)", fontFamily: tradeFont }}>
+    <div style={{ minHeight: "100vh", padding: isMobile ? "15px 14px" : "28px 32px", color: "var(--text-primary)", fontFamily: tradeFont }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 20, flexWrap: "wrap", marginBottom: 24 }}>
         <div>
           <h1 style={{ margin: "0 0 6px", fontSize: 26, fontWeight: 800 }}>Import / Export Command Center</h1>
@@ -84,14 +86,14 @@ export default function TradeOverviewPage() {
         </div>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4,minmax(0,1fr))", gap: 12, marginBottom: 24 }}>
+      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,minmax(0,1fr))", gap: 12, marginBottom: 24 }}>
         {[ 
           { label: "Shipments", value: data.summary.shipmentCount, color: "#38bdf8" },
           { label: "Active LC / TT", value: data.summary.activeLcCount, color: "#a78bfa" },
           { label: "Customs Open", value: data.summary.openCustomsCount, color: "#f59e0b" },
           { label: "Rebate Claims", value: data.summary.rebateCount, color: "#22c55e" },
         ].map((card) => (
-          <div key={card.label} style={{ background: tradeBg, border: `1px solid ${tradeBorder}`, borderRadius: 14, padding: "18px 20px" }}>
+          <div key={card.label} style={{ background: tradeBg, border: `1px solid ${tradeBorder}`, borderRadius: 14, padding: isMobile ? "12px 10px" : "18px 20px" }}>
             <div style={{ fontSize: 12, color: tradeMuted, marginBottom: 8 }}>{card.label}</div>
             <div style={{ fontSize: 24, fontWeight: 800, color: card.color }}>{card.value}</div>
           </div>
@@ -100,7 +102,7 @@ export default function TradeOverviewPage() {
 
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 18 }}>
         <div style={{ background: tradeBg, border: `1px solid ${tradeBorder}`, borderRadius: 16, overflow: "hidden" }}>
-          <div style={{ padding: "16px 18px", borderBottom: `1px solid ${tradeBorder}`, fontSize: 15, fontWeight: 800 }}>Movement Watchlist</div>
+          <div style={{ padding: isMobile ? "12px 10px" : "16px 18px", borderBottom: `1px solid ${tradeBorder}`, fontSize: 15, fontWeight: 800 }}>Movement Watchlist</div>
           <div style={{ padding: 18, display: "grid", gap: 10 }}>
             {shipments.filter((row) => row.status !== "CLEARED").slice(0, 6).map((row) => (
               <div key={row.id} style={{ padding: "12px 14px", borderRadius: 10, background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.05)" }}>
@@ -113,7 +115,7 @@ export default function TradeOverviewPage() {
         </div>
 
         <div style={{ background: tradeBg, border: `1px solid ${tradeBorder}`, borderRadius: 16, overflow: "hidden" }}>
-          <div style={{ padding: "16px 18px", borderBottom: `1px solid ${tradeBorder}`, fontSize: 15, fontWeight: 800 }}>Financial Snapshot</div>
+          <div style={{ padding: isMobile ? "12px 10px" : "16px 18px", borderBottom: `1px solid ${tradeBorder}`, fontSize: 15, fontWeight: 800 }}>Financial Snapshot</div>
           <div style={{ padding: 18, display: "grid", gap: 10 }}>
             {[
               { label: "Open customs payable", value: `USD ${data.summary.openCustomsPayable.toLocaleString()}`, color: "#f59e0b" },

@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { getCurrentUser } from "@/lib/auth";
+import { useResponsive } from "@/hooks/useResponsive";
 
 const ff = "'Outfit','Inter',sans-serif";
 function fmt(n: number) { return n.toLocaleString("en-US", { minimumFractionDigits: 0, maximumFractionDigits: 0 }); }
@@ -14,6 +15,7 @@ const SEV: Record<string, { label: string; color: string; bg: string }> = {
 };
 
 export default function AuditExceptionPage() {
+  const { isMobile } = useResponsive();
   const user = getCurrentUser();
   const [data, setData]       = useState<Row[]>([]);
   const [loading, setLoading] = useState(true);
@@ -30,7 +32,7 @@ export default function AuditExceptionPage() {
   const inp: React.CSSProperties = { background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 8, padding: "7px 12px", color: "var(--text-primary)", fontFamily: ff, fontSize: 12, outline: "none" };
 
   return (
-    <div style={{ padding: "24px 28px", fontFamily: ff, color: "var(--text-primary)", maxWidth: 1100 }}>
+    <div style={{ padding: isMobile ? "13px 13px" : "24px 28px", fontFamily: ff, color: "var(--text-primary)", maxWidth: 1100 }}>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 24, flexWrap: "wrap", gap: 12 }}>
         <div>
           <h1 style={{ margin: 0, fontSize: 22, fontWeight: 900, letterSpacing: "-.3px" }}>Audit & Exception Log</h1>
@@ -52,7 +54,7 @@ export default function AuditExceptionPage() {
       </div>
 
       {criticalCount > 0 && (
-        <div style={{ marginBottom: 20, padding: "14px 18px", borderRadius: 12, background: "rgba(239,68,68,.07)", border: "1px solid rgba(239,68,68,.25)", display: "flex", alignItems: "center", gap: 12 }}>
+        <div style={{ marginBottom: 20, padding: isMobile ? "12px 10px" : "14px 18px", borderRadius: 12, background: "rgba(239,68,68,.07)", border: "1px solid rgba(239,68,68,.25)", display: "flex", alignItems: "center", gap: 12 }}>
           <span style={{ fontSize: 20 }}>🚨</span>
           <span style={{ fontSize: 13, fontWeight: 700, color: "#ef4444" }}>{criticalCount} critical exception{criticalCount > 1 ? "s" : ""} require immediate attention</span>
         </div>

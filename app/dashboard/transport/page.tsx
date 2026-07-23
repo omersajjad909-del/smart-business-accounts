@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { fetchJson, transportBg, transportBorder, transportFont, transportMuted, type TransportControlCenter } from "./_shared";
+import { useResponsive } from "@/hooks/useResponsive";
 
 const emptyState: TransportControlCenter = {
   summary: { fleetSize: 0, availableVehicles: 0, maintenanceVehicles: 0, drivers: 0, driversOnDuty: 0, trips: 0, activeTrips: 0, completedTrips: 0, dispatches: 0, activeDispatches: 0, fuelCost: 0, maintenanceCost: 0, expenseBooked: 0, netRevenue: 0 },
@@ -16,6 +17,7 @@ const emptyState: TransportControlCenter = {
 };
 
 export default function TransportOverviewPage() {
+  const { isMobile } = useResponsive();
   const [data, setData] = useState(emptyState);
 
   useEffect(() => {
@@ -25,7 +27,7 @@ export default function TransportOverviewPage() {
   const { summary, trips } = data;
 
   return (
-    <div style={{ minHeight: "100vh", padding: "28px 32px", color: "#fff", fontFamily: transportFont }}>
+    <div style={{ minHeight: "100vh", padding: isMobile ? "17px 16px" : "28px 32px", color: "#fff", fontFamily: transportFont }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 20, flexWrap: "wrap", marginBottom: 24 }}>
         <div>
           <h1 style={{ margin: "0 0 6px", fontSize: 26, fontWeight: 800 }}>Transport Command Center</h1>
@@ -42,7 +44,7 @@ export default function TransportOverviewPage() {
             { label: "Expenses", href: "/dashboard/transport/expenses" },
             { label: "Analytics", href: "/dashboard/transport/analytics" },
           ].map((item) => (
-            <Link prefetch={false} key={item.href} href={item.href} style={{ padding: "10px 14px", borderRadius: 10, border: `1px solid ${transportBorder}`, background: transportBg, color: "#93c5fd", textDecoration: "none", fontSize: 12, fontWeight: 700 }}>
+            <Link prefetch={false} key={item.href} href={item.href} style={{ padding: isMobile ? "8px 8px" : "10px 14px", borderRadius: 10, border: `1px solid ${transportBorder}`, background: transportBg, color: "#93c5fd", textDecoration: "none", fontSize: 12, fontWeight: 700 }}>
               {item.label}
             </Link>
           ))}
@@ -57,7 +59,7 @@ export default function TransportOverviewPage() {
           { label: "Fuel Cost", value: `Rs. ${summary.fuelCost.toLocaleString()}`, color: "#f87171" },
           { label: "Net Revenue", value: `Rs. ${summary.netRevenue.toLocaleString()}`, color: "#34d399" },
         ].map((card) => (
-          <div key={card.label} style={{ background: transportBg, border: `1px solid ${transportBorder}`, borderRadius: 14, padding: "18px 20px" }}>
+          <div key={card.label} style={{ background: transportBg, border: `1px solid ${transportBorder}`, borderRadius: 14, padding: isMobile ? "11px 10px" : "18px 20px" }}>
             <div style={{ fontSize: 12, color: transportMuted, marginBottom: 8 }}>{card.label}</div>
             <div style={{ fontSize: 24, fontWeight: 800, color: card.color }}>{card.value}</div>
           </div>
@@ -66,10 +68,10 @@ export default function TransportOverviewPage() {
 
       <div style={{ display: "grid", gridTemplateColumns: "1.05fr .95fr", gap: 18 }}>
         <div style={{ background: transportBg, border: `1px solid ${transportBorder}`, borderRadius: 16, overflow: "hidden" }}>
-          <div style={{ padding: "16px 18px", borderBottom: `1px solid ${transportBorder}`, fontSize: 15, fontWeight: 800 }}>Trip Watchlist</div>
+          <div style={{ padding: isMobile ? "10px 9px" : "16px 18px", borderBottom: `1px solid ${transportBorder}`, fontSize: 15, fontWeight: 800 }}>Trip Watchlist</div>
           <div style={{ padding: 18, display: "grid", gap: 10 }}>
             {trips.filter((row) => row.status !== "completed" && row.status !== "cancelled").slice(0, 6).map((row) => (
-              <div key={row.id} style={{ padding: "12px 14px", borderRadius: 10, background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.05)" }}>
+              <div key={row.id} style={{ padding: isMobile ? "8px 8px" : "12px 14px", borderRadius: 10, background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.05)" }}>
                 <div style={{ fontSize: 14, fontWeight: 700 }}>{row.tripNo}</div>
                 <div style={{ fontSize: 12, color: transportMuted, marginTop: 4 }}>{row.vehicle || "-"} | {row.driver || "-"}</div>
                 <div style={{ fontSize: 12, color: "#93c5fd", marginTop: 6 }}>{row.from} to {row.to}</div>
@@ -80,7 +82,7 @@ export default function TransportOverviewPage() {
         </div>
 
         <div style={{ background: transportBg, border: `1px solid ${transportBorder}`, borderRadius: 16, overflow: "hidden" }}>
-          <div style={{ padding: "16px 18px", borderBottom: `1px solid ${transportBorder}`, fontSize: 15, fontWeight: 800 }}>Operations Snapshot</div>
+          <div style={{ padding: isMobile ? "10px 9px" : "16px 18px", borderBottom: `1px solid ${transportBorder}`, fontSize: 15, fontWeight: 800 }}>Operations Snapshot</div>
           <div style={{ padding: 18, display: "grid", gap: 10 }}>
             {[
               { label: "Vehicles available", value: summary.availableVehicles, color: "#22c55e" },
@@ -90,7 +92,7 @@ export default function TransportOverviewPage() {
               { label: "Maintenance cost", value: `Rs. ${summary.maintenanceCost.toLocaleString()}`, color: "#fb7185" },
               { label: "Trip expenses booked", value: `Rs. ${summary.expenseBooked.toLocaleString()}`, color: "#f97316" },
             ].map((row) => (
-              <div key={row.label} style={{ display: "flex", justifyContent: "space-between", padding: "10px 12px", borderRadius: 10, background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.05)" }}>
+              <div key={row.label} style={{ display: "flex", justifyContent: "space-between", padding: isMobile ? "8px 8px" : "10px 12px", borderRadius: 10, background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.05)" }}>
                 <span style={{ fontSize: 13, color: transportMuted }}>{row.label}</span>
                 <span style={{ fontSize: 15, fontWeight: 800, color: row.color }}>{row.value}</span>
               </div>

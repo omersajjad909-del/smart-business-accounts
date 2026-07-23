@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useBusinessRecords } from "@/lib/useBusinessRecords";
 import { getCurrentUser } from "@/lib/auth";
 import { hotelFont, hotelMuted } from "../_shared";
+import { useResponsive } from "@/hooks/useResponsive";
 
 const bg = "rgba(255,255,255,.03)";
 const border = "rgba(255,255,255,.07)";
@@ -26,6 +27,7 @@ const STATUS_CONFIG: Record<LaundryStatus, { label: string; color: string; bg: s
 const empty = { guest: "", room: "", items: "", notes: "", amount: "" };
 
 export default function LaundryPage() {
+  const { isMobile } = useResponsive();
   const user = getCurrentUser();
   const headers: HeadersInit = {
     "Content-Type": "application/json",
@@ -81,7 +83,7 @@ export default function LaundryPage() {
   }
 
   return (
-    <div style={{ minHeight: "100vh", padding: "28px 32px", color: "#fff", fontFamily: hotelFont }}>
+    <div style={{ minHeight: "100vh", padding: isMobile ? "15px 14px" : "28px 32px", color: "#fff", fontFamily: hotelFont }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24 }}>
         <div>
           <h1 style={{ margin: "0 0 4px", fontSize: 22, fontWeight: 800 }}>🧺 Laundry Management</h1>
@@ -98,7 +100,7 @@ export default function LaundryPage() {
           const c = STATUS_CONFIG[s];
           return (
             <div key={s} onClick={() => setFilterStatus(filterStatus === s ? "all" : s)}
-              style={{ background: filterStatus === s ? c.bg : bg, border: `1px solid ${filterStatus === s ? c.color.replace(")", ",.35)").replace("rgb(", "rgba(") : border}`, borderRadius: 12, padding: "14px 16px", cursor: "pointer" }}>
+              style={{ background: filterStatus === s ? c.bg : bg, border: `1px solid ${filterStatus === s ? c.color.replace(")", ",.35)").replace("rgb(", "rgba(") : border}`, borderRadius: 12, padding: isMobile ? "12px 10px" : "14px 16px", cursor: "pointer" }}>
               <div style={{ fontSize: 11, color: c.color, fontWeight: 700, marginBottom: 4 }}>{c.label}</div>
               <div style={{ fontSize: 24, fontWeight: 800, color: c.color }}>{counts[s] || 0}</div>
             </div>

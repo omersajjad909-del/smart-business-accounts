@@ -6,6 +6,7 @@ import { useEffect, useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import toast from "react-hot-toast";
 import { getCurrentUser } from "@/lib/auth";
+import { useResponsive } from "@/hooks/useResponsive";
 
 /* ─── Types ──────────────────────────────────────────── */
 type PaymentMethod = {
@@ -186,7 +187,7 @@ function AddCardModal({ onClose, onSuccess }: { onClose:()=>void; onSuccess?:(ca
       <div onClick={onClose} style={{ position:"absolute", inset:0, background:"rgba(0,0,0,.72)", backdropFilter:"blur(6px)" }}/>
       <div style={{ position:"relative", width:"100%", maxWidth:500, background:"#0f1630", borderRadius:24, border:"1px solid rgba(255,255,255,.1)", boxShadow:"0 32px 80px rgba(0,0,0,.5)", overflow:"hidden" }}>
         <div style={{ height:3, background:"linear-gradient(90deg,#6366f1,#8b5cf6,#d946ef)" }}/>
-        <div style={{ padding:"22px 28px", borderBottom:"1px solid rgba(255,255,255,.07)", display:"flex", alignItems:"center", justifyContent:"space-between" }}>
+        <div style={{ padding: isMobile ? "12px 13px" : "22px 28px", borderBottom:"1px solid rgba(255,255,255,.07)", display:"flex", alignItems:"center", justifyContent:"space-between" }}>
           <div>
             <h2 style={{ margin:0, fontSize:17, fontWeight:800, color:"white" }}>Add Payment Method</h2>
             <p style={{ margin:"3px 0 0", fontSize:12, color:"rgba(255,255,255,.4)" }}>Encrypted &amp; secure — we never store full card numbers</p>
@@ -204,7 +205,7 @@ function AddCardModal({ onClose, onSuccess }: { onClose:()=>void; onSuccess?:(ca
 
           {step === "card" && (
             <div style={{ display:"flex", flexDirection:"column", gap:16 }}>
-              <div style={{ height:100, borderRadius:14, background:brandCfg.grad, padding:"16px 20px", position:"relative", overflow:"hidden", boxShadow:"0 8px 28px rgba(0,0,0,.3)" }}>
+              <div style={{ height:100, borderRadius:14, background:brandCfg.grad, padding: isMobile ? "12px 10px" : "16px 20px", position:"relative", overflow:"hidden", boxShadow:"0 8px 28px rgba(0,0,0,.3)" }}>
                 <div style={{ position:"absolute", top:-20, right:-20, width:110, height:110, borderRadius:"50%", background:"rgba(255,255,255,.06)" }}/>
                 <div style={{ width:28, height:20, borderRadius:4, background:"linear-gradient(135deg,#fbbf24,#d97706)", marginBottom:10 }}/>
                 <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-end" }}>
@@ -472,7 +473,7 @@ function BillingPage() {
   }
 
   if (loading) return (
-    <div style={{ padding:"32px 28px", fontFamily:"'Outfit',sans-serif" }}>
+    <div style={{ padding: isMobile ? "18px 13px" : "32px 28px", fontFamily:"'Outfit',sans-serif" }}>
       {[1,2,3].map(i => <div key={i} style={{ height:80, borderRadius:16, background:"rgba(255,255,255,.05)", marginBottom:16, animation:"pulse 1.5s infinite" }}/>)}
     </div>
   );
@@ -509,7 +510,7 @@ function BillingPage() {
 
       {/* ── Paywall Banner (shown when redirected without active subscription) ── */}
       {isRequired && (
-        <div style={{ marginBottom:24, borderRadius:20, background:"linear-gradient(135deg,rgba(239,68,68,.1),rgba(220,38,38,.06))", border:"1.5px solid rgba(239,68,68,.35)", padding:"24px 28px", display:"flex", alignItems:"center", gap:20 }}>
+        <div style={{ marginBottom:24, borderRadius:20, background:"linear-gradient(135deg,rgba(239,68,68,.1),rgba(220,38,38,.06))", border:"1.5px solid rgba(239,68,68,.35)", padding: isMobile ? "13px 13px" : "24px 28px", display:"flex", alignItems:"center", gap:20 }}>
           <div style={{ width:52, height:52, borderRadius:14, background:"rgba(239,68,68,.15)", border:"1px solid rgba(239,68,68,.3)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:24, flexShrink:0 }}>🔒</div>
           <div>
             <div style={{ fontSize:17, fontWeight:800, color:"#fca5a5", marginBottom:4 }}>Active subscription required</div>
@@ -522,7 +523,7 @@ function BillingPage() {
 
       {/* ── Success Banner ── */}
       {showUpgradeBanner && (
-        <div style={{ marginBottom:20, padding:"16px 20px", borderRadius:16, background:"rgba(52,211,153,.08)", border:"1.5px solid rgba(52,211,153,.22)", display:"flex", alignItems:"center", gap:14, animation:"fadeUp .4s ease" }}>
+        <div style={{ marginBottom:20, padding: isMobile ? "12px 10px" : "16px 20px", borderRadius:16, background:"rgba(52,211,153,.08)", border:"1.5px solid rgba(52,211,153,.22)", display:"flex", alignItems:"center", gap:14, animation:"fadeUp .4s ease" }}>
           <div style={{ width:42, height:42, borderRadius:12, background:"rgba(52,211,153,.15)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:22, flexShrink:0 }}>✅</div>
           <div style={{ flex:1 }}>
             <div style={{ fontSize:15, fontWeight:800, color:"#34d399" }}>Plan activated successfully!</div>
@@ -534,7 +535,7 @@ function BillingPage() {
 
       {/* ── Page header ── */}
       {(paymentManagedExternally || paymentNote) && (
-        <div style={{ marginBottom:20, padding:"14px 18px", borderRadius:16, background:paymentManagedExternally?"rgba(99,102,241,.10)":"rgba(251,191,36,.09)", border:paymentManagedExternally?"1px solid rgba(99,102,241,.24)":"1px solid rgba(251,191,36,.24)", display:"flex", alignItems:"flex-start", gap:12 }}>
+        <div style={{ marginBottom:20, padding: isMobile ? "12px 10px" : "14px 18px", borderRadius:16, background:paymentManagedExternally?"rgba(99,102,241,.10)":"rgba(251,191,36,.09)", border:paymentManagedExternally?"1px solid rgba(99,102,241,.24)":"1px solid rgba(251,191,36,.24)", display:"flex", alignItems:"flex-start", gap:12 }}>
           <div style={{ width:36, height:36, borderRadius:12, background:paymentManagedExternally?"rgba(99,102,241,.14)":"rgba(251,191,36,.14)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:18, flexShrink:0 }}>
             {paymentManagedExternally ? "🔐" : "ℹ️"}
           </div>
@@ -561,14 +562,14 @@ function BillingPage() {
       </div>
 
       {/* ── Stats row ── */}
-      <div className="bill-stats" style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:14, marginBottom:24 }}>
+      <div className="bill-stats" style={{ display:"grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap:14, marginBottom:24 }}>
         {[
           { label:"Current Plan",   value: currentPlan.name,                          icon: currentPlan.icon, color: currentPlan.color },
           { label:"Status",         value: subscription?.status||"—",                 icon: "●",              color: "#34d399", isStatus:true },
           { label:"Next Renewal",   value: subscription?.currentPeriodEnd ? fmtDate(subscription.currentPeriodEnd) : "—", icon:"📅", color:"#fbbf24" },
           { label:"Monthly Amount", value: subscription ? `$${subscription.amount}/mo` : "—",                 icon: "💰", color: "#38bdf8" },
         ].map(s => (
-          <div key={s.label} style={{ padding:"17px 18px", borderRadius:16, background:"rgba(255,255,255,.03)", border:"1px solid rgba(255,255,255,.07)", display:"flex", alignItems:"center", gap:14 }}>
+          <div key={s.label} style={{ padding: isMobile ? "12px 10px" : "17px 18px", borderRadius:16, background:"rgba(255,255,255,.03)", border:"1px solid rgba(255,255,255,.07)", display:"flex", alignItems:"center", gap:14 }}>
             <div style={{ width:40, height:40, borderRadius:12, background:`${s.color}18`, display:"flex", alignItems:"center", justifyContent:"center", fontSize:18, flexShrink:0 }}>{s.icon}</div>
             <div>
               <div style={{ fontSize:10, fontWeight:700, color:"rgba(255,255,255,.3)", letterSpacing:".06em", textTransform:"uppercase" }}>{s.label}</div>
@@ -599,10 +600,10 @@ function BillingPage() {
           {/* Subscription */}
           <div style={{ ...card }}>
             <div style={{ height:3, background:`linear-gradient(90deg,${currentPlan.gradFrom},${currentPlan.gradTo})` }}/>
-            <div style={{ padding:"24px 28px" }}>
+            <div style={{ padding: isMobile ? "13px 13px" : "24px 28px" }}>
               <div className="bill-sub-inner" style={{ display:"flex", alignItems:"flex-start", gap:24, flexWrap:"wrap" }}>
                 {/* Plan badge */}
-                <div style={{ padding:"20px 24px", borderRadius:16, background:`linear-gradient(135deg,${currentPlan.gradFrom}18,${currentPlan.gradTo}10)`, border:`1px solid ${currentPlan.color}22`, textAlign:"center", minWidth:150 }}>
+                <div style={{ padding: isMobile ? "12px 11px" : "20px 24px", borderRadius:16, background:`linear-gradient(135deg,${currentPlan.gradFrom}18,${currentPlan.gradTo}10)`, border:`1px solid ${currentPlan.color}22`, textAlign:"center", minWidth:150 }}>
                   <div style={{ fontSize:30, marginBottom:6 }}>{currentPlan.icon}</div>
                   <div style={{ fontSize:19, fontWeight:900, color:currentPlan.color }}>{currentPlan.name}</div>
                   <div style={{ fontSize:12, color:"rgba(255,255,255,.35)", marginTop:4 }}>${currentPlan.monthlyPrice}<span style={{ fontSize:11 }}>/mo</span></div>
@@ -651,7 +652,7 @@ function BillingPage() {
           {effectiveUserLimit !== null && (
             <div style={{ ...card }}>
               <div style={{ height:3, background:"linear-gradient(90deg,#6366f1,#7c3aed)" }}/>
-              <div style={{ padding:"20px 24px" }}>
+              <div style={{ padding: isMobile ? "12px 11px" : "20px 24px" }}>
                 <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", gap:16, flexWrap:"wrap" }}>
                   {/* Left: usage info */}
                   <div style={{ flex:1, minWidth:200 }}>
@@ -697,12 +698,12 @@ function BillingPage() {
 
           {/* Recent invoices */}
           <div style={{ ...card }}>
-            <div style={{ padding:"18px 24px", borderBottom:"1px solid rgba(255,255,255,.06)", display:"flex", alignItems:"center", justifyContent:"space-between" }}>
+            <div style={{ padding: isMobile ? "12px 11px" : "18px 24px", borderBottom:"1px solid rgba(255,255,255,.06)", display:"flex", alignItems:"center", justifyContent:"space-between" }}>
               <div style={{ fontSize:15, fontWeight:800 }}>Recent Invoices</div>
               <button onClick={() => setActiveTab("invoices")} style={{ fontSize:12, fontWeight:600, color:"#a5b4fc", background:"none", border:"none", cursor:"pointer", fontFamily:"inherit" }}>View all →</button>
             </div>
             {invoices.length === 0 ? (
-              <div style={{ padding:"32px 24px", textAlign:"center", color:"rgba(255,255,255,.3)" }}>                <div style={{ fontSize:28, marginBottom:8 }}>💳</div>
+              <div style={{ padding: isMobile ? "18px 11px" : "32px 24px", textAlign:"center", color:"rgba(255,255,255,.3)" }}>                <div style={{ fontSize:28, marginBottom:8 }}>💳</div>
                 <div style={{ fontSize:13, fontWeight:600 }}>No invoices yet</div>
               </div>
             ) : (
@@ -730,12 +731,12 @@ function BillingPage() {
 
           {/* Payment methods preview */}
           <div style={{ ...card }}>
-            <div style={{ padding:"18px 24px", borderBottom:"1px solid rgba(255,255,255,.06)", display:"flex", alignItems:"center", justifyContent:"space-between" }}>
+            <div style={{ padding: isMobile ? "12px 11px" : "18px 24px", borderBottom:"1px solid rgba(255,255,255,.06)", display:"flex", alignItems:"center", justifyContent:"space-between" }}>
               <div style={{ fontSize:15, fontWeight:800 }}>Payment Methods</div>
               <button onClick={() => setActiveTab("methods")} style={{ fontSize:12, fontWeight:600, color:"#a5b4fc", background:"none", border:"none", cursor:"pointer", fontFamily:"inherit" }}>Manage →</button>
             </div>
             {paymentMethods.length === 0 ? (
-              <div style={{ padding:"28px 24px", textAlign:"center" }}>                <div style={{ fontSize:26, marginBottom:8 }}>🧾</div>
+              <div style={{ padding: isMobile ? "15px 11px" : "28px 24px", textAlign:"center" }}>                <div style={{ fontSize:26, marginBottom:8 }}>🧾</div>
                 <div style={{ fontSize:13, fontWeight:600, color:"rgba(255,255,255,.4)", marginBottom:12 }}>
                   {paymentManagedExternally ? "No card details are stored in FinovaOS." : "No payment methods saved"}
                 </div>
@@ -751,7 +752,7 @@ function BillingPage() {
             ) : paymentMethods.slice(0,2).map(pm => {
               const cfg = CARD_BRANDS[pm.brand] ?? CARD_BRANDS.unknown;
               return (
-                <div key={pm.id} className="row-hover" style={{ padding:"14px 24px", display:"flex", alignItems:"center", gap:16, borderBottom:"1px solid rgba(255,255,255,.04)" }}>
+                <div key={pm.id} className="row-hover" style={{ padding: isMobile ? "12px 11px" : "14px 24px", display:"flex", alignItems:"center", gap:16, borderBottom:"1px solid rgba(255,255,255,.04)" }}>
                   <div style={{ width:52, height:34, borderRadius:8, background:cfg.grad, display:"flex", alignItems:"center", justifyContent:"center", fontSize:8, fontWeight:900, color:"rgba(255,255,255,.5)", letterSpacing:1, flexShrink:0 }}>{cfg.label}</div>
                   <div style={{ flex:1 }}>
                     <div style={{ fontSize:13, fontWeight:700 }}>{cfg.label} •••• {pm.last4}</div>
@@ -782,7 +783,7 @@ function BillingPage() {
             </div>
           </div>
 
-          <div className="bill-plans" style={{ display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:18 }}>
+          <div className="bill-plans" style={{ display:"grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(3,1fr)", gap:18 }}>
             {PLANS.map(plan => {
               const isCurrent = currentPlanCode === plan.code;
               const pricingKey = plan.code === "ENTERPRISE" ? "enterprise" : plan.code === "PROFESSIONAL" ? "professional" : "starter";
@@ -858,7 +859,7 @@ function BillingPage() {
             ) : paymentMethods.map((pm, i) => {
               const cfg = CARD_BRANDS[pm.brand] ?? CARD_BRANDS.unknown;
               return (
-                <div key={pm.id} className="row-hover" style={{ padding:"18px 24px", display:"flex", alignItems:"center", gap:18, borderBottom:i<paymentMethods.length-1?"1px solid rgba(255,255,255,.05)":"none" }}>
+                <div key={pm.id} className="row-hover" style={{ padding: isMobile ? "12px 11px" : "18px 24px", display:"flex", alignItems:"center", gap:18, borderBottom:i<paymentMethods.length-1?"1px solid rgba(255,255,255,.05)":"none" }}>
                   <div style={{ width:72, height:46, borderRadius:10, background:cfg.grad, padding:"8px 12px", position:"relative", flexShrink:0, boxShadow:"0 4px 16px rgba(0,0,0,.25)" }}>
                     <div style={{ width:18, height:13, borderRadius:3, background:"linear-gradient(135deg,#fbbf24,#d97706)", marginBottom:5, opacity:.9 }}/>
                     <div style={{ fontSize:8, color:"rgba(255,255,255,.75)", fontFamily:"monospace", letterSpacing:1.5 }}>•••• {pm.last4}</div>
@@ -879,7 +880,7 @@ function BillingPage() {
             })}
           </div>
           {/* Processor badges */}
-          <div style={{ marginTop:18, padding:"16px 20px", borderRadius:14, background:"rgba(255,255,255,.02)", border:"1px solid rgba(255,255,255,.06)" }}>
+          <div style={{ marginTop:18, padding: isMobile ? "12px 10px" : "16px 20px", borderRadius:14, background:"rgba(255,255,255,.02)", border:"1px solid rgba(255,255,255,.06)" }}>
             <div style={{ fontSize:10, fontWeight:700, color:"rgba(255,255,255,.28)", letterSpacing:".08em", textTransform:"uppercase", marginBottom:10 }}>Accepted Payment Methods</div>
             <div style={{ fontSize:12, color:"rgba(255,255,255,.42)", marginBottom:10, lineHeight:1.55 }}>
               {paymentManagedExternally
@@ -921,12 +922,12 @@ function BillingPage() {
                   <tbody>
                     {invoices.map((inv,i) => (
                       <tr key={inv.id} className="row-hover" style={{ borderBottom:i<invoices.length-1?"1px solid rgba(255,255,255,.04)":"none" }}>
-                        <td style={{ padding:"14px 20px", fontSize:13, fontWeight:700, color:"rgba(255,255,255,.85)", fontFamily:"monospace" }}>{inv.number}</td>
-                        <td style={{ padding:"14px 20px", fontSize:13, color:"rgba(255,255,255,.4)" }}>{inv.date}</td>
-                        <td style={{ padding:"14px 20px", fontSize:13, color:"rgba(255,255,255,.65)" }}>{inv.plan}</td>
-                        <td style={{ padding:"14px 20px", fontSize:13, fontWeight:700 }}>${inv.amount}.00 {inv.currency}</td>
-                        <td style={{ padding:"14px 20px" }}><StatusBadge status={inv.status}/></td>
-                        <td style={{ padding:"14px 20px" }}><button onClick={() => toast("PDF download coming soon.")} style={{ display:"flex", alignItems:"center", gap:5, padding:"5px 12px", borderRadius:8, border:"1px solid rgba(255,255,255,.08)", background:"rgba(255,255,255,.04)", fontSize:11, fontWeight:600, color:"rgba(255,255,255,.45)", cursor:"pointer", fontFamily:"inherit" }}>⬇ PDF</button></td>
+                        <td style={{ padding: isMobile ? "12px 10px" : "14px 20px", fontSize:13, fontWeight:700, color:"rgba(255,255,255,.85)", fontFamily:"monospace" }}>{inv.number}</td>
+                        <td style={{ padding: isMobile ? "12px 10px" : "14px 20px", fontSize:13, color:"rgba(255,255,255,.4)" }}>{inv.date}</td>
+                        <td style={{ padding: isMobile ? "12px 10px" : "14px 20px", fontSize:13, color:"rgba(255,255,255,.65)" }}>{inv.plan}</td>
+                        <td style={{ padding: isMobile ? "12px 10px" : "14px 20px", fontSize:13, fontWeight:700 }}>${inv.amount}.00 {inv.currency}</td>
+                        <td style={{ padding: isMobile ? "12px 10px" : "14px 20px" }}><StatusBadge status={inv.status}/></td>
+                        <td style={{ padding: isMobile ? "12px 10px" : "14px 20px" }}><button onClick={() => toast("PDF download coming soon.")} style={{ display:"flex", alignItems:"center", gap:5, padding:"5px 12px", borderRadius:8, border:"1px solid rgba(255,255,255,.08)", background:"rgba(255,255,255,.04)", fontSize:11, fontWeight:600, color:"rgba(255,255,255,.45)", cursor:"pointer", fontFamily:"inherit" }}>⬇ PDF</button></td>
                       </tr>
                     ))}
                   </tbody>
@@ -993,7 +994,7 @@ function BillingPage() {
               </div>
 
               {/* Price breakdown */}
-              <div style={{ padding:"14px 18px", borderRadius:14, background:"linear-gradient(135deg,rgba(99,102,241,.1),rgba(124,58,237,.08))", border:"1px solid rgba(99,102,241,.2)", marginBottom:20 }}>
+              <div style={{ padding: isMobile ? "12px 10px" : "14px 18px", borderRadius:14, background:"linear-gradient(135deg,rgba(99,102,241,.1),rgba(124,58,237,.08))", border:"1px solid rgba(99,102,241,.2)", marginBottom:20 }}>
                 <div style={{ display:"flex", justifyContent:"space-between", marginBottom:8 }}>
                   <span style={{ fontSize:12, color:"rgba(255,255,255,.5)" }}>{seatQty} seat{seatQty > 1 ? "s" : ""} × ${seatCyclePrice}/seat/mo</span>
                   <span style={{ fontSize:13, fontWeight:700, color:"white" }}>${seatTotalCost}/mo</span>
@@ -1028,6 +1029,7 @@ function BillingPage() {
 }
 
 export default function BillingPageWrapper() {
+  const { isMobile } = useResponsive();
   return (
     <Suspense fallback={<div style={{ padding:32, fontFamily:"Outfit,sans-serif", color:"white" }}>Loading...</div>}>
       <BillingPage />

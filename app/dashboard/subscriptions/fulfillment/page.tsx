@@ -5,6 +5,7 @@ import toast from "react-hot-toast";
 import { useMemo, useState } from "react";
 import { useBusinessRecords } from "@/lib/useBusinessRecords";
 import { mapSaaSSubscribers, saasBg, saasBorder, saasFont, saasMuted, saasStatusColor, todayIso } from "../_shared";
+import { useResponsive } from "@/hooks/useResponsive";
 
 type FulfillmentRecord = {
   id: string;
@@ -45,6 +46,7 @@ const smallButton: React.CSSProperties = {
 };
 
 export default function SubscriptionFulfillmentPage() {
+  const { isMobile } = useResponsive();
   const subscriberStore = useBusinessRecords("subscription_subscriber");
   const boxStore = useBusinessRecords("subscription_box_catalog");
   const { records, loading, create, update } = useBusinessRecords("subscription_fulfillment");
@@ -78,13 +80,13 @@ export default function SubscriptionFulfillmentPage() {
   };
 
   return (
-    <div style={{ padding: "28px 32px", color: "#fff", minHeight: "100vh", fontFamily: saasFont }}>
+    <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", color: "#fff", minHeight: "100vh", fontFamily: saasFont }}>
       <div style={{ marginBottom: 24 }}>
         <h1 style={{ margin: "0 0 6px", fontSize: 28, fontWeight: 900 }}>Fulfillment Cycles</h1>
         <p style={{ margin: 0, color: saasMuted, fontSize: 14 }}>Packing, dispatch, tracking, aur delivered lifecycle ko member-wise manage karein.</p>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "360px 1fr", gap: 18 }}>
+      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "360px 1fr", gap: 18 }}>
         <div style={{ background: saasBg, border: `1px solid ${saasBorder}`, borderRadius: 18, padding: 20 }}>
           <div style={{ fontSize: 16, fontWeight: 800, marginBottom: 16 }}>New Fulfillment Run</div>
           <div style={{ display: "grid", gap: 12 }}>
@@ -104,7 +106,7 @@ export default function SubscriptionFulfillmentPage() {
         </div>
 
         <div style={{ background: saasBg, border: `1px solid ${saasBorder}`, borderRadius: 18, overflow: "hidden" }}>
-          <div style={{ padding: "16px 18px", borderBottom: `1px solid ${saasBorder}`, fontSize: 16, fontWeight: 800 }}>Dispatch Watchlist</div>
+          <div style={{ padding: isMobile ? "12px 10px" : "16px 18px", borderBottom: `1px solid ${saasBorder}`, fontSize: 16, fontWeight: 800 }}>Dispatch Watchlist</div>
           <div style={{ display: "grid", gap: 12, padding: 18 }}>
             {!loading && rows.length === 0 && <div style={{ color: "rgba(255,255,255,.28)" }}>No fulfillment cycles yet.</div>}
             {rows.map((row) => (

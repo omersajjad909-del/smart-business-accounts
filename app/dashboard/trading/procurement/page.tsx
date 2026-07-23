@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import {
+import { useResponsive } from "@/hooks/useResponsive";
   fetchJson,
   formatDate,
   formatMoney,
@@ -18,6 +19,7 @@ import {
 } from "../_shared";
 
 export default function TradingProcurementPage() {
+  const { isMobile } = useResponsive();
   const [purchaseOrders, setPurchaseOrders] = useState<PurchaseOrderLite[]>([]);
   const [purchaseInvoices, setPurchaseInvoices] = useState<PurchaseInvoiceLite[]>([]);
   const [grns, setGrns] = useState<GrnLite[]>([]);
@@ -57,7 +59,7 @@ export default function TradingProcurementPage() {
   );
 
   return (
-    <div style={{ padding: "28px 32px", fontFamily: tradingFont, color: "var(--text-primary)", minHeight: "100vh" }}>
+    <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", fontFamily: tradingFont, color: "var(--text-primary)", minHeight: "100vh" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 26 }}>
         <div>
           <h1 style={{ fontSize: 24, fontWeight: 800, margin: "0 0 6px" }}>Procurement Desk</h1>
@@ -75,14 +77,14 @@ export default function TradingProcurementPage() {
         </div>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4,minmax(0,1fr))", gap: 12, marginBottom: 24 }}>
+      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,minmax(0,1fr))", gap: 12, marginBottom: 24 }}>
         {[
           { label: "Purchase Orders", value: purchaseOrders.length, color: "#34d399" },
           { label: "Pending PO Value", value: formatMoney(pendingPoValue), color: "#f59e0b" },
           { label: "Purchase Invoices", value: formatMoney(invoiceValue), color: "#a78bfa" },
           { label: "GRNs Logged", value: grns.length, color: "#38bdf8" },
         ].map((card) => (
-          <div key={card.label} style={{ background: tradingBg, border: `1px solid ${tradingBorder}`, borderRadius: 14, padding: "18px 20px" }}>
+          <div key={card.label} style={{ background: tradingBg, border: `1px solid ${tradingBorder}`, borderRadius: 14, padding: isMobile ? "12px 10px" : "18px 20px" }}>
             <div style={{ fontSize: 12, color: tradingMuted, marginBottom: 8 }}>{card.label}</div>
             <div style={{ fontSize: 24, fontWeight: 800, color: card.color }}>{card.value}</div>
           </div>
@@ -91,7 +93,7 @@ export default function TradingProcurementPage() {
 
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
         <div style={{ background: tradingBg, border: `1px solid ${tradingBorder}`, borderRadius: 16, overflow: "hidden" }}>
-          <div style={{ padding: "16px 18px", borderBottom: `1px solid ${tradingBorder}`, fontSize: 15, fontWeight: 800 }}>Supplier Orders</div>
+          <div style={{ padding: isMobile ? "12px 10px" : "16px 18px", borderBottom: `1px solid ${tradingBorder}`, fontSize: 15, fontWeight: 800 }}>Supplier Orders</div>
           <table style={{ width: "100%", borderCollapse: "collapse" }}>
             <thead>
               <tr>
@@ -121,7 +123,7 @@ export default function TradingProcurementPage() {
 
         <div style={{ display: "grid", gap: 14 }}>
           <div style={{ background: tradingBg, border: `1px solid ${tradingBorder}`, borderRadius: 16, overflow: "hidden" }}>
-            <div style={{ padding: "16px 18px", borderBottom: `1px solid ${tradingBorder}`, fontSize: 15, fontWeight: 800 }}>Goods Receipt Notes</div>
+            <div style={{ padding: isMobile ? "12px 10px" : "16px 18px", borderBottom: `1px solid ${tradingBorder}`, fontSize: 15, fontWeight: 800 }}>Goods Receipt Notes</div>
             <div style={{ padding: 16, display: "grid", gap: 10 }}>
               {grns.slice(0, 5).map((row) => (
                 <div key={row.id} style={{ padding: "12px 14px", borderRadius: 12, background: "var(--panel-bg)", border: `1px solid ${tradingBorder}` }}>
@@ -138,7 +140,7 @@ export default function TradingProcurementPage() {
           </div>
 
           <div style={{ background: tradingBg, border: `1px solid ${tradingBorder}`, borderRadius: 16, overflow: "hidden" }}>
-            <div style={{ padding: "16px 18px", borderBottom: `1px solid ${tradingBorder}`, fontSize: 15, fontWeight: 800 }}>Latest Purchase Invoices</div>
+            <div style={{ padding: isMobile ? "12px 10px" : "16px 18px", borderBottom: `1px solid ${tradingBorder}`, fontSize: 15, fontWeight: 800 }}>Latest Purchase Invoices</div>
             <div style={{ padding: 16, display: "grid", gap: 10 }}>
               {purchaseInvoices.slice(0, 5).map((row) => (
                 <div key={row.id} style={{ padding: "12px 14px", borderRadius: 12, background: "rgba(167,139,250,.08)", border: "1px solid rgba(167,139,250,.16)" }}>

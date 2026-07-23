@@ -6,6 +6,7 @@ import toast from "react-hot-toast";
 import { useEffect, useState } from "react";
 import { getCurrentUser } from "@/lib/auth";
 import { exportToCSV } from "@/lib/export";
+import { useResponsive } from "@/hooks/useResponsive";
 
 type Account = {
   id: string;
@@ -23,6 +24,7 @@ type Budget = {
 };
 
 export default function BudgetPage() {
+  const { isMobile } = useResponsive();
   const currentYear = new Date().getFullYear();
   const [accounts, setAccounts] = useState<Account[]>([]);
   const [budgets, setBudgets] = useState<Budget[]>([]);

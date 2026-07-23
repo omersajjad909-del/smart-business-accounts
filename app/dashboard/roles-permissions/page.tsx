@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { getCurrentUser } from "@/lib/auth";
 import { PERMISSIONS } from "@/lib/permissions";
+import { useResponsive } from "@/hooks/useResponsive";
 
 const ALL_ROLES = [
   { value: "ADMIN",              label: "Admin" },
@@ -21,6 +22,7 @@ interface Role { role: string; permissions: string[]; }
 type CurrentUser = { id: string; role: string; name?: string; email?: string; };
 
 export default function RolePermissionManager() {
+  const { isMobile } = useResponsive();
   const [user, setUser]                     = useState<CurrentUser | null>(null);
   const [roles, setRoles]                   = useState<Role[]>([]);
   const [selectedRole, setSelectedRole]     = useState<string>("ADMIN");
@@ -82,7 +84,7 @@ export default function RolePermissionManager() {
     page:    { padding: "24px", maxWidth: 1100, margin: "0 auto", fontFamily: "inherit" },
     heading: { fontSize: 22, fontWeight: 800, color: "white", marginBottom: 4 },
     sub:     { fontSize: 13, color: "rgba(255,255,255,0.4)", marginBottom: 24 },
-    grid:    { display: "grid", gridTemplateColumns: "220px 1fr", gap: 16 } as React.CSSProperties,
+    grid:    { display: "grid", gridTemplateColumns: isMobile ? "1fr" : "220px 1fr", gap: 16 } as React.CSSProperties,
     panel:   { borderRadius: 12, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", padding: "16px" },
     roleBtn: (active: boolean): React.CSSProperties => ({
       display: "block", width: "100%", textAlign: "left", padding: "10px 12px",

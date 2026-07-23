@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { MaintenanceControlCenter, fetchJson, maintenanceBg, maintenanceBorder, maintenanceFont, maintenanceMuted } from "./_shared";
+import { useResponsive } from "@/hooks/useResponsive";
 
 const emptyState: MaintenanceControlCenter = {
   summary: {
@@ -26,6 +27,7 @@ const emptyState: MaintenanceControlCenter = {
 };
 
 export default function MaintenanceOverviewPage() {
+  const { isMobile } = useResponsive();
   const [data, setData] = useState(emptyState);
 
   useEffect(() => {
@@ -35,7 +37,7 @@ export default function MaintenanceOverviewPage() {
   const { summary, contracts, jobs, parts } = data;
 
   return (
-    <div style={{ minHeight: "100vh", padding: "28px 32px", color: "#fff", fontFamily: maintenanceFont }}>
+    <div style={{ minHeight: "100vh", padding: isMobile ? "15px 14px" : "28px 32px", color: "#fff", fontFamily: maintenanceFont }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 18, flexWrap: "wrap", marginBottom: 24 }}>
         <div>
           <div style={{ fontSize: 12, color: "#34d399", fontWeight: 800, letterSpacing: ".08em", textTransform: "uppercase", marginBottom: 8 }}>Maintenance Services</div>
@@ -67,7 +69,7 @@ export default function MaintenanceOverviewPage() {
           { label: "Low Stock", value: summary.lowStockParts, color: "#f87171" },
           { label: "Contract Value", value: `Rs. ${summary.contractValue.toLocaleString()}`, color: "#22c55e" },
         ].map((card) => (
-          <div key={card.label} style={{ background: maintenanceBg, border: `1px solid ${maintenanceBorder}`, borderRadius: 16, padding: "18px 20px" }}>
+          <div key={card.label} style={{ background: maintenanceBg, border: `1px solid ${maintenanceBorder}`, borderRadius: 16, padding: isMobile ? "12px 10px" : "18px 20px" }}>
             <div style={{ fontSize: 12, color: maintenanceMuted, marginBottom: 8 }}>{card.label}</div>
             <div style={{ fontSize: 24, fontWeight: 800, color: card.color }}>{card.value}</div>
           </div>
@@ -77,7 +79,7 @@ export default function MaintenanceOverviewPage() {
       <div style={{ display: "grid", gridTemplateColumns: "1.15fr .85fr", gap: 18 }}>
         <div style={{ background: "linear-gradient(135deg, rgba(34,197,94,.14), rgba(16,185,129,.08))", border: `1px solid ${maintenanceBorder}`, borderRadius: 20, padding: 24 }}>
           <div style={{ fontSize: 13, color: "#bbf7d0", fontWeight: 800, marginBottom: 12, textTransform: "uppercase", letterSpacing: ".07em" }}>Service Flow</div>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(4,minmax(0,1fr))", gap: 12 }}>
+          <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,minmax(0,1fr))", gap: 12 }}>
             {[
               { title: "AMC Scope", body: "Client contract, covered assets, and annual visit commitments define service load." },
               { title: "Schedule Board", body: "Preventive visits and due inspections are planned against teams and sites." },
@@ -118,7 +120,7 @@ export default function MaintenanceOverviewPage() {
                 { label: "Urgent jobs", value: `${summary.urgentJobs} urgent`, tone: "#f87171" },
                 { label: "Reserved parts", value: `${parts.filter((row) => row.status === "reserved").length} reserved`, tone: "#a78bfa" },
               ].map((row) => (
-                <div key={row.label} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "rgba(255,255,255,.025)", border: "1px solid rgba(255,255,255,.06)", borderRadius: 14, padding: "14px 16px" }}>
+                <div key={row.label} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "rgba(255,255,255,.025)", border: "1px solid rgba(255,255,255,.06)", borderRadius: 14, padding: isMobile ? "12px 10px" : "14px 16px" }}>
                   <span style={{ fontSize: 13, color: maintenanceMuted }}>{row.label}</span>
                   <span style={{ fontSize: 14, fontWeight: 800, color: row.tone }}>{row.value}</span>
                 </div>

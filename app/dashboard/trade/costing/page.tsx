@@ -4,6 +4,7 @@ import { confirmToast, alertToast } from "@/lib/toast-feedback";
 import { useMemo, useState } from "react";
 import { useBusinessRecords } from "@/lib/useBusinessRecords";
 import { mapImportCostingRecords, tradeBg, tradeBorder, tradeFont, tradeMuted } from "../_shared";
+import { useResponsive } from "@/hooks/useResponsive";
 
 type CostingStatus = "draft" | "reviewed" | "posted";
 
@@ -47,6 +48,7 @@ function num(value: string) {
 }
 
 export default function ImportCostingPage() {
+  const { isMobile } = useResponsive();
   const { records, loading, create, update, remove } = useBusinessRecords("import_costing");
   const rows = useMemo(() => mapImportCostingRecords(records), [records]);
 
@@ -198,7 +200,7 @@ export default function ImportCostingPage() {
   }
 
   return (
-    <div style={{ minHeight: "100vh", padding: "28px 32px", color: "var(--text-primary)", fontFamily: tradeFont }}>
+    <div style={{ minHeight: "100vh", padding: isMobile ? "15px 14px" : "28px 32px", color: "var(--text-primary)", fontFamily: tradeFont }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 16, flexWrap: "wrap", marginBottom: 24 }}>
         <div>
           <h1 style={{ margin: "0 0 6px", fontSize: 26, fontWeight: 800 }}>Import Costing</h1>
@@ -209,14 +211,14 @@ export default function ImportCostingPage() {
         </button>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4,minmax(0,1fr))", gap: 12, marginBottom: 22 }}>
+      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,minmax(0,1fr))", gap: 12, marginBottom: 22 }}>
         {[
           { label: "Costing Records", value: kpis.records, color: "#60a5fa" },
           { label: "Booked Landed Cost", value: `USD ${kpis.bookedValue.toLocaleString()}`, color: "#34d399" },
           { label: "Avg Landed / Unit", value: `USD ${kpis.avgLanded.toFixed(2)}`, color: "#fbbf24" },
           { label: "Pending Review", value: kpis.pending, color: "#c084fc" },
         ].map((card) => (
-          <div key={card.label} style={{ background: tradeBg, border: `1px solid ${tradeBorder}`, borderRadius: 14, padding: "18px 20px" }}>
+          <div key={card.label} style={{ background: tradeBg, border: `1px solid ${tradeBorder}`, borderRadius: 14, padding: isMobile ? "12px 10px" : "18px 20px" }}>
             <div style={{ fontSize: 12, color: tradeMuted, marginBottom: 8 }}>{card.label}</div>
             <div style={{ fontSize: 22, fontWeight: 800, color: card.color }}>{card.value}</div>
           </div>
@@ -288,7 +290,7 @@ export default function ImportCostingPage() {
               <button onClick={() => setShowModal(false)} style={{ background: "transparent", border: "none", color: tradeMuted, fontSize: 24, cursor: "pointer" }}>x</button>
             </div>
 
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(3,minmax(0,1fr))", gap: 14 }}>
+            <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(3,minmax(0,1fr))", gap: 14 }}>
               <div><label style={labelStyle}>Shipment Ref</label><input value={form.shipmentRef} onChange={(e) => setForm((prev) => ({ ...prev, shipmentRef: e.target.value }))} style={inputStyle} /></div>
               <div><label style={labelStyle}>Supplier</label><input value={form.supplier} onChange={(e) => setForm((prev) => ({ ...prev, supplier: e.target.value }))} style={inputStyle} /></div>
               <div><label style={labelStyle}>Currency</label><select value={form.currency} onChange={(e) => setForm((prev) => ({ ...prev, currency: e.target.value }))} style={inputStyle}>{CURRENCIES.map((currency) => <option key={currency} value={currency}>{currency}</option>)}</select></div>
@@ -303,7 +305,7 @@ export default function ImportCostingPage() {
               <div><label style={labelStyle}>Status</label><select value={form.status} onChange={(e) => setForm((prev) => ({ ...prev, status: e.target.value as CostingStatus }))} style={inputStyle}><option value="draft">Draft</option><option value="reviewed">Reviewed</option><option value="posted">Posted</option></select></div>
             </div>
 
-            <div style={{ marginTop: 18, padding: "14px 16px", borderRadius: 12, background: "var(--panel-bg)", border: `1px solid ${tradeBorder}`, display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
+            <div style={{ marginTop: 18, padding: isMobile ? "12px 10px" : "14px 16px", borderRadius: 12, background: "var(--panel-bg)", border: `1px solid ${tradeBorder}`, display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
               <div>
                 <div style={{ fontSize: 11, color: tradeMuted, textTransform: "uppercase", letterSpacing: ".05em", marginBottom: 6 }}>Total Landed Cost</div>
                 <div style={{ fontSize: 24, fontWeight: 800, color: "#34d399" }}>{form.currency} {landedCost.toLocaleString()}</div>

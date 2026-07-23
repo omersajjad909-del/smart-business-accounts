@@ -3,6 +3,7 @@
 import toast from "react-hot-toast";
 import { useState } from 'react';
 import { useBusinessRecords } from '@/lib/useBusinessRecords';
+import { useResponsive } from "@/hooks/useResponsive";
 
 const S = {
   page: { padding: '32px', fontFamily: 'Inter, sans-serif', color: '#fff', minHeight: '100vh' },
@@ -10,8 +11,8 @@ const S = {
   title: { fontSize: 24, fontWeight: 700, margin: 0 },
   sub: { fontSize: 14, color: 'rgba(255,255,255,.5)', marginTop: 4 },
   btn: { background: '#7c3aed', color: '#fff', border: 'none', borderRadius: 8, padding: '10px 20px', fontWeight: 600, cursor: 'pointer', fontSize: 14 },
-  stats: { display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 16, marginBottom: 28 },
-  stat: { background: 'rgba(255,255,255,.03)', border: '1px solid rgba(255,255,255,.07)', borderRadius: 12, padding: '20px 24px' },
+  stats: { display: 'grid', gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 16, marginBottom: 28 },
+  stat: { background: 'rgba(255,255,255,.03)', border: '1px solid rgba(255,255,255,.07)', borderRadius: 12, padding: isMobile ? "12px 11px" : "20px 24px" },
   statLabel: { fontSize: 13, color: 'rgba(255,255,255,.5)', marginBottom: 6 },
   statVal: { fontSize: 28, fontWeight: 700 },
   filters: { display: 'flex', gap: 12, marginBottom: 24, flexWrap: 'wrap' as const },
@@ -20,7 +21,7 @@ const S = {
   card: { background: 'rgba(255,255,255,.03)', border: '1px solid rgba(255,255,255,.07)', borderRadius: 12, overflow: 'hidden' },
   table: { width: '100%', borderCollapse: 'collapse' as const },
   th: { textAlign: 'left' as const, padding: '12px 16px', fontSize: 12, color: 'rgba(255,255,255,.5)', borderBottom: '1px solid rgba(255,255,255,.07)', fontWeight: 600 },
-  td: { padding: '14px 16px', fontSize: 14, borderBottom: '1px solid rgba(255,255,255,.04)' },
+  td: { padding: isMobile ? "12px 10px" : "14px 16px", fontSize: 14, borderBottom: '1px solid rgba(255,255,255,.04)' },
   badge: (c: string) => ({ display: 'inline-block', background: `${c}20`, color: c, borderRadius: 6, padding: '2px 10px', fontSize: 12, fontWeight: 600 }),
   priorityDot: (c: string) => ({ display: 'inline-block', width: 8, height: 8, borderRadius: '50%', background: c, marginRight: 6 }),
   overlay: { position: 'fixed' as const, inset: 0, background: 'rgba(0,0,0,.6)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center' },
@@ -42,6 +43,7 @@ const STATUSES = ['Open', 'In Progress', 'Waiting Client', 'Resolved', 'Closed']
 const AGENTS = ['Ahmed K.', 'Sara M.', 'Bilal R.', 'Zara H.'];
 
 export default function SupportPage() {
+  const { isMobile } = useResponsive();
   const { records, loading, create, update } = useBusinessRecords('support_ticket');
   const [statusFilter, setStatusFilter] = useState('All');
   const [priorityFilter, setPriorityFilter] = useState('All');

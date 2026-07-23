@@ -4,6 +4,7 @@ import toast from "react-hot-toast";
 import { useEffect, useState } from "react";
 import { getCurrentUser } from "@/lib/auth";
 import DateInput from "@/app/dashboard/reports/_components/DateInput";
+import { useResponsive } from "@/hooks/useResponsive";
 
 const ff = "'Outfit','Inter',sans-serif";
 
@@ -28,6 +29,7 @@ function typeBadge(type: string) {
 }
 
 export default function StockLedgerPage() {
+  const { isMobile } = useResponsive();
   const today = new Date().toISOString().slice(0, 10);
   const [items,  setItems]  = useState<Item[]>([]);
   const [itemId, setItemId] = useState("");
@@ -71,7 +73,7 @@ export default function StockLedgerPage() {
   };
 
   return (
-    <div style={{ minHeight: "100vh", background: "#080e1b", color: "#e2e8f0", fontFamily: ff, padding: "28px 32px" }}>
+    <div style={{ minHeight: "100vh", background: "#080e1b", color: "#e2e8f0", fontFamily: ff, padding: isMobile ? "15px 14px" : "28px 32px" }}>
       <style>{`
         .sl-row:hover td { background: rgba(99,102,241,.04) !important; }
         .sl-opening td  { opacity: .6; }
@@ -109,7 +111,7 @@ export default function StockLedgerPage() {
       </div>
 
       {/* ── Filter Card ── */}
-      <div style={{ background: "#111827", border: "1px solid rgba(255,255,255,.08)", borderRadius: 14, padding: "18px 20px", marginBottom: 20, display: "flex", alignItems: "flex-end", gap: 14, flexWrap: "wrap" }}>
+      <div style={{ background: "#111827", border: "1px solid rgba(255,255,255,.08)", borderRadius: 14, padding: isMobile ? "12px 10px" : "18px 20px", marginBottom: 20, display: "flex", alignItems: "flex-end", gap: 14, flexWrap: "wrap" }}>
         {/* Item select */}
         <div style={{ display: "flex", flexDirection: "column", gap: 5, flex: "1 1 260px", minWidth: 220 }}>
           <label style={{ fontSize: 10, fontWeight: 700, color: "rgba(255,255,255,.38)", letterSpacing: ".07em", textTransform: "uppercase" }}>Select Item</label>
@@ -157,14 +159,14 @@ export default function StockLedgerPage() {
 
       {/* ── Summary KPI cards ── */}
       {hasLoaded && !loading && rows.length > 0 && (
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(160px,1fr))", gap: 12, marginBottom: 20 }}>
+        <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(auto-fit,minmax(160px,1fr))", gap: 12, marginBottom: 20 }}>
           {[
             { label: "Total IN",     value: totalIn.toLocaleString(),    color: "#34d399", bg: "rgba(16,185,129,.09)",  border: "rgba(16,185,129,.2)",  icon: "▲" },
             { label: "Total OUT",    value: totalOut.toLocaleString(),   color: "#f87171", bg: "rgba(239,68,68,.09)",   border: "rgba(239,68,68,.2)",   icon: "▼" },
             { label: "Net Balance",  value: finalBal.toLocaleString(),   color: "#818cf8", bg: "rgba(99,102,241,.1)",   border: "rgba(99,102,241,.25)", icon: "=" },
             { label: "Transactions", value: String(nonOpening.length),   color: "#e2e8f0", bg: "rgba(255,255,255,.04)", border: "rgba(255,255,255,.1)",  icon: "#" },
           ].map(k => (
-            <div key={k.label} style={{ background: k.bg, border: `1px solid ${k.border}`, borderRadius: 12, padding: "14px 16px" }}>
+            <div key={k.label} style={{ background: k.bg, border: `1px solid ${k.border}`, borderRadius: 12, padding: isMobile ? "12px 10px" : "14px 16px" }}>
               <div style={{ fontSize: 9, color: "rgba(255,255,255,.35)", letterSpacing: ".09em", textTransform: "uppercase", marginBottom: 6, fontWeight: 700, display: "flex", alignItems: "center", gap: 5 }}>
                 <span style={{ fontSize: 11, color: k.color, fontWeight: 900 }}>{k.icon}</span>
                 {k.label}

@@ -2,6 +2,7 @@
 import { fmtDate } from "@/lib/dateUtils";
 import { useEffect, useState } from "react";
 import { getCurrentUser } from "@/lib/auth";
+import { useResponsive } from "@/hooks/useResponsive";
 
 const STATUS_META: Record<string, { label: string; color: string }> = {
   PENDING:   { label: "⏳ Under Review",  color: "#fbbf24" },
@@ -12,6 +13,7 @@ const STATUS_META: Record<string, { label: string; color: string }> = {
 type PrevItem = { id: string; message: string; rating: number; status: string; createdAt: string };
 
 export default function TestimonialPage() {
+  const { isMobile } = useResponsive();
   const user = getCurrentUser() as any;
 
   const [rating,   setRating]   = useState(5);
@@ -253,7 +255,7 @@ export default function TestimonialPage() {
               const s = STATUS_META[item.status] || { label: item.status, color: "#64748b" };
               return (
                 <div key={item.id} style={{
-                  padding: "14px 16px", borderRadius: "10px",
+                  padding: isMobile ? "12px 10px" : "14px 16px", borderRadius: "10px",
                   background: "var(--app-bg)", border: "1px solid var(--border)",
                 }}>
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: "12px", marginBottom: "8px" }}>

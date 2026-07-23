@@ -2,10 +2,11 @@
 
 import { useEffect, useState } from "react";
 import { ItControlCenter, fetchJson, itBg, itBorder, itFont, itMuted } from "../_shared";
+import { useResponsive } from "@/hooks/useResponsive";
 
 function Metric({ title, value, note, color }: { title: string; value: string; note: string; color: string }) {
   return (
-    <div style={{ background: itBg, border: `1px solid ${itBorder}`, borderRadius: 18, padding: "20px 22px" }}>
+    <div style={{ background: itBg, border: `1px solid ${itBorder}`, borderRadius: 18, padding: isMobile ? "12px 10px" : "20px 22px" }}>
       <div style={{ fontSize: 12, color: itMuted, marginBottom: 8, textTransform: "uppercase", letterSpacing: ".06em" }}>{title}</div>
       <div style={{ fontSize: 26, fontWeight: 900, color }}>{value}</div>
       <div style={{ fontSize: 12, color: itMuted, marginTop: 6 }}>{note}</div>
@@ -34,6 +35,7 @@ const emptyState: ItControlCenter = {
 };
 
 export default function ITAnalyticsPage() {
+  const { isMobile } = useResponsive();
   const [data, setData] = useState(emptyState);
 
   useEffect(() => {
@@ -54,7 +56,7 @@ export default function ITAnalyticsPage() {
   }));
 
   return (
-    <div style={{ padding: "28px 32px", minHeight: "100vh", color: "#fff", fontFamily: itFont }}>
+    <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", minHeight: "100vh", color: "#fff", fontFamily: itFont }}>
       <div style={{ marginBottom: 24 }}>
         <div style={{ fontSize: 12, color: "#a78bfa", fontWeight: 700, letterSpacing: ".08em", textTransform: "uppercase", marginBottom: 10 }}>IT Analytics</div>
         <h1 style={{ fontSize: 30, fontWeight: 900, margin: "0 0 10px" }}>Delivery health, stack mix, and support pressure</h1>
@@ -63,7 +65,7 @@ export default function ITAnalyticsPage() {
         </p>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4, minmax(0,1fr))", gap: 14, marginBottom: 24 }}>
+      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,minmax(0,1fr))", gap: 14, marginBottom: 24 }}>
         <Metric title="Active Revenue" value={`Rs. ${summary.activeContractValue.toLocaleString()}`} note="Active contracts only" color="#60a5fa" />
         <Metric title="Project Spend" value={`Rs. ${totalSpent.toLocaleString()}`} note="Tracked delivery burn" color="#f59e0b" />
         <Metric title="Average Progress" value={`${summary.averageProgress}%`} note={`${summary.projects} projects tracked`} color="#8b5cf6" />

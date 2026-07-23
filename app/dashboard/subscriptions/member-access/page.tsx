@@ -5,6 +5,7 @@ import toast from "react-hot-toast";
 import { useMemo, useState } from "react";
 import { useBusinessRecords } from "@/lib/useBusinessRecords";
 import { mapSaaSSubscribers, saasBg, saasBorder, saasFont, saasMuted, saasStatusColor, todayIso } from "../_shared";
+import { useResponsive } from "@/hooks/useResponsive";
 
 type AccessRecord = {
   id: string;
@@ -45,6 +46,7 @@ const smallButton: React.CSSProperties = {
 };
 
 export default function MemberAccessPage() {
+  const { isMobile } = useResponsive();
   const subscriberStore = useBusinessRecords("subscription_subscriber");
   const tierStore = useBusinessRecords("membership_content_tier");
   const { records, loading, create, update } = useBusinessRecords("membership_access");
@@ -77,13 +79,13 @@ export default function MemberAccessPage() {
   };
 
   return (
-    <div style={{ padding: "28px 32px", color: "#fff", minHeight: "100vh", fontFamily: saasFont }}>
+    <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", color: "#fff", minHeight: "100vh", fontFamily: saasFont }}>
       <div style={{ marginBottom: 24 }}>
         <h1 style={{ margin: "0 0 6px", fontSize: 28, fontWeight: 900 }}>Member Access</h1>
         <p style={{ margin: 0, color: saasMuted, fontSize: 14 }}>Subscribers ko tier-based access assign karein aur revoke / renew lifecycle manage karein.</p>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "360px 1fr", gap: 18 }}>
+      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "360px 1fr", gap: 18 }}>
         <div style={{ background: saasBg, border: `1px solid ${saasBorder}`, borderRadius: 18, padding: 20 }}>
           <div style={{ fontSize: 16, fontWeight: 800, marginBottom: 16 }}>Grant Access</div>
           <div style={{ display: "grid", gap: 12 }}>
@@ -101,7 +103,7 @@ export default function MemberAccessPage() {
         </div>
 
         <div style={{ background: saasBg, border: `1px solid ${saasBorder}`, borderRadius: 18, overflow: "hidden" }}>
-          <div style={{ padding: "16px 18px", borderBottom: `1px solid ${saasBorder}`, fontSize: 16, fontWeight: 800 }}>Access Matrix</div>
+          <div style={{ padding: isMobile ? "12px 10px" : "16px 18px", borderBottom: `1px solid ${saasBorder}`, fontSize: 16, fontWeight: 800 }}>Access Matrix</div>
           <div style={{ display: "grid", gap: 12, padding: 18 }}>
             {!loading && accessRows.length === 0 && <div style={{ color: "rgba(255,255,255,.28)" }}>No access records yet.</div>}
             {accessRows.map((row) => (

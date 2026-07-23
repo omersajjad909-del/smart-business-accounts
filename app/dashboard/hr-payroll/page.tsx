@@ -7,6 +7,7 @@ import {
   ResponsiveContainer, PieChart, Pie, Cell,
 } from "recharts";
 import { getCurrentUser } from "@/lib/auth";
+import { useResponsive } from "@/hooks/useResponsive";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 type AttRecord = {
@@ -194,6 +195,7 @@ function TodayPanel({ att }: { att: AttRecord[] }) {
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 export default function HrPayrollDashboard() {
+  const { isMobile } = useResponsive();
   const user = getCurrentUser();
   const [month, setMonth] = useState(currentMonth);
   const [att, setAtt]     = useState<AttRecord[]>([]);
@@ -318,7 +320,7 @@ export default function HrPayrollDashboard() {
         }
       `}</style>
 
-      <div style={{ maxWidth: 1400, margin: "0 auto", padding: "20px 16px" }}>
+      <div style={{ maxWidth: 1400, margin: "0 auto", padding: isMobile ? "12px 10px" : "20px 16px" }}>
 
         {/* ── Header ────────────────────────────────────────────────────────── */}
         <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 28, flexWrap: "wrap", gap: 16 }}>

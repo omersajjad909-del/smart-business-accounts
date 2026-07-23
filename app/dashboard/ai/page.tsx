@@ -6,6 +6,7 @@ import { useEffect, useRef, useState, useCallback } from "react";
 import { useSearchParams } from "next/navigation";
 import { getCurrentUser } from "@/lib/auth";
 import {
+import { useResponsive } from "@/hooks/useResponsive";
   XAxis, YAxis, CartesianGrid, Tooltip,
   ResponsiveContainer, BarChart, Bar, Legend,
 } from "recharts";
@@ -525,7 +526,7 @@ function Panel({ children, style, id, className }: { children: React.ReactNode; 
   return (
     <div id={id} className={className} style={{
       background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.08)",
-      borderRadius: 16, padding: "20px 22px", ...style,
+      borderRadius: 16, padding: isMobile ? "12px 10px" : "20px 22px", ...style,
     }}>
       {children}
     </div>
@@ -573,6 +574,7 @@ function HealthRing({ score }: { score: number }) {
 
 // ─── Main Page ───────────────────────────────────────────────────────────────
 export default function AICommandCenter() {
+  const { isMobile } = useResponsive();
   const searchParams = useSearchParams();
   const [tab, setTab] = useState<Tab>("overview");
   const [ctx, setCtx] = useState<FinCtx | null>(null);
@@ -1576,7 +1578,7 @@ export default function AICommandCenter() {
                     </div>
                     {forecast ? (
                       <>
-                        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, minmax(0, 1fr))", gap: 10, marginBottom: 16 }}>
+                        <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(3,minmax(0,1fr))", gap: 10, marginBottom: 16 }}>
                           {[
                             { label: "30 Days", value: forecast.projections.closingCash30d },
                             { label: "60 Days", value: forecast.projections.closingCash60d },
@@ -1841,7 +1843,7 @@ export default function AICommandCenter() {
                         key={s.q}
                         onClick={() => sendChat(s.q)}
                         style={{
-                          display: "flex", alignItems: "center", gap: 13, padding: "14px 16px",
+                          display: "flex", alignItems: "center", gap: 13, padding: isMobile ? "12px 10px" : "14px 16px",
                           borderRadius: 16, background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.08)",
                           color: "white", cursor: "pointer", textAlign: "left", fontFamily: "inherit",
                           transition: "all .18s",
@@ -1909,7 +1911,7 @@ export default function AICommandCenter() {
                   {chatLoading && messages[messages.length - 1]?.content === "" && (
                     <div style={{ display: "flex", gap: 12, padding: "8px 20px", alignItems: "flex-start" }}>
                       <div style={{ width: 34, height: 34, borderRadius: "50%", background: "linear-gradient(135deg,#6366f1,#4f46e5)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, boxShadow: "0 4px 16px rgba(79,70,229,.4)" }}><AiIcon size={17} /></div>
-                      <div style={{ padding: "14px 18px", borderRadius: "4px 20px 20px 20px", background: "rgba(255,255,255,.07)", border: "1px solid rgba(255,255,255,.09)", display: "flex", gap: 5, alignItems: "center" }}>
+                      <div style={{ padding: isMobile ? "12px 10px" : "14px 18px", borderRadius: "4px 20px 20px 20px", background: "rgba(255,255,255,.07)", border: "1px solid rgba(255,255,255,.09)", display: "flex", gap: 5, alignItems: "center" }}>
                         {[0,1,2].map(j => <div key={j} style={{ width: 8, height: 8, borderRadius: "50%", background: "rgba(99,102,241,.8)", animation: `pulse 1.1s ease ${j * .18}s infinite` }} />)}
                       </div>
                     </div>
@@ -1970,7 +1972,7 @@ export default function AICommandCenter() {
             </div>{/* end left conversation */}
 
             {/* ── Right: Context Panel ── */}
-            <div style={{ width: 272, background: "rgba(255,255,255,.018)", overflowY: "auto", padding: "18px 14px", flexShrink: 0, display: "flex", flexDirection: "column", gap: 18 }}>
+            <div style={{ width: 272, background: "rgba(255,255,255,.018)", overflowY: "auto", padding: isMobile ? "12px 10px" : "18px 14px", flexShrink: 0, display: "flex", flexDirection: "column", gap: 18 }}>
 
               {/* Health Ring */}
               <div style={{ textAlign: "center", padding: "16px 0 4px" }}>
@@ -2140,7 +2142,7 @@ export default function AICommandCenter() {
                   <div key={i} style={{
                     background: alert.severity === "critical" ? "rgba(239,68,68,.08)" : alert.severity === "warning" ? "rgba(245,158,11,.06)" : "rgba(99,102,241,.06)",
                     border: `1px solid ${alert.severity === "critical" ? "rgba(239,68,68,.25)" : alert.severity === "warning" ? "rgba(245,158,11,.25)" : "rgba(99,102,241,.25)"}`,
-                    borderRadius: 14, padding: "18px 20px",
+                    borderRadius: 14, padding: isMobile ? "12px 10px" : "18px 20px",
                   }}>
                     <div style={{ display: "flex", alignItems: "flex-start", gap: 14 }}>
                       <div style={{ fontSize: 24, flexShrink: 0, marginTop: 2 }}><AlertIcon severity={alert.severity} /></div>
@@ -2252,7 +2254,7 @@ export default function AICommandCenter() {
                         const riskColor = sig.risk === "high" ? "#ef4444" : sig.risk === "medium" ? "#f59e0b" : "#10b981";
                         const confColor = sig.confidence >= 75 ? "#10b981" : sig.confidence >= 55 ? "#f59e0b" : "#f87171";
                         return (
-                          <div key={i} style={{ background: "rgba(255,255,255,.03)", borderRadius: 12, padding: "14px 16px", border: "1px solid rgba(255,255,255,.06)" }}>
+                          <div key={i} style={{ background: "rgba(255,255,255,.03)", borderRadius: 12, padding: isMobile ? "12px 10px" : "14px 16px", border: "1px solid rgba(255,255,255,.06)" }}>
                             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
                               <div style={{ fontSize: 12.5, fontWeight: 700, color: "rgba(255,255,255,.8)" }}>{sig.label}</div>
                               <div style={{ display: "flex", gap: 6 }}>
@@ -2312,7 +2314,7 @@ export default function AICommandCenter() {
                     const priorityBg   = { urgent: "rgba(239,68,68,.08)", high: "rgba(245,158,11,.07)", medium: "rgba(99,102,241,.08)", low: "rgba(16,185,129,.07)" }[rec.priority] || "rgba(99,102,241,.08)";
                     const priorityBorder = { urgent: "rgba(239,68,68,.25)", high: "rgba(245,158,11,.25)", medium: "rgba(99,102,241,.25)", low: "rgba(16,185,129,.25)" }[rec.priority] || "rgba(99,102,241,.25)";
                     return (
-                      <div key={i} style={{ background: priorityBg, border: `1px solid ${priorityBorder}`, borderRadius: 16, padding: "18px 20px", display: "flex", flexDirection: "column", gap: 12 }}>
+                      <div key={i} style={{ background: priorityBg, border: `1px solid ${priorityBorder}`, borderRadius: 16, padding: isMobile ? "12px 10px" : "18px 20px", display: "flex", flexDirection: "column", gap: 12 }}>
                         {/* Header */}
                         <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 10 }}>
                           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
@@ -2358,7 +2360,7 @@ export default function AICommandCenter() {
                 </div>
 
                 {/* AI chat prompt */}
-                <div style={{ marginTop: 20, padding: "16px 20px", borderRadius: 14, background: "rgba(99,102,241,.06)", border: "1px solid rgba(99,102,241,.2)", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 14 }}>
+                <div style={{ marginTop: 20, padding: isMobile ? "12px 10px" : "16px 20px", borderRadius: 14, background: "rgba(99,102,241,.06)", border: "1px solid rgba(99,102,241,.2)", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 14 }}>
                   <div>
                     <div style={{ fontWeight: 700, fontSize: 13, marginBottom: 3 }}>Want a deeper explanation?</div>
                     <div style={{ fontSize: 12, color: "rgba(255,255,255,.4)" }}>Ask AI to explain any recommendation in detail or suggest more ideas.</div>
@@ -2486,7 +2488,7 @@ export default function AICommandCenter() {
                   return (
                     <div style={{ display: "grid", gap: 16 }}>
                       {/* Header */}
-                      <div style={{ background: "rgba(16,185,129,.08)", border: "1px solid rgba(16,185,129,.2)", borderRadius: 16, padding: "16px 20px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
+                      <div style={{ background: "rgba(16,185,129,.08)", border: "1px solid rgba(16,185,129,.2)", borderRadius: 16, padding: isMobile ? "12px 10px" : "16px 20px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
                         <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
                           <span style={{ fontSize: 28 }}>{tr.flagEmoji}</span>
                           <div>
@@ -2744,7 +2746,7 @@ export default function AICommandCenter() {
                       { label: "Profit", value: fmt(report.summary.profit, currency), color: report.summary.profit >= 0 ? "#10b981" : "#ef4444" },
                       { label: "Cash Risk", value: report.highlights?.cashRisk || "n/a", color: report.highlights?.cashRisk === "high" ? "#ef4444" : report.highlights?.cashRisk === "medium" ? "#f59e0b" : "#a5b4fc" },
                     ].map((item) => (
-                      <Panel key={item.label} style={{ padding: "16px 18px" }}>
+                      <Panel key={item.label} style={{ padding: isMobile ? "12px 10px" : "16px 18px" }}>
                         <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,.35)", textTransform: "uppercase", letterSpacing: ".08em", marginBottom: 8 }}>{item.label}</div>
                         <div style={{ fontSize: 20, fontWeight: 900, color: item.color }}>{item.value}</div>
                       </Panel>
@@ -2793,7 +2795,7 @@ export default function AICommandCenter() {
                   AI will analyze all your financial data and generate a comprehensive {reportPeriod} report including revenue, expenses, profit, cash flow, risks, and recommendations.
                 </div>
                 <button onClick={() => loadReport(reportPeriod)} style={{
-                  padding: "14px 32px", borderRadius: 12, background: "linear-gradient(135deg,#6366f1,#4f46e5)",
+                  padding: isMobile ? "12px 14px" : "14px 32px", borderRadius: 12, background: "linear-gradient(135deg,#6366f1,#4f46e5)",
                   border: "none", color: "white", fontSize: 15, fontWeight: 800, cursor: "pointer",
                   fontFamily: "inherit", boxShadow: "0 8px 24px rgba(99,102,241,.4)", display: "inline-flex", alignItems: "center", gap: 8,
                 }}>
@@ -2925,7 +2927,7 @@ export default function AICommandCenter() {
                   Discover what products to add, industry trends, seasonal opportunities, and competitive strategies for your business type.
                 </div>
                 <button onClick={loadMarketIntel} style={{
-                  padding: "14px 32px", borderRadius: 12, background: "linear-gradient(135deg,#6366f1,#4f46e5)",
+                  padding: isMobile ? "12px 14px" : "14px 32px", borderRadius: 12, background: "linear-gradient(135deg,#6366f1,#4f46e5)",
                   border: "none", color: "white", fontSize: 15, fontWeight: 800, cursor: "pointer",
                   fontFamily: "inherit", boxShadow: "0 8px 24px rgba(99,102,241,.4)",
                 }}>Analyze Market</button>
@@ -2957,7 +2959,7 @@ export default function AICommandCenter() {
                     </div>
                   </div>
                   {(businessAdvisor.quickWins?.length || 0) > 0 && (
-                    <div style={{ background: "rgba(16,185,129,.08)", border: "1px solid rgba(16,185,129,.2)", borderRadius: 12, padding: "14px 18px", minWidth: 200 }}>
+                    <div style={{ background: "rgba(16,185,129,.08)", border: "1px solid rgba(16,185,129,.2)", borderRadius: 12, padding: isMobile ? "12px 10px" : "14px 18px", minWidth: 200 }}>
                       <div style={{ fontSize: 12, fontWeight: 700, color: "#6ee7b7", marginBottom: 8 }}>⚡ QUICK WINS</div>
                       {businessAdvisor.quickWins.slice(0, 3).map((win, i) => (
                         <div key={i} style={{ fontSize: 12, color: "rgba(255,255,255,.7)", lineHeight: 1.6, paddingLeft: 8 }}>• {win}</div>
@@ -3052,7 +3054,7 @@ export default function AICommandCenter() {
                   Get a personalized growth plan, cross-sell opportunities, market gap analysis, and risk warnings — all based on your real business data.
                 </div>
                 <button onClick={loadBusinessAdvisor} style={{
-                  padding: "14px 32px", borderRadius: 12, background: "linear-gradient(135deg,#6366f1,#4f46e5)",
+                  padding: isMobile ? "12px 14px" : "14px 32px", borderRadius: 12, background: "linear-gradient(135deg,#6366f1,#4f46e5)",
                   border: "none", color: "white", fontSize: 15, fontWeight: 800, cursor: "pointer",
                   fontFamily: "inherit", boxShadow: "0 8px 24px rgba(99,102,241,.4)",
                 }}>Get Business Plan</button>
@@ -3072,7 +3074,7 @@ export default function AICommandCenter() {
                   AI scans your bank transactions and automatically matches them to invoices, payments, and expenses — with a confidence score for each match.
                 </div>
                 <button onClick={loadReconciliation} style={{
-                  padding: "14px 32px", borderRadius: 12, background: "linear-gradient(135deg,#6366f1,#4f46e5)",
+                  padding: isMobile ? "12px 14px" : "14px 32px", borderRadius: 12, background: "linear-gradient(135deg,#6366f1,#4f46e5)",
                   border: "none", color: "white", fontSize: 15, fontWeight: 800, cursor: "pointer",
                   fontFamily: "inherit", boxShadow: "0 8px 24px rgba(99,102,241,.4)",
                 }}>Run Reconciliation AI</button>
@@ -3093,7 +3095,7 @@ export default function AICommandCenter() {
                     { label: "Pending Review", value: reconciliation.summary.pending, color: "#f59e0b" },
                     { label: "Unmatched", value: reconciliation.summary.unmatched, color: "#ef4444" },
                   ].map(k => (
-                    <div key={k.label} style={{ background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.08)", borderRadius: 14, padding: "16px 18px" }}>
+                    <div key={k.label} style={{ background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.08)", borderRadius: 14, padding: isMobile ? "12px 10px" : "16px 18px" }}>
                       <div style={{ fontSize: 11, color: "rgba(255,255,255,.38)", marginBottom: 8, fontWeight: 600 }}>{k.label}</div>
                       <div style={{ fontSize: 26, fontWeight: 800, color: k.color }}>{k.value}</div>
                     </div>
@@ -3102,7 +3104,7 @@ export default function AICommandCenter() {
 
                 {/* Empty state when no bank transactions exist */}
                 {reconciliation.summary.total === 0 && (
-                  <div style={{ background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.08)", borderRadius: 16, padding: "40px 28px", textAlign: "center" }}>
+                  <div style={{ background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.08)", borderRadius: 16, padding: isMobile ? "22px 13px" : "40px 28px", textAlign: "center" }}>
                     <div style={{ fontSize: 44, marginBottom: 16 }}>🏦</div>
                     <div style={{ fontSize: 17, fontWeight: 800, marginBottom: 10 }}>No Bank Transactions Found</div>
                     <div style={{ fontSize: 13, color: "rgba(255,255,255,.45)", lineHeight: 1.8, maxWidth: 420, margin: "0 auto 24px" }}>
@@ -3115,7 +3117,7 @@ export default function AICommandCenter() {
                         { icon: "✏️", label: "Enter Transactions Manually", desc: "Add bank entries one by one" },
                         { icon: "🔄", label: "Auto-sync Bank Feed", desc: "Connect your bank for live sync" },
                       ].map(s => (
-                        <div key={s.label} style={{ background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.08)", borderRadius: 12, padding: "14px 16px", textAlign: "left" }}>
+                        <div key={s.label} style={{ background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.08)", borderRadius: 12, padding: isMobile ? "12px 10px" : "14px 16px", textAlign: "left" }}>
                           <div style={{ fontSize: 22, marginBottom: 8 }}>{s.icon}</div>
                           <div style={{ fontSize: 12, fontWeight: 700, color: "rgba(255,255,255,.8)", marginBottom: 4 }}>{s.label}</div>
                           <div style={{ fontSize: 11, color: "rgba(255,255,255,.35)", lineHeight: 1.5 }}>{s.desc}</div>
@@ -3155,7 +3157,7 @@ export default function AICommandCenter() {
                       return (
                         <div key={item.id} style={{ background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)", borderRadius: 14, overflow: "hidden" }}>
                           {/* Transaction header */}
-                          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "14px 18px", gap: 16, flexWrap: "wrap", borderBottom: item.matches.length > 0 ? "1px solid rgba(255,255,255,.05)" : "none" }}>
+                          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: isMobile ? "12px 10px" : "14px 18px", gap: 16, flexWrap: "wrap", borderBottom: item.matches.length > 0 ? "1px solid rgba(255,255,255,.05)" : "none" }}>
                             <div style={{ display: "flex", alignItems: "center", gap: 14, minWidth: 0 }}>
                               <div style={{
                                 width: 36, height: 36, borderRadius: 10, flexShrink: 0,
@@ -3253,7 +3255,7 @@ export default function AICommandCenter() {
           {/* ── SCAN RECEIPT TAB ─────────────────────────────────────────── */}
         {tab === "scan" && (
           <div style={{ maxWidth: 760, margin: "0 auto", display: "flex", flexDirection: "column", gap: 20 }}>
-            <div style={{ background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.08)", borderRadius: 18, padding: "24px 26px" }}>
+            <div style={{ background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.08)", borderRadius: 18, padding: isMobile ? "13px 12px" : "24px 26px" }}>
               <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 18 }}>
                 <div style={{ width: 42, height: 42, borderRadius: 12, background: "linear-gradient(135deg,#6366f1,#4f46e5)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20 }}>📷</div>
                 <div>
@@ -3280,7 +3282,7 @@ export default function AICommandCenter() {
                 }}
                 style={{
                   border: `2px dashed ${scanFile ? "rgba(99,102,241,.5)" : "rgba(255,255,255,.12)"}`,
-                  borderRadius: 14, padding: "32px 20px", textAlign: "center", cursor: "pointer",
+                  borderRadius: 14, padding: isMobile ? "18px 10px" : "32px 20px", textAlign: "center", cursor: "pointer",
                   background: scanFile ? "rgba(99,102,241,.06)" : "rgba(255,255,255,.02)",
                   transition: "all .2s", marginBottom: 16,
                 }}
@@ -3339,7 +3341,7 @@ export default function AICommandCenter() {
 
             {/* Results */}
             {scanResult && (
-              <div style={{ background: "rgba(255,255,255,.04)", border: "1px solid rgba(99,102,241,.25)", borderRadius: 18, padding: "22px 24px" }}>
+              <div style={{ background: "rgba(255,255,255,.04)", border: "1px solid rgba(99,102,241,.25)", borderRadius: 18, padding: isMobile ? "12px 11px" : "22px 24px" }}>
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 18 }}>
                   <div style={{ fontSize: 15, fontWeight: 800 }}>Extracted Data</div>
                   <div style={{ display: "flex", alignItems: "center", gap: 6, padding: "5px 12px", borderRadius: 999, background: scanResult.confidence >= 80 ? "rgba(16,185,129,.1)" : "rgba(245,158,11,.1)", border: `1px solid ${scanResult.confidence >= 80 ? "rgba(16,185,129,.3)" : "rgba(245,158,11,.3)"}` }}>
@@ -3364,7 +3366,7 @@ export default function AICommandCenter() {
                 </div>
 
                 {/* Totals */}
-                <div style={{ padding: "14px 16px", borderRadius: 12, background: "rgba(99,102,241,.06)", border: "1px solid rgba(99,102,241,.18)", marginBottom: 16 }}>
+                <div style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderRadius: 12, background: "rgba(99,102,241,.06)", border: "1px solid rgba(99,102,241,.18)", marginBottom: 16 }}>
                   <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}>
                     <span style={{ fontSize: 13, color: "rgba(255,255,255,.5)" }}>Subtotal</span>
                     <span style={{ fontSize: 13, fontWeight: 700 }}>{scanResult.currency} {scanResult.subtotal?.toLocaleString() ?? "—"}</span>
@@ -3419,7 +3421,7 @@ export default function AICommandCenter() {
         {/* ── QUICK INVOICE GEN TAB ─────────────────────────────────────── */}
         {tab === "invoice-gen" && (
           <div style={{ maxWidth: 760, margin: "0 auto", display: "flex", flexDirection: "column", gap: 20 }}>
-            <div style={{ background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.08)", borderRadius: 18, padding: "24px 26px" }}>
+            <div style={{ background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.08)", borderRadius: 18, padding: isMobile ? "13px 12px" : "24px 26px" }}>
               <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 18 }}>
                 <div style={{ width: 42, height: 42, borderRadius: 12, background: "linear-gradient(135deg,#10b981,#059669)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20 }}>✍️</div>
                 <div>
@@ -3455,7 +3457,7 @@ export default function AICommandCenter() {
                   rows={3}
                   style={{
                     width: "100%", background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.12)",
-                    borderRadius: 12, padding: "14px 16px", color: "white", fontSize: 14,
+                    borderRadius: 12, padding: isMobile ? "12px 10px" : "14px 16px", color: "white", fontSize: 14,
                     fontFamily: "inherit", resize: "vertical", outline: "none", boxSizing: "border-box",
                   }}
                 />
@@ -3487,7 +3489,7 @@ export default function AICommandCenter() {
 
             {/* Draft preview */}
             {invoiceDraft && (
-              <div style={{ background: "rgba(255,255,255,.04)", border: "1px solid rgba(16,185,129,.25)", borderRadius: 18, padding: "22px 24px" }}>
+              <div style={{ background: "rgba(255,255,255,.04)", border: "1px solid rgba(16,185,129,.25)", borderRadius: 18, padding: isMobile ? "12px 11px" : "22px 24px" }}>
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 18 }}>
                   <div style={{ fontSize: 15, fontWeight: 800 }}>Invoice Draft</div>
                   <div style={{ display: "flex", alignItems: "center", gap: 6, padding: "5px 12px", borderRadius: 999, background: invoiceDraft.confidence >= 80 ? "rgba(16,185,129,.1)" : "rgba(245,158,11,.1)", border: `1px solid ${invoiceDraft.confidence >= 80 ? "rgba(16,185,129,.3)" : "rgba(245,158,11,.3)"}` }}>
@@ -3513,11 +3515,11 @@ export default function AICommandCenter() {
                 <div style={{ marginBottom: 14 }}>
                   <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,.3)", textTransform: "uppercase", letterSpacing: ".07em", marginBottom: 8 }}>Line Items</div>
                   <div style={{ borderRadius: 10, overflow: "hidden", border: "1px solid rgba(255,255,255,.07)" }}>
-                    <div style={{ display: "grid", gridTemplateColumns: "1fr 60px 90px 80px 90px", gap: 0, padding: "8px 14px", background: "rgba(255,255,255,.04)", fontSize: 10.5, fontWeight: 700, color: "rgba(255,255,255,.35)", textTransform: "uppercase" }}>
+                    <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 60px 90px 80px 90px", gap: 0, padding: "8px 14px", background: "rgba(255,255,255,.04)", fontSize: 10.5, fontWeight: 700, color: "rgba(255,255,255,.35)", textTransform: "uppercase" }}>
                       <span>Description</span><span style={{ textAlign: "center" }}>Qty</span><span style={{ textAlign: "right" }}>Unit Price</span><span style={{ textAlign: "center" }}>Tax</span><span style={{ textAlign: "right" }}>Amount</span>
                     </div>
                     {invoiceDraft.items.map((item, i) => (
-                      <div key={i} style={{ display: "grid", gridTemplateColumns: "1fr 60px 90px 80px 90px", gap: 0, padding: "11px 14px", borderTop: "1px solid rgba(255,255,255,.05)", fontSize: 13 }}>
+                      <div key={i} style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 60px 90px 80px 90px", gap: 0, padding: "11px 14px", borderTop: "1px solid rgba(255,255,255,.05)", fontSize: 13 }}>
                         <span style={{ color: "rgba(255,255,255,.8)" }}>{item.description}</span>
                         <span style={{ textAlign: "center", color: "rgba(255,255,255,.5)" }}>{item.qty}</span>
                         <span style={{ textAlign: "right", color: "rgba(255,255,255,.6)" }}>{item.unitPrice.toLocaleString()}</span>
@@ -3529,7 +3531,7 @@ export default function AICommandCenter() {
                 </div>
 
                 {/* Totals */}
-                <div style={{ padding: "14px 16px", borderRadius: 12, background: "rgba(16,185,129,.05)", border: "1px solid rgba(16,185,129,.18)" }}>
+                <div style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderRadius: 12, background: "rgba(16,185,129,.05)", border: "1px solid rgba(16,185,129,.18)" }}>
                   <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}>
                     <span style={{ fontSize: 13, color: "rgba(255,255,255,.5)" }}>Subtotal</span>
                     <span style={{ fontSize: 13, fontWeight: 700 }}>PKR {invoiceDraft.subtotal.toLocaleString()}</span>
@@ -3588,30 +3590,30 @@ export default function AICommandCenter() {
             {invForecastError && !invForecastLoading && <div style={{ textAlign: "center", padding: 40, color: "#f87171", fontSize: 13 }}>⚠️ {invForecastError} <button onClick={() => { setInvForecast(null); loadInvForecast(); }} style={{ marginLeft: 10, color: "#a5b4fc", background: "none", border: "none", cursor: "pointer", fontFamily: "inherit", fontWeight: 700 }}>Retry</button></div>}
             {invForecast && !invForecastLoading && (
               <>
-                <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 12, marginBottom: 20 }}>
+                <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 12, marginBottom: 20 }}>
                   {[
                     { label: "Critical", value: invForecast.summary.criticalCount, color: "#ef4444", bg: "rgba(239,68,68,.08)", desc: "< 15 days stock" },
                     { label: "Warning", value: invForecast.summary.warningCount, color: "#f59e0b", bg: "rgba(245,158,11,.08)", desc: "< 30 days stock" },
                     { label: "Total Tracked", value: invForecast.summary.totalItems, color: "#818cf8", bg: "rgba(99,102,241,.08)", desc: "products analyzed" },
                     { label: "Reorder Value", value: invForecast.summary.reorderValueFormatted, color: "#10b981", bg: "rgba(16,185,129,.08)", desc: "estimated cost" },
                   ].map(card => (
-                    <div key={card.label} style={{ padding: "16px 18px", borderRadius: 14, background: card.bg, border: `1px solid ${card.color}22` }}>
+                    <div key={card.label} style={{ padding: isMobile ? "12px 10px" : "16px 18px", borderRadius: 14, background: card.bg, border: `1px solid ${card.color}22` }}>
                       <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,.4)", textTransform: "uppercase", letterSpacing: ".06em", marginBottom: 6 }}>{card.label}</div>
                       <div style={{ fontSize: 22, fontWeight: 900, color: card.color }}>{card.value}</div>
                       <div style={{ fontSize: 10.5, color: "rgba(255,255,255,.3)", marginTop: 3 }}>{card.desc}</div>
                     </div>
                   ))}
                 </div>
-                {invForecast.narrative && <div style={{ padding: "14px 18px", borderRadius: 12, background: "rgba(245,158,11,.06)", border: "1px solid rgba(245,158,11,.18)", fontSize: 13, color: "rgba(255,255,255,.75)", marginBottom: 18, lineHeight: 1.7 }}>{renderMarkdown(invForecast.narrative)}</div>}
+                {invForecast.narrative && <div style={{ padding: isMobile ? "12px 10px" : "14px 18px", borderRadius: 12, background: "rgba(245,158,11,.06)", border: "1px solid rgba(245,158,11,.18)", fontSize: 13, color: "rgba(255,255,255,.75)", marginBottom: 18, lineHeight: 1.7 }}>{renderMarkdown(invForecast.narrative)}</div>}
                 <div style={{ background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)", borderRadius: 14, overflow: "hidden" }}>
-                  <div style={{ display: "grid", gridTemplateColumns: "1fr 80px 90px 90px 90px 90px", padding: "10px 16px", background: "rgba(255,255,255,.04)", fontSize: 10.5, fontWeight: 700, color: "rgba(255,255,255,.35)", textTransform: "uppercase", gap: 8 }}>
+                  <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 80px 90px 90px 90px 90px", padding: "10px 16px", background: "rgba(255,255,255,.04)", fontSize: 10.5, fontWeight: 700, color: "rgba(255,255,255,.35)", textTransform: "uppercase", gap: 8 }}>
                     <span>Product</span><span style={{ textAlign: "center" }}>Stock</span><span style={{ textAlign: "center" }}>Avg/Mo</span><span style={{ textAlign: "center" }}>Forecast</span><span style={{ textAlign: "center" }}>Days Left</span><span style={{ textAlign: "center" }}>Reorder</span>
                   </div>
                   {invForecast.forecasts.map((item, i) => {
                     const urgencyColor = item.urgency === "critical" ? "#ef4444" : item.urgency === "warning" ? "#f59e0b" : "#10b981";
                     const trendIcon = item.trend === "growing" ? "↑" : item.trend === "declining" ? "↓" : "→";
                     return (
-                      <div key={item.itemId} style={{ display: "grid", gridTemplateColumns: "1fr 80px 90px 90px 90px 90px", padding: "12px 16px", borderTop: "1px solid rgba(255,255,255,.04)", gap: 8, alignItems: "center" }}>
+                      <div key={item.itemId} style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 80px 90px 90px 90px 90px", padding: "12px 16px", borderTop: "1px solid rgba(255,255,255,.04)", gap: 8, alignItems: "center" }}>
                         <div>
                           <div style={{ fontSize: 13, fontWeight: 600, color: "rgba(255,255,255,.85)" }}>{item.name}</div>
                           <div style={{ fontSize: 10.5, color: item.trend === "growing" ? "#10b981" : item.trend === "declining" ? "#ef4444" : "rgba(255,255,255,.35)", marginTop: 2 }}>{trendIcon} {item.trend}</div>
@@ -3653,7 +3655,7 @@ export default function AICommandCenter() {
                   ].map(card => {
                     const positive = card.value >= 0;
                     return (
-                      <div key={card.label} style={{ padding: "20px 22px", borderRadius: 14, background: positive ? "rgba(16,185,129,.07)" : "rgba(239,68,68,.07)", border: `1px solid ${positive ? "rgba(16,185,129,.25)" : "rgba(239,68,68,.25)"}` }}>
+                      <div key={card.label} style={{ padding: isMobile ? "12px 10px" : "20px 22px", borderRadius: 14, background: positive ? "rgba(16,185,129,.07)" : "rgba(239,68,68,.07)", border: `1px solid ${positive ? "rgba(16,185,129,.25)" : "rgba(239,68,68,.25)"}` }}>
                         <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,.4)", textTransform: "uppercase", letterSpacing: ".06em", marginBottom: 8 }}>{card.label}</div>
                         <div style={{ fontSize: 24, fontWeight: 900, color: positive ? "#10b981" : "#ef4444" }}>{positive ? "+" : ""}{card.currency} {Math.abs(card.value).toLocaleString()}</div>
                         <div style={{ fontSize: 11, color: "rgba(255,255,255,.35)", marginTop: 4 }}>{positive ? "Positive cash position" : "Cash gap — action needed"}</div>
@@ -3661,9 +3663,9 @@ export default function AICommandCenter() {
                     );
                   })}
                 </div>
-                {cashflowOpt.narrative && <div style={{ padding: "14px 18px", borderRadius: 12, background: "rgba(16,185,129,.05)", border: "1px solid rgba(16,185,129,.15)", fontSize: 13, color: "rgba(255,255,255,.75)", marginBottom: 18, lineHeight: 1.7 }}>{renderMarkdown(cashflowOpt.narrative)}</div>}
+                {cashflowOpt.narrative && <div style={{ padding: isMobile ? "12px 10px" : "14px 18px", borderRadius: 12, background: "rgba(16,185,129,.05)", border: "1px solid rgba(16,185,129,.15)", fontSize: 13, color: "rgba(255,255,255,.75)", marginBottom: 18, lineHeight: 1.7 }}>{renderMarkdown(cashflowOpt.narrative)}</div>}
                 {cashflowOpt.tips.length > 0 && (
-                  <div style={{ background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)", borderRadius: 14, padding: "18px 20px", marginBottom: 20 }}>
+                  <div style={{ background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)", borderRadius: 14, padding: isMobile ? "12px 10px" : "18px 20px", marginBottom: 20 }}>
                     <div style={{ fontSize: 12, fontWeight: 700, color: "rgba(255,255,255,.4)", textTransform: "uppercase", letterSpacing: ".07em", marginBottom: 14 }}>💡 Optimization Actions</div>
                     {cashflowOpt.tips.map((tip, i) => {
                       const impactColor = tip.impact === "critical" ? "#ef4444" : tip.impact === "high" ? "#f59e0b" : "#818cf8";
@@ -3721,26 +3723,26 @@ export default function AICommandCenter() {
             {churnError && !churnLoading && <div style={{ textAlign: "center", padding: 40, color: "#f87171", fontSize: 13 }}>⚠️ {churnError} <button onClick={() => { setChurnResult(null); loadChurn(); }} style={{ marginLeft: 10, color: "#a5b4fc", background: "none", border: "none", cursor: "pointer", fontFamily: "inherit", fontWeight: 700 }}>Retry</button></div>}
             {churnResult && !churnLoading && (
               <>
-                <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 12, marginBottom: 20 }}>
+                <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 12, marginBottom: 20 }}>
                   {[
                     { label: "Critical Risk", value: churnResult.summary.criticalCount, color: "#ef4444", bg: "rgba(239,68,68,.08)" },
                     { label: "High Risk", value: churnResult.summary.highCount, color: "#f59e0b", bg: "rgba(245,158,11,.08)" },
                     { label: "Total Customers", value: churnResult.summary.totalCustomers, color: "#818cf8", bg: "rgba(99,102,241,.08)" },
                     { label: "Revenue at Risk", value: `${churnResult.summary.currency} ${Math.round(churnResult.summary.atRiskRevenue / 1000)}K`, color: "#ef4444", bg: "rgba(239,68,68,.08)" },
                   ].map(card => (
-                    <div key={card.label} style={{ padding: "16px 18px", borderRadius: 14, background: card.bg, border: `1px solid ${card.color}22` }}>
+                    <div key={card.label} style={{ padding: isMobile ? "12px 10px" : "16px 18px", borderRadius: 14, background: card.bg, border: `1px solid ${card.color}22` }}>
                       <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,.4)", textTransform: "uppercase", letterSpacing: ".06em", marginBottom: 6 }}>{card.label}</div>
                       <div style={{ fontSize: 22, fontWeight: 900, color: card.color }}>{card.value}</div>
                     </div>
                   ))}
                 </div>
-                {churnResult.narrative && <div style={{ padding: "14px 18px", borderRadius: 12, background: "rgba(139,92,246,.06)", border: "1px solid rgba(139,92,246,.18)", fontSize: 13, color: "rgba(255,255,255,.75)", marginBottom: 18, lineHeight: 1.7 }}>{renderMarkdown(churnResult.narrative)}</div>}
+                {churnResult.narrative && <div style={{ padding: isMobile ? "12px 10px" : "14px 18px", borderRadius: 12, background: "rgba(139,92,246,.06)", border: "1px solid rgba(139,92,246,.18)", fontSize: 13, color: "rgba(255,255,255,.75)", marginBottom: 18, lineHeight: 1.7 }}>{renderMarkdown(churnResult.narrative)}</div>}
                 <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                   {churnResult.customers.map(customer => {
                     const riskColor = customer.churnRisk === "critical" ? "#ef4444" : customer.churnRisk === "high" ? "#f59e0b" : customer.churnRisk === "medium" ? "#818cf8" : "#10b981";
                     const trendIcon = customer.revenueTrend === "growing" ? "↑" : customer.revenueTrend === "gone_silent" ? "⚠" : customer.revenueTrend === "declining" ? "↓" : "→";
                     return (
-                      <div key={customer.customerId} style={{ padding: "16px 18px", borderRadius: 12, background: "rgba(255,255,255,.03)", border: `1px solid ${customer.churnRisk === "critical" ? "rgba(239,68,68,.25)" : "rgba(255,255,255,.07)"}`, display: "flex", gap: 16, alignItems: "flex-start" }}>
+                      <div key={customer.customerId} style={{ padding: isMobile ? "12px 10px" : "16px 18px", borderRadius: 12, background: "rgba(255,255,255,.03)", border: `1px solid ${customer.churnRisk === "critical" ? "rgba(239,68,68,.25)" : "rgba(255,255,255,.07)"}`, display: "flex", gap: 16, alignItems: "flex-start" }}>
                         <div style={{ width: 44, height: 44, borderRadius: 12, background: `${riskColor}15`, border: `2px solid ${riskColor}40`, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                           <div style={{ fontSize: 16, fontWeight: 900, color: riskColor }}>{customer.churnScore}</div>
                         </div>
@@ -3783,27 +3785,27 @@ export default function AICommandCenter() {
             {supplierIntelError && !supplierIntelLoading && <div style={{ textAlign: "center", padding: 40, color: "#f87171", fontSize: 13 }}>⚠️ {supplierIntelError} <button onClick={() => { setSupplierIntel(null); loadSupplierIntel(); }} style={{ marginLeft: 10, color: "#a5b4fc", background: "none", border: "none", cursor: "pointer", fontFamily: "inherit", fontWeight: 700 }}>Retry</button></div>}
             {supplierIntel && !supplierIntelLoading && (
               <>
-                <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 12, marginBottom: 20 }}>
+                <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(3,1fr)", gap: 12, marginBottom: 20 }}>
                   {[
                     { label: "High Opportunity", value: supplierIntel.summary.highOpportunityCount, color: "#10b981", desc: "suppliers to negotiate now" },
                     { label: "Total Suppliers", value: supplierIntel.summary.totalSuppliers, color: "#818cf8", desc: "with 2+ orders" },
                     { label: "Potential Savings", value: `${supplierIntel.summary.currency} ${Math.round(supplierIntel.summary.totalPotentialSaving / 1000)}K/yr`, color: "#f59e0b", desc: "if discounts secured" },
                   ].map(card => (
-                    <div key={card.label} style={{ padding: "18px 20px", borderRadius: 14, background: `${card.color}0d`, border: `1px solid ${card.color}22` }}>
+                    <div key={card.label} style={{ padding: isMobile ? "12px 10px" : "18px 20px", borderRadius: 14, background: `${card.color}0d`, border: `1px solid ${card.color}22` }}>
                       <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,.4)", textTransform: "uppercase", letterSpacing: ".06em", marginBottom: 6 }}>{card.label}</div>
                       <div style={{ fontSize: 24, fontWeight: 900, color: card.color }}>{card.value}</div>
                       <div style={{ fontSize: 10.5, color: "rgba(255,255,255,.3)", marginTop: 3 }}>{card.desc}</div>
                     </div>
                   ))}
                 </div>
-                {supplierIntel.narrative && <div style={{ padding: "14px 18px", borderRadius: 12, background: "rgba(14,165,233,.05)", border: "1px solid rgba(14,165,233,.15)", fontSize: 13, color: "rgba(255,255,255,.75)", marginBottom: 18, lineHeight: 1.7 }}>{renderMarkdown(supplierIntel.narrative)}</div>}
+                {supplierIntel.narrative && <div style={{ padding: isMobile ? "12px 10px" : "14px 18px", borderRadius: 12, background: "rgba(14,165,233,.05)", border: "1px solid rgba(14,165,233,.15)", fontSize: 13, color: "rgba(255,255,255,.75)", marginBottom: 18, lineHeight: 1.7 }}>{renderMarkdown(supplierIntel.narrative)}</div>}
                 <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
                   {supplierIntel.suppliers.map(supplier => {
                     const opColor = supplier.negotiationOpportunity === "high" ? "#10b981" : supplier.negotiationOpportunity === "medium" ? "#f59e0b" : "#818cf8";
                     const trendIcon = supplier.spendTrend === "increasing" ? "↑" : supplier.spendTrend === "decreasing" ? "↓" : "→";
                     const trendColor = supplier.spendTrend === "increasing" ? "#ef4444" : supplier.spendTrend === "decreasing" ? "#10b981" : "rgba(255,255,255,.4)";
                     return (
-                      <div key={supplier.supplierId} style={{ padding: "16px 18px", borderRadius: 12, background: "rgba(255,255,255,.03)", border: `1px solid ${supplier.negotiationOpportunity === "high" ? "rgba(16,185,129,.25)" : "rgba(255,255,255,.07)"}` }}>
+                      <div key={supplier.supplierId} style={{ padding: isMobile ? "12px 10px" : "16px 18px", borderRadius: 12, background: "rgba(255,255,255,.03)", border: `1px solid ${supplier.negotiationOpportunity === "high" ? "rgba(16,185,129,.25)" : "rgba(255,255,255,.07)"}` }}>
                         <div style={{ display: "flex", alignItems: "flex-start", gap: 14 }}>
                           <div style={{ flex: 1 }}>
                             <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 6, flexWrap: "wrap" }}>
@@ -3849,7 +3851,7 @@ export default function AICommandCenter() {
                 <div style={{ fontSize: 12, color: "rgba(255,255,255,.4)" }}>Type a description and AI instantly suggests the correct GL account — no manual lookup needed</div>
               </div>
             </div>
-            <div style={{ background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.08)", borderRadius: 18, padding: "24px 26px", marginBottom: 16 }}>
+            <div style={{ background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.08)", borderRadius: 18, padding: isMobile ? "13px 12px" : "24px 26px", marginBottom: 16 }}>
               <div style={{ display: "flex", gap: 12, marginBottom: 12 }}>
                 <div style={{ flex: 2 }}>
                   <label style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,.4)", textTransform: "uppercase", letterSpacing: ".06em", display: "block", marginBottom: 6 }}>Description / Narration</label>
@@ -3880,7 +3882,7 @@ export default function AICommandCenter() {
                   <div style={{ padding: 24, textAlign: "center", color: "rgba(255,255,255,.4)", fontSize: 13 }}>No matching GL accounts found. Try a different description.</div>
                 )}
                 {glResult.suggestions.map((s, i) => (
-                  <div key={i} style={{ padding: "16px 18px", borderRadius: 12, background: i === 0 ? "rgba(99,102,241,.07)" : "rgba(255,255,255,.03)", border: `1px solid ${i === 0 ? "rgba(99,102,241,.3)" : "rgba(255,255,255,.07)"}` }}>
+                  <div key={i} style={{ padding: isMobile ? "12px 10px" : "16px 18px", borderRadius: 12, background: i === 0 ? "rgba(99,102,241,.07)" : "rgba(255,255,255,.03)", border: `1px solid ${i === 0 ? "rgba(99,102,241,.3)" : "rgba(255,255,255,.07)"}` }}>
                     <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10 }}>
                       {i === 0 && <span style={{ fontSize: 11, fontWeight: 800, color: "#818cf8", background: "rgba(99,102,241,.15)", padding: "3px 10px", borderRadius: 999 }}>BEST MATCH</span>}
                       <span style={{ fontSize: 15, fontWeight: 800, color: "rgba(255,255,255,.9)" }}>{s.category}</span>
@@ -3902,7 +3904,7 @@ export default function AICommandCenter() {
                   </div>
                 ))}
                 {glResult.fallbackAccounts.length > 0 && glResult.suggestions.length === 0 && (
-                  <div style={{ padding: "16px 18px", borderRadius: 12, background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)" }}>
+                  <div style={{ padding: isMobile ? "12px 10px" : "16px 18px", borderRadius: 12, background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)" }}>
                     <div style={{ fontSize: 12, fontWeight: 700, color: "rgba(255,255,255,.4)", marginBottom: 10 }}>Possible Matches (by name search)</div>
                     <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
                       {glResult.fallbackAccounts.map(acc => (
@@ -3929,14 +3931,14 @@ export default function AICommandCenter() {
                 <div style={{ fontSize: 12, color: "rgba(255,255,255,.4)" }}>AI groups your expenses into categories and highlights where to cut costs</div>
               </div>
             </div>
-            <div style={{ background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.08)", borderRadius: 18, padding: "24px 26px", marginBottom: 16 }}>
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 10, marginBottom: 18 }}>
+            <div style={{ background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.08)", borderRadius: 18, padding: isMobile ? "13px 12px" : "24px 26px", marginBottom: 16 }}>
+              <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(3,1fr)", gap: 10, marginBottom: 18 }}>
                 {[
                   { label: "This Month Expenses", value: ctx ? `${ctx.company.currency} ${Number(ctx.expenses.thisMonth).toLocaleString()}` : "—", color: "#ef4444" },
                   { label: "Top Expense", value: ctx?.topExpenses?.[0]?.category || "—", color: "#f59e0b" },
                   { label: "Expense Categories", value: ctx?.topExpenses?.length ? `${ctx.topExpenses.length} detected` : "—", color: "#a78bfa" },
                 ].map(card => (
-                  <div key={card.label} style={{ background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)", borderRadius: 12, padding: "14px 16px" }}>
+                  <div key={card.label} style={{ background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)", borderRadius: 12, padding: isMobile ? "12px 10px" : "14px 16px" }}>
                     <div style={{ fontSize: 11, color: "rgba(255,255,255,.4)", marginBottom: 6 }}>{card.label}</div>
                     <div style={{ fontSize: 16, fontWeight: 800, color: card.color }}>{card.value}</div>
                   </div>
@@ -3948,13 +3950,13 @@ export default function AICommandCenter() {
               </button>
             </div>
             {expenseCatLoading && (
-              <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "20px 24px", background: "rgba(255,255,255,.03)", borderRadius: 14, border: "1px solid rgba(255,255,255,.07)" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 12, padding: isMobile ? "12px 11px" : "20px 24px", background: "rgba(255,255,255,.03)", borderRadius: 14, border: "1px solid rgba(255,255,255,.07)" }}>
                 <div style={{ width: 20, height: 20, border: "2px solid rgba(245,158,11,.3)", borderTopColor: "#f59e0b", borderRadius: "50%", animation: "spin .8s linear infinite", flexShrink: 0 }} />
                 <span style={{ color: "rgba(255,255,255,.5)", fontSize: 13 }}>AI is analyzing your expense patterns...</span>
               </div>
             )}
             {expenseCat && !expenseCatLoading && (
-              <div style={{ background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.08)", borderRadius: 16, padding: "20px 22px" }}>
+              <div style={{ background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.08)", borderRadius: 16, padding: isMobile ? "12px 10px" : "20px 22px" }}>
                 <div style={{ fontSize: 12, fontWeight: 700, color: "rgba(255,255,255,.35)", textTransform: "uppercase", letterSpacing: ".07em", marginBottom: 14 }}>Categorization Report</div>
                 {renderMarkdown(expenseCat)}
               </div>
@@ -3972,14 +3974,14 @@ export default function AICommandCenter() {
                 <div style={{ fontSize: 12, color: "rgba(255,255,255,.4)" }}>AI suggests realistic budget targets and shows where you&apos;re over or under plan</div>
               </div>
             </div>
-            <div style={{ background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.08)", borderRadius: 18, padding: "24px 26px", marginBottom: 16 }}>
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 10, marginBottom: 18 }}>
+            <div style={{ background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.08)", borderRadius: 18, padding: isMobile ? "13px 12px" : "24px 26px", marginBottom: 16 }}>
+              <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(3,1fr)", gap: 10, marginBottom: 18 }}>
                 {[
                   { label: "Revenue This Month", value: ctx ? `${ctx.company.currency} ${Number(ctx.revenue.thisMonth).toLocaleString()}` : "—", color: "#10b981" },
                   { label: "Revenue Last Month", value: ctx ? `${ctx.company.currency} ${Number(ctx.revenue.lastMonth).toLocaleString()}` : "—", color: "#34d399" },
                   { label: "Net Profit This Month", value: ctx ? `${ctx.company.currency} ${Number(ctx.profit.thisMonth).toLocaleString()}` : "—", color: "#a78bfa" },
                 ].map(card => (
-                  <div key={card.label} style={{ background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)", borderRadius: 12, padding: "14px 16px" }}>
+                  <div key={card.label} style={{ background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)", borderRadius: 12, padding: isMobile ? "12px 10px" : "14px 16px" }}>
                     <div style={{ fontSize: 11, color: "rgba(255,255,255,.4)", marginBottom: 6 }}>{card.label}</div>
                     <div style={{ fontSize: 16, fontWeight: 800, color: card.color }}>{card.value}</div>
                   </div>
@@ -3991,13 +3993,13 @@ export default function AICommandCenter() {
               </button>
             </div>
             {budgetLoading && (
-              <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "20px 24px", background: "rgba(255,255,255,.03)", borderRadius: 14, border: "1px solid rgba(255,255,255,.07)" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 12, padding: isMobile ? "12px 11px" : "20px 24px", background: "rgba(255,255,255,.03)", borderRadius: 14, border: "1px solid rgba(255,255,255,.07)" }}>
                 <div style={{ width: 20, height: 20, border: "2px solid rgba(16,185,129,.3)", borderTopColor: "#10b981", borderRadius: "50%", animation: "spin .8s linear infinite", flexShrink: 0 }} />
                 <span style={{ color: "rgba(255,255,255,.5)", fontSize: 13 }}>AI is building your budget roadmap...</span>
               </div>
             )}
             {budgetAnalysis && !budgetLoading && (
-              <div style={{ background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.08)", borderRadius: 16, padding: "20px 22px" }}>
+              <div style={{ background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.08)", borderRadius: 16, padding: isMobile ? "12px 10px" : "20px 22px" }}>
                 <div style={{ fontSize: 12, fontWeight: 700, color: "rgba(255,255,255,.35)", textTransform: "uppercase", letterSpacing: ".07em", marginBottom: 14 }}>Budget Plan & Variance</div>
                 {renderMarkdown(budgetAnalysis)}
               </div>
@@ -4015,14 +4017,14 @@ export default function AICommandCenter() {
                 <div style={{ fontSize: 12, color: "rgba(255,255,255,.4)" }}>AI scans for duplicate invoices, suspicious patterns, and internal control gaps</div>
               </div>
             </div>
-            <div style={{ background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.08)", borderRadius: 18, padding: "24px 26px", marginBottom: 16 }}>
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 10, marginBottom: 18 }}>
+            <div style={{ background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.08)", borderRadius: 18, padding: isMobile ? "13px 12px" : "24px 26px", marginBottom: 16 }}>
+              <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(3,1fr)", gap: 10, marginBottom: 18 }}>
                 {[
                   { label: "Recent Invoices Scanned", value: ctx?.recentInvoices?.length ? `${ctx.recentInvoices.length} invoices` : "—", color: "#ef4444" },
                   { label: "Top Customer", value: ctx?.topCustomers?.[0]?.name || "—", color: "#f59e0b" },
                   { label: "Overdue Count", value: ctx?.receivables?.overdueCount != null ? `${ctx.receivables.overdueCount} overdue` : "—", color: "#f87171" },
                 ].map(card => (
-                  <div key={card.label} style={{ background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)", borderRadius: 12, padding: "14px 16px" }}>
+                  <div key={card.label} style={{ background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)", borderRadius: 12, padding: isMobile ? "12px 10px" : "14px 16px" }}>
                     <div style={{ fontSize: 11, color: "rgba(255,255,255,.4)", marginBottom: 6 }}>{card.label}</div>
                     <div style={{ fontSize: 16, fontWeight: 800, color: card.color }}>{card.value}</div>
                   </div>
@@ -4034,13 +4036,13 @@ export default function AICommandCenter() {
               </button>
             </div>
             {duplicateLoading && (
-              <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "20px 24px", background: "rgba(255,255,255,.03)", borderRadius: 14, border: "1px solid rgba(255,255,255,.07)" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 12, padding: isMobile ? "12px 11px" : "20px 24px", background: "rgba(255,255,255,.03)", borderRadius: 14, border: "1px solid rgba(255,255,255,.07)" }}>
                 <div style={{ width: 20, height: 20, border: "2px solid rgba(239,68,68,.3)", borderTopColor: "#ef4444", borderRadius: "50%", animation: "spin .8s linear infinite", flexShrink: 0 }} />
                 <span style={{ color: "rgba(255,255,255,.5)", fontSize: 13 }}>AI is reviewing your transaction history...</span>
               </div>
             )}
             {duplicateResult && !duplicateLoading && (
-              <div style={{ background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.08)", borderRadius: 16, padding: "20px 22px" }}>
+              <div style={{ background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.08)", borderRadius: 16, padding: isMobile ? "12px 10px" : "20px 22px" }}>
                 <div style={{ fontSize: 12, fontWeight: 700, color: "rgba(255,255,255,.35)", textTransform: "uppercase", letterSpacing: ".07em", marginBottom: 14 }}>Audit & Anomaly Report</div>
                 {renderMarkdown(duplicateResult)}
               </div>
@@ -4058,14 +4060,14 @@ export default function AICommandCenter() {
                 <div style={{ fontSize: 12, color: "rgba(255,255,255,.4)" }}>AI ranks customers by revenue, payment behaviour, and estimated CLV</div>
               </div>
             </div>
-            <div style={{ background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.08)", borderRadius: 18, padding: "24px 26px", marginBottom: 16 }}>
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 10, marginBottom: 18 }}>
+            <div style={{ background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.08)", borderRadius: 18, padding: isMobile ? "13px 12px" : "24px 26px", marginBottom: 16 }}>
+              <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(3,1fr)", gap: 10, marginBottom: 18 }}>
                 {[
                   { label: "Total Customers", value: ctx?.topCustomers?.length ? `${ctx.topCustomers.length} tracked` : "—", color: "#38bdf8" },
                   { label: "Top Customer Revenue", value: ctx?.topCustomers?.[0] ? `${ctx.company?.currency} ${Number(ctx.topCustomers[0].amount).toLocaleString()}` : "—", color: "#34d399" },
                   { label: "Total Receivables", value: ctx ? `${ctx.company.currency} ${Number(ctx.receivables.total).toLocaleString()}` : "—", color: "#f59e0b" },
                 ].map(card => (
-                  <div key={card.label} style={{ background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)", borderRadius: 12, padding: "14px 16px" }}>
+                  <div key={card.label} style={{ background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)", borderRadius: 12, padding: isMobile ? "12px 10px" : "14px 16px" }}>
                     <div style={{ fontSize: 11, color: "rgba(255,255,255,.4)", marginBottom: 6 }}>{card.label}</div>
                     <div style={{ fontSize: 16, fontWeight: 800, color: card.color }}>{card.value}</div>
                   </div>
@@ -4077,13 +4079,13 @@ export default function AICommandCenter() {
               </button>
             </div>
             {customerProfitLoading && (
-              <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "20px 24px", background: "rgba(255,255,255,.03)", borderRadius: 14, border: "1px solid rgba(255,255,255,.07)" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 12, padding: isMobile ? "12px 11px" : "20px 24px", background: "rgba(255,255,255,.03)", borderRadius: 14, border: "1px solid rgba(255,255,255,.07)" }}>
                 <div style={{ width: 20, height: 20, border: "2px solid rgba(56,189,248,.3)", borderTopColor: "#38bdf8", borderRadius: "50%", animation: "spin .8s linear infinite", flexShrink: 0 }} />
                 <span style={{ color: "rgba(255,255,255,.5)", fontSize: 13 }}>AI is analysing customer value and CLV...</span>
               </div>
             )}
             {customerProfit && !customerProfitLoading && (
-              <div style={{ background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.08)", borderRadius: 16, padding: "20px 22px" }}>
+              <div style={{ background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.08)", borderRadius: 16, padding: isMobile ? "12px 10px" : "20px 22px" }}>
                 <div style={{ fontSize: 12, fontWeight: 700, color: "rgba(255,255,255,.35)", textTransform: "uppercase", letterSpacing: ".07em", marginBottom: 14 }}>Customer Profitability Report</div>
                 {renderMarkdown(customerProfit)}
               </div>
@@ -4101,15 +4103,15 @@ export default function AICommandCenter() {
                 <div style={{ fontSize: 12, color: "rgba(255,255,255,.4)" }}>Full profitability, liquidity, efficiency, and leverage ratios with benchmarks</div>
               </div>
             </div>
-            <div style={{ background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.08)", borderRadius: 18, padding: "24px 26px", marginBottom: 16 }}>
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 10, marginBottom: 18 }}>
+            <div style={{ background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.08)", borderRadius: 18, padding: isMobile ? "13px 12px" : "24px 26px", marginBottom: 16 }}>
+              <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 10, marginBottom: 18 }}>
                 {[
                   { label: "Revenue", value: ctx ? `${ctx.company.currency} ${Number(ctx.revenue.thisMonth).toLocaleString()}` : "—", color: "#10b981" },
                   { label: "Profit", value: ctx ? `${ctx.company.currency} ${Number(ctx.profit.thisMonth).toLocaleString()}` : "—", color: "#a78bfa" },
                   { label: "Receivables", value: ctx ? `${ctx.company.currency} ${Number(ctx.receivables.total).toLocaleString()}` : "—", color: "#f59e0b" },
                   { label: "Cash Position", value: ctx ? `${ctx.company.currency} ${Number(ctx.cashPosition).toLocaleString()}` : "—", color: "#38bdf8" },
                 ].map(card => (
-                  <div key={card.label} style={{ background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)", borderRadius: 12, padding: "14px 16px" }}>
+                  <div key={card.label} style={{ background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)", borderRadius: 12, padding: isMobile ? "12px 10px" : "14px 16px" }}>
                     <div style={{ fontSize: 11, color: "rgba(255,255,255,.4)", marginBottom: 6 }}>{card.label}</div>
                     <div style={{ fontSize: 15, fontWeight: 800, color: card.color }}>{card.value}</div>
                   </div>
@@ -4121,13 +4123,13 @@ export default function AICommandCenter() {
               </button>
             </div>
             {ratiosLoading && (
-              <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "20px 24px", background: "rgba(255,255,255,.03)", borderRadius: 14, border: "1px solid rgba(255,255,255,.07)" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 12, padding: isMobile ? "12px 11px" : "20px 24px", background: "rgba(255,255,255,.03)", borderRadius: 14, border: "1px solid rgba(255,255,255,.07)" }}>
                 <div style={{ width: 20, height: 20, border: "2px solid rgba(167,139,250,.3)", borderTopColor: "#a78bfa", borderRadius: "50%", animation: "spin .8s linear infinite", flexShrink: 0 }} />
                 <span style={{ color: "rgba(255,255,255,.5)", fontSize: 13 }}>AI is computing your financial ratios...</span>
               </div>
             )}
             {ratiosResult && !ratiosLoading && (
-              <div style={{ background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.08)", borderRadius: 16, padding: "20px 22px" }}>
+              <div style={{ background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.08)", borderRadius: 16, padding: isMobile ? "12px 10px" : "20px 22px" }}>
                 <div style={{ fontSize: 12, fontWeight: 700, color: "rgba(255,255,255,.35)", textTransform: "uppercase", letterSpacing: ".07em", marginBottom: 14 }}>Financial Ratios Report</div>
                 {renderMarkdown(ratiosResult)}
               </div>

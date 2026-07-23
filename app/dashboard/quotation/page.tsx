@@ -11,6 +11,7 @@ import { getCurrentUser } from "@/lib/auth";
 import { hasPermission } from "@/lib/hasPermission";
 import { PERMISSIONS } from "@/lib/permissions";
 import { useRouter } from "next/navigation";
+import { useResponsive } from "@/hooks/useResponsive";
 
 type Account = { id: string; name: string };
 type Item = {
@@ -57,6 +58,7 @@ type PrintPreferences = {
 };
 
 export default function QuotationPage() {
+  const { isMobile } = useResponsive();
   const router = useRouter();
   const today = new Date().toISOString().slice(0, 10);
   const user = getCurrentUser();
@@ -657,23 +659,23 @@ export default function QuotationPage() {
               {isMobile ? (
                 <div>
                   {rows.map((r, i) => (
-                    <div key={i} style={{ border: "1px solid var(--border)", borderRadius: 10, padding: "12px 14px", marginBottom: 10, background: "rgba(255,255,255,0.02)" }}>
+                    <div key={i} style={{ border: "1px solid var(--border)", borderRadius: 10, padding: isMobile ? "8px 8px" : "12px 14px", marginBottom: 10, background: "rgba(255,255,255,0.02)" }}>
                       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
                         <span style={{ fontSize: 11, fontWeight: 700, color: "var(--text-muted)", textTransform: "uppercase" }}>Item {i + 1}</span>
                         <button onClick={() => removeRow(i)} disabled={rows.length === 1} style={{ background: "transparent", border: "none", cursor: rows.length === 1 ? "not-allowed" : "pointer", color: rows.length === 1 ? "var(--text-muted)" : "#f87171", fontSize: 18, lineHeight: 1, padding: 0 }}>×</button>
                       </div>
-                      <select style={{ width: "100%", padding: "9px 13px", borderRadius: 8, border: "1.5px solid var(--border)", background: "var(--app-bg)", color: "var(--text-primary)", fontSize: 13, marginBottom: 8, boxSizing: "border-box" as const }} value={r.itemId} onChange={e => selectItem(i, e.target.value)}>
+                      <select style={{ width: "100%", padding: isMobile ? "8px 8px" : "9px 13px", borderRadius: 8, border: "1.5px solid var(--border)", background: "var(--app-bg)", color: "var(--text-primary)", fontSize: 13, marginBottom: 8, boxSizing: "border-box" as const }} value={r.itemId} onChange={e => selectItem(i, e.target.value)}>
                         <option value="">— Select Item —</option>
                         {items.map(it => <option key={it.id} value={it.id}>{it.name}{it.description ? ` (${it.description})` : ""}</option>)}
                       </select>
-                      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
+                      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: 8 }}>
                         <div>
                           <div style={{ fontSize: 10, color: "var(--text-muted)", fontWeight: 700, marginBottom: 4, textTransform: "uppercase" }}>Qty</div>
-                          <input type="number" value={r.qty} onChange={e => updateRow(i, "qty", e.target.value)} style={{ width: "100%", padding: "9px 13px", borderRadius: 8, border: "1.5px solid var(--border)", background: "var(--app-bg)", color: "var(--text-primary)", fontSize: 13, textAlign: "right" as const, boxSizing: "border-box" as const }} />
+                          <input type="number" value={r.qty} onChange={e => updateRow(i, "qty", e.target.value)} style={{ width: "100%", padding: isMobile ? "8px 8px" : "9px 13px", borderRadius: 8, border: "1.5px solid var(--border)", background: "var(--app-bg)", color: "var(--text-primary)", fontSize: 13, textAlign: "right" as const, boxSizing: "border-box" as const }} />
                         </div>
                         <div>
                           <div style={{ fontSize: 10, color: "var(--text-muted)", fontWeight: 700, marginBottom: 4, textTransform: "uppercase" }}>Rate</div>
-                          <input type="number" value={r.rate} onChange={e => updateRow(i, "rate", e.target.value)} style={{ width: "100%", padding: "9px 13px", borderRadius: 8, border: "1.5px solid var(--border)", background: "var(--app-bg)", color: "var(--text-primary)", fontSize: 13, textAlign: "right" as const, boxSizing: "border-box" as const }} />
+                          <input type="number" value={r.rate} onChange={e => updateRow(i, "rate", e.target.value)} style={{ width: "100%", padding: isMobile ? "8px 8px" : "9px 13px", borderRadius: 8, border: "1.5px solid var(--border)", background: "var(--app-bg)", color: "var(--text-primary)", fontSize: 13, textAlign: "right" as const, boxSizing: "border-box" as const }} />
                         </div>
                       </div>
                       {(Number(r.qty) > 0 || Number(r.rate) > 0) && (
@@ -687,30 +689,30 @@ export default function QuotationPage() {
                   <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
                     <thead>
                       <tr style={{ background: "rgba(99,102,241,0.07)" }}>
-                        <th style={{ padding: "10px 14px", textAlign: "left", color: "var(--text-muted)", fontWeight: 700, fontSize: 10.5, textTransform: "uppercase" }}>Item</th>
-                        <th style={{ padding: "10px 14px", textAlign: "center", color: "var(--text-muted)", fontWeight: 700, fontSize: 10.5, textTransform: "uppercase", width: 100 }}>Qty</th>
-                        <th style={{ padding: "10px 14px", textAlign: "center", color: "var(--text-muted)", fontWeight: 700, fontSize: 10.5, textTransform: "uppercase", width: 130 }}>Rate</th>
-                        <th style={{ padding: "10px 14px", textAlign: "right", color: "var(--text-muted)", fontWeight: 700, fontSize: 10.5, textTransform: "uppercase", width: 120 }}>Amount</th>
+                        <th style={{ padding: isMobile ? "8px 8px" : "10px 14px", textAlign: "left", color: "var(--text-muted)", fontWeight: 700, fontSize: 10.5, textTransform: "uppercase" }}>Item</th>
+                        <th style={{ padding: isMobile ? "8px 8px" : "10px 14px", textAlign: "center", color: "var(--text-muted)", fontWeight: 700, fontSize: 10.5, textTransform: "uppercase", width: 100 }}>Qty</th>
+                        <th style={{ padding: isMobile ? "8px 8px" : "10px 14px", textAlign: "center", color: "var(--text-muted)", fontWeight: 700, fontSize: 10.5, textTransform: "uppercase", width: 130 }}>Rate</th>
+                        <th style={{ padding: isMobile ? "8px 8px" : "10px 14px", textAlign: "right", color: "var(--text-muted)", fontWeight: 700, fontSize: 10.5, textTransform: "uppercase", width: 120 }}>Amount</th>
                         <th style={{ width: 36 }}></th>
                       </tr>
                     </thead>
                     <tbody>
                       {rows.map((r, i) => (
                         <tr key={i} style={{ borderTop: "1px solid var(--border)" }}>
-                          <td style={{ padding: "8px 10px" }}>
-                            <select style={{ width: "100%", padding: "7px 10px", borderRadius: 8, border: "1.5px solid var(--border)", background: "var(--app-bg)", color: "var(--text-primary)", fontSize: 13 }} value={r.itemId} onChange={e => selectItem(i, e.target.value)}>
+                          <td style={{ padding: isMobile ? "8px 8px" : "8px 10px" }}>
+                            <select style={{ width: "100%", padding: isMobile ? "8px 8px" : "7px 10px", borderRadius: 8, border: "1.5px solid var(--border)", background: "var(--app-bg)", color: "var(--text-primary)", fontSize: 13 }} value={r.itemId} onChange={e => selectItem(i, e.target.value)}>
                               <option value="">— Select Item —</option>
                               {items.map(it => <option key={it.id} value={it.id}>{it.name}{it.description ? ` (${it.description})` : ""}</option>)}
                             </select>
                           </td>
-                          <td style={{ padding: "8px 6px", width: 100 }}>
-                            <input type="number" value={r.qty} onChange={e => updateRow(i, "qty", e.target.value)} style={{ width: "100%", padding: "7px 8px", borderRadius: 8, border: "1.5px solid var(--border)", background: "var(--app-bg)", color: "var(--text-primary)", fontSize: 13, textAlign: "center" as const }} />
+                          <td style={{ padding: isMobile ? "8px 8px" : "8px 6px", width: 100 }}>
+                            <input type="number" value={r.qty} onChange={e => updateRow(i, "qty", e.target.value)} style={{ width: "100%", padding: isMobile ? "8px 8px" : "7px 8px", borderRadius: 8, border: "1.5px solid var(--border)", background: "var(--app-bg)", color: "var(--text-primary)", fontSize: 13, textAlign: "center" as const }} />
                           </td>
-                          <td style={{ padding: "8px 6px", width: 130 }}>
-                            <input type="number" value={r.rate} onChange={e => updateRow(i, "rate", e.target.value)} style={{ width: "100%", padding: "7px 8px", borderRadius: 8, border: "1.5px solid var(--border)", background: "var(--app-bg)", color: "var(--text-primary)", fontSize: 13, textAlign: "right" as const }} />
+                          <td style={{ padding: isMobile ? "8px 8px" : "8px 6px", width: 130 }}>
+                            <input type="number" value={r.rate} onChange={e => updateRow(i, "rate", e.target.value)} style={{ width: "100%", padding: isMobile ? "8px 8px" : "7px 8px", borderRadius: 8, border: "1.5px solid var(--border)", background: "var(--app-bg)", color: "var(--text-primary)", fontSize: 13, textAlign: "right" as const }} />
                           </td>
-                          <td style={{ padding: "8px 14px", textAlign: "right", fontWeight: 700 }}>{(Number(r.qty) * Number(r.rate) || 0).toLocaleString()}</td>
-                          <td style={{ padding: "8px 8px", textAlign: "center" }}>
+                          <td style={{ padding: isMobile ? "8px 8px" : "8px 14px", textAlign: "right", fontWeight: 700 }}>{(Number(r.qty) * Number(r.rate) || 0).toLocaleString()}</td>
+                          <td style={{ padding: isMobile ? "8px 8px" : "8px 8px", textAlign: "center" }}>
                             <button onClick={() => removeRow(i)} disabled={rows.length === 1} style={{ background: "none", border: "none", cursor: rows.length === 1 ? "not-allowed" : "pointer", color: "#f87171", fontSize: 16, opacity: rows.length === 1 ? 0.3 : 1 }}>×</button>
                           </td>
                         </tr>
@@ -862,7 +864,7 @@ export default function QuotationPage() {
               background: "white", color: "#000",
               fontFamily: "'Courier New',Courier,monospace",
               width: 220, margin: "0 auto 32px",
-              padding: "10px 12px",
+              padding: isMobile ? "8px 8px" : "10px 12px",
               boxShadow: "0 4px 24px rgba(0,0,0,0.18)",
               borderRadius: 4,
               display: printMode === "55mm" ? "block" : "none",

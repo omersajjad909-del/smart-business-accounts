@@ -1,36 +1,37 @@
 "use client";
 import { useState } from "react";
 import { useBusinessRecords } from "@/lib/useBusinessRecords";
+import { useResponsive } from "@/hooks/useResponsive";
 
 const S = {
-  page: { minHeight: "100vh", background: "#0f1117", color: "#fff", fontFamily: "'Outfit','Inter',sans-serif", padding: "32px" },
+  page: { minHeight: "100vh", background: "#0f1117", color: "#fff", fontFamily: "'Outfit','Inter',sans-serif", padding: isMobile ? "16px" : "32px" },
   header: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "28px" },
   title: { fontSize: "24px", fontWeight: 700, margin: 0 },
   sub: { fontSize: "13px", color: "rgba(255,255,255,.45)", marginTop: "4px" },
   btn: { background: "linear-gradient(135deg,#6366f1,#8b5cf6)", color: "#fff", border: "none", borderRadius: "10px", padding: "10px 20px", fontSize: "14px", fontWeight: 600, cursor: "pointer" },
-  statsGrid: { display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: "16px", marginBottom: "28px" },
+  statsGrid: { display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: "16px", marginBottom: "28px" },
   statCard: { background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)", borderRadius: "14px", padding: "20px" },
   statLabel: { fontSize: "12px", color: "rgba(255,255,255,.45)", marginBottom: "8px", textTransform: "uppercase" as const, letterSpacing: "0.5px" },
   statValue: { fontSize: "28px", fontWeight: 700 },
   statSub: { fontSize: "12px", color: "rgba(255,255,255,.35)", marginTop: "4px" },
-  layout: { display: "grid", gridTemplateColumns: "1fr 340px", gap: "20px" },
+  layout: { display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 340px", gap: "20px" },
   table: { width: "100%", borderCollapse: "collapse" as const, background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)", borderRadius: "14px", overflow: "hidden" },
-  th: { padding: "14px 16px", textAlign: "left" as const, fontSize: "11px", color: "rgba(255,255,255,.4)", textTransform: "uppercase" as const, letterSpacing: "0.5px", borderBottom: "1px solid rgba(255,255,255,.07)", background: "rgba(255,255,255,.02)" },
+  th: { padding: isMobile ? "12px 10px" : "14px 16px", textAlign: "left" as const, fontSize: "11px", color: "rgba(255,255,255,.4)", textTransform: "uppercase" as const, letterSpacing: "0.5px", borderBottom: "1px solid rgba(255,255,255,.07)", background: "rgba(255,255,255,.02)" },
   tr: (sel: boolean) => ({ background: sel ? "rgba(99,102,241,.1)" : "transparent", cursor: "pointer" }),
-  td: { padding: "14px 16px", fontSize: "13px", color: "rgba(255,255,255,.8)", borderBottom: "1px solid rgba(255,255,255,.04)" },
+  td: { padding: isMobile ? "12px 10px" : "14px 16px", fontSize: "13px", color: "rgba(255,255,255,.8)", borderBottom: "1px solid rgba(255,255,255,.04)" },
   badge: (color: string) => ({ background: color, color: "#fff", borderRadius: "20px", padding: "3px 10px", fontSize: "11px", fontWeight: 600, display: "inline-block" }),
   detailPanel: { background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)", borderRadius: "14px", padding: "22px" },
   detailTitle: { fontSize: "16px", fontWeight: 700, marginBottom: "6px" },
   detailSub: { fontSize: "12px", color: "rgba(255,255,255,.4)", marginBottom: "18px" },
   detailRow: { display: "flex", justifyContent: "space-between", fontSize: "13px", color: "rgba(255,255,255,.6)", marginBottom: "10px", paddingBottom: "10px", borderBottom: "1px solid rgba(255,255,255,.05)" },
   overlay: { position: "fixed" as const, inset: 0, background: "rgba(0,0,0,.7)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000 },
-  modal: { background: "#1a1d2e", border: "1px solid rgba(255,255,255,.1)", borderRadius: "18px", padding: "32px", width: "520px", maxHeight: "90vh", overflowY: "auto" as const },
+  modal: { background: "#1a1d2e", border: "1px solid rgba(255,255,255,.1)", borderRadius: "18px", padding: "32px", width: isMobile ? "min(520px, 94vw)" : "520px", maxHeight: "90vh", overflowY: "auto" as const },
   modalTitle: { fontSize: "18px", fontWeight: 700, marginBottom: "24px" },
   formGroup: { marginBottom: "16px" },
   label: { display: "block", fontSize: "12px", color: "rgba(255,255,255,.5)", marginBottom: "6px", textTransform: "uppercase" as const, letterSpacing: "0.4px" },
   input: { width: "100%", background: "rgba(255,255,255,.05)", border: "1px solid rgba(255,255,255,.1)", borderRadius: "8px", padding: "10px 12px", color: "#fff", fontSize: "14px", outline: "none", boxSizing: "border-box" as const },
   row2: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" },
-  row3: { display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "12px" },
+  row3: { display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr 1fr", gap: "12px" },
   modalBtns: { display: "flex", gap: "10px", marginTop: "24px", justifyContent: "flex-end" },
   cancelBtn: { background: "rgba(255,255,255,.07)", color: "#fff", border: "none", borderRadius: "8px", padding: "10px 20px", fontSize: "14px", cursor: "pointer" },
 };
@@ -40,6 +41,7 @@ const FEE_COLORS: Record<string, string> = {
 };
 
 export default function StudentsPage() {
+  const { isMobile } = useResponsive();
   const { records, loading, create } = useBusinessRecords("student");
   const [selected, setSelected] = useState<string | null>(null);
   const [showModal, setShowModal] = useState(false);

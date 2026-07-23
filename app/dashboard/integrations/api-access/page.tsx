@@ -2,6 +2,7 @@
 import { confirmToast, alertToast } from "@/lib/toast-feedback";
 
 import { useEffect, useMemo, useState } from "react";
+import { useResponsive } from "@/hooks/useResponsive";
 
 type ApiKeyRecord = {
   id: string;
@@ -30,6 +31,7 @@ function formatDate(value: string | null) {
 }
 
 export default function ApiAccessPage() {
+  const { isMobile } = useResponsive();
   const [keys, setKeys] = useState<ApiKeyRecord[]>([]);
   const [loading, setLoading] = useState(true);
   const [creating, setCreating] = useState(false);

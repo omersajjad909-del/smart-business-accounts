@@ -3,12 +3,14 @@
 import toast from "react-hot-toast";
 import { useState } from "react";
 import { useBusinessRecords } from "@/lib/useBusinessRecords";
+import { useResponsive } from "@/hooks/useResponsive";
 
 const ff = "'Outfit','Inter',sans-serif";
 const bg = "rgba(255,255,255,.03)";
 const border = "rgba(255,255,255,.07)";
 
 export default function FieldsPage() {
+  const { isMobile } = useResponsive();
   const { records, loading, create, update } = useBusinessRecords("field");
   const [showModal, setShowModal] = useState(false);
   const [form, setForm] = useState({ name: "", area: "", soilType: "", irrigationType: "", location: "" });
@@ -41,15 +43,15 @@ export default function FieldsPage() {
   }
 
   return (
-    <div style={{ padding: "28px 32px", fontFamily: ff, color: "#fff", minHeight: "100vh" }}>
+    <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", fontFamily: ff, color: "#fff", minHeight: "100vh" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 28 }}>
         <div><h1 style={{ fontSize: 22, fontWeight: 800, margin: "0 0 4px" }}>🌿 Fields</h1><p style={{ fontSize: 13, color: "rgba(255,255,255,.4)", margin: 0 }}>Manage agricultural fields</p></div>
         <button onClick={() => setShowModal(true)} style={{ padding: "10px 20px", borderRadius: 10, border: "none", background: "#34d399", color: "#0f1117", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>+ Add Field</button>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 12, marginBottom: 28 }}>
+      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(3,1fr)", gap: 12, marginBottom: 28 }}>
         {[{ label: "Total Fields", val: fields.length, color: "#34d399" }, { label: "Active", val: fields.filter(f => f.status === "active").length, color: "#818cf8" }, { label: "Total Area", val: `${totalArea.toFixed(1)} acres`, color: "#f59e0b" }].map(s => (
-          <div key={s.label} style={{ background: bg, border: `1px solid ${border}`, borderRadius: 12, padding: "20px 24px" }}><div style={{ fontSize: 13, color: "rgba(255,255,255,.5)", marginBottom: 6 }}>{s.label}</div><div style={{ fontSize: 22, fontWeight: 700, color: s.color }}>{s.val}</div></div>
+          <div key={s.label} style={{ background: bg, border: `1px solid ${border}`, borderRadius: 12, padding: isMobile ? "12px 11px" : "20px 24px" }}><div style={{ fontSize: 13, color: "rgba(255,255,255,.5)", marginBottom: 6 }}>{s.label}</div><div style={{ fontSize: 22, fontWeight: 700, color: s.color }}>{s.val}</div></div>
         ))}
       </div>
 
@@ -57,7 +59,7 @@ export default function FieldsPage() {
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(300px,1fr))", gap: 16 }}>
         {fields.map(f => (
-          <div key={f.id} style={{ background: bg, border: `1px solid ${border}`, borderRadius: 12, padding: "20px 24px" }}>
+          <div key={f.id} style={{ background: bg, border: `1px solid ${border}`, borderRadius: 12, padding: isMobile ? "12px 11px" : "20px 24px" }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 12 }}>
               <div style={{ fontWeight: 700, fontSize: 16 }}>{f.name}</div>
               <span style={{ display: "inline-block", background: f.status === "active" ? "rgba(52,211,153,.15)" : "rgba(107,114,128,.15)", color: f.status === "active" ? "#34d399" : "#6b7280", borderRadius: 6, padding: "2px 8px", fontSize: 11, fontWeight: 600 }}>{f.status}</span>

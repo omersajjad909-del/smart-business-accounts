@@ -5,6 +5,7 @@ import { confirmToast } from "@/lib/toast-feedback";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { getCurrentUser } from "@/lib/auth";
+import { useResponsive } from "@/hooks/useResponsive";
 
 // ─── Design tokens ────────────────────────────────────────────────────────────
 const ff     = "'Outfit','Inter',sans-serif";
@@ -63,6 +64,7 @@ const STATUS_COLOR: Record<string, { bg: string; text: string }> = {
 const CATEGORIES = ["TRAVEL","FOOD","SUPPLIES","UTILITIES","OTHER"];
 
 export default function ExpenseVouchersPage() {
+  const { isMobile } = useResponsive();
   const user = getCurrentUser();
 
   const [vouchers,    setVouchers]    = useState<ExpenseVoucher[]>([]);
@@ -210,7 +212,7 @@ export default function ExpenseVouchersPage() {
   const lbl:   React.CSSProperties = { fontSize: 11, color: "var(--text-muted)", fontWeight: 700, marginBottom: 5, display: "block", textTransform: "uppercase", letterSpacing: 0.5 };
 
   return (
-    <div style={{ padding: "24px 28px", fontFamily: ff, color: "var(--text-primary)", maxWidth: 1100 }}>
+    <div style={{ padding: isMobile ? "13px 13px" : "24px 28px", fontFamily: ff, color: "var(--text-primary)", maxWidth: 1100 }}>
 
       {/* Header */}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24, flexWrap: "wrap", gap: 12 }}>
@@ -248,7 +250,7 @@ export default function ExpenseVouchersPage() {
           <div style={{ marginBottom: 18 }}>
             <span style={{ fontSize: 12, color: "rgba(250,204,21,.7)" }}>Enter criteria — leave blank to get all records. Use <b style={{ color: "#facc15" }}>&gt;</b>, <b style={{ color: "#facc15" }}>&lt;</b>, <b style={{ color: "#facc15" }}>&gt;=</b> for date range.</span>
           </div>
-          <div style={{ display: "grid", gridTemplateColumns: "180px 240px 1fr", gap: 16, marginBottom: 24 }}>
+          <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "180px 240px 1fr", gap: 16, marginBottom: 24 }}>
             <div>
               <label style={{ ...lbl, color: "rgba(250,204,21,.6)" }}>Voucher # (e.g. EV-5)</label>
               <input autoFocus value={queryVNo} onChange={e=>setQueryVNo(e.target.value)} placeholder="EV-1 or blank…"
@@ -283,7 +285,7 @@ export default function ExpenseVouchersPage() {
         <form onSubmit={handleSubmit} style={{ ...panel, marginBottom: 24 }}>
           <div style={{ fontSize: 15, fontWeight: 700, color: accent, marginBottom: 18 }}>{editingId ? "Edit Expense Voucher" : "New Expense Voucher"}</div>
 
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr", gap: 16, marginBottom: 16 }}>
+          <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr 1fr" : "1fr 1fr 1fr 1fr", gap: 16, marginBottom: 16 }}>
             <div>
               <label style={lbl}>Voucher No *</label>
               <input style={inp} value={form.voucherNo} onChange={e => setForm(f => ({ ...f, voucherNo: e.target.value }))} placeholder="EV-001" required />

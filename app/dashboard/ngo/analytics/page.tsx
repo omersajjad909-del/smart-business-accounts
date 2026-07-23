@@ -2,10 +2,11 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { NgoControlCenter, fetchJson, ngoBg, ngoBorder, ngoFont, ngoMuted } from "../_shared";
+import { useResponsive } from "@/hooks/useResponsive";
 
 function Metric({ title, value, note, color }: { title: string; value: string; note: string; color: string }) {
   return (
-    <div style={{ background: ngoBg, border: `1px solid ${ngoBorder}`, borderRadius: 18, padding: "20px 22px" }}>
+    <div style={{ background: ngoBg, border: `1px solid ${ngoBorder}`, borderRadius: 18, padding: isMobile ? "12px 10px" : "20px 22px" }}>
       <div style={{ fontSize: 12, color: ngoMuted, marginBottom: 8, textTransform: "uppercase", letterSpacing: ".06em" }}>{title}</div>
       <div style={{ fontSize: 26, fontWeight: 900, color }}>{value}</div>
       <div style={{ fontSize: 12, color: ngoMuted, marginTop: 6 }}>{note}</div>
@@ -23,6 +24,7 @@ const emptyState: NgoControlCenter = {
 };
 
 export default function NgoAnalyticsPage() {
+  const { isMobile } = useResponsive();
   const [data, setData] = useState(emptyState);
 
   useEffect(() => {
@@ -44,7 +46,7 @@ export default function NgoAnalyticsPage() {
   const expenseVolume = transactions.filter((transaction) => transaction.type === "expense").reduce((sum, transaction) => sum + transaction.amount, 0);
 
   return (
-    <div style={{ padding: "28px 32px", minHeight: "100vh", color: "#fff", fontFamily: ngoFont }}>
+    <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", minHeight: "100vh", color: "#fff", fontFamily: ngoFont }}>
       <div style={{ marginBottom: 24 }}>
         <div style={{ fontSize: 12, color: "#a5b4fc", fontWeight: 700, letterSpacing: ".08em", textTransform: "uppercase", marginBottom: 10 }}>NGO Analytics</div>
         <h1 style={{ fontSize: 30, fontWeight: 900, margin: "0 0 10px" }}>Fundraising mix, aid burden, aur mission accountability</h1>
@@ -53,7 +55,7 @@ export default function NgoAnalyticsPage() {
         </p>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4, minmax(0,1fr))", gap: 14, marginBottom: 24 }}>
+      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,minmax(0,1fr))", gap: 14, marginBottom: 24 }}>
         <Metric title="Donor Raised" value={`Rs. ${summary.donorRaised.toLocaleString()}`} note="Direct donor contributions" color="#34d399" />
         <Metric title="Grant Book" value={`Rs. ${summary.grantBook.toLocaleString()}`} note="Approved grant portfolio" color="#60a5fa" />
         <Metric title="Monthly Aid" value={`Rs. ${summary.monthlyAid.toLocaleString()}`} note="Active beneficiary commitment" color="#f59e0b" />

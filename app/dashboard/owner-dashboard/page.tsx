@@ -2,6 +2,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { getCurrentUser } from "@/lib/auth";
 import Link from "next/link";
+import { useResponsive } from "@/hooks/useResponsive";
 
 const F = "'Outfit','Inter',sans-serif";
 
@@ -135,6 +136,7 @@ const ACT_COLORS: Record<string, string> = {
 };
 
 export default function OwnerDashboardPage() {
+  const { isMobile } = useResponsive();
   const [data, setData] = useState<SummaryData | null>(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -223,16 +225,16 @@ export default function OwnerDashboardPage() {
 
       {loading ? (
         <div style={{ display: "grid", gap: 16 }}>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 14 }}>
+          <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(3,1fr)", gap: 14 }}>
             {Array(6).fill(0).map((_, i) => (
-              <div key={i} style={{ background: T.panel, border: `1px solid ${T.border}`, borderRadius: 14, padding: "20px 22px" }}>
+              <div key={i} style={{ background: T.panel, border: `1px solid ${T.border}`, borderRadius: 14, padding: isMobile ? "12px 10px" : "20px 22px" }}>
                 <Skeleton w="50%" h={10} /><div style={{ height: 10 }} />
                 <Skeleton w="70%" h={24} /><div style={{ height: 8 }} />
                 <Skeleton w="40%" h={8} />
               </div>
             ))}
           </div>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 340px", gap: 16 }}>
+          <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 340px", gap: 16 }}>
             <div style={{ background: T.panel, border: `1px solid ${T.border}`, borderRadius: 14, padding: 22, height: 200 }}><Skeleton h={160} /></div>
             <div style={{ background: T.panel, border: `1px solid ${T.border}`, borderRadius: 14, padding: 22, height: 200 }}><Skeleton h={160} /></div>
           </div>
@@ -240,13 +242,13 @@ export default function OwnerDashboardPage() {
       ) : (
         <>
           {/* ── KPI GRID ── */}
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 14, marginBottom: 16 }}>
+          <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(3,1fr)", gap: 14, marginBottom: 16 }}>
             {KPIS.map((k, i) => {
               const inner = (
                 <div style={{
                   background: T.panel, border: `1px solid ${T.border}`,
                   borderTop: `3px solid ${k.color}`,
-                  borderRadius: 14, padding: "18px 20px", height: "100%",
+                  borderRadius: 14, padding: isMobile ? "12px 10px" : "18px 20px", height: "100%",
                   boxSizing: "border-box", transition: "border-color .2s",
                   position: "relative", overflow: "hidden",
                 }}>
@@ -297,10 +299,10 @@ export default function OwnerDashboardPage() {
           )}
 
           {/* ── CHART + HEALTH ── */}
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 320px", gap: 16, marginBottom: 16 }}>
+          <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 320px", gap: 16, marginBottom: 16 }}>
 
             {/* Bar chart */}
-            <div style={{ background: T.panel, border: `1px solid ${T.border}`, borderRadius: 16, padding: "20px 24px" }}>
+            <div style={{ background: T.panel, border: `1px solid ${T.border}`, borderRadius: 16, padding: isMobile ? "12px 11px" : "20px 24px" }}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
                 <div style={{ fontSize: 14, fontWeight: 800 }}>Revenue vs Expenses — 12 Months</div>
                 <div style={{ display: "flex", gap: 14, fontSize: 11, color: T.muted }}>
@@ -311,7 +313,7 @@ export default function OwnerDashboardPage() {
               <BarChart rev={data?.revenueHistory ?? []} exp={data?.expensesHistory ?? []} />
 
               {/* Mini P&L waterfall */}
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 10, marginTop: 18, borderTop: `1px solid ${T.border}`, paddingTop: 16 }}>
+              <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 10, marginTop: 18, borderTop: `1px solid ${T.border}`, paddingTop: 16 }}>
                 {[
                   { label: "Revenue",    value: data?.revenue ?? 0,  color: T.emerald },
                   { label: "Expenses",   value: -(data?.expenses ?? 0), color: T.red },
@@ -327,7 +329,7 @@ export default function OwnerDashboardPage() {
             </div>
 
             {/* Health arc + ratio cards */}
-            <div style={{ background: T.panel, border: `1px solid ${T.border}`, borderRadius: 16, padding: "20px 22px", display: "flex", flexDirection: "column", alignItems: "center" }}>
+            <div style={{ background: T.panel, border: `1px solid ${T.border}`, borderRadius: 16, padding: isMobile ? "12px 10px" : "20px 22px", display: "flex", flexDirection: "column", alignItems: "center" }}>
               <div style={{ fontSize: 13, fontWeight: 800, marginBottom: 4, alignSelf: "flex-start" }}>Financial Health</div>
               <div style={{ fontSize: 11, color: T.muted, marginBottom: 16, alignSelf: "flex-start" }}>Based on profit margin</div>
               <HealthArc score={margin} label={hLabel} color={hColor} />
@@ -350,7 +352,7 @@ export default function OwnerDashboardPage() {
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 16 }}>
 
             {/* Quick actions */}
-            <div style={{ background: T.panel, border: `1px solid ${T.border}`, borderRadius: 16, padding: "20px 22px" }}>
+            <div style={{ background: T.panel, border: `1px solid ${T.border}`, borderRadius: 16, padding: isMobile ? "12px 10px" : "20px 22px" }}>
               <div style={{ fontSize: 14, fontWeight: 800, marginBottom: 16 }}>Quick Actions</div>
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
                 {QUICK.map(q => (
@@ -373,7 +375,7 @@ export default function OwnerDashboardPage() {
             </div>
 
             {/* Top Customers */}
-            <div style={{ background: T.panel, border: `1px solid ${T.border}`, borderRadius: 16, padding: "20px 22px" }}>
+            <div style={{ background: T.panel, border: `1px solid ${T.border}`, borderRadius: 16, padding: isMobile ? "12px 10px" : "20px 22px" }}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
                 <div style={{ fontSize: 14, fontWeight: 800 }}>Top Customers</div>
                 <Link prefetch={false} href="/dashboard/customer-statement" style={{ fontSize: 11, color: T.violet, textDecoration: "none" }}>View all →</Link>
@@ -408,7 +410,7 @@ export default function OwnerDashboardPage() {
           </div>
 
           {/* ── RECENT ACTIVITY ── */}
-          <div style={{ background: T.panel, border: `1px solid ${T.border}`, borderRadius: 16, padding: "20px 24px" }}>
+          <div style={{ background: T.panel, border: `1px solid ${T.border}`, borderRadius: 16, padding: isMobile ? "12px 11px" : "20px 24px" }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
               <div style={{ fontSize: 14, fontWeight: 800 }}>Recent Activity</div>
               <span style={{ fontSize: 11, color: T.muted }}>{data?.recentActivity?.length ?? 0} events</span>

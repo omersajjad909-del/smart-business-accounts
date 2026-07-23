@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect, useCallback } from "react";
 import { getCurrentUser } from "@/lib/auth";
+import { useResponsive } from "@/hooks/useResponsive";
 
 const FONT = "'Outfit','Inter',sans-serif";
 
@@ -58,6 +59,7 @@ function DiffViewer({ before, after }: { before: string | null; after: string | 
 }
 
 export default function AuditTrailPage() {
+  const { isMobile } = useResponsive();
   const [logs, setLogs] = useState<AuditLog[]>([]);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(false);
@@ -100,7 +102,7 @@ export default function AuditTrailPage() {
   const td: React.CSSProperties = { padding: "12px 14px", fontSize: 13, borderBottom: "1px solid var(--border)", color: "var(--text-primary)", verticalAlign: "top" };
 
   return (
-    <div style={{ minHeight: "100vh", background: "var(--app-bg)", padding: "32px 28px", fontFamily: FONT, color: "var(--text-primary)" }}>
+    <div style={{ minHeight: "100vh", background: "var(--app-bg)", padding: isMobile ? "16px" : "32px" 28px", fontFamily: FONT, color: "var(--text-primary)" }}>
 
       {/* Header */}
       <div style={{ marginBottom: 28 }}>
@@ -109,14 +111,14 @@ export default function AuditTrailPage() {
       </div>
 
       {/* KPI */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 16, marginBottom: 28 }}>
+      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 16, marginBottom: 28 }}>
         {[
           { label: "Total Events", value: total, color: "#6366f1" },
           { label: "Current Page", value: `${logs.length} shown`, color: "#a5b4fc" },
           { label: "Entities Tracked", value: ENTITIES.length + "+", color: "#10b981" },
           { label: "Retention", value: "90 days", color: "#fbbf24" },
         ].map(k => (
-          <div key={k.label} style={{ background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 14, padding: "18px 20px" }}>
+          <div key={k.label} style={{ background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 14, padding: isMobile ? "12px 10px" : "18px 20px" }}>
             <div style={{ fontSize: 11, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: 0.8, marginBottom: 8 }}>{k.label}</div>
             <div style={{ fontSize: 26, fontWeight: 700, color: k.color, lineHeight: 1 }}>{k.value}</div>
           </div>

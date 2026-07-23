@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useBusinessRecords } from "@/lib/useBusinessRecords";
 import { getCurrentUser } from "@/lib/auth";
 import { hotelFont, hotelMuted } from "../_shared";
+import { useResponsive } from "@/hooks/useResponsive";
 
 const bg = "rgba(255,255,255,.03)";
 const border = "rgba(255,255,255,.07)";
@@ -23,6 +24,7 @@ const CATEGORIES = ["Room Issue", "Food & Beverage", "Service", "Noise", "Mainte
 const empty = { title: "", guestName: "", room: "", category: "Room Issue", priority: "medium", notes: "" };
 
 export default function ComplaintsPage() {
+  const { isMobile } = useResponsive();
   const user = getCurrentUser();
 
   const { records, loading, create, update, remove } = useBusinessRecords("hotel_complaint");
@@ -72,7 +74,7 @@ export default function ComplaintsPage() {
   }
 
   return (
-    <div style={{ minHeight: "100vh", padding: "28px 32px", color: "#fff", fontFamily: hotelFont }}>
+    <div style={{ minHeight: "100vh", padding: isMobile ? "15px 14px" : "28px 32px", color: "#fff", fontFamily: hotelFont }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24 }}>
         <div>
           <h1 style={{ margin: "0 0 4px", fontSize: 22, fontWeight: 800 }}>⚠️ Guest Complaints</h1>
@@ -84,14 +86,14 @@ export default function ComplaintsPage() {
       </div>
 
       {/* Stats */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 12, marginBottom: 24 }}>
+      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(3,1fr)", gap: 12, marginBottom: 24 }}>
         {[
           { label: "Open",        value: openCount,       ...STATUSES.open },
           { label: "In Progress", value: inProgressCount, ...STATUSES.in_progress },
           { label: "Resolved",    value: resolvedCount,   ...STATUSES.resolved },
         ].map(s => (
           <div key={s.label} onClick={() => setFilterStatus(filterStatus === s.label.toLowerCase().replace(" ", "_") ? "all" : s.label.toLowerCase().replace(" ", "_"))}
-            style={{ background: bg, border: `1px solid ${border}`, borderRadius: 14, padding: "18px 20px", cursor: "pointer" }}>
+            style={{ background: bg, border: `1px solid ${border}`, borderRadius: 14, padding: isMobile ? "12px 10px" : "18px 20px", cursor: "pointer" }}>
             <div style={{ fontSize: 12, color: s.color, fontWeight: 700, marginBottom: 4 }}>{s.label}</div>
             <div style={{ fontSize: 32, fontWeight: 800, color: s.color }}>{s.value}</div>
           </div>

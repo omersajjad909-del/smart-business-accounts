@@ -6,6 +6,7 @@ import { DateInput } from "@/app/dashboard/reports/_components/DateInput";
 import { fmtDate } from "@/lib/dateUtils";
 import { getCurrentUser } from "@/lib/auth";
 import { exportToCSV } from "@/lib/export";
+import { useResponsive } from "@/hooks/useResponsive";
 
 type Account  = { id: string; name: string; code?: string };
 type LedgerRow = {
@@ -19,6 +20,7 @@ const fmt = (n: number, cur = "") =>
 const closeX: React.CSSProperties = { position:"absolute", top:14, right:16, background:"none", border:"none", color:"rgba(255,255,255,.35)", fontSize:20, cursor:"pointer", lineHeight:1, padding:4, borderRadius:6, fontFamily:"inherit" };
 
 export default function LedgerReportPage() {
+  const { isMobile } = useResponsive();
   const router = useRouter();
   const today = new Date().toISOString().slice(0, 10);
   const [accounts,    setAccounts]    = useState<Account[]>([]);
@@ -119,7 +121,7 @@ export default function LedgerReportPage() {
           <div style={{
             background: "linear-gradient(145deg,#0f1a35,#0b1225)",
             border: "1px solid rgba(99,102,241,.25)",
-            borderRadius: 18, padding: "36px 40px", width: "100%", maxWidth: 480,
+            borderRadius: 18, padding: isMobile ? "20px 18px" : "36px 40px", width: "100%", maxWidth: 480,
             boxShadow: "0 32px 80px rgba(0,0,0,.6)", position: "relative",
           }}>
             <button style={closeX} onClick={() => rows.length > 0 ? setShowModal(false) : router.back()}>✕</button>
@@ -313,7 +315,7 @@ export default function LedgerReportPage() {
           }}>
             {/* Compact header */}
             <div style={{
-              padding: "14px 20px",
+              padding: isMobile ? "12px 10px" : "14px 20px",
               background: "rgba(99,102,241,.08)",
               borderBottom: "1px solid rgba(255,255,255,.07)",
               display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 8,

@@ -3,6 +3,7 @@ import { useState, useMemo, useEffect } from "react";
 import { useBusinessRecords } from "@/lib/useBusinessRecords";
 import { getCurrentUser } from "@/lib/auth";
 import toast from "react-hot-toast";
+import { useResponsive } from "@/hooks/useResponsive";
 
 const STATUS_COLOR: Record<string, string> = { COMPLETED: "#10b981", IN_TRANSIT: "#f59e0b", PENDING: "#6366f1" };
 
@@ -13,6 +14,7 @@ type TransferRow = { itemId: string; itemName: string; qty: string; search: stri
 const emptyRow = (): TransferRow => ({ itemId: "", itemName: "", qty: "", search: "", showDrop: false });
 
 export default function StockTransferPage() {
+  const { isMobile } = useResponsive();
   const { records, loading, create, setStatus } = useBusinessRecords("stock_transfer");
   const [showModal, setShowModal] = useState(false);
   const [fromBranch, setFromBranch] = useState("");
@@ -117,7 +119,7 @@ export default function StockTransferPage() {
   const s = { fontFamily: "'Outfit','Inter',sans-serif" };
 
   return (
-    <div style={{ ...s, minHeight: "100vh", background: "var(--app-bg)", padding: "28px 24px", color: "var(--text-primary)" }}>
+    <div style={{ ...s, minHeight: "100vh", background: "var(--app-bg)", padding: isMobile ? "15px 11px" : "28px 24px", color: "var(--text-primary)" }}>
       <style>{`@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap');`}</style>
 
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 24 }}>
@@ -130,14 +132,14 @@ export default function StockTransferPage() {
         </button>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 16, marginBottom: 24 }}>
+      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 16, marginBottom: 24 }}>
         {[
           { label: "Total Transfers", val: transfers.length, color: "#818cf8" },
           { label: "Pending", val: transfers.filter(t => t.status === "PENDING").length, color: "#6366f1" },
           { label: "In Transit", val: transfers.filter(t => t.status === "IN_TRANSIT").length, color: "#f59e0b" },
           { label: "Completed", val: transfers.filter(t => t.status === "COMPLETED").length, color: "#10b981" },
         ].map(k => (
-          <div key={k.label} style={{ background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 14, padding: "16px 20px" }}>
+          <div key={k.label} style={{ background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 14, padding: isMobile ? "12px 10px" : "16px 20px" }}>
             <div style={{ fontSize: 11, color: "var(--text-muted)", marginBottom: 4 }}>{k.label}</div>
             <div style={{ fontSize: 22, fontWeight: 700, color: k.color }}>{loading ? "…" : k.val}</div>
           </div>

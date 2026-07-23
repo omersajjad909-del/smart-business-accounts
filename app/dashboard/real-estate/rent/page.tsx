@@ -1,13 +1,15 @@
 "use client";
 import { useState } from "react";
 import { useBusinessRecords } from "@/lib/useBusinessRecords";
+import { useResponsive } from "@/hooks/useResponsive";
 
 const ff = "'Outfit','Inter',sans-serif";
 const bg = "rgba(255,255,255,0.03)";
 const border = "rgba(255,255,255,0.07)";
-const card: React.CSSProperties = { background: bg, border: `1px solid ${border}`, borderRadius: 12, padding: "20px 24px", fontFamily: ff };
+const card: React.CSSProperties = { background: bg, border: `1px solid ${border}`, borderRadius: 12, padding: isMobile ? "12px 11px" : "20px 24px", fontFamily: ff };
 
 export default function RentPage() {
+  const { isMobile } = useResponsive();
   const { records, loading, create, update } = useBusinessRecords("rent_payment");
   const leaseStore = useBusinessRecords("lease");
   const [showModal, setShowModal] = useState(false);
@@ -51,13 +53,13 @@ export default function RentPage() {
   }
 
   return (
-    <div style={{ padding: "28px 32px", fontFamily: ff, color: "#fff", minHeight: "100vh" }}>
+    <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", fontFamily: ff, color: "#fff", minHeight: "100vh" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 28 }}>
         <div><h1 style={{ fontSize: 22, fontWeight: 800, margin: "0 0 4px" }}>💰 Rent Collection</h1><p style={{ fontSize: 13, color: "rgba(255,255,255,.4)", margin: 0 }}>Track monthly rent payments</p></div>
         <button onClick={() => { setFormError(""); setShowModal(true); }} style={{ padding: "10px 22px", borderRadius: 10, border: "none", background: "linear-gradient(135deg,#818cf8,#6366f1)", color: "white", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>+ Add Payment</button>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 12, marginBottom: 28 }}>
+      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 12, marginBottom: 28 }}>
         {[{ label: "Total Records", val: payments.length, color: "#818cf8" }, { label: "Collected", val: `Rs. ${collected.toLocaleString()}`, color: "#34d399" }, { label: "Pending", val: `Rs. ${pending.toLocaleString()}`, color: "#f87171" }, { label: "Overdue", val: payments.filter(p => p.status === "overdue").length, color: "#f59e0b" }].map(s => (
           <div key={s.label} style={card}><div style={{ fontSize: 13, color: "rgba(255,255,255,.5)", marginBottom: 6 }}>{s.label}</div><div style={{ fontSize: 22, fontWeight: 700, color: s.color }}>{s.val}</div></div>
         ))}
@@ -73,15 +75,15 @@ export default function RentPage() {
           <tbody>
             {payments.map(p => (
               <tr key={p.id}>
-                <td style={{ padding: "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)", fontWeight: 600 }}>{p.tenant}</td>
-                <td style={{ padding: "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)", fontSize: 13 }}>{p.property}</td>
-                <td style={{ padding: "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)", fontSize: 13 }}>{p.month}</td>
-                <td style={{ padding: "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)", color: "#34d399", fontWeight: 600 }}>Rs. {p.amount.toLocaleString()}</td>
-                <td style={{ padding: "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)", fontSize: 12, color: "rgba(255,255,255,.5)" }}>{p.dueDate}</td>
-                <td style={{ padding: "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)" }}>
+                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)", fontWeight: 600 }}>{p.tenant}</td>
+                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)", fontSize: 13 }}>{p.property}</td>
+                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)", fontSize: 13 }}>{p.month}</td>
+                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)", color: "#34d399", fontWeight: 600 }}>Rs. {p.amount.toLocaleString()}</td>
+                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)", fontSize: 12, color: "rgba(255,255,255,.5)" }}>{p.dueDate}</td>
+                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)" }}>
                   <span style={{ display: "inline-block", background: p.status === "paid" ? "#34d39920" : p.status === "overdue" ? "#ef444420" : "#f59e0b20", color: p.status === "paid" ? "#34d399" : p.status === "overdue" ? "#ef4444" : "#f59e0b", borderRadius: 6, padding: "2px 10px", fontSize: 12, fontWeight: 600 }}>{p.status}</span>
                 </td>
-                <td style={{ padding: "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)" }}>
+                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)" }}>
                   {p.status !== "paid" && <button onClick={() => void markPaid(p.id)} style={{ padding: "5px 10px", background: "#34d39920", border: "1px solid rgba(52,211,153,.3)", color: "#34d399", borderRadius: 6, fontSize: 12, cursor: "pointer" }}>Mark Paid</button>}
                 </td>
               </tr>

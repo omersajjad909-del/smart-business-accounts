@@ -6,6 +6,7 @@ import { fmtDate } from "@/lib/dateUtils";
 import { DateInput } from "@/app/dashboard/reports/_components/DateInput";
 import { getCurrentUser } from "@/lib/auth";
 import { exportToCSV } from "@/lib/export";
+import { useResponsive } from "@/hooks/useResponsive";
 
 type TBRow = {
   code: string; name: string; category: string;
@@ -25,6 +26,7 @@ const fmt = (n: number, cur = "") =>
 const today = new Date().toISOString().slice(0, 10);
 
 export default function TrialBalancePage() {
+  const { isMobile } = useResponsive();
   const router  = useRouter();
   const fromRef = useRef<HTMLInputElement>(null);
   const toRef   = useRef<HTMLInputElement>(null);
@@ -253,30 +255,30 @@ export default function TrialBalancePage() {
                     <table style={{ width:"100%", borderCollapse:"collapse" }}>
                       <tbody>
                         <tr>
-                          <td colSpan={2} style={{ padding:"14px 20px", fontSize:10, fontWeight:800, color:"rgba(255,255,255,.4)", letterSpacing:".1em", textTransform:"uppercase", whiteSpace:"nowrap" as const, borderRight:"1px solid rgba(255,255,255,.05)" }}>
+                          <td colSpan={2} style={{ padding: isMobile ? "12px 10px" : "14px 20px", fontSize:10, fontWeight:800, color:"rgba(255,255,255,.4)", letterSpacing:".1em", textTransform:"uppercase", whiteSpace:"nowrap" as const, borderRight:"1px solid rgba(255,255,255,.05)" }}>
                             Grand Total
                           </td>
-                          <td style={{ padding:"14px 14px", textAlign:"right" as const, whiteSpace:"nowrap" as const, borderRight:"1px solid rgba(255,255,255,.04)" }}>
+                          <td style={{ padding: isMobile ? "12px 10px" : "14px 14px", textAlign:"right" as const, whiteSpace:"nowrap" as const, borderRight:"1px solid rgba(255,255,255,.04)" }}>
                             <div style={{ fontSize:9, fontWeight:700, color:"rgba(255,255,255,.3)", letterSpacing:".08em", textTransform:"uppercase" as const, marginBottom:3 }}>Total Op Dr</div>
                             <div style={{ fontSize:13, fontWeight:800, color:"rgba(255,255,255,.6)" }}>{fmt(t.opDebit, cur)}</div>
                           </td>
-                          <td style={{ padding:"14px 14px", textAlign:"right" as const, whiteSpace:"nowrap" as const, borderRight:"1px solid rgba(255,255,255,.04)" }}>
+                          <td style={{ padding: isMobile ? "12px 10px" : "14px 14px", textAlign:"right" as const, whiteSpace:"nowrap" as const, borderRight:"1px solid rgba(255,255,255,.04)" }}>
                             <div style={{ fontSize:9, fontWeight:700, color:"rgba(255,255,255,.3)", letterSpacing:".08em", textTransform:"uppercase" as const, marginBottom:3 }}>Total Op Cr</div>
                             <div style={{ fontSize:13, fontWeight:800, color:"rgba(255,255,255,.6)" }}>{fmt(t.opCredit, cur)}</div>
                           </td>
-                          <td style={{ padding:"14px 14px", textAlign:"right" as const, whiteSpace:"nowrap" as const, borderRight:"1px solid rgba(255,255,255,.04)" }}>
+                          <td style={{ padding: isMobile ? "12px 10px" : "14px 14px", textAlign:"right" as const, whiteSpace:"nowrap" as const, borderRight:"1px solid rgba(255,255,255,.04)" }}>
                             <div style={{ fontSize:9, fontWeight:700, color:"rgba(52,211,153,.5)", letterSpacing:".08em", textTransform:"uppercase" as const, marginBottom:3 }}>Total Tr Dr</div>
                             <div style={{ fontSize:13, fontWeight:800, color:"#34d399" }}>{fmt(t.transDebit, cur)}</div>
                           </td>
-                          <td style={{ padding:"14px 14px", textAlign:"right" as const, whiteSpace:"nowrap" as const, borderRight:"1px solid rgba(255,255,255,.04)" }}>
+                          <td style={{ padding: isMobile ? "12px 10px" : "14px 14px", textAlign:"right" as const, whiteSpace:"nowrap" as const, borderRight:"1px solid rgba(255,255,255,.04)" }}>
                             <div style={{ fontSize:9, fontWeight:700, color:"rgba(52,211,153,.5)", letterSpacing:".08em", textTransform:"uppercase" as const, marginBottom:3 }}>Total Tr Cr</div>
                             <div style={{ fontSize:13, fontWeight:800, color:"#f87171" }}>{fmt(t.transCredit, cur)}</div>
                           </td>
-                          <td style={{ padding:"14px 14px", textAlign:"right" as const, whiteSpace:"nowrap" as const, borderRight:"1px solid rgba(255,255,255,.04)" }}>
+                          <td style={{ padding: isMobile ? "12px 10px" : "14px 14px", textAlign:"right" as const, whiteSpace:"nowrap" as const, borderRight:"1px solid rgba(255,255,255,.04)" }}>
                             <div style={{ fontSize:9, fontWeight:700, color:"rgba(251,191,36,.5)", letterSpacing:".08em", textTransform:"uppercase" as const, marginBottom:3 }}>Total Cl Dr</div>
                             <div style={{ fontSize:13, fontWeight:800, color:"#fbbf24" }}>{fmt(t.clDebit, cur)}</div>
                           </td>
-                          <td style={{ padding:"14px 14px", textAlign:"right" as const, whiteSpace:"nowrap" as const }}>
+                          <td style={{ padding: isMobile ? "12px 10px" : "14px 14px", textAlign:"right" as const, whiteSpace:"nowrap" as const }}>
                             <div style={{ fontSize:9, fontWeight:700, color:"rgba(251,191,36,.5)", letterSpacing:".08em", textTransform:"uppercase" as const, marginBottom:3 }}>Total Cl Cr</div>
                             <div style={{ fontSize:13, fontWeight:800, color:"#fbbf24" }}>{fmt(t.clCredit, cur)}</div>
                           </td>

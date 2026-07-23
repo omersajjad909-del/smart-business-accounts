@@ -3,6 +3,7 @@ import { useState, useMemo, useEffect } from "react";
 import { useBusinessRecords } from "@/lib/useBusinessRecords";
 import { getCurrentUser } from "@/lib/auth";
 import toast from "react-hot-toast";
+import { useResponsive } from "@/hooks/useResponsive";
 
 const BLANK = { itemId: "", item: "", batch: "", mfgDate: "", expDate: "", qty: "", unit: "Units", supplier: "" };
 type InventoryItem = { id: string; name: string; code?: string };
@@ -20,6 +21,7 @@ function getExpiryStatus(days: number) {
 }
 
 export default function BatchExpiryPage() {
+  const { isMobile } = useResponsive();
   const { records, loading, create, remove } = useBusinessRecords("batch_expiry");
   const [showModal, setShowModal] = useState(false);
   const [form, setForm] = useState(BLANK);
@@ -113,7 +115,7 @@ export default function BatchExpiryPage() {
   const s = { fontFamily: "'Outfit','Inter',sans-serif" };
 
   return (
-    <div style={{ ...s, minHeight: "100vh", background: "var(--app-bg)", padding: "28px 24px", color: "var(--text-primary)" }}>
+    <div style={{ ...s, minHeight: "100vh", background: "var(--app-bg)", padding: isMobile ? "15px 11px" : "28px 24px", color: "var(--text-primary)" }}>
       <style>{`@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap');`}</style>
 
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 24 }}>
@@ -126,14 +128,14 @@ export default function BatchExpiryPage() {
         </button>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 16, marginBottom: 24 }}>
+      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 16, marginBottom: 24 }}>
         {[
           { label: "Total Batches", val: batches.length, color: "#818cf8" },
           { label: "Critical (≤7 days)", val: batches.filter(b => b.daysLeft <= 7).length, color: "#ef4444" },
           { label: "Expiring Soon (≤30d)", val: batches.filter(b => b.daysLeft > 7 && b.daysLeft <= 30).length, color: "#f59e0b" },
           { label: "Safe Stock", val: batches.filter(b => b.daysLeft > 30).length, color: "#10b981" },
         ].map(k => (
-          <div key={k.label} style={{ background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 14, padding: "16px 20px" }}>
+          <div key={k.label} style={{ background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 14, padding: isMobile ? "12px 10px" : "16px 20px" }}>
             <div style={{ fontSize: 11, color: "var(--text-muted)", marginBottom: 4 }}>{k.label}</div>
             <div style={{ fontSize: 26, fontWeight: 700, color: k.color }}>{loading ? "…" : k.val}</div>
           </div>

@@ -1,6 +1,7 @@
 ﻿"use client";
 import { useEffect, useState } from "react";
 import { getCurrentUser } from "@/lib/auth";
+import { useResponsive } from "@/hooks/useResponsive";
 
 type Employee = {
   id: string;
@@ -44,6 +45,7 @@ function getHeaders(): Record<string, string> {
 }
 
 export default function AdvanceSalaryPage() {
+  const { isMobile } = useResponsive();
   const [advances, setAdvances] = useState<Advance[]>([]);
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [loading, setLoading] = useState(true);
@@ -115,12 +117,12 @@ export default function AdvanceSalaryPage() {
   }
 
   const s: Record<string, React.CSSProperties> = {
-    page:   { padding: "28px 32px", maxWidth: 1100, margin: "0 auto", fontFamily: "'Outfit','Inter',sans-serif", color: "var(--text-primary)" },
+    page:   { padding: isMobile ? "15px 14px" : "28px 32px", maxWidth: 1100, margin: "0 auto", fontFamily: "'Outfit','Inter',sans-serif", color: "var(--text-primary)" },
     header: { display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 24 },
     title:  { fontSize: 22, fontWeight: 800, color: "var(--text-primary)", margin: 0 },
     sub:    { fontSize: 13, color: "var(--text-muted)", marginTop: 3 },
     btn:    { padding: "10px 20px", borderRadius: 10, border: "none", background: "#818cf8", color: "white", fontSize: 13, fontWeight: 700, cursor: "pointer" },
-    cards:  { display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 16, marginBottom: 24 },
+    cards:  { display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(3,1fr)", gap: 16, marginBottom: 24 },
     card:   { borderRadius: 14, padding: 20, background: "var(--panel-bg)", border: "1px solid var(--border)" },
     clabel: { fontSize: 11, color: "var(--text-muted)", fontWeight: 600, textTransform: "uppercase" as const, letterSpacing: ".06em" },
     cval:   { fontSize: 26, fontWeight: 800, color: "var(--text-primary)", marginTop: 6 },
@@ -166,7 +168,7 @@ export default function AdvanceSalaryPage() {
 
       {/* Table */}
       <div style={{ borderRadius: 14, border: "1px solid var(--border)", overflow: "hidden", background: "var(--panel-bg)" }}>
-        <div style={{ padding: "16px 20px", borderBottom: "1px solid var(--border)", fontSize: 14, fontWeight: 700, color: "var(--text-primary)" }}>
+        <div style={{ padding: isMobile ? "12px 10px" : "16px 20px", borderBottom: "1px solid var(--border)", fontSize: 14, fontWeight: 700, color: "var(--text-primary)" }}>
           Advance Records
         </div>
         {loading ? (

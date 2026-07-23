@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
 import { useBusinessRecords } from "@/lib/useBusinessRecords";
+import { useResponsive } from "@/hooks/useResponsive";
 
 const FONT = "'Outfit','Inter',sans-serif";
 const ACCENT = "#10b981";
@@ -16,6 +17,7 @@ const STATUS_STYLE: Record<string, { bg: string; color: string }> = {
 };
 
 export default function PackingListPage() {
+  const { isMobile } = useResponsive();
   const { records, loading, create, update, remove } = useBusinessRecords("packing_list");
   const [commercialInvoices, setCommercialInvoices] = useState<any[]>([]);
   const [search, setSearch] = useState("");
@@ -140,7 +142,7 @@ export default function PackingListPage() {
   const lbl: React.CSSProperties = { fontSize: 11, color: "var(--text-muted)", fontWeight: 700, textTransform: "uppercase", letterSpacing: 0.6, display: "block", marginBottom: 5 };
 
   return (
-    <div style={{ minHeight: "100vh", background: "var(--app-bg)", padding: "32px 28px", fontFamily: FONT, color: "var(--text-primary)" }}>
+    <div style={{ minHeight: "100vh", background: "var(--app-bg)", padding: isMobile ? "16px" : "32px" 28px", fontFamily: FONT, color: "var(--text-primary)" }}>
 
       <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 28 }}>
         <div>
@@ -153,14 +155,14 @@ export default function PackingListPage() {
       </div>
 
       {/* KPIs */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 14, marginBottom: 28 }}>
+      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 14, marginBottom: 28 }}>
         {[
           { label: "Total Lists", value: kpis.total, color: ACCENT },
           { label: "Draft", value: kpis.draft, color: "#94a3b8" },
           { label: "Shipped", value: kpis.shipped, color: "#34d399" },
           { label: "Total Packages", value: kpis.totalPkg.toLocaleString(), color: "#a5b4fc" },
         ].map(k => (
-          <div key={k.label} style={{ background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 14, padding: "16px 18px" }}>
+          <div key={k.label} style={{ background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 14, padding: isMobile ? "12px 10px" : "16px 18px" }}>
             <div style={{ fontSize: 10, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: 0.8, marginBottom: 8 }}>{k.label}</div>
             <div style={{ fontSize: 26, fontWeight: 800, color: k.color, lineHeight: 1 }}>{k.value}</div>
           </div>
@@ -218,14 +220,14 @@ export default function PackingListPage() {
       {modal && (
         <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.7)", zIndex: 1000, display: "flex", alignItems: "flex-start", justifyContent: "center", padding: 20, overflowY: "auto" }}
           onClick={e => { if (e.target === e.currentTarget) setModal(false); }}>
-          <div style={{ background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 18, width: "100%", maxWidth: 900, padding: "28px 32px", fontFamily: FONT, marginTop: 20, marginBottom: 20 }}>
+          <div style={{ background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 18, width: "100%", maxWidth: 900, padding: isMobile ? "15px 14px" : "28px 32px", fontFamily: FONT, marginTop: 20, marginBottom: 20 }}>
             <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 24 }}>
               <h2 style={{ fontSize: 18, fontWeight: 700, margin: 0 }}>{editing ? "Edit Packing List" : "New Packing List"}</h2>
               <button onClick={() => setModal(false)} style={{ background: "none", border: "none", color: "var(--text-muted)", fontSize: 22, cursor: "pointer" }}>×</button>
             </div>
 
             {/* Header fields */}
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 12, marginBottom: 16 }}>
+            <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(3,1fr)", gap: 12, marginBottom: 16 }}>
               <div><label style={lbl}>Commercial Invoice</label>
                 <select value={form.commercialInvoiceId} onChange={e => fillFromCommercialInvoice(e.target.value)} style={inp()}>
                   <option value="">Select commercial invoice</option>
@@ -244,7 +246,7 @@ export default function PackingListPage() {
               <div><label style={lbl}>Exporter</label><input value={form.exporter} onChange={e => sf("exporter", e.target.value)} style={inp()} /></div>
               <div><label style={lbl}>Importer</label><input value={form.importer} onChange={e => sf("importer", e.target.value)} style={inp()} /></div>
             </div>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 12, marginBottom: 20 }}>
+            <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 12, marginBottom: 20 }}>
               <div><label style={lbl}>CI No</label><input value={form.ciNo} onChange={e => sf("ciNo", e.target.value)} style={inp()} /></div>
               <div><label style={lbl}>BL / AWB No</label><input value={form.blNo} onChange={e => sf("blNo", e.target.value)} style={inp()} /></div>
               <div><label style={lbl}>Port of Loading</label><input value={form.portOfLoading} onChange={e => sf("portOfLoading", e.target.value)} style={inp()} /></div>

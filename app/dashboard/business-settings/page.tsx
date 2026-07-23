@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { useResponsive } from "@/hooks/useResponsive";
 
 type Tab = "general" | "identity" | "invoice" | "subscription";
 
@@ -50,7 +51,7 @@ const inp = (extra?:object) => ({
   fontFamily:"inherit",outline:"none",boxSizing:"border-box" as const,...(extra||{}),
 });
 const lbl = {fontSize:11,fontWeight:700,color:"rgba(255,255,255,.4)",textTransform:"uppercase" as const,letterSpacing:".07em",marginBottom:5,display:"block"};
-const section = (extra?:object) => ({borderRadius:14,background:"var(--panel-bg)",border:"1px solid var(--border)",padding:"22px 24px",marginBottom:16,...(extra||{})});
+const section = (extra?:object) => ({borderRadius:14,background:"var(--panel-bg)",border:"1px solid var(--border)",padding: isMobile ? "12px 11px" : "22px 24px",marginBottom:16,...(extra||{})});
 
 function Field({label,children}:{label:string;children:React.ReactNode}) {
   return (
@@ -65,6 +66,7 @@ function Grid({children,cols=2}:{children:React.ReactNode;cols?:number}) {
 }
 
 export default function BusinessSettingsPage() {
+  const { isMobile } = useResponsive();
   const [tab, setTab] = useState<Tab>("general");
   const [loading, setLoading]   = useState(true);
   const [saving, setSaving]     = useState(false);
@@ -240,7 +242,7 @@ export default function BusinessSettingsPage() {
               <span style={{marginLeft:"auto",padding:"3px 10px",borderRadius:20,background:"rgba(251,191,36,.1)",border:"1px solid rgba(251,191,36,.25)",color:"#fbbf24",fontSize:10,fontWeight:700}}>READ ONLY</span>
             </div>
             <p style={{margin:"0 0 16px",fontSize:12,color:"var(--text-muted)"}}>Your business type is locked after setup to protect your data and chart of accounts.</p>
-            <div style={{display:"flex",alignItems:"center",gap:14,padding:"16px 18px",borderRadius:12,background:`${biz.color}0f`,border:`1px solid ${biz.color}25`}}>
+            <div style={{display:"flex",alignItems:"center",gap:14,padding: isMobile ? "12px 10px" : "16px 18px",borderRadius:12,background:`${biz.color}0f`,border:`1px solid ${biz.color}25`}}>
               <div style={{width:50,height:50,borderRadius:14,background:`${biz.color}20`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:24,flexShrink:0}}>{biz.icon}</div>
               <div>
                 <div style={{fontSize:16,fontWeight:800,color:"white"}}>{biz.label}</div>
@@ -392,7 +394,7 @@ export default function BusinessSettingsPage() {
           {/* Plan overview */}
           <div style={section()}>
             <div style={{fontSize:14,fontWeight:800,marginBottom:16}}>Current Plan</div>
-            <div style={{display:"flex",alignItems:"center",gap:16,padding:"18px 20px",borderRadius:12,background:`${planColor}0f`,border:`1px solid ${planColor}25`,marginBottom:16}}>
+            <div style={{display:"flex",alignItems:"center",gap:16,padding: isMobile ? "12px 10px" : "18px 20px",borderRadius:12,background:`${planColor}0f`,border:`1px solid ${planColor}25`,marginBottom:16}}>
               <div style={{width:52,height:52,borderRadius:15,background:`${planColor}20`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:24,flexShrink:0}}>
                 {co.plan==="ENTERPRISE"?"🏆":co.plan==="PRO"?"⚡":"🌱"}
               </div>
@@ -409,13 +411,13 @@ export default function BusinessSettingsPage() {
             </div>
 
             {/* Stats grid */}
-            <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:12}}>
+            <div style={{display:"grid",gridTemplateColumns: isMobile ? "1fr" : "repeat(3,1fr)",gap:12}}>
               {[
                 {label:"Team Members",    value:co.totalUsers,    icon:"👥", color:"#818cf8"},
                 {label:"Chart of Accounts",value:co.totalAccounts, icon:"📊", color:"#34d399"},
                 {label:"Member Since",    value:co.createdAt ? new Date(co.createdAt).getFullYear() : "—", icon:"📅", color:"#f59e0b"},
               ].map(s=>(
-                <div key={s.label} style={{padding:"16px 18px",borderRadius:12,background:"rgba(255,255,255,.03)",border:"1px solid rgba(255,255,255,.07)"}}>
+                <div key={s.label} style={{padding: isMobile ? "12px 10px" : "16px 18px",borderRadius:12,background:"rgba(255,255,255,.03)",border:"1px solid rgba(255,255,255,.07)"}}>
                   <div style={{fontSize:20,marginBottom:8}}>{s.icon}</div>
                   <div style={{fontSize:22,fontWeight:900,color:s.color,marginBottom:4}}>{s.value}</div>
                   <div style={{fontSize:11,color:"var(--text-muted)",fontWeight:600}}>{s.label}</div>
@@ -447,7 +449,7 @@ export default function BusinessSettingsPage() {
               ))}
             </div>
             {co.plan==="STARTER" && (
-              <div style={{marginTop:14,padding:"14px 18px",borderRadius:12,background:"linear-gradient(135deg,rgba(99,102,241,.1),rgba(139,92,246,.06))",border:"1px solid rgba(99,102,241,.2)",display:"flex",alignItems:"center",justifyContent:"space-between",gap:12}}>
+              <div style={{marginTop:14,padding: isMobile ? "12px 10px" : "14px 18px",borderRadius:12,background:"linear-gradient(135deg,rgba(99,102,241,.1),rgba(139,92,246,.06))",border:"1px solid rgba(99,102,241,.2)",display:"flex",alignItems:"center",justifyContent:"space-between",gap:12}}>
                 <div>
                   <div style={{fontSize:13,fontWeight:800,color:"white",marginBottom:3}}>Upgrade to unlock more features</div>
                   <div style={{fontSize:12,color:"rgba(255,255,255,.45)"}}>Get CRM, AI insights, advanced analytics, and priority support.</div>

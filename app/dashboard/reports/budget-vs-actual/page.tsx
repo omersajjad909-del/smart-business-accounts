@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { getCurrentUser } from "@/lib/auth";
+import { useResponsive } from "@/hooks/useResponsive";
 
 const ff = "'Outfit','Inter',sans-serif";
 function fmt(n: number) { return n.toLocaleString("en-US", { minimumFractionDigits: 0, maximumFractionDigits: 0 }); }
@@ -18,6 +19,7 @@ interface BudgetRow {
 type CostCenter = { id: string; code: string; name: string };
 
 export default function BudgetVsActualPage() {
+  const { isMobile } = useResponsive();
   const user = getCurrentUser();
   const [data,         setData]         = useState<BudgetRow[]>([]);
   const [loading,      setLoading]      = useState(true);
@@ -68,7 +70,7 @@ export default function BudgetVsActualPage() {
   const underCount = data.filter(r => r.status === "under").length;
 
   return (
-    <div style={{ padding: "24px 28px", fontFamily: ff, color: "var(--text-primary)", maxWidth: 1100 }}>
+    <div style={{ padding: isMobile ? "13px 13px" : "24px 28px", fontFamily: ff, color: "var(--text-primary)", maxWidth: 1100 }}>
 
       {/* Header */}
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 24, flexWrap: "wrap", gap: 12 }}>
@@ -105,7 +107,7 @@ export default function BudgetVsActualPage() {
           { label: "Over Budget",     value: String(overCount),  color: "#f87171", bg: "rgba(248,113,113,.07)", border: "rgba(248,113,113,.2)" },
           { label: "Under Budget",    value: String(underCount), color: "#34d399", bg: "rgba(52,211,153,.07)",  border: "rgba(52,211,153,.2)" },
         ].map((c, i) => (
-          <div key={i} style={{ borderRadius: 12, padding: "14px 16px", background: c.bg, border: `1px solid ${c.border}` }}>
+          <div key={i} style={{ borderRadius: 12, padding: isMobile ? "12px 10px" : "14px 16px", background: c.bg, border: `1px solid ${c.border}` }}>
             <div style={{ fontSize: 10, color: "var(--text-muted)", fontWeight: 700, textTransform: "uppercase", letterSpacing: ".06em", marginBottom: 6 }}>{c.label}</div>
             <div style={{ fontSize: 18, fontWeight: 900, color: c.color }}>{c.value}</div>
           </div>
@@ -127,7 +129,7 @@ export default function BudgetVsActualPage() {
 
       {/* Table */}
       <div style={{ background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 14, overflow: "hidden" }}>
-        <div style={{ padding: "14px 18px", borderBottom: "1px solid var(--border)", fontSize: 13, fontWeight: 700 }}>
+        <div style={{ padding: isMobile ? "12px 10px" : "14px 18px", borderBottom: "1px solid var(--border)", fontSize: 13, fontWeight: 700 }}>
           Category-wise Breakdown
         </div>
         <table style={{ width: "100%", borderCollapse: "collapse" }}>

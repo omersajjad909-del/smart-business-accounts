@@ -5,6 +5,7 @@ import toast from "react-hot-toast";
 import { useMemo, useState } from "react";
 import { useBusinessRecords } from "@/lib/useBusinessRecords";
 import { restaurantBg, restaurantBorder, restaurantFont, restaurantMuted } from "../_shared";
+import { useResponsive } from "@/hooks/useResponsive";
 
 type TableStatus = "available" | "occupied" | "reserved" | "cleaning";
 const STATUS_META: Record<TableStatus, { label: string; color: string; bg: string; emoji: string }> = {
@@ -15,6 +16,7 @@ const STATUS_META: Record<TableStatus, { label: string; color: string; bg: strin
 };
 
 export default function TablesPage() {
+  const { isMobile } = useResponsive();
   const { records, loading, create, update } = useBusinessRecords("restaurant_table");
   const orderStore = useBusinessRecords("restaurant_order");
   const reservationStore = useBusinessRecords("restaurant_reservation");
@@ -71,27 +73,27 @@ export default function TablesPage() {
         </div>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 12, marginBottom: 28 }}>
+      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 12, marginBottom: 28 }}>
         {(Object.entries(counts) as [TableStatus, number][]).map(([status, count]) => {
           const meta = STATUS_META[status];
-          return <div key={status} style={{ padding: "16px 18px", borderRadius: 13, background: meta.bg, border: `1px solid ${meta.color}30` }}><div style={{ fontSize: 22, fontWeight: 800, color: meta.color }}>{count}</div><div style={{ fontSize: 12, color: "rgba(255,255,255,.6)", marginTop: 3 }}>{meta.emoji} {meta.label}</div></div>;
+          return <div key={status} style={{ padding: isMobile ? "12px 10px" : "16px 18px", borderRadius: 13, background: meta.bg, border: `1px solid ${meta.color}30` }}><div style={{ fontSize: 22, fontWeight: 800, color: meta.color }}>{count}</div><div style={{ fontSize: 12, color: "rgba(255,255,255,.6)", marginTop: 3 }}>{meta.emoji} {meta.label}</div></div>;
         })}
       </div>
 
       {loading && <div style={{ textAlign: "center", padding: 40, color: restaurantMuted }}>Loading...</div>}
 
-      <div style={{ display: "grid", gridTemplateColumns: selected ? "1fr 340px" : "1fr", gap: 20 }}>
+      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : selected ? "1fr 340px" : "1fr", gap: 20 }}>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(120px,1fr))", gap: 12 }}>
           {tables.map((table) => {
             const meta = STATUS_META[table.status];
             const isSelected = selected === table.id;
-            return <div key={table.id} onClick={() => setSelected(isSelected ? null : table.id)} style={{ padding: "18px 14px", borderRadius: 14, background: isSelected ? meta.bg : restaurantBg, border: `2px solid ${isSelected ? meta.color : `${meta.color}30`}`, cursor: "pointer", textAlign: "center" }}><div style={{ fontSize: 26, marginBottom: 6 }}>{meta.emoji}</div><div style={{ fontSize: 18, fontWeight: 800 }}>Table {table.number}</div><div style={{ fontSize: 11, color: restaurantMuted, marginTop: 2 }}>Cap: {table.capacity}</div><div style={{ fontSize: 11, fontWeight: 700, color: meta.color, marginTop: 6, padding: "2px 8px", borderRadius: 20, background: `${meta.color}15`, display: "inline-block" }}>{meta.label}</div>{table.order && <div style={{ fontSize: 12, fontWeight: 700, color: "#f59e0b", marginTop: 6 }}>Rs.{table.order.total.toLocaleString()}</div>}</div>;
+            return <div key={table.id} onClick={() => setSelected(isSelected ? null : table.id)} style={{ padding: isMobile ? "12px 10px" : "18px 14px", borderRadius: 14, background: isSelected ? meta.bg : restaurantBg, border: `2px solid ${isSelected ? meta.color : `${meta.color}30`}`, cursor: "pointer", textAlign: "center" }}><div style={{ fontSize: 26, marginBottom: 6 }}>{meta.emoji}</div><div style={{ fontSize: 18, fontWeight: 800 }}>Table {table.number}</div><div style={{ fontSize: 11, color: restaurantMuted, marginTop: 2 }}>Cap: {table.capacity}</div><div style={{ fontSize: 11, fontWeight: 700, color: meta.color, marginTop: 6, padding: "2px 8px", borderRadius: 20, background: `${meta.color}15`, display: "inline-block" }}>{meta.label}</div>{table.order && <div style={{ fontSize: 12, fontWeight: 700, color: "#f59e0b", marginTop: 6 }}>Rs.{table.order.total.toLocaleString()}</div>}</div>;
           })}
           {!loading && tables.length === 0 && <div style={{ background: restaurantBg, border: `1px solid ${restaurantBorder}`, borderRadius: 12, padding: 40, textAlign: "center", color: "rgba(255,255,255,.25)", gridColumn: "1/-1" }}>No tables added yet.</div>}
         </div>
 
         {selectedTable && (
-          <div style={{ padding: "20px 22px", borderRadius: 16, background: restaurantBg, border: `1px solid ${restaurantBorder}`, height: "fit-content" }}>
+          <div style={{ padding: isMobile ? "12px 10px" : "20px 22px", borderRadius: 16, background: restaurantBg, border: `1px solid ${restaurantBorder}`, height: "fit-content" }}>
             <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 18 }}>
               <div style={{ fontSize: 16, fontWeight: 800 }}>Table {selectedTable.number}</div>
               <button onClick={() => setSelected(null)} style={{ background: "none", border: "none", color: "rgba(255,255,255,.4)", fontSize: 18, cursor: "pointer" }}>×</button>

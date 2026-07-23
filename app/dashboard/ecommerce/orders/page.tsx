@@ -5,6 +5,7 @@ import type { CSSProperties } from "react";
 import { useMemo, useState } from "react";
 import { useBusinessRecords } from "@/lib/useBusinessRecords";
 import {
+import { useResponsive } from "@/hooks/useResponsive";
   ecommerceBg,
   ecommerceBorder,
   ecommerceFont,
@@ -42,6 +43,7 @@ const nextStatus: Record<string, string> = {
 };
 
 export default function EcommerceOrdersPage() {
+  const { isMobile } = useResponsive();
   const { records, loading, create, update } = useBusinessRecords("ecommerce_order");
   const productsHook = useBusinessRecords("ecommerce_product");
   const orders = useMemo(() => mapEcommerceOrders(records), [records]);
@@ -120,7 +122,7 @@ export default function EcommerceOrdersPage() {
   }
 
   return (
-    <div style={{ padding: "28px 32px", fontFamily: ecommerceFont, color: "#fff", minHeight: "100vh" }}>
+    <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", fontFamily: ecommerceFont, color: "#fff", minHeight: "100vh" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 28 }}>
         <div>
           <h1 style={{ fontSize: 24, fontWeight: 900, margin: "0 0 6px" }}>Orders Desk</h1>
@@ -131,14 +133,14 @@ export default function EcommerceOrdersPage() {
         </button>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 12, marginBottom: 24 }}>
+      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 12, marginBottom: 24 }}>
         {[
           { label: "Total Orders", value: orders.length, color: "#818cf8" },
           { label: "Pending / Processing", value: orders.filter((order) => order.status === "pending" || order.status === "processing").length, color: "#f59e0b" },
           { label: "Shipped", value: orders.filter((order) => order.status === "shipped").length, color: "#60a5fa" },
           { label: "Delivered Revenue", value: `Rs. ${totalRevenue.toLocaleString()}`, color: "#34d399" },
         ].map((card) => (
-          <div key={card.label} style={{ background: ecommerceBg, border: `1px solid ${ecommerceBorder}`, borderRadius: 16, padding: "18px 20px" }}>
+          <div key={card.label} style={{ background: ecommerceBg, border: `1px solid ${ecommerceBorder}`, borderRadius: 16, padding: isMobile ? "12px 10px" : "18px 20px" }}>
             <div style={{ fontSize: 12, color: ecommerceMuted, marginBottom: 8, textTransform: "uppercase", letterSpacing: ".06em" }}>{card.label}</div>
             <div style={{ fontSize: 24, fontWeight: 900, color: card.color }}>{card.value}</div>
           </div>
@@ -287,7 +289,7 @@ const thStyle: CSSProperties = {
 };
 
 const tdStyle: CSSProperties = {
-  padding: "14px 16px",
+  padding: isMobile ? "12px 10px" : "14px 16px",
   borderBottom: "1px solid rgba(255,255,255,.04)",
   fontSize: 13,
   verticalAlign: "top",

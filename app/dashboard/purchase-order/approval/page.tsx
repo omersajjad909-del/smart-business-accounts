@@ -3,6 +3,7 @@
 import { useState, useMemo } from "react";
 import { DateInput } from "@/app/dashboard/reports/_components/DateInput";
 import { useBusinessRecords } from "@/lib/useBusinessRecords";
+import { useResponsive } from "@/hooks/useResponsive";
 
 /* ─── types ─── */
 interface LineItem {
@@ -51,7 +52,7 @@ function KpiCard({ label, value, color }: { label: string; value: number; color:
         background: "var(--panel-bg)",
         border: "1px solid var(--border)",
         borderRadius: 12,
-        padding: "20px 24px",
+        padding: isMobile ? "12px 11px" : "20px 24px",
         flex: "1 1 160px",
         minWidth: 140,
       }}
@@ -414,7 +415,7 @@ function ApprovalCard({
           flexWrap: "wrap",
           gap: 12,
           alignItems: "center",
-          padding: "16px 20px",
+          padding: isMobile ? "12px 10px" : "16px 20px",
           cursor: "pointer",
         }}
         onClick={() => setExpanded((v) => !v)}
@@ -439,7 +440,7 @@ function ApprovalCard({
 
       {/* Expanded content */}
       {expanded && (
-        <div style={{ borderTop: "1px solid var(--border)", padding: "16px 20px" }}>
+        <div style={{ borderTop: "1px solid var(--border)", padding: isMobile ? "12px 10px" : "16px 20px" }}>
           {/* Line items */}
           {po.items && po.items.length > 0 && (
             <div style={{ marginBottom: 16 }}>
@@ -526,6 +527,7 @@ function ApprovalCard({
 
 /* ─── Main Page ─── */
 export default function PurchaseOrderApprovalPage() {
+  const { isMobile } = useResponsive();
   const { records, loading, create, setStatus, remove } = useBusinessRecords("purchase_order");
 
   const [activeTab, setActiveTab] = useState<"pending" | "all">("pending");
@@ -603,7 +605,7 @@ export default function PurchaseOrderApprovalPage() {
         background: "var(--app-bg)",
         fontFamily: "'Outfit','Inter',sans-serif",
         color: "var(--text-primary)",
-        padding: "32px 28px",
+        padding: isMobile ? "16px" : "32px" 28px",
         boxSizing: "border-box",
       }}
     >

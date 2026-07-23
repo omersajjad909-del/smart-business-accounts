@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { getCurrentUser } from "@/lib/auth";
+import { useResponsive } from "@/hooks/useResponsive";
 
 const ff = "'Outfit','Inter',sans-serif";
 function fmt(n: number) { return n.toLocaleString("en-US", { minimumFractionDigits: 0, maximumFractionDigits: 0 }); }
@@ -15,6 +16,7 @@ const STATUS: Record<string, { label: string; color: string; bg: string }> = {
 };
 
 export default function OrderFulfillmentPage() {
+  const { isMobile } = useResponsive();
   const user = getCurrentUser();
   const [data, setData]       = useState<Row[]>([]);
   const [loading, setLoading] = useState(true);
@@ -34,7 +36,7 @@ export default function OrderFulfillmentPage() {
   const inp: React.CSSProperties = { background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 8, padding: "7px 12px", color: "var(--text-primary)", fontFamily: ff, fontSize: 12, outline: "none" };
 
   return (
-    <div style={{ padding: "24px 28px", fontFamily: ff, color: "var(--text-primary)", maxWidth: 1100 }}>
+    <div style={{ padding: isMobile ? "13px 13px" : "24px 28px", fontFamily: ff, color: "var(--text-primary)", maxWidth: 1100 }}>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 24, flexWrap: "wrap", gap: 12 }}>
         <div>
           <h1 style={{ margin: 0, fontSize: 22, fontWeight: 900, letterSpacing: "-.3px" }}>Order Fulfillment Rate</h1>
@@ -54,13 +56,13 @@ export default function OrderFulfillmentPage() {
         </div>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 14, marginBottom: 20 }}>
+      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(3,1fr)", gap: 14, marginBottom: 20 }}>
         {[
           { label: "On-Time Rate",    value: `${onTimeRate.toFixed(1)}%`,    color: onTimeRate >= 90 ? "#34d399" : onTimeRate >= 70 ? "#fbbf24" : "#f87171", bg: "rgba(129,140,248,.07)", border: "rgba(129,140,248,.2)" },
           { label: "Delayed Orders",  value: `${delayedCount} orders`,        color: delayedCount > 0 ? "#f87171" : "#34d399",   bg: "rgba(248,113,113,.07)", border: "rgba(248,113,113,.2)" },
           { label: "Total Orders",    value: `${data.length}`,                color: "#818cf8",  bg: "rgba(129,140,248,.07)", border: "rgba(129,140,248,.2)" },
         ].map((c, i) => (
-          <div key={i} style={{ borderRadius: 14, padding: "18px 20px", background: c.bg, border: `1px solid ${c.border}` }}>
+          <div key={i} style={{ borderRadius: 14, padding: isMobile ? "12px 10px" : "18px 20px", background: c.bg, border: `1px solid ${c.border}` }}>
             <div style={{ fontSize: 11, color: "var(--text-muted)", fontWeight: 700, textTransform: "uppercase", letterSpacing: ".06em", marginBottom: 8 }}>{c.label}</div>
             <div style={{ fontSize: 20, fontWeight: 900, color: c.color }}>{c.value}</div>
           </div>

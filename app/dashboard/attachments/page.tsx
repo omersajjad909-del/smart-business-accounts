@@ -3,6 +3,7 @@ import { fmtDate } from "@/lib/dateUtils";
 import { confirmToast, alertToast } from "@/lib/toast-feedback";
 import { useState, useEffect, useRef } from "react";
 import { getCurrentUser } from "@/lib/auth";
+import { useResponsive } from "@/hooks/useResponsive";
 
 const FONT = "'Outfit','Inter',sans-serif";
 
@@ -32,6 +33,7 @@ function formatBytes(bytes: number): string {
 }
 
 export default function AttachmentsPage() {
+  const { isMobile } = useResponsive();
   const [attachments, setAttachments] = useState<Attachment[]>([]);
   const [loading, setLoading]         = useState(false);
   const [uploading, setUploading]     = useState(false);
@@ -108,7 +110,7 @@ export default function AttachmentsPage() {
   const td: React.CSSProperties = { padding: "12px 14px", fontSize: 13, borderBottom: "1px solid var(--border)", color: "var(--text-primary)", verticalAlign: "middle" };
 
   return (
-    <div style={{ minHeight: "100vh", background: "var(--app-bg)", padding: "32px 28px", fontFamily: FONT, color: "var(--text-primary)" }}>
+    <div style={{ minHeight: "100vh", background: "var(--app-bg)", padding: isMobile ? "16px" : "32px" 28px", fontFamily: FONT, color: "var(--text-primary)" }}>
 
       {/* Header */}
       <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 28 }}>
@@ -125,14 +127,14 @@ export default function AttachmentsPage() {
       </div>
 
       {/* KPI */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 16, marginBottom: 28 }}>
+      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 16, marginBottom: 28 }}>
         {[
           { label: "Total Files", value: kpis.total, color: "#6366f1" },
           { label: "Total Size", value: formatBytes(kpis.totalSize), color: "#a5b4fc" },
           { label: "PDFs", value: kpis.pdfs, color: "#f87171" },
           { label: "Images", value: kpis.images, color: "#34d399" },
         ].map(k => (
-          <div key={k.label} style={{ background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 14, padding: "18px 20px" }}>
+          <div key={k.label} style={{ background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 14, padding: isMobile ? "12px 10px" : "18px 20px" }}>
             <div style={{ fontSize: 11, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: 0.8, marginBottom: 8 }}>{k.label}</div>
             <div style={{ fontSize: 26, fontWeight: 700, color: k.color, lineHeight: 1 }}>{k.value}</div>
           </div>
@@ -219,7 +221,7 @@ export default function AttachmentsPage() {
         <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.65)", zIndex: 1000, display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}
           onClick={e => { if (e.target === e.currentTarget) { setUploadModal(false); setError(null); } }}
         >
-          <div style={{ background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 18, width: "100%", maxWidth: 480, padding: "28px 32px", fontFamily: FONT }}>
+          <div style={{ background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 18, width: "100%", maxWidth: 480, padding: isMobile ? "15px 14px" : "28px 32px", fontFamily: FONT }}>
             <h2 style={{ fontSize: 17, fontWeight: 700, margin: "0 0 20px" }}>Upload File</h2>
 
             <div style={{ marginBottom: 16 }}>
@@ -243,7 +245,7 @@ export default function AttachmentsPage() {
               onDrop={e => { e.preventDefault(); handleUpload(e.dataTransfer.files); }}
               onDragOver={e => e.preventDefault()}
               onClick={() => fileRef.current?.click()}
-              style={{ border: "2px dashed var(--border)", borderRadius: 12, padding: "32px 20px", textAlign: "center", cursor: "pointer", marginBottom: 16, background: "rgba(99,102,241,0.03)" }}
+              style={{ border: "2px dashed var(--border)", borderRadius: 12, padding: isMobile ? "18px 10px" : "32px 20px", textAlign: "center", cursor: "pointer", marginBottom: 16, background: "rgba(99,102,241,0.03)" }}
             >
               <input ref={fileRef} type="file" multiple style={{ display: "none" }} onChange={e => handleUpload(e.target.files)}
                 accept=".jpg,.jpeg,.png,.gif,.webp,.pdf,.doc,.docx,.xls,.xlsx,.csv,.txt" />

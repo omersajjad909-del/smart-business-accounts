@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useBusinessRecords } from "@/lib/useBusinessRecords";
 import {
+import { useResponsive } from "@/hooks/useResponsive";
   mapSalonAppointments,
   mapSalonServices,
   mapSalonStylists,
@@ -27,6 +28,7 @@ const EMPTY_FORM = {
 };
 
 export default function SalonAppointmentsPage() {
+  const { isMobile } = useResponsive();
   const appointmentsHook = useBusinessRecords("salon_appointment");
   const stylistsHook = useBusinessRecords("stylist");
   const servicesHook = useBusinessRecords("salon_service");
@@ -122,7 +124,7 @@ export default function SalonAppointmentsPage() {
   }
 
   return (
-    <div style={{ minHeight: "100vh", color: "#fff", fontFamily: salonFont, padding: "28px 32px" }}>
+    <div style={{ minHeight: "100vh", color: "#fff", fontFamily: salonFont, padding: isMobile ? "15px 14px" : "28px 32px" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24 }}>
         <div>
           <h1 style={{ margin: 0, fontSize: 28, fontWeight: 800 }}>Salon Appointments</h1>
@@ -131,14 +133,14 @@ export default function SalonAppointmentsPage() {
         <button onClick={() => setShowModal(true)} style={{ background: "#ec4899", color: "#fff", border: "none", borderRadius: 10, padding: "11px 18px", fontSize: 14, fontWeight: 700, cursor: "pointer", fontFamily: salonFont }}>+ Book Appointment</button>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 16, marginBottom: 24 }}>
+      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 16, marginBottom: 24 }}>
         {[
           { label: "Today Total", value: todayTotal, color: "#ec4899" },
           { label: "Confirmed / Active", value: activeQueue, color: "#60a5fa" },
           { label: "In Progress", value: inProgress, color: "#a78bfa" },
           { label: "Revenue", value: `Rs. ${revenue.toLocaleString()}`, color: "#34d399" },
         ].map((stat) => (
-          <div key={stat.label} style={{ background: salonBg, border: `1px solid ${salonBorder}`, borderRadius: 16, padding: "20px 22px" }}>
+          <div key={stat.label} style={{ background: salonBg, border: `1px solid ${salonBorder}`, borderRadius: 16, padding: isMobile ? "12px 10px" : "20px 22px" }}>
             <div style={{ fontSize: 28, fontWeight: 800, color: stat.color }}>{stat.value}</div>
             <div style={{ marginTop: 6, fontSize: 12, color: salonMuted, textTransform: "uppercase", letterSpacing: ".06em" }}>{stat.label}</div>
           </div>
@@ -202,7 +204,7 @@ export default function SalonAppointmentsPage() {
             </div>
             <div style={{ display: "grid", gap: 10 }}>
               {list.map((appointment) => (
-                <div key={appointment.id} style={{ background: salonBg, border: `1px solid ${salonBorder}`, borderRadius: 16, padding: "14px 18px", display: "flex", alignItems: "center", gap: 16 }}>
+                <div key={appointment.id} style={{ background: salonBg, border: `1px solid ${salonBorder}`, borderRadius: 16, padding: isMobile ? "12px 10px" : "14px 18px", display: "flex", alignItems: "center", gap: 16 }}>
                   <div style={{ minWidth: 70, textAlign: "center" }}>
                     <div style={{ fontSize: 17, fontWeight: 800 }}>{appointment.time}</div>
                     <div style={{ fontSize: 11, color: salonMuted }}>{appointment.duration} min</div>

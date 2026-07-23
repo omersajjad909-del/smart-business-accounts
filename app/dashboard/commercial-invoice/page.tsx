@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
 import { useBusinessRecords } from "@/lib/useBusinessRecords";
+import { useResponsive } from "@/hooks/useResponsive";
 
 const FONT = "'Outfit','Inter',sans-serif";
 const ACCENT = "#6366f1";
@@ -23,6 +24,7 @@ const STATUS_STYLE: Record<string, { bg: string; color: string }> = {
 };
 
 export default function CommercialInvoicePage() {
+  const { isMobile } = useResponsive();
   const { records, loading, create, update, remove } = useBusinessRecords("commercial_invoice");
   const [salesInvoices, setSalesInvoices] = useState<any[]>([]);
   const [search, setSearch] = useState("");
@@ -161,7 +163,7 @@ export default function CommercialInvoicePage() {
   const lbl: React.CSSProperties = { fontSize: 11, color: "var(--text-muted)", fontWeight: 700, textTransform: "uppercase", letterSpacing: 0.6, display: "block", marginBottom: 5 };
 
   return (
-    <div style={{ minHeight: "100vh", background: "var(--app-bg)", padding: "32px 28px", fontFamily: FONT, color: "var(--text-primary)" }}>
+    <div style={{ minHeight: "100vh", background: "var(--app-bg)", padding: isMobile ? "16px" : "32px" 28px", fontFamily: FONT, color: "var(--text-primary)" }}>
 
       {/* Header */}
       <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 28 }}>
@@ -175,14 +177,14 @@ export default function CommercialInvoicePage() {
       </div>
 
       {/* KPIs */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 14, marginBottom: 28 }}>
+      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 14, marginBottom: 28 }}>
         {[
           { label: "Total Invoices", value: kpis.total,    color: ACCENT },
           { label: "Issued / Sent",  value: kpis.issued,   color: "#38bdf8" },
           { label: "Paid",           value: kpis.paid,     color: "#34d399" },
           { label: "Total Value",    value: `$${(kpis.totalVal/1000).toFixed(1)}k`, color: "#a5b4fc" },
         ].map(k => (
-          <div key={k.label} style={{ background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 14, padding: "16px 18px" }}>
+          <div key={k.label} style={{ background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 14, padding: isMobile ? "12px 10px" : "16px 18px" }}>
             <div style={{ fontSize: 10, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: 0.8, marginBottom: 8 }}>{k.label}</div>
             <div style={{ fontSize: 26, fontWeight: 800, color: k.color, lineHeight: 1 }}>{k.value}</div>
           </div>
@@ -258,7 +260,7 @@ export default function CommercialInvoicePage() {
       {modal && (
         <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.7)", zIndex: 1000, display: "flex", alignItems: "flex-start", justifyContent: "center", padding: "20px", overflowY: "auto" }}
           onClick={e => { if (e.target === e.currentTarget) setModal(false); }}>
-          <div style={{ background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 18, width: "100%", maxWidth: 860, padding: "28px 32px", fontFamily: FONT, marginTop: 20, marginBottom: 20 }}>
+          <div style={{ background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 18, width: "100%", maxWidth: 860, padding: isMobile ? "15px 14px" : "28px 32px", fontFamily: FONT, marginTop: 20, marginBottom: 20 }}>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 24 }}>
               <h2 style={{ fontSize: 18, fontWeight: 700, margin: 0 }}>{editing ? "Edit Commercial Invoice" : "New Commercial Invoice"}</h2>
               <button onClick={() => setModal(false)} style={{ background: "transparent", border: "none", color: "var(--text-muted)", fontSize: 22, cursor: "pointer" }}>×</button>
@@ -266,7 +268,7 @@ export default function CommercialInvoicePage() {
 
             {/* Section: Invoice Info */}
             <div style={{ fontSize: 11, fontWeight: 700, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: 0.7, marginBottom: 12 }}>Invoice Info</div>
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 12, marginBottom: 20 }}>
+            <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr 1fr", gap: 12, marginBottom: 20 }}>
               <div><label style={lbl}>Source Sales Invoice</label>
                 <select value={form.sourceSalesInvoiceId} onChange={e => fillFromSalesInvoice(e.target.value)} style={inp()}>
                   <option value="">Select source invoice</option>
@@ -300,7 +302,7 @@ export default function CommercialInvoicePage() {
 
             {/* Section: Shipping */}
             <div style={{ fontSize: 11, fontWeight: 700, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: 0.7, marginBottom: 12 }}>Shipping Details</div>
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr", gap: 12, marginBottom: 12 }}>
+            <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr 1fr" : "1fr 1fr 1fr 1fr", gap: 12, marginBottom: 12 }}>
               <div><label style={lbl}>Incoterm</label>
                 <select value={form.incoterm} onChange={e => sf("incoterm", e.target.value)} style={inp()}>
                   {INCOTERMS.map(t => <option key={t}>{t}</option>)}
@@ -314,7 +316,7 @@ export default function CommercialInvoicePage() {
               <div><label style={lbl}>Country of Origin</label><input value={form.countryOfOrigin} onChange={e => sf("countryOfOrigin", e.target.value)} style={inp()} /></div>
               <div><label style={lbl}>Country of Destination</label><input value={form.countryOfDestination} onChange={e => sf("countryOfDestination", e.target.value)} style={inp()} /></div>
             </div>
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr", gap: 12, marginBottom: 20 }}>
+            <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr 1fr" : "1fr 1fr 1fr 1fr", gap: 12, marginBottom: 20 }}>
               <div><label style={lbl}>Port of Loading</label><input value={form.portOfLoading} onChange={e => sf("portOfLoading", e.target.value)} style={inp()} /></div>
               <div><label style={lbl}>Port of Discharge</label><input value={form.portOfDischarge} onChange={e => sf("portOfDischarge", e.target.value)} style={inp()} /></div>
               <div><label style={lbl}>BL / AWB No</label><input value={form.blNo} onChange={e => sf("blNo", e.target.value)} style={inp()} /></div>
@@ -359,7 +361,7 @@ export default function CommercialInvoicePage() {
             {/* Charges + Totals */}
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20, marginBottom: 20 }}>
               <div>
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10, marginBottom: 12 }}>
+                <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr 1fr", gap: 10, marginBottom: 12 }}>
                   <div><label style={lbl}>Freight ({form.currency})</label><input type="number" value={form.freight} onChange={e => sf("freight", Number(e.target.value))} style={inp()} /></div>
                   <div><label style={lbl}>Insurance ({form.currency})</label><input type="number" value={form.insurance} onChange={e => sf("insurance", Number(e.target.value))} style={inp()} /></div>
                   <div><label style={lbl}>Discount ({form.currency})</label><input type="number" value={form.discount} onChange={e => sf("discount", Number(e.target.value))} style={inp()} /></div>
@@ -386,7 +388,7 @@ export default function CommercialInvoicePage() {
             </div>
 
             {/* Packing */}
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 12, marginBottom: 16 }}>
+            <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 12, marginBottom: 16 }}>
               <div><label style={lbl}>Packing Type</label><input value={form.packingType} onChange={e => sf("packingType", e.target.value)} placeholder="Cartons, Pallets…" style={inp()} /></div>
               <div><label style={lbl}>Total Packages</label><input value={form.totalPackages} onChange={e => sf("totalPackages", e.target.value)} style={inp()} /></div>
               <div><label style={lbl}>Gross Weight (kg)</label><input value={form.grossWeight} onChange={e => sf("grossWeight", e.target.value)} style={inp()} /></div>

@@ -3,6 +3,7 @@ import { confirmToast } from "@/lib/toast-feedback";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { getCurrentUser } from "@/lib/auth";
+import { useResponsive } from "@/hooks/useResponsive";
 
 const ff     = "'Outfit','Inter',sans-serif";
 const accent = "#10b981";
@@ -33,6 +34,7 @@ const TAX_TYPES = [
 ];
 
 export default function TaxConfigurationPage() {
+  const { isMobile } = useResponsive();
   const user = getCurrentUser();
 
   const [taxes,      setTaxes]      = useState<TaxConfiguration[]>([]);
@@ -105,7 +107,7 @@ export default function TaxConfigurationPage() {
   const panel: React.CSSProperties = { background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 14 };
 
   return (
-    <div style={{ padding: "24px 28px", fontFamily: ff, color: "var(--text-primary)", maxWidth: 920 }}>
+    <div style={{ padding: isMobile ? "13px 13px" : "24px 28px", fontFamily: ff, color: "var(--text-primary)", maxWidth: 920 }}>
 
       {/* Header */}
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 24 }}>
@@ -126,7 +128,7 @@ export default function TaxConfigurationPage() {
             {editingId ? "Edit Tax Configuration" : "New Tax Configuration"}
           </div>
 
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 16, marginBottom: 16 }}>
+          <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr 1fr", gap: 16, marginBottom: 16 }}>
             {/* Tax Type */}
             <div style={{ gridColumn: "1 / 3" }}>
               <label style={lbl}>Tax Type *</label>
@@ -186,7 +188,7 @@ export default function TaxConfigurationPage() {
 
       {/* List */}
       <div style={{ ...panel, overflow: "hidden" }}>
-        <div style={{ padding: "14px 18px", borderBottom: "1px solid var(--border)", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+        <div style={{ padding: isMobile ? "12px 10px" : "14px 18px", borderBottom: "1px solid var(--border)", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
           <div style={{ fontSize: 14, fontWeight: 700 }}>Configured Taxes ({taxes.length})</div>
           {taxes.length === 0 && (
             <div style={{ fontSize: 12, color: "var(--text-muted)" }}>No taxes configured yet</div>
@@ -203,7 +205,7 @@ export default function TaxConfigurationPage() {
           <tbody>
             {taxes.length === 0 ? (
               <tr>
-                <td colSpan={6} style={{ padding: "48px 20px", textAlign: "center", color: "var(--text-muted)", fontSize: 14 }}>
+                <td colSpan={6} style={{ padding: isMobile ? "26px 10px" : "48px 20px", textAlign: "center", color: "var(--text-muted)", fontSize: 14 }}>
                   <div style={{ fontSize: 32, marginBottom: 8 }}>🧾</div>
                   No tax configurations yet — click &ldquo;+ New Tax&rdquo; to add one
                 </td>

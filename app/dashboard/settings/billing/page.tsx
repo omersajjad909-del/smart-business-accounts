@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { getCurrentUser } from "@/lib/auth";
+import { useResponsive } from "@/hooks/useResponsive";
 
 type Invoice = {
   id: string;
@@ -131,6 +132,7 @@ function Alert({ msg, type }: { msg: string; type: "error" | "success" }) {
 }
 
 export default function BillingSettingsPage() {
+  const { isMobile } = useResponsive();
   const currentUser = useMemo(() => getCurrentUser(), []);
   const isAdmin = currentUser?.role === "ADMIN";
 
@@ -468,7 +470,7 @@ export default function BillingSettingsPage() {
             {invoices.length === 0 ? (
               <div
                 style={{
-                  padding: "40px 20px",
+                  padding: isMobile ? "22px 10px" : "40px 20px",
                   textAlign: "center",
                   color: "rgba(255,255,255,.42)",
                   fontSize: 13,

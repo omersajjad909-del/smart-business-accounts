@@ -7,6 +7,7 @@ import toast from "react-hot-toast";
 import { getCurrentUser } from "@/lib/auth";
 import { PrintActionBar } from "@/components/print/PrintActionBar";
 import { PrintDocA4, PrintPaperWrapper } from "@/components/print/PrintDocA4";
+import { useResponsive } from "@/hooks/useResponsive";
 
 const FONT = "'Outfit','Inter',sans-serif";
 const ACCENT = "#6366f1";
@@ -37,7 +38,7 @@ const STATUS_COLORS: Record<string, { bg: string; text: string; border: string }
 
 function inp(extra?: React.CSSProperties): React.CSSProperties {
   return {
-    padding: "9px 13px", borderRadius: 8, border: `1.5px solid ${BORDER}`,
+    padding: isMobile ? "8px 8px" : "9px 13px", borderRadius: 8, border: `1.5px solid ${BORDER}`,
     background: BG, color: TEXT, fontFamily: FONT, fontSize: 13.5, outline: "none",
     width: "100%", boxSizing: "border-box" as const, ...extra,
   };
@@ -47,6 +48,7 @@ function Label({ children }: { children: React.ReactNode }) {
 }
 
 export default function PurchaseOrderPage() {
+  const { isMobile } = useResponsive();
   const today = new Date().toISOString().slice(0, 10);
   const user = getCurrentUser();
   const [isMobile, setIsMobile] = useState(false);
@@ -271,11 +273,11 @@ export default function PurchaseOrderPage() {
         </div>
         <div style={{ display: "flex", gap: 8 }}>
           <button onClick={() => { setShowList(!showList); if (!showList) setShowForm(false); else setShowForm(true); }}
-            style={{ padding: "9px 18px", borderRadius: 8, border: `1px solid ${BORDER}`, background: showList ? "rgba(99,102,241,0.12)" : PANEL, color: showList ? ACCENT : TEXT, fontFamily: FONT, fontSize: 13, fontWeight: 600, cursor: "pointer" }}>
+            style={{ padding: isMobile ? "8px 9px" : "9px 18px", borderRadius: 8, border: `1px solid ${BORDER}`, background: showList ? "rgba(99,102,241,0.12)" : PANEL, color: showList ? ACCENT : TEXT, fontFamily: FONT, fontSize: 13, fontWeight: 600, cursor: "pointer" }}>
             {showList ? "Hide List" : "Show List"}
           </button>
           <button onClick={() => { setShowForm(true); setShowList(false); resetForm(); loadPOs(); }}
-            style={{ padding: "9px 20px", borderRadius: 8, border: "none", background: "linear-gradient(135deg,#6366f1,#4f46e5)", color: "#fff", fontFamily: FONT, fontSize: 13, fontWeight: 700, cursor: "pointer", boxShadow: "0 4px 14px rgba(99,102,241,0.4)" }}>
+            style={{ padding: isMobile ? "8px 10px" : "9px 20px", borderRadius: 8, border: "none", background: "linear-gradient(135deg,#6366f1,#4f46e5)", color: "#fff", fontFamily: FONT, fontSize: 13, fontWeight: 700, cursor: "pointer", boxShadow: "0 4px 14px rgba(99,102,241,0.4)" }}>
             + New PO
           </button>
         </div>
@@ -289,13 +291,13 @@ export default function PurchaseOrderPage() {
               <thead>
                 <tr style={{ background: "rgba(99,102,241,0.07)", borderBottom: `1px solid ${BORDER}` }}>
                   {["PO Number", "Date", "Supplier", "Branch", "Approval", "GRN Status", "Items", "Actions"].map(h => (
-                    <th key={h} style={{ padding: "12px 16px", textAlign: "left", color: MUTED, fontWeight: 700, fontSize: 10.5, textTransform: "uppercase", letterSpacing: 0.7, whiteSpace: "nowrap" }}>{h}</th>
+                    <th key={h} style={{ padding: isMobile ? "8px 8px" : "12px 16px", textAlign: "left", color: MUTED, fontWeight: 700, fontSize: 10.5, textTransform: "uppercase", letterSpacing: 0.7, whiteSpace: "nowrap" }}>{h}</th>
                   ))}
                 </tr>
               </thead>
               <tbody>
                 {pos.length === 0 ? (
-                  <tr><td colSpan={8} style={{ padding: "40px 16px", textAlign: "center", color: MUTED }}>No purchase orders yet</td></tr>
+                  <tr><td colSpan={8} style={{ padding: isMobile ? "24px 8px" : "40px 16px", textAlign: "center", color: MUTED }}>No purchase orders yet</td></tr>
                 ) : pos.map((po) => {
                   const scApproval = STATUS_COLORS[po.approvalStatus || "PENDING"] || STATUS_COLORS.PENDING;
                   const scGrn = STATUS_COLORS[po.status || "PENDING"] || STATUS_COLORS.PENDING;
@@ -303,25 +305,25 @@ export default function PurchaseOrderPage() {
                     <tr key={po.id} style={{ borderBottom: `1px solid ${BORDER}`, transition: "background .12s" }}
                       onMouseEnter={e => (e.currentTarget as HTMLElement).style.background = "rgba(99,102,241,0.05)"}
                       onMouseLeave={e => (e.currentTarget as HTMLElement).style.background = "transparent"}>
-                      <td style={{ padding: "13px 16px", fontWeight: 700, color: ACCENT, fontFamily: "monospace", fontSize: 13 }}>{po.poNo}</td>
-                      <td style={{ padding: "13px 16px", color: MUTED, fontSize: 12 }}>{fmtDate(po.date)}</td>
-                      <td style={{ padding: "13px 16px", fontWeight: 600 }}>{po.supplier?.name || "—"}</td>
-                      <td style={{ padding: "13px 16px" }}>
+                      <td style={{ padding: isMobile ? "8px 8px" : "13px 16px", fontWeight: 700, color: ACCENT, fontFamily: "monospace", fontSize: 13 }}>{po.poNo}</td>
+                      <td style={{ padding: isMobile ? "8px 8px" : "13px 16px", color: MUTED, fontSize: 12 }}>{fmtDate(po.date)}</td>
+                      <td style={{ padding: isMobile ? "8px 8px" : "13px 16px", fontWeight: 600 }}>{po.supplier?.name || "—"}</td>
+                      <td style={{ padding: isMobile ? "8px 8px" : "13px 16px" }}>
                         {po.branch?.name
-                          ? <span style={{ padding: "3px 10px", borderRadius: 20, fontSize: 10, fontWeight: 700, background: "rgba(99,102,241,0.1)", color: ACCENT, border: `1px solid rgba(99,102,241,0.25)` }}>🏢 {po.branch.name}</span>
+                          ? <span style={{ padding: isMobile ? "8px 8px" : "3px 10px", borderRadius: 20, fontSize: 10, fontWeight: 700, background: "rgba(99,102,241,0.1)", color: ACCENT, border: `1px solid rgba(99,102,241,0.25)` }}>🏢 {po.branch.name}</span>
                           : <span style={{ fontSize: 12, color: MUTED }}>—</span>}
                       </td>
-                      <td style={{ padding: "13px 16px" }}>
-                        <span style={{ padding: "3px 10px", borderRadius: 20, fontSize: 10, fontWeight: 700, background: scApproval.bg, color: scApproval.text, border: `1px solid ${scApproval.border}` }}>
+                      <td style={{ padding: isMobile ? "8px 8px" : "13px 16px" }}>
+                        <span style={{ padding: isMobile ? "8px 8px" : "3px 10px", borderRadius: 20, fontSize: 10, fontWeight: 700, background: scApproval.bg, color: scApproval.text, border: `1px solid ${scApproval.border}` }}>
                           {po.approvalStatus || "PENDING"}
                         </span>
                       </td>
-                      <td style={{ padding: "13px 16px" }}>
-                        <span style={{ padding: "3px 10px", borderRadius: 20, fontSize: 10, fontWeight: 700, background: scGrn.bg, color: scGrn.text, border: `1px solid ${scGrn.border}` }}>
+                      <td style={{ padding: isMobile ? "8px 8px" : "13px 16px" }}>
+                        <span style={{ padding: isMobile ? "8px 8px" : "3px 10px", borderRadius: 20, fontSize: 10, fontWeight: 700, background: scGrn.bg, color: scGrn.text, border: `1px solid ${scGrn.border}` }}>
                           {po.status || "PENDING"}
                         </span>
                       </td>
-                      <td style={{ padding: "13px 16px", maxWidth: 200 }}>
+                      <td style={{ padding: isMobile ? "8px 8px" : "13px 16px", maxWidth: 200 }}>
                         {po.items?.length > 0 ? (
                           <div>
                             <div style={{ fontSize: 12, fontWeight: 600, color: TEXT, lineHeight: 1.5 }}>
@@ -332,13 +334,13 @@ export default function PurchaseOrderPage() {
                           </div>
                         ) : <span style={{ color: MUTED, fontSize: 12 }}>—</span>}
                       </td>
-                      <td style={{ padding: "13px 16px" }}>
+                      <td style={{ padding: isMobile ? "8px 8px" : "13px 16px" }}>
                         <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
                           {(!po.approvalStatus || po.approvalStatus === "PENDING") && (
-                            <button onClick={() => approvePO(po)} style={{ padding: "5px 13px", borderRadius: 6, border: "1px solid rgba(52,211,153,0.4)", background: "rgba(52,211,153,0.1)", color: "#34d399", fontFamily: FONT, fontSize: 11, fontWeight: 700, cursor: "pointer" }}>✓ Approve</button>
+                            <button onClick={() => approvePO(po)} style={{ padding: isMobile ? "8px 8px" : "5px 13px", borderRadius: 6, border: "1px solid rgba(52,211,153,0.4)", background: "rgba(52,211,153,0.1)", color: "#34d399", fontFamily: FONT, fontSize: 11, fontWeight: 700, cursor: "pointer" }}>✓ Approve</button>
                           )}
-                          <button onClick={() => startEdit(po)} style={{ padding: "5px 13px", borderRadius: 6, border: `1px solid ${ACCENT}`, background: "rgba(99,102,241,0.1)", color: ACCENT, fontFamily: FONT, fontSize: 11, fontWeight: 700, cursor: "pointer" }}>Edit</button>
-                          <button onClick={() => deletePO(po.id)} style={{ padding: "5px 13px", borderRadius: 6, border: "1px solid rgba(248,113,113,0.35)", background: "rgba(248,113,113,0.07)", color: "#f87171", fontFamily: FONT, fontSize: 11, fontWeight: 700, cursor: "pointer" }}>Del</button>
+                          <button onClick={() => startEdit(po)} style={{ padding: isMobile ? "8px 8px" : "5px 13px", borderRadius: 6, border: `1px solid ${ACCENT}`, background: "rgba(99,102,241,0.1)", color: ACCENT, fontFamily: FONT, fontSize: 11, fontWeight: 700, cursor: "pointer" }}>Edit</button>
+                          <button onClick={() => deletePO(po.id)} style={{ padding: isMobile ? "8px 8px" : "5px 13px", borderRadius: 6, border: "1px solid rgba(248,113,113,0.35)", background: "rgba(248,113,113,0.07)", color: "#f87171", fontFamily: FONT, fontSize: 11, fontWeight: 700, cursor: "pointer" }}>Del</button>
                         </div>
                       </td>
                     </tr>
@@ -347,7 +349,7 @@ export default function PurchaseOrderPage() {
               </tbody>
             </table>
           </div>
-          <div style={{ padding: "11px 18px", borderTop: `1px solid ${BORDER}`, fontSize: 12, color: MUTED }}>{pos.length} purchase orders</div>
+          <div style={{ padding: isMobile ? "8px 9px" : "11px 18px", borderTop: `1px solid ${BORDER}`, fontSize: 12, color: MUTED }}>{pos.length} purchase orders</div>
         </div>
       )}
 
@@ -370,7 +372,7 @@ export default function PurchaseOrderPage() {
                   {supplierId && suppliers.find((s: any) => s.id === supplierId) && (() => {
                     const s = suppliers.find((x: any) => x.id === supplierId);
                     return (
-                      <div style={{ padding: "10px 12px", background: "var(--panel-bg-2)", borderRadius: 8, border: `1px solid ${BORDER}` }}>
+                      <div style={{ padding: isMobile ? "8px 8px" : "10px 12px", background: "var(--panel-bg-2)", borderRadius: 8, border: `1px solid ${BORDER}` }}>
                         <div style={{ fontWeight: 700, fontSize: 14, marginBottom: 4 }}>{s.name}</div>
                         {(s.email || s.phone) && <div style={{ fontSize: 12, color: MUTED, marginBottom: 3, display: "flex", gap: 12, flexWrap: "wrap" }}>{s.email && <span>{s.email}</span>}{s.phone && <span>{s.phone}</span>}</div>}
                         {s.address && <div style={{ fontSize: 12, color: MUTED, marginBottom: 3 }}>{s.address}{s.city ? `, ${s.city}` : ""}</div>}
@@ -383,7 +385,7 @@ export default function PurchaseOrderPage() {
                 <div style={{ background: PANEL, border: `1px solid ${BORDER}`, borderRadius: 12, padding: 18 }}>
                   <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 12, color: TEXT }}>Your Business Details</div>
                   {companyInfo ? (
-                    <div style={{ padding: "10px 12px", background: "var(--panel-bg-2)", borderRadius: 8, border: `1px solid ${BORDER}` }}>
+                    <div style={{ padding: isMobile ? "8px 8px" : "10px 12px", background: "var(--panel-bg-2)", borderRadius: 8, border: `1px solid ${BORDER}` }}>
                       <div style={{ fontWeight: 700, fontSize: 14, marginBottom: 4 }}>{companyInfo.name}</div>
                       {companyInfo.address && <div style={{ fontSize: 12, color: MUTED, marginBottom: 3 }}>{companyInfo.address}</div>}
                       <div style={{ fontSize: 12, color: MUTED, display: "flex", gap: 12, flexWrap: "wrap" }}>{companyInfo.phone && <span>Phone: {companyInfo.phone}</span>}{companyInfo.email && <span>{companyInfo.email}</span>}</div>
@@ -422,7 +424,7 @@ export default function PurchaseOrderPage() {
                             {items.map((it: any) => <option key={it.id} value={it.id}>{it.name}</option>)}
                           </select>
                           {(r as any).sku && <div style={{ fontSize: 11, color: MUTED, marginBottom: 6 }}>SKU: {(r as any).sku}{(r as any).unit ? ` | Unit: ${(r as any).unit}` : ""}</div>}
-                          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
+                          <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: 8 }}>
                             {(["qty","rate","discountPercent","taxPercent"] as const).map(k => (
                               <div key={k}><div style={{ fontSize: 10, color: MUTED, fontWeight: 700, marginBottom: 3, textTransform: "uppercase" }}>{k === "qty" ? "Qty" : k === "rate" ? "Unit Price" : k === "discountPercent" ? "Disc %" : "Tax %"}</div>
                                 <input type="number" value={(r as any)[k]} onChange={e => updateRow(i, k, e.target.value)} placeholder="0" style={inp({ textAlign: "right" })} /></div>
@@ -439,7 +441,7 @@ export default function PurchaseOrderPage() {
                       <thead>
                         <tr style={{ borderBottom: `2px solid ${BORDER}` }}>
                           {["#","Item / Description","SKU","Qty","Unit","Unit Price","Disc %","Tax %","Total",""].map((h,hi) => (
-                            <th key={h+hi} style={{ padding: "8px 7px", fontSize: 10, fontWeight: 700, color: MUTED, textTransform: "uppercase", letterSpacing: 0.4, textAlign: hi >= 3 && hi <= 8 ? "right" : "left", whiteSpace: "nowrap" }}>{h}</th>
+                            <th key={h+hi} style={{ padding: isMobile ? "8px 8px" : "8px 7px", fontSize: 10, fontWeight: 700, color: MUTED, textTransform: "uppercase", letterSpacing: 0.4, textAlign: hi >= 3 && hi <= 8 ? "right" : "left", whiteSpace: "nowrap" }}>{h}</th>
                           ))}
                         </tr>
                       </thead>
@@ -455,8 +457,8 @@ export default function PurchaseOrderPage() {
                               onMouseEnter={e => { const btn = (e.currentTarget as HTMLElement).querySelector(".row-del-btn") as HTMLElement; if (btn) btn.style.opacity = "1"; }}
                               onMouseLeave={e => { const btn = (e.currentTarget as HTMLElement).querySelector(".row-del-btn") as HTMLElement; if (btn) btn.style.opacity = "0"; }}
                             >
-                              <td style={{ padding: "6px 7px", fontSize: 12, color: MUTED, width: 28 }}>{i + 1}</td>
-                              <td style={{ padding: "6px 7px", minWidth: 140 }}>
+                              <td style={{ padding: isMobile ? "8px 8px" : "6px 7px", fontSize: 12, color: MUTED, width: 28 }}>{i + 1}</td>
+                              <td style={{ padding: isMobile ? "8px 8px" : "6px 7px", minWidth: 140 }}>
                                 <select value={r.itemId} onChange={e => {
                                   const it = items.find((x: any) => x.id === e.target.value);
                                   if (!it) return;
@@ -464,21 +466,21 @@ export default function PurchaseOrderPage() {
                                   copy[i] = { ...copy[i], itemId: it.id, name: it.name, desc: it.description || "", rate: String(it.purchaseRate || it.rate || ""), unit: it.unit || "", sku: it.code || "" };
                                   if (i === copy.length - 1) copy.push(emptyRow());
                                   setRows(copy);
-                                }} style={{ ...inp({ padding: "5px 7px", fontSize: 13 }) }}>
+                                }} style={{ ...inp({ padding: isMobile ? "8px 8px" : "5px 7px", fontSize: 13 }) }}>
                                   <option value="">— Select —</option>
                                   {items.map((it: any) => <option key={it.id} value={it.id}>{it.name}</option>)}
                                 </select>
                                 {r.desc && <div style={{ fontSize: 11, color: MUTED, marginTop: 2, paddingLeft: 2 }}>{r.desc}</div>}
                               </td>
-                              <td style={{ padding: "6px 7px", fontSize: 12, color: MUTED, width: 72 }}>{(r as any).sku || "—"}</td>
-                              <td style={{ padding: "6px 7px", width: 68 }}><input type="number" value={r.qty} onChange={e => updateRow(i, "qty", e.target.value)} placeholder="0" style={inp({ padding: "5px 7px", textAlign: "right", fontSize: 13 })} /></td>
-                              <td style={{ padding: "6px 7px", fontSize: 12, color: MUTED, width: 52 }}>{(r as any).unit || "—"}</td>
-                              <td style={{ padding: "6px 7px", width: 94 }}><input type="number" value={r.rate} onChange={e => updateRow(i, "rate", e.target.value)} placeholder="0.00" style={inp({ padding: "5px 7px", textAlign: "right", fontSize: 13 })} /></td>
-                              <td style={{ padding: "6px 7px", width: 66 }}><input type="number" value={(r as any).discountPercent} onChange={e => updateRow(i, "discountPercent", e.target.value)} placeholder="0" style={inp({ padding: "5px 7px", textAlign: "right", fontSize: 13 })} /></td>
-                              <td style={{ padding: "6px 7px", width: 66 }}><input type="number" value={(r as any).taxPercent} onChange={e => updateRow(i, "taxPercent", e.target.value)} placeholder="0" style={inp({ padding: "5px 7px", textAlign: "right", fontSize: 13 })} /></td>
-                              <td style={{ padding: "6px 7px", textAlign: "right", fontWeight: 600, fontSize: 13, width: 94, whiteSpace: "nowrap" }}>{lineBase > 0 ? (lineBase - lineDisc + lineTax).toLocaleString() : <span style={{ color: MUTED }}>—</span>}</td>
+                              <td style={{ padding: isMobile ? "8px 8px" : "6px 7px", fontSize: 12, color: MUTED, width: 72 }}>{(r as any).sku || "—"}</td>
+                              <td style={{ padding: isMobile ? "8px 8px" : "6px 7px", width: 68 }}><input type="number" value={r.qty} onChange={e => updateRow(i, "qty", e.target.value)} placeholder="0" style={inp({ padding: isMobile ? "8px 8px" : "5px 7px", textAlign: "right", fontSize: 13 })} /></td>
+                              <td style={{ padding: isMobile ? "8px 8px" : "6px 7px", fontSize: 12, color: MUTED, width: 52 }}>{(r as any).unit || "—"}</td>
+                              <td style={{ padding: isMobile ? "8px 8px" : "6px 7px", width: 94 }}><input type="number" value={r.rate} onChange={e => updateRow(i, "rate", e.target.value)} placeholder="0.00" style={inp({ padding: isMobile ? "8px 8px" : "5px 7px", textAlign: "right", fontSize: 13 })} /></td>
+                              <td style={{ padding: isMobile ? "8px 8px" : "6px 7px", width: 66 }}><input type="number" value={(r as any).discountPercent} onChange={e => updateRow(i, "discountPercent", e.target.value)} placeholder="0" style={inp({ padding: isMobile ? "8px 8px" : "5px 7px", textAlign: "right", fontSize: 13 })} /></td>
+                              <td style={{ padding: isMobile ? "8px 8px" : "6px 7px", width: 66 }}><input type="number" value={(r as any).taxPercent} onChange={e => updateRow(i, "taxPercent", e.target.value)} placeholder="0" style={inp({ padding: isMobile ? "8px 8px" : "5px 7px", textAlign: "right", fontSize: 13 })} /></td>
+                              <td style={{ padding: isMobile ? "8px 8px" : "6px 7px", textAlign: "right", fontWeight: 600, fontSize: 13, width: 94, whiteSpace: "nowrap" }}>{lineBase > 0 ? (lineBase - lineDisc + lineTax).toLocaleString() : <span style={{ color: MUTED }}>—</span>}</td>
                               {/* DELETE — hover only, NOT in tab order, NEVER triggered by Enter */}
-                              <td style={{ padding: "6px 4px", width: 34, textAlign: "center" }}>
+                              <td style={{ padding: isMobile ? "8px 8px" : "6px 4px", width: 34, textAlign: "center" }}>
                                 {rows.length > 1 && !isEmpty && (
                                   <button
                                     type="button"
@@ -545,10 +547,10 @@ export default function PurchaseOrderPage() {
                 <div style={{ fontSize: 10, fontWeight: 700, color: MUTED, letterSpacing: 1, textTransform: "uppercase", marginBottom: 6 }}>Purchase Order</div>
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
                   <div style={{ fontSize: 18, fontWeight: 800, fontFamily: "monospace", color: TEXT }}>{poNo || "—"}</div>
-                  <span style={{ fontSize: 11, fontWeight: 700, padding: "3px 10px", borderRadius: 20, background: (STATUS_COLORS[approvalStatus] || STATUS_COLORS.PENDING).bg, color: (STATUS_COLORS[approvalStatus] || STATUS_COLORS.PENDING).text, border: `1px solid ${(STATUS_COLORS[approvalStatus] || STATUS_COLORS.PENDING).border}` }}>{approvalStatus}</span>
+                  <span style={{ fontSize: 11, fontWeight: 700, padding: isMobile ? "8px 8px" : "3px 10px", borderRadius: 20, background: (STATUS_COLORS[approvalStatus] || STATUS_COLORS.PENDING).bg, color: (STATUS_COLORS[approvalStatus] || STATUS_COLORS.PENDING).text, border: `1px solid ${(STATUS_COLORS[approvalStatus] || STATUS_COLORS.PENDING).border}` }}>{approvalStatus}</span>
                 </div>
                 <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+                  <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: 10 }}>
                     <div><Label>Order Date</Label><DateInput value={date} onChange={setDate} style={inp()} /></div>
                     <div><Label>Due Date</Label><DateInput value={dueDate} onChange={setDueDate} style={inp()} /></div>
                   </div>
@@ -562,14 +564,14 @@ export default function PurchaseOrderPage() {
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: 13 }}>
                     <span style={{ color: MUTED }}>Discount</span>
                     <div style={{ display: "flex", gap: 5 }}>
-                      <select value={discountType} onChange={e => setDiscountType(e.target.value)} style={{ ...inp({ width: 58, padding: "3px 6px", fontSize: 12 }) }}><option value="flat">Flat</option><option value="percent">%</option></select>
-                      <input type="number" value={discount} onChange={e => setDiscount(e.target.value)} placeholder="0" style={{ ...inp({ width: 78, padding: "3px 7px", fontSize: 12, textAlign: "right" }) }} />
+                      <select value={discountType} onChange={e => setDiscountType(e.target.value)} style={{ ...inp({ width: 58, padding: isMobile ? "8px 8px" : "3px 6px", fontSize: 12 }) }}><option value="flat">Flat</option><option value="percent">%</option></select>
+                      <input type="number" value={discount} onChange={e => setDiscount(e.target.value)} placeholder="0" style={{ ...inp({ width: 78, padding: isMobile ? "8px 8px" : "3px 7px", fontSize: 12, textAlign: "right" }) }} />
                     </div>
                   </div>
                   {discountAmt > 0 && <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, color: "var(--danger)" }}><span>Discount Amount</span><span>— {cur} {discountAmt.toLocaleString()}</span></div>}
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: 13 }}>
                     <span style={{ color: MUTED }}>Shipping Charges</span>
-                    <input type="number" value={freight} onChange={e => setFreight(e.target.value)} placeholder="0.00" style={{ ...inp({ width: 100, padding: "3px 7px", fontSize: 12, textAlign: "right" }) }} />
+                    <input type="number" value={freight} onChange={e => setFreight(e.target.value)} placeholder="0.00" style={{ ...inp({ width: 100, padding: isMobile ? "8px 8px" : "3px 7px", fontSize: 12, textAlign: "right" }) }} />
                   </div>
                   <div style={{ display: "flex", justifyContent: "space-between", borderTop: `2px solid ${BORDER}`, paddingTop: 12, fontSize: 18, fontWeight: 800 }}>
                     <span>Grand Total</span>
@@ -658,7 +660,7 @@ export default function PurchaseOrderPage() {
           background: "white", color: "#000",
           fontFamily: "'Courier New',Courier,monospace",
           width: 220, margin: "0 auto",
-          padding: "10px 12px",
+          padding: isMobile ? "8px 8px" : "10px 12px",
           boxShadow: "0 4px 24px rgba(0,0,0,0.15)",
           borderRadius: 4,
           display: printMode === "58mm" ? "block" : "none",
@@ -729,10 +731,10 @@ export default function PurchaseOrderPage() {
             <Label>Recipient Email</Label>
             <input type="email" value={recipientEmail} onChange={e => setRecipientEmail(e.target.value)} placeholder="supplier@example.com" style={{ ...inp(), marginBottom: 18 }} />
             <div style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}>
-              <button onClick={confirmSendEmail} disabled={sendingEmail} style={{ padding: "9px 22px", borderRadius: 8, border: "none", background: "linear-gradient(135deg,#6366f1,#4f46e5)", color: "#fff", fontFamily: FONT, fontSize: 13, fontWeight: 700, cursor: "pointer", opacity: sendingEmail ? 0.7 : 1 }}>
+              <button onClick={confirmSendEmail} disabled={sendingEmail} style={{ padding: isMobile ? "8px 11px" : "9px 22px", borderRadius: 8, border: "none", background: "linear-gradient(135deg,#6366f1,#4f46e5)", color: "#fff", fontFamily: FONT, fontSize: 13, fontWeight: 700, cursor: "pointer", opacity: sendingEmail ? 0.7 : 1 }}>
                 {sendingEmail ? "Sending…" : "Send Email"}
               </button>
-              <button onClick={() => setEmailModalOpen(false)} style={{ padding: "9px 18px", borderRadius: 8, border: `1px solid ${BORDER}`, background: "transparent", color: MUTED, fontFamily: FONT, fontSize: 13, cursor: "pointer" }}>Cancel</button>
+              <button onClick={() => setEmailModalOpen(false)} style={{ padding: isMobile ? "8px 9px" : "9px 18px", borderRadius: 8, border: `1px solid ${BORDER}`, background: "transparent", color: MUTED, fontFamily: FONT, fontSize: 13, cursor: "pointer" }}>Cancel</button>
               
             </div>
           </div>

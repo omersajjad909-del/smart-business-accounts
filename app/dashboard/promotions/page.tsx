@@ -2,6 +2,7 @@
 import toast from "react-hot-toast";
 import { useState, useMemo } from "react";
 import { useBusinessRecords } from "@/lib/useBusinessRecords";
+import { useResponsive } from "@/hooks/useResponsive";
 
 const ff = "'Outfit','Inter',sans-serif";
 const ACCENT = "#f97316";
@@ -56,6 +57,7 @@ function computeStatus(startDate: string, endDate: string, manualStatus: string)
 }
 
 export default function PromotionsPage() {
+  const { isMobile } = useResponsive();
   const { records, loading, create, update, remove } = useBusinessRecords("promotion");
   const [showModal, setShowModal] = useState(false);
   const [form, setForm]           = useState(EMPTY);
@@ -104,7 +106,7 @@ export default function PromotionsPage() {
   const td: React.CSSProperties = { padding: "13px 14px", fontSize: 13, borderBottom: `1px solid ${BORDER}` };
 
   return (
-    <div style={{ padding: "28px 32px", fontFamily: ff, color: "#fff", minHeight: "100vh" }}>
+    <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", fontFamily: ff, color: "#fff", minHeight: "100vh" }}>
 
       {/* Header */}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 28 }}>
@@ -118,14 +120,14 @@ export default function PromotionsPage() {
       </div>
 
       {/* KPIs */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 12, marginBottom: 24 }}>
+      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 12, marginBottom: 24 }}>
         {[
           { label: "Total Promotions", value: promos.length,   color: ACCENT },
           { label: "Active Now",       value: activeCount,      color: "#34d399" },
           { label: "Scheduled",        value: scheduledCount,   color: "#38bdf8" },
           { label: "Expired",          value: expiredCount,     color: "#94a3b8" },
         ].map(k => (
-          <div key={k.label} style={{ background: BG, border: `1px solid ${BORDER}`, borderRadius: 12, padding: "18px 20px" }}>
+          <div key={k.label} style={{ background: BG, border: `1px solid ${BORDER}`, borderRadius: 12, padding: isMobile ? "12px 10px" : "18px 20px" }}>
             <div style={{ fontSize: 12, color: MUTED, marginBottom: 6 }}>{k.label}</div>
             <div style={{ fontSize: 24, fontWeight: 800, color: k.color }}>{k.value}</div>
           </div>

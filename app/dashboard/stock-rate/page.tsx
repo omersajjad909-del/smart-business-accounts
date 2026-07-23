@@ -6,6 +6,7 @@ import { confirmToast, alertToast } from "@/lib/toast-feedback";
 import { useEffect, useState } from "react";
 import { getCurrentUser } from "@/lib/auth";
 import toast from "react-hot-toast";
+import { useResponsive } from "@/hooks/useResponsive";
 
 type Item = {
   id: string;
@@ -22,6 +23,7 @@ type Rate = {
 };
 
 export default function StockRatePage() {
+  const { isMobile } = useResponsive();
   const user = getCurrentUser();
   const today = new Date().toISOString().slice(0, 10);
 

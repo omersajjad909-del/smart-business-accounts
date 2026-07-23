@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import {
+import { useResponsive } from "@/hooks/useResponsive";
   fetchJson,
   pharmacyBg,
   pharmacyBorder,
@@ -20,6 +21,7 @@ const emptyState: PharmacyControlCenter = {
 };
 
 export default function PharmacyAnalyticsPage() {
+  const { isMobile } = useResponsive();
   const [data, setData] = useState(emptyState);
 
   useEffect(() => {
@@ -56,29 +58,29 @@ export default function PharmacyAnalyticsPage() {
   }, [sales]);
 
   return (
-    <div style={{ minHeight: "100vh", padding: "28px 32px", color: "#fff", fontFamily: pharmacyFont }}>
+    <div style={{ minHeight: "100vh", padding: isMobile ? "15px 14px" : "28px 32px", color: "#fff", fontFamily: pharmacyFont }}>
       <div style={{ marginBottom: 24 }}>
         <h1 style={{ margin: "0 0 6px", fontSize: 26, fontWeight: 800 }}>Pharmacy Analytics</h1>
         <p style={{ margin: 0, fontSize: 13, color: pharmacyMuted }}>Inventory composition, prescription demand, and sales mix.</p>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4,minmax(0,1fr))", gap: 12, marginBottom: 24 }}>
+      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,minmax(0,1fr))", gap: 12, marginBottom: 24 }}>
         {[
           { label: "Total Stock Units", value: drugs.reduce((sum, row) => sum + row.stock, 0), color: "#fb7185" },
           { label: "Inventory Value", value: `Rs. ${drugs.reduce((sum, row) => sum + row.stock * row.unitPrice, 0).toLocaleString()}`, color: "#34d399" },
           { label: "Expired Lines", value: drugs.filter((row) => row.isExpired).length, color: "#f87171" },
           { label: "Prescription Volume", value: prescriptions.length, color: "#60a5fa" },
         ].map((card) => (
-          <div key={card.label} style={{ background: pharmacyBg, border: `1px solid ${pharmacyBorder}`, borderRadius: 14, padding: "18px 20px" }}>
+          <div key={card.label} style={{ background: pharmacyBg, border: `1px solid ${pharmacyBorder}`, borderRadius: 14, padding: isMobile ? "12px 10px" : "18px 20px" }}>
             <div style={{ fontSize: 12, color: pharmacyMuted, marginBottom: 8 }}>{card.label}</div>
             <div style={{ fontSize: 22, fontWeight: 800, color: card.color }}>{card.value}</div>
           </div>
         ))}
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 18 }}>
+      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr 1fr", gap: 18 }}>
         <section style={{ background: pharmacyBg, border: `1px solid ${pharmacyBorder}`, borderRadius: 16, overflow: "hidden" }}>
-          <div style={{ padding: "16px 18px", borderBottom: `1px solid ${pharmacyBorder}`, fontSize: 15, fontWeight: 800 }}>Category Mix</div>
+          <div style={{ padding: isMobile ? "12px 10px" : "16px 18px", borderBottom: `1px solid ${pharmacyBorder}`, fontSize: 15, fontWeight: 800 }}>Category Mix</div>
           <div style={{ padding: 18, display: "grid", gap: 10 }}>
             {categoryRows.slice(0, 6).map((row) => (
               <div key={row.category} style={{ display: "grid", gap: 4, padding: "10px 12px", borderRadius: 10, background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.05)" }}>
@@ -90,7 +92,7 @@ export default function PharmacyAnalyticsPage() {
         </section>
 
         <section style={{ background: pharmacyBg, border: `1px solid ${pharmacyBorder}`, borderRadius: 16, overflow: "hidden" }}>
-          <div style={{ padding: "16px 18px", borderBottom: `1px solid ${pharmacyBorder}`, fontSize: 15, fontWeight: 800 }}>Prescription Demand</div>
+          <div style={{ padding: isMobile ? "12px 10px" : "16px 18px", borderBottom: `1px solid ${pharmacyBorder}`, fontSize: 15, fontWeight: 800 }}>Prescription Demand</div>
           <div style={{ padding: 18, display: "grid", gap: 10 }}>
             {demandRows.map((row) => (
               <div key={row.name} style={{ display: "flex", justifyContent: "space-between", padding: "10px 12px", borderRadius: 10, background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.05)" }}>
@@ -103,7 +105,7 @@ export default function PharmacyAnalyticsPage() {
         </section>
 
         <section style={{ background: pharmacyBg, border: `1px solid ${pharmacyBorder}`, borderRadius: 16, overflow: "hidden" }}>
-          <div style={{ padding: "16px 18px", borderBottom: `1px solid ${pharmacyBorder}`, fontSize: 15, fontWeight: 800 }}>Payment Mix</div>
+          <div style={{ padding: isMobile ? "12px 10px" : "16px 18px", borderBottom: `1px solid ${pharmacyBorder}`, fontSize: 15, fontWeight: 800 }}>Payment Mix</div>
           <div style={{ padding: 18, display: "grid", gap: 10 }}>
             {paymentRows.map((row) => (
               <div key={row.method} style={{ display: "flex", justifyContent: "space-between", padding: "10px 12px", borderRadius: 10, background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.05)" }}>

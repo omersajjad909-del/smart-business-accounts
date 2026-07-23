@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { getCurrentUser } from "@/lib/auth";
+import { useResponsive } from "@/hooks/useResponsive";
 
 const ff = "'Outfit','Inter',sans-serif";
 function fmt(n: number) { return n.toLocaleString("en-US", { minimumFractionDigits: 0, maximumFractionDigits: 0 }); }
@@ -9,6 +10,7 @@ interface WarehouseRow { warehouseName: string; itemName: string; category: stri
 interface WarehouseSummary { name: string; totalItems: number; totalValue: number; lowStockCount: number; }
 
 export default function WarehouseStockPage() {
+  const { isMobile } = useResponsive();
   const user = getCurrentUser();
   const [rows, setRows]         = useState<WarehouseRow[]>([]);
   const [warehouses, setWarehouses] = useState<WarehouseSummary[]>([]);
@@ -24,7 +26,7 @@ export default function WarehouseStockPage() {
   const inp: React.CSSProperties = { background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 8, padding: "7px 12px", color: "var(--text-primary)", fontFamily: ff, fontSize: 12, outline: "none" };
 
   return (
-    <div style={{ padding: "24px 28px", fontFamily: ff, color: "var(--text-primary)", maxWidth: 1100 }}>
+    <div style={{ padding: isMobile ? "13px 13px" : "24px 28px", fontFamily: ff, color: "var(--text-primary)", maxWidth: 1100 }}>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 24 }}>
         <div>
           <h1 style={{ margin: 0, fontSize: 22, fontWeight: 900, letterSpacing: "-.3px" }}>Warehouse-wise Stock</h1>
@@ -41,7 +43,7 @@ export default function WarehouseStockPage() {
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(200px,1fr))", gap: 12, marginBottom: 20 }}>
           {warehouses.map((w, i) => (
             <div key={i} onClick={() => setSelected(selected === w.name ? "all" : w.name)}
-              style={{ borderRadius: 12, padding: "16px 18px", background: selected === w.name ? "rgba(99,102,241,.1)" : "var(--panel-bg)", border: `1px solid ${selected === w.name ? "rgba(99,102,241,.4)" : "var(--border)"}`, cursor: "pointer" }}>
+              style={{ borderRadius: 12, padding: isMobile ? "12px 10px" : "16px 18px", background: selected === w.name ? "rgba(99,102,241,.1)" : "var(--panel-bg)", border: `1px solid ${selected === w.name ? "rgba(99,102,241,.4)" : "var(--border)"}`, cursor: "pointer" }}>
               <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 8 }}>🏭 {w.name}</div>
               <div style={{ fontSize: 18, fontWeight: 900, color: "#818cf8", marginBottom: 4 }}>{cur} {fmt(w.totalValue)}</div>
               <div style={{ fontSize: 11, color: "var(--text-muted)" }}>{w.totalItems} items {w.lowStockCount > 0 && <span style={{ color: "#f87171" }}>• {w.lowStockCount} low stock</span>}</div>
@@ -51,7 +53,7 @@ export default function WarehouseStockPage() {
       )}
 
       <div style={{ background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 14, overflow: "hidden" }}>
-        <div style={{ padding: "14px 18px", borderBottom: "1px solid var(--border)", fontSize: 13, fontWeight: 700 }}>
+        <div style={{ padding: isMobile ? "12px 10px" : "14px 18px", borderBottom: "1px solid var(--border)", fontSize: 13, fontWeight: 700 }}>
           {selected === "all" ? "All Warehouses" : selected} — {filtered.length} items
         </div>
         <table style={{ width: "100%", borderCollapse: "collapse" }}>

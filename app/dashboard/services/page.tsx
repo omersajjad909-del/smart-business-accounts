@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import {
+import { useResponsive } from "@/hooks/useResponsive";
   ServicesControlCenter,
   fetchJson,
   serviceBg,
@@ -32,6 +33,7 @@ const emptyState: ServicesControlCenter = {
 };
 
 export default function ServicesDashboard() {
+  const { isMobile } = useResponsive();
   const [data, setData] = useState(emptyState);
 
   useEffect(() => {
@@ -49,7 +51,7 @@ export default function ServicesDashboard() {
   ];
 
   return (
-    <div style={{ padding: "28px 32px", fontFamily: serviceFont, color: "#e2e8f0" }}>
+    <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", fontFamily: serviceFont, color: "#e2e8f0" }}>
       <div style={{ marginBottom: 28 }}>
         <h1 style={{ fontSize: 24, fontWeight: 800, color: "white", margin: 0 }}>Service Command Center</h1>
         <p style={{ color: serviceMuted, fontSize: 14, marginTop: 6 }}>
@@ -57,14 +59,14 @@ export default function ServicesDashboard() {
         </p>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(210px,1fr))", gap: 14, marginBottom: 28 }}>
+      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(auto-fill,minmax(210px,1fr))", gap: 14, marginBottom: 28 }}>
         {[
           { label: "Catalog Services", value: summary.catalog, color: "#34d399" },
           { label: "Active Projects", value: summary.activeProjects, color: "#38bdf8" },
           { label: "Open Deliveries", value: summary.deliveries - summary.completedProjects, color: "#f59e0b" },
           { label: "Billable Value", value: `Rs. ${summary.billableValue.toLocaleString()}`, color: "#f97316" },
         ].map((card) => (
-          <div key={card.label} style={{ background: serviceBg, border: `1px solid ${serviceBorder}`, borderRadius: 14, padding: "18px 20px" }}>
+          <div key={card.label} style={{ background: serviceBg, border: `1px solid ${serviceBorder}`, borderRadius: 14, padding: isMobile ? "12px 10px" : "18px 20px" }}>
             <div style={{ fontSize: 11, color: "rgba(255,255,255,.4)", marginBottom: 6, textTransform: "uppercase", letterSpacing: ".06em" }}>{card.label}</div>
             <div style={{ fontSize: 24, fontWeight: 800, color: card.color }}>{card.value}</div>
           </div>

@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { IspControlCenter, fetchJson, ispBg, ispBorder, ispFont, ispMuted } from "./_shared";
+import { useResponsive } from "@/hooks/useResponsive";
 
 const emptyState: IspControlCenter = {
   summary: {
@@ -24,6 +25,7 @@ const emptyState: IspControlCenter = {
 };
 
 export default function IspOverviewPage() {
+  const { isMobile } = useResponsive();
   const [data, setData] = useState(emptyState);
 
   useEffect(() => {
@@ -33,7 +35,7 @@ export default function IspOverviewPage() {
   const { summary, bills, tickets, connections } = data;
 
   return (
-    <div style={{ padding: "28px 32px", minHeight: "100vh", color: "#fff", fontFamily: ispFont }}>
+    <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", minHeight: "100vh", color: "#fff", fontFamily: ispFont }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 18, flexWrap: "wrap", marginBottom: 24 }}>
         <div>
           <div style={{ fontSize: 12, color: "#60a5fa", fontWeight: 800, letterSpacing: ".08em", textTransform: "uppercase", marginBottom: 8 }}>ISP / Cable Network</div>
@@ -65,7 +67,7 @@ export default function IspOverviewPage() {
           { label: "Open Tickets", value: summary.openTickets, color: "#c084fc" },
           { label: "Collected", value: `Rs. ${summary.paidRevenue.toLocaleString()}`, color: "#22c55e" },
         ].map((card) => (
-          <div key={card.label} style={{ background: ispBg, border: `1px solid ${ispBorder}`, borderRadius: 16, padding: "18px 20px" }}>
+          <div key={card.label} style={{ background: ispBg, border: `1px solid ${ispBorder}`, borderRadius: 16, padding: isMobile ? "12px 10px" : "18px 20px" }}>
             <div style={{ fontSize: 12, color: ispMuted, marginBottom: 8 }}>{card.label}</div>
             <div style={{ fontSize: 24, fontWeight: 800, color: card.color }}>{card.value}</div>
           </div>
@@ -75,7 +77,7 @@ export default function IspOverviewPage() {
       <div style={{ display: "grid", gridTemplateColumns: "1.15fr .85fr", gap: 18 }}>
         <div style={{ background: "linear-gradient(135deg, rgba(59,130,246,.14), rgba(14,165,233,.08))", border: `1px solid ${ispBorder}`, borderRadius: 20, padding: 24 }}>
           <div style={{ fontSize: 13, color: "#bfdbfe", fontWeight: 800, marginBottom: 12, textTransform: "uppercase", letterSpacing: ".07em" }}>Service Flow</div>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(4,minmax(0,1fr))", gap: 12 }}>
+          <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,minmax(0,1fr))", gap: 12 }}>
             {[
               { title: "Package Setup", body: "Bandwidth plans, quotas, and monthly rates define karein." },
               { title: "Connection Desk", body: "Customer address, package assignment, and activation pipeline control karein." },
@@ -118,7 +120,7 @@ export default function IspOverviewPage() {
                 { label: "Assigned tickets", value: `${tickets.filter((item) => item.status === "assigned").length} active`, tone: "#c084fc" },
                 { label: "Pending installs", value: `${connections.filter((item) => item.status === "pending").length} waiting`, tone: "#34d399" },
               ].map((row) => (
-                <div key={row.label} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "rgba(255,255,255,.025)", border: "1px solid rgba(255,255,255,.06)", borderRadius: 14, padding: "14px 16px" }}>
+                <div key={row.label} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "rgba(255,255,255,.025)", border: "1px solid rgba(255,255,255,.06)", borderRadius: 14, padding: isMobile ? "12px 10px" : "14px 16px" }}>
                   <span style={{ fontSize: 13, color: ispMuted }}>{row.label}</span>
                   <span style={{ fontSize: 14, fontWeight: 800, color: row.tone }}>{row.value}</span>
                 </div>

@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import {
+import { useResponsive } from "@/hooks/useResponsive";
   fetchJson,
   formatMoney,
   normalizeStatus,
@@ -20,6 +21,7 @@ import {
 } from "../_shared";
 
 export default function TradingAnalyticsPage() {
+  const { isMobile } = useResponsive();
   const [salesInvoices, setSalesInvoices] = useState<SalesInvoiceLite[]>([]);
   const [purchaseOrders, setPurchaseOrders] = useState<PurchaseOrderLite[]>([]);
   const [purchaseInvoices, setPurchaseInvoices] = useState<PurchaseInvoiceLite[]>([]);
@@ -80,7 +82,7 @@ export default function TradingAnalyticsPage() {
   ];
 
   return (
-    <div style={{ padding: "28px 32px", fontFamily: tradingFont, color: "var(--text-primary)", minHeight: "100vh" }}>
+    <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", fontFamily: tradingFont, color: "var(--text-primary)", minHeight: "100vh" }}>
       <div style={{ marginBottom: 26 }}>
         <h1 style={{ fontSize: 24, fontWeight: 800, margin: "0 0 6px" }}>Trading Analytics</h1>
         <p style={{ fontSize: 13, color: tradingMuted, margin: 0 }}>
@@ -88,9 +90,9 @@ export default function TradingAnalyticsPage() {
         </p>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4,minmax(0,1fr))", gap: 12, marginBottom: 24 }}>
+      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,minmax(0,1fr))", gap: 12, marginBottom: 24 }}>
         {cards.map((card) => (
-          <div key={card.label} style={{ background: tradingBg, border: `1px solid ${tradingBorder}`, borderRadius: 14, padding: "18px 20px" }}>
+          <div key={card.label} style={{ background: tradingBg, border: `1px solid ${tradingBorder}`, borderRadius: 14, padding: isMobile ? "12px 10px" : "18px 20px" }}>
             <div style={{ fontSize: 12, color: tradingMuted, marginBottom: 8 }}>{card.label}</div>
             <div style={{ fontSize: 24, fontWeight: 800, color: card.color }}>{card.value}</div>
           </div>
@@ -117,7 +119,7 @@ export default function TradingAnalyticsPage() {
         </div>
 
         <div style={{ background: tradingBg, border: `1px solid ${tradingBorder}`, borderRadius: 16, overflow: "hidden" }}>
-          <div style={{ padding: "16px 18px", borderBottom: `1px solid ${tradingBorder}`, fontSize: 15, fontWeight: 800 }}>Fast Inventory View</div>
+          <div style={{ padding: isMobile ? "12px 10px" : "16px 18px", borderBottom: `1px solid ${tradingBorder}`, fontSize: 15, fontWeight: 800 }}>Fast Inventory View</div>
           <table style={{ width: "100%", borderCollapse: "collapse" }}>
             <thead>
               <tr>

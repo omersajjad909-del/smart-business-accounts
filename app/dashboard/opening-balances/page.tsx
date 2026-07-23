@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect, useCallback } from "react";
 import { getCurrentUser } from "@/lib/auth";
+import { useResponsive } from "@/hooks/useResponsive";
 
 const FONT = "'Outfit','Inter',sans-serif";
 
@@ -17,6 +18,7 @@ const input: React.CSSProperties = {
 };
 
 export default function OpeningBalancesPage() {
+  const { isMobile } = useResponsive();
   const [tab, setTab]               = useState<"manual" | "csv">("manual");
   const [accounts, setAccounts]     = useState<Account[]>([]);
   const [rows, setRows]             = useState<BalanceRow[]>([BLANK_ROW()]);
@@ -109,7 +111,7 @@ export default function OpeningBalancesPage() {
   const th: React.CSSProperties = { padding: "10px 12px", textAlign: "left", fontSize: 11, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: 0.7, borderBottom: "1px solid var(--border)", fontWeight: 600 };
 
   return (
-    <div style={{ minHeight: "100vh", background: "var(--app-bg)", padding: "32px 28px", fontFamily: FONT, color: "var(--text-primary)" }}>
+    <div style={{ minHeight: "100vh", background: "var(--app-bg)", padding: isMobile ? "16px" : "32px" 28px", fontFamily: FONT, color: "var(--text-primary)" }}>
 
       {/* Header */}
       <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 28, flexWrap: "wrap", gap: 12 }}>
@@ -143,7 +145,7 @@ export default function OpeningBalancesPage() {
       </div>
 
       {/* Date picker */}
-      <div style={{ background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 14, padding: "16px 20px", marginBottom: 20, display: "flex", alignItems: "center", gap: 20, flexWrap: "wrap" }}>
+      <div style={{ background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 14, padding: isMobile ? "12px 10px" : "16px 20px", marginBottom: 20, display: "flex", alignItems: "center", gap: 20, flexWrap: "wrap" }}>
         <div>
           <div style={{ fontSize: 11, color: "var(--text-muted)", fontWeight: 700, textTransform: "uppercase", letterSpacing: 0.6, marginBottom: 6 }}>Opening Balance Date</div>
           <input type="date" value={date} onChange={e => setDate(e.target.value)}
@@ -157,7 +159,7 @@ export default function OpeningBalancesPage() {
 
       {/* Result banner */}
       {result && (
-        <div style={{ background: "rgba(34,197,94,0.08)", border: "1px solid rgba(34,197,94,0.25)", borderRadius: 12, padding: "14px 20px", marginBottom: 20 }}>
+        <div style={{ background: "rgba(34,197,94,0.08)", border: "1px solid rgba(34,197,94,0.25)", borderRadius: 12, padding: isMobile ? "12px 10px" : "14px 20px", marginBottom: 20 }}>
           <div style={{ fontWeight: 700, color: "#4ade80", marginBottom: 4 }}>✓ Opening balances saved successfully</div>
           <div style={{ fontSize: 12, color: "var(--text-muted)" }}>Updated: {result.updated} accounts · Skipped: {result.skipped}</div>
           {result.errors?.length ? (
@@ -281,7 +283,7 @@ export default function OpeningBalancesPage() {
 
       {/* ── CSV IMPORT ── */}
       {tab === "csv" && (
-        <div style={{ background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 14, padding: "24px 28px" }}>
+        <div style={{ background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 14, padding: isMobile ? "13px 13px" : "24px 28px" }}>
           <div style={{ fontSize: 13, color: "var(--text-muted)", marginBottom: 16, lineHeight: 1.7 }}>
             Paste CSV with columns: <code style={{ background: "rgba(99,102,241,0.12)", padding: "2px 7px", borderRadius: 4, fontSize: 12, color: "#a5b4fc" }}>code,debit,credit</code><br />
             Use the account <strong style={{ color: "var(--text-primary)" }}>code</strong> from your Chart of Accounts (not the name).
@@ -298,7 +300,7 @@ export default function OpeningBalancesPage() {
       )}
 
       {/* Help tip */}
-      <div style={{ marginTop: 20, padding: "14px 18px", background: "rgba(99,102,241,0.06)", border: "1px solid rgba(99,102,241,0.15)", borderRadius: 12, fontSize: 12, color: "var(--text-muted)", lineHeight: 1.7 }}>
+      <div style={{ marginTop: 20, padding: isMobile ? "12px 10px" : "14px 18px", background: "rgba(99,102,241,0.06)", border: "1px solid rgba(99,102,241,0.15)", borderRadius: 12, fontSize: 12, color: "var(--text-muted)", lineHeight: 1.7 }}>
         <strong style={{ color: "var(--text-primary)" }}>Tip:</strong> Opening balances must follow double-entry — every debit needs an equal credit.
         Common entries: Cash/Bank (Dr), Accounts Receivable (Dr), Inventory (Dr) vs Accounts Payable (Cr), Loans (Cr), Capital/Equity (Cr).
       </div>

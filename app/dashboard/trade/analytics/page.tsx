@@ -2,8 +2,10 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { fetchJson, tradeBg, tradeBorder, tradeFont, tradeMuted, type TradeControlCenter } from "../_shared";
+import { useResponsive } from "@/hooks/useResponsive";
 
 export default function TradeAnalyticsPage() {
+  const { isMobile } = useResponsive();
   const [data, setData] = useState<TradeControlCenter>({
     summary: {
       shipmentCount: 0,
@@ -74,29 +76,29 @@ export default function TradeAnalyticsPage() {
   }, [lcs]);
 
   return (
-    <div style={{ minHeight: "100vh", padding: "28px 32px", color: "var(--text-primary)", fontFamily: tradeFont }}>
+    <div style={{ minHeight: "100vh", padding: isMobile ? "15px 14px" : "28px 32px", color: "var(--text-primary)", fontFamily: tradeFont }}>
       <div style={{ marginBottom: 24 }}>
         <h1 style={{ margin: "0 0 6px", fontSize: 26, fontWeight: 800 }}>Trade Analytics</h1>
         <p style={{ margin: 0, fontSize: 13, color: tradeMuted }}>Movement, compliance, finance, and claim visibility.</p>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4,minmax(0,1fr))", gap: 12, marginBottom: 24 }}>
+      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,minmax(0,1fr))", gap: 12, marginBottom: 24 }}>
         {[
           { label: "Shipment Value", value: `USD ${data.summary.shipmentValue.toLocaleString()}`, color: "#38bdf8" },
           { label: "LC / TT Value", value: `USD ${data.summary.lcValue.toLocaleString()}`, color: "#a78bfa" },
           { label: "Landed Cost", value: `USD ${data.summary.landedCost.toLocaleString()}`, color: "#f59e0b" },
           { label: "Rebate Value", value: `USD ${data.summary.rebateValue.toLocaleString()}`, color: "#22c55e" },
         ].map((card) => (
-          <div key={card.label} style={{ background: tradeBg, border: `1px solid ${tradeBorder}`, borderRadius: 14, padding: "18px 20px" }}>
+          <div key={card.label} style={{ background: tradeBg, border: `1px solid ${tradeBorder}`, borderRadius: 14, padding: isMobile ? "12px 10px" : "18px 20px" }}>
             <div style={{ fontSize: 12, color: tradeMuted, marginBottom: 8 }}>{card.label}</div>
             <div style={{ fontSize: 22, fontWeight: 800, color: card.color }}>{card.value}</div>
           </div>
         ))}
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 18 }}>
+      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr 1fr", gap: 18 }}>
         <section style={{ background: tradeBg, border: `1px solid ${tradeBorder}`, borderRadius: 16, overflow: "hidden" }}>
-          <div style={{ padding: "16px 18px", borderBottom: `1px solid ${tradeBorder}`, fontSize: 15, fontWeight: 800 }}>Top Routes</div>
+          <div style={{ padding: isMobile ? "12px 10px" : "16px 18px", borderBottom: `1px solid ${tradeBorder}`, fontSize: 15, fontWeight: 800 }}>Top Routes</div>
           <div style={{ padding: 18, display: "grid", gap: 10 }}>
             {routeRows.map((row) => (
               <div key={row.route} style={{ display: "flex", justifyContent: "space-between", padding: "10px 12px", borderRadius: 10, background: "var(--panel-bg)", border: "1px solid rgba(255,255,255,.05)" }}>
@@ -108,7 +110,7 @@ export default function TradeAnalyticsPage() {
         </section>
 
         <section style={{ background: tradeBg, border: `1px solid ${tradeBorder}`, borderRadius: 16, overflow: "hidden" }}>
-          <div style={{ padding: "16px 18px", borderBottom: `1px solid ${tradeBorder}`, fontSize: 15, fontWeight: 800 }}>Customs Status</div>
+          <div style={{ padding: isMobile ? "12px 10px" : "16px 18px", borderBottom: `1px solid ${tradeBorder}`, fontSize: 15, fontWeight: 800 }}>Customs Status</div>
           <div style={{ padding: 18, display: "grid", gap: 10 }}>
             {statusRows.map((row) => (
               <div key={row.status} style={{ display: "flex", justifyContent: "space-between", padding: "10px 12px", borderRadius: 10, background: "var(--panel-bg)", border: "1px solid rgba(255,255,255,.05)" }}>
@@ -120,7 +122,7 @@ export default function TradeAnalyticsPage() {
         </section>
 
         <section style={{ background: tradeBg, border: `1px solid ${tradeBorder}`, borderRadius: 16, overflow: "hidden" }}>
-          <div style={{ padding: "16px 18px", borderBottom: `1px solid ${tradeBorder}`, fontSize: 15, fontWeight: 800 }}>LC Currency Mix</div>
+          <div style={{ padding: isMobile ? "12px 10px" : "16px 18px", borderBottom: `1px solid ${tradeBorder}`, fontSize: 15, fontWeight: 800 }}>LC Currency Mix</div>
           <div style={{ padding: 18, display: "grid", gap: 10 }}>
             {lcCurrencyRows.map((row) => (
               <div key={row.currency} style={{ display: "flex", justifyContent: "space-between", padding: "10px 12px", borderRadius: 10, background: "var(--panel-bg)", border: "1px solid rgba(255,255,255,.05)" }}>

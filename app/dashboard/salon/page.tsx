@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import {
+import { useResponsive } from "@/hooks/useResponsive";
   SalonControlCenter,
   fetchJson,
   salonBg,
@@ -33,7 +34,7 @@ const emptyState: SalonControlCenter = {
 
 function StatCard({ label, value, tone }: { label: string; value: string | number; tone: string }) {
   return (
-    <div style={{ background: salonBg, border: `1px solid ${salonBorder}`, borderRadius: 18, padding: "20px 22px" }}>
+    <div style={{ background: salonBg, border: `1px solid ${salonBorder}`, borderRadius: 18, padding: isMobile ? "12px 10px" : "20px 22px" }}>
       <div style={{ fontSize: 12, color: salonMuted, marginBottom: 8, textTransform: "uppercase", letterSpacing: ".06em" }}>{label}</div>
       <div style={{ fontSize: 28, fontWeight: 800, color: tone }}>{value}</div>
     </div>
@@ -41,6 +42,7 @@ function StatCard({ label, value, tone }: { label: string; value: string | numbe
 }
 
 export default function SalonOverviewPage() {
+  const { isMobile } = useResponsive();
   const [data, setData] = useState(emptyState);
 
   useEffect(() => {
@@ -51,7 +53,7 @@ export default function SalonOverviewPage() {
   const topServices = [...services].sort((a, b) => Number(b.popular) - Number(a.popular) || b.price - a.price).slice(0, 4);
 
   return (
-    <div style={{ padding: "28px 32px", minHeight: "100vh", color: "#fff", fontFamily: salonFont }}>
+    <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", minHeight: "100vh", color: "#fff", fontFamily: salonFont }}>
       <div style={{ marginBottom: 26 }}>
         <div style={{ fontSize: 12, color: "#f472b6", fontWeight: 700, letterSpacing: ".08em", textTransform: "uppercase", marginBottom: 10 }}>Salon / Beauty</div>
         <h1 style={{ fontSize: 30, fontWeight: 900, margin: "0 0 10px" }}>Owner Beauty Desk</h1>
@@ -71,7 +73,7 @@ export default function SalonOverviewPage() {
       <div style={{ display: "grid", gridTemplateColumns: "1.15fr .85fr", gap: 18, marginBottom: 18 }}>
         <div style={{ background: "linear-gradient(135deg, rgba(244,114,182,.14), rgba(129,140,248,.11))", border: `1px solid ${salonBorder}`, borderRadius: 20, padding: 24 }}>
           <div style={{ fontSize: 13, color: "#fbcfe8", fontWeight: 800, marginBottom: 10, textTransform: "uppercase", letterSpacing: ".07em" }}>Business Flow</div>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(4, minmax(0,1fr))", gap: 12 }}>
+          <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,minmax(0,1fr))", gap: 12 }}>
             {[
               { title: "Book Slot", body: "Client, stylist, date, aur service ke saath appointment schedule." },
               { title: "Confirm Visit", body: "Stylist availability aur time-slot discipline maintain karein." },
@@ -97,7 +99,7 @@ export default function SalonOverviewPage() {
               { href: "/dashboard/sales-invoice", label: "Billing Counter", hint: "Issue invoice for products and services" },
               { href: "/dashboard/salon/analytics", label: "See Salon Analytics", hint: "Revenue, utilization, and service mix" },
             ].map((item) => (
-              <Link prefetch={false} key={item.href} href={item.href} style={{ textDecoration: "none", color: "#fff", background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)", borderRadius: 14, padding: "14px 16px" }}>
+              <Link prefetch={false} key={item.href} href={item.href} style={{ textDecoration: "none", color: "#fff", background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)", borderRadius: 14, padding: isMobile ? "12px 10px" : "14px 16px" }}>
                 <div style={{ fontSize: 14, fontWeight: 800, marginBottom: 4 }}>{item.label}</div>
                 <div style={{ fontSize: 12, color: salonMuted }}>{item.hint}</div>
               </Link>
@@ -136,7 +138,7 @@ export default function SalonOverviewPage() {
               { label: "Leave pressure", value: `${summary.leaveStylists} team members away`, tone: "#f59e0b" },
               { label: "Inactive services", value: `${services.filter((service) => service.status !== "Active").length} cards paused`, tone: "#94a3b8" },
             ].map((row) => (
-              <div key={row.label} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "rgba(255,255,255,.025)", border: "1px solid rgba(255,255,255,.06)", borderRadius: 14, padding: "14px 16px" }}>
+              <div key={row.label} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "rgba(255,255,255,.025)", border: "1px solid rgba(255,255,255,.06)", borderRadius: 14, padding: isMobile ? "12px 10px" : "14px 16px" }}>
                 <span style={{ fontSize: 13, color: salonMuted }}>{row.label}</span>
                 <span style={{ fontSize: 14, fontWeight: 800, color: row.tone }}>{row.value}</span>
               </div>

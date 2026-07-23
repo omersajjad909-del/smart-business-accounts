@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { getCurrentUser } from "@/lib/auth";
+import { useResponsive } from "@/hooks/useResponsive";
 
 const ff = "'Outfit','Inter',sans-serif";
 function fmt(n: number) { return n.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
@@ -8,6 +9,7 @@ function fmt(n: number) { return n.toLocaleString("en-US", { minimumFractionDigi
 interface COGSRow { itemName: string; category: string; qtySold: number; costPerUnit: number; totalCost: number; revenue: number; grossProfit: number; grossMarginPct: number; }
 
 export default function COGSPage() {
+  const { isMobile } = useResponsive();
   const user = getCurrentUser();
   const [data, setData] = useState<COGSRow[]>([]);
   const [loading, setLoading] = useState(true);
@@ -25,7 +27,7 @@ export default function COGSPage() {
   const inp: React.CSSProperties = { background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 8, padding: "7px 12px", color: "var(--text-primary)", fontFamily: ff, fontSize: 12, outline: "none" };
 
   return (
-    <div style={{ padding: "24px 28px", fontFamily: ff, color: "var(--text-primary)", maxWidth: 1200 }}>
+    <div style={{ padding: isMobile ? "13px 13px" : "24px 28px", fontFamily: ff, color: "var(--text-primary)", maxWidth: 1200 }}>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 24, flexWrap: "wrap", gap: 12 }}>
         <div>
           <h1 style={{ margin: 0, fontSize: 22, fontWeight: 900, letterSpacing: "-.3px" }}>Cost of Goods Sold (COGS)</h1>
@@ -42,14 +44,14 @@ export default function COGSPage() {
       </div>
 
       {/* Summary */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 14, marginBottom: 24 }}>
+      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 14, marginBottom: 24 }}>
         {[
           { label: "Total COGS",     value: `${cur} ${fmt(totals.cost)}`,   color: "#f87171", bg: "rgba(248,113,113,.07)",  border: "rgba(248,113,113,.2)" },
           { label: "Total Revenue",  value: `${cur} ${fmt(totals.rev)}`,    color: "#34d399", bg: "rgba(52,211,153,.07)",   border: "rgba(52,211,153,.2)" },
           { label: "Gross Profit",   value: `${cur} ${fmt(totals.profit)}`, color: "#818cf8", bg: "rgba(129,140,248,.07)",  border: "rgba(129,140,248,.2)" },
           { label: "Gross Margin",   value: totals.rev > 0 ? ((totals.profit / totals.rev) * 100).toFixed(1) + "%" : "—", color: "#fbbf24", bg: "rgba(251,191,36,.07)", border: "rgba(251,191,36,.2)" },
         ].map((c, i) => (
-          <div key={i} style={{ borderRadius: 14, padding: "18px 20px", background: c.bg, border: `1px solid ${c.border}` }}>
+          <div key={i} style={{ borderRadius: 14, padding: isMobile ? "12px 10px" : "18px 20px", background: c.bg, border: `1px solid ${c.border}` }}>
             <div style={{ fontSize: 11, color: "var(--text-muted)", fontWeight: 700, textTransform: "uppercase", letterSpacing: ".06em", marginBottom: 8 }}>{c.label}</div>
             <div style={{ fontSize: 20, fontWeight: 900, color: c.color }}>{c.value}</div>
           </div>

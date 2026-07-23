@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { fetchJson, type UtilityControlCenter } from "./_shared";
+import { useResponsive } from "@/hooks/useResponsive";
 
 const emptyState: UtilityControlCenter = {
   summary: { activeAccounts: 0, pendingAccounts: 0, suspendedAccounts: 0, meters: 0, verifiedReadings: 0, openBills: 0, billedValue: 0, unitsLogged: 0 },
@@ -12,6 +13,7 @@ const emptyState: UtilityControlCenter = {
 };
 
 export default function UtilitiesOverviewPage() {
+  const { isMobile } = useResponsive();
   const [data, setData] = useState(emptyState);
   const [businessType, setBusinessType] = useState("electric_company");
 
@@ -49,7 +51,7 @@ export default function UtilitiesOverviewPage() {
           };
 
   return (
-    <div style={{ padding: "28px 32px", color: "#e2e8f0", fontFamily: "'Outfit','Inter',sans-serif" }}>
+    <div style={{ padding: isMobile ? "17px 16px" : "28px 32px", color: "#e2e8f0", fontFamily: "'Outfit','Inter',sans-serif" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 20, flexWrap: "wrap", marginBottom: 24 }}>
         <div>
           <h1 style={{ margin: "0 0 6px", fontSize: 26, fontWeight: 800, color: "white" }}>{utilityConfig.title}</h1>
@@ -62,7 +64,7 @@ export default function UtilitiesOverviewPage() {
             { label: utilityConfig.meterLabel, href: "/dashboard/utilities/meters" },
             { label: "Analytics", href: "/dashboard/utilities/analytics" },
           ].map((item) => (
-            <Link prefetch={false} key={item.href} href={item.href} style={{ padding: "10px 14px", borderRadius: 10, border: "1px solid rgba(255,255,255,.08)", background: "rgba(255,255,255,.03)", color: "#bae6fd", textDecoration: "none", fontSize: 12, fontWeight: 700 }}>
+            <Link prefetch={false} key={item.href} href={item.href} style={{ padding: isMobile ? "8px 8px" : "10px 14px", borderRadius: 10, border: "1px solid rgba(255,255,255,.08)", background: "rgba(255,255,255,.03)", color: "#bae6fd", textDecoration: "none", fontSize: 12, fontWeight: 700 }}>
               {item.label}
             </Link>
           ))}
@@ -77,7 +79,7 @@ export default function UtilitiesOverviewPage() {
           { label: "Verified Readings", value: summary.verifiedReadings, color: "#34d399" },
           { label: "Billed Value", value: summary.billedValue.toLocaleString(), color: "#60a5fa" },
         ].map((card) => (
-          <div key={card.label} style={{ background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)", borderRadius: 16, padding: "18px 20px" }}>
+          <div key={card.label} style={{ background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)", borderRadius: 16, padding: isMobile ? "11px 10px" : "18px 20px" }}>
             <div style={{ fontSize: 11, color: "rgba(255,255,255,.45)", marginBottom: 8, textTransform: "uppercase", letterSpacing: ".06em" }}>{card.label}</div>
             <div style={{ fontSize: 24, fontWeight: 800, color: card.color }}>{card.value}</div>
           </div>
@@ -89,7 +91,7 @@ export default function UtilitiesOverviewPage() {
           <div style={{ fontSize: 15, fontWeight: 700, color: "white", marginBottom: 14 }}>Billing Watchlist</div>
           <div style={{ display: "grid", gap: 10 }}>
             {bills.slice(0, 6).map((item) => (
-              <div key={item.id} style={{ padding: "12px 14px", borderRadius: 12, background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.05)" }}>
+              <div key={item.id} style={{ padding: isMobile ? "8px 8px" : "12px 14px", borderRadius: 12, background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.05)" }}>
                 <div style={{ fontSize: 14, fontWeight: 700 }}>{item.invoice}</div>
                 <div style={{ fontSize: 12, color: "rgba(255,255,255,.45)", marginTop: 4 }}>{item.account || "-"} | {item.billingMonth || "-"}</div>
                 <div style={{ fontSize: 12, color: "#93c5fd", marginTop: 6 }}>Amount {item.amount.toLocaleString()} | {item.status}</div>
@@ -104,7 +106,7 @@ export default function UtilitiesOverviewPage() {
             <div style={{ fontSize: 15, fontWeight: 700, color: "white", marginBottom: 12 }}>Connection Desk</div>
             <div style={{ display: "grid", gap: 10 }}>
               {connections.slice(0, 5).map((item) => (
-                <div key={item.id} style={{ display: "flex", justifyContent: "space-between", gap: 12, padding: "10px 12px", borderRadius: 12, background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.05)" }}>
+                <div key={item.id} style={{ display: "flex", justifyContent: "space-between", gap: 12, padding: isMobile ? "8px 8px" : "10px 12px", borderRadius: 12, background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.05)" }}>
                   <div>
                     <div style={{ fontSize: 13, fontWeight: 700 }}>{item.account}</div>
                     <div style={{ fontSize: 12, color: "rgba(255,255,255,.45)" }}>{item.customer || "-"}</div>
@@ -122,7 +124,7 @@ export default function UtilitiesOverviewPage() {
             <div style={{ fontSize: 15, fontWeight: 700, color: "white", marginBottom: 12 }}>Meter Coverage</div>
             <div style={{ display: "grid", gap: 10 }}>
               {meters.slice(0, 5).map((item) => (
-                <div key={item.id} style={{ display: "flex", justifyContent: "space-between", gap: 12, padding: "10px 12px", borderRadius: 12, background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.05)" }}>
+                <div key={item.id} style={{ display: "flex", justifyContent: "space-between", gap: 12, padding: isMobile ? "8px 8px" : "10px 12px", borderRadius: 12, background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.05)" }}>
                   <div>
                     <div style={{ fontSize: 13, fontWeight: 700 }}>{item.meter}</div>
                     <div style={{ fontSize: 12, color: "rgba(255,255,255,.45)" }}>{item.account || "-"}</div>

@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import type { CSSProperties } from "react";
+import { useResponsive } from "@/hooks/useResponsive";
 
 const INVOICE_CATEGORIES = [
   {
@@ -39,6 +40,7 @@ const INVOICE_CATEGORIES = [
 ];
 
 export default function InvoicesPage() {
+  const { isMobile } = useResponsive();
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
@@ -66,7 +68,7 @@ export default function InvoicesPage() {
   };
 
   const headerStyle: CSSProperties = {
-    padding: "20px 16px",
+    padding: isMobile ? "12px 10px" : "20px 16px",
     borderBottom: "1px solid var(--border)",
     marginBottom: "24px",
   };
@@ -175,7 +177,7 @@ export default function InvoicesPage() {
                 <span style={{ fontSize: 12, color: "var(--text-muted)" }}>{category.items.length}</span>
               </div>
             )}
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))", gap: 12 }}>
+            <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(auto-fill, minmax(260px, 1fr))", gap: 12 }}>
               {category.items.map((item) => (
                 <Link key={item.path} href={item.path} style={cardStyle}>
                   <div style={{ fontSize: 14, fontWeight: 700, color: "var(--text-primary)" }}>{item.name}</div>

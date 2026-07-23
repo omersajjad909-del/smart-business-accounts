@@ -1,5 +1,6 @@
 "use client";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useResponsive } from "@/hooks/useResponsive";
 
 interface Conversation {
   id: string;
@@ -44,6 +45,7 @@ function fmt(iso: string) {
 }
 
 export default function AdminChatInbox() {
+  const { isMobile } = useResponsive();
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [filter, setFilter]               = useState("all");
   const [selected, setSelected]           = useState<Conversation | null>(null);
@@ -119,7 +121,7 @@ export default function AdminChatInbox() {
     <div style={{ height: "calc(100vh - 56px)", display: "flex", flexDirection: "column", fontFamily: "'Outfit','Inter',sans-serif", background: "var(--bg)", overflow: "hidden" }}>
 
       {/* Header */}
-      <div style={{ padding: "16px 24px", borderBottom: "1px solid var(--border)", display: "flex", alignItems: "center", gap: 12, flexShrink: 0 }}>
+      <div style={{ padding: isMobile ? "12px 11px" : "16px 24px", borderBottom: "1px solid var(--border)", display: "flex", alignItems: "center", gap: 12, flexShrink: 0 }}>
         <div style={{ fontSize: 18 }}>💬</div>
         <div>
           <div style={{ fontSize: 15, fontWeight: 700, color: "var(--text)" }}>Support Inbox</div>
@@ -198,7 +200,7 @@ export default function AdminChatInbox() {
           <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden" }}>
 
             {/* Thread header */}
-            <div style={{ padding: "14px 20px", borderBottom: "1px solid var(--border)", display: "flex", alignItems: "center", gap: 12, flexShrink: 0 }}>
+            <div style={{ padding: isMobile ? "12px 10px" : "14px 20px", borderBottom: "1px solid var(--border)", display: "flex", alignItems: "center", gap: 12, flexShrink: 0 }}>
               <div style={{ flex: 1 }}>
                 <div style={{ fontSize: 14, fontWeight: 700, color: "var(--text)" }}>{selected.customer_name}</div>
                 {selected.customer_email && <div style={{ fontSize: 12, color: "var(--text-muted)" }}>{selected.customer_email}</div>}
@@ -232,7 +234,7 @@ export default function AdminChatInbox() {
             </div>
 
             {/* Messages */}
-            <div style={{ flex: 1, overflowY: "auto", padding: "16px 20px", display: "flex", flexDirection: "column", gap: 10 }}>
+            <div style={{ flex: 1, overflowY: "auto", padding: isMobile ? "12px 10px" : "16px 20px", display: "flex", flexDirection: "column", gap: 10 }}>
               {messages.length === 0 ? (
                 <div style={{ textAlign: "center", color: "var(--text-muted)", fontSize: 13, marginTop: 40 }}>No messages yet</div>
               ) : messages.map(m => {

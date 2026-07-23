@@ -3,6 +3,7 @@
 import toast from "react-hot-toast";
 import { useState } from 'react';
 import { useBusinessRecords } from '@/lib/useBusinessRecords';
+import { useResponsive } from "@/hooks/useResponsive";
 
 const S = {
   page: { padding: '32px', fontFamily: 'Inter, sans-serif', color: '#fff', minHeight: '100vh' },
@@ -10,8 +11,8 @@ const S = {
   title: { fontSize: 24, fontWeight: 700, margin: 0 },
   sub: { fontSize: 14, color: 'rgba(255,255,255,.5)', marginTop: 4 },
   btn: { background: '#7c3aed', color: '#fff', border: 'none', borderRadius: 8, padding: '10px 20px', fontWeight: 600, cursor: 'pointer', fontSize: 14 },
-  stats: { display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 16, marginBottom: 28 },
-  stat: { background: 'rgba(255,255,255,.03)', border: '1px solid rgba(255,255,255,.07)', borderRadius: 12, padding: '20px 24px' },
+  stats: { display: 'grid', gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 16, marginBottom: 28 },
+  stat: { background: 'rgba(255,255,255,.03)', border: '1px solid rgba(255,255,255,.07)', borderRadius: 12, padding: isMobile ? "12px 11px" : "20px 24px" },
   statLabel: { fontSize: 13, color: 'rgba(255,255,255,.5)', marginBottom: 6 },
   statVal: { fontSize: 28, fontWeight: 700 },
   tabs: { display: 'flex', gap: 8, marginBottom: 24 },
@@ -40,6 +41,7 @@ const S = {
 const STATUS_COLOR: Record<string, string> = { Active: '#34d399', 'On Hold': '#fbbf24', Completed: '#818cf8', Delayed: '#f87171' };
 
 export default function ITProjectsPage() {
+  const { isMobile } = useResponsive();
   const { records, loading, create } = useBusinessRecords('it_project');
   const [tab, setTab] = useState('All');
   const [showModal, setShowModal] = useState(false);

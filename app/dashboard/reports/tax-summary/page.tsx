@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { DateInput } from "@/app/dashboard/reports/_components/DateInput";
 import { getCurrentUser } from "@/lib/auth";
 import { exportToCSV } from "@/lib/export";
+import { useResponsive } from "@/hooks/useResponsive";
 
 type TaxSummary = {
   taxType: string; taxCode: string; taxRate: number; invoiceCount: number;
@@ -15,6 +16,7 @@ const fmtN = (n: number) => n.toLocaleString(undefined, { minimumFractionDigits:
 const todayStr = () => new Date().toISOString().slice(0, 10);
 
 export default function TaxSummaryPage() {
+  const { isMobile } = useResponsive();
   const router  = useRouter();
   const fromRef = useRef<HTMLInputElement>(null);
   const toRef   = useRef<HTMLInputElement>(null);
@@ -103,13 +105,13 @@ export default function TaxSummaryPage() {
             <>
               {/* KPI cards */}
               {data.length > 0 && (
-                <div style={{ display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:12, marginBottom:20 }}>
+                <div style={{ display:"grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(3,1fr)", gap:12, marginBottom:20 }}>
                   {[
                     { label:"Total Tax Collected", val:totalTax, color:"#fbbf24", bg:"rgba(251,191,36,.08)", border:"rgba(251,191,36,.2)" },
                     { label:"Total Invoice Amount", val:totalAmt, color:"#818cf8", bg:"rgba(129,140,248,.08)", border:"rgba(129,140,248,.2)" },
                     { label:"Tax Types", val:data.length, color:"#34d399", bg:"rgba(52,211,153,.08)", border:"rgba(52,211,153,.2)", isCount:true },
                   ].map(k => (
-                    <div key={k.label} style={{ background:k.bg, border:`1px solid ${k.border}`, borderRadius:14, padding:"18px 20px" }}>
+                    <div key={k.label} style={{ background:k.bg, border:`1px solid ${k.border}`, borderRadius:14, padding: isMobile ? "12px 10px" : "18px 20px" }}>
                       <div style={{ fontSize:10, fontWeight:700, color:"rgba(255,255,255,.35)", textTransform:"uppercase", letterSpacing:".08em", marginBottom:8 }}>{k.label}</div>
                       <div style={{ fontSize:26, fontWeight:900, color:k.color }}>{(k as any).isCount ? k.val : `${cur ? cur+" " : ""}${fmtN(k.val as number)}`}</div>
                     </div>
@@ -119,7 +121,7 @@ export default function TaxSummaryPage() {
 
               {/* Report header */}
               <div style={{ background:"rgba(255,255,255,.03)", border:"1px solid rgba(255,255,255,.08)", borderRadius:16, overflow:"hidden" }}>
-                <div style={{ padding:"20px 24px", background:"linear-gradient(135deg,rgba(245,158,11,.1),rgba(217,119,6,.05))", borderBottom:"1px solid rgba(255,255,255,.07)", display:"flex", justifyContent:"space-between", alignItems:"center" }}>
+                <div style={{ padding: isMobile ? "12px 11px" : "20px 24px", background:"linear-gradient(135deg,rgba(245,158,11,.1),rgba(217,119,6,.05))", borderBottom:"1px solid rgba(255,255,255,.07)", display:"flex", justifyContent:"space-between", alignItems:"center" }}>
                   <div>
                     <div style={{ fontSize:16, fontWeight:800, color:"white" }}>{companyInfo?.name || "Tax Summary Report"}</div>
                     <div style={{ fontSize:11, color:"rgba(255,255,255,.35)", marginTop:3 }}>Period: {from} — {to}</div>
@@ -142,7 +144,7 @@ export default function TaxSummaryPage() {
                     </thead>
                     <tbody>
                       {data.length === 0 ? (
-                        <tr><td colSpan={7} style={{ padding:"40px 16px", textAlign:"center", color:"rgba(255,255,255,.2)", fontSize:13 }}>No tax data found for this period</td></tr>
+                        <tr><td colSpan={7} style={{ padding: isMobile ? "22px 10px" : "40px 16px", textAlign:"center", color:"rgba(255,255,255,.2)", fontSize:13 }}>No tax data found for this period</td></tr>
                       ) : data.map((d, i) => (
                         <tr key={i} style={{ background:i%2===0?"transparent":"rgba(255,255,255,.012)", borderBottom:"1px solid rgba(255,255,255,.04)" }}
                           onMouseEnter={e => (e.currentTarget.style.background="rgba(245,158,11,.05)")}

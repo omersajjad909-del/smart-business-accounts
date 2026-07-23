@@ -2,6 +2,7 @@
 import { fmtDate } from "@/lib/dateUtils";
 import { useEffect, useState } from "react";
 import { getCurrentUser } from "@/lib/auth";
+import { useResponsive } from "@/hooks/useResponsive";
 
 type Referral = {
   id: string;
@@ -26,6 +27,7 @@ const STATUS_LABEL: Record<string, { label: string; color: string }> = {
 };
 
 export default function ReferralsPage() {
+  const { isMobile } = useResponsive();
   const [referralCode, setReferralCode] = useState<string | null>(null);
   const [stats,        setStats]        = useState<Stats | null>(null);
   const [referrals,    setReferrals]    = useState<Referral[]>([]);
@@ -71,7 +73,7 @@ export default function ReferralsPage() {
   );
 
   return (
-    <div style={{ padding: "32px 28px", maxWidth: 700, fontFamily: "'Outfit','DM Sans',sans-serif" }}>
+    <div style={{ padding: isMobile ? "18px 13px" : "32px 28px", maxWidth: 700, fontFamily: "'Outfit','DM Sans',sans-serif" }}>
 
       {/* Header */}
       <div style={{ marginBottom: 28 }}>
@@ -84,14 +86,14 @@ export default function ReferralsPage() {
       </div>
 
       {/* Stats */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 12, marginBottom: 28 }}>
+      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 12, marginBottom: 28 }}>
         {[
           { label: "Total Invited",  value: stats?.total     ?? 0, color: "#818cf8" },
           { label: "Signed Up",      value: stats?.signed_up ?? 0, color: "#fbbf24" },
           { label: "Converted",      value: stats?.converted ?? 0, color: "#34d399" },
           { label: "Rewards ($)",    value: `$${(stats?.rewards ?? 0).toFixed(0)}`, color: "#f472b6" },
         ].map(s => (
-          <div key={s.label} style={{ borderRadius: 12, background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)", padding: "16px 18px" }}>
+          <div key={s.label} style={{ borderRadius: 12, background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)", padding: isMobile ? "12px 10px" : "16px 18px" }}>
             <div style={{ fontSize: 11, color: "rgba(255,255,255,.4)", marginBottom: 6, fontWeight: 600 }}>{s.label}</div>
             <div style={{ fontSize: 24, fontWeight: 800, color: s.color }}>{s.value}</div>
           </div>
@@ -99,7 +101,7 @@ export default function ReferralsPage() {
       </div>
 
       {/* Referral link */}
-      <div style={{ borderRadius: 16, background: "rgba(99,102,241,.06)", border: "1px solid rgba(99,102,241,.2)", padding: "24px 24px", marginBottom: 28 }}>
+      <div style={{ borderRadius: 16, background: "rgba(99,102,241,.06)", border: "1px solid rgba(99,102,241,.2)", padding: isMobile ? "13px 11px" : "24px 24px", marginBottom: 28 }}>
         <div style={{ fontSize: 13, fontWeight: 700, color: "white", marginBottom: 14 }}>Your Referral Link</div>
 
         {referralCode ? (
@@ -145,11 +147,11 @@ export default function ReferralsPage() {
 
       {/* Referral history */}
       <div style={{ borderRadius: 14, background: "rgba(255,255,255,.02)", border: "1px solid rgba(255,255,255,.07)", overflow: "hidden" }}>
-        <div style={{ padding: "14px 20px", borderBottom: "1px solid rgba(255,255,255,.06)", fontSize: 13, fontWeight: 700, color: "white" }}>
+        <div style={{ padding: isMobile ? "12px 10px" : "14px 20px", borderBottom: "1px solid rgba(255,255,255,.06)", fontSize: 13, fontWeight: 700, color: "white" }}>
           Referral History
         </div>
         {referrals.length === 0 ? (
-          <div style={{ padding: "40px 20px", textAlign: "center", color: "rgba(255,255,255,.25)", fontSize: 13 }}>
+          <div style={{ padding: isMobile ? "22px 10px" : "40px 20px", textAlign: "center", color: "rgba(255,255,255,.25)", fontSize: 13 }}>
             No referrals yet. Share your link to get started!
           </div>
         ) : (

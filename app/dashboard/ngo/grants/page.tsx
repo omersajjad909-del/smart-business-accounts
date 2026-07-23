@@ -3,6 +3,7 @@
 import toast from "react-hot-toast";
 import { useState } from "react";
 import { useBusinessRecords } from "@/lib/useBusinessRecords";
+import { useResponsive } from "@/hooks/useResponsive";
 
 const ff = "'Outfit','Inter',sans-serif";
 const bg = "rgba(255,255,255,.03)";
@@ -12,6 +13,7 @@ const statusColor: Record<string,string> = { active:"#22c55e", completed:"#6b728
 const statusLabel: Record<string,string> = { active:"Active", completed:"Completed", pending_report:"Report Due", closed:"Closed" };
 
 export default function GrantsPage() {
+  const { isMobile } = useResponsive();
   const { records, loading, create } = useBusinessRecords("grant");
   const [showModal, setShowModal] = useState(false);
   const [form, setForm] = useState({ grantNo:"", title:"", donor:"", amount:"", currency:"PKR", startDate:"", endDate:"", purpose:"", reportDue:"" });
@@ -57,7 +59,7 @@ export default function GrantsPage() {
   const btn = (c:string) => ({ background:c, border:"none", borderRadius:8, padding:"10px 20px", color:"#fff", fontFamily:ff, cursor:"pointer", fontSize:14, fontWeight:600 });
 
   return (
-    <div style={{ fontFamily:ff, color:"#fff", padding:24, minHeight:"100vh", background:"#0f0f0f" }}>
+    <div style={{ fontFamily:ff, color:"#fff", padding: isMobile ? "12px" : "24px", minHeight:"100vh", background:"#0f0f0f" }}>
       <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:24 }}>
         <div>
           <h1 style={{ margin:0, fontSize:24, fontWeight:700 }}>Grant Tracking</h1>
@@ -66,7 +68,7 @@ export default function GrantsPage() {
         <button onClick={()=>setShowModal(true)} style={btn("#6366f1")}>+ Add Grant</button>
       </div>
 
-      <div style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:16, marginBottom:24 }}>
+      <div style={{ display:"grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap:16, marginBottom:24 }}>
         {[
           { label:"Active Grants", value:grants.filter(g=>g.status==="active").length, color:"#22c55e" },
           { label:"Total Received", value:`Rs. ${(totalReceived/1000000).toFixed(1)}M`, color:"#3b82f6" },

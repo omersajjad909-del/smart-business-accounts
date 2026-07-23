@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import {
+import { useResponsive } from "@/hooks/useResponsive";
   GymControlCenter,
   fetchJson,
   gymBg,
@@ -33,7 +34,7 @@ const emptyState: GymControlCenter = {
 
 function Metric({ title, value, note, color }: { title: string; value: string; note: string; color: string }) {
   return (
-    <div style={{ background: gymBg, border: `1px solid ${gymBorder}`, borderRadius: 18, padding: "20px 22px" }}>
+    <div style={{ background: gymBg, border: `1px solid ${gymBorder}`, borderRadius: 18, padding: isMobile ? "12px 10px" : "20px 22px" }}>
       <div style={{ fontSize: 12, color: gymMuted, marginBottom: 8, textTransform: "uppercase", letterSpacing: ".06em" }}>{title}</div>
       <div style={{ fontSize: 26, fontWeight: 900, color }}>{value}</div>
       <div style={{ fontSize: 12, color: gymMuted, marginTop: 6 }}>{note}</div>
@@ -42,6 +43,7 @@ function Metric({ title, value, note, color }: { title: string; value: string; n
 }
 
 export default function GymAnalyticsPage() {
+  const { isMobile } = useResponsive();
   const [data, setData] = useState(emptyState);
 
   useEffect(() => {
@@ -74,7 +76,7 @@ export default function GymAnalyticsPage() {
   }, [trainers]);
 
   return (
-    <div style={{ padding: "28px 32px", minHeight: "100vh", color: "#fff", fontFamily: gymFont }}>
+    <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", minHeight: "100vh", color: "#fff", fontFamily: gymFont }}>
       <div style={{ marginBottom: 24 }}>
         <div style={{ fontSize: 12, color: "#86efac", fontWeight: 700, letterSpacing: ".08em", textTransform: "uppercase", marginBottom: 10 }}>Gym Analytics</div>
         <h1 style={{ fontSize: 30, fontWeight: 900, margin: "0 0 10px" }}>Membership Health, Class Demand & Trainer Utilization</h1>
@@ -83,7 +85,7 @@ export default function GymAnalyticsPage() {
         </p>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4, minmax(0,1fr))", gap: 14, marginBottom: 24 }}>
+      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,minmax(0,1fr))", gap: 14, marginBottom: 24 }}>
         <Metric title="Paid Revenue" value={`Rs. ${summary.paidRevenue.toLocaleString()}`} note="Paid memberships only" color="#34d399" />
         <Metric title="Active Members" value={String(summary.activeMembers)} note={`${expiredMembers} memberships expired`} color="#60a5fa" />
         <Metric title="Payment Risk" value={String(summary.overdueMembers)} note="Pending fee follow-ups" color="#f87171" />

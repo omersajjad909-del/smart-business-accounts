@@ -3,6 +3,7 @@
 import toast from "react-hot-toast";
 import { useState } from "react";
 import { useBusinessRecords } from "@/lib/useBusinessRecords";
+import { useResponsive } from "@/hooks/useResponsive";
 
 const ff = "'Outfit','Inter',sans-serif";
 const bg = "rgba(255,255,255,0.03)";
@@ -17,6 +18,7 @@ const NEXT_LABEL: Record<string, string> = { requested: "Collect Sample", sample
 const EMPTY_FORM = { patient: "", doctor: "", requestDate: new Date().toISOString().split("T")[0], urgent: false, tests: [] as string[] };
 
 export default function LabPage() {
+  const { isMobile } = useResponsive();
   const { records, loading, create, update } = useBusinessRecords("lab_test");
   const patientStore = useBusinessRecords("patient");
   const [showModal, setShowModal] = useState(false);
@@ -92,7 +94,7 @@ export default function LabPage() {
   }
 
   return (
-    <div style={{ minHeight: "100vh", background: "#0f1117", color: "#fff", fontFamily: ff, padding: "28px 32px" }}>
+    <div style={{ minHeight: "100vh", background: "#0f1117", color: "#fff", fontFamily: ff, padding: isMobile ? "15px 14px" : "28px 32px" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24 }}>
         <div>
           <h1 style={{ margin: 0, fontSize: 26, fontWeight: 700 }}>Lab Tests</h1>
@@ -105,7 +107,7 @@ export default function LabPage() {
       </div>
 
       {/* Stats */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 16, marginBottom: 24 }}>
+      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 16, marginBottom: 24 }}>
         {[
           { label: "Today's Tests", value: today, color: "#a78bfa" },
           { label: "Processing", value: processing, color: "#3b82f6" },

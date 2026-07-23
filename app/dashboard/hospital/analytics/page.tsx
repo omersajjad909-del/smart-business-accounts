@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { HospitalControlCenter, fetchJson, hospitalBg, hospitalBorder, hospitalFont, hospitalMuted } from "../_shared";
+import { useResponsive } from "@/hooks/useResponsive";
 
 const emptyState: HospitalControlCenter = {
   summary: { patients: 0, activePatients: 0, todayAppointments: 0, completedAppointments: 0, activePrescriptions: 0, completedPrescriptions: 0, pendingLabs: 0, urgentPendingLabs: 0, icuPatients: 0 },
@@ -12,6 +13,7 @@ const emptyState: HospitalControlCenter = {
 };
 
 export default function HospitalAnalyticsPage() {
+  const { isMobile } = useResponsive();
   const [data, setData] = useState(emptyState);
 
   useEffect(() => {
@@ -38,13 +40,13 @@ export default function HospitalAnalyticsPage() {
   ];
 
   return (
-    <div style={{ minHeight: "100vh", padding: "28px 32px", color: "#fff", fontFamily: hospitalFont }}>
+    <div style={{ minHeight: "100vh", padding: isMobile ? "17px 16px" : "28px 32px", color: "#fff", fontFamily: hospitalFont }}>
       <div style={{ marginBottom: 26 }}>
         <h1 style={{ margin: "0 0 6px", fontSize: 24, fontWeight: 800 }}>Healthcare Analytics</h1>
         <p style={{ margin: 0, fontSize: 13, color: hospitalMuted }}>Operational view of case load, department demand, and clinical throughput.</p>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 18, marginBottom: 18 }}>
+      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: 18, marginBottom: 18 }}>
         <div style={{ background: hospitalBg, border: `1px solid ${hospitalBorder}`, borderRadius: 16, padding: 18 }}>
           <div style={{ fontSize: 15, fontWeight: 800, marginBottom: 14 }}>Operational Completion</div>
           <div style={{ display: "grid", gap: 12 }}>
@@ -69,7 +71,7 @@ export default function HospitalAnalyticsPage() {
           <div style={{ fontSize: 15, fontWeight: 800, marginBottom: 14 }}>Department Demand</div>
           <div style={{ display: "grid", gap: 10 }}>
             {Object.entries(departmentLoad).sort((a, b) => b[1] - a[1]).slice(0, 6).map(([dept, count]) => (
-              <div key={dept} style={{ display: "flex", justifyContent: "space-between", padding: "10px 12px", borderRadius: 10, background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.05)" }}>
+              <div key={dept} style={{ display: "flex", justifyContent: "space-between", padding: isMobile ? "8px 8px" : "10px 12px", borderRadius: 10, background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.05)" }}>
                 <span style={{ fontSize: 13 }}>{dept}</span>
                 <span style={{ fontSize: 15, fontWeight: 800, color: "#93c5fd" }}>{count}</span>
               </div>
@@ -79,12 +81,12 @@ export default function HospitalAnalyticsPage() {
         </div>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 18 }}>
+      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: 18 }}>
         <div style={{ background: hospitalBg, border: `1px solid ${hospitalBorder}`, borderRadius: 16, padding: 18 }}>
           <div style={{ fontSize: 15, fontWeight: 800, marginBottom: 14 }}>Doctor Schedule Pressure</div>
           <div style={{ display: "grid", gap: 10 }}>
             {Object.entries(doctorLoad).sort((a, b) => b[1] - a[1]).slice(0, 6).map(([doctor, count]) => (
-              <div key={doctor} style={{ display: "flex", justifyContent: "space-between", padding: "10px 12px", borderRadius: 10, background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.05)" }}>
+              <div key={doctor} style={{ display: "flex", justifyContent: "space-between", padding: isMobile ? "8px 8px" : "10px 12px", borderRadius: 10, background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.05)" }}>
                 <span style={{ fontSize: 13 }}>{doctor}</span>
                 <span style={{ fontSize: 15, fontWeight: 800, color: "#c4b5fd" }}>{count}</span>
               </div>
@@ -102,7 +104,7 @@ export default function HospitalAnalyticsPage() {
               { label: "Active prescriptions", value: prescriptions.filter((row) => row.status === "active").length, color: "#22c55e" },
               { label: "Urgent pending labs", value: labs.filter((row) => row.urgent && row.status !== "completed").length, color: "#f97316" },
             ].map((row) => (
-              <div key={row.label} style={{ display: "flex", justifyContent: "space-between", padding: "10px 12px", borderRadius: 10, background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.05)" }}>
+              <div key={row.label} style={{ display: "flex", justifyContent: "space-between", padding: isMobile ? "8px 8px" : "10px 12px", borderRadius: 10, background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.05)" }}>
                 <span style={{ fontSize: 13, color: hospitalMuted }}>{row.label}</span>
                 <span style={{ fontSize: 15, fontWeight: 800, color: row.color }}>{row.value}</span>
               </div>

@@ -3,12 +3,14 @@
 import { useMemo, useState } from "react";
 import { useBusinessRecords } from "@/lib/useBusinessRecords";
 import { mapDriverRecords, todayIso, transportBg, transportBorder, transportFont, transportMuted } from "../_shared";
+import { useResponsive } from "@/hooks/useResponsive";
 
 const statusColor: Record<string, string> = { available: "#22c55e", on_duty: "#3b82f6", off_day: "#f59e0b", suspended: "#ef4444" };
 const statusLabel: Record<string, string> = { available: "Available", on_duty: "On Duty", off_day: "Off Day", suspended: "Suspended" };
 const initialForm = { empId: "", name: "", phone: "", cnic: "", licenseNo: "", licenseExpiry: "", experience: "", salary: "" };
 
 export default function DriversPage() {
+  const { isMobile } = useResponsive();
   const { records, loading, create } = useBusinessRecords("driver");
   const [showModal, setShowModal] = useState(false);
   const [error, setError] = useState("");
@@ -54,7 +56,7 @@ export default function DriversPage() {
   const btn = (c: string) => ({ background: c, border: "none", borderRadius: 8, padding: "10px 20px", color: "#fff", fontFamily: transportFont, cursor: "pointer", fontSize: 14, fontWeight: 600 });
 
   return (
-    <div style={{ fontFamily: transportFont, color: "#fff", padding: 24, minHeight: "100vh" }}>
+    <div style={{ fontFamily: transportFont, color: "#fff", padding: isMobile ? "12px" : "24px", minHeight: "100vh" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24 }}>
         <div>
           <h1 style={{ margin: 0, fontSize: 24, fontWeight: 700 }}>Driver Management</h1>
@@ -63,7 +65,7 @@ export default function DriversPage() {
         <button onClick={() => setShowModal(true)} style={btn("#2563eb")}>Add Driver</button>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 16, marginBottom: 24 }}>
+      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 16, marginBottom: 24 }}>
         {[
           { label: "Total Drivers", value: stats.total, color: "#2563eb" },
           { label: "Available", value: stats.available, color: "#22c55e" },

@@ -1,20 +1,21 @@
 "use client";
 import { useState } from "react";
 import { useBusinessRecords } from "@/lib/useBusinessRecords";
+import { useResponsive } from "@/hooks/useResponsive";
 
 const s = {
-  page: { minHeight: "100vh", background: "#0f0f13", fontFamily: "'Outfit','Inter',sans-serif", color: "#fff", padding: "32px" } as React.CSSProperties,
+  page: { minHeight: "100vh", background: "#0f0f13", fontFamily: "'Outfit','Inter',sans-serif", color: "#fff", padding: isMobile ? "16px" : "32px" } as React.CSSProperties,
   heading: { fontSize: 26, fontWeight: 700, marginBottom: 4 } as React.CSSProperties,
   sub: { color: "rgba(255,255,255,.45)", fontSize: 13, marginBottom: 28 } as React.CSSProperties,
-  statsRow: { display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 16, marginBottom: 28 } as React.CSSProperties,
-  card: { background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)", borderRadius: 14, padding: "20px 24px" } as React.CSSProperties,
+  statsRow: { display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 16, marginBottom: 28 } as React.CSSProperties,
+  card: { background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)", borderRadius: 14, padding: isMobile ? "12px 11px" : "20px 24px" } as React.CSSProperties,
   cardLabel: { fontSize: 12, color: "rgba(255,255,255,.45)", marginBottom: 8, textTransform: "uppercase" as const, letterSpacing: 1 },
   cardValue: { fontSize: 28, fontWeight: 700 },
-  mainLayout: { display: "grid", gridTemplateColumns: "1fr 360px", gap: 24 } as React.CSSProperties,
+  mainLayout: { display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 360px", gap: 24 } as React.CSSProperties,
   topRow: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 } as React.CSSProperties,
   sectionTitle: { fontSize: 16, fontWeight: 700 } as React.CSSProperties,
   btn: { background: "#6366f1", color: "#fff", border: "none", borderRadius: 10, padding: "10px 22px", fontSize: 14, fontWeight: 600, cursor: "pointer" } as React.CSSProperties,
-  tCard: (sel: boolean) => ({ background: sel ? "rgba(99,102,241,.08)" : "rgba(255,255,255,.03)", border: `1px solid ${sel ? "rgba(99,102,241,.4)" : "rgba(255,255,255,.07)"}`, borderRadius: 14, padding: "18px 20px", marginBottom: 12, cursor: "pointer", transition: "all .2s" }) as React.CSSProperties,
+  tCard: (sel: boolean) => ({ background: sel ? "rgba(99,102,241,.08)" : "rgba(255,255,255,.03)", border: `1px solid ${sel ? "rgba(99,102,241,.4)" : "rgba(255,255,255,.07)"}`, borderRadius: 14, padding: isMobile ? "12px 10px" : "18px 20px", marginBottom: 12, cursor: "pointer", transition: "all .2s" }) as React.CSSProperties,
   tTop: { display: "flex", justifyContent: "space-between", alignItems: "flex-start" } as React.CSSProperties,
   tName: { fontSize: 15, fontWeight: 700, marginBottom: 4 } as React.CSSProperties,
   tSub: { fontSize: 12, color: "rgba(255,255,255,.4)" } as React.CSSProperties,
@@ -43,6 +44,7 @@ const statusConfig: Record<string, { label: string; color: string }> = {
 };
 
 export default function TenantsPage() {
+  const { isMobile } = useResponsive();
   const { records, loading, create } = useBusinessRecords("tenant");
   const propertyStore = useBusinessRecords("property");
   const [selected, setSelected] = useState<string | null>(null);

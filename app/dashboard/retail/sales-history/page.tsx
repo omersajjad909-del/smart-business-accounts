@@ -5,6 +5,7 @@ import { confirmToast } from "@/lib/toast-feedback";
 import { DateInput } from "@/app/dashboard/reports/_components/DateInput";
 import { getCurrentUser } from "@/lib/auth";
 import { ThermalReceipt, generateFBRInvoice, type CompanyInfo } from "@/app/dashboard/retail/_components/ThermalReceipt";
+import { useResponsive } from "@/hooks/useResponsive";
 
 const ff = "'Outfit','Inter',sans-serif";
 
@@ -36,6 +37,7 @@ const PAY_BG: Record<string, string> = {
 };
 
 export default function SalesHistoryPage() {
+  const { isMobile } = useResponsive();
   const user = getCurrentUser();
   const { records, loading, remove } = useBusinessRecords("pos_sale");
   const [search, setSearch] = useState("");
@@ -120,7 +122,7 @@ export default function SalesHistoryPage() {
   };
 
   return (
-    <div style={{ padding: "28px 32px", fontFamily: ff, color: "#fff", minHeight: "100vh", background: "#0a0f1a" }}>
+    <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", fontFamily: ff, color: "#fff", minHeight: "100vh", background: "#0a0f1a" }}>
       <style>{`
         @media print {
           body * { visibility: hidden !important; }
@@ -143,14 +145,14 @@ export default function SalesHistoryPage() {
       </div>
 
       {/* Stats */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 12, marginBottom: 24 }}>
+      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 12, marginBottom: 24 }}>
         {[
           { label: "Bills", value: filtered.length, color: "#818cf8", icon: "🧾" },
           { label: "Total Revenue", value: `Rs. ${totalRevenue.toLocaleString()}`, color: "#34d399", icon: "💰" },
           { label: "Total Tax", value: `Rs. ${totalTax.toLocaleString()}`, color: "#fbbf24", icon: "📊" },
           { label: "Total Discount", value: `Rs. ${totalDiscount.toLocaleString()}`, color: "#f87171", icon: "🏷️" },
         ].map(s => (
-          <div key={s.label} style={{ background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)", borderRadius: 14, padding: "18px 22px" }}>
+          <div key={s.label} style={{ background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)", borderRadius: 14, padding: isMobile ? "12px 10px" : "18px 22px" }}>
             <div style={{ fontSize: 12, color: "rgba(255,255,255,.4)", marginBottom: 8 }}>{s.icon} {s.label}</div>
             <div style={{ fontSize: 22, fontWeight: 800, color: s.color }}>{s.value}</div>
           </div>
@@ -211,7 +213,7 @@ export default function SalesHistoryPage() {
               <div
                 className="sale-row"
                 onClick={() => setExpandedId(isOpen ? null : sale.id)}
-                style={{ display: "grid", gridTemplateColumns: "140px 100px 1fr 110px 130px 120px auto", alignItems: "center", gap: 16, padding: "16px 20px", cursor: "pointer" }}
+                style={{ display: "grid", gridTemplateColumns: "140px 100px 1fr 110px 130px 120px auto", alignItems: "center", gap: 16, padding: isMobile ? "12px 10px" : "16px 20px", cursor: "pointer" }}
               >
                 {/* Receipt # */}
                 <div>
@@ -270,10 +272,10 @@ export default function SalesHistoryPage() {
 
               {/* Expanded Detail */}
               {isOpen && (
-                <div style={{ borderTop: "1px solid rgba(255,255,255,.06)", display: "grid", gridTemplateColumns: "1fr 300px", gap: 0 }}>
+                <div style={{ borderTop: "1px solid rgba(255,255,255,.06)", display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 300px", gap: 0 }}>
 
                   {/* Items */}
-                  <div style={{ padding: "20px 24px", borderRight: "1px solid rgba(255,255,255,.06)" }}>
+                  <div style={{ padding: isMobile ? "12px 11px" : "20px 24px", borderRight: "1px solid rgba(255,255,255,.06)" }}>
                     <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,.35)", letterSpacing: ".08em", textTransform: "uppercase", marginBottom: 14 }}>Items Sold</div>
                     {sale.items.length > 0 ? (
                       <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
@@ -294,7 +296,7 @@ export default function SalesHistoryPage() {
                   </div>
 
                   {/* Summary */}
-                  <div style={{ padding: "20px 24px" }}>
+                  <div style={{ padding: isMobile ? "12px 11px" : "20px 24px" }}>
                     <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,.35)", letterSpacing: ".08em", textTransform: "uppercase", marginBottom: 14 }}>Bill Summary</div>
                     <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                       <div style={{ display: "flex", justifyContent: "space-between", fontSize: 13 }}>

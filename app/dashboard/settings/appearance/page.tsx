@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import toast from "react-hot-toast";
 import { BRAND_ORDER, BRAND_PRESETS, type BrandKey } from "@/lib/brandPalette";
 import { getCurrentUser } from "@/lib/auth";
+import { useResponsive } from "@/hooks/useResponsive";
 
 type ThemeMode = "light" | "dark" | "auto";
 type Density = "compact" | "comfortable";
@@ -26,6 +27,7 @@ const LABEL: React.CSSProperties = {
 };
 
 export default function AppearancePage() {
+  const { isMobile } = useResponsive();
   const currentUser = getCurrentUser() as { role?: string } | null;
   const isAdmin = String(currentUser?.role || "").toUpperCase() === "ADMIN";
 

@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
+import { useResponsive } from "@/hooks/useResponsive";
 
 const FONT = "'Outfit','Inter',sans-serif";
 
@@ -158,7 +159,7 @@ function ContentDemo() {
         <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#fbbf24", display: "inline-block", animation: "demoPing 1.2s infinite" }} />
         LIVE PREVIEW — AI Content Generator
       </div>
-      <div style={{ background: "rgba(0,0,0,.3)", borderRadius: 12, padding: "14px 16px", border: "1px solid rgba(251,191,36,.2)" }}>
+      <div style={{ background: "rgba(0,0,0,.3)", borderRadius: 12, padding: isMobile ? "12px 10px" : "14px 16px", border: "1px solid rgba(251,191,36,.2)" }}>
         <div style={{ fontSize: 11, color: "#fbbf24", marginBottom: 8, fontWeight: 600 }}>Prompt: "Write a social post for our summer sale"</div>
         <div style={{ background: "rgba(255,255,255,.04)", borderRadius: 8, padding: "10px 12px", minHeight: 90, fontSize: 12.5, color: "rgba(255,255,255,.85)", lineHeight: 1.6 }}>
           {full.slice(0, shown)}
@@ -343,7 +344,7 @@ function UpsellGate() {
 
       <div style={{ borderRadius: 20, background: "linear-gradient(135deg,rgba(124,58,237,.2),rgba(37,99,235,.14))", border: "1px solid rgba(124,58,237,.4)", overflow: "hidden", marginBottom: 16 }}>
         <div style={{ height: 3, background: "linear-gradient(90deg,#7c3aed,#2563eb,#a78bfa,#38bdf8)" }} />
-        <div style={{ padding: "22px 26px", display: "flex", alignItems: "center", gap: 18, flexWrap: "wrap" }}>
+        <div style={{ padding: isMobile ? "12px 12px" : "22px 26px", display: "flex", alignItems: "center", gap: 18, flexWrap: "wrap" }}>
           <div style={{ width: 50, height: 50, borderRadius: 14, background: "linear-gradient(135deg,#7c3aed,#2563eb)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22, flexShrink: 0 }}>⚡</div>
           <div style={{ flex: 1, minWidth: 220 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap", marginBottom: 4 }}>
@@ -361,7 +362,7 @@ function UpsellGate() {
         </div>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 350px", gap: 14 }}>
+      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 350px", gap: 14 }}>
         <div style={{ background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.08)", borderRadius: 16, overflow: "hidden" }}>
           <div style={{ display: "flex", overflowX: "auto", borderBottom: "1px solid rgba(255,255,255,.08)", scrollbarWidth: "none" as const }}>
             {DEMO_TABS.map(dt => (
@@ -370,7 +371,7 @@ function UpsellGate() {
               </button>
             ))}
           </div>
-          <div style={{ padding: "18px 20px", minHeight: 280, position: "relative" as const }}>
+          <div style={{ padding: isMobile ? "12px 10px" : "18px 20px", minHeight: 280, position: "relative" as const }}>
             {demoTab === "whatsapp" && <WADemo key="wa" />}
             {demoTab === "drip"     && <DripDemo key="drip" />}
             {demoTab === "social"   && <SocialDemo key="social" />}
@@ -453,6 +454,7 @@ function UpsellGate() {
 
 // ─────────────────────────────────────────────────────────────────────────────
 export default function AutomationPage() {
+  const { isMobile } = useResponsive();
   const [tab, setTab] = useState<Tab>("overview");
   const [addonEnabled, setAddonEnabled] = useState<boolean | null>(null); // null = loading
   const [showActivatedBanner, setShowActivatedBanner] = useState(false);
@@ -489,7 +491,7 @@ export default function AutomationPage() {
   ];
 
   return (
-    <div style={{ fontFamily: FONT, color: "#e2e8f0", minHeight: "100vh", padding: "24px" }}>
+    <div style={{ fontFamily: FONT, color: "#e2e8f0", minHeight: "100vh", padding: isMobile ? "12px" : "24px" }}>
       {/* Header */}
       <div style={{ marginBottom: 28 }}>
         <h1 style={{ fontSize: 26, fontWeight: 700, margin: 0, background: "linear-gradient(135deg,#a78bfa,#38bdf8)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
@@ -502,7 +504,7 @@ export default function AutomationPage() {
 
       {/* Activation success banner */}
       {showActivatedBanner && (
-        <div style={{ marginBottom: 20, padding: "14px 20px", borderRadius: 12, background: "linear-gradient(135deg,rgba(34,197,94,.15),rgba(16,185,129,.1))", border: "1px solid rgba(34,197,94,.35)", display: "flex", alignItems: "center", gap: 12 }}>
+        <div style={{ marginBottom: 20, padding: isMobile ? "12px 10px" : "14px 20px", borderRadius: 12, background: "linear-gradient(135deg,rgba(34,197,94,.15),rgba(16,185,129,.1))", border: "1px solid rgba(34,197,94,.35)", display: "flex", alignItems: "center", gap: 12 }}>
           <span style={{ fontSize: 22 }}>🎉</span>
           <div>
             <div style={{ fontWeight: 700, color: "#22c55e", fontSize: 15 }}>Automation Add-on Activated!</div>
@@ -551,7 +553,7 @@ function Card({ children, style = {}, onClick }: { children: React.ReactNode; st
   return (
     <div onClick={onClick} style={{
       background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)",
-      borderRadius: 14, padding: "20px 22px", ...style,
+      borderRadius: 14, padding: isMobile ? "12px 10px" : "20px 22px", ...style,
     }}>{children}</div>
   );
 }
@@ -969,7 +971,7 @@ function LeadsTab() {
   const statusColors: Record<string, string> = { new: "#38bdf8", contacted: "#a78bfa", qualified: "#22c55e", lost: "#f87171", won: "#fbbf24" };
 
   return (
-    <div style={{ display: "grid", gridTemplateColumns: "320px 1fr", gap: 20 }}>
+    <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "320px 1fr", gap: 20 }}>
       {toast && <Toast {...toast} />}
 
       <Card>
@@ -1101,7 +1103,7 @@ function SheetsTab() {
             { action: "sync_leads", label: "Sync CRM Leads", icon: "👥", desc: "Export all leads to 'Leads' sheet" },
             { action: "sync_contacts", label: "Sync Customers", icon: "🏢", desc: "Export all customers to 'Contacts' sheet" },
           ].map(item => (
-            <div key={item.action} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "14px 16px", borderRadius: 10, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)" }}>
+            <div key={item.action} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: isMobile ? "12px 10px" : "14px 16px", borderRadius: 10, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)" }}>
               <div>
                 <div style={{ fontSize: 14, fontWeight: 600 }}>{item.icon} {item.label}</div>
                 <div style={{ fontSize: 12, color: "rgba(255,255,255,0.4)", marginTop: 3 }}>{item.desc}</div>

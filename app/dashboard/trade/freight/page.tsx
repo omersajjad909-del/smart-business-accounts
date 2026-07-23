@@ -2,6 +2,7 @@
 import { useState, useMemo } from "react";
 import { useBusinessRecords, BusinessRecord } from "@/lib/useBusinessRecords";
 import DateInput from "@/app/dashboard/reports/_components/DateInput";
+import { useResponsive } from "@/hooks/useResponsive";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -63,7 +64,7 @@ const MODE_ICON: Record<FreightMode, string> = {
 const FONT = "'Outfit','Inter',sans-serif";
 
 const s = {
-  page:   { fontFamily: FONT, color: "var(--text-primary)", padding: "28px 24px", minHeight: "100vh", background: "var(--app-bg)" },
+  page:   { fontFamily: FONT, color: "var(--text-primary)", padding: isMobile ? "15px 11px" : "28px 24px", minHeight: "100vh", background: "var(--app-bg)" },
   panel:  { background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 14 },
   inp:    { background: "rgba(255,255,255,.05)", border: "1px solid var(--border)", borderRadius: 8, padding: "9px 13px", color: "var(--text-primary)", fontFamily: FONT, fontSize: 13, width: "100%", boxSizing: "border-box" as const, outline: "none" },
   label:  { fontSize: 12, color: "var(--text-muted)", display: "block", marginBottom: 5, fontWeight: 500 } as React.CSSProperties,
@@ -71,7 +72,7 @@ const s = {
   badge:  (color: string, bg: string, border: string) => ({ background: bg, color, border: `1px solid ${border}`, borderRadius: 20, padding: "3px 10px", fontSize: 11, fontWeight: 700, whiteSpace: "nowrap" as const, display: "inline-block" }),
   th:     { padding: "11px 13px", textAlign: "left" as const, fontSize: 11, color: "var(--text-muted)", fontWeight: 600, textTransform: "uppercase" as const, letterSpacing: "0.06em", whiteSpace: "nowrap" as const, borderBottom: "1px solid var(--border)" },
   td:     { padding: "12px 13px", fontSize: 12, color: "var(--text-primary)", borderBottom: "1px solid var(--border)", verticalAlign: "middle" as const },
-  kpi:    { background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 12, padding: "18px 20px", minWidth: 0 },
+  kpi:    { background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 12, padding: isMobile ? "12px 10px" : "18px 20px", minWidth: 0 },
   tabBtn: (active: boolean) => ({ background: active ? "#6366f1" : "rgba(255,255,255,.06)", border: `1px solid ${active ? "#6366f1" : "var(--border)"}`, borderRadius: 8, padding: "7px 14px", color: active ? "#fff" : "var(--text-muted)", fontFamily: FONT, cursor: "pointer", fontSize: 12, fontWeight: 600, whiteSpace: "nowrap" as const }),
 };
 
@@ -111,6 +112,7 @@ function fmtAmt(n: number, cur = "USD") {
 // ─── Main Page ────────────────────────────────────────────────────────────────
 
 export default function FreightManagementPage() {
+  const { isMobile } = useResponsive();
   const { records, loading, create, update, remove } = useBusinessRecords("trade_freight");
   const [filterTab, setFilterTab] = useState("ALL");
   const [modeFilter, setModeFilter] = useState("ALL");
@@ -380,7 +382,7 @@ export default function FreightManagementPage() {
 
       {/* Modal */}
       {showModal && (
-        <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.75)", display: "flex", alignItems: "flex-start", justifyContent: "center", zIndex: 1000, overflowY: "auto", padding: "32px 16px" }}>
+        <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.75)", display: "flex", alignItems: "flex-start", justifyContent: "center", zIndex: 1000, overflowY: "auto", padding: isMobile ? "18px 10px" : "32px 16px" }}>
           <div style={{ ...s.panel, width: "100%", maxWidth: 800, padding: 32 }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24 }}>
               <h2 style={{ margin: 0, fontSize: 18, fontWeight: 800 }}>{editId ? "Edit Freight" : "New Freight Booking"}</h2>
@@ -410,7 +412,7 @@ export default function FreightManagementPage() {
             </div>
 
             {/* Ports + Countries */}
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr", gap: 14, marginBottom: 14 }}>
+            <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr 1fr" : "1fr 1fr 1fr 1fr", gap: 14, marginBottom: 14 }}>
               <div><label style={s.label}>Origin Port *</label>
                 <input value={String(form.originPort)} onChange={e => sf("originPort", e.target.value)} style={s.inp} placeholder="e.g. Karachi" /></div>
               <div><label style={s.label}>Destination Port *</label>
@@ -422,7 +424,7 @@ export default function FreightManagementPage() {
             </div>
 
             {/* Dates + Transit */}
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr", gap: 14, marginBottom: 14 }}>
+            <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr 1fr" : "1fr 1fr 1fr 1fr", gap: 14, marginBottom: 14 }}>
               <div><label style={s.label}>ETD (Departure)</label>
                 <DateInput value={String(form.etd || "")} onChange={v => sf("etd", v)} style={s.inp} /></div>
               <div><label style={s.label}>ETA (Arrival)</label>
@@ -436,7 +438,7 @@ export default function FreightManagementPage() {
             </div>
 
             {/* Cargo */}
-            <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr 1fr", gap: 14, marginBottom: 14 }}>
+            <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr 1fr" : "2fr 1fr 1fr 1fr", gap: 14, marginBottom: 14 }}>
               <div><label style={s.label}>Cargo Description</label>
                 <input value={String(form.cargoDesc)} onChange={e => sf("cargoDesc", e.target.value)} style={s.inp} placeholder="e.g. Textile goods, machinery parts" /></div>
               <div><label style={s.label}>Containers</label>
@@ -448,9 +450,9 @@ export default function FreightManagementPage() {
             </div>
 
             {/* Costs */}
-            <div style={{ background: "rgba(99,102,241,.04)", border: "1px solid rgba(99,102,241,.15)", borderRadius: 12, padding: "16px 18px", marginBottom: 14 }}>
+            <div style={{ background: "rgba(99,102,241,.04)", border: "1px solid rgba(99,102,241,.15)", borderRadius: 12, padding: isMobile ? "12px 10px" : "16px 18px", marginBottom: 14 }}>
               <div style={{ fontSize: 13, fontWeight: 700, color: "#a5b4fc", marginBottom: 12 }}>Cost Breakdown</div>
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr 1fr", gap: 14 }}>
+              <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr 1fr" : "1fr 1fr 1fr 1fr 1fr", gap: 14 }}>
                 <div><label style={s.label}>Currency</label>
                   <select value={String(form.currency)} onChange={e => sf("currency", e.target.value)} style={s.inp}>
                     {CURRENCIES.map(c => <option key={c} value={c}>{c}</option>)}

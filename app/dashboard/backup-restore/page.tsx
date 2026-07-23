@@ -3,6 +3,7 @@ import { confirmToast, alertToast } from "@/lib/toast-feedback";
 
 import { useEffect, useState } from "react";
 import { getCurrentUser } from "@/lib/auth";
+import { useResponsive } from "@/hooks/useResponsive";
 
 type Backup = {
   id: string;
@@ -31,6 +32,7 @@ function userHasPerm(user: AuthUser | null, perm: string): boolean {
 }
 
 export default function BackupRestorePage() {
+  const { isMobile } = useResponsive();
   const [backups, setBackups] = useState<Backup[]>([]);
   const [loading, setLoading] = useState(false);
   const [creating, setCreating] = useState(false);
@@ -168,7 +170,7 @@ export default function BackupRestorePage() {
   /* ── styles ── */
   const card: React.CSSProperties = {
     borderRadius: 14, background: "rgba(255,255,255,0.04)",
-    border: "1px solid rgba(255,255,255,0.08)", padding: "20px 24px",
+    border: "1px solid rgba(255,255,255,0.08)", padding: isMobile ? "12px 11px" : "20px 24px",
   };
   const btn = (color: string, disabled?: boolean): React.CSSProperties => ({
     padding: "9px 18px", borderRadius: 9, border: "none",

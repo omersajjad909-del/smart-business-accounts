@@ -2,6 +2,7 @@
 
 import { useMemo, useState, useCallback } from "react";
 import { useBusinessRecords, BusinessRecord } from "@/lib/useBusinessRecords";
+import { useResponsive } from "@/hooks/useResponsive";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -148,7 +149,7 @@ function fmt(n: number) {
 const FONT = "'Outfit','Inter',sans-serif";
 
 const s = {
-  page:   { fontFamily: FONT, color: "var(--text-primary)", padding: "28px 24px", minHeight: "100vh", background: "var(--app-bg)" },
+  page:   { fontFamily: FONT, color: "var(--text-primary)", padding: isMobile ? "15px 11px" : "28px 24px", minHeight: "100vh", background: "var(--app-bg)" },
   panel:  { background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 14 },
   inp:    { background: "rgba(255,255,255,.05)", border: "1px solid var(--border)", borderRadius: 8, padding: "9px 13px", color: "var(--text-primary)", fontFamily: FONT, fontSize: 13, width: "100%", boxSizing: "border-box" as const, outline: "none" },
   label:  { fontSize: 12, color: "var(--text-muted)", display: "block", marginBottom: 5, fontWeight: 500 } as React.CSSProperties,
@@ -156,7 +157,7 @@ const s = {
   badge:  (color: string, bg: string, border: string) => ({ background: bg, color, border: `1px solid ${border}`, borderRadius: 20, padding: "3px 10px", fontSize: 11, fontWeight: 700, whiteSpace: "nowrap" as const, display: "inline-block" }),
   th:     { padding: "11px 13px", textAlign: "left" as const, fontSize: 11, color: "var(--text-muted)", fontWeight: 600, textTransform: "uppercase" as const, letterSpacing: "0.06em", whiteSpace: "nowrap" as const, borderBottom: "1px solid var(--border)" },
   td:     { padding: "12px 13px", fontSize: 12, color: "var(--text-primary)", borderBottom: "1px solid var(--border)", verticalAlign: "middle" as const, whiteSpace: "nowrap" as const },
-  kpi:    { ...{} as object, background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 12, padding: "18px 20px", minWidth: 0 },
+  kpi:    { ...{} as object, background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 12, padding: isMobile ? "12px 10px" : "18px 20px", minWidth: 0 },
   tabBtn: (active: boolean) => ({ background: active ? "#3b82f6" : "rgba(255,255,255,.06)", border: `1px solid ${active ? "#3b82f6" : "var(--border)"}`, borderRadius: 8, padding: "7px 14px", color: active ? "#fff" : "var(--text-muted)", fontFamily: FONT, cursor: "pointer", fontSize: 12, fontWeight: 600, whiteSpace: "nowrap" as const }),
 };
 
@@ -191,6 +192,7 @@ const INITIAL_FORM = {
 // ─── Main Page ────────────────────────────────────────────────────────────────
 
 export default function CustomsClearancePage() {
+  const { isMobile } = useResponsive();
   const { records, loading, create, update, remove } = useBusinessRecords("customs_clearance");
 
   const [filterTab, setFilterTab]   = useState("ALL");
@@ -538,7 +540,7 @@ export default function CustomsClearancePage() {
 
       {/* New/Edit Modal */}
       {showModal && (
-        <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.75)", display: "flex", alignItems: "flex-start", justifyContent: "center", zIndex: 1000, overflowY: "auto", padding: "32px 16px" }}>
+        <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.75)", display: "flex", alignItems: "flex-start", justifyContent: "center", zIndex: 1000, overflowY: "auto", padding: isMobile ? "18px 10px" : "32px 16px" }}>
           <div style={{ ...s.panel, width: "100%", maxWidth: 780, padding: 32 }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24 }}>
               <h2 style={{ margin: 0, fontSize: 18, fontWeight: 800 }}>
@@ -548,7 +550,7 @@ export default function CustomsClearancePage() {
             </div>
 
             {/* Type + Declaration No + Status */}
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 14, marginBottom: 14 }}>
+            <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr 1fr", gap: 14, marginBottom: 14 }}>
               <div>
                 <label style={s.label}>Type *</label>
                 <select value={form.type} onChange={e => setField("type", e.target.value as "Import" | "Export")} style={s.inp}>
@@ -581,7 +583,7 @@ export default function CustomsClearancePage() {
             </div>
 
             {/* Port + Country + Mode */}
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 14, marginBottom: 14 }}>
+            <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr 1fr", gap: 14, marginBottom: 14 }}>
               <div>
                 <label style={s.label}>Port of {form.type === "Import" ? "Entry" : "Exit"}</label>
                 <input value={form.portOfEntryExit} onChange={e => setField("portOfEntryExit", e.target.value)} style={s.inp} placeholder="e.g. Port Karachi" />
@@ -655,7 +657,7 @@ export default function CustomsClearancePage() {
             </div>
 
             {/* Financial Fields */}
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 14, marginBottom: 14 }}>
+            <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(3,1fr)", gap: 14, marginBottom: 14 }}>
               <div>
                 <label style={s.label}>{form.type === "Import" ? "CIF Value" : "FOB Value"} ($) *</label>
                 <input type="number" min="0" step="0.01" value={form.cifFobValue} onChange={e => setField("cifFobValue", e.target.value)} style={s.inp} placeholder="0.00" />
@@ -674,7 +676,7 @@ export default function CustomsClearancePage() {
               </div>
             </div>
 
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 14, marginBottom: 14 }}>
+            <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 14, marginBottom: 14 }}>
               <div>
                 <label style={s.label}>Duty Amount ($) <span style={{ color: "#9ca3af", fontWeight: 400 }}>(auto)</span></label>
                 <input type="number" min="0" step="0.01" value={form.dutyAmount} onChange={e => setField("dutyAmount", e.target.value)} style={{ ...s.inp, borderColor: "#fbbf2466" }} placeholder="0.00" />
@@ -727,7 +729,7 @@ export default function CustomsClearancePage() {
             </div>
 
             {/* Dates */}
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 14, marginBottom: 14 }}>
+            <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(3,1fr)", gap: 14, marginBottom: 14 }}>
               <div>
                 <label style={s.label}>Filing Date *</label>
                 <input type="date" value={form.filingDate} onChange={e => setField("filingDate", e.target.value)} style={s.inp} />

@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { fetchJson, formatMoney, saasBg, saasBorder, saasFont, saasMuted, type SubscriptionsControlCenter } from "../_shared";
+import { useResponsive } from "@/hooks/useResponsive";
 
 const emptyState: SubscriptionsControlCenter = {
   summary: {
@@ -23,6 +24,7 @@ const emptyState: SubscriptionsControlCenter = {
 };
 
 export default function MrrArrPage() {
+  const { isMobile } = useResponsive();
   const [data, setData] = useState(emptyState);
 
   useEffect(() => {
@@ -37,20 +39,20 @@ export default function MrrArrPage() {
   const overdue = subscribers.filter((item) => item.status === "past_due").reduce((sum, item) => sum + item.amount, 0);
 
   return (
-    <div style={{ padding: "28px 32px", color: "#fff", minHeight: "100vh", fontFamily: saasFont }}>
+    <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", color: "#fff", minHeight: "100vh", fontFamily: saasFont }}>
       <div style={{ marginBottom: 24 }}>
         <h1 style={{ margin: "0 0 6px", fontSize: 28, fontWeight: 900 }}>MRR / ARR</h1>
         <p style={{ margin: 0, color: saasMuted, fontSize: 14 }}>Recurring revenue, churn pressure, aur collection quality ka clean SaaS snapshot.</p>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4,minmax(0,1fr))", gap: 12, marginBottom: 24 }}>
+      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,minmax(0,1fr))", gap: 12, marginBottom: 24 }}>
         {[
           { label: "MRR", value: formatMoney(Math.round(mrr)), color: "#34d399" },
           { label: "ARR", value: formatMoney(Math.round(arr)), color: "#60a5fa" },
           { label: "Collected", value: formatMoney(Math.round(collected)), color: "#c084fc" },
           { label: "Churn", value: `${churn}%`, color: "#f59e0b" },
         ].map((card) => (
-          <div key={card.label} style={{ background: saasBg, border: `1px solid ${saasBorder}`, borderRadius: 16, padding: "18px 20px" }}>
+          <div key={card.label} style={{ background: saasBg, border: `1px solid ${saasBorder}`, borderRadius: 16, padding: isMobile ? "12px 10px" : "18px 20px" }}>
             <div style={{ fontSize: 12, color: saasMuted, marginBottom: 8 }}>{card.label}</div>
             <div style={{ fontSize: 24, fontWeight: 800, color: card.color }}>{card.value}</div>
           </div>

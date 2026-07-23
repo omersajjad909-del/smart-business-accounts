@@ -2,10 +2,11 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { LawControlCenter, fetchJson, lawBg, lawBorder, lawFont, lawMuted } from "../_shared";
+import { useResponsive } from "@/hooks/useResponsive";
 
 function Metric({ title, value, note, color }: { title: string; value: string; note: string; color: string }) {
   return (
-    <div style={{ background: lawBg, border: `1px solid ${lawBorder}`, borderRadius: 18, padding: "20px 22px" }}>
+    <div style={{ background: lawBg, border: `1px solid ${lawBorder}`, borderRadius: 18, padding: isMobile ? "12px 10px" : "20px 22px" }}>
       <div style={{ fontSize: 12, color: lawMuted, marginBottom: 8, textTransform: "uppercase", letterSpacing: ".06em" }}>{title}</div>
       <div style={{ fontSize: 26, fontWeight: 900, color }}>{value}</div>
       <div style={{ fontSize: 12, color: lawMuted, marginTop: 6 }}>{note}</div>
@@ -22,6 +23,7 @@ const emptyState: LawControlCenter = {
 };
 
 export default function LawAnalyticsPage() {
+  const { isMobile } = useResponsive();
   const [data, setData] = useState(emptyState);
 
   useEffect(() => {
@@ -41,7 +43,7 @@ export default function LawAnalyticsPage() {
   }, [entries]);
 
   return (
-    <div style={{ padding: "28px 32px", minHeight: "100vh", color: "#fff", fontFamily: lawFont }}>
+    <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", minHeight: "100vh", color: "#fff", fontFamily: lawFont }}>
       <div style={{ marginBottom: 24 }}>
         <div style={{ fontSize: 12, color: "#fdba74", fontWeight: 700, letterSpacing: ".08em", textTransform: "uppercase", marginBottom: 10 }}>Law Analytics</div>
         <h1 style={{ fontSize: 30, fontWeight: 900, margin: "0 0 10px" }}>Practice mix, fees, aur lawyer load</h1>
@@ -50,7 +52,7 @@ export default function LawAnalyticsPage() {
         </p>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4, minmax(0,1fr))", gap: 14, marginBottom: 24 }}>
+      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,minmax(0,1fr))", gap: 14, marginBottom: 24 }}>
         <Metric title="Total Billed" value={`Rs. ${summary.totalBilled.toLocaleString()}`} note="All legal invoices" color="#60a5fa" />
         <Metric title="Collected" value={`Rs. ${summary.paidRevenue.toLocaleString()}`} note="Paid invoices only" color="#34d399" />
         <Metric title="Outstanding" value={`Rs. ${summary.outstanding.toLocaleString()}`} note="Client receivables" color="#f87171" />

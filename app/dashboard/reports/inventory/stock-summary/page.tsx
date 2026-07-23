@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { getCurrentUser } from "@/lib/auth";
+import { useResponsive } from "@/hooks/useResponsive";
 
 type StockRow = {
   itemId: string;
@@ -26,6 +27,7 @@ function stockStatusLabel(qty: number) {
 }
 
 export default function StockSummaryPage() {
+  const { isMobile } = useResponsive();
   const today = new Date().toISOString().slice(0, 10);
   const [asOnDate, setAsOnDate] = useState(today);
   const [rows, setRows] = useState<StockRow[]>([]);

@@ -11,6 +11,7 @@ import { getCurrentUser } from "@/lib/auth";
 import { hasPermission } from "@/lib/hasPermission";
 import { PERMISSIONS } from "@/lib/permissions";
 import { useRouter } from "next/navigation";
+import { useResponsive } from "@/hooks/useResponsive";
 
 
 type Account = { id: string; name: string };
@@ -51,6 +52,7 @@ type PrintPreferences = {
 };
 
 export default function DeliveryChallanPage() {
+  const { isMobile } = useResponsive();
   const _router = useRouter();
   const today = new Date().toISOString().slice(0, 10);
   const user = getCurrentUser();

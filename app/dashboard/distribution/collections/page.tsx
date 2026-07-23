@@ -7,6 +7,7 @@ import { useEffect, useMemo, useState } from "react";
 import { getCurrentUser } from "@/lib/auth";
 import { useBusinessRecords } from "@/lib/useBusinessRecords";
 import {
+import { useResponsive } from "@/hooks/useResponsive";
   distributionBg,
   distributionBorder,
   distributionFont,
@@ -55,6 +56,7 @@ const emptyForm: CollectionForm = {
 };
 
 export default function DistributionCollectionsPage() {
+  const { isMobile } = useResponsive();
   const user = getCurrentUser();
   const collectionRecords = useBusinessRecords("distribution_collection");
   const routeRecords = useBusinessRecords("distribution_route");
@@ -250,7 +252,7 @@ export default function DistributionCollectionsPage() {
   }
 
   return (
-    <div style={{ padding: "28px 32px", fontFamily: distributionFont, color: "#fff", minHeight: "100vh" }}>
+    <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", fontFamily: distributionFont, color: "#fff", minHeight: "100vh" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 28 }}>
         <div>
           <h1 style={{ fontSize: 22, fontWeight: 800, margin: "0 0 4px" }}>Distribution Collections</h1>
@@ -263,13 +265,13 @@ export default function DistributionCollectionsPage() {
         </button>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 12, marginBottom: 28 }}>
+      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(3,1fr)", gap: 12, marginBottom: 28 }}>
         {[
           { label: "Entries", value: collections.length, color: "#f97316" },
           { label: "Total Collected", value: `Rs. ${totalCollected.toLocaleString()}`, color: "#34d399" },
           { label: "Reconciled", value: `Rs. ${settledAmount.toLocaleString()}`, color: "#38bdf8" },
         ].map((card) => (
-          <div key={card.label} style={{ background: distributionBg, border: `1px solid ${distributionBorder}`, borderRadius: 12, padding: "20px 24px" }}>
+          <div key={card.label} style={{ background: distributionBg, border: `1px solid ${distributionBorder}`, borderRadius: 12, padding: isMobile ? "12px 11px" : "20px 24px" }}>
             <div style={{ fontSize: 13, color: "rgba(255,255,255,.5)", marginBottom: 6 }}>{card.label}</div>
             <div style={{ fontSize: 22, fontWeight: 700, color: card.color }}>{card.value}</div>
           </div>
@@ -290,19 +292,19 @@ export default function DistributionCollectionsPage() {
           <tbody>
             {collections.map((row) => (
               <tr key={row.id}>
-                <td style={{ padding: "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)", fontWeight: 700 }}>{row.customerName}</td>
-                <td style={{ padding: "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)", fontSize: 13 }}>{row.routeName || "-"}</td>
-                <td style={{ padding: "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)", fontSize: 13 }}>{row.invoiceRef || "-"}</td>
-                <td style={{ padding: "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)", fontSize: 12 }}>{row.paymentMode}</td>
-                <td style={{ padding: "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)", color: "#34d399", fontWeight: 700 }}>Rs. {row.amount.toLocaleString()}</td>
-                <td style={{ padding: "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)", fontSize: 12 }}>{row.receiptNo || "-"}</td>
-                <td style={{ padding: "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)", fontSize: 12 }}>{row.date || "-"}</td>
-                <td style={{ padding: "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)" }}>
+                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)", fontWeight: 700 }}>{row.customerName}</td>
+                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)", fontSize: 13 }}>{row.routeName || "-"}</td>
+                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)", fontSize: 13 }}>{row.invoiceRef || "-"}</td>
+                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)", fontSize: 12 }}>{row.paymentMode}</td>
+                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)", color: "#34d399", fontWeight: 700 }}>Rs. {row.amount.toLocaleString()}</td>
+                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)", fontSize: 12 }}>{row.receiptNo || "-"}</td>
+                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)", fontSize: 12 }}>{row.date || "-"}</td>
+                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)" }}>
                   <span style={{ display: "inline-block", background: row.status === "reconciled" ? "rgba(52,211,153,.15)" : "rgba(245,158,11,.15)", color: row.status === "reconciled" ? "#34d399" : "#f59e0b", borderRadius: 999, padding: "4px 10px", fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: ".04em" }}>
                     {row.status}
                   </span>
                 </td>
-                <td style={{ padding: "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)", display: "flex", gap: 8 }}>
+                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)", display: "flex", gap: 8 }}>
                   <button onClick={() => editCollection(row)} style={{ padding: "6px 10px", background: "rgba(99,102,241,.16)", border: "1px solid rgba(99,102,241,.3)", color: "#a5b4fc", borderRadius: 6, fontSize: 11, cursor: "pointer" }}>
                     Edit
                   </button>

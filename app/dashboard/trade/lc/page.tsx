@@ -2,6 +2,7 @@
 import { confirmToast, alertToast } from "@/lib/toast-feedback";
 import { useState, useMemo } from "react";
 import { useBusinessRecords } from "@/lib/useBusinessRecords";
+import { useResponsive } from "@/hooks/useResponsive";
 
 // ── Style constants ────────────────────────────────────────────────────────────
 const FF = "'Outfit','Inter',sans-serif";
@@ -99,6 +100,7 @@ const TABS = ["All", "LC", "TT", ...ALL_STATUSES];
 
 // ── Main page ──────────────────────────────────────────────────────────────────
 export default function LCPage() {
+  const { isMobile } = useResponsive();
   const { records, loading, create, update, remove } = useBusinessRecords("lc_tt");
 
   const [tab, setTab] = useState("All");
@@ -253,7 +255,7 @@ export default function LCPage() {
 
   // ── Render ─────────────────────────────────────────────────────────────────
   return (
-    <div style={{ minHeight: "100vh", background: "var(--app-bg,#0d1117)", color: "var(--text-primary,#fff)", fontFamily: FF, padding: "28px 32px" }}>
+    <div style={{ minHeight: "100vh", background: "var(--app-bg,#0d1117)", color: "var(--text-primary,#fff)", fontFamily: FF, padding: isMobile ? "15px 14px" : "28px 32px" }}>
 
       {/* Header */}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 28 }}>
@@ -308,7 +310,7 @@ export default function LCPage() {
       </div>
 
       {/* Main layout */}
-      <div style={{ display: "grid", gridTemplateColumns: selectedItem ? "1fr 380px" : "1fr", gap: 18 }}>
+      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : selectedItem ? "1fr 380px" : "1fr", gap: 18 }}>
 
         {/* Table */}
         <div style={{ ...card, padding: 0, overflow: "hidden" }}>

@@ -6,6 +6,7 @@ import toast from "react-hot-toast";
 import { useMemo, useState } from "react";
 import { useBusinessRecords } from "@/lib/useBusinessRecords";
 import {
+import { useResponsive } from "@/hooks/useResponsive";
   mapRestaurantMenuRecords,
   mapRestaurantOrderRecords,
   mapRestaurantTableRecords,
@@ -35,6 +36,7 @@ const emptyForm: OrderForm = {
 };
 
 export default function RestaurantOrdersPage() {
+  const { isMobile } = useResponsive();
   const orderStore = useBusinessRecords("restaurant_order");
   const tableStore = useBusinessRecords("restaurant_table");
   const menuStore = useBusinessRecords("menu_item");
@@ -212,7 +214,7 @@ export default function RestaurantOrdersPage() {
   }
 
   return (
-    <div style={{ padding: "28px 32px", color: "#fff", fontFamily: restaurantFont, minHeight: "100vh" }}>
+    <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", color: "#fff", fontFamily: restaurantFont, minHeight: "100vh" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 26 }}>
         <div>
           <h1 style={{ fontSize: 24, fontWeight: 800, margin: "0 0 6px" }}>Restaurant Order Board</h1>
@@ -221,14 +223,14 @@ export default function RestaurantOrdersPage() {
         <button onClick={() => setShowModal(true)} style={{ padding: "10px 18px", borderRadius: 10, border: "none", background: "#ef4444", color: "#fff", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>+ New Order</button>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4,minmax(0,1fr))", gap: 12, marginBottom: 24 }}>
+      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,minmax(0,1fr))", gap: 12, marginBottom: 24 }}>
         {[
           { label: "Draft Orders", value: orders.filter((row) => row.status === "draft").length, color: "#94a3b8" },
           { label: "Kitchen Queue", value: orders.filter((row) => row.status === "in_kitchen").length, color: "#f59e0b" },
           { label: "Served", value: orders.filter((row) => row.status === "served").length, color: "#34d399" },
           { label: "Ticket Value", value: `Rs. ${orders.reduce((sum, row) => sum + row.total, 0).toLocaleString()}`, color: "#fca5a5" },
         ].map((card) => (
-          <div key={card.label} style={{ background: restaurantBg, border: `1px solid ${restaurantBorder}`, borderRadius: 14, padding: "18px 20px" }}>
+          <div key={card.label} style={{ background: restaurantBg, border: `1px solid ${restaurantBorder}`, borderRadius: 14, padding: isMobile ? "12px 10px" : "18px 20px" }}>
             <div style={{ fontSize: 12, color: "rgba(255,255,255,.45)", marginBottom: 8 }}>{card.label}</div>
             <div style={{ fontSize: 24, fontWeight: 800, color: card.color }}>{card.value}</div>
           </div>

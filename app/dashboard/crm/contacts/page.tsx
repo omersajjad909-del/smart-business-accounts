@@ -4,6 +4,7 @@ import { confirmToast, alertToast } from "@/lib/toast-feedback";
 import toast from "react-hot-toast";
 
 import { useState, useEffect } from "react";
+import { useResponsive } from "@/hooks/useResponsive";
 
 interface Contact {
   id: string;
@@ -17,6 +18,7 @@ interface Contact {
 }
 
 export default function CrmContactsPage() {
+  const { isMobile } = useResponsive();
   const [contacts, setContacts] = useState<Contact[]>([]);
   const [loading, setLoading] = useState(false);
   const [editing, setEditing] = useState<string | null>(null);

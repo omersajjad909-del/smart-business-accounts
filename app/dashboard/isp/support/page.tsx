@@ -5,6 +5,7 @@ import toast from "react-hot-toast";
 import { useMemo, useState } from "react";
 import { useBusinessRecords } from "@/lib/useBusinessRecords";
 import { ispBg, ispBorder, ispFont, ispMuted, ispStatusColor, mapIspConnections, mapIspTickets, todayIso } from "../_shared";
+import { useResponsive } from "@/hooks/useResponsive";
 
 const inputStyle: React.CSSProperties = {
   width: "100%",
@@ -37,6 +38,7 @@ const smallButton: React.CSSProperties = {
 };
 
 export default function IspSupportPage() {
+  const { isMobile } = useResponsive();
   const connectionStore = useBusinessRecords("isp_connection");
   const { records, loading, create, update } = useBusinessRecords("isp_ticket");
   const connections = useMemo(() => mapIspConnections(connectionStore.records), [connectionStore.records]);
@@ -64,13 +66,13 @@ export default function IspSupportPage() {
   };
 
   return (
-    <div style={{ padding: "28px 32px", color: "#fff", minHeight: "100vh", fontFamily: ispFont }}>
+    <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", color: "#fff", minHeight: "100vh", fontFamily: ispFont }}>
       <div style={{ marginBottom: 24 }}>
         <h1 style={{ margin: "0 0 6px", fontSize: 28, fontWeight: 900 }}>Support Tickets</h1>
         <p style={{ margin: 0, color: ispMuted, fontSize: 14 }}>Service complaints, outage escalations, aur field follow-up yahan manage karein.</p>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "360px 1fr", gap: 18 }}>
+      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "360px 1fr", gap: 18 }}>
         <div style={{ background: ispBg, border: `1px solid ${ispBorder}`, borderRadius: 18, padding: 20 }}>
           <div style={{ fontSize: 16, fontWeight: 800, marginBottom: 16 }}>New Ticket</div>
           <div style={{ display: "grid", gap: 12 }}>
@@ -89,7 +91,7 @@ export default function IspSupportPage() {
         </div>
 
         <div style={{ background: ispBg, border: `1px solid ${ispBorder}`, borderRadius: 18, overflow: "hidden" }}>
-          <div style={{ padding: "16px 18px", borderBottom: `1px solid ${ispBorder}`, fontSize: 16, fontWeight: 800 }}>Support Desk</div>
+          <div style={{ padding: isMobile ? "12px 10px" : "16px 18px", borderBottom: `1px solid ${ispBorder}`, fontSize: 16, fontWeight: 800 }}>Support Desk</div>
           <div style={{ display: "grid", gap: 12, padding: 18 }}>
             {!loading && tickets.length === 0 && <div style={{ color: "rgba(255,255,255,.28)" }}>No support tickets yet.</div>}
             {tickets.map((row) => (

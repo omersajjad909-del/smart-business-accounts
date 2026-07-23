@@ -3,6 +3,7 @@
 import { useState, useMemo } from "react";
 import Link from "next/link";
 import type { CSSProperties } from "react";
+import { useResponsive } from "@/hooks/useResponsive";
 
 // ── Report categories and definitions ──
 const REPORT_CATEGORIES = [
@@ -109,6 +110,7 @@ const REPORT_CATEGORIES = [
 
 // ── Main Component ──
 export default function ReportsPage() {
+  const { isMobile } = useResponsive();
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
@@ -137,7 +139,7 @@ export default function ReportsPage() {
   };
 
   const headerStyle: CSSProperties = {
-    padding: "20px 16px",
+    padding: isMobile ? "12px 10px" : "20px 16px",
     borderBottom: "1px solid var(--border)",
     marginBottom: "24px",
   };
@@ -201,7 +203,7 @@ export default function ReportsPage() {
 
   const reportsGridStyle: CSSProperties = {
     display: "grid",
-    gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))",
+    gridTemplateColumns: isMobile ? "1fr" : "repeat(auto-fill, minmax(280px, 1fr))",
     gap: "12px",
   };
 
@@ -238,7 +240,7 @@ export default function ReportsPage() {
   };
 
   const emptyStyle: CSSProperties = {
-    padding: "40px 20px",
+    padding: isMobile ? "22px 10px" : "40px 20px",
     textAlign: "center",
     color: "var(--text-muted)",
   };

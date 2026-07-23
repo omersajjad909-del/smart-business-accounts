@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { getCurrentUser } from "@/lib/auth";
+import { useResponsive } from "@/hooks/useResponsive";
 
 type Branch = {
   id: string;
@@ -23,6 +24,7 @@ type AdminControlSettings = {
 };
 
 export default function BranchUsersPage() {
+  const { isMobile } = useResponsive();
   const user = getCurrentUser();
   const [branches, setBranches] = useState<Branch[]>([]);
   const [users, setUsers] = useState<UserRow[]>([]);
@@ -97,7 +99,7 @@ export default function BranchUsersPage() {
   };
 
   return (
-    <div style={{ ...shell, minHeight: "100vh", background: "var(--app-bg)", padding: "28px 24px", color: "var(--text-primary)" }}>
+    <div style={{ ...shell, minHeight: "100vh", background: "var(--app-bg)", padding: isMobile ? "15px 11px" : "28px 24px", color: "var(--text-primary)" }}>
       <style>{`@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap');`}</style>
 
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 16, marginBottom: 24 }}>
@@ -124,21 +126,21 @@ export default function BranchUsersPage() {
         </Link>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 16, marginBottom: 24 }}>
+      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 16, marginBottom: 24 }}>
         {[
           { label: "Branches", value: branches.length, color: "#818cf8" },
           { label: "Team Members", value: users.length, color: "#10b981" },
           { label: "Assigned Users", value: assignedUsers, color: "#f59e0b" },
           { label: "Needs Branch Setup", value: unassignedUsers, color: "#ef4444" },
         ].map((card) => (
-          <div key={card.label} style={{ background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 14, padding: "16px 20px" }}>
+          <div key={card.label} style={{ background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 14, padding: isMobile ? "12px 10px" : "16px 20px" }}>
             <div style={{ fontSize: 11, color: "var(--text-muted)", marginBottom: 4 }}>{card.label}</div>
             <div style={{ fontSize: 24, fontWeight: 700, color: card.color }}>{loading ? "..." : card.value}</div>
           </div>
         ))}
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "300px 1fr", gap: 18, marginBottom: 18 }}>
+      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "300px 1fr", gap: 18, marginBottom: 18 }}>
         <div style={{ background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 14, padding: 18 }}>
           <div style={{ fontSize: 12, color: "var(--text-muted)", fontWeight: 700, marginBottom: 12 }}>Branches In Retail Network</div>
           {branches.length === 0 ? (

@@ -3,6 +3,7 @@
 import toast from "react-hot-toast";
 import { useState } from 'react';
 import { useBusinessRecords } from '@/lib/useBusinessRecords';
+import { useResponsive } from "@/hooks/useResponsive";
 
 const S = {
   page: { padding: '32px', fontFamily: 'Inter, sans-serif', color: '#fff', minHeight: '100vh' },
@@ -10,8 +11,8 @@ const S = {
   title: { fontSize: 24, fontWeight: 700, margin: 0 },
   sub: { fontSize: 14, color: 'rgba(255,255,255,.5)', marginTop: 4 },
   btn: { background: '#7c3aed', color: '#fff', border: 'none', borderRadius: 8, padding: '10px 20px', fontWeight: 600, cursor: 'pointer', fontSize: 14 },
-  stats: { display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 16, marginBottom: 28 },
-  stat: { background: 'rgba(255,255,255,.03)', border: '1px solid rgba(255,255,255,.07)', borderRadius: 12, padding: '20px 24px' },
+  stats: { display: 'grid', gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 16, marginBottom: 28 },
+  stat: { background: 'rgba(255,255,255,.03)', border: '1px solid rgba(255,255,255,.07)', borderRadius: 12, padding: isMobile ? "12px 11px" : "20px 24px" },
   statLabel: { fontSize: 13, color: 'rgba(255,255,255,.5)', marginBottom: 6 },
   statVal: { fontSize: 28, fontWeight: 700 },
   tabs: { display: 'flex', gap: 8, marginBottom: 24 },
@@ -21,7 +22,7 @@ const S = {
   badge: (c: string) => ({ display: 'inline-block', background: `${c}20`, color: c, borderRadius: 6, padding: '2px 10px', fontSize: 12, fontWeight: 600 }),
   progressBar: { background: 'rgba(255,255,255,.08)', borderRadius: 4, height: 6 },
   progressFill: (pct: number, c: string) => ({ width: `${Math.min(pct, 100)}%`, height: '100%', borderRadius: 4, background: c }),
-  infoGrid: { display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 12, margin: '16px 0' },
+  infoGrid: { display: 'grid', gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 12, margin: '16px 0' },
   infoItem: { background: 'rgba(255,255,255,.04)', borderRadius: 8, padding: '10px 12px' },
   infoLabel: { fontSize: 11, color: 'rgba(255,255,255,.4)', marginBottom: 4 },
   infoVal: { fontSize: 14, fontWeight: 600 },
@@ -42,6 +43,7 @@ const PAYMENT_SCHEDULES = ['Monthly', 'Milestone', 'Upfront', 'Quarterly'];
 const STATUS_COLOR: Record<string, string> = { Active: '#34d399', Expiring: '#fbbf24', Expired: '#f87171', Draft: '#6b7280', Terminated: '#ef4444' };
 
 export default function ContractsPage() {
+  const { isMobile } = useResponsive();
   const { records, loading, create, update } = useBusinessRecords('contract');
   const [tab, setTab] = useState('All');
   const [showModal, setShowModal] = useState(false);

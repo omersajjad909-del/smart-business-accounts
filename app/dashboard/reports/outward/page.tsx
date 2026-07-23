@@ -3,8 +3,10 @@
 import { useEffect, useState } from "react";
 import { getCurrentUser } from "@/lib/auth";
 import { exportToCSV } from "@/lib/export";
+import { useResponsive } from "@/hooks/useResponsive";
 
 export default function OutwardReportPage() {
+  const { isMobile } = useResponsive();
   const today = new Date().toISOString().slice(0, 10);
   const [fromDate, setFromDate] = useState(today);
   const [toDate, setToDate] = useState(today);

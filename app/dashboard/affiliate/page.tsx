@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState, useCallback } from "react";
 import { getCurrentUser } from "@/lib/auth";
+import { useResponsive } from "@/hooks/useResponsive";
 
 interface AffiliateConversion {
   id: string;
@@ -90,7 +91,7 @@ const MARKETING_ASSETS = [
 
 function StatCard({ label, value, sub, color, icon }: { label: string; value: string; sub?: string; color: string; icon: string }) {
   return (
-    <div style={{ background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.08)", borderRadius: 14, padding: "20px 24px", display: "flex", flexDirection: "column", gap: 8 }}>
+    <div style={{ background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.08)", borderRadius: 14, padding: isMobile ? "12px 11px" : "20px 24px", display: "flex", flexDirection: "column", gap: 8 }}>
       <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
         <span style={{ fontSize: 22 }}>{icon}</span>
         <span style={{ fontSize: 13, color: "#94a3b8", fontWeight: 500 }}>{label}</span>
@@ -107,6 +108,7 @@ function getHeaders(user: ReturnType<typeof getCurrentUser>): Record<string, str
 }
 
 export default function AffiliateDashboardPage() {
+  const { isMobile } = useResponsive();
   const [affiliate, setAffiliate] = useState<AffiliateProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [tab, setTab] = useState<"overview" | "conversions" | "payouts" | "assets" | "settings">("overview");
@@ -167,7 +169,7 @@ export default function AffiliateDashboardPage() {
     background: "linear-gradient(135deg,#080c1e 0%,#0d1035 60%,#080c1e 100%)",
     fontFamily: "'Outfit','Inter',sans-serif",
     color: "#e2e8f0",
-    padding: "32px",
+    padding: isMobile ? "16px" : "32px",
   };
 
   if (loading) return (
@@ -223,7 +225,7 @@ export default function AffiliateDashboardPage() {
 
       {/* Referral Link Bar */}
       {affiliate.status === "APPROVED" && (
-        <div style={{ background: "rgba(99,102,241,.08)", border: "1px solid rgba(99,102,241,.25)", borderRadius: 12, padding: "14px 20px", marginBottom: 28, display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
+        <div style={{ background: "rgba(99,102,241,.08)", border: "1px solid rgba(99,102,241,.25)", borderRadius: 12, padding: isMobile ? "12px 10px" : "14px 20px", marginBottom: 28, display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
           <span style={{ fontSize: 14, color: "#94a3b8", flexShrink: 0 }}>Your referral link:</span>
           <code style={{ flex: 1, color: "#818cf8", fontSize: 13, background: "rgba(99,102,241,.1)", padding: "4px 10px", borderRadius: 6, minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
             {affiliate.referralLink}
@@ -236,7 +238,7 @@ export default function AffiliateDashboardPage() {
 
       {/* Pending banner */}
       {affiliate.status === "PENDING" && (
-        <div style={{ background: "rgba(251,191,36,.08)", border: "1px solid rgba(251,191,36,.25)", borderRadius: 12, padding: "14px 20px", marginBottom: 28, color: "#fbbf24", fontSize: 14 }}>
+        <div style={{ background: "rgba(251,191,36,.08)", border: "1px solid rgba(251,191,36,.25)", borderRadius: 12, padding: isMobile ? "12px 10px" : "14px 20px", marginBottom: 28, color: "#fbbf24", fontSize: 14 }}>
           ⏳ Your application is under review. We approve within 1-2 business days. You will receive an email when approved.
         </div>
       )}
@@ -266,7 +268,7 @@ export default function AffiliateDashboardPage() {
           {/* Commission Tier Progress */}
           <div style={{ background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.08)", borderRadius: 14, padding: 24, marginBottom: 24 }}>
             <h3 style={{ margin: "0 0 20px", fontSize: 16, fontWeight: 700 }}>Commission Tier</h3>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 12 }}>
+            <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 12 }}>
               {[
                 { tier: "STARTER", refs: "1–5",    rate: "20%", icon: "🌱", color: "#818cf8" },
                 { tier: "GROWTH",  refs: "6–20",   rate: "25%", icon: "🚀", color: "#34d399" },

@@ -3,10 +3,11 @@
 import { useMemo } from "react";
 import { useBusinessRecords } from "@/lib/useBusinessRecords";
 import { mapMediaCampaign, mapMediaClient, mapMediaPlan, mediaAccent } from "../_shared";
+import { useResponsive } from "@/hooks/useResponsive";
 
 function card(label: string, value: string | number, color: string) {
   return (
-    <div style={{ background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)", borderRadius: 16, padding: "18px 20px" }}>
+    <div style={{ background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)", borderRadius: 16, padding: isMobile ? "12px 10px" : "18px 20px" }}>
       <div style={{ fontSize: 11, color: "rgba(255,255,255,.45)", textTransform: "uppercase", letterSpacing: ".06em", marginBottom: 6 }}>{label}</div>
       <div style={{ fontSize: 28, fontWeight: 800, color }}>{value}</div>
     </div>
@@ -14,6 +15,7 @@ function card(label: string, value: string | number, color: string) {
 }
 
 export default function MediaAnalyticsPage() {
+  const { isMobile } = useResponsive();
   const campaignStore = useBusinessRecords("media_campaign");
   const clientStore = useBusinessRecords("media_client");
   const planStore = useBusinessRecords("media_plan");
@@ -37,7 +39,7 @@ export default function MediaAnalyticsPage() {
   }, [campaigns, clients, plans]);
 
   return (
-    <div style={{ padding: "28px 32px", color: "#e2e8f0", fontFamily: "'Outfit','Inter',sans-serif" }}>
+    <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", color: "#e2e8f0", fontFamily: "'Outfit','Inter',sans-serif" }}>
       <div style={{ marginBottom: 24 }}>
         <h1 style={{ margin: "0 0 6px", fontSize: 24, fontWeight: 800, color: "white" }}>Media Analytics</h1>
         <p style={{ margin: 0, fontSize: 14, color: "rgba(255,255,255,.45)" }}>
@@ -45,7 +47,7 @@ export default function MediaAnalyticsPage() {
         </p>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(180px,1fr))", gap: 14, marginBottom: 24 }}>
+      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(auto-fit,minmax(180px,1fr))", gap: 14, marginBottom: 24 }}>
         {card("Active Campaigns", stats.activeCampaigns, mediaAccent)}
         {card("Active Clients", stats.activeClients, "#34d399")}
         {card("Approved Plans", stats.approvedPlans, "#60a5fa")}

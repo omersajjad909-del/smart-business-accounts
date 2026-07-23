@@ -3,10 +3,11 @@
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { EcommerceControlCenter, ecommerceBg, ecommerceBorder, ecommerceFont, ecommerceMuted, fetchJson } from "./_shared";
+import { useResponsive } from "@/hooks/useResponsive";
 
 function StatCard({ label, value, tone }: { label: string; value: string | number; tone: string }) {
   return (
-    <div style={{ background: ecommerceBg, border: `1px solid ${ecommerceBorder}`, borderRadius: 18, padding: "20px 22px" }}>
+    <div style={{ background: ecommerceBg, border: `1px solid ${ecommerceBorder}`, borderRadius: 18, padding: isMobile ? "12px 10px" : "20px 22px" }}>
       <div style={{ fontSize: 12, color: ecommerceMuted, marginBottom: 8, textTransform: "uppercase", letterSpacing: ".06em" }}>{label}</div>
       <div style={{ fontSize: 28, fontWeight: 800, color: tone }}>{value}</div>
     </div>
@@ -38,6 +39,7 @@ const emptyState: EcommerceControlCenter = {
 };
 
 export default function EcommerceOverviewPage() {
+  const { isMobile } = useResponsive();
   const [data, setData] = useState<EcommerceControlCenter>(emptyState);
 
   useEffect(() => {
@@ -47,7 +49,7 @@ export default function EcommerceOverviewPage() {
   const topProducts = useMemo(() => [...data.products].sort((a, b) => b.sales - a.sales).slice(0, 4), [data.products]);
 
   return (
-    <div style={{ padding: "28px 32px", minHeight: "100vh", color: "#fff", fontFamily: ecommerceFont }}>
+    <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", minHeight: "100vh", color: "#fff", fontFamily: ecommerceFont }}>
       <div style={{ marginBottom: 26 }}>
         <div style={{ fontSize: 12, color: "#818cf8", fontWeight: 700, letterSpacing: ".08em", textTransform: "uppercase", marginBottom: 10 }}>E-Commerce / Online Store</div>
         <h1 style={{ fontSize: 30, fontWeight: 900, margin: "0 0 10px" }}>Command Center</h1>
@@ -67,7 +69,7 @@ export default function EcommerceOverviewPage() {
       <div style={{ display: "grid", gridTemplateColumns: "1.2fr .8fr", gap: 18, marginBottom: 18 }}>
         <div style={{ background: "linear-gradient(135deg, rgba(99,102,241,.14), rgba(20,184,166,.12))", border: `1px solid ${ecommerceBorder}`, borderRadius: 20, padding: 24 }}>
           <div style={{ fontSize: 13, color: "#c7d2fe", fontWeight: 800, marginBottom: 10, textTransform: "uppercase", letterSpacing: ".07em" }}>Business Flow</div>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(4, minmax(0,1fr))", gap: 12 }}>
+          <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,minmax(0,1fr))", gap: 12 }}>
             {[
               { title: "Catalog Ready", body: `${data.summary.activeProducts} active listings are currently available.` },
               { title: "Orders Control", body: `${data.summary.activeOrders} orders are live across pending and processing.` },
@@ -93,7 +95,7 @@ export default function EcommerceOverviewPage() {
               { href: "/dashboard/ecommerce/shipping", label: "Track Shipments", hint: "Courier and ETA follow-up" },
               { href: "/dashboard/ecommerce/analytics", label: "See Ecommerce Analytics", hint: "Revenue, returns, platform mix" },
             ].map((item) => (
-              <Link prefetch={false} key={item.href} href={item.href} style={{ textDecoration: "none", color: "#fff", background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)", borderRadius: 14, padding: "14px 16px" }}>
+              <Link prefetch={false} key={item.href} href={item.href} style={{ textDecoration: "none", color: "#fff", background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)", borderRadius: 14, padding: isMobile ? "12px 10px" : "14px 16px" }}>
                 <div style={{ fontSize: 14, fontWeight: 800, marginBottom: 4 }}>{item.label}</div>
                 <div style={{ fontSize: 12, color: ecommerceMuted }}>{item.hint}</div>
               </Link>
@@ -132,7 +134,7 @@ export default function EcommerceOverviewPage() {
               { label: "Customer Service", value: `${data.summary.openReturns} active return cases`, tone: "#f59e0b" },
               { label: "Fulfillment Readiness", value: `${data.summary.inTransitShipments} shipments in motion`, tone: "#60a5fa" },
             ].map((row) => (
-              <div key={row.label} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "rgba(255,255,255,.025)", border: "1px solid rgba(255,255,255,.06)", borderRadius: 14, padding: "14px 16px" }}>
+              <div key={row.label} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "rgba(255,255,255,.025)", border: "1px solid rgba(255,255,255,.06)", borderRadius: 14, padding: isMobile ? "12px 10px" : "14px 16px" }}>
                 <div style={{ fontSize: 13, color: ecommerceMuted }}>{row.label}</div>
                 <div style={{ fontSize: 14, fontWeight: 800, color: row.tone }}>{row.value}</div>
               </div>

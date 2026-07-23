@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { getCurrentUser } from "@/lib/auth";
+import { useResponsive } from "@/hooks/useResponsive";
 
 const FONT = "'Outfit','Inter',sans-serif";
 
@@ -15,6 +16,7 @@ type Statement = { openingBalance: number; transactions: TxRow[]; closingBalance
 const fmt = (n: number) => Math.abs(n).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
 export default function SupplierStatementPage() {
+  const { isMobile } = useResponsive();
   const [suppliers, setSuppliers] = useState<Supplier[]>([]);
   const [search,    setSearch]    = useState("");
   const [dropOpen,  setDropOpen]  = useState(false);
@@ -88,7 +90,7 @@ export default function SupplierStatementPage() {
           <div style={{
             background: "linear-gradient(145deg,#0f1a35,#0b1225)",
             border: "1px solid rgba(139,92,246,.25)",
-            borderRadius: 18, padding: "36px 40px", width: "100%", maxWidth: 480,
+            borderRadius: 18, padding: isMobile ? "20px 18px" : "36px 40px", width: "100%", maxWidth: 480,
             boxShadow: "0 32px 80px rgba(0,0,0,.6)", position: "relative",
           }}>
             <button style={{
@@ -260,7 +262,7 @@ export default function SupplierStatementPage() {
                   </table>
                 </div>
 
-                <div style={{ padding: "16px 24px", background: "rgba(139,92,246,.08)", borderTop: "1px solid rgba(139,92,246,.2)", display: "flex", justifyContent: "space-between", fontSize: 15, fontWeight: 800 }}>
+                <div style={{ padding: isMobile ? "12px 11px" : "16px 24px", background: "rgba(139,92,246,.08)", borderTop: "1px solid rgba(139,92,246,.2)", display: "flex", justifyContent: "space-between", fontSize: 15, fontWeight: 800 }}>
                   <span style={{ color: "rgba(255,255,255,.5)" }}>Closing Balance</span>
                   <span style={{ color: statement.closingBalance >= 0 ? "#a78bfa" : "#f87171" }}>
                     {fmt(statement.closingBalance)} <span style={{ fontSize: 11 }}>{statement.closingBalance >= 0 ? "Dr" : "Cr"}</span>

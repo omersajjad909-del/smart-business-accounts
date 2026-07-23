@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { useResponsive } from "@/hooks/useResponsive";
 
 type BranchReport = {
   id: string;
@@ -38,6 +39,7 @@ const periods = [
 ];
 
 export default function BranchReportsPage() {
+  const { isMobile } = useResponsive();
   const [selectedBranch, setSelectedBranch] = useState("all");
   const [period, setPeriod] = useState("this_month");
   const [loading, setLoading] = useState(true);
@@ -90,7 +92,7 @@ export default function BranchReportsPage() {
   const s = { fontFamily: "'Outfit','Inter',sans-serif" };
 
   return (
-    <div style={{ ...s, minHeight: "100vh", background: "var(--app-bg)", padding: "28px 24px", color: "var(--text-primary)" }}>
+    <div style={{ ...s, minHeight: "100vh", background: "var(--app-bg)", padding: isMobile ? "15px 11px" : "28px 24px", color: "var(--text-primary)" }}>
       <style>{`@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap');`}</style>
 
       <div style={{ marginBottom: 28 }}>
@@ -115,7 +117,7 @@ export default function BranchReportsPage() {
         </select>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 16, marginBottom: 28 }}>
+      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(3,1fr)", gap: 16, marginBottom: 28 }}>
         {[
           { label: "Total Sales", val: `Rs ${combined.sales.toLocaleString()}`, color: "#10b981" },
           { label: "Total Purchases", val: `Rs ${combined.purchases.toLocaleString()}`, color: "#818cf8" },
@@ -124,7 +126,7 @@ export default function BranchReportsPage() {
           { label: "Transactions", val: combined.transactions.toLocaleString(), color: "#6366f1" },
           { label: "Customers Served", val: combined.customers.toLocaleString(), color: "#34d399" },
         ].map((kpi) => (
-          <div key={kpi.label} style={{ background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 14, padding: "18px 20px" }}>
+          <div key={kpi.label} style={{ background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 14, padding: isMobile ? "12px 10px" : "18px 20px" }}>
             <div style={{ fontSize: 11, color: "var(--text-muted)", marginBottom: 6 }}>{kpi.label}</div>
             <div style={{ fontSize: 22, fontWeight: 700, color: kpi.color }}>{loading ? "..." : kpi.val}</div>
           </div>
@@ -132,7 +134,7 @@ export default function BranchReportsPage() {
       </div>
 
       <div style={{ display: "grid", gridTemplateColumns: "1.15fr .85fr", gap: 16, marginBottom: 24 }}>
-        <div style={{ background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 14, padding: "18px 20px" }}>
+        <div style={{ background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 14, padding: isMobile ? "12px 10px" : "18px 20px" }}>
           <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 12 }}>Enterprise Summary</div>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(2,1fr)", gap: 12 }}>
             {[
@@ -141,7 +143,7 @@ export default function BranchReportsPage() {
               { label: "Low Traffic Branches", value: String(lowTrafficBranches), color: lowTrafficBranches ? "#f97316" : "#22c55e" },
               { label: "Active Branches", value: String(selectedRows.filter((row) => row.isActive).length), color: "#818cf8" },
             ].map((item) => (
-              <div key={item.label} style={{ border: "1px solid var(--border)", borderRadius: 12, padding: "14px 16px", background: "rgba(255,255,255,.02)" }}>
+              <div key={item.label} style={{ border: "1px solid var(--border)", borderRadius: 12, padding: isMobile ? "12px 10px" : "14px 16px", background: "rgba(255,255,255,.02)" }}>
                 <div style={{ fontSize: 11, color: "var(--text-muted)", marginBottom: 6, textTransform: "uppercase", letterSpacing: ".06em" }}>{item.label}</div>
                 <div style={{ fontSize: 16, fontWeight: 700, color: item.color }}>{loading ? "..." : item.value}</div>
               </div>
@@ -149,7 +151,7 @@ export default function BranchReportsPage() {
           </div>
         </div>
 
-        <div style={{ background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 14, padding: "18px 20px" }}>
+        <div style={{ background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 14, padding: isMobile ? "12px 10px" : "18px 20px" }}>
           <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 12 }}>Action Watchlist</div>
           <div style={{ fontSize: 13, lineHeight: 1.8, color: "var(--text-muted)" }}>
             Profit Risk: <span style={{ color: lowMarginBranches ? "#f59e0b" : "#22c55e" }}>{loading ? "..." : `${lowMarginBranches} branch(es)`}</span>
@@ -164,7 +166,7 @@ export default function BranchReportsPage() {
       </div>
 
       <div style={{ background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 14, marginBottom: 24, overflow: "hidden" }}>
-        <div style={{ padding: "16px 20px", borderBottom: "1px solid var(--border)", fontSize: 14, fontWeight: 600 }}>Branch Comparison</div>
+        <div style={{ padding: isMobile ? "12px 10px" : "16px 20px", borderBottom: "1px solid var(--border)", fontSize: 14, fontWeight: 600 }}>Branch Comparison</div>
         <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
           <thead>
             <tr style={{ background: "rgba(99,102,241,.06)" }}>
@@ -212,7 +214,7 @@ export default function BranchReportsPage() {
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: 16 }}>
         {selectedRows.map((row) => (
-          <div key={row.id} style={{ background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 14, padding: "18px 20px" }}>
+          <div key={row.id} style={{ background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 14, padding: isMobile ? "12px 10px" : "18px 20px" }}>
             <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 14 }}>Top Items - {row.name}</div>
             {row.topItems.length ? (
               row.topItems.map((item, rank) => (

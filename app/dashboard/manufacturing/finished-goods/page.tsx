@@ -3,12 +3,14 @@
 import { useMemo, useState } from "react";
 import { useBusinessRecords } from "@/lib/useBusinessRecords";
 import { mapFinishedGoodsRecord, mapProductionOrderRecord } from "../_shared";
+import { useResponsive } from "@/hooks/useResponsive";
 
 const ff = "'Outfit','Inter',sans-serif";
 const bg = "rgba(255,255,255,0.03)";
 const border = "rgba(255,255,255,0.07)";
 
 export default function FinishedGoodsPage() {
+  const { isMobile } = useResponsive();
   const goodsStore = useBusinessRecords("finished_good_batch");
   const productionStore = useBusinessRecords("production_order");
   const [showModal, setShowModal] = useState(false);
@@ -47,7 +49,7 @@ export default function FinishedGoodsPage() {
   }
 
   return (
-    <div style={{ padding: "28px 32px", fontFamily: ff, color: "#fff", minHeight: "100vh" }}>
+    <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", fontFamily: ff, color: "#fff", minHeight: "100vh" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 28 }}>
         <div>
           <h1 style={{ fontSize: 22, fontWeight: 800, margin: "0 0 4px" }}>Finished Goods</h1>
@@ -58,14 +60,14 @@ export default function FinishedGoodsPage() {
         </button>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 12, marginBottom: 24 }}>
+      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 12, marginBottom: 24 }}>
         {[
           { label: "Batches", value: goods.length, color: "#22c55e" },
           { label: "Total Quantity", value: goods.reduce((sum, item) => sum + item.quantity, 0), color: "#38bdf8" },
           { label: "Warehouses", value: new Set(goods.map((item) => item.warehouse)).size, color: "#f59e0b" },
           { label: "Linked Orders", value: goods.filter((item) => item.productionOrderId).length, color: "#a78bfa" },
         ].map((card) => (
-          <div key={card.label} style={{ background: bg, border: `1px solid ${border}`, borderRadius: 14, padding: "18px 20px" }}>
+          <div key={card.label} style={{ background: bg, border: `1px solid ${border}`, borderRadius: 14, padding: isMobile ? "12px 10px" : "18px 20px" }}>
             <div style={{ fontSize: 12, color: "rgba(255,255,255,.5)", marginBottom: 6 }}>{card.label}</div>
             <div style={{ fontSize: 22, fontWeight: 800, color: card.color }}>{card.value}</div>
           </div>
@@ -86,13 +88,13 @@ export default function FinishedGoodsPage() {
           <tbody>
             {goods.map((item) => (
               <tr key={item.id}>
-                <td style={{ padding: "14px 16px", borderBottom: "1px solid rgba(255,255,255,.05)", color: "rgba(255,255,255,.55)" }}>{item.batchNo}</td>
-                <td style={{ padding: "14px 16px", borderBottom: "1px solid rgba(255,255,255,.05)", fontWeight: 700 }}>{item.product}</td>
-                <td style={{ padding: "14px 16px", borderBottom: "1px solid rgba(255,255,255,.05)" }}>{item.quantity}</td>
-                <td style={{ padding: "14px 16px", borderBottom: "1px solid rgba(255,255,255,.05)" }}>{item.warehouse}</td>
-                <td style={{ padding: "14px 16px", borderBottom: "1px solid rgba(255,255,255,.05)", color: "rgba(255,255,255,.55)" }}>{item.productionOrderId || "Manual"}</td>
-                <td style={{ padding: "14px 16px", borderBottom: "1px solid rgba(255,255,255,.05)" }}>{item.productionDate}</td>
-                <td style={{ padding: "14px 16px", borderBottom: "1px solid rgba(255,255,255,.05)" }}>
+                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.05)", color: "rgba(255,255,255,.55)" }}>{item.batchNo}</td>
+                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.05)", fontWeight: 700 }}>{item.product}</td>
+                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.05)" }}>{item.quantity}</td>
+                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.05)" }}>{item.warehouse}</td>
+                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.05)", color: "rgba(255,255,255,.55)" }}>{item.productionOrderId || "Manual"}</td>
+                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.05)" }}>{item.productionDate}</td>
+                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.05)" }}>
                   <span style={{ display: "inline-block", background: "rgba(34,197,94,.15)", color: "#22c55e", borderRadius: 999, padding: "4px 10px", fontSize: 11, fontWeight: 700 }}>
                     {item.status.toUpperCase()}
                   </span>

@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { fetchJson, travelAccent, type TravelControlCenter } from "./_shared";
+import { useResponsive } from "@/hooks/useResponsive";
 
 const emptyState: TravelControlCenter = {
   summary: { tickets: 0, issuedTickets: 0, pendingTickets: 0, visaCases: 0, activeVisaCases: 0, hotels: 0, confirmedHotels: 0, tours: 0, confirmedTours: 0, settlements: 0, pendingSettlements: 0, monthlySales: 0, supplierExposure: 0, passports: 0 },
@@ -26,6 +27,7 @@ const NAV_ITEMS = [
 ];
 
 export default function TravelOverviewPage() {
+  const { isMobile } = useResponsive();
   const [data, setData] = useState(emptyState);
 
   useEffect(() => {
@@ -35,7 +37,7 @@ export default function TravelOverviewPage() {
   const { summary, tickets, visas, hotels, tours } = data;
 
   return (
-    <div style={{ padding: "28px 32px", color: "#e2e8f0", fontFamily: "'Outfit','Inter',sans-serif" }}>
+    <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", color: "#e2e8f0", fontFamily: "'Outfit','Inter',sans-serif" }}>
       {/* Header */}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 20, flexWrap: "wrap", marginBottom: 28 }}>
         <div>
@@ -54,7 +56,7 @@ export default function TravelOverviewPage() {
       </div>
 
       {/* KPI Grid */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(140px,1fr))", gap: 12, marginBottom: 24 }}>
+      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(auto-fit,minmax(140px,1fr))", gap: 12, marginBottom: 24 }}>
         {[
           { label: "Tickets", value: summary.tickets, color: travelAccent },
           { label: "Issued", value: summary.issuedTickets, color: "#34d399" },
@@ -71,7 +73,7 @@ export default function TravelOverviewPage() {
           { label: "Total Sales", value: `Rs. ${summary.monthlySales.toLocaleString()}`, color: "#60a5fa" },
           { label: "Supplier Exposure", value: `Rs. ${summary.supplierExposure.toLocaleString()}`, color: "#c084fc" },
         ].map(card => (
-          <div key={card.label} style={{ background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)", borderRadius: 14, padding: "16px 18px" }}>
+          <div key={card.label} style={{ background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)", borderRadius: 14, padding: isMobile ? "12px 10px" : "16px 18px" }}>
             <div style={{ fontSize: 11, color: "rgba(255,255,255,.4)", marginBottom: 6, textTransform: "uppercase", letterSpacing: ".06em" }}>{card.label}</div>
             <div style={{ fontSize: 22, fontWeight: 800, color: card.color }}>{card.value}</div>
           </div>
@@ -79,7 +81,7 @@ export default function TravelOverviewPage() {
       </div>
 
       {/* Four-column desk */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(280px,1fr))", gap: 16 }}>
+      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(auto-fit,minmax(280px,1fr))", gap: 16 }}>
 
         {/* Ticketing Desk */}
         <div style={{ background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)", borderRadius: 16, padding: 20 }}>

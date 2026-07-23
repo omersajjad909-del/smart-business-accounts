@@ -6,6 +6,7 @@ import toast from "react-hot-toast";
 import { useMemo, useState } from "react";
 import { useBusinessRecords } from "@/lib/useBusinessRecords";
 import {
+import { useResponsive } from "@/hooks/useResponsive";
   mapDriverRecords,
   mapTransportExpenseRecords,
   mapTripRecords,
@@ -50,6 +51,7 @@ const statusColor: Record<ExpenseStatus, string> = {
 };
 
 export default function TransportExpensesPage() {
+  const { isMobile } = useResponsive();
   const expenseStore = useBusinessRecords("transport_expense");
   const tripStore = useBusinessRecords("trip");
   const fleetStore = useBusinessRecords("vehicle");
@@ -169,7 +171,7 @@ export default function TransportExpensesPage() {
   const input = { width: "100%", background: "rgba(255,255,255,.05)", border: `1px solid ${transportBorder}`, borderRadius: 8, padding: "10px 12px", color: "#fff", fontFamily: transportFont, boxSizing: "border-box" as const, fontSize: 14 };
 
   return (
-    <div style={{ fontFamily: transportFont, color: "#fff", padding: 24, minHeight: "100vh" }}>
+    <div style={{ fontFamily: transportFont, color: "#fff", padding: isMobile ? "12px" : "24px", minHeight: "100vh" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24, gap: 12 }}>
         <div>
           <h1 style={{ margin: 0, fontSize: 24, fontWeight: 800 }}>Trip Expenses</h1>
@@ -180,7 +182,7 @@ export default function TransportExpensesPage() {
         </button>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 12, marginBottom: 22 }}>
+      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(3,1fr)", gap: 12, marginBottom: 22 }}>
         {[
           { label: "Total Logged", value: `Rs. ${total.toLocaleString()}`, color: "#f87171" },
           { label: "Approved", value: `Rs. ${approved.toLocaleString()}`, color: "#f59e0b" },

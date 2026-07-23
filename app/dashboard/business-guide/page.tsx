@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { getBusinessType, type BusinessType } from "@/lib/businessModules";
+import { useResponsive } from "@/hooks/useResponsive";
 
 type CompanyInfo = {
   name: string;
@@ -331,6 +332,7 @@ const AI_FEATURES = [
 ];
 
 export default function BusinessGuidePage() {
+  const { isMobile } = useResponsive();
   const [companyInfo, setCompanyInfo] = useState<CompanyInfo | null>(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<"overview" | "workflow" | "modules" | "ai" | "start">("overview");
@@ -371,7 +373,7 @@ export default function BusinessGuidePage() {
         .sk { border-radius:10px; background:linear-gradient(90deg,rgba(255,255,255,.04) 25%,rgba(255,255,255,.08) 50%,rgba(255,255,255,.04) 75%); background-size:800px 100%; animation:skshimmer 1.4s infinite linear; }
       `}</style>
       {/* Hero skeleton */}
-      <div style={{ borderRadius:24, padding:"32px 36px", marginBottom:24, background:"rgba(255,255,255,.03)", border:"1px solid rgba(255,255,255,.08)" }}>
+      <div style={{ borderRadius:24, padding: isMobile ? "18px 16px" : "32px 36px", marginBottom:24, background:"rgba(255,255,255,.03)", border:"1px solid rgba(255,255,255,.08)" }}>
         <div className="sk" style={{ height:22, width:200, marginBottom:20 }} />
         <div className="sk" style={{ height:42, width:320, marginBottom:14 }} />
         <div className="sk" style={{ height:14, width:"80%", marginBottom:8 }} />
@@ -426,7 +428,7 @@ export default function BusinessGuidePage() {
 
       {/* ── Hero ──────────────────────────────────────────────────────────────── */}
       <div style={{
-        borderRadius: 24, padding: "32px 36px", marginBottom: 24,
+        borderRadius: 24, padding: isMobile ? "18px 16px" : "32px 36px", marginBottom: 24,
         background: `linear-gradient(135deg, rgba(${businessMeta.color === "#818cf8" ? "99,102,241" : "99,102,241"},.15) 0%, rgba(8,10,28,.95) 60%)`,
         border: "1px solid rgba(255,255,255,.08)",
         position: "relative", overflow: "hidden",
@@ -475,7 +477,7 @@ export default function BusinessGuidePage() {
               { label: "AI Features", val: "9", color: "#f59e0b" },
               { label: "Reports Available", val: "15+", color: "#38bdf8" },
             ].map((s) => (
-              <div key={s.label} style={{ background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.07)", borderRadius: 14, padding: "14px 16px", textAlign: "center" }}>
+              <div key={s.label} style={{ background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.07)", borderRadius: 14, padding: isMobile ? "12px 10px" : "14px 16px", textAlign: "center" }}>
                 <div style={{ fontSize: 22, fontWeight: 800, color: s.color }}>{s.val}</div>
                 <div style={{ fontSize: 10, color: "rgba(255,255,255,.4)", marginTop: 3, fontWeight: 600 }}>{s.label}</div>
               </div>
@@ -497,7 +499,7 @@ export default function BusinessGuidePage() {
       {activeTab === "overview" && (
         <div style={{ animation: "fadeUp .4s ease", display: "flex", flexDirection: "column", gap: 20 }}>
           {/* What FinovaOS does for this business */}
-          <div style={{ background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.08)", borderRadius: 20, padding: "28px 30px" }}>
+          <div style={{ background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.08)", borderRadius: 20, padding: isMobile ? "15px 14px" : "28px 30px" }}>
             <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,.35)", letterSpacing: ".08em", marginBottom: 12 }}>WHAT FINOVA DOES FOR YOUR BUSINESS</div>
             <h2 style={{ margin: "0 0 20px", fontSize: 22, fontWeight: 800 }}>Everything you need to run {businessMeta.label} operations</h2>
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(260px,1fr))", gap: 16 }}>
@@ -509,7 +511,7 @@ export default function BusinessGuidePage() {
                 { icon: "📱", title: "Notifications & Alerts", desc: "Automated WhatsApp and email alerts for invoices, payments, low stock, and more." },
                 { icon: "🌍", title: "Multi-Currency Ready", desc: "Handle foreign invoices, exchange rates, and multi-currency reports with ease." },
               ].map((item) => (
-                <div key={item.title} style={{ background: "rgba(255,255,255,.025)", border: "1px solid rgba(255,255,255,.06)", borderRadius: 16, padding: "18px 20px" }}>
+                <div key={item.title} style={{ background: "rgba(255,255,255,.025)", border: "1px solid rgba(255,255,255,.06)", borderRadius: 16, padding: isMobile ? "12px 10px" : "18px 20px" }}>
                   <div style={{ fontSize: 24, marginBottom: 10 }}>{item.icon}</div>
                   <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 8, color: "white" }}>{item.title}</div>
                   <div style={{ fontSize: 12.5, color: "rgba(255,255,255,.5)", lineHeight: 1.7 }}>{item.desc}</div>
@@ -529,7 +531,7 @@ export default function BusinessGuidePage() {
               { label: "Team Management", href: "/dashboard/team", icon: "👥", color: "#f87171" },
             ].map((link) => (
               <Link prefetch={false} key={link.href} href={link.href} style={{
-                display: "flex", alignItems: "center", gap: 12, padding: "14px 18px", borderRadius: 14, textDecoration: "none",
+                display: "flex", alignItems: "center", gap: 12, padding: isMobile ? "12px 10px" : "14px 18px", borderRadius: 14, textDecoration: "none",
                 background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)",
                 transition: "all .2s",
               }}
@@ -548,7 +550,7 @@ export default function BusinessGuidePage() {
       {/* ── WORKFLOW TAB ──────────────────────────────────────────────────────── */}
       {activeTab === "workflow" && (
         <div style={{ animation: "fadeUp .4s ease" }}>
-          <div style={{ background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.08)", borderRadius: 20, padding: "28px 30px" }}>
+          <div style={{ background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.08)", borderRadius: 20, padding: isMobile ? "15px 14px" : "28px 30px" }}>
             <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,.35)", letterSpacing: ".08em", marginBottom: 8 }}>STEP-BY-STEP BUSINESS WORKFLOW</div>
             <h2 style={{ margin: "0 0 8px", fontSize: 22, fontWeight: 800 }}>How {businessMeta.label} businesses operate on FinovaOS</h2>
             <p style={{ margin: "0 0 28px", fontSize: 14, color: "rgba(255,255,255,.4)", lineHeight: 1.7 }}>
@@ -573,7 +575,7 @@ export default function BusinessGuidePage() {
                   <div className="flow-step" style={{
                     flex: 1, marginLeft: 16, marginBottom: i < flow.length - 1 ? 8 : 0,
                     background: "rgba(255,255,255,.025)", border: "1px solid rgba(255,255,255,.06)",
-                    borderRadius: 16, padding: "16px 20px",
+                    borderRadius: 16, padding: isMobile ? "12px 10px" : "16px 20px",
                   }}>
                     <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, marginBottom: 8 }}>
                       <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
@@ -598,7 +600,7 @@ export default function BusinessGuidePage() {
       {/* ── MODULES TAB ───────────────────────────────────────────────────────── */}
       {activeTab === "modules" && (
         <div style={{ animation: "fadeUp .4s ease" }}>
-          <div style={{ background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.08)", borderRadius: 20, padding: "28px 30px" }}>
+          <div style={{ background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.08)", borderRadius: 20, padding: isMobile ? "15px 14px" : "28px 30px" }}>
             <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,.35)", letterSpacing: ".08em", marginBottom: 8 }}>YOUR AVAILABLE MODULES</div>
             <h2 style={{ margin: "0 0 8px", fontSize: 22, fontWeight: 800 }}>Key features for {businessMeta.label} businesses</h2>
             <p style={{ margin: "0 0 28px", fontSize: 14, color: "rgba(255,255,255,.4)", lineHeight: 1.7 }}>
@@ -609,7 +611,7 @@ export default function BusinessGuidePage() {
                 <Link prefetch={false} key={mod.label} href={mod.link} style={{ textDecoration: "none" }}>
                   <div className="module-card" style={{
                     background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)",
-                    borderRadius: 16, padding: "18px 20px", cursor: "pointer",
+                    borderRadius: 16, padding: isMobile ? "12px 10px" : "18px 20px", cursor: "pointer",
                   }}>
                     <div style={{ fontSize: 26, marginBottom: 12 }}>{mod.icon}</div>
                     <div style={{ fontSize: 14, fontWeight: 700, color: "white", marginBottom: 6 }}>{mod.label}</div>
@@ -625,7 +627,7 @@ export default function BusinessGuidePage() {
           </div>
 
           {/* Key Reports */}
-          <div style={{ marginTop: 20, background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.08)", borderRadius: 20, padding: "24px 28px" }}>
+          <div style={{ marginTop: 20, background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.08)", borderRadius: 20, padding: isMobile ? "13px 13px" : "24px 28px" }}>
             <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 16 }}>📊 Important Reports</div>
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(180px,1fr))", gap: 10 }}>
               {[
@@ -661,7 +663,7 @@ export default function BusinessGuidePage() {
         <div style={{ animation: "fadeUp .4s ease" }}>
           {/* AI Hero */}
           <div style={{
-            borderRadius: 20, padding: "32px 36px", marginBottom: 20,
+            borderRadius: 20, padding: isMobile ? "18px 16px" : "32px 36px", marginBottom: 20,
             background: "linear-gradient(135deg, rgba(167,139,250,.12), rgba(99,102,241,.08), rgba(8,10,28,.95))",
             border: "1px solid rgba(167,139,250,.2)",
           }}>
@@ -675,7 +677,7 @@ export default function BusinessGuidePage() {
                 Open AI Center →
               </Link>
             </div>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 10 }}>
+            <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(3,1fr)", gap: 10 }}>
               {[
                 { val: "9", label: "AI Tabs" }, { val: "24/7", label: "Monitoring" }, { val: "0", label: "OpenAI Required*" },
               ].map((s) => (
@@ -691,7 +693,7 @@ export default function BusinessGuidePage() {
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(280px,1fr))", gap: 16 }}>
             {AI_FEATURES.map((f) => (
               <Link prefetch={false} key={f.title} href={f.link} style={{ textDecoration: "none" }}>
-                <div className="module-card" style={{ background: "rgba(255,255,255,.03)", border: "1px solid rgba(167,139,250,.12)", borderRadius: 18, padding: "22px 24px", height: "100%" }}>
+                <div className="module-card" style={{ background: "rgba(255,255,255,.03)", border: "1px solid rgba(167,139,250,.12)", borderRadius: 18, padding: isMobile ? "12px 11px" : "22px 24px", height: "100%" }}>
                   <div style={{ fontSize: 28, marginBottom: 12 }}>{f.icon}</div>
                   <div style={{ fontSize: 15, fontWeight: 700, color: "white", marginBottom: 8 }}>{f.title}</div>
                   <div style={{ fontSize: 13, color: "rgba(255,255,255,.5)", lineHeight: 1.7 }}>{f.desc}</div>
@@ -704,7 +706,7 @@ export default function BusinessGuidePage() {
             ))}
           </div>
 
-          <div style={{ marginTop: 16, padding: "14px 20px", borderRadius: 12, background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.06)", fontSize: 12, color: "rgba(255,255,255,.4)", textAlign: "center" }}>
+          <div style={{ marginTop: 16, padding: isMobile ? "12px 10px" : "14px 20px", borderRadius: 12, background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.06)", fontSize: 12, color: "rgba(255,255,255,.4)", textAlign: "center" }}>
             * 80% of AI features work without OpenAI credits — powered by your real business data and rule-based intelligence.
           </div>
         </div>
@@ -713,7 +715,7 @@ export default function BusinessGuidePage() {
       {/* ── QUICK START TAB ───────────────────────────────────────────────────── */}
       {activeTab === "start" && (
         <div style={{ animation: "fadeUp .4s ease" }}>
-          <div style={{ background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.08)", borderRadius: 20, padding: "28px 30px" }}>
+          <div style={{ background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.08)", borderRadius: 20, padding: isMobile ? "15px 14px" : "28px 30px" }}>
             <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,.35)", letterSpacing: ".08em", marginBottom: 8 }}>GETTING STARTED CHECKLIST</div>
             <h2 style={{ margin: "0 0 8px", fontSize: 22, fontWeight: 800 }}>Set up FinovaOS in 30 minutes</h2>
             <p style={{ margin: "0 0 24px", fontSize: 14, color: "rgba(255,255,255,.4)", lineHeight: 1.7 }}>
@@ -736,7 +738,7 @@ export default function BusinessGuidePage() {
                 const done = completedTasks.includes(item.id);
                 return (
                   <div key={item.id} className="check-item" style={{
-                    display: "flex", alignItems: "center", gap: 16, padding: "14px 18px", borderRadius: 14,
+                    display: "flex", alignItems: "center", gap: 16, padding: isMobile ? "12px 10px" : "14px 18px", borderRadius: 14,
                     background: done ? "rgba(16,185,129,.05)" : "rgba(255,255,255,.025)",
                     border: `1px solid ${done ? "rgba(16,185,129,.2)" : item.urgent ? "rgba(239,68,68,.15)" : "rgba(255,255,255,.06)"}`,
                     transition: "all .2s", cursor: "pointer",
@@ -774,7 +776,7 @@ export default function BusinessGuidePage() {
             </div>
 
             {completedTasks.length === CHECKLIST.length && (
-              <div style={{ marginTop: 20, padding: "20px 24px", borderRadius: 14, background: "rgba(16,185,129,.08)", border: "1px solid rgba(16,185,129,.2)", textAlign: "center" }}>
+              <div style={{ marginTop: 20, padding: isMobile ? "12px 11px" : "20px 24px", borderRadius: 14, background: "rgba(16,185,129,.08)", border: "1px solid rgba(16,185,129,.2)", textAlign: "center" }}>
                 <div style={{ fontSize: 28, marginBottom: 8 }}>🎉</div>
                 <div style={{ fontSize: 16, fontWeight: 800, color: "#6ee7b7" }}>Setup Complete!</div>
                 <div style={{ fontSize: 13, color: "rgba(255,255,255,.5)", marginTop: 4 }}>Your business is now fully configured. Head to the dashboard to get started.</div>
@@ -791,7 +793,7 @@ export default function BusinessGuidePage() {
               { icon: "📹", title: "Video Tutorials", desc: "Watch step-by-step walkthroughs for each module.", href: "/help", color: "#38bdf8" },
             ].map((r) => (
               <Link prefetch={false} key={r.title} href={r.href} style={{ textDecoration: "none" }}>
-                <div style={{ background: "rgba(255,255,255,.03)", border: `1px solid ${r.color}18`, borderRadius: 16, padding: "20px 22px", transition: "all .2s" }}
+                <div style={{ background: "rgba(255,255,255,.03)", border: `1px solid ${r.color}18`, borderRadius: 16, padding: isMobile ? "12px 10px" : "20px 22px", transition: "all .2s" }}
                   onMouseEnter={e => { (e.currentTarget as HTMLDivElement).style.borderColor = `${r.color}35`; }}
                   onMouseLeave={e => { (e.currentTarget as HTMLDivElement).style.borderColor = `${r.color}18`; }}
                 >

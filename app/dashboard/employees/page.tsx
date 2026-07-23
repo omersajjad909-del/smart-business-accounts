@@ -25,6 +25,7 @@ interface Employee {
 }
 
 import { DEPARTMENTS, DESIGNATIONS, fmtDept } from "@/lib/hrCatalog";
+import { useResponsive } from "@/hooks/useResponsive";
 const FREQ_LABEL: Record<string, string> = { MONTHLY: "Monthly", WEEKLY: "Weekly", HOURLY: "Hourly" };
 const EMPTY_FORM = {
   employeeId: "", firstName: "", lastName: "", email: "",
@@ -44,6 +45,7 @@ function authHeaders() {
 }
 
 export default function EmployeesPage() {
+  const { isMobile } = useResponsive();
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [loading,   setLoading]   = useState(false);
   const [editing,   setEditing]   = useState<string | null>(null);
@@ -114,7 +116,7 @@ export default function EmployeesPage() {
   };
 
   return (
-    <div style={{ padding: "28px 24px", minHeight: "100%", background: "var(--app-bg)", fontFamily: ff, color: "var(--text-primary)" }}>
+    <div style={{ padding: isMobile ? "15px 11px" : "28px 24px", minHeight: "100%", background: "var(--app-bg)", fontFamily: ff, color: "var(--text-primary)" }}>
       <div style={{ maxWidth: 1100, margin: "0 auto" }}>
 
         {/* Header */}
@@ -145,7 +147,7 @@ export default function EmployeesPage() {
               {editing ? "Edit Employee" : "New Employee"}
             </h2>
             <form onSubmit={handleSubmit}>
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 14, marginBottom: 14 }}>
+              <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(3,1fr)", gap: 14, marginBottom: 14 }}>
                 {[
                   { key: "employeeId", label: "Employee ID", type: "text",  req: true  },
                   { key: "firstName",  label: "First Name",  type: "text",  req: true  },

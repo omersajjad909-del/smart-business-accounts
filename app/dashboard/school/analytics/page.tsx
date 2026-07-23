@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { fetchJson, schoolBg, schoolBorder, schoolFont, schoolMuted, type SchoolControlCenter } from "../_shared";
+import { useResponsive } from "@/hooks/useResponsive";
 
 const emptyState: SchoolControlCenter = {
   summary: { students: 0, activeStudents: 0, defaulters: 0, collectedFees: 0, pendingFees: 0, schedules: 0, exams: 0, passRate: 0, pendingAdmissions: 0, teachers: 0, attendancePresent: 0, attendanceTotal: 0 },
@@ -15,6 +16,7 @@ const emptyState: SchoolControlCenter = {
 };
 
 export default function SchoolAnalyticsPage() {
+  const { isMobile } = useResponsive();
   const [data, setData] = useState(emptyState);
 
   useEffect(() => {
@@ -48,18 +50,18 @@ export default function SchoolAnalyticsPage() {
   }, {}), [exams]);
 
   return (
-    <div style={{ minHeight: "100vh", padding: "28px 32px", color: "#fff", fontFamily: schoolFont }}>
+    <div style={{ minHeight: "100vh", padding: isMobile ? "17px 16px" : "28px 32px", color: "#fff", fontFamily: schoolFont }}>
       <div style={{ marginBottom: 26 }}>
         <h1 style={{ margin: "0 0 6px", fontSize: 24, fontWeight: 800 }}>School Analytics</h1>
         <p style={{ margin: 0, fontSize: 13, color: schoolMuted }}>Enrollment mix, fee demand, exam performance, and timetable load.</p>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 18, marginBottom: 18 }}>
+      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: 18, marginBottom: 18 }}>
         <div style={{ background: schoolBg, border: `1px solid ${schoolBorder}`, borderRadius: 16, padding: 18 }}>
           <div style={{ fontSize: 15, fontWeight: 800, marginBottom: 14 }}>Student Distribution by Class</div>
           <div style={{ display: "grid", gap: 10 }}>
             {Object.entries(classMix).sort((a, b) => b[1] - a[1]).map(([className, count]) => (
-              <div key={className} style={{ display: "flex", justifyContent: "space-between", padding: "10px 12px", borderRadius: 10, background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.05)" }}>
+              <div key={className} style={{ display: "flex", justifyContent: "space-between", padding: isMobile ? "8px 8px" : "10px 12px", borderRadius: 10, background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.05)" }}>
                 <span style={{ fontSize: 13 }}>Class {className}</span>
                 <span style={{ fontSize: 15, fontWeight: 800, color: "#a5b4fc" }}>{count}</span>
               </div>
@@ -74,7 +76,7 @@ export default function SchoolAnalyticsPage() {
             {["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"].map((day) => {
               const count = schedules.filter((row) => row.day === day).length;
               return (
-                <div key={day} style={{ display: "flex", justifyContent: "space-between", padding: "10px 12px", borderRadius: 10, background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.05)" }}>
+                <div key={day} style={{ display: "flex", justifyContent: "space-between", padding: isMobile ? "8px 8px" : "10px 12px", borderRadius: 10, background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.05)" }}>
                   <span style={{ fontSize: 13 }}>{day}</span>
                   <span style={{ fontSize: 15, fontWeight: 800, color: "#34d399" }}>{count}</span>
                 </div>
@@ -84,12 +86,12 @@ export default function SchoolAnalyticsPage() {
         </div>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 18 }}>
+      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: 18 }}>
         <div style={{ background: schoolBg, border: `1px solid ${schoolBorder}`, borderRadius: 16, padding: 18 }}>
           <div style={{ fontSize: 15, fontWeight: 800, marginBottom: 14 }}>Fee Demand by Month</div>
           <div style={{ display: "grid", gap: 10 }}>
             {Object.entries(feeByMonth).sort((a, b) => b[1] - a[1]).map(([month, amount]) => (
-              <div key={month} style={{ display: "flex", justifyContent: "space-between", padding: "10px 12px", borderRadius: 10, background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.05)" }}>
+              <div key={month} style={{ display: "flex", justifyContent: "space-between", padding: isMobile ? "8px 8px" : "10px 12px", borderRadius: 10, background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.05)" }}>
                 <span style={{ fontSize: 13 }}>{month}</span>
                 <span style={{ fontSize: 15, fontWeight: 800, color: "#60a5fa" }}>Rs. {amount.toLocaleString()}</span>
               </div>
@@ -104,7 +106,7 @@ export default function SchoolAnalyticsPage() {
             {Object.keys(examByClass).map((className) => {
               const avg = Math.round(examByClass[className] / Math.max(1, examCountByClass[className]));
               return (
-                <div key={className} style={{ display: "flex", justifyContent: "space-between", padding: "10px 12px", borderRadius: 10, background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.05)" }}>
+                <div key={className} style={{ display: "flex", justifyContent: "space-between", padding: isMobile ? "8px 8px" : "10px 12px", borderRadius: 10, background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.05)" }}>
                   <span style={{ fontSize: 13 }}>Class {className}</span>
                   <span style={{ fontSize: 15, fontWeight: 800, color: avg >= 50 ? "#34d399" : "#f87171" }}>{avg}%</span>
                 </div>

@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { fetchJson, foodProcessingAccent, type FoodProcessingControlCenter } from "./_shared";
+import { useResponsive } from "@/hooks/useResponsive";
 
 const emptyState: FoodProcessingControlCenter = {
   summary: { recipes: 0, liveRecipes: 0, approvedRecipes: 0, avgUnitCost: 0, totalYield: 0 },
@@ -10,6 +11,7 @@ const emptyState: FoodProcessingControlCenter = {
 };
 
 export default function FoodProcessingOverviewPage() {
+  const { isMobile } = useResponsive();
   const [data, setData] = useState(emptyState);
 
   useEffect(() => {
@@ -19,7 +21,7 @@ export default function FoodProcessingOverviewPage() {
   const { summary, recipes } = data;
 
   return (
-    <div style={{ padding: "28px 32px", color: "#e2e8f0", fontFamily: "'Outfit','Inter',sans-serif" }}>
+    <div style={{ padding: isMobile ? "17px 16px" : "28px 32px", color: "#e2e8f0", fontFamily: "'Outfit','Inter',sans-serif" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 20, flexWrap: "wrap", marginBottom: 24 }}>
         <div>
           <h1 style={{ margin: "0 0 6px", fontSize: 26, fontWeight: 800, color: "white" }}>Food Processing Command Center</h1>
@@ -32,7 +34,7 @@ export default function FoodProcessingOverviewPage() {
             { label: "Production Orders", href: "/dashboard/manufacturing/production-orders" },
             { label: "Analytics", href: "/dashboard/food-processing/analytics" },
           ].map((item) => (
-            <Link prefetch={false} key={item.href} href={item.href} style={{ padding: "10px 14px", borderRadius: 10, border: "1px solid rgba(255,255,255,.08)", background: "rgba(255,255,255,.03)", color: "#fdba74", textDecoration: "none", fontSize: 12, fontWeight: 700 }}>
+            <Link prefetch={false} key={item.href} href={item.href} style={{ padding: isMobile ? "8px 8px" : "10px 14px", borderRadius: 10, border: "1px solid rgba(255,255,255,.08)", background: "rgba(255,255,255,.03)", color: "#fdba74", textDecoration: "none", fontSize: 12, fontWeight: 700 }}>
               {item.label}
             </Link>
           ))}
@@ -47,7 +49,7 @@ export default function FoodProcessingOverviewPage() {
           { label: "Avg Unit Cost", value: summary.avgUnitCost.toLocaleString(), color: "#fbbf24" },
           { label: "Total Yield", value: summary.totalYield.toLocaleString(), color: "#f97316" },
         ].map((card) => (
-          <div key={card.label} style={{ background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)", borderRadius: 16, padding: "18px 20px" }}>
+          <div key={card.label} style={{ background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)", borderRadius: 16, padding: isMobile ? "11px 10px" : "18px 20px" }}>
             <div style={{ fontSize: 11, color: "rgba(255,255,255,.45)", marginBottom: 8, textTransform: "uppercase", letterSpacing: ".06em" }}>{card.label}</div>
             <div style={{ fontSize: 24, fontWeight: 800, color: card.color }}>{card.value}</div>
           </div>
@@ -58,7 +60,7 @@ export default function FoodProcessingOverviewPage() {
         <div style={{ fontSize: 15, fontWeight: 700, color: "white", marginBottom: 14 }}>Recipe Watchlist</div>
         <div style={{ display: "grid", gap: 10 }}>
           {recipes.slice(0, 8).map((item) => (
-            <div key={item.id} style={{ display: "flex", justifyContent: "space-between", gap: 12, padding: "10px 12px", borderRadius: 12, background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.05)" }}>
+            <div key={item.id} style={{ display: "flex", justifyContent: "space-between", gap: 12, padding: isMobile ? "8px 8px" : "10px 12px", borderRadius: 12, background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.05)" }}>
               <div>
                 <div style={{ fontSize: 13, fontWeight: 700 }}>{item.recipe}</div>
                 <div style={{ fontSize: 12, color: "rgba(255,255,255,.45)" }}>{item.sku || "-"}</div>

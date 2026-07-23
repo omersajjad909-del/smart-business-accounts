@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { getCurrentUser } from "@/lib/auth";
 import { exportToCSV } from "@/lib/export";
 import { exportToPDF } from "@/lib/pdf-export";
+import { useResponsive } from "@/hooks/useResponsive";
 
 type ProfitabilityData = {
   customerId?: string;
@@ -21,6 +22,7 @@ type ProfitabilityData = {
 };
 
 export default function ProfitabilityPage() {
+  const { isMobile } = useResponsive();
   const today = new Date().toISOString().slice(0, 10);
   const [from, setFrom] = useState("2026-01-01");
   const [to, setTo] = useState(today);

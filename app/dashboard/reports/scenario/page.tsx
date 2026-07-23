@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { getCurrentUser } from "@/lib/auth";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from "recharts";
+import { useResponsive } from "@/hooks/useResponsive";
 
 const ff = "'Outfit','Inter',sans-serif";
 function fmt(n: number) { return n.toLocaleString("en-US", { minimumFractionDigits: 0, maximumFractionDigits: 0 }); }
@@ -9,6 +10,7 @@ function fmt(n: number) { return n.toLocaleString("en-US", { minimumFractionDigi
 interface ScenarioResult { label: string; revenue: number; cogs: number; expenses: number; netProfit: number; marginPct: number; }
 
 export default function ScenarioPage() {
+  const { isMobile } = useResponsive();
   const user = getCurrentUser();
   const [base, setBase]       = useState<ScenarioResult | null>(null);
   const [loading, setLoading] = useState(true);
@@ -57,7 +59,7 @@ export default function ScenarioPage() {
   const lblStyle: React.CSSProperties = { fontSize: 12, fontWeight: 700, color: "var(--text-muted)", textTransform: "uppercase" as const, letterSpacing: ".05em" };
 
   return (
-    <div style={{ padding: "24px 28px", fontFamily: ff, color: "var(--text-primary)", maxWidth: 1100 }}>
+    <div style={{ padding: isMobile ? "13px 13px" : "24px 28px", fontFamily: ff, color: "var(--text-primary)", maxWidth: 1100 }}>
       <div style={{ marginBottom: 24 }}>
         <h1 style={{ margin: 0, fontSize: 22, fontWeight: 900, letterSpacing: "-.3px" }}>Scenario Planning</h1>
         <p style={{ margin: "4px 0 0", fontSize: 12, color: "var(--text-muted)" }}>What-if analysis — see how revenue, costs & expenses affect your bottom line</p>
@@ -68,9 +70,9 @@ export default function ScenarioPage() {
       : (
         <>
           {/* Sliders */}
-          <div style={{ background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 14, padding: "22px 24px", marginBottom: 20 }}>
+          <div style={{ background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 14, padding: isMobile ? "12px 11px" : "22px 24px", marginBottom: 20 }}>
             <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 18 }}>🎛️ Adjust Your Scenario</div>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 24 }}>
+            <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(3,1fr)", gap: 24 }}>
               {[
                 { label: "Revenue Change", val: revenueChg, set: setRevenueChg, color: "#818cf8" },
                 { label: "COGS Change",    val: cogsChg,    set: setCogsChg,    color: "#f87171" },

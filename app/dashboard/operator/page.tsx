@@ -6,6 +6,7 @@ import toast from "react-hot-toast";
 import { getCurrentUser } from "@/lib/auth";
 import type { OperatorAction, OperatorDecision, OperatorPayload } from "@/lib/businessOperator";
 import type { AnomalyAlert } from "@/lib/finovaAI";
+import { useResponsive } from "@/hooks/useResponsive";
 
 /* ── Design tokens ──────────────────────────────────────────────────────── */
 const T = {
@@ -138,7 +139,7 @@ function StatCard({ label, value, note, accent, icon }: { label: string; value: 
       background: T.panel, borderRadius: 20,
       border: `1px solid ${T.border}`,
       borderTop: `3px solid ${accent}`,
-      padding: "20px 22px",
+      padding: isMobile ? "12px 10px" : "20px 22px",
       boxShadow: "0 8px 28px rgba(0,0,0,.2)",
     }}>
       <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 80, background: `radial-gradient(ellipse at top, ${accent}14, transparent 75%)`, pointerEvents: "none" }} />
@@ -182,7 +183,7 @@ function DecisionCard({ decision, queueingId, onQueue }: {
       position: "relative", overflow: "hidden",
       background: T.glass, border: `1px solid ${T.border}`,
       borderLeft: `3px solid ${tone.bar}`,
-      borderRadius: 18, padding: "18px 20px",
+      borderRadius: 18, padding: isMobile ? "12px 10px" : "18px 20px",
     }}>
       <div style={{ position: "absolute", top: -40, right: -20, width: 130, height: 130, background: `radial-gradient(circle, ${tone.bar}14, transparent 65%)`, pointerEvents: "none" }} />
       <div style={{ position: "relative", display: "flex", gap: 16, flexWrap: "wrap" }}>
@@ -266,7 +267,7 @@ function ProblemCard({ problem }: { problem: AnomalyAlert }) {
 /* ── Playbook Card ──────────────────────────────────────────────────────── */
 function PlaybookCard({ playbook }: { playbook: { title: string; summary: string; steps: { label: string; description: string; href?: string }[] } }) {
   return (
-    <div style={{ borderRadius: 18, padding: "18px 20px", background: T.glass, border: `1px solid ${T.border}` }}>
+    <div style={{ borderRadius: 18, padding: isMobile ? "12px 10px" : "18px 20px", background: T.glass, border: `1px solid ${T.border}` }}>
       <div style={{ fontSize: 16, fontWeight: 800, color: T.text }}>{playbook.title}</div>
       <div style={{ marginTop: 5, fontSize: 12.5, color: T.muted, lineHeight: 1.6 }}>{playbook.summary}</div>
       <div style={{ marginTop: 14, display: "grid", gap: 12 }}>
@@ -306,7 +307,7 @@ function ActionCard({ action, queueingId, buttonLabel, onQueue }: {
     <div style={{
       background: T.glass, border: `1px solid ${T.border}`,
       borderLeft: `3px solid ${tone.bar}`,
-      borderRadius: 16, padding: "16px 18px",
+      borderRadius: 16, padding: isMobile ? "12px 10px" : "16px 18px",
     }}>
       <div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" }}>
         <span style={{ padding: "2px 9px", borderRadius: 99, background: tone.bg, border: `1px solid ${tone.border}`, color: tone.text, fontSize: 10, fontWeight: 800, textTransform: "uppercase", letterSpacing: ".1em" }}>{action.priority}</span>
@@ -344,7 +345,7 @@ function Skeleton() {
     <div style={{ padding: 24, minHeight: "100vh", color: "white", fontFamily: "'Outfit','Inter',sans-serif" }}>
       <style>{`@keyframes sk{0%,100%{opacity:.35}50%{opacity:.7}} .sk{background:rgba(255,255,255,.07);border-radius:12px;animation:sk 1.7s ease infinite}`}</style>
       <div className="sk" style={{ height: 190, borderRadius: 24, marginBottom: 18 }} />
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 14, marginBottom: 18 }}>
+      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 14, marginBottom: 18 }}>
         {[0,1,2,3].map(i => <div key={i} className="sk" style={{ height: 120, borderRadius: 20 }} />)}
       </div>
       <div style={{ display: "grid", gridTemplateColumns: "1.4fr 1fr", gap: 18 }}>
@@ -360,6 +361,7 @@ function Skeleton() {
 
 /* ── Main Page ──────────────────────────────────────────────────────────── */
 export default function BusinessOperatorPage() {
+  const { isMobile } = useResponsive();
   const [data,       setData]       = useState<OperatorPayload | null>(null);
   const [loading,    setLoading]    = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -440,7 +442,7 @@ export default function BusinessOperatorPage() {
   const healthColor = data.overview.healthScore >= 70 ? T.emerald : data.overview.healthScore >= 45 ? T.amber : T.red;
 
   return (
-    <div style={{ minHeight: "100vh", padding: 24, color: "white", fontFamily: "'Outfit','Inter',sans-serif" }}>
+    <div style={{ minHeight: "100vh", padding: isMobile ? "12px" : "24px", color: "white", fontFamily: "'Outfit','Inter',sans-serif" }}>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&display=swap');
         @keyframes live-pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.5;transform:scale(1.4)} }
@@ -534,7 +536,7 @@ export default function BusinessOperatorPage() {
           <div style={{
             width: 310, maxWidth: "100%", borderRadius: 20,
             background: "rgba(255,255,255,.04)", border: `1px solid ${T.border}`,
-            padding: "22px 24px",
+            padding: isMobile ? "12px 11px" : "22px 24px",
             display: "flex", flexDirection: "column", gap: 0,
           }}>
             <div style={{ fontSize: 11, color: T.dim, textTransform: "uppercase", letterSpacing: ".15em", fontWeight: 700, marginBottom: 16 }}>Operator Health</div>
@@ -586,7 +588,7 @@ export default function BusinessOperatorPage() {
               <DecisionCard key={d.id} decision={d} queueingId={queueingId} onQueue={queueAction} />
             ))}
             {data.todaysDecisions.length === 0 && (
-              <div style={{ textAlign: "center", padding: "40px 20px", color: T.dim, fontSize: 14 }}>
+              <div style={{ textAlign: "center", padding: isMobile ? "22px 10px" : "40px 20px", color: T.dim, fontSize: 14 }}>
                 No urgent decisions today. Your business is running smoothly! ✓
               </div>
             )}
@@ -603,7 +605,7 @@ export default function BusinessOperatorPage() {
                 <ProblemCard key={`${prob.title}-${i}`} problem={prob} />
               ))}
               {data.detectedProblems.length === 0 && (
-                <div style={{ textAlign: "center", padding: "30px 16px", color: T.dim, fontSize: 13 }}>
+                <div style={{ textAlign: "center", padding: isMobile ? "17px 10px" : "30px 16px", color: T.dim, fontSize: 13 }}>
                   No anomalies detected. Everything looks normal. ✓
                 </div>
               )}

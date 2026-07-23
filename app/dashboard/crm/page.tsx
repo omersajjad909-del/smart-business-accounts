@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useResponsive } from "@/hooks/useResponsive";
 
 const FF = "'Outfit','Inter',sans-serif";
 const ACCENT = "#6366f1";
@@ -22,6 +23,7 @@ const TYPE_ICON: Record<string, string> = { CALL: "📞", EMAIL: "📧", MEETING
 const TYPE_COLOR: Record<string, string> = { CALL: "#34d399", EMAIL: "#60a5fa", MEETING: "#a78bfa", NOTE: "#fbbf24" };
 
 export default function CRMOverview() {
+  const { isMobile } = useResponsive();
   const [contacts, setContacts]         = useState<Contact[]>([]);
   const [opps, setOpps]                 = useState<Opportunity[]>([]);
   const [interactions, setInteractions] = useState<Interaction[]>([]);
@@ -63,7 +65,7 @@ export default function CRMOverview() {
   ];
 
   return (
-    <div style={{ padding: "28px 32px", fontFamily: FF, color: "var(--text-primary)", minHeight: "100vh", background: "var(--app-bg)" }}>
+    <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", fontFamily: FF, color: "var(--text-primary)", minHeight: "100vh", background: "var(--app-bg)" }}>
 
       {/* ── Header ── */}
       <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 32, flexWrap: "wrap", gap: 12 }}>
@@ -88,7 +90,7 @@ export default function CRMOverview() {
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(200px,1fr))", gap: 14, marginBottom: 28 }}>
         {STATS.map(s => (
           <Link key={s.label} href={s.href} prefetch={false} style={{ textDecoration: "none" }}>
-            <div style={{ background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 14, padding: "18px 20px", position: "relative", overflow: "hidden", cursor: "pointer", transition: "transform .15s, border-color .15s" }}
+            <div style={{ background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 14, padding: isMobile ? "12px 10px" : "18px 20px", position: "relative", overflow: "hidden", cursor: "pointer", transition: "transform .15s, border-color .15s" }}
               onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = s.color; (e.currentTarget as HTMLElement).style.transform = "translateY(-1px)"; }}
               onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = "var(--border)"; (e.currentTarget as HTMLElement).style.transform = ""; }}
             >
@@ -104,7 +106,7 @@ export default function CRMOverview() {
       </div>
 
       {/* ── Main 3-col Content ── */}
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 20, marginBottom: 24 }}>
+      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr 1fr", gap: 20, marginBottom: 24 }}>
 
         {/* Recent Contacts */}
         <Panel title="Recent Contacts" href="/dashboard/crm/contacts" loading={loading} empty={contacts.length === 0} emptyMsg="No contacts yet">
@@ -167,7 +169,7 @@ export default function CRMOverview() {
 
       {/* ── Win Rate Bar (if data exists) ── */}
       {opps.length > 0 && (
-        <div style={{ background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 14, padding: "16px 20px", marginBottom: 24, display: "flex", alignItems: "center", gap: 20, flexWrap: "wrap" }}>
+        <div style={{ background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 14, padding: isMobile ? "12px 10px" : "16px 20px", marginBottom: 24, display: "flex", alignItems: "center", gap: 20, flexWrap: "wrap" }}>
           <div style={{ fontSize: 13, fontWeight: 700, color: "var(--text-primary)", whiteSpace: "nowrap" }}>Pipeline Health</div>
           <div style={{ flex: 1, minWidth: 200 }}>
             <div style={{ display: "flex", gap: 3, height: 8, borderRadius: 8, overflow: "hidden" }}>
@@ -205,7 +207,7 @@ export default function CRMOverview() {
         {NAV.map(n => (
           <Link key={n.href} href={n.href} prefetch={false} style={{ textDecoration: "none" }}>
             <div
-              style={{ display: "flex", alignItems: "center", gap: 14, padding: "14px 18px", borderRadius: 12, background: "var(--panel-bg)", border: "1px solid var(--border)", cursor: "pointer", transition: "border-color .15s, transform .15s" }}
+              style={{ display: "flex", alignItems: "center", gap: 14, padding: isMobile ? "12px 10px" : "14px 18px", borderRadius: 12, background: "var(--panel-bg)", border: "1px solid var(--border)", cursor: "pointer", transition: "border-color .15s, transform .15s" }}
               onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = n.accent; (e.currentTarget as HTMLElement).style.transform = "translateY(-1px)"; }}
               onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = "var(--border)"; (e.currentTarget as HTMLElement).style.transform = ""; }}
             >
@@ -231,7 +233,7 @@ function Panel({ title, href, loading, empty, emptyMsg, children }: {
 }) {
   return (
     <div style={{ background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 14, overflow: "hidden" }}>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "14px 18px", borderBottom: "1px solid var(--border)" }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: isMobile ? "12px 10px" : "14px 18px", borderBottom: "1px solid var(--border)" }}>
         <span style={{ fontSize: 13, fontWeight: 700, color: "var(--text-primary)" }}>{title}</span>
         <Link prefetch={false} href={href} style={{ fontSize: 11, color: ACCENT, textDecoration: "none", fontWeight: 600, fontFamily: FF }}>View all →</Link>
       </div>

@@ -2,6 +2,7 @@
 import toast from "react-hot-toast";
 import { useState, useMemo } from "react";
 import { useBusinessRecords } from "@/lib/useBusinessRecords";
+import { useResponsive } from "@/hooks/useResponsive";
 
 const ff = "'Outfit','Inter',sans-serif";
 const ACCENT = "#38bdf8";
@@ -36,6 +37,7 @@ function ExpiryBadge({ days }: { days: number }) {
 }
 
 export default function BatchTrackingPage() {
+  const { isMobile } = useResponsive();
   const batchHook  = useBusinessRecords("batch_record");
   const serialHook = useBusinessRecords("serial_record");
   const [tab, setTab]           = useState<Tab>("batches");
@@ -99,7 +101,7 @@ export default function BatchTrackingPage() {
   const td: React.CSSProperties = { padding: "12px 14px", fontSize: 13, borderBottom: `1px solid ${BORDER}` };
 
   return (
-    <div style={{ padding: "28px 32px", fontFamily: ff, color: "#fff", minHeight: "100vh" }}>
+    <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", fontFamily: ff, color: "#fff", minHeight: "100vh" }}>
 
       {/* Header */}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 28 }}>
@@ -113,14 +115,14 @@ export default function BatchTrackingPage() {
       </div>
 
       {/* KPIs */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 12, marginBottom: 24 }}>
+      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 12, marginBottom: 24 }}>
         {[
           { label: "Total Batches",      value: batches.length,  color: ACCENT },
           { label: "Expiring ≤ 30 days", value: expiring,         color: "#fbbf24" },
           { label: "Expired",            value: expired,          color: "#ef4444" },
           { label: "Serials Sold",       value: sold,             color: "#a78bfa" },
         ].map(k => (
-          <div key={k.label} style={{ background: BG, border: `1px solid ${BORDER}`, borderRadius: 12, padding: "18px 20px" }}>
+          <div key={k.label} style={{ background: BG, border: `1px solid ${BORDER}`, borderRadius: 12, padding: isMobile ? "12px 10px" : "18px 20px" }}>
             <div style={{ fontSize: 12, color: MUTED, marginBottom: 6 }}>{k.label}</div>
             <div style={{ fontSize: 24, fontWeight: 800, color: k.color }}>{k.value}</div>
           </div>

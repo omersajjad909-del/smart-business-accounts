@@ -3,11 +3,13 @@
 import { useMemo, useState } from "react";
 import { useBusinessRecords } from "@/lib/useBusinessRecords";
 import { restaurantBg, restaurantBorder, restaurantFont, restaurantMuted } from "../_shared";
+import { useResponsive } from "@/hooks/useResponsive";
 
 const CATEGORIES = ["All", "Starters", "Mains", "Desserts", "Drinks", "Sides"];
 const CAT_COLORS: Record<string, string> = { Starters: "#f59e0b", Mains: "#ef4444", Desserts: "#ec4899", Drinks: "#3b82f6", Sides: "#10b981" };
 
 export default function MenuPage() {
+  const { isMobile } = useResponsive();
   const { records, loading, create, update } = useBusinessRecords("menu_item");
   const [tab, setTab] = useState("All");
   const [showModal, setShowModal] = useState(false);
@@ -47,7 +49,7 @@ export default function MenuPage() {
   }
 
   return (
-    <div style={{ padding: "28px 32px", fontFamily: restaurantFont, color: "#fff", minHeight: "100vh" }}>
+    <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", fontFamily: restaurantFont, color: "#fff", minHeight: "100vh" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 28 }}>
         <div>
           <h1 style={{ fontSize: 22, fontWeight: 800, margin: "0 0 4px" }}>Menu</h1>
@@ -56,14 +58,14 @@ export default function MenuPage() {
         <button onClick={() => { setShowModal(true); setFormError(""); }} style={{ padding: "10px 20px", borderRadius: 10, border: "none", background: "#ef4444", color: "white", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>+ Add Item</button>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 12, marginBottom: 28 }}>
+      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 12, marginBottom: 28 }}>
         {[
           { label: "Total Items", val: items.length, color: "#f87171" },
           { label: "Available", val: items.filter((item) => item.available).length, color: "#34d399" },
           { label: "Avg Margin", val: `${avgMargin}%`, color: "#f59e0b" },
           { label: "Categories", val: CATEGORIES.length - 1, color: "#818cf8" },
         ].map((card) => (
-          <div key={card.label} style={{ background: restaurantBg, border: `1px solid ${restaurantBorder}`, borderRadius: 12, padding: "20px 24px" }}>
+          <div key={card.label} style={{ background: restaurantBg, border: `1px solid ${restaurantBorder}`, borderRadius: 12, padding: isMobile ? "12px 11px" : "20px 24px" }}>
             <div style={{ fontSize: 13, color: "rgba(255,255,255,.5)", marginBottom: 6 }}>{card.label}</div>
             <div style={{ fontSize: 22, fontWeight: 700, color: card.color }}>{card.val}</div>
           </div>

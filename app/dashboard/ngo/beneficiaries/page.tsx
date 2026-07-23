@@ -3,6 +3,7 @@
 import toast from "react-hot-toast";
 import { useState } from "react";
 import { useBusinessRecords } from "@/lib/useBusinessRecords";
+import { useResponsive } from "@/hooks/useResponsive";
 
 const ff = "'Outfit','Inter',sans-serif";
 const bg = "rgba(255,255,255,.03)";
@@ -12,6 +13,7 @@ const catColor: Record<string,string> = { orphan:"#6366f1", widow:"#f59e0b", dis
 const catLabel: Record<string,string> = { orphan:"Orphan", widow:"Widow", disabled:"Disabled", student:"Student", family:"Family" };
 
 export default function BeneficiariesPage() {
+  const { isMobile } = useResponsive();
   const { records, loading, create } = useBusinessRecords("beneficiary");
   const [showModal, setShowModal] = useState(false);
   const [filterCat, setFilterCat] = useState("all");
@@ -59,7 +61,7 @@ export default function BeneficiariesPage() {
   const btn = (c:string) => ({ background:c, border:"none", borderRadius:8, padding:"10px 20px", color:"#fff", fontFamily:ff, cursor:"pointer", fontSize:14, fontWeight:600 });
 
   return (
-    <div style={{ fontFamily:ff, color:"#fff", padding:24, minHeight:"100vh", background:"#0f0f0f" }}>
+    <div style={{ fontFamily:ff, color:"#fff", padding: isMobile ? "12px" : "24px", minHeight:"100vh", background:"#0f0f0f" }}>
       <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:24 }}>
         <div>
           <h1 style={{ margin:0, fontSize:24, fontWeight:700 }}>Beneficiary Management</h1>
@@ -68,7 +70,7 @@ export default function BeneficiariesPage() {
         <button onClick={()=>setShowModal(true)} style={btn("#6366f1")}>+ Add Beneficiary</button>
       </div>
 
-      <div style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:16, marginBottom:24 }}>
+      <div style={{ display:"grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap:16, marginBottom:24 }}>
         {[
           { label:"Total Beneficiaries", value:beneficiaries.length, color:"#6366f1" },
           { label:"Active", value:beneficiaries.filter(b=>b.status==="active").length, color:"#22c55e" },

@@ -6,6 +6,7 @@ import toast from "react-hot-toast";
 import { useMemo, useState } from "react";
 import { useBusinessRecords } from "@/lib/useBusinessRecords";
 import {
+import { useResponsive } from "@/hooks/useResponsive";
   mapDispatchRecords,
   mapTripRecords,
   todayIso,
@@ -60,6 +61,7 @@ const statusLabel: Record<DispatchStatus, string> = {
 };
 
 export default function TransportDispatchPage() {
+  const { isMobile } = useResponsive();
   const dispatchStore = useBusinessRecords("transport_dispatch");
   const tripStore = useBusinessRecords("trip");
   const [showModal, setShowModal] = useState(false);
@@ -191,7 +193,7 @@ export default function TransportDispatchPage() {
   const input = { width: "100%", background: "rgba(255,255,255,.05)", border: `1px solid ${transportBorder}`, borderRadius: 8, padding: "10px 12px", color: "#fff", fontFamily: transportFont, boxSizing: "border-box" as const, fontSize: 14 };
 
   return (
-    <div style={{ fontFamily: transportFont, color: "#fff", padding: 24, minHeight: "100vh" }}>
+    <div style={{ fontFamily: transportFont, color: "#fff", padding: isMobile ? "12px" : "24px", minHeight: "100vh" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24, gap: 12 }}>
         <div>
           <h1 style={{ margin: 0, fontSize: 24, fontWeight: 800 }}>Dispatch Board</h1>
@@ -202,7 +204,7 @@ export default function TransportDispatchPage() {
         </button>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 12, marginBottom: 20 }}>
+      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 12, marginBottom: 20 }}>
         {[
           { label: "Total Dispatches", value: summary.total, color: "#60a5fa" },
           { label: "Active", value: summary.active, color: "#38bdf8" },
@@ -241,7 +243,7 @@ export default function TransportDispatchPage() {
                   </span>
                   <span style={{ fontSize: 12, color: transportMuted }}>Trip: {row.tripNo || "-"}</span>
                 </div>
-                <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 8, fontSize: 13, color: "rgba(255,255,255,.62)" }}>
+                <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 8, fontSize: 13, color: "rgba(255,255,255,.62)" }}>
                   <div>Vehicle: {row.vehicle || "-"}</div>
                   <div>Driver: {row.driver || "-"}</div>
                   <div>Customer: {row.customer || "-"}</div>

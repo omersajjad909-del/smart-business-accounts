@@ -3,10 +3,11 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { LawControlCenter, fetchJson, lawBg, lawBorder, lawFont, lawMuted } from "./_shared";
+import { useResponsive } from "@/hooks/useResponsive";
 
 function StatCard({ label, value, tone }: { label: string; value: string | number; tone: string }) {
   return (
-    <div style={{ background: lawBg, border: `1px solid ${lawBorder}`, borderRadius: 18, padding: "20px 22px" }}>
+    <div style={{ background: lawBg, border: `1px solid ${lawBorder}`, borderRadius: 18, padding: isMobile ? "12px 10px" : "20px 22px" }}>
       <div style={{ fontSize: 12, color: lawMuted, marginBottom: 8, textTransform: "uppercase", letterSpacing: ".06em" }}>{label}</div>
       <div style={{ fontSize: 28, fontWeight: 800, color: tone }}>{value}</div>
     </div>
@@ -22,6 +23,7 @@ const emptyState: LawControlCenter = {
 };
 
 export default function LawFirmOverviewPage() {
+  const { isMobile } = useResponsive();
   const [data, setData] = useState(emptyState);
 
   useEffect(() => {
@@ -32,7 +34,7 @@ export default function LawFirmOverviewPage() {
   const topMatters = [...cases].slice(0, 4);
 
   return (
-    <div style={{ padding: "28px 32px", minHeight: "100vh", color: "#fff", fontFamily: lawFont }}>
+    <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", minHeight: "100vh", color: "#fff", fontFamily: lawFont }}>
       <div style={{ marginBottom: 26 }}>
         <div style={{ fontSize: 12, color: "#fdba74", fontWeight: 700, letterSpacing: ".08em", textTransform: "uppercase", marginBottom: 10 }}>Law Firm</div>
         <h1 style={{ fontSize: 30, fontWeight: 900, margin: "0 0 10px" }}>Practice Control Center</h1>
@@ -52,7 +54,7 @@ export default function LawFirmOverviewPage() {
       <div style={{ display: "grid", gridTemplateColumns: "1.15fr .85fr", gap: 18, marginBottom: 18 }}>
         <div style={{ background: "linear-gradient(135deg, rgba(146,64,14,.14), rgba(251,191,36,.08))", border: `1px solid ${lawBorder}`, borderRadius: 20, padding: 24 }}>
           <div style={{ fontSize: 13, color: "#fed7aa", fontWeight: 800, marginBottom: 10, textTransform: "uppercase", letterSpacing: ".07em" }}>Practice Flow</div>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(4, minmax(0,1fr))", gap: 12 }}>
+          <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,minmax(0,1fr))", gap: 12 }}>
             {[
               { title: "Open Client", body: "Client file, contact details, aur account standing maintain karein." },
               { title: "Register Case", body: "Case type, court, hearing schedule, aur assigned lawyer track karein." },
@@ -78,7 +80,7 @@ export default function LawFirmOverviewPage() {
               { href: "/dashboard/law-firm/billing", label: "Legal Billing", hint: "Invoices, receipts, and dues follow-up" },
               { href: "/dashboard/law-firm/analytics", label: "See Law Analytics", hint: "Practice health and revenue reading" },
             ].map((item) => (
-              <Link prefetch={false} key={item.href} href={item.href} style={{ textDecoration: "none", color: "#fff", background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)", borderRadius: 14, padding: "14px 16px" }}>
+              <Link prefetch={false} key={item.href} href={item.href} style={{ textDecoration: "none", color: "#fff", background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)", borderRadius: 14, padding: isMobile ? "12px 10px" : "14px 16px" }}>
                 <div style={{ fontSize: 14, fontWeight: 800, marginBottom: 4 }}>{item.label}</div>
                 <div style={{ fontSize: 12, color: lawMuted }}>{item.hint}</div>
               </Link>
@@ -114,7 +116,7 @@ export default function LawFirmOverviewPage() {
               { label: "Sent invoices", value: `${invoices.filter((invoice) => invoice.status === "Sent").length} awaiting payment`, tone: "#fbbf24" },
               { label: "Closed cases", value: `${cases.filter((legalCase) => legalCase.status === "Closed" || legalCase.status === "Won" || legalCase.status === "Lost").length} archived`, tone: "#a78bfa" },
             ].map((row) => (
-              <div key={row.label} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "rgba(255,255,255,.025)", border: "1px solid rgba(255,255,255,.06)", borderRadius: 14, padding: "14px 16px" }}>
+              <div key={row.label} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "rgba(255,255,255,.025)", border: "1px solid rgba(255,255,255,.06)", borderRadius: 14, padding: isMobile ? "12px 10px" : "14px 16px" }}>
                 <span style={{ fontSize: 13, color: lawMuted }}>{row.label}</span>
                 <span style={{ fontSize: 14, fontWeight: 800, color: row.tone }}>{row.value}</span>
               </div>

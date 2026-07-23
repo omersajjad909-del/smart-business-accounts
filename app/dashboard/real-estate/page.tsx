@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { RealEstateControlCenter, fetchJson, realEstateBg, realEstateBorder, realEstateFont, realEstateMuted } from "./_shared";
+import { useResponsive } from "@/hooks/useResponsive";
 
 const emptyState: RealEstateControlCenter = {
   summary: {
@@ -25,6 +26,7 @@ const emptyState: RealEstateControlCenter = {
 };
 
 export default function RealEstateOverviewPage() {
+  const { isMobile } = useResponsive();
   const [data, setData] = useState(emptyState);
 
   useEffect(() => {
@@ -35,7 +37,7 @@ export default function RealEstateOverviewPage() {
   const expiringLeases = leases.filter((row) => row.status === "active").slice(0, 5);
 
   return (
-    <div style={{ minHeight: "100vh", padding: "28px 32px", color: "#fff", fontFamily: realEstateFont }}>
+    <div style={{ minHeight: "100vh", padding: isMobile ? "15px 14px" : "28px 32px", color: "#fff", fontFamily: realEstateFont }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 26, gap: 20, flexWrap: "wrap" }}>
         <div>
           <h1 style={{ margin: "0 0 6px", fontSize: 26, fontWeight: 800 }}>Real Estate Command Center</h1>
@@ -56,14 +58,14 @@ export default function RealEstateOverviewPage() {
         </div>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4,minmax(0,1fr))", gap: 12, marginBottom: 24 }}>
+      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,minmax(0,1fr))", gap: 12, marginBottom: 24 }}>
         {[
           { label: "Properties", value: summary.properties, color: "#818cf8" },
           { label: "Occupancy", value: `${summary.occupancyRate}%`, color: "#34d399" },
           { label: "Collected Rent", value: `Rs. ${summary.collectedRent.toLocaleString()}`, color: "#60a5fa" },
           { label: "Pending Rent", value: `Rs. ${summary.pendingRent.toLocaleString()}`, color: "#f87171" },
         ].map((card) => (
-          <div key={card.label} style={{ background: realEstateBg, border: `1px solid ${realEstateBorder}`, borderRadius: 14, padding: "18px 20px" }}>
+          <div key={card.label} style={{ background: realEstateBg, border: `1px solid ${realEstateBorder}`, borderRadius: 14, padding: isMobile ? "12px 10px" : "18px 20px" }}>
             <div style={{ fontSize: 12, color: realEstateMuted, marginBottom: 8 }}>{card.label}</div>
             <div style={{ fontSize: 24, fontWeight: 800, color: card.color }}>{card.value}</div>
           </div>
@@ -72,7 +74,7 @@ export default function RealEstateOverviewPage() {
 
       <div style={{ display: "grid", gridTemplateColumns: "1.1fr .9fr", gap: 18 }}>
         <div style={{ background: realEstateBg, border: `1px solid ${realEstateBorder}`, borderRadius: 16, overflow: "hidden" }}>
-          <div style={{ padding: "16px 18px", borderBottom: `1px solid ${realEstateBorder}`, fontSize: 15, fontWeight: 800 }}>Portfolio Snapshot</div>
+          <div style={{ padding: isMobile ? "12px 10px" : "16px 18px", borderBottom: `1px solid ${realEstateBorder}`, fontSize: 15, fontWeight: 800 }}>Portfolio Snapshot</div>
           <div style={{ padding: 18, display: "grid", gap: 10 }}>
             {[
               { label: "Vacant properties", value: summary.vacantProperties, color: "#34d399" },
@@ -89,7 +91,7 @@ export default function RealEstateOverviewPage() {
         </div>
 
         <div style={{ background: realEstateBg, border: `1px solid ${realEstateBorder}`, borderRadius: 16, overflow: "hidden" }}>
-          <div style={{ padding: "16px 18px", borderBottom: `1px solid ${realEstateBorder}`, fontSize: 15, fontWeight: 800 }}>Lease Watchlist</div>
+          <div style={{ padding: isMobile ? "12px 10px" : "16px 18px", borderBottom: `1px solid ${realEstateBorder}`, fontSize: 15, fontWeight: 800 }}>Lease Watchlist</div>
           <div style={{ padding: 18, display: "grid", gap: 10 }}>
             {expiringLeases.length === 0 && <div style={{ color: "rgba(255,255,255,.28)" }}>No active leases yet.</div>}
             {expiringLeases.map((lease) => (

@@ -5,6 +5,7 @@ import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useBusinessRecords } from "@/lib/useBusinessRecords";
 import { getCurrentUser } from "@/lib/auth";
+import { useResponsive } from "@/hooks/useResponsive";
 
 // ── Design tokens ──────────────────────────────────────────────────────────────
 const FONT   = "'Outfit','Inter',sans-serif";
@@ -74,6 +75,7 @@ const lbl: React.CSSProperties = {
 interface Customer { id: string; name: string; }
 
 export default function CnfPage() {
+  const { isMobile } = useResponsive();
   const user = getCurrentUser();
   const { records, loading, create, update, remove } = useBusinessRecords("cnf_job");
 
@@ -282,7 +284,7 @@ export default function CnfPage() {
   };
 
   return (
-    <div style={{ minHeight: "100vh", padding: "28px 32px", color: "#f1f5f9", fontFamily: FONT }}>
+    <div style={{ minHeight: "100vh", padding: isMobile ? "15px 14px" : "28px 32px", color: "#f1f5f9", fontFamily: FONT }}>
       {/* Header */}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 24, flexWrap: "wrap", gap: 12 }}>
         <div>
@@ -321,7 +323,7 @@ export default function CnfPage() {
           { label: "Unbilled Jobs",    value: kpis.unbilled,            color: "#f87171" },
           { label: "Total Billed",     value: fmt(kpis.revenue),        color: "#34d399" },
         ].map(card => (
-          <div key={card.label} style={{ background: BG, border: `1px solid ${BORDER}`, borderRadius: 16, padding: "18px 20px" }}>
+          <div key={card.label} style={{ background: BG, border: `1px solid ${BORDER}`, borderRadius: 16, padding: isMobile ? "12px 10px" : "18px 20px" }}>
             <div style={{ fontSize: 12, color: MUTED, marginBottom: 8, textTransform: "uppercase", letterSpacing: ".05em" }}>{card.label}</div>
             <div style={{ fontSize: 22, fontWeight: 800, color: card.color }}>{card.value}</div>
           </div>

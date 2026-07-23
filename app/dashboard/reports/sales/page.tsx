@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { getCurrentUser } from "@/lib/auth";
 import { exportToCSV } from "@/lib/export";
 import { DateInput } from "@/app/dashboard/reports/_components/DateInput";
+import { useResponsive } from "@/hooks/useResponsive";
 
 const ff = "'Outfit','Inter',sans-serif";
 function fmt(n: number) { return n.toLocaleString("en-US", { minimumFractionDigits: 0, maximumFractionDigits: 2 }); }
@@ -29,6 +30,7 @@ const selectStyle: React.CSSProperties = {
 };
 
 export default function SalesReportPage() {
+  const { isMobile } = useResponsive();
   const router = useRouter();
   const today  = new Date().toISOString().slice(0, 10);
 
@@ -116,7 +118,7 @@ export default function SalesReportPage() {
           <div style={{
             background: "linear-gradient(145deg,#0f1a35,#0b1225)",
             border: "1px solid rgba(52,211,153,.2)",
-            borderRadius: 18, padding: "36px 40px", width: "100%", maxWidth: 500,
+            borderRadius: 18, padding: isMobile ? "20px 18px" : "36px 40px", width: "100%", maxWidth: 500,
             boxShadow: "0 32px 80px rgba(0,0,0,.6)", position: "relative",
           }}>
             <button
@@ -244,7 +246,7 @@ export default function SalesReportPage() {
 
       {/* ── FULL PAGE REPORT ── */}
       {!showModal && (
-        <div style={{ padding:"28px 32px", maxWidth:1140, margin:"0 auto" }}>
+        <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", maxWidth:1140, margin:"0 auto" }}>
 
           {/* Top bar */}
           <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:24, flexWrap:"wrap", gap:12 }}>
@@ -285,14 +287,14 @@ export default function SalesReportPage() {
           </div>
 
           {/* KPI Cards */}
-          <div style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:12, marginBottom:24 }}>
+          <div style={{ display:"grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap:12, marginBottom:24 }}>
             {[
               { label:"Total Invoices",  val: uniqueInvoices,            color:"#818cf8", icon:"🧾" },
               { label:"Customers",       val: uniqueCustomers,           color:"#38bdf8", icon:"👥" },
               { label:"Total Qty",       val: fmt(totalQty),             color:"#fbbf24", icon:"📦" },
               { label:"Total Amount",    val: `Rs ${fmt(totalAmount)}`,  color:"#34d399", icon:"💰" },
             ].map(k => (
-              <div key={k.label} style={{ padding:"14px 16px", borderRadius:12, background:"rgba(255,255,255,.03)", border:"1px solid rgba(255,255,255,.07)", display:"flex", alignItems:"center", gap:12 }}>
+              <div key={k.label} style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderRadius:12, background:"rgba(255,255,255,.03)", border:"1px solid rgba(255,255,255,.07)", display:"flex", alignItems:"center", gap:12 }}>
                 <span style={{ fontSize:20 }}>{k.icon}</span>
                 <div>
                   <div style={{ fontSize:10, color:"rgba(255,255,255,.4)", fontWeight:700, textTransform:"uppercase", letterSpacing:".06em" }}>{k.label}</div>

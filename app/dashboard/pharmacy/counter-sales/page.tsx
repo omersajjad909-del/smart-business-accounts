@@ -3,10 +3,12 @@
 import { useMemo, useState } from "react";
 import { useBusinessRecords } from "@/lib/useBusinessRecords";
 import { mapCounterSaleRecords, mapDrugRecords, pharmacyBg, pharmacyBorder, pharmacyFont, pharmacyMuted, todayIso } from "../_shared";
+import { useResponsive } from "@/hooks/useResponsive";
 
 const initialForm = { medicine: "", customer: "Walk-in", quantity: 1, amount: 0, paymentMethod: "cash", saleDate: todayIso() };
 
 export default function PharmacyCounterSalesPage() {
+  const { isMobile } = useResponsive();
   const saleStore = useBusinessRecords("pharmacy_sale");
   const inventoryStore = useBusinessRecords("drug");
   const [showModal, setShowModal] = useState(false);
@@ -54,7 +56,7 @@ export default function PharmacyCounterSalesPage() {
   }
 
   return (
-    <div style={{ minHeight: "100vh", padding: "28px 32px", color: "#fff", fontFamily: pharmacyFont }}>
+    <div style={{ minHeight: "100vh", padding: isMobile ? "15px 14px" : "28px 32px", color: "#fff", fontFamily: pharmacyFont }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24 }}>
         <div>
           <h1 style={{ margin: "0 0 6px", fontSize: 22, fontWeight: 800 }}>Counter Sales</h1>
@@ -63,13 +65,13 @@ export default function PharmacyCounterSalesPage() {
         <button onClick={() => setShowModal(true)} style={{ padding: "10px 18px", borderRadius: 10, border: "none", background: "#60a5fa", color: "#fff", fontWeight: 700, cursor: "pointer" }}>Record Sale</button>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(3,minmax(0,1fr))", gap: 12, marginBottom: 18 }}>
+      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(3,minmax(0,1fr))", gap: 12, marginBottom: 18 }}>
         {[
           { label: "Sales Count", value: sales.length, color: "#60a5fa" },
           { label: "Units Sold", value: sales.reduce((sum, row) => sum + row.quantity, 0), color: "#34d399" },
           { label: "Revenue", value: `Rs. ${sales.reduce((sum, row) => sum + row.amount, 0).toLocaleString()}`, color: "#f59e0b" },
         ].map((card) => (
-          <div key={card.label} style={{ background: pharmacyBg, border: `1px solid ${pharmacyBorder}`, borderRadius: 14, padding: "18px 20px" }}>
+          <div key={card.label} style={{ background: pharmacyBg, border: `1px solid ${pharmacyBorder}`, borderRadius: 14, padding: isMobile ? "12px 10px" : "18px 20px" }}>
             <div style={{ fontSize: 12, color: pharmacyMuted, marginBottom: 8 }}>{card.label}</div>
             <div style={{ fontSize: 22, fontWeight: 800, color: card.color }}>{card.value}</div>
           </div>
@@ -86,13 +88,13 @@ export default function PharmacyCounterSalesPage() {
           <tbody>
             {sales.map((row) => (
               <tr key={row.id}>
-                <td style={{ padding: "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)", fontWeight: 700 }}>{row.medicine}</td>
-                <td style={{ padding: "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)" }}>{row.customer}</td>
-                <td style={{ padding: "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)" }}>{row.quantity}</td>
-                <td style={{ padding: "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)" }}>Rs. {row.amount.toLocaleString()}</td>
-                <td style={{ padding: "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)", textTransform: "capitalize" }}>{row.paymentMethod}</td>
-                <td style={{ padding: "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)" }}>{row.saleDate}</td>
-                <td style={{ padding: "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)" }}>{row.status}</td>
+                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)", fontWeight: 700 }}>{row.medicine}</td>
+                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)" }}>{row.customer}</td>
+                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)" }}>{row.quantity}</td>
+                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)" }}>Rs. {row.amount.toLocaleString()}</td>
+                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)", textTransform: "capitalize" }}>{row.paymentMethod}</td>
+                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)" }}>{row.saleDate}</td>
+                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)" }}>{row.status}</td>
               </tr>
             ))}
             {!saleStore.loading && sales.length === 0 && <tr><td colSpan={7} style={{ padding: 32, textAlign: "center", color: "rgba(255,255,255,.28)" }}>No counter sales recorded yet.</td></tr>}

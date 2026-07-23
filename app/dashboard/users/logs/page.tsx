@@ -4,8 +4,10 @@ import { getCurrentUser } from "@/lib/auth";
 import { Loader2, AlertCircle, History } from "lucide-react"; 
 import { hasPermission } from "@/lib/hasPermission";
 import { PERMISSIONS } from "@/lib/permissions";
+import { useResponsive } from "@/hooks/useResponsive";
 
 export default function ActivityLogsPage() {
+  const { isMobile } = useResponsive();
   const [logs, setLogs] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);

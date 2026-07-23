@@ -2,6 +2,7 @@
 import { useState, useEffect, useRef } from "react";
 import { getCurrentUser } from "@/lib/auth";
 import { useBusinessRecords } from "@/lib/useBusinessRecords";
+import { useResponsive } from "@/hooks/useResponsive";
 type LoyaltySettings = {
   enabled: boolean; pointsPerHundred: number; redeemValue: number;
   minRedeemPoints: number; cardPrefix: string; expiryDays: number;
@@ -21,6 +22,7 @@ type Customer = {
 };
 
 export default function LoyaltyPage() {
+  const { isMobile } = useResponsive();
   const userRef = useRef(getCurrentUser());
   const user = userRef.current;
 
@@ -157,7 +159,7 @@ export default function LoyaltyPage() {
   };
 
   return (
-    <div style={{ padding: "28px 32px", fontFamily: ff, color: "#fff", minHeight: "100vh" }}>
+    <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", fontFamily: ff, color: "#fff", minHeight: "100vh" }}>
       <style>{`
         .lc-row:hover { background: rgba(255,255,255,.03) !important; }
         .lc-btn:hover { opacity: .8; }
@@ -184,14 +186,14 @@ export default function LoyaltyPage() {
       </div>
 
       {/* Stats */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 12, marginBottom: 24 }}>
+      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 12, marginBottom: 24 }}>
         {[
           { label: "Total Customers", value: activeCustomers.length, color: "#818cf8", icon: "👥" },
           { label: "Points in Circulation", value: totalPoints.toLocaleString(), color: "#f59e0b", icon: "⭐" },
           { label: "Total Redeemed", value: `${totalRedeemed.toLocaleString()} pts`, color: "#34d399", icon: "🔄" },
           { label: "Total Customer Spend", value: `Rs. ${totalSpent.toLocaleString()}`, color: "#a5b4fc", icon: "💰" },
         ].map(s => (
-          <div key={s.label} style={{ background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)", borderRadius: 14, padding: "18px 20px" }}>
+          <div key={s.label} style={{ background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)", borderRadius: 14, padding: isMobile ? "12px 10px" : "18px 20px" }}>
             <div style={{ fontSize: 13, color: "rgba(255,255,255,.45)", marginBottom: 6 }}>{s.icon} {s.label}</div>
             <div style={{ fontSize: 22, fontWeight: 800, color: s.color }}>{s.value}</div>
           </div>
@@ -200,12 +202,12 @@ export default function LoyaltyPage() {
 
       {/* Settings Panel */}
       {showConfig && (
-        <div style={{ background: "rgba(99,102,241,.06)", border: "1px solid rgba(99,102,241,.18)", borderRadius: 14, padding: "20px 24px", marginBottom: 24 }}>
+        <div style={{ background: "rgba(99,102,241,.06)", border: "1px solid rgba(99,102,241,.18)", borderRadius: 14, padding: isMobile ? "12px 11px" : "20px 24px", marginBottom: 24 }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 18 }}>
             <div style={{ fontSize: 15, fontWeight: 700, color: "#818cf8" }}>⚙ Loyalty Settings</div>
             {configSaved && <span style={{ fontSize: 12, color: "#34d399", fontWeight: 700 }}>✓ Saved</span>}
           </div>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 16, marginBottom: 18 }}>
+          <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(3,1fr)", gap: 16, marginBottom: 18 }}>
             {[
               { label: "Points per Rs.100", key: "pointsPerHundred", type: "number", hint: "Points earned per Rs.100 spent" },
               { label: "Redeem Value (Rs./pt)", key: "redeemValue", type: "number", hint: "Rs. discount per 1 point redeemed" },
@@ -320,7 +322,7 @@ export default function LoyaltyPage() {
         <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.72)", backdropFilter: "blur(6px)", zIndex: 50, display: "flex", alignItems: "center", justifyContent: "center" }}
           onClick={() => setShowRegister(false)}>
           <div onClick={e => e.stopPropagation()}
-            style={{ background: "#111c30", border: "1px solid rgba(255,255,255,.1)", borderRadius: 18, padding: "28px 32px", width: "min(96vw,440px)", fontFamily: ff }}>
+            style={{ background: "#111c30", border: "1px solid rgba(255,255,255,.1)", borderRadius: 18, padding: isMobile ? "15px 14px" : "28px 32px", width: "min(96vw,440px)", fontFamily: ff }}>
             <div style={{ fontSize: 17, fontWeight: 800, marginBottom: 6 }}>Register New Customer</div>
             <div style={{ fontSize: 12, color: "rgba(255,255,255,.4)", marginBottom: 22 }}>A loyalty card number will be auto-generated.</div>
             {regError && (
@@ -362,7 +364,7 @@ export default function LoyaltyPage() {
           <div onClick={e => e.stopPropagation()}
             style={{ background: "#111c30", border: "1px solid rgba(255,255,255,.1)", borderRadius: 18, width: "min(96vw,580px)", maxHeight: "85vh", overflow: "hidden", display: "flex", flexDirection: "column", fontFamily: ff }}>
             {/* Header */}
-            <div style={{ padding: "18px 22px", borderBottom: "1px solid rgba(255,255,255,.08)", display: "flex", justifyContent: "space-between", alignItems: "center", flexShrink: 0 }}>
+            <div style={{ padding: isMobile ? "12px 10px" : "18px 22px", borderBottom: "1px solid rgba(255,255,255,.08)", display: "flex", justifyContent: "space-between", alignItems: "center", flexShrink: 0 }}>
               <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
                 <div style={{ width: 44, height: 44, borderRadius: "50%", background: "rgba(99,102,241,.2)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, fontWeight: 800, color: "#818cf8" }}>
                   {detailCustomer.name.charAt(0).toUpperCase()}
@@ -376,13 +378,13 @@ export default function LoyaltyPage() {
             </div>
 
             {/* Stats */}
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 0, borderBottom: "1px solid rgba(255,255,255,.07)", flexShrink: 0 }}>
+            <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr 1fr", gap: 0, borderBottom: "1px solid rgba(255,255,255,.07)", flexShrink: 0 }}>
               {[
                 { label: "Points Balance", value: `${detailCustomer.points.toLocaleString()} pts`, color: "#f59e0b" },
                 { label: "Total Spent", value: `Rs. ${detailCustomer.totalSpent.toLocaleString()}`, color: "#a5b4fc" },
                 { label: "Last Purchase", value: dateStr(detailCustomer.lastPurchase), color: "#34d399" },
               ].map((s, i) => (
-                <div key={s.label} style={{ padding: "14px 18px", borderRight: i < 2 ? "1px solid rgba(255,255,255,.06)" : "none" }}>
+                <div key={s.label} style={{ padding: isMobile ? "12px 10px" : "14px 18px", borderRight: i < 2 ? "1px solid rgba(255,255,255,.06)" : "none" }}>
                   <div style={{ fontSize: 10, color: "rgba(255,255,255,.35)", marginBottom: 4, textTransform: "uppercase", letterSpacing: ".07em" }}>{s.label}</div>
                   <div style={{ fontSize: 16, fontWeight: 800, color: s.color }}>{s.value}</div>
                 </div>
@@ -390,7 +392,7 @@ export default function LoyaltyPage() {
             </div>
 
             {/* History */}
-            <div style={{ flex: 1, overflowY: "auto", padding: "14px 20px" }}>
+            <div style={{ flex: 1, overflowY: "auto", padding: isMobile ? "12px 10px" : "14px 20px" }}>
               <div style={{ fontSize: 12, color: "rgba(255,255,255,.4)", marginBottom: 10, fontWeight: 600 }}>Transaction History ({detailCustomer.history.length})</div>
               {detailCustomer.history.length === 0 ? (
                 <div style={{ textAlign: "center", padding: "28px 0", color: "rgba(255,255,255,.25)", fontSize: 13 }}>No transactions yet</div>

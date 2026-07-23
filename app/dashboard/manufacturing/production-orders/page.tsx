@@ -5,6 +5,7 @@ import toast from "react-hot-toast";
 import { useMemo, useState } from "react";
 import { useBusinessRecords } from "@/lib/useBusinessRecords";
 import { mapBomRecord, mapFinishedGoodsRecord, mapProductionOrderRecord, mapWorkOrderRecord } from "../_shared";
+import { useResponsive } from "@/hooks/useResponsive";
 
 const ff = "'Outfit','Inter',sans-serif";
 const bg = "rgba(255,255,255,0.03)";
@@ -12,6 +13,7 @@ const border = "rgba(255,255,255,0.07)";
 const statusColor: Record<string, string> = { planned: "#818cf8", in_progress: "#f59e0b", completed: "#22c55e", cancelled: "#6b7280" };
 
 export default function ProductionOrdersPage() {
+  const { isMobile } = useResponsive();
   const orderStore = useBusinessRecords("production_order");
   const bomStore = useBusinessRecords("bom");
   const goodsStore = useBusinessRecords("finished_good_batch");
@@ -108,7 +110,7 @@ export default function ProductionOrdersPage() {
   }
 
   return (
-    <div style={{ padding: "28px 32px", fontFamily: ff, color: "#fff", minHeight: "100vh" }}>
+    <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", fontFamily: ff, color: "#fff", minHeight: "100vh" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 26 }}>
         <div>
           <h1 style={{ fontSize: 22, fontWeight: 800, margin: "0 0 4px" }}>Production Orders</h1>
@@ -119,14 +121,14 @@ export default function ProductionOrdersPage() {
         </button>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 12, marginBottom: 20 }}>
+      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 12, marginBottom: 20 }}>
         {[
           { label: "Total Orders", value: orders.length, color: "#f97316" },
           { label: "Planned", value: orders.filter((item) => item.status === "planned").length, color: "#818cf8" },
           { label: "In Progress", value: orders.filter((item) => item.status === "in_progress").length, color: "#f59e0b" },
           { label: "Completed To FG", value: orders.filter((item) => item.status === "completed").length, color: "#22c55e" },
         ].map((card) => (
-          <div key={card.label} style={{ background: bg, border: `1px solid ${border}`, borderRadius: 14, padding: "18px 20px" }}>
+          <div key={card.label} style={{ background: bg, border: `1px solid ${border}`, borderRadius: 14, padding: isMobile ? "12px 10px" : "18px 20px" }}>
             <div style={{ fontSize: 12, color: "rgba(255,255,255,.48)", marginBottom: 6 }}>{card.label}</div>
             <div style={{ fontSize: 21, fontWeight: 800, color: card.color }}>{card.value}</div>
           </div>
@@ -141,7 +143,7 @@ export default function ProductionOrdersPage() {
           const linkedWorkOrders = workOrders.filter((item) => item.linkedProductionOrderId === order.orderId);
           const incompleteWorkOrders = linkedWorkOrders.filter((item) => item.status !== "completed").length;
           return (
-            <div key={order.id} style={{ background: bg, border: `1px solid ${border}`, borderRadius: 14, padding: "18px 22px" }}>
+            <div key={order.id} style={{ background: bg, border: `1px solid ${border}`, borderRadius: 14, padding: isMobile ? "12px 10px" : "18px 22px" }}>
               <div style={{ display: "flex", justifyContent: "space-between", gap: 14, alignItems: "flex-start", marginBottom: 12 }}>
                 <div>
                   <div style={{ fontSize: 15, fontWeight: 800 }}>{order.product}</div>

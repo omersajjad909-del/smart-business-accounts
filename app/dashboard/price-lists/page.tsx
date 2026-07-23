@@ -3,6 +3,7 @@ import { confirmToast } from "@/lib/toast-feedback";
 import toast from "react-hot-toast";
 import { useState, useEffect, useMemo } from "react";
 import { getCurrentUser } from "@/lib/auth";
+import { useResponsive } from "@/hooks/useResponsive";
 
 // ── Design tokens ─────────────────────────────────────────────────────────────
 const FONT   = "'Outfit','Inter',sans-serif";
@@ -85,6 +86,7 @@ async function apiDelete(id: string, headers: Record<string, string>) {
 
 // ═══════════════════════════════════════════════════════════════════════════════
 export default function PriceListsPage() {
+  const { isMobile } = useResponsive();
   const user = getCurrentUser();
   const headers = useMemo<Record<string, string>>(() => ({
     "x-user-role":  user?.role || "ADMIN",
@@ -316,14 +318,14 @@ export default function PriceListsPage() {
       </div>
 
       {/* KPIs */}
-      <div style={{ display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:12, marginBottom:28 }}>
+      <div style={{ display:"grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(3,1fr)", gap:12, marginBottom:28 }}>
         {[
           { label:"Total Lists",   value:totalLists,  color:ACCENT },
           { label:"Active",        value:activeLists, color:"#34d399" },
           { label:"Items Covered", value:itemsCovered,color:"#60a5fa" },
         ].map(k => (
           <div key={k.label} style={{ background:PANEL, border:`1px solid ${BORDER}`,
-            borderRadius:12, padding:"18px 22px" }}>
+            borderRadius:12, padding: isMobile ? "12px 10px" : "18px 22px" }}>
             <div style={{ fontSize:12, color:MUTED, marginBottom:6 }}>{k.label}</div>
             <div style={{ fontSize:24, fontWeight:800, color:k.color }}>{k.value}</div>
           </div>
@@ -476,7 +478,7 @@ export default function PriceListsPage() {
             {/* Add item row */}
             {availableItems.length > 0 ? (
               <div style={{ display:"grid", gridTemplateColumns:"1fr auto auto", gap:10,
-                padding:"14px 16px", background:"rgba(99,102,241,0.06)",
+                padding: isMobile ? "12px 10px" : "14px 16px", background:"rgba(99,102,241,0.06)",
                 border:`1px solid rgba(99,102,241,0.2)`, borderRadius:10, marginBottom:20 }}>
                 <select style={INPUT} value={addItemId} onChange={e => {
                   setAddItemId(e.target.value);

@@ -3,6 +3,7 @@
 import toast from "react-hot-toast";
 import { useState } from 'react';
 import { useBusinessRecords } from '@/lib/useBusinessRecords';
+import { useResponsive } from "@/hooks/useResponsive";
 
 const S = {
   page: { padding: '32px', fontFamily: 'Inter, sans-serif', color: '#fff', minHeight: '100vh' },
@@ -10,8 +11,8 @@ const S = {
   title: { fontSize: 24, fontWeight: 700, margin: 0 },
   sub: { fontSize: 14, color: 'rgba(255,255,255,.5)', marginTop: 4 },
   btn: { background: '#16a34a', color: '#fff', border: 'none', borderRadius: 8, padding: '10px 20px', fontWeight: 600, cursor: 'pointer', fontSize: 14 },
-  stats: { display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 16, marginBottom: 28 },
-  stat: { background: 'rgba(255,255,255,.03)', border: '1px solid rgba(255,255,255,.07)', borderRadius: 12, padding: '20px 24px' },
+  stats: { display: 'grid', gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 16, marginBottom: 28 },
+  stat: { background: 'rgba(255,255,255,.03)', border: '1px solid rgba(255,255,255,.07)', borderRadius: 12, padding: isMobile ? "12px 11px" : "20px 24px" },
   statLabel: { fontSize: 13, color: 'rgba(255,255,255,.5)', marginBottom: 6 },
   statVal: { fontSize: 28, fontWeight: 700 },
   grid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(280px,1fr))', gap: 20 },
@@ -39,6 +40,7 @@ const COLORS = ['#16a34a', '#0369a1', '#db2777', '#7c3aed', '#c2410c'];
 const SPECS = ['Weight Training', 'Yoga', 'Cardio', 'Boxing', 'CrossFit', 'Pilates', 'Swimming'];
 
 export default function TrainersPage() {
+  const { isMobile } = useResponsive();
   const { records, loading, create } = useBusinessRecords('trainer');
   const [showModal, setShowModal] = useState(false);
   const [form, setForm] = useState({ name: '', specialization: 'Weight Training', salary: '', status: 'Active' });

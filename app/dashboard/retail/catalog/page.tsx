@@ -4,6 +4,7 @@ import { useBusinessRecords } from "@/lib/useBusinessRecords";
 import { getCurrentUser } from "@/lib/auth";
 import Link from "next/link";
 import ImageUpload from "@/components/ImageUpload";
+import { useResponsive } from "@/hooks/useResponsive";
 
 // ── Pure Code128B barcode generator (no external library) ──────────────────
 const C128B: string[] = [
@@ -64,6 +65,7 @@ const UNITS = ["Pcs", "Kg", "Gram", "Ltr", "ML", "Meter", "Foot", "Box", "Pack",
 const emptyForm = { name: "", category: "", sku: "", unit: "Pcs", price: 0, costPrice: 0, stock: 0, description: "", imageUrl: "" };
 
 export default function ProductCatalogPage() {
+  const { isMobile } = useResponsive();
   const user = getCurrentUser();
   const authHeaders: HeadersInit = {
     "Content-Type": "application/json",
@@ -323,7 +325,7 @@ export default function ProductCatalogPage() {
   };
 
   return (
-    <div style={{ padding: "28px 32px", fontFamily: ff, color: "#fff", minHeight: "100vh" }}>
+    <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", fontFamily: ff, color: "#fff", minHeight: "100vh" }}>
       <style>{`
         @media print {
           body * { visibility: hidden !important; }
@@ -378,13 +380,13 @@ export default function ProductCatalogPage() {
       </div>
 
       {/* Stats */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 12, marginBottom: 28 }}>
+      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(3,1fr)", gap: 12, marginBottom: 28 }}>
         {[
           { label: "Total Products", val: totalProducts, color: "#f97316" },
           { label: "Active", val: activeProducts, color: "#34d399" },
           { label: "Avg Margin", val: `${avgMargin}%`, color: "#818cf8" },
         ].map(s => (
-          <div key={s.label} style={{ background: bg, border: `1px solid ${border}`, borderRadius: 12, padding: "20px 24px" }}>
+          <div key={s.label} style={{ background: bg, border: `1px solid ${border}`, borderRadius: 12, padding: isMobile ? "12px 11px" : "20px 24px" }}>
             <div style={{ fontSize: 13, color: "rgba(255,255,255,.5)", marginBottom: 6 }}>{s.label}</div>
             <div style={{ fontSize: 22, fontWeight: 700, color: s.color }}>{s.val}</div>
           </div>
@@ -706,7 +708,7 @@ export default function ProductCatalogPage() {
               <h2 style={{ fontSize: 17, fontWeight: 800, margin: 0 }}>🖨 Print Barcode Labels</h2>
               <button onClick={() => setShowCatPrint(false)} style={{ background: "none", border: "none", color: "rgba(255,255,255,.5)", fontSize: 22, cursor: "pointer" }}>✕</button>
             </div>
-            <div style={{ background: "white", borderRadius: 10, padding: "16px 20px", textAlign: "center", marginBottom: 20 }}>
+            <div style={{ background: "white", borderRadius: 10, padding: isMobile ? "12px 10px" : "16px 20px", textAlign: "center", marginBottom: 20 }}>
               <div style={{ fontSize: 12, fontWeight: 700, color: "#000", marginBottom: 8 }}>{catPrintItem.name}</div>
               <CatalogBarcode value={catPrintItem.sku} height={56} moduleWidth={2} />
               {catPrintItem.price > 0 && <div style={{ fontSize: 13, fontWeight: 800, color: "#000", marginTop: 6 }}>Rs. {catPrintItem.price.toLocaleString()}</div>}

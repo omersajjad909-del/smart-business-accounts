@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { getCurrentUser } from "@/lib/auth";
 import { toast } from "react-hot-toast";
 import { DateInput } from "@/app/dashboard/reports/_components/DateInput";
+import { useResponsive } from "@/hooks/useResponsive";
 
 const ff   = "'Outfit','Inter',sans-serif";
 const BLUE = "#6366f1";
@@ -112,6 +113,7 @@ function printVoucher(entries: EntryRow[], voucherNo: string, date: string, mode
 }
 
 export default function CPVPage() {
+  const { isMobile } = useResponsive();
   const user  = getCurrentUser();
   const today = new Date().toISOString().slice(0, 10);
 
@@ -270,13 +272,13 @@ export default function CPVPage() {
   const clickInp: React.CSSProperties = { ...inp, cursor:"pointer", caretColor:"transparent" };
 
   return (
-    <div style={{ padding:"24px 28px", fontFamily:ff, color:"rgba(255,255,255,.85)", maxWidth:1200 }}>
+    <div style={{ padding: isMobile ? "13px 13px" : "24px 28px", fontFamily:ff, color:"rgba(255,255,255,.85)", maxWidth:1200 }}>
 
       {/* ── CHART OF ACCOUNT MODAL ── */}
       {pickerOpen && (
         <div style={{ position:"fixed", inset:0, background:"rgba(0,0,0,.78)", zIndex:2000, display:"flex", alignItems:"center", justifyContent:"center" }} onClick={closePicker}>
           <div style={{ background:"#0c0e1a", border:"1px solid rgba(255,255,255,.15)", borderRadius:14, width:640, maxHeight:580, display:"flex", flexDirection:"column", boxShadow:"0 24px 80px rgba(0,0,0,.9)" }} onClick={e => e.stopPropagation()}>
-            <div style={{ padding:"14px 20px", borderBottom:"1px solid rgba(255,255,255,.1)", display:"flex", justifyContent:"space-between", alignItems:"center" }}>
+            <div style={{ padding: isMobile ? "12px 10px" : "14px 20px", borderBottom:"1px solid rgba(255,255,255,.1)", display:"flex", justifyContent:"space-between", alignItems:"center" }}>
               <span style={{ fontWeight:800, fontSize:15, color:"rgba(255,255,255,.9)", letterSpacing:".05em" }}>CHART OF ACCOUNT</span>
               <span style={{ fontSize:11, color:"rgba(255,255,255,.35)" }}>Choices in list: {filteredPickerAccts.length}</span>
             </div>
@@ -372,7 +374,7 @@ export default function CPVPage() {
           <div style={{ marginBottom:16, fontSize:12, color:"rgba(250,204,21,.7)" }}>
             Enter criteria below — leave blank to get all records. Use <b style={{color:"#facc15"}}>&gt;</b>, <b style={{color:"#facc15"}}>&lt;</b>, <b style={{color:"#facc15"}}>&gt;=</b> for date range.
           </div>
-          <div style={{ display:"grid", gridTemplateColumns:"180px 240px 1fr", gap:16, marginBottom:24 }}>
+          <div style={{ display:"grid", gridTemplateColumns: isMobile ? "1fr" : "180px 240px 1fr", gap:16, marginBottom:24 }}>
             <div>
               <label style={{ ...lbl, color:"rgba(250,204,21,.6)" }}>CPV # (e.g. CPV-5)</label>
               <input autoFocus value={queryCpvNo} onChange={e => setQueryCpvNo(e.target.value)} placeholder="CPV-1 or blank for all…"
@@ -408,7 +410,7 @@ export default function CPVPage() {
 
       {/* ── FORM ── */}
       <div style={{ background:"rgba(255,255,255,.03)", border:"1px solid rgba(255,255,255,.08)", borderRadius:16, padding:24, marginBottom:24, display: queryMode ? "none" : undefined }}>
-        <div style={{ display:"grid", gridTemplateColumns:"160px 160px 1fr 2fr", gap:14, marginBottom:20 }}>
+        <div style={{ display:"grid", gridTemplateColumns: isMobile ? "1fr 1fr" : "160px 160px 1fr 2fr", gap:14, marginBottom:20 }}>
           <div><label style={lbl}>Date</label><DateInput value={date} onChange={setDate} style={inp} /></div>
           <div>
             <label style={lbl}>Mode</label>

@@ -4,6 +4,7 @@ import { confirmToast, alertToast } from "@/lib/toast-feedback";
 import toast from "react-hot-toast";
 import { useState } from "react";
 import { useBusinessRecords } from "@/lib/useBusinessRecords";
+import { useResponsive } from "@/hooks/useResponsive";
 
 const ff = "'Outfit','Inter',sans-serif";
 const bg = "rgba(255,255,255,0.03)";
@@ -16,6 +17,7 @@ const statusLabel: Record<string, string> = { admitted: "Admitted", discharged: 
 const EMPTY_FORM = { mrNo: "", name: "", age: 0, gender: "Male", bloodGroup: "B+", phone: "", address: "", diagnosis: "", doctor: "", admitDate: "", status: "opd", insurance: false };
 
 export default function PatientsPage() {
+  const { isMobile } = useResponsive();
   const { records, loading, create, update, remove } = useBusinessRecords("patient");
   const appointmentStore = useBusinessRecords("appointment");
   const prescriptionStore = useBusinessRecords("prescription");
@@ -86,7 +88,7 @@ export default function PatientsPage() {
   }
 
   return (
-    <div style={{ minHeight: "100vh", background: "#0f1117", color: "#fff", fontFamily: ff, padding: "28px 32px" }}>
+    <div style={{ minHeight: "100vh", background: "#0f1117", color: "#fff", fontFamily: ff, padding: isMobile ? "15px 14px" : "28px 32px" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24 }}>
         <div>
           <h1 style={{ margin: 0, fontSize: 26, fontWeight: 700 }}>Patient Records</h1>
@@ -128,14 +130,14 @@ export default function PatientsPage() {
 
       {loading && <div style={{ textAlign: "center", padding: 40, color: "rgba(255,255,255,0.4)" }}>Loading...</div>}
 
-      <div style={{ display: "grid", gridTemplateColumns: selectedPatient ? "1fr 380px" : "1fr", gap: 20 }}>
+      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : selectedPatient ? "1fr 380px" : "1fr", gap: 20 }}>
         {/* List */}
         <div style={{ ...card, padding: 0, overflow: "hidden" }}>
           <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 14 }}>
             <thead>
               <tr style={{ borderBottom: `1px solid ${border}` }}>
                 {["MR No", "Patient", "Age/Gender", "Blood", "Doctor", "Admit Date", "Status", "Ins."].map(h => (
-                  <th key={h} style={{ padding: "14px 16px", textAlign: "left", color: "rgba(255,255,255,0.45)", fontWeight: 500, fontSize: 12 }}>{h}</th>
+                  <th key={h} style={{ padding: isMobile ? "12px 10px" : "14px 16px", textAlign: "left", color: "rgba(255,255,255,0.45)", fontWeight: 500, fontSize: 12 }}>{h}</th>
                 ))}
               </tr>
             </thead>

@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import {
+import { useResponsive } from "@/hooks/useResponsive";
   GymControlCenter,
   fetchJson,
   gymBg,
@@ -35,7 +36,7 @@ const emptyState: GymControlCenter = {
 
 function StatCard({ label, value, tone }: { label: string; value: string | number; tone: string }) {
   return (
-    <div style={{ background: gymBg, border: `1px solid ${gymBorder}`, borderRadius: 18, padding: "20px 22px" }}>
+    <div style={{ background: gymBg, border: `1px solid ${gymBorder}`, borderRadius: 18, padding: isMobile ? "12px 10px" : "20px 22px" }}>
       <div style={{ fontSize: 12, color: gymMuted, marginBottom: 8, textTransform: "uppercase", letterSpacing: ".06em" }}>{label}</div>
       <div style={{ fontSize: 28, fontWeight: 800, color: tone }}>{value}</div>
     </div>
@@ -43,6 +44,7 @@ function StatCard({ label, value, tone }: { label: string; value: string | numbe
 }
 
 export default function GymOverviewPage() {
+  const { isMobile } = useResponsive();
   const [data, setData] = useState(emptyState);
 
   useEffect(() => {
@@ -53,7 +55,7 @@ export default function GymOverviewPage() {
   const topClasses = [...classes].sort((a, b) => b.enrolled - a.enrolled).slice(0, 4);
 
   return (
-    <div style={{ padding: "28px 32px", minHeight: "100vh", color: "#fff", fontFamily: gymFont }}>
+    <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", minHeight: "100vh", color: "#fff", fontFamily: gymFont }}>
       <div style={{ marginBottom: 26 }}>
         <div style={{ fontSize: 12, color: "#86efac", fontWeight: 700, letterSpacing: ".08em", textTransform: "uppercase", marginBottom: 10 }}>Gym / Fitness</div>
         <h1 style={{ fontSize: 30, fontWeight: 900, margin: "0 0 10px" }}>Owner Fitness Desk</h1>
@@ -73,7 +75,7 @@ export default function GymOverviewPage() {
       <div style={{ display: "grid", gridTemplateColumns: "1.15fr .85fr", gap: 18, marginBottom: 18 }}>
         <div style={{ background: "linear-gradient(135deg, rgba(34,197,94,.12), rgba(59,130,246,.1))", border: `1px solid ${gymBorder}`, borderRadius: 20, padding: 24 }}>
           <div style={{ fontSize: 13, color: "#bbf7d0", fontWeight: 800, marginBottom: 10, textTransform: "uppercase", letterSpacing: ".07em" }}>Business Flow</div>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(4, minmax(0,1fr))", gap: 12 }}>
+          <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,minmax(0,1fr))", gap: 12 }}>
             {[
               { title: "Sell Membership", body: "Choose a plan, onboard the member, and track payment status." },
               { title: "Assign Trainers", body: "Manage staff based on specialization and active client load." },
@@ -99,7 +101,7 @@ export default function GymOverviewPage() {
               { href: "/dashboard/gym/analytics", label: "See Gym Analytics", hint: "Revenue, utilization, and risk reading" },
               { href: "/dashboard/payment-receipts", label: "Payment Follow-up", hint: "Member receipts and collections" },
             ].map((item) => (
-              <Link prefetch={false} key={item.href} href={item.href} style={{ textDecoration: "none", color: "#fff", background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)", borderRadius: 14, padding: "14px 16px" }}>
+              <Link prefetch={false} key={item.href} href={item.href} style={{ textDecoration: "none", color: "#fff", background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)", borderRadius: 14, padding: isMobile ? "12px 10px" : "14px 16px" }}>
                 <div style={{ fontSize: 14, fontWeight: 800, marginBottom: 4 }}>{item.label}</div>
                 <div style={{ fontSize: 12, color: gymMuted }}>{item.hint}</div>
               </Link>
@@ -138,7 +140,7 @@ export default function GymOverviewPage() {
               { label: "Trainer load", value: `${trainers.reduce((sum, trainer) => sum + trainer.activeClients, 0)} active clients handled`, tone: "#34d399" },
               { label: "Off-duty staff", value: `${trainers.filter((trainer) => trainer.status === "Off Duty").length} trainers unavailable`, tone: "#f97316" },
             ].map((row) => (
-              <div key={row.label} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "rgba(255,255,255,.025)", border: "1px solid rgba(255,255,255,.06)", borderRadius: 14, padding: "14px 16px" }}>
+              <div key={row.label} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "rgba(255,255,255,.025)", border: "1px solid rgba(255,255,255,.06)", borderRadius: 14, padding: isMobile ? "12px 10px" : "14px 16px" }}>
                 <span style={{ fontSize: 13, color: gymMuted }}>{row.label}</span>
                 <span style={{ fontSize: 14, fontWeight: 800, color: row.tone }}>{row.value}</span>
               </div>

@@ -5,6 +5,7 @@ import toast from "react-hot-toast";
 import { useMemo, useState } from "react";
 import { useBusinessRecords } from "@/lib/useBusinessRecords";
 import { mapSaaSPlans, saasBg, saasBorder, saasFont, saasMuted, saasStatusColor } from "../_shared";
+import { useResponsive } from "@/hooks/useResponsive";
 
 type BoxRecord = {
   id: string;
@@ -20,7 +21,7 @@ const inputStyle: React.CSSProperties = {
   border: "1px solid rgba(255,255,255,.1)",
   borderRadius: 10,
   color: "#fff",
-  padding: "12px 14px",
+  padding: isMobile ? "8px 8px" : "12px 14px",
   fontSize: 14,
 };
 
@@ -29,7 +30,7 @@ const primaryButton: React.CSSProperties = {
   color: "#fff",
   border: "none",
   borderRadius: 10,
-  padding: "12px 16px",
+  padding: isMobile ? "8px 8px" : "12px 16px",
   fontWeight: 800,
   cursor: "pointer",
 };
@@ -39,12 +40,13 @@ const smallButton: React.CSSProperties = {
   color: "#bfdbfe",
   border: "1px solid rgba(96,165,250,.25)",
   borderRadius: 10,
-  padding: "8px 10px",
+  padding: isMobile ? "8px 8px" : "8px 10px",
   fontWeight: 700,
   cursor: "pointer",
 };
 
 export default function SubscriptionBoxCatalogPage() {
+  const { isMobile } = useResponsive();
   const planStore = useBusinessRecords("subscription_plan");
   const { records, loading, create, update } = useBusinessRecords("subscription_box_catalog");
   const plans = useMemo(() => mapSaaSPlans(planStore.records).filter((plan) => plan.status === "active"), [planStore.records]);
@@ -78,7 +80,7 @@ export default function SubscriptionBoxCatalogPage() {
   };
 
   return (
-    <div style={{ padding: "28px 32px", color: "#fff", minHeight: "100vh", fontFamily: saasFont }}>
+    <div style={{ padding: isMobile ? "17px 16px" : "28px 32px", color: "#fff", minHeight: "100vh", fontFamily: saasFont }}>
       <div style={{ marginBottom: 24 }}>
         <h1 style={{ margin: "0 0 6px", fontSize: 28, fontWeight: 900 }}>Box Catalog</h1>
         <p style={{ margin: 0, color: saasMuted, fontSize: 14 }}>Har subscription cycle ke liye curated box bundles aur plan-wise catalog yahan manage karein.</p>
@@ -101,7 +103,7 @@ export default function SubscriptionBoxCatalogPage() {
         </div>
 
         <div style={{ background: saasBg, border: `1px solid ${saasBorder}`, borderRadius: 18, overflow: "hidden" }}>
-          <div style={{ padding: "16px 18px", borderBottom: `1px solid ${saasBorder}`, fontSize: 16, fontWeight: 800 }}>Curated Boxes</div>
+          <div style={{ padding: isMobile ? "10px 9px" : "16px 18px", borderBottom: `1px solid ${saasBorder}`, fontSize: 16, fontWeight: 800 }}>Curated Boxes</div>
           <div style={{ display: "grid", gap: 12, padding: 18 }}>
             {!loading && boxes.length === 0 && <div style={{ color: "rgba(255,255,255,.28)" }}>No box bundles yet.</div>}
             {boxes.map((box) => {
@@ -114,7 +116,7 @@ export default function SubscriptionBoxCatalogPage() {
                       <div style={{ fontSize: 12, color: saasMuted, marginTop: 6 }}>{String(box.data?.planName || "-")} | ${(Number(box.amount || 0)).toLocaleString()}</div>
                       <div style={{ fontSize: 12, color: "#93c5fd", marginTop: 8 }}>{items.join(" • ") || "No items listed"}</div>
                     </div>
-                    <span style={{ padding: "4px 10px", borderRadius: 999, background: `${saasStatusColor(box.status)}20`, color: saasStatusColor(box.status), fontSize: 12, fontWeight: 700 }}>{box.status}</span>
+                    <span style={{ padding: isMobile ? "8px 8px" : "4px 10px", borderRadius: 999, background: `${saasStatusColor(box.status)}20`, color: saasStatusColor(box.status), fontSize: 12, fontWeight: 700 }}>{box.status}</span>
                   </div>
                   <div style={{ display: "flex", gap: 8, marginTop: 14 }}>
                     {box.status === "active" && <button style={smallButton} onClick={() => update(box.id, { status: "archived" })}>Archive</button>}

@@ -3,6 +3,7 @@ import { confirmToast, alertToast } from "@/lib/toast-feedback";
 
 import { useState } from "react";
 import { getCurrentUser } from "@/lib/auth";
+import { useResponsive } from "@/hooks/useResponsive";
 
 const FONT = "'Outfit','Inter',sans-serif";
 const DANGER = "#ef4444";
@@ -17,6 +18,7 @@ function fmt(val: number) {
 }
 
 export default function YearEndClosingPage() {
+  const { isMobile } = useResponsive();
   const today = new Date().toISOString().slice(0, 10);
   const [date, setDate] = useState(today);
   const [loading, setLoading] = useState(false);
@@ -59,7 +61,7 @@ export default function YearEndClosingPage() {
         minHeight: "100vh",
         background: "var(--app-bg)",
         fontFamily: FONT,
-        padding: "28px 24px",
+        padding: isMobile ? "15px 11px" : "28px 24px",
         color: "var(--text-primary)",
         maxWidth: 760,
       }}
@@ -77,7 +79,7 @@ export default function YearEndClosingPage() {
       {/* Warning banner */}
       <div
         style={{
-          padding: "16px 20px",
+          padding: isMobile ? "12px 10px" : "16px 20px",
           borderRadius: 10,
           border: `1px solid ${DANGER}`,
           background: DANGER_LIGHT,

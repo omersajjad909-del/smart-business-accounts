@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { getCurrentUser } from "@/lib/auth";
 import { toast } from "react-hot-toast";
 import { DateInput } from "@/app/dashboard/reports/_components/DateInput";
+import { useResponsive } from "@/hooks/useResponsive";
 
 const ff     = "'Outfit','Inter',sans-serif";
 const PURPLE = "#a78bfa";
@@ -69,6 +70,7 @@ const BLANK_ENTRIES: Entry[] = [
 ];
 
 export default function JVPage() {
+  const { isMobile } = useResponsive();
   const today = new Date().toISOString().slice(0, 10);
   const user  = getCurrentUser();
 
@@ -236,7 +238,7 @@ export default function JVPage() {
         @media screen { .print-area { display:none; } }
       `}</style>
 
-      <div style={{ padding: "24px 28px", fontFamily: ff, color: "var(--text-primary)", maxWidth: 1000 }}>
+      <div style={{ padding: isMobile ? "13px 13px" : "24px 28px", fontFamily: ff, color: "var(--text-primary)", maxWidth: 1000 }}>
 
         {/* Title */}
         <div style={{ marginBottom: 20, display: "flex", alignItems: "flex-start", justifyContent: "space-between", flexWrap: "wrap", gap: 12 }}>
@@ -297,7 +299,7 @@ export default function JVPage() {
             <div style={{ marginBottom: 20 }}>
               <span style={{ fontSize: 12, color: "rgba(250,204,21,.7)" }}>Enter criteria — leave blank to get all records. Use <b style={{ color: "#facc15" }}>&gt;</b>, <b style={{ color: "#facc15" }}>&lt;</b>, <b style={{ color: "#facc15" }}>&gt;=</b> for date range.</span>
             </div>
-            <div style={{ display: "grid", gridTemplateColumns: "180px 240px 1fr", gap: 16, marginBottom: 24 }}>
+            <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "180px 240px 1fr", gap: 16, marginBottom: 24 }}>
               <div>
                 <label style={{ ...lbl, color: "rgba(250,204,21,.6)" }}>JV # (e.g. JV-5)</label>
                 <input autoFocus value={queryJvNo} onChange={e => setQueryJvNo(e.target.value)} placeholder="JV-1 or blank for all…"

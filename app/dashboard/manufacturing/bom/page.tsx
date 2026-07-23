@@ -3,12 +3,14 @@
 import { useMemo, useState } from "react";
 import { useBusinessRecords } from "@/lib/useBusinessRecords";
 import { mapBomRecord, mapProductionOrderRecord, mapRawMaterialRecord } from "../_shared";
+import { useResponsive } from "@/hooks/useResponsive";
 
 const ff = "'Outfit','Inter',sans-serif";
 const bg = "rgba(255,255,255,0.03)";
 const border = "rgba(255,255,255,0.07)";
 
 export default function BOMPage() {
+  const { isMobile } = useResponsive();
   const bomStore = useBusinessRecords("bom");
   const rawMaterialStore = useBusinessRecords("raw_material");
   const productionStore = useBusinessRecords("production_order");
@@ -55,7 +57,7 @@ export default function BOMPage() {
   }
 
   return (
-    <div style={{ padding: "28px 32px", fontFamily: ff, color: "#fff", minHeight: "100vh" }}>
+    <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", fontFamily: ff, color: "#fff", minHeight: "100vh" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 26 }}>
         <div>
           <h1 style={{ fontSize: 22, fontWeight: 800, margin: "0 0 4px" }}>Bill of Materials</h1>
@@ -66,14 +68,14 @@ export default function BOMPage() {
         </button>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 12, marginBottom: 20 }}>
+      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 12, marginBottom: 20 }}>
         {[
           { label: "Total BOMs", value: boms.length, color: "#f97316" },
           { label: "Products In Production", value: new Set(orders.map((item) => item.product)).size, color: "#38bdf8" },
           { label: "Raw Materials Available", value: materials.length, color: "#22c55e" },
           { label: "Average Recipe Cost", value: `Rs. ${boms.length ? Math.round(boms.reduce((sum, item) => sum + item.unitCost, 0) / boms.length).toLocaleString() : 0}`, color: "#f59e0b" },
         ].map((card) => (
-          <div key={card.label} style={{ background: bg, border: `1px solid ${border}`, borderRadius: 14, padding: "18px 20px" }}>
+          <div key={card.label} style={{ background: bg, border: `1px solid ${border}`, borderRadius: 14, padding: isMobile ? "12px 10px" : "18px 20px" }}>
             <div style={{ fontSize: 12, color: "rgba(255,255,255,.48)", marginBottom: 6 }}>{card.label}</div>
             <div style={{ fontSize: 21, fontWeight: 800, color: card.color }}>{card.value}</div>
           </div>
@@ -85,7 +87,7 @@ export default function BOMPage() {
           {boms.map((bom) => {
             const linkedOrders = orders.filter((order) => order.product === bom.product).length;
             return (
-              <div key={bom.id} style={{ background: bg, border: `1px solid ${border}`, borderRadius: 14, padding: "20px 22px" }}>
+              <div key={bom.id} style={{ background: bg, border: `1px solid ${border}`, borderRadius: 14, padding: isMobile ? "12px 10px" : "20px 22px" }}>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 16, marginBottom: 12 }}>
                   <div>
                     <div style={{ fontSize: 16, fontWeight: 800 }}>{bom.product}</div>

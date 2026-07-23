@@ -3,6 +3,7 @@ import { confirmToast } from "@/lib/toast-feedback";
 import toast from "react-hot-toast";
 import { useEffect, useState } from "react";
 import { getCurrentUser } from "@/lib/auth";
+import { useResponsive } from "@/hooks/useResponsive";
 
 // ─── Design tokens ────────────────────────────────────────────────────────────
 const ff     = "'Outfit','Inter',sans-serif";
@@ -19,6 +20,7 @@ interface Payroll {
 function fmt(n: number) { return n.toLocaleString("en-PK"); }
 
 export default function PayrollPage() {
+  const { isMobile } = useResponsive();
   const user = getCurrentUser();
 
   const [payroll,       setPayroll]       = useState<Payroll[]>([]);
@@ -227,7 +229,7 @@ export default function PayrollPage() {
   const lbl:   React.CSSProperties = { fontSize: 11, color: "var(--text-muted)", fontWeight: 700, marginBottom: 5, display: "block", textTransform: "uppercase", letterSpacing: 0.5 };
 
   return (
-    <div style={{ padding: "24px 28px", fontFamily: ff, color: "var(--text-primary)", maxWidth: 1200 }}>
+    <div style={{ padding: isMobile ? "13px 13px" : "24px 28px", fontFamily: ff, color: "var(--text-primary)", maxWidth: 1200 }}>
 
       {/* Header */}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24 }}>
@@ -254,7 +256,7 @@ export default function PayrollPage() {
         <div style={{ fontSize: 15, fontWeight: 700, color: accent, marginBottom: 18 }}>
           {editingId ? "Edit Payroll Record" : "New Payroll Entry"}
         </div>
-        <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr 1fr auto", gap: 14, marginBottom: 14, alignItems: "end" }}>
+        <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr 1fr" : "2fr 1fr 1fr 1fr auto", gap: 14, marginBottom: 14, alignItems: "end" }}>
           <div>
             <label style={lbl}>Employee *</label>
             <select style={inp} required value={form.employeeId}
@@ -285,7 +287,7 @@ export default function PayrollPage() {
             {loading ? "Saving…" : editingId ? "Update" : "Save"}
           </button>
         </div>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 14 }}>
+        <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr 1fr", gap: 14 }}>
           <div>
             <label style={lbl}>Deductions {detectedAdv > 0 && <span style={{ color: "#f87171", marginLeft: 4 }}>(Auto: {fmt(detectedAdv)})</span>}</label>
             <input type="number" style={{ ...inp, borderColor: form.deductions > 0 ? "rgba(248,113,113,0.4)" : undefined }} placeholder="0"
@@ -307,7 +309,7 @@ export default function PayrollPage() {
         {/* ── Attendance-driven breakdown card ── */}
         {attSummary && form.employeeId && form.baseSalary > 0 && (
           <div style={{
-            marginTop: 18, padding: "16px 18px", borderRadius: 12,
+            marginTop: 18, padding: isMobile ? "12px 10px" : "16px 18px", borderRadius: 12,
             background: "rgba(34,197,94,.06)", border: "1px solid rgba(34,197,94,.22)",
             fontSize: 12.5, color: "var(--text-primary)",
           }}>
@@ -466,7 +468,7 @@ export default function PayrollPage() {
         const totalEmployees = payroll.length;
 
         return (
-        <div style={{ position: "fixed", inset: 0, background: "rgba(9, 12, 30, 0.85)", backdropFilter: "blur(6px)", zIndex: 50, display: "flex", flexDirection: "column", alignItems: "center", overflowY: "auto", padding: "24px 16px" }}>
+        <div style={{ position: "fixed", inset: 0, background: "rgba(9, 12, 30, 0.85)", backdropFilter: "blur(6px)", zIndex: 50, display: "flex", flexDirection: "column", alignItems: "center", overflowY: "auto", padding: isMobile ? "13px 10px" : "24px 16px" }}>
           {/* Toolbar */}
           <div style={{ display: "flex", width: "100%", maxWidth: 900, justifyContent: "space-between", marginBottom: 18, alignItems: "center" }}>
             <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
@@ -524,14 +526,14 @@ export default function PayrollPage() {
             </div>
 
             {/* Summary strip */}
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", background: "#f8fafc", borderBottom: "1px solid #e2e8f0" }}>
+            <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", background: "#f8fafc", borderBottom: "1px solid #e2e8f0" }}>
               {[
                 { label: "Total Basic",     val: fmt(totalBasic),          color: "#0f172a" },
                 { label: "Total Deductions",val: `-${fmt(totalDed)}`,      color: "#dc2626" },
                 { label: "Net Payable",     val: fmt(netPay),              color: "#16a34a" },
                 { label: "Paid / Pending",  val: `${paidCount}/${totalEmployees}`, color: "#0f172a", small: true },
               ].map((s, i) => (
-                <div key={s.label} style={{ padding: "20px 24px", borderRight: i < 3 ? "1px solid #e2e8f0" : "none" }}>
+                <div key={s.label} style={{ padding: isMobile ? "12px 11px" : "20px 24px", borderRight: i < 3 ? "1px solid #e2e8f0" : "none" }}>
                   <div style={{ fontSize: 9, fontWeight: 700, color: "#94a3b8", letterSpacing: ".1em", textTransform: "uppercase", marginBottom: 6 }}>{s.label}</div>
                   <div style={{ fontSize: s.small ? 16 : 20, fontWeight: 800, color: s.color, letterSpacing: "-0.01em" }}>{s.val}</div>
                 </div>
@@ -539,7 +541,7 @@ export default function PayrollPage() {
             </div>
 
             {/* Table */}
-            <div style={{ padding: "24px 40px" }}>
+            <div style={{ padding: isMobile ? "13px 18px" : "24px 40px" }}>
               <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 12 }}>
                 <thead>
                   <tr>
@@ -606,7 +608,7 @@ export default function PayrollPage() {
 
             {/* Signature blocks */}
             <div style={{ padding: "0 40px 24px", marginTop: 40 }}>
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 40 }}>
+              <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr 1fr", gap: 40 }}>
                 {["Prepared By", "Verified By", "Approved By"].map((label) => (
                   <div key={label} style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
                     <div style={{ height: 60 }} />
@@ -621,7 +623,7 @@ export default function PayrollPage() {
             {/* Footer */}
             <div style={{
               borderTop: "1px solid #e2e8f0",
-              padding: "16px 40px",
+              padding: isMobile ? "12px 18px" : "16px 40px",
               display: "flex",
               justifyContent: "space-between",
               alignItems: "center",

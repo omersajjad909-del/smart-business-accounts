@@ -4,6 +4,7 @@ import { confirmToast } from "@/lib/toast-feedback";
 import { useState, useEffect } from "react";
 import { getCurrentUser } from "@/lib/auth";
 import toast from "react-hot-toast";
+import { useResponsive } from "@/hooks/useResponsive";
 
 const ACCENT = "#6366f1";
 const ACCENT_LIGHT = "rgba(99,102,241,0.12)";
@@ -40,6 +41,7 @@ function authHeaders() {
 }
 
 export default function CurrenciesPage() {
+  const { isMobile } = useResponsive();
   const [currencies, setCurrencies] = useState<Currency[]>([]);
   const [loading, setLoading] = useState(false);
   const [editing, setEditing] = useState<string | null>(null);
@@ -210,7 +212,7 @@ export default function CurrenciesPage() {
   const fmtNum = (n: number) => n.toLocaleString("en-PK", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
   return (
-    <div style={{ minHeight: "100vh", background: "var(--app-bg)", fontFamily: FONT, padding: "28px 24px", color: "var(--text-primary)" }}>
+    <div style={{ minHeight: "100vh", background: "var(--app-bg)", fontFamily: FONT, padding: isMobile ? "15px 11px" : "28px 24px", color: "var(--text-primary)" }}>
       {/* Toast */}
       {toastMsg && (
         <div style={{
@@ -235,12 +237,12 @@ export default function CurrenciesPage() {
       </div>
 
       {/* Form */}
-      <div style={{ background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 12, padding: "20px 24px", marginBottom: 24 }}>
+      <div style={{ background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 12, padding: isMobile ? "12px 11px" : "20px 24px", marginBottom: 24 }}>
         <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 16 }}>
           {editing ? "Edit Currency" : "Add New Currency"}
         </div>
         <form onSubmit={handleSubmit}>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 14, marginBottom: 16 }}>
+          <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(auto-fit, minmax(180px, 1fr))", gap: 14, marginBottom: 16 }}>
             {[
               { key: "code",         placeholder: "Code (e.g. USD)",     type: "text"   },
               { key: "name",         placeholder: "Name (e.g. US Dollar)", type: "text" },
@@ -311,7 +313,7 @@ export default function CurrenciesPage() {
 
       {/* Table */}
       <div style={{ background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 12, overflow: "hidden" }}>
-        <div style={{ padding: "14px 20px", borderBottom: "1px solid var(--border)", fontSize: 14, fontWeight: 700 }}>
+        <div style={{ padding: isMobile ? "12px 10px" : "14px 20px", borderBottom: "1px solid var(--border)", fontSize: 14, fontWeight: 700 }}>
           Configured Currencies ({currencies.length})
         </div>
         {loading ? (
@@ -412,7 +414,7 @@ export default function CurrenciesPage() {
         {showFxForm && (
           <div style={{ background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 12, padding: 20, marginBottom: 20 }}>
             <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 16 }}>New FX Gain / Loss Entry</div>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(180px,1fr))", gap: 14, marginBottom: 14 }}>
+            <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(auto-fill,minmax(180px,1fr))", gap: 14, marginBottom: 14 }}>
               <div>
                 <label style={{ fontSize: 11, color: "var(--text-muted)", fontWeight: 600, display: "block", marginBottom: 5 }}>CURRENCY *</label>
                 <select
@@ -486,7 +488,7 @@ export default function CurrenciesPage() {
 
         {/* FX Entries Table */}
         <div style={{ background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 12, overflow: "hidden" }}>
-          <div style={{ padding: "14px 20px", borderBottom: "1px solid var(--border)", fontSize: 14, fontWeight: 700 }}>
+          <div style={{ padding: isMobile ? "12px 10px" : "14px 20px", borderBottom: "1px solid var(--border)", fontSize: 14, fontWeight: 700 }}>
             FX Gain / Loss Ledger ({fxEntries.length})
           </div>
           {fxLoading ? (

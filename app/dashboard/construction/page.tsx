@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { ConstructionControlCenter, constructionBg, constructionBorder, constructionFont, constructionMuted, fetchJson } from "./_shared";
+import { useResponsive } from "@/hooks/useResponsive";
 
 const emptyState: ConstructionControlCenter = {
   summary: { projects: 0, activeProjects: 0, sites: 0, activeSites: 0, materialValue: 0, lowStockMaterials: 0, subcontractors: 0, contractExposure: 0, boqItems: 0, certifiedBilling: 0, expenses: 0, contractorPayments: 0 },
@@ -17,6 +18,7 @@ const emptyState: ConstructionControlCenter = {
 };
 
 export default function ConstructionOverviewPage() {
+  const { isMobile } = useResponsive();
   const [data, setData] = useState(emptyState);
 
   useEffect(() => {
@@ -26,7 +28,7 @@ export default function ConstructionOverviewPage() {
   const { summary, projects, subcontractors } = data;
 
   return (
-    <div style={{ minHeight: "100vh", padding: "28px 32px", color: "#fff", fontFamily: constructionFont }}>
+    <div style={{ minHeight: "100vh", padding: isMobile ? "15px 14px" : "28px 32px", color: "#fff", fontFamily: constructionFont }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 20, flexWrap: "wrap", marginBottom: 24 }}>
         <div>
           <h1 style={{ margin: "0 0 6px", fontSize: 26, fontWeight: 800 }}>Construction Command Center</h1>
@@ -47,14 +49,14 @@ export default function ConstructionOverviewPage() {
         </div>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4,minmax(0,1fr))", gap: 12, marginBottom: 24 }}>
+      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,minmax(0,1fr))", gap: 12, marginBottom: 24 }}>
         {[
           { label: "Active Projects", value: summary.activeProjects, color: "#fb923c" },
           { label: "Active Sites", value: summary.activeSites, color: "#34d399" },
           { label: "Material Value", value: `Rs. ${summary.materialValue.toLocaleString()}`, color: "#60a5fa" },
           { label: "Open Contracts", value: `Rs. ${summary.contractExposure.toLocaleString()}`, color: "#f59e0b" },
         ].map((card) => (
-          <div key={card.label} style={{ background: constructionBg, border: `1px solid ${constructionBorder}`, borderRadius: 14, padding: "18px 20px" }}>
+          <div key={card.label} style={{ background: constructionBg, border: `1px solid ${constructionBorder}`, borderRadius: 14, padding: isMobile ? "12px 10px" : "18px 20px" }}>
             <div style={{ fontSize: 12, color: constructionMuted, marginBottom: 8 }}>{card.label}</div>
             <div style={{ fontSize: 24, fontWeight: 800, color: card.color }}>{card.value}</div>
           </div>

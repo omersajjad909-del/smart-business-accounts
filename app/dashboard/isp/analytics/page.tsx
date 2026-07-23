@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { IspControlCenter, fetchJson, ispBg, ispBorder, ispFont, ispMuted } from "../_shared";
+import { useResponsive } from "@/hooks/useResponsive";
 
 const emptyState: IspControlCenter = {
   summary: {
@@ -23,6 +24,7 @@ const emptyState: IspControlCenter = {
 };
 
 export default function IspAnalyticsPage() {
+  const { isMobile } = useResponsive();
   const [data, setData] = useState(emptyState);
 
   useEffect(() => {
@@ -41,7 +43,7 @@ export default function IspAnalyticsPage() {
   }));
 
   return (
-    <div style={{ padding: "28px 32px", minHeight: "100vh", color: "#fff", fontFamily: ispFont }}>
+    <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", minHeight: "100vh", color: "#fff", fontFamily: ispFont }}>
       <div style={{ marginBottom: 24 }}>
         <div style={{ fontSize: 12, color: "#93c5fd", fontWeight: 800, letterSpacing: ".08em", textTransform: "uppercase", marginBottom: 8 }}>ISP Analytics</div>
         <h1 style={{ margin: "0 0 8px", fontSize: 28, fontWeight: 900 }}>Portfolio, billing, and support pressure</h1>
@@ -50,14 +52,14 @@ export default function IspAnalyticsPage() {
         </p>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4,minmax(0,1fr))", gap: 14, marginBottom: 24 }}>
+      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,minmax(0,1fr))", gap: 14, marginBottom: 24 }}>
         {[
           { label: "Packages", value: data.summary.packages, color: "#60a5fa" },
           { label: "Active Base", value: data.summary.activeConnections, color: "#34d399" },
           { label: "Open Support", value: data.summary.openTickets, color: "#c084fc" },
           { label: "Paid Revenue", value: `Rs. ${data.summary.paidRevenue.toLocaleString()}`, color: "#22c55e" },
         ].map((card) => (
-          <div key={card.label} style={{ background: ispBg, border: `1px solid ${ispBorder}`, borderRadius: 18, padding: "20px 22px" }}>
+          <div key={card.label} style={{ background: ispBg, border: `1px solid ${ispBorder}`, borderRadius: 18, padding: isMobile ? "12px 10px" : "20px 22px" }}>
             <div style={{ fontSize: 12, color: ispMuted, marginBottom: 8, textTransform: "uppercase", letterSpacing: ".06em" }}>{card.label}</div>
             <div style={{ fontSize: 28, fontWeight: 800, color: card.color }}>{card.value}</div>
           </div>
@@ -69,7 +71,7 @@ export default function IspAnalyticsPage() {
           <div style={{ fontSize: 13, color: "#34d399", fontWeight: 800, marginBottom: 16, textTransform: "uppercase", letterSpacing: ".07em" }}>Package Mix</div>
           <div style={{ display: "grid", gap: 12 }}>
             {Object.entries(packageMix).sort((a, b) => b[1] - a[1]).map(([speed, count]) => (
-              <div key={speed} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "rgba(255,255,255,.025)", border: "1px solid rgba(255,255,255,.06)", borderRadius: 14, padding: "14px 16px" }}>
+              <div key={speed} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "rgba(255,255,255,.025)", border: "1px solid rgba(255,255,255,.06)", borderRadius: 14, padding: isMobile ? "12px 10px" : "14px 16px" }}>
                 <span style={{ fontSize: 13 }}>{speed}</span>
                 <span style={{ fontSize: 14, fontWeight: 800, color: "#93c5fd" }}>{count}</span>
               </div>
@@ -82,12 +84,12 @@ export default function IspAnalyticsPage() {
           <div style={{ fontSize: 13, color: "#f87171", fontWeight: 800, marginBottom: 16, textTransform: "uppercase", letterSpacing: ".07em" }}>Billing & Support</div>
           <div style={{ display: "grid", gap: 12 }}>
             {billingByStatus.map((row) => (
-              <div key={row.status} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "rgba(255,255,255,.025)", border: "1px solid rgba(255,255,255,.06)", borderRadius: 14, padding: "14px 16px" }}>
+              <div key={row.status} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "rgba(255,255,255,.025)", border: "1px solid rgba(255,255,255,.06)", borderRadius: 14, padding: isMobile ? "12px 10px" : "14px 16px" }}>
                 <span style={{ fontSize: 13, color: ispMuted }}>{row.status}</span>
                 <span style={{ fontSize: 14, fontWeight: 800, color: row.status === "paid" ? "#34d399" : row.status === "overdue" ? "#f87171" : "#c084fc" }}>{row.count}</span>
               </div>
             ))}
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "rgba(255,255,255,.025)", border: "1px solid rgba(255,255,255,.06)", borderRadius: 14, padding: "14px 16px" }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "rgba(255,255,255,.025)", border: "1px solid rgba(255,255,255,.06)", borderRadius: 14, padding: isMobile ? "12px 10px" : "14px 16px" }}>
               <span style={{ fontSize: 13, color: ispMuted }}>Resolved tickets</span>
               <span style={{ fontSize: 14, fontWeight: 800, color: "#34d399" }}>{data.tickets.filter((item) => item.status === "resolved" || item.status === "closed").length}</span>
             </div>

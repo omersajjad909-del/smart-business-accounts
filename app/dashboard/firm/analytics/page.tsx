@@ -2,6 +2,7 @@
 
 import { useBusinessRecords } from "@/lib/useBusinessRecords";
 import {
+import { useResponsive } from "@/hooks/useResponsive";
   firmBg,
   firmBorder,
   firmFont,
@@ -14,7 +15,7 @@ import {
 
 function Metric({ title, value, note, color }: { title: string; value: string; note: string; color: string }) {
   return (
-    <div style={{ background: firmBg, border: `1px solid ${firmBorder}`, borderRadius: 18, padding: "20px 22px" }}>
+    <div style={{ background: firmBg, border: `1px solid ${firmBorder}`, borderRadius: 18, padding: isMobile ? "12px 10px" : "20px 22px" }}>
       <div style={{ fontSize: 12, color: firmMuted, marginBottom: 8, textTransform: "uppercase", letterSpacing: ".06em" }}>{title}</div>
       <div style={{ fontSize: 26, fontWeight: 900, color }}>{value}</div>
       <div style={{ fontSize: 12, color: firmMuted, marginTop: 6 }}>{note}</div>
@@ -23,6 +24,7 @@ function Metric({ title, value, note, color }: { title: string; value: string; n
 }
 
 export default function FirmAnalyticsPage() {
+  const { isMobile } = useResponsive();
   const clients = mapFirmClients(useBusinessRecords("firm_client").records);
   const projects = mapFirmProjects(useBusinessRecords("firm_project").records);
   const invoices = mapFirmBilling(useBusinessRecords("firm_billing").records);
@@ -42,7 +44,7 @@ export default function FirmAnalyticsPage() {
   const industryMix = [...industryMap.entries()].sort((a, b) => b[1] - a[1]);
 
   return (
-    <div style={{ padding: "28px 32px", minHeight: "100vh", color: "#fff", fontFamily: firmFont }}>
+    <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", minHeight: "100vh", color: "#fff", fontFamily: firmFont }}>
       <div style={{ marginBottom: 24 }}>
         <div style={{ fontSize: 12, color: "#818cf8", fontWeight: 700, letterSpacing: ".08em", textTransform: "uppercase", marginBottom: 10 }}>Firm Analytics</div>
         <h1 style={{ fontSize: 30, fontWeight: 900, margin: "0 0 10px" }}>Portfolio mix, fee realization, aur utilization</h1>
@@ -51,7 +53,7 @@ export default function FirmAnalyticsPage() {
         </p>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4, minmax(0,1fr))", gap: 14, marginBottom: 24 }}>
+      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,minmax(0,1fr))", gap: 14, marginBottom: 24 }}>
         <Metric title="Clients" value={`${clients.length}`} note="Total portfolio size" color="#60a5fa" />
         <Metric title="Engagements" value={`${projects.length}`} note="All active + closed work" color="#8b5cf6" />
         <Metric title="Fee Realization" value={`$${collected.toLocaleString()}`} note={`of $${billed.toLocaleString()} billed`} color="#34d399" />

@@ -4,6 +4,7 @@ import { confirmToast } from "@/lib/toast-feedback";
 import toast from "react-hot-toast";
 import { useEffect, useState } from "react";
 import { getCurrentUser } from "@/lib/auth";
+import { useResponsive } from "@/hooks/useResponsive";
 
 const ff = "'Outfit','Inter',sans-serif";
 const ACCENT = "#818cf8";
@@ -49,6 +50,7 @@ function authH() {
 }
 
 export default function AttendancePage() {
+  const { isMobile } = useResponsive();
   const [employees,          setEmployees]          = useState<Employee[]>([]);
   const [records,            setRecords]            = useState<AttendanceRecord[]>([]);
   const [holidays,           setHolidays]           = useState<{ date: string; name: string }[]>([]);
@@ -199,7 +201,7 @@ export default function AttendancePage() {
         {/* Employee list */}
         <div style={{ flex: 1, overflowY: "auto" }}>
           {filtered.length === 0 ? (
-            <div style={{ padding: "40px 20px", textAlign: "center" }}>
+            <div style={{ padding: isMobile ? "22px 10px" : "40px 20px", textAlign: "center" }}>
               <div style={{ fontSize: 32, marginBottom: 10 }}>👥</div>
               <div style={{ fontSize: 13, fontWeight: 700, color: "var(--text-muted)", marginBottom: 4 }}>
                 No employees found
@@ -252,7 +254,7 @@ export default function AttendancePage() {
       <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden", minHeight: 0 }}>
 
         {/* Top bar */}
-        <div style={{ padding: "16px 24px", borderBottom: "1px solid var(--border)",
+        <div style={{ padding: isMobile ? "12px 11px" : "16px 24px", borderBottom: "1px solid var(--border)",
           display: "flex", justifyContent: "space-between", alignItems: "center",
           background: "var(--panel-bg)", flexShrink: 0 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
@@ -487,7 +489,7 @@ export default function AttendancePage() {
             boxShadow: "0 24px 60px rgba(0,0,0,.3)" }}>
 
             {/* Modal header */}
-            <div style={{ padding: "16px 20px", borderBottom: "1px solid var(--border)",
+            <div style={{ padding: isMobile ? "12px 10px" : "16px 20px", borderBottom: "1px solid var(--border)",
               display: "flex", justifyContent: "space-between", alignItems: "center",
               background: `${ACCENT}0a` }}>
               <div>
@@ -513,7 +515,7 @@ export default function AttendancePage() {
                   textTransform: "uppercase", letterSpacing: ".05em", marginBottom: 8 }}>
                   Status
                 </div>
-                <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 6 }}>
+                <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(3,1fr)", gap: 6 }}>
                   {(["PRESENT","ABSENT","LEAVE","HALF_DAY","LATE","HOLIDAY"] as const).map(s => {
                     const c = SC[s]; const active = formData.status === s;
                     return (

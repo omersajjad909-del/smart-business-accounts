@@ -2,12 +2,14 @@
 import { useState } from "react";
 import { useBusinessRecords } from "@/lib/useBusinessRecords";
 import Link from "next/link";
+import { useResponsive } from "@/hooks/useResponsive";
 
 const ff = "'Outfit','Inter',sans-serif";
 const bg = "rgba(255,255,255,0.03)";
 const border = "rgba(255,255,255,0.07)";
 
 export default function StockReceiptsPage() {
+  const { isMobile } = useResponsive();
   const { records, loading } = useBusinessRecords("stock_receipt");
   const [search, setSearch] = useState("");
 
@@ -45,7 +47,7 @@ export default function StockReceiptsPage() {
   };
 
   return (
-    <div style={{ padding: "28px 32px", fontFamily: ff, color: "#fff", minHeight: "100vh" }}>
+    <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", fontFamily: ff, color: "#fff", minHeight: "100vh" }}>
 
       {/* Header */}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 28 }}>
@@ -65,14 +67,14 @@ export default function StockReceiptsPage() {
       </div>
 
       {/* Stats */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 12, marginBottom: 28 }}>
+      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 12, marginBottom: 28 }}>
         {[
           { label: "Total Receipts", value: receipts.length, color: "#34d399" },
           { label: "Total Units Received", value: totalReceived.toLocaleString(), color: "#6366f1" },
           { label: "Total Purchase Cost", value: `Rs. ${totalCost.toLocaleString()}`, color: "#f59e0b" },
           { label: "Unique Suppliers", value: uniqueSuppliers, color: "#a78bfa" },
         ].map(s => (
-          <div key={s.label} style={{ background: bg, border: `1px solid ${border}`, borderRadius: 12, padding: "18px 22px" }}>
+          <div key={s.label} style={{ background: bg, border: `1px solid ${border}`, borderRadius: 12, padding: isMobile ? "12px 10px" : "18px 22px" }}>
             <div style={{ fontSize: 12, color: "rgba(255,255,255,.45)", marginBottom: 6 }}>{s.label}</div>
             <div style={{ fontSize: 22, fontWeight: 800, color: s.color }}>{s.value}</div>
           </div>

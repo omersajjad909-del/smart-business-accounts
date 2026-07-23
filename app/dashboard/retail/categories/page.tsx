@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import { useBusinessRecords } from "@/lib/useBusinessRecords";
+import { useResponsive } from "@/hooks/useResponsive";
 
 interface Category {
   id: string;
@@ -17,6 +18,7 @@ const COLORS = [
 ];
 
 export default function RetailCategoriesPage() {
+  const { isMobile } = useResponsive();
   const {
     records: catRecords,
     loading,
@@ -111,7 +113,7 @@ export default function RetailCategoriesPage() {
   const categorized = productRecords.filter(r => r.data?.category).length;
 
   return (
-    <div style={{ fontFamily: ff, minHeight: "100vh", background: "var(--app-bg)", padding: "28px 24px", color: "var(--text-primary)" }}>
+    <div style={{ fontFamily: ff, minHeight: "100vh", background: "var(--app-bg)", padding: isMobile ? "15px 11px" : "28px 24px", color: "var(--text-primary)" }}>
       <style>{`@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap');`}</style>
 
       {/* Header */}
@@ -131,13 +133,13 @@ export default function RetailCategoriesPage() {
       </div>
 
       {/* Stats */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 16, marginBottom: 24 }}>
+      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(3,1fr)", gap: 16, marginBottom: 24 }}>
         {[
           { label: "Total Categories", val: categories.length, color: "#f97316" },
           { label: "Products Categorized", val: categorized, color: "#10b981" },
           { label: "Uncategorized Products", val: totalProducts - categorized, color: "#f59e0b" },
         ].map(s => (
-          <div key={s.label} style={{ background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 14, padding: "16px 20px" }}>
+          <div key={s.label} style={{ background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 14, padding: isMobile ? "12px 10px" : "16px 20px" }}>
             <div style={{ fontSize: 11, color: "var(--text-muted)", marginBottom: 4 }}>{s.label}</div>
             <div style={{ fontSize: 22, fontWeight: 700, color: s.color }}>{s.val}</div>
           </div>

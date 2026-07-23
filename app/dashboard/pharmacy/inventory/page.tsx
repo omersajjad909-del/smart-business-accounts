@@ -3,10 +3,12 @@
 import { useMemo, useState } from "react";
 import { useBusinessRecords } from "@/lib/useBusinessRecords";
 import { mapDrugRecords, pharmacyBg, pharmacyBorder, pharmacyFont, pharmacyMuted } from "../_shared";
+import { useResponsive } from "@/hooks/useResponsive";
 
 const initialForm = { name: "", category: "Tablet", manufacturer: "", batchNo: "", stock: 0, minStock: 20, unitPrice: 0, expiryDate: "" };
 
 export default function PharmacyInventoryPage() {
+  const { isMobile } = useResponsive();
   const { records, loading, create } = useBusinessRecords("drug");
   const [showModal, setShowModal] = useState(false);
   const [error, setError] = useState("");
@@ -46,7 +48,7 @@ export default function PharmacyInventoryPage() {
   }
 
   return (
-    <div style={{ padding: "28px 32px", fontFamily: pharmacyFont, color: "#fff", minHeight: "100vh" }}>
+    <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", fontFamily: pharmacyFont, color: "#fff", minHeight: "100vh" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 28 }}>
         <div>
           <h1 style={{ fontSize: 22, fontWeight: 800, margin: "0 0 4px" }}>Drug Inventory</h1>
@@ -55,9 +57,9 @@ export default function PharmacyInventoryPage() {
         <button onClick={() => setShowModal(true)} style={{ padding: "10px 20px", borderRadius: 10, border: "none", background: "#fb7185", color: "white", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>Add Drug</button>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 12, marginBottom: 28 }}>
+      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 12, marginBottom: 28 }}>
         {[{ label: "Total Drugs", val: drugs.length, color: "#fb7185" }, { label: "Low Stock", val: lowStock, color: "#ef4444" }, { label: "Expired", val: expired, color: "#f59e0b" }, { label: "Inventory Value", val: `Rs. ${totalValue.toLocaleString()}`, color: "#34d399" }].map((s) => (
-          <div key={s.label} style={{ background: pharmacyBg, border: `1px solid ${pharmacyBorder}`, borderRadius: 12, padding: "20px 24px" }}>
+          <div key={s.label} style={{ background: pharmacyBg, border: `1px solid ${pharmacyBorder}`, borderRadius: 12, padding: isMobile ? "12px 11px" : "20px 24px" }}>
             <div style={{ fontSize: 13, color: pharmacyMuted, marginBottom: 6 }}>{s.label}</div>
             <div style={{ fontSize: 18, fontWeight: 700, color: s.color }}>{s.val}</div>
           </div>
@@ -74,15 +76,15 @@ export default function PharmacyInventoryPage() {
           <tbody>
             {drugs.map((d) => (
               <tr key={d.id} style={{ opacity: d.isExpired ? 0.6 : 1 }}>
-                <td style={{ padding: "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)", fontWeight: 600 }}>{d.name}</td>
-                <td style={{ padding: "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)", fontSize: 13 }}>{d.category}</td>
-                <td style={{ padding: "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)", fontSize: 13, color: pharmacyMuted }}>{d.manufacturer || "-"}</td>
-                <td style={{ padding: "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)", fontSize: 12, color: pharmacyMuted }}>{d.batchNo}</td>
-                <td style={{ padding: "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)", color: d.isLow ? "#ef4444" : "#fff", fontWeight: d.isLow ? 700 : 400 }}>{d.stock}</td>
-                <td style={{ padding: "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)", fontSize: 13, color: pharmacyMuted }}>{d.minStock}</td>
-                <td style={{ padding: "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)" }}>Rs. {d.unitPrice.toLocaleString()}</td>
-                <td style={{ padding: "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)", fontSize: 12, color: d.isExpired ? "#ef4444" : pharmacyMuted }}>{d.expiryDate}</td>
-                <td style={{ padding: "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)" }}>
+                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)", fontWeight: 600 }}>{d.name}</td>
+                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)", fontSize: 13 }}>{d.category}</td>
+                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)", fontSize: 13, color: pharmacyMuted }}>{d.manufacturer || "-"}</td>
+                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)", fontSize: 12, color: pharmacyMuted }}>{d.batchNo}</td>
+                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)", color: d.isLow ? "#ef4444" : "#fff", fontWeight: d.isLow ? 700 : 400 }}>{d.stock}</td>
+                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)", fontSize: 13, color: pharmacyMuted }}>{d.minStock}</td>
+                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)" }}>Rs. {d.unitPrice.toLocaleString()}</td>
+                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)", fontSize: 12, color: d.isExpired ? "#ef4444" : pharmacyMuted }}>{d.expiryDate}</td>
+                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)" }}>
                   {d.isExpired ? <span style={{ display: "inline-block", background: "rgba(245,158,11,.15)", color: "#f59e0b", borderRadius: 6, padding: "2px 8px", fontSize: 10, fontWeight: 600 }}>Expired</span> :
                    d.isLow ? <span style={{ display: "inline-block", background: "rgba(239,68,68,.15)", color: "#ef4444", borderRadius: 6, padding: "2px 8px", fontSize: 10, fontWeight: 600 }}>Low Stock</span> :
                    <span style={{ display: "inline-block", background: "rgba(52,211,153,.15)", color: "#34d399", borderRadius: 6, padding: "2px 8px", fontSize: 10, fontWeight: 600 }}>OK</span>}

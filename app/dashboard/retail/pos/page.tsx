@@ -4,6 +4,7 @@ import { useEffect, useState, useRef } from "react";
 import { getCurrentUser } from "@/lib/auth";
 import { useBusinessRecords } from "@/lib/useBusinessRecords";
 import { ThermalReceipt, generateFBRInvoice, type ReceiptData, type CompanyInfo } from "@/app/dashboard/retail/_components/ThermalReceipt";
+import { useResponsive } from "@/hooks/useResponsive";
 
 const ff = "'Outfit','Inter',sans-serif";
 const PAGE_SIZE = 12;
@@ -23,6 +24,7 @@ type BarcodeItem = {
 };
 
 export default function POSPage() {
+  const { isMobile } = useResponsive();
   const userRef = useRef(getCurrentUser());
   const user = userRef.current;
   const cashierName = (user as { name?: string } | null)?.name || "Cashier";
@@ -1042,7 +1044,7 @@ export default function POSPage() {
 
           {/* ── Column Headers ── */}
           {cart.length > 0 && (
-            <div style={{ display: "grid", gridTemplateColumns: "22px 1fr 68px 88px 58px 68px 18px", gap: 4, padding: "5px 14px", borderBottom: "1px solid rgba(255,255,255,.05)", background: "rgba(255,255,255,.018)", flexShrink: 0 }}>
+            <div style={{ overflowX: "auto" }}><div style={{ display: "grid", gridTemplateColumns: "22px 1fr 68px 88px 58px 68px 18px", gap: 4, padding: "5px 14px", borderBottom: "1px solid rgba(255,255,255,.05)", background: "rgba(255,255,255,.018)", flexShrink: 0 }}><div style={{ minWidth: 560 }}>
               {(["#", "Item", "Price", "Qty", "Disc", "Total", ""] as string[]).map((h, i) => (
                 <div key={i} style={{ fontSize: 8, color: "rgba(255,255,255,.28)", letterSpacing: ".07em", textTransform: "uppercase", fontWeight: 700, textAlign: i >= 2 && i <= 5 ? "right" : "left" }}>{h}</div>
               ))}
@@ -1060,7 +1062,7 @@ export default function POSPage() {
             ) : cart.map((item, idx) => {
               const lineTotal = item.price * item.qty - (item.itemDiscount || 0) * item.qty;
               return (
-                <div key={item.id} style={{ display: "grid", gridTemplateColumns: "22px 1fr 68px 88px 58px 68px 18px", gap: 4, alignItems: "center", padding: "7px 4px", marginBottom: 2, borderBottom: "1px solid rgba(255,255,255,.04)" }}>
+                <div style={{ overflowX: "auto" }}><div key={item.id} style={{ display: "grid", gridTemplateColumns: "22px 1fr 68px 88px 58px 68px 18px", gap: 4, alignItems: "center", padding: "7px 4px", marginBottom: 2, borderBottom: "1px solid rgba(255,255,255,.04)" }}><div style={{ minWidth: 560 }}>
                   <div style={{ fontSize: 10, color: "rgba(255,255,255,.22)", textAlign: "center" }}>{idx + 1}</div>
                   <div style={{ minWidth: 0 }}>
                     <div style={{ fontSize: 12, fontWeight: 600, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", color: "#dde6f5" }}>{item.name}</div>
@@ -1326,7 +1328,7 @@ export default function POSPage() {
         <div style={{ position: "fixed", inset: 0, zIndex: 90 }} onClick={() => setShowHeld(false)}>
           <div onClick={e => e.stopPropagation()}
             style={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%,-50%)", width: "min(94vw,520px)", background: "#111c30", border: "1px solid rgba(255,255,255,.1)", borderRadius: 16, overflow: "hidden", boxShadow: "0 24px 60px rgba(0,0,0,.6)" }}>
-            <div style={{ padding: "14px 18px", borderBottom: "1px solid rgba(255,255,255,.08)", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+            <div style={{ padding: isMobile ? "12px 10px" : "14px 18px", borderBottom: "1px solid rgba(255,255,255,.08)", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
               <div>
                 <div style={{ fontSize: 16, fontWeight: 800, color: "#fff" }}>Held Sales</div>
                 <div style={{ fontSize: 11, color: "rgba(255,255,255,.35)", marginTop: 1 }}>{heldSales.length} sale{heldSales.length !== 1 ? "s" : ""} on hold — click to recall</div>
@@ -1378,7 +1380,7 @@ export default function POSPage() {
           onClick={() => setShowPriceCheck(false)}>
           <div onClick={e => e.stopPropagation()}
             style={{ width: "min(94vw,560px)", background: "#111c30", border: "1px solid rgba(255,255,255,.1)", borderRadius: 16, overflow: "hidden", boxShadow: "0 24px 60px rgba(0,0,0,.6)" }}>
-            <div style={{ padding: "14px 18px", borderBottom: "1px solid rgba(255,255,255,.08)", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+            <div style={{ padding: isMobile ? "12px 10px" : "14px 18px", borderBottom: "1px solid rgba(255,255,255,.08)", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
               <div>
                 <div style={{ fontSize: 16, fontWeight: 800, color: "#fff" }}>🔍 Price Check</div>
                 <div style={{ fontSize: 11, color: "rgba(255,255,255,.35)", marginTop: 1 }}>Search product to check price — press Enter to add to cart</div>
@@ -1473,7 +1475,7 @@ export default function POSPage() {
       {showScanner && (
         <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.92)", zIndex: 200, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
           {/* Header */}
-          <div style={{ position: "absolute", top: 0, left: 0, right: 0, display: "flex", alignItems: "center", justifyContent: "space-between", padding: "16px 20px" }}>
+          <div style={{ position: "absolute", top: 0, left: 0, right: 0, display: "flex", alignItems: "center", justifyContent: "space-between", padding: isMobile ? "12px 10px" : "16px 20px" }}>
             <div>
               <div style={{ fontSize: 16, fontWeight: 800, color: "#fff" }}>Camera Scanner</div>
               <div style={{ fontSize: 12, color: "rgba(255,255,255,.4)", marginTop: 2 }}>Point at barcode to add product instantly</div>

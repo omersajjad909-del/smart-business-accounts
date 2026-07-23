@@ -13,6 +13,7 @@ import { PERMISSIONS } from "@/lib/permissions";
 import { PrintActionBar } from "@/components/print/PrintActionBar";
 import { PrintDocA4, PrintPaperWrapper } from "@/components/print/PrintDocA4";
 import type { PrintColumn, PrintTotalsLine } from "@/components/print/PrintDocA4";
+import { useResponsive } from "@/hooks/useResponsive";
 
 
 // ─── Design tokens ────────────────────────────────────────────────────────────
@@ -580,7 +581,7 @@ function SalesInvoiceContent() {
             <div style={{ marginBottom: 18 }}>
               <span style={{ fontSize: 12, color: "rgba(250,204,21,.7)" }}>Enter criteria — leave blank to get all. Use <b style={{ color: "#facc15" }}>&gt;</b>, <b style={{ color: "#facc15" }}>&lt;</b>, <b style={{ color: "#facc15" }}>&gt;=</b> for date range.</span>
             </div>
-            <div style={{ display: "grid", gridTemplateColumns: "180px 240px 1fr", gap: 16, marginBottom: 24 }}>
+            <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "180px 240px 1fr", gap: 16, marginBottom: 24 }}>
               <div>
                 <label style={{ ...labelStyle, color: "rgba(250,204,21,.6)" }}>Invoice # (e.g. INV-5)</label>
                 <input autoFocus value={siQueryInvNo} onChange={e => setSiQueryInvNo(e.target.value)} placeholder="INV-1 or blank…"
@@ -1221,6 +1222,7 @@ function SalesInvoiceContent() {
 }
 
 export default function SalesInvoicePage() {
+  const { isMobile } = useResponsive();
   return (
     <Suspense fallback={<div style={{ padding: 40, textAlign: "center", fontFamily: "'Outfit',sans-serif", color: "var(--text-muted)" }}>Loading Invoice…</div>}>
       <SalesInvoiceContent />

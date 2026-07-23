@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import {
+import { useResponsive } from "@/hooks/useResponsive";
   SalonControlCenter,
   fetchJson,
   salonBg,
@@ -32,7 +33,7 @@ const emptyState: SalonControlCenter = {
 
 function Metric({ title, value, note, color }: { title: string; value: string; note: string; color: string }) {
   return (
-    <div style={{ background: salonBg, border: `1px solid ${salonBorder}`, borderRadius: 18, padding: "20px 22px" }}>
+    <div style={{ background: salonBg, border: `1px solid ${salonBorder}`, borderRadius: 18, padding: isMobile ? "12px 10px" : "20px 22px" }}>
       <div style={{ fontSize: 12, color: salonMuted, marginBottom: 8, textTransform: "uppercase", letterSpacing: ".06em" }}>{title}</div>
       <div style={{ fontSize: 26, fontWeight: 900, color }}>{value}</div>
       <div style={{ fontSize: 12, color: salonMuted, marginTop: 6 }}>{note}</div>
@@ -41,6 +42,7 @@ function Metric({ title, value, note, color }: { title: string; value: string; n
 }
 
 export default function SalonAnalyticsPage() {
+  const { isMobile } = useResponsive();
   const [data, setData] = useState(emptyState);
 
   useEffect(() => {
@@ -73,7 +75,7 @@ export default function SalonAnalyticsPage() {
   }, [appointments]);
 
   return (
-    <div style={{ padding: "28px 32px", minHeight: "100vh", color: "#fff", fontFamily: salonFont }}>
+    <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", minHeight: "100vh", color: "#fff", fontFamily: salonFont }}>
       <div style={{ marginBottom: 24 }}>
         <div style={{ fontSize: 12, color: "#f472b6", fontWeight: 700, letterSpacing: ".08em", textTransform: "uppercase", marginBottom: 10 }}>Salon Analytics</div>
         <h1 style={{ fontSize: 30, fontWeight: 900, margin: "0 0 10px" }}>Revenue, stylist load, aur service mix</h1>
@@ -82,7 +84,7 @@ export default function SalonAnalyticsPage() {
         </p>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4, minmax(0,1fr))", gap: 14, marginBottom: 24 }}>
+      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,minmax(0,1fr))", gap: 14, marginBottom: 24 }}>
         <Metric title="Gross Revenue" value={`Rs. ${summary.completedRevenue.toLocaleString()}`} note="Completed appointments" color="#34d399" />
         <Metric title="Completion Rate" value={`${appointments.length ? Math.round((summary.completedAppointments / appointments.length) * 100) : 0}%`} note="Completed vs total bookings" color="#60a5fa" />
         <Metric title="Cancellation Rate" value={`${summary.cancellationRate}%`} note="Cancelled bookings ratio" color="#f87171" />

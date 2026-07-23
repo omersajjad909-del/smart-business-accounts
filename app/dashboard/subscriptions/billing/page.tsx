@@ -5,6 +5,7 @@ import toast from "react-hot-toast";
 import { useMemo, useState } from "react";
 import { useBusinessRecords } from "@/lib/useBusinessRecords";
 import { addBillingCycle, mapSaaSBillingRuns, mapSaaSSubscribers, saasBg, saasBorder, saasFont, saasMuted, saasStatusColor, todayIso } from "../_shared";
+import { useResponsive } from "@/hooks/useResponsive";
 
 const inputStyle: React.CSSProperties = {
   width: "100%",
@@ -37,6 +38,7 @@ const smallButton: React.CSSProperties = {
 };
 
 export default function RecurringBillingPage() {
+  const { isMobile } = useResponsive();
   const subscriberStore = useBusinessRecords("subscription_subscriber");
   const { records, loading, create, update } = useBusinessRecords("subscription_billing");
   const subscribers = useMemo(() => mapSaaSSubscribers(subscriberStore.records).filter((item) => item.status === "active" || item.status === "past_due"), [subscriberStore.records]);
@@ -65,13 +67,13 @@ export default function RecurringBillingPage() {
   };
 
   return (
-    <div style={{ padding: "28px 32px", color: "#fff", minHeight: "100vh", fontFamily: saasFont }}>
+    <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", color: "#fff", minHeight: "100vh", fontFamily: saasFont }}>
       <div style={{ marginBottom: 24 }}>
         <h1 style={{ margin: "0 0 6px", fontSize: 28, fontWeight: 900 }}>Recurring Billing</h1>
         <p style={{ margin: 0, color: saasMuted, fontSize: 14 }}>Invoice runs, due dates, aur collection state ko subscription-wise monitor karein.</p>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "340px 1fr", gap: 18 }}>
+      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "340px 1fr", gap: 18 }}>
         <div style={{ background: saasBg, border: `1px solid ${saasBorder}`, borderRadius: 18, padding: 20 }}>
           <div style={{ fontSize: 16, fontWeight: 800, marginBottom: 14 }}>Generate Billing Run</div>
           <select style={inputStyle} value={subscriberId} onChange={(e) => setSubscriberId(e.target.value)}>
@@ -82,7 +84,7 @@ export default function RecurringBillingPage() {
         </div>
 
         <div style={{ background: saasBg, border: `1px solid ${saasBorder}`, borderRadius: 18, overflow: "hidden" }}>
-          <div style={{ padding: "16px 18px", borderBottom: `1px solid ${saasBorder}`, fontSize: 16, fontWeight: 800 }}>Billing Runs</div>
+          <div style={{ padding: isMobile ? "12px 10px" : "16px 18px", borderBottom: `1px solid ${saasBorder}`, fontSize: 16, fontWeight: 800 }}>Billing Runs</div>
           <div style={{ display: "grid", gap: 12, padding: 18 }}>
             {!loading && billings.length === 0 && <div style={{ color: "rgba(255,255,255,.28)" }}>No billing runs yet.</div>}
             {billings.map((row) => (

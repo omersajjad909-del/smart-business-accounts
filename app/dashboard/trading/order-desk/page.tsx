@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import {
+import { useResponsive } from "@/hooks/useResponsive";
   fetchJson,
   formatDate,
   formatMoney,
@@ -18,6 +19,7 @@ import {
 } from "../_shared";
 
 export default function TradingOrderDeskPage() {
+  const { isMobile } = useResponsive();
   const [quotations, setQuotations] = useState<QuotationLite[]>([]);
   const [salesInvoices, setSalesInvoices] = useState<SalesInvoiceLite[]>([]);
   const [challans, setChallans] = useState<DeliveryChallanLite[]>([]);
@@ -62,7 +64,7 @@ export default function TradingOrderDeskPage() {
   const recentQuotations = quotations.slice(0, 6);
 
   return (
-    <div style={{ padding: "28px 32px", fontFamily: tradingFont, color: "var(--text-primary)", minHeight: "100vh" }}>
+    <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", fontFamily: tradingFont, color: "var(--text-primary)", minHeight: "100vh" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 26 }}>
         <div>
           <h1 style={{ fontSize: 24, fontWeight: 800, margin: "0 0 6px" }}>Order Desk</h1>
@@ -80,14 +82,14 @@ export default function TradingOrderDeskPage() {
         </div>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4,minmax(0,1fr))", gap: 12, marginBottom: 24 }}>
+      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,minmax(0,1fr))", gap: 12, marginBottom: 24 }}>
         {[
           { label: "Quotations", value: quotations.length, color: "#38bdf8" },
           { label: "Accepted Quotes", value: acceptedQuotations, color: "#34d399" },
           { label: "Delivered Challans", value: deliveredChallans, color: "#f59e0b" },
           { label: "Sale Return Value", value: formatMoney(returnedValue), color: "#f87171" },
         ].map((card) => (
-          <div key={card.label} style={{ background: tradingBg, border: `1px solid ${tradingBorder}`, borderRadius: 14, padding: "18px 20px" }}>
+          <div key={card.label} style={{ background: tradingBg, border: `1px solid ${tradingBorder}`, borderRadius: 14, padding: isMobile ? "12px 10px" : "18px 20px" }}>
             <div style={{ fontSize: 12, color: tradingMuted, marginBottom: 8 }}>{card.label}</div>
             <div style={{ fontSize: 24, fontWeight: 800, color: card.color }}>{card.value}</div>
           </div>
@@ -96,7 +98,7 @@ export default function TradingOrderDeskPage() {
 
       <div style={{ display: "grid", gridTemplateColumns: "1.2fr .8fr", gap: 14, marginBottom: 24 }}>
         <div style={{ background: tradingBg, border: `1px solid ${tradingBorder}`, borderRadius: 16, overflow: "hidden" }}>
-          <div style={{ padding: "16px 18px", borderBottom: `1px solid ${tradingBorder}`, fontSize: 15, fontWeight: 800 }}>Recent Sales Orders</div>
+          <div style={{ padding: isMobile ? "12px 10px" : "16px 18px", borderBottom: `1px solid ${tradingBorder}`, fontSize: 15, fontWeight: 800 }}>Recent Sales Orders</div>
           <table style={{ width: "100%", borderCollapse: "collapse" }}>
             <thead>
               <tr>
@@ -126,7 +128,7 @@ export default function TradingOrderDeskPage() {
 
         <div style={{ display: "grid", gap: 14 }}>
           <div style={{ background: tradingBg, border: `1px solid ${tradingBorder}`, borderRadius: 16, overflow: "hidden" }}>
-            <div style={{ padding: "16px 18px", borderBottom: `1px solid ${tradingBorder}`, fontSize: 15, fontWeight: 800 }}>Quotation Pipeline</div>
+            <div style={{ padding: isMobile ? "12px 10px" : "16px 18px", borderBottom: `1px solid ${tradingBorder}`, fontSize: 15, fontWeight: 800 }}>Quotation Pipeline</div>
             <div style={{ padding: 16, display: "grid", gap: 10 }}>
               {recentQuotations.map((row) => (
                 <div key={row.id} style={{ padding: "12px 14px", borderRadius: 12, background: "var(--panel-bg)", border: `1px solid ${tradingBorder}` }}>
@@ -143,7 +145,7 @@ export default function TradingOrderDeskPage() {
           </div>
 
           <div style={{ background: tradingBg, border: `1px solid ${tradingBorder}`, borderRadius: 16, overflow: "hidden" }}>
-            <div style={{ padding: "16px 18px", borderBottom: `1px solid ${tradingBorder}`, fontSize: 15, fontWeight: 800 }}>Dispatch & Returns</div>
+            <div style={{ padding: isMobile ? "12px 10px" : "16px 18px", borderBottom: `1px solid ${tradingBorder}`, fontSize: 15, fontWeight: 800 }}>Dispatch & Returns</div>
             <div style={{ padding: 16, display: "grid", gap: 10 }}>
               <div style={{ padding: "12px 14px", borderRadius: 12, background: "rgba(245,158,11,.08)", border: "1px solid rgba(245,158,11,.16)" }}>
                 <div style={{ fontSize: 12, color: tradingMuted }}>Delivery Challans</div>

@@ -2,6 +2,7 @@
 import { fmtDate } from "@/lib/dateUtils";
 import { useEffect, useState } from "react";
 import { getCurrentUser } from "@/lib/auth";
+import { useResponsive } from "@/hooks/useResponsive";
 
 type CompanyInfo = { name: string; plan: string; country: string | null; businessType: string | null };
 
@@ -65,6 +66,7 @@ type HistoryItem = {
 };
 
 export default function FeedbackPage() {
+  const { isMobile } = useResponsive();
   const user = getCurrentUser();
 
   const [fbType,   setFbType]   = useState<FeedbackType>("feedback");
@@ -162,7 +164,7 @@ export default function FeedbackPage() {
         <div style={{
           ...card, marginBottom: "20px",
           background: "rgba(52,211,153,0.06)", border: "1px solid rgba(52,211,153,0.25)",
-          textAlign: "center", padding: "40px 24px",
+          textAlign: "center", padding: isMobile ? "22px 11px" : "40px 24px",
         }}>
           <div style={{ fontSize: "48px", marginBottom: "12px" }}>✅</div>
           <div style={{ fontSize: "18px", fontWeight: 700, color: "#34d399", marginBottom: "6px" }}>
@@ -197,7 +199,7 @@ export default function FeedbackPage() {
           {/* Type selector */}
           <div style={{ marginBottom: "22px" }}>
             <label style={labelStyle}>Select Type</label>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "8px" }}>
+            <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: "8px" }}>
               {TYPES.map(t => (
                 <button
                   key={t.id}
@@ -295,7 +297,7 @@ export default function FeedbackPage() {
           {/* User + Company info strip */}
           {user && (
             <div style={{
-              padding: "14px 16px", borderRadius: "10px", marginBottom: "16px",
+              padding: isMobile ? "12px 10px" : "14px 16px", borderRadius: "10px", marginBottom: "16px",
               background: "var(--app-bg)", border: "1px solid var(--border)",
             }}>
               <div style={{

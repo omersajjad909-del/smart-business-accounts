@@ -4,6 +4,7 @@ import { useBusinessRecords } from "@/lib/useBusinessRecords";
 import { confirmToast } from "@/lib/toast-feedback";
 import { getCurrentUser } from "@/lib/auth";
 import { fmtDate } from "@/lib/dateUtils";
+import { useResponsive } from "@/hooks/useResponsive";
 
 const ff = "'Outfit','Inter',sans-serif";
 const bg = "rgba(255,255,255,.03)";
@@ -27,6 +28,7 @@ type Session = {
 };
 
 export default function POSSessionsPage() {
+  const { isMobile } = useResponsive();
   const { records, loading, create, update } = useBusinessRecords("pos_session");
   const { records: saleRecords } = useBusinessRecords("pos_sale");
   const user = getCurrentUser();
@@ -163,7 +165,7 @@ export default function POSSessionsPage() {
   };
 
   return (
-    <div style={{ padding: "28px 32px", fontFamily: ff, color: "#fff", minHeight: "100vh", background: "#0a0f1a" }}>
+    <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", fontFamily: ff, color: "#fff", minHeight: "100vh", background: "#0a0f1a" }}>
 
       {/* Header */}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 28 }}>
@@ -180,14 +182,14 @@ export default function POSSessionsPage() {
       </div>
 
       {/* Stats */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 12, marginBottom: 28 }}>
+      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 12, marginBottom: 28 }}>
         {[
           { label: "Open Sessions", value: openSessions.length, color: "#10b981", sub: openSessions.map(s => s.cashier).join(", ") || "None" },
           { label: "Today's Revenue", value: `Rs. ${todayRevenue.toLocaleString()}`, color: "#34d399", sub: `${todaySessions.length} sessions today` },
           { label: "Today's Transactions", value: todayTxns, color: "#818cf8", sub: "All shifts combined" },
           { label: "Total Sessions", value: sessions.length, color: "rgba(255,255,255,.6)", sub: `${sessions.filter(s => s.status === "CLOSED").length} closed` },
         ].map(s => (
-          <div key={s.label} style={{ background: bg, border: `1px solid ${border}`, borderRadius: 14, padding: "18px 22px" }}>
+          <div key={s.label} style={{ background: bg, border: `1px solid ${border}`, borderRadius: 14, padding: isMobile ? "12px 10px" : "18px 22px" }}>
             <div style={{ fontSize: 12, color: "rgba(255,255,255,.4)", marginBottom: 8 }}>{s.label}</div>
             <div style={{ fontSize: 22, fontWeight: 800, color: s.color, marginBottom: 4 }}>{loading ? "…" : s.value}</div>
             <div style={{ fontSize: 11, color: "rgba(255,255,255,.25)" }}>{s.sub}</div>
@@ -218,7 +220,7 @@ export default function POSSessionsPage() {
               {/* Main row */}
               <div
                 onClick={() => setExpandedId(isExpanded ? null : session.id)}
-                style={{ display: "grid", gridTemplateColumns: "110px 100px 140px 1fr 1fr 1fr 130px auto", alignItems: "center", gap: 16, padding: "16px 22px", cursor: "pointer" }}
+                style={{ display: "grid", gridTemplateColumns: "110px 100px 140px 1fr 1fr 1fr 130px auto", alignItems: "center", gap: 16, padding: isMobile ? "12px 10px" : "16px 22px", cursor: "pointer" }}
               >
                 {/* Session ref */}
                 <div>
@@ -288,18 +290,18 @@ export default function POSSessionsPage() {
 
               {/* Close Session Modal (inline) */}
               {isClosing && (
-                <div style={{ borderTop: `1px solid rgba(239,68,68,.2)`, background: "rgba(239,68,68,.05)", padding: "20px 24px" }}>
+                <div style={{ borderTop: `1px solid rgba(239,68,68,.2)`, background: "rgba(239,68,68,.05)", padding: isMobile ? "12px 11px" : "20px 24px" }}>
                   <div style={{ fontSize: 14, fontWeight: 700, color: "#f87171", marginBottom: 16 }}>🔒 Close Session — {session.sessionRef}</div>
-                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 16, marginBottom: 16 }}>
-                    <div style={{ background: "rgba(255,255,255,.04)", borderRadius: 10, padding: "14px 16px" }}>
+                  <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr 1fr", gap: 16, marginBottom: 16 }}>
+                    <div style={{ background: "rgba(255,255,255,.04)", borderRadius: 10, padding: isMobile ? "12px 10px" : "14px 16px" }}>
                       <div style={{ fontSize: 11, color: "rgba(255,255,255,.4)", marginBottom: 6 }}>Opening Cash</div>
                       <div style={{ fontWeight: 800, fontSize: 18 }}>Rs. {session.openingCash.toLocaleString()}</div>
                     </div>
-                    <div style={{ background: "rgba(16,185,129,.06)", border: "1px solid rgba(16,185,129,.15)", borderRadius: 10, padding: "14px 16px" }}>
+                    <div style={{ background: "rgba(16,185,129,.06)", border: "1px solid rgba(16,185,129,.15)", borderRadius: 10, padding: isMobile ? "12px 10px" : "14px 16px" }}>
                       <div style={{ fontSize: 11, color: "rgba(255,255,255,.4)", marginBottom: 6 }}>Cash Sales</div>
                       <div style={{ fontWeight: 800, fontSize: 18, color: "#34d399" }}>Rs. {session.cashSales.toLocaleString()}</div>
                     </div>
-                    <div style={{ background: "rgba(99,102,241,.06)", border: "1px solid rgba(99,102,241,.15)", borderRadius: 10, padding: "14px 16px" }}>
+                    <div style={{ background: "rgba(99,102,241,.06)", border: "1px solid rgba(99,102,241,.15)", borderRadius: 10, padding: isMobile ? "12px 10px" : "14px 16px" }}>
                       <div style={{ fontSize: 11, color: "rgba(255,255,255,.4)", marginBottom: 6 }}>Expected in Drawer</div>
                       <div style={{ fontWeight: 800, fontSize: 18, color: "#818cf8" }}>Rs. {session.expectedCash.toLocaleString()}</div>
                     </div>
@@ -342,7 +344,7 @@ export default function POSSessionsPage() {
 
               {/* Expanded — Sales in session */}
               {isExpanded && !isClosing && (
-                <div style={{ borderTop: `1px solid ${border}`, padding: "20px 24px" }}>
+                <div style={{ borderTop: `1px solid ${border}`, padding: isMobile ? "12px 11px" : "20px 24px" }}>
                   <div style={{ fontSize: 12, fontWeight: 700, color: "rgba(255,255,255,.35)", letterSpacing: ".06em", textTransform: "uppercase", marginBottom: 14 }}>
                     Sales in this session ({thisSales.length})
                   </div>

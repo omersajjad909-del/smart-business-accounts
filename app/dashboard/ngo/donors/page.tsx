@@ -3,6 +3,7 @@
 import toast from "react-hot-toast";
 import { useState } from "react";
 import { useBusinessRecords } from "@/lib/useBusinessRecords";
+import { useResponsive } from "@/hooks/useResponsive";
 
 const ff = "'Outfit','Inter',sans-serif";
 const bg = "rgba(255,255,255,.03)";
@@ -19,6 +20,7 @@ const getTier = (total: number) => {
 };
 
 export default function DonorsPage() {
+  const { isMobile } = useResponsive();
   const { records, loading, create } = useBusinessRecords("donor");
   const [showModal, setShowModal] = useState(false);
   const [filterType, setFilterType] = useState("all");
@@ -62,7 +64,7 @@ export default function DonorsPage() {
   const btn = (c:string) => ({ background:c, border:"none", borderRadius:8, padding:"10px 20px", color:"#fff", fontFamily:ff, cursor:"pointer", fontSize:14, fontWeight:600 });
 
   return (
-    <div style={{ fontFamily:ff, color:"#fff", padding:24, minHeight:"100vh", background:"#0f0f0f" }}>
+    <div style={{ fontFamily:ff, color:"#fff", padding: isMobile ? "12px" : "24px", minHeight:"100vh", background:"#0f0f0f" }}>
       <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:24 }}>
         <div>
           <h1 style={{ margin:0, fontSize:24, fontWeight:700 }}>Donor Management</h1>
@@ -71,7 +73,7 @@ export default function DonorsPage() {
         <button onClick={()=>setShowModal(true)} style={btn("#6366f1")}>+ Add Donor</button>
       </div>
 
-      <div style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:16, marginBottom:24 }}>
+      <div style={{ display:"grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap:16, marginBottom:24 }}>
         {[
           { label:"Total Donors", value:donors.length, color:"#6366f1" },
           { label:"Active Donors", value:donors.filter(d=>d.status==="active").length, color:"#22c55e" },

@@ -2,10 +2,11 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { AgricultureControlCenter, agricultureBg, agricultureBorder, agricultureFont, agricultureMuted, fetchJson } from "../_shared";
+import { useResponsive } from "@/hooks/useResponsive";
 
 function Metric({ title, value, note, color }: { title: string; value: string; note: string; color: string }) {
   return (
-    <div style={{ background: agricultureBg, border: `1px solid ${agricultureBorder}`, borderRadius: 18, padding: "20px 22px" }}>
+    <div style={{ background: agricultureBg, border: `1px solid ${agricultureBorder}`, borderRadius: 18, padding: isMobile ? "12px 10px" : "20px 22px" }}>
       <div style={{ fontSize: 12, color: agricultureMuted, marginBottom: 8, textTransform: "uppercase", letterSpacing: ".06em" }}>{title}</div>
       <div style={{ fontSize: 26, fontWeight: 900, color }}>{value}</div>
       <div style={{ fontSize: 12, color: agricultureMuted, marginTop: 6 }}>{note}</div>
@@ -35,6 +36,7 @@ const emptyState: AgricultureControlCenter = {
 };
 
 export default function AgricultureAnalyticsPage() {
+  const { isMobile } = useResponsive();
   const [data, setData] = useState<AgricultureControlCenter>(emptyState);
 
   useEffect(() => {
@@ -63,7 +65,7 @@ export default function AgricultureAnalyticsPage() {
   const activeArea = data.fields.filter((field) => field.status === "active").reduce((sum, field) => sum + field.area, 0);
 
   return (
-    <div style={{ padding: "28px 32px", minHeight: "100vh", color: "#fff", fontFamily: agricultureFont }}>
+    <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", minHeight: "100vh", color: "#fff", fontFamily: agricultureFont }}>
       <div style={{ marginBottom: 24 }}>
         <div style={{ fontSize: 12, color: "#86efac", fontWeight: 700, letterSpacing: ".08em", textTransform: "uppercase", marginBottom: 10 }}>Agriculture Analytics</div>
         <h1 style={{ fontSize: 30, fontWeight: 900, margin: "0 0 10px" }}>Yield, land utilization, and farm-side revenue</h1>
@@ -72,7 +74,7 @@ export default function AgricultureAnalyticsPage() {
         </p>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4, minmax(0,1fr))", gap: 14, marginBottom: 24 }}>
+      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,minmax(0,1fr))", gap: 14, marginBottom: 24 }}>
         <Metric title="Harvest Revenue" value={`Rs. ${data.summary.harvestRevenue.toLocaleString()}`} note="Recorded harvest sales" color="#34d399" />
         <Metric title="Active Land" value={`${activeArea.toFixed(1)} acres`} note={`${data.summary.fields} fields registered`} color="#60a5fa" />
         <Metric title="Average Yield" value={`${avgYieldPerHarvest}`} note="Per harvest record" color="#f59e0b" />

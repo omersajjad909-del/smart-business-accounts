@@ -6,6 +6,7 @@ import toast from "react-hot-toast";
 
 import { useEffect, useState } from "react";
 import { getCurrentUser } from "@/lib/auth";
+import { useResponsive } from "@/hooks/useResponsive";
 
 type Row = { itemId: string; name: string; qty: number | ""; maxQty: number };
 
@@ -22,6 +23,7 @@ type Outward = {
 };
 
 export default function OutwardPage() {
+  const { isMobile } = useResponsive();
   const today = new Date().toISOString().slice(0, 10);
   const user = getCurrentUser();
 

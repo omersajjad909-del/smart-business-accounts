@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
+import { useResponsive } from "@/hooks/useResponsive";
 
 const wholesaleBg = "rgba(255,255,255,.035)";
 const wholesaleBorder = "rgba(255,255,255,.08)";
@@ -155,7 +156,7 @@ function formatDate(value: string) {
 
 function StatCard({ label, value, tone, sub }: { label: string; value: string | number; tone: string; sub?: string }) {
   return (
-    <div style={{ background: wholesaleBg, border: `1px solid ${wholesaleBorder}`, borderRadius: 18, padding: "20px 22px" }}>
+    <div style={{ background: wholesaleBg, border: `1px solid ${wholesaleBorder}`, borderRadius: 18, padding: isMobile ? "12px 10px" : "20px 22px" }}>
       <div style={{ fontSize: 12, color: wholesaleMuted, marginBottom: 8, textTransform: "uppercase", letterSpacing: ".06em" }}>{label}</div>
       <div style={{ fontSize: 28, fontWeight: 800, color: tone }}>{value}</div>
       {sub ? <div style={{ fontSize: 12, color: "rgba(255,255,255,.42)", marginTop: 8 }}>{sub}</div> : null}
@@ -164,6 +165,7 @@ function StatCard({ label, value, tone, sub }: { label: string; value: string | 
 }
 
 export default function WholesaleDashboard() {
+  const { isMobile } = useResponsive();
   const [data, setData] = useState<WholesaleControlCenter>(emptyState);
 
   useEffect(() => {
@@ -190,7 +192,7 @@ export default function WholesaleDashboard() {
   );
 
   return (
-    <div style={{ minHeight: "100vh", padding: "28px 32px", color: "#fff", fontFamily: wholesaleFont }}>
+    <div style={{ minHeight: "100vh", padding: isMobile ? "15px 14px" : "28px 32px", color: "#fff", fontFamily: wholesaleFont }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 20, flexWrap: "wrap", marginBottom: 24 }}>
         <div>
           <div style={{ fontSize: 12, color: "#fbbf24", fontWeight: 800, letterSpacing: ".08em", textTransform: "uppercase", marginBottom: 10 }}>
@@ -244,7 +246,7 @@ export default function WholesaleDashboard() {
           <div style={{ fontSize: 13, color: "#fde68a", fontWeight: 800, marginBottom: 12, textTransform: "uppercase", letterSpacing: ".07em" }}>
             Operating Flow
           </div>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(4, minmax(0,1fr))", gap: 12 }}>
+          <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,minmax(0,1fr))", gap: 12 }}>
             {[
               { title: "Quote & Order", body: `${data.summary.totalSalesOrders} sales orders tracked with ${data.summary.pendingSalesOrders} still pending.` },
               { title: "Procure & Receive", body: `${data.summary.totalPurchaseInvoices} purchase invoices already booked for supply continuity.` },
@@ -275,7 +277,7 @@ export default function WholesaleDashboard() {
               { label: "Price lists active", value: data.summary.activePriceLists, tone: "#a78bfa" },
               { label: "Customers over limit", value: data.summary.customersOverLimit, tone: "#f87171" },
             ].map((row) => (
-              <div key={row.label} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "rgba(255,255,255,.025)", border: "1px solid rgba(255,255,255,.06)", borderRadius: 14, padding: "14px 16px" }}>
+              <div key={row.label} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "rgba(255,255,255,.025)", border: "1px solid rgba(255,255,255,.06)", borderRadius: 14, padding: isMobile ? "12px 10px" : "14px 16px" }}>
                 <div style={{ fontSize: 13, color: wholesaleMuted }}>{row.label}</div>
                 <div style={{ fontSize: 14, fontWeight: 800, color: row.tone }}>{row.value}</div>
               </div>

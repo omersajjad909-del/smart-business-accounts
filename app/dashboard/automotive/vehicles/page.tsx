@@ -1,6 +1,7 @@
 "use client";
 import { useState, useMemo } from "react";
 import { useBusinessRecords } from "@/lib/useBusinessRecords";
+import { useResponsive } from "@/hooks/useResponsive";
 
 const FONT = "'Outfit','Inter',sans-serif";
 
@@ -42,6 +43,7 @@ function Badge({ label, palette }: { label: string; palette: Record<string, { bg
 }
 
 export default function VehiclesPage() {
+  const { isMobile } = useResponsive();
   const { records, loading, create, setStatus, remove } = useBusinessRecords("auto_vehicle");
   const [modal, setModal]   = useState(false);
   const [form, setForm]     = useState(BLANK);
@@ -111,7 +113,7 @@ export default function VehiclesPage() {
   const td: React.CSSProperties     = { padding: "13px 16px", fontSize: 14, borderBottom: "1px solid var(--border)", color: "var(--text-primary)" };
 
   return (
-    <div style={{ minHeight: "100vh", background: "var(--app-bg)", padding: "32px 28px", fontFamily: FONT, color: "var(--text-primary)" }}>
+    <div style={{ minHeight: "100vh", background: "var(--app-bg)", padding: isMobile ? "16px" : "32px" 28px", fontFamily: FONT, color: "var(--text-primary)" }}>
 
       {/* ── Header ── */}
       <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 28 }}>
@@ -128,14 +130,14 @@ export default function VehiclesPage() {
       </div>
 
       {/* ── KPI Cards ── */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 16, marginBottom: 28 }}>
+      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 16, marginBottom: 28 }}>
         {[
           { label: "Total Vehicles", value: kpis.total,     accent: "#6366f1" },
           { label: "Available",      value: kpis.available, accent: "#4ade80" },
           { label: "Reserved",       value: kpis.reserved,  accent: "#fbbf24" },
           { label: "Sold",           value: kpis.sold,      accent: "#f87171" },
         ].map(k => (
-          <div key={k.label} style={{ background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 14, padding: "20px 24px" }}>
+          <div key={k.label} style={{ background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 14, padding: isMobile ? "12px 11px" : "20px 24px" }}>
             <div style={{ fontSize: 11, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: 0.8, marginBottom: 10 }}>{k.label}</div>
             <div style={{ fontSize: 34, fontWeight: 700, color: k.accent, lineHeight: 1 }}>{k.value}</div>
           </div>
@@ -217,7 +219,7 @@ export default function VehiclesPage() {
           style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.65)", zIndex: 1000, display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}
           onClick={e => { if (e.target === e.currentTarget) { setModal(false); setForm(BLANK); } }}
         >
-          <div style={{ background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 18, width: "100%", maxWidth: 560, padding: "32px 36px", fontFamily: FONT }}>
+          <div style={{ background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 18, width: "100%", maxWidth: 560, padding: isMobile ? "18px 16px" : "32px 36px", fontFamily: FONT }}>
             <h2 style={{ fontSize: 18, fontWeight: 700, margin: "0 0 24px" }}>Add Vehicle</h2>
 
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px 20px", marginBottom: 24 }}>

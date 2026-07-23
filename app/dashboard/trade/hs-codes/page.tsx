@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { getCurrentUser } from "@/lib/auth";
 import toast from "react-hot-toast";
 import { confirmToast } from "@/lib/toast-feedback";
+import { useResponsive } from "@/hooks/useResponsive";
 
 const ff = "'Outfit','Inter',sans-serif";
 const accent = "#6366f1";
@@ -28,6 +29,7 @@ const COMMON_HS_CODES: Omit<HSCode, "id">[] = [
 ];
 
 export default function HSCodesPage() {
+  const { isMobile } = useResponsive();
   const user = getCurrentUser();
   const [codes, setCodes] = useState<HSCode[]>([]);
   const [loading, setLoading] = useState(true);
@@ -90,7 +92,7 @@ export default function HSCodesPage() {
   const filtered = search ? codes.filter(c => c.code.includes(search) || c.description.toLowerCase().includes(search.toLowerCase())) : codes;
 
   return (
-    <div style={{ padding: "24px 28px", fontFamily: ff, color: "var(--text-primary)", maxWidth: 1100 }}>
+    <div style={{ padding: isMobile ? "13px 13px" : "24px 28px", fontFamily: ff, color: "var(--text-primary)", maxWidth: 1100 }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 24, flexWrap: "wrap", gap: 10 }}>
         <div>
           <h1 style={{ margin: 0, fontSize: 24, fontWeight: 700 }}>HS Code Master</h1>

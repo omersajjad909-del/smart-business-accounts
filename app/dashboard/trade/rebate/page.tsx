@@ -4,6 +4,7 @@ import { confirmToast, alertToast } from "@/lib/toast-feedback";
 import { useMemo, useState } from "react";
 import { useBusinessRecords } from "@/lib/useBusinessRecords";
 import { mapRebateRecords, tradeBg, tradeBorder, tradeFont, tradeMuted } from "../_shared";
+import { useResponsive } from "@/hooks/useResponsive";
 
 type RebateStatus = "filed" | "under_review" | "approved" | "received" | "rejected";
 
@@ -44,7 +45,7 @@ const cardStyle: React.CSSProperties = {
   background: tradeBg,
   border: `1px solid ${tradeBorder}`,
   borderRadius: 14,
-  padding: "18px 20px",
+  padding: isMobile ? "12px 10px" : "18px 20px",
 };
 
 function todayIso() {
@@ -57,6 +58,7 @@ function buildClaimNo(count: number) {
 }
 
 export default function TradeRebatePage() {
+  const { isMobile } = useResponsive();
   const { records, loading, create, update, remove } = useBusinessRecords("export_rebate");
   const rebates = useMemo(() => mapRebateRecords(records), [records]);
 
@@ -196,7 +198,7 @@ export default function TradeRebatePage() {
   }
 
   return (
-    <div style={{ minHeight: "100vh", padding: "28px 32px", color: "var(--text-primary)", fontFamily: tradeFont }}>
+    <div style={{ minHeight: "100vh", padding: isMobile ? "15px 14px" : "28px 32px", color: "var(--text-primary)", fontFamily: tradeFont }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 16, flexWrap: "wrap", marginBottom: 24 }}>
         <div>
           <h1 style={{ margin: "0 0 6px", fontSize: 26, fontWeight: 800 }}>Export Rebate & Drawback</h1>
@@ -207,7 +209,7 @@ export default function TradeRebatePage() {
         </button>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4,minmax(0,1fr))", gap: 12, marginBottom: 22 }}>
+      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,minmax(0,1fr))", gap: 12, marginBottom: 22 }}>
         {[
           { label: "Claims", value: totals.total, color: "#60a5fa" },
           { label: "Open Claims", value: totals.open, color: "#fbbf24" },
@@ -283,7 +285,7 @@ export default function TradeRebatePage() {
               <button onClick={() => setShowModal(false)} style={{ background: "transparent", border: "none", color: tradeMuted, fontSize: 24, cursor: "pointer" }}>x</button>
             </div>
 
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(3,minmax(0,1fr))", gap: 14 }}>
+            <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(3,minmax(0,1fr))", gap: 14 }}>
               <div><label style={labelStyle}>Claim No</label><input value={form.claimNo} onChange={(e) => setForm((prev) => ({ ...prev, claimNo: e.target.value }))} style={inputStyle} /></div>
               <div><label style={labelStyle}>Scheme</label><select value={form.scheme} onChange={(e) => setForm((prev) => ({ ...prev, scheme: e.target.value }))} style={inputStyle}>{SCHEMES.map((scheme) => <option key={scheme} value={scheme}>{scheme}</option>)}</select></div>
               <div><label style={labelStyle}>Status</label><select value={form.status} onChange={(e) => setForm((prev) => ({ ...prev, status: e.target.value as RebateStatus }))} style={inputStyle}>{STATUS_OPTIONS.map((status) => <option key={status} value={status}>{status.replace("_", " ")}</option>)}</select></div>

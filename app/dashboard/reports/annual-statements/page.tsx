@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { getCurrentUser } from "@/lib/auth";
+import { useResponsive } from "@/hooks/useResponsive";
 
 const ACCENT = "#6366f1";
 const FONT = "'Outfit','Inter',sans-serif";
@@ -15,6 +16,7 @@ function colorVal(n: number, positive = "#34d399", negative = "#f87171") {
 }
 
 export default function AnnualStatementsPage() {
+  const { isMobile } = useResponsive();
   const currentYear = new Date().getFullYear();
   const [year, setYear] = useState(currentYear.toString());
   const [data, setData] = useState<any>(null);
@@ -71,7 +73,7 @@ export default function AnnualStatementsPage() {
         minHeight: "100vh",
         background: "var(--app-bg)",
         fontFamily: FONT,
-        padding: "28px 24px",
+        padding: isMobile ? "15px 11px" : "28px 24px",
         color: "var(--text-primary)",
       }}
     >
@@ -128,7 +130,7 @@ export default function AnnualStatementsPage() {
 
       {/* Error */}
       {error && (
-        <div style={{ padding: "14px 20px", borderRadius: 10, background: "rgba(248,113,113,0.1)", border: "1px solid rgba(248,113,113,0.3)", color: "#f87171", marginBottom: 20, fontSize: 14 }}>
+        <div style={{ padding: isMobile ? "12px 10px" : "14px 20px", borderRadius: 10, background: "rgba(248,113,113,0.1)", border: "1px solid rgba(248,113,113,0.3)", color: "#f87171", marginBottom: 20, fontSize: 14 }}>
           {error}
         </div>
       )}
@@ -190,7 +192,7 @@ export default function AnnualStatementsPage() {
 
           {/* Account Details table */}
           <div style={{ ...panelStyle, padding: 0, overflow: "hidden" }} id="annual-printable">
-            <div style={{ padding: "16px 24px", borderBottom: "1px solid var(--border)", fontSize: 15, fontWeight: 700 }}>
+            <div style={{ padding: isMobile ? "12px 11px" : "16px 24px", borderBottom: "1px solid var(--border)", fontSize: 15, fontWeight: 700 }}>
               Account Ledger Summary
             </div>
             <div style={{ overflowX: "auto" }}>
@@ -220,7 +222,7 @@ export default function AnnualStatementsPage() {
                 <tbody>
                   {(data.accounts ?? []).length === 0 ? (
                     <tr>
-                      <td colSpan={6} style={{ padding: "40px 16px", textAlign: "center", color: "var(--text-muted)" }}>
+                      <td colSpan={6} style={{ padding: isMobile ? "22px 10px" : "40px 16px", textAlign: "center", color: "var(--text-muted)" }}>
                         No account data for {year}
                       </td>
                     </tr>
@@ -281,7 +283,7 @@ const panelStyle: React.CSSProperties = {
   background: "var(--panel-bg)",
   border: "1px solid var(--border)",
   borderRadius: 12,
-  padding: "20px 24px",
+  padding: isMobile ? "12px 11px" : "20px 24px",
 };
 
 function btnStyle(bg: string, disabled = false): React.CSSProperties {

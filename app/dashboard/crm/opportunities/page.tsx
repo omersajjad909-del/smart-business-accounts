@@ -5,6 +5,7 @@ import { confirmToast, alertToast } from "@/lib/toast-feedback";
 import toast from "react-hot-toast";
 
 import { useState, useEffect } from "react";
+import { useResponsive } from "@/hooks/useResponsive";
 
 interface Opportunity {
   id: string;
@@ -18,6 +19,7 @@ interface Opportunity {
 }
 
 export default function OpportunitiesPage() {
+  const { isMobile } = useResponsive();
   const [opportunities, setOpportunities] = useState<Opportunity[]>([]);
   const [contacts, setContacts] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);

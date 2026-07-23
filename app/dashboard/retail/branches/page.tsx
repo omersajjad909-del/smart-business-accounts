@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { getCurrentUser } from "@/lib/auth";
 import toast from "react-hot-toast";
+import { useResponsive } from "@/hooks/useResponsive";
 
 type Branch = {
   id: string;
@@ -27,6 +28,7 @@ function authHeaders() {
 }
 
 export default function RetailBranchesPage() {
+  const { isMobile } = useResponsive();
   const [items,    setItems]    = useState<Branch[]>([]);
   const [loading,  setLoading]  = useState(true);
   const [saving,   setSaving]   = useState(false);
@@ -118,13 +120,13 @@ export default function RetailBranchesPage() {
       </div>
 
       {/* Stats */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 14, marginBottom: 28 }}>
+      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(3,1fr)", gap: 14, marginBottom: 28 }}>
         {[
           { label: "Total Branches", val: items.length,                           color: "#818cf8" },
           { label: "Active",         val: items.filter(b => b.isActive).length,   color: "#10b981" },
           { label: "Cities",         val: cities,                                  color: "#f59e0b" },
         ].map(kpi => (
-          <div key={kpi.label} style={{ background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 14, padding: "16px 20px" }}>
+          <div key={kpi.label} style={{ background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 14, padding: isMobile ? "12px 10px" : "16px 20px" }}>
             <div style={{ fontSize: 11, color: "var(--text-muted)", marginBottom: 4 }}>{kpi.label}</div>
             <div style={{ fontSize: 28, fontWeight: 700, color: kpi.color }}>{loading ? "..." : kpi.val}</div>
           </div>
@@ -144,7 +146,7 @@ export default function RetailBranchesPage() {
             <div key={b.id} style={{
               background: "var(--panel-bg)",
               border: `1px solid ${b.isActive ? "rgba(99,102,241,.25)" : "var(--border)"}`,
-              borderRadius: 16, padding: "20px 22px", position: "relative",
+              borderRadius: 16, padding: isMobile ? "12px 10px" : "20px 22px", position: "relative",
               opacity: b.isActive ? 1 : 0.65,
             }}>
               {b.isActive && (

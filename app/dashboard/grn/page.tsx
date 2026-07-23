@@ -7,6 +7,7 @@ import toast from "react-hot-toast";
 import { getCurrentUser } from "@/lib/auth";
 import { PrintActionBar } from "@/components/print/PrintActionBar";
 import { PrintDocA4, PrintPaperWrapper } from "@/components/print/PrintDocA4";
+import { useResponsive } from "@/hooks/useResponsive";
 
 const FONT = "'Outfit','Inter',sans-serif";
 const ACCENT = "#6366f1";
@@ -34,6 +35,7 @@ function Label({ children }: { children: React.ReactNode }) {
 }
 
 export default function GRNPage() {
+  const { isMobile } = useResponsive();
   const today = new Date().toISOString().slice(0, 10);
   const user  = getCurrentUser();
   const [isMobile, setIsMobile] = useState(false);
@@ -224,7 +226,7 @@ export default function GRNPage() {
               </thead>
               <tbody>
                 {grns.length === 0 ? (
-                  <tr><td colSpan={7} style={{ padding: "48px 16px", textAlign: "center", color: MUTED }}>
+                  <tr><td colSpan={7} style={{ padding: isMobile ? "26px 10px" : "48px 16px", textAlign: "center", color: MUTED }}>
                     <div style={{ fontSize: 28, marginBottom: 8 }}>📥</div>
                     <div style={{ fontWeight: 600 }}>No GRNs recorded yet</div>
                   </td></tr>
@@ -261,7 +263,7 @@ export default function GRNPage() {
       {!showList && !preview && (
         <div className="no-print">
           {/* Page Header */}
-          <div style={{ background: PANEL, border: `1.5px solid ${BORDER}`, borderRadius: 14, padding: "14px 22px", marginBottom: 20, display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 10 }}>
+          <div style={{ background: PANEL, border: `1.5px solid ${BORDER}`, borderRadius: 14, padding: isMobile ? "12px 10px" : "14px 22px", marginBottom: 20, display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 10 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
               <div style={{ width: 36, height: 36, borderRadius: 9, background: "rgba(52,211,153,0.12)", display: "flex", alignItems: "center", justifyContent: "center" }}>
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#34d399" strokeWidth="2"><path d="M20 12V22H4V12"/><path d="M22 7H2v5h20V7z"/><path d="M12 22V7"/><path d="M12 7H7.5a2.5 2.5 0 010-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 000-5C13 2 12 7 12 7z"/></svg>
@@ -337,7 +339,7 @@ export default function GRNPage() {
                             <option value="">— Select Item —</option>
                             {allItems.map((it: any) => <option key={it.id} value={it.id}>{it.name}</option>)}
                           </select>
-                          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8 }}>
+                          <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr 1fr", gap: 8 }}>
                             <div><Label>Ordered</Label><input type="number" value={row.orderedQty} onChange={e => updateRow(idx, "orderedQty", e.target.value)} placeholder="0" style={inp({ textAlign: "center" })} /></div>
                             <div><Label><span style={{ color: isShort ? "#fbbf24" : "#34d399" }}>Received</span></Label><input type="number" value={row.receivedQty} onChange={e => updateRow(idx, "receivedQty", e.target.value)} placeholder="0" style={inp({ textAlign: "center", color: isShort ? "#fbbf24" : "#34d399", fontWeight: 700 })} /></div>
                             <div><Label>Rate</Label><input type="number" value={row.rate} onChange={e => updateRow(idx, "rate", e.target.value)} placeholder="0.00" style={inp({ textAlign: "right" })} /></div>

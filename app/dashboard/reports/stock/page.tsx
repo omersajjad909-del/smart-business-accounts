@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { getCurrentUser } from "@/lib/auth";
 import { DateInput } from "@/app/dashboard/reports/_components/DateInput";
+import { useResponsive } from "@/hooks/useResponsive";
 
 const ff = "'Outfit','Inter',sans-serif";
 function fmt(n: number) { return n.toLocaleString("en-US", { minimumFractionDigits: 0, maximumFractionDigits: 2 }); }
@@ -45,6 +46,7 @@ function exportCSV(rows: Row[], asOn: string) {
 }
 
 export default function StockReportPage() {
+  const { isMobile } = useResponsive();
   const router  = useRouter();
   const today   = new Date().toISOString().slice(0, 10);
 
@@ -116,7 +118,7 @@ export default function StockReportPage() {
           <div style={{
             background: "linear-gradient(145deg,#0f1a35,#0b1225)",
             border: "1px solid rgba(129,140,248,.25)",
-            borderRadius: 18, padding: "36px 40px", width: "100%", maxWidth: 440,
+            borderRadius: 18, padding: isMobile ? "20px 18px" : "36px 40px", width: "100%", maxWidth: 440,
             boxShadow: "0 32px 80px rgba(0,0,0,.6)", position: "relative",
           }}>
             <button onClick={() => router.back()} style={{ position:"absolute", top:14, right:16, background:"none", border:"none", color:"rgba(255,255,255,.35)", fontSize:20, cursor:"pointer", padding:4, borderRadius:6, fontFamily:ff }}>✕</button>
@@ -173,7 +175,7 @@ export default function StockReportPage() {
 
       {/* ── REPORT VIEW ── */}
       {!showModal && (
-        <div style={{ padding: "28px 32px", maxWidth: 1300, margin: "0 auto" }}>
+        <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", maxWidth: 1300, margin: "0 auto" }}>
 
           {/* Top bar */}
           <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:24, flexWrap:"wrap", gap:12 }}>
@@ -205,7 +207,7 @@ export default function StockReportPage() {
               { label:"Total Sold",         val: `Rs ${fmtAmt(rows.reduce((s,r)=>s+r.soldAmt,0))}`,      color:"#f59e0b", icon:"📤" },
               { label:"Stock Value",        val: `Rs ${fmtAmt(rows.reduce((s,r)=>s+r.remainingAmt,0))}`, color:"#34d399", icon:"💰" },
             ].map(k => (
-              <div key={k.label} style={{ padding:"14px 16px", borderRadius:12, background:"rgba(255,255,255,.03)", border:"1px solid rgba(255,255,255,.07)", display:"flex", alignItems:"center", gap:12 }}>
+              <div key={k.label} style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderRadius:12, background:"rgba(255,255,255,.03)", border:"1px solid rgba(255,255,255,.07)", display:"flex", alignItems:"center", gap:12 }}>
                 <span style={{ fontSize:20 }}>{k.icon}</span>
                 <div>
                   <div style={{ fontSize:9, color:"rgba(255,255,255,.35)", fontWeight:700, textTransform:"uppercase", letterSpacing:".06em" }}>{k.label}</div>

@@ -3,12 +3,14 @@
 import { useMemo, useState } from "react";
 import { useBusinessRecords } from "@/lib/useBusinessRecords";
 import { mapServiceCatalogRecord } from "../_shared";
+import { useResponsive } from "@/hooks/useResponsive";
 
 const ff = "'Outfit','Inter',sans-serif";
 const bg = "rgba(255,255,255,0.03)";
 const border = "rgba(255,255,255,0.07)";
 
 export default function ServiceCatalogPage() {
+  const { isMobile } = useResponsive();
   const store = useBusinessRecords("service_catalog");
   const services = useMemo(() => store.records.map(mapServiceCatalogRecord), [store.records]);
   const [showModal, setShowModal] = useState(false);
@@ -27,7 +29,7 @@ export default function ServiceCatalogPage() {
   }
 
   return (
-    <div style={{ padding: "28px 32px", fontFamily: ff, color: "#fff", minHeight: "100vh" }}>
+    <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", fontFamily: ff, color: "#fff", minHeight: "100vh" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24 }}>
         <div>
           <h1 style={{ fontSize: 22, fontWeight: 800, margin: "0 0 4px" }}>Service Catalog</h1>
@@ -36,7 +38,7 @@ export default function ServiceCatalogPage() {
         <button onClick={() => setShowModal(true)} style={{ padding: "10px 20px", borderRadius: 10, border: "none", background: "#34d399", color: "#fff", fontWeight: 700, cursor: "pointer" }}>+ Add Service</button>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(260px,1fr))", gap: 14 }}>
+      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(auto-fill,minmax(260px,1fr))", gap: 14 }}>
         {services.map((service) => (
           <div key={service.id} style={{ background: bg, border: `1px solid ${border}`, borderRadius: 14, padding: 20 }}>
             <div style={{ fontSize: 16, fontWeight: 800 }}>{service.name}</div>

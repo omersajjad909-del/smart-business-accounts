@@ -5,6 +5,7 @@ import toast from "react-hot-toast";
 import { useMemo, useState } from "react";
 import { useBusinessRecords } from "@/lib/useBusinessRecords";
 import {
+import { useResponsive } from "@/hooks/useResponsive";
   constructionBg,
   constructionBorder,
   constructionFont,
@@ -22,6 +23,7 @@ const STATUS_COLOR: Record<string, string> = {
 };
 
 export default function ConstructionProjectsPage() {
+  const { isMobile } = useResponsive();
   const projectStore = useBusinessRecords("construction_project");
   const siteStore = useBusinessRecords("construction_site");
   const { loading, create, update } = projectStore;
@@ -122,7 +124,7 @@ export default function ConstructionProjectsPage() {
   }
 
   return (
-    <div style={{ padding: "28px 32px", fontFamily: constructionFont, color: "#fff", minHeight: "100vh" }}>
+    <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", fontFamily: constructionFont, color: "#fff", minHeight: "100vh" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 28, gap: 16, flexWrap: "wrap" }}>
         <div>
           <h1 style={{ fontSize: 22, fontWeight: 800, margin: "0 0 4px" }}>Construction Projects</h1>
@@ -131,14 +133,14 @@ export default function ConstructionProjectsPage() {
         <button onClick={() => setShowModal(true)} style={{ padding: "10px 20px", borderRadius: 10, border: "none", background: "#f97316", color: "white", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>New Project</button>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 12, marginBottom: 28 }}>
+      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 12, marginBottom: 28 }}>
         {[
           { label: "Total Projects", val: projects.length, color: "#f97316" },
           { label: "Active", val: active, color: "#f59e0b" },
           { label: "Total Budget", val: `Rs. ${totalBudget.toLocaleString()}`, color: "#818cf8" },
           { label: "Spent to Date", val: `Rs. ${totalSpent.toLocaleString()}`, color: "#ef4444" },
         ].map((s) => (
-          <div key={s.label} style={{ background: constructionBg, border: `1px solid ${constructionBorder}`, borderRadius: 12, padding: "20px 24px" }}>
+          <div key={s.label} style={{ background: constructionBg, border: `1px solid ${constructionBorder}`, borderRadius: 12, padding: isMobile ? "12px 11px" : "20px 24px" }}>
             <div style={{ fontSize: 13, color: "rgba(255,255,255,.5)", marginBottom: 6 }}>{s.label}</div>
             <div style={{ fontSize: 18, fontWeight: 700, color: s.color }}>{s.val}</div>
           </div>
@@ -149,7 +151,7 @@ export default function ConstructionProjectsPage() {
 
       <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
         {projects.map((project) => (
-          <div key={project.id} style={{ background: constructionBg, border: `1px solid ${constructionBorder}`, borderRadius: 12, padding: "20px 24px" }}>
+          <div key={project.id} style={{ background: constructionBg, border: `1px solid ${constructionBorder}`, borderRadius: 12, padding: isMobile ? "12px 11px" : "20px 24px" }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 12, gap: 16, flexWrap: "wrap" }}>
               <div>
                 <div style={{ fontWeight: 700, fontSize: 16, marginBottom: 4 }}>{project.name}</div>

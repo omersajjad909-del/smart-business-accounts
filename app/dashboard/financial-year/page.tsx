@@ -8,6 +8,7 @@ import { useEffect, useState } from "react";
 import { getCurrentUser } from "@/lib/auth";
 import { hasPermission } from "@/lib/hasPermission";
 import { PERMISSIONS } from "@/lib/permissions";
+import { useResponsive } from "@/hooks/useResponsive";
 
 type FinancialYear = {
   id: string;
@@ -20,6 +21,7 @@ type FinancialYear = {
 };
 
 export default function FinancialYearPage() {
+  const { isMobile } = useResponsive();
   const [years, setYears] = useState<FinancialYear[]>([]);
   const [loading, setLoading] = useState(false);
   const [showForm, setShowForm] = useState(false);

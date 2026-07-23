@@ -5,8 +5,10 @@ import { useEffect, useState } from "react";
 import { getCurrentUser } from "@/lib/auth";
 import { PERMISSIONS } from "@/lib/permissions";
 import { resolvePlanPermissions, PERMISSION_CATEGORIES } from "@/lib/planPermissions";
+import { useResponsive } from "@/hooks/useResponsive";
 
 export default function AdminPermissionsPage() {
+  const { isMobile } = useResponsive();
   const userSession = getCurrentUser();
   const isAdmin = userSession?.role === "ADMIN";
 
@@ -96,7 +98,7 @@ export default function AdminPermissionsPage() {
   );
 
   const card: React.CSSProperties = {
-    borderRadius:14, padding:"20px 24px",
+    borderRadius:14, padding: isMobile ? "12px 11px" : "20px 24px",
     background:"rgba(255,255,255,0.03)",
     border:"1px solid rgba(255,255,255,0.07)",
     marginBottom:16,

@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { getCurrentUser } from "@/lib/auth";
+import { useResponsive } from "@/hooks/useResponsive";
 
 const ff = "'Outfit','Inter',sans-serif";
 function fmt(n: number) { return n.toLocaleString("en-US", { minimumFractionDigits: 0, maximumFractionDigits: 0 }); }
@@ -8,6 +9,7 @@ function fmt(n: number) { return n.toLocaleString("en-US", { minimumFractionDigi
 interface Row { driverOrRoute: string; totalDeliveries: number; onTimeCount: number; lateCount: number; failedCount: number; onTimeRatePct: number; avgDeliveryDays: number; }
 
 export default function DeliveryPerformancePage() {
+  const { isMobile } = useResponsive();
   const user = getCurrentUser();
   const [data, setData]       = useState<Row[]>([]);
   const [loading, setLoading] = useState(true);
@@ -24,7 +26,7 @@ export default function DeliveryPerformancePage() {
   const inp: React.CSSProperties = { background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 8, padding: "7px 12px", color: "var(--text-primary)", fontFamily: ff, fontSize: 12, outline: "none" };
 
   return (
-    <div style={{ padding: "24px 28px", fontFamily: ff, color: "var(--text-primary)", maxWidth: 1100 }}>
+    <div style={{ padding: isMobile ? "13px 13px" : "24px 28px", fontFamily: ff, color: "var(--text-primary)", maxWidth: 1100 }}>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 24, flexWrap: "wrap", gap: 12 }}>
         <div>
           <h1 style={{ margin: 0, fontSize: 22, fontWeight: 900, letterSpacing: "-.3px" }}>Delivery Performance</h1>
@@ -42,14 +44,14 @@ export default function DeliveryPerformancePage() {
         </div>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 12, marginBottom: 20 }}>
+      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 12, marginBottom: 20 }}>
         {[
           { label: "On-Time Rate",     value: `${overallOnTime.toFixed(1)}%`, color: overallOnTime >= 90 ? "#34d399" : overallOnTime >= 70 ? "#fbbf24" : "#f87171" },
           { label: "Total Deliveries", value: fmt(totals.deliveries),          color: "#818cf8" },
           { label: "Late",             value: fmt(totals.late),                color: "#fbbf24" },
           { label: "Failed",           value: fmt(totals.failed),              color: "#f87171" },
         ].map((c, i) => (
-          <div key={i} style={{ borderRadius: 12, padding: "16px 18px", background: "var(--panel-bg)", border: "1px solid var(--border)" }}>
+          <div key={i} style={{ borderRadius: 12, padding: isMobile ? "12px 10px" : "16px 18px", background: "var(--panel-bg)", border: "1px solid var(--border)" }}>
             <div style={{ fontSize: 11, color: "var(--text-muted)", fontWeight: 700, textTransform: "uppercase", letterSpacing: ".06em", marginBottom: 6 }}>{c.label}</div>
             <div style={{ fontSize: 20, fontWeight: 900, color: c.color }}>{c.value}</div>
           </div>

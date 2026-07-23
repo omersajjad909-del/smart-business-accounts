@@ -4,6 +4,7 @@ import type { CSSProperties } from "react";
 import { useMemo, useState } from "react";
 import { useBusinessRecords } from "@/lib/useBusinessRecords";
 import { ecommerceBg, ecommerceBorder, ecommerceFont, ecommerceMuted, mapEcommerceProducts, platformOptions } from "../_shared";
+import { useResponsive } from "@/hooks/useResponsive";
 
 type ProductForm = {
   name: string;
@@ -24,6 +25,7 @@ const emptyForm: ProductForm = {
 };
 
 export default function EcommerceProductsPage() {
+  const { isMobile } = useResponsive();
   const { records, loading, create, update } = useBusinessRecords("ecommerce_product");
   const products = useMemo(() => mapEcommerceProducts(records), [records]);
   const [showModal, setShowModal] = useState(false);
@@ -67,7 +69,7 @@ export default function EcommerceProductsPage() {
   }
 
   return (
-    <div style={{ padding: "28px 32px", fontFamily: ecommerceFont, color: "#fff", minHeight: "100vh" }}>
+    <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", fontFamily: ecommerceFont, color: "#fff", minHeight: "100vh" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 28 }}>
         <div>
           <h1 style={{ fontSize: 24, fontWeight: 900, margin: "0 0 6px" }}>Product Listings</h1>
@@ -78,14 +80,14 @@ export default function EcommerceProductsPage() {
         </button>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 12, marginBottom: 24 }}>
+      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 12, marginBottom: 24 }}>
         {[
           { label: "Total Products", value: products.length, color: "#818cf8" },
           { label: "Active Listings", value: products.filter((product) => product.status === "active").length, color: "#34d399" },
           { label: "Low Stock", value: lowStock, color: "#f59e0b" },
           { label: "Sales Value", value: `Rs. ${totalRevenue.toLocaleString()}`, color: "#a78bfa" },
         ].map((card) => (
-          <div key={card.label} style={{ background: ecommerceBg, border: `1px solid ${ecommerceBorder}`, borderRadius: 16, padding: "18px 20px" }}>
+          <div key={card.label} style={{ background: ecommerceBg, border: `1px solid ${ecommerceBorder}`, borderRadius: 16, padding: isMobile ? "12px 10px" : "18px 20px" }}>
             <div style={{ fontSize: 12, color: ecommerceMuted, marginBottom: 8, textTransform: "uppercase", letterSpacing: ".06em" }}>{card.label}</div>
             <div style={{ fontSize: 24, fontWeight: 900, color: card.color }}>{card.value}</div>
           </div>
@@ -115,14 +117,14 @@ export default function EcommerceProductsPage() {
             <tbody>
               {products.map((product) => (
                 <tr key={product.id}>
-                  <td style={{ padding: "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)", fontWeight: 700 }}>{product.name}</td>
-                  <td style={{ padding: "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)", fontSize: 13 }}>{product.category}</td>
-                  <td style={{ padding: "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)", fontSize: 12, color: ecommerceMuted }}>{product.sku}</td>
-                  <td style={{ padding: "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)", fontSize: 13 }}>{product.platform}</td>
-                  <td style={{ padding: "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)", color: "#34d399", fontWeight: 700 }}>Rs. {product.price.toLocaleString()}</td>
-                  <td style={{ padding: "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)", color: product.stock === 0 ? "#f87171" : "#fff", fontWeight: product.stock <= 5 ? 700 : 500 }}>{product.stock}</td>
-                  <td style={{ padding: "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)" }}>{product.sales}</td>
-                  <td style={{ padding: "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)" }}>
+                  <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)", fontWeight: 700 }}>{product.name}</td>
+                  <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)", fontSize: 13 }}>{product.category}</td>
+                  <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)", fontSize: 12, color: ecommerceMuted }}>{product.sku}</td>
+                  <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)", fontSize: 13 }}>{product.platform}</td>
+                  <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)", color: "#34d399", fontWeight: 700 }}>Rs. {product.price.toLocaleString()}</td>
+                  <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)", color: product.stock === 0 ? "#f87171" : "#fff", fontWeight: product.stock <= 5 ? 700 : 500 }}>{product.stock}</td>
+                  <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)" }}>{product.sales}</td>
+                  <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)" }}>
                     <button
                       onClick={() => update(product.id, { status: product.status === "active" ? "inactive" : "active" })}
                       style={{

@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { fetchJson, schoolBg, schoolBorder, schoolFont, schoolMuted, type SchoolControlCenter } from "./_shared";
+import { useResponsive } from "@/hooks/useResponsive";
 
 const emptyState: SchoolControlCenter = {
   summary: { students: 0, activeStudents: 0, defaulters: 0, collectedFees: 0, pendingFees: 0, schedules: 0, exams: 0, passRate: 0, pendingAdmissions: 0, teachers: 0, attendancePresent: 0, attendanceTotal: 0 },
@@ -16,6 +17,7 @@ const emptyState: SchoolControlCenter = {
 };
 
 export default function SchoolOverviewPage() {
+  const { isMobile } = useResponsive();
   const [data, setData] = useState(emptyState);
 
   useEffect(() => {
@@ -25,7 +27,7 @@ export default function SchoolOverviewPage() {
   const { summary, students } = data;
 
   return (
-    <div style={{ minHeight: "100vh", padding: "28px 32px", color: "#fff", fontFamily: schoolFont }}>
+    <div style={{ minHeight: "100vh", padding: isMobile ? "17px 16px" : "28px 32px", color: "#fff", fontFamily: schoolFont }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 20, flexWrap: "wrap", marginBottom: 24 }}>
         <div>
           <h1 style={{ margin: "0 0 6px", fontSize: 26, fontWeight: 800 }}>School Command Center</h1>
@@ -39,7 +41,7 @@ export default function SchoolOverviewPage() {
             { label: "Exams", href: "/dashboard/school/exams" },
             { label: "Analytics", href: "/dashboard/school/analytics" },
           ].map((item) => (
-            <Link prefetch={false} key={item.href} href={item.href} style={{ padding: "10px 14px", borderRadius: 10, border: `1px solid ${schoolBorder}`, background: schoolBg, color: "#a5b4fc", textDecoration: "none", fontSize: 12, fontWeight: 700 }}>
+            <Link prefetch={false} key={item.href} href={item.href} style={{ padding: isMobile ? "8px 8px" : "10px 14px", borderRadius: 10, border: `1px solid ${schoolBorder}`, background: schoolBg, color: "#a5b4fc", textDecoration: "none", fontSize: 12, fontWeight: 700 }}>
               {item.label}
             </Link>
           ))}
@@ -54,7 +56,7 @@ export default function SchoolOverviewPage() {
           { label: "Pending Fees", value: `Rs. ${summary.pendingFees.toLocaleString()}`, color: "#f87171" },
           { label: "Pass Rate", value: `${summary.passRate}%`, color: "#f59e0b" },
         ].map((card) => (
-          <div key={card.label} style={{ background: schoolBg, border: `1px solid ${schoolBorder}`, borderRadius: 14, padding: "18px 20px" }}>
+          <div key={card.label} style={{ background: schoolBg, border: `1px solid ${schoolBorder}`, borderRadius: 14, padding: isMobile ? "11px 10px" : "18px 20px" }}>
             <div style={{ fontSize: 12, color: schoolMuted, marginBottom: 8 }}>{card.label}</div>
             <div style={{ fontSize: 24, fontWeight: 800, color: card.color }}>{card.value}</div>
           </div>
@@ -63,7 +65,7 @@ export default function SchoolOverviewPage() {
 
       <div style={{ display: "grid", gridTemplateColumns: "1.05fr .95fr", gap: 18 }}>
         <div style={{ background: schoolBg, border: `1px solid ${schoolBorder}`, borderRadius: 16, overflow: "hidden" }}>
-          <div style={{ padding: "16px 18px", borderBottom: `1px solid ${schoolBorder}`, fontSize: 15, fontWeight: 800 }}>Academic Snapshot</div>
+          <div style={{ padding: isMobile ? "10px 9px" : "16px 18px", borderBottom: `1px solid ${schoolBorder}`, fontSize: 15, fontWeight: 800 }}>Academic Snapshot</div>
           <div style={{ padding: 18, display: "grid", gap: 10 }}>
             {[
               { label: "Scheduled periods", value: summary.schedules, color: "#a5b4fc" },
@@ -72,7 +74,7 @@ export default function SchoolOverviewPage() {
               { label: "Teachers", value: summary.teachers, color: "#34d399" },
               { label: "Attendance today", value: `${summary.attendancePresent}/${summary.attendanceTotal}`, color: "#60a5fa" },
             ].map((row) => (
-              <div key={row.label} style={{ display: "flex", justifyContent: "space-between", padding: "10px 12px", borderRadius: 10, background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.05)" }}>
+              <div key={row.label} style={{ display: "flex", justifyContent: "space-between", padding: isMobile ? "8px 8px" : "10px 12px", borderRadius: 10, background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.05)" }}>
                 <span style={{ fontSize: 13, color: schoolMuted }}>{row.label}</span>
                 <span style={{ fontSize: 16, fontWeight: 800, color: row.color }}>{row.value}</span>
               </div>
@@ -81,10 +83,10 @@ export default function SchoolOverviewPage() {
         </div>
 
         <div style={{ background: schoolBg, border: `1px solid ${schoolBorder}`, borderRadius: 16, overflow: "hidden" }}>
-          <div style={{ padding: "16px 18px", borderBottom: `1px solid ${schoolBorder}`, fontSize: 15, fontWeight: 800 }}>Watchlist</div>
+          <div style={{ padding: isMobile ? "10px 9px" : "16px 18px", borderBottom: `1px solid ${schoolBorder}`, fontSize: 15, fontWeight: 800 }}>Watchlist</div>
           <div style={{ padding: 18, display: "grid", gap: 10 }}>
             {students.filter((row) => row.feeStatus === "overdue").slice(0, 5).map((student) => (
-              <div key={student.id} style={{ padding: "12px 14px", borderRadius: 10, background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.05)" }}>
+              <div key={student.id} style={{ padding: isMobile ? "8px 8px" : "12px 14px", borderRadius: 10, background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.05)" }}>
                 <div style={{ fontSize: 14, fontWeight: 700 }}>{student.name}</div>
                 <div style={{ fontSize: 12, color: schoolMuted, marginTop: 4 }}>Roll {student.rollNo} | Class {student.className}{student.section ? `-${student.section}` : ""}</div>
                 <div style={{ fontSize: 12, color: "#fca5a5", marginTop: 6 }}>Fee status: {student.feeStatus}</div>

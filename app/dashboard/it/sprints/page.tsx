@@ -3,6 +3,7 @@
 import toast from "react-hot-toast";
 import { useState } from 'react';
 import { useBusinessRecords } from '@/lib/useBusinessRecords';
+import { useResponsive } from "@/hooks/useResponsive";
 
 const S = {
   page: { padding: '32px', fontFamily: 'Inter, sans-serif', color: '#fff', minHeight: '100vh' },
@@ -10,15 +11,15 @@ const S = {
   title: { fontSize: 24, fontWeight: 700, margin: 0 },
   sub: { fontSize: 14, color: 'rgba(255,255,255,.5)', marginTop: 4 },
   btn: { background: '#7c3aed', color: '#fff', border: 'none', borderRadius: 8, padding: '10px 20px', fontWeight: 600, cursor: 'pointer', fontSize: 14 },
-  stats: { display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 16, marginBottom: 28 },
-  stat: { background: 'rgba(255,255,255,.03)', border: '1px solid rgba(255,255,255,.07)', borderRadius: 12, padding: '20px 24px' },
+  stats: { display: 'grid', gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 16, marginBottom: 28 },
+  stat: { background: 'rgba(255,255,255,.03)', border: '1px solid rgba(255,255,255,.07)', borderRadius: 12, padding: isMobile ? "12px 11px" : "20px 24px" },
   statLabel: { fontSize: 13, color: 'rgba(255,255,255,.5)', marginBottom: 6 },
   statVal: { fontSize: 28, fontWeight: 700 },
   grid: { display: 'grid', gap: 20 },
   card: { background: 'rgba(255,255,255,.03)', border: '1px solid rgba(255,255,255,.07)', borderRadius: 12, padding: 24 },
   badge: (c: string) => ({ display: 'inline-block', background: `${c}20`, color: c, borderRadius: 6, padding: '2px 10px', fontSize: 12, fontWeight: 600 }),
-  kanban: { display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 12, margin: '20px 0' },
-  kanbanCol: (c: string) => ({ background: `${c}10`, border: `1px solid ${c}30`, borderRadius: 10, padding: '14px 16px', textAlign: 'center' as const }),
+  kanban: { display: 'grid', gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 12, margin: '20px 0' },
+  kanbanCol: (c: string) => ({ background: `${c}10`, border: `1px solid ${c}30`, borderRadius: 10, padding: isMobile ? "12px 10px" : "14px 16px", textAlign: 'center' as const }),
   kanbanLabel: { fontSize: 12, color: 'rgba(255,255,255,.5)', marginBottom: 6 },
   kanbanCount: (c: string) => ({ fontSize: 28, fontWeight: 700, color: c }),
   progressBar: { background: 'rgba(255,255,255,.08)', borderRadius: 4, height: 6 },
@@ -38,6 +39,7 @@ const S = {
 const STATUS_COLOR: Record<string, string> = { Active: '#34d399', Completed: '#818cf8', Planning: '#38bdf8' };
 
 export default function SprintsPage() {
+  const { isMobile } = useResponsive();
   const { records, loading, create } = useBusinessRecords('sprint');
   const [showModal, setShowModal] = useState(false);
   const [form, setForm] = useState({ projectName: '', name: '', start: '', end: '', total: '', status: 'Active' });

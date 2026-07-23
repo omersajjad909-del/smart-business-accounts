@@ -4,6 +4,7 @@ import { confirmToast, alertToast } from "@/lib/toast-feedback";
 import toast from "react-hot-toast";
 import { useState } from "react";
 import { useBusinessRecords } from "@/lib/useBusinessRecords";
+import { useResponsive } from "@/hooks/useResponsive";
 
 const ff = "'Outfit','Inter',sans-serif";
 const bg = "rgba(255,255,255,0.03)";
@@ -16,6 +17,7 @@ const EMPTY_MED: Medicine = { name: "", dosage: "", frequency: "Once daily", dur
 const EMPTY_FORM = { patient: "", doctor: "", date: new Date().toISOString().split("T")[0], medicines: [{ ...EMPTY_MED }], diagnosis: "", notes: "" };
 
 export default function PrescriptionsPage() {
+  const { isMobile } = useResponsive();
   const { records, loading, create, update } = useBusinessRecords("prescription");
   const patientStore = useBusinessRecords("patient");
   const [expanded, setExpanded] = useState<string | null>(null);
@@ -87,7 +89,7 @@ export default function PrescriptionsPage() {
   }
 
   return (
-    <div style={{ minHeight: "100vh", background: "#0f1117", color: "#fff", fontFamily: ff, padding: "28px 32px" }}>
+    <div style={{ minHeight: "100vh", background: "#0f1117", color: "#fff", fontFamily: ff, padding: isMobile ? "15px 14px" : "28px 32px" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24 }}>
         <div>
           <h1 style={{ margin: 0, fontSize: 26, fontWeight: 700 }}>Prescriptions</h1>
@@ -100,7 +102,7 @@ export default function PrescriptionsPage() {
       </div>
 
       {/* Stats */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 16, marginBottom: 24 }}>
+      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 16, marginBottom: 24 }}>
         {[
           { label: "Total", value: total, color: "#a78bfa" },
           { label: "Active", value: active, color: "#22c55e" },
@@ -221,7 +223,7 @@ export default function PrescriptionsPage() {
               <button onClick={addMed} style={{ background: "rgba(59,130,246,0.15)", border: `1px solid rgba(59,130,246,0.3)`, color: "#3b82f6", borderRadius: 6, padding: "5px 12px", cursor: "pointer", fontFamily: ff, fontSize: 12 }}>+ Add Row</button>
             </div>
             {form.medicines.map((m, i) => (
-              <div key={i} style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1.5fr 1fr 60px 32px", gap: 8, marginBottom: 8 }}>
+              <div key={i} style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr 1fr" : "2fr 1fr 1.5fr 1fr 60px 32px", gap: 8, marginBottom: 8 }}>
                 {(["name", "dosage", "frequency", "duration"] as (keyof Medicine)[]).map(key => (
                   <input key={key} value={String(m[key])} onChange={e => updateMed(i, key, e.target.value)} placeholder={key.charAt(0).toUpperCase() + key.slice(1)}
                     style={{ background: bg, border: `1px solid ${border}`, borderRadius: 6, padding: "7px 10px", color: "#fff", fontFamily: ff, fontSize: 13, boxSizing: "border-box" }} />

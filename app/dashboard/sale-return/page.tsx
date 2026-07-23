@@ -7,6 +7,7 @@ import { useCallback, useEffect, useState } from "react";
 import { getCurrentUser } from "@/lib/auth";
 import { PrintActionBar } from "@/components/print/PrintActionBar";
 import { PrintDocA4, PrintPaperWrapper } from "@/components/print/PrintDocA4";
+import { useResponsive } from "@/hooks/useResponsive";
 
 const FONT  = "'Outfit','Inter',sans-serif";
 const ACCENT = "#f87171";
@@ -17,7 +18,7 @@ const MUTED  = "var(--text-muted)";
 const BG     = "var(--app-bg)";
 
 function inp(extra?: React.CSSProperties): React.CSSProperties {
-  return { padding: "9px 13px", borderRadius: 8, border: `1.5px solid ${BORDER}`, background: BG, color: TEXT, fontFamily: FONT, fontSize: 13.5, outline: "none", width: "100%", boxSizing: "border-box" as const, ...extra };
+  return { padding: isMobile ? "8px 8px" : "9px 13px", borderRadius: 8, border: `1.5px solid ${BORDER}`, background: BG, color: TEXT, fontFamily: FONT, fontSize: 13.5, outline: "none", width: "100%", boxSizing: "border-box" as const, ...extra };
 }
 function Label({ children }: { children: React.ReactNode }) {
   return <div style={{ fontSize: 10.5, color: MUTED, fontWeight: 700, marginBottom: 5, textTransform: "uppercase" as const, letterSpacing: 0.6 }}>{children}</div>;
@@ -41,6 +42,7 @@ type SavedData = {
 };
 
 export default function SalesReturnPage() {
+  const { isMobile } = useResponsive();
   const today = new Date().toISOString().slice(0, 10);
   const user  = getCurrentUser();
 
@@ -229,8 +231,8 @@ export default function SalesReturnPage() {
             <p style={{ margin: "3px 0 0", fontSize: 13, color: MUTED }}>{returns.length} total returns</p>
           </div>
           <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-            <button onClick={() => { setShowList(!showList); if (!showList) { setShowForm(false); loadReturns(); } else setShowForm(true); }} style={{ padding: "9px 18px", borderRadius: 8, border: `1px solid ${BORDER}`, background: showList ? "rgba(248,113,113,0.12)" : PANEL, color: showList ? ACCENT : TEXT, fontFamily: FONT, fontSize: 13, fontWeight: 600, cursor: "pointer" }}>{showList ? "Hide List" : "Show List"}</button>
-            <button onClick={() => { setShowForm(true); setShowList(false); resetForm(); }} style={{ padding: "9px 20px", borderRadius: 8, border: "none", background: "linear-gradient(135deg,#f87171,#dc2626)", color: "#fff", fontFamily: FONT, fontSize: 13, fontWeight: 700, cursor: "pointer", boxShadow: "0 4px 14px rgba(220,38,38,0.35)" }}>+ New Return</button>
+            <button onClick={() => { setShowList(!showList); if (!showList) { setShowForm(false); loadReturns(); } else setShowForm(true); }} style={{ padding: isMobile ? "8px 9px" : "9px 18px", borderRadius: 8, border: `1px solid ${BORDER}`, background: showList ? "rgba(248,113,113,0.12)" : PANEL, color: showList ? ACCENT : TEXT, fontFamily: FONT, fontSize: 13, fontWeight: 600, cursor: "pointer" }}>{showList ? "Hide List" : "Show List"}</button>
+            <button onClick={() => { setShowForm(true); setShowList(false); resetForm(); }} style={{ padding: isMobile ? "8px 10px" : "9px 20px", borderRadius: 8, border: "none", background: "linear-gradient(135deg,#f87171,#dc2626)", color: "#fff", fontFamily: FONT, fontSize: 13, fontWeight: 700, cursor: "pointer", boxShadow: "0 4px 14px rgba(220,38,38,0.35)" }}>+ New Return</button>
           </div>
         </div>
 
@@ -242,30 +244,30 @@ export default function SalesReturnPage() {
                 <thead>
                   <tr style={{ background: "rgba(248,113,113,0.07)" }}>
                     {["Return No", "Date", "Customer", "Invoice", "Total", "Actions"].map((h, hi) => (
-                      <th key={h} style={{ padding: "12px 16px", textAlign: hi >= 4 ? "right" : "left", color: MUTED, fontWeight: 700, fontSize: 10.5, textTransform: "uppercase", letterSpacing: 0.7 }}>{h}</th>
+                      <th key={h} style={{ padding: isMobile ? "8px 8px" : "12px 16px", textAlign: hi >= 4 ? "right" : "left", color: MUTED, fontWeight: 700, fontSize: 10.5, textTransform: "uppercase", letterSpacing: 0.7 }}>{h}</th>
                     ))}
                   </tr>
                 </thead>
                 <tbody>
                   {returns.length === 0 ? (
-                    <tr><td colSpan={6} style={{ padding: "40px 16px", textAlign: "center", color: MUTED }}>No returns found</td></tr>
+                    <tr><td colSpan={6} style={{ padding: isMobile ? "24px 8px" : "40px 16px", textAlign: "center", color: MUTED }}>No returns found</td></tr>
                   ) : returns.map(ret => (
                     <tr key={ret.id} style={{ borderTop: `1px solid ${BORDER}` }}>
-                      <td style={{ padding: "13px 16px", fontWeight: 700, color: ACCENT, fontFamily: "monospace", fontSize: 13 }}>{ret.returnNo}</td>
-                      <td style={{ padding: "13px 16px", color: MUTED }}>{fmtDate(ret.date)}</td>
-                      <td style={{ padding: "13px 16px", fontWeight: 600 }}>{ret.customer?.name || "—"}</td>
-                      <td style={{ padding: "13px 16px", color: MUTED }}>{ret.invoice?.invoiceNo || "—"}</td>
-                      <td style={{ padding: "13px 16px", textAlign: "right", fontWeight: 700 }}>{fmt(ret.total)}</td>
-                      <td style={{ padding: "13px 16px", textAlign: "right", whiteSpace: "nowrap" }}>
-                        <button onClick={() => startEdit(ret)} style={{ padding: "5px 13px", borderRadius: 6, border: "1px solid rgba(248,113,113,0.35)", background: "rgba(248,113,113,0.08)", color: ACCENT, fontFamily: FONT, fontSize: 11, fontWeight: 700, cursor: "pointer", marginRight: 8 }}>Edit</button>
-                        <button onClick={() => deleteReturn(ret.id)} style={{ padding: "5px 13px", borderRadius: 6, border: `1px solid ${BORDER}`, background: "transparent", color: MUTED, fontFamily: FONT, fontSize: 11, cursor: "pointer" }}>Delete</button>
+                      <td style={{ padding: isMobile ? "8px 8px" : "13px 16px", fontWeight: 700, color: ACCENT, fontFamily: "monospace", fontSize: 13 }}>{ret.returnNo}</td>
+                      <td style={{ padding: isMobile ? "8px 8px" : "13px 16px", color: MUTED }}>{fmtDate(ret.date)}</td>
+                      <td style={{ padding: isMobile ? "8px 8px" : "13px 16px", fontWeight: 600 }}>{ret.customer?.name || "—"}</td>
+                      <td style={{ padding: isMobile ? "8px 8px" : "13px 16px", color: MUTED }}>{ret.invoice?.invoiceNo || "—"}</td>
+                      <td style={{ padding: isMobile ? "8px 8px" : "13px 16px", textAlign: "right", fontWeight: 700 }}>{fmt(ret.total)}</td>
+                      <td style={{ padding: isMobile ? "8px 8px" : "13px 16px", textAlign: "right", whiteSpace: "nowrap" }}>
+                        <button onClick={() => startEdit(ret)} style={{ padding: isMobile ? "8px 8px" : "5px 13px", borderRadius: 6, border: "1px solid rgba(248,113,113,0.35)", background: "rgba(248,113,113,0.08)", color: ACCENT, fontFamily: FONT, fontSize: 11, fontWeight: 700, cursor: "pointer", marginRight: 8 }}>Edit</button>
+                        <button onClick={() => deleteReturn(ret.id)} style={{ padding: isMobile ? "8px 8px" : "5px 13px", borderRadius: 6, border: `1px solid ${BORDER}`, background: "transparent", color: MUTED, fontFamily: FONT, fontSize: 11, cursor: "pointer" }}>Delete</button>
                       </td>
                     </tr>
                   ))}
                 </tbody>
               </table>
             </div>
-            <div style={{ padding: "11px 18px", borderTop: `1px solid ${BORDER}`, fontSize: 12, color: MUTED }}>{returns.length} returns</div>
+            <div style={{ padding: isMobile ? "8px 9px" : "11px 18px", borderTop: `1px solid ${BORDER}`, fontSize: 12, color: MUTED }}>{returns.length} returns</div>
           </div>
         )}
 
@@ -273,7 +275,7 @@ export default function SalesReturnPage() {
         {showForm && !preview && (
           <div className="no-print">
             {/* Page header card */}
-            <div style={{ background: PANEL, border: `1.5px solid ${BORDER}`, borderRadius: 14, padding: "14px 22px", marginBottom: 20, display: "flex", alignItems: "center", gap: 12 }}>
+            <div style={{ background: PANEL, border: `1.5px solid ${BORDER}`, borderRadius: 14, padding: isMobile ? "8px 11px" : "14px 22px", marginBottom: 20, display: "flex", alignItems: "center", gap: 12 }}>
               <div style={{ width: 36, height: 36, borderRadius: 9, background: "rgba(248,113,113,0.12)", display: "flex", alignItems: "center", justifyContent: "center" }}>
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={ACCENT} strokeWidth="2"><polyline points="3 6 5 2 19 2 21 6"/><path d="M1 6h22"/><path d="M5 6l1 14h12l1-14"/><line x1="9" y1="11" x2="9" y2="17"/><line x1="15" y1="11" x2="15" y2="17"/></svg>
               </div>
@@ -300,7 +302,7 @@ export default function SalesReturnPage() {
                       </select>
                     </div>
                     {customerName && (
-                      <div style={{ padding: "10px 12px", background: "rgba(248,113,113,0.06)", borderRadius: 8, border: `1px solid rgba(248,113,113,0.25)` }}>
+                      <div style={{ padding: isMobile ? "8px 8px" : "10px 12px", background: "rgba(248,113,113,0.06)", borderRadius: 8, border: `1px solid rgba(248,113,113,0.25)` }}>
                         <div style={{ fontWeight: 700, fontSize: 13, color: ACCENT, marginBottom: 2 }}>{customerName}</div>
                         {displayInvoiceNo && <div style={{ fontSize: 11, color: MUTED }}>Invoice: {displayInvoiceNo}</div>}
                       </div>
@@ -309,7 +311,7 @@ export default function SalesReturnPage() {
                   <div style={{ background: PANEL, border: `1px solid ${BORDER}`, borderRadius: 12, padding: 18 }}>
                     <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 12, color: TEXT }}>Your Business</div>
                     {companyInfo ? (
-                      <div style={{ padding: "10px 12px", background: "var(--panel-bg-2,rgba(255,255,255,0.03))", borderRadius: 8, border: `1px solid ${BORDER}` }}>
+                      <div style={{ padding: isMobile ? "8px 8px" : "10px 12px", background: "var(--panel-bg-2,rgba(255,255,255,0.03))", borderRadius: 8, border: `1px solid ${BORDER}` }}>
                         <div style={{ fontWeight: 700, fontSize: 14, marginBottom: 4 }}>{companyInfo.name}</div>
                         {companyInfo.address && <div style={{ fontSize: 12, color: MUTED, marginBottom: 3 }}>{companyInfo.address}</div>}
                         {companyInfo.phone && <div style={{ fontSize: 12, color: MUTED }}>{companyInfo.phone}</div>}
@@ -321,17 +323,17 @@ export default function SalesReturnPage() {
                 {/* Items Table */}
                 {rows.length > 0 && (
                   <div style={{ background: PANEL, border: `1px solid ${BORDER}`, borderRadius: 12, overflow: "hidden" }}>
-                    <div style={{ padding: "12px 16px", borderBottom: `1px solid ${BORDER}`, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                    <div style={{ padding: isMobile ? "8px 8px" : "12px 16px", borderBottom: `1px solid ${BORDER}`, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                       <div style={{ fontSize: 13, fontWeight: 700, color: TEXT }}>Return Items</div>
                       <div style={{ fontSize: 11, color: MUTED }}>{rows.filter(r => Number(r.qty) > 0).length} selected</div>
                     </div>
                     {isMobile ? (
-                      <div style={{ padding: "10px 14px" }}>
+                      <div style={{ padding: isMobile ? "8px 8px" : "10px 14px" }}>
                         {rows.map((r, i) => (
-                          <div key={i} style={{ border: `1px solid ${BORDER}`, borderRadius: 10, padding: "12px 14px", marginBottom: 10 }}>
+                          <div key={i} style={{ border: `1px solid ${BORDER}`, borderRadius: 10, padding: isMobile ? "8px 8px" : "12px 14px", marginBottom: 10 }}>
                             <div style={{ fontWeight: 700, color: TEXT, marginBottom: 6 }}>{r.name}</div>
                             <div style={{ fontSize: 11, color: MUTED, marginBottom: 8 }}>Max returnable: <strong style={{ color: "#60a5fa" }}>{r.maxQty}</strong></div>
-                            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
+                            <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: 8 }}>
                               <div><Label>Return Qty</Label><input type="number" min={0} max={r.maxQty} value={r.qty} onChange={e => updateRow(i, "qty", e.target.value)} style={inp({ textAlign: "right", borderColor: "rgba(248,113,113,0.4)" })} /></div>
                               <div><Label>Rate</Label><div style={{ ...inp(), background: "transparent" }}>{fmt(r.rate)}</div></div>
                               <div><Label>Disc%</Label><input type="number" value={r.discountPercent} onChange={e => updateRow(i, "discountPercent", e.target.value)} style={inp({ textAlign: "right" })} /></div>
@@ -346,7 +348,7 @@ export default function SalesReturnPage() {
                           <thead>
                             <tr style={{ background: "rgba(248,113,113,0.06)" }}>
                               {["Item", "Max Qty", "Return Qty", "Rate", "Disc%", "Tax%", "Amount", "×"].map((h, hi) => (
-                                <th key={hi} style={{ padding: "10px 8px", textAlign: hi >= 3 ? "right" : "left", color: MUTED, fontWeight: 700, fontSize: 10.5, textTransform: "uppercase", letterSpacing: 0.6 }}>{h}</th>
+                                <th key={hi} style={{ padding: isMobile ? "8px 8px" : "10px 8px", textAlign: hi >= 3 ? "right" : "left", color: MUTED, fontWeight: 700, fontSize: 10.5, textTransform: "uppercase", letterSpacing: 0.6 }}>{h}</th>
                               ))}
                             </tr>
                           </thead>
@@ -359,12 +361,12 @@ export default function SalesReturnPage() {
                                 <tr key={i} style={{ borderTop: `1px solid ${BORDER}` }}>
                                   <td style={{ padding: "8px", fontWeight: 600, fontSize: 13, minWidth: 120 }}>{r.name}</td>
                                   <td style={{ padding: "8px", textAlign: "left", fontWeight: 700, color: "#60a5fa", fontSize: 13 }}>{r.maxQty}</td>
-                                  <td style={{ padding: "6px 8px", width: 90 }}><input type="number" min={0} max={r.maxQty} value={r.qty} onChange={e => updateRow(i, "qty", e.target.value)} style={inp({ padding: "5px 7px", textAlign: "right", fontSize: 13, borderColor: "rgba(248,113,113,0.4)" })} /></td>
+                                  <td style={{ padding: isMobile ? "8px 8px" : "6px 8px", width: 90 }}><input type="number" min={0} max={r.maxQty} value={r.qty} onChange={e => updateRow(i, "qty", e.target.value)} style={inp({ padding: isMobile ? "8px 8px" : "5px 7px", textAlign: "right", fontSize: 13, borderColor: "rgba(248,113,113,0.4)" })} /></td>
                                   <td style={{ padding: "8px", textAlign: "right", fontSize: 13, color: MUTED, width: 80 }}>{fmt(r.rate)}</td>
-                                  <td style={{ padding: "6px 8px", width: 72 }}><input type="number" value={r.discountPercent} onChange={e => updateRow(i, "discountPercent", e.target.value)} placeholder="0" style={inp({ padding: "5px 7px", textAlign: "right", fontSize: 13 })} /></td>
-                                  <td style={{ padding: "6px 8px", width: 72 }}><input type="number" value={r.taxPercent} onChange={e => updateRow(i, "taxPercent", e.target.value)} placeholder="0" style={inp({ padding: "5px 7px", textAlign: "right", fontSize: 13 })} /></td>
+                                  <td style={{ padding: isMobile ? "8px 8px" : "6px 8px", width: 72 }}><input type="number" value={r.discountPercent} onChange={e => updateRow(i, "discountPercent", e.target.value)} placeholder="0" style={inp({ padding: isMobile ? "8px 8px" : "5px 7px", textAlign: "right", fontSize: 13 })} /></td>
+                                  <td style={{ padding: isMobile ? "8px 8px" : "6px 8px", width: 72 }}><input type="number" value={r.taxPercent} onChange={e => updateRow(i, "taxPercent", e.target.value)} placeholder="0" style={inp({ padding: isMobile ? "8px 8px" : "5px 7px", textAlign: "right", fontSize: 13 })} /></td>
                                   <td style={{ padding: "8px", textAlign: "right", fontWeight: 600, fontSize: 13, whiteSpace: "nowrap", width: 90 }}>{fmt(lineBase - lineDisc + lineTax)}</td>
-                                  <td style={{ padding: "6px 8px", width: 28 }}><button onClick={() => setRows(rows.filter((_, idx) => idx !== i))} style={{ background: "none", border: "none", color: ACCENT, cursor: "pointer", fontSize: 17, padding: 0 }}>×</button></td>
+                                  <td style={{ padding: isMobile ? "8px 8px" : "6px 8px", width: 28 }}><button onClick={() => setRows(rows.filter((_, idx) => idx !== i))} style={{ background: "none", border: "none", color: ACCENT, cursor: "pointer", fontSize: 17, padding: 0 }}>×</button></td>
                                 </tr>
                               );
                             })}
@@ -405,7 +407,7 @@ export default function SalesReturnPage() {
                   <div style={{ fontSize: 10, fontWeight: 700, color: MUTED, letterSpacing: 1, textTransform: "uppercase", marginBottom: 6 }}>Sales Return</div>
                   <div style={{ fontSize: 17, fontWeight: 800, fontFamily: "monospace", color: ACCENT, marginBottom: 16 }}>{editing?.returnNo || returnNo || "Auto #"}</div>
                   <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+                    <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: 10 }}>
                       <div><Label>Return Date</Label><DateInput value={date} onChange={setDate} style={inp()} /></div>
                       <div><Label>Due Date</Label><DateInput value={dueDate} onChange={setDueDate} style={inp()} /></div>
                     </div>
@@ -420,15 +422,15 @@ export default function SalesReturnPage() {
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: 13 }}>
                       <span style={{ color: MUTED }}>Overall Discount</span>
                       <div style={{ display: "flex", gap: 5 }}>
-                        <select value={discountType} onChange={e => setDiscountType(e.target.value)} style={{ ...inp({ width: 58, padding: "3px 6px", fontSize: 12 }) }}><option value="flat">Flat</option><option value="percent">%</option></select>
-                        <input type="number" value={discount} onChange={e => setDiscount(e.target.value === "" ? "" : Number(e.target.value))} placeholder="0" style={{ ...inp({ width: 80, padding: "3px 7px", fontSize: 12, textAlign: "right" }) }} />
+                        <select value={discountType} onChange={e => setDiscountType(e.target.value)} style={{ ...inp({ width: 58, padding: isMobile ? "8px 8px" : "3px 6px", fontSize: 12 }) }}><option value="flat">Flat</option><option value="percent">%</option></select>
+                        <input type="number" value={discount} onChange={e => setDiscount(e.target.value === "" ? "" : Number(e.target.value))} placeholder="0" style={{ ...inp({ width: 80, padding: isMobile ? "8px 8px" : "3px 7px", fontSize: 12, textAlign: "right" }) }} />
                       </div>
                     </div>
                     {discountAmt > 0 && <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, color: "var(--danger,#f87171)" }}><span>Discount Amount</span><span>— {cur} {fmt(discountAmt)}</span></div>}
                     {perItemTaxAmt > 0 && <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, color: "#60a5fa" }}><span>Item Tax</span><span>+ {cur} {fmt(perItemTaxAmt)}</span></div>}
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: 13 }}>
                       <span style={{ color: MUTED }}>Freight</span>
-                      <input type="number" value={freight} onChange={e => setFreight(e.target.value === "" ? "" : Number(e.target.value))} placeholder="0.00" style={{ ...inp({ width: 100, padding: "3px 7px", fontSize: 12, textAlign: "right" }) }} />
+                      <input type="number" value={freight} onChange={e => setFreight(e.target.value === "" ? "" : Number(e.target.value))} placeholder="0.00" style={{ ...inp({ width: 100, padding: isMobile ? "8px 8px" : "3px 7px", fontSize: 12, textAlign: "right" }) }} />
                     </div>
                     <div style={{ display: "flex", justifyContent: "space-between", borderTop: `2px solid ${BORDER}`, paddingTop: 12, fontSize: 18, fontWeight: 800 }}>
                       <span>Net Total</span>
@@ -525,7 +527,7 @@ export default function SalesReturnPage() {
             <div style={{ fontSize: 24, fontWeight: 900, letterSpacing: 1 }}>SALES RETURN VOUCHER</div>
             <div style={{ fontSize: 12, color: "#333", marginTop: 4 }}>Date: {savedData.date} &nbsp;|&nbsp; Voucher No: {savedData.returnNo}</div>
           </div>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginBottom: 16, fontSize: 12 }}>
+          <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: 10, marginBottom: 16, fontSize: 12 }}>
             <div><strong>Customer:</strong> {savedData.customerName}</div>
             <div><strong>Ref Invoice:</strong> {savedData.invoiceNo}</div>
             {savedData.driverName && <div><strong>Driver / Person:</strong> {savedData.driverName}</div>}
@@ -535,19 +537,19 @@ export default function SalesReturnPage() {
           <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 12, marginBottom: 18 }}>
             <thead>
               <tr style={{ borderTop: "2px solid #000", borderBottom: "2px solid #000", background: "#f0f0f0" }}>
-                <th style={{ padding: "8px 10px", textAlign: "left" }}>Description</th>
-                <th style={{ padding: "8px 10px", textAlign: "center", width: 60 }}>Qty</th>
-                <th style={{ padding: "8px 10px", textAlign: "right", width: 90 }}>Rate</th>
-                <th style={{ padding: "8px 10px", textAlign: "right", width: 100 }}>Amount</th>
+                <th style={{ padding: isMobile ? "8px 8px" : "8px 10px", textAlign: "left" }}>Description</th>
+                <th style={{ padding: isMobile ? "8px 8px" : "8px 10px", textAlign: "center", width: 60 }}>Qty</th>
+                <th style={{ padding: isMobile ? "8px 8px" : "8px 10px", textAlign: "right", width: 90 }}>Rate</th>
+                <th style={{ padding: isMobile ? "8px 8px" : "8px 10px", textAlign: "right", width: 100 }}>Amount</th>
               </tr>
             </thead>
             <tbody>
               {savedData.items.map((it, idx) => (
                 <tr key={idx} style={{ borderBottom: "1px solid #ddd" }}>
-                  <td style={{ padding: "8px 10px", fontWeight: 600 }}>{it.name}</td>
-                  <td style={{ padding: "8px 10px", textAlign: "center" }}>{it.qty}</td>
-                  <td style={{ padding: "8px 10px", textAlign: "right" }}>{fmt(it.rate)}</td>
-                  <td style={{ padding: "8px 10px", textAlign: "right", fontWeight: 600 }}>{fmt(it.qty * it.rate)}</td>
+                  <td style={{ padding: isMobile ? "8px 8px" : "8px 10px", fontWeight: 600 }}>{it.name}</td>
+                  <td style={{ padding: isMobile ? "8px 8px" : "8px 10px", textAlign: "center" }}>{it.qty}</td>
+                  <td style={{ padding: isMobile ? "8px 8px" : "8px 10px", textAlign: "right" }}>{fmt(it.rate)}</td>
+                  <td style={{ padding: isMobile ? "8px 8px" : "8px 10px", textAlign: "right", fontWeight: 600 }}>{fmt(it.qty * it.rate)}</td>
                 </tr>
               ))}
             </tbody>
@@ -559,7 +561,7 @@ export default function SalesReturnPage() {
               <div style={{ display: "flex", justifyContent: "space-between", borderTop: "3px solid #000", paddingTop: 8, fontWeight: 900, fontSize: 16 }}><span>Net Total:</span><span>{fmt(savedData.netTotal)}</span></div>
             </div>
           </div>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 40 }}>
+          <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: 40 }}>
             {["Prepared By", "Received By"].map(l => (
               <div key={l}><div style={{ borderTop: "1px solid #000", paddingTop: 6, fontSize: 11, color: "#444" }}>{l}</div></div>
             ))}

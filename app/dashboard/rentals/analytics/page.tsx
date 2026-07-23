@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { fetchJson, rentalsAccent, type RentalsControlCenter } from "../_shared";
+import { useResponsive } from "@/hooks/useResponsive";
 
 const emptyState: RentalsControlCenter = {
   summary: { items: 0, availableItems: 0, bookings: 0, activeBookings: 0, agreements: 0, activeAgreements: 0, maintenanceJobs: 0, dueMaintenance: 0, bookingValue: 0 },
@@ -12,6 +13,7 @@ const emptyState: RentalsControlCenter = {
 };
 
 export default function RentalsAnalyticsPage() {
+  const { isMobile } = useResponsive();
   const [data, setData] = useState(emptyState);
 
   useEffect(() => {
@@ -19,20 +21,20 @@ export default function RentalsAnalyticsPage() {
   }, []);
 
   return (
-    <div style={{ padding: "28px 32px", color: "#e2e8f0", fontFamily: "'Outfit','Inter',sans-serif" }}>
+    <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", color: "#e2e8f0", fontFamily: "'Outfit','Inter',sans-serif" }}>
       <div style={{ marginBottom: 24 }}>
         <h1 style={{ margin: "0 0 6px", fontSize: 24, fontWeight: 800, color: "white" }}>Rentals Analytics</h1>
         <p style={{ margin: 0, fontSize: 14, color: "rgba(255,255,255,.45)" }}>Asset utilization, booking pressure, agreement discipline, and maintenance impact.</p>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4,minmax(0,1fr))", gap: 14, marginBottom: 24 }}>
+      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,minmax(0,1fr))", gap: 14, marginBottom: 24 }}>
         {[
           { label: "Items", value: data.summary.items, color: rentalsAccent },
           { label: "Active Bookings", value: data.summary.activeBookings, color: "#fbbf24" },
           { label: "Active Agreements", value: data.summary.activeAgreements, color: "#60a5fa" },
           { label: "Due Maintenance", value: data.summary.dueMaintenance, color: "#f97316" },
         ].map((card) => (
-          <div key={card.label} style={{ background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)", borderRadius: 16, padding: "18px 20px" }}>
+          <div key={card.label} style={{ background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)", borderRadius: 16, padding: isMobile ? "12px 10px" : "18px 20px" }}>
             <div style={{ fontSize: 11, color: "rgba(255,255,255,.45)", textTransform: "uppercase", letterSpacing: ".06em", marginBottom: 6 }}>{card.label}</div>
             <div style={{ fontSize: 28, fontWeight: 800, color: card.color }}>{card.value}</div>
           </div>

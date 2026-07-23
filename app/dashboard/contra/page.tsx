@@ -5,6 +5,7 @@ import { DateInput } from "@/app/dashboard/reports/_components/DateInput";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { getCurrentUser } from "@/lib/auth";
+import { useResponsive } from "@/hooks/useResponsive";
 
 const ff    = "'Outfit','Inter',sans-serif";
 const TEAL  = "#14b8a6";
@@ -50,6 +51,7 @@ function runQuery(entries: ContraEntry[], cNo: string, dateQ: string, acct: stri
 }
 
 export default function ContraPage() {
+  const { isMobile } = useResponsive();
   const user  = getCurrentUser();
   const today = new Date().toISOString().slice(0, 10);
 
@@ -166,7 +168,7 @@ export default function ContraPage() {
   const panel: React.CSSProperties = { background:"var(--panel-bg)", border:"1px solid var(--border)", borderRadius:12, padding:20, fontFamily:ff };
 
   return (
-    <div style={{ padding:"24px 28px", fontFamily:ff, color:"var(--text-primary)", maxWidth:1000 }}>
+    <div style={{ padding: isMobile ? "13px 13px" : "24px 28px", fontFamily:ff, color:"var(--text-primary)", maxWidth:1000 }}>
 
       {/* Title */}
       <div style={{ marginBottom:20, display:"flex", alignItems:"flex-start", justifyContent:"space-between", flexWrap:"wrap", gap:12 }}>
@@ -216,7 +218,7 @@ export default function ContraPage() {
           <div style={{ marginBottom:20 }}>
             <span style={{ fontSize:12, color:"rgba(250,204,21,.7)" }}>Enter criteria — leave blank to get all records. Use <b style={{ color:"#facc15" }}>&gt;</b>, <b style={{ color:"#facc15" }}>&lt;</b>, <b style={{ color:"#facc15" }}>&gt;=</b> for date range.</span>
           </div>
-          <div style={{ display:"grid", gridTemplateColumns:"180px 240px 1fr", gap:16, marginBottom:24 }}>
+          <div style={{ display:"grid", gridTemplateColumns: isMobile ? "1fr" : "180px 240px 1fr", gap:16, marginBottom:24 }}>
             <div>
               <label style={{ ...lbl, color:"rgba(250,204,21,.6)" }}>Contra # (e.g. CTR-5)</label>
               <input autoFocus value={queryCNo} onChange={e=>setQueryCNo(e.target.value)} placeholder="CTR-1 or blank…"
@@ -253,7 +255,7 @@ export default function ContraPage() {
       <div style={{ ...panel, marginBottom:28, display:queryMode?"none":undefined }}>
         <div style={{ fontSize:15, fontWeight:700, color:TEAL, marginBottom:20 }}>{editingId?"Edit Contra Entry":"New Contra Entry"}</div>
         <form onSubmit={handleSubmit}>
-          <div style={{ display:"grid", gridTemplateColumns:"160px 1fr 1fr 160px", gap:14, marginBottom:16 }}>
+          <div style={{ display:"grid", gridTemplateColumns: isMobile ? "1fr 1fr" : "160px 1fr 1fr 160px", gap:14, marginBottom:16 }}>
             <div>
               <label style={lbl}>Date *</label>
               <DateInput value={date} onChange={setDate} style={inp} />

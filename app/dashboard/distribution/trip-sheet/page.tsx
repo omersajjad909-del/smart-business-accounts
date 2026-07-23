@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { useBusinessRecords } from "@/lib/useBusinessRecords";
 import {
+import { useResponsive } from "@/hooks/useResponsive";
   distributionBg,
   distributionBorder,
   distributionFont,
@@ -11,6 +12,7 @@ import {
 } from "../_shared";
 
 export default function DistributionTripSheetPage() {
+  const { isMobile } = useResponsive();
   const routeRecords = useBusinessRecords("distribution_route");
   const deliveryRecords = useBusinessRecords("delivery");
   const stockRecords = useBusinessRecords("van_stock");
@@ -44,7 +46,7 @@ export default function DistributionTripSheetPage() {
   })), [selectedDate, selectedRouteId, stockRecords.records]);
 
   return (
-    <div style={{ padding: "28px 32px", fontFamily: distributionFont, color: "#fff", minHeight: "100vh" }}>
+    <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", fontFamily: distributionFont, color: "#fff", minHeight: "100vh" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 28 }}>
         <div>
           <h1 style={{ fontSize: 22, fontWeight: 800, margin: "0 0 4px" }}>Trip Sheet</h1>

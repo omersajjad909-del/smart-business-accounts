@@ -8,6 +8,7 @@ import { BUSINESS_TYPES, type BusinessType } from "@/lib/businessModules";
 import { CURRENCY_SYMBOL } from "@/lib/currency-client";
 import DemoBusinessShowcase from "./DemoBusinessShowcase";
 import {
+import { useResponsive } from "@/hooks/useResponsive";
   LineChart,
   Line,
   AreaChart,
@@ -339,7 +340,7 @@ function AIInsightPanel({
           boxShadow:
             "0 10px 40px rgba(99,102,241,.35), inset 0 0 60px rgba(139,92,246,.15)",
           border: "1px solid rgba(99,102,241,.22)",
-          padding: "14px 16px",
+          padding: isMobile ? "12px 10px" : "14px 16px",
           flex: 1,
           display: "flex",
           flexDirection: "column",
@@ -475,6 +476,7 @@ function AIInsightPanel({
    MAIN DASHBOARD
 ══════════════════════════════════════════════════════════ */
 export default function DashboardContent() {
+  const { isMobile } = useResponsive();
   const allowed = useRequirePermission(PERMISSIONS.VIEW_DASHBOARD);
   const storedUser = getCurrentUser() as {
     businessType?: string | null;
@@ -1040,7 +1042,7 @@ export default function DashboardContent() {
           className="db-card db-kpi-bal"
           style={{
             borderRadius: 16,
-            padding: "20px 22px",
+            padding: isMobile ? "12px 10px" : "20px 22px",
             background:
               "linear-gradient(135deg,rgba(99,102,241,.14),rgba(79,70,229,.07))",
             border: "1px solid rgba(99,102,241,.22)",
@@ -1102,7 +1104,7 @@ export default function DashboardContent() {
           className="db-card"
           style={{
             borderRadius: 16,
-            padding: "20px 22px",
+            padding: isMobile ? "12px 10px" : "20px 22px",
             background: "rgba(16,185,129,.07)",
             border: "1px solid rgba(16,185,129,.2)",
           }}
@@ -1163,7 +1165,7 @@ export default function DashboardContent() {
           className="db-card"
           style={{
             borderRadius: 16,
-            padding: "20px 22px",
+            padding: isMobile ? "12px 10px" : "20px 22px",
             background: "rgba(248,113,113,.07)",
             border: "1px solid rgba(248,113,113,.2)",
           }}
@@ -1224,7 +1226,7 @@ export default function DashboardContent() {
           className="db-card"
           style={{
             borderRadius: 16,
-            padding: "20px 22px",
+            padding: isMobile ? "12px 10px" : "20px 22px",
             background: `${profC}0f`,
             border: `1px solid ${profC}28`,
           }}
@@ -1633,7 +1635,7 @@ export default function DashboardContent() {
           className="db-grid-exempt"
           style={{
             display: "grid",
-            gridTemplateColumns: "1fr 1fr 1fr",
+            gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr 1fr",
             gap: 8,
             paddingTop: 16,
             borderTop: "1px solid rgba(255,255,255,.12)",
@@ -1703,7 +1705,7 @@ export default function DashboardContent() {
           className="db-grid-exempt"
           style={{
             display: "grid",
-            gridTemplateColumns: "repeat(4,1fr)",
+            gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)",
             gap: 10,
           }}
         >
@@ -2087,7 +2089,7 @@ export default function DashboardContent() {
             background:
               "linear-gradient(135deg,rgba(99,102,241,.12),rgba(139,92,246,.07))",
             border: "1px solid rgba(99,102,241,.25)",
-            padding: "18px 16px",
+            padding: isMobile ? "12px 10px" : "18px 16px",
             display: "flex",
             gap: 16,
             alignItems: "center",
@@ -2629,6 +2631,7 @@ export default function DashboardContent() {
               View all
             </Link>
           </div>
+          <div style={{ overflowX: "auto" }}>
           <div
             style={{
               display: "grid",
@@ -2637,6 +2640,7 @@ export default function DashboardContent() {
               padding: "7px 20px",
               borderBottom: "1px solid var(--border)",
               background: "rgba(255,255,255,.02)",
+              minWidth: 480,
             }}
           >
             {["Type", "Description", "Date", "Amount", "Status"].map((h) => (
@@ -2684,6 +2688,7 @@ export default function DashboardContent() {
                     gridTemplateColumns: "80px 1fr 88px 96px 80px",
                     gap: 6,
                     padding: "11px 20px",
+                    minWidth: 480,
                     borderBottom:
                       i < Math.min(stats.recentActivity.length, 6) - 1
                         ? "1px solid rgba(255,255,255,.04)"
@@ -2748,6 +2753,7 @@ export default function DashboardContent() {
               );
             })
           )}
+          </div>{/* /overflowX wrapper */}
         </div>
 
         {/* Top Expenses Donut */}
@@ -2924,7 +2930,7 @@ export default function DashboardContent() {
               borderRadius: 16,
               background: "var(--panel-bg)",
               border: "1px solid var(--border)",
-              padding: "17px 18px",
+              padding: isMobile ? "12px 10px" : "17px 18px",
             }}
           >
             <div
@@ -3015,7 +3021,7 @@ export default function DashboardContent() {
               borderRadius: 16,
               background: "var(--panel-bg)",
               border: "1px solid var(--border)",
-              padding: "17px 18px",
+              padding: isMobile ? "12px 10px" : "17px 18px",
               flex: 1,
               overflow: "hidden",
             }}
@@ -3283,7 +3289,7 @@ export default function DashboardContent() {
             borderRadius: 16,
             background: "var(--panel-bg)",
             border: "1px solid var(--border)",
-            padding: "17px 20px",
+            padding: isMobile ? "12px 10px" : "17px 20px",
           }}
         >
           <div
@@ -3328,7 +3334,7 @@ export default function DashboardContent() {
                 key={b.id}
                 style={{
                   borderRadius: 12,
-                  padding: "14px 16px",
+                  padding: isMobile ? "12px 10px" : "14px 16px",
                   background: "rgba(99,102,241,.06)",
                   border: "1px solid rgba(99,102,241,.15)",
                 }}
@@ -3381,7 +3387,7 @@ export default function DashboardContent() {
         <div
           style={{
             borderRadius: 16,
-            padding: "26px 22px",
+            padding: isMobile ? "14px 10px" : "26px 22px",
             background: "rgba(99,102,241,.05)",
             border: "1px solid rgba(99,102,241,.18)",
             marginBottom: 20,

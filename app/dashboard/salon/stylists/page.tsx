@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { useBusinessRecords } from "@/lib/useBusinessRecords";
 import {
+import { useResponsive } from "@/hooks/useResponsive";
   mapSalonAppointments,
   mapSalonStylists,
   salonBg,
@@ -23,6 +24,7 @@ type StylistForm = {
 const EMPTY_FORM: StylistForm = { name: "", specialization: "Hair Styling", phone: "", status: "Active" };
 
 export default function StylistsPage() {
+  const { isMobile } = useResponsive();
   const stylistsHook = useBusinessRecords("stylist");
   const appointmentsHook = useBusinessRecords("salon_appointment");
 
@@ -105,11 +107,11 @@ export default function StylistsPage() {
         <button style={{ background: "#ec4899", color: "#fff", border: "none", borderRadius: 10, padding: "10px 20px", fontWeight: 700, cursor: "pointer", fontSize: 14 }} onClick={() => setShowModal(true)}>+ Add Stylist</button>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 16, marginBottom: 28 }}>
-        <div style={{ background: salonBg, border: `1px solid ${salonBorder}`, borderRadius: 16, padding: "20px 24px" }}><div style={{ fontSize: 13, color: salonMuted, marginBottom: 6 }}>Total Stylists</div><div style={{ fontSize: 28, fontWeight: 800 }}>{stylistsWithLiveStats.length}</div></div>
-        <div style={{ background: salonBg, border: `1px solid ${salonBorder}`, borderRadius: 16, padding: "20px 24px" }}><div style={{ fontSize: 13, color: salonMuted, marginBottom: 6 }}>Active Today</div><div style={{ fontSize: 28, fontWeight: 800, color: "#34d399" }}>{active}</div></div>
-        <div style={{ background: salonBg, border: `1px solid ${salonBorder}`, borderRadius: 16, padding: "20px 24px" }}><div style={{ fontSize: 13, color: salonMuted, marginBottom: 6 }}>Avg Earnings</div><div style={{ fontSize: 24, fontWeight: 800, color: "#fbbf24" }}>Rs. {avgEarnings.toLocaleString()}</div></div>
-        <div style={{ background: salonBg, border: `1px solid ${salonBorder}`, borderRadius: 16, padding: "20px 24px" }}><div style={{ fontSize: 13, color: salonMuted, marginBottom: 6 }}>Top Earner</div><div style={{ fontSize: 18, fontWeight: 800, color: "#ec4899" }}>{top?.name || "-"}</div></div>
+      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 16, marginBottom: 28 }}>
+        <div style={{ background: salonBg, border: `1px solid ${salonBorder}`, borderRadius: 16, padding: isMobile ? "12px 11px" : "20px 24px" }}><div style={{ fontSize: 13, color: salonMuted, marginBottom: 6 }}>Total Stylists</div><div style={{ fontSize: 28, fontWeight: 800 }}>{stylistsWithLiveStats.length}</div></div>
+        <div style={{ background: salonBg, border: `1px solid ${salonBorder}`, borderRadius: 16, padding: isMobile ? "12px 11px" : "20px 24px" }}><div style={{ fontSize: 13, color: salonMuted, marginBottom: 6 }}>Active Today</div><div style={{ fontSize: 28, fontWeight: 800, color: "#34d399" }}>{active}</div></div>
+        <div style={{ background: salonBg, border: `1px solid ${salonBorder}`, borderRadius: 16, padding: isMobile ? "12px 11px" : "20px 24px" }}><div style={{ fontSize: 13, color: salonMuted, marginBottom: 6 }}>Avg Earnings</div><div style={{ fontSize: 24, fontWeight: 800, color: "#fbbf24" }}>Rs. {avgEarnings.toLocaleString()}</div></div>
+        <div style={{ background: salonBg, border: `1px solid ${salonBorder}`, borderRadius: 16, padding: isMobile ? "12px 11px" : "20px 24px" }}><div style={{ fontSize: 13, color: salonMuted, marginBottom: 6 }}>Top Earner</div><div style={{ fontSize: 18, fontWeight: 800, color: "#ec4899" }}>{top?.name || "-"}</div></div>
       </div>
 
       {error && <div style={{ marginBottom: 14, fontSize: 12, color: "#fda4af" }}>{error}</div>}

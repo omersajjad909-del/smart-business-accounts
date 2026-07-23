@@ -6,6 +6,7 @@ import toast from "react-hot-toast";
 import { useMemo, useState } from "react";
 import { useBusinessRecords } from "@/lib/useBusinessRecords";
 import {
+import { useResponsive } from "@/hooks/useResponsive";
   mapRestaurantReservationRecords,
   mapRestaurantTableRecords,
   restaurantBg,
@@ -32,6 +33,7 @@ const emptyForm: ReservationForm = {
 };
 
 export default function RestaurantReservationsPage() {
+  const { isMobile } = useResponsive();
   const reservationStore = useBusinessRecords("restaurant_reservation");
   const tableStore = useBusinessRecords("restaurant_table");
   const orderStore = useBusinessRecords("restaurant_order");
@@ -164,7 +166,7 @@ export default function RestaurantReservationsPage() {
   }
 
   return (
-    <div style={{ padding: "28px 32px", color: "#fff", fontFamily: restaurantFont, minHeight: "100vh" }}>
+    <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", color: "#fff", fontFamily: restaurantFont, minHeight: "100vh" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 26 }}>
         <div>
           <h1 style={{ fontSize: 24, fontWeight: 800, margin: "0 0 6px" }}>Restaurant Reservations</h1>
@@ -173,14 +175,14 @@ export default function RestaurantReservationsPage() {
         <button onClick={() => setShowModal(true)} style={{ padding: "10px 18px", borderRadius: 10, border: "none", background: "#ef4444", color: "#fff", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>+ New Reservation</button>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4,minmax(0,1fr))", gap: 12, marginBottom: 24 }}>
+      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,minmax(0,1fr))", gap: 12, marginBottom: 24 }}>
         {[
           { label: "Booked", value: reservations.filter((row) => row.status === "booked").length, color: "#f59e0b" },
           { label: "Confirmed", value: reservations.filter((row) => row.status === "confirmed").length, color: "#38bdf8" },
           { label: "Arrived", value: reservations.filter((row) => row.status === "arrived").length, color: "#34d399" },
           { label: "Cancelled", value: reservations.filter((row) => row.status === "cancelled").length, color: "#ef4444" },
         ].map((card) => (
-          <div key={card.label} style={{ background: restaurantBg, border: `1px solid ${restaurantBorder}`, borderRadius: 14, padding: "18px 20px" }}>
+          <div key={card.label} style={{ background: restaurantBg, border: `1px solid ${restaurantBorder}`, borderRadius: 14, padding: isMobile ? "12px 10px" : "18px 20px" }}>
             <div style={{ fontSize: 12, color: "rgba(255,255,255,.45)", marginBottom: 8 }}>{card.label}</div>
             <div style={{ fontSize: 24, fontWeight: 800, color: card.color }}>{card.value}</div>
           </div>

@@ -3,10 +3,11 @@
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { AgricultureControlCenter, agricultureBg, agricultureBorder, agricultureFont, agricultureMuted, fetchJson } from "./_shared";
+import { useResponsive } from "@/hooks/useResponsive";
 
 function StatCard({ label, value, tone }: { label: string; value: string | number; tone: string }) {
   return (
-    <div style={{ background: agricultureBg, border: `1px solid ${agricultureBorder}`, borderRadius: 18, padding: "20px 22px" }}>
+    <div style={{ background: agricultureBg, border: `1px solid ${agricultureBorder}`, borderRadius: 18, padding: isMobile ? "12px 10px" : "20px 22px" }}>
       <div style={{ fontSize: 12, color: agricultureMuted, marginBottom: 8, textTransform: "uppercase", letterSpacing: ".06em" }}>{label}</div>
       <div style={{ fontSize: 28, fontWeight: 800, color: tone }}>{value}</div>
     </div>
@@ -35,6 +36,7 @@ const emptyState: AgricultureControlCenter = {
 };
 
 export default function AgricultureOverviewPage() {
+  const { isMobile } = useResponsive();
   const [data, setData] = useState<AgricultureControlCenter>(emptyState);
 
   useEffect(() => {
@@ -44,7 +46,7 @@ export default function AgricultureOverviewPage() {
   const topFields = useMemo(() => [...data.fields].sort((a, b) => b.area - a.area).slice(0, 4), [data.fields]);
 
   return (
-    <div style={{ padding: "28px 32px", minHeight: "100vh", color: "#fff", fontFamily: agricultureFont }}>
+    <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", minHeight: "100vh", color: "#fff", fontFamily: agricultureFont }}>
       <div style={{ marginBottom: 26 }}>
         <div style={{ fontSize: 12, color: "#86efac", fontWeight: 700, letterSpacing: ".08em", textTransform: "uppercase", marginBottom: 10 }}>Agriculture / Farm</div>
         <h1 style={{ fontSize: 30, fontWeight: 900, margin: "0 0 10px" }}>Farm Control Center</h1>
@@ -64,7 +66,7 @@ export default function AgricultureOverviewPage() {
       <div style={{ display: "grid", gridTemplateColumns: "1.15fr .85fr", gap: 18, marginBottom: 18 }}>
         <div style={{ background: "linear-gradient(135deg, rgba(34,197,94,.12), rgba(245,158,11,.1))", border: `1px solid ${agricultureBorder}`, borderRadius: 20, padding: 24 }}>
           <div style={{ fontSize: 13, color: "#dcfce7", fontWeight: 800, marginBottom: 10, textTransform: "uppercase", letterSpacing: ".07em" }}>Business Flow</div>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(4, minmax(0,1fr))", gap: 12 }}>
+          <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,minmax(0,1fr))", gap: 12 }}>
             {[
               { title: "Prepare Field", body: `${data.summary.activeFields} active field blocks are in current rotation.` },
               { title: "Plant Crop", body: `${data.summary.crops} crop cycles are recorded across the farm.` },
@@ -90,7 +92,7 @@ export default function AgricultureOverviewPage() {
               { href: "/dashboard/agriculture/harvest", label: "Record Harvest", hint: "Yield and buyer-side revenue capture" },
               { href: "/dashboard/agriculture/analytics", label: "See Farm Analytics", hint: "Yield, revenue, and utilization insights" },
             ].map((item) => (
-              <Link prefetch={false} key={item.href} href={item.href} style={{ textDecoration: "none", color: "#fff", background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)", borderRadius: 14, padding: "14px 16px" }}>
+              <Link prefetch={false} key={item.href} href={item.href} style={{ textDecoration: "none", color: "#fff", background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)", borderRadius: 14, padding: isMobile ? "12px 10px" : "14px 16px" }}>
                 <div style={{ fontSize: 14, fontWeight: 800, marginBottom: 4 }}>{item.label}</div>
                 <div style={{ fontSize: 12, color: agricultureMuted }}>{item.hint}</div>
               </Link>
@@ -129,7 +131,7 @@ export default function AgricultureOverviewPage() {
               { label: "Failed crops", value: `${data.summary.failedCrops} at risk`, tone: "#f87171" },
               { label: "Animal groups", value: `${data.summary.livestockGroups} types recorded`, tone: "#f59e0b" },
             ].map((row) => (
-              <div key={row.label} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "rgba(255,255,255,.025)", border: "1px solid rgba(255,255,255,.06)", borderRadius: 14, padding: "14px 16px" }}>
+              <div key={row.label} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "rgba(255,255,255,.025)", border: "1px solid rgba(255,255,255,.06)", borderRadius: 14, padding: isMobile ? "12px 10px" : "14px 16px" }}>
                 <span style={{ fontSize: 13, color: agricultureMuted }}>{row.label}</span>
                 <span style={{ fontSize: 14, fontWeight: 800, color: row.tone }}>{row.value}</span>
               </div>

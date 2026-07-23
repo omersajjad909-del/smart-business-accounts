@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { useBusinessRecords } from "@/lib/useBusinessRecords";
 import {
+import { useResponsive } from "@/hooks/useResponsive";
   mapSalonAppointments,
   salonBg,
   salonBorder,
@@ -13,6 +14,7 @@ import {
 } from "../_shared";
 
 export default function SalonClientHistoryPage() {
+  const { isMobile } = useResponsive();
   const appointments = mapSalonAppointments(useBusinessRecords("salon_appointment").records);
   const [search, setSearch] = useState("");
 
@@ -51,11 +53,11 @@ export default function SalonClientHistoryPage() {
         <p style={{ fontSize: 14, color: salonMuted, marginTop: 6 }}>Repeat clients, favorite services, aur spend history ko yahan se samjhein.</p>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 16, marginBottom: 24 }}>
-        <div style={{ background: salonBg, border: `1px solid ${salonBorder}`, borderRadius: 16, padding: "20px 24px" }}><div style={{ fontSize: 13, color: salonMuted, marginBottom: 6 }}>Clients</div><div style={{ fontSize: 28, fontWeight: 800 }}>{clients.length}</div></div>
-        <div style={{ background: salonBg, border: `1px solid ${salonBorder}`, borderRadius: 16, padding: "20px 24px" }}><div style={{ fontSize: 13, color: salonMuted, marginBottom: 6 }}>Repeat Clients</div><div style={{ fontSize: 28, fontWeight: 800, color: "#34d399" }}>{clients.filter((client) => client.visits.length > 1).length}</div></div>
-        <div style={{ background: salonBg, border: `1px solid ${salonBorder}`, borderRadius: 16, padding: "20px 24px" }}><div style={{ fontSize: 13, color: salonMuted, marginBottom: 6 }}>High Value</div><div style={{ fontSize: 24, fontWeight: 800, color: "#fbbf24" }}>{clients.filter((client) => client.totalSpend >= 10000).length}</div></div>
-        <div style={{ background: salonBg, border: `1px solid ${salonBorder}`, borderRadius: 16, padding: "20px 24px" }}><div style={{ fontSize: 13, color: salonMuted, marginBottom: 6 }}>Total Visits</div><div style={{ fontSize: 24, fontWeight: 800, color: "#a78bfa" }}>{appointments.length}</div></div>
+      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 16, marginBottom: 24 }}>
+        <div style={{ background: salonBg, border: `1px solid ${salonBorder}`, borderRadius: 16, padding: isMobile ? "12px 11px" : "20px 24px" }}><div style={{ fontSize: 13, color: salonMuted, marginBottom: 6 }}>Clients</div><div style={{ fontSize: 28, fontWeight: 800 }}>{clients.length}</div></div>
+        <div style={{ background: salonBg, border: `1px solid ${salonBorder}`, borderRadius: 16, padding: isMobile ? "12px 11px" : "20px 24px" }}><div style={{ fontSize: 13, color: salonMuted, marginBottom: 6 }}>Repeat Clients</div><div style={{ fontSize: 28, fontWeight: 800, color: "#34d399" }}>{clients.filter((client) => client.visits.length > 1).length}</div></div>
+        <div style={{ background: salonBg, border: `1px solid ${salonBorder}`, borderRadius: 16, padding: isMobile ? "12px 11px" : "20px 24px" }}><div style={{ fontSize: 13, color: salonMuted, marginBottom: 6 }}>High Value</div><div style={{ fontSize: 24, fontWeight: 800, color: "#fbbf24" }}>{clients.filter((client) => client.totalSpend >= 10000).length}</div></div>
+        <div style={{ background: salonBg, border: `1px solid ${salonBorder}`, borderRadius: 16, padding: isMobile ? "12px 11px" : "20px 24px" }}><div style={{ fontSize: 13, color: salonMuted, marginBottom: 6 }}>Total Visits</div><div style={{ fontSize: 24, fontWeight: 800, color: "#a78bfa" }}>{appointments.length}</div></div>
       </div>
 
       <div style={{ marginBottom: 18 }}>
@@ -83,7 +85,7 @@ export default function SalonClientHistoryPage() {
               </div>
             </div>
 
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(3, minmax(0,1fr))", gap: 12, marginBottom: 14 }}>
+            <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(3,minmax(0,1fr))", gap: 12, marginBottom: 14 }}>
               <div style={{ background: "rgba(255,255,255,.025)", borderRadius: 12, border: "1px solid rgba(255,255,255,.06)", padding: "12px 14px" }}>
                 <div style={{ fontSize: 12, color: salonMuted }}>Last Visit</div>
                 <div style={{ marginTop: 4, fontWeight: 700 }}>{client.lastVisit?.date || "-"} {client.lastVisit?.time || ""}</div>

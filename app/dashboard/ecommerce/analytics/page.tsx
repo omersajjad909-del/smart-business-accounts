@@ -2,10 +2,11 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { EcommerceControlCenter, ecommerceBg, ecommerceBorder, ecommerceFont, ecommerceMuted, fetchJson } from "../_shared";
+import { useResponsive } from "@/hooks/useResponsive";
 
 function Metric({ title, value, note, color }: { title: string; value: string; note: string; color: string }) {
   return (
-    <div style={{ background: ecommerceBg, border: `1px solid ${ecommerceBorder}`, borderRadius: 18, padding: "20px 22px" }}>
+    <div style={{ background: ecommerceBg, border: `1px solid ${ecommerceBorder}`, borderRadius: 18, padding: isMobile ? "12px 10px" : "20px 22px" }}>
       <div style={{ fontSize: 12, color: ecommerceMuted, marginBottom: 8, textTransform: "uppercase", letterSpacing: ".06em" }}>{title}</div>
       <div style={{ fontSize: 26, fontWeight: 900, color }}>{value}</div>
       <div style={{ fontSize: 12, color: ecommerceMuted, marginTop: 6 }}>{note}</div>
@@ -38,6 +39,7 @@ const emptyState: EcommerceControlCenter = {
 };
 
 export default function EcommerceAnalyticsPage() {
+  const { isMobile } = useResponsive();
   const [data, setData] = useState<EcommerceControlCenter>(emptyState);
 
   useEffect(() => {
@@ -69,7 +71,7 @@ export default function EcommerceAnalyticsPage() {
     .slice(0, 5);
 
   return (
-    <div style={{ padding: "28px 32px", minHeight: "100vh", color: "#fff", fontFamily: ecommerceFont }}>
+    <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", minHeight: "100vh", color: "#fff", fontFamily: ecommerceFont }}>
       <div style={{ marginBottom: 24 }}>
         <div style={{ fontSize: 12, color: "#818cf8", fontWeight: 700, letterSpacing: ".08em", textTransform: "uppercase", marginBottom: 10 }}>Ecommerce Analytics</div>
         <h1 style={{ fontSize: 30, fontWeight: 900, margin: "0 0 10px" }}>Revenue, returns, and fulfillment performance</h1>
@@ -78,7 +80,7 @@ export default function EcommerceAnalyticsPage() {
         </p>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4, minmax(0,1fr))", gap: 14, marginBottom: 24 }}>
+      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,minmax(0,1fr))", gap: 14, marginBottom: 24 }}>
         <Metric title="Gross Sales" value={`Rs. ${data.summary.grossSales.toLocaleString()}`} note="All ecommerce orders" color="#34d399" />
         <Metric title="Delivered Orders" value={String(data.summary.deliveredOrders)} note="Closed revenue orders" color="#60a5fa" />
         <Metric title="Return Rate" value={`${data.summary.returnRate}%`} note="Return requests vs orders" color="#f59e0b" />
@@ -111,16 +113,16 @@ export default function EcommerceAnalyticsPage() {
         <div style={{ background: ecommerceBg, border: `1px solid ${ecommerceBorder}`, borderRadius: 20, padding: 22 }}>
           <div style={{ fontSize: 13, color: "#f87171", fontWeight: 800, marginBottom: 16, textTransform: "uppercase", letterSpacing: ".07em" }}>Return Pressure</div>
           <div style={{ display: "grid", gap: 12 }}>
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "rgba(255,255,255,.025)", border: "1px solid rgba(255,255,255,.06)", borderRadius: 14, padding: "14px 16px" }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "rgba(255,255,255,.025)", border: "1px solid rgba(255,255,255,.06)", borderRadius: 14, padding: isMobile ? "12px 10px" : "14px 16px" }}>
               <span style={{ fontSize: 13, color: ecommerceMuted }}>Total return value</span>
               <span style={{ fontSize: 15, fontWeight: 800, color: "#f87171" }}>Rs. {totalReturns.toLocaleString()}</span>
             </div>
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "rgba(255,255,255,.025)", border: "1px solid rgba(255,255,255,.06)", borderRadius: 14, padding: "14px 16px" }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "rgba(255,255,255,.025)", border: "1px solid rgba(255,255,255,.06)", borderRadius: 14, padding: isMobile ? "12px 10px" : "14px 16px" }}>
               <span style={{ fontSize: 13, color: ecommerceMuted }}>Cancelled orders</span>
               <span style={{ fontSize: 15, fontWeight: 800, color: "#f59e0b" }}>{cancelled}</span>
             </div>
             {returnReasonData.slice(0, 4).map(([reason, count]) => (
-              <div key={reason} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "rgba(255,255,255,.025)", border: "1px solid rgba(255,255,255,.06)", borderRadius: 14, padding: "14px 16px" }}>
+              <div key={reason} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "rgba(255,255,255,.025)", border: "1px solid rgba(255,255,255,.06)", borderRadius: 14, padding: isMobile ? "12px 10px" : "14px 16px" }}>
                 <span style={{ fontSize: 13 }}>{reason}</span>
                 <span style={{ fontSize: 14, fontWeight: 800, color: "#c7d2fe" }}>{count} cases</span>
               </div>
@@ -156,7 +158,7 @@ export default function EcommerceAnalyticsPage() {
               { label: "Catalog depth", value: `${data.products.filter((product) => product.stock > 0).length} in-stock products`, tone: "#34d399" },
               { label: "Order mix", value: `${data.summary.activeOrders} active orders`, tone: "#f59e0b" },
             ].map((row) => (
-              <div key={row.label} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "rgba(255,255,255,.025)", border: "1px solid rgba(255,255,255,.06)", borderRadius: 14, padding: "14px 16px" }}>
+              <div key={row.label} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "rgba(255,255,255,.025)", border: "1px solid rgba(255,255,255,.06)", borderRadius: 14, padding: isMobile ? "12px 10px" : "14px 16px" }}>
                 <span style={{ fontSize: 13, color: ecommerceMuted }}>{row.label}</span>
                 <span style={{ fontSize: 14, fontWeight: 800, color: row.tone }}>{row.value}</span>
               </div>

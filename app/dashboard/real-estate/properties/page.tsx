@@ -3,6 +3,7 @@
 import toast from "react-hot-toast";
 import { useState } from "react";
 import { useBusinessRecords } from "@/lib/useBusinessRecords";
+import { useResponsive } from "@/hooks/useResponsive";
 
 const ff = "'Outfit','Inter',sans-serif";
 const bg = "rgba(255,255,255,0.03)";
@@ -17,6 +18,7 @@ const STATUS_META: Record<PropStatus, { label: string; color: string; bg: string
 };
 
 export default function PropertiesPage() {
+  const { isMobile } = useResponsive();
   const { records, loading, create, update } = useBusinessRecords("property");
   const leaseStore = useBusinessRecords("lease");
   const [filter, setFilter] = useState<"all" | PropStatus>("all");
@@ -79,9 +81,9 @@ export default function PropertiesPage() {
         <button onClick={() => { setFormError(""); setShowCreate(true); }} style={{ padding: "10px 22px", borderRadius: 10, border: "none", background: "linear-gradient(135deg,#818cf8,#6366f1)", color: "white", fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>+ Add Property</button>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 12, marginBottom: 28 }}>
+      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 12, marginBottom: 28 }}>
         {[{ label: "Total Properties", val: properties.length, color: "#818cf8" }, { label: "Rented", val: occupied, color: "#818cf8" }, { label: "Vacant", val: properties.filter(p => p.status === "vacant").length, color: "#34d399" }, { label: "Monthly Income", val: `Rs. ${totalRent.toLocaleString()}`, color: "#34d399" }].map(s => (
-          <div key={s.label} style={{ background: bg, border: `1px solid ${border}`, borderRadius: 12, padding: "16px 18px" }}>
+          <div key={s.label} style={{ background: bg, border: `1px solid ${border}`, borderRadius: 12, padding: isMobile ? "12px 10px" : "16px 18px" }}>
             <div style={{ fontSize: 22, fontWeight: 800, color: s.color }}>{s.val}</div>
             <div style={{ fontSize: 12, color: "rgba(255,255,255,.6)", marginTop: 3 }}>{s.label}</div>
           </div>
@@ -98,7 +100,7 @@ export default function PropertiesPage() {
 
       {loading && <div style={{ textAlign: "center", padding: 40, color: "rgba(255,255,255,0.4)" }}>Loading...</div>}
 
-      <div style={{ display: "grid", gridTemplateColumns: selected ? "1fr 340px" : "1fr", gap: 20 }}>
+      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : selected ? "1fr 340px" : "1fr", gap: 20 }}>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(280px,1fr))", gap: 16 }}>
           {filtered.map(prop => {
             const m = STATUS_META[prop.status];
@@ -120,7 +122,7 @@ export default function PropertiesPage() {
         </div>
 
         {selectedProp && (
-          <div style={{ background: bg, border: `1px solid ${border}`, borderRadius: 16, padding: "20px 22px", height: "fit-content" }}>
+          <div style={{ background: bg, border: `1px solid ${border}`, borderRadius: 16, padding: isMobile ? "12px 10px" : "20px 22px", height: "fit-content" }}>
             <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 16 }}>
               <div style={{ fontWeight: 800, fontSize: 16 }}>{selectedProp.name}</div>
               <button onClick={() => setSelected(null)} style={{ background: "none", border: "none", color: "rgba(255,255,255,.4)", fontSize: 18, cursor: "pointer" }}>×</button>

@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { getCurrentUser } from "@/lib/auth";
+import { useResponsive } from "@/hooks/useResponsive";
 
 const ff = "'Outfit','Inter',sans-serif";
 function fmt(n: number, d = 0) { return n.toLocaleString("en-US", { minimumFractionDigits: d, maximumFractionDigits: d }); }
@@ -8,6 +9,7 @@ function fmt(n: number, d = 0) { return n.toLocaleString("en-US", { minimumFract
 interface TurnoverRow { itemName: string; category: string; openingStock: number; closingStock: number; cogs: number; avgInventory: number; turnoverRatio: number; daysOnHand: number; }
 
 export default function StockTurnoverPage() {
+  const { isMobile } = useResponsive();
   const user = getCurrentUser();
   const [data, setData]       = useState<TurnoverRow[]>([]);
   const [loading, setLoading] = useState(true);
@@ -21,7 +23,7 @@ export default function StockTurnoverPage() {
   const inp: React.CSSProperties = { background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 8, padding: "7px 12px", color: "var(--text-primary)", fontFamily: ff, fontSize: 12, outline: "none" };
 
   return (
-    <div style={{ padding: "24px 28px", fontFamily: ff, color: "var(--text-primary)", maxWidth: 1100 }}>
+    <div style={{ padding: isMobile ? "13px 13px" : "24px 28px", fontFamily: ff, color: "var(--text-primary)", maxWidth: 1100 }}>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 24 }}>
         <div>
           <h1 style={{ margin: 0, fontSize: 22, fontWeight: 900, letterSpacing: "-.3px" }}>Stock Turnover Ratio</h1>
@@ -35,12 +37,12 @@ export default function StockTurnoverPage() {
       </div>
 
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14, marginBottom: 20 }}>
-        <div style={{ background: "rgba(129,140,248,.07)", border: "1px solid rgba(129,140,248,.2)", borderRadius: 14, padding: "18px 20px" }}>
+        <div style={{ background: "rgba(129,140,248,.07)", border: "1px solid rgba(129,140,248,.2)", borderRadius: 14, padding: isMobile ? "12px 10px" : "18px 20px" }}>
           <div style={{ fontSize: 11, color: "var(--text-muted)", fontWeight: 700, textTransform: "uppercase", letterSpacing: ".06em", marginBottom: 8 }}>Avg Turnover Ratio</div>
           <div style={{ fontSize: 28, fontWeight: 900, color: "#818cf8" }}>{fmt(avgTurnover, 2)}x</div>
           <div style={{ fontSize: 11, color: "var(--text-muted)", marginTop: 4 }}>Higher = better. Industry avg: 4–8x</div>
         </div>
-        <div style={{ background: "rgba(52,211,153,.07)", border: "1px solid rgba(52,211,153,.2)", borderRadius: 14, padding: "18px 20px" }}>
+        <div style={{ background: "rgba(52,211,153,.07)", border: "1px solid rgba(52,211,153,.2)", borderRadius: 14, padding: isMobile ? "12px 10px" : "18px 20px" }}>
           <div style={{ fontSize: 11, color: "var(--text-muted)", fontWeight: 700, textTransform: "uppercase", letterSpacing: ".06em", marginBottom: 8 }}>Formula</div>
           <div style={{ fontSize: 13, fontWeight: 700, color: "#34d399", lineHeight: 1.6 }}>Turnover = COGS ÷ Avg Inventory</div>
           <div style={{ fontSize: 11, color: "var(--text-muted)", marginTop: 4 }}>Days on Hand = 365 ÷ Turnover Ratio</div>

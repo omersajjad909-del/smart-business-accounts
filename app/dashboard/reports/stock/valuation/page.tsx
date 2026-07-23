@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { getCurrentUser } from "@/lib/auth";
+import { useResponsive } from "@/hooks/useResponsive";
 
 const ff = "'Outfit','Inter',sans-serif";
 function fmt(n: number, d = 0) { return n.toLocaleString("en-US", { minimumFractionDigits: d, maximumFractionDigits: d }); }
@@ -8,6 +9,7 @@ function fmt(n: number, d = 0) { return n.toLocaleString("en-US", { minimumFract
 interface ValuationRow { itemName: string; category: string; stockQty: number; avgCost: number; fifoCost: number; totalValueAvg: number; totalValueFifo: number; marketPrice: number; }
 
 export default function StockValuationPage() {
+  const { isMobile } = useResponsive();
   const user = getCurrentUser();
   const [data, setData]       = useState<ValuationRow[]>([]);
   const [loading, setLoading] = useState(true);
@@ -20,7 +22,7 @@ export default function StockValuationPage() {
   const totalValue = data.reduce((s, r) => s + (method === "avg" ? r.totalValueAvg : r.totalValueFifo), 0);
 
   return (
-    <div style={{ padding: "24px 28px", fontFamily: ff, color: "var(--text-primary)", maxWidth: 1100 }}>
+    <div style={{ padding: isMobile ? "13px 13px" : "24px 28px", fontFamily: ff, color: "var(--text-primary)", maxWidth: 1100 }}>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 24 }}>
         <div>
           <h1 style={{ margin: 0, fontSize: 22, fontWeight: 900, letterSpacing: "-.3px" }}>Stock Valuation</h1>
@@ -35,7 +37,7 @@ export default function StockValuationPage() {
         </div>
       </div>
 
-      <div style={{ marginBottom: 20, padding: "18px 22px", borderRadius: 14, background: "rgba(129,140,248,.07)", border: "1px solid rgba(129,140,248,.2)", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+      <div style={{ marginBottom: 20, padding: isMobile ? "12px 10px" : "18px 22px", borderRadius: 14, background: "rgba(129,140,248,.07)", border: "1px solid rgba(129,140,248,.2)", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
         <div>
           <div style={{ fontSize: 11, color: "var(--text-muted)", fontWeight: 700, textTransform: "uppercase", letterSpacing: ".06em", marginBottom: 4 }}>Total Inventory Value ({method === "avg" ? "Weighted Average" : "FIFO"})</div>
           <div style={{ fontSize: 28, fontWeight: 900, color: "#818cf8" }}>{cur} {fmt(totalValue)}</div>

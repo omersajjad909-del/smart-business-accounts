@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { getCurrentUser } from "@/lib/auth";
+import { useResponsive } from "@/hooks/useResponsive";
 
 type LocationRow = {
   location: string;
@@ -10,6 +11,7 @@ type LocationRow = {
 };
 
 export default function LocationStockPage() {
+  const { isMobile } = useResponsive();
   const [rows, setRows] = useState<LocationRow[]>([]);
   const [loading, setLoading] = useState(false);
 

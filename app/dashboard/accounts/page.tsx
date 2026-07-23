@@ -4,6 +4,7 @@ import toast from "react-hot-toast";
 import { useEffect, useState } from "react";
 import { getCurrentUser } from "@/lib/auth";
 import { confirmToast } from "@/lib/toast-feedback";
+import { useResponsive } from "@/hooks/useResponsive";
 
 const FONT = "'Outfit','Inter',sans-serif";
 const ACCENT = "#6366f1";
@@ -106,6 +107,7 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
 }
 
 export default function ChartOfAccounts() {
+  const { isMobile } = useResponsive();
   const [accounts, setAccounts] = useState<Account[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("ALL");
@@ -233,7 +235,7 @@ export default function ChartOfAccounts() {
   );
 
   return (
-    <div style={{ minHeight: "100vh", background: BG, fontFamily: FONT, padding: "28px 24px", color: TEXT }}>
+    <div style={{ minHeight: "100vh", background: BG, fontFamily: FONT, padding: isMobile ? "15px 11px" : "28px 24px", color: TEXT }}>
 
       {/* ── Header ── */}
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 28, flexWrap: "wrap", gap: 12 }}>
@@ -304,7 +306,7 @@ export default function ChartOfAccounts() {
 
         {/* Form Header */}
         <div style={{
-          padding: "16px 22px",
+          padding: isMobile ? "12px 10px" : "16px 22px",
           borderBottom: `1px solid ${BORDER}`,
           background: editingId ? "rgba(99,102,241,0.06)" : "rgba(255,255,255,0.02)",
           display: "flex", alignItems: "center", justifyContent: "space-between",
@@ -329,11 +331,11 @@ export default function ChartOfAccounts() {
           )}
         </div>
 
-        <div style={{ padding: "20px 22px" }}>
+        <div style={{ padding: isMobile ? "12px 10px" : "20px 22px" }}>
 
           {/* Section 1: Identity */}
           <SectionTitle icon="🏷️" label="Account Identity" />
-          <div style={{ display: "grid", gridTemplateColumns: "1.2fr 160px 2fr", gap: 14, marginBottom: 22 }}>
+          <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1.2fr 160px 2fr", gap: 14, marginBottom: 22 }}>
             <Field label="Category *">
               <select
                 value={form.partyType}
@@ -365,7 +367,7 @@ export default function ChartOfAccounts() {
           {showContact && (
             <>
               <SectionTitle icon="📞" label="Contact Information" />
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr", gap: 14, marginBottom: 22 }}>
+              <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr 1fr" : "1fr 1fr 1fr 1fr", gap: 14, marginBottom: 22 }}>
                 <Field label="Phone">
                   <input value={form.phone} onChange={e => f("phone", e.target.value)} placeholder="0300-0000000" style={inp()} />
                 </Field>
@@ -386,7 +388,7 @@ export default function ChartOfAccounts() {
           {showTax && (
             <>
               <SectionTitle icon="📋" label="Tax & Credit" />
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr", gap: 14, marginBottom: 22 }}>
+              <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr 1fr" : "1fr 1fr 1fr 1fr", gap: 14, marginBottom: 22 }}>
                 <Field label="NTN">
                   <input value={form.ntn} onChange={e => f("ntn", e.target.value)} placeholder="1234567-8" style={inp()} />
                 </Field>
@@ -407,7 +409,7 @@ export default function ChartOfAccounts() {
           {showBankIban && (
             <>
               <SectionTitle icon="🏦" label="Bank Details" />
-              <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr", gap: 14, marginBottom: 22 }}>
+              <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "2fr 1fr", gap: 14, marginBottom: 22 }}>
                 <Field label="IBAN / Account No.">
                   <input value={form.bankIban} onChange={e => f("bankIban", e.target.value)} placeholder="PK36SCBL0000001123456702" style={inp()} />
                 </Field>
@@ -420,7 +422,7 @@ export default function ChartOfAccounts() {
 
           {/* Section 5: Opening Balance */}
           <SectionTitle icon="💰" label="Opening Balance" />
-          <div style={{ display: "grid", gridTemplateColumns: "1.2fr 1fr 1fr 1fr", gap: 14, marginBottom: 22 }}>
+          <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr 1fr" : "1.2fr 1fr 1fr 1fr", gap: 14, marginBottom: 22 }}>
             <Field label="Opening Date">
               <input type="date" value={form.openDate} onChange={e => f("openDate", e.target.value)} style={{ ...inp(), colorScheme: "dark" }} />
             </Field>
@@ -525,7 +527,7 @@ export default function ChartOfAccounts() {
             <tbody>
               {filtered.length === 0 ? (
                 <tr>
-                  <td colSpan={8} style={{ padding: "48px 16px", textAlign: "center", color: MUTED }}>
+                  <td colSpan={8} style={{ padding: isMobile ? "26px 10px" : "48px 16px", textAlign: "center", color: MUTED }}>
                     <div style={{ fontSize: 32, marginBottom: 8 }}>📂</div>
                     <div style={{ fontSize: 14, fontWeight: 600 }}>No accounts found</div>
                     <div style={{ fontSize: 12, marginTop: 4 }}>Try a different search or category filter</div>

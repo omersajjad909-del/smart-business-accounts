@@ -5,6 +5,7 @@ import toast from "react-hot-toast";
 import { useMemo, useState } from "react";
 import { useBusinessRecords } from "@/lib/useBusinessRecords";
 import {
+import { useResponsive } from "@/hooks/useResponsive";
   constructionBg,
   constructionBorder,
   constructionFont,
@@ -16,6 +17,7 @@ import {
 const STATUS_COLOR: Record<string, string> = { active: "#34d399", inactive: "#6b7280", maintenance: "#f59e0b" };
 
 export default function ConstructionSitesPage() {
+  const { isMobile } = useResponsive();
   const siteStore = useBusinessRecords("construction_site");
   const projectStore = useBusinessRecords("construction_project");
   const { records, loading, create, update } = siteStore;
@@ -60,15 +62,15 @@ export default function ConstructionSitesPage() {
   }
 
   return (
-    <div style={{ padding: "28px 32px", fontFamily: constructionFont, color: "#fff", minHeight: "100vh" }}>
+    <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", fontFamily: constructionFont, color: "#fff", minHeight: "100vh" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 28 }}>
         <div><h1 style={{ fontSize: 22, fontWeight: 800, margin: "0 0 4px" }}>Construction Sites</h1><p style={{ fontSize: 13, color: constructionMuted, margin: 0 }}>Manage active construction sites and their staffing readiness.</p></div>
         <button onClick={() => setShowModal(true)} style={{ padding: "10px 20px", borderRadius: 10, border: "none", background: "#f97316", color: "white", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>Add Site</button>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 12, marginBottom: 28 }}>
+      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(3,1fr)", gap: 12, marginBottom: 28 }}>
         {[{ label: "Total Sites", val: sites.length, color: "#f97316" }, { label: "Active", val: sites.filter((s) => s.status === "active").length, color: "#34d399" }, { label: "Total Workers", val: sites.reduce((a, s) => a + s.workers, 0), color: "#818cf8" }].map((s) => (
-          <div key={s.label} style={{ background: constructionBg, border: `1px solid ${constructionBorder}`, borderRadius: 12, padding: "20px 24px" }}><div style={{ fontSize: 13, color: "rgba(255,255,255,.5)", marginBottom: 6 }}>{s.label}</div><div style={{ fontSize: 22, fontWeight: 700, color: s.color }}>{s.val}</div></div>
+          <div key={s.label} style={{ background: constructionBg, border: `1px solid ${constructionBorder}`, borderRadius: 12, padding: isMobile ? "12px 11px" : "20px 24px" }}><div style={{ fontSize: 13, color: "rgba(255,255,255,.5)", marginBottom: 6 }}>{s.label}</div><div style={{ fontSize: 22, fontWeight: 700, color: s.color }}>{s.val}</div></div>
         ))}
       </div>
 
@@ -78,7 +80,7 @@ export default function ConstructionSitesPage() {
         {sites.map((site) => {
           const activeProjects = projects.filter((project) => project.site === site.name && project.status !== "completed");
           return (
-            <div key={site.id} style={{ background: constructionBg, border: `1px solid ${constructionBorder}`, borderRadius: 12, padding: "20px 24px" }}>
+            <div key={site.id} style={{ background: constructionBg, border: `1px solid ${constructionBorder}`, borderRadius: 12, padding: isMobile ? "12px 11px" : "20px 24px" }}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 12 }}>
                 <div style={{ fontWeight: 700, fontSize: 15 }}>{site.name}</div>
                 <span style={{ display: "inline-block", background: `${STATUS_COLOR[site.status]}20`, color: STATUS_COLOR[site.status], borderRadius: 6, padding: "2px 8px", fontSize: 11, fontWeight: 600 }}>{site.status}</span>

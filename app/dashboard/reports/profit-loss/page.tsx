@@ -5,6 +5,7 @@ import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { DateInput } from "@/app/dashboard/reports/_components/DateInput";
 import { getCurrentUser } from "@/lib/auth";
+import { useResponsive } from "@/hooks/useResponsive";
 
 const ff = "'Outfit','Inter',sans-serif";
 
@@ -94,7 +95,7 @@ function Section({ title, color, icon, children }: { title: string; color: strin
 
 function ResultBar({ label, amount, margin, color }: { label: string; amount: number; margin?: number; color: string }) {
   return (
-    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "14px 20px", borderRadius: 12, background: `${color}0f`, border: `1.5px solid ${color}33`, marginBottom: 12 }}>
+    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: isMobile ? "12px 10px" : "14px 20px", borderRadius: 12, background: `${color}0f`, border: `1.5px solid ${color}33`, marginBottom: 12 }}>
       <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
         <span style={{ fontSize: 14, fontWeight: 800, color }}>{label}</span>
         {margin !== undefined && <MarginBadge pct={margin} />}
@@ -107,6 +108,7 @@ function ResultBar({ label, amount, margin, color }: { label: string; amount: nu
 }
 
 export default function ProfitLossPage() {
+  const { isMobile } = useResponsive();
   const router  = useRouter();
   const fromRef = useRef<HTMLInputElement>(null);
   const toRef   = useRef<HTMLInputElement>(null);
@@ -240,7 +242,7 @@ export default function ProfitLossPage() {
                     { label: "Operating Profit (EBIT)", val: r.operatingProfit, color: isEBIT ? "#a78bfa" : "#f87171", icon: "⚙️", pct: r.operatingMarginPct },
                     { label: isProfit ? "Net Profit" : "Net Loss", val: r.netProfit, color: isProfit ? "#34d399" : "#f87171", icon: isProfit ? "✅" : "⚠️", pct: r.netMarginPct },
                   ].map(k => (
-                    <div key={k.label} style={{ background: `${k.color}0e`, border: `1px solid ${k.color}28`, borderRadius: 13, padding: "14px 16px" }}>
+                    <div key={k.label} style={{ background: `${k.color}0e`, border: `1px solid ${k.color}28`, borderRadius: 13, padding: isMobile ? "12px 10px" : "14px 16px" }}>
                       <div style={{ fontSize: 9, fontWeight: 700, color: "rgba(255,255,255,.32)", letterSpacing: ".08em", textTransform: "uppercase", marginBottom: 8, display: "flex", alignItems: "center", gap: 5 }}>
                         <span>{k.icon}</span>{k.label}
                       </div>
@@ -336,7 +338,7 @@ export default function ProfitLossPage() {
 
                 {/* 7. NET PROFIT — BOTTOM LINE */}
                 <div style={{
-                  padding: "20px 22px", borderRadius: 14, marginTop: 4,
+                  padding: isMobile ? "12px 10px" : "20px 22px", borderRadius: 14, marginTop: 4,
                   background: isProfit ? "linear-gradient(135deg,rgba(52,211,153,.1),rgba(16,185,129,.05))" : "linear-gradient(135deg,rgba(248,113,113,.1),rgba(239,68,68,.05))",
                   border: `1.5px solid ${isProfit ? "rgba(52,211,153,.3)" : "rgba(248,113,113,.3)"}`,
                 }}>

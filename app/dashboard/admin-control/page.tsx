@@ -6,6 +6,7 @@ import { PERMISSIONS } from "@/lib/permissions";
 import { COUNTRIES as ALL_COUNTRIES, sortCountries } from "@/lib/countries";
 import { CURRENCY_LABEL, SUPPORTED_CURRENCIES, currencyByCountry } from "@/lib/currency-client";
 import Link from "next/link";
+import { useResponsive } from "@/hooks/useResponsive";
 
 /* ─── types ─── */
 type Branch = { id: string; code: string; name: string; city?: string | null; isActive: boolean; address?: string; latitude?: number | null; longitude?: number | null; geoSource?: "exact" | "manual" | "country" | "unset" };
@@ -73,6 +74,7 @@ const TABS: { id: TabId; icon: string; label: string }[] = [
 
 /* ══════════════════════════════════════ PAGE ══════════════════════════════════════ */
 export default function AdminControlPage() {
+  const { isMobile } = useResponsive();
   const me = getCurrentUser();
   const isAdmin = me?.role === "ADMIN";
 
@@ -272,7 +274,7 @@ export default function AdminControlPage() {
   );
 
   return (
-    <div style={{ padding: "28px 32px", fontFamily: ff, color: "#fff", minHeight: "100vh" }}>
+    <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", fontFamily: ff, color: "#fff", minHeight: "100vh" }}>
 
       {/* ── Header ── */}
       <div style={{ marginBottom: 28 }}>
@@ -282,14 +284,14 @@ export default function AdminControlPage() {
 
       {/* ── KPI strip ── */}
       {!loading && (
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 12, marginBottom: 28 }}>
+        <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 12, marginBottom: 28 }}>
           {[
             { label: "Plan",           value: company?.plan || "STARTER",     color: "#818cf8" },
             { label: "Branches",       value: branches.length,                color: "#34d399" },
             { label: "Team Members",   value: users.length,                   color: "#38bdf8" },
             { label: "Assigned Users", value: Object.values(settings.branchAssignments).filter(a => a.length > 0).length, color: "#f59e0b" },
           ].map(k => (
-            <div key={k.label} style={{ background: BG, border: `1px solid ${BDR}`, borderRadius: 12, padding: "18px 20px" }}>
+            <div key={k.label} style={{ background: BG, border: `1px solid ${BDR}`, borderRadius: 12, padding: isMobile ? "12px 10px" : "18px 20px" }}>
               <div style={{ fontSize: 11, color: MUTED, textTransform: "uppercase", letterSpacing: ".08em", marginBottom: 6 }}>{k.label}</div>
               <div style={{ fontSize: 24, fontWeight: 800, color: k.color }}>{k.value}</div>
             </div>
@@ -324,7 +326,7 @@ export default function AdminControlPage() {
               <div style={panel}>
                 <div style={sectionTitle}>Company Identity</div>
                 <div style={sectionSub}>Name, country and base currency shown on all invoices and reports.</div>
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 14, marginBottom: 16 }}>
+                <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr 1fr", gap: 14, marginBottom: 16 }}>
                   <Field label="Company Name"><input style={inp} value={companyForm.companyName} onChange={e => setCompanyForm(s => ({ ...s, companyName: e.target.value }))} /></Field>
                   <Field label="Country">
                     <select style={inp} value={companyForm.country} onChange={e => updateCompanyCountry(e.target.value)}>
@@ -338,7 +340,7 @@ export default function AdminControlPage() {
                     </select>
                   </Field>
                 </div>
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 14, marginBottom: 16 }}>
+                <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr 1fr", gap: 14, marginBottom: 16 }}>
                   <Field label="Legal Name"><input style={inp} value={settings.companyIdentity.legalName} onChange={e => setSettings(s => ({ ...s, companyIdentity: { ...s.companyIdentity, legalName: e.target.value } }))} placeholder="Registered company name" /></Field>
                   <Field label="Website"><input style={inp} value={settings.companyIdentity.website} onChange={e => setSettings(s => ({ ...s, companyIdentity: { ...s.companyIdentity, website: e.target.value } }))} placeholder="https://yourcompany.com" /></Field>
                   <Field label="Postal Code"><input style={inp} value={settings.companyIdentity.postalCode} onChange={e => setSettings(s => ({ ...s, companyIdentity: { ...s.companyIdentity, postalCode: e.target.value } }))} /></Field>
@@ -353,7 +355,7 @@ export default function AdminControlPage() {
               <div style={panel}>
                 <div style={sectionTitle}>Invoice Contact Details</div>
                 <div style={sectionSub}>Shown on customer-facing documents and support sections.</div>
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 14 }}>
+                <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr 1fr", gap: 14 }}>
                   <Field label="Contact Name"><input style={inp} value={settings.invoiceContact.contactName} onChange={e => setSettings(s => ({ ...s, invoiceContact: { ...s.invoiceContact, contactName: e.target.value } }))} /></Field>
                   <Field label="Invoice Email"><input style={inp} value={settings.invoiceContact.email} onChange={e => setSettings(s => ({ ...s, invoiceContact: { ...s.invoiceContact, email: e.target.value } }))} /></Field>
                   <Field label="Invoice Phone"><input style={inp} value={settings.invoiceContact.phone} onChange={e => setSettings(s => ({ ...s, invoiceContact: { ...s.invoiceContact, phone: e.target.value } }))} /></Field>
@@ -396,7 +398,7 @@ export default function AdminControlPage() {
               <div style={panel}>
                 <div style={sectionTitle}>Templates & Format</div>
                 <div style={sectionSub}>Controls how invoices and receipts are generated.</div>
-                <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 14, marginBottom: 14 }}>
+                <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(3,1fr)", gap: 14, marginBottom: 14 }}>
                   <Field label="Invoice Template">
                     <select style={inp} value={settings.printPreferences.invoiceTemplate} onChange={e => setSettings(s => ({ ...s, printPreferences: { ...s.printPreferences, invoiceTemplate: e.target.value as PrintPreferences["invoiceTemplate"] } }))}>
                       <option value="classic">Classic</option><option value="compact">Compact</option><option value="modern">Modern</option>
@@ -472,7 +474,7 @@ export default function AdminControlPage() {
                 <div style={sectionSub}>{branches.length} branch{branches.length !== 1 ? "es" : ""} configured.</div>
                 <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
                   {branches.length === 0 ? <div style={{ textAlign: "center", padding: 32, color: MUTED }}>No branches yet.</div> : branches.map(b => (
-                    <div key={b.id} style={{ padding: "14px 16px", borderRadius: 10, border: `1px solid ${BDR}`, background: "rgba(255,255,255,.02)", display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12 }}>
+                    <div key={b.id} style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderRadius: 10, border: `1px solid ${BDR}`, background: "rgba(255,255,255,.02)", display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12 }}>
                       <div>
                         <div style={{ fontWeight: 700, fontSize: 14 }}>{b.code} · {b.name}</div>
                         <div style={{ fontSize: 12, color: MUTED, marginTop: 2 }}>{b.city || "No city"} · <span style={{ color: b.isActive ? "#34d399" : "#f87171" }}>{b.isActive ? "Active" : "Inactive"}</span></div>
@@ -568,7 +570,7 @@ export default function AdminControlPage() {
                       return (
                         <div>
                           {/* User header + action buttons */}
-                          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14, flexWrap: "wrap", gap: 10, padding: "14px 16px", borderRadius: 12, background: "rgba(99,102,241,.06)", border: `1px solid rgba(99,102,241,.2)` }}>
+                          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14, flexWrap: "wrap", gap: 10, padding: isMobile ? "12px 10px" : "14px 16px", borderRadius: 12, background: "rgba(99,102,241,.06)", border: `1px solid rgba(99,102,241,.2)` }}>
                             <div>
                               <div style={{ fontSize: 15, fontWeight: 800, color: "#fff" }}>{selUser?.name}</div>
                               <div style={{ fontSize: 12, color: MUTED, marginTop: 2 }}>{selUser?.role} · {selUser?.email}</div>
@@ -581,7 +583,7 @@ export default function AdminControlPage() {
                           </div>
 
                           {/* Permission checkboxes */}
-                          <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 7 }}>
+                          <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(3,1fr)", gap: 7 }}>
                             {availablePermissions.map(p => (
                               <label key={p} style={{ display: "flex", alignItems: "center", gap: 9, padding: "9px 13px", borderRadius: 8, border: `1px solid ${perms.includes(p) ? "rgba(99,102,241,.35)" : BDR}`, background: perms.includes(p) ? "rgba(99,102,241,.07)" : "rgba(255,255,255,.02)", fontSize: 12, fontWeight: 600, cursor: "pointer" }}>
                                 <input type="checkbox" checked={perms.includes(p)} onChange={() => setUserPermsMap(m => ({ ...m, [selectedUserId]: perms.includes(p) ? perms.filter(x => x !== p) : [...perms, p] }))} style={{ accentColor: ACCENT }} />
@@ -606,7 +608,7 @@ export default function AdminControlPage() {
               <div style={panel}>
                 <div style={sectionTitle}>Tax & Registration Profile</div>
                 <div style={sectionSub}>Tax details reused across invoices, compliance docs and print layouts.</div>
-                <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 14 }}>
+                <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(3,1fr)", gap: 14 }}>
                   <Field label="Primary Tax Label"><input style={inp} value={settings.taxProfile.taxIdLabel} onChange={e => setSettings(s => ({ ...s, taxProfile: { ...s.taxProfile, taxIdLabel: e.target.value } }))} placeholder="NTN / Tax ID / TRN" /></Field>
                   <Field label="Primary Tax Number"><input style={inp} value={settings.taxProfile.taxIdValue} onChange={e => setSettings(s => ({ ...s, taxProfile: { ...s.taxProfile, taxIdValue: e.target.value } }))} /></Field>
                   <Field label="VAT Number"><input style={inp} value={settings.taxProfile.vatNumber} onChange={e => setSettings(s => ({ ...s, taxProfile: { ...s.taxProfile, vatNumber: e.target.value } }))} /></Field>
@@ -618,7 +620,7 @@ export default function AdminControlPage() {
               <div style={panel}>
                 <div style={sectionTitle}>Bank Details for Print Templates</div>
                 <div style={sectionSub}>Remittance and transfer details shown on invoices and quotations.</div>
-                <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 14 }}>
+                <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(3,1fr)", gap: 14 }}>
                   <Field label="Bank Name"><input style={inp} value={settings.bankDetails.bankName} onChange={e => setSettings(s => ({ ...s, bankDetails: { ...s.bankDetails, bankName: e.target.value } }))} /></Field>
                   <Field label="Account Title"><input style={inp} value={settings.bankDetails.accountTitle} onChange={e => setSettings(s => ({ ...s, bankDetails: { ...s.bankDetails, accountTitle: e.target.value } }))} /></Field>
                   <Field label="Account Number"><input style={inp} value={settings.bankDetails.accountNumber} onChange={e => setSettings(s => ({ ...s, bankDetails: { ...s.bankDetails, accountNumber: e.target.value } }))} /></Field>

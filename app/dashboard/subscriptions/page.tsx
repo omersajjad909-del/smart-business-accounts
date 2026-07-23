@@ -12,6 +12,7 @@ import {
   type SubscriptionsControlCenter,
 } from "./_shared";
 import type { BusinessType } from "@/lib/businessModules";
+import { useResponsive } from "@/hooks/useResponsive";
 
 const emptyState: SubscriptionsControlCenter = {
   summary: {
@@ -33,6 +34,7 @@ const emptyState: SubscriptionsControlCenter = {
 };
 
 export default function SubscriptionsOverviewPage() {
+  const { isMobile } = useResponsive();
   const [businessType, setBusinessType] = useState<BusinessType>("saas_company");
   const [data, setData] = useState(emptyState);
 
@@ -108,7 +110,7 @@ export default function SubscriptionsOverviewPage() {
       ];
 
   return (
-    <div style={{ padding: "28px 32px", minHeight: "100vh", color: "#fff", fontFamily: saasFont }}>
+    <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", minHeight: "100vh", color: "#fff", fontFamily: saasFont }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 18, flexWrap: "wrap", marginBottom: 24 }}>
         <div>
           <div style={{ fontSize: 12, color: "#60a5fa", fontWeight: 800, letterSpacing: ".08em", textTransform: "uppercase", marginBottom: 8 }}>
@@ -136,7 +138,7 @@ export default function SubscriptionsOverviewPage() {
           { label: "MRR", value: formatMoney(Math.round(summary.mrr)), color: "#c084fc" },
           { label: "ARR", value: formatMoney(Math.round(summary.arr)), color: "#22c55e" },
         ].map((card) => (
-          <div key={card.label} style={{ background: saasBg, border: `1px solid ${saasBorder}`, borderRadius: 16, padding: "18px 20px" }}>
+          <div key={card.label} style={{ background: saasBg, border: `1px solid ${saasBorder}`, borderRadius: 16, padding: isMobile ? "12px 10px" : "18px 20px" }}>
             <div style={{ fontSize: 12, color: saasMuted, marginBottom: 8 }}>{card.label}</div>
             <div style={{ fontSize: 24, fontWeight: 800, color: card.color }}>{card.value}</div>
           </div>
@@ -148,7 +150,7 @@ export default function SubscriptionsOverviewPage() {
           <div style={{ fontSize: 13, color: "#bfdbfe", fontWeight: 800, marginBottom: 12, textTransform: "uppercase", letterSpacing: ".07em" }}>
             {isMembershipWebsite ? "Membership Flow" : isSubscriptionBox ? "Fulfillment Flow" : "SaaS Flow"}
           </div>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(4,minmax(0,1fr))", gap: 12 }}>
+          <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,minmax(0,1fr))", gap: 12 }}>
             {flow.map((step, index) => (
               <div key={step.title} style={{ background: "rgba(8,12,30,.36)", border: "1px solid rgba(255,255,255,.08)", borderRadius: 16, padding: 16 }}>
                 <div style={{ width: 28, height: 28, borderRadius: 999, background: "rgba(147,197,253,.16)", color: "#dbeafe", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 800, fontSize: 12, marginBottom: 12 }}>{index + 1}</div>

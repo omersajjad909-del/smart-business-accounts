@@ -4,6 +4,7 @@ import { confirmToast } from "@/lib/toast-feedback";
 import toast from "react-hot-toast";
 import { useEffect, useState } from "react";
 import { getCurrentUser } from "@/lib/auth";
+import { useResponsive } from "@/hooks/useResponsive";
 
 // ─── Design tokens ────────────────────────────────────────────────────────────
 const ff     = "'Outfit','Inter',sans-serif";
@@ -31,6 +32,7 @@ interface ReconciliationSuggestion {
 function fmt(n: number) { return n.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
 
 export default function BankReconciliationPage() {
+  const { isMobile } = useResponsive();
   const user = getCurrentUser();
 
   const [bankAccounts,       setBankAccounts]       = useState<BankAccount[]>([]);
@@ -187,7 +189,7 @@ export default function BankReconciliationPage() {
   const lbl:   React.CSSProperties = { fontSize: 11, color: "var(--text-muted)", fontWeight: 700, marginBottom: 5, display: "block", textTransform: "uppercase", letterSpacing: 0.5 };
 
   return (
-    <div style={{ padding: "24px 28px", fontFamily: ff, color: "var(--text-primary)", maxWidth: 1100 }}>
+    <div style={{ padding: isMobile ? "13px 13px" : "24px 28px", fontFamily: ff, color: "var(--text-primary)", maxWidth: 1100 }}>
 
       {/* Header */}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24 }}>
@@ -205,7 +207,7 @@ export default function BankReconciliationPage() {
       {showBankForm && (
         <form onSubmit={handleAddBank} style={{ ...panel, marginBottom: 24 }}>
           <div style={{ fontSize: 15, fontWeight: 700, color: accent, marginBottom: 18 }}>{editingBankId ? "Edit Bank Account" : "New Bank Account"}</div>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr", gap: 16, marginBottom: 20 }}>
+          <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr 1fr" : "1fr 1fr 1fr 1fr", gap: 16, marginBottom: 20 }}>
             <div>
               <label style={lbl}>Bank Name *</label>
               <input style={inp} placeholder="e.g. HBL, MCB" value={bankForm.bankName} onChange={e => setBankForm(f => ({ ...f, bankName: e.target.value }))} required />
@@ -350,7 +352,7 @@ export default function BankReconciliationPage() {
 
       {/* Statements Table */}
       <div style={{ ...panel, padding: 0, overflow: "hidden", marginBottom: 20 }}>
-        <div style={{ padding: "14px 18px", borderBottom: "1px solid var(--border)", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <div style={{ padding: isMobile ? "12px 10px" : "14px 18px", borderBottom: "1px solid var(--border)", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
           <div style={{ fontSize: 14, fontWeight: 700 }}>Unreconciled Bank Statements ({statements.length})</div>
           {selectedStatements.length > 0 && (
             <div style={{ fontSize: 13, color: "var(--text-muted)" }}>{selectedStatements.length} selected</div>

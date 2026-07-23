@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { getCurrentUser } from "@/lib/auth";
+import { useResponsive } from "@/hooks/useResponsive";
 
 type InwardRow = {
     date: string;
@@ -15,6 +16,7 @@ type InwardRow = {
 };
 
 export default function InwardReportPage() {
+  const { isMobile } = useResponsive();
     const today = new Date().toISOString().slice(0, 10);
     const [fromDate, setFromDate] = useState("2025-01-01");
     const [toDate, setToDate] = useState(today);

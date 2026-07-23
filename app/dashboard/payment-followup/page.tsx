@@ -1,5 +1,6 @@
 "use client";
 import { useState, useMemo, useEffect, useCallback } from "react";
+import { useResponsive } from "@/hooks/useResponsive";
 
 const FONT = "'Outfit','Inter',sans-serif";
 
@@ -37,6 +38,7 @@ function AgingBadge({ days }: { days: number }) {
 }
 
 export default function PaymentFollowupPage() {
+  const { isMobile } = useResponsive();
   const [invoices, setInvoices] = useState<OverdueInvoice[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<"ALL" | "PENDING" | "CONTACTED" | "PROMISED" | "PAID">("ALL");
@@ -105,7 +107,7 @@ export default function PaymentFollowupPage() {
   const TABS: Array<"ALL" | "PENDING" | "CONTACTED" | "PROMISED" | "PAID"> = ["ALL", "PENDING", "CONTACTED", "PROMISED", "PAID"];
 
   return (
-    <div style={{ minHeight: "100vh", background: "var(--app-bg)", padding: "32px 28px", fontFamily: FONT, color: "var(--text-primary)" }}>
+    <div style={{ minHeight: "100vh", background: "var(--app-bg)", padding: isMobile ? "16px" : "32px" 28px", fontFamily: FONT, color: "var(--text-primary)" }}>
 
       {/* Header */}
       <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 28 }}>
@@ -119,14 +121,14 @@ export default function PaymentFollowupPage() {
       </div>
 
       {/* KPI Cards */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 16, marginBottom: 28 }}>
+      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 16, marginBottom: 28 }}>
         {[
           { label: "Overdue Invoices",  value: loading ? "…" : kpis.total,    color: "#6366f1" },
           { label: "Not Yet Contacted", value: loading ? "…" : kpis.pending,  color: "#f87171" },
           { label: "In Progress",       value: loading ? "…" : kpis.inProg,   color: "#fbbf24" },
           { label: "Total Overdue",     value: loading ? "…" : `Rs. ${kpis.totalAmt.toLocaleString()}`, color: "#f87171" },
         ].map(k => (
-          <div key={k.label} style={{ background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 14, padding: "20px 22px" }}>
+          <div key={k.label} style={{ background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 14, padding: isMobile ? "12px 10px" : "20px 22px" }}>
             <div style={{ fontSize: 11, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: 0.8, marginBottom: 10 }}>{k.label}</div>
             <div style={{ fontSize: 30, fontWeight: 700, color: k.color, lineHeight: 1 }}>{k.value}</div>
           </div>
@@ -211,7 +213,7 @@ export default function PaymentFollowupPage() {
           style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.65)", zIndex: 1000, display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}
           onClick={e => { if (e.target === e.currentTarget) setNoteModal(null); }}
         >
-          <div style={{ background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 18, width: "100%", maxWidth: 480, padding: "28px 32px", fontFamily: FONT }}>
+          <div style={{ background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 18, width: "100%", maxWidth: 480, padding: isMobile ? "15px 14px" : "28px 32px", fontFamily: FONT }}>
             <h2 style={{ fontSize: 17, fontWeight: 700, margin: "0 0 6px" }}>Follow-up Note</h2>
             <p style={{ fontSize: 12, color: "var(--text-muted)", margin: "0 0 20px" }}>{noteModal.invoiceNo} · {noteModal.customer}</p>
             <textarea

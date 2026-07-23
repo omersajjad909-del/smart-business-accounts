@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { HotelControlCenter, fetchJson, hotelFont, hotelMuted } from "./_shared";
+import { useResponsive } from "@/hooks/useResponsive";
 
 const emptyState: HotelControlCenter = {
   summary: {
@@ -24,6 +25,7 @@ const STATUS_COLORS: Record<string, { bg: string; text: string; label: string }>
 };
 
 export default function HotelOverviewPage() {
+  const { isMobile } = useResponsive();
   const [data, setData] = useState(emptyState);
   const [loading, setLoading] = useState(true);
 
@@ -39,7 +41,7 @@ export default function HotelOverviewPage() {
     .reduce((s, o) => s + o.amount, 0);
 
   return (
-    <div style={{ minHeight: "100vh", padding: "28px 32px", color: "#fff", fontFamily: hotelFont }}>
+    <div style={{ minHeight: "100vh", padding: isMobile ? "15px 14px" : "28px 32px", color: "#fff", fontFamily: hotelFont }}>
 
       {/* Header */}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 24, flexWrap: "wrap", gap: 12 }}>
@@ -68,14 +70,14 @@ export default function HotelOverviewPage() {
       </div>
 
       {/* Row 1: Main Stats */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 12, marginBottom: 12 }}>
+      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 12, marginBottom: 12 }}>
         {[
           { label: "Today's Check-Ins",   value: summary.todayCheckIns,      icon: "🚪", color: "#34d399" },
           { label: "Today's Check-Outs",  value: summary.todayCheckOuts,     icon: "🔑", color: "#60a5fa" },
           { label: "Expected Arrivals",   value: summary.expectedArrivals,   icon: "🧳", color: "#f59e0b" },
           { label: "Open Complaints",     value: summary.openComplaints,     icon: "⚠️", color: "#f87171" },
         ].map(c => (
-          <div key={c.label} style={{ background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)", borderRadius: 14, padding: "18px 20px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          <div key={c.label} style={{ background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)", borderRadius: 14, padding: isMobile ? "12px 10px" : "18px 20px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
             <div>
               <div style={{ fontSize: 12, color: hotelMuted, marginBottom: 6 }}>{c.label}</div>
               <div style={{ fontSize: 28, fontWeight: 800, color: c.color, lineHeight: 1 }}>{loading ? "—" : c.value}</div>
@@ -86,14 +88,14 @@ export default function HotelOverviewPage() {
       </div>
 
       {/* Row 2: Secondary Stats */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 12, marginBottom: 12 }}>
+      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 12, marginBottom: 12 }}>
         {[
           { label: "Occupancy",            value: `${summary.occupancyRate}%\n${summary.occupiedRooms}/${summary.rooms} rooms`, icon: "📊", color: "#a78bfa" },
           { label: "Revenue Today",        value: `Rs. ${revenueToday.toLocaleString()}`,   icon: "💰", color: "#34d399" },
           { label: "Checked-In Guests",    value: summary.checkedInGuests,    icon: "🛏️", color: "#60a5fa" },
           { label: "Pending Reservations", value: summary.pendingReservations, icon: "📋", color: "#f59e0b" },
         ].map(c => (
-          <div key={c.label} style={{ background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)", borderRadius: 14, padding: "18px 20px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          <div key={c.label} style={{ background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)", borderRadius: 14, padding: isMobile ? "12px 10px" : "18px 20px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
             <div>
               <div style={{ fontSize: 12, color: hotelMuted, marginBottom: 6 }}>{c.label}</div>
               <div style={{ fontSize: 22, fontWeight: 800, color: c.color, lineHeight: 1.2, whiteSpace: "pre-line" }}>{loading ? "—" : c.value}</div>
@@ -104,13 +106,13 @@ export default function HotelOverviewPage() {
       </div>
 
       {/* Row 3: Laundry Stats */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 12, marginBottom: 24 }}>
+      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(3,1fr)", gap: 12, marginBottom: 24 }}>
         {[
           { label: "Laundry Pending",     value: summary.laundryPending,    sub: "Awaiting pickup/processing", icon: "🧺", color: "#f59e0b" },
           { label: "In Progress",         value: summary.laundryInProgress, sub: "Washing / Ironing",          icon: "🫧", color: "#60a5fa" },
           { label: "Ready to Deliver",    value: summary.laundryReady,      sub: "Cleaned & folded",           icon: "✅", color: "#34d399" },
         ].map(c => (
-          <div key={c.label} style={{ background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)", borderRadius: 14, padding: "18px 20px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          <div key={c.label} style={{ background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)", borderRadius: 14, padding: isMobile ? "12px 10px" : "18px 20px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
             <div>
               <div style={{ fontSize: 12, color: hotelMuted, marginBottom: 4 }}>{c.label}</div>
               <div style={{ fontSize: 32, fontWeight: 800, color: c.color, lineHeight: 1, marginBottom: 4 }}>{loading ? "—" : c.value}</div>
@@ -122,7 +124,7 @@ export default function HotelOverviewPage() {
       </div>
 
       {/* Room Status Board */}
-      <div style={{ background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)", borderRadius: 16, padding: "20px 24px", marginBottom: 20 }}>
+      <div style={{ background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)", borderRadius: 16, padding: isMobile ? "12px 11px" : "20px 24px", marginBottom: 20 }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16, flexWrap: "wrap", gap: 10 }}>
           <div style={{ fontSize: 15, fontWeight: 800 }}>🏠 Room Status Board <span style={{ fontSize: 12, color: hotelMuted, fontWeight: 400, marginLeft: 6 }}>{rooms.length} rooms</span></div>
           <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
@@ -157,7 +159,7 @@ export default function HotelOverviewPage() {
       {/* Bottom: Stay Watchlist + Operations */}
       <div style={{ display: "grid", gridTemplateColumns: "1.1fr .9fr", gap: 18 }}>
         <div style={{ background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)", borderRadius: 16, overflow: "hidden" }}>
-          <div style={{ padding: "14px 18px", borderBottom: "1px solid rgba(255,255,255,.07)", fontSize: 14, fontWeight: 800 }}>Stay Watchlist</div>
+          <div style={{ padding: isMobile ? "12px 10px" : "14px 18px", borderBottom: "1px solid rgba(255,255,255,.07)", fontSize: 14, fontWeight: 800 }}>Stay Watchlist</div>
           <div style={{ padding: 16, display: "grid", gap: 8 }}>
             {reservations.filter(r => r.status !== "checked_out").slice(0, 6).map(r => (
               <div key={r.id} style={{ padding: "10px 12px", borderRadius: 10, background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.05)" }}>
@@ -173,7 +175,7 @@ export default function HotelOverviewPage() {
         </div>
 
         <div style={{ background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)", borderRadius: 16, overflow: "hidden" }}>
-          <div style={{ padding: "14px 18px", borderBottom: "1px solid rgba(255,255,255,.07)", fontSize: 14, fontWeight: 800 }}>Operations Snapshot</div>
+          <div style={{ padding: isMobile ? "12px 10px" : "14px 18px", borderBottom: "1px solid rgba(255,255,255,.07)", fontSize: 14, fontWeight: 800 }}>Operations Snapshot</div>
           <div style={{ padding: 16, display: "grid", gap: 8 }}>
             {[
               { label: "Available rooms",        value: rooms.filter(r => r.status === "available").length,  color: "#34d399" },

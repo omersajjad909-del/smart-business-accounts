@@ -3,12 +3,14 @@
 import toast from "react-hot-toast";
 import { useState } from "react";
 import { useBusinessRecords } from "@/lib/useBusinessRecords";
+import { useResponsive } from "@/hooks/useResponsive";
 
 const ff = "'Outfit','Inter',sans-serif";
 const bg = "rgba(255,255,255,.03)";
 const border = "rgba(255,255,255,.07)";
 
 export default function FundsPage() {
+  const { isMobile } = useResponsive();
   const { records: fundRecords, loading: fundsLoading } = useBusinessRecords("fund");
   const { records: txRecords, loading: txLoading, create: createTx } = useBusinessRecords("fund_transaction");
   const [showModal, setShowModal] = useState(false);
@@ -59,7 +61,7 @@ export default function FundsPage() {
   const btn = (c:string) => ({ background:c, border:"none", borderRadius:8, padding:"10px 20px", color:"#fff", fontFamily:ff, cursor:"pointer", fontSize:14, fontWeight:600 });
 
   return (
-    <div style={{ fontFamily:ff, color:"#fff", padding:24, minHeight:"100vh", background:"#0f0f0f" }}>
+    <div style={{ fontFamily:ff, color:"#fff", padding: isMobile ? "12px" : "24px", minHeight:"100vh", background:"#0f0f0f" }}>
       <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:24 }}>
         <div>
           <h1 style={{ margin:0, fontSize:24, fontWeight:700 }}>Fund Accounting</h1>
@@ -68,7 +70,7 @@ export default function FundsPage() {
         <button onClick={()=>setShowModal(true)} style={btn("#6366f1")}>+ Add Transaction</button>
       </div>
 
-      <div style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:16, marginBottom:24 }}>
+      <div style={{ display:"grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap:16, marginBottom:24 }}>
         {[
           { label:"Total Funds", value:funds.length, color:"#6366f1" },
           { label:"Total Balance", value:`Rs. ${(totalBalance/1000000).toFixed(2)}M`, color:"#22c55e" },
@@ -98,7 +100,7 @@ export default function FundsPage() {
                 </div>
                 <span style={{ background:f.status==="active"?"rgba(34,197,94,.15)":"rgba(107,114,128,.15)", color:f.status==="active"?"#22c55e":"#6b7280", border:`1px solid ${f.status==="active"?"#22c55e40":"#6b728040"}`, borderRadius:20, padding:"3px 10px", fontSize:12, fontWeight:600 }}>{f.status==="active"?"Active":"Closed"}</span>
               </div>
-              <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr 1fr", gap:8, marginBottom:12, textAlign:"center" }}>
+              <div style={{ display:"grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr 1fr", gap:8, marginBottom:12, textAlign:"center" }}>
                 <div>
                   <div style={{ fontSize:16, fontWeight:700, color:"#22c55e" }}>Rs. {(f.balance/1000).toFixed(0)}K</div>
                   <div style={{ fontSize:11, color:"rgba(255,255,255,.4)" }}>Balance</div>

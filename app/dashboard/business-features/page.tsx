@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { getCurrentUser } from "@/lib/auth";
 import toast from "react-hot-toast";
+import { useResponsive } from "@/hooks/useResponsive";
 
 const ff = "'Outfit','Inter',sans-serif";
 
@@ -285,6 +286,7 @@ function FlowList({ steps, color }: { steps: readonly string[]; color: string })
 
 /* ══════════════ PAGE ══════════════ */
 export default function BusinessFeaturesPage() {
+  const { isMobile } = useResponsive();
   const [features, setFeatures] = useState<Features>({ ...DEFAULT });
   const [saved,    setSaved]    = useState<Features>({ ...DEFAULT });
   const [loading,  setLoading]  = useState(true);
@@ -338,7 +340,7 @@ export default function BusinessFeaturesPage() {
   );
 
   if (!isAdmin) return (
-    <div style={{ padding: "40px 28px", fontFamily: ff }}>
+    <div style={{ padding: isMobile ? "22px 13px" : "40px 28px", fontFamily: ff }}>
       <div style={{ padding: 32, borderRadius: 16, background: "rgba(248,113,113,.07)", border: "1px solid rgba(248,113,113,.25)", textAlign: "center", color: "#f87171" }}>
         <div style={{ fontSize: 32, marginBottom: 12 }}>🔒</div>
         <div style={{ fontSize: 18, fontWeight: 800, marginBottom: 6 }}>Admin Only</div>
@@ -368,7 +370,7 @@ export default function BusinessFeaturesPage() {
         </div>
 
         {/* Concept banner */}
-        <div style={{ marginTop: 20, padding: "14px 18px", borderRadius: 12, background: "rgba(99,102,241,.06)", border: "1px solid rgba(99,102,241,.15)", display: "flex", gap: 14, alignItems: "flex-start" }}>
+        <div style={{ marginTop: 20, padding: isMobile ? "12px 10px" : "14px 18px", borderRadius: 12, background: "rgba(99,102,241,.06)", border: "1px solid rgba(99,102,241,.15)", display: "flex", gap: 14, alignItems: "flex-start" }}>
           <span style={{ fontSize: 22, flexShrink: 0 }}>🧠</span>
           <div>
             <div style={{ fontSize: 13, fontWeight: 700, color: "#818cf8", marginBottom: 4 }}>One system. Adaptive workflow.</div>
@@ -412,7 +414,7 @@ export default function BusinessFeaturesPage() {
               overflow: "hidden", transition: "border-color .2s, background .2s",
             }}>
               {/* Card header */}
-              <div style={{ padding: "18px 22px", display: "flex", alignItems: "center", gap: 16 }}>
+              <div style={{ padding: isMobile ? "12px 10px" : "18px 22px", display: "flex", alignItems: "center", gap: 16 }}>
                 <div style={{ fontSize: 28, flexShrink: 0 }}>{fc.icon}</div>
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
@@ -431,7 +433,7 @@ export default function BusinessFeaturesPage() {
               {/* Flow comparison */}
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", borderTop: `1px solid ${isOn ? fc.border : "rgba(255,255,255,.05)"}` }}>
                 {/* Simple side */}
-                <div style={{ padding: "14px 18px", borderRight: "1px solid rgba(255,255,255,.05)", background: !isOn ? "rgba(52,211,153,.04)" : "transparent" }}>
+                <div style={{ padding: isMobile ? "12px 10px" : "14px 18px", borderRight: "1px solid rgba(255,255,255,.05)", background: !isOn ? "rgba(52,211,153,.04)" : "transparent" }}>
                   <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 10 }}>
                     <div style={{ width: 7, height: 7, borderRadius: "50%", background: !isOn ? "#34d399" : "#334155" }} />
                     <div style={{ fontSize: 10, fontWeight: 800, color: !isOn ? "#34d399" : "#334155", textTransform: "uppercase", letterSpacing: ".06em" }}>
@@ -443,7 +445,7 @@ export default function BusinessFeaturesPage() {
                 </div>
 
                 {/* Advanced side */}
-                <div style={{ padding: "14px 18px", background: isOn ? `${fc.color}08` : "transparent" }}>
+                <div style={{ padding: isMobile ? "12px 10px" : "14px 18px", background: isOn ? `${fc.color}08` : "transparent" }}>
                   <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 10 }}>
                     <div style={{ width: 7, height: 7, borderRadius: "50%", background: isOn ? fc.color : "#334155" }} />
                     <div style={{ fontSize: 10, fontWeight: 800, color: isOn ? fc.color : "#334155", textTransform: "uppercase", letterSpacing: ".06em" }}>

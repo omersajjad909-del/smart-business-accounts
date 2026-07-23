@@ -5,6 +5,7 @@ import { confirmToast, alertToast } from "@/lib/toast-feedback";
 import toast from "react-hot-toast";
 
 import { useState, useEffect } from "react";
+import { useResponsive } from "@/hooks/useResponsive";
 
 interface Interaction {
   id: string;
@@ -18,6 +19,7 @@ interface Interaction {
 }
 
 export default function InteractionsPage() {
+  const { isMobile } = useResponsive();
   const [interactions, setInteractions] = useState<Interaction[]>([]);
   const [contacts, setContacts] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);

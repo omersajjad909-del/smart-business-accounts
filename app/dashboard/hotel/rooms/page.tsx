@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import { useBusinessRecords } from "@/lib/useBusinessRecords";
+import { useResponsive } from "@/hooks/useResponsive";
 
 const ff = "'Outfit','Inter',sans-serif";
 const bg = "rgba(255,255,255,0.03)";
@@ -8,6 +9,7 @@ const border = "rgba(255,255,255,0.07)";
 const STATUS_COLOR: Record<string, string> = { available: "#34d399", occupied: "#ef4444", cleaning: "#f59e0b", maintenance: "#6b7280" };
 
 export default function HotelRoomsPage() {
+  const { isMobile } = useResponsive();
   const { records, loading, create, update } = useBusinessRecords("hotel_room");
   const [showModal, setShowModal] = useState(false);
   const [error, setError] = useState("");
@@ -47,15 +49,15 @@ export default function HotelRoomsPage() {
   }
 
   return (
-    <div style={{ padding: "28px 32px", fontFamily: ff, color: "#fff", minHeight: "100vh" }}>
+    <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", fontFamily: ff, color: "#fff", minHeight: "100vh" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 28 }}>
         <div><h1 style={{ fontSize: 22, fontWeight: 800, margin: "0 0 4px" }}>🏨 Hotel Rooms</h1><p style={{ fontSize: 13, color: "rgba(255,255,255,.4)", margin: 0 }}>Manage room inventory and status</p></div>
         <button onClick={() => setShowModal(true)} style={{ padding: "10px 20px", borderRadius: 10, border: "none", background: "#f97316", color: "white", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>+ Add Room</button>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 12, marginBottom: 28 }}>
+      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 12, marginBottom: 28 }}>
         {[{ label: "Total Rooms", val: rooms.length, color: "#f97316" }, { label: "Available", val: available, color: "#34d399" }, { label: "Occupied", val: occupied, color: "#ef4444" }, { label: "Occupancy Rate", val: `${occupancy}%`, color: "#818cf8" }].map(s => (
-          <div key={s.label} style={{ background: bg, border: `1px solid ${border}`, borderRadius: 12, padding: "20px 24px" }}><div style={{ fontSize: 13, color: "rgba(255,255,255,.5)", marginBottom: 6 }}>{s.label}</div><div style={{ fontSize: 22, fontWeight: 700, color: s.color }}>{s.val}</div></div>
+          <div key={s.label} style={{ background: bg, border: `1px solid ${border}`, borderRadius: 12, padding: isMobile ? "12px 11px" : "20px 24px" }}><div style={{ fontSize: 13, color: "rgba(255,255,255,.5)", marginBottom: 6 }}>{s.label}</div><div style={{ fontSize: 22, fontWeight: 700, color: s.color }}>{s.val}</div></div>
         ))}
       </div>
 
@@ -63,7 +65,7 @@ export default function HotelRoomsPage() {
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(200px,1fr))", gap: 12 }}>
         {rooms.map(r => (
-          <div key={r.id} style={{ background: bg, border: `1px solid ${STATUS_COLOR[r.status]}40`, borderRadius: 12, padding: "16px 20px" }}>
+          <div key={r.id} style={{ background: bg, border: `1px solid ${STATUS_COLOR[r.status]}40`, borderRadius: 12, padding: isMobile ? "12px 10px" : "16px 20px" }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
               <div style={{ fontWeight: 800, fontSize: 18 }}>#{r.number}</div>
               <span style={{ display: "inline-block", background: `${STATUS_COLOR[r.status]}20`, color: STATUS_COLOR[r.status], borderRadius: 6, padding: "2px 8px", fontSize: 10, fontWeight: 600 }}>{r.status}</span>

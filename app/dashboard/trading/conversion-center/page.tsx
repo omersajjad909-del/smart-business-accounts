@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import {
+import { useResponsive } from "@/hooks/useResponsive";
   fetchJson,
   formatDate,
   formatMoney,
@@ -22,6 +23,7 @@ import {
 } from "../_shared";
 
 export default function TradingConversionCenterPage() {
+  const { isMobile } = useResponsive();
   const [quotations, setQuotations] = useState<QuotationLite[]>([]);
   const [salesInvoices, setSalesInvoices] = useState<SalesInvoiceLite[]>([]);
   const [purchaseOrders, setPurchaseOrders] = useState<PurchaseOrderLite[]>([]);
@@ -87,7 +89,7 @@ export default function TradingConversionCenterPage() {
   ];
 
   return (
-    <div style={{ padding: "28px 32px", fontFamily: tradingFont, color: "var(--text-primary)", minHeight: "100vh" }}>
+    <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", fontFamily: tradingFont, color: "var(--text-primary)", minHeight: "100vh" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 16, marginBottom: 26 }}>
         <div>
           <h1 style={{ fontSize: 24, fontWeight: 800, margin: "0 0 6px" }}>Conversion Center</h1>
@@ -105,9 +107,9 @@ export default function TradingConversionCenterPage() {
         </div>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(3,minmax(0,1fr))", gap: 12, marginBottom: 24 }}>
+      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(3,minmax(0,1fr))", gap: 12, marginBottom: 24 }}>
         {metrics.map((metric) => (
-          <div key={metric.label} style={{ background: tradingBg, border: `1px solid ${tradingBorder}`, borderRadius: 14, padding: "18px 20px" }}>
+          <div key={metric.label} style={{ background: tradingBg, border: `1px solid ${tradingBorder}`, borderRadius: 14, padding: isMobile ? "12px 10px" : "18px 20px" }}>
             <div style={{ fontSize: 12, color: tradingMuted, marginBottom: 8 }}>{metric.label}</div>
             <div style={{ fontSize: 24, fontWeight: 800, color: metric.color }}>{metric.value}</div>
           </div>
@@ -116,7 +118,7 @@ export default function TradingConversionCenterPage() {
 
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
         <div style={{ background: tradingBg, border: `1px solid ${tradingBorder}`, borderRadius: 16, overflow: "hidden" }}>
-          <div style={{ padding: "16px 18px", borderBottom: `1px solid ${tradingBorder}`, fontSize: 15, fontWeight: 800 }}>Commercial Pipeline Checks</div>
+          <div style={{ padding: isMobile ? "12px 10px" : "16px 18px", borderBottom: `1px solid ${tradingBorder}`, fontSize: 15, fontWeight: 800 }}>Commercial Pipeline Checks</div>
           <div style={{ padding: 16, display: "grid", gap: 10 }}>
             {quotations.slice(0, 6).map((entry) => (
               <div key={entry.id} style={{ padding: "12px 14px", borderRadius: 12, background: "var(--panel-bg)", border: `1px solid ${tradingBorder}` }}>
@@ -132,7 +134,7 @@ export default function TradingConversionCenterPage() {
         </div>
 
         <div style={{ background: tradingBg, border: `1px solid ${tradingBorder}`, borderRadius: 16, overflow: "hidden" }}>
-          <div style={{ padding: "16px 18px", borderBottom: `1px solid ${tradingBorder}`, fontSize: 15, fontWeight: 800 }}>Procurement Hand-off Checks</div>
+          <div style={{ padding: isMobile ? "12px 10px" : "16px 18px", borderBottom: `1px solid ${tradingBorder}`, fontSize: 15, fontWeight: 800 }}>Procurement Hand-off Checks</div>
           <table style={{ width: "100%", borderCollapse: "collapse" }}>
             <thead>
               <tr>

@@ -3,6 +3,7 @@
 import toast from "react-hot-toast";
 import { useEffect, useState } from "react";
 import { getCurrentUser } from "@/lib/auth";
+import { useResponsive } from "@/hooks/useResponsive";
 
 type Channel = "whatsapp" | "sms" | "email";
 type Tab = "whatsapp" | "email" | "sms" | "preferences";
@@ -24,6 +25,7 @@ const DEFAULT_WA:  WhatsAppForm = { enabled: false, token: "", phoneId: "", apiV
 const DEFAULT_EMAIL: EmailForm  = { enabled: false, host: "", port: 587, secure: false, user: "", pass: "", from: "", fromName: "FinovaOS" };
 
 export default function NotificationsPage() {
+  const { isMobile } = useResponsive();
   const currentUser = getCurrentUser();
 
   const [tab, setTab]           = useState<Tab>("whatsapp");
@@ -462,7 +464,7 @@ export default function NotificationsPage() {
           </div>
 
           <div style={{
-            padding: "16px 20px", borderRadius: "10px", marginBottom: "20px",
+            padding: isMobile ? "12px 10px" : "16px 20px", borderRadius: "10px", marginBottom: "20px",
             background: status.sms ? "rgba(99,102,241,0.06)" : "rgba(248,113,113,0.06)",
             border: `1px solid ${status.sms ? "rgba(99,102,241,0.25)" : "rgba(248,113,113,0.2)"}`,
           }}>
@@ -549,7 +551,7 @@ export default function NotificationsPage() {
 
           {/* Table header */}
           <div style={{
-            display: "grid", gridTemplateColumns: "1fr 100px 100px 100px",
+            display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 100px 100px 100px",
             gap: "8px", padding: "8px 12px", marginBottom: "4px",
           }}>
             <div style={{ fontSize: "10px", fontWeight: 700, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.07em" }}>Event</div>
@@ -563,7 +565,7 @@ export default function NotificationsPage() {
           {/* Rows */}
           {NOTIF_TYPES.map((n, i) => (
             <div key={n.key} style={{
-              display: "grid", gridTemplateColumns: "1fr 100px 100px 100px",
+              display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 100px 100px 100px",
               gap: "8px", padding: "12px 12px", alignItems: "center",
               background: i % 2 === 0 ? "var(--app-bg)" : "transparent",
               borderRadius: "8px",

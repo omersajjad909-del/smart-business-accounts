@@ -3,10 +3,11 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { NgoControlCenter, fetchJson, ngoBg, ngoBorder, ngoFont, ngoMuted } from "./_shared";
+import { useResponsive } from "@/hooks/useResponsive";
 
 function StatCard({ label, value, tone }: { label: string; value: string | number; tone: string }) {
   return (
-    <div style={{ background: ngoBg, border: `1px solid ${ngoBorder}`, borderRadius: 18, padding: "20px 22px" }}>
+    <div style={{ background: ngoBg, border: `1px solid ${ngoBorder}`, borderRadius: 18, padding: isMobile ? "12px 10px" : "20px 22px" }}>
       <div style={{ fontSize: 12, color: ngoMuted, marginBottom: 8, textTransform: "uppercase", letterSpacing: ".06em" }}>{label}</div>
       <div style={{ fontSize: 28, fontWeight: 800, color: tone }}>{value}</div>
     </div>
@@ -23,6 +24,7 @@ const emptyState: NgoControlCenter = {
 };
 
 export default function NgoOverviewPage() {
+  const { isMobile } = useResponsive();
   const [data, setData] = useState(emptyState);
 
   useEffect(() => {
@@ -33,7 +35,7 @@ export default function NgoOverviewPage() {
   const topDonors = [...donors].sort((a, b) => b.totalDonated - a.totalDonated).slice(0, 4);
 
   return (
-    <div style={{ padding: "28px 32px", minHeight: "100vh", color: "#fff", fontFamily: ngoFont }}>
+    <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", minHeight: "100vh", color: "#fff", fontFamily: ngoFont }}>
       <div style={{ marginBottom: 26 }}>
         <div style={{ fontSize: 12, color: "#a5b4fc", fontWeight: 700, letterSpacing: ".08em", textTransform: "uppercase", marginBottom: 10 }}>NGO / Non-Profit</div>
         <h1 style={{ fontSize: 30, fontWeight: 900, margin: "0 0 10px" }}>Mission Control Desk</h1>
@@ -53,7 +55,7 @@ export default function NgoOverviewPage() {
       <div style={{ display: "grid", gridTemplateColumns: "1.15fr .85fr", gap: 18, marginBottom: 18 }}>
         <div style={{ background: "linear-gradient(135deg, rgba(99,102,241,.14), rgba(59,130,246,.1))", border: `1px solid ${ngoBorder}`, borderRadius: 20, padding: 24 }}>
           <div style={{ fontSize: 13, color: "#c7d2fe", fontWeight: 800, marginBottom: 10, textTransform: "uppercase", letterSpacing: ".07em" }}>Mission Flow</div>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(4, minmax(0,1fr))", gap: 12 }}>
+          <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,minmax(0,1fr))", gap: 12 }}>
             {[
               { title: "Capture Donors", body: "Donor profile, frequency, aur fundraising relationships maintain karein." },
               { title: "Track Grants", body: "Grant amount, donor, report due dates, aur compliance monitor karein." },
@@ -79,7 +81,7 @@ export default function NgoOverviewPage() {
               { href: "/dashboard/ngo/funds", label: "Fund Accounting", hint: "Receipts, expenses, and balances" },
               { href: "/dashboard/ngo/analytics", label: "See NGO Analytics", hint: "Mission-side financial and impact reading" },
             ].map((item) => (
-              <Link prefetch={false} key={item.href} href={item.href} style={{ textDecoration: "none", color: "#fff", background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)", borderRadius: 14, padding: "14px 16px" }}>
+              <Link prefetch={false} key={item.href} href={item.href} style={{ textDecoration: "none", color: "#fff", background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)", borderRadius: 14, padding: isMobile ? "12px 10px" : "14px 16px" }}>
                 <div style={{ fontSize: 14, fontWeight: 800, marginBottom: 4 }}>{item.label}</div>
                 <div style={{ fontSize: 12, color: ngoMuted }}>{item.hint}</div>
               </Link>
@@ -115,7 +117,7 @@ export default function NgoOverviewPage() {
               { label: "Fund transactions", value: `${summary.transactions} entries on record`, tone: "#f59e0b" },
               { label: "Inactive beneficiaries", value: `${beneficiaries.filter((beneficiary) => beneficiary.status !== "active").length} paused`, tone: "#f87171" },
             ].map((row) => (
-              <div key={row.label} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "rgba(255,255,255,.025)", border: "1px solid rgba(255,255,255,.06)", borderRadius: 14, padding: "14px 16px" }}>
+              <div key={row.label} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "rgba(255,255,255,.025)", border: "1px solid rgba(255,255,255,.06)", borderRadius: 14, padding: isMobile ? "12px 10px" : "14px 16px" }}>
                 <span style={{ fontSize: 13, color: ngoMuted }}>{row.label}</span>
                 <span style={{ fontSize: 14, fontWeight: 800, color: row.tone }}>{row.value}</span>
               </div>

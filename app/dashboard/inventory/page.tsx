@@ -3,6 +3,7 @@ import { useEffect, useState, useMemo, useRef } from "react";
 import { getCurrentUser } from "@/lib/auth";
 import Link from "next/link";
 import toast from "react-hot-toast";
+import { useResponsive } from "@/hooks/useResponsive";
 
 const FONT = "'Outfit','Inter',sans-serif";
 
@@ -32,6 +33,7 @@ const STATUS_STYLE: Record<StockStatus, { bg: string; color: string; label: stri
 };
 
 export default function InventoryPage() {
+  const { isMobile } = useResponsive();
   const [stock, setStock]         = useState<StockRow[]>([]);
   const [loading, setLoading]     = useState(true);
   const [search, setSearch]       = useState("");
@@ -178,7 +180,7 @@ export default function InventoryPage() {
   const FILTER_TABS: Array<"ALL" | StockStatus> = ["ALL", "OK", "LOW", "OUT"];
 
   return (
-    <div style={{ minHeight: "100vh", background: "var(--app-bg)", padding: "32px 28px", fontFamily: FONT, color: "var(--text-primary)" }}>
+    <div style={{ minHeight: "100vh", background: "var(--app-bg)", padding: isMobile ? "16px" : "32px" 28px", fontFamily: FONT, color: "var(--text-primary)" }}>
 
       {/* Header */}
       <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 28, flexWrap: "wrap", gap: 12 }}>
@@ -215,7 +217,7 @@ export default function InventoryPage() {
           { label: "Out of Stock",   value: kpis.out,      color: "#f87171" },
           { label: "Stock Value",    value: fmtK(kpis.totalVal), color: "#a5b4fc" },
         ].map(k => (
-          <div key={k.label} style={{ background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 14, padding: "16px 18px" }}>
+          <div key={k.label} style={{ background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 14, padding: isMobile ? "12px 10px" : "16px 18px" }}>
             <div style={{ fontSize: 10, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: 0.8, marginBottom: 8 }}>{k.label}</div>
             <div style={{ fontSize: 24, fontWeight: 800, color: k.color, lineHeight: 1 }}>{k.value}</div>
           </div>

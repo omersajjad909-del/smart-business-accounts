@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import { useResponsive } from "@/hooks/useResponsive";
 
 const ROLES = [
   { value: "ADMIN", label: "Admin", color: "#7c3aed" },
@@ -15,6 +16,7 @@ const ROLES = [
 ];
 
 export default function TeamPage() {
+  const { isMobile } = useResponsive();
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
   const [role, setRole] = useState("VIEWER");
@@ -298,7 +300,7 @@ export default function TeamPage() {
       <div
         style={{
           marginTop: "16px",
-          padding: "16px 20px",
+          padding: isMobile ? "12px 10px" : "16px 20px",
           borderRadius: "10px",
           background: "var(--panel-bg)",
           border: "1px solid var(--border)",

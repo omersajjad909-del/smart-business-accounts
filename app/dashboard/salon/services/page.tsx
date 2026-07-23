@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { useBusinessRecords } from "@/lib/useBusinessRecords";
 import {
+import { useResponsive } from "@/hooks/useResponsive";
   mapSalonAppointments,
   mapSalonServices,
   salonBg,
@@ -16,6 +17,7 @@ import {
 const CATEGORY_TABS = ["All", ...salonServiceCategories];
 
 export default function ServicesPage() {
+  const { isMobile } = useResponsive();
   const servicesHook = useBusinessRecords("salon_service");
   const appointments = mapSalonAppointments(useBusinessRecords("salon_appointment").records);
   const services = mapSalonServices(servicesHook.records);
@@ -87,11 +89,11 @@ export default function ServicesPage() {
         <button style={{ background: "#ec4899", color: "#fff", border: "none", borderRadius: 10, padding: "10px 20px", fontWeight: 700, cursor: "pointer", fontSize: 14 }} onClick={() => setShowModal(true)}>+ Add Service</button>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 16, marginBottom: 28 }}>
-        <div style={{ background: salonBg, border: `1px solid ${salonBorder}`, borderRadius: 16, padding: "20px 24px" }}><div style={{ fontSize: 13, color: salonMuted, marginBottom: 6 }}>Total Services</div><div style={{ fontSize: 28, fontWeight: 800 }}>{services.length}</div></div>
-        <div style={{ background: salonBg, border: `1px solid ${salonBorder}`, borderRadius: 16, padding: "20px 24px" }}><div style={{ fontSize: 13, color: salonMuted, marginBottom: 6 }}>Active Services</div><div style={{ fontSize: 28, fontWeight: 800, color: "#34d399" }}>{active}</div></div>
-        <div style={{ background: salonBg, border: `1px solid ${salonBorder}`, borderRadius: 16, padding: "20px 24px" }}><div style={{ fontSize: 13, color: salonMuted, marginBottom: 6 }}>Most Popular</div><div style={{ fontSize: 18, fontWeight: 800, color: "#ec4899" }}>{popular}</div></div>
-        <div style={{ background: salonBg, border: `1px solid ${salonBorder}`, borderRadius: 16, padding: "20px 24px" }}><div style={{ fontSize: 13, color: salonMuted, marginBottom: 6 }}>Avg Price</div><div style={{ fontSize: 24, fontWeight: 800, color: "#fbbf24" }}>Rs. {avgPrice.toLocaleString()}</div></div>
+      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 16, marginBottom: 28 }}>
+        <div style={{ background: salonBg, border: `1px solid ${salonBorder}`, borderRadius: 16, padding: isMobile ? "12px 11px" : "20px 24px" }}><div style={{ fontSize: 13, color: salonMuted, marginBottom: 6 }}>Total Services</div><div style={{ fontSize: 28, fontWeight: 800 }}>{services.length}</div></div>
+        <div style={{ background: salonBg, border: `1px solid ${salonBorder}`, borderRadius: 16, padding: isMobile ? "12px 11px" : "20px 24px" }}><div style={{ fontSize: 13, color: salonMuted, marginBottom: 6 }}>Active Services</div><div style={{ fontSize: 28, fontWeight: 800, color: "#34d399" }}>{active}</div></div>
+        <div style={{ background: salonBg, border: `1px solid ${salonBorder}`, borderRadius: 16, padding: isMobile ? "12px 11px" : "20px 24px" }}><div style={{ fontSize: 13, color: salonMuted, marginBottom: 6 }}>Most Popular</div><div style={{ fontSize: 18, fontWeight: 800, color: "#ec4899" }}>{popular}</div></div>
+        <div style={{ background: salonBg, border: `1px solid ${salonBorder}`, borderRadius: 16, padding: isMobile ? "12px 11px" : "20px 24px" }}><div style={{ fontSize: 13, color: salonMuted, marginBottom: 6 }}>Avg Price</div><div style={{ fontSize: 24, fontWeight: 800, color: "#fbbf24" }}>Rs. {avgPrice.toLocaleString()}</div></div>
       </div>
 
       {error && <div style={{ marginBottom: 14, fontSize: 12, color: "#fda4af" }}>{error}</div>}
@@ -118,17 +120,17 @@ export default function ServicesPage() {
               <tr><td colSpan={6} style={{ padding: 32, textAlign: "center", color: salonMuted, fontSize: 14 }}>No services found.</td></tr>
             ) : filtered.map((service) => (
               <tr key={service.id}>
-                <td style={{ padding: "14px 16px", fontSize: 14, borderBottom: "1px solid rgba(255,255,255,.04)" }}>
+                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", fontSize: 14, borderBottom: "1px solid rgba(255,255,255,.04)" }}>
                   <div style={{ fontWeight: 700 }}>{service.name}</div>
                   {service.name === popular && <span style={{ fontSize: 11, color: "#fbbf24" }}>Most booked</span>}
                 </td>
-                <td style={{ padding: "14px 16px", fontSize: 14, borderBottom: "1px solid rgba(255,255,255,.04)" }}>{service.category}</td>
-                <td style={{ padding: "14px 16px", fontSize: 14, borderBottom: "1px solid rgba(255,255,255,.04)" }}>{service.duration} min</td>
-                <td style={{ padding: "14px 16px", fontSize: 14, borderBottom: "1px solid rgba(255,255,255,.04)" }}>Rs. {service.price.toLocaleString()}</td>
-                <td style={{ padding: "14px 16px", fontSize: 14, borderBottom: "1px solid rgba(255,255,255,.04)" }}>
+                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", fontSize: 14, borderBottom: "1px solid rgba(255,255,255,.04)" }}>{service.category}</td>
+                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", fontSize: 14, borderBottom: "1px solid rgba(255,255,255,.04)" }}>{service.duration} min</td>
+                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", fontSize: 14, borderBottom: "1px solid rgba(255,255,255,.04)" }}>Rs. {service.price.toLocaleString()}</td>
+                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", fontSize: 14, borderBottom: "1px solid rgba(255,255,255,.04)" }}>
                   <span style={{ display: "inline-block", background: `${salonStatusColor(service.status)}20`, color: salonStatusColor(service.status), borderRadius: 999, padding: "3px 10px", fontSize: 12, fontWeight: 700 }}>{service.status}</span>
                 </td>
-                <td style={{ padding: "14px 16px", fontSize: 14, borderBottom: "1px solid rgba(255,255,255,.04)" }}>
+                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", fontSize: 14, borderBottom: "1px solid rgba(255,255,255,.04)" }}>
                   <button style={{ padding: "6px 12px", fontSize: 12, borderRadius: 8, border: "1px solid rgba(255,255,255,.1)", background: service.status === "Active" ? "rgba(255,255,255,.06)" : "rgba(52,211,153,.16)", color: "#fff", cursor: "pointer" }} onClick={() => toggleStatus(service.id, service.status)}>
                     {service.status === "Active" ? "Deactivate" : "Activate"}
                   </button>

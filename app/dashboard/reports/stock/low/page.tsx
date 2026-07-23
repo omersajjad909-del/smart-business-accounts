@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { getCurrentUser } from "@/lib/auth";
+import { useResponsive } from "@/hooks/useResponsive";
 
 type LowStockRow = {
   itemId: string;
@@ -12,6 +13,7 @@ type LowStockRow = {
 };
 
 export default function LowStockPage() {
+  const { isMobile } = useResponsive();
   const [rows, setRows] = useState<LowStockRow[]>([]);
   const [loading, setLoading] = useState(false);
 

@@ -3,11 +3,13 @@
 import { useMemo, useState } from "react";
 import { useBusinessRecords } from "@/lib/useBusinessRecords";
 import { mapPrescriptionRecords, pharmacyBg, pharmacyBorder, pharmacyFont, pharmacyMuted, todayIso } from "../_shared";
+import { useResponsive } from "@/hooks/useResponsive";
 
 const STATUS_COLOR: Record<string, string> = { pending: "#f59e0b", dispensed: "#34d399", cancelled: "#6b7280" };
 const initialForm = { patient: "", doctor: "", drugs: "", date: todayIso(), notes: "" };
 
 export default function PharmacyPrescriptionsPage() {
+  const { isMobile } = useResponsive();
   const { records, loading, create, update } = useBusinessRecords("pharmacy_prescription");
   const [showModal, setShowModal] = useState(false);
   const [error, setError] = useState("");
@@ -35,7 +37,7 @@ export default function PharmacyPrescriptionsPage() {
   }
 
   return (
-    <div style={{ padding: "28px 32px", fontFamily: pharmacyFont, color: "#fff", minHeight: "100vh" }}>
+    <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", fontFamily: pharmacyFont, color: "#fff", minHeight: "100vh" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 28 }}>
         <div>
           <h1 style={{ fontSize: 22, fontWeight: 800, margin: "0 0 4px" }}>Prescriptions</h1>
@@ -44,9 +46,9 @@ export default function PharmacyPrescriptionsPage() {
         <button onClick={() => setShowModal(true)} style={{ padding: "10px 20px", borderRadius: 10, border: "none", background: "#fb7185", color: "white", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>New Prescription</button>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 12, marginBottom: 28 }}>
+      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(3,1fr)", gap: 12, marginBottom: 28 }}>
         {[{ label: "Total", val: prescriptions.length, color: "#fb7185" }, { label: "Pending", val: prescriptions.filter((p) => p.status === "pending").length, color: "#f59e0b" }, { label: "Dispensed", val: prescriptions.filter((p) => p.status === "dispensed").length, color: "#34d399" }].map((s) => (
-          <div key={s.label} style={{ background: pharmacyBg, border: `1px solid ${pharmacyBorder}`, borderRadius: 12, padding: "20px 24px" }}>
+          <div key={s.label} style={{ background: pharmacyBg, border: `1px solid ${pharmacyBorder}`, borderRadius: 12, padding: isMobile ? "12px 11px" : "20px 24px" }}>
             <div style={{ fontSize: 13, color: pharmacyMuted, marginBottom: 6 }}>{s.label}</div>
             <div style={{ fontSize: 22, fontWeight: 700, color: s.color }}>{s.val}</div>
           </div>
@@ -57,7 +59,7 @@ export default function PharmacyPrescriptionsPage() {
 
       <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
         {prescriptions.map((p) => (
-          <div key={p.id} style={{ background: pharmacyBg, border: `1px solid ${pharmacyBorder}`, borderRadius: 10, padding: "16px 20px", display: "flex", alignItems: "center", gap: 16 }}>
+          <div key={p.id} style={{ background: pharmacyBg, border: `1px solid ${pharmacyBorder}`, borderRadius: 10, padding: isMobile ? "12px 10px" : "16px 20px", display: "flex", alignItems: "center", gap: 16 }}>
             <div style={{ flex: 1 }}>
               <div style={{ display: "flex", gap: 10, alignItems: "center", marginBottom: 4 }}>
                 <span style={{ fontWeight: 700 }}>{p.patient}</span>

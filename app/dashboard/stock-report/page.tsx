@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useResponsive } from "@/hooks/useResponsive";
 
 type StockItem = {
   id: string;
@@ -11,6 +12,7 @@ type StockItem = {
 };
 
 export default function StockReportPage() {
+  const { isMobile } = useResponsive();
   const [items, setItems] = useState<StockItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");

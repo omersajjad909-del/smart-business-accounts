@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import {
+import { useResponsive } from "@/hooks/useResponsive";
   fetchJson,
   formatDate,
   tradingBg,
@@ -16,6 +17,7 @@ import {
 } from "../_shared";
 
 export default function TradingDispatchBoardPage() {
+  const { isMobile } = useResponsive();
   const [challans, setChallans] = useState<DeliveryChallanLite[]>([]);
   const [outward, setOutward] = useState<OutwardLite[]>([]);
   const [salesInvoices, setSalesInvoices] = useState<SalesInvoiceLite[]>([]);
@@ -51,7 +53,7 @@ export default function TradingDispatchBoardPage() {
   );
 
   return (
-    <div style={{ padding: "28px 32px", fontFamily: tradingFont, color: "var(--text-primary)", minHeight: "100vh" }}>
+    <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", fontFamily: tradingFont, color: "var(--text-primary)", minHeight: "100vh" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 26 }}>
         <div>
           <h1 style={{ fontSize: 24, fontWeight: 800, margin: "0 0 6px" }}>Dispatch Board</h1>
@@ -69,14 +71,14 @@ export default function TradingDispatchBoardPage() {
         </div>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4,minmax(0,1fr))", gap: 12, marginBottom: 24 }}>
+      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,minmax(0,1fr))", gap: 12, marginBottom: 24 }}>
         {[
           { label: "Sales Invoices", value: salesInvoices.length, color: "#38bdf8" },
           { label: "Pending Challans", value: pendingChallans.length, color: "#f59e0b" },
           { label: "Delivered Challans", value: deliveredChallans.length, color: "#34d399" },
           { label: "Outward Entries", value: outward.length, color: "#a78bfa" },
         ].map((card) => (
-          <div key={card.label} style={{ background: tradingBg, border: `1px solid ${tradingBorder}`, borderRadius: 14, padding: "18px 20px" }}>
+          <div key={card.label} style={{ background: tradingBg, border: `1px solid ${tradingBorder}`, borderRadius: 14, padding: isMobile ? "12px 10px" : "18px 20px" }}>
             <div style={{ fontSize: 12, color: tradingMuted, marginBottom: 8 }}>{card.label}</div>
             <div style={{ fontSize: 24, fontWeight: 800, color: card.color }}>{card.value}</div>
           </div>
@@ -85,7 +87,7 @@ export default function TradingDispatchBoardPage() {
 
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
         <div style={{ background: tradingBg, border: `1px solid ${tradingBorder}`, borderRadius: 16, overflow: "hidden" }}>
-          <div style={{ padding: "16px 18px", borderBottom: `1px solid ${tradingBorder}`, fontSize: 15, fontWeight: 800 }}>Delivery Challans</div>
+          <div style={{ padding: isMobile ? "12px 10px" : "16px 18px", borderBottom: `1px solid ${tradingBorder}`, fontSize: 15, fontWeight: 800 }}>Delivery Challans</div>
           <table style={{ width: "100%", borderCollapse: "collapse" }}>
             <thead>
               <tr>
@@ -114,7 +116,7 @@ export default function TradingDispatchBoardPage() {
         </div>
 
         <div style={{ background: tradingBg, border: `1px solid ${tradingBorder}`, borderRadius: 16, overflow: "hidden" }}>
-          <div style={{ padding: "16px 18px", borderBottom: `1px solid ${tradingBorder}`, fontSize: 15, fontWeight: 800 }}>Outward Register Feed</div>
+          <div style={{ padding: isMobile ? "12px 10px" : "16px 18px", borderBottom: `1px solid ${tradingBorder}`, fontSize: 15, fontWeight: 800 }}>Outward Register Feed</div>
           <table style={{ width: "100%", borderCollapse: "collapse" }}>
             <thead>
               <tr>

@@ -2,6 +2,7 @@
 
 import { useState, useMemo } from "react";
 import { useBusinessRecords } from "@/lib/useBusinessRecords";
+import { useResponsive } from "@/hooks/useResponsive";
 
 const ff = "'Outfit','Inter',sans-serif";
 const panelBg = "rgba(255,255,255,.03)";
@@ -25,6 +26,7 @@ function getPassportStatus(expiryDate: string): { label: string; color: string }
 }
 
 export default function PassportDatabasePage() {
+  const { isMobile } = useResponsive();
   const { records, loading, create, update, remove } = useBusinessRecords("travel_passport");
 
   const [showModal, setShowModal] = useState(false);
@@ -105,7 +107,7 @@ export default function PassportDatabasePage() {
   const inp: React.CSSProperties = { width: "100%", background: inputBg, border: `1px solid ${panelBorder}`, borderRadius: 10, padding: "10px 12px", color: "#fff", fontSize: 13, boxSizing: "border-box", fontFamily: ff };
 
   return (
-    <div style={{ padding: "28px 32px", fontFamily: ff, color: "#e2e8f0" }}>
+    <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", fontFamily: ff, color: "#e2e8f0" }}>
       {/* Header */}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 20, flexWrap: "wrap", marginBottom: 24 }}>
         <div>
@@ -116,14 +118,14 @@ export default function PassportDatabasePage() {
       </div>
 
       {/* Stats */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(160px,1fr))", gap: 14, marginBottom: 24 }}>
+      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(auto-fit,minmax(160px,1fr))", gap: 14, marginBottom: 24 }}>
         {[
           { label: "Total Passports", value: passports.length, color: ACCENT },
           { label: "Valid", value: totalValid, color: "#34d399" },
           { label: "Expiring Soon", value: totalExpiring, color: "#fbbf24" },
           { label: "Expired", value: totalExpired, color: "#f87171" },
         ].map(s => (
-          <div key={s.label} style={{ background: panelBg, border: `1px solid ${panelBorder}`, borderRadius: 14, padding: "16px 20px" }}>
+          <div key={s.label} style={{ background: panelBg, border: `1px solid ${panelBorder}`, borderRadius: 14, padding: isMobile ? "12px 10px" : "16px 20px" }}>
             <div style={{ fontSize: 11, color: "rgba(255,255,255,.4)", marginBottom: 6, textTransform: "uppercase", letterSpacing: ".06em" }}>{s.label}</div>
             <div style={{ fontSize: 24, fontWeight: 800, color: s.color }}>{s.value}</div>
           </div>

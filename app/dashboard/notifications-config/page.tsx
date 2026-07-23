@@ -2,6 +2,7 @@
 import toast from "react-hot-toast";
 import { useState, useEffect } from "react";
 import { getCurrentUser } from "@/lib/auth";
+import { useResponsive } from "@/hooks/useResponsive";
 
 const ff = "'Outfit','Inter',sans-serif";
 const ACCENT = "#34d399";
@@ -9,7 +10,7 @@ const BG = "rgba(255,255,255,.03)";
 const BORDER = "rgba(255,255,255,.08)";
 const MUTED = "rgba(255,255,255,.45)";
 
-const inp: React.CSSProperties = { width: "100%", boxSizing: "border-box", background: "rgba(255,255,255,.05)", border: `1px solid ${BORDER}`, borderRadius: 8, padding: "9px 12px", fontSize: 13, color: "#fff", fontFamily: ff, outline: "none" };
+const inp: React.CSSProperties = { width: "100%", boxSizing: "border-box", background: "rgba(255,255,255,.05)", border: `1px solid ${BORDER}`, borderRadius: 8, padding: isMobile ? "8px 8px" : "9px 12px", fontSize: 13, color: "#fff", fontFamily: ff, outline: "none" };
 const lbl: React.CSSProperties = { fontSize: 11, fontWeight: 700, color: MUTED, textTransform: "uppercase" as const, letterSpacing: ".06em", display: "block", marginBottom: 5 };
 
 type Channel = "whatsapp" | "sms";
@@ -72,6 +73,7 @@ function Toggle({ on, onChange }: { on: boolean; onChange: () => void }) {
 }
 
 export default function NotificationsConfigPage() {
+  const { isMobile } = useResponsive();
   const user = getCurrentUser();
   const [config, setConfig]   = useState<NotifConfig>(DEFAULT_CONFIG);
   const [saved, setSaved]     = useState<NotifConfig>(DEFAULT_CONFIG);
@@ -139,7 +141,7 @@ export default function NotificationsConfigPage() {
   if (loading) return <div style={{ padding: 40, textAlign: "center", color: MUTED, fontFamily: ff }}>Loading…</div>;
 
   return (
-    <div style={{ padding: "28px 32px", fontFamily: ff, color: "#fff", minHeight: "100vh", maxWidth: 860 }}>
+    <div style={{ padding: isMobile ? "17px 16px" : "28px 32px", fontFamily: ff, color: "#fff", minHeight: "100vh", maxWidth: 860 }}>
 
       {/* Header */}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 28 }}>
@@ -151,7 +153,7 @@ export default function NotificationsConfigPage() {
           <span style={{ fontSize: 13, color: MUTED }}>Notifications</span>
           <Toggle on={config.enabled} onChange={() => setConfig(c => ({ ...c, enabled: !c.enabled }))} />
           {hasChanges && (
-            <button onClick={handleSave} disabled={saving} style={{ padding: "9px 20px", borderRadius: 8, border: "none", background: saving ? "rgba(52,211,153,.4)" : ACCENT, color: "#fff", fontSize: 13, fontWeight: 700, cursor: saving ? "not-allowed" : "pointer" }}>
+            <button onClick={handleSave} disabled={saving} style={{ padding: isMobile ? "8px 10px" : "9px 20px", borderRadius: 8, border: "none", background: saving ? "rgba(52,211,153,.4)" : ACCENT, color: "#fff", fontSize: 13, fontWeight: 700, cursor: saving ? "not-allowed" : "pointer" }}>
               {saving ? "Saving…" : "💾 Save"}
             </button>
           )}
@@ -160,7 +162,7 @@ export default function NotificationsConfigPage() {
 
       {/* Master off banner */}
       {!config.enabled && (
-        <div style={{ background: "rgba(248,113,113,.06)", border: "1px solid rgba(248,113,113,.2)", borderRadius: 12, padding: "14px 18px", marginBottom: 20, display: "flex", gap: 12, alignItems: "center" }}>
+        <div style={{ background: "rgba(248,113,113,.06)", border: "1px solid rgba(248,113,113,.2)", borderRadius: 12, padding: isMobile ? "8px 9px" : "14px 18px", marginBottom: 20, display: "flex", gap: 12, alignItems: "center" }}>
           <span style={{ fontSize: 20 }}>⚠️</span>
           <div style={{ fontSize: 13, color: "#f87171" }}>Notifications are <strong>disabled</strong>. Toggle the switch above to enable.</div>
         </div>
@@ -169,7 +171,7 @@ export default function NotificationsConfigPage() {
       {/* Tabs */}
       <div style={{ display: "flex", gap: 8, marginBottom: 24 }}>
         {[{ v: "setup" as const, l: "⚙️ Setup" }, { v: "events" as const, l: "🔔 Events" }, { v: "templates" as const, l: "📝 Templates" }].map(t => (
-          <button key={t.v} onClick={() => setActiveTab(t.v)} style={{ padding: "8px 18px", borderRadius: 8, border: "none", fontSize: 13, fontWeight: 700, cursor: "pointer", background: activeTab === t.v ? ACCENT : "rgba(255,255,255,.06)", color: activeTab === t.v ? "#fff" : MUTED }}>
+          <button key={t.v} onClick={() => setActiveTab(t.v)} style={{ padding: isMobile ? "8px 9px" : "8px 18px", borderRadius: 8, border: "none", fontSize: 13, fontWeight: 700, cursor: "pointer", background: activeTab === t.v ? ACCENT : "rgba(255,255,255,.06)", color: activeTab === t.v ? "#fff" : MUTED }}>
             {t.l}
           </button>
         ))}
@@ -182,7 +184,7 @@ export default function NotificationsConfigPage() {
           {/* Channel */}
           <div style={{ background: BG, border: `1px solid ${BORDER}`, borderRadius: 12, padding: 22 }}>
             <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 16 }}>Notification Channel</div>
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+            <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: 12 }}>
               {(["whatsapp", "sms"] as Channel[]).map(ch => (
                 <div key={ch} onClick={() => setConfig(c => ({ ...c, channel: ch }))} style={{ padding: 16, borderRadius: 10, border: `2px solid ${config.channel === ch ? ACCENT : BORDER}`, cursor: "pointer", background: config.channel === ch ? "rgba(52,211,153,.06)" : "transparent", transition: "border-color .15s" }}>
                   <div style={{ fontSize: 22, marginBottom: 6 }}>{ch === "whatsapp" ? "📱" : "📟"}</div>
@@ -218,7 +220,7 @@ export default function NotificationsConfigPage() {
             <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 14 }}>Send Test Message</div>
             <div style={{ display: "flex", gap: 10 }}>
               <input style={{ ...inp, flex: 1 }} value={testPhone} onChange={e => setTestPhone(e.target.value)} placeholder="+923001234567" />
-              <button onClick={handleTest} disabled={testing} style={{ padding: "9px 20px", borderRadius: 8, border: "none", background: testing ? "rgba(52,211,153,.4)" : ACCENT, color: "#fff", fontSize: 13, fontWeight: 700, cursor: testing ? "not-allowed" : "pointer", whiteSpace: "nowrap" }}>
+              <button onClick={handleTest} disabled={testing} style={{ padding: isMobile ? "8px 10px" : "9px 20px", borderRadius: 8, border: "none", background: testing ? "rgba(52,211,153,.4)" : ACCENT, color: "#fff", fontSize: 13, fontWeight: 700, cursor: testing ? "not-allowed" : "pointer", whiteSpace: "nowrap" }}>
                 {testing ? "Sending…" : "Send Test"}
               </button>
             </div>
@@ -230,11 +232,11 @@ export default function NotificationsConfigPage() {
       {/* Events Tab */}
       {activeTab === "events" && (
         <div style={{ background: BG, border: `1px solid ${BORDER}`, borderRadius: 12, overflow: "hidden" }}>
-          <div style={{ padding: "14px 18px", borderBottom: `1px solid ${BORDER}`, fontSize: 14, fontWeight: 700 }}>Notification Triggers</div>
+          <div style={{ padding: isMobile ? "8px 9px" : "14px 18px", borderBottom: `1px solid ${BORDER}`, fontSize: 14, fontWeight: 700 }}>Notification Triggers</div>
           {Object.entries(config.events).map(([key, enabled]) => {
             const meta = EVENT_LABELS[key];
             return (
-              <div key={key} style={{ padding: "16px 18px", borderBottom: `1px solid ${BORDER}`, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
+              <div key={key} style={{ padding: isMobile ? "10px 9px" : "16px 18px", borderBottom: `1px solid ${BORDER}`, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
                 <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
                   <span style={{ fontSize: 20 }}>{meta.icon}</span>
                   <div>
@@ -252,8 +254,8 @@ export default function NotificationsConfigPage() {
       {/* Templates Tab */}
       {activeTab === "templates" && (
         <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          <div style={{ background: "rgba(52,211,153,.06)", border: "1px solid rgba(52,211,153,.15)", borderRadius: 10, padding: "12px 16px", fontSize: 12, color: "#6ee7b7" }}>
-            Available variables: <code style={{ background: "rgba(255,255,255,.07)", padding: "1px 5px", borderRadius: 4 }}>{"{{customer}}"}</code> <code style={{ background: "rgba(255,255,255,.07)", padding: "1px 5px", borderRadius: 4 }}>{"{{amount}}"}</code> <code style={{ background: "rgba(255,255,255,.07)", padding: "1px 5px", borderRadius: 4 }}>{"{{date}}"}</code> <code style={{ background: "rgba(255,255,255,.07)", padding: "1px 5px", borderRadius: 4 }}>{"{{business}}"}</code> <code style={{ background: "rgba(255,255,255,.07)", padding: "1px 5px", borderRadius: 4 }}>{"{{product}}"}</code> <code style={{ background: "rgba(255,255,255,.07)", padding: "1px 5px", borderRadius: 4 }}>{"{{qty}}"}</code>
+          <div style={{ background: "rgba(52,211,153,.06)", border: "1px solid rgba(52,211,153,.15)", borderRadius: 10, padding: isMobile ? "8px 8px" : "12px 16px", fontSize: 12, color: "#6ee7b7" }}>
+            Available variables: <code style={{ background: "rgba(255,255,255,.07)", padding: isMobile ? "8px 8px" : "1px 5px", borderRadius: 4 }}>{"{{customer}}"}</code> <code style={{ background: "rgba(255,255,255,.07)", padding: isMobile ? "8px 8px" : "1px 5px", borderRadius: 4 }}>{"{{amount}}"}</code> <code style={{ background: "rgba(255,255,255,.07)", padding: isMobile ? "8px 8px" : "1px 5px", borderRadius: 4 }}>{"{{date}}"}</code> <code style={{ background: "rgba(255,255,255,.07)", padding: isMobile ? "8px 8px" : "1px 5px", borderRadius: 4 }}>{"{{business}}"}</code> <code style={{ background: "rgba(255,255,255,.07)", padding: isMobile ? "8px 8px" : "1px 5px", borderRadius: 4 }}>{"{{product}}"}</code> <code style={{ background: "rgba(255,255,255,.07)", padding: isMobile ? "8px 8px" : "1px 5px", borderRadius: 4 }}>{"{{qty}}"}</code>
           </div>
           {(Object.entries(config.templates) as [keyof NotifConfig["templates"], string][]).map(([key, val]) => (
             <div key={key} style={{ background: BG, border: `1px solid ${BORDER}`, borderRadius: 12, padding: 18 }}>
@@ -268,10 +270,10 @@ export default function NotificationsConfigPage() {
 
       {/* Floating save */}
       {hasChanges && (
-        <div style={{ position: "fixed", bottom: 24, left: "50%", transform: "translateX(-50%)", zIndex: 999, display: "flex", alignItems: "center", gap: 12, padding: "11px 22px", borderRadius: 12, background: "#0f172a", border: `1px solid rgba(52,211,153,.3)`, boxShadow: "0 8px 32px rgba(0,0,0,.5)" }}>
+        <div style={{ position: "fixed", bottom: 24, left: "50%", transform: "translateX(-50%)", zIndex: 999, display: "flex", alignItems: "center", gap: 12, padding: isMobile ? "8px 11px" : "11px 22px", borderRadius: 12, background: "#0f172a", border: `1px solid rgba(52,211,153,.3)`, boxShadow: "0 8px 32px rgba(0,0,0,.5)" }}>
           <span style={{ fontSize: 13, color: ACCENT, fontWeight: 600 }}>Unsaved changes</span>
-          <button onClick={() => setConfig({ ...saved })} style={{ padding: "6px 14px", borderRadius: 7, border: `1px solid ${BORDER}`, background: "transparent", color: MUTED, fontSize: 12, cursor: "pointer" }}>Discard</button>
-          <button onClick={handleSave} disabled={saving} style={{ padding: "6px 18px", borderRadius: 7, border: "none", background: saving ? "rgba(52,211,153,.4)" : ACCENT, color: "#fff", fontSize: 13, fontWeight: 700, cursor: saving ? "not-allowed" : "pointer" }}>
+          <button onClick={() => setConfig({ ...saved })} style={{ padding: isMobile ? "8px 8px" : "6px 14px", borderRadius: 7, border: `1px solid ${BORDER}`, background: "transparent", color: MUTED, fontSize: 12, cursor: "pointer" }}>Discard</button>
+          <button onClick={handleSave} disabled={saving} style={{ padding: isMobile ? "8px 9px" : "6px 18px", borderRadius: 7, border: "none", background: saving ? "rgba(52,211,153,.4)" : ACCENT, color: "#fff", fontSize: 13, fontWeight: 700, cursor: saving ? "not-allowed" : "pointer" }}>
             {saving ? "Saving…" : "💾 Save"}
           </button>
         </div>

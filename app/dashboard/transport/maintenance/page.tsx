@@ -6,6 +6,7 @@ import toast from "react-hot-toast";
 import { useMemo, useState } from "react";
 import { useBusinessRecords } from "@/lib/useBusinessRecords";
 import { mapMaintenanceRecords, mapVehicleRecords, todayIso, transportBg, transportBorder, transportFont, transportMuted } from "../_shared";
+import { useResponsive } from "@/hooks/useResponsive";
 
 type MaintenanceStatus = "scheduled" | "in_progress" | "completed" | "cancelled";
 
@@ -41,6 +42,7 @@ const statusColor: Record<MaintenanceStatus, string> = {
 };
 
 export default function TransportMaintenancePage() {
+  const { isMobile } = useResponsive();
   const maintenanceStore = useBusinessRecords("vehicle_maintenance");
   const fleetStore = useBusinessRecords("vehicle");
   const [showModal, setShowModal] = useState(false);
@@ -149,7 +151,7 @@ export default function TransportMaintenancePage() {
   const input = { width: "100%", background: "rgba(255,255,255,.05)", border: `1px solid ${transportBorder}`, borderRadius: 8, padding: "10px 12px", color: "#fff", fontFamily: transportFont, boxSizing: "border-box" as const, fontSize: 14 };
 
   return (
-    <div style={{ fontFamily: transportFont, color: "#fff", padding: 24, minHeight: "100vh" }}>
+    <div style={{ fontFamily: transportFont, color: "#fff", padding: isMobile ? "12px" : "24px", minHeight: "100vh" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24, gap: 12 }}>
         <div>
           <h1 style={{ margin: 0, fontSize: 24, fontWeight: 800 }}>Vehicle Maintenance</h1>
@@ -160,7 +162,7 @@ export default function TransportMaintenancePage() {
         </button>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 12, marginBottom: 22 }}>
+      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 12, marginBottom: 22 }}>
         {[
           { label: "Scheduled", value: scheduled, color: "#60a5fa" },
           { label: "In Progress", value: inProgress, color: "#f59e0b" },
@@ -186,7 +188,7 @@ export default function TransportMaintenancePage() {
                     {String(row.status).replace("_", " ")}
                   </span>
                 </div>
-                <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 8, fontSize: 13, color: "rgba(255,255,255,.62)" }}>
+                <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 8, fontSize: 13, color: "rgba(255,255,255,.62)" }}>
                   <div>Vehicle: {row.vehicle}</div>
                   <div>Service: {row.serviceType || "-"}</div>
                   <div>Workshop: {row.workshop || "-"}</div>

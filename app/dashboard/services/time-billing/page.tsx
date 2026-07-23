@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { useBusinessRecords } from "@/lib/useBusinessRecords";
 import { mapServiceProjectRecord, mapServiceTimesheetRecord } from "../_shared";
+import { useResponsive } from "@/hooks/useResponsive";
 
 const ff = "'Outfit','Inter',sans-serif";
 const bg = "rgba(255,255,255,0.03)";
@@ -13,6 +14,7 @@ function getToday() {
 }
 
 export default function ServiceTimeBillingPage() {
+  const { isMobile } = useResponsive();
   const timesheetStore = useBusinessRecords("service_timesheet");
   const projectStore = useBusinessRecords("service_project");
 
@@ -79,7 +81,7 @@ export default function ServiceTimeBillingPage() {
   }
 
   return (
-    <div style={{ padding: "28px 32px", fontFamily: ff, color: "#fff", minHeight: "100vh" }}>
+    <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", fontFamily: ff, color: "#fff", minHeight: "100vh" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24 }}>
         <div>
           <h1 style={{ fontSize: 22, fontWeight: 800, margin: "0 0 4px" }}>Time Billing</h1>
@@ -95,14 +97,14 @@ export default function ServiceTimeBillingPage() {
         </button>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(210px,1fr))", gap: 14, marginBottom: 22 }}>
+      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(auto-fill,minmax(210px,1fr))", gap: 14, marginBottom: 22 }}>
         {[
           { label: "Billable Hours", value: totalHours.toLocaleString(), color: "#38bdf8" },
           { label: "Billable Value", value: `Rs. ${totalValue.toLocaleString()}`, color: "#22c55e" },
           { label: "Approved Entries", value: approvedCount, color: "#f59e0b" },
           { label: "Draft Entries", value: draftCount, color: "#f97316" },
         ].map((card) => (
-          <div key={card.label} style={{ background: bg, border: `1px solid ${border}`, borderRadius: 14, padding: "18px 20px" }}>
+          <div key={card.label} style={{ background: bg, border: `1px solid ${border}`, borderRadius: 14, padding: isMobile ? "12px 10px" : "18px 20px" }}>
             <div style={{ fontSize: 11, color: "rgba(255,255,255,.4)", marginBottom: 6, textTransform: "uppercase", letterSpacing: ".06em" }}>
               {card.label}
             </div>

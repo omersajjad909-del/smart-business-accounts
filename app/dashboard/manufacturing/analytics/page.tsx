@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { ManufacturingControlCenter, fetchJson } from "../_shared";
+import { useResponsive } from "@/hooks/useResponsive";
 
 const ff = "'Outfit','Inter',sans-serif";
 const bg = "rgba(255,255,255,0.03)";
@@ -18,6 +19,7 @@ const emptyState: ManufacturingControlCenter = {
 };
 
 export default function ManufacturingAnalyticsPage() {
+  const { isMobile } = useResponsive();
   const [data, setData] = useState(emptyState);
 
   useEffect(() => {
@@ -25,20 +27,20 @@ export default function ManufacturingAnalyticsPage() {
   }, []);
 
   return (
-    <div style={{ padding: "28px 32px", fontFamily: ff, color: "#fff", minHeight: "100vh" }}>
+    <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", fontFamily: ff, color: "#fff", minHeight: "100vh" }}>
       <div style={{ marginBottom: 24 }}>
         <h1 style={{ fontSize: 24, fontWeight: 800, margin: "0 0 6px" }}>Manufacturing Analytics</h1>
         <p style={{ fontSize: 13, color: "rgba(255,255,255,.45)", margin: 0 }}>Production throughput, material risk, and quality performance.</p>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 12, marginBottom: 18 }}>
+      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 12, marginBottom: 18 }}>
         {[
           { label: "Planned", value: data.summary.plannedProduction, color: "#f59e0b" },
           { label: "Running", value: data.summary.runningProduction, color: "#60a5fa" },
           { label: "Completed", value: data.summary.completedProduction, color: "#34d399" },
           { label: "Blocked", value: data.summary.blockedProduction, color: "#ef4444" },
         ].map((card) => (
-          <div key={card.label} style={{ background: bg, border: `1px solid ${border}`, borderRadius: 12, padding: "18px 20px" }}>
+          <div key={card.label} style={{ background: bg, border: `1px solid ${border}`, borderRadius: 12, padding: isMobile ? "12px 10px" : "18px 20px" }}>
             <div style={{ fontSize: 12, color: "rgba(255,255,255,.5)", marginBottom: 8 }}>{card.label}</div>
             <div style={{ fontSize: 22, fontWeight: 800, color: card.color }}>{card.value}</div>
           </div>

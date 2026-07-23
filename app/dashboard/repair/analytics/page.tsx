@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { fetchJson, repairAccent, type RepairControlCenter } from "../_shared";
+import { useResponsive } from "@/hooks/useResponsive";
 
 const emptyState: RepairControlCenter = {
   summary: { jobs: 0, activeJobs: 0, readyJobs: 0, technicians: 0, activeTechnicians: 0, partsCost: 0, warrantyClaims: 0, warrantyExposure: 0 },
@@ -12,6 +13,7 @@ const emptyState: RepairControlCenter = {
 };
 
 export default function RepairAnalyticsPage() {
+  const { isMobile } = useResponsive();
   const [data, setData] = useState(emptyState);
 
   useEffect(() => {
@@ -25,27 +27,27 @@ export default function RepairAnalyticsPage() {
   }, [data.jobs]);
 
   return (
-    <div style={{ padding: "28px 32px", color: "#e2e8f0", fontFamily: "'Outfit','Inter',sans-serif" }}>
+    <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", color: "#e2e8f0", fontFamily: "'Outfit','Inter',sans-serif" }}>
       <div style={{ marginBottom: 24 }}>
         <h1 style={{ margin: "0 0 6px", fontSize: 24, fontWeight: 800, color: "white" }}>Repair Analytics</h1>
         <p style={{ margin: 0, fontSize: 14, color: "rgba(255,255,255,.45)" }}>Job ageing, technician productivity, parts cost pressure, and warranty-return visibility.</p>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4,minmax(0,1fr))", gap: 14, marginBottom: 24 }}>
+      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,minmax(0,1fr))", gap: 14, marginBottom: 24 }}>
         {[
           { label: "Active Jobs", value: data.summary.activeJobs, color: "#60a5fa" },
           { label: "Ready Jobs", value: data.summary.readyJobs, color: "#34d399" },
           { label: "Parts Cost", value: data.summary.partsCost.toLocaleString(), color: "#f59e0b" },
           { label: "Warranty Exposure", value: data.summary.warrantyExposure.toLocaleString(), color: repairAccent },
         ].map((card) => (
-          <div key={card.label} style={{ background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)", borderRadius: 16, padding: "18px 20px" }}>
+          <div key={card.label} style={{ background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)", borderRadius: 16, padding: isMobile ? "12px 10px" : "18px 20px" }}>
             <div style={{ fontSize: 11, color: "rgba(255,255,255,.45)", textTransform: "uppercase", letterSpacing: ".06em", marginBottom: 6 }}>{card.label}</div>
             <div style={{ fontSize: 28, fontWeight: 800, color: card.color }}>{card.value}</div>
           </div>
         ))}
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 16 }}>
+      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr 1fr", gap: 16 }}>
         <section style={{ background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)", borderRadius: 16, padding: 20 }}>
           <div style={{ fontSize: 15, fontWeight: 700, color: "white", marginBottom: 14 }}>Job Status Mix</div>
           <div style={{ display: "grid", gap: 10 }}>

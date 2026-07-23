@@ -1,10 +1,12 @@
 "use client";
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { useResponsive } from "@/hooks/useResponsive";
 
 interface Customer { id: string; code?: string; name: string; phone: string; email: string; city: string; creditLimit: number; balance: number; totalSales: number; transactions?: number; loyaltyPoints: number; status: string; }
 
 export default function RetailCustomersPage() {
+  const { isMobile } = useResponsive();
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
@@ -46,7 +48,7 @@ export default function RetailCustomersPage() {
   const inp = { padding: "9px 12px", background: "var(--app-bg)", border: "1px solid var(--border)", borderRadius: 8, color: "var(--text-primary)", fontSize: 13, width: "100%", boxSizing: "border-box" as const };
 
   return (
-    <div style={{ ...s, minHeight: "100vh", background: "var(--app-bg)", padding: "28px 24px", color: "var(--text-primary)" }}>
+    <div style={{ ...s, minHeight: "100vh", background: "var(--app-bg)", padding: isMobile ? "15px 11px" : "28px 24px", color: "var(--text-primary)" }}>
       <style>{`@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap');`}</style>
 
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 24 }}>
@@ -60,14 +62,14 @@ export default function RetailCustomersPage() {
       </div>
 
       {/* KPIs */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 16, marginBottom: 24 }}>
+      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 16, marginBottom: 24 }}>
         {[
           { label: "Total Customers", val: customers.length, color: "#818cf8" },
           { label: "Active", val: customers.filter(c => c.status === "active").length, color: "#10b981" },
           { label: "Outstanding Balance", val: `Rs ${totalBalance.toLocaleString()}`, color: "#f59e0b" },
           { label: "Total Sales (All Time)", val: `Rs ${totalSales.toLocaleString()}`, color: "#6366f1" },
         ].map(kpi => (
-          <div key={kpi.label} style={{ background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 14, padding: "16px 20px" }}>
+          <div key={kpi.label} style={{ background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 14, padding: isMobile ? "12px 10px" : "16px 20px" }}>
             <div style={{ fontSize: 11, color: "var(--text-muted)", marginBottom: 4 }}>{kpi.label}</div>
             <div style={{ fontSize: 22, fontWeight: 700, color: kpi.color }}>{kpi.val}</div>
           </div>

@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { getCurrentUser } from "@/lib/auth";
 import { confirmToast } from "@/lib/toast-feedback";
+import { useResponsive } from "@/hooks/useResponsive";
 
 const ff = "'Outfit','Inter',sans-serif";
 const ACCENT = "#a78bfa";
@@ -27,6 +28,7 @@ const lbl: React.CSSProperties = {
 };
 
 export default function HolidaysPage() {
+  const { isMobile } = useResponsive();
   const [holidays, setHolidays] = useState<Holiday[]>([]);
   const [loading, setLoading] = useState(true);
   const [year, setYear] = useState(new Date().getFullYear());

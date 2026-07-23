@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState, useCallback } from "react";
 import { getCurrentUser } from "@/lib/auth";
+import { useResponsive } from "@/hooks/useResponsive";
 
 type ShortcutItem = {
   id: string;
@@ -33,7 +34,7 @@ function isBrowserReserved(keys: string[]): boolean {
 
 const card: React.CSSProperties = {
   background: "var(--panel-bg)", border: "1px solid var(--border)",
-  borderRadius: 14, padding: "22px 24px", marginBottom: 16,
+  borderRadius: 14, padding: isMobile ? "12px 11px" : "22px 24px", marginBottom: 16,
 };
 const lbl: React.CSSProperties = {
   fontSize: 11, fontWeight: 700, color: "var(--text-muted)",
@@ -228,6 +229,7 @@ let _idCounter = Date.now();
 function genId() { return `sc_${++_idCounter}`; }
 
 export default function ShortcutsPage() {
+  const { isMobile } = useResponsive();
   const currentUser = getCurrentUser();
   const isAdmin = currentUser?.role === "ADMIN";
 
@@ -411,7 +413,7 @@ export default function ShortcutsPage() {
         </div>
 
         {shortcuts.length === 0 ? (
-          <div style={{ textAlign: "center", padding: "32px 16px", color: "var(--text-muted)", fontSize: 13 }}>
+          <div style={{ textAlign: "center", padding: isMobile ? "18px 10px" : "32px 16px", color: "var(--text-muted)", fontSize: 13 }}>
             No shortcuts configured.{isAdmin && <> <button onClick={addNew} style={{ ...btn(), display: "inline", marginLeft: 8 }}>Add one</button></>}
           </div>
         ) : (

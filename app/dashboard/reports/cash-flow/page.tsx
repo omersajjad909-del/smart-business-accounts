@@ -4,6 +4,7 @@ import { useRef, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { DateInput } from "@/app/dashboard/reports/_components/DateInput";
 import { getCurrentUser } from "@/lib/auth";
+import { useResponsive } from "@/hooks/useResponsive";
 
 interface CashFlowItem { date: string; voucherNo: string; description: string; amount: number; type: "INFLOW"|"OUTFLOW"; }
 interface CashFlowSection { items: CashFlowItem[]; inflow: number; outflow: number; net: number; }
@@ -23,7 +24,7 @@ function Section({ title, accent, section, expanded, onToggle }: { title:string;
   const border = "rgba(255,255,255,.06)";
   return (
     <div style={{ background:"rgba(255,255,255,.03)", border:"1px solid rgba(255,255,255,.08)", borderRadius:12, overflow:"hidden", marginBottom:12 }}>
-      <div onClick={onToggle} style={{ display:"flex", justifyContent:"space-between", alignItems:"center", padding:"14px 20px", cursor:"pointer", borderBottom: expanded ? `1px solid ${border}` : "none" }}>
+      <div onClick={onToggle} style={{ display:"flex", justifyContent:"space-between", alignItems:"center", padding: isMobile ? "12px 10px" : "14px 20px", cursor:"pointer", borderBottom: expanded ? `1px solid ${border}` : "none" }}>
         <div style={{ display:"flex", alignItems:"center", gap:10 }}>
           <span style={{ width:10, height:10, borderRadius:"50%", background:accent, display:"inline-block" }}/>
           <span style={{ fontWeight:700, fontSize:15, color:"white" }}>{title}</span>
@@ -45,7 +46,7 @@ function Section({ title, accent, section, expanded, onToggle }: { title:string;
           </tr></thead>
           <tbody>
             {section.items.length === 0 ? (
-              <tr><td colSpan={5} style={{ padding:"20px 14px", textAlign:"center", color:"rgba(255,255,255,.3)", fontSize:13 }}>No transactions in this period</td></tr>
+              <tr><td colSpan={5} style={{ padding: isMobile ? "12px 10px" : "20px 14px", textAlign:"center", color:"rgba(255,255,255,.3)", fontSize:13 }}>No transactions in this period</td></tr>
             ) : section.items.map((item, i) => (
               <tr key={i} style={{ borderBottom:`1px solid ${border}` }}>
                 <td style={{ padding:"9px 14px", fontSize:12, color:"rgba(255,255,255,.45)" }}>{item.date}</td>
@@ -65,6 +66,7 @@ function Section({ title, accent, section, expanded, onToggle }: { title:string;
 }
 
 export default function CashFlowPage() {
+  const { isMobile } = useResponsive();
   const router  = useRouter();
   const fromRef = useRef<HTMLInputElement>(null);
   const toRef   = useRef<HTMLInputElement>(null);
@@ -158,7 +160,7 @@ export default function CashFlowPage() {
               </div>
 
               {/* Net banner */}
-              <div style={{ background:data.netCashFlow>=0?"rgba(34,197,94,.08)":"rgba(239,68,68,.08)", border:`1px solid ${data.netCashFlow>=0?"rgba(34,197,94,.25)":"rgba(239,68,68,.25)"}`, borderRadius:12, padding:"16px 24px", marginBottom:20, display:"flex", justifyContent:"space-between", alignItems:"center" }}>
+              <div style={{ background:data.netCashFlow>=0?"rgba(34,197,94,.08)":"rgba(239,68,68,.08)", border:`1px solid ${data.netCashFlow>=0?"rgba(34,197,94,.25)":"rgba(239,68,68,.25)"}`, borderRadius:12, padding: isMobile ? "12px 11px" : "16px 24px", marginBottom:20, display:"flex", justifyContent:"space-between", alignItems:"center" }}>
                 <span style={{ fontSize:14, fontWeight:600, color:"rgba(255,255,255,.8)" }}>Net Increase / (Decrease) in Cash</span>
                 <span style={{ fontSize:28, fontWeight:800, color:data.netCashFlow>=0?"#4ade80":"#f87171" }}>{data.netCashFlow>=0?"":" −"}{fmt(data.netCashFlow)}</span>
               </div>
@@ -187,8 +189,8 @@ export default function CashFlowPage() {
                       </tr>
                     ))}
                     <tr style={{ background:data.netCashFlow>=0?"rgba(34,197,94,.06)":"rgba(239,68,68,.06)" }}>
-                      <td style={{ padding:"14px 20px", fontSize:14, fontWeight:800, color:"white" }}>Net Cash Flow</td>
-                      <td style={{ padding:"14px 20px", textAlign:"right", fontWeight:900, fontSize:18, color:data.netCashFlow>=0?"#4ade80":"#f87171" }}>{data.netCashFlow>=0?"":" −"}{fmt(data.netCashFlow)}</td>
+                      <td style={{ padding: isMobile ? "12px 10px" : "14px 20px", fontSize:14, fontWeight:800, color:"white" }}>Net Cash Flow</td>
+                      <td style={{ padding: isMobile ? "12px 10px" : "14px 20px", textAlign:"right", fontWeight:900, fontSize:18, color:data.netCashFlow>=0?"#4ade80":"#f87171" }}>{data.netCashFlow>=0?"":" −"}{fmt(data.netCashFlow)}</td>
                     </tr>
                   </tbody>
                 </table>

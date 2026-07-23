@@ -5,6 +5,7 @@ import toast from "react-hot-toast";
 import { useMemo, useState } from "react";
 import { useBusinessRecords } from "@/lib/useBusinessRecords";
 import { mapSaaSPlans, saasBg, saasBorder, saasFont, saasMuted, saasStatusColor } from "../_shared";
+import { useResponsive } from "@/hooks/useResponsive";
 
 const intervals = ["Monthly", "Quarterly", "Yearly"];
 
@@ -39,6 +40,7 @@ const smallButton: React.CSSProperties = {
 };
 
 export default function SubscriptionPlansPage() {
+  const { isMobile } = useResponsive();
   const { records, loading, create, update } = useBusinessRecords("subscription_plan");
   const plans = useMemo(() => mapSaaSPlans(records), [records]);
   const [form, setForm] = useState({ name: "", interval: "Monthly", price: "99", trialDays: "14", seats: "5" });
@@ -70,7 +72,7 @@ export default function SubscriptionPlansPage() {
   };
 
   return (
-    <div style={{ padding: "28px 32px", color: "#fff", minHeight: "100vh", fontFamily: saasFont }}>
+    <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", color: "#fff", minHeight: "100vh", fontFamily: saasFont }}>
       <div style={{ marginBottom: 24 }}>
         <h1 style={{ margin: "0 0 6px", fontSize: 28, fontWeight: 900 }}>Subscription Plans</h1>
         <p style={{ margin: 0, color: saasMuted, fontSize: 14 }}>Pricing tiers, trial structure, aur seat packaging yahan se manage karein.</p>
@@ -84,7 +86,7 @@ export default function SubscriptionPlansPage() {
             <select style={inputStyle} value={form.interval} onChange={(e) => setForm((p) => ({ ...p, interval: e.target.value }))}>
               {intervals.map((interval) => <option key={interval}>{interval}</option>)}
             </select>
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10 }}>
+            <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr 1fr", gap: 10 }}>
               <input style={inputStyle} value={form.price} onChange={(e) => setForm((p) => ({ ...p, price: e.target.value }))} placeholder="Price" />
               <input style={inputStyle} value={form.trialDays} onChange={(e) => setForm((p) => ({ ...p, trialDays: e.target.value }))} placeholder="Trial days" />
               <input style={inputStyle} value={form.seats} onChange={(e) => setForm((p) => ({ ...p, seats: e.target.value }))} placeholder="Seats" />
@@ -94,7 +96,7 @@ export default function SubscriptionPlansPage() {
         </div>
 
         <div style={{ background: saasBg, border: `1px solid ${saasBorder}`, borderRadius: 18, overflow: "hidden" }}>
-          <div style={{ padding: "16px 18px", borderBottom: `1px solid ${saasBorder}`, fontSize: 16, fontWeight: 800 }}>Plan Catalog</div>
+          <div style={{ padding: isMobile ? "12px 10px" : "16px 18px", borderBottom: `1px solid ${saasBorder}`, fontSize: 16, fontWeight: 800 }}>Plan Catalog</div>
           <div style={{ display: "grid", gap: 12, padding: 18 }}>
             {!loading && plans.length === 0 && <div style={{ color: "rgba(255,255,255,.28)" }}>No plans yet.</div>}
             {plans.map((plan) => (

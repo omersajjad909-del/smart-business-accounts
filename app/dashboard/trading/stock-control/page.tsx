@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import toast from "react-hot-toast";
 import {
+import { useResponsive } from "@/hooks/useResponsive";
   fetchJson,
   formatDate,
   formatMoney,
@@ -19,6 +20,7 @@ import {
 const REASONS = ["Physical Count", "Damaged / Broken", "Theft / Loss", "Found (surplus)", "Expired / Disposal", "Data Correction", "Other"];
 
 export default function TradingStockControlPage() {
+  const { isMobile } = useResponsive();
   const [stock, setStock] = useState<StockRow[]>([]);
   const [outward, setOutward] = useState<OutwardLite[]>([]);
   const [adjModal, setAdjModal] = useState(false);
@@ -94,7 +96,7 @@ export default function TradingStockControlPage() {
   );
 
   return (
-    <div style={{ padding: "28px 32px", fontFamily: tradingFont, color: "var(--text-primary)", minHeight: "100vh" }}>
+    <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", fontFamily: tradingFont, color: "var(--text-primary)", minHeight: "100vh" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 26 }}>
         <div>
           <h1 style={{ fontSize: 24, fontWeight: 800, margin: "0 0 6px" }}>Stock Control</h1>
@@ -115,14 +117,14 @@ export default function TradingStockControlPage() {
         </div>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4,minmax(0,1fr))", gap: 12, marginBottom: 24 }}>
+      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,minmax(0,1fr))", gap: 12, marginBottom: 24 }}>
         {[
           { label: "Stock Items", value: stock.length, color: "#38bdf8" },
           { label: "Stock Value", value: formatMoney(stockValue), color: "#34d399" },
           { label: "Low Stock Watch", value: lowStock.length, color: "#f59e0b" },
           { label: "Outward Qty", value: outwardQty, color: "#a78bfa" },
         ].map((card) => (
-          <div key={card.label} style={{ background: tradingBg, border: `1px solid ${tradingBorder}`, borderRadius: 14, padding: "18px 20px" }}>
+          <div key={card.label} style={{ background: tradingBg, border: `1px solid ${tradingBorder}`, borderRadius: 14, padding: isMobile ? "12px 10px" : "18px 20px" }}>
             <div style={{ fontSize: 12, color: tradingMuted, marginBottom: 8 }}>{card.label}</div>
             <div style={{ fontSize: 24, fontWeight: 800, color: card.color }}>{card.value}</div>
           </div>
@@ -131,7 +133,7 @@ export default function TradingStockControlPage() {
 
       <div style={{ display: "grid", gridTemplateColumns: "1.2fr .8fr", gap: 14 }}>
         <div style={{ background: tradingBg, border: `1px solid ${tradingBorder}`, borderRadius: 16, overflow: "hidden" }}>
-          <div style={{ padding: "16px 18px", borderBottom: `1px solid ${tradingBorder}`, fontSize: 15, fontWeight: 800 }}>Stock Position</div>
+          <div style={{ padding: isMobile ? "12px 10px" : "16px 18px", borderBottom: `1px solid ${tradingBorder}`, fontSize: 15, fontWeight: 800 }}>Stock Position</div>
           <table style={{ width: "100%", borderCollapse: "collapse" }}>
             <thead>
               <tr>
@@ -163,7 +165,7 @@ export default function TradingStockControlPage() {
 
         <div style={{ display: "grid", gap: 14 }}>
           <div style={{ background: tradingBg, border: `1px solid ${tradingBorder}`, borderRadius: 16, overflow: "hidden" }}>
-            <div style={{ padding: "16px 18px", borderBottom: `1px solid ${tradingBorder}`, fontSize: 15, fontWeight: 800 }}>Low / Empty Stock</div>
+            <div style={{ padding: isMobile ? "12px 10px" : "16px 18px", borderBottom: `1px solid ${tradingBorder}`, fontSize: 15, fontWeight: 800 }}>Low / Empty Stock</div>
             <div style={{ padding: 16, display: "grid", gap: 10 }}>
               {lowStock.slice(0, 6).map((row) => (
                 <div key={row.itemId} style={{ padding: "12px 14px", borderRadius: 12, background: Number(row.stockQty || 0) <= 0 ? "rgba(248,113,113,.08)" : "rgba(245,158,11,.08)", border: Number(row.stockQty || 0) <= 0 ? "1px solid rgba(248,113,113,.18)" : "1px solid rgba(245,158,11,.18)" }}>
@@ -179,7 +181,7 @@ export default function TradingStockControlPage() {
           </div>
 
           <div style={{ background: tradingBg, border: `1px solid ${tradingBorder}`, borderRadius: 16, overflow: "hidden" }}>
-            <div style={{ padding: "16px 18px", borderBottom: `1px solid ${tradingBorder}`, fontSize: 15, fontWeight: 800 }}>Recent Outward Movement</div>
+            <div style={{ padding: isMobile ? "12px 10px" : "16px 18px", borderBottom: `1px solid ${tradingBorder}`, fontSize: 15, fontWeight: 800 }}>Recent Outward Movement</div>
             <div style={{ padding: 16, display: "grid", gap: 10 }}>
               {outward.slice(0, 5).map((row) => (
                 <div key={row.id} style={{ padding: "12px 14px", borderRadius: 12, background: "var(--panel-bg)", border: `1px solid ${tradingBorder}` }}>
@@ -231,7 +233,7 @@ export default function TradingStockControlPage() {
                     return (
                       <button key={row.itemId}
                         onClick={() => { setAdjItem(row); setAdjQty(String(row.stockQty)); }}
-                        style={{ textAlign: "left", padding: "14px 16px", borderRadius: 12,
+                        style={{ textAlign: "left", padding: isMobile ? "12px 10px" : "14px 16px", borderRadius: 12,
                           background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.08)",
                           cursor: "pointer", display: "flex", alignItems: "center", gap: 12,
                           transition: "border-color .15s" }}
@@ -260,7 +262,7 @@ export default function TradingStockControlPage() {
               <div style={{ display: "grid", gap: 18 }}>
 
                 {/* Item info bar */}
-                <div style={{ display: "flex", alignItems: "center", gap: 14, padding: "14px 16px", borderRadius: 12, background: "rgba(167,139,250,.08)", border: "1px solid rgba(167,139,250,.2)" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 14, padding: isMobile ? "12px 10px" : "14px 16px", borderRadius: 12, background: "rgba(167,139,250,.08)", border: "1px solid rgba(167,139,250,.2)" }}>
                   <div style={{ flex: 1 }}>
                     <div style={{ fontWeight: 800, fontSize: 15, color: "#f1f5f9" }}>{adjItem.itemName}</div>
                     <div style={{ fontSize: 12, color: tradingMuted, marginTop: 3 }}>{adjItem.unit || "—"}</div>

@@ -5,6 +5,7 @@ import toast from "react-hot-toast";
 import { useEffect, useMemo, useState } from "react";
 import { useBusinessRecords } from "@/lib/useBusinessRecords";
 import { restaurantBg, restaurantBorder, restaurantFont, restaurantMuted } from "../_shared";
+import { useResponsive } from "@/hooks/useResponsive";
 
 const PRIORITY_COLOR: Record<string, string> = { high: "#ef4444", medium: "#f59e0b", low: "#34d399" };
 
@@ -38,7 +39,7 @@ function KitchenKanbanCol({
       </div>
       <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
         {rows.map((order) => (
-          <div key={order.id} style={{ background: "rgba(255,255,255,.04)", border: `1px solid ${PRIORITY_COLOR[order.priority]}30`, borderLeft: `3px solid ${PRIORITY_COLOR[order.priority]}`, borderRadius: 10, padding: "14px 16px" }}>
+          <div key={order.id} style={{ background: "rgba(255,255,255,.04)", border: `1px solid ${PRIORITY_COLOR[order.priority]}30`, borderLeft: `3px solid ${PRIORITY_COLOR[order.priority]}`, borderRadius: 10, padding: isMobile ? "12px 10px" : "14px 16px" }}>
             <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8 }}>
               <div style={{ fontWeight: 700, fontSize: 14 }}>Table {order.table}</div>
               <div style={{ fontSize: 11, color: order.elapsed > 15 ? "#ef4444" : restaurantMuted }}>⏱ {order.elapsed}m</div>
@@ -59,6 +60,7 @@ function KitchenKanbanCol({
 }
 
 export default function KitchenPage() {
+  const { isMobile } = useResponsive();
   const { records, loading, create, update } = useBusinessRecords("kitchen_order");
   const orderStore = useBusinessRecords("restaurant_order");
   const [showModal, setShowModal] = useState(false);
@@ -120,7 +122,7 @@ export default function KitchenPage() {
   }
 
   return (
-    <div style={{ padding: "28px 32px", fontFamily: restaurantFont, color: "#fff", minHeight: "100vh" }}>
+    <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", fontFamily: restaurantFont, color: "#fff", minHeight: "100vh" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 28 }}>
         <div>
           <h1 style={{ fontSize: 22, fontWeight: 800, margin: "0 0 4px" }}>Kitchen Display</h1>

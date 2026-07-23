@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { HospitalControlCenter, fetchJson, hospitalBg, hospitalBorder, hospitalFont, hospitalMuted } from "./_shared";
+import { useResponsive } from "@/hooks/useResponsive";
 
 const emptyState: HospitalControlCenter = {
   summary: { patients: 0, activePatients: 0, todayAppointments: 0, completedAppointments: 0, activePrescriptions: 0, completedPrescriptions: 0, pendingLabs: 0, urgentPendingLabs: 0, icuPatients: 0 },
@@ -13,6 +14,7 @@ const emptyState: HospitalControlCenter = {
 };
 
 export default function HospitalOverviewPage() {
+  const { isMobile } = useResponsive();
   const [data, setData] = useState(emptyState);
   const [businessType, setBusinessType] = useState("hospital");
 
@@ -59,7 +61,7 @@ export default function HospitalOverviewPage() {
       ];
 
   return (
-    <div style={{ minHeight: "100vh", padding: "28px 32px", color: "#fff", fontFamily: hospitalFont }}>
+    <div style={{ minHeight: "100vh", padding: isMobile ? "15px 14px" : "28px 32px", color: "#fff", fontFamily: hospitalFont }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 26, gap: 20, flexWrap: "wrap" }}>
         <div>
           <h1 style={{ margin: "0 0 6px", fontSize: 26, fontWeight: 800 }}>{heroTitle}</h1>
@@ -74,14 +76,14 @@ export default function HospitalOverviewPage() {
         </div>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4,minmax(0,1fr))", gap: 12, marginBottom: 24 }}>
+      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,minmax(0,1fr))", gap: 12, marginBottom: 24 }}>
         {[
           { label: "Active Patients", value: summary.activePatients, color: "#3b82f6" },
           { label: "Today's Appointments", value: summary.todayAppointments, color: "#a78bfa" },
           { label: "Active Prescriptions", value: summary.activePrescriptions, color: "#22c55e" },
           { label: "Pending Labs", value: summary.pendingLabs, color: "#f59e0b" },
         ].map((card) => (
-          <div key={card.label} style={{ background: hospitalBg, border: `1px solid ${hospitalBorder}`, borderRadius: 14, padding: "18px 20px" }}>
+          <div key={card.label} style={{ background: hospitalBg, border: `1px solid ${hospitalBorder}`, borderRadius: 14, padding: isMobile ? "12px 10px" : "18px 20px" }}>
             <div style={{ fontSize: 12, color: hospitalMuted, marginBottom: 8 }}>{card.label}</div>
             <div style={{ fontSize: 24, fontWeight: 800, color: card.color }}>{card.value}</div>
           </div>
@@ -90,7 +92,7 @@ export default function HospitalOverviewPage() {
 
       <div style={{ display: "grid", gridTemplateColumns: "1.2fr .8fr", gap: 18, alignItems: "start" }}>
         <div style={{ background: hospitalBg, border: `1px solid ${hospitalBorder}`, borderRadius: 16, overflow: "hidden" }}>
-          <div style={{ padding: "16px 18px", borderBottom: `1px solid ${hospitalBorder}`, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          <div style={{ padding: isMobile ? "12px 10px" : "16px 18px", borderBottom: `1px solid ${hospitalBorder}`, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
             <div style={{ fontSize: 15, fontWeight: 800 }}>{isClinic ? "Today's OPD Queue" : "Today's Front Desk Queue"}</div>
             <Link prefetch={false} href="/dashboard/hospital/appointments" style={{ color: "#93c5fd", fontSize: 12, fontWeight: 700, textDecoration: "none" }}>
               Open schedule

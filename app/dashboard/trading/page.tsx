@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import {
+import { useResponsive } from "@/hooks/useResponsive";
   fetchJson,
   formatDate,
   formatMoney,
@@ -41,6 +42,7 @@ const quickLinks = [
 ];
 
 export default function TradingOverviewPage() {
+  const { isMobile } = useResponsive();
   const [data, setData] = useState<OverviewState>({
     summary: {},
     quotations: [],
@@ -103,7 +105,7 @@ export default function TradingOverviewPage() {
   ];
 
   return (
-    <div style={{ padding: "28px 32px", fontFamily: tradingFont, color: "var(--text-primary)", minHeight: "100vh" }}>
+    <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", fontFamily: tradingFont, color: "var(--text-primary)", minHeight: "100vh" }}>
       <div style={{ display: "flex", justifyContent: "space-between", gap: 16, alignItems: "flex-start", marginBottom: 26 }}>
         <div>
           <div style={{ fontSize: 12, letterSpacing: ".12em", color: "rgba(56,189,248,.8)", textTransform: "uppercase", fontWeight: 700, marginBottom: 8 }}>
@@ -122,9 +124,9 @@ export default function TradingOverviewPage() {
         </Link>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(3,minmax(0,1fr))", gap: 12, marginBottom: 24 }}>
+      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(3,minmax(0,1fr))", gap: 12, marginBottom: 24 }}>
         {cards.map((card) => (
-          <div key={card.label} style={{ background: tradingBg, border: `1px solid ${tradingBorder}`, borderRadius: 14, padding: "18px 20px" }}>
+          <div key={card.label} style={{ background: tradingBg, border: `1px solid ${tradingBorder}`, borderRadius: 14, padding: isMobile ? "12px 10px" : "18px 20px" }}>
             <div style={{ fontSize: 12, color: tradingMuted, marginBottom: 8 }}>{card.label}</div>
             <div style={{ fontSize: 24, fontWeight: 800, color: card.tone }}>{card.value}</div>
           </div>
@@ -142,7 +144,7 @@ export default function TradingOverviewPage() {
               { label: "Purchase Invoices", value: data.purchaseInvoices.length, sub: "Received cost", color: "#a78bfa" },
               { label: "Delivery Challans", value: data.challans.length, sub: "Dispatch docs", color: "#f97316" },
             ].map((entry) => (
-              <div key={entry.label} style={{ background: "rgba(255,255,255,.02)", border: `1px solid ${tradingBorder}`, borderRadius: 12, padding: "16px 14px" }}>
+              <div key={entry.label} style={{ background: "rgba(255,255,255,.02)", border: `1px solid ${tradingBorder}`, borderRadius: 12, padding: isMobile ? "12px 10px" : "16px 14px" }}>
                 <div style={{ fontSize: 11, color: tradingMuted, marginBottom: 6 }}>{entry.label}</div>
                 <div style={{ fontSize: 22, fontWeight: 800, color: entry.color }}>{entry.value}</div>
                 <div style={{ fontSize: 11, color: "rgba(255,255,255,.3)", marginTop: 6 }}>{entry.sub}</div>
@@ -173,7 +175,7 @@ export default function TradingOverviewPage() {
 
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
         <div style={{ background: tradingBg, border: `1px solid ${tradingBorder}`, borderRadius: 16, overflow: "hidden" }}>
-          <div style={{ padding: "16px 18px", borderBottom: `1px solid ${tradingBorder}`, fontSize: 15, fontWeight: 800 }}>Recent Sales Activity</div>
+          <div style={{ padding: isMobile ? "12px 10px" : "16px 18px", borderBottom: `1px solid ${tradingBorder}`, fontSize: 15, fontWeight: 800 }}>Recent Sales Activity</div>
           <table style={{ width: "100%", borderCollapse: "collapse" }}>
             <thead>
               <tr>
@@ -203,7 +205,7 @@ export default function TradingOverviewPage() {
         </div>
 
         <div style={{ background: tradingBg, border: `1px solid ${tradingBorder}`, borderRadius: 16, overflow: "hidden" }}>
-          <div style={{ padding: "16px 18px", borderBottom: `1px solid ${tradingBorder}`, fontSize: 15, fontWeight: 800 }}>Recent Procurement</div>
+          <div style={{ padding: isMobile ? "12px 10px" : "16px 18px", borderBottom: `1px solid ${tradingBorder}`, fontSize: 15, fontWeight: 800 }}>Recent Procurement</div>
           <table style={{ width: "100%", borderCollapse: "collapse" }}>
             <thead>
               <tr>

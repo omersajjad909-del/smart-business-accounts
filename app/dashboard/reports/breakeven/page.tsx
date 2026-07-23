@@ -2,11 +2,13 @@
 import { useEffect, useState } from "react";
 import { getCurrentUser } from "@/lib/auth";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine } from "recharts";
+import { useResponsive } from "@/hooks/useResponsive";
 
 const ff = "'Outfit','Inter',sans-serif";
 function fmt(n: number) { return n.toLocaleString("en-US", { minimumFractionDigits: 0, maximumFractionDigits: 0 }); }
 
 export default function BreakevenPage() {
+  const { isMobile } = useResponsive();
   const user = getCurrentUser();
   const [data, setData]         = useState<any>(null);
   const [loading, setLoading]   = useState(true);
@@ -32,7 +34,7 @@ export default function BreakevenPage() {
   if (loading) return <div style={{ padding: 40, textAlign: "center", color: "var(--text-muted)", fontFamily: ff }}>Loading…</div>;
 
   return (
-    <div style={{ padding: "24px 28px", fontFamily: ff, color: "var(--text-primary)", maxWidth: 1000 }}>
+    <div style={{ padding: isMobile ? "13px 13px" : "24px 28px", fontFamily: ff, color: "var(--text-primary)", maxWidth: 1000 }}>
       <div style={{ marginBottom: 24 }}>
         <h1 style={{ margin: 0, fontSize: 22, fontWeight: 900, letterSpacing: "-.3px" }}>Break-even Analysis</h1>
         <p style={{ margin: "4px 0 0", fontSize: 12, color: "var(--text-muted)" }}>Kitni sale pe loss band hota hai — ab jano</p>
@@ -47,13 +49,13 @@ export default function BreakevenPage() {
       ) : (
         <>
           {/* Key metrics */}
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 14, marginBottom: 24 }}>
+          <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(3,1fr)", gap: 14, marginBottom: 24 }}>
             {[
               { label: "Break-even Units",   value: `${fmt(data.breakevenUnits || 0)} units`,       color: "#818cf8", bg: "rgba(129,140,248,.07)", border: "rgba(129,140,248,.2)", desc: "Units to sell to cover all costs" },
               { label: "Break-even Revenue", value: `${cur} ${fmt(data.breakevenRevenue || 0)}`,    color: "#fbbf24", bg: "rgba(251,191,36,.07)",  border: "rgba(251,191,36,.2)",  desc: "Revenue needed to break even" },
               { label: "Margin of Safety",   value: `${(data.marginOfSafety || 0).toFixed(1)}%`,   color: data.marginOfSafety > 20 ? "#34d399" : "#f87171", bg: data.marginOfSafety > 20 ? "rgba(52,211,153,.07)" : "rgba(248,113,113,.07)", border: data.marginOfSafety > 20 ? "rgba(52,211,153,.2)" : "rgba(248,113,113,.2)", desc: "Buffer before reaching break-even" },
             ].map((c, i) => (
-              <div key={i} style={{ borderRadius: 14, padding: "18px 20px", background: c.bg, border: `1px solid ${c.border}` }}>
+              <div key={i} style={{ borderRadius: 14, padding: isMobile ? "12px 10px" : "18px 20px", background: c.bg, border: `1px solid ${c.border}` }}>
                 <div style={{ fontSize: 11, color: "var(--text-muted)", fontWeight: 700, textTransform: "uppercase", letterSpacing: ".06em", marginBottom: 8 }}>{c.label}</div>
                 <div style={{ fontSize: 22, fontWeight: 900, color: c.color, marginBottom: 6 }}>{c.value}</div>
                 <div style={{ fontSize: 11, color: "var(--text-muted)" }}>{c.desc}</div>
@@ -69,7 +71,7 @@ export default function BreakevenPage() {
               { label: "Avg Selling Price/Unit", value: `${cur} ${fmt(data.avgSellingPrice || 0)}`, desc: "Average price you sell at", color: "#34d399" },
               { label: "Contribution Margin",    value: `${cur} ${fmt((data.avgSellingPrice || 0) - (data.variableCostPerUnit || 0))}`, desc: "Revenue − Variable Cost per unit", color: "#818cf8" },
             ].map((c, i) => (
-              <div key={i} style={{ background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 12, padding: "16px 18px" }}>
+              <div key={i} style={{ background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 12, padding: isMobile ? "12px 10px" : "16px 18px" }}>
                 <div style={{ fontSize: 11, color: "var(--text-muted)", fontWeight: 700, textTransform: "uppercase", letterSpacing: ".06em", marginBottom: 6 }}>{c.label}</div>
                 <div style={{ fontSize: 18, fontWeight: 900, color: c.color, marginBottom: 4 }}>{c.value}</div>
                 <div style={{ fontSize: 11, color: "var(--text-muted)" }}>{c.desc}</div>

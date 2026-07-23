@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useResponsive } from "@/hooks/useResponsive";
 
 const ff = "'Outfit','Inter',sans-serif";
 const panelBg = "rgba(255,255,255,.03)";
@@ -37,6 +38,7 @@ const empty: AnalyticsData = {
 };
 
 export default function TravelAnalyticsPage() {
+  const { isMobile } = useResponsive();
   const [data, setData] = useState<AnalyticsData>(empty);
   const [loading, setLoading] = useState(true);
 
@@ -61,7 +63,7 @@ export default function TravelAnalyticsPage() {
   ];
 
   return (
-    <div style={{ padding: "28px 32px", fontFamily: ff, color: "#e2e8f0" }}>
+    <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", fontFamily: ff, color: "#e2e8f0" }}>
       {/* Header */}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 20, flexWrap: "wrap", marginBottom: 28 }}>
         <div>
@@ -82,7 +84,7 @@ export default function TravelAnalyticsPage() {
       {!loading && (
         <>
           {/* KPI Row */}
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(160px,1fr))", gap: 14, marginBottom: 24 }}>
+          <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(auto-fit,minmax(160px,1fr))", gap: 14, marginBottom: 24 }}>
             {[
               { label: "Total Revenue", value: `Rs. ${summary.totalRevenue.toLocaleString()}`, color: "#34d399" },
               { label: "Total Cost", value: `Rs. ${summary.totalCost.toLocaleString()}`, color: "#f87171" },
@@ -92,7 +94,7 @@ export default function TravelAnalyticsPage() {
               { label: "Pending Invoices", value: summary.pendingInvoices, color: "#fbbf24" },
               { label: "Pending Settlements", value: summary.pendingSettlements, color: "#f87171" },
             ].map(k => (
-              <div key={k.label} style={{ background: panelBg, border: `1px solid ${panelBorder}`, borderRadius: 14, padding: "16px 20px" }}>
+              <div key={k.label} style={{ background: panelBg, border: `1px solid ${panelBorder}`, borderRadius: 14, padding: isMobile ? "12px 10px" : "16px 20px" }}>
                 <div style={{ fontSize: 11, color: "rgba(255,255,255,.4)", textTransform: "uppercase", letterSpacing: ".06em", marginBottom: 8 }}>{k.label}</div>
                 <div style={{ fontSize: 22, fontWeight: 800, color: k.color }}>{k.value}</div>
               </div>

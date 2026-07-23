@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { getCurrentUser } from "@/lib/auth";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
+import { useResponsive } from "@/hooks/useResponsive";
 
 const ff = "'Outfit','Inter',sans-serif";
 function fmt(n: number) { return n.toLocaleString("en-US", { minimumFractionDigits: 0, maximumFractionDigits: 0 }); }
@@ -9,6 +10,7 @@ function fmt(n: number) { return n.toLocaleString("en-US", { minimumFractionDigi
 interface Row { region: string; totalSales: number; totalProfit: number; marginPct: number; invoiceCount: number; customerCount: number; growthPct: number; }
 
 export default function SalesRegionPage() {
+  const { isMobile } = useResponsive();
   const user = getCurrentUser();
   const [data, setData]       = useState<Row[]>([]);
   const [loading, setLoading] = useState(true);
@@ -22,7 +24,7 @@ export default function SalesRegionPage() {
   const topRegion = [...data].sort((a, b) => b.totalSales - a.totalSales)[0];
 
   return (
-    <div style={{ padding: "24px 28px", fontFamily: ff, color: "var(--text-primary)", maxWidth: 1100 }}>
+    <div style={{ padding: isMobile ? "13px 13px" : "24px 28px", fontFamily: ff, color: "var(--text-primary)", maxWidth: 1100 }}>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 24 }}>
         <div>
           <h1 style={{ margin: 0, fontSize: 22, fontWeight: 900, letterSpacing: "-.3px" }}>Sales by Region</h1>
@@ -34,7 +36,7 @@ export default function SalesRegionPage() {
       </div>
 
       {topRegion && (
-        <div style={{ marginBottom: 20, padding: "16px 20px", borderRadius: 14, background: "rgba(99,102,241,.07)", border: "1px solid rgba(99,102,241,.2)", display: "flex", alignItems: "center", gap: 16 }}>
+        <div style={{ marginBottom: 20, padding: isMobile ? "12px 10px" : "16px 20px", borderRadius: 14, background: "rgba(99,102,241,.07)", border: "1px solid rgba(99,102,241,.2)", display: "flex", alignItems: "center", gap: 16 }}>
           <div style={{ fontSize: 28 }}>🏆</div>
           <div>
             <div style={{ fontSize: 11, color: "var(--text-muted)", fontWeight: 700, textTransform: "uppercase", letterSpacing: ".06em" }}>Top Region</div>

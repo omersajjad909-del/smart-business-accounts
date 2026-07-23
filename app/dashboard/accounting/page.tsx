@@ -1,5 +1,6 @@
 "use client";
 import Link from "next/link";
+import { useResponsive } from "@/hooks/useResponsive";
 
 const FONT = "'Outfit','Inter',sans-serif";
 
@@ -21,8 +22,9 @@ const MODULES = [
 ];
 
 export default function AccountingPage() {
+  const { isMobile } = useResponsive();
   return (
-    <div style={{ minHeight: "100vh", background: "var(--app-bg)", padding: "32px 28px", fontFamily: FONT, color: "var(--text-primary)" }}>
+    <div style={{ minHeight: "100vh", background: "var(--app-bg)", padding: isMobile ? "16px" : "32px" 28px", fontFamily: FONT, color: "var(--text-primary)" }}>
       <div style={{ marginBottom: 32 }}>
         <h1 style={{ fontSize: 26, fontWeight: 800, margin: "0 0 6px", letterSpacing: -0.5 }}>Accounting</h1>
         <p style={{ margin: 0, fontSize: 13, color: "var(--text-muted)" }}>Full double-entry bookkeeping — vouchers, journals, balances, assets</p>
@@ -33,7 +35,7 @@ export default function AccountingPage() {
           <Link prefetch={false} key={m.href} href={m.href} style={{ textDecoration: "none" }}>
             <div style={{
               background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 14,
-              padding: "18px 20px", cursor: "pointer", transition: "border-color .15s, transform .15s",
+              padding: isMobile ? "12px 10px" : "18px 20px", cursor: "pointer", transition: "border-color .15s, transform .15s",
               display: "flex", alignItems: "flex-start", gap: 14,
             }}
               onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = m.color; (e.currentTarget as HTMLElement).style.transform = "translateY(-2px)"; }}

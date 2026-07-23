@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { getCurrentUser } from "@/lib/auth";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend, ReferenceLine } from "recharts";
+import { useResponsive } from "@/hooks/useResponsive";
 
 const ff = "'Outfit','Inter',sans-serif";
 function fmt(n: number) { return n.toLocaleString("en-US", { minimumFractionDigits: 0, maximumFractionDigits: 0 }); }
@@ -10,6 +11,7 @@ interface ForecastPoint { month: string; actual: number | null; forecast: number
 interface ForecastSummary { nextMonthForecast: number; nextQuarterForecast: number; growthRatePct: number; confidence: number; }
 
 export default function ForecastPage() {
+  const { isMobile } = useResponsive();
   const user = getCurrentUser();
   const [points, setPoints]   = useState<ForecastPoint[]>([]);
   const [summary, setSummary] = useState<ForecastSummary | null>(null);
@@ -26,7 +28,7 @@ export default function ForecastPage() {
   const inp: React.CSSProperties = { background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 8, padding: "7px 12px", color: "var(--text-primary)", fontFamily: ff, fontSize: 12, outline: "none" };
 
   return (
-    <div style={{ padding: "24px 28px", fontFamily: ff, color: "var(--text-primary)", maxWidth: 1100 }}>
+    <div style={{ padding: isMobile ? "13px 13px" : "24px 28px", fontFamily: ff, color: "var(--text-primary)", maxWidth: 1100 }}>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 24 }}>
         <div>
           <h1 style={{ margin: 0, fontSize: 22, fontWeight: 900, letterSpacing: "-.3px" }}>Sales Forecast</h1>
@@ -40,14 +42,14 @@ export default function ForecastPage() {
       </div>
 
       {summary && (
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 12, marginBottom: 20 }}>
+        <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 12, marginBottom: 20 }}>
           {[
             { label: "Next Month",    value: `${cur} ${fmt(summary.nextMonthForecast)}`,    color: "#818cf8", bg: "rgba(129,140,248,.07)", border: "rgba(129,140,248,.2)" },
             { label: "Next Quarter",  value: `${cur} ${fmt(summary.nextQuarterForecast)}`,  color: "#6366f1", bg: "rgba(99,102,241,.07)",   border: "rgba(99,102,241,.2)" },
             { label: "Growth Rate",   value: `${summary.growthRatePct > 0 ? "+" : ""}${summary.growthRatePct.toFixed(1)}%`, color: summary.growthRatePct >= 0 ? "#34d399" : "#f87171", bg: "rgba(52,211,153,.07)", border: "rgba(52,211,153,.2)" },
             { label: "Confidence",    value: `${summary.confidence.toFixed(0)}%`,           color: "#fbbf24", bg: "rgba(251,191,36,.07)",   border: "rgba(251,191,36,.2)" },
           ].map((c, i) => (
-            <div key={i} style={{ borderRadius: 14, padding: "18px 20px", background: c.bg, border: `1px solid ${c.border}` }}>
+            <div key={i} style={{ borderRadius: 14, padding: isMobile ? "12px 10px" : "18px 20px", background: c.bg, border: `1px solid ${c.border}` }}>
               <div style={{ fontSize: 11, color: "var(--text-muted)", fontWeight: 700, textTransform: "uppercase", letterSpacing: ".06em", marginBottom: 8 }}>{c.label}</div>
               <div style={{ fontSize: 18, fontWeight: 900, color: c.color }}>{c.value}</div>
             </div>

@@ -3,8 +3,10 @@
 import toast from "react-hot-toast";
 import { useEffect, useState } from "react";
 import { getCurrentUser } from "@/lib/auth";
+import { useResponsive } from "@/hooks/useResponsive";
 
 export default function UsersPage() {
+  const { isMobile } = useResponsive();
   const userSession = getCurrentUser();
   const isAdmin = userSession?.role === "ADMIN";
 

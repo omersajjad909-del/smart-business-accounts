@@ -3,11 +3,13 @@
 import { useMemo, useState } from "react";
 import { useBusinessRecords } from "@/lib/useBusinessRecords";
 import { mapFuelRecords, todayIso, transportBg, transportBorder, transportFont, transportMuted } from "../_shared";
+import { useResponsive } from "@/hooks/useResponsive";
 
 const ftColor: Record<string, string> = { petrol: "#3b82f6", diesel: "#f59e0b", cng: "#22c55e" };
 const initialForm = { vehicle: "", driver: "", date: todayIso(), liters: "", pricePerLiter: "", odometer: "", station: "", fuelType: "diesel" };
 
 export default function FuelPage() {
+  const { isMobile } = useResponsive();
   const { records, loading, create } = useBusinessRecords("fuel_log");
   const [showModal, setShowModal] = useState(false);
   const [error, setError] = useState("");
@@ -48,7 +50,7 @@ export default function FuelPage() {
   const maxBar = Math.max(...Object.values(byDate), 1);
 
   return (
-    <div style={{ fontFamily: transportFont, color: "#fff", padding: 24, minHeight: "100vh" }}>
+    <div style={{ fontFamily: transportFont, color: "#fff", padding: isMobile ? "12px" : "24px", minHeight: "100vh" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24 }}>
         <div>
           <h1 style={{ margin: 0, fontSize: 24, fontWeight: 700 }}>Fuel Tracking</h1>
@@ -57,7 +59,7 @@ export default function FuelPage() {
         <button onClick={() => setShowModal(true)} style={btn("#2563eb")}>Add Record</button>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 16, marginBottom: 24 }}>
+      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 16, marginBottom: 24 }}>
         {[
           { label: "This Month Cost", value: `Rs. ${monthCost.toLocaleString()}`, color: "#ef4444" },
           { label: "Total Liters", value: `${monthLiters.toLocaleString()} L`, color: "#3b82f6" },

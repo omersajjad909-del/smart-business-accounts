@@ -3,6 +3,7 @@
 import toast from "react-hot-toast";
 import { useState } from "react";
 import { useBusinessRecords } from "@/lib/useBusinessRecords";
+import { useResponsive } from "@/hooks/useResponsive";
 
 const ff = "'Outfit','Inter',sans-serif";
 const bg = "rgba(255,255,255,0.03)";
@@ -19,6 +20,7 @@ const DEPARTMENTS = ["Cardiology", "Surgery", "Neurology", "Pediatrics", "Gyneco
 const EMPTY_FORM = { patient: "", doctor: "", department: "", date: new Date().toISOString().split("T")[0], time: "09:00", type: "consultation", notes: "" };
 
 export default function AppointmentsPage() {
+  const { isMobile } = useResponsive();
   const { records, loading, create, update } = useBusinessRecords("appointment");
   const patientStore = useBusinessRecords("patient");
   const [showModal, setShowModal] = useState(false);
@@ -78,7 +80,7 @@ export default function AppointmentsPage() {
   }
 
   return (
-    <div style={{ minHeight: "100vh", background: "#0f1117", color: "#fff", fontFamily: ff, padding: "28px 32px" }}>
+    <div style={{ minHeight: "100vh", background: "#0f1117", color: "#fff", fontFamily: ff, padding: isMobile ? "15px 14px" : "28px 32px" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24 }}>
         <div>
           <h1 style={{ margin: 0, fontSize: 26, fontWeight: 700 }}>Appointments</h1>
@@ -91,7 +93,7 @@ export default function AppointmentsPage() {
       </div>
 
       {/* Stats */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 16, marginBottom: 24 }}>
+      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 16, marginBottom: 24 }}>
         {[
           { label: "Today Total", value: todayTotal, color: "#a78bfa" },
           { label: "Confirmed", value: confirmed, color: "#3b82f6" },
@@ -123,7 +125,7 @@ export default function AppointmentsPage() {
           <div style={{ ...card, textAlign: "center", padding: 40, color: "rgba(255,255,255,0.25)" }}>No appointments found.</div>
         )}
         {filtered.map(appt => (
-          <div key={appt.id} style={{ ...card, display: "flex", alignItems: "center", gap: 20, padding: "16px 20px" }}>
+          <div key={appt.id} style={{ ...card, display: "flex", alignItems: "center", gap: 20, padding: isMobile ? "12px 10px" : "16px 20px" }}>
             <div style={{ minWidth: 64, textAlign: "center" }}>
               <div style={{ fontSize: 18, fontWeight: 700, color: "#fff" }}>{appt.time}</div>
             </div>

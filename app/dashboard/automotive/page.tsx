@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { AutomotiveControlCenter, autoBg, autoBorder, autoFont, autoMuted, fetchJson } from "./_shared";
+import { useResponsive } from "@/hooks/useResponsive";
 
 const emptyState: AutomotiveControlCenter = {
   summary: {
@@ -25,6 +26,7 @@ const emptyState: AutomotiveControlCenter = {
 };
 
 export default function AutomotiveOverviewPage() {
+  const { isMobile } = useResponsive();
   const [data, setData] = useState<AutomotiveControlCenter>(emptyState);
 
   useEffect(() => {
@@ -42,7 +44,7 @@ export default function AutomotiveOverviewPage() {
   );
 
   return (
-    <div style={{ padding: "28px 32px", minHeight: "100vh", color: "#fff", fontFamily: autoFont }}>
+    <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", minHeight: "100vh", color: "#fff", fontFamily: autoFont }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 18, flexWrap: "wrap", marginBottom: 24 }}>
         <div>
           <div style={{ fontSize: 12, color: "#60a5fa", fontWeight: 800, letterSpacing: ".08em", textTransform: "uppercase", marginBottom: 8 }}>Car Showroom</div>
@@ -65,14 +67,14 @@ export default function AutomotiveOverviewPage() {
         </div>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4,minmax(0,1fr))", gap: 12, marginBottom: 24 }}>
+      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,minmax(0,1fr))", gap: 12, marginBottom: 24 }}>
         {[
           { label: "Vehicles", value: data.summary.vehicles, color: "#60a5fa" },
           { label: "Inventory Value", value: `$${data.summary.inventoryValue.toLocaleString()}`, color: "#34d399" },
           { label: "Open Deals", value: data.summary.openDeals, color: "#c084fc" },
           { label: "Completed Drives", value: data.summary.completedDrives, color: "#f59e0b" },
         ].map((card) => (
-          <div key={card.label} style={{ background: autoBg, border: `1px solid ${autoBorder}`, borderRadius: 16, padding: "18px 20px" }}>
+          <div key={card.label} style={{ background: autoBg, border: `1px solid ${autoBorder}`, borderRadius: 16, padding: isMobile ? "12px 10px" : "18px 20px" }}>
             <div style={{ fontSize: 12, color: autoMuted, marginBottom: 8 }}>{card.label}</div>
             <div style={{ fontSize: 24, fontWeight: 800, color: card.color }}>{card.value}</div>
           </div>
@@ -81,7 +83,7 @@ export default function AutomotiveOverviewPage() {
 
       <div style={{ background: "linear-gradient(135deg, rgba(59,130,246,.14), rgba(14,165,233,.08))", border: `1px solid ${autoBorder}`, borderRadius: 20, padding: 24 }}>
         <div style={{ fontSize: 13, color: "#bfdbfe", fontWeight: 800, marginBottom: 12, textTransform: "uppercase", letterSpacing: ".07em" }}>Showroom Flow</div>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(4,minmax(0,1fr))", gap: 12 }}>
+        <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,minmax(0,1fr))", gap: 12 }}>
           {[
             { title: "Vehicle Stock", body: `${data.summary.availableVehicles} units are open for sale with VIN and pricing control.` },
             { title: "Test Drives", body: `${data.summary.scheduledDrives} customer drives are currently scheduled.` },

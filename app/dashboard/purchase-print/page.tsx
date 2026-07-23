@@ -10,8 +10,10 @@ const Barcode = dynamic(() => import("react-barcode"), {
   loading: () => <p>Loading Barcode...</p>
 });
 import { QRCodeSVG } from "qrcode.react";
+import { useResponsive } from "@/hooks/useResponsive";
 
 export default function PurchasePrint() {
+  const { isMobile } = useResponsive();
   return (
     <Suspense fallback={<div className="p-10 text-center">Loading Print Preview...</div>}>
       <PurchasePrintContent />

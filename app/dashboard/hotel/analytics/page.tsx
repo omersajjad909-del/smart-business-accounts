@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { HotelControlCenter, fetchJson, hotelBg, hotelBorder, hotelFont, hotelMuted } from "../_shared";
+import { useResponsive } from "@/hooks/useResponsive";
 
 const emptyState: HotelControlCenter = {
   summary: { rooms: 0, occupiedRooms: 0, occupancyRate: 0, checkedInGuests: 0, reservedGuests: 0, serviceRevenue: 0, pendingHousekeeping: 0, maintenanceRooms: 0 },
@@ -12,6 +13,7 @@ const emptyState: HotelControlCenter = {
 };
 
 export default function HotelAnalyticsPage() {
+  const { isMobile } = useResponsive();
   const [data, setData] = useState(emptyState);
 
   useEffect(() => {
@@ -29,18 +31,18 @@ export default function HotelAnalyticsPage() {
   }, {}), [serviceOrders]);
 
   return (
-    <div style={{ minHeight: "100vh", padding: "28px 32px", color: "#fff", fontFamily: hotelFont }}>
+    <div style={{ minHeight: "100vh", padding: isMobile ? "17px 16px" : "28px 32px", color: "#fff", fontFamily: hotelFont }}>
       <div style={{ marginBottom: 26 }}>
         <h1 style={{ margin: "0 0 6px", fontSize: 24, fontWeight: 800 }}>Hotel Analytics</h1>
         <p style={{ margin: 0, fontSize: 13, color: hotelMuted }}>Room mix, active stays, housekeeping load, and service demand.</p>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 18, marginBottom: 18 }}>
+      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: 18, marginBottom: 18 }}>
         <div style={{ background: hotelBg, border: `1px solid ${hotelBorder}`, borderRadius: 16, padding: 18 }}>
           <div style={{ fontSize: 15, fontWeight: 800, marginBottom: 14 }}>Room Mix</div>
           <div style={{ display: "grid", gap: 10 }}>
             {Object.entries(roomMix).sort((a, b) => b[1] - a[1]).map(([type, count]) => (
-              <div key={type} style={{ display: "flex", justifyContent: "space-between", padding: "10px 12px", borderRadius: 10, background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.05)" }}>
+              <div key={type} style={{ display: "flex", justifyContent: "space-between", padding: isMobile ? "8px 8px" : "10px 12px", borderRadius: 10, background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.05)" }}>
                 <span style={{ fontSize: 13 }}>{type}</span>
                 <span style={{ fontSize: 15, fontWeight: 800, color: "#fdba74" }}>{count}</span>
               </div>
@@ -58,7 +60,7 @@ export default function HotelAnalyticsPage() {
               { label: "Checked out", value: reservations.filter((row) => row.status === "checked_out").length, color: "#94a3b8" },
               { label: "Pending housekeeping", value: housekeeping.filter((row) => row.status !== "completed").length, color: "#f59e0b" },
             ].map((row) => (
-              <div key={row.label} style={{ display: "flex", justifyContent: "space-between", padding: "10px 12px", borderRadius: 10, background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.05)" }}>
+              <div key={row.label} style={{ display: "flex", justifyContent: "space-between", padding: isMobile ? "8px 8px" : "10px 12px", borderRadius: 10, background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.05)" }}>
                 <span style={{ fontSize: 13, color: hotelMuted }}>{row.label}</span>
                 <span style={{ fontSize: 15, fontWeight: 800, color: row.color }}>{row.value}</span>
               </div>
@@ -71,7 +73,7 @@ export default function HotelAnalyticsPage() {
         <div style={{ fontSize: 15, fontWeight: 800, marginBottom: 14 }}>Room Service Revenue by Room</div>
         <div style={{ display: "grid", gap: 10 }}>
           {Object.entries(serviceByRoom).sort((a, b) => b[1] - a[1]).map(([room, amount]) => (
-            <div key={room} style={{ display: "flex", justifyContent: "space-between", padding: "10px 12px", borderRadius: 10, background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.05)" }}>
+            <div key={room} style={{ display: "flex", justifyContent: "space-between", padding: isMobile ? "8px 8px" : "10px 12px", borderRadius: 10, background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.05)" }}>
               <span style={{ fontSize: 13 }}>Room {room}</span>
               <span style={{ fontSize: 15, fontWeight: 800, color: "#34d399" }}>Rs. {amount.toLocaleString()}</span>
             </div>

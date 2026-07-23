@@ -3,6 +3,7 @@ import { confirmToast } from "@/lib/toast-feedback";
 import { useState, useMemo, useEffect } from "react";
 import { useBusinessRecords } from "@/lib/useBusinessRecords";
 import { getCurrentUser } from "@/lib/auth";
+import { useResponsive } from "@/hooks/useResponsive";
 
 const ACCENT = "#f59e0b";
 const FONT = "'Outfit','Inter',sans-serif";
@@ -64,6 +65,7 @@ const inputStyle: React.CSSProperties = {
 interface Customer { id: string; name: string; }
 
 export default function CreditLimitsPage() {
+  const { isMobile } = useResponsive();
   const user = getCurrentUser();
   const { records, loading, create, update, remove } = useBusinessRecords("credit_limit");
   const [showModal, setShowModal]   = useState(false);
@@ -199,7 +201,7 @@ export default function CreditLimitsPage() {
   }
 
   return (
-    <div style={{ padding: "28px 32px", fontFamily: FONT, color: "var(--text-primary)", minHeight: "100vh" }}>
+    <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", fontFamily: FONT, color: "var(--text-primary)", minHeight: "100vh" }}>
 
       {/* Header */}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 28 }}>
@@ -221,11 +223,11 @@ export default function CreditLimitsPage() {
       </div>
 
       {/* KPI Cards */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 12, marginBottom: 28 }}>
+      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 12, marginBottom: 28 }}>
         {kpis.map((k) => (
           <div key={k.label} style={{
             background: "var(--panel-bg)", border: "1px solid var(--border)",
-            borderRadius: 12, padding: "20px 24px",
+            borderRadius: 12, padding: isMobile ? "12px 11px" : "20px 24px",
           }}>
             <div style={{ fontSize: 13, color: "var(--text-muted)", marginBottom: 6 }}>{k.label}</div>
             <div style={{ fontSize: 22, fontWeight: 800, color: k.color }}>{k.value}</div>
@@ -329,7 +331,7 @@ export default function CreditLimitsPage() {
         }}>
           <div style={{
             background: "var(--panel-bg)", border: "1px solid var(--border)",
-            borderRadius: 16, padding: "32px 28px", width: 440, fontFamily: FONT,
+            borderRadius: 16, padding: isMobile ? "18px 13px" : "32px 28px", width: 440, fontFamily: FONT,
           }}>
             <h2 style={{ fontSize: 18, fontWeight: 800, margin: "0 0 20px", color: "var(--text-primary)" }}>
               {editId ? "Edit Credit Limit" : "Set Credit Limit"}

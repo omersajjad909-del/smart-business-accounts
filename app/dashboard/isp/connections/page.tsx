@@ -5,6 +5,7 @@ import toast from "react-hot-toast";
 import { useMemo, useState } from "react";
 import { useBusinessRecords } from "@/lib/useBusinessRecords";
 import { ispBg, ispBorder, ispFont, ispMuted, ispStatusColor, mapIspConnections, mapIspPackages, todayIso } from "../_shared";
+import { useResponsive } from "@/hooks/useResponsive";
 
 const inputStyle: React.CSSProperties = {
   width: "100%",
@@ -12,7 +13,7 @@ const inputStyle: React.CSSProperties = {
   border: "1px solid rgba(255,255,255,.1)",
   borderRadius: 10,
   color: "#fff",
-  padding: "12px 14px",
+  padding: isMobile ? "8px 8px" : "12px 14px",
   fontSize: 14,
 };
 
@@ -21,7 +22,7 @@ const primaryButton: React.CSSProperties = {
   color: "#fff",
   border: "none",
   borderRadius: 10,
-  padding: "12px 16px",
+  padding: isMobile ? "8px 8px" : "12px 16px",
   fontWeight: 800,
   cursor: "pointer",
 };
@@ -31,12 +32,13 @@ const smallButton: React.CSSProperties = {
   color: "#bfdbfe",
   border: "1px solid rgba(96,165,250,.25)",
   borderRadius: 10,
-  padding: "8px 10px",
+  padding: isMobile ? "8px 8px" : "8px 10px",
   fontWeight: 700,
   cursor: "pointer",
 };
 
 export default function IspConnectionsPage() {
+  const { isMobile } = useResponsive();
   const packageStore = useBusinessRecords("isp_package");
   const { records, loading, create, update } = useBusinessRecords("isp_connection");
   const packages = useMemo(() => mapIspPackages(packageStore.records).filter((item) => item.status === "active"), [packageStore.records]);
@@ -68,7 +70,7 @@ export default function IspConnectionsPage() {
   };
 
   return (
-    <div style={{ padding: "28px 32px", color: "#fff", minHeight: "100vh", fontFamily: ispFont }}>
+    <div style={{ padding: isMobile ? "17px 16px" : "28px 32px", color: "#fff", minHeight: "100vh", fontFamily: ispFont }}>
       <div style={{ marginBottom: 24 }}>
         <h1 style={{ margin: "0 0 6px", fontSize: 28, fontWeight: 900 }}>Connections</h1>
         <p style={{ margin: 0, color: ispMuted, fontSize: 14 }}>Customer installs, active lines, package mapping, aur suspended accounts yahan manage karein.</p>
@@ -91,7 +93,7 @@ export default function IspConnectionsPage() {
         </div>
 
         <div style={{ background: ispBg, border: `1px solid ${ispBorder}`, borderRadius: 18, overflow: "hidden" }}>
-          <div style={{ padding: "16px 18px", borderBottom: `1px solid ${ispBorder}`, fontSize: 16, fontWeight: 800 }}>Connection Desk</div>
+          <div style={{ padding: isMobile ? "10px 9px" : "16px 18px", borderBottom: `1px solid ${ispBorder}`, fontSize: 16, fontWeight: 800 }}>Connection Desk</div>
           <div style={{ display: "grid", gap: 12, padding: 18 }}>
             {!loading && connections.length === 0 && <div style={{ color: "rgba(255,255,255,.28)" }}>No connections yet.</div>}
             {connections.map((row) => (
@@ -102,7 +104,7 @@ export default function IspConnectionsPage() {
                     <div style={{ fontSize: 12, color: ispMuted, marginTop: 6 }}>{row.phone} | {row.packageName}</div>
                     <div style={{ fontSize: 12, color: "#93c5fd", marginTop: 8 }}>{row.address}</div>
                   </div>
-                  <span style={{ padding: "4px 10px", borderRadius: 999, background: `${ispStatusColor(row.status)}20`, color: ispStatusColor(row.status), fontSize: 12, fontWeight: 700 }}>{row.status}</span>
+                  <span style={{ padding: isMobile ? "8px 8px" : "4px 10px", borderRadius: 999, background: `${ispStatusColor(row.status)}20`, color: ispStatusColor(row.status), fontSize: 12, fontWeight: 700 }}>{row.status}</span>
                 </div>
                 <div style={{ display: "flex", gap: 8, marginTop: 14, flexWrap: "wrap" }}>
                   {row.status !== "active" && <button style={smallButton} onClick={() => update(row.id, { status: "active" })}>Activate</button>}

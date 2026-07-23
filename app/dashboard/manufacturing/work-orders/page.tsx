@@ -5,6 +5,7 @@ import toast from "react-hot-toast";
 import { useMemo, useState } from "react";
 import { useBusinessRecords } from "@/lib/useBusinessRecords";
 import { mapProductionOrderRecord, mapWorkOrderRecord } from "../_shared";
+import { useResponsive } from "@/hooks/useResponsive";
 
 const ff = "'Outfit','Inter',sans-serif";
 const bg = "rgba(255,255,255,0.03)";
@@ -12,6 +13,7 @@ const border = "rgba(255,255,255,0.07)";
 const statusColor: Record<string, string> = { open: "#f59e0b", in_progress: "#38bdf8", completed: "#22c55e", on_hold: "#6b7280" };
 
 export default function WorkOrdersPage() {
+  const { isMobile } = useResponsive();
   const workStore = useBusinessRecords("work_order");
   const productionStore = useBusinessRecords("production_order");
   const [showModal, setShowModal] = useState(false);
@@ -102,7 +104,7 @@ export default function WorkOrdersPage() {
   }
 
   return (
-    <div style={{ padding: "28px 32px", fontFamily: ff, color: "#fff", minHeight: "100vh" }}>
+    <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", fontFamily: ff, color: "#fff", minHeight: "100vh" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 26 }}>
         <div>
           <h1 style={{ fontSize: 22, fontWeight: 800, margin: "0 0 4px" }}>Work Orders</h1>
@@ -113,14 +115,14 @@ export default function WorkOrdersPage() {
         </button>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 12, marginBottom: 20 }}>
+      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 12, marginBottom: 20 }}>
         {[
           { label: "Total Work Orders", value: workOrders.length, color: "#f97316" },
           { label: "Open", value: workOrders.filter((item) => item.status === "open").length, color: "#f59e0b" },
           { label: "In Progress", value: workOrders.filter((item) => item.status === "in_progress").length, color: "#38bdf8" },
           { label: "Completed", value: workOrders.filter((item) => item.status === "completed").length, color: "#22c55e" },
         ].map((card) => (
-          <div key={card.label} style={{ background: bg, border: `1px solid ${border}`, borderRadius: 14, padding: "18px 20px" }}>
+          <div key={card.label} style={{ background: bg, border: `1px solid ${border}`, borderRadius: 14, padding: isMobile ? "12px 10px" : "18px 20px" }}>
             <div style={{ fontSize: 12, color: "rgba(255,255,255,.48)", marginBottom: 6 }}>{card.label}</div>
             <div style={{ fontSize: 21, fontWeight: 800, color: card.color }}>{card.value}</div>
           </div>
@@ -141,23 +143,23 @@ export default function WorkOrdersPage() {
           <tbody>
             {workOrders.map((order) => (
               <tr key={order.id}>
-                <td style={{ padding: "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)", color: "rgba(255,255,255,.48)" }}>{order.workOrderId}</td>
-                <td style={{ padding: "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)", fontWeight: 700 }}>{order.title}</td>
-                <td style={{ padding: "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)", color: "rgba(255,255,255,.55)" }}>{order.linkedProductionOrderId || "Standalone"}</td>
-                <td style={{ padding: "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)" }}>{order.machine}</td>
-                <td style={{ padding: "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)" }}>{order.operator}</td>
-                <td style={{ padding: "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)" }}>{order.estimatedHours}h</td>
-                <td style={{ padding: "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)" }}>
+                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)", color: "rgba(255,255,255,.48)" }}>{order.workOrderId}</td>
+                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)", fontWeight: 700 }}>{order.title}</td>
+                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)", color: "rgba(255,255,255,.55)" }}>{order.linkedProductionOrderId || "Standalone"}</td>
+                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)" }}>{order.machine}</td>
+                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)" }}>{order.operator}</td>
+                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)" }}>{order.estimatedHours}h</td>
+                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)" }}>
                   <span style={{ color: order.priority === "high" ? "#ef4444" : order.priority === "medium" ? "#f59e0b" : "#22c55e", fontWeight: 700, fontSize: 12 }}>
                     {order.priority}
                   </span>
                 </td>
-                <td style={{ padding: "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)" }}>
+                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)" }}>
                   <span style={{ display: "inline-block", background: `${statusColor[order.status] || "#94a3b8"}20`, color: statusColor[order.status] || "#94a3b8", borderRadius: 999, padding: "4px 10px", fontSize: 11, fontWeight: 700 }}>
                     {order.status.replace("_", " ").toUpperCase()}
                   </span>
                 </td>
-                <td style={{ padding: "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)" }}>
+                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)" }}>
                   {order.status === "open" && (
                     <button onClick={() => startWorkOrder(order.id, order.linkedProductionOrderId)} style={{ padding: "5px 10px", background: "rgba(56,189,248,.15)", border: "1px solid rgba(56,189,248,.3)", color: "#38bdf8", borderRadius: 6, fontSize: 11, cursor: "pointer" }}>
                       Start

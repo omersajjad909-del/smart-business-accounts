@@ -4,6 +4,7 @@ import { useState, useMemo, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useBusinessRecords } from "@/lib/useBusinessRecords";
 import { getCurrentUser } from "@/lib/auth";
+import { useResponsive } from "@/hooks/useResponsive";
 
 // ─── Design tokens ───────────────────────────────────────────────────────────
 const ff = "'Outfit','Inter',sans-serif";
@@ -53,6 +54,7 @@ function fmt(n: number) {
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 export default function SalesOrderPage() {
+  const { isMobile } = useResponsive();
   const router = useRouter();
   const { records, loading, create, setStatus, remove } = useBusinessRecords("sales_order");
 
@@ -311,7 +313,7 @@ export default function SalesOrderPage() {
       </div>
 
       {/* ── KPI cards ── */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 16, marginBottom: 24 }}>
+      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 16, marginBottom: 24 }}>
         {[
           { label: "Total Orders", value: total, color: accent },
           { label: "Pending", value: pending, color: STATUS_COLORS.PENDING },
@@ -657,13 +659,13 @@ export default function SalesOrderPage() {
                 </div>
               ) : (
                 <>
-                  <div style={{ display: "grid", gridTemplateColumns: "1fr 80px 110px 90px 32px", gap: 8, marginBottom: 6 }}>
+                  <div style={{ overflowX: "auto" }}><div style={{ display: "grid", gridTemplateColumns: "1fr 80px 110px 90px 32px", gap: 8, marginBottom: 6 }}><div style={{ minWidth: 480 }}>
                     {["Item Name", "Qty", "Unit Price", "Total", ""].map((h) => (
                       <span key={h} style={{ fontSize: 11, color: "var(--text-muted)", fontWeight: 600, textTransform: "uppercase" }}>{h}</span>
                     ))}
                   </div>
                   {form.items.map((item, idx) => (
-                    <div key={idx} style={{ display: "grid", gridTemplateColumns: "1fr 80px 110px 90px 32px", gap: 8, marginBottom: 8, alignItems: "center" }}>
+                    <div style={{ overflowX: "auto" }}><div key={idx} style={{ display: "grid", gridTemplateColumns: "1fr 80px 110px 90px 32px", gap: 8, marginBottom: 8, alignItems: "center" }}><div style={{ minWidth: 480 }}>
                       <select style={inputStyle} value={item.itemId || item.name}
                         onChange={(e) => {
                           const selected = itemList.find(i => i.id === e.target.value);
@@ -707,7 +709,7 @@ export default function SalesOrderPage() {
                 justifyContent: "flex-end",
                 alignItems: "center",
                 gap: 12,
-                padding: "14px 16px",
+                padding: isMobile ? "12px 10px" : "14px 16px",
                 background: "rgba(99,102,241,0.08)",
                 borderRadius: 10,
                 border: "1px solid " + accent + "33",

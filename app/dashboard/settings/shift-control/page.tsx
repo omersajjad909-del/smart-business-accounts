@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
+import { useResponsive } from "@/hooks/useResponsive";
 
 type ShiftSetting = {
   days: string[];
@@ -59,6 +60,7 @@ const defaultShift = (): ShiftSetting => ({
 });
 
 export default function ShiftControlPage() {
+  const { isMobile } = useResponsive();
   const [users, setUsers] = useState<UserEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState<string | null>(null);
@@ -146,7 +148,7 @@ export default function ShiftControlPage() {
   const nonAdminUsers = users.filter(u => u.role?.toUpperCase() !== "ADMIN");
 
   return (
-    <div style={{ padding: "28px 32px", maxWidth: 860, margin: "0 auto", fontFamily: "'Outfit','Inter',sans-serif" }}>
+    <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", maxWidth: 860, margin: "0 auto", fontFamily: "'Outfit','Inter',sans-serif" }}>
       {/* Toast */}
       {toast && (
         <div style={{
@@ -199,7 +201,7 @@ export default function ShiftControlPage() {
                   onClick={() => setExpanded(isOpen ? null : u.id)}
                   style={{
                     display: "flex", alignItems: "center", gap: 14,
-                    padding: "16px 20px", cursor: "pointer",
+                    padding: isMobile ? "12px 10px" : "16px 20px", cursor: "pointer",
                     background: isOpen ? "rgba(99,102,241,0.06)" : "transparent",
                   }}
                 >
@@ -327,7 +329,7 @@ export default function ShiftControlPage() {
                         </div>
 
                         {/* Times */}
-                        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr", gap: 14, paddingTop: 16 }}>
+                        <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr 1fr" : "1fr 1fr 1fr 1fr", gap: 14, paddingTop: 16 }}>
                           {[
                             { label: "Start Time", key: "startTime" as const },
                             { label: "End Time", key: "endTime" as const },
@@ -372,7 +374,7 @@ export default function ShiftControlPage() {
                         {/* Overtime section */}
                         <div style={{
                           marginTop: 18, background: "rgba(245,158,11,0.08)",
-                          border: "1px solid rgba(245,158,11,0.25)", borderRadius: 12, padding: "14px 16px",
+                          border: "1px solid rgba(245,158,11,0.25)", borderRadius: 12, padding: isMobile ? "12px 10px" : "14px 16px",
                         }}>
                           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
                             <div>

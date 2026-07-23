@@ -1,6 +1,7 @@
 "use client";
 import { useState, useMemo } from "react";
 import { useBusinessRecords } from "@/lib/useBusinessRecords";
+import { useResponsive } from "@/hooks/useResponsive";
 
 type DiscountType = "PERCENTAGE" | "FIXED" | "BUY_X_GET_Y";
 const STATUS_COLOR: Record<string, string> = { ACTIVE: "#10b981", SCHEDULED: "#f59e0b", EXPIRED: "#94a3b8" };
@@ -9,6 +10,7 @@ const TYPE_LABELS: Record<DiscountType, string> = { PERCENTAGE: "% Off", FIXED: 
 const BLANK = { name: "", code: "", type: "PERCENTAGE" as DiscountType, value: "", minPurchase: "", maxUses: "", startDate: "", endDate: "" };
 
 export default function DiscountsPage() {
+  const { isMobile } = useResponsive();
   const { records, loading, create, setStatus } = useBusinessRecords("retail_discount");
   const [showModal, setShowModal] = useState(false);
   const [form, setForm] = useState(BLANK);
@@ -57,7 +59,7 @@ export default function DiscountsPage() {
   const s = { fontFamily: "'Outfit','Inter',sans-serif" };
 
   return (
-    <div style={{ ...s, minHeight: "100vh", background: "var(--app-bg)", padding: "28px 24px", color: "var(--text-primary)" }}>
+    <div style={{ ...s, minHeight: "100vh", background: "var(--app-bg)", padding: isMobile ? "15px 11px" : "28px 24px", color: "var(--text-primary)" }}>
       <style>{`@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap');`}</style>
 
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 24 }}>
@@ -70,14 +72,14 @@ export default function DiscountsPage() {
         </button>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 16, marginBottom: 24 }}>
+      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 16, marginBottom: 24 }}>
         {[
           { label: "Active Discounts", val: discounts.filter(d => d.status === "ACTIVE").length, color: "#10b981" },
           { label: "Scheduled", val: discounts.filter(d => d.status === "SCHEDULED").length, color: "#f59e0b" },
           { label: "Total Uses (Active)", val: discounts.filter(d => d.status === "ACTIVE").reduce((s, d) => s + d.usedCount, 0), color: "#818cf8" },
           { label: "Total Discounts", val: discounts.length, color: "#6366f1" },
         ].map(kpi => (
-          <div key={kpi.label} style={{ background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 14, padding: "16px 20px" }}>
+          <div key={kpi.label} style={{ background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 14, padding: isMobile ? "12px 10px" : "16px 20px" }}>
             <div style={{ fontSize: 11, color: "var(--text-muted)", marginBottom: 4 }}>{kpi.label}</div>
             <div style={{ fontSize: 26, fontWeight: 700, color: kpi.color }}>{loading ? "…" : kpi.val}</div>
           </div>

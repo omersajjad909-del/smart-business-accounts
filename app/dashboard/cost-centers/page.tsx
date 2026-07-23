@@ -1,11 +1,13 @@
 "use client";
 import { useEffect, useState } from "react";
+import { useResponsive } from "@/hooks/useResponsive";
 
 const ff = "'Outfit','Inter',sans-serif";
 
 type CostCenter = { id: string; code: string; name: string; isActive: boolean };
 
 export default function CostCentersPage() {
+  const { isMobile } = useResponsive();
   const [items,   setItems]   = useState<CostCenter[]>([]);
   const [loading, setLoading] = useState(false);
   const [editId,  setEditId]  = useState<string | null>(null);
@@ -68,7 +70,7 @@ export default function CostCentersPage() {
   const inactiveItems = items.filter(c => !c.isActive);
 
   return (
-    <div style={{ padding: "28px 28px", fontFamily: ff, color: "var(--text-primary)", maxWidth: 860 }}>
+    <div style={{ padding: isMobile ? "15px 13px" : "28px 28px", fontFamily: ff, color: "var(--text-primary)", maxWidth: 860 }}>
 
       {/* Header */}
       <div style={{ marginBottom: 24 }}>
@@ -79,13 +81,13 @@ export default function CostCentersPage() {
       </div>
 
       {/* Stats row */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 12, marginBottom: 24 }}>
+      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(3,1fr)", gap: 12, marginBottom: 24 }}>
         {[
           { label: "Total",    value: items.length,         color: "#6366f1", bg: "rgba(99,102,241,.07)",  border: "rgba(99,102,241,.2)" },
           { label: "Active",   value: activeItems.length,   color: "#34d399", bg: "rgba(52,211,153,.07)",  border: "rgba(52,211,153,.2)" },
           { label: "Inactive", value: inactiveItems.length, color: "#6b7280", bg: "rgba(107,114,128,.06)", border: "rgba(107,114,128,.15)" },
         ].map(s => (
-          <div key={s.label} style={{ borderRadius: 12, padding: "14px 18px", background: s.bg, border: `1px solid ${s.border}` }}>
+          <div key={s.label} style={{ borderRadius: 12, padding: isMobile ? "12px 10px" : "14px 18px", background: s.bg, border: `1px solid ${s.border}` }}>
             <div style={{ fontSize: 11, color: "var(--text-muted)", fontWeight: 700, textTransform: "uppercase", letterSpacing: ".06em", marginBottom: 4 }}>{s.label}</div>
             <div style={{ fontSize: 24, fontWeight: 900, color: s.color }}>{s.value}</div>
           </div>
@@ -93,7 +95,7 @@ export default function CostCentersPage() {
       </div>
 
       {/* Form */}
-      <div style={{ background: "var(--panel-bg)", border: `1.5px solid ${editId ? "rgba(99,102,241,.4)" : "var(--border)"}`, borderRadius: 14, padding: "20px 22px", marginBottom: 24 }}>
+      <div style={{ background: "var(--panel-bg)", border: `1.5px solid ${editId ? "rgba(99,102,241,.4)" : "var(--border)"}`, borderRadius: 14, padding: isMobile ? "12px 10px" : "20px 22px", marginBottom: 24 }}>
         <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 16, color: editId ? "#818cf8" : "var(--text-primary)" }}>
           {editId ? "✏️ Edit Cost Center" : "➕ New Cost Center"}
         </div>
@@ -147,7 +149,7 @@ export default function CostCentersPage() {
           </div>
           {items.map((c, i) => (
             <div key={c.id}
-              style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "14px 18px", borderBottom: i < items.length - 1 ? "1px solid var(--border)" : "none", gap: 12 }}
+              style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: isMobile ? "12px 10px" : "14px 18px", borderBottom: i < items.length - 1 ? "1px solid var(--border)" : "none", gap: 12 }}
               onMouseEnter={e => (e.currentTarget.style.background = "var(--app-bg)")}
               onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
               <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
