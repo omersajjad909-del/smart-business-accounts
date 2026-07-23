@@ -203,16 +203,27 @@ export default function AboutPage() {
             <span style={{ fontSize: 12, color: "rgba(255,255,255,.45)", fontWeight: 500 }}>About</span>
           </div>
 
-          {/* Badge */}
+          {/* Badges row */}
           <div style={{
-            display: "inline-flex", alignItems: "center", gap: 8, padding: "6px 14px 6px 10px",
-            borderRadius: 100, background: "rgba(99,102,241,.1)", border: "1px solid rgba(99,102,241,.22)",
+            display: "flex", alignItems: "center", justifyContent: "center", gap: 10, flexWrap: "wrap",
             marginBottom: 28,
             opacity: heroVis ? 1 : 0, transform: heroVis ? "translateY(0)" : "translateY(16px)",
             transition: "opacity .55s ease, transform .55s ease",
           }}>
-            <span style={{ width: 7, height: 7, borderRadius: "50%", background: "#10b981", animation: "pulse 2s infinite", display: "inline-block" }} />
-            <span style={{ fontSize: 11, fontWeight: 700, color: "#a5b4fc", letterSpacing: ".08em" }}>OUR STORY</span>
+            <div style={{
+              display: "inline-flex", alignItems: "center", gap: 8, padding: "6px 14px 6px 10px",
+              borderRadius: 100, background: "rgba(99,102,241,.1)", border: "1px solid rgba(99,102,241,.22)",
+            }}>
+              <span style={{ width: 7, height: 7, borderRadius: "50%", background: "#10b981", animation: "pulse 2s infinite", display: "inline-block" }} />
+              <span style={{ fontSize: 11, fontWeight: 700, color: "#a5b4fc", letterSpacing: ".08em" }}>OUR STORY</span>
+            </div>
+            <div style={{
+              display: "inline-flex", alignItems: "center", gap: 7, padding: "6px 13px",
+              borderRadius: 100, background: "rgba(52,211,153,.08)", border: "1px solid rgba(52,211,153,.22)",
+            }}>
+              <span style={{ fontSize: 12 }}>🇵🇰</span>
+              <span style={{ fontSize: 11, fontWeight: 700, color: "#34d399", letterSpacing: ".06em" }}>PSEB Registered IT Exporter</span>
+            </div>
           </div>
 
           <h1 style={{

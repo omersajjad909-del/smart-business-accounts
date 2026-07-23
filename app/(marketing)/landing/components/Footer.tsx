@@ -394,6 +394,15 @@ export default function Footer() {
       </span>
     </p>
   </div>
+  <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+    <div style={{ width: 16, height: 1, background: "rgba(255,255,255,.1)", borderRadius: 1 }} />
+    <p style={{ fontSize: 10.5, color: "rgba(255,255,255,.15)", margin: 0 }}>
+      <span style={{ color: "rgba(52,211,153,.55)", fontWeight: 600 }}>PSEB</span>{" "}
+      Registered IT Exporter{" · "}
+      <span style={{ color: "rgba(255,255,255,.28)", fontWeight: 600 }}>FBR</span>{" "}
+      Registered
+    </p>
+  </div>
 </div>
 
           {/* Center: links */}
