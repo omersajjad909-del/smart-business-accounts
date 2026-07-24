@@ -623,7 +623,7 @@ function OverviewTab({ onNavigate }: { onNavigate: (t: Tab) => void }) {
     { id: "leads" as Tab, icon: "👥", title: "CRM Lead Capture", desc: "Capture leads from forms, Facebook Lead Ads, and webhooks into your CRM.", color: "#fb923c" },
     { id: "sheets" as Tab, icon: "📊", title: "Google Sheets Sync", desc: "Sync your leads, contacts, and data to Google Sheets automatically.", color: "#34d399" },
     { id: "social" as Tab, icon: "📱", title: "Social Media Posting", desc: "Schedule and auto-publish posts to Facebook, Instagram, and LinkedIn.", color: "#f472b6" },
-    { id: "content" as Tab, icon: "✍️", title: "AI Content Generator", desc: "Generate social posts, email copy, ad content with Claude AI in seconds.", color: "#fbbf24" },
+    { id: "content" as Tab, icon: "✍️", title: "AI Content Generator", desc: "Generate social posts, email copy, ad content with FinovaOS AI in seconds.", color: "#fbbf24" },
     { id: "chatbot" as Tab, icon: "🤖", title: "Website Chatbot", desc: "Embed an AI chatbot on your website. Paste one script tag — it works instantly.", color: "#38bdf8" },
   ];
 
@@ -1421,7 +1421,7 @@ function ChatbotTab() {
         <Card>
           <h3 style={{ margin: "0 0 12px", fontSize: 16, fontWeight: 700 }}>Features</h3>
           {[
-            "AI-powered responses using Claude",
+            "AI-powered responses using FinovaOS AI",
             "Conversation memory within a session",
             "Auto-open after 5 seconds for new visitors",
             "Mobile responsive design",

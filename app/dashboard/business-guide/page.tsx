@@ -683,7 +683,7 @@ export default function BusinessGuidePage() {
               {[
                 { val: String(enabledAiTools.length), label: "AI Tools" },
                 { val: "24/7", label: "Monitoring" },
-                { val: "0", label: "OpenAI Required*" },
+                { val: "0", label: "External API Required*" },
               ].map((s) => (
                 <div key={s.label} style={{ background: "rgba(255,255,255,.04)", borderRadius: 12, padding: "14px", textAlign: "center" }}>
                   <div style={{ fontSize: 24, fontWeight: 800, color: "#a5b4fc" }}>{s.val}</div>
