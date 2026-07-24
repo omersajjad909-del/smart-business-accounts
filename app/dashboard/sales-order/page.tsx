@@ -68,17 +68,6 @@ export default function SalesOrderPage() {
   // Saved customers + items
   const [customers, setCustomers] = useState<{ id: string; name: string }[]>([]);
   const [itemList,  setItemList]  = useState<{ id: string; name: string; salePrice?: number }[]>([]);
-  const [isMobile,  setIsMobile]  = useState(false);
-
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    const media = window.matchMedia("(max-width: 900px)");
-    const onChange = () => setIsMobile(media.matches);
-    onChange();
-    media.addEventListener("change", onChange);
-    return () => media.removeEventListener("change", onChange);
-  }, []);
-
   useEffect(() => {
     const u = getCurrentUser();
     const h: Record<string, string> = {};

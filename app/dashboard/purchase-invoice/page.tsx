@@ -211,7 +211,6 @@ const [searchTerm, setSearchTerm] = useState("");
   const [currencies, setCurrencies] = useState<Currency[]>([]);
   const [currencyId, setCurrencyId] = useState("");
   const [exchangeRate, setExchangeRate] = useState(1);
-  const [isMobile, setIsMobile] = useState(false);
   const [companyInfo, setCompanyInfo] = useState<any>(null);
 
   // ── Query Mode (F7 / F8) ────────────────────────────────────────────────────
@@ -256,14 +255,6 @@ const [searchTerm, setSearchTerm] = useState("");
     setScanCode("");
   }
 
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    const media = window.matchMedia("(max-width: 900px)");
-    const onChange = () => setIsMobile(media.matches);
-    onChange();
-    media.addEventListener("change", onChange);
-    return () => media.removeEventListener("change", onChange);
-  }, []);
 
   useEffect(() => {
     fetch("/api/currencies")

@@ -80,7 +80,6 @@ function SalesInvoiceContent() {
   const today = new Date().toISOString().slice(0, 10);
   const user = getCurrentUser();
   const canCreate = hasPermission(user, PERMISSIONS.CREATE_SALES_INVOICE);
-  const [isMobile, setIsMobile] = useState(false);
 
   // ── Data ──
   const [customers, setCustomers]   = useState<Account[]>([]);
@@ -153,14 +152,6 @@ function SalesInvoiceContent() {
     }).finally(() => setLoading(false));
   }, []);
 
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    const media = window.matchMedia("(max-width: 900px)");
-    const onChange = () => setIsMobile(media.matches);
-    onChange();
-    media.addEventListener("change", onChange);
-    return () => media.removeEventListener("change", onChange);
-  }, []);
 
   useEffect(() => {
     fetch("/api/currencies").then(r => r.json()).then(d => { if (Array.isArray(d)) setCurrencies(d); }).catch(() => {});
