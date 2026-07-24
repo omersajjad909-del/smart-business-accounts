@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import toast from "react-hot-toast";
 
@@ -1208,8 +1208,7 @@ export default function AICommandCenter() {
   const cleanMarkdownText = (value: string) =>
     value
       .trim()
-      .replace(/^[-*#\d.]+\s*/, "")
-      .replace(/^â€¢\s*/, "")
+      .replace(/^(?:[-#]+\s*|\d+[.)]\s*|[•*]\s*)/, "")
       .replace(/\*\*(.*?)\*\*/g, "$1")
       .replace(/__(.*?)__/g, "$1")
       .replace(/^\*+/, "")
@@ -1240,41 +1239,40 @@ export default function AICommandCenter() {
       if (!line) return <div key={i} style={{ height: 6 }} />;
 
       // Headings — match with or without space (###Title or ### Title)
-      const h4m = line.match(/^#{4}\s*(.*)/);  if (h4m) return <div key={i} style={{ fontSize: 13, fontWeight: 700, color: "#e0e7ff", margin: "10px 0 2px", letterSpacing: ".01em" }}>{h4m[1]}</div>;
-      const h3m = line.match(/^#{3}\s*(.*)/);  if (h3m) return <div key={i} style={{ fontSize: 13.5, fontWeight: 700, color: "#c7d2fe", margin: "12px 0 4px", borderLeft: "3px solid #6366f1", paddingLeft: 8 }}>{h3m[1]}</div>;
-      const h2m = line.match(/^#{2}\s*(.*)/);  if (h2m) return <div key={i} style={{ fontSize: 15, fontWeight: 700, color: "#a5b4fc", margin: "14px 0 6px" }}>{h2m[1]}</div>;
-      const h1m = line.match(/^#{1}\s+(.*)/);  if (h1m) return <div key={i} style={{ fontSize: 17, fontWeight: 800, color: "white", margin: "16px 0 8px", borderBottom: "1px solid rgba(255,255,255,.12)", paddingBottom: 6 }}>{h1m[1]}</div>;
+      const h4m = line.match(/^#{4}\s*(.*)/);  if (h4m) return <div key={i} style={{ fontSize: 13, fontWeight: 700, color: "#e0e7ff", margin: "10px 0 2px", letterSpacing: ".01em" }}>{cleanMarkdownText(h4m[1])}</div>;
+      const h3m = line.match(/^#{3}\s*(.*)/);  if (h3m) return <div key={i} style={{ fontSize: 13.5, fontWeight: 700, color: "#c7d2fe", margin: "12px 0 4px", borderLeft: "3px solid #6366f1", paddingLeft: 8 }}>{cleanMarkdownText(h3m[1])}</div>;
+      const h2m = line.match(/^#{2}\s*(.*)/);  if (h2m) return <div key={i} style={{ fontSize: 15, fontWeight: 700, color: "#a5b4fc", margin: "14px 0 6px" }}>{cleanMarkdownText(h2m[1])}</div>;
+      const h1m = line.match(/^#{1}\s+(.*)/);  if (h1m) return <div key={i} style={{ fontSize: 17, fontWeight: 800, color: "white", margin: "16px 0 8px", borderBottom: "1px solid rgba(255,255,255,.12)", paddingBottom: 6 }}>{cleanMarkdownText(h1m[1])}</div>;
 
       // Numbered list  1. text
       const numm = line.match(/^(\d+)\.\s+(.*)/);
       if (numm) {
-        const inner = numm[2].replace(/\*\*(.*?)\*\*/g, "<strong style=\"color:white\">$1</strong>");
+        const inner = cleanMarkdownText(numm[2]);
         return (
           <div key={i} style={{ display: "flex", gap: 10, padding: "3px 0", alignItems: "flex-start" }}>
             <span style={{ minWidth: 22, height: 22, borderRadius: "50%", background: "rgba(99,102,241,.35)", color: "#c7d2fe", fontSize: 11, fontWeight: 700, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, marginTop: 1 }}>{numm[1]}</span>
-            <span dir="auto" style={{ color: "rgba(255,255,255,.9)", fontSize: 13.5, lineHeight: 1.75 }} dangerouslySetInnerHTML={{ __html: inner }} />
+            <span dir="auto" style={{ color: "rgba(255,255,255,.9)", fontSize: 13.5, lineHeight: 1.75 }}>{inner}</span>
           </div>
         );
       }
 
       // Bullet  • - *
       if (line.startsWith("• ") || line.startsWith("- ") || line.startsWith("* ")) {
-        const inner = line.slice(2).replace(/\*\*(.*?)\*\*/g, "<strong style=\"color:white\">$1</strong>");
+        const inner = cleanMarkdownText(line.slice(2));
         return (
           <div key={i} style={{ display: "flex", gap: 8, padding: "2px 0", alignItems: "flex-start", paddingLeft: 4 }}>
             <span style={{ color: "#818cf8", fontSize: 14, flexShrink: 0, marginTop: 1 }}>•</span>
-            <span dir="auto" style={{ color: "rgba(255,255,255,.88)", fontSize: 13.5, lineHeight: 1.75 }} dangerouslySetInnerHTML={{ __html: inner }} />
+            <span dir="auto" style={{ color: "rgba(255,255,255,.88)", fontSize: 13.5, lineHeight: 1.75 }}>{inner}</span>
           </div>
         );
       }
 
       // Whole-line bold **text**
       if (line.startsWith("**") && line.endsWith("**") && line.length > 4)
-        return <div key={i} style={{ fontWeight: 700, color: "white", fontSize: 14, margin: "6px 0 2px" }}>{line.slice(2, -2)}</div>;
+        return <div key={i} style={{ fontWeight: 700, color: "white", fontSize: 14, margin: "6px 0 2px" }}>{cleanMarkdownText(line)}</div>;
 
       // Normal paragraph — inline bold + RTL support
-      const html = line.replace(/\*\*(.*?)\*\*/g, "<strong style=\"color:white;font-weight:700\">$1</strong>");
-      return <div key={i} dir="auto" style={{ color: "rgba(255,255,255,.85)", fontSize: 13.5, lineHeight: 1.8, margin: "1px 0" }} dangerouslySetInnerHTML={{ __html: html }} />;
+      return <div key={i} dir="auto" style={{ color: "rgba(255,255,255,.85)", fontSize: 13.5, lineHeight: 1.8, margin: "1px 0" }}>{cleanMarkdownText(line)}</div>;
     });
   }
 
@@ -1567,12 +1565,11 @@ export default function AICommandCenter() {
                     </div>
                     <div style={{ display: "grid", gap: 7 }}>
                       {(insights || "").split("\n").filter(Boolean).slice(0, 4).map((line, index) => {
-                        const clean = line.replace(/^[-•*#\d.]\s*/, "");
-                        const html = clean.replace(/\*\*(.*?)\*\*/g, "<strong style=\"color:white;font-weight:700\">$1</strong>");
+                        const clean = cleanMarkdownText(line);
                         return (
                           <div key={index} style={{ display: "flex", gap: 8, alignItems: "flex-start", color: "rgba(255,255,255,.72)", fontSize: 12.5, lineHeight: 1.6 }}>
                             <span style={{ color: "#6366f1", flexShrink: 0 }}>•</span>
-                            <span dangerouslySetInnerHTML={{ __html: html }} />
+                            <span>{clean}</span>
                           </div>
                         );
                       })}
