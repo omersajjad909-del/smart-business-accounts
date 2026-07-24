@@ -18,7 +18,7 @@ type Affiliate = {
   _count?: { conversions: number; payouts: number };
 };
 
-const TIERS = ["STARTER", "GROWTH", "PRO", "ELITE"] as const;
+const TIERS = ["STARTE", "GROWTH", "PRO", "ELITE"] as const;
 const STATUSES = ["PENDING", "APPROVED", "SUSPENDED", "REJECTED"] as const;
 
 function authHeaders(): Record<string, string> {
