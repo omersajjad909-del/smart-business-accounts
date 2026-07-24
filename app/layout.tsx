@@ -43,8 +43,8 @@ export const metadata: Metadata = {
     "AI ERP",
     "smart accounting software",
   ],
-  authors: [{ name: "Finova Forge", url: "https://finovaforge.com" }],
-  creator: "Finova Forge",
+  authors: [{ name: "Umer Sajjad", url: "https://www.finovaos.app/forge/about" }, { name: "Finova Forge", url: "https://finovaforge.com" }],
+  creator: "Umer Sajjad",
   publisher: "Finova Forge",
   robots: {
     index: true,
@@ -144,6 +144,21 @@ const softwareApplicationJsonLd = {
   ],
 };
 
+const founderJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "Person",
+  "@id": `${BASE_URL}/#founder`,
+  name: "Umer Sajjad",
+  jobTitle: "Founder & CEO",
+  worksFor: { "@id": `${BASE_URL}/#organization` },
+  url: `${BASE_URL}/forge/about`,
+  sameAs: [
+    "https://linkedin.com/company/finovaforge",
+    `${BASE_URL}/forge/about`,
+  ],
+  description: "Umer Sajjad is the Founder and CEO of Finova Forge and FinovaOS — an AI-powered cloud accounting and business management platform for SMEs.",
+};
+
 const organizationJsonLd = {
   "@context": "https://schema.org",
   "@type": "Organization",
@@ -158,7 +173,13 @@ const organizationJsonLd = {
     height: 512,
   },
   description: "Finova Forge is the company behind FinovaOS, a cloud accounting and business management platform for modern SMEs.",
-  foundingDate: "2023",
+  foundingDate: "2024",
+  foundingLocation: "Pakistan",
+  founder: {
+    "@id": `${BASE_URL}/#founder`,
+    "@type": "Person",
+    name: "Umer Sajjad",
+  },
   numberOfEmployees: { "@type": "QuantitativeValue", value: 120 },
   contactPoint: [
     {
@@ -214,6 +235,7 @@ export default async function RootLayout({
         {/* Clarity is injected by AnalyticsLoader only after analytics consent is given */}
         <script nonce={nonce} suppressHydrationWarning type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(softwareApplicationJsonLd) }} />
         <script nonce={nonce} suppressHydrationWarning type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }} />
+        <script nonce={nonce} suppressHydrationWarning type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(founderJsonLd) }} />
         <script nonce={nonce} suppressHydrationWarning type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }} />
       </head>
       <body className="app-root" suppressHydrationWarning>
