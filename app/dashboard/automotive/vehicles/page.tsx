@@ -113,7 +113,7 @@ export default function VehiclesPage() {
   const td: React.CSSProperties     = { padding: "13px 16px", fontSize: 14, borderBottom: "1px solid var(--border)", color: "var(--text-primary)" };
 
   return (
-    <div style={{ minHeight: "100vh", background: "var(--app-bg)", padding: isMobile ? "16px" : "32px" 28px", fontFamily: FONT, color: "var(--text-primary)" }}>
+    <div style={{ minHeight: "100vh", background: "var(--app-bg)", padding: isMobile ? "15px 14px" : "28px 32px", fontFamily: FONT, color: "var(--text-primary)" }}>
 
       {/* ── Header ── */}
       <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 28 }}>

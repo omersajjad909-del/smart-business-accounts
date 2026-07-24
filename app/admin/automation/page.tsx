@@ -490,7 +490,7 @@ function ContentTab() {
         <Inp label="Keywords" value={form.keywords} onChange={e => setForm(f => ({ ...f, keywords: e.target.value }))} placeholder="FinovaOS, Pakistan, accounting software, AI" />
         <Inp label="Word Count" type="number" value={form.wordCount} onChange={e => setForm(f => ({ ...f, wordCount: +e.target.value }))} />
         <Txta label="Business Context" value={form.context} onChange={e => setForm(f => ({ ...f, context: e.target.value }))} rows={2} />
-        <Btn onClick={generate} loading={loading}>Generate with Claude AI</Btn>
+        <Btn onClick={generate} loading={loading}>Generate with FinovaOS AI</Btn>
       </Card>
 
       <Card>

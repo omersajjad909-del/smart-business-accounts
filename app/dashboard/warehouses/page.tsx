@@ -276,7 +276,7 @@ export default function WarehousesPage() {
     <div style={{
       fontFamily: "'Outfit','Inter',sans-serif",
       color: "var(--text-primary)",
-      padding: isMobile ? "16px" : "32px" 28px",
+      padding: isMobile ? "15px 14px" : "28px 32px",
       minHeight: "100vh",
       background: "var(--app-bg)",
     }}>

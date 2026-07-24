@@ -274,7 +274,7 @@ function TechStack() {
     { label: "Node.js", cat: "Backend", color: "#68a063" },
     { label: "PostgreSQL", cat: "Database", color: "#336791" },
     { label: "Supabase", cat: "Platform", color: "#3ecf8e" },
-    { label: "OpenAI", cat: "AI", color: "#74aa9c" },
+    { label: "FinovaOS AI", cat: "AI", color: "#a78bfa" },
     { label: "Vercel", cat: "Cloud", color: "rgba(255,255,255,.7)" },
     { label: "TypeScript", cat: "Language", color: "#3178c6" },
     { label: "AES-256", cat: "Security", color: "#f87171" },

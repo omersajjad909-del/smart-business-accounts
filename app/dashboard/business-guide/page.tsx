@@ -715,7 +715,7 @@ export default function BusinessGuidePage() {
           </div>
 
           <div style={{ marginTop: 16, padding: isMobile ? "12px 10px" : "14px 20px", borderRadius: 12, background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.06)", fontSize: 12, color: "rgba(255,255,255,.4)", textAlign: "center" }}>
-            * 80% of AI features work without OpenAI credits — powered by your real business data and rule-based intelligence.
+            * 80% of AI features work without any external API credits — powered by your real business data and rule-based intelligence.
           </div>
         </div>
       )}

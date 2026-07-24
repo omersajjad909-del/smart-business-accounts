@@ -605,7 +605,7 @@ export default function PurchaseOrderApprovalPage() {
         background: "var(--app-bg)",
         fontFamily: "'Outfit','Inter',sans-serif",
         color: "var(--text-primary)",
-        padding: isMobile ? "16px" : "32px" 28px",
+        padding: isMobile ? "15px 14px" : "28px 32px",
         boxSizing: "border-box",
       }}
     >

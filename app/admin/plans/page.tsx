@@ -34,7 +34,7 @@ const MODULES = [
   { id: "api_access",    label: "API Access",             icon: "⚡", desc: "REST API + Webhooks" },
   { id: "whatsapp_sms",  label: "WhatsApp & SMS",         icon: "💬", desc: "Automated notifications" },
   { id: "tax_filing",    label: "Tax Filing",             icon: "📋", desc: "Jurisdiction-ready tax reports" },
-  { id: "ai_assistant",  label: "AI Financial Assistant", icon: "🤖", desc: "Claude-powered insights & chat" },
+  { id: "ai_assistant",  label: "AI Financial Assistant", icon: "🤖", desc: "FinovaOS AI insights & chat" },
 ];
 
 const STATUS_COLORS: Record<string, { bg: string; text: string }> = {
@@ -885,7 +885,7 @@ export default function AdminPlansPage() {
           <div style={{ padding: "16px 20px", borderRadius: 14, background: "rgba(167,139,250,.06)", border: "1px solid rgba(167,139,250,.2)", marginBottom: 24 }}>
             <div style={{ fontSize: 13, fontWeight: 700, color: "#a78bfa", marginBottom: 10 }}>⚡ Automation Add-on — $79/month per company</div>
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: 8 }}>
-              {["WhatsApp Auto-Reply (Claude AI)", "Email Drip Campaigns", "Zapier / Make Webhooks", "CRM Lead Capture", "Website AI Chatbot", "Social Media Auto-posting", "Google Sheets Sync", "AI Content Generator"].map(f => (
+              {["WhatsApp Auto-Reply (FinovaOS AI)", "Email Drip Campaigns", "Zapier / Make Webhooks", "CRM Lead Capture", "Website AI Chatbot", "Social Media Auto-posting", "Google Sheets Sync", "AI Content Generator"].map(f => (
                 <div key={f} style={{ fontSize: 12, color: "#94a3b8", display: "flex", alignItems: "center", gap: 6 }}>
                   <span style={{ color: "#22c55e", fontSize: 10 }}>✓</span> {f}
                 </div>

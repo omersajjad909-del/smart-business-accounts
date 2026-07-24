@@ -24,7 +24,7 @@ const MODULES = [
 export default function AccountingPage() {
   const { isMobile } = useResponsive();
   return (
-    <div style={{ minHeight: "100vh", background: "var(--app-bg)", padding: isMobile ? "16px" : "32px" 28px", fontFamily: FONT, color: "var(--text-primary)" }}>
+    <div style={{ minHeight: "100vh", background: "var(--app-bg)", padding: isMobile ? "15px 14px" : "28px 32px", fontFamily: FONT, color: "var(--text-primary)" }}>
       <div style={{ marginBottom: 32 }}>
         <h1 style={{ fontSize: 26, fontWeight: 800, margin: "0 0 6px", letterSpacing: -0.5 }}>Accounting</h1>
         <p style={{ margin: 0, fontSize: 13, color: "var(--text-muted)" }}>Full double-entry bookkeeping — vouchers, journals, balances, assets</p>
