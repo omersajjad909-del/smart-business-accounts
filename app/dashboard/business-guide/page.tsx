@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { getBusinessType, type BusinessType } from "@/lib/businessModules";
 import { useResponsive } from "@/hooks/useResponsive";
+import { AI_TOOL_META, type AiToolId } from "@/lib/dashboardFeatureRegistry";
 
 type CompanyInfo = {
   name: string;
@@ -321,15 +322,6 @@ const CHECKLIST = [
   { id: 8, task: "Explore AI Intelligence", icon: "🤖", link: "/dashboard/ai", urgent: false },
 ];
 
-// ─── AI Features highlight ─────────────────────────────────────────────────────
-const AI_FEATURES = [
-  { icon: "⚡", title: "Business Health Score", desc: "Real-time score 0–100 based on your revenue, profit, cash, and receivables.", link: "/dashboard/ai" },
-  { icon: "💬", title: "Ask AI Anything", desc: "Chat with your financial data in plain English. Get instant answers.", link: "/dashboard/ai?tab=chat" },
-  { icon: "🔔", title: "Smart Alerts", desc: "Auto-detect overdue invoices, cash risks, expense spikes, revenue drops.", link: "/dashboard/ai?tab=alerts" },
-  { icon: "📈", title: "30/60/90-Day Forecast", desc: "AI predicts your next 3 months of revenue, expenses, and cashflow.", link: "/dashboard/ai?tab=forecast" },
-  { icon: "🌐", title: "Market Intelligence", desc: "Discover what products to add and what trends are hitting your industry.", link: "/dashboard/ai?tab=market" },
-  { icon: "🧭", title: "Business Advisor", desc: "Get a personalized growth plan, cross-sell ideas, and risk warnings.", link: "/dashboard/ai?tab=advisor" },
-];
 
 export default function BusinessGuidePage() {
   const { isMobile } = useResponsive();
@@ -337,13 +329,17 @@ export default function BusinessGuidePage() {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<"overview" | "workflow" | "modules" | "ai" | "start">("overview");
   const [completedTasks, setCompletedTasks] = useState<number[]>([]);
+  const [enabledAiTools, setEnabledAiTools] = useState<AiToolId[]>([]);
 
   useEffect(() => {
     (async () => {
       try {
-        const res = await fetch("/api/me/company", { cache: "no-store" });
-        if (res.ok) {
-          const data = await res.json();
+        const [companyRes, aiToolsRes] = await Promise.all([
+          fetch("/api/me/company", { cache: "no-store" }),
+          fetch("/api/me/ai-tools", { cache: "no-store" }),
+        ]);
+        if (companyRes.ok) {
+          const data = await companyRes.json();
           setCompanyInfo({
             name: String(data?.name || "Your Company"),
             businessType: (data?.businessType || "trading") as BusinessType,
@@ -352,6 +348,10 @@ export default function BusinessGuidePage() {
             country: data?.country || null,
             baseCurrency: data?.baseCurrency || null,
           });
+        }
+        if (aiToolsRes.ok) {
+          const data = await aiToolsRes.json();
+          if (Array.isArray(data?.tools)) setEnabledAiTools(data.tools as AiToolId[]);
         }
       } catch {}
       finally { setLoading(false); }
@@ -474,7 +474,7 @@ export default function BusinessGuidePage() {
             {[
               { label: "Modules Available", val: String(businessMeta.modules.length), color: "#a5b4fc" },
               { label: "Workflow Steps", val: String(flow.length), color: "#34d399" },
-              { label: "AI Features", val: "9", color: "#f59e0b" },
+              { label: "AI Features", val: String(enabledAiTools.length || "…"), color: "#f59e0b" },
               { label: "Reports Available", val: "15+", color: "#38bdf8" },
             ].map((s) => (
               <div key={s.label} style={{ background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.07)", borderRadius: 14, padding: isMobile ? "12px 10px" : "14px 16px", textAlign: "center" }}>
@@ -671,7 +671,9 @@ export default function BusinessGuidePage() {
               <div style={{ width: 56, height: 56, borderRadius: 16, background: "rgba(167,139,250,.2)", border: "1px solid rgba(167,139,250,.3)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 28 }}>🤖</div>
               <div>
                 <div style={{ fontSize: 22, fontWeight: 800, marginBottom: 4 }}>FinovaOS AI Intelligence</div>
-                <div style={{ fontSize: 13, color: "rgba(255,255,255,.45)" }}>9 AI-powered features analyzing your real business data 24/7</div>
+                <div style={{ fontSize: 13, color: "rgba(255,255,255,.45)" }}>
+                  {enabledAiTools.length} AI-powered features analyzing your real business data 24/7
+                </div>
               </div>
               <Link prefetch={false} href="/dashboard/ai" style={{ marginLeft: "auto", padding: "12px 24px", borderRadius: 12, background: "linear-gradient(135deg,#6366f1,#4f46e5)", color: "white", textDecoration: "none", fontSize: 13, fontWeight: 700, whiteSpace: "nowrap", boxShadow: "0 8px 24px rgba(99,102,241,.35)" }}>
                 Open AI Center →
@@ -679,7 +681,9 @@ export default function BusinessGuidePage() {
             </div>
             <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(3,1fr)", gap: 10 }}>
               {[
-                { val: "9", label: "AI Tabs" }, { val: "24/7", label: "Monitoring" }, { val: "0", label: "OpenAI Required*" },
+                { val: String(enabledAiTools.length), label: "AI Tools" },
+                { val: "24/7", label: "Monitoring" },
+                { val: "0", label: "OpenAI Required*" },
               ].map((s) => (
                 <div key={s.label} style={{ background: "rgba(255,255,255,.04)", borderRadius: 12, padding: "14px", textAlign: "center" }}>
                   <div style={{ fontSize: 24, fontWeight: 800, color: "#a5b4fc" }}>{s.val}</div>
@@ -689,21 +693,25 @@ export default function BusinessGuidePage() {
             </div>
           </div>
 
-          {/* AI Feature Cards */}
+          {/* AI Feature Cards — dynamic from admin-controlled plan config */}
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(280px,1fr))", gap: 16 }}>
-            {AI_FEATURES.map((f) => (
-              <Link prefetch={false} key={f.title} href={f.link} style={{ textDecoration: "none" }}>
-                <div className="module-card" style={{ background: "rgba(255,255,255,.03)", border: "1px solid rgba(167,139,250,.12)", borderRadius: 18, padding: isMobile ? "12px 11px" : "22px 24px", height: "100%" }}>
-                  <div style={{ fontSize: 28, marginBottom: 12 }}>{f.icon}</div>
-                  <div style={{ fontSize: 15, fontWeight: 700, color: "white", marginBottom: 8 }}>{f.title}</div>
-                  <div style={{ fontSize: 13, color: "rgba(255,255,255,.5)", lineHeight: 1.7 }}>{f.desc}</div>
-                  <div style={{ marginTop: 14, fontSize: 11, fontWeight: 700, color: "#a78bfa", display: "flex", alignItems: "center", gap: 6 }}>
-                    Explore
-                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="5" y1="12" x2="19" y2="12" /><polyline points="12 5 19 12 12 19" /></svg>
+            {enabledAiTools.map((toolId) => {
+              const meta = AI_TOOL_META[toolId];
+              if (!meta) return null;
+              return (
+                <Link prefetch={false} key={toolId} href={`/dashboard/ai?tab=${meta.tab}`} style={{ textDecoration: "none" }}>
+                  <div className="module-card" style={{ background: "rgba(255,255,255,.03)", border: "1px solid rgba(167,139,250,.12)", borderRadius: 18, padding: isMobile ? "12px 11px" : "22px 24px", height: "100%" }}>
+                    <div style={{ fontSize: 28, marginBottom: 12 }}>{meta.icon}</div>
+                    <div style={{ fontSize: 15, fontWeight: 700, color: "white", marginBottom: 8 }}>{meta.label}</div>
+                    <div style={{ fontSize: 13, color: "rgba(255,255,255,.5)", lineHeight: 1.7 }}>{meta.desc}</div>
+                    <div style={{ marginTop: 14, fontSize: 11, fontWeight: 700, color: "#a78bfa", display: "flex", alignItems: "center", gap: 6 }}>
+                      Explore
+                      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="5" y1="12" x2="19" y2="12" /><polyline points="12 5 19 12 12 19" /></svg>
+                    </div>
                   </div>
-                </div>
-              </Link>
-            ))}
+                </Link>
+              );
+            })}
           </div>
 
           <div style={{ marginTop: 16, padding: isMobile ? "12px 10px" : "14px 20px", borderRadius: 12, background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.06)", fontSize: 12, color: "rgba(255,255,255,.4)", textAlign: "center" }}>

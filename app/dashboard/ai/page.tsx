@@ -5,8 +5,9 @@ import toast from "react-hot-toast";
 import { useEffect, useRef, useState, useCallback } from "react";
 import { useSearchParams } from "next/navigation";
 import { getCurrentUser } from "@/lib/auth";
-import {
 import { useResponsive } from "@/hooks/useResponsive";
+import { AI_TOOL_META, type AiToolId } from "@/lib/dashboardFeatureRegistry";
+import {
   XAxis, YAxis, CartesianGrid, Tooltip,
   ResponsiveContainer, BarChart, Bar, Legend,
 } from "recharts";
@@ -577,6 +578,7 @@ export default function AICommandCenter() {
   const { isMobile } = useResponsive();
   const searchParams = useSearchParams();
   const [tab, setTab] = useState<Tab>("overview");
+  const [enabledTabIds, setEnabledTabIds] = useState<Set<string> | null>(null);
   const [ctx, setCtx] = useState<FinCtx | null>(null);
   const [alerts, setAlerts] = useState<AnomalyAlert[]>([]);
   const [insights, setInsights] = useState<string>("");
@@ -1203,6 +1205,17 @@ export default function AICommandCenter() {
   }
 
   // ── Markdown renderer ──────────────────────────────────────────────────────
+  const cleanMarkdownText = (value: string) =>
+    value
+      .trim()
+      .replace(/^[-*#\d.]+\s*/, "")
+      .replace(/^â€¢\s*/, "")
+      .replace(/\*\*(.*?)\*\*/g, "$1")
+      .replace(/__(.*?)__/g, "$1")
+      .replace(/^\*+/, "")
+      .replace(/\*+$/, "")
+      .trim();
+
   function renderMarkdown(text: string) {
     // Normalize: ensure each block element starts on its own line
     const normalized = text

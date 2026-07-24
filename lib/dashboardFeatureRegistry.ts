@@ -2362,9 +2362,72 @@ export const DASHBOARD_FEATURE_DEFS: DashboardFeatureDefinition[] = [
     section: "Inventory",
     businessTypes: ["wholesale", "wholesale_multistore", "trading", "distribution"],
   },
+  // ── AI Intelligence tools (sub-tab level; routes are virtual — won't trigger layout redirects) ──
+  { id: "AI_OVERVIEW",        label: "Business Health Score",   route: "/dashboard/ai?tab=overview",        business: "trading", businessLabel: "AI Intelligence", section: "Core",      description: "Real-time score 0–100 based on revenue, profit, cash, and receivables." },
+  { id: "AI_CHAT",            label: "Ask AI Anything",         route: "/dashboard/ai?tab=chat",            business: "trading", businessLabel: "AI Intelligence", section: "Core",      description: "Chat with your financial data in plain English. Get instant answers." },
+  { id: "AI_INSIGHTS",        label: "AI Insights",             route: "/dashboard/ai?tab=insights",        business: "trading", businessLabel: "AI Intelligence", section: "Core",      description: "Deep analytical insights into your financial performance." },
+  { id: "AI_ALERTS",          label: "Smart Alerts",            route: "/dashboard/ai?tab=alerts",          business: "trading", businessLabel: "AI Intelligence", section: "Core",      description: "Auto-detect overdue invoices, cash risks, expense spikes, revenue drops." },
+  { id: "AI_FORECAST",        label: "30/60/90-Day Forecast",   route: "/dashboard/ai?tab=forecast",        business: "trading", businessLabel: "AI Intelligence", section: "Reports",   description: "AI predicts your next 3 months of revenue, expenses, and cashflow." },
+  { id: "AI_TAX",             label: "Tax Estimate",            route: "/dashboard/ai?tab=tax",             business: "trading", businessLabel: "AI Intelligence", section: "Reports",   description: "Get AI-powered tax estimates based on your current financials." },
+  { id: "AI_REPORT",          label: "Monthly Report",          route: "/dashboard/ai?tab=report",          business: "trading", businessLabel: "AI Intelligence", section: "Reports",   description: "AI-generated monthly performance report with insights." },
+  { id: "AI_RATIOS",          label: "Financial Ratios",        route: "/dashboard/ai?tab=ratios",          business: "trading", businessLabel: "AI Intelligence", section: "Reports",   description: "Key financial ratios computed and benchmarked automatically." },
+  { id: "AI_BUDGET",          label: "Budget & Variance",       route: "/dashboard/ai?tab=budget",          business: "trading", businessLabel: "AI Intelligence", section: "Reports",   description: "Track budget vs actual and get AI-powered variance analysis." },
+  { id: "AI_RECOMMENDATIONS", label: "AI Recommendations",      route: "/dashboard/ai?tab=recommendations", business: "trading", businessLabel: "AI Intelligence", section: "Operations", description: "Get prioritized action items to improve business performance." },
+  { id: "AI_REMINDERS",       label: "Invoice Reminders",       route: "/dashboard/ai?tab=reminders",       business: "trading", businessLabel: "AI Intelligence", section: "Operations", description: "Auto-detect and send payment reminders for overdue invoices." },
+  { id: "AI_INVOICE_GEN",     label: "Quick Invoice",           route: "/dashboard/ai?tab=invoice-gen",     business: "trading", businessLabel: "AI Intelligence", section: "Operations", description: "Generate invoices from natural language descriptions." },
+  { id: "AI_SCAN",            label: "Scan Receipt",            route: "/dashboard/ai?tab=scan",            business: "trading", businessLabel: "AI Intelligence", section: "Operations", description: "Scan receipts and invoices to auto-create expense entries." },
+  { id: "AI_RECONCILIATION",  label: "AI Reconciliation",       route: "/dashboard/ai?tab=reconciliation",  business: "trading", businessLabel: "AI Intelligence", section: "Operations", description: "AI-powered bank reconciliation matching and verification." },
+  { id: "AI_MARKET",          label: "Market Intelligence",     route: "/dashboard/ai?tab=market",          business: "trading", businessLabel: "AI Intelligence", section: "Growth",    description: "Discover what products to add and what trends are hitting your industry." },
+  { id: "AI_ADVISOR",         label: "Business Advisor",        route: "/dashboard/ai?tab=advisor",         business: "trading", businessLabel: "AI Intelligence", section: "Growth",    description: "Get a personalized growth plan, cross-sell ideas, and risk warnings." },
+  { id: "AI_INV_FORECAST",    label: "Stock Forecast",          route: "/dashboard/ai?tab=inv-forecast",    business: "trading", businessLabel: "AI Intelligence", section: "Inventory", description: "Predict inventory needs and reorder points with AI." },
+  { id: "AI_CASHFLOW_OPT",    label: "Cash Optimizer",          route: "/dashboard/ai?tab=cashflow-opt",    business: "trading", businessLabel: "AI Intelligence", section: "Inventory", description: "Optimize cash flow with AI-driven payment scheduling." },
+  { id: "AI_SUPPLIER_INTEL",  label: "Supplier Intel",          route: "/dashboard/ai?tab=supplier-intel",  business: "trading", businessLabel: "AI Intelligence", section: "Inventory", description: "Analyze supplier performance and negotiate better terms." },
+  { id: "AI_CHURN",           label: "Churn Prediction",        route: "/dashboard/ai?tab=churn",           business: "trading", businessLabel: "AI Intelligence", section: "Analytics", description: "Identify customers at risk of churning before they leave." },
+  { id: "AI_CUSTOMER_PROFIT", label: "Customer Profitability",  route: "/dashboard/ai?tab=customer-profit", business: "trading", businessLabel: "AI Intelligence", section: "Analytics", description: "Analyze profitability by customer segment and individual." },
+  { id: "AI_GL_SUGGEST",      label: "GL Auto-Code",            route: "/dashboard/ai?tab=gl-suggest",      business: "trading", businessLabel: "AI Intelligence", section: "Analytics", description: "Automatically suggest general ledger codes for transactions." },
+  { id: "AI_EXPENSE_CAT",     label: "Expense Categories",      route: "/dashboard/ai?tab=expense-cat",     business: "trading", businessLabel: "AI Intelligence", section: "Analytics", description: "AI-powered expense categorization for better tracking." },
+  { id: "AI_DUPLICATE",       label: "Duplicate Detection",     route: "/dashboard/ai?tab=duplicate",       business: "trading", businessLabel: "AI Intelligence", section: "Analytics", description: "Find and flag duplicate transactions and invoices." },
 ];
 
 export const DASHBOARD_FEATURE_IDS = DASHBOARD_FEATURE_DEFS.map((feature) => feature.id);
+
+export const AI_TOOL_IDS = [
+  "AI_OVERVIEW", "AI_CHAT", "AI_INSIGHTS", "AI_ALERTS",
+  "AI_FORECAST", "AI_TAX", "AI_REPORT", "AI_RATIOS", "AI_BUDGET",
+  "AI_RECOMMENDATIONS", "AI_REMINDERS", "AI_INVOICE_GEN", "AI_SCAN", "AI_RECONCILIATION",
+  "AI_MARKET", "AI_ADVISOR",
+  "AI_INV_FORECAST", "AI_CASHFLOW_OPT", "AI_SUPPLIER_INTEL",
+  "AI_CHURN", "AI_CUSTOMER_PROFIT", "AI_GL_SUGGEST", "AI_EXPENSE_CAT", "AI_DUPLICATE",
+] as const;
+
+export type AiToolId = (typeof AI_TOOL_IDS)[number];
+
+export const AI_TOOL_META: Record<AiToolId, { icon: string; label: string; desc: string; tab: string }> = {
+  AI_OVERVIEW:        { icon: "⚡",  label: "Business Health Score",  desc: "Real-time score 0–100 based on revenue, profit, cash, and receivables.",           tab: "overview" },
+  AI_CHAT:            { icon: "💬",  label: "Ask AI Anything",         desc: "Chat with your financial data in plain English. Get instant answers.",             tab: "chat" },
+  AI_INSIGHTS:        { icon: "✦",   label: "AI Insights",             desc: "Deep analytical insights into your financial performance.",                         tab: "insights" },
+  AI_ALERTS:          { icon: "🔔",  label: "Smart Alerts",            desc: "Auto-detect overdue invoices, cash risks, expense spikes, revenue drops.",          tab: "alerts" },
+  AI_FORECAST:        { icon: "📈",  label: "30/60/90-Day Forecast",   desc: "AI predicts your next 3 months of revenue, expenses, and cashflow.",               tab: "forecast" },
+  AI_TAX:             { icon: "🧾",  label: "Tax Estimate",            desc: "Get AI-powered tax estimates based on your current financials.",                    tab: "tax" },
+  AI_REPORT:          { icon: "📄",  label: "Monthly Report",          desc: "AI-generated monthly performance report with insights.",                            tab: "report" },
+  AI_RATIOS:          { icon: "⚖️",  label: "Financial Ratios",        desc: "Key financial ratios computed and benchmarked automatically.",                      tab: "ratios" },
+  AI_BUDGET:          { icon: "📊",  label: "Budget & Variance",       desc: "Track budget vs actual and get AI-powered variance analysis.",                      tab: "budget" },
+  AI_RECOMMENDATIONS: { icon: "🎯",  label: "AI Recommendations",      desc: "Get prioritized action items to improve business performance.",                     tab: "recommendations" },
+  AI_REMINDERS:       { icon: "📮",  label: "Invoice Reminders",       desc: "Auto-detect and send payment reminders for overdue invoices.",                     tab: "reminders" },
+  AI_INVOICE_GEN:     { icon: "✍️",  label: "Quick Invoice",           desc: "Generate invoices from natural language descriptions.",                             tab: "invoice-gen" },
+  AI_SCAN:            { icon: "📷",  label: "Scan Receipt",            desc: "Scan receipts and invoices to auto-create expense entries.",                        tab: "scan" },
+  AI_RECONCILIATION:  { icon: "🔗",  label: "AI Reconciliation",       desc: "AI-powered bank reconciliation matching and verification.",                         tab: "reconciliation" },
+  AI_MARKET:          { icon: "🌐",  label: "Market Intelligence",     desc: "Discover what products to add and what trends are hitting your industry.",          tab: "market" },
+  AI_ADVISOR:         { icon: "🧭",  label: "Business Advisor",        desc: "Get a personalized growth plan, cross-sell ideas, and risk warnings.",              tab: "advisor" },
+  AI_INV_FORECAST:    { icon: "📦",  label: "Stock Forecast",          desc: "Predict inventory needs and reorder points with AI.",                               tab: "inv-forecast" },
+  AI_CASHFLOW_OPT:    { icon: "💵",  label: "Cash Optimizer",          desc: "Optimize cash flow with AI-driven payment scheduling.",                             tab: "cashflow-opt" },
+  AI_SUPPLIER_INTEL:  { icon: "🤝",  label: "Supplier Intel",          desc: "Analyze supplier performance and negotiate better terms.",                          tab: "supplier-intel" },
+  AI_CHURN:           { icon: "👥",  label: "Churn Prediction",        desc: "Identify customers at risk of churning before they leave.",                         tab: "churn" },
+  AI_CUSTOMER_PROFIT: { icon: "👤",  label: "Customer Profitability",  desc: "Analyze profitability by customer segment and individual.",                         tab: "customer-profit" },
+  AI_GL_SUGGEST:      { icon: "🏷️",  label: "GL Auto-Code",            desc: "Automatically suggest general ledger codes for transactions.",                      tab: "gl-suggest" },
+  AI_EXPENSE_CAT:     { icon: "📂",  label: "Expense Categories",      desc: "AI-powered expense categorization for better tracking.",                            tab: "expense-cat" },
+  AI_DUPLICATE:       { icon: "🔍",  label: "Duplicate Detection",     desc: "Find and flag duplicate transactions and invoices.",                                tab: "duplicate" },
+};
 
 export function createDefaultDashboardFeatureFlags(): Record<DashboardFeaturePlanCode, string[]> {
   return {
