@@ -371,8 +371,8 @@ const CATEGORIES = [
       },
       {
         name: "AI Financial Assistant",
-        description: "Ask questions about your business in plain English. Get instant summaries, spot anomalies, and receive actionable recommendations powered by Claude AI, built directly into your dashboard.",
-        highlights: ["Natural language queries", "Multi-language support", "Claude AI powered"],
+        description: "Ask questions about your business in plain English. Get instant summaries, spot anomalies, and receive actionable recommendations powered by FinovaOS AI, built directly into your dashboard.",
+        highlights: ["Natural language queries", "Multi-language support", "FinovaOS AI powered"],
         mockType: "ai",
       },
     ],

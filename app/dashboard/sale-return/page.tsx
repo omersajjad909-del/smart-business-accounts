@@ -18,7 +18,7 @@ const MUTED  = "var(--text-muted)";
 const BG     = "var(--app-bg)";
 
 function inp(extra?: React.CSSProperties): React.CSSProperties {
-  return { padding: isMobile ? "8px 8px" : "9px 13px", borderRadius: 8, border: `1.5px solid ${BORDER}`, background: BG, color: TEXT, fontFamily: FONT, fontSize: 13.5, outline: "none", width: "100%", boxSizing: "border-box" as const, ...extra };
+  return { padding: "9px 13px", borderRadius: 8, border: `1.5px solid ${BORDER}`, background: BG, color: TEXT, fontFamily: FONT, fontSize: 13.5, outline: "none", width: "100%", boxSizing: "border-box" as const, ...extra };
 }
 function Label({ children }: { children: React.ReactNode }) {
   return <div style={{ fontSize: 10.5, color: MUTED, fontWeight: 700, marginBottom: 5, textTransform: "uppercase" as const, letterSpacing: 0.6 }}>{children}</div>;
@@ -46,7 +46,6 @@ export default function SalesReturnPage() {
   const today = new Date().toISOString().slice(0, 10);
   const user  = getCurrentUser();
 
-  const [isMobile, setIsMobile] = useState(false);
   const [companyInfo, setCompanyInfo] = useState<any>(null);
   const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [returns,  setReturns]  = useState<SaleReturn[]>([]);
@@ -73,15 +72,6 @@ export default function SalesReturnPage() {
   const [preview,          setPreview]          = useState(false);
   const [savedData,        setSavedData]        = useState<SavedData | null>(null);
   const [returnNo,         setReturnNo]         = useState("");
-
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    const media = window.matchMedia("(max-width: 900px)");
-    const onChange = () => setIsMobile(media.matches);
-    onChange();
-    media.addEventListener("change", onChange);
-    return () => media.removeEventListener("change", onChange);
-  }, []);
 
   useEffect(() => {
     fetch("/api/me/company").then(r => r.ok ? r.json() : null).then(d => { if (d) setCompanyInfo(d); }).catch(() => {});

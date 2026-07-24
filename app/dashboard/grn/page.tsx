@@ -38,7 +38,6 @@ export default function GRNPage() {
   const { isMobile } = useResponsive();
   const today = new Date().toISOString().slice(0, 10);
   const user  = getCurrentUser();
-  const [isMobile, setIsMobile] = useState(false);
 
   const [suppliers, setSuppliers] = useState<any[]>([]);
   const [allItems,  setAllItems]  = useState<any[]>([]);
@@ -59,15 +58,6 @@ export default function GRNPage() {
   const [rows, setRows] = useState<GRNItem[]>([
     { itemId: "", name: "", orderedQty: "", receivedQty: "", rate: "", remarks: "" },
   ]);
-
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    const media = window.matchMedia("(max-width: 900px)");
-    const onChange = () => setIsMobile(media.matches);
-    onChange();
-    media.addEventListener("change", onChange);
-    return () => media.removeEventListener("change", onChange);
-  }, []);
 
   function bh(): Record<string, string> {
     return { "Content-Type": "application/json", "x-company-id": user?.companyId || "", "x-user-role": user?.role || "", "x-user-id": user?.id || "" };

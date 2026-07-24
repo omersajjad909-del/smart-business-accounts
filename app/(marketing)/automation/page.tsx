@@ -151,7 +151,7 @@ const FEATURES = [
     glow: "rgba(251,191,36,.15)",
     border: "rgba(251,191,36,.25)",
     tagline: "Professional marketing content in 10 seconds",
-    description: "Generate high-quality social media posts, email campaigns, ad copy, product descriptions, and WhatsApp messages using Claude AI. Just describe what you want — get ready-to-publish content in English or Urdu instantly.",
+    description: "Generate high-quality social media posts, email campaigns, ad copy, product descriptions, and WhatsApp messages using FinovaOS AI. Just describe what you want — get ready-to-publish content in English or Urdu instantly.",
     bullets: [
       "Social posts, email, ad copy, WhatsApp, blog",
       "English and Urdu / Roman Urdu support",
@@ -178,7 +178,7 @@ const COMPARE_TOOLS = [
 const FAQS = [
   { q: "Can I buy only the Automation add-on without a main plan?", a: "The Automation add-on is available with any active FinovaOS plan: Starter, Professional, or Enterprise. You need an active base plan first." },
   { q: "What is required for WhatsApp Auto-Reply?", a: "You need a WhatsApp Business API account (via Meta). You can apply through Meta Business Suite, and setup usually takes 1-3 days. We provide a step-by-step guide." },
-  { q: "Can AI content be generated in Urdu as well?", a: "Yes. Claude AI can generate content in both Urdu and Roman Urdu. You can choose your preferred language from the language dropdown." },
+  { q: "Can AI content be generated in Urdu as well?", a: "Yes. FinovaOS AI can generate content in both Urdu and Roman Urdu. You can choose your preferred language from the language dropdown." },
   { q: "Is it difficult to add the chatbot to my website?", a: "Not at all. Copy one script tag and paste it before </body> on your website. No complex coding required, and setup takes about 2 minutes." },
   { q: "Can I import existing leads?", a: "Yes. You can upload leads via Excel/CSV using the import wizard. This feature is available on Professional and Enterprise plans." },
   { q: "Is a demo available?", a: "Yes, you can book a personalized demo where we show the automation setup for your business. Click 'Get Started' to book." },
@@ -359,7 +359,7 @@ export default function AutomationLandingPage() {
             { icon: "🔗", text: "Webhooks — unlimited outbound & inbound tokens" },
             { icon: "📱", text: "Social media — Facebook, Instagram, LinkedIn" },
             { icon: "📊", text: "Google Sheets — unlimited syncs" },
-            { icon: "✍️", text: "AI content — unlimited generation (Claude AI)" },
+            { icon: "✍️", text: "AI content — unlimited generation (FinovaOS AI)" },
             { icon: "📈", text: "Full analytics dashboard" },
             { icon: "🔒", text: "HMAC-signed webhooks for security" },
             { icon: "📞", text: "Priority support for add-on issues" },

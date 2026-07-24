@@ -65,16 +65,6 @@ export default function QuotationPage() {
 
   const [authorized, setAuthorized] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [isMobile, setIsMobile] = useState(false);
-
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    const media = window.matchMedia("(max-width: 900px)");
-    const onChange = () => setIsMobile(media.matches);
-    onChange();
-    media.addEventListener("change", onChange);
-    return () => media.removeEventListener("change", onChange);
-  }, []);
 
   const [customers, setCustomers] = useState<Account[]>([]);
   const [items, setItems] = useState<Item[]>([]);

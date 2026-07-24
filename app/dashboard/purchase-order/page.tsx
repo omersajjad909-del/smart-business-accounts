@@ -38,7 +38,7 @@ const STATUS_COLORS: Record<string, { bg: string; text: string; border: string }
 
 function inp(extra?: React.CSSProperties): React.CSSProperties {
   return {
-    padding: isMobile ? "8px 8px" : "9px 13px", borderRadius: 8, border: `1.5px solid ${BORDER}`,
+    padding: "9px 13px", borderRadius: 8, border: `1.5px solid ${BORDER}`,
     background: BG, color: TEXT, fontFamily: FONT, fontSize: 13.5, outline: "none",
     width: "100%", boxSizing: "border-box" as const, ...extra,
   };
@@ -51,7 +51,6 @@ export default function PurchaseOrderPage() {
   const { isMobile } = useResponsive();
   const today = new Date().toISOString().slice(0, 10);
   const user = getCurrentUser();
-  const [isMobile, setIsMobile] = useState(false);
 
   const [suppliers, setSuppliers] = useState<any[]>([]);
   const [items, setItems] = useState<any[]>([]);
@@ -82,15 +81,6 @@ export default function PurchaseOrderPage() {
   const [sendingEmail, setSendingEmail] = useState(false);
   const [emailModalOpen, setEmailModalOpen] = useState(false);
   const [recipientEmail, setRecipientEmail] = useState("");
-
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    const media = window.matchMedia("(max-width: 900px)");
-    const onChange = () => setIsMobile(media.matches);
-    onChange();
-    media.addEventListener("change", onChange);
-    return () => media.removeEventListener("change", onChange);
-  }, []);
 
   useEffect(() => {
     function handleKey(e: KeyboardEvent) {

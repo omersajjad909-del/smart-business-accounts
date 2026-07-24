@@ -7,8 +7,8 @@ import { getCurrentUser, getStoredDemoBusinessPreference } from "@/lib/auth";
 import { BUSINESS_TYPES, type BusinessType } from "@/lib/businessModules";
 import { CURRENCY_SYMBOL } from "@/lib/currency-client";
 import DemoBusinessShowcase from "./DemoBusinessShowcase";
-import {
 import { useResponsive } from "@/hooks/useResponsive";
+import {
   LineChart,
   Line,
   AreaChart,
