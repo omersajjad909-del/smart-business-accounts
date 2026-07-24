@@ -674,6 +674,20 @@ export default function AICommandCenter() {
   const chatInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
+    fetch("/api/me/ai-tools", { cache: "no-store" })
+      .then(r => r.ok ? r.json() : null)
+      .then(data => {
+        if (Array.isArray(data?.tools)) {
+          const tabIds = new Set<string>(
+            (data.tools as AiToolId[]).map(id => AI_TOOL_META[id]?.tab).filter(Boolean)
+          );
+          setEnabledTabIds(tabIds);
+        }
+      })
+      .catch(() => {});
+  }, []);
+
+  useEffect(() => {
     const nextTab = searchParams.get("tab");
     const allowedTabs = new Set<Tab>([
       "overview", "chat", "insights", "alerts", "forecast",
@@ -703,7 +717,7 @@ export default function AICommandCenter() {
     // Welcome message in chat
     setMessages([{
       role: "assistant",
-      content: "👋 Hi! I'm **FinovaOS AI** — your financial intelligence assistant.\n\nI can see your real business data and help you with:\n• Revenue & expense analysis\n• Cash flow forecasting\n• Invoice & customer insights\n• Inventory intelligence\n• Business recommendations\n\nWhat would you like to know?",
+      content: "👋 Hi! I'm FinovaOS AI — your financial intelligence assistant.\n\nI can see your real business data and help you with:\n• Revenue & expense analysis\n• Cash flow forecasting\n• Invoice & customer insights\n• Inventory intelligence\n• Business recommendations\n\nWhat would you like to know?",
       ts: Date.now(),
     }]);
 
@@ -1216,6 +1230,7 @@ export default function AICommandCenter() {
       .trim();
 
   function renderMarkdown(text: string) {
+    const boldMarker = "*".repeat(2);
     // Normalize: ensure each block element starts on its own line
     const normalized = text
       .replace(/\r\n/g, "\n")
@@ -1267,8 +1282,8 @@ export default function AICommandCenter() {
         );
       }
 
-      // Whole-line bold **text**
-      if (line.startsWith("**") && line.endsWith("**") && line.length > 4)
+      // Whole-line bold text
+      if (line.startsWith(boldMarker) && line.endsWith(boldMarker) && line.length > 4)
         return <div key={i} style={{ fontWeight: 700, color: "white", fontSize: 14, margin: "6px 0 2px" }}>{cleanMarkdownText(line)}</div>;
 
       // Normal paragraph — inline bold + RTL support
@@ -1296,44 +1311,48 @@ export default function AICommandCenter() {
     "Estimate my tax position this month",
   ];
 
-  const TABS: { id: Tab; label: string; icon: string }[] = [
-    { id: "overview",         label: "Overview",              icon: "⚡" },
-    { id: "chat",             label: "Ask AI",                icon: "💬" },
-    { id: "insights",         label: "Insights",              icon: "✦" },
+  const ALL_TABS: { id: Tab; label: string; icon: string }[] = [
+    { id: "overview",         label: "Overview",               icon: "⚡" },
+    { id: "chat",             label: "Ask AI",                 icon: "💬" },
+    { id: "insights",         label: "Insights",               icon: "✦" },
     { id: "alerts",           label: `Alerts${alerts.length > 0 ? ` (${alerts.length})` : ""}`, icon: "🔔" },
-    { id: "forecast",         label: "Forecast",              icon: "📈" },
-    { id: "recommendations",  label: "Recommendations",       icon: "🎯" },
-    { id: "reminders",        label: "Invoice Reminders",     icon: "🔔" },
-    { id: "tax",              label: "Tax Estimate",          icon: "🧾" },
-    { id: "report",           label: "Monthly Report",        icon: "📄" },
-    { id: "market",           label: "Market Intel",          icon: "🌐" },
-    { id: "advisor",          label: "Advisor",               icon: "🧭" },
-    { id: "reconciliation",   label: "Reconciliation",        icon: "🔗" },
-    { id: "scan",             label: "Scan Receipt",          icon: "📷" },
-    { id: "invoice-gen",      label: "Quick Invoice",         icon: "✍️" },
-    { id: "inv-forecast",     label: "Stock Forecast",        icon: "📦" },
-    { id: "cashflow-opt",     label: "Cash Optimizer",        icon: "💵" },
-    { id: "churn",            label: "Churn Prediction",      icon: "👥" },
-    { id: "supplier-intel",   label: "Supplier Intel",        icon: "🤝" },
-    { id: "gl-suggest",       label: "GL Auto-Code",          icon: "🏷️" },
-    { id: "expense-cat",      label: "Expense Categories",    icon: "📂" },
-    { id: "budget",           label: "Budget & Variance",     icon: "📊" },
-    { id: "duplicate",        label: "Duplicate Detection",   icon: "🔍" },
+    { id: "forecast",         label: "Forecast",               icon: "📈" },
+    { id: "recommendations",  label: "Recommendations",        icon: "🎯" },
+    { id: "reminders",        label: "Invoice Reminders",      icon: "🔔" },
+    { id: "tax",              label: "Tax Estimate",           icon: "🧾" },
+    { id: "report",           label: "Monthly Report",         icon: "📄" },
+    { id: "market",           label: "Market Intel",           icon: "🌐" },
+    { id: "advisor",          label: "Advisor",                icon: "🧭" },
+    { id: "reconciliation",   label: "Reconciliation",         icon: "🔗" },
+    { id: "scan",             label: "Scan Receipt",           icon: "📷" },
+    { id: "invoice-gen",      label: "Quick Invoice",          icon: "✍️" },
+    { id: "inv-forecast",     label: "Stock Forecast",         icon: "📦" },
+    { id: "cashflow-opt",     label: "Cash Optimizer",         icon: "💵" },
+    { id: "churn",            label: "Churn Prediction",       icon: "👥" },
+    { id: "supplier-intel",   label: "Supplier Intel",         icon: "🤝" },
+    { id: "gl-suggest",       label: "GL Auto-Code",           icon: "🏷️" },
+    { id: "expense-cat",      label: "Expense Categories",     icon: "📂" },
+    { id: "budget",           label: "Budget & Variance",      icon: "📊" },
+    { id: "duplicate",        label: "Duplicate Detection",    icon: "🔍" },
     { id: "customer-profit",  label: "Customer Profitability", icon: "👤" },
-    { id: "ratios",           label: "Financial Ratios",      icon: "⚖️" },
+    { id: "ratios",           label: "Financial Ratios",       icon: "⚖️" },
   ];
+  const TABS = enabledTabIds ? ALL_TABS.filter(t => enabledTabIds.has(t.id)) : ALL_TABS;
+  const enabledTabSet = new Set(TABS.map(t => t.id));
 
-  const TAB_GROUPS: { id: string; label: string; icon: string; color: string; tabs: Tab[] }[] = [
-    { id: "core",      label: "Core",       icon: "⚡", color: "#6366f1", tabs: ["overview", "chat", "insights", "alerts"] },
-    { id: "reports",   label: "Reports",    icon: "📊", color: "#10b981", tabs: ["forecast", "tax", "report", "ratios", "budget"] },
-    { id: "ops",       label: "Operations", icon: "⚙️", color: "#f59e0b", tabs: ["recommendations", "reminders", "invoice-gen", "scan", "reconciliation"] },
-    { id: "growth",    label: "Growth",     icon: "🌐", color: "#8b5cf6", tabs: ["market", "advisor"] },
-    { id: "inventory", label: "Inventory",  icon: "📦", color: "#0ea5e9", tabs: ["inv-forecast", "cashflow-opt", "supplier-intel"] },
-    { id: "analytics", label: "Analytics",  icon: "🔬", color: "#ec4899", tabs: ["churn", "customer-profit", "gl-suggest", "expense-cat", "duplicate"] },
-  ];
+  const TAB_GROUPS = [
+    { id: "core",      label: "Core",       icon: "⚡", color: "#6366f1", tabs: ["overview", "chat", "insights", "alerts"] as Tab[] },
+    { id: "reports",   label: "Reports",    icon: "📊", color: "#10b981", tabs: ["forecast", "tax", "report", "ratios", "budget"] as Tab[] },
+    { id: "ops",       label: "Operations", icon: "⚙️", color: "#f59e0b", tabs: ["recommendations", "reminders", "invoice-gen", "scan", "reconciliation"] as Tab[] },
+    { id: "growth",    label: "Growth",     icon: "🌐", color: "#8b5cf6", tabs: ["market", "advisor"] as Tab[] },
+    { id: "inventory", label: "Inventory",  icon: "📦", color: "#0ea5e9", tabs: ["inv-forecast", "cashflow-opt", "supplier-intel"] as Tab[] },
+    { id: "analytics", label: "Analytics",  icon: "🔬", color: "#ec4899", tabs: ["churn", "customer-profit", "gl-suggest", "expense-cat", "duplicate"] as Tab[] },
+  ]
+    .map(g => ({ ...g, tabs: g.tabs.filter(t => enabledTabSet.has(t)) }))
+    .filter(g => g.tabs.length > 0);
 
   const activeGroup = TAB_GROUPS.find(g => g.tabs.includes(tab)) ?? TAB_GROUPS[0];
-  const tabsInGroup = TABS.filter(t => activeGroup.tabs.includes(t.id));
+  const tabsInGroup = TABS.filter(t => activeGroup?.tabs.includes(t.id));
 
   return (
     <div style={{ fontFamily: "'Outfit','DM Sans',sans-serif", color: "white", display: "flex", flexDirection: "column", height: "calc(100vh - 56px)", overflow: "hidden", margin: "-16px -12px", width: "calc(100% + 24px)", maxWidth: "none" }}>
@@ -1911,7 +1930,7 @@ export default function AICommandCenter() {
                       }}>
                         {m.role === "assistant"
                           ? <div>{renderMarkdown(m.content)}{streaming && i === messages.filter(x => x.content).length - 1 && m.content && <span className="cursor-blink" />}</div>
-                          : <span>{m.content}</span>
+                          : <span>{cleanMarkdownText(m.content)}</span>
                         }
                       </div>
                     </div>
@@ -2087,7 +2106,7 @@ export default function AICommandCenter() {
                     <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 12, color: "rgba(255,255,255,.6)" }}>📈 Revenue Analyzer</div>
                     {revenueAnalyzer ? (
                       <div style={{ display: "grid", gap: 8 }}>
-                        {revenueAnalyzer.summary.map((line) => <div key={line} style={{ fontSize: 12.5, color: "rgba(255,255,255,.72)" }}>{line}</div>)}
+                        {revenueAnalyzer.summary.map((line) => <div key={line} style={{ fontSize: 12.5, color: "rgba(255,255,255,.72)" }}>{cleanMarkdownText(line)}</div>)}
                         {revenueAnalyzer.topCustomer && <div style={{ fontSize: 12, color: "#a5b4fc" }}>Top customer: {revenueAnalyzer.topCustomer.name}</div>}
                         {revenueAnalyzer.topProduct && <div style={{ fontSize: 12, color: "#6ee7b7" }}>Top product: {revenueAnalyzer.topProduct.name}</div>}
                         {revenueAnalyzer.bestMonth && <div style={{ fontSize: 12, color: "rgba(255,255,255,.5)" }}>Best month: {revenueAnalyzer.bestMonth.month}</div>}
@@ -2100,7 +2119,7 @@ export default function AICommandCenter() {
                     {profitability ? (
                       <div style={{ display: "grid", gap: 8 }}>
                         <div style={{ fontSize: 24, fontWeight: 900, color: profitability.marginPct >= 0 ? "#10b981" : "#ef4444" }}>{profitability.marginPct}% margin</div>
-                        {profitability.summary.map((line) => <div key={line} style={{ fontSize: 12.5, color: "rgba(255,255,255,.72)" }}>{line}</div>)}
+                        {profitability.summary.map((line) => <div key={line} style={{ fontSize: 12.5, color: "rgba(255,255,255,.72)" }}>{cleanMarkdownText(line)}</div>)}
                       </div>
                     ) : <div style={{ color: "rgba(255,255,255,.35)", fontSize: 13 }}>Loading profitability...</div>}
                   </Panel>
@@ -2109,7 +2128,7 @@ export default function AICommandCenter() {
                     <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 12, color: "rgba(255,255,255,.6)" }}>📦 Inventory Intelligence</div>
                     {inventoryIntel ? (
                       <div style={{ display: "grid", gap: 8 }}>
-                        {inventoryIntel.summary.map((line) => <div key={line} style={{ fontSize: 12.5, color: "rgba(255,255,255,.72)" }}>{line}</div>)}
+                        {inventoryIntel.summary.map((line) => <div key={line} style={{ fontSize: 12.5, color: "rgba(255,255,255,.72)" }}>{cleanMarkdownText(line)}</div>)}
                         <div style={{ fontSize: 12, color: "#fcd34d" }}>Reorder now: {inventoryIntel.reorderItems.join(", ") || "No urgent items"}</div>
                         <div style={{ fontSize: 12, color: "rgba(255,255,255,.5)" }}>Dead stock: {inventoryIntel.deadStockItems.join(", ") || "None"}</div>
                       </div>
@@ -2411,7 +2430,7 @@ export default function AICommandCenter() {
                   </div>
                   <div style={{ display: "grid", gap: 8, marginTop: 14 }}>
                     {invoiceReminders.summary.map((line) => (
-                      <div key={line} style={{ fontSize: 12.5, color: "rgba(255,255,255,.72)", lineHeight: 1.6 }}>{line}</div>
+                      <div key={line} style={{ fontSize: 12.5, color: "rgba(255,255,255,.72)", lineHeight: 1.6 }}>{cleanMarkdownText(line)}</div>
                     ))}
                   </div>
                 </Panel>
