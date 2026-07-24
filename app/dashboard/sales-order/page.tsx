@@ -659,13 +659,13 @@ export default function SalesOrderPage() {
                 </div>
               ) : (
                 <>
-                  <div style={{ overflowX: "auto" }}><div style={{ display: "grid", gridTemplateColumns: "1fr 80px 110px 90px 32px", gap: 8, marginBottom: 6 }}><div style={{ minWidth: 480 }}>
+                  <div style={{ overflowX: "auto" }}><div style={{ display: "grid", gridTemplateColumns: "1fr 80px 110px 90px 32px", gap: 8, marginBottom: 6, minWidth: 480 }}>
                     {["Item Name", "Qty", "Unit Price", "Total", ""].map((h) => (
                       <span key={h} style={{ fontSize: 11, color: "var(--text-muted)", fontWeight: 600, textTransform: "uppercase" }}>{h}</span>
                     ))}
-                  </div>
+                  </div></div>
                   {form.items.map((item, idx) => (
-                    <div style={{ overflowX: "auto" }}><div key={idx} style={{ display: "grid", gridTemplateColumns: "1fr 80px 110px 90px 32px", gap: 8, marginBottom: 8, alignItems: "center" }}><div style={{ minWidth: 480 }}>
+                    <div style={{ overflowX: "auto" }}><div key={idx} style={{ display: "grid", gridTemplateColumns: "1fr 80px 110px 90px 32px", gap: 8, marginBottom: 8, alignItems: "center", minWidth: 480 }}>
                       <select style={inputStyle} value={item.itemId || item.name}
                         onChange={(e) => {
                           const selected = itemList.find(i => i.id === e.target.value);
@@ -683,7 +683,7 @@ export default function SalesOrderPage() {
                       <input type="number" min={0} step="0.01" style={{ ...inputStyle, textAlign: "right" }} value={item.unitPrice} onChange={(e) => updateItem(idx, "unitPrice", e.target.value)} />
                       <span style={{ fontSize: 14, fontWeight: 600, color: "var(--text-primary)", textAlign: "right", padding: "0 4px" }}>{fmt(item.qty * item.unitPrice)}</span>
                       <button onClick={() => removeItem(idx)} disabled={form.items.length === 1} style={{ background: "transparent", border: "none", cursor: form.items.length === 1 ? "not-allowed" : "pointer", color: form.items.length === 1 ? "var(--text-muted)" : "#f87171", fontSize: 18, lineHeight: 1, padding: 0 }}>×</button>
-                    </div>
+                    </div></div>
                   ))}
                 </>
               )}

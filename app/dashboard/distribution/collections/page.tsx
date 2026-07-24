@@ -6,8 +6,8 @@ import toast from "react-hot-toast";
 import { useEffect, useMemo, useState } from "react";
 import { getCurrentUser } from "@/lib/auth";
 import { useBusinessRecords } from "@/lib/useBusinessRecords";
-import {
 import { useResponsive } from "@/hooks/useResponsive";
+import {
   distributionBg,
   distributionBorder,
   distributionFont,

@@ -1229,66 +1229,147 @@ export default function AICommandCenter() {
       .replace(/\*+$/, "")
       .trim();
 
+  function renderInline(raw: string): React.ReactNode {
+    const cleaned = raw
+      .trim()
+      .replace(/^(?:[-#]+\s*|\d+[.)]\s*|[•*]\s*)/, "")
+      .replace(/^\*+\s*/, "")
+      .replace(/\*+$/, "")
+      .trim();
+    const parts = cleaned.split(/(\*\*[^*\n]+\*\*|__[^_\n]+__)/g);
+    // Single part — strip any stray ** that didn't form a complete bold pair
+    if (parts.length === 1) return cleaned.replace(/\*\*/g, "").replace(/__/g, "") || null;
+    return (
+      <>
+        {parts.map((p, i) => {
+          const b = p.match(/^\*\*([^*]+)\*\*$/) || p.match(/^__([^_]+)__$/);
+          if (b) return <strong key={i} style={{ color: "white", fontWeight: 700 }}>{b[1]}</strong>;
+          // Strip any unclosed ** from non-bold segments
+          const clean = p.replace(/\*\*/g, "").replace(/__/g, "");
+          return clean ? <span key={i}>{clean}</span> : null;
+        })}
+      </>
+    );
+  }
+
   function renderMarkdown(text: string) {
     const boldMarker = "*".repeat(2);
-    // Normalize: ensure each block element starts on its own line
     const normalized = text
       .replace(/\r\n/g, "\n")
-      // numbered items concatenated inline — only split when:
-      //   • preceded by a non-digit non-period char (avoids "2.5", "v3.1")
-      //   • number is 1–2 digits (list items, not large numbers)
-      //   • followed by a non-digit (avoids splitting "1.5 kg" etc.)
-      // e.g. "inventory:1. Wavy" → "inventory:\n1. Wavy"
-      //      "Wavy2. PEPSI"      → "Wavy\n2. PEPSI"
+      // Expand double-pipe row separators used by AI: "| A || B |" → "| A |\n| B |"
+      .replace(/\|\|+/g, "|\n|")
+      // Split table that immediately follows description text: "Budget:| col |" → two lines
+      .replace(/:\s*\|(?=[^|\n]*\|)/g, ":\n|")
+      // numbered items concatenated inline
       .replace(/([^0-9.\n])(\d{1,2})\.\s+([^0-9\n])/g, (_, a, n, c) => `${a}\n${n}. ${c}`)
-      // inline bullets "• " not at start of line → new line
+      // inline bullets not at start of line → new line
       .replace(/([^\n])\s*•\s+/g, (_, before) => `${before}\n• `)
       // headings always on own line
       .replace(/#{1,4}\s*/g, (m) => "\n" + m)
-      .replace(/\n{3,}/g, "\n\n");               // collapse 3+ blank lines to 2
+      .replace(/\n{3,}/g, "\n\n");
 
     const lines = normalized.split("\n");
+    const elements: React.ReactNode[] = [];
+    let idx = 0;
 
-    return lines.map((rawLine, i) => {
+    function renderTable(tableLines: string[], keyBase: number): React.ReactNode {
+      const parsed = tableLines.map(row => {
+        const cols = row.split("|");
+        return cols.slice(1, cols.length - 1).map(c => c.trim());
+      });
+      // Separator row: all dashes, colons, em-dashes
+      const sepIdx = parsed.findIndex(cols => cols.length > 0 && cols.every(c => /^[-:—–\s]+$/.test(c)));
+      const headerRows = sepIdx > 0 ? parsed.slice(0, sepIdx) : [];
+      const bodyRows = (sepIdx >= 0 ? parsed.slice(sepIdx + 1) : parsed)
+        .filter(cols => cols.length > 0 && cols.some(c => c !== ""));
+
+      return (
+        <div key={`t${keyBase}`} style={{ overflowX: "auto", margin: "8px 0 4px" }}>
+          <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 12.5 }}>
+            {headerRows.length > 0 && (
+              <thead>
+                {headerRows.map((cols, ri) => (
+                  <tr key={ri}>
+                    {cols.map((c, ci) => (
+                      <th key={ci} style={{ padding: "6px 10px", background: "rgba(99,102,241,.22)", color: "#c7d2fe", fontWeight: 700, borderBottom: "1px solid rgba(99,102,241,.35)", textAlign: "left", whiteSpace: "nowrap" }}>
+                        {renderInline(c)}
+                      </th>
+                    ))}
+                  </tr>
+                ))}
+              </thead>
+            )}
+            <tbody>
+              {bodyRows.map((cols, ri) => (
+                <tr key={ri} style={{ background: ri % 2 === 0 ? "rgba(255,255,255,.03)" : "transparent" }}>
+                  {cols.map((c, ci) => (
+                    <td key={ci} style={{ padding: "5px 10px", color: "rgba(255,255,255,.85)", borderBottom: "1px solid rgba(255,255,255,.06)", fontSize: 12.5 }}>
+                      {renderInline(c)}
+                    </td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      );
+    }
+
+    while (idx < lines.length) {
+      const rawLine = lines[idx];
       const line = rawLine.trimStart();
-      if (!line) return <div key={i} style={{ height: 6 }} />;
 
-      // Headings — match with or without space (###Title or ### Title)
-      const h4m = line.match(/^#{4}\s*(.*)/);  if (h4m) return <div key={i} style={{ fontSize: 13, fontWeight: 700, color: "#e0e7ff", margin: "10px 0 2px", letterSpacing: ".01em" }}>{cleanMarkdownText(h4m[1])}</div>;
-      const h3m = line.match(/^#{3}\s*(.*)/);  if (h3m) return <div key={i} style={{ fontSize: 13.5, fontWeight: 700, color: "#c7d2fe", margin: "12px 0 4px", borderLeft: "3px solid #6366f1", paddingLeft: 8 }}>{cleanMarkdownText(h3m[1])}</div>;
-      const h2m = line.match(/^#{2}\s*(.*)/);  if (h2m) return <div key={i} style={{ fontSize: 15, fontWeight: 700, color: "#a5b4fc", margin: "14px 0 6px" }}>{cleanMarkdownText(h2m[1])}</div>;
-      const h1m = line.match(/^#{1}\s+(.*)/);  if (h1m) return <div key={i} style={{ fontSize: 17, fontWeight: 800, color: "white", margin: "16px 0 8px", borderBottom: "1px solid rgba(255,255,255,.12)", paddingBottom: 6 }}>{cleanMarkdownText(h1m[1])}</div>;
+      // Table block: group consecutive | lines and render as <table>
+      if (line.startsWith("|")) {
+        const tableLines: string[] = [];
+        const tableKey = idx;
+        while (idx < lines.length && lines[idx].trimStart().startsWith("|")) {
+          tableLines.push(lines[idx].trimStart());
+          idx++;
+        }
+        elements.push(renderTable(tableLines, tableKey));
+        continue;
+      }
 
-      // Numbered list  1. text
+      if (!line) { elements.push(<div key={idx} style={{ height: 6 }} />); idx++; continue; }
+      if (/^\*{1,3}$/.test(line)) { idx++; continue; }
+
+      const h4m = line.match(/^#{4}\s*(.*)/);  if (h4m) { elements.push(<div key={idx} style={{ fontSize: 13, fontWeight: 700, color: "#e0e7ff", margin: "10px 0 2px", letterSpacing: ".01em" }}>{renderInline(h4m[1])}</div>); idx++; continue; }
+      const h3m = line.match(/^#{3}\s*(.*)/);  if (h3m) { elements.push(<div key={idx} style={{ fontSize: 13.5, fontWeight: 700, color: "#c7d2fe", margin: "12px 0 4px", borderLeft: "3px solid #6366f1", paddingLeft: 8 }}>{renderInline(h3m[1])}</div>); idx++; continue; }
+      const h2m = line.match(/^#{2}\s*(.*)/);  if (h2m) { elements.push(<div key={idx} style={{ fontSize: 15, fontWeight: 700, color: "#a5b4fc", margin: "14px 0 6px" }}>{renderInline(h2m[1])}</div>); idx++; continue; }
+      const h1m = line.match(/^#{1}\s+(.*)/);  if (h1m) { elements.push(<div key={idx} style={{ fontSize: 17, fontWeight: 800, color: "white", margin: "16px 0 8px", borderBottom: "1px solid rgba(255,255,255,.12)", paddingBottom: 6 }}>{renderInline(h1m[1])}</div>); idx++; continue; }
+
       const numm = line.match(/^(\d+)\.\s+(.*)/);
       if (numm) {
-        const inner = cleanMarkdownText(numm[2]);
-        return (
-          <div key={i} style={{ display: "flex", gap: 10, padding: "3px 0", alignItems: "flex-start" }}>
+        elements.push(
+          <div key={idx} style={{ display: "flex", gap: 10, padding: "3px 0", alignItems: "flex-start" }}>
             <span style={{ minWidth: 22, height: 22, borderRadius: "50%", background: "rgba(99,102,241,.35)", color: "#c7d2fe", fontSize: 11, fontWeight: 700, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, marginTop: 1 }}>{numm[1]}</span>
-            <span dir="auto" style={{ color: "rgba(255,255,255,.9)", fontSize: 13.5, lineHeight: 1.75 }}>{inner}</span>
+            <span dir="auto" style={{ color: "rgba(255,255,255,.9)", fontSize: 13.5, lineHeight: 1.75 }}>{renderInline(numm[2])}</span>
           </div>
         );
+        idx++; continue;
       }
 
-      // Bullet  • - *
       if (line.startsWith("• ") || line.startsWith("- ") || line.startsWith("* ")) {
-        const inner = cleanMarkdownText(line.slice(2));
-        return (
-          <div key={i} style={{ display: "flex", gap: 8, padding: "2px 0", alignItems: "flex-start", paddingLeft: 4 }}>
+        elements.push(
+          <div key={idx} style={{ display: "flex", gap: 8, padding: "2px 0", alignItems: "flex-start", paddingLeft: 4 }}>
             <span style={{ color: "#818cf8", fontSize: 14, flexShrink: 0, marginTop: 1 }}>•</span>
-            <span dir="auto" style={{ color: "rgba(255,255,255,.88)", fontSize: 13.5, lineHeight: 1.75 }}>{inner}</span>
+            <span dir="auto" style={{ color: "rgba(255,255,255,.88)", fontSize: 13.5, lineHeight: 1.75 }}>{renderInline(line.slice(2))}</span>
           </div>
         );
+        idx++; continue;
       }
 
-      // Whole-line bold text
-      if (line.startsWith(boldMarker) && line.endsWith(boldMarker) && line.length > 4)
-        return <div key={i} style={{ fontWeight: 700, color: "white", fontSize: 14, margin: "6px 0 2px" }}>{cleanMarkdownText(line)}</div>;
+      if (line.startsWith(boldMarker) && line.endsWith(boldMarker) && line.length > 4) {
+        elements.push(<div key={idx} style={{ fontWeight: 700, color: "white", fontSize: 14, margin: "6px 0 2px" }}>{renderInline(line)}</div>);
+        idx++; continue;
+      }
 
-      // Normal paragraph — inline bold + RTL support
-      return <div key={i} dir="auto" style={{ color: "rgba(255,255,255,.85)", fontSize: 13.5, lineHeight: 1.8, margin: "1px 0" }}>{cleanMarkdownText(line)}</div>;
-    });
+      elements.push(<div key={idx} dir="auto" style={{ color: "rgba(255,255,255,.85)", fontSize: 13.5, lineHeight: 1.8, margin: "1px 0" }}>{renderInline(line)}</div>);
+      idx++;
+    }
+
+    return elements;
   }
 
   // ── Loading screen ─────────────────────────────────────────────────────────

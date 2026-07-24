@@ -1044,11 +1044,11 @@ export default function POSPage() {
 
           {/* ── Column Headers ── */}
           {cart.length > 0 && (
-            <div style={{ overflowX: "auto" }}><div style={{ display: "grid", gridTemplateColumns: "22px 1fr 68px 88px 58px 68px 18px", gap: 4, padding: "5px 14px", borderBottom: "1px solid rgba(255,255,255,.05)", background: "rgba(255,255,255,.018)", flexShrink: 0 }}><div style={{ minWidth: 560 }}>
+            <div style={{ overflowX: "auto" }}><div style={{ display: "grid", gridTemplateColumns: "22px 1fr 68px 88px 58px 68px 18px", gap: 4, padding: "5px 14px", borderBottom: "1px solid rgba(255,255,255,.05)", background: "rgba(255,255,255,.018)", flexShrink: 0, minWidth: 560 }}>
               {(["#", "Item", "Price", "Qty", "Disc", "Total", ""] as string[]).map((h, i) => (
                 <div key={i} style={{ fontSize: 8, color: "rgba(255,255,255,.28)", letterSpacing: ".07em", textTransform: "uppercase", fontWeight: 700, textAlign: i >= 2 && i <= 5 ? "right" : "left" }}>{h}</div>
               ))}
-            </div>
+            </div></div>
           )}
 
           {/* ── Cart Items ── */}
@@ -1062,7 +1062,7 @@ export default function POSPage() {
             ) : cart.map((item, idx) => {
               const lineTotal = item.price * item.qty - (item.itemDiscount || 0) * item.qty;
               return (
-                <div style={{ overflowX: "auto" }}><div key={item.id} style={{ display: "grid", gridTemplateColumns: "22px 1fr 68px 88px 58px 68px 18px", gap: 4, alignItems: "center", padding: "7px 4px", marginBottom: 2, borderBottom: "1px solid rgba(255,255,255,.04)" }}><div style={{ minWidth: 560 }}>
+                <div style={{ overflowX: "auto" }}><div key={item.id} style={{ display: "grid", gridTemplateColumns: "22px 1fr 68px 88px 58px 68px 18px", gap: 4, alignItems: "center", padding: "7px 4px", marginBottom: 2, borderBottom: "1px solid rgba(255,255,255,.04)", minWidth: 560 }}>
                   <div style={{ fontSize: 10, color: "rgba(255,255,255,.22)", textAlign: "center" }}>{idx + 1}</div>
                   <div style={{ minWidth: 0 }}>
                     <div style={{ fontSize: 12, fontWeight: 600, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", color: "#dde6f5" }}>{item.name}</div>
@@ -1088,7 +1088,7 @@ export default function POSPage() {
                   </div>
                   <div style={{ fontSize: 11, fontWeight: 700, color: "#a5b4fc", textAlign: "right" }}>Rs.{lineTotal.toLocaleString()}</div>
                   <button onClick={() => removeItem(item.id)} style={{ background: "none", border: "none", color: "rgba(255,255,255,.18)", fontSize: 13, cursor: "pointer", padding: 0, textAlign: "center", lineHeight: 1 }}>✕</button>
-                </div>
+                </div></div>
               );
             })}
           </div>

@@ -1,8 +1,8 @@
 "use client";
 
 import { useBusinessRecords } from "@/lib/useBusinessRecords";
-import {
 import { useResponsive } from "@/hooks/useResponsive";
+import {
   firmBg,
   firmBorder,
   firmFont,

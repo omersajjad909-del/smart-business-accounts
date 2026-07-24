@@ -3,8 +3,8 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useBusinessRecords } from "@/lib/useBusinessRecords";
-import {
 import { useResponsive } from "@/hooks/useResponsive";
+import {
   firmBg,
   firmBorder,
   firmFont,

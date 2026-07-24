@@ -4,8 +4,8 @@ import { fmtDate } from "@/lib/dateUtils";
 import type { CSSProperties } from "react";
 import { useMemo, useState } from "react";
 import { useBusinessRecords } from "@/lib/useBusinessRecords";
-import {
 import { useResponsive } from "@/hooks/useResponsive";
+import {
   ecommerceBg,
   ecommerceBorder,
   ecommerceFont,

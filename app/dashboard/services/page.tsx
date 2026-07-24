@@ -2,8 +2,8 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import {
 import { useResponsive } from "@/hooks/useResponsive";
+import {
   ServicesControlCenter,
   fetchJson,
   serviceBg,
