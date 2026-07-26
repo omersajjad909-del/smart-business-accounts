@@ -46,32 +46,40 @@ FinovaOS is a complete cloud accounting and ERP platform for small and medium bu
 FINOVA PLANS
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-STARTER:
-- Up to 5 users
-- Core accounting, invoicing, quotations, and essential financial reports
-- 1 company, 1 branch
+STARTER (exact prices → see LIVE PRICING section):
+- Up to 3 users | 1 branch
+- Sales & purchase invoicing, quotations, delivery challans, sale returns
+- Inventory management, purchase orders (PO), goods received notes (GRN)
+- Chart of accounts, ledger, trial balance, ageing reports
+- Payment receipts (CRV), expense vouchers (CPV), journal vouchers (JV), bulk payments
+- Trading control (order desk, procurement, stock control, dispatch board)
 - Email support
 
-PROFESSIONAL:
-- Up to 25 users
+PROFESSIONAL (exact prices → see LIVE PRICING section):
+- Up to 10 users | 3 branches
 - Everything in Starter +
-- Inventory, banking, CRM, HR & payroll, advanced reporting
-- Multi-branch and multi-company support
-- Better operational reporting and controls
+- Advanced reports: P&L, Balance Sheet, Cash Flow, Inventory Reports, Stock Ledger
+- Bank Reconciliation + Tax Configuration
+- CRM (customer & supplier management, contacts, interaction history)
+- HR & Payroll (employees, attendance, payroll, advance salary)
+- Multi-branch management, user & role management
+- Budget Planning, Recurring Transactions, Financial Year
+- Basic AI: Ask AI, Smart Suggestions, Expense Categorization
+- Priority support
 
-ENTERPRISE:
-- Unlimited users
-- All major business modules and advanced controls
-- API access and custom integrations
-- WhatsApp and SMS notifications
-- SSO, advanced permissions, and priority support
-- Unlimited companies and branches
+ENTERPRISE (exact prices → see LIVE PRICING section):
+- Up to 25 users | 10 branches (extra user seats available at +$7/mo USD)
+- Everything in Professional +
+- Full AI suite: Forecast, Anomaly Detection, Natural Language Queries, Cash Flow Prediction
+- API Access + Backup & Restore + Email Settings
+- Audit Log + View Logs
+- Priority 24/7 support
 
-CUSTOM:
-- Choose only the modules you need
-- Flexible pay-per-module style setup
-- Ideal for businesses that want a tailored workflow
-- Custom pricing based on selected modules and scale
+CUSTOM (pay per module — see LIVE PRICING section):
+- Build your own plan — pick only the modules you need
+- Each module priced individually (Accounting $15/mo, Inventory $12/mo, HR $20/mo, etc.)
+- 20% discount on yearly billing
+- Ideal for lean businesses that want a tailored, cost-effective setup
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 CORE MODULES & FEATURES
@@ -1528,22 +1536,231 @@ function localAIReply(message: string, ctx: FinancialContext | null): string {
   ].filter(Boolean).join("\n");
 }
 
+// ─── Live Pricing Context (fetched from DB each request) ─────────────────────
+
+const _AI_USD_DEFAULTS = {
+  starter:    { monthly: 49,  yearly: 39  },
+  pro:        { monthly: 99,  yearly: 79  },
+  enterprise: { monthly: 249, yearly: 199 },
+};
+const _AI_PKR_DEFAULTS = {
+  starter:    { monthly: 3999,  yearly: 2999  },
+  pro:        { monthly: 8999,  yearly: 6999  },
+  enterprise: { monthly: 14999, yearly: 11999 },
+};
+const _AI_CUSTOM_MODULES = [
+  { name: "Accounting & Invoicing",  price: 15 },
+  { name: "Inventory Management",    price: 12 },
+  { name: "CRM",                     price: 15 },
+  { name: "HR & Payroll",            price: 20 },
+  { name: "Bank Reconciliation",     price: 10 },
+  { name: "Tax & Compliance",        price: 10 },
+  { name: "Advanced Reports",        price: 8  },
+  { name: "Multi-Branch",            price: 15 },
+  { name: "WhatsApp & SMS",          price: 8  },
+  { name: "API Access",              price: 20 },
+];
+
+async function buildLivePricingContext(): Promise<string> {
+  let planCfg: { details: string | null; createdAt: Date } | null = null;
+  let pkrCfg:  { details: string | null } | null = null;
+  try {
+    [planCfg, pkrCfg] = await prisma.$transaction([
+      prisma.activityLog.findFirst({ where: { action: "PLAN_CONFIG"     }, orderBy: { createdAt: "desc" }, select: { details: true, createdAt: true } }),
+      prisma.activityLog.findFirst({ where: { action: "PKR_PLAN_CONFIG" }, orderBy: { createdAt: "desc" }, select: { details: true } }),
+    ]);
+  } catch { /* fall through to defaults */ }
+
+  let usd  = { ..._AI_USD_DEFAULTS };
+  let pkr  = { ..._AI_PKR_DEFAULTS };
+  let lims = { starter: 3, pro: 10, enterprise: 25 };
+  let brch = { starter: 1, pro: 3,  enterprise: 10 };
+  let seat = { monthly: 7, yearly: 6 };
+  let note = "(default pricing)";
+
+  if (planCfg?.details) {
+    try {
+      const p = JSON.parse(planCfg.details);
+      if (p?.pricing) {
+        const ap = p.pricing;
+        usd = {
+          starter:    { monthly: ap.starter?.monthly    ?? 49,  yearly: ap.starter?.yearly    ?? 39  },
+          pro:        { monthly: ap.pro?.monthly        ?? 99,  yearly: ap.pro?.yearly        ?? 79  },
+          enterprise: { monthly: ap.enterprise?.monthly ?? 249, yearly: ap.enterprise?.yearly ?? 199 },
+        };
+        note = `(admin updated: ${new Date(planCfg.createdAt).toLocaleDateString()})`;
+      }
+      if (p?.planLimits)  lims = { ...lims,  ...p.planLimits  };
+      if (p?.branchLimits) brch = { ...brch, ...p.branchLimits };
+      if (p?.seatPricing) seat = { monthly: p.seatPricing.monthly ?? 7, yearly: p.seatPricing.yearly ?? 6 };
+    } catch { /* ignore parse errors, use defaults */ }
+  }
+
+  if (pkrCfg?.details) {
+    try {
+      const p = JSON.parse(pkrCfg.details)?.pricing;
+      if (p) {
+        pkr = {
+          starter:    { monthly: p.starter?.monthly    ?? 3999,  yearly: p.starter?.yearly    ?? 2999  },
+          pro:        { monthly: p.pro?.monthly        ?? 8999,  yearly: p.pro?.yearly        ?? 6999  },
+          enterprise: { monthly: p.enterprise?.monthly ?? 14999, yearly: p.enterprise?.yearly ?? 11999 },
+        };
+      }
+    } catch { /* ignore */ }
+  }
+
+  const f = (n: number) => n.toLocaleString("en-PK");
+
+  return `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+LIVE PLAN PRICING ${note}
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+USD PRICING (International — Stripe/LemonSqueezy):
+• STARTER:      $${usd.starter.monthly}/mo  |  $${usd.starter.yearly}/mo billed yearly (save 20%)
+• PROFESSIONAL: $${usd.pro.monthly}/mo  |  $${usd.pro.yearly}/mo billed yearly (save 20%)
+• ENTERPRISE:   $${usd.enterprise.monthly}/mo  |  $${usd.enterprise.yearly}/mo billed yearly (save 20%)
+• Extra User Seat: +$${seat.monthly}/mo  |  +$${seat.yearly}/mo billed yearly
+
+PKR PRICING (Pakistan — Safepay):
+• STARTER:      ₨${f(pkr.starter.monthly)}/mo  |  ₨${f(pkr.starter.yearly)}/mo billed yearly
+• PROFESSIONAL: ₨${f(pkr.pro.monthly)}/mo  |  ₨${f(pkr.pro.yearly)}/mo billed yearly
+• ENTERPRISE:   ₨${f(pkr.enterprise.monthly)}/mo  |  ₨${f(pkr.enterprise.yearly)}/mo billed yearly
+
+USER & BRANCH LIMITS:
+• STARTER:      ${lims.starter} users max | ${brch.starter} branch
+• PROFESSIONAL: ${lims.pro} users max | ${brch.pro} branches
+• ENTERPRISE:   ${lims.enterprise} users max | ${brch.enterprise} branches
+
+PLAN FEATURE MATRIX:
+Feature                              | STARTER | PRO | ENTERPRISE
+Sales & Purchase Invoices            |   ✅   |  ✅  |    ✅
+Quotations & Delivery Challans       |   ✅   |  ✅  |    ✅
+Inventory Management                 |   ✅   |  ✅  |    ✅
+Trading Control                      |   ✅   |  ✅  |    ✅
+Trial Balance & Ledger Reports       |   ✅   |  ✅  |    ✅
+Payment Receipts & Expense Vouchers  |   ✅   |  ✅  |    ✅
+Advanced Reports (P&L, Balance Sheet)|   ❌   |  ✅  |    ✅
+Bank Reconciliation                  |   ❌   |  ✅  |    ✅
+CRM                                  |   ❌   |  ✅  |    ✅
+HR & Payroll                         |   ❌   |  ✅  |    ✅
+Multi-Branch                         |   ❌   |  ✅  |    ✅
+Budget Planning                      |   ❌   |  ✅  |    ✅
+Recurring Transactions               |   ❌   |  ✅  |    ✅
+AI Features (Ask AI, Suggestions)    |   ❌   |  ✅  |    ✅
+Advanced AI (Forecast, Anomaly)      |   ❌   |  ❌  |    ✅
+API Access                           |   ❌   |  ❌  |    ✅
+Backup & Restore                     |   ❌   |  ❌  |    ✅
+Audit Log                            |   ❌   |  ❌  |    ✅
+
+CUSTOM PLAN — Module-by-Module Pricing (USD/mo, 20% off yearly):
+${_AI_CUSTOM_MODULES.map(m => `• ${m.name}: $${m.price}/mo`).join("\n")}
+
+Pricing page: /pricing | Upgrade: /dashboard/settings/billing | Contact: hello@finovaos.app`;
+}
+
+function buildCompanyPlanFeatures(plan: string | null | undefined): string {
+  const p = String(plan || "STARTER").toUpperCase().replace("PROFESSIONAL", "PRO");
+
+  const matrix: Record<string, { has: string[]; missing: string[]; upgradeNote: string }> = {
+    STARTER: {
+      has: [
+        "Sales & Purchase Invoicing (/dashboard/sales-invoice, /dashboard/purchase-invoice)",
+        "Purchase Orders & GRN (/dashboard/purchase-order, /dashboard/grn)",
+        "Quotations & Delivery Challans",
+        "Inventory Management (/dashboard/inventory)",
+        "Chart of Accounts & Ledger (/dashboard/accounts)",
+        "Basic Reports: Trial Balance, Ageing, Ledger",
+        "Payment Receipts CRV, Expense Vouchers CPV/JV, Bulk Payments",
+        "Trading Control: Order Desk, Dispatch, Procurement",
+        "Opening Balances",
+      ],
+      missing: [
+        "Advanced Reports (P&L, Balance Sheet, Cash Flow, Inventory Reports) → upgrade to PRO",
+        "Bank Reconciliation → upgrade to PRO",
+        "CRM → upgrade to PRO",
+        "HR & Payroll → upgrade to PRO",
+        "Multi-Branch → upgrade to PRO",
+        "AI Features (Ask AI, Smart Suggestions) → upgrade to PRO",
+        "Advanced AI (Forecast, Anomaly Detection) → upgrade to ENTERPRISE",
+        "API Access, Backup & Restore → upgrade to ENTERPRISE",
+      ],
+      upgradeNote: "Upgrade to PRO at /dashboard/settings/billing to unlock HR, CRM, Advanced Reports & AI.",
+    },
+    PRO: {
+      has: [
+        "Everything in Starter",
+        "Advanced Reports: P&L, Balance Sheet, Cash Flow, Stock Ledger",
+        "Bank Reconciliation (/dashboard/bank-reconciliation)",
+        "CRM — customers, suppliers, contacts (/dashboard/crm)",
+        "HR & Payroll — employees, attendance, payroll (/dashboard/employees)",
+        "Multi-Branch + User & Role Management",
+        "Budget Planning + Recurring Transactions + Financial Year",
+        "AI: Ask AI, Smart Suggestions, Expense Categorization",
+      ],
+      missing: [
+        "Advanced AI (Forecast, Anomaly Detection, Cash Flow Prediction) → ENTERPRISE",
+        "API Access → ENTERPRISE",
+        "Backup & Restore → ENTERPRISE",
+        "Audit Log → ENTERPRISE",
+        "Email Settings → ENTERPRISE",
+      ],
+      upgradeNote: "Upgrade to ENTERPRISE at /dashboard/settings/billing for full AI suite & API Access.",
+    },
+    ENTERPRISE: {
+      has: [
+        "All features — no restrictions",
+        "Full AI suite: Forecast, Anomaly Detection, Natural Language, Cash Flow Prediction",
+        "API Access + Backup & Restore + Audit Log + Email Settings",
+        "Priority 24/7 Support",
+      ],
+      missing: [],
+      upgradeNote: "You are on the highest plan. All features are available.",
+    },
+    CUSTOM: {
+      has: ["Custom module selection — access depends on your active modules"],
+      missing: ["Contact support at hello@finovaos.app to check or change your active modules"],
+      upgradeNote: "To switch to a standard plan: /dashboard/settings/billing",
+    },
+  };
+
+  const cfg = matrix[p] || matrix.STARTER;
+
+  return `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+THIS COMPANY'S PLAN: ${p}
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+AVAILABLE ON ${p}:
+${cfg.has.map(f => `✅ ${f}`).join("\n")}
+
+${cfg.missing.length > 0 ? `REQUIRES UPGRADE:\n${cfg.missing.map(f => `❌ ${f}`).join("\n")}\n\n${cfg.upgradeNote}` : cfg.upgradeNote}`;
+}
+
 export async function finovaChat(
   message: string,
   history: ChatMessage[],
   companyId: string | null
 ): Promise<AsyncIterable<string>> {
-  // Build financial context if we have a company
+  // Build financial context + live pricing in parallel for efficiency
   let contextStr = "";
   let ctx: FinancialContext | null = null;
-  if (companyId) {
-    try {
-      ctx = await buildFinancialContext(companyId);
-      contextStr = buildContextString(ctx);
-    } catch {
-      contextStr = "\n[Financial data temporarily unavailable]\n";
-    }
-  }
+  let pricingContext = "";
+
+  await Promise.all([
+    (async () => {
+      if (!companyId) return;
+      try {
+        ctx = await buildFinancialContext(companyId);
+        contextStr = buildContextString(ctx);
+      } catch {
+        contextStr = "\n[Financial data temporarily unavailable]\n";
+      }
+    })(),
+    (async () => {
+      try {
+        pricingContext = await buildLivePricingContext();
+      } catch { /* static plan info from system prompt still applies */ }
+    })(),
+  ]);
 
   if (!HAS_AI_KEY) {
     const fallback = localAIReply(message, ctx);
@@ -1551,7 +1768,15 @@ export async function finovaChat(
       yield fallback;
     })();
   }
-  const systemPrompt = FINOVA_SYSTEM_PROMPT + (contextStr ? `\n\nCURRENT FINANCIAL DATA:\n${contextStr}` : "");
+
+  const planContext = ctx ? buildCompanyPlanFeatures(ctx.company.plan) : "";
+
+  const systemPrompt =
+    FINOVA_SYSTEM_PROMPT
+    + (pricingContext ? `\n\n${pricingContext}` : "")
+    + (planContext   ? `\n\n${planContext}`   : "")
+    + (contextStr    ? `\n\nCURRENT FINANCIAL DATA:\n${contextStr}` : "");
+
   const messages = [
     ...history.map((h) => ({ role: h.role, content: h.content })),
     { role: "user" as const, content: message },
