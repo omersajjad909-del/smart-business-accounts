@@ -4,7 +4,7 @@ import { Toaster } from "react-hot-toast";
 import "./globals.css";
 
 import CookieBanner from "./(marketing)/landing/components/CookieBanner";
-import AnalyticsLoader from "./(marketing)/landing/components/AnalyticsLoader";
+import AnalyticsGate from "./(marketing)/landing/components/AnalyticsGate";
 import { ThemeProvider } from "@/components/theme-provider";
 import VisitorTracker from "@/components/VisitorTracker";
 
@@ -297,7 +297,7 @@ export default async function RootLayout({
       </head>
       <body className="app-root" suppressHydrationWarning>
         <VisitorTracker />
-        <AnalyticsLoader />
+        <AnalyticsGate />
         <ThemeProvider
           attribute="class"
           defaultTheme="dark"

@@ -35,6 +35,8 @@ function buildCsp(nonce: string): string {
     "font-src 'self' https://fonts.gstatic.com",
     "img-src 'self' data: blob: https:",
     "connect-src 'self' https://ipapi.co https://www.googletagmanager.com https://static.cloudflareinsights.com https://cloudflareinsights.com https://www.google-analytics.com https://www.google.com https://*.sentry.io https://*.ingest.sentry.io https://*.ingest.us.sentry.io https://*.clarity.ms",
+    "worker-src 'self' blob: https://www.clarity.ms",
+    "child-src 'self' blob:",
     "frame-src 'self'",
     "object-src 'none'",
     "base-uri 'self'",
