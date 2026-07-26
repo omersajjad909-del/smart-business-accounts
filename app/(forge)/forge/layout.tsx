@@ -86,8 +86,8 @@ const forgeOrganizationJsonLd = {
     width: 512,
     height: 512,
   },
-  description: "Finova Forge is a PSEB Registered IT Exporter based in Lahore, Pakistan — founded in 2024 by Umer Sajjad. We build FinovaOS, an AI-powered cloud ERP & accounting platform for 22+ industries with 50+ modules.",
-  foundingDate: "2024",
+  description: "Finova Forge is a PSEB Registered IT Exporter based in Lahore, Pakistan — founded in 2025 by Umer Sajjad. We build FinovaOS, an AI-powered cloud ERP & accounting platform for 22+ industries with 50+ modules.",
+  foundingDate: "2025",
   foundingLocation: {
     "@type": "Place",
     name: "Lahore, Pakistan",

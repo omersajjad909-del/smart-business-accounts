@@ -56,7 +56,7 @@ const INDUSTRIES = [
 
 const TIMELINE = [
   {
-    year: "2024",
+    year: "2025",
     title: "The Frustration",
     desc: "Existing ERP software was either priced out of reach, built for Western markets, or took months to implement. Operational businesses — traders, distributors, manufacturers — were running on spreadsheets and manual work.",
     color: "#818cf8",
@@ -605,7 +605,7 @@ export default function AboutPage() {
               Passionate about building software that fits how real businesses work — without the enterprise complexity, price tag, or six-month implementation timelines.
             </p>
             <div style={{ display: "flex", gap: 10, flexWrap: "wrap", justifyContent: "center" }}>
-              {["Pakistan 🇵🇰", "Lahore", "Est. 2024"].map(tag => (
+              {["Pakistan 🇵🇰", "Lahore", "Est. 2025"].map(tag => (
                 <span key={tag} style={{
                   fontSize: 11, fontWeight: 700, color: "rgba(245,158,11,.7)",
                   background: "rgba(245,158,11,.08)", border: "1px solid rgba(245,158,11,.18)",
@@ -638,10 +638,10 @@ export default function AboutPage() {
                 </div>
               </div>
               <p style={{ fontSize: 13, color: "rgba(255,255,255,.42)", lineHeight: 1.8, margin: "0 0 16px" }}>
-                Finova Forge is the software company that designs, builds, and ships FinovaOS. Founded in 2024 in Lahore, Pakistan — registered as a PSEB-certified IT exporter — with a mission to build purpose-built business software for underserved markets worldwide.
+                Finova Forge is the software company that designs, builds, and ships FinovaOS. Founded in 2025 in Lahore, Pakistan — registered as a PSEB-certified IT exporter — with a mission to build purpose-built business software for underserved markets worldwide.
               </p>
               <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-                {["PSEB Registered", "IT Exporter", "Founded 2024", "Lahore, Pakistan"].map(t => (
+                {["PSEB Registered", "IT Exporter", "Founded 2025", "Lahore, Pakistan"].map(t => (
                   <span key={t} style={{ fontSize: 10, fontWeight: 700, color: "rgba(255,255,255,.35)",
                     background: "rgba(255,255,255,.05)", border: "1px solid rgba(255,255,255,.1)",
                     borderRadius: 100, padding: "3px 10px" }}>{t}</span>

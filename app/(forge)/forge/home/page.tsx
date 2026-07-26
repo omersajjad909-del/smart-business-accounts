@@ -79,7 +79,7 @@ function Hero() {
         {/* Stats */}
         <div className="forge-hero-stats" style={{ marginTop: "clamp(48px,8vw,80px)", display: "flex", gap: "clamp(24px,5vw,56px)", justifyContent: "center", flexWrap: "wrap" }}>
           {[
-            { v: "2024", l: "Founded" },
+            { v: "2025", l: "Founded" },
             { v: "40+", l: "Countries" },
             { v: "1", l: "Live Product" },
             { v: "∞", l: "Ambition" },

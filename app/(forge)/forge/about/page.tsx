@@ -97,7 +97,7 @@ function Story() {
   const [ref, vis] = useInView();
   const chapters = [
     {
-      year: "2024",
+      year: "2025",
       title: "The Problem Worth Solving",
       body: "Umer Sajjad looked at the accounting software landscape and saw a massive gap. Enterprise tools were expensive and complex — requiring months to implement. Simple tools lacked the depth growing businesses needed. Millions of companies were still running on spreadsheets and paying the price for it.",
     },
