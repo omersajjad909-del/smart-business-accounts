@@ -563,6 +563,152 @@ export default function AboutPage() {
       </FadeIn>
 
       {/* ════════════════════════════════
+          FOUNDER & COMPANY
+      ════════════════════════════════ */}
+      <FadeIn style={{ maxWidth: 1100, margin: "0 auto", padding: "0 24px 90px" }}>
+        <div style={{ textAlign: "center", marginBottom: 48 }}>
+          <div className="section-label" style={{ background: "rgba(245,158,11,.08)", border: "1px solid rgba(245,158,11,.22)", color: "#fbbf24" }}>
+            <span style={{ width: 5, height: 5, borderRadius: "50%", background: "#f59e0b" }} />
+            THE PEOPLE & COMPANY BEHIND THIS
+          </div>
+          <h2 style={{ fontFamily: "'Lora',serif", fontSize: "clamp(26px,3.5vw,38px)", fontWeight: 700, letterSpacing: "-1.2px", lineHeight: 1.2, marginBottom: 14 }}>
+            Who built FinovaOS
+          </h2>
+          <p style={{ fontSize: 15, color: "rgba(255,255,255,.38)", maxWidth: 500, margin: "0 auto" }}>
+            FinovaOS is the flagship product of Finova Forge — a software company founded in Lahore, Pakistan with a global reach.
+          </p>
+        </div>
+
+        {/* Two-column: Founder + Company */}
+        <div className="ab-2col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 24, marginBottom: 32 }}>
+
+          {/* Founder card */}
+          <div style={{
+            borderRadius: 24, padding: "40px 36px",
+            background: "linear-gradient(145deg,rgba(245,158,11,.07),rgba(239,68,68,.04))",
+            border: "1px solid rgba(245,158,11,.2)",
+            display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center",
+          }}>
+            <div style={{
+              width: 96, height: 96, borderRadius: "50%",
+              background: "linear-gradient(135deg,#f59e0b,#ef4444)",
+              display: "flex", alignItems: "center", justifyContent: "center",
+              fontSize: 40, fontWeight: 900, color: "white",
+              boxShadow: "0 8px 32px rgba(245,158,11,.3)",
+              marginBottom: 20,
+            }}>U</div>
+            <h3 style={{ fontSize: 22, fontWeight: 900, color: "white", margin: "0 0 6px", letterSpacing: "-.4px" }}>Umer Sajjad</h3>
+            <div style={{ fontSize: 11, fontWeight: 700, color: "#f59e0b", letterSpacing: ".08em", textTransform: "uppercase", marginBottom: 16 }}>
+              Founder & CEO — Finova Forge
+            </div>
+            <p style={{ fontSize: 14, color: "rgba(255,255,255,.45)", lineHeight: 1.85, margin: "0 0 24px" }}>
+              Passionate about building software that fits how real businesses work — without the enterprise complexity, price tag, or six-month implementation timelines.
+            </p>
+            <div style={{ display: "flex", gap: 10, flexWrap: "wrap", justifyContent: "center" }}>
+              {["Pakistan 🇵🇰", "Lahore", "Est. 2024"].map(tag => (
+                <span key={tag} style={{
+                  fontSize: 11, fontWeight: 700, color: "rgba(245,158,11,.7)",
+                  background: "rgba(245,158,11,.08)", border: "1px solid rgba(245,158,11,.18)",
+                  borderRadius: 100, padding: "4px 12px",
+                }}>{tag}</span>
+              ))}
+            </div>
+          </div>
+
+          {/* Company cards stacked */}
+          <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+
+            {/* Finova Forge */}
+            <div style={{
+              flex: 1, borderRadius: 20, padding: "28px 28px",
+              background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.08)",
+              position: "relative", overflow: "hidden",
+            }}>
+              <div style={{ position: "absolute", top: -30, right: -30, width: 120, height: 120,
+                borderRadius: "50%", background: "radial-gradient(circle,rgba(245,158,11,.1),transparent 70%)",
+                pointerEvents: "none" }} />
+              <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 16 }}>
+                <div style={{ width: 44, height: 44, borderRadius: 13,
+                  background: "linear-gradient(135deg,#f59e0b,#ef4444)",
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  fontSize: 20, flexShrink: 0 }}>🔨</div>
+                <div>
+                  <div style={{ fontSize: 16, fontWeight: 800, color: "white" }}>Finova Forge</div>
+                  <div style={{ fontSize: 11, color: "rgba(255,255,255,.35)", marginTop: 2 }}>Parent Company · Software Studio</div>
+                </div>
+              </div>
+              <p style={{ fontSize: 13, color: "rgba(255,255,255,.42)", lineHeight: 1.8, margin: "0 0 16px" }}>
+                Finova Forge is the software company that designs, builds, and ships FinovaOS. Founded in 2024 in Lahore, Pakistan — registered as a PSEB-certified IT exporter — with a mission to build purpose-built business software for underserved markets worldwide.
+              </p>
+              <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                {["PSEB Registered", "IT Exporter", "Founded 2024", "Lahore, Pakistan"].map(t => (
+                  <span key={t} style={{ fontSize: 10, fontWeight: 700, color: "rgba(255,255,255,.35)",
+                    background: "rgba(255,255,255,.05)", border: "1px solid rgba(255,255,255,.1)",
+                    borderRadius: 100, padding: "3px 10px" }}>{t}</span>
+                ))}
+              </div>
+            </div>
+
+            {/* FinovaOS */}
+            <div style={{
+              flex: 1, borderRadius: 20, padding: "28px 28px",
+              background: "rgba(99,102,241,.04)", border: "1px solid rgba(99,102,241,.18)",
+              position: "relative", overflow: "hidden",
+            }}>
+              <div style={{ position: "absolute", top: -30, right: -30, width: 120, height: 120,
+                borderRadius: "50%", background: "radial-gradient(circle,rgba(99,102,241,.12),transparent 70%)",
+                pointerEvents: "none" }} />
+              <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 16 }}>
+                <div style={{ width: 44, height: 44, borderRadius: 13,
+                  background: "linear-gradient(135deg,#6366f1,#7c3aed)",
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  fontSize: 20, flexShrink: 0 }}>🖥️</div>
+                <div>
+                  <div style={{ fontSize: 16, fontWeight: 800, color: "white" }}>FinovaOS</div>
+                  <div style={{ fontSize: 11, color: "rgba(255,255,255,.35)", marginTop: 2 }}>Flagship Product · Cloud ERP</div>
+                </div>
+              </div>
+              <p style={{ fontSize: 13, color: "rgba(255,255,255,.42)", lineHeight: 1.8, margin: "0 0 16px" }}>
+                FinovaOS is Finova Forge's flagship product — a complete cloud-based business management platform covering accounting, inventory, HR, invoicing, CRM, payroll, and more. Built specifically for operational businesses that need real depth, not surface-level tools.
+              </p>
+              <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                {["Cloud ERP", "50+ Modules", "6 Industries", "Weekly Releases"].map(t => (
+                  <span key={t} style={{ fontSize: 10, fontWeight: 700, color: "rgba(99,102,241,.8)",
+                    background: "rgba(99,102,241,.1)", border: "1px solid rgba(99,102,241,.25)",
+                    borderRadius: 100, padding: "3px 10px" }}>{t}</span>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Quote from founder */}
+        <div style={{
+          borderRadius: 20, padding: "32px 40px",
+          background: "rgba(255,255,255,.02)", border: "1px solid rgba(255,255,255,.07)",
+          textAlign: "center", position: "relative", overflow: "hidden",
+        }}>
+          <div style={{ position: "absolute", top: 0, left: "20%", right: "20%", height: 1,
+            background: "linear-gradient(90deg,transparent,rgba(245,158,11,.35),transparent)" }} />
+          <div style={{ fontSize: 28, color: "rgba(245,158,11,.3)", fontFamily: "Georgia,serif", lineHeight: 1, marginBottom: 12 }}>"</div>
+          <p style={{ fontFamily: "'Lora',serif", fontSize: "clamp(15px,2vw,19px)", fontWeight: 600,
+            color: "rgba(255,255,255,.75)", lineHeight: 1.7, maxWidth: 680, margin: "0 auto 20px", fontStyle: "italic" }}>
+            I built FinovaOS because I saw businesses running on spreadsheets that should have had proper software a decade ago. The goal was simple — make something powerful enough for serious operations, but simple enough to set up in a day.
+          </p>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 12 }}>
+            <div style={{ width: 36, height: 36, borderRadius: "50%",
+              background: "linear-gradient(135deg,#f59e0b,#ef4444)",
+              display: "flex", alignItems: "center", justifyContent: "center",
+              fontSize: 14, fontWeight: 900, color: "white" }}>U</div>
+            <div style={{ textAlign: "left" }}>
+              <div style={{ fontSize: 13, fontWeight: 700, color: "white" }}>Umer Sajjad</div>
+              <div style={{ fontSize: 11, color: "rgba(255,255,255,.35)" }}>Founder & CEO, Finova Forge</div>
+            </div>
+          </div>
+        </div>
+      </FadeIn>
+
+      {/* ════════════════════════════════
           FINAL CTA
       ════════════════════════════════ */}
       <FadeIn style={{ maxWidth: 720, margin: "0 auto", padding: "0 24px 120px", textAlign: "center" }}>
