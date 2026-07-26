@@ -210,7 +210,7 @@ function AuthPageInner() {
         setCurrentUser(data.user);
       }
       setMessage("Signed in successfully.");
-      router.push(data.redirectTo || redirectTo);
+      window.location.href = data.redirectTo || redirectTo;
     } catch {
       setError("Unable to complete the request. Please try again.");
     } finally {
@@ -237,7 +237,7 @@ function AuthPageInner() {
       try { localStorage.removeItem("pendingVerification"); } catch {}
       if (data.user) setCurrentUser(data.user);
       setMessage("Email verified! Redirecting...");
-      router.push(data.next || data.redirectTo || redirectTo);
+      window.location.href = data.next || data.redirectTo || redirectTo;
     } catch {
       setError("Unable to verify code. Please try again.");
     } finally {
