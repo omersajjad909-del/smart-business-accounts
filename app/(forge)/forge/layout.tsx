@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 
 const FORGE_URL = "https://finovaforge.com";
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "https://www.finovaos.app";
 const FORGE_TITLE = "Finova Forge - Industry-Specific Business Software | Trading, Manufacturing, Restaurant, Retail & More";
 const FORGE_DESCRIPTION =
   "Finova Forge is a software company building intelligent, industry-specific business tools — trading, wholesale, manufacturing, distribution, restaurant, retail, import/export, construction, hospital, school, pharmacy, and more. Creators of FinovaOS.";
@@ -11,8 +12,8 @@ export const metadata: Metadata = {
   title: FORGE_TITLE,
   description: FORGE_DESCRIPTION,
   applicationName: "Finova Forge",
-  authors: [{ name: "Finova Forge", url: FORGE_URL }],
-  creator: "Finova Forge",
+  authors: [{ name: "Umer Sajjad", url: "https://www.linkedin.com/in/umer-sajjad-657936417" }, { name: "Finova Forge", url: FORGE_URL }],
+  creator: "Umer Sajjad",
   publisher: "Finova Forge",
   keywords: [
     "Finova Forge", "FinovaOS", "software company Pakistan",
@@ -72,6 +73,79 @@ export const metadata: Metadata = {
   },
 };
 
+const forgeOrganizationJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "@id": `${BASE_URL}/#organization`,
+  name: "Finova Forge",
+  alternateName: "FinovaOS",
+  url: FORGE_URL,
+  logo: {
+    "@type": "ImageObject",
+    url: `${FORGE_URL}/FinovaForge.png`,
+    width: 512,
+    height: 512,
+  },
+  description: "Finova Forge is a PSEB Registered IT Exporter based in Lahore, Pakistan — founded in 2024 by Umer Sajjad. We build FinovaOS, an AI-powered cloud ERP & accounting platform for 22+ industries with 50+ modules.",
+  foundingDate: "2024",
+  foundingLocation: {
+    "@type": "Place",
+    name: "Lahore, Pakistan",
+    address: {
+      "@type": "PostalAddress",
+      addressLocality: "Lahore",
+      addressCountry: "PK",
+    },
+  },
+  founder: {
+    "@type": "Person",
+    name: "Umer Sajjad",
+    jobTitle: "Founder & CEO",
+    url: `${BASE_URL}/forge/about`,
+    sameAs: ["https://www.linkedin.com/in/umer-sajjad-657936417"],
+  },
+  contactPoint: {
+    "@type": "ContactPoint",
+    contactType: "customer service",
+    email: "hello@finovaos.app",
+    availableLanguage: ["English", "Urdu"],
+  },
+  sameAs: [
+    `${BASE_URL}`,
+    "https://www.linkedin.com/in/umer-sajjad-657936417",
+  ],
+};
+
+const forgePersonJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "Person",
+  name: "Umer Sajjad",
+  jobTitle: "Founder & CEO",
+  worksFor: {
+    "@type": "Organization",
+    name: "Finova Forge",
+    url: FORGE_URL,
+  },
+  url: `${BASE_URL}/forge/about`,
+  sameAs: [
+    "https://www.linkedin.com/in/umer-sajjad-657936417",
+    `${BASE_URL}/forge/about`,
+    `${BASE_URL}/about`,
+  ],
+  address: {
+    "@type": "PostalAddress",
+    addressLocality: "Lahore",
+    addressCountry: "PK",
+  },
+  description: "Umer Sajjad is the Founder and CEO of Finova Forge — a PSEB Registered IT Exporter from Lahore, Pakistan — and creator of FinovaOS, an AI cloud ERP platform serving 22+ industries.",
+};
+
 export default function ForgeLayout({ children }: { children: React.ReactNode }) {
-  return <>{children}</>;
+  return (
+    <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(forgeOrganizationJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(forgePersonJsonLd) }} />
+      {children}
+    </>
+  );
 }

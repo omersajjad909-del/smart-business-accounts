@@ -210,10 +210,16 @@ const founderJsonLd = {
   worksFor: { "@id": `${BASE_URL}/#organization` },
   url: `${BASE_URL}/forge/about`,
   sameAs: [
-    "https://linkedin.com/company/finovaforge",
+    "https://www.linkedin.com/in/umer-sajjad-657936417",
     `${BASE_URL}/forge/about`,
+    `${BASE_URL}/about`,
   ],
-  description: "Umer Sajjad is the Founder and CEO of Finova Forge and FinovaOS — an AI-powered cloud accounting and business management platform for SMEs.",
+  description: "Umer Sajjad is the Founder and CEO of Finova Forge — a PSEB Registered IT Exporter based in Lahore, Pakistan — and the creator of FinovaOS, an AI-powered cloud ERP and accounting platform serving 22+ industries with 50+ modules.",
+  address: {
+    "@type": "PostalAddress",
+    addressLocality: "Lahore",
+    addressCountry: "PK",
+  },
 };
 
 const organizationJsonLd = {
@@ -221,7 +227,7 @@ const organizationJsonLd = {
   "@type": "Organization",
   "@id": `${BASE_URL}/#organization`,
   name: "Finova Forge",
-  alternateName: "FinovaOS",
+  alternateName: ["FinovaOS", "Finova Forge Pakistan"],
   url: "https://finovaforge.com",
   logo: {
     "@type": "ImageObject",
@@ -229,35 +235,33 @@ const organizationJsonLd = {
     width: 512,
     height: 512,
   },
-  description: "Finova Forge is the software company behind FinovaOS — a cloud ERP & accounting platform purpose-built for trading, wholesale, manufacturing, distribution, restaurant, retail, import/export, construction, hospital, school, pharmacy, transport, real estate, and service businesses worldwide.",
+  description: "Finova Forge is a PSEB Registered IT Exporter based in Lahore, Pakistan — founded in 2024 by Umer Sajjad. We build FinovaOS, a cloud ERP & accounting platform purpose-built for 22+ industries including trading, manufacturing, restaurant, retail, import/export, construction, hospital, school, pharmacy, and transport businesses worldwide.",
   foundingDate: "2024",
-  foundingLocation: "Pakistan",
+  foundingLocation: {
+    "@type": "Place",
+    name: "Lahore, Pakistan",
+    address: {
+      "@type": "PostalAddress",
+      addressLocality: "Lahore",
+      addressCountry: "PK",
+    },
+  },
   founder: {
     "@id": `${BASE_URL}/#founder`,
     "@type": "Person",
     name: "Umer Sajjad",
   },
-  numberOfEmployees: { "@type": "QuantitativeValue", value: 120 },
-  contactPoint: [
-    {
-      "@type": "ContactPoint",
-      telephone: "+92-304-7653693",
-      contactType: "customer service",
-      email: "hello@finovaos.app",
-      url: `${BASE_URL}/contact`,
-      availableLanguage: ["English", "Arabic", "Urdu"],
-    },
-    {
-      "@type": "ContactPoint",
-      contactType: "legal",
-      email: "legal@finovaos.app",
-      url: `${BASE_URL}/legal/privacy`,
-    },
-  ],
+  contactPoint: {
+    "@type": "ContactPoint",
+    contactType: "customer service",
+    email: "hello@finovaos.app",
+    url: `${BASE_URL}/contact`,
+    availableLanguage: ["English", "Urdu"],
+  },
   sameAs: [
     "https://finovaforge.com",
     "https://www.finovaos.app",
-    "https://linkedin.com/company/finovaforge",
+    "https://www.linkedin.com/in/umer-sajjad-657936417",
   ],
 };
 
