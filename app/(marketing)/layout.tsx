@@ -22,23 +22,56 @@ export async function generateMetadata(): Promise<Metadata> {
     template: "%s | FinovaOS",
   },
   description:
-    "Best cloud accounting software for Pakistan & UAE businesses. FBR-ready invoicing, inventory, HR & payroll, bank reconciliation, CRM — all in one platform. Trusted by 500+ SMEs in Karachi, Lahore, Dubai.",
+    "FinovaOS — cloud ERP & accounting software purpose-built for trading, wholesale, manufacturing, distribution, restaurant, retail, import/export, construction, hospital, school, pharmacy, and service businesses in Pakistan, UAE & worldwide. FBR-ready invoicing, inventory, HR & payroll, bank reconciliation, CRM.",
   keywords: [
-    // Pakistan-specific
-    "accounting software Pakistan", "cloud accounting Pakistan", "FBR accounting software",
-    "business software Pakistan", "invoicing software Pakistan", "SME accounting Pakistan",
-    "Karachi accounting software", "Lahore business software", "online accounting Pakistan",
-    // UAE/Gulf
-    "accounting software UAE", "cloud accounting Dubai", "SME software Dubai",
-    // AI
-    "AI accounting software", "AI business intelligence", "smart accounting software",
-    "AI ERP Pakistan", "business health score", "AI financial insights",
-    // Features
-    "invoicing software", "inventory management", "HR payroll software", "bank reconciliation",
-    "CRM software", "financial management", "GST invoicing", "FBR compliant",
-    "ERP software Pakistan", "cloud ERP",
     // Brand
-    "FinovaOS", "FinovaOS accounting",
+    "FinovaOS", "Finova Forge", "FinovaOS accounting",
+    // Core platform
+    "cloud accounting software", "cloud ERP", "AI accounting software",
+    "business management software", "ERP software Pakistan", "online accounting Pakistan",
+    // Features
+    "invoicing software", "inventory management", "HR payroll software",
+    "bank reconciliation", "CRM software", "multi-currency accounting",
+    "FBR accounting software", "FBR compliant invoicing", "GST invoicing",
+    // Trading & Wholesale
+    "trading business software", "trading company accounting software",
+    "wholesale accounting software", "wholesale ERP", "trading ERP Pakistan",
+    // Distribution
+    "distribution management software", "distribution ERP Pakistan",
+    "route-based sales software", "van sales software",
+    // Manufacturing
+    "manufacturing ERP Pakistan", "manufacturing accounting software",
+    "bill of materials software", "production order management", "job costing software",
+    // Restaurant
+    "restaurant management software", "restaurant billing software",
+    "restaurant POS Pakistan", "food business software",
+    // Retail
+    "retail accounting software", "retail POS software", "retail management system",
+    // Import / Export
+    "import export software Pakistan", "clearing forwarding software",
+    "trade management software", "shipment tracking software",
+    // Construction
+    "construction accounting software", "construction ERP Pakistan",
+    // Hospital & Clinic
+    "hospital management software Pakistan", "clinic billing software",
+    "healthcare accounting software",
+    // School
+    "school management software Pakistan", "school fee management",
+    // Pharmacy
+    "pharmacy management software Pakistan", "pharmacy billing",
+    // Transport
+    "transport management software", "fleet management software",
+    // Real Estate
+    "real estate accounting software", "property management Pakistan",
+    // Other industries
+    "hotel management software", "NGO accounting software",
+    "law firm billing software", "IT company accounting",
+    "salon management software", "gym management software",
+    "ecommerce accounting software", "agriculture accounting software",
+    // Geo
+    "accounting software Pakistan", "cloud accounting Pakistan",
+    "business software Karachi", "business software Lahore",
+    "accounting software UAE", "cloud accounting Dubai",
   ],
   authors: [{ name: "FinovaOS", url: BASE }],
   creator: "FinovaOS",
