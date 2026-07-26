@@ -155,6 +155,7 @@ const softwareApplicationJsonLd = {
   description: "FinovaOS — cloud ERP & accounting software purpose-built for trading, wholesale, manufacturing, distribution, restaurant, retail, import/export, construction, hospital, school, pharmacy, transport, real estate, and service businesses.",
   url: BASE_URL,
   screenshot: `${BASE_URL}${BRAND_ICON_PATH}`,
+  sameAs: ["https://www.wikidata.org/wiki/Q140702000"],
   brand: {
     "@type": "Brand",
     name: "FinovaOS",
@@ -211,6 +212,7 @@ const founderJsonLd = {
   url: `${BASE_URL}/forge/about`,
   sameAs: [
     "https://www.linkedin.com/in/umer-sajjad-657936417",
+    "https://www.wikidata.org/wiki/Q140701676",
     `${BASE_URL}/forge/about`,
     `${BASE_URL}/about`,
   ],
@@ -262,6 +264,7 @@ const organizationJsonLd = {
     "https://finovaforge.com",
     "https://www.finovaos.app",
     "https://www.linkedin.com/in/umer-sajjad-657936417",
+    "https://www.wikidata.org/wiki/Q140701786",
   ],
 };
 

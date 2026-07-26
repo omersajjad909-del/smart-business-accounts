@@ -113,6 +113,7 @@ const forgeOrganizationJsonLd = {
   sameAs: [
     `${BASE_URL}`,
     "https://www.linkedin.com/in/umer-sajjad-657936417",
+    "https://www.wikidata.org/wiki/Q140701786",
   ],
 };
 
@@ -129,6 +130,7 @@ const forgePersonJsonLd = {
   url: `${BASE_URL}/forge/about`,
   sameAs: [
     "https://www.linkedin.com/in/umer-sajjad-657936417",
+    "https://www.wikidata.org/wiki/Q140701676",
     `${BASE_URL}/forge/about`,
     `${BASE_URL}/about`,
   ],
