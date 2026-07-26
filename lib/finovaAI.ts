@@ -370,6 +370,158 @@ NEEDS OPENAI CREDITS FOR:
 Note: Even without OpenAI credits, 80% of AI features work perfectly using rule-based + database systems.
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+COMPLETE BUSINESS WORKFLOWS (step-by-step)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Use these workflows to guide users who ask "kahan se banao", "aage kya hoga", "koi step miss ho jaye to kya hoga", etc.
+
+─── PURCHASE CYCLE (Kharidari ka flow) ───
+Step 1: Purchase Order (PO) → /dashboard/purchase-order
+  • Supplier ko order dena. Status: Pending → Approved → Received.
+  • PO mein items, quantity, rate likho. Supplier ko send karo.
+  • ⚠ PO banana zaroori nahi — direct Purchase Invoice bana sakte ho — lekin PO se tracking aur approval milti hai.
+
+Step 2: Goods Receipt Note / Inward (GRN) → /dashboard/goods-receipt
+  • Jab maal aa jaye, GRN banao. PO select karo, maal check karo, quantity confirm karo.
+  • ✅ GRN banane se stock automatically inventory mein add hota hai.
+  • ⚠ AGAR GRN NAHI BANAYA: Stock inventory mein add NAHI hoga. Aapka balance stock galat rahega. Baad mein reports aur stock value incorrect hongi.
+  • GRN ke baad PO ka status "Received" ho jata hai.
+
+Step 3: Purchase Invoice → /dashboard/purchase-invoice
+  • Supplier ki bill enter karo. GRN se link karo (items auto-fill ho jate hain).
+  • ✅ Purchase Invoice banane se Accounts Payable (supplier ko dena hai) mein amount add hoti hai.
+  • ⚠ AGAR Purchase Invoice NAHI BANAI: Expense books mein record nahi hoga. Supplier ka balance zero dikhega. Financial reports (P&L, Balance Sheet) galat hongi.
+
+Step 4: CPV — Cash Payment Voucher → /dashboard/cpv
+  • Supplier ko payment karo. Purchase Invoice select karo, payment mode choose karo (cash/bank/cheque).
+  • ✅ CPV banane se Accounts Payable clear hoti hai. Supplier ka balance zero ho jata hai.
+  • ⚠ AGAR CPV NAHI BANAYA: Supplier outstanding mein rahega. Reports mein galat payables dikhenge.
+
+COMPLETE PURCHASE FLOW SUMMARY:
+PO (order dena) → GRN (maal receive karna, stock add hota hai) → Purchase Invoice (bill enter karna, payable banti hai) → CPV (payment karna, payable clear hoti hai)
+
+─── SALES CYCLE (Bikri ka flow) ───
+Step 1: Quotation → /dashboard/quotation
+  • Customer ko price quote karo. Convert to Invoice karo jab order confirm ho.
+  • ⚠ Optional step — directly Sales Invoice bhi bana sakte ho.
+
+Step 2: Sales Invoice → /dashboard/sales-invoice
+  • Customer ki bill banao. Items, quantity, rate, tax add karo.
+  • ✅ Sales Invoice banane se Accounts Receivable (customer se lena hai) mein amount add hoti hai. Revenue record hota hai. Stock (if inventory linked) automatically reduce hota hai.
+  • ⚠ AGAR Sales Invoice NAHI BANAI: Revenue record nahi hoga. Customer balance zero dikhega. Inventory deduct nahi hogi (stock galat rahega).
+
+Step 3: Delivery Challan → /dashboard/delivery-challan
+  • Maal deliver karte waqt challan banao. Sales Invoice se link karo.
+  • ⚠ Optional — sirf tab zaroori hai jab delivery record rakhni ho ya driver ko document dena ho.
+
+Step 4: CRV — Cash Receipt Voucher → /dashboard/crv
+  • Customer se payment receive karo. Sales Invoice select karo, amount enter karo.
+  • ✅ CRV banane se invoice "Paid" ho jati hai. Accounts Receivable clear hoti hai.
+  • ⚠ AGAR CRV NAHI BANAYA: Customer outstanding mein rahega. Invoice "Unpaid" dikhegi. Cash/bank balance update nahi hoga.
+
+COMPLETE SALES FLOW SUMMARY:
+Quotation (optional) → Sales Invoice (bill banana, receivable banti hai) → Delivery Challan (optional) → CRV (payment receive karna, receivable clear hoti hai)
+
+─── INVENTORY FLOW ───
+Inward (stock aata hai):
+  • GRN → Purchase Invoice → Stock automatically add hota hai
+  • Manual Inward: /dashboard/inventory → Inward entry
+
+Outward (stock jata hai):
+  • Sales Invoice banane se automatically stock deduct hota hai
+  • Manual Outward: /dashboard/inventory → Outward entry
+
+⚠ COMMON INVENTORY MISTAKES:
+  • GRN nahi banaya → stock add nahi hua → stock report galat
+  • Sales Invoice banai lekin inventory item link nahi ki → stock deduct nahi hua
+  • Opening stock enter nahi ki → sab reports se pehle ka stock missing
+
+─── HR & PAYROLL FLOW ───
+Step 1: Employee add karo → /dashboard/employees
+  • Name, designation, department, basic salary enter karo.
+
+Step 2: Attendance mark karo → /dashboard/attendance
+  • Daily ya monthly attendance. In/out time record karo.
+
+Step 3: Payroll process karo → /dashboard/payroll
+  • Month choose karo. Salary + allowances + deductions auto-calculate.
+  • ⚠ AGAR ATTENDANCE NAHI BHARI: Payroll mein attendance-based deductions calculate nahi hongi.
+
+Step 4: Salary disburse karo → CPV banao ya bank transfer record karo.
+
+─── BANK RECONCILIATION FLOW ───
+Step 1: Bank statement download karo (CSV/Excel).
+Step 2: /dashboard/bank-reconciliation → Statement upload karo.
+Step 3: System automatically transactions match karta hai.
+Step 4: Unmatched transactions dhundho → missing entries banao (JV ya payment voucher).
+Step 5: Mark as Reconciled.
+
+⚠ AGAR BANK RECONCILIATION NAHI KARI: Duplicate payments, missing transactions, aur cash flow mismatch detect nahi honge.
+
+─── JOURNAL VOUCHER (JV) — kab use karein ───
+JV sirf tab banao jab koi standard document nahi:
+  • Opening balances enter karna
+  • Bank charges / interest record karna
+  • Depreciation record karna
+  • Error correction karna
+  • Non-cash adjustments
+
+⚠ JV galat banane se Trial Balance mismatch ho sakta hai.
+
+─── ADVANCE PAYMENT FLOW ───
+Customer se advance lena:
+  • CRV banao → Account: "Customer Advances" select karo.
+  • Jab invoice bane → advance adjust karo invoice mein.
+
+Supplier ko advance dena:
+  • CPV banao → Account: "Supplier Advances" select karo.
+  • Jab Purchase Invoice aaye → advance deduct karo.
+
+─── CREDIT NOTE & DEBIT NOTE ───
+Credit Note (Sales Return):
+  • Customer ne maal wapas kiya → /dashboard/credit-notes
+  • Sales Invoice se link karo. Stock wapas add hoga. Receivable reduce hogi.
+
+Debit Note (Purchase Return):
+  • Aapne supplier ko maal wapas kiya → /dashboard/debit-notes
+  • Purchase Invoice se link karo. Stock reduce hogi. Payable reduce hogi.
+
+─── FINANCIAL YEAR FLOW ───
+Saal ke shuru mein:
+  1. New Financial Year create karo → /dashboard/financial-years
+  2. Opening balances enter karo (accounts ki closing from last year)
+  3. Operations shuru karo
+
+Saal ke akhir mein:
+  1. Bank Reconciliation complete karo
+  2. Trial Balance check karo (debits = credits)
+  3. P&L aur Balance Sheet generate karo
+  4. Year close karo
+
+─── COMMON USER MISTAKES & HOW TO FIX ───
+
+MISTAKE 1: Bill kahan se banate hain?
+→ Customer ka bill = Sales Invoice (/dashboard/sales-invoice)
+→ Supplier ka bill = Purchase Invoice (/dashboard/purchase-invoice)
+
+MISTAKE 2: PO ke baad kya banao?
+→ GRN (maal receive karo) → Purchase Invoice (bill enter karo) → CPV (payment karo)
+
+MISTAKE 3: Customer ne payment ki but balance abhi bhi show ho raha hai?
+→ CRV (Cash Receipt Voucher) nahi banaya. /dashboard/crv mein jao, invoice select karo, payment enter karo.
+
+MISTAKE 4: Stock reports galat show ho rahi hain?
+→ GRN nahi banaya, ya Sales Invoice mein inventory item link nahi ki.
+
+MISTAKE 5: Supplier ko paise diye lekin accounts mein show nahi?
+→ CPV nahi banaya. /dashboard/cpv mein jao.
+
+MISTAKE 6: Trial Balance mismatch?
+→ Koi JV galat tha, ya opening balances missing hain.
+
+MISTAKE 7: Inventory mein stock hai lekin invoice mein available nahi?
+→ Item create nahi ki ya /dashboard/inventory mein item add nahi hui.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ACCOUNTING CONCEPTS (for user education)
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
