@@ -20,28 +20,72 @@ export const metadata: Metadata = {
     template: "%s | FinovaOS",
   },
   description:
-    "AI cloud accounting for SMEs. Invoicing, inventory, HR, payroll, bank reconciliation, CRM — all in one. Trusted by 500+ SMEs in Pakistan and UAE.",
+    "FinovaOS — cloud ERP & accounting software purpose-built for trading, wholesale, manufacturing, distribution, restaurant, retail, import/export, construction, and service businesses. Invoicing, inventory, HR, payroll, CRM, bank reconciliation — all in one platform.",
   keywords: [
-    "accounting software",
-    "cloud accounting",
-    "AI accounting software",
-    "AI business intelligence",
-    "invoicing software",
-    "inventory management",
-    "HR payroll software",
-    "bank reconciliation",
-    "CRM",
-    "SME accounting",
-    "global accounting software",
-    "multi-currency accounting",
-    "accounting software Pakistan",
-    "UAE accounting software",
-    "ERP software",
-    "FinovaOS",
-    "business management software",
-    "online accounting",
-    "AI ERP",
-    "smart accounting software",
+    // Brand
+    "FinovaOS", "Finova Forge", "FinovaOS accounting",
+    // Core platform
+    "cloud accounting software", "cloud ERP", "AI accounting software", "AI ERP",
+    "business management software", "online accounting", "smart accounting software",
+    "AI business intelligence", "business health score",
+    // Features
+    "invoicing software", "inventory management", "HR payroll software",
+    "bank reconciliation", "CRM software", "multi-currency accounting",
+    "financial reports", "purchase order software", "goods receipt note",
+    "expense management", "payroll software", "attendance management",
+    // Industries — Trading & Wholesale
+    "trading business software", "trading company accounting software",
+    "wholesale accounting software", "wholesale business ERP",
+    "trading ERP Pakistan", "wholesale management system",
+    // Industries — Distribution
+    "distribution management software", "distribution ERP",
+    "route-based sales software", "van sales software", "multi-warehouse software",
+    // Industries — Manufacturing
+    "manufacturing ERP", "manufacturing accounting software",
+    "bill of materials software", "production order management",
+    "job costing software", "raw material management",
+    // Industries — Restaurant
+    "restaurant management software", "restaurant billing software",
+    "restaurant POS software", "food & beverage ERP",
+    // Industries — Retail
+    "retail accounting software", "retail POS software",
+    "retail management system", "retail inventory software",
+    // Industries — Import / Export
+    "import export software", "trade management software",
+    "clearing forwarding software", "shipment tracking software",
+    "LC TT management", "commercial invoice software",
+    // Industries — Construction
+    "construction accounting software", "construction ERP",
+    "job costing construction", "project billing software",
+    // Industries — Hotel
+    "hotel management software", "hotel billing software", "hospitality ERP",
+    // Industries — Hospital & Clinic
+    "hospital management software", "clinic billing software",
+    "healthcare accounting software", "hospital ERP",
+    // Industries — School & Education
+    "school management software", "school fee management",
+    "education ERP", "student billing software",
+    // Industries — Pharmacy
+    "pharmacy management software", "pharmacy billing software", "pharmacy ERP",
+    // Industries — Transport
+    "transport management software", "fleet management software", "transport billing",
+    // Industries — Real Estate
+    "real estate accounting software", "property management software",
+    // Industries — Service
+    "service business accounting", "service company invoicing",
+    // Industries — NGO
+    "NGO accounting software", "non-profit accounting software",
+    // Industries — IT & Law
+    "IT company accounting software", "law firm billing software",
+    // Industries — Salon, Gym, E-commerce, Agriculture
+    "salon management software", "gym management software",
+    "ecommerce accounting software", "agriculture accounting software",
+    // Geo — Pakistan
+    "accounting software Pakistan", "cloud accounting Pakistan",
+    "FBR accounting software", "ERP software Pakistan",
+    "business software Karachi", "business software Lahore",
+    // Geo — UAE/Gulf
+    "accounting software UAE", "cloud accounting Dubai", "SME software Gulf",
   ],
   authors: [{ name: "Umer Sajjad", url: "https://www.finovaos.app/forge/about" }, { name: "Finova Forge", url: "https://finovaforge.com" }],
   creator: "Umer Sajjad",
@@ -108,7 +152,7 @@ const softwareApplicationJsonLd = {
   name: "FinovaOS",
   applicationCategory: "BusinessApplication",
   operatingSystem: "Web",
-  description: "Cloud accounting software for modern SMEs. Invoicing, inventory, HR & payroll, bank reconciliation, CRM.",
+  description: "FinovaOS — cloud ERP & accounting software purpose-built for trading, wholesale, manufacturing, distribution, restaurant, retail, import/export, construction, hospital, school, pharmacy, transport, real estate, and service businesses.",
   url: BASE_URL,
   screenshot: `${BASE_URL}${BRAND_ICON_PATH}`,
   brand: {
@@ -141,6 +185,19 @@ const softwareApplicationJsonLd = {
     "Financial Reports",
     "Expense Auto-Categorization",
     "Duplicate Transaction Detection",
+    "Trading & Wholesale Management",
+    "Manufacturing — Bill of Materials & Production Orders",
+    "Distribution — Route-based Sales & Van Stock",
+    "Restaurant — POS & Food Billing",
+    "Retail — POS & Branch Stock Control",
+    "Import/Export — Commercial Invoices & Shipment Tracking",
+    "Construction — Job Costing & Project Billing",
+    "Hospital & Clinic Billing",
+    "School Fee Management",
+    "Pharmacy Management",
+    "Transport & Fleet Management",
+    "Real Estate Accounting",
+    "Clearing & Forwarding Management",
   ],
 };
 
@@ -172,7 +229,7 @@ const organizationJsonLd = {
     width: 512,
     height: 512,
   },
-  description: "Finova Forge is the company behind FinovaOS, a cloud accounting and business management platform for modern SMEs.",
+  description: "Finova Forge is the software company behind FinovaOS — a cloud ERP & accounting platform purpose-built for trading, wholesale, manufacturing, distribution, restaurant, retail, import/export, construction, hospital, school, pharmacy, transport, real estate, and service businesses worldwide.",
   foundingDate: "2024",
   foundingLocation: "Pakistan",
   founder: {
