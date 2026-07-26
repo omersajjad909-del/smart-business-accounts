@@ -22,6 +22,7 @@ export async function GET(req: NextRequest) {
       where: { id: companyId },
       select: {
         id: true,
+        companyNo: true,
         name: true,
         country: true,
         baseCurrency: true,

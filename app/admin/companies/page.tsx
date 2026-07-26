@@ -6,6 +6,7 @@ import toast from "react-hot-toast";
 
 type Row = {
   id: string;
+  companyNo?: number | null;
   name: string;
   country?: string | null;
   plan?: string | null;
@@ -199,6 +200,7 @@ function DetailRow({ company, onImpersonate }: { company: Row; onImpersonate: (i
   }
 
   const items = [
+    { label: "Company ID",         value: company.companyNo ? String(company.companyNo) : "—", mono: true, key: "companyno" },
     { label: "Owner Name",         value: company.ownerName    || "—", mono: false, key: "name"   },
     { label: "Owner Email",        value: company.ownerEmail   || "—", mono: true,  key: "email"  },
     { label: "Business Type",      value: BIZ_LABELS[company.businessType || ""] || company.businessType || "—", mono: false, key: "biztype" },
@@ -211,7 +213,7 @@ function DetailRow({ company, onImpersonate }: { company: Row; onImpersonate: (i
 
   return (
     <tr>
-      <td colSpan={10} style={{ background: "rgba(99,102,241,.04)", borderBottom: "1px solid rgba(255,255,255,.06)" }}>
+      <td colSpan={11} style={{ background: "rgba(99,102,241,.04)", borderBottom: "1px solid rgba(255,255,255,.06)" }}>
         <div style={{ padding: "16px 24px", display: "flex", flexDirection: "column", gap: 16 }}>
           {/* Fields grid */}
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px,1fr))", gap: 14 }}>
@@ -354,7 +356,8 @@ export default function AdminCompaniesPage() {
       (c.ownerEmail || "").toLowerCase().includes(text) ||
       (c.ownerName || "").toLowerCase().includes(text) ||
       (c.businessType || "").toLowerCase().includes(text) ||
-      bizLabel.toLowerCase().includes(text);
+      bizLabel.toLowerCase().includes(text) ||
+      String(c.companyNo || "").includes(text);
     const matchPlan    = filterPlan    === "ALL" || (c.plan || "STARTER").toUpperCase() === filterPlan;
     const matchStatus  = filterStatus  === "ALL" || (c.subscriptionStatus || "ACTIVE").toUpperCase() === filterStatus;
     const matchHealth  = filterHealth  === "ALL" || (c.aiHealth || "") === filterHealth;
@@ -449,16 +452,16 @@ export default function AdminCompaniesPage() {
         <table style={{ width: "100%", borderCollapse: "collapse" }}>
           <thead>
             <tr style={{ background: "rgba(255,255,255,.04)" }}>
-              {["", "Company", "Business Type", "Country", "Plan", "Status", "AI Score", "Users", "Renewal", "Actions"].map(h => (
+              {["", "ID", "Company", "Business Type", "Country", "Plan", "Status", "AI Score", "Users", "Renewal", "Actions"].map(h => (
                 <th key={h} style={{ padding: "12px 16px", textAlign: h === "Actions" ? "right" : "left", fontSize: 10, fontWeight: 800, color: "#475569", letterSpacing: ".07em", borderBottom: "1px solid rgba(255,255,255,.07)" }}>{h.toUpperCase()}</th>
               ))}
             </tr>
           </thead>
           <tbody>
             {loading ? (
-              <tr><td colSpan={10} style={{ padding: "60px 0", textAlign: "center", color: "#475569", fontSize: 14 }}>Loading companies…</td></tr>
+              <tr><td colSpan={11} style={{ padding: "60px 0", textAlign: "center", color: "#475569", fontSize: 14 }}>Loading companies…</td></tr>
             ) : filtered.length === 0 ? (
-              <tr><td colSpan={10} style={{ padding: "60px 0", textAlign: "center", color: "#475569", fontSize: 14 }}>No companies found</td></tr>
+              <tr><td colSpan={11} style={{ padding: "60px 0", textAlign: "center", color: "#475569", fontSize: 14 }}>No companies found</td></tr>
             ) : (
               filtered.map(c => (
                 <>
@@ -468,6 +471,11 @@ export default function AdminCompaniesPage() {
                         style={{ background: "none", border: "none", cursor: "pointer", color: "#475569", fontSize: 14, width: 24, height: 24, borderRadius: 6, display: "flex", alignItems: "center", justifyContent: "center", transition: "transform .15s", transform: expanded === c.id ? "rotate(90deg)" : "none" }}>
                         ▶
                       </button>
+                    </td>
+                    <td style={{ padding: "14px 16px", whiteSpace: "nowrap" }}>
+                      <span style={{ fontSize: 12, fontWeight: 800, color: "#38bdf8", fontFamily: "monospace", background: "rgba(56,189,248,.08)", border: "1px solid rgba(56,189,248,.2)", borderRadius: 6, padding: "3px 8px" }}>
+                        #{c.companyNo || "—"}
+                      </span>
                     </td>
                     <td style={{ padding: "14px 16px" }}>
                       <div style={{ fontWeight: 700, fontSize: 14, color: "white" }}>{c.name}</div>

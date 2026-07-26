@@ -10,6 +10,7 @@ export async function GET(req: NextRequest) {
       orderBy: { createdAt: "desc" },
       select: {
         id: true,
+        companyNo: true,
         name: true,
         country: true,
         plan: true,

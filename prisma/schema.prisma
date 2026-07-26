@@ -456,6 +456,7 @@ model OutwardItem {
 
 model Company {
   id        String  @id @default(uuid())
+  companyNo Int     @unique @default(autoincrement())
   name      String
   code      String?
   isActive  Boolean @default(true)

@@ -2090,7 +2090,12 @@ export default function DashboardLayout({
                     ? <img src={companyDetail.logoUrl} alt="logo" style={{width:"100%",height:"100%",objectFit:"cover"}}/>
                     : <img src="/icon1.png" alt="FinovaOS" width={18} height={18} style={{objectFit:"contain"}}/>}
                 </div>
-                <span style={{fontSize:14,fontWeight:800,color:"white",letterSpacing:"-.2px",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{companyName}</span>
+                <div style={{minWidth:0}}>
+                  <span style={{fontSize:14,fontWeight:800,color:"white",letterSpacing:"-.2px",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap",display:"block"}}>{companyName}</span>
+                  {companyDetail?.companyNo && (
+                    <span style={{fontSize:10,fontWeight:700,color:"rgba(56,189,248,0.8)",fontFamily:"monospace",letterSpacing:".04em"}}>ID: {companyDetail.companyNo}</span>
+                  )}
+                </div>
               </div>
               {/* Theme toggle */}
               <div style={{flexShrink:0,marginRight:4}}><ModeToggle /></div>
@@ -2402,6 +2407,11 @@ export default function DashboardLayout({
                         <div style={{fontSize:10,color:"rgba(255,255,255,0.4)",marginTop:1,textTransform:"capitalize"}}>
                           {(currentUser.role||"User").toLowerCase()} · {avatarUploading ? "Uploading..." : "Tap photo to change"}
                         </div>
+                        {companyDetail?.companyNo && (
+                          <div style={{fontSize:10,fontWeight:700,color:"rgba(56,189,248,0.85)",marginTop:3,fontFamily:"monospace",letterSpacing:".04em"}}>
+                            Company ID: {companyDetail.companyNo}
+                          </div>
+                        )}
                       </div>
                     </div>
 
