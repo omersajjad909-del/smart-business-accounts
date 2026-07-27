@@ -575,7 +575,7 @@ export default function AboutPage() {
             Who built FinovaOS
           </h2>
           <p style={{ fontSize: 15, color: "rgba(255,255,255,.38)", maxWidth: 500, margin: "0 auto" }}>
-            FinovaOS is the flagship product of Finova Forge — a software company founded in Lahore, Pakistan with a global reach.
+            FinovaOS is the flagship product of Finova Forge — a software company founded in Faisalabad, Pakistan with a global reach.
           </p>
         </div>
 
@@ -605,7 +605,7 @@ export default function AboutPage() {
               Passionate about building software that fits how real businesses work — without the enterprise complexity, price tag, or six-month implementation timelines.
             </p>
             <div style={{ display: "flex", gap: 10, flexWrap: "wrap", justifyContent: "center" }}>
-              {["Pakistan 🇵🇰", "Lahore", "Est. 2025"].map(tag => (
+              {["Pakistan 🇵🇰", "Faisalabad", "Est. 2025"].map(tag => (
                 <span key={tag} style={{
                   fontSize: 11, fontWeight: 700, color: "rgba(245,158,11,.7)",
                   background: "rgba(245,158,11,.08)", border: "1px solid rgba(245,158,11,.18)",
@@ -641,7 +641,7 @@ export default function AboutPage() {
                 Finova Forge is the software company that designs, builds, and ships FinovaOS. Founded in 2025 in Lahore, Pakistan — registered as a PSEB-certified IT exporter — with a mission to build purpose-built business software for underserved markets worldwide.
               </p>
               <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-                {["PSEB Registered", "IT Exporter", "Founded 2025", "Lahore, Pakistan"].map(t => (
+                {["PSEB Registered", "IT Exporter", "Founded 2025", "Faisalabad, Pakistan"].map(t => (
                   <span key={t} style={{ fontSize: 10, fontWeight: 700, color: "rgba(255,255,255,.35)",
                     background: "rgba(255,255,255,.05)", border: "1px solid rgba(255,255,255,.1)",
                     borderRadius: 100, padding: "3px 10px" }}>{t}</span>

@@ -129,7 +129,7 @@ function Hero() {
           We design and build intelligent, industry-specific business software for companies across South Asia and beyond.
         </p>
         <p style={{ fontSize: 15, color: "rgba(255,255,255,.25)", marginBottom: 48 }}>
-          Lahore, Pakistan &nbsp;{"\u00B7"}&nbsp; Est. 2025
+          Faisalabad, Pakistan &nbsp;{"\u00B7"}&nbsp; Est. 2025
         </p>
 
         <div style={{ display: "flex", gap: 14, justifyContent: "center", flexWrap: "wrap" }}>
@@ -319,7 +319,7 @@ function Team() {
             <div style={{ fontSize: 18, fontWeight: 900, color: "white", marginBottom: 4 }}>Umer Sajjad</div>
             <div style={{ fontSize: 12, color: "#f59e0b", fontWeight: 700, marginBottom: 14, letterSpacing: ".04em" }}>Founder & CEO</div>
             <div style={{ fontSize: 13, color: "rgba(255,255,255,.38)", lineHeight: 1.7 }}>
-              Building FinovaForge from Lahore, Pakistan. Passionate about making enterprise-grade software accessible to every business.
+              Building FinovaForge from Faisalabad, Pakistan. Passionate about making enterprise-grade software accessible to every business.
             </div>
           </div>
         </div>
