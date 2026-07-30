@@ -12,16 +12,19 @@ const DEFAULT_PRICING = {
   starter: { monthly: 49, yearly: 39 },
   pro: { monthly: 99, yearly: 79 },
   enterprise: { monthly: 249, yearly: 199 },
+  // $828/yr ($69/mo equivalent) — matches the yearly price shown on the addon payment page
+  addon_automation: { monthly: 79, yearly: 69 },
 };
 const DEFAULT_SEAT_PRICING = {
   monthly: 7,
   yearly: 6,
 };
 
-function normalizePlanKey(planCode: string): "starter" | "pro" | "enterprise" {
+function normalizePlanKey(planCode: string): "starter" | "pro" | "enterprise" | "addon_automation" {
   const normalized = String(planCode || "").toUpperCase();
   if (normalized === "PRO" || normalized === "PROFESSIONAL") return "pro";
   if (normalized === "ENTERPRISE") return "enterprise";
+  if (normalized === "ADDON-AUTOMATION") return "addon_automation";
   return "starter";
 }
 
@@ -38,34 +41,7 @@ export async function POST(req: NextRequest) {
 
     const body = await req.json();
     const planCode = String(body?.planCode || "STARTER").toUpperCase();
-
-    // ── Automation addon: activate directly, no payment gateway needed ────────
-    if (planCode === "ADDON-AUTOMATION") {
-      const base = getRuntimeAppUrl(req.nextUrl.origin);
-      await prisma.$executeRawUnsafe(`
-        CREATE TABLE IF NOT EXISTS "AutomationAddon" (
-          "id" TEXT PRIMARY KEY DEFAULT gen_random_uuid()::text,
-          "companyId" TEXT NOT NULL UNIQUE,
-          "enabled" BOOLEAN NOT NULL DEFAULT true,
-          "plan" TEXT NOT NULL DEFAULT 'MONTHLY',
-          "pricePerMonth" DOUBLE PRECISION NOT NULL DEFAULT 79,
-          "expiresAt" TIMESTAMP(3),
-          "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-          "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP
-        )
-      `).catch(() => {});
-      await prisma.$executeRaw`
-        INSERT INTO "AutomationAddon" ("companyId", "enabled", "plan", "pricePerMonth")
-        VALUES (${companyId}, true, ${body?.billingCycle?.toUpperCase() === "YEARLY" ? "YEARLY" : "MONTHLY"}, 79)
-        ON CONFLICT ("companyId") DO UPDATE SET "enabled" = true, "updatedAt" = NOW()
-      `.catch(() => {});
-      await prisma.activityLog.create({
-        data: { companyId, userId: userId || null, action: "ADDON_AUTOMATION_ACTIVATED", details: JSON.stringify({ planCode, activatedAt: new Date().toISOString() }) },
-      }).catch(() => {});
-      const successRedirect = String(body?.successUrl || `${base}/dashboard/automation?addon=activated`);
-      return apiOk({ url: successRedirect, activated: true });
-    }
-    // ─────────────────────────────────────────────────────────────────────────
+    const isAddonPlan = planCode.startsWith("ADDON-");
 
     const billingCycle = String(body?.billingCycle || "MONTHLY").toUpperCase() === "YEARLY" ? "YEARLY" : "MONTHLY";
     const successUrl = String(body?.successUrl || "");
@@ -105,7 +81,9 @@ export async function POST(req: NextRequest) {
       }
     } catch {}
 
-    const extraSeats = await getCompanyExtraSeats(companyId);
+    // Extra-seat billing applies to the base ERP plan's user count — not to
+    // standalone add-ons like Automation, which are flat-priced.
+    const extraSeats = isAddonPlan ? 0 : await getCompanyExtraSeats(companyId);
     const planBasePerMonth =
       Number(pricing[normalizedPlan]?.[billingCycle === "YEARLY" ? "yearly" : "monthly"]) ||
       Number(DEFAULT_PRICING[normalizedPlan][billingCycle === "YEARLY" ? "yearly" : "monthly"]);
@@ -231,6 +209,35 @@ export async function POST(req: NextRequest) {
     // No payment provider configured — block checkout in production
     if (process.env.NODE_ENV === "production") {
       return apiError("Payment provider not configured. Please contact support.", 503);
+    }
+
+    // Development/local fallback only — add-ons never touch Company.plan/subscriptionStatus
+    if (isAddonPlan) {
+      const base = getRuntimeAppUrl(req.nextUrl.origin);
+      if (planCode === "ADDON-AUTOMATION") {
+        await prisma.$executeRawUnsafe(`
+          CREATE TABLE IF NOT EXISTS "AutomationAddon" (
+            "id" TEXT PRIMARY KEY DEFAULT gen_random_uuid()::text,
+            "companyId" TEXT NOT NULL UNIQUE,
+            "enabled" BOOLEAN NOT NULL DEFAULT true,
+            "plan" TEXT NOT NULL DEFAULT 'MONTHLY',
+            "pricePerMonth" DOUBLE PRECISION NOT NULL DEFAULT 79,
+            "expiresAt" TIMESTAMP(3),
+            "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP
+          )
+        `).catch(() => {});
+        await prisma.$executeRaw`
+          INSERT INTO "AutomationAddon" ("companyId", "enabled", "plan", "pricePerMonth")
+          VALUES (${companyId}, true, ${billingCycle}, ${finalCustomPrice})
+          ON CONFLICT ("companyId") DO UPDATE SET "enabled" = true, "updatedAt" = NOW()
+        `.catch(() => {});
+      }
+      await prisma.activityLog.create({
+        data: { companyId, userId: userId || null, action: "ADDON_AUTOMATION_ACTIVATED", details: JSON.stringify({ planCode, billingCycle, activatedAt: new Date().toISOString(), provider: "DIRECT_FALLBACK_DEV_ONLY" }) },
+      }).catch(() => {});
+      const successRedirect = String(body?.successUrl || `${base}/dashboard/automation?addon=activated`);
+      return apiOk({ url: successRedirect, activated: true });
     }
 
     // Development/local fallback only

@@ -31,7 +31,9 @@ export function resolveLemonVariantId(
   billingCycle: BillingCycle,
   isPakistan = false,
 ) {
-  const normalizedPlan = String(planCode || "STARTER").toUpperCase();
+  // "ADDON-AUTOMATION" -> "AUTOMATION" so it resolves against the
+  // LEMONSQUEEZY_VARIANT_AUTOMATION_* env vars below.
+  const normalizedPlan = String(planCode || "STARTER").toUpperCase().replace(/^ADDON-/, "");
   const cycle = billingCycle === "YEARLY" ? "YEARLY" : "MONTHLY";
   const suffix = isPakistan ? "_PK" : "";
 
