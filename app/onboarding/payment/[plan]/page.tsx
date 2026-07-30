@@ -794,13 +794,19 @@ export default function PaymentPage() {
                 <div style={{ marginTop:14, padding:"13px 14px", borderRadius:12, background:"rgba(255,255,255,.02)", border:"1px solid rgba(255,255,255,.06)" }}>
                   <div style={{ fontSize:9, fontWeight:700, color:"rgba(255,255,255,.28)", letterSpacing:".08em", textTransform:"uppercase", marginBottom:10 }}>We accept</div>
                   <div style={{ display:"flex", flexWrap:"wrap", gap:6 }}>
-                    {[
-                      { label:"Visa",        color:"#1a1f71" },
-                      { label:"Mastercard",  color:"#eb001b" },
-                      { label:"PayPal",      color:"#003087" },
-                      { label:"Apple Pay",   color:"#a3a3a3" },
-                      { label:"Google Pay",  color:"#4285F4" },
-                    ].map(p => (
+                    {(isPakistan
+                      ? [
+                          { label:"Visa",        color:"#1a1f71" },
+                          { label:"Mastercard",  color:"#eb001b" },
+                        ]
+                      : [
+                          { label:"Visa",        color:"#1a1f71" },
+                          { label:"Mastercard",  color:"#eb001b" },
+                          { label:"PayPal",      color:"#003087" },
+                          { label:"Apple Pay",   color:"#a3a3a3" },
+                          { label:"Google Pay",  color:"#4285F4" },
+                        ]
+                    ).map(p => (
                       <div key={p.label} style={{ padding:"3px 10px", borderRadius:7, background:`${p.color}18`, border:`1px solid ${p.color}30`, fontSize:10, fontWeight:700, color:`${p.color}cc`, letterSpacing:".03em" }}>{p.label}</div>
                     ))}
                   </div>

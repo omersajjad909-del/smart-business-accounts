@@ -95,7 +95,9 @@
       "Bash(curl -s -o /dev/null -w \"starter: %{http_code}\\\\n\" \"http://localhost:3000/onboarding/payment/starter\" --max-time 30)",
       "Bash(curl -s -o /dev/null -w \"no-country: %{http_code}\\\\n\" \"http://localhost:3000/onboarding/payment/addon-automation\" --max-time 30)",
       "Bash(taskkill //PID 8828 //F)",
-      "Bash(rm -rf .next)"
+      "Bash(rm -rf .next)",
+      "Bash(curl -s \"http://localhost:3000/onboarding/payment/addon-automation?cycle=monthly&country=PK\" --max-time 30 -o /tmp/pk2.html)",
+      "Bash(taskkill //PID 4340 //F)"
     ],
     "additionalDirectories": [
       "d:\\projects\\smart-business-accounts\\app\\api\\chat\\conversations",
