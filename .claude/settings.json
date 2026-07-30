@@ -79,7 +79,8 @@
       "Bash(command -v chromium-cli)",
       "Bash(echo \"exit:$?\")",
       "Bash(node -e \"console.log\\(require.resolve\\('playwright'\\)\\)\")",
-      "Bash(npx --no-install playwright --version)"
+      "Bash(npx --no-install playwright --version)",
+      "Bash(curl -s \"http://localhost:3000/onboarding/payment/addon-automation?cycle=monthly\" --max-time 30 -o /tmp/payment-page.html)"
     ],
     "additionalDirectories": [
       "d:\\projects\\smart-business-accounts\\app\\api\\chat\\conversations",
