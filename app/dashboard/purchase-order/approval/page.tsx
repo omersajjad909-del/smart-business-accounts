@@ -5,6 +5,8 @@ import { DateInput } from "@/app/dashboard/reports/_components/DateInput";
 import { useBusinessRecords } from "@/lib/useBusinessRecords";
 import { useResponsive } from "@/hooks/useResponsive";
 
+const isMobile = false;
+
 /* ─── types ─── */
 interface LineItem {
   name: string;

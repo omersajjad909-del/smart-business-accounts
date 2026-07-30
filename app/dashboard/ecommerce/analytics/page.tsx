@@ -4,6 +4,8 @@ import { useEffect, useMemo, useState } from "react";
 import { EcommerceControlCenter, ecommerceBg, ecommerceBorder, ecommerceFont, ecommerceMuted, fetchJson } from "../_shared";
 import { useResponsive } from "@/hooks/useResponsive";
 
+const isMobile = false;
+
 function Metric({ title, value, note, color }: { title: string; value: string; note: string; color: string }) {
   return (
     <div style={{ background: ecommerceBg, border: `1px solid ${ecommerceBorder}`, borderRadius: 18, padding: isMobile ? "12px 10px" : "20px 22px" }}>

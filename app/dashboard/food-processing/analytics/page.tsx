@@ -5,6 +5,8 @@ import { useBusinessRecords } from "@/lib/useBusinessRecords";
 import { foodProcessingAccent, mapFoodRecipe } from "../_shared";
 import { useResponsive } from "@/hooks/useResponsive";
 
+const isMobile = false;
+
 const cardStyle: React.CSSProperties = {
   background: "rgba(255,255,255,.03)",
   border: "1px solid rgba(255,255,255,.07)",

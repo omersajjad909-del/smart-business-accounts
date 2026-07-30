@@ -4,6 +4,8 @@ import { useEffect, useState, useCallback } from "react";
 import { getCurrentUser } from "@/lib/auth";
 import { useResponsive } from "@/hooks/useResponsive";
 
+const isMobile = false;
+
 const ACCENT = "#6366f1";
 const FONT = "'Outfit','Inter',sans-serif";
 

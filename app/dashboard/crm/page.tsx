@@ -3,6 +3,8 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useResponsive } from "@/hooks/useResponsive";
 
+const isMobile = false;
+
 const FF = "'Outfit','Inter',sans-serif";
 const ACCENT = "#6366f1";
 

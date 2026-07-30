@@ -1,6 +1,8 @@
 "use client";
 import { confirmToast, alertToast } from "@/lib/toast-feedback";
 
+const isMobile = false;
+
 import { useMemo, useState } from "react";
 import { useBusinessRecords } from "@/lib/useBusinessRecords";
 import { mapRebateRecords, tradeBg, tradeBorder, tradeFont, tradeMuted } from "../_shared";

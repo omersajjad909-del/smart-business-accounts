@@ -3,6 +3,8 @@ import { useState, useMemo } from "react";
 import { useBusinessRecords } from "@/lib/useBusinessRecords";
 import { useResponsive } from "@/hooks/useResponsive";
 
+const isMobile = false;
+
 const font = "'Outfit','Inter',sans-serif";
 
 const S = {

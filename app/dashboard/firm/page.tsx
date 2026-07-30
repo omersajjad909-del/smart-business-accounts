@@ -5,6 +5,8 @@ import { useEffect, useState } from "react";
 import { useBusinessRecords } from "@/lib/useBusinessRecords";
 import { useResponsive } from "@/hooks/useResponsive";
 import {
+const isMobile = false;
+
   firmBg,
   firmBorder,
   firmFont,

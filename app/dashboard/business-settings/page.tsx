@@ -3,6 +3,8 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useResponsive } from "@/hooks/useResponsive";
 
+const isMobile = false;
+
 type Tab = "general" | "identity" | "invoice" | "subscription";
 
 interface CompanyInfo {

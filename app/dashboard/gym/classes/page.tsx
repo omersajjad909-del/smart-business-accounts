@@ -3,6 +3,8 @@ import { useState } from 'react';
 import { useBusinessRecords } from '@/lib/useBusinessRecords';
 import { useResponsive } from "@/hooks/useResponsive";
 
+const isMobile = false;
+
 const S = {
   page: { padding: '32px', fontFamily: 'Inter, sans-serif', color: '#fff', minHeight: '100vh' },
   header: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 28 },

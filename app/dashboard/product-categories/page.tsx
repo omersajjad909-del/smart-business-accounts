@@ -3,6 +3,8 @@ import { useState, useMemo } from "react";
 import { useBusinessRecords, BusinessRecord } from "@/lib/useBusinessRecords";
 import { useResponsive } from "@/hooks/useResponsive";
 
+const isMobile = false;
+
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 type CategoryType = "PRODUCT" | "SERVICE" | "RAW_MATERIAL" | "FINISHED_GOODS" | "SPARE_PARTS";

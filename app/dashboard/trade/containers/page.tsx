@@ -4,6 +4,8 @@ import { useBusinessRecords, BusinessRecord } from "@/lib/useBusinessRecords";
 import DateInput from "@/app/dashboard/reports/_components/DateInput";
 import { useResponsive } from "@/hooks/useResponsive";
 
+const isMobile = false;
+
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 type ContainerType   = "20ft" | "40ft" | "40ft HC" | "20ft Reefer" | "40ft Reefer" | "20ft OT" | "40ft OT" | "Flat Rack";

@@ -3,6 +3,8 @@ import { useState } from "react";
 import { useBusinessRecords } from "@/lib/useBusinessRecords";
 import { useResponsive } from "@/hooks/useResponsive";
 
+const isMobile = false;
+
 const s = {
   page: { minHeight: "100vh", background: "#0f0f13", fontFamily: "'Outfit','Inter',sans-serif", color: "#fff", padding: isMobile ? "16px" : "32px" } as React.CSSProperties,
   heading: { fontSize: 26, fontWeight: 700, marginBottom: 4 } as React.CSSProperties,

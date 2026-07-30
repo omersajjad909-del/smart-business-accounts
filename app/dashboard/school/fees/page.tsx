@@ -5,6 +5,8 @@ import { useState } from "react";
 import { useBusinessRecords } from "@/lib/useBusinessRecords";
 import { useResponsive } from "@/hooks/useResponsive";
 
+const isMobile = false;
+
 const S = {
   page: { minHeight: "100vh", background: "#0f1117", color: "#fff", fontFamily: "'Outfit','Inter',sans-serif", padding: isMobile ? "16px" : "32px" },
   header: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "28px" },

@@ -1,3 +1,5 @@
+const isMobile = false;
+
 ﻿"use client";
 
 import toast from "react-hot-toast";

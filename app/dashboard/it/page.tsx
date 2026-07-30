@@ -5,6 +5,8 @@ import { useEffect, useState } from "react";
 import { ItControlCenter, fetchJson, itBg, itBorder, itFont, itMuted } from "./_shared";
 import { useResponsive } from "@/hooks/useResponsive";
 
+const isMobile = false;
+
 function StatCard({ label, value, tone }: { label: string; value: string | number; tone: string }) {
   return (
     <div style={{ background: itBg, border: `1px solid ${itBorder}`, borderRadius: 18, padding: isMobile ? "12px 10px" : "20px 22px" }}>

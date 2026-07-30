@@ -7,6 +7,8 @@ import { DateInput } from "@/app/dashboard/reports/_components/DateInput";
 import { getCurrentUser } from "@/lib/auth";
 import { useResponsive } from "@/hooks/useResponsive";
 
+const isMobile = false;
+
 const ff = "'Outfit','Inter',sans-serif";
 
 interface LineItem { name: string; amount: number; }

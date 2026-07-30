@@ -6,6 +6,8 @@ import { DateInput } from "@/app/dashboard/reports/_components/DateInput";
 import { getCurrentUser } from "@/lib/auth";
 import { useResponsive } from "@/hooks/useResponsive";
 
+const isMobile = false;
+
 interface CashFlowItem { date: string; voucherNo: string; description: string; amount: number; type: "INFLOW"|"OUTFLOW"; }
 interface CashFlowSection { items: CashFlowItem[]; inflow: number; outflow: number; net: number; }
 interface CashFlowData { period: { from: string; to: string }; operating: CashFlowSection; investing: CashFlowSection; financing: CashFlowSection; netCashFlow: number; }

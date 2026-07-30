@@ -5,6 +5,8 @@ import { useBusinessRecords } from "@/lib/useBusinessRecords";
 import { restaurantBg, restaurantBorder, restaurantFont, restaurantMuted } from "../_shared";
 import { useResponsive } from "@/hooks/useResponsive";
 
+const isMobile = false;
+
 const card: React.CSSProperties = { background: restaurantBg, border: `1px solid ${restaurantBorder}`, borderRadius: 12, padding: isMobile ? "12px 11px" : "20px 24px", fontFamily: restaurantFont };
 
 export default function RecipeCostingPage() {

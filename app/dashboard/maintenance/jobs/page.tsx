@@ -4,6 +4,8 @@ import { useState } from "react";
 import { useBusinessRecords, BusinessRecord } from "@/lib/useBusinessRecords";
 import { useResponsive } from "@/hooks/useResponsive";
 
+const isMobile = false;
+
 const PRIORITIES = ["Low", "Medium", "High", "Urgent"] as const;
 const STATUSES   = ["Pending", "In-Progress", "Completed", "Cancelled"] as const;
 

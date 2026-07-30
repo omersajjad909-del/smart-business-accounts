@@ -4,6 +4,8 @@ import { useBusinessRecords, BusinessRecord } from "@/lib/useBusinessRecords";
 import DateInput from "@/app/dashboard/reports/_components/DateInput";
 import { useResponsive } from "@/hooks/useResponsive";
 
+const isMobile = false;
+
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 type MovementType = "STOCK_IN" | "STOCK_OUT" | "ADJUSTMENT";

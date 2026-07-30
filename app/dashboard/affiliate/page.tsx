@@ -3,6 +3,8 @@ import { useEffect, useState, useCallback } from "react";
 import { getCurrentUser } from "@/lib/auth";
 import { useResponsive } from "@/hooks/useResponsive";
 
+const isMobile = false;
+
 interface AffiliateConversion {
   id: string;
   customerEmail: string;

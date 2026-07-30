@@ -2,6 +2,8 @@
 
 import toast from "react-hot-toast";
 
+const isMobile = false;
+
 import { useEffect, useMemo, useState } from "react";
 import { useBusinessRecords } from "@/lib/useBusinessRecords";
 import { restaurantBg, restaurantBorder, restaurantFont, restaurantMuted } from "../_shared";

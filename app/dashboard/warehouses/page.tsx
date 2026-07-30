@@ -1,6 +1,8 @@
 "use client";
 import { fmtDate } from "@/lib/dateUtils";
 
+const isMobile = false;
+
 import { useState, useMemo, useEffect } from "react";
 import { useBusinessRecords, BusinessRecord } from "@/lib/useBusinessRecords";
 import { useResponsive } from "@/hooks/useResponsive";

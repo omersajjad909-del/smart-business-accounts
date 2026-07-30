@@ -4,6 +4,8 @@ import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { useResponsive } from "@/hooks/useResponsive";
 
+const isMobile = false;
+
 const wholesaleBg = "rgba(255,255,255,.035)";
 const wholesaleBorder = "rgba(255,255,255,.08)";
 const wholesaleMuted = "rgba(255,255,255,.56)";

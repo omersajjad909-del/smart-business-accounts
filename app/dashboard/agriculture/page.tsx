@@ -5,6 +5,8 @@ import { useEffect, useMemo, useState } from "react";
 import { AgricultureControlCenter, agricultureBg, agricultureBorder, agricultureFont, agricultureMuted, fetchJson } from "./_shared";
 import { useResponsive } from "@/hooks/useResponsive";
 
+const isMobile = false;
+
 function StatCard({ label, value, tone }: { label: string; value: string | number; tone: string }) {
   return (
     <div style={{ background: agricultureBg, border: `1px solid ${agricultureBorder}`, borderRadius: 18, padding: isMobile ? "12px 10px" : "20px 22px" }}>

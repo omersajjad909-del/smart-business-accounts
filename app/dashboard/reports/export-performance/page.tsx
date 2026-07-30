@@ -4,6 +4,8 @@ import DateInput from "@/app/dashboard/reports/_components/DateInput";
 import { getCurrentUser } from "@/lib/auth";
 import { useResponsive } from "@/hooks/useResponsive";
 
+const isMobile = false;
+
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 interface ExportRecord {

@@ -4,6 +4,8 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useResponsive } from "@/hooks/useResponsive";
 import {
+const isMobile = false;
+
   GymControlCenter,
   fetchJson,
   gymBg,

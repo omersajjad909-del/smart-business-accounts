@@ -4,6 +4,8 @@ import { useBusinessRecords, BusinessRecord } from "@/lib/useBusinessRecords";
 import DateInput from "@/app/dashboard/reports/_components/DateInput";
 import { useResponsive } from "@/hooks/useResponsive";
 
+const isMobile = false;
+
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 type DocType   = "Shipping Bill" | "Export Declaration" | "Bill of Lading" | "Airway Bill" | "Export Permit" | "Phytosanitary Certificate" | "Fumigation Certificate" | "Inspection Certificate" | "Insurance Certificate" | "Other";

@@ -2,6 +2,8 @@
 import { fmtDate } from "@/lib/dateUtils";
 import { confirmToast, alertToast } from "@/lib/toast-feedback";
 
+const isMobile = false;
+
 import { useEffect, useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import toast from "react-hot-toast";

@@ -8,6 +8,8 @@ import type { OperatorAction, OperatorDecision, OperatorPayload } from "@/lib/bu
 import type { AnomalyAlert } from "@/lib/finovaAI";
 import { useResponsive } from "@/hooks/useResponsive";
 
+const isMobile = false;
+
 /* ── Design tokens ──────────────────────────────────────────────────────── */
 const T = {
   bg:      "#070a1c",

@@ -4,6 +4,8 @@ import { useState, useEffect } from "react";
 import { getCurrentUser } from "@/lib/auth";
 import { useResponsive } from "@/hooks/useResponsive";
 
+const isMobile = false;
+
 const ff = "'Outfit','Inter',sans-serif";
 const ACCENT = "#34d399";
 const BG = "rgba(255,255,255,.03)";

@@ -5,6 +5,8 @@ import { useEffect, useState } from "react";
 import { LawControlCenter, fetchJson, lawBg, lawBorder, lawFont, lawMuted } from "./_shared";
 import { useResponsive } from "@/hooks/useResponsive";
 
+const isMobile = false;
+
 function StatCard({ label, value, tone }: { label: string; value: string | number; tone: string }) {
   return (
     <div style={{ background: lawBg, border: `1px solid ${lawBorder}`, borderRadius: 18, padding: isMobile ? "12px 10px" : "20px 22px" }}>
