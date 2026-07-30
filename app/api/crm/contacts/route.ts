@@ -47,7 +47,6 @@ export async function POST(req: NextRequest) {
   if (guard) return guard;
 
   try {
-    await ensureContactScopedUniqueIndexes();
     const companyId = await resolveCompanyId(req);
     if (!companyId) {
       return NextResponse.json({ error: "Company required" }, { status: 400 });
@@ -115,7 +114,6 @@ export async function PUT(req: NextRequest) {
   if (guard) return guard;
 
   try {
-    await ensureContactScopedUniqueIndexes();
     const companyId = await resolveCompanyId(req);
     if (!companyId) {
       return NextResponse.json({ error: "Company required" }, { status: 400 });
