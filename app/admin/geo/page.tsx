@@ -48,11 +48,18 @@ const TAB_CONFIG: { key: Tab; label: string; color: string; accent: string }[] =
   { key: "visitors",  label: "Visitors",  color: "#38bdf8", accent: "rgba(56,189,248,.15)" },
 ];
 
+function fmtTime(val: string | null | undefined) {
+  if (!val) return null;
+  const d = new Date(val);
+  return d.toLocaleString("en-PK", { day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit", hour12: true });
+}
+
 export default function GeoAnalyticsPage() {
   const [data, setData]   = useState<GeoResponse | null>(null);
   const [tab, setTab]     = useState<Tab>("visitors");
   const [query, setQuery] = useState("");
   const [loading, setLoading] = useState(true);
+  const [showAll, setShowAll] = useState(false);
 
   useEffect(() => {
     fetch("/api/admin/geo/map", { cache: "no-store" })
@@ -77,6 +84,8 @@ export default function GeoAnalyticsPage() {
   }, [currentPins, query]);
 
   const tabConf = TAB_CONFIG.find(t => t.key === tab)!;
+  const LIMIT = 30;
+  const visiblePins = showAll ? filteredPins : filteredPins.slice(0, LIMIT);;
 
   const statCards = [
     { label: "Companies", value: data?.stats.companies ?? 0, sub: `${data?.stats.exactCompanies ?? 0} exact pins`,   color: "#6366f1" },
@@ -161,7 +170,7 @@ export default function GeoAnalyticsPage() {
             {tab === "companies" ? "TOP COMPANIES" : tab === "branches" ? "BRANCH PINS" : "RECENT VISITORS"}
           </div>
           <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-            {filteredPins.slice(0, 20).map((pin, i) => (
+            {visiblePins.map((pin, i) => (
               <div key={`${pin.type}-${pin.label}-${i}`} style={{
                 background: "rgba(255,255,255,.03)",
                 border: "1px solid rgba(255,255,255,.07)",
@@ -187,7 +196,20 @@ export default function GeoAnalyticsPage() {
                 {pin.country && !pin.city && !pin.address && (
                   <div style={{ fontSize: 11, color: "rgba(255,255,255,.35)" }}>{pin.country}</div>
                 )}
-                <div style={{ fontSize: 10, color: "rgba(255,255,255,.2)", marginTop: 4, fontFamily: "monospace" }}>
+                {pin.page && (
+                  <div style={{ fontSize: 10, color: "rgba(99,102,241,.7)", marginTop: 4 }}>📄 {pin.page}</div>
+                )}
+                {pin.device && (
+                  <div style={{ fontSize: 10, color: "rgba(255,255,255,.3)", marginTop: 2 }}>
+                    {pin.device === "mobile" ? "📱" : pin.device === "tablet" ? "🖥️" : "💻"} {pin.device}
+                  </div>
+                )}
+                {pin.visitedAt && (
+                  <div style={{ fontSize: 10, color: "rgba(56,189,248,.6)", marginTop: 4 }}>
+                    🕐 {fmtTime(pin.visitedAt)}
+                  </div>
+                )}
+                <div style={{ fontSize: 10, color: "rgba(255,255,255,.15)", marginTop: 4, fontFamily: "monospace" }}>
                   {pin.lat.toFixed(4)}, {pin.lon.toFixed(4)}
                 </div>
               </div>
@@ -197,10 +219,29 @@ export default function GeoAnalyticsPage() {
                 No pins for this filter.
               </div>
             )}
-            {filteredPins.length > 20 && (
-              <div style={{ textAlign: "center", fontSize: 12, color: "rgba(255,255,255,.3)", padding: "8px 0" }}>
-                +{filteredPins.length - 20} more not shown
-              </div>
+            {!showAll && filteredPins.length > LIMIT && (
+              <button
+                onClick={() => setShowAll(true)}
+                style={{
+                  width: "100%", padding: "10px", borderRadius: 10, fontSize: 12, fontWeight: 700,
+                  background: "rgba(99,102,241,.12)", border: "1px solid rgba(99,102,241,.3)",
+                  color: "#818cf8", cursor: "pointer",
+                }}
+              >
+                Show all {filteredPins.length} visitors
+              </button>
+            )}
+            {showAll && filteredPins.length > LIMIT && (
+              <button
+                onClick={() => setShowAll(false)}
+                style={{
+                  width: "100%", padding: "10px", borderRadius: 10, fontSize: 12, fontWeight: 700,
+                  background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.1)",
+                  color: "rgba(255,255,255,.4)", cursor: "pointer",
+                }}
+              >
+                Show less
+              </button>
             )}
           </div>
         </div>
