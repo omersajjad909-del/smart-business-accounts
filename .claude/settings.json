@@ -80,7 +80,12 @@
       "Bash(echo \"exit:$?\")",
       "Bash(node -e \"console.log\\(require.resolve\\('playwright'\\)\\)\")",
       "Bash(npx --no-install playwright --version)",
-      "Bash(curl -s \"http://localhost:3000/onboarding/payment/addon-automation?cycle=monthly\" --max-time 30 -o /tmp/payment-page.html)"
+      "Bash(curl -s \"http://localhost:3000/onboarding/payment/addon-automation?cycle=monthly\" --max-time 30 -o /tmp/payment-page.html)",
+      "Bash(lsof -ti:3000 -sTCP:LISTEN)",
+      "Bash(xargs -r kill)",
+      "Bash(taskkill //IM node.exe //FI \"WINDOWTITLE eq npm*\")",
+      "Bash(netstat -ano)",
+      "Bash(taskkill //PID 13012 //F)"
     ],
     "additionalDirectories": [
       "d:\\projects\\smart-business-accounts\\app\\api\\chat\\conversations",
