@@ -75,6 +75,7 @@ function siRunQuery(invoices: SalesInvoice[], invNo: string, dateQ: string, part
 
 // ─── Component ───────────────────────────────────────────────────────────────
 function SalesInvoiceContent() {
+  const { isMobile } = useResponsive();
   const searchParams = useSearchParams();
   const queryId = searchParams.get("id");
   const today = new Date().toISOString().slice(0, 10);
@@ -1213,7 +1214,6 @@ function SalesInvoiceContent() {
 }
 
 export default function SalesInvoicePage() {
-  const { isMobile } = useResponsive();
   return (
     <Suspense fallback={<div style={{ padding: 40, textAlign: "center", fontFamily: "'Outfit',sans-serif", color: "var(--text-muted)" }}>Loading Invoice…</div>}>
       <SalesInvoiceContent />

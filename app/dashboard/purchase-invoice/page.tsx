@@ -156,6 +156,7 @@ function labelStyle(): React.CSSProperties {
 }
 
 function PurchaseInvoiceContent() {
+  const { isMobile } = useResponsive();
   const searchParams = useSearchParams();
   const queryId = searchParams.get("id");
   const today = new Date().toISOString().slice(0, 10);
@@ -1455,7 +1456,6 @@ const [searchTerm, setSearchTerm] = useState("");
 }
 
 export default function PurchaseInvoicePage() {
-  const { isMobile } = useResponsive();
   return (
     <Suspense fallback={<div className="p-4 text-center">Loading Invoice...</div>}>
       <PurchaseInvoiceContent />

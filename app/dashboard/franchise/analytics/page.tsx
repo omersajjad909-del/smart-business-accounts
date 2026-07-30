@@ -4,7 +4,7 @@ import { useMemo } from "react";
 import { useBusinessRecords } from "@/lib/useBusinessRecords";
 import { useResponsive } from "@/hooks/useResponsive";
 
-function card(label: string, value: string | number, color: string) {
+function card(label: string, value: string | number, color: string, isMobile: boolean) {
   return (
     <div style={{ background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)", borderRadius: 16, padding: isMobile ? "12px 10px" : "18px 20px" }}>
       <div style={{ fontSize: 11, color: "rgba(255,255,255,.45)", textTransform: "uppercase", letterSpacing: ".06em", marginBottom: 6 }}>{label}</div>
@@ -66,11 +66,11 @@ export default function FranchiseAnalyticsPage() {
       </div>
 
       <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(auto-fit,minmax(180px,1fr))", gap: 14, marginBottom: 24 }}>
-        {card("Outlets", stats.outlets, "#22c55e")}
-        {card("Active Outlets", stats.activeOutlets, "#60a5fa")}
-        {card("Monthly Sales", stats.monthlySales.toLocaleString(), "#fbbf24")}
-        {card("Royalty Value", stats.royaltyValue.toLocaleString(), "#a78bfa")}
-        {card("Received Cycles", stats.received, "#34d399")}
+        {card("Outlets", stats.outlets, "#22c55e", isMobile)}
+        {card("Active Outlets", stats.activeOutlets, "#60a5fa", isMobile)}
+        {card("Monthly Sales", stats.monthlySales.toLocaleString(), "#fbbf24", isMobile)}
+        {card("Royalty Value", stats.royaltyValue.toLocaleString(), "#a78bfa", isMobile)}
+        {card("Received Cycles", stats.received, "#34d399", isMobile)}
       </div>
 
       <div style={{ display: "grid", gridTemplateColumns: "1.1fr .9fr", gap: 16 }}>

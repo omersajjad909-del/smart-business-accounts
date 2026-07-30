@@ -341,6 +341,7 @@ function ActionCard({ action, queueingId, buttonLabel, onQueue }: {
 
 /* ── Skeleton Loader ────────────────────────────────────────────────────── */
 function Skeleton() {
+  const { isMobile } = useResponsive();
   return (
     <div style={{ padding: 24, minHeight: "100vh", color: "white", fontFamily: "'Outfit','Inter',sans-serif" }}>
       <style>{`@keyframes sk{0%,100%{opacity:.35}50%{opacity:.7}} .sk{background:rgba(255,255,255,.07);border-radius:12px;animation:sk 1.7s ease infinite}`}</style>

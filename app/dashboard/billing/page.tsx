@@ -263,6 +263,7 @@ function AddCardModal({ onClose, onSuccess }: { onClose:()=>void; onSuccess?:(ca
    MAIN PAGE
 ═══════════════════════════════════════════════════════ */
 function BillingPage() {
+  const { isMobile } = useResponsive();
   const searchParams = useSearchParams();
   const upgraded = searchParams?.get("upgrade") === "success";
   const isRequired = searchParams?.get("required") === "1";
@@ -1029,7 +1030,6 @@ function BillingPage() {
 }
 
 export default function BillingPageWrapper() {
-  const { isMobile } = useResponsive();
   return (
     <Suspense fallback={<div style={{ padding:32, fontFamily:"Outfit,sans-serif", color:"white" }}>Loading...</div>}>
       <BillingPage />
