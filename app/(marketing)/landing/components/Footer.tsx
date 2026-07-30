@@ -316,7 +316,7 @@ export default function Footer() {
             <div className="ft-contact-items" style={{ display: "flex", flexDirection: "column", gap: 12, marginBottom: 28 }}>
               {[
                 { Icon: Mail,  text: "hello@finovaos.app", color: "#818cf8", href: "mailto:hello@finovaos.app" },
-                { Icon: Phone, text: "+92 304-7653693",        color: "#34d399", href: "https://wa.me/923047653693" },
+                { Icon: Phone, text: "+92 317-8653693",        color: "#34d399", href: "https://wa.me/923047653693" },
                 { Icon: Globe, text: "finovaos.app",            color: "#fbbf24", href: "https://finovaos.app" },
               ].map(({ Icon, text, color, href }) => (
                 <a key={text} href={href} className="ft-contact-item" target="_blank" rel="noopener noreferrer" style={{ display: "flex", alignItems: "center", gap: 10, textDecoration: "none" }}>
