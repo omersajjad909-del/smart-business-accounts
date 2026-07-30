@@ -91,6 +91,7 @@ function AIInsightPanel({
   role: string;
   userId: string;
 }) {
+  const { isMobile } = useResponsive();
   const [insights, setInsights] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeSlide, setActiveSlide] = useState(0);
