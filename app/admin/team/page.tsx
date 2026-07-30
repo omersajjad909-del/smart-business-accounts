@@ -174,7 +174,7 @@ export default function AdminTeamPage() {
         <input className="tm-inp" placeholder="Search name or email…" value={search} onChange={e => setSearch(e.target.value)} style={{ minWidth: 280 }} />
       </div>
 
-      <div style={{ background: "rgba(255,255,255,.02)", border: "1px solid rgba(255,255,255,.07)", borderRadius: 16, overflow: "hidden" }}>
+      <div style={{ background: "rgba(255,255,255,.02)", border: "1px solid rgba(255,255,255,.07)", borderRadius: 16, overflowX: "auto", overflowY: "hidden" }}>
         <table style={{ width: "100%", borderCollapse: "collapse" }}>
           <thead>
             <tr style={{ borderBottom: "1px solid rgba(255,255,255,.07)" }}>

@@ -427,7 +427,7 @@ export default function AdminSubscriptionsPage() {
       </div>
 
       {/* Table */}
-      <div style={{ borderRadius: 18, border: "1px solid rgba(255,255,255,.07)", overflow: "hidden" }}>
+      <div style={{ borderRadius: 18, border: "1px solid rgba(255,255,255,.07)", overflowX: "auto", overflowY: "hidden" }}>
         <table style={{ width: "100%", borderCollapse: "collapse" }}>
           <thead>
             <tr style={{ background: "rgba(255,255,255,.04)" }}>

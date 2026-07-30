@@ -86,7 +86,16 @@
       "Bash(taskkill //IM node.exe //FI \"WINDOWTITLE eq npm*\")",
       "Bash(netstat -ano)",
       "Bash(taskkill //PID 13012 //F)",
-      "Bash(node scripts/next-lock-recover.js)"
+      "Bash(node scripts/next-lock-recover.js)",
+      "Bash(node \"C:\\\\Users\\\\STANDA~1\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\d--projects-smart-business-accounts\\\\c9a094d9-a81b-461b-a63d-575ba558a08a\\\\scratchpad\\\\fix-table-overflow.js\")",
+      "Bash(curl -s \"http://localhost:3000/onboarding/payment/addon-automation?cycle=monthly&country=PK\" --max-time 30)",
+      "Bash(curl -s \"http://localhost:3000/onboarding/payment/addon-automation?cycle=monthly&country=US\" --max-time 30)",
+      "Bash(curl -s -o /tmp/pk-test.html -w \"HTTP:%{http_code} SIZE:%{size_download}\\\\n\" \"http://localhost:3000/onboarding/payment/addon-automation?cycle=monthly&country=PK\" --max-time 30)",
+      "Bash(curl -s -o /dev/null -w \"HTTP:%{http_code}\\\\n\" \"http://localhost:3000/onboarding/payment/addon-automation?cycle=monthly&country=PK\" --max-time 30)",
+      "Bash(curl -s -o /dev/null -w \"starter: %{http_code}\\\\n\" \"http://localhost:3000/onboarding/payment/starter\" --max-time 30)",
+      "Bash(curl -s -o /dev/null -w \"no-country: %{http_code}\\\\n\" \"http://localhost:3000/onboarding/payment/addon-automation\" --max-time 30)",
+      "Bash(taskkill //PID 8828 //F)",
+      "Bash(rm -rf .next)"
     ],
     "additionalDirectories": [
       "d:\\projects\\smart-business-accounts\\app\\api\\chat\\conversations",

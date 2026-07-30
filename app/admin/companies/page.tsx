@@ -448,8 +448,8 @@ export default function AdminCompaniesPage() {
       </div>
 
       {/* Table */}
-      <div style={{ borderRadius: 18, border: "1px solid rgba(255,255,255,.08)", overflow: "hidden" }}>
-        <table style={{ width: "100%", borderCollapse: "collapse" }}>
+      <div style={{ borderRadius: 18, border: "1px solid rgba(255,255,255,.08)", overflowX: "auto", overflowY: "hidden" }}>
+        <table style={{ width: "100%", minWidth: 960, borderCollapse: "collapse" }}>
           <thead>
             <tr style={{ background: "rgba(255,255,255,.04)" }}>
               {["", "ID", "Company", "Business Type", "Country", "Plan", "Status", "AI Score", "Users", "Renewal", "Actions"].map(h => (

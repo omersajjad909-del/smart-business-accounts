@@ -128,7 +128,7 @@ export default function AdminFeedbackPage() {
       </div>
 
       {/* Table */}
-      <div style={{ background: "rgba(255,255,255,.02)", border: "1px solid rgba(255,255,255,.07)", borderRadius: 16, overflow: "hidden" }}>
+      <div style={{ background: "rgba(255,255,255,.02)", border: "1px solid rgba(255,255,255,.07)", borderRadius: 16, overflowX: "auto", overflowY: "hidden" }}>
         <div style={{ overflowX: "auto" }}>
         <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 600 }}>
           <thead>

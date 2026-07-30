@@ -251,9 +251,21 @@ export default function PaymentPage() {
     if (currency) setStoredCurrencyPreference(currency, country);
   }, [currency, country]);
 
-  const availableGroups = METHOD_GROUPS;
+  // Pakistan sees only the Pakistan card option; everywhere else sees only
+  // the 4 international methods — no mixing, so there's nothing to be
+  // confused by.
+  const isPakistan = country.trim().toUpperCase() === "PK";
+  const availableGroups = METHOD_GROUPS.filter((group) => group.label === (isPakistan ? "Pakistan" : "International"));
   const allAvailableMethods = availableGroups.flatMap((group) => group.methods);
   const selectedMethodDef = allAvailableMethods.find((m) => m.id === method) || allAvailableMethods[0];
+
+  // Keep the selected method in sync with whichever group is actually visible.
+  useEffect(() => {
+    if (!allAvailableMethods.some((m) => m.id === method) && allAvailableMethods[0]) {
+      setMethod(allAvailableMethods[0].id);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isPakistan]);
 
   // 75% off for first 3 months — today's charge is 25% of full price
   const discountedPrice  = plan === "custom" ? planPrice : Math.round(planPrice * 0.25);

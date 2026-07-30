@@ -230,7 +230,7 @@ export default function BusinessModulesPage() {
                 </div>
 
                 {/* Table */}
-                <div style={{ border: "1px solid rgba(255,255,255,.07)", borderRadius: 14, overflow: "hidden" }}>
+                <div style={{ border: "1px solid rgba(255,255,255,.07)", borderRadius: 14, overflowX: "auto", overflowY: "hidden" }}>
                   <table style={{ width: "100%", borderCollapse: "collapse" }}>
                     <thead>
                       <tr>

@@ -297,19 +297,6 @@ export default function AdminShell({ children }: { children: ReactNode }) {
               </section>
             ))}
           </div>
-
-          <button
-            type="button"
-            className="fin-admin-userCard"
-            onClick={() => setProfileOpen((v) => !v)}
-          >
-            <div className="fin-admin-avatar">{initials}</div>
-            <div className="fin-admin-userMeta">
-              <div className="fin-admin-userName">{profile?.name || user?.name || "Admin"}</div>
-              <div className="fin-admin-userRole">Super Admin</div>
-            </div>
-            <div className="fin-admin-userArrow">›</div>
-          </button>
         </aside>
 
         {/* ── Main content ─────────────────────────────────────────── */}
