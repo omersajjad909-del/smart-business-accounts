@@ -57,7 +57,7 @@ const IconGooglePay = () => (
 );
 
 /* ── Method groups ──────────────────────────────────────── */
-type MethodGroup = { label: string; color: string; bg: string; border: string; badge: string; methods: MethodDef[] };
+type MethodGroup = { label: string; color: string; bg: string; border: string; methods: MethodDef[] };
 
 const METHOD_GROUPS: MethodGroup[] = [
   {
@@ -65,12 +65,11 @@ const METHOD_GROUPS: MethodGroup[] = [
     color: "#fbbf24",
     bg: "rgba(251,191,36,0.06)",
     border: "rgba(251,191,36,0.2)",
-    badge: "LemonSqueezy",
     methods: [
-      { id: "card",       label: "Credit / Debit Card", desc: "Visa & Mastercard",              popular: true, processor: "LemonSqueezy", processorColor: "#fbbf24", icon: <IconCard /> },
-      { id: "paypal",     label: "PayPal",              desc: "Pay with your PayPal balance",                   processor: "LemonSqueezy", processorColor: "#fbbf24", icon: <IconPayPal /> },
-      { id: "applepay",   label: "Apple Pay",           desc: "One-tap checkout on Safari & iOS",               processor: "LemonSqueezy", processorColor: "#fbbf24", icon: <IconApplePay /> },
-      { id: "googlepay",  label: "Google Pay",          desc: "One-tap checkout on Chrome & Android",           processor: "LemonSqueezy", processorColor: "#fbbf24", icon: <IconGooglePay /> },
+      { id: "card",       label: "Credit / Debit Card", desc: "Visa & Mastercard",              popular: true, processor: "Secure Checkout", processorColor: "#fbbf24", icon: <IconCard /> },
+      { id: "paypal",     label: "PayPal",              desc: "Pay with your PayPal balance",                   processor: "Secure Checkout", processorColor: "#fbbf24", icon: <IconPayPal /> },
+      { id: "applepay",   label: "Apple Pay",           desc: "One-tap checkout on Safari & iOS",               processor: "Secure Checkout", processorColor: "#fbbf24", icon: <IconApplePay /> },
+      { id: "googlepay",  label: "Google Pay",          desc: "One-tap checkout on Chrome & Android",           processor: "Secure Checkout", processorColor: "#fbbf24", icon: <IconGooglePay /> },
     ],
   },
   {
@@ -78,9 +77,8 @@ const METHOD_GROUPS: MethodGroup[] = [
     color: "#34d399",
     bg: "rgba(52,211,153,0.06)",
     border: "rgba(52,211,153,0.2)",
-    badge: "Safepay",
     methods: [
-      { id: "card-pk", label: "Card Payment", desc: "Visa & Mastercard", popular: true, processor: "Safepay", processorColor: "#34d399", icon: <IconCard /> },
+      { id: "card-pk", label: "Card Payment", desc: "Visa & Mastercard", popular: true, processor: "Secure Checkout", processorColor: "#34d399", icon: <IconCard /> },
     ],
   },
 ];
@@ -520,7 +518,7 @@ export default function PaymentPage() {
                     </div>
                     <div style={{ flex:1 }}>
                       <div style={{ fontWeight:600, fontSize:14, color:"white" }}>{savedPayMethod.label}</div>
-                      <div style={{ fontSize:11, color:"rgba(255,255,255,.45)", marginTop:1 }}>via {savedPayMethod.processor} · saved from your {activePlanName} plan</div>
+                      <div style={{ fontSize:11, color:"rgba(255,255,255,.45)", marginTop:1 }}>Saved from your {activePlanName} plan</div>
                     </div>
                     <span style={{ padding:"3px 10px", borderRadius:20, background:"rgba(34,197,94,.12)", border:"1px solid rgba(34,197,94,.25)", color:"#22c55e", fontSize:11, fontWeight:700 }}>Saved</span>
                   </div>
@@ -572,7 +570,6 @@ export default function PaymentPage() {
                           {group.label === "International" ? "🌍" : "🇵🇰"} {group.label}
                         </div>
                         <div style={{ flex:1, height:1, background:"rgba(255,255,255,.06)" }}/>
-                        <div style={{ fontSize:9, fontWeight:600, color:"rgba(255,255,255,.2)", letterSpacing:".04em", whiteSpace:"nowrap" }}>via {group.badge}</div>
                       </div>
 
                       <div style={{ display:"flex", flexDirection:"column", gap:6 }}>
@@ -638,7 +635,7 @@ export default function PaymentPage() {
                       <div>
                         <div style={{ fontSize:14, fontWeight:700, color:"white", marginBottom:3 }}>Pay with {selectedMethodDef?.label}</div>
                         <div style={{ fontSize:11, color:"rgba(255,255,255,.4)", lineHeight:1.55 }}>
-                          You&apos;ll enter your details on {selectedMethodDef?.processor}&apos;s secure checkout page — nothing is stored here.
+                          You&apos;ll enter your details on our secure checkout page — nothing is stored here.
                         </div>
                       </div>
                     </div>
