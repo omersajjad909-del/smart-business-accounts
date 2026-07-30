@@ -607,46 +607,6 @@ export default function DashboardContent() {
               : [],
           });
         }
-        if (dashboard.charts) {
-          const ch = dashboard.charts;
-          const sA = ch.salesTrend || [],
-            pA = ch.purchasesTrend || [];
-          const MN = [
-            "Jan",
-            "Feb",
-            "Mar",
-            "Apr",
-            "May",
-            "Jun",
-            "Jul",
-            "Aug",
-            "Sep",
-            "Oct",
-            "Nov",
-            "Dec",
-          ];
-          const lbls = [
-            ...new Set([
-              ...sA.map((s: any) => s.label),
-              ...pA.map((p: any) => p.label),
-            ]),
-          ].sort() as string[];
-          setChart(
-            lbls.map((l) => {
-              const rv = sA.find((s: any) => s.label === l)?.value || 0;
-              const ex = pA.find((p: any) => p.label === l)?.value || 0;
-              let dl = l;
-              if (/^\d{4}-\d{2}-\d{2}$/.test(l)) {
-                const d = new Date(l + "T00:00:00");
-                dl = `${MN[d.getMonth()]} ${d.getDate()}`;
-              } else if (/^\d{4}-\d{2}$/.test(l)) {
-                const [yr, mo] = l.split("-");
-                dl = `${MN[parseInt(mo, 10) - 1]} ${yr}`;
-              }
-              return { label: dl, Revenue: rv, Expenses: ex, Profit: rv - ex };
-            }),
-          );
-        }
         if (dashboard.businessType) {
           const b = dashboard.businessType;
           if (!initDemo && b.businessType)
@@ -666,33 +626,10 @@ export default function DashboardContent() {
             logoUrl: s.logoUrl || null,
           });
         }
-        if (dashboard.expenses) {
-          const eb = dashboard.expenses;
-          const rows = eb.rows || [];
-          const EC = ["#ef4444", "#f59e0b", "#6366f1", "#10b981", "#38bdf8"];
-          const tot = rows.reduce(
-            (a: number, r: any) => a + Number(r.amount || 0),
-            0,
-          );
-          if (tot > 0)
-            setDonut(
-              rows.slice(0, 5).map((r: any, i: number) => ({
-                name: r.category || r.label || "Other",
-                value: Number(r.amount || 0),
-                color: EC[i],
-              })),
-            );
-        }
-        if (dashboard.todayStats) {
-          const t = dashboard.todayStats;
-          setTodayStats({
-            todaySales: Number(t.todaySales || 0),
-            todayOrders: Number(t.todayOrders || 0),
-            pendingCount: Number(t.pendingCount || 0),
-            lowStockCount: Number(t.lowStockCount || 0),
-          });
-        }
-        if (dashboard.dueData) setDueData(dashboard.dueData);
+        // Main stat cards are ready — stop blocking the page here. Charts,
+        // expense breakdown, today's stats and due-this-week are fetched
+        // separately below so they never hold up the initial render.
+        setLoad(false);
 
         // Collect secondary results (already in-flight since before dashboard fetch)
         const [meData, notifData] = await Promise.all([mePromise, notifPromise]);
@@ -702,9 +639,74 @@ export default function DashboardContent() {
           setUnreadNotifs(
             (notifData.notifications as any[]).filter((n: any) => !n.isRead).length,
           );
+
+        // Below-the-fold widgets — fetched after the critical content has
+        // already rendered, so they never block the initial page load.
+        fetch(`/api/dashboard/secondary?period=${period}`, { headers: h, cache: "no-store" })
+          .then((r) => (r.ok ? r.json() : null))
+          .then((secondary) => {
+            if (!secondary) return;
+            if (secondary.charts) {
+              const ch = secondary.charts;
+              const sA = ch.salesTrend || [],
+                pA = ch.purchasesTrend || [];
+              const MN = [
+                "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+                "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
+              ];
+              const lbls = [
+                ...new Set([
+                  ...sA.map((s: any) => s.label),
+                  ...pA.map((p: any) => p.label),
+                ]),
+              ].sort() as string[];
+              setChart(
+                lbls.map((l) => {
+                  const rv = sA.find((s: any) => s.label === l)?.value || 0;
+                  const ex = pA.find((p: any) => p.label === l)?.value || 0;
+                  let dl = l;
+                  if (/^\d{4}-\d{2}-\d{2}$/.test(l)) {
+                    const d = new Date(l + "T00:00:00");
+                    dl = `${MN[d.getMonth()]} ${d.getDate()}`;
+                  } else if (/^\d{4}-\d{2}$/.test(l)) {
+                    const [yr, mo] = l.split("-");
+                    dl = `${MN[parseInt(mo, 10) - 1]} ${yr}`;
+                  }
+                  return { label: dl, Revenue: rv, Expenses: ex, Profit: rv - ex };
+                }),
+              );
+            }
+            if (secondary.expenses) {
+              const eb = secondary.expenses;
+              const rows = eb.rows || [];
+              const EC = ["#ef4444", "#f59e0b", "#6366f1", "#10b981", "#38bdf8"];
+              const tot = rows.reduce(
+                (a: number, r: any) => a + Number(r.amount || 0),
+                0,
+              );
+              if (tot > 0)
+                setDonut(
+                  rows.slice(0, 5).map((r: any, i: number) => ({
+                    name: r.category || r.label || "Other",
+                    value: Number(r.amount || 0),
+                    color: EC[i],
+                  })),
+                );
+            }
+            if (secondary.todayStats) {
+              const t = secondary.todayStats;
+              setTodayStats({
+                todaySales: Number(t.todaySales || 0),
+                todayOrders: Number(t.todayOrders || 0),
+                pendingCount: Number(t.pendingCount || 0),
+                lowStockCount: Number(t.lowStockCount || 0),
+              });
+            }
+            if (secondary.dueData) setDueData(secondary.dueData);
+          })
+          .catch(() => {});
       } catch (e) {
         console.error("Dashboard:", e);
-      } finally {
         setLoad(false);
       }
     })();
