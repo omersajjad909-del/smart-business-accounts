@@ -1365,7 +1365,7 @@ export default function DashboardContent() {
           >
             {userAvatar || companyInfo?.logoUrl ? (
               <img
-                src={userAvatar || companyInfo?.logoUrl!}
+                src={userAvatar || companyInfo?.logoUrl || ""}
                 alt="avatar"
                 style={{ width: "100%", height: "100%", objectFit: "cover" }}
               />
