@@ -18,7 +18,7 @@ const PLAN_META: Record<string, { name: string; price: number; yearlyPrice: numb
 };
 
 /* ── Payment method types ───────────────────────────────── */
-type PayMethod = "card" | "paypal" | "bank" | "jazzcash" | "easypaisa" | "card-pk";
+type PayMethod = "card" | "paypal" | "applepay" | "googlepay" | "card-pk";
 
 type MethodDef = {
   id: PayMethod;
@@ -32,58 +32,27 @@ type MethodDef = {
 
 /* ── SVG Icons for payment methods ─────────────────────── */
 const IconCard = () => (
-  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
     <rect x="1" y="4" width="22" height="16" rx="3"/><line x1="1" y1="10" x2="23" y2="10"/>
   </svg>
 );
 const IconPayPal = () => (
-  <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
     <path d="M7.02 21H3.64l.92-5.86H7.7c2.27 0 3.6-1.12 3.98-3.36.38-2.24-.8-3.36-3.07-3.36H5.5L7.16 3h3.11c3.55 0 5.5 1.73 4.9 5.16C14.5 11.5 12.1 13.5 8.7 13.5H6.38l-.46 2.97-.85 4.53H7.02z" fill="#009cde"/>
     <path d="M19.5 8c-.38 2.18-1.68 3.72-3.5 4.32.77 1.7 3.5 4.68 3.5 4.68" fill="#003087" opacity=".5"/>
   </svg>
 );
 const IconApplePay = () => (
-  <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
     <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
   </svg>
 );
 const IconGooglePay = () => (
-  <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
     <path d="M3.67 8.67C4.9 5.4 8.2 3 12 3c2.3 0 4.3.8 5.87 2.07L15.4 7.53C14.47 6.87 13.28 6.5 12 6.5c-2.35 0-4.35 1.42-5.3 3.47L3.67 8.67z" fill="#EA4335"/>
     <path d="M3 12c0-.46.04-.9.1-1.33L6.7 9.97C6.57 10.63 6.5 11.3 6.5 12s.07 1.37.2 2.03L3.1 13.33C3.04 12.9 3 12.46 3 12z" fill="#FBBC05"/>
     <path d="M12 21c-3.8 0-7.1-2.4-8.33-5.67l3.03-1.3C7.65 16.08 9.65 17.5 12 17.5c1.28 0 2.47-.37 3.4-1.03l2.47 2.47C15.87 20.2 14.03 21 12 21z" fill="#34A853"/>
     <path d="M21 12c0-.67-.08-1.3-.2-1.92H12v3.67h5.07c-.22 1.2-.88 2.2-1.87 2.87l2.47 2.47C19.7 17.6 21 15 21 12z" fill="#4285F4"/>
-  </svg>
-);
-const IconBank = () => (
-  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-    <path d="m3 22 18 0"/><path d="M6 18v-7"/><path d="M10 18v-7"/><path d="M14 18v-7"/><path d="M18 18v-7"/>
-    <path d="m2 11 10-7 10 7"/>
-  </svg>
-);
-const IconAch = () => (
-  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-    <rect x="2" y="5" width="20" height="14" rx="3"/><path d="M6 12h5"/><path d="M6 9h8"/><path d="M15 15l2-2 2 2"/>
-  </svg>
-);
-const IconSepa = () => (
-  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-    <circle cx="12" cy="12" r="9"/><path d="M8 10h8"/><path d="M8 14h6"/><path d="M16.5 7.5h.01"/>
-  </svg>
-);
-const IconJazz = () => (
-  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-    <rect x="5" y="2" width="14" height="20" rx="2"/><path d="M12 18h.01"/><path d="M8 6h8"/><path d="M8 10h8"/>
-  </svg>
-);
-const IconCrypto = () => (
-  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M11.767 19.089c4.924.868 6.14-6.025 1.216-6.894m-1.216 6.894L5.86 18.047m5.908 1.042-.347 1.97m1.563-8.864c4.924.869 6.14-6.025 1.215-6.893m-1.215 6.893L4.645 9.15m7.533 1.033-.346 1.97m-7.55-4.07 4.44.78"/>
-  </svg>
-);
-const IconKlarna = () => (
-  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/><path d="M12 6v6l4 2"/>
   </svg>
 );
 
@@ -96,10 +65,12 @@ const METHOD_GROUPS: MethodGroup[] = [
     color: "#fbbf24",
     bg: "rgba(251,191,36,0.06)",
     border: "rgba(251,191,36,0.2)",
-    badge: "LemonSqueezy · Global",
+    badge: "LemonSqueezy",
     methods: [
-      { id: "card",   label: "Credit / Debit Card", desc: "Visa, Mastercard, Amex, Discover", popular: true, processor: "LemonSqueezy", processorColor: "#fbbf24", icon: <IconCard /> },
-      { id: "paypal", label: "PayPal",               desc: "Pay with your PayPal balance",                   processor: "LemonSqueezy", processorColor: "#fbbf24", icon: <IconPayPal /> },
+      { id: "card",       label: "Credit / Debit Card", desc: "Visa & Mastercard",              popular: true, processor: "LemonSqueezy", processorColor: "#fbbf24", icon: <IconCard /> },
+      { id: "paypal",     label: "PayPal",              desc: "Pay with your PayPal balance",                   processor: "LemonSqueezy", processorColor: "#fbbf24", icon: <IconPayPal /> },
+      { id: "applepay",   label: "Apple Pay",           desc: "One-tap checkout on Safari & iOS",               processor: "LemonSqueezy", processorColor: "#fbbf24", icon: <IconApplePay /> },
+      { id: "googlepay",  label: "Google Pay",          desc: "One-tap checkout on Chrome & Android",           processor: "LemonSqueezy", processorColor: "#fbbf24", icon: <IconGooglePay /> },
     ],
   },
   {
@@ -107,30 +78,15 @@ const METHOD_GROUPS: MethodGroup[] = [
     color: "#34d399",
     bg: "rgba(52,211,153,0.06)",
     border: "rgba(52,211,153,0.2)",
-    badge: "Safepay 🇵🇰 · Automatic",
+    badge: "Safepay",
     methods: [
-      { id: "card-pk",   label: "Card Payment",  desc: "Visa, Mastercard, Debit · Safepay",         popular: true, processor: "Safepay",   processorColor: "#34d399", icon: <IconCard /> },
-      { id: "jazzcash",  label: "JazzCash",      desc: "Mobile wallet · via Safepay",               processor: "Safepay",   processorColor: "#CC0000", icon: <IconJazz /> },
-      { id: "easypaisa", label: "Easypaisa",     desc: "Mobile wallet · via Safepay",               processor: "Safepay",   processorColor: "#44B549", icon: <IconJazz /> },
-      { id: "bank",      label: "Bank Transfer", desc: "IBFT · HBL, UBL, Meezan & all 1Link banks", processor: "Safepay",   processorColor: "#34d399", icon: <IconBank /> },
+      { id: "card-pk", label: "Card Payment", desc: "Visa & Mastercard", popular: true, processor: "Safepay", processorColor: "#34d399", icon: <IconCard /> },
     ],
   },
 ];
 
-const FALLBACK_ENABLED_METHODS: PayMethod[] = ["card", "paypal", "jazzcash", "easypaisa", "bank", "card-pk"];
+const FALLBACK_ENABLED_METHODS: PayMethod[] = ["card", "paypal", "applepay", "googlepay", "card-pk"];
 const ALLOWED_CHECKOUT_METHODS = new Set<PayMethod>(FALLBACK_ENABLED_METHODS);
-
-/* ── Helpers ────────────────────────────────────────────── */
-function fmt4(v: string) { return v.replace(/\D/g,"").slice(0,16).replace(/(.{4})/g,"$1 ").trim(); }
-function fmtExp(v: string) { const d = v.replace(/\D/g,"").slice(0,4); return d.length>2?d.slice(0,2)+"/"+d.slice(2):d; }
-function detectBrand(n: string) {
-  const s = n.replace(/\s/g,"");
-  if (/^4/.test(s))    return { label:"VISA",       grad:"linear-gradient(135deg,#1a1f71,#1e3a8a)" };
-  if (/^5[1-5]/.test(s)) return { label:"MASTERCARD", grad:"linear-gradient(135deg,#2d1b69,#c2185b)" };
-  if (/^3[47]/.test(s))  return { label:"AMEX",       grad:"linear-gradient(135deg,#1a3c5e,#0277bd)" };
-  if (/^6/.test(s))    return { label:"DISCOVER",    grad:"linear-gradient(135deg,#7c3102,#f76f20)" };
-  return { label:"CARD", grad:"linear-gradient(135deg,#312e81,#4f46e5)" };
-}
 
 /* ── Step indicator ─────────────────────────────────────── */
 function Steps({ current }: { current: 1|2|3 }) {
@@ -192,29 +148,12 @@ export default function PaymentPage() {
   /* ── Form state ── */
   const [step,        setStep]        = useState<1|2|3>(1);
   const [method,      setMethod]      = useState<PayMethod>("card");
-  const [cardNumber,  setCardNumber]  = useState("");
-  const [expiry,      setExpiry]      = useState("");
-  const [cvc,         setCvc]         = useState("");
-  const [holder,      setHolder]      = useState("");
   const [email,       setEmail]       = useState("");
   const [lockedVerificationEmail, setLockedVerificationEmail] = useState("");
-  const [bankName,    setBankName]    = useState("");
-  const [accountNo,   setAccountNo]   = useState("");
-  const [phone,       setPhone]       = useState("");
-  const [walletId,    setWalletId]    = useState("");
-  const [cryptoAddr,  setCryptoAddr]  = useState("");
-  const [coin,        setCoin]        = useState("BTC");
   const [otp,         setOtp]         = useState(["","","","","",""]);
   const [processing,  setProcessing]  = useState(false);
   const [activating,  setActivating]  = useState(false);
   const [otpError,    setOtpError]    = useState("");
-  const [enabledMethods, setEnabledMethods] = useState<PayMethod[]>(FALLBACK_ENABLED_METHODS);
-  const [txId,        setTxId]        = useState("");
-  const [pkPending,   setPkPending]   = useState(false);
-  const [jazzNumber,  setJazzNumber]  = useState<string>("");
-  const [epNumber,    setEpNumber]    = useState<string>("");
-  const [jazzQr,      setJazzQr]      = useState<string>("");
-  const [epQr,        setEpQr]        = useState<string>("");
 
   /* Coupon */
   const [couponInput,    setCouponInput]    = useState("");
@@ -314,39 +253,9 @@ export default function PaymentPage() {
     if (currency) setStoredCurrencyPreference(currency, country);
   }, [currency, country]);
 
-  useEffect(() => {
-    (async () => {
-      try {
-        const response = await fetch("/api/public/payment-gateways", { cache: "no-store" });
-        if (!response.ok) return;
-        const data = await response.json();
-        if (Array.isArray(data?.enabledMethodIds) && data.enabledMethodIds.length > 0) {
-          setEnabledMethods((data.enabledMethodIds as PayMethod[]).filter((methodId) => ALLOWED_CHECKOUT_METHODS.has(methodId)));
-        }
-        if (Array.isArray(data?.gateways)) {
-          const jzGw = data.gateways.find((g: any) => g.key === "JAZZCASH");
-          const epGw = data.gateways.find((g: any) => g.key === "EASYPAISA");
-          try { if (jzGw?.configJson) { const cfg = JSON.parse(jzGw.configJson); setJazzNumber(cfg.accountNumber || ""); setJazzQr(cfg.qrCode || ""); } } catch {}
-          try { if (epGw?.configJson) { const cfg = JSON.parse(epGw.configJson); setEpNumber(cfg.accountNumber || ""); setEpQr(cfg.qrCode || ""); } } catch {}
-        }
-      } catch {}
-    })();
-  }, []);
-
-  const enabledMethodSet = new Set(enabledMethods);
-  const availableGroups = METHOD_GROUPS
-    .map((group) => ({
-      ...group,
-      methods: group.methods.filter((methodOption) => enabledMethodSet.has(methodOption.id)),
-    }))
-    .filter((group) => group.methods.length > 0);
+  const availableGroups = METHOD_GROUPS;
   const allAvailableMethods = availableGroups.flatMap((group) => group.methods);
-
-  useEffect(() => {
-    if (!allAvailableMethods.some((methodOption) => methodOption.id === method) && allAvailableMethods[0]) {
-      setMethod(allAvailableMethods[0].id);
-    }
-  }, [allAvailableMethods, method]);
+  const selectedMethodDef = allAvailableMethods.find((m) => m.id === method) || allAvailableMethods[0];
 
   // 75% off for first 3 months — today's charge is 25% of full price
   const discountedPrice  = plan === "custom" ? planPrice : Math.round(planPrice * 0.25);
@@ -376,61 +285,16 @@ export default function PaymentPage() {
     finally { setCouponLoading(false); }
   }
 
-  const brand = detectBrand(cardNumber);
   const verificationEmail = (lockedVerificationEmail || email).trim().toLowerCase();
   const isVerificationEmailLocked = !!lockedVerificationEmail;
-
-  const isPkMethod = false; // All PK methods now go through Safepay checkout automatically
-  const pkrRate = rates?.PKR || FX_USD["PKR"] || 280;
-  const pkrAmount = Math.round(finalPrice * pkrRate);
-  const pkAccountNumber = method === "jazzcash" ? jazzNumber : epNumber;
-  const pkQrCode = method === "jazzcash" ? jazzQr : epQr;
-
-  async function submitPkPayment(userId: string, companyId: string) {
-    try {
-      const res = await fetch("/api/billing/pk-payment", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          userId,
-          companyId,
-          email: verificationEmail,
-          plan,
-          billingCycle,
-          method,
-          mobileNumber: phone,
-          txId,
-          amountPkr: pkrAmount,
-        }),
-      });
-      const data = await res.json();
-      if (res.ok) {
-        setPkPending(true);
-        setStep(3);
-      } else {
-        setOtpError(data?.error || "Failed to submit. Please try again.");
-        setActivating(false);
-      }
-    } catch {
-      setOtpError("Network error. Please try again.");
-      setActivating(false);
-    }
-  }
 
   async function activatePlanDirect() {
     const user = getCurrentUser();
     if (!user) { setOtpError("Please sign in again before activating your plan."); return; }
     setActivating(true);
-    if (isPkMethod) {
-      if (!phone)  { setOtpError("Please enter your mobile number"); setActivating(false); return; }
-      if (!txId)   { setOtpError("Please enter the transaction ID"); setActivating(false); return; }
-      await submitPkPayment(user.id || "", user.companyId || "");
-      return;
-    }
     // Save selected payment method for future auto-fill
     try {
-      const allMethods = allAvailableMethods;
-      const mDef = allMethods.find(m => m.id === method);
+      const mDef = allAvailableMethods.find(m => m.id === method);
       if (mDef) {
         localStorage.setItem("finovaPayMethod", JSON.stringify({ type: mDef.id, label: mDef.label, processor: mDef.processor, processorColor: mDef.processorColor }));
       }
@@ -470,8 +334,6 @@ export default function PaymentPage() {
 
   async function handlePaymentSubmit() {
     if (!verificationEmail) { setOtpError("Please enter your email address"); return; }
-    if (isPkMethod && !phone) { setOtpError("Please enter your mobile number"); return; }
-    if (isPkMethod && !txId)  { setOtpError("Please enter the transaction ID"); return; }
     setOtpError("");
     const currentUser = getCurrentUser();
     if (currentUser?.id && currentUser?.companyId) { await activatePlanDirect(); return; }
@@ -524,10 +386,6 @@ export default function PaymentPage() {
       }
       const user = verifyData?.user || getCurrentUser();
       if (!user) { setOtpError("Please sign in again."); setActivating(false); return; }
-      if (isPkMethod) {
-        await submitPkPayment(user.id || "", user.companyId || "");
-        return;
-      }
       const res = await fetch("/api/billing/checkout", {
         method: "POST",
         headers: {
@@ -580,6 +438,8 @@ export default function PaymentPage() {
     letterSpacing:".08em", textTransform:"uppercase", display:"block", marginBottom:6,
   };
 
+  const REASSURANCE = ["Auto-renewal billing", "Cancel anytime", "Secure hosted checkout", "Instant activation"];
+
   /* ── Yearly savings ── */
   return (
     <div style={{ minHeight:"100vh", background:"linear-gradient(160deg,#06091c 0%,#0b0f28 45%,#07091e 100%)", color:"white", fontFamily:"'Outfit','DM Sans',sans-serif" }}>
@@ -609,7 +469,6 @@ export default function PaymentPage() {
           .pay-steps{display:none!important}
         }
         @media(max-width:600px){
-          .pay-two{grid-template-columns:1fr!important}
           .pay-perks{grid-template-columns:1fr!important}
         }
       `}</style>
@@ -690,7 +549,7 @@ export default function PaymentPage() {
                 🔒 Secure Checkout
               </div>
               <h1 style={{ margin:"0 0 6px", fontSize:26, fontWeight:800, letterSpacing:"-0.8px" }}>Complete Your Payment</h1>
-              <p style={{ margin:0, fontSize:13, color:"rgba(255,255,255,.4)" }}>Choose a payment method and enter your details below</p>
+              <p style={{ margin:0, fontSize:13, color:"rgba(255,255,255,.4)" }}>Choose how you&apos;d like to pay — you&apos;ll finish securely on our payment partner&apos;s page</p>
               <div style={{ marginTop:10, display:"inline-flex", alignItems:"center", gap:8, padding:"5px 12px", borderRadius:999, border:"1px solid rgba(56,189,248,.22)", background:"rgba(56,189,248,.08)", color:"#7dd3fc", fontSize:11, fontWeight:700 }}>
                 {currency} · {country}
               </div>
@@ -698,18 +557,14 @@ export default function PaymentPage() {
 
             <div className="pay-grid" style={{ display:"grid", gridTemplateColumns:"1fr 300px", gap:20, alignItems:"start" }}>
 
-              {/* LEFT: method selector + form */}
+              {/* LEFT: method selector + explainer */}
               <div style={{ display:"flex", flexDirection:"column", gap:16 }}>
 
                 {/* ── Method Groups ── */}
                 <div style={{ borderRadius:18, background:"rgba(255,255,255,.03)", border:"1px solid rgba(255,255,255,.07)", padding:"20px 20px 14px" }}>
                   <div style={{ fontSize:10, fontWeight:700, color:"rgba(255,255,255,.35)", letterSpacing:".1em", textTransform:"uppercase", marginBottom:16 }}>Select Payment Method</div>
 
-                  {availableGroups.length === 0 ? (
-                    <div style={{ padding:"16px", borderRadius:12, background:"rgba(239,68,68,.08)", border:"1px solid rgba(239,68,68,.18)", fontSize:12, color:"#fca5a5" }}>
-                      No payment methods are enabled right now. Please contact support or try again later.
-                    </div>
-                  ) : availableGroups.map((group, gi) => (
+                  {availableGroups.map((group, gi) => (
                     <div key={group.label} style={{ marginBottom: gi < availableGroups.length - 1 ? 20 : 4 }}>
                       {/* Group header */}
                       <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:10 }}>
@@ -717,7 +572,7 @@ export default function PaymentPage() {
                           {group.label === "International" ? "🌍" : "🇵🇰"} {group.label}
                         </div>
                         <div style={{ flex:1, height:1, background:"rgba(255,255,255,.06)" }}/>
-                        <div style={{ fontSize:9, fontWeight:600, color:"rgba(255,255,255,.2)", letterSpacing:".04em", whiteSpace:"nowrap" }}>via {group.badge.split(" · ")[0]}</div>
+                        <div style={{ fontSize:9, fontWeight:600, color:"rgba(255,255,255,.2)", letterSpacing:".04em", whiteSpace:"nowrap" }}>via {group.badge}</div>
                       </div>
 
                       <div style={{ display:"flex", flexDirection:"column", gap:6 }}>
@@ -759,10 +614,8 @@ export default function PaymentPage() {
                               <div style={{ fontSize:11, color:"rgba(255,255,255,.32)", marginTop:3 }}>{m.desc}</div>
                             </div>
                             {/* Badge */}
-                            {m.popular ? (
+                            {m.popular && (
                               <div style={{ padding:"2px 9px", borderRadius:8, background:"linear-gradient(135deg,#6366f1,#8b5cf6)", fontSize:9, fontWeight:800, color:"white", letterSpacing:".05em", whiteSpace:"nowrap", flexShrink:0 }}>POPULAR</div>
-                            ) : (
-                              <div style={{ fontSize:9, color:"rgba(255,255,255,.18)", fontWeight:600, flexShrink:0, textAlign:"right", lineHeight:1.4 }}>{m.processor}</div>
                             )}
                           </div>
                         ))}
@@ -771,198 +624,36 @@ export default function PaymentPage() {
                   ))}
                 </div>
 
-                {/* ── Form based on method ── */}
+                {/* ── How it works (unified — all methods redirect to a secure hosted checkout) ── */}
                 <div style={{ borderRadius:18, background:"rgba(255,255,255,.03)", border:"1px solid rgba(255,255,255,.07)", padding:"20px" }}>
                   <div style={{ fontSize:10, fontWeight:700, color:"rgba(255,255,255,.3)", letterSpacing:".1em", textTransform:"uppercase", marginBottom:16 }}>
                     Payment Details
                   </div>
 
-                  {/* CARD */}
-                  {method === "card" && (
-                    <div style={{ display:"flex", flexDirection:"column", gap:16 }}>
-                      {/* Live card preview */}
-                      <div style={{ width:"100%", aspectRatio:"1.586/1", borderRadius:18, background:brand.grad, padding:"24px 28px", position:"relative", overflow:"hidden", boxShadow:"0 20px 52px rgba(0,0,0,.4), inset 0 1px 0 rgba(255,255,255,.12)", display:"flex", flexDirection:"column", justifyContent:"space-between" }}>
-                        <div style={{ position:"absolute", top:-60, right:-60, width:260, height:260, borderRadius:"50%", background:"rgba(255,255,255,.05)", pointerEvents:"none" }}/>
-                        <div style={{ position:"absolute", bottom:-80, left:-40, width:220, height:220, borderRadius:"50%", background:"rgba(255,255,255,.04)", pointerEvents:"none" }}/>
-                        <div style={{ display:"flex", alignItems:"flex-start", justifyContent:"space-between", position:"relative", zIndex:1 }}>
-                          <div style={{ width:46, height:34, borderRadius:6, background:"linear-gradient(135deg,#fbbf24,#d97706)", boxShadow:"0 2px 8px rgba(0,0,0,.3), inset 0 1px 0 rgba(255,255,255,.3)", position:"relative" }}>
-                            <div style={{ position:"absolute", top:"50%", left:0, right:0, height:1, background:"rgba(0,0,0,.15)" }}/>
-                            <div style={{ position:"absolute", top:0, bottom:0, left:"50%", width:1, background:"rgba(0,0,0,.15)" }}/>
-                          </div>
-                          <svg width="24" height="24" viewBox="0 0 30 30" fill="none" opacity="0.55">
-                            <path d="M15 8 Q22 15 15 22" stroke="white" strokeWidth="2.5" strokeLinecap="round" fill="none"/>
-                            <path d="M15 3 Q27 15 15 27" stroke="white" strokeWidth="2" strokeLinecap="round" fill="none" opacity="0.6"/>
-                            <circle cx="15" cy="15" r="2.5" fill="white" opacity="0.8"/>
-                          </svg>
-                        </div>
-                        <div style={{ position:"relative", zIndex:1 }}>
-                          <div style={{ fontSize:20, color:"rgba(255,255,255,.92)", fontFamily:"'Courier New',monospace", letterSpacing:4, fontWeight:600 }}>{cardNumber || "•••• •••• •••• ••••"}</div>
-                        </div>
-                        <div style={{ display:"flex", alignItems:"flex-end", justifyContent:"space-between", position:"relative", zIndex:1 }}>
-                          <div>
-                            <div style={{ fontSize:8, color:"rgba(255,255,255,.4)", letterSpacing:".12em", textTransform:"uppercase", marginBottom:3 }}>Card Holder</div>
-                            <div style={{ fontSize:12, color:"rgba(255,255,255,.9)", fontWeight:600, letterSpacing:1, textTransform:"uppercase" }}>{holder || "CARDHOLDER NAME"}</div>
-                          </div>
-                          <div style={{ display:"flex", gap:20, alignItems:"flex-end" }}>
-                            <div>
-                              <div style={{ fontSize:8, color:"rgba(255,255,255,.4)", letterSpacing:".12em", textTransform:"uppercase", marginBottom:3 }}>Expires</div>
-                              <div style={{ fontSize:12, color:"rgba(255,255,255,.9)", fontWeight:600, fontFamily:"monospace" }}>{expiry || "MM/YY"}</div>
-                            </div>
-                            <div style={{ fontSize:13, fontWeight:900, color:"rgba(255,255,255,.5)", letterSpacing:2 }}>{brand.label}</div>
-                          </div>
-                        </div>
-                      </div>
-                      <div><label style={lbl}>Card Number</label><input value={cardNumber} onChange={e=>setCardNumber(fmt4(e.target.value))} placeholder="1234 5678 9012 3456" maxLength={19} style={{...inp,fontFamily:"monospace",letterSpacing:2}}/></div>
-                      <div className="pay-two" style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:12 }}>
-                        <div><label style={lbl}>Expiry Date</label><input value={expiry} onChange={e=>setExpiry(fmtExp(e.target.value))} placeholder="MM/YY" maxLength={5} style={inp}/></div>
-                        <div><label style={lbl}>CVV / CVC</label><input value={cvc} onChange={e=>setCvc(e.target.value.replace(/\D/g,"").slice(0,4))} placeholder="•••" type="password" maxLength={4} style={inp}/></div>
-                      </div>
-                      <div><label style={lbl}>Cardholder Name</label><input value={holder} onChange={e=>setHolder(e.target.value.toUpperCase())} placeholder="AS ON CARD" style={{...inp,textTransform:"uppercase"}}/></div>
-                      <div><label style={lbl}>Email for Receipt</label><input value={verificationEmail} onChange={e=>!isVerificationEmailLocked && setEmail(e.target.value)} readOnly={isVerificationEmailLocked} placeholder="you@example.com" type="email" style={{...inp, opacity:isVerificationEmailLocked?.valueOf() ? 0.78 : 1, cursor:isVerificationEmailLocked ? "not-allowed" : "text"}}/></div>
-                    </div>
-                  )}
-
-                  {/* PAYPAL */}
-                  {method === "paypal" && (
-                    <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
-                      <div style={{ display:"flex", alignItems:"center", gap:14, padding:"16px 18px", borderRadius:14, background:"rgba(0,156,222,.06)", border:"1px solid rgba(0,156,222,.18)" }}>
-                        <div style={{ width:48, height:48, borderRadius:14, background:"rgba(0,156,222,.12)", border:"1px solid rgba(0,156,222,.3)", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
-                          <IconPayPal />
-                        </div>
-                        <div>
-                          <div style={{ fontSize:14, fontWeight:700, color:"white", marginBottom:3 }}>Pay with PayPal</div>
-                          <div style={{ fontSize:11, color:"rgba(255,255,255,.4)", lineHeight:1.55 }}>You&apos;ll be redirected to PayPal to complete your subscription. Auto-renewal included.</div>
-                        </div>
-                      </div>
-                      <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:8 }}>
-                        {["Auto-recurring billing","Cancel anytime","Secure PayPal flow","Instant activation"].map(t=>(
-                          <div key={t} style={{ display:"flex", alignItems:"center", gap:7, fontSize:11, color:"rgba(255,255,255,.55)", background:"rgba(255,255,255,.03)", border:"1px solid rgba(255,255,255,.07)", borderRadius:9, padding:"8px 11px" }}>
-                            <span style={{ color:"#009cde", flexShrink:0 }}>✓</span>{t}
-                          </div>
-                        ))}
-                      </div>
-                      <div><label style={lbl}>Email for Receipt</label><input value={verificationEmail} onChange={e=>!isVerificationEmailLocked && setEmail(e.target.value)} readOnly={isVerificationEmailLocked} placeholder="you@example.com" type="email" style={{...inp, opacity:isVerificationEmailLocked ? 0.78 : 1, cursor:isVerificationEmailLocked ? "not-allowed" : "text"}}/></div>
-                    </div>
-                  )}
-
-                  {/* SAFEPAY BANK TRANSFER */}
-                  {method === "bank" && (
-                    <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
-                      <div style={{ display:"flex", alignItems:"center", gap:14, padding:"16px 18px", borderRadius:14, background:"rgba(52,211,153,.06)", border:"1px solid rgba(52,211,153,.18)" }}>
-                        <div style={{ width:48, height:48, borderRadius:14, background:"rgba(52,211,153,.1)", border:"1px solid rgba(52,211,153,.25)", display:"flex", alignItems:"center", justifyContent:"center", color:"#34d399", flexShrink:0 }}>
-                          <IconBank />
-                        </div>
-                        <div>
-                          <div style={{ fontSize:14, fontWeight:700, color:"white", marginBottom:3 }}>Bank Transfer via Safepay</div>
-                          <div style={{ fontSize:11, color:"rgba(255,255,255,.4)", lineHeight:1.55 }}>IBFT — HBL, UBL, Meezan, Faysal &amp; all 1Link banks. Details shown at checkout.</div>
-                        </div>
-                      </div>
-                      <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:8 }}>
-                        {["All 1Link banks","Unique reference","Auto-verification","Secure Safepay flow"].map(t=>(
-                          <div key={t} style={{ display:"flex", alignItems:"center", gap:7, fontSize:11, color:"rgba(255,255,255,.55)", background:"rgba(255,255,255,.03)", border:"1px solid rgba(255,255,255,.07)", borderRadius:9, padding:"8px 11px" }}>
-                            <span style={{ color:"#34d399", flexShrink:0 }}>✓</span>{t}
-                          </div>
-                        ))}
-                      </div>
-                      <div style={{ padding:"10px 14px", borderRadius:10, background:"rgba(52,211,153,.05)", border:"1px solid rgba(52,211,153,.14)", fontSize:11, color:"rgba(255,255,255,.38)", textAlign:"center", lineHeight:1.65 }}>
-                        Click &ldquo;Proceed&rdquo; → Bank details shown on Safepay checkout · Auto-activated on confirmation
-                      </div>
-                      <div><label style={lbl}>Email for Confirmation</label><input value={verificationEmail} onChange={e=>!isVerificationEmailLocked && setEmail(e.target.value)} readOnly={isVerificationEmailLocked} placeholder="you@example.com" type="email" style={{...inp, opacity:isVerificationEmailLocked ? 0.78 : 1, cursor:isVerificationEmailLocked ? "not-allowed" : "text"}}/></div>
-                    </div>
-                  )}
-
-                  {/* JAZZCASH / EASYPAISA — automated via Safepay */}
-                  {(method === "jazzcash" || method === "easypaisa") && (
-                    <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
-                      <div style={{ display:"flex", alignItems:"center", gap:14, padding:"16px 18px", borderRadius:14, background:method==="jazzcash"?"rgba(204,0,0,.06)":"rgba(68,181,73,.06)", border:`1px solid ${method==="jazzcash"?"rgba(204,0,0,.2)":"rgba(68,181,73,.2)"}` }}>
-                        <div style={{ width:48, height:48, borderRadius:14, background:method==="jazzcash"?"rgba(204,0,0,.1)":"rgba(68,181,73,.1)", border:`1px solid ${method==="jazzcash"?"rgba(204,0,0,.3)":"rgba(68,181,73,.3)"}`, display:"flex", alignItems:"center", justifyContent:"center", color:method==="jazzcash"?"#CC0000":"#44B549", flexShrink:0 }}>
-                          <IconJazz />
-                        </div>
-                        <div>
-                          <div style={{ fontSize:14, fontWeight:700, color:"white", marginBottom:3 }}>{method==="jazzcash"?"JazzCash":"Easypaisa"} via Safepay</div>
-                          <div style={{ fontSize:11, color:"rgba(255,255,255,.4)", lineHeight:1.55 }}>You&apos;ll complete payment on Safepay&apos;s secure checkout — fully automated, no manual steps.</div>
-                        </div>
-                      </div>
-                      <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:8 }}>
-                        {["Auto-verification","Instant activation","Secure Safepay flow","No TX ID needed"].map(t=>(
-                          <div key={t} style={{ display:"flex", alignItems:"center", gap:7, fontSize:11, color:"rgba(255,255,255,.55)", background:"rgba(255,255,255,.03)", border:"1px solid rgba(255,255,255,.07)", borderRadius:9, padding:"8px 11px" }}>
-                            <span style={{ color:"#34d399", flexShrink:0 }}>✓</span>{t}
-                          </div>
-                        ))}
-                      </div>
-                      <div style={{ padding:"10px 14px", borderRadius:10, background:"rgba(52,211,153,.05)", border:"1px solid rgba(52,211,153,.14)", fontSize:11, color:"rgba(255,255,255,.38)", textAlign:"center", lineHeight:1.65 }}>
-                        Click &ldquo;Proceed&rdquo; → redirected to Safepay to complete {method==="jazzcash"?"JazzCash":"Easypaisa"} payment
-                      </div>
-                      <div><label style={lbl}>Email for Confirmation</label><input value={verificationEmail} onChange={e=>!isVerificationEmailLocked && setEmail(e.target.value)} readOnly={isVerificationEmailLocked} placeholder="you@example.com" type="email" style={{...inp, opacity:isVerificationEmailLocked ? 0.78 : 1, cursor:isVerificationEmailLocked ? "not-allowed" : "text"}}/></div>
-                    </div>
-                  )}
-
-                  {/* PKR CARD — Safepay */}
-                  {method === "card-pk" && (
-                    <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
-                      <div style={{ display:"flex", alignItems:"center", gap:14, padding:"16px 18px", borderRadius:14, background:"rgba(52,211,153,.06)", border:"1px solid rgba(52,211,153,.18)" }}>
-                        <div style={{ width:48, height:48, borderRadius:14, background:"rgba(52,211,153,.1)", border:"1px solid rgba(52,211,153,.25)", display:"flex", alignItems:"center", justifyContent:"center", color:"#34d399", flexShrink:0 }}>
-                          <IconCard />
-                        </div>
-                        <div>
-                          <div style={{ fontSize:14, fontWeight:700, color:"white", marginBottom:3 }}>Card via Safepay 🇵🇰</div>
-                          <div style={{ fontSize:11, color:"rgba(255,255,255,.4)", lineHeight:1.55 }}>Pakistani Visa, Mastercard &amp; debit cards. You&apos;ll enter details on Safepay&apos;s secure checkout page.</div>
-                        </div>
-                      </div>
-                      <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:8 }}>
-                        {["Visa & Mastercard","Debit cards OK","Auto-activation","Powered by Safepay"].map(t=>(
-                          <div key={t} style={{ display:"flex", alignItems:"center", gap:7, fontSize:11, color:"rgba(255,255,255,.55)", background:"rgba(255,255,255,.03)", border:"1px solid rgba(255,255,255,.07)", borderRadius:9, padding:"8px 11px" }}>
-                            <span style={{ color:"#34d399", flexShrink:0 }}>✓</span>{t}
-                          </div>
-                        ))}
-                      </div>
-                      <div style={{ padding:"10px 14px", borderRadius:10, background:"rgba(52,211,153,.05)", border:"1px solid rgba(52,211,153,.14)", fontSize:11, color:"rgba(255,255,255,.38)", textAlign:"center", lineHeight:1.65 }}>
-                        Click &ldquo;Proceed&rdquo; → card details entered securely on Safepay&apos;s checkout
-                      </div>
-                      <div><label style={lbl}>Email for Receipt</label><input value={verificationEmail} onChange={e=>!isVerificationEmailLocked && setEmail(e.target.value)} readOnly={isVerificationEmailLocked} placeholder="you@example.com" type="email" style={{...inp, opacity:isVerificationEmailLocked ? 0.78 : 1, cursor:isVerificationEmailLocked ? "not-allowed" : "text"}}/></div>
-                    </div>
-                  )}
-
-                  {/* CRYPTO */}
-                  {method === "crypto" && (
-                    <div style={{ display:"flex", flexDirection:"column", alignItems:"center", gap:16, padding:"32px 20px", textAlign:"center" }}>
-                      <div style={{ width:64, height:64, borderRadius:18, background:"rgba(167,139,250,.1)", border:"1px solid rgba(167,139,250,.25)", display:"flex", alignItems:"center", justifyContent:"center", color:"#a78bfa" }}>
-                        <IconCrypto />
+                  <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
+                    <div style={{ display:"flex", alignItems:"center", gap:14, padding:"16px 18px", borderRadius:14, background:`${selectedMethodDef?.processorColor}10`, border:`1px solid ${selectedMethodDef?.processorColor}30` }}>
+                      <div style={{ width:48, height:48, borderRadius:14, background:`${selectedMethodDef?.processorColor}18`, border:`1px solid ${selectedMethodDef?.processorColor}40`, display:"flex", alignItems:"center", justifyContent:"center", color:selectedMethodDef?.processorColor, flexShrink:0 }}>
+                        {selectedMethodDef?.icon}
                       </div>
                       <div>
-                        <div style={{ fontSize:15, fontWeight:700, marginBottom:6 }}>Cryptocurrency</div>
-                        <div style={{ display:"inline-flex", alignItems:"center", gap:6, padding:"3px 12px", borderRadius:20, background:"rgba(251,191,36,.1)", border:"1px solid rgba(251,191,36,.25)", fontSize:10, fontWeight:700, color:"#fbbf24", letterSpacing:".06em", textTransform:"uppercase" }}>
-                          🚀 Coming Soon
+                        <div style={{ fontSize:14, fontWeight:700, color:"white", marginBottom:3 }}>Pay with {selectedMethodDef?.label}</div>
+                        <div style={{ fontSize:11, color:"rgba(255,255,255,.4)", lineHeight:1.55 }}>
+                          You&apos;ll enter your details on {selectedMethodDef?.processor}&apos;s secure checkout page — nothing is stored here.
                         </div>
                       </div>
-                      <div style={{ fontSize:12, color:"rgba(255,255,255,.4)", lineHeight:1.75, maxWidth:300 }}>
-                        We&apos;re integrating crypto payment support (BTC, ETH, USDT and more). Please choose another payment method for now.
-                      </div>
-                      <div style={{ display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:8, width:"100%", marginTop:4 }}>
-                        {["BTC","ETH","USDT","BNB","SOL","MATIC"].map(c => (
-                          <div key={c} style={{ padding:"7px 10px", borderRadius:9, background:"rgba(255,255,255,.04)", border:"1px solid rgba(255,255,255,.07)", fontSize:11, fontWeight:600, color:"rgba(255,255,255,.3)", textAlign:"center" }}>{c}</div>
-                        ))}
-                      </div>
                     </div>
-                  )}
-
-                  {/* KLARNA */}
-                  {method === "klarna" && (
-                    <div style={{ display:"flex", flexDirection:"column", alignItems:"center", gap:16, padding:"24px 20px" }}>
-                      <div style={{ width:60, height:60, borderRadius:16, background:"rgba(255,182,193,.1)", border:"1px solid rgba(255,182,193,.25)", display:"flex", alignItems:"center", justifyContent:"center", color:"#ffb6c1" }}>
-                        <IconKlarna />
-                      </div>
-                      <div style={{ fontSize:15, fontWeight:700 }}>Buy Now, Pay Later</div>
-                      <div style={{ display:"grid", gridTemplateColumns:"repeat(2,1fr)", gap:10, width:"100%", marginTop:4 }}>
-                        {["Pay in 4 installments","0% interest for 30 days","No hidden fees","Instant approval"].map(t => (
-                          <div key={t} style={{ display:"flex", alignItems:"center", gap:7, fontSize:11, color:"rgba(255,255,255,.6)", background:"rgba(255,255,255,.04)", border:"1px solid rgba(255,255,255,.07)", borderRadius:9, padding:"9px 12px" }}>
-                            <span style={{ color:"#34d399", fontSize:12 }}>✓</span>{t}
-                          </div>
-                        ))}
-                      </div>
-                      <div style={{ width:"100%" }}><label style={lbl}>Email for Klarna</label><input value={verificationEmail} onChange={e=>!isVerificationEmailLocked && setEmail(e.target.value)} readOnly={isVerificationEmailLocked} placeholder="you@example.com" type="email" style={{...inp, opacity:isVerificationEmailLocked ? 0.78 : 1, cursor:isVerificationEmailLocked ? "not-allowed" : "text"}}/></div>
+                    <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:8 }}>
+                      {REASSURANCE.map(t=>(
+                        <div key={t} style={{ display:"flex", alignItems:"center", gap:7, fontSize:11, color:"rgba(255,255,255,.55)", background:"rgba(255,255,255,.03)", border:"1px solid rgba(255,255,255,.07)", borderRadius:9, padding:"8px 11px" }}>
+                          <span style={{ color:selectedMethodDef?.processorColor, flexShrink:0 }}>✓</span>{t}
+                        </div>
+                      ))}
                     </div>
-                  )}
+                    <div>
+                      <label style={lbl}>Email for Receipt</label>
+                      <input value={verificationEmail} onChange={e=>!isVerificationEmailLocked && setEmail(e.target.value)} readOnly={isVerificationEmailLocked} placeholder="you@example.com" type="email" style={{...inp, opacity:isVerificationEmailLocked ? 0.78 : 1, cursor:isVerificationEmailLocked ? "not-allowed" : "text"}}/>
+                    </div>
+                  </div>
                 </div>
 
                 {/* Error */}
@@ -1095,12 +786,11 @@ export default function PaymentPage() {
                   <div style={{ fontSize:9, fontWeight:700, color:"rgba(255,255,255,.28)", letterSpacing:".08em", textTransform:"uppercase", marginBottom:10 }}>We accept</div>
                   <div style={{ display:"flex", flexWrap:"wrap", gap:6 }}>
                     {[
-                      { label:"Visa",       color:"#1a1f71" },
-                      { label:"Mastercard", color:"#eb001b" },
-                      { label:"PayPal",     color:"#003087" },
-                      { label:"JazzCash",   color:"#CC0000" },
-                      { label:"Easypaisa", color:"#44B549" },
-                      { label:"1Link",      color:"#0ea5e9" },
+                      { label:"Visa",        color:"#1a1f71" },
+                      { label:"Mastercard",  color:"#eb001b" },
+                      { label:"PayPal",      color:"#003087" },
+                      { label:"Apple Pay",   color:"#a3a3a3" },
+                      { label:"Google Pay",  color:"#4285F4" },
                     ].map(p => (
                       <div key={p.label} style={{ padding:"3px 10px", borderRadius:7, background:`${p.color}18`, border:`1px solid ${p.color}30`, fontSize:10, fontWeight:700, color:`${p.color}cc`, letterSpacing:".03em" }}>{p.label}</div>
                     ))}
@@ -1163,52 +853,8 @@ export default function PaymentPage() {
           </div>
         )}
 
-        {/* ═══ STEP 3: Success / PK Pending ═══ */}
-        {step === 3 && pkPending && (
-          <div style={{ maxWidth:480, margin:"0 auto", textAlign:"center" }}>
-            <div style={{ width:90, height:90, borderRadius:28, background:"rgba(251,191,36,.1)", border:"1.5px solid rgba(251,191,36,.3)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:42, margin:"0 auto 24px" }}>⏳</div>
-            <h2 style={{ margin:"0 0 8px", fontSize:26, fontWeight:900, letterSpacing:"-0.5px", color:"white" }}>Payment Submitted!</h2>
-            <p style={{ fontSize:13, color:"rgba(255,255,255,.45)", lineHeight:1.75, margin:"0 0 28px" }}>
-              We&apos;ve received your transaction details. Our team will verify your payment within <strong style={{ color:"#fbbf24" }}>a few hours</strong> and activate your plan.
-            </p>
-
-            <div style={{ background:"rgba(255,255,255,.03)", border:"1px solid rgba(255,255,255,.08)", borderRadius:16, padding:"20px 22px", marginBottom:20, textAlign:"left" }}>
-              <div style={{ fontSize:10, fontWeight:700, color:"rgba(255,255,255,.3)", textTransform:"uppercase", letterSpacing:".08em", marginBottom:14 }}>Submission Summary</div>
-              <div style={{ display:"grid", gap:10 }}>
-                {[
-                  ["Payment Method", method === "jazzcash" ? "📱 JazzCash" : "💳 Easypaisa"],
-                  ["Transaction ID", txId || "—"],
-                  ["Amount", `PKR ${pkrAmount.toLocaleString()}`],
-                  ["Plan", `${plan.charAt(0).toUpperCase()+plan.slice(1)} · ${billingCycle}`],
-                ].map(([label, value]) => (
-                  <div key={label} style={{ display:"flex", justifyContent:"space-between", alignItems:"center", fontSize:12 }}>
-                    <span style={{ color:"rgba(255,255,255,.35)" }}>{label}</span>
-                    <span style={{ color:"rgba(255,255,255,.8)", fontWeight:600 }}>{value}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <div style={{ background:"rgba(251,191,36,.06)", border:"1px solid rgba(251,191,36,.2)", borderRadius:14, padding:"16px 18px", marginBottom:24, textAlign:"left" }}>
-              <div style={{ fontSize:12, fontWeight:700, color:"#fbbf24", marginBottom:6 }}>What happens next?</div>
-              <div style={{ display:"grid", gap:6 }}>
-                {["Our team verifies your TX ID on the payment app","You receive a confirmation email once approved","Your plan activates automatically — no action needed"].map((txt, i) => (
-                  <div key={i} style={{ display:"flex", gap:10, alignItems:"flex-start", fontSize:11, color:"rgba(255,255,255,.5)", lineHeight:1.6 }}>
-                    <span style={{ color:"#fbbf24", fontWeight:800, flexShrink:0, marginTop:1 }}>{i+1}.</span>
-                    <span>{txt}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <div style={{ padding:"12px 18px", borderRadius:12, background:"rgba(255,255,255,.03)", border:"1px solid rgba(255,255,255,.07)", fontSize:11, color:"rgba(255,255,255,.35)", lineHeight:1.7 }}>
-              Questions? Contact us at{" "}
-              <a href="mailto:hello@finovaos.app" style={{ color:"#a5b4fc", textDecoration:"none", fontWeight:600 }}>hello@finovaos.app</a>
-            </div>
-          </div>
-        )}
-
-        {step === 3 && !pkPending && (() => {
+        {/* ═══ STEP 3: Success ═══ */}
+        {step === 3 && (() => {
           const pm = PLAN_META[plan] || PLAN_META.starter;
           const perks: Record<string,string[]> = {
             starter:      ["Sales & Purchase Invoicing","Inventory Management","Ledger & Trial Balance","Basic Financial Reports","Up to 5 users"],
