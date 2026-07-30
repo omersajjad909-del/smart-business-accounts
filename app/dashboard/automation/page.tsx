@@ -146,6 +146,7 @@ function SocialDemo() {
 }
 
 function ContentDemo() {
+  const { isMobile } = useResponsive();
   const full = "🚀 Big announcement! Our summer collection just dropped — 50+ new styles, up to 50% off. Available in-store & online. Shop now before it sells out! ✨ #NewArrival #SummerSale";
   const [shown, setShown] = useState(0);
   useEffect(() => {
@@ -266,6 +267,7 @@ function WebhooksDemo() {
 }
 
 function UpsellGate() {
+  const { isMobile } = useResponsive();
   type DemoId = "whatsapp" | "drip" | "social" | "content" | "leads" | "webhooks";
   const [demoTab, setDemoTab] = useState<DemoId>("whatsapp");
   const [autoPlay, setAutoPlay] = useState(true);
@@ -550,6 +552,7 @@ export default function AutomationPage() {
 
 // ─── Shared UI atoms ──────────────────────────────────────────────────────────
 function Card({ children, style = {}, onClick }: { children: React.ReactNode; style?: React.CSSProperties; onClick?: () => void }) {
+  const { isMobile } = useResponsive();
   return (
     <div onClick={onClick} style={{
       background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)",
@@ -935,6 +938,7 @@ function WebhooksTab() {
 
 // ─── CRM LEADS ────────────────────────────────────────────────────────────────
 function LeadsTab() {
+  const { isMobile } = useResponsive();
   const [leads, setLeads] = useState<any[]>([]);
   const [form, setForm] = useState({ name: "", email: "", phone: "", source: "manual", notes: "" });
   const [loading, setLoading] = useState(false);
@@ -1040,6 +1044,7 @@ function LeadsTab() {
 
 // ─── GOOGLE SHEETS ────────────────────────────────────────────────────────────
 function SheetsTab() {
+  const { isMobile } = useResponsive();
   const [cfg, setCfg] = useState({ spreadsheetId: "", sheetName: "Sheet1", serviceAccountJson: "" });
   const [status, setStatus] = useState<any>(null);
   const [loading, setLoading] = useState(false);
