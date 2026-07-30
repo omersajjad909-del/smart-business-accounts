@@ -5,8 +5,6 @@ import { useEffect, useState } from "react";
 import { useBusinessRecords } from "@/lib/useBusinessRecords";
 import { useResponsive } from "@/hooks/useResponsive";
 import {
-const isMobile = false;
-
   firmBg,
   firmBorder,
   firmFont,
@@ -16,6 +14,7 @@ const isMobile = false;
   mapFirmProjects,
   mapFirmTimesheets,
 } from "./_shared";
+const isMobile = false;
 
 function StatCard({ label, value, tone }: { label: string; value: string | number; tone: string }) {
   return (

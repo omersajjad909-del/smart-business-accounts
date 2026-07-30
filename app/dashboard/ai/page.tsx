@@ -1,5 +1,3 @@
-const isMobile = false;
-
 ﻿"use client";
 
 import toast from "react-hot-toast";
@@ -13,6 +11,7 @@ import {
   XAxis, YAxis, CartesianGrid, Tooltip,
   ResponsiveContainer, BarChart, Bar, Legend,
 } from "recharts";
+const isMobile = false;
 
 // ─── Types ─────────────────────────────────────────────────────────────────
 type Tab = "overview" | "chat" | "insights" | "alerts" | "forecast" | "recommendations" | "reminders" | "tax" | "report" | "market" | "advisor" | "reconciliation" | "scan" | "invoice-gen" | "inv-forecast" | "cashflow-opt" | "churn" | "supplier-intel" | "gl-suggest" | "expense-cat" | "budget" | "duplicate" | "customer-profit" | "ratios";

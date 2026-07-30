@@ -3,8 +3,6 @@
 import { useBusinessRecords } from "@/lib/useBusinessRecords";
 import { useResponsive } from "@/hooks/useResponsive";
 import {
-const isMobile = false;
-
   firmBg,
   firmBorder,
   firmFont,
@@ -14,6 +12,7 @@ const isMobile = false;
   mapFirmProjects,
   mapFirmTimesheets,
 } from "../_shared";
+const isMobile = false;
 
 function Metric({ title, value, note, color }: { title: string; value: string; note: string; color: string }) {
   return (

@@ -5,8 +5,6 @@ import { useMemo, useState } from "react";
 import { useBusinessRecords } from "@/lib/useBusinessRecords";
 import { useResponsive } from "@/hooks/useResponsive";
 import {
-const isMobile = false;
-
   courierOptions,
   ecommerceBg,
   ecommerceBorder,
@@ -18,6 +16,7 @@ const isMobile = false;
   todayIso,
   toPkDate,
 } from "../_shared";
+const isMobile = false;
 
 type ShipmentForm = {
   orderId: string;

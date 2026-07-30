@@ -4,8 +4,6 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useResponsive } from "@/hooks/useResponsive";
 import {
-const isMobile = false;
-
   SalonControlCenter,
   fetchJson,
   salonBg,
@@ -13,6 +11,7 @@ const isMobile = false;
   salonFont,
   salonMuted,
 } from "./_shared";
+const isMobile = false;
 
 const emptyState: SalonControlCenter = {
   summary: {

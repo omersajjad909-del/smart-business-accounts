@@ -5,8 +5,6 @@ import { useMemo, useState } from "react";
 import { useBusinessRecords } from "@/lib/useBusinessRecords";
 import { useResponsive } from "@/hooks/useResponsive";
 import {
-const isMobile = false;
-
   ecommerceBg,
   ecommerceBorder,
   ecommerceFont,
@@ -17,6 +15,7 @@ const isMobile = false;
   returnReasons,
   toPkDate,
 } from "../_shared";
+const isMobile = false;
 
 type ReturnForm = {
   orderId: string;

@@ -3,8 +3,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useResponsive } from "@/hooks/useResponsive";
 import {
-const isMobile = false;
-
   ServicesControlCenter,
   fetchJson,
   serviceBg,
@@ -12,6 +10,7 @@ const isMobile = false;
   serviceFont,
   serviceMuted,
 } from "../_shared";
+const isMobile = false;
 
 const emptyState: ServicesControlCenter = {
   summary: {

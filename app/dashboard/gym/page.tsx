@@ -4,8 +4,6 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useResponsive } from "@/hooks/useResponsive";
 import {
-const isMobile = false;
-
   GymControlCenter,
   fetchJson,
   gymBg,
@@ -14,6 +12,7 @@ const isMobile = false;
   gymMuted,
   gymStatusColor,
 } from "./_shared";
+const isMobile = false;
 
 const emptyState: GymControlCenter = {
   summary: {

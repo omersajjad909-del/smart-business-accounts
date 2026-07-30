@@ -3,8 +3,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useResponsive } from "@/hooks/useResponsive";
 import {
-const isMobile = false;
-
   GymControlCenter,
   fetchJson,
   gymBg,
@@ -12,6 +10,7 @@ const isMobile = false;
   gymFont,
   gymMuted,
 } from "../_shared";
+const isMobile = false;
 
 const emptyState: GymControlCenter = {
   summary: {
