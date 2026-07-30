@@ -352,10 +352,9 @@ function UpsellGate() {
             <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap", marginBottom: 4 }}>
               <h2 style={{ margin: 0, fontSize: 18, fontWeight: 800, color: "white" }}>Business Automation Add-on</h2>
               <span style={{ padding: "3px 10px", borderRadius: 20, background: "rgba(251,191,36,.15)", color: "#fbbf24", fontSize: 11, fontWeight: 700, border: "1px solid rgba(251,191,36,.3)" }}>$79/month</span>
-              <span style={{ padding: "3px 10px", borderRadius: 20, background: "rgba(34,197,94,.1)", color: "#22c55e", fontSize: 11, fontWeight: 700, border: "1px solid rgba(34,197,94,.25)" }}>Save $358+/mo</span>
             </div>
             <p style={{ margin: 0, fontSize: 13, color: "rgba(255,255,255,.55)", lineHeight: 1.6 }}>
-              8+ AI-powered tools in one — replaces WATI, Mailchimp, HubSpot, Zapier, Buffer &amp; Intercom. See them live below, then add to your plan.
+              8+ AI-powered automation tools in one — WhatsApp, email, social, leads, webhooks &amp; more. See them live below, then add to your plan.
             </p>
           </div>
           <a href="/onboarding/payment/addon-automation?cycle=monthly" style={{ padding: "11px 22px", borderRadius: 10, background: "linear-gradient(135deg,#7c3aed,#2563eb)", color: "white", fontSize: 13, fontWeight: 700, textDecoration: "none", display: "inline-block", flexShrink: 0, whiteSpace: "nowrap" }}>
@@ -435,17 +434,8 @@ function UpsellGate() {
         </div>
       </div>
 
-      <div style={{ marginTop: 12, padding: "12px 18px", borderRadius: 12, background: "rgba(0,0,0,.25)", border: "1px solid rgba(255,255,255,.06)", display: "flex", alignItems: "center", gap: 14, flexWrap: "wrap" }}>
-        <div style={{ fontSize: 11, color: "#64748b", fontWeight: 700 }}>ALTERNATIVES:</div>
-        <div style={{ display: "flex", gap: 10, flex: 1, flexWrap: "wrap" }}>
-          {[["WATI","$99"],["Mailchimp","$99"],["Intercom","$74"],["HubSpot","$50"],["Zapier","$49"],["Buffer","$18"]].map(([tool, price]) => (
-            <span key={tool} style={{ fontSize: 11.5, color: "#475569" }}>{tool} <span style={{ color: "#f87171", fontWeight: 700 }}>{price}</span></span>
-          ))}
-        </div>
-        <div style={{ fontSize: 13 }}>
-          <span style={{ color: "#f87171", fontWeight: 900, textDecoration: "line-through" }}>$438+/mo</span>
-          <span style={{ color: "#22c55e", fontWeight: 900, marginLeft: 8 }}>vs $79/mo</span>
-        </div>
+      <div style={{ marginTop: 12, padding: "12px 18px", borderRadius: 12, background: "rgba(0,0,0,.25)", border: "1px solid rgba(255,255,255,.06)", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 14, flexWrap: "wrap" }}>
+        <div style={{ fontSize: 13, fontWeight: 900, color: "#22c55e" }}>$79/mo</div>
         <a href="/onboarding/payment/addon-automation?cycle=monthly" style={{ padding: "9px 18px", borderRadius: 10, background: "linear-gradient(135deg,#7c3aed,#2563eb)", color: "white", fontSize: 12, fontWeight: 700, textDecoration: "none", whiteSpace: "nowrap" }}>
           Get Started →
         </a>
