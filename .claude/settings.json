@@ -85,7 +85,8 @@
       "Bash(xargs -r kill)",
       "Bash(taskkill //IM node.exe //FI \"WINDOWTITLE eq npm*\")",
       "Bash(netstat -ano)",
-      "Bash(taskkill //PID 13012 //F)"
+      "Bash(taskkill //PID 13012 //F)",
+      "Bash(node scripts/next-lock-recover.js)"
     ],
     "additionalDirectories": [
       "d:\\projects\\smart-business-accounts\\app\\api\\chat\\conversations",
