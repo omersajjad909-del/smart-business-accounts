@@ -166,7 +166,7 @@ function SalesInvoiceContent() {
       "x-user-id": user.id || "",
       ...(user.companyId ? { "x-company-id": user.companyId } : {}),
     };
-    fetch("/api/accounts", { headers: h }).then(r => r.json()).then(d => {
+    fetch("/api/accounts?partyType=CUSTOMER", { headers: h }).then(r => r.json()).then(d => {
       const list = Array.isArray(d) ? d : d.accounts || [];
       setCustomers(list.filter((a: any) => a.partyType === "CUSTOMER"));
     });

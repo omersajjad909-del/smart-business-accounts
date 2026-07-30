@@ -123,7 +123,7 @@ export default function QuotationPage() {
     // Load initial data
     loadQuotations();
     
-    fetch("/api/accounts", {
+    fetch("/api/accounts?partyType=CUSTOMER", {
       headers: { "x-user-role": user.role },
     })
       .then(r => r.json())

@@ -92,7 +92,7 @@ export default function OutwardPage() {
   useEffect(() => {
     loadOutwards();
     const user = getCurrentUser();
-    fetch("/api/accounts?type=CUSTOMER", { 
+    fetch("/api/accounts?partyType=CUSTOMER", {
       headers: { 
         "x-user-role": user?.role || "ADMIN" 
       } 

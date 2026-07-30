@@ -75,7 +75,7 @@ export default function SalesOrderPage() {
     if (u?.role)      h["x-user-role"]  = u.role;
     if (u?.companyId) h["x-company-id"] = u.companyId;
 
-    fetch("/api/accounts", { headers: h })
+    fetch("/api/accounts?partyType=CUSTOMER", { headers: h })
       .then(r => r.ok ? r.json() : [])
       .then(d => {
         const list = Array.isArray(d) ? d : d.accounts || [];

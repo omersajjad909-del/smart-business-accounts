@@ -17,7 +17,7 @@ export default function OutwardReportPage() {
 
   // Load customers safely.
   useEffect(() => {
-    fetch("/api/accounts")
+    fetch("/api/accounts?partyType=CUSTOMER")
       .then((r) => r.json())
       .then((d) => {
         // Ensure the response is an array; otherwise fall back to an empty array.

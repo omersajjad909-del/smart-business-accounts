@@ -65,7 +65,7 @@ export default function GRNPage() {
 
   useEffect(() => {
     fetch("/api/me/company").then(r => r.ok ? r.json() : null).then(d => { if (d) setCompanyInfo(d); }).catch(() => {});
-    fetch("/api/accounts",       { headers: bh() }).then(r => r.json()).then(d => {
+    fetch("/api/accounts?partyType=SUPPLIER", { headers: bh() }).then(r => r.json()).then(d => {
       const list = Array.isArray(d) ? d : [];
       setSuppliers(list.filter((a: any) => a.partyType === "SUPPLIER"));
     }).catch(() => {});

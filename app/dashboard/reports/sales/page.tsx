@@ -61,7 +61,7 @@ export default function SalesReportPage() {
   const h = () => ({ "x-user-id": user?.id||"", "x-user-role": user?.role||"", "x-company-id": user?.companyId||"" });
 
   useEffect(() => {
-    fetch("/api/accounts", { credentials: "include", headers: h() })
+    fetch("/api/accounts?partyType=CUSTOMER", { credentials: "include", headers: h() })
       .then(r => r.json())
       .then(d => setCustomers((Array.isArray(d) ? d : []).filter((a: any) => a.partyType === "CUSTOMER")))
       .catch(() => {});

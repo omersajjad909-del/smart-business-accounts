@@ -78,7 +78,7 @@ export default function CreditLimitsPage() {
 
   useEffect(() => {
     if (!user) return;
-    fetch("/api/accounts", {
+    fetch("/api/accounts?partyType=CUSTOMER", {
       headers: { "x-user-role": user.role || "", "x-user-id": user.id || "", "x-company-id": user.companyId || "" },
     })
       .then(r => r.json())

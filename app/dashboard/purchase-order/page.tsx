@@ -104,7 +104,7 @@ export default function PurchaseOrderPage() {
   useEffect(() => {
     loadPOs(); loadCompany();
     const h = { "x-user-role": user?.role || "ADMIN", "x-user-id": user?.id || "", "x-company-id": user?.companyId || "" };
-    fetch("/api/accounts", { headers: h }).then(r => r.json()).then(d => {
+    fetch("/api/accounts?partyType=SUPPLIER", { headers: h }).then(r => r.json()).then(d => {
       const list = Array.isArray(d) ? d : d.accounts;
       setSuppliers(Array.isArray(list) ? list.filter((a: any) => a.partyType === "SUPPLIER") : []);
     }).catch(() => setSuppliers([]));

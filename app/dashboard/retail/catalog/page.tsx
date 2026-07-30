@@ -100,7 +100,7 @@ export default function ProductCatalogPage() {
   const [suppliers, setSuppliers] = useState<{ id: string; name: string }[]>([]);
 
   useEffect(() => {
-    fetch("/api/accounts", { headers: authHeaders })
+    fetch("/api/accounts?partyType=SUPPLIER", { headers: authHeaders })
       .then(r => r.json())
       .then(d => {
         const list = Array.isArray(d) ? d : d.accounts ?? [];

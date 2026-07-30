@@ -130,7 +130,7 @@ export default function AdvancePaymentPage() {
     try {
       const [aRes, acRes] = await Promise.all([
         fetch("/api/advance-payment", { headers: h() }),
-        fetch("/api/accounts",        { headers: h() }),
+        fetch("/api/accounts?partyType=SUPPLIER", { headers: h() }),
       ]);
       const [aData, acData] = await Promise.all([aRes.json(), acRes.json()]);
       const list: AdvancePayment[] = Array.isArray(aData) ? aData : [];

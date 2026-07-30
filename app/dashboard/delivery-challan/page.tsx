@@ -110,7 +110,7 @@ const [searchTerm, _setSearchTerm] = useState("");
     // Load initial data
     loadChallans();
     
-    fetch("/api/accounts", {
+    fetch("/api/accounts?partyType=CUSTOMER", {
       headers: { "x-user-role": user.role },
     })
       .then(r => r.json())

@@ -7,23 +7,9 @@ import { ensureEmployeePayableAccount } from "@/lib/payrollAccounting";
 
 const EMP_PII_FIELDS = ["cnic", "phone"] as const;
 
-async function ensureEmployeeScopedUniqueIndexes() {
-  await prisma.$executeRawUnsafe(`DROP INDEX IF EXISTS "Employee_email_key"`);
-  await prisma.$executeRawUnsafe(`DROP INDEX IF EXISTS "Employee_employeeId_key"`);
-  await prisma.$executeRawUnsafe(`
-    CREATE UNIQUE INDEX IF NOT EXISTS "Employee_companyId_email_key"
-    ON "Employee"("companyId", "email")
-  `);
-  await prisma.$executeRawUnsafe(`
-    CREATE UNIQUE INDEX IF NOT EXISTS "Employee_companyId_employeeId_key"
-    ON "Employee"("companyId", "employeeId")
-  `);
-}
-
 // GET: Fetch all employees
 export async function GET(req: NextRequest) {
   try {
-    await ensureEmployeeScopedUniqueIndexes();
     const companyId = await resolveCompanyId(req);
     if (!companyId) {
       return NextResponse.json({ error: "Company required" }, { status: 400 });
@@ -42,10 +28,6 @@ export async function GET(req: NextRequest) {
         ...(department && { department }),
         ...(isActive !== undefined && { isActive }),
       },
-      include: {
-        attendances: { orderBy: { date: "desc" }, take: 10 },
-        // payroll: { orderBy: { monthYear: "desc" }, take: 3 },
-      },
       orderBy: { firstName: "asc" },
     });
 
@@ -62,7 +44,6 @@ export async function POST(req: NextRequest) {
   if (guard) return guard;
 
   try {
-    await ensureEmployeeScopedUniqueIndexes();
     const companyId = await resolveCompanyId(req);
     if (!companyId) {
       return NextResponse.json({ error: "Company required" }, { status: 400 });
@@ -175,7 +156,6 @@ export async function PUT(req: NextRequest) {
     }
 
     const body = await req.json();
-    await ensureEmployeeScopedUniqueIndexes();
 
     // Fix: Convert dateOfJoining to Date object if present
     if (body.dateOfJoining) {

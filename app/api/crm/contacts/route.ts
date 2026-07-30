@@ -4,19 +4,9 @@ import { prisma } from "@/lib/prisma";
 import { resolveCompanyId, resolveBranchId } from "@/lib/tenant";
 import { safeEncryptField, safeDecryptField } from "@/lib/fieldEncrypt";
 
-async function ensureContactScopedUniqueIndexes() {
-  await prisma.$executeRawUnsafe(`DROP INDEX IF EXISTS "Contact_email_key"`);
-  await prisma.$executeRawUnsafe(`
-    CREATE UNIQUE INDEX IF NOT EXISTS "Contact_companyId_email_key"
-    ON "Contact"("companyId", "email")
-    WHERE "email" IS NOT NULL
-  `);
-}
-
 // GET: Fetch all contacts
 export async function GET(req: NextRequest) {
   try {
-    await ensureContactScopedUniqueIndexes();
     const companyId = await resolveCompanyId(req);
     if (!companyId) {
       return NextResponse.json({ error: "Company required" }, { status: 400 });
@@ -40,10 +30,6 @@ export async function GET(req: NextRequest) {
         ...(type && { type }),
         ...(company && { companyName: { contains: company, mode: "insensitive" } }),
         ...(isActive !== undefined && { isActive }),
-      },
-      include: {
-        interactions: { orderBy: { date: "desc" }, take: 5 },
-        opportunities: { orderBy: { createdAt: "desc" }, take: 3 },
       },
       orderBy: { name: "asc" },
     });

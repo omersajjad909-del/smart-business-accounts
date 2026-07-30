@@ -95,7 +95,7 @@ export default function CnfPage() {
   }), [user]);
 
   useEffect(() => {
-    fetch("/api/accounts", { headers })
+    fetch("/api/accounts?partyType=CUSTOMER", { headers })
       .then(r => r.ok ? r.json() : [])
       .then(d => {
         const list = Array.isArray(d) ? d : d.accounts || [];

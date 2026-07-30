@@ -304,7 +304,7 @@ const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
     loadInvoices();
-    fetch("/api/accounts", { headers: requestHeaders })
+    fetch("/api/accounts?partyType=SUPPLIER", { headers: requestHeaders })
       .then(r => r.json())
       .then(d => {
         const list = Array.isArray(d) ? d : d.accounts;
