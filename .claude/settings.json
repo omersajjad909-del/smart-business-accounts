@@ -75,7 +75,11 @@
       "Bash(cat next.config.js)",
       "Bash(cat next.config.ts)",
       "Bash(cat next.config.mjs)",
-      "Bash(node -e \"const { BUSINESS_PHASE_CONFIG } = require\\('./lib/businessModules.ts'\\); console.log\\(Object.keys\\(BUSINESS_PHASE_CONFIG\\).length\\)\")"
+      "Bash(node -e \"const { BUSINESS_PHASE_CONFIG } = require\\('./lib/businessModules.ts'\\); console.log\\(Object.keys\\(BUSINESS_PHASE_CONFIG\\).length\\)\")",
+      "Bash(command -v chromium-cli)",
+      "Bash(echo \"exit:$?\")",
+      "Bash(node -e \"console.log\\(require.resolve\\('playwright'\\)\\)\")",
+      "Bash(npx --no-install playwright --version)"
     ],
     "additionalDirectories": [
       "d:\\projects\\smart-business-accounts\\app\\api\\chat\\conversations",
