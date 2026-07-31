@@ -75,7 +75,11 @@ export default function PayrollPage() {
         : 0;
       setDetectedAdv(advTotal);
 
-      // Previous month unpaid balance
+      // Previous month unpaid balance — only for shortfalls NOT already tracked
+      // by the advance balance above. If last month's negative balance came from
+      // an advance deduction, that outstanding amount is already carried forward
+      // via the advance's own `balance` field (rolled into advTotal), so adding
+      // it again here would double-count the same debt.
       let prevDeduction = 0;
       try {
         const [yr, mo] = form.monthYear.split("-").map(Number);
@@ -85,9 +89,10 @@ export default function PayrollPage() {
         const prevData = await prevRes.json();
         if (Array.isArray(prevData) && prevData.length > 0) {
           const rec = prevData[0];
+          const wasAdvanceDeduction = String(rec.deductionReason || "").toLowerCase().includes("advance");
           const prevNet = rec.baseSalary + (rec.allowances || 0) - (rec.deductions || 0);
           const prevBal = prevNet - (rec.additionalCash || 0);
-          if (prevBal < 0) prevDeduction = Math.abs(prevBal);
+          if (prevBal < 0 && !wasAdvanceDeduction) prevDeduction = Math.abs(prevBal);
         }
       } catch {}
 
