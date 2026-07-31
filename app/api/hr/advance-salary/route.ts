@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireRole } from "@/lib/requireRole";
 import { resolveCompanyId } from "@/lib/tenant";
+import { reconcileAdvanceRecoveries } from "@/lib/payrollAdvanceRecovery";
 
 type AdvancePayload = {
   reason?: string;
@@ -56,6 +57,8 @@ export async function GET(req: NextRequest) {
     if (!companyId) {
       return NextResponse.json({ error: "Company required" }, { status: 400 });
     }
+
+    await reconcileAdvanceRecoveries(companyId);
 
     const advances = await prisma.advanceSalary.findMany({
       where: { companyId, deletedAt: null },

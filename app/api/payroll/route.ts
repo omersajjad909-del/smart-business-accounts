@@ -7,6 +7,7 @@ import {
   createPayrollPaymentCPV,
   deleteVoucherByTag,
 } from "@/lib/payrollAccounting";
+import { reconcileEmployeeAdvanceRecoveries } from "@/lib/payrollAdvanceRecovery";
 
 // GET: Fetch payroll records
 export async function GET(req: NextRequest) {
@@ -96,6 +97,14 @@ export async function POST(req: NextRequest) {
         netSalary,
       },
     });
+
+    if (String(deductionReason || "").toLowerCase().includes("advance")) {
+      try {
+        await reconcileEmployeeAdvanceRecoveries(companyId, employeeId);
+      } catch (advanceErr: any) {
+        console.error("Advance recovery sync failed (non-fatal):", advanceErr?.message || advanceErr);
+      }
+    }
 
     // Salary accrual JV — DR Salary Expense, CR Employee Payable
     try {
@@ -195,6 +204,18 @@ export async function PUT(req: NextRequest) {
       }
     }
 
+    const hadAdvanceDeduction = String(existing.deductionReason || "").toLowerCase().includes("advance");
+    const hasAdvanceDeduction = payroll
+      ? String(payroll.deductionReason || "").toLowerCase().includes("advance")
+      : false;
+    if (payroll && (hadAdvanceDeduction || hasAdvanceDeduction)) {
+      try {
+        await reconcileEmployeeAdvanceRecoveries(companyId, payroll.employeeId);
+      } catch (advanceErr: any) {
+        console.error("Advance recovery sync failed (non-fatal):", advanceErr?.message || advanceErr);
+      }
+    }
+
     return NextResponse.json(payroll);
   } catch (error) {
     console.error("Error updating payroll:", error);
@@ -225,9 +246,22 @@ export async function DELETE(req: NextRequest) {
         await deleteVoucherByTag(companyId, `[PAYMENT:${id}]`);
       } catch {}
 
+      const deletedPayroll = await prisma.payroll.findFirst({
+        where: { id, companyId },
+        select: { employeeId: true },
+      });
+
       await prisma.payroll.deleteMany({
         where: { id, companyId },
       });
+
+      if (deletedPayroll) {
+        try {
+          await reconcileEmployeeAdvanceRecoveries(companyId, deletedPayroll.employeeId);
+        } catch (advanceErr: any) {
+          console.error("Advance recovery sync failed (non-fatal):", advanceErr?.message || advanceErr);
+        }
+      }
 
       return NextResponse.json({ success: true });
     } catch (error) {

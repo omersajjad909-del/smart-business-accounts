@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { requireRole } from "@/lib/requireRole";
 import { resolveCompanyId } from "@/lib/tenant";
 import { createAdvanceSalaryVoucher, deleteVoucherByTag } from "@/lib/payrollAccounting";
+import { reconcileAdvanceRecoveries } from "@/lib/payrollAdvanceRecovery";
 
 // GET: Fetch advances
 export async function GET(req: NextRequest) {
@@ -33,6 +34,8 @@ export async function GET(req: NextRequest) {
         console.error("❌ Prisma Client out of sync. advanceSalary model missing.");
         return NextResponse.json({ error: "System update required. Please restart the server." }, { status: 500 });
     }
+
+    await reconcileAdvanceRecoveries(companyId, employeeId);
 
     const advances = await prisma.advanceSalary.findMany({
       where,
