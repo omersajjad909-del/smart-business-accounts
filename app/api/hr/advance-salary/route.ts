@@ -3,7 +3,6 @@ import { prisma } from "@/lib/prisma";
 import { requireRole } from "@/lib/requireRole";
 import { resolveCompanyId } from "@/lib/tenant";
 import {
-  getAdvanceRecoveryRows,
   reconcileAdvanceRecoveries,
   type AdvanceRecoveryRow,
 } from "@/lib/payrollAdvanceRecovery";
@@ -67,8 +66,7 @@ export async function GET(req: NextRequest) {
 
     const recoveryById = new Map<string, AdvanceRecoveryRow>();
     try {
-      await reconcileAdvanceRecoveries(companyId);
-      for (const row of await getAdvanceRecoveryRows(companyId)) {
+      for (const row of await reconcileAdvanceRecoveries(companyId)) {
         recoveryById.set(row.advanceId, row);
       }
     } catch (recoveryError) {

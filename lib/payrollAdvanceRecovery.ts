@@ -112,28 +112,17 @@ async function calculateEmployeeAdvanceRecoveryRows(
   });
 }
 
-export async function getAdvanceRecoveryRows(companyId: string, employeeId?: string | null) {
+// Reconciling and reading were previously two separate transactions that each
+// recomputed the same rows from scratch — every advance list request paid for
+// the recovery calculation twice. reconcile now returns the rows it already
+// computed so callers never need a second pass.
+export async function reconcileEmployeeAdvanceRecoveries(
+  companyId: string,
+  employeeId: string
+): Promise<AdvanceRecoveryRow[]> {
   return prisma.$transaction(async (tx) => {
-    const employees = employeeId
-      ? [{ employeeId }]
-      : await tx.advanceSalary.findMany({
-          where: { companyId, deletedAt: null },
-          select: { employeeId: true },
-          distinct: ["employeeId"],
-        });
-
-    const rows: AdvanceRecoveryRow[] = [];
-    for (const employee of employees) {
-      rows.push(...(await calculateEmployeeAdvanceRecoveryRows(tx, companyId, employee.employeeId)));
-    }
-    return rows;
-  });
-}
-
-export async function reconcileEmployeeAdvanceRecoveries(companyId: string, employeeId: string) {
-  await prisma.$transaction(async (tx) => {
     const rows = await calculateEmployeeAdvanceRecoveryRows(tx, companyId, employeeId);
-    if (!rows.length) return;
+    if (!rows.length) return rows;
 
     await tx.advanceSalary.updateMany({
       where: { companyId, employeeId, deletedAt: null, status: "DEDUCTED" },
@@ -150,13 +139,16 @@ export async function reconcileEmployeeAdvanceRecoveries(companyId: string, empl
         data: { status: "DEDUCTED" },
       });
     }
+    return rows;
   });
 }
 
-export async function reconcileAdvanceRecoveries(companyId: string, employeeId?: string | null) {
+export async function reconcileAdvanceRecoveries(
+  companyId: string,
+  employeeId?: string | null
+): Promise<AdvanceRecoveryRow[]> {
   if (employeeId) {
-    await reconcileEmployeeAdvanceRecoveries(companyId, employeeId);
-    return;
+    return reconcileEmployeeAdvanceRecoveries(companyId, employeeId);
   }
 
   const employees = await prisma.advanceSalary.findMany({
@@ -165,7 +157,10 @@ export async function reconcileAdvanceRecoveries(companyId: string, employeeId?:
     distinct: ["employeeId"],
   });
 
-  for (const advance of employees) {
-    await reconcileEmployeeAdvanceRecoveries(companyId, advance.employeeId);
-  }
+  // Each employee's reconciliation is independent — run them concurrently
+  // instead of one sequential round trip per employee.
+  const rowsByEmployee = await Promise.all(
+    employees.map((advance) => reconcileEmployeeAdvanceRecoveries(companyId, advance.employeeId))
+  );
+  return rowsByEmployee.flat();
 }
