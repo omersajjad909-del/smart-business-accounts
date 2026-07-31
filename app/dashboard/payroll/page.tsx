@@ -62,7 +62,7 @@ export default function PayrollPage() {
   async function calculateAutoDeductions() {
     try {
       const [advRes, calcRes] = await Promise.all([
-        fetch(`/api/advance?employeeId=${form.employeeId}&status=PENDING&monthYear=${form.monthYear}`),
+        fetch(`/api/advance?employeeId=${form.employeeId}&status=PENDING&monthYear=${form.monthYear}`, { cache: "no-store" }),
         fetch(`/api/payroll/calculate?employeeId=${form.employeeId}&monthYear=${form.monthYear}`, { cache: "no-store" }),
       ]);
       const advData  = await advRes.json();

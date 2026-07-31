@@ -1,15 +1,5 @@
 import { prisma } from "@/lib/prisma";
 
-function monthEnd(monthYear: string) {
-  const [year, month] = monthYear.split("-").map(Number);
-  return new Date(year, month, 0, 23, 59, 59, 999);
-}
-
-function advanceAppliesToPayroll(advance: { date: Date; monthYear?: string | null }, payrollMonth: string) {
-  if (advance.monthYear) return advance.monthYear <= payrollMonth;
-  return advance.date <= monthEnd(payrollMonth);
-}
-
 export async function reconcileEmployeeAdvanceRecoveries(companyId: string, employeeId: string) {
   await prisma.$transaction(async (tx) => {
     const advances = await tx.advanceSalary.findMany({
@@ -37,7 +27,6 @@ export async function reconcileEmployeeAdvanceRecoveries(companyId: string, empl
 
       for (const advance of advances) {
         if (deductedAdvanceIds.has(advance.id)) continue;
-        if (!advanceAppliesToPayroll(advance, payroll.monthYear)) continue;
 
         const amount = Number(advance.amount || 0);
         if (amount > 0 && remainingAdvanceDeduction + 0.01 >= amount) {
