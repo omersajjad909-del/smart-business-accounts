@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import {
-  LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip,
+  LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
   ResponsiveContainer, PieChart, Pie, Cell,
 } from "recharts";
 import { getCurrentUser } from "@/lib/auth";
@@ -65,6 +65,11 @@ function currentMonth() {
 function monthLabel(ym: string) {
   const [y, m] = ym.split("-");
   return new Date(+y, +m - 1).toLocaleString("en-US", { month: "long", year: "numeric" });
+}
+
+function monthShortLabel(ym: string) {
+  const [y, m] = ym.split("-");
+  return new Date(+y, +m - 1).toLocaleString("en-US", { month: "short", year: "2-digit" });
 }
 
 // ─── Stat Card ────────────────────────────────────────────────────────────────
