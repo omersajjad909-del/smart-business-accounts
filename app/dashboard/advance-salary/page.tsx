@@ -172,7 +172,7 @@ export default function AdvanceSalaryPage() {
           Advance Records
         </div>
         {loading ? (
-          <div style={{ padding: 40, textAlign: "center", color: "var(--text-muted)" }}>Loadingâ€¦</div>
+          <div style={{ padding: 40, textAlign: "center", color: "var(--text-muted)" }}>Loading</div>
         ) : (
           <table style={s.table}>
             <thead>

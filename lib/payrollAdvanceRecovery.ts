@@ -12,7 +12,7 @@ export async function reconcileEmployeeAdvanceRecoveries(companyId: string, empl
 
     const payrolls = await tx.payroll.findMany({
       where: { companyId, employeeId },
-      select: { monthYear: true, deductions: true, deductionReason: true },
+      select: { monthYear: true, baseSalary: true, allowances: true, deductions: true, deductionReason: true },
       orderBy: { monthYear: "asc" },
     });
 
@@ -22,7 +22,12 @@ export async function reconcileEmployeeAdvanceRecoveries(companyId: string, empl
       const reason = String(payroll.deductionReason || "").toLowerCase();
       if (!reason.includes("advance")) continue;
 
-      let remainingAdvanceDeduction = Number(payroll.deductions || 0);
+      // A deduction only actually recovers money if the salary was large enough to
+      // absorb it. If deductions exceed base+allowances, pay goes negative and the
+      // shortfall carries forward as unrecovered debt (see "Next Month" balance on
+      // the payroll page) — so it must not count toward clearing the advance.
+      const grossEarnings = Number(payroll.baseSalary || 0) + Number(payroll.allowances || 0);
+      let remainingAdvanceDeduction = Math.min(Number(payroll.deductions || 0), Math.max(0, grossEarnings));
       if (remainingAdvanceDeduction <= 0) continue;
 
       for (const advance of advances) {
