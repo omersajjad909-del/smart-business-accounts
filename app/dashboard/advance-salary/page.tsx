@@ -51,6 +51,7 @@ export default function AdvanceSalaryPage() {
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState({ employeeId: "", amount: "", reason: "", deductMonths: "1" });
   const [saving, setSaving] = useState(false);
   const [msg, setMsg] = useState("");
@@ -79,21 +80,24 @@ export default function AdvanceSalaryPage() {
     if (!form.employeeId || !form.amount) { setMsg("Please select an employee and enter amount"); return; }
     setSaving(true);
     try {
+      const payload = {
+        employeeId: form.employeeId,
+        employeeName: selectedEmployee ? employeeLabel(selectedEmployee) : "",
+        amount: parseFloat(form.amount),
+        reason: form.reason,
+        deductMonths: parseInt(form.deductMonths),
+      };
+      const method = editingId ? "PATCH" : "POST";
       const r = await fetch("/api/hr/advance-salary", {
-        method: "POST", credentials: "include",
+        method,
+        credentials: "include",
         headers: { "Content-Type": "application/json", ...getHeaders() },
-        body: JSON.stringify({
-          employeeId: form.employeeId,
-          employeeName: selectedEmployee ? employeeLabel(selectedEmployee) : "",
-          amount: parseFloat(form.amount),
-          reason: form.reason,
-          deductMonths: parseInt(form.deductMonths),
-        }),
+        body: JSON.stringify(editingId ? { id: editingId, ...payload } : payload),
       });
+      const d = await r.json().catch(() => ({}));
       if (r.ok) {
-        const d = await r.json();
-        setAdvances(prev => [d.advance || {
-          id: Date.now().toString(),
+        const advance = d.advance || {
+          id: editingId || Date.now().toString(),
           employeeId: form.employeeId,
           employeeName: selectedEmployee ? employeeLabel(selectedEmployee) : "",
           amount: parseFloat(form.amount),
@@ -102,19 +106,65 @@ export default function AdvanceSalaryPage() {
           deductedSoFar: 0,
           status: "PENDING" as const,
           date: new Date().toISOString().slice(0, 10),
-        }, ...prev]);
-        setMsg("Advance recorded successfully");
+        };
+        if (editingId) {
+          setAdvances(prev => prev.map(a => a.id === editingId ? advance : a));
+          setMsg("Advance updated successfully");
+        } else {
+          setAdvances(prev => [advance, ...prev]);
+          setMsg("Advance recorded successfully");
+        }
         setShowForm(false);
+        setEditingId(null);
         setForm({ employeeId: "", amount: "", reason: "", deductMonths: "1" });
       } else {
-        const j = await r.json().catch(() => ({}));
-        setMsg(j?.error || "Failed to save");
+        setMsg(d?.error || "Failed to save");
       }
     } catch {
       setMsg("Error saving advance");
     } finally {
       setSaving(false);
     }
+  }
+
+  async function handleDelete(id: string, name: string) {
+    if (!confirm(`Delete advance for ${name}?`)) return;
+    setSaving(true);
+    try {
+      const r = await fetch(`/api/hr/advance-salary?id=${encodeURIComponent(id)}`, {
+        method: "DELETE",
+        credentials: "include",
+        headers: getHeaders(),
+      });
+      const d = await r.json().catch(() => ({}));
+      if (r.ok) {
+        setAdvances(prev => prev.filter(a => a.id !== id));
+        if (editingId === id) {
+          setEditingId(null);
+          setShowForm(false);
+          setForm({ employeeId: "", amount: "", reason: "", deductMonths: "1" });
+        }
+        setMsg("Advance deleted");
+      } else {
+        setMsg(d?.error || "Failed to delete advance");
+      }
+    } catch {
+      setMsg("Error deleting advance");
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  function openEdit(a: Advance) {
+    setEditingId(a.id);
+    setForm({
+      employeeId: a.employeeId,
+      amount: a.amount.toString(),
+      reason: a.reason,
+      deductMonths: a.deductMonths.toString(),
+    });
+    setMsg("");
+    setShowForm(true);
   }
 
   const s: Record<string, React.CSSProperties> = {
@@ -178,7 +228,7 @@ export default function AdvanceSalaryPage() {
           <table style={s.table}>
             <thead>
               <tr>
-                {["Employee", "Date", "Amount", "Deduct Over", "Recovered", "Balance", "Status"].map(h => (
+                {["Employee", "Date", "Amount", "Deduct Over", "Recovered", "Balance", "Status", "Actions"].map(h => (
                   <th key={h} style={s.th}>{h}</th>
                 ))}
               </tr>
@@ -216,6 +266,10 @@ export default function AdvanceSalaryPage() {
                       <span style={{ padding: "3px 10px", borderRadius: 20, fontSize: 11, fontWeight: 700, background: `${STATUS_COLOR[a.status]}20`, color: STATUS_COLOR[a.status], border: `1px solid ${STATUS_COLOR[a.status]}40` }}>
                         {a.status}
                       </span>
+                    </td>
+                    <td style={s.td}>
+                      <button type="button" style={{ background: "transparent", border: "1px solid rgba(99,102,241,0.3)", borderRadius: 6, padding: "4px 10px", fontSize: 12, color: "#818cf8", cursor: "pointer", marginRight: 8 }} onClick={() => openEdit(a)}>Edit</button>
+                      <button type="button" style={{ background: "transparent", border: "1px solid rgba(248,113,113,0.3)", borderRadius: 6, padding: "4px 10px", fontSize: 12, color: "#f87171", cursor: "pointer" }} onClick={() => handleDelete(a.id, a.employeeName)}>Delete</button>
                     </td>
                   </tr>
                 );

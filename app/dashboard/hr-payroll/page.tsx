@@ -208,6 +208,7 @@ export default function HrPayrollDashboard() {
   const [pay, setPay]     = useState<PayRecord[]>([]);
   const [emps, setEmps]   = useState<Emp[]>([]);
   const [loading, setLoading] = useState(true);
+  const [allAttLoaded, setAllAttLoaded] = useState(false);
   const [chartView, setChartView] = useState<"daily" | "monthly" | "allTime">("daily");
 
   const h: Record<string, string> = {
@@ -218,21 +219,39 @@ export default function HrPayrollDashboard() {
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      const [aRes, pRes, eRes, allARes] = await Promise.all([
+      const [aRes, pRes, eRes] = await Promise.all([
         fetch(`/api/attendance?month=${month}`, { headers: h }),
         fetch(`/api/payroll?monthYear=${month}`,{ headers: h }),
         fetch(`/api/employees`,                 { headers: h }),
-        fetch(`/api/attendance`,                 { headers: h }),
       ]);
-      const [aData, pData, eData, allAData] = await Promise.all([aRes.json(), pRes.json(), eRes.json(), allARes.json()]);
+      const [aData, pData, eData] = await Promise.all([aRes.json(), pRes.json(), eRes.json()]);
       setAtt(Array.isArray(aData) ? aData : []);
       setPay(Array.isArray(pData) ? pData : []);
       setEmps(Array.isArray(eData) ? eData : []);
-      setAllAtt(Array.isArray(allAData) ? allAData : []);
     } catch { /* silent */ } finally {
       setLoading(false);
     }
   }, [month]);
+
+  // Full attendance history is only needed for the Monthly/All Time chart views —
+  // fetch it lazily on first switch instead of on every page load/refresh.
+  const loadAllAttendance = useCallback(async () => {
+    try {
+      const res = await fetch(`/api/attendance`, { headers: h });
+      const data = await res.json();
+      setAllAtt(Array.isArray(data) ? data : []);
+      setAllAttLoaded(true);
+    } catch { /* silent */ }
+  }, []);
+
+  useEffect(() => {
+    if (chartView !== "daily" && !allAttLoaded) loadAllAttendance();
+  }, [chartView, allAttLoaded, loadAllAttendance]);
+
+  function refresh() {
+    load();
+    if (allAttLoaded) loadAllAttendance();
+  }
 
   useEffect(() => { load(); }, [load]);
 
@@ -385,7 +404,7 @@ export default function HrPayrollDashboard() {
               }}
             />
             <button
-              onClick={load}
+              onClick={refresh}
               style={{
                 width: 38, height: 38, borderRadius: 8, border: `1px solid ${C.border}`,
                 background: "var(--card-bg)", cursor: "pointer", fontSize: 16,

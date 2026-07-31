@@ -86,6 +86,94 @@ export async function GET(req: NextRequest) {
   }
 }
 
+export async function PATCH(req: NextRequest) {
+  const guard = requireRole(req, ["ADMIN", "ACCOUNTANT"]);
+  if (guard) return guard;
+
+  try {
+    const companyId = await resolveCompanyId(req);
+    if (!companyId) {
+      return NextResponse.json({ error: "Company required" }, { status: 400 });
+    }
+
+    const body = await req.json();
+    const id = String(body.id || "").trim();
+    const employeeId = String(body.employeeId || "").trim();
+    const amount = Number(body.amount || 0);
+    const reason = String(body.reason || "").trim();
+    const deductMonths = Math.max(1, Number(body.deductMonths || 1));
+
+    if (!id || !employeeId || amount <= 0) {
+      return NextResponse.json({ error: "Advance id, employee and valid amount are required" }, { status: 400 });
+    }
+
+    const existingAdvance = await prisma.advanceSalary.findFirst({
+      where: { id, companyId, deletedAt: null },
+    });
+    if (!existingAdvance) {
+      return NextResponse.json({ error: "Advance record not found" }, { status: 404 });
+    }
+
+    const employee = await prisma.employee.findFirst({
+      where: { id: employeeId, companyId, isActive: true },
+      select: { id: true, firstName: true, lastName: true },
+    });
+    if (!employee) {
+      return NextResponse.json({ error: "Employee not found" }, { status: 404 });
+    }
+
+    const advance = await prisma.advanceSalary.update({
+      where: { id },
+      data: {
+        employeeId,
+        amount,
+        remarks: JSON.stringify({ reason, deductMonths }),
+        updatedAt: new Date(),
+      },
+      include: { employee: { select: { firstName: true, lastName: true } } },
+    });
+
+    return NextResponse.json({ advance: mapAdvance(advance) });
+  } catch (error) {
+    console.error("[hr/advance-salary] Failed to update advance.", error);
+    return NextResponse.json({ error: "Failed to update advance" }, { status: 500 });
+  }
+}
+
+export async function DELETE(req: NextRequest) {
+  const guard = requireRole(req, ["ADMIN", "ACCOUNTANT"]);
+  if (guard) return guard;
+
+  try {
+    const companyId = await resolveCompanyId(req);
+    if (!companyId) {
+      return NextResponse.json({ error: "Company required" }, { status: 400 });
+    }
+
+    const id = String(req.nextUrl.searchParams.get("id") || "").trim();
+    if (!id) {
+      return NextResponse.json({ error: "Advance id is required" }, { status: 400 });
+    }
+
+    const advance = await prisma.advanceSalary.findFirst({
+      where: { id, companyId, deletedAt: null },
+    });
+    if (!advance) {
+      return NextResponse.json({ error: "Advance record not found" }, { status: 404 });
+    }
+
+    await prisma.advanceSalary.update({
+      where: { id },
+      data: { deletedAt: new Date(), deletedBy: req.headers.get("x-user-id") || undefined },
+    });
+
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    console.error("[hr/advance-salary] Failed to delete advance.", error);
+    return NextResponse.json({ error: "Failed to delete advance" }, { status: 500 });
+  }
+}
+
 export async function POST(req: NextRequest) {
   const guard = requireRole(req, ["ADMIN", "ACCOUNTANT"]);
   if (guard) return guard;
