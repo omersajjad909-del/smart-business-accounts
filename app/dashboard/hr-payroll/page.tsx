@@ -263,6 +263,38 @@ export default function HrPayrollDashboard() {
     .sort((a, b) => +a[0] - +b[0])
     .map(([day, v]) => ({ day: `${month.slice(5)}-${day.padStart(2,"0")}`, ...v }));
 
+  // ── Monthly chart data (group all-time records by month) ──────────────────
+  const monthMap = new Map<string, { Present: number; Absent: number; Late: number; Leave: number }>();
+  allAtt.forEach(r => {
+    const key = r.date.slice(0, 7); // YYYY-MM
+    if (!monthMap.has(key)) monthMap.set(key, { Present: 0, Absent: 0, Late: 0, Leave: 0 });
+    const e = monthMap.get(key)!;
+    if (r.status === "PRESENT")  e.Present++;
+    if (r.status === "ABSENT")   e.Absent++;
+    if (r.status === "LATE")     e.Late++;
+    if (r.status === "LEAVE")    e.Leave++;
+  });
+  const monthlyData = Array.from(monthMap.entries())
+    .sort((a, b) => a[0].localeCompare(b[0]))
+    .map(([ym, v]) => ({ day: monthShortLabel(ym), ...v }));
+
+  // ── All-time chart data (single aggregate across all history) ─────────────
+  const allTimeData = [{
+    day: "All Time",
+    Present: allAtt.filter(r => r.status === "PRESENT").length,
+    Absent:  allAtt.filter(r => r.status === "ABSENT").length,
+    Late:    allAtt.filter(r => r.status === "LATE").length,
+    Leave:   allAtt.filter(r => r.status === "LEAVE").length,
+  }];
+
+  const chartData = chartView === "monthly" ? monthlyData : chartView === "allTime" ? allTimeData : lineData;
+  const chartHasData = chartView === "allTime" ? allAtt.length > 0 : chartData.length > 0;
+  const chartSubtitle = chartView === "daily"
+    ? monthLabel(month)
+    : chartView === "monthly"
+      ? `${monthlyData.length} month${monthlyData.length === 1 ? "" : "s"} on record`
+      : `${allAtt.length} record${allAtt.length === 1 ? "" : "s"} since inception`;
+
   // ── Donut chart data ───────────────────────────────────────────────────────
   const total = presentToday + absentToday + lateToday + leaveToday || 1;
   const donutData = [
