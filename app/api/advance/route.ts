@@ -3,7 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { requireRole } from "@/lib/requireRole";
 import { resolveCompanyId } from "@/lib/tenant";
 import { createAdvanceSalaryVoucher, deleteVoucherByTag } from "@/lib/payrollAccounting";
-import { reconcileAdvanceRecoveries } from "@/lib/payrollAdvanceRecovery";
+import { getAdvanceRecoveryRows, reconcileAdvanceRecoveries } from "@/lib/payrollAdvanceRecovery";
 
 // GET: Fetch advances
 export async function GET(req: NextRequest) {
@@ -36,6 +36,9 @@ export async function GET(req: NextRequest) {
     }
 
     await reconcileAdvanceRecoveries(companyId, employeeId);
+    const recoveryById = new Map(
+      (await getAdvanceRecoveryRows(companyId, employeeId)).map((row) => [row.advanceId, row])
+    );
 
     const advances = await prisma.advanceSalary.findMany({
       where,
@@ -43,7 +46,14 @@ export async function GET(req: NextRequest) {
       orderBy: { date: "desc" },
     });
 
-    return NextResponse.json(advances);
+    return NextResponse.json(advances.map((advance) => {
+      const recovery = recoveryById.get(advance.id);
+      return {
+        ...advance,
+        deductedSoFar: recovery?.recovered ?? (advance.status === "DEDUCTED" ? Number(advance.amount || 0) : 0),
+        balance: recovery?.balance ?? (advance.status === "DEDUCTED" ? 0 : Number(advance.amount || 0)),
+      };
+    }));
   } catch (error) {
     console.error("Error fetching advances:", error);
     return NextResponse.json({ error: "Failed to fetch advances" }, { status: 500 });

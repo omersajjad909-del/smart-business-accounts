@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireRole } from "@/lib/requireRole";
 import { resolveCompanyId } from "@/lib/tenant";
-import { reconcileAdvanceRecoveries } from "@/lib/payrollAdvanceRecovery";
+import { getAdvanceRecoveryRows, reconcileAdvanceRecoveries } from "@/lib/payrollAdvanceRecovery";
 
 type AdvancePayload = {
   reason?: string;
@@ -31,9 +31,11 @@ function mapAdvance(advance: {
   status: string;
   remarks?: string | null;
   employee?: { firstName?: string | null; lastName?: string | null } | null;
-}) {
+}, recovery?: { recovered: number; balance: number; status: "DEDUCTED" | "PENDING" }) {
   const payload = parsePayload(advance.remarks);
-  const isCleared = advance.status === "DEDUCTED" || advance.status === "CLEARED";
+  const balance = recovery ? recovery.balance : advance.status === "DEDUCTED" || advance.status === "CLEARED" ? 0 : Number(advance.amount || 0);
+  const recovered = recovery ? recovery.recovered : balance <= 0 ? Number(advance.amount || 0) : 0;
+  const isCleared = balance <= 0.01;
 
   return {
     id: advance.id,
@@ -42,7 +44,8 @@ function mapAdvance(advance: {
     amount: Number(advance.amount || 0),
     reason: payload.reason || "",
     deductMonths: Number(payload.deductMonths || 1),
-    deductedSoFar: isCleared ? Number(advance.amount || 0) : 0,
+    deductedSoFar: recovered,
+    balance,
     status: isCleared ? "CLEARED" : "ACTIVE",
     date: advance.date.toISOString().slice(0, 10),
   };
@@ -59,6 +62,9 @@ export async function GET(req: NextRequest) {
     }
 
     await reconcileAdvanceRecoveries(companyId);
+    const recoveryById = new Map(
+      (await getAdvanceRecoveryRows(companyId)).map((row) => [row.advanceId, row])
+    );
 
     const advances = await prisma.advanceSalary.findMany({
       where: { companyId, deletedAt: null },
@@ -66,7 +72,7 @@ export async function GET(req: NextRequest) {
       orderBy: { date: "desc" },
     });
 
-    return NextResponse.json({ advances: advances.map(mapAdvance) });
+    return NextResponse.json({ advances: advances.map((advance) => mapAdvance(advance, recoveryById.get(advance.id))) });
   } catch (error) {
     console.error("[hr/advance-salary] Failed to fetch advances.", error);
     return NextResponse.json({ error: "Failed to fetch advances" }, { status: 500 });

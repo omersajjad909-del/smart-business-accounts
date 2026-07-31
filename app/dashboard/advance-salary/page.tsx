@@ -20,6 +20,7 @@ type Advance = {
   reason: string;
   deductMonths: number;
   deductedSoFar: number;
+  balance?: number;
   status: "ACTIVE" | "CLEARED" | "PENDING";
   date: string;
 };
@@ -67,7 +68,7 @@ export default function AdvanceSalaryPage() {
     }).catch(() => {}).finally(() => setLoading(false));
   }, []);
 
-  const totalActive = advances.filter(a => a.status === "ACTIVE").reduce((s, a) => s + (a.amount - a.deductedSoFar), 0);
+  const totalActive = advances.filter(a => a.status === "ACTIVE").reduce((s, a) => s + (a.balance ?? (a.amount - a.deductedSoFar)), 0);
   const totalDisbursed = advances.reduce((s, a) => s + a.amount, 0);
   const totalCleared = advances.filter(a => a.status === "CLEARED").length;
 
@@ -188,7 +189,7 @@ export default function AdvanceSalaryPage() {
                   No advance records yet. Click <strong>+ New Advance</strong> to get started.
                 </td></tr>
               ) : advances.map(a => {
-                const balance = a.amount - a.deductedSoFar;
+                const balance = a.balance ?? (a.amount - a.deductedSoFar);
                 const pct = a.amount > 0 ? Math.round((a.deductedSoFar / a.amount) * 100) : 0;
                 return (
                   <tr key={a.id}

@@ -67,7 +67,9 @@ export default function PayrollPage() {
       ]);
       const advData  = await advRes.json();
       const calcData = calcRes.ok ? await calcRes.json() : null;
-      const advTotal = Array.isArray(advData) ? advData.reduce((s: number, a: any) => s + a.amount, 0) : 0;
+      const advTotal = Array.isArray(advData)
+        ? advData.reduce((sum: number, advance: any) => sum + Number(advance.balance ?? advance.amount ?? 0), 0)
+        : 0;
       setDetectedAdv(advTotal);
 
       // Previous month unpaid balance
