@@ -57,7 +57,10 @@ export default function PayrollPage() {
   useEffect(() => {
     if (form.employeeId && form.monthYear) calculateAutoDeductions();
     else setDetectedAdv(0);
-  }, [form.employeeId, form.monthYear, form.baseSalary]);
+    // form.baseSalary intentionally excluded — calculateAutoDeductions never reads
+    // it, so including it re-fired 3 API calls on every keystroke while typing.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [form.employeeId, form.monthYear]);
 
   async function calculateAutoDeductions() {
     try {
