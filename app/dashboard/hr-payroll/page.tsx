@@ -459,12 +459,12 @@ export default function HrPayrollDashboard() {
             background: C.card, borderRadius: 12, padding: 24,
             border: `1px solid ${C.border}`, boxShadow: "0 1px 6px rgba(0,0,0,.06)",
           }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 16, flexWrap: "wrap", gap: 10 }}>
               <div>
                 <h3 style={{ margin: 0, fontWeight: 700, fontSize: 15.5, color: C.text }}>Attendance Overview</h3>
-                <p style={{ margin: "3px 0 0", fontSize: 12, color: C.sub }}>{monthLabel(month)}</p>
+                <p style={{ margin: "3px 0 0", fontSize: 12, color: C.sub }}>{chartSubtitle}</p>
               </div>
-              <div style={{ display: "flex", gap: 16 }}>
+              <div style={{ display: "flex", gap: 16, flexWrap: "wrap" }}>
                 {[
                   { label: "Present", color: C.present },
                   { label: "Absent",  color: C.absent  },
@@ -479,13 +479,49 @@ export default function HrPayrollDashboard() {
               </div>
             </div>
 
-            {lineData.length === 0 ? (
+            <div style={{ display: "flex", gap: 4, background: "var(--surface)", padding: 3, borderRadius: 8, width: "fit-content", marginBottom: 16 }}>
+              {([
+                { key: "daily",   label: "Daily"    },
+                { key: "monthly", label: "Monthly"  },
+                { key: "allTime", label: "All Time" },
+              ] as const).map(t => (
+                <button
+                  key={t.key}
+                  onClick={() => setChartView(t.key)}
+                  style={{
+                    padding: "5px 14px", borderRadius: 6, border: "none", cursor: "pointer",
+                    fontFamily: ff, fontSize: 11.5, fontWeight: 600,
+                    background: chartView === t.key ? "var(--card-bg)" : "transparent",
+                    color: chartView === t.key ? C.text : C.sub,
+                    boxShadow: chartView === t.key ? "0 1px 4px rgba(0,0,0,.08)" : "none",
+                    transition: "all .15s",
+                  }}
+                >
+                  {t.label}
+                </button>
+              ))}
+            </div>
+
+            {!chartHasData ? (
               <div style={{ height: 220, display: "flex", alignItems: "center", justifyContent: "center", color: C.sub, fontSize: 13 }}>
-                No attendance data for this month
+                {chartView === "daily" ? "No attendance data for this month" : "No attendance data recorded yet"}
               </div>
+            ) : chartView === "allTime" ? (
+              <ResponsiveContainer width="100%" height={220}>
+                <BarChart data={chartData} margin={{ top: 5, right: 10, left: -20, bottom: 5 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
+                  <XAxis dataKey="day" tick={{ fontSize: 11, fill: C.sub }} tickLine={false} axisLine={false} />
+                  <YAxis tick={{ fontSize: 11, fill: C.sub }} tickLine={false} axisLine={false} />
+                  <Tooltip content={<ChartTooltip />} />
+                  <Bar dataKey="Present" fill={C.present} radius={[4, 4, 0, 0]} />
+                  <Bar dataKey="Absent"  fill={C.absent}  radius={[4, 4, 0, 0]} />
+                  <Bar dataKey="Late"    fill={C.late}    radius={[4, 4, 0, 0]} />
+                  <Bar dataKey="Leave"   fill={C.leave}   radius={[4, 4, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
             ) : (
               <ResponsiveContainer width="100%" height={220}>
-                <LineChart data={lineData} margin={{ top: 5, right: 10, left: -20, bottom: 5 }}>
+                <LineChart data={chartData} margin={{ top: 5, right: 10, left: -20, bottom: 5 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
                   <XAxis dataKey="day" tick={{ fontSize: 11, fill: C.sub }} tickLine={false} axisLine={false} />
                   <YAxis tick={{ fontSize: 11, fill: C.sub }} tickLine={false} axisLine={false} />
