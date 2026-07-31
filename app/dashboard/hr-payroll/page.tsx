@@ -204,9 +204,11 @@ export default function HrPayrollDashboard() {
   const user = getCurrentUser();
   const [month, setMonth] = useState(currentMonth);
   const [att, setAtt]     = useState<AttRecord[]>([]);
+  const [allAtt, setAllAtt] = useState<AttRecord[]>([]);
   const [pay, setPay]     = useState<PayRecord[]>([]);
   const [emps, setEmps]   = useState<Emp[]>([]);
   const [loading, setLoading] = useState(true);
+  const [chartView, setChartView] = useState<"daily" | "monthly" | "allTime">("daily");
 
   const h: Record<string, string> = {
     "x-user-role": user?.role || "",
@@ -216,15 +218,17 @@ export default function HrPayrollDashboard() {
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      const [aRes, pRes, eRes] = await Promise.all([
+      const [aRes, pRes, eRes, allARes] = await Promise.all([
         fetch(`/api/attendance?month=${month}`, { headers: h }),
         fetch(`/api/payroll?monthYear=${month}`,{ headers: h }),
         fetch(`/api/employees`,                 { headers: h }),
+        fetch(`/api/attendance`,                 { headers: h }),
       ]);
-      const [aData, pData, eData] = await Promise.all([aRes.json(), pRes.json(), eRes.json()]);
+      const [aData, pData, eData, allAData] = await Promise.all([aRes.json(), pRes.json(), eRes.json(), allARes.json()]);
       setAtt(Array.isArray(aData) ? aData : []);
       setPay(Array.isArray(pData) ? pData : []);
       setEmps(Array.isArray(eData) ? eData : []);
+      setAllAtt(Array.isArray(allAData) ? allAData : []);
     } catch { /* silent */ } finally {
       setLoading(false);
     }
