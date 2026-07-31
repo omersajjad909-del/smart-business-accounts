@@ -2,7 +2,11 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireRole } from "@/lib/requireRole";
 import { resolveCompanyId } from "@/lib/tenant";
-import { getAdvanceRecoveryRows, reconcileAdvanceRecoveries } from "@/lib/payrollAdvanceRecovery";
+import {
+  getAdvanceRecoveryRows,
+  reconcileAdvanceRecoveries,
+  type AdvanceRecoveryRow,
+} from "@/lib/payrollAdvanceRecovery";
 
 type AdvancePayload = {
   reason?: string;
@@ -61,10 +65,15 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: "Company required" }, { status: 400 });
     }
 
-    await reconcileAdvanceRecoveries(companyId);
-    const recoveryById = new Map(
-      (await getAdvanceRecoveryRows(companyId)).map((row) => [row.advanceId, row])
-    );
+    const recoveryById = new Map<string, AdvanceRecoveryRow>();
+    try {
+      await reconcileAdvanceRecoveries(companyId);
+      for (const row of await getAdvanceRecoveryRows(companyId)) {
+        recoveryById.set(row.advanceId, row);
+      }
+    } catch (recoveryError) {
+      console.error("[hr/advance-salary] Advance recovery sync failed.", recoveryError);
+    }
 
     const advances = await prisma.advanceSalary.findMany({
       where: { companyId, deletedAt: null },

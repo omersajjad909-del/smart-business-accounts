@@ -4,10 +4,7 @@ import Navbar from "./landing/components/navbar";
 import Offer from "./landing/components/Offer";
 import Footer from "./landing/components/Footer";
 import ChatWidget from "./landing/components/ChatWidget";
-import CookieBanner from "./landing/components/CookieBanner";
 import GeoPrecisionPrompt from "./landing/components/GeoPrecisionPrompt";
-import { Suspense } from "react";
-import VisitorTracker from "./landing/components/VisitorTracker";
 
 const BASE = process.env.NEXT_PUBLIC_BASE_URL || "https://www.finovaos.app";
 
@@ -125,9 +122,7 @@ export default function MarketingLayout({
       <main className="grow overflow-x-hidden">{children}</main>
       <Footer />
       <ChatWidget />
-      <CookieBanner />
       <GeoPrecisionPrompt />
-      <Suspense fallback={null}><VisitorTracker /></Suspense>
     </div>
   );
 }

@@ -166,6 +166,8 @@ export function proxy(req: NextRequest) {
     "/api/chat/escalate",
     // Public support ticket form (no login required)
     "/api/support/ticket",
+    // Anonymous marketing-site visitor tracking (no auth / company context)
+    "/api/track/visit",
   ];
   const isApi = pathname.startsWith("/api/");
   const isPublic = publicApi.some((p) => pathname.startsWith(p));
