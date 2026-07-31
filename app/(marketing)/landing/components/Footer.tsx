@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Facebook, Instagram, Linkedin, Mail, Phone, Globe, ArrowRight, Zap, Twitter, Youtube, Music2 } from "lucide-react";
+import { Facebook, Instagram, Linkedin, Mail, Phone,MapPin, Globe, ArrowRight, Zap, Twitter, Youtube, Music2 } from "lucide-react";
 import { useEffect, useState } from "react";
 
 const PRODUCT_LINKS = [
