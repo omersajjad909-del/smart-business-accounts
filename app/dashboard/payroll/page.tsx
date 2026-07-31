@@ -55,12 +55,18 @@ export default function PayrollPage() {
   useEffect(() => { fetchEmployees(); fetchPayroll(); setForm(p => ({ ...p, monthYear })); }, [monthYear]);
 
   useEffect(() => {
+    // Skip while editing an existing record — its saved deductions/reason were
+    // already loaded verbatim by handleEdit(). Re-running the auto-calculator
+    // here would recompute against the *current* (post-save) advance state and
+    // silently strip out amounts already recovered by this very record (e.g.
+    // an advance this payroll itself just cleared).
+    if (editingId) return;
     if (form.employeeId && form.monthYear) calculateAutoDeductions();
     else setDetectedAdv(0);
     // form.baseSalary intentionally excluded — calculateAutoDeductions never reads
     // it, so including it re-fired 3 API calls on every keystroke while typing.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [form.employeeId, form.monthYear]);
+  }, [form.employeeId, form.monthYear, editingId]);
 
   async function calculateAutoDeductions() {
     try {
