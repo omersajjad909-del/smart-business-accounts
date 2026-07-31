@@ -195,7 +195,7 @@ export default function AdvanceSalaryPage() {
           <h1 style={s.title}>Advance Salary</h1>
           <p style={s.sub}>Manage employee salary advances and auto-deduction schedules</p>
         </div>
-        <button style={s.btn} onClick={() => { setMsg(""); setShowForm(true); }}>+ New Advance</button>
+        <button style={s.btn} onClick={() => { setMsg(""); setEditingId(null); setShowForm(true); }}>+ New Advance</button>
       </div>
 
       {/* KPI Cards */}
@@ -235,7 +235,7 @@ export default function AdvanceSalaryPage() {
             </thead>
             <tbody>
               {advances.length === 0 ? (
-                <tr><td colSpan={7} style={{ ...s.td, textAlign: "center", padding: 32, color: "var(--text-muted)" }}>
+                <tr><td colSpan={8} style={{ ...s.td, textAlign: "center", padding: 32, color: "var(--text-muted)" }}>
                   No advance records yet. Click <strong>+ New Advance</strong> to get started.
                 </td></tr>
               ) : advances.map(a => {
@@ -316,7 +316,7 @@ export default function AdvanceSalaryPage() {
                 <button style={{ ...s.btn, flex: 1 }} onClick={handleSave} disabled={saving}>
                   {saving ? "Saving" : "Save Advance"}
                 </button>
-                <button style={{ ...s.btn, background: "var(--border)", color: "var(--text-muted)", flex: 1 }} onClick={() => { setShowForm(false); setMsg(""); }}>
+                <button style={{ ...s.btn, background: "var(--border)", color: "var(--text-muted)", flex: 1 }} onClick={() => { setShowForm(false); setMsg(""); setEditingId(null); }}>
                   Cancel
                 </button>
               </div>
