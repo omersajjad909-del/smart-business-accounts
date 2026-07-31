@@ -85,7 +85,13 @@ async function calculateEmployeeAdvanceRecoveryRows(
       row.balance += notRecoveredFromSalary;
     }
 
-    let extraCashCarry = Number(payroll.additionalCash || 0);
+    // Extra cash only becomes new debt when it exceeds what the employee actually
+    // earned this month (netSalary). Paying out exactly what they're owed — even
+    // after an advance deduction fully cleared — is a normal settlement, not a
+    // fresh loan, and must not resurrect an already-recovered advance.
+    const netSalary = grossSalary - Number(payroll.deductions || 0);
+    const entitlement = Math.max(0, netSalary);
+    let extraCashCarry = Math.max(0, Number(payroll.additionalCash || 0) - entitlement);
     for (let index = affectedRows.length - 1; index >= 0 && extraCashCarry > 0; index--) {
       const row = rows.find((candidate) => candidate.advanceId === affectedRows[index].advanceId);
       if (!row) continue;
