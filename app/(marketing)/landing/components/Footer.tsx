@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Facebook, Instagram, Linkedin, Mail, Phone,MapPin, Globe, ArrowRight, Zap, Twitter, Youtube, Music2 } from "lucide-react";
+import { Facebook, Instagram, Linkedin, Mail, Phone, Globe, ArrowRight, Zap, Twitter, Youtube, Music2 } from "lucide-react";
 import { useEffect, useState } from "react";
 
 const PRODUCT_LINKS = [
@@ -318,7 +318,7 @@ export default function Footer() {
                 { Icon: Mail,  text: "hello@finovaos.app", color: "#818cf8", href: "mailto:hello@finovaos.app" },
                 { Icon: Phone, text: "+92 317-8653693",        color: "#34d399", href: "https://wa.me/923047653693" },
                 { Icon: Globe, text: "finovaos.app",            color: "#fbbf24", href: "https://finovaos.app" },
-                { Icon: MapPin, text: "p-277 , Lasani Town, Sargodha road , Faisalabad",            color: "#fbbf24", href: "https://finovaos.app" },
+                { Icon: Globe, text: "p-277 , Lasani Town, Sargodha road , Faisalabad",            color: "#fbbf24", href: "https://finovaos.app" },
               ].map(({ Icon, text, color, href }) => (
                 <a key={text} href={href} className="ft-contact-item" target="_blank" rel="noopener noreferrer" style={{ display: "flex", alignItems: "center", gap: 10, textDecoration: "none" }}>
                   <div className="ft-contact-icon" style={{
