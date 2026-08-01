@@ -45,6 +45,7 @@ export default function PayrollPage() {
     employeeId: "", monthYear: (() => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}`; })(),
     baseSalary: 0, allowances: 0, deductions: 0, deductionReason: "", additionalCash: 0,
   });
+  const [companyName, setCompanyName] = useState("");
 
   const h = (json = false): Record<string, string> => ({
     "x-user-role":  user?.role || "",
@@ -53,6 +54,14 @@ export default function PayrollPage() {
   });
 
   useEffect(() => { fetchEmployees(); fetchPayroll(); setForm(p => ({ ...p, monthYear })); }, [monthYear]);
+
+  useEffect(() => {
+    fetch("/api/me/company", { headers: h() })
+      .then(r => r.ok ? r.json() : null)
+      .then(d => { if (d?.name) setCompanyName(d.name); })
+      .catch(() => {});
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     // Skip while editing an existing record — its saved deductions/reason were
