@@ -3,6 +3,7 @@ import { fmtDate } from "@/lib/dateUtils";
 
 import { useEffect, useLayoutEffect, useState, useRef, Suspense, createContext, useContext } from "react";
 import Link from "next/link";
+import dynamic from "next/dynamic";
 import { usePathname, useRouter } from "next/navigation";
 import {
   getCurrentUser,
