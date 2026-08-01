@@ -106,7 +106,8 @@
       "Bash(xargs -I{} du -h {})",
       "Bash(NODE_OPTIONS=\"--max-old-space-size=6144\" npx tsc --noEmit -p .)",
       "Bash(echo \"started in background pid $!\")",
-      "Bash(echo \"started pid $!\")"
+      "Bash(echo \"started pid $!\")",
+      "Bash(grep -n \"^\\\\s*th\\\\b\\\\|th\\\\s*{\\\\|th\\\\[|th:not\\\\|th,\\\\| th \" app/globals.css)"
     ],
     "additionalDirectories": [
       "d:\\projects\\smart-business-accounts\\app\\api\\chat\\conversations",

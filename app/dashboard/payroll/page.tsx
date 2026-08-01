@@ -519,7 +519,14 @@ export default function PayrollPage() {
           </div>
 
           {/* Print styles */}
-          <style>{`@media print {
+          <style>{`
+            /* The app's global dark-mode table theme (html.dark .dashboard-root th/td)
+               overrides th/td colors with !important, which bleeds into this white
+               printable paper and makes the header text invisible in dark mode.
+               Win it back with an ID selector, on-screen and when printing. */
+            #payroll-printable th { background: transparent !important; color: #0f172a !important; }
+            #payroll-printable td { border-color: #e2e8f0 !important; }
+            @media print {
               @page { size: A4; margin: 0; }
               body * { visibility: hidden !important; }
               #payroll-printable, #payroll-printable * { visibility: visible !important; }
