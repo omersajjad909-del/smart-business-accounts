@@ -100,7 +100,8 @@
       "Bash(taskkill //PID 4340 //F)",
       "Bash(cp /tmp/inspect.mjs ./scripts_tmp/inspect.mjs)",
       "Bash(node ./scripts_tmp/inspect.mjs)",
-      "Bash(cd d:/projects/smart-business-accounts && rm -rf scripts_tmp && rm -f /tmp/inspect.mjs)"
+      "Bash(cd d:/projects/smart-business-accounts && rm -rf scripts_tmp && rm -f /tmp/inspect.mjs)",
+      "Bash(git rev-list *)"
     ],
     "additionalDirectories": [
       "d:\\projects\\smart-business-accounts\\app\\api\\chat\\conversations",
