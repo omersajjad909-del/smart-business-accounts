@@ -630,14 +630,13 @@ export default function PayrollPage() {
             </div>
 
             {/* Signature blocks */}
-            <div style={{ padding: "0 40px 24px", marginTop: 40 }}>
-              <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr 1fr", gap: 40 }}>
-                {["Prepared By", "Verified By", "Approved By"].map((label) => (
+            <div style={{ padding: "0 40px 32px", marginTop: 48 }}>
+              <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr 1fr", gap: 56 }}>
+                {["Prepared by", "Checked by", "Approved by"].map((label) => (
                   <div key={label} style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
-                    <div style={{ height: 60 }} />
+                    <div style={{ height: 56 }} />
                     <div style={{ width: "100%", borderTop: "1.5px solid #0f172a" }} />
-                    <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: ".1em", textTransform: "uppercase", color: "#0f172a", marginTop: 8 }}>{label}</div>
-                    <div style={{ fontSize: 9, color: "#94a3b8", marginTop: 2 }}>Name · Signature · Date</div>
+                    <div style={{ fontSize: 11, fontWeight: 700, color: "#0f172a", marginTop: 8 }}>{label}</div>
                   </div>
                 ))}
               </div>
