@@ -102,7 +102,8 @@
       "Bash(node ./scripts_tmp/inspect.mjs)",
       "Bash(cd d:/projects/smart-business-accounts && rm -rf scripts_tmp && rm -f /tmp/inspect.mjs)",
       "Bash(git rev-list *)",
-      "Bash(timeout 280 npx next build)"
+      "Bash(timeout 280 npx next build)",
+      "Bash(xargs -I{} du -h {})"
     ],
     "additionalDirectories": [
       "d:\\projects\\smart-business-accounts\\app\\api\\chat\\conversations",
