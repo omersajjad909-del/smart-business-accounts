@@ -14,7 +14,6 @@ import {
 import { logout } from "@/lib/logout";
 import { hasPermission as baseHasPermission } from "@/lib/hasPermission";
 import { PERMISSIONS } from "@/lib/permissions";
-import GlobalSearch from "@/components/GlobalSearch";
 import { useGlobalEnterNavigation } from "@/hooks/useGlobalEnterNavigation";
 import { useAutoLogout } from "@/hooks/useAutoLogout";
 import { ModeToggle } from "@/components/mode-toggle";
@@ -25,6 +24,7 @@ import AppearanceApplier from "@/components/AppearanceApplier";
 // on every single dashboard page load.
 const ImageAdjusterModal = dynamic(() => import("@/components/ImageAdjusterModal"), { ssr: false });
 const DemoSessionTimer   = dynamic(() => import("@/components/DemoSessionTimer"),   { ssr: false });
+const GlobalSearch       = dynamic(() => import("@/components/GlobalSearch"),       { ssr: false });
 import { hasModule as baseHasModule, type BusinessType } from "@/lib/businessModules";
 import { findDashboardFeatureByRoute } from "@/lib/dashboardFeatureRegistry";
 import { FINOVA_COMPANY_PROFILE_UPDATED, FINOVA_USER_PROFILE_UPDATED } from "@/lib/dashboardProfileEvents";
