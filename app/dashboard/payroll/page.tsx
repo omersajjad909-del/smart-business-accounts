@@ -229,6 +229,7 @@ export default function PayrollPage() {
       }
     </style></head><body>
     <div style="text-align:center;margin-bottom:30px;border-bottom:2px solid #000;padding-bottom:10px">
+    ${companyName ? `<div style="font-weight:bold;font-size:1.15em;margin-bottom:6px">${companyName}</div>` : ""}
     <h1 style="margin:0">Payslip</h1><p style="margin:4px 0 0">Period: ${p.monthYear}</p></div>
     <div class="row"><span class="label">Employee ID:</span><span>${p.employee.employeeId}</span></div>
     <div class="row"><span class="label">Employee Name:</span><span>${p.employee.firstName} ${p.employee.lastName}</span></div>
@@ -239,6 +240,14 @@ export default function PayrollPage() {
     <div class="row" style="font-weight:bold"><span class="label">Net Pay:</span><span class="amt">${fmt(pay)}</span></div>
     ${p.additionalCash > 0 ? `<div class="row"><span class="label">Cash Paid:</span><span class="amt">-${fmt(p.additionalCash)}</span></div>` : ""}
     <div class="row" style="font-weight:bold;${next < 0 ? "color:#000" : ""}"><span class="label">Balance:</span><span class="amt">${fmt(next)}</span></div>
+    <div style="display:flex;justify-content:space-between;gap:40px;margin-top:56px">
+      <div style="flex:1;text-align:center">
+        <div style="border-top:1px solid #000;padding-top:6px;font-size:.85em;font-weight:bold">HR Signature</div>
+      </div>
+      <div style="flex:1;text-align:center">
+        <div style="border-top:1px solid #000;padding-top:6px;font-size:.85em;font-weight:bold">Employee Signature</div>
+      </div>
+    </div>
     <div class="footer"><p>System Generated Payslip</p></div>
     <div style="margin-top:32px;border-top:1px solid #eee;padding-top:8px;text-align:center;font-size:10px;color:#000">Powered by FinovaOS</div>
     <script>window.print();</script></body></html>`;
