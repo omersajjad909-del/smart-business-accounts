@@ -498,7 +498,6 @@ export default function PayrollPage() {
         const netPay = totalBasic - totalDed;
         const monthLabel = new Date(monthYear + "-01").toLocaleDateString("en-GB", { month: "long", year: "numeric" });
         const generatedAt = new Date().toLocaleString("en-GB", { day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" });
-        const paidCount = payroll.filter(p => p.paymentStatus === "PAID").length;
         const totalEmployees = payroll.length;
 
         return (
@@ -535,13 +534,18 @@ export default function PayrollPage() {
             boxShadow: "0 30px 80px rgba(0,0,0,.4)", borderRadius: 6, overflow: "hidden",
           }}>
             {/* Accent bar */}
-            <div style={{ height: 6, background: "linear-gradient(90deg, #16a34a, #22c55e, #4ade80)" }} />
+            <div style={{ height: 6, background: "#0f172a" }} />
 
             {/* Header */}
             <div style={{ padding: "32px 40px 24px", borderBottom: "1px solid #e2e8f0" }}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 24 }}>
                 <div>
-                  <div style={{ fontSize: 10, fontWeight: 800, color: "#22c55e", letterSpacing: ".14em", textTransform: "uppercase", marginBottom: 6 }}>
+                  {companyName && (
+                    <div style={{ fontSize: 18, fontWeight: 800, color: "#0f172a", marginBottom: 12, letterSpacing: "-0.01em" }}>
+                      {companyName}
+                    </div>
+                  )}
+                  <div style={{ fontSize: 10, fontWeight: 800, color: "#64748b", letterSpacing: ".14em", textTransform: "uppercase", marginBottom: 6 }}>
                     Monthly Statement
                   </div>
                   <h1 style={{ fontSize: 28, fontWeight: 800, letterSpacing: "-0.02em", margin: "0 0 4px", color: "#0f172a" }}>
@@ -557,21 +561,6 @@ export default function PayrollPage() {
                   <div style={{ marginTop: 4, fontSize: 10, color: "#94a3b8" }}>Ref: PR-{monthYear}</div>
                 </div>
               </div>
-            </div>
-
-            {/* Summary strip */}
-            <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", background: "#f8fafc", borderBottom: "1px solid #e2e8f0" }}>
-              {[
-                { label: "Total Basic",     val: fmt(totalBasic),          color: "#0f172a" },
-                { label: "Total Deductions",val: `-${fmt(totalDed)}`,      color: "#dc2626" },
-                { label: "Net Payable",     val: fmt(netPay),              color: "#16a34a" },
-                { label: "Paid / Pending",  val: `${paidCount}/${totalEmployees}`, color: "#0f172a", small: true },
-              ].map((s, i) => (
-                <div key={s.label} style={{ padding: isMobile ? "12px 11px" : "20px 24px", borderRight: i < 3 ? "1px solid #e2e8f0" : "none" }}>
-                  <div style={{ fontSize: 9, fontWeight: 700, color: "#94a3b8", letterSpacing: ".1em", textTransform: "uppercase", marginBottom: 6 }}>{s.label}</div>
-                  <div style={{ fontSize: s.small ? 16 : 20, fontWeight: 800, color: s.color, letterSpacing: "-0.01em" }}>{s.val}</div>
-                </div>
-              ))}
             </div>
 
             {/* Table */}
