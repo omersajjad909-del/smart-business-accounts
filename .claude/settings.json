@@ -97,13 +97,17 @@
       "Bash(taskkill //PID 8828 //F)",
       "Bash(rm -rf .next)",
       "Bash(curl -s \"http://localhost:3000/onboarding/payment/addon-automation?cycle=monthly&country=PK\" --max-time 30 -o /tmp/pk2.html)",
-      "Bash(taskkill //PID 4340 //F)"
+      "Bash(taskkill //PID 4340 //F)",
+      "Bash(cp /tmp/inspect.mjs ./scripts_tmp/inspect.mjs)",
+      "Bash(node ./scripts_tmp/inspect.mjs)",
+      "Bash(cd d:/projects/smart-business-accounts && rm -rf scripts_tmp && rm -f /tmp/inspect.mjs)"
     ],
     "additionalDirectories": [
       "d:\\projects\\smart-business-accounts\\app\\api\\chat\\conversations",
       "d:\\projects\\smart-business-accounts\\app\\api\\bulk-payments",
       "d:\\projects\\smart-business-accounts\\app\\api\\payment-followup",
-      "d:\\projects\\smart-business-accounts\\app\\admin\\companies\\[id]"
+      "d:\\projects\\smart-business-accounts\\app\\admin\\companies\\[id]",
+      "\\tmp"
     ]
   }
 }
