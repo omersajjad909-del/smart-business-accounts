@@ -525,6 +525,8 @@ export default function PayrollPage() {
               #payroll-printable, #payroll-printable * { visibility: visible !important; }
               #payroll-printable { position: fixed; inset: 0; margin: 0 !important; box-shadow: none !important; background: #fff !important; color: #0f172a !important; }
               #payroll-printable * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+              /* Ensure signatures appear in a single horizontal row when printing */
+              #payroll-printable .signature-grid { grid-template-columns: 1fr 1fr 1fr !important; }
             }`}</style>
 
           {/* Paper */}
@@ -631,7 +633,7 @@ export default function PayrollPage() {
 
             {/* Signature blocks */}
             <div style={{ padding: "0 40px 32px", marginTop: 48 }}>
-              <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr 1fr", gap: 56 }}>
+              <div className="signature-grid" style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr 1fr", gap: 56 }}>
                 {["Prepared by", "Checked by", "Approved by"].map((label) => (
                   <div key={label} style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
                     <div style={{ height: 56 }} />
