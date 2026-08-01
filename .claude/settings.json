@@ -103,7 +103,9 @@
       "Bash(cd d:/projects/smart-business-accounts && rm -rf scripts_tmp && rm -f /tmp/inspect.mjs)",
       "Bash(git rev-list *)",
       "Bash(timeout 280 npx next build)",
-      "Bash(xargs -I{} du -h {})"
+      "Bash(xargs -I{} du -h {})",
+      "Bash(NODE_OPTIONS=\"--max-old-space-size=6144\" npx tsc --noEmit -p .)",
+      "Bash(echo \"started in background pid $!\")"
     ],
     "additionalDirectories": [
       "d:\\projects\\smart-business-accounts\\app\\api\\chat\\conversations",

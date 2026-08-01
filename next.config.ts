@@ -30,7 +30,12 @@ const nextConfig: NextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
-  experimental: {},
+  experimental: {
+    // Auto tree-shakes barrel-file imports (e.g. `import { X } from "lucide-react"`)
+    // into per-module imports at build time, so pages only ship the specific
+    // icons/chart pieces they actually use instead of the whole package graph.
+    optimizePackageImports: ["lucide-react", "recharts"],
+  },
   async redirects() {
     return [
       {

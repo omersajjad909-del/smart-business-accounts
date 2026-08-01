@@ -18,6 +18,9 @@ import { useGlobalEnterNavigation } from "@/hooks/useGlobalEnterNavigation";
 import { useAutoLogout } from "@/hooks/useAutoLogout";
 import { ModeToggle } from "@/components/mode-toggle";
 import AppearanceApplier from "@/components/AppearanceApplier";
+import { hasModule as baseHasModule, type BusinessType } from "@/lib/businessModules";
+import { findDashboardFeatureByRoute } from "@/lib/dashboardFeatureRegistry";
+import { FINOVA_COMPANY_PROFILE_UPDATED, FINOVA_USER_PROFILE_UPDATED } from "@/lib/dashboardProfileEvents";
 
 // Deferred out of the main dashboard bundle — each is only relevant in a rare
 // path (avatar cropping, demo-account sessions), not needed for first paint
@@ -25,9 +28,6 @@ import AppearanceApplier from "@/components/AppearanceApplier";
 const ImageAdjusterModal = dynamic(() => import("@/components/ImageAdjusterModal"), { ssr: false });
 const DemoSessionTimer   = dynamic(() => import("@/components/DemoSessionTimer"),   { ssr: false });
 const GlobalSearch       = dynamic(() => import("@/components/GlobalSearch"),       { ssr: false });
-import { hasModule as baseHasModule, type BusinessType } from "@/lib/businessModules";
-import { findDashboardFeatureByRoute } from "@/lib/dashboardFeatureRegistry";
-import { FINOVA_COMPANY_PROFILE_UPDATED, FINOVA_USER_PROFILE_UPDATED } from "@/lib/dashboardProfileEvents";
 
 // Context to pass sidebarCollapsed + expand function to nav components
 const SidebarCtx = createContext<{ collapsed: boolean; expand: () => void; canShowHref: (href: string) => boolean }>({
