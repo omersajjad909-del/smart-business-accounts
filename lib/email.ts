@@ -742,6 +742,42 @@ export async function sendPkPaymentStatusEmail(opts: {
   } catch {}
 }
 
+// ─── Plan / add-on activation confirmation ─────────────────────────────────────
+export async function sendPlanActivatedEmail(opts: {
+  customerEmail: string;
+  customerName?: string | null;
+  planLabel: string;
+  billingCycle: string;
+  amountUsd?: number;
+}): Promise<void> {
+  const rows: [string, string | null | undefined][] = [
+    ["Plan", opts.planLabel],
+    ["Billing", opts.billingCycle],
+  ];
+  if (opts.amountUsd) rows.push(["Amount", `$${opts.amountUsd.toLocaleString()}/mo`]);
+  rows.push(["Activated", new Date().toLocaleString("en-US", { dateStyle: "medium", timeStyle: "short" })]);
+
+  const html = emailBase({
+    companyName: "FinovaOS",
+    badgeText: "Plan Activated",
+    badgeColor: "#10b981",
+    content: `
+      <p style="margin:0 0 4px;font-size:22px;font-weight:800;color:#0f172a;">✅ Your ${opts.planLabel} is Now Active!</p>
+      <p style="margin:0 0 20px;font-size:14px;color:#64748b;">Hi ${opts.customerName || "there"}, your plan has been activated on your FinovaOS account.</p>
+      ${infoGrid(rows)}
+      <div style="text-align:center;margin:24px 0;">
+        <a href="${process.env.NEXT_PUBLIC_APP_URL || "https://app.finovaos.app"}/dashboard"
+           style="display:inline-block;background:#10b981;color:#ffffff;text-decoration:none;padding:13px 32px;border-radius:10px;font-size:14px;font-weight:700;">
+          Go to Dashboard →
+        </a>
+      </div>
+    `,
+  });
+  try {
+    await sendEmail({ to: opts.customerEmail, subject: `✅ ${opts.planLabel} Activated — FinovaOS`, html });
+  } catch {}
+}
+
 // ─── Login alert email ────────────────────────────────────────────────────────
 export async function sendLoginAlertEmail(opts: {
   to: string;

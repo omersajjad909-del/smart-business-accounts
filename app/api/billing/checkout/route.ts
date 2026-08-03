@@ -7,6 +7,7 @@ import { createLemonCheckout, hasLemonSqueezyConfig } from "@/lib/lemonsqueezy";
 import { createSafepayCheckout, hasSafepayConfig, usdToPkr } from "@/lib/safepay";
 import { getCompanyExtraSeats } from "@/lib/companySeatLimit";
 import { getCustomPlanCycleAmountUsd, parseCustomModules } from "@/lib/customPlanPricing";
+import { sendPlanActivatedEmail } from "@/lib/email";
 
 const DEFAULT_PRICING = {
   starter: { monthly: 49, yearly: 39 },
