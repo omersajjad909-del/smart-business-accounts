@@ -412,7 +412,7 @@ export default function AdminCompaniesPage() {
           { label: "AI: At Risk", value: stats.atRisk,     color: "#ef4444" },
           { label: "Avg AI Score",value: loading ? "—" : avgScore, color: avgScore >= 75 ? "#10b981" : avgScore >= 50 ? "#f59e0b" : "#ef4444" },
         ].map(s => (
-          <div key={s.label} style={{ padding: "14px 16px", borderRadius: 14, background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.07)" }}>
+          <div key={s.label} style={{ padding: "13px 10px", borderRadius: 14, background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.07)" }}>
             <div style={{ fontSize: 22, fontWeight: 900, color: s.color }}>{loading ? "—" : s.value}</div>
             <div style={{ fontSize: 11, color: "#475569", fontWeight: 700, marginTop: 2 }}>{s.label}</div>
           </div>
@@ -472,44 +472,44 @@ export default function AdminCompaniesPage() {
                         ▶
                       </button>
                     </td>
-                    <td style={{ padding: "14px 16px", whiteSpace: "nowrap" }}>
+                    <td style={{ padding: "13px 10px", whiteSpace: "nowrap" }}>
                       <span style={{ fontSize: 12, fontWeight: 800, color: "#38bdf8", fontFamily: "monospace", background: "rgba(56,189,248,.08)", border: "1px solid rgba(56,189,248,.2)", borderRadius: 6, padding: "3px 8px" }}>
                         #{c.companyNo || "—"}
                       </span>
                     </td>
-                    <td style={{ padding: "14px 16px" }}>
+                    <td style={{ padding: "13px 10px" }}>
                       <div style={{ fontWeight: 700, fontSize: 14, color: "white" }}>{c.name}</div>
                       {c.ownerEmail && <div style={{ fontSize: 11, color: "#64748b", marginTop: 2 }}>{c.ownerEmail}</div>}
                     </td>
-                    <td style={{ padding: "14px 16px" }}>
+                    <td style={{ padding: "13px 10px" }}>
                       <span style={{ padding: "3px 10px", borderRadius: 20, background: "rgba(56,189,248,.1)", border: "1px solid rgba(56,189,248,.2)", color: "#7dd3fc", fontSize: 11, fontWeight: 700 }}>
                         {BIZ_LABELS[c.businessType || ""] || c.businessType || "Trading"}
                       </span>
                     </td>
-                    <td style={{ padding: "14px 16px", fontSize: 13, color: "#94a3b8" }}>{c.country || "—"}</td>
-                    <td style={{ padding: "14px 16px" }}><PlanBadge plan={c.plan} /></td>
-                    <td style={{ padding: "14px 16px" }}><StatusBadge status={c.subscriptionStatus} /></td>
-                    <td style={{ padding: "14px 16px" }}><AIScoreBadge score={c.aiScore} health={c.aiHealth} /></td>
-                    <td style={{ padding: "14px 16px", fontSize: 13, color: "#94a3b8", textAlign: "center" }}>{c.usersCount}</td>
-                    <td style={{ padding: "14px 16px", fontSize: 12, color: "#475569" }}>
+                    <td style={{ padding: "13px 10px", fontSize: 13, color: "#94a3b8" }}>{c.country || "—"}</td>
+                    <td style={{ padding: "13px 10px" }}><PlanBadge plan={c.plan} /></td>
+                    <td style={{ padding: "13px 10px" }}><StatusBadge status={c.subscriptionStatus} /></td>
+                    <td style={{ padding: "13px 10px" }}><AIScoreBadge score={c.aiScore} health={c.aiHealth} /></td>
+                    <td style={{ padding: "13px 10px", fontSize: 13, color: "#94a3b8", textAlign: "center" }}>{c.usersCount}</td>
+                    <td style={{ padding: "13px 10px", fontSize: 12, color: "#475569" }}>
                       {c.currentPeriodEnd ? new Date(c.currentPeriodEnd).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" }) : "—"}
                     </td>
-                    <td style={{ padding: "14px 16px", textAlign: "right" }}>
-                      <div style={{ display: "flex", gap: 6, justifyContent: "flex-end" }}>
+                    <td style={{ padding: "13px 10px", textAlign: "right" }}>
+                      <div style={{ display: "flex", gap: 5, justifyContent: "flex-end" }}>
                         <a href={`/admin/companies/${c.id}`}
-                          style={{ padding: "5px 12px", borderRadius: 8, background: "rgba(56,189,248,.1)", border: "1px solid rgba(56,189,248,.2)", color: "#38bdf8", fontSize: 11, fontWeight: 700, textDecoration: "none", display: "inline-flex", alignItems: "center" }}>
+                          style={{ padding: "5px 9px", borderRadius: 8, background: "rgba(56,189,248,.1)", border: "1px solid rgba(56,189,248,.2)", color: "#38bdf8", fontSize: 11, fontWeight: 700, textDecoration: "none", display: "inline-flex", alignItems: "center" }}>
                           Details
                         </a>
                         <button onClick={() => setChanging(c)} disabled={busy === c.id}
-                          style={{ padding: "5px 12px", borderRadius: 8, background: "rgba(99,102,241,.12)", border: "1px solid rgba(99,102,241,.25)", color: "#818cf8", fontSize: 11, fontWeight: 700, cursor: "pointer" }}>
+                          style={{ padding: "5px 9px", borderRadius: 8, background: "rgba(99,102,241,.12)", border: "1px solid rgba(99,102,241,.25)", color: "#818cf8", fontSize: 11, fontWeight: 700, cursor: "pointer" }}>
                           ✦ Plan
                         </button>
                         <button onClick={() => toggleStatus(c)} disabled={busy === c.id}
-                          style={{ padding: "5px 12px", borderRadius: 8, background: c.isActive === false ? "rgba(34,197,94,.12)" : "rgba(245,158,11,.12)", border: `1px solid ${c.isActive === false ? "rgba(34,197,94,.25)" : "rgba(245,158,11,.25)"}`, color: c.isActive === false ? "#22c55e" : "#f59e0b", fontSize: 11, fontWeight: 700, cursor: "pointer" }}>
+                          style={{ padding: "5px 9px", borderRadius: 8, background: c.isActive === false ? "rgba(34,197,94,.12)" : "rgba(245,158,11,.12)", border: `1px solid ${c.isActive === false ? "rgba(34,197,94,.25)" : "rgba(245,158,11,.25)"}`, color: c.isActive === false ? "#22c55e" : "#f59e0b", fontSize: 11, fontWeight: 700, cursor: "pointer" }}>
                           {busy === c.id ? "…" : c.isActive === false ? "Activate" : "Suspend"}
                         </button>
                         <button onClick={() => deleteCompany(c.id)} disabled={busy === c.id}
-                          style={{ padding: "5px 12px", borderRadius: 8, background: "rgba(239,68,68,.1)", border: "1px solid rgba(239,68,68,.2)", color: "#f87171", fontSize: 11, fontWeight: 700, cursor: "pointer" }}>
+                          style={{ padding: "5px 9px", borderRadius: 8, background: "rgba(239,68,68,.1)", border: "1px solid rgba(239,68,68,.2)", color: "#f87171", fontSize: 11, fontWeight: 700, cursor: "pointer" }}>
                           {busy === c.id ? "…" : "Delete"}
                         </button>
                       </div>
