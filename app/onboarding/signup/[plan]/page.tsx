@@ -378,6 +378,26 @@ export default function SignupByPlanPage() {
           if (f.ok) { const fj = await f.json(); if (fj?.rates) rates = fj.rates; }
         } catch {}
         setCurrency(cur);
+
+        // Pakistan uses admin-set PKR-native prices, NOT the USD price run through
+        // FX — the same rule the /pricing page applies (see its `isPKUser` branch).
+        // Converting instead produced wildly different figures between the two
+        // pages (e.g. Enterprise showed Rs3,750 on /pricing but Rs17,236 here).
+        const pkr = j?.pkrPricing;
+        const isPkUser = cur === "PKR" || searchParams.get("country") === "PK";
+        const pkrPlan = pkr
+          ? (planCode === "pro" ? pkr.pro : planCode === "enterprise" ? pkr.enterprise : planCode === "starter" ? pkr.starter : null)
+          : null;
+
+        if (isPkUser && pkrPlan) {
+          // API returns `monthly` as PKR/month and `yearly` as the PKR annual total.
+          const amount = billingCycle === "yearly"
+            ? Math.round(Number(pkrPlan.yearly || 0))
+            : Math.round(Number(pkrPlan.monthly || 0) * 0.25);
+          setPrice(`₨${amount.toLocaleString("en-PK")}`);
+          return;
+        }
+
         const baseMonthly = planCode === "pro" ? p.pro.monthly : planCode === "enterprise" ? p.enterprise.monthly : planCode === "starter" ? p.starter.monthly : null;
         if (baseMonthly !== null) {
           const rate = (rates && rates[cur]) || FX_USD[cur] || 1;
