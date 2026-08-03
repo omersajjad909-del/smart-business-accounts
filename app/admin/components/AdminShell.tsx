@@ -282,6 +282,7 @@ export default function AdminShell({ children }: { children: ReactNode }) {
                       <Link
                         key={item.id}
                         href={item.href}
+                        prefetch={false}
                         className={`fin-admin-navLink${active ? " is-active" : ""}`}
                         onClick={() => { setMobileOpen(false); setQuickOpen(false); }}
                       >
@@ -392,10 +393,10 @@ export default function AdminShell({ children }: { children: ReactNode }) {
                       </div>
                     </div>
                     <div className="fin-admin-dropdownList">
-                      <Link href="/admin"             className="fin-admin-linkRow" onClick={() => setProfileOpen(false)}>Dashboard</Link>
-                      <Link href="/admin/settings"    className="fin-admin-linkRow" onClick={() => setProfileOpen(false)}>Settings</Link>
-                      <Link href="/admin/permissions" className="fin-admin-linkRow" onClick={() => setProfileOpen(false)}>Roles & Permissions</Link>
-                      <Link href="/admin/system"      className="fin-admin-linkRow" onClick={() => setProfileOpen(false)}>System Health</Link>
+                      <Link href="/admin"             prefetch={false} className="fin-admin-linkRow" onClick={() => setProfileOpen(false)}>Dashboard</Link>
+                      <Link href="/admin/settings"    prefetch={false} className="fin-admin-linkRow" onClick={() => setProfileOpen(false)}>Settings</Link>
+                      <Link href="/admin/permissions" prefetch={false} className="fin-admin-linkRow" onClick={() => setProfileOpen(false)}>Roles & Permissions</Link>
+                      <Link href="/admin/system"      prefetch={false} className="fin-admin-linkRow" onClick={() => setProfileOpen(false)}>System Health</Link>
                       <button
                         type="button"
                         className="fin-admin-linkRow fin-admin-linkRow--danger"
@@ -421,6 +422,7 @@ export default function AdminShell({ children }: { children: ReactNode }) {
             <Link
               key={item.id}
               href={item.href}
+              prefetch={false}
               className={`fin-admin-mobileLink${active ? " is-active" : ""}`}
               onClick={() => { setMobileOpen(false); setQuickOpen(false); }}
             >
@@ -438,6 +440,7 @@ export default function AdminShell({ children }: { children: ReactNode }) {
                 <Link
                   key={action.label}
                   href={action.href}
+                  prefetch={false}
                   className="fin-admin-fabAction"
                   onClick={() => setQuickOpen(false)}
                 >
@@ -463,6 +466,7 @@ export default function AdminShell({ children }: { children: ReactNode }) {
             <Link
               key={item.id}
               href={item.href}
+              prefetch={false}
               className={`fin-admin-mobileLink${active ? " is-active" : ""}`}
               onClick={() => { setMobileOpen(false); setQuickOpen(false); }}
             >
