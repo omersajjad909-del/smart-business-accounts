@@ -17,6 +17,7 @@ export async function GET(
       where: { id },
       select: {
         id: true,
+        companyNo: true,
         name: true,
         country: true,
         baseCurrency: true,

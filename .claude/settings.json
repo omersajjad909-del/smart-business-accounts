@@ -112,7 +112,8 @@
       "Bash(npx vercel *)",
       "Bash(timeout 25 npx vercel whoami)",
       "Bash(grep -A3 -n \"^                      <Link$\\\\|^            <Link$\\\\|^                <Link$\" app/admin/components/AdminShell.tsx)",
-      "Bash(python -c ' *)"
+      "Bash(python -c ' *)",
+      "Bash(npx prisma *)"
     ],
     "additionalDirectories": [
       "d:\\projects\\smart-business-accounts\\app\\api\\chat\\conversations",

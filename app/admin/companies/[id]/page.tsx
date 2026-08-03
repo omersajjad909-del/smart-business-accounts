@@ -5,7 +5,7 @@ import { getCurrentUser } from "@/lib/auth";
 import toast from "react-hot-toast";
 
 type Company = {
-  id: string; name: string; country: string | null; baseCurrency: string | null;
+  id: string; companyNo?: number | null; name: string; country: string | null; baseCurrency: string | null;
   plan: string | null; activeModules: string | null; subscriptionStatus: string | null;
   stripeCustomerId: string | null; currentPeriodEnd: string | null;
   createdAt: string; businessType: string | null; businessSetupDone: boolean;
@@ -182,7 +182,7 @@ export default function CompanyDetailPage({ params }: { params: Promise<{ id: st
           )}
         </div>
         <div style={{ marginTop: 6, fontSize: 12, color: "rgba(255,255,255,.3)" }}>
-          ID: <span style={{ fontFamily: "monospace", color: "rgba(255,255,255,.4)" }}>{company.id}</span>
+          ID: <span style={{ fontFamily: "monospace", color: "rgba(255,255,255,.4)" }}>#{company.companyNo ?? "—"}</span>
         </div>
       </div>
 
