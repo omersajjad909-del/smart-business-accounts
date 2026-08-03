@@ -642,7 +642,11 @@ export default function SignupByPlanPage() {
           .phone-grid{grid-template-columns:1fr!important;}
           .steps{display:none!important;}
           .signup-sidebar{display:none!important;}
-          .signup-form{order:1;}
+          /* Single column below 900px — drop the explicit row/column placement
+             so the intro and form stack normally instead of staying pinned to
+             the desktop grid's column 2. */
+          .signup-intro{grid-column:1!important;grid-row:auto!important;}
+          .signup-form{order:1;grid-column:1!important;grid-row:auto!important;}
           .signup-header{padding:14px 16px !important;}
           .signup-main{padding:24px 14px 64px !important;}
         }
@@ -725,10 +729,38 @@ export default function SignupByPlanPage() {
 
       {/* â”€â”€ MAIN â”€â”€ */}
       <main className="signup-main" style={{ position:"relative", zIndex:1, maxWidth:1200, margin:"0 auto", padding:"40px 24px 80px" }}>
-        <div className="main-grid" style={{ display:"grid", gridTemplateColumns:"340px 1fr", gap:28 }}>
+        {/* Two rows: the intro heading occupies row 1 of the right column only, so
+            the plan card and the form card both begin on row 2 — they stay level
+            with each other no matter how tall the (responsive) heading gets. */}
+        <div className="main-grid" style={{ display:"grid", gridTemplateColumns:"340px 1fr", columnGap:28, rowGap:0 }}>
+
+          {/* â”€â”€ INTRO (right column, row 1) â”€â”€ */}
+          <div className="signup-intro" style={{ gridColumn:2, gridRow:1, marginBottom:28 }}>
+            <div style={{
+              display:"inline-flex", alignItems:"center", gap:7,
+              padding:"5px 14px", borderRadius:22,
+              background:"rgba(99,102,241,.1)", border:"1.5px solid rgba(99,102,241,.28)",
+              fontSize:10.5, fontWeight:700, color:"#a5b4fc",
+              letterSpacing:".09em", textTransform:"uppercase", marginBottom:16,
+            }}>
+              <span style={{ width:5, height:5, borderRadius:"50%", background:"#6366f1", animation:"blink 2s ease infinite" }}/>
+              Step 2 of 3 - Account Setup
+            </div>
+            <h1 style={{
+              fontFamily:"'Lora',serif", fontSize:"clamp(26px,3.5vw,38px)",
+              fontWeight:700, color:"white", letterSpacing:"-1px", lineHeight:1.1, marginBottom:8,
+            }}>
+              Create your account
+            </h1>
+            <p style={{ fontSize:14, color:"rgba(255,255,255,.38)", fontWeight:400 }}>
+              Set up your{" "}
+              <strong style={{ color:current.color }}>{current.name}</strong>{" "}
+              workspace in under 2 minutes.
+            </p>
+          </div>
 
           {/* â”€â”€ SIDEBAR â”€â”€ */}
-          <aside className="fu d1 signup-sidebar" style={{ display:"flex", flexDirection:"column", gap:16 }}>
+          <aside className="fu d1 signup-sidebar" style={{ gridColumn:1, gridRow:2, display:"flex", flexDirection:"column", gap:16 }}>
 
             {/* Plan card */}
             <div style={{
@@ -845,31 +877,7 @@ export default function SignupByPlanPage() {
           </aside>
 
           {/* â”€â”€ FORM â”€â”€ */}
-          <section className="fu d2 signup-form">
-            <div style={{ marginBottom:28 }}>
-              <div style={{
-                display:"inline-flex", alignItems:"center", gap:7,
-                padding:"5px 14px", borderRadius:22,
-                background:"rgba(99,102,241,.1)", border:"1.5px solid rgba(99,102,241,.28)",
-                fontSize:10.5, fontWeight:700, color:"#a5b4fc",
-                letterSpacing:".09em", textTransform:"uppercase", marginBottom:16,
-              }}>
-                <span style={{ width:5, height:5, borderRadius:"50%", background:"#6366f1", animation:"blink 2s ease infinite" }}/>
-                Step 2 of 3 - Account Setup
-              </div>
-              <h1 style={{
-                fontFamily:"'Lora',serif", fontSize:"clamp(26px,3.5vw,38px)",
-                fontWeight:700, color:"white", letterSpacing:"-1px", lineHeight:1.1, marginBottom:8,
-              }}>
-                Create your account
-              </h1>
-              <p style={{ fontSize:14, color:"rgba(255,255,255,.38)", fontWeight:400 }}>
-                Set up your{" "}
-                <strong style={{ color:current.color }}>{current.name}</strong>{" "}
-                workspace in under 2 minutes.
-              </p>
-            </div>
-
+          <section className="fu d2 signup-form" style={{ gridColumn:2, gridRow:2 }}>
             {/* Error */}
             {error && (
               <div style={{
