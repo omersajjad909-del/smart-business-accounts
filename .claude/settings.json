@@ -111,7 +111,8 @@
       "Bash(node scripts/_check_addon_tmp.mjs)",
       "Bash(npx vercel *)",
       "Bash(timeout 25 npx vercel whoami)",
-      "Bash(grep -A3 -n \"^                      <Link$\\\\|^            <Link$\\\\|^                <Link$\" app/admin/components/AdminShell.tsx)"
+      "Bash(grep -A3 -n \"^                      <Link$\\\\|^            <Link$\\\\|^                <Link$\" app/admin/components/AdminShell.tsx)",
+      "Bash(python -c ' *)"
     ],
     "additionalDirectories": [
       "d:\\projects\\smart-business-accounts\\app\\api\\chat\\conversations",
