@@ -114,7 +114,9 @@
       "Bash(grep -A3 -n \"^                      <Link$\\\\|^            <Link$\\\\|^                <Link$\" app/admin/components/AdminShell.tsx)",
       "Bash(python -c ' *)",
       "Bash(npx prisma *)",
-      "Bash(grep -v \"node_modules\\\\|Cannot find module '@/\\\\|JSX\\\\|--jsx\")"
+      "Bash(grep -v \"node_modules\\\\|Cannot find module '@/\\\\|JSX\\\\|--jsx\")",
+      "Bash(awk -F= '/^LEMONSQUEEZY_API_KEY=/{print \\(length\\($2\\)>20 ? \"looks like a real key \\(\"length\\($2\\)\" chars\\)\" : \"PLACEHOLDER/EMPTY -> \"$2\\)}' .env)",
+      "Bash(awk -F= '/^LEMONSQUEEZY_WEBHOOK_SECRET=/{print \\(length\\($2\\)>10 ? \"set \\(\"length\\($2\\)\" chars\\)\" : \"PLACEHOLDER/EMPTY -> \"$2\\)}' .env)"
     ],
     "additionalDirectories": [
       "d:\\projects\\smart-business-accounts\\app\\api\\chat\\conversations",
