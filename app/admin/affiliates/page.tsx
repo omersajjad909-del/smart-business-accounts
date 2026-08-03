@@ -95,7 +95,7 @@ export default function AdminAffiliatesPage() {
 
       <div style={{ marginBottom: 28 }}>
         <h1 style={{ margin: "0 0 4px", fontSize: 24, fontWeight: 800 }}>Affiliates</h1>
-        <p style={{ margin: 0, fontSize: 12, color: "rgba(255,255,255,.4)" }}>
+        <p style={{ margin: 0, fontSize: 13, color: "rgba(255,255,255,.4)" }}>
           Review affiliate applications, adjust tiers, and manage commission rates.
         </p>
       </div>
