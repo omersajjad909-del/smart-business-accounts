@@ -215,23 +215,29 @@ export async function POST(req: NextRequest) {
     if (isAddonPlan) {
       const base = getRuntimeAppUrl(req.nextUrl.origin);
       if (planCode === "ADDON-AUTOMATION") {
+        // Schema must match the table the admin panel actually created
+        // (app/api/admin/automation-addon/route.ts) — columns are "price" and
+        // "activatedAt", not "pricePerMonth"/"createdAt"/"updatedAt". Using the
+        // wrong names here previously made the insert fail with "column ...
+        // does not exist" — silently swallowed, so checkout reported
+        // "activated" while nothing was actually saved.
         await prisma.$executeRawUnsafe(`
           CREATE TABLE IF NOT EXISTS "AutomationAddon" (
-            "id" TEXT PRIMARY KEY DEFAULT gen_random_uuid()::text,
-            "companyId" TEXT NOT NULL UNIQUE,
-            "enabled" BOOLEAN NOT NULL DEFAULT true,
-            "plan" TEXT NOT NULL DEFAULT 'MONTHLY',
-            "pricePerMonth" DOUBLE PRECISION NOT NULL DEFAULT 79,
-            "expiresAt" TIMESTAMP(3),
-            "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-            "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP
+            "id"          TEXT PRIMARY KEY DEFAULT gen_random_uuid()::text,
+            "companyId"   TEXT NOT NULL UNIQUE,
+            "enabled"     BOOLEAN NOT NULL DEFAULT true,
+            "plan"        TEXT NOT NULL DEFAULT 'monthly',
+            "price"       DOUBLE PRECISION NOT NULL DEFAULT 79,
+            "activatedAt" TIMESTAMPTZ NOT NULL DEFAULT now(),
+            "expiresAt"   TIMESTAMPTZ,
+            "notes"       TEXT
           )
-        `).catch(() => {});
+        `);
         await prisma.$executeRaw`
-          INSERT INTO "AutomationAddon" ("companyId", "enabled", "plan", "pricePerMonth")
-          VALUES (${companyId}, true, ${billingCycle}, ${finalCustomPrice})
-          ON CONFLICT ("companyId") DO UPDATE SET "enabled" = true, "updatedAt" = NOW()
-        `.catch(() => {});
+          INSERT INTO "AutomationAddon" ("companyId", "enabled", "plan", "price")
+          VALUES (${companyId}, true, ${billingCycle.toLowerCase()}, ${finalCustomPrice > 0 ? finalCustomPrice : 79})
+          ON CONFLICT ("companyId") DO UPDATE SET "enabled" = true, "plan" = EXCLUDED.plan, "price" = EXCLUDED.price, "activatedAt" = now()
+        `;
       }
       await prisma.activityLog.create({
         data: { companyId, userId: userId || null, action: "ADDON_AUTOMATION_ACTIVATED", details: JSON.stringify({ planCode, billingCycle, activatedAt: new Date().toISOString(), provider: "DIRECT_FALLBACK_DEV_ONLY" }) },
