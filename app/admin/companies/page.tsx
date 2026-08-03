@@ -383,8 +383,6 @@ export default function AdminCompaniesPage() {
       <style>{`
         select option { background: #0f172a; color: white; }
         .hover-row:hover { background: rgba(255,255,255,.03) !important; }
-        .admin-companies-table { table-layout: fixed; }
-        .admin-companies-table td, .admin-companies-table th { word-break: break-word; overflow-wrap: anywhere; white-space: normal; }
       `}</style>
 
       {/* Header */}
@@ -450,8 +448,8 @@ export default function AdminCompaniesPage() {
       </div>
 
       {/* Table */}
-      <div style={{ borderRadius: 18, border: "1px solid rgba(255,255,255,.08)", overflow: "auto" }}>
-        <table className="admin-companies-table" style={{ width: "100%", minWidth: 960, borderCollapse: "collapse" }}>
+      <div style={{ borderRadius: 18, border: "1px solid rgba(255,255,255,.08)", overflowX: "auto", overflowY: "hidden" }}>
+        <table style={{ width: "100%", minWidth: 960, borderCollapse: "collapse" }}>
           <thead>
             <tr style={{ background: "rgba(255,255,255,.04)" }}>
               {["", "ID", "Company", "Business Type", "Country", "Plan", "Status", "AI Score", "Users", "Renewal", "Actions"].map(h => (
