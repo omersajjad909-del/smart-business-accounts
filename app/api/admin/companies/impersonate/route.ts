@@ -65,6 +65,11 @@ export async function POST(req: NextRequest) {
     // 5. Issue a short-lived JWT (1 hour) for the company user
     const issuedAt = Math.floor(Date.now() / 1000);
     const impersonateToken = signJwt({
+      // `userId` is the canonical claim every consumer reads (/api/me/bootstrap
+      // rejects the token without it — that produced a "Session expired." screen
+      // right after impersonating). `id` is kept for the proxy, which falls back
+      // to it, and for any older code paths.
+      userId: owner.id,
       id: owner.id,
       email: owner.email,
       name: owner.name,

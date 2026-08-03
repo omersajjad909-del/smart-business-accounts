@@ -214,9 +214,9 @@ function DetailRow({ company, onImpersonate }: { company: Row; onImpersonate: (i
   return (
     <tr>
       <td colSpan={11} style={{ background: "rgba(99,102,241,.04)", borderBottom: "1px solid rgba(255,255,255,.06)" }}>
-        <div style={{ padding: "16px 24px", display: "flex", flexDirection: "column", gap: 16 }}>
+        <div style={{ padding: "12px 14px", display: "flex", flexDirection: "column", gap: 12 }}>
           {/* Fields grid */}
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px,1fr))", gap: 14 }}>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(150px,1fr))", gap: 10 }}>
             {items.map(item => (
               <div key={item.key} style={{ display: "flex", flexDirection: "column", gap: 4 }}>
                 <div style={{ fontSize: 10, fontWeight: 700, color: "#475569", letterSpacing: ".06em" }}>{item.label.toUpperCase()}</div>
@@ -449,11 +449,11 @@ export default function AdminCompaniesPage() {
 
       {/* Table */}
       <div style={{ borderRadius: 18, border: "1px solid rgba(255,255,255,.08)", overflowX: "auto", overflowY: "hidden" }}>
-        <table style={{ width: "100%", minWidth: 960, borderCollapse: "collapse" }}>
+        <table style={{ width: "100%", minWidth: 880, borderCollapse: "collapse" }}>
           <thead>
             <tr style={{ background: "rgba(255,255,255,.04)" }}>
               {["", "ID", "Company", "Business Type", "Country", "Plan", "Status", "AI Score", "Users", "Renewal", "Actions"].map(h => (
-                <th key={h} style={{ padding: "12px 16px", textAlign: h === "Actions" ? "right" : "left", fontSize: 10, fontWeight: 800, color: "#475569", letterSpacing: ".07em", borderBottom: "1px solid rgba(255,255,255,.07)" }}>{h.toUpperCase()}</th>
+                <th key={h} style={{ padding: "12px 10px", textAlign: h === "Actions" ? "right" : "left", fontSize: 10, fontWeight: 800, color: "#475569", letterSpacing: ".07em", borderBottom: "1px solid rgba(255,255,255,.07)" }}>{h.toUpperCase()}</th>
               ))}
             </tr>
           </thead>
