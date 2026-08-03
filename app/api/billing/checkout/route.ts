@@ -207,12 +207,15 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    // TEMPORARY: Lemon Squeezy isn't activated yet, so no payment provider is
-    // configured in production either. Rather than blocking every signup with
-    // a hard error, fall through to the same no-payment activation path used
-    // in dev. Remove this bypass once Lemon Squeezy is live.
-    //
-    // Direct activation fallback — add-ons never touch Company.plan/subscriptionStatus
+    // No payment provider configured — block checkout in production so a real
+    // payment method (Lemon Squeezy) is required instead of silently activating
+    // for free. Re-enabled now that Lemon Squeezy is configured — the branch
+    // above should handle real checkouts before this is ever reached.
+    if (process.env.NODE_ENV === "production") {
+      return apiError("Payment provider not configured. Please contact support.", 503);
+    }
+
+    // Development/local fallback only — add-ons never touch Company.plan/subscriptionStatus
     if (isAddonPlan) {
       const base = getRuntimeAppUrl(req.nextUrl.origin);
       if (planCode === "ADDON-AUTOMATION") {
