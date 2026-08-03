@@ -545,7 +545,7 @@ export default function BillingSettingsPage() {
 
           {/* Footnote */}
           <p style={{ marginTop: 22, textAlign: "center", fontSize: 12, color: "rgba(255,255,255,.34)" }}>
-            Need help with billing? <Link href="/dashboard/support" style={{ color: "#a78bfa" }}>Contact support</Link> — we usually reply within a few hours.
+            Need help with billing? <Link href="/support" style={{ color: "#a78bfa" }}>Contact support</Link> — we usually reply within a few hours.
           </p>
         </>
       )}
