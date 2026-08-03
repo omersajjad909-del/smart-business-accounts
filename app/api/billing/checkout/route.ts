@@ -243,6 +243,15 @@ export async function POST(req: NextRequest) {
       await prisma.activityLog.create({
         data: { companyId, userId: userId || null, action: "ADDON_AUTOMATION_ACTIVATED", details: JSON.stringify({ planCode, billingCycle, activatedAt: new Date().toISOString(), provider: "DIRECT_FALLBACK_DEV_ONLY" }) },
       }).catch(() => {});
+      if (user?.email) {
+        sendPlanActivatedEmail({
+          customerEmail: user.email,
+          customerName: user.name,
+          planLabel: "Business Automation Add-on",
+          billingCycle,
+          amountUsd: finalCustomPrice > 0 ? finalCustomPrice : 79,
+        }).catch(() => {});
+      }
       const successRedirect = String(body?.successUrl || `${base}/dashboard/automation?addon=activated`);
       return apiOk({ url: successRedirect, activated: true });
     }
@@ -280,6 +289,16 @@ export async function POST(req: NextRequest) {
         }),
       },
     }).catch(() => {});
+
+    if (user?.email) {
+      sendPlanActivatedEmail({
+        customerEmail: user.email,
+        customerName: user.name,
+        planLabel: `${planCode} Plan`,
+        billingCycle,
+        amountUsd: finalCustomPrice > 0 ? finalCustomPrice : planBasePerMonth,
+      }).catch(() => {});
+    }
 
     if (couponCode) {
       try {
