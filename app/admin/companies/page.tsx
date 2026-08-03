@@ -2,6 +2,7 @@
 import { confirmToast, alertToast } from "@/lib/toast-feedback";
 import { useEffect, useState } from "react";
 import { getCurrentUser, setCurrentUser } from "@/lib/auth";
+import { getAppUrl } from "@/lib/domains";
 import toast from "react-hot-toast";
 
 type Row = {
@@ -200,7 +201,8 @@ function DetailRow({ company, onImpersonate }: { company: Row; onImpersonate: (i
   }
 
   const items = [
-    { label: "Company ID",         value: company.companyNo ? String(company.companyNo) : "—", mono: true, key: "companyno" },
+    // Company ID intentionally omitted — the collapsed row's ID column already
+    // shows it, and repeating it here widened the panel enough to overflow.
     { label: "Owner Name",         value: company.ownerName    || "—", mono: false, key: "name"   },
     { label: "Owner Email",        value: company.ownerEmail   || "—", mono: true,  key: "email"  },
     { label: "Business Type",      value: BIZ_LABELS[company.businessType || ""] || company.businessType || "—", mono: false, key: "biztype" },
@@ -336,7 +338,14 @@ export default function AdminCompaniesPage() {
       if (r.ok && j.user) {
         setCurrentUser(j.user);
         toast.success(`Logged in as ${j.user.name || j.user.email} — opening dashboard`);
-        setTimeout(() => { window.open("/dashboard", "_blank"); }, 500);
+        // The dashboard lives on a different domain than the admin panel, so a
+        // relative "/dashboard" would open admin.<host>/dashboard where the
+        // impersonation cookie doesn't exist → "Session expired." Hand the token
+        // to the app domain instead so it can set its own cookie.
+        const target = j.token
+          ? `${getAppUrl()}/api/auth/impersonate-handoff?token=${encodeURIComponent(j.token)}`
+          : `${getAppUrl()}/dashboard`;
+        setTimeout(() => { window.open(target, "_blank"); }, 500);
       } else {
         toast.error(j.error || "Impersonation failed");
       }
@@ -449,7 +458,7 @@ export default function AdminCompaniesPage() {
 
       {/* Table */}
       <div style={{ borderRadius: 18, border: "1px solid rgba(255,255,255,.08)", overflowX: "auto", overflowY: "hidden" }}>
-        <table style={{ width: "100%", minWidth: 880, borderCollapse: "collapse" }}>
+        <table style={{ width: "100%", minWidth: 760, borderCollapse: "collapse" }}>
           <thead>
             <tr style={{ background: "rgba(255,255,255,.04)" }}>
               {["", "ID", "Company", "Business Type", "Country", "Plan", "Status", "AI Score", "Users", "Renewal", "Actions"].map(h => (

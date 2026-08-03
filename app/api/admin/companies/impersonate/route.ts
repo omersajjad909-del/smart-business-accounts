@@ -113,7 +113,15 @@ export async function POST(req: NextRequest) {
     };
 
     // 8. Set a short-lived cookie and return user payload
-    const response = NextResponse.json({ success: true, user: userPayload, companyName: company.name });
+    // `token` is returned so the admin panel can hand it off to the app domain
+    // (see /api/auth/impersonate-handoff) — the cookie below is host-only and
+    // does not cross from admin.finovaos.app to the app's own domain.
+    const response = NextResponse.json({
+      success: true,
+      user: userPayload,
+      companyName: company.name,
+      token: impersonateToken,
+    });
     response.cookies.set("sb_auth", impersonateToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",

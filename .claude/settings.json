@@ -113,7 +113,8 @@
       "Bash(timeout 25 npx vercel whoami)",
       "Bash(grep -A3 -n \"^                      <Link$\\\\|^            <Link$\\\\|^                <Link$\" app/admin/components/AdminShell.tsx)",
       "Bash(python -c ' *)",
-      "Bash(npx prisma *)"
+      "Bash(npx prisma *)",
+      "Bash(grep -v \"node_modules\\\\|Cannot find module '@/\\\\|JSX\\\\|--jsx\")"
     ],
     "additionalDirectories": [
       "d:\\projects\\smart-business-accounts\\app\\api\\chat\\conversations",
