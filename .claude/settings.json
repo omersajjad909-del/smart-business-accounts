@@ -108,7 +108,9 @@
       "Bash(echo \"started in background pid $!\")",
       "Bash(echo \"started pid $!\")",
       "Bash(grep -n \"^\\\\s*th\\\\b\\\\|th\\\\s*{\\\\|th\\\\[|th:not\\\\|th,\\\\| th \" app/globals.css)",
-      "Bash(node scripts/_check_addon_tmp.mjs)"
+      "Bash(node scripts/_check_addon_tmp.mjs)",
+      "Bash(npx vercel *)",
+      "Bash(timeout 25 npx vercel whoami)"
     ],
     "additionalDirectories": [
       "d:\\projects\\smart-business-accounts\\app\\api\\chat\\conversations",
