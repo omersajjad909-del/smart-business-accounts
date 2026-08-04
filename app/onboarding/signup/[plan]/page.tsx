@@ -343,6 +343,12 @@ export default function SignupByPlanPage() {
   const planCode = String(params?.plan || "").toLowerCase();
   const current = PLAN_CONFIG[planCode as keyof typeof PLAN_CONFIG] || PLAN_CONFIG.starter;
 
+  const DEFAULT_PKR_PRICING = {
+    starter:    { monthly: 3999,  yearly: 3199 },
+    pro:        { monthly: 8999,  yearly: 7199 },
+    enterprise: { monthly: 14999, yearly: 11999 },
+  } as const;
+
   const [price, setPrice] = useState<string>("");
   const [currency, setCurrency] = useState<keyof typeof FX_USD>("USD");
   const billingCycle = useMemo(
@@ -391,16 +397,17 @@ export default function SignupByPlanPage() {
           : planCode === "starter" ? "starter"
           : null;
         const pkrPlan = planKey && pkr ? pkr[planKey] : null;
+        const fallbackPkrPlan = planKey ? (DEFAULT_PKR_PRICING as any)[planKey] : null;
 
-        if (isPkUser && pkrPlan) {
-          // API returns `monthly` as PKR/month and `yearly` as the PKR annual total.
-          // Monthly display should show the 75% intro price for the first 3 months,
-          // matching the pricing page behavior.
-          const amount = billingCycle === "yearly"
-            ? Math.round(Number(pkrPlan.yearly || 0))
-            : Math.round(Number(pkrPlan.monthly || 0) * 0.25);
-          setPrice(`₨${amount.toLocaleString("en-PK")}`);
-          return;
+        if (isPkUser) {
+          const sourcePlan = pkrPlan || fallbackPkrPlan;
+          if (sourcePlan) {
+            const amount = billingCycle === "yearly"
+              ? Math.round(Number(sourcePlan.yearly || 0))
+              : Math.round(Number(sourcePlan.monthly || 0) * 0.25);
+            setPrice(`₨${amount.toLocaleString("en-PK")}`);
+            return;
+          }
         }
 
         const baseMonthly = planCode === "pro" ? p.pro.monthly : planCode === "enterprise" ? p.enterprise.monthly : planCode === "starter" ? p.starter.monthly : null;
