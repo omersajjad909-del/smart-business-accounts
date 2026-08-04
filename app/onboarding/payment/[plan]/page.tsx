@@ -87,8 +87,8 @@ const FALLBACK_ENABLED_METHODS: PayMethod[] = ["card", "paypal", "applepay", "go
 const ALLOWED_CHECKOUT_METHODS = new Set<PayMethod>(FALLBACK_ENABLED_METHODS);
 
 /* ── Step indicator ─────────────────────────────────────── */
-function Steps({ current }: { current: 1|2|3 }) {
-  const steps = [{ n:1, label:"Payment" }, { n:2, label:"Verify" }, { n:3, label:"Done" }];
+function Steps({ current, finalLabel = "Done" }: { current: 1|2|3; finalLabel?: string }) {
+  const steps = [{ n:1, label:"Payment" }, { n:2, label:"Verify" }, { n:3, label:finalLabel }];
   return (
     <div style={{ display:"flex", alignItems:"center", gap:0 }}>
       {steps.map((s,i) => (
@@ -152,6 +152,13 @@ export default function PaymentPage() {
   const [processing,  setProcessing]  = useState(false);
   const [activating,  setActivating]  = useState(false);
   const [otpError,    setOtpError]    = useState("");
+  // /api/billing/checkout returns a `url` for two very different reasons: a
+  // real payment provider (Lemon Squeezy/Safepay) checkout link — nothing is
+  // active yet, the user still has to pay — or, only in the dev-only direct
+  // fallback, a plan that's already been switched on with no payment at all.
+  // Step 3 must show the right message for each; showing "Activated!" before
+  // the user has even reached the payment page is what caused the confusion.
+  const [pendingRealPayment, setPendingRealPayment] = useState(false);
 
   /* Coupon */
   const [couponInput,    setCouponInput]    = useState("");
@@ -332,6 +339,7 @@ export default function PaymentPage() {
       });
       const data = await res.json();
       if (res.ok && data?.url) {
+        setPendingRealPayment(data.provider === "lemonsqueezy" || data.provider === "safepay");
         setStep(3);
         await new Promise(r => setTimeout(r, 1500));
         window.location.href = data.url;
@@ -418,6 +426,7 @@ export default function PaymentPage() {
       });
       const data = await res.json();
       if (res.ok && data?.url) {
+        setPendingRealPayment(data.provider === "lemonsqueezy" || data.provider === "safepay");
         setStep(3);
         await new Promise(r => setTimeout(r, 1500));
         window.location.href = data.url;
@@ -498,7 +507,7 @@ export default function PaymentPage() {
             </div>
             <span style={{ fontSize:17, fontWeight:700, letterSpacing:"-.3px" }}>FinovaOS</span>
           </div>
-          <div className="pay-steps"><Steps current={step} /></div>
+          <div className="pay-steps"><Steps current={step} finalLabel={pendingRealPayment ? "Checkout" : "Done"} /></div>
           <button onClick={() => step===1 ? router.back() : setStep(1)}
             style={{ fontSize:12, fontWeight:600, color:"rgba(255,255,255,.45)", padding:"7px 14px", borderRadius:9, border:"1.5px solid rgba(255,255,255,.1)", background:"rgba(255,255,255,.04)", cursor:"pointer", fontFamily:"inherit" }}>
             ← Back
@@ -896,8 +905,17 @@ export default function PaymentPage() {
               </div>
               <div style={{ animation:"celebSlide .5s ease .3s both" }}>
                 <div style={{ fontSize:11, fontWeight:700, textTransform:"uppercase", letterSpacing:2, color:pm.color, marginBottom:8 }}>Welcome to FinovaOS</div>
-                <h2 style={{ margin:"0 0 6px", fontSize:32, fontWeight:900, background:`linear-gradient(135deg, white 30%, ${pm.color})`, WebkitBackgroundClip:"text", WebkitTextFillColor:"transparent" }}>{pm.name} Activated!</h2>
-                <p style={{ fontSize:14, color:"rgba(255,255,255,.45)", margin:"0 0 28px" }}>Your account is ready. Taking you to your dashboard…</p>
+                {pendingRealPayment ? (
+                  <>
+                    <h2 style={{ margin:"0 0 6px", fontSize:32, fontWeight:900, background:`linear-gradient(135deg, white 30%, ${pm.color})`, WebkitBackgroundClip:"text", WebkitTextFillColor:"transparent" }}>Almost there…</h2>
+                    <p style={{ fontSize:14, color:"rgba(255,255,255,.45)", margin:"0 0 28px" }}>Taking you to secure checkout to complete your {pm.name} subscription. Nothing is active yet until payment goes through.</p>
+                  </>
+                ) : (
+                  <>
+                    <h2 style={{ margin:"0 0 6px", fontSize:32, fontWeight:900, background:`linear-gradient(135deg, white 30%, ${pm.color})`, WebkitBackgroundClip:"text", WebkitTextFillColor:"transparent" }}>{pm.name} Activated!</h2>
+                    <p style={{ fontSize:14, color:"rgba(255,255,255,.45)", margin:"0 0 28px" }}>Your account is ready. Taking you to your dashboard…</p>
+                  </>
+                )}
               </div>
               <div style={{ background:"rgba(255,255,255,.04)", border:`1px solid ${pm.border}`, borderRadius:16, padding:"20px 24px", marginBottom:28, textAlign:"left", animation:"celebSlide .5s ease .5s both", opacity:0 }}>
                 <div style={{ fontSize:11, fontWeight:700, color:pm.color, textTransform:"uppercase", letterSpacing:1, marginBottom:14 }}>What&apos;s included</div>
