@@ -692,22 +692,11 @@ export default function SignupByPlanPage() {
           maxWidth:1200, margin:"0 auto", padding:"14px 24px",
           display:"flex", alignItems:"center", justifyContent:"space-between",
         }}>
-          {/* Logo */}
-          <div style={{ display:"flex", alignItems:"center", gap:12 }}>
-            <div style={{
-              width:38, height:38, borderRadius:11,
-              background:"linear-gradient(135deg,#6366f1,#4f46e5)",
-              display:"flex", alignItems:"center", justifyContent:"center",
-              boxShadow:"0 4px 14px rgba(99,102,241,.4)",
-            }}>
-              {/* <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.2">
-                <path d="M12 2L2 7l10 5 10-5-10-5z"/>
-                <path d="M2 17l10 5 10-5"/>
-                <path d="M2 12l10 5 10-5"/>
-              </svg> */}
-              <img src="/icon1.png" alt="FinovaOS" style={{ width:22, height:22, objectFit:"contain" }} />
-
-            </div>
+          {/* Logo — rendered directly on the dark header, no colored badge behind
+              it. The mark itself is a blue-to-purple gradient, so the old
+              blue-to-purple gradient box it sat in swallowed it at 22px. */}
+          <div style={{ display:"flex", alignItems:"center", gap:10 }}>
+            <img src="/icon1.png" alt="FinovaOS" style={{ width:34, height:34, objectFit:"contain" }} />
             <span style={{ fontFamily:"'Lora',serif", fontSize:18, fontWeight:700, color:"white", letterSpacing:"-.3px" }}>
               FinovaOS
             </span>
