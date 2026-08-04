@@ -21,7 +21,6 @@ type Stats = {
   totalUsers: number;
   activeUsers: number;
   inactiveUsers: number;
-  adminCount: number;
 };
 
 const ROLES = ["ADMIN", "ACCOUNTANT", "MANAGER", "VIEWER", "USER"];
