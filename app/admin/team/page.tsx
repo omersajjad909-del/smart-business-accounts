@@ -14,6 +14,10 @@ type Member = {
   createdAt: string;
   lastLoginAt?: string | null;
   isSuperAdmin?: boolean;
+  // "platform" = a User-table row with role=ADMIN (the original super admin
+  // login path) rather than an AdminUser team member — can't be disabled or
+  // removed from this page, only viewed, since PATCH/DELETE only touch AdminUser.
+  source?: "team" | "platform";
 };
 
 function authHeaders(): Record<string, string> {
@@ -77,6 +81,10 @@ export default function AdminTeamPage() {
   }
 
   async function toggleActive(m: Member) {
+    if (m.source === "platform") {
+      toast.error("Platform admins can't be disabled from here");
+      return;
+    }
     try {
       const r = await fetch("/api/admin/team", {
         method: "PATCH",
@@ -119,7 +127,9 @@ export default function AdminTeamPage() {
         <div>
           <h1 style={{ margin: "0 0 4px", fontSize: 24, fontWeight: 800 }}>Admin Team</h1>
           <p style={{ margin: 0, fontSize: 13, color: "rgba(255,255,255,.4)" }}>
-            Manage internal admin panel users, teams, and access.
+            Every admin account lives here — team members and platform admins alike.
+            Platform admins are view-only; they're never listed under Companies or Users,
+            and can't be deleted or disabled from anywhere in the admin panel.
           </p>
         </div>
         <button className="tm-btn" onClick={() => setShowForm(!showForm)} style={{ background: "linear-gradient(135deg,#6366f1,#4f46e5)", color: "white" }}>
@@ -208,10 +218,14 @@ export default function AdminTeamPage() {
                 </td>
                 <td style={td}>
                   <div style={{ display: "flex", gap: 6 }}>
-                    <button className="tm-btn-sm" onClick={() => toggleActive(m)}
-                      style={{ background: m.active ? "rgba(148,163,184,.15)" : "rgba(52,211,153,.15)", color: m.active ? "#94a3b8" : "#34d399" }}>
-                      {m.active ? "Disable" : "Enable"}
-                    </button>
+                    {m.source === "platform" ? (
+                      <span style={{ fontSize: 11, color: "rgba(255,255,255,.3)", fontStyle: "italic" }}>View only</span>
+                    ) : (
+                      <button className="tm-btn-sm" onClick={() => toggleActive(m)}
+                        style={{ background: m.active ? "rgba(148,163,184,.15)" : "rgba(52,211,153,.15)", color: m.active ? "#94a3b8" : "#34d399" }}>
+                        {m.active ? "Disable" : "Enable"}
+                      </button>
+                    )}
                     {!m.isSuperAdmin && (
                       <button className="tm-btn-sm" onClick={() => removeMember(m)}
                         style={{ background: "rgba(248,113,113,.15)", color: "#f87171" }}>Remove</button>
