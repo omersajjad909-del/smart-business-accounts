@@ -7,7 +7,12 @@ export async function GET(req: NextRequest) {
     const admin = requireAdmin(req);
     if (admin instanceof NextResponse) return admin;
 
+    // Platform admins (role=ADMIN) are managed exclusively from Admin Team
+    // (/admin/team) — excluding them here keeps this list to company users
+    // only, so an admin account can't be selected and deleted alongside a
+    // customer's user by mistake, the way "finovaos.app@gmail.com" was.
     const users = await prisma.user.findMany({
+      where: { role: { not: "ADMIN" } },
       orderBy: { createdAt: "desc" },
       select: {
         id: true,
@@ -40,9 +45,8 @@ export async function GET(req: NextRequest) {
     const totalUsers = rows.length;
     const activeUsers = rows.filter((u) => u.active).length;
     const inactiveUsers = totalUsers - activeUsers;
-    const adminCount = rows.filter((u) => u.role === "ADMIN").length;
 
-    return NextResponse.json({ rows, stats: { totalUsers, activeUsers, inactiveUsers, adminCount } });
+    return NextResponse.json({ rows, stats: { totalUsers, activeUsers, inactiveUsers } });
   } catch (e: unknown) {
     return NextResponse.json({ error: e instanceof Error ? e.message : "Failed" }, { status: 500 });
   }

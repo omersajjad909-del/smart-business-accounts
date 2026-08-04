@@ -258,11 +258,12 @@ export default function AdminUsersPage() {
     return true;
   });
 
+  // Platform admins are no longer listed on this page (see /admin/team) —
+  // dropped the "Admins" stat card along with them.
   const statCards = [
     { label: "Total Users",    value: stats?.totalUsers   ?? "—", tone: "purple", icon: "users" },
     { label: "Active",         value: stats?.activeUsers  ?? "—", tone: "green",  icon: "check" },
     { label: "Inactive",       value: stats?.inactiveUsers ?? "—", tone: "orange", icon: "ban"  },
-    { label: "Admins",         value: stats?.adminCount   ?? "—", tone: "blue",   icon: "shield"},
   ];
 
   return (
