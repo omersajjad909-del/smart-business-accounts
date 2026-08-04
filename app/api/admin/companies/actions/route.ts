@@ -126,7 +126,15 @@ export async function POST(req: NextRequest) {
             select: { userId: true },
           });
           const stillLinkedIds = new Set(stillLinked.map((u: { userId: string }) => u.userId));
-          const toDelete = orphanUserIds.filter((id: string) => !stillLinkedIds.has(id));
+          // Platform admins (role=ADMIN) must never be auto-deleted just because
+          // the last company they happened to be linked to was removed — this is
+          // exactly how the super admin account "finovaos.app@gmail.com" got
+          // wiped out. They're managed exclusively from /admin/team.
+          const orphanAdmins = orphanUserIds.length
+            ? await prisma.user.findMany({ where: { id: { in: orphanUserIds }, role: "ADMIN" }, select: { id: true } })
+            : [];
+          const protectedIds = new Set(orphanAdmins.map((u: { id: string }) => u.id));
+          const toDelete = orphanUserIds.filter((id: string) => !stillLinkedIds.has(id) && !protectedIds.has(id));
           if (toDelete.length > 0) {
             await Promise.allSettled([
               prisma.session.deleteMany({ where: { userId: { in: toDelete } } }),

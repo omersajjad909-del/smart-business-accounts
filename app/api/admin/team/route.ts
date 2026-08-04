@@ -8,14 +8,35 @@ function isAdmin(req: NextRequest) {
   return req.headers.get("x-user-role") === "ADMIN";
 }
 
-// GET — list all team members
+// GET — list all admin accounts: AdminUser team members PLUS User-table
+// platform admins (role=ADMIN), merged into one directory. Platform admins
+// are tagged `source:"platform"` and always `isSuperAdmin:true` so the UI
+// treats them the same as a super admin — no disable/remove controls — since
+// this page is only equipped to manage AdminUser rows (see PATCH/DELETE).
 export async function GET(req: NextRequest) {
   try {
     if (!isAdmin(req)) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-    const members = await (prisma as any).adminUser.findMany({
-      orderBy: { createdAt: "desc" },
-      select: { id: true, name: true, email: true, team: true, allowedPages: true, active: true, createdAt: true, lastLoginAt: true, isSuperAdmin: true },
-    });
+    const [teamMembers, platformAdmins] = await Promise.all([
+      (prisma as any).adminUser.findMany({
+        orderBy: { createdAt: "desc" },
+        select: { id: true, name: true, email: true, team: true, allowedPages: true, active: true, createdAt: true, lastLoginAt: true, isSuperAdmin: true },
+      }),
+      prisma.user.findMany({
+        where: { role: "ADMIN" },
+        orderBy: { createdAt: "desc" },
+        select: { id: true, name: true, email: true, active: true, createdAt: true },
+      }),
+    ]);
+
+    const members = [
+      ...teamMembers.map((m: any) => ({ ...m, source: "team" })),
+      ...platformAdmins.map((u: any) => ({
+        id: u.id, name: u.name, email: u.email, team: "Platform Admin",
+        allowedPages: null, active: u.active, createdAt: u.createdAt,
+        lastLoginAt: null, isSuperAdmin: true, source: "platform",
+      })),
+    ];
+
     return NextResponse.json({ members });
   } catch (e: any) {
     return NextResponse.json({ error: e.message }, { status: 500 });
@@ -58,6 +79,13 @@ export async function PATCH(req: NextRequest) {
     const { id, name, team, allowedPages, active, password } = await req.json();
     if (!id) return NextResponse.json({ error: "id required" }, { status: 400 });
 
+    // Platform admins (User table, role=ADMIN) aren't AdminUser rows — this
+    // endpoint can't touch them. Manage those accounts directly, deliberately.
+    const isPlatformAdmin = await prisma.user.findFirst({ where: { id, role: "ADMIN" }, select: { id: true } });
+    if (isPlatformAdmin) {
+      return NextResponse.json({ error: "Platform admins can't be managed from here." }, { status: 403 });
+    }
+
     const data: any = {};
     if (name         !== undefined) data.name         = name;
     if (team         !== undefined) data.team         = team;
@@ -78,6 +106,12 @@ export async function DELETE(req: NextRequest) {
     if (!isAdmin(req)) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     const id = new URL(req.url).searchParams.get("id");
     if (!id) return NextResponse.json({ error: "id required" }, { status: 400 });
+
+    const isPlatformAdmin = await prisma.user.findFirst({ where: { id, role: "ADMIN" }, select: { id: true } });
+    if (isPlatformAdmin) {
+      return NextResponse.json({ error: "Platform admins can't be deleted from here." }, { status: 403 });
+    }
+
     await (prisma as any).adminUser.delete({ where: { id } });
     return NextResponse.json({ success: true });
   } catch (e: any) {

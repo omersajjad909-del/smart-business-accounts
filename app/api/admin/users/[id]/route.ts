@@ -57,8 +57,15 @@ export async function DELETE(
     if (admin instanceof NextResponse) return admin;
 
     const { id } = await params;
-    const user = await prisma.user.findUnique({ where: { id }, select: { id: true, name: true, email: true } });
+    const user = await prisma.user.findUnique({ where: { id }, select: { id: true, name: true, email: true, role: true } });
     if (!user) return NextResponse.json({ error: "User not found" }, { status: 404 });
+
+    // Platform admins can't be deleted from here — this is exactly how
+    // "finovaos.app@gmail.com" got wiped out via a company/user cleanup.
+    // Managing admin accounts is a deliberate action reserved for /admin/team.
+    if (user.role === "ADMIN") {
+      return NextResponse.json({ error: "Cannot delete a platform admin from here. Manage admin accounts from Admin Team." }, { status: 403 });
+    }
 
     await Promise.allSettled([
       prisma.session.deleteMany({ where: { userId: id } }),
