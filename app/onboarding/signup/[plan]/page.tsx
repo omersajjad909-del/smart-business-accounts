@@ -385,12 +385,17 @@ export default function SignupByPlanPage() {
         // pages (e.g. Enterprise showed Rs3,750 on /pricing but Rs17,236 here).
         const pkr = j?.pkrPricing;
         const isPkUser = cur === "PKR" || searchParams.get("country") === "PK";
-        const pkrPlan = pkr
-          ? (planCode === "pro" ? pkr.pro : planCode === "enterprise" ? pkr.enterprise : planCode === "starter" ? pkr.starter : null)
+        const planKey = planCode === "professional" ? "pro"
+          : planCode === "pro" ? "pro"
+          : planCode === "enterprise" ? "enterprise"
+          : planCode === "starter" ? "starter"
           : null;
+        const pkrPlan = planKey && pkr ? pkr[planKey] : null;
 
         if (isPkUser && pkrPlan) {
           // API returns `monthly` as PKR/month and `yearly` as the PKR annual total.
+          // Monthly display should show the 75% intro price for the first 3 months,
+          // matching the pricing page behavior.
           const amount = billingCycle === "yearly"
             ? Math.round(Number(pkrPlan.yearly || 0))
             : Math.round(Number(pkrPlan.monthly || 0) * 0.25);
