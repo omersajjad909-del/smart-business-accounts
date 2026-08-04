@@ -117,7 +117,8 @@
       "Bash(grep -v \"node_modules\\\\|Cannot find module '@/\\\\|JSX\\\\|--jsx\")",
       "Bash(awk -F= '/^LEMONSQUEEZY_API_KEY=/{print \\(length\\($2\\)>20 ? \"looks like a real key \\(\"length\\($2\\)\" chars\\)\" : \"PLACEHOLDER/EMPTY -> \"$2\\)}' .env)",
       "Bash(awk -F= '/^LEMONSQUEEZY_WEBHOOK_SECRET=/{print \\(length\\($2\\)>10 ? \"set \\(\"length\\($2\\)\" chars\\)\" : \"PLACEHOLDER/EMPTY -> \"$2\\)}' .env)",
-      "Bash(node -e 'const d=JSON.parse\\(require\\(\"fs\"\\).readFileSync\\(\"ls_p1.json\",\"utf8\"\\)\\); console.log\\(\"data len:\", \\(d.data||[]\\).length\\); console.log\\(\"first:\", d.data && d.data[0] ? d.data[0].id+\" \"+d.data[0].attributes.name : \"none\"\\);')"
+      "Bash(node -e 'const d=JSON.parse\\(require\\(\"fs\"\\).readFileSync\\(\"ls_p1.json\",\"utf8\"\\)\\); console.log\\(\"data len:\", \\(d.data||[]\\).length\\); console.log\\(\"first:\", d.data && d.data[0] ? d.data[0].id+\" \"+d.data[0].attributes.name : \"none\"\\);')",
+      "Bash(node _scratch_admin_check.js)"
     ],
     "additionalDirectories": [
       "d:\\projects\\smart-business-accounts\\app\\api\\chat\\conversations",
