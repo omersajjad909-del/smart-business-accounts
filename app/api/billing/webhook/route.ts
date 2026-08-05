@@ -317,31 +317,53 @@ async function handleLemonWebhook(req: NextRequest, raw: string) {
   const displayCurrency = custom?.display_currency ? String(custom.display_currency).toUpperCase() : null;
   const displayCountry  = custom?.display_country  ? String(custom.display_country).toUpperCase()  : null;
 
+  // LemonSqueezy's `subscription_*` events cover TWO unrelated resource
+  // types under one prefix: real subscription-status events (data.type
+  // "subscriptions", where attrs.status is "active"/"on_trial"/etc — exactly
+  // what mapLemonSubscriptionStatus expects) vs subscription-invoice events
+  // (data.type "subscription-invoices", where attrs.status is an invoice
+  // status like "paid"). subscription_payment_success carries the latter.
+  // Previously every subscription_* event ran through mapLemonSubscriptionStatus
+  // unconditionally — so a payment_success event's invoice status "paid"
+  // fell through the switch's default case to "INACTIVE" and silently
+  // overwrote the company's real "ACTIVE" status that subscription_created
+  // had just set moments earlier. That's exactly what happened on this
+  // company: subscription_created → ACTIVE, subscription_updated → ACTIVE,
+  // then subscription_payment_success → INACTIVE (wrong) clobbered both.
+  const SUBSCRIPTION_STATUS_EVENTS = new Set([
+    "subscription_created", "subscription_updated", "subscription_cancelled",
+    "subscription_resumed", "subscription_expired", "subscription_paused", "subscription_unpaused",
+  ]);
+
   if (eventName.startsWith("subscription_") && companyId) {
-    const status           = mapLemonSubscriptionStatus(String(attrs?.status || ""));
     const currentPeriodEnd = safeDate(attrs?.renews_at || attrs?.ends_at || attrs?.trial_ends_at);
     const customerId       = attrs?.customer_id ? String(attrs.customer_id) : null;
     const subscriptionId   = payload?.data?.id  ? String(payload.data.id)  : null;
     const invoiceAmount    = typeof attrs?.subtotal === "number" ? Number(attrs.subtotal) / 100 : null;
+    let status: string | null = null;
 
-    await applySuccessfulPlanUpdate({
-      companyId, planCode, status,
-      providerCustomerId: customerId,
-      providerSubscriptionId: subscriptionId,
-      currentPeriodEnd, billingCycle, displayCurrency, displayCountry,
-      invoiceAmount,
-    });
+    if (SUBSCRIPTION_STATUS_EVENTS.has(eventName)) {
+      status = mapLemonSubscriptionStatus(String(attrs?.status || ""));
 
-    await prisma.activityLog.create({
-      data: {
-        companyId, userId: null,
-        action: "LEMON_SUBSCRIPTION_EVENT",
-        details: JSON.stringify({ eventName, planCode, status, subscriptionId, customerId, currentPeriodEnd: currentPeriodEnd?.toISOString() || null }),
-      },
-    }).catch(() => {});
+      await applySuccessfulPlanUpdate({
+        companyId, planCode, status,
+        providerCustomerId: customerId,
+        providerSubscriptionId: subscriptionId,
+        currentPeriodEnd, billingCycle, displayCurrency, displayCountry,
+        invoiceAmount,
+      });
 
-    if (eventName === "subscription_created" && (status === "ACTIVE" || status === "TRIALING")) {
-      await sendWelcomeSubscriptionEmail(companyId, planCode, displayCountry);
+      await prisma.activityLog.create({
+        data: {
+          companyId, userId: null,
+          action: "LEMON_SUBSCRIPTION_EVENT",
+          details: JSON.stringify({ eventName, planCode, status, subscriptionId, customerId, currentPeriodEnd: currentPeriodEnd?.toISOString() || null }),
+        },
+      }).catch(() => {});
+
+      if (eventName === "subscription_created" && (status === "ACTIVE" || status === "TRIALING")) {
+        await sendWelcomeSubscriptionEmail(companyId, planCode, displayCountry);
+      }
     }
 
     if (eventName === "subscription_payment_success" && invoiceAmount) {
