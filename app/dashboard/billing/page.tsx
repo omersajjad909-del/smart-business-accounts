@@ -745,7 +745,12 @@ function BillingPage() {
                         <td style={{ padding:"13px 20px", fontSize:12, color:"rgba(255,255,255,.65)" }}>{inv.plan}</td>
                         <td style={{ padding:"13px 20px", fontSize:12, fontWeight:700 }}>${inv.amount}.00</td>
                         <td style={{ padding:"13px 20px" }}><StatusBadge status={inv.status}/></td>
-                        <td style={{ padding:"13px 20px" }}><button onClick={() => toast("PDF download coming soon.")} style={{ padding:"4px 12px", borderRadius:8, border:"1px solid rgba(255,255,255,.08)", background:"rgba(255,255,255,.04)", fontSize:11, fontWeight:600, color:"rgba(255,255,255,.45)", cursor:"pointer", fontFamily:"inherit" }}>⬇ PDF</button></td>
+                        <td style={{ padding:"13px 20px" }}>
+                          <button
+                            onClick={() => window.open(`/api/billing/invoices/pdf?invoiceId=${encodeURIComponent(inv.id)}`, "_blank")}
+                            style={{ padding:"4px 12px", borderRadius:8, border:"1px solid rgba(255,255,255,.08)", background:"rgba(255,255,255,.04)", fontSize:11, fontWeight:600, color:"rgba(255,255,255,.45)", cursor:"pointer", fontFamily:"inherit" }}
+                          >⬇ PDF</button>
+                        </td>
                       </tr>
                     ))}
                   </tbody>
@@ -952,7 +957,12 @@ function BillingPage() {
                         <td style={{ padding: isMobile ? "12px 10px" : "14px 20px", fontSize:13, color:"rgba(255,255,255,.65)" }}>{inv.plan}</td>
                         <td style={{ padding: isMobile ? "12px 10px" : "14px 20px", fontSize:13, fontWeight:700 }}>${inv.amount}.00 {inv.currency}</td>
                         <td style={{ padding: isMobile ? "12px 10px" : "14px 20px" }}><StatusBadge status={inv.status}/></td>
-                        <td style={{ padding: isMobile ? "12px 10px" : "14px 20px" }}><button onClick={() => toast("PDF download coming soon.")} style={{ display:"flex", alignItems:"center", gap:5, padding:"5px 12px", borderRadius:8, border:"1px solid rgba(255,255,255,.08)", background:"rgba(255,255,255,.04)", fontSize:11, fontWeight:600, color:"rgba(255,255,255,.45)", cursor:"pointer", fontFamily:"inherit" }}>⬇ PDF</button></td>
+                        <td style={{ padding: isMobile ? "12px 10px" : "14px 20px" }}>
+                          <button
+                            onClick={() => window.open(`/api/billing/invoices/pdf?invoiceId=${encodeURIComponent(inv.id)}`, "_blank")}
+                            style={{ display:"flex", alignItems:"center", gap:5, padding:"5px 12px", borderRadius:8, border:"1px solid rgba(255,255,255,.08)", background:"rgba(255,255,255,.04)", fontSize:11, fontWeight:600, color:"rgba(255,255,255,.45)", cursor:"pointer", fontFamily:"inherit" }}
+                          >⬇ PDF</button>
+                        </td>
                       </tr>
                     ))}
                   </tbody>
