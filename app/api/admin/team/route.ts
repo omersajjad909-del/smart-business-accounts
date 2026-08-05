@@ -21,8 +21,10 @@ export async function GET(req: NextRequest) {
         orderBy: { createdAt: "desc" },
         select: { id: true, name: true, email: true, team: true, allowedPages: true, active: true, createdAt: true, lastLoginAt: true, isSuperAdmin: true },
       }),
+      // role="ADMIN" alone also matches every company owner (signup assigns
+      // it automatically) — only true platform admins have zero companies.
       prisma.user.findMany({
-        where: { role: "ADMIN" },
+        where: { role: "ADMIN", companies: { none: {} } },
         orderBy: { createdAt: "desc" },
         select: { id: true, name: true, email: true, active: true, createdAt: true },
       }),

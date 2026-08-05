@@ -57,13 +57,20 @@ export async function DELETE(
     if (admin instanceof NextResponse) return admin;
 
     const { id } = await params;
-    const user = await prisma.user.findUnique({ where: { id }, select: { id: true, name: true, email: true, role: true } });
+    const user = await prisma.user.findUnique({
+      where: { id },
+      select: { id: true, name: true, email: true, role: true, companies: { select: { companyId: true }, take: 1 } },
+    });
     if (!user) return NextResponse.json({ error: "User not found" }, { status: 404 });
 
-    // Platform admins can't be deleted from here — this is exactly how
-    // "finovaos.app@gmail.com" got wiped out via a company/user cleanup.
-    // Managing admin accounts is a deliberate action reserved for /admin/team.
-    if (user.role === "ADMIN") {
+    // Only block deleting TRUE platform admins — role="ADMIN" with zero
+    // companies (e.g. finovaos.app@gmail.com). role="ADMIN" alone isn't
+    // enough: every company owner also gets role="ADMIN" on signup, and
+    // deleting a company's owner along with the company is normal, expected
+    // admin-panel behavior. Checking "zero companies" here is a stable,
+    // non-circular signal since it reflects this user's general state, not
+    // just the outcome of whatever deletion is in progress.
+    if (user.role === "ADMIN" && user.companies.length === 0) {
       return NextResponse.json({ error: "Cannot delete a platform admin from here. Manage admin accounts from Admin Team." }, { status: 403 });
     }
 

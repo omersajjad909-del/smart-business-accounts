@@ -7,12 +7,12 @@ export async function GET(req: NextRequest) {
     const admin = requireAdmin(req);
     if (admin instanceof NextResponse) return admin;
 
-    // Platform admins (role=ADMIN) are managed exclusively from Admin Team
-    // (/admin/team) — excluding them here keeps this list to company users
-    // only, so an admin account can't be selected and deleted alongside a
-    // customer's user by mistake, the way "finovaos.app@gmail.com" was.
+    // Company owners get role="ADMIN" too (every signup creates one), so
+    // role alone can't identify a platform admin. Only exclude the true
+    // platform admins here — role="ADMIN" with zero companies, like
+    // "finovaos.app@gmail.com" — those are managed exclusively from
+    // /admin/team and should never be selectable for deletion from this list.
     const users = await prisma.user.findMany({
-      where: { role: { not: "ADMIN" } },
       orderBy: { createdAt: "desc" },
       select: {
         id: true,
@@ -29,7 +29,9 @@ export async function GET(req: NextRequest) {
       },
     });
 
-    const rows = users.map((u) => ({
+    const rows = users
+      .filter((u) => !(u.role === "ADMIN" && u.companies.length === 0))
+      .map((u) => ({
       id: u.id,
       name: u.name,
       email: u.email,

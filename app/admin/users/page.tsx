@@ -23,10 +23,10 @@ type Stats = {
   inactiveUsers: number;
 };
 
-// "ADMIN" intentionally excluded — that role is reserved for platform admins
-// (managed on /admin/team), and this page no longer lists them. Assigning it
-// to a company user here would just make them vanish from this list.
-const ROLES = ["ACCOUNTANT", "MANAGER", "VIEWER", "USER"];
+// "ADMIN" here means "owner of their own company" (every signup gets this
+// role) — this page lists those users normally. Only true platform admins
+// (role=ADMIN with zero companies) are excluded; see /api/admin/users/all.
+const ROLES = ["ADMIN", "ACCOUNTANT", "MANAGER", "VIEWER", "USER"];
 
 const ROLE_COLORS: Record<string, { bg: string; color: string }> = {
   ADMIN:      { bg: "rgba(139,92,246,.18)", color: "#c4b5fd" },
