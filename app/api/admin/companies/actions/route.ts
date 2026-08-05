@@ -33,8 +33,10 @@ export async function POST(req: NextRequest) {
           data: { defaultCompanyId: null },
         });
 
-        // Wave 1 — child/detail rows (all independent, run in parallel)
-        await Promise.allSettled([
+        // Delete dependent records in ordered batches instead of running many
+        // parallel queries. This reduces database contention on large companies.
+        await prisma.$transaction([
+          // Child/detail rows
           prisma.purchaseOrderItem.deleteMany({ where: { po: { companyId } } }),
           prisma.purchaseInvoiceItem.deleteMany({ where: { invoice: { companyId } } }),
           prisma.salesInvoiceItem.deleteMany({ where: { invoice: { companyId } } }),
@@ -60,10 +62,10 @@ export async function POST(req: NextRequest) {
           (prisma as any).interaction?.deleteMany?.({ where: { contact: { companyId } } }),
           (prisma as any).contactDocument?.deleteMany?.({ where: { contact: { companyId } } }),
           (prisma as any).contactNote?.deleteMany?.({ where: { contact: { companyId } } }),
-        ]);
+        ], { timeout: 120_000 });
 
-        // Wave 2 — parent/header rows (run in parallel after children gone)
-        await Promise.allSettled([
+        await prisma.$transaction([
+          // Parent/header rows
           prisma.paymentReceipt.deleteMany({ where: { companyId } }),
           prisma.bankReconciliation.deleteMany({ where: { bankAccount: { companyId } } }),
           prisma.bankStatement.deleteMany({ where: { companyId } }),
@@ -82,7 +84,7 @@ export async function POST(req: NextRequest) {
           prisma.outward.deleteMany({ where: { companyId } }),
           prisma.voucher.deleteMany({ where: { companyId } }),
           prisma.taxConfiguration.deleteMany({ where: { companyId } }),
-          prisma.recurringTransaction.deleteMany({ where: { companyId } }),
+          prisma.recurringTransaction.deleteMany({ where: { companyId } } ),
           prisma.budget.deleteMany({ where: { companyId } }),
           prisma.inventoryTxn.deleteMany({ where: { companyId } }),
           prisma.stockRate.deleteMany({ where: { companyId } }),
@@ -97,10 +99,10 @@ export async function POST(req: NextRequest) {
           prisma.contact.deleteMany({ where: { companyId } }),
           (prisma as any).goodsReceiptNote?.deleteMany?.({ where: { companyId } }),
           (prisma as any).systemBackup?.deleteMany?.({ where: { companyId } }),
-        ]);
+        ], { timeout: 120_000 });
 
-        // Wave 3 — logs, permissions, accounts, bank (all parallel)
-        await Promise.allSettled([
+        await prisma.$transaction([
+          // Logs, permissions, accounts, and supporting data
           prisma.activityLog.deleteMany({ where: { companyId } }),
           prisma.auditLog.deleteMany({ where: { companyId } }),
           prisma.loginLog.deleteMany({ where: { companyId } }),
@@ -114,25 +116,11 @@ export async function POST(req: NextRequest) {
           prisma.bankAccount.deleteMany({ where: { companyId } }),
           prisma.itemNew.deleteMany({ where: { companyId } }),
           prisma.account.deleteMany({ where: { companyId } }),
-        ]);
+        ], { timeout: 120_000 });
 
-        // Wave 4 — delete company itself
         await prisma.company.delete({ where: { id: companyId } });
 
-        // Wave 5 — clean up orphan users (no remaining companies)
-        //
-        // NOTE on platform-admin safety: role="ADMIN" is NOT a reliable signal
-        // here — every normal company signup also creates its owner with
-        // role="ADMIN" (see /api/onboarding/signup), so a blanket role check
-        // would block deleting a perfectly normal company owner along with
-        // their company, which is the whole point of this action. A genuinely
-        // orphaned user (no companies left) always had exactly one company —
-        // this one — so "will they have 0 companies after this" can never
-        // distinguish a true platform admin from a regular sole owner; both
-        // look identical at this point. The real fix is upstream: true
-        // platform admins are excluded from /admin/users and protected from
-        // direct deletion via /api/admin/users/[id] based on having ZERO
-        // companies *before* any deletion — a non-circular, reliable check.
+        // Clean up orphan users (no remaining companies)
         if (orphanUserIds.length > 0) {
           const stillLinked = await prisma.userCompany.findMany({
             where: { userId: { in: orphanUserIds } },
@@ -141,12 +129,12 @@ export async function POST(req: NextRequest) {
           const stillLinkedIds = new Set(stillLinked.map((u: { userId: string }) => u.userId));
           const toDelete = orphanUserIds.filter((id: string) => !stillLinkedIds.has(id));
           if (toDelete.length > 0) {
-            await Promise.allSettled([
+            await prisma.$transaction([
               prisma.session.deleteMany({ where: { userId: { in: toDelete } } }),
               prisma.loginLog.deleteMany({ where: { userId: { in: toDelete } } }),
               prisma.auditLog.deleteMany({ where: { userId: { in: toDelete } } }),
               prisma.activityLog.deleteMany({ where: { userId: { in: toDelete } } }),
-            ]);
+            ], { timeout: 120_000 });
             await prisma.user.deleteMany({ where: { id: { in: toDelete } } });
           }
         }
