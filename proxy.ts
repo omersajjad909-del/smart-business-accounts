@@ -168,6 +168,11 @@ export function proxy(req: NextRequest) {
     "/api/support/ticket",
     // Anonymous marketing-site visitor tracking (no auth / company context)
     "/api/track/visit",
+    // Payment provider webhooks (Lemon Squeezy / Safepay / Stripe) — these
+    // POSTs carry no auth cookie or company header; blocking them here was
+    // why successful checkouts never activated (status stayed INACTIVE, no
+    // invoices). The route verifies each provider's HMAC signature itself.
+    "/api/billing/webhook",
   ];
   const isApi = pathname.startsWith("/api/");
   const isPublic = publicApi.some((p) => pathname.startsWith(p));

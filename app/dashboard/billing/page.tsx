@@ -524,17 +524,36 @@ function BillingPage() {
         </div>
       )}
 
-      {/* ── Success Banner ── */}
-      {showUpgradeBanner && (
-        <div style={{ marginBottom:20, padding: isMobile ? "12px 10px" : "16px 20px", borderRadius:16, background:"rgba(52,211,153,.08)", border:"1.5px solid rgba(52,211,153,.22)", display:"flex", alignItems:"center", gap:14, animation:"fadeUp .4s ease" }}>
-          <div style={{ width:42, height:42, borderRadius:12, background:"rgba(52,211,153,.15)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:22, flexShrink:0 }}>✅</div>
-          <div style={{ flex:1 }}>
-            <div style={{ fontSize:15, fontWeight:800, color:"#34d399" }}>Plan activated successfully!</div>
-            <div style={{ fontSize:12, color:"rgba(52,211,153,.7)", marginTop:2 }}>Your subscription is now active. Add a payment method below for uninterrupted service.</div>
+      {/* ── Success Banner ──
+          ?upgrade=success only means the user came BACK from the provider's
+          checkout — the subscription actually flips to ACTIVE when the
+          provider's webhook lands, which can be seconds later (or never, if
+          payment ultimately failed). Claiming "activated!" off the URL alone
+          showed a green success banner over an Inactive plan. Gate the copy
+          on the real status instead. */}
+      {showUpgradeBanner && (() => {
+        const isReallyActive = ["active", "trialing"].includes(String(subscription?.status || "").toLowerCase());
+        const c       = isReallyActive ? "#34d399"                : "#fcd34d";
+        const bg      = isReallyActive ? "rgba(52,211,153,.08)"   : "rgba(251,191,36,.08)";
+        const border  = isReallyActive ? "rgba(52,211,153,.22)"   : "rgba(251,191,36,.24)";
+        const iconBg  = isReallyActive ? "rgba(52,211,153,.15)"   : "rgba(251,191,36,.14)";
+        return (
+          <div style={{ marginBottom:20, padding: isMobile ? "12px 10px" : "16px 20px", borderRadius:16, background:bg, border:`1.5px solid ${border}`, display:"flex", alignItems:"center", gap:14, animation:"fadeUp .4s ease" }}>
+            <div style={{ width:42, height:42, borderRadius:12, background:iconBg, display:"flex", alignItems:"center", justifyContent:"center", fontSize:22, flexShrink:0 }}>{isReallyActive ? "✅" : "⏳"}</div>
+            <div style={{ flex:1 }}>
+              <div style={{ fontSize:15, fontWeight:800, color:c }}>
+                {isReallyActive ? "Plan activated successfully!" : "Payment received — activating your plan…"}
+              </div>
+              <div style={{ fontSize:12, color:c, opacity:.7, marginTop:2 }}>
+                {isReallyActive
+                  ? "Your subscription is now active. Add a payment method below for uninterrupted service."
+                  : "We're confirming your payment with the billing provider. This usually takes under a minute — refresh this page shortly. If it stays inactive, contact support."}
+              </div>
+            </div>
+            <button onClick={() => setShowUpgradeBanner(false)} style={{ width:28, height:28, borderRadius:8, border:`1px solid ${border}`, background:"transparent", cursor:"pointer", fontSize:14, color:c }}>✕</button>
           </div>
-          <button onClick={() => setShowUpgradeBanner(false)} style={{ width:28, height:28, borderRadius:8, border:"1px solid rgba(52,211,153,.22)", background:"transparent", cursor:"pointer", fontSize:14, color:"#34d399" }}>✕</button>
-        </div>
-      )}
+        );
+      })()}
 
       {/* ── Page header ── */}
       {(paymentManagedExternally || paymentNote) && (
