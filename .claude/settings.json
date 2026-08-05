@@ -121,7 +121,8 @@
       "Bash(node _scratch_admin_check.js)",
       "Bash(node _scratch_admin_restore.js)",
       "Bash(identify public/icon1.png)",
-      "Bash(python3 -c ' *)"
+      "Bash(python3 -c ' *)",
+      "Bash(node scripts/_tmp-delete-test-company.js)"
     ],
     "additionalDirectories": [
       "d:\\projects\\smart-business-accounts\\app\\api\\chat\\conversations",
