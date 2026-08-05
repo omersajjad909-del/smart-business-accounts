@@ -721,7 +721,7 @@ export default function PaymentPage() {
                     </div>
                   )}
                   <div style={{ fontSize:26, fontWeight:900, color:meta.color, marginTop:4, lineHeight:1 }}>
-                    {formatFromUSD(discountedPrice, currency, rates)}
+                    {formatFromUSD(finalPrice, currency, rates)}
                     <span style={{ fontSize:12, fontWeight:500, color:"rgba(255,255,255,.35)" }}> today</span>
                   </div>
                   {couponApplied && plan !== "custom" && (
