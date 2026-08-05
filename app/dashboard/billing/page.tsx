@@ -649,9 +649,12 @@ function BillingPage() {
                 <div style={{ display:"flex", flexDirection:"column", gap:8, minWidth:180 }}>
                   {!isCanceled ? (
                     <>
-                      <button onClick={() => handleCheckout(currentPlanCode==="ENTERPRISE"?"PROFESSIONAL":currentPlanCode==="PROFESSIONAL"?"ENTERPRISE":"PROFESSIONAL")} disabled={!!checkingOut}
-                        style={{ padding:"11px 20px", borderRadius:12, background:`linear-gradient(135deg,${currentPlan.gradFrom},${currentPlan.gradTo})`, border:"none", color:"white", fontSize:13, fontWeight:700, cursor:"pointer", fontFamily:"inherit", opacity:checkingOut?.5:1 }}>
-                        {checkingOut ? "Processing..." : currentPlanCode==="ENTERPRISE" ? "Manage Plan" : `Upgrade to ${currentPlanCode==="PROFESSIONAL"?"Enterprise":"Professional"} →`}
+                      <button
+                        onClick={() => handleCheckout(currentPlanCode, subscription?.billingCycle === "yearly" ? "yearly" : "monthly")}
+                        disabled={!!checkingOut}
+                        style={{ padding:"11px 20px", borderRadius:12, background:`linear-gradient(135deg,${currentPlan.gradFrom},${currentPlan.gradTo})`, border:"none", color:"white", fontSize:13, fontWeight:700, cursor:"pointer", fontFamily:"inherit", opacity: checkingOut ? 0.5 : 1 }}
+                      >
+                        {checkingOut ? "Processing..." : `Renew ${currentPlan.name}`}
                       </button>
                       <button onClick={() => setActiveTab("plans")} style={{ padding:"10px 20px", borderRadius:12, background:"rgba(255,255,255,.05)", border:"1px solid rgba(255,255,255,.09)", color:"rgba(255,255,255,.6)", fontSize:12, fontWeight:600, cursor:"pointer", fontFamily:"inherit" }}>
                         View all plans
@@ -838,7 +841,7 @@ function BillingPage() {
                     {plan.notIncluded.map(f => <div key={f} style={{ display:"flex", alignItems:"center", gap:8, fontSize:12, color:"rgba(255,255,255,.22)" }}><span style={{ flexShrink:0, opacity:.4 }}>✕</span>{f}</div>)}
                   </div>
                   <button onClick={() => !isCurrent && handleCheckout(plan.code, billing==="annual"?"yearly":"monthly")} disabled={isCurrent||!!checkingOut}
-                    style={{ width:"100%", padding:"12px", borderRadius:12, border:"none", fontSize:13, fontWeight:700, cursor:isCurrent?"default":"pointer", fontFamily:"inherit", transition:"all .2s", background:isCurrent?"rgba(255,255,255,.06)":`linear-gradient(135deg,${plan.gradFrom},${plan.gradTo})`, color:isCurrent?"rgba(255,255,255,.3)":"white", boxShadow:isCurrent?"none":`0 4px 20px ${plan.color}28`, opacity:checkingOut&&checkingOut!==plan.code?.5:1 }}>
+                    style={{ width:"100%", padding:"12px", borderRadius:12, border:"none", fontSize:13, fontWeight:700, cursor:isCurrent?"default":"pointer", fontFamily:"inherit", transition:"all .2s", background:isCurrent?"rgba(255,255,255,.06)":`linear-gradient(135deg,${plan.gradFrom},${plan.gradTo})`, color:isCurrent?"rgba(255,255,255,.3)":"white", boxShadow:isCurrent?"none":`0 4px 20px ${plan.color}28`, opacity: checkingOut && checkingOut !== plan.code ? 0.5 : 1 }}>
                     {checkingOut===plan.code ? "Processing..." : isCurrent ? "Current Plan" : isHigher ? `Upgrade to ${plan.name} →` : isLower ? `Downgrade to ${plan.name}` : `Select ${plan.name}`}
                   </button>
                 </div>
