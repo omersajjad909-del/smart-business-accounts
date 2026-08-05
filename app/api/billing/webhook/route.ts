@@ -340,10 +340,9 @@ async function handleLemonWebhook(req: NextRequest, raw: string) {
     const customerId       = attrs?.customer_id ? String(attrs.customer_id) : null;
     const subscriptionId   = payload?.data?.id  ? String(payload.data.id)  : null;
     const invoiceAmount    = typeof attrs?.subtotal === "number" ? Number(attrs.subtotal) / 100 : null;
-    let status: string | null = null;
 
     if (SUBSCRIPTION_STATUS_EVENTS.has(eventName)) {
-      status = mapLemonSubscriptionStatus(String(attrs?.status || ""));
+      const status = mapLemonSubscriptionStatus(String(attrs?.status || ""));
 
       await applySuccessfulPlanUpdate({
         companyId, planCode, status,
