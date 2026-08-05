@@ -450,24 +450,66 @@ export default function AutomationPage() {
   const [tab, setTab] = useState<Tab>("overview");
   const [addonEnabled, setAddonEnabled] = useState<boolean | null>(null); // null = loading
   const [showActivatedBanner, setShowActivatedBanner] = useState(false);
+  // "?addon=activated" only means the user came BACK from checkout — the
+  // add-on actually turns on when the provider's webhook lands, which can be
+  // a few seconds later (or never, if payment ultimately failed). Showing
+  // "Activated!" straight off the URL param — before confirming via
+  // /api/automation/addon-status — is exactly what claimed success while
+  // nothing was actually enabled. Same class of bug as the billing page's
+  // premature "Plan activated successfully!" banner.
+  const [awaitingActivation, setAwaitingActivation] = useState(false);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
-    if (params.get("addon") === "activated") {
-      setShowActivatedBanner(true);
+    const cameFromCheckout = params.get("addon") === "activated";
+    if (cameFromCheckout) {
       // Clean URL without reload
       window.history.replaceState({}, "", window.location.pathname);
-      setTimeout(() => setShowActivatedBanner(false), 6000);
     }
-    (async () => {
+
+    let cancelled = false;
+    const checkStatus = async (): Promise<boolean> => {
       try {
         const r = await fetch("/api/automation/addon-status", { headers: authHeaders() });
         const d = await r.json();
-        setAddonEnabled(d.enabled === true);
+        return d.enabled === true;
       } catch {
-        setAddonEnabled(false);
+        return false;
       }
+    };
+
+    (async () => {
+      const enabled = await checkStatus();
+      if (cancelled) return;
+      setAddonEnabled(enabled);
+
+      if (!cameFromCheckout) return;
+
+      if (enabled) {
+        setShowActivatedBanner(true);
+        setTimeout(() => setShowActivatedBanner(false), 6000);
+        return;
+      }
+
+      // Webhook may still be in flight — poll briefly before giving up.
+      setAwaitingActivation(true);
+      for (let attempt = 0; attempt < 5 && !cancelled; attempt++) {
+        await new Promise((resolve) => setTimeout(resolve, 2000));
+        if (cancelled) return;
+        const nowEnabled = await checkStatus();
+        if (cancelled) return;
+        if (nowEnabled) {
+          setAddonEnabled(true);
+          setAwaitingActivation(false);
+          setShowActivatedBanner(true);
+          setTimeout(() => setShowActivatedBanner(false), 6000);
+          return;
+        }
+      }
+      if (!cancelled) setAwaitingActivation(false);
     })();
+
+    return () => { cancelled = true; };
   }, []);
 
   const tabs: { id: Tab; label: string; icon: string }[] = [
@@ -505,10 +547,23 @@ export default function AutomationPage() {
         </div>
       )}
 
-      {addonEnabled === false && <UpsellGate />}
+      {/* Came back from checkout but the webhook hasn't landed yet — show
+          this instead of the upsell gate, which would otherwise ask them to
+          "buy" an add-on they may have just paid for. */}
+      {awaitingActivation && (
+        <div style={{ marginBottom: 20, padding: isMobile ? "12px 10px" : "14px 20px", borderRadius: 12, background: "linear-gradient(135deg,rgba(251,191,36,.12),rgba(217,119,6,.08))", border: "1px solid rgba(251,191,36,.3)", display: "flex", alignItems: "center", gap: 12 }}>
+          <span style={{ fontSize: 22 }}>⏳</span>
+          <div>
+            <div style={{ fontWeight: 700, color: "#fbbf24", fontSize: 15 }}>Payment received — activating your add-on…</div>
+            <div style={{ fontSize: 13, color: "rgba(255,255,255,0.6)", marginTop: 2 }}>We're confirming your payment with the billing provider. This usually takes under a minute.</div>
+          </div>
+        </div>
+      )}
 
-      {/* Tabs + content — only show if addon active (or still loading) */}
-      {addonEnabled !== false && (
+      {addonEnabled === false && !awaitingActivation && <UpsellGate />}
+
+      {/* Tabs + content — only show if addon active (or still loading/confirming) */}
+      {(addonEnabled !== false || awaitingActivation) && (
         <>
           <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 28 }}>
             {tabs.map(t => (

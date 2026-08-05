@@ -131,6 +131,11 @@ export default function PaymentPage() {
   const [currency, setCurrency] = useState<string>(searchParams.get("currency") || "USD");
   const [country,  setCountry]  = useState<string>(searchParams.get("country")  || "US");
   const [rates,    setRates]    = useState<Record<string, number> | null>(null);
+  // Admin-set PKR-native pricing (same source /pricing and /onboarding/signup
+  // use) — Pakistan must show THIS, not the USD price run through an FX rate.
+  // That FX-conversion path is what previously showed Rs 27,522 here for a
+  // plan the pricing page itself prices at Rs 8,999.
+  const [pkrPricing, setPkrPricing] = useState<Record<string, { monthly: number; yearly: number }> | null>(null);
 
   const planPrice =
     plan === "custom"
@@ -251,6 +256,10 @@ export default function PaymentPage() {
         const fx = await fetch("/api/public/fx", { cache: "no-store" });
         if (fx.ok) { const d = await fx.json(); if (d?.rates) setRates(d.rates); }
       } catch {}
+      try {
+        const pr = await fetch("/api/public/pricing", { cache: "no-store" });
+        if (pr.ok) { const d = await pr.json(); if (d?.pkrPricing) setPkrPricing(d.pkrPricing); }
+      } catch {}
     })();
   }, [searchParams]);
 
@@ -279,8 +288,26 @@ export default function PaymentPage() {
       ? Math.max(0, planPrice - (planPrice * couponApplied.value) / 100)
       : Math.max(0, planPrice - couponApplied.value)
     : planPrice;
-  const displayPlanPrice  = formatFromUSD(planPrice, currency, rates);
-  const displayFinalPrice = formatFromUSD(finalPrice, currency, rates);
+
+  // Pakistan uses admin-set PKR-native prices, NOT the USD price run through
+  // FX — same rule /pricing and /onboarding/signup apply. plan keys here use
+  // "pro"/"professional" interchangeably; pkrPricing only has "pro".
+  const isPkUser = currency === "PKR" || country.trim().toUpperCase() === "PK";
+  const pkrKey = plan === "professional" ? "pro" : plan;
+  const pkrPlan = pkrPricing?.[pkrKey] || null;
+  const pkrBasePrice = pkrPlan ? (billingCycle === "yearly" ? pkrPlan.yearly : pkrPlan.monthly) : null;
+  const pkrFinalPrice = pkrBasePrice !== null && couponApplied
+    ? couponApplied.type === "percent"
+      ? Math.max(0, pkrBasePrice - (pkrBasePrice * couponApplied.value) / 100)
+      : Math.max(0, pkrBasePrice - couponApplied.value)
+    : pkrBasePrice;
+
+  const displayPlanPrice  = isPkUser && pkrBasePrice !== null
+    ? `₨${pkrBasePrice.toLocaleString("en-PK")}`
+    : formatFromUSD(planPrice, currency, rates);
+  const displayFinalPrice = isPkUser && pkrFinalPrice !== null
+    ? `₨${pkrFinalPrice.toLocaleString("en-PK")}`
+    : formatFromUSD(finalPrice, currency, rates);
 
   async function applyCoupon() {
     const code = couponInput.trim().toUpperCase();
@@ -721,7 +748,7 @@ export default function PaymentPage() {
                     </div>
                   )}
                   <div style={{ fontSize:26, fontWeight:900, color:meta.color, marginTop:4, lineHeight:1 }}>
-                    {formatFromUSD(finalPrice, currency, rates)}
+                    {displayFinalPrice}
                     <span style={{ fontSize:12, fontWeight:500, color:"rgba(255,255,255,.35)" }}> today</span>
                   </div>
                   {couponApplied && plan !== "custom" && (
