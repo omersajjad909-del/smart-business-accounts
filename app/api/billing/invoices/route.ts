@@ -64,13 +64,20 @@ export async function GET(req: NextRequest) {
         currentPeriodStart: true,
         currentPeriodEnd: true,
         createdAt: true,
+        provider: true,
       },
     });
 
     const effectivePlan = (subscription?.plan || company.plan || "STARTER").toUpperCase();
     const effectiveStatus = subscription?.status || company.subscriptionStatus || "ACTIVE";
     const cycle = (subscription?.billingCycle || "MONTHLY").toUpperCase();
-    const currency = company.baseCurrency || "USD";
+    // `pricePerMonth` is stored in whatever currency the provider actually
+    // settles in — Safepay always settles in PKR, but LemonSqueezy (and
+    // Stripe) always settle in USD regardless of what was *displayed* during
+    // checkout. Using company.baseCurrency here paired the real USD amount
+    // with a "PKR" label for every Pakistani company, showing e.g. "PKR 249"
+    // for what was actually a $249 charge.
+    const currency = subscription?.provider === "SAFEPAY" ? "PKR" : "USD";
     const baseAmount = subscription?.pricePerMonth || PLAN_PRICES[effectivePlan] || 0;
     const amount = cycle === "YEARLY" ? Math.round(baseAmount * 12) : baseAmount;
     const periodEnd =

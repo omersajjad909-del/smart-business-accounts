@@ -70,6 +70,13 @@ const CARD_BRANDS: Record<string, { label: string; grad: string }> = {
 const DIRECT_ACCEPTED_METHODS = ["Visa", "Mastercard", "American Express", "Discover"];
 const LEMON_ACCEPTED_METHODS = ["Visa", "Mastercard", "American Express", "Discover"];
 
+// Invoices carry whatever currency the provider actually settled in
+// (/api/billing/invoices derives it from provider, not company.baseCurrency)
+// — a hardcoded "$" prefix showed e.g. "$249.00 PKR" for PKR invoices.
+function formatInvoiceAmount(amount: number, currency: string) {
+  const symbol = currency === "PKR" ? "₨" : currency === "USD" ? "$" : `${currency} `;
+  return `${symbol}${amount.toLocaleString()}${currency === "PKR" ? "" : ".00"}`;
+}
 function formatCardNumber(val: string) { return val.replace(/\D/g,"").slice(0,16).replace(/(.{4})/g,"$1 ").trim(); }
 function formatExpiry(val: string) { const d = val.replace(/\D/g,"").slice(0,4); return d.length>2?d.slice(0,2)+"/"+d.slice(2):d; }
 function detectBrand(num: string): string {
@@ -743,7 +750,7 @@ function BillingPage() {
                         <td style={{ padding:"13px 20px", fontSize:12, fontWeight:700, color:"rgba(255,255,255,.8)", fontFamily:"monospace" }}>{inv.number}</td>
                         <td style={{ padding:"13px 20px", fontSize:12, color:"rgba(255,255,255,.4)" }}>{inv.date}</td>
                         <td style={{ padding:"13px 20px", fontSize:12, color:"rgba(255,255,255,.65)" }}>{inv.plan}</td>
-                        <td style={{ padding:"13px 20px", fontSize:12, fontWeight:700 }}>${inv.amount}.00</td>
+                        <td style={{ padding:"13px 20px", fontSize:12, fontWeight:700 }}>{formatInvoiceAmount(inv.amount, inv.currency)}</td>
                         <td style={{ padding:"13px 20px" }}><StatusBadge status={inv.status}/></td>
                         <td style={{ padding:"13px 20px" }}>
                           <button
@@ -955,7 +962,7 @@ function BillingPage() {
                         <td style={{ padding: isMobile ? "12px 10px" : "14px 20px", fontSize:13, fontWeight:700, color:"rgba(255,255,255,.85)", fontFamily:"monospace" }}>{inv.number}</td>
                         <td style={{ padding: isMobile ? "12px 10px" : "14px 20px", fontSize:13, color:"rgba(255,255,255,.4)" }}>{inv.date}</td>
                         <td style={{ padding: isMobile ? "12px 10px" : "14px 20px", fontSize:13, color:"rgba(255,255,255,.65)" }}>{inv.plan}</td>
-                        <td style={{ padding: isMobile ? "12px 10px" : "14px 20px", fontSize:13, fontWeight:700 }}>${inv.amount}.00 {inv.currency}</td>
+                        <td style={{ padding: isMobile ? "12px 10px" : "14px 20px", fontSize:13, fontWeight:700 }}>{formatInvoiceAmount(inv.amount, inv.currency)}</td>
                         <td style={{ padding: isMobile ? "12px 10px" : "14px 20px" }}><StatusBadge status={inv.status}/></td>
                         <td style={{ padding: isMobile ? "12px 10px" : "14px 20px" }}>
                           <button
