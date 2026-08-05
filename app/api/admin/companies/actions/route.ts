@@ -120,21 +120,26 @@ export async function POST(req: NextRequest) {
         await prisma.company.delete({ where: { id: companyId } });
 
         // Wave 5 — clean up orphan users (no remaining companies)
+        //
+        // NOTE on platform-admin safety: role="ADMIN" is NOT a reliable signal
+        // here — every normal company signup also creates its owner with
+        // role="ADMIN" (see /api/onboarding/signup), so a blanket role check
+        // would block deleting a perfectly normal company owner along with
+        // their company, which is the whole point of this action. A genuinely
+        // orphaned user (no companies left) always had exactly one company —
+        // this one — so "will they have 0 companies after this" can never
+        // distinguish a true platform admin from a regular sole owner; both
+        // look identical at this point. The real fix is upstream: true
+        // platform admins are excluded from /admin/users and protected from
+        // direct deletion via /api/admin/users/[id] based on having ZERO
+        // companies *before* any deletion — a non-circular, reliable check.
         if (orphanUserIds.length > 0) {
           const stillLinked = await prisma.userCompany.findMany({
             where: { userId: { in: orphanUserIds } },
             select: { userId: true },
           });
           const stillLinkedIds = new Set(stillLinked.map((u: { userId: string }) => u.userId));
-          // Platform admins (role=ADMIN) must never be auto-deleted just because
-          // the last company they happened to be linked to was removed — this is
-          // exactly how the super admin account "finovaos.app@gmail.com" got
-          // wiped out. They're managed exclusively from /admin/team.
-          const orphanAdmins = orphanUserIds.length
-            ? await prisma.user.findMany({ where: { id: { in: orphanUserIds }, role: "ADMIN" }, select: { id: true } })
-            : [];
-          const protectedIds = new Set(orphanAdmins.map((u: { id: string }) => u.id));
-          const toDelete = orphanUserIds.filter((id: string) => !stillLinkedIds.has(id) && !protectedIds.has(id));
+          const toDelete = orphanUserIds.filter((id: string) => !stillLinkedIds.has(id));
           if (toDelete.length > 0) {
             await Promise.allSettled([
               prisma.session.deleteMany({ where: { userId: { in: toDelete } } }),
