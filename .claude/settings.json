@@ -123,7 +123,8 @@
       "Bash(identify public/icon1.png)",
       "Bash(python3 -c ' *)",
       "Bash(node scripts/_tmp-delete-test-company.js)",
-      "Bash(rm scripts/_tmp-delete-test-company.js)"
+      "Bash(rm scripts/_tmp-delete-test-company.js)",
+      "Bash(curl -s -X POST \"https://www.finovaos.app/api/billing/webhook\" -H \"Content-Type: application/json\" -H \"x-signature: test-invalid\" -d '{\"probe\":true}' -w \"\\\\nHTTP:%{http_code}\\\\n\")"
     ],
     "additionalDirectories": [
       "d:\\projects\\smart-business-accounts\\app\\api\\chat\\conversations",
