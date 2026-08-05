@@ -218,6 +218,12 @@ export async function POST(req: NextRequest) {
     // Development/local fallback only — add-ons never touch Company.plan/subscriptionStatus
     if (isAddonPlan) {
       const base = getRuntimeAppUrl(req.nextUrl.origin);
+      const successRedirect = String(body?.successUrl || `${base}/dashboard/automation?addon=activated`);
+
+      if (!body?.forceActivate) {
+        return apiOk({ url: successRedirect, activated: false, provider: "direct_fallback_dev_only" });
+      }
+
       if (planCode === "ADDON-AUTOMATION") {
         // Schema must match the table the admin panel actually created
         // (app/api/admin/automation-addon/route.ts) — columns are "price" and
@@ -255,11 +261,17 @@ export async function POST(req: NextRequest) {
           amountUsd: finalCustomPrice > 0 ? finalCustomPrice : 79,
         }).catch(() => {});
       }
-      const successRedirect = String(body?.successUrl || `${base}/dashboard/automation?addon=activated`);
       return apiOk({ url: successRedirect, activated: true });
     }
 
-    // Development/local fallback only
+    // Development/local fallback only — do not change the company until
+    // a real payment provider webhook confirms the purchase.
+    if (!body?.forceActivate) {
+      const base = getRuntimeAppUrl(req.nextUrl.origin);
+      const redirectUrl = successUrl || `${base}/dashboard/billing?upgrade=success`;
+      return apiOk({ url: redirectUrl, sessionId: "direct", provider: "direct_fallback", activated: false });
+    }
+
     await prisma.company.update({
       where: { id: companyId },
       data: {
