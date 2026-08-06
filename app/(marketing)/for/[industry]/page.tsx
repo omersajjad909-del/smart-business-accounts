@@ -1026,7 +1026,7 @@ export default function IndustryPage() {
           {/* CTA row */}
           <div style={{ display:"grid", gridTemplateColumns:"2fr 1fr 1fr 1fr", background:"rgba(255,255,255,.02)", borderTop:"1px solid rgba(255,255,255,.08)" }}>
             <div style={{ padding:"20px 24px", fontSize:12, color:"rgba(255,255,255,.28)" }}>
-              {type.isLive ? "🔥 75% off — first 3 months" : "⏳ Launching soon — join the waitlist"}
+              {type.isLive ? "🔥 50% off — first 3 months" : "⏳ Launching soon — join the waitlist"}
             </div>
             {PLANS.map(p => (
               <div key={p.key} style={{ padding:"14px", textAlign:"center", borderLeft:"1px solid rgba(255,255,255,.06)", background:p.featured?"rgba(99,102,241,.06)":"transparent" }}>
