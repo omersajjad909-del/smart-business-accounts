@@ -811,7 +811,7 @@ export default function PricingPage() {
               ⚡ Power Add-On
             </div>
             <h2 style={{ fontSize: "clamp(24px,3.5vw,36px)", fontWeight: 900, letterSpacing: "-.02em", marginBottom: 10 }}>
-              Add Marketing Automation to any plan
+              Add Business Automation to any plan
             </h2>
             <p style={{ color: "rgba(255,255,255,.42)", fontSize: 15, maxWidth: 560, margin: "0 auto" }}>
               Turn FinovaOS into a complete business growth engine. Available on Starter, Professional, and Enterprise.

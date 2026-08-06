@@ -1583,7 +1583,7 @@ export default function SolutionsPage() {
                 letterSpacing:".09em", textTransform:"uppercase", marginBottom:22,
                 animation:"floatBadge 3s ease-in-out infinite",
               }}>
-                🔥 75% OFF — First 3 Months
+                🔥 50% OFF — First 3 Months
               </div>
 
               <h2 style={{ fontFamily:"'Lora',serif", fontSize:"clamp(30px,4.5vw,50px)", fontWeight:700, color:"white", letterSpacing:"-1.2px", lineHeight:1.12, marginBottom:14 }}>

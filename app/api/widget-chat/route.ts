@@ -26,7 +26,7 @@ PRICING PLANS (exact — never change these numbers):
 Current launch offer: 75% off for the first 3 months on all plans.
 
 POWER ADD-ON (available on any plan):
-- Marketing Automation: automated email campaigns, WhatsApp broadcasts, lead nurturing, drip sequences, customer segmentation
+- Business Automation: workflow automation, reminders, internal communications, task coordination, and business process efficiency
 
 KEY FEATURES:
 - Accounting: double-entry bookkeeping, chart of accounts, journal entries, financial year management

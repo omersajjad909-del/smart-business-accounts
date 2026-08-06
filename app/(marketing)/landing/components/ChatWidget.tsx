@@ -67,7 +67,7 @@ const KB: [RegExp, string][] = [
    "FinovaOS supports 150+ currencies:\n• PKR, USD, AED, GBP, EUR, SAR\n• Real-time exchange rates\n• Multi-currency invoicing\n\nPerfect for import/export businesses! 💱"],
 
   [/marketing.?auto|whatsapp.?broadcast|email.?campaign|drip.?sequence|lead.?nurtur|send.?campaign|bulk.?message/i,
-   "FinovaOS Marketing Automation (Power Add-on):\n\n• Automated email campaigns\n• WhatsApp broadcasts to all customers\n• Lead nurturing & drip sequences\n• Customer segmentation by behavior\n• Open rate & click tracking\n\nAvailable as a Power Add-on on ANY plan!\nContact: hello@finovaos.app for pricing 📣"],
+   "FinovaOS Business Automation (Power Add-on):\n\n• Automated email campaigns\n• WhatsApp broadcasts to all customers\n• Lead nurturing & drip sequences\n• Customer segmentation by behavior\n• Open rate & click tracking\n\nAvailable as a Power Add-on on ANY plan!\nContact: hello@finovaos.app for pricing 📣"],
 
   [/\bapi\b|integration|webhook|third.?party|zapier|import.?data|custom.?integrat|connect.?with/i,
    "FinovaOS API & Integrations:\n\n• Full REST API access (Enterprise plan)\n• Webhook support for real-time sync\n• CSV & Excel import/export on all plans\n• Custom integrations on request\n• Connect with eCommerce, payment gateways, banks\n\nContact: hello@finovaos.app for custom integrations 🔌"],
