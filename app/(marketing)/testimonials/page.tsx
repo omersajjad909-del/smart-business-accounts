@@ -126,7 +126,7 @@ export default function TestimonialsPage() {
           <div style={{position:"absolute",right:-40,top:"50%",transform:"translateY(-50%)",width:260,height:260,borderRadius:"50%",background:"radial-gradient(circle,rgba(99,102,241,.14),transparent 70%)",pointerEvents:"none"}}/>
           <div style={{position:"relative"}}>
             <div style={{display:"inline-flex",alignItems:"center",gap:7,padding:"4px 12px",borderRadius:100,marginBottom:12,background:"rgba(251,191,36,.1)",border:"1px solid rgba(251,191,36,.25)",fontSize:11,fontWeight:700,color:"#fbbf24"}}>
-              🏷️ 75% OFF — FIRST 3 MONTHS
+              🏷️ 50% OFF — FIRST 3 MONTHS
             </div>
             <h3 style={{fontFamily:"'Lora',serif",fontSize:"clamp(18px,2.5vw,26px)",fontWeight:700,color:"white",letterSpacing:"-.4px",marginBottom:6}}>
               Join thousands of businesses on FinovaOS
