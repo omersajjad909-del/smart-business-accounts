@@ -858,7 +858,7 @@ export default function SolutionSection() {
                 color: "#fbbf24",
               }}
             >
-              LIMITED OFFER - 75% OFF FIRST 3 MONTHS
+              LIMITED OFFER - 50% OFF FIRST 3 MONTHS
             </div>
             <h3 style={{ fontFamily: "'Lora',serif", fontSize: "clamp(18px,2.5vw,26px)", fontWeight: 700, color: "white", letterSpacing: "-.4px", marginBottom: 6 }}>
               Stop patching. Start running.

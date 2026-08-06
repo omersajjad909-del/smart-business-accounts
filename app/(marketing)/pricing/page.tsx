@@ -660,14 +660,14 @@ export default function PricingPage() {
           {PLANS.map((plan) => {
             const pricingKey = plan.slug as keyof PlanPricing;
             const regularPrice = billing === "yearly" ? publicPricing[pricingKey].yearly : publicPricing[pricingKey].monthly;
-            const introPrice = Math.round(regularPrice * 0.25);
+            const introPrice = Math.round(regularPrice * 0.50);
 
             // Use admin-set PKR prices when visitor is from Pakistan
             const pkrPlanKey = plan.slug as "starter" | "professional" | "enterprise";
             const useAdminPkr = isPKUser && pkrPricing != null;
             const pkrAmount = useAdminPkr ? (billing === "yearly" ? pkrPricing![pkrPlanKey].yearly : pkrPricing![pkrPlanKey].monthly) : 0;
             const displayRegular = useAdminPkr ? `₨${pkrAmount.toLocaleString("en-PK")}` : formatPrice(regularPrice);
-            const displayIntro   = useAdminPkr ? `₨${Math.round(pkrAmount * 0.25).toLocaleString("en-PK")}` : formatPrice(introPrice);
+            const displayIntro   = useAdminPkr ? `₨${Math.round(pkrAmount * 0.50).toLocaleString("en-PK")}` : formatPrice(introPrice);
             return (
               <div key={plan.slug} style={{ position: "relative", borderRadius: 22, background: plan.featured ? "linear-gradient(160deg,rgba(99,102,241,.16),rgba(255,255,255,.03))" : "rgba(255,255,255,.03)", border: `1.5px solid ${plan.border}`, overflow: "hidden", boxShadow: plan.featured ? "0 28px 80px rgba(99,102,241,.22)" : "0 10px 30px rgba(0,0,0,.16)" }}>
                 <div style={{ height: 3, background: plan.gradient }} />
@@ -678,7 +678,7 @@ export default function PricingPage() {
                   <div style={{ margin: "24px 0" }}>
                     <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
                       <span style={{ fontSize: 11, color: "rgba(255,255,255,.55)", textTransform: "uppercase", letterSpacing: ".06em", fontWeight: 800 }}>Now</span>
-                      <span style={{ padding: "2px 8px", borderRadius: 6, background: "rgba(249,115,22,.18)", border: "1px solid rgba(249,115,22,.4)", fontSize: 10, fontWeight: 800, color: "#fb923c" }}>75% OFF x 3 months</span>
+                      <span style={{ padding: "2px 8px", borderRadius: 6, background: "rgba(249,115,22,.18)", border: "1px solid rgba(249,115,22,.4)", fontSize: 10, fontWeight: 800, color: "#fb923c" }}>50% OFF x 3 months</span>
                     </div>
                     <div style={{ fontSize: 42, fontWeight: 900, color: plan.color, letterSpacing: "-.03em", lineHeight: 1 }}>{displayIntro}</div>
                     <div style={{ fontSize: 13, color: "rgba(255,255,255,.92)", marginTop: 6, fontWeight: 700 }}>

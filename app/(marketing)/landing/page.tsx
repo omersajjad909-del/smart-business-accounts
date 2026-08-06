@@ -176,7 +176,7 @@ const JSON_LD = {
           "name": "What is the pricing for FinovaOS?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "FinovaOS offers three plans: Starter ($49/mo), Professional ($99/mo), and Enterprise ($249/mo). A launch offer gives 75% off for the first 3 months on any plan. All plans include accounting, invoicing, inventory, and AI intelligence — no hidden add-ons.",
+            "text": "FinovaOS offers three plans: Starter ($49/mo), Professional ($99/mo), and Enterprise ($249/mo). A launch offer gives 50% off for the first 3 months on any plan. All plans include accounting, invoicing, inventory, and AI intelligence — no hidden add-ons.",
           },
         },
       ],
