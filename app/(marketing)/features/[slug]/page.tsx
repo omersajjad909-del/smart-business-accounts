@@ -553,7 +553,7 @@ export default async function FeaturePage({ params }: { params: Promise<{ slug: 
                 background: "rgba(251,191,36,.1)", border: "1px solid rgba(251,191,36,.25)",
                 fontSize: 11, fontWeight: 700, color: "#fbbf24",
               }}>
-                🏷️ 75% OFF — FIRST 3 MONTHS
+                🏷️ 50% OFF — FIRST 3 MONTHS
               </div>
               <h3 style={{ fontFamily:"'Lora',serif", fontSize:"clamp(18px,2.5vw,24px)", fontWeight:700, marginBottom:6, letterSpacing:"-.4px" }}>
                 Ready to try {m.title}?
