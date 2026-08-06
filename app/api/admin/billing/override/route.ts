@@ -7,7 +7,7 @@ import { requireAdmin, logAdminAction } from "@/lib/adminAuth";
   Actions:
     - EXTEND_TRIAL      — set currentPeriodEnd to future date, status → TRIALING
     - GRANT_FREE_ACCESS — set plan + status → ACTIVE + currentPeriodEnd
-    - RESET_INTRO_OFFER — delete BILLING_OFFER_CLAIM log (lets them use 75% off again)
+    - RESET_INTRO_OFFER — delete BILLING_OFFER_CLAIM log (lets them use 50% off again)
     - SET_STATUS        — manually override subscriptionStatus only
     - SET_EXTRA_SEATS   — set company-level additional seats on top of plan limit
     - ADD_NOTE          — add an internal audit note

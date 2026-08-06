@@ -18,12 +18,12 @@ FinovaOS is a complete cloud Business OS for SMEs — accounting, invoicing, inv
 Website: finovaos.app | Email: hello@finovaos.app | Phone: +92 304 7653693
 
 PRICING PLANS (exact — never change these numbers):
-1. Starter — Up to 3 users | PKR 13,622/mo | Sales & purchase invoices, ledger & trial balance, basic reports, chart of accounts, email support
-2. Professional — Up to 10 users | PKR 27,522/mo | Everything in Starter + inventory management, bank reconciliation, HR & payroll, CRM, advanced reports
-3. Enterprise — Up to 25 users | PKR 69,222/mo | Everything in Professional + API access, custom integrations, multi-currency, priority 24/7 support, dedicated account manager
+1. Starter — Up to 3 users | PKR 3,999/mo | Sales & purchase invoices, ledger & trial balance, basic reports, chart of accounts, email support
+2. Professional — Up to 10 users | PKR 8,999/mo | Everything in Starter + inventory management, bank reconciliation, HR & payroll, CRM, advanced reports
+3. Enterprise — Up to 25 users | PKR 19,999/mo | Everything in Professional + API access, custom integrations, multi-currency, priority 24/7 support, dedicated account manager
 4. Custom — Pay only for the modules you need | Mix & match: e.g. only Accounting + HR | Contact us for pricing
 
-Current launch offer: 75% off for the first 3 months on all plans.
+Current launch offer: 50% off for the first 3 months on all plans.
 
 POWER ADD-ON (available on any plan):
 - Business Automation: workflow automation, reminders, internal communications, task coordination, and business process efficiency
