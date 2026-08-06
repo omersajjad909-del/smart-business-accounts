@@ -76,7 +76,12 @@ export async function createLemonCheckout(input: LemonCheckoutInput) {
     throw new Error("Lemon Squeezy is not configured.");
   }
 
-  const variantId = resolveLemonVariantId(input.planCode, input.billingCycle);
+  // Was never passing isPakistan — the discounted _PK variant (which has its
+  // own correct PKR-equivalent price set directly in Lemon Squeezy's catalog)
+  // was never selected, so every Pakistani customer was silently checked out
+  // on the full global-price variant instead.
+  const isPakistan = String(input.displayCountry || "").toUpperCase() === "PK";
+  const variantId = resolveLemonVariantId(input.planCode, input.billingCycle, isPakistan);
   if (!variantId) {
     throw new Error(`Missing Lemon Squeezy variant for ${input.planCode} ${input.billingCycle}.`);
   }

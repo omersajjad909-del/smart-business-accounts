@@ -160,6 +160,17 @@ export async function POST(req: NextRequest) {
 
     if (hasLemonSqueezyConfig()) {
       const base = getRuntimeAppUrl(req.nextUrl.origin);
+      // The Lemon Squeezy "_PK" variant already carries the correct
+      // discounted PKR-equivalent price directly in Lemon Squeezy's own
+      // catalog. Sending customPriceUsd (always computed from the *global*
+      // USD pricing) would override it with the full international rate —
+      // exactly what silently charged Pakistani customers the world price.
+      // Only override when it's actually needed: Custom-plan pricing is
+      // always dynamic, and seat add-ons must be added on top of the base
+      // price (PK-specific seat pricing doesn't exist yet, so seat add-ons
+      // still price in USD for PK customers — a known follow-up gap, but the
+      // common case of a plain plan signup now charges the right amount).
+      const skipCustomPriceForPk = isPkrCustomer && planCode !== "CUSTOM" && seatAddonCycleAmount <= 0;
       const checkout = await createLemonCheckout({
         planCode,
         billingCycle,
@@ -172,7 +183,7 @@ export async function POST(req: NextRequest) {
         couponCode,
         displayCurrency: displayCurrency || company.baseCurrency,
         displayCountry: displayCountry || company.country,
-        customPriceUsd: finalCustomPrice > 0 ? finalCustomPrice : null,
+        customPriceUsd: skipCustomPriceForPk ? null : (finalCustomPrice > 0 ? finalCustomPrice : null),
       });
 
       await prisma.activityLog.create({
