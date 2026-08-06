@@ -404,7 +404,7 @@ export default function SignupByPlanPage() {
           if (sourcePlan) {
             const amount = billingCycle === "yearly"
               ? Math.round(Number(sourcePlan.yearly || 0))
-              : Math.round(Number(sourcePlan.monthly || 0) * 0.25);
+              : Math.round(Number(sourcePlan.monthly || 0) * 0.50);
             setPrice(`₨${amount.toLocaleString("en-PK")}`);
             return;
           }
@@ -414,7 +414,7 @@ export default function SignupByPlanPage() {
         if (baseMonthly !== null) {
           const rate = (rates && rates[cur]) || FX_USD[cur] || 1;
           const sym = CURRENCY_SYMBOL[cur] || "";
-          const usd = billingCycle === "yearly" ? Math.round(baseMonthly * 12 * 0.8) : Math.round(baseMonthly * 0.25);
+          const usd = billingCycle === "yearly" ? Math.round(baseMonthly * 12 * 0.8) : Math.round(baseMonthly * 0.50);
           const localized = Math.round((usd * rate + Number.EPSILON) * 100) / 100;
           setPrice(`${sym}${localized}`);
         }
