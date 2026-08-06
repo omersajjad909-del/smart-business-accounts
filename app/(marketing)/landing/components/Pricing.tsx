@@ -409,7 +409,7 @@ export default function PricingSection() {
             </span>
           </h2>
           <p style={{fontSize:16,color:"rgba(255,255,255,.4)",lineHeight:1.8,maxWidth:480,margin:"0 auto 32px"}}>
-            75% off for your first 3 months. No hidden fees. Cancel anytime.
+            50% off for your first 3 months. No hidden fees. Cancel anytime.
           </p>
 
           {/* Monthly / Yearly toggle + Currency selector row */}
