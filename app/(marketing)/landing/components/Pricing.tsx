@@ -171,7 +171,7 @@ function PlanCard({ plan, billing, prices, vis, i, currency, planLimits, planHig
   const raw      = isCustom ? null : prices[plan.key as keyof Prices];
   const priceUSD = raw ? (billing === "yearly" ? Math.round(raw.yearly / 12) : raw.monthly) : 0;
   const normalUSD= raw ? raw.monthly : 0;
-  const first3USD= Math.round(priceUSD * 0.25); // 75% off
+  const first3USD= Math.round(priceUSD * 0.50); // 50% off
   const fmt      = (usd: number) => formatFromUSD(usd, currency);
   const sym      = CURRENCY_SYMBOL[currency] || currency;
 
@@ -228,11 +228,11 @@ function PlanCard({ plan, billing, prices, vis, i, currency, planLimits, planHig
           </>
         ) : (
           <>
-            {/* Original price + 75% off badge — small row */}
+            {/* Original price + 50% off badge — small row */}
             <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:6 }}>
               <span style={{ fontSize:13, color:"rgba(255,255,255,.35)", textDecoration:"line-through" }}>{fmt(normalUSD)}/mo</span>
               <span style={{ padding:"2px 8px", borderRadius:6, background:"rgba(249,115,22,.2)", border:"1px solid rgba(249,115,22,.4)", fontSize:10, fontWeight:800, color:"#fb923c" }}>
-                75% OFF × 3 months
+                50% OFF × 3 months
               </span>
             </div>
             {/* Discounted price — big */}
