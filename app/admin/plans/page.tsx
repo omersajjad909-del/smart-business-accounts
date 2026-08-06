@@ -502,7 +502,7 @@ export default function AdminPlansPage() {
           <div style={{ marginTop: 20, padding: "14px 18px", borderRadius: 12, background: "rgba(251,191,36,.06)", border: "1px solid rgba(251,191,36,.15)", display: "flex", alignItems: "center", gap: 12 }}>
             <span style={{ fontSize: 22 }}>🎁</span>
             <div style={{ fontSize: 13, color: "#fbbf24" }}>
-              <strong>75% intro offer</strong> is applied via Stripe coupon <code style={{ background: "rgba(255,255,255,.06)", padding: "1px 6px", borderRadius: 4, fontSize: 11 }}>STRIPE_COUPON_75_OFF</code> env variable — not stored here.
+              <strong>50% intro offer</strong> is applied via the Lemon Squeezy coupon set in the <code style={{ background: "rgba(255,255,255,.06)", padding: "1px 6px", borderRadius: 4, fontSize: 11 }}>LEMONSQUEEZY_LAUNCH_DISCOUNT</code> env variable — not stored here.
             </div>
           </div>
         </Card>

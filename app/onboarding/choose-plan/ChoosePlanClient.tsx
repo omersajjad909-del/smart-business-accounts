@@ -262,7 +262,22 @@ export default function ChoosePlanPage() {
   }
 
   // ── Addon purchase page ───────────────────────────────────────────────────
+  const hideAutomationAddon = true;
+
   if (addonMode) {
+    if (hideAutomationAddon) {
+      return (
+        <div style={{ minHeight: "100vh", padding: "120px 24px", background: "linear-gradient(160deg,#06071a 0%,#0c0f2e 50%,#080c1e 100%)", color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", textAlign: "center" }}>
+          <div style={{ maxWidth: 680 }}>
+            <div style={{ fontSize: "clamp(2rem,4vw,3rem)", fontWeight: 900, marginBottom: 24 }}>Operations Automation add-on is temporarily unavailable</div>
+            <p style={{ fontSize: 17, color: "rgba(255,255,255,.72)", lineHeight: 1.8 }}>
+              This add-on purchase flow is currently hidden while we update the offering. Please use the main plan selection pages instead.
+            </p>
+          </div>
+        </div>
+      );
+    }
+
     const monthlyUsd = 79;
     const yearlyUsd  = 69;
     const price = billing === "yearly" ? formatPrice(yearlyUsd) : formatPrice(monthlyUsd);

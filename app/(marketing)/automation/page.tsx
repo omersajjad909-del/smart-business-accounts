@@ -191,10 +191,24 @@ export default function AutomationLandingPage() {
   const [roiDeal, setRoiDeal] = useState(500);
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   const [heroRef, heroVis] = useInView();
+  const hideAutomationPage = true;
 
   const roiRevenue = Math.round((roiLeads * roiConvert / 100) * roiDeal);
   const roiReturn = roiRevenue - 79;
   const roiMultiple = roiReturn > 0 ? Math.round(roiReturn / 79) : 0;
+
+  if (hideAutomationPage) {
+    return (
+      <div style={{ minHeight: "100vh", padding: "120px 24px", background: "#050812", color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", textAlign: "center" }}>
+        <div style={{ maxWidth: 680 }}>
+          <div style={{ fontSize: "clamp(2rem,4vw,3rem)", fontWeight: 900, marginBottom: 24 }}>Operations Automation page is temporarily hidden</div>
+          <p style={{ fontSize: 17, color: "rgba(255,255,255,.72)", lineHeight: 1.8 }}>
+            This page is currently unavailable while we update the product offering. The automation add-on is being reviewed and refreshed before it becomes visible again.
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div style={{ fontFamily: F, background: "#050812", color: "#e2e8f0", overflowX: "hidden" }}>

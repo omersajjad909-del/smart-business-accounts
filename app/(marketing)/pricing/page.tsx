@@ -805,7 +805,7 @@ export default function PricingPage() {
         </div>
 
         {/* ── AUTOMATION ADD-ON ────────────────────────────────── */}
-        <div style={{ marginBottom: 80 }}>
+        <div style={{ marginBottom: 80, display: "none" }}>
           <div style={{ textAlign: "center", marginBottom: 36 }}>
             <div style={{ display: "inline-flex", alignItems: "center", gap: 8, background: "rgba(124,58,237,.12)", border: "1px solid rgba(124,58,237,.28)", borderRadius: 100, padding: "5px 14px", fontSize: 12, color: "#a78bfa", fontWeight: 700, marginBottom: 16 }}>
               ⚡ Power Add-On
