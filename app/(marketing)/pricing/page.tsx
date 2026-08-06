@@ -814,7 +814,7 @@ export default function PricingPage() {
               Add Business Automation to any plan
             </h2>
             <p style={{ color: "rgba(255,255,255,.42)", fontSize: 15, maxWidth: 560, margin: "0 auto" }}>
-              Turn FinovaOS into a complete business growth engine. Available on Starter, Professional, and Enterprise.
+              Turn FinovaOS into a complete business efficiency add-on. Available on Starter, Professional, and Enterprise.
             </p>
           </div>
 
@@ -861,7 +861,7 @@ export default function PricingPage() {
                     { icon: "💬", label: "WhatsApp Auto-Reply", sub: "AI replies 24/7" },
                     { icon: "📧", label: "Email Drip Campaigns", sub: "Auto nurture leads" },
                     { icon: "🤖", label: "Website Chatbot", sub: "1 script tag embed" },
-                    { icon: "🎯", label: "CRM Lead Capture", sub: "FB Ads + web + WA" },
+                    { icon: "🎯", label: "CRM Lead Capture", sub: "Web + WA + lead forms" },
                     { icon: "🔗", label: "Zapier / Make", sub: "5,000+ app connects" },
                     { icon: "📱", label: "Social Auto-Post", sub: "FB · IG · LinkedIn" },
                     { icon: "📊", label: "Google Sheets Sync", sub: "1-click export" },

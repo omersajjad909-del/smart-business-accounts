@@ -130,11 +130,11 @@ export default function AdminAutomationPage() {
         <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 6 }}>
           <div style={{ fontSize: 28 }}>⚡</div>
           <h1 style={{ fontSize: 26, fontWeight: 800, margin: 0, background: "linear-gradient(135deg,#a78bfa,#38bdf8)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
-            Marketing Automation
+            Business Automation
           </h1>
         </div>
         <p style={{ margin: 0, color: "rgba(255,255,255,.4)", fontSize: 14 }}>
-          FinovaOS marketing — WhatsApp blasts, email campaigns, AI content, lead management
+          FinovaOS business automation — WhatsApp workflows, email sequences, AI content, lead management
         </p>
       </div>
 

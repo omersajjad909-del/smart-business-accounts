@@ -16,7 +16,7 @@ const sections = [
   { name: 'Business Modules', icon: '🧩', href: '/admin/business-modules' },
 { name: 'Feature Flags', icon: '🚩', href: '/admin/feature-flags' },
   { name: 'Broadcasts', icon: '📢', href: '/admin/broadcasts' },
-  { name: 'Marketing Automation', icon: '⚡', href: '/admin/automation' },
+  { name: 'Business Automation', icon: '⚡', href: '/admin/automation' },
   { name: 'Marketing Autopilot', icon: '🤖', href: '/admin/marketing-autopilot' },
   { name: 'CRM Workspace', icon: '🤝', href: '/admin/crm' },
   { name: 'Leads', icon: '🎯', href: '/admin/leads' },
