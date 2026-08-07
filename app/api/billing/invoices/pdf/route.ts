@@ -59,7 +59,6 @@ export async function GET(req: NextRequest): Promise<Response> {
           // "Failed to generate invoice PDF" error. billingCycle lives on
           // Subscription (already queried below and used as the source).
           name: true,
-          baseCurrency: true,
           plan: true,
           currentPeriodEnd: true,
           subscriptionStatus: true,
