@@ -3,8 +3,7 @@
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { getCurrentUser, setCurrentUser } from "@/lib/auth";
-import { FX_USD, formatFromUSD } from "@/lib/currency-client";
-import { getStoredCurrencyPreference, setStoredCurrencyPreference } from "@/lib/currencyPreference";
+import { formatFromUSD } from "@/lib/currency-client";
 import { getCustomPlanCycleAmountUsd, parseCustomModules } from "@/lib/customPlanPricing";
 
 /* ── Plan meta ──────────────────────────────────────────── */
@@ -128,8 +127,11 @@ export default function PaymentPage() {
   const customModuleIds = parseCustomModules(customModulesParam);
 
   const [billingCycle, setBillingCycle] = useState<"monthly"|"yearly">(urlCycle);
-  const [currency, setCurrency] = useState<string>(searchParams.get("currency") || "USD");
-  const [country,  setCountry]  = useState<string>(searchParams.get("country")  || "US");
+  // Seeded to global pricing and replaced by /api/public/pricing-region below.
+  // Deliberately not read from `?currency=` / `?country=` any more — those are
+  // caller-controlled and could promise a price checkout would not honour.
+  const [currency, setCurrency] = useState<string>("USD");
+  const [country,  setCountry]  = useState<string>("US");
   const [rates,    setRates]    = useState<Record<string, number> | null>(null);
   // Admin-set PKR-native pricing (same source /pricing and /onboarding/signup
   // use) — Pakistan must show THIS, not the USD price run through an FX rate.
@@ -272,9 +274,9 @@ export default function PaymentPage() {
     })();
   }, [searchParams]);
 
-  useEffect(() => {
-    if (currency) setStoredCurrencyPreference(currency, country);
-  }, [currency, country]);
+  // No currency preference is stored from this page any more — the region is
+  // resolved per-request from the IP, so persisting a choice would only give a
+  // stale currency a chance to reappear ahead of the authoritative one.
 
   // Pakistan sees only the Pakistan card option; everywhere else sees only
   // the 4 international methods — no mixing, so there's nothing to be

@@ -2,17 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import {
-  CURRENCY_LABEL,
-  FX_USD,
-  SUPPORTED_CURRENCIES,
-  formatFromUSD,
-} from "@/lib/currency-client";
-import {
-  FINOVA_CURRENCY_EVENT,
-  getStoredCurrencyPreference,
-  setStoredCurrencyPreference,
-} from "@/lib/currencyPreference";
+import { formatFromUSD } from "@/lib/currency-client";
 
 type BillingCycle = "monthly" | "yearly";
 type PlanPricing = {
@@ -404,31 +394,20 @@ export default function PricingPage() {
 
   useEffect(() => {
     (async () => {
-      const stored = getStoredCurrencyPreference();
-      if (stored.currency && FX_USD[stored.currency]) {
-        // User has a stored choice — use it, skip geo detection
-        setCurrency(stored.currency);
-        if (stored.country) setCountry(stored.country);
-        else if (stored.currency === "PKR") setCountry("PK");
-      } else {
-        // First-time visitor — detect from IP, but don't save automatically
-        try {
-          const geo = await fetch("/api/public/geo", { cache: "no-store" });
-          if (geo.ok) {
-            const d = await geo.json();
-            if (d?.currency && FX_USD[d.currency]) setCurrency(d.currency);
-            if (d?.country) setCountry(d.country);
-          }
-        } catch {}
-      }
-      // Always resolve the real IP country, independent of the stored/selected
-      // currency. Picking "PKR" from the dropdown is a display preference and
-      // must not unlock Pakistan's discounted price list to a visitor abroad.
+      // IP decides, nothing else. The stored-preference branch that used to be
+      // here let a saved "PKR" choice survive across visits and unlock the
+      // Pakistan price list from anywhere; /api/billing/checkout would then
+      // charge USD, so the page was advertising a price it could not honour.
       try {
-        const geo = await fetch("/api/public/geo", { cache: "no-store" });
-        if (geo.ok) {
-          const d = await geo.json();
-          if (d?.country) setGeoCountry(String(d.country).toUpperCase());
+        const res = await fetch("/api/public/pricing-region", { cache: "no-store" });
+        if (res.ok) {
+          const d = await res.json();
+          if (d?.currency) setCurrency(d.currency);
+          if (d?.country) {
+            const cc = String(d.country).toUpperCase();
+            setCountry(cc);
+            setGeoCountry(cc);
+          }
         }
       } catch {}
       try {
@@ -510,16 +489,10 @@ export default function PricingPage() {
     })();
   }, []);
 
-  useEffect(() => {
-    const handler = (e: Event) => {
-      const d = (e as CustomEvent<{ currency?: string; country?: string | null }>).detail;
-      if (d?.currency && FX_USD[d.currency]) setCurrency(d.currency);
-      if (d?.country) setCountry(d.country);
-      else if (d?.currency === "PKR") setCountry("PK");
-    };
-    window.addEventListener(FINOVA_CURRENCY_EVENT, handler as EventListener);
-    return () => window.removeEventListener(FINOVA_CURRENCY_EVENT, handler as EventListener);
-  }, []);
+  // The FINOVA_CURRENCY_EVENT listener that used to be here let any other
+  // component on the page push a currency into this one — another way the
+  // display could drift away from what checkout charges. Currency is now
+  // resolved once, from the IP, and nothing may override it.
 
   const yearlyDiscount = customPlanData.yearlyDiscount ?? 20;
   const seatRate = billing === "yearly" ? seatPricing.yearly : seatPricing.monthly;
@@ -660,19 +633,13 @@ export default function PricingPage() {
               </button>
             ))}
           </div>
-          <select value={currency} onChange={e => {
-              const c = e.target.value;
-              const newCountry = c === "PKR" ? "PK" : country;
-              setCurrency(c);
-              setCountry(newCountry);
-              setStoredCurrencyPreference(c, newCountry);
-              window.dispatchEvent(new CustomEvent(FINOVA_CURRENCY_EVENT, { detail: { currency: c, country: newCountry } }));
-            }} style={{ background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.09)", borderRadius: 12, padding: "9px 12px", color: "rgba(255,255,255,.8)", fontSize: 12, fontWeight: 700, outline: "none", cursor: "pointer", fontFamily: ff }}>
-            {SUPPORTED_CURRENCIES.map(code => <option key={code} value={code}>{code} - {CURRENCY_LABEL[code]}</option>)}
-          </select>
+          {/* The 30-currency picker is gone. Billing happens in exactly two
+              currencies — PKR for Pakistan, USD everywhere else — decided by
+              the visitor's IP, so offering a choice here could only ever
+              disagree with what checkout charges. */}
         </div>
         <div style={{ textAlign: "center", color: "rgba(255,255,255,.3)", fontSize: 12, marginBottom: 40 }}>
-          Showing prices in {currency} · Final billing currency confirmed at checkout
+          Showing prices in {currency} · this is the currency you will be billed in
         </div>
 
         {/* ── USE-CASE WIZARD ───────────────────────────────── */}

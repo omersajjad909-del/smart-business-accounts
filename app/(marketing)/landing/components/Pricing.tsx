@@ -329,38 +329,19 @@ export default function PricingSection() {
       .catch(() => {});
   }, []);
 
-  // Auto-detect currency from location
+  // Currency comes from the visitor's IP and nothing else — same answer
+  // /pricing and /api/billing/checkout get, so the landing page cannot quote a
+  // currency the checkout will not bill in. The stored-preference branch and
+  // the manual picker that used to live here are gone.
   useEffect(() => {
-    const stored = getStoredCurrencyPreference();
-    if (stored.currency && FX_USD[stored.currency]) {
-      // User has previously chosen a currency — respect it, skip geo
-      setCurrency(stored.currency);
-      if (stored.country) setCountry(stored.country);
-    } else {
-      // First-time visitor — detect from IP, but don't save (user must choose manually)
-      fetch("/api/public/geo", { cache: "no-store" })
-        .then(r => r.ok ? r.json() : null)
-        .then(d => {
-          if (d?.currency && FX_USD[d.currency]) {
-            setCurrency(d.currency);
-            if (d.country) setCountry(d.country);
-          }
-        })
-        .catch(() => {});
-    }
-    const onCurrencyChanged = (event: Event) => {
-      const detail = (event as CustomEvent<{ currency?: string; country?: string | null }>).detail;
-      if (detail?.currency && FX_USD[detail.currency]) setCurrency(detail.currency);
-    };
-    window.addEventListener(FINOVA_CURRENCY_EVENT, onCurrencyChanged as EventListener);
-    return () => window.removeEventListener(FINOVA_CURRENCY_EVENT, onCurrencyChanged as EventListener);
+    fetch("/api/public/pricing-region", { cache: "no-store" })
+      .then(r => r.ok ? r.json() : null)
+      .then(d => {
+        if (d?.currency) setCurrency(d.currency);
+        if (d?.country) setCountry(String(d.country).toUpperCase());
+      })
+      .catch(() => {});
   }, []);
-
-  function handleCurrencyChange(code: string) {
-    setCurrency(code);
-    setStoredCurrencyPreference(code, country);
-    window.dispatchEvent(new CustomEvent(FINOVA_CURRENCY_EVENT, { detail: { currency: code, country } }));
-  }
 
   function price(usd: number) {
     return formatFromUSD(usd, currency);
