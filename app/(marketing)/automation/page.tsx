@@ -16,199 +16,160 @@ function useInView() {
   return [ref, vis] as const;
 }
 
-// ─── Features ─────────────────────────────────────────────────────────────────
+// ─── Features — operational business-process automation only. No marketing,
+// no customer outreach/campaigns, no lead capture or social posting. ─────────
 const FEATURES = [
   {
-    icon: "💬",
-    title: "WhatsApp Auto-Reply",
+    icon: "🔔",
+    title: "Overdue Invoice Reminders",
     color: "#22c55e",
     glow: "rgba(34,197,94,.15)",
     border: "rgba(34,197,94,.25)",
-    tagline: "Never miss a customer message — even at 3am",
-    description: "When a customer messages your WhatsApp Business number, our AI reads the message and sends an intelligent, context-aware reply instantly. You configure the personality and knowledge — we handle the rest 24/7.",
+    tagline: "Never chase a late payment by hand again",
+    description: "FinovaOS automatically scans your sales invoices for overdue due dates and gives you a ready-to-send reminder queue. Review the list, send with one click — no spreadsheets, no manual follow-up tracking.",
     bullets: [
-      "AI replies in seconds, day or night",
-      "Trained on your business info & FAQs",
-      "Handles price inquiries, order status, complaints",
-      "Hands off to human when needed",
-      "Full conversation logs in your dashboard",
+      "Auto-detected from your invoice due dates",
+      "One-click reminder email to the customer on file",
+      "Aging view: how many days overdue, per invoice",
+      "You stay in control — nothing sends without your review",
+      "Full send history logged in your dashboard",
     ],
-    roi: "Average business misses 60% of WhatsApp messages. Each missed message = lost sale.",
-    value: "Replaces a dedicated WhatsApp operator ($200–400/month)",
+    roi: "Businesses that follow up on overdue invoices within a week recover payment far more often than those who wait a month.",
+    value: "Cuts the hours your team spends manually tracking who owes what",
   },
   {
-    icon: "📧",
-    title: "Email Drip Campaigns",
+    icon: "📦",
+    title: "Low Stock Reorder Alerts",
     color: "#38bdf8",
     glow: "rgba(56,189,248,.15)",
     border: "rgba(56,189,248,.25)",
-    tagline: "Turn cold leads into paying customers — automatically",
-    description: "Build multi-step email sequences that automatically nurture your leads over days or weeks. A new lead signs up → they get email 1 immediately → email 2 after 3 days → email 3 after 7 days. All on autopilot.",
+    tagline: "Know the moment stock runs low — not after it's gone",
+    description: "Set a reorder threshold per item once. FinovaOS watches your live inventory and flags anything that drops below it, so you reorder before you're out — not after a customer asks for something you don't have.",
     bullets: [
-      "Unlimited campaigns with unlimited steps",
-      "AI-generated email body (no copywriter needed)",
-      "Personalized with customer name & details",
-      "Pause, edit, or stop campaigns anytime",
-      "Open/click tracking (coming soon)",
+      "Per-item reorder threshold, set once",
+      "Live dashboard list of everything below threshold",
+      "Email alert when an item crosses the line",
+      "Works across every warehouse/branch you track",
+      "No manual stock-count spreadsheets needed",
     ],
-    roi: "Email drip campaigns have 3–10x higher ROI than one-time email blasts.",
-    value: "Replaces Mailchimp ($150/mo) + copywriter ($500+/month)",
+    roi: "Stockouts cost sales on the spot. Reorder alerts catch the gap before a customer ever notices.",
+    value: "Replaces manual stock-count checklists and spreadsheet trackers",
   },
   {
-    icon: "🤖",
-    title: "Website Chatbot",
+    icon: "📊",
+    title: "Scheduled Financial Reports",
     color: "#a78bfa",
     glow: "rgba(167,139,250,.15)",
     border: "rgba(167,139,250,.25)",
-    tagline: "Convert website visitors into leads while you sleep",
-    description: "Embed a smart AI chatbot on your website with a single line of code. Visitors get instant answers about your products, pricing, and services. The chatbot collects their contact info and passes it to your CRM automatically.",
+    tagline: "Your P&L in your inbox — without asking anyone",
+    description: "Pick the reports you want (P&L, Balance Sheet, Trial Balance, Cash Flow), pick who should get them, pick the schedule. FinovaOS generates and delivers them automatically — every week, every month, on autopilot.",
     bullets: [
-      "One script tag — works on any website",
-      "Fully customizable color, name & greeting",
-      "AI trained on your business information",
-      "Auto-collects leads into your CRM",
-      "Mobile responsive, works everywhere",
+      "P&L, Balance Sheet, Trial Balance, Cash Flow",
+      "Weekly or monthly delivery",
+      "Send to owner, accountant, or any recipient list",
+      "Same report data as your live Reports section",
+      "Pause or change the schedule anytime",
     ],
-    roi: "Websites with live chat convert 3.5x more visitors than those without.",
-    value: "Replaces Intercom / Drift ($74–400/month)",
+    roi: "No more asking your accountant for numbers or manually exporting reports every month.",
+    value: "Keeps leadership informed without anyone having to remember to run a report",
   },
   {
-    icon: "🎯",
-    title: "Lead Capture & CRM",
+    icon: "✅",
+    title: "Approval Workflow Automation",
     color: "#fb923c",
     glow: "rgba(251,146,60,.15)",
     border: "rgba(251,146,60,.25)",
-    tagline: "Every lead captured, tracked, and followed up",
-    description: "Capture leads from multiple sources — your website chatbot, Facebook Lead Ads, WhatsApp, manual entry, and inbound webhooks from Zapier. All leads land in one clean CRM with status tracking and auto-follow-up.",
+    tagline: "Spending controls that enforce themselves",
+    description: "Set a threshold — any Purchase Order or expense voucher above it automatically routes for manager approval before it goes through. No more surprise spending, no more chasing sign-offs over WhatsApp.",
     bullets: [
-      "Facebook Lead Ads direct integration",
-      "Website chatbot lead capture",
-      "WhatsApp inquiry auto-capture",
-      "Lead pipeline: New → Contacted → Qualified → Won",
-      "Auto-WhatsApp greeting on new lead",
+      "Set your own approval threshold per document type",
+      "Purchase Orders and expense vouchers covered",
+      "Automatic routing — no manual escalation needed",
+      "Full approval trail for audits",
+      "Approve or reject right from your dashboard",
     ],
-    roi: "Businesses that follow up within 5 minutes are 9x more likely to convert.",
-    value: "Replaces HubSpot CRM ($50–400/month)",
+    roi: "Uncontrolled spending is one of the most common ways SMEs lose money silently. Threshold-based approval closes that gap.",
+    value: "Replaces informal 'ask before you spend' policies nobody actually follows",
+  },
+  {
+    icon: "🗄️",
+    title: "Automated Backups",
+    color: "#f472b6",
+    glow: "rgba(244,114,182,.15)",
+    border: "rgba(244,114,182,.25)",
+    tagline: "Your business data, backed up without thinking about it",
+    description: "Set a backup schedule once — daily or weekly — and FinovaOS takes care of the rest. Your company's financial and operational data is automatically snapshotted, so a mistake or outage never means starting over.",
+    bullets: [
+      "Daily or weekly automatic backups",
+      "No manual export-and-save routine",
+      "Restore points available from your dashboard",
+      "Runs quietly in the background",
+      "One less thing your team has to remember",
+    ],
+    roi: "Data loss from a single mistake can cost days of rework. Automated backups make that risk disappear.",
+    value: "Peace of mind that doesn't depend on someone remembering to do it",
   },
   {
     icon: "🔗",
     title: "Zapier / Make Webhooks",
-    color: "#f472b6",
-    glow: "rgba(244,114,182,.15)",
-    border: "rgba(244,114,182,.25)",
-    tagline: "Connect FinovaOS to 5,000+ apps — no code needed",
-    description: "Send data OUT to Zapier, Make, or n8n when events happen in FinovaOS (invoice paid, new lead, etc.). Receive data IN from any app via our secure inbound webhook tokens. Build complex automations without writing a single line of code.",
-    bullets: [
-      "Outbound: trigger Zapier on any FinovaOS event",
-      "Inbound: receive data from any app",
-      "HMAC-SHA256 signed for security",
-      "Create leads, send WhatsApp from Zaps",
-      "Connect Google Forms, Typeform, Calendly & more",
-    ],
-    roi: "Manual data entry costs businesses 10–20% of staff time. Webhooks eliminate it.",
-    value: "Replaces Zapier Professional ($49–799/month) for integrations",
-  },
-  {
-    icon: "📱",
-    title: "Social Media Auto-Posting",
-    color: "#ec4899",
-    glow: "rgba(236,72,153,.15)",
-    border: "rgba(236,72,153,.25)",
-    tagline: "Schedule once, publish everywhere",
-    description: "Write a post, select your platforms, pick a time — done. FinovaOS automatically publishes to Facebook, Instagram, and LinkedIn at the scheduled time. No more logging into 3 different apps every day.",
-    bullets: [
-      "Facebook Pages, Instagram Business, LinkedIn",
-      "Schedule posts in advance",
-      "Publish immediately or queue for later",
-      "Image support for Instagram",
-      "Post history with status tracking",
-    ],
-    roi: "Consistent social media presence increases brand awareness by 80% and generates 3x more leads.",
-    value: "Replaces Buffer / Hootsuite ($18–99/month)",
-  },
-  {
-    icon: "📊",
-    title: "Google Sheets Sync",
     color: "#34d399",
     glow: "rgba(52,211,153,.15)",
     border: "rgba(52,211,153,.25)",
-    tagline: "Your data in Google Sheets — always up to date",
-    description: "Connect your Google Spreadsheet and sync your FinovaOS data with one click. Leads, customers, contacts — exported instantly to a Google Sheet that your team can access and share. Perfect for reporting, analysis, and sharing with stakeholders.",
+    tagline: "Connect FinovaOS to 5,000+ business apps — no code needed",
+    description: "Send data OUT to Zapier, Make, or n8n when business events happen in FinovaOS — an invoice gets paid, stock crosses a threshold, a PO is approved. Receive data IN from any app via secure inbound webhook tokens. Build cross-tool automations without writing code.",
     bullets: [
-      "One-click sync of leads & customers",
-      "Custom column mapping",
-      "Works with Google Service Account (no login needed)",
-      "Auto-append — doesn't overwrite existing data",
-      "Share with your team or investors instantly",
+      "Outbound: trigger Zapier/Make on any FinovaOS event",
+      "Inbound: receive data from any connected app",
+      "HMAC-SHA256 signed for security",
+      "Connect Google Forms, Sheets, ERPs & more",
+      "Build multi-step business workflows across tools",
     ],
-    roi: "Finance teams spend 4–6 hours/week manually copying data to spreadsheets.",
-    value: "Replaces Coupler.io / Sheetgo ($19–49/month)",
+    roi: "Manual data re-entry between business tools costs staff hours every week. Webhooks eliminate it entirely.",
+    value: "Ties FinovaOS into whatever else runs your business",
   },
   {
-    icon: "✍️",
-    title: "AI Content Generator",
+    icon: "📈",
+    title: "Google Sheets Sync",
     color: "#fbbf24",
     glow: "rgba(251,191,36,.15)",
     border: "rgba(251,191,36,.25)",
-    tagline: "Professional marketing content in 10 seconds",
-    description: "Generate high-quality social media posts, email campaigns, ad copy, product descriptions, and WhatsApp messages using FinovaOS AI. Just describe what you want — get ready-to-publish content in English or Urdu instantly.",
+    tagline: "Your operational data in Google Sheets — always current",
+    description: "Connect a Google Spreadsheet and sync your FinovaOS business data with one click — invoices, inventory, ledger entries. Always up to date, ready to share with your accountant, partners, or investors.",
     bullets: [
-      "Social posts, email, ad copy, WhatsApp, blog",
-      "English and Urdu / Roman Urdu support",
-      "Tone control: professional, casual, persuasive",
-      "Keyword injection for SEO",
-      "Generates 150–1000 words in seconds",
+      "One-click sync of invoices, inventory & ledger data",
+      "Custom column mapping",
+      "Works with a Google Service Account (no login sharing needed)",
+      "Auto-append — never overwrites existing data",
+      "Share instantly with your team or stakeholders",
     ],
-    roi: "A freelance copywriter charges $15–50 per piece. You'll generate hundreds per month.",
-    value: "Replaces Jasper AI / Copy.ai ($49–125/month)",
+    roi: "Finance teams spend hours a week manually copying numbers into spreadsheets for outside review.",
+    value: "Keeps everyone working from the same live numbers",
   },
 ];
 
 const COMPARE_TOOLS = [
-  { tool: "WhatsApp Auto-Reply only (WATI/AiSensy)", price: "$49–199/mo" },
-  { tool: "Email automation (Mailchimp/ActiveCampaign)", price: "$50–149/mo" },
-  { tool: "Website chatbot (Intercom/Drift)", price: "$74–374/mo" },
-  { tool: "CRM (HubSpot/Pipedrive)", price: "$50–400/mo" },
-  { tool: "Social scheduler (Buffer/Hootsuite)", price: "$18–99/mo" },
+  { tool: "Invoice reminder / AR automation tools", price: "$20–60/mo" },
+  { tool: "Inventory reorder alert add-ons", price: "$15–49/mo" },
+  { tool: "Scheduled reporting tools", price: "$29–99/mo" },
+  { tool: "Approval workflow software", price: "$25–79/mo" },
+  { tool: "Automated backup services", price: "$10–39/mo" },
   { tool: "Zapier Pro", price: "$49–799/mo" },
-  { tool: "AI content (Jasper/Copy.ai)", price: "$49–125/mo" },
-  { tool: "Google Sheets sync (Coupler.io)", price: "$19–49/mo" },
+  { tool: "Sheet-sync tools (Coupler.io)", price: "$19–49/mo" },
 ];
 
 const FAQS = [
   { q: "Can I buy only the Automation add-on without a main plan?", a: "The Automation add-on is available with any active FinovaOS plan: Starter, Professional, or Enterprise. You need an active base plan first." },
-  { q: "What is required for WhatsApp Auto-Reply?", a: "You need a WhatsApp Business API account (via Meta). You can apply through Meta Business Suite, and setup usually takes 1-3 days. We provide a step-by-step guide." },
-  { q: "Can AI content be generated in Urdu as well?", a: "Yes. FinovaOS AI can generate content in both Urdu and Roman Urdu. You can choose your preferred language from the language dropdown." },
-  { q: "Is it difficult to add the chatbot to my website?", a: "Not at all. Copy one script tag and paste it before </body> on your website. No complex coding required, and setup takes about 2 minutes." },
-  { q: "Can I import existing leads?", a: "Yes. You can upload leads via Excel/CSV using the import wizard. This feature is available on Professional and Enterprise plans." },
-  { q: "Is a demo available?", a: "Yes, you can book a personalized demo where we show the automation setup for your business. Click 'Get Started' to book." },
+  { q: "Is anything sent automatically without my approval?", a: "Overdue invoice reminders are queued for your review — you send them with one click, nothing goes out on its own. Scheduled reports and low-stock/backup alerts run on the schedule you set, and you can pause or change it anytime." },
+  { q: "Does this include any marketing or customer outreach tools?", a: "No. This add-on is purely internal business-process automation — invoice reminders, stock alerts, reporting, approvals, backups, and data integrations. It does not include email/SMS marketing campaigns, social media posting, or lead-generation tools." },
+  { q: "What is required to set up the approval workflow?", a: "Just set your approval threshold amount in the dashboard — no external accounts or integrations needed. It works immediately for Purchase Orders and expense vouchers." },
+  { q: "Can I connect this to tools outside FinovaOS?", a: "Yes — via the Zapier/Make webhooks and Google Sheets sync, you can connect FinovaOS events and data to thousands of other business apps." },
+  { q: "Is a demo available?", a: "Yes — reach out via live chat or the contact form and we'll walk you through the add-on for your business." },
 ];
 
 // ─── PAGE ─────────────────────────────────────────────────────────────────────
 export default function AutomationLandingPage() {
-  const [roiLeads, setRoiLeads] = useState(50);
-  const [roiConvert, setRoiConvert] = useState(10);
-  const [roiDeal, setRoiDeal] = useState(500);
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   const [heroRef, heroVis] = useInView();
-  const hideAutomationPage = true;
-
-  const roiRevenue = Math.round((roiLeads * roiConvert / 100) * roiDeal);
-  const roiReturn = roiRevenue - 79;
-  const roiMultiple = roiReturn > 0 ? Math.round(roiReturn / 79) : 0;
-
-  if (hideAutomationPage) {
-    return (
-      <div style={{ minHeight: "100vh", padding: "120px 24px", background: "#050812", color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", textAlign: "center" }}>
-        <div style={{ maxWidth: 680 }}>
-          <div style={{ fontSize: "clamp(2rem,4vw,3rem)", fontWeight: 900, marginBottom: 24 }}>Operations Automation page is temporarily hidden</div>
-          <p style={{ fontSize: 17, color: "rgba(255,255,255,.72)", lineHeight: 1.8 }}>
-            This page is currently unavailable while we update the product offering. The automation add-on is being reviewed and refreshed before it becomes visible again.
-          </p>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div style={{ fontFamily: F, background: "#050812", color: "#e2e8f0", overflowX: "hidden" }}>
@@ -230,14 +191,14 @@ export default function AutomationLandingPage() {
 
           <h1 style={{ fontSize: "clamp(2.2rem, 5vw, 3.8rem)", fontWeight: 900, margin: "0 0 20px", lineHeight: 1.15 }}>
             <span style={{ background: "linear-gradient(135deg,#a78bfa,#38bdf8,#34d399)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
-              8 Powerful Automations
+              Business Automation
             </span>
             <br />
-            <span style={{ color: "#fff" }}>in One Add-On</span>
+            <span style={{ color: "#fff" }}>that runs your operations</span>
           </h1>
 
           <p style={{ fontSize: "clamp(1rem, 2vw, 1.2rem)", color: "rgba(255,255,255,.6)", maxWidth: 620, margin: "0 auto 36px", lineHeight: 1.7 }}>
-            WhatsApp auto-reply, email drip campaigns, AI chatbot, social media posting, lead capture, webhooks, Google Sheets sync, and AI content generation — all for <strong style={{ color: "#fff" }}>$79/month</strong>.
+            Overdue invoice reminders, low-stock alerts, scheduled reports, approval workflows, automated backups, and business-app integrations — all for <strong style={{ color: "#fff" }}>$79/month</strong>.
           </p>
 
           <div style={{ display: "flex", gap: 14, justifyContent: "center", flexWrap: "wrap" }}>
@@ -259,7 +220,7 @@ export default function AutomationLandingPage() {
 
           {/* Mini feature pills */}
           <div style={{ display: "flex", flexWrap: "wrap", gap: 10, justifyContent: "center", marginTop: 40 }}>
-            {["💬 WhatsApp AI", "📧 Email Drip", "🤖 Website Chatbot", "🎯 Lead CRM", "🔗 Webhooks", "📱 Social Media", "📊 Google Sheets", "✍️ AI Content"].map(f => (
+            {["🔔 Invoice Reminders", "📦 Low Stock Alerts", "📊 Scheduled Reports", "✅ Approval Workflows", "🗄️ Auto Backups", "🔗 Webhooks", "📈 Sheets Sync"].map(f => (
               <span key={f} style={{ padding: "5px 14px", borderRadius: 100, background: "rgba(255,255,255,.06)", border: "1px solid rgba(255,255,255,.1)", fontSize: 13, color: "rgba(255,255,255,.65)" }}>{f}</span>
             ))}
           </div>
@@ -273,7 +234,7 @@ export default function AutomationLandingPage() {
             Buying all these tools separately costs much more
           </h2>
           <p style={{ color: "rgba(255,255,255,.5)", fontSize: 15 }}>
-            You would pay <strong style={{ color: "#f87171" }}>$400-$2,200/month</strong> for all these tools combined -<br />
+            You would pay <strong style={{ color: "#f87171" }}>$150-$1,100/month</strong> for equivalent tools combined -<br />
             or just <strong style={{ color: "#34d399" }}>$79/month</strong> with FinovaOS Automation.
           </p>
         </div>
@@ -293,7 +254,7 @@ export default function AutomationLandingPage() {
         <div style={{ padding: "24px 32px", borderRadius: 16, background: "linear-gradient(135deg,rgba(34,197,94,.1),rgba(52,211,153,.05))", border: "2px solid rgba(34,197,94,.3)", textAlign: "center" }}>
           <div style={{ fontSize: 13, color: "#34d399", fontWeight: 600, marginBottom: 8 }}>FinovaOS Automation Add-On</div>
           <div style={{ fontSize: "2rem", fontWeight: 900, color: "#34d399" }}>$79 <span style={{ fontSize: "1rem", color: "rgba(255,255,255,.5)", fontWeight: 400 }}>/month</span></div>
-          <div style={{ fontSize: 13, color: "rgba(255,255,255,.5)", marginTop: 4 }}>All 8 features. One price. Cancel anytime.</div>
+          <div style={{ fontSize: 13, color: "rgba(255,255,255,.5)", marginTop: 4 }}>All 7 features. One price. Cancel anytime.</div>
         </div>
       </div>
 
@@ -313,68 +274,24 @@ export default function AutomationLandingPage() {
         </div>
       </div>
 
-      {/* ── ROI CALCULATOR ── */}
-      <div style={{ padding: "80px 24px", background: "rgba(255,255,255,.02)", borderTop: "1px solid rgba(255,255,255,.06)", borderBottom: "1px solid rgba(255,255,255,.06)" }}>
-        <div style={{ maxWidth: 700, margin: "0 auto" }}>
-          <div style={{ textAlign: "center", marginBottom: 40 }}>
-            <h2 style={{ fontSize: "clamp(1.6rem, 3vw, 2.2rem)", fontWeight: 800, margin: "0 0 10px" }}>
-              ROI Calculator
-            </h2>
-            <p style={{ color: "rgba(255,255,255,.5)", fontSize: 15 }}>See how much return you can generate from $79/month.</p>
-          </div>
-
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 20, marginBottom: 32 }}>
-            {[
-              { label: "Monthly leads (website + WhatsApp)", value: roiLeads, min: 5, max: 1000, step: 5, set: setRoiLeads },
-              { label: "Conversion rate (%)", value: roiConvert, min: 1, max: 50, step: 1, set: setRoiConvert },
-              { label: "Avg. deal value ($)", value: roiDeal, min: 50, max: 10000, step: 50, set: setRoiDeal },
-            ].map((s, i) => (
-              <div key={i} style={{ background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.08)", borderRadius: 14, padding: "18px 16px" }}>
-                <label style={{ display: "block", fontSize: 11, color: "rgba(255,255,255,.45)", marginBottom: 12, lineHeight: 1.4 }}>{s.label}</label>
-                <div style={{ fontSize: 24, fontWeight: 800, color: "#a78bfa", marginBottom: 12 }}>{s.value}{i === 1 ? "%" : i === 2 ? "$" : ""}</div>
-                <input type="range" min={s.min} max={s.max} step={s.step} value={s.value}
-                  onChange={e => s.set(Number(e.target.value))}
-                  style={{ width: "100%", accentColor: "#7c3aed" }} />
-              </div>
-            ))}
-          </div>
-
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 14 }}>
-            {[
-              { label: "Revenue from automation", value: `$${roiRevenue.toLocaleString()}`, color: "#34d399", sub: "per month" },
-              { label: "Cost of add-on", value: "$79", color: "#f87171", sub: "per month" },
-              { label: "Net return", value: roiMultiple > 0 ? `${roiMultiple}x ROI` : "—", color: "#fbbf24", sub: `$${Math.max(0, roiReturn).toLocaleString()} net profit` },
-            ].map((r, i) => (
-              <div key={i} style={{ background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.08)", borderRadius: 14, padding: "20px 18px", textAlign: "center" }}>
-                <div style={{ fontSize: 11, color: "rgba(255,255,255,.4)", marginBottom: 8 }}>{r.label}</div>
-                <div style={{ fontSize: 26, fontWeight: 900, color: r.color }}>{r.value}</div>
-                <div style={{ fontSize: 11, color: "rgba(255,255,255,.35)", marginTop: 4 }}>{r.sub}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-
       {/* ── WHAT'S INCLUDED ── */}
       <div style={{ padding: "80px 24px", maxWidth: 800, margin: "0 auto" }}>
         <div style={{ textAlign: "center", marginBottom: 48 }}>
           <h2 style={{ fontSize: "clamp(1.6rem, 3vw, 2.2rem)", fontWeight: 800, margin: "0 0 10px" }}>
             What is included in $79/month
           </h2>
-          <p style={{ color: "rgba(255,255,255,.5)", fontSize: 15 }}>No hidden fees. No per-message charges. One flat rate.</p>
+          <p style={{ color: "rgba(255,255,255,.5)", fontSize: 15 }}>No hidden fees. No per-action charges. One flat rate.</p>
         </div>
 
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
           {[
-            { icon: "💬", text: "WhatsApp auto-reply — unlimited conversations" },
-            { icon: "📧", text: "Email drip — unlimited campaigns & contacts" },
-            { icon: "🤖", text: "Website chatbot — embed on unlimited pages" },
-            { icon: "🎯", text: "CRM leads — unlimited lead capture & tracking" },
+            { icon: "🔔", text: "Overdue invoice reminder queue — unlimited" },
+            { icon: "📦", text: "Low stock alerts — unlimited items & branches" },
+            { icon: "📊", text: "Scheduled reports — unlimited recipients" },
+            { icon: "✅", text: "Approval workflows — POs & expense vouchers" },
+            { icon: "🗄️", text: "Automated backups — daily or weekly" },
             { icon: "🔗", text: "Webhooks — unlimited outbound & inbound tokens" },
-            { icon: "📱", text: "Social media — Facebook, Instagram, LinkedIn" },
-            { icon: "📊", text: "Google Sheets — unlimited syncs" },
-            { icon: "✍️", text: "AI content — unlimited generation (FinovaOS AI)" },
-            { icon: "📈", text: "Full analytics dashboard" },
+            { icon: "📈", text: "Google Sheets sync — unlimited syncs" },
             { icon: "🔒", text: "HMAC-signed webhooks for security" },
             { icon: "📞", text: "Priority support for add-on issues" },
             { icon: "🔄", text: "Cancel anytime, no lock-in" },
@@ -412,10 +329,10 @@ export default function AutomationLandingPage() {
       {/* ── CTA ── */}
       <div style={{ padding: "80px 24px", textAlign: "center", background: "radial-gradient(ellipse 60% 50% at 50% 100%, rgba(124,58,237,.2) 0%, transparent 70%)" }}>
         <h2 style={{ fontSize: "clamp(1.8rem, 3vw, 2.8rem)", fontWeight: 900, margin: "0 0 16px" }}>
-          Ready to grow your business on autopilot?
+          Ready to run your business on autopilot?
         </h2>
         <p style={{ color: "rgba(255,255,255,.5)", fontSize: 16, marginBottom: 36 }}>
-          No hidden fees. Cancel anytime. Full access to all 8 automation features.
+          No hidden fees. Cancel anytime. Full access to all automation features.
         </p>
         <Link href="/get-started" style={{
           display: "inline-block", padding: "16px 40px", borderRadius: 14,
