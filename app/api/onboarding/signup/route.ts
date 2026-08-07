@@ -61,7 +61,14 @@ export async function POST(req: NextRequest) {
           where: {
             userId: existing.id,
             action: {
-              notIn: ["SIGNUP", "USER_PHONE_SET", "VERIFY_OTP", "EMAIL_OTP"],
+              notIn: [
+                "SIGNUP",
+                "USER_PHONE_SET",
+                "VERIFY_OTP",
+                "EMAIL_OTP",
+                "COMPANY_COUNTRY_SET",
+                "ACCOUNT_VERIFIED",
+              ],
             },
           },
         })

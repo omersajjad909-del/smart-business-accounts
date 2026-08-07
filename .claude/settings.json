@@ -139,7 +139,13 @@
       "Bash(cp .env .env.bak-perf)",
       "Bash(sed -i '/^DATABASE_URL=/ s#:5432/postgres#:6543/postgres#; /^DATABASE_URL=/ s#connection_limit=10#connection_limit=1#' .env)",
       "Bash(awk '/^model ActivityLog/,/^}/' prisma/schema.prisma)",
-      "Bash(NODE_OPTIONS=--max-old-space-size=8192 npx tsc --noEmit -p tsconfig.json)"
+      "Bash(NODE_OPTIONS=--max-old-space-size=8192 npx tsc --noEmit -p tsconfig.json)",
+      "Bash(git update-ref *)",
+      "Bash(git tag *)",
+      "Bash(git reflog *)",
+      "Bash(git gc *)",
+      "Bash(git stash *)",
+      "Bash(git checkout *)"
     ],
     "additionalDirectories": [
       "d:\\projects\\smart-business-accounts\\app\\api\\chat\\conversations",
