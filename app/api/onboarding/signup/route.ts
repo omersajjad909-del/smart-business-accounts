@@ -50,36 +50,74 @@ export async function POST(req: NextRequest) {
     });
 
     if (existing) {
-      const hasSession = await prisma.session
-        .findFirst({
-          where: { userId: existing.id },
-        })
-        .catch(() => null);
+      // Everything the onboarding funnel itself writes. Reaching any of these
+      // only proves the visitor started signing up — not that an account worth
+      // protecting exists. Verifying the email logs several of them *and*
+      // creates a Session, which is why a `session` lookup used to be here and
+      // why abandoning checkout after the OTP left the address permanently
+      // unusable: the user was told "already registered" but had no plan, no
+      // data and nothing to log in to.
+      const ONBOARDING_ONLY_ACTIONS = [
+        "SIGNUP",
+        "USER_PHONE_SET",
+        "VERIFY_OTP",
+        "EMAIL_OTP",
+        "COMPANY_COUNTRY_SET",
+        "ACCOUNT_VERIFIED",
+        "LOGIN",
+        "LOGOUT",
+        "LOGIN_FAILED",
+      ];
 
-      const hasActivity = await prisma.activityLog
-        .findFirst({
-          where: {
-            userId: existing.id,
-            action: {
-              notIn: [
-                "SIGNUP",
-                "USER_PHONE_SET",
-                "VERIFY_OTP",
-                "EMAIL_OTP",
-                "COMPANY_COUNTRY_SET",
-                "ACCOUNT_VERIFIED",
-              ],
+      const [realActivity, paidCompany, sharedCompany] = await Promise.all([
+        // Any action beyond the funnel means the product was actually used.
+        prisma.activityLog
+          .findFirst({
+            where: {
+              userId: existing.id,
+              action: { notIn: ONBOARDING_ONLY_ACTIONS },
             },
-          },
-        })
-        .catch(() => null);
+            select: { id: true },
+          })
+          .catch(() => null),
 
-      if (hasSession || hasActivity) {
+        // Money is the strongest signal — never reclaim an account that paid.
+        existing.defaultCompanyId
+          ? prisma.company
+              .findFirst({
+                where: {
+                  id: existing.defaultCompanyId,
+                  NOT: { subscriptionStatus: "INACTIVE" },
+                },
+                select: { id: true },
+              })
+              .catch(() => null)
+          : Promise.resolve(null),
+
+        // Someone else's colleague — deleting this would take them down too.
+        existing.defaultCompanyId
+          ? prisma.userCompany
+              .count({
+                where: {
+                  companyId: existing.defaultCompanyId,
+                  NOT: { userId: existing.id },
+                },
+              })
+              .catch(() => 0)
+          : Promise.resolve(0),
+      ]);
+
+      if (realActivity || paidCompany || (sharedCompany ?? 0) > 0) {
         return NextResponse.json(
           { error: "Email already registered. Please login." },
           { status: 409 },
         );
       }
+
+      // Abandoned signup — clear the half-built account so the same address can
+      // start over. Sessions must go too, or the stale cookie outlives the user
+      // row it points at.
+      await prisma.session.deleteMany({ where: { userId: existing.id } }).catch(() => {});
 
       try {
         await prisma.userCompany.deleteMany({ where: { userId: existing.id } });
@@ -119,7 +157,9 @@ export async function POST(req: NextRequest) {
         name: companyName,
         isActive: true,
         country: countryCode ? String(countryCode).toUpperCase() : "US",
-        baseCurrency: currencyByCountry(countryCode ? String(countryCode).toUpperCase() : "US"),
+        // currencyByCountry returns null for countries it has no mapping for —
+        // fall back to USD rather than writing null into a non-nullable column.
+        baseCurrency: currencyByCountry(countryCode ? String(countryCode).toUpperCase() : "US") || "USD",
         businessType: businessType ? String(businessType) as BusinessType : "trading",
         businessSetupDone: Boolean(businessType),
         plan: normalizedPlanCode,
