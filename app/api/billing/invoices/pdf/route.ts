@@ -112,7 +112,10 @@ export async function GET(req: NextRequest): Promise<Response> {
       tax: 0,
       discount: 0,
       total: amount,
-      currency: company.baseCurrency || "USD",
+      // pricePerMonth is stored in the currency the provider settles in —
+      // Safepay in PKR, LemonSqueezy/Stripe always in USD. Labelling it with
+      // company.baseCurrency showed "PKR 249" for what was really a $249 charge.
+      currency: subscription?.provider === "SAFEPAY" ? "PKR" : "USD",
       notes: "Subscription invoice for FinovaOS hosted billing.",
       status: company.subscriptionStatus?.toUpperCase() === "ACTIVE" ? "PAID" : "OPEN",
     };
