@@ -306,8 +306,11 @@ export async function POST(req: NextRequest) {
         plan: planCode,
         subscriptionStatus: "ACTIVE",
         currentPeriodEnd: new Date(Date.now() + (billingCycle === "YEARLY" ? 365 : 30) * 24 * 60 * 60 * 1000),
-        ...(displayCurrency ? { baseCurrency: displayCurrency } : {}),
-        ...(displayCountry ? { country: displayCountry } : {}),
+        // Deliberately does NOT write baseCurrency/country from the request.
+        // It used to persist the client's claimed values onto the company,
+        // which turned a one-off `?country=PK` into a permanent discount on
+        // every future renewal. The company's region is set at signup and
+        // only an admin should change it.
       },
     });
 
@@ -320,8 +323,9 @@ export async function POST(req: NextRequest) {
           planCode,
           billingCycle,
           activatedAt: new Date().toISOString(),
-          displayCurrency,
-          displayCountry,
+          displayCurrency: company.baseCurrency || requestedCurrency,
+          displayCountry: pricingCountry,
+          requestedCountry,
           baseCycleAmount,
           seatAddonCycleAmount,
           seatAddonPerMonth,
