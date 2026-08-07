@@ -168,6 +168,11 @@ export function proxy(req: NextRequest) {
     "/api/support/ticket",
     // Anonymous marketing-site visitor tracking (no auth / company context)
     "/api/track/visit",
+    // Cross-domain impersonation handoff — this endpoint *bootstraps* the
+    // session on the app domain, so by definition no sb_auth cookie (and no
+    // x-company-id) exists yet when it is called. The route itself verifies
+    // the signed, 1h-lived JWT and rejects anything without `impersonatedBy`.
+    "/api/auth/impersonate-handoff",
     // Payment provider webhooks (Lemon Squeezy / Safepay / Stripe) — these
     // POSTs carry no auth cookie or company header; blocking them here was
     // why successful checkouts never activated (status stayed INACTIVE, no
