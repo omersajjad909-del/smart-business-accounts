@@ -135,7 +135,9 @@
       "Bash(git -C \"d:/projects/smart-business-accounts\" ls-files --error-unmatch .env)",
       "Bash(node scripts/verify-env.js)",
       "Bash(curl -s -o /dev/null -w \"usefinova.app -> %{http_code} %{redirect_url}\\\\n\" -I https://usefinova.app/ --max-time 20)",
-      "Bash(curl -s -o /dev/null -w \"www.usefinova.app -> %{http_code} %{redirect_url}\\\\n\" -I https://www.usefinova.app/ --max-time 20)"
+      "Bash(curl -s -o /dev/null -w \"www.usefinova.app -> %{http_code} %{redirect_url}\\\\n\" -I https://www.usefinova.app/ --max-time 20)",
+      "Bash(cp .env .env.bak-perf)",
+      "Bash(sed -i '/^DATABASE_URL=/ s#:5432/postgres#:6543/postgres#; /^DATABASE_URL=/ s#connection_limit=10#connection_limit=1#' .env)"
     ],
     "additionalDirectories": [
       "d:\\projects\\smart-business-accounts\\app\\api\\chat\\conversations",
