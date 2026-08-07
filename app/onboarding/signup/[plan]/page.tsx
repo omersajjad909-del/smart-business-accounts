@@ -390,7 +390,16 @@ export default function SignupByPlanPage() {
         // Converting instead produced wildly different figures between the two
         // pages (e.g. Enterprise showed Rs3,750 on /pricing but Rs17,236 here).
         const pkr = j?.pkrPricing;
-        const isPkUser = cur === "PKR" || searchParams.get("country") === "PK";
+        // Was `cur === "PKR" || searchParams.get("country") === "PK"` — both
+        // caller-controlled, so `?country=PK` (or just picking PKR) showed the
+        // discounted Pakistan price list to anyone. Ask the edge instead; the
+        // geo route ignores its own `?country=` override in production.
+        let geoCountry: string | null = null;
+        try {
+          const g = await fetch("/api/public/geo", { cache: "no-store" });
+          if (g.ok) { const gj = await g.json(); if (gj?.country) geoCountry = String(gj.country).toUpperCase(); }
+        } catch {}
+        const isPkUser = geoCountry === "PK";
         const planKey = planCode === "professional" ? "pro"
           : planCode === "pro" ? "pro"
           : planCode === "enterprise" ? "enterprise"
