@@ -321,7 +321,10 @@ export default function PaymentPage() {
   // Pakistan uses admin-set PKR-native prices, NOT the USD price run through
   // FX — same rule /pricing and /onboarding/signup apply. plan keys here use
   // "pro"/"professional" interchangeably; pkrPricing only has "pro".
-  const isPkUser = currency === "PKR" || country.trim().toUpperCase() === "PK";
+  // Was `currency === "PKR" || country === "PK"` — both client-controlled, so
+  // `?country=PK` showed the discounted PKR price to anyone. Regional pricing
+  // now requires the server to confirm the region.
+  const isPkUser = regionalPricingAllowed;
   const pkrKey = plan === "professional" ? "pro" : plan;
   const pkrPlan = pkrPricing?.[pkrKey] || null;
   const pkrBasePrice = pkrPlan ? (billingCycle === "yearly" ? pkrPlan.yearly : pkrPlan.monthly) : null;

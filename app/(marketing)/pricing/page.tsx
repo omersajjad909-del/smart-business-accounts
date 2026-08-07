@@ -372,6 +372,11 @@ export default function PricingPage() {
     enterprise:   { monthly: 14999, yearly: 11999 }, // 14,999/mo → 20% off yearly = 11,999/mo
   };
   const [pkrPricing, setPkrPricing] = useState<{ starter: { monthly: number; yearly: number }; professional: { monthly: number; yearly: number }; enterprise: { monthly: number; yearly: number } } | null>(DEFAULT_PKR_PRICING);
+  // Edge-detected country from /api/public/geo. Unlike `country` below it is
+  // never seeded from localStorage or the currency dropdown, so it is the only
+  // thing allowed to unlock the PKR-native price list. Null until resolved →
+  // global pricing shows first.
+  const [geoCountry, setGeoCountry] = useState<string | null>(null);
   const [pkrAddonPricing, setPkrAddonPricing] = useState<{ monthly: number; yearly: number } | null>({ monthly: 1800, yearly: 1440 });
   const [planLimits, setPlanLimits] = useState<Record<string, number | null>>(DEFAULT_PLAN_LIMITS);
   // Key must be "professional" (not "pro") — the render below reads
@@ -416,6 +421,16 @@ export default function PricingPage() {
           }
         } catch {}
       }
+      // Always resolve the real IP country, independent of the stored/selected
+      // currency. Picking "PKR" from the dropdown is a display preference and
+      // must not unlock Pakistan's discounted price list to a visitor abroad.
+      try {
+        const geo = await fetch("/api/public/geo", { cache: "no-store" });
+        if (geo.ok) {
+          const d = await geo.json();
+          if (d?.country) setGeoCountry(String(d.country).toUpperCase());
+        }
+      } catch {}
       try {
         const fx = await fetch("/api/public/fx", { cache: "no-store" });
         if (fx.ok) { const d = await fx.json(); if (d?.rates) setRates(d.rates); }
@@ -522,7 +537,11 @@ export default function PricingPage() {
   const formatPrice = (usd: number) => formatFromUSD(usd, currency);
 
   // When country is PK and admin has set PKR prices, use those directly
-  const isPKUser = country === "PK" || currency === "PKR";
+  // Was `country === "PK" || currency === "PKR"` — the currency dropdown alone
+  // handed any visitor Pakistan's discounted price list. Regional pricing now
+  // follows the edge-detected country only; the dropdown still does plain FX
+  // conversion for everyone else.
+  const isPKUser = geoCountry === "PK";
   const getPlanPrice = (slug: "starter" | "professional" | "enterprise") => {
     const usdPrice = billing === "yearly" ? publicPricing[slug].yearly : publicPricing[slug].monthly;
     if (isPKUser && pkrPricing) {

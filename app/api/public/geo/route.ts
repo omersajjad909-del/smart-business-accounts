@@ -28,8 +28,16 @@ export async function GET(req: NextRequest) {
   // 3) Accept-Language fallback
   try {
     const { searchParams } = new URL(req.url);
-    const overrideCurrency = String(searchParams.get("currency") || "").trim().toUpperCase() || null;
-    const overrideCountry = String(searchParams.get("country") || "").trim().toUpperCase() || null;
+    // Query overrides are a local testing aid only. In production they let any
+    // visitor claim a discounted region (`?country=PK`), which then seeded the
+    // pricing UI — so they are ignored once deployed.
+    const allowOverride = process.env.NODE_ENV !== "production";
+    const overrideCurrency = allowOverride
+      ? String(searchParams.get("currency") || "").trim().toUpperCase() || null
+      : null;
+    const overrideCountry = allowOverride
+      ? String(searchParams.get("country") || "").trim().toUpperCase() || null
+      : null;
 
     const ipCountry = readCountryFromHeaders(req);
     const acceptLanguage = req.headers.get("accept-language");
