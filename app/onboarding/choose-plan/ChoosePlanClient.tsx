@@ -315,10 +315,9 @@ export default function ChoosePlanPage() {
 
             <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:8, marginBottom:28 }}>
               {[
-                { icon:"💬", label:"WhatsApp Auto-Reply" }, { icon:"📧", label:"Email Drip Campaigns" },
-                { icon:"🤖", label:"Website Chatbot" },     { icon:"👥", label:"CRM Lead Capture" },
-                { icon:"🔗", label:"Zapier / Make" },       { icon:"📱", label:"Social Auto-Post" },
-                { icon:"📊", label:"Google Sheets Sync" },  { icon:"✍️", label:"AI Content Gen" },
+                { icon:"🔔", label:"Invoice Reminders" },  { icon:"📦", label:"Low Stock Alerts" },
+                { icon:"📊", label:"Scheduled Reports" },  { icon:"🔗", label:"Zapier / Make" },
+                { icon:"📈", label:"Google Sheets Sync" },
               ].map(f => (
                 <div key={f.label} style={{ display:"flex", alignItems:"center", gap:8, padding:"8px 10px", borderRadius:8, background:"rgba(255,255,255,.04)" }}>
                   <span style={{ fontSize:15 }}>{f.icon}</span>

@@ -862,14 +862,11 @@ export default function PricingPage() {
                 {/* Right: Features grid */}
                 <div className="addon-feat" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
                   {[
-                    { icon: "💬", label: "WhatsApp Auto-Reply", sub: "AI replies 24/7" },
-                    { icon: "📧", label: "Email Drip Campaigns", sub: "Auto nurture leads" },
-                    { icon: "🤖", label: "Website Chatbot", sub: "1 script tag embed" },
-                    { icon: "🎯", label: "CRM Lead Capture", sub: "Web + WA + lead forms" },
+                    { icon: "🔔", label: "Invoice Reminders", sub: "Overdue invoice follow-up" },
+                    { icon: "📦", label: "Low Stock Alerts", sub: "Reorder before you run out" },
+                    { icon: "📊", label: "Scheduled Reports", sub: "P&L, Balance Sheet & more" },
                     { icon: "🔗", label: "Zapier / Make", sub: "5,000+ app connects" },
-                    { icon: "📱", label: "Social Auto-Post", sub: "FB · IG · LinkedIn" },
-                    { icon: "📊", label: "Google Sheets Sync", sub: "1-click export" },
-                    { icon: "✍️", label: "AI Content Gen", sub: "English & Urdu" },
+                    { icon: "📈", label: "Google Sheets Sync", sub: "1-click export" },
                   ].map(f => (
                     <div key={f.label} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 12px", borderRadius: 10, background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.07)" }}>
                       <span style={{ fontSize: 18, flexShrink: 0 }}>{f.icon}</span>
@@ -885,7 +882,7 @@ export default function PricingPage() {
               {/* Value comparison bar */}
               <div className="val-bar" style={{ marginTop: 28, paddingTop: 24, borderTop: "1px solid rgba(255,255,255,.08)", display: "flex", alignItems: "center", gap: 20, flexWrap: "wrap" }}>
                 <span style={{ fontSize: 13, color: "rgba(255,255,255,.4)" }}>These tools cost separately:</span>
-                {["WATI $99", "Mailchimp $99", "Intercom $74", "HubSpot $50", "Zapier $49", "Buffer $18", "Jasper $49"].map(t => (
+                {["AR reminder tools $40", "Reorder alert add-ons $30", "Reporting tools $60", "Zapier $49", "Sheet sync $30"].map(t => (
                   <span key={t} style={{ fontSize: 12, padding: "3px 10px", borderRadius: 6, background: "rgba(248,113,113,.1)", border: "1px solid rgba(248,113,113,.2)", color: "#fca5a5" }}>{t}</span>
                 ))}
                 <span style={{ fontSize: 13, fontWeight: 700, color: "#34d399" }}>= {formatPrice(438)}+/mo vs our {getAddonDisplayPrice(79, 69)}</span>

@@ -66,8 +66,8 @@ const KB: [RegExp, string][] = [
   [/currency|pkr|usd|rupee|dollar|exchange/i,
    "FinovaOS supports 150+ currencies:\n• PKR, USD, AED, GBP, EUR, SAR\n• Real-time exchange rates\n• Multi-currency invoicing\n\nPerfect for import/export businesses! 💱"],
 
-  [/marketing.?auto|whatsapp.?broadcast|email.?campaign|drip.?sequence|lead.?nurtur|send.?campaign|bulk.?message/i,
-   "FinovaOS Business Automation (Power Add-on):\n\n• Automated email campaigns\n• WhatsApp broadcasts to all customers\n• Lead nurturing & drip sequences\n• Customer segmentation by behavior\n• Open rate & click tracking\n\nAvailable as a Power Add-on on ANY plan!\nContact: hello@finovaos.app for pricing 📣"],
+  [/business.?automation|automation.?add.?on|invoice.?remind|reorder.?alert|low.?stock.?alert|scheduled.?report/i,
+   "FinovaOS Business Automation (Power Add-on):\n\n• Overdue invoice reminders (one-click send)\n• Low stock reorder alerts\n• Scheduled financial reports (P&L, Balance Sheet & more)\n• Zapier / Make webhooks\n• Google Sheets sync\n\nAvailable as a Power Add-on on ANY plan for $79/month!\nContact: hello@finovaos.app for details 📣"],
 
   [/\bapi\b|integration|webhook|third.?party|zapier|import.?data|custom.?integrat|connect.?with/i,
    "FinovaOS API & Integrations:\n\n• Full REST API access (Enterprise plan)\n• Webhook support for real-time sync\n• CSV & Excel import/export on all plans\n• Self-configurable connectors for eCommerce, payment gateways, and banks\n\nSee the API docs at finovaos.app/docs 🔌"],
