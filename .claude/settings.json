@@ -138,7 +138,8 @@
       "Bash(curl -s -o /dev/null -w \"www.usefinova.app -> %{http_code} %{redirect_url}\\\\n\" -I https://www.usefinova.app/ --max-time 20)",
       "Bash(cp .env .env.bak-perf)",
       "Bash(sed -i '/^DATABASE_URL=/ s#:5432/postgres#:6543/postgres#; /^DATABASE_URL=/ s#connection_limit=10#connection_limit=1#' .env)",
-      "Bash(awk '/^model ActivityLog/,/^}/' prisma/schema.prisma)"
+      "Bash(awk '/^model ActivityLog/,/^}/' prisma/schema.prisma)",
+      "Bash(NODE_OPTIONS=--max-old-space-size=8192 npx tsc --noEmit -p tsconfig.json)"
     ],
     "additionalDirectories": [
       "d:\\projects\\smart-business-accounts\\app\\api\\chat\\conversations",
