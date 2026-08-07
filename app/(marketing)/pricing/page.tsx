@@ -1064,9 +1064,9 @@ export default function PricingPage() {
             </div>
 
             {/* Right — Price summary */}
-            <div className="cp-sidebar" style={{ width: 276, flexShrink: 0, position: "sticky", top: 24 }}>
-              <div style={{ borderRadius: 20, background: "rgba(249,115,22,.07)", border: "1.5px solid rgba(249,115,22,.28)", padding: "24px 22px" }}>
-                <div style={{ fontSize: 11, fontWeight: 800, color: "#f97316", letterSpacing: ".08em", textTransform: "uppercase", marginBottom: 16 }}>Your Estimate</div>
+            <div className="cp-sidebar" style={{ width: 320, flexShrink: 0, position: "sticky", top: 24 }}>
+              <div style={{ borderRadius: 20, background: "rgba(249,115,22,.07)", border: "1.5px solid rgba(249,115,22,.28)", padding: "22px 20px" }}>
+                <div style={{ fontSize: 10, fontWeight: 800, color: "#f97316", letterSpacing: ".06em", textTransform: "uppercase", marginBottom: 14 }}>Your Estimate</div>
 
                 {/* Modules breakdown */}
                 {selectedModules.length === 0 ? (
@@ -1113,10 +1113,10 @@ export default function PricingPage() {
                       <span>−{formatPrice(Math.round(customMonthly * yearlyDiscount / 100))}</span>
                     </div>
                   )}
-                  <div style={{ fontSize: 11, color: "rgba(255,255,255,.3)", marginBottom: 4 }}>
+                  <div style={{ fontSize: 10, color: "rgba(255,255,255,.3)", marginBottom: 4 }}>
                     {billing === "yearly" ? "Per month, billed annually" : "Per month"}
                   </div>
-                  <div style={{ fontSize: 46, fontWeight: 900, color: customMonthly > 0 ? "#f97316" : "rgba(255,255,255,.2)", lineHeight: 1, letterSpacing: "-1.5px" }}>
+                  <div style={{ fontSize: 42, fontWeight: 900, color: customMonthly > 0 ? "#f97316" : "rgba(255,255,255,.2)", lineHeight: 1, letterSpacing: "-1.5px" }}>
                     {customMonthly > 0 ? formatPrice(customDisplayUsd) : "—"}
                   </div>
                   {billing === "yearly" && customMonthly > 0 && (
