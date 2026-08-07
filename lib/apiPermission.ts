@@ -24,6 +24,14 @@ export async function apiHasPermission(
 
   const isAdmin = userRole?.toUpperCase() === "ADMIN";
 
+  // Platform admins operate outside any tenant — proxy.ts gives them the
+  // synthetic "system" company context. Plan gating below would look up a
+  // Company row with id "system", find nothing, fall back to STARTER and then
+  // gate the platform admin by a *customer* plan. Short-circuit instead: it
+  // removes two DB round trips from every single /api/admin/* request, which
+  // is what made the whole admin panel feel slow.
+  if (isAdmin && companyId === "system") return true;
+
   // Determine if allowed by role/user assignment
   let allowedByUserOrRole = isAdmin; // ADMIN always allowed by role
 
