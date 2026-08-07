@@ -132,7 +132,8 @@
       "Bash(node -e \"console.log\\(require\\('./node_modules/jspdf/package.json'\\).version\\)\")",
       "WebFetch(domain:docs.lemonsqueezy.com)",
       "WebSearch",
-      "Bash(git -C \"d:/projects/smart-business-accounts\" ls-files --error-unmatch .env)"
+      "Bash(git -C \"d:/projects/smart-business-accounts\" ls-files --error-unmatch .env)",
+      "Bash(node scripts/verify-env.js)"
     ],
     "additionalDirectories": [
       "d:\\projects\\smart-business-accounts\\app\\api\\chat\\conversations",
