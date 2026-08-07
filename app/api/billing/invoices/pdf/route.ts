@@ -73,6 +73,7 @@ export async function GET(req: NextRequest): Promise<Response> {
           billingCycle: true,
           pricePerMonth: true,
           currentPeriodEnd: true,
+          provider: true,
         },
       }),
     ]);
