@@ -129,7 +129,9 @@
       "Bash(nslookup -type=TXT pay.finovaos.app 8.8.8.8)",
       "Bash(xargs cat)",
       "Bash(grep -n \"Up to \\\\${\" \"app/\\(marketing\\)/pricing/page.tsx\")",
-      "Bash(node -e \"console.log\\(require\\('./node_modules/jspdf/package.json'\\).version\\)\")"
+      "Bash(node -e \"console.log\\(require\\('./node_modules/jspdf/package.json'\\).version\\)\")",
+      "WebFetch(domain:docs.lemonsqueezy.com)",
+      "WebSearch"
     ],
     "additionalDirectories": [
       "d:\\projects\\smart-business-accounts\\app\\api\\chat\\conversations",
