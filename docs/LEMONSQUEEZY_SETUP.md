@@ -41,34 +41,48 @@ LEMONSQUEEZY_VARIANT_CUSTOM_YEARLY=
 
 ## 3. Add Webhook In LemonSqueezy
 
-Use this endpoint:
-
-```text
-https://finovaos.app/api/billing/webhook
-```
-
-If you want to use the app domain instead:
+Use the app domain — the same value as `NEXT_PUBLIC_APP_URL`:
 
 ```text
 https://usefinova.app/api/billing/webhook
 ```
 
-Recommended events:
+Events to enable — these are exactly the ones `app/api/billing/webhook/route.ts`
+implements:
 
-- `order_created`
-- `subscription_created`
-- `subscription_updated`
-- `subscription_cancelled`
-- `subscription_resumed`
-- `subscription_expired`
-- `subscription_payment_success`
-- `subscription_payment_failed`
+| Event | Handled by FinovaOS |
+| --- | --- |
+| `order_created` | logs `PAYMENT_EVENT` |
+| `order_refunded` | logs `REFUND_PROCESSED` + refund email |
+| `subscription_created` | sets plan + `ACTIVE` status, sends welcome email |
+| `subscription_updated` | plan / status sync |
+| `subscription_cancelled` | status sync |
+| `subscription_resumed` | status sync |
+| `subscription_expired` | status sync |
+| `subscription_paused` | status sync |
+| `subscription_unpaused` | status sync |
+| `subscription_payment_success` | receipt email, clears dunning, duplicate-charge check |
+| `subscription_payment_failed` | starts dunning, sets `PAST_DUE` |
+| `subscription_payment_refunded` | logs `REFUND_PROCESSED` + refund email |
+
+Leave these unchecked — no handler exists for them: `affiliate_activated`,
+`customer_updated`, `dispute_created`, `dispute_resolved`,
+`license_key_created`, `license_key_updated`.
+
+`subscription_plan_changed` is also not handled: it is not in the
+`SUBSCRIPTION_STATUS_EVENTS` set, so enabling it delivers events that are
+silently ignored. Upgrades and downgrades still sync because LemonSqueezy
+fires `subscription_updated` alongside it.
 
 Copy the webhook signing secret into:
 
 ```env
 LEMONSQUEEZY_WEBHOOK_SECRET=
 ```
+
+The same value must be set locally and in Vercel. If it does not match the
+secret stored in LemonSqueezy, `verifyLemonSignature` rejects every event
+with a 400.
 
 ## 4. What FinovaOS Already Handles
 
