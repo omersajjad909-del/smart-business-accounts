@@ -82,7 +82,7 @@ export async function GET(req: NextRequest): Promise<Response> {
     }
 
     const effectivePlan = (subscription?.plan || company.plan || "STARTER").toUpperCase();
-    const effectiveBillingCycle = (subscription?.billingCycle || company.billingCycle || "MONTHLY").toUpperCase();
+    const effectiveBillingCycle = (subscription?.billingCycle || "MONTHLY").toUpperCase();
     const baseAmount = subscription?.pricePerMonth || PLAN_PRICES[effectivePlan] || 0;
     const amount = effectiveBillingCycle === "YEARLY" ? Math.round(baseAmount * 12) : baseAmount;
     const periodEnd = subscription?.currentPeriodEnd || company.currentPeriodEnd || company.createdAt;
