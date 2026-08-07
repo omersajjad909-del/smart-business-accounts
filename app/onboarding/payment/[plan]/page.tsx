@@ -136,6 +136,12 @@ export default function PaymentPage() {
   // That FX-conversion path is what previously showed Rs 27,522 here for a
   // plan the pricing page itself prices at Rs 8,999.
   const [pkrPricing, setPkrPricing] = useState<Record<string, { monthly: number; yearly: number }> | null>(null);
+  // Server-resolved region. `country` above is a display preference seeded from
+  // `?country=`; these two come from /api/billing/pricing-region and are the
+  // only thing allowed to unlock regional (PKR-native) pricing. Default false
+  // so the UI fails closed on global pricing while the request is in flight.
+  const [regionalPricingAllowed, setRegionalPricingAllowed] = useState(false);
+  const [serverCountry, setServerCountry] = useState<string | null>(null);
 
   const planPrice =
     plan === "custom"
@@ -260,6 +266,27 @@ export default function PaymentPage() {
         const pr = await fetch("/api/public/pricing", { cache: "no-store" });
         if (pr.ok) { const d = await pr.json(); if (d?.pkrPricing) setPkrPricing(d.pkrPricing); }
       } catch {}
+      // Authoritative region — same resolution /api/billing/checkout uses to
+      // pick the Lemon Squeezy variant. `currency`/`country` above are only a
+      // display preference (and are seeded from the URL), so regional pricing
+      // must be gated on this instead or the screen can promise a price the
+      // checkout will not honour.
+      try {
+        const user = getCurrentUser();
+        const res = await fetch("/api/billing/pricing-region", {
+          cache: "no-store",
+          headers: {
+            "x-company-id": user?.companyId || "",
+            "x-user-id": user?.id || "",
+            "x-user-role": user?.role || "",
+          },
+        });
+        if (res.ok) {
+          const d = await res.json();
+          setRegionalPricingAllowed(Boolean(d?.regionalPricingAllowed));
+          if (d?.country) setServerCountry(String(d.country).toUpperCase());
+        }
+      } catch {}
     })();
   }, [searchParams]);
 
@@ -270,7 +297,9 @@ export default function PaymentPage() {
   // Pakistan sees only the Pakistan card option; everywhere else sees only
   // the 4 international methods — no mixing, so there's nothing to be
   // confused by.
-  const isPakistan = country.trim().toUpperCase() === "PK";
+  // Payment-method groups follow the server's region, not the URL — offering
+  // the Pakistan-only rails to someone who will be charged in USD just dead-ends.
+  const isPakistan = (serverCountry ?? country).trim().toUpperCase() === "PK";
   const availableGroups = METHOD_GROUPS.filter((group) => group.label === (isPakistan ? "Pakistan" : "International"));
   const allAvailableMethods = availableGroups.flatMap((group) => group.methods);
   const selectedMethodDef = allAvailableMethods.find((m) => m.id === method) || allAvailableMethods[0];
