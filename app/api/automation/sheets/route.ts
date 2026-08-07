@@ -7,8 +7,9 @@
  * GET  /api/automation/sheets              — get config
  * PUT  /api/automation/sheets              — save config { spreadsheetId, serviceAccountJson, sheetName }
  * POST /api/automation/sheets              — append a row { sheetName?, values: string[] }
- * POST /api/automation/sheets?action=sync_leads   — sync all CRM leads to sheet
  * POST /api/automation/sheets?action=sync_contacts — sync all customers/contacts to sheet
+ * POST /api/automation/sheets?action=sync_invoices — sync sales invoices to sheet
+ * POST /api/automation/sheets?action=sync_inventory — sync inventory items to sheet
  * GET  /api/automation/sheets?action=read  — read rows from sheet
  */
 
@@ -179,23 +180,50 @@ export async function POST(req: NextRequest) {
     const action = searchParams.get("action");
     const accessToken = await getSheetsAccessToken(cfg.serviceAccountJson);
 
-    if (action === "sync_leads") {
-      // Sync CRM leads
-      const rows = await prisma.$queryRaw<any[]>`
-        SELECT name, email, phone, source, status, notes, "createdAt"
-        FROM "CRMLead" WHERE "companyId" = ${companyId}
-        ORDER BY "createdAt" DESC LIMIT 1000
-      `.catch(() => []);
+    if (action === "sync_invoices") {
+      // Sync sales invoices — operational business data, not marketing.
+      const invoices = await prisma.salesInvoice.findMany({
+        where: { companyId },
+        select: { invoiceNo: true, date: true, dueDate: true, total: true, customer: { select: { name: true } } },
+        take: 1000,
+        orderBy: { date: "desc" },
+      }).catch(() => [] as any[]);
 
-      const sheetName = searchParams.get("sheet") || "Leads";
-      const header = ["Name", "Email", "Phone", "Source", "Status", "Notes", "Created At"];
+      const sheetName = searchParams.get("sheet") || "Invoices";
+      const header = ["Invoice #", "Date", "Due Date", "Customer", "Total"];
       const values = [
         header,
-        ...rows.map(r => [r.name, r.email, r.phone, r.source, r.status, r.notes, new Date(r.createdAt).toLocaleString()]),
+        ...invoices.map((inv) => [
+          inv.invoiceNo,
+          new Date(inv.date).toLocaleDateString(),
+          inv.dueDate ? new Date(inv.dueDate).toLocaleDateString() : "",
+          inv.customer?.name || "",
+          String(inv.total),
+        ]),
       ];
 
       await appendToSheet(cfg.spreadsheetId, sheetName, values, accessToken);
-      return NextResponse.json({ success: true, synced: rows.length });
+      return NextResponse.json({ success: true, synced: invoices.length });
+    }
+
+    if (action === "sync_inventory") {
+      // Sync inventory items — operational business data, not marketing.
+      const items = await prisma.itemNew.findMany({
+        where: { companyId },
+        select: { name: true, sku: true, quantity: true, minStock: true, unitPrice: true },
+        take: 1000,
+        orderBy: { name: "asc" },
+      }).catch(() => [] as any[]);
+
+      const sheetName = searchParams.get("sheet") || "Inventory";
+      const header = ["Item", "SKU", "Quantity", "Reorder Level", "Unit Price"];
+      const values = [
+        header,
+        ...items.map((it: any) => [it.name || "", it.sku || "", String(it.quantity ?? ""), String(it.minStock ?? ""), String(it.unitPrice ?? "")]),
+      ];
+
+      await appendToSheet(cfg.spreadsheetId, sheetName, values, accessToken);
+      return NextResponse.json({ success: true, synced: items.length });
     }
 
     if (action === "sync_contacts") {
