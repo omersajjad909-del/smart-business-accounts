@@ -1,6 +1,3 @@
-import { jsPDF } from "jspdf";
-import autoTable from "jspdf-autotable";
-
 export interface InvoicePdfData {
   invoiceNumber: string;
   invoiceDate: string;
@@ -39,6 +36,8 @@ function fmtNum(n: number): string {
 
 /** Generate an invoice PDF as a Node.js Buffer. */
 export async function generateInvoicePdf(data: InvoicePdfData): Promise<Buffer> {
+  const { jsPDF } = await import("jspdf");
+  const autoTable = (await import("jspdf-autotable")).default;
   const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
 
   const pageW = doc.internal.pageSize.getWidth();

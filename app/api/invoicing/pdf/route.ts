@@ -293,7 +293,7 @@ export async function GET(req: NextRequest): Promise<Response> {
     const pdfData = buildPdfData(inv, items, company, type);
     const pdfBuffer = await generateInvoicePdf(pdfData);
 
-    return new Response(pdfBuffer, {
+    return new NextResponse(new Uint8Array(pdfBuffer), {
       status: 200,
       headers: {
         "Content-Type": "application/pdf",
