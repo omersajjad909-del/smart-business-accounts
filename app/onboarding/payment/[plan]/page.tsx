@@ -243,21 +243,24 @@ export default function PaymentPage() {
 
   useEffect(() => {
     (async () => {
-      const stored = getStoredCurrencyPreference();
-      if (!searchParams.get("currency") && stored.currency && FX_USD[stored.currency]) {
-        setCurrency(stored.currency);
-      }
-      if (!searchParams.get("country") && stored.country) setCountry(stored.country);
-      if ((!searchParams.get("currency") || !searchParams.get("country")) && (!stored.currency || !stored.country)) {
-        try {
-          const geo = await fetch("/api/public/geo", { cache: "no-store" });
-          if (geo.ok) {
-            const d = await geo.json();
-            if (d?.currency && FX_USD[d.currency]) setCurrency(d.currency);
-            if (d?.country) setCountry(d.country);
+      // Region first, and it is the only thing that sets the currency here.
+      // /api/billing/checkout runs the same resolver on the same request, so
+      // what this returns is exactly what the card will be charged in. The old
+      // stored-preference / `?currency=` / geo seeding is gone: it could show a
+      // currency the checkout would then refuse to honour.
+      try {
+        const res = await fetch("/api/public/pricing-region", { cache: "no-store" });
+        if (res.ok) {
+          const d = await res.json();
+          if (d?.currency) setCurrency(d.currency);
+          if (d?.country) {
+            const cc = String(d.country).toUpperCase();
+            setServerCountry(cc);
+            setCountry(cc);
           }
-        } catch {}
-      }
+          setRegionalPricingAllowed(Boolean(d?.isPakistan));
+        }
+      } catch {}
       try {
         const fx = await fetch("/api/public/fx", { cache: "no-store" });
         if (fx.ok) { const d = await fx.json(); if (d?.rates) setRates(d.rates); }
@@ -265,18 +268,6 @@ export default function PaymentPage() {
       try {
         const pr = await fetch("/api/public/pricing", { cache: "no-store" });
         if (pr.ok) { const d = await pr.json(); if (d?.pkrPricing) setPkrPricing(d.pkrPricing); }
-      } catch {}
-      // Authoritative region — /api/billing/checkout runs the same resolver on
-      // the same request, so whatever this returns is exactly what the card
-      // will be charged in. It overrides the currency picked above.
-      try {
-        const res = await fetch("/api/public/pricing-region", { cache: "no-store" });
-        if (res.ok) {
-          const d = await res.json();
-          if (d?.currency) setCurrency(d.currency);
-          if (d?.country) setServerCountry(String(d.country).toUpperCase());
-          setRegionalPricingAllowed(Boolean(d?.isPakistan));
-        }
       } catch {}
     })();
   }, [searchParams]);
