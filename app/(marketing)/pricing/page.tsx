@@ -24,7 +24,7 @@ type PlanPricing = {
 const DEFAULT_HIGHLIGHTS = {
   starter:    ["Up to 3 users","Sales & purchase invoices","Ledger & trial balance","Basic reports","Chart of accounts","Email support","🤖 AI Chat"],
   professional: ["Up to 10 users","Everything in Starter","Inventory management","Bank reconciliation","HR & Payroll","CRM + Advanced reports","🤖 AI Assistant (ask anything)","🤖 Smart invoice & expense AI"],
-  enterprise: ["Up to 25 users","Everything in Professional","API access","Custom integrations","Multi-currency","Priority support 24/7","🤖 AI Chat","🤖 AI Financial Insights","🤖 Smart Alerts & Anomaly Detection","🤖 Revenue Forecast","🤖 Market Intelligence","🤖 AI Business Advisor","🤖 Full AI Suite"],
+  enterprise: ["Up to 25 users","Everything in Professional","API access","Integration-ready APIs & webhooks","Multi-currency","Priority support 24/7","🤖 AI Chat","🤖 AI Financial Insights","🤖 Smart Alerts & Anomaly Detection","🤖 Revenue Forecast","🤖 Market Intelligence","🤖 AI Business Advisor","🤖 Full AI Suite"],
 };
 
 const PLANS = [
@@ -374,7 +374,11 @@ export default function PricingPage() {
   const [pkrPricing, setPkrPricing] = useState<{ starter: { monthly: number; yearly: number }; professional: { monthly: number; yearly: number }; enterprise: { monthly: number; yearly: number } } | null>(DEFAULT_PKR_PRICING);
   const [pkrAddonPricing, setPkrAddonPricing] = useState<{ monthly: number; yearly: number } | null>({ monthly: 1800, yearly: 1440 });
   const [planLimits, setPlanLimits] = useState<Record<string, number | null>>(DEFAULT_PLAN_LIMITS);
-  const [branchLimits, setBranchLimits] = useState<Record<string, number | null>>({ starter: 1, pro: 3, enterprise: 10 });
+  // Key must be "professional" (not "pro") — the render below reads
+  // branchLimits.professional; before the /api/public/pricing fetch resolves,
+  // the initial state's "pro" key made that read undefined, showing a live
+  // "Up to undefined" in the Branches comparison row.
+  const [branchLimits, setBranchLimits] = useState<Record<string, number | null>>({ starter: 1, professional: 3, enterprise: 10 });
   const [seatPricing, setSeatPricing] = useState<{ monthly: number; yearly: number }>(DEFAULT_SEAT_PRICING);
   const [planHighlights, setPlanHighlights] = useState<Record<string, string[]>>(DEFAULT_HIGHLIGHTS);
   const [customPlanData, setCustomPlanData] = useState<{ basePrice: number; yearlyDiscount: number; modules: any[] }>({

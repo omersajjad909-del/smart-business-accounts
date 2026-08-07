@@ -67,7 +67,7 @@ const ARTICLES: Record<string, {
       { type:"heading", text:"Professional Plan — Best for growing teams" },
       { type:"list", items:["Up to 3 companies", "Everything in Starter", "Bank reconciliation", "Advanced reports & analytics", "Role-based access control", "Up to 10 users", "Priority email support"] },
       { type:"heading", text:"Enterprise Plan — Best for large organizations" },
-      { type:"list", items:["Unlimited companies & branches", "Everything in Professional", "Custom integrations & API", "Dedicated onboarding manager", "Unlimited users", "24/7 priority support", "SLA guarantee"] },
+      { type:"list", items:["Unlimited companies & branches", "Everything in Professional", "Integration-ready APIs & webhooks", "Unlimited users", "24/7 priority support", "SLA guarantee"] },
       { type:"tip", text:"Start with Starter and upgrade anytime — your data and settings carry over automatically. There's no lock-in." },
       { type:"warning", text:"If you need multi-branch support or more than 10 users, go directly to Enterprise. Starter and Pro do not support unlimited branches." },
     ],

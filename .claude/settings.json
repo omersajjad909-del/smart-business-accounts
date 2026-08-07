@@ -127,7 +127,8 @@
       "Bash(curl -s -X POST \"https://www.finovaos.app/api/billing/webhook\" -H \"Content-Type: application/json\" -H \"x-signature: test-invalid\" -d '{\"probe\":true}' -w \"\\\\nHTTP:%{http_code}\\\\n\")",
       "Bash(nslookup pay.finovaos.app 8.8.8.8)",
       "Bash(nslookup -type=TXT pay.finovaos.app 8.8.8.8)",
-      "Bash(xargs cat)"
+      "Bash(xargs cat)",
+      "Bash(grep -n \"Up to \\\\${\" \"app/\\(marketing\\)/pricing/page.tsx\")"
     ],
     "additionalDirectories": [
       "d:\\projects\\smart-business-accounts\\app\\api\\chat\\conversations",

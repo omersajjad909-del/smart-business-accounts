@@ -149,7 +149,7 @@ const SOLUTIONS_CARDS = [
 /* ─── Simple nav links ─── */
 const NAV_LINKS = [
   { label: "Pricing",      href: "/pricing" },
-  { label: "Case Studies", href: "/case-studies" },
+  { label: "About us", href: "/about" },
   // { label: "Contact", href: "/contact" },
 ]
 

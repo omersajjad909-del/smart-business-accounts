@@ -166,7 +166,7 @@ import { useState, useEffect } from "react";
              <div className="mt-2 text-4xl font-extrabold">${prices.enterprise}</div>
              <div className="mt-2 text-sm text-slate-600">For large operations and custom needs</div>
              <div className="mt-6 space-y-2 text-sm">
-               <div>Custom integrations</div>
+               <div>Integration-ready APIs & webhooks</div>
                <div>Priority support</div>
                <div>Dedicated onboarding</div>
              </div>

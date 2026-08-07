@@ -70,7 +70,7 @@ const KB: [RegExp, string][] = [
    "FinovaOS Business Automation (Power Add-on):\n\n• Automated email campaigns\n• WhatsApp broadcasts to all customers\n• Lead nurturing & drip sequences\n• Customer segmentation by behavior\n• Open rate & click tracking\n\nAvailable as a Power Add-on on ANY plan!\nContact: hello@finovaos.app for pricing 📣"],
 
   [/\bapi\b|integration|webhook|third.?party|zapier|import.?data|custom.?integrat|connect.?with/i,
-   "FinovaOS API & Integrations:\n\n• Full REST API access (Enterprise plan)\n• Webhook support for real-time sync\n• CSV & Excel import/export on all plans\n• Custom integrations on request\n• Connect with eCommerce, payment gateways, banks\n\nContact: hello@finovaos.app for custom integrations 🔌"],
+   "FinovaOS API & Integrations:\n\n• Full REST API access (Enterprise plan)\n• Webhook support for real-time sync\n• CSV & Excel import/export on all plans\n• Self-configurable connectors for eCommerce, payment gateways, and banks\n\nSee the API docs at finovaos.app/docs 🔌"],
 
   [/why finova|better than|compare|versus|\bvs\b|quickbooks|xero|competitor|best accounting|alternative|kon sa software/i,
    "Why FinovaOS over QuickBooks / Xero?\n\n• All-in-one: Accounting + HR + Inventory + CRM in ONE platform\n• Built for Pakistan: PKR pricing, Urdu support\n• 12,000+ businesses trust FinovaOS\n• 75% cheaper than international alternatives\n• Local support team available in Urdu/English\n• No hidden per-module fees\n• 14-day money-back guarantee\n\nSwitch with full data migration support! 🏆"],
