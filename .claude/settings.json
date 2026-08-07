@@ -128,7 +128,8 @@
       "Bash(nslookup pay.finovaos.app 8.8.8.8)",
       "Bash(nslookup -type=TXT pay.finovaos.app 8.8.8.8)",
       "Bash(xargs cat)",
-      "Bash(grep -n \"Up to \\\\${\" \"app/\\(marketing\\)/pricing/page.tsx\")"
+      "Bash(grep -n \"Up to \\\\${\" \"app/\\(marketing\\)/pricing/page.tsx\")",
+      "Bash(node -e \"console.log\\(require\\('./node_modules/jspdf/package.json'\\).version\\)\")"
     ],
     "additionalDirectories": [
       "d:\\projects\\smart-business-accounts\\app\\api\\chat\\conversations",
