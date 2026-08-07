@@ -86,6 +86,10 @@ export async function createLemonCheckout(input: LemonCheckoutInput) {
     throw new Error(`Missing Lemon Squeezy variant for ${input.planCode} ${input.billingCycle}.`);
   }
 
+  // An explicit coupon the buyer typed, otherwise the store-wide launch code.
+  const autoDiscountCode = env("LEMONSQUEEZY_LAUNCH_DISCOUNT") || null;
+  const discountCode = input.couponCode || autoDiscountCode;
+
   const body = {
     data: {
       type: "checkouts",
@@ -115,10 +119,7 @@ export async function createLemonCheckout(input: LemonCheckoutInput) {
           ...(input.name ? { name: input.name } : {}),
           ...(input.displayCountry ? { billing_address: { country: input.displayCountry } } : {}),
           // Use provided coupon OR auto-apply launch discount if set
-          ...((() => {
-            const code = input.couponCode || env("LEMONSQUEEZY_LAUNCH_DISCOUNT");
-            return code ? { discount_code: code } : {};
-          })()),
+          ...(discountCode ? { discount_code: discountCode } : {}),
           custom: {
             company_id: input.companyId,
             user_id: input.userId || "",
@@ -141,24 +142,45 @@ export async function createLemonCheckout(input: LemonCheckoutInput) {
     },
   };
 
-  const response = await fetch("https://api.lemonsqueezy.com/v1/checkouts", {
-    method: "POST",
-    headers: {
-      Accept: "application/vnd.api+json",
-      "Content-Type": "application/vnd.api+json",
-      Authorization: `Bearer ${apiKey}`,
-    },
-    body: JSON.stringify(body),
-  });
-
-  const json = await response.json().catch(() => ({}));
-  if (!response.ok) {
+  async function postCheckout(payload: unknown) {
+    const response = await fetch("https://api.lemonsqueezy.com/v1/checkouts", {
+      method: "POST",
+      headers: {
+        Accept: "application/vnd.api+json",
+        "Content-Type": "application/vnd.api+json",
+        Authorization: `Bearer ${apiKey}`,
+      },
+      body: JSON.stringify(payload),
+    });
+    const json = await response.json().catch(() => ({}));
     const detail =
       json?.errors?.[0]?.detail ||
       json?.errors?.[0]?.title ||
       json?.message ||
       "Failed to create Lemon Squeezy checkout.";
-    throw new Error(detail);
+    return { ok: response.ok, json, detail };
+  }
+
+  let result = await postCheckout(body);
+
+  // The launch code is applied to every checkout from an env var, so a typo or
+  // a code that was never created in Lemon Squeezy ("The discount code X does
+  // not exist.") took down *all* checkouts — the buyer just saw an error and
+  // could not pay at all. A store-wide promo failing is not a reason to refuse
+  // the sale: drop it and retry at full price. A coupon the buyer typed
+  // themselves still fails loudly, because they need to know it was rejected.
+  const discountRejected =
+    !result.ok && Boolean(autoDiscountCode) && !input.couponCode && /discount/i.test(result.detail);
+
+  if (discountRejected) {
+    const retryBody = JSON.parse(JSON.stringify(body));
+    delete retryBody.data.attributes.checkout_data.discount_code;
+    result = await postCheckout(retryBody);
+  }
+
+  const json = result.json;
+  if (!result.ok) {
+    throw new Error(result.detail);
   }
 
   const checkoutUrl = json?.data?.attributes?.url;

@@ -176,6 +176,9 @@ export default function PaymentPage() {
   /* Coupon */
   const [couponInput,    setCouponInput]    = useState("");
   const [couponApplied,  setCouponApplied]  = useState<{ code: string; type: string; value: number } | null>(null);
+  // The store-wide promo, kept separately so the summary can label it as an
+  // automatic discount rather than something the buyer typed in.
+  const [autoDiscount,   setAutoDiscount]   = useState<{ code: string; type: string; value: number } | null>(null);
   const [couponError,    setCouponError]    = useState("");
   const [couponLoading,  setCouponLoading]  = useState(false);
 
@@ -271,6 +274,20 @@ export default function PaymentPage() {
         const pr = await fetch("/api/public/pricing", { cache: "no-store" });
         if (pr.ok) { const d = await pr.json(); if (d?.pkrPricing) setPkrPricing(d.pkrPricing); }
       } catch {}
+      // The store-wide launch discount is applied to every checkout server-side.
+      // Show it here too, otherwise the summary quotes the full price and the
+      // Lemon Squeezy page then charges less — the same "screen disagrees with
+      // checkout" problem the currency fix addressed.
+      try {
+        const ld = await fetch("/api/public/launch-discount", { cache: "no-store" });
+        if (ld.ok) {
+          const d = await ld.json();
+          if (d?.discount) {
+            setCouponApplied(prev => prev ?? d.discount);
+            setAutoDiscount(d.discount);
+          }
+        }
+      } catch {}
     })();
   }, [searchParams]);
 
@@ -343,6 +360,10 @@ export default function PaymentPage() {
     finally { setCouponLoading(false); }
   }
 
+  // Null when the applied coupon is just the automatic store-wide promo.
+  const manualCouponCode =
+    couponApplied && couponApplied.code !== autoDiscount?.code ? couponApplied.code : null;
+
   const verificationEmail = (lockedVerificationEmail || email).trim().toLowerCase();
   const isVerificationEmailLocked = !!lockedVerificationEmail;
 
@@ -371,7 +392,11 @@ export default function PaymentPage() {
           successUrl: plan === "addon-automation"
             ? `${window.location.origin}/dashboard/automation?addon=activated`
             : `${window.location.origin}/dashboard/billing?upgrade=success`,
-          couponCode: couponApplied?.code || null,
+          // Only a coupon the buyer actually typed. The launch promo is added
+          // server-side; echoing it back would mark it as buyer-supplied, and
+          // createLemonCheckout deliberately fails loudly on those instead of
+          // silently dropping them.
+          couponCode: manualCouponCode,
           displayCurrency: currency,
           displayCountry: country,
           billingCycle,
@@ -458,7 +483,11 @@ export default function PaymentPage() {
           successUrl: plan === "addon-automation"
             ? window.location.origin + "/dashboard/automation?addon=activated"
             : window.location.origin + "/dashboard/billing?upgrade=success",
-          couponCode: couponApplied?.code || null,
+          // Only a coupon the buyer actually typed. The launch promo is added
+          // server-side; echoing it back would mark it as buyer-supplied, and
+          // createLemonCheckout deliberately fails loudly on those instead of
+          // silently dropping them.
+          couponCode: manualCouponCode,
           displayCurrency: currency,
           displayCountry: country,
           billingCycle,
