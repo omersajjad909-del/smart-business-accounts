@@ -1,21 +1,27 @@
 import type { NextRequest } from "next/server";
 
 /**
- * Server-side country resolution for *pricing* decisions.
+ * One rule for the whole product: the visitor's IP country decides the price
+ * they see *and* the price they are charged.
  *
- * Anything the browser sends (request body, query string, localStorage) is
- * attacker-controlled: `/onboarding/payment/starter?country=PK` used to flow
- * straight through to Lemon Squeezy variant selection, so any visitor in the
- * world could hand themselves the discounted Pakistan price. Pricing must
- * therefore never read the client's claimed country.
+ *   Pakistan  → PKR, Lemon Squeezy `_PK` variants
+ *   Elsewhere → USD, global variants
+ *
+ * There is no third currency and no user-facing switch. Every earlier bug in
+ * this area came from letting the browser have an opinion — `?country=PK`, a
+ * localStorage preference, or a 30-entry currency dropdown could each unlock
+ * Pakistan's discounted price list from anywhere in the world, and the display
+ * could disagree with what checkout actually charged.
  *
  * Trust order:
- *   1. `company.country` — declared once at signup, stored in our DB, tied to
- *      the account and auditable. A travelling Pakistani business keeps its
- *      regional price; a visitor cannot change it per-request.
- *   2. CDN/edge IP geo headers — set by the platform, not forgeable by the
- *      browser. Used when the company has no country on record.
- *   3. "US" — full global pricing. Fail closed, never to the cheaper tier.
+ *   1. CDN/edge IP headers — set by the platform, the browser cannot forge them.
+ *   2. `company.country` — only when the edge gives us nothing (local dev, an
+ *      unknown proxy). Keeps existing customers on their normal price.
+ *   3. "US" — global pricing. Fail closed, never to the cheaper tier.
+ *
+ * A VPN does flip the result, by design: the user asked for IP to be the rule.
+ * The backstop is Lemon Squeezy, which validates the card's own billing country
+ * at checkout, so a spoofed region still has to survive the card.
  */
 
 const GEO_HEADERS = [
@@ -24,6 +30,9 @@ const GEO_HEADERS = [
   "cloudfront-viewer-country",
   "x-country-code",
 ] as const;
+
+/** The only two currencies the product prices in. */
+export type PricingCurrency = "PKR" | "USD";
 
 export function readGeoCountryFromHeaders(req: NextRequest): string | null {
   for (const header of GEO_HEADERS) {
@@ -38,34 +47,33 @@ function normalizeCountry(value: string | null | undefined): string | null {
   return /^[A-Z]{2}$/.test(cc) ? cc : null;
 }
 
-export type PricingCountry = {
-  /** The country pricing is actually computed from. Never client-supplied. */
+export function pricingCurrencyForCountry(country: string | null | undefined): PricingCurrency {
+  return normalizeCountry(country) === "PK" ? "PKR" : "USD";
+}
+
+export type PricingRegion = {
+  /** Country pricing is computed from. Never client-supplied. */
   country: string;
-  source: "company" | "geo" | "default";
-  /** Edge-detected country, kept for fraud review. */
-  geoCountry: string | null;
-  /**
-   * True when the account's declared country and the edge geo disagree. Not a
-   * blocker on its own (VPNs and travel are normal) but worth logging so the
-   * fraud module can review discounted-region signups from elsewhere.
-   */
-  geoMismatch: boolean;
+  /** "PKR" for Pakistan, "USD" for everyone else. */
+  currency: PricingCurrency;
+  isPakistan: boolean;
+  source: "geo" | "company" | "default";
 };
 
-export function resolvePricingCountry(
+export function resolvePricingRegion(
   req: NextRequest,
-  companyCountry: string | null | undefined,
-): PricingCountry {
-  const geoCountry = readGeoCountryFromHeaders(req);
+  companyCountry?: string | null,
+): PricingRegion {
+  const geo = readGeoCountryFromHeaders(req);
   const declared = normalizeCountry(companyCountry);
 
-  const country = declared || geoCountry || "US";
-  const source: PricingCountry["source"] = declared ? "company" : geoCountry ? "geo" : "default";
+  const country = geo || declared || "US";
+  const source: PricingRegion["source"] = geo ? "geo" : declared ? "company" : "default";
 
   return {
     country,
+    currency: pricingCurrencyForCountry(country),
+    isPakistan: country === "PK",
     source,
-    geoCountry,
-    geoMismatch: Boolean(declared && geoCountry && declared !== geoCountry),
   };
 }

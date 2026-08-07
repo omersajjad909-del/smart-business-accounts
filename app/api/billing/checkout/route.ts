@@ -3,7 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { resolveCompanyId } from "@/lib/tenant";
 import { apiError, apiOk } from "@/lib/apiError";
 import { getRuntimeAppUrl } from "@/lib/domains";
-import { resolvePricingCountry } from "@/lib/geoCountry";
+import { resolvePricingRegion } from "@/lib/geoCountry";
 import { createLemonCheckout, hasLemonSqueezyConfig } from "@/lib/lemonsqueezy";
 import { createSafepayCheckout, hasSafepayConfig, usdToPkr } from "@/lib/safepay";
 import { getCompanyExtraSeats } from "@/lib/companySeatLimit";
@@ -68,7 +68,9 @@ export async function POST(req: NextRequest) {
 
     // Authoritative, server-side pricing region. Derived from the stored
     // company record and edge geo headers only.
-    const pricingRegion = resolvePricingCountry(req, company.country);
+    // IP-driven, same resolver /api/public/pricing-region serves the UI from —
+    // so the currency on screen is always the currency charged.
+    const pricingRegion = resolvePricingRegion(req, company.country);
     const pricingCountry = pricingRegion.country;
 
     const user = userId
@@ -120,7 +122,10 @@ export async function POST(req: NextRequest) {
     // here (`displayCountry === "PK" || displayCurrency === "PKR"`) meant a
     // request body — or just `?country=PK` in the page URL — granted Pakistan
     // pricing to anyone, anywhere.
-    const isPkrCustomer = pricingCountry === "PK" || company.baseCurrency === "PKR";
+    // Purely IP-driven. `company.baseCurrency === "PKR"` used to be OR'd in
+    // here, which pinned an account to PKR forever regardless of where the
+    // request actually came from — the opposite of the rule we now follow.
+    const isPkrCustomer = pricingRegion.isPakistan;
 
     if (isPkrCustomer && hasSafepayConfig()) {
       const base      = getRuntimeAppUrl(req.nextUrl.origin);
@@ -192,7 +197,7 @@ export async function POST(req: NextRequest) {
         email: user?.email || null,
         name: user?.name || company.name,
         couponCode,
-        displayCurrency: company.baseCurrency || requestedCurrency,
+        displayCurrency: pricingRegion.currency,
         // Drives _PK variant selection in resolveLemonVariantId — server-resolved.
         displayCountry: pricingCountry,
         customPriceUsd: skipCustomPriceForPk ? null : (finalCustomPrice > 0 ? finalCustomPrice : null),
@@ -210,11 +215,10 @@ export async function POST(req: NextRequest) {
             checkoutId: checkout.checkoutId,
             variantId: checkout.variantId,
             couponCode,
-            displayCurrency: company.baseCurrency || requestedCurrency,
+            displayCurrency: pricingRegion.currency,
             displayCountry: pricingCountry,
-            pricingCountrySource: pricingRegion.source,
-            geoCountry: pricingRegion.geoCountry,
-            geoMismatch: pricingRegion.geoMismatch,
+            pricingRegionSource: pricingRegion.source,
+            companyCountry: company.country,
             requestedCountry,
             requestedCurrency,
             baseCycleAmount,
@@ -323,7 +327,7 @@ export async function POST(req: NextRequest) {
           planCode,
           billingCycle,
           activatedAt: new Date().toISOString(),
-          displayCurrency: company.baseCurrency || requestedCurrency,
+          displayCurrency: pricingRegion.currency,
           displayCountry: pricingCountry,
           requestedCountry,
           baseCycleAmount,

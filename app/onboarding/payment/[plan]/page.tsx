@@ -266,25 +266,16 @@ export default function PaymentPage() {
         const pr = await fetch("/api/public/pricing", { cache: "no-store" });
         if (pr.ok) { const d = await pr.json(); if (d?.pkrPricing) setPkrPricing(d.pkrPricing); }
       } catch {}
-      // Authoritative region — same resolution /api/billing/checkout uses to
-      // pick the Lemon Squeezy variant. `currency`/`country` above are only a
-      // display preference (and are seeded from the URL), so regional pricing
-      // must be gated on this instead or the screen can promise a price the
-      // checkout will not honour.
+      // Authoritative region — /api/billing/checkout runs the same resolver on
+      // the same request, so whatever this returns is exactly what the card
+      // will be charged in. It overrides the currency picked above.
       try {
-        const user = getCurrentUser();
-        const res = await fetch("/api/billing/pricing-region", {
-          cache: "no-store",
-          headers: {
-            "x-company-id": user?.companyId || "",
-            "x-user-id": user?.id || "",
-            "x-user-role": user?.role || "",
-          },
-        });
+        const res = await fetch("/api/public/pricing-region", { cache: "no-store" });
         if (res.ok) {
           const d = await res.json();
-          setRegionalPricingAllowed(Boolean(d?.regionalPricingAllowed));
+          if (d?.currency) setCurrency(d.currency);
           if (d?.country) setServerCountry(String(d.country).toUpperCase());
+          setRegionalPricingAllowed(Boolean(d?.isPakistan));
         }
       } catch {}
     })();
