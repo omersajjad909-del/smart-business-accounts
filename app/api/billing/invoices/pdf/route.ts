@@ -53,14 +53,15 @@ export async function GET(req: NextRequest): Promise<Response> {
       prisma.company.findUnique({
         where: { id: companyId },
         select: {
+          // Company has no address/phone/email/billingCycle fields — selecting
+          // them threw a PrismaClientValidationError on every request, which
+          // this route's catch block silently turned into the generic
+          // "Failed to generate invoice PDF" error. billingCycle lives on
+          // Subscription (already queried below and used as the source).
           name: true,
-          address: true,
-          phone: true,
-          email: true,
           baseCurrency: true,
           plan: true,
           currentPeriodEnd: true,
-          billingCycle: true,
           subscriptionStatus: true,
           createdAt: true,
         },
