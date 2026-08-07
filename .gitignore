@@ -46,3 +46,8 @@ prisma/.env
 
 # Sentry Config File
 .env.sentry-build-plugin
+
+# Local env backups — never commit (contain live secrets)
+.env.bak*
+.env.backup*
+.env.*.bak
