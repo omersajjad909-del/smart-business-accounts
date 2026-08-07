@@ -97,8 +97,8 @@ export async function GET(req: NextRequest): Promise<Response> {
       companyPhone: process.env.SUPPORT_PHONE || "",
       companyEmail: process.env.SUPPORT_EMAIL || "support@finovaos.app",
       customerName: company.name,
-      customerAddress: company.address || "",
-      customerPhone: company.phone || "",
+      customerAddress: "",
+      customerPhone: "",
       items: [
         {
           name: `${effectivePlan} subscription (${effectiveBillingCycle.toLowerCase()})`,
