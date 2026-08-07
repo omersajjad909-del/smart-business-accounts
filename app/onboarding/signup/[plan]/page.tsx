@@ -364,18 +364,17 @@ export default function SignupByPlanPage() {
         const j = await r.json();
         const p = j?.pricing;
         if (!p) return;
-        const stored = getStoredCurrencyPreference();
-        const requestedCurrency = searchParams.get("currency");
-        let cur: keyof typeof FX_USD =
-          requestedCurrency && FX_USD[requestedCurrency]
-            ? (requestedCurrency as keyof typeof FX_USD)
-            : stored.currency && FX_USD[stored.currency]
-              ? (stored.currency as keyof typeof FX_USD)
-              : "USD";
+        // Currency and region both come from the IP. `?currency=` and the
+        // stored preference used to win here, which let the plan page quote a
+        // currency /api/billing/checkout would not bill in.
+        let cur = "USD";
+        let geoCountry: string | null = null;
         try {
-          if (!requestedCurrency && !stored.currency) {
-            const g = await fetch("/api/public/geo", { cache:"no-store" });
-            if (g.ok) { const gj = await g.json(); if (gj?.currency && FX_USD[gj.currency]) cur = gj.currency; }
+          const g = await fetch("/api/public/pricing-region", { cache: "no-store" });
+          if (g.ok) {
+            const gj = await g.json();
+            if (gj?.currency) cur = gj.currency;
+            if (gj?.country) geoCountry = String(gj.country).toUpperCase();
           }
         } catch {}
         let rates: Record<string, number> | null = null;
@@ -390,15 +389,6 @@ export default function SignupByPlanPage() {
         // Converting instead produced wildly different figures between the two
         // pages (e.g. Enterprise showed Rs3,750 on /pricing but Rs17,236 here).
         const pkr = j?.pkrPricing;
-        // Was `cur === "PKR" || searchParams.get("country") === "PK"` — both
-        // caller-controlled, so `?country=PK` (or just picking PKR) showed the
-        // discounted Pakistan price list to anyone. Ask the edge instead; the
-        // geo route ignores its own `?country=` override in production.
-        let geoCountry: string | null = null;
-        try {
-          const g = await fetch("/api/public/geo", { cache: "no-store" });
-          if (g.ok) { const gj = await g.json(); if (gj?.country) geoCountry = String(gj.country).toUpperCase(); }
-        } catch {}
         const isPkUser = geoCountry === "PK";
         const planKey = planCode === "professional" ? "pro"
           : planCode === "pro" ? "pro"

@@ -129,8 +129,10 @@ export default function ChoosePlanPage() {
   const [livePricing,     setLivePricing]     = useState<Record<string, {monthly:number; yearly:number}>>({});
   const [liveFeatures,    setLiveFeatures]    = useState<string[]>([]);
   const [liveFeatureMatrix, setLiveFeatureMatrix] = useState<Record<string, string[]>>({});
-  const [currency, setCurrency] = useState<string>(searchParams.get("currency") || "USD");
-  const [country, setCountry] = useState<string>(searchParams.get("country") || "US");
+  // Global pricing until /api/public/pricing-region answers. Not seeded from
+  // the query string — that was a way to carry a chosen currency into signup.
+  const [currency, setCurrency] = useState<string>("USD");
+  const [country, setCountry] = useState<string>("US");
   const [rates, setRates] = useState<Record<string, number> | null>(null);
 
   // ── Addon mode: ?addon=automation ────────────────────────────────────────
@@ -183,25 +185,18 @@ export default function ChoosePlanPage() {
 
   useEffect(() => {
     (async () => {
-      const stored = getStoredCurrencyPreference();
-      if (!searchParams.get("currency") || !searchParams.get("country")) {
-        try {
-          const geo = await fetch("/api/public/geo", { cache: "no-store" });
-          if (geo.ok) {
-            const data = await geo.json();
-            if (!searchParams.get("currency") && data?.currency && FX_USD[data.currency]) setCurrency(data.currency);
-            else if (!searchParams.get("currency") && stored.currency && FX_USD[stored.currency]) setCurrency(stored.currency);
-            if (!searchParams.get("country") && data?.country) setCountry(data.country);
-            else if (!searchParams.get("country") && stored.country) setCountry(stored.country);
-          } else {
-            if (!searchParams.get("currency") && stored.currency && FX_USD[stored.currency]) setCurrency(stored.currency);
-            if (!searchParams.get("country") && stored.country) setCountry(stored.country);
-          }
-        } catch {
-          if (!searchParams.get("currency") && stored.currency && FX_USD[stored.currency]) setCurrency(stored.currency);
-          if (!searchParams.get("country") && stored.country) setCountry(stored.country);
+      // IP decides the currency, and it is the only input. The `?currency=` /
+      // `?country=` / stored-preference cascade that used to be here could pin
+      // this page to a currency /api/billing/checkout would never bill in — and
+      // this page builds the signup link, so the wrong value travelled onward.
+      try {
+        const res = await fetch("/api/public/pricing-region", { cache: "no-store" });
+        if (res.ok) {
+          const data = await res.json();
+          if (data?.currency) setCurrency(data.currency);
+          if (data?.country) setCountry(String(data.country).toUpperCase());
         }
-      }
+      } catch {}
 
       try {
         const fx = await fetch("/api/public/fx", { cache: "no-store" });

@@ -1,15 +1,7 @@
 "use client";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
-import {
-  CURRENCY_LABEL, CURRENCY_SYMBOL, FX_USD, SUPPORTED_CURRENCIES,
-  formatFromUSD,
-} from "@/lib/currency-client";
-import {
-  getStoredCurrencyPreference,
-  setStoredCurrencyPreference,
-  FINOVA_CURRENCY_EVENT,
-} from "@/lib/currencyPreference";
+import { CURRENCY_SYMBOL, formatFromUSD } from "@/lib/currency-client";
 
 function useInView() {
   const ref = useRef<HTMLDivElement>(null);
@@ -414,32 +406,17 @@ export default function PricingSection() {
               ))}
             </div>
 
-            {/* Currency selector */}
+            {/* Currency is not selectable — billing is PKR for Pakistan and
+                USD everywhere else, decided by IP. A picker here could only
+                quote a currency checkout would refuse. */}
             <div style={{
               display:"inline-flex", alignItems:"center", gap:6,
-              padding:"4px 6px 4px 10px", borderRadius:12,
+              padding:"6px 12px", borderRadius:12,
               background:"rgba(255,255,255,.04)", border:"1px solid rgba(255,255,255,.09)",
             }}>
-              <span style={{ fontSize:13, fontWeight:700, color:"rgba(255,255,255,.5)" }}>
-                {CURRENCY_SYMBOL[currency] || currency}
+              <span style={{ fontSize:12, fontWeight:700, color:"rgba(255,255,255,.5)" }}>
+                {CURRENCY_SYMBOL[currency] || currency} {currency}
               </span>
-              <select
-                aria-label="Select currency"
-                value={currency}
-                onChange={e => handleCurrencyChange(e.target.value)}
-                style={{
-                  background:"transparent", border:"none",
-                  color:"rgba(255,255,255,.8)", fontSize:12, fontWeight:700,
-                  outline:"none", cursor:"pointer", fontFamily:"inherit",
-                  padding:"4px 2px",
-                }}
-              >
-                {SUPPORTED_CURRENCIES.map(code => (
-                  <option key={code} value={code} style={{ background:"#1e1b4b" }}>
-                    {code} — {CURRENCY_LABEL[code]}
-                  </option>
-                ))}
-              </select>
             </div>
           </div>
         </div>
