@@ -541,9 +541,16 @@ async function handleLemonWebhook(req: NextRequest, raw: string) {
         action: "PAYMENT_EVENT",
         details: JSON.stringify({
           provider: "LEMON_SQUEEZY", eventName,
-          amount: attrs?.subtotal ?? attrs?.total ?? null,
+          // `total` is what the card was charged. This read `subtotal` first,
+          // which is the price *before* the discount — the launch-offer sale
+          // that actually collected $24.50 was recorded as $49.00.
+          amount: attrs?.total ?? attrs?.subtotal ?? null,
           currency: attrs?.currency || "USD",
-          orderId: payload?.data?.id || null,
+          // Both order_created and subscription_payment_success fire for one
+          // payment, so readers must dedupe on this. Prefer the order id over
+          // the event's own id, which differs between the two events.
+          orderId: String(attrs?.order_id ?? payload?.data?.id ?? ""),
+          status: "paid",
         }),
       },
     }).catch(() => {});
