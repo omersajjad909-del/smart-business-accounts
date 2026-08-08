@@ -986,6 +986,9 @@ export default function DashboardLayout({
               {hasPermission(currentUser, PERMISSIONS.CREATE_DELIVERY_CHALLAN) && <NavLink href="/dashboard/delivery-challan" pathname={pathname}>Delivery Challan</NavLink>}
               {hasPermission(currentUser, PERMISSIONS.CREATE_SALES_INVOICE) && <NavLink href="/dashboard/sales-invoice" pathname={pathname}>Sales Invoice</NavLink>}
               {hasPermission(currentUser, PERMISSIONS.CREATE_SALE_RETURN) && <NavLink href="/dashboard/sale-return" pathname={pathname}>Sale Return</NavLink>}
+              {/* Both had a module toggle and a working page but no way in. */}
+              {hasPermission(currentUser, PERMISSIONS.CREATE_DELIVERY_CHALLAN) && hasModule(businessType, "outward") && <NavLink href="/dashboard/outward" pathname={pathname}>Outward / Dispatch</NavLink>}
+              {hasPermission(currentUser, PERMISSIONS.CREATE_PURCHASE_INVOICE) && hasModule(businessType, "landed_cost") && <NavLink href="/dashboard/landed-cost" pathname={pathname}>Landed Cost</NavLink>}
               {/* ── Admin ── */}
 
               {bizFeatures?.customerCreditLimits && hasPermission(currentUser, PERMISSIONS.VIEW_INVENTORY) && <NavLink href="/dashboard/credit-limits" pathname={pathname}>💳 Credit Limits</NavLink>}
@@ -1042,6 +1045,14 @@ export default function DashboardLayout({
               {hasPermission(currentUser, PERMISSIONS.VIEW_ACCOUNTING) && <NavLink href="/dashboard/jv" pathname={pathname}>Journal Voucher (JV)</NavLink>}
               {hasPermission(currentUser, PERMISSIONS.MANAGE_OPENING_BALANCES) && <NavLink href="/dashboard/opening-balances" pathname={pathname}>Opening Balances</NavLink>}
               {hasPermission(currentUser, PERMISSIONS.VIEW_ACCOUNTING) && <NavLink href="/dashboard/advance-payment" pathname={pathname}>Advance Payment</NavLink>}
+              {/* These four shipped as working pages with a module toggle in the
+                  admin panel, but no sidebar entry anywhere — an admin could
+                  switch them on and the customer still had no way to reach them
+                  short of typing the URL. */}
+              {hasPermission(currentUser, PERMISSIONS.VIEW_ACCOUNTING) && hasModule(businessType, "contra") && <NavLink href="/dashboard/contra" pathname={pathname}>Contra Entry</NavLink>}
+              {hasPermission(currentUser, PERMISSIONS.VIEW_ACCOUNTING) && hasModule(businessType, "petty_cash") && <NavLink href="/dashboard/petty-cash" pathname={pathname}>Petty Cash</NavLink>}
+              {hasPermission(currentUser, PERMISSIONS.VIEW_ACCOUNTING) && hasModule(businessType, "loans") && <NavLink href="/dashboard/loans" pathname={pathname}>Loans</NavLink>}
+              {hasPermission(currentUser, PERMISSIONS.VIEW_ACCOUNTING) && hasModule(businessType, "recurring") && <NavLink href="/dashboard/recurring-transactions" pathname={pathname}>Recurring Transactions</NavLink>}
             </NavGroup>
           )}
 
@@ -1972,6 +1983,7 @@ export default function DashboardLayout({
               <NavLink href="/dashboard/users" pathname={pathname}>Team</NavLink>
               {hasPermission(currentUser, PERMISSIONS.VIEW_LOGS) && <NavLink href="/dashboard/users/logs" pathname={pathname}>System Logs</NavLink>}
               {hasPermission(currentUser, PERMISSIONS.VIEW_FINANCIAL_REPORTS) && <NavLink href="/dashboard/audit-trail" pathname={pathname}>Audit Trail</NavLink>}
+              {hasPermission(currentUser, PERMISSIONS.VIEW_FINANCIAL_REPORTS) && hasModule(businessType, "fixed_assets") && <NavLink href="/dashboard/fixed-assets" pathname={pathname}>Fixed Assets</NavLink>}
             </NavGroup>
           )}
 
