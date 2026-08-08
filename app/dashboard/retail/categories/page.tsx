@@ -114,7 +114,6 @@ export default function RetailCategoriesPage() {
 
   return (
     <div style={{ fontFamily: ff, minHeight: "100vh", background: "var(--app-bg)", padding: isMobile ? "15px 11px" : "28px 24px", color: "var(--text-primary)" }}>
-      <style>{``}</style>
 
       {/* Header */}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 24 }}>
