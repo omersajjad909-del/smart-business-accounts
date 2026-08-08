@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useMemo } from "react";
 import { BUSINESS_TYPES } from "@/lib/businessModules";
+import { dashboardFeaturesForBusinessType } from "@/lib/dashboardFeatureRegistry";
 import { getCurrentUser } from "@/lib/auth";
 
 const FONT = "'Outfit','Inter',sans-serif";
@@ -247,6 +248,8 @@ function getDefaultPlanModules(allModules: string[]): Record<Plan, string[]> {
 }
 
 type ConfigMap = Record<string, Record<Plan, string[]>>;
+/** Same shape as ConfigMap, but the values are dashboard page ids. */
+type PageConfigMap = Record<string, Record<Plan, string[]>>;
 
 const MODULE_GROUPS: Array<{ id: string; label: string; icon: string; keys: string[] }> = [
   { id: "core",      label: "Core",               icon: "⚙️",  keys: ["dashboard","admin_settings","chart_of_accounts","opening_balances"] },
@@ -275,6 +278,7 @@ export default function AdminPermissionsPage() {
   const [search,     setSearch]     = useState("");
   const [selected,   setSelected]   = useState<typeof BUSINESS_TYPES[0] | null>(null);
   const [config,     setConfig]     = useState<ConfigMap>({});
+  const [pageConfig, setPageConfig] = useState<PageConfigMap>({});
   const [saving,     setSaving]     = useState(false);
   const [saved,      setSaved]      = useState(false);
   const [enabledIds,      setEnabledIds]      = useState<Set<string> | null>(null);
@@ -289,8 +293,8 @@ export default function AdminPermissionsPage() {
   // Load saved config + enabled business types
   useEffect(() => {
     fetch("/api/admin/business-plan-modules", { headers: getHeaders() })
-      .then(r => r.ok ? r.json() : { config: {} })
-      .then(d => setConfig(d.config || {}))
+      .then(r => r.ok ? r.json() : { config: {}, pageConfig: {} })
+      .then(d => { setConfig(d.config || {}); setPageConfig(d.pageConfig || {}); })
       .catch(() => {});
 
     fetch("/api/admin/business-modules", { headers: getHeaders() })
@@ -312,6 +316,60 @@ export default function AdminPermissionsPage() {
     return getDefaultPlanModules(selected.modules as string[]);
   }, [selected, config]);
 
+  // Every dashboard page this business type owns, grouped the way the sidebar
+  // groups them. This is the list that was missing: the module keys above cover
+  // 114 generic modules, while these are the actual pages — all 24 AI tools,
+  // the industry control centres, everything.
+  const pageFeatures = useMemo(
+    () => (selected ? dashboardFeaturesForBusinessType(selected.id) : []),
+    [selected]
+  );
+
+  const pageGroups = useMemo(() => {
+    const bySection = new Map<string, { id: string; label: string }[]>();
+    for (const f of pageFeatures) {
+      const section = `${f.businessLabel} · ${f.section}`;
+      if (!bySection.has(section)) bySection.set(section, []);
+      bySection.get(section)!.push({ id: f.id, label: f.label });
+    }
+    return Array.from(bySection.entries()).map(([label, items]) => ({
+      id: `page:${label}`,
+      label,
+      items,
+    }));
+  }, [pageFeatures]);
+
+  // No saved override means "everything on" — a business type should not lose
+  // its pages just because nobody has opened this screen yet.
+  const planPages = useMemo((): Record<Plan, string[]> => {
+    const allIds = pageFeatures.map(f => f.id);
+    const saved = selected ? pageConfig[selected.id] : undefined;
+    if (!saved) return { STARTER: allIds, PRO: allIds, ENTERPRISE: allIds };
+    return {
+      STARTER:    saved.STARTER    ?? allIds,
+      PRO:        saved.PRO        ?? allIds,
+      ENTERPRISE: saved.ENTERPRISE ?? allIds,
+    };
+  }, [selected, pageConfig, pageFeatures]);
+
+  function setPlanPages(plan: Plan, ids: string[]) {
+    if (!selected) return;
+    setPageConfig(prev => ({
+      ...prev,
+      [selected.id]: { ...planPages, [plan]: ids },
+    }));
+  }
+
+  function togglePage(plan: Plan, featureId: string) {
+    const current = planPages[plan];
+    setPlanPages(
+      plan,
+      current.includes(featureId)
+        ? current.filter(id => id !== featureId)
+        : [...current, featureId]
+    );
+  }
+
   function toggleModule(plan: Plan, mod: string) {
     if (!selected || ALWAYS_ON.has(mod)) return;
     const current = planModules[plan];
@@ -328,13 +386,35 @@ export default function AdminPermissionsPage() {
   function applyPreset(preset: "all" | "default" | "min") {
     if (!selected) return;
     const all = selected.modules as string[];
+    const allPages = pageFeatures.map(f => f.id);
+    // Presets act on pages too — otherwise "All ON" would leave most of the
+    // sidebar untouched, since pages outnumber module keys roughly 3 to 1.
     if (preset === "all") {
       setConfig(prev => ({ ...prev, [selected.id]: { STARTER: all, PRO: all, ENTERPRISE: all } }));
+      setPageConfig(prev => ({ ...prev, [selected.id]: { STARTER: allPages, PRO: allPages, ENTERPRISE: allPages } }));
     } else if (preset === "default") {
       setConfig(prev => { const n = { ...prev }; delete n[selected.id]; return n; });
+      setPageConfig(prev => { const n = { ...prev }; delete n[selected.id]; return n; });
     } else {
       const core = all.filter(m => ALWAYS_ON.has(m));
       setConfig(prev => ({ ...prev, [selected.id]: { STARTER: core, PRO: all.filter(m => !new Set(["hr_payroll","bank_reconciliation"]).has(m)), ENTERPRISE: all } }));
+      // Recommended tiering for pages: Starter gets the control centre of each
+      // section, Pro gets everything except the AI tools, Enterprise gets all.
+      const firstOfEachSection = new Set<string>();
+      const seenSections = new Set<string>();
+      for (const f of pageFeatures) {
+        const key = `${f.businessLabel} · ${f.section}`;
+        if (!seenSections.has(key)) { seenSections.add(key); firstOfEachSection.add(f.id); }
+      }
+      const aiIds = new Set(pageFeatures.filter(f => f.businessLabel === "AI Intelligence").map(f => f.id));
+      setPageConfig(prev => ({
+        ...prev,
+        [selected.id]: {
+          STARTER:    allPages.filter(id => firstOfEachSection.has(id) && !aiIds.has(id)),
+          PRO:        allPages.filter(id => !aiIds.has(id)),
+          ENTERPRISE: allPages,
+        },
+      }));
     }
   }
 
@@ -344,7 +424,7 @@ export default function AdminPermissionsPage() {
       const res = await fetch("/api/admin/business-plan-modules", {
         method: "POST",
         headers: getHeaders(),
-        body: JSON.stringify({ config }),
+        body: JSON.stringify({ config, pageConfig }),
       });
       if (res.ok) { setSaved(true); setTimeout(() => setSaved(false), 2500); }
     } finally { setSaving(false); }
@@ -613,6 +693,102 @@ export default function AdminPermissionsPage() {
                       );
                     })}
                   </div>
+
+                  {/* ── Pages: every screen this business type owns ────────── */}
+                  {pageGroups.length > 0 && (
+                    <>
+                      <div style={{ display: "grid", gridTemplateColumns: "1fr 170px 170px 170px", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 12, overflow: "hidden", margin: "18px 0 10px" }}>
+                        <div style={{ padding: "12px 18px", borderRight: "1px solid rgba(255,255,255,0.06)" }}>
+                          <div style={{ fontSize: 12, fontWeight: 700, color: "white" }}>Pages ({pageFeatures.length})</div>
+                          <div style={{ fontSize: 10, color: "rgba(255,255,255,.3)", marginTop: 2 }}>
+                            Every screen in the sidebar for this business type
+                          </div>
+                        </div>
+                        {PLANS.map(plan => {
+                          const meta = PLAN_META[plan];
+                          const count = planPages[plan].length;
+                          return (
+                            <div key={plan} style={{ padding: "10px 14px", borderRight: "1px solid rgba(255,255,255,0.06)", textAlign: "center" }}>
+                              <div style={{ fontSize: 13, fontWeight: 700, color: meta.color }}>{meta.label}</div>
+                              <div style={{ fontSize: 10, color: "rgba(255,255,255,.3)", marginBottom: 7 }}>{count}/{pageFeatures.length} enabled</div>
+                              <div style={{ display: "flex", gap: 4, justifyContent: "center" }}>
+                                <button onClick={() => setPlanPages(plan, pageFeatures.map(f => f.id))}
+                                  style={{ padding: "3px 8px", borderRadius: 5, border: `1px solid ${meta.border}`, background: "transparent", color: meta.color, fontSize: 9, fontWeight: 700, cursor: "pointer", fontFamily: FONT }}>All ON</button>
+                                <button onClick={() => setPlanPages(plan, [])}
+                                  style={{ padding: "3px 8px", borderRadius: 5, border: "1px solid rgba(255,255,255,.1)", background: "transparent", color: "rgba(255,255,255,.4)", fontSize: 9, fontWeight: 700, cursor: "pointer", fontFamily: FONT }}>None</button>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+
+                      <div style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 12, overflow: "hidden" }}>
+                        {pageGroups.map((group, gi) => {
+                          const isExpanded = expandedGroups.has(group.id);
+                          const isLast = gi === pageGroups.length - 1;
+                          const ids = group.items.map(i => i.id);
+
+                          return (
+                            <div key={group.id} style={{ borderBottom: isLast ? "none" : "1px solid rgba(255,255,255,0.05)" }}>
+                              <div
+                                onClick={() => setExpandedGroups(prev => { const n = new Set(prev); n.has(group.id) ? n.delete(group.id) : n.add(group.id); return n; })}
+                                style={{ display: "grid", gridTemplateColumns: "1fr 170px 170px 170px", padding: "9px 16px", background: "rgba(255,255,255,0.035)", cursor: "pointer", userSelect: "none" }}
+                              >
+                                <div style={{ display: "flex", alignItems: "center", gap: 7 }}>
+                                  <span style={{ fontSize: 10, color: "rgba(255,255,255,.4)", width: 10, flexShrink: 0 }}>{isExpanded ? "▼" : "▶"}</span>
+                                  <span style={{ fontSize: 12, fontWeight: 700, color: "white" }}>{group.label}</span>
+                                  <span style={{ fontSize: 10, color: "rgba(255,255,255,.25)" }}>({group.items.length})</span>
+                                </div>
+                                {PLANS.map(plan => {
+                                  const meta = PLAN_META[plan];
+                                  const onCount = ids.filter(id => planPages[plan].includes(id)).length;
+                                  const allOn = onCount === ids.length;
+                                  return (
+                                    <div key={plan} style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 7 }} onClick={e => e.stopPropagation()}>
+                                      <span style={{ fontSize: 10, fontWeight: 700, color: allOn ? meta.color : "rgba(255,255,255,.3)", minWidth: 28, textAlign: "right" }}>
+                                        {onCount}/{ids.length}
+                                      </span>
+                                      <button
+                                        onClick={() => {
+                                          const cur = new Set(planPages[plan]);
+                                          if (allOn) ids.forEach(id => cur.delete(id));
+                                          else ids.forEach(id => cur.add(id));
+                                          setPlanPages(plan, Array.from(cur));
+                                        }}
+                                        style={{ padding: "2px 7px", borderRadius: 4, fontSize: 9, fontWeight: 700, cursor: "pointer", border: `1px solid ${allOn ? "rgba(248,113,113,.4)" : meta.border}`, background: "transparent", color: allOn ? "#f87171" : meta.color, fontFamily: FONT }}
+                                      >
+                                        {allOn ? "All OFF" : "All ON"}
+                                      </button>
+                                    </div>
+                                  );
+                                })}
+                              </div>
+
+                              {isExpanded && group.items.map((item, ii) => (
+                                <div key={item.id} style={{ display: "grid", gridTemplateColumns: "1fr 170px 170px 170px", padding: "7px 16px 7px 40px", borderTop: "1px solid rgba(255,255,255,0.03)", background: ii % 2 === 0 ? "transparent" : "rgba(255,255,255,0.01)" }}>
+                                  <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                                    <span style={{ fontSize: 12, color: "rgba(255,255,255,.65)" }}>{item.label}</span>
+                                  </div>
+                                  {PLANS.map(plan => {
+                                    const meta = PLAN_META[plan];
+                                    const isOn = planPages[plan].includes(item.id);
+                                    return (
+                                      <div key={plan} style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
+                                        <div onClick={() => togglePage(plan, item.id)}
+                                          style={{ width: 34, height: 19, borderRadius: 10, position: "relative", transition: "background .2s", background: isOn ? meta.color : "rgba(255,255,255,0.1)", cursor: "pointer", flexShrink: 0 }}>
+                                          <div style={{ position: "absolute", top: 2.5, left: isOn ? 17 : 2.5, width: 14, height: 14, borderRadius: "50%", background: "white", transition: "left .2s", boxShadow: "0 1px 3px rgba(0,0,0,.3)" }}/>
+                                        </div>
+                                      </div>
+                                    );
+                                  })}
+                                </div>
+                              ))}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </>
+                  )}
                 </>
               );
             })()}

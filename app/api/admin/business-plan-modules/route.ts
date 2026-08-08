@@ -43,8 +43,15 @@ export async function GET(req: NextRequest) {
       orderBy: { createdAt: "desc" },
       select: { details: true },
     });
-    const config = log?.details ? JSON.parse(log.details) : {};
-    return NextResponse.json({ config });
+    const parsed = log?.details ? JSON.parse(log.details) : {};
+    const wrapped =
+      parsed && typeof parsed === "object" &&
+      ("config" in parsed || "pageConfig" in parsed);
+
+    return NextResponse.json({
+      config: wrapped ? (parsed.config || {}) : parsed,
+      pageConfig: wrapped ? (parsed.pageConfig || {}) : {},
+    });
   } catch (e: any) {
     return NextResponse.json({ error: e.message }, { status: 500 });
   }
@@ -54,15 +61,18 @@ export async function POST(req: NextRequest) {
   if (!isAdmin(req)) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
   try {
-    const { config } = await req.json();
+    const { config, pageConfig } = await req.json();
     if (!config || typeof config !== "object") {
       return NextResponse.json({ error: "Invalid config" }, { status: 400 });
+    }
+    if (pageConfig !== undefined && (pageConfig === null || typeof pageConfig !== "object")) {
+      return NextResponse.json({ error: "Invalid pageConfig" }, { status: 400 });
     }
 
     await prisma.activityLog.create({
       data: {
         action: ACTION_KEY,
-        details: JSON.stringify(config),
+        details: JSON.stringify({ config, pageConfig: pageConfig || {} }),
         userId: null,
         companyId: null,
       },

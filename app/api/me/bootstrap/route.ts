@@ -79,6 +79,7 @@ export async function GET(req: NextRequest) {
       businessModuleLog,
       shortcutsLog,
       adminControl,
+      businessPlanModulesLog,
     ] = await Promise.all([
       prisma.user.findUnique({
         where: { id: userId },
@@ -132,6 +133,11 @@ export async function GET(req: NextRequest) {
         select: { details: true },
       }).catch(() => null),
       getCompanyAdminControlSettings(companyId).catch(() => null),
+      prisma.activityLog.findFirst({
+        where: { action: "BUSINESS_PLAN_MODULES_CONFIG" },
+        orderBy: { createdAt: "desc" },
+        select: { details: true },
+      }).catch(() => null),
     ]);
 
     if (!user) return NextResponse.json({ error: "User not found" }, { status: 404 });
@@ -215,10 +221,31 @@ export async function GET(req: NextRequest) {
       activeModules: company.activeModules,
     });
 
-    const dashboardFeatures =
-      dashboardFlagsMap[planCode] ||
-      dashboardFlagsMap[planCode.toLowerCase()] ||
-      null;
+    // Page access: a per-business-type assignment made in /admin/permissions
+    // wins over the plan-wide list from /admin/plans. Before this, the two
+    // screens disagreed — /admin/permissions could not reach most pages at all.
+    let businessPageFlags: Record<string, Record<string, string[]>> | null = null;
+    if (businessPlanModulesLog?.details) {
+      try {
+        const parsed = JSON.parse(businessPlanModulesLog.details);
+        businessPageFlags = parsed?.pageConfig || null;
+      } catch {}
+    }
+
+    let dashboardFeatures = resolveDashboardFeaturesForCompany({
+      businessType: String(company.businessType || ""),
+      planCode,
+      planFlags: dashboardFlagsMap,
+      businessFlags: businessPageFlags,
+    });
+
+    // Global page-visibility hides apply on top of whichever list won.
+    if (dashboardFeatures && pageVisibilityLog?.details) {
+      try {
+        const hidden = new Set(JSON.parse(pageVisibilityLog.details) as string[]);
+        if (hidden.size > 0) dashboardFeatures = dashboardFeatures.filter(id => !hidden.has(id));
+      } catch {}
+    }
 
     // Business module status
     let moduleOverrides: Record<string, string> = {};
