@@ -88,6 +88,42 @@ export async function GET(req: NextRequest) {
       return apiOk({ invoices: [] });
     }
 
+    // Real charges, when we have them.
+    //
+    // Everything above only *derives* an amount from the plan's list price, so a
+    // customer who paid $24.50 with the launch discount was shown a $49.00 paid
+    // invoice — a receipt that disagrees with their card statement. The webhook
+    // already records what Lemon Squeezy actually took, so prefer that and keep
+    // the derived row only as a fallback for a subscription with no payment
+    // logged yet.
+    const paymentLogs = await prisma.activityLog.findMany({
+      where: { companyId, action: "PAYMENT_EVENT" },
+      orderBy: { createdAt: "desc" },
+      select: { id: true, createdAt: true, details: true },
+      take: 50,
+    }).catch(() => []);
+
+    const realInvoices = paymentLogs.flatMap((log, i) => {
+      let det: any;
+      try { det = log.details ? JSON.parse(log.details) : null; } catch { return []; }
+      const minorUnits = Number(det?.amount ?? det?.amount_paid ?? 0);
+      if (!Number.isFinite(minorUnits) || minorUnits <= 0) return [];
+      return [{
+        id: `pay_${log.id}`,
+        number: `INV-${log.createdAt.getFullYear()}-${String(paymentLogs.length - i).padStart(3, "0")}`,
+        date: formatInvoiceDate(log.createdAt),
+        amount: minorUnits / 100,
+        currency: String(det?.currency || currency).toUpperCase(),
+        status: "paid" as const,
+        plan: effectivePlan,
+        billingCycle: cycle,
+      }];
+    });
+
+    if (realInvoices.length > 0) {
+      return apiOk({ invoices: realInvoices });
+    }
+
     return apiOk({
       invoices: [
         {

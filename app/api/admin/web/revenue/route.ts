@@ -37,16 +37,33 @@ export async function GET(req: NextRequest) {
     for (const l of logs) {
       let det: any;
       try { det = l.details ? JSON.parse(l.details) : null; } catch { det = null; }
-      if (!det || String(det.status) !== "succeeded") continue;
+      if (!det) continue;
+
+      // This used to require `det.status === "succeeded"` and read
+      // `det.amount_paid` — the Stripe payload shape. The Lemon Squeezy webhook
+      // that actually writes PAYMENT_EVENT records neither: it has no `status`
+      // field and stores the figure under `amount`. So every real payment was
+      // skipped on the first check and revenue sat at $0 with "No payment
+      // events recorded yet", even with money in the Lemon Squeezy dashboard.
+      // Accept both shapes: only reject a status when one is present and says
+      // the charge did not succeed.
+      const status = det.status ? String(det.status).toLowerCase() : null;
+      if (status && status !== "succeeded" && status !== "paid") continue;
+
       const key = ym(l.createdAt);
       if (!months.includes(key)) continue;
-      const amt = Number(det.amount_paid || 0);
-      // Convert to USD if known currencies
-      const curr = String(det.currency || "USD").toUpperCase();
-      const rate = curr === "USD" ? 1 : 1; // keep raw; currency normalization can be added later
-      mrrMap[key] = (mrrMap[key] || 0) + amt * rate / 100; // Stripe cents→units
+
+      const rawAmount = Number(det.amount ?? det.amount_paid ?? 0);
+      if (!Number.isFinite(rawAmount) || rawAmount <= 0) continue;
+
+      // Both providers report minor units (cents / paisa).
+      mrrMap[key] = (mrrMap[key] || 0) + rawAmount / 100;
     }
-    const series = months.map((label) => ({ label, value: Math.round((mrrMap[label] || 0)) }));
+    // Kept to 2dp — rounding to whole units turned a $24.50 first sale into $25.
+    const series = months.map((label) => ({
+      label,
+      value: Math.round((mrrMap[label] || 0) * 100) / 100,
+    }));
 
     return NextResponse.json({
       mrrSeries: series,
