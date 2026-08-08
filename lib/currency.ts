@@ -99,16 +99,33 @@ const COUNTRY_TO_CURRENCY: Record<string, string> = {
   SI: "EUR", EE: "EUR", LV: "EUR", LT: "EUR", HR: "EUR",
 };
 
+/** Full country name → ISO code, built once from the shared country list. */
+const NAME_TO_CODE: Record<string, string> = Object.fromEntries(
+  COUNTRIES.map((c) => [c.name.toLowerCase(), c.code])
+);
+
 /**
- * Maps a 2-letter ISO country code to a currency code, or null if unknown.
+ * Maps a country to its currency, or null if unknown.
  *
- * Accepts null/undefined because `Company.country` is nullable and nearly every
- * caller passes it straight through — the body already guarded for it, only the
- * signature disagreed.
+ * Accepts **either** a 2-letter ISO code ("PK") or a full country name
+ * ("Pakistan"). The lookup table is keyed by code, but `Company.country` stores
+ * the display name — its schema default is literally "United States" — so every
+ * `company.baseCurrency || currencyByCountry(company.country)` fallback silently
+ * resolved to null and the currency was never inferred.
+ *
+ * Also accepts null/undefined because `Company.country` is nullable and callers
+ * pass it straight through.
  */
-export function currencyByCountry(countryCode: string | null | undefined): string | null {
-  if (!countryCode) return null;
-  return COUNTRY_TO_CURRENCY[countryCode.toUpperCase()] ?? null;
+export function currencyByCountry(country: string | null | undefined): string | null {
+  if (!country) return null;
+  const raw = String(country).trim();
+  if (!raw) return null;
+
+  const direct = COUNTRY_TO_CURRENCY[raw.toUpperCase()];
+  if (direct) return direct;
+
+  const code = NAME_TO_CODE[raw.toLowerCase()];
+  return code ? COUNTRY_TO_CURRENCY[code] ?? null : null;
 }
 
 /** Picks a currency from the Accept-Language header (best-effort). */
