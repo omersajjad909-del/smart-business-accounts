@@ -142,12 +142,6 @@ export default function AdminPlansPage() {
     ENTERPRISE: PLAN_DEFAULT_PERMISSIONS.ENTERPRISE,
     CUSTOM: [],
   });
-  const [pkrDashboardFeatureFlags, setPkrDashboardFeatureFlags] = useState<Record<PlanCode, string[]>>({
-    STARTER: [...DASHBOARD_FEATURE_IDS],
-    PRO: [...DASHBOARD_FEATURE_IDS],
-    ENTERPRISE: [...DASHBOARD_FEATURE_IDS],
-    CUSTOM: [...DASHBOARD_FEATURE_IDS],
-  });
   const [loadingPkrConfig, setLoadingPkrConfig] = useState(false);
   const [savingPkrConfig,  setSavingPkrConfig]  = useState(false);
 
@@ -265,7 +259,9 @@ export default function AdminPlansPage() {
       const r = await fetch("/api/admin/pkr-plan-config", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ pricing: pkrPricing, planPermissions: pkrPlanPermissions, dashboardFeatureFlags: pkrDashboardFeatureFlags }),
+        // No dashboardFeatureFlags: page access is set once for all currencies
+        // in Pages & Modules, so writing a PKR copy would only drift.
+        body: JSON.stringify({ pricing: pkrPricing, planPermissions: pkrPlanPermissions }),
       });
       if (r.ok) toast.success("PKR configuration saved!");
       else { const j = await r.json(); toast.error(j?.error || "Save failed"); }
@@ -276,14 +272,6 @@ export default function AdminPlansPage() {
     setPkrPlanPermissions(prev => {
       const list = new Set(prev[planCode] || []);
       if (list.has(perm)) list.delete(perm); else list.add(perm);
-      return { ...prev, [planCode]: Array.from(list) };
-    });
-  }
-
-  function togglePkrDashboardFeature(planCode: PlanCode, featureId: string) {
-    setPkrDashboardFeatureFlags(prev => {
-      const list = new Set(prev[planCode] || []);
-      if (list.has(featureId)) list.delete(featureId); else list.add(featureId);
       return { ...prev, [planCode]: Array.from(list) };
     });
   }
@@ -692,43 +680,23 @@ export default function AdminPlansPage() {
             </div>
           </Card>
 
-          {/* PKR Dashboard Feature Flags */}
-          <Card title="PKR Dashboard Pages" subtitle="Which dashboard pages are visible to PKR users per plan">
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: 16 }}>
-              {(["STARTER", "PRO", "ENTERPRISE", "CUSTOM"] as const).map(pc => {
-                const enabled = new Set(pkrDashboardFeatureFlags[pc] || []);
-                const grouped = DASHBOARD_FEATURE_DEFS.reduce((acc, feature) => {
-                  const key = feature.businessLabel || feature.business;
-                  (acc[key] ||= []).push(feature);
-                  return acc;
-                }, {} as Record<string, typeof DASHBOARD_FEATURE_DEFS>);
-                return (
-                  <div key={pc} style={{ borderRadius: 16, border: "1px solid rgba(5,150,105,.15)", background: "rgba(5,150,105,.03)", overflow: "hidden" }}>
-                    <div style={{ padding: "14px 16px", borderBottom: "1px solid rgba(5,150,105,.1)", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                      <div style={{ fontSize: 14, fontWeight: 800, color: "white", textTransform: "capitalize" }}>PKR · {pc.toLowerCase()}</div>
-                      <span style={{ fontSize: 11, color: "#475569" }}>{enabled.size}/{DASHBOARD_FEATURE_DEFS.length}</span>
-                    </div>
-                    <div style={{ maxHeight: 400, overflowY: "auto", padding: "12px 16px" }}>
-                      {Object.entries(grouped).map(([group, features]) => (
-                        <div key={`pkr-pages-${pc}-${group}`} style={{ marginBottom: 14 }}>
-                          <div style={{ fontSize: 9, fontWeight: 800, color: "#64748b", letterSpacing: ".08em", marginBottom: 5, textTransform: "uppercase" }}>{group}</div>
-                          {features.map(feature => (
-                            <label key={`pkr-pages-${pc}-${feature.id}`} style={{ display: "flex", alignItems: "flex-start", gap: 8, fontSize: 11, color: enabled.has(feature.id) ? "#cbd5e1" : "#475569", padding: "4px 0", cursor: "pointer" }}>
-                              <input type="checkbox" className="perm-check"
-                                checked={enabled.has(feature.id)}
-                                onChange={() => togglePkrDashboardFeature(pc, feature.id)} />
-                              <span>
-                                <span style={{ display: "block", fontWeight: 700 }}>{feature.label}</span>
-                                <span style={{ display: "block", fontFamily: "monospace", fontSize: 10, color: "#64748b" }}>{feature.route}</span>
-                              </span>
-                            </label>
-                          ))}
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                );
-              })}
+          {/* Page assignment is not currency-specific — it lives in one place.
+              A duplicate PKR page grid used to sit here, so the same page could
+              be granted in one screen and revoked in the other. */}
+          <Card title="PKR Dashboard Pages" subtitle="Page access is set once for all currencies">
+            <div style={{ padding: "18px 20px", borderRadius: 14, background: "rgba(99,102,241,.06)", border: "1px solid rgba(99,102,241,.22)", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16, flexWrap: "wrap" }}>
+              <div style={{ fontSize: 12.5, color: "#94a3b8", lineHeight: 1.6, maxWidth: 620 }}>
+                Which pages each plan gets is now set per business type in{" "}
+                <strong style={{ color: "#c7d2fe" }}>Pages &amp; Modules</strong>, and applies to PKR and USD
+                companies alike. PKR <strong style={{ color: "#c7d2fe" }}>pricing</strong> and{" "}
+                <strong style={{ color: "#c7d2fe" }}>permissions</strong> above stay Pakistan-specific.
+              </div>
+              <button
+                onClick={() => setTab("pages")}
+                style={{ padding: "9px 18px", borderRadius: 10, background: "linear-gradient(135deg,#4f46e5,#7c3aed)", border: "none", color: "white", fontSize: 12.5, fontWeight: 700, cursor: "pointer", whiteSpace: "nowrap" }}
+              >
+                Open Pages &amp; Modules →
+              </button>
             </div>
           </Card>
         </>

@@ -184,17 +184,25 @@ export async function GET(req: NextRequest) {
       String(company.country || "").toUpperCase() === "PK" ||
       String(company.country || "").toLowerCase() === "pakistan";
 
-    // Plan config: permissions + dashboard features
-    // PKR companies use admin-set PKR-specific permissions/features
+    // Plan permissions stay Pakistan-specific — PKR companies use the admin-set
+    // PKR permission list when one exists.
     let planPermsMap: Record<string, string[]>;
-    let dashboardFlagsMap: Record<string, string[]>;
     const activeConfigLog = isPkrCompany && pkrPlanConfigLog ? pkrPlanConfigLog : planConfigLog;
     if (activeConfigLog?.details) {
-      const saved = JSON.parse(activeConfigLog.details);
-      planPermsMap = normalizePlanPermissions(saved.planPermissions);
-      dashboardFlagsMap = normalizeDashboardFeatureFlags(saved.dashboardFeatureFlags);
+      planPermsMap = normalizePlanPermissions(JSON.parse(activeConfigLog.details).planPermissions);
     } else {
       planPermsMap = normalizePlanPermissions();
+    }
+
+    // Page access is NOT currency-specific. It used to read the PKR config too,
+    // so the same page could be granted in one admin screen and revoked in the
+    // other; the PKR page grid has been removed and this now always reads the
+    // single currency-neutral list, which the per-business-type assignment in
+    // Plans → Pages & Modules then overrides.
+    let dashboardFlagsMap: Record<string, string[]>;
+    if (planConfigLog?.details) {
+      dashboardFlagsMap = normalizeDashboardFeatureFlags(JSON.parse(planConfigLog.details).dashboardFeatureFlags);
+    } else {
       dashboardFlagsMap = normalizeDashboardFeatureFlags();
     }
 

@@ -27,16 +27,10 @@ export async function GET(req: NextRequest) {
     });
     if (!company) return NextResponse.json({ error: "Company not found" }, { status: 404 });
 
-    const isPkr =
-      company.baseCurrency === "PKR" ||
-      String(company.country || "").toUpperCase() === "PK" ||
-      String(company.country || "").toLowerCase() === "pakistan";
-
-    const [planConfigLog, pkrPlanConfigLog, businessPlanModulesLog] = await Promise.all([
+    // No PKR branch here any more: page access is currency-neutral, so the
+    // PKR_PLAN_CONFIG lookup this used to do had nothing left to contribute.
+    const [planConfigLog, businessPlanModulesLog] = await Promise.all([
       prisma.activityLog.findFirst({ where: { action: "PLAN_CONFIG" }, orderBy: { createdAt: "desc" } }),
-      isPkr
-        ? prisma.activityLog.findFirst({ where: { action: "PKR_PLAN_CONFIG" }, orderBy: { createdAt: "desc" } })
-        : Promise.resolve(null),
       prisma.activityLog.findFirst({
         where: { action: "BUSINESS_PLAN_MODULES_CONFIG" },
         orderBy: { createdAt: "desc" },
@@ -44,11 +38,11 @@ export async function GET(req: NextRequest) {
       }).catch(() => null),
     ]);
 
-    const activeLog = isPkr && pkrPlanConfigLog ? pkrPlanConfigLog : planConfigLog;
+    // Page access is not currency-specific — see the same note in
+    // /api/me/bootstrap. The PKR config no longer carries a page list.
     let dashboardFlagsMap: Record<string, string[]>;
-    if (activeLog?.details) {
-      const saved = JSON.parse(activeLog.details);
-      dashboardFlagsMap = normalizeDashboardFeatureFlags(saved.dashboardFeatureFlags);
+    if (planConfigLog?.details) {
+      dashboardFlagsMap = normalizeDashboardFeatureFlags(JSON.parse(planConfigLog.details).dashboardFeatureFlags);
     } else {
       dashboardFlagsMap = normalizeDashboardFeatureFlags();
     }
