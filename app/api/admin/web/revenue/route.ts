@@ -28,11 +28,28 @@ export async function GET(req: NextRequest) {
       months.push(ym(d));
     }
 
+    // Prefer Lemon Squeezy's own numbers — it is the system that took the money.
+    const lemonOrders = await fetchLemonOrders();
+    if (lemonOrders) {
+      return NextResponse.json({
+        mrrSeries: monthlySeries(lemonOrders, 6),
+        planDistribution: {
+          starter: dist.STARTER || 0,
+          pro: dist.PRO || 0,
+          enterprise: dist.ENTERPRISE || 0,
+        },
+        source: "lemonsqueezy",
+      });
+    }
+
     const logs = await prisma.activityLog.findMany({
       where: { action: "PAYMENT_EVENT" },
       orderBy: { createdAt: "desc" },
       select: { createdAt: true, details: true },
     });
+    // order_created and subscription_payment_success both write a PAYMENT_EVENT
+    // for one payment — counting both is what doubled $49 into $98.
+    const seenOrders = new Set<string>();
     const mrrMap: Record<string, number> = {};
     for (const l of logs) {
       let det: any;
