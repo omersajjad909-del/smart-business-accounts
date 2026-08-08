@@ -197,7 +197,9 @@ export default function CompanyProfilePage() {
     setForm((f) => ({
       ...f,
       country: countryName,
-      baseCurrency: match ? currencyByCountry(match.code) : f.baseCurrency,
+      // currencyByCountry returns null for countries it has no rate for — keep
+      // the existing selection rather than blanking the field.
+      baseCurrency: (match && currencyByCountry(match.code)) || f.baseCurrency,
     }));
   }
 

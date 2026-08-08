@@ -140,7 +140,9 @@ export default function AdminControlPage() {
 
   function updateCompanyCountry(name: string) {
     const match = ALL_COUNTRIES.find(c => c.name === name);
-    setCompanyForm(s => ({ ...s, country: name, baseCurrency: match ? currencyByCountry(match.code) : s.baseCurrency }));
+    // currencyByCountry returns null for countries it has no rate for — keep
+    // the existing selection rather than blanking the field.
+    setCompanyForm(s => ({ ...s, country: name, baseCurrency: (match && currencyByCountry(match.code)) || s.baseCurrency }));
   }
 
   async function getBrowserLocation() {

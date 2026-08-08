@@ -1,6 +1,9 @@
 "use client";
 // Client-safe currency utilities — NO server/prisma imports
 
+// Plain data module, no server imports — safe on the client.
+import { COUNTRIES } from "@/lib/countries";
+
 export const SUPPORTED_CURRENCIES = [
   "USD", "EUR", "GBP", "CAD", "AUD", "JPY", "CHF", "SGD", "INR", "AED",
   "SAR", "PKR", "MYR", "NZD", "HKD", "NOK", "SEK", "DKK", "ZAR", "BRL",
@@ -56,10 +59,25 @@ const COUNTRY_TO_CURRENCY: Record<string, string> = {
   SI: "EUR", EE: "EUR", LV: "EUR", LT: "EUR", HR: "EUR",
 };
 
-/** Client-side twin of the same helper in lib/currency.ts — keep both in step. */
-export function currencyByCountry(countryCode: string | null | undefined): string | null {
-  if (!countryCode) return null;
-  return COUNTRY_TO_CURRENCY[countryCode.toUpperCase()] ?? null;
+/** Full country name → ISO code, built once from the shared country list. */
+const NAME_TO_CODE: Record<string, string> = Object.fromEntries(
+  COUNTRIES.map((c) => [c.name.toLowerCase(), c.code])
+);
+
+/**
+ * Client-side twin of the same helper in lib/currency.ts — keep both in step.
+ * Accepts a 2-letter ISO code ("PK") or a full country name ("Pakistan").
+ */
+export function currencyByCountry(country: string | null | undefined): string | null {
+  if (!country) return null;
+  const raw = String(country).trim();
+  if (!raw) return null;
+
+  const direct = COUNTRY_TO_CURRENCY[raw.toUpperCase()];
+  if (direct) return direct;
+
+  const code = NAME_TO_CODE[raw.toLowerCase()];
+  return code ? COUNTRY_TO_CURRENCY[code] ?? null : null;
 }
 
 export function pickCurrencyByAcceptLanguage(acceptLanguage: string | null): string | null {
