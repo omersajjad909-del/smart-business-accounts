@@ -4,8 +4,19 @@
  * GET  — returns saved per-business-per-plan module config
  * POST — saves per-business-per-plan module config
  *
- * Config shape: Record<businessType, Record<"STARTER"|"PRO"|"ENTERPRISE", string[]>>
- * Stored in ActivityLog with action = "BUSINESS_PLAN_MODULES_CONFIG"
+ * Two maps, both keyed the same way —
+ *   config     — module keys   Record<businessType, Record<Plan, ModuleKey[]>>
+ *   pageConfig — dashboard page ids  Record<businessType, Record<Plan, FeatureId[]>>
+ *
+ * `pageConfig` was added so every page a business type owns — including the 24
+ * AI tools and the per-industry control centres — can be assigned to a plan
+ * from one screen. Before it, `/admin/permissions` only knew 114 coarse module
+ * keys while the sidebar gated 289 pages through `/admin/plans`, so most pages
+ * appeared nowhere in this screen.
+ *
+ * Stored in ActivityLog with action = "BUSINESS_PLAN_MODULES_CONFIG". Rows
+ * written before `pageConfig` existed hold the bare `config` object, so GET
+ * accepts both the wrapped and unwrapped shapes.
  */
 
 import { NextRequest, NextResponse } from "next/server";

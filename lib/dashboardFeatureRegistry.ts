@@ -2438,6 +2438,57 @@ export function createDefaultDashboardFeatureFlags(): Record<DashboardFeaturePla
   };
 }
 
+/**
+ * Features that are not industry-specific — every business type gets them.
+ * The AI tools live under `business: "trading"` for historical reasons, but a
+ * pharmacy gets the same 24 AI tabs a trading company does.
+ */
+export const CROSS_BUSINESS_FEATURE_LABELS = new Set(["AI Intelligence"]);
+
+/**
+ * Every dashboard page a given business type can see, whether or not a plan
+ * currently grants it. This is the list `/admin/permissions` renders so an
+ * admin can assign each page to Starter / Pro / Enterprise.
+ *
+ * Mirrors the access check in `app/dashboard/layout.tsx` — a feature belongs to
+ * a business type when its `businessTypes` includes it, falling back to the
+ * broader `business` group when the def does not narrow it.
+ */
+export function dashboardFeaturesForBusinessType(businessType: string): DashboardFeatureDefinition[] {
+  const target = String(businessType || "").trim();
+  if (!target) return [];
+  return DASHBOARD_FEATURE_DEFS.filter((feature) => {
+    if (CROSS_BUSINESS_FEATURE_LABELS.has(feature.businessLabel)) return true;
+    const allowed = feature.businessTypes?.length ? feature.businessTypes : [feature.business];
+    return allowed.includes(target);
+  });
+}
+
+/**
+ * Resolves the page list for one company: a per-business-type override set in
+ * `/admin/permissions` wins, otherwise the plan-wide list from `/admin/plans`.
+ *
+ * Returning `null` means "no restriction configured" — callers treat that as
+ * full access, which is what the sidebar already does for a null feature set.
+ */
+export function resolveDashboardFeaturesForCompany(opts: {
+  businessType: string;
+  planCode: string;
+  planFlags: Record<string, string[]>;
+  businessFlags?: Record<string, Record<string, string[]>> | null;
+}): string[] | null {
+  const plan = String(opts.planCode || "STARTER").toUpperCase();
+  const byBusiness = opts.businessFlags?.[opts.businessType];
+  const scoped = byBusiness?.[plan] ?? byBusiness?.[plan.toLowerCase()];
+  if (Array.isArray(scoped)) {
+    // Constrain to pages the business type actually owns, so a stale saved id
+    // cannot hand a pharmacy a trading-only page.
+    const owned = new Set(dashboardFeaturesForBusinessType(opts.businessType).map((f) => f.id));
+    return scoped.filter((id) => owned.has(id));
+  }
+  return opts.planFlags[plan] ?? opts.planFlags[plan.toLowerCase()] ?? null;
+}
+
 export function findDashboardFeatureByRoute(pathname: string): DashboardFeatureDefinition | null {
   const normalized = String(pathname || "").replace(/\/+$/, "") || "/";
   return DASHBOARD_FEATURE_DEFS.find((feature) => {
