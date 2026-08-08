@@ -15,22 +15,38 @@ export async function GET(req: NextRequest) {
       where: { subscriptionStatus: "ACTIVE" },
     } as any);
 
-    // Compute MRR from payment events (current month)
-    const monthStart = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
-    const payments = await prisma.activityLog.findMany({
-      where: { action: "PAYMENT_EVENT", createdAt: { gte: monthStart } },
-      select: { details: true },
-    });
+    // MRR straight from Lemon Squeezy — see lib/lemonRevenue.ts for why the
+    // ActivityLog-derived version kept reporting the wrong figure.
     let mrr = 0;
-    for (const p of payments) {
-      try {
-        const det = p.details ? JSON.parse(p.details) : null;
-        if (!det || det.status !== "succeeded") continue;
-        const amt = Number(det.amount_paid || 0);
-        mrr += amt / 100; // stripe cents
-      } catch {}
+    const orders = await fetchLemonOrders();
+    if (orders) {
+      mrr = revenueForMonth(orders);
+    } else {
+      // Lemon Squeezy unreachable or unconfigured — fall back to our own log.
+      const monthStart = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
+      const payments = await prisma.activityLog.findMany({
+        where: { action: "PAYMENT_EVENT", createdAt: { gte: monthStart } },
+        select: { details: true },
+      });
+      const seen = new Set<string>();
+      for (const p of payments) {
+        try {
+          const det = p.details ? JSON.parse(p.details) : null;
+          if (!det) continue;
+          const status = det.status ? String(det.status).toLowerCase() : null;
+          if (status && status !== "succeeded" && status !== "paid") continue;
+          // order_created and subscription_payment_success both log the same
+          // payment; count each order once.
+          const key = String(det.orderId || "");
+          if (key && seen.has(key)) continue;
+          if (key) seen.add(key);
+          const amt = Number(det.amount ?? det.amount_paid ?? 0);
+          if (Number.isFinite(amt) && amt > 0) mrr += amt / 100;
+        } catch {}
+      }
+      mrr = Math.round(mrr * 100) / 100;
     }
-    const arr = mrr * 12;
+    const arr = Math.round(mrr * 12 * 100) / 100;
 
     const countByPlan: Record<string, number> = {};
     activeCompanies.forEach((r: any) => {
