@@ -34,11 +34,18 @@ export async function GET(req: NextRequest) {
       logins24h = new Set(sessions.map((s: any) => s.userId)).size;
     } catch {}
 
+    // Lemon Squeezy first — it is the system that took the money. The inline
+    // parse this replaced looked for the Stripe shape (`status: "succeeded"`,
+    // `amount_paid`) that our Lemon Squeezy webhook never writes, so it always
+    // reported $0.
     let revenueThisMonth = 0;
     try {
-      const logs = await prisma.activityLog.findMany({ where: { action: "PAYMENT_EVENT", createdAt: { gte: monthStart } }, select: { details: true } });
-      for (const l of logs) {
-        try { const d = JSON.parse(l.details||"{}"); if (d?.status==="succeeded") revenueThisMonth += Number(d.amount_paid||0)/100; } catch {}
+      const orders = await fetchLemonOrders();
+      if (orders) {
+        revenueThisMonth = revenueForMonth(orders, now);
+      } else {
+        const logs = await prisma.activityLog.findMany({ where: { action: "PAYMENT_EVENT", createdAt: { gte: monthStart } }, select: { createdAt: true, details: true } });
+        revenueThisMonth = revenueFromPaymentLogs(logs)[ym(now)] || 0;
       }
     } catch {}
 
