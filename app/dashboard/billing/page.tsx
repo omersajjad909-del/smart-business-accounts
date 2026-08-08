@@ -20,6 +20,8 @@ type PaymentMethodsResponse = {
   managedExternally?: boolean;
   paymentMethods?: PaymentMethod[];
   defaultId?: string | null;
+  /** Lemon Squeezy hosted "update payment method" link, signed and short-lived. */
+  updateUrl?: string | null;
   note?: string;
 };
 type Invoice = {
@@ -466,10 +468,20 @@ function BillingPage() {
   const isCanceled      = subscription?.status?.toLowerCase() === "canceled";
   const paymentProvider = String(paymentMeta?.provider || "INTERNAL").toUpperCase();
   const paymentManagedExternally = Boolean(paymentMeta?.managedExternally);
+  // Signed, short-lived Lemon Squeezy link for replacing the card on file.
+  const paymentUpdateUrl = paymentMeta?.updateUrl || null;
   const paymentNote = paymentMeta?.note || "";
   const acceptedMethods = paymentManagedExternally ? LEMON_ACCEPTED_METHODS : DIRECT_ACCEPTED_METHODS;
 
   function openPaymentMethodFlow() {
+    // Lemon Squeezy mints a signed link for changing the card on file. Sending
+    // the customer there is the actual "update my card" flow — the old branch
+    // just bounced them to the Plans tab with a toast, which never let anyone
+    // replace an expiring card.
+    if (paymentUpdateUrl) {
+      window.open(paymentUpdateUrl, "_blank", "noopener,noreferrer");
+      return;
+    }
     if (paymentManagedExternally) {
       setActiveTab("plans");
       toast("Payment methods are collected during secure checkout.");
@@ -586,7 +598,7 @@ function BillingPage() {
           <p style={{ margin:"4px 0 0", fontSize:13, color:"rgba(255,255,255,.4)" }}>Manage your subscription, payment methods, and invoices</p>
         </div>
         <button onClick={openPaymentMethodFlow} style={{ padding:"9px 18px", borderRadius:11, background:"linear-gradient(135deg,#6366f1,#7c3aed)", border:"none", color:"white", fontSize:13, fontWeight:700, cursor:"pointer", fontFamily:"inherit" }}>
-          {paymentManagedExternally ? "Open Checkout" : "+ Add Card"}
+          {paymentUpdateUrl ? "Update Card" : paymentManagedExternally ? "Open Checkout" : "+ Add Card"}
         </button>
       </div>
 
@@ -783,7 +795,7 @@ function BillingPage() {
                     : paymentNote || "Add a card for uninterrupted service."}
                 </div>
                 <button onClick={openPaymentMethodFlow} style={{ padding:"9px 20px", borderRadius:10, background:"rgba(99,102,241,.15)", border:"1px solid rgba(99,102,241,.3)", color:"#a5b4fc", fontSize:13, fontWeight:700, cursor:"pointer", fontFamily:"inherit" }}>
-                  {paymentManagedExternally ? "Open Secure Checkout" : "+ Add Card"}
+                  {paymentUpdateUrl ? "Update Card" : paymentManagedExternally ? "Open Secure Checkout" : "+ Add Card"}
                 </button>
               </div>
             ) : paymentMethods.slice(0,2).map(pm => {
@@ -793,8 +805,20 @@ function BillingPage() {
                   <div style={{ width:52, height:34, borderRadius:8, background:cfg.grad, display:"flex", alignItems:"center", justifyContent:"center", fontSize:8, fontWeight:900, color:"rgba(255,255,255,.5)", letterSpacing:1, flexShrink:0 }}>{cfg.label}</div>
                   <div style={{ flex:1 }}>
                     <div style={{ fontSize:13, fontWeight:700 }}>{cfg.label} •••• {pm.last4}</div>
-                    <div style={{ fontSize:11, color:"rgba(255,255,255,.3)", marginTop:2 }}>Expires {String(pm.expMonth).padStart(2,"0")}/{pm.expYear}</div>
+                    {/* Lemon Squeezy does not report the expiry, so a card that
+                        came from there has expMonth/expYear of 0 — show the
+                        provider line instead of a fake "Expires 00/0". */}
+                    <div style={{ fontSize:11, color:"rgba(255,255,255,.3)", marginTop:2 }}>
+                      {pm.expYear
+                        ? `Expires ${String(pm.expMonth).padStart(2,"0")}/${pm.expYear}`
+                        : "Held securely by our payment provider"}
+                    </div>
                   </div>
+                  {paymentUpdateUrl && (
+                    <button onClick={openPaymentMethodFlow} style={{ padding:"6px 14px", borderRadius:9, background:"rgba(255,255,255,.06)", border:"1px solid rgba(255,255,255,.14)", color:"rgba(255,255,255,.8)", fontSize:12, fontWeight:700, cursor:"pointer", fontFamily:"inherit" }}>
+                      Update
+                    </button>
+                  )}
                   {pm.isDefault && <span style={{ padding:"2px 8px", borderRadius:8, background:"rgba(99,102,241,.15)", border:"1px solid rgba(99,102,241,.28)", fontSize:10, fontWeight:700, color:"#a5b4fc" }}>DEFAULT</span>}
                 </div>
               );
@@ -874,7 +898,7 @@ function BillingPage() {
               </p>
             </div>
             <button onClick={openPaymentMethodFlow} style={{ padding:"9px 18px", borderRadius:11, background:"linear-gradient(135deg,#6366f1,#7c3aed)", border:"none", color:"white", fontSize:13, fontWeight:700, cursor:"pointer", fontFamily:"inherit" }}>
-              {paymentManagedExternally ? "Open Checkout" : "+ Add Card"}
+              {paymentUpdateUrl ? "Update Card" : paymentManagedExternally ? "Open Checkout" : "+ Add Card"}
             </button>
           </div>
           <div style={{ ...card }}>
