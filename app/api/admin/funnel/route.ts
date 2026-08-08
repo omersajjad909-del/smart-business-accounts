@@ -76,24 +76,43 @@ export async function GET(req: NextRequest) {
   const activeCompanies  = companies.filter(c => String(c.subscriptionStatus || "").toUpperCase() === "ACTIVE");
   const cancelledCompanies = companies.filter(c => String(c.subscriptionStatus || "").toUpperCase() === "CANCELLED");
 
-  // Paid = companies that have had a succeeded payment event
+  // Paid = companies that have had a succeeded payment event.
+  //
+  // This used to require `status === "succeeded"` and read `amount_paid` — the
+  // Stripe payload shape. Our Lemon Squeezy webhook writes "paid" and `amount`,
+  // so no company ever counted as paid and revenue was always $0. Accept both
+  // shapes, and dedupe on orderId because order_created and
+  // subscription_payment_success each log the same payment.
   const paidCompanyIds = new Set<string>();
+  const seenOrders = new Set<string>();
   let totalRevenue = 0;
   for (const log of paymentLogs) {
     try {
       const d = log.details ? JSON.parse(log.details) : null;
-      if (!d || d.status !== "succeeded") continue;
+      if (!d) continue;
+      const status = d.status ? String(d.status).toLowerCase() : null;
+      if (status && status !== "succeeded" && status !== "paid") continue;
       if (log.companyId) paidCompanyIds.add(log.companyId);
-      totalRevenue += Number(d.amount_paid || 0) / 100;
+
+      const orderKey = String(d.orderId || "");
+      if (orderKey) {
+        if (seenOrders.has(orderKey)) continue;
+        seenOrders.add(orderKey);
+      }
+      const minorUnits = Number(d.amount ?? d.amount_paid ?? 0);
+      if (Number.isFinite(minorUnits) && minorUnits > 0) totalRevenue += minorUnits / 100;
     } catch {}
   }
+  totalRevenue = Math.round(totalRevenue * 100) / 100;
 
   // Recent paid (in time window)
   const recentPaidIds = new Set<string>();
   for (const log of paymentLogs.filter(l => l.createdAt >= since)) {
     try {
       const d = log.details ? JSON.parse(log.details) : null;
-      if (!d || d.status !== "succeeded") continue;
+      if (!d) continue;
+      const status = d.status ? String(d.status).toLowerCase() : null;
+      if (status && status !== "succeeded" && status !== "paid") continue;
       if (log.companyId) recentPaidIds.add(log.companyId);
     } catch {}
   }
