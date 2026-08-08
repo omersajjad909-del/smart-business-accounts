@@ -554,6 +554,52 @@ async function handleLemonWebhook(req: NextRequest, raw: string) {
         }),
       },
     }).catch(() => {});
+
+    // Admin bell notification. Only the Pakistan gateway raised one before, so
+    // a Lemon Squeezy sale landed in the revenue figures with nothing in the
+    // bell — the $24.50 subscription went unannounced.
+    const orderKey = String(attrs?.order_id ?? payload?.data?.id ?? "");
+    const minorUnits = Number(attrs?.total ?? attrs?.subtotal ?? 0);
+    const currency = String(attrs?.currency || "USD").toUpperCase();
+    const buyerEmail = String(attrs?.user_email || attrs?.customer_email || "");
+
+    try {
+      // order_created and subscription_payment_success both fire for one
+      // payment, so key the notification on the order and skip the second.
+      const already = orderKey
+        ? await prisma.notification.findFirst({
+            where: { message: { contains: `#${orderKey}` } },
+            select: { id: true },
+          })
+        : null;
+
+      if (!already) {
+        const company = await prisma.company.findUnique({
+          where: { id: companyId },
+          select: { name: true },
+        }).catch(() => null);
+
+        const amountLabel =
+          Number.isFinite(minorUnits) && minorUnits > 0
+            ? `${currency} ${(minorUnits / 100).toFixed(2)}`
+            : "Payment";
+
+        await prisma.notification.create({
+          data: {
+            title: `💳 New Subscription: ${amountLabel}`,
+            message: [
+              company?.name || "Unknown company",
+              String(planCode || "").toUpperCase() || "PLAN",
+              buyerEmail,
+              `#${orderKey}`,
+            ].filter(Boolean).join(" · "),
+            type: "SUCCESS",
+            link: "/admin/subscriptions",
+            isRead: false,
+          },
+        });
+      }
+    } catch {}
   }
 
   return apiOk({ received: true, provider: "lemonsqueezy" });

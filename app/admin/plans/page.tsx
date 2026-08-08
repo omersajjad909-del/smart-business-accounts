@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { PERMISSION_CATEGORIES, PLAN_DEFAULT_PERMISSIONS } from "@/lib/planPermissions";
 import { DASHBOARD_FEATURE_DEFS, DASHBOARD_FEATURE_IDS } from "@/lib/dashboardFeatureRegistry";
+import BusinessPlanMatrix from "../components/BusinessPlanMatrix";
 import toast from "react-hot-toast";
 
 /* ─── Types ─────────────────────────────────────────── */
@@ -70,7 +71,13 @@ function Card({ children, title, subtitle }: { children: React.ReactNode; title:
    MAIN PAGE
 ═══════════════════════════════════════════════════════ */
 export default function AdminPlansPage() {
+  // ?tab=pages lets /admin/permissions forward straight to the merged grid.
   const [tab, setTab] = useState<TabKey>("pricing");
+
+  useEffect(() => {
+    const requested = new URLSearchParams(window.location.search).get("tab");
+    if (requested && TAB_KEYS.includes(requested as TabKey)) setTab(requested as TabKey);
+  }, []);
 
   /* ── Pricing & Permissions state ── */
   const [plans, setPlans] = useState<Plan[]>([
@@ -381,7 +388,7 @@ export default function AdminPlansPage() {
   const TABS: { key: TabKey; label: string; icon: string }[] = [
     { key: "pricing",          label: "Pricing (USD)",      icon: "💰" },
     { key: "permissions",      label: "Permissions",        icon: "🔐" },
-    { key: "pages",            label: "Pages",              icon: "📄" },
+    { key: "pages",            label: "Pages & Modules",    icon: "📄" },
     { key: "pkr-pricing",      label: "PKR Pricing",        icon: "🇵🇰" },
     { key: "pkr-permissions",  label: "PKR Permissions",    icon: "🔒" },
     { key: "custom-plans",     label: "Custom Requests",    icon: "📋" },
@@ -405,7 +412,9 @@ export default function AdminPlansPage() {
           <h1 style={{ margin: 0, fontSize: 22, fontWeight: 800, color: "white" }}>Plans & Billing Config</h1>
           <p style={{ margin: "4px 0 0", fontSize: 13, color: "#475569" }}>Configure pricing, permissions, custom requests, and module pricing</p>
         </div>
-        {(tab === "pricing" || tab === "permissions" || tab === "pages") && (
+        {/* Pages & Modules carries its own Save — this one writes plan-config
+            and would look like it saved the grid without doing so. */}
+        {(tab === "pricing" || tab === "permissions") && (
           <button onClick={saveConfig} disabled={savingConfig || loadingConfig}
             style={{ padding: "10px 22px", borderRadius: 12, background: savingConfig ? "#4338ca" : "linear-gradient(135deg,#4f46e5,#7c3aed)", border: "none", color: "white", fontSize: 13, fontWeight: 700, cursor: "pointer", opacity: savingConfig ? .7 : 1 }}>
             {savingConfig ? "Saving…" : "Save Changes"}
@@ -445,7 +454,7 @@ export default function AdminPlansPage() {
         ))}
       </div>
 
-      {loadingConfig && (tab === "pricing" || tab === "permissions" || tab === "pages") && (
+      {loadingConfig && (tab === "pricing" || tab === "permissions") && (
         <div style={{ padding: "40px 0", textAlign: "center", color: "#475569" }}>Loading configuration…</div>
       )}
       {loadingPkrConfig && (tab === "pkr-pricing" || tab === "pkr-permissions") && (
@@ -547,46 +556,12 @@ export default function AdminPlansPage() {
         </Card>
       )}
 
-      {/* ══ TAB: CUSTOM PLAN REQUESTS ══ */}
-      {tab === "pages" && !loadingConfig && (
-        <Card title="Plan Pages" subtitle="Every dashboard page is listed for every plan. Page Visibility still hides pages globally for all plans.">
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: 16 }}>
-            {(["STARTER", "PRO", "ENTERPRISE", "CUSTOM"] as const).map(pc => {
-              const enabled = new Set(dashboardFeatureFlags[pc] || []);
-              const grouped = DASHBOARD_FEATURE_DEFS.reduce((acc, feature) => {
-                const key = feature.businessLabel || feature.business;
-                (acc[key] ||= []).push(feature);
-                return acc;
-              }, {} as Record<string, typeof DASHBOARD_FEATURE_DEFS>);
-              return (
-                <div key={pc} style={{ borderRadius: 16, border: "1px solid rgba(255,255,255,.08)", background: "rgba(255,255,255,.03)", overflow: "hidden" }}>
-                  <div style={{ padding: "14px 16px", borderBottom: "1px solid rgba(255,255,255,.06)", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                    <div style={{ fontSize: 14, fontWeight: 800, color: "white", textTransform: "capitalize" }}>{pc.toLowerCase()}</div>
-                    <span style={{ fontSize: 11, color: "#475569" }}>{enabled.size}/{DASHBOARD_FEATURE_DEFS.length}</span>
-                  </div>
-                  <div style={{ maxHeight: 520, overflowY: "auto", padding: "12px 16px" }}>
-                    {Object.entries(grouped).map(([group, features]) => (
-                      <div key={`${pc}-${group}`} style={{ marginBottom: 14 }}>
-                        <div style={{ fontSize: 9, fontWeight: 800, color: "#64748b", letterSpacing: ".08em", marginBottom: 5, textTransform: "uppercase" }}>{group}</div>
-                        {features.map(feature => (
-                          <label key={`${pc}-${feature.id}`} style={{ display: "flex", alignItems: "flex-start", gap: 8, fontSize: 11, color: enabled.has(feature.id) ? "#cbd5e1" : "#475569", padding: "4px 0", cursor: "pointer" }}>
-                            <input type="checkbox" className="perm-check"
-                              checked={enabled.has(feature.id)}
-                              onChange={() => toggleDashboardFeature(pc, feature.id)} />
-                            <span>
-                              <span style={{ display: "block", fontWeight: 700 }}>{feature.label}</span>
-                              <span style={{ display: "block", fontFamily: "monospace", fontSize: 10, color: "#64748b" }}>{feature.route}</span>
-                            </span>
-                          </label>
-                        ))}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </Card>
+      {/* ══ TAB: PAGES & MODULES ══
+          Was a plan-wide checklist of all 289 pages with no business-type axis,
+          duplicating the separate /admin/permissions screen. Both are now this
+          one grid: pick a business type, assign each page and module to a plan. */}
+      {tab === "pages" && (
+        <BusinessPlanMatrix embedded />
       )}
 
       {/* ══ TAB: PKR PRICING ══ */}
