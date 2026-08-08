@@ -16,7 +16,9 @@ type FinancePayload = {
 
 function fmtMoney(n: number) {
   if (n >= 1000) return `$${(n / 1000).toFixed(1)}k`;
-  return `$${n.toFixed(0)}`;
+  // Keep the cents below $1k — `toFixed(0)` rendered a real $24.50 as "$25",
+  // which does not match the Lemon Squeezy dashboard the figure comes from.
+  return Number.isInteger(n) ? `$${n}` : `$${n.toFixed(2)}`;
 }
 
 export default function AdminRevenuePage() {
@@ -184,7 +186,7 @@ function RevenueLineChart({ rows, loading }: { rows: { label: string; value: num
           <circle cx={p.x} cy={p.y} r="4.5" fill="#6366f1" stroke="#0a0f1e" strokeWidth="2" />
           {p.value > 0 && (
             <text x={p.x} y={p.y - 10} textAnchor="middle" fontSize="11" fill="rgba(255,255,255,.7)" fontWeight="700">
-              ${p.value.toLocaleString()}
+              {fmtMoney(p.value)}
             </text>
           )}
           <text x={p.x} y={H - 8} textAnchor="middle" fontSize="11" fill="rgba(148,163,184,.7)">
