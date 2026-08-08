@@ -246,7 +246,7 @@ export default function AdminPlansPage() {
           const d = await r.json();
           if (d?.pricing)              setPkrPricing(d.pricing);
           if (d?.planPermissions)      setPkrPlanPermissions(d.planPermissions);
-          if (d?.dashboardFeatureFlags) setPkrDashboardFeatureFlags(d.dashboardFeatureFlags);
+          // d.dashboardFeatureFlags is ignored — page access is currency-neutral.
         }
       } finally { setLoadingPkrConfig(false); }
     })();
