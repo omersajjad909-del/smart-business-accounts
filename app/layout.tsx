@@ -3,6 +3,31 @@ import { headers } from "next/headers";
 import { Toaster } from "react-hot-toast";
 import "./globals.css";
 
+/**
+ * Every weight of Outfit and Lora the marketing pages use, requested once.
+ *
+ * 63 components each carried their own
+ * `<style>{`@import url('https://fonts.googleapis.com/...')`}</style>`. An
+ * `@import` inside an inline <style> is the slowest font path there is: the
+ * preload scanner cannot see it, so the browser has to parse the HTML, parse
+ * that CSS, fetch the stylesheet, and only then fetch the font files. The home
+ * page fired a dozen of them, and when the fonts finally landed the whole page
+ * reflowed — which is what looked like the page loading a second time.
+ *
+ * One <link> in <head>, preceded by preconnects, is discovered immediately and
+ * shared by every component. Kept as a plain stylesheet rather than next/font
+ * on purpose: those 63 components hard-code `fontFamily: "'Outfit',sans-serif"`
+ * and next/font only exposes a hashed family name, which would silently drop
+ * every one of them back to the system sans.
+ */
+const GOOGLE_FONTS_HREF =
+  "https://fonts.googleapis.com/css2" +
+  "?family=Outfit:wght@300;400;500;600;700;800;900" +
+  "&family=Lora:ital,wght@0,400;0,600;0,700;1,600;1,700" +
+  // Blog pages set their body copy in DM Sans.
+  "&family=DM+Sans:wght@400;500;600;700;800" +
+  "&display=swap";
+
 import CookieBanner from "./(marketing)/landing/components/CookieBanner";
 import AnalyticsGate from "./(marketing)/landing/components/AnalyticsGate";
 import { ThemeProvider } from "@/components/theme-provider";
@@ -291,6 +316,9 @@ export default async function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link rel="stylesheet" href={GOOGLE_FONTS_HREF} />
         {/* Guard against third-party scripts (Clarity, etc.) probing window.webkit.messageHandlers in non-WKWebView contexts */}
         <script nonce={nonce} suppressHydrationWarning dangerouslySetInnerHTML={{ __html: `if(typeof window!=="undefined"&&!window.webkit){window.webkit={messageHandlers:{}}}` }} />
         {/* GA4 — loaded early but defaults to consent denied until AnalyticsLoader updates it */}

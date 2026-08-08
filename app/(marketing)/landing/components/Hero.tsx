@@ -63,7 +63,7 @@ export default function Hero() {
     }}>
 
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap');
+        
         *, *::before, *::after { box-sizing: border-box; margin: 0; }
 
         @keyframes fadeUp   { from{opacity:0;transform:translateY(22px)} to{opacity:1;transform:translateY(0)} }

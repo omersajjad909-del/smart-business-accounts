@@ -56,7 +56,7 @@ export default function BlogPage() {
   return (
     <main style={{ minHeight: "100vh", background: "#06071a", color: "white", fontFamily: "'DM Sans',system-ui,sans-serif", overflowX: "hidden" }}>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,700;1,400&family=DM+Sans:wght@400;500;600;700;800&display=swap');
+        
         * { box-sizing: border-box; }
         .blog-card { background: rgba(255,255,255,.035); border: 1px solid rgba(255,255,255,.07); border-radius: 20px; overflow: hidden; transition: transform .22s ease, border-color .22s ease, box-shadow .22s ease; }
         .blog-card:hover { transform: translateY(-5px); box-shadow: 0 20px 60px rgba(0,0,0,.4); }

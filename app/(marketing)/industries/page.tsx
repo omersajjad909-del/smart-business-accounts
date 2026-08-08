@@ -60,7 +60,7 @@ export default function IndustriesPage() {
       fontFamily: "'Outfit','DM Sans',sans-serif",
     }}>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Lora:ital,wght@0,700;1,600&display=swap');
+        
         *, *::before, *::after { box-sizing: border-box; }
         @keyframes ind-float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-6px)} }
         @keyframes ind-blink { 0%,100%{opacity:1} 50%{opacity:.3} }

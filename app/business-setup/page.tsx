@@ -189,7 +189,7 @@ export default function BusinessSetupPage() {
       fontFamily: "'Outfit','Inter',sans-serif", padding: "40px 20px", color: "white",
     }}>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&display=swap');
+        
         @keyframes fadeUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
         @keyframes fadeIn { from{opacity:0} to{opacity:1} }
         .bt-card { transition: all .18s; cursor: pointer; }

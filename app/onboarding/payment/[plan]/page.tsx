@@ -533,7 +533,7 @@ export default function PaymentPage() {
   return (
     <div style={{ minHeight:"100vh", background:"linear-gradient(160deg,#06091c 0%,#0b0f28 45%,#07091e 100%)", color:"white", fontFamily:"'Outfit','DM Sans',sans-serif" }}>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap');
+        
         *,*::before,*::after{box-sizing:border-box}
         @keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
         @keyframes spin{to{transform:rotate(360deg)}}

@@ -347,7 +347,7 @@ export default function HrPayrollDashboard() {
   return (
     <div style={{ background: C.bg, minHeight: "100vh", fontFamily: ff, color: C.text, minWidth: 0, overflowX: "hidden" }}>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap');
+        
         *,*::before,*::after{box-sizing:border-box;}
         @keyframes spin{to{transform:rotate(360deg)}}
 

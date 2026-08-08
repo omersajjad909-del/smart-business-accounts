@@ -629,7 +629,7 @@ export default function SignupByPlanPage() {
       color:"white", fontFamily:"'Outfit','DM Sans',sans-serif",
     }}>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Lora:ital,wght@0,700;1,700&display=swap');
+        
         *,*::before,*::after{box-sizing:border-box;}
         @keyframes fadeUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
         @keyframes spin{to{transform:rotate(360deg)}}

@@ -219,7 +219,7 @@ export default function AgentDashboard() {
   return (
     <div style={{ minHeight:"100vh", background:"#080c1e", color:"white", fontFamily:"'Outfit','DM Sans',sans-serif", display:"flex", flexDirection:"column" }}>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap');
+        
         *,*::before,*::after { box-sizing:border-box; margin:0; padding:0; }
         @keyframes fadeIn { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
         @keyframes blink  { 0%,100%{opacity:1} 50%{opacity:.3} }

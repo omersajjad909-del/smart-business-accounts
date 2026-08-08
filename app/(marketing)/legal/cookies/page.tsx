@@ -67,7 +67,7 @@ export default function CookiePolicyPage() {
       }}
     >
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Lora:wght@700&display=swap');
+        
         *,*::before,*::after{box-sizing:border-box;}
       `}</style>
 

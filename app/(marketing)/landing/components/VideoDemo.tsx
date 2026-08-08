@@ -814,7 +814,7 @@ export default function VideoDemo() {
       position:"relative", overflow:"hidden",
     }}>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Lora:wght@600;700&display=swap');
+        
         *,*::before,*::after{box-sizing:border-box;}
         @keyframes orb2{0%,100%{transform:translate(0,0)}50%{transform:translate(-18px,14px)}}
         @keyframes slideIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}

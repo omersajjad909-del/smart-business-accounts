@@ -285,7 +285,7 @@ export default function DocsPage() {
       color: "white", fontFamily: "'Outfit',sans-serif",
     }}>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Lora:ital,wght@0,700;1,700&display=swap');
+        
         *,*::before,*::after{box-sizing:border-box;}
         @keyframes orbDrift{0%,100%{transform:translate(-50%,-50%)}50%{transform:translate(-50%,-60%)}}
         @keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}

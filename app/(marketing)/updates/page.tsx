@@ -189,7 +189,7 @@ export default function UpdatesPage() {
   return (
     <main style={{ minHeight:"100vh", background:"linear-gradient(180deg,#06071a 0%,#080c22 50%,#06071a 100%)", color:"white", fontFamily:"'Outfit','DM Sans',sans-serif", overflowX:"hidden" }}>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,700;1,400&family=Outfit:wght@400;500;600;700;800;900&family=Roboto+Mono:wght@500&display=swap');
+        
         *,*::before,*::after{box-sizing:border-box;}
         @keyframes pulse-dot{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.85)}}
         @keyframes shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}

@@ -447,7 +447,7 @@ export default function BusinessOperatorPage() {
   return (
     <div style={{ minHeight: "100vh", padding: isMobile ? "12px" : "24px", color: "white", fontFamily: "'Outfit','Inter',sans-serif" }}>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&display=swap');
+        
         @keyframes live-pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.5;transform:scale(1.4)} }
         @keyframes spin-ccw   { to{transform:rotate(-360deg)} }
         .op-spin { animation: spin-ccw .8s linear infinite; }

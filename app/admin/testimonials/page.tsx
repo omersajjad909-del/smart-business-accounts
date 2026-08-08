@@ -76,7 +76,7 @@ export default function TestimonialsAdminPage() {
 
   return (
     <div style={{ minHeight:"100vh", background:"#05071a", color:"white", fontFamily:"'Outfit',sans-serif", padding:"32px 28px" }}>
-      <style>{`@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap'); *,*::before,*::after{box-sizing:border-box;}`}</style>
+      <style>{` *,*::before,*::after{box-sizing:border-box;}`}</style>
 
       {/* Header */}
       <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:28, flexWrap:"wrap", gap:12 }}>

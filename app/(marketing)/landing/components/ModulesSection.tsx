@@ -152,7 +152,7 @@ export default function ModulesSection() {
       position: "relative", overflow: "hidden",
     }}>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&family=Lora:wght@600;700&display=swap');
+        
         @keyframes orb-mod{0%,100%{transform:translate(0,0)}50%{transform:translate(-20px,15px)}}
       `}</style>
 

@@ -73,7 +73,7 @@ export default function SupportTicketPage() {
       }}
     >
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Lora:wght@600;700&display=swap');
+        
         *, *::before, *::after { box-sizing:border-box; }
         @keyframes fadeUp { from { opacity:0; transform: translateY(18px); } to { opacity:1; transform: translateY(0); } }
         @keyframes gridDrift { from{transform:translateY(0)} to{transform:translateY(40px)} }

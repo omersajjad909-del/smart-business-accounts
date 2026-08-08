@@ -505,7 +505,7 @@ function BillingPage() {
   return (
     <div style={{ padding:"28px 28px 80px", maxWidth:1050, margin:"0 auto", fontFamily:"'Outfit','DM Sans',sans-serif", color:"white" }}>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap');
+        
         @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
         @keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
         input:focus,select:focus{border-color:rgba(99,102,241,.6)!important;box-shadow:0 0 0 3px rgba(99,102,241,.12)!important;outline:none!important}

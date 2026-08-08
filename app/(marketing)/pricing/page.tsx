@@ -550,7 +550,7 @@ export default function PricingPage() {
   return (
     <div style={{ minHeight: "100vh", background: "linear-gradient(180deg,#080c1e 0%,#0c0f2e 35%,#080c1e 100%)", color: "white", fontFamily: ff }}>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&display=swap');
+        
         *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
         select option{background:#0f1629;color:white}
         .feat-row:hover{background:rgba(255,255,255,.03)}

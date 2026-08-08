@@ -292,7 +292,7 @@ export default function ApiDocsPage() {
       color: "white", fontFamily: "'Outfit',sans-serif",
     }}>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Lora:wght@700&display=swap');
+        
         *,*::before,*::after{box-sizing:border-box;}
         code,pre{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;}
         @keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}

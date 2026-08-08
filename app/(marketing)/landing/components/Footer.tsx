@@ -112,7 +112,7 @@ export default function Footer() {
       overflow: "hidden",
     }}>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Lora:ital,wght@0,700;1,600&display=swap');
+        
         *, *::before, *::after { box-sizing: border-box; }
 
         @keyframes ft-orb1 { 0%,100%{transform:translate(0,0) scale(1)} 50%{transform:translate(20px,-16px) scale(1.06)} }

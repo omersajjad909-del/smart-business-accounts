@@ -24,7 +24,7 @@ export default function Offer() {
       flexWrap: "nowrap",
     }}>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&display=swap');
+        
         @media(max-width:600px){
           .offer-badge { display:none !important; }
           .offer-text  { font-size:12px !important; }

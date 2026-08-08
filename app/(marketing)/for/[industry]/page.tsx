@@ -801,7 +801,7 @@ export default function IndustryPage() {
   return (
     <div style={{ minHeight:"100vh", background:"linear-gradient(180deg,#060918 0%,#080c22 60%,#0a0f2a 100%)", fontFamily:ff, color:"white" }}>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Lora:ital,wght@0,700;1,700&display=swap');
+        
         *,*::before,*::after{box-sizing:border-box}
         @keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
         .fade-up{animation:fadeUp .5s ease forwards}

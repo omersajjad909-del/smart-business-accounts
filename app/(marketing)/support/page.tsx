@@ -275,7 +275,7 @@ export default function SupportPage() {
   return (
     <>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Lora:wght@600;700&display=swap');
+        
         *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
         @keyframes orb{0%,100%{transform:translate(0,0)}50%{transform:translate(28px,-18px)}}
         @keyframes pulse{0%{transform:scale(.88);opacity:0}50%{opacity:.5}100%{transform:scale(2);opacity:0}}

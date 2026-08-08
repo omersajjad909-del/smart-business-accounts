@@ -26,7 +26,7 @@ export default function TrustedBy() {
       overflow: "hidden",
     }}>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&display=swap');
+        
         *,*::before,*::after{box-sizing:border-box;}
         @keyframes scroll-left {
           0% { transform: translateX(0); }

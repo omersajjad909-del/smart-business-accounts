@@ -155,7 +155,7 @@ const NAV_LINKS = [
 
 /* ─── Shared styles ─── */
 const SHARED_CSS = `
-  @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Lora:wght@700&display=swap');
+  
   *, *::before, *::after { box-sizing: border-box; }
 
   @keyframes megaIn   { from{opacity:0;transform:translateY(-8px)} to{opacity:1;transform:translateY(0)} }

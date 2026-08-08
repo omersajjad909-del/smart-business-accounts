@@ -82,7 +82,7 @@ export default function CTASection() {
       overflow: "hidden",
     }}>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Lora:ital,wght@0,700;1,700&display=swap');
+        
         *,*::before,*::after{box-sizing:border-box;}
         @keyframes orbPulse{0%,100%{transform:translate(-50%,-50%) scale(1);opacity:.6}50%{transform:translate(-50%,-50%) scale(1.08);opacity:.9}}
         @keyframes ringRotate{to{transform:translate(-50%,-50%) rotate(360deg)}}

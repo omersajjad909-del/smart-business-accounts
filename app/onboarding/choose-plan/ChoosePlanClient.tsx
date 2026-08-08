@@ -370,7 +370,7 @@ export default function ChoosePlanPage() {
       overflow: "hidden",
     }}>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Lora:wght@700&display=swap');
+        
         *,*::before,*::after { box-sizing:border-box; }
         @keyframes orbDrift { 0%,100%{transform:translate(0,0) scale(1)} 50%{transform:translate(22px,-18px) scale(1.06)} }
         @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }

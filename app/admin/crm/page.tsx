@@ -192,7 +192,7 @@ export default function AdminCrmPage() {
   return (
     <div style={{ minHeight: "100vh", background: "linear-gradient(180deg,#080c1e,#0c0f2e)", color: "white", fontFamily: "'Outfit',sans-serif", padding: "32px 24px" }}>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap');
+        
         *,*::before,*::after{box-sizing:border-box;}
         @media (max-width: 980px) {.crm-two{grid-template-columns:1fr!important}.crm-pipeline{grid-template-columns:repeat(3,minmax(220px,1fr))!important}}
         @media (max-width: 720px) {.crm-pipeline{grid-template-columns:1fr!important}.crm-vis-head,.crm-vis-row{grid-template-columns:1.4fr .8fr .8fr .8fr!important}}

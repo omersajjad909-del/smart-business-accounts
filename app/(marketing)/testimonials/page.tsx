@@ -48,7 +48,7 @@ export default function TestimonialsPage() {
   return (
     <div style={{ background:"linear-gradient(160deg,#05071a 0%,#080c22 50%,#070a1e 100%)", minHeight:"100vh", fontFamily:"'Outfit',sans-serif", color:"white" }}>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Lora:wght@600;700&display=swap');
+        
         *,*::before,*::after{box-sizing:border-box;}
         @keyframes orb{0%,100%{transform:translate(0,0)}50%{transform:translate(20px,-15px)}}
         @keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}

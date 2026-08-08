@@ -66,7 +66,7 @@ export default function PkPaymentsPage() {
 
   return (
     <div style={{ padding: "32px 28px", minHeight: "100vh", background: "#0b0f24", color: "white", fontFamily: "'Outfit', sans-serif" }}>
-      <style>{`@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap');`}</style>
+      <style>{``}</style>
 
       {/* Header */}
       <div style={{ marginBottom: 28 }}>

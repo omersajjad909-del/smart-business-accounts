@@ -41,7 +41,7 @@ export default function NewsletterSection() {
       borderTop: "1px solid rgba(255,255,255,.06)",
     }}>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&display=swap');
+        
         *,*::before,*::after{box-sizing:border-box;}
         @keyframes nl-orb{0%,100%{transform:translate(0,0)}50%{transform:translate(20px,-16px)}}
         @keyframes nl-pulse{0%,100%{box-shadow:0 0 0 0 rgba(99,102,241,.4)}70%{box-shadow:0 0 0 8px rgba(99,102,241,0)}}

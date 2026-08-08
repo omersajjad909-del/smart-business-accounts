@@ -247,7 +247,7 @@ export default function StatusPage() {
         color:"white", fontFamily:"'Outfit','DM Sans',sans-serif",
       }}>
         <style>{`
-          @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Lora:ital,wght@0,700;1,700&display=swap');
+          
           *,*::before,*::after{box-sizing:border-box;}
           @keyframes orbDrift{0%,100%{transform:translate(0,0)}50%{transform:translate(16px,-14px)}}
           @keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}

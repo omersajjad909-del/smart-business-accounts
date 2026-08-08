@@ -119,7 +119,7 @@ export default function AboutPage() {
       overflowX: "hidden",
     }}>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Lora:ital,wght@0,600;0,700;1,600&display=swap');
+        
         *,*::before,*::after{box-sizing:border-box;margin:0;}
         @keyframes orbA{0%,100%{transform:translate(0,0)}50%{transform:translate(28px,-20px)}}
         @keyframes orbB{0%,100%{transform:translate(0,0)}50%{transform:translate(-18px,14px)}}
