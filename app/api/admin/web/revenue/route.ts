@@ -67,6 +67,10 @@ export async function GET(req: NextRequest) {
       const status = det.status ? String(det.status).toLowerCase() : null;
       if (status && status !== "succeeded" && status !== "paid") continue;
 
+      const orderKey = String(det.orderId || "");
+      if (orderKey && seenOrders.has(orderKey)) continue;
+      if (orderKey) seenOrders.add(orderKey);
+
       const key = ym(l.createdAt);
       if (!months.includes(key)) continue;
 
