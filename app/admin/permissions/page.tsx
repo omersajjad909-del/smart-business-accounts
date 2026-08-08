@@ -19,6 +19,11 @@ const PLAN_META: Record<Plan, { label: string; color: string; bg: string; border
 const MODULE_LABELS: Record<string, string> = {
   dashboard: "Dashboard",
   ai_assistant: "AI Assistant",
+  business_guide: "Business Guide",
+  owner_dashboard: "Owner Dashboard",
+  ai_intelligence: "AI Intelligence",
+  business_operator: "Business Operator",
+  automation: "Business Automation",
   chart_of_accounts: "Chart of Accounts",
   cpv: "Cash Payment Voucher",
   crv: "Cash Receipt Voucher",
@@ -244,7 +249,10 @@ function getDefaultPlanModules(allModules: string[]): Record<Plan, string[]> {
 type ConfigMap = Record<string, Record<Plan, string[]>>;
 
 const MODULE_GROUPS: Array<{ id: string; label: string; icon: string; keys: string[] }> = [
-  { id: "core",      label: "Core",               icon: "⚙️",  keys: ["dashboard","ai_assistant","admin_settings","chart_of_accounts","opening_balances"] },
+  { id: "core",      label: "Core",               icon: "⚙️",  keys: ["dashboard","admin_settings","chart_of_accounts","opening_balances"] },
+  // AI and the dashboard utilities used to be hard-wired into the sidebar with
+  // no module key, so they could never be included in or excluded from a plan.
+  { id: "ai",        label: "AI & Automation",     icon: "🤖",  keys: ["ai_assistant","ai_intelligence","business_operator","business_guide","owner_dashboard","automation"] },
   { id: "vouchers",  label: "Vouchers & Finance",  icon: "📑",  keys: ["cpv","crv","jv","contra","advance_payment","petty_cash","credit_note","debit_note","expense_vouchers","loans","recurring","tax_configuration"] },
   { id: "banking",   label: "Banking & Payments",  icon: "🏦",  keys: ["bank_reconciliation","payment_receipts","bulk_payments","payment_followup","customer_statement","supplier_statement"] },
   { id: "reports",   label: "Financial Reports",   icon: "📊",  keys: ["reports_financial","ledger","trial_balance","profit_loss","balance_sheet","ageing_report","cash_flow"] },

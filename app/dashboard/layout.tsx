@@ -934,10 +934,19 @@ export default function DashboardLayout({
           {/* Dashboard utilities */}
           {canShowDashboardUtilities && hasPermission(currentUser, PERMISSIONS.VIEW_DASHBOARD) && (
             <div style={{marginBottom:6}}>
-              <NavLink href="/dashboard/business-guide" pathname={pathname}>Business Guide</NavLink>
-              <NavLink href="/dashboard/owner-dashboard" pathname={pathname}>Owner Dashboard</NavLink>
-              <NavLink href="/dashboard/ai" pathname={pathname}>AI Intelligence</NavLink>
-              {hasPermission(currentUser, PERMISSIONS.AI_BUSINESS_OPERATOR) && (
+              {/* Each of these now honours its own module toggle, like every
+                  other feature. They were previously unconditional, so the
+                  admin permissions screen had no way to reach them. */}
+              {hasModule(businessType, "business_guide") && (
+                <NavLink href="/dashboard/business-guide" pathname={pathname}>Business Guide</NavLink>
+              )}
+              {hasModule(businessType, "owner_dashboard") && (
+                <NavLink href="/dashboard/owner-dashboard" pathname={pathname}>Owner Dashboard</NavLink>
+              )}
+              {hasModule(businessType, "ai_intelligence") && (
+                <NavLink href="/dashboard/ai" pathname={pathname}>AI Intelligence</NavLink>
+              )}
+              {hasModule(businessType, "business_operator") && hasPermission(currentUser, PERMISSIONS.AI_BUSINESS_OPERATOR) && (
                 <NavLink href="/dashboard/operator" pathname={pathname}>Business Operator</NavLink>
               )}
             </div>
@@ -1967,6 +1976,7 @@ export default function DashboardLayout({
           )}
 
           {/* ── AUTOMATION ADD-ON ── */}
+          {hasModule(businessType, "automation") && (
           <NavGroup
             title="Automation"
             icon={<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>}
@@ -1975,6 +1985,7 @@ export default function DashboardLayout({
           >
             <NavLink href="/dashboard/automation" pathname={pathname}>⚡ Business Automation</NavLink>
           </NavGroup>
+          )}
 
           {/* ── SETTINGS ── */}
           {showSettingsSection && (

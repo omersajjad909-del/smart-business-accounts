@@ -39,6 +39,11 @@ export type BusinessType =
 
 export type ModuleKey =
   | "dashboard" | "ai_assistant"
+  // Cross-business dashboard features. These shipped as always-on sidebar links
+  // with no module gate at all, so an admin could not include or exclude them
+  // per plan the way every other feature can be. They are ordinary modules.
+  | "business_guide" | "owner_dashboard" | "ai_intelligence"
+  | "business_operator" | "automation"
   | "sales_invoice" | "purchase_invoice" | "purchase_order" | "quotation"
   | "delivery_challan" | "sale_return" | "outward"
   | "bank_reconciliation" | "payment_receipts" | "expense_vouchers"
@@ -151,6 +156,8 @@ const CORE: ModuleKey[] = [
 // ── Phase 1 Core — granular reports + HR instead of broad keys ──
 const CORE_P1: ModuleKey[] = [
   "dashboard", "ai_assistant",
+  // Available to every Phase 1 business type — they are not industry-specific.
+  "business_guide", "owner_dashboard", "ai_intelligence", "business_operator", "automation",
   "chart_of_accounts", "cpv", "crv", "jv", "contra", "advance_payment",
   "petty_cash", "credit_note", "debit_note", "bank_reconciliation",
   "payment_receipts", "expense_vouchers", "tax_configuration",
