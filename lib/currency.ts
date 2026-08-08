@@ -99,9 +99,16 @@ const COUNTRY_TO_CURRENCY: Record<string, string> = {
   SI: "EUR", EE: "EUR", LV: "EUR", LT: "EUR", HR: "EUR",
 };
 
-/** Maps a 2-letter ISO country code to a currency code, or null if unknown. */
-export function currencyByCountry(countryCode: string): string | null {
-  return COUNTRY_TO_CURRENCY[countryCode?.toUpperCase()] ?? null;
+/**
+ * Maps a 2-letter ISO country code to a currency code, or null if unknown.
+ *
+ * Accepts null/undefined because `Company.country` is nullable and nearly every
+ * caller passes it straight through — the body already guarded for it, only the
+ * signature disagreed.
+ */
+export function currencyByCountry(countryCode: string | null | undefined): string | null {
+  if (!countryCode) return null;
+  return COUNTRY_TO_CURRENCY[countryCode.toUpperCase()] ?? null;
 }
 
 /** Picks a currency from the Accept-Language header (best-effort). */

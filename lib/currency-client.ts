@@ -56,8 +56,10 @@ const COUNTRY_TO_CURRENCY: Record<string, string> = {
   SI: "EUR", EE: "EUR", LV: "EUR", LT: "EUR", HR: "EUR",
 };
 
-export function currencyByCountry(countryCode: string): string | null {
-  return COUNTRY_TO_CURRENCY[countryCode?.toUpperCase()] ?? null;
+/** Client-side twin of the same helper in lib/currency.ts — keep both in step. */
+export function currencyByCountry(countryCode: string | null | undefined): string | null {
+  if (!countryCode) return null;
+  return COUNTRY_TO_CURRENCY[countryCode.toUpperCase()] ?? null;
 }
 
 export function pickCurrencyByAcceptLanguage(acceptLanguage: string | null): string | null {
