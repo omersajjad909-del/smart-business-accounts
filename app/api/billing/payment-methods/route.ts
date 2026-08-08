@@ -85,10 +85,30 @@ export async function GET(req: NextRequest) {
   const brand = attrs?.card_brand ? String(attrs.card_brand) : null;
   const lastFour = attrs?.card_last_four ? String(attrs.card_last_four) : null;
 
+  // Returned in the same array shape the billing page already renders, so the
+  // existing card row lights up without a UI rewrite. Expiry is deliberately
+  // absent — Lemon Squeezy does not expose it, and inventing a value here
+  // would put a wrong expiry date in front of the customer.
+  const paymentMethods =
+    brand || lastFour
+      ? [
+          {
+            id: subscription.stripeSubscriptionId,
+            brand: (brand || "unknown").toLowerCase(),
+            last4: lastFour || "••••",
+            expMonth: 0,
+            expYear: 0,
+            holderName: "",
+            isDefault: true,
+          },
+        ]
+      : [];
+
   return NextResponse.json({
     provider: "LEMONSQUEEZY",
     managedExternally: true,
-    paymentMethod: brand || lastFour ? { brand, lastFour } : null,
+    paymentMethods,
+    defaultId: paymentMethods[0]?.id ?? null,
     updateUrl,
     subscriptionStatus: attrs?.status || subscription.status || null,
     renewsAt: attrs?.renews_at || null,
