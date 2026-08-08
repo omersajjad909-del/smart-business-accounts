@@ -946,6 +946,11 @@ export default function DashboardLayout({
               {hasModule(businessType, "ai_intelligence") && (
                 <NavLink href="/dashboard/ai" pathname={pathname}>AI Intelligence</NavLink>
               )}
+              {/* The ai_assistant module was switchable in the admin panel but
+                  its page was referenced from nowhere in the app. */}
+              {hasModule(businessType, "ai_assistant") && (
+                <NavLink href="/dashboard/ai-assistant" pathname={pathname}>AI Assistant</NavLink>
+              )}
               {hasModule(businessType, "business_operator") && hasPermission(currentUser, PERMISSIONS.AI_BUSINESS_OPERATOR) && (
                 <NavLink href="/dashboard/operator" pathname={pathname}>Business Operator</NavLink>
               )}
