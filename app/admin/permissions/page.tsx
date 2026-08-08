@@ -449,7 +449,7 @@ export default function AdminPermissionsPage() {
         <div>
           <h1 style={{ fontSize: 22, fontWeight: 700, margin: "0 0 4px", color: "white" }}>Plan Permissions</h1>
           <p style={{ margin: 0, fontSize: 13, color: "rgba(255,255,255,0.4)" }}>
-            Select a business type → manage which modules each plan gets
+            Select a business type → assign every module and every page to Starter / Pro / Enterprise
           </p>
         </div>
         <div style={{ display: "flex", gap: 10, alignItems: "center" }}>

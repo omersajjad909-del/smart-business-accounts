@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { resolveCompanyId } from "@/lib/tenant";
-import { AI_TOOL_IDS, DASHBOARD_FEATURE_IDS, createDefaultDashboardFeatureFlags } from "@/lib/dashboardFeatureRegistry";
+import { AI_TOOL_IDS, DASHBOARD_FEATURE_IDS, createDefaultDashboardFeatureFlags, resolveDashboardFeaturesForCompany } from "@/lib/dashboardFeatureRegistry";
 
 function normalizeDashboardFeatureFlags(saved: Record<string, string[]> = {}) {
   const defaults = createDefaultDashboardFeatureFlags();
@@ -23,7 +23,7 @@ export async function GET(req: NextRequest) {
 
     const company = await prisma.company.findUnique({
       where: { id: companyId },
-      select: { plan: true, country: true, baseCurrency: true },
+      select: { plan: true, country: true, baseCurrency: true, businessType: true },
     });
     if (!company) return NextResponse.json({ error: "Company not found" }, { status: 404 });
 
@@ -32,11 +32,16 @@ export async function GET(req: NextRequest) {
       String(company.country || "").toUpperCase() === "PK" ||
       String(company.country || "").toLowerCase() === "pakistan";
 
-    const [planConfigLog, pkrPlanConfigLog] = await Promise.all([
+    const [planConfigLog, pkrPlanConfigLog, businessPlanModulesLog] = await Promise.all([
       prisma.activityLog.findFirst({ where: { action: "PLAN_CONFIG" }, orderBy: { createdAt: "desc" } }),
       isPkr
         ? prisma.activityLog.findFirst({ where: { action: "PKR_PLAN_CONFIG" }, orderBy: { createdAt: "desc" } })
         : Promise.resolve(null),
+      prisma.activityLog.findFirst({
+        where: { action: "BUSINESS_PLAN_MODULES_CONFIG" },
+        orderBy: { createdAt: "desc" },
+        select: { details: true },
+      }).catch(() => null),
     ]);
 
     const activeLog = isPkr && pkrPlanConfigLog ? pkrPlanConfigLog : planConfigLog;
@@ -53,8 +58,22 @@ export async function GET(req: NextRequest) {
         ? "PRO"
         : String(company.plan || "STARTER").toUpperCase();
 
+    // Same resolution the sidebar uses — a per-business-type assignment from
+    // /admin/permissions wins over the plan-wide list from /admin/plans.
+    let businessPageFlags: Record<string, Record<string, string[]>> | null = null;
+    if (businessPlanModulesLog?.details) {
+      try {
+        businessPageFlags = JSON.parse(businessPlanModulesLog.details)?.pageConfig || null;
+      } catch {}
+    }
+
     const enabledFeatures = new Set(
-      dashboardFlagsMap[planCode] || dashboardFlagsMap[planCode.toLowerCase()] || []
+      resolveDashboardFeaturesForCompany({
+        businessType: String(company.businessType || ""),
+        planCode,
+        planFlags: dashboardFlagsMap,
+        businessFlags: businessPageFlags,
+      }) || []
     );
 
     const enabledAiTools = (AI_TOOL_IDS as readonly string[]).filter((id) => enabledFeatures.has(id));
