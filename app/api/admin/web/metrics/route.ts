@@ -2,6 +2,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getTokenFromRequest, verifyJwt } from "@/lib/auth";
+import { fetchLemonOrders, revenueForMonth, revenueFromPaymentLogs, ym } from "@/lib/lemonRevenue";
 
 async function safeCount(fn: () => Promise<number>): Promise<number> {
   try { return await fn(); } catch { return 0; }

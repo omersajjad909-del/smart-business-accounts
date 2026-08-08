@@ -140,17 +140,20 @@ export async function GET(req: NextRequest) {
     ).length;
 
     // ── Revenue: this month vs last month ─────────────────────────────────
+    // Lemon Squeezy is the system that took the money, so ask it first. This
+    // card read `details.status === "succeeded"` and `details.amount_paid` —
+    // the Stripe payload shape — while the Lemon Squeezy webhook writes
+    // "paid" and `amount`, so every real payment was skipped and the card sat
+    // at $0 with money visible in the Lemon Squeezy dashboard.
     let monthlyRevenue = 0;
     let lastMonthRevenue = 0;
-    for (const log of paymentLogs) {
-      const details = parseDetails(log.details);
-      if (String(details?.status || "") !== "succeeded") continue;
-      const amount = Number(details?.amount_paid || 0) / 100;
-      if (log.createdAt >= thisMonthStart) {
-        monthlyRevenue += amount;
-      } else if (log.createdAt >= lastMonthStart && log.createdAt <= lastMonthEnd) {
-        lastMonthRevenue += amount;
-      }
+    if (lemonOrders) {
+      monthlyRevenue = revenueForMonth(lemonOrders, now);
+      lastMonthRevenue = revenueForMonth(lemonOrders, lastMonthStart);
+    } else {
+      const byMonth = revenueFromPaymentLogs(paymentLogs);
+      monthlyRevenue = byMonth[ym(now)] || 0;
+      lastMonthRevenue = byMonth[ym(lastMonthStart)] || 0;
     }
 
     // ── Growth: companies (this month vs last month) ───────────────────────
