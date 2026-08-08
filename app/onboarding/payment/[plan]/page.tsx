@@ -974,7 +974,14 @@ export default function PaymentPage() {
                 </div>
               </div>
               <div style={{ animation:"celebSlide .5s ease .3s both" }}>
-                <div style={{ fontSize:11, fontWeight:700, textTransform:"uppercase", letterSpacing:2, color:pm.color, marginBottom:8 }}>Welcome to FinovaOS</div>
+                {/* This eyebrow read "Welcome to FinovaOS" on both branches, so
+                    a buyer being handed off to Lemon Squeezy was welcomed to a
+                    product they had not paid for yet — and the body copy right
+                    below it says the opposite. Only greet them once the plan is
+                    actually active. */}
+                <div style={{ fontSize:11, fontWeight:700, textTransform:"uppercase", letterSpacing:2, color:pm.color, marginBottom:8 }}>
+                  {pendingRealPayment ? "Redirecting to secure checkout" : "Welcome to FinovaOS"}
+                </div>
                 {pendingRealPayment ? (
                   <>
                     <h2 style={{ margin:"0 0 6px", fontSize:32, fontWeight:900, background:`linear-gradient(135deg, white 30%, ${pm.color})`, WebkitBackgroundClip:"text", WebkitTextFillColor:"transparent" }}>Almost there…</h2>

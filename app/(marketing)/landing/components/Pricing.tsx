@@ -406,18 +406,10 @@ export default function PricingSection() {
               ))}
             </div>
 
-            {/* Currency is not selectable — billing is PKR for Pakistan and
-                USD everywhere else, decided by IP. A picker here could only
-                quote a currency checkout would refuse. */}
-            <div style={{
-              display:"inline-flex", alignItems:"center", gap:6,
-              padding:"6px 12px", borderRadius:12,
-              background:"rgba(255,255,255,.04)", border:"1px solid rgba(255,255,255,.09)",
-            }}>
-              <span style={{ fontSize:12, fontWeight:700, color:"rgba(255,255,255,.5)" }}>
-                {CURRENCY_SYMBOL[currency] || currency} {currency}
-              </span>
-            </div>
+            {/* No currency control and no currency label. Billing is PKR for
+                Pakistan and USD everywhere else, chosen from the visitor's IP —
+                there is nothing to pick, and the prices below already carry
+                their own symbol. */}
           </div>
         </div>
 

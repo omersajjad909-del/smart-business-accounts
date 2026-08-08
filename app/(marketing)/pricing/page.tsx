@@ -620,7 +620,9 @@ export default function PricingPage() {
             <span style={{ background: "linear-gradient(135deg,#818cf8,#c4b5fd)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>your region</span>
           </h1>
           <p style={{ maxWidth: 640, margin: "0 auto", color: "rgba(255,255,255,.48)", fontSize: 17, lineHeight: 1.65 }}>
-            FinovaOS shows prices in your local currency — PKR, INR, AED, and more. <strong style={{ color: "rgba(255,255,255,.7)" }}>No hidden fees. Cancel anytime.</strong>
+            {/* Was "PKR, INR, AED, and more" — we only ever bill in PKR or USD,
+                so naming currencies we do not support promised too much. */}
+            Prices are shown in the currency you will be billed in. <strong style={{ color: "rgba(255,255,255,.7)" }}>No hidden fees. Cancel anytime.</strong>
           </p>
         </div>
 
@@ -638,9 +640,9 @@ export default function PricingPage() {
               the visitor's IP, so offering a choice here could only ever
               disagree with what checkout charges. */}
         </div>
-        <div style={{ textAlign: "center", color: "rgba(255,255,255,.3)", fontSize: 12, marginBottom: 40 }}>
-          Showing prices in {currency} · this is the currency you will be billed in
-        </div>
+        {/* No currency line here. The amounts already carry their own symbol,
+            so spelling out "USD"/"PKR" only added noise. */}
+        <div style={{ marginBottom: 40 }} />
 
         {/* ── USE-CASE WIZARD ───────────────────────────────── */}
         <UseCaseWizard />
