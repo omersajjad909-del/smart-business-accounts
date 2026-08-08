@@ -49,7 +49,9 @@ export const ADMIN_NAV_ITEMS: AdminNavItem[] = [
 
   // ── SYSTEM ────────────────────────────────────────────────────────────────
   { id: "settings",         label: "Settings",          href: "/admin/settings",            group: "System",    short: "ST", icon: "spark" },
-  { id: "permissions",      label: "Roles & Permissions", href: "/admin/permissions",       group: "System",    short: "RP", icon: "lock" },
+  // Plan access lives in Plans → Pages & Modules; this entry used to open a
+  // second, overlapping screen at /admin/permissions.
+  { id: "permissions",      label: "Roles & Permissions", href: "/admin/plans?tab=pages",   group: "System",    short: "RP", icon: "lock" },
   { id: "team",             label: "Admin Team",        href: "/admin/team",                group: "System",    short: "TM", icon: "users" },
   { id: "sessions",         label: "User Sessions",     href: "/admin/sessions",            group: "System",    short: "SS", icon: "users" },
   { id: "api-keys",         label: "API Keys",          href: "/admin/api-keys",            group: "System",    short: "AK", icon: "lock" },

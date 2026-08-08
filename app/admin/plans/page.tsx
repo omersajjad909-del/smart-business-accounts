@@ -47,6 +47,7 @@ const STATUS_COLORS: Record<string, { bg: string; text: string }> = {
 
 type PlanCode = "STARTER" | "PRO" | "ENTERPRISE" | "CUSTOM";
 type TabKey = "pricing" | "permissions" | "pages" | "custom-plans" | "modules" | "addon" | "pkr-pricing" | "pkr-permissions";
+const TAB_KEYS: TabKey[] = ["pricing", "permissions", "pages", "custom-plans", "modules", "addon", "pkr-pricing", "pkr-permissions"];
 
 type AddonCompany = {
   id: string; name: string; plan: string; createdAt: string;

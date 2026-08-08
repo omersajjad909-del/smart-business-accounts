@@ -395,7 +395,7 @@ export default function AdminShell({ children }: { children: ReactNode }) {
                     <div className="fin-admin-dropdownList">
                       <Link href="/admin"             prefetch={false} className="fin-admin-linkRow" onClick={() => setProfileOpen(false)}>Dashboard</Link>
                       <Link href="/admin/settings"    prefetch={false} className="fin-admin-linkRow" onClick={() => setProfileOpen(false)}>Settings</Link>
-                      <Link href="/admin/permissions" prefetch={false} className="fin-admin-linkRow" onClick={() => setProfileOpen(false)}>Roles & Permissions</Link>
+                      <Link href="/admin/plans?tab=pages" prefetch={false} className="fin-admin-linkRow" onClick={() => setProfileOpen(false)}>Roles & Permissions</Link>
                       <Link href="/admin/system"      prefetch={false} className="fin-admin-linkRow" onClick={() => setProfileOpen(false)}>System Health</Link>
                       <button
                         type="button"
