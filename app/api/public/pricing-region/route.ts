@@ -24,6 +24,10 @@ export async function GET(req: NextRequest) {
     currency: region.currency,
     isPakistan: region.isPakistan,
     source: region.source,
+    // Echoing the raw signals makes "why am I seeing the wrong currency?"
+    // answerable by opening this URL, instead of guessing. All of it is the
+    // caller's own request data.
+    signals: region.signals,
   });
   // Per-visitor answer — must never be shared from a CDN cache.
   response.headers.set("Cache-Control", "private, no-store, max-age=0");
