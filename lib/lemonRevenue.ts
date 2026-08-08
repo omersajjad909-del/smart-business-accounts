@@ -109,6 +109,48 @@ export function monthlySeries(orders: LemonOrder[], count = 6) {
   return out;
 }
 
+/**
+ * Fallback for when Lemon Squeezy is unreachable or unconfigured: sum our own
+ * `PAYMENT_EVENT` ActivityLog rows into `{ "YYYY-MM": total }`.
+ *
+ * Readers must go through this rather than parsing `details` themselves — the
+ * hand-rolled versions kept drifting from the writer's payload shape (looking
+ * for a `status` of "succeeded" when the webhook writes "paid", reading
+ * `amount_paid` when it writes `amount`) and silently reporting $0.
+ */
+export function revenueFromPaymentLogs(
+  logs: Array<{ createdAt: Date; details: string | null }>,
+) {
+  const seenOrders = new Set<string>();
+  const byMonth: Record<string, number> = {};
+
+  for (const log of logs) {
+    let det: any;
+    try { det = log.details ? JSON.parse(log.details) : null; } catch { det = null; }
+    if (!det) continue;
+
+    // Only reject a status when one is present and says the charge failed.
+    const status = det.status ? String(det.status).toLowerCase() : null;
+    if (status && status !== "succeeded" && status !== "paid") continue;
+
+    // order_created and subscription_payment_success both fire for one payment.
+    const orderKey = String(det.orderId || "");
+    if (orderKey) {
+      if (seenOrders.has(orderKey)) continue;
+      seenOrders.add(orderKey);
+    }
+
+    const minorUnits = Number(det.amount ?? det.amount_paid ?? 0);
+    if (!Number.isFinite(minorUnits) || minorUnits <= 0) continue;
+
+    const key = ym(log.createdAt);
+    byMonth[key] = (byMonth[key] || 0) + minorUnits / 100;
+  }
+
+  for (const key of Object.keys(byMonth)) byMonth[key] = round2(byMonth[key]);
+  return byMonth;
+}
+
 function round2(n: number) {
   return Math.round(n * 100) / 100;
 }

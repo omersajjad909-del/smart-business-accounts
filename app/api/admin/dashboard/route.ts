@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/adminAuth";
+import { fetchLemonOrders, revenueForMonth, revenueFromPaymentLogs, ym } from "@/lib/lemonRevenue";
 
 function dayKey(date: Date) {
   return date.toISOString().slice(0, 10);
@@ -83,6 +84,7 @@ export async function GET(req: NextRequest) {
       apiErrors24h,
       failedLogins24h,
       totalActivityLogs,
+      lemonOrders,
     ] = await Promise.all([
       prisma.company.findMany({
         orderBy: { createdAt: "desc" },
@@ -127,6 +129,7 @@ export async function GET(req: NextRequest) {
         where: { action: "LOGIN_FAILED", createdAt: { gte: dayAgo } },
       }).catch(() => 0),
       prisma.activityLog.count().catch(() => 0),
+      fetchLemonOrders(),
     ]);
 
     // ── KPI totals ─────────────────────────────────────────────────────────
