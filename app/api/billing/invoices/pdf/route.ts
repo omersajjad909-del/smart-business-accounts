@@ -83,8 +83,11 @@ export async function GET(req: NextRequest): Promise<Response> {
 
     const effectivePlan = (subscription?.plan || company.plan || "STARTER").toUpperCase();
     const effectiveBillingCycle = (subscription?.billingCycle || "MONTHLY").toUpperCase();
-    const baseAmount = subscription?.pricePerMonth || PLAN_PRICES[effectivePlan] || 0;
-    const amount = effectiveBillingCycle === "YEARLY" ? Math.round(baseAmount * 12) : baseAmount;
+    const paidAmount = subscription?.pricePerMonth || PLAN_PRICES[effectivePlan] || 0;
+    const amount = effectiveBillingCycle === "YEARLY" ? Math.round(paidAmount * 12) : paidAmount;
+    const standardBaseAmount = PLAN_PRICES[effectivePlan] || 0;
+    const standardAmount = effectiveBillingCycle === "YEARLY" ? Math.round(standardBaseAmount * 12) : standardBaseAmount;
+    const discount = Math.max(0, standardAmount - amount);
     const periodEnd = subscription?.currentPeriodEnd || company.currentPeriodEnd || company.createdAt;
     const invoiceNumber = `INV-${new Date(periodEnd).getFullYear()}-001`;
 
@@ -103,19 +106,21 @@ export async function GET(req: NextRequest): Promise<Response> {
         {
           name: `${effectivePlan} subscription (${effectiveBillingCycle.toLowerCase()})`,
           qty: 1,
-          rate: amount,
-          amount,
+          rate: effectiveBillingCycle === "YEARLY" ? standardAmount : standardBaseAmount,
+          amount: standardAmount,
         },
       ],
-      subtotal: amount,
+      subtotal: standardAmount,
       tax: 0,
-      discount: 0,
+      discount,
       total: amount,
       // pricePerMonth is stored in the currency the provider settles in —
       // Safepay in PKR, LemonSqueezy/Stripe always in USD. Labelling it with
       // company.baseCurrency showed "PKR 249" for what was really a $249 charge.
       currency: subscription?.provider === "SAFEPAY" ? "PKR" : "USD",
-      notes: "Subscription invoice for FinovaOS hosted billing.",
+      notes: discount > 0
+        ? "Subscription invoice for FinovaOS hosted billing. Launch offer applied: 50% off for first 3 months."
+        : "Subscription invoice for FinovaOS hosted billing.",
       status: company.subscriptionStatus?.toUpperCase() === "ACTIVE" ? "PAID" : "OPEN",
     };
 
