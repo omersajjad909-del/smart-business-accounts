@@ -95,7 +95,7 @@ export default function MarketingLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="mkt-page flex min-h-screen flex-col bg-[#060919]">
+    <div className="mkt-page flex min-h-dvh flex-col bg-[#060919]">
       <style>{`
         @media(max-width:640px){
           .mkt-page [style*="130px 24px"]{padding-top:60px !important;padding-bottom:28px !important;}
@@ -119,7 +119,7 @@ export default function MarketingLayout({
       <div className="sticky top-0 z-50">
         <Navbar />
       </div>
-      <main className="grow overflow-x-hidden">{children}</main>
+      <main className="grow overflow-x-hidden overflow-y-auto">{children}</main>
       <Footer />
       <ChatWidget />
       <GeoPrecisionPrompt />

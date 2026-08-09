@@ -357,8 +357,8 @@ export default async function RootLayout({
               error:   { iconTheme: { primary: "#f87171", secondary: "var(--surface)" } },
             }}
           />
-          <div className="flex min-h-screen flex-col">
-            <main className="flex-grow">{children}</main>
+          <div className="flex min-h-dvh flex-col">
+            <main className="flex-grow overflow-y-auto">{children}</main>
           </div>
           <CookieBanner />
         </ThemeProvider>
