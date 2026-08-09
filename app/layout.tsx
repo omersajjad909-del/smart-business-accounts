@@ -33,7 +33,6 @@ import AnalyticsGate from "./(marketing)/landing/components/AnalyticsGate";
 import { ThemeProvider } from "@/components/theme-provider";
 import VisitorTracker from "@/components/VisitorTracker";
 import ClientRegionSignal from "@/components/ClientRegionSignal";
-import ScrollRestorer from "@/components/ScrollRestorer";
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "https://www.finovaos.app";
 const GOOGLE_SITE_VERIFICATION =
@@ -335,7 +334,13 @@ export default async function RootLayout({
       <body className="app-root" suppressHydrationWarning>
         <VisitorTracker />
         <ClientRegionSignal />
-        <ScrollRestorer />
+        {/* ScrollRestorer removed. It hunted for any fixed/sticky element
+            covering the viewport and set `pointer-events: none` on it — which
+            caught the dashboard sidebar (position:fixed, top:0, bottom:0) and
+            left it dead: unscrollable and unclickable. It also re-scanned every
+            element in the document on every DOM mutation. It was a workaround
+            for scrolling bugs whose real causes are now fixed: overflow on
+            body/<main> and the dashboard shell's use of vh. */}
         <AnalyticsGate />
         <ThemeProvider
           attribute="class"

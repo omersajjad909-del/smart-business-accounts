@@ -924,7 +924,9 @@ export default function DashboardLayout({
 
         {/* ---- NAV ---- */}
         <SidebarCtx.Provider value={{ collapsed: sidebarCollapsed, expand: () => setSidebarCollapsed(false), canShowHref: canShowDashboardHref }}>
-        <nav style={{flex:1,overflowY:"auto",padding:"8px 8px",paddingBottom:80}}>
+        {/* overscrollBehavior:"contain" so dragging past the end of the menu
+            does not carry on and scroll the page behind the open drawer. */}
+        <nav style={{flex:1,overflowY:"auto",overscrollBehavior:"contain",padding:"8px 8px",paddingBottom:80}}>
 
           {/* ── Main Dashboard link ── */}
           {hasPermission(currentUser, PERMISSIONS.VIEW_DASHBOARD) && (
