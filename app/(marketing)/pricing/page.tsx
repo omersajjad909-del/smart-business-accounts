@@ -353,9 +353,9 @@ function UseCaseWizard() {
               ))}
             </div>
           </div>
-          <a href={`/onboarding/signup/${chosen.plan}`} style={{ background: `linear-gradient(135deg,${chosen.color},${chosen.color}bb)`, color: "#fff", padding: "10px 22px", borderRadius: 10, fontWeight: 700, fontSize: 14, textDecoration: "none", flexShrink: 0 }}>
-            Start with {chosen.recommended} →
-          </a>
+          <button type="button" disabled style={{ background: `linear-gradient(135deg,${chosen.color},${chosen.color}bb)`, color: "#fff", padding: "10px 22px", borderRadius: 10, fontWeight: 700, fontSize: 14, textDecoration: "none", flexShrink: 0, cursor: "not-allowed", opacity: 0.8, border: "none" }}>
+            Launching Soon
+          </button>
         </div>
       )}
     </div>
@@ -560,8 +560,8 @@ export default function PricingPage() {
     return formatPrice(usdDiffPerMonth * 12);
   };
 
-  const buildHref = (slug: string) => `/onboarding/signup/${slug}?cycle=${billing}&currency=${currency}&country=${country}`;
-  const buildCustomHref = () => `/onboarding/choose-plan?plan=custom&modules=${selectedModules.join(",")}&extraUsers=${extraUsers}&extraBranches=${extraBranches}&cycle=${billing}&currency=${currency}&country=${country}`;
+  const buildHref = (slug: string) => undefined;
+  const buildCustomHref = () => undefined;
   const toggleModule = (id: string) => setSelectedModules(p => p.includes(id) ? p.filter(x => x !== id) : [...p, id]);
   // Single-app buy: clear everything else so the estimate shows exactly what
   // that one module costs, and drop the seat/branch add-ons that only make
@@ -720,9 +720,9 @@ export default function PricingPage() {
                       {billing === "yearly" ? "Intro price for first 3 months, then yearly-plan monthly equivalent applies." : "Intro price for first 3 months, then regular monthly billing starts."}
                     </div> */}
                   </div>
-                  <Link href={buildHref(plan.slug)} style={{ display: "block", textAlign: "center", padding: "12px 18px", borderRadius: 12, textDecoration: "none", color: "white", fontWeight: 800, background: plan.gradient, marginBottom: 22, fontSize: 14 }}>
-                    Continue with {plan.name}
-                  </Link>
+                  <button type="button" disabled style={{ display: "block", width: "100%", textAlign: "center", padding: "12px 18px", borderRadius: 12, textDecoration: "none", color: "white", fontWeight: 800, background: plan.gradient, marginBottom: 22, fontSize: 14, cursor: "not-allowed", opacity: 0.85, border: "none" }}>
+                    Launching Soon
+                  </button>
                   {/* <div style={{ fontSize: 11, color: "rgba(255,255,255,.42)", marginTop: -12, marginBottom: 16, textAlign: "center" }}>
                     You&apos;ll be charged {formatPrice(regularPrice)}/mo after the first 3 months.
                   </div> */}
@@ -877,13 +877,13 @@ export default function PricingPage() {
                     Add to any plan · Cancel anytime · No hidden fees
                   </div>
                   <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
-                    <Link href="/onboarding/choose-plan?addon=automation" style={{
+                    <button type="button" disabled style={{
                       padding: "12px 28px", borderRadius: 12, background: "linear-gradient(135deg,#7c3aed,#2563eb)",
                       color: "#fff", textDecoration: "none", fontSize: 14, fontWeight: 700,
-                      boxShadow: "0 0 24px rgba(124,58,237,.35)",
+                      boxShadow: "0 0 24px rgba(124,58,237,.35)", cursor: "not-allowed", opacity: 0.85, border: "none",
                     }}>
-                      Add to my plan →
-                    </Link>
+                      Launching Soon
+                    </button>
                     <Link href="/automation" style={{
                       padding: "12px 20px", borderRadius: 12, border: "1px solid rgba(255,255,255,.15)",
                       color: "rgba(255,255,255,.7)", textDecoration: "none", fontSize: 14, fontWeight: 600,
@@ -1007,9 +1007,9 @@ export default function PricingPage() {
               <div style={{ padding: "24px 24px", fontSize: 13, fontWeight: 700, color: "rgba(255,255,255,.3)" }}>Ready to start?</div>
               {PLANS.map((plan) => (
                 <div key={plan.slug} style={{ padding: "20px 16px", borderLeft: "1px solid rgba(255,255,255,.06)", background: plan.featured ? "rgba(99,102,241,.06)" : "transparent" }}>
-                  <Link href={buildHref(plan.slug)} style={{ display: "block", textAlign: "center", padding: "11px 12px", borderRadius: 10, textDecoration: "none", color: "white", fontWeight: 800, fontSize: 13, background: plan.gradient }}>
-                    Get {plan.name}
-                  </Link>
+                  <button type="button" disabled style={{ display: "block", width: "100%", textAlign: "center", padding: "11px 12px", borderRadius: 10, textDecoration: "none", color: "white", fontWeight: 800, fontSize: 13, background: plan.gradient, cursor: "not-allowed", opacity: 0.85, border: "none" }}>
+                    Launching Soon
+                  </button>
                 </div>
               ))}
             </div>
@@ -1259,18 +1259,20 @@ export default function PricingPage() {
                   </div>
                 )}
 
-                <Link
-                  href={selectedModules.length && !needsCoreModule ? buildCustomHref() : "#custom"}
+                <button
+                  type="button"
+                  disabled
                   style={{
-                    display: "block", textAlign: "center", padding: "13px 18px", borderRadius: 12,
+                    display: "block", width: "100%", textAlign: "center", padding: "13px 18px", borderRadius: 12,
                     background: selectedModules.length && !needsCoreModule ? "linear-gradient(135deg,#f97316,#ea580c)" : "rgba(255,255,255,.06)",
                     color: "white", fontWeight: 800, fontSize: 14, textDecoration: "none",
-                    opacity: selectedModules.length && !needsCoreModule ? 1 : 0.5,
+                    opacity: selectedModules.length && !needsCoreModule ? 0.85 : 0.5,
                     border: selectedModules.length && !needsCoreModule ? "none" : "1px solid rgba(255,255,255,.1)",
+                    cursor: "not-allowed",
                   }}
                 >
-                  {!selectedModules.length ? "Select modules above" : needsCoreModule ? "Pick a module that runs alone" : standaloneOnly ? "Continue with this app →" : "Continue →"}
-                </Link>
+                  Launching Soon
+                </button>
                 <div style={{ fontSize: 11, color: "rgba(255,255,255,.22)", textAlign: "center", marginTop: 10 }}>
                   You&apos;ll confirm everything before payment
                 </div>

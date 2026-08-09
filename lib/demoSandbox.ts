@@ -134,6 +134,7 @@ export async function prewarmSandboxes(
       where: { isDemo: true, demoExpiresAt: null, businessType },
     });
     for (let i = idle; i < perType; i++) {
+      let createdId: string | null = null;
       try {
         const company = await prisma.company.create({
           data: {
@@ -148,6 +149,7 @@ export async function prewarmSandboxes(
             demoExpiresAt: null, // idle until someone claims it
           },
         });
+        createdId = company.id;
         await prisma.userCompany.upsert({
           where: { userId_companyId: { userId: user.id, companyId: company.id } },
           update: {},
@@ -159,6 +161,9 @@ export async function prewarmSandboxes(
         // Log it — a silent catch here once hid a seeder crash that left one
         // whole business type without any warm sandboxes.
         console.error(`[demo] prewarm failed for ${businessType}:`, e);
+        // An empty shell left on the shelf would be handed to a visitor as a
+        // blank workspace, which is worse than making them wait for a seed.
+        if (createdId) await destroyDemoSandbox(createdId).catch(() => {});
         failed++;
       }
     }
