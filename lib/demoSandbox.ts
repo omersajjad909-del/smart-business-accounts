@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { signJwt } from "@/lib/auth";
 import {
   DEMO_BUSINESS_TYPES,
+  DEMO_SEED_VERSION,
   type DemoBusinessType,
   getDemoProfile,
   isDemoBusinessType,
@@ -147,6 +148,8 @@ export async function prewarmSandboxes(
             subscriptionStatus: "ACTIVE",
             isDemo: true,
             demoExpiresAt: null, // idle until someone claims it
+            // Which seed built this shelf item — see DEMO_SEED_VERSION.
+            code: DEMO_SEED_VERSION,
           },
         });
         createdId = company.id;
@@ -234,6 +237,7 @@ export async function createDemoSandbox(
       subscriptionStatus: "ACTIVE",
       isDemo: true,
       demoExpiresAt: expiresAt,
+      code: DEMO_SEED_VERSION,
     },
   });
 
@@ -438,6 +442,10 @@ export async function sweepExpiredSandboxes(limit = 50): Promise<{ swept: number
       OR: [
         { demoExpiresAt: { lt: new Date() } },
         { demoExpiresAt: null, createdAt: { lt: idleCutoff } },
+        // Built by an older seed — retire it now rather than hand a visitor
+        // data we have already fixed. Claimed sandboxes are left alone; someone
+        // may be working inside one right this second.
+        { demoExpiresAt: null, code: { not: DEMO_SEED_VERSION } },
       ],
     },
     select: { id: true },

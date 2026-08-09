@@ -17,6 +17,18 @@ import { safeEncryptField } from "@/lib/fieldEncrypt";
  * dataset lands in ~20 round trips instead of ~400.
  */
 
+/**
+ * Bump this whenever the seeded data changes.
+ *
+ * Pre-warmed sandboxes sit on the shelf already seeded, so a fix shipped today
+ * would not reach anyone who is handed one of yesterday's — they would keep
+ * seeing the old data until the 3-day staleness cutoff caught up. The version
+ * is stamped on each sandbox at build time and the cleanup cron retires any
+ * idle sandbox that does not match, so a deploy plus one cron tick is all it
+ * takes for the shelf to rebuild itself.
+ */
+export const DEMO_SEED_VERSION = "demo-seed-v2";
+
 export const DEMO_BUSINESS_TYPES = [
   "trading",
   "retail",

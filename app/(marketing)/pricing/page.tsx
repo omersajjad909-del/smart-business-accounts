@@ -611,8 +611,13 @@ export default function PricingPage() {
     return formatPrice(usdDiffPerMonth * 12);
   };
 
-  const buildHref = (slug: string) => undefined;
-  const buildCustomHref = () => undefined;
+  // These were stubbed to `undefined` while every CTA was a dead "Launching
+  // Soon" button. BuyCta needs the real destinations again so that flipping
+  // NEXT_PUBLIC_SIGNUPS_OPEN is genuinely all it takes to go live.
+  const buildHref = (slug: string) =>
+    `/onboarding/signup/${slug}?cycle=${billing}&currency=${currency}&country=${country}`;
+  const buildCustomHref = () =>
+    `/onboarding/choose-plan?plan=custom&modules=${selectedModules.join(",")}&extraUsers=${extraUsers}&extraBranches=${extraBranches}&cycle=${billing}&currency=${currency}&country=${country}`;
   const toggleModule = (id: string) => setSelectedModules(p => p.includes(id) ? p.filter(x => x !== id) : [...p, id]);
   // Single-app buy: clear everything else so the estimate shows exactly what
   // that one module costs, and drop the seat/branch add-ons that only make
