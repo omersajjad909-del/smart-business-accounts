@@ -63,6 +63,41 @@ export function acceptLanguageIndicatesPakistan(req: NextRequest): boolean {
   return /(?:^|[,\s])(?:[a-z]{2,3}-PK|ur)(?:[;,\s]|$)/i.test(header);
 }
 
+/**
+ * Third opinion: the device's own time zone, sent by the page as
+ * `x-client-timezone`.
+ *
+ * The locale check above was meant to rescue Pakistani visitors whose IP
+ * resolves abroad, but it misses most of them — a Pakistani SME almost always
+ * runs the browser in plain `en-US`, so `accept-language` carries no `-PK` at
+ * all. Their clock, on the other hand, is set to Karachi. Measured on a real
+ * Karachi connection: the edge reported `SG` and the locale said nothing, while
+ * the time zone said `Asia/Karachi`.
+ *
+ * Client-supplied, like `accept-language` — and trusted on the same terms. It
+ * can only ever move a visitor *into* Pakistan pricing, which is the cheaper
+ * tier, and the money still has to clear Safepay's Pakistani payment methods,
+ * so a spoofed zone buys a discounted display and nothing else.
+ */
+const PAKISTAN_TIMEZONES = new Set(["asia/karachi"]);
+
+/** Cookie written once per visit by <ClientRegionSignal>. */
+export const CLIENT_TZ_COOKIE = "fx_tz";
+
+export function timezoneIndicatesPakistan(req: NextRequest): boolean {
+  // A cookie rather than a per-fetch header on purpose: it rides along on every
+  // request automatically, including the POST to /api/billing/checkout. If the
+  // signal reached the pricing display but not checkout, the page would quote
+  // PKR and the card would be charged USD — the exact split this module exists
+  // to prevent.
+  const tz = String(
+    req.headers.get("x-client-timezone") || req.cookies.get(CLIENT_TZ_COOKIE)?.value || "",
+  )
+    .trim()
+    .toLowerCase();
+  return PAKISTAN_TIMEZONES.has(tz);
+}
+
 function normalizeCountry(value: string | null | undefined): string | null {
   const cc = String(value || "").trim().toUpperCase();
   return /^[A-Z]{2}$/.test(cc) ? cc : null;
@@ -78,11 +113,12 @@ export type PricingRegion = {
   /** "PKR" for Pakistan, "USD" for everyone else. */
   currency: PricingCurrency;
   isPakistan: boolean;
-  source: "geo" | "locale" | "company" | "default";
+  source: "geo" | "locale" | "timezone" | "company" | "default";
   /** Raw signals, for debugging a wrong currency without guesswork. */
   signals: {
     geoCountry: string | null;
     localeSaysPakistan: boolean;
+    timezoneSaysPakistan: boolean;
     companyCountry: string | null;
   };
 };
@@ -93,9 +129,15 @@ export function resolvePricingRegion(
 ): PricingRegion {
   const geo = readGeoCountryFromHeaders(req);
   const localePK = acceptLanguageIndicatesPakistan(req);
+  const tzPK = timezoneIndicatesPakistan(req);
   const declared = normalizeCountry(companyCountry);
 
-  const signals = { geoCountry: geo, localeSaysPakistan: localePK, companyCountry: declared };
+  const signals = {
+    geoCountry: geo,
+    localeSaysPakistan: localePK,
+    timezoneSaysPakistan: tzPK,
+    companyCountry: declared,
+  };
 
   // Pakistan wins on any single trustworthy signal, because the cost of a false
   // negative (a real Pakistani SME quoted the full USD price and leaving) is far
@@ -106,6 +148,9 @@ export function resolvePricingRegion(
   }
   if (localePK) {
     return { country: "PK", currency: "PKR", isPakistan: true, source: "locale", signals };
+  }
+  if (tzPK) {
+    return { country: "PK", currency: "PKR", isPakistan: true, source: "timezone", signals };
   }
   if (declared === "PK") {
     return { country: "PK", currency: "PKR", isPakistan: true, source: "company", signals };
