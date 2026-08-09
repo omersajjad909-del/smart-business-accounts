@@ -125,8 +125,8 @@ body {
      body's overflow to the viewport and body becomes a scroll container of its
      own — and `position: sticky` dies for everything inside it. That is what
      un-stuck the navbar (it sits in a `sticky top-0` wrapper in both
-     app/page.tsx and the marketing layout). Horizontal clipping is handled by
-     the single `html { overflow-x: clip }` rule further down. */
+     app/page.tsx and the marketing layout). Horizontal clipping lives on
+     `.app-page-shell` further down — a wrapper, never the root. */
   background-color: var(--app-bg);
   color: var(--text-primary);
   font-family: var(--font-sans), system-ui, -apple-system, "Segoe UI", sans-serif;
@@ -629,11 +629,23 @@ html.dark .dashboard-root ::-webkit-scrollbar-thumb:hover { background: rgba(255
    container and killed vertical scrolling on mobile browsers; html is the
    element the viewport actually scrolls, so clipping the x-axis here does the
    same job without that side effect. */
-/* `clip`, not `hidden`. Both stop sideways overflow, but `hidden` makes the
-   element a scroll container — which is what broke `position: sticky` on the
-   navbar and, on `body`, killed vertical scrolling on mobile. `clip` only
-   clips: no scroll container, so sticky and page scrolling both keep working. */
-html { overflow-x: clip; }
+/* Sideways overflow is clipped on the page wrapper — never on html or body.
+
+   Three constraints had to hold at once and each previous attempt broke one:
+     · `overflow-x: hidden` on body → body becomes a scroll container, which
+       killed vertical scrolling on mobile.
+     · `overflow-x: hidden` on html → same, and it also un-stuck the navbar.
+     · `overflow-x: clip` on html → fine in Chrome (it keeps overflow-y
+       visible), but WebKit treats overflow on the *root* element differently
+       and stops the page scrolling. Desktop and Chrome device emulation both
+       looked correct while a real iPhone would not scroll at all.
+
+   On an ordinary wrapper `clip` is safe: it is not a scroll container, so
+   `position: sticky` keeps working, and the root element is left alone so the
+   viewport scrolls normally everywhere. Fixed-position children (the dashboard
+   sidebar, the mobile bottom nav) take the viewport as their containing block,
+   so this does not clip them. */
+.app-page-shell { overflow-x: clip; }
 img, video, svg { max-width: 100%; }
 
 /* Utility: lock page scrolling for overlays (modals, mobile menus) by adding

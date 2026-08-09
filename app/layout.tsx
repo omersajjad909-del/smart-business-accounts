@@ -366,7 +366,7 @@ export default async function RootLayout({
               error:   { iconTheme: { primary: "#f87171", secondary: "var(--surface)" } },
             }}
           />
-          <div className="flex min-h-dvh flex-col">
+          <div className="app-page-shell flex min-h-dvh flex-col">
             {/* No overflow utilities here. `overflow-y-auto` turns this <main>
                 into a scroll container, and every page renders inside it — so
                 the sticky navbar wrapper (app/page.tsx, the marketing layout)
