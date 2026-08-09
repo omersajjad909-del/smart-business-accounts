@@ -9,6 +9,7 @@ import {
 import { COUNTRIES, sortCountries } from "@/lib/countries";
 import { BUSINESS_TYPES, type BusinessType } from "@/lib/businessModules";
 import { clearCurrentUser, getCurrentUser } from "@/lib/auth";
+import { clientRegionHeaders } from "@/lib/clientRegion";
 
 /* â”€â”€â”€ Country dial codes â”€â”€â”€ */
 /* ─── Phone number format groups per country ─── */
@@ -370,7 +371,7 @@ export default function SignupByPlanPage() {
         let cur = "USD";
         let geoCountry: string | null = null;
         try {
-          const g = await fetch("/api/public/pricing-region", { cache: "no-store" });
+          const g = await fetch("/api/public/pricing-region", { cache: "no-store", headers: clientRegionHeaders() });
           if (g.ok) {
             const gj = await g.json();
             if (gj?.currency) cur = gj.currency;

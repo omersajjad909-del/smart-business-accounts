@@ -5,6 +5,7 @@ import React, { useEffect, useState } from "react";
 import { getCurrentUser, setCurrentUser } from "@/lib/auth";
 import { formatFromUSD } from "@/lib/currency-client";
 import { getCustomPlanCycleAmountUsd, parseCustomModules } from "@/lib/customPlanPricing";
+import { clientRegionHeaders } from "@/lib/clientRegion";
 
 /* ── Plan meta ──────────────────────────────────────────── */
 const PLAN_META: Record<string, { name: string; price: number; yearlyPrice: number; color: string; glow: string; dim: string; border: string; gradientFrom: string; gradientTo: string; icon: string }> = {

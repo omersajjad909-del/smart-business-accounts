@@ -9,6 +9,7 @@ import {
 } from "@/lib/currencyPreference";
 import { getCustomPlanMonthlyUsd } from "@/lib/customPlanPricing";
 import { getCurrentUser } from "@/lib/auth";
+import { clientRegionHeaders } from "@/lib/clientRegion";
 
 /* ══════════════════════════════════════════════════════════
    TYPES & DATA — exact match with PricingSection.tsx

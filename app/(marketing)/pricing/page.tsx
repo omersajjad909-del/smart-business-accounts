@@ -5,6 +5,7 @@ import Link from "next/link";
 import { formatFromUSD } from "@/lib/currency-client";
 import { STANDALONE_MODULE_IDS } from "@/lib/customPlanPricing";
 import { SIGNUPS_OPEN } from "@/lib/signupGate";
+import { clientRegionHeaders } from "@/lib/clientRegion";
 
 /**
  * Every buy button on this page.

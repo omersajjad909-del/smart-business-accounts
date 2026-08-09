@@ -3,6 +3,7 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { CURRENCY_SYMBOL, formatFromUSD } from "@/lib/currency-client";
 import { signupHref } from "@/lib/signupGate";
+import { clientRegionHeaders } from "@/lib/clientRegion";
 
 function useInView() {
   const ref = useRef<HTMLDivElement>(null);
