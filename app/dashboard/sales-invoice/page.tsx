@@ -254,7 +254,17 @@ function SalesInvoiceContent() {
     if (e.key === "Enter") {
       e.preventDefault();
       if (!scanCode) return;
-      const found = items.find(i => i.barcode === scanCode || i.id === scanCode);
+      // The box says "scan barcode or type SKU", but SKU (item code) was never
+      // matched here — only barcode and id — so typing the SKU shown in the
+      // row below always answered "Item not found". Purchase Invoice already
+      // matched all three; this brings Sales Invoice in line, and trims/ignores
+      // case the way the POS search does.
+      const q = scanCode.trim().toLowerCase();
+      const found = items.find(i =>
+        i.barcode?.trim().toLowerCase() === q ||
+        i.code?.trim().toLowerCase() === q ||
+        i.id === scanCode
+      );
       if (found) {
         const newRow: Row = { itemId: found.id, name: found.name, description: found.description || "", availableQty: found.availableQty, qty: 1, rate: found.salePrice || "", discountPercent: "", taxPercent: found.taxRate || "", unit: found.unit || "", sku: found.code || "" };
         const last = rows[rows.length - 1];
