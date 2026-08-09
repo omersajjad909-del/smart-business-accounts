@@ -16,19 +16,9 @@ type DemoBusinessId =
   | "trading"
   | "wholesale"
   | "distribution"
-  | "clearing_forwarding"
-  | "restaurant"
   | "retail"
-  | "manufacturing"
-  | "hospital"
-  | "school"
-  | "hotel"
-  | "construction"
-  | "pharmacy"
-  | "transport"
-  | "real_estate"
   | "import_company"
-  | "travel";
+  | "clearing_forwarding";
 
 type DemoBusiness = {
   id: DemoBusinessId;
@@ -48,7 +38,6 @@ type DemoBusiness = {
   proof: string[];
   highlights: Array<{ label: string; value: string; sub: string }>;
   sampleDocs: string[];
-  users: string;
 };
 
 const BUSINESSES: DemoBusiness[] = [
@@ -84,7 +73,6 @@ const BUSINESSES: DemoBusiness[] = [
       { label: "Margin Tracking", value: "Per Item", sub: "Know exactly what makes money" },
     ],
     sampleDocs: ["Quotation", "Sales Invoice", "Delivery Challan", "Customer Statement", "Purchase Order"],
-    users: "Active",
   },
   {
     // Wholesale has its own seeded sandbox now (dealer network, bulk cartons),
@@ -120,7 +108,6 @@ const BUSINESSES: DemoBusiness[] = [
       { label: "Credit Alerts", value: "Automatic", sub: "Stop sales before limit is breached" },
     ],
     sampleDocs: ["Wholesale Invoice", "Price List", "Dealer Statement", "Outstanding Summary", "Credit Note"],
-    users: "1,800+",
   },
   {
     id: "distribution",
@@ -154,41 +141,6 @@ const BUSINESSES: DemoBusiness[] = [
       { label: "Collections", value: "Reconciled", sub: "Every rupee matched to invoice" },
     ],
     sampleDocs: ["Trip Sheet", "Van Loading Order", "Delivery Note", "Collection Register", "Route Report"],
-    users: "950+",
-  },
-  {
-    id: "restaurant",
-    liveBusinessType: "restaurant",
-    demoAvailable: false,
-    icon: "🍽️",
-    label: "Restaurant",
-    category: "Food & Beverage",
-    tagline: "Tables, kitchen, recipes, and daily cash — fully managed.",
-    description:
-      "Built for restaurants, cafes, fast food chains, and food courts that need table management, kitchen orders, and cost tracking.",
-    color: "#f97316",
-    gradient: "linear-gradient(135deg,#ea580c,#f97316)",
-    modules: ["Table Management", "Kitchen Orders (KOT)", "Menu & Pricing", "Recipe Costing", "Daily Cash Report", "Staff Tips", "Reservations", "Expense Tracking"],
-    workflow: [
-      { step: "Customer seated", detail: "Assign table and open order in seconds" },
-      { step: "Order to kitchen", detail: "KOT printed or displayed on kitchen screen" },
-      { step: "Bill and payment", detail: "Generate bill, split if needed, accept cash or card" },
-      { step: "End-of-day report", detail: "Daily sales, wastage, and cash reconciliation" },
-    ],
-    insights: ["Best-selling dishes by revenue and margin", "Peak hours to plan staffing better", "Recipe-wise food cost vs selling price"],
-    aiFeatures: [
-      "🤖 AI identifies your most profitable menu items",
-      "📉 Alerts when food cost percentage rises above target",
-      "🍕 Suggests pricing adjustments based on ingredient cost changes",
-    ],
-    proof: ["Built specifically for food service operations", "Recipe costing tracks real food cost per dish", "Daily cash reports close the day in minutes not hours"],
-    highlights: [
-      { label: "Order Processing", value: "Instant", sub: "KOT to kitchen in under 10 seconds" },
-      { label: "Recipe Costing", value: "Per Dish", sub: "Real food cost tracked automatically" },
-      { label: "Daily Close", value: "5 Minutes", sub: "Cash report generates itself" },
-    ],
-    sampleDocs: ["KOT (Kitchen Order Ticket)", "Customer Bill", "Daily Sales Report", "Recipe Cost Sheet", "Expense Voucher"],
-    users: "3,100+",
   },
   {
     id: "retail",
@@ -222,279 +174,6 @@ const BUSINESSES: DemoBusiness[] = [
       { label: "Loyalty ROI", value: "Proven", sub: "Repeat customers spend 2.3x more" },
     ],
     sampleDocs: ["POS Receipt", "Stock Report", "Loyalty Statement", "Branch Sales Report", "Purchase Order"],
-    users: "Active",
-  },
-  {
-    id: "manufacturing",
-    liveBusinessType: "manufacturing",
-    demoAvailable: false,
-    icon: "🏭",
-    label: "Manufacturing",
-    category: "Production",
-    tagline: "Raw materials to finished goods — track every production step.",
-    description:
-      "Built for factories, production units, and manufacturers needing BOM, work orders, production tracking, and cost control.",
-    color: "#6366f1",
-    gradient: "linear-gradient(135deg,#4f46e5,#6366f1)",
-    modules: ["Bill of Materials (BOM)", "Work Orders", "Production Tracking", "Raw Material Control", "Finished Goods", "Quality Control", "Manufacturing Cost", "Waste Tracking"],
-    workflow: [
-      { step: "Sales order received", detail: "Create production order based on demand and BOM" },
-      { step: "Issue raw materials", detail: "Materials issued from warehouse to production floor" },
-      { step: "Track production", detail: "Work order progress tracked in real-time" },
-      { step: "Finished goods to store", detail: "Quality check, then goods moved to finished stock" },
-    ],
-    insights: ["Production efficiency per batch and per machine", "Raw material consumption vs standard BOM", "Cost per unit vs selling price — real manufacturing margin"],
-    aiFeatures: [
-      "🤖 AI detects production inefficiencies per batch",
-      "📦 Predicts raw material shortages before they stop production",
-      "💰 Alerts when actual cost per unit exceeds standard",
-    ],
-    proof: ["BOM-based production planning eliminates over-ordering", "Real cost tracking vs estimated gives true profit picture", "Quality control integrated into production workflow"],
-    highlights: [
-      { label: "BOM Accuracy", value: "100%", sub: "Actual vs standard variance tracked" },
-      { label: "Waste Control", value: "Measured", sub: "Every gram of raw material accounted" },
-      { label: "Cost Visibility", value: "Per Unit", sub: "Real production cost always known" },
-    ],
-    sampleDocs: ["Work Order", "BOM Sheet", "Material Issue Voucher", "Production Report", "Quality Check Form"],
-    users: "720+",
-  },
-  {
-    id: "hospital",
-    liveBusinessType: "hospital",
-    demoAvailable: false,
-    icon: "🏥",
-    label: "Hospital / Clinic",
-    category: "Healthcare",
-    tagline: "Patients, prescriptions, lab, and billing — all connected.",
-    description:
-      "For hospitals, clinics, diagnostic centers, and specialist practices needing patient records, lab integration, and billing.",
-    color: "#ec4899",
-    gradient: "linear-gradient(135deg,#db2777,#ec4899)",
-    modules: ["Patient Registration", "Appointments", "Prescriptions", "Lab Orders & Results", "Ward Management", "Doctor Billing", "Insurance Claims", "Pharmacy Link"],
-    workflow: [
-      { step: "Patient registered", detail: "Complete patient profile with history in one place" },
-      { step: "Doctor consultation", detail: "Prescription written and linked to patient record" },
-      { step: "Lab or pharmacy", detail: "Lab tests ordered, results linked back to file" },
-      { step: "Billing and discharge", detail: "Full bill generated from all services rendered" },
-    ],
-    insights: ["Doctor-wise patient load and revenue performance", "Most common diagnoses and treatment patterns", "Insurance claim acceptance rate and pending recoveries"],
-    aiFeatures: [
-      "🤖 AI flags patients overdue for follow-up",
-      "💊 Detects prescription patterns that suggest over-medication",
-      "📋 Summarizes patient history before each consultation",
-    ],
-    proof: ["Patient records linked across departments in real-time", "Lab results auto-attach to prescription and billing", "Insurance claim tracking reduces revenue leakage"],
-    highlights: [
-      { label: "Patient Flow", value: "Seamless", sub: "OPD to IPD to discharge fully tracked" },
-      { label: "Lab TAT", value: "Monitored", sub: "Test turnaround time measured per lab" },
-      { label: "Billing Accuracy", value: "99%+", sub: "All services auto-captured in final bill" },
-    ],
-    sampleDocs: ["Prescription", "Lab Report", "Patient Invoice", "Insurance Claim", "Discharge Summary"],
-    users: "580+",
-  },
-  {
-    id: "school",
-    liveBusinessType: "school",
-    demoAvailable: false,
-    icon: "🎓",
-    label: "School / Institute",
-    category: "Education",
-    tagline: "Students, fees, exams, and attendance — one platform.",
-    description:
-      "For schools, colleges, academies, and training institutes managing students, fee collection, exam results, and schedules.",
-    color: "#14b8a6",
-    gradient: "linear-gradient(135deg,#0d9488,#14b8a6)",
-    modules: ["Student Enrollment", "Fee Collection", "Attendance Tracking", "Exam Results", "Class Schedules", "Teacher Management", "Parent Statements", "Expense Tracking"],
-    workflow: [
-      { step: "Student enrolled", detail: "Complete profile with guardian info and class assignment" },
-      { step: "Fee schedule set", detail: "Monthly, quarterly, or custom fee terms configured" },
-      { step: "Attendance and exams", detail: "Daily attendance logged, exam results recorded per student" },
-      { step: "Parent statement", detail: "Fee status and academic performance shared with parents" },
-    ],
-    insights: ["Fee collection rate by class and term", "Students with repeated absences — early warning", "Exam performance trends across batches"],
-    aiFeatures: [
-      "🤖 AI identifies students at risk of dropping out",
-      "📅 Predicts which students will miss fee payment",
-      "📊 Generates academic performance summary per student",
-    ],
-    proof: ["Fee defaulters tracked automatically with reminders", "Attendance-to-performance correlation visible to teachers", "Parent statements reduce inquiry calls to administration"],
-    highlights: [
-      { label: "Fee Recovery", value: "Tracked", sub: "Defaulters flagged with full history" },
-      { label: "Attendance", value: "Daily Log", sub: "Class and student level both tracked" },
-      { label: "Parent Access", value: "Statements", sub: "Transparent fee and academic records" },
-    ],
-    sampleDocs: ["Enrollment Form", "Fee Invoice", "Attendance Sheet", "Report Card", "Parent Statement"],
-    users: "1,100+",
-  },
-  {
-    id: "hotel",
-    liveBusinessType: "hotel",
-    demoAvailable: false,
-    icon: "🏨",
-    label: "Hotel & Hospitality",
-    category: "Hospitality",
-    tagline: "Reservations, rooms, housekeeping, and folios — all managed.",
-    description:
-      "For hotels, guesthouses, service apartments, and resorts managing bookings, room service, and guest billing.",
-    color: "#a78bfa",
-    gradient: "linear-gradient(135deg,#7c3aed,#a78bfa)",
-    modules: ["Reservations", "Front Desk Check-in", "Room Management", "Housekeeping", "Room Service Orders", "Guest Folio", "Restaurant Integration", "Revenue Reports"],
-    workflow: [
-      { step: "Reservation made", detail: "Booking created with room assignment and dates" },
-      { step: "Check-in and folio open", detail: "Guest identity verified, folio opened for all charges" },
-      { step: "Services during stay", detail: "Room service, restaurant, and extras added to folio" },
-      { step: "Checkout and billing", detail: "Full folio presented, payment received, room released" },
-    ],
-    insights: ["Occupancy rate by room type and day of week", "RevPAR (revenue per available room) tracked daily", "Service revenue per guest vs room revenue"],
-    aiFeatures: [
-      "🤖 AI forecasts occupancy for next 30 days",
-      "💰 Recommends dynamic pricing based on demand signals",
-      "🏨 Identifies guests with high lifetime value for loyalty programs",
-    ],
-    proof: ["Folio tracks every charge from check-in to checkout", "Housekeeping task assignment keeps rooms ready on time", "Revenue analysis by room type improves pricing decisions"],
-    highlights: [
-      { label: "Occupancy Tracking", value: "Live", sub: "Real-time room status always visible" },
-      { label: "Folio Accuracy", value: "100%", sub: "Every charge posted to guest account" },
-      { label: "Checkout Speed", value: "2 Min", sub: "Folio ready before guest arrives at desk" },
-    ],
-    sampleDocs: ["Reservation Confirmation", "Guest Folio", "Room Service Order", "Housekeeping Log", "Revenue Report"],
-    users: "430+",
-  },
-  {
-    id: "construction",
-    liveBusinessType: "construction",
-    demoAvailable: false,
-    icon: "🏗️",
-    label: "Construction",
-    category: "Projects",
-    tagline: "Projects, BOQ, contractors, and cost — all under control.",
-    description:
-      "For contractors, builders, and project-based businesses managing sites, BOQ, subcontractors, and material costs.",
-    color: "#fb923c",
-    gradient: "linear-gradient(135deg,#ea580c,#fb923c)",
-    modules: ["Project Management", "BOQ (Bill of Quantities)", "Material Requisition", "Subcontractor Payments", "Site Expenses", "Progress Billing", "Cost vs Budget", "Labour Tracking"],
-    workflow: [
-      { step: "Project created", detail: "BOQ entered with estimated quantities and rates" },
-      { step: "Materials ordered", detail: "Requisition raised, GRN received and linked to project cost" },
-      { step: "Subcontractor work", detail: "Work certified and payment processed against contract" },
-      { step: "Progress billing", detail: "Client billed per milestone or percentage completion" },
-    ],
-    insights: ["Cost vs budget per project — where overruns happen", "Subcontractor payment history and outstanding", "Material wastage vs BOQ estimate"],
-    aiFeatures: [
-      "🤖 AI predicts which projects are at risk of cost overrun",
-      "📋 Alerts when material consumption exceeds BOQ estimate",
-      "💡 Recommends contractor payment schedule optimization",
-    ],
-    proof: ["BOQ-linked cost tracking eliminates project budget surprises", "Progress billing keeps cash flow positive during long projects", "Site expense controls reduce informal cash leakage"],
-    highlights: [
-      { label: "Budget Control", value: "Live", sub: "Actual vs estimated always visible" },
-      { label: "Subcontractor Bill", value: "Verified", sub: "Work certified before payment released" },
-      { label: "Project Margin", value: "Real-time", sub: "Revenue minus all costs as you go" },
-    ],
-    sampleDocs: ["BOQ Sheet", "Material Requisition", "Subcontractor Certificate", "Progress Invoice", "Cost Report"],
-    users: "660+",
-  },
-  {
-    id: "pharmacy",
-    liveBusinessType: "pharmacy",
-    demoAvailable: false,
-    icon: "💊",
-    label: "Pharmacy",
-    category: "Healthcare",
-    tagline: "Medicines, prescriptions, expiry, and batch control — covered.",
-    description:
-      "For retail pharmacies, wholesale drug stores, and hospital pharmacies needing batch control, expiry alerts, and counter sales.",
-    color: "#22d3ee",
-    gradient: "linear-gradient(135deg,#0891b2,#22d3ee)",
-    modules: ["Counter Sales", "Prescription Management", "Batch & Expiry Control", "Inventory Valuation", "Supplier Purchases", "Return Management", "Near-Expiry Alerts", "Sales Analytics"],
-    workflow: [
-      { step: "Prescription received", detail: "Enter prescription and search medicines instantly" },
-      { step: "Batch selection", detail: "System auto-selects nearest expiry batch (FEFO)" },
-      { step: "Counter sale billed", detail: "Invoice generated with batch and expiry details" },
-      { step: "Reorder triggered", detail: "Low stock alert prompts purchase order to supplier" },
-    ],
-    insights: ["Near-expiry medicines by value — return or discount before loss", "Fast vs slow-moving medicines by category", "Prescription vs OTC sales split"],
-    aiFeatures: [
-      "🤖 AI predicts which medicines will go near-expiry next month",
-      "📦 Recommends optimal reorder quantity per medicine",
-      "⚠️ Flags medicines frequently sold below approved price",
-    ],
-    proof: ["FEFO (First Expiry First Out) batch selection prevents waste", "Near-expiry alerts give time to return stock to supplier", "Prescription tracking reduces dispensing errors"],
-    highlights: [
-      { label: "Expiry Control", value: "FEFO", sub: "Auto-selects earliest expiry batch" },
-      { label: "Wastage Reduction", value: "-60%", sub: "Alerts before expiry crosses deadline" },
-      { label: "Sales Speed", value: "Instant", sub: "Search by name, generic, or brand" },
-    ],
-    sampleDocs: ["Counter Sale Invoice", "Prescription Record", "Batch Ledger", "Near-Expiry Report", "Purchase Invoice"],
-    users: "1,950+",
-  },
-  {
-    id: "transport",
-    liveBusinessType: "transport",
-    demoAvailable: false,
-    icon: "🚛",
-    label: "Transport & Fleet",
-    category: "Logistics",
-    tagline: "Fleet, drivers, trips, fuel, and maintenance — fully tracked.",
-    description:
-      "For transport companies, fleet operators, and logistics businesses managing vehicles, drivers, trips, and costs.",
-    color: "#34d399",
-    gradient: "linear-gradient(135deg,#059669,#34d399)",
-    modules: ["Fleet Management", "Driver Profiles", "Trip Management", "Fuel Tracking", "Vehicle Maintenance", "Route Dispatch", "Freight Billing", "Transport Analytics"],
-    workflow: [
-      { step: "Trip assigned", detail: "Driver and vehicle matched to consignment and route" },
-      { step: "Dispatch and tracking", detail: "Departure logged, fuel issued, route confirmed" },
-      { step: "Delivery confirmed", detail: "Proof of delivery recorded, freight charges posted" },
-      { step: "Cost reconciliation", detail: "Fuel, tolls, driver allowance all matched to trip" },
-    ],
-    insights: ["Cost per trip per vehicle — actual vs estimated", "Fuel consumption variance by driver and route", "Vehicle maintenance schedule and overdue services"],
-    aiFeatures: [
-      "🤖 AI identifies drivers with high fuel consumption patterns",
-      "🔧 Predicts vehicle breakdowns before they cause delays",
-      "📍 Suggests optimal routing to reduce cost per km",
-    ],
-    proof: ["Trip-wise cost tracking removes informal expense leakage", "Maintenance schedule prevents unexpected breakdowns", "Fuel control reduces one of the biggest transport cost variables"],
-    highlights: [
-      { label: "Trip Cost", value: "Per Trip", sub: "Full cost visibility per journey" },
-      { label: "Fuel Control", value: "Tracked", sub: "Issued, consumed, variance reported" },
-      { label: "Fleet Health", value: "Scheduled", sub: "Maintenance alerts prevent breakdown" },
-    ],
-    sampleDocs: ["Trip Sheet", "Fuel Issue Voucher", "Freight Invoice", "Maintenance Log", "Driver Expense Claim"],
-    users: "780+",
-  },
-  {
-    id: "real_estate",
-    liveBusinessType: "real_estate",
-    demoAvailable: false,
-    icon: "🏢",
-    label: "Real Estate",
-    category: "Property",
-    tagline: "Properties, tenants, leases, and rent — all in one ledger.",
-    description:
-      "For property managers, real estate companies, and landlords managing rental properties, leases, and maintenance.",
-    color: "#f472b6",
-    gradient: "linear-gradient(135deg,#db2777,#f472b6)",
-    modules: ["Property Management", "Tenant Profiles", "Lease Agreements", "Rent Collection", "Maintenance Requests", "Expense Tracking", "Vacancy Dashboard", "Owner Reports"],
-    workflow: [
-      { step: "Property listed", detail: "Add property with units, specifications, and target rent" },
-      { step: "Tenant onboarded", detail: "Lease terms set, deposit recorded, access granted" },
-      { step: "Monthly rent collected", detail: "Invoices auto-generated, payments posted to ledger" },
-      { step: "Renewal or exit", detail: "Lease renewal or vacancy handled with full history" },
-    ],
-    insights: ["Occupancy rate across portfolio by property type", "Rent collection rate and defaulters with ageing", "Maintenance cost per unit vs rental income"],
-    aiFeatures: [
-      "🤖 AI predicts which tenants are likely to not renew",
-      "📊 Recommends rent revision based on market comps",
-      "🔔 Alerts when maintenance costs are eroding net yield",
-    ],
-    proof: ["Auto rent invoicing eliminates manual follow-up", "Vacancy dashboard shows which units need attention first", "Owner reports give portfolio performance in one view"],
-    highlights: [
-      { label: "Rent Collection", value: "Auto", sub: "Invoices generated on lease schedule" },
-      { label: "Vacancy Rate", value: "Monitored", sub: "Every empty unit flagged with days idle" },
-      { label: "Net Yield", value: "Per Unit", sub: "Income minus expenses per property" },
-    ],
-    sampleDocs: ["Lease Agreement", "Rent Invoice", "Maintenance Request", "Deposit Receipt", "Owner Report"],
-    users: "510+",
   },
   {
     id: "import_company",
@@ -528,7 +207,6 @@ const BUSINESSES: DemoBusiness[] = [
       { label: "Currency Support", value: "Global", sub: "Multi-currency for foreign transactions" },
     ],
     sampleDocs: ["Commercial Invoice", "Packing List", "Shipment Record", "LC Register", "Landed Cost Sheet"],
-    users: "890+",
   },
   {
     id: "clearing_forwarding",
@@ -562,41 +240,6 @@ const BUSINESSES: DemoBusiness[] = [
       { label: "Documentation", value: "Tracked", sub: "GD, BL, and delivery order in one place" },
     ],
     sampleDocs: ["Job File", "Clearance Invoice", "Port Charges Sheet", "Client Statement", "Delivery Order"],
-    users: "Active",
-  },
-  {
-    id: "travel",
-    liveBusinessType: "travel",
-    demoAvailable: false,
-    icon: "✈️",
-    label: "Travel Agency",
-    category: "Services",
-    tagline: "Ticketing, visas, and customer travel files — properly organized.",
-    description:
-      "Built for travel consultants and agencies handling airline tickets, visa processing, travel quotes, and passenger case follow-up.",
-    color: "#38bdf8",
-    gradient: "linear-gradient(135deg,#0ea5e9,#38bdf8)",
-    modules: ["Airline Tickets", "Visa Cases", "Quotations", "Sales Invoice", "Expense Vouchers", "CRM", "Payment Receipts", "Owner Dashboard"],
-    workflow: [
-      { step: "Customer inquiry", detail: "Capture passenger route, airline preference, and travel date instantly" },
-      { step: "Quote and booking", detail: "Send quotation, confirm booking, and record PNR against the file" },
-      { step: "Issue or process", detail: "Mark ticket as issued or move visa case from document check to submitted" },
-      { step: "Collect and follow up", detail: "Track service fee, outstanding balance, and travel-case status in one place" },
-    ],
-    insights: ["Issued vs pending ticketing pipeline", "Visa cases waiting on documents or embassy submission", "Sales value across tickets and visa services"],
-    aiFeatures: [
-      "🤖 AI highlights ticket files still not issued before travel date",
-      "🛂 Flags visa cases that are stuck in document check too long",
-      "📈 Summarizes travel revenue split between airline and visa services",
-    ],
-    proof: ["Travel-specific booking refs, PNR, passport, and submission statuses", "Same dashboard supports both airline tickets and visa processing", "Works with quotations, invoicing, and expense tracking already in FinovaOS"],
-    highlights: [
-      { label: "Ticket Pipeline", value: "Live", sub: "Quoted, booked, issued, or cancelled" },
-      { label: "Visa Desk", value: "Tracked", sub: "Document check through approval" },
-      { label: "Service Billing", value: "Ready", sub: "Quotes and invoices linked to operations" },
-    ],
-    sampleDocs: ["Ticket Booking Ref", "Visa Case File", "Quotation", "Sales Invoice", "Customer Follow-up Note"],
-    users: "350+",
   },
 ];
 
@@ -615,11 +258,13 @@ const CATEGORY_COLORS: Record<string, string> = {
 
 const CATEGORIES = Array.from(new Set(BUSINESSES.map((b) => b.category)));
 
+// "60+ Business Types" was the old catalogue count while this page showed one
+// live demo — a number the page itself contradicted.
 const TRUST_STATS = [
-  { value: "60+",          label: "Business Types",   icon: "🏢" },
+  { value: "6",            label: "Live Demos",       icon: "🏢" },
   { value: "Early Access", label: "Limited Spots",    icon: "🚀" },
-  { value: "99.9%",        label: "Uptime SLA",       icon: "🔒" },
-  { value: "< 2 min",      label: "Setup Time",       icon: "⚡" },
+  { value: "No signup",    label: "To Start",         icon: "⚡" },
+  { value: "30 min",       label: "Full Access",      icon: "⏱️" },
 ];
 
 export default function DemoPage() {
@@ -765,23 +410,13 @@ export default function DemoPage() {
             See exactly how FinovaOS runs it.
           </span>
         </h1>
+        {/* The page now lists only what actually opens. A grid of "coming soon"
+            cards next to live ones just made a visitor guess which was which. */}
         <p style={{ fontSize: 17, color: "rgba(255,255,255,.5)", lineHeight: 1.8, maxWidth: 620, margin: "0 auto 32px" }}>
-          {BUSINESSES.length} business verticals, {BUSINESSES.filter(b => isDemoLive(b.liveBusinessType)).length} live today.
-          Each live demo opens a private {DEMO_MINUTES}-minute workspace configured for your industry — real customers, stock,
-          posted invoices and payroll already loaded, so you can test it like it is your own business.
+          {BUSINESSES.length} business types, all live right now. Each one opens a private {DEMO_MINUTES}-minute
+          workspace configured for your industry — real customers, stock, posted invoices and payroll already
+          loaded, so you can test it like it is your own business.
         </p>
-
-        {BUSINESSES.filter(b => isDemoLive(b.liveBusinessType)).length > 0 && (
-          <div style={{ display: "inline-flex", flexWrap: "wrap", justifyContent: "center", gap: 8, padding: "10px 16px", borderRadius: 999, background: "rgba(245,158,11,.08)", border: "1px solid rgba(245,158,11,.2)", marginBottom: 8 }}>
-            <span style={{ fontSize: 12, fontWeight: 800, color: "#fbbf24" }}>Live now:</span>
-            {BUSINESSES.filter(b => isDemoLive(b.liveBusinessType)).map((b, i, arr) => (
-              <span key={b.id} style={{ display: "inline-flex", alignItems: "center", gap: 8 }}>
-                <span style={{ fontSize: 12, color: "rgba(255,255,255,.7)" }}>{b.label}</span>
-                {i < arr.length - 1 && <span style={{ fontSize: 12, color: "rgba(255,255,255,.35)" }}>|</span>}
-              </span>
-            ))}
-          </div>
-        )}
 
         {/* Trust bar */}
         <div style={{ display: "flex", justifyContent: "center", flexWrap: "wrap", gap: 10, marginBottom: 8 }}>
@@ -872,7 +507,9 @@ export default function DemoPage() {
                     {isDemoLive(entry.liveBusinessType) ? "Live Demo" : "Coming Soon"}
                   </span>
                 </div>
-                <div style={{ marginTop: 10, fontSize: 11, color: "rgba(255,255,255,.25)", fontWeight: 700 }}>{entry.users} users</div>
+                {/* The per-business user counts that used to sit here were
+                    invented. Pre-launch, the honest signal is the category. */}
+                <div style={{ marginTop: 10, fontSize: 11, color: "rgba(255,255,255,.25)", fontWeight: 700, letterSpacing: ".04em", textTransform: "uppercase" }}>{entry.category}</div>
               </div>
             );
           })}
@@ -902,7 +539,7 @@ export default function DemoPage() {
                 <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 6, flexWrap: "wrap" }}>
                   <div style={{ fontSize: 28, fontWeight: 900, letterSpacing: -0.8 }}>{biz.label}</div>
                   <div style={{ padding: "4px 12px", borderRadius: 999, background: `${biz.color}20`, color: biz.color, fontSize: 11, fontWeight: 800 }}>
-                    {biz.users} users
+                    {biz.category}
                   </div>
                   <div style={{ padding: "4px 12px", borderRadius: 999, background: isDemoLive(biz.liveBusinessType) ? "rgba(16,185,129,.14)" : "rgba(245,158,11,.12)", color: isDemoLive(biz.liveBusinessType) ? "#34d399" : "#fbbf24", fontSize: 11, fontWeight: 800 }}>
                     {isDemoLive(biz.liveBusinessType) ? "Live Demo Ready" : "Coming Soon"}
@@ -1137,13 +774,16 @@ export default function DemoPage() {
                 How the {biz.label} demo works
               </div>
               <div style={{ fontSize: 13, color: "rgba(255,255,255,.55)", lineHeight: 1.75, marginBottom: 16 }}>
-                Use the <strong style={{ color: biz.color }}>📅 Book Live Demo</strong> button at the top of this section to pick a 30-minute slot. At your booked time, click the access link and you&apos;ll be dropped into a real dashboard pre-configured for {biz.label}. When your 30 minutes are up, all test data is automatically reset — nothing persists.
+                Hit <strong style={{ color: biz.color }}>▶ Start Demo Now</strong> and you land in a real dashboard pre-configured for {biz.label} —
+                customers, suppliers, stock, posted invoices and a payroll run already in place. Create your own invoices,
+                run payroll, check the reports. The workspace is yours alone, and everything you do is wiped when the
+                {" "}{DEMO_MINUTES} minutes are up. Prefer a guided walkthrough? Book a slot instead.
               </div>
               <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
                 {[
-                  { icon: "🗓️", text: "Pick a 30-min slot" },
-                  { icon: "⚡", text: "Real dashboard, real data" },
-                  { icon: "🧹", text: "Auto-clean when demo ends" },
+                  { icon: "⚡", text: "No signup, starts instantly" },
+                  { icon: "🔒", text: "Private workspace, not shared" },
+                  { icon: "🧹", text: "Auto-wiped when it ends" },
                 ].map(pt => (
                   <div key={pt.text} style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "8px 14px", borderRadius: 999, background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.08)", fontSize: 12, color: "rgba(255,255,255,.7)", fontWeight: 600 }}>
                     <span>{pt.icon}</span> {pt.text}

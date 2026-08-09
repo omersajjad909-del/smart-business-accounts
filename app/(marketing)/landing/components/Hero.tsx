@@ -256,39 +256,23 @@ export default function Hero() {
                   Watch Demo
                 </Link>
               </div>
+              {/* "No credit card required" is gone — there is no free trial to
+                  start without one, so the line promised something checkout
+                  cannot honour. */}
               <p style={{ fontSize:12.5, color:"rgba(255,255,255,.4)", marginBottom:32, fontWeight:500 }}>
-                Priority early access · No credit card required · Launch pricing locked in
+                Priority early access · Launch pricing locked in
               </p>
 
-              {/* Social proof row */}
+              {/* Trust row. The customer count and star rating that used to sit
+                  here were invented — we are pre-launch, so anything a visitor
+                  could check would contradict them. Only claims the product
+                  actually backs are left. */}
               <div className="h5 hero-proof" style={{ display:"flex", alignItems:"center", gap:16, flexWrap:"wrap" }}>
-                {/* Avatar stack */}
-                <div style={{ display:"flex", alignItems:"center", gap:8 }}>
-                  <div style={{ display:"flex" }}>
-                    {["AH","SR","FM","MK","PR"].map((init, i) => (
-                      <div key={i} style={{
-                        width:28, height:28, borderRadius:"50%",
-                        background:`linear-gradient(135deg,${["#6366f1","#10b981","#f59e0b","#3b82f6","#ec4899"][i]},${["#4f46e5","#059669","#d97706","#2563eb","#db2777"][i]})`,
-                        border:"2px solid #04061a",
-                        display:"flex", alignItems:"center", justifyContent:"center",
-                        fontSize:9, fontWeight:800, color:"white",
-                        marginLeft: i === 0 ? 0 : -8, zIndex:5-i, position:"relative",
-                      }}>{init}</div>
-                    ))}
-                  </div>
-                  <div>
-                    <div style={{ display:"flex", gap:1, marginBottom:1 }}>
-                      {[1,2,3,4,5].map(n => <span key={n} style={{ fontSize:10, color:"#fbbf24" }}>★</span>)}
-                    </div>
-                    <span style={{ fontSize:11, fontWeight:600, color:"rgba(255,255,255,.5)" }}>
-                      <span style={{ color:"rgba(255,255,255,.8)" }}>500+</span> businesses trust FinovaOS
-                    </span>
-                  </div>
-                </div>
-                <span style={{ width:1, height:16, background:"rgba(255,255,255,.1)", display:"inline-block" }}/>
                 <span style={{ fontSize:12, fontWeight:600, color:"rgba(255,255,255,.35)" }}>14-day money-back guarantee</span>
                 <span style={{ width:1, height:16, background:"rgba(255,255,255,.1)", display:"inline-block" }}/>
                 <span style={{ fontSize:12, fontWeight:600, color:"rgba(255,255,255,.35)" }}>Cancel anytime</span>
+                <span style={{ width:1, height:16, background:"rgba(255,255,255,.1)", display:"inline-block" }}/>
+                <span style={{ fontSize:12, fontWeight:600, color:"rgba(255,255,255,.35)" }}>No setup fee</span>
               </div>
 
             </div>

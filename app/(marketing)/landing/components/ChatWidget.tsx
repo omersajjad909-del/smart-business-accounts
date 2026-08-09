@@ -16,7 +16,7 @@ const KB: [RegExp, string][] = [
    "Hello! 👋 I'm FinovaOS AI Assistant.\n\nI can help with:\n• Pricing & plans\n• Invoice & billing\n• Inventory management\n• HR & Payroll\n• Banking & reports\n• CRM & AI features\n\nAsk me anything!"],
 
   [/what is finova|finova kya|about finova|kaun sa software|introduce yourself/i,
-   "FinovaOS is a complete cloud Business OS for SMEs — all in one platform:\n\n• Accounting & double-entry bookkeeping\n• Sales & purchase invoicing\n• Inventory management\n• HR & Payroll\n• Banking & reconciliation\n• CRM & customer management\n• AI financial intelligence\n\nUsed by 12,000+ businesses. 🚀"],
+   "FinovaOS is a complete cloud Business OS for SMEs — all in one platform:\n\n• Accounting & double-entry bookkeeping\n• Sales & purchase invoicing\n• Inventory management\n• HR & Payroll\n• Banking & reconciliation\n• CRM & customer management\n• AI financial intelligence\n\nSix industries live today — try any of them free on the demo page. 🚀"],
 
   [/pric|plan|cost|kitna|starter|professional|enterprise|subscription|fee|charge/i,
    "FinovaOS ke 4 plans hain:\n\n1. **Starter** — 3 users | PKR 3,999/mo | Invoicing, ledger, basic reports\n2. **Professional** — 10 users | PKR 8,999/mo | + Inventory, HR & Payroll, Banking, CRM\n3. **Enterprise** — 25 users | PKR 19,999/mo | + API access, integrations, priority support\n4. **Custom** — Sirf woh modules jo chahiye, pay per module\n\n🔥 Launch offer: 50% off pehle 3 mahine!\nContact: hello@finovaos.app 💰"],
@@ -73,7 +73,7 @@ const KB: [RegExp, string][] = [
    "FinovaOS API & Integrations:\n\n• Full REST API access (Enterprise plan)\n• Webhook support for real-time sync\n• CSV & Excel import/export on all plans\n• Self-configurable connectors for eCommerce, payment gateways, and banks\n\nSee the API docs at finovaos.app/docs 🔌"],
 
   [/why finova|better than|compare|versus|\bvs\b|quickbooks|xero|competitor|best accounting|alternative|kon sa software/i,
-   "Why FinovaOS over QuickBooks / Xero?\n\n• All-in-one: Accounting + HR + Inventory + CRM in ONE platform\n• Built for Pakistan: PKR pricing, Urdu support\n• 12,000+ businesses trust FinovaOS\n• 75% cheaper than international alternatives\n• Local support team available in Urdu/English\n• No hidden per-module fees\n• 14-day money-back guarantee\n\nSwitch with full data migration support! 🏆"],
+   "Why FinovaOS over QuickBooks / Xero?\n\n• All-in-one: Accounting + HR + Inventory + CRM in ONE platform\n• Built for Pakistan: PKR pricing, Urdu support\n• 75% cheaper than international alternatives\n• Local support team available in Urdu/English\n• No hidden per-module fees\n• 14-day money-back guarantee\n\nSwitch with full data migration support! 🏆"],
 
   [/\bgst\b|sales.?tax|withholding|\bfbr\b|\bntn\b|\bwht\b|income.?tax|\bvat\b|tax.?rate|tax.?setup/i,
    "FinovaOS Tax Management:\n\n• GST/Sales Tax on invoices (any rate)\n• Withholding Tax (WHT) management\n• FBR-compliant reporting\n• Multiple tax rates & categories\n• Tax-inclusive & tax-exclusive pricing\n• Tax Summary report (PDF/Excel export)\n• Input/Output tax tracking\n\nDashboard → Reports → Tax Summary 📋"],

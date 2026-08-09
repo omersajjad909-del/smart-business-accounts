@@ -426,8 +426,20 @@ export async function destroyDemoSandbox(companyId: string): Promise<boolean> {
  * nothing else would ever clean those up.
  */
 export async function sweepExpiredSandboxes(limit = 50): Promise<{ swept: number; failed: number }> {
+  // Seeded dates are relative to the moment of seeding ("45 days ago"), so a
+  // sandbox that has sat on the shelf for a week would open on a workspace
+  // whose "this month" charts are empty. Retire stale idle ones too and let
+  // prewarm rebuild them with fresh dates.
+  const idleCutoff = new Date(Date.now() - 3 * 24 * 60 * 60 * 1000);
+
   const stale = await prisma.company.findMany({
-    where: { isDemo: true, demoExpiresAt: { lt: new Date() } },
+    where: {
+      isDemo: true,
+      OR: [
+        { demoExpiresAt: { lt: new Date() } },
+        { demoExpiresAt: null, createdAt: { lt: idleCutoff } },
+      ],
+    },
     select: { id: true },
     take: limit,
   });

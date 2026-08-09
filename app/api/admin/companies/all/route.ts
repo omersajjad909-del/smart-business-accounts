@@ -7,6 +7,9 @@ export async function GET(req: NextRequest) {
     const admin = requireAdmin(req);
     if (admin instanceof NextResponse) return admin;
     const companies = await prisma.company.findMany({
+      // Demo sandboxes are throwaway workspaces, not customers — listing them
+      // here would bury the real accounts under a rolling set of demo copies.
+      where: { isDemo: false },
       orderBy: { createdAt: "desc" },
       select: {
         id: true,

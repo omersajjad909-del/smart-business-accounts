@@ -87,6 +87,9 @@ export async function GET(req: NextRequest) {
       lemonOrders,
     ] = await Promise.all([
       prisma.company.findMany({
+        // Every metric on this page is derived from this list, so demo
+        // sandboxes would show up as signups, active plans and revenue seats.
+        where: { isDemo: false },
         orderBy: { createdAt: "desc" },
         select: {
           id: true,

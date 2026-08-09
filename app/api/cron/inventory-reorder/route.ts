@@ -16,7 +16,10 @@ export async function GET(req: NextRequest) {
   after(async () => {
     try {
       const companies = await prisma.company.findMany({
-        where: { isActive: true, subscriptionStatus: "ACTIVE" },
+        // Skip demo sandboxes — they are seeded with deliberately low stock and
+        // would generate reorder alerts (and emails) for a company that will be
+        // deleted within the hour.
+        where: { isActive: true, subscriptionStatus: "ACTIVE", isDemo: false },
         select: { id: true },
       });
 

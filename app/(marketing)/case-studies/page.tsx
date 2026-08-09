@@ -192,10 +192,12 @@ export default function CaseStudiesPage() {
 
         {/* Stats */}
         <div style={{ display: "flex", justifyContent: "center", gap: 40, flexWrap: "wrap", marginBottom: 40 }}>
+          {/* Customer count, ROI and retention were placeholders — none of them
+              are measurable yet. */}
           {[
-            { val: "500+", label: "Businesses" },
-            { val: "10x", label: "Avg. ROI" },
-            { val: "97%", label: "Retention Rate" },
+            { val: "6", label: "Industries Live" },
+            { val: "PKR & USD", label: "Billing" },
+            { val: "FBR-ready", label: "Tax Compliance" },
           ].map(s => (
             <div key={s.label} style={{ textAlign: "center" }}>
               <div style={{ fontSize: 32, fontWeight: 800, color: "#818cf8" }}>{s.val}</div>
@@ -283,7 +285,7 @@ export default function CaseStudiesPage() {
       {/* CTA */}
       <div style={{ textAlign: "center", padding: "60px 24px 100px", borderTop: "1px solid rgba(255,255,255,.06)" }}>
         <h2 style={{ fontSize: 32, fontWeight: 700, margin: "0 0 12px" }}>Ready to write your success story?</h2>
-        <p style={{ color: "#64748b", marginBottom: 28, fontSize: 16 }}>Join 500+ businesses already running on FinovaOS.</p>
+        <p style={{ color: "#64748b", marginBottom: 28, fontSize: 16 }}>Start on FinovaOS with launch pricing locked in.</p>
         <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
           <Link href="/onboarding/choose-plan" style={{ background: "linear-gradient(135deg,#4f46e5,#7c3aed)", color: "#fff", padding: "13px 28px", borderRadius: 12, fontWeight: 700, textDecoration: "none", fontSize: 15 }}>
             Get Started →

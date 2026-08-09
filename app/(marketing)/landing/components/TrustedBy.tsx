@@ -41,17 +41,20 @@ export default function TrustedBy() {
 
         {/* Header */}
         <div style={{ textAlign: "center", marginBottom: 40 }}>
+          {/* Customer counts, ratings and revenue-tracked figures were all
+              invented while the product is pre-launch. Replaced with claims the
+              platform itself backs. */}
           <p style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,.3)", letterSpacing: ".1em", textTransform: "uppercase", marginBottom: 16 }}>
-            TRUSTED BY 500+ BUSINESSES IN 20+ COUNTRIES
+            BUILT FOR PAKISTAN & THE GULF — LAUNCHING NOW
           </p>
 
           {/* Stats row */}
           <div className="trust-stats" style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 1, maxWidth: 720, margin: "0 auto 40px" }}>
             {[
-              { n: "500+",     l: "Businesses",              color: "#818cf8" },
-              { n: "20+",      l: "Countries",               color: "#34d399" },
-              { n: "4.9★",     l: "Average Rating",          color: "#fbbf24" },
-              { n: "Rs. 2Cr+", l: "Monthly Revenue Tracked", color: "#38bdf8" },
+              { n: "6",        l: "Industries Live",         color: "#818cf8" },
+              { n: "PKR & USD", l: "Billing Currencies",     color: "#34d399" },
+              { n: "FBR-ready", l: "Tax Compliance",         color: "#fbbf24" },
+              { n: "All-in-one", l: "Accounts · HR · Stock", color: "#38bdf8" },
             ].map((s, i) => (
               <div key={i} style={{
                 padding: "16px 12px", textAlign: "center",

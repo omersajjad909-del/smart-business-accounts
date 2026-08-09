@@ -29,7 +29,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "Join FinovaOS — We're Hiring",
-    description: "Remote-first, equity, health coverage. 4.8★ Glassdoor. Join our global team.",
+    description: "Remote-first, equity, health coverage. Join our global team.",
     images: [`${BASE}/icon.png`],
   },
   alternates: { canonical: `${BASE}/careers` },

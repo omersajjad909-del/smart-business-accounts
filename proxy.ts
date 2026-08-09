@@ -196,7 +196,6 @@ export function proxy(req: NextRequest) {
     "/api/test-login",
     "/api/analytics",
     "/api/demo/login",
-    "/api/demo/seed",
     "/api/demo/slots",
     "/api/demo/book",
     "/api/demo/start",

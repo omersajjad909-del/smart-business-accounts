@@ -5,7 +5,7 @@ const BASE = process.env.NEXT_PUBLIC_BASE_URL || "https://www.finovaos.app";
 export const metadata: Metadata = {
   title: "FinovaOS — #1 Cloud Accounting Software for Pakistan & Gulf SMEs",
   description:
-    "Best cloud accounting software for Pakistan & UAE businesses. FBR-ready invoicing, inventory management, HR & payroll, bank reconciliation, CRM — all in one platform. Trusted by 500+ SMEs in Karachi, Lahore, and Dubai.",
+    "Cloud accounting software for Pakistan & UAE businesses. FBR-ready invoicing, inventory management, HR & payroll, bank reconciliation, CRM — all in one platform, built for SMEs in Karachi, Lahore, and Dubai.",
   keywords: [
     // Pakistan-specific
     "accounting software Pakistan", "cloud accounting Pakistan", "FBR accounting software",
@@ -34,7 +34,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "FinovaOS — Cloud Accounting for Pakistan & Gulf SMEs",
-    description: "FBR-ready invoicing, inventory, HR & payroll, bank reconciliation, CRM — all in one platform. Trusted by 500+ SMEs.",
+    description: "FBR-ready invoicing, inventory, HR & payroll, bank reconciliation, CRM — all in one platform built for SMEs.",
     images: [`${BASE}/icon.png`],
   },
   alternates: { canonical: `${BASE}/` },

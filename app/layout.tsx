@@ -137,7 +137,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "FinovaOS - Global Accounting & Business Management Platform",
     description:
-      "AI-powered cloud accounting for SMEs. Trusted by 500+ businesses in Pakistan, UAE & beyond.",
+      "AI-powered cloud accounting for SMEs in Pakistan, the UAE & beyond.",
   },
   applicationName: "FinovaOS",
   generator: "Next.js",

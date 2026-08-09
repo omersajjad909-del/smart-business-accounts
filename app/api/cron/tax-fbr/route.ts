@@ -22,7 +22,9 @@ export async function GET(req: NextRequest) {
       }
 
       const companies = await prisma.company.findMany({
-        where: { isActive: true, country: { in: ["Pakistan", "PK"] }, subscriptionStatus: "ACTIVE" },
+        // Demo sandboxes are Pakistan-based and permanently "ACTIVE"; they must
+        // not trigger real FBR filing reminders.
+        where: { isActive: true, country: { in: ["Pakistan", "PK"] }, subscriptionStatus: "ACTIVE", isDemo: false },
         include: { defaultUsers: { select: { email: true, name: true } } },
       });
 

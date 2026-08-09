@@ -22,7 +22,7 @@ const JSON_LD = {
       "@type": "SoftwareApplication",
       "@id": `${BASE}/#software`,
       "name": "FinovaOS",
-      "description": "Cloud accounting software for Pakistan & UAE SMEs. FBR-ready invoicing, inventory management, HR & payroll, bank reconciliation, and CRM — all in one platform. Trusted by 500+ businesses in Karachi, Lahore, and Dubai.",
+      "description": "Cloud accounting software for Pakistan & UAE SMEs. FBR-ready invoicing, inventory management, HR & payroll, bank reconciliation, and CRM — all in one platform, built for businesses in Karachi, Lahore, and Dubai.",
       "url": BASE,
       "applicationCategory": "BusinessApplication",
       "applicationSubCategory": "AccountingApplication",
@@ -46,13 +46,10 @@ const JSON_LD = {
           "billingIncrement": "P1M",
         },
       ],
-      "aggregateRating": {
-        "@type": "AggregateRating",
-        "ratingValue": "4.8",
-        "reviewCount": "500",
-        "bestRating": "5",
-        "worstRating": "1",
-      },
+      // No aggregateRating here on purpose. It used to declare 4.8 from 500
+      // reviews, which do not exist — Google treats fabricated review markup as
+      // spam and can drop the site's rich results entirely. Add it back only
+      // when there are real reviews to count.
       "featureList": [
         "FBR-compliant invoicing",
         "Double-entry accounting",

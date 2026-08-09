@@ -15,7 +15,9 @@ export async function GET(req: NextRequest) {
   after(async () => {
     try {
       const companies = await prisma.company.findMany({
-        where: { isActive: true, subscriptionStatus: "ACTIVE" },
+        // Demo sandboxes carry made-up customer phone numbers — texting them
+        // would spend credit and could reach a real person by coincidence.
+        where: { isActive: true, subscriptionStatus: "ACTIVE", isDemo: false },
         select: { id: true, name: true },
       });
 

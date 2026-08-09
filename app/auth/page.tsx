@@ -360,10 +360,12 @@ function AuthPageInner() {
 
             {/* Bottom stats row */}
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 12, marginTop: 36 }}>
+              {/* The customer count and star rating here were invented — we are
+                  pre-launch and have neither yet. */}
               {[
-                { value: "500+", label: "Businesses", desc: "across 6 countries", color: "#34d399", border: "rgba(52,211,153,0.2)", bg: "rgba(52,211,153,0.08)" },
+                { value: "6", label: "Industries", desc: "live workspaces", color: "#34d399", border: "rgba(52,211,153,0.2)", bg: "rgba(52,211,153,0.08)" },
                 { value: "99.9%", label: "Uptime", desc: "SLA guaranteed", color: "#818cf8", border: "rgba(99,102,241,0.2)", bg: "rgba(99,102,241,0.08)" },
-                { value: "4.9★", label: "Rating", desc: "from real users", color: "#fbbf24", border: "rgba(251,191,36,0.2)", bg: "rgba(251,191,36,0.08)" },
+                { value: "FBR", label: "Ready", desc: "tax compliance", color: "#fbbf24", border: "rgba(251,191,36,0.2)", bg: "rgba(251,191,36,0.08)" },
               ].map((c) => (
                 <div key={c.label} style={{ background: c.bg, border: `1px solid ${c.border}`, borderRadius: 16, padding: "14px 16px" }}>
                   <div style={{ fontSize: 20, fontWeight: 800, color: c.color, letterSpacing: "-0.5px", marginBottom: 2 }}>{c.value}</div>
