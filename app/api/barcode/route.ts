@@ -14,9 +14,18 @@ export async function GET(req: NextRequest) {
     const code    = searchParams.get("code");
 
     if (barcode || code) {
-      // 1. Try ItemNew first
+      // 1. Try ItemNew first.
+      // A scanner and a person typing share this one box, so whatever arrives is
+      // matched against both columns. Previously `?barcode=` only ever looked at
+      // the barcode column, and an item whose printed SKU differs from its
+      // barcode came back "not found" even though it was sitting right there.
+      const term = (barcode || code)!;
       const item = await prisma.itemNew.findFirst({
-        where: { companyId, deletedAt: null, ...(barcode ? { barcode } : { code: code! }) },
+        where: {
+          companyId,
+          deletedAt: null,
+          OR: [{ barcode: term }, { code: term }],
+        },
         select: {
           id: true, name: true, code: true, barcode: true,
           unit: true, rate: true, description: true,
@@ -38,8 +47,8 @@ export async function GET(req: NextRequest) {
       });
       const match = records.find(r => {
         const d = r.data as Record<string, unknown>;
-        return (barcode && d?.barcode === barcode) ||
-               (code    && d?.sku    === code);
+        // Same rule as ItemNew above — the term matches either field.
+        return d?.barcode === term || d?.sku === term;
       });
       if (match) {
         const d = match.data as Record<string, unknown>;

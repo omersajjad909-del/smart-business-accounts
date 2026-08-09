@@ -541,8 +541,14 @@ export async function seedDemoCompany(
   const accountRows = [...coaRows, ...customers, ...suppliers];
 
   // ── Items ─────────────────────────────────────────────────────────────
+  // ItemNew.barcode is unique across the whole database, so it cannot simply be
+  // the SKU — two live sandboxes would collide on the first item. It is built
+  // from the sandbox id instead, but kept all-numeric so the barcode column and
+  // the scan box show something that looks like a real barcode rather than
+  // "30BC0892-ITM-001".
+  const barcodePrefix = String(parseInt(tag, 16));
   const items = p.items.map(
-    ([code, name, unit, purchaseRate, rate, openingQty, minStock]) => ({
+    ([code, name, unit, purchaseRate, rate, openingQty, minStock], i) => ({
       id: randomUUID(),
       companyId,
       code,
@@ -553,8 +559,7 @@ export async function seedDemoCompany(
       purchaseRate,
       taxRate: p.taxRate,
       minStock,
-      // Barcode is globally unique — never emit a bare SKU here.
-      barcode: `${tag}-${code}`,
+      barcode: `${barcodePrefix}${String(i + 1).padStart(3, "0")}`,
       description: null,
       openingQty,
     }),
