@@ -27,6 +27,8 @@ import { FINOVA_COMPANY_PROFILE_UPDATED, FINOVA_USER_PROFILE_UPDATED } from "@/l
 // on every single dashboard page load.
 const ImageAdjusterModal = dynamic(() => import("@/components/ImageAdjusterModal"), { ssr: false });
 const DemoSessionTimer   = dynamic(() => import("@/components/DemoSessionTimer"),   { ssr: false });
+// Renders nothing unless the URL has ?debug=scroll — see the component.
+const ScrollDebugPanel   = dynamic(() => import("@/components/ScrollDebugPanel"),   { ssr: false });
 const GlobalSearch       = dynamic(() => import("@/components/GlobalSearch"),       { ssr: false });
 
 // Context to pass sidebarCollapsed + expand function to nav components
