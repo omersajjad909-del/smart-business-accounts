@@ -27,8 +27,6 @@ import { FINOVA_COMPANY_PROFILE_UPDATED, FINOVA_USER_PROFILE_UPDATED } from "@/l
 // on every single dashboard page load.
 const ImageAdjusterModal = dynamic(() => import("@/components/ImageAdjusterModal"), { ssr: false });
 const DemoSessionTimer   = dynamic(() => import("@/components/DemoSessionTimer"),   { ssr: false });
-// Renders nothing unless the URL has ?debug=scroll — see the component.
-const ScrollDebugPanel   = dynamic(() => import("@/components/ScrollDebugPanel"),   { ssr: false });
 const GlobalSearch       = dynamic(() => import("@/components/GlobalSearch"),       { ssr: false });
 
 // Context to pass sidebarCollapsed + expand function to nav components
@@ -787,7 +785,6 @@ export default function DashboardLayout({
     <div className="dashboard-root" style={{display:"flex",minHeight:"100dvh",background:"var(--app-bg)",fontSize:13,color:"var(--text-primary)",position:"relative"}}>
       <AppearanceApplier />
       <DemoSessionTimer />
-      <ScrollDebugPanel />
 
       {/* ── Idle auto-logout warning modal ── */}
       {showIdleWarning && (
