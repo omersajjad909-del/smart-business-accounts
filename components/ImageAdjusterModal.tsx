@@ -180,7 +180,7 @@ export default function ImageAdjusterModal({
       window.removeEventListener("touchmove", onTouchMove);
       window.removeEventListener("touchend", onTouchEnd);
     };
-  }, []);
+  }, [open]);
 
   function beginDrag(clientX: number, clientY: number) {
     dragRef.current = { startX: clientX, startY: clientY, origX: position.x, origY: position.y };
