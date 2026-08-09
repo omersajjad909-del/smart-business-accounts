@@ -45,15 +45,15 @@ export default function TrustedBy() {
               invented while the product is pre-launch. Replaced with claims the
               platform itself backs. */}
           <p style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,.3)", letterSpacing: ".1em", textTransform: "uppercase", marginBottom: 16 }}>
-            BUILT FOR PAKISTAN & THE GULF — LAUNCHING NOW
+            ONE PLATFORM FOR BUSINESSES WORLDWIDE — LAUNCHING NOW
           </p>
 
           {/* Stats row */}
           <div className="trust-stats" style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 1, maxWidth: 720, margin: "0 auto 40px" }}>
             {[
-              { n: "6",        l: "Industries Live",         color: "#818cf8" },
-              { n: "PKR & USD", l: "Billing Currencies",     color: "#34d399" },
-              { n: "FBR-ready", l: "Tax Compliance",         color: "#fbbf24" },
+              { n: "6",          l: "Industries Live",       color: "#818cf8" },
+              { n: "Multi-currency", l: "Invoicing",         color: "#34d399" },
+              { n: "GST · VAT · WHT", l: "Tax Support",      color: "#fbbf24" },
               { n: "All-in-one", l: "Accounts · HR · Stock", color: "#38bdf8" },
             ].map((s, i) => (
               <div key={i} style={{
@@ -94,20 +94,21 @@ export default function TrustedBy() {
           </div>
         </div>
 
-        {/* Bottom ratings */}
+        {/* This row used to show G2 4.9/5 (128 reviews), Capterra 4.8/5 (94)
+            and Trustpilot 4.9/5 (211). None of those listings or reviews exist —
+            putting real review platforms' names behind invented scores is the
+            one claim here a visitor can check in ten seconds, and those
+            platforms act on misuse of their marks. Replaced with what the
+            product actually offers on day one. */}
         <div style={{ display: "flex", justifyContent: "center", gap: 32, marginTop: 40, flexWrap: "wrap" }}>
           {[
-            { platform: "G2",         rating: "4.9/5", reviews: "128 reviews", color: "#f97316" },
-            { platform: "Capterra",   rating: "4.8/5", reviews: "94 reviews",  color: "#3b82f6" },
-            { platform: "Trustpilot", rating: "4.9/5", reviews: "211 reviews", color: "#34d399" },
+            { title: "Try before you buy", sub: "Full live demo, no signup",   color: "#f97316" },
+            { title: "Money-back",         sub: "14 days, no questions",       color: "#3b82f6" },
+            { title: "Your data, exportable", sub: "Excel & PDF, anytime",     color: "#34d399" },
           ].map(r => (
-            <div key={r.platform} style={{ textAlign: "center" }}>
-              <div style={{ fontSize: 11, fontWeight: 800, color: "rgba(255,255,255,.3)", letterSpacing: ".06em", marginBottom: 4 }}>{r.platform}</div>
-              <div style={{ display: "flex", gap: 2, justifyContent: "center", marginBottom: 4 }}>
-                {[1,2,3,4,5].map(n => <span key={n} style={{ fontSize: 12, color: "#fbbf24" }}>★</span>)}
-              </div>
-              <div style={{ fontSize: 13, fontWeight: 800, color: r.color }}>{r.rating}</div>
-              <div style={{ fontSize: 10, color: "rgba(255,255,255,.25)" }}>{r.reviews}</div>
+            <div key={r.title} style={{ textAlign: "center" }}>
+              <div style={{ fontSize: 13, fontWeight: 800, color: r.color, marginBottom: 4 }}>{r.title}</div>
+              <div style={{ fontSize: 11, color: "rgba(255,255,255,.3)" }}>{r.sub}</div>
             </div>
           ))}
         </div>

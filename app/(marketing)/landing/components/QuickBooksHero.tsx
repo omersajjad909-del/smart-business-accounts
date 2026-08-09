@@ -19,7 +19,7 @@ export default function QuickBooksHero() {
           <div className={`transition-all duration-1000 ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-100 text-emerald-700 text-xs font-bold uppercase tracking-widest mb-6">
               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-              Trusted by 10,000+ Businesses
+              All-in-one Business OS
             </div>
             
             <h1 className="text-5xl lg:text-6xl font-extrabold text-slate-900 leading-[1.1] tracking-tight mb-6">
@@ -46,18 +46,12 @@ export default function QuickBooksHero() {
               </Link>
             </div>
 
-            <div className="flex items-center gap-8">
-              <div className="flex -space-x-3">
-                {[1,2,3,4].map(i => (
-                  <div key={i} className="w-10 h-10 rounded-full border-2 border-white bg-slate-100 flex items-center justify-center text-[10px] font-bold text-slate-400">
-                    U{i}
-                  </div>
-                ))}
-              </div>
-              <div className="text-sm">
-                <div className="font-bold text-slate-900">4.9/5 Rating</div>
-                <div className="text-slate-500 font-medium">based on 2,000+ reviews</div>
-              </div>
+            {/* The avatar stack and "4.9/5 from 2,000+ reviews" that used to sit
+                here were invented — pre-launch there are no reviews to average. */}
+            <div className="flex items-center gap-8 text-sm text-slate-500 font-medium">
+              <span>14-day money-back guarantee</span>
+              <span className="text-slate-300">|</span>
+              <span>Cancel anytime</span>
             </div>
           </div>
 

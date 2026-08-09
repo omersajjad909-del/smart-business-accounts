@@ -196,8 +196,8 @@ export default function CaseStudiesPage() {
               are measurable yet. */}
           {[
             { val: "6", label: "Industries Live" },
-            { val: "PKR & USD", label: "Billing" },
-            { val: "FBR-ready", label: "Tax Compliance" },
+            { val: "Multi-currency", label: "Invoicing" },
+            { val: "GST · VAT · WHT", label: "Tax Support" },
           ].map(s => (
             <div key={s.label} style={{ textAlign: "center" }}>
               <div style={{ fontSize: 32, fontWeight: 800, color: "#818cf8" }}>{s.val}</div>
