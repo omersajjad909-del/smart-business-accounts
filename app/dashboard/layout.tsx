@@ -787,6 +787,7 @@ export default function DashboardLayout({
     <div className="dashboard-root" style={{display:"flex",minHeight:"100dvh",background:"var(--app-bg)",fontSize:13,color:"var(--text-primary)",position:"relative"}}>
       <AppearanceApplier />
       <DemoSessionTimer />
+      <ScrollDebugPanel />
 
       {/* ── Idle auto-logout warning modal ── */}
       {showIdleWarning && (
