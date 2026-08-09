@@ -3,13 +3,18 @@ import { useEffect, useState } from "react";
 
 const FONT = "'Outfit','Inter',sans-serif";
 
-function readDemoCookie(): { bookingId: string; endsAt: number } | null {
+type DemoSession = { bookingId?: string; companyId?: string; endsAt: number };
+
+// Instant demos carry a companyId, booked ones a bookingId — either is enough
+// to identify the sandbox to wipe on exit.
+function readDemoCookie(): DemoSession | null {
   if (typeof document === "undefined") return null;
   const match = document.cookie.match(/(?:^|;\s*)finova_demo=([^;]+)/);
   if (!match) return null;
   try {
     const parsed = JSON.parse(decodeURIComponent(match[1]));
-    if (parsed?.bookingId && typeof parsed.endsAt === "number") return parsed;
+    if (typeof parsed?.endsAt !== "number") return null;
+    if (parsed.bookingId || parsed.companyId) return parsed;
   } catch {}
   return null;
 }
@@ -17,7 +22,7 @@ function readDemoCookie(): { bookingId: string; endsAt: number } | null {
 function pad(n: number) { return n.toString().padStart(2, "0"); }
 
 export default function DemoSessionTimer() {
-  const [session, setSession] = useState<{ bookingId: string; endsAt: number } | null>(null);
+  const [session, setSession] = useState<DemoSession | null>(null);
   const [now, setNow] = useState(() => Date.now());
   const [ending, setEnding] = useState(false);
   const [confirmEnd, setConfirmEnd] = useState(false);

@@ -482,6 +482,11 @@ model Company {
   brandColor String?  // Preset key from the 8-color brand palette (e.g. "teal", "indigo", "purple")
   createdAt DateTime @default(now())
 
+  // Demo sandbox — one throwaway company per demo visitor. Seeded from the
+  // golden dataset in lib/demoSeed.ts, wiped when the session ends or expires.
+  isDemo        Boolean   @default(false)
+  demoExpiresAt DateTime? // Hard deadline; the cleanup cron deletes anything past it
+
   // CCPA compliance
   ccpaOptOut   Boolean   @default(false)
   ccpaOptOutAt DateTime?

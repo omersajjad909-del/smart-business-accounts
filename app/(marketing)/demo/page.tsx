@@ -6,10 +6,17 @@ import BookingModal from "./BookingModal";
 
 const FONT = "'Outfit','Inter',sans-serif";
 
+// Published demo sign-in. Kept in sync with lib/demoSandbox.ts — every visitor
+// uses the same pair but lands in their own sandbox.
+const DEMO_EMAIL = "demo@finovaos.app";
+const DEMO_PASSWORD = "12345678";
+const DEMO_MINUTES = 30;
+
 type DemoBusinessId =
   | "trading"
   | "wholesale"
   | "distribution"
+  | "clearing_forwarding"
   | "restaurant"
   | "retail"
   | "manufacturing"
@@ -80,8 +87,10 @@ const BUSINESSES: DemoBusiness[] = [
     users: "Active",
   },
   {
+    // Wholesale has its own seeded sandbox now (dealer network, bulk cartons),
+    // so it no longer piggy-backs on the trading workspace.
     id: "wholesale",
-    liveBusinessType: "trading",
+    liveBusinessType: "wholesale",
     demoAvailable: true,
     icon: "🏬",
     label: "Wholesale",
@@ -184,9 +193,9 @@ const BUSINESSES: DemoBusiness[] = [
   {
     id: "retail",
     liveBusinessType: "retail",
-    demoAvailable: false,
+    demoAvailable: true,
     icon: "🏪",
-    label: "Retail & POS",
+    label: "Retail & Multi-Store",
     category: "Commerce",
     tagline: "Scan, sell, sync — fast POS with real-time stock and loyalty.",
     description:
@@ -522,9 +531,43 @@ const BUSINESSES: DemoBusiness[] = [
     users: "890+",
   },
   {
+    id: "clearing_forwarding",
+    liveBusinessType: "clearing_forwarding",
+    demoAvailable: true,
+    icon: "🛃",
+    label: "Clearing & Forwarding",
+    category: "Trade",
+    tagline: "Every container, every GD, every charge — billed and recovered.",
+    description:
+      "For customs clearing agents and freight forwarders handling GD filing, port charges, container transport, and client recovery.",
+    color: "#f59e0b",
+    gradient: "linear-gradient(135deg,#d97706,#f59e0b)",
+    modules: ["Job File", "GD Filing", "Port & Terminal Charges", "Container Transport", "Client Billing", "Expense Recovery", "Outstandings", "Service Tax"],
+    workflow: [
+      { step: "Job opened", detail: "Client consignment logged with BL, container, and vessel details" },
+      { step: "Costs incurred", detail: "Port charges, terminal handling, and transport posted to the job" },
+      { step: "Clearance completed", detail: "GD filed, duty paid, and delivery arranged to client warehouse" },
+      { step: "Invoice and recover", detail: "Service fee plus reimbursables billed and tracked till payment" },
+    ],
+    insights: ["Job-wise profitability — service fee against actual cost", "Reimbursable expenses still pending recovery from clients", "Container turnaround time and detention exposure"],
+    aiFeatures: [
+      "🤖 AI flags jobs where cost has overtaken the agreed service fee",
+      "⏱️ Warns on containers approaching detention charges",
+      "📊 Summarizes monthly clearance volume by client",
+    ],
+    proof: ["Every port and transport charge tied back to a job file", "Reimbursables never lost between clearance and billing", "Service sales tax handled on every invoice"],
+    highlights: [
+      { label: "Cost Recovery", value: "Job-wise", sub: "No reimbursable slips through" },
+      { label: "Job Profit", value: "Per File", sub: "Know which clients are actually worth it" },
+      { label: "Documentation", value: "Tracked", sub: "GD, BL, and delivery order in one place" },
+    ],
+    sampleDocs: ["Job File", "Clearance Invoice", "Port Charges Sheet", "Client Statement", "Delivery Order"],
+    users: "Active",
+  },
+  {
     id: "travel",
     liveBusinessType: "travel",
-    demoAvailable: true,
+    demoAvailable: false,
     icon: "✈️",
     label: "Travel Agency",
     category: "Services",
@@ -584,6 +627,8 @@ export default function DemoPage() {
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<"overview" | "workflow" | "ai">("overview");
   const [bookingOpen, setBookingOpen] = useState(false);
+  const [launching, setLaunching] = useState<string | null>(null);
+  const [launchError, setLaunchError] = useState<string | null>(null);
 
   // Seed from hardcoded values so there's no flash on load
   const [liveStatusMap, setLiveStatusMap] = useState<Record<string, string>>(
@@ -610,6 +655,35 @@ export default function DemoPage() {
     if (!biz || !isDemoLive(biz.liveBusinessType)) return;
     setStoredDemoBusinessPreference(biz.liveBusinessType);
     setBookingOpen(true);
+  }
+
+  /**
+   * Starts a demo straight away. The API builds a private sandbox company for
+   * this visitor and sets the session cookie, so there is nothing to book and
+   * nothing shared with whoever else is in the demo right now.
+   */
+  async function handleInstantDemo() {
+    if (!biz || !isDemoLive(biz.liveBusinessType) || launching) return;
+    setLaunchError(null);
+    setLaunching(biz.liveBusinessType);
+    setStoredDemoBusinessPreference(biz.liveBusinessType);
+    try {
+      const res = await fetch("/api/demo/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ businessType: biz.liveBusinessType }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        setLaunchError(data?.message || "Could not start the demo. Please try again.");
+        setLaunching(null);
+        return;
+      }
+      window.location.href = "/dashboard";
+    } catch {
+      setLaunchError("Network error — please check your connection and try again.");
+      setLaunching(null);
+    }
   }
 
   function selectBiz(id: DemoBusinessId) {
@@ -692,7 +766,9 @@ export default function DemoPage() {
           </span>
         </h1>
         <p style={{ fontSize: 17, color: "rgba(255,255,255,.5)", lineHeight: 1.8, maxWidth: 620, margin: "0 auto 32px" }}>
-          14 business verticals. Each demo opens a real live workspace configured for your industry — with AI insights, workflows, and actual data pre-loaded.
+          {BUSINESSES.length} business verticals, {BUSINESSES.filter(b => isDemoLive(b.liveBusinessType)).length} live today.
+          Each live demo opens a private {DEMO_MINUTES}-minute workspace configured for your industry — real customers, stock,
+          posted invoices and payroll already loaded, so you can test it like it is your own business.
         </p>
 
         {BUSINESSES.filter(b => isDemoLive(b.liveBusinessType)).length > 0 && (
@@ -834,30 +910,65 @@ export default function DemoPage() {
                 </div>
                 <div style={{ fontSize: 14, color: "rgba(255,255,255,.5)", lineHeight: 1.7, maxWidth: 680 }}>{biz.description}</div>
               </div>
-              <button
-                className="launch-btn"
-                onClick={handleBook}
-                disabled={!isDemoLive(biz.liveBusinessType)}
-                style={{
-                  flexShrink: 0,
-                  background: isDemoLive(biz.liveBusinessType) ? biz.gradient : "rgba(255,255,255,.08)",
-                  color: isDemoLive(biz.liveBusinessType) ? "#fff" : "rgba(255,255,255,.45)",
-                  borderRadius: 16,
-                  padding: "14px 28px",
-                  fontSize: 14,
-                  fontWeight: 800,
-                  cursor: !isDemoLive(biz.liveBusinessType) ? "not-allowed" : "pointer",
-                  boxShadow: isDemoLive(biz.liveBusinessType) ? `0 10px 28px ${biz.color}35` : "none",
-                  whiteSpace: "nowrap",
-                }}
-              >
-                📅 Book Live Demo
-              </button>
+              <div style={{ display: "flex", gap: 10, flexShrink: 0, flexWrap: "wrap" }}>
+                <button
+                  className="launch-btn"
+                  onClick={handleInstantDemo}
+                  disabled={!isDemoLive(biz.liveBusinessType) || launching !== null}
+                  style={{
+                    background: isDemoLive(biz.liveBusinessType) ? biz.gradient : "rgba(255,255,255,.08)",
+                    color: isDemoLive(biz.liveBusinessType) ? "#fff" : "rgba(255,255,255,.45)",
+                    borderRadius: 16,
+                    padding: "14px 28px",
+                    fontSize: 14,
+                    fontWeight: 800,
+                    cursor: !isDemoLive(biz.liveBusinessType) || launching ? "not-allowed" : "pointer",
+                    boxShadow: isDemoLive(biz.liveBusinessType) ? `0 10px 28px ${biz.color}35` : "none",
+                    whiteSpace: "nowrap",
+                    opacity: launching && launching !== biz.liveBusinessType ? 0.5 : 1,
+                  }}
+                >
+                  {launching === biz.liveBusinessType ? "Preparing your workspace…" : "▶ Start Demo Now"}
+                </button>
+                <button
+                  className="launch-btn"
+                  onClick={handleBook}
+                  disabled={!isDemoLive(biz.liveBusinessType)}
+                  style={{
+                    background: "rgba(255,255,255,.06)",
+                    border: "1px solid rgba(255,255,255,.14)",
+                    color: "rgba(255,255,255,.72)",
+                    borderRadius: 16,
+                    padding: "14px 22px",
+                    fontSize: 14,
+                    fontWeight: 700,
+                    cursor: !isDemoLive(biz.liveBusinessType) ? "not-allowed" : "pointer",
+                    whiteSpace: "nowrap",
+                  }}
+                >
+                  📅 Book a Slot
+                </button>
+              </div>
             </div>
+
+            {launchError && (
+              <div style={{ marginTop: -8, marginBottom: 20, padding: "14px 18px", borderRadius: 16, background: "rgba(239,68,68,.1)", border: "1px solid rgba(239,68,68,.28)", color: "#fca5a5", fontSize: 13, lineHeight: 1.6 }}>
+                {launchError}
+              </div>
+            )}
+
+            {isDemoLive(biz.liveBusinessType) && (
+              <div style={{ marginTop: -8, marginBottom: 20, padding: "14px 18px", borderRadius: 16, background: "rgba(16,185,129,.07)", border: "1px solid rgba(16,185,129,.2)", color: "rgba(255,255,255,.72)", fontSize: 13, lineHeight: 1.7 }}>
+                Opens a private {DEMO_MINUTES}-minute workspace already loaded with customers, suppliers, stock,
+                posted invoices, payroll and live dashboard figures — yours alone, and wiped the moment you leave.
+                Sign-in is <strong style={{ color: "#fff" }}>{DEMO_EMAIL}</strong> / <strong style={{ color: "#fff" }}>{DEMO_PASSWORD}</strong> if you would rather log in yourself.
+              </div>
+            )}
 
             {!isDemoLive(biz.liveBusinessType) && (
               <div style={{ marginTop: -8, marginBottom: 20, padding: "14px 18px", borderRadius: 16, background: "rgba(245,158,11,.08)", border: "1px solid rgba(245,158,11,.2)", color: "rgba(255,255,255,.72)", fontSize: 13, lineHeight: 1.6 }}>
-                This business preview is available, but its live demo workspace has not launched yet. For now, Trading, Wholesale, Distribution, Import / Export, and Travel Agency open into a real live demo.
+                This business preview is available, but its live demo workspace has not launched yet. Phase 1 live demos are
+                Trading, Retail &amp; Multi-Store, Distribution, Import / Export, Clearing &amp; Forwarding, and Wholesale.
               </div>
             )}
 

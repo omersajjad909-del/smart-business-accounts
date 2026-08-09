@@ -135,6 +135,53 @@ export function proxy(req: NextRequest) {
       return NextResponse.redirect(url);
     }
   }
+  // Endpoints a demo visitor may not reach: the platform's own billing and
+  // account plumbing, anything that changes who can log in, and the admin
+  // console. Everything else — the actual product — stays open.
+  const DEMO_BLOCKED_API = [
+    "/api/admin/",
+    "/api/billing/",
+    "/api/subscriptions",
+    "/api/coupons",
+    "/api/affiliates",
+    "/api/referrals",
+    "/api/backup",
+    "/api/gdpr",
+    "/api/ccpa",
+    "/api/invitations",
+    "/api/me/change-email",
+    "/api/me/password",
+    "/api/auth/change-password",
+    "/api/auth/signup",
+    "/api/plaid",
+  ];
+
+  // Readable so the screens render, but frozen against changes — a demo may
+  // browse the team and company settings without editing who can sign in or
+  // wiring a real integration.
+  const DEMO_READONLY_API = [
+    "/api/companies",
+    "/api/company",
+    "/api/users",
+    "/api/team",
+    "/api/permissions",
+    "/api/security",
+    "/api/integrations",
+    "/api/upload",
+    "/api/media",
+  ];
+
+  // Answered with a plausible success, but nothing leaves the building.
+  const DEMO_SILENCED_API = [
+    "/api/email/send",
+    "/api/email-verification",
+    "/api/whatsapp/",
+    "/api/notifications/sms",
+    "/api/automation/sms",
+    "/api/ai/invoice-reminders/send",
+    "/api/support/ticket",
+  ];
+
   const publicApi = [
     "/api/auth/login",
     "/api/login",
@@ -182,7 +229,44 @@ export function proxy(req: NextRequest) {
   const isApi = pathname.startsWith("/api/");
   const isPublic = publicApi.some((p) => pathname.startsWith(p));
   const userRole = headers.get("x-user-role");
-  
+
+  // ── Demo session guardrails ──────────────────────────────────────────────
+  // A demo visitor is a real ADMIN inside a throwaway company, so every
+  // day-to-day screen must keep working — invoices, payroll, vouchers, reports.
+  // What must not work is anything that reaches the outside world or the
+  // platform itself. The `demo` claim is signed into the token by
+  // createDemoSandbox, so it cannot be set by the client.
+  if (decoded?.demo === true) {
+    if (DEMO_BLOCKED_API.some((p) => pathname.startsWith(p))) {
+      return NextResponse.json(
+        { error: "Not available in the demo", demo: true },
+        { status: 403 },
+      );
+    }
+    if (req.method !== "GET" && DEMO_READONLY_API.some((p) => pathname.startsWith(p))) {
+      return NextResponse.json(
+        { error: "Read-only in the demo", demo: true },
+        { status: 403 },
+      );
+    }
+    // Outbound messaging is answered with a success the UI can render, but
+    // nothing is actually sent — seeded parties carry placeholder addresses
+    // and a demo must never mail or text a real person.
+    if (DEMO_SILENCED_API.some((p) => pathname.startsWith(p))) {
+      return NextResponse.json({
+        success: true,
+        demo: true,
+        message: "Demo mode — message prepared but not sent",
+      });
+    }
+    if (pathname.startsWith("/admin")) {
+      const url = req.nextUrl.clone();
+      url.pathname = "/dashboard";
+      return NextResponse.redirect(url);
+    }
+  }
+
+
   if (isApi && !isPublic && !headers.get("x-company-id")) {
     // 🔥 Allow Admin APIs for Admins without company context
     if (pathname.startsWith("/api/admin/") && userRole === "ADMIN") {

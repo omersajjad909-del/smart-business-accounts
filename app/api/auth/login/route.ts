@@ -15,6 +15,15 @@ import {
   isUserVerified,
   sendVerificationCode,
 } from "@/lib/verification";
+import {
+  DEMO_EMAIL,
+  DEMO_MAX_CONCURRENT,
+  countActiveSandboxes,
+  createDemoSandbox,
+  isDemoBusinessType,
+  isDemoCredential,
+  isDemoPassword,
+} from "@/lib/demoSandbox";
 type RolePermission = Prisma.RolePermissionGetPayload<Prisma.RolePermissionDefaultArgs>;
 
 export async function POST(req: NextRequest) {
@@ -45,6 +54,58 @@ export async function POST(req: NextRequest) {
     }
 
     const emailNormalized = email.trim().toLowerCase();
+
+    // ── Demo account ───────────────────────────────────────────────────────
+    // The published demo credentials never reach the normal login path: there
+    // is no single demo company to sign into, and the OTP step below would try
+    // to mail a verification code to a mailbox nobody reads. Instead each
+    // attempt mints a private sandbox seeded with the golden dataset.
+    if (isDemoCredential(emailNormalized)) {
+      if (!isDemoPassword(password)) {
+        return NextResponse.json({ message: "Invalid username/email or password" }, { status: 401 });
+      }
+      const requested = String(body?.businessType || "").trim().toLowerCase();
+      const businessType = isDemoBusinessType(requested) ? requested : "trading";
+
+      if ((await countActiveSandboxes()) >= DEMO_MAX_CONCURRENT) {
+        return NextResponse.json(
+          { message: "All demo sessions are busy right now. Please try again in a few minutes." },
+          { status: 503 },
+        );
+      }
+
+      const sandbox = await createDemoSandbox(businessType);
+      const endsAt = sandbox.expiresAt.getTime();
+      const maxAge = Math.max(60, Math.round((endsAt - Date.now()) / 1000));
+
+      const demoRes = NextResponse.json({
+        user: {
+          id: sandbox.userId,
+          name: "Demo User",
+          email: DEMO_EMAIL,
+          role: "ADMIN",
+          permissions: [],
+          rolePermissions: [],
+          companyId: sandbox.companyId,
+          companies: [{ id: sandbox.companyId, name: sandbox.companyName, isDefault: true }],
+        },
+        demo: true,
+        sessionEndsAt: endsAt,
+      });
+      const demoCookie = {
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "lax" as const,
+        path: "/",
+        maxAge,
+      };
+      demoRes.cookies.set("sb_auth", sandbox.token, { ...demoCookie, httpOnly: true });
+      demoRes.cookies.set(
+        "finova_demo",
+        JSON.stringify({ companyId: sandbox.companyId, endsAt }),
+        { ...demoCookie, httpOnly: false },
+      );
+      return demoRes;
+    }
 
     // Check database connection - search by email OR name
     let user;
