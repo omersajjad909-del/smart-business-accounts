@@ -473,14 +473,16 @@ export async function seedDemoCompany(
   // must not collide between concurrent sandboxes.
   const tag = companyId.replace(/-/g, "").slice(0, 8).toUpperCase();
 
-  // ── Branches ──────────────────────────────────────────────────────────
+  // Nothing is written until the very end: every id is generated up front and
+  // the whole dataset goes out as one transaction. Against a remote database
+  // that turns ~25 sequential round trips into one, which is the difference
+  // between a demo that opens in seconds and one people give up on. It also
+  // means a failure leaves no half-built company behind.
   const branchIds: string[] = [];
-  await prisma.branch.createMany({
-    data: p.branches.map(([code, name, city]) => {
-      const id = randomUUID();
-      branchIds.push(id);
-      return { id, companyId, code, name, city, isActive: true };
-    }),
+  const branchRows = p.branches.map(([code, name, city]) => {
+    const id = randomUUID();
+    branchIds.push(id);
+    return { id, companyId, code, name, city, isActive: true };
   });
   const mainBranch = branchIds[0];
   const branchFor = (i: number) => branchIds[i % branchIds.length];
@@ -536,7 +538,7 @@ export async function seedDemoCompany(
     creditLimit: 0,
   }));
 
-  await prisma.account.createMany({ data: [...coaRows, ...customers, ...suppliers] });
+  const accountRows = [...coaRows, ...customers, ...suppliers];
 
   // ── Items ─────────────────────────────────────────────────────────────
   const items = p.items.map(
@@ -558,49 +560,41 @@ export async function seedDemoCompany(
     }),
   );
 
-  await prisma.itemNew.createMany({
-    data: items.map(({ openingQty: _ignored, ...row }) => row),
-  });
+  const itemRows = items.map(({ openingQty: _ignored, ...row }) => row);
 
-  await prisma.stockRate.createMany({
-    data: items.map((it) => ({
-      id: randomUUID(),
-      companyId,
-      itemId: it.id,
-      rate: it.purchaseRate,
-      date: daysAgo(120),
-    })),
-  });
+  const stockRateRows = items.map((it) => ({
+    id: randomUUID(),
+    companyId,
+    itemId: it.id,
+    rate: it.purchaseRate,
+    date: daysAgo(120),
+  }));
 
   // ── Tax configuration ─────────────────────────────────────────────────
   const taxConfigId = randomUUID();
-  await prisma.taxConfiguration.create({
-    data: {
-      id: taxConfigId,
-      companyId,
-      taxType: p.itemCategory === "SERVICE" ? "SALES_TAX" : "GST",
-      taxCode: `${p.itemCategory === "SERVICE" ? "PST" : "GST"}-${p.taxRate}-${tag}`,
-      taxRate: p.taxRate,
-      description: `${p.taxRate}% ${p.itemCategory === "SERVICE" ? "sales tax on services" : "general sales tax"}`,
-      isActive: true,
-    },
-  });
+  const taxRow = {
+    id: taxConfigId,
+    companyId,
+    taxType: p.itemCategory === "SERVICE" ? "SALES_TAX" : "GST",
+    taxCode: `${p.itemCategory === "SERVICE" ? "PST" : "GST"}-${p.taxRate}-${tag}`,
+    taxRate: p.taxRate,
+    description: `${p.taxRate}% ${p.itemCategory === "SERVICE" ? "sales tax on services" : "general sales tax"}`,
+    isActive: true,
+  };
 
   // ── Bank account ──────────────────────────────────────────────────────
   const openingBank = 2_400_000;
   const bankAccountId = randomUUID();
-  await prisma.bankAccount.create({
-    data: {
-      id: bankAccountId,
-      companyId,
-      // Globally unique column — carries the sandbox tag.
-      accountNo: `PK36MEZN00${tag}`,
-      bankName: "Meezan Bank",
-      accountName: `${p.companyName} — Current Account`,
-      accountId: accountId[A.BANK],
-      balance: openingBank,
-    },
-  });
+  const bankRow = {
+    id: bankAccountId,
+    companyId,
+    // Globally unique column — carries the sandbox tag.
+    accountNo: `PK36MEZN00${tag}`,
+    bankName: "Meezan Bank",
+    accountName: `${p.companyName} — Current Account`,
+    accountId: accountId[A.BANK],
+    balance: openingBank,
+  };
 
   // ── Ledger accumulator ────────────────────────────────────────────────
   const ledger: LedgerRow[] = [];
@@ -686,7 +680,9 @@ export async function seedDemoCompany(
 
     for (let l = 0; l < lineCount; l++) {
       const it = stockableItems[(i * 3 + l) % stockableItems.length];
-      const qty = Math.max(4, Math.round(10 + jitter(i * 10 + l) * 40));
+      // Purchase volume is deliberately kept below sales volume — a demo that
+      // opens on a loss-making P&L is not a demo anyone wants to see.
+      const qty = Math.max(6, Math.round(12 + jitter(i * 10 + l) * 15));
       const amount = qty * it.purchaseRate;
       net += amount;
       purchaseItems.push({
@@ -804,7 +800,7 @@ export async function seedDemoCompany(
 
     for (let l = 0; l < lineCount; l++) {
       const it = items[(i * 2 + l) % items.length];
-      const qty = Math.max(2, Math.round(5 + jitter(i * 7 + l) * 25));
+      const qty = Math.max(3, Math.round(6 + jitter(i * 7 + l) * 13));
       const amount = qty * it.rate;
       net += amount;
       salesItems.push({
@@ -1148,40 +1144,47 @@ export async function seedDemoCompany(
       isReconciled: i === 0,
     }));
 
-  // ── Write everything ──────────────────────────────────────────────────
-  await prisma.purchaseOrder.createMany({ data: purchaseOrders });
-  await prisma.purchaseOrderItem.createMany({ data: purchaseOrderItems });
-  await prisma.purchaseInvoice.createMany({ data: purchaseInvoices });
-  await prisma.purchaseInvoiceItem.createMany({ data: purchaseItems });
-  await prisma.goodsReceiptNote.createMany({ data: grns });
-  await prisma.goodsReceiptNoteItem.createMany({ data: grnItems });
-  await prisma.salesInvoice.createMany({ data: salesInvoices });
-  await prisma.salesInvoiceItem.createMany({ data: salesItems });
-  await prisma.quotation.createMany({ data: quotations });
-  await prisma.quotationItem.createMany({ data: quotationItems });
-  await prisma.inventoryTxn.createMany({ data: inventoryTxns });
-  await prisma.voucher.createMany({ data: vouchers });
-  await prisma.voucherEntry.createMany({ data: voucherEntries });
-  await prisma.paymentReceipt.createMany({ data: receipts });
-  await prisma.expenseVoucher.createMany({ data: expenseVouchers });
-  await prisma.expenseItem.createMany({ data: expenseItems });
-  await prisma.employee.createMany({ data: employees });
-  await prisma.attendance.createMany({ data: attendance });
-  await prisma.payroll.createMany({ data: payroll });
-  await prisma.advanceSalary.createMany({ data: advances });
-  await prisma.contact.createMany({ data: contacts });
-  await prisma.bankStatement.createMany({ data: bankStatements });
-  await prisma.ledgerEntry.createMany({ data: ledger });
-
   // Bank balance must agree with what the ledger says about it, otherwise the
   // dashboard's cash tile contradicts the bank ledger on the very first click.
-  const bankMovement = ledger
-    .filter((l) => l.accountId === accountId[A.BANK])
-    .reduce((s, l) => s + l.debit - l.credit, 0);
-  await prisma.bankAccount.update({
-    where: { id: bankAccountId },
-    data: { balance: round2(bankMovement) },
-  });
+  const bankMovement = round2(
+    ledger
+      .filter((l) => l.accountId === accountId[A.BANK])
+      .reduce((s, l) => s + l.debit - l.credit, 0),
+  );
+  bankRow.balance = bankMovement;
+
+  // ── Write everything, in FK order, as one batch ───────────────────────
+  await prisma.$transaction([
+    prisma.branch.createMany({ data: branchRows }),
+    prisma.account.createMany({ data: accountRows }),
+    prisma.itemNew.createMany({ data: itemRows }),
+    prisma.stockRate.createMany({ data: stockRateRows }),
+    prisma.taxConfiguration.create({ data: taxRow }),
+    prisma.bankAccount.create({ data: bankRow }),
+    prisma.purchaseOrder.createMany({ data: purchaseOrders }),
+    prisma.purchaseOrderItem.createMany({ data: purchaseOrderItems }),
+    prisma.purchaseInvoice.createMany({ data: purchaseInvoices }),
+    prisma.purchaseInvoiceItem.createMany({ data: purchaseItems }),
+    prisma.goodsReceiptNote.createMany({ data: grns }),
+    prisma.goodsReceiptNoteItem.createMany({ data: grnItems }),
+    prisma.salesInvoice.createMany({ data: salesInvoices }),
+    prisma.salesInvoiceItem.createMany({ data: salesItems }),
+    prisma.quotation.createMany({ data: quotations }),
+    prisma.quotationItem.createMany({ data: quotationItems }),
+    prisma.inventoryTxn.createMany({ data: inventoryTxns }),
+    prisma.voucher.createMany({ data: vouchers }),
+    prisma.voucherEntry.createMany({ data: voucherEntries }),
+    prisma.paymentReceipt.createMany({ data: receipts }),
+    prisma.expenseVoucher.createMany({ data: expenseVouchers }),
+    prisma.expenseItem.createMany({ data: expenseItems }),
+    prisma.employee.createMany({ data: employees }),
+    prisma.attendance.createMany({ data: attendance }),
+    prisma.payroll.createMany({ data: payroll }),
+    prisma.advanceSalary.createMany({ data: advances }),
+    prisma.contact.createMany({ data: contacts }),
+    prisma.bankStatement.createMany({ data: bankStatements }),
+    prisma.ledgerEntry.createMany({ data: ledger }),
+  ]);
 
   const totalDebit = round2(ledger.reduce((s, l) => s + l.debit, 0));
   const totalCredit = round2(ledger.reduce((s, l) => s + l.credit, 0));
