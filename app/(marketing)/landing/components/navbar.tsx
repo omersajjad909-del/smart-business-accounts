@@ -376,10 +376,10 @@ export default function Navbar() {
   }, [])
 
   useEffect(() => {
-    document.body.style.overflow = mobileOpen ? "hidden" : ""
-    return () => {
-      document.body.style.overflow = ""
-    }
+    const el = document.documentElement;
+    if (mobileOpen) el.classList.add("fnv-lock-scroll");
+    else el.classList.remove("fnv-lock-scroll");
+    return () => el.classList.remove("fnv-lock-scroll");
   }, [mobileOpen])
 
   const openMega  = (which: "features" | "solutions") => {

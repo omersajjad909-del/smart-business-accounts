@@ -628,6 +628,17 @@ html.dark .dashboard-root ::-webkit-scrollbar-thumb:hover { background: rgba(255
 html { overflow-x: hidden; }
 img, video, svg { max-width: 100%; }
 
+/* Utility: lock page scrolling for overlays (modals, mobile menus) by adding
+   the `fnv-lock-scroll` class to <html>. Using a class avoids leaving inline
+   styles on <body> which can break scrolling on some mobile browsers. */
+html.fnv-lock-scroll,
+html.fnv-lock-scroll body {
+  overflow: hidden !important;
+  height: 100dvh !important;
+  -webkit-overflow-scrolling: auto !important;
+  touch-action: none !important;
+}
+
 /* ── Pricing page ── */
 .pricing-grid { grid-template-columns: repeat(3,1fr) !important; }
 .custom-grid  { grid-template-columns: repeat(2,1fr) !important; }

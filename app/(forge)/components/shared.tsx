@@ -24,11 +24,10 @@ export function ForgeNav() {
   }, [pathname]);
 
   useEffect(() => {
-    if (menuOpen) document.body.style.overflow = "hidden";
-    else document.body.style.overflow = "";
-    return () => {
-      document.body.style.overflow = "";
-    };
+    const el = document.documentElement;
+    if (menuOpen) el.classList.add("fnv-lock-scroll");
+    else el.classList.remove("fnv-lock-scroll");
+    return () => el.classList.remove("fnv-lock-scroll");
   }, [menuOpen]);
 
   const links = [
