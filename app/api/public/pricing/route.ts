@@ -52,22 +52,49 @@ const DEFAULT_PLAN_HIGHLIGHTS = {
   ],
 };
 
+// `standalone: true` means the module is a complete product on its own — it is
+// offered as a single-app subscription on /pricing. Keep in sync with
+// STANDALONE_MODULE_IDS in lib/customPlanPricing.ts.
 const DEFAULT_CUSTOM_PLAN = {
   basePrice: 0,
   yearlyDiscount: 20,
   modules: [
-    { id: "accounting",          name: "Accounting & Invoicing",  price: 15, desc: "Ledger, invoices, vouchers, P&L, balance sheet",        icon: "📒", enabled: true,  category: "core" },
-    { id: "inventory",           name: "Inventory Management",    price: 12, desc: "Stock tracking, GRN, barcode, low-stock alerts",         icon: "📦", enabled: true,  category: "core" },
-    { id: "crm",                 name: "CRM",                     price: 15, desc: "Contacts, sales pipeline, interaction logs",             icon: "👥", enabled: true,  category: "core" },
-    { id: "hr_payroll",          name: "HR & Payroll",            price: 20, desc: "Employees, attendance, payroll, advance salary",         icon: "👨‍💼", enabled: true,  category: "core" },
-    { id: "bank_reconciliation", name: "Bank Reconciliation",     price: 10, desc: "Statement import, discrepancy flagging, closing",        icon: "🏦", enabled: true,  category: "finance" },
-    { id: "tax_filing",          name: "Tax & Compliance",        price: 10, desc: "Tax summary, GST/VAT reports, compliance docs",          icon: "🧾", enabled: true,  category: "finance" },
-    { id: "reports",             name: "Advanced Reports",        price: 8,  desc: "Cash flow, profitability, annual statements",            icon: "📈", enabled: true,  category: "operations" },
-    { id: "multi_branch",        name: "Multi-Branch",            price: 15, desc: "Branches, consolidated reports, branch access",          icon: "🏢", enabled: true,  category: "operations" },
-    { id: "whatsapp",            name: "WhatsApp & SMS",          price: 8,  desc: "Payment reminders, invoices via WhatsApp and SMS",       icon: "💬", enabled: true,  category: "integrations" },
-    { id: "api_access",          name: "API Access",              price: 20, desc: "REST API, webhooks, third-party integrations",           icon: "⚡", enabled: true,  category: "integrations" },
+    { id: "accounting",          name: "Accounting & Invoicing",  price: 15, desc: "Ledger, invoices, vouchers, P&L, balance sheet",        icon: "📒", enabled: true,  category: "core", standalone: true },
+    { id: "inventory",           name: "Inventory Management",    price: 12, desc: "Stock tracking, GRN, barcode, low-stock alerts",         icon: "📦", enabled: true,  category: "core", standalone: true },
+    { id: "crm",                 name: "CRM",                     price: 15, desc: "Contacts, sales pipeline, interaction logs",             icon: "👥", enabled: true,  category: "core", standalone: true },
+    { id: "hr_payroll",          name: "HR & Payroll",            price: 20, desc: "Employees, attendance, payroll, advance salary",         icon: "👨‍💼", enabled: true,  category: "core", standalone: true },
+    { id: "trading",             name: "Trading Desk",            price: 18, desc: "Order desk, procurement, dispatch, outstandings",        icon: "🔄", enabled: true,  category: "core", standalone: true },
+    { id: "bank_reconciliation", name: "Bank Reconciliation",     price: 10, desc: "Statement import, discrepancy flagging, closing",        icon: "🏦", enabled: true,  category: "finance", standalone: true },
+    { id: "tax_filing",          name: "Tax & Compliance",        price: 10, desc: "Tax summary, GST/VAT reports, compliance docs",          icon: "🧾", enabled: true,  category: "finance", standalone: false },
+    { id: "reports",             name: "Advanced Reports",        price: 8,  desc: "Cash flow, profitability, annual statements",            icon: "📈", enabled: true,  category: "operations", standalone: false },
+    { id: "multi_branch",        name: "Multi-Branch",            price: 15, desc: "Branches, consolidated reports, branch access",          icon: "🏢", enabled: true,  category: "operations", standalone: false },
+    { id: "whatsapp",            name: "WhatsApp & SMS",          price: 8,  desc: "Payment reminders, invoices via WhatsApp and SMS",       icon: "💬", enabled: true,  category: "integrations", standalone: false },
+    { id: "api_access",          name: "API Access",              price: 20, desc: "REST API, webhooks, third-party integrations",           icon: "⚡", enabled: true,  category: "integrations", standalone: false },
   ],
 };
+
+// A saved PLAN_CONFIG carries the module list as it looked when the admin last
+// hit save, so modules added to the catalog afterwards would never reach the
+// pricing page. Admin-edited entries win; anything new is appended.
+function mergeCustomPlan(saved: unknown) {
+  const savedPlan = saved as { basePrice?: number; yearlyDiscount?: number; modules?: unknown } | null | undefined;
+  if (!savedPlan) return DEFAULT_CUSTOM_PLAN;
+  const savedModules = Array.isArray(savedPlan.modules) ? savedPlan.modules : [];
+  if (!savedModules.length) return { ...DEFAULT_CUSTOM_PLAN, ...savedPlan, modules: DEFAULT_CUSTOM_PLAN.modules };
+
+  const byId = new Map<string, Record<string, unknown>>();
+  for (const m of savedModules as Record<string, unknown>[]) {
+    if (m && typeof m.id === "string") byId.set(m.id, m);
+  }
+  const merged = DEFAULT_CUSTOM_PLAN.modules.map((def) => {
+    const override = byId.get(def.id);
+    byId.delete(def.id);
+    // `standalone` is a catalog fact, not a price — never let a stale saved
+    // entry drop it.
+    return override ? { ...def, ...override, standalone: def.standalone } : def;
+  });
+  return { ...DEFAULT_CUSTOM_PLAN, ...savedPlan, modules: [...merged, ...Array.from(byId.values())] };
+}
 
 export async function GET() {
   try {
@@ -130,7 +157,7 @@ export async function GET() {
               yearly: Number(payload.seatPricing?.yearly ?? 6) * 12,
             }
           : DEFAULT_SEAT_PRICING,
-        customPlan: payload?.customPlan ?? DEFAULT_CUSTOM_PLAN,
+        customPlan: mergeCustomPlan(payload?.customPlan),
         planHighlights: payload?.planHighlights
           ? { ...DEFAULT_PLAN_HIGHLIGHTS, ...payload.planHighlights }
           : DEFAULT_PLAN_HIGHLIGHTS,

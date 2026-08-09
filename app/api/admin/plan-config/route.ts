@@ -62,6 +62,7 @@ const DEFAULT_CUSTOM_PLAN = {
     { id: "inventory",           name: "Inventory Management",    price: 12, desc: "Stock tracking, GRN, barcode, low-stock alerts",         icon: "📦", enabled: true,  category: "core" },
     { id: "crm",                 name: "CRM",                     price: 15, desc: "Contacts, sales pipeline, interaction logs",             icon: "👥", enabled: true,  category: "core" },
     { id: "hr_payroll",          name: "HR & Payroll",            price: 20, desc: "Employees, attendance, payroll, advance salary",         icon: "👨‍💼", enabled: true,  category: "core" },
+    { id: "trading",             name: "Trading Desk",            price: 18, desc: "Order desk, procurement, dispatch, outstandings",        icon: "🔄", enabled: true,  category: "core" },
     { id: "bank_reconciliation", name: "Bank Reconciliation",     price: 10, desc: "Statement import, discrepancy flagging, closing",        icon: "🏦", enabled: true,  category: "finance" },
     { id: "tax_filing",          name: "Tax & Compliance",        price: 10, desc: "Tax summary, GST/VAT reports, compliance docs",          icon: "🧾", enabled: true,  category: "finance" },
     { id: "reports",             name: "Advanced Reports",        price: 8,  desc: "Cash flow, profitability, annual statements",            icon: "📈", enabled: true,  category: "operations" },
