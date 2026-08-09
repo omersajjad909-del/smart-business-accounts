@@ -51,7 +51,9 @@ export default async function RootPage() {
       <div className="sticky top-0 z-50">
         <Navbar />
       </div>
-      <main className="grow overflow-x-hidden">
+      {/* `overflow-x-hidden` here also made this a scroll container. Sideways
+          overflow is clipped once by `html { overflow-x: clip }`. */}
+      <main className="grow">
         <Hero />
         <VideoDemo />
         <SolutionSection />

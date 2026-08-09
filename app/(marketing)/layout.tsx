@@ -119,7 +119,10 @@ export default function MarketingLayout({
       <div className="sticky top-0 z-50">
         <Navbar />
       </div>
-      <main className="grow overflow-x-hidden overflow-y-auto">{children}</main>
+      {/* Overflow utilities removed — they made this a scroll container, which
+          breaks `position: sticky` on the navbar above and nests a second
+          scroller inside the page. See app/layout.tsx. */}
+      <main className="grow">{children}</main>
       <Footer />
       <ChatWidget />
       <GeoPrecisionPrompt />

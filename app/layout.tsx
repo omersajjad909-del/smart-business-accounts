@@ -362,7 +362,13 @@ export default async function RootLayout({
             }}
           />
           <div className="flex min-h-dvh flex-col">
-            <main className="grow overflow-y-auto">{children}</main>
+            {/* No overflow utilities here. `overflow-y-auto` turns this <main>
+                into a scroll container, and every page renders inside it — so
+                the sticky navbar wrapper (app/page.tsx, the marketing layout)
+                had a scrolling ancestor and stopped sticking. Vertical scroll
+                belongs to the page; sideways overflow is clipped once by
+                `html { overflow-x: clip }` in globals.css. */}
+            <main className="grow">{children}</main>
           </div>
           <CookieBanner />
         </ThemeProvider>
