@@ -669,7 +669,10 @@ export async function seedDemoCompany(
   const grns: any[] = [];
   const grnItems: any[] = [];
 
-  const stockableItems = items.filter((it) => it.openingQty > 0 || p.itemCategory !== "SERVICE");
+  // A service business buys the same lines it sells (port charges, transport)
+  // but holds no stock, so it still needs purchase lines — the earlier filter
+  // left that list empty and the seed blew up on the first purchase.
+  const stocked = p.itemCategory !== "SERVICE";
 
   for (let i = 0; i < 6; i++) {
     const supplier = suppliers[i % suppliers.length];
