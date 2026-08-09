@@ -104,8 +104,13 @@ export default function ImageAdjusterModal({
     return () => window.removeEventListener("keydown", onKeyDown);
   }, [open, onCancel]);
 
-  // Window-level drag + pinch handlers — read all state via refs
+  // Window-level drag + pinch handlers — read all state via refs.
+  // Bound to `open` like the Escape handler above: with `[]` deps these window
+  // listeners stayed attached for the lifetime of the dashboard, long after the
+  // modal was closed.
   useEffect(() => {
+    if (!open) return;
+
     function clamp(x: number, y: number) {
       const { minX, maxX, minY, maxY } = boundsRef.current;
       return {
