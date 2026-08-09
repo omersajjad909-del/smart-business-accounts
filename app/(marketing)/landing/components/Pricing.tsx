@@ -150,10 +150,12 @@ function Cross() {
   );
 }
 
-function PlanCard({ plan, billing, prices, vis, i, currency, planLimits, planHighlights }: {
+function PlanCard({ plan, billing, prices, pkrPrices, vis, i, currency, planLimits, planHighlights }: {
   plan: typeof PLANS[0];
   billing: "monthly" | "yearly";
   prices: Prices;
+  /** Admin-set Pakistan list, or null for everyone else. Yearly is the annual total. */
+  pkrPrices: Prices | null;
   vis: boolean;
   i: number;
   currency: string;
@@ -162,11 +164,25 @@ function PlanCard({ plan, billing, prices, vis, i, currency, planLimits, planHig
 }) {
   const [hov, setHov] = useState(false);
   const isCustom = plan.key === "custom";
+  // Pakistan has its own price list set in admin — Rs 3,999 rather than the
+  // FX conversion of $49. This section used to convert USD for everyone, so a
+  // Pakistani visitor saw Rs 13,622 here and Rs 3,999 on /pricing: two prices
+  // for the same plan on the same site. When the PKR list is available it wins,
+  // exactly as it does on /pricing.
+  const rawPkr   = !isCustom && pkrPrices ? pkrPrices[plan.key as keyof Prices] : null;
   const raw      = isCustom ? null : prices[plan.key as keyof Prices];
   const priceUSD = raw ? (billing === "yearly" ? Math.round(raw.yearly / 12) : raw.monthly) : 0;
   const normalUSD= raw ? raw.monthly : 0;
   const first3USD= Math.round(priceUSD * 0.50); // 50% off
-  const fmt      = (usd: number) => formatFromUSD(usd, currency);
+
+  const pkrPerMonth = rawPkr ? (billing === "yearly" ? Math.round(rawPkr.yearly / 12) : rawPkr.monthly) : 0;
+  const pkrNormal   = rawPkr ? rawPkr.monthly : 0;
+  const pkrFirst3   = Math.round(pkrPerMonth * 0.50);
+  const rs = (n: number) => `Rs${Math.round(n).toLocaleString("en-PK")}`;
+
+  /** Local list price when there is one, otherwise the converted USD figure. */
+  const fmt = (usd: number, pkr?: number) =>
+    rawPkr && pkr !== undefined ? rs(pkr) : formatFromUSD(usd, currency);
   const sym      = CURRENCY_SYMBOL[currency] || currency;
 
   return (
@@ -224,23 +240,25 @@ function PlanCard({ plan, billing, prices, vis, i, currency, planLimits, planHig
           <>
             {/* Original price + 50% off badge — small row */}
             <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:6 }}>
-              <span style={{ fontSize:13, color:"rgba(255,255,255,.35)", textDecoration:"line-through" }}>{fmt(normalUSD)}/mo</span>
+              <span style={{ fontSize:13, color:"rgba(255,255,255,.35)", textDecoration:"line-through" }}>{fmt(normalUSD, pkrNormal)}/mo</span>
               <span style={{ padding:"2px 8px", borderRadius:6, background:"rgba(249,115,22,.2)", border:"1px solid rgba(249,115,22,.4)", fontSize:10, fontWeight:800, color:"#fb923c" }}>
                 50% OFF × 3 months
               </span>
             </div>
             {/* Discounted price — big */}
             <div style={{ display:"flex", alignItems:"baseline", gap:3, marginBottom:6 }}>
-              <span style={{ fontSize:15, fontWeight:700, color:"rgba(255,255,255,.6)" }}>{sym}</span>
+              <span style={{ fontSize:15, fontWeight:700, color:"rgba(255,255,255,.6)" }}>{rawPkr ? "Rs" : sym}</span>
               <span style={{ fontSize:52, fontWeight:900, color:"white", letterSpacing:"-2px", lineHeight:1, fontFamily:"'Lora',serif" }}>
-                {formatFromUSD(first3USD, currency).replace(/[^0-9.,]/g, "")}
+                {rawPkr
+                  ? Math.round(pkrFirst3).toLocaleString("en-PK")
+                  : formatFromUSD(first3USD, currency).replace(/[^0-9.,]/g, "")}
               </span>
               <span style={{ fontSize:13, color:"rgba(255,255,255,.4)", fontWeight:500 }}>/mo</span>
             </div>
             {/* Sub note */}
             <div style={{ fontSize:12, color:"rgba(255,255,255,.35)", marginTop:2 }}>
               {billing === "yearly" && raw
-                ? `Billed annually ${fmt(raw.yearly)}/yr — saves ${fmt((normalUSD * 12) - raw.yearly)}/yr`
+                ? `Billed annually ${fmt(raw.yearly, rawPkr?.yearly)}/yr — saves ${fmt((normalUSD * 12) - raw.yearly, rawPkr ? (pkrNormal * 12) - rawPkr.yearly : undefined)}/yr`
                 : "First 3 months discounted, then full monthly billing"}
             </div>
           </>
@@ -309,6 +327,9 @@ export default function PricingSection() {
   const [planHighlights, setPlanHighlights] = useState(DEFAULT_PLAN_HIGHLIGHTS);
   const [currency, setCurrency] = useState<string>("USD");
   const [country,  setCountry]  = useState<string | null>(null);
+  // Pakistan's own list price, served by /api/public/pricing alongside the USD
+  // one. Null until it arrives, so nothing shows a half-converted figure.
+  const [pkrPricing, setPkrPricing] = useState<Prices | null>(null);
 
   useEffect(() => {
     fetch("/api/public/pricing")
@@ -321,6 +342,12 @@ export default function PricingSection() {
           enterprise: d.planLimits.enterprise ?? DEFAULT_PLAN_LIMITS.enterprise,
         });
         if (d?.planHighlights) setPlanHighlights(h => ({ ...h, ...d.planHighlights }));
+        // Same shape as `prices`: monthly, plus yearly as the annual total.
+        if (d?.pkrPricing) setPkrPricing({
+          starter:    { monthly: Number(d.pkrPricing.starter?.monthly    ?? 3999),  yearly: Number(d.pkrPricing.starter?.yearly    ?? 38388)  },
+          pro:        { monthly: Number(d.pkrPricing.pro?.monthly        ?? 8999),  yearly: Number(d.pkrPricing.pro?.yearly        ?? 86388)  },
+          enterprise: { monthly: Number(d.pkrPricing.enterprise?.monthly ?? 19999), yearly: Number(d.pkrPricing.enterprise?.yearly ?? 191988) },
+        });
       })
       .catch(() => {});
   }, []);
@@ -420,7 +447,7 @@ export default function PricingSection() {
         {/* Plans — 3 column grid (Starter, Pro, Enterprise) */}
         <div className="pricing-grid" style={{ display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:16, marginBottom:32, alignItems:"start" }}>
           {PLANS.filter(p => p.key !== "custom").map((plan, i) => (
-            <PlanCard key={plan.key} plan={plan} billing={billing} prices={prices} vis={vis} i={i} currency={currency} planLimits={planLimits} planHighlights={planHighlights} />
+            <PlanCard key={plan.key} plan={plan} billing={billing} prices={prices} pkrPrices={country === "PK" ? pkrPricing : null} vis={vis} i={i} currency={currency} planLimits={planLimits} planHighlights={planHighlights} />
           ))}
         </div>
 

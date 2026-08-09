@@ -120,9 +120,13 @@ body {
   padding: 0;
   width: 100%;
   min-height: 100%;
-  overflow-x: hidden;
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
+  /* No overflow declarations here on purpose.
+     When html's overflow is not `visible`, the browser stops propagating
+     body's overflow to the viewport and body becomes a scroll container of its
+     own — and `position: sticky` dies for everything inside it. That is what
+     un-stuck the navbar (it sits in a `sticky top-0` wrapper in both
+     app/page.tsx and the marketing layout). Horizontal clipping is handled by
+     the single `html { overflow-x: clip }` rule further down. */
   background-color: var(--app-bg);
   color: var(--text-primary);
   font-family: var(--font-sans), system-ui, -apple-system, "Segoe UI", sans-serif;
@@ -625,7 +629,11 @@ html.dark .dashboard-root ::-webkit-scrollbar-thumb:hover { background: rgba(255
    container and killed vertical scrolling on mobile browsers; html is the
    element the viewport actually scrolls, so clipping the x-axis here does the
    same job without that side effect. */
-html { overflow-x: hidden; }
+/* `clip`, not `hidden`. Both stop sideways overflow, but `hidden` makes the
+   element a scroll container — which is what broke `position: sticky` on the
+   navbar and, on `body`, killed vertical scrolling on mobile. `clip` only
+   clips: no scroll container, so sticky and page scrolling both keep working. */
+html { overflow-x: clip; }
 img, video, svg { max-width: 100%; }
 
 /* Utility: lock page scrolling for overlays (modals, mobile menus) by adding

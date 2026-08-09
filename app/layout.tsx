@@ -33,6 +33,7 @@ import AnalyticsGate from "./(marketing)/landing/components/AnalyticsGate";
 import { ThemeProvider } from "@/components/theme-provider";
 import VisitorTracker from "@/components/VisitorTracker";
 import ClientRegionSignal from "@/components/ClientRegionSignal";
+import ScrollRestorer from "@/components/ScrollRestorer";
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "https://www.finovaos.app";
 const GOOGLE_SITE_VERIFICATION =
@@ -334,6 +335,7 @@ export default async function RootLayout({
       <body className="app-root" suppressHydrationWarning>
         <VisitorTracker />
         <ClientRegionSignal />
+        <ScrollRestorer />
         <AnalyticsGate />
         <ThemeProvider
           attribute="class"
@@ -360,7 +362,7 @@ export default async function RootLayout({
             }}
           />
           <div className="flex min-h-dvh flex-col">
-            <main className="flex-grow overflow-y-auto">{children}</main>
+            <main className="grow overflow-y-auto">{children}</main>
           </div>
           <CookieBanner />
         </ThemeProvider>
