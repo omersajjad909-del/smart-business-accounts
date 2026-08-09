@@ -42,6 +42,19 @@ export default function ScrollDebugPanel() {
     };
     window.addEventListener("scroll", onScroll, { passive: true });
 
+    // Does a programmatic scroll move the page at all? On a desktop browser it
+    // does; if it does not here, the document is not the scroller iOS thinks it
+    // is, and the numbers below say which element is.
+    let progScroll = "(pending)";
+    setTimeout(() => {
+      const before = window.scrollY;
+      window.scrollTo(0, 250);
+      setTimeout(() => {
+        progScroll = `${Math.round(before)} -> ${Math.round(window.scrollY)}`;
+        window.scrollTo(0, before);
+      }, 120);
+    }, 2500);
+
     const tick = setInterval(() => {
       const d = document.documentElement;
       const b = document.body;
@@ -50,16 +63,22 @@ export default function ScrollDebugPanel() {
       const root = document.querySelector(".dashboard-root") as HTMLElement | null;
       const rs = root ? getComputedStyle(root) : null;
       const nav = document.querySelector(".dashboard-root aside nav") as HTMLElement | null;
+      const pane = document.querySelector(".dashboard-content-scroll") as HTMLElement | null;
+      const ps = pane ? getComputedStyle(pane) : null;
+      const se = document.scrollingElement as HTMLElement | null;
+      const vv = (window as any).visualViewport;
 
       setInfo([
-        `win ${window.innerWidth}x${window.innerHeight}  scrollY ${Math.round(window.scrollY)} (max ${Math.round(maxScrollY)})`,
-        `doc scrollH ${d.scrollHeight}  body scrollH ${b.scrollHeight}`,
-        `html oy:${ds.overflowY} ox:${ds.overflowX} ta:${ds.touchAction} h:${ds.height}`,
-        `body oy:${bs.overflowY} ta:${bs.touchAction} h:${bs.height}`,
-        root ? `root oy:${rs!.overflowY} ta:${rs!.touchAction} h:${rs!.height} pos:${rs!.position}` : "root: none",
-        nav ? `sidebar-nav oy:${getComputedStyle(nav).overflowY} scrollH ${nav.scrollHeight} clientH ${nav.clientHeight} scrollTop ${Math.round(nav.scrollTop)}` : "sidebar-nav: none",
-        `html.class: ${d.className || "(none)"}`,
-        `touchmove fired ${moves}  |  defaultPrevented ${prevented}`,
+        `win ${window.innerWidth}x${window.innerHeight} vv ${vv ? Math.round(vv.height) : "-"}  scrollY ${Math.round(window.scrollY)} (max ${Math.round(maxScrollY)})`,
+        `scroller=${se ? se.tagName : "?"} clientH ${se?.clientHeight} scrollH ${se?.scrollHeight} top ${Math.round(se?.scrollTop || 0)}`,
+        `htmlEl clientH ${d.clientHeight} scrollH ${d.scrollHeight} offH ${d.offsetHeight}`,
+        `bodyEl clientH ${b.clientHeight} scrollH ${b.scrollHeight} h:${bs.height} minH:${bs.minHeight}`,
+        `html oy:${ds.overflowY} ox:${ds.overflowX} h:${ds.height} minH:${ds.minHeight}`,
+        root ? `root h:${rs!.height} minH:${rs!.minHeight} disp:${rs!.display} pos:${rs!.position}` : "root: none",
+        pane ? `pane oy:${ps!.overflowY} h:${ps!.height} clientH ${pane.clientHeight} scrollH ${pane.scrollHeight} top ${Math.round(pane.scrollTop)}` : "pane: none",
+        nav ? `sidebar-nav oy:${getComputedStyle(nav).overflowY} scrollH ${nav.scrollHeight} clientH ${nav.clientHeight}` : "sidebar-nav: none",
+        `programmatic scrollTo(250): ${progScroll}`,
+        `touchmove ${moves} | prevented ${prevented} | html.class ${d.className || "-"}`,
       ]);
     }, 400);
 
