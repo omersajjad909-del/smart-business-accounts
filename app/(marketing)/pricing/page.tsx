@@ -59,6 +59,22 @@ const MODULE_CATEGORIES = [
   { id: "integrations", label: "Integrations", icon: "🔗", color: "#f97316" },
 ];
 
+// Modules that are a finished product on their own. The picker uses this to
+// tell a buyer whether a single tick is already a usable subscription, or
+// whether the module only layers on top of something else.
+const STANDALONE_IDS = new Set<string>(STANDALONE_MODULE_IDS);
+
+// Single-app pitches — what the account actually looks like when this is the
+// only module on it. Ordered by how often people ask for it on its own.
+const STANDALONE_APPS = [
+  { id: "hr_payroll",          label: "Payroll & HR",     icon: "👨‍💼", color: "#f472b6", points: ["Employees & attendance", "Monthly salary run + payslips", "Advance salary & loans"] },
+  { id: "crm",                 label: "CRM",              icon: "👥",   color: "#a5b4fc", points: ["Contacts & companies", "Sales pipeline & leads", "Interaction history"] },
+  { id: "inventory",           label: "Inventory",        icon: "📦",   color: "#38bdf8", points: ["Stock in / stock out", "GRN & barcode scanning", "Low-stock alerts"] },
+  { id: "accounting",          label: "Accounting",       icon: "📒",   color: "#818cf8", points: ["Invoices & vouchers", "Ledger & trial balance", "P&L and balance sheet"] },
+  { id: "trading",             label: "Trading Desk",     icon: "🔄",   color: "#fbbf24", points: ["Order desk & procurement", "Dispatch board", "Outstandings & conversions"] },
+  { id: "bank_reconciliation", label: "Bank & Payments",  icon: "🏦",   color: "#34d399", points: ["Statement import", "Discrepancy flagging", "Receipts & payment vouchers"] },
+];
+
 const DEFAULT_PUBLIC_PRICING: PlanPricing = {
   starter: { monthly: 49, yearly: 39 },
   professional: { monthly: 99, yearly: 79 },
@@ -256,6 +272,9 @@ const FAQS = [
   { q: "Will prices automatically match my country?", a: "Yes. We detect your region and show localized display pricing. You can still change the currency manually at any time." },
   { q: "Is the charged currency the same as displayed?", a: "Displayed pricing is localized for convenience. Final billing currency is confirmed during checkout." },
   { q: "Can I build my own package?", a: "Yes. The Custom plan lets you pick only the modules you need and see an instant estimate." },
+  { q: "Can I buy just one module — payroll only, for example?", a: "Yes. Payroll & HR, CRM, Inventory, Accounting, Trading Desk and Bank & Payments each run on their own, so you can subscribe to a single one and pay only for that. Modules marked Add-on (Advanced Reports, Multi-Branch, WhatsApp & SMS, API Access, Tax & Compliance) layer on top of one of those." },
+  { q: "Can I add more modules later?", a: "Yes. Start with one module and add others whenever you need them — your data stays in the same account and billing adjusts from the next cycle." },
+  { q: "Is Business Automation included in a plan?", a: "No, it is a separate add-on at a flat monthly price and can be attached to any plan, including a single-module package." },
   { q: "Can I switch plans later?", a: "Yes. You can upgrade, downgrade, or move to a custom package at any time." },
   { q: "Can I see a demo before buying?", a: "Yes. Book a personalized demo and we'll walk you through everything for your business type. Contact us via live chat or the contact form." },
 ];
@@ -384,6 +403,7 @@ export default function PricingPage() {
       { id:"inventory", name:"Inventory Management", price:12, desc:"Stock tracking, GRN, barcode, low-stock alerts", icon:"📦", enabled:true, category:"core" },
       { id:"crm", name:"CRM", price:15, desc:"Contacts, sales pipeline, interaction logs", icon:"👥", enabled:true, category:"core" },
       { id:"hr_payroll", name:"HR & Payroll", price:20, desc:"Employees, attendance, payroll, advance salary", icon:"👨‍💼", enabled:true, category:"core" },
+      { id:"trading", name:"Trading Desk", price:18, desc:"Order desk, procurement, dispatch, outstandings", icon:"🔄", enabled:true, category:"core" },
       { id:"bank_reconciliation", name:"Bank Reconciliation", price:10, desc:"Statement import, discrepancy flagging, closing", icon:"🏦", enabled:true, category:"finance" },
       { id:"tax_filing", name:"Tax & Compliance", price:10, desc:"Tax summary, GST/VAT reports, compliance docs", icon:"🧾", enabled:true, category:"finance" },
       { id:"reports", name:"Advanced Reports", price:8, desc:"Cash flow, profitability, annual statements", icon:"📈", enabled:true, category:"operations" },
@@ -543,6 +563,22 @@ export default function PricingPage() {
   const buildHref = (slug: string) => `/onboarding/signup/${slug}?cycle=${billing}&currency=${currency}&country=${country}`;
   const buildCustomHref = () => `/onboarding/choose-plan?plan=custom&modules=${selectedModules.join(",")}&extraUsers=${extraUsers}&extraBranches=${extraBranches}&cycle=${billing}&currency=${currency}&country=${country}`;
   const toggleModule = (id: string) => setSelectedModules(p => p.includes(id) ? p.filter(x => x !== id) : [...p, id]);
+  // Single-app buy: clear everything else so the estimate shows exactly what
+  // that one module costs, and drop the seat/branch add-ons that only make
+  // sense on a bigger package.
+  const selectOnlyModule = (id: string) => {
+    setSelectedModules([id]);
+    setExtraUsers(0);
+    setExtraBranches(0);
+    if (typeof document !== "undefined") {
+      document.getElementById("custom")?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  };
+  const isStandalone = (id: string) => STANDALONE_IDS.has(id);
+  const standaloneOnly = selectedModules.length === 1 && isStandalone(selectedModules[0]);
+  // A package of only layer-on modules cannot run — flag it instead of letting
+  // someone check out into an empty app.
+  const needsCoreModule = selectedModules.length > 0 && !selectedModules.some(isStandalone);
   const toggleCat = (id: string) => setOpenCats(p => { const n = new Set(p); n.has(id) ? n.delete(id) : n.add(id); return n; });
   const usersLabel = (v: number | null | undefined) => (v === null || v === undefined ? "Unlimited" : `Up to ${v}`);
 
@@ -559,6 +595,7 @@ export default function PricingPage() {
         @media(max-width:900px){
           .pg{grid-template-columns:1fr !important}
           .cg{grid-template-columns:1fr !important}
+          .sa-grid{grid-template-columns:repeat(2,1fr) !important}
         }
 
         /* Comparison table — sticky first column on mobile */
@@ -603,6 +640,8 @@ export default function PricingPage() {
           /* Custom plan */
           .cp-row{flex-direction:column !important;}
           .cp-sidebar{width:100% !important;position:static !important;top:auto !important;}
+          .sa-grid{grid-template-columns:1fr !important;}
+          .mod-grid{grid-template-columns:1fr !important;}
 
           /* FAQ */
           .pr-pad h2{font-size:24px !important;}
@@ -798,7 +837,7 @@ export default function PricingPage() {
         </div>
 
         {/* ── AUTOMATION ADD-ON ────────────────────────────────── */}
-        <div style={{ marginBottom: 80, display: "none" }}>
+        <div style={{ marginBottom: 80 }}>
           <div style={{ textAlign: "center", marginBottom: 36 }}>
             <div style={{ display: "inline-flex", alignItems: "center", gap: 8, background: "rgba(124,58,237,.12)", border: "1px solid rgba(124,58,237,.28)", borderRadius: 100, padding: "5px 14px", fontSize: 12, color: "#a78bfa", fontWeight: 700, marginBottom: 16 }}>
               ⚡ Power Add-On
@@ -807,7 +846,7 @@ export default function PricingPage() {
               Add Business Automation to any plan
             </h2>
             <p style={{ color: "rgba(255,255,255,.42)", fontSize: 15, maxWidth: 560, margin: "0 auto" }}>
-              Turn FinovaOS into a complete business efficiency add-on. Available on Starter, Professional, and Enterprise.
+              Flat {getAddonDisplayPrice(79, 69)}/month on top of whatever you already pay — Starter, Professional, Enterprise, or a custom package.
             </p>
           </div>
 
@@ -823,9 +862,15 @@ export default function PricingPage() {
                     <span style={{ fontSize: 52, fontWeight: 900, color: "#fff", letterSpacing: "-.03em" }}>{getAddonDisplayPrice(79, 69)}</span>
                     <span style={{ fontSize: 14, color: "rgba(255,255,255,.4)" }}>/month</span>
                   </div>
-                  {billing === "yearly" && (
-                    <div style={{ fontSize: 13, color: "#34d399", marginBottom: 8 }}>
-                      {getAddonDisplayPrice(79, 69)}/month on yearly plan — save {getAddonYearlySaving(10)}/year
+                  {/* The old line here repeated the same number the big price
+                      already shows. Say what the cycle actually costs instead. */}
+                  {billing === "yearly" ? (
+                    <div style={{ fontSize: 13, color: "#34d399", marginBottom: 8, fontWeight: 700 }}>
+                      Billed annually — save {getAddonYearlySaving(10)}/year vs monthly
+                    </div>
+                  ) : (
+                    <div style={{ fontSize: 13, color: "rgba(255,255,255,.5)", marginBottom: 8 }}>
+                      Billed monthly — pay yearly and it drops to {isPKUser && pkrAddonPricing ? `₨${pkrAddonPricing.yearly.toLocaleString("en-PK")}` : formatPrice(69)}/mo
                     </div>
                   )}
                   <div style={{ fontSize: 13, color: "rgba(255,255,255,.4)", marginBottom: 28 }}>
@@ -980,9 +1025,84 @@ export default function PricingPage() {
               🧩 Custom Plan
             </div>
             <h2 style={{ fontSize: "clamp(28px,4vw,42px)", fontWeight: 900, letterSpacing: "-.03em", marginBottom: 10 }}>Pay only for modules you need</h2>
-            <p style={{ color: "rgba(255,255,255,.42)", fontSize: 15, maxWidth: 540, margin: "0 auto" }}>
-              Pick the exact features your business needs. No bloat, no unused modules — just what you actually use.
+            <p style={{ color: "rgba(255,255,255,.42)", fontSize: 15, maxWidth: 560, margin: "0 auto" }}>
+              Pick the exact features your business needs. No bloat, no unused modules — and if you only need one, buy just that one.
             </p>
+          </div>
+
+          {/* ── STANDALONE APPS — one module, on its own ─────── */}
+          <div style={{ marginBottom: 36 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 14, flexWrap: "wrap" }}>
+              <span style={{ fontSize: 11, fontWeight: 800, color: "rgba(255,255,255,.3)", letterSpacing: ".08em", textTransform: "uppercase" }}>
+                🎯 Run just one
+              </span>
+              <span style={{ fontSize: 13, color: "rgba(255,255,255,.42)" }}>
+                These modules work on their own — no full accounting setup required.
+              </span>
+            </div>
+
+            <div className="sa-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 12 }}>
+              {STANDALONE_APPS.map(app => {
+                const mod = customPlanData.modules.find((m: any) => m.id === app.id);
+                if (!mod) return null;
+                const active = selectedModules.length === 1 && selectedModules[0] === app.id;
+                return (
+                  <button
+                    key={app.id}
+                    onClick={() => selectOnlyModule(app.id)}
+                    style={{
+                      textAlign: "left", padding: "18px 18px 16px", borderRadius: 16, cursor: "pointer",
+                      fontFamily: ff, color: "white", transition: "all .2s",
+                      border: `1.5px solid ${active ? app.color + "80" : "rgba(255,255,255,.07)"}`,
+                      background: active
+                        ? `linear-gradient(160deg,${app.color}1f,rgba(255,255,255,.02))`
+                        : "rgba(255,255,255,.025)",
+                    }}
+                  >
+                    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, marginBottom: 10 }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                        <span style={{ fontSize: 22, lineHeight: 1 }}>{app.icon}</span>
+                        <span style={{ fontSize: 14, fontWeight: 800, color: active ? app.color : "white" }}>{app.label}</span>
+                      </div>
+                      <span style={{ fontSize: 9, fontWeight: 800, letterSpacing: ".06em", padding: "3px 7px", borderRadius: 5, color: app.color, background: `${app.color}18`, border: `1px solid ${app.color}33`, whiteSpace: "nowrap" }}>
+                        STANDALONE
+                      </span>
+                    </div>
+                    <div style={{ display: "flex", flexDirection: "column", gap: 5, marginBottom: 12 }}>
+                      {app.points.map(p => (
+                        <div key={p} style={{ display: "flex", alignItems: "center", gap: 7, fontSize: 11.5, color: "rgba(255,255,255,.45)" }}>
+                          <svg width="9" height="9" viewBox="0 0 12 10" fill="none" style={{ flexShrink: 0 }}>
+                            <path d="M1 5.5L4.5 9 11 1" stroke={app.color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                          </svg>
+                          {p}
+                        </div>
+                      ))}
+                    </div>
+                    <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: 8, paddingTop: 11, borderTop: "1px solid rgba(255,255,255,.06)" }}>
+                      {/* Same base price the picker below shows — the yearly
+                          discount is applied once, in the estimate total. */}
+                      <span style={{ fontSize: 17, fontWeight: 900, color: app.color, letterSpacing: "-.02em" }}>
+                        {formatPrice(mod.price)}
+                        <span style={{ fontSize: 10, fontWeight: 500, color: "rgba(255,255,255,.3)" }}>/mo</span>
+                      </span>
+                      <span style={{ fontSize: 11, fontWeight: 700, color: active ? app.color : "rgba(255,255,255,.4)" }}>
+                        {active ? "✓ Selected" : "Pick this only →"}
+                      </span>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+
+            <div style={{ marginTop: 12, fontSize: 12, color: "rgba(255,255,255,.32)" }}>
+              Need only the automation tools? <Link href="/onboarding/choose-plan?addon=automation" style={{ color: "#a78bfa", textDecoration: "none", fontWeight: 700 }}>Business Automation is sold separately →</Link>
+            </div>
+          </div>
+
+          <div style={{ height: 1, background: "rgba(255,255,255,.06)", marginBottom: 32 }} />
+
+          <div style={{ fontSize: 13, color: "rgba(255,255,255,.42)", marginBottom: 18, textAlign: "center" }}>
+            …or build your own package — tick anything below and the estimate updates live.
           </div>
 
           <div className="cp-row" style={{ display: "flex", gap: 20, alignItems: "flex-start", flexWrap: "wrap" }}>
@@ -996,7 +1116,7 @@ export default function PricingPage() {
                     <div style={{ fontSize: 11, fontWeight: 800, color: "rgba(255,255,255,.3)", letterSpacing: ".08em", textTransform: "uppercase", marginBottom: 10, display: "flex", alignItems: "center", gap: 7 }}>
                       <span style={{ color: cat.color }}>{cat.icon}</span>{cat.label}
                     </div>
-                    <div style={{ display: "grid", gridTemplateColumns: "repeat(2,1fr)", gap: 10 }}>
+                    <div className="mod-grid" style={{ display: "grid", gridTemplateColumns: "repeat(2,1fr)", gap: 10 }}>
                       {catMods.map((module: any) => {
                         const sel = selectedModules.includes(module.id);
                         return (
@@ -1016,8 +1136,22 @@ export default function PricingPage() {
                               </div>
                             </div>
                             <div style={{ fontSize: 11, color: "rgba(255,255,255,.38)", lineHeight: 1.5, marginBottom: 9 }}>{module.desc}</div>
-                            <div style={{ fontSize: 14, fontWeight: 800, color: sel ? "#f97316" : "rgba(255,255,255,.45)" }}>
-                              +{formatPrice(module.price)}<span style={{ fontSize: 10, fontWeight: 500, color: "rgba(255,255,255,.3)" }}>/mo</span>
+                            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, flexWrap: "wrap" }}>
+                              <div style={{ fontSize: 14, fontWeight: 800, color: sel ? "#f97316" : "rgba(255,255,255,.45)" }}>
+                                +{formatPrice(module.price)}<span style={{ fontSize: 10, fontWeight: 500, color: "rgba(255,255,255,.3)" }}>/mo</span>
+                              </div>
+                              {/* Says whether ticking only this box is already a
+                                  working subscription, or whether it needs a
+                                  module underneath it. */}
+                              {isStandalone(module.id) ? (
+                                <span style={{ fontSize: 9, fontWeight: 800, letterSpacing: ".05em", padding: "3px 7px", borderRadius: 5, color: "#34d399", background: "rgba(52,211,153,.12)", border: "1px solid rgba(52,211,153,.25)" }}>
+                                  RUNS ALONE
+                                </span>
+                              ) : (
+                                <span style={{ fontSize: 9, fontWeight: 800, letterSpacing: ".05em", padding: "3px 7px", borderRadius: 5, color: "rgba(255,255,255,.35)", background: "rgba(255,255,255,.05)", border: "1px solid rgba(255,255,255,.1)" }}>
+                                  ADD-ON
+                                </span>
+                              )}
                             </div>
                           </button>
                         );
@@ -1052,7 +1186,14 @@ export default function PricingPage() {
             {/* Right — Price summary */}
             <div className="cp-sidebar" style={{ width: 320, flexShrink: 0, position: "sticky", top: 24 }}>
               <div style={{ borderRadius: 20, background: "rgba(249,115,22,.07)", border: "1.5px solid rgba(249,115,22,.28)", padding: "22px 20px" }}>
-                <div style={{ fontSize: 10, fontWeight: 800, color: "#f97316", letterSpacing: ".06em", textTransform: "uppercase", marginBottom: 14 }}>Your Estimate</div>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, marginBottom: 14 }}>
+                  <span style={{ fontSize: 10, fontWeight: 800, color: "#f97316", letterSpacing: ".06em", textTransform: "uppercase" }}>Your Estimate</span>
+                  {standaloneOnly && (
+                    <span style={{ fontSize: 9, fontWeight: 800, letterSpacing: ".05em", padding: "3px 7px", borderRadius: 5, color: "#34d399", background: "rgba(52,211,153,.12)", border: "1px solid rgba(52,211,153,.25)" }}>
+                      SINGLE APP
+                    </span>
+                  )}
+                </div>
 
                 {/* Modules breakdown */}
                 {selectedModules.length === 0 ? (
@@ -1112,20 +1253,26 @@ export default function PricingPage() {
                   )}
                 </div>
 
+                {needsCoreModule && (
+                  <div style={{ marginBottom: 12, padding: "10px 12px", borderRadius: 10, background: "rgba(251,191,36,.08)", border: "1px solid rgba(251,191,36,.22)", fontSize: 11.5, color: "#fbbf24", lineHeight: 1.5 }}>
+                    Add one module marked <strong>Runs alone</strong> — the ones you picked layer on top of another module.
+                  </div>
+                )}
+
                 <Link
-                  href={selectedModules.length ? buildCustomHref() : "#custom"}
+                  href={selectedModules.length && !needsCoreModule ? buildCustomHref() : "#custom"}
                   style={{
                     display: "block", textAlign: "center", padding: "13px 18px", borderRadius: 12,
-                    background: selectedModules.length ? "linear-gradient(135deg,#f97316,#ea580c)" : "rgba(255,255,255,.06)",
+                    background: selectedModules.length && !needsCoreModule ? "linear-gradient(135deg,#f97316,#ea580c)" : "rgba(255,255,255,.06)",
                     color: "white", fontWeight: 800, fontSize: 14, textDecoration: "none",
-                    opacity: selectedModules.length ? 1 : 0.5,
-                    border: selectedModules.length ? "none" : "1px solid rgba(255,255,255,.1)",
+                    opacity: selectedModules.length && !needsCoreModule ? 1 : 0.5,
+                    border: selectedModules.length && !needsCoreModule ? "none" : "1px solid rgba(255,255,255,.1)",
                   }}
                 >
-                  {selectedModules.length ? "Continue →" : "Select modules above"}
+                  {!selectedModules.length ? "Select modules above" : needsCoreModule ? "Pick a module that runs alone" : standaloneOnly ? "Continue with this app →" : "Continue →"}
                 </Link>
                 <div style={{ fontSize: 11, color: "rgba(255,255,255,.22)", textAlign: "center", marginTop: 10 }}>
-                  You'll confirm everything before payment
+                  You&apos;ll confirm everything before payment
                 </div>
               </div>
             </div>
