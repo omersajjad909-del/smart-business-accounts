@@ -2,6 +2,7 @@
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { CURRENCY_SYMBOL, formatFromUSD } from "@/lib/currency-client";
+import { signupHref } from "@/lib/signupGate";
 
 function useInView() {
   const ref = useRef<HTMLDivElement>(null);
@@ -248,7 +249,9 @@ function PlanCard({ plan, billing, prices, vis, i, currency, planLimits, planHig
       <div style={{ marginBottom: 8 }} />
 
       {/* CTA */}
-      <Link href={isCustom ? "/onboarding/choose-plan?plan=custom" : `/onboarding/signup/${plan.slug}`} style={{
+      {/* This is the landing page's own pricing block — separate from the
+          /pricing page, so its CTAs needed the gate too. */}
+      <Link href={signupHref(isCustom ? "/onboarding/choose-plan?plan=custom" : `/onboarding/signup/${plan.slug}`)} style={{
         display:"flex", alignItems:"center", justifyContent:"center", gap:8,
         padding:"13px 20px", borderRadius:12, marginBottom:24,
         background: plan.featured

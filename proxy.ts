@@ -1,5 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getTokenFromRequest, verifyJwt } from "@/lib/auth";
+import {
+  SIGNUPS_OPEN,
+  WAITLIST_PATH,
+  isSignupApiRoute,
+  isSignupPageRoute,
+} from "@/lib/signupGate";
 
 const FORGE_HOSTS = ["finovaforge.com", "www.finovaforge.com"];
 
@@ -116,6 +122,26 @@ export function proxy(req: NextRequest) {
   // The old "user" cookie fallback was removed because it allowed role spoofing.
 
   const pathname = req.nextUrl.pathname || "";
+
+  // ── Signup gate ──────────────────────────────────────────────────────────
+  // Pre-launch: no new accounts. Enforced here rather than by disabling
+  // buttons, because a disabled button still leaves the URL, the API and every
+  // old link working. Visitors land on the waitlist so the interest is kept.
+  if (!SIGNUPS_OPEN) {
+    if (isSignupApiRoute(pathname)) {
+      return NextResponse.json(
+        { error: "Signups are not open yet", waitlist: WAITLIST_PATH },
+        { status: 403 },
+      );
+    }
+    if (isSignupPageRoute(pathname)) {
+      const url = req.nextUrl.clone();
+      url.pathname = WAITLIST_PATH;
+      url.search = "";
+      return NextResponse.redirect(url);
+    }
+  }
+
   // Require auth for app pages
   const needsAuth =
     (pathname.startsWith("/dashboard") ||

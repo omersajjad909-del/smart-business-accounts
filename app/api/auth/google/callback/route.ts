@@ -8,6 +8,7 @@ import {
   isUserVerified,
   sendVerificationCode,
 } from "@/lib/verification";
+import { SIGNUPS_OPEN, WAITLIST_PATH } from "@/lib/signupGate";
 
 export async function GET(req: NextRequest) {
   try {
@@ -67,6 +68,13 @@ export async function GET(req: NextRequest) {
 
     let user = await prisma.user.findUnique({ where: { email } });
     let companyId = user?.defaultCompanyId || "";
+
+    // "Sign in with Google" is also a signup door — an unknown email lands here
+    // and walks away with a company. While the gate is closed, existing users
+    // still sign in normally; anyone new goes to the waitlist.
+    if (!user && !SIGNUPS_OPEN) {
+      return NextResponse.redirect(new URL(`${WAITLIST_PATH}?from=google`, base));
+    }
 
     if (!user) {
       const hash = await bcrypt.hash(cryptoRandom(), 10);

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
 import { signJwt, verifyJwt } from "@/lib/auth";
+import { SIGNUPS_OPEN, WAITLIST_PATH } from "@/lib/signupGate";
 
 export async function GET(req: NextRequest) {
   try {
@@ -16,6 +17,14 @@ export async function GET(req: NextRequest) {
 
     let user = await prisma.user.findUnique({ where: { email } });
     let companyId = user?.defaultCompanyId || "";
+
+    // A magic link for an unknown email creates an account, so it is a signup
+    // door too. Existing users keep signing in; new ones go to the waitlist.
+    if (!user && !SIGNUPS_OPEN) {
+      const base = process.env.NEXT_PUBLIC_APP_URL || req.nextUrl.origin;
+      return NextResponse.redirect(new URL(`${WAITLIST_PATH}?from=magic`, base));
+    }
+
     if (!user) {
       const hash = await bcrypt.hash(cryptoRandom(), 10);
       const company = await prisma.company.create({
