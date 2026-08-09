@@ -329,7 +329,7 @@ export default function PricingSection() {
   // currency the checkout will not bill in. The stored-preference branch and
   // the manual picker that used to live here are gone.
   useEffect(() => {
-    fetch("/api/public/pricing-region", { cache: "no-store" })
+    fetch("/api/public/pricing-region", { cache: "no-store", headers: clientRegionHeaders() })
       .then(r => r.ok ? r.json() : null)
       .then(d => {
         if (d?.currency) setCurrency(d.currency);

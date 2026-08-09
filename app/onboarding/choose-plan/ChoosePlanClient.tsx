@@ -190,7 +190,7 @@ export default function ChoosePlanPage() {
       // this page to a currency /api/billing/checkout would never bill in — and
       // this page builds the signup link, so the wrong value travelled onward.
       try {
-        const res = await fetch("/api/public/pricing-region", { cache: "no-store" });
+        const res = await fetch("/api/public/pricing-region", { cache: "no-store", headers: clientRegionHeaders() });
         if (res.ok) {
           const data = await res.json();
           if (data?.currency) setCurrency(data.currency);

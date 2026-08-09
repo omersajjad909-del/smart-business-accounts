@@ -471,7 +471,7 @@ export default function PricingPage() {
       // Pakistan price list from anywhere; /api/billing/checkout would then
       // charge USD, so the page was advertising a price it could not honour.
       try {
-        const res = await fetch("/api/public/pricing-region", { cache: "no-store" });
+        const res = await fetch("/api/public/pricing-region", { cache: "no-store", headers: clientRegionHeaders() });
         if (res.ok) {
           const d = await res.json();
           if (d?.currency) setCurrency(d.currency);

@@ -254,7 +254,7 @@ export default function PaymentPage() {
       // stored-preference / `?currency=` / geo seeding is gone: it could show a
       // currency the checkout would then refuse to honour.
       try {
-        const res = await fetch("/api/public/pricing-region", { cache: "no-store" });
+        const res = await fetch("/api/public/pricing-region", { cache: "no-store", headers: clientRegionHeaders() });
         if (res.ok) {
           const d = await res.json();
           if (d?.currency) setCurrency(d.currency);

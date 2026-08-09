@@ -526,7 +526,7 @@ const shellStyles = `
 
 /* ── Root ────────────────────────────────────────────────────────────── */
 .fin-admin-root{
-  min-height:100vh;
+  min-height:100dvh;
   color:var(--text);
   font-family:'Outfit','DM Sans',sans-serif;
   background:
@@ -541,12 +541,12 @@ const shellStyles = `
 
 /* ── Layout ──────────────────────────────────────────────────────────── */
 .fin-admin-shell{
-  min-height:100vh;
+  min-height:100dvh;
   display:grid;
   grid-template-columns:260px minmax(0,1fr);
 }
 .fin-admin-sidebar{
-  position:sticky;top:0;height:100vh;
+  position:sticky;top:0;height:100dvh;
   padding:14px 10px 12px;
   display:grid;grid-template-rows:auto 1fr auto;
   background:linear-gradient(180deg,var(--panel),var(--panel-2));
@@ -626,6 +626,8 @@ const shellStyles = `
 .fin-admin-main{
   min-width:0;overflow-x:hidden;
   display:grid;grid-template-rows:auto 1fr;
+  /* allow the inner page area to shrink so it can scroll on small viewports */
+  min-height: 0;
 }
 .fin-admin-topbar{
   position:sticky;top:0;z-index:30;
@@ -682,6 +684,9 @@ const shellStyles = `
 .fin-admin-page{
   min-width:0;overflow-x:hidden;
   padding:20px 20px 32px;
+  /* Make the page content itself scrollable when the topbar is sticky */
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 /* ── Dropdowns ──────────────────────────────────────────────────────── */

@@ -32,6 +32,7 @@ import CookieBanner from "./(marketing)/landing/components/CookieBanner";
 import AnalyticsGate from "./(marketing)/landing/components/AnalyticsGate";
 import { ThemeProvider } from "@/components/theme-provider";
 import VisitorTracker from "@/components/VisitorTracker";
+import ClientRegionSignal from "@/components/ClientRegionSignal";
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "https://www.finovaos.app";
 const GOOGLE_SITE_VERIFICATION =
@@ -332,6 +333,7 @@ export default async function RootLayout({
       </head>
       <body className="app-root" suppressHydrationWarning>
         <VisitorTracker />
+        <ClientRegionSignal />
         <AnalyticsGate />
         <ThemeProvider
           attribute="class"
