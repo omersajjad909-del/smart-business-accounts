@@ -155,7 +155,10 @@ export async function prewarmSandboxes(
         });
         await seedDemoCompany(company.id, businessType);
         built++;
-      } catch {
+      } catch (e) {
+        // Log it — a silent catch here once hid a seeder crash that left one
+        // whole business type without any warm sandboxes.
+        console.error(`[demo] prewarm failed for ${businessType}:`, e);
         failed++;
       }
     }

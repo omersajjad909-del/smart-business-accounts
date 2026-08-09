@@ -682,7 +682,7 @@ export async function seedDemoCompany(
     let net = 0;
 
     for (let l = 0; l < lineCount; l++) {
-      const it = stockableItems[(i * 3 + l) % stockableItems.length];
+      const it = items[(i * 3 + l) % items.length];
       // Purchase volume is deliberately kept below sales volume — a demo that
       // opens on a loss-making P&L is not a demo anyone wants to see.
       const qty = Math.max(6, Math.round(12 + jitter(i * 10 + l) * 15));
@@ -698,18 +698,20 @@ export async function seedDemoCompany(
         discountPercent: 0,
         taxPercent: p.taxRate,
       });
-      inventoryTxns.push({
-        id: randomUUID(),
-        companyId,
-        type: "PURCHASE",
-        date,
-        itemId: it.id,
-        qty,
-        rate: it.purchaseRate,
-        amount,
-        location: "MAIN",
-        partyId: supplier.id,
-      });
+      if (stocked) {
+        inventoryTxns.push({
+          id: randomUUID(),
+          companyId,
+          type: "PURCHASE",
+          date,
+          itemId: it.id,
+          qty,
+          rate: it.purchaseRate,
+          amount,
+          location: "MAIN",
+          partyId: supplier.id,
+        });
+      }
     }
 
     const tax = round2((net * p.taxRate) / 100);
@@ -816,7 +818,7 @@ export async function seedDemoCompany(
         discountPercent: 0,
         taxPercent: p.taxRate,
       });
-      if (p.itemCategory !== "SERVICE") {
+      if (stocked) {
         inventoryTxns.push({
           id: randomUUID(),
           companyId,
