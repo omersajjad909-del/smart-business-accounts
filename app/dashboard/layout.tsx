@@ -777,7 +777,12 @@ export default function DashboardLayout({
   }
 
   return (
-    <div className="dashboard-root" style={{display:"flex",minHeight:"100vh",background:"var(--app-bg)",fontSize:13,color:"var(--text-primary)",position:"relative"}}>
+    // dvh, not vh. On a phone `100vh` is the height with the browser chrome
+    // hidden, which is taller than what is actually on screen — so the shell
+    // hung below the visible area and the page had almost nothing left to
+    // scroll. `dvh` tracks the visible viewport as the address bar shows and
+    // hides. Desktop is unaffected: there the two are identical.
+    <div className="dashboard-root" style={{display:"flex",minHeight:"100dvh",background:"var(--app-bg)",fontSize:13,color:"var(--text-primary)",position:"relative"}}>
       <AppearanceApplier />
       <DemoSessionTimer />
 
@@ -2087,7 +2092,7 @@ export default function DashboardLayout({
         onCancel={() => setPendingAvatarFile(null)}
         onConfirm={uploadAvatarFromAdjustedImage}
       />
-      <main style={{flex:1,display:"flex",flexDirection:"column",minHeight:"100vh",minWidth:0,marginLeft:isMobileViewport ? 0 : SW,transition:"margin-left .25s ease"}}>
+      <main style={{flex:1,display:"flex",flexDirection:"column",minHeight:"100dvh",minWidth:0,marginLeft:isMobileViewport ? 0 : SW,transition:"margin-left .25s ease"}}>
 
         {/* ---- TOPBAR ---- */}
         {!isMobileDashboardHome && (
@@ -2490,7 +2495,14 @@ export default function DashboardLayout({
         )}
 
         {/* ---- PAGE CONTENT ---- */}
-        <div style={{flex:1,overflowY:"auto",padding:isMobileViewport ? "10px 10px" : "16px 12px",paddingBottom: isMobileViewport ? "80px" : "16px"}} className="dashboard-content-scroll sm:px-4 sm:py-5 lg:px-6">
+        {/* Desktop keeps the app-shell pattern: this pane is the scroller, so
+            the sidebar and topbar never move. On a phone that nested scroller
+            is what broke scrolling — a touch drag inside a flex-sized
+            overflow:auto pane, whose bottom edge sits under the browser
+            toolbar, has nowhere to go. Mobile therefore scrolls the page
+            itself; the bottom nav is position:fixed and the 80px padding below
+            keeps content clear of it. */}
+        <div style={{flex:1,overflowY:isMobileViewport ? "visible" : "auto",padding:isMobileViewport ? "10px 10px" : "16px 12px",paddingBottom: isMobileViewport ? "80px" : "16px"}} className="dashboard-content-scroll sm:px-4 sm:py-5 lg:px-6">
           <div style={{width:"100%",maxWidth:1280,margin:"0 auto"}} className="dashboard-content-inner">
             {currentUser?.email === "finovaos.app@gmail.com" && (
               <div style={{
