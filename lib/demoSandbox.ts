@@ -71,10 +71,96 @@ export async function getOrCreateDemoUser() {
   });
 }
 
+/**
+ * How many ready-to-claim sandboxes to keep warm per business type.
+ *
+ * Seeding a company against a remote database takes a good few seconds, which
+ * is a long time to stare at a spinner before a sales demo. The cleanup cron
+ * builds these ahead of time so "Start Demo Now" hands over an already-loaded
+ * workspace. An idle sandbox is one with isDemo = true and demoExpiresAt null;
+ * claiming it just stamps the deadline.
+ */
+export const DEMO_PREWARM_PER_TYPE = 2;
+
 export async function countActiveSandboxes(): Promise<number> {
   return prisma.company.count({
     where: { isDemo: true, demoExpiresAt: { gt: new Date() } },
   });
+}
+
+/**
+ * Take one warm sandbox off the shelf, atomically. SKIP LOCKED means two
+ * visitors arriving at the same instant can never be handed the same company —
+ * the second one either gets a different row or none, and falls back to
+ * building a fresh sandbox.
+ */
+async function claimIdleSandbox(
+  businessType: DemoBusinessType,
+  expiresAt: Date,
+): Promise<string | null> {
+  try {
+    const rows = await prisma.$queryRaw<{ id: string }[]>`
+      UPDATE "Company" SET "demoExpiresAt" = ${expiresAt}
+      WHERE id = (
+        SELECT id FROM "Company"
+        WHERE "isDemo" = true
+          AND "demoExpiresAt" IS NULL
+          AND "businessType" = ${businessType}
+        ORDER BY "createdAt" ASC
+        FOR UPDATE SKIP LOCKED
+        LIMIT 1
+      )
+      RETURNING id
+    `;
+    return rows[0]?.id ?? null;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Refill the shelf. Called by the cleanup cron, so the cost of seeding is paid
+ * in the background rather than while a visitor waits.
+ */
+export async function prewarmSandboxes(
+  perType = DEMO_PREWARM_PER_TYPE,
+): Promise<{ built: number; failed: number }> {
+  const user = await getOrCreateDemoUser();
+  let built = 0;
+  let failed = 0;
+
+  for (const businessType of DEMO_BUSINESS_TYPES) {
+    const idle = await prisma.company.count({
+      where: { isDemo: true, demoExpiresAt: null, businessType },
+    });
+    for (let i = idle; i < perType; i++) {
+      try {
+        const company = await prisma.company.create({
+          data: {
+            name: getDemoProfile(businessType).companyName,
+            country: "PK",
+            baseCurrency: "PKR",
+            businessType,
+            businessSetupDone: true,
+            plan: "ENTERPRISE",
+            subscriptionStatus: "ACTIVE",
+            isDemo: true,
+            demoExpiresAt: null, // idle until someone claims it
+          },
+        });
+        await prisma.userCompany.upsert({
+          where: { userId_companyId: { userId: user.id, companyId: company.id } },
+          update: {},
+          create: { userId: user.id, companyId: company.id, isDefault: false },
+        });
+        await seedDemoCompany(company.id, businessType);
+        built++;
+      } catch {
+        failed++;
+      }
+    }
+  }
+  return { built, failed };
 }
 
 export interface DemoSandbox {
@@ -84,7 +170,8 @@ export interface DemoSandbox {
   companyName: string;
   token: string;
   expiresAt: Date;
-  seed: Awaited<ReturnType<typeof seedDemoCompany>>;
+  /** Null when a pre-warmed sandbox was claimed — it was seeded earlier. */
+  seed: Awaited<ReturnType<typeof seedDemoCompany>> | null;
 }
 
 /**
@@ -99,6 +186,33 @@ export async function createDemoSandbox(
   const user = await getOrCreateDemoUser();
   const minutes = Math.max(5, Math.min(opts.minutes ?? DEMO_SESSION_MINUTES, 240));
   const expiresAt = new Date(Date.now() + minutes * 60_000);
+
+  // Warm sandbox available? Hand it over as-is — it is already seeded.
+  const claimedId = await claimIdleSandbox(businessType, expiresAt);
+  if (claimedId) {
+    const token = signJwt({
+      userId: user.id,
+      role: user.role,
+      companyId: claimedId,
+      demo: true,
+    });
+    try {
+      await prisma.session.create({
+        data: { userId: user.id, token, expiresAt, companyId: claimedId },
+      });
+    } catch {
+      // Session row is for admin visibility only.
+    }
+    return {
+      companyId: claimedId,
+      userId: user.id,
+      businessType,
+      companyName: profile.companyName,
+      token,
+      expiresAt,
+      seed: null,
+    };
+  }
 
   const company = await prisma.company.create({
     data: {

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { sweepExpiredSandboxes } from "@/lib/demoSandbox";
+import { prewarmSandboxes, sweepExpiredSandboxes } from "@/lib/demoSandbox";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
@@ -36,7 +36,14 @@ export async function GET(req: NextRequest) {
     // part that matters.
   }
 
-  const remaining = await prisma.company.count({ where: { isDemo: true } });
+  // Rebuild the shelf of ready-to-claim sandboxes so the next visitor walks
+  // straight in instead of waiting on a seed.
+  const prewarm = await prewarmSandboxes().catch(() => ({ built: 0, failed: 0 }));
 
-  return NextResponse.json({ swept, failed, bookingsClosed, remaining });
+  const [remaining, idle] = await Promise.all([
+    prisma.company.count({ where: { isDemo: true } }),
+    prisma.company.count({ where: { isDemo: true, demoExpiresAt: null } }),
+  ]);
+
+  return NextResponse.json({ swept, failed, bookingsClosed, prewarm, remaining, idle });
 }
