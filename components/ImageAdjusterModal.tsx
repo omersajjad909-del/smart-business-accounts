@@ -136,6 +136,15 @@ export default function ImageAdjusterModal({
     const onMouseUp = () => up();
 
     const onTouchMove = (e: TouchEvent) => {
+      // Only cancel the browser's own gesture while a drag or pinch of the
+      // image is actually under way. This used to call preventDefault() on
+      // every touchmove that reached the window, which silently disabled touch
+      // scrolling for the entire dashboard — page and sidebar both — on every
+      // phone, whether or not this modal was even open.
+      const dragging = dragRef.current !== null;
+      const pinching = e.touches.length === 2 && pinchRef.current !== null;
+      if (!dragging && !pinching) return;
+
       e.preventDefault();
       if (e.touches.length === 2 && pinchRef.current) {
         const dist = pinchDist(e.touches);
