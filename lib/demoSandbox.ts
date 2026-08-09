@@ -332,7 +332,9 @@ const CLEANUP_ORDER = [
   "Account",
   "Branch",
   "CostCenter",
-  "Notification",
+  // Notification is deliberately absent: it has no companyId (only an optional
+  // userId shared by every demo session), so there is no safe per-sandbox
+  // filter for it.
   "ActivityLog",
   "AuditLog",
   "Session",
@@ -366,6 +368,9 @@ const CHILD_CLEANUP: Record<string, { fk: string; parentIds: string }> = {
     fk: "opportunityId",
     parentIds: `SELECT id FROM "Opportunity" WHERE "contactId" IN (${OWNED_BY("Contact")})`,
   },
+  // InvoiceTax carries no companyId either, and leaving its rows behind blocks
+  // the TaxConfiguration delete on a foreign key.
+  InvoiceTax: { fk: "taxConfigurationId", parentIds: OWNED_BY("TaxConfiguration") },
   TaxAccount: { fk: "taxConfigurationId", parentIds: OWNED_BY("TaxConfiguration") },
   BankReconciliation: { fk: "bankAccountId", parentIds: OWNED_BY("BankAccount") },
 };
