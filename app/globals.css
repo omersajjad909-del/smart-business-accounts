@@ -619,8 +619,12 @@ html.dark .dashboard-root ::-webkit-scrollbar-thumb:hover { background: rgba(255
            auth, onboarding, and all public pages
 ═══════════════════════════════════════════════════════════════ */
 
-/* Base: prevent horizontal overflow on all pages */
-body { overflow-x: hidden; }
+/* Base: prevent horizontal overflow on all pages.
+   This lives on html, not body. On body it made the body its own scroll
+   container and killed vertical scrolling on mobile browsers; html is the
+   element the viewport actually scrolls, so clipping the x-axis here does the
+   same job without that side effect. */
+html { overflow-x: hidden; }
 img, video, svg { max-width: 100%; }
 
 /* ── Pricing page ── */
