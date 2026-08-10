@@ -2611,7 +2611,7 @@ export const AI_TOOL_META: Record<AiToolId, { icon: string; label: string; desc:
  */
 export function createDefaultDashboardFeatureFlags(): Record<DashboardFeaturePlanCode, string[]> {
   const forPlan = (planCode: "STARTER" | "PRO" | "ENTERPRISE"): string[] => {
-    const granted = new Set(PLAN_DEFAULT_PERMISSIONS[planCode] || []);
+    const granted = new Set<string>(PLAN_DEFAULT_PERMISSIONS[planCode] || []);
     return DASHBOARD_FEATURE_DEFS
       .filter((f) => !f.core || !f.permKey || granted.has(f.permKey))
       .map((f) => f.id);

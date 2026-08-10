@@ -1,7 +1,8 @@
 "use client";
 import { fmtDate } from "@/lib/dateUtils";
 
-import { useEffect, useLayoutEffect, useState, useRef, Suspense, createContext, useContext } from "react";
+import { useEffect, useLayoutEffect, useState, useRef, Suspense, createContext, useContext, Children, isValidElement } from "react";
+import type { ReactNode } from "react";
 import Link from "next/link";
 import dynamic from "next/dynamic";
 import { usePathname, useRouter } from "next/navigation";
@@ -740,14 +741,27 @@ export default function DashboardLayout({
       .sort((a, b) => b.prefix.length - a.prefix.length)[0];
     if (!matched) return;
 
-    // Wait for the plan permissions to load before bouncing anyone — otherwise
-    // a slow /api/public/plan-config turns every deep link into a redirect.
-    if (!allowedPlanPerms) return;
-
-    if (!hasPermission(currentUser, matched.permission)) {
+    if (!baseHasPermission(currentUser, matched.permission)) {
       router.replace("/dashboard");
     }
-  }, [ready, currentUser, pathname, router, allowedPlanPerms]);
+  }, [ready, currentUser, pathname, router]);
+
+  // ── Plan page guard ──────────────────────────────────────────
+  // The other half of the split: the guard above answers "is this user allowed
+  // to?", this one answers "does their plan include this page?" — and it reads
+  // the same Pages & Modules list the sidebar does, so a link you cannot see is
+  // also a URL you cannot open. Runs for admins too; a plan limit is not a role.
+  useEffect(() => {
+    if (!ready || !currentUser) return;
+    // null means "no restriction configured" — and waiting avoids bouncing a
+    // deep link while /api/me/bootstrap is still in flight.
+    if (!allowedDashboardFeatures) return;
+    if (pathname === "/dashboard") return;
+
+    const feature = findDashboardFeatureByRoute(pathname);
+    if (!feature) return;
+    if (!allowedDashboardFeatures.has(feature.id)) router.replace("/dashboard");
+  }, [ready, currentUser, pathname, router, allowedDashboardFeatures]);
 
   useLayoutEffect(() => {
     if (!currentUser?.companyId) return;
@@ -2848,6 +2862,17 @@ function NavDirectLink({ href, icon, children, pathname, exact }: {
   );
 }
 
+/** Every `href` handed to a descendant of a nav group, fragments included. */
+function collectNavHrefs(node: ReactNode, out: string[] = []): string[] {
+  Children.forEach(node, (child) => {
+    if (!isValidElement(child)) return;
+    const props = child.props as { href?: unknown; children?: ReactNode };
+    if (typeof props.href === "string") out.push(props.href);
+    if (props.children) collectNavHrefs(props.children, out);
+  });
+  return out;
+}
+
 function NavGroup({ title, icon, open, onToggle, children }: {
   title: string;
   icon: React.ReactNode;
@@ -2855,8 +2880,17 @@ function NavGroup({ title, icon, open, onToggle, children }: {
   onToggle: () => void;
   children: React.ReactNode;
 }) {
-  const { collapsed, expand } = useContext(SidebarCtx);
+  const { collapsed, expand, canShowHref } = useContext(SidebarCtx);
   const displayTitle = cleanNavLabel(title);
+
+  // Every NavLink hides itself when the plan does not include its page, so a
+  // group can end up with nothing inside it. Now that the plan gate lives on
+  // the links rather than on the group headings, drop the empty heading too —
+  // otherwise a Starter sidebar is full of sections that expand into nothing.
+  // Checking rendered output is not possible from here, so read the hrefs the
+  // children were given and ask the same question NavLink will ask.
+  const hrefs = collectNavHrefs(children);
+  if (hrefs.length > 0 && !hrefs.some(canShowHref)) return null;
 
   // Collapsed mode: show only icon, centered, with tooltip
   if (collapsed) {
