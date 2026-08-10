@@ -157,21 +157,11 @@ export function mapWorkOrderRecord(record: BusinessRecord): ManufacturingWorkOrd
   };
 }
 
-export function mapRawMaterialRecord(record: BusinessRecord): ManufacturingRawMaterial {
-  const currentStock = Number(record.data?.currentStock || 0);
-  const minStock = Number(record.data?.minStock || 10);
-  return {
-    id: record.id,
-    name: record.title,
-    unit: String(record.data?.unit || "kg"),
-    currentStock,
-    minStock,
-    unitCost: record.amount || 0,
-    supplier: String(record.data?.supplier || ""),
-    status: record.status || "available",
-    isLow: currentStock <= minStock,
-  };
-}
+// mapRawMaterialRecord used to live here, turning a `raw_material`
+// BusinessRecord into a material row. Raw materials are ItemNew rows now, with
+// stock and cost derived from InventoryTxn, so nothing maps that shape any more
+// — see loadManufacturingItems below. The ManufacturingRawMaterial type stays
+// because the control-centre response still uses it.
 
 export function mapFinishedGoodsRecord(record: BusinessRecord): ManufacturingFinishedGood {
   return {
