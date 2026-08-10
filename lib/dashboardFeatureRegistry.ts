@@ -2418,6 +2418,17 @@ export const DASHBOARD_FEATURE_DEFS: DashboardFeatureDefinition[] = [
  * plan does not include without needing a per-link check.
  */
 export const CORE_DASHBOARD_FEATURES: DashboardFeatureDefinition[] = [
+  // ── Industry sub-pages that had a sidebar link but no def, so nothing could
+  //    assign them to a plan. Not `core` — they stay scoped to their trade. ──
+  { id: "RETAIL_SALES_HISTORY", label: "Sales History", route: "/dashboard/retail/sales-history", section: "Point of Sale", business: "retail", businessLabel: "Retail / Multi-Store", businessTypes: ["retail"] },
+  { id: "RETAIL_CATEGORIES", label: "Categories", route: "/dashboard/retail/categories", section: "Inventory", business: "retail", businessLabel: "Retail / Multi-Store", businessTypes: ["retail"] },
+  { id: "RETAIL_STOCK_RECEIPTS", label: "Stock Receipts", route: "/dashboard/retail/stock-receipts", section: "Inventory", business: "retail", businessLabel: "Retail / Multi-Store", businessTypes: ["retail"] },
+  { id: "RENTAL_BOOKINGS_ALT", label: "Rental Bookings", route: "/dashboard/rental/bookings", section: "Operations", business: "rentals", businessLabel: "Rental Business", businessTypes: ["equipment_rental", "property_rental", "generator_rental", "car_rental"] },
+  { id: "RENTAL_AGREEMENTS_ALT", label: "Rental Agreements", route: "/dashboard/rental/agreements", section: "Operations", business: "rentals", businessLabel: "Rental Business", businessTypes: ["equipment_rental", "property_rental", "generator_rental", "car_rental"] },
+  { id: "PRINTING_ORDERS", label: "Print Orders", route: "/dashboard/printing/orders", section: "Production", business: "media", businessLabel: "Printing Press", businessTypes: ["printing_press"] },
+  { id: "PRINTING_PAPER_STOCK", label: "Paper Stock", route: "/dashboard/printing/paper-stock", section: "Production", business: "media", businessLabel: "Printing Press", businessTypes: ["printing_press"] },
+  { id: "PRINTING_DELIVERY", label: "Print Delivery", route: "/dashboard/printing/delivery", section: "Production", business: "media", businessLabel: "Printing Press", businessTypes: ["printing_press"] },
+
   // ── Sales & Purchase ──
   { id: "CORE_INVOICES", label: "All Invoices", route: "/dashboard/invoices", section: "Sales & Purchase", core: true, permKey: "VIEW_INVENTORY", business: "service", businessLabel: "Core (all businesses)" },
   { id: "CORE_PURCHASE_ORDER", label: "Purchase Order", route: "/dashboard/purchase-order", section: "Sales & Purchase", core: true, permKey: "CREATE_PURCHASE_ORDER", business: "service", businessLabel: "Core (all businesses)" },
