@@ -53,20 +53,20 @@ const DEFAULT_PLAN_HIGHLIGHTS = {
     "Multi-branch (up to 3)",
     "🤖 AI Assistant (ask anything)",
     "🤖 Smart invoice & expense AI",
-    "🤖 Business Operator automation",
   ],
   enterprise: [
     // Was "Unlimited users" — getMaxUsersForPlan caps Enterprise at 25.
     "Up to 25 users",
     "Everything in Professional",
     "Multi-branch (up to 10)",
-    "Multi-currency",
-    "API access & webhooks",
-    "Custom integrations",
-    "Audit trail & backup/restore",
-    "🤖 Full AI suite — forecast, anomaly & cash-flow",
-    "Priority support 24/7",
-    "Dedicated onboarding & account manager",
+    "Custom roles & approval workflows",
+    "Audit trail & system logs",
+    "Cost centers & multi-currency",
+    "API access, webhooks & custom integrations",
+    "Backup & restore",
+    "🤖 AI Business Operator — runs tasks for you",
+    "🤖 Forecasting, anomaly detection & cash-flow AI",
+    "Priority support 24/7 + dedicated account manager",
   ],
 };
 
@@ -162,11 +162,12 @@ const DEFAULT_CONFIG = {
         viewLedger: true, viewTrialBalance: true,
         // hrPayroll was false while PRO's permission list grants
         // VIEW_HR_PAYROLL and the pricing card advertises "HR & Payroll".
-        // backupRestore is Enterprise-only, matching PLAN_DEFAULT_PERMISSIONS.
+        // backupRestore and aiBusinessOperator are Enterprise-only, matching
+        // PLAN_DEFAULT_PERMISSIONS.
         advancedReports: true, bankReconciliation: true, inventoryReports: true,
         crm: true, hrPayroll: true, backupRestore: false,
         prioritySupport: true, multiBranch: true, apiAccess: false,
-        aiAssistant: true, aiBusinessOperator: true, aiSmartSuggestions: true,
+        aiAssistant: true, aiBusinessOperator: false, aiSmartSuggestions: true,
         aiForecast: false, aiAnomalyDetection: false, aiExpenseCategorization: true,
         aiNaturalLanguage: false, aiCashFlowPrediction: false,
       },
