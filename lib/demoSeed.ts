@@ -636,7 +636,10 @@ export async function seedDemoCompany(
       code,
       name,
       unit,
-      category: p.itemCategory,
+      // A manufacturer's item list holds both what it consumes and what it
+      // makes, and the two are not the same category — the BOM screen filters
+      // on it. Everywhere else every item shares the profile's one category.
+      category: code.startsWith("FG-") ? "FINISHED" : code.startsWith("RM-") ? "RAW_MATERIAL" : p.itemCategory,
       rate,
       purchaseRate,
       taxRate: p.taxRate,
