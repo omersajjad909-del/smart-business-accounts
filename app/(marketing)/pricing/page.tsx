@@ -701,6 +701,32 @@ export default function PricingPage() {
   // someone check out into an empty app.
   const needsCoreModule = selectedModules.length > 0 && !selectedModules.some(isStandalone);
   const toggleCat = (id: string) => setOpenCats(p => { const n = new Set(p); n.has(id) ? n.delete(id) : n.add(id); return n; });
+
+  // ── What the comparison table actually renders ───────────────────────────
+  // A row's three cells come from the admin Permissions screen whenever the row
+  // names a permission; otherwise they are the hardcoded values in COMPARISON.
+  const resolveRow = (feat: Feature): [Val, Val, Val] => {
+    const override = feat.permKey ? featureMap[feat.permKey] : undefined;
+    return override
+      ? [override.starter, override.pro, override.enterprise]
+      : [feat.starter, feat.pro, feat.enterprise];
+  };
+  // Untick a permission on all three plans and the feature is not part of the
+  // product on any plan — so the row is dropped instead of rendering as three
+  // dashes, and a category left with no rows disappears with it. Rows the admin
+  // screen cannot reach (Users, Branches, support promises) always stay.
+  const isRowVisible = (feat: Feature) => {
+    if (!feat.permKey || featureMap[feat.permKey] === undefined) return true;
+    return resolveRow(feat).some(v => v !== false && v !== null);
+  };
+  const visibleComparison = useMemo(
+    () =>
+      COMPARISON
+        .map(cat => ({ ...cat, features: cat.features.filter(isRowVisible) }))
+        .filter(cat => cat.features.length > 0),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [featureMap]
+  );
   const usersLabel = (v: number | null | undefined) => (v === null || v === undefined ? "Unlimited" : `Up to ${v}`);
 
   const ff = "'Outfit','DM Sans',sans-serif";
