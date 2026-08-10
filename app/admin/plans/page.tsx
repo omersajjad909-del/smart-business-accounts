@@ -351,6 +351,28 @@ export default function AdminPlansPage() {
     } finally { setSavingMod(null); }
   }
 
+  /* ─── Reset plan permissions to the recommended defaults ───
+     This screen seeds its checkboxes from the saved config, so once anything
+     has ever been saved there was no way back to the ladder in
+     PLAN_DEFAULT_PERMISSIONS — hitting Save just wrote the old values out
+     again, and the public pricing table kept rendering them. This puts the
+     defaults back into the boxes; Save then makes them live. */
+  function resetPlanPermissionsToDefaults() {
+    const ok = window.confirm(
+      "Reset Starter, Pro and Enterprise to the recommended permission ladder?\n\n" +
+      "This only changes the checkboxes — nothing is saved until you press " +
+      "\"Save Configuration\". Your Custom plan list is left alone."
+    );
+    if (!ok) return;
+    setPlanPermissions(prev => ({
+      ...prev,
+      STARTER:    [...PLAN_DEFAULT_PERMISSIONS.STARTER],
+      PRO:        [...PLAN_DEFAULT_PERMISSIONS.PRO],
+      ENTERPRISE: [...PLAN_DEFAULT_PERMISSIONS.ENTERPRISE],
+    }));
+    toast.success("Defaults loaded — press Save Configuration to apply");
+  }
+
   /* ─── Toggle plan permission ─── */
   function togglePlanPermission(planCode: PlanCode, perm: string) {
     setPlanPermissions(prev => {
@@ -508,7 +530,20 @@ export default function AdminPlansPage() {
 
       {/* ══ TAB: PERMISSIONS ══ */}
       {tab === "permissions" && !loadingConfig && (
-        <Card title="Plan Permissions" subtitle="Tick which permissions each plan includes">
+        <Card title="Plan Permissions" subtitle="Tick which permissions each plan includes — this drives both the dashboard and the public pricing table">
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 14, flexWrap: "wrap", marginBottom: 18, padding: "12px 16px", borderRadius: 12, background: "rgba(79,70,229,.08)", border: "1px solid rgba(79,70,229,.22)" }}>
+            <div style={{ fontSize: 12, color: "#94a3b8", lineHeight: 1.6, maxWidth: 620 }}>
+              Unticking a permission here removes its ✓ from the matching row on{" "}
+              <span style={{ fontFamily: "monospace", fontSize: 11, color: "#c7d2fe" }}>/pricing</span>{" "}
+              and locks the page in the dashboard. Changes go live about a minute after saving — no deploy needed.
+            </div>
+            <button
+              onClick={resetPlanPermissionsToDefaults}
+              style={{ flexShrink: 0, padding: "9px 16px", borderRadius: 10, border: "1px solid rgba(148,163,184,.28)", background: "rgba(255,255,255,.04)", color: "#cbd5e1", fontSize: 12, fontWeight: 700, cursor: "pointer" }}
+            >
+              ↺ Reset to recommended
+            </button>
+          </div>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))", gap: 16 }}>
             {(["STARTER", "PRO", "ENTERPRISE", "CUSTOM"] as const).map(pc => {
               const count = (planPermissions[pc] || []).length;
