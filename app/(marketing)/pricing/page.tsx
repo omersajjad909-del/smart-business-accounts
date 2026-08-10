@@ -91,19 +91,19 @@ const DEFAULT_HIGHLIGHTS = {
     "Multi-branch (up to 3)",
     "🤖 AI Assistant (ask anything)",
     "🤖 Smart invoice & expense AI",
-    "🤖 Business Operator automation",
   ],
   enterprise: [
     "Up to 25 users",
     "Everything in Professional",
     "Multi-branch (up to 10)",
-    "Multi-currency",
-    "API access & webhooks",
-    "Custom integrations",
-    "Audit trail & backup/restore",
-    "🤖 Full AI suite — forecast, anomaly & cash-flow",
-    "Priority support 24/7",
-    "Dedicated onboarding & account manager",
+    "Custom roles & approval workflows",
+    "Audit trail & system logs",
+    "Cost centers & multi-currency",
+    "API access, webhooks & custom integrations",
+    "Backup & restore",
+    "🤖 AI Business Operator — runs tasks for you",
+    "🤖 Forecasting, anomaly detection & cash-flow AI",
+    "Priority support 24/7 + dedicated account manager",
   ],
 };
 
@@ -364,8 +364,9 @@ const COMPARISON: Category[] = [
     title: "AI Features",
     features: [
       { name: "AI assistant (ask anything)",    permKey: "AI_ASSISTANT",             starter: false, pro: true,  enterprise: true },
-      // Pro holds AI_BUSINESS_OPERATOR; this row sold it as Enterprise-only.
-      { name: "AI Business Operator",           permKey: "AI_BUSINESS_OPERATOR",     starter: false, pro: true,  enterprise: true, tooltip: "An AI agent that can run tasks, answer business questions, and suggest actions autonomously" },
+      // Bundled with Enterprise; Starter and Pro can buy it as the Business
+      // Automation add-on.
+      { name: "AI Business Operator",           permKey: "AI_BUSINESS_OPERATOR",     starter: false, pro: false, enterprise: true, tooltip: "An AI agent that runs tasks, answers business questions and suggests actions on its own. Included in Enterprise; available as an add-on on Starter and Professional." },
       { name: "Smart invoice suggestions",      permKey: "AI_SMART_SUGGESTIONS",     starter: false, pro: true,  enterprise: true },
       { name: "AI-powered sales forecast",      permKey: "AI_FORECAST",              starter: false, pro: false, enterprise: true },
       { name: "Anomaly & fraud detection",      permKey: "AI_ANOMALY_DETECTION",     starter: false, pro: false, enterprise: true },
@@ -383,7 +384,7 @@ const COMPARISON: Category[] = [
       { name: "Tax summary report", permKey: "VIEW_FINANCIAL_REPORTS", starter: true, pro: true, enterprise: true },
       { name: "Tax forecast", permKey: "VIEW_PROFIT_LOSS_REPORT", starter: false, pro: true, enterprise: true },
       { name: "FBR / compliance docs", permKey: "TAX_CONFIGURATION", starter: false, pro: true, enterprise: true },
-      { name: "Audit & exception log", permKey: "VIEW_AUDIT_LOG", starter: false, pro: true, enterprise: true },
+      { name: "Audit & exception log", permKey: "VIEW_AUDIT_LOG", starter: false, pro: false, enterprise: true },
       { name: "17+ tax type support", permKey: "TAX_CONFIGURATION", starter: false, pro: true, enterprise: true },
     ],
   },
