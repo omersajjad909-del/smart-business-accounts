@@ -71,6 +71,29 @@ const DEFAULT_PLAN_HIGHLIGHTS = {
   ],
 };
 
+function normalizePlanHighlights(saved: unknown) {
+  const savedHighlights = (saved && typeof saved === "object")
+    ? saved as Partial<Record<keyof typeof DEFAULT_PLAN_HIGHLIGHTS, unknown>>
+    : {};
+
+  return Object.fromEntries(
+    Object.entries(DEFAULT_PLAN_HIGHLIGHTS).map(([plan, defaults]) => {
+      const savedList = Array.isArray(savedHighlights[plan as keyof typeof DEFAULT_PLAN_HIGHLIGHTS])
+        ? (savedHighlights[plan as keyof typeof DEFAULT_PLAN_HIGHLIGHTS] as unknown[])
+            .filter((item): item is string => typeof item === "string" && item.trim().length > 0)
+        : [];
+
+      if (!savedList.length) return [plan, defaults];
+
+      const merged = [...savedList];
+      for (const item of defaults) {
+        if (!merged.includes(item)) merged.push(item);
+      }
+      return [plan, merged];
+    })
+  ) as typeof DEFAULT_PLAN_HIGHLIGHTS;
+}
+
 // `standalone: true` means the module is a complete product on its own — it is
 // offered as a single-app subscription on /pricing. Keep in sync with
 // STANDALONE_MODULE_IDS in lib/customPlanPricing.ts.
@@ -177,9 +200,7 @@ export async function GET() {
             }
           : DEFAULT_SEAT_PRICING,
         customPlan: mergeCustomPlan(payload?.customPlan),
-        planHighlights: payload?.planHighlights
-          ? { ...DEFAULT_PLAN_HIGHLIGHTS, ...payload.planHighlights }
-          : DEFAULT_PLAN_HIGHLIGHTS,
+        planHighlights: normalizePlanHighlights(payload?.planHighlights),
         features: payload?.features ?? null,
         featureMatrix: payload?.featureMatrix ?? null,
         pkrPricing,

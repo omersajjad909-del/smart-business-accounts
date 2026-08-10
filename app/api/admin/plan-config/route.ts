@@ -70,6 +70,29 @@ const DEFAULT_PLAN_HIGHLIGHTS = {
   ],
 };
 
+function normalizePlanHighlights(saved: unknown) {
+  const savedHighlights = (saved && typeof saved === "object")
+    ? saved as Partial<Record<keyof typeof DEFAULT_PLAN_HIGHLIGHTS, unknown>>
+    : {};
+
+  return Object.fromEntries(
+    Object.entries(DEFAULT_PLAN_HIGHLIGHTS).map(([plan, defaults]) => {
+      const savedList = Array.isArray(savedHighlights[plan as keyof typeof DEFAULT_PLAN_HIGHLIGHTS])
+        ? (savedHighlights[plan as keyof typeof DEFAULT_PLAN_HIGHLIGHTS] as unknown[])
+            .filter((item): item is string => typeof item === "string" && item.trim().length > 0)
+        : [];
+
+      if (!savedList.length) return [plan, defaults];
+
+      const merged = [...savedList];
+      for (const item of defaults) {
+        if (!merged.includes(item)) merged.push(item);
+      }
+      return [plan, merged];
+    })
+  ) as typeof DEFAULT_PLAN_HIGHLIGHTS;
+}
+
 const DEFAULT_CUSTOM_PLAN = {
   basePrice: 0,
   yearlyDiscount: 20,
@@ -226,7 +249,7 @@ export async function GET(req: NextRequest) {
         pricing: { ...DEFAULT_PRICING, ...(saved.pricing || {}) },
         seatPricing: { ...DEFAULT_SEAT_PRICING, ...(saved.seatPricing || {}) },
         customPlan: { ...DEFAULT_CUSTOM_PLAN, ...(saved.customPlan || {}), modules: saved.customPlan?.modules ?? DEFAULT_CUSTOM_PLAN.modules },
-        planHighlights: { ...DEFAULT_PLAN_HIGHLIGHTS, ...(saved.planHighlights || {}) },
+        planHighlights: normalizePlanHighlights(saved.planHighlights),
         planPermissions: normalizePlanPermissions(saved.planPermissions),
         dashboardFeatureFlags: normalizeDashboardFeatureFlags(saved.dashboardFeatureFlags),
       });
