@@ -6,10 +6,12 @@ import { DASHBOARD_FEATURE_IDS, createDefaultDashboardFeatureFlags } from "@/lib
 const ADMIN_ONLY = "ADMIN";
 
 // Default PKR prices (in Pakistani Rupees)
+// Enterprise was 14,999 here while the saved config the live site serves says
+// 19,999 — so the admin editor opened on a price we do not actually charge.
 export const DEFAULT_PKR_PRICING = {
   starter:    { monthly: 3999,  yearly: 3199  },  // PKR/mo · PKR/mo billed yearly (20% off)
   pro:        { monthly: 8999,  yearly: 7199  },
-  enterprise: { monthly: 14999, yearly: 11999 },
+  enterprise: { monthly: 19999, yearly: 15999 },
 };
 
 export const DEFAULT_PKR_SEAT_PRICING = {
