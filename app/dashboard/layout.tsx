@@ -596,10 +596,17 @@ export default function DashboardLayout({
   }, []);
 
 
-  const hasPermission = (user: any, perm: string) => {
-    if (!allowedPlanPerms) return baseHasPermission(user, perm);
-    return baseHasPermission(user, perm) && allowedPlanPerms.has(perm);
-  };
+  // Two independent questions, two owners:
+  //
+  //   "is this user allowed to do it?"  → their own role/permissions, below
+  //   "does their plan include it?"     → Plans → Pages & Modules, via
+  //                                        canShowDashboardHref on every NavLink
+  //
+  // This used to AND the plan's permission list in here, which made Plans →
+  // Permissions a second dashboard gate — so the same page could be granted in
+  // the page grid and revoked by the permission screen. Permissions now only
+  // describes what /pricing advertises.
+  const hasPermission = (user: any, perm: string) => baseHasPermission(user, perm);
 
   const canShowDashboardUtilities = !isCustomPlan;
   const canShowBranchSelector = branches.length > 0 && (!isCustomPlan || hasCustomActiveModule("multi_branch"));
