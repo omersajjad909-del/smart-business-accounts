@@ -4,7 +4,10 @@ import toast from "react-hot-toast";
 
 import { useMemo, useState } from "react";
 import { useBusinessRecords } from "@/lib/useBusinessRecords";
-import { mapBomRecord, mapFinishedGoodsRecord, mapProductionOrderRecord, mapWorkOrderRecord } from "../_shared";
+import {
+  mapBomRecord, mapFinishedGoodsRecord, mapProductionOrderRecord, mapWorkOrderRecord,
+  quoteProductionRun, type ProductionRunQuote,
+} from "../_shared";
 import { useResponsive } from "@/hooks/useResponsive";
 
 const ff = "'Outfit','Inter',sans-serif";
@@ -83,29 +86,60 @@ export default function ProductionOrdersPage() {
     await orderStore.update(orderId, { status: "in_progress" });
   }
 
-  async function completeOrder(order: ReturnType<typeof mapProductionOrderRecord>) {
+  /**
+   * Completing an order used to just flip a status and write a finished-goods
+   * row — no material left stock and nothing reached the ledger. Now it opens a
+   * costed preview first; the server does the consuming and posting.
+   */
+  async function openCompleteDialog(order: ProductionOrder) {
     const linkedWorkOrders = workOrders.filter((item) => item.linkedProductionOrderId === order.orderId);
     if (linkedWorkOrders.some((item) => item.status !== "completed")) {
       toast("Complete linked work orders before finishing this production order.");
       return;
     }
-    await orderStore.update(order.id, {
-      status: "completed",
-      data: { completed: order.quantity },
-    });
+    const remaining = Math.max(order.quantity - order.completed, 1);
+    setRunOrder(order);
+    setRunQty(remaining);
+    setRunError("");
+    setRunQuote(null);
+    setQuoting(true);
+    const quote = await quoteProductionRun(order.id, remaining);
+    setQuoting(false);
+    if (!quote) { setRunError("Could not reach the server."); return; }
+    if (quote.error) { setRunError(quote.error); return; }
+    setRunQuote(quote);
+  }
 
-    if (!finishedGoods.some((item) => item.productionOrderId === order.orderId)) {
-      await goodsStore.create({
-        title: order.product,
-        status: "available",
-        date: order.plannedDate || new Date().toISOString().slice(0, 10),
-        data: {
-          batchNo: `FG-${String(finishedGoods.length + 1).padStart(4, "0")}`,
-          quantity: order.quantity,
-          warehouse: "Main Warehouse",
-          productionOrderId: order.orderId,
-        },
+  async function requote(qty: number) {
+    if (!runOrder || qty <= 0) return;
+    setQuoting(true);
+    const quote = await quoteProductionRun(runOrder.id, qty);
+    setQuoting(false);
+    if (quote && !quote.error) setRunQuote(quote);
+  }
+
+  async function confirmRun() {
+    if (!runOrder) return;
+    setRunning(true);
+    setRunError("");
+    try {
+      const res = await fetch("/api/manufacturing/production-orders/complete", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ productionOrderId: runOrder.id, producedQty: runQty, allowNegativeStock: allowShort }),
       });
+      const body = await res.json();
+      if (!res.ok) throw new Error(body?.error || "Could not complete the run.");
+      toast.success(
+        `${body.producedQty} units received · batch ${body.batchNo} · Rs. ${Math.round(body.totalCost).toLocaleString()} to Finished Goods`,
+      );
+      setRunOrder(null);
+      setRunQuote(null);
+      await Promise.all([orderStore.refetch?.(), goodsStore.refetch?.()]);
+    } catch (e) {
+      setRunError(e instanceof Error ? e.message : "Could not complete the run.");
+    } finally {
+      setRunning(false);
     }
   }
 
