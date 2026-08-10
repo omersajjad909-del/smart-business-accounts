@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { PLAN_DEFAULT_PERMISSIONS } from "@/lib/planPermissions";
+import { PERMISSIONS } from "@/lib/permissions";
 
 // Maps each permission key → which plans have it by default
 // Admin overrides (saved via /api/admin/plan-config) will override these defaults
@@ -28,7 +29,15 @@ export async function GET(_req: NextRequest) {
     }
 
     // Return as a simple map: permissionKey → { starter, pro, enterprise }
+    //
+    // Built over every known permission, NOT over the union of the three saved
+    // lists. With the union, a permission the admin unticked on all three plans
+    // dropped out of the map entirely — and the pricing table treats a missing
+    // key as "no override" and falls back to its hardcoded row. So unticking a
+    // feature everywhere made its ticks reappear on the public page, which is
+    // the exact opposite of what the admin asked for.
     const allKeys = Array.from(new Set([
+      ...Object.values(PERMISSIONS) as string[],
       ...planPermissions.STARTER,
       ...planPermissions.PRO,
       ...planPermissions.ENTERPRISE,
