@@ -202,12 +202,14 @@ const COMPARISON: Category[] = [
       { name: "Custom domain (white-label)", starter: false, pro: false, enterprise: true },
       { name: "API access", permKey: "API_ACCESS", starter: false, pro: false, enterprise: true },
       { name: "Webhooks & integrations", permKey: "API_ACCESS", starter: false, pro: false, enterprise: true },
-      // No permKey: "Basic" on Starter is MANAGE_USERS (invite your 3 seats);
-      // MANAGE_ROLES is what makes it "Advanced" from Pro up.
-      { name: "Role-based permissions", starter: "Basic", pro: "Advanced", enterprise: "Custom" },
-      { name: "Approval workflows", permKey: "MANAGE_APPROVALS", starter: false, pro: true, enterprise: true },
-      { name: "Cost centers", permKey: "MANAGE_COST_CENTERS", starter: false, pro: true, enterprise: true },
-      { name: "Audit trail", permKey: "VIEW_AUDIT_LOG", starter: false, pro: true, enterprise: true },
+      // No permKey: Starter and Pro both run on MANAGE_USERS (invite seats,
+      // assign the built-in roles). MANAGE_ROLES — custom roles — is the
+      // Enterprise row directly below.
+      { name: "Role-based permissions", starter: "Basic", pro: "Standard", enterprise: "Custom" },
+      { name: "Approval workflows", permKey: "MANAGE_APPROVALS", starter: false, pro: false, enterprise: true },
+      { name: "Cost centers", permKey: "MANAGE_COST_CENTERS", starter: false, pro: false, enterprise: true },
+      { name: "Custom roles", permKey: "MANAGE_ROLES", starter: false, pro: false, enterprise: true },
+      { name: "Audit trail & system logs", permKey: "VIEW_AUDIT_LOG", starter: false, pro: false, enterprise: true },
       { name: "Backup & restore", permKey: "BACKUP_RESTORE", starter: false, pro: false, enterprise: true },
     ],
   },

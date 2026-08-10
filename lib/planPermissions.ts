@@ -252,8 +252,6 @@ export const PLAN_DEFAULT_PERMISSIONS: Record<string, PermissionValue[]> = {
     // Core
     PERMISSIONS.VIEW_DASHBOARD,
     PERMISSIONS.VIEW_SETTINGS,
-    PERMISSIONS.VIEW_LOGS,
-    PERMISSIONS.VIEW_AUDIT_LOG,
 
     // Accounts
     PERMISSIONS.VIEW_ACCOUNTS,
@@ -322,35 +320,39 @@ export const PLAN_DEFAULT_PERMISSIONS: Record<string, PermissionValue[]> = {
     PERMISSIONS.TRADING_CONVERSION_CENTER,
     PERMISSIONS.TRADING_ANALYTICS,
 
-    // Organization
+    // Organization — run the team, but governance stays Enterprise
     PERMISSIONS.MANAGE_USERS,
-    PERMISSIONS.MANAGE_ROLES,
     PERMISSIONS.VIEW_HR_PAYROLL,
     PERMISSIONS.VIEW_CRM,
     PERMISSIONS.BUDGET_PLANNING,
     PERMISSIONS.RECURRING_TRANSACTIONS,
     PERMISSIONS.FINANCIAL_YEAR,
-    PERMISSIONS.MANAGE_APPROVALS,
 
-    // Scale — branches and cost centres, but not currencies or the API
+    // Scale — branches (capped at 3 by branchLimits), but not currencies,
+    // cost centres or the API
     PERMISSIONS.MULTI_BRANCH,
-    PERMISSIONS.MANAGE_COST_CENTERS,
 
-    // AI — assistant and automation, not the predictive suite
+    // AI — the assistant and the everyday helpers, not the autonomous agent
+    // and not the predictive suite
     PERMISSIONS.AI_ASSISTANT,
-    PERMISSIONS.AI_BUSINESS_OPERATOR,
     PERMISSIONS.AI_SMART_SUGGESTIONS,
     PERMISSIONS.AI_EXPENSE_CATEGORIZATION,
 
-    // The comment here used to say AI_BUSINESS_OPERATOR was excluded while the
-    // line above granted it. Pro keeps it — that is what the pricing page sells.
-    // NO: AI_FORECAST, AI_ANOMALY_DETECTION, AI_NATURAL_LANGUAGE,
-    //     AI_CASH_FLOW_PREDICTION
-    // NO: MULTI_CURRENCY, API_ACCESS, BACKUP_RESTORE, EMAIL_SETTINGS
+    // Deliberately NOT in Pro — this is what Enterprise is for. An earlier pass
+    // pushed all of these down into Pro, which left Enterprise as "Pro plus a
+    // bigger user count", i.e. nothing anyone would upgrade for.
+    //
+    // Governance:  VIEW_AUDIT_LOG, VIEW_LOGS, MANAGE_ROLES, MANAGE_APPROVALS,
+    //              MANAGE_COST_CENTERS, BACKUP_RESTORE, EMAIL_SETTINGS
+    // Integration: API_ACCESS, MULTI_CURRENCY
+    // AI:          AI_BUSINESS_OPERATOR (also sold as an add-on to lower
+    //              plans), AI_FORECAST, AI_ANOMALY_DETECTION,
+    //              AI_NATURAL_LANGUAGE, AI_CASH_FLOW_PREDICTION
   ],
 
   // ── ENTERPRISE ─────────────────────────────────────────────────────────────
-  // Everything — all features, all AI, audit, backup, API, multi-currency
+  // Everything — plus the governance, integration and predictive-AI block that
+  // Pro deliberately does not get. See the note at the end of PRO.
   ENTERPRISE: [...ALL_PERMISSION_VALUES],
 };
 
