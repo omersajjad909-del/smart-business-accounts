@@ -627,7 +627,13 @@ export default function PricingPage() {
             }));
           }
           if (d?.planHighlights) {
-            setPlanHighlights(h => ({ ...h, ...d.planHighlights }));
+            // The API keys the middle plan "pro"; PLANS keys it "professional",
+            // and the card reads planHighlights[plan.slug]. Spreading the raw
+            // response therefore added a "pro" entry nobody reads and left the
+            // Professional card permanently on its hardcoded fallback — admin
+            // edits to it did nothing. Normalise the key on the way in.
+            const { pro, ...rest } = d.planHighlights as Record<string, string[]>;
+            setPlanHighlights(h => ({ ...h, ...rest, ...(pro ? { professional: pro } : {}) }));
           }
           if (d?.pkrPricing) {
             setPkrPricing({
