@@ -694,17 +694,7 @@ export default function PricingPage() {
   const buildCustomHref = () =>
     `/onboarding/choose-plan?plan=custom&modules=${selectedModules.join(",")}&extraUsers=${extraUsers}&extraBranches=${extraBranches}&cycle=${billing}&currency=${currency}&country=${country}`;
   const toggleModule = (id: string) => setSelectedModules(p => p.includes(id) ? p.filter(x => x !== id) : [...p, id]);
-  // Single-app buy: clear everything else so the estimate shows exactly what
-  // that one module costs, and drop the seat/branch add-ons that only make
-  // sense on a bigger package.
-  const selectOnlyModule = (id: string) => {
-    setSelectedModules([id]);
-    setExtraUsers(0);
-    setExtraBranches(0);
-    if (typeof document !== "undefined") {
-      document.getElementById("custom")?.scrollIntoView({ behavior: "smooth", block: "start" });
-    }
-  };
+  // selectOnlyModule was the "Pick this only" handler on the removed grid.
   const isStandalone = (id: string) => STANDALONE_IDS.has(id);
   const standaloneOnly = selectedModules.length === 1 && isStandalone(selectedModules[0]);
   // A package of only layer-on modules cannot run — flag it instead of letting
@@ -726,7 +716,6 @@ export default function PricingPage() {
         @media(max-width:900px){
           .pg{grid-template-columns:1fr !important}
           .cg{grid-template-columns:1fr !important}
-          .sa-grid{grid-template-columns:repeat(2,1fr) !important}
         }
 
         /* Comparison table — sticky first column on mobile */
@@ -771,7 +760,6 @@ export default function PricingPage() {
           /* Custom plan */
           .cp-row{flex-direction:column !important;}
           .cp-sidebar{width:100% !important;position:static !important;top:auto !important;}
-          .sa-grid{grid-template-columns:1fr !important;}
           .mod-grid{grid-template-columns:1fr !important;}
 
           /* FAQ */
