@@ -36,6 +36,7 @@ export const DEMO_BUSINESS_TYPES = [
   "import_company",
   "clearing_forwarding",
   "wholesale",
+  "manufacturing",
 ] as const;
 
 export type DemoBusinessType = (typeof DEMO_BUSINESS_TYPES)[number];
@@ -407,6 +408,75 @@ const PROFILES: Record<DemoBusinessType, DemoProfile> = {
       ["Loading labour — monthly", "5026", 148000, "OTHER"],
       ["Warehouse electricity", A.UTILITIES, 68000, "UTILITIES"],
       ["Packing material & straps", A.OFFICE, 34000, "SUPPLIES"],
+    ],
+  },
+
+  // Items here are the raw materials a run consumes plus the goods it produces,
+  // so the seeded company can open Manufacturing → BOM and build a real costed
+  // production order against stock that actually exists. Codes are prefixed
+  // RM-/FG- to match what /api/manufacturing/items generates.
+  manufacturing: {
+    label: "Manufacturing",
+    emoji: "🏭",
+    companyName: "Sialkot Steel & Furniture Works",
+    taxRate: 18,
+    itemCategory: "RAW_MATERIAL",
+    branches: [
+      ["FAC", "Production Unit — Sialkot", "Sialkot"],
+      ["WH1", "Finished Goods Store", "Sialkot"],
+    ],
+    customers: [
+      ["Al-Fatah Furniture Mart", "Lahore", 30, 486000],
+      ["Metro Office Supplies", "Islamabad", 45, 232000],
+      ["Gujrat Home Centre", "Gujrat", 30, 0],
+      ["Karachi Interior House", "Karachi", 60, 375000],
+    ],
+    suppliers: [
+      ["Pak Steel Traders", "Lahore", 640000],
+      ["Chenab Timber Depot", "Gujranwala", 285000],
+      ["Ravi Paints & Chemicals", "Lahore", 0],
+      ["National Hardware Supply", "Sialkot", 118000],
+    ],
+    items: [
+      // Raw materials — what production consumes
+      ["RM-101", "MS Steel Sheet 4x8 — 18 Gauge", "SHEET", 8600, 0, 240, 60],
+      ["RM-102", "Steel Pipe 1 inch — 20ft", "PCS", 1450, 0, 520, 120],
+      ["RM-103", "Sheesham Wood Plank — 6ft", "PCS", 3800, 0, 180, 40],
+      ["RM-104", "Powder Coat Paint — 25kg Drum", "DRUM", 14500, 0, 26, 8],
+      ["RM-105", "Foam Sheet 2 inch", "SHEET", 2200, 0, 145, 40],
+      ["RM-106", "Nuts, Bolts & Fittings — Kit", "KIT", 640, 0, 900, 200],
+      ["RM-107", "Rexine Upholstery — Metre", "MTR", 780, 0, 620, 150],
+      // Finished goods — what production produces
+      ["FG-201", "Executive Office Chair", "PCS", 0, 18500, 0, 10],
+      ["FG-202", "Steel Filing Cabinet — 4 Drawer", "PCS", 0, 27400, 0, 8],
+      ["FG-203", "Office Desk 5ft — Sheesham Top", "PCS", 0, 42000, 0, 6],
+      ["FG-204", "Steel Almirah — 6ft", "PCS", 0, 34800, 0, 6],
+    ],
+    employees: [
+      ["Tanveer", "Ahmed", "Production Manager", "Production", 165000],
+      ["Zahid", "Hussain", "Floor Supervisor", "Production", 92000],
+      ["Naveed", "Akhtar", "Quality Inspector", "Quality", 78000],
+      ["Farhan", "Ali", "Store Keeper", "Operations", 58000],
+      ["Uzma", "Siddiqui", "Cost Accountant", "Finance", 125000],
+      ["Imran", "Bashir", "Machine Operator", "Production", 52000],
+    ],
+    extraAccounts: [
+      // The three the posting engine writes to. Codes match MFG_ACCOUNTS in
+      // lib/manufacturingPosting.ts, so a demo run posts into these and the
+      // balances are visible immediately in the trial balance.
+      ["1200", "Raw Material Stock", "ASSET", "STOCK"],
+      ["1201", "Work In Progress", "ASSET", "STOCK"],
+      ["1202", "Finished Goods", "ASSET", "STOCK"],
+      ["5030", "Factory Wages", "EXPENSE", "EXPENSE"],
+      ["5031", "Machine Maintenance", "EXPENSE", "EXPENSE"],
+      ["5032", "Factory Power & Fuel", "EXPENSE", "EXPENSE"],
+    ],
+    expenses: [
+      ["Factory wages — production floor", "5030", 486000, "OTHER"],
+      ["Machine servicing & spares", "5031", 132000, "OTHER"],
+      ["Factory electricity & gas", "5032", 295000, "UTILITIES"],
+      ["Factory rent", A.RENT, 240000, "OTHER"],
+      ["Packing & crating material", A.OFFICE, 58000, "SUPPLIES"],
     ],
   },
 };
