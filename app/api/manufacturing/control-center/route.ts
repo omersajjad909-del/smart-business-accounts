@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { resolveCompanyId } from "@/lib/tenant";
+import { getStockOnHand, getAverageCosts } from "@/lib/manufacturingPosting";
 
 function normalizeRole(value: string | null | undefined) {
   return String(value || "").trim().toUpperCase();
@@ -19,7 +20,11 @@ export async function GET(req: NextRequest) {
     prisma.businessRecord.findMany({ where: { companyId, category: "bom" }, orderBy: { createdAt: "desc" } }),
     prisma.businessRecord.findMany({ where: { companyId, category: "production_order" }, orderBy: { createdAt: "desc" } }),
     prisma.businessRecord.findMany({ where: { companyId, category: "work_order" }, orderBy: { createdAt: "desc" } }),
-    prisma.businessRecord.findMany({ where: { companyId, category: "raw_material" }, orderBy: { createdAt: "desc" } }),
+    prisma.itemNew.findMany({
+      where: { companyId, deletedAt: null, category: "RAW_MATERIAL" },
+      select: { id: true, name: true, unit: true, minStock: true, purchaseRate: true },
+      orderBy: { name: "asc" },
+    }),
     prisma.businessRecord.findMany({ where: { companyId, category: "finished_good_batch" }, orderBy: { createdAt: "desc" } }),
     prisma.businessRecord.findMany({ where: { companyId, category: "quality_check" }, orderBy: { createdAt: "desc" } }),
   ]);
@@ -66,22 +71,30 @@ export async function GET(req: NextRequest) {
       linkedProductionOrderId: String(data.linkedProductionOrderId || ""),
     };
   });
-  const mappedMaterials = materials.map((record) => {
-    const data = (record.data || {}) as Record<string, unknown>;
-    const currentStock = Number(data.currentStock || 0);
-    const minStock = Number(data.minStock || 10);
+  // Raw materials are real inventory now: stock and cost are derived from
+  // InventoryTxn rather than read off a hand-typed BusinessRecord field, so this
+  // panel agrees with the stock reports and the Raw Material Stock account.
+  const materialIds = materials.map((item) => item.id);
+  const [materialStock, materialCosts] = await Promise.all([
+    getStockOnHand(prisma, companyId, materialIds),
+    getAverageCosts(prisma, companyId, materialIds),
+  ]);
+  const mappedMaterials = materials.map((item) => {
+    const currentStock = materialStock.get(item.id) ?? 0;
+    const unitCost = materialCosts.get(item.id) ?? item.purchaseRate;
     return {
-      id: record.id,
-      name: record.title,
-      unit: String(data.unit || "kg"),
+      id: item.id,
+      name: item.name,
+      unit: item.unit,
       currentStock,
-      minStock,
-      unitCost: Number(record.amount || 0),
-      supplier: String(data.supplier || ""),
-      status: String(record.status || "available"),
-      isLow: currentStock <= minStock,
+      minStock: item.minStock,
+      unitCost,
+      supplier: "",
+      status: currentStock <= item.minStock ? "low_stock" : "available",
+      isLow: currentStock <= item.minStock,
     };
   });
+
   const mappedFinishedGoods = finishedGoods.map((record) => {
     const data = (record.data || {}) as Record<string, unknown>;
     return {
@@ -113,10 +126,10 @@ export async function GET(req: NextRequest) {
     summary: {
       bomCount: boms.length,
       plannedProduction: mappedProduction.filter((item) => item.status === "planned").length,
-      runningProduction: mappedProduction.filter((item) => item.status === "in_progress").length,
+      runningProduction: mappedProduction.filter((item) => item.status === "in_progress" || item.status === "running").length,
       completedProduction: mappedProduction.filter((item) => item.status === "completed").length,
       openWorkOrders: mappedWorkOrders.filter((item) => item.status !== "completed").length,
-      blockedProduction: mappedProduction.filter((item) => item.status === "in_progress" && mappedWorkOrders.some((work) => work.linkedProductionOrderId === item.orderId && work.status !== "completed")).length,
+      blockedProduction: mappedProduction.filter((item) => (item.status === "in_progress" || item.status === "running") && mappedWorkOrders.some((work) => work.linkedProductionOrderId === item.orderId && work.status !== "completed")).length,
       lowMaterials: mappedMaterials.filter((item) => item.isLow).length,
       materialValue: mappedMaterials.reduce((sum, item) => sum + item.currentStock * item.unitCost, 0),
       finishedQuantity: mappedFinishedGoods.reduce((sum, item) => sum + item.quantity, 0),
