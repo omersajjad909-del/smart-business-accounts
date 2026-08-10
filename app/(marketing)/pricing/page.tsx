@@ -153,16 +153,8 @@ const MODULE_CATEGORIES = [
 // whether the module only layers on top of something else.
 const STANDALONE_IDS = new Set<string>(STANDALONE_MODULE_IDS);
 
-// Single-app pitches — what the account actually looks like when this is the
-// only module on it. Ordered by how often people ask for it on its own.
-const STANDALONE_APPS = [
-  { id: "hr_payroll",          label: "Payroll & HR",     icon: "👨‍💼", color: "#f472b6", points: ["Employees & attendance", "Monthly salary run + payslips", "Advance salary & loans"] },
-  { id: "crm",                 label: "CRM",              icon: "👥",   color: "#a5b4fc", points: ["Contacts & companies", "Sales pipeline & leads", "Interaction history"] },
-  { id: "inventory",           label: "Inventory",        icon: "📦",   color: "#38bdf8", points: ["Stock in / stock out", "GRN & barcode scanning", "Low-stock alerts"] },
-  { id: "accounting",          label: "Accounting",       icon: "📒",   color: "#818cf8", points: ["Invoices & vouchers", "Ledger & trial balance", "P&L and balance sheet"] },
-  { id: "trading",             label: "Trading Desk",     icon: "🔄",   color: "#fbbf24", points: ["Order desk & procurement", "Dispatch board", "Outstandings & conversions"] },
-  { id: "bank_reconciliation", label: "Bank & Payments",  icon: "🏦",   color: "#34d399", points: ["Statement import", "Discrepancy flagging", "Receipts & payment vouchers"] },
-];
+// STANDALONE_APPS lived here — the copy for the "Run just one" grid. That grid
+// duplicated the module picker card-for-card, so both are gone.
 
 const DEFAULT_PUBLIC_PRICING: PlanPricing = {
   starter: { monthly: 49, yearly: 39 },
