@@ -188,3 +188,65 @@ export function mapQualityCheckRecord(record: BusinessRecord): ManufacturingQual
     checkedDate: record.date?.split("T")[0] || "",
   };
 }
+
+// ── Real inventory ────────────────────────────────────────────────────────────
+// Manufacturing used to keep raw materials in BusinessRecord, separate from the
+// ItemNew rows purchasing and sales use, so the same physical sack of flour
+// existed twice and neither copy knew the other's stock. Everything below reads
+// the real inventory instead.
+
+export type ManufacturingItem = {
+  id: string;
+  code: string;
+  name: string;
+  unit: string;
+  category: string;
+  purchaseRate: number;
+  rate: number;
+  minStock: number;
+  currentStock: number;
+  unitCost: number;
+  stockValue: number;
+  isLow: boolean;
+};
+
+/** One material line of a BOM: a real item and how much of it a batch consumes. */
+export type BomLineInput = { itemId: string; qty: number };
+
+export type PricedBomLine = BomLineInput & {
+  itemName: string;
+  unit: string;
+  unitCost: number;
+  requiredQty: number;
+  availableQty: number;
+  lineCost: number;
+};
+
+export type ProductionRunQuote = {
+  producedQty: number;
+  remaining: number;
+  lines: PricedBomLine[];
+  totalCost: number;
+  unitCost: number;
+  shortages: PricedBomLine[];
+  error?: string;
+  needsBomLines?: boolean;
+};
+
+export async function loadManufacturingItems(category?: "RAW_MATERIAL" | "FINISHED"): Promise<ManufacturingItem[]> {
+  const query = category ? `?category=${category}` : "";
+  return fetchJson<ManufacturingItem[]>(`/api/manufacturing/items${query}`, []);
+}
+
+export async function quoteProductionRun(productionOrderId: string, qty?: number): Promise<ProductionRunQuote | null> {
+  const params = new URLSearchParams({ productionOrderId });
+  if (qty && qty > 0) params.set("qty", String(qty));
+  try {
+    const res = await fetch(`/api/manufacturing/production-orders/complete?${params}`, { cache: "no-store" });
+    const body = await res.json();
+    if (!res.ok) return { ...body, lines: [], shortages: [], totalCost: 0, unitCost: 0, producedQty: 0, remaining: 0 };
+    return body as ProductionRunQuote;
+  } catch {
+    return null;
+  }
+}
