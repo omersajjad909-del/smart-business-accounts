@@ -277,6 +277,105 @@ export default function ProductionOrdersPage() {
           </div>
         </div>
       )}
+
+      {/* ── Record production ──
+          Shows exactly what will leave stock, what it costs and where the money
+          lands, before anything is written. */}
+      {runOrder && (
+        <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.7)", zIndex: 50, display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }}>
+          <div style={{ background: "#161b27", border: `1px solid ${border}`, borderRadius: 16, padding: 28, width: 620, maxHeight: "90vh", overflowY: "auto", fontFamily: ff }}>
+            <h2 style={{ margin: "0 0 4px", fontSize: 18, fontWeight: 700 }}>Record production</h2>
+            <div style={{ fontSize: 12.5, color: "rgba(255,255,255,.42)", marginBottom: 18 }}>
+              {runOrder.orderId} · {runOrder.product} · {runOrder.completed}/{runOrder.quantity} done
+            </div>
+
+            {runError && (
+              <div style={{ marginBottom: 14, padding: "10px 12px", borderRadius: 8, background: "rgba(239,68,68,.14)", border: "1px solid rgba(239,68,68,.28)", color: "#fca5a5", fontSize: 12, lineHeight: 1.6 }}>{runError}</div>
+            )}
+
+            <div style={{ marginBottom: 16 }}>
+              <label style={{ display: "block", fontSize: 12, color: "rgba(255,255,255,.45)", marginBottom: 6 }}>Units finished in this run</label>
+              <input
+                type="number" min={1} value={runQty}
+                onChange={(e) => setRunQty(Math.max(1, Number(e.target.value) || 1))}
+                onBlur={(e) => requote(Math.max(1, Number(e.target.value) || 1))}
+                style={{ width: 180, background: bg, border: `1px solid ${border}`, borderRadius: 8, padding: "9px 12px", color: "#fff", boxSizing: "border-box" }}
+              />
+            </div>
+
+            {quoting && <div style={{ fontSize: 13, color: "rgba(255,255,255,.4)", padding: "12px 0" }}>Costing this run…</div>}
+
+            {runQuote && !quoting && (
+              <>
+                <div style={{ border: `1px solid ${border}`, borderRadius: 12, overflow: "hidden", marginBottom: 14 }}>
+                  <table style={{ width: "100%", borderCollapse: "collapse" }}>
+                    <thead>
+                      <tr style={{ background: "rgba(255,255,255,.03)" }}>
+                        {["Material", "Needed", "In stock", "Cost"].map((h, i) => (
+                          <th key={h} style={{ padding: "10px 14px", fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,.4)", textTransform: "uppercase", letterSpacing: ".05em", textAlign: i === 0 ? "left" : "right" }}>{h}</th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {runQuote.lines.map((line) => {
+                        const short = line.availableQty < line.requiredQty;
+                        return (
+                          <tr key={line.itemId} style={{ borderTop: `1px solid ${border}` }}>
+                            <td style={{ padding: "10px 14px", fontSize: 12.5 }}>{line.itemName}</td>
+                            <td style={{ padding: "10px 14px", fontSize: 12.5, textAlign: "right", fontWeight: 700 }}>{line.requiredQty}{line.unit}</td>
+                            <td style={{ padding: "10px 14px", fontSize: 12.5, textAlign: "right", color: short ? "#fca5a5" : "rgba(255,255,255,.55)", fontWeight: short ? 700 : 400 }}>{line.availableQty}{line.unit}</td>
+                            <td style={{ padding: "10px 14px", fontSize: 12.5, textAlign: "right", color: "rgba(255,255,255,.62)" }}>Rs. {Math.round(line.lineCost).toLocaleString()}</td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+
+                {runQuote.shortages.length > 0 && (
+                  <div style={{ marginBottom: 14, padding: "12px 14px", borderRadius: 10, background: "rgba(239,68,68,.1)", border: "1px solid rgba(239,68,68,.26)" }}>
+                    <div style={{ fontSize: 12.5, color: "#fca5a5", fontWeight: 700, marginBottom: 6 }}>Not enough material for {runQuote.shortages.length} item(s)</div>
+                    <label style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 12, color: "rgba(255,255,255,.55)", cursor: "pointer" }}>
+                      <input type="checkbox" checked={allowShort} onChange={(e) => setAllowShort(e.target.checked)} />
+                      Produce anyway — stock will go negative until the purchase is entered
+                    </label>
+                  </div>
+                )}
+
+                <div style={{ padding: "14px 16px", borderRadius: 12, background: "rgba(34,197,94,.08)", border: "1px solid rgba(34,197,94,.22)", marginBottom: 8 }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 8 }}>
+                    <span style={{ fontSize: 12.5, color: "rgba(255,255,255,.5)" }}>Total material cost</span>
+                    <span style={{ fontSize: 18, fontWeight: 800, color: "#22c55e" }}>Rs. {Math.round(runQuote.totalCost).toLocaleString()}</span>
+                  </div>
+                  <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, color: "rgba(255,255,255,.42)" }}>
+                    <span>Per unit</span><span>Rs. {Math.round(runQuote.unitCost).toLocaleString()}</span>
+                  </div>
+                </div>
+
+                <div style={{ fontSize: 11.5, color: "rgba(255,255,255,.35)", lineHeight: 1.7, marginBottom: 16 }}>
+                  Dr Work In Progress → Cr Raw Material Stock, then Dr Finished Goods → Cr Work In Progress.
+                  Material leaves stock, {runQty} × {runOrder.product} arrives at cost.
+                </div>
+              </>
+            )}
+
+            <div style={{ display: "flex", gap: 12 }}>
+              <button
+                onClick={confirmRun}
+                disabled={running || quoting || !runQuote || (runQuote.shortages.length > 0 && !allowShort)}
+                style={{
+                  flex: 1, padding: "11px 0", border: "none", borderRadius: 8, color: "#fff", fontSize: 14, fontWeight: 700,
+                  background: running || !runQuote || (runQuote.shortages.length > 0 && !allowShort) ? "rgba(34,197,94,.35)" : "#22c55e",
+                  cursor: running || !runQuote ? "not-allowed" : "pointer",
+                }}
+              >
+                {running ? "Recording…" : "Confirm production"}
+              </button>
+              <button onClick={() => { setRunOrder(null); setRunQuote(null); setAllowShort(false); }} style={{ padding: "11px 24px", background: "transparent", border: `1px solid ${border}`, borderRadius: 8, color: "rgba(255,255,255,.65)", cursor: "pointer" }}>Cancel</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
