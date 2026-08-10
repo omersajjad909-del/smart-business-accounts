@@ -36,7 +36,11 @@ export type ManufacturingBom = {
   id: string;
   product: string;
   version: string;
+  /** Legacy free-text material names — kept so pre-existing BOMs still render. */
   materials: string[];
+  /** Structured lines against real items. Empty on BOMs made before costing. */
+  lines: { itemId: string; qty: number }[];
+  finishedItemId: string;
   unitCost: number;
   yieldUnits: number;
 };
@@ -111,6 +115,12 @@ export function mapBomRecord(record: BusinessRecord): ManufacturingBom {
       .split(",")
       .map((item) => item.trim())
       .filter(Boolean),
+    lines: Array.isArray(record.data?.lines)
+      ? (record.data.lines as { itemId?: unknown; qty?: unknown }[])
+          .map((line) => ({ itemId: String(line?.itemId || ""), qty: Number(line?.qty) || 0 }))
+          .filter((line) => line.itemId && line.qty > 0)
+      : [],
+    finishedItemId: String(record.data?.finishedItemId || ""),
     unitCost: record.amount || 0,
     yieldUnits: Number(record.data?.yield || 1),
   };
