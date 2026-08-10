@@ -61,10 +61,50 @@ type PlanPricing = {
   enterprise: { monthly: number; yearly: number };
 };
 
+// Fallbacks for the plan cards, used until /api/public/pricing answers. Keep in
+// step with DEFAULT_PLAN_HIGHLIGHTS in that route and with
+// PLAN_DEFAULT_PERMISSIONS in lib/planPermissions.ts.
+//
+// Starter used to advertise "🤖 AI Chat" while STARTER holds no AI permission
+// at all, so the one AI bullet on the cheapest card was for a locked page.
 const DEFAULT_HIGHLIGHTS = {
-  starter:    ["Up to 3 users","Sales & purchase invoices","Ledger & trial balance","Basic reports","Chart of accounts","Email support","🤖 AI Chat"],
-  professional: ["Up to 10 users","Everything in Starter","Inventory management","Bank reconciliation","HR & Payroll","CRM + Advanced reports","🤖 AI Assistant (ask anything)","🤖 Smart invoice & expense AI"],
-  enterprise: ["Up to 25 users","Everything in Professional","API access","Integration-ready APIs & webhooks","Multi-currency","Priority support 24/7","🤖 AI Chat","🤖 AI Financial Insights","🤖 Smart Alerts & Anomaly Detection","🤖 Revenue Forecast","🤖 Market Intelligence","🤖 AI Business Advisor","🤖 Full AI Suite"],
+  starter: [
+    "Up to 3 users",
+    "Sales & purchase invoices",
+    "Basic accounting & chart of accounts",
+    "Ledger & trial balance",
+    "Basic inventory",
+    "Expense management",
+    "Basic financial reports",
+    "Receivables & payables",
+    "Email support",
+  ],
+  professional: [
+    "Up to 10 users",
+    "Everything in Starter",
+    "Advanced inventory & barcode",
+    "Bank reconciliation",
+    "CRM & sales analytics",
+    "HR & Payroll",
+    "Trading control",
+    "Advanced & strategic reports",
+    "Multi-branch (up to 3)",
+    "🤖 AI Assistant (ask anything)",
+    "🤖 Smart invoice & expense AI",
+    "🤖 Business Operator automation",
+  ],
+  enterprise: [
+    "Up to 25 users",
+    "Everything in Professional",
+    "Multi-branch (up to 10)",
+    "Multi-currency",
+    "API access & webhooks",
+    "Custom integrations",
+    "Audit trail & backup/restore",
+    "🤖 Full AI suite — forecast, anomaly & cash-flow",
+    "Priority support 24/7",
+    "Dedicated onboarding & account manager",
+  ],
 };
 
 const PLANS = [
@@ -145,6 +185,9 @@ type Val = boolean | string | null;
 interface Feature { name: string; permKey?: string; starter: Val; pro: Val; enterprise: Val; tooltip?: string; }
 interface Category { id: string; icon: string; title: string; features: Feature[]; }
 
+// Every row here is enforced by PLAN_DEFAULT_PERMISSIONS in
+// lib/planPermissions.ts. When a row moves, the permission list moves with it —
+// `permKey` names the permission a row is backed by wherever one exists.
 const COMPARISON: Category[] = [
   {
     id: "platform",
@@ -152,12 +195,16 @@ const COMPARISON: Category[] = [
     title: "Core Platform",
     features: [
       { name: "Users", starter: "Up to 3", pro: "Up to 10", enterprise: "Up to 25" },
-      { name: "Branches", starter: "1", pro: "3", enterprise: "10" },
+      { name: "Branches", permKey: "MULTI_BRANCH", starter: "1", pro: "3", enterprise: "10" },
+      { name: "Multi-currency", permKey: "MULTI_CURRENCY", starter: false, pro: false, enterprise: true },
       { name: "Custom domain (white-label)", starter: false, pro: false, enterprise: true },
-      { name: "API access", starter: false, pro: false, enterprise: true },
-      { name: "Webhooks & integrations", starter: false, pro: false, enterprise: true },
-      { name: "Role-based permissions", starter: "Basic", pro: "Advanced", enterprise: "Custom" },
-      { name: "Audit trail", starter: false, pro: true, enterprise: true },
+      { name: "API access", permKey: "API_ACCESS", starter: false, pro: false, enterprise: true },
+      { name: "Webhooks & integrations", permKey: "API_ACCESS", starter: false, pro: false, enterprise: true },
+      { name: "Role-based permissions", permKey: "MANAGE_ROLES", starter: "Basic", pro: "Advanced", enterprise: "Custom" },
+      { name: "Approval workflows", permKey: "MANAGE_APPROVALS", starter: false, pro: true, enterprise: true },
+      { name: "Cost centers", permKey: "MANAGE_COST_CENTERS", starter: false, pro: true, enterprise: true },
+      { name: "Audit trail", permKey: "VIEW_AUDIT_LOG", starter: false, pro: true, enterprise: true },
+      { name: "Backup & restore", permKey: "BACKUP_RESTORE", starter: false, pro: false, enterprise: true },
     ],
   },
   {
@@ -167,13 +214,21 @@ const COMPARISON: Category[] = [
     features: [
       { name: "Chart of accounts", starter: true, pro: true, enterprise: true },
       { name: "Journal vouchers (CPV/CRV)", starter: true, pro: true, enterprise: true },
-      { name: "Ledger & trial balance", starter: true, pro: true, enterprise: true },
-      { name: "Profit & loss statement", starter: true, pro: true, enterprise: true },
-      { name: "Balance sheet", starter: true, pro: true, enterprise: true },
+      { name: "Ledger & trial balance", permKey: "VIEW_TRIAL_BALANCE_REPORT", starter: true, pro: true, enterprise: true },
+      // P&L and balance sheet are VIEW_PROFIT_LOSS_REPORT /
+      // VIEW_BALANCE_SHEET_REPORT, neither of which Starter has ever held.
+      { name: "Profit & loss statement", permKey: "VIEW_PROFIT_LOSS_REPORT", starter: false, pro: true, enterprise: true },
+      { name: "Balance sheet", permKey: "VIEW_BALANCE_SHEET_REPORT", starter: false, pro: true, enterprise: true },
       { name: "Cash flow statement", starter: false, pro: true, enterprise: true },
-      { name: "Budget vs actual tracking", starter: false, pro: true, enterprise: true },
-      { name: "Multi-currency accounts", starter: false, pro: false, enterprise: true },
-      { name: "Financial year management", starter: true, pro: true, enterprise: true },
+      { name: "Budget vs actual tracking", permKey: "BUDGET_PLANNING", starter: false, pro: true, enterprise: true },
+      { name: "Contra & petty cash", permKey: "MANAGE_PETTY_CASH", starter: true, pro: true, enterprise: true },
+      { name: "Credit & debit notes", permKey: "CREATE_CREDIT_NOTE", starter: false, pro: true, enterprise: true },
+      { name: "Loans & recurring entries", permKey: "MANAGE_LOANS", starter: false, pro: true, enterprise: true },
+      { name: "Fixed assets", permKey: "VIEW_FIXED_ASSETS", starter: false, pro: true, enterprise: true },
+      { name: "Multi-currency accounts", permKey: "MULTI_CURRENCY", starter: false, pro: false, enterprise: true },
+      // Financial year management is PRO+ in PLAN_DEFAULT_PERMISSIONS; this row
+      // said every plan had it.
+      { name: "Financial year management", permKey: "FINANCIAL_YEAR", starter: false, pro: true, enterprise: true },
     ],
   },
   {
@@ -198,16 +253,39 @@ const COMPARISON: Category[] = [
     icon: "📦",
     title: "Inventory & Stock",
     features: [
-      { name: "Item catalog", starter: true, pro: true, enterprise: true },
-      { name: "Stock tracking", starter: false, pro: true, enterprise: true },
-      { name: "GRN (Goods Receipt)", starter: false, pro: true, enterprise: true },
-      { name: "Barcode / QR scanning", starter: false, pro: true, enterprise: true },
-      { name: "Reorder level alerts", starter: false, pro: true, enterprise: true },
-      { name: "Warehouse management", starter: false, pro: false, enterprise: true },
+      // Starter genuinely holds VIEW_INVENTORY, CREATE_ITEMS and
+      // CREATE_STOCK_RATE, so "no stock tracking at all" was never true. The
+      // real Pro upgrade is the tooling around it — barcode, price lists,
+      // warehouses and the inventory reports.
+      { name: "Item catalog", permKey: "VIEW_CATALOG", starter: true, pro: true, enterprise: true },
+      { name: "Stock tracking", permKey: "VIEW_INVENTORY", starter: "Basic", pro: "Advanced", enterprise: "Advanced" },
+      { name: "GRN (Goods Receipt)", starter: true, pro: true, enterprise: true },
+      { name: "Purchase orders (PO tracking)", permKey: "CREATE_PURCHASE_ORDER", starter: true, pro: true, enterprise: true },
+      { name: "Barcode / QR scanning", permKey: "MANAGE_BARCODE", starter: false, pro: true, enterprise: true },
+      { name: "Price lists", permKey: "MANAGE_PRICE_LISTS", starter: false, pro: true, enterprise: true },
+      { name: "Promotions & discount engine", permKey: "MANAGE_PROMOTIONS", starter: false, pro: true, enterprise: true },
+      { name: "Reorder level alerts", permKey: "VIEW_LOW_STOCK", starter: false, pro: true, enterprise: true },
+      { name: "Warehouse management", permKey: "MULTI_BRANCH", starter: false, pro: true, enterprise: true },
       { name: "Stock valuation (FIFO/Avg)", starter: false, pro: true, enterprise: true },
       { name: "Expiry tracking", starter: false, pro: true, enterprise: true },
       { name: "Dead stock detection", starter: false, pro: true, enterprise: true },
-      { name: "Purchase orders (PO tracking)", starter: false, pro: true, enterprise: true },
+    ],
+  },
+  {
+    id: "trading",
+    icon: "🔄",
+    title: "Trading Control",
+    features: [
+      // The whole block was granted to Starter in code while never appearing on
+      // this page at all — the upgrade it is supposed to drive was invisible.
+      { name: "Trading overview", permKey: "TRADING_OVERVIEW", starter: false, pro: true, enterprise: true },
+      { name: "Order desk", permKey: "TRADING_ORDER_DESK", starter: false, pro: true, enterprise: true },
+      { name: "Procurement desk", permKey: "TRADING_PROCUREMENT", starter: false, pro: true, enterprise: true },
+      { name: "Stock control", permKey: "TRADING_STOCK_CONTROL", starter: false, pro: true, enterprise: true },
+      { name: "Outstandings", permKey: "TRADING_OUTSTANDINGS", starter: false, pro: true, enterprise: true },
+      { name: "Dispatch board", permKey: "TRADING_DISPATCH_BOARD", starter: false, pro: true, enterprise: true },
+      { name: "Conversion center", permKey: "TRADING_CONVERSION_CENTER", starter: false, pro: true, enterprise: true },
+      { name: "Trading analytics", permKey: "TRADING_ANALYTICS", starter: false, pro: true, enterprise: true },
     ],
   },
   {
@@ -216,12 +294,13 @@ const COMPARISON: Category[] = [
     title: "Banking & Payments",
     features: [
       { name: "Bank account management", starter: true, pro: true, enterprise: true },
-      { name: "Bank reconciliation", starter: false, pro: true, enterprise: true },
-      { name: "Bank statement import", starter: false, pro: true, enterprise: true },
-      { name: "Bulk payments", starter: false, pro: true, enterprise: true },
-      { name: "Advance payments", starter: false, pro: true, enterprise: true },
-      { name: "Payment receipts (CRV)", starter: true, pro: true, enterprise: true },
-      { name: "Expense vouchers (CPV)", starter: true, pro: true, enterprise: true },
+      { name: "Bank reconciliation", permKey: "BANK_RECONCILIATION", starter: false, pro: true, enterprise: true },
+      { name: "Bank statement import", permKey: "BANK_RECONCILIATION", starter: false, pro: true, enterprise: true },
+      { name: "Bulk payments", permKey: "BULK_PAYMENTS", starter: false, pro: true, enterprise: true },
+      // Starter holds MANAGE_ADVANCE_PAYMENT — this row said otherwise.
+      { name: "Advance payments", permKey: "MANAGE_ADVANCE_PAYMENT", starter: true, pro: true, enterprise: true },
+      { name: "Payment receipts (CRV)", permKey: "PAYMENT_RECEIPTS", starter: true, pro: true, enterprise: true },
+      { name: "Expense vouchers (CPV)", permKey: "EXPENSE_VOUCHERS", starter: true, pro: true, enterprise: true },
       { name: "Payment follow-up automation", starter: false, pro: true, enterprise: true },
     ],
   },
@@ -230,17 +309,19 @@ const COMPARISON: Category[] = [
     icon: "📊",
     title: "Reports & Analytics",
     features: [
-      { name: "Basic reports (sales, purchases)", starter: true, pro: true, enterprise: true },
-      { name: "Ageing report (AR/AP)", starter: true, pro: true, enterprise: true },
-      { name: "Advanced financial reports", starter: false, pro: true, enterprise: true },
-      { name: "Inventory intelligence reports", starter: false, pro: true, enterprise: true },
-      { name: "Customer profitability", starter: false, pro: true, enterprise: true },
-      { name: "Salesman performance", starter: false, pro: true, enterprise: true },
-      { name: "Discount analysis", starter: false, pro: true, enterprise: true },
-      { name: "Delivery & fulfillment reports", starter: false, pro: false, enterprise: true },
-      { name: "Supplier performance reports", starter: false, pro: false, enterprise: true },
-      { name: "Sales forecast (AI-powered)", starter: false, pro: false, enterprise: true },
-      { name: "Scenario planning", starter: false, pro: false, enterprise: true },
+      { name: "Basic reports (sales, purchases)", permKey: "VIEW_REPORTS", starter: true, pro: true, enterprise: true },
+      { name: "Ageing report (AR/AP)", permKey: "VIEW_AGEING_REPORT", starter: true, pro: true, enterprise: true },
+      { name: "Advanced financial reports", permKey: "VIEW_PROFIT_LOSS_REPORT", starter: false, pro: true, enterprise: true },
+      { name: "Inventory intelligence reports", permKey: "VIEW_INVENTORY_REPORTS", starter: false, pro: true, enterprise: true },
+      { name: "Customer profitability", permKey: "VIEW_SALES_REPORT", starter: false, pro: true, enterprise: true },
+      { name: "Salesman performance", permKey: "VIEW_SALES_REPORT", starter: false, pro: true, enterprise: true },
+      { name: "Discount analysis", permKey: "VIEW_SALES_REPORT", starter: false, pro: true, enterprise: true },
+      // Operations and strategic reports are Pro — there is no Enterprise-only
+      // permission behind them, and the sidebar now hands both to Pro.
+      { name: "Delivery & fulfillment reports", permKey: "VIEW_OUTWARD", starter: false, pro: true, enterprise: true },
+      { name: "Supplier performance reports", permKey: "VIEW_OUTWARD", starter: false, pro: true, enterprise: true },
+      { name: "Scenario planning & sales forecast", permKey: "VIEW_PROFIT_LOSS_REPORT", starter: false, pro: true, enterprise: true },
+      { name: "AI-powered revenue forecast", permKey: "AI_FORECAST", starter: false, pro: false, enterprise: true },
       { name: "Export to Excel / PDF", starter: true, pro: true, enterprise: true },
     ],
   },
@@ -277,7 +358,8 @@ const COMPARISON: Category[] = [
     title: "AI Features",
     features: [
       { name: "AI assistant (ask anything)",    permKey: "AI_ASSISTANT",             starter: false, pro: true,  enterprise: true },
-      { name: "AI Business Operator",           permKey: "AI_BUSINESS_OPERATOR",     starter: false, pro: false, enterprise: true, tooltip: "An AI agent that can run tasks, answer business questions, and suggest actions autonomously" },
+      // Pro holds AI_BUSINESS_OPERATOR; this row sold it as Enterprise-only.
+      { name: "AI Business Operator",           permKey: "AI_BUSINESS_OPERATOR",     starter: false, pro: true,  enterprise: true, tooltip: "An AI agent that can run tasks, answer business questions, and suggest actions autonomously" },
       { name: "Smart invoice suggestions",      permKey: "AI_SMART_SUGGESTIONS",     starter: false, pro: true,  enterprise: true },
       { name: "AI-powered sales forecast",      permKey: "AI_FORECAST",              starter: false, pro: false, enterprise: true },
       { name: "Anomaly & fraud detection",      permKey: "AI_ANOMALY_DETECTION",     starter: false, pro: false, enterprise: true },
@@ -292,11 +374,11 @@ const COMPARISON: Category[] = [
     title: "Tax & Compliance",
     features: [
       { name: "GST / VAT / WHT / FED", starter: true, pro: true, enterprise: true },
-      { name: "Tax summary report", starter: true, pro: true, enterprise: true },
-      { name: "Tax forecast", starter: false, pro: true, enterprise: true },
-      { name: "FBR / compliance docs", starter: false, pro: true, enterprise: true },
-      { name: "Audit & exception log", starter: false, pro: true, enterprise: true },
-      { name: "17+ tax type support", starter: false, pro: true, enterprise: true },
+      { name: "Tax summary report", permKey: "VIEW_FINANCIAL_REPORTS", starter: true, pro: true, enterprise: true },
+      { name: "Tax forecast", permKey: "VIEW_PROFIT_LOSS_REPORT", starter: false, pro: true, enterprise: true },
+      { name: "FBR / compliance docs", permKey: "TAX_CONFIGURATION", starter: false, pro: true, enterprise: true },
+      { name: "Audit & exception log", permKey: "VIEW_AUDIT_LOG", starter: false, pro: true, enterprise: true },
+      { name: "17+ tax type support", permKey: "TAX_CONFIGURATION", starter: false, pro: true, enterprise: true },
     ],
   },
   {
@@ -431,7 +513,9 @@ export default function PricingPage() {
   const DEFAULT_PKR_PRICING = {
     starter:      { monthly: 3999,  yearly: 3199  }, // 3,999/mo → 20% off yearly = 3,199/mo
     professional: { monthly: 8999,  yearly: 7199  }, // 8,999/mo → 20% off yearly = 7,199/mo
-    enterprise:   { monthly: 14999, yearly: 11999 }, // 14,999/mo → 20% off yearly = 11,999/mo
+    // Was 14,999 while the live site served 19,999 from the saved PKR config —
+    // so any failure of /api/public/pricing quietly under-quoted Enterprise.
+    enterprise:   { monthly: 19999, yearly: 15999 }, // 19,999/mo → 20% off yearly = 15,999/mo
   };
   const [pkrPricing, setPkrPricing] = useState<{ starter: { monthly: number; yearly: number }; professional: { monthly: number; yearly: number }; enterprise: { monthly: number; yearly: number } } | null>(DEFAULT_PKR_PRICING);
   // Edge-detected country from /api/public/geo. Unlike `country` below it is
@@ -543,7 +627,7 @@ export default function PricingPage() {
             setPkrPricing({
               starter:      { monthly: Number(d.pkrPricing.starter?.monthly      ?? 3999),  yearly: Math.round(Number(d.pkrPricing.starter?.yearly      ?? 38388)  / 12) },
               professional: { monthly: Number(d.pkrPricing.pro?.monthly          ?? 8999),  yearly: Math.round(Number(d.pkrPricing.pro?.yearly          ?? 86388)  / 12) },
-              enterprise:   { monthly: Number(d.pkrPricing.enterprise?.monthly   ?? 14999), yearly: Math.round(Number(d.pkrPricing.enterprise?.yearly   ?? 143988) / 12) },
+              enterprise:   { monthly: Number(d.pkrPricing.enterprise?.monthly   ?? 19999), yearly: Math.round(Number(d.pkrPricing.enterprise?.yearly   ?? 191988) / 12) },
             });
           }
           if (d?.pkrAddonPricing) {

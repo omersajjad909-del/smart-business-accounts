@@ -26,8 +26,17 @@ export const PERMISSION_CATEGORIES: PermissionCategory[] = [
       PERMISSIONS.VIEW_ACCOUNTS,
       PERMISSIONS.CREATE_CPV,
       PERMISSIONS.CREATE_CRV,
+      PERMISSIONS.CREATE_JV,
+      PERMISSIONS.CREATE_CONTRA,
       PERMISSIONS.VIEW_ACCOUNTING,
       PERMISSIONS.MANAGE_OPENING_BALANCES,
+      PERMISSIONS.MANAGE_ADVANCE_PAYMENT,
+      PERMISSIONS.MANAGE_PETTY_CASH,
+      PERMISSIONS.CREATE_CREDIT_NOTE,
+      PERMISSIONS.CREATE_DEBIT_NOTE,
+      PERMISSIONS.MANAGE_LOANS,
+      PERMISSIONS.MANAGE_RECURRING,
+      PERMISSIONS.VIEW_FIXED_ASSETS,
     ],
   },
   {
@@ -38,6 +47,7 @@ export const PERMISSION_CATEGORIES: PermissionCategory[] = [
       PERMISSIONS.CREATE_ACCOUNTS,
       PERMISSIONS.CREATE_ITEMS,
       PERMISSIONS.CREATE_STOCK_RATE,
+      PERMISSIONS.MANAGE_BARCODE,
       PERMISSIONS.VIEW_INVENTORY,
       PERMISSIONS.CREATE_PURCHASE_ORDER,
       PERMISSIONS.CREATE_PURCHASE_INVOICE,
@@ -46,6 +56,8 @@ export const PERMISSION_CATEGORIES: PermissionCategory[] = [
       PERMISSIONS.CREATE_OUTWARD,
       PERMISSIONS.CREATE_QUOTATION,
       PERMISSIONS.CREATE_DELIVERY_CHALLAN,
+      PERMISSIONS.MANAGE_PRICE_LISTS,
+      PERMISSIONS.MANAGE_PROMOTIONS,
     ],
   },
   {
@@ -107,6 +119,17 @@ export const PERMISSION_CATEGORIES: PermissionCategory[] = [
       PERMISSIONS.FINANCIAL_YEAR,
       PERMISSIONS.BACKUP_RESTORE,
       PERMISSIONS.EMAIL_SETTINGS,
+      PERMISSIONS.MANAGE_APPROVALS,
+    ],
+  },
+  {
+    key: "scale",
+    label: "Scale & Integrations",
+    permissions: [
+      PERMISSIONS.MULTI_BRANCH,
+      PERMISSIONS.MULTI_CURRENCY,
+      PERMISSIONS.API_ACCESS,
+      PERMISSIONS.MANAGE_COST_CENTERS,
     ],
   },
   // ── AI Features ── (was missing from categories — now included)
@@ -126,35 +149,70 @@ export const PERMISSION_CATEGORIES: PermissionCategory[] = [
   },
 ];
 
-const ALL_PERMISSION_VALUES: PermissionValue[] = Array.from(
-  new Set(PERMISSION_CATEGORIES.flatMap((c) => c.permissions))
-);
+// Derived from PERMISSIONS, not from PERMISSION_CATEGORIES.
+//
+// It used to be the flatMap of the categories, which quietly made "Enterprise
+// gets everything" mean "Enterprise gets everything someone remembered to put
+// in a category". Nine permissions — JV, Contra, Petty Cash, Loans, Barcode,
+// Credit/Debit Note, Advance Payment, Recurring — were in PERMISSIONS but in no
+// category, so Enterprise never received them and the admin permissions screen
+// (which renders the categories) had no checkbox for them either.
+const ALL_PERMISSION_VALUES: PermissionValue[] = Object.values(PERMISSIONS);
+
+// The categories drive the admin UI, so a permission missing from them is
+// unassignable no matter what a plan grants. Fail loudly in development rather
+// than shipping another invisible permission.
+const UNCATEGORIZED_PERMISSIONS: PermissionValue[] = (() => {
+  const categorized = new Set(PERMISSION_CATEGORIES.flatMap((c) => c.permissions));
+  return ALL_PERMISSION_VALUES.filter((p) => !categorized.has(p));
+})();
+
+if (process.env.NODE_ENV !== "production" && UNCATEGORIZED_PERMISSIONS.length > 0) {
+  console.error(
+    `[planPermissions] ${UNCATEGORIZED_PERMISSIONS.length} permission(s) are in PERMISSIONS but no ` +
+    `PERMISSION_CATEGORIES entry, so /dashboard/admin/permissions cannot assign them: ` +
+    UNCATEGORIZED_PERMISSIONS.join(", ")
+  );
+}
 
 // ─────────────────────────────────────────────────────────────────────────────
-//  PLAN DEFAULT PERMISSIONS — recommended config
+//  PLAN DEFAULT PERMISSIONS — the ladder the pricing page sells
 //
-//  STARTER    → Core features only. No advanced reports, no AI, no HR/CRM.
-//  PRO        → Everything except top-tier AI + audit/backup.
-//  ENTERPRISE → Everything.
+//  STARTER    → Core accounting + basic operations. "Start running your books."
+//  PRO        → Intelligence + automation + complete operations.
+//  ENTERPRISE → Scale + control + integrations. Everything.
+//
+//  These three lists are the enforcement side of the public comparison table in
+//  app/(marketing)/pricing/page.tsx. A row there and an entry here have to move
+//  together — if they disagree, we are either charging for something we lock or
+//  giving away something we advertise as an upgrade.
 // ─────────────────────────────────────────────────────────────────────────────
 
 export const PLAN_DEFAULT_PERMISSIONS: Record<string, PermissionValue[]> = {
 
   // ── STARTER ────────────────────────────────────────────────────────────────
-  // Basic accounting + inventory + sales + basic reports + payments
+  // Basic accounting + catalog + sales/purchase + basic reports + payments.
   STARTER: [
     // Core
     PERMISSIONS.VIEW_DASHBOARD,
     PERMISSIONS.VIEW_SETTINGS,
+    // Starter sells "up to 3 users", so the owner has to be able to invite
+    // them. The sidebar's Admin group is gated on MANAGE_USERS and plan gating
+    // applies to admins too, so without this the seats were unsellable.
+    PERMISSIONS.MANAGE_USERS,
 
-    // Accounts
+    // Accounts — basic accounting, expense management
     PERMISSIONS.VIEW_ACCOUNTS,
     PERMISSIONS.CREATE_CPV,
     PERMISSIONS.CREATE_CRV,
+    PERMISSIONS.CREATE_JV,
+    PERMISSIONS.CREATE_CONTRA,
     PERMISSIONS.VIEW_ACCOUNTING,
     PERMISSIONS.MANAGE_OPENING_BALANCES,
+    PERMISSIONS.MANAGE_ADVANCE_PAYMENT,
+    PERMISSIONS.MANAGE_PETTY_CASH,
 
-    // Inventory & Sales
+    // Inventory & Sales — catalog and documents, no advanced stock tooling
     PERMISSIONS.VIEW_CATALOG,
     PERMISSIONS.CREATE_ACCOUNTS,
     PERMISSIONS.CREATE_ITEMS,
@@ -178,43 +236,47 @@ export const PLAN_DEFAULT_PERMISSIONS: Record<string, PermissionValue[]> = {
     // Basic Banking
     PERMISSIONS.PAYMENT_RECEIPTS,
     PERMISSIONS.EXPENSE_VOUCHERS,
-    PERMISSIONS.BULK_PAYMENTS,
 
-    // Trading Control
-    PERMISSIONS.TRADING_OVERVIEW,
-    PERMISSIONS.TRADING_ORDER_DESK,
-    PERMISSIONS.TRADING_PROCUREMENT,
-    PERMISSIONS.TRADING_STOCK_CONTROL,
-    PERMISSIONS.TRADING_OUTSTANDINGS,
-    PERMISSIONS.TRADING_DISPATCH_BOARD,
-    PERMISSIONS.TRADING_CONVERSION_CENTER,
-    PERMISSIONS.TRADING_ANALYTICS,
-
-    // Operator
-    PERMISSIONS.AI_BUSINESS_OPERATOR,
-
-    // NO: Advanced reports, HR, CRM, AI, Audit, Backup, Budget, Bank Reconciliation
+    // NO: Trading Control — it was fully open here while the pricing table sold
+    //     it as an upgrade. Same story for AI_BUSINESS_OPERATOR, our most
+    //     expensive feature, which Starter was getting for free.
+    // NO: Bank reconciliation, bulk payments, tax config, barcode, price lists,
+    //     promotions, credit/debit notes, loans, recurring, fixed assets,
+    //     advanced reports, HR, CRM, budget, audit, backup, AI, multi-branch,
+    //     multi-currency, API access.
   ],
 
   // ── PROFESSIONAL ───────────────────────────────────────────────────────────
-  // Everything in Starter + advanced reports + HR/CRM + banking + basic AI
+  // Everything in Starter + advanced reports + HR/CRM + banking + working AI.
   PRO: [
     // Core
     PERMISSIONS.VIEW_DASHBOARD,
     PERMISSIONS.VIEW_SETTINGS,
+    PERMISSIONS.VIEW_LOGS,
+    PERMISSIONS.VIEW_AUDIT_LOG,
 
     // Accounts
     PERMISSIONS.VIEW_ACCOUNTS,
     PERMISSIONS.CREATE_CPV,
     PERMISSIONS.CREATE_CRV,
+    PERMISSIONS.CREATE_JV,
+    PERMISSIONS.CREATE_CONTRA,
     PERMISSIONS.VIEW_ACCOUNTING,
     PERMISSIONS.MANAGE_OPENING_BALANCES,
+    PERMISSIONS.MANAGE_ADVANCE_PAYMENT,
+    PERMISSIONS.MANAGE_PETTY_CASH,
+    PERMISSIONS.CREATE_CREDIT_NOTE,
+    PERMISSIONS.CREATE_DEBIT_NOTE,
+    PERMISSIONS.MANAGE_LOANS,
+    PERMISSIONS.MANAGE_RECURRING,
+    PERMISSIONS.VIEW_FIXED_ASSETS,
 
     // Inventory & Sales
     PERMISSIONS.VIEW_CATALOG,
     PERMISSIONS.CREATE_ACCOUNTS,
     PERMISSIONS.CREATE_ITEMS,
     PERMISSIONS.CREATE_STOCK_RATE,
+    PERMISSIONS.MANAGE_BARCODE,
     PERMISSIONS.VIEW_INVENTORY,
     PERMISSIONS.CREATE_PURCHASE_ORDER,
     PERMISSIONS.CREATE_PURCHASE_INVOICE,
@@ -223,6 +285,8 @@ export const PLAN_DEFAULT_PERMISSIONS: Record<string, PermissionValue[]> = {
     PERMISSIONS.CREATE_OUTWARD,
     PERMISSIONS.CREATE_QUOTATION,
     PERMISSIONS.CREATE_DELIVERY_CHALLAN,
+    PERMISSIONS.MANAGE_PRICE_LISTS,
+    PERMISSIONS.MANAGE_PROMOTIONS,
 
     // Full Reports
     PERMISSIONS.VIEW_REPORTS,
@@ -266,20 +330,27 @@ export const PLAN_DEFAULT_PERMISSIONS: Record<string, PermissionValue[]> = {
     PERMISSIONS.BUDGET_PLANNING,
     PERMISSIONS.RECURRING_TRANSACTIONS,
     PERMISSIONS.FINANCIAL_YEAR,
+    PERMISSIONS.MANAGE_APPROVALS,
 
-    // Basic AI (no advanced AI)
+    // Scale — branches and cost centres, but not currencies or the API
+    PERMISSIONS.MULTI_BRANCH,
+    PERMISSIONS.MANAGE_COST_CENTERS,
+
+    // AI — assistant and automation, not the predictive suite
     PERMISSIONS.AI_ASSISTANT,
     PERMISSIONS.AI_BUSINESS_OPERATOR,
     PERMISSIONS.AI_SMART_SUGGESTIONS,
     PERMISSIONS.AI_EXPENSE_CATEGORIZATION,
 
+    // The comment here used to say AI_BUSINESS_OPERATOR was excluded while the
+    // line above granted it. Pro keeps it — that is what the pricing page sells.
     // NO: AI_FORECAST, AI_ANOMALY_DETECTION, AI_NATURAL_LANGUAGE,
-    //     AI_CASH_FLOW_PREDICTION, AI_BUSINESS_OPERATOR
-    // NO: BACKUP_RESTORE, EMAIL_SETTINGS, VIEW_AUDIT_LOG, VIEW_LOGS
+    //     AI_CASH_FLOW_PREDICTION
+    // NO: MULTI_CURRENCY, API_ACCESS, BACKUP_RESTORE, EMAIL_SETTINGS
   ],
 
   // ── ENTERPRISE ─────────────────────────────────────────────────────────────
-  // Everything — all features, all AI, audit, backup
+  // Everything — all features, all AI, audit, backup, API, multi-currency
   ENTERPRISE: [...ALL_PERMISSION_VALUES],
 };
 
@@ -373,8 +444,16 @@ export const CUSTOM_MODULE_PERMISSIONS: ModulePermissionMap = {
     PERMISSIONS.TRADING_ANALYTICS,
   ],
   operator: [PERMISSIONS.AI_BUSINESS_OPERATOR],
-  multi_branch: [PERMISSIONS.VIEW_SETTINGS],
-  api_access:   [PERMISSIONS.VIEW_SETTINGS],
+  // These three used to map to VIEW_SETTINGS, which is not a gate — every plan
+  // has it, so buying the Multi-Branch or API Access add-on granted nothing and
+  // not buying it withheld nothing. They have their own keys now.
+  multi_branch: [
+    PERMISSIONS.MULTI_BRANCH,
+    PERMISSIONS.MANAGE_COST_CENTERS,
+    PERMISSIONS.VIEW_SETTINGS,
+  ],
+  multi_currency: [PERMISSIONS.MULTI_CURRENCY, PERMISSIONS.VIEW_SETTINGS],
+  api_access:   [PERMISSIONS.API_ACCESS, PERMISSIONS.VIEW_SETTINGS],
   tax_filing:   [PERMISSIONS.TAX_CONFIGURATION],
   whatsapp:     [PERMISSIONS.VIEW_SETTINGS],
 };

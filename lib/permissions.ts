@@ -93,6 +93,23 @@ export const PERMISSIONS = {
   // Settings
   VIEW_SETTINGS: "VIEW_SETTINGS",
 
+  // Scale & Integrations
+  //
+  // These five used to have no key of their own. Multi-branch, multi-currency
+  // and API access are the features Enterprise is sold on, yet the custom-plan
+  // map pointed all three at VIEW_SETTINGS — so anyone who could open Settings
+  // had them. They are real permissions now, and the sidebar checks them.
+  MULTI_BRANCH: "MULTI_BRANCH",
+  MULTI_CURRENCY: "MULTI_CURRENCY",
+  API_ACCESS: "API_ACCESS",
+  MANAGE_COST_CENTERS: "MANAGE_COST_CENTERS",
+  MANAGE_APPROVALS: "MANAGE_APPROVALS",
+
+  // Commercial
+  MANAGE_PRICE_LISTS: "MANAGE_PRICE_LISTS",
+  MANAGE_PROMOTIONS: "MANAGE_PROMOTIONS",
+  VIEW_FIXED_ASSETS: "VIEW_FIXED_ASSETS",
+
   // Advanced Features
   BUDGET_PLANNING: "BUDGET_PLANNING",
   RECURRING_TRANSACTIONS: "RECURRING_TRANSACTIONS",

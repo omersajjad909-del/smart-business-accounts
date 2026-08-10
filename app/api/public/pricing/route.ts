@@ -25,30 +25,49 @@ const DEFAULT_SEAT_PRICING = {
   yearly: 72, // yearly annual total (6/mo equivalent)
 };
 
+// Keep in step with DEFAULT_HIGHLIGHTS in app/(marketing)/pricing/page.tsx and
+// with PLAN_DEFAULT_PERMISSIONS in lib/planPermissions.ts — a bullet here that
+// the plan does not actually grant is a promise we bill for and then lock.
+//
+// "Unlimited users" used to sit on Enterprise while getMaxUsersForPlan capped
+// it at 25.
 const DEFAULT_PLAN_HIGHLIGHTS = {
   starter: [
     "Up to 3 users",
     "Sales & purchase invoices",
+    "Basic accounting & chart of accounts",
     "Ledger & trial balance",
-    "Basic reports",
-    "Chart of accounts",
+    "Basic inventory",
+    "Expense management",
+    "Basic financial reports",
+    "Receivables & payables",
     "Email support",
   ],
   pro: [
     "Up to 10 users",
     "Everything in Starter",
-    "Inventory management",
+    "Advanced inventory & barcode",
     "Bank reconciliation",
+    "CRM & sales analytics",
     "HR & Payroll",
-    "CRM + Advanced reports",
+    "Trading control",
+    "Advanced & strategic reports",
+    "Multi-branch (up to 3)",
+    "🤖 AI Assistant (ask anything)",
+    "🤖 Smart invoice & expense AI",
+    "🤖 Business Operator automation",
   ],
   enterprise: [
-    "Unlimited users",
+    "Up to 25 users",
     "Everything in Professional",
-    "API access",
-    "Custom integrations",
+    "Multi-branch (up to 10)",
     "Multi-currency",
+    "API access & webhooks",
+    "Custom integrations",
+    "Audit trail & backup/restore",
+    "🤖 Full AI suite — forecast, anomaly & cash-flow",
     "Priority support 24/7",
+    "Dedicated onboarding & account manager",
   ],
 };
 

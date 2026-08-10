@@ -27,30 +27,46 @@ const DEFAULT_BRANCH_LIMITS = {
   enterprise: 10,
 };
 
+// Mirrors DEFAULT_PLAN_HIGHLIGHTS in app/api/public/pricing/route.ts — the
+// admin panel seeds its editor from here, the public page renders from there.
 const DEFAULT_PLAN_HIGHLIGHTS = {
   starter: [
     "Up to 3 users",
     "Sales & purchase invoices",
+    "Basic accounting & chart of accounts",
     "Ledger & trial balance",
-    "Basic reports",
-    "Chart of accounts",
+    "Basic inventory",
+    "Expense management",
+    "Basic financial reports",
+    "Receivables & payables",
     "Email support",
   ],
   pro: [
     "Up to 10 users",
     "Everything in Starter",
-    "Inventory management",
+    "Advanced inventory & barcode",
     "Bank reconciliation",
+    "CRM & sales analytics",
     "HR & Payroll",
-    "CRM + Advanced reports",
+    "Trading control",
+    "Advanced & strategic reports",
+    "Multi-branch (up to 3)",
+    "🤖 AI Assistant (ask anything)",
+    "🤖 Smart invoice & expense AI",
+    "🤖 Business Operator automation",
   ],
   enterprise: [
-    "Unlimited users",
+    // Was "Unlimited users" — getMaxUsersForPlan caps Enterprise at 25.
+    "Up to 25 users",
     "Everything in Professional",
-    "API access",
-    "Custom integrations",
+    "Multi-branch (up to 10)",
     "Multi-currency",
+    "API access & webhooks",
+    "Custom integrations",
+    "Audit trail & backup/restore",
+    "🤖 Full AI suite — forecast, anomaly & cash-flow",
     "Priority support 24/7",
+    "Dedicated onboarding & account manager",
   ],
 };
 
@@ -129,7 +145,9 @@ const DEFAULT_CONFIG = {
       features: {
         viewDashboard: true, createSalesInvoice: true, createPurchaseInvoice: true,
         viewLedger: true, viewTrialBalance: true,
-        advancedReports: false, bankReconciliation: true, inventoryReports: false,
+        // bankReconciliation was true here while STARTER's permission list and
+        // the public comparison table both said Starter does not get it.
+        advancedReports: false, bankReconciliation: false, inventoryReports: false,
         crm: false, hrPayroll: false, backupRestore: false,
         prioritySupport: false, multiBranch: false, apiAccess: false,
         aiAssistant: false, aiBusinessOperator: false, aiSmartSuggestions: false,
@@ -142,10 +160,13 @@ const DEFAULT_CONFIG = {
       features: {
         viewDashboard: true, createSalesInvoice: true, createPurchaseInvoice: true,
         viewLedger: true, viewTrialBalance: true,
+        // hrPayroll was false while PRO's permission list grants
+        // VIEW_HR_PAYROLL and the pricing card advertises "HR & Payroll".
+        // backupRestore is Enterprise-only, matching PLAN_DEFAULT_PERMISSIONS.
         advancedReports: true, bankReconciliation: true, inventoryReports: true,
-        crm: true, hrPayroll: false, backupRestore: true,
+        crm: true, hrPayroll: true, backupRestore: false,
         prioritySupport: true, multiBranch: true, apiAccess: false,
-        aiAssistant: true, aiBusinessOperator: false, aiSmartSuggestions: true,
+        aiAssistant: true, aiBusinessOperator: true, aiSmartSuggestions: true,
         aiForecast: false, aiAnomalyDetection: false, aiExpenseCategorization: true,
         aiNaturalLanguage: false, aiCashFlowPrediction: false,
       },

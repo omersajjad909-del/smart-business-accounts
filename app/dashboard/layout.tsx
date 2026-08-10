@@ -669,12 +669,17 @@ export default function DashboardLayout({
     }
   }, [ready, subInfo, pathname, router]);
 
-  // ── Role-based page guard ────────────────────────────────────
-  // Protects sensitive routes from direct URL access by under-privileged roles.
-  // ADMIN always passes. Other roles are checked against their permissions.
+  // ── Role + plan page guard ───────────────────────────────────
+  // Protects sensitive routes from direct URL access.
+  //
+  // ADMIN used to skip this entirely, which meant plan limits were only ever
+  // enforced by hiding sidebar links: a Starter admin who typed
+  // /dashboard/branches got the full Enterprise page. The guard now runs for
+  // admins too — via the plan-aware hasPermission, so for an admin it reduces
+  // to "is this feature in your plan?" while other roles are still checked
+  // against their own permissions as well.
   useEffect(() => {
     if (!ready || !currentUser) return;
-    if (currentUser.role?.toUpperCase() === "ADMIN") return;
 
     const ROUTE_GUARDS: Array<{ prefix: string; permission: string }> = [
       { prefix: "/dashboard/trial-balance",       permission: PERMISSIONS.VIEW_TRIAL_BALANCE_REPORT },
@@ -696,15 +701,46 @@ export default function DashboardLayout({
       { prefix: "/dashboard/backup-restore",      permission: PERMISSIONS.BACKUP_RESTORE },
       { prefix: "/dashboard/financial-year",      permission: PERMISSIONS.FINANCIAL_YEAR },
       { prefix: "/dashboard/ai",                  permission: PERMISSIONS.AI_ASSISTANT },
+      { prefix: "/dashboard/ai-assistant",        permission: PERMISSIONS.AI_ASSISTANT },
+      { prefix: "/dashboard/operator",            permission: PERMISSIONS.AI_BUSINESS_OPERATOR },
+      { prefix: "/dashboard/automation",          permission: PERMISSIONS.AI_BUSINESS_OPERATOR },
+      { prefix: "/dashboard/crm",                 permission: PERMISSIONS.VIEW_CRM },
+      { prefix: "/dashboard/trading",             permission: PERMISSIONS.TRADING_OVERVIEW },
+      // Enterprise scale features. Each had a working page reachable by URL
+      // with nothing checking the plan.
+      { prefix: "/dashboard/branches",            permission: PERMISSIONS.MULTI_BRANCH },
+      { prefix: "/dashboard/warehouses",          permission: PERMISSIONS.MULTI_BRANCH },
+      { prefix: "/dashboard/warehouse-transfers", permission: PERMISSIONS.MULTI_BRANCH },
+      { prefix: "/dashboard/currencies",          permission: PERMISSIONS.MULTI_CURRENCY },
+      { prefix: "/dashboard/integrations",        permission: PERMISSIONS.API_ACCESS },
+      { prefix: "/dashboard/cost-centers",        permission: PERMISSIONS.MANAGE_COST_CENTERS },
+      { prefix: "/dashboard/approvals",           permission: PERMISSIONS.MANAGE_APPROVALS },
+      { prefix: "/dashboard/fixed-assets",        permission: PERMISSIONS.VIEW_FIXED_ASSETS },
+      { prefix: "/dashboard/price-lists",         permission: PERMISSIONS.MANAGE_PRICE_LISTS },
+      { prefix: "/dashboard/promotions",          permission: PERMISSIONS.MANAGE_PROMOTIONS },
+      { prefix: "/dashboard/barcode",             permission: PERMISSIONS.MANAGE_BARCODE },
+      { prefix: "/dashboard/loans",               permission: PERMISSIONS.MANAGE_LOANS },
+      { prefix: "/dashboard/petty-cash",          permission: PERMISSIONS.MANAGE_PETTY_CASH },
+      { prefix: "/dashboard/contra",              permission: PERMISSIONS.CREATE_CONTRA },
+      { prefix: "/dashboard/advance-payment",     permission: PERMISSIONS.MANAGE_ADVANCE_PAYMENT },
+      { prefix: "/dashboard/recurring-transactions", permission: PERMISSIONS.MANAGE_RECURRING },
     ];
 
-    const matched = ROUTE_GUARDS.find(g => pathname.startsWith(g.prefix));
+    // Longest prefix wins, so "/dashboard/reports/forecast" is not decided by a
+    // shorter entry that happens to sit earlier in the list.
+    const matched = ROUTE_GUARDS
+      .filter(g => pathname === g.prefix || pathname.startsWith(g.prefix + "/"))
+      .sort((a, b) => b.prefix.length - a.prefix.length)[0];
     if (!matched) return;
 
-    if (!baseHasPermission(currentUser, matched.permission)) {
+    // Wait for the plan permissions to load before bouncing anyone — otherwise
+    // a slow /api/public/plan-config turns every deep link into a redirect.
+    if (!allowedPlanPerms) return;
+
+    if (!hasPermission(currentUser, matched.permission)) {
       router.replace("/dashboard");
     }
-  }, [ready, currentUser, pathname, router]);
+  }, [ready, currentUser, pathname, router, allowedPlanPerms]);
 
   useLayoutEffect(() => {
     if (!currentUser?.companyId) return;
@@ -1003,8 +1039,8 @@ export default function DashboardLayout({
               {hasPermission(currentUser, PERMISSIONS.CREATE_PURCHASE_INVOICE) && hasModule(businessType, "landed_cost") && <NavLink href="/dashboard/landed-cost" pathname={pathname}>Landed Cost</NavLink>}
               {/* ── Admin ── */}
 
-              {bizFeatures?.customerCreditLimits && hasPermission(currentUser, PERMISSIONS.VIEW_INVENTORY) && <NavLink href="/dashboard/credit-limits" pathname={pathname}>💳 Credit Limits</NavLink>}
-              {bizFeatures?.discountEngine && hasPermission(currentUser, PERMISSIONS.CREATE_SALES_INVOICE) && <NavLink href="/dashboard/promotions" pathname={pathname}>🏷️ Promotions</NavLink>}
+              {bizFeatures?.customerCreditLimits && hasPermission(currentUser, PERMISSIONS.VIEW_CRM) && <NavLink href="/dashboard/credit-limits" pathname={pathname}>💳 Credit Limits</NavLink>}
+              {bizFeatures?.discountEngine && hasPermission(currentUser, PERMISSIONS.MANAGE_PROMOTIONS) && <NavLink href="/dashboard/promotions" pathname={pathname}>🏷️ Promotions</NavLink>}
               {hasPermission(currentUser, PERMISSIONS.VIEW_INVENTORY) && <NavLink href="/dashboard/payment-receipts" pathname={pathname}>Payment Receipts</NavLink>}
             </NavGroup>
           )}
@@ -1019,10 +1055,11 @@ export default function DashboardLayout({
             >
               {hasPermission(currentUser, PERMISSIONS.VIEW_INVENTORY) && <NavLink href="/dashboard/inventory" pathname={pathname}>Inventory Overview</NavLink>}
               {hasPermission(currentUser, PERMISSIONS.CREATE_ITEMS) && <NavLink href="/dashboard/items-new" pathname={pathname}>Inventory Items</NavLink>}
-              {bizFeatures?.multiWarehouse && hasPermission(currentUser, PERMISSIONS.VIEW_INVENTORY) && <NavLink href="/dashboard/warehouses" pathname={pathname}>Warehouses</NavLink>}
+              {bizFeatures?.multiWarehouse && hasPermission(currentUser, PERMISSIONS.MULTI_BRANCH) && <NavLink href="/dashboard/warehouses" pathname={pathname}>Warehouses</NavLink>}
+              {bizFeatures?.multiWarehouse && hasPermission(currentUser, PERMISSIONS.MULTI_BRANCH) && <NavLink href="/dashboard/warehouse-transfers" pathname={pathname}>Warehouse Transfers</NavLink>}
               {bizFeatures?.productVariants && hasPermission(currentUser, PERMISSIONS.VIEW_CATALOG) && <NavLink href="/dashboard/product-variants" pathname={pathname}>👕 Product Variants</NavLink>}
               {bizFeatures?.batchSerialTracking && hasPermission(currentUser, PERMISSIONS.VIEW_INVENTORY) && <NavLink href="/dashboard/batch-tracking" pathname={pathname}>🔢 Batch & Serial</NavLink>}
-              {hasPermission(currentUser, PERMISSIONS.VIEW_INVENTORY) && <NavLink href="/dashboard/price-lists" pathname={pathname}>Price Lists</NavLink>}
+              {hasPermission(currentUser, PERMISSIONS.MANAGE_PRICE_LISTS) && <NavLink href="/dashboard/price-lists" pathname={pathname}>Price Lists</NavLink>}
               {hasPermission(currentUser, PERMISSIONS.CREATE_STOCK_RATE) && <NavLink href="/dashboard/stock-rate" pathname={pathname}>Stock Rates</NavLink>}
               {hasPermission(currentUser, PERMISSIONS.MANAGE_BARCODE) && <NavLink href="/dashboard/barcode" pathname={pathname}>Barcode</NavLink>}
             </NavGroup>
@@ -1142,8 +1179,8 @@ export default function DashboardLayout({
               {hasDashboardFeature("RETAIL_CATALOG") && <NavLink href="/dashboard/retail/catalog" pathname={pathname}>Product Catalog</NavLink>}
               {hasDashboardFeature("RETAIL_CATALOG") && <NavLink href="/dashboard/retail/categories" pathname={pathname}>Categories</NavLink>}
               {hasDashboardFeature("RETAIL_CATALOG") && <NavLink href="/dashboard/retail/stock-receipts" pathname={pathname}>Stock Receipts</NavLink>}
-              <NavLink href="/dashboard/barcode" pathname={pathname}>🔲 Barcode Management</NavLink>
-              {bizFeatures?.multiWarehouse && hasDashboardFeature("RETAIL_STOCK_TRANSFER") && <NavLink href="/dashboard/retail/stock-transfer" pathname={pathname}>Stock Transfer</NavLink>}
+              {hasPermission(currentUser, PERMISSIONS.MANAGE_BARCODE) && <NavLink href="/dashboard/barcode" pathname={pathname}>🔲 Barcode Management</NavLink>}
+              {bizFeatures?.multiWarehouse && hasPermission(currentUser, PERMISSIONS.MULTI_BRANCH) && hasDashboardFeature("RETAIL_STOCK_TRANSFER") && <NavLink href="/dashboard/retail/stock-transfer" pathname={pathname}>Stock Transfer</NavLink>}
               {hasDashboardFeature("RETAIL_STOCK_ADJUSTMENT") && <NavLink href="/dashboard/retail/stock-adjustment" pathname={pathname}>Stock Adjustment</NavLink>}
               {hasDashboardFeature("RETAIL_BATCH_EXPIRY") && <NavLink href="/dashboard/retail/batch-expiry" pathname={pathname}>Batch & Expiry</NavLink>}
               {bizFeatures?.batchSerialTracking && <NavLink href="/dashboard/batch-tracking" pathname={pathname}>🔢 Batch & Serial</NavLink>}
@@ -1175,6 +1212,9 @@ export default function DashboardLayout({
             </NavGroup>
 
             {/* ── 7. Multi-Store ── */}
+            {/* Multi-store is the Enterprise/Pro upsell, so the group needs the
+                plan permission and not just the per-business feature flags. */}
+            {hasPermission(currentUser, PERMISSIONS.MULTI_BRANCH) && (
             <NavGroup
               title="🏪 Multi-Store"
               icon={<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>}
@@ -1186,6 +1226,7 @@ export default function DashboardLayout({
               {hasDashboardFeature("RETAIL_BRANCH_USERS") && <NavLink href="/dashboard/retail/branch-users" pathname={pathname}>Branch Users</NavLink>}
               {hasDashboardFeature("RETAIL_BRANCH_REPORTS") && <NavLink href="/dashboard/retail/branch-reports" pathname={pathname}>Branch Reports</NavLink>}
             </NavGroup>
+            )}
 
 
           </>)}
@@ -1870,7 +1911,9 @@ export default function DashboardLayout({
               {hasPermission(currentUser, PERMISSIONS.VIEW_PROFIT_LOSS_REPORT) && <NavLink href="/dashboard/reports/profit-loss" pathname={pathname}>Profit & Loss</NavLink>}
               {hasPermission(currentUser, PERMISSIONS.VIEW_BALANCE_SHEET_REPORT) && <NavLink href="/dashboard/reports/balance-sheet" pathname={pathname}>Balance Sheet</NavLink>}
               {hasPermission(currentUser, PERMISSIONS.VIEW_LEDGER_REPORT) && <NavLink href="/dashboard/reports/ledger" pathname={pathname}>Ledger</NavLink>}
-              {hasPermission(currentUser, PERMISSIONS.VIEW_FINANCIAL_REPORTS) && <NavLink href="/dashboard/reports/cash-flow" pathname={pathname}>Cash Flow</NavLink>}
+              {/* Cash flow is sold as a Pro upgrade, so it cannot ride on
+                  VIEW_FINANCIAL_REPORTS, which Starter holds. */}
+              {hasPermission(currentUser, PERMISSIONS.VIEW_PROFIT_LOSS_REPORT) && <NavLink href="/dashboard/reports/cash-flow" pathname={pathname}>Cash Flow</NavLink>}
               {hasPermission(currentUser, PERMISSIONS.VIEW_FINANCIAL_REPORTS) && <NavLink href="/dashboard/reports/tax-summary" pathname={pathname}>Tax Summary</NavLink>}
               {hasPermission(currentUser, PERMISSIONS.VIEW_FINANCIAL_REPORTS) && <NavLink href="/dashboard/customer-statement" pathname={pathname}>Customer Statement</NavLink>}
               {hasPermission(currentUser, PERMISSIONS.VIEW_FINANCIAL_REPORTS) && <NavLink href="/dashboard/supplier-statement" pathname={pathname}>Supplier Statement</NavLink>}
@@ -1879,7 +1922,11 @@ export default function DashboardLayout({
 
 
           {/* ── ADVANCED FINANCIAL REPORTS ── */}
-          {hasPermission(currentUser, PERMISSIONS.VIEW_REPORTS) && (
+          {/* These six report groups were all gated on VIEW_REPORTS, which
+              Starter holds — so every "advanced report" the pricing page sells
+              as a Pro or Enterprise upgrade was already in a Starter sidebar.
+              Each group now asks for a permission its own tier actually has. */}
+          {hasPermission(currentUser, PERMISSIONS.VIEW_PROFIT_LOSS_REPORT) && (
             <NavGroup
               title="Advanced Financial"
               icon={<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>}
@@ -1897,7 +1944,7 @@ export default function DashboardLayout({
           )}
 
           {/* ── INVENTORY INTELLIGENCE ── */}
-          {hasPermission(currentUser, PERMISSIONS.VIEW_REPORTS) && (
+          {hasPermission(currentUser, PERMISSIONS.VIEW_INVENTORY_REPORTS) && (
             <NavGroup
               title="Inventory Intelligence"
               icon={<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg>}
@@ -1919,7 +1966,7 @@ export default function DashboardLayout({
           )}
 
           {/* ── SALES & CUSTOMER ANALYTICS ── */}
-          {hasPermission(currentUser, PERMISSIONS.VIEW_REPORTS) && (
+          {hasPermission(currentUser, PERMISSIONS.VIEW_SALES_REPORT) && (
             <NavGroup
               title="Sales Analytics"
               icon={<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>}
@@ -1944,16 +1991,18 @@ export default function DashboardLayout({
               open={openSection === "receivablesPayables"}
               onToggle={() => toggle("receivablesPayables")}
             >
+              {/* Ageing and payment history are the Starter-tier basics here;
+                  follow-up, bad debts and credit analysis are the Pro upgrade. */}
               {hasPermission(currentUser, PERMISSIONS.VIEW_AGEING_REPORT) && <NavLink href="/dashboard/reports/ageing" pathname={pathname}>Ageing Report</NavLink>}
-              {hasPermission(currentUser, PERMISSIONS.VIEW_FINANCIAL_REPORTS) && <NavLink href="/dashboard/payment-followup" pathname={pathname}>Payment Follow-up</NavLink>}
               <NavLink href="/dashboard/reports/payment-history" pathname={pathname}>Payment History</NavLink>
-              <NavLink href="/dashboard/reports/bad-debts" pathname={pathname}>Bad Debts</NavLink>
-              <NavLink href="/dashboard/reports/credit-analysis" pathname={pathname}>Credit Analysis</NavLink>
+              {hasPermission(currentUser, PERMISSIONS.VIEW_PROFIT_LOSS_REPORT) && <NavLink href="/dashboard/payment-followup" pathname={pathname}>Payment Follow-up</NavLink>}
+              {hasPermission(currentUser, PERMISSIONS.VIEW_PROFIT_LOSS_REPORT) && <NavLink href="/dashboard/reports/bad-debts" pathname={pathname}>Bad Debts</NavLink>}
+              {hasPermission(currentUser, PERMISSIONS.VIEW_PROFIT_LOSS_REPORT) && <NavLink href="/dashboard/reports/credit-analysis" pathname={pathname}>Credit Analysis</NavLink>}
             </NavGroup>
           )}
 
           {/* ── OPERATIONS REPORTS ── */}
-          {hasPermission(currentUser, PERMISSIONS.VIEW_REPORTS) && (
+          {hasPermission(currentUser, PERMISSIONS.VIEW_OUTWARD) && (
             <NavGroup
               title="Operations Reports"
               icon={<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>}
@@ -1968,7 +2017,7 @@ export default function DashboardLayout({
           )}
 
           {/* ── STRATEGIC REPORTS ── */}
-          {hasPermission(currentUser, PERMISSIONS.VIEW_REPORTS) && (
+          {hasPermission(currentUser, PERMISSIONS.VIEW_PROFIT_LOSS_REPORT) && (
             <NavGroup
               title="Strategic Reports"
               icon={<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>}
@@ -1997,8 +2046,12 @@ export default function DashboardLayout({
               <NavLink href="/dashboard/users" pathname={pathname}>Roles & Permissions</NavLink> */}
               <NavLink href="/dashboard/users" pathname={pathname}>Team</NavLink>
               {hasPermission(currentUser, PERMISSIONS.VIEW_LOGS) && <NavLink href="/dashboard/users/logs" pathname={pathname}>System Logs</NavLink>}
-              {hasPermission(currentUser, PERMISSIONS.VIEW_FINANCIAL_REPORTS) && <NavLink href="/dashboard/audit-trail" pathname={pathname}>Audit Trail</NavLink>}
-              {hasPermission(currentUser, PERMISSIONS.VIEW_FINANCIAL_REPORTS) && hasModule(businessType, "fixed_assets") && <NavLink href="/dashboard/fixed-assets" pathname={pathname}>Fixed Assets</NavLink>}
+              {/* Was gated on VIEW_FINANCIAL_REPORTS while ROUTE_GUARDS below
+                  checked VIEW_AUDIT_LOG — the link appeared and then bounced
+                  you straight back to /dashboard. Both use the same key now. */}
+              {hasPermission(currentUser, PERMISSIONS.VIEW_AUDIT_LOG) && <NavLink href="/dashboard/audit-trail" pathname={pathname}>Audit Trail</NavLink>}
+              {hasPermission(currentUser, PERMISSIONS.VIEW_FIXED_ASSETS) && hasModule(businessType, "fixed_assets") && <NavLink href="/dashboard/fixed-assets" pathname={pathname}>Fixed Assets</NavLink>}
+              {hasPermission(currentUser, PERMISSIONS.MANAGE_APPROVALS) && <NavLink href="/dashboard/approvals" pathname={pathname}>Approvals</NavLink>}
             </NavGroup>
           )}
 
@@ -2022,7 +2075,13 @@ export default function DashboardLayout({
               open={openSection === "settings"}
               onToggle={() => toggle("settings")}
             >
-              {(!isCustomPlan || hasCustomActiveModule("multi_branch")) && <NavLink href="/dashboard/cost-centers" pathname={pathname}>Cost Centers</NavLink>}
+              {/* Branches and Currencies had working pages and no way in — no
+                  sidebar entry anywhere in the app. They are the Enterprise
+                  upsell, so they are gated on their own keys rather than on
+                  VIEW_SETTINGS, which every plan holds. */}
+              {hasPermission(currentUser, PERMISSIONS.MULTI_BRANCH) && <NavLink href="/dashboard/branches" pathname={pathname}>Branches</NavLink>}
+              {hasPermission(currentUser, PERMISSIONS.MULTI_CURRENCY) && <NavLink href="/dashboard/currencies" pathname={pathname}>Currencies</NavLink>}
+              {hasPermission(currentUser, PERMISSIONS.MANAGE_COST_CENTERS) && <NavLink href="/dashboard/cost-centers" pathname={pathname}>Cost Centers</NavLink>}
               {!isCustomPlan && hasPermission(currentUser, PERMISSIONS.FINANCIAL_YEAR) && <NavLink href="/dashboard/financial-year" pathname={pathname}>Financial Year</NavLink>}
               {!isCustomPlan && hasPermission(currentUser, PERMISSIONS.BUDGET_PLANNING) && <NavLink href="/dashboard/budget" pathname={pathname}>Budget Planning</NavLink>}
               {!isCustomPlan && hasPermission(currentUser, PERMISSIONS.BACKUP_RESTORE) && <NavLink href="/dashboard/backup-restore" pathname={pathname}>Backup & Restore</NavLink>}
@@ -2032,7 +2091,7 @@ export default function DashboardLayout({
               <NavLink href="/dashboard/settings/appearance" pathname={pathname}>🎨 Appearance</NavLink>
               <NavLink href="/dashboard/settings/holidays"   pathname={pathname}>🎉 Public Holidays</NavLink>
               {!isCustomPlan && <NavLink href="/dashboard/security-access" pathname={pathname}>Security & Access</NavLink>}
-              {(!isCustomPlan || hasCustomActiveModule("api_access")) && <NavLink href="/dashboard/integrations" pathname={pathname}>Integrations</NavLink>}
+              {hasPermission(currentUser, PERMISSIONS.API_ACCESS) && <NavLink href="/dashboard/integrations" pathname={pathname}>Integrations</NavLink>}
               <NavLink href="/dashboard/affiliate" pathname={pathname}>🤝 Affiliate Program</NavLink>
             </NavGroup>
           )}
