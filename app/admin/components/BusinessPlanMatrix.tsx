@@ -282,7 +282,10 @@ const MODULE_GROUPS: Array<{ id: string; label: string; icon: string; keys: stri
  * /admin/permissions, which meant two places decided what a plan could see and
  * they disagreed; that route now redirects here.
  */
-export default function BusinessPlanMatrix({ embedded = false }: { embedded?: boolean }) {
+export default function BusinessPlanMatrix({ embedded = false, scope = "WORLD" }: { embedded?: boolean; scope?: "WORLD" | "PKR" }) {
+  // WORLD and PKR are two separate saved configs behind the same grid, so the
+  // Pakistan audience can have a different set of dashboard pages per plan.
+  const scopeQuery = scope === "PKR" ? "?scope=PKR" : "";
   const [user]       = useState(() => getCurrentUser());
   const [search,     setSearch]     = useState("");
   const [selected,   setSelected]   = useState<typeof BUSINESS_TYPES[0] | null>(null);
@@ -301,7 +304,7 @@ export default function BusinessPlanMatrix({ embedded = false }: { embedded?: bo
 
   // Load saved config + enabled business types
   useEffect(() => {
-    fetch("/api/admin/business-plan-modules", { headers: getHeaders() })
+    fetch(`/api/admin/business-plan-modules${scopeQuery}`, { headers: getHeaders() })
       .then(r => r.ok ? r.json() : { config: {}, pageConfig: {} })
       .then(d => { setConfig(d.config || {}); setPageConfig(d.pageConfig || {}); })
       .catch(() => {});
@@ -430,7 +433,7 @@ export default function BusinessPlanMatrix({ embedded = false }: { embedded?: bo
   async function save() {
     setSaving(true);
     try {
-      const res = await fetch("/api/admin/business-plan-modules", {
+      const res = await fetch(`/api/admin/business-plan-modules${scopeQuery}`, {
         method: "POST",
         headers: getHeaders(),
         body: JSON.stringify({ config, pageConfig }),

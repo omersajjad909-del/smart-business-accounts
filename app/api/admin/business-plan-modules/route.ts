@@ -23,7 +23,23 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getTokenFromRequest, verifyJwt } from "@/lib/auth";
 
-const ACTION_KEY = "BUSINESS_PLAN_MODULES_CONFIG";
+// Two independent copies of this config, chosen by ?scope=.
+//   WORLD — Plans → Pages & Modules       (every non-Pakistan company)
+//   PKR   — Plans → PKR Pages & Modules   (Pakistan companies)
+// Separate keys, never merged: an admin editing one screen must not silently
+// move pages for the other audience.
+const ACTION_KEYS = {
+  WORLD: "BUSINESS_PLAN_MODULES_CONFIG",
+  PKR:   "PKR_BUSINESS_PLAN_MODULES_CONFIG",
+} as const;
+
+export type PageScope = keyof typeof ACTION_KEYS;
+
+function scopeFrom(req: NextRequest): PageScope {
+  return String(new URL(req.url).searchParams.get("scope") || "").toUpperCase() === "PKR"
+    ? "PKR"
+    : "WORLD";
+}
 
 function isAdmin(req: NextRequest) {
   const role = String(req.headers.get("x-user-role") || "").toUpperCase();
@@ -39,7 +55,7 @@ export async function GET(req: NextRequest) {
 
   try {
     const log = await prisma.activityLog.findFirst({
-      where: { action: ACTION_KEY },
+      where: { action: ACTION_KEYS[scopeFrom(req)] },
       orderBy: { createdAt: "desc" },
       select: { details: true },
     });
@@ -71,7 +87,7 @@ export async function POST(req: NextRequest) {
 
     await prisma.activityLog.create({
       data: {
-        action: ACTION_KEY,
+        action: ACTION_KEYS[scopeFrom(req)],
         details: JSON.stringify({ config, pageConfig: pageConfig || {} }),
         userId: null,
         companyId: null,
