@@ -1176,79 +1176,16 @@ export default function PricingPage() {
             </p>
           </div>
 
-          {/* ── STANDALONE APPS — one module, on its own ─────── */}
-          <div style={{ marginBottom: 36 }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 14, flexWrap: "wrap" }}>
-              <span style={{ fontSize: 11, fontWeight: 800, color: "rgba(255,255,255,.3)", letterSpacing: ".08em", textTransform: "uppercase" }}>
-                🎯 Run just one
-              </span>
-              <span style={{ fontSize: 13, color: "rgba(255,255,255,.42)" }}>
-                These modules work on their own — no full accounting setup required.
-              </span>
-            </div>
-
-            <div className="sa-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 12 }}>
-              {STANDALONE_APPS.map(app => {
-                const mod = customPlanData.modules.find((m: any) => m.id === app.id);
-                if (!mod) return null;
-                const active = selectedModules.length === 1 && selectedModules[0] === app.id;
-                return (
-                  <button
-                    key={app.id}
-                    onClick={() => selectOnlyModule(app.id)}
-                    style={{
-                      textAlign: "left", padding: "18px 18px 16px", borderRadius: 16, cursor: "pointer",
-                      fontFamily: ff, color: "white", transition: "all .2s",
-                      border: `1.5px solid ${active ? app.color + "80" : "rgba(255,255,255,.07)"}`,
-                      background: active
-                        ? `linear-gradient(160deg,${app.color}1f,rgba(255,255,255,.02))`
-                        : "rgba(255,255,255,.025)",
-                    }}
-                  >
-                    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, marginBottom: 10 }}>
-                      <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                        <span style={{ fontSize: 22, lineHeight: 1 }}>{app.icon}</span>
-                        <span style={{ fontSize: 14, fontWeight: 800, color: active ? app.color : "white" }}>{app.label}</span>
-                      </div>
-                      <span style={{ fontSize: 9, fontWeight: 800, letterSpacing: ".06em", padding: "3px 7px", borderRadius: 5, color: app.color, background: `${app.color}18`, border: `1px solid ${app.color}33`, whiteSpace: "nowrap" }}>
-                        STANDALONE
-                      </span>
-                    </div>
-                    <div style={{ display: "flex", flexDirection: "column", gap: 5, marginBottom: 12 }}>
-                      {app.points.map(p => (
-                        <div key={p} style={{ display: "flex", alignItems: "center", gap: 7, fontSize: 11.5, color: "rgba(255,255,255,.45)" }}>
-                          <svg width="9" height="9" viewBox="0 0 12 10" fill="none" style={{ flexShrink: 0 }}>
-                            <path d="M1 5.5L4.5 9 11 1" stroke={app.color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                          </svg>
-                          {p}
-                        </div>
-                      ))}
-                    </div>
-                    <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: 8, paddingTop: 11, borderTop: "1px solid rgba(255,255,255,.06)" }}>
-                      {/* Same base price the picker below shows — the yearly
-                          discount is applied once, in the estimate total. */}
-                      <span style={{ fontSize: 17, fontWeight: 900, color: app.color, letterSpacing: "-.02em" }}>
-                        {formatPrice(mod.price)}
-                        <span style={{ fontSize: 10, fontWeight: 500, color: "rgba(255,255,255,.3)" }}>/mo</span>
-                      </span>
-                      <span style={{ fontSize: 11, fontWeight: 700, color: active ? app.color : "rgba(255,255,255,.4)" }}>
-                        {active ? "✓ Selected" : "Pick this only →"}
-                      </span>
-                    </div>
-                  </button>
-                );
-              })}
-            </div>
-
-            {/* A second Business Automation pitch used to sit here, a screen
-                below the dedicated add-on section that already sells it with a
-                CTA. One pitch per product on a pricing page. */}
-          </div>
-
-          <div style={{ height: 1, background: "rgba(255,255,255,.06)", marginBottom: 32 }} />
-
+          {/* The "Run just one" grid used to sit here: six cards for HR & Payroll,
+              CRM, Inventory, Accounting, Trading Desk and Bank & Payments, each
+              with its price and a "Pick this only" button. Every one of those six
+              is also a card in the picker directly below, at the same price — the
+              same modules rendered twice on one screen. The picker already badges
+              them RUNS ALONE and its estimate updates live, so the grid was a
+              duplicate with no extra information. */}
           <div style={{ fontSize: 13, color: "rgba(255,255,255,.42)", marginBottom: 18, textAlign: "center" }}>
-            …or build your own package — tick anything below and the estimate updates live.
+            Tick anything below and the estimate updates live. Modules marked{" "}
+            <span style={{ color: "#34d399", fontWeight: 700 }}>RUNS ALONE</span> work on their own — pick just one and that is your whole subscription.
           </div>
 
           <div className="cp-row" style={{ display: "flex", gap: 20, alignItems: "flex-start", flexWrap: "wrap" }}>
