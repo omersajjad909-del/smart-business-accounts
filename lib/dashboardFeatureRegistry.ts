@@ -14,6 +14,12 @@ export type DashboardFeatureDefinition = {
   category?: string;
   plans?: string[];
   defaultEnabled?: boolean;
+  /**
+   * Cross-business page — a salon, a pharmacy and a trading company all get it.
+   * Core pages ignore `business` / `businessTypes` entirely and appear in every
+   * business type's list in Plans → Pages & Modules.
+   */
+  core?: boolean;
 };
 
 export const DASHBOARD_FEATURE_DEFS: DashboardFeatureDefinition[] = [
@@ -2389,6 +2395,159 @@ export const DASHBOARD_FEATURE_DEFS: DashboardFeatureDefinition[] = [
   { id: "AI_DUPLICATE",       label: "Duplicate Detection",     route: "/dashboard/ai?tab=duplicate",       business: "trading", businessLabel: "AI Intelligence", section: "Analytics", description: "Find and flag duplicate transactions and invoices." },
 ];
 
+
+/**
+ * Cross-business pages — the ones every business type has.
+ *
+ * These were the gap that made "Pages & Modules controls the dashboard" untrue:
+ * the registry only knew industry pages (salon, gym, pharmacy…), so CRM, HR,
+ * invoicing, the report groups and settings had no entry here at all and could
+ * only ever be gated by a permission. With them listed, an admin can assign
+ * every sidebar page to a plan from one screen, and NavLink hides anything the
+ * plan does not include without needing a per-link check.
+ */
+export const CORE_DASHBOARD_FEATURES: DashboardFeatureDefinition[] = [
+  // ── Sales & Purchase ──
+  { id: "CORE_INVOICES", label: "All Invoices", route: "/dashboard/invoices", section: "Sales & Purchase", core: true, business: "service", businessLabel: "Core (all businesses)" },
+  { id: "CORE_PURCHASE_ORDER", label: "Purchase Order", route: "/dashboard/purchase-order", section: "Sales & Purchase", core: true, business: "service", businessLabel: "Core (all businesses)" },
+  { id: "CORE_GRN", label: "GRN (Goods Receipt)", route: "/dashboard/grn", section: "Sales & Purchase", core: true, business: "service", businessLabel: "Core (all businesses)" },
+  { id: "CORE_PURCHASE_INVOICE", label: "Purchase Invoice", route: "/dashboard/purchase-invoice", section: "Sales & Purchase", core: true, business: "service", businessLabel: "Core (all businesses)" },
+  { id: "CORE_PURCHASE_RETURN", label: "Purchase Return", route: "/dashboard/purchase-return", section: "Sales & Purchase", core: true, business: "service", businessLabel: "Core (all businesses)" },
+  { id: "CORE_QUOTATION", label: "Quotation", route: "/dashboard/quotation", section: "Sales & Purchase", core: true, business: "service", businessLabel: "Core (all businesses)" },
+  { id: "CORE_SALES_INVOICE", label: "Sales Invoice", route: "/dashboard/sales-invoice", section: "Sales & Purchase", core: true, business: "service", businessLabel: "Core (all businesses)" },
+  { id: "CORE_SALE_RETURN", label: "Sale Return", route: "/dashboard/sale-return", section: "Sales & Purchase", core: true, business: "service", businessLabel: "Core (all businesses)" },
+  { id: "CORE_DELIVERY_CHALLAN", label: "Delivery Challan", route: "/dashboard/delivery-challan", section: "Sales & Purchase", core: true, business: "service", businessLabel: "Core (all businesses)" },
+  { id: "CORE_OUTWARD", label: "Outward / Dispatch", route: "/dashboard/outward", section: "Sales & Purchase", core: true, business: "service", businessLabel: "Core (all businesses)" },
+  { id: "CORE_LANDED_COST", label: "Landed Cost", route: "/dashboard/landed-cost", section: "Sales & Purchase", core: true, business: "service", businessLabel: "Core (all businesses)" },
+  { id: "CORE_PAYMENT_RECEIPTS", label: "Payment Receipts", route: "/dashboard/payment-receipts", section: "Sales & Purchase", core: true, business: "service", businessLabel: "Core (all businesses)" },
+  { id: "CORE_PROMOTIONS", label: "Promotions", route: "/dashboard/promotions", section: "Sales & Purchase", core: true, business: "service", businessLabel: "Core (all businesses)" },
+  // ── Inventory ──
+  { id: "CORE_INVENTORY", label: "Inventory Overview", route: "/dashboard/inventory", section: "Inventory", core: true, business: "service", businessLabel: "Core (all businesses)" },
+  { id: "CORE_ITEMS_NEW", label: "Inventory Items", route: "/dashboard/items-new", section: "Inventory", core: true, business: "service", businessLabel: "Core (all businesses)" },
+  { id: "CORE_PRODUCT_VARIANTS", label: "Product Variants", route: "/dashboard/product-variants", section: "Inventory", core: true, business: "service", businessLabel: "Core (all businesses)" },
+  { id: "CORE_BATCH_TRACKING", label: "Batch & Serial", route: "/dashboard/batch-tracking", section: "Inventory", core: true, business: "service", businessLabel: "Core (all businesses)" },
+  { id: "CORE_STOCK_RATE", label: "Stock Rates", route: "/dashboard/stock-rate", section: "Inventory", core: true, business: "service", businessLabel: "Core (all businesses)" },
+  { id: "CORE_BARCODE", label: "Barcode", route: "/dashboard/barcode", section: "Inventory", core: true, business: "service", businessLabel: "Core (all businesses)" },
+  // ── Banking & Payments ──
+  { id: "CORE_BANK_RECONCILIATION", label: "Bank Reconciliation", route: "/dashboard/bank-reconciliation", section: "Banking & Payments", core: true, business: "service", businessLabel: "Core (all businesses)" },
+  { id: "CORE_EXPENSE_VOUCHERS", label: "Expense Vouchers", route: "/dashboard/expense-vouchers", section: "Banking & Payments", core: true, business: "service", businessLabel: "Core (all businesses)" },
+  { id: "CORE_TAX_CONFIGURATION", label: "Tax & GST", route: "/dashboard/tax-configuration", section: "Banking & Payments", core: true, business: "service", businessLabel: "Core (all businesses)" },
+  { id: "CORE_BULK_PAYMENTS", label: "Bulk Payments", route: "/dashboard/bulk-payments", section: "Banking & Payments", core: true, business: "service", businessLabel: "Core (all businesses)" },
+  // ── Accounting ──
+  { id: "CORE_ACCOUNTS", label: "Chart of Accounts", route: "/dashboard/accounts", section: "Accounting", core: true, business: "service", businessLabel: "Core (all businesses)" },
+  { id: "CORE_CPV", label: "CPV (Cash Payment)", route: "/dashboard/cpv", section: "Accounting", core: true, business: "service", businessLabel: "Core (all businesses)" },
+  { id: "CORE_CRV", label: "CRV (Cash Receipt)", route: "/dashboard/crv", section: "Accounting", core: true, business: "service", businessLabel: "Core (all businesses)" },
+  { id: "CORE_JV", label: "Journal Voucher", route: "/dashboard/jv", section: "Accounting", core: true, business: "service", businessLabel: "Core (all businesses)" },
+  { id: "CORE_CONTRA", label: "Contra Entry", route: "/dashboard/contra", section: "Accounting", core: true, business: "service", businessLabel: "Core (all businesses)" },
+  { id: "CORE_OPENING_BALANCES", label: "Opening Balances", route: "/dashboard/opening-balances", section: "Accounting", core: true, business: "service", businessLabel: "Core (all businesses)" },
+  { id: "CORE_ADVANCE_PAYMENT", label: "Advance Payment", route: "/dashboard/advance-payment", section: "Accounting", core: true, business: "service", businessLabel: "Core (all businesses)" },
+  { id: "CORE_PETTY_CASH", label: "Petty Cash", route: "/dashboard/petty-cash", section: "Accounting", core: true, business: "service", businessLabel: "Core (all businesses)" },
+  { id: "CORE_LOANS", label: "Loans", route: "/dashboard/loans", section: "Accounting", core: true, business: "service", businessLabel: "Core (all businesses)" },
+  { id: "CORE_RECURRING_TRANSACTIONS", label: "Recurring Transactions", route: "/dashboard/recurring-transactions", section: "Accounting", core: true, business: "service", businessLabel: "Core (all businesses)" },
+  // ── CRM ──
+  { id: "CORE_CRM", label: "CRM Overview", route: "/dashboard/crm", section: "CRM", core: true, business: "service", businessLabel: "Core (all businesses)" },
+  { id: "CORE_CRM_CONTACTS", label: "Contacts", route: "/dashboard/crm/contacts", section: "CRM", core: true, business: "service", businessLabel: "Core (all businesses)" },
+  { id: "CORE_CRM_OPPORTUNITIES", label: "Opportunities", route: "/dashboard/crm/opportunities", section: "CRM", core: true, business: "service", businessLabel: "Core (all businesses)" },
+  { id: "CORE_CRM_INTERACTIONS", label: "Interactions", route: "/dashboard/crm/interactions", section: "CRM", core: true, business: "service", businessLabel: "Core (all businesses)" },
+  // ── HR & Payroll ──
+  { id: "CORE_HR_PAYROLL", label: "HR Overview", route: "/dashboard/hr-payroll", section: "HR & Payroll", core: true, business: "service", businessLabel: "Core (all businesses)" },
+  { id: "CORE_EMPLOYEES", label: "Employees", route: "/dashboard/employees", section: "HR & Payroll", core: true, business: "service", businessLabel: "Core (all businesses)" },
+  { id: "CORE_ATTENDANCE", label: "Attendance", route: "/dashboard/attendance", section: "HR & Payroll", core: true, business: "service", businessLabel: "Core (all businesses)" },
+  { id: "CORE_PAYROLL", label: "Payroll", route: "/dashboard/payroll", section: "HR & Payroll", core: true, business: "service", businessLabel: "Core (all businesses)" },
+  { id: "CORE_ADVANCE_SALARY", label: "Advance Salary", route: "/dashboard/advance-salary", section: "HR & Payroll", core: true, business: "service", businessLabel: "Core (all businesses)" },
+  // ── Financial Reports ──
+  { id: "CORE_REPORTS", label: "All Reports", route: "/dashboard/reports", section: "Financial Reports", core: true, business: "service", businessLabel: "Core (all businesses)" },
+  { id: "CORE_REPORTS_TRIAL_BALANCE", label: "Trial Balance", route: "/dashboard/reports/trial-balance", section: "Financial Reports", core: true, business: "service", businessLabel: "Core (all businesses)" },
+  { id: "CORE_REPORTS_PROFIT_LOSS", label: "Profit & Loss", route: "/dashboard/reports/profit-loss", section: "Financial Reports", core: true, business: "service", businessLabel: "Core (all businesses)" },
+  { id: "CORE_REPORTS_BALANCE_SHEET", label: "Balance Sheet", route: "/dashboard/reports/balance-sheet", section: "Financial Reports", core: true, business: "service", businessLabel: "Core (all businesses)" },
+  { id: "CORE_REPORTS_LEDGER", label: "Ledger", route: "/dashboard/reports/ledger", section: "Financial Reports", core: true, business: "service", businessLabel: "Core (all businesses)" },
+  { id: "CORE_REPORTS_CASH_FLOW", label: "Cash Flow", route: "/dashboard/reports/cash-flow", section: "Financial Reports", core: true, business: "service", businessLabel: "Core (all businesses)" },
+  { id: "CORE_REPORTS_TAX_SUMMARY", label: "Tax Summary", route: "/dashboard/reports/tax-summary", section: "Financial Reports", core: true, business: "service", businessLabel: "Core (all businesses)" },
+  { id: "CORE_CUSTOMER_STATEMENT", label: "Customer Statement", route: "/dashboard/customer-statement", section: "Financial Reports", core: true, business: "service", businessLabel: "Core (all businesses)" },
+  { id: "CORE_SUPPLIER_STATEMENT", label: "Supplier Statement", route: "/dashboard/supplier-statement", section: "Financial Reports", core: true, business: "service", businessLabel: "Core (all businesses)" },
+  // ── Advanced Financial ──
+  { id: "CORE_REPORTS_BUDGET_VS_ACTUAL", label: "Budget vs Actual", route: "/dashboard/reports/budget-vs-actual", section: "Advanced Financial", core: true, business: "service", businessLabel: "Core (all businesses)" },
+  { id: "CORE_REPORTS_COGS", label: "COGS Report", route: "/dashboard/reports/cogs", section: "Advanced Financial", core: true, business: "service", businessLabel: "Core (all businesses)" },
+  { id: "CORE_REPORTS_GROSS_MARGIN", label: "Gross Margin", route: "/dashboard/reports/gross-margin", section: "Advanced Financial", core: true, business: "service", businessLabel: "Core (all businesses)" },
+  { id: "CORE_REPORTS_EXPENSE_BREAKDOWN", label: "Expense Breakdown", route: "/dashboard/reports/expense-breakdown", section: "Advanced Financial", core: true, business: "service", businessLabel: "Core (all businesses)" },
+  { id: "CORE_REPORTS_BREAKEVEN", label: "Breakeven Analysis", route: "/dashboard/reports/breakeven", section: "Advanced Financial", core: true, business: "service", businessLabel: "Core (all businesses)" },
+  { id: "CORE_REPORTS_TAX_FORECAST", label: "Tax Forecast", route: "/dashboard/reports/tax-forecast", section: "Advanced Financial", core: true, business: "service", businessLabel: "Core (all businesses)" },
+  { id: "CORE_REPORTS_AUDIT_EXCEPTION", label: "Audit & Exceptions", route: "/dashboard/reports/audit-exception", section: "Advanced Financial", core: true, business: "service", businessLabel: "Core (all businesses)" },
+  // ── Inventory Intelligence ──
+  { id: "CORE_REPORTS_STOCK", label: "Stock Report", route: "/dashboard/reports/stock", section: "Inventory Intelligence", core: true, business: "service", businessLabel: "Core (all businesses)" },
+  { id: "CORE_REPORTS_STOCK_LEDGER", label: "Stock Ledger", route: "/dashboard/reports/stock-ledger", section: "Inventory Intelligence", core: true, business: "service", businessLabel: "Core (all businesses)" },
+  { id: "CORE_REPORTS_STOCK_MOVEMENT", label: "Stock Movement", route: "/dashboard/reports/stock/movement", section: "Inventory Intelligence", core: true, business: "service", businessLabel: "Core (all businesses)" },
+  { id: "CORE_REPORTS_INVENTORY_STOCK_SUMMARY", label: "Stock Summary", route: "/dashboard/reports/inventory/stock-summary", section: "Inventory Intelligence", core: true, business: "service", businessLabel: "Core (all businesses)" },
+  { id: "CORE_REPORTS_INVENTORY_INWARD", label: "Inward Report", route: "/dashboard/reports/inventory/inward", section: "Inventory Intelligence", core: true, business: "service", businessLabel: "Core (all businesses)" },
+  { id: "CORE_REPORTS_OUTWARD", label: "Outward Report", route: "/dashboard/reports/outward", section: "Inventory Intelligence", core: true, business: "service", businessLabel: "Core (all businesses)" },
+  { id: "CORE_REPORTS_STOCK_DEAD", label: "Dead Stock", route: "/dashboard/reports/stock/dead", section: "Inventory Intelligence", core: true, business: "service", businessLabel: "Core (all businesses)" },
+  { id: "CORE_REPORTS_STOCK_TURNOVER", label: "Stock Turnover", route: "/dashboard/reports/stock/turnover", section: "Inventory Intelligence", core: true, business: "service", businessLabel: "Core (all businesses)" },
+  { id: "CORE_REPORTS_STOCK_EXPIRY", label: "Expiry Tracking", route: "/dashboard/reports/stock/expiry", section: "Inventory Intelligence", core: true, business: "service", businessLabel: "Core (all businesses)" },
+  { id: "CORE_REPORTS_STOCK_VALUATION", label: "Stock Valuation", route: "/dashboard/reports/stock/valuation", section: "Inventory Intelligence", core: true, business: "service", businessLabel: "Core (all businesses)" },
+  { id: "CORE_REPORTS_STOCK_WAREHOUSE", label: "Warehouse Stock", route: "/dashboard/reports/stock/warehouse", section: "Inventory Intelligence", core: true, business: "service", businessLabel: "Core (all businesses)" },
+  { id: "CORE_REPORTS_STOCK_LOW", label: "Reorder Alerts", route: "/dashboard/reports/stock/low", section: "Inventory Intelligence", core: true, business: "service", businessLabel: "Core (all businesses)" },
+  // ── Sales Analytics ──
+  { id: "CORE_REPORTS_SALES", label: "Sales Report", route: "/dashboard/reports/sales", section: "Sales Analytics", core: true, business: "service", businessLabel: "Core (all businesses)" },
+  { id: "CORE_REPORTS_CUSTOMER_PROFITABILITY", label: "Customer Profitability", route: "/dashboard/reports/customer-profitability", section: "Sales Analytics", core: true, business: "service", businessLabel: "Core (all businesses)" },
+  { id: "CORE_REPORTS_SALESMAN_PERFORMANCE", label: "Salesman Performance", route: "/dashboard/reports/salesman-performance", section: "Sales Analytics", core: true, business: "service", businessLabel: "Core (all businesses)" },
+  { id: "CORE_REPORTS_DISCOUNT_ANALYSIS", label: "Discount Analysis", route: "/dashboard/reports/discount-analysis", section: "Sales Analytics", core: true, business: "service", businessLabel: "Core (all businesses)" },
+  { id: "CORE_REPORTS_SALES_REGION", label: "Sales by Region", route: "/dashboard/reports/sales-region", section: "Sales Analytics", core: true, business: "service", businessLabel: "Core (all businesses)" },
+  { id: "CORE_REPORTS_PRODUCT_PROFITABILITY", label: "Product Profitability", route: "/dashboard/reports/product-profitability", section: "Sales Analytics", core: true, business: "service", businessLabel: "Core (all businesses)" },
+  { id: "CORE_REPORTS_RETURNS_ANALYSIS", label: "Returns Analysis", route: "/dashboard/reports/returns-analysis", section: "Sales Analytics", core: true, business: "service", businessLabel: "Core (all businesses)" },
+  // ── Receivables & Payables ──
+  { id: "CORE_REPORTS_AGEING", label: "Ageing Report", route: "/dashboard/reports/ageing", section: "Receivables & Payables", core: true, business: "service", businessLabel: "Core (all businesses)" },
+  { id: "CORE_REPORTS_PAYMENT_HISTORY", label: "Payment History", route: "/dashboard/reports/payment-history", section: "Receivables & Payables", core: true, business: "service", businessLabel: "Core (all businesses)" },
+  { id: "CORE_PAYMENT_FOLLOWUP", label: "Payment Follow-up", route: "/dashboard/payment-followup", section: "Receivables & Payables", core: true, business: "service", businessLabel: "Core (all businesses)" },
+  { id: "CORE_REPORTS_BAD_DEBTS", label: "Bad Debts", route: "/dashboard/reports/bad-debts", section: "Receivables & Payables", core: true, business: "service", businessLabel: "Core (all businesses)" },
+  { id: "CORE_REPORTS_CREDIT_ANALYSIS", label: "Credit Analysis", route: "/dashboard/reports/credit-analysis", section: "Receivables & Payables", core: true, business: "service", businessLabel: "Core (all businesses)" },
+  // ── Operations Reports ──
+  { id: "CORE_REPORTS_ORDER_FULFILLMENT", label: "Order Fulfillment", route: "/dashboard/reports/order-fulfillment", section: "Operations Reports", core: true, business: "service", businessLabel: "Core (all businesses)" },
+  { id: "CORE_REPORTS_DELIVERY_PERFORMANCE", label: "Delivery Performance", route: "/dashboard/reports/delivery-performance", section: "Operations Reports", core: true, business: "service", businessLabel: "Core (all businesses)" },
+  { id: "CORE_REPORTS_PO_TRACKING", label: "PO Tracking", route: "/dashboard/reports/po-tracking", section: "Operations Reports", core: true, business: "service", businessLabel: "Core (all businesses)" },
+  { id: "CORE_REPORTS_SUPPLIER_PERFORMANCE", label: "Supplier Performance", route: "/dashboard/reports/supplier-performance", section: "Operations Reports", core: true, business: "service", businessLabel: "Core (all businesses)" },
+  // ── Strategic Reports ──
+  { id: "CORE_REPORTS_FORECAST", label: "Sales Forecast", route: "/dashboard/reports/forecast", section: "Strategic Reports", core: true, business: "service", businessLabel: "Core (all businesses)" },
+  { id: "CORE_REPORTS_SCENARIO", label: "Scenario Planning", route: "/dashboard/reports/scenario", section: "Strategic Reports", core: true, business: "service", businessLabel: "Core (all businesses)" },
+  // ── AI & Automation ──
+  { id: "CORE_AI", label: "AI Intelligence", route: "/dashboard/ai", section: "AI & Automation", core: true, business: "service", businessLabel: "Core (all businesses)" },
+  { id: "CORE_AI_ASSISTANT", label: "AI Assistant", route: "/dashboard/ai-assistant", section: "AI & Automation", core: true, business: "service", businessLabel: "Core (all businesses)" },
+  { id: "CORE_OPERATOR", label: "Business Operator", route: "/dashboard/operator", section: "AI & Automation", core: true, business: "service", businessLabel: "Core (all businesses)" },
+  { id: "CORE_AUTOMATION", label: "Business Automation", route: "/dashboard/automation", section: "AI & Automation", core: true, business: "service", businessLabel: "Core (all businesses)" },
+  { id: "CORE_OWNER_DASHBOARD", label: "Owner Dashboard", route: "/dashboard/owner-dashboard", section: "AI & Automation", core: true, business: "service", businessLabel: "Core (all businesses)" },
+  { id: "CORE_BUSINESS_GUIDE", label: "Business Guide", route: "/dashboard/business-guide", section: "AI & Automation", core: true, business: "service", businessLabel: "Core (all businesses)" },
+  // ── Admin ──
+  { id: "CORE_ADMIN_CONTROL", label: "Admin Control Center", route: "/dashboard/admin-control", section: "Admin", core: true, business: "service", businessLabel: "Core (all businesses)" },
+  { id: "CORE_CHAT", label: "Support Inbox", route: "/dashboard/chat", section: "Admin", core: true, business: "service", businessLabel: "Core (all businesses)" },
+  { id: "CORE_BUSINESS_FEATURES", label: "Business Features", route: "/dashboard/business-features", section: "Admin", core: true, business: "service", businessLabel: "Core (all businesses)" },
+  { id: "CORE_NOTIFICATIONS_CONFIG", label: "Notification Settings", route: "/dashboard/notifications-config", section: "Admin", core: true, business: "service", businessLabel: "Core (all businesses)" },
+  { id: "CORE_SHORTCUTS", label: "Keyboard Shortcuts", route: "/dashboard/shortcuts", section: "Admin", core: true, business: "service", businessLabel: "Core (all businesses)" },
+  { id: "CORE_USERS", label: "Team", route: "/dashboard/users", section: "Admin", core: true, business: "service", businessLabel: "Core (all businesses)" },
+  { id: "CORE_USERS_LOGS", label: "System Logs", route: "/dashboard/users/logs", section: "Admin", core: true, business: "service", businessLabel: "Core (all businesses)" },
+  { id: "CORE_AUDIT_TRAIL", label: "Audit Trail", route: "/dashboard/audit-trail", section: "Admin", core: true, business: "service", businessLabel: "Core (all businesses)" },
+  { id: "CORE_FIXED_ASSETS", label: "Fixed Assets", route: "/dashboard/fixed-assets", section: "Admin", core: true, business: "service", businessLabel: "Core (all businesses)" },
+  { id: "CORE_APPROVALS", label: "Approvals", route: "/dashboard/approvals", section: "Admin", core: true, business: "service", businessLabel: "Core (all businesses)" },
+  // ── Settings ──
+  { id: "CORE_BRANCHES", label: "Branches", route: "/dashboard/branches", section: "Settings", core: true, business: "service", businessLabel: "Core (all businesses)" },
+  { id: "CORE_CURRENCIES", label: "Currencies", route: "/dashboard/currencies", section: "Settings", core: true, business: "service", businessLabel: "Core (all businesses)" },
+  { id: "CORE_COST_CENTERS", label: "Cost Centers", route: "/dashboard/cost-centers", section: "Settings", core: true, business: "service", businessLabel: "Core (all businesses)" },
+  { id: "CORE_FINANCIAL_YEAR", label: "Financial Year", route: "/dashboard/financial-year", section: "Settings", core: true, business: "service", businessLabel: "Core (all businesses)" },
+  { id: "CORE_BUDGET", label: "Budget Planning", route: "/dashboard/budget", section: "Settings", core: true, business: "service", businessLabel: "Core (all businesses)" },
+  { id: "CORE_BACKUP_RESTORE", label: "Backup & Restore", route: "/dashboard/backup-restore", section: "Settings", core: true, business: "service", businessLabel: "Core (all businesses)" },
+  { id: "CORE_ACCOUNT_SETTINGS", label: "Account Settings", route: "/dashboard/account-settings", section: "Settings", core: true, business: "service", businessLabel: "Core (all businesses)" },
+  { id: "CORE_BILLING", label: "My Billing", route: "/dashboard/billing", section: "Settings", core: true, business: "service", businessLabel: "Core (all businesses)" },
+  { id: "CORE_SETTINGS_APPEARANCE", label: "Appearance", route: "/dashboard/settings/appearance", section: "Settings", core: true, business: "service", businessLabel: "Core (all businesses)" },
+  { id: "CORE_SETTINGS_HOLIDAYS", label: "Public Holidays", route: "/dashboard/settings/holidays", section: "Settings", core: true, business: "service", businessLabel: "Core (all businesses)" },
+  { id: "CORE_SECURITY_ACCESS", label: "Security & Access", route: "/dashboard/security-access", section: "Settings", core: true, business: "service", businessLabel: "Core (all businesses)" },
+  { id: "CORE_INTEGRATIONS", label: "Integrations", route: "/dashboard/integrations", section: "Settings", core: true, business: "service", businessLabel: "Core (all businesses)" },
+  { id: "CORE_AFFILIATE", label: "Affiliate Program", route: "/dashboard/affiliate", section: "Settings", core: true, business: "service", businessLabel: "Core (all businesses)" },
+  { id: "CORE_COMPANY_PROFILE", label: "Company Profile", route: "/dashboard/company-profile", section: "Settings", core: true, business: "service", businessLabel: "Core (all businesses)" },
+  { id: "CORE_NOTIFICATIONS", label: "Notifications", route: "/dashboard/notifications", section: "Settings", core: true, business: "service", businessLabel: "Core (all businesses)" },
+];
+
+// Core pages join the same list the sidebar, the admin grid and the route
+// guard all read, so there is still exactly one registry.
+DASHBOARD_FEATURE_DEFS.push(...CORE_DASHBOARD_FEATURES);
+
 export const DASHBOARD_FEATURE_IDS = DASHBOARD_FEATURE_DEFS.map((feature) => feature.id);
 
 export const AI_TOOL_IDS = [
@@ -2443,7 +2602,7 @@ export function createDefaultDashboardFeatureFlags(): Record<DashboardFeaturePla
  * The AI tools live under `business: "trading"` for historical reasons, but a
  * pharmacy gets the same 24 AI tabs a trading company does.
  */
-export const CROSS_BUSINESS_FEATURE_LABELS = new Set(["AI Intelligence"]);
+export const CROSS_BUSINESS_FEATURE_LABELS = new Set(["AI Intelligence", "Core (all businesses)"]);
 
 /**
  * Every dashboard page a given business type can see, whether or not a plan
@@ -2458,6 +2617,7 @@ export function dashboardFeaturesForBusinessType(businessType: string): Dashboar
   const target = String(businessType || "").trim();
   if (!target) return [];
   return DASHBOARD_FEATURE_DEFS.filter((feature) => {
+    if (feature.core) return true;
     if (CROSS_BUSINESS_FEATURE_LABELS.has(feature.businessLabel)) return true;
     const allowed = feature.businessTypes?.length ? feature.businessTypes : [feature.business];
     return allowed.includes(target);
