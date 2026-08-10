@@ -46,8 +46,13 @@ const STATUS_COLORS: Record<string, { bg: string; text: string }> = {
 };
 
 type PlanCode = "STARTER" | "PRO" | "ENTERPRISE" | "CUSTOM";
-type TabKey = "pricing" | "permissions" | "pages" | "custom-plans" | "modules" | "addon" | "pkr-pricing" | "pkr-permissions";
-const TAB_KEYS: TabKey[] = ["pricing", "permissions", "pages", "custom-plans", "modules", "addon", "pkr-pricing", "pkr-permissions"];
+// Four gating screens, two audiences × two jobs:
+//   permissions      → what the /pricing table shows outside Pakistan
+//   pkr-permissions  → what the /pricing table shows inside Pakistan
+//   pages            → which dashboard pages a plan gets outside Pakistan
+//   pkr-pages        → which dashboard pages a plan gets inside Pakistan
+type TabKey = "pricing" | "permissions" | "pages" | "custom-plans" | "modules" | "addon" | "pkr-pricing" | "pkr-permissions" | "pkr-pages";
+const TAB_KEYS: TabKey[] = ["pricing", "permissions", "pages", "custom-plans", "modules", "addon", "pkr-pricing", "pkr-permissions", "pkr-pages"];
 
 type AddonCompany = {
   id: string; name: string; plan: string; createdAt: string;
@@ -56,6 +61,22 @@ type AddonCompany = {
 type AddonStats = { total: number; active: number; mrr: number };
 
 /* ─── Section card ───────────────────────────────────── */
+/* Says out loud which audience a tab edits and which surface it changes.
+   Without it the four gating screens look interchangeable, and an admin has no
+   way to tell that "Permissions" is the website and "Pages & Modules" is the
+   dashboard, or that the PKR pair only ever reaches Pakistan. */
+function ScopeNote({ title, body, pk = false }: { title: string; body: string; pk?: boolean }) {
+  const accent = pk ? "5,150,105" : "79,70,229";
+  return (
+    <div style={{ padding: "13px 18px", borderRadius: 14, marginBottom: 18, background: `rgba(${accent},.08)`, border: `1px solid rgba(${accent},.25)` }}>
+      <div style={{ fontSize: 13, fontWeight: 800, color: pk ? "#6ee7b7" : "#c7d2fe", marginBottom: 4 }}>
+        {pk ? "🇵🇰 " : "🌍 "}{title}
+      </div>
+      <div style={{ fontSize: 12, color: "#94a3b8", lineHeight: 1.6 }}>{body}</div>
+    </div>
+  );
+}
+
 function Card({ children, title, subtitle }: { children: React.ReactNode; title: string; subtitle?: string }) {
   return (
     <div style={{ borderRadius: 18, border: "1px solid rgba(255,255,255,.07)", background: "rgba(255,255,255,.025)", overflow: "hidden", marginBottom: 24 }}>
@@ -402,6 +423,7 @@ export default function AdminPlansPage() {
     { key: "pages",            label: "Pages & Modules",    icon: "📄" },
     { key: "pkr-pricing",      label: "PKR Pricing",        icon: "🇵🇰" },
     { key: "pkr-permissions",  label: "PKR Permissions",    icon: "🔒" },
+    { key: "pkr-pages",        label: "PKR Pages & Modules", icon: "📑" },
     { key: "custom-plans",     label: "Custom Requests",    icon: "📋" },
     { key: "modules",          label: "Module Pricing",     icon: "🧩" },
     { key: "addon",            label: "Automation Add-on",  icon: "⚡" },
@@ -530,12 +552,16 @@ export default function AdminPlansPage() {
 
       {/* ══ TAB: PERMISSIONS ══ */}
       {tab === "permissions" && !loadingConfig && (
-        <Card title="Plan Permissions" subtitle="Tick which permissions each plan includes — this drives both the dashboard and the public pricing table">
+        <Card title="Plan Permissions" subtitle="What the public pricing table shows outside Pakistan">
+          <ScopeNote
+            title="Pricing table — rest of the world"
+            body="Drives the comparison table on /pricing for every visitor outside Pakistan. Untick a permission on all three plans and its row disappears from the table entirely. Pakistan visitors read PKR Permissions instead."
+          />
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 14, flexWrap: "wrap", marginBottom: 18, padding: "12px 16px", borderRadius: 12, background: "rgba(79,70,229,.08)", border: "1px solid rgba(79,70,229,.22)" }}>
             <div style={{ fontSize: 12, color: "#94a3b8", lineHeight: 1.6, maxWidth: 620 }}>
-              Unticking a permission here removes its ✓ from the matching row on{" "}
-              <span style={{ fontFamily: "monospace", fontSize: 11, color: "#c7d2fe" }}>/pricing</span>{" "}
-              and locks the page in the dashboard. Changes go live about a minute after saving — no deploy needed.
+              These lists are also the plan gate the dashboard enforces, so a feature you untick here is
+              both hidden on <span style={{ fontFamily: "monospace", fontSize: 11, color: "#c7d2fe" }}>/pricing</span>{" "}
+              and locked in the app. Changes are live within a minute of saving — no deploy needed.
             </div>
             <button
               onClick={resetPlanPermissionsToDefaults}
@@ -585,7 +611,26 @@ export default function AdminPlansPage() {
           duplicating the separate /admin/permissions screen. Both are now this
           one grid: pick a business type, assign each page and module to a plan. */}
       {tab === "pages" && (
-        <BusinessPlanMatrix embedded />
+        <>
+          <ScopeNote
+            title="Dashboard pages — rest of the world"
+            body="Whatever is ticked for a plan here is what that plan's customers see in their dashboard sidebar. This screen does not touch the public pricing table, and it does not apply to Pakistan-based companies — those are on PKR Pages & Modules."
+          />
+          <BusinessPlanMatrix key="pages-world" embedded scope="WORLD" />
+        </>
+      )}
+
+      {/* ══ TAB: PKR PAGES & MODULES ══
+          Same grid, its own saved config, applied only to Pakistan companies. */}
+      {tab === "pkr-pages" && (
+        <>
+          <ScopeNote
+            title="Dashboard pages — Pakistan customers only"
+            body="Applies to companies whose country is Pakistan or whose base currency is PKR. Saved separately from the world grid, so changing one never moves pages for the other audience."
+            pk
+          />
+          <BusinessPlanMatrix key="pages-pkr" embedded scope="PKR" />
+        </>
       )}
 
       {/* ══ TAB: PKR PRICING ══ */}
@@ -680,7 +725,12 @@ export default function AdminPlansPage() {
             </div>
           </div>
 
-          <Card title="PKR Plan Permissions" subtitle="Features available to PKR users per plan">
+          <Card title="PKR Plan Permissions" subtitle="What the public pricing table shows inside Pakistan">
+            <ScopeNote
+              pk
+              title="Pricing table — Pakistan visitors only"
+              body="Drives the comparison table on /pricing for visitors resolved to Pakistan, and the plan gate for companies with country Pakistan or base currency PKR. Untick a permission on all three plans and its row disappears from the table. Everyone else reads the world Permissions tab."
+            />
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))", gap: 16 }}>
               {(["STARTER", "PRO", "ENTERPRISE", "CUSTOM"] as const).map(pc => {
                 const count = (pkrPlanPermissions[pc] || []).length;
@@ -715,22 +765,20 @@ export default function AdminPlansPage() {
             </div>
           </Card>
 
-          {/* Page assignment is not currency-specific — it lives in one place.
-              A duplicate PKR page grid used to sit here, so the same page could
-              be granted in one screen and revoked in the other. */}
-          <Card title="PKR Dashboard Pages" subtitle="Page access is set once for all currencies">
-            <div style={{ padding: "18px 20px", borderRadius: 14, background: "rgba(99,102,241,.06)", border: "1px solid rgba(99,102,241,.22)", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16, flexWrap: "wrap" }}>
+          {/* Pakistan page access has its own grid again, on its own tab. This
+              card only points at it — the two used to be one shared config. */}
+          <Card title="PKR Dashboard Pages" subtitle="Now a tab of its own">
+            <div style={{ padding: "18px 20px", borderRadius: 14, background: "rgba(5,150,105,.07)", border: "1px solid rgba(5,150,105,.25)", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16, flexWrap: "wrap" }}>
               <div style={{ fontSize: 12.5, color: "#94a3b8", lineHeight: 1.6, maxWidth: 620 }}>
-                Which pages each plan gets is now set per business type in{" "}
-                <strong style={{ color: "#c7d2fe" }}>Pages &amp; Modules</strong>, and applies to PKR and USD
-                companies alike. PKR <strong style={{ color: "#c7d2fe" }}>pricing</strong> and{" "}
-                <strong style={{ color: "#c7d2fe" }}>permissions</strong> above stay Pakistan-specific.
+                Which dashboard pages a Pakistan company gets is set per business type in{" "}
+                <strong style={{ color: "#6ee7b7" }}>PKR Pages &amp; Modules</strong>. It is saved separately
+                from the world grid, so the two audiences can differ.
               </div>
               <button
-                onClick={() => setTab("pages")}
-                style={{ padding: "9px 18px", borderRadius: 10, background: "linear-gradient(135deg,#4f46e5,#7c3aed)", border: "none", color: "white", fontSize: 12.5, fontWeight: 700, cursor: "pointer", whiteSpace: "nowrap" }}
+                onClick={() => setTab("pkr-pages")}
+                style={{ padding: "9px 18px", borderRadius: 10, background: "linear-gradient(135deg,#059669,#047857)", border: "none", color: "white", fontSize: 12.5, fontWeight: 700, cursor: "pointer", whiteSpace: "nowrap" }}
               >
-                Open Pages &amp; Modules →
+                Open PKR Pages &amp; Modules →
               </button>
             </div>
           </Card>

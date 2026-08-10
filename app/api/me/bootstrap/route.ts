@@ -80,6 +80,7 @@ export async function GET(req: NextRequest) {
       shortcutsLog,
       adminControl,
       businessPlanModulesLog,
+      pkrBusinessPlanModulesLog,
     ] = await Promise.all([
       prisma.user.findUnique({
         where: { id: userId },
@@ -135,6 +136,11 @@ export async function GET(req: NextRequest) {
       getCompanyAdminControlSettings(companyId).catch(() => null),
       prisma.activityLog.findFirst({
         where: { action: "BUSINESS_PLAN_MODULES_CONFIG" },
+        orderBy: { createdAt: "desc" },
+        select: { details: true },
+      }).catch(() => null),
+      prisma.activityLog.findFirst({
+        where: { action: "PKR_BUSINESS_PLAN_MODULES_CONFIG" },
         orderBy: { createdAt: "desc" },
         select: { details: true },
       }).catch(() => null),
@@ -194,14 +200,13 @@ export async function GET(req: NextRequest) {
       planPermsMap = normalizePlanPermissions();
     }
 
-    // Page access is NOT currency-specific. It used to read the PKR config too,
-    // so the same page could be granted in one admin screen and revoked in the
-    // other; the PKR page grid has been removed and this now always reads the
-    // single currency-neutral list, which the per-business-type assignment in
-    // Plans → Pages & Modules then overrides.
+    // Page access is currency-specific again, and has its own screen per
+    // audience: Plans → Pages & Modules for the world, Plans → PKR Pages &
+    // Modules for Pakistan. Each writes its own config, so editing one never
+    // moves pages for the other.
     let dashboardFlagsMap: Record<string, string[]>;
-    if (planConfigLog?.details) {
-      dashboardFlagsMap = normalizeDashboardFeatureFlags(JSON.parse(planConfigLog.details).dashboardFeatureFlags);
+    if (activeConfigLog?.details) {
+      dashboardFlagsMap = normalizeDashboardFeatureFlags(JSON.parse(activeConfigLog.details).dashboardFeatureFlags);
     } else {
       dashboardFlagsMap = normalizeDashboardFeatureFlags();
     }
@@ -233,9 +238,11 @@ export async function GET(req: NextRequest) {
     // wins over the plan-wide list from /admin/plans. Before this, the two
     // screens disagreed — /admin/permissions could not reach most pages at all.
     let businessPageFlags: Record<string, Record<string, string[]>> | null = null;
-    if (businessPlanModulesLog?.details) {
+    const activePageModulesLog =
+      isPkrCompany && pkrBusinessPlanModulesLog ? pkrBusinessPlanModulesLog : businessPlanModulesLog;
+    if (activePageModulesLog?.details) {
       try {
-        const parsed = JSON.parse(businessPlanModulesLog.details);
+        const parsed = JSON.parse(activePageModulesLog.details);
         businessPageFlags = parsed?.pageConfig || null;
       } catch {}
     }
