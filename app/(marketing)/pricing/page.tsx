@@ -527,7 +527,6 @@ export default function PricingPage() {
   // thing allowed to unlock the PKR-native price list. Null until resolved →
   // global pricing shows first.
   const [geoCountry, setGeoCountry] = useState<string | null>(null);
-  const [pkrAddonPricing, setPkrAddonPricing] = useState<{ monthly: number; yearly: number } | null>({ monthly: 1800, yearly: 1440 });
   const [planLimits, setPlanLimits] = useState<Record<string, number | null>>(DEFAULT_PLAN_LIMITS);
   // Key must be "professional" (not "pro") — the render below reads
   // branchLimits.professional; before the /api/public/pricing fetch resolves,
@@ -634,12 +633,8 @@ export default function PricingPage() {
               enterprise:   { monthly: Number(d.pkrPricing.enterprise?.monthly   ?? 19999), yearly: Math.round(Number(d.pkrPricing.enterprise?.yearly   ?? 191988) / 12) },
             });
           }
-          if (d?.pkrAddonPricing) {
-            setPkrAddonPricing({
-              monthly: Number(d.pkrAddonPricing.monthly ?? 1800),
-              yearly:  Math.round(Number(d.pkrAddonPricing.yearly ?? 17280) / 12),
-            });
-          }
+          // pkrAddonPricing was read here for the automation card's price. That
+          // card no longer shows one, so nothing on this page consumes it.
         }
       } catch {}
       // Load live plan feature overrides from admin config
@@ -685,20 +680,10 @@ export default function PricingPage() {
     }
     return formatPrice(usdPrice);
   };
-  const getAddonDisplayPrice = (usdMonthly: number, usdYearly: number) => {
-    if (isPKUser && pkrAddonPricing) {
-      const amount = billing === "yearly" ? pkrAddonPricing.yearly : pkrAddonPricing.monthly;
-      return `₨${amount.toLocaleString("en-PK")}`;
-    }
-    return formatPrice(billing === "yearly" ? usdYearly : usdMonthly);
-  };
-  const getAddonYearlySaving = (usdDiffPerMonth: number) => {
-    if (isPKUser && pkrAddonPricing) {
-      const saving = (pkrAddonPricing.monthly - pkrAddonPricing.yearly) * 12;
-      return `₨${saving.toLocaleString("en-PK")}`;
-    }
-    return formatPrice(usdDiffPerMonth * 12);
-  };
+  // getAddonDisplayPrice / getAddonYearlySaving used to live here. The
+  // automation card is the only thing that ever called them and it no longer
+  // quotes a price, so they went with it rather than sitting here as the next
+  // person's "why is this unused?".
 
   // These were stubbed to `undefined` while every CTA was a dead "Launching
   // Soon" button. BuyCta needs the real destinations again so that flipping
@@ -1003,7 +988,7 @@ export default function PricingPage() {
             <div style={{ padding: "36px 40px" }}>
               <div className="addon-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 40, alignItems: "center" }}>
 
-                {/* Left: Price + CTA */}
+                {/* Left: Pitch + CTA */}
                 <div>
                   {/* No price here on purpose. Automation is quoted with the
                       plan it is attached to, so a number on this card would be
@@ -1246,9 +1231,9 @@ export default function PricingPage() {
               })}
             </div>
 
-            <div style={{ marginTop: 12, fontSize: 12, color: "rgba(255,255,255,.32)" }}>
-              Need only the automation tools? <Link href="/onboarding/choose-plan?addon=automation" style={{ color: "#a78bfa", textDecoration: "none", fontWeight: 700 }}>Business Automation is sold separately →</Link>
-            </div>
+            {/* A second Business Automation pitch used to sit here, a screen
+                below the dedicated add-on section that already sells it with a
+                CTA. One pitch per product on a pricing page. */}
           </div>
 
           <div style={{ height: 1, background: "rgba(255,255,255,.06)", marginBottom: 32 }} />
@@ -1313,9 +1298,13 @@ export default function PricingPage() {
                 );
               })}
 
-              {/* Add-ons */}
+              {/* Seats & branches.
+                  This block was headed "Add-ons — Optional" while the module
+                  cards directly above it badge layer-on modules "ADD-ON" — two
+                  different meanings of the same word on one screen. These are
+                  quantities, not features, so they are Extras now. */}
               <div style={{ padding: "20px 22px", borderRadius: 16, background: "rgba(255,255,255,.02)", border: "1px solid rgba(255,255,255,.07)", marginTop: 4 }}>
-                <div style={{ fontSize: 11, fontWeight: 800, color: "rgba(255,255,255,.3)", letterSpacing: ".08em", textTransform: "uppercase", marginBottom: 14 }}>Add-ons — Optional</div>
+                <div style={{ fontSize: 11, fontWeight: 800, color: "rgba(255,255,255,.3)", letterSpacing: ".08em", textTransform: "uppercase", marginBottom: 14 }}>Extras — Optional</div>
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
                   {[
                     { key: "users",    label: "Extra Users",    icon: "👥", color: "#a5b4fc", val: extraUsers,    set: setExtraUsers },
@@ -1361,7 +1350,7 @@ export default function PricingPage() {
                   </div>
                 )}
 
-                {/* Add-ons breakdown */}
+                {/* Extras breakdown — seats and branches */}
                 {(extraUsers > 0 || extraBranches > 0) && (
                   <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 12, paddingTop: 10, borderTop: "1px solid rgba(255,255,255,.07)" }}>
                     {extraUsers > 0 && (
