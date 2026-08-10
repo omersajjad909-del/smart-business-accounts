@@ -13,7 +13,9 @@ import { useResponsive } from "@/hooks/useResponsive";
 const ff = "'Outfit','Inter',sans-serif";
 const bg = "rgba(255,255,255,0.03)";
 const border = "rgba(255,255,255,0.07)";
-const statusColor: Record<string, string> = { planned: "#818cf8", in_progress: "#f59e0b", completed: "#22c55e", cancelled: "#6b7280" };
+const statusColor: Record<string, string> = { planned: "#818cf8", in_progress: "#f59e0b", running: "#f59e0b", completed: "#22c55e", cancelled: "#6b7280" };
+
+type ProductionOrder = ReturnType<typeof mapProductionOrderRecord>;
 
 export default function ProductionOrdersPage() {
   const { isMobile } = useResponsive();
@@ -23,6 +25,14 @@ export default function ProductionOrdersPage() {
   const workStore = useBusinessRecords("work_order");
   const [showModal, setShowModal] = useState(false);
   const [formError, setFormError] = useState("");
+  // Completion dialog — priced before anything is written.
+  const [runOrder, setRunOrder] = useState<ProductionOrder | null>(null);
+  const [runQty, setRunQty] = useState(1);
+  const [runQuote, setRunQuote] = useState<ProductionRunQuote | null>(null);
+  const [quoting, setQuoting] = useState(false);
+  const [running, setRunning] = useState(false);
+  const [runError, setRunError] = useState("");
+  const [allowShort, setAllowShort] = useState(false);
   const [form, setForm] = useState({
     product: "",
     bomId: "",
@@ -199,9 +209,9 @@ export default function ProductionOrdersPage() {
                     Start
                   </button>
                 )}
-                {order.status === "in_progress" && (
-                  <button onClick={() => completeOrder(order)} style={{ padding: "7px 14px", background: "rgba(34,197,94,.15)", border: "1px solid rgba(34,197,94,.3)", color: "#22c55e", borderRadius: 8, fontSize: 12, fontWeight: 700, cursor: "pointer" }}>
-                    Complete + FG Batch
+                {(order.status === "in_progress" || order.status === "running") && (
+                  <button onClick={() => openCompleteDialog(order)} style={{ padding: "7px 14px", background: "rgba(34,197,94,.15)", border: "1px solid rgba(34,197,94,.3)", color: "#22c55e", borderRadius: 8, fontSize: 12, fontWeight: 700, cursor: "pointer" }}>
+                    Record production →
                   </button>
                 )}
                 {order.status !== "completed" && order.status !== "cancelled" && (
