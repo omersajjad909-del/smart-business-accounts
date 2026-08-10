@@ -195,12 +195,16 @@ const COMPARISON: Category[] = [
     title: "Core Platform",
     features: [
       { name: "Users", starter: "Up to 3", pro: "Up to 10", enterprise: "Up to 25" },
-      { name: "Branches", permKey: "MULTI_BRANCH", starter: "1", pro: "3", enterprise: "10" },
+      // No permKey: every company has its one branch, and MULTI_BRANCH is what
+      // unlocks a second — so the "1" on Starter is a limit, not a grant.
+      { name: "Branches", starter: "1", pro: "3", enterprise: "10" },
       { name: "Multi-currency", permKey: "MULTI_CURRENCY", starter: false, pro: false, enterprise: true },
       { name: "Custom domain (white-label)", starter: false, pro: false, enterprise: true },
       { name: "API access", permKey: "API_ACCESS", starter: false, pro: false, enterprise: true },
       { name: "Webhooks & integrations", permKey: "API_ACCESS", starter: false, pro: false, enterprise: true },
-      { name: "Role-based permissions", permKey: "MANAGE_ROLES", starter: "Basic", pro: "Advanced", enterprise: "Custom" },
+      // No permKey: "Basic" on Starter is MANAGE_USERS (invite your 3 seats);
+      // MANAGE_ROLES is what makes it "Advanced" from Pro up.
+      { name: "Role-based permissions", starter: "Basic", pro: "Advanced", enterprise: "Custom" },
       { name: "Approval workflows", permKey: "MANAGE_APPROVALS", starter: false, pro: true, enterprise: true },
       { name: "Cost centers", permKey: "MANAGE_COST_CENTERS", starter: false, pro: true, enterprise: true },
       { name: "Audit trail", permKey: "VIEW_AUDIT_LOG", starter: false, pro: true, enterprise: true },
