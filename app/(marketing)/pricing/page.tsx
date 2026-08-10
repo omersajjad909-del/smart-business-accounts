@@ -994,7 +994,7 @@ export default function PricingPage() {
               Add Business Automation to any plan
             </h2>
             <p style={{ color: "rgba(255,255,255,.42)", fontSize: 15, maxWidth: 560, margin: "0 auto" }}>
-              Flat {getAddonDisplayPrice(79, 69)}/month on top of whatever you already pay — Starter, Professional, Enterprise, or a custom package.
+              Attach it to whatever you already pay for — Starter, Professional, Enterprise, or a custom package.
             </p>
           </div>
 
@@ -1005,22 +1005,16 @@ export default function PricingPage() {
 
                 {/* Left: Price + CTA */}
                 <div>
-                  <div style={{ fontSize: 13, color: "#a78bfa", fontWeight: 700, marginBottom: 6 }}>AUTOMATION ADD-ON</div>
-                  <div style={{ display: "flex", alignItems: "baseline", gap: 8, marginBottom: 6 }}>
-                    <span style={{ fontSize: 52, fontWeight: 900, color: "#fff", letterSpacing: "-.03em" }}>{getAddonDisplayPrice(79, 69)}</span>
-                    <span style={{ fontSize: 14, color: "rgba(255,255,255,.4)" }}>/month</span>
+                  {/* No price here on purpose. Automation is quoted with the
+                      plan it is attached to, so a number on this card would be
+                      a second, competing price for the same subscription. */}
+                  <div style={{ fontSize: 13, color: "#a78bfa", fontWeight: 700, marginBottom: 10 }}>AUTOMATION ADD-ON</div>
+                  <div style={{ fontSize: 26, fontWeight: 900, color: "#fff", letterSpacing: "-.02em", lineHeight: 1.25, marginBottom: 10 }}>
+                    Put the busywork on autopilot
                   </div>
-                  {/* The old line here repeated the same number the big price
-                      already shows. Say what the cycle actually costs instead. */}
-                  {billing === "yearly" ? (
-                    <div style={{ fontSize: 13, color: "#34d399", marginBottom: 8, fontWeight: 700 }}>
-                      Billed annually — save {getAddonYearlySaving(10)}/year vs monthly
-                    </div>
-                  ) : (
-                    <div style={{ fontSize: 13, color: "rgba(255,255,255,.5)", marginBottom: 8 }}>
-                      Billed monthly — pay yearly and it drops to {isPKUser && pkrAddonPricing ? `₨${pkrAddonPricing.yearly.toLocaleString("en-PK")}` : formatPrice(69)}/mo
-                    </div>
-                  )}
+                  <div style={{ fontSize: 14, color: "rgba(255,255,255,.5)", lineHeight: 1.6, marginBottom: 10 }}>
+                    Chasing overdue invoices, watching stock levels and rebuilding the same reports every month — all of it runs on its own.
+                  </div>
                   <div style={{ fontSize: 13, color: "rgba(255,255,255,.4)", marginBottom: 28 }}>
                     Add to any plan · Cancel anytime · No hidden fees
                   </div>
@@ -1064,13 +1058,17 @@ export default function PricingPage() {
                 </div>
               </div>
 
-              {/* Value comparison bar */}
+              {/* Value comparison bar.
+                  The dollar figures that used to sit here were hard-coded USD
+                  ($40, $30, $60 … "= $438+/mo vs our $79") — they ignored the
+                  visitor's currency and quoted an automation price this card
+                  deliberately no longer shows. The point stands without them. */}
               <div className="val-bar" style={{ marginTop: 28, paddingTop: 24, borderTop: "1px solid rgba(255,255,255,.08)", display: "flex", alignItems: "center", gap: 20, flexWrap: "wrap" }}>
-                <span style={{ fontSize: 13, color: "rgba(255,255,255,.4)" }}>These tools cost separately:</span>
-                {["AR reminder tools $40", "Reorder alert add-ons $30", "Reporting tools $60", "Zapier $49", "Sheet sync $30"].map(t => (
-                  <span key={t} style={{ fontSize: 12, padding: "3px 10px", borderRadius: 6, background: "rgba(248,113,113,.1)", border: "1px solid rgba(248,113,113,.2)", color: "#fca5a5" }}>{t}</span>
+                <span style={{ fontSize: 13, color: "rgba(255,255,255,.4)" }}>Replaces separate subscriptions for:</span>
+                {["AR reminder tools", "Reorder alerts", "Reporting tools", "Zapier", "Sheet sync"].map(t => (
+                  <span key={t} style={{ fontSize: 12, padding: "3px 10px", borderRadius: 6, background: "rgba(167,139,250,.1)", border: "1px solid rgba(167,139,250,.22)", color: "#c4b5fd" }}>{t}</span>
                 ))}
-                <span style={{ fontSize: 13, fontWeight: 700, color: "#34d399" }}>= {formatPrice(438)}+/mo vs our {getAddonDisplayPrice(79, 69)}</span>
+                <span style={{ fontSize: 13, fontWeight: 700, color: "#34d399" }}>— all in one add-on</span>
               </div>
             </div>
           </div>
