@@ -640,7 +640,10 @@ export default function PricingPage() {
       } catch {}
       // Load live plan feature overrides from admin config
       try {
-        const pf = await fetch("/api/public/plan-features", { cache: "no-store" });
+        // Same region headers as the currency fetch — this endpoint now serves
+        // Pakistan the PKR Permissions table and everyone else the world one,
+        // and it must not race the cookie on a cold visit.
+        const pf = await fetch("/api/public/plan-features", { cache: "no-store", headers: clientRegionHeaders() });
         if (pf.ok) { const d = await pf.json(); if (d?.featureMap) setFeatureMap(d.featureMap); }
       } catch {}
     })();
@@ -1099,7 +1102,7 @@ export default function PricingPage() {
             </div>
 
             {/* Categories */}
-            {COMPARISON.map(cat => (
+            {visibleComparison.map(cat => (
               <div key={cat.id}>
                 {/* Category header — clickable */}
                 <button
@@ -1136,11 +1139,7 @@ export default function PricingPage() {
                             <span style={{ fontSize: 13, fontWeight: 700, color: PLAN_COLORS[pi] }}>{lim === null ? "Unlimited" : lim === 1 ? "1 branch" : `Up to ${lim}`}</span>
                           </div>
                         ))
-                      : ([
-                          feat.permKey && featureMap[feat.permKey] !== undefined ? featureMap[feat.permKey].starter : feat.starter,
-                          feat.permKey && featureMap[feat.permKey] !== undefined ? featureMap[feat.permKey].pro : feat.pro,
-                          feat.permKey && featureMap[feat.permKey] !== undefined ? featureMap[feat.permKey].enterprise : feat.enterprise,
-                        ] as Val[]).map((v, pi) => (
+                      : resolveRow(feat).map((v, pi) => (
                           <div key={pi} style={{ padding: "13px 16px", textAlign: "center", borderLeft: "1px solid rgba(255,255,255,.04)", display: "flex", alignItems: "center", justifyContent: "center", background: PLANS[pi].featured ? "rgba(99,102,241,.03)" : "transparent" }}>
                             <Val v={v} color={PLAN_COLORS[pi]} />
                           </div>
