@@ -16,6 +16,7 @@ import {
   completeProductionRun,
   priceProductionRun,
   readBomLines,
+  readBomConversion,
   ManufacturingError,
 } from "@/lib/manufacturingPosting";
 
@@ -60,11 +61,17 @@ export async function GET(req: NextRequest) {
     const done = Number(orderData.completed ?? 0);
     const producedQty = qty > 0 ? Math.floor(qty) : Math.max(ordered - done, 1);
 
+    // The quote must price the run exactly the way completing it will, so the
+    // screen shows the real cost — conversion cost and warehouse included.
+    const conversion = readBomConversion(bomData);
     const priced = await priceProductionRun({
       companyId,
       bomLines: lines,
       bomYield: Number(bomData.yield ?? 1),
       producedQty,
+      labourPerBatch: conversion.labourPerBatch,
+      overheadPerBatch: conversion.overheadPerBatch,
+      location: searchParams.get("location") || "MAIN",
     });
 
     return NextResponse.json({
@@ -100,6 +107,9 @@ export async function POST(req: NextRequest) {
       date: body.date,
       allowNegativeStock: body.allowNegativeStock === true,
       location: body.location,
+      // Optional actuals — omit and the BOM's per-batch figures are scaled.
+      labourCost: body.labourCost != null ? Number(body.labourCost) : undefined,
+      overheadCost: body.overheadCost != null ? Number(body.overheadCost) : undefined,
     });
 
     return NextResponse.json({ success: true, ...result });

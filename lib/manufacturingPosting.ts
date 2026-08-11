@@ -185,22 +185,64 @@ export async function getAverageCosts(
   return out;
 }
 
-/** Finds a company's account by code, creating it if the chart predates it. */
+/**
+ * Conversion cost the BOM declares for one batch.
+ *
+ * Production used to cost material only, so a PVC bag that took a roll plus an
+ * hour of labour and machine time was valued at the roll alone. Finished goods
+ * went onto the balance sheet too cheap, and the labour stayed in the P&L as a
+ * period expense in the month it was paid rather than following the goods.
+ */
+export function readBomConversion(data: unknown): {
+  labourPerBatch: number;
+  overheadPerBatch: number;
+} {
+  const d = (data ?? {}) as Record<string, unknown>;
+  const num = (v: unknown) => {
+    const n = Number(v);
+    return Number.isFinite(n) && n > 0 ? n : 0;
+  };
+  return {
+    labourPerBatch: num(d.labourPerBatch),
+    overheadPerBatch: num(d.overheadPerBatch),
+  };
+}
+
+/**
+ * Finds a company's account, creating it if the chart predates it.
+ *
+ * Name is checked before code because the codes are not unique across business
+ * types: 5101 is "Factory Labour" in the manufacturing chart but "Purchase
+ * Returns" in the trading one, so keying on the code alone would post wages
+ * into a purchase-returns account for any company set up as trading.
+ */
 export async function ensureAccount(
   tx: Db,
   companyId: string,
   spec: { code: string; name: string; type: string },
 ): Promise<string> {
-  const existing = await tx.account.findFirst({
+  const byName = await tx.account.findFirst({
+    where: {
+      companyId,
+      deletedAt: null,
+      name: { equals: spec.name, mode: "insensitive" },
+    },
+    select: { id: true },
+  });
+  if (byName) return byName.id;
+
+  // A company set up as "trading" and later switched to manufacturing has no
+  // WIP account. Create it rather than refusing to post — but not on top of a
+  // code another account already owns, or the chart ends up with two 5101s
+  // meaning different things.
+  const codeTaken = await tx.account.findFirst({
     where: { companyId, code: spec.code, deletedAt: null },
     select: { id: true },
   });
-  if (existing) return existing.id;
+  const code = codeTaken ? `${spec.code}-MFG` : spec.code;
 
-  // A company set up as "trading" and later switched to manufacturing has no
-  // WIP account. Create it rather than refusing to post.
   const created = await tx.account.create({
-    data: { companyId, code: spec.code, name: spec.name, type: spec.type },
+    data: { companyId, code, name: spec.name, type: spec.type },
     select: { id: true },
   });
   return created.id;
@@ -217,10 +259,26 @@ export async function priceProductionRun(opts: {
   bomYield: number;
   /** Units being produced now. */
   producedQty: number;
+  /** Conversion cost the BOM declares per batch; scaled like the material. */
+  labourPerBatch?: number;
+  overheadPerBatch?: number;
+  /** Absolute overrides for this run, if the operator entered actuals. */
+  labourCost?: number;
+  overheadCost?: number;
+  /** Warehouse the run draws on. Omit to look at every location. */
+  location?: string | null;
   client?: Db;
-}): Promise<{ lines: BomLineCost[]; totalCost: number; unitCost: number; shortages: BomLineCost[] }> {
+}): Promise<{
+  lines: BomLineCost[];
+  materialCost: number;
+  labourCost: number;
+  overheadCost: number;
+  totalCost: number;
+  unitCost: number;
+  shortages: BomLineCost[];
+}> {
   const db = (opts.client ?? prisma) as Db;
-  const { companyId, bomLines, producedQty } = opts;
+  const { companyId, bomLines, producedQty, location } = opts;
   const bomYield = opts.bomYield > 0 ? opts.bomYield : 1;
   const scale = producedQty / bomYield;
 
@@ -230,8 +288,8 @@ export async function priceProductionRun(opts: {
       where: { companyId, id: { in: itemIds } },
       select: { id: true, name: true, unit: true },
     }),
-    getStockOnHand(db, companyId, itemIds),
-    getAverageCosts(db, companyId, itemIds),
+    getStockOnHand(db, companyId, itemIds, location),
+    getAverageCosts(db, companyId, itemIds, location),
   ]);
   const byId = new Map(items.map((i) => [i.id, i]));
 
@@ -253,9 +311,23 @@ export async function priceProductionRun(opts: {
     };
   });
 
-  const totalCost = lines.reduce((s, l) => s + l.lineCost, 0);
+  const materialCost = lines.reduce((s, l) => s + l.lineCost, 0);
+
+  // Conversion cost scales with the run unless the operator gave an actual.
+  const round2 = (n: number) => Math.round(n * 100) / 100;
+  const labourCost = round2(
+    opts.labourCost != null ? Number(opts.labourCost) || 0 : (opts.labourPerBatch || 0) * scale,
+  );
+  const overheadCost = round2(
+    opts.overheadCost != null ? Number(opts.overheadCost) || 0 : (opts.overheadPerBatch || 0) * scale,
+  );
+  const totalCost = materialCost + labourCost + overheadCost;
+
   return {
     lines,
+    materialCost,
+    labourCost,
+    overheadCost,
     totalCost,
     unitCost: producedQty > 0 ? totalCost / producedQty : 0,
     shortages: lines.filter((l) => l.availableQty < l.requiredQty),
@@ -264,6 +336,9 @@ export async function priceProductionRun(opts: {
 
 export type CompletedRun = {
   producedQty: number;
+  materialCost: number;
+  labourCost: number;
+  overheadCost: number;
   totalCost: number;
   unitCost: number;
   lines: BomLineCost[];
@@ -288,6 +363,9 @@ export async function completeProductionRun(opts: {
   /** Produce anyway when material is short — the shortfall shows as negative stock. */
   allowNegativeStock?: boolean;
   location?: string;
+  /** Actual conversion cost for this run; overrides what the BOM declares. */
+  labourCost?: number;
+  overheadCost?: number;
 }): Promise<CompletedRun> {
   const { companyId, productionOrderId } = opts;
   const producedQty = Math.floor(Number(opts.producedQty));
@@ -338,11 +416,19 @@ export async function completeProductionRun(opts: {
     });
     if (!finishedItem) throw new ManufacturingError("The BOM's finished product item no longer exists", 404);
 
+    const conversion = readBomConversion(bomData);
     const priced = await priceProductionRun({
       companyId,
       bomLines,
       bomYield: Number(bomData.yield ?? 1),
       producedQty,
+      labourPerBatch: conversion.labourPerBatch,
+      overheadPerBatch: conversion.overheadPerBatch,
+      labourCost: opts.labourCost,
+      overheadCost: opts.overheadCost,
+      // Material is consumed out of one warehouse, so availability and cost are
+      // read from that warehouse rather than from company-wide totals.
+      location,
       client: tx,
     });
 
@@ -389,11 +475,14 @@ export async function completeProductionRun(opts: {
     // This used to be MFG_ACCOUNTS.RAW_MATERIAL_STOCK (1200) while purchase
     // invoices debit Stock/Inventory, so issuing material drove 1200 negative
     // and left the purchased value stranded in Stock/Inventory forever.
-    const [rawMaterialAccountId, wipAccountId, finishedAccountId] = await Promise.all([
-      resolveInventoryAccountId(tx, companyId),
-      ensureAccount(tx, companyId, MFG_ACCOUNTS.WORK_IN_PROGRESS),
-      resolveFinishedGoodsAccountId(tx, companyId),
-    ]);
+    const [rawMaterialAccountId, wipAccountId, finishedAccountId, labourAccountId, overheadAccountId] =
+      await Promise.all([
+        resolveInventoryAccountId(tx, companyId),
+        ensureAccount(tx, companyId, MFG_ACCOUNTS.WORK_IN_PROGRESS),
+        resolveFinishedGoodsAccountId(tx, companyId),
+        ensureAccount(tx, companyId, MFG_ACCOUNTS.FACTORY_LABOUR),
+        ensureAccount(tx, companyId, MFG_ACCOUNTS.FACTORY_OVERHEAD),
+      ]);
 
     // Was `count() + 1` / `+ 2`, which repeated a number as soon as any MFG
     // voucher was deleted — the count dropped while the highest number did not.
@@ -412,11 +501,22 @@ export async function completeProductionRun(opts: {
           voucherNo: issueVoucherNo,
           type: "MFG",
           date,
-          narration: `Material issued to production ${orderLabel}`,
+          narration: `Material and conversion cost charged to production ${orderLabel}`,
           entries: {
             create: [
+              // WIP absorbs the full cost of the run …
               { companyId, accountId: wipAccountId, amount: priced.totalCost },
-              { companyId, accountId: rawMaterialAccountId, amount: -priced.totalCost },
+              // … released from stock, and from the labour and overhead the
+              // factory already expensed. Crediting those expense accounts is
+              // the absorption step: the cost stops being a period expense and
+              // follows the goods until they are sold.
+              { companyId, accountId: rawMaterialAccountId, amount: -priced.materialCost },
+              ...(priced.labourCost > 0
+                ? [{ companyId, accountId: labourAccountId, amount: -priced.labourCost }]
+                : []),
+              ...(priced.overheadCost > 0
+                ? [{ companyId, accountId: overheadAccountId, amount: -priced.overheadCost }]
+                : []),
             ],
           },
         },
@@ -482,6 +582,9 @@ export async function completeProductionRun(opts: {
 
     return {
       producedQty,
+      materialCost: priced.materialCost,
+      labourCost: priced.labourCost,
+      overheadCost: priced.overheadCost,
       totalCost: priced.totalCost,
       unitCost: priced.unitCost,
       lines: priced.lines,
