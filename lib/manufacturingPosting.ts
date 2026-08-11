@@ -46,6 +46,22 @@ export const INVENTORY_TXN_TYPES = {
   PRODUCTION_RECEIPT: "PRODUCTION_RECEIPT",
 } as const;
 
+/**
+ * Inbound movements whose `amount` is genuinely what the stock *cost*.
+ *
+ * Not every positive InventoryTxn is a cost. `SALE_RETURN` rows — written by
+ * sales returns and by the reversal legs of invoice edits and deletes — carry
+ * the *sale* rate, and `ADJUSTMENT` rows carry `item.rate`, which is also the
+ * sale rate. Averaging those in inflated every cost in the system: one return
+ * of a bag sold at 20 dragged its 11.25 production cost upwards, and the next
+ * production run then issued material at that wrong price.
+ */
+export const COST_BEARING_INBOUND_TYPES = [
+  "PURCHASE",
+  "PRODUCTION_RECEIPT",
+  "OPENING",
+] as const;
+
 export type BomLine = { itemId: string; qty: number };
 
 export type BomLineCost = BomLine & {
@@ -123,7 +139,12 @@ export async function getAverageCosts(
   if (!itemIds.length) return out;
 
   const inbound = await tx.inventoryTxn.findMany({
-    where: { companyId, itemId: { in: itemIds }, qty: { gt: 0 } },
+    where: {
+      companyId,
+      itemId: { in: itemIds },
+      qty: { gt: 0 },
+      type: { in: [...COST_BEARING_INBOUND_TYPES] },
+    },
     select: { itemId: true, qty: true, amount: true },
   });
   const totals = new Map<string, { qty: number; value: number }>();
