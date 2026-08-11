@@ -1,22 +1,25 @@
 /**
- * Single switch for light mode.
+ * Theme policy.
  *
- * The app ships dark-only while the light palette is unfinished — several
- * dashboard surfaces still hardcode light-on-dark colours, so anything that
- * removed the `dark` class produced an unreadable page. Rather than deleting
- * the light code paths, every place that could turn light off reads this flag,
- * so bringing it back is a one-line change plus whatever palette work is left.
+ * Dark is the default for everyone, and it does not follow the operating
+ * system. `enableSystem` used to be on, so a visitor whose OS was set to light
+ * got the light palette on first load even though dark is the intended look —
+ * which is why the app opened white for most people.
  *
- * Flipping this to `true` re-enables:
- *   • the moon/sun button in the dashboard header  (components/mode-toggle.tsx)
- *   • the Theme selector on Settings → Appearance  (app/dashboard/settings/appearance/page.tsx)
- *   • the saved-preference applier                 (components/AppearanceApplier.tsx)
- *
- * It does NOT undo `forcedTheme="dark"` on the ThemeProvider in app/layout.tsx —
- * that one is deliberately a separate, visible edit, because it is the thing
- * that actually pins the theme.
+ * Light mode itself still works and the header toggle still switches to it; it
+ * is simply never the starting point. Once a user picks a theme, next-themes
+ * remembers it.
  */
-export const ALLOW_LIGHT_THEME = false;
 
-/** The only theme in use while ALLOW_LIGHT_THEME is false. */
-export const FORCED_THEME = "dark" as const;
+/** The header toggle and the Appearance selector are available. */
+export const ALLOW_LIGHT_THEME = true;
+
+/** What a user sees before they have chosen anything. */
+export const DEFAULT_THEME = "dark" as const;
+
+/**
+ * Whether the OS preference decides the starting theme.
+ *
+ * Off on purpose: DEFAULT_THEME should mean the same thing on every machine.
+ */
+export const FOLLOW_SYSTEM_THEME = false;
