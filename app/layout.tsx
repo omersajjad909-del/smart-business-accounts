@@ -31,6 +31,7 @@ const GOOGLE_FONTS_HREF =
 import CookieBanner from "./(marketing)/landing/components/CookieBanner";
 import AnalyticsGate from "./(marketing)/landing/components/AnalyticsGate";
 import { ThemeProvider } from "@/components/theme-provider";
+import { DEFAULT_THEME, FOLLOW_SYSTEM_THEME } from "@/lib/themeConfig";
 import VisitorTracker from "@/components/VisitorTracker";
 import ClientRegionSignal from "@/components/ClientRegionSignal";
 
@@ -342,21 +343,14 @@ export default async function RootLayout({
             for scrolling bugs whose real causes are now fixed: overflow on
             body/<main> and the dashboard shell's use of vh. */}
         <AnalyticsGate />
-        {/* Dark only, for now.
-            The light palette is not finished — several dashboard surfaces still
-            hardcode white-on-dark values, so a visitor whose OS is set to light
-            got an unreadable mix. `forcedTheme` overrides the stored choice and
-            the system preference both, and `enableSystem` is off so nothing can
-            flip it back.
-
-            To bring light mode back: drop forcedTheme, restore enableSystem,
-            and re-enable the three call sites listed in ALLOW_LIGHT_THEME in
-            lib/themeConfig.ts. */}
+        {/* Dark is the default for everyone. `enableSystem` is off on purpose:
+            with it on, a visitor whose OS was set to light opened the app in
+            light even though dark is the intended default. The header toggle
+            still switches, and the choice is remembered. See lib/themeConfig.ts. */}
         <ThemeProvider
           attribute="class"
-          defaultTheme="dark"
-          forcedTheme="dark"
-          enableSystem={false}
+          defaultTheme={DEFAULT_THEME}
+          enableSystem={FOLLOW_SYSTEM_THEME}
           disableTransitionOnChange
         >
           <Toaster
