@@ -640,10 +640,18 @@ export default function DashboardLayout({
     if (!companyDetail.businessSetupDone) router.replace("/business-setup");
   }, [ready, companyDetail?.businessSetupDone]);
 
+  // Industry page guard — "is this page part of your trade?"
+  //
+  // This only ever saw industry pages, because the registry only held those.
+  // Now that the 119 cross-business pages are in it too, findDashboardFeature
+  // ByRoute matches almost every route — and core pages carry a placeholder
+  // `business` value, so the ownership test below failed all of them and threw
+  // the customer back to /dashboard from every single page. Core pages belong
+  // to every trade; the plan guard further down is what decides them.
   useEffect(() => {
     if (!ready) return;
     const feature = findDashboardFeatureByRoute(pathname);
-    if (!feature) return;
+    if (!feature || feature.core) return;
     if (isCustomPlan) {
       router.replace("/dashboard");
       return;
