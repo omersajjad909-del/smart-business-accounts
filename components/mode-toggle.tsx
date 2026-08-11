@@ -2,12 +2,17 @@
 
 import * as React from "react"
 import { useTheme } from "next-themes"
+import { ALLOW_LIGHT_THEME } from "@/lib/themeConfig"
 
 export function ModeToggle() {
   const { resolvedTheme, setTheme } = useTheme()
   const [mounted, setMounted] = React.useState(false)
 
   React.useEffect(() => { setMounted(true) }, [])
+
+  // Dark-only for now. Rendering nothing rather than a disabled button keeps
+  // the header clean; the call sites do not need to know.
+  if (!ALLOW_LIGHT_THEME) return null
 
   if (!mounted) return <div style={{ width: 36, height: 36 }} />
 

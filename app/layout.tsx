@@ -342,10 +342,21 @@ export default async function RootLayout({
             for scrolling bugs whose real causes are now fixed: overflow on
             body/<main> and the dashboard shell's use of vh. */}
         <AnalyticsGate />
+        {/* Dark only, for now.
+            The light palette is not finished — several dashboard surfaces still
+            hardcode white-on-dark values, so a visitor whose OS is set to light
+            got an unreadable mix. `forcedTheme` overrides the stored choice and
+            the system preference both, and `enableSystem` is off so nothing can
+            flip it back.
+
+            To bring light mode back: drop forcedTheme, restore enableSystem,
+            and re-enable the three call sites listed in ALLOW_LIGHT_THEME in
+            lib/themeConfig.ts. */}
         <ThemeProvider
           attribute="class"
           defaultTheme="dark"
-          enableSystem
+          forcedTheme="dark"
+          enableSystem={false}
           disableTransitionOnChange
         >
           <Toaster
