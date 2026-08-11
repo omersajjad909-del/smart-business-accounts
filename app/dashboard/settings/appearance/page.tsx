@@ -283,14 +283,27 @@ export default function AppearancePage() {
           </div>
         </div>
 
-        {/* Theme mode */}
+        {/* Theme mode — Light and Auto are hidden while the light palette is
+            unfinished. The stored preference is left alone, so whoever had
+            Light selected gets it back untouched when it returns. */}
         <div style={{ marginBottom: 22 }}>
           <div style={LABEL}>Theme</div>
-          <SegmentedControl
-            value={prefs.themeMode}
-            options={[{v:"light",l:"☀️ Light"},{v:"dark",l:"🌙 Dark"},{v:"auto",l:"🖥 Auto"}]}
-            onChange={v => saveUserPrefs({ themeMode: v as ThemeMode })}
-          />
+          {ALLOW_LIGHT_THEME ? (
+            <SegmentedControl
+              value={prefs.themeMode}
+              options={[{v:"light",l:"☀️ Light"},{v:"dark",l:"🌙 Dark"},{v:"auto",l:"🖥 Auto"}]}
+              onChange={v => saveUserPrefs({ themeMode: v as ThemeMode })}
+            />
+          ) : (
+            <div style={{ display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
+              <div style={{ padding: "8px 16px", borderRadius: 10, background: "rgba(99,102,241,.12)", border: "1px solid rgba(99,102,241,.3)", fontSize: 13, fontWeight: 700, color: "#a5b4fc" }}>
+                🌙 Dark
+              </div>
+              <div style={{ fontSize: 12, color: "rgba(255,255,255,.38)" }}>
+                Light mode is coming back once its colours are finished.
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Density */}
