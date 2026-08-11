@@ -43,6 +43,11 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${BASE}/case-studies`,      lastModified: now, changeFrequency: "monthly" as const, priority: 0.75 },
     { url: `${BASE}/integrations`,      lastModified: now, changeFrequency: "monthly" as const, priority: 0.75 },
     { url: `${BASE}/faq`,               lastModified: now, changeFrequency: "monthly" as const, priority: 0.7 },
+    // Head-to-head pages — slugs must match RIVALS in compare/_data.ts
+    { url: `${BASE}/compare/xero`,       lastModified: now, changeFrequency: "monthly" as const, priority: 0.75 },
+    { url: `${BASE}/compare/zoho-books`, lastModified: now, changeFrequency: "monthly" as const, priority: 0.75 },
+    { url: `${BASE}/compare/quickbooks`, lastModified: now, changeFrequency: "monthly" as const, priority: 0.75 },
+    { url: `${BASE}/compare/wave`,       lastModified: now, changeFrequency: "monthly" as const, priority: 0.7 },
   ];
 
   // Additional pages
