@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { resolveCompanyId, resolveBranchId, resolveBranchIdOrDefault } from "@/lib/tenant";
+import { postCogsVoucher } from "@/lib/cogsPosting";
 type SaleReturn = Prisma.SaleReturnGetPayload<{
   select: {
     returnNo: true;
