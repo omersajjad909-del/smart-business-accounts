@@ -210,6 +210,8 @@ export function proxy(req: NextRequest) {
 
   const publicApi = [
     "/api/auth/login",
+    "/api/auth/forgot-password",
+    "/api/auth/reset-password",
     "/api/login",
     "/api/auth/signup",
     "/api/auth/google",
