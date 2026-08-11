@@ -148,6 +148,7 @@ export async function getAverageCosts(
   tx: Db,
   companyId: string,
   itemIds: string[],
+  location?: string | null,
 ): Promise<Map<string, number>> {
   const out = new Map<string, number>();
   if (!itemIds.length) return out;
@@ -158,6 +159,7 @@ export async function getAverageCosts(
       itemId: { in: itemIds },
       qty: { gt: 0 },
       type: { in: [...COST_BEARING_INBOUND_TYPES] },
+      ...(location ? { location } : {}),
     },
     select: { itemId: true, qty: true, amount: true },
   });
