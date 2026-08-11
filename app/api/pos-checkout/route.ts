@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { resolveCompanyId } from "@/lib/tenant";
+import { postCogsVoucher } from "@/lib/cogsPosting";
+import { nextVoucherNo } from "@/lib/inventoryAccounts";
 
 export async function POST(req: NextRequest) {
   try {
@@ -74,11 +76,13 @@ export async function POST(req: NextRequest) {
         });
       }
       if (salesAcc && debitAcc) {
-        const count = await prisma.voucher.count({ where: { type: "SI", companyId } });
+        // Was `count(type: "SI") + 1`, which counted ordinary sales invoices too
+        // and so jumped or repeated. Numbered off the POS- series itself now.
+        const voucherNo = `POS-${await nextVoucherNo(prisma, companyId, "SI", "POS")}`;
         await prisma.voucher.create({
           data: {
             companyId,
-            voucherNo: `POS-${count + 1}`,
+            voucherNo,
             type: "SI",
             date: txnDate,
             narration: `POS Sale`,
@@ -89,6 +93,15 @@ export async function POST(req: NextRequest) {
               ],
             },
           },
+        });
+
+        // Cost leg — a POS sale moves stock exactly like an invoice does.
+        await postCogsVoucher(prisma, {
+          companyId,
+          voucherNo,
+          date: txnDate,
+          lines: items.map((i) => ({ itemId: i.itemNewId, qty: Number(i.qty) })),
+          narration: `Cost of goods sold — POS ${voucherNo}`,
         });
       }
     } catch (glErr) {

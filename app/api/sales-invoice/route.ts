@@ -537,6 +537,17 @@ export async function PUT(req: NextRequest) {
         });
       }
 
+      // Re-post the cost leg for the edited lines. The old voucher is dropped
+      // rather than reversed so the stock account is left with no residue.
+      await removeCogsVoucher(tx, companyId, existing.invoiceNo);
+      await postCogsVoucher(tx, {
+        companyId,
+        branchId: existing.branchId,
+        voucherNo: existing.invoiceNo,
+        date: new Date(date),
+        lines: items.map((i: any) => ({ itemId: i.itemId, qty: Number(i.qty) })),
+      });
+
       await tx.currencyTransaction.deleteMany({
         where: { transactionType: "INVOICE", transactionId: id },
       });
@@ -609,6 +620,9 @@ export async function DELETE(req: NextRequest) {
         await tx.voucherEntry.deleteMany({ where: { voucherId: voucher.id } });
         await tx.voucher.delete({ where: { id: voucher.id } });
       }
+
+      // The cost leg goes with it, at the value it was originally posted at.
+      await removeCogsVoucher(tx, companyId, existing.invoiceNo);
 
       // Reverse inventory transactions on delete
       for (const oldItem of existing.items) {
