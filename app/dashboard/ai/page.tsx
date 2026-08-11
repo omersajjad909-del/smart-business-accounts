@@ -1419,7 +1419,13 @@ export default function AICommandCenter() {
     { id: "customer-profit",  label: "Customer Profitability", icon: "👤" },
     { id: "ratios",           label: "Financial Ratios",       icon: "⚖️" },
   ];
-  const TABS = enabledTabIds ? ALL_TABS.filter(t => enabledTabIds.has(t.id)) : ALL_TABS;
+  // An *empty* result means the plan/business-type config simply never listed
+  // the AI tool ids — not that this company is entitled to zero of them.
+  // Filtering on it wiped the whole tab bar and left the page looking like a
+  // bare chat box with every AI tool gone. Page-level access is already gated
+  // by the sidebar and /admin/permissions; this filter only narrows when it
+  // actually has something to say.
+  const TABS = enabledTabIds?.size ? ALL_TABS.filter(t => enabledTabIds.has(t.id)) : ALL_TABS;
   const enabledTabSet = new Set(TABS.map(t => t.id));
 
   const TAB_GROUPS = [

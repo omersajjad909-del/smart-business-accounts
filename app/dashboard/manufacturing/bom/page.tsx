@@ -32,7 +32,7 @@ export default function BOMPage() {
   const [showModal, setShowModal] = useState(false);
   const [formError, setFormError] = useState("");
   const [saving, setSaving] = useState(false);
-  const [form, setForm] = useState({ finishedItemId: "", version: "v1.0", yieldUnits: 1 });
+  const [form, setForm] = useState({ finishedItemId: "", version: "v1.0", yieldUnits: 1, labourPerBatch: 0, overheadPerBatch: 0 });
   const [lines, setLines] = useState<LineDraft[]>([{ itemId: "", qty: "" }]);
 
   const boms = useMemo(() => bomStore.records.map(mapBomRecord), [bomStore.records]);
@@ -59,8 +59,12 @@ export default function BOMPage() {
       total += qty * item.unitCost;
     }
     const yieldUnits = form.yieldUnits > 0 ? form.yieldUnits : 1;
-    return { batchCost: total, unitCost: total / yieldUnits };
-  }, [lines, itemsById, form.yieldUnits]);
+    // Conversion cost counts too — a bag costs the roll plus the labour and
+    // machine time that turned the roll into a bag.
+    const conversion = (Number(form.labourPerBatch) || 0) + (Number(form.overheadPerBatch) || 0);
+    const batchCost = total + conversion;
+    return { materialCost: total, conversion, batchCost, unitCost: batchCost / yieldUnits };
+  }, [lines, itemsById, form.yieldUnits, form.labourPerBatch, form.overheadPerBatch]);
 
   function setLine(index: number, patch: Partial<LineDraft>) {
     setLines((current) => current.map((line, i) => (i === index ? { ...line, ...patch } : line)));
@@ -95,13 +99,15 @@ export default function BOMPage() {
           yield: form.yieldUnits,
           finishedItemId: finished.id,
           lines: cleaned,
+          labourPerBatch: Number(form.labourPerBatch) || 0,
+          overheadPerBatch: Number(form.overheadPerBatch) || 0,
           // Kept so older readers and the control centre still render a
           // material summary without having to resolve item ids.
           materials: cleaned.map((l) => itemsById.get(l.itemId)?.name).filter(Boolean).join(", "),
         },
       });
       setShowModal(false);
-      setForm({ finishedItemId: "", version: "v1.0", yieldUnits: 1 });
+      setForm({ finishedItemId: "", version: "v1.0", yieldUnits: 1, labourPerBatch: 0, overheadPerBatch: 0 });
       setLines([{ itemId: "", qty: "" }]);
     } catch (e) {
       setFormError(e instanceof Error ? e.message : "Could not save the BOM.");
@@ -250,6 +256,23 @@ export default function BOMPage() {
               </div>
             </div>
 
+            {/* Conversion cost. Leaving these at 0 values finished goods at
+                material cost alone, which understates what a batch really cost. */}
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginTop: 12 }}>
+              <div>
+                <label style={{ display: "block", fontSize: 12, color: "rgba(255,255,255,.45)", marginBottom: 6 }}>Labour per batch</label>
+                <input type="number" min={0} step="any" value={form.labourPerBatch}
+                  onChange={(e) => setForm((c) => ({ ...c, labourPerBatch: Number(e.target.value) }))}
+                  placeholder="0" style={inputStyle} />
+              </div>
+              <div>
+                <label style={{ display: "block", fontSize: 12, color: "rgba(255,255,255,.45)", marginBottom: 6 }}>Overhead per batch</label>
+                <input type="number" min={0} step="any" value={form.overheadPerBatch}
+                  onChange={(e) => setForm((c) => ({ ...c, overheadPerBatch: Number(e.target.value) }))}
+                  placeholder="0" style={inputStyle} />
+              </div>
+            </div>
+
             <div style={{ marginTop: 18 }}>
               <label style={{ display: "block", fontSize: 12, color: "rgba(255,255,255,.45)", marginBottom: 8 }}>Materials consumed per batch</label>
               <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
@@ -285,6 +308,11 @@ export default function BOMPage() {
               <div style={{ textAlign: "right" }}>
                 <div style={{ fontSize: 17, fontWeight: 800, color: "#22c55e" }}>Rs. {Math.round(draftCost.unitCost).toLocaleString()} <span style={{ fontSize: 12, fontWeight: 500, color: "rgba(255,255,255,.4)" }}>/ unit</span></div>
                 <div style={{ fontSize: 11, color: "rgba(255,255,255,.38)" }}>Rs. {Math.round(draftCost.batchCost).toLocaleString()} per batch of {form.yieldUnits || 1}</div>
+                {draftCost.conversion > 0 && (
+                  <div style={{ fontSize: 11, color: "rgba(255,255,255,.3)", marginTop: 2 }}>
+                    Material Rs. {Math.round(draftCost.materialCost).toLocaleString()} + conversion Rs. {Math.round(draftCost.conversion).toLocaleString()}
+                  </div>
+                )}
               </div>
             </div>
 
