@@ -4,32 +4,51 @@ import Link from "next/link";
 import { Facebook, Instagram, Linkedin, Mail, Phone, Globe, ArrowRight, Zap, Twitter, Youtube, Music2 } from "lucide-react";
 import { useEffect, useState } from "react";
 
+// Four balanced columns. The legal links used to sit inside Company, which
+// pushed it to 14 entries against Product's 8 and repeated every one of them in
+// the bottom bar. Legal now has its own column and the bottom bar keeps only
+// the handful a visitor actually looks for down there.
 const PRODUCT_LINKS = [
   { label: "Core Features",      href: "/features" },
   { label: "Pricing Plans",      href: "/pricing" },
   { label: "ROI Calculator",     href: "/roi-calculator" },
-  { label: "Compare vs Xero",    href: "/compare" },
+  { label: "Release Notes",      href: "/updates" },
+  { label: "Changelog",          href: "/changelog" },
+  { label: "API Docs",           href: "/developers/api" },
+];
+
+const SOLUTIONS_LINKS = [
   { label: "All Industries",     href: "/industries" },
   { label: "Industry Solutions", href: "/solutions" },
-  { label: "Data Security",      href: "/security" },
-  { label: "Release Notes",      href: "/updates" },
+  { label: "Integrations",       href: "/integrations" },
+  // The page compares FinovaOS against Xero, Zoho, Wave and QuickBooks — the
+  // old "Compare vs Xero" label undersold it and cost the other three any
+  // chance of ranking.
+  { label: "Compare Software",   href: "/compare" },
+  { label: "Documentation",      href: "/docs" },
+  { label: "Book a Demo",        href: "/demo" },
 ];
 
 const COMPANY_LINKS = [
   { label: "About Us",           href: "/about" },
-  { label: "Waitlist",           href: "/waitlist" },
-  { label: "Changelog",          href: "/changelog" },
-  { label: "Case Studies",       href: "/case-studies" },
   { label: "Careers",            href: "/careers" },
+  { label: "Case Studies",       href: "/case-studies" },
+  { label: "Blog",               href: "/blog" },
   { label: "Support Center",     href: "/support" },
+  { label: "Contact Us",         href: "/contact" },
   { label: "Affiliate Program",  href: "/affiliate" },
+];
+
+const LEGAL_LINKS = [
   { label: "Privacy Policy",     href: "/legal/privacy" },
-  { label: "Cookie Policy",      href: "/legal/cookies" },
   { label: "Terms of Service",   href: "/legal/terms" },
   { label: "Refund Policy",      href: "/legal/refund" },
+  { label: "Cookie Policy",      href: "/legal/cookies" },
   { label: "SLA",                href: "/legal/sla" },
   { label: "DPA",                href: "/legal/dpa" },
   { label: "Acceptable Use",     href: "/legal/aup" },
+  { label: "Data Security",      href: "/security" },
+  { label: "FAQ",                href: "/faq" },
 ];
 
 const SOCIALS_DEFAULT = [
@@ -72,22 +91,49 @@ const SOCIALS_DEFAULT = [
 ];
 
 const BOTTOM_LINKS = [
-  { label: "Waitlist", href: "/waitlist" },
-  { label: "Privacy",  href: "/legal/privacy" },
-  { label: "Cookies",  href: "/legal/cookies" },
-  { label: "Terms",    href: "/legal/terms" },
-  { label: "Refund",   href: "/legal/refund" },
-  { label: "Security", href: "/security" },
-  { label: "SLA",      href: "/legal/sla" },
-  { label: "AUP",      href: "/legal/aup" },
-  { label: "Sitemap",  href: "/all-pages" },
-  { label: "Status",   href: "/status" },
+  { label: "Privacy", href: "/legal/privacy" },
+  { label: "Terms",   href: "/legal/terms" },
+  { label: "Cookies", href: "/legal/cookies" },
+  { label: "Sitemap", href: "/all-pages" },
+  { label: "Status",  href: "/status" },
 ];
 
 const STATS = [
   { val: "50+",   label: "Modules",  color: "#818cf8" },
   { val: "99.9%", label: "Uptime",   color: "#34d399" },
 ];
+
+/** One footer link column — four of these replace the two long lists. */
+function LinkColumn({
+  title,
+  color,
+  links,
+}: {
+  title: string;
+  color: string;
+  links: { label: string; href: string }[];
+}) {
+  return (
+    <div>
+      <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 20 }}>
+        <div style={{ width: 3, height: 14, borderRadius: 2, background: `linear-gradient(180deg, ${color}, ${color}cc)` }}/>
+        <span style={{ fontSize: 10, fontWeight: 700, color, letterSpacing: ".12em", textTransform: "uppercase" }}>{title}</span>
+      </div>
+      <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
+        {links.map(({ label, href }) => (
+          <li key={label}>
+            <Link href={href} className="ft-link">
+              <svg width="4" height="4" viewBox="0 0 4 4" style={{ flexShrink: 0, opacity: .45 }}>
+                <circle cx="2" cy="2" r="2" fill={color}/>
+              </svg>
+              {label}
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
 
 export default function Footer() {
   const [socialLinks, setSocialLinks] = useState<Record<string, string>>({});
@@ -170,15 +216,19 @@ export default function Footer() {
         .ft-contact-item:hover .ft-contact-icon { transform: scale(1.1); }
         .ft-contact-icon { transition: transform .2s; }
 
+        /* Five columns only fit on a wide screen; below that the brand block
+           takes a full row and the four link columns wrap under it. */
+        @media (max-width: 1100px) {
+          .ft-grid { grid-template-columns: repeat(4, 1fr) !important; }
+          .ft-brand { grid-column: 1 / -1; }
+        }
         @media (max-width: 960px) {
           .ft-grid { grid-template-columns: 1fr 1fr !important; }
           .ft-brand { grid-column: 1 / -1; }
-          .ft-contact-col { grid-column: 1 / -1; }
         }
         @media (max-width: 600px) {
           .ft-grid { grid-template-columns: 1fr 1fr !important; gap: 28px 20px !important; }
           .ft-brand { grid-column: 1 / -1; }
-          .ft-contact-col { grid-column: 1 / -1; }
           .ft-cta-card { display: none !important; }
           .ft-contact-items { flex-direction: row !important; flex-wrap: wrap !important; gap: 10px !important; }
           .ft-bottom-inner { flex-direction: column !important; align-items: center !important; gap: 12px !important; text-align: center; }
@@ -208,10 +258,13 @@ export default function Footer() {
       </div>
 
       {/* Main content */}
-      <div className="ft-main-pad" style={{ maxWidth: 1220, margin: "0 auto", padding: "80px 24px 0", position: "relative", zIndex: 1 }}>
+      {/* 80px of footer padding stacked on top of the CTA section's own 80px
+          bottom padding, with only a one-line pill between them — which read as
+          a large empty band above the links. Tightened on both counts. */}
+      <div className="ft-main-pad" style={{ maxWidth: 1220, margin: "0 auto", padding: "52px 24px 0", position: "relative", zIndex: 1 }}>
 
         {/* Top headline strip */}
-        <div className="ft-top-strip" style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 56, flexWrap: "wrap" }}>
+        <div className="ft-top-strip" style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 34, flexWrap: "wrap" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "6px 14px", borderRadius: 100, background: "rgba(99,102,241,.1)", border: "1px solid rgba(99,102,241,.2)" }}>
             <Zap size={12} color="#818cf8"/>
             <span style={{ fontSize: 11, fontWeight: 700, color: "#818cf8", letterSpacing: ".08em", textTransform: "uppercase" }}>Business OS</span>
@@ -219,8 +272,9 @@ export default function Footer() {
           <span style={{ fontSize: 13, color: "rgba(255,255,255,.25)" }}>— All-in-one platform for modern businesses</span>
         </div>
 
-        {/* Main 4-column grid */}
-        <div className="ft-grid" style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr 1.35fr", gap: "48px 52px", marginBottom: 64 }}>
+        {/* Brand + four link columns. Contact and the CTA sit under the brand
+            so the link columns stay even instead of one running to 14 rows. */}
+        <div className="ft-grid" style={{ display: "grid", gridTemplateColumns: "2.1fr 1fr 1fr 1fr 1fr", gap: "48px 40px", marginBottom: 64 }}>
 
           {/* Brand column */}
           <div className="ft-brand">
@@ -264,63 +318,16 @@ export default function Footer() {
                 </div>
               ))}
             </div>
-          </div>
 
-          {/* Product column */}
-          <div>
-            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 20 }}>
-              <div style={{ width: 3, height: 14, borderRadius: 2, background: "linear-gradient(180deg,#818cf8,#6366f1)" }}/>
-              <span style={{ fontSize: 10, fontWeight: 700, color: "#818cf8", letterSpacing: ".12em", textTransform: "uppercase" }}>Product</span>
-            </div>
-            <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
-              {PRODUCT_LINKS.map(({ label, href }) => (
-                <li key={label}>
-                  <Link href={href} className="ft-link">
-                    <svg width="4" height="4" viewBox="0 0 4 4" style={{ flexShrink: 0, opacity: .45 }}>
-                      <circle cx="2" cy="2" r="2" fill="#818cf8"/>
-                    </svg>
-                    {label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Company column */}
-          <div>
-            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 20 }}>
-              <div style={{ width: 3, height: 14, borderRadius: 2, background: "linear-gradient(180deg,#34d399,#10b981)" }}/>
-              <span style={{ fontSize: 10, fontWeight: 700, color: "#34d399", letterSpacing: ".12em", textTransform: "uppercase" }}>Company</span>
-            </div>
-            <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
-              {COMPANY_LINKS.map(({ label, href }) => (
-                <li key={label}>
-                  <Link href={href} className="ft-link">
-                    <svg width="4" height="4" viewBox="0 0 4 4" style={{ flexShrink: 0, opacity: .45 }}>
-                      <circle cx="2" cy="2" r="2" fill="#34d399"/>
-                    </svg>
-                    {label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Contact + CTA column */}
-          <div className="ft-contact-col">
-            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 20 }}>
-              <div style={{ width: 3, height: 14, borderRadius: 2, background: "linear-gradient(180deg,#fbbf24,#f59e0b)" }}/>
-              <span style={{ fontSize: 10, fontWeight: 700, color: "#fbbf24", letterSpacing: ".12em", textTransform: "uppercase" }}>Get in Touch</span>
-            </div>
-
-            <div className="ft-contact-items" style={{ display: "flex", flexDirection: "column", gap: 12, marginBottom: 28 }}>
+            {/* Contact — moved out of its own column so the four link columns
+                line up evenly across the row. */}
+            <div className="ft-contact-items" style={{ display: "flex", flexDirection: "column", gap: 12, marginTop: 30 }}>
               {[
                 { Icon: Mail,  text: "hello@finovaos.app", color: "#818cf8", href: "mailto:hello@finovaos.app" },
-                { Icon: Phone, text: "+92 317-8653693",        color: "#34d399", href: "https://wa.me/923047653693" },
-                { Icon: Globe, text: "finovaos.app",            color: "#fbbf24", href: "https://finovaos.app" },
-                { Icon: Globe, text: "Lasani Town, Sargodha road , Faisalabad",            color: "#fbbf24", href: "https://finovaos.app" },
+                { Icon: Phone, text: "+92 317-8653693", color: "#34d399", href: "https://wa.me/923047653693" },
+                { Icon: Globe, text: "Lasani Town, Sargodha Road, Faisalabad", color: "#fbbf24", href: "/contact" },
               ].map(({ Icon, text, color, href }) => (
-                <a key={text} href={href} className="ft-contact-item" target="_blank" rel="noopener noreferrer" style={{ display: "flex", alignItems: "center", gap: 10, textDecoration: "none" }}>
+                <a key={text} href={href} className="ft-contact-item" style={{ display: "flex", alignItems: "center", gap: 10, textDecoration: "none" }}>
                   <div className="ft-contact-icon" style={{
                     width: 32, height: 32, borderRadius: 9, flexShrink: 0,
                     background: `${color}14`, border: `1px solid ${color}28`,
@@ -333,29 +340,36 @@ export default function Footer() {
               ))}
             </div>
 
-            {/* CTA card */}
+            {/* CTA card — kept from the old contact column so the footer still
+                has a conversion path. */}
             <div className="ft-cta-card" style={{
-              borderRadius: 14, padding: "18px",
+              borderRadius: 14, padding: "16px 18px", marginTop: 24, maxWidth: 340,
               background: "linear-gradient(135deg,rgba(99,102,241,.1),rgba(79,70,229,.06))",
               border: "1px solid rgba(99,102,241,.2)",
               position: "relative", overflow: "hidden",
             }}>
               <div aria-hidden style={{ position: "absolute", top: -30, right: -30, width: 100, height: 100, borderRadius: "50%", background: "radial-gradient(circle,rgba(99,102,241,.14),transparent 70%)", pointerEvents: "none" }}/>
-              <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 8 }}>
-                <span style={{ fontSize: 14 }}>🚀</span>
-                <span style={{ fontSize: 10.5, fontWeight: 800, color: "#a5b4fc", letterSpacing: ".08em", textTransform: "uppercase" }}>Get Started</span>
-              </div>
               <p style={{ fontSize: 13.5, color: "rgba(255,255,255,.75)", fontWeight: 600, margin: "0 0 5px", lineHeight: 1.3 }}>
                 Take Control of Your Business Today
               </p>
               <p style={{ fontSize: 11.5, color: "rgba(255,255,255,.32)", margin: "0 0 14px", lineHeight: 1.55 }}>
-                Stop wasting time on spreadsheets. Automate invoicing, payments, and reporting. Get real-time insights with AI-powered analytics. Scale with confidence.
+                Automate invoicing, payments, and reporting — with real-time AI insights.
               </p>
-              <Link href="/pricing" className="ft-cta-btn">
-                Get Started <ArrowRight size={13}/>
-              </Link>
+              <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                <Link href="/pricing" className="ft-cta-btn">
+                  View Pricing <ArrowRight size={13}/>
+                </Link>
+                <Link href="/demo" className="ft-cta-btn" style={{ background: "rgba(255,255,255,.06)", boxShadow: "none" }}>
+                  Book a Demo
+                </Link>
+              </div>
             </div>
           </div>
+
+          <LinkColumn title="Product"   color="#818cf8" links={PRODUCT_LINKS} />
+          <LinkColumn title="Solutions" color="#34d399" links={SOLUTIONS_LINKS} />
+          <LinkColumn title="Company"   color="#fbbf24" links={COMPANY_LINKS} />
+          <LinkColumn title="Legal"     color="#f472b6" links={LEGAL_LINKS} />
 
         </div>
 
