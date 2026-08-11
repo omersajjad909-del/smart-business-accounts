@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import { BRAND_PRESETS, type BrandKey } from "@/lib/brandPalette";
+import { ALLOW_LIGHT_THEME } from "@/lib/themeConfig";
 
 type PrefsResponse = {
   themeMode?: "light" | "dark" | "auto";
@@ -33,11 +34,16 @@ export default function AppearanceApplier() {
     let currentThemeMode: "light" | "dark" | "auto" = "auto";
     const applyThemeMode = (mode: "light" | "dark" | "auto") => {
       currentThemeMode = mode;
+      // Dark-only for now. A user who picked Light or Auto before the palette
+      // was pulled still has that preference stored, so honouring it here would
+      // strip the `dark` class straight back off after the provider set it.
+      if (!ALLOW_LIGHT_THEME) { root.classList.add("dark"); return; }
       if (mode === "dark") root.classList.add("dark");
       else if (mode === "light") root.classList.remove("dark");
       else root.classList.toggle("dark", media.matches);
     };
     const onSystemThemeChange = () => {
+      if (!ALLOW_LIGHT_THEME) return;
       if (currentThemeMode === "auto") root.classList.toggle("dark", media.matches);
     };
     media.addEventListener?.("change", onSystemThemeChange);
