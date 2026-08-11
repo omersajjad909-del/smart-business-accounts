@@ -29,14 +29,16 @@ export default function AppearanceApplier() {
     let cancelled = false;
     const root = document.documentElement;
 
-    // Auto/dark handling — respected until user selects light or dark
+    // Auto/dark handling — respected until user selects light or dark.
+    //
+    // `null` until a saved preference actually arrives. It used to start at
+    // "auto", so before the fetch resolved an OS theme change could pull the
+    // page to light even for someone who had never chosen anything — and dark
+    // is the default. Only an explicit "auto" follows the system now.
     const media = window.matchMedia("(prefers-color-scheme: dark)");
-    let currentThemeMode: "light" | "dark" | "auto" = "auto";
+    let currentThemeMode: "light" | "dark" | "auto" | null = null;
     const applyThemeMode = (mode: "light" | "dark" | "auto") => {
       currentThemeMode = mode;
-      // Dark-only for now. A user who picked Light or Auto before the palette
-      // was pulled still has that preference stored, so honouring it here would
-      // strip the `dark` class straight back off after the provider set it.
       if (!ALLOW_LIGHT_THEME) { root.classList.add("dark"); return; }
       if (mode === "dark") root.classList.add("dark");
       else if (mode === "light") root.classList.remove("dark");
