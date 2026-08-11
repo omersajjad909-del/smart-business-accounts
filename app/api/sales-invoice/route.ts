@@ -8,6 +8,7 @@ import { resolveCompanyId, resolveBranchId, resolveBranchIdOrDefault } from "@/l
 import { ensureOpenPeriod } from "@/lib/financialLock";
 import { requireActiveSubscription } from "@/lib/subscriptionGuard";
 import { logAuditFromReq } from "@/lib/auditLogger";
+import { postCogsVoucher, removeCogsVoucher } from "@/lib/cogsPosting";
 type SalesInvoiceNoOnly = Prisma.SalesInvoiceGetPayload<{
   select: { invoiceNo: true };
 }>;
@@ -310,6 +311,16 @@ export async function POST(req: NextRequest) {
         },
       });
     }
+
+    // The cost leg. Without it the goods left the warehouse but their value
+    // stayed on the balance sheet, and the P&L booked the whole sale as profit.
+    await postCogsVoucher(prisma, {
+      companyId,
+      branchId,
+      voucherNo: invoice.invoiceNo,
+      date: new Date(date),
+      lines: items.map((i: any) => ({ itemId: i.itemId, qty: Number(i.qty) })),
+    });
 
     // If invoice is linked to a Sales Order, mark SO as CONFIRMED
     if (soId) {
