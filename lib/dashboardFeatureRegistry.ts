@@ -2678,15 +2678,49 @@ export function resolveDashboardFeaturesForCompany(opts: {
   businessFlags?: Record<string, Record<string, string[]>> | null;
 }): string[] | null {
   const plan = String(opts.planCode || "STARTER").toUpperCase();
+  const planKey = (plan === "PRO" || plan === "ENTERPRISE" || plan === "CUSTOM" ? plan : "STARTER") as
+    "STARTER" | "PRO" | "ENTERPRISE" | "CUSTOM";
   const byBusiness = opts.businessFlags?.[opts.businessType];
   const scoped = byBusiness?.[plan] ?? byBusiness?.[plan.toLowerCase()];
   if (Array.isArray(scoped)) {
     // Constrain to pages the business type actually owns, so a stale saved id
     // cannot hand a pharmacy a trading-only page.
     const owned = new Set(dashboardFeaturesForBusinessType(opts.businessType).map((f) => f.id));
-    return scoped.filter((id) => owned.has(id));
+    return healSavedFeatureList(scoped, planKey).filter((id) => owned.has(id));
   }
-  return opts.planFlags[plan] ?? opts.planFlags[plan.toLowerCase()] ?? null;
+  const planList = opts.planFlags[plan] ?? opts.planFlags[plan.toLowerCase()] ?? null;
+  return planList ? healSavedFeatureList(planList, planKey) : null;
+}
+
+const CORE_FEATURE_IDS = CORE_DASHBOARD_FEATURES.filter((f) => f.core).map((f) => f.id);
+
+/**
+ * Heals a page list that was saved before the core pages existed.
+ *
+ * The registry only ever held industry pages, so every Pages & Modules config
+ * saved before that change lists nothing but industry ids. Once the 119 core
+ * pages became the dashboard's plan gate, those saved lists blocked all of
+ * them — CRM, invoicing, reports, settings — and the whole dashboard bounced
+ * back to /dashboard.
+ *
+ * A config saved after the change cannot contain zero core ids unless an admin
+ * deliberately unticked all 119, so "no core ids at all" is a reliable marker
+ * for a stale list. When we see one, the plan's core defaults are merged in and
+ * the admin's industry choices are left exactly as they were.
+ */
+export function healSavedFeatureList(
+  saved: string[],
+  planCode: "STARTER" | "PRO" | "ENTERPRISE" | "CUSTOM",
+): string[] {
+  if (saved.some((id) => id.startsWith("CORE_"))) return saved;
+  const defaults = createDefaultDashboardFeatureFlags()[planCode] || [];
+  const coreDefaults = defaults.filter((id) => id.startsWith("CORE_"));
+  return Array.from(new Set([...saved, ...coreDefaults]));
+}
+
+/** True when a list predates the core pages and needs healing. */
+export function isPreCoreFeatureList(saved: string[]): boolean {
+  return CORE_FEATURE_IDS.length > 0 && !saved.some((id) => id.startsWith("CORE_"));
 }
 
 export function findDashboardFeatureByRoute(pathname: string): DashboardFeatureDefinition | null {

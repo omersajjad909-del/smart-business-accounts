@@ -32,14 +32,23 @@ function normalizePlanPermissions(saved: Record<string, string[]> = {}) {
 
 function normalizeDashboardFeatureFlags(saved: Record<string, string[]> = {}) {
   const defaults = createDefaultDashboardFeatureFlags();
-  const clean = (list: string[] | undefined, fallback: string[]) =>
-    Array.isArray(list) ? list.filter((id) => DASHBOARD_FEATURE_IDS.includes(id)) : fallback;
+  // healSavedFeatureList adds the core pages back to a list saved before they
+  // existed. Without it every page a plan config predates is treated as "not in
+  // your plan", which locks the whole dashboard.
+  const clean = (
+    list: string[] | undefined,
+    fallback: string[],
+    plan: "STARTER" | "PRO" | "ENTERPRISE" | "CUSTOM",
+  ) =>
+    Array.isArray(list)
+      ? healSavedFeatureList(list.filter((id) => DASHBOARD_FEATURE_IDS.includes(id)), plan)
+      : fallback;
   const get = (k: string) => saved[k] || saved[k.toLowerCase()];
   return {
-    STARTER:    clean(get("STARTER"),    defaults.STARTER),
-    PRO:        clean(get("PRO"),        defaults.PRO),
-    ENTERPRISE: clean(get("ENTERPRISE"), defaults.ENTERPRISE),
-    CUSTOM:     clean(get("CUSTOM"),     defaults.CUSTOM),
+    STARTER:    clean(get("STARTER"),    defaults.STARTER,    "STARTER"),
+    PRO:        clean(get("PRO"),        defaults.PRO,        "PRO"),
+    ENTERPRISE: clean(get("ENTERPRISE"), defaults.ENTERPRISE, "ENTERPRISE"),
+    CUSTOM:     clean(get("CUSTOM"),     defaults.CUSTOM,     "CUSTOM"),
   };
 }
 
