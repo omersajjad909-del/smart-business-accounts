@@ -758,6 +758,12 @@ export default function DashboardLayout({
     if (!allowedDashboardFeatures) return;
     if (pathname === "/dashboard") return;
 
+    // A list that grants no core pages at all is a stale config, not a plan
+    // that genuinely excludes CRM, invoicing, reports and settings. The server
+    // heals those, but if one ever reaches here, letting it through beats
+    // bouncing the customer off every page in the product.
+    if (!Array.from(allowedDashboardFeatures).some(id => id.startsWith("CORE_"))) return;
+
     const feature = findDashboardFeatureByRoute(pathname);
     if (!feature) return;
     if (!allowedDashboardFeatures.has(feature.id)) router.replace("/dashboard");
