@@ -6,6 +6,7 @@ import { sendEmail } from "@/lib/email";
 import { emailTemplates } from "@/lib/emailTemplates";
 import { mapLemonSubscriptionStatus, verifyLemonSignature } from "@/lib/lemonsqueezy";
 import { mapSafepayEventToStatus, verifySafepaySignature } from "@/lib/safepay";
+import { createBillingInvoiceAccessToken, getHostedBillingInvoiceId } from "@/lib/billingInvoice";
 
 function safeDate(value: unknown) {
   if (!value) return null;
@@ -153,11 +154,13 @@ async function sendPaymentConfirmationEmail(
   planCode: string,
   amount: number,
   currency: string,
-  nextBillingDate: string,
+  nextBillingDate: string | null,
 ) {
   try {
     const uc = await getCompanyOwner(companyId);
     if (!uc?.user?.email) return;
+    const invoiceId = getHostedBillingInvoiceId(companyId);
+    const invoiceToken = createBillingInvoiceAccessToken(companyId, invoiceId);
 
     await sendEmail({
       to:      uc.user.email,
@@ -168,7 +171,7 @@ async function sendPaymentConfirmationEmail(
         amount,
         currency,
         nextBillingDate,
-        `${APP_URL}/dashboard/settings/subscription`,
+        `${APP_URL}/api/billing/invoices/pdf?invoiceId=${encodeURIComponent(invoiceId)}&token=${encodeURIComponent(invoiceToken)}`,
         `${APP_URL}/dashboard`,
       ),
     });
@@ -368,7 +371,7 @@ async function handleLemonWebhook(req: NextRequest, raw: string) {
     if (eventName === "subscription_payment_success" && invoiceAmount) {
       const nextBilling = currentPeriodEnd
         ? currentPeriodEnd.toLocaleDateString("en-GB", { day: "2-digit", month: "long", year: "numeric" })
-        : "your next billing date";
+        : null;
       await sendPaymentConfirmationEmail(companyId, planCode, invoiceAmount, attrs?.currency || "USD", nextBilling);
 
       // Successful payment ends any dunning streak — clear paymentFailedAt.
@@ -680,7 +683,7 @@ async function handleStripeWebhook(req: NextRequest, raw: string) {
       : null;
     const nextBilling  = periodEnd
       ? periodEnd.toLocaleDateString("en-GB", { day: "2-digit", month: "long", year: "numeric" })
-      : "your next billing date";
+      : null;
 
     if (companyId && amountPaid > 0) {
       await sendPaymentConfirmationEmail(companyId, planCode, amountPaid, currency, nextBilling);

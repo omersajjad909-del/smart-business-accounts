@@ -206,8 +206,8 @@ export const emailTemplates = {
     planCode: string,
     amount: number,
     currency: string,
-    nextBillingDate: string,
-    invoiceUrl: string,
+    nextBillingDate: string | null,
+    invoiceUrl: string | null,
     dashboardUrl: string,
     language?: SupportedLanguage
   ): string => {
@@ -219,6 +219,11 @@ export const emailTemplates = {
     const successColor = "#10B981";
     const lightBg = "#F8FAFC";
     const borderColor = "#E2E8F0";
+    const hasNextBillingDate = Boolean(nextBillingDate);
+    const hasInvoiceUrl = Boolean(invoiceUrl);
+    const renewalMessage = hasNextBillingDate
+      ? t.paymentConfirmation.renewalNote(nextBillingDate as string)
+      : "You can manage your subscription, billing details, and renewal settings anytime from your dashboard.";
 
     return `
 <!DOCTYPE html>
@@ -227,6 +232,7 @@ export const emailTemplates = {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Payment Received - FinovaOS</title>
+    <meta name="x-preheader" content="Your FinovaOS payment receipt and billing details are ready.">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
@@ -295,6 +301,9 @@ export const emailTemplates = {
             <p style="font-size:15px;color:#475569;margin-bottom:20px;">
                 ${t.paymentConfirmation.successText(planInfo.displayName)}
             </p>
+            <p style="font-size:13px;color:#64748B;margin-bottom:16px;">
+                You are receiving this receipt because a payment was processed for your FinovaOS subscription.
+            </p>
             <div class="status-badge">${t.paymentConfirmation.statusBadge}</div>
             <div class="invoice-box">
                 <div class="invoice-row">
@@ -309,10 +318,12 @@ export const emailTemplates = {
                     <span class="invoice-label">${t.paymentConfirmation.labelPaymentDate}</span>
                     <span class="invoice-value">${new Date().toLocaleDateString("en-GB")}</span>
                 </div>
+                ${hasNextBillingDate ? `
                 <div class="invoice-row">
                     <span class="invoice-label">${t.paymentConfirmation.labelNextBilling}</span>
                     <span class="invoice-value">${nextBillingDate}</span>
                 </div>
+                ` : ""}
                 <div class="invoice-total">
                     <span class="total-label">${t.paymentConfirmation.labelTotalPaid}</span>
                     <span class="total-amount">${currency} ${amount.toFixed(2)}</span>
@@ -320,10 +331,14 @@ export const emailTemplates = {
             </div>
             <div class="button-group">
                 <a href="${dashboardUrl}" class="button button-primary">${t.goToDashboard}</a>
-                <a href="${invoiceUrl}" class="button button-secondary">${t.paymentConfirmation.downloadInvoice}</a>
+                ${hasInvoiceUrl ? `<a href="${invoiceUrl}" class="button button-secondary">${t.paymentConfirmation.downloadInvoice}</a>` : ""}
             </div>
             <p style="font-size:14px;color:#64748B;margin-top:20px;">
-                ${t.paymentConfirmation.renewalNote(nextBillingDate)}
+                ${renewalMessage}
+            </p>
+            <p style="font-size:12px;color:#64748B;margin-top:12px;word-break:break-all;">
+                Open dashboard: <a href="${dashboardUrl}" style="color:${brandColor};">${dashboardUrl}</a>
+                ${hasInvoiceUrl ? `<br/>Invoice PDF: <a href="${invoiceUrl}" style="color:${brandColor};">${invoiceUrl}</a>` : ""}
             </p>
         </div>
         <div class="footer">

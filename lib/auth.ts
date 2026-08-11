@@ -1,4 +1,4 @@
-import { createHmac } from "crypto";
+import { createHmac, randomBytes } from "crypto";
 
 const BROWSER_USER_KEY = "user";
 const DEMO_BUSINESS_KEY = "finova_demo_business";
@@ -118,25 +118,103 @@ function getSessionSecret(): string {
   return secret;
 }
 
-export function signJwt(payload: Record<string, any>): string {
+/** Default lifetime of a full login session token — matches Session.expiresAt. */
+export const DEFAULT_SESSION_TTL_MS = 7 * 24 * 60 * 60 * 1000;
+
+/**
+ * Normalise an `exp` claim to epoch milliseconds.
+ * Call sites have historically mixed units: admin impersonation mints seconds
+ * (`issuedAt + 3600`), magic links and OTP tokens mint milliseconds. Anything
+ * below 1e12 cannot be a sane millisecond timestamp (that is 2001), so it is
+ * treated as seconds.
+ */
+function expToMs(exp: unknown): number {
+  const n = Number(exp);
+  if (!Number.isFinite(n) || n <= 0) return 0;
+  return n < 1e12 ? n * 1000 : n;
+}
+
+/** Length-safe, branch-free string compare so signature checks don't leak timing. */
+function constantTimeEqual(a: string, b: string): boolean {
+  if (a.length !== b.length) return false;
+  let diff = 0;
+  for (let i = 0; i < a.length; i++) diff |= a.charCodeAt(i) ^ b.charCodeAt(i);
+  return diff === 0;
+}
+
+function randomJti(): string {
+  try {
+    return randomBytes(12).toString("base64url");
+  } catch {
+    // Edge runtime without node:crypto bindings
+    const bytes = new Uint8Array(12);
+    globalThis.crypto.getRandomValues(bytes);
+    return Buffer.from(bytes).toString("base64url");
+  }
+}
+
+/**
+ * Mint an HS256 token.
+ *
+ * Every token gets `iat`, a random `jti` and an `exp` — `verifyJwt` rejects
+ * anything without a live `exp`, so a leaked cookie can no longer be replayed
+ * forever. The `jti` also guarantees two logins with an identical payload
+ * produce different tokens, which is what `Session.token @unique` assumes.
+ *
+ * Pass `ttlMs` for short-lived tokens (pre-auth, handoff, state). An explicit
+ * `exp` in the payload always wins.
+ */
+export function signJwt(
+  payload: Record<string, any>,
+  opts: { ttlMs?: number } = {},
+): string {
   const secret = getSessionSecret();
   const header = { alg: "HS256", typ: "JWT" };
+  const now = Date.now();
+  const body: Record<string, any> = {
+    iat: now,
+    jti: randomJti(),
+    ...payload,
+    exp: payload.exp ?? now + (opts.ttlMs ?? DEFAULT_SESSION_TTL_MS),
+  };
   const enc = (obj: any) => Buffer.from(JSON.stringify(obj)).toString("base64url");
-  const data = `${enc(header)}.${enc(payload)}`;
+  const data = `${enc(header)}.${enc(body)}`;
   const hmac = createHmac("sha256", secret).update(data).digest("base64url");
   return `${data}.${hmac}`;
 }
 
-export function verifyJwt(token: string): Record<string, any> | null {
+/**
+ * Verify signature *and* expiry. A token with no `exp` claim is rejected:
+ * tokens minted before expiry enforcement existed were valid forever, so they
+ * are deliberately invalidated rather than grandfathered in.
+ *
+ * `maxAgeMs` additionally caps how long ago the token may have been issued,
+ * for flows that want a tighter bound than the token's own `exp`.
+ */
+export function verifyJwt(
+  token: string,
+  opts: { maxAgeMs?: number } = {},
+): Record<string, any> | null {
   try {
     const secret = getSessionSecret();
     const [h, p, s] = token.split(".");
     if (!h || !p || !s) return null;
     const data = `${h}.${p}`;
     const expected = createHmac("sha256", secret).update(data).digest("base64url");
-    if (expected !== s) return null;
+    if (!constantTimeEqual(expected, s)) return null;
+
     const payloadJson = Buffer.from(p, "base64url").toString("utf8");
     const payload = JSON.parse(payloadJson);
+    if (!payload || typeof payload !== "object") return null;
+
+    const expMs = expToMs(payload.exp);
+    if (!expMs || Date.now() >= expMs) return null;
+
+    if (opts.maxAgeMs) {
+      const iatMs = expToMs(payload.iat);
+      if (!iatMs || Date.now() - iatMs > opts.maxAgeMs) return null;
+    }
+
     return payload;
   } catch {
     return null;

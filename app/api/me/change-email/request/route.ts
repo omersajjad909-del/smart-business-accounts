@@ -1,16 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import { createHmac, randomInt } from "crypto";
-import { getTokenFromRequest, verifyJwt } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { sendEmail } from "@/lib/email";
-
-function authUser(req: NextRequest) {
-  const token = getTokenFromRequest(req);
-  if (!token) return null;
-  const payload = verifyJwt(token);
-  return payload?.userId ? payload : null;
-}
+import { requireActiveSession, isCredentialChangeAllowed } from "@/lib/sessionGuard";
 
 function otpHash(code: string) {
   const secret = process.env.SESSION_SECRET || "dev-insecure-secret";
@@ -25,9 +18,15 @@ function maskEmail(email: string) {
 
 export async function POST(req: NextRequest) {
   try {
-    const payload = authUser(req);
-    if (!payload?.userId) {
+    const session = await requireActiveSession(req);
+    if (!session) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    if (!isCredentialChangeAllowed(session)) {
+      return NextResponse.json(
+        { error: "Email cannot be changed from an impersonated or demo session" },
+        { status: 403 },
+      );
     }
 
     const body = await req.json();
@@ -42,7 +41,7 @@ export async function POST(req: NextRequest) {
     }
 
     const user = await prisma.user.findUnique({
-      where: { id: String(payload.userId) },
+      where: { id: session.userId },
       select: { id: true, name: true, email: true, password: true },
     });
     if (!user) return NextResponse.json({ error: "User not found" }, { status: 404 });
@@ -74,12 +73,18 @@ export async function POST(req: NextRequest) {
     const code = String(randomInt(0, 1_000_000)).padStart(6, "0");
     const exp = Date.now() + 15 * 60 * 1000;
 
+    // Only the newest OTP may ever be live — a previous pending request (to a
+    // different address) must not stay redeemable.
+    await prisma.activityLog.deleteMany({
+      where: { userId: user.id, action: "EMAIL_CHANGE_OTP" },
+    });
+
     await prisma.activityLog.create({
       data: {
         userId: user.id,
-        companyId: String(payload.companyId || ""),
+        companyId: session.companyId || null,
         action: "EMAIL_CHANGE_OTP",
-        details: JSON.stringify({ h: otpHash(code), exp, newEmail }),
+        details: JSON.stringify({ h: otpHash(code), exp, newEmail, attempts: 0 }),
       },
     });
 

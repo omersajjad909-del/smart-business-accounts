@@ -212,6 +212,7 @@ export function proxy(req: NextRequest) {
     "/api/auth/login",
     "/api/auth/forgot-password",
     "/api/auth/reset-password",
+    "/api/billing/invoices/pdf",
     "/api/login",
     "/api/auth/signup",
     "/api/auth/google",

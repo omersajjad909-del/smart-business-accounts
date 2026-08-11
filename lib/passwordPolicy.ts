@@ -1,0 +1,75 @@
+// FILE: lib/passwordPolicy.ts
+//
+// One password policy for every path that sets a password (signup, reset,
+// change). Previously each route did its own `length < 8` check, so a reset
+// link could set a password weaker than the signup form would accept.
+
+/** Passwords that show up at the top of every breach corpus. */
+const BLOCKLIST = new Set([
+  "password", "password1", "password123", "passw0rd", "12345678", "123456789",
+  "1234567890", "qwerty123", "qwertyuiop", "letmein1", "iloveyou", "admin123",
+  "welcome1", "welcome123", "abc12345", "111111111", "finova123", "finovaos",
+  "changeme", "secret123", "monkey123", "football1", "sunshine1", "trustno1",
+]);
+
+export type PasswordCheck = { ok: true } | { ok: false; error: string };
+
+/**
+ * @param password  the candidate password
+ * @param context   values the password must not simply echo (email, name)
+ */
+export function validatePassword(
+  password: string,
+  context: (string | null | undefined)[] = [],
+): PasswordCheck {
+  const pw = String(password || "");
+
+  if (pw.length < 10) {
+    return { ok: false, error: "Password must be at least 10 characters" };
+  }
+  if (pw.length > 200) {
+    return { ok: false, error: "Password must be 200 characters or fewer" };
+  }
+
+  const classes =
+    Number(/[a-z]/.test(pw)) +
+    Number(/[A-Z]/.test(pw)) +
+    Number(/[0-9]/.test(pw)) +
+    Number(/[^A-Za-z0-9]/.test(pw));
+  if (classes < 3) {
+    return {
+      ok: false,
+      error:
+        "Password must include at least three of: lowercase, uppercase, number, symbol",
+    };
+  }
+
+  const lower = pw.toLowerCase();
+  if (BLOCKLIST.has(lower)) {
+    return { ok: false, error: "This password is too common. Choose another." };
+  }
+
+  // A single repeated character, or a straight run off the keyboard/number row.
+  if (/^(.)\1+$/.test(pw)) {
+    return { ok: false, error: "Password cannot be a single repeated character" };
+  }
+  if (/(0123456789|abcdefghij|qwertyuiop)/.test(lower)) {
+    return { ok: false, error: "This password is too predictable. Choose another." };
+  }
+
+  for (const raw of context) {
+    const value = String(raw || "").toLowerCase().trim();
+    if (!value) continue;
+    // Compare against the local part of an email too — "umersajjad981@gmail.com"
+    // should rule out "umersajjad981" as a password.
+    const local = value.split("@")[0];
+    if (local.length >= 4 && lower.includes(local)) {
+      return {
+        ok: false,
+        error: "Password must not contain your name or email address",
+      };
+    }
+  }
+
+  return { ok: true };
+}
