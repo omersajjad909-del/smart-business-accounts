@@ -139,7 +139,6 @@ export function proxy(req: NextRequest) {
     "/api/admin/shift-settings",
     "/api/admin/cleanup-vouchers",
     "/api/admin/logs", // company-scoped for tenant callers, see the route
-
     "/api/admin/tax-presets",
     "/api/admin/dev-test/",
     "/api/admin/cron/", // scheduler-authenticated, not cookie-authenticated
