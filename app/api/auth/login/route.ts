@@ -368,12 +368,17 @@ export async function POST(req: NextRequest) {
     // ── 2FA enforcement ──
     // If user has 2FA enabled, issue a short-lived pre-auth token instead of full session
     if (user.twoFactorEnabled && user.twoFactorSecret) {
-      const preAuthToken = signJwt({
-        userId: safeUser.id,
-        role: safeUser.role,
-        companyId: defaultCompanyId,
-        twoFactorPending: true,
-      });
+      const preAuthToken = signJwt(
+        {
+          userId: safeUser.id,
+          role: safeUser.role,
+          companyId: defaultCompanyId,
+          twoFactorPending: true,
+        },
+        // Must expire with the cookie — otherwise the pre-auth token outlives
+        // the 2FA prompt and stays redeemable at /api/auth/2fa/complete.
+        { ttlMs: 5 * 60_000 },
+      );
       const res2fa = NextResponse.json({ needs2FA: true });
       res2fa.cookies.set("sb_2fa_pending", preAuthToken, {
         httpOnly: true,

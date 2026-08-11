@@ -125,7 +125,7 @@ export async function POST(req: NextRequest) {
       to: user.email,
       subject: "Reset your FinovaOS password",
       html: emailTemplates.passwordReset(
-        { name: user.name || user.email },
+        { name: user.name || user.email, email: user.email },
         resetUrl,
       ),
     });

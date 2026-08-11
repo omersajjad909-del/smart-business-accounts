@@ -123,6 +123,46 @@ export function proxy(req: NextRequest) {
 
   const pathname = req.nextUrl.pathname || "";
 
+  // ── Platform admin console isolation ─────────────────────────────────────
+  // `/api/admin/*` is two things at once: the platform (super-admin) console
+  // AND a handful of tenant-facing endpoints the dashboard has always called.
+  // Because ADMIN is also the tenant-owner role and both logins share the
+  // sb_auth cookie, a customer's own session used to satisfy every one of the
+  // ~55 routes that just check `role === "ADMIN"` — i.e. full cross-tenant
+  // access. Only tokens minted by /api/admin/auth/login carry `scope: "admin"`;
+  // everything not on the tenant list below now requires one.
+  const TENANT_ADMIN_API = [
+    "/api/admin/auth/login",
+    "/api/admin/roles",
+    "/api/admin/user-permissions",
+    "/api/admin/notifications",
+    "/api/admin/shift-settings",
+    "/api/admin/cleanup-vouchers",
+    "/api/admin/logs", // company-scoped for tenant callers, see the route
+
+    "/api/admin/tax-presets",
+    "/api/admin/dev-test/",
+    "/api/admin/cron/", // scheduler-authenticated, not cookie-authenticated
+  ];
+  if (
+    pathname.startsWith("/api/admin/") &&
+    !TENANT_ADMIN_API.some((p) => pathname.startsWith(p)) &&
+    decoded?.scope !== "admin"
+  ) {
+    return NextResponse.json({ error: "Admin authentication required" }, { status: 403 });
+  }
+  // Admin console *pages* likewise.
+  if (
+    pathname.startsWith("/admin") &&
+    !pathname.startsWith("/admin/login") &&
+    decoded?.scope !== "admin"
+  ) {
+    const url = req.nextUrl.clone();
+    url.pathname = "/admin/login";
+    url.search = "";
+    return NextResponse.redirect(url);
+  }
+
   // ── Signup gate ──────────────────────────────────────────────────────────
   // Pre-launch: no new accounts. Enforced here rather than by disabling
   // buttons, because a disabled button still leaves the URL, the API and every

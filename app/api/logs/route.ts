@@ -3,6 +3,11 @@ import { prisma } from "@/lib/prisma";
 import { apiHasPermission } from "@/lib/apiPermission";
 import { PERMISSIONS } from "@/lib/permissions";
 import { resolveCompanyId } from "@/lib/tenant";
+import {
+  excludeSensitiveActions,
+  isSensitiveLogAction,
+  redactLogs,
+} from "@/lib/logRedaction";
 
 export async function GET(req: NextRequest) {
   const userId = req.headers.get("x-user-id");
@@ -41,12 +46,30 @@ export async function GET(req: NextRequest) {
     if (from) where.createdAt.gte = new Date(from);
     if (to) where.createdAt.lte = new Date(to);
   }
+  // Rows holding live auth secrets are never returned or searchable, whatever
+  // `action`/`q` asked for.
+  where.action = action
+    ? (isSensitiveLogAction(action) ? "__never__" : action)
+    : excludeSensitiveActions();
 
-  const logs = await prisma.activityLog.findMany({
-    where,
-    orderBy: { createdAt: "desc" },
-    include: { user: true },
-  });
+  const logs = redactLogs(
+    await prisma.activityLog.findMany({
+      where,
+      orderBy: { createdAt: "desc" },
+      take: 5000,
+      // `include: { user: true }` used to ship the whole User row to anyone with
+      // VIEW_LOGS — bcrypt password hash and twoFactorSecret included.
+      select: {
+        id: true,
+        action: true,
+        details: true,
+        userId: true,
+        companyId: true,
+        createdAt: true,
+        user: { select: { id: true, name: true, email: true, role: true } },
+      },
+    }),
+  );
 
   if (format === "csv") {
     const header = ["id", "action", "details", "userName", "userEmail", "createdAt"].join(",");

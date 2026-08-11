@@ -14,6 +14,13 @@ const FEATURES = [
 ];
 
 export async function GET(req: NextRequest) {
+  // This route sends mail from our domain to any address the caller names —
+  // an unauthenticated open relay for phishing and reputation-burning spam.
+  // It exists for local template work only and is off outside development.
+  if (process.env.NODE_ENV === "production") {
+    return NextResponse.json({ error: "Not found" }, { status: 404 });
+  }
+
   const to = req.nextUrl.searchParams.get("to");
   const preview = req.nextUrl.searchParams.get("preview");
   const template = req.nextUrl.searchParams.get("t") || "welcomeSubscription";

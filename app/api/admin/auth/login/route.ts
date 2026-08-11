@@ -9,6 +9,32 @@ export const runtime = "nodejs";
 // Normalized error — never reveal whether email exists or not
 const INVALID_CREDS = { message: "Invalid credentials" };
 
+/** Admin-panel sessions are short-lived; the blast radius of a stolen one is total. */
+const ADMIN_SESSION_TTL_MS = 12 * 60 * 60 * 1000;
+
+/**
+ * Decide whether a `User` row is a *platform* super admin rather than just the
+ * ADMIN (owner) of some tenant company.
+ *
+ * Preferred: an explicit `SUPER_ADMIN_EMAILS` allowlist (comma-separated).
+ * Fallback, so nobody is locked out of an existing deployment before that env
+ * var is set: the account must not belong to any company. Real platform admins
+ * are standalone rows; every tenant owner has at least one UserCompany link.
+ *
+ * Set SUPER_ADMIN_EMAILS in production and this fallback stops being used.
+ */
+async function isPlatformSuperAdmin(userId: string, email: string): Promise<boolean> {
+  const allowlist = (process.env.SUPER_ADMIN_EMAILS || "")
+    .split(",")
+    .map((e) => e.trim().toLowerCase())
+    .filter(Boolean);
+
+  if (allowlist.length > 0) return allowlist.includes(email.toLowerCase());
+
+  const membership = await prisma.userCompany.count({ where: { userId } });
+  return membership === 0;
+}
+
 export async function POST(req: NextRequest) {
   try {
     // ── Rate limiting: max 10 attempts per IP per 15 minutes ────────────────
@@ -32,13 +58,30 @@ export async function POST(req: NextRequest) {
     if (!email || !password)
       return NextResponse.json({ message: "Email and password required" }, { status: 400 });
 
-    // ── 1. Try Super Admin (User table with role=ADMIN) ──────────────────────
+    // ── 1. Try Super Admin (User table) ──────────────────────────────────────
+    // `User.role === "ADMIN"` only means "owner of a company" — it is the
+    // tenant-admin role. On its own it let every customer's company owner sign
+    // into the platform admin panel with their normal password. A User row now
+    // only counts as a platform super admin when it is explicitly allowlisted.
     const superAdmin = await prisma.user.findUnique({ where: { email } });
-    if (superAdmin && superAdmin.role === "ADMIN") {
+    if (superAdmin && superAdmin.role === "ADMIN" && (await isPlatformSuperAdmin(superAdmin.id, email))) {
       const match = await bcrypt.compare(password, superAdmin.password);
       if (!match) return NextResponse.json(INVALID_CREDS, { status: 401 });
+      if (!superAdmin.active) {
+        return NextResponse.json({ message: "Account is disabled." }, { status: 403 });
+      }
 
-      const token = await signJwt({ id: superAdmin.id, email: superAdmin.email, role: "ADMIN", name: superAdmin.name });
+      const token = await signJwt(
+        {
+          id: superAdmin.id,
+          email: superAdmin.email,
+          role: "ADMIN",
+          name: superAdmin.name,
+          scope: "admin",
+          isSuperAdmin: true,
+        },
+        { ttlMs: ADMIN_SESSION_TTL_MS },
+      );
       const response = NextResponse.json({
         success: true,
         user: { id: superAdmin.id, name: superAdmin.name, email: superAdmin.email, role: "ADMIN", isSuperAdmin: true, allowedPages: null },
@@ -58,7 +101,17 @@ export async function POST(req: NextRequest) {
 
       await (prisma as any).adminUser.update({ where: { id: teamMember.id }, data: { lastLoginAt: new Date() } });
 
-      const token = await signJwt({ id: teamMember.id, email: teamMember.email, role: "ADMIN", name: teamMember.name });
+      const token = await signJwt(
+        {
+          id: teamMember.id,
+          email: teamMember.email,
+          role: "ADMIN",
+          name: teamMember.name,
+          scope: "admin",
+          isSuperAdmin: Boolean(teamMember.isSuperAdmin),
+        },
+        { ttlMs: ADMIN_SESSION_TTL_MS },
+      );
 
       let allowedPages: string[] = [];
       try { allowedPages = JSON.parse(teamMember.allowedPages || "[]"); } catch {}

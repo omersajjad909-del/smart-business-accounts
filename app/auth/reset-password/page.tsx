@@ -16,11 +16,12 @@ function ResetPasswordForm() {
   const [error,     setError]     = useState("");
   const [showPass,  setShowPass]  = useState(false);
 
+  // Mirrors lib/passwordPolicy.ts — 10+ chars and at least 3 character classes.
   const strength = useMemo(() => {
     if (!password) return 0;
     let s = 0;
-    if (password.length >= 8) s++;
-    if (/[A-Z]/.test(password)) s++;
+    if (password.length >= 10) s++;
+    if (/[a-z]/.test(password) && /[A-Z]/.test(password)) s++;
     if (/[0-9]/.test(password)) s++;
     if (/[^A-Za-z0-9]/.test(password)) s++;
     return s;
@@ -33,8 +34,8 @@ function ResetPasswordForm() {
     e.preventDefault();
     setError("");
     if (password !== confirm) { setError("Passwords do not match"); return; }
-    if (password.length < 8)  { setError("Password must be at least 8 characters"); return; }
-    if (!token)                { setError("Invalid or missing reset token"); return; }
+    if (password.length < 10) { setError("Password must be at least 10 characters"); return; }
+    if (!token)               { setError("Invalid or missing reset token"); return; }
 
     setLoading(true);
     try {
@@ -107,7 +108,7 @@ function ResetPasswordForm() {
                 <div>
                   <label style={{ fontSize:10, fontWeight:700, color:"rgba(255,255,255,.4)", textTransform:"uppercase", letterSpacing:".06em", display:"block", marginBottom:6 }}>New Password</label>
                   <div style={{ position:"relative" }}>
-                    <input type={showPass?"text":"password"} value={password} onChange={e=>setPassword(e.target.value)} placeholder="Min 8 characters" required autoComplete="new-password"
+                    <input type={showPass?"text":"password"} value={password} onChange={e=>setPassword(e.target.value)} placeholder="Min 10 chars, mix letters/numbers/symbols" required autoComplete="new-password"
                       style={{ width:"100%", padding:"12px 40px 12px 14px", borderRadius:11, background:"rgba(255,255,255,.05)", border:"1px solid rgba(255,255,255,.1)", color:"white", fontSize:14, outline:"none", boxSizing:"border-box" as any }}
                       onFocus={e=>e.target.style.borderColor="rgba(99,102,241,.5)"}
                       onBlur={e=>e.target.style.borderColor="rgba(255,255,255,.1)"}
@@ -141,8 +142,8 @@ function ResetPasswordForm() {
                   )}
                 </div>
 
-                <button type="submit" disabled={loading || !password || !confirm || password !== confirm}
-                  style={{ padding:"13px", borderRadius:11, background:(loading||!password||!confirm||password!==confirm)?"rgba(99,102,241,.3)":"linear-gradient(135deg,#4f46e5,#7c3aed)", border:"none", color:"white", fontSize:14, fontWeight:700, cursor:(loading||!password||!confirm||password!==confirm)?"not-allowed":"pointer", transition:"all .2s" }}>
+                <button type="submit" disabled={loading || password.length < 10 || !confirm || password !== confirm}
+                  style={{ padding:"13px", borderRadius:11, background:(loading||password.length<10||!confirm||password!==confirm)?"rgba(99,102,241,.3)":"linear-gradient(135deg,#4f46e5,#7c3aed)", border:"none", color:"white", fontSize:14, fontWeight:700, cursor:(loading||password.length<10||!confirm||password!==confirm)?"not-allowed":"pointer", transition:"all .2s" }}>
                   {loading ? "Updating..." : "Reset Password →"}
                 </button>
               </form>

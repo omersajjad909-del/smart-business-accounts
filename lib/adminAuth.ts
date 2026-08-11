@@ -40,13 +40,23 @@ export function requireAdmin(req: NextRequest): AdminContext | NextResponse {
   const token = getTokenFromRequest(req as any);
   if (token) {
     const payload = verifyJwt(token);
-    if (payload && String(payload.role).toUpperCase() === "ADMIN") {
+    // `role: "ADMIN"` is NOT sufficient: ADMIN is also the tenant-owner role in
+    // the User table, and a normal company login mints its token into the same
+    // sb_auth cookie. Checking only the role meant every company owner's own
+    // session opened the whole super-admin panel — all tenants, billing
+    // overrides, impersonation. Only /api/admin/auth/login mints `scope:"admin"`.
+    if (
+      payload &&
+      payload.scope === "admin" &&
+      String(payload.role).toUpperCase() === "ADMIN" &&
+      payload.id
+    ) {
       return {
         id: String(payload.id),
         email: String(payload.email || ""),
         name: String(payload.name || ""),
         role: "ADMIN",
-        isSuperAdmin: Boolean(payload.isSuperAdmin ?? true),
+        isSuperAdmin: Boolean(payload.isSuperAdmin),
       };
     }
   }
