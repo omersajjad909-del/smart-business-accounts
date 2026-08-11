@@ -66,6 +66,18 @@ export async function costSoldLines(
   ]);
   const byId = new Map(items.map((i) => [i.id, i]));
 
+  // At most two accounts are involved (finished goods, general stock), so they
+  // are resolved once and reused rather than queried per line.
+  const accountCache = new Map<string, string>();
+  const accountFor = async (category: string | null) => {
+    const key = String(category || "").toUpperCase() === "FINISHED" ? "FINISHED" : "OTHER";
+    const cached = accountCache.get(key);
+    if (cached) return cached;
+    const id = await stockAccountIdForCategory(db, companyId, category);
+    accountCache.set(key, id);
+    return id;
+  };
+
   const costed: CostedLine[] = [];
   let total = 0;
   for (const [itemId, qty] of byItem) {
@@ -76,7 +88,7 @@ export async function costSoldLines(
     const unitCost = costs.get(itemId) ?? item.purchaseRate ?? 0;
     if (!Number.isFinite(unitCost) || unitCost <= 0) continue;
 
-    const stockAccountId = await stockAccountIdForCategory(db, companyId, item.category);
+    const stockAccountId = await accountFor(item.category);
     const cost = unitCost * qty;
     costed.push({ itemId, qty, unitCost, cost, stockAccountId });
     total += cost;
