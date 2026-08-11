@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { resolveCompanyId, resolveBranchId, resolveBranchIdOrDefault } from "@/lib/tenant";
-import { postCogsVoucher } from "@/lib/cogsPosting";
+import { postCogsVoucher, type Db } from "@/lib/cogsPosting";
 type SaleReturn = Prisma.SaleReturnGetPayload<{
   select: {
     returnNo: true;
@@ -174,6 +174,19 @@ export async function POST(req: NextRequest) {
             ],
           },
         },
+      });
+
+      // Cost leg, reversed: the goods are back in stock, so their cost has to
+      // come back out of Cost of Goods Sold. Valued at the current weighted
+      // average — the original invoice's cost is not carried on the return.
+      await postCogsVoucher(tx as unknown as Db, {
+        companyId,
+        branchId,
+        voucherNo: nextNo,
+        date: new Date(date),
+        lines: items.map((i: any) => ({ itemId: i.itemId, qty: Number(i.qty) })),
+        direction: "reverse",
+        narration: `Cost of goods returned — ${nextNo}`,
       });
 
       return saleReturn;

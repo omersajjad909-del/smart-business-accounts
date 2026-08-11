@@ -14,7 +14,15 @@
 
 import { prisma } from "@/lib/prisma";
 
-type Db = Omit<
+/**
+ * The shared client or a transaction handle.
+ *
+ * Derived from the client we actually use rather than `Prisma.TransactionClient`,
+ * which does not accept an extended client. Routes that annotate their handle as
+ * `Prisma.TransactionClient` cast to this at the call boundary — the two are the
+ * same object at runtime, they just do not unify in the generated types.
+ */
+export type Db = Omit<
   typeof prisma,
   "$connect" | "$disconnect" | "$on" | "$transaction" | "$use" | "$extends"
 >;

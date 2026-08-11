@@ -8,7 +8,7 @@ import { resolveCompanyId, resolveBranchId, resolveBranchIdOrDefault } from "@/l
 import { ensureOpenPeriod } from "@/lib/financialLock";
 import { requireActiveSubscription } from "@/lib/subscriptionGuard";
 import { logAuditFromReq } from "@/lib/auditLogger";
-import { postCogsVoucher, removeCogsVoucher } from "@/lib/cogsPosting";
+import { postCogsVoucher, removeCogsVoucher, type Db } from "@/lib/cogsPosting";
 type SalesInvoiceNoOnly = Prisma.SalesInvoiceGetPayload<{
   select: { invoiceNo: true };
 }>;
@@ -539,8 +539,8 @@ export async function PUT(req: NextRequest) {
 
       // Re-post the cost leg for the edited lines. The old voucher is dropped
       // rather than reversed so the stock account is left with no residue.
-      await removeCogsVoucher(tx, companyId, existing.invoiceNo);
-      await postCogsVoucher(tx, {
+      await removeCogsVoucher(tx as unknown as Db, companyId, existing.invoiceNo);
+      await postCogsVoucher(tx as unknown as Db, {
         companyId,
         branchId: existing.branchId,
         voucherNo: existing.invoiceNo,
@@ -622,7 +622,7 @@ export async function DELETE(req: NextRequest) {
       }
 
       // The cost leg goes with it, at the value it was originally posted at.
-      await removeCogsVoucher(tx, companyId, existing.invoiceNo);
+      await removeCogsVoucher(tx as unknown as Db, companyId, existing.invoiceNo);
 
       // Reverse inventory transactions on delete
       for (const oldItem of existing.items) {

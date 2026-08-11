@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { resolveCompanyId } from "@/lib/tenant";
+import { getAverageCosts } from "@/lib/manufacturingPosting";
 
 function periodRange(period: string): { start: Date; end: Date } {
   const now = new Date();
@@ -31,14 +32,25 @@ export async function GET(req: NextRequest) {
       },
     });
 
+    // Cost basis is the same weighted average the ledger posts at.
+    //
+    // This used to multiply by `item.purchaseRate`. For anything manufactured
+    // that number is 0 — a PVC bag is never bought, it is made — so the report
+    // showed zero cost and 100% gross margin on exactly the products whose cost
+    // matters most. Purchase rate is now only the fallback for items with no
+    // costed movements at all.
+    const itemIds = [...new Set(soldItems.map((it) => it.itemId).filter(Boolean) as string[])];
+    const avgCosts = await getAverageCosts(prisma, companyId, itemIds);
+
     const map = new Map<string, { name: string; category: string; qtySold: number; totalCost: number; revenue: number }>();
 
     for (const it of soldItems) {
       const key = it.itemId;
       if (!map.has(key)) map.set(key, { name: it.item.name, category: it.item.category, qtySold: 0, totalCost: 0, revenue: 0 });
       const rec = map.get(key)!;
+      const unitCost = avgCosts.get(key) ?? it.item.purchaseRate ?? 0;
       rec.qtySold += it.qty;
-      rec.totalCost += it.qty * (it.item.purchaseRate || 0);
+      rec.totalCost += it.qty * unitCost;
       rec.revenue += it.amount;
     }
 
@@ -52,8 +64,8 @@ export async function GET(req: NextRequest) {
       .sort((a, b) => b.totalCost - a.totalCost);
 
     return NextResponse.json({ rows });
-  } catch (e: any) {
+  } catch (e: unknown) {
     console.error("COGS ERROR:", e);
-    return NextResponse.json({ error: e.message }, { status: 500 });
+    return NextResponse.json({ error: "Failed to build COGS report" }, { status: 500 });
   }
 }

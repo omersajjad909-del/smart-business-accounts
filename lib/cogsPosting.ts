@@ -15,17 +15,14 @@
 // cost 11.25 to make is released at 11.25 — not at whatever someone once typed
 // into the item's purchase rate.
 
-import { prisma } from "@/lib/prisma";
 import { getAverageCosts } from "@/lib/manufacturingPosting";
 import {
   resolveCogsAccountId,
   stockAccountIdForCategory,
+  type Db,
 } from "@/lib/inventoryAccounts";
 
-type Db = Omit<
-  typeof prisma,
-  "$connect" | "$disconnect" | "$on" | "$transaction" | "$use" | "$extends"
->;
+export type { Db };
 
 /** Voucher type for the cost leg. Kept separate from the SI/SR revenue voucher. */
 export const COGS_VOUCHER_TYPE = "COGS";

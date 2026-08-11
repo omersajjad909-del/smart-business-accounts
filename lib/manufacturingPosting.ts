@@ -23,6 +23,11 @@
  */
 
 import { prisma } from "@/lib/prisma";
+import {
+  nextVoucherNo,
+  resolveFinishedGoodsAccountId,
+  resolveInventoryAccountId,
+} from "@/lib/inventoryAccounts";
 
 /**
  * Either the shared client or a transaction handle. Derived from the client we
@@ -369,16 +374,22 @@ export async function completeProductionRun(opts: {
     });
 
     // ── 3. The two vouchers ──
+    // Raw material is credited out of the account the purchase debited it into.
+    // This used to be MFG_ACCOUNTS.RAW_MATERIAL_STOCK (1200) while purchase
+    // invoices debit Stock/Inventory, so issuing material drove 1200 negative
+    // and left the purchased value stranded in Stock/Inventory forever.
     const [rawMaterialAccountId, wipAccountId, finishedAccountId] = await Promise.all([
-      ensureAccount(tx, companyId, MFG_ACCOUNTS.RAW_MATERIAL_STOCK),
+      resolveInventoryAccountId(tx, companyId),
       ensureAccount(tx, companyId, MFG_ACCOUNTS.WORK_IN_PROGRESS),
-      ensureAccount(tx, companyId, MFG_ACCOUNTS.FINISHED_GOODS),
+      resolveFinishedGoodsAccountId(tx, companyId),
     ]);
 
-    const mfgCount = await tx.voucher.count({ where: { companyId, type: "MFG" } });
+    // Was `count() + 1` / `+ 2`, which repeated a number as soon as any MFG
+    // voucher was deleted — the count dropped while the highest number did not.
+    const nextMfg = await nextVoucherNo(tx, companyId, "MFG", "MFG");
     const orderLabel = String(orderData.orderId || order.title);
-    const issueVoucherNo = `MFG-${mfgCount + 1}`;
-    const receiptVoucherNo = `MFG-${mfgCount + 2}`;
+    const issueVoucherNo = `MFG-${nextMfg}`;
+    const receiptVoucherNo = `MFG-${nextMfg + 1}`;
     const branchId = opts.branchId || null;
 
     // A zero-cost run (nothing ever received, no purchase rate set) would post a
