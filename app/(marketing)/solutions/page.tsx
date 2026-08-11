@@ -1408,7 +1408,12 @@ export default function SolutionsPage() {
               opacity:heroVisible?1:0, transition:"opacity .6s ease .3s",
               maxWidth:820, margin:"0 auto",
             }}>
-              {TAB_GROUPS.map(group => (
+              {/* Only groups with something live in them — an empty "Healthcare"
+                  row with no pills under it read as a broken page. */}
+              {TAB_GROUPS
+                .map(group => ({ ...group, ids: group.ids.filter(id => { const i = INDUSTRIES.find(x => x.id === id); return i && isLive(i); }) }))
+                .filter(group => group.ids.length > 0)
+                .map(group => (
                 <div key={group.label} style={{ display:"flex", alignItems:"flex-start", gap:0 }}>
                   {/* Category label */}
                   <div style={{
