@@ -891,6 +891,7 @@ export async function sendEmail(options: {
 }): Promise<{ success: boolean; messageId?: string; error?: string }> {
   const toStr = Array.isArray(options.to) ? options.to.join(', ') : options.to;
   const toArr = Array.isArray(options.to) ? options.to : [options.to];
+  let resendError: string | undefined;
 
   // ── Resend path (platform emails, no companyId) ──────────────────────────
   const resend = getResend();
@@ -913,15 +914,16 @@ export async function sendEmail(options: {
       return { success: true, messageId: data?.id };
     } catch (error: any) {
       console.error('❌ Resend error:', error);
-      prisma.emailLog.create({ data: { to: toStr, subject: options.subject, status: 'failed', error: error.message } }).catch(() => {});
-      return { success: false, error: error.message };
+      resendError = error?.message || 'Resend delivery failed';
     }
   }
 
   // ── SMTP path (company emails) ────────────────────────────────────────────
   const { transport, config } = await getTransporter(options.companyId);
   if (!transport) {
-    return { success: false, error: 'Email not configured.' };
+    const error = resendError || 'Email not configured.';
+    prisma.emailLog.create({ data: { to: toStr, subject: options.subject, status: 'failed', error } }).catch(() => {});
+    return { success: false, error };
   }
 
   try {
@@ -947,8 +949,9 @@ export async function sendEmail(options: {
     return { success: true, messageId: info.messageId };
   } catch (error: any) {
     console.error('❌ Email send error:', error);
-    prisma.emailLog.create({ data: { to: toStr, subject: options.subject, status: 'failed', error: error.message } }).catch(() => {});
-    return { success: false, error: error.message || 'Failed to send email' };
+    const message = error.message || resendError || 'Failed to send email';
+    prisma.emailLog.create({ data: { to: toStr, subject: options.subject, status: 'failed', error: message } }).catch(() => {});
+    return { success: false, error: message };
   }
 }
 
