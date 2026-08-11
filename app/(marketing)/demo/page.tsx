@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { setStoredDemoBusinessPreference } from "@/lib/auth";
 import BookingModal from "./BookingModal";
+import { DEMO_BUSINESSES, type DemoBusiness, type DemoBusinessId } from "@/lib/businessCatalog";
 
 const FONT = "'Outfit','Inter',sans-serif";
 
