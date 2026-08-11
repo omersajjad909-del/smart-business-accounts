@@ -5,6 +5,7 @@ import toast from "react-hot-toast";
 import { BRAND_ORDER, BRAND_PRESETS, type BrandKey } from "@/lib/brandPalette";
 import { getCurrentUser } from "@/lib/auth";
 import { useResponsive } from "@/hooks/useResponsive";
+import { ALLOW_LIGHT_THEME } from "@/lib/themeConfig";
 
 type ThemeMode = "light" | "dark" | "auto";
 type Density = "compact" | "comfortable";
