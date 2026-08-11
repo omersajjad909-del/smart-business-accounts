@@ -41,7 +41,8 @@ export const MFG_ACCOUNTS = {
   RAW_MATERIAL_STOCK: { code: "1200", name: "Raw Material Stock", type: "Asset" },
   WORK_IN_PROGRESS:   { code: "1201", name: "Work In Progress",   type: "Asset" },
   FINISHED_GOODS:     { code: "1202", name: "Finished Goods",     type: "Asset" },
-  PRODUCTION_VARIANCE:{ code: "5101", name: "Production Variance", type: "Expense" },
+  FACTORY_LABOUR:     { code: "5101", name: "Factory Labour",     type: "Expense" },
+  FACTORY_OVERHEAD:   { code: "5102", name: "Manufacturing Overhead", type: "Expense" },
 } as const;
 
 export const INVENTORY_TXN_TYPES = {
@@ -109,17 +110,25 @@ export function readBomLines(data: unknown): { lines: BomLine[]; usable: boolean
   return { lines, usable: lines.length > 0 };
 }
 
-/** Stock on hand per item, in one query rather than one per line. */
+/**
+ * Stock on hand per item, in one query rather than one per line.
+ *
+ * `location` narrows to a single warehouse. Production must consume from the
+ * store it is actually drawing on — without this a run could be approved
+ * against stock sitting in another warehouse and then drive that warehouse
+ * negative.
+ */
 export async function getStockOnHand(
   tx: Db,
   companyId: string,
   itemIds: string[],
+  location?: string | null,
 ): Promise<Map<string, number>> {
   const out = new Map<string, number>();
   if (!itemIds.length) return out;
   const rows = await tx.inventoryTxn.groupBy({
     by: ["itemId"],
-    where: { companyId, itemId: { in: itemIds } },
+    where: { companyId, itemId: { in: itemIds }, ...(location ? { location } : {}) },
     _sum: { qty: true },
   });
   for (const r of rows) out.set(r.itemId, r._sum.qty ?? 0);
