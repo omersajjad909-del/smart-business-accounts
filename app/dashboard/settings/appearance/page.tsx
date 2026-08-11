@@ -64,6 +64,9 @@ export default function AppearancePage() {
   useEffect(() => {
     // Apply theme mode preview
     const root = document.documentElement;
+    // Dark-only for now — previewing light here would strip the class off the
+    // whole app, not just this page.
+    if (!ALLOW_LIGHT_THEME) { root.classList.add("dark"); return; }
     if (prefs.themeMode === "dark") root.classList.add("dark");
     else if (prefs.themeMode === "light") root.classList.remove("dark");
     else {
