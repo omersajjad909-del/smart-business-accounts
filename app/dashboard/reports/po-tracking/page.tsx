@@ -34,8 +34,13 @@ export default function PoTrackingPage() {
   const h = (): Record<string, string> => ({ "x-user-role": user?.role || "", "x-user-id": user?.id || "", "x-company-id": user?.companyId || "" });
   useEffect(() => { setLoading(true); fetch(`/api/reports/po-tracking?period=${period}`, { headers: h() }).then(r => r.ok ? r.json() : {}).then((d: any) => { setData(d.rows || []); setLoading(false); }).catch(() => setLoading(false)); }, [period]);
 
-  const filtered = status === "all" ? data : data.filter(r => r.status === status);
-  const pendingTotal = data.filter(r => r.status === "sent" || r.status === "partial").reduce((s, r) => s + r.pendingValue, 0);
+  // Compare normalised keys — the API sends "PENDING", the dropdown holds
+  // "pending", so the raw === comparison this used to do never matched and
+  // every filter but "All Statuses" came back empty.
+  const filtered = status === "all" ? data : data.filter(r => normalizeBadgeKey(r.status) === status);
+  const pendingTotal = data
+    .filter(r => ["pending", "approved", "partial"].includes(normalizeBadgeKey(r.status)))
+    .reduce((s, r) => s + r.pendingValue, 0);
 
   const inp: React.CSSProperties = { background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 8, padding: "7px 12px", color: "var(--text-primary)", fontFamily: ff, fontSize: 12, outline: "none" };
 
