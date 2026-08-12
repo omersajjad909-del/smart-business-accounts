@@ -115,8 +115,12 @@ export async function POST(req: Request) {
 
     if (!paymentAccount) return NextResponse.json({ error: "Cash/Bank account not found" }, { status: 400 });
 
-    const count     = await prisma.voucher.count({ where: { type: "CRV", companyId } });
-    const voucherNo = `CRV-${count + 1}`;
+    // Counting type "CRV" was wrong twice over: payment receipts post their own
+    // voucher as type "CRV" (numbered REC-n), so every receipt pushed this
+    // series forward and left gaps — and deleting any CRV dropped the count,
+    // handing the next voucher a number already in use. Numbered off the CRV-
+    // series itself now.
+    const voucherNo = `CRV-${await nextVoucherNo(prisma, companyId, "CRV", "CRV")}`;
 
     const result = await prisma.$transaction(async (tx: any) => {
       const voucherEntries = [
