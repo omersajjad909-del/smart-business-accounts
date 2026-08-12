@@ -2,18 +2,24 @@
 import { useEffect, useState } from "react";
 import { getCurrentUser } from "@/lib/auth";
 import { useResponsive } from "@/hooks/useResponsive";
+import { badgeFor, normalizeBadgeKey, type Badge } from "@/lib/reportBadge";
 
 const ff = "'Outfit','Inter',sans-serif";
 function fmt(n: number) { return n.toLocaleString("en-US", { minimumFractionDigits: 0, maximumFractionDigits: 0 }); }
 
-interface Row { poNumber: string; supplierName: string; poDate: string; expectedDate: string; receivedDate: string | null; totalValue: number; receivedValue: number; pendingValue: number; status: "draft" | "sent" | "partial" | "received" | "cancelled"; }
+interface Row { poNumber: string; supplierName: string; poDate: string; expectedDate: string; receivedDate: string | null; totalValue: number; receivedValue: number; pendingValue: number; status: string; }
 
-const STATUS: Record<string, { label: string; color: string; bg: string }> = {
-  draft:      { label: "Draft",          color: "var(--text-muted)", bg: "var(--app-bg)" },
-  sent:       { label: "Sent",           color: "#818cf8", bg: "rgba(129,140,248,.1)" },
-  partial:    { label: "Partial",        color: "#fbbf24", bg: "rgba(251,191,36,.1)" },
-  received:   { label: "Received ✓",    color: "#34d399", bg: "rgba(52,211,153,.1)" },
-  cancelled:  { label: "Cancelled",      color: "#f87171", bg: "rgba(248,113,113,.1)" },
+// Keys are what /api/reports/po-tracking actually sends, normalised: the raw
+// PurchaseOrder.status ("PENDING", "APPROVED", "CANCELLED", …) plus the two the
+// route derives itself, "PARTIAL" and "FULLY_RECEIVED". The old map was keyed
+// "draft"/"sent"/"received", which matched none of them.
+const STATUS: Record<string, Badge> = {
+  draft:           { label: "Draft",       color: "var(--text-muted)", bg: "var(--app-bg)" },
+  pending:         { label: "Pending",     color: "#818cf8", bg: "rgba(129,140,248,.1)" },
+  approved:        { label: "Approved",    color: "#818cf8", bg: "rgba(129,140,248,.1)" },
+  partial:         { label: "Partial",     color: "#fbbf24", bg: "rgba(251,191,36,.1)" },
+  fully_received:  { label: "Received ✓",  color: "#34d399", bg: "rgba(52,211,153,.1)" },
+  cancelled:       { label: "Cancelled",   color: "#f87171", bg: "rgba(248,113,113,.1)" },
 };
 
 export default function PoTrackingPage() {
