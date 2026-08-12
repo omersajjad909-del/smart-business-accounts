@@ -44,7 +44,7 @@ export default function BusinessModulesPage() {
   async function load() {
     setLoading(true);
     try {
-      const r = await fetch("/api/admin/business-modules", { credentials: "include", headers: headers() });
+      const r = await fetch("/api/admin/business-modules", { credentials: "include", headers: headers(), cache: "no-store" });
       const d = await r.json();
       setModules(d.modules || []);
     } finally {
@@ -64,8 +64,16 @@ export default function BusinessModulesPage() {
         body: JSON.stringify({ action: "TOGGLE", id, enabled: !currentEnabled }),
       });
       if (r.ok) {
-        setModules(prev => prev.map(m => m.id === id ? { ...m, enabled: !currentEnabled, status: !currentEnabled ? "live" : "coming_soon", adminOverride: true } : m));
+        // Re-read from the server instead of patching local state. The optimistic
+        // version painted the row Live and "Modified" the moment the request
+        // returned 200 — so a save that did not stick still looked like it had,
+        // and the only way to find out was to open the API by hand. Every other
+        // action on this page already reloads; this one did not.
+        await load();
         setMsg(`${!currentEnabled ? "✅ Enabled" : "⏸ Disabled"}: ${id}`);
+      } else {
+        const d = await r.json().catch(() => ({}));
+        setMsg(`❌ Could not save: ${d?.error || `${r.status} ${r.statusText}`}`);
       }
     } finally {
       setSaving(null);
