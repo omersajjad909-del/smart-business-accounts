@@ -16,6 +16,16 @@ const isMobile = false;
 // ─── Types ─────────────────────────────────────────────────────────────────
 type Tab = "overview" | "chat" | "insights" | "alerts" | "forecast" | "recommendations" | "reminders" | "tax" | "report" | "market" | "advisor" | "reconciliation" | "scan" | "invoice-gen" | "inv-forecast" | "cashflow-opt" | "churn" | "supplier-intel" | "gl-suggest" | "expense-cat" | "budget" | "duplicate" | "customer-profit" | "ratios";
 
+// Tab bar order, kept at module scope so the "current tab is not allowed for
+// this plan" fallback can pick the first tool the company actually has without
+// waiting for ALL_TABS (which needs live alert counts) to be built.
+const TAB_ORDER: Tab[] = [
+  "overview", "chat", "insights", "alerts", "forecast", "recommendations", "reminders",
+  "tax", "report", "market", "advisor", "reconciliation", "scan", "invoice-gen",
+  "inv-forecast", "cashflow-opt", "churn", "supplier-intel", "gl-suggest",
+  "expense-cat", "budget", "duplicate", "customer-profit", "ratios",
+];
+
 // ── Scan Receipt types
 interface ScannedItem { description: string; qty: number | null; unitPrice: number | null; amount: number }
 interface ScanResult {
@@ -678,7 +688,11 @@ export default function AICommandCenter() {
     fetch("/api/me/ai-tools", { cache: "no-store" })
       .then(r => r.ok ? r.json() : null)
       .then(data => {
-        if (Array.isArray(data?.tools)) {
+        // `restricted: false` means no page config was ever saved — only then is
+        // "no list" the same as full access. When a config exists we honour it
+        // even if it grants zero tools, otherwise switching every AI toggle off
+        // in /admin/plans handed the company all 24 tabs back.
+        if (Array.isArray(data?.tools) && data?.restricted !== false) {
           const tabIds = new Set<string>(
             (data.tools as AiToolId[]).map(id => AI_TOOL_META[id]?.tab).filter(Boolean)
           );
@@ -696,10 +710,21 @@ export default function AICommandCenter() {
       "scan", "invoice-gen", "inv-forecast", "cashflow-opt", "churn", "supplier-intel", "gl-suggest",
       "expense-cat", "budget", "duplicate", "customer-profit", "ratios",
     ]);
-    if (nextTab && allowedTabs.has(nextTab as Tab)) {
+    // A tool the plan does not grant has no tab to click, but ?tab=ratios still
+    // opened it by hand — the deep link has to clear the same gate the tab bar
+    // does. `enabledTabIds === null` = nothing configured, everything allowed.
+    if (nextTab && allowedTabs.has(nextTab as Tab) && (!enabledTabIds || enabledTabIds.has(nextTab))) {
       setTab(nextTab as Tab);
     }
-  }, [searchParams]);
+  }, [searchParams, enabledTabIds]);
+
+  // The tools list arrives after mount, so the tab already on screen (default
+  // or deep-linked) can turn out to be one this company does not have.
+  useEffect(() => {
+    if (!enabledTabIds || enabledTabIds.has(tab)) return;
+    const firstAllowed = TAB_ORDER.find(t => enabledTabIds.has(t));
+    if (firstAllowed) setTab(firstAllowed);
+  }, [enabledTabIds, tab]);
 
   const getHeaders = useCallback((): Record<string, string> => {
     const user = getCurrentUser();
@@ -1419,13 +1444,11 @@ export default function AICommandCenter() {
     { id: "customer-profit",  label: "Customer Profitability", icon: "👤" },
     { id: "ratios",           label: "Financial Ratios",       icon: "⚖️" },
   ];
-  // An *empty* result means the plan/business-type config simply never listed
-  // the AI tool ids — not that this company is entitled to zero of them.
-  // Filtering on it wiped the whole tab bar and left the page looking like a
-  // bare chat box with every AI tool gone. Page-level access is already gated
-  // by the sidebar and /admin/permissions; this filter only narrows when it
-  // actually has something to say.
-  const TABS = enabledTabIds?.size ? ALL_TABS.filter(t => enabledTabIds.has(t.id)) : ALL_TABS;
+  // `enabledTabIds === null` = the API said no page config exists (or the call
+  // failed), so nothing is being gated and every tab shows. A non-null set is
+  // the admin's answer and is applied as-is, empty included — treating empty as
+  // "show everything" is what made turning tools off in /admin/plans do nothing.
+  const TABS = enabledTabIds ? ALL_TABS.filter(t => enabledTabIds.has(t.id)) : ALL_TABS;
   const enabledTabSet = new Set(TABS.map(t => t.id));
 
   const TAB_GROUPS = [
@@ -1441,6 +1464,22 @@ export default function AICommandCenter() {
 
   const activeGroup = TAB_GROUPS.find(g => g.tabs.includes(tab)) ?? TAB_GROUPS[0];
   const tabsInGroup = TABS.filter(t => activeGroup?.tabs.includes(t.id));
+
+  // Every AI tool switched off for this plan. Without this the tab bar rendered
+  // empty while the Overview panel below it kept showing, so the page looked
+  // half-broken instead of locked.
+  if (TABS.length === 0) {
+    return (
+      <div style={{ fontFamily: "'Outfit','DM Sans',sans-serif", color: "white", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 14, minHeight: "60vh", textAlign: "center", padding: "0 24px" }}>
+        <div style={{ width: 52, height: 52, borderRadius: 15, background: "linear-gradient(135deg,#6366f1,#4f46e5)", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 6px 20px rgba(99,102,241,.4)" }}><AiIcon size={26} /></div>
+        <div style={{ fontSize: 18, fontWeight: 800, letterSpacing: "-.3px" }}>AI tools are not enabled</div>
+        <div style={{ fontSize: 13.5, color: "rgba(255,255,255,.45)", maxWidth: 420, lineHeight: 1.6 }}>
+          No AI Intelligence tool is assigned to your plan for this business type.
+          Ask your administrator to enable them in Plans → Pages &amp; Modules.
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div style={{ fontFamily: "'Outfit','DM Sans',sans-serif", color: "white", display: "flex", flexDirection: "column", height: "calc(100vh - 56px)", overflow: "hidden", margin: "-16px -12px", width: "calc(100% + 24px)", maxWidth: "none" }}>
@@ -1499,7 +1538,7 @@ export default function AICommandCenter() {
       {/* ══ ROW 1: GROUPS ════════════════════════════════════════════════════ */}
       <div className="ai-tabs-bar" style={{ padding: "0 16px", borderBottom: "1px solid rgba(255,255,255,.06)", display: "flex", gap: 2, overflowX: "auto", flexShrink: 0, scrollbarWidth: "none", background: "rgba(255,255,255,.015)" }}>
         {TAB_GROUPS.map(g => {
-          const isActive = activeGroup.id === g.id;
+          const isActive = activeGroup?.id === g.id;
           const hasBadge = g.id === "core" && alerts.length > 0;
           return (
             <button key={g.id} className="ai-tab-btn" onClick={() => {
@@ -1527,7 +1566,7 @@ export default function AICommandCenter() {
         {tabsInGroup.map(t => (
           <button key={t.id} className="ai-tab-btn" onClick={() => handleTab(t.id)} style={{
             padding: "7px 11px", border: "none",
-            borderBottom: tab === t.id ? `2px solid ${activeGroup.color}` : "2px solid transparent",
+            borderBottom: tab === t.id ? `2px solid ${activeGroup?.color ?? "#6366f1"}` : "2px solid transparent",
             background: "none",
             color: tab === t.id ? "white" : "rgba(255,255,255,.38)",
             fontSize: 11.5, fontWeight: tab === t.id ? 700 : 400,
