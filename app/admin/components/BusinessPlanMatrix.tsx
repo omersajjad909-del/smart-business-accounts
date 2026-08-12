@@ -381,99 +381,99 @@ export default function BusinessPlanMatrix({ embedded = false, scope = "WORLD" }
               </div>
             )}
             {pageGroups.length > 0 && (
-                    <>
-                      <div style={{ display: "grid", gridTemplateColumns: "1fr 170px 170px 170px", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 12, overflow: "hidden", margin: "18px 0 10px" }}>
-                        <div style={{ padding: "12px 18px", borderRight: "1px solid rgba(255,255,255,0.06)" }}>
-                          <div style={{ fontSize: 12, fontWeight: 700, color: "white" }}>Pages ({pageFeatures.length})</div>
-                          <div style={{ fontSize: 10, color: "rgba(255,255,255,.3)", marginTop: 2 }}>
-                            Every screen in the sidebar for this business type
-                          </div>
+              <>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 170px 170px 170px", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 12, overflow: "hidden", margin: "18px 0 10px" }}>
+                  <div style={{ padding: "12px 18px", borderRight: "1px solid rgba(255,255,255,0.06)" }}>
+                    <div style={{ fontSize: 12, fontWeight: 700, color: "white" }}>Pages ({pageFeatures.length})</div>
+                    <div style={{ fontSize: 10, color: "rgba(255,255,255,.3)", marginTop: 2 }}>
+                      Every screen in the sidebar for this business type
+                    </div>
+                  </div>
+                  {PLANS.map(plan => {
+                    const meta = PLAN_META[plan];
+                    const count = planPages[plan].length;
+                    return (
+                      <div key={plan} style={{ padding: "10px 14px", borderRight: "1px solid rgba(255,255,255,0.06)", textAlign: "center" }}>
+                        <div style={{ fontSize: 13, fontWeight: 700, color: meta.color }}>{meta.label}</div>
+                        <div style={{ fontSize: 10, color: "rgba(255,255,255,.3)", marginBottom: 7 }}>{count}/{pageFeatures.length} enabled</div>
+                        <div style={{ display: "flex", gap: 4, justifyContent: "center" }}>
+                          <button onClick={() => setPlanPages(plan, pageFeatures.map(f => f.id))}
+                            style={{ padding: "3px 8px", borderRadius: 5, border: `1px solid ${meta.border}`, background: "transparent", color: meta.color, fontSize: 9, fontWeight: 700, cursor: "pointer", fontFamily: FONT }}>All ON</button>
+                          <button onClick={() => setPlanPages(plan, [])}
+                            style={{ padding: "3px 8px", borderRadius: 5, border: "1px solid rgba(255,255,255,.1)", background: "transparent", color: "rgba(255,255,255,.4)", fontSize: 9, fontWeight: 700, cursor: "pointer", fontFamily: FONT }}>None</button>
                         </div>
-                        {PLANS.map(plan => {
-                          const meta = PLAN_META[plan];
-                          const count = planPages[plan].length;
-                          return (
-                            <div key={plan} style={{ padding: "10px 14px", borderRight: "1px solid rgba(255,255,255,0.06)", textAlign: "center" }}>
-                              <div style={{ fontSize: 13, fontWeight: 700, color: meta.color }}>{meta.label}</div>
-                              <div style={{ fontSize: 10, color: "rgba(255,255,255,.3)", marginBottom: 7 }}>{count}/{pageFeatures.length} enabled</div>
-                              <div style={{ display: "flex", gap: 4, justifyContent: "center" }}>
-                                <button onClick={() => setPlanPages(plan, pageFeatures.map(f => f.id))}
-                                  style={{ padding: "3px 8px", borderRadius: 5, border: `1px solid ${meta.border}`, background: "transparent", color: meta.color, fontSize: 9, fontWeight: 700, cursor: "pointer", fontFamily: FONT }}>All ON</button>
-                                <button onClick={() => setPlanPages(plan, [])}
-                                  style={{ padding: "3px 8px", borderRadius: 5, border: "1px solid rgba(255,255,255,.1)", background: "transparent", color: "rgba(255,255,255,.4)", fontSize: 9, fontWeight: 700, cursor: "pointer", fontFamily: FONT }}>None</button>
-                              </div>
-                            </div>
-                          );
-                        })}
                       </div>
+                    );
+                  })}
+                </div>
 
-                      <div style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 12, overflow: "hidden" }}>
-                        {pageGroups.map((group, gi) => {
-                          const isExpanded = expandedGroups.has(group.id);
-                          const isLast = gi === pageGroups.length - 1;
-                          const ids = group.items.map(i => i.id);
+                <div style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 12, overflow: "hidden" }}>
+                  {pageGroups.map((group, gi) => {
+                    const isExpanded = expandedGroups.has(group.id);
+                    const isLast = gi === pageGroups.length - 1;
+                    const ids = group.items.map(i => i.id);
 
-                          return (
-                            <div key={group.id} style={{ borderBottom: isLast ? "none" : "1px solid rgba(255,255,255,0.05)" }}>
-                              <div
-                                onClick={() => setExpandedGroups(prev => { const n = new Set(prev); n.has(group.id) ? n.delete(group.id) : n.add(group.id); return n; })}
-                                style={{ display: "grid", gridTemplateColumns: "1fr 170px 170px 170px", padding: "9px 16px", background: "rgba(255,255,255,0.035)", cursor: "pointer", userSelect: "none" }}
-                              >
-                                <div style={{ display: "flex", alignItems: "center", gap: 7 }}>
-                                  <span style={{ fontSize: 10, color: "rgba(255,255,255,.4)", width: 10, flexShrink: 0 }}>{isExpanded ? "▼" : "▶"}</span>
-                                  <span style={{ fontSize: 12, fontWeight: 700, color: "white" }}>{group.label}</span>
-                                  <span style={{ fontSize: 10, color: "rgba(255,255,255,.25)" }}>({group.items.length})</span>
-                                </div>
-                                {PLANS.map(plan => {
-                                  const meta = PLAN_META[plan];
-                                  const onCount = ids.filter(id => planPages[plan].includes(id)).length;
-                                  const allOn = onCount === ids.length;
-                                  return (
-                                    <div key={plan} style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 7 }} onClick={e => e.stopPropagation()}>
-                                      <span style={{ fontSize: 10, fontWeight: 700, color: allOn ? meta.color : "rgba(255,255,255,.3)", minWidth: 28, textAlign: "right" }}>
-                                        {onCount}/{ids.length}
-                                      </span>
-                                      <button
-                                        onClick={() => {
-                                          const cur = new Set(planPages[plan]);
-                                          if (allOn) ids.forEach(id => cur.delete(id));
-                                          else ids.forEach(id => cur.add(id));
-                                          setPlanPages(plan, Array.from(cur));
-                                        }}
-                                        style={{ padding: "2px 7px", borderRadius: 4, fontSize: 9, fontWeight: 700, cursor: "pointer", border: `1px solid ${allOn ? "rgba(248,113,113,.4)" : meta.border}`, background: "transparent", color: allOn ? "#f87171" : meta.color, fontFamily: FONT }}
-                                      >
-                                        {allOn ? "All OFF" : "All ON"}
-                                      </button>
-                                    </div>
-                                  );
-                                })}
+                    return (
+                      <div key={group.id} style={{ borderBottom: isLast ? "none" : "1px solid rgba(255,255,255,0.05)" }}>
+                        <div
+                          onClick={() => setExpandedGroups(prev => { const n = new Set(prev); n.has(group.id) ? n.delete(group.id) : n.add(group.id); return n; })}
+                          style={{ display: "grid", gridTemplateColumns: "1fr 170px 170px 170px", padding: "9px 16px", background: "rgba(255,255,255,0.035)", cursor: "pointer", userSelect: "none" }}
+                        >
+                          <div style={{ display: "flex", alignItems: "center", gap: 7 }}>
+                            <span style={{ fontSize: 10, color: "rgba(255,255,255,.4)", width: 10, flexShrink: 0 }}>{isExpanded ? "▼" : "▶"}</span>
+                            <span style={{ fontSize: 12, fontWeight: 700, color: "white" }}>{group.label}</span>
+                            <span style={{ fontSize: 10, color: "rgba(255,255,255,.25)" }}>({group.items.length})</span>
+                          </div>
+                          {PLANS.map(plan => {
+                            const meta = PLAN_META[plan];
+                            const onCount = ids.filter(id => planPages[plan].includes(id)).length;
+                            const allOn = onCount === ids.length;
+                            return (
+                              <div key={plan} style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 7 }} onClick={e => e.stopPropagation()}>
+                                <span style={{ fontSize: 10, fontWeight: 700, color: allOn ? meta.color : "rgba(255,255,255,.3)", minWidth: 28, textAlign: "right" }}>
+                                  {onCount}/{ids.length}
+                                </span>
+                                <button
+                                  onClick={() => {
+                                    const cur = new Set(planPages[plan]);
+                                    if (allOn) ids.forEach(id => cur.delete(id));
+                                    else ids.forEach(id => cur.add(id));
+                                    setPlanPages(plan, Array.from(cur));
+                                  }}
+                                  style={{ padding: "2px 7px", borderRadius: 4, fontSize: 9, fontWeight: 700, cursor: "pointer", border: `1px solid ${allOn ? "rgba(248,113,113,.4)" : meta.border}`, background: "transparent", color: allOn ? "#f87171" : meta.color, fontFamily: FONT }}
+                                >
+                                  {allOn ? "All OFF" : "All ON"}
+                                </button>
                               </div>
+                            );
+                          })}
+                        </div>
 
-                              {isExpanded && group.items.map((item, ii) => (
-                                <div key={item.id} style={{ display: "grid", gridTemplateColumns: "1fr 170px 170px 170px", padding: "7px 16px 7px 40px", borderTop: "1px solid rgba(255,255,255,0.03)", background: ii % 2 === 0 ? "transparent" : "rgba(255,255,255,0.01)" }}>
-                                  <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                                    <span style={{ fontSize: 12, color: "rgba(255,255,255,.65)" }}>{item.label}</span>
+                        {isExpanded && group.items.map((item, ii) => (
+                          <div key={item.id} style={{ display: "grid", gridTemplateColumns: "1fr 170px 170px 170px", padding: "7px 16px 7px 40px", borderTop: "1px solid rgba(255,255,255,0.03)", background: ii % 2 === 0 ? "transparent" : "rgba(255,255,255,0.01)" }}>
+                            <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                              <span style={{ fontSize: 12, color: "rgba(255,255,255,.65)" }}>{item.label}</span>
+                            </div>
+                            {PLANS.map(plan => {
+                              const meta = PLAN_META[plan];
+                              const isOn = planPages[plan].includes(item.id);
+                              return (
+                                <div key={plan} style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
+                                  <div onClick={() => togglePage(plan, item.id)}
+                                    style={{ width: 34, height: 19, borderRadius: 10, position: "relative", transition: "background .2s", background: isOn ? meta.color : "rgba(255,255,255,0.1)", cursor: "pointer", flexShrink: 0 }}>
+                                    <div style={{ position: "absolute", top: 2.5, left: isOn ? 17 : 2.5, width: 14, height: 14, borderRadius: "50%", background: "white", transition: "left .2s", boxShadow: "0 1px 3px rgba(0,0,0,.3)" }}/>
                                   </div>
-                                  {PLANS.map(plan => {
-                                    const meta = PLAN_META[plan];
-                                    const isOn = planPages[plan].includes(item.id);
-                                    return (
-                                      <div key={plan} style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
-                                        <div onClick={() => togglePage(plan, item.id)}
-                                          style={{ width: 34, height: 19, borderRadius: 10, position: "relative", transition: "background .2s", background: isOn ? meta.color : "rgba(255,255,255,0.1)", cursor: "pointer", flexShrink: 0 }}>
-                                          <div style={{ position: "absolute", top: 2.5, left: isOn ? 17 : 2.5, width: 14, height: 14, borderRadius: "50%", background: "white", transition: "left .2s", boxShadow: "0 1px 3px rgba(0,0,0,.3)" }}/>
-                                        </div>
-                                      </div>
-                                    );
-                                  })}
                                 </div>
-                              ))}
-                            </div>
-                          );
-                        })}
+                              );
+                            })}
+                          </div>
+                        ))}
                       </div>
-                    </>
-                  )}
+                    );
+                  })}
+                </div>
+              </>
+            )}
 
             {/* Save */}
             <div style={{ marginTop: 16, display: "flex", justifyContent: "flex-end", gap: 10 }}>
