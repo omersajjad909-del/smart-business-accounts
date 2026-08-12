@@ -114,8 +114,9 @@ export async function POST(req: Request) {
 
     if (!paymentAccount) return NextResponse.json({ error: "Cash/Bank account not found" }, { status: 400 });
 
-    const count     = await prisma.voucher.count({ where: { type: "CPV", companyId } });
-    const voucherNo = `CPV-${count + 1}`;
+    // Same fix as CRV: a deleted voucher used to drop the count and hand the
+    // next one a number already in use.
+    const voucherNo = `CPV-${await nextVoucherNo(prisma, companyId, "CPV", "CPV")}`;
 
     const result = await prisma.$transaction(async (tx: any) => {
       const voucherEntries = [
