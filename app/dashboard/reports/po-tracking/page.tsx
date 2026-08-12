@@ -54,9 +54,10 @@ export default function PoTrackingPage() {
         <div style={{ display: "flex", gap: 10 }}>
           <select value={status} onChange={e => setStatus(e.target.value)} style={inp}>
             <option value="all">All Statuses</option>
-            <option value="sent">Sent</option>
+            <option value="pending">Pending</option>
+            <option value="approved">Approved</option>
             <option value="partial">Partial</option>
-            <option value="received">Received</option>
+            <option value="fully_received">Received</option>
             <option value="draft">Draft</option>
             <option value="cancelled">Cancelled</option>
           </select>
