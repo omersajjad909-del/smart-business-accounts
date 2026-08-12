@@ -211,11 +211,13 @@ export default function CrmContactsPage() {
               </select>
             </div>
 
-            <div className="flex gap-2">
+            {/* `flex-1` stretched Add into a full-width bar across the page.
+                A submit button should be the size of its label. */}
+            <div className="flex gap-2 justify-end">
               <button
                 type="submit"
                 disabled={loading}
-                className="flex-1 bg-blue-600 text-white py-2 rounded font-semibold hover:bg-blue-700"
+                className="px-8 bg-blue-600 text-white py-2 rounded font-semibold hover:bg-blue-700 disabled:opacity-60"
               >
                 {loading
                   ? "Loading..."
@@ -283,19 +285,24 @@ export default function CrmContactsPage() {
                         {contact.type}
                       </span>
                     </td>
-                    <td className="px-6 py-3 text-center space-x-2">
-                      <button
-                        onClick={() => handleEdit(contact)}
-                        className="px-3 py-1 bg-blue-500 text-white rounded text-sm hover:bg-blue-600"
-                      >
-                        Edit
-                      </button>
-                      <button
-                        onClick={() => handleDelete(contact.id)}
-                        className="px-3 py-1 bg-red-500 text-white rounded text-sm hover:bg-red-600"
-                      >
-                        Delete
-                      </button>
+                    {/* space-x-2 only spaced the buttons; it did not stop them
+                        wrapping, so a narrow Actions column stacked Edit above
+                        Delete. Flex with nowrap keeps them on one line. */}
+                    <td className="px-6 py-3 whitespace-nowrap">
+                      <div className="flex items-center justify-center gap-2">
+                        <button
+                          onClick={() => handleEdit(contact)}
+                          className="px-3 py-1 rounded text-sm font-medium bg-blue-500/15 text-blue-400 border border-blue-500/30 hover:bg-blue-500/25 transition-colors"
+                        >
+                          Edit
+                        </button>
+                        <button
+                          onClick={() => handleDelete(contact.id)}
+                          className="px-3 py-1 rounded text-sm font-medium bg-red-500/15 text-red-400 border border-red-500/30 hover:bg-red-500/25 transition-colors"
+                        >
+                          Delete
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))}
