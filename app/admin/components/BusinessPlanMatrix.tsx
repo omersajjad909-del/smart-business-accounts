@@ -16,262 +16,9 @@ const PLAN_META: Record<Plan, { label: string; color: string; bg: string; border
   ENTERPRISE: { label: "Enterprise", color: "#34d399", bg: "rgba(52,211,153,0.08)", border: "rgba(52,211,153,0.3)", desc: "Full access" },
 };
 
-// Human-readable module labels
-const MODULE_LABELS: Record<string, string> = {
-  dashboard: "Dashboard",
-  ai_assistant: "AI Assistant",
-  business_guide: "Business Guide",
-  owner_dashboard: "Owner Dashboard",
-  ai_intelligence: "AI Intelligence",
-  business_operator: "Business Operator",
-  automation: "Business Automation",
-  chart_of_accounts: "Chart of Accounts",
-  cpv: "Cash Payment Voucher",
-  crv: "Cash Receipt Voucher",
-  jv: "Journal Voucher",
-  contra: "Contra Entry",
-  advance_payment: "Advance Payments",
-  petty_cash: "Petty Cash",
-  credit_note: "Credit Note",
-  debit_note: "Debit Note",
-  bank_reconciliation: "Bank Reconciliation",
-  payment_receipts: "Payment Receipts",
-  expense_vouchers: "Expense Vouchers",
-  tax_configuration: "Tax Configuration",
-  bulk_payments: "Bulk Payments",
-  loans: "Loans",
-  recurring: "Recurring Transactions",
-  reports_financial: "Financial Reports",
-  admin_settings: "Settings",
-  opening_balances: "Opening Balances",
-  sales_invoice: "Sales Invoice",
-  purchase_invoice: "Purchase Invoice",
-  purchase_order: "Purchase Order",
-  quotation: "Quotation",
-  delivery_challan: "Delivery Challan",
-  sale_return: "Sale Return",
-  outward: "Outward / Dispatch",
-  inventory_items: "Inventory Items",
-  stock_rates: "Stock Rates",
-  barcode: "Barcode Management",
-  reports_inventory: "Inventory Reports",
-  crm: "CRM",
-  hr_payroll: "HR & Payroll",
-  bom: "Bill of Materials",
-  production_orders: "Production Orders",
-  work_orders: "Work Orders",
-  raw_materials: "Raw Materials",
-  restaurant_tables: "Tables",
-  restaurant_menu: "Menu",
-  kitchen_orders: "Kitchen Orders",
-  recipe_costing: "Recipe Costing",
-  re_properties: "Properties",
-  re_tenants: "Tenants",
-  re_rent: "Rent Collection",
-  re_leases: "Lease Management",
-  projects: "Projects",
-  site_management: "Site Management",
-  material_requests: "Material Requests",
-  subcontractors: "Subcontractors",
-  routes: "Routes",
-  delivery_tracking: "Delivery Tracking",
-  van_sales: "Van Sales",
-  pos: "Point of Sale",
-  loyalty_points: "Loyalty Points",
-  product_catalog: "Product Catalog",
-  stock_transfer: "Stock Transfer",
-  branch_reports: "Branch Reports",
-  online_store_sync: "Online Store Sync",
-  supplier_portal: "Supplier Portal",
-  student_mgmt: "Student Management",
-  fee_collection: "Fee Collection",
-  class_schedule: "Class Schedule",
-  exam_results: "Exam Results",
-  patient_records: "Patient Records",
-  appointments: "Appointments",
-  prescriptions: "Prescriptions",
-  lab_tests: "Lab Tests",
-  room_booking: "Room Booking",
-  housekeeping: "Housekeeping",
-  room_service: "Room Service",
-  front_desk: "Front Desk",
-  drug_inventory: "Drug Inventory",
-  prescriptions_pharmacy: "Pharmacy Prescriptions",
-  expiry_tracking: "Expiry Tracking",
-  appointments_salon: "Appointments",
-  stylist_mgmt: "Stylist Management",
-  service_menu: "Service Menu",
-  memberships: "Memberships",
-  class_schedule_gym: "Class Schedule",
-  trainer_mgmt: "Trainer Management",
-  fleet_mgmt: "Fleet Management",
-  trips: "Trips",
-  driver_mgmt: "Driver Management",
-  fuel_tracking: "Fuel Tracking",
-  crop_mgmt: "Crop Management",
-  livestock: "Livestock",
-  field_mgmt: "Field Management",
-  harvest: "Harvest",
-  donor_mgmt: "Donor Management",
-  grant_tracking: "Grant Tracking",
-  beneficiary_mgmt: "Beneficiary Management",
-  fund_accounting: "Fund Accounting",
-  product_listings: "Product Listings",
-  order_mgmt: "Order Management",
-  returns_mgmt: "Returns Management",
-  shipping: "Shipping",
-  case_mgmt: "Case Management",
-  billing_legal: "Legal Billing",
-  client_portal: "Client Portal",
-  time_billing: "Time Billing",
-  project_mgmt: "Project Management",
-  sprint_tracking: "Sprint Tracking",
-  client_contracts: "Client Contracts",
-  tech_support: "Tech Support",
-  vehicle_inventory: "Vehicle Inventory",
-  service_jobs: "Service Jobs",
-  parts_inventory: "Parts Inventory",
-  vehicle_rental: "Vehicle Rental",
-  ad_campaigns: "Ad Campaigns",
-  media_planning: "Media Planning",
-  content_production: "Content Production",
-  print_jobs: "Print Jobs",
-  subscriptions: "Subscriptions",
-  mrr_tracking: "MRR Tracking",
-  bandwidth_mgmt: "Bandwidth Management",
-  billing_recurring: "Recurring Billing",
-  audit_files: "Audit Files",
-  consulting_projects: "Consulting Projects",
-  architectural_drawings: "Architectural Drawings",
-  repair_jobs: "Repair Jobs",
-  spare_parts_repair: "Spare Parts",
-  warranty_tracking: "Warranty Tracking",
-  solar_projects: "Solar Projects",
-  utility_billing: "Utility Billing",
-  meter_reading: "Meter Reading",
-  shipments: "Shipments",
-  customs_clearance: "Customs Clearance",
-  lc_management: "L/C Management",
-  event_bookings: "Event Bookings",
-  vendor_management: "Vendor Management",
-  event_budget: "Event Budget",
-  travel_bookings: "Travel Bookings",
-  visa_processing: "Visa Processing",
-  travel_settlements: "Travel Settlements",
-  rental_items: "Rental Items",
-  rental_agreements: "Rental Agreements",
-  maintenance_schedule: "Maintenance Schedule",
-  franchise_outlets: "Franchise Outlets",
-  royalty_tracking: "Royalty Tracking",
-  brand_compliance: "Brand Compliance",
-  // Granular financial report keys
-  ledger: "Ledger / Accounts",
-  trial_balance: "Trial Balance",
-  profit_loss: "Profit & Loss",
-  balance_sheet: "Balance Sheet",
-  ageing_report: "Ageing Report",
-  cash_flow: "Cash Flow Statement",
-  stock_ledger: "Stock Ledger",
-  // Granular HR keys
-  employees: "Employees",
-  payroll: "Payroll",
-  attendance: "Attendance",
-  advance_salary: "Advance Salary",
-  // Commerce — granular page keys
-  purchase_return: "Purchase Return",
-  payment_followup: "Payment Follow-up",
-  customer_statement: "Customer Statement",
-  supplier_statement: "Supplier Statement",
-  fixed_assets: "Fixed Assets",
-  audit_trail: "Audit Trail",
-  budget: "Budget",
-  cost_centers: "Cost Centers",
-  price_lists: "Price Lists",
-  credit_limits: "Credit Limits",
-  warehouses: "Warehouses",
-  sales_order: "Sales Order",
-  stock_movements: "Stock Movements",
-  warehouse_transfers: "Warehouse Transfers",
-  purchase_requisition: "Purchase Requisition",
-  landed_cost: "Landed Cost",
-  // Phase 1 — Distribution
-  stock_on_van: "Stock On Van",
-  collections: "Collections",
-  trip_sheet: "Trip Sheet",
-  distribution_analytics: "Distribution Analytics",
-  // Phase 1 — Trading
-  order_desk: "Order Desk",
-  trading_analytics: "Trading Analytics",
-  delivery_order: "Delivery Orders",
-  // Phase 1 — Import / Export
-  import_costing: "Import Costing",
-  export_rebate: "Export Rebate / Drawback",
-  freight: "Freight",
-  containers: "Containers",
-  hs_codes: "HS Code Master",
-  commercial_invoice: "Commercial Invoice",
-  packing_list: "Packing List",
-  cert_of_origin: "Certificate of Origin",
-  export_docs: "Export Documents",
-  trade_analytics: "Trade Analytics",
-  export_performance: "Export Performance",
-  // Phase 1 — Clearing & Forwarding
-  cnf_jobs: "C&F Job Files",
-};
-
-// Core modules always ON for all plans
-const ALWAYS_ON = new Set([
-  "dashboard", "admin_settings", "reports_financial", "chart_of_accounts",
-  "cpv", "crv", "payment_receipts", "expense_vouchers",
-]);
-
-// Default plan tiers for modules
-function getDefaultPlanModules(allModules: string[]): Record<Plan, string[]> {
-  // Advanced modules only for PRO+
-  const advancedModules = new Set([
-    "reports_inventory", "crm", "hr_payroll", "bank_reconciliation",
-    "tax_configuration", "bom", "production_orders", "branch_reports",
-    "online_store_sync", "supplier_portal", "mrr_tracking", "audit_files",
-    "franchise_outlets", "royalty_tracking", "brand_compliance",
-    "recurring", "loans", "advance_payment",
-  ]);
-  // Enterprise-only modules
-  const enterpriseOnly = new Set([
-    "hr_payroll", "bank_reconciliation",
-  ]);
-
-  const starter = allModules.filter(m => !advancedModules.has(m));
-  const pro     = allModules.filter(m => !enterpriseOnly.has(m));
-  const enterprise = [...allModules];
-
-  return { STARTER: starter, PRO: pro, ENTERPRISE: enterprise };
-}
-
 type ConfigMap = Record<string, Record<Plan, string[]>>;
 /** Same shape as ConfigMap, but the values are dashboard page ids. */
 type PageConfigMap = Record<string, Record<Plan, string[]>>;
-
-const MODULE_GROUPS: Array<{ id: string; label: string; icon: string; keys: string[] }> = [
-  { id: "core",      label: "Core",               icon: "⚙️",  keys: ["dashboard","admin_settings","chart_of_accounts","opening_balances"] },
-  // AI and the dashboard utilities used to be hard-wired into the sidebar with
-  // no module key, so they could never be included in or excluded from a plan.
-  { id: "ai",        label: "AI & Automation",     icon: "🤖",  keys: ["ai_assistant","ai_intelligence","business_operator","business_guide","owner_dashboard","automation"] },
-  { id: "vouchers",  label: "Vouchers & Finance",  icon: "📑",  keys: ["cpv","crv","jv","contra","advance_payment","petty_cash","credit_note","debit_note","expense_vouchers","loans","recurring","tax_configuration"] },
-  { id: "banking",   label: "Banking & Payments",  icon: "🏦",  keys: ["bank_reconciliation","payment_receipts","bulk_payments","payment_followup","customer_statement","supplier_statement"] },
-  { id: "reports",   label: "Financial Reports",   icon: "📊",  keys: ["reports_financial","ledger","trial_balance","profit_loss","balance_sheet","ageing_report","cash_flow"] },
-  { id: "sales",     label: "Sales",               icon: "🧾",  keys: ["sales_invoice","sales_order","quotation","delivery_challan","delivery_order","sale_return","outward"] },
-  { id: "purchases", label: "Purchases",           icon: "🛒",  keys: ["purchase_invoice","purchase_order","purchase_return","purchase_requisition","landed_cost"] },
-  { id: "inventory", label: "Inventory",           icon: "📦",  keys: ["inventory_items","stock_rates","barcode","stock_movements","price_lists","credit_limits","warehouses","warehouse_transfers","reports_inventory","stock_ledger"] },
-  { id: "hr",        label: "HR & Payroll",        icon: "👥",  keys: ["hr_payroll","employees","payroll","attendance","advance_salary"] },
-  { id: "crm",       label: "CRM",                 icon: "🤝",  keys: ["crm"] },
-  { id: "assets",    label: "Assets & Control",    icon: "🏗️", keys: ["fixed_assets","audit_trail","budget","cost_centers"] },
-  { id: "trading",   label: "Trading",             icon: "📈",  keys: ["order_desk","delivery_order","trading_analytics"] },
-  { id: "dist",      label: "Distribution",        icon: "🚚",  keys: ["routes","delivery_tracking","van_sales","stock_on_van","collections","trip_sheet","distribution_analytics"] },
-  { id: "retail",    label: "Retail / POS",        icon: "🏪",  keys: ["pos","loyalty_points","product_catalog","stock_transfer","branch_reports","online_store_sync","supplier_portal"] },
-  { id: "trade_ops", label: "Trade Operations",    icon: "🚢",  keys: ["shipments","containers","freight","customs_clearance","lc_management"] },
-  { id: "trade_doc", label: "Trade Documents",     icon: "📋",  keys: ["hs_codes","import_costing","export_rebate","commercial_invoice","packing_list","cert_of_origin","export_docs","trade_analytics","export_performance"] },
-  { id: "cnf",       label: "C&F Operations",      icon: "🛃",  keys: ["cnf_jobs"] },
-];
 
 /**
  * Business type × plan assignment grid — every module key and every dashboard
@@ -331,18 +78,8 @@ export default function BusinessPlanMatrix({ embedded = false, scope = "WORLD" }
       .catch(() => setEnabledIds(new Set()));
   }, []);
 
-  // Get plan modules for selected business (saved config or defaults)
-  const planModules = useMemo((): Record<Plan, string[]> => {
-    if (!selected) return { STARTER: [], PRO: [], ENTERPRISE: [] };
-    const saved = config[selected.id];
-    if (saved) return saved as Record<Plan, string[]>;
-    return getDefaultPlanModules(selected.modules as string[]);
-  }, [selected, config]);
-
   // Every dashboard page this business type owns, grouped the way the sidebar
-  // groups them. This is the list that was missing: the module keys above cover
-  // 114 generic modules, while these are the actual pages — all 24 AI tools,
-  // the industry control centres, everything.
+  // groups them — all 24 AI tools, the industry control centres, everything.
   const pageFeatures = useMemo(
     () => (selected ? dashboardFeaturesForBusinessType(selected.id) : []),
     [selected]
@@ -360,26 +97,6 @@ export default function BusinessPlanMatrix({ embedded = false, scope = "WORLD" }
       label,
       items,
     }));
-  }, [pageFeatures]);
-
-  /**
-   * Module keys that name the same screen as a page below.
-   *
-   * `order_desk` is a module AND `TRADING_ORDER_DESK` is a page at
-   * /dashboard/trading/order-desk. Only the page flag gates the sidebar link,
-   * so the module toggle is a dead switch — and the two could be set to
-   * opposite values, which is exactly what made the grid look duplicated.
-   * Matched on the route's last segment so no hand-written list goes stale.
-   */
-  const pageShadowMap = useMemo(() => {
-    const map = new Map<string, string>();
-    for (const f of pageFeatures) {
-      const route = (f as { route?: string }).route ?? "";
-      const slug = route.split("?")[0].replace(/\/$/, "").split("/").pop() ?? "";
-      if (!slug) continue;
-      map.set(slug.replace(/-/g, "_"), f.label);
-    }
-    return map;
   }, [pageFeatures]);
 
   // No saved override means "everything on" — a business type should not lose
@@ -413,36 +130,16 @@ export default function BusinessPlanMatrix({ embedded = false, scope = "WORLD" }
     );
   }
 
-  function toggleModule(plan: Plan, mod: string) {
-    if (!selected || ALWAYS_ON.has(mod)) return;
-    const current = planModules[plan];
-    const next = current.includes(mod)
-      ? current.filter(m => m !== mod)
-      : [...current, mod];
-
-    setConfig(prev => ({
-      ...prev,
-      [selected.id]: { ...planModules, [plan]: next },
-    }));
-  }
-
   function applyPreset(preset: "all" | "default" | "min") {
     if (!selected) return;
-    const all = selected.modules as string[];
     const allPages = pageFeatures.map(f => f.id);
-    // Presets act on pages too — otherwise "All ON" would leave most of the
-    // sidebar untouched, since pages outnumber module keys roughly 3 to 1.
     if (preset === "all") {
-      setConfig(prev => ({ ...prev, [selected.id]: { STARTER: all, PRO: all, ENTERPRISE: all } }));
       setPageConfig(prev => ({ ...prev, [selected.id]: { STARTER: allPages, PRO: allPages, ENTERPRISE: allPages } }));
     } else if (preset === "default") {
-      setConfig(prev => { const n = { ...prev }; delete n[selected.id]; return n; });
       setPageConfig(prev => { const n = { ...prev }; delete n[selected.id]; return n; });
     } else {
-      const core = all.filter(m => ALWAYS_ON.has(m));
-      setConfig(prev => ({ ...prev, [selected.id]: { STARTER: core, PRO: all.filter(m => !new Set(["hr_payroll","bank_reconciliation"]).has(m)), ENTERPRISE: all } }));
-      // Recommended tiering for pages: Starter gets the control centre of each
-      // section, Pro gets everything except the AI tools, Enterprise gets all.
+      // Recommended tiering: Starter gets the control centre of each section,
+      // Pro gets everything except the AI tools, Enterprise gets all.
       const firstOfEachSection = new Set<string>();
       const seenSections = new Set<string>();
       for (const f of pageFeatures) {
