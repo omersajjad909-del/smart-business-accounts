@@ -31,21 +31,62 @@ function isAdmin(req: NextRequest) {
   } catch { return false; }
 }
 
+/**
+ * Reads the admin's on/off overrides.
+ *
+ * This used to swallow every failure and return {}, which reads as "no
+ * overrides" — so a single unparseable row, or a momentary database error,
+ * silently reverted every business type to its phase default and nothing
+ * anywhere said so. It now walks back through recent rows to the newest one
+ * that actually parses, and a real failure is logged rather than disguised as
+ * an empty config.
+ */
 async function loadOverrides(): Promise<Record<string, string>> {
   try {
-    const log = await prisma.activityLog.findFirst({
+    const logs = await prisma.activityLog.findMany({
       where: { action: ACTION_KEY },
       orderBy: { createdAt: "desc" },
+      take: 10,
+      select: { id: true, details: true },
     });
-    if (log?.details) return JSON.parse(log.details) as Record<string, string>;
-  } catch {}
+    for (const log of logs) {
+      if (!log.details) continue;
+      try {
+        const parsed = JSON.parse(log.details);
+        if (parsed && typeof parsed === "object" && !Array.isArray(parsed)) {
+          return parsed as Record<string, string>;
+        }
+      } catch {
+        console.warn(`[business-modules] Skipping unparseable override row ${log.id}`);
+      }
+    }
+  } catch (err) {
+    console.error("[business-modules] Could not read overrides:", err);
+  }
   return {};
 }
 
+/**
+ * Writes the overrides and reads them straight back.
+ *
+ * The write is the whole configuration, not a delta, so a lost write loses
+ * every override at once. Confirming it landed means a failed save surfaces as
+ * an error the admin can see instead of a screen that says "Live" over a
+ * database that says otherwise.
+ */
 async function saveOverrides(overrides: Record<string, string>) {
   await prisma.activityLog.create({
     data: { action: ACTION_KEY, details: JSON.stringify(overrides) },
   });
+
+  const readBack = await loadOverrides();
+  for (const [id, status] of Object.entries(overrides)) {
+    if (readBack[id] !== status) {
+      throw new Error(
+        `Saved "${id}" as ${status} but the database read back ${readBack[id] ?? "nothing"}. Nothing was changed.`,
+      );
+    }
+  }
 }
 
 /** Send notification emails to all un-notified waitlist entries for a business type */
@@ -180,14 +221,28 @@ export async function POST(req: NextRequest) {
   // ── TOGGLE single type ─────────────────────────────────────
   if (action === "TOGGLE") {
     if (!id) return NextResponse.json({ error: "id required" }, { status: 400 });
+    if (!BUSINESS_PHASE_CONFIG[id as keyof typeof BUSINESS_PHASE_CONFIG]) {
+      return NextResponse.json({ error: `Unknown business type "${id}"` }, { status: 400 });
+    }
     const turningOn = !!enabled;
     overrides[id] = turningOn ? "live" : "coming_soon";
-    await saveOverrides(overrides);
 
-    // Auto-notify waitlist when turning ON
+    try {
+      await saveOverrides(overrides);
+    } catch (err) {
+      return NextResponse.json(
+        { error: err instanceof Error ? err.message : "Could not save the change" },
+        { status: 500 },
+      );
+    }
+
+    // Waitlist mail is best-effort — it must not make a saved change look failed.
     let notified = 0;
     if (turningOn) {
-      notified = await notifyWaitlist(id);
+      notified = await notifyWaitlist(id).catch((e) => {
+        console.error("[business-modules] Waitlist notify failed:", e);
+        return 0;
+      });
     }
 
     return NextResponse.json({ success: true, id, status: overrides[id], notified });
