@@ -2,16 +2,22 @@
 import { useEffect, useState } from "react";
 import { getCurrentUser } from "@/lib/auth";
 import { useResponsive } from "@/hooks/useResponsive";
+import { badgeFor, normalizeBadgeKey, type Badge } from "@/lib/reportBadge";
+import { fmtDate } from "@/lib/dateUtils";
 
 const ff = "'Outfit','Inter',sans-serif";
 function fmt(n: number) { return n.toLocaleString("en-US", { minimumFractionDigits: 0, maximumFractionDigits: 0 }); }
 
-interface Row { customerName: string; invoiceNo: string; invoiceDate: string; dueDate: string; amount: number; daysOverdue: number; status: "at_risk" | "probable_bad" | "written_off"; }
+interface Row { customerName: string; invoiceNo: string; invoiceDate: string; dueDate: string; amount: number; daysOverdue: number; status: string; }
 
-const STATUS: Record<string, { label: string; color: string; bg: string }> = {
-  at_risk:      { label: "At Risk",      color: "#fbbf24", bg: "rgba(251,191,36,.1)" },
-  probable_bad: { label: "Probable Bad", color: "#fb923c", bg: "rgba(251,146,60,.1)" },
-  written_off:  { label: "Written Off",  color: "#f87171", bg: "rgba(248,113,113,.1)" },
+// The route buckets purely on days overdue: "Overdue" (≤90), "Doubtful" (>90),
+// "Bad Debt" (>180). Nothing is ever "written off" — that would need a
+// write-off posting, which this report does not do — so the old third key
+// promised an action the system never took.
+const STATUS: Record<string, Badge> = {
+  overdue:  { label: "Overdue",  color: "#fbbf24", bg: "rgba(251,191,36,.1)" },
+  doubtful: { label: "Doubtful", color: "#fb923c", bg: "rgba(251,146,60,.1)" },
+  bad_debt: { label: "Bad Debt", color: "#f87171", bg: "rgba(248,113,113,.1)" },
 };
 
 export default function BadDebtsPage() {
@@ -25,9 +31,12 @@ export default function BadDebtsPage() {
   const h = (): Record<string, string> => ({ "x-user-role": user?.role || "", "x-user-id": user?.id || "", "x-company-id": user?.companyId || "" });
   useEffect(() => { setLoading(true); fetch("/api/reports/bad-debts", { headers: h() }).then(r => r.ok ? r.json() : {}).then((d: any) => { setData(d.rows || []); setLoading(false); }).catch(() => setLoading(false)); }, []);
 
-  const filtered = filter === "all" ? data : data.filter(r => r.status === filter);
-  const totalAtRisk = data.filter(r => r.status !== "written_off").reduce((s, r) => s + r.amount, 0);
-  const totalWrittenOff = data.filter(r => r.status === "written_off").reduce((s, r) => s + r.amount, 0);
+  const filtered = filter === "all" ? data : data.filter(r => normalizeBadgeKey(r.status) === filter);
+  // "At risk" is everything not yet hard bad debt; the bad-debt tile is the
+  // 180-day bucket. Both used to test against "written_off", a status the API
+  // never sends, so the first tile counted everything and the second zero.
+  const totalAtRisk = data.filter(r => normalizeBadgeKey(r.status) !== "bad_debt").reduce((s, r) => s + r.amount, 0);
+  const totalWrittenOff = data.filter(r => normalizeBadgeKey(r.status) === "bad_debt").reduce((s, r) => s + r.amount, 0);
 
   const inp: React.CSSProperties = { background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 8, padding: "7px 12px", color: "var(--text-primary)", fontFamily: ff, fontSize: 12, outline: "none" };
 
@@ -40,9 +49,9 @@ export default function BadDebtsPage() {
         </div>
         <select value={filter} onChange={e => setFilter(e.target.value)} style={inp}>
           <option value="all">All Statuses</option>
-          <option value="at_risk">At Risk (60–90 days)</option>
-          <option value="probable_bad">Probable Bad (90+ days)</option>
-          <option value="written_off">Written Off</option>
+          <option value="overdue">Overdue (up to 90 days)</option>
+          <option value="doubtful">Doubtful (90+ days)</option>
+          <option value="bad_debt">Bad Debt (180+ days)</option>
         </select>
       </div>
 
@@ -70,15 +79,15 @@ export default function BadDebtsPage() {
             {loading ? <tr><td colSpan={7} style={{ padding: 40, textAlign: "center", color: "var(--text-muted)" }}>Loading…</td></tr>
             : filtered.length === 0 ? <tr><td colSpan={7} style={{ padding: 48, textAlign: "center", color: "var(--text-muted)" }}><div style={{ fontSize: 32, marginBottom: 8 }}>✅</div>No bad debts — all receivables are healthy</td></tr>
             : [...filtered].sort((a, b) => b.daysOverdue - a.daysOverdue).map((r, i) => {
-              const s = STATUS[r.status];
+              const s = badgeFor(STATUS, r.status);
               return (
                 <tr key={i} style={{ borderBottom: i < filtered.length - 1 ? "1px solid var(--border)" : "none" }}
                   onMouseEnter={e => (e.currentTarget.style.background = "var(--app-bg)")}
                   onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
                   <td style={{ padding: "12px 14px", fontSize: 13, fontWeight: 600 }}>{r.customerName}</td>
                   <td style={{ padding: "12px 14px", fontSize: 12, color: "#818cf8" }}>{r.invoiceNo}</td>
-                  <td style={{ padding: "12px 14px", textAlign: "right", fontSize: 12, color: "var(--text-muted)" }}>{r.invoiceDate}</td>
-                  <td style={{ padding: "12px 14px", textAlign: "right", fontSize: 12, color: "var(--text-muted)" }}>{r.dueDate}</td>
+                  <td style={{ padding: "12px 14px", textAlign: "right", fontSize: 12, color: "var(--text-muted)" }}>{fmtDate(r.invoiceDate)}</td>
+                  <td style={{ padding: "12px 14px", textAlign: "right", fontSize: 12, color: "var(--text-muted)" }}>{fmtDate(r.dueDate)}</td>
                   <td style={{ padding: "12px 14px", textAlign: "right", fontSize: 13, fontWeight: 700 }}>{cur} {fmt(r.amount)}</td>
                   <td style={{ padding: "12px 14px", textAlign: "right", fontSize: 13, fontWeight: 700, color: r.daysOverdue > 90 ? "#f87171" : r.daysOverdue > 60 ? "#fb923c" : "#fbbf24" }}>{r.daysOverdue} days</td>
                   <td style={{ padding: "12px 14px", textAlign: "right" }}>

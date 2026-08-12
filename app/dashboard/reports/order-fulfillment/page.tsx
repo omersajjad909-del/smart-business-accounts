@@ -2,17 +2,22 @@
 import { useEffect, useState } from "react";
 import { getCurrentUser } from "@/lib/auth";
 import { useResponsive } from "@/hooks/useResponsive";
+import { badgeFor, normalizeBadgeKey, type Badge } from "@/lib/reportBadge";
+import { fmtDate } from "@/lib/dateUtils";
 
 const ff = "'Outfit','Inter',sans-serif";
 function fmt(n: number) { return n.toLocaleString("en-US", { minimumFractionDigits: 0, maximumFractionDigits: 0 }); }
 
-interface Row { orderId: string; customerName: string; orderDate: string; promisedDate: string; fulfilledDate: string | null; status: "fulfilled" | "pending" | "delayed" | "cancelled"; daysVariance: number; value: number; }
+interface Row { orderId: string; customerName: string; orderDate: string; promisedDate: string; fulfilledDate: string | null; status: string; daysVariance: number; value: number; }
 
-const STATUS: Record<string, { label: string; color: string; bg: string }> = {
-  fulfilled:  { label: "Fulfilled",  color: "#34d399", bg: "rgba(52,211,153,.1)" },
-  pending:    { label: "Pending",    color: "#818cf8", bg: "rgba(129,140,248,.1)" },
-  delayed:    { label: "Delayed",    color: "#f87171", bg: "rgba(248,113,113,.1)" },
-  cancelled:  { label: "Cancelled",  color: "var(--text-muted)", bg: "var(--app-bg)" },
+// The route derives three states from the delivery challan: INVOICED becomes
+// "FULFILLED", DELIVERED stays "DELIVERED", everything else is "PENDING". It
+// has no "delayed" or "cancelled" — lateness is `daysVariance`, which the
+// Delayed tile below now uses instead.
+const STATUS: Record<string, Badge> = {
+  fulfilled: { label: "Fulfilled", color: "#34d399", bg: "rgba(52,211,153,.1)" },
+  delivered: { label: "Delivered", color: "#38bdf8", bg: "rgba(56,189,248,.1)" },
+  pending:   { label: "Pending",   color: "#818cf8", bg: "rgba(129,140,248,.1)" },
 };
 
 export default function OrderFulfillmentPage() {
@@ -27,11 +32,13 @@ export default function OrderFulfillmentPage() {
   const h = (): Record<string, string> => ({ "x-user-role": user?.role || "", "x-user-id": user?.id || "", "x-company-id": user?.companyId || "" });
   useEffect(() => { setLoading(true); fetch(`/api/reports/order-fulfillment?period=${period}`, { headers: h() }).then(r => r.ok ? r.json() : {}).then((d: any) => { setData(d.rows || []); setLoading(false); }).catch(() => setLoading(false)); }, [period]);
 
-  const filtered = status === "all" ? data : data.filter(r => r.status === status);
-  const fulfilledOnTime = data.filter(r => r.status === "fulfilled" && r.daysVariance <= 0).length;
-  const totalFulfilled  = data.filter(r => r.status === "fulfilled").length;
+  const filtered = status === "all" ? data : data.filter(r => normalizeBadgeKey(r.status) === status);
+  const fulfilledOnTime = data.filter(r => normalizeBadgeKey(r.status) === "fulfilled" && r.daysVariance <= 0).length;
+  const totalFulfilled  = data.filter(r => normalizeBadgeKey(r.status) === "fulfilled").length;
   const onTimeRate      = totalFulfilled > 0 ? (fulfilledOnTime / totalFulfilled) * 100 : 0;
-  const delayedCount    = data.filter(r => r.status === "delayed").length;
+  // Late = past the promised date and not fulfilled yet, or fulfilled late.
+  // Counting status === "delayed" always returned 0; no such status exists.
+  const delayedCount    = data.filter(r => r.daysVariance > 0).length;
 
   const inp: React.CSSProperties = { background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 8, padding: "7px 12px", color: "var(--text-primary)", fontFamily: ff, fontSize: 12, outline: "none" };
 
@@ -46,9 +53,8 @@ export default function OrderFulfillmentPage() {
           <select value={status} onChange={e => setStatus(e.target.value)} style={inp}>
             <option value="all">All Orders</option>
             <option value="fulfilled">Fulfilled</option>
+            <option value="delivered">Delivered</option>
             <option value="pending">Pending</option>
-            <option value="delayed">Delayed</option>
-            <option value="cancelled">Cancelled</option>
           </select>
           <select value={period} onChange={e => setPeriod(e.target.value)} style={inp}>
             <option value="month">This Month</option><option value="quarter">This Quarter</option><option value="year">This Year</option>
@@ -82,7 +88,7 @@ export default function OrderFulfillmentPage() {
             {loading ? <tr><td colSpan={8} style={{ padding: 40, textAlign: "center", color: "var(--text-muted)" }}>Loading…</td></tr>
             : filtered.length === 0 ? <tr><td colSpan={8} style={{ padding: 48, textAlign: "center", color: "var(--text-muted)" }}><div style={{ fontSize: 32, marginBottom: 8 }}>📦</div>No orders found for this period</td></tr>
             : filtered.map((r, i) => {
-              const s = STATUS[r.status];
+              const s = badgeFor(STATUS, r.status);
               const varianceColor = r.daysVariance < 0 ? "#34d399" : r.daysVariance === 0 ? "var(--text-muted)" : "#f87171";
               return (
                 <tr key={i} style={{ borderBottom: i < filtered.length - 1 ? "1px solid var(--border)" : "none" }}
@@ -90,9 +96,9 @@ export default function OrderFulfillmentPage() {
                   onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
                   <td style={{ padding: "12px 14px", fontSize: 12, color: "#818cf8" }}>{r.orderId}</td>
                   <td style={{ padding: "12px 14px", fontSize: 13, fontWeight: 600 }}>{r.customerName}</td>
-                  <td style={{ padding: "12px 14px", textAlign: "right", fontSize: 12, color: "var(--text-muted)" }}>{r.orderDate}</td>
-                  <td style={{ padding: "12px 14px", textAlign: "right", fontSize: 12, color: "var(--text-muted)" }}>{r.promisedDate}</td>
-                  <td style={{ padding: "12px 14px", textAlign: "right", fontSize: 12, color: "var(--text-muted)" }}>{r.fulfilledDate || "—"}</td>
+                  <td style={{ padding: "12px 14px", textAlign: "right", fontSize: 12, color: "var(--text-muted)" }}>{fmtDate(r.orderDate)}</td>
+                  <td style={{ padding: "12px 14px", textAlign: "right", fontSize: 12, color: "var(--text-muted)" }}>{fmtDate(r.promisedDate)}</td>
+                  <td style={{ padding: "12px 14px", textAlign: "right", fontSize: 12, color: "var(--text-muted)" }}>{fmtDate(r.fulfilledDate)}</td>
                   <td style={{ padding: "12px 14px", textAlign: "right", fontSize: 13, fontWeight: 700, color: varianceColor }}>
                     {r.status === "pending" ? "—" : r.daysVariance === 0 ? "On time" : `${r.daysVariance > 0 ? "+" : ""}${r.daysVariance}d`}
                   </td>
