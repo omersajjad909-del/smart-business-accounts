@@ -1127,7 +1127,7 @@ export default function DashboardLayout({
             >
               {hasPermission(currentUser, PERMISSIONS.CREATE_ACCOUNTS) && <NavLink href="/dashboard/accounts" pathname={pathname}>Chart of Accounts</NavLink>}
               {hasPermission(currentUser, PERMISSIONS.CREATE_CPV) && <NavLink href="/dashboard/cpv" pathname={pathname}>CPV (Cash Payment)</NavLink>}
-              {hasPermission(currentUser, PERMISSIONS.CREATE_CRV) && <NavLink href="/dashboard/crv" pathname={pathname}>CRV (Cash Receipt)</NavLink>}
+              {hasPermission(currentUser, PERMISSIONS.CREATE_CRV) && <NavLink href="/dashboard/crv" pathname={pathname}>Receipts (CRV)</NavLink>}
               {hasPermission(currentUser, PERMISSIONS.VIEW_ACCOUNTING) && <NavLink href="/dashboard/jv" pathname={pathname}>Journal Voucher (JV)</NavLink>}
               {hasPermission(currentUser, PERMISSIONS.MANAGE_OPENING_BALANCES) && <NavLink href="/dashboard/opening-balances" pathname={pathname}>Opening Balances</NavLink>}
               {hasPermission(currentUser, PERMISSIONS.VIEW_ACCOUNTING) && <NavLink href="/dashboard/advance-payment" pathname={pathname}>Advance Payment</NavLink>}
@@ -1189,7 +1189,7 @@ export default function DashboardLayout({
               <NavLink href="/dashboard/sale-return" pathname={pathname}>↩️ Sales Returns</NavLink>
               <NavLink href="/dashboard/quotation" pathname={pathname}>📄 Quotations</NavLink>
               <NavLink href="/dashboard/delivery-challan" pathname={pathname}>🚚 Delivery Challan</NavLink>
-              <NavLink href="/dashboard/payment-receipts" pathname={pathname}>💳 Payment Collection</NavLink>
+              <NavLink href="/dashboard/crv" pathname={pathname}>💳 Receipts</NavLink>
             </NavGroup>
 
             {/* ── 3. Purchases ── */}
