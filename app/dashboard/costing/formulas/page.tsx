@@ -19,6 +19,7 @@ import {
   type FormulaStep,
   type FormulaOutput,
   type OutputRole,
+  type StepResult,
 } from "@/lib/formulaEngine";
 import { FORMULA_CATEGORIES, FORMULA_TEMPLATES } from "@/lib/formulaTemplates";
 
@@ -172,7 +173,9 @@ export default function FormulasPage() {
   /* ─────────────────────────── Editor ─────────────────────────── */
   if (editing) {
     const d = editing.draft;
-    const stepValues = new Map(preview?.steps.map((s) => [s.key, s]) ?? []);
+    const stepValues = new Map<string, StepResult>(
+      preview?.steps.map((s): [string, StepResult] => [s.key, s]) ?? [],
+    );
 
     return (
       <div style={{ fontFamily: FONT, color: "white", padding: "24px 20px 80px", maxWidth: 1180, margin: "0 auto" }}>
