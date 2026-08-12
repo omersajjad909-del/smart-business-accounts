@@ -2379,6 +2379,12 @@ export const DASHBOARD_FEATURE_DEFS: DashboardFeatureDefinition[] = [
     section: "Inventory",
     businessTypes: ["wholesale", "wholesale_multistore", "trading", "distribution"],
   },
+  // ── Costing — deliberately not tied to one business type. A printer, a
+  //    garment unit and a plastics moulder all cost their work from a formula;
+  //    only the formula differs, and the user writes that themselves. ──
+  { id: "COSTING_SHEETS",   label: "Costing",  route: "/dashboard/costing",          business: "trading", businessLabel: "Costing", section: "Operations", description: "Work out job cost from your own formulas and save it as a sheet." },
+  { id: "COSTING_FORMULAS", label: "Formulas", route: "/dashboard/costing/formulas", business: "trading", businessLabel: "Costing", section: "Operations", description: "Write and version the costing formulas your trade uses." },
+
   // ── AI Intelligence tools (sub-tab level; routes are virtual — won't trigger layout redirects) ──
   { id: "AI_OVERVIEW",        label: "Business Health Score",   route: "/dashboard/ai?tab=overview",        business: "trading", businessLabel: "AI Intelligence", section: "Core",      description: "Real-time score 0–100 based on revenue, profit, cash, and receivables." },
   { id: "AI_CHAT",            label: "Ask AI Anything",         route: "/dashboard/ai?tab=chat",            business: "trading", businessLabel: "AI Intelligence", section: "Core",      description: "Chat with your financial data in plain English. Get instant answers." },
