@@ -679,7 +679,12 @@ export default function BusinessPlanMatrix({ embedded = false, scope = "WORLD" }
                   {/* Grouped module table */}
                   <div style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 12, overflow: "hidden" }}>
                     {MODULE_GROUPS.map((group, gi) => {
-                      const groupMods = group.keys.filter(k => allMods.includes(k));
+                      // Modules whose screen is listed under Pages are dropped:
+                      // the sidebar link is gated by the page flag, so the module
+                      // switch changed nothing while appearing to. Keeping both
+                      // let the two be set to opposite values, which is what made
+                      // the grid look like it had duplicate rows.
+                      const groupMods = group.keys.filter(k => allMods.includes(k) && !pageShadowMap.has(k));
                       if (groupMods.length === 0) return null;
                       const isExpanded = expandedGroups.has(group.id);
                       const isLast = gi === MODULE_GROUPS.length - 1;
@@ -728,25 +733,11 @@ export default function BusinessPlanMatrix({ embedded = false, scope = "WORLD" }
                           {/* Module rows */}
                           {isExpanded && groupMods.map((mod, mi) => {
                             const locked = ALWAYS_ON.has(mod);
-                            // Some module keys name the same screen as a row in
-                            // Pages below. The sidebar link is gated by the page
-                            // flag, not the module flag, so the module switch here
-                            // changes nothing — turning "Order Desk" off up here
-                            // left the page visible and looked like a bug.
-                            const shadowedBy = pageShadowMap.get(mod);
                             return (
                               <div key={mod} style={{ display: "grid", gridTemplateColumns: "1fr 170px 170px 170px", padding: "7px 16px 7px 40px", borderTop: "1px solid rgba(255,255,255,0.03)", background: mi % 2 === 0 ? "transparent" : "rgba(255,255,255,0.01)" }}>
                                 <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                                  <span style={{ fontSize: 12, color: shadowedBy ? "rgba(255,255,255,.35)" : "rgba(255,255,255,.65)" }}>{MODULE_LABELS[mod] || mod}</span>
+                                  <span style={{ fontSize: 12, color: "rgba(255,255,255,.65)" }}>{MODULE_LABELS[mod] || mod}</span>
                                   {locked && <span style={{ fontSize: 9, color: "rgba(255,255,255,.2)", fontWeight: 700, textTransform: "uppercase", letterSpacing: ".04em" }}>core</span>}
-                                  {shadowedBy && (
-                                    <span
-                                      title={`The sidebar link for this screen is controlled by "${shadowedBy}" in Pages below. This switch has no effect.`}
-                                      style={{ fontSize: 9, fontWeight: 700, textTransform: "uppercase", letterSpacing: ".04em", color: "#fbbf24", background: "rgba(251,191,36,.12)", border: "1px solid rgba(251,191,36,.3)", borderRadius: 20, padding: "1px 6px", cursor: "help" }}
-                                    >
-                                      set in pages
-                                    </span>
-                                  )}
                                 </div>
                                 {PLANS.map(plan => {
                                   const meta = PLAN_META[plan];
