@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { getCurrentUser } from "@/lib/auth";
 import { useResponsive } from "@/hooks/useResponsive";
+import { fmtDate } from "@/lib/dateUtils";
 
 const ff = "'Outfit','Inter',sans-serif";
 function fmt(n: number) { return n.toLocaleString("en-US", { minimumFractionDigits: 0, maximumFractionDigits: 0 }); }
@@ -69,7 +70,7 @@ export default function PaymentHistoryPage() {
                   </td>
                   <td style={{ padding: "12px 14px", textAlign: "right", fontSize: 13, color: "#34d399" }}>{r.onTimeCount}</td>
                   <td style={{ padding: "12px 14px", textAlign: "right", fontSize: 13, color: r.lateCount > 0 ? "#f87171" : "var(--text-muted)" }}>{r.lateCount > 0 ? r.lateCount : "—"}</td>
-                  <td style={{ padding: "12px 14px", textAlign: "right", fontSize: 12, color: "var(--text-muted)" }}>{r.lastPaymentDate || "—"}</td>
+                  <td style={{ padding: "12px 14px", textAlign: "right", fontSize: 12, color: "var(--text-muted)" }}>{fmtDate(r.lastPaymentDate)}</td>
                 </tr>
               );
             })}
