@@ -1076,7 +1076,9 @@ export default function DashboardLayout({
 
               {bizFeatures?.customerCreditLimits && hasPermission(currentUser, PERMISSIONS.VIEW_CRM) && <NavLink href="/dashboard/credit-limits" pathname={pathname}>💳 Credit Limits</NavLink>}
               {bizFeatures?.discountEngine && hasPermission(currentUser, PERMISSIONS.MANAGE_PROMOTIONS) && <NavLink href="/dashboard/promotions" pathname={pathname}>🏷️ Promotions</NavLink>}
-              {hasPermission(currentUser, PERMISSIONS.VIEW_INVENTORY) && <NavLink href="/dashboard/payment-receipts" pathname={pathname}>Payment Receipts</NavLink>}
+              {/* Receipts live on the CRV screen. Payment Receipts posted the
+                  same voucher (type "CRV"), so two menu entries led to one
+                  ledger effect under two numbering series. */}
             </NavGroup>
           )}
 
