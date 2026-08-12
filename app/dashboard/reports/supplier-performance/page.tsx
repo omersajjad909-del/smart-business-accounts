@@ -32,7 +32,9 @@ export default function SupplierPerformancePage() {
   useEffect(() => { setLoading(true); fetch(`/api/reports/supplier-performance?period=${period}`, { headers: h() }).then(r => r.ok ? r.json() : {}).then((d: any) => { setData(d.rows || []); setLoading(false); }).catch(() => setLoading(false)); }, [period]);
 
   const inp: React.CSSProperties = { background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 8, padding: "7px 12px", color: "var(--text-primary)", fontFamily: ff, fontSize: 12, outline: "none" };
-  const poorSuppliers = data.filter(r => r.rating === "poor").length;
+  // Ratings are 1–5; "poor" is the bottom two bands. Comparing against the
+  // string "poor" counted nothing, so the warning banner never appeared.
+  const poorSuppliers = data.filter(r => Number(r.rating) <= 2).length;
 
   return (
     <div style={{ padding: isMobile ? "13px 13px" : "24px 28px", fontFamily: ff, color: "var(--text-primary)", maxWidth: 1100 }}>

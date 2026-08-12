@@ -628,9 +628,15 @@ export default function DashboardLayout({
       hasCustomActiveModule("whatsapp") ||
       hasCustomActiveModule("api_access"));
 
+  const getDashboardFeatureAccessIds = (featureId: string) => {
+    if (featureId === "RETAIL_BRANCHES") return ["RETAIL_BRANCHES", "CORE_BRANCHES"];
+    if (featureId === "CORE_BRANCHES") return ["CORE_BRANCHES", "RETAIL_BRANCHES"];
+    return [featureId];
+  };
+
   const hasDashboardFeature = (featureId: string) => {
     if (!allowedDashboardFeatures) return true;
-    return allowedDashboardFeatures.has(featureId);
+    return getDashboardFeatureAccessIds(featureId).some((id) => allowedDashboardFeatures.has(id));
   };
 
   const canShowDashboardHref = (href: string) => {
@@ -798,7 +804,10 @@ export default function DashboardLayout({
 
     const feature = findDashboardFeatureByRoute(pathname);
     if (!feature) return;
-    if (!allowedDashboardFeatures.has(feature.id)) router.replace("/dashboard");
+    const allowedFeatureIds = getDashboardFeatureAccessIds(feature.id);
+    if (!allowedFeatureIds.some((id) => allowedDashboardFeatures.has(id))) {
+      router.replace("/dashboard");
+    }
   }, [ready, currentUser, pathname, router, allowedDashboardFeatures]);
 
   useLayoutEffect(() => {
