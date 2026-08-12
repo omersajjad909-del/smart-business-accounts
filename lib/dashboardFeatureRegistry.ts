@@ -2732,10 +2732,27 @@ export function isPreCoreFeatureList(saved: string[]): boolean {
   return CORE_FEATURE_IDS.length > 0 && !saved.some((id) => id.startsWith("CORE_"));
 }
 
+/**
+ * The page definition that owns a route.
+ *
+ * Longest prefix wins, exactly as the ROUTE_GUARDS matcher in the dashboard
+ * layout does. Taking the *first* prefix match instead let a parent swallow all
+ * of its children — "/dashboard/reports" answered for its 40 sub-reports and
+ * "/dashboard/costing" for /costing/formulas — so 248 sub-pages were gated on
+ * their parent's id. The sidebar checks each child's own id, so a page an admin
+ * had revoked in Pages & Modules lost its link but still opened by URL.
+ */
 export function findDashboardFeatureByRoute(pathname: string): DashboardFeatureDefinition | null {
   const normalized = String(pathname || "").replace(/\/+$/, "") || "/";
-  return DASHBOARD_FEATURE_DEFS.find((feature) => {
+  let best: DashboardFeatureDefinition | null = null;
+  let bestLength = -1;
+  for (const feature of DASHBOARD_FEATURE_DEFS) {
     const route = feature.route.replace(/\/+$/, "") || "/";
-    return normalized === route || normalized.startsWith(`${route}/`);
-  }) || null;
+    if (normalized !== route && !normalized.startsWith(`${route}/`)) continue;
+    if (route.length > bestLength) {
+      best = feature;
+      bestLength = route.length;
+    }
+  }
+  return best;
 }
