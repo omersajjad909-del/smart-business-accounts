@@ -334,7 +334,7 @@ export default function BusinessPlanMatrix({ embedded = false, scope = "WORLD" }
                 <div>
                   <div style={{ fontSize: 18, fontWeight: 700, color: "white" }}>{selected.label}</div>
                   <div style={{ fontSize: 12, color: "rgba(255,255,255,0.4)", marginTop: 2 }}>
-                    {(selected.modules as string[]).length} total modules available
+                    {pageFeatures.length} pages available
                   </div>
                 </div>
               </div>
@@ -346,118 +346,13 @@ export default function BusinessPlanMatrix({ embedded = false, scope = "WORLD" }
               </div>
             </div>
 
-            {/* Plan header bar */}
-            {(() => {
-              const allMods = selected.modules as string[];
-              return (
-                <>
-                  <div style={{ display: "grid", gridTemplateColumns: "1fr 170px 170px 170px", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 12, overflow: "hidden", marginBottom: 10 }}>
-                    <div style={{ padding: "12px 18px", borderRight: "1px solid rgba(255,255,255,0.06)", display: "flex", alignItems: "center" }}>
-                      <span style={{ fontSize: 12, color: "rgba(255,255,255,.3)", fontWeight: 600 }}>{allMods.length} modules total</span>
-                    </div>
-                    {PLANS.map(plan => {
-                      const meta = PLAN_META[plan];
-                      const count = allMods.filter(m => planModules[plan].includes(m)).length;
-                      return (
-                        <div key={plan} style={{ padding: "10px 14px", borderRight: "1px solid rgba(255,255,255,0.06)", textAlign: "center" }}>
-                          <div style={{ fontSize: 13, fontWeight: 700, color: meta.color }}>{meta.label}</div>
-                          <div style={{ fontSize: 10, color: "rgba(255,255,255,.3)", marginBottom: 7 }}>{count}/{allMods.length} enabled</div>
-                          <div style={{ display: "flex", gap: 4, justifyContent: "center" }}>
-                            <button onClick={() => setConfig(prev => ({ ...prev, [selected.id]: { ...planModules, [plan]: allMods } }))}
-                              style={{ padding: "3px 8px", borderRadius: 5, border: `1px solid ${meta.border}`, background: "transparent", color: meta.color, fontSize: 9, fontWeight: 700, cursor: "pointer", fontFamily: FONT }}>All ON</button>
-                            <button onClick={() => setConfig(prev => ({ ...prev, [selected.id]: { ...planModules, [plan]: allMods.filter(m => ALWAYS_ON.has(m)) } }))}
-                              style={{ padding: "3px 8px", borderRadius: 5, border: "1px solid rgba(255,255,255,.1)", background: "transparent", color: "rgba(255,255,255,.4)", fontSize: 9, fontWeight: 700, cursor: "pointer", fontFamily: FONT }}>Core</button>
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-
-                  {/* Grouped module table */}
-                  <div style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 12, overflow: "hidden" }}>
-                    {MODULE_GROUPS.map((group, gi) => {
-                      // Modules whose screen is listed under Pages are dropped:
-                      // the sidebar link is gated by the page flag, so the module
-                      // switch changed nothing while appearing to. Keeping both
-                      // let the two be set to opposite values, which is what made
-                      // the grid look like it had duplicate rows.
-                      const groupMods = group.keys.filter(k => allMods.includes(k) && !pageShadowMap.has(k));
-                      if (groupMods.length === 0) return null;
-                      const isExpanded = expandedGroups.has(group.id);
-                      const isLast = gi === MODULE_GROUPS.length - 1;
-
-                      return (
-                        <div key={group.id} style={{ borderBottom: isLast ? "none" : "1px solid rgba(255,255,255,0.05)" }}>
-                          {/* Group header */}
-                          <div
-                            onClick={() => setExpandedGroups(prev => { const n = new Set(prev); n.has(group.id) ? n.delete(group.id) : n.add(group.id); return n; })}
-                            style={{ display: "grid", gridTemplateColumns: "1fr 170px 170px 170px", padding: "9px 16px", background: "rgba(255,255,255,0.035)", cursor: "pointer", userSelect: "none" }}
-                          >
-                            <div style={{ display: "flex", alignItems: "center", gap: 7 }}>
-                              <span style={{ fontSize: 10, color: "rgba(255,255,255,.4)", width: 10, flexShrink: 0 }}>{isExpanded ? "▼" : "▶"}</span>
-                              <span style={{ fontSize: 13 }}>{group.icon}</span>
-                              <span style={{ fontSize: 12, fontWeight: 700, color: "white" }}>{group.label}</span>
-                              <span style={{ fontSize: 10, color: "rgba(255,255,255,.25)" }}>({groupMods.length})</span>
-                            </div>
-                            {PLANS.map(plan => {
-                              const meta = PLAN_META[plan];
-                              const onCount = groupMods.filter(m => planModules[plan].includes(m)).length;
-                              const allOn = onCount === groupMods.length;
-                              const nonLocked = groupMods.filter(m => !ALWAYS_ON.has(m));
-                              return (
-                                <div key={plan} style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 7 }} onClick={e => e.stopPropagation()}>
-                                  <span style={{ fontSize: 10, fontWeight: 700, color: allOn ? meta.color : "rgba(255,255,255,.3)", minWidth: 28, textAlign: "right" }}>
-                                    {onCount}/{groupMods.length}
-                                  </span>
-                                  {nonLocked.length > 0 && (
-                                    <button
-                                      onClick={() => setConfig(prev => {
-                                        const cur = new Set(planModules[plan]);
-                                        if (allOn) nonLocked.forEach(m => cur.delete(m));
-                                        else nonLocked.forEach(m => cur.add(m));
-                                        return { ...prev, [selected.id]: { ...planModules, [plan]: Array.from(cur) } };
-                                      })}
-                                      style={{ padding: "2px 7px", borderRadius: 4, fontSize: 9, fontWeight: 700, cursor: "pointer", border: `1px solid ${allOn ? "rgba(248,113,113,.4)" : meta.border}`, background: "transparent", color: allOn ? "#f87171" : meta.color, fontFamily: FONT }}
-                                    >
-                                      {allOn ? "All OFF" : "All ON"}
-                                    </button>
-                                  )}
-                                </div>
-                              );
-                            })}
-                          </div>
-
-                          {/* Module rows */}
-                          {isExpanded && groupMods.map((mod, mi) => {
-                            const locked = ALWAYS_ON.has(mod);
-                            return (
-                              <div key={mod} style={{ display: "grid", gridTemplateColumns: "1fr 170px 170px 170px", padding: "7px 16px 7px 40px", borderTop: "1px solid rgba(255,255,255,0.03)", background: mi % 2 === 0 ? "transparent" : "rgba(255,255,255,0.01)" }}>
-                                <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                                  <span style={{ fontSize: 12, color: "rgba(255,255,255,.65)" }}>{MODULE_LABELS[mod] || mod}</span>
-                                  {locked && <span style={{ fontSize: 9, color: "rgba(255,255,255,.2)", fontWeight: 700, textTransform: "uppercase", letterSpacing: ".04em" }}>core</span>}
-                                </div>
-                                {PLANS.map(plan => {
-                                  const meta = PLAN_META[plan];
-                                  const isOn = planModules[plan].includes(mod);
-                                  return (
-                                    <div key={plan} style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
-                                      <div onClick={() => !locked && toggleModule(plan, mod)}
-                                        style={{ width: 34, height: 19, borderRadius: 10, position: "relative", transition: "background .2s", background: isOn ? meta.color : "rgba(255,255,255,0.1)", cursor: locked ? "default" : "pointer", opacity: locked ? 0.7 : 1, flexShrink: 0 }}>
-                                        <div style={{ position: "absolute", top: 2.5, left: isOn ? 17 : 2.5, width: 14, height: 14, borderRadius: "50%", background: "white", transition: "left .2s", boxShadow: "0 1px 3px rgba(0,0,0,.3)" }}/>
-                                      </div>
-                                    </div>
-                                  );
-                                })}
-                              </div>
-                            );
-                          })}
-                        </div>
-                      );
-                    })}
-                  </div>
-
-                  {/* ── Pages: every screen this business type owns ────────── */}
-                  {pageGroups.length > 0 && (
+            {/* ── Pages: every screen this business type owns ────────── */}
+            {pageGroups.length === 0 && (
+              <div style={{ padding: 28, textAlign: "center", fontSize: 13, color: "rgba(255,255,255,.35)", background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 12 }}>
+                No dashboard pages are registered for this business type yet.
+              </div>
+            )}
+            {pageGroups.length > 0 && (
                     <>
                       <div style={{ display: "grid", gridTemplateColumns: "1fr 170px 170px 170px", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 12, overflow: "hidden", margin: "18px 0 10px" }}>
                         <div style={{ padding: "12px 18px", borderRight: "1px solid rgba(255,255,255,0.06)" }}>
@@ -551,9 +446,6 @@ export default function BusinessPlanMatrix({ embedded = false, scope = "WORLD" }
                       </div>
                     </>
                   )}
-                </>
-              );
-            })()}
 
             {/* Save */}
             <div style={{ marginTop: 16, display: "flex", justifyContent: "flex-end", gap: 10 }}>
