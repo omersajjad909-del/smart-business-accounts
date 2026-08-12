@@ -3,6 +3,7 @@
 import { useEffect, useState, useMemo } from "react";
 import { BUSINESS_TYPES } from "@/lib/businessModules";
 import { dashboardFeaturesForBusinessType } from "@/lib/dashboardFeatureRegistry";
+import { navGroupTitle, navPositionForRoute } from "@/lib/dashboardNavOrder";
 import { getCurrentUser } from "@/lib/auth";
 
 const FONT = "'Outfit','Inter',sans-serif";
@@ -97,18 +98,46 @@ export default function BusinessPlanMatrix({ embedded = false, scope = "WORLD" }
     [selected]
   );
 
+  /**
+   * Grouped and ordered exactly as the customer's sidebar renders them.
+   *
+   * This used to group by the registry's own `businessLabel · section`, which
+   * produced headings ("Core (all businesses) · Sales & Purchase") that appear
+   * nowhere in the product and pushed the shared pages below the industry ones —
+   * the opposite of the sidebar, where Sales & Purchase sits near the top. An
+   * admin comparing the two screens had to translate between two orderings.
+   */
   const pageGroups = useMemo(() => {
-    const bySection = new Map<string, { id: string; label: string }[]>();
-    for (const f of pageFeatures) {
-      const section = `${f.businessLabel} · ${f.section}`;
-      if (!bySection.has(section)) bySection.set(section, []);
-      bySection.get(section)!.push({ id: f.id, label: f.label });
+    type Row = { id: string; label: string; sort: number };
+    const byGroup = new Map<number, Row[]>();
+    const unlisted: Row[] = [];
+
+    pageFeatures.forEach((f, i) => {
+      const pos = navPositionForRoute(f.route);
+      if (!pos) { unlisted.push({ id: f.id, label: f.label, sort: i }); return; }
+      if (!byGroup.has(pos.group)) byGroup.set(pos.group, []);
+      byGroup.get(pos.group)!.push({ id: f.id, label: f.label, sort: pos.item });
+    });
+
+    const groups = [...byGroup.entries()]
+      .sort(([a], [b]) => a - b)
+      .map(([groupIndex, rows]) => ({
+        id: `nav:${groupIndex}`,
+        label: navGroupTitle(groupIndex),
+        items: rows.sort((a, b) => a.sort - b.sort).map(({ id, label }) => ({ id, label })),
+      }));
+
+    // Pages the sidebar never links — a redirect-only route, or a screen reached
+    // from the user menu. Kept assignable and kept visible: a page landing here
+    // is also how you notice it has no sidebar link at all.
+    if (unlisted.length) {
+      groups.push({
+        id: "nav:unlisted",
+        label: "Not in the sidebar",
+        items: unlisted.map(({ id, label }) => ({ id, label })),
+      });
     }
-    return Array.from(bySection.entries()).map(([label, items]) => ({
-      id: `page:${label}`,
-      label,
-      items,
-    }));
+    return groups;
   }, [pageFeatures]);
 
   // No saved override means "everything on" — a business type should not lose
@@ -150,14 +179,13 @@ export default function BusinessPlanMatrix({ embedded = false, scope = "WORLD" }
     } else if (preset === "default") {
       setPageConfig(prev => { const n = { ...prev }; delete n[selected.id]; return n; });
     } else {
-      // Recommended tiering: Starter gets the control centre of each section,
-      // Pro gets everything except the AI tools, Enterprise gets all.
-      const firstOfEachSection = new Set<string>();
-      const seenSections = new Set<string>();
-      for (const f of pageFeatures) {
-        const key = `${f.businessLabel} · ${f.section}`;
-        if (!seenSections.has(key)) { seenSections.add(key); firstOfEachSection.add(f.id); }
-      }
+      // Recommended tiering: Starter gets the first page of each sidebar group,
+      // Pro gets everything except the AI tools, Enterprise gets all. Keyed off
+      // the same grouping the grid displays, so "first of each" means what the
+      // admin can see rather than a section field they never look at.
+      const firstOfEachSection = new Set(
+        pageGroups.map(g => g.items[0]?.id).filter(Boolean) as string[]
+      );
       const aiIds = new Set(pageFeatures.filter(f => f.businessLabel === "AI Intelligence").map(f => f.id));
       setPageConfig(prev => ({
         ...prev,
