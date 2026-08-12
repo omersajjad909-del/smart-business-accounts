@@ -708,6 +708,12 @@ export default function BusinessPlanMatrix({ embedded = false, scope = "WORLD" }
                           {/* Module rows */}
                           {isExpanded && groupMods.map((mod, mi) => {
                             const locked = ALWAYS_ON.has(mod);
+                            // Some module keys name the same screen as a row in
+                            // Pages below. The sidebar link is gated by the page
+                            // flag, not the module flag, so the module switch here
+                            // changes nothing — turning "Order Desk" off up here
+                            // left the page visible and looked like a bug.
+                            const shadowedBy = pageShadowMap.get(mod);
                             return (
                               <div key={mod} style={{ display: "grid", gridTemplateColumns: "1fr 170px 170px 170px", padding: "7px 16px 7px 40px", borderTop: "1px solid rgba(255,255,255,0.03)", background: mi % 2 === 0 ? "transparent" : "rgba(255,255,255,0.01)" }}>
                                 <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
