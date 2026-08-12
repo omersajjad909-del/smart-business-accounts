@@ -2385,8 +2385,15 @@ export const DASHBOARD_FEATURE_DEFS: DashboardFeatureDefinition[] = [
   //    are `core`: without it the industry guard read `business: "trading"`
   //    literally and bounced every non-trading company back to /dashboard from
   //    a link its own sidebar had just offered. ──
-  { id: "COSTING_SHEETS",   label: "Costing",  route: "/dashboard/costing",          business: "trading", businessLabel: "Costing", section: "Operations", core: true, description: "Work out job cost from your own formulas and save it as a sheet." },
-  { id: "COSTING_FORMULAS", label: "Formulas", route: "/dashboard/costing/formulas", business: "trading", businessLabel: "Costing", section: "Operations", core: true, description: "Write and version the costing formulas your trade uses." },
+  // Manufacturing only. These were `core: true` on the reasoning that a printer,
+  // a garment unit and a plastics moulder all cost jobs the same way — but none
+  // of those are business types here; the catalogue has eight, and only
+  // `manufacturing` carries the production modules (bom, work_orders,
+  // raw_materials). So the flag put a job-costing sheet in front of every
+  // trader, wholesaler and travel agent instead. Import / Export keeps its own
+  // Import Costing page (TRADE_IMPORT_COSTING) and is unaffected.
+  { id: "COSTING_SHEETS",   label: "Costing",  route: "/dashboard/costing",          business: "manufacturing", businessTypes: ["manufacturing"], businessLabel: "Costing", section: "Operations", description: "Work out job cost from your own formulas and save it as a sheet." },
+  { id: "COSTING_FORMULAS", label: "Formulas", route: "/dashboard/costing/formulas", business: "manufacturing", businessTypes: ["manufacturing"], businessLabel: "Costing", section: "Operations", description: "Write and version the costing formulas your trade uses." },
 
   // ── AI Intelligence tools (sub-tab level; routes are virtual — won't trigger layout redirects) ──
   { id: "AI_OVERVIEW",        label: "Business Health Score",   route: "/dashboard/ai?tab=overview",        business: "trading", businessLabel: "AI Intelligence", section: "Core",      description: "Real-time score 0–100 based on revenue, profit, cash, and receivables." },

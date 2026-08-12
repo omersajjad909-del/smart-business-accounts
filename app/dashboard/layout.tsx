@@ -1301,10 +1301,11 @@ export default function DashboardLayout({
               {hasDashboardFeature("MANUFACTURING_QUALITY") && <NavLink href="/dashboard/manufacturing/quality" pathname={pathname}>Quality Control</NavLink>}
             </NavGroup>
           )}
-          {/* Costing sits outside the Manufacturing group on purpose: a printer,
-              a garment unit and a plastics moulder all need it, and none of them
-              are business type "manufacturing". Gated only by the plan flags, so
-              it stays assignable from /admin/permissions like every other page. */}
+          {/* Its own group rather than a Manufacturing sub-item, but the two
+              pages are registered to business type "manufacturing" — they used
+              to be cross-business, which showed a job-costing sheet to traders
+              and travel agents. Still gated only by the plan flags, so it stays
+              assignable in Plans → Pages like every other page. */}
           {(hasDashboardFeature("COSTING_SHEETS") || hasDashboardFeature("COSTING_FORMULAS")) && (
             <NavGroup
               title="Costing"
