@@ -302,20 +302,31 @@ export default function BusinessPlanMatrix({ embedded = false, scope = "WORLD" }
     return h;
   };
 
+  // Business types that are enabled but have no entry in BUSINESS_TYPES. These
+  // used to disappear without trace: the header counts what /business-modules
+  // reports, while the grid renders BUSINESS_TYPES filtered by those ids — so a
+  // type live in one list and missing from the other showed in the count and
+  // nowhere else. Surfaced now instead of silently dropped.
+  const [orphanIds, setOrphanIds] = useState<string[]>([]);
+
   // Load saved config + enabled business types
   useEffect(() => {
-    fetch(`/api/admin/business-plan-modules${scopeQuery}`, { headers: getHeaders() })
+    // no-store on both: this grid is opened straight after toggling a type on
+    // in Modules, and a cached response makes the change look like it failed.
+    fetch(`/api/admin/business-plan-modules${scopeQuery}`, { headers: getHeaders(), cache: "no-store" })
       .then(r => r.ok ? r.json() : { config: {}, pageConfig: {} })
       .then(d => { setConfig(d.config || {}); setPageConfig(d.pageConfig || {}); })
       .catch(() => {});
 
-    fetch("/api/admin/business-modules", { headers: getHeaders() })
+    fetch("/api/admin/business-modules", { headers: getHeaders(), cache: "no-store" })
       .then(r => r.ok ? r.json() : { modules: [] })
       .then(d => {
         const ids = new Set<string>(
           (d.modules || []).filter((m: any) => m.enabled).map((m: any) => m.id as string)
         );
         setEnabledIds(ids);
+        const known = new Set<string>(BUSINESS_TYPES.map(b => b.id as string));
+        setOrphanIds([...ids].filter(id => !known.has(id)));
       })
       .catch(() => setEnabledIds(new Set()));
   }, []);
@@ -497,8 +508,19 @@ export default function BusinessPlanMatrix({ embedded = false, scope = "WORLD" }
         <div style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 16, overflow: "hidden" }}>
           <div style={{ padding: "14px 16px", borderBottom: "1px solid rgba(255,255,255,0.07)" }}>
             <div style={{ fontSize: 10, fontWeight: 700, color: "rgba(255,255,255,0.35)", textTransform: "uppercase", letterSpacing: 0.8, marginBottom: 10 }}>
-              {enabledIds ? `${enabledIds.size} Enabled` : "Loading…"} Business Types
+              {enabledIds ? `${filtered.length} of ${enabledIds.size} Enabled` : "Loading…"} Business Types
             </div>
+            {orphanIds.length > 0 && (
+              <div style={{
+                fontSize: 11, lineHeight: 1.6, color: "#fbbf24", marginBottom: 10,
+                background: "rgba(251,191,36,.08)", border: "1px solid rgba(251,191,36,.25)",
+                borderRadius: 8, padding: "8px 10px",
+              }}>
+                Enabled but not configurable here: <strong>{orphanIds.join(", ")}</strong>.
+                These are live in Modules but have no entry in the business catalogue,
+                so their pages cannot be assigned.
+              </div>
+            )}
             <input
               value={search}
               onChange={e => setSearch(e.target.value)}
