@@ -182,6 +182,14 @@ export default function BusinessPlanMatrix({ embedded = false, scope = "WORLD" }
     } finally { setSaving(false); }
   }
 
+  // Page count per business type for the list on the left. Memoised because it
+  // walks the whole registry once per type and the list re-renders on search.
+  const pageCounts = useMemo(() => {
+    const counts: Record<string, number> = {};
+    for (const b of BUSINESS_TYPES) counts[b.id] = dashboardFeaturesForBusinessType(b.id).length;
+    return counts;
+  }, []);
+
   // Only show business types that are currently enabled in Business Modules admin
   const filtered = useMemo(() => {
     const businesses = enabledIds
@@ -273,7 +281,7 @@ export default function BusinessPlanMatrix({ embedded = false, scope = "WORLD" }
               // Grid view when nothing selected
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(160px, 1fr))", gap: 10, padding: 14 }}>
                 {filtered.map(b => {
-                  const hasCustom = !!config[b.id];
+                  const hasCustom = !!pageConfig[b.id];
                   return (
                     <div
                       key={b.id}
@@ -287,7 +295,7 @@ export default function BusinessPlanMatrix({ embedded = false, scope = "WORLD" }
                     >
                       <div style={{ fontSize: 24, marginBottom: 6 }}>{b.icon}</div>
                       <div style={{ fontSize: 12, fontWeight: 600, color: "white", marginBottom: 2 }}>{b.label}</div>
-                      <div style={{ fontSize: 10, color: "rgba(255,255,255,0.35)" }}>{(b.modules as string[]).length} modules</div>
+                      <div style={{ fontSize: 10, color: "rgba(255,255,255,0.35)" }}>{pageCounts[b.id] ?? 0} pages</div>
                       {hasCustom && (
                         <div style={{ marginTop: 6, fontSize: 9, fontWeight: 700, color: "#818cf8", textTransform: "uppercase", letterSpacing: 0.5 }}>
                           Customized
@@ -303,7 +311,7 @@ export default function BusinessPlanMatrix({ embedded = false, scope = "WORLD" }
               // List view when something is selected
               filtered.map(b => {
                 const isActive = selected.id === b.id;
-                const hasCustom = !!config[b.id];
+                const hasCustom = !!pageConfig[b.id];
                 return (
                   <div
                     key={b.id}
@@ -320,7 +328,7 @@ export default function BusinessPlanMatrix({ embedded = false, scope = "WORLD" }
                     <span style={{ fontSize: 18, flexShrink: 0 }}>{b.icon}</span>
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <div style={{ fontSize: 13, fontWeight: isActive ? 700 : 500, color: "white" }}>{b.label}</div>
-                      <div style={{ fontSize: 10, color: "rgba(255,255,255,0.35)" }}>{(b.modules as string[]).length} modules</div>
+                      <div style={{ fontSize: 10, color: "rgba(255,255,255,0.35)" }}>{pageCounts[b.id] ?? 0} pages</div>
                     </div>
                     {hasCustom && (
                       <span style={{ fontSize: 9, fontWeight: 700, color: "#818cf8", textTransform: "uppercase", background: "rgba(99,102,241,0.15)", padding: "1px 5px", borderRadius: 4 }}>Custom</span>
