@@ -27,22 +27,32 @@ export async function GET(req: NextRequest) {
     });
     if (!company) return NextResponse.json({ error: "Company not found" }, { status: 404 });
 
-    // No PKR branch here any more: page access is currency-neutral, so the
-    // PKR_PLAN_CONFIG lookup this used to do had nothing left to contribute.
-    const [planConfigLog, businessPlanModulesLog] = await Promise.all([
-      prisma.activityLog.findFirst({ where: { action: "PLAN_CONFIG" }, orderBy: { createdAt: "desc" } }),
-      prisma.activityLog.findFirst({
-        where: { action: "BUSINESS_PLAN_MODULES_CONFIG" },
-        orderBy: { createdAt: "desc" },
-        select: { details: true },
-      }).catch(() => null),
-    ]);
+    // Page access IS currency-specific — /admin/plans keeps two independent
+    // grids, "Pages & Modules" for the world and "PKR Pages & Modules" for
+    // Pakistan, each writing its own config. This route used to read the world
+    // keys only, so every toggle a Pakistani company's admin flipped in the PKR
+    // grid was ignored here and the AI tab stayed on screen after being turned
+    // off. Resolution below mirrors /api/me/bootstrap exactly — the two must
+    // agree or the sidebar and the AI tab bar disagree about the same page.
+    const [planConfigLog, pkrPlanConfigLog, businessPlanModulesLog, pkrBusinessPlanModulesLog, pageVisibilityLog] =
+      await Promise.all([
+        prisma.activityLog.findFirst({ where: { action: "PLAN_CONFIG" }, orderBy: { createdAt: "desc" }, select: { details: true } }).catch(() => null),
+        prisma.activityLog.findFirst({ where: { action: "PKR_PLAN_CONFIG" }, orderBy: { createdAt: "desc" }, select: { details: true } }).catch(() => null),
+        prisma.activityLog.findFirst({ where: { action: "BUSINESS_PLAN_MODULES_CONFIG" }, orderBy: { createdAt: "desc" }, select: { details: true } }).catch(() => null),
+        prisma.activityLog.findFirst({ where: { action: "PKR_BUSINESS_PLAN_MODULES_CONFIG" }, orderBy: { createdAt: "desc" }, select: { details: true } }).catch(() => null),
+        prisma.activityLog.findFirst({ where: { action: "PAGE_VISIBILITY_CONFIG" }, orderBy: { createdAt: "desc" }, select: { details: true } }).catch(() => null),
+      ]);
 
-    // Page access is not currency-specific — see the same note in
-    // /api/me/bootstrap. The PKR config no longer carries a page list.
+    const isPkrCompany =
+      company.baseCurrency === "PKR" ||
+      String(company.country || "").toUpperCase() === "PK" ||
+      String(company.country || "").toLowerCase() === "pakistan";
+
+    const activeConfigLog = isPkrCompany && pkrPlanConfigLog ? pkrPlanConfigLog : planConfigLog;
+
     let dashboardFlagsMap: Record<string, string[]>;
-    if (planConfigLog?.details) {
-      dashboardFlagsMap = normalizeDashboardFeatureFlags(JSON.parse(planConfigLog.details).dashboardFeatureFlags);
+    if (activeConfigLog?.details) {
+      dashboardFlagsMap = normalizeDashboardFeatureFlags(JSON.parse(activeConfigLog.details).dashboardFeatureFlags);
     } else {
       dashboardFlagsMap = normalizeDashboardFeatureFlags();
     }
@@ -55,24 +65,41 @@ export async function GET(req: NextRequest) {
     // Same resolution the sidebar uses — a per-business-type assignment from
     // /admin/permissions wins over the plan-wide list from /admin/plans.
     let businessPageFlags: Record<string, Record<string, string[]>> | null = null;
-    if (businessPlanModulesLog?.details) {
+    const activePageModulesLog =
+      isPkrCompany && pkrBusinessPlanModulesLog ? pkrBusinessPlanModulesLog : businessPlanModulesLog;
+    if (activePageModulesLog?.details) {
       try {
-        businessPageFlags = JSON.parse(businessPlanModulesLog.details)?.pageConfig || null;
+        businessPageFlags = JSON.parse(activePageModulesLog.details)?.pageConfig || null;
       } catch {}
     }
 
-    const enabledFeatures = new Set(
-      resolveDashboardFeaturesForCompany({
-        businessType: String(company.businessType || ""),
-        planCode,
-        planFlags: dashboardFlagsMap,
-        businessFlags: businessPageFlags,
-      }) || []
-    );
+    let resolved = resolveDashboardFeaturesForCompany({
+      businessType: String(company.businessType || ""),
+      planCode,
+      planFlags: dashboardFlagsMap,
+      businessFlags: businessPageFlags,
+    });
 
+    // Global page-visibility hides apply on top of whichever list won, exactly
+    // as in /api/me/bootstrap.
+    if (resolved && pageVisibilityLog?.details) {
+      try {
+        const hidden = new Set(JSON.parse(pageVisibilityLog.details) as string[]);
+        if (hidden.size > 0) resolved = resolved.filter((id) => !hidden.has(id));
+      } catch {}
+    }
+
+    // `null` means no page config has ever been saved — that is the only case
+    // where "no list" means full access. A saved list that grants zero AI tools
+    // is a real answer and must be returned as an empty array, not widened.
+    if (!resolved) {
+      return NextResponse.json({ tools: [...AI_TOOL_IDS], plan: planCode, restricted: false });
+    }
+
+    const enabledFeatures = new Set(resolved);
     const enabledAiTools = (AI_TOOL_IDS as readonly string[]).filter((id) => enabledFeatures.has(id));
 
-    return NextResponse.json({ tools: enabledAiTools, plan: planCode });
+    return NextResponse.json({ tools: enabledAiTools, plan: planCode, restricted: true });
   } catch (e: any) {
     return NextResponse.json({ error: e.message }, { status: 500 });
   }
