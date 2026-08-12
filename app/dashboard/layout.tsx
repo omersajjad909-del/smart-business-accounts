@@ -634,6 +634,25 @@ export default function DashboardLayout({
     return hasDashboardFeature(feature.id);
   };
 
+  /**
+   * The ownership half of the page guard below, asked ahead of time: does this
+   * trade own the page at all?
+   *
+   * Every industry NavGroup gates itself on hasModule, so its links can never
+   * point at someone else's page. Costing is the exception — it is gated purely
+   * on plan flags because it used to be a cross-business page — and
+   * hasDashboardFeature answers "yes" whenever no plan config has been saved.
+   * Without this a trading company saw the Costing link and got bounced back to
+   * /dashboard the moment it clicked.
+   */
+  const ownsDashboardRoute = (href: string) => {
+    const feature = findDashboardFeatureByRoute(href);
+    if (!feature || feature.core) return true;
+    if (isCustomPlan) return false;
+    const allowed = feature.businessTypes?.length ? feature.businessTypes : [feature.business];
+    return allowed.includes(effectiveBusinessType);
+  };
+
   // Redirect to business-setup if company hasn't completed setup
   useEffect(() => {
     if (!ready || !companyDetail) return;
@@ -1306,7 +1325,8 @@ export default function DashboardLayout({
               to be cross-business, which showed a job-costing sheet to traders
               and travel agents. Still gated only by the plan flags, so it stays
               assignable in Plans → Pages like every other page. */}
-          {(hasDashboardFeature("COSTING_SHEETS") || hasDashboardFeature("COSTING_FORMULAS")) && (
+          {ownsDashboardRoute("/dashboard/costing") &&
+           (hasDashboardFeature("COSTING_SHEETS") || hasDashboardFeature("COSTING_FORMULAS")) && (
             <NavGroup
               title="Costing"
               icon={<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/><line x1="8" y1="10" x2="8" y2="10"/><line x1="12" y1="10" x2="12" y2="10"/><line x1="16" y1="10" x2="16" y2="10"/><line x1="8" y1="14" x2="8" y2="14"/><line x1="12" y1="14" x2="12" y2="14"/><line x1="16" y1="14" x2="16" y2="18"/><line x1="8" y1="18" x2="12" y2="18"/></svg>}
