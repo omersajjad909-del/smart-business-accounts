@@ -2,17 +2,20 @@
 import { useEffect, useState } from "react";
 import { getCurrentUser } from "@/lib/auth";
 import { useResponsive } from "@/hooks/useResponsive";
+import { badgeFor, type Badge } from "@/lib/reportBadge";
 
 const ff = "'Outfit','Inter',sans-serif";
 function fmt(n: number) { return n.toLocaleString("en-US", { minimumFractionDigits: 0, maximumFractionDigits: 0 }); }
 
-interface Row { customerName: string; revenue: number; cogs: number; grossProfit: number; marginPct: number; invoiceCount: number; avgOrderValue: number; segment: "star" | "good" | "average" | "low"; }
+interface Row { customerName: string; revenue: number; cogs: number; grossProfit: number; marginPct: number; invoiceCount: number; avgOrderValue: number; segment: string; }
 
-const SEG: Record<string, { label: string; color: string; bg: string }> = {
-  star:    { label: "Star Customer ⭐", color: "#34d399", bg: "rgba(52,211,153,.1)" },
-  good:    { label: "Good",            color: "#818cf8", bg: "rgba(129,140,248,.1)" },
-  average: { label: "Average",         color: "#fbbf24", bg: "rgba(251,191,36,.1)" },
-  low:     { label: "Low Value",       color: "#f87171", bg: "rgba(248,113,113,.1)" },
+// The route buckets customers by revenue into "High Value" / "Mid Value" /
+// "Low Value" (three bands, with spaces). The map used to hold four made-up
+// keys — star/good/average/low — none of which the API has ever sent.
+const SEG: Record<string, Badge> = {
+  high_value: { label: "Star Customer ⭐", color: "#34d399", bg: "rgba(52,211,153,.1)" },
+  mid_value:  { label: "Mid Value",        color: "#818cf8", bg: "rgba(129,140,248,.1)" },
+  low_value:  { label: "Low Value",        color: "#fbbf24", bg: "rgba(251,191,36,.1)" },
 };
 
 export default function CustomerProfitabilityPage() {
@@ -52,7 +55,7 @@ export default function CustomerProfitabilityPage() {
             {loading ? <tr><td colSpan={9} style={{ padding: 40, textAlign: "center", color: "var(--text-muted)" }}>Loading…</td></tr>
             : data.length === 0 ? <tr><td colSpan={9} style={{ padding: 48, textAlign: "center", color: "var(--text-muted)" }}><div style={{ fontSize: 32, marginBottom: 8 }}>👥</div>No customer data found</td></tr>
             : [...data].sort((a, b) => b.grossProfit - a.grossProfit).map((r, i) => {
-              const s = SEG[r.segment];
+              const s = badgeFor(SEG, r.segment);
               return (
                 <tr key={i} style={{ borderBottom: i < data.length - 1 ? "1px solid var(--border)" : "none" }}
                   onMouseEnter={e => (e.currentTarget.style.background = "var(--app-bg)")}

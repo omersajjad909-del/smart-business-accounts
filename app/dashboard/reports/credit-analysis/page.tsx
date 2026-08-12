@@ -2,13 +2,16 @@
 import { useEffect, useState } from "react";
 import { getCurrentUser } from "@/lib/auth";
 import { useResponsive } from "@/hooks/useResponsive";
+import { badgeFor, normalizeBadgeKey, type Badge } from "@/lib/reportBadge";
 
 const ff = "'Outfit','Inter',sans-serif";
 function fmt(n: number) { return n.toLocaleString("en-US", { minimumFractionDigits: 0, maximumFractionDigits: 0 }); }
 
-interface Row { customerName: string; creditLimit: number; outstanding: number; utilizationPct: number; avgDaysToPay: number; overdueAmount: number; riskRating: "low" | "medium" | "high"; }
+// riskRating arrives uppercase ("HIGH" / "MEDIUM" / "LOW") — badgeFor lowercases
+// before the lookup, which is the whole reason this page stopped crashing.
+interface Row { customerName: string; creditLimit: number; outstanding: number; utilizationPct: number; avgDaysToPay: number; overdueAmount: number; riskRating: string; }
 
-const RISK: Record<string, { label: string; color: string; bg: string }> = {
+const RISK: Record<string, Badge> = {
   low:    { label: "Low Risk ✓",  color: "#34d399", bg: "rgba(52,211,153,.1)" },
   medium: { label: "Medium Risk", color: "#fbbf24", bg: "rgba(251,191,36,.1)" },
   high:   { label: "High Risk ⚠", color: "#f87171", bg: "rgba(248,113,113,.1)" },
@@ -25,8 +28,8 @@ export default function CreditAnalysisPage() {
   const h = (): Record<string, string> => ({ "x-user-role": user?.role || "", "x-user-id": user?.id || "", "x-company-id": user?.companyId || "" });
   useEffect(() => { setLoading(true); fetch("/api/reports/credit-analysis", { headers: h() }).then(r => r.ok ? r.json() : {}).then((d: any) => { setData(d.rows || []); setLoading(false); }).catch(() => setLoading(false)); }, []);
 
-  const filtered = riskFilter === "all" ? data : data.filter(r => r.riskRating === riskFilter);
-  const highRiskCount = data.filter(r => r.riskRating === "high").length;
+  const filtered = riskFilter === "all" ? data : data.filter(r => normalizeBadgeKey(r.riskRating) === riskFilter);
+  const highRiskCount = data.filter(r => normalizeBadgeKey(r.riskRating) === "high").length;
   const totalExposure = data.reduce((s, r) => s + r.outstanding, 0);
 
   const inp: React.CSSProperties = { background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 8, padding: "7px 12px", color: "var(--text-primary)", fontFamily: ff, fontSize: 12, outline: "none" };
@@ -72,7 +75,7 @@ export default function CreditAnalysisPage() {
             {loading ? <tr><td colSpan={7} style={{ padding: 40, textAlign: "center", color: "var(--text-muted)" }}>Loading…</td></tr>
             : filtered.length === 0 ? <tr><td colSpan={7} style={{ padding: 48, textAlign: "center", color: "var(--text-muted)" }}><div style={{ fontSize: 32, marginBottom: 8 }}>📊</div>No credit data found — set credit limits on customers</td></tr>
             : [...filtered].sort((a, b) => b.utilizationPct - a.utilizationPct).map((r, i) => {
-              const risk = RISK[r.riskRating];
+              const risk = badgeFor(RISK, r.riskRating);
               const utilColor = r.utilizationPct >= 90 ? "#f87171" : r.utilizationPct >= 70 ? "#fbbf24" : "#34d399";
               return (
                 <tr key={i} style={{ borderBottom: i < filtered.length - 1 ? "1px solid var(--border)" : "none" }}
