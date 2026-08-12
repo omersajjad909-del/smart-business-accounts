@@ -16,18 +16,30 @@ const PLAN_META: Record<Plan, { label: string; color: string; bg: string; border
   ENTERPRISE: { label: "Enterprise", color: "#34d399", bg: "rgba(52,211,153,0.08)", border: "rgba(52,211,153,0.3)", desc: "Full access" },
 };
 
+/**
+ * The legacy module-key half of the saved blob. Nothing reads it: the sidebar
+ * gates every link through the page registry (`canShowDashboardHref`) and
+ * /api/me/bootstrap only ever parses `pageConfig`. It is still loaded and
+ * posted back untouched so an old saved config is not destroyed.
+ */
 type ConfigMap = Record<string, Record<Plan, string[]>>;
 /** Same shape as ConfigMap, but the values are dashboard page ids. */
 type PageConfigMap = Record<string, Record<Plan, string[]>>;
 
 /**
- * Business type × plan assignment grid — every module key and every dashboard
- * page, assignable to Starter / Pro / Enterprise.
+ * Business type × plan assignment grid — every dashboard page, assignable to
+ * Starter / Pro / Enterprise.
  *
  * Lives here rather than in a route of its own because it is rendered as the
  * "Pages & Modules" tab of /admin/plans. It used to be a second admin screen at
  * /admin/permissions, which meant two places decided what a plan could see and
  * they disagreed; that route now redirects here.
+ *
+ * It also used to show a second grid of module keys above the pages. Those
+ * keys named the same screens — `trading_analytics` beside the
+ * `TRADING_ANALYTICS` page — but gated nothing, so the same screen appeared
+ * twice with two switches that could disagree and only one that meant
+ * anything. One screen, one row, one switch.
  */
 export default function BusinessPlanMatrix({ embedded = false, scope = "WORLD" }: { embedded?: boolean; scope?: "WORLD" | "PKR" }) {
   // WORLD and PKR are two separate saved configs behind the same grid, so the
@@ -41,7 +53,7 @@ export default function BusinessPlanMatrix({ embedded = false, scope = "WORLD" }
   const [saving,     setSaving]     = useState(false);
   const [saved,      setSaved]      = useState(false);
   const [enabledIds,      setEnabledIds]      = useState<Set<string> | null>(null);
-  const [expandedGroups,  setExpandedGroups]  = useState<Set<string>>(new Set(["core","vouchers","banking","reports","sales","purchases","inventory","hr"]));
+  const [expandedGroups,  setExpandedGroups]  = useState<Set<string>>(new Set());
 
   const getHeaders = () => {
     const h: Record<string, string> = { "Content-Type": "application/json" };
@@ -342,6 +354,14 @@ export default function BusinessPlanMatrix({ embedded = false, scope = "WORLD" }
                 <button onClick={() => applyPreset("default")} style={presetBtn}>Reset to Defaults</button>
                 <button onClick={() => applyPreset("min")}     style={presetBtn}>Recommended</button>
                 <button onClick={() => applyPreset("all")}     style={presetBtn}>All ON</button>
+                <button
+                  onClick={() => setExpandedGroups(prev =>
+                    prev.size === pageGroups.length ? new Set() : new Set(pageGroups.map(g => g.id))
+                  )}
+                  style={presetBtn}
+                >
+                  {expandedGroups.size === pageGroups.length ? "Collapse All" : "Expand All"}
+                </button>
                 <button onClick={() => setSelected(null)} style={{ ...presetBtn, color: "rgba(255,255,255,0.4)" }}>← Back</button>
               </div>
             </div>
