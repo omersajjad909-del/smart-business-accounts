@@ -2,13 +2,15 @@
 import { useEffect, useState } from "react";
 import { getCurrentUser } from "@/lib/auth";
 import { useResponsive } from "@/hooks/useResponsive";
+import { badgeFor, type Badge } from "@/lib/reportBadge";
+import { fmtDate } from "@/lib/dateUtils";
 
 const ff = "'Outfit','Inter',sans-serif";
 function fmt(n: number) { return n.toLocaleString("en-US", { minimumFractionDigits: 0, maximumFractionDigits: 0 }); }
 
 interface MovementRow { itemName: string; category: string; qtySold: number; qtyPurchased: number; turnoverDays: number; movementTag: "fast" | "slow" | "dead"; lastSaleDate?: string; stockQty: number; }
 
-const TAG: Record<string, { label: string; color: string; bg: string }> = {
+const TAG: Record<string, Badge> = {
   fast: { label: "Fast Moving 🔥", color: "#34d399", bg: "rgba(52,211,153,.1)" },
   slow: { label: "Slow Moving ⚠️", color: "#fbbf24", bg: "rgba(251,191,36,.1)" },
   dead: { label: "Dead Stock 💀",  color: "#f87171", bg: "rgba(248,113,113,.1)" },
@@ -68,7 +70,7 @@ export default function StockMovementPage() {
                 <div style={{ fontSize: 32, marginBottom: 8 }}>📦</div>No items found
               </td></tr>
             ) : filtered.map((r, i) => {
-              const tag = TAG[r.movementTag];
+              const tag = badgeFor(TAG, r.movementTag);
               return (
                 <tr key={i} style={{ borderBottom: i < filtered.length - 1 ? "1px solid var(--border)" : "none" }}
                   onMouseEnter={e => (e.currentTarget.style.background = "var(--app-bg)")}
@@ -78,7 +80,7 @@ export default function StockMovementPage() {
                   <td style={{ padding: "12px 14px", textAlign: "right", fontSize: 13 }}>{fmt(r.qtySold)}</td>
                   <td style={{ padding: "12px 14px", textAlign: "right", fontSize: 13, fontWeight: 700, color: r.stockQty === 0 ? "#f87171" : "var(--text-primary)" }}>{fmt(r.stockQty)}</td>
                   <td style={{ padding: "12px 14px", textAlign: "right", fontSize: 13 }}>{r.turnoverDays > 0 ? `${r.turnoverDays}d` : "—"}</td>
-                  <td style={{ padding: "12px 14px", textAlign: "right", fontSize: 12, color: "var(--text-muted)" }}>{r.lastSaleDate ? new Date(r.lastSaleDate).toLocaleDateString() : "Never"}</td>
+                  <td style={{ padding: "12px 14px", textAlign: "right", fontSize: 12, color: "var(--text-muted)" }}>{r.lastSaleDate ? fmtDate(r.lastSaleDate) : "Never"}</td>
                   <td style={{ padding: "12px 14px", textAlign: "right" }}>
                     <span style={{ padding: "3px 10px", borderRadius: 20, fontSize: 11, fontWeight: 700, background: tag.bg, color: tag.color }}>{tag.label}</span>
                   </td>

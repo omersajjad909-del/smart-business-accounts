@@ -2,13 +2,17 @@
 import { useEffect, useState } from "react";
 import { getCurrentUser } from "@/lib/auth";
 import { useResponsive } from "@/hooks/useResponsive";
+import { badgeFor, type Badge } from "@/lib/reportBadge";
+import { fmtDate } from "@/lib/dateUtils";
 
 const ff = "'Outfit','Inter',sans-serif";
 function fmt(n: number) { return n.toLocaleString("en-US", { minimumFractionDigits: 0, maximumFractionDigits: 0 }); }
 
 interface ExpiryRow { itemName: string; batchNo: string; qty: number; expiryDate: string; daysToExpiry: number; value: number; status: "expired" | "critical" | "warning" | "ok"; }
 
-const STATUS: Record<string, { label: string; color: string; bg: string }> = {
+// Keys match what the route sends today; badgeFor keeps the page alive if that
+// ever drifts, the way it did on seven other reports.
+const STATUS: Record<string, Badge> = {
   expired:  { label: "Expired 💀",    color: "#f87171", bg: "rgba(248,113,113,.1)" },
   critical: { label: "< 30 days 🚨",  color: "#f97316", bg: "rgba(249,115,22,.1)" },
   warning:  { label: "< 90 days ⚠️",  color: "#fbbf24", bg: "rgba(251,191,36,.1)" },
@@ -64,7 +68,7 @@ export default function StockExpiryPage() {
             {loading ? <tr><td colSpan={7} style={{ padding: 40, textAlign: "center", color: "var(--text-muted)" }}>Loading…</td></tr>
             : filtered.length === 0 ? <tr><td colSpan={7} style={{ padding: 48, textAlign: "center", color: "var(--text-muted)" }}><div style={{ fontSize: 32, marginBottom: 8 }}>✅</div>No expiry issues found</td></tr>
             : filtered.sort((a, b) => a.daysToExpiry - b.daysToExpiry).map((r, i) => {
-              const s = STATUS[r.status];
+              const s = badgeFor(STATUS, r.status);
               return (
                 <tr key={i} style={{ borderBottom: i < filtered.length - 1 ? "1px solid var(--border)" : "none" }}
                   onMouseEnter={e => (e.currentTarget.style.background = "var(--app-bg)")}
@@ -73,7 +77,7 @@ export default function StockExpiryPage() {
                   <td style={{ padding: "12px 14px", fontSize: 12, color: "#818cf8", fontWeight: 700 }}>{r.batchNo}</td>
                   <td style={{ padding: "12px 14px", textAlign: "right", fontSize: 13 }}>{fmt(r.qty)}</td>
                   <td style={{ padding: "12px 14px", textAlign: "right", fontSize: 13 }}>{cur} {fmt(r.value)}</td>
-                  <td style={{ padding: "12px 14px", textAlign: "right", fontSize: 12 }}>{new Date(r.expiryDate).toLocaleDateString()}</td>
+                  <td style={{ padding: "12px 14px", textAlign: "right", fontSize: 12 }}>{fmtDate(r.expiryDate)}</td>
                   <td style={{ padding: "12px 14px", textAlign: "right", fontSize: 13, fontWeight: 800, color: s.color }}>{r.daysToExpiry < 0 ? `${Math.abs(r.daysToExpiry)}d ago` : `${r.daysToExpiry}d`}</td>
                   <td style={{ padding: "12px 14px", textAlign: "right" }}>
                     <span style={{ padding: "3px 10px", borderRadius: 20, fontSize: 11, fontWeight: 700, background: s.bg, color: s.color }}>{s.label}</span>
