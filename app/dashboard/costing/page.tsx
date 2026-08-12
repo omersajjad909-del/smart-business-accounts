@@ -124,7 +124,7 @@ function CostingInner() {
       refId: selected.id,
       amount: typeof run.values[primary?.key ?? ""] === "number"
         ? (run.values[primary.key] as number)
-        : null,
+        : undefined,
       date: new Date().toISOString(),
       data: {
         formulaId: selected.id,
