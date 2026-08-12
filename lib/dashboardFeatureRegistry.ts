@@ -2341,7 +2341,7 @@ export const DASHBOARD_FEATURE_DEFS: DashboardFeatureDefinition[] = [
     business: "wholesale",
     businessLabel: "Wholesale",
     section: "Control Center",
-    businessTypes: ["wholesale", "wholesale_multistore"],
+    businessTypes: ["wholesale"],
   },
   {
     id: "WHOLESALE_SALES_ORDER",
@@ -2350,7 +2350,7 @@ export const DASHBOARD_FEATURE_DEFS: DashboardFeatureDefinition[] = [
     business: "wholesale",
     businessLabel: "Wholesale",
     section: "Sales",
-    businessTypes: ["wholesale", "wholesale_multistore", "trading", "distribution"],
+    businessTypes: ["wholesale", "trading", "distribution"],
   },
   {
     id: "WHOLESALE_PRICE_LISTS",
@@ -2359,7 +2359,7 @@ export const DASHBOARD_FEATURE_DEFS: DashboardFeatureDefinition[] = [
     business: "wholesale",
     businessLabel: "Wholesale",
     section: "Sales",
-    businessTypes: ["wholesale", "wholesale_multistore", "trading"],
+    businessTypes: ["wholesale", "trading"],
   },
   {
     id: "WHOLESALE_CREDIT_LIMITS",
@@ -2368,7 +2368,7 @@ export const DASHBOARD_FEATURE_DEFS: DashboardFeatureDefinition[] = [
     business: "wholesale",
     businessLabel: "Wholesale",
     section: "Finance Desk",
-    businessTypes: ["wholesale", "wholesale_multistore", "trading", "distribution"],
+    businessTypes: ["wholesale", "trading", "distribution"],
   },
   {
     id: "WHOLESALE_WAREHOUSES",
@@ -2377,7 +2377,7 @@ export const DASHBOARD_FEATURE_DEFS: DashboardFeatureDefinition[] = [
     business: "wholesale",
     businessLabel: "Wholesale",
     section: "Inventory",
-    businessTypes: ["wholesale", "wholesale_multistore", "trading", "distribution"],
+    businessTypes: ["wholesale", "trading", "distribution"],
   },
   // ── Costing — deliberately not tied to one business type. A printer, a
   //    garment unit and a plastics moulder all cost their work from a formula;

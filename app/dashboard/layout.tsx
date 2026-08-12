@@ -1961,7 +1961,11 @@ export default function DashboardLayout({
           )}
 
           {/* ── WHOLESALE ── */}
-          {!isCustomPlan && (businessType === "wholesale" || businessType === "wholesale_multistore") && (
+          {/* "wholesale_multistore" used to be OR'd in here. No such business
+              type exists — the BusinessType union has "wholesale" and, for
+              multi-outlet retail, "chain_store" — so the comparison was dead
+              and TypeScript flagged it as an impossible narrowing. */}
+          {!isCustomPlan && businessType === "wholesale" && (
             <NavGroup
               title="Wholesale"
               icon={<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>}

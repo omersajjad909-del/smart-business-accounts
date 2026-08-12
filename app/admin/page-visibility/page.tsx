@@ -17,7 +17,7 @@ const PHASE1_BUSINESSES = new Set([
   "trading", "retail", "distribution", "wholesale", "trade",
 ]);
 const PHASE1_TYPES = new Set([
-  "trading", "retail", "distribution", "wholesale", "wholesale_multistore",
+  "trading", "retail", "distribution", "wholesale",
   "import_company", "export_company", "clearing_forwarding",
 ]);
 
