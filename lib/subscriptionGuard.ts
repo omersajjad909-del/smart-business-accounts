@@ -51,13 +51,17 @@ export async function requireEntitlement(req: Request, entitlement: string) {
     );
   }
 
-  // Fetch the latest plan configuration from the audit log
-  const latestConfig = await prisma.activityLog.findFirst({
-    where: { action: "PLAN_CONFIG", companyId: "system" },
-    orderBy: { createdAt: "desc" },
-  });
-
-  const defaultConfig = {
+  // Entitlements are a fixed ladder, not an admin-editable one.
+  //
+  // This used to read the newest PLAN_CONFIG row filtered on
+  // `companyId: "system"` — a value nothing ever writes (the admin panel saves
+  // with `companyId: null`), so the query always came back empty and the table
+  // below was what actually ran. Dropping the filter would NOT have "fixed"
+  // it: PLAN_CONFIG carries `planPermissions` / `dashboardFeatureFlags`, never
+  // the `plans[].features` shape read here, so `currentPlan` would resolve to
+  // null and every entitlement-gated route would answer 402. Per-page access
+  // is configured in /admin/plans and enforced via lib/apiPermission.ts.
+  const config: { plans: { code: string; name: string; features: Record<string, boolean> }[] } = {
     plans: [
       { code: "starter",    name: "Starter",      features: { viewDashboard: true, createSalesInvoice: true, createPurchaseInvoice: true, viewLedger: true, viewTrialBalance: true, advancedReports: false, bankReconciliation: true,  inventoryReports: false, crm: false, hrPayroll: false, backupRestore: false, prioritySupport: false, multiBranch: false, apiAccess: false } },
       { code: "pro",        name: "Professional", features: { viewDashboard: true, createSalesInvoice: true, createPurchaseInvoice: true, viewLedger: true, viewTrialBalance: true, advancedReports: true,  bankReconciliation: true,  inventoryReports: true,  crm: true,  hrPayroll: false, backupRestore: true,  prioritySupport: true,  multiBranch: true,  apiAccess: false } },
@@ -65,8 +69,6 @@ export async function requireEntitlement(req: Request, entitlement: string) {
       { code: "custom",     name: "Custom",       features: { viewDashboard: true, createSalesInvoice: false, createPurchaseInvoice: false, viewLedger: true, viewTrialBalance: true, advancedReports: false, bankReconciliation: false, inventoryReports: false, crm: false, hrPayroll: false, backupRestore: false, prioritySupport: false, multiBranch: false, apiAccess: false } },
     ],
   };
-
-  const config = latestConfig?.details ? JSON.parse(latestConfig.details) : defaultConfig;
 
   // PRO_PLUS is treated as Enterprise (legacy compatibility)
   const planCodeMap: Record<string, string> = {

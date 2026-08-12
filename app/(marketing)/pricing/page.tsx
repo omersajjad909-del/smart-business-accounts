@@ -86,7 +86,6 @@ const DEFAULT_HIGHLIGHTS = {
     "Everything in Starter",
     "Advanced inventory & barcode",
     "Bank reconciliation",
-    "CRM & sales analytics",
     "HR & Payroll",
     "Trading control",
     "Advanced & strategic reports",
