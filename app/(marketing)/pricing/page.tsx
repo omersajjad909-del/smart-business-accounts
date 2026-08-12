@@ -65,8 +65,9 @@ type PlanPricing = {
 // step with DEFAULT_PLAN_HIGHLIGHTS in that route and with
 // PLAN_DEFAULT_PERMISSIONS in lib/planPermissions.ts.
 //
-// Starter used to advertise "🤖 AI Chat" while STARTER holds no AI permission
-// at all, so the one AI bullet on the cheapest card was for a locked page.
+// "🤖 Ask AI" on Starter is intentional: STARTER carries no AI permission by
+// default, the access is granted per-tenant from /admin/permissions. Do not
+// drop the bullet for looking unbacked by PLAN_DEFAULT_PERMISSIONS.
 const DEFAULT_HIGHLIGHTS = {
   starter: [
     "Up to 3 users",

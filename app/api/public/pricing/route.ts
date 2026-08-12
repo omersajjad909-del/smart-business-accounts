@@ -28,6 +28,8 @@ const DEFAULT_SEAT_PRICING = {
 // Keep in step with DEFAULT_HIGHLIGHTS in app/(marketing)/pricing/page.tsx and
 // with PLAN_DEFAULT_PERMISSIONS in lib/planPermissions.ts — a bullet here that
 // the plan does not actually grant is a promise we bill for and then lock.
+// Exception: Starter's "🤖 Ask AI" is granted per-tenant from /admin/permissions
+// rather than by PLAN_DEFAULT_PERMISSIONS.
 //
 // "Unlimited users" used to sit on Enterprise while getMaxUsersForPlan capped
 // it at 25.
