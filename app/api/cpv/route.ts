@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { resolveCompanyId, resolveBranchId, resolveBranchIdOrDefault } from "@/lib/tenant";
 import { PERMISSIONS } from "@/lib/permissions";
 import { apiHasPermission } from "@/lib/apiPermission";
+import { nextVoucherNo } from "@/lib/inventoryAccounts";
 
 // GET — list vouchers with all their party entries
 export async function GET(req: NextRequest) {
