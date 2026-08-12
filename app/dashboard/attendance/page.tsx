@@ -8,6 +8,7 @@ import { useResponsive } from "@/hooks/useResponsive";
 
 const ff = "'Outfit','Inter',sans-serif";
 const ACCENT = "#818cf8";
+const WEEK_DAY_LABELS = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
 interface AttendanceRecord {
   id: string; employeeId: string; date: string; status: string;
@@ -54,6 +55,7 @@ export default function AttendancePage() {
   const [employees,          setEmployees]          = useState<Employee[]>([]);
   const [records,            setRecords]            = useState<AttendanceRecord[]>([]);
   const [holidays,           setHolidays]           = useState<{ date: string; name: string }[]>([]);
+  const [weeklyOffDays,      setWeeklyOffDays]      = useState<number[]>([0]);
   const [loading,            setLoading]            = useState(false);
   const [selectedEmployeeId, setSelectedEmployeeId] = useState<string | null>(null);
   const [month,              setMonth]              = useState(new Date().toISOString().slice(0, 7));
@@ -71,15 +73,30 @@ export default function AttendancePage() {
   async function fetchHolidays(m: string) {
     try {
       const y = m.split("-")[0];
-      const r = await fetch(`/api/holidays?year=${y}`, { headers: authH() });
+      const [r, settingsRes] = await Promise.all([
+        fetch(`/api/holidays?year=${y}`, { headers: authH() }),
+        fetch("/api/holidays/settings", { headers: authH() }),
+      ]);
       const d = await r.json();
+      const settings = await settingsRes.json();
       setHolidays(Array.isArray(d)
         ? d.map((h: any) => ({ date: String(h.date).slice(0, 10), name: h.name }))
         : []);
-    } catch { setHolidays([]); }
+      setWeeklyOffDays(Array.isArray(settings?.weeklyOffDays) ? settings.weeklyOffDays : [0]);
+    } catch {
+      setHolidays([]);
+      setWeeklyOffDays([0]);
+    }
   }
 
   const holidayFor = (date: Date) => holidays.find(h => h.date === toISO(date));
+  const isWeeklyOff = (date: Date) => weeklyOffDays.includes(date.getDay());
+  const defaultHolidayName = (date: Date) => {
+    const holiday = holidayFor(date);
+    if (holiday) return holiday.name;
+    if (isWeeklyOff(date)) return `Weekly Off (${WEEK_DAY_LABELS[date.getDay()]})`;
+    return "";
+  };
 
   async function fetchEmployees() {
     try {
@@ -146,15 +163,14 @@ export default function AttendancePage() {
   const days     = calDays();
   const sel      = employees.find(e => e.id === selectedEmployeeId);
   const weekDays = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
-  const isSun    = (d: Date) => d.getDay() === 0;
   const validD   = days.filter((d): d is Date => d !== null);
-  const sunHols  = validD.filter(d => isSun(d) && !recFor(d)).length;
+  const defaultHolidays = validD.filter(d => isWeeklyOff(d) && !recFor(d)).length;
 
   const stats = {
     present: records.filter(r => r.status==="PRESENT"||r.status==="LATE").length,
     absent:  records.filter(r => r.status==="ABSENT").length,
     leave:   records.filter(r => r.status==="LEAVE"||r.status==="HALF_DAY").length,
-    holiday: records.filter(r => r.status==="HOLIDAY").length + sunHols,
+    holiday: records.filter(r => r.status==="HOLIDAY").length + defaultHolidays,
   };
 
   const filtered = employees.filter(e =>
@@ -381,11 +397,12 @@ export default function AttendancePage() {
 
                       const rec    = recFor(date);
                       const hol    = holidayFor(date);
-                      const isHoliday = !!hol || isSun(date);
+                      const weeklyOff = isWeeklyOff(date);
+                      const isHoliday = !!hol || weeklyOff;
                       const ds     = toISO(date);
                       const today  = ds === toISO(new Date());
                       const isSel  = selectedDate === ds;
-                      const sunHol = !rec && isHoliday;
+                      const defaultHol = !rec && isHoliday;
                       const sc     = rec ? (SC[rec.status] || SC.PRESENT) : null;
 
                       return (
@@ -403,12 +420,12 @@ export default function AttendancePage() {
                               // Auto-fill from shift when marking a working day
                               checkIn:  isHoliday ? "" : shiftS,
                               checkOut: isHoliday ? "" : shiftE,
-                              remarks: hol ? hol.name : "",
+                              remarks: defaultHolidayName(date),
                             });
                           }}
                           style={{ minHeight: 90, padding: 8, cursor: "pointer",
                             display: "flex", flexDirection: "column",
-                            background: isSel ? `${ACCENT}14` : sunHol ? "rgba(167,139,250,.04)" : "var(--app-bg)",
+                            background: isSel ? `${ACCENT}14` : defaultHol ? "rgba(167,139,250,.04)" : "var(--app-bg)",
                             borderRight: "1px solid var(--border)", borderBottom: "1px solid var(--border)",
                             outline: today ? `2px solid ${ACCENT}` : "none", outlineOffset: "-2px",
                             transition: "background .12s",
@@ -449,7 +466,7 @@ export default function AttendancePage() {
                                 </div>
                               )}
                             </div>
-                          ) : sunHol ? (
+                          ) : defaultHol ? (
                             <div>
                               <span style={{ display: "block", textAlign: "center", fontSize: 9, fontWeight: 700,
                                 padding: "3px 4px", borderRadius: 6,
@@ -457,10 +474,10 @@ export default function AttendancePage() {
                                 border: "1px solid rgba(167,139,250,.15)" }}>
                                 HOLIDAY
                               </span>
-                              {hol && (
+                              {isHoliday && (
                                 <div style={{ fontSize: 8, textAlign: "center", color: "rgba(167,139,250,.7)",
                                   marginTop: 3, fontWeight: 600 }}>
-                                  {hol.name.slice(0, 18)}
+                                  {defaultHolidayName(date).slice(0, 18)}
                                 </div>
                               )}
                             </div>

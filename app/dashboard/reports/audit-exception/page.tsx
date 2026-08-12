@@ -2,16 +2,20 @@
 import { useEffect, useState } from "react";
 import { getCurrentUser } from "@/lib/auth";
 import { useResponsive } from "@/hooks/useResponsive";
+import { badgeFor, normalizeBadgeKey, type Badge } from "@/lib/reportBadge";
 
 const ff = "'Outfit','Inter',sans-serif";
 function fmt(n: number) { return n.toLocaleString("en-US", { minimumFractionDigits: 0, maximumFractionDigits: 0 }); }
 
-interface Row { id: string; type: string; description: string; referenceNo: string; amount: number; date: string; severity: "critical" | "warning" | "info"; resolvedAt: string | null; }
+interface Row { id: string; type: string; description: string; referenceNo: string; amount: number; date: string; severity: string; resolvedAt: string | null; }
 
-const SEV: Record<string, { label: string; color: string; bg: string }> = {
-  critical: { label: "Critical", color: "#ef4444", bg: "rgba(239,68,68,.1)" },
-  warning:  { label: "Warning",  color: "#f59e0b", bg: "rgba(245,158,11,.1)" },
-  info:     { label: "Info",     color: "#818cf8", bg: "rgba(129,140,248,.1)" },
+// /api/reports/audit-exception grades every entry "HIGH" | "MEDIUM" | "LOW".
+// The map was keyed "critical"/"warning"/"info", so no row ever matched and the
+// page crashed reading `.bg` off undefined.
+const SEV: Record<string, Badge> = {
+  high:   { label: "Critical", color: "#ef4444", bg: "rgba(239,68,68,.1)" },
+  medium: { label: "Warning",  color: "#f59e0b", bg: "rgba(245,158,11,.1)" },
+  low:    { label: "Info",     color: "#818cf8", bg: "rgba(129,140,248,.1)" },
 };
 
 export default function AuditExceptionPage() {
@@ -26,8 +30,8 @@ export default function AuditExceptionPage() {
   const h = (): Record<string, string> => ({ "x-user-role": user?.role || "", "x-user-id": user?.id || "", "x-company-id": user?.companyId || "" });
   useEffect(() => { setLoading(true); fetch(`/api/reports/audit-exception?status=${filter}`, { headers: h() }).then(r => r.ok ? r.json() : {}).then((d: any) => { setData(d.rows || []); setLoading(false); }).catch(() => setLoading(false)); }, [filter]);
 
-  const filtered = sev === "all" ? data : data.filter(r => r.severity === sev);
-  const criticalCount = data.filter(r => r.severity === "critical" && !r.resolvedAt).length;
+  const filtered = sev === "all" ? data : data.filter(r => normalizeBadgeKey(r.severity) === sev);
+  const criticalCount = data.filter(r => normalizeBadgeKey(r.severity) === "high" && !r.resolvedAt).length;
 
   const inp: React.CSSProperties = { background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 8, padding: "7px 12px", color: "var(--text-primary)", fontFamily: ff, fontSize: 12, outline: "none" };
 
@@ -41,9 +45,9 @@ export default function AuditExceptionPage() {
         <div style={{ display: "flex", gap: 10 }}>
           <select value={sev} onChange={e => setSev(e.target.value)} style={inp}>
             <option value="all">All Severities</option>
-            <option value="critical">Critical</option>
-            <option value="warning">Warning</option>
-            <option value="info">Info</option>
+            <option value="high">Critical</option>
+            <option value="medium">Warning</option>
+            <option value="low">Info</option>
           </select>
           <select value={filter} onChange={e => setFilter(e.target.value)} style={inp}>
             <option value="unresolved">Unresolved</option>
@@ -73,7 +77,7 @@ export default function AuditExceptionPage() {
             {loading ? <tr><td colSpan={7} style={{ padding: 40, textAlign: "center", color: "var(--text-muted)" }}>Loading…</td></tr>
             : filtered.length === 0 ? <tr><td colSpan={7} style={{ padding: 48, textAlign: "center", color: "var(--text-muted)" }}><div style={{ fontSize: 32, marginBottom: 8 }}>✅</div>No exceptions found — books are clean</td></tr>
             : filtered.map((r, i) => {
-              const s = SEV[r.severity];
+              const s = badgeFor(SEV, r.severity);
               return (
                 <tr key={i} style={{ borderBottom: i < filtered.length - 1 ? "1px solid var(--border)" : "none" }}
                   onMouseEnter={e => (e.currentTarget.style.background = "var(--app-bg)")}

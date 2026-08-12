@@ -7,6 +7,7 @@ import { useResponsive } from "@/hooks/useResponsive";
 
 const ff = "'Outfit','Inter',sans-serif";
 const ACCENT = "#a78bfa";
+const WEEK_DAYS = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
 type Holiday = { id: string; date: string; name: string; isRecurring: boolean };
 
@@ -34,6 +35,8 @@ export default function HolidaysPage() {
   const [year, setYear] = useState(new Date().getFullYear());
   const [form, setForm] = useState({ date: "", name: "", isRecurring: false });
   const [saving, setSaving] = useState(false);
+  const [weeklyOffDays, setWeeklyOffDays] = useState<number[]>([0]);
+  const [savingWeeklyOff, setSavingWeeklyOff] = useState(false);
   const currentUser = getCurrentUser() as { role?: string; id?: string } | null;
   const isAdmin = String(currentUser?.role || "").toUpperCase() === "ADMIN";
 
@@ -47,12 +50,20 @@ export default function HolidaysPage() {
   async function load() {
     setLoading(true);
     try {
-      const r = await fetch(`/api/holidays?year=${year}`, { headers: authH(), cache: "no-store" });
-      const d = await r.json();
+      const [holidaysRes, settingsRes] = await Promise.all([
+        fetch(`/api/holidays?year=${year}`, { headers: authH(), cache: "no-store" }),
+        fetch("/api/holidays/settings", { headers: authH(), cache: "no-store" }),
+      ]);
+      const d = await holidaysRes.json();
+      const settings = await settingsRes.json();
       setHolidays(Array.isArray(d) ? d.map((h: any) => ({
         id: h.id, date: String(h.date).slice(0, 10), name: h.name, isRecurring: !!h.isRecurring,
       })) : []);
-    } catch { setHolidays([]); }
+      setWeeklyOffDays(Array.isArray(settings?.weeklyOffDays) ? settings.weeklyOffDays : [0]);
+    } catch {
+      setHolidays([]);
+      setWeeklyOffDays([0]);
+    }
     finally { setLoading(false); }
   }
 
@@ -83,6 +94,31 @@ export default function HolidaysPage() {
     } catch { toast.error("Delete failed"); }
   }
 
+  function toggleWeeklyOff(day: number) {
+    setWeeklyOffDays((prev) =>
+      prev.includes(day) ? prev.filter((value) => value !== day) : [...prev, day].sort((a, b) => a - b)
+    );
+  }
+
+  async function saveWeeklyOff() {
+    setSavingWeeklyOff(true);
+    try {
+      const r = await fetch("/api/holidays/settings", {
+        method: "PUT",
+        headers: { ...authH(), "Content-Type": "application/json" },
+        body: JSON.stringify({ weeklyOffDays }),
+      });
+      const d = await r.json();
+      if (!r.ok) throw new Error(d?.error || "Failed");
+      setWeeklyOffDays(Array.isArray(d?.weeklyOffDays) ? d.weeklyOffDays : [0]);
+      toast.success("Weekly off saved");
+    } catch (e: any) {
+      toast.error(e?.message || "Failed to save weekly off");
+    } finally {
+      setSavingWeeklyOff(false);
+    }
+  }
+
   return (
     <div style={{ maxWidth: 900, margin: "0 auto", padding: "24px 20px 80px", fontFamily: ff, display: "flex", flexDirection: "column", gap: 22 }}>
       <header>
@@ -91,6 +127,69 @@ export default function HolidaysPage() {
           Company-wide holiday calendar. Marked dates auto-appear as HOLIDAY on the attendance calendar for every employee — no per-day marking needed. Sundays are always treated as holiday by default.
         </p>
       </header>
+
+      <section style={CARD}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 16, marginBottom: 14, flexDirection: isMobile ? "column" : "row" }}>
+          <div>
+            <div style={{ fontSize: 15, fontWeight: 800, marginBottom: 6 }}>Weekly Off Defaults</div>
+            <div style={{ fontSize: 13, color: "var(--text-muted, rgba(255,255,255,.5))", lineHeight: 1.6 }}>
+              Choose the weekly holiday pattern for the attendance calendar, such as Friday only, Sunday only, or Saturday and Sunday.
+            </div>
+          </div>
+          {isAdmin && (
+            <button
+              type="button"
+              onClick={saveWeeklyOff}
+              disabled={savingWeeklyOff}
+              style={{
+                padding: "10px 18px",
+                borderRadius: 10,
+                border: "none",
+                background: savingWeeklyOff ? `${ACCENT}66` : ACCENT,
+                color: "#fff",
+                fontFamily: ff,
+                fontSize: 13,
+                fontWeight: 800,
+                cursor: savingWeeklyOff ? "not-allowed" : "pointer",
+                whiteSpace: "nowrap",
+              }}
+            >
+              {savingWeeklyOff ? "Saving..." : "Save Weekly Off"}
+            </button>
+          )}
+        </div>
+
+        <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 10 }}>
+          {WEEK_DAYS.map((day, index) => {
+            const active = weeklyOffDays.includes(index);
+            return (
+              <button
+                key={day}
+                type="button"
+                disabled={!isAdmin}
+                onClick={() => isAdmin && toggleWeeklyOff(index)}
+                style={{
+                  padding: "12px 10px",
+                  borderRadius: 12,
+                  border: `1px solid ${active ? `${ACCENT}66` : "rgba(255,255,255,.1)"}`,
+                  background: active ? `${ACCENT}18` : "rgba(255,255,255,.02)",
+                  color: active ? ACCENT : "var(--text-primary, #fff)",
+                  fontFamily: ff,
+                  fontSize: 12,
+                  fontWeight: 700,
+                  cursor: isAdmin ? "pointer" : "default",
+                  textAlign: "left",
+                }}
+              >
+                <div>{day}</div>
+                <div style={{ marginTop: 4, fontSize: 10, color: active ? ACCENT : "var(--text-muted, rgba(255,255,255,.5))", textTransform: "uppercase", letterSpacing: ".05em" }}>
+                  {active ? "Holiday" : "Working Day"}
+                </div>
+              </button>
+            );
+          })}
+        </div>
+      </section>
 
       {isAdmin && (
         <section style={CARD}>
