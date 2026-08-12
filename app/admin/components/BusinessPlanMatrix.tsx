@@ -362,6 +362,26 @@ export default function BusinessPlanMatrix({ embedded = false, scope = "WORLD" }
     }));
   }, [pageFeatures]);
 
+  /**
+   * Module keys that name the same screen as a page below.
+   *
+   * `order_desk` is a module AND `TRADING_ORDER_DESK` is a page at
+   * /dashboard/trading/order-desk. Only the page flag gates the sidebar link,
+   * so the module toggle is a dead switch — and the two could be set to
+   * opposite values, which is exactly what made the grid look duplicated.
+   * Matched on the route's last segment so no hand-written list goes stale.
+   */
+  const pageShadowMap = useMemo(() => {
+    const map = new Map<string, string>();
+    for (const f of pageFeatures) {
+      const route = (f as { route?: string }).route ?? "";
+      const slug = route.split("?")[0].replace(/\/$/, "").split("/").pop() ?? "";
+      if (!slug) continue;
+      map.set(slug.replace(/-/g, "_"), f.label);
+    }
+    return map;
+  }, [pageFeatures]);
+
   // No saved override means "everything on" — a business type should not lose
   // its pages just because nobody has opened this screen yet.
   const planPages = useMemo((): Record<Plan, string[]> => {
@@ -717,8 +737,16 @@ export default function BusinessPlanMatrix({ embedded = false, scope = "WORLD" }
                             return (
                               <div key={mod} style={{ display: "grid", gridTemplateColumns: "1fr 170px 170px 170px", padding: "7px 16px 7px 40px", borderTop: "1px solid rgba(255,255,255,0.03)", background: mi % 2 === 0 ? "transparent" : "rgba(255,255,255,0.01)" }}>
                                 <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                                  <span style={{ fontSize: 12, color: "rgba(255,255,255,.65)" }}>{MODULE_LABELS[mod] || mod}</span>
+                                  <span style={{ fontSize: 12, color: shadowedBy ? "rgba(255,255,255,.35)" : "rgba(255,255,255,.65)" }}>{MODULE_LABELS[mod] || mod}</span>
                                   {locked && <span style={{ fontSize: 9, color: "rgba(255,255,255,.2)", fontWeight: 700, textTransform: "uppercase", letterSpacing: ".04em" }}>core</span>}
+                                  {shadowedBy && (
+                                    <span
+                                      title={`The sidebar link for this screen is controlled by "${shadowedBy}" in Pages below. This switch has no effect.`}
+                                      style={{ fontSize: 9, fontWeight: 700, textTransform: "uppercase", letterSpacing: ".04em", color: "#fbbf24", background: "rgba(251,191,36,.12)", border: "1px solid rgba(251,191,36,.3)", borderRadius: 20, padding: "1px 6px", cursor: "help" }}
+                                    >
+                                      set in pages
+                                    </span>
+                                  )}
                                 </div>
                                 {PLANS.map(plan => {
                                   const meta = PLAN_META[plan];
