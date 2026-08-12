@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { getCurrentUser } from "@/lib/auth";
 import { useResponsive } from "@/hooks/useResponsive";
 import { badgeFor, normalizeBadgeKey, type Badge } from "@/lib/reportBadge";
+import { fmtDate } from "@/lib/dateUtils";
 
 const ff = "'Outfit','Inter',sans-serif";
 function fmt(n: number) { return n.toLocaleString("en-US", { minimumFractionDigits: 0, maximumFractionDigits: 0 }); }
@@ -89,16 +90,16 @@ export default function PoTrackingPage() {
             {loading ? <tr><td colSpan={9} style={{ padding: 40, textAlign: "center", color: "var(--text-muted)" }}>Loading…</td></tr>
             : filtered.length === 0 ? <tr><td colSpan={9} style={{ padding: 48, textAlign: "center", color: "var(--text-muted)" }}><div style={{ fontSize: 32, marginBottom: 8 }}>📋</div>No purchase orders found</td></tr>
             : filtered.map((r, i) => {
-              const s = STATUS[r.status];
+              const s = badgeFor(STATUS, r.status);
               return (
                 <tr key={i} style={{ borderBottom: i < filtered.length - 1 ? "1px solid var(--border)" : "none" }}
                   onMouseEnter={e => (e.currentTarget.style.background = "var(--app-bg)")}
                   onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
                   <td style={{ padding: "12px 14px", fontSize: 12, color: "#818cf8" }}>{r.poNumber}</td>
                   <td style={{ padding: "12px 14px", fontSize: 13, fontWeight: 600 }}>{r.supplierName}</td>
-                  <td style={{ padding: "12px 14px", textAlign: "right", fontSize: 12, color: "var(--text-muted)" }}>{r.poDate}</td>
-                  <td style={{ padding: "12px 14px", textAlign: "right", fontSize: 12, color: "var(--text-muted)" }}>{r.expectedDate}</td>
-                  <td style={{ padding: "12px 14px", textAlign: "right", fontSize: 12, color: "var(--text-muted)" }}>{r.receivedDate || "—"}</td>
+                  <td style={{ padding: "12px 14px", textAlign: "right", fontSize: 12, color: "var(--text-muted)" }}>{fmtDate(r.poDate)}</td>
+                  <td style={{ padding: "12px 14px", textAlign: "right", fontSize: 12, color: "var(--text-muted)" }}>{fmtDate(r.expectedDate)}</td>
+                  <td style={{ padding: "12px 14px", textAlign: "right", fontSize: 12, color: "var(--text-muted)" }}>{fmtDate(r.receivedDate)}</td>
                   <td style={{ padding: "12px 14px", textAlign: "right", fontSize: 13 }}>{cur} {fmt(r.totalValue)}</td>
                   <td style={{ padding: "12px 14px", textAlign: "right", fontSize: 13, color: "#34d399" }}>{r.receivedValue > 0 ? `${cur} ${fmt(r.receivedValue)}` : "—"}</td>
                   <td style={{ padding: "12px 14px", textAlign: "right", fontSize: 13, fontWeight: 700, color: r.pendingValue > 0 ? "#fbbf24" : "var(--text-muted)" }}>{r.pendingValue > 0 ? `${cur} ${fmt(r.pendingValue)}` : "—"}</td>

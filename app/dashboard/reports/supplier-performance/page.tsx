@@ -2,17 +2,22 @@
 import { useEffect, useState } from "react";
 import { getCurrentUser } from "@/lib/auth";
 import { useResponsive } from "@/hooks/useResponsive";
+import { badgeFor, type Badge } from "@/lib/reportBadge";
 
 const ff = "'Outfit','Inter',sans-serif";
 function fmt(n: number) { return n.toLocaleString("en-US", { minimumFractionDigits: 0, maximumFractionDigits: 0 }); }
 
-interface Row { supplierName: string; totalOrders: number; onTimeDelivery: number; onTimePct: number; qualityRejectCount: number; rejectRatePct: number; avgLeadDays: number; totalPurchased: number; rating: "excellent" | "good" | "average" | "poor"; }
+interface Row { supplierName: string; totalOrders: number; onTimeDelivery: number; onTimePct: number; qualityRejectCount: number; rejectRatePct: number; avgLeadDays: number; totalPurchased: number; rating: number; }
 
-const RATING: Record<string, { label: string; color: string; bg: string }> = {
-  excellent: { label: "Excellent ⭐", color: "#34d399", bg: "rgba(52,211,153,.1)" },
-  good:      { label: "Good",        color: "#818cf8", bg: "rgba(129,140,248,.1)" },
-  average:   { label: "Average",     color: "#fbbf24", bg: "rgba(251,191,36,.1)" },
-  poor:      { label: "Poor",        color: "#f87171", bg: "rgba(248,113,113,.1)" },
+// /api/reports/supplier-performance grades on-time delivery as a 1–5 number,
+// not a word. The map used to be keyed "excellent"/"good"/"average"/"poor", so
+// every lookup missed and the page crashed before rendering a single row.
+const RATING: Record<string, Badge> = {
+  "5": { label: "Excellent ⭐", color: "#34d399", bg: "rgba(52,211,153,.1)" },
+  "4": { label: "Good",         color: "#818cf8", bg: "rgba(129,140,248,.1)" },
+  "3": { label: "Average",      color: "#fbbf24", bg: "rgba(251,191,36,.1)" },
+  "2": { label: "Weak",         color: "#fb923c", bg: "rgba(251,146,60,.1)" },
+  "1": { label: "Poor",         color: "#f87171", bg: "rgba(248,113,113,.1)" },
 };
 
 export default function SupplierPerformancePage() {
@@ -63,7 +68,7 @@ export default function SupplierPerformancePage() {
             {loading ? <tr><td colSpan={9} style={{ padding: 40, textAlign: "center", color: "var(--text-muted)" }}>Loading…</td></tr>
             : data.length === 0 ? <tr><td colSpan={9} style={{ padding: 48, textAlign: "center", color: "var(--text-muted)" }}><div style={{ fontSize: 32, marginBottom: 8 }}>🏭</div>No supplier data found for this period</td></tr>
             : [...data].sort((a, b) => b.onTimePct - a.onTimePct).map((r, i) => {
-              const rat = RATING[r.rating];
+              const rat = badgeFor(RATING, r.rating);
               const otColor = r.onTimePct >= 90 ? "#34d399" : r.onTimePct >= 70 ? "#fbbf24" : "#f87171";
               return (
                 <tr key={i} style={{ borderBottom: i < data.length - 1 ? "1px solid var(--border)" : "none" }}

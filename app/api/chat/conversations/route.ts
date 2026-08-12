@@ -1,13 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { requireRole } from "@/lib/requireRole";
+import { resolveChatScope } from "@/lib/chatScope";
 
 export const runtime = "nodejs";
 
-// GET /api/chat/conversations — list all (admin only)
+// GET /api/chat/conversations — the caller's own inbox
 export async function GET(req: NextRequest) {
-  const guard = requireRole(req, ["ADMIN"]);
-  if (guard) return guard;
+  const scope = await resolveChatScope(req);
+  if (scope.error) return scope.error;
 
   try {
     const { searchParams } = new URL(req.url);
@@ -15,7 +15,9 @@ export async function GET(req: NextRequest) {
     const limit  = Number(searchParams.get("limit") || "100");
 
     const conversations = await prisma.chatConversation.findMany({
-      where: status && status !== "all" ? { status } : undefined,
+      // Company filter is not optional. Without it this route handed every
+      // tenant admin the whole platform's conversations.
+      where: { ...scope.where, ...(status && status !== "all" ? { status } : {}) },
       orderBy: { updatedAt: "desc" },
       take: limit,
       include: {

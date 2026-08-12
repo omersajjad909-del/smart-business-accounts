@@ -1,21 +1,28 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { requireRole } from "@/lib/requireRole";
+import { resolveChatScope } from "@/lib/chatScope";
 
 export const runtime = "nodejs";
 
-// PATCH /api/chat/conversations/[id] — update status, assigned_agent (admin only)
+// PATCH /api/chat/conversations/[id] — update status, assigned_agent
 export async function PATCH(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const guard = requireRole(req, ["ADMIN"]);
-  if (guard) return guard;
+  const scope = await resolveChatScope(req);
+  if (scope.error) return scope.error;
 
   try {
     const { id } = await params;
     const body = await req.json();
     const { status, assignedAgent } = body;
+
+    // Any tenant admin could resolve or reassign anyone's conversation by id.
+    const owned = await prisma.chatConversation.findFirst({
+      where: { id, ...scope.where },
+      select: { id: true },
+    });
+    if (!owned) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
     const updated = await prisma.chatConversation.update({
       where: { id },
@@ -38,13 +45,19 @@ export async function PATCH(
 }
 
 // GET /api/chat/conversations/[id] — single conversation
+//
+// This had no guard of any kind: anyone who knew (or guessed) a conversation
+// id could read the visitor's name and email straight off the public internet.
 export async function GET(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const scope = await resolveChatScope(req);
+  if (scope.error) return scope.error;
+
   try {
     const { id } = await params;
-    const conv = await prisma.chatConversation.findUnique({ where: { id } });
+    const conv = await prisma.chatConversation.findFirst({ where: { id, ...scope.where } });
     if (!conv) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
     return NextResponse.json({

@@ -1,18 +1,39 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { requireRole } from "@/lib/requireRole";
+import { resolveChatScope } from "@/lib/chatScope";
 
 export const runtime = "nodejs";
 
-// GET /api/chat/messages?conversationId= (admin only)
+/**
+ * GET /api/chat/messages?conversationId=
+ *
+ * Two callers, two rules:
+ *   - The finovaos.app widget polls this anonymously for the visitor's own
+ *     transcript, holding the conversation id it was handed. It may only read
+ *     public widget conversations (the ones stored with no companyId).
+ *   - A signed-in ADMIN reads from the support inbox, limited to their own
+ *     company's conversations (the platform team's "system" context owns the
+ *     public ones).
+ *
+ * Before this, one ADMIN check covered both and no company filter existed at
+ * all, so any customer's admin could pull any transcript on the platform by id.
+ */
 export async function GET(req: NextRequest) {
-  const guard = requireRole(req, ["ADMIN"]);
-  if (guard) return guard;
-
   try {
     const { searchParams } = new URL(req.url);
     const conversationId = searchParams.get("conversationId");
     if (!conversationId) return NextResponse.json({ data: [] });
+
+    const scope = await resolveChatScope(req);
+    const where = scope.error
+      ? { id: conversationId, companyId: null }   // anonymous widget visitor
+      : { id: conversationId, ...scope.where };   // support inbox
+
+    const owned = await prisma.chatConversation.findFirst({
+      where,
+      select: { id: true },
+    });
+    if (!owned) return NextResponse.json({ data: [] }, { status: 404 });
 
     const messages = await prisma.chatMessage.findMany({
       where: { conversationId },
