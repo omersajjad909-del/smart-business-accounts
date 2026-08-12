@@ -642,7 +642,9 @@ export const DASHBOARD_NAV_GROUPS: DashboardNavGroup[] = [
       "/dashboard/delivery-order",
       "/dashboard/stock-movements",
       "/dashboard/product-categories",
-      "/dashboard/warehouse-transfers",
+      // /dashboard/warehouse-transfers lives in the Inventory group — listing it
+      // twice never moved it (ROUTE_POSITION keeps the first group a route is
+      // found in) and only made the sidebar link it from two places.
       "/dashboard/purchase-requisition",
     ],
   },
@@ -653,7 +655,7 @@ export const DASHBOARD_NAV_GROUPS: DashboardNavGroup[] = [
       "/dashboard/sales-order",
       "/dashboard/price-lists",
       "/dashboard/credit-limits",
-      "/dashboard/warehouses",
+      // /dashboard/warehouses — same story, it belongs to the Inventory group.
     ],
   },
   {

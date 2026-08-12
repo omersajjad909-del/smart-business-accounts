@@ -1955,7 +1955,12 @@ export default function DashboardLayout({
               {hasDashboardFeature("TRADING_DELIVERY_ORDER") && <NavLink href="/dashboard/delivery-order" pathname={pathname}>Delivery Orders</NavLink>}
               {hasDashboardFeature("TRADING_STOCK_MOVEMENTS") && <NavLink href="/dashboard/stock-movements" pathname={pathname}>Stock Movements</NavLink>}
               {hasDashboardFeature("TRADING_PRODUCT_CATEGORIES") && <NavLink href="/dashboard/product-categories" pathname={pathname}>Product Categories</NavLink>}
-              {hasDashboardFeature("TRADING_WAREHOUSE_TRANSFERS") && <NavLink href="/dashboard/warehouse-transfers" pathname={pathname}>Warehouse Transfers</NavLink>}
+              {/* Warehouse Transfers is linked from the Inventory group, not here.
+                  The same route in two groups put one page in the sidebar twice,
+                  and /admin/plans only ever showed it once — ROUTE_POSITION keeps
+                  the first group a route appears in, which is Inventory — so the
+                  Trading Control copy answered to a toggle that was not next to
+                  it. One route, one link. */}
               {hasDashboardFeature("TRADING_PURCHASE_REQUISITION") && <NavLink href="/dashboard/purchase-requisition" pathname={pathname}>Purchase Requisition</NavLink>}
             </NavGroup>
           )}
@@ -1976,7 +1981,8 @@ export default function DashboardLayout({
               {hasDashboardFeature("WHOLESALE_SALES_ORDER") && <NavLink href="/dashboard/sales-order" pathname={pathname}>Sales Orders</NavLink>}
               {hasDashboardFeature("WHOLESALE_PRICE_LISTS") && <NavLink href="/dashboard/price-lists" pathname={pathname}>Price Lists</NavLink>}
               {hasDashboardFeature("WHOLESALE_CREDIT_LIMITS") && <NavLink href="/dashboard/credit-limits" pathname={pathname}>Credit Limits</NavLink>}
-              {hasDashboardFeature("WHOLESALE_WAREHOUSES") && <NavLink href="/dashboard/warehouses" pathname={pathname}>Warehouses & Transfers</NavLink>}
+              {/* Warehouses is linked from the Inventory group — same one-route-
+                  one-link rule as Warehouse Transfers above. */}
             </NavGroup>
           )}
 
