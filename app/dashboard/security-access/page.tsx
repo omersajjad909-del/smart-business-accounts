@@ -3,6 +3,21 @@
 import { useEffect, useState } from "react";
 import { getCurrentUser } from "@/lib/auth";
 import { QRCodeSVG } from "qrcode.react";
+import { fmtDate } from "@/lib/dateUtils";
+
+/**
+ * Sessions, keys and auth events are all timestamps, and `toLocaleString()`
+ * rendered them in the browser's locale — "8/12/2026, 10:55:01 PM" on a US
+ * profile. Everything else in the product reads dd-mm-yyyy, so this shows
+ * dd-mm-yyyy with a 24h clock beside it.
+ */
+function fmtDateTime(value: string | null | undefined): string {
+  if (!value) return "Never";
+  const d = new Date(value);
+  if (isNaN(d.getTime())) return "—";
+  const time = d.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" });
+  return `${fmtDate(d)} · ${time}`;
+}
 
 type SecurityPayload = {
   company: {
@@ -270,8 +285,8 @@ export default function SecurityAccessPage() {
                         <div className="mt-1 text-xs text-[var(--text-muted)]">{session.user?.email || "No email"}</div>
                       </div>
                       <div className="text-right text-xs text-[var(--text-muted)]">
-                        <div>Started: {new Date(session.createdAt).toLocaleString()}</div>
-                        <div>Expires: {new Date(session.expiresAt).toLocaleString()}</div>
+                        <div>Started: {fmtDateTime(session.createdAt)}</div>
+                        <div>Expires: {fmtDateTime(session.expiresAt)}</div>
                       </div>
                     </div>
                     <div className="mt-3 grid gap-2 text-xs text-[var(--text-muted)]">
@@ -322,7 +337,7 @@ export default function SecurityAccessPage() {
                           </div>
                         </div>
                         <div className="shrink-0 text-xs text-(--text-muted)">
-                          {new Date(event.createdAt).toLocaleString()}
+                          {fmtDateTime(event.createdAt)}
                         </div>
                       </div>
                     </div>
@@ -347,7 +362,7 @@ export default function SecurityAccessPage() {
               <p>Provider: {data.sso.providerName || "Not set"}</p>
               <p>Type: {data.sso.providerType || "Not set"}</p>
               <p>Domain: {data.sso.domainHint || "Not set"}</p>
-              <p>Last update: {data.sso.updatedAt ? new Date(data.sso.updatedAt).toLocaleString() : "Never"}</p>
+              <p>Last update: {fmtDateTime(data.sso.updatedAt)}</p>
             </div>
           </div>
 
@@ -372,7 +387,7 @@ export default function SecurityAccessPage() {
                     </div>
                     <div className="mt-2 text-xs text-[var(--text-muted)]">{key.keyPreview}</div>
                     <div className="mt-2 text-xs text-[var(--text-muted)]">
-                      Last used: {key.lastUsedAt ? new Date(key.lastUsedAt).toLocaleString() : "Never"}
+                      Last used: {fmtDateTime(key.lastUsedAt)}
                     </div>
                   </div>
                 ))
