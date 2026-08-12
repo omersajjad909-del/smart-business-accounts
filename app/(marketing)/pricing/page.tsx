@@ -77,6 +77,7 @@ const DEFAULT_HIGHLIGHTS = {
     "Expense management",
     "Basic financial reports",
     "Receivables & payables",
+    "🤖 Ask AI",
     "Email support",
   ],
   professional: [

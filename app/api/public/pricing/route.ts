@@ -41,6 +41,7 @@ const DEFAULT_PLAN_HIGHLIGHTS = {
     "Expense management",
     "Basic financial reports",
     "Receivables & payables",
+    "🤖 Ask AI",
     "Email support",
   ],
   pro: [
