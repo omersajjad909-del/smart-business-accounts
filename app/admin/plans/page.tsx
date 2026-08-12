@@ -420,10 +420,10 @@ export default function AdminPlansPage() {
   const TABS: { key: TabKey; label: string; icon: string }[] = [
     { key: "pricing",          label: "Pricing (USD)",      icon: "💰" },
     { key: "permissions",      label: "Permissions",        icon: "🔐" },
-    { key: "pages",            label: "Pages & Modules",    icon: "📄" },
+    { key: "pages",            label: "Pages",              icon: "📄" },
     { key: "pkr-pricing",      label: "PKR Pricing",        icon: "🇵🇰" },
     { key: "pkr-permissions",  label: "PKR Permissions",    icon: "🔒" },
-    { key: "pkr-pages",        label: "PKR Pages & Modules", icon: "📑" },
+    { key: "pkr-pages",        label: "PKR Pages",          icon: "📑" },
     { key: "custom-plans",     label: "Custom Requests",    icon: "📋" },
     { key: "modules",          label: "Module Pricing",     icon: "🧩" },
     { key: "addon",            label: "Automation Add-on",  icon: "⚡" },
@@ -609,12 +609,12 @@ export default function AdminPlansPage() {
       {/* ══ TAB: PAGES & MODULES ══
           Was a plan-wide checklist of all 289 pages with no business-type axis,
           duplicating the separate /admin/permissions screen. Both are now this
-          one grid: pick a business type, assign each page and module to a plan. */}
+          one grid: pick a business type, assign each page to a plan. */}
       {tab === "pages" && (
         <>
           <ScopeNote
             title="Dashboard pages — rest of the world"
-            body="Whatever is ticked for a plan here is what that plan's customers see in their dashboard sidebar. This screen does not touch the public pricing table, and it does not apply to Pakistan-based companies — those are on PKR Pages & Modules."
+            body="Whatever is ticked for a plan here is what that plan's customers see in their dashboard sidebar. This screen does not touch the public pricing table, and it does not apply to Pakistan-based companies — those are on PKR Pages."
           />
           <BusinessPlanMatrix key="pages-world" embedded scope="WORLD" />
         </>
@@ -771,14 +771,14 @@ export default function AdminPlansPage() {
             <div style={{ padding: "18px 20px", borderRadius: 14, background: "rgba(5,150,105,.07)", border: "1px solid rgba(5,150,105,.25)", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16, flexWrap: "wrap" }}>
               <div style={{ fontSize: 12.5, color: "#94a3b8", lineHeight: 1.6, maxWidth: 620 }}>
                 Which dashboard pages a Pakistan company gets is set per business type in{" "}
-                <strong style={{ color: "#6ee7b7" }}>PKR Pages &amp; Modules</strong>. It is saved separately
+                <strong style={{ color: "#6ee7b7" }}>PKR Pages</strong>. It is saved separately
                 from the world grid, so the two audiences can differ.
               </div>
               <button
                 onClick={() => setTab("pkr-pages")}
                 style={{ padding: "9px 18px", borderRadius: 10, background: "linear-gradient(135deg,#059669,#047857)", border: "none", color: "white", fontSize: 12.5, fontWeight: 700, cursor: "pointer", whiteSpace: "nowrap" }}
               >
-                Open PKR Pages &amp; Modules →
+                Open PKR Pages →
               </button>
             </div>
           </Card>
