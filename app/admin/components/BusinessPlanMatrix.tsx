@@ -109,35 +109,66 @@ export default function BusinessPlanMatrix({ embedded = false, scope = "WORLD" }
    */
   const pageGroups = useMemo(() => {
     type Row = { id: string; label: string; sort: number };
-    const byGroup = new Map<number, Row[]>();
+    type Group = { id: string; label: string; groupSort: number; itemSort: number; seq: number; items: Row[] };
+
+    // Features sharing one resolved route are tabs of a single page — the 24 AI
+    // tools are all /dashboard/ai?tab=… behind one "AI Intelligence" link. Left
+    // alone they collapse into whichever sidebar group holds that link, burying
+    // 24 rows under "Main". They keep their registry section as a sub-heading
+    // instead, parked at the position of the link they live behind.
+    const perRoute = new Map<string, number>();
+    for (const f of pageFeatures) {
+      const base = f.route.split("?")[0];
+      perRoute.set(base, (perRoute.get(base) ?? 0) + 1);
+    }
+
+    const groups = new Map<string, Group>();
     const unlisted: Row[] = [];
 
     pageFeatures.forEach((f, i) => {
       const pos = navPositionForRoute(f.route);
       if (!pos) { unlisted.push({ id: f.id, label: f.label, sort: i }); return; }
-      if (!byGroup.has(pos.group)) byGroup.set(pos.group, []);
-      byGroup.get(pos.group)!.push({ id: f.id, label: f.label, sort: pos.item });
+
+      // The bare route is the page itself and stays in its sidebar group; only
+      // the ?tab= siblings hanging off it get split out.
+      const tabbed = f.route.includes("?") && (perRoute.get(f.route.split("?")[0]) ?? 0) > 1;
+      const key   = tabbed ? `${pos.group}:${pos.item}:${f.businessLabel} · ${f.section}` : `${pos.group}`;
+      const label = tabbed ? `${f.businessLabel} · ${f.section}` : navGroupTitle(pos.group);
+
+      if (!groups.has(key)) {
+        groups.set(key, {
+          id: `nav:${key}`,
+          label,
+          groupSort: pos.group,
+          // A whole sidebar group outranks the tab groups hanging off one of its
+          // links, so it sorts above them.
+          itemSort: tabbed ? pos.item : -1,
+          seq: groups.size,
+          items: [],
+        });
+      }
+      groups.get(key)!.items.push({ id: f.id, label: f.label, sort: tabbed ? i : pos.item });
     });
 
-    const groups = [...byGroup.entries()]
-      .sort(([a], [b]) => a - b)
-      .map(([groupIndex, rows]) => ({
-        id: `nav:${groupIndex}`,
-        label: navGroupTitle(groupIndex),
-        items: rows.sort((a, b) => a.sort - b.sort).map(({ id, label }) => ({ id, label })),
+    const ordered = [...groups.values()]
+      .sort((a, b) => a.groupSort - b.groupSort || a.itemSort - b.itemSort || a.seq - b.seq)
+      .map(g => ({
+        id: g.id,
+        label: g.label,
+        items: g.items.sort((a, b) => a.sort - b.sort).map(({ id, label }) => ({ id, label })),
       }));
 
     // Pages the sidebar never links — a redirect-only route, or a screen reached
     // from the user menu. Kept assignable and kept visible: a page landing here
     // is also how you notice it has no sidebar link at all.
     if (unlisted.length) {
-      groups.push({
+      ordered.push({
         id: "nav:unlisted",
         label: "Not in the sidebar",
         items: unlisted.map(({ id, label }) => ({ id, label })),
       });
     }
-    return groups;
+    return ordered;
   }, [pageFeatures]);
 
   // No saved override means "everything on" — a business type should not lose
