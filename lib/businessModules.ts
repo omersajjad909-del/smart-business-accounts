@@ -220,14 +220,14 @@ export const BUSINESS_TYPES: BusinessTypeMeta[] = [
     ],
   },
 
-  /* PHASE-2+ (hidden for Phase 1 launch)
+  // Phase 1 launch: Manufacturing is now live and configurable.
   // ── MANUFACTURING ──────────────────────────────────────────
   {
     id: "manufacturing", label: "Manufacturing", icon: "🏭", emoji: "🏭",
     description: "Produce goods from raw materials — factories, garments, food processing",
     tagline: "Raw Material → Production → Finished Goods",
     color: "#f59e0b", gradient: "linear-gradient(135deg,#d97706,#f59e0b)", category: "Production",
-    modules: [...CORE, "sales_invoice","purchase_invoice","purchase_order","quotation","delivery_challan","sale_return","outward","inventory_items","stock_rates","barcode","reports_inventory","crm","hr_payroll","bom","production_orders","work_orders","raw_materials"],
+    modules: [...CORE_P1, "sales_invoice","purchase_invoice","purchase_order","quotation","delivery_challan","sale_return","outward","inventory_items","stock_rates","barcode","stock_movements","stock_ledger","reports_inventory","customer_statement","supplier_statement","fixed_assets","audit_trail","budget","cost_centers","crm","bom","production_orders","work_orders","raw_materials"],
     defaultAccounts: [
       ...COMMON_ACCOUNTS,
       { code: "1100", name: "Accounts Receivable", type: "Asset" },
@@ -255,7 +255,7 @@ export const BUSINESS_TYPES: BusinessTypeMeta[] = [
       { label: "Dispatch Goods", href: "/dashboard/delivery-challan", icon: "🚚", color: "#38bdf8" },
     ],
   },
-  */
+
 
   // ── DISTRIBUTION ───────────────────────────────────────────
   {
@@ -1718,7 +1718,7 @@ export const BUSINESS_PHASE_CONFIG: Record<string, { phase: 1|2|3|4; status: Pha
   clearing_forwarding:  { phase:1, status:"live",        category:"Commerce",          label:"Clearing & Forwarding",   emoji:"🛃", description:"Freight forwarding, customs documentation" },
 
   // ── Phase 2 — COMING SOON (Production + Retail + Food) ──────
-  manufacturing:        { phase:2, status:"coming_soon", category:"Production",        label:"Manufacturing",           emoji:"🏭", description:"BOM, production orders, work orders, finished goods" },
+  manufacturing:        { phase:1, status:"live",        category:"Production",        label:"Manufacturing",           emoji:"🏭", description:"BOM, production orders, work orders, finished goods" },
   food_processing:      { phase:2, status:"coming_soon", category:"Production",        label:"Food Processing",         emoji:"🥫", description:"Recipe-based production, batch tracking, food costing" },
   ecommerce:            { phase:2, status:"coming_soon", category:"Commerce",          label:"E-Commerce",              emoji:"🛍️", description:"Online orders, product listings, shipping, returns" },
   restaurant:           { phase:2, status:"coming_soon", category:"Food & Beverage",   label:"Restaurant / Café",       emoji:"🍽️", description:"Tables, kitchen display, menu, recipe costing" },
