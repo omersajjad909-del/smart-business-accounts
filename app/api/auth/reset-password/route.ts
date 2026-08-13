@@ -135,20 +135,23 @@ export async function POST(req: NextRequest) {
         where: { id: user.id },
         data: { password: hashedPassword },
       }),
-      prisma.activityLog.update({
-        where: { id: resetLog.id },
-        data: {
-          details: JSON.stringify({
-            ...details,
-            usedAt: Date.now(),
-          }),
-        },
-      }),
       prisma.activityLog.deleteMany({
         where: {
           userId: user.id,
           action: "PASSWORD_RESET_REQUESTED",
-          id: { not: resetLog.id },
+        },
+      }),
+      prisma.activityLog.create({
+        data: {
+          userId: user.id,
+          companyId: resetLog.companyId,
+          action: "PASSWORD_RESET",
+          details: JSON.stringify({
+            resetRequestId: resetLog.id,
+            requestedAt: details?.requestedAt ?? null,
+            resetAt: Date.now(),
+            ip,
+          }),
         },
       }),
       // Any pending email-change OTP is abandoned: whoever held the old

@@ -96,6 +96,8 @@ export async function GET(req: NextRequest) {
         select: {
           id: true, name: true, email: true, role: true,
           defaultCompanyId: true, avatar: true,
+          // Needed for the company 2FA-enforcement gate below.
+          twoFactorEnabled: true,
           permissions: { select: { permission: true, companyId: true } },
         },
       }),
@@ -290,6 +292,11 @@ export async function GET(req: NextRequest) {
       }
     }
 
+    // Company-wide 2FA policy. Reported here rather than blocking the login,
+    // because Security & Access — the only screen where 2FA can be enrolled —
+    // lives behind the login.
+    const mustEnable2FA = await needsTwoFactorEnrollment(companyId, user.twoFactorEnabled === true);
+
     return NextResponse.json({
       user: safeUser,
       company: companyData,
@@ -300,6 +307,7 @@ export async function GET(req: NextRequest) {
       moduleStatus,
       bizFeatures,
       isPkrCompany,
+      mustEnable2FA,
     }, {
       headers: { "Cache-Control": "private, no-store" },
     });

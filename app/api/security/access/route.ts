@@ -145,3 +145,89 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: error.message || "Failed to load security center" }, { status: 500 });
   }
 }
+
+/**
+ * POST — update the company security policy (admins only).
+ *
+ * Body: { twoFactorEnforced: boolean }
+ */
+export async function POST(req: NextRequest) {
+  const userId = req.headers.get("x-user-id");
+  const userRole = String(req.headers.get("x-user-role") || "").toUpperCase();
+  const companyId = await resolveCompanyId(req);
+
+  if (!companyId) return NextResponse.json({ error: "Company required" }, { status: 400 });
+  if (userRole !== "ADMIN") {
+    return NextResponse.json({ error: "Only an admin can change security policy" }, { status: 403 });
+  }
+  const allowed = await apiHasPermission(userId, userRole, PERMISSIONS.MANAGE_USERS, companyId);
+  if (!allowed) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+
+  try {
+    const body = await req.json().catch(() => ({}));
+    const policy = await setSecurityPolicy(
+      companyId,
+      { twoFactorEnforced: body?.twoFactorEnforced === true },
+      userId,
+    );
+    return NextResponse.json({ ok: true, policy });
+  } catch (error: any) {
+    return NextResponse.json({ error: error.message || "Failed to save policy" }, { status: 500 });
+  }
+}
+
+/**
+ * DELETE — revoke sessions.
+ *
+ * The screen listed active sessions with no way to end one, so an admin could
+ * see a session they did not recognise and do nothing about it.
+ *
+ * Body: { sessionId } to end one, or { scope: "others" } to end every session
+ * of this company except the caller's own.
+ */
+export async function DELETE(req: NextRequest) {
+  const userId = req.headers.get("x-user-id");
+  const userRole = String(req.headers.get("x-user-role") || "").toUpperCase();
+  const companyId = await resolveCompanyId(req);
+
+  if (!companyId) return NextResponse.json({ error: "Company required" }, { status: 400 });
+
+  try {
+    const body = await req.json().catch(() => ({}));
+    const sessionId = typeof body?.sessionId === "string" ? body.sessionId : null;
+    const scope = body?.scope === "others" ? "others" : null;
+
+    if (scope === "others") {
+      // Anyone may drop their own other sessions; only an admin may clear the
+      // whole company.
+      const isAdmin = userRole === "ADMIN";
+      const result = await prisma.session.deleteMany({
+        where: {
+          companyId,
+          ...(isAdmin ? {} : { userId: userId || "" }),
+          ...(body?.keepSessionId ? { id: { not: String(body.keepSessionId) } } : {}),
+        },
+      });
+      return NextResponse.json({ ok: true, revoked: result.count });
+    }
+
+    if (!sessionId) return NextResponse.json({ error: "sessionId required" }, { status: 400 });
+
+    // Scope the lookup to this company so an id from another tenant cannot be
+    // revoked, and let a non-admin end only their own sessions.
+    const session = await prisma.session.findFirst({
+      where: { id: sessionId, companyId, ...(userRole === "ADMIN" ? {} : { userId: userId || "" }) },
+      select: { id: true },
+    });
+    if (!session) return NextResponse.json({ error: "Not found" }, { status: 404 });
+
+    await prisma.session.delete({ where: { id: session.id } });
+    await prisma.activityLog.create({
+      data: { companyId, userId: userId || null, action: "SESSION_REVOKED", details: JSON.stringify({ sessionId }) },
+    }).catch(() => {});
+
+    return NextResponse.json({ ok: true, revoked: 1 });
+  } catch (error: any) {
+    return NextResponse.json({ error: error.message || "Failed to revoke session" }, { status: 500 });
+  }
+}
