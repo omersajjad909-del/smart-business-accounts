@@ -856,7 +856,7 @@ export default function DashboardContent() {
 
         .db-kpi{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px;}
         @media(max-width:1100px){.db-kpi{grid-template-columns:repeat(2,1fr);}}
-        @media(max-width:500px){.db-kpi{grid-template-columns:repeat(3,1fr);gap:8px;}}
+        @media(max-width:500px){.db-kpi{grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:12px;}}
         @media(max-width:500px){.db-kpi-bal{grid-column:1/-1;}}
 
         .db-mid{display:grid;grid-template-columns:2fr 1fr;gap:16px;margin-bottom:20px;min-height:340px;}
@@ -1046,7 +1046,7 @@ export default function DashboardContent() {
           className="db-card db-kpi-bal"
           style={{
             borderRadius: 16,
-            padding: isMobile ? "12px 10px" : "20px 22px",
+            padding: isMobile ? "8px 8px" : "20px 22px",
             background:
               "linear-gradient(135deg,rgba(99,102,241,.14),rgba(79,70,229,.07))",
             border: "1px solid rgba(99,102,241,.22)",
@@ -1057,12 +1057,12 @@ export default function DashboardContent() {
               display: "flex",
               alignItems: "flex-start",
               justifyContent: "space-between",
-              marginBottom: 14,
+              marginBottom: isMobile ? 6 : 14,
             }}
           >
             <span
               style={{
-                fontSize: isMobile ? 10 : 12,
+                fontSize: isMobile ? 9 : 12,
                 fontWeight: 600,
                 color: "rgba(99,102,241,.8)",
               }}
@@ -1090,7 +1090,7 @@ export default function DashboardContent() {
               fontWeight: 900,
               color: "#818cf8",
               letterSpacing: "-1px",
-              marginBottom: 8,
+              marginBottom: isMobile ? 4 : 8,
             }}
           >
             {cur} {fmt(stats.cashBalance)}
@@ -1108,7 +1108,7 @@ export default function DashboardContent() {
           className="db-card"
           style={{
             borderRadius: 16,
-            padding: isMobile ? "12px 8px" : "20px 22px",
+            padding: isMobile ? "8px 8px" : "20px 22px",
             background: "rgba(16,185,129,.07)",
             border: "1px solid rgba(16,185,129,.2)",
           }}
@@ -1118,12 +1118,12 @@ export default function DashboardContent() {
               display: "flex",
               alignItems: "flex-start",
               justifyContent: "space-between",
-              marginBottom: 14,
+              marginBottom: isMobile ? 6 : 14,
             }}
           >
             <span
               style={{
-                fontSize: isMobile ? 10 : 12,
+                fontSize: isMobile ? 9 : 12,
                 fontWeight: 600,
                 color: "rgba(16,185,129,.8)",
               }}
@@ -1151,7 +1151,7 @@ export default function DashboardContent() {
               fontWeight: 900,
               color: "#10b981",
               letterSpacing: "-1px",
-              marginBottom: 8,
+              marginBottom: isMobile ? 4 : 8,
             }}
           >
             {cur} {fmt(stats.revenue)}
@@ -1169,7 +1169,7 @@ export default function DashboardContent() {
           className="db-card"
           style={{
             borderRadius: 16,
-            padding: isMobile ? "12px 8px" : "20px 22px",
+            padding: isMobile ? "8px 8px" : "20px 22px",
             background: "rgba(248,113,113,.07)",
             border: "1px solid rgba(248,113,113,.2)",
           }}
@@ -1179,12 +1179,12 @@ export default function DashboardContent() {
               display: "flex",
               alignItems: "flex-start",
               justifyContent: "space-between",
-              marginBottom: 14,
+              marginBottom: isMobile ? 6 : 14,
             }}
           >
             <span
               style={{
-                fontSize: isMobile ? 10 : 12,
+                fontSize: isMobile ? 9 : 12,
                 fontWeight: 600,
                 color: "rgba(248,113,113,.8)",
               }}
@@ -1230,7 +1230,7 @@ export default function DashboardContent() {
           className="db-card"
           style={{
             borderRadius: 16,
-            padding: isMobile ? "12px 8px" : "20px 22px",
+            padding: isMobile ? "8px 8px" : "20px 22px",
             background: `${profC}0f`,
             border: `1px solid ${profC}28`,
           }}
@@ -1240,11 +1240,11 @@ export default function DashboardContent() {
               display: "flex",
               alignItems: "flex-start",
               justifyContent: "space-between",
-              marginBottom: 14,
+              marginBottom: isMobile ? 6 : 14,
             }}
           >
             <span
-              style={{ fontSize: isMobile ? 10 : 12, fontWeight: 600, color: `${profC}cc` }}
+              style={{ fontSize: isMobile ? 9 : 12, fontWeight: 600, color: `${profC}cc` }}
             >
               Profit This Month
             </span>
