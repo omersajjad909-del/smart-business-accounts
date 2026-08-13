@@ -1212,7 +1212,7 @@ export default function DashboardContent() {
               fontWeight: 900,
               color: "#f87171",
               letterSpacing: "-1px",
-              marginBottom: 8,
+              marginBottom: isMobile ? 4 : 8,
             }}
           >
             {cur} {fmt(stats.expenses)}
@@ -1269,7 +1269,7 @@ export default function DashboardContent() {
               fontWeight: 900,
               color: profC,
               letterSpacing: "-1px",
-              marginBottom: 8,
+              marginBottom: isMobile ? 4 : 8,
             }}
           >
             {cur} {fmt(stats.profit)}
