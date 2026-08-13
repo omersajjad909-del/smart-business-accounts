@@ -55,6 +55,10 @@ export default function BusinessPlanMatrix({ embedded = false, scope = "WORLD" }
   const [saved,      setSaved]      = useState(false);
   const [enabledIds,      setEnabledIds]      = useState<Set<string> | null>(null);
   const [expandedGroups,  setExpandedGroups]  = useState<Set<string>>(new Set());
+  // Business types whose override "Reset to Defaults" cleared. The server merges
+  // per type, so a missing key means "not edited" — a deletion has to be named.
+  const [removedIds,      setRemovedIds]      = useState<string[]>([]);
+  const [saveError,       setSaveError]       = useState<string | null>(null);
 
   const getHeaders = () => {
     const h: Record<string, string> = { "Content-Type": "application/json" };
@@ -186,6 +190,7 @@ export default function BusinessPlanMatrix({ embedded = false, scope = "WORLD" }
 
   function setPlanPages(plan: Plan, ids: string[]) {
     if (!selected) return;
+    setRemovedIds(prev => prev.filter(id => id !== selected.id));
     setPageConfig(prev => ({
       ...prev,
       [selected.id]: { ...planPages, [plan]: ids },
@@ -206,10 +211,13 @@ export default function BusinessPlanMatrix({ embedded = false, scope = "WORLD" }
     if (!selected) return;
     const allPages = pageFeatures.map(f => f.id);
     if (preset === "all") {
+      setRemovedIds(prev => prev.filter(id => id !== selected.id));
       setPageConfig(prev => ({ ...prev, [selected.id]: { STARTER: allPages, PRO: allPages, ENTERPRISE: allPages } }));
     } else if (preset === "default") {
+      setRemovedIds(prev => (prev.includes(selected.id) ? prev : [...prev, selected.id]));
       setPageConfig(prev => { const n = { ...prev }; delete n[selected.id]; return n; });
     } else {
+      setRemovedIds(prev => prev.filter(id => id !== selected.id));
       // Recommended tiering: Starter gets the first page of each sidebar group,
       // Pro gets everything except the AI tools, Enterprise gets all. Keyed off
       // the same grouping the grid displays, so "first of each" means what the
@@ -231,13 +239,25 @@ export default function BusinessPlanMatrix({ embedded = false, scope = "WORLD" }
 
   async function save() {
     setSaving(true);
+    setSaveError(null);
     try {
       const res = await fetch(`/api/admin/business-plan-modules${scopeQuery}`, {
         method: "POST",
         headers: getHeaders(),
-        body: JSON.stringify({ config, pageConfig }),
+        body: JSON.stringify({ config, pageConfig, removed: removedIds }),
       });
-      if (res.ok) { setSaved(true); setTimeout(() => setSaved(false), 2500); }
+      if (res.ok) {
+        setRemovedIds([]);
+        setSaved(true);
+        setTimeout(() => setSaved(false), 2500);
+      } else {
+        // A failed save used to look identical to a successful one — the button
+        // simply stopped saying "Saving…" and the toggles stayed as typed.
+        const msg = await res.json().catch(() => null);
+        setSaveError(msg?.error || `Save failed (${res.status}) — nothing was written.`);
+      }
+    } catch (e: any) {
+      setSaveError(e?.message || "Save failed — nothing was written.");
     } finally { setSaving(false); }
   }
 

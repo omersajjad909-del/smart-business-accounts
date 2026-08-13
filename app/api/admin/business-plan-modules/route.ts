@@ -77,7 +77,7 @@ export async function POST(req: NextRequest) {
   if (!isAdmin(req)) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
   try {
-    const { config, pageConfig } = await req.json();
+    const { config, pageConfig, removed } = await req.json();
     if (!config || typeof config !== "object") {
       return NextResponse.json({ error: "Invalid config" }, { status: 400 });
     }
@@ -85,10 +85,43 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Invalid pageConfig" }, { status: 400 });
     }
 
+    const action = ACTION_KEYS[scopeFrom(req)];
+
+    /* Merge per business type instead of replacing the whole document.
+       The grid POSTs the entire map it loaded on mount, so a second tab left
+       open on an older snapshot used to overwrite everything saved since —
+       one Save in a stale tab silently wiped another business type's whole
+       page config back to "all on". Only the types present in this request
+       move; everything else keeps whatever was saved last. */
+    const prevLog = await prisma.activityLog.findFirst({
+      where: { action },
+      orderBy: { createdAt: "desc" },
+      select: { details: true },
+    });
+    let prevConfig: Record<string, any> = {};
+    let prevPageConfig: Record<string, any> = {};
+    try {
+      const parsed = prevLog?.details ? JSON.parse(prevLog.details) : {};
+      const wrapped = parsed && typeof parsed === "object" &&
+        ("config" in parsed || "pageConfig" in parsed);
+      prevConfig     = (wrapped ? parsed.config : parsed) || {};
+      prevPageConfig = (wrapped ? parsed.pageConfig : {}) || {};
+    } catch { /* unreadable row — treat as empty and let this save stand */ }
+
+    const mergedConfig     = { ...prevConfig, ...config };
+    const mergedPageConfig = { ...prevPageConfig, ...(pageConfig || {}) };
+
+    // "Reset to Defaults" drops a type's override entirely. A merge can't tell
+    // that apart from "not edited", so the client names those types explicitly.
+    for (const id of Array.isArray(removed) ? removed : []) {
+      delete mergedConfig[String(id)];
+      delete mergedPageConfig[String(id)];
+    }
+
     await prisma.activityLog.create({
       data: {
-        action: ACTION_KEYS[scopeFrom(req)],
-        details: JSON.stringify({ config, pageConfig: pageConfig || {} }),
+        action,
+        details: JSON.stringify({ config: mergedConfig, pageConfig: mergedPageConfig }),
         userId: null,
         companyId: null,
       },
