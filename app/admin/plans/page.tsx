@@ -302,8 +302,15 @@ export default function AdminPlansPage() {
         // in Pages & Modules, so writing a PKR copy would only drift.
         body: JSON.stringify({ pricing: pkrPricing, planPermissions: pkrPlanPermissions }),
       });
-      if (r.ok) toast.success("PKR configuration saved!");
-      else { const j = await r.json(); toast.error(j?.error || "Save failed"); }
+      if (!r.ok) { const j = await r.json(); toast.error(j?.error || "Save failed"); return; }
+
+      // Module rates live in PLAN_CONFIG (both currencies together), not in the
+      // PKR document — the public pricing route reads them from there. Saving
+      // them here too means the PKR tab's own button does what it looks like it
+      // does for the module cards below the plans.
+      if (tab === "pkr-pricing") await saveAllModulePrices({ silent: true });
+
+      toast.success("PKR configuration saved!");
     } finally { setSavingPkrConfig(false); }
   }
 
@@ -383,7 +390,7 @@ export default function AdminPlansPage() {
      module on its own is not offered any more: the config is stored as one
      document, so a per-module POST would have to read-modify-write it and two
      quick saves could drop each other's edit. */
-  async function saveAllModulePrices() {
+  async function saveAllModulePrices(opts: { silent?: boolean } = {}) {
     setSavingMod("all");
     try {
       // Read first so nothing already saved under customPlan is lost.
@@ -410,7 +417,7 @@ export default function AdminPlansPage() {
           customPlan: { ...(current?.customPlan || {}), modules },
         }),
       });
-      if (r.ok) toast.success("Module prices saved — live on /pricing");
+      if (r.ok) { if (!opts.silent) toast.success("Module prices saved — live on /pricing"); }
       else { const j = await r.json().catch(() => ({})); toast.error(j?.error || "Save failed"); }
     } finally { setSavingMod(null); }
   }
@@ -751,6 +758,62 @@ export default function AdminPlansPage() {
               </div>
             </div>
           </Card>
+
+          {/* Custom-plan modules, in rupees — the same monthly + annual pair the
+              three plans above carry. Their USD rates sit on Module Pricing. */}
+          <div style={{ marginTop: 24 }}>
+            <Card title="PKR Module Pricing" subtitle="Custom plan — per-module monthly and annual per-month prices in Pakistani Rupees">
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))", gap: 20 }}>
+                {MODULES.map(m => (
+                  <div key={m.id} style={{ borderRadius: 16, border: "1px solid rgba(52,211,153,.22)", background: "rgba(5,150,105,.06)", padding: "22px" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 20 }}>
+                      <div style={{ width: 38, height: 38, borderRadius: 10, background: "rgba(52,211,153,.15)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}>{m.icon}</div>
+                      <div>
+                        <div style={{ fontSize: 15, fontWeight: 800, color: "white" }}>{m.label}</div>
+                        <div style={{ fontSize: 11, color: "#475569" }}>per company / month (PKR)</div>
+                      </div>
+                    </div>
+
+                    <div style={{ marginBottom: 14 }}>
+                      <label style={{ fontSize: 10, fontWeight: 700, color: "#475569", letterSpacing: ".06em", display: "block", marginBottom: 6 }}>MONTHLY PRICE (₨)</label>
+                      <div style={{ position: "relative" }}>
+                        <span style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", color: "#64748b", fontSize: 12, fontWeight: 700 }}>₨</span>
+                        <input type="number" min={0} step={100} value={modulePricesPkr[m.id] || 0}
+                          onChange={e => setModulePricesPkr(prev => ({ ...prev, [m.id]: Number(e.target.value) }))}
+                          style={{ ...inputStyle, paddingLeft: 30 }} />
+                      </div>
+                    </div>
+
+                    <div>
+                      <label style={{ fontSize: 10, fontWeight: 700, color: "#475569", letterSpacing: ".06em", display: "block", marginBottom: 6 }}>ANNUAL PRICE / MO (₨)</label>
+                      <div style={{ position: "relative" }}>
+                        <span style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", color: "#64748b", fontSize: 12, fontWeight: 700 }}>₨</span>
+                        <input type="number" min={0} step={100} value={modulePricesPkrYearly[m.id] || 0}
+                          onChange={e => setModulePricesPkrYearly(prev => ({ ...prev, [m.id]: Number(e.target.value) }))}
+                          style={{ ...inputStyle, paddingLeft: 30 }} />
+                      </div>
+                      <div style={{ fontSize: 11, color: "#475569", marginTop: 6 }}>
+                        Billed <span style={{ color: "#34d399", fontWeight: 700 }}>₨{((modulePricesPkrYearly[m.id] || 0) * 12).toLocaleString()}</span>/yr
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Custom must stay cheaper than the plan that already contains it. */}
+              {(() => {
+                const totPkr = MODULES.reduce((s, m) => s + (modulePricesPkr[m.id] || 0), 0);
+                const entPkr = Number((pkrPricing as any)?.enterprise?.monthly) || 0;
+                const ok = totPkr > 0 && entPkr > 0 && totPkr < entPkr;
+                return (
+                  <div style={{ marginTop: 22, padding: "14px 18px", borderRadius: 14, background: ok ? "rgba(34,197,94,.08)" : "rgba(239,68,68,.08)", border: `1px solid ${ok ? "rgba(34,197,94,.25)" : "rgba(239,68,68,.3)"}`, fontSize: 12.5, color: ok ? "#22c55e" : "#f87171", fontWeight: 700 }}>
+                    {ok ? "✓" : "⚠"} All six modules ₨{totPkr.toLocaleString()}/mo vs Enterprise ₨{entPkr.toLocaleString()}/mo
+                    {!ok && " — Custom costs more than the plan that already includes it."}
+                  </div>
+                );
+              })()}
+            </Card>
+          </div>
         </>
       )}
 

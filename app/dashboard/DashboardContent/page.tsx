@@ -1713,8 +1713,10 @@ export default function DashboardContent() {
           className="db-grid-exempt"
           style={{
             display: "grid",
-            gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)",
+            gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
             gap: 10,
+            maxWidth: 240,
+            margin: "0 auto",
           }}
         >
           {[
