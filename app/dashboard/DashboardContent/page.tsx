@@ -1062,7 +1062,7 @@ export default function DashboardContent() {
           >
             <span
               style={{
-                fontSize: 12,
+                fontSize: isMobile ? 10 : 12,
                 fontWeight: 600,
                 color: "rgba(99,102,241,.8)",
               }}
@@ -1071,14 +1071,14 @@ export default function DashboardContent() {
             </span>
             <div
               style={{
-                width: 38,
-                height: 38,
+                width: isMobile ? 28 : 38,
+                height: isMobile ? 28 : 38,
                 borderRadius: 11,
                 background: "rgba(99,102,241,.18)",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                fontSize: 17,
+                fontSize: isMobile ? 13 : 17,
               }}
             >
               💳
@@ -1086,7 +1086,7 @@ export default function DashboardContent() {
           </div>
           <div
             style={{
-              fontSize: 26,
+              fontSize: isMobile ? 20 : 26,
               fontWeight: 900,
               color: "#818cf8",
               letterSpacing: "-1px",
@@ -1095,7 +1095,7 @@ export default function DashboardContent() {
           >
             {cur} {fmt(stats.cashBalance)}
           </div>
-          <div style={{ fontSize: 11, fontWeight: 700, color: grC }}>
+          <div style={{ fontSize: isMobile ? 9 : 11, fontWeight: 700, color: grC }}>
             {stats.revenueGrowth >= 0 ? "↑" : "↓"}{" "}
             {Math.abs(stats.revenueGrowth).toFixed(1)}%{" "}
             <span style={{ color: "var(--text-muted)", fontWeight: 400 }}>
