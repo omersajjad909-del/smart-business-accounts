@@ -2746,6 +2746,40 @@ export function healSavedPlanFeatureFlags(
 }
 
 /**
+ * The plan-wide page grid a company actually gets, healed and normalised.
+ *
+ * This is the list every business type falls back to when Pages & Modules holds
+ * no override for it, so it is what the dashboard applies in that case — and
+ * therefore what the admin grid must show for an unconfigured business type.
+ * Both callers read it from here so the screen and the sidebar cannot drift.
+ */
+export function resolvePlanWideFeatureFlags(
+  savedFlags: Record<string, string[]> = {},
+): Record<DashboardFeaturePlanCode, string[]> {
+  const defaults = createDefaultDashboardFeatureFlags();
+  // healSavedPlanFeatureFlags restores every page the saved grid predates — it
+  // is a whitelist, so a page added to the registry after the last save reads
+  // as "not in your plan" and disappears from the product. healSavedFeatureList
+  // then covers the core pages for each individual list.
+  const saved = healSavedPlanFeatureFlags(savedFlags);
+  const clean = (
+    list: string[] | undefined,
+    fallback: string[],
+    plan: DashboardFeaturePlanCode,
+  ) =>
+    Array.isArray(list)
+      ? healSavedFeatureList(list.filter((id) => DASHBOARD_FEATURE_IDS.includes(id)), plan)
+      : fallback;
+  const get = (k: string) => saved[k] || saved[k.toLowerCase()];
+  return {
+    STARTER:    clean(get("STARTER"),    defaults.STARTER,    "STARTER"),
+    PRO:        clean(get("PRO"),        defaults.PRO,        "PRO"),
+    ENTERPRISE: clean(get("ENTERPRISE"), defaults.ENTERPRISE, "ENTERPRISE"),
+    CUSTOM:     clean(get("CUSTOM"),     defaults.CUSTOM,     "CUSTOM"),
+  };
+}
+
+/**
  * Resolves the page list for one company: a per-business-type override set in
  * `/admin/permissions` wins, otherwise the plan-wide list from `/admin/plans`.
  *

@@ -47,20 +47,31 @@ function resolveFlags(savedFlags: Record<string, string[]>) {
   const owned = dashboardFeaturesForBusinessType(BT);
   console.log("pages owned by import_company:", owned.length);
 
-  const resolved = resolveDashboardFeaturesForCompany({
-    businessType: BT,
-    planCode: "STARTER",
-    planFlags: map as any,
-    businessFlags: null,          // no WORLD grid row exists
-    fallbackBusinessFlags: null,  // OM company, so no PKR fallback
-  });
+  for (const planCode of ["STARTER", "PRO", "ENTERPRISE"]) {
+    const resolved = resolveDashboardFeaturesForCompany({
+      businessType: BT,
+      planCode,
+      planFlags: map as any,
+      businessFlags: null,          // no WORLD grid row exists
+      fallbackBusinessFlags: null,  // OM company, so no PKR fallback
+    });
+    const granted = new Set(resolved || []);
+    const missing = owned.filter((f) => !granted.has(f.id));
+    console.log(
+      `${planCode}: resolved=${resolved ? resolved.length : null}  owned=${owned.length}  ownedGranted=${owned.length - missing.length}  ownedMissing=${missing.length}`,
+    );
+  }
 
-  console.log("resolved features for STARTER:", resolved ? resolved.length : null);
-
-  const granted = new Set(resolved || []);
-  const missing = owned.filter((f) => !granted.has(f.id));
-  console.log("\nOWNED BUT NOT GRANTED:", missing.length);
-  for (const f of missing) console.log("  ", f.id, "|", f.label, "|", f.route);
+  // Which of the 15 trade pages land on STARTER?
+  const starter = new Set(
+    resolveDashboardFeaturesForCompany({
+      businessType: BT, planCode: "STARTER", planFlags: map as any,
+      businessFlags: null, fallbackBusinessFlags: null,
+    }) || [],
+  );
+  const trade = owned.filter((f) => f.id.startsWith("TRADE_"));
+  console.log("\nTRADE pages:", trade.length, "granted on STARTER:", trade.filter((f) => starter.has(f.id)).length);
+  for (const f of trade) console.log("  ", starter.has(f.id) ? "ON " : "OFF", f.id, "|", f.label);
 
   await prisma.$disconnect();
 })().catch(async (e) => { console.error(e); await prisma.$disconnect(); process.exit(1); });

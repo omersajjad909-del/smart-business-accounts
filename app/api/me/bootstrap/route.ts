@@ -31,29 +31,9 @@ function normalizePlanPermissions(saved: Record<string, string[]> = {}) {
   return { STARTER: get("STARTER"), PRO: get("PRO"), ENTERPRISE: get("ENTERPRISE"), CUSTOM: get("CUSTOM") };
 }
 
-function normalizeDashboardFeatureFlags(savedFlags: Record<string, string[]> = {}) {
-  const defaults = createDefaultDashboardFeatureFlags();
-  // healSavedPlanFeatureFlags restores every page the saved grid predates — it
-  // is a whitelist, so a page added to the registry after the last save reads
-  // as "not in your plan" and disappears from the product. healSavedFeatureList
-  // then covers the core pages for each individual list.
-  const saved = healSavedPlanFeatureFlags(savedFlags);
-  const clean = (
-    list: string[] | undefined,
-    fallback: string[],
-    plan: "STARTER" | "PRO" | "ENTERPRISE" | "CUSTOM",
-  ) =>
-    Array.isArray(list)
-      ? healSavedFeatureList(list.filter((id) => DASHBOARD_FEATURE_IDS.includes(id)), plan)
-      : fallback;
-  const get = (k: string) => saved[k] || saved[k.toLowerCase()];
-  return {
-    STARTER:    clean(get("STARTER"),    defaults.STARTER,    "STARTER"),
-    PRO:        clean(get("PRO"),        defaults.PRO,        "PRO"),
-    ENTERPRISE: clean(get("ENTERPRISE"), defaults.ENTERPRISE, "ENTERPRISE"),
-    CUSTOM:     clean(get("CUSTOM"),     defaults.CUSTOM,     "CUSTOM"),
-  };
-}
+// Shared with /api/admin/business-plan-modules so the Pages & Modules grid and
+// the dashboard sidebar resolve an unconfigured business type identically.
+const normalizeDashboardFeatureFlags = resolvePlanWideFeatureFlags;
 
 function computeModuleStatus(overrides: Record<string, string>) {
   const statusMap: Record<string, "live" | "coming_soon"> = {};
