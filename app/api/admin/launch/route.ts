@@ -12,45 +12,42 @@
 import { NextRequest, NextResponse } from "next/server";
 
 import { prisma } from "@/lib/prisma";
-import { getTokenFromRequest, verifyJwt } from "@/lib/auth";
+import { requireAdmin } from "@/lib/adminAuth";
 import { getSiteStatus, SITE_LIVE_KEY } from "@/lib/siteStatus";
 
-function adminFromRequest(req: NextRequest) {
-  try {
-    const payload = verifyJwt(getTokenFromRequest(req as any)!);
-    if (String(payload?.role || "").toUpperCase() !== "ADMIN") return null;
-    return payload;
-  } catch {
-    return null;
-  }
+/**
+ * ActivityLog.userId is a foreign key into User, but an admin session is not
+ * necessarily a User: super admins are User rows, while team members live in
+ * AdminUser. Writing a team member's id straight into the column fails the
+ * constraint, so the id is only kept when it really is a User. The human-
+ * readable actor is recorded in `details` either way.
+ */
+async function userIdIfReal(id: string): Promise<string | null> {
+  const user = await prisma.user
+    .findUnique({ where: { id }, select: { id: true } })
+    .catch(() => null);
+  return user?.id ?? null;
 }
 
 export async function GET(req: NextRequest) {
-  if (!adminFromRequest(req) && String(req.headers.get("x-user-role") || "").toUpperCase() !== "ADMIN") {
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-  }
+  const admin = requireAdmin(req);
+  if (admin instanceof NextResponse) return admin;
+
   return NextResponse.json(await getSiteStatus(), {
     headers: { "Cache-Control": "private, no-store" },
   });
 }
 
 export async function POST(req: NextRequest) {
-  const admin = adminFromRequest(req);
-  // The header check alone is trivially forgeable, so a valid ADMIN token is
-  // required here — this endpoint decides whether the product is visible.
-  if (!admin?.userId) {
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-  }
+  const admin = requireAdmin(req);
+  if (admin instanceof NextResponse) return admin;
 
   try {
     const body = await req.json().catch(() => ({}));
     const live = body?.live !== false;
 
-    const userId = String(admin.userId);
-    const actor = await prisma.user
-      .findUnique({ where: { id: userId }, select: { name: true, email: true } })
-      .catch(() => null);
-    const by = actor?.name || actor?.email || userId;
+    const by = admin.name || admin.email || admin.id;
+    const userId = await userIdIfReal(admin.id);
 
     const writes: any[] = [
       prisma.activityLog.create({
