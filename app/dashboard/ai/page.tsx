@@ -1590,8 +1590,10 @@ export default function AICommandCenter() {
       </div>
 
       {/* ── Content area ── */}
-      <div style={{ flex: 1, overflow: "hidden", display: "flex" }}>
-        <div style={{ flex: 1, overflowY: tab === "chat" ? "hidden" : "auto", padding: tab === "chat" ? 0 : isMobile ? "16px 14px 60px" : "24px 32px 60px" }}>
+      {/* Both panes stay clipped-and-internally-scrolled on desktop. On mobile
+          they must let content through to the page scroller above them. */}
+      <div style={{ flex: 1, overflow: isMobile ? "visible" : "hidden", display: "flex", minHeight: 0 }}>
+        <div style={{ flex: 1, minWidth: 0, overflowY: isMobile ? "visible" : tab === "chat" ? "hidden" : "auto", padding: tab === "chat" ? 0 : isMobile ? "14px 12px 24px" : "24px 32px 60px" }}>
 
         {/* ══ OVERVIEW ════════════════════════════════════════════════════ */}
         {tab === "overview" && (
