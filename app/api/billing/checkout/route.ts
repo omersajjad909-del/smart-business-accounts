@@ -9,6 +9,7 @@ import { createSafepayCheckout, hasSafepayConfig, usdToPkr } from "@/lib/safepay
 import { getCompanyExtraSeats } from "@/lib/companySeatLimit";
 import { getCustomPlanCycleAmountUsd, parseCustomModules } from "@/lib/customPlanPricing";
 import { sendPlanActivatedEmail } from "@/lib/email";
+import { AUTOMATION_ADDON_ENABLED, isAutomationAddon } from "@/lib/addons";
 
 const DEFAULT_PRICING = {
   starter: { monthly: 49, yearly: 39 },
@@ -59,6 +60,13 @@ export async function POST(req: NextRequest) {
     const customPrice = Number(body?.customPrice || 0);
     const customModulesFromBody = parseCustomModules(body?.customModules);
     const normalizedPlan = normalizePlanKey(planCode);
+
+    // The Automation add-on is not on sale yet — its Lemon Squeezy variants are
+    // dead. Refused here rather than only hiding the buttons, because an old
+    // link or a saved tab would otherwise still reach a checkout that errors.
+    if (isAutomationAddon(planCode) && !AUTOMATION_ADDON_ENABLED) {
+      return apiError("The Automation add-on is not available yet.", 403);
+    }
 
     const company = await prisma.company.findUnique({
       where: { id: companyId },

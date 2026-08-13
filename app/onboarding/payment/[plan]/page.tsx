@@ -6,6 +6,7 @@ import { getCurrentUser, setCurrentUser } from "@/lib/auth";
 import { formatFromUSD } from "@/lib/currency-client";
 import { getCustomPlanCycleAmountUsd, parseCustomModules } from "@/lib/customPlanPricing";
 import { clientRegionHeaders } from "@/lib/clientRegion";
+import { AUTOMATION_ADDON_ENABLED } from "@/lib/addons";
 
 /* ── Plan meta ──────────────────────────────────────────── */
 const PLAN_META: Record<string, { name: string; price: number; yearlyPrice: number; color: string; glow: string; dim: string; border: string; gradientFrom: string; gradientTo: string; icon: string }> = {
@@ -126,6 +127,14 @@ export default function PaymentPage() {
   const queryPrice = Number(searchParams.get("price") || "");
   const customModulesParam = searchParams.get("modules") || "";
   const customModuleIds = parseCustomModules(customModulesParam);
+
+  // The Automation add-on is not on sale yet. Old links and bookmarks still
+  // point here, so send them to pricing rather than a checkout that 403s.
+  useEffect(() => {
+    if (plan === "addon-automation" && !AUTOMATION_ADDON_ENABLED) {
+      router.replace("/pricing");
+    }
+  }, [plan, router]);
 
   const [billingCycle, setBillingCycle] = useState<"monthly"|"yearly">(urlCycle);
   // Seeded to global pricing and replaced by /api/public/pricing-region below.
