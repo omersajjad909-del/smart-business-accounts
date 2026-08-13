@@ -2676,6 +2676,31 @@ export function dashboardFeaturesForBusinessType(businessType: string): Dashboar
 }
 
 /**
+ * Pulls the saved plan-wide page grid out of one PLAN_CONFIG blob, or null when
+ * that blob carries no page grid at all.
+ *
+ * The distinction matters: a config that never wrote `dashboardFeatureFlags` —
+ * PKR_PLAN_CONFIG is exactly that, since the PKR tab of /admin/plans posts only
+ * pricing and permissions — must not be read as "no pages configured", because
+ * the callers then fall back to the wide-open defaults and every page the admin
+ * switched off comes back. An empty-in-every-plan grid is treated the same way:
+ * nothing was ever assigned there, so it says nothing about page access.
+ */
+export function readSavedDashboardFeatureFlags(
+  details?: string | null,
+): Record<string, string[]> | null {
+  if (!details) return null;
+  try {
+    const flags = JSON.parse(details)?.dashboardFeatureFlags;
+    if (!flags || typeof flags !== "object") return null;
+    const hasAny = Object.values(flags).some((list) => Array.isArray(list) && list.length > 0);
+    return hasAny ? (flags as Record<string, string[]>) : null;
+  } catch {
+    return null;
+  }
+}
+
+/**
  * Resolves the page list for one company: a per-business-type override set in
  * `/admin/permissions` wins, otherwise the plan-wide list from `/admin/plans`.
  *

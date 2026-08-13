@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getTokenFromRequest, verifyJwt } from "@/lib/auth";
 import { resolvePlanPermissions, PLAN_DEFAULT_PERMISSIONS } from "@/lib/planPermissions";
-import { DASHBOARD_FEATURE_IDS, createDefaultDashboardFeatureFlags, resolveDashboardFeaturesForCompany, healSavedFeatureList } from "@/lib/dashboardFeatureRegistry";
+import { DASHBOARD_FEATURE_IDS, createDefaultDashboardFeatureFlags, readSavedDashboardFeatureFlags, resolveDashboardFeaturesForCompany, healSavedFeatureList } from "@/lib/dashboardFeatureRegistry";
 import { BUSINESS_PHASE_CONFIG } from "@/lib/businessModules";
 import { currencyByCountry } from "@/lib/currency";
 import { getCompanyAdminControlSettings } from "@/lib/companyAdminControl";
@@ -212,16 +212,22 @@ export async function GET(req: NextRequest) {
       planPermsMap = normalizePlanPermissions();
     }
 
-    // Page access is currency-specific again, and has its own screen per
-    // audience: Plans → Pages & Modules for the world, Plans → PKR Pages &
-    // Modules for Pakistan. Each writes its own config, so editing one never
-    // moves pages for the other.
-    let dashboardFlagsMap: Record<string, string[]>;
-    if (activeConfigLog?.details) {
-      dashboardFlagsMap = normalizeDashboardFeatureFlags(JSON.parse(activeConfigLog.details).dashboardFeatureFlags);
-    } else {
-      dashboardFlagsMap = normalizeDashboardFeatureFlags();
-    }
+    // The plan-wide page grid is currency-neutral: /admin/plans writes it once
+    // in Pages & Modules and its PKR tab deliberately posts no
+    // dashboardFeatureFlags ("page access is set once for all currencies").
+    // Reading it from whichever config won above therefore handed every PKR
+    // company an empty grid, which normalize() widens into the defaults — every
+    // page on, including the ones the admin had switched off in every plan.
+    // Demo sandboxes are built as PK/PKR companies, so that is exactly what a
+    // demo visitor was seeing. An older PKR config that does carry a grid is
+    // still honoured; only the "carries nothing" case falls through to the
+    // world config.
+    const savedFeatureFlags =
+      (isPkrCompany ? readSavedDashboardFeatureFlags(pkrPlanConfigLog?.details) : null) ??
+      readSavedDashboardFeatureFlags(planConfigLog?.details);
+    const dashboardFlagsMap: Record<string, string[]> = savedFeatureFlags
+      ? normalizeDashboardFeatureFlags(savedFeatureFlags)
+      : normalizeDashboardFeatureFlags();
 
     // Apply global page visibility overrides
     if (pageVisibilityLog?.details) {

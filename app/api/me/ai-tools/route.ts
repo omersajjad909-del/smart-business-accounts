@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { resolveCompanyId } from "@/lib/tenant";
-import { AI_TOOL_IDS, DASHBOARD_FEATURE_IDS, createDefaultDashboardFeatureFlags, resolveDashboardFeaturesForCompany } from "@/lib/dashboardFeatureRegistry";
+import { AI_TOOL_IDS, DASHBOARD_FEATURE_IDS, createDefaultDashboardFeatureFlags, readSavedDashboardFeatureFlags, resolveDashboardFeaturesForCompany } from "@/lib/dashboardFeatureRegistry";
 
 function normalizeDashboardFeatureFlags(saved: Record<string, string[]> = {}) {
   const defaults = createDefaultDashboardFeatureFlags();
@@ -27,8 +27,8 @@ export async function GET(req: NextRequest) {
     });
     if (!company) return NextResponse.json({ error: "Company not found" }, { status: 404 });
 
-    // Page access IS currency-specific — /admin/plans keeps two independent
-    // grids, "Pages & Modules" for the world and "PKR Pages & Modules" for
+    // The per-business-type page grid IS currency-specific — /admin/plans keeps
+    // two of them, "Pages & Modules" for the world and "PKR Pages & Modules" for
     // Pakistan, each writing its own config. This route used to read the world
     // keys only, so every toggle a Pakistani company's admin flipped in the PKR
     // grid was ignored here and the AI tab stayed on screen after being turned
@@ -48,14 +48,17 @@ export async function GET(req: NextRequest) {
       String(company.country || "").toUpperCase() === "PK" ||
       String(company.country || "").toLowerCase() === "pakistan";
 
-    const activeConfigLog = isPkrCompany && pkrPlanConfigLog ? pkrPlanConfigLog : planConfigLog;
-
-    let dashboardFlagsMap: Record<string, string[]>;
-    if (activeConfigLog?.details) {
-      dashboardFlagsMap = normalizeDashboardFeatureFlags(JSON.parse(activeConfigLog.details).dashboardFeatureFlags);
-    } else {
-      dashboardFlagsMap = normalizeDashboardFeatureFlags();
-    }
+    // The plan-wide half of that grid is the exception: it is written once for
+    // all currencies (the PKR tab of /admin/plans posts no
+    // dashboardFeatureFlags), so a PKR company reading it out of its own config
+    // found nothing and normalize() widened that into the wide-open defaults.
+    // Same fallback as /api/me/bootstrap — see the comment there.
+    const savedFeatureFlags =
+      (isPkrCompany ? readSavedDashboardFeatureFlags(pkrPlanConfigLog?.details) : null) ??
+      readSavedDashboardFeatureFlags(planConfigLog?.details);
+    const dashboardFlagsMap: Record<string, string[]> = savedFeatureFlags
+      ? normalizeDashboardFeatureFlags(savedFeatureFlags)
+      : normalizeDashboardFeatureFlags();
 
     const planCode =
       String(company.plan || "STARTER").toUpperCase() === "PROFESSIONAL"
