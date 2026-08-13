@@ -8,7 +8,7 @@ import { rateLimitAsync } from "@/lib/rateLimit";
 import { validatePassword } from "@/lib/passwordPolicy";
 import { sendEmail } from "@/lib/email";
 
-const RESET_TTL_MS = 60 * 60 * 1000;
+const RESET_TTL_MS = 24 * 60 * 60 * 1000; // 24 hours
 
 function hashResetToken(token: string) {
   return createHash("sha256").update(token).digest("hex");
@@ -87,6 +87,7 @@ export async function POST(req: NextRequest) {
     });
 
     if (!resetLog?.userId) {
+      console.error("Reset token not found in database");
       return invalidToken();
     }
 
@@ -95,13 +96,24 @@ export async function POST(req: NextRequest) {
     const expiresAt = Number(details?.exp || 0);
     const usedAt = Number(details?.usedAt || 0);
 
-    if (
-      !storedHash ||
-      !hashesEqual(storedHash, tokenHash) ||
-      !expiresAt ||
-      Date.now() > expiresAt ||
-      usedAt
-    ) {
+    // Debug logging
+    if (!storedHash || !expiresAt) {
+      console.error("Invalid token details:", { hasHash: !!storedHash, hasExp: !!expiresAt, details });
+      return invalidToken();
+    }
+
+    if (Date.now() > expiresAt) {
+      console.error("Token expired:", { now: Date.now(), expiresAt, diff: Date.now() - expiresAt });
+      return invalidToken();
+    }
+
+    if (!hashesEqual(storedHash, tokenHash)) {
+      console.error("Token hash mismatch");
+      return invalidToken();
+    }
+
+    if (usedAt) {
+      console.error("Token already used");
       return invalidToken();
     }
 

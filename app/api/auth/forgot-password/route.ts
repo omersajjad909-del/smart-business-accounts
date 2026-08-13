@@ -6,7 +6,7 @@ import { rateLimitAsync } from "@/lib/rateLimit";
 import { sendEmail, emailTemplates } from "@/lib/email";
 import { getRuntimeAppUrl } from "@/lib/domains";
 
-const RESET_TTL_MS = 60 * 60 * 1000;
+const RESET_TTL_MS = 24 * 60 * 60 * 1000; // 24 hours
 
 function hashResetToken(token: string) {
   return createHash("sha256").update(token).digest("hex");
