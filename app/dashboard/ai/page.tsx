@@ -1968,13 +1968,16 @@ export default function AICommandCenter() {
 
         {/* ══ CHAT ════════════════════════════════════════════════════════ */}
         {tab === "chat" && (
-          <div style={{ display: "flex", height: "100%", animation: "fadeUp .35s ease both" }}>
+          // 272px of context panel beside the conversation leaves ~150px for the
+          // chat on a phone — the welcome copy wrapped to one word per line.
+          // Mobile stacks them: conversation first, context below it.
+          <div style={{ display: "flex", flexDirection: isMobile ? "column" : "row", height: isMobile ? "auto" : "100%", animation: "fadeUp .35s ease both" }}>
 
             {/* ── Left: Conversation ── */}
-            <div style={{ flex: 1, display: "flex", flexDirection: "column", minWidth: 0, borderRight: "1px solid rgba(255,255,255,.06)" }}>
+            <div style={{ flex: 1, display: "flex", flexDirection: "column", minWidth: 0, borderRight: isMobile ? "none" : "1px solid rgba(255,255,255,.06)" }}>
 
             {/* ── Messages area ── */}
-            <div style={{ flex: 1, overflowY: "auto", display: "flex", flexDirection: "column" }}>
+            <div style={{ flex: 1, overflowY: isMobile ? "visible" : "auto", minHeight: isMobile ? 260 : 0, display: "flex", flexDirection: "column" }}>
 
               {/* ── EMPTY / WELCOME STATE ── */}
               {messages.filter(m => m.role === "user").length === 0 ? (
@@ -2139,7 +2142,7 @@ export default function AICommandCenter() {
             </div>{/* end left conversation */}
 
             {/* ── Right: Context Panel ── */}
-            <div style={{ width: 272, background: "rgba(255,255,255,.018)", overflowY: "auto", padding: isMobile ? "12px 10px" : "18px 14px", flexShrink: 0, display: "flex", flexDirection: "column", gap: 18 }}>
+            <div style={{ width: isMobile ? "100%" : 272, background: "rgba(255,255,255,.018)", borderTop: isMobile ? "1px solid rgba(255,255,255,.06)" : "none", overflowY: isMobile ? "visible" : "auto", padding: isMobile ? "12px 10px 20px" : "18px 14px", flexShrink: 0, display: "flex", flexDirection: "column", gap: isMobile ? 14 : 18 }}>
 
               {/* Health Ring */}
               <div style={{ textAlign: "center", padding: "16px 0 4px" }}>
@@ -2149,20 +2152,34 @@ export default function AICommandCenter() {
               </div>
 
               {/* KPI mini cards */}
+              {/* One per row costs four rows of height — half the phone screen
+                  before the chat is even reached. Mobile lays them across a
+                  single row with the label stacked over the value, which is the
+                  same information in roughly a quarter of the height. */}
               {ctx && (
-                <div style={{ display: "grid", gap: 7 }}>
-                  <div style={{ fontSize: 10, fontWeight: 700, color: "rgba(255,255,255,.3)", textTransform: "uppercase", letterSpacing: ".08em", marginBottom: 2 }}>Live Snapshot</div>
-                  {[
-                    { label: "Revenue", value: fmt(ctx.revenue.thisMonth, currency), color: "#10b981" },
-                    { label: "Profit",  value: fmt(ctx.profit.thisMonth, currency),  color: ctx.profit.thisMonth >= 0 ? "#10b981" : "#ef4444" },
-                    { label: "Overdue", value: fmt(ctx.receivables.overdue, currency), color: "#f59e0b" },
-                    { label: "Stock",   value: fmt(ctx.inventory.stockValue, currency), color: "#34d399" },
-                  ].map(kpi => (
-                    <div key={kpi.label} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "8px 11px", borderRadius: 10, background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.06)" }}>
-                      <span style={{ fontSize: 11, color: "rgba(255,255,255,.4)" }}>{kpi.label}</span>
-                      <span style={{ fontSize: 12, fontWeight: 700, color: kpi.color }}>{kpi.value}</span>
-                    </div>
-                  ))}
+                <div>
+                  <div style={{ fontSize: 10, fontWeight: 700, color: "rgba(255,255,255,.3)", textTransform: "uppercase", letterSpacing: ".08em", marginBottom: 7 }}>Live Snapshot</div>
+                  <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(4,minmax(0,1fr))" : "1fr", gap: isMobile ? 6 : 7 }}>
+                    {[
+                      { label: "Revenue", value: fmt(ctx.revenue.thisMonth, currency), color: "#10b981" },
+                      { label: "Profit",  value: fmt(ctx.profit.thisMonth, currency),  color: ctx.profit.thisMonth >= 0 ? "#10b981" : "#ef4444" },
+                      { label: "Overdue", value: fmt(ctx.receivables.overdue, currency), color: "#f59e0b" },
+                      { label: "Stock",   value: fmt(ctx.inventory.stockValue, currency), color: "#34d399" },
+                    ].map(kpi => (
+                      <div key={kpi.label} style={{
+                        display: "flex",
+                        flexDirection: isMobile ? "column" : "row",
+                        justifyContent: isMobile ? "center" : "space-between",
+                        alignItems: isMobile ? "flex-start" : "center",
+                        gap: isMobile ? 2 : 0,
+                        padding: isMobile ? "7px 8px" : "8px 11px",
+                        borderRadius: 10, background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.06)", minWidth: 0,
+                      }}>
+                        <span style={{ fontSize: isMobile ? 9.5 : 11, color: "rgba(255,255,255,.4)", whiteSpace: "nowrap" }}>{kpi.label}</span>
+                        <span style={{ fontSize: isMobile ? 11 : 12, fontWeight: 700, color: kpi.color, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", maxWidth: "100%" }}>{kpi.value}</span>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               )}
 
