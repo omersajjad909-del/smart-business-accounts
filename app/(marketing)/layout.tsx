@@ -1,5 +1,8 @@
 import type { Metadata } from "next";
-import { headers } from "next/headers";
+import { headers, cookies } from "next/headers";
+import { verifyJwt } from "@/lib/auth";
+import { getSiteStatus } from "@/lib/siteStatus";
+import ComingSoonGate from "./ComingSoonGate";
 import Navbar from "./landing/components/navbar";
 import Offer from "./landing/components/Offer";
 import Footer from "./landing/components/Footer";
@@ -89,11 +92,37 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-export default function MarketingLayout({
+/**
+ * Is the person asking an admin?
+ *
+ * Admins keep the real site while it is held back, so the pre-launch review
+ * happens on the actual pages rather than a staging guess. Read straight from
+ * the auth cookie — the marketing layout is a server component and has no
+ * session context of its own.
+ */
+async function viewerIsAdmin(): Promise<boolean> {
+  try {
+    const token = (await cookies()).get("sb_auth")?.value;
+    if (!token) return false;
+    return String(verifyJwt(token)?.role || "").toUpperCase() === "ADMIN";
+  } catch {
+    return false;
+  }
+}
+
+export default async function MarketingLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  // Only the marketing pages are gated. /dashboard and /auth sit outside this
+  // layout and stay reachable, so paying customers keep working through a
+  // pre-launch hold and can still sign in.
+  const { live } = await getSiteStatus();
+  if (!live && !(await viewerIsAdmin())) {
+    return <ComingSoonGate />;
+  }
+
   return (
     <div className="mkt-page flex min-h-dvh flex-col bg-[#060919]">
       <style>{`

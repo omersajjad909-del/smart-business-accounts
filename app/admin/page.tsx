@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { getCurrentUser } from "@/lib/auth";
+import LaunchNowCard from "./components/LaunchNowCard";
 
 type DashboardPayload = {
   cards: {
@@ -122,6 +123,9 @@ export default function AdminDashboardPage() {
           </div>
         </div>
       </section>
+
+      {/* Launch state is the first thing an operator should see on this page. */}
+      <LaunchNowCard />
 
       {error ? (
         <section className="dash-card error-card">

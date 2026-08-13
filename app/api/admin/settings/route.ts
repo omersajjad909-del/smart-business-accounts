@@ -22,15 +22,38 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ key, value: null });
     }
 
-    // Default settings response
-    const settings = {
+    // Defaults, then whatever has actually been saved on top. Returning the
+    // bare defaults meant every toggle on this screen read back as its default
+    // however many times it had been saved — the Maintenance Mode switch, for
+    // one, flipped itself off on every reload.
+    const defaults: Record<string, unknown> = {
       appName: "FinovaOS",
       supportEmail: "hello@finovaos.app",
       maintenanceMode: false,
       allowSignups: true,
       maxUsersPerCompany: 50,
-      sessionTimeout: 30
+      sessionTimeout: 30,
     };
+
+    const savedRows = await prisma.activityLog.findMany({
+      where: { action: "ADMIN_SETTING" },
+      orderBy: { createdAt: "desc" },
+      select: { details: true },
+      take: 200,
+    }).catch(() => []);
+
+    const settings = { ...defaults };
+    const seen = new Set<string>();
+    for (const row of savedRows) {
+      try {
+        const { key: k, value } = JSON.parse(row.details || "{}");
+        // Newest first, so the first sighting of a key is the current value.
+        if (typeof k === "string" && k && !seen.has(k)) {
+          seen.add(k);
+          settings[k] = value;
+        }
+      } catch {}
+    }
 
     return NextResponse.json({ settings });
   } catch (e: any) {
