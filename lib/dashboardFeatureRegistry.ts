@@ -2725,7 +2725,12 @@ export function healSavedFeatureList(
 ): string[] {
   if (saved.some((id) => id.startsWith("CORE_"))) return saved;
   const defaults = createDefaultDashboardFeatureFlags()[planCode] || [];
-  const coreDefaults = defaults.filter((id) => id.startsWith("CORE_"));
+  // Membership, not the id prefix: three core pages (Warehouses, Warehouse
+  // Transfers, Price Lists) kept their old WHOLESALE_/TRADING_ ids because those
+  // ids are already saved in live configs, so a prefix test would skip them and
+  // heal a stale list into one still missing them.
+  const coreIds = new Set(CORE_FEATURE_IDS);
+  const coreDefaults = defaults.filter((id) => coreIds.has(id));
   return Array.from(new Set([...saved, ...coreDefaults]));
 }
 
