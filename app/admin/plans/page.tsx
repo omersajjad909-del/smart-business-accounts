@@ -374,7 +374,9 @@ export default function AdminPlansPage() {
     setSavingMod("all");
     try {
       // Read first so nothing already saved under customPlan is lost.
-      const current = await fetch("/api/admin/plan-config").then(r => (r.ok ? r.json() : {})).catch(() => ({}));
+      const current: any = await fetch("/api/admin/plan-config")
+        .then(r => (r.ok ? r.json() : {}))
+        .catch(() => ({}));
       const existing: any[] = Array.isArray(current?.customPlan?.modules) ? current.customPlan.modules : [];
       const byId = new Map(existing.map((m: any) => [m.id, m]));
 
@@ -1108,46 +1110,88 @@ export default function AdminPlansPage() {
                       </div>
                     </div>
 
-                    {/* Price input */}
-                    <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-                      <div style={{ position: "relative", flex: 1 }}>
+                    {/* World price */}
+                    <div>
+                      <label style={{ fontSize: 10, fontWeight: 700, color: "#475569", letterSpacing: ".06em", display: "block", marginBottom: 5 }}>WORLD PRICE (USD)</label>
+                      <div style={{ position: "relative" }}>
                         <span style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", color: "#64748b", fontSize: 13 }}>$</span>
                         <input type="number" min={0} step={1} value={modulePrices[m.id] || 0}
                           onChange={e => setModulePrices(prev => ({ ...prev, [m.id]: Number(e.target.value) }))}
                           style={{ ...inputStyle, paddingLeft: 28, fontSize: 15, fontWeight: 700 }} />
                         <span style={{ position: "absolute", right: 12, top: "50%", transform: "translateY(-50%)", color: "#334155", fontSize: 11 }}>/mo</span>
                       </div>
-                      <button onClick={() => saveModulePrice(m.id)} disabled={savingMod === m.id || savingMod === "all"}
-                        style={{ padding: "10px 14px", borderRadius: 10, background: savingMod === m.id ? "#4338ca" : "rgba(99,102,241,.2)", border: "1px solid rgba(99,102,241,.3)", color: "#818cf8", fontSize: 12, fontWeight: 700, cursor: "pointer", flexShrink: 0 }}>
-                        {savingMod === m.id ? "…" : "Save"}
-                      </button>
+                    </div>
+
+                    {/* Pakistan price — a real price, not a conversion */}
+                    <div>
+                      <label style={{ fontSize: 10, fontWeight: 700, color: "#34d399", letterSpacing: ".06em", display: "block", marginBottom: 5 }}>🇵🇰 PAKISTAN PRICE (PKR)</label>
+                      <div style={{ position: "relative" }}>
+                        <span style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", color: "#64748b", fontSize: 12 }}>Rs</span>
+                        <input type="number" min={0} step={100} value={modulePricesPkr[m.id] || 0}
+                          onChange={e => setModulePricesPkr(prev => ({ ...prev, [m.id]: Number(e.target.value) }))}
+                          style={{ ...inputStyle, paddingLeft: 34, fontSize: 15, fontWeight: 700, borderColor: "rgba(52,211,153,.25)" }} />
+                        <span style={{ position: "absolute", right: 12, top: "50%", transform: "translateY(-50%)", color: "#334155", fontSize: 11 }}>/mo</span>
+                      </div>
+                      {/* What the old code did — shown so the gap is obvious. */}
+                      {(modulePrices[m.id] || 0) > 0 && (
+                        <div style={{ fontSize: 10.5, color: "#475569", marginTop: 4 }}>
+                          Straight conversion would be Rs {((modulePrices[m.id] || 0) * 278).toLocaleString()} — far above the plan rates.
+                        </div>
+                      )}
                     </div>
 
                     {/* Annual estimate */}
                     {(modulePrices[m.id] || 0) > 0 && (
                       <div style={{ fontSize: 11, color: "#334155" }}>
                         Annual: <span style={{ color: "#22c55e" }}>${((modulePrices[m.id] || 0) * 12).toFixed(0)}/yr</span>
+                        {(modulePricesPkr[m.id] || 0) > 0 && (
+                          <> · <span style={{ color: "#34d399" }}>Rs {((modulePricesPkr[m.id] || 0) * 12).toLocaleString()}/yr</span></>
+                        )}
                       </div>
                     )}
                   </div>
                 ))}
               </div>
 
-              {/* Total monthly */}
-              <div style={{ marginTop: 22, padding: "16px 20px", borderRadius: 14, background: "rgba(99,102,241,.08)", border: "1px solid rgba(99,102,241,.2)", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                <div>
-                  <div style={{ fontSize: 13, fontWeight: 700, color: "white" }}>If all modules selected</div>
-                  <div style={{ fontSize: 12, color: "#475569" }}>Max custom plan value</div>
-                </div>
-                <div style={{ textAlign: "right" }}>
-                  <div style={{ fontSize: 22, fontWeight: 900, color: "#818cf8" }}>
-                    ${Object.values(modulePrices).reduce((sum, v) => sum + v, 0)}<span style={{ fontSize: 13, fontWeight: 500, color: "#475569" }}>/mo</span>
+              {/* Total, and the sanity check that matters:
+                  Custom must never cost more than the plan that contains it,
+                  or nobody has a reason to build one. */}
+              {(() => {
+                const totUsd = MODULES.reduce((s, m) => s + (modulePrices[m.id] || 0), 0);
+                const totPkr = MODULES.reduce((s, m) => s + (modulePricesPkr[m.id] || 0), 0);
+                const entUsd = Number(pricing?.enterprise?.monthly) || 249;
+                const entPkr = Number(pkrPricing?.enterprise?.monthly) || 19999;
+                const usdOk = totUsd > 0 && totUsd < entUsd;
+                const pkrOk = totPkr > 0 && totPkr < entPkr;
+                return (
+                  <div style={{ marginTop: 22, padding: "16px 20px", borderRadius: 14, background: "rgba(99,102,241,.08)", border: "1px solid rgba(99,102,241,.2)" }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 16, flexWrap: "wrap" }}>
+                      <div>
+                        <div style={{ fontSize: 13, fontWeight: 700, color: "white" }}>If all modules selected</div>
+                        <div style={{ fontSize: 12, color: "#475569" }}>Max custom plan value</div>
+                      </div>
+                      <div style={{ textAlign: "right" }}>
+                        <div style={{ fontSize: 22, fontWeight: 900, color: "#818cf8" }}>
+                          ${totUsd}<span style={{ fontSize: 13, fontWeight: 500, color: "#475569" }}>/mo</span>
+                          <span style={{ color: "#334155", fontWeight: 400, margin: "0 8px" }}>·</span>
+                          <span style={{ color: "#34d399" }}>Rs {totPkr.toLocaleString()}</span><span style={{ fontSize: 13, fontWeight: 500, color: "#475569" }}>/mo</span>
+                        </div>
+                        <div style={{ fontSize: 12, color: "#22c55e" }}>
+                          ${(totUsd * 12).toFixed(0)}/yr · Rs {(totPkr * 12).toLocaleString()}/yr
+                        </div>
+                      </div>
+                    </div>
+                    <div style={{ marginTop: 12, paddingTop: 12, borderTop: "1px solid rgba(255,255,255,.07)", display: "flex", gap: 18, flexWrap: "wrap", fontSize: 11.5 }}>
+                      <span style={{ color: usdOk ? "#22c55e" : "#f87171", fontWeight: 700 }}>
+                        {usdOk ? "✓" : "⚠"} World: ${totUsd} vs Enterprise ${entUsd}
+                      </span>
+                      <span style={{ color: pkrOk ? "#22c55e" : "#f87171", fontWeight: 700 }}>
+                        {pkrOk ? "✓" : "⚠"} Pakistan: Rs {totPkr.toLocaleString()} vs Enterprise Rs {entPkr.toLocaleString()}
+                      </span>
+                    </div>
                   </div>
-                  <div style={{ fontSize: 12, color: "#22c55e" }}>
-                    ${(Object.values(modulePrices).reduce((sum, v) => sum + v, 0) * 12).toFixed(0)}/yr
-                  </div>
-                </div>
-              </div>
+                );
+              })()}
             </>
           )}
         </Card>
