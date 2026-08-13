@@ -1125,45 +1125,35 @@ export default function AdminPlansPage() {
                       </div>
                     </div>
 
-                    {/* World price */}
+                    {/* Same two fields the three plans carry. */}
                     <div>
-                      <label style={{ fontSize: 10, fontWeight: 700, color: "#475569", letterSpacing: ".06em", display: "block", marginBottom: 5 }}>WORLD PRICE (USD)</label>
+                      <label style={{ fontSize: 10, fontWeight: 700, color: "#475569", letterSpacing: ".06em", display: "block", marginBottom: 6 }}>MONTHLY PRICE (USD)</label>
                       <div style={{ position: "relative" }}>
-                        <span style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", color: "#64748b", fontSize: 13 }}>$</span>
-                        <input type="number" min={0} step={1} value={modulePrices[m.id] || 0}
+                        <span style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", color: "#64748b", fontSize: 14 }}>$</span>
+                        <input type="number" min={0} value={modulePrices[m.id] || 0}
                           onChange={e => setModulePrices(prev => ({ ...prev, [m.id]: Number(e.target.value) }))}
-                          style={{ ...inputStyle, paddingLeft: 28, fontSize: 15, fontWeight: 700 }} />
-                        <span style={{ position: "absolute", right: 12, top: "50%", transform: "translateY(-50%)", color: "#334155", fontSize: 11 }}>/mo</span>
+                          style={{ ...inputStyle, paddingLeft: 28 }} />
                       </div>
                     </div>
 
-                    {/* Pakistan price — a real price, not a conversion */}
                     <div>
-                      <label style={{ fontSize: 10, fontWeight: 700, color: "#34d399", letterSpacing: ".06em", display: "block", marginBottom: 5 }}>🇵🇰 PAKISTAN PRICE (PKR)</label>
+                      <label style={{ fontSize: 10, fontWeight: 700, color: "#475569", letterSpacing: ".06em", display: "block", marginBottom: 6 }}>ANNUAL PRICE / MO (USD)</label>
                       <div style={{ position: "relative" }}>
-                        <span style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", color: "#64748b", fontSize: 12 }}>Rs</span>
-                        <input type="number" min={0} step={100} value={modulePricesPkr[m.id] || 0}
-                          onChange={e => setModulePricesPkr(prev => ({ ...prev, [m.id]: Number(e.target.value) }))}
-                          style={{ ...inputStyle, paddingLeft: 34, fontSize: 15, fontWeight: 700, borderColor: "rgba(52,211,153,.25)" }} />
-                        <span style={{ position: "absolute", right: 12, top: "50%", transform: "translateY(-50%)", color: "#334155", fontSize: 11 }}>/mo</span>
+                        <span style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", color: "#64748b", fontSize: 14 }}>$</span>
+                        <input type="number" min={0} value={modulePricesYearly[m.id] || 0}
+                          onChange={e => setModulePricesYearly(prev => ({ ...prev, [m.id]: Number(e.target.value) }))}
+                          style={{ ...inputStyle, paddingLeft: 28 }} />
                       </div>
-                      {/* What the old code did — shown so the gap is obvious. */}
-                      {(modulePrices[m.id] || 0) > 0 && (
-                        <div style={{ fontSize: 10.5, color: "#475569", marginTop: 4 }}>
-                          Straight conversion would be Rs {((modulePrices[m.id] || 0) * 278).toLocaleString()} — far above the plan rates.
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Annual estimate */}
-                    {(modulePrices[m.id] || 0) > 0 && (
-                      <div style={{ fontSize: 11, color: "#334155" }}>
-                        Annual: <span style={{ color: "#22c55e" }}>${((modulePrices[m.id] || 0) * 12).toFixed(0)}/yr</span>
-                        {(modulePricesPkr[m.id] || 0) > 0 && (
-                          <> · <span style={{ color: "#34d399" }}>Rs {((modulePricesPkr[m.id] || 0) * 12).toLocaleString()}/yr</span></>
+                      <div style={{ fontSize: 11, color: "#475569", marginTop: 6 }}>
+                        Billed <span style={{ color: "#22c55e", fontWeight: 700 }}>${((modulePricesYearly[m.id] || 0) * 12).toFixed(0)}</span>/yr
+                        {(modulePrices[m.id] || 0) > 0 && (modulePricesYearly[m.id] || 0) > 0 && (
+                          <> · saves {Math.max(0, Math.round((1 - (modulePricesYearly[m.id] || 0) / (modulePrices[m.id] || 1)) * 100))}%</>
                         )}
                       </div>
-                    )}
+                      <div style={{ fontSize: 10.5, color: "#334155", marginTop: 4 }}>
+                        🇵🇰 PKR rates for this module are on the <strong style={{ color: "#34d399" }}>PKR Pricing</strong> tab.
+                      </div>
+                    </div>
                   </div>
                 ))}
               </div>
