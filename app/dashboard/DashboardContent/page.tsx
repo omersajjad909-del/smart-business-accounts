@@ -1164,7 +1164,7 @@ export default function DashboardContent() {
             </span>
           </div>
         </div>
-        {/* Expenses */}}
+        {/* Expenses */}
         <div
           className="db-card"
           style={{
