@@ -1539,7 +1539,7 @@ export default function AICommandCenter() {
       </div>
 
       {/* ══ ROW 1: GROUPS ════════════════════════════════════════════════════ */}
-      <div className="ai-tabs-bar" style={{ padding: "0 16px", borderBottom: "1px solid rgba(255,255,255,.06)", display: "flex", gap: 2, overflowX: "auto", flexShrink: 0, scrollbarWidth: "none", background: "rgba(255,255,255,.015)" }}>
+      <div className="ai-tabs-bar" style={{ padding: isMobile ? "0 8px" : "0 16px", borderBottom: "1px solid rgba(255,255,255,.06)", display: "flex", gap: isMobile ? 1 : 2, overflowX: "auto", flexShrink: 0, scrollbarWidth: "none", background: "rgba(255,255,255,.015)" }}>
         {TAB_GROUPS.map(g => {
           const isActive = activeGroup?.id === g.id;
           const hasBadge = g.id === "core" && alerts.length > 0;
