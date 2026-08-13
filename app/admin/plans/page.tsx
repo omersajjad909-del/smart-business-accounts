@@ -25,17 +25,24 @@ type CustomPlanRequest = {
 
 type ModulePrice = { id?: string; moduleId: string; price: number };
 
+/**
+ * The modules a customer can actually buy on the Custom plan.
+ *
+ * This list used to be its own invention — ten entries with ids like
+ * `bank_connect`, `whatsapp_sms` and `ai_assistant` that matched nothing in
+ * lib/customPlanPricing, no `accounting` or `trading` at all, and prices saved
+ * to a ModulePrice table no public route has ever read. Editing it changed
+ * nothing a customer saw. It is now the same six modules /pricing sells, and
+ * the prices are saved into PLAN_CONFIG where the public pricing API reads
+ * them.
+ */
 const MODULES = [
-  { id: "crm",           label: "CRM & Sales",           icon: "🎯", desc: "Contacts, Opportunities, Interactions" },
-  { id: "hr_payroll",    label: "HR & Payroll",           icon: "👥", desc: "Employees, Attendance, Payroll" },
-  { id: "inventory",     label: "Inventory & Warehouse",  icon: "📦", desc: "Items, Stock, GRN, Dispatch" },
-  { id: "reports",       label: "Advanced Reports",       icon: "📊", desc: "P&L, Balance Sheet, Cash Flow" },
-  { id: "multi_branch",  label: "Multi-Branch Support",   icon: "🌍", desc: "Branch management & consolidation" },
-  { id: "bank_connect",  label: "Bank Connect (Plaid)",   icon: "🏦", desc: "Auto bank reconciliation" },
-  { id: "api_access",    label: "API Access",             icon: "⚡", desc: "REST API + Webhooks" },
-  { id: "whatsapp_sms",  label: "WhatsApp & SMS",         icon: "💬", desc: "Automated notifications" },
-  { id: "tax_filing",    label: "Tax Filing",             icon: "📋", desc: "Jurisdiction-ready tax reports" },
-  { id: "ai_assistant",  label: "AI Financial Assistant", icon: "🤖", desc: "FinovaOS AI insights & chat" },
+  { id: "accounting",          label: "Accounting & Invoicing", icon: "📒", desc: "Ledger, invoices, vouchers, P&L, balance sheet" },
+  { id: "inventory",           label: "Inventory Management",   icon: "📦", desc: "Stock tracking, GRN, barcode, low-stock alerts" },
+  { id: "crm",                 label: "CRM",                    icon: "👥", desc: "Contacts, sales pipeline, interaction logs" },
+  { id: "hr_payroll",          label: "HR & Payroll",           icon: "👨‍💼", desc: "Employees, attendance, payroll, advance salary" },
+  { id: "trading",             label: "Trading Desk",           icon: "🔄", desc: "Order desk, procurement, dispatch, outstandings" },
+  { id: "bank_reconciliation", label: "Bank Reconciliation",    icon: "🏦", desc: "Statement import, discrepancy flagging, closing" },
 ];
 
 const STATUS_COLORS: Record<string, { bg: string; text: string }> = {
@@ -144,8 +151,13 @@ export default function AdminPlansPage() {
   const [addonEditPlan, setAddonEditPlan]   = useState<"monthly" | "yearly">("monthly");
   const [addonEditNotes, setAddonEditNotes] = useState("");
 
-  /* ── Module pricing ── */
+  /* ── Module pricing (Custom plan) ── */
   const [modulePrices, setModulePrices] = useState<Record<string, number>>(
+    Object.fromEntries(MODULES.map(m => [m.id, 0]))
+  );
+  // Pakistan list price per module. Kept separate from the USD figure on
+  // purpose: converting one into the other is exactly the bug this replaced.
+  const [modulePricesPkr, setModulePricesPkr] = useState<Record<string, number>>(
     Object.fromEntries(MODULES.map(m => [m.id, 0]))
   );
   const [loadingMods, setLoadingMods] = useState(false);
@@ -297,18 +309,27 @@ export default function AdminPlansPage() {
     });
   }
 
-  /* ─── Load module prices ─── */
+  /* ─── Load module prices ───
+     From plan-config, which is what /api/public/pricing serves to customers.
+     The old ModulePrice table this read from is not wired to anything. */
   useEffect(() => {
     if (tab !== "modules") return;
     (async () => {
       setLoadingMods(true);
       try {
-        const r = await fetch("/api/admin/module-prices");
+        const r = await fetch("/api/admin/plan-config");
         if (r.ok) {
-          const list: ModulePrice[] = await r.json();
-          const map: Record<string, number> = {};
-          list.forEach(m => { map[m.moduleId] = m.price; });
-          setModulePrices(prev => ({ ...prev, ...map }));
+          const d = await r.json();
+          const mods: any[] = Array.isArray(d?.customPlan?.modules) ? d.customPlan.modules : [];
+          const usd: Record<string, number> = {};
+          const pkr: Record<string, number> = {};
+          for (const m of mods) {
+            if (!m?.id) continue;
+            usd[m.id] = Number(m.price) || 0;
+            pkr[m.id] = Number(m.pricePkr) || 0;
+          }
+          setModulePrices(prev => ({ ...prev, ...usd }));
+          setModulePricesPkr(prev => ({ ...prev, ...pkr }));
         }
       } finally { setLoadingMods(false); }
     })();
@@ -344,31 +365,36 @@ export default function AdminPlansPage() {
     } finally { setUpdatingReq(null); }
   }
 
-  /* ─── Save single module price ─── */
-  async function saveModulePrice(moduleId: string) {
-    setSavingMod(moduleId);
-    try {
-      const r = await fetch("/api/admin/module-prices", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ moduleId, price: modulePrices[moduleId] || 0 }),
-      });
-      if (r.ok) toast.success(`${moduleId} price saved`);
-      else toast.error("Failed to save");
-    } finally { setSavingMod(null); }
-  }
-
+  /* ─── Save module prices ───
+     One write of the whole customPlan block into plan-config. Saving a single
+     module on its own is not offered any more: the config is stored as one
+     document, so a per-module POST would have to read-modify-write it and two
+     quick saves could drop each other's edit. */
   async function saveAllModulePrices() {
     setSavingMod("all");
     try {
-      await Promise.all(
-        MODULES.map(m => fetch("/api/admin/module-prices", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ moduleId: m.id, price: modulePrices[m.id] || 0 }),
-        }))
-      );
-      toast.success("All module prices saved!");
+      // Read first so nothing already saved under customPlan is lost.
+      const current = await fetch("/api/admin/plan-config").then(r => (r.ok ? r.json() : {})).catch(() => ({}));
+      const existing: any[] = Array.isArray(current?.customPlan?.modules) ? current.customPlan.modules : [];
+      const byId = new Map(existing.map((m: any) => [m.id, m]));
+
+      const modules = MODULES.map(m => ({
+        ...(byId.get(m.id) || { id: m.id, name: m.label, enabled: true, standalone: true }),
+        id: m.id,
+        price: Number(modulePrices[m.id]) || 0,
+        pricePkr: Number(modulePricesPkr[m.id]) || 0,
+      }));
+
+      const r = await fetch("/api/admin/plan-config", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          ...current,
+          customPlan: { ...(current?.customPlan || {}), modules },
+        }),
+      });
+      if (r.ok) toast.success("Module prices saved — live on /pricing");
+      else { const j = await r.json().catch(() => ({})); toast.error(j?.error || "Save failed"); }
     } finally { setSavingMod(null); }
   }
 
