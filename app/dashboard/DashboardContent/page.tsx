@@ -1713,9 +1713,12 @@ export default function DashboardContent() {
           className="db-grid-exempt"
           style={{
             display: "grid",
-            gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
-            gap: 10,
-            maxWidth: 240,
+            // All four across instead of 2×2 — the tiles are icon-and-label, so
+            // a quarter of the width is plenty and it saves a whole row of
+            // scrolling on the first screen.
+            gridTemplateColumns: "repeat(4, minmax(0, 1fr))",
+            gap: 8,
+            // The 240px cap was sized for two columns; four need the full width.
             margin: "0 auto",
           }}
         >

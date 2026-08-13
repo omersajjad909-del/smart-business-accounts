@@ -63,6 +63,8 @@ export async function proxy(req: NextRequest) {
     const fwdHeaders = new Headers(req.headers);
     fwdHeaders.set("x-nonce", nonce);
     fwdHeaders.set("x-pathname", req.nextUrl.pathname);
+    // Same reason as the main branch below: Next reads the nonce from here.
+    fwdHeaders.set("Content-Security-Policy", csp);
     // Redirect /favicon.ico to the Finova Forge logo so Google Search picks it up.
     if (pathname === "/favicon.ico") {
       return NextResponse.redirect(new URL("/FinovaForge.png", req.url), { status: 301 });
@@ -90,6 +92,12 @@ export async function proxy(req: NextRequest) {
   const headers = new Headers(req.headers);
   headers.set("x-nonce", nonce);
   headers.set("x-pathname", req.nextUrl.pathname);
+  // Next.js stamps its own bootstrap/hydration scripts with the nonce only when
+  // it can read the policy off the *request*. Setting it on the response alone
+  // left those inline scripts unnonced, and `strict-dynamic` makes the browser
+  // ignore the host allowlist — so every one of them was refused with
+  // "Executing inline script violates the following Content Security Policy".
+  headers.set("Content-Security-Policy", csp);
 
   // 🔥 Clear incoming sensitive headers to prevent spoofing
   headers.delete("x-user-id");
