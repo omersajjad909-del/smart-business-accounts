@@ -84,6 +84,13 @@ export async function GET(req: NextRequest) {
     const apiKeys = await listCompanyApiKeys(companyId);
     const activeApiKeys = apiKeys.filter((key) => key.status === "active");
     const ssoConfig = safeParse(ssoConfigLog?.details || null);
+    const policy = await getSecurityPolicy(companyId);
+
+    // How many users still have to enrol before the policy is actually met.
+    const [totalUsers, enrolledUsers] = await Promise.all([
+      prisma.user.count({ where: { defaultCompanyId: companyId } }),
+      prisma.user.count({ where: { defaultCompanyId: companyId, twoFactorEnabled: true } }),
+    ]);
 
     return NextResponse.json({
       company,
@@ -91,7 +98,9 @@ export async function GET(req: NextRequest) {
         activeSessions: sessions.length,
         activeApiKeys: activeApiKeys.length,
         ssoEnabled: Boolean(ssoConfig && ssoConfig.enabled),
-        twoFactorEnforced: false,
+        twoFactorEnforced: policy.twoFactorEnforced,
+        twoFactorEnrolled: enrolledUsers,
+        totalUsers,
       },
       sessions: sessions.map((session) => ({
         id: session.id,
