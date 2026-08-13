@@ -32,6 +32,8 @@ type SecurityPayload = {
     activeApiKeys: number;
     ssoEnabled: boolean;
     twoFactorEnforced: boolean;
+    twoFactorEnrolled?: number;
+    totalUsers?: number;
   };
   sessions: Array<{
     id: string;

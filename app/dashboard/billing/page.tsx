@@ -876,9 +876,9 @@ function BillingPage() {
               const brandLabel = cardBrandLabel(pm.brand);
               return (
                 <div key={pm.id} className="row-hover" style={{ padding: isMobile ? "12px 11px" : "14px 24px", display:"flex", alignItems:"center", gap:16, borderBottom:"1px solid rgba(255,255,255,.04)" }}>
-                  <div style={{ width:52, height:34, borderRadius:8, background:cfg.grad, display:"flex", alignItems:"center", justifyContent:"center", fontSize:8, fontWeight:900, color:"rgba(255,255,255,.5)", letterSpacing:1, flexShrink:0 }}>{cfg.label}</div>
+                  <CardBrandMark brand={pm.brand} />
                   <div style={{ flex:1 }}>
-                    <div style={{ fontSize:13, fontWeight:700 }}>{cfg.label} •••• {pm.last4}</div>
+                    <div style={{ fontSize:13, fontWeight:700 }}>{brandLabel} ending in {pm.last4}</div>
                     {/* Lemon Squeezy does not report the expiry, so a card that
                         came from there has expMonth/expYear of 0 — show the
                         provider line instead of a fake "Expires 00/0". */}
@@ -893,7 +893,6 @@ function BillingPage() {
                       Update
                     </button>
                   )}
-                  {pm.isDefault && <span style={{ padding:"2px 8px", borderRadius:8, background:"rgba(99,102,241,.15)", border:"1px solid rgba(99,102,241,.28)", fontSize:10, fontWeight:700, color:"#a5b4fc" }}>DEFAULT</span>}
                 </div>
               );
             })}
@@ -992,19 +991,19 @@ function BillingPage() {
                 </button>
               </div>
             ) : paymentMethods.map((pm, i) => {
-              const cfg = CARD_BRANDS[pm.brand] ?? CARD_BRANDS.unknown;
+              const brandLabel = cardBrandLabel(pm.brand);
               return (
                 <div key={pm.id} className="row-hover" style={{ padding: isMobile ? "12px 11px" : "18px 24px", display:"flex", alignItems:"center", gap:18, borderBottom:i<paymentMethods.length-1?"1px solid rgba(255,255,255,.05)":"none" }}>
-                  <div style={{ width:72, height:46, borderRadius:10, background:cfg.grad, padding:"8px 12px", position:"relative", flexShrink:0, boxShadow:"0 4px 16px rgba(0,0,0,.25)" }}>
-                    <div style={{ width:18, height:13, borderRadius:3, background:"linear-gradient(135deg,#fbbf24,#d97706)", marginBottom:5, opacity:.9 }}/>
-                    <div style={{ fontSize:8, color:"rgba(255,255,255,.75)", fontFamily:"monospace", letterSpacing:1.5 }}>•••• {pm.last4}</div>
-                  </div>
+                  <CardBrandMark brand={pm.brand} />
                   <div style={{ flex:1 }}>
                     <div style={{ display:"flex", alignItems:"center", gap:8 }}>
-                      <span style={{ fontWeight:700, fontSize:14 }}>{cfg.label} ending in {pm.last4}</span>
-                      {pm.isDefault && <span style={{ padding:"2px 8px", borderRadius:8, background:"rgba(99,102,241,.15)", border:"1px solid rgba(99,102,241,.28)", fontSize:10, fontWeight:700, color:"#a5b4fc" }}>DEFAULT</span>}
+                      <span style={{ fontWeight:700, fontSize:14 }}>{brandLabel} ending in {pm.last4}</span>
                     </div>
-                    <div style={{ fontSize:12, color:"rgba(255,255,255,.35)", marginTop:3 }}>{pm.holderName} · Expires {String(pm.expMonth).padStart(2,"0")}/{pm.expYear}</div>
+                    <div style={{ fontSize:12, color:"rgba(255,255,255,.35)", marginTop:3 }}>
+                      {pm.expYear
+                        ? `${pm.holderName ? `${pm.holderName} - ` : ""}Expires ${String(pm.expMonth).padStart(2,"0")}/${pm.expYear}`
+                        : "Held securely by our payment provider"}
+                    </div>
                   </div>
                   <div style={{ display:"flex", gap:8 }}>
                     {!pm.isDefault && <button onClick={() => setDefaultCard(pm.id)} style={{ fontSize:11, fontWeight:600, padding:"6px 14px", borderRadius:9, border:"1px solid rgba(255,255,255,.09)", background:"rgba(255,255,255,.04)", color:"rgba(255,255,255,.55)", cursor:"pointer", fontFamily:"inherit" }}>Set Default</button>}
