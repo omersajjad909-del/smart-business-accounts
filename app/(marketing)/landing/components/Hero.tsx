@@ -1,7 +1,8 @@
 ﻿"use client";
 import Link from "next/link";
 import React, { useEffect, useRef, useState } from "react";
-import { signupHref } from "@/lib/signupGate";
+import { signupHrefFor } from "@/lib/signupGate";
+import { useSignupsOpen } from "@/hooks/useSignupsOpen";
 
 /* ── Animated counter ── */
 function useCounter(target: number, duration = 1800, active = false) {
@@ -249,7 +250,7 @@ export default function Hero() {
                 </Link>
                 {/* Went straight to signup, skipping the pricing page entirely —
                     so the "Launching Soon" buttons there never saw this visitor. */}
-                <Link href={signupHref("/onboarding/signup/starter")} className="cta-ghost">
+                <Link href={signupHrefFor(signupsOpen, "/onboarding/signup/starter")} className="cta-ghost">
                   Get Started
                 </Link>
                 <Link href="/demo" className="cta-ghost">
