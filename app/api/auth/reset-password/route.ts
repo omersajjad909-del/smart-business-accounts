@@ -38,6 +38,61 @@ function invalidToken() {
   );
 }
 
+/**
+ * Is this link still the live one?
+ *
+ * Only one reset link may be redeemable at a time — requesting a new one voids
+ * every earlier link. A browser tab left open on the older email keeps working
+ * as far as the user can tell: the form renders, the password meter says
+ * "Strong", and the link is only revealed as dead after they have typed a
+ * password twice and pressed the button. Asking on page load turns that into an
+ * up-front "request a new link".
+ *
+ * Answering costs nothing: the caller must already hold the 64-hex token, so
+ * this tells them only what redeeming it would tell them a moment later. The
+ * reply is a bare boolean — no email, no account state.
+ */
+export async function GET(req: NextRequest) {
+  const ip = (req.headers.get("x-forwarded-for") || "unknown").split(",")[0].trim();
+  const rl = await rateLimitAsync(`reset-check:${ip}`, 30, 60_000);
+  if (!rl.allowed) {
+    return NextResponse.json({ valid: true }, { status: 200 });
+  }
+
+  const token = String(req.nextUrl.searchParams.get("token") || "").trim();
+  if (!/^[a-f0-9]{64}$/i.test(token)) {
+    return NextResponse.json({ valid: false });
+  }
+
+  try {
+    const tokenHash = hashResetToken(token);
+    const resetLog = await prisma.activityLog.findFirst({
+      where: {
+        action: "PASSWORD_RESET_REQUESTED",
+        details: { contains: tokenHash } satisfies Prisma.StringNullableFilter,
+        createdAt: { gte: new Date(Date.now() - RESET_TTL_MS) },
+      },
+      orderBy: { createdAt: "desc" },
+      select: { details: true },
+    });
+
+    const details = safeJson(resetLog?.details ?? null);
+    const storedHash = String(details?.tokenHash || "");
+    const expiresAt = Number(details?.exp || 0);
+    const valid =
+      !!storedHash &&
+      hashesEqual(storedHash, tokenHash) &&
+      !!expiresAt &&
+      Date.now() <= expiresAt &&
+      !Number(details?.usedAt || 0);
+
+    return NextResponse.json({ valid });
+  } catch {
+    // A lookup failure must not strand someone on a link that is actually fine.
+    return NextResponse.json({ valid: true });
+  }
+}
+
 export async function POST(req: NextRequest) {
   try {
     const ip = (req.headers.get("x-forwarded-for") || "unknown")

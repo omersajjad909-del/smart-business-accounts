@@ -2,7 +2,7 @@
 // FILE: app/auth/reset-password/page.tsx
 import Link from "next/link";
 import { useSearchParams, useRouter } from "next/navigation";
-import { useState, useMemo, Suspense } from "react";
+import { useState, useMemo, useEffect, Suspense } from "react";
 
 function ResetPasswordForm() {
   const searchParams = useSearchParams();
@@ -15,6 +15,19 @@ function ResetPasswordForm() {
   const [done,      setDone]      = useState(false);
   const [error,     setError]     = useState("");
   const [showPass,  setShowPass]  = useState(false);
+  // Requesting a new reset email voids every earlier link, so a tab left open
+  // on the previous email is already dead. Ask before the user types anything.
+  const [tokenDead, setTokenDead] = useState(false);
+
+  useEffect(() => {
+    if (!token) return;
+    let cancelled = false;
+    fetch(`/api/auth/reset-password?token=${encodeURIComponent(token)}`, { cache: "no-store" })
+      .then(r => r.ok ? r.json() : { valid: true })
+      .then(d => { if (!cancelled && d?.valid === false) setTokenDead(true); })
+      .catch(() => {});
+    return () => { cancelled = true; };
+  }, [token]);
 
   // Mirrors lib/passwordPolicy.ts — 10+ chars and at least 3 character classes.
   const strength = useMemo(() => {
@@ -56,13 +69,19 @@ function ResetPasswordForm() {
     setLoading(false);
   }
 
-  if (!token) {
+  if (!token || tokenDead) {
     return (
-      <main style={{ minHeight:"100vh", background:"linear-gradient(160deg,#080c1e,#0c0f2e)", display:"flex", alignItems:"center", justifyContent:"center", fontFamily:"'DM Sans',system-ui,sans-serif" }}>
-        <div style={{ textAlign:"center", color:"white" }}>
+      <main style={{ minHeight:"100vh", background:"linear-gradient(160deg,#080c1e,#0c0f2e)", display:"flex", alignItems:"center", justifyContent:"center", padding:24, fontFamily:"'DM Sans',system-ui,sans-serif" }}>
+        <div style={{ textAlign:"center", color:"white", maxWidth:360 }}>
           <div style={{ fontSize:48, marginBottom:16 }}>⚠️</div>
-          <h1 style={{ fontSize:20, marginBottom:10 }}>Invalid reset link</h1>
-          <Link href="/auth/forgot-password" style={{ color:"#818cf8", fontWeight:600, textDecoration:"none" }}>Request a new one →</Link>
+          <h1 style={{ fontSize:20, marginBottom:10 }}>This reset link is no longer valid</h1>
+          {tokenDead && (
+            <p style={{ fontSize:13, color:"rgba(255,255,255,.45)", lineHeight:1.7, marginBottom:20 }}>
+              Only the newest reset email works. If you requested more than one,
+              open the most recent one — or get a fresh link below.
+            </p>
+          )}
+          <Link href="/auth/forgot-password" style={{ display:"inline-block", padding:"12px 22px", borderRadius:11, background:"linear-gradient(135deg,#4f46e5,#7c3aed)", color:"white", fontWeight:700, fontSize:14, textDecoration:"none" }}>Request a new link →</Link>
         </div>
       </main>
     );
@@ -100,6 +119,14 @@ function ResetPasswordForm() {
               {error && (
                 <div style={{ marginBottom:16, padding:"10px 14px", borderRadius:10, background:"rgba(248,113,113,.1)", border:"1px solid rgba(248,113,113,.25)", color:"#f87171", fontSize:13 }}>
                   {error}
+                  {/* A dead link cannot be retyped into working — the only way
+                      forward is a fresh email, so say so instead of leaving the
+                      user pressing the same button. */}
+                  {/token/i.test(error) && (
+                    <div style={{ marginTop:8 }}>
+                      <Link href="/auth/forgot-password" style={{ color:"#a5b4fc", fontWeight:700, textDecoration:"none" }}>Request a new link →</Link>
+                    </div>
+                  )}
                 </div>
               )}
 
