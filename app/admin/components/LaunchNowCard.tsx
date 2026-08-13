@@ -204,8 +204,10 @@ export default function LaunchNowCard() {
           </div>
         </div>
 
-        {/* One button, as asked: nothing here but Launch Now until it is live. */}
-        {!status.live && (
+        {/* Before launch this is the only control, as asked. Afterwards there
+            has to be a way back, or a test launch can only be undone from the
+            database. */}
+        {!status.live ? (
           <button
             type="button"
             onClick={() => setConfirming("launch")}
@@ -217,6 +219,24 @@ export default function LaunchNowCard() {
             }}
           >
             🚀 Launch Now
+          </button>
+        ) : status.forcedByEnv ? (
+          // Held open by NEXT_PUBLIC_SIGNUPS_OPEN — no button can close that.
+          <span style={{ fontSize: 12, color: "rgba(148,163,184,.75)", maxWidth: 210, textAlign: "right" }}>
+            Forced open by environment variable
+          </span>
+        ) : (
+          <button
+            type="button"
+            onClick={() => setConfirming("offline")}
+            style={{
+              padding: "9px 16px", borderRadius: 10, cursor: "pointer",
+              background: "rgba(255,255,255,.05)", border: "1px solid rgba(255,255,255,.14)",
+              color: "rgba(226,232,240,.75)", fontSize: 12.5, fontWeight: 600, fontFamily: "inherit",
+              whiteSpace: "nowrap",
+            }}
+          >
+            Close signups
           </button>
         )}
       </div>
