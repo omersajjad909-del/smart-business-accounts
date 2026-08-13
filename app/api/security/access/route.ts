@@ -4,6 +4,7 @@ import { apiHasPermission } from "@/lib/apiPermission";
 import { resolveCompanyId } from "@/lib/tenant";
 import { PERMISSIONS } from "@/lib/permissions";
 import { listCompanyApiKeys } from "@/lib/apiKeys";
+import { getSecurityPolicy, setSecurityPolicy } from "@/lib/securityPolicy";
 
 function safeParse(details: string | null) {
   if (!details) return null;
