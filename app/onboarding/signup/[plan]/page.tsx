@@ -11,6 +11,7 @@ import { BUSINESS_TYPES, type BusinessType } from "@/lib/businessModules";
 import { clearCurrentUser, getCurrentUser } from "@/lib/auth";
 import { clientRegionHeaders } from "@/lib/clientRegion";
 import PasswordChecklist from "@/components/PasswordChecklist";
+import { MIN_PASSWORD_LENGTH } from "@/lib/passwordPolicy";
 
 /* â”€â”€â”€ Country dial codes â”€â”€â”€ */
 /* ─── Phone number format groups per country ─── */
