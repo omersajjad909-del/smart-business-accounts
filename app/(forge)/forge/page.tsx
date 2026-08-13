@@ -129,7 +129,7 @@ function Hero() {
           We design and build intelligent, industry-specific business software for companies across South Asia and beyond.
         </p>
         <p style={{ fontSize: 15, color: "rgba(255,255,255,.25)", marginBottom: 48 }}>
-          Faisalabad, Pakistan &nbsp;{"\u00B7"}&nbsp; Est. 2025
+          Est. 2025
         </p>
 
         <div style={{ display: "flex", gap: 14, justifyContent: "center", flexWrap: "wrap" }}>

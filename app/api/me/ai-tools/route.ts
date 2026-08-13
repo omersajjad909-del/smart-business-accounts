@@ -1,10 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { resolveCompanyId } from "@/lib/tenant";
-import { AI_TOOL_IDS, DASHBOARD_FEATURE_IDS, createDefaultDashboardFeatureFlags, readSavedDashboardFeatureFlags, resolveDashboardFeaturesForCompany } from "@/lib/dashboardFeatureRegistry";
+import { AI_TOOL_IDS, DASHBOARD_FEATURE_IDS, createDefaultDashboardFeatureFlags, healSavedPlanFeatureFlags, readSavedDashboardFeatureFlags, resolveDashboardFeaturesForCompany } from "@/lib/dashboardFeatureRegistry";
 
-function normalizeDashboardFeatureFlags(saved: Record<string, string[]> = {}) {
+function normalizeDashboardFeatureFlags(savedFlags: Record<string, string[]> = {}) {
   const defaults = createDefaultDashboardFeatureFlags();
+  // Same heal as /api/me/bootstrap: the saved grid predates every AI tool, so
+  // read as a plain whitelist it hands back an empty AI tab bar.
+  const saved = healSavedPlanFeatureFlags(savedFlags);
   const clean = (list: string[] | undefined, fallback: string[]) =>
     Array.isArray(list) ? list.filter((id) => DASHBOARD_FEATURE_IDS.includes(id)) : fallback;
   const get = (k: string) => saved[k] || saved[k.toLowerCase()];
@@ -66,21 +69,25 @@ export async function GET(req: NextRequest) {
         : String(company.plan || "STARTER").toUpperCase();
 
     // Same resolution the sidebar uses — a per-business-type assignment from
-    // /admin/permissions wins over the plan-wide list from /admin/plans.
-    let businessPageFlags: Record<string, Record<string, string[]>> | null = null;
-    const activePageModulesLog =
-      isPkrCompany && pkrBusinessPlanModulesLog ? pkrBusinessPlanModulesLog : businessPlanModulesLog;
-    if (activePageModulesLog?.details) {
+    // Plans → Pages & Modules wins over the plan-wide list, and a PKR grid that
+    // says nothing about this business type falls through to the world one.
+    const readPageConfig = (details?: string | null) => {
+      if (!details) return null;
       try {
-        businessPageFlags = JSON.parse(activePageModulesLog.details)?.pageConfig || null;
-      } catch {}
-    }
+        return (JSON.parse(details)?.pageConfig as Record<string, Record<string, string[]>>) || null;
+      } catch {
+        return null;
+      }
+    };
+    const worldPageFlags = readPageConfig(businessPlanModulesLog?.details);
+    const pkrPageFlags = readPageConfig(pkrBusinessPlanModulesLog?.details);
 
     let resolved = resolveDashboardFeaturesForCompany({
       businessType: String(company.businessType || ""),
       planCode,
       planFlags: dashboardFlagsMap,
-      businessFlags: businessPageFlags,
+      businessFlags: isPkrCompany ? pkrPageFlags : worldPageFlags,
+      fallbackBusinessFlags: isPkrCompany ? worldPageFlags : null,
     });
 
     // Global page-visibility hides apply on top of whichever list won, exactly

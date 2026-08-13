@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getTokenFromRequest, verifyJwt } from "@/lib/auth";
 import { resolvePlanPermissions, PLAN_DEFAULT_PERMISSIONS } from "@/lib/planPermissions";
-import { DASHBOARD_FEATURE_IDS, createDefaultDashboardFeatureFlags, readSavedDashboardFeatureFlags, resolveDashboardFeaturesForCompany, healSavedFeatureList } from "@/lib/dashboardFeatureRegistry";
+import { DASHBOARD_FEATURE_IDS, createDefaultDashboardFeatureFlags, readSavedDashboardFeatureFlags, resolveDashboardFeaturesForCompany, healSavedFeatureList, healSavedPlanFeatureFlags } from "@/lib/dashboardFeatureRegistry";
 import { BUSINESS_PHASE_CONFIG } from "@/lib/businessModules";
 import { currencyByCountry } from "@/lib/currency";
 import { getCompanyAdminControlSettings } from "@/lib/companyAdminControl";
@@ -31,11 +31,13 @@ function normalizePlanPermissions(saved: Record<string, string[]> = {}) {
   return { STARTER: get("STARTER"), PRO: get("PRO"), ENTERPRISE: get("ENTERPRISE"), CUSTOM: get("CUSTOM") };
 }
 
-function normalizeDashboardFeatureFlags(saved: Record<string, string[]> = {}) {
+function normalizeDashboardFeatureFlags(savedFlags: Record<string, string[]> = {}) {
   const defaults = createDefaultDashboardFeatureFlags();
-  // healSavedFeatureList adds the core pages back to a list saved before they
-  // existed. Without it every page a plan config predates is treated as "not in
-  // your plan", which locks the whole dashboard.
+  // healSavedPlanFeatureFlags restores every page the saved grid predates — it
+  // is a whitelist, so a page added to the registry after the last save reads
+  // as "not in your plan" and disappears from the product. healSavedFeatureList
+  // then covers the core pages for each individual list.
+  const saved = healSavedPlanFeatureFlags(savedFlags);
   const clean = (
     list: string[] | undefined,
     fallback: string[],
@@ -252,24 +254,33 @@ export async function GET(req: NextRequest) {
       activeModules: company.activeModules,
     });
 
-    // Page access: a per-business-type assignment made in /admin/permissions
-    // wins over the plan-wide list from /admin/plans. Before this, the two
-    // screens disagreed — /admin/permissions could not reach most pages at all.
-    let businessPageFlags: Record<string, Record<string, string[]>> | null = null;
-    const activePageModulesLog =
-      isPkrCompany && pkrBusinessPlanModulesLog ? pkrBusinessPlanModulesLog : businessPlanModulesLog;
-    if (activePageModulesLog?.details) {
+    // Page access: a per-business-type assignment made in Plans → Pages &
+    // Modules wins over the plan-wide list. Before this, the two screens
+    // disagreed — /admin/permissions could not reach most pages at all.
+    const readPageConfig = (details?: string | null) => {
+      if (!details) return null;
       try {
-        const parsed = JSON.parse(activePageModulesLog.details);
-        businessPageFlags = parsed?.pageConfig || null;
-      } catch {}
-    }
+        return (JSON.parse(details)?.pageConfig as Record<string, Record<string, string[]>>) || null;
+      } catch {
+        return null;
+      }
+    };
+    const worldPageFlags = readPageConfig(businessPlanModulesLog?.details);
+    const pkrPageFlags = readPageConfig(pkrBusinessPlanModulesLog?.details);
+    // PKR keeps its own grid, but only where it has actually been filled in.
+    // A business type the PKR grid says nothing about falls through to the
+    // world grid instead of losing its page gate altogether — that hole is why
+    // pages switched off for a business type still showed up in the demo, whose
+    // sandboxes are all PK/PKR companies.
+    const businessPageFlags = isPkrCompany ? pkrPageFlags : worldPageFlags;
+    const fallbackPageFlags = isPkrCompany ? worldPageFlags : null;
 
     let dashboardFeatures = resolveDashboardFeaturesForCompany({
       businessType: String(company.businessType || ""),
       planCode,
       planFlags: dashboardFlagsMap,
       businessFlags: businessPageFlags,
+      fallbackBusinessFlags: fallbackPageFlags,
     });
 
     // Global page-visibility hides apply on top of whichever list won.

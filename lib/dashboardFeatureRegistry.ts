@@ -2701,6 +2701,51 @@ export function readSavedDashboardFeatureFlags(
 }
 
 /**
+ * Restores the pages a saved plan-wide grid predates.
+ *
+ * The grid inside PLAN_CONFIG is a whitelist, so a page it does not name is
+ * indistinguishable from a page an admin unticked — except that the screen
+ * which edited it is gone (its "Pages" tab became the per-business-type grid),
+ * and the saved lists have not changed since April 2026. Everything added to
+ * the registry since then — all 24 AI tools, costing sheets, the retail and
+ * printing sub-pages, the 119 core pages — is missing from it, so reading it
+ * as a plain whitelist switches off a third of the product for any company
+ * whose business type has no entry in the live grid.
+ *
+ * The union of the four plan lists is what the config actually knows about.
+ * Ids outside that vocabulary never had a switch, so they fall back to the
+ * defaults for each plan; ids inside it keep whatever the admin assigned. This
+ * generalises `healSavedFeatureList`, which did the same for the core pages
+ * only.
+ */
+export function healSavedPlanFeatureFlags(
+  saved: Record<string, string[]>,
+): Record<string, string[]> {
+  const known = new Set<string>();
+  for (const list of Object.values(saved || {})) {
+    if (Array.isArray(list)) for (const id of list) known.add(id);
+  }
+  // Nothing saved at all: the caller's own defaults are the right answer.
+  if (known.size === 0) return saved;
+
+  const unseen = DASHBOARD_FEATURE_IDS.filter((id) => !known.has(id));
+  if (unseen.length === 0) return saved;
+
+  const defaults = createDefaultDashboardFeatureFlags();
+  const healed: Record<string, string[]> = {};
+  for (const [plan, list] of Object.entries(saved)) {
+    const upper = String(plan).toUpperCase();
+    const planKey = (upper === "PRO" || upper === "ENTERPRISE" || upper === "CUSTOM" ? upper : "STARTER") as
+      DashboardFeaturePlanCode;
+    const byDefault = new Set(defaults[planKey] || []);
+    healed[plan] = Array.from(
+      new Set([...(Array.isArray(list) ? list : []), ...unseen.filter((id) => byDefault.has(id))]),
+    );
+  }
+  return healed;
+}
+
+/**
  * Resolves the page list for one company: a per-business-type override set in
  * `/admin/permissions` wins, otherwise the plan-wide list from `/admin/plans`.
  *
@@ -2712,11 +2757,20 @@ export function resolveDashboardFeaturesForCompany(opts: {
   planCode: string;
   planFlags: Record<string, string[]>;
   businessFlags?: Record<string, Record<string, string[]>> | null;
+  /**
+   * The other audience's grid, consulted only when `businessFlags` says nothing
+   * about this business type. A PKR company reads the PKR grid, but "no PKR
+   * entry" used to mean no page gate at all — so a business type switched off
+   * page by page in the world grid still showed every page to Pakistani
+   * companies and to demo sandboxes, which are built as PK/PKR.
+   */
+  fallbackBusinessFlags?: Record<string, Record<string, string[]>> | null;
 }): string[] | null {
   const plan = String(opts.planCode || "STARTER").toUpperCase();
   const planKey = (plan === "PRO" || plan === "ENTERPRISE" || plan === "CUSTOM" ? plan : "STARTER") as
     "STARTER" | "PRO" | "ENTERPRISE" | "CUSTOM";
-  const byBusiness = opts.businessFlags?.[opts.businessType];
+  const byBusiness =
+    opts.businessFlags?.[opts.businessType] ?? opts.fallbackBusinessFlags?.[opts.businessType];
   const scoped = byBusiness?.[plan] ?? byBusiness?.[plan.toLowerCase()];
   if (Array.isArray(scoped)) {
     // Constrain to pages the business type actually owns, so a stale saved id

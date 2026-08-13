@@ -325,7 +325,7 @@ export default function Footer() {
               {[
                 { Icon: Mail,  text: "hello@finovaos.app", color: "#818cf8", href: "mailto:hello@finovaos.app" },
                 { Icon: Phone, text: "+92 317-8653693", color: "#34d399", href: "https://wa.me/923047653693" },
-                { Icon: Globe, text: "Lasani Town, Sargodha Road, Faisalabad", color: "#fbbf24", href: "/contact" },
+
               ].map(({ Icon, text, color, href }) => (
                 <a key={text} href={href} className="ft-contact-item" style={{ display: "flex", alignItems: "center", gap: 10, textDecoration: "none" }}>
                   <div className="ft-contact-icon" style={{
