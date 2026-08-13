@@ -5,6 +5,7 @@ import Link from "next/link";
 import { formatFromUSD } from "@/lib/currency-client";
 import { STANDALONE_MODULE_IDS } from "@/lib/customPlanPricing";
 import { SIGNUPS_OPEN } from "@/lib/signupGate";
+import { useSignupsOpen } from "@/hooks/useSignupsOpen";
 import { clientRegionHeaders } from "@/lib/clientRegion";
 
 /**
@@ -29,7 +30,11 @@ function BuyCta({
   disabled?: boolean;
   children: React.ReactNode;
 }) {
-  if (!SIGNUPS_OPEN) {
+  // Runtime, not build time: pressing Launch Now in the admin panel turns these
+  // into real links without a redeploy.
+  const signupsOpen = useSignupsOpen();
+
+  if (!signupsOpen) {
     return (
       <button
         type="button"
