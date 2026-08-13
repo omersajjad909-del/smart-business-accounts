@@ -481,6 +481,15 @@ export default function AccountSettingsPage() {
                 </button>
               </div>
             </form>
+
+            <div style={{ marginTop: 16, paddingTop: 16, borderTop: "1px solid rgba(255,255,255,.08)" }}>
+              <p style={{ fontSize: 12, color: "rgba(255,255,255,.5)", marginBottom: 10 }}>
+                Need more detailed password requirements and real-time validation?
+              </p>
+              <a href="/dashboard/change-password" style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "9px 12px", borderRadius: 10, textDecoration: "none", color: "#c7d2fe", background: "rgba(99,102,241,.12)", border: "1px solid rgba(99,102,241,.2)", fontSize: 12, fontWeight: 700, transition: "all .2s" }}>
+                Go to Detailed Change Password →
+              </a>
+            </div>
           </div>
 
           {/* Company Access */}
