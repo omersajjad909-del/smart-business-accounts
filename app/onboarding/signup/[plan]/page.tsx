@@ -10,6 +10,7 @@ import { COUNTRIES, sortCountries } from "@/lib/countries";
 import { BUSINESS_TYPES, type BusinessType } from "@/lib/businessModules";
 import { clearCurrentUser, getCurrentUser } from "@/lib/auth";
 import { clientRegionHeaders } from "@/lib/clientRegion";
+import PasswordChecklist from "@/components/PasswordChecklist";
 
 /* â”€â”€â”€ Country dial codes â”€â”€â”€ */
 /* ─── Phone number format groups per country ─── */
@@ -509,7 +510,9 @@ export default function SignupByPlanPage() {
   const passwordStrength = useMemo(() => {
     if (!password) return 0;
     let s = 0;
-    if (password.length >= 8) s++;
+    // 10, not 8 — the meter sat one notch above the checklist below it and
+    // called an 8-character password "Fair" while the policy rejects it.
+    if (password.length >= MIN_PASSWORD_LENGTH) s++;
     if (/[A-Z]/.test(password)) s++;
     if (/[0-9]/.test(password)) s++;
     if (/[^A-Za-z0-9]/.test(password)) s++;
@@ -1174,6 +1177,14 @@ export default function SignupByPlanPage() {
                       </div>
                     </div>
                   )}
+
+                  {/* The bar says how strong; this says what is still missing.
+                      Email and name are passed in because the policy rejects a
+                      password that contains either. */}
+                  <PasswordChecklist
+                    password={password}
+                    context={[email, `${firstName} ${lastName}`.trim()]}
+                  />
                 </div>
 
                 {/* Checkboxes */}
