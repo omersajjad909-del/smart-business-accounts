@@ -110,11 +110,12 @@ const DEFAULT_CUSTOM_PLAN = {
     { id: "hr_payroll",          name: "HR & Payroll",            price: 20, desc: "Employees, attendance, payroll, advance salary",         icon: "👨‍💼", enabled: true,  category: "core", standalone: true },
     { id: "trading",             name: "Trading Desk",            price: 18, desc: "Order desk, procurement, dispatch, outstandings",        icon: "🔄", enabled: true,  category: "core", standalone: true },
     { id: "bank_reconciliation", name: "Bank Reconciliation",     price: 10, desc: "Statement import, discrepancy flagging, closing",        icon: "🏦", enabled: true,  category: "finance", standalone: true },
-    { id: "tax_filing",          name: "Tax & Compliance",        price: 10, desc: "Tax summary, GST/VAT reports, compliance docs",          icon: "🧾", enabled: true,  category: "finance", standalone: false },
-    { id: "reports",             name: "Advanced Reports",        price: 8,  desc: "Cash flow, profitability, annual statements",            icon: "📈", enabled: true,  category: "operations", standalone: false },
-    { id: "multi_branch",        name: "Multi-Branch",            price: 15, desc: "Branches, consolidated reports, branch access",          icon: "🏢", enabled: true,  category: "operations", standalone: false },
-    { id: "whatsapp",            name: "WhatsApp & SMS",          price: 8,  desc: "Payment reminders, invoices via WhatsApp and SMS",       icon: "💬", enabled: true,  category: "integrations", standalone: false },
-    { id: "api_access",          name: "API Access",              price: 20, desc: "REST API, webhooks, third-party integrations",           icon: "⚡", enabled: true,  category: "integrations", standalone: false },
+    // The five layered modules (Tax & Compliance, Advanced Reports,
+    // Multi-Branch, WhatsApp & SMS, API Access) were removed from the menu —
+    // each needs a base module underneath to mean anything, and nothing stopped
+    // a buyer picking one on its own. Keep in step with CUSTOM_PLAN_MODULES in
+    // lib/customPlanPricing.ts, which is what actually prices and validates a
+    // selection. Existing subscriptions are untouched.
   ],
 };
 
