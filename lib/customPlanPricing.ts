@@ -21,13 +21,18 @@ export const CUSTOM_PLAN_YEARLY_DISCOUNT = 0.2; // 20%
 // international amount: all six modules came to PKR 25,020 against an
 // Enterprise plan of PKR 19,999, and Accounting alone cost more than a whole
 // Starter subscription. Nobody would have bought it.
+// Four prices per module, the same shape the three plans carry: a monthly and
+// an annual-per-month figure, in each of the two currencies. All four are set
+// in Admin → Plans (USD on Module Pricing, PKR on PKR Pricing) — the annual
+// column used to be a fixed 20% off, which meant the one lever the plans give
+// an admin was missing here.
 export const CUSTOM_PLAN_MODULES = [
-  { id: "accounting", name: "Accounting & Invoicing", price: 15, pricePkr: 2999 },
-  { id: "inventory", name: "Inventory Management", price: 12, pricePkr: 2499 },
-  { id: "crm", name: "CRM", price: 15, pricePkr: 2999 },
-  { id: "hr_payroll", name: "HR & Payroll", price: 20, pricePkr: 3999 },
-  { id: "trading", name: "Trading Desk", price: 18, pricePkr: 3499 },
-  { id: "bank_reconciliation", name: "Bank Reconciliation", price: 10, pricePkr: 1999 },
+  { id: "accounting", name: "Accounting & Invoicing", price: 15, priceYearly: 12, pricePkr: 2999, pricePkrYearly: 2399 },
+  { id: "inventory", name: "Inventory Management", price: 12, priceYearly: 10, pricePkr: 2499, pricePkrYearly: 1999 },
+  { id: "crm", name: "CRM", price: 15, priceYearly: 12, pricePkr: 2999, pricePkrYearly: 2399 },
+  { id: "hr_payroll", name: "HR & Payroll", price: 20, priceYearly: 16, pricePkr: 3999, pricePkrYearly: 3199 },
+  { id: "trading", name: "Trading Desk", price: 18, priceYearly: 14, pricePkr: 3499, pricePkrYearly: 2799 },
+  { id: "bank_reconciliation", name: "Bank Reconciliation", price: 10, priceYearly: 8, pricePkr: 1999, pricePkrYearly: 1599 },
 ] as const;
 
 // Modules that are a usable product on their own — a company can subscribe to
@@ -71,10 +76,32 @@ export function getCustomModulesMonthlyTotalUsd(moduleIds: string[]): number {
   return moduleIds.reduce((sum, id) => sum + (CUSTOM_MODULE_MAP.get(id)?.price || 0), 0);
 }
 
+type ModuleRates = { price: number; priceYearly?: number; pricePkr?: number; pricePkrYearly?: number };
+
+/** One module's rate for a currency and cycle, or null when it is not set. */
+export function getModuleRate(
+  id: string,
+  currency: "USD" | "PKR",
+  billingCycle: "MONTHLY" | "YEARLY",
+): number | null {
+  const mod = CUSTOM_MODULE_MAP.get(id) as ModuleRates | undefined;
+  if (!mod) return null;
+  if (currency === "PKR") {
+    const monthly = mod.pricePkr;
+    if (monthly == null) return null;
+    if (billingCycle === "MONTHLY") return monthly;
+    // No explicit annual rate falls back to the standard yearly discount, the
+    // way it behaved before the column existed.
+    return mod.pricePkrYearly ?? Math.round(monthly * (1 - CUSTOM_PLAN_YEARLY_DISCOUNT));
+  }
+  if (billingCycle === "MONTHLY") return mod.price;
+  return mod.priceYearly ?? Math.round(mod.price * (1 - CUSTOM_PLAN_YEARLY_DISCOUNT));
+}
+
 /** The Pakistan list price for one module, or null if it has none. */
 export function getModulePricePkr(id: string): number | null {
-  const mod = CUSTOM_MODULE_MAP.get(id);
-  return mod && "pricePkr" in mod ? (mod as { pricePkr: number }).pricePkr : null;
+  const mod = CUSTOM_MODULE_MAP.get(id) as ModuleRates | undefined;
+  return mod?.pricePkr ?? null;
 }
 
 /**

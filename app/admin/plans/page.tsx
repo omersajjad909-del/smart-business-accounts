@@ -155,9 +155,15 @@ export default function AdminPlansPage() {
   const [modulePrices, setModulePrices] = useState<Record<string, number>>(
     Object.fromEntries(MODULES.map(m => [m.id, 0]))
   );
+  const [modulePricesYearly, setModulePricesYearly] = useState<Record<string, number>>(
+    Object.fromEntries(MODULES.map(m => [m.id, 0]))
+  );
   // Pakistan list price per module. Kept separate from the USD figure on
   // purpose: converting one into the other is exactly the bug this replaced.
   const [modulePricesPkr, setModulePricesPkr] = useState<Record<string, number>>(
+    Object.fromEntries(MODULES.map(m => [m.id, 0]))
+  );
+  const [modulePricesPkrYearly, setModulePricesPkrYearly] = useState<Record<string, number>>(
     Object.fromEntries(MODULES.map(m => [m.id, 0]))
   );
   const [loadingMods, setLoadingMods] = useState(false);
@@ -313,7 +319,8 @@ export default function AdminPlansPage() {
      From plan-config, which is what /api/public/pricing serves to customers.
      The old ModulePrice table this read from is not wired to anything. */
   useEffect(() => {
-    if (tab !== "modules") return;
+    // PKR module rates live on the PKR Pricing tab, so both tabs load this.
+    if (tab !== "modules" && tab !== "pkr-pricing") return;
     (async () => {
       setLoadingMods(true);
       try {
@@ -322,14 +329,20 @@ export default function AdminPlansPage() {
           const d = await r.json();
           const mods: any[] = Array.isArray(d?.customPlan?.modules) ? d.customPlan.modules : [];
           const usd: Record<string, number> = {};
+          const usdY: Record<string, number> = {};
           const pkr: Record<string, number> = {};
+          const pkrY: Record<string, number> = {};
           for (const m of mods) {
             if (!m?.id) continue;
-            usd[m.id] = Number(m.price) || 0;
-            pkr[m.id] = Number(m.pricePkr) || 0;
+            usd[m.id]  = Number(m.price) || 0;
+            usdY[m.id] = Number(m.priceYearly) || 0;
+            pkr[m.id]  = Number(m.pricePkr) || 0;
+            pkrY[m.id] = Number(m.pricePkrYearly) || 0;
           }
           setModulePrices(prev => ({ ...prev, ...usd }));
+          setModulePricesYearly(prev => ({ ...prev, ...usdY }));
           setModulePricesPkr(prev => ({ ...prev, ...pkr }));
+          setModulePricesPkrYearly(prev => ({ ...prev, ...pkrY }));
         }
       } finally { setLoadingMods(false); }
     })();
@@ -383,8 +396,10 @@ export default function AdminPlansPage() {
       const modules = MODULES.map(m => ({
         ...(byId.get(m.id) || { id: m.id, name: m.label, enabled: true, standalone: true }),
         id: m.id,
-        price: Number(modulePrices[m.id]) || 0,
-        pricePkr: Number(modulePricesPkr[m.id]) || 0,
+        price:          Number(modulePrices[m.id])          || 0,
+        priceYearly:    Number(modulePricesYearly[m.id])    || 0,
+        pricePkr:       Number(modulePricesPkr[m.id])       || 0,
+        pricePkrYearly: Number(modulePricesPkrYearly[m.id]) || 0,
       }));
 
       const r = await fetch("/api/admin/plan-config", {
