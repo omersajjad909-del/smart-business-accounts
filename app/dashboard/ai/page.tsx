@@ -1482,7 +1482,13 @@ export default function AICommandCenter() {
   }
 
   return (
-    <div style={{ fontFamily: "'Outfit','DM Sans',sans-serif", color: "white", display: "flex", flexDirection: "column", height: "calc(100vh - 56px)", overflow: "hidden", margin: "-16px -12px", width: "calc(100% + 24px)", maxWidth: "none" }}>
+    // Desktop is an app shell: a fixed-height, non-scrolling box whose panes
+    // scroll internally. On a phone the dashboard layout scrolls the page
+    // itself (its content pane is overflow:visible), so pinning this page to
+    // one viewport height and clipping it left every tab's lower half
+    // unreachable — nothing below the fold could be scrolled to. Mobile grows
+    // with its content and lets the page do the scrolling.
+    <div style={{ fontFamily: "'Outfit','DM Sans',sans-serif", color: "white", display: "flex", flexDirection: "column", height: isMobile ? "auto" : "calc(100vh - 56px)", minHeight: isMobile ? "calc(100vh - 160px)" : undefined, overflow: isMobile ? "visible" : "hidden", margin: "-16px -12px", width: "calc(100% + 24px)", maxWidth: "none" }}>
       <style>{`
         @keyframes spin { to { transform: rotate(360deg) } }
         @keyframes fadeUp { from { opacity:0; transform:translateY(10px) } to { opacity:1; transform:translateY(0) } }
