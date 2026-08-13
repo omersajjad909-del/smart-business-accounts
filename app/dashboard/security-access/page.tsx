@@ -254,13 +254,38 @@ export default function SecurityAccessPage() {
         </div>
         <div className="rounded-2xl border border-[var(--border)] bg-[var(--panel-bg)] p-5">
           <div className="text-xs uppercase tracking-[0.18em] text-[var(--text-muted)]">2FA enforcement</div>
-          <div className="mt-2">
+          <div className="mt-2 flex flex-wrap items-center gap-3">
             <span className={`rounded-full border px-3 py-1 text-xs font-semibold ${statusPill(data.overview.twoFactorEnforced)}`}>
               {data.overview.twoFactorEnforced ? "Enforced" : "Not configured"}
             </span>
+            {isAdmin && (
+              <button
+                onClick={() => togglePolicy(!data.overview.twoFactorEnforced)}
+                disabled={policySaving}
+                className="rounded-lg border border-[var(--border)] px-3 py-1 text-xs font-semibold text-[var(--text-primary)] disabled:opacity-50">
+                {policySaving ? "Saving…" : data.overview.twoFactorEnforced ? "Turn off" : "Require for everyone"}
+              </button>
+            )}
           </div>
+          {typeof data.overview.totalUsers === "number" && (
+            <div className="mt-2 text-xs text-[var(--text-muted)]">
+              {data.overview.twoFactorEnrolled ?? 0} of {data.overview.totalUsers} users enrolled
+            </div>
+          )}
+          {policyMsg && <div className="mt-2 text-xs text-[var(--accent)]">{policyMsg}</div>}
         </div>
       </div>
+
+      {/* Company requires 2FA and this user has not enrolled — the dashboard
+          sends them here until they do. */}
+      {enrollRequired && !twoFAEnabled && (
+        <div className="mb-6 rounded-2xl border border-amber-500/30 bg-amber-500/10 p-5">
+          <div className="text-sm font-semibold text-amber-300">Two-factor authentication is required</div>
+          <div className="mt-1 text-xs text-amber-200/80">
+            Your administrator requires 2FA on every account. Set it up below to continue using the dashboard.
+          </div>
+        </div>
+      )}
 
       <div className="grid gap-6 lg:grid-cols-[1.1fr_.9fr]">
         <div className="space-y-6">

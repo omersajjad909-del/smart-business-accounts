@@ -69,6 +69,80 @@ const CARD_BRANDS: Record<string, { label: string; grad: string }> = {
   unknown:    { label: "CARD",       grad: "linear-gradient(135deg,#312e81,#4f46e5)" },
 };
 
+function normalizeCardBrand(brand: string) {
+  const key = String(brand || "").toLowerCase().replace(/\s+/g, "");
+  if (key === "mastercard" || key === "master") return "mastercard";
+  if (key === "americanexpress" || key === "amex") return "amex";
+  if (key === "discover") return "discover";
+  if (key === "visa") return "visa";
+  return "unknown";
+}
+
+function cardBrandLabel(brand: string) {
+  const key = normalizeCardBrand(brand);
+  if (key === "mastercard") return "Mastercard";
+  if (key === "amex") return "American Express";
+  if (key === "discover") return "Discover";
+  if (key === "visa") return "Visa";
+  return "Card";
+}
+
+function CardBrandMark({ brand, compact = false }: { brand: string; compact?: boolean }) {
+  const key = normalizeCardBrand(brand);
+  const boxStyle = {
+    width: compact ? 36 : 48,
+    height: compact ? 24 : 32,
+    borderRadius: 7,
+    background: "#fff",
+    border: "1px solid rgba(255,255,255,.12)",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    position: "relative" as const,
+    flexShrink: 0,
+    boxShadow: "0 6px 18px rgba(0,0,0,.18)",
+  };
+
+  if (key === "mastercard") {
+    return (
+      <div style={boxStyle} aria-label="Mastercard">
+        <span style={{ width: compact ? 12 : 15, height: compact ? 12 : 15, borderRadius: "50%", background: "#eb001b", transform: "translateX(3px)", display: "block" }} />
+        <span style={{ width: compact ? 12 : 15, height: compact ? 12 : 15, borderRadius: "50%", background: "#f79e1b", transform: "translateX(-3px)", display: "block", mixBlendMode: "multiply" as any }} />
+      </div>
+    );
+  }
+
+  if (key === "visa") {
+    return (
+      <div style={boxStyle} aria-label="Visa">
+        <span style={{ color: "#1a1f71", fontSize: compact ? 10 : 13, fontWeight: 900, letterSpacing: 0, fontStyle: "italic" }}>VISA</span>
+      </div>
+    );
+  }
+
+  if (key === "amex") {
+    return (
+      <div style={{ ...boxStyle, background: "#2e77bc" }} aria-label="American Express">
+        <span style={{ color: "#fff", fontSize: compact ? 8 : 10, fontWeight: 900, letterSpacing: 0 }}>AMEX</span>
+      </div>
+    );
+  }
+
+  if (key === "discover") {
+    return (
+      <div style={boxStyle} aria-label="Discover">
+        <span style={{ color: "#111827", fontSize: compact ? 7 : 9, fontWeight: 900, letterSpacing: 0 }}>DISCOVER</span>
+      </div>
+    );
+  }
+
+  return (
+    <div style={{ ...boxStyle, background: "#111827" }} aria-label="Card">
+      <span style={{ color: "#fff", fontSize: compact ? 8 : 10, fontWeight: 900, letterSpacing: 0 }}>CARD</span>
+    </div>
+  );
+}
+
 const DIRECT_ACCEPTED_METHODS = ["Visa", "Mastercard", "American Express", "Discover"];
 const LEMON_ACCEPTED_METHODS = ["Visa", "Mastercard", "American Express", "Discover"];
 
@@ -799,7 +873,7 @@ function BillingPage() {
                 </button>
               </div>
             ) : paymentMethods.slice(0,2).map(pm => {
-              const cfg = CARD_BRANDS[pm.brand] ?? CARD_BRANDS.unknown;
+              const brandLabel = cardBrandLabel(pm.brand);
               return (
                 <div key={pm.id} className="row-hover" style={{ padding: isMobile ? "12px 11px" : "14px 24px", display:"flex", alignItems:"center", gap:16, borderBottom:"1px solid rgba(255,255,255,.04)" }}>
                   <div style={{ width:52, height:34, borderRadius:8, background:cfg.grad, display:"flex", alignItems:"center", justifyContent:"center", fontSize:8, fontWeight:900, color:"rgba(255,255,255,.5)", letterSpacing:1, flexShrink:0 }}>{cfg.label}</div>
