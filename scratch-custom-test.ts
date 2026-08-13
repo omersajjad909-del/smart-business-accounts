@@ -33,19 +33,25 @@ const PICK = ["accounting", "inventory"]; // Accounting + Inventory
     "= Rs", (usdM * 278).toLocaleString());
 
   console.log("\n=== 3. Real Lemon Squeezy checkout (no charge) ===");
-  const co = await createLemonCheckout({
-    planCode: "CUSTOM",
-    billingCycle: "MONTHLY",
-    successUrl: "https://www.usefinova.app/dashboard/billing?upgrade=success",
-    cancelUrl: "https://www.usefinova.app/dashboard/billing?cancel=1",
-    companyId: "diagnostic-test",
-    userId: null,
-    email: null,
-    name: "Diagnostic",
-    customPriceUsd: usdM,
-    displayCurrency: "USD",
-    displayCountry: "US",
-  });
-  console.log("  checkout URL:", co.checkoutUrl);
+  for (const [label, userId] of [["with user id", "diag-user-1"], ["empty user id (guest)", null]] as const) {
+    try {
+      const co = await createLemonCheckout({
+        planCode: "CUSTOM",
+        billingCycle: "MONTHLY",
+        successUrl: "https://www.usefinova.app/dashboard/billing?upgrade=success",
+        cancelUrl: "https://www.usefinova.app/dashboard/billing?cancel=1",
+        companyId: "diagnostic-test",
+        userId,
+        email: null,
+        name: "Diagnostic",
+        customPriceUsd: usdM,
+        displayCurrency: "USD",
+        displayCountry: "US",
+      });
+      console.log(`  ✅ ${label}: ${co.checkoutUrl}`);
+    } catch (e: any) {
+      console.log(`  ❌ ${label}: ${e?.message || e}`);
+    }
+  }
   process.exit(0);
 })().catch((e) => { console.error("ERR", e?.message || e); process.exit(1); });
