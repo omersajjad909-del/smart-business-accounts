@@ -510,7 +510,7 @@ export default function AdminPlansPage() {
           </button>
         )}
         {tab === "modules" && (
-          <button onClick={saveAllModulePrices} disabled={savingMod === "all"}
+          <button onClick={() => saveAllModulePrices()} disabled={savingMod === "all"}
             style={{ padding: "10px 22px", borderRadius: 12, background: savingMod === "all" ? "#4338ca" : "linear-gradient(135deg,#4f46e5,#7c3aed)", border: "none", color: "white", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>
             {savingMod === "all" ? "Saving…" : "Save All Module Prices"}
           </button>
