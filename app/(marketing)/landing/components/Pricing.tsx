@@ -164,6 +164,8 @@ function PlanCard({ plan, billing, prices, pkrPrices, vis, i, currency, planLimi
 }) {
   const [hov, setHov] = useState(false);
   const isCustom = plan.key === "custom";
+  // Runtime gate, so Launch Now opens this without a redeploy.
+  const signupsOpen = useSignupsOpen();
   // Pakistan has its own price list set in admin — Rs 3,999 rather than the
   // FX conversion of $49. This section used to convert USD for everyone, so a
   // Pakistani visitor saw Rs 13,622 here and Rs 3,999 on /pricing: two prices
@@ -270,7 +272,7 @@ function PlanCard({ plan, billing, prices, pkrPrices, vis, i, currency, planLimi
       {/* CTA */}
       {/* This is the landing page's own pricing block — separate from the
           /pricing page, so its CTAs needed the gate too. */}
-      <Link href={signupHref(isCustom ? "/onboarding/choose-plan?plan=custom" : `/onboarding/signup/${plan.slug}`)} style={{
+      <Link href={signupHrefFor(signupsOpen, isCustom ? "/onboarding/choose-plan?plan=custom" : `/onboarding/signup/${plan.slug}`)} style={{
         display:"flex", alignItems:"center", justifyContent:"center", gap:8,
         padding:"13px 20px", borderRadius:12, marginBottom:24,
         background: plan.featured
