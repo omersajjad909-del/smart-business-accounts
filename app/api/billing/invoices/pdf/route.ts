@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { generateInvoicePdf } from "@/lib/invoicePdf";
-import { buildHostedBillingInvoice, verifyBillingInvoiceAccessToken } from "@/lib/billingInvoice";
-import { resolveCompanyId } from "@/lib/tenant";
 
 export const runtime = "nodejs";
 
@@ -14,78 +12,88 @@ const PLAN_PRICES: Record<string, number> = {
   CUSTOM: 0,
 };
 
-function fmtDate(date: Date): string {
-  return `${String(date.getDate()).padStart(2, "0")}-${String(date.getMonth() + 1).padStart(2, "0")}-${date.getFullYear()}`;
+async function resolveCompanyId(req: NextRequest): Promise<string | null> {
+  const companyId = req.headers.get("x-company-id");
+  if (companyId) return companyId;
+
+  const userId = req.headers.get("x-user-id");
+  if (!userId) return null;
+
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { defaultCompanyId: true },
+  });
+  return user?.defaultCompanyId || null;
 }
 
-function parsePaymentDetails(details: string | null) {
+function fmtDate(date: Date | string | null | undefined): string {
+  if (!date) return "";
+  const d = typeof date === "string" ? new Date(date) : date;
+  return `${String(d.getDate()).padStart(2, "0")}-${String(d.getMonth() + 1).padStart(2, "0")}-${d.getFullYear()}`;
+}
+
+export async function GET(req: NextRequest): Promise<Response> {
   try {
-    return details ? JSON.parse(details) : null;
-  } catch {
-    return null;
-  }
-}
+    const companyId = await resolveCompanyId(req);
+    if (!companyId) {
+      return NextResponse.json({ error: "Company required" }, { status: 400 });
+    }
 
-async function buildPaymentLogInvoice(companyId: string, invoiceId: string) {
-  if (!invoiceId.startsWith("pay_")) return null;
+    const url = new URL(req.url);
+    const invoiceId = url.searchParams.get("invoiceId");
+    if (!invoiceId) {
+      return NextResponse.json({ error: "invoiceId is required" }, { status: 400 });
+    }
 
-  const [company, subscription, logs] = await Promise.all([
-    prisma.company.findUnique({
-      where: { id: companyId },
-      select: { name: true, plan: true },
-    }),
-    prisma.subscription.findUnique({
-      where: { companyId },
-      select: { plan: true, billingCycle: true },
-    }),
-    prisma.activityLog.findMany({
-      where: { companyId, action: "PAYMENT_EVENT" },
-      orderBy: { createdAt: "desc" },
-      select: { id: true, createdAt: true, details: true },
-      take: 50,
-    }).catch(() => []),
-  ]);
+    if (invoiceId !== `sub_${companyId}`) {
+      return NextResponse.json({ error: "Invoice not found" }, { status: 404 });
+    }
 
-  if (!company) return null;
+    const [company, subscription] = await Promise.all([
+      prisma.company.findUnique({
+        where: { id: companyId },
+        select: {
+          // Company has no address/phone/email/billingCycle fields — selecting
+          // them threw a PrismaClientValidationError on every request, which
+          // this route's catch block silently turned into the generic
+          // "Failed to generate invoice PDF" error. billingCycle lives on
+          // Subscription (already queried below and used as the source).
+          name: true,
+          plan: true,
+          currentPeriodEnd: true,
+          subscriptionStatus: true,
+          createdAt: true,
+        },
+      }),
+      prisma.subscription.findUnique({
+        where: { companyId },
+        select: {
+          plan: true,
+          billingCycle: true,
+          pricePerMonth: true,
+          currentPeriodEnd: true,
+          provider: true,
+        },
+      }),
+    ]);
 
-  const invoiceSources: Array<{
-    log: (typeof logs)[number];
-    details: any;
-    key: string;
-  }> = [];
-  const seen = new Set<string>();
+    if (!company) {
+      return NextResponse.json({ error: "Company not found" }, { status: 404 });
+    }
 
-  for (const log of logs) {
-    const details = parsePaymentDetails(log.details);
-    const minorUnits = Number(details?.amount ?? details?.amount_paid ?? 0);
-    if (!Number.isFinite(minorUnits) || minorUnits <= 0) continue;
+    const effectivePlan = (subscription?.plan || company.plan || "STARTER").toUpperCase();
+    const effectiveBillingCycle = (subscription?.billingCycle || "MONTHLY").toUpperCase();
+    const paidAmount = subscription?.pricePerMonth || PLAN_PRICES[effectivePlan] || 0;
+    const amount = effectiveBillingCycle === "YEARLY" ? Math.round(paidAmount * 12) : paidAmount;
+    const standardBaseAmount = PLAN_PRICES[effectivePlan] || 0;
+    const standardAmount = effectiveBillingCycle === "YEARLY" ? Math.round(standardBaseAmount * 12) : standardBaseAmount;
+    const discount = Math.max(0, standardAmount - amount);
+    const periodEnd = subscription?.currentPeriodEnd || company.currentPeriodEnd || company.createdAt;
+    const invoiceNumber = `INV-${new Date(periodEnd).getFullYear()}-001`;
 
-    const key =
-      String(details?.orderId || details?.order_id || details?.subscriptionId || log.id).trim() || log.id;
-    if (seen.has(key)) continue;
-    seen.add(key);
-    invoiceSources.push({ log, details, key });
-  }
-
-  const match = invoiceSources.find(({ log, key }) => invoiceId === `pay_${log.id}` || invoiceId === `pay_${key}`);
-  if (!match) return null;
-
-  const index = invoiceSources.findIndex(({ log }) => log.id === match.log.id);
-  const effectivePlan = (subscription?.plan || company.plan || "STARTER").toUpperCase();
-  const cycle = (subscription?.billingCycle || "MONTHLY").toUpperCase();
-  const minorUnits = Number(match.details?.amount ?? match.details?.amount_paid ?? 0);
-  const total = minorUnits / 100;
-  const currency = String(match.details?.currency || "USD").toUpperCase();
-  const standardBaseAmount = PLAN_PRICES[effectivePlan] || total;
-  const standardAmount = cycle === "YEARLY" ? Math.round(standardBaseAmount * 12) : standardBaseAmount;
-  const discount = Math.max(0, standardAmount - total);
-  const invoiceNumber = `INV-${match.log.createdAt.getFullYear()}-${String(invoiceSources.length - index).padStart(3, "0")}`;
-
-  return {
-    invoiceNumber,
-    pdfData: {
+    const pdfData = {
       invoiceNumber,
-      invoiceDate: fmtDate(match.log.createdAt),
+      invoiceDate: fmtDate(periodEnd),
       dueDate: "",
       companyName: "Finova Forge",
       companyAddress: "FinovaOS, Business Suite",
@@ -96,60 +104,32 @@ async function buildPaymentLogInvoice(companyId: string, invoiceId: string) {
       customerPhone: "",
       items: [
         {
-          name: `${effectivePlan} subscription (${cycle.toLowerCase()})`,
+          name: `${effectivePlan} subscription (${effectiveBillingCycle.toLowerCase()})`,
           qty: 1,
-          rate: discount > 0 ? standardAmount : total,
-          amount: discount > 0 ? standardAmount : total,
+          rate: effectiveBillingCycle === "YEARLY" ? standardAmount : standardBaseAmount,
+          amount: standardAmount,
         },
       ],
-      subtotal: discount > 0 ? standardAmount : total,
+      subtotal: standardAmount,
       tax: 0,
       discount,
-      total,
-      currency,
+      total: amount,
+      // pricePerMonth is stored in the currency the provider settles in —
+      // Safepay in PKR, LemonSqueezy/Stripe always in USD. Labelling it with
+      // company.baseCurrency showed "PKR 249" for what was really a $249 charge.
+      currency: subscription?.provider === "SAFEPAY" ? "PKR" : "USD",
       notes: discount > 0
-        ? "Subscription invoice for FinovaOS hosted billing. Launch offer applied."
+        ? "Subscription invoice for FinovaOS hosted billing. Launch offer applied: 50% off for first 3 months."
         : "Subscription invoice for FinovaOS hosted billing.",
-      status: "PAID",
-    },
-  };
-}
+      status: company.subscriptionStatus?.toUpperCase() === "ACTIVE" ? "PAID" : "OPEN",
+    };
 
-export async function GET(req: NextRequest): Promise<Response> {
-  try {
-    const url = new URL(req.url);
-    const invoiceId = url.searchParams.get("invoiceId");
-    const token = url.searchParams.get("token");
-    if (!invoiceId) {
-      return NextResponse.json({ error: "invoiceId is required" }, { status: 400 });
-    }
-
-    const tokenPayload = token ? verifyBillingInvoiceAccessToken(token) : null;
-    const companyId = tokenPayload?.companyId || (await resolveCompanyId(req));
-    if (!companyId) {
-      return NextResponse.json({ error: "Company required" }, { status: 400 });
-    }
-
-    if (token && (!tokenPayload || tokenPayload.invoiceId !== invoiceId)) {
-      return NextResponse.json({ error: "Invalid or expired invoice link" }, { status: 401 });
-    }
-
-    const paymentLogInvoice = await buildPaymentLogInvoice(companyId, invoiceId);
-    const hostedInvoice = paymentLogInvoice ? null : await buildHostedBillingInvoice(companyId);
-    const invoice =
-      paymentLogInvoice ||
-      (hostedInvoice && invoiceId === hostedInvoice.invoiceId ? hostedInvoice : null);
-
-    if (!invoice) {
-      return NextResponse.json({ error: "Invoice not found" }, { status: 404 });
-    }
-
-    const pdfBuffer = await generateInvoicePdf(invoice.pdfData);
+    const pdfBuffer = await generateInvoicePdf(pdfData);
     return new NextResponse(new Uint8Array(pdfBuffer), {
       status: 200,
       headers: {
         "Content-Type": "application/pdf",
-        "Content-Disposition": `attachment; filename="invoice-${invoice.invoiceNumber}.pdf"`,
+        "Content-Disposition": `attachment; filename="invoice-${invoiceNumber}.pdf"`,
         "Content-Length": String(pdfBuffer.length),
       },
     });

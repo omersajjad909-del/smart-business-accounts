@@ -31,7 +31,6 @@ const GOOGLE_FONTS_HREF =
 import CookieBanner from "./(marketing)/landing/components/CookieBanner";
 import AnalyticsGate from "./(marketing)/landing/components/AnalyticsGate";
 import { ThemeProvider } from "@/components/theme-provider";
-import { DEFAULT_THEME, FOLLOW_SYSTEM_THEME } from "@/lib/themeConfig";
 import VisitorTracker from "@/components/VisitorTracker";
 import ClientRegionSignal from "@/components/ClientRegionSignal";
 
@@ -343,14 +342,10 @@ export default async function RootLayout({
             for scrolling bugs whose real causes are now fixed: overflow on
             body/<main> and the dashboard shell's use of vh. */}
         <AnalyticsGate />
-        {/* Dark is the default for everyone. `enableSystem` is off on purpose:
-            with it on, a visitor whose OS was set to light opened the app in
-            light even though dark is the intended default. The header toggle
-            still switches, and the choice is remembered. See lib/themeConfig.ts. */}
         <ThemeProvider
           attribute="class"
-          defaultTheme={DEFAULT_THEME}
-          enableSystem={FOLLOW_SYSTEM_THEME}
+          defaultTheme="dark"
+          enableSystem
           disableTransitionOnChange
         >
           <Toaster

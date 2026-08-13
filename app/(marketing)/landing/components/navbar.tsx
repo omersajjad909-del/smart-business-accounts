@@ -3,7 +3,6 @@
 import Link from "next/link"
 import { useEffect, useRef, useState } from "react"
 import { Menu, X } from "lucide-react"
-import { DEMO_BUSINESSES } from "@/lib/businessCatalog"
 
 /* ─── Features Mega Data ─── */
 const FEATURES_COLS = [
@@ -77,24 +76,19 @@ const FEATURES_CARDS = [
   },
 ]
 
-/* ─── Solutions Mega Data ───
-   The "By Industry" column is built from lib/businessCatalog.ts rather than
-   typed out here. It used to be a fixed list of six that had drifted from what
-   we actually sell — it named Export and Travel separately while missing
-   Manufacturing entirely, so launching a business type left the menu stale. */
-const INDUSTRY_LINKS = DEMO_BUSINESSES.map((b) => ({
-  label: b.label,
-  href: `/solutions?industry=${b.liveBusinessType}`,
-  icon: b.icon,
-}));
-
+/* ─── Solutions Mega Data ─── */
 const SOLUTIONS_COLS = [
   {
     heading: "By Industry",
     color: "#a78bfa",
     links: [
-      ...INDUSTRY_LINKS,
-      { label: "View All Solutions", href: "/solutions", icon: "🌐" },
+      { label: "Trading & Wholesale",    href: "/solutions?industry=trading",    icon: "🛒" },
+      { label: "Distribution & FMCG",   href: "/solutions?industry=distribution",icon: "🚚" },
+      { label: "Retail & Multi-Store",   href: "/solutions?industry=retail",     icon: "🏪" },
+      { label: "Travel Agency",          href: "/solutions?industry=travel",     icon: "✈️" },
+      { label: "Import Business",        href: "/solutions?industry=import",     icon: "📦" },
+      { label: "Export Business",        href: "/solutions?industry=export",     icon: "🚢" },
+      { label: "View All Solutions",     href: "/solutions",                     icon: "🌐" },
     ],
   },
   {
