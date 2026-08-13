@@ -6,6 +6,7 @@ const isMobile = false;
 import { useState, useMemo, useEffect } from "react";
 import { useBusinessRecords, BusinessRecord } from "@/lib/useBusinessRecords";
 import { useResponsive } from "@/hooks/useResponsive";
+import { WAREHOUSE_TRANSFER_CATEGORY, normalizeWarehouseTransfer } from "@/lib/warehouseTransfers";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -63,15 +64,16 @@ function mapWarehouse(r: BusinessRecord) {
 }
 
 function mapTransfer(r: BusinessRecord) {
+  const t = normalizeWarehouseTransfer(r);
   return {
-    id: r.id,
-    from: (r.data.from as string) || "",
-    to: (r.data.to as string) || "",
-    item: (r.data.item as string) || "",
-    qty: (r.data.qty as number) || 0,
-    notes: (r.data.notes as string) || "",
-    status: r.status || "COMPLETED",
-    date: r.date || r.createdAt,
+    id: t.id,
+    from: t.from,
+    to: t.to,
+    item: t.itemSummary,
+    qty: t.totalQty,
+    notes: t.notes,
+    status: t.status,
+    date: t.date,
   };
 }
 
@@ -130,7 +132,7 @@ export default function WarehousesPage() {
   const { records: whRecords, loading: whLoading, create: whCreate, setStatus: whSetStatus } =
     useBusinessRecords("warehouse");
   const { records: txRecords, loading: txLoading, create: txCreate } =
-    useBusinessRecords("stock_transfer");
+    useBusinessRecords(WAREHOUSE_TRANSFER_CATEGORY);
 
   const [showAddModal, setShowAddModal] = useState(false);
   const [showTransferModal, setShowTransferModal] = useState(false);
@@ -202,18 +204,24 @@ export default function WarehousesPage() {
     const toName = warehouses.find(w => w.id === txForm.toId)?.name || txForm.toId;
 
     setTxSaving(true);
+    const transferNo = `TRF-${new Date().getFullYear()}-${String(Math.floor(Math.random() * 9000) + 1000)}`;
+    const today = new Date().toISOString().split("T")[0];
     try {
+      // Written in the same shape /dashboard/warehouse-transfers reads, so a
+      // quick transfer made here opens as a proper transfer document there.
       await txCreate({
-        title: `Transfer: ${txForm.item.trim()} (${txForm.qty}) — ${fromName} → ${toName}`,
+        title: transferNo,
         status: "COMPLETED",
         data: {
-          from: fromName,
-          to: toName,
+          transferNo,
+          date: today,
+          fromWarehouse: fromName,
+          toWarehouse: toName,
           fromId: txForm.fromId,
           toId: txForm.toId,
           itemId: txForm.itemId,
-          item: txForm.item.trim(),
-          qty: Number(txForm.qty),
+          items: [{ itemName: txForm.item.trim(), qty: Number(txForm.qty), unit: "PCS", notes: "" }],
+          reason: "",
           notes: txForm.notes.trim(),
         },
         date: new Date().toISOString(),

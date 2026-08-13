@@ -1248,6 +1248,69 @@ export async function seedDemoCompany(
   );
   bankRow.balance = bankMovement;
 
+  // ── Warehouses & warehouse transfers ──────────────────────────────────
+  // /dashboard/warehouses and /dashboard/warehouse-transfers read BusinessRecord
+  // rows, and the seed wrote none — so both pages opened empty in every demo and
+  // looked broken rather than unseeded. One warehouse per branch (a demo branch
+  // is a physical site) plus a few transfers between them.
+  const stockValueTotal = round2(items.reduce((s, it) => s + it.openingQty * it.purchaseRate, 0));
+  const warehouseRows = p.branches.map(([code, name, city], i) => {
+    const share = i === 0 ? 0.6 : 0.4 / Math.max(1, p.branches.length - 1);
+    const capacity = 5000 + i * 2500;
+    return {
+      id: randomUUID(),
+      companyId,
+      category: "warehouse",
+      title: name,
+      status: "ACTIVE",
+      amount: round2(stockValueTotal * share),
+      date: daysAgo(150),
+      data: {
+        location: city,
+        address: `${name}, ${city}`,
+        capacity,
+        capacityUsed: Math.round(capacity * (0.72 - i * 0.18)),
+        itemsCount: Math.max(1, Math.round(items.length * (i === 0 ? 1 : 0.6))),
+        manager: [
+          employees[i % Math.max(1, employees.length)]?.firstName,
+          employees[i % Math.max(1, employees.length)]?.lastName,
+        ].filter(Boolean).join(" "),
+        phone: "",
+        isDefault: i === 0,
+        notes: `${code} — seeded demo site`,
+      },
+    };
+  });
+
+  // Transfers need two distinct sites; a single-branch profile gets none.
+  const transferRows = warehouseRows.length < 2 ? [] : [0, 1, 2].map((n) => {
+    const from = warehouseRows[n % warehouseRows.length];
+    const to = warehouseRows[(n + 1) % warehouseRows.length];
+    const item = items[n % items.length];
+    const transferNo = `TRF-${new Date().getFullYear()}-${String(1001 + n)}`;
+    const status = n === 0 ? "COMPLETED" : n === 1 ? "IN_TRANSIT" : "DRAFT";
+    const when = daysAgo(12 - n * 4);
+    return {
+      id: randomUUID(),
+      companyId,
+      category: "warehouse_transfer",
+      title: transferNo,
+      status,
+      date: when,
+      data: {
+        transferNo,
+        date: when.toISOString().split("T")[0],
+        fromId: from.id,
+        toId: to.id,
+        fromWarehouse: from.title,
+        toWarehouse: to.title,
+        items: [{ itemName: item.name, qty: 10 + n * 5, unit: item.unit, notes: "" }],
+        reason: n === 0 ? "Restock branch" : n === 1 ? "Excess stock rebalance" : "Planned replenishment",
+        notes: "",
+      },
+    };
+  });
+
   // ── Write everything, in FK order, as one batch ───────────────────────
   await prisma.$transaction([
     prisma.branch.createMany({ data: branchRows }),
@@ -1279,6 +1342,7 @@ export async function seedDemoCompany(
     prisma.contact.createMany({ data: contacts }),
     prisma.bankStatement.createMany({ data: bankStatements }),
     prisma.ledgerEntry.createMany({ data: ledger }),
+    prisma.businessRecord.createMany({ data: [...warehouseRows, ...transferRows] }),
   ]);
 
   const totalDebit = round2(ledger.reduce((s, l) => s + l.debit, 0));

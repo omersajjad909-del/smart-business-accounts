@@ -3,6 +3,8 @@ import { useState, useMemo } from "react";
 import { useBusinessRecords, BusinessRecord } from "@/lib/useBusinessRecords";
 import DateInput from "@/app/dashboard/reports/_components/DateInput";
 import { useResponsive } from "@/hooks/useResponsive";
+import { fmtDate } from "@/lib/dateUtils";
+import { WAREHOUSE_TRANSFER_CATEGORY, normalizeWarehouseTransfer } from "@/lib/warehouseTransfers";
 
 const isMobile = false;
 
@@ -50,21 +52,57 @@ const BLANK_ITEM: TransferItem = { itemName: "", qty: "", unit: "PCS", notes: ""
 const BLANK_FORM = { transferNo: genNo(), date: todayIso(), fromWarehouse: "", toWarehouse: "", items: [{ ...BLANK_ITEM }], reason: "", notes: "", status: "DRAFT" as TransferStatus };
 
 function mapRecord(r: BusinessRecord): WarehouseTransferRecord {
-  const d = (r.data ?? {}) as Partial<WarehouseTransferData>;
+  // normalizeWarehouseTransfer also understands the flat single-line shape the
+  // Warehouses page used to write, so those older transfers list here too.
+  const t = normalizeWarehouseTransfer(r);
   return {
-    id: r.id, status: (r.status as TransferStatus) ?? "DRAFT", createdAt: r.createdAt,
-    transferNo: d.transferNo ?? r.title ?? "", date: d.date ?? r.date ?? "",
-    fromWarehouse: d.fromWarehouse ?? "", toWarehouse: d.toWarehouse ?? "",
-    items: Array.isArray(d.items) ? d.items : [{ ...BLANK_ITEM }],
-    reason: d.reason ?? "", notes: d.notes ?? "",
+    id: t.id, status: (t.status as TransferStatus) ?? "DRAFT", createdAt: r.createdAt,
+    // DateInput and the date filter both want a bare YYYY-MM-DD; legacy records
+    // fall back to the record's own timestamp, which carries a time component.
+    transferNo: t.transferNo, date: t.date.split("T")[0],
+    fromWarehouse: t.from, toWarehouse: t.to,
+    items: t.items.length ? t.items : [{ ...BLANK_ITEM }],
+    reason: t.reason, notes: t.notes,
   };
+}
+
+/**
+ * Picks one of the company's warehouses, and stays a plain text box when there
+ * are none yet — a brand new company has not created any, and a dropdown with
+ * nothing in it would leave the form impossible to submit. A saved transfer that
+ * names a warehouse since renamed or deleted keeps its own value as an option.
+ */
+function WarehousePicker({ value, onChange, options, placeholder }: {
+  value: string;
+  onChange: (v: string) => void;
+  options: string[];
+  placeholder: string;
+}) {
+  if (!options.length) {
+    return <input value={value} onChange={e => onChange(e.target.value)} style={s.inp} placeholder={placeholder} />;
+  }
+  const choices = value && !options.includes(value) ? [value, ...options] : options;
+  return (
+    <select value={value} onChange={e => onChange(e.target.value)} style={s.inp}>
+      <option value="">Select warehouse…</option>
+      {choices.map(name => <option key={name} value={name}>{name}</option>)}
+    </select>
+  );
 }
 
 // ─── Main Page ────────────────────────────────────────────────────────────────
 
 export default function WarehouseTransfersPage() {
   const { isMobile } = useResponsive();
-  const { records, loading, create, update, remove } = useBusinessRecords("warehouse_transfer");
+  const { records, loading, create, update, remove } = useBusinessRecords(WAREHOUSE_TRANSFER_CATEGORY);
+  // The warehouses an admin actually created on /dashboard/warehouses. The two
+  // sides were free text before, so a transfer could name a warehouse that did
+  // not exist and never lined up with the warehouse list.
+  const { records: warehouseRecords } = useBusinessRecords("warehouse");
+  const warehouseNames = useMemo(
+    () => warehouseRecords.map(r => r.title).filter(Boolean),
+    [warehouseRecords],
+  );
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState({ ...BLANK_FORM });
   const [editing, setEditing] = useState<string | null>(null);
@@ -99,7 +137,7 @@ export default function WarehouseTransfersPage() {
     if (!form.fromWarehouse.trim() || !form.toWarehouse.trim()) return alert("Both warehouses are required");
     if (form.fromWarehouse === form.toWarehouse) return alert("From and To warehouses must be different");
     setSaving(true);
-    const payload = { category: "warehouse_transfer", title: form.transferNo, status: form.status, date: form.date, data: { ...form } };
+    const payload = { category: WAREHOUSE_TRANSFER_CATEGORY, title: form.transferNo, status: form.status, date: form.date, data: { ...form } };
     editing ? await update(editing, payload) : await create(payload);
     setSaving(false); setShowForm(false);
   };
@@ -153,9 +191,9 @@ export default function WarehouseTransfersPage() {
             <div><label style={s.label}>Date</label>
               <DateInput value={form.date} onChange={v => sf("date", v)} style={s.inp} /></div>
             <div><label style={s.label}>From Warehouse *</label>
-              <input value={form.fromWarehouse} onChange={e => sf("fromWarehouse", e.target.value)} style={s.inp} placeholder="e.g. Main Warehouse" /></div>
+              <WarehousePicker value={form.fromWarehouse} onChange={v => sf("fromWarehouse", v)} options={warehouseNames} placeholder="e.g. Main Warehouse" /></div>
             <div><label style={s.label}>To Warehouse *</label>
-              <input value={form.toWarehouse} onChange={e => sf("toWarehouse", e.target.value)} style={s.inp} placeholder="e.g. Branch Warehouse" /></div>
+              <WarehousePicker value={form.toWarehouse} onChange={v => sf("toWarehouse", v)} options={warehouseNames} placeholder="e.g. Branch Warehouse" /></div>
           </div>
 
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14, marginBottom: 14 }}>
@@ -248,7 +286,7 @@ export default function WarehouseTransfersPage() {
                 return (
                   <tr key={t.id}>
                     <td style={{ ...s.td, fontWeight: 700, color: ACCENT }}>{t.transferNo}</td>
-                    <td style={s.td}>{t.date ? new Date(t.date).toLocaleDateString("en-PK") : "—"}</td>
+                    <td style={s.td}>{t.date ? fmtDate(t.date) : "—"}</td>
                     <td style={{ ...s.td, fontWeight: 600 }}>{t.fromWarehouse || "—"}</td>
                     <td style={{ ...s.td, fontWeight: 600 }}>{t.toWarehouse || "—"}</td>
                     <td style={{ ...s.td, color: "var(--text-muted)" }}>{t.items.length} line(s) · {totalQty} units</td>

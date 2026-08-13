@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { resolveCompanyId } from "@/lib/tenant";
+import { WAREHOUSE_TRANSFER_CATEGORY, normalizeWarehouseTransfer } from "@/lib/warehouseTransfers";
 
 function statusKey(value: string | null | undefined) {
   return String(value || "").trim().toUpperCase();
@@ -78,7 +79,7 @@ export async function GET(req: NextRequest) {
       orderBy: { createdAt: "asc" },
     }),
     prisma.businessRecord.findMany({
-      where: { companyId, category: "stock_transfer" },
+      where: { companyId, category: WAREHOUSE_TRANSFER_CATEGORY },
       orderBy: { createdAt: "desc" },
       take: 12,
     }),
@@ -139,14 +140,14 @@ export async function GET(req: NextRequest) {
   });
 
   const mappedTransfers = transfers.map((row) => {
-    const data = (row.data || {}) as Record<string, unknown>;
+    const t = normalizeWarehouseTransfer(row);
     return {
-      id: row.id,
-      item: String(data.item || row.title || ""),
-      from: String(data.from || ""),
-      to: String(data.to || ""),
-      qty: Number(data.qty || 0),
-      status: row.status || "COMPLETED",
+      id: t.id,
+      item: t.itemSummary || t.transferNo,
+      from: t.from,
+      to: t.to,
+      qty: t.totalQty,
+      status: t.status,
       date: normalizeDate(row.date || row.createdAt),
     };
   });

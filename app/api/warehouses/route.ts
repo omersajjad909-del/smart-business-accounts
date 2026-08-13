@@ -1,9 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { resolveCompanyId } from "@/lib/tenant";
+import { WAREHOUSE_TRANSFER_CATEGORY, normalizeWarehouseTransfer } from "@/lib/warehouseTransfers";
 
 const WH_CATEGORY = "warehouse";
-const TX_CATEGORY = "stock_transfer";
+// Was "stock_transfer", which is /dashboard/retail/stock-transfer's category —
+// so this route returned retail store transfers alongside warehouse ones.
+const TX_CATEGORY = WAREHOUSE_TRANSFER_CATEGORY;
 
 // GET /api/warehouses?includeTransfers=true
 export async function GET(req: NextRequest) {
@@ -50,19 +53,20 @@ export async function GET(req: NextRequest) {
     });
 
     const transfers = txRecords.map(r => {
-      const d = r.data as Record<string, unknown>;
+      const t = normalizeWarehouseTransfer(r);
       return {
-        id:     r.id,
+        id:     t.id,
         title:  r.title,
-        from:   (d.from   as string) || "",
-        to:     (d.to     as string) || "",
-        fromId: (d.fromId as string) || "",
-        toId:   (d.toId   as string) || "",
-        item:   (d.item   as string) || "",
-        qty:    Number(d.qty)        || 0,
-        notes:  (d.notes  as string) || "",
-        status: r.status             || "COMPLETED",
-        date:   r.date               || r.createdAt,
+        from:   t.from,
+        to:     t.to,
+        fromId: t.fromId,
+        toId:   t.toId,
+        item:   t.itemSummary,
+        qty:    t.totalQty,
+        items:  t.items,
+        notes:  t.notes,
+        status: t.status,
+        date:   t.date,
       };
     });
 
@@ -97,14 +101,27 @@ export async function POST(req: NextRequest) {
       if (!item?.trim())    return NextResponse.json({ error: "item required" }, { status: 400 });
       if (!qty || Number(qty) <= 0) return NextResponse.json({ error: "qty must be > 0" }, { status: 400 });
 
+      const now = new Date();
+      const transferNo = `TRF-${now.getFullYear()}-${String(Math.floor(Math.random() * 9000) + 1000)}`;
       const record = await prisma.businessRecord.create({
         data: {
           companyId,
           category: TX_CATEGORY,
-          title:    `Transfer: ${item.trim()} (${qty}) — ${fromName || fromId} → ${toName || toId}`,
+          title:    transferNo,
           status:   "COMPLETED",
-          data: { fromId, toId, from: fromName || fromId, to: toName || toId, item: item.trim(), qty: Number(qty), notes: notes || "" },
-          date:     new Date(),
+          // Same shape /dashboard/warehouse-transfers writes and reads.
+          data: {
+            transferNo,
+            date:          now.toISOString().split("T")[0],
+            fromId,
+            toId,
+            fromWarehouse: fromName || fromId,
+            toWarehouse:   toName || toId,
+            items:         [{ itemName: item.trim(), qty: Number(qty), unit: "PCS", notes: "" }],
+            reason:        "",
+            notes:         notes || "",
+          },
+          date:     now,
         },
       });
       return NextResponse.json({ success: true, transfer: record }, { status: 201 });
