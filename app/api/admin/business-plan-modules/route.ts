@@ -22,6 +22,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getTokenFromRequest, verifyJwt } from "@/lib/auth";
+import {
+  readSavedDashboardFeatureFlags,
+  resolvePlanWideFeatureFlags,
+} from "@/lib/dashboardFeatureRegistry";
 
 // Two independent copies of this config, chosen by ?scope=.
 //   WORLD — Plans → Pages & Modules       (every non-Pakistan company)
@@ -54,11 +58,20 @@ export async function GET(req: NextRequest) {
   if (!isAdmin(req)) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
   try {
-    const log = await prisma.activityLog.findFirst({
-      where: { action: ACTION_KEYS[scopeFrom(req)] },
-      orderBy: { createdAt: "desc" },
-      select: { details: true },
-    });
+    const [log, planLog] = await Promise.all([
+      prisma.activityLog.findFirst({
+        where: { action: ACTION_KEYS[scopeFrom(req)] },
+        orderBy: { createdAt: "desc" },
+        select: { details: true },
+      }),
+      // The plan-wide grid lives in PLAN_CONFIG for both scopes — PKR_PLAN_CONFIG
+      // stores pricing and permissions only, never a page grid.
+      prisma.activityLog.findFirst({
+        where: { action: "PLAN_CONFIG" },
+        orderBy: { createdAt: "desc" },
+        select: { details: true },
+      }).catch(() => null),
+    ]);
     const parsed = log?.details ? JSON.parse(log.details) : {};
     const wrapped =
       parsed && typeof parsed === "object" &&
@@ -67,6 +80,12 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({
       config: wrapped ? (parsed.config || {}) : parsed,
       pageConfig: wrapped ? (parsed.pageConfig || {}) : {},
+      // What a business type with no override actually gets. The grid renders
+      // this instead of ticking every box, so it stops promising pages the
+      // plan does not grant.
+      planFallback: resolvePlanWideFeatureFlags(
+        readSavedDashboardFeatureFlags(planLog?.details) || {},
+      ),
     });
   } catch (e: any) {
     return NextResponse.json({ error: e.message }, { status: 500 });

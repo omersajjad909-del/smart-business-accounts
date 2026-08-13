@@ -51,6 +51,9 @@ export default function BusinessPlanMatrix({ embedded = false, scope = "WORLD" }
   const [selected,   setSelected]   = useState<typeof BUSINESS_TYPES[0] | null>(null);
   const [config,     setConfig]     = useState<ConfigMap>({});
   const [pageConfig, setPageConfig] = useState<PageConfigMap>({});
+  // The plan-wide grid an unconfigured business type falls back to, straight
+  // from the same resolver /api/me/bootstrap uses for the sidebar.
+  const [planFallback, setPlanFallback] = useState<Record<Plan, string[]> | null>(null);
   const [saving,     setSaving]     = useState(false);
   const [saved,      setSaved]      = useState(false);
   const [enabledIds,      setEnabledIds]      = useState<Set<string> | null>(null);
@@ -79,7 +82,11 @@ export default function BusinessPlanMatrix({ embedded = false, scope = "WORLD" }
     // in Modules, and a cached response makes the change look like it failed.
     fetch(`/api/admin/business-plan-modules${scopeQuery}`, { headers: getHeaders(), cache: "no-store" })
       .then(r => r.ok ? r.json() : { config: {}, pageConfig: {} })
-      .then(d => { setConfig(d.config || {}); setPageConfig(d.pageConfig || {}); })
+      .then(d => {
+        setConfig(d.config || {});
+        setPageConfig(d.pageConfig || {});
+        setPlanFallback(d.planFallback || null);
+      })
       .catch(() => {});
 
     fetch("/api/admin/business-modules", { headers: getHeaders(), cache: "no-store" })
@@ -175,18 +182,33 @@ export default function BusinessPlanMatrix({ embedded = false, scope = "WORLD" }
     return ordered;
   }, [pageFeatures]);
 
-  // No saved override means "everything on" — a business type should not lose
-  // its pages just because nobody has opened this screen yet.
-  const planPages = useMemo((): Record<Plan, string[]> => {
+  // What a business type with no override of its own actually gets: the
+  // plan-wide grid, narrowed to the pages this type owns.
+  //
+  // This used to tick every box on every plan, which read as "all 161 pages are
+  // on for Starter" while the dashboard was falling through to the plan-wide
+  // list and granting 89 of them. The screen has to show the rule the sidebar
+  // applies, or every unconfigured business type looks fully enabled and is not.
+  const fallbackPages = useMemo((): Record<Plan, string[]> => {
     const allIds = pageFeatures.map(f => f.id);
+    if (!planFallback) return { STARTER: allIds, PRO: allIds, ENTERPRISE: allIds };
+    const owned = new Set(allIds);
+    const narrow = (plan: Plan) =>
+      Array.isArray(planFallback[plan])
+        ? planFallback[plan].filter(id => owned.has(id))
+        : allIds;
+    return { STARTER: narrow("STARTER"), PRO: narrow("PRO"), ENTERPRISE: narrow("ENTERPRISE") };
+  }, [planFallback, pageFeatures]);
+
+  const planPages = useMemo((): Record<Plan, string[]> => {
     const saved = selected ? pageConfig[selected.id] : undefined;
-    if (!saved) return { STARTER: allIds, PRO: allIds, ENTERPRISE: allIds };
+    if (!saved) return fallbackPages;
     return {
-      STARTER:    saved.STARTER    ?? allIds,
-      PRO:        saved.PRO        ?? allIds,
-      ENTERPRISE: saved.ENTERPRISE ?? allIds,
+      STARTER:    saved.STARTER    ?? fallbackPages.STARTER,
+      PRO:        saved.PRO        ?? fallbackPages.PRO,
+      ENTERPRISE: saved.ENTERPRISE ?? fallbackPages.ENTERPRISE,
     };
-  }, [selected, pageConfig, pageFeatures]);
+  }, [selected, pageConfig, fallbackPages]);
 
   function setPlanPages(plan: Plan, ids: string[]) {
     if (!selected) return;
