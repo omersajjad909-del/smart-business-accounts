@@ -1,4 +1,17 @@
-export const CUSTOM_PLAN_BASE_MONTHLY_USD = 15;
+/**
+ * Platform fee added on top of the chosen modules — currently none.
+ *
+ * This was 15 while /api/public/pricing published `basePrice: 0` and the
+ * pricing page added nothing to the module subtotal. So the estimate a customer
+ * agreed to and the amount checkout actually asked Lemon Squeezy for were $15
+ * apart on every single Custom subscription: pick Accounting + Inventory, see
+ * $27, get billed $42.
+ *
+ * Zero is the figure the published pricing has always shown. If a base fee is
+ * ever wanted, it has to be set in both places — here and `basePrice` in
+ * /api/public/pricing — or the same gap opens again.
+ */
+export const CUSTOM_PLAN_BASE_MONTHLY_USD = 0;
 export const CUSTOM_PLAN_YEARLY_DISCOUNT = 0.2; // 20%
 
 // Only modules that are a working product on their own are sold here.
