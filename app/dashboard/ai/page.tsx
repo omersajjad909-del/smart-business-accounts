@@ -1490,18 +1490,21 @@ export default function AICommandCenter() {
         @keyframes aiPing { 0%{transform:scale(1);opacity:.9} 70%{transform:scale(1.6);opacity:0} 100%{transform:scale(1.6);opacity:0} }
         .kpi-card { background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.08); border-radius:16px; padding:20px 22px; transition:all .2s; }
         .kpi-card:hover { border-color:rgba(99,102,241,.3); background:rgba(99,102,241,.06); }
+        @media(max-width:600px) { .kpi-card { padding:14px 16px; } }
         .q-pill { background:rgba(99,102,241,.1); border:1px solid rgba(99,102,241,.22); color:#c7d2fe; border-radius:999px; padding:8px 14px; font-size:12px; font-weight:600; cursor:pointer; font-family:inherit; transition:all .2s; text-align:left; }
         .q-pill:hover { background:rgba(99,102,241,.18); color:#ffffff; border-color:rgba(99,102,241,.36); transform:translateY(-1px); }
+        @media(max-width:600px) { .q-pill { padding:6px 10px; font-size:11px; } }
         .cursor-blink { display:inline-block; width:3px; height:15px; background:linear-gradient(to bottom,#818cf8,#6366f1); animation:pulse .7s ease infinite; margin-left:3px; vertical-align:middle; border-radius:2px; box-shadow:0 0 8px rgba(99,102,241,.7); }
         .insight-block h1,h2,h3 { color:inherit }
         .ctx-quick-btn { display:block; width:100%; padding:8px 12px; border-radius:9px; background:none; border:1px solid rgba(255,255,255,.07); color:rgba(255,255,255,.55); font-size:11.5px; font-weight:500; cursor:pointer; font-family:inherit; text-align:left; margin-bottom:5px; transition:all .15s; }
         .ctx-quick-btn:hover { background:rgba(99,102,241,.12); border-color:rgba(99,102,241,.3); color:white; }
         .ai-tabs-bar::-webkit-scrollbar { display:none; }
         .ai-tab-btn:hover { color:rgba(255,255,255,.8) !important; }
+        @media(max-width:600px) { .ai-tab-btn { padding:7px 10px !important; font-size:11px !important; } }
       `}</style>
 
       {/* ══ TOP HEADER ═══════════════════════════════════════════════════════ */}
-      <div style={{ padding: "10px 24px", borderBottom: "1px solid rgba(255,255,255,.07)", display: "flex", alignItems: "center", justifyContent: "space-between", flexShrink: 0, background: "rgba(255,255,255,.018)" }}>
+      <div style={{ padding: isMobile ? "8px 14px" : "10px 24px", borderBottom: "1px solid rgba(255,255,255,.07)", display: "flex", alignItems: "center", justifyContent: "space-between", flexShrink: 0, background: "rgba(255,255,255,.018)" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
           <div style={{ width: 34, height: 34, borderRadius: 10, background: "linear-gradient(135deg,#6366f1,#4f46e5)", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 4px 14px rgba(99,102,241,.45)", flexShrink: 0 }}><AiIcon size={18} /></div>
           <div>
@@ -1582,7 +1585,7 @@ export default function AICommandCenter() {
 
       {/* ── Content area ── */}
       <div style={{ flex: 1, overflow: "hidden", display: "flex" }}>
-        <div style={{ flex: 1, overflowY: tab === "chat" ? "hidden" : "auto", padding: tab === "chat" ? 0 : "24px 32px 60px" }}>
+        <div style={{ flex: 1, overflowY: tab === "chat" ? "hidden" : "auto", padding: tab === "chat" ? 0 : isMobile ? "16px 14px 60px" : "24px 32px 60px" }}>
 
         {/* ══ OVERVIEW ════════════════════════════════════════════════════ */}
         {tab === "overview" && (
