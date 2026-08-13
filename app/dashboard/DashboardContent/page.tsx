@@ -1639,9 +1639,11 @@ export default function DashboardContent() {
           className="db-grid-exempt"
           style={{
             display: "grid",
-            gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr 1fr",
-            gap: 8,
-            paddingTop: 16,
+            // Three across on mobile too. Stacking them turned this card into
+            // half a phone screen for three numbers that each fit in a third.
+            gridTemplateColumns: "1fr 1fr 1fr",
+            gap: isMobile ? 6 : 8,
+            paddingTop: isMobile ? 12 : 16,
             borderTop: "1px solid rgba(255,255,255,.12)",
             position: "relative",
           }}
@@ -1655,7 +1657,7 @@ export default function DashboardContent() {
               c: profC == "#10b981" ? "#86efac" : "#fca5a5",
             },
           ].map((s, i) => (
-            <div key={i}>
+            <div key={i} style={{ minWidth: 0 }}>
               <div
                 style={{
                   fontSize: 9,
@@ -1670,7 +1672,9 @@ export default function DashboardContent() {
               </div>
               <div
                 style={{
-                  fontSize: 13,
+                  // Amounts sit in a third of the width now, so they shrink a
+                  // step on mobile rather than being clipped to "Rs 1…".
+                  fontSize: isMobile ? 12 : 13,
                   fontWeight: 800,
                   color: s.c,
                   whiteSpace: "nowrap",
