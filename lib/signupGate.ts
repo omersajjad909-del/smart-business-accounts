@@ -20,6 +20,54 @@
 
 export const SIGNUPS_OPEN = process.env.NEXT_PUBLIC_SIGNUPS_OPEN === "true";
 
+/**
+ * The launch switch, moved to something a button can actually press.
+ *
+ * The environment variable still wins — it stays the deploy-time answer and
+ * nothing about it changes. What it could never be is *flipped at runtime*: a
+ * NEXT_PUBLIC_ value is baked into the client bundle at build time, so an admin
+ * pressing "Launch Now" had no way to move it without a redeploy. So the gate
+ * now also opens on a row written by /api/admin/launch.
+ *
+ * Default is still CLOSED, exactly as before. A missing row, a malformed row or
+ * a database that will not answer all mean "not launched" — pre-launch is the
+ * safe state, and this must never open the doors on its own.
+ */
+export const SITE_LAUNCHED_KEY = "siteLaunched";
+
+// Read on every proxied request, so it is cached briefly rather than hitting the
+// database each time. A few seconds of staleness on launch day is invisible.
+const CACHE_TTL_MS = 15_000;
+let cached: { open: boolean; at: number } | null = null;
+
+export async function getSignupsOpen(): Promise<boolean> {
+  if (SIGNUPS_OPEN) return true;
+
+  const now = Date.now();
+  if (cached && now - cached.at < CACHE_TTL_MS) return cached.open;
+
+  let open = false;
+  try {
+    const { prisma } = await import("@/lib/prisma");
+    const row = await prisma.activityLog.findFirst({
+      where: {
+        action: "ADMIN_SETTING",
+        details: { startsWith: `{"key":"${SITE_LAUNCHED_KEY}"` },
+      },
+      orderBy: { createdAt: "desc" },
+      select: { details: true },
+    });
+    open = JSON.parse(row?.details || "{}")?.value === true;
+  } catch {
+    // Keep whatever we last knew rather than slamming the doors mid-traffic on
+    // a transient database error; closed on a cold start.
+    open = cached?.open ?? false;
+  }
+
+  cached = { open, at: now };
+  return open;
+}
+
 export const WAITLIST_PATH = "/waitlist";
 
 /**
@@ -57,4 +105,9 @@ export function isSignupApiRoute(pathname: string): boolean {
  */
 export function signupHref(openHref: string): string {
   return SIGNUPS_OPEN ? openHref : WAITLIST_PATH;
+}
+
+/** Same decision as `signupHref`, for callers that know the runtime flag. */
+export function signupHrefFor(open: boolean, openHref: string): string {
+  return open ? openHref : WAITLIST_PATH;
 }
