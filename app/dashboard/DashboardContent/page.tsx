@@ -856,7 +856,8 @@ export default function DashboardContent() {
 
         .db-kpi{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px;}
         @media(max-width:1100px){.db-kpi{grid-template-columns:repeat(2,1fr);}}
-        @media(max-width:500px){.db-kpi{grid-template-columns:1fr 1fr;gap:10px;}}
+        @media(max-width:500px){.db-kpi{grid-template-columns:repeat(3,1fr);gap:8px;}}
+        @media(max-width:500px){.db-kpi-bal{grid-column:1/-1;}}
 
         .db-mid{display:grid;grid-template-columns:2fr 1fr;gap:16px;margin-bottom:20px;min-height:340px;}
         @media(max-width:960px){.db-mid{grid-template-columns:1fr;}}
@@ -1107,7 +1108,7 @@ export default function DashboardContent() {
           className="db-card"
           style={{
             borderRadius: 16,
-            padding: isMobile ? "12px 10px" : "20px 22px",
+            padding: isMobile ? "12px 8px" : "20px 22px",
             background: "rgba(16,185,129,.07)",
             border: "1px solid rgba(16,185,129,.2)",
           }}
@@ -1122,7 +1123,7 @@ export default function DashboardContent() {
           >
             <span
               style={{
-                fontSize: 12,
+                fontSize: isMobile ? 10 : 12,
                 fontWeight: 600,
                 color: "rgba(16,185,129,.8)",
               }}
@@ -1131,14 +1132,14 @@ export default function DashboardContent() {
             </span>
             <div
               style={{
-                width: 38,
-                height: 38,
+                width: isMobile ? 28 : 38,
+                height: isMobile ? 28 : 38,
                 borderRadius: 11,
                 background: "rgba(16,185,129,.15)",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                fontSize: 17,
+                fontSize: isMobile ? 13 : 17,
               }}
             >
               📈
@@ -1146,7 +1147,7 @@ export default function DashboardContent() {
           </div>
           <div
             style={{
-              fontSize: 26,
+              fontSize: isMobile ? 16 : 26,
               fontWeight: 900,
               color: "#10b981",
               letterSpacing: "-1px",
@@ -1155,7 +1156,7 @@ export default function DashboardContent() {
           >
             {cur} {fmt(stats.revenue)}
           </div>
-          <div style={{ fontSize: 11, fontWeight: 700, color: grC }}>
+          <div style={{ fontSize: isMobile ? 9 : 11, fontWeight: 700, color: grC }}>
             {stats.revenueGrowth >= 0 ? "↑" : "↓"}{" "}
             {Math.abs(stats.revenueGrowth).toFixed(1)}%{" "}
             <span style={{ color: "var(--text-muted)", fontWeight: 400 }}>
@@ -1163,12 +1164,12 @@ export default function DashboardContent() {
             </span>
           </div>
         </div>
-        {/* Expenses */}
+        {/* Expenses */}}
         <div
           className="db-card"
           style={{
             borderRadius: 16,
-            padding: isMobile ? "12px 10px" : "20px 22px",
+            padding: isMobile ? "12px 8px" : "20px 22px",
             background: "rgba(248,113,113,.07)",
             border: "1px solid rgba(248,113,113,.2)",
           }}
@@ -1183,7 +1184,7 @@ export default function DashboardContent() {
           >
             <span
               style={{
-                fontSize: 12,
+                fontSize: isMobile ? 10 : 12,
                 fontWeight: 600,
                 color: "rgba(248,113,113,.8)",
               }}
@@ -1192,14 +1193,14 @@ export default function DashboardContent() {
             </span>
             <div
               style={{
-                width: 38,
-                height: 38,
+                width: isMobile ? 28 : 38,
+                height: isMobile ? 28 : 38,
                 borderRadius: 11,
                 background: "rgba(248,113,113,.15)",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                fontSize: 17,
+                fontSize: isMobile ? 13 : 17,
               }}
             >
               📉
@@ -1207,7 +1208,7 @@ export default function DashboardContent() {
           </div>
           <div
             style={{
-              fontSize: 26,
+              fontSize: isMobile ? 16 : 26,
               fontWeight: 900,
               color: "#f87171",
               letterSpacing: "-1px",
@@ -1216,7 +1217,7 @@ export default function DashboardContent() {
           >
             {cur} {fmt(stats.expenses)}
           </div>
-          <div style={{ fontSize: 11, fontWeight: 700, color: expC }}>
+          <div style={{ fontSize: isMobile ? 9 : 11, fontWeight: 700, color: expC }}>
             {stats.expensesGrowth >= 0 ? "↑" : "↓"}{" "}
             {Math.abs(stats.expensesGrowth).toFixed(1)}%{" "}
             <span style={{ color: "var(--text-muted)", fontWeight: 400 }}>
@@ -1229,7 +1230,7 @@ export default function DashboardContent() {
           className="db-card"
           style={{
             borderRadius: 16,
-            padding: isMobile ? "12px 10px" : "20px 22px",
+            padding: isMobile ? "12px 8px" : "20px 22px",
             background: `${profC}0f`,
             border: `1px solid ${profC}28`,
           }}
@@ -1243,20 +1244,20 @@ export default function DashboardContent() {
             }}
           >
             <span
-              style={{ fontSize: 12, fontWeight: 600, color: `${profC}cc` }}
+              style={{ fontSize: isMobile ? 10 : 12, fontWeight: 600, color: `${profC}cc` }}
             >
               Profit This Month
             </span>
             <div
               style={{
-                width: 38,
-                height: 38,
+                width: isMobile ? 28 : 38,
+                height: isMobile ? 28 : 38,
                 borderRadius: 11,
                 background: `${profC}18`,
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                fontSize: 17,
+                fontSize: isMobile ? 13 : 17,
               }}
             >
               {stats.profit >= 0 ? "🚀" : "📉"}
@@ -1264,7 +1265,7 @@ export default function DashboardContent() {
           </div>
           <div
             style={{
-              fontSize: 26,
+              fontSize: isMobile ? 16 : 26,
               fontWeight: 900,
               color: profC,
               letterSpacing: "-1px",
@@ -1273,7 +1274,7 @@ export default function DashboardContent() {
           >
             {cur} {fmt(stats.profit)}
           </div>
-          <div style={{ fontSize: 11, fontWeight: 700, color: prfC }}>
+          <div style={{ fontSize: isMobile ? 9 : 11, fontWeight: 700, color: prfC }}>
             {stats.profitGrowth >= 0 ? "↑" : "↓"}{" "}
             {Math.abs(stats.profitGrowth).toFixed(1)}%{" "}
             <span style={{ color: "var(--text-muted)", fontWeight: 400 }}>
