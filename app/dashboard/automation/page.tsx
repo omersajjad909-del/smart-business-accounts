@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useResponsive } from "@/hooks/useResponsive";
+import { AUTOMATION_ADDON_ENABLED } from "@/lib/addons";
 
 const FONT = "'Outfit','Inter',sans-serif";
 
@@ -40,15 +41,20 @@ function UpsellGate() {
           <div style={{ flex: 1, minWidth: 220 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap", marginBottom: 4 }}>
               <h2 style={{ margin: 0, fontSize: 18, fontWeight: 800, color: "white" }}>Business Automation Add-on</h2>
-              <span style={{ padding: "3px 10px", borderRadius: 20, background: "rgba(251,191,36,.15)", color: "#fbbf24", fontSize: 11, fontWeight: 700, border: "1px solid rgba(251,191,36,.3)" }}>$79/month</span>
+              <span style={{ padding: "3px 10px", borderRadius: 20, background: "rgba(251,191,36,.15)", color: "#fbbf24", fontSize: 11, fontWeight: 700, border: "1px solid rgba(251,191,36,.3)" }}>
+                {AUTOMATION_ADDON_ENABLED ? "$79/month" : "Coming soon"}
+              </span>
             </div>
             <p style={{ margin: 0, fontSize: 13, color: "rgba(255,255,255,.55)", lineHeight: 1.6 }}>
               Operational automation for invoice follow-up, stock alerts, reporting, and business-app integrations.
             </p>
           </div>
-          <a href="/onboarding/payment/addon-automation?cycle=monthly" style={{ padding: "11px 22px", borderRadius: 10, background: "linear-gradient(135deg,#7c3aed,#2563eb)", color: "white", fontSize: 13, fontWeight: 700, textDecoration: "none", display: "inline-block", flexShrink: 0, whiteSpace: "nowrap" }}>
-            Add to my plan →
-          </a>
+          {/* No price, no buy button until it can actually be purchased. */}
+          {AUTOMATION_ADDON_ENABLED && (
+            <a href="/onboarding/payment/addon-automation?cycle=monthly" style={{ padding: "11px 22px", borderRadius: 10, background: "linear-gradient(135deg,#7c3aed,#2563eb)", color: "white", fontSize: 13, fontWeight: 700, textDecoration: "none", display: "inline-block", flexShrink: 0, whiteSpace: "nowrap" }}>
+              Add to my plan →
+            </a>
+          )}
         </div>
       </div>
 
@@ -62,12 +68,18 @@ function UpsellGate() {
         ))}
       </div>
 
-      <div style={{ marginTop: 14, padding: "12px 18px", borderRadius: 12, background: "rgba(0,0,0,.25)", border: "1px solid rgba(255,255,255,.06)", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 14, flexWrap: "wrap" }}>
-        <div style={{ fontSize: 13, fontWeight: 900, color: "#22c55e" }}>$79/mo</div>
-        <a href="/onboarding/payment/addon-automation?cycle=monthly" style={{ padding: "9px 18px", borderRadius: 10, background: "linear-gradient(135deg,#7c3aed,#2563eb)", color: "white", fontSize: 12, fontWeight: 700, textDecoration: "none", whiteSpace: "nowrap" }}>
-          Get Started →
-        </a>
-      </div>
+      {AUTOMATION_ADDON_ENABLED ? (
+        <div style={{ marginTop: 14, padding: "12px 18px", borderRadius: 12, background: "rgba(0,0,0,.25)", border: "1px solid rgba(255,255,255,.06)", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 14, flexWrap: "wrap" }}>
+          <div style={{ fontSize: 13, fontWeight: 900, color: "#22c55e" }}>$79/mo</div>
+          <a href="/onboarding/payment/addon-automation?cycle=monthly" style={{ padding: "9px 18px", borderRadius: 10, background: "linear-gradient(135deg,#7c3aed,#2563eb)", color: "white", fontSize: 12, fontWeight: 700, textDecoration: "none", whiteSpace: "nowrap" }}>
+            Get Started →
+          </a>
+        </div>
+      ) : (
+        <div style={{ marginTop: 14, padding: "12px 18px", borderRadius: 12, background: "rgba(0,0,0,.25)", border: "1px solid rgba(255,255,255,.06)", fontSize: 12.5, color: "rgba(255,255,255,.45)", textAlign: "center" }}>
+          Launching soon — we&apos;ll let you know the moment it&apos;s ready.
+        </div>
+      )}
     </div>
   );
 }

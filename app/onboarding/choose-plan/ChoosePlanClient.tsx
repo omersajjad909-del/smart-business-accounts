@@ -10,6 +10,7 @@ import {
 import { getCustomPlanMonthlyUsd } from "@/lib/customPlanPricing";
 import { getCurrentUser } from "@/lib/auth";
 import { clientRegionHeaders } from "@/lib/clientRegion";
+import { AUTOMATION_ADDON_ENABLED } from "@/lib/addons";
 
 /* ══════════════════════════════════════════════════════════
    TYPES & DATA — exact match with PricingSection.tsx
@@ -137,7 +138,10 @@ export default function ChoosePlanPage() {
   const [rates, setRates] = useState<Record<string, number> | null>(null);
 
   // ── Addon mode: ?addon=automation ────────────────────────────────────────
-  const addonMode = searchParams.get("addon") === "automation";
+  // `?addon=automation` falls back to the normal plan chooser while the add-on
+  // is off, so the whole upsell view and its buy buttons disappear with it.
+  const addonMode =
+    searchParams.get("addon") === "automation" && AUTOMATION_ADDON_ENABLED;
   const [loggedInUser, setLoggedInUser] = useState<{ name?: string; email?: string; id?: string } | null>(null);
 
   // Redirect bare custom plan requests to the pricing page
