@@ -384,6 +384,14 @@ export default function SecurityAccessPage() {
                       <div>IP: {session.ip || "Unavailable"}</div>
                       <div className="truncate">Device: {session.userAgent || "Unavailable"}</div>
                     </div>
+                    <div className="mt-3">
+                      <button
+                        onClick={() => revokeSession(session.id)}
+                        disabled={revoking === session.id}
+                        className="rounded-lg border border-red-500/30 bg-red-500/10 px-3 py-1 text-xs font-semibold text-red-300 disabled:opacity-50">
+                        {revoking === session.id ? "Signing out…" : "Sign out this session"}
+                      </button>
+                    </div>
                   </div>
                 ))
               )}
