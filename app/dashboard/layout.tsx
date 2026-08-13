@@ -210,6 +210,11 @@ export default function DashboardLayout({
   const [ready, setReady] = useState(false);
   const [allowedPlanPerms, setAllowedPlanPerms] = useState<Set<string> | null>(null);
   const [allowedDashboardFeatures, setAllowedDashboardFeatures] = useState<Set<string> | null>(null);
+  // Company policy says every user must have 2FA and this one does not yet.
+  // The login is allowed through — Security & Access is the only place 2FA can
+  // be enrolled, so blocking it there would lock the user out of the fix.
+  const [mustEnable2FA, setMustEnable2FA] = useState(false);
+
   // No bizFeatures state any more. The BusinessFeatureFlags from
   // /dashboard/business-features used to gate 13 sidebar links on top of the
   // plan config, and every flag defaults to false — so pages an admin had
@@ -589,6 +594,8 @@ export default function DashboardLayout({
 
         if (Array.isArray(d.dashboardFeatures)) setAllowedDashboardFeatures(new Set(d.dashboardFeatures));
         else setAllowedDashboardFeatures(null);
+
+        setMustEnable2FA(d.mustEnable2FA === true);
 
       } catch {
         const u = getCurrentUser() as CurrentUser;
