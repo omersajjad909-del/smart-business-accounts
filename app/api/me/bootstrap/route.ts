@@ -6,6 +6,7 @@ import { DASHBOARD_FEATURE_IDS, createDefaultDashboardFeatureFlags, resolveDashb
 import { BUSINESS_PHASE_CONFIG } from "@/lib/businessModules";
 import { currencyByCountry } from "@/lib/currency";
 import { getCompanyAdminControlSettings } from "@/lib/companyAdminControl";
+import { needsTwoFactorEnrollment } from "@/lib/securityPolicy";
 
 const DEFAULT_SHORTCUTS = [
   { id: "search",    keys: ["Alt","S"], label: "Global Search",     action: "focus_search",  enabled: true },
