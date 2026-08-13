@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { generateInvoicePdf } from "@/lib/invoicePdf";
 import { buildHostedBillingInvoice, verifyBillingInvoiceAccessToken } from "@/lib/billingInvoice";
+import { resolveCompanyId } from "@/lib/tenant";
 
 export const runtime = "nodejs";
 
@@ -12,20 +13,6 @@ const PLAN_PRICES: Record<string, number> = {
   ENTERPRISE: 249,
   CUSTOM: 0,
 };
-
-async function resolveCompanyId(req: NextRequest): Promise<string | null> {
-  const companyId = req.headers.get("x-company-id");
-  if (companyId) return companyId;
-
-  const userId = req.headers.get("x-user-id");
-  if (!userId) return null;
-
-  const user = await prisma.user.findUnique({
-    where: { id: userId },
-    select: { defaultCompanyId: true },
-  });
-  return user?.defaultCompanyId || null;
-}
 
 function fmtDate(date: Date): string {
   return `${String(date.getDate()).padStart(2, "0")}-${String(date.getMonth() + 1).padStart(2, "0")}-${date.getFullYear()}`;

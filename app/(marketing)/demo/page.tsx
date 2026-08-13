@@ -34,7 +34,7 @@ const CATEGORIES = Array.from(new Set(BUSINESSES.map((b) => b.category)));
 // "60+ Business Types" was the old catalogue count while this page showed one
 // live demo — a number the page itself contradicted.
 const TRUST_STATS = [
-  { value: "6",            label: "Live Demos",       icon: "🏢" },
+  { value: "7",            label: "Live Demos",       icon: "🏢" },
   { value: "Early Access", label: "Limited Spots",    icon: "🚀" },
   { value: "No signup",    label: "To Start",         icon: "⚡" },
   { value: "30 min",       label: "Full Access",      icon: "⏱️" },

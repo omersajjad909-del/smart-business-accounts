@@ -127,6 +127,70 @@ export default function SecurityAccessPage() {
   const [disablePassword, setDisablePassword] = useState("");
   const [showDisableForm, setShowDisableForm] = useState(false);
 
+  // Company policy + session control
+  const [policySaving, setPolicySaving] = useState(false);
+  const [policyMsg, setPolicyMsg] = useState("");
+  const [revoking, setRevoking] = useState<string | null>(null);
+  const isAdmin = String(getCurrentUser()?.role || "").toUpperCase() === "ADMIN";
+  // The dashboard redirects here with ?enroll2fa=1 when the company requires
+  // 2FA and this account has none.
+  const enrollRequired =
+    typeof window !== "undefined" && new URLSearchParams(window.location.search).has("enroll2fa");
+
+  const authHeaders = (): Record<string, string> => {
+    const u = getCurrentUser();
+    return {
+      "Content-Type": "application/json",
+      "x-user-id": u?.id || "",
+      "x-user-role": u?.role || "",
+      "x-company-id": u?.companyId || "",
+    };
+  };
+
+  async function togglePolicy(next: boolean) {
+    setPolicySaving(true);
+    setPolicyMsg("");
+    try {
+      const res = await fetch("/api/security/access", {
+        method: "POST",
+        headers: authHeaders(),
+        body: JSON.stringify({ twoFactorEnforced: next }),
+      });
+      const json = await res.json();
+      if (!res.ok) throw new Error(json?.error || "Failed to save");
+      setData(d => (d ? { ...d, overview: { ...d.overview, twoFactorEnforced: next } } : d));
+      setPolicyMsg(next ? "2FA is now required for every user." : "2FA requirement removed.");
+    } catch (e: any) {
+      setPolicyMsg(e?.message || "Failed to save policy");
+    } finally {
+      setPolicySaving(false);
+    }
+  }
+
+  async function revokeSession(sessionId: string) {
+    setRevoking(sessionId);
+    try {
+      const res = await fetch("/api/security/access", {
+        method: "DELETE",
+        headers: authHeaders(),
+        body: JSON.stringify({ sessionId }),
+      });
+      if (res.ok) {
+        setData(d =>
+          d
+            ? {
+                ...d,
+                sessions: d.sessions.filter(s => s.id !== sessionId),
+                overview: { ...d.overview, activeSessions: Math.max(0, d.overview.activeSessions - 1) },
+              }
+            : d,
+        );
+      }
+    } finally {
+      setRevoking(null);
+    }
+  }
+
   useEffect(() => {
     const load = async () => {
       setLoading(true);
