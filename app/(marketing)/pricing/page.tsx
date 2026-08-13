@@ -1116,9 +1116,12 @@ export default function PricingPage() {
               same modules rendered twice on one screen. The picker already badges
               them RUNS ALONE and its estimate updates live, so the grid was a
               duplicate with no extra information. */}
+          {/* Every module on the menu is now standalone, so the old sentence
+              singling out the RUNS ALONE ones drew a distinction that no longer
+              exists — the badge would have sat on all of them. */}
           <div style={{ fontSize: 13, color: "rgba(255,255,255,.42)", marginBottom: 18, textAlign: "center" }}>
-            Tick anything below and the estimate updates live. Modules marked{" "}
-            <span style={{ color: "#34d399", fontWeight: 700 }}>RUNS ALONE</span> work on their own — pick just one and that is your whole subscription.
+            Tick anything below and the estimate updates live. Every module{" "}
+            <span style={{ color: "#34d399", fontWeight: 700 }}>runs on its own</span> — pick just one and that is your whole subscription.
           </div>
 
           <div className="cp-row" style={{ display: "flex", gap: 20, alignItems: "flex-start", flexWrap: "wrap" }}>
