@@ -1981,19 +1981,19 @@ export default function AICommandCenter() {
 
               {/* ── EMPTY / WELCOME STATE ── */}
               {messages.filter(m => m.role === "user").length === 0 ? (
-                <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", flex: 1, padding: "32px 20px 16px", textAlign: "center" }}>
+                <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", flex: 1, padding: isMobile ? "18px 14px 12px" : "32px 20px 16px", textAlign: "center" }}>
                   {/* AI Avatar */}
-                  <div style={{ position: "relative", marginBottom: 20 }}>
-                    <div style={{ width: 76, height: 76, borderRadius: 26, background: "linear-gradient(135deg,#6366f1,#4f46e5)", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 20px 60px rgba(79,70,229,.5), 0 0 0 1px rgba(99,102,241,.3)" }}>
-                      <AiIcon size={36} />
+                  <div style={{ position: "relative", marginBottom: isMobile ? 12 : 20 }}>
+                    <div style={{ width: isMobile ? 56 : 76, height: isMobile ? 56 : 76, borderRadius: isMobile ? 19 : 26, background: "linear-gradient(135deg,#6366f1,#4f46e5)", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 20px 60px rgba(79,70,229,.5), 0 0 0 1px rgba(99,102,241,.3)" }}>
+                      <AiIcon size={isMobile ? 27 : 36} />
                     </div>
                     <div style={{ position: "absolute", bottom: -3, right: -3, width: 22, height: 22, borderRadius: "50%", background: "#10b981", border: "2.5px solid rgba(15,15,40,1)", display: "flex", alignItems: "center", justifyContent: "center" }}>
                       <div style={{ width: 7, height: 7, borderRadius: "50%", background: "white" }} />
                     </div>
                   </div>
 
-                  <div style={{ fontSize: 28, fontWeight: 900, color: "white", marginBottom: 8, letterSpacing: "-.5px" }}>FinovaOS AI</div>
-                  <div style={{ fontSize: 14, color: "rgba(255,255,255,.42)", marginBottom: 32, maxWidth: 400, lineHeight: 1.7 }}>
+                  <div style={{ fontSize: isMobile ? 20 : 28, fontWeight: 900, color: "white", marginBottom: isMobile ? 6 : 8, letterSpacing: "-.5px" }}>FinovaOS AI</div>
+                  <div style={{ fontSize: isMobile ? 12.5 : 14, color: "rgba(255,255,255,.42)", marginBottom: isMobile ? 18 : 32, maxWidth: 400, lineHeight: 1.6 }}>
                     Your financial intelligence assistant — connected to your live business data.<br />
                   </div>
 
