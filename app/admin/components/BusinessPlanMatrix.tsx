@@ -303,6 +303,11 @@ export default function BusinessPlanMatrix({ embedded = false, scope = "WORLD" }
               ✓ Saved
             </span>
           )}
+          {saveError && (
+            <span style={{ fontSize: 12, fontWeight: 600, color: "#f87171", padding: "8px 14px", borderRadius: 8, background: "rgba(248,113,113,0.1)", border: "1px solid rgba(248,113,113,0.3)" }}>
+              ✕ {saveError}
+            </span>
+          )}
           <button
             onClick={save}
             disabled={saving}
@@ -558,6 +563,9 @@ export default function BusinessPlanMatrix({ embedded = false, scope = "WORLD" }
             <div style={{ marginTop: 16, display: "flex", justifyContent: "flex-end", gap: 10 }}>
               {saved && (
                 <span style={{ fontSize: 13, fontWeight: 600, color: "#34d399", alignSelf: "center" }}>✓ Saved</span>
+              )}
+              {saveError && (
+                <span style={{ fontSize: 12, fontWeight: 600, color: "#f87171", alignSelf: "center" }}>✕ {saveError}</span>
               )}
               <button
                 onClick={save} disabled={saving}
