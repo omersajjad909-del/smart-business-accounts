@@ -674,6 +674,44 @@ export default function PricingPage() {
   );
   const customDisplayUsd = billing === "yearly" ? Math.round(customMonthly * (1 - yearlyDiscount / 100)) : customMonthly;
   const formatPrice = (usd: number) => formatFromUSD(usd, currency);
+  // Rupee totals are summed from the rupee rates, never converted from the USD
+  // subtotal — otherwise the line items and the headline would disagree.
+  const customPkrMonthly = useMemo(() => {
+    if (geoCountry !== "PK") return null;
+    let total = 0;
+    for (const m of customPlanData.modules) {
+      if (!selectedModules.includes(m.id)) continue;
+      const rate = Number(m?.pricePkr) || 0;
+      if (rate <= 0) return null; // A module with no rupee rate falls back to USD.
+      total += rate;
+    }
+    return total;
+  }, [selectedModules, customPlanData, geoCountry]);
+
+  /**
+   * What one module costs, for whoever is looking.
+   *
+   * Inside Pakistan this reads the module's own rupee rate — the same figure an
+   * admin types on Plans → PKR Pricing. Converting the USD price at the spot
+   * rate, which is what happened before, quoted a Pakistani visitor PKR 4,170
+   * for Accounting against a whole Starter plan at PKR 3,999.
+   */
+  const modulePkrRate = (m: any): number | null => {
+    if (!isPKUser) return null;
+    const monthly = Number(m?.pricePkr) || 0;
+    if (monthly <= 0) return null;
+    if (billing !== "yearly") return monthly;
+    const yearly = Number(m?.pricePkrYearly) || 0;
+    return yearly > 0 ? yearly : Math.round(monthly * (1 - yearlyDiscount / 100));
+  };
+  const formatModulePrice = (m: any) => {
+    const pkr = modulePkrRate(m);
+    if (pkr != null) return `₨${pkr.toLocaleString("en-PK")}`;
+    const usd = billing === "yearly"
+      ? (Number(m?.priceYearly) || Math.round(Number(m?.price) * (1 - yearlyDiscount / 100)))
+      : Number(m?.price) || 0;
+    return formatPrice(usd);
+  };
 
   // When country is PK and admin has set PKR prices, use those directly
   // Was `country === "PK" || currency === "PKR"` — the currency dropdown alone
@@ -1157,7 +1195,7 @@ export default function PricingPage() {
                             <div style={{ fontSize: 11, color: "rgba(255,255,255,.38)", lineHeight: 1.5, marginBottom: 9 }}>{module.desc}</div>
                             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, flexWrap: "wrap" }}>
                               <div style={{ fontSize: 14, fontWeight: 800, color: sel ? "#f97316" : "rgba(255,255,255,.45)" }}>
-                                +{formatPrice(module.price)}<span style={{ fontSize: 10, fontWeight: 500, color: "rgba(255,255,255,.3)" }}>/mo</span>
+                                +{formatModulePrice(module)}<span style={{ fontSize: 10, fontWeight: 500, color: "rgba(255,255,255,.3)" }}>/mo</span>
                               </div>
                               {/* Says whether ticking only this box is already a
                                   working subscription, or whether it needs a
@@ -1226,7 +1264,7 @@ export default function PricingPage() {
                     {customPlanData.modules.filter((m: any) => selectedModules.includes(m.id)).map((m: any) => (
                       <div key={m.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                         <span style={{ fontSize: 12, color: "rgba(255,255,255,.55)" }}>{m.icon} {m.name}</span>
-                        <span style={{ fontSize: 12, fontWeight: 700, color: "rgba(255,255,255,.78)" }}>{formatPrice(m.price)}</span>
+                        <span style={{ fontSize: 12, fontWeight: 700, color: "rgba(255,255,255,.78)" }}>{formatModulePrice(m)}</span>
                       </div>
                     ))}
                   </div>
@@ -1254,24 +1292,33 @@ export default function PricingPage() {
                 <div style={{ borderTop: "1px solid rgba(249,115,22,.25)", paddingTop: 14, marginBottom: 16 }}>
                   {billing === "yearly" && customMonthly > 0 && (
                     <div style={{ fontSize: 11, color: "rgba(255,255,255,.35)", marginBottom: 4, display: "flex", justifyContent: "space-between" }}>
-                      <span>Subtotal</span><span>{formatPrice(customMonthly)}/mo</span>
+                      <span>Subtotal</span>
+                      <span>{customPkrMonthly != null ? `₨${customPkrMonthly.toLocaleString("en-PK")}` : formatPrice(customMonthly)}/mo</span>
                     </div>
                   )}
                   {billing === "yearly" && (
                     <div style={{ fontSize: 11, color: "#34d399", marginBottom: 6, display: "flex", justifyContent: "space-between", fontWeight: 700 }}>
                       <span>Yearly −{yearlyDiscount}%</span>
-                      <span>−{formatPrice(Math.round(customMonthly * yearlyDiscount / 100))}</span>
+                      <span>−{customPkrMonthly != null
+                        ? `₨${Math.round(customPkrMonthly * yearlyDiscount / 100).toLocaleString("en-PK")}`
+                        : formatPrice(Math.round(customMonthly * yearlyDiscount / 100))}</span>
                     </div>
                   )}
                   <div style={{ fontSize: 10, color: "rgba(255,255,255,.3)", marginBottom: 4 }}>
                     {billing === "yearly" ? "Per month, billed annually" : "Per month"}
                   </div>
                   <div style={{ fontSize: 42, fontWeight: 900, color: customMonthly > 0 ? "#f97316" : "rgba(255,255,255,.2)", lineHeight: 1, letterSpacing: "-1.5px" }}>
-                    {customMonthly > 0 ? formatPrice(customDisplayUsd) : "—"}
+                    {customMonthly <= 0
+                      ? "—"
+                      : customPkrMonthly != null
+                        ? `₨${(billing === "yearly" ? Math.round(customPkrMonthly * (1 - yearlyDiscount / 100)) : customPkrMonthly).toLocaleString("en-PK")}`
+                        : formatPrice(customDisplayUsd)}
                   </div>
                   {billing === "yearly" && customMonthly > 0 && (
                     <div style={{ fontSize: 11, color: "#34d399", marginTop: 6, fontWeight: 700 }}>
-                      Save {formatPrice(Math.round(customMonthly * yearlyDiscount / 100 * 12))} per year
+                      Save {customPkrMonthly != null
+                        ? `₨${Math.round(customPkrMonthly * yearlyDiscount / 100 * 12).toLocaleString("en-PK")}`
+                        : formatPrice(Math.round(customMonthly * yearlyDiscount / 100 * 12))} per year
                     </div>
                   )}
                 </div>
