@@ -116,6 +116,8 @@ export default function LaunchNowCard() {
   const [working, setWorking] = useState(false);
   const [celebrate, setCelebrate] = useState(false);
   const [error, setError] = useState("");
+  // T-minus. `null` means no launch in progress.
+  const [countdown, setCountdown] = useState<number | null>(null);
 
   const headers = useCallback((json = false) => {
     const u = getCurrentUser();
@@ -133,7 +135,7 @@ export default function LaunchNowCard() {
       .catch(() => {});
   }, [headers]);
 
-  async function apply(live: boolean) {
+  const apply = useCallback(async (live: boolean) => {
     setWorking(true);
     setError("");
     try {
@@ -152,7 +154,30 @@ export default function LaunchNowCard() {
     } finally {
       setWorking(false);
     }
-  }
+  }, [headers]);
+
+  /**
+   * T-minus 10 to launch.
+   *
+   * Nothing is written until the count reaches zero, so Abort genuinely aborts
+   * — a countdown that had already flipped the switch behind the scenes would
+   * be theatre with a lie in it.
+   */
+  useEffect(() => {
+    if (countdown === null) return;
+
+    if (countdown > 0) {
+      const t = setTimeout(() => setCountdown(n => (n === null ? null : n - 1)), 1000);
+      return () => clearTimeout(t);
+    }
+
+    // Zero: hold on "0" for a beat, then actually launch.
+    const t = setTimeout(() => {
+      setCountdown(null);
+      apply(true);
+    }, 700);
+    return () => clearTimeout(t);
+  }, [countdown, apply]);
 
   if (!status) return null;
 
@@ -264,7 +289,7 @@ export default function LaunchNowCard() {
             </div>
             <p style={{ fontSize: 13.5, lineHeight: 1.75, color: "rgba(255,255,255,.5)", marginBottom: 24 }}>
               {confirming === "launch"
-                ? "Every pricing button goes live and visitors can sign up and pay immediately."
+                ? "A 10-second countdown starts. At zero every pricing button goes live and visitors can sign up and pay. You can abort until then."
                 : "Buy buttons go back to “Launching Soon”. Existing customers are unaffected."}
             </p>
             <div style={{ display: "flex", gap: 10, justifyContent: "center" }}>
@@ -283,7 +308,16 @@ export default function LaunchNowCard() {
               <button
                 type="button"
                 disabled={working}
-                onClick={() => apply(confirming === "launch")}
+                onClick={() => {
+                  if (confirming === "launch") {
+                    // Countdown first; the write happens when it hits zero.
+                    setConfirming(null);
+                    setError("");
+                    setCountdown(10);
+                  } else {
+                    apply(false);
+                  }
+                }}
                 style={{
                   padding: "11px 26px", borderRadius: 11, border: "none",
                   cursor: working ? "not-allowed" : "pointer",
@@ -293,10 +327,74 @@ export default function LaunchNowCard() {
                   color: "white", fontSize: 13.5, fontWeight: 800, fontFamily: "inherit",
                 }}
               >
-                {working ? "Working…" : confirming === "launch" ? "Yes, launch it" : "Take offline"}
+                {working ? "Working…" : confirming === "launch" ? "Start countdown" : "Close signups"}
               </button>
             </div>
           </div>
+        </div>
+      )}
+
+      {/* ── T-minus countdown ── */}
+      {countdown !== null && (
+        <div
+          style={{
+            position: "fixed", inset: 0, zIndex: 9999, display: "flex",
+            flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 8,
+            background: "radial-gradient(circle at 50% 45%, rgba(79,70,229,.22), rgba(2,4,16,.96))",
+            backdropFilter: "blur(8px)", fontFamily: "'Outfit','DM Sans',sans-serif", color: "white",
+          }}
+        >
+          <div style={{ fontSize: 13, fontWeight: 700, letterSpacing: ".32em", textTransform: "uppercase", color: "rgba(255,255,255,.42)" }}>
+            {countdown === 0 ? "Liftoff" : "Launching FinovaOS"}
+          </div>
+
+          <div style={{ position: "relative", width: 260, height: 260, display: "flex", alignItems: "center", justifyContent: "center" }}>
+            {/* Ring drains as the count falls. */}
+            <svg width="260" height="260" style={{ position: "absolute", inset: 0, transform: "rotate(-90deg)" }}>
+              <circle cx="130" cy="130" r="118" fill="none" stroke="rgba(255,255,255,.07)" strokeWidth="6" />
+              <circle
+                cx="130" cy="130" r="118" fill="none"
+                stroke={countdown <= 3 ? "#f59e0b" : "#818cf8"}
+                strokeWidth="6" strokeLinecap="round"
+                strokeDasharray={2 * Math.PI * 118}
+                strokeDashoffset={2 * Math.PI * 118 * (1 - countdown / 10)}
+                style={{ transition: "stroke-dashoffset 1s linear, stroke .3s" }}
+              />
+            </svg>
+            <div
+              // Keyed so the animation replays on every tick.
+              key={countdown}
+              style={{
+                fontSize: countdown === 0 ? 96 : 132, fontWeight: 900, lineHeight: 1,
+                letterSpacing: "-4px",
+                color: countdown <= 3 ? "#fbbf24" : "white",
+                textShadow: countdown <= 3 ? "0 0 60px rgba(245,158,11,.6)" : "0 0 60px rgba(99,102,241,.55)",
+                animation: "tmTick .5s cubic-bezier(.18,.89,.32,1.28) both",
+              }}
+            >
+              {countdown === 0 ? "🚀" : countdown}
+            </div>
+          </div>
+
+          <button
+            type="button"
+            onClick={() => setCountdown(null)}
+            disabled={countdown === 0}
+            style={{
+              marginTop: 14, padding: "9px 22px", borderRadius: 999,
+              cursor: countdown === 0 ? "not-allowed" : "pointer",
+              background: "rgba(255,255,255,.06)", border: "1px solid rgba(255,255,255,.16)",
+              color: "rgba(255,255,255,.6)", fontSize: 12.5, fontWeight: 700, fontFamily: "inherit",
+              opacity: countdown === 0 ? 0.35 : 1,
+            }}
+          >
+            Abort
+          </button>
+          <div style={{ fontSize: 11.5, color: "rgba(255,255,255,.25)" }}>
+            Nothing changes until the count reaches zero
+          </div>
+
+          <style>{`@keyframes tmTick { from { opacity:0; transform:scale(1.7) } to { opacity:1; transform:scale(1) } }`}</style>
         </div>
       )}
 
@@ -314,9 +412,16 @@ export default function LaunchNowCard() {
             }}
           >
             <div style={{ textAlign: "center", color: "white", fontFamily: "'Outfit','DM Sans',sans-serif", animation: "launchPop .6s cubic-bezier(.18,.89,.32,1.28) both" }}>
-              <div style={{ fontSize: 76, marginBottom: 10 }}>🎉</div>
-              <div style={{ fontSize: 40, fontWeight: 900, letterSpacing: "-1px", marginBottom: 12 }}>
-                FinovaOS is LIVE
+              <div style={{ fontSize: 76, marginBottom: 6 }}>🎉</div>
+              <div style={{ fontSize: 20, fontWeight: 800, letterSpacing: ".18em", textTransform: "uppercase", color: "#a5b4fc", marginBottom: 10 }}>
+                Congratulations
+              </div>
+              <div style={{
+                fontSize: 46, fontWeight: 900, letterSpacing: "-1.5px", marginBottom: 14, lineHeight: 1.1,
+                background: "linear-gradient(120deg,#ffffff,#c7d2fe,#a78bfa)",
+                WebkitBackgroundClip: "text", backgroundClip: "text", color: "transparent",
+              }}>
+                FinovaOS is Launched
               </div>
               <p style={{ fontSize: 15, color: "rgba(255,255,255,.6)", marginBottom: 26 }}>
                 Every pricing button is now open. You are taking customers.
