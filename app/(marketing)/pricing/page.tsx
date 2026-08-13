@@ -4,7 +4,6 @@ import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { formatFromUSD } from "@/lib/currency-client";
 import { STANDALONE_MODULE_IDS } from "@/lib/customPlanPricing";
-import { SIGNUPS_OPEN } from "@/lib/signupGate";
 import { useSignupsOpen } from "@/hooks/useSignupsOpen";
 import { clientRegionHeaders } from "@/lib/clientRegion";
 
