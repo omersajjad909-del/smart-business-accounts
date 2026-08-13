@@ -671,6 +671,14 @@ export default function DashboardLayout({
     return allowed.includes(effectiveBusinessType);
   };
 
+  // 2FA enforcement gate. Without this the admin's toggle in Security & Access
+  // would be a label and nothing more — users could ignore it forever.
+  useEffect(() => {
+    if (!ready || !mustEnable2FA) return;
+    if (pathname === "/dashboard/security-access") return;
+    router.replace("/dashboard/security-access?enroll2fa=1");
+  }, [ready, mustEnable2FA, pathname]);
+
   // Redirect to business-setup if company hasn't completed setup
   useEffect(() => {
     if (!ready || !companyDetail) return;

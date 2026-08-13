@@ -35,6 +35,14 @@ function buildInvoiceStatus(status?: string | null) {
   }
 }
 
+function parsePaymentDetails(details: string | null) {
+  try {
+    return details ? JSON.parse(details) : null;
+  } catch {
+    return null;
+  }
+}
+
 export async function GET(req: NextRequest) {
   try {
     const companyId = req.headers.get("x-company-id");
@@ -103,21 +111,34 @@ export async function GET(req: NextRequest) {
       take: 50,
     }).catch(() => []);
 
-    const realInvoices = paymentLogs.flatMap((log, i) => {
-      let det: any;
-      try { det = log.details ? JSON.parse(log.details) : null; } catch { return []; }
+    const invoiceSourceLogs = new Map<string, { log: (typeof paymentLogs)[number]; details: any }>();
+    for (const log of paymentLogs) {
+      const det = parsePaymentDetails(log.details);
       const minorUnits = Number(det?.amount ?? det?.amount_paid ?? 0);
-      if (!Number.isFinite(minorUnits) || minorUnits <= 0) return [];
-      return [{
+      if (!Number.isFinite(minorUnits) || minorUnits <= 0) continue;
+
+      // Lemon Squeezy can send both order_created and subscription_payment_success
+      // for one card charge. The order id is the shared receipt key.
+      const dedupeKey =
+        String(det?.orderId || det?.order_id || det?.subscriptionId || log.id).trim() || log.id;
+      if (!invoiceSourceLogs.has(dedupeKey)) {
+        invoiceSourceLogs.set(dedupeKey, { log, details: det });
+      }
+    }
+
+    const realInvoices = Array.from(invoiceSourceLogs.values()).map(({ log, details: det }, i) => {
+      const minorUnits = Number(det?.amount ?? det?.amount_paid ?? 0);
+      return {
         id: `pay_${log.id}`,
-        number: `INV-${log.createdAt.getFullYear()}-${String(paymentLogs.length - i).padStart(3, "0")}`,
+        paymentKey: String(det?.orderId || det?.order_id || det?.subscriptionId || log.id),
+        number: `INV-${log.createdAt.getFullYear()}-${String(invoiceSourceLogs.size - i).padStart(3, "0")}`,
         date: formatInvoiceDate(log.createdAt),
         amount: minorUnits / 100,
         currency: String(det?.currency || currency).toUpperCase(),
         status: "paid" as const,
         plan: effectivePlan,
         billingCycle: cycle,
-      }];
+      };
     });
 
     if (realInvoices.length > 0) {
