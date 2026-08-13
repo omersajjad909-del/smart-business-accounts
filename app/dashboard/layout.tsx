@@ -2003,10 +2003,9 @@ export default function DashboardLayout({
             >
               {hasDashboardFeature("WHOLESALE_OVERVIEW") && <NavLink href="/dashboard/wholesale" pathname={pathname}>Wholesale Overview</NavLink>}
               {hasDashboardFeature("WHOLESALE_SALES_ORDER") && <NavLink href="/dashboard/sales-order" pathname={pathname}>Sales Orders</NavLink>}
-              {hasDashboardFeature("WHOLESALE_PRICE_LISTS") && <NavLink href="/dashboard/price-lists" pathname={pathname}>Price Lists</NavLink>}
               {hasDashboardFeature("WHOLESALE_CREDIT_LIMITS") && <NavLink href="/dashboard/credit-limits" pathname={pathname}>Credit Limits</NavLink>}
-              {/* Warehouses is linked from the Inventory group — same one-route-
-                  one-link rule as Warehouse Transfers above. */}
+              {/* Warehouses and Price Lists are linked from the Inventory group —
+                  same one-route-one-link rule as Warehouse Transfers above. */}
             </NavGroup>
           )}
 

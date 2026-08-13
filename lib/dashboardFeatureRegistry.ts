@@ -2314,15 +2314,8 @@ export const DASHBOARD_FEATURE_DEFS: DashboardFeatureDefinition[] = [
     section: "Inventory",
     businessTypes: ["trading", "wholesale", "distribution"],
   },
-  {
-    id: "TRADING_WAREHOUSE_TRANSFERS",
-    label: "Warehouse Transfers",
-    route: "/dashboard/warehouse-transfers",
-    business: "trading",
-    businessLabel: "Trading",
-    section: "Logistics",
-    businessTypes: ["trading", "wholesale", "distribution"],
-  },
+  // TRADING_WAREHOUSE_TRANSFERS moved to the core Inventory block below — the
+  // sidebar links it from the shared Inventory group for every trade.
   {
     id: "TRADING_PURCHASE_REQUISITION",
     label: "Purchase Requisition",
@@ -2352,15 +2345,7 @@ export const DASHBOARD_FEATURE_DEFS: DashboardFeatureDefinition[] = [
     section: "Sales",
     businessTypes: ["wholesale", "trading", "distribution"],
   },
-  {
-    id: "WHOLESALE_PRICE_LISTS",
-    label: "Price Lists",
-    route: "/dashboard/price-lists",
-    business: "wholesale",
-    businessLabel: "Wholesale",
-    section: "Sales",
-    businessTypes: ["wholesale", "trading"],
-  },
+  // WHOLESALE_PRICE_LISTS moved to the core Inventory block below.
   {
     id: "WHOLESALE_CREDIT_LIMITS",
     label: "Credit Limits",
@@ -2370,15 +2355,7 @@ export const DASHBOARD_FEATURE_DEFS: DashboardFeatureDefinition[] = [
     section: "Finance Desk",
     businessTypes: ["wholesale", "trading", "distribution"],
   },
-  {
-    id: "WHOLESALE_WAREHOUSES",
-    label: "Warehouses & Transfers",
-    route: "/dashboard/warehouses",
-    business: "wholesale",
-    businessLabel: "Wholesale",
-    section: "Inventory",
-    businessTypes: ["wholesale", "trading", "distribution"],
-  },
+  // WHOLESALE_WAREHOUSES moved to the core Inventory block below.
   // ── Costing — deliberately not tied to one business type. A printer, a
   //    garment unit and a plastics moulder all cost their work from a formula;
   //    only the formula differs, and the user writes that themselves. So both
@@ -2462,8 +2439,26 @@ export const CORE_DASHBOARD_FEATURES: DashboardFeatureDefinition[] = [
   // ── Inventory ──
   { id: "CORE_INVENTORY", label: "Inventory Overview", route: "/dashboard/inventory", section: "Inventory", core: true, permKey: "VIEW_INVENTORY", business: "service", businessLabel: "Core (all businesses)" },
   { id: "CORE_ITEMS_NEW", label: "Inventory Items", route: "/dashboard/items-new", section: "Inventory", core: true, permKey: "CREATE_ITEMS", business: "service", businessLabel: "Core (all businesses)" },
+  // Warehouses, Warehouse Transfers and Price Lists used to be industry defs
+  // (WHOLESALE_WAREHOUSES / TRADING_WAREHOUSE_TRANSFERS / WHOLESALE_PRICE_LISTS)
+  // scoped to wholesale + trading + distribution, while the sidebar links all
+  // three from the shared Inventory group for every trade. That mismatch cost
+  // twice: /admin/plans showed the Inventory group with 6 pages instead of 9 for
+  // every other business type, so the three could not be assigned to a plan at
+  // all; and the industry guard in the dashboard layout bounced anyone whose
+  // trade was not on that list straight back to /dashboard the moment they
+  // clicked the link their own sidebar had just offered.
+  //
+  // They are core pages — a warehouse is a warehouse whatever you sell — so the
+  // gate is the permission (MULTI_BRANCH / MANAGE_PRICE_LISTS), same as
+  // CORE_BRANCHES. The ids keep their old prefixes on purpose: they are already
+  // saved in live plan and per-company page configs, and renaming them would
+  // silently switch the pages off for every company that has them ticked.
+  { id: "WHOLESALE_WAREHOUSES", label: "Warehouses", route: "/dashboard/warehouses", section: "Inventory", core: true, permKey: "MULTI_BRANCH", business: "service", businessLabel: "Core (all businesses)" },
+  { id: "TRADING_WAREHOUSE_TRANSFERS", label: "Warehouse Transfers", route: "/dashboard/warehouse-transfers", section: "Inventory", core: true, permKey: "MULTI_BRANCH", business: "service", businessLabel: "Core (all businesses)" },
   { id: "CORE_PRODUCT_VARIANTS", label: "Product Variants", route: "/dashboard/product-variants", section: "Inventory", core: true, permKey: "VIEW_CATALOG", business: "service", businessLabel: "Core (all businesses)" },
   { id: "CORE_BATCH_TRACKING", label: "Batch & Serial", route: "/dashboard/batch-tracking", section: "Inventory", core: true, permKey: "VIEW_INVENTORY", business: "service", businessLabel: "Core (all businesses)" },
+  { id: "WHOLESALE_PRICE_LISTS", label: "Price Lists", route: "/dashboard/price-lists", section: "Inventory", core: true, permKey: "MANAGE_PRICE_LISTS", business: "service", businessLabel: "Core (all businesses)" },
   { id: "CORE_STOCK_RATE", label: "Stock Rates", route: "/dashboard/stock-rate", section: "Inventory", core: true, permKey: "CREATE_STOCK_RATE", business: "service", businessLabel: "Core (all businesses)" },
   { id: "CORE_BARCODE", label: "Barcode", route: "/dashboard/barcode", section: "Inventory", core: true, permKey: "MANAGE_BARCODE", business: "service", businessLabel: "Core (all businesses)" },
   // ── Banking & Payments ──

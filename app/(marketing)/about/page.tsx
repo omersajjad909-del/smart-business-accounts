@@ -51,7 +51,7 @@ const INDUSTRIES = [
   { icon: "🚚", title: "Distribution", desc: "Route-based sales, multi-warehouse transfers, van stock management, and collections.", color: "#8b5cf6" },
   { icon: "🏭", title: "Manufacturing", desc: "Bills of materials, production orders, raw material consumption, and job costing.", color: "#f59e0b" },
   { icon: "🚢", title: "Import / Export", desc: "Commercial invoices, packing lists, shipment tracking, LC/TT activity, and trade costing.", color: "#14b8a6" },
-  { icon: "✈️", title: "Travel Agency", desc: "Airline tickets, PNRs, visa cases, client quotations, and service billing in one desk.", color: "#818cf8" },
+  { icon: "⚓", title: "Clearing & Forwarding", desc: "Import and export shipments, customs clearance, GDs, invoices, consignments, and client billing in one desk.", color: "#818cf8"},
 ];
 
 const TIMELINE = [
