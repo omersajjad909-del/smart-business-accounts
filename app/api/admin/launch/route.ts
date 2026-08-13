@@ -13,7 +13,8 @@ import { NextRequest, NextResponse } from "next/server";
 
 import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/adminAuth";
-import { getSiteStatus, SITE_LIVE_KEY } from "@/lib/siteStatus";
+import { getSiteStatus } from "@/lib/siteStatus";
+import { SITE_LAUNCHED_KEY } from "@/lib/signupGate";
 
 /**
  * ActivityLog.userId is a foreign key into User, but an admin session is not
@@ -50,11 +51,13 @@ export async function POST(req: NextRequest) {
     const userId = await userIdIfReal(admin.id);
 
     const writes: any[] = [
+      // Every buy button, signup URL and checkout API reads this one key
+      // through lib/signupGate.
       prisma.activityLog.create({
         data: {
           action: "ADMIN_SETTING",
           userId,
-          details: JSON.stringify({ key: SITE_LIVE_KEY, value: live }),
+          details: JSON.stringify({ key: SITE_LAUNCHED_KEY, value: live }),
         },
       }),
     ];

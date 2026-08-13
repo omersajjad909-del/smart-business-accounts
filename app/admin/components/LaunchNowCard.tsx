@@ -16,7 +16,12 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { getCurrentUser } from "@/lib/auth";
 
-type Status = { live: boolean; launchedAt: string | null; launchedBy: string | null };
+type Status = {
+  live: boolean;
+  launchedAt: string | null;
+  launchedBy: string | null;
+  forcedByEnv?: boolean;
+};
 
 const COLORS = ["#6366f1", "#8b5cf6", "#10b981", "#f59e0b", "#ef4444", "#38bdf8", "#f472b6"];
 
@@ -186,57 +191,34 @@ export default function LaunchNowCard() {
           </div>
           <div style={{ minWidth: 0 }}>
             <div style={{ fontSize: 16, fontWeight: 800, color: "var(--text, #fff)", letterSpacing: "-.2px" }}>
-              {status.live ? "Your website is LIVE" : "Ready to launch"}
+              {status.live ? "FinovaOS is LIVE" : "Ready to launch"}
             </div>
             <div style={{ fontSize: 12.5, color: "rgba(148,163,184,.9)", marginTop: 3 }}>
               {status.live
                 ? launchedOn
-                  ? `Live since ${launchedOn}${status.launchedBy ? ` · launched by ${status.launchedBy}` : ""}`
-                  : "Public site is open to all visitors."
-                : "Visitors are seeing the Coming Soon page. Press Launch to open the site."}
+                  ? `Launched ${launchedOn}${status.launchedBy ? ` by ${status.launchedBy}` : ""} · buy buttons are open`
+                  : "Signups and buy buttons are open."
+                : "Pricing buttons show “Launching Soon”. Press Launch Now to open them."}
             </div>
             {error && <div style={{ fontSize: 12, color: "#f87171", marginTop: 6 }}>{error}</div>}
           </div>
         </div>
 
-        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          {status.live ? (
-            <>
-              <a
-                href="/"
-                target="_blank"
-                rel="noreferrer"
-                style={{ fontSize: 12.5, fontWeight: 600, color: "#a5b4fc", textDecoration: "none" }}
-              >
-                View live site →
-              </a>
-              <button
-                type="button"
-                onClick={() => setConfirming("offline")}
-                style={{
-                  padding: "9px 16px", borderRadius: 10, cursor: "pointer",
-                  background: "rgba(255,255,255,.05)", border: "1px solid rgba(255,255,255,.14)",
-                  color: "rgba(226,232,240,.75)", fontSize: 12.5, fontWeight: 600, fontFamily: "inherit",
-                }}
-              >
-                Take offline
-              </button>
-            </>
-          ) : (
-            <button
-              type="button"
-              onClick={() => setConfirming("launch")}
-              style={{
-                padding: "13px 30px", borderRadius: 12, cursor: "pointer", border: "none",
-                background: "linear-gradient(135deg,#6366f1,#7c3aed)", color: "white",
-                fontSize: 14.5, fontWeight: 800, fontFamily: "inherit",
-                boxShadow: "0 10px 30px rgba(99,102,241,.45)", whiteSpace: "nowrap",
-              }}
-            >
-              🚀 Launch Now
-            </button>
-          )}
-        </div>
+        {/* One button, as asked: nothing here but Launch Now until it is live. */}
+        {!status.live && (
+          <button
+            type="button"
+            onClick={() => setConfirming("launch")}
+            style={{
+              padding: "13px 30px", borderRadius: 12, cursor: "pointer", border: "none",
+              background: "linear-gradient(135deg,#6366f1,#7c3aed)", color: "white",
+              fontSize: 14.5, fontWeight: 800, fontFamily: "inherit",
+              boxShadow: "0 10px 30px rgba(99,102,241,.45)", whiteSpace: "nowrap",
+            }}
+          >
+            🚀 Launch Now
+          </button>
+        )}
       </div>
 
       {/* ── Confirm ── */}
@@ -258,12 +240,12 @@ export default function LaunchNowCard() {
           >
             <div style={{ fontSize: 40, marginBottom: 12 }}>{confirming === "launch" ? "🚀" : "⚠️"}</div>
             <div style={{ fontSize: 19, fontWeight: 800, marginBottom: 10 }}>
-              {confirming === "launch" ? "Launch FinovaOS?" : "Take the site offline?"}
+              {confirming === "launch" ? "Launch FinovaOS?" : "Close signups again?"}
             </div>
             <p style={{ fontSize: 13.5, lineHeight: 1.75, color: "rgba(255,255,255,.5)", marginBottom: 24 }}>
               {confirming === "launch"
-                ? "The public website will open to every visitor immediately."
-                : "Visitors will see the Coming Soon page. Existing customers can still sign in and use their dashboard."}
+                ? "Every pricing button goes live and visitors can sign up and pay immediately."
+                : "Buy buttons go back to “Launching Soon”. Existing customers are unaffected."}
             </p>
             <div style={{ display: "flex", gap: 10, justifyContent: "center" }}>
               <button
@@ -317,7 +299,7 @@ export default function LaunchNowCard() {
                 FinovaOS is LIVE
               </div>
               <p style={{ fontSize: 15, color: "rgba(255,255,255,.6)", marginBottom: 26 }}>
-                Your website is now open to the world.
+                Every pricing button is now open. You are taking customers.
               </p>
               <a
                 href="/"

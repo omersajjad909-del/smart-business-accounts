@@ -1,57 +1,49 @@
 // FILE: lib/siteStatus.ts
 //
-// Whether the public marketing site is open to the world.
+// Has the product been launched? — the state behind the Launch Now button.
 //
-// The launch flag lives in the same ActivityLog `ADMIN_SETTING` store the rest
-// of /admin/settings uses, so there is no new table and no new migration. It is
-// read by the marketing layout on every render and written only by
-// /api/admin/launch.
+// This is the same flag lib/signupGate.ts gates every buy button, signup URL
+// and checkout API on, read here for the admin panel. One key, so the button
+// and the doors can never disagree.
 //
-// The default is LIVE. The site has been serving real visitors for months, so a
-// missing row must never be read as "not launched yet" — that would take a
-// running product offline the moment this code deployed. Going dark is only
-// ever the result of an explicit "take offline" action.
+// Default is NOT launched, matching the signup gate's own default. Pre-launch
+// is the safe state: a missing row, a bad row or a database that will not
+// answer must never be read as "we are selling now".
 
 import { prisma } from "@/lib/prisma";
-
-export const SITE_LIVE_KEY = "siteLive";
+import { SITE_LAUNCHED_KEY, SIGNUPS_OPEN } from "@/lib/signupGate";
 
 export type SiteStatus = {
+  /** Buy buttons enabled and signup URLs open. */
   live: boolean;
-  /** When the site was last launched, if it ever was. */
   launchedAt: string | null;
   launchedBy: string | null;
+  /** True when NEXT_PUBLIC_SIGNUPS_OPEN forced it open at build time. */
+  forcedByEnv: boolean;
 };
-
-/** Reads one ADMIN_SETTING key, newest write wins. */
-async function readSetting(key: string): Promise<unknown> {
-  const log = await prisma.activityLog
-    .findFirst({
-      where: { action: "ADMIN_SETTING", details: { startsWith: `{"key":"${key}"` } },
-      orderBy: { createdAt: "desc" },
-      select: { details: true },
-    })
-    .catch(() => null);
-  if (!log?.details) return undefined;
-  try {
-    return JSON.parse(log.details)?.value;
-  } catch {
-    return undefined;
-  }
-}
 
 export async function getSiteStatus(): Promise<SiteStatus> {
   try {
-    const [live, launch] = await Promise.all([
-      readSetting(SITE_LIVE_KEY),
-      prisma.activityLog
-        .findFirst({
-          where: { action: "SITE_LAUNCHED" },
-          orderBy: { createdAt: "desc" },
-          select: { createdAt: true, details: true },
-        })
-        .catch(() => null),
+    const [setting, launch] = await Promise.all([
+      prisma.activityLog.findFirst({
+        where: {
+          action: "ADMIN_SETTING",
+          details: { startsWith: `{"key":"${SITE_LAUNCHED_KEY}"` },
+        },
+        orderBy: { createdAt: "desc" },
+        select: { details: true },
+      }).catch(() => null),
+      prisma.activityLog.findFirst({
+        where: { action: "SITE_LAUNCHED" },
+        orderBy: { createdAt: "desc" },
+        select: { createdAt: true, details: true },
+      }).catch(() => null),
     ]);
+
+    let flag = false;
+    try {
+      flag = JSON.parse(setting?.details || "{}")?.value === true;
+    } catch {}
 
     let launchedBy: string | null = null;
     try {
@@ -59,14 +51,12 @@ export async function getSiteStatus(): Promise<SiteStatus> {
     } catch {}
 
     return {
-      // Only an explicit `false` closes the site. Anything else — no row, a
-      // malformed row, a failed read — means live.
-      live: live !== false,
+      live: SIGNUPS_OPEN || flag,
       launchedAt: launch?.createdAt?.toISOString() ?? null,
       launchedBy,
+      forcedByEnv: SIGNUPS_OPEN,
     };
   } catch {
-    // A database hiccup must not black out the public site.
-    return { live: true, launchedAt: null, launchedBy: null };
+    return { live: SIGNUPS_OPEN, launchedAt: null, launchedBy: null, forcedByEnv: SIGNUPS_OPEN };
   }
 }

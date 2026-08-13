@@ -45,6 +45,8 @@ function Sparkline({ d, color }: { d: number[]; color: string }) {
 export default function Hero() {
   const [ready, setReady] = useState(false);
   const sectionRef = useRef<HTMLElement>(null);
+  // Runtime gate, so Launch Now opens this without a redeploy.
+  const signupsOpen = useSignupsOpen();
 
   useEffect(() => {
     const t = setTimeout(() => setReady(true), 100);

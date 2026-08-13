@@ -51,7 +51,7 @@ function buildCsp(nonce: string): string {
   ].join("; ");
 }
 
-export function proxy(req: NextRequest) {
+export async function proxy(req: NextRequest) {
   // Per-request CSP nonce — server components read this via next/headers.
   const nonce = generateNonce();
   const csp = buildCsp(nonce);
