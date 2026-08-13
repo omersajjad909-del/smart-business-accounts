@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getTokenFromRequest, verifyJwt } from "@/lib/auth";
 import {
-  SIGNUPS_OPEN,
   WAITLIST_PATH,
+  getSignupsOpen,
   isSignupApiRoute,
   isSignupPageRoute,
 } from "@/lib/signupGate";
@@ -166,7 +166,10 @@ export function proxy(req: NextRequest) {
   // Pre-launch: no new accounts. Enforced here rather than by disabling
   // buttons, because a disabled button still leaves the URL, the API and every
   // old link working. Visitors land on the waitlist so the interest is kept.
-  if (!SIGNUPS_OPEN) {
+  //
+  // Only the two route lists below are consulted, so the database read costs
+  // nothing on ordinary traffic — and it is cached for a few seconds anyway.
+  if ((isSignupApiRoute(pathname) || isSignupPageRoute(pathname)) && !(await getSignupsOpen())) {
     if (isSignupApiRoute(pathname)) {
       return NextResponse.json(
         { error: "Signups are not open yet", waitlist: WAITLIST_PATH },
