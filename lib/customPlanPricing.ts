@@ -1,6 +1,18 @@
 export const CUSTOM_PLAN_BASE_MONTHLY_USD = 15;
 export const CUSTOM_PLAN_YEARLY_DISCOUNT = 0.2; // 20%
 
+// Only modules that are a working product on their own are sold here.
+//
+// The list used to carry five more — Advanced Reports, Multi-Branch, WhatsApp &
+// SMS, API Access, Tax & Compliance. Each of those is a layer over something
+// else: Advanced Reports has nothing to report on by itself, Multi-Branch has
+// nothing to branch, API Access has no data to expose. A customer could tick
+// "Advanced Reports" alone, pay $8/mo and land in an app with no data in it.
+//
+// They are not gone from the product — CUSTOM_MODULE_PERMISSIONS still grants
+// them, so every existing subscription keeps exactly what it bought. They are
+// only off the self-serve menu until they can be sold as dependent add-ons
+// that require a base module first.
 export const CUSTOM_PLAN_MODULES = [
   { id: "accounting", name: "Accounting & Invoicing", price: 15 },
   { id: "inventory", name: "Inventory Management", price: 12 },
@@ -8,11 +20,6 @@ export const CUSTOM_PLAN_MODULES = [
   { id: "hr_payroll", name: "HR & Payroll", price: 20 },
   { id: "trading", name: "Trading Desk", price: 18 },
   { id: "bank_reconciliation", name: "Bank Reconciliation", price: 10 },
-  { id: "reports", name: "Advanced Reports", price: 8 },
-  { id: "multi_branch", name: "Multi-Branch", price: 15 },
-  { id: "whatsapp", name: "WhatsApp & SMS", price: 8 },
-  { id: "api_access", name: "API Access", price: 20 },
-  { id: "tax_filing", name: "Tax & Compliance", price: 10 },
 ] as const;
 
 // Modules that are a usable product on their own — a company can subscribe to
