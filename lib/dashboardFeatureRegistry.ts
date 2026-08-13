@@ -2682,9 +2682,9 @@ export function dashboardFeaturesForBusinessType(businessType: string): Dashboar
  * The distinction matters: a config that never wrote `dashboardFeatureFlags` —
  * PKR_PLAN_CONFIG is exactly that, since the PKR tab of /admin/plans posts only
  * pricing and permissions — must not be read as "no pages configured", because
- * the callers then fall back to the wide-open defaults and every page the admin
- * switched off comes back. An empty-in-every-plan grid is treated the same way:
- * nothing was ever assigned there, so it says nothing about page access.
+ * the callers then fall back to the wide-open defaults and the plan gate
+ * disappears. An empty-in-every-plan grid is treated the same way: nothing was
+ * ever assigned there, so it says nothing about page access.
  */
 export function readSavedDashboardFeatureFlags(
   details?: string | null,

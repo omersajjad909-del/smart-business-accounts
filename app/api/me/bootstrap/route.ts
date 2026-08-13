@@ -215,15 +215,12 @@ export async function GET(req: NextRequest) {
     }
 
     // The plan-wide page grid is currency-neutral: /admin/plans writes it once
-    // in Pages & Modules and its PKR tab deliberately posts no
-    // dashboardFeatureFlags ("page access is set once for all currencies").
-    // Reading it from whichever config won above therefore handed every PKR
-    // company an empty grid, which normalize() widens into the defaults — every
-    // page on, including the ones the admin had switched off in every plan.
-    // Demo sandboxes are built as PK/PKR companies, so that is exactly what a
-    // demo visitor was seeing. An older PKR config that does carry a grid is
-    // still honoured; only the "carries nothing" case falls through to the
-    // world config.
+    // and its PKR tab deliberately posts no dashboardFeatureFlags ("page access
+    // is set once for all currencies"). Reading it from whichever config won
+    // above therefore handed every PKR company — every demo sandbox included,
+    // since those are built as PK/PKR — an empty grid, and an empty grid widens
+    // into "every page on". A PKR config that does carry a grid is still
+    // honoured; only the "carries nothing" case falls through to the world one.
     const savedFeatureFlags =
       (isPkrCompany ? readSavedDashboardFeatureFlags(pkrPlanConfigLog?.details) : null) ??
       readSavedDashboardFeatureFlags(planConfigLog?.details);
