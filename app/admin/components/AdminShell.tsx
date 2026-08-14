@@ -333,7 +333,9 @@ export default function AdminShell({ children }: { children: ReactNode }) {
                 <Svg><circle cx="11" cy="11" r="7" /><line x1="21" y1="21" x2="16.65" y2="16.65" /></Svg>
               </button>
 
-              {/* Theme toggle */}
+              {/* Theme toggle — hidden while light is off, so the button cannot
+                  promise a palette the app does not have yet. */}
+              {ALLOW_LIGHT_THEME && (
               <button type="button" className="fin-admin-iconButton" aria-label="Toggle theme"
                 onClick={() => setTheme((c) => (c === "dark" ? "light" : "dark"))}>
                 {theme === "dark" ? (
