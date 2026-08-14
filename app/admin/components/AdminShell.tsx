@@ -6,6 +6,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { clearCurrentUser, getCurrentUser } from "@/lib/auth";
 import { ADMIN_NAV_GROUP_ORDER, ADMIN_NAV_ITEMS } from "@/app/admin/admin-nav";
+import { ALLOW_LIGHT_THEME } from "@/lib/themeConfig";
 
 type AdminNotification = {
   id: string;
@@ -346,6 +347,7 @@ export default function AdminShell({ children }: { children: ReactNode }) {
                   </svg>
                 )}
               </button>
+              )}
 
               {/* Notifications */}
               <div className="fin-admin-menuWrap" ref={notifRef}>
