@@ -78,8 +78,12 @@ export default function AdminShell({ children }: { children: ReactNode }) {
   const [quickOpen,  setQuickOpen]  = useState(false);
 
   // ── Fix: always start "dark" (SSR-safe), sync from localStorage in effect ──
+  // The admin panel keeps its own theme key, so it needs the same policy check
+  // the rest of the app got — otherwise an admin who had switched to light
+  // stayed on the unfinished light palette while every other screen was dark.
   const [theme, setTheme] = useState<"dark" | "light">("dark");
   useEffect(() => {
+    if (!ALLOW_LIGHT_THEME) return;
     const stored = window.localStorage.getItem("admin-theme-v2");
     if (stored === "light") setTheme("light");
   }, []);

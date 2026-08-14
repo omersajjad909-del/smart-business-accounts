@@ -31,6 +31,7 @@ const GOOGLE_FONTS_HREF =
 import CookieBanner from "./(marketing)/landing/components/CookieBanner";
 import AnalyticsGate from "./(marketing)/landing/components/AnalyticsGate";
 import { ThemeProvider } from "@/components/theme-provider";
+import { ALLOW_LIGHT_THEME, DEFAULT_THEME, FOLLOW_SYSTEM_THEME } from "@/lib/themeConfig";
 import VisitorTracker from "@/components/VisitorTracker";
 import ClientRegionSignal from "@/components/ClientRegionSignal";
 
