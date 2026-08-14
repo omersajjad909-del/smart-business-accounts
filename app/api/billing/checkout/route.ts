@@ -7,7 +7,7 @@ import { resolvePricingRegion } from "@/lib/geoCountry";
 import { createLemonCheckout, hasLemonSqueezyConfig } from "@/lib/lemonsqueezy";
 import { createSafepayCheckout, hasSafepayConfig, usdToPkr } from "@/lib/safepay";
 import { getCompanyExtraSeats } from "@/lib/companySeatLimit";
-import { getCustomPlanCycleAmountUsd, parseCustomModules } from "@/lib/customPlanPricing";
+import { getCustomPlanCycleAmountUsd, getModuleRate, parseCustomModules } from "@/lib/customPlanPricing";
 import { sendPlanActivatedEmail } from "@/lib/email";
 import { AUTOMATION_ADDON_ENABLED, isAutomationAddon } from "@/lib/addons";
 
