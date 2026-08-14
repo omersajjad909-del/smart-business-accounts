@@ -244,16 +244,28 @@ export default function Hero() {
 
               {/* CTAs */}
               <div className="h4 hero-ctarow" style={{ display:"flex", gap:12, flexWrap:"wrap", marginBottom:16 }}>
-                <Link href="/waitlist" className="cta-primary">
-                  Join the Waitlist
-                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                    <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
-                  </svg>
-                </Link>
+                {/* Once we are selling, there is nothing to wait for: the
+                    waitlist CTA goes and Get Started takes the primary slot, so
+                    the hero reads as two buttons rather than a gap. The
+                    /waitlist page itself stays put — old links to it still
+                    work, it just stops being advertised here. */}
+                {!signupsOpen && (
+                  <Link href="/waitlist" className="cta-primary">
+                    Join the Waitlist
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                      <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
+                    </svg>
+                  </Link>
+                )}
                 {/* Went straight to signup, skipping the pricing page entirely —
                     so the "Launching Soon" buttons there never saw this visitor. */}
-                <Link href={signupHrefFor(signupsOpen, "/onboarding/signup/starter")} className="cta-ghost">
+                <Link href={signupHrefFor(signupsOpen, "/onboarding/signup/starter")} className={signupsOpen ? "cta-primary" : "cta-ghost"}>
                   Get Started
+                  {signupsOpen && (
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                      <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
+                    </svg>
+                  )}
                 </Link>
                 <Link href="/demo" className="cta-ghost">
                   <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" stroke="none">
