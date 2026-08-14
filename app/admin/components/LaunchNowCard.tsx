@@ -393,24 +393,26 @@ function playLaunchSound() {
 }
 
 /**
- * The countdown, read aloud. Browsers ship speech synthesis with no asset to
- * download, which is the whole reason this is words and not a recording.
+ * The countdown read aloud. Each number speaks its actual word only; no extra
+ * launch phrase is added at zero.
  */
-const COUNT_WORDS = ["Let's start", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten"];
+const COUNT_WORDS = ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten"];
 
 function speakCount(n: number) {
   try {
+    if (n <= 0) return;
+
     const synth = window.speechSynthesis;
     if (!synth) return;
-    const u = new SpeechSynthesisUtterance(COUNT_WORDS[n] ?? String(n));
+    const word = COUNT_WORDS[n] ?? String(n);
+    const u = new SpeechSynthesisUtterance(word);
     u.lang = "en-US";
-    // Slightly urgent through the count, then a beat brighter on "Let's start".
-    u.rate = n === 0 ? 0.95 : 1.1;
-    u.pitch = n === 0 ? 1.15 : 1;
+    u.rate = 1.1;
+    u.pitch = 1;
     const voice = synth.getVoices().find(v => /^en[-_]?/i.test(v.lang));
     if (voice) u.voice = voice;
-    // Drop whatever is still speaking so a slow voice cannot run into the
-    // next tick and put the count out of step with the numbers on screen.
+    // Drop whatever is still speaking so the next number does not overlap the
+    // current one and the spoken count stays in sync with the visual countdown.
     synth.cancel();
     synth.speak(u);
   } catch {
