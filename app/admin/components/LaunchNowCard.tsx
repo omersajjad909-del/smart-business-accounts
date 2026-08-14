@@ -49,9 +49,9 @@ const FADE_AFTER = 2000;
  * canvas bursts and the audio booms both read this list, which is the only
  * reason picture and sound stay together.
  */
-const SHELLS = [850, 1750, 2600, 3500, 4300];
+const SHELLS = [850, 1900, 3100, 4500, 5900, 7300];
 const SHELL_RISE = 620;   // whistle lead-in before the boom
-const SHOW_ENDS = 5600;
+const SHOW_ENDS = 9000;
 
 type Piece = {
   x: number; y: number; vx: number; vy: number;
@@ -362,7 +362,7 @@ function playLaunchSound() {
     void ctx.resume().catch(() => {});
 
     const master = ctx.createGain();
-    master.gain.value = 0.45;
+    master.gain.value = 0.8;
     master.connect(ctx.destination);
 
     const t0 = ctx.currentTime + 0.02;
