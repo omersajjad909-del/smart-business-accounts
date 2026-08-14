@@ -658,7 +658,7 @@ export default function LaunchNowCard() {
                     setConfirming(null);
                     setError("");
                     setCountdown(10);
-                    setTimeout(() => speakCount(10), 180);
+                    // setTimeout(() => speakCount(10), 180);
                   } else {
                     apply(false);
                   }
