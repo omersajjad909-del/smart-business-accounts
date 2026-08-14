@@ -8,6 +8,7 @@ import { createLemonCheckout, hasLemonSqueezyConfig } from "@/lib/lemonsqueezy";
 import { createSafepayCheckout, hasSafepayConfig, usdToPkr } from "@/lib/safepay";
 import { getCompanyExtraSeats } from "@/lib/companySeatLimit";
 import { getCustomPlanCycleAmountUsd, getModuleRate, parseCustomModules } from "@/lib/customPlanPricing";
+import { FX_USD } from "@/lib/currency";
 import { sendPlanActivatedEmail } from "@/lib/email";
 import { AUTOMATION_ADDON_ENABLED, isAutomationAddon } from "@/lib/addons";
 
@@ -108,6 +109,11 @@ export async function POST(req: NextRequest) {
         if (Array.isArray(cfg?.customPlan?.modules)) savedCustomModules = cfg.customPlan.modules;
       }
     } catch {}
+
+    // Rupee totals are converted to USD once, at the end, because Lemon Squeezy
+    // settles in USD. Same table the pricing pages display from, so the figure
+    // charged tracks the figure quoted.
+    const PKR_PER_USD = Number(FX_USD.PKR) || 278;
 
     /**
      * What the chosen modules cost, in the currency this customer is being
