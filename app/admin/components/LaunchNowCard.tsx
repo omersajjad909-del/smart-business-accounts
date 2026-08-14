@@ -8,10 +8,11 @@
  * celebration afterwards is deliberate: launching a product should feel like
  * something happened.
  *
- * The confetti is hand-rolled on a canvas rather than pulled from a package —
- * the site's CSP blocks external script hosts, and 40 lines of physics beats a
- * dependency for one animation. The pop sound is synthesised with Web Audio for
- * the same reason: no asset to host, nothing for the CSP to block.
+ * The confetti and fireworks are hand-rolled on a canvas rather than pulled from
+ * a package — the site's CSP blocks external script hosts, and a little physics
+ * beats a dependency for one animation. The sound is synthesised with Web Audio
+ * for the same reason: no asset to host, nothing for the CSP to block. The
+ * countdown is read aloud through the browser's own speech synthesis.
  */
 
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -38,10 +39,19 @@ const SIDES = [
   { name: "top",    at: (w: number, h: number, r: number) => [w * (0.1 + r * 0.8), 0],  angle: 90,   spread: 120, speed: 0.45 },
 ];
 
-// Three volleys, so the celebration lasts a few seconds instead of a blink.
-const WAVES = [0, 700, 1400];
+// Four volleys, so the celebration lasts a few seconds instead of a blink.
+const WAVES = [0, 720, 1420, 2850];
 const PER_SIDE = 34;
-const FADE_AFTER = 2400;
+const FADE_AFTER = 2000;
+
+/**
+ * When each aerial shell detonates, in ms from the start of the show. The
+ * canvas bursts and the audio booms both read this list, which is the only
+ * reason picture and sound stay together.
+ */
+const SHELLS = [850, 1750, 2600, 3500, 4300];
+const SHELL_RISE = 620;   // whistle lead-in before the boom
+const SHOW_ENDS = 5600;
 
 type Piece = {
   x: number; y: number; vx: number; vy: number;
@@ -49,7 +59,12 @@ type Piece = {
   born: number; life: number;
 };
 
-function Confetti({ onDone }: { onDone: () => void }) {
+type Spark = {
+  x: number; y: number; vx: number; vy: number;
+  size: number; color: string; born: number; ttl: number;
+};
+
+function Celebration({ onDone }: { onDone: () => void }) {
   const ref = useRef<HTMLCanvasElement | null>(null);
 
   useEffect(() => {
@@ -71,6 +86,7 @@ function Confetti({ onDone }: { onDone: () => void }) {
     const H = () => window.innerHeight;
 
     const pieces: Piece[] = [];
+    const sparks: Spark[] = [];
 
     const spawn = () => {
       const w = W(), h = H(), now = Date.now();
@@ -94,12 +110,43 @@ function Confetti({ onDone }: { onDone: () => void }) {
       }
     };
 
+    /**
+     * A shell detonating: a ring of sparks thrown outward, drawn additively so
+     * the middle of the burst blooms white the way a real one does.
+     */
+    const burst = () => {
+      const w = W(), h = H(), now = Date.now();
+      const cx = w * (0.15 + Math.random() * 0.7);
+      const cy = h * (0.12 + Math.random() * 0.34);
+      const color = COLORS[Math.floor(Math.random() * COLORS.length)];
+      const count = 90 + Math.floor(Math.random() * 40);
+      const power = 4.4 + Math.random() * 2.4;
+
+      for (let i = 0; i < count; i++) {
+        // Even angles with a little jitter keep the ring from clumping.
+        const a = (i / count) * Math.PI * 2 + (Math.random() - 0.5) * 0.25;
+        const speed = power * (0.45 + Math.random() * 0.75);
+        sparks.push({
+          x: cx, y: cy,
+          vx: Math.cos(a) * speed,
+          vy: Math.sin(a) * speed,
+          size: 1.5 + Math.random() * 2,
+          // A few stragglers in a second colour, like a two-tone shell.
+          color: Math.random() < 0.22 ? "#fff7ed" : color,
+          born: now,
+          ttl: 900 + Math.random() * 700,
+        });
+      }
+    };
+
     spawn();
-    const timers = WAVES.slice(1).map(delay => setTimeout(spawn, delay));
+    const timers = [
+      ...WAVES.slice(1).map(delay => setTimeout(spawn, delay)),
+      ...SHELLS.map(delay => setTimeout(burst, delay)),
+    ];
 
     let raf = 0;
     const start = Date.now();
-    const lastWave = WAVES[WAVES.length - 1];
 
     const frame = () => {
       const w = W(), h = H(), now = Date.now();
@@ -126,9 +173,33 @@ function Confetti({ onDone }: { onDone: () => void }) {
         }
       }
 
-      // Keep the loop running until the last volley has had its turn, even if
-      // the earlier pieces have all landed.
-      if (alive || now - start < lastWave + 400) raf = requestAnimationFrame(frame);
+      // Sparks glow: additive blending, so overlapping trails burn brighter.
+      ctx.save();
+      ctx.globalCompositeOperation = "lighter";
+      for (const s of sparks) {
+        const age = now - s.born;
+        if (age > s.ttl) continue;
+        s.vy += 0.045;         // sparks are light; they hang before they drop
+        s.vx *= 0.976;
+        s.vy *= 0.976;
+        s.x += s.vx;
+        s.y += s.vy;
+
+        alive = true;
+        // Bright and steady at first, then a quick flicker as it burns out.
+        const t = age / s.ttl;
+        const fade = 1 - t * t;
+        ctx.globalAlpha = Math.max(0, fade * (t > 0.55 ? 0.55 + Math.random() * 0.45 : 1));
+        ctx.fillStyle = s.color;
+        ctx.beginPath();
+        ctx.arc(s.x, s.y, s.size * (1 - t * 0.45), 0, Math.PI * 2);
+        ctx.fill();
+      }
+      ctx.restore();
+
+      // Keep the loop running until the last shell has had its turn, even if
+      // everything fired earlier has already landed.
+      if (alive || now - start < SHOW_ENDS) raf = requestAnimationFrame(frame);
       else onDone();
     };
     raf = requestAnimationFrame(frame);
@@ -195,10 +266,93 @@ function chimeAt(ctx: AudioContext, out: GainNode, t: number, freq: number) {
   osc.stop(t + 0.95);
 }
 
+/** Fills a buffer with white noise shaped by `env(progress) -> 0..1`. */
+function noiseBuffer(ctx: AudioContext, dur: number, env: (p: number) => number) {
+  const buf = ctx.createBuffer(1, Math.ceil(ctx.sampleRate * dur), ctx.sampleRate);
+  const data = buf.getChannelData(0);
+  for (let i = 0; i < data.length; i++) {
+    data[i] = (Math.random() * 2 - 1) * env(i / data.length);
+  }
+  return buf;
+}
+
+/** The rising whistle of a shell on its way up. Ends where the boom begins. */
+function whistleAt(ctx: AudioContext, out: GainNode, t: number, dur: number) {
+  const osc = ctx.createOscillator();
+  osc.type = "sine";
+  osc.frequency.setValueAtTime(600, t);
+  osc.frequency.exponentialRampToValueAtTime(2300, t + dur * 0.82);
+  osc.frequency.exponentialRampToValueAtTime(1500, t + dur);
+
+  // A slow warble stops it sounding like a test tone.
+  const lfo = ctx.createOscillator();
+  lfo.frequency.value = 11;
+  const lfoDepth = ctx.createGain();
+  lfoDepth.gain.value = 45;
+  lfo.connect(lfoDepth).connect(osc.frequency);
+
+  const g = ctx.createGain();
+  g.gain.setValueAtTime(0.0001, t);
+  g.gain.exponentialRampToValueAtTime(0.1, t + 0.12);
+  g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+  osc.connect(g).connect(out);
+
+  osc.start(t); osc.stop(t + dur);
+  lfo.start(t); lfo.stop(t + dur);
+}
+
+/** The detonation: a wide low-passed blast with a sub-bass thump underneath. */
+function boomAt(ctx: AudioContext, out: GainNode, t: number, level: number) {
+  const dur = 1;
+  const blast = ctx.createBufferSource();
+  blast.buffer = noiseBuffer(ctx, dur, p => Math.pow(1 - p, 2.2));
+  const lp = ctx.createBiquadFilter();
+  lp.type = "lowpass";
+  lp.Q.value = 1.1;
+  lp.frequency.setValueAtTime(900, t);
+  lp.frequency.exponentialRampToValueAtTime(70, t + dur * 0.7);
+  const bg = ctx.createGain();
+  bg.gain.setValueAtTime(level, t);
+  bg.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+  blast.connect(lp).connect(bg).connect(out);
+  blast.start(t);
+
+  const sub = ctx.createOscillator();
+  sub.type = "sine";
+  sub.frequency.setValueAtTime(95, t);
+  sub.frequency.exponentialRampToValueAtTime(28, t + 0.45);
+  const sg = ctx.createGain();
+  sg.gain.setValueAtTime(level * 0.85, t);
+  sg.gain.exponentialRampToValueAtTime(0.0001, t + 0.6);
+  sub.connect(sg).connect(out);
+  sub.start(t); sub.stop(t + 0.62);
+}
+
+/** The scattered tick-tick-tick of burning stars after the shell opens. */
+function crackleAt(ctx: AudioContext, out: GainNode, t: number, dur: number, level: number) {
+  const src = ctx.createBufferSource();
+  // Sparse random spikes over a decaying floor: that gap between ticks is what
+  // makes it read as crackle rather than as hiss.
+  src.buffer = noiseBuffer(ctx, dur, p => {
+    const decay = Math.pow(1 - p, 1.6);
+    return decay * (Math.random() < 0.06 ? 1 : 0.09);
+  });
+  const hp = ctx.createBiquadFilter();
+  hp.type = "highpass";
+  hp.frequency.value = 2400;
+  const g = ctx.createGain();
+  g.gain.setValueAtTime(level, t);
+  g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+  src.connect(hp).connect(g).connect(out);
+  src.start(t);
+}
+
 /**
- * The sound of the launch: one pop per side, then two lighter rounds timed to
- * the later confetti waves. Audio is decoration — if the browser refuses it
- * (no Web Audio, blocked autoplay), the launch carries on silently.
+ * The sound of the launch, about five and a half seconds of it: a popper on
+ * each side of the screen, a short fanfare, then five shells that whistle up,
+ * boom and crackle away — timed to the same `SHELLS` list the canvas uses, so
+ * every bang lands on a burst. Audio is decoration; if the browser refuses it
+ * (no Web Audio, blocked autoplay) the launch carries on silently.
  */
 function playLaunchSound() {
   try {
@@ -208,20 +362,64 @@ function playLaunchSound() {
     void ctx.resume().catch(() => {});
 
     const master = ctx.createGain();
-    master.gain.value = 0.5;
+    master.gain.value = 0.45;
     master.connect(ctx.destination);
 
     const t0 = ctx.currentTime + 0.02;
-    [0, 0.08, 0.16, 0.24].forEach((d, i) => popAt(ctx, master, t0 + d, 0.9 - i * 0.1));
-    [0.72, 0.81].forEach((d, i) => popAt(ctx, master, t0 + d, 0.65 - i * 0.1));
-    [1.42, 1.51].forEach((d, i) => popAt(ctx, master, t0 + d, 0.5 - i * 0.1));
+
+    // Poppers, one per side, then lighter rounds on the later confetti waves.
+    [0, 0.08, 0.16, 0.24].forEach((d, i) => popAt(ctx, master, t0 + d, 0.85 - i * 0.1));
+    WAVES.slice(1).forEach((ms, i) => {
+      popAt(ctx, master, t0 + ms / 1000, 0.6 - i * 0.08);
+      popAt(ctx, master, t0 + ms / 1000 + 0.09, 0.5 - i * 0.08);
+    });
+
     [523.25, 659.25, 783.99, 1046.5].forEach((f, i) => chimeAt(ctx, master, t0 + 0.2 + i * 0.11, f));
 
+    // Shells. The last one is the finale, so it gets the longest tail.
+    SHELLS.forEach((ms, i) => {
+      const at = t0 + ms / 1000;
+      const finale = i === SHELLS.length - 1;
+      whistleAt(ctx, master, at - SHELL_RISE / 1000, SHELL_RISE / 1000);
+      boomAt(ctx, master, at, finale ? 0.95 : 0.62 + Math.random() * 0.2);
+      crackleAt(ctx, master, at + 0.05, finale ? 1.5 : 0.9, finale ? 0.4 : 0.28);
+    });
+
     // Let the tail ring out, then release the audio device.
-    setTimeout(() => { void ctx.close().catch(() => {}); }, 4500);
+    setTimeout(() => { void ctx.close().catch(() => {}); }, SHOW_ENDS + 2000);
   } catch {
     /* no sound, no problem */
   }
+}
+
+/**
+ * The countdown, read aloud. Browsers ship speech synthesis with no asset to
+ * download, which is the whole reason this is words and not a recording.
+ */
+const COUNT_WORDS = ["Let's start", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten"];
+
+function speakCount(n: number) {
+  try {
+    const synth = window.speechSynthesis;
+    if (!synth) return;
+    const u = new SpeechSynthesisUtterance(COUNT_WORDS[n] ?? String(n));
+    u.lang = "en-US";
+    // Slightly urgent through the count, then a beat brighter on "Let's start".
+    u.rate = n === 0 ? 0.95 : 1.1;
+    u.pitch = n === 0 ? 1.15 : 1;
+    const voice = synth.getVoices().find(v => /^en[-_]?/i.test(v.lang));
+    if (voice) u.voice = voice;
+    // Drop whatever is still speaking so a slow voice cannot run into the
+    // next tick and put the count out of step with the numbers on screen.
+    synth.cancel();
+    synth.speak(u);
+  } catch {
+    /* silence is an acceptable countdown */
+  }
+}
+
+function stopSpeaking() {
+  try { window.speechSynthesis?.cancel(); } catch { /* nothing to stop */ }
 }
 
 export default function LaunchNowCard() {
@@ -285,13 +483,23 @@ export default function LaunchNowCard() {
       return () => clearTimeout(t);
     }
 
-    // Zero: hold on "0" for a beat, then actually launch.
+    // Zero: hold on "0" long enough for "Let's start" to land, then launch.
     const t = setTimeout(() => {
       setCountdown(null);
       apply(true);
-    }, 700);
+    }, 900);
     return () => clearTimeout(t);
   }, [countdown, apply]);
+
+  // Ten, nine, eight… and "Let's start" on zero. Kept in its own effect so the
+  // voice follows the number on screen and nothing else re-triggers it.
+  useEffect(() => {
+    if (countdown === null) return;
+    speakCount(countdown);
+  }, [countdown]);
+
+  // An aborted or unmounted countdown must not keep talking.
+  useEffect(() => stopSpeaking, []);
 
   if (!status) return null;
 
@@ -492,7 +700,7 @@ export default function LaunchNowCard() {
 
           <button
             type="button"
-            onClick={() => setCountdown(null)}
+            onClick={() => { stopSpeaking(); setCountdown(null); }}
             disabled={countdown === 0}
             style={{
               marginTop: 14, padding: "9px 22px", borderRadius: 999,
@@ -515,7 +723,7 @@ export default function LaunchNowCard() {
       {/* ── Celebration ── */}
       {celebrate && (
         <>
-          <Confetti onDone={() => {}} />
+          <Celebration onDone={() => {}} />
           <div
             onClick={() => setCelebrate(false)}
             style={{
