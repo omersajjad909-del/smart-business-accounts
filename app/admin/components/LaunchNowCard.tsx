@@ -404,17 +404,37 @@ function speakCount(n: number) {
 
     const synth = window.speechSynthesis;
     if (!synth) return;
-    const word = COUNT_WORDS[n] ?? String(n);
-    const u = new SpeechSynthesisUtterance(word);
-    u.lang = "en-US";
-    u.rate = 1.1;
-    u.pitch = 1;
-    const voice = synth.getVoices().find(v => /^en[-_]?/i.test(v.lang));
-    if (voice) u.voice = voice;
-    // Drop whatever is still speaking so the next number does not overlap the
-    // current one and the spoken count stays in sync with the visual countdown.
-    synth.cancel();
-    synth.speak(u);
+
+    const speakNow = () => {
+      const word = COUNT_WORDS[n] ?? String(n);
+      const u = new SpeechSynthesisUtterance(word);
+      u.lang = "en-US";
+      u.rate = 1.15;
+      u.pitch = 1;
+
+      const voice = synth.getVoices().find(v => /^en[-_]?/i.test(v.lang));
+      if (voice) u.voice = voice;
+
+      synth.cancel();
+      synth.resume?.();
+      synth.speak(u);
+    };
+
+    const voices = synth.getVoices();
+    if (voices.length > 0) {
+      speakNow();
+      return;
+    }
+
+    const onVoicesChanged = () => {
+      synth.removeEventListener("voiceschanged", onVoicesChanged);
+      speakNow();
+    };
+    synth.addEventListener("voiceschanged", onVoicesChanged);
+    setTimeout(() => {
+      synth.removeEventListener("voiceschanged", onVoicesChanged);
+      speakNow();
+    }, 450);
   } catch {
     /* silence is an acceptable countdown */
   }
@@ -638,6 +658,7 @@ export default function LaunchNowCard() {
                     setConfirming(null);
                     setError("");
                     setCountdown(10);
+                    setTimeout(() => speakCount(10), 180);
                   } else {
                     apply(false);
                   }
