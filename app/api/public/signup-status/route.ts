@@ -13,11 +13,18 @@ import { NextResponse } from "next/server";
 
 import { getSignupsOpen } from "@/lib/signupGate";
 
+// This handler reads no request data, so Next would happily render it once at
+// build time and serve that answer forever — freezing the site at "not
+// launched" no matter what the admin presses. It must run per request.
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export async function GET() {
   return NextResponse.json(
     { open: await getSignupsOpen() },
-    // Briefly cacheable: launch day tolerates a few seconds, ordinary days
-    // should not re-ask on every page view.
-    { headers: { "Cache-Control": "public, max-age=10" } },
+    // No caching in front of the launch switch itself. The database is already
+    // protected by the 15-second cache inside getSignupsOpen(); a CDN copy
+    // here would just be one more place launch day could get stuck.
+    { headers: { "Cache-Control": "no-store, max-age=0" } },
   );
 }

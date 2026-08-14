@@ -1036,9 +1036,15 @@ export default function PricingPage() {
               <div style={{ padding: "24px 24px", fontSize: 13, fontWeight: 700, color: "rgba(255,255,255,.3)" }}>Ready to start?</div>
               {PLANS.map((plan) => (
                 <div key={plan.slug} style={{ padding: "20px 16px", borderLeft: "1px solid rgba(255,255,255,.06)", background: plan.featured ? "rgba(99,102,241,.06)" : "transparent" }}>
-                  <button type="button" disabled style={{ display: "block", width: "100%", textAlign: "center", padding: "11px 12px", borderRadius: 10, textDecoration: "none", color: "white", fontWeight: 800, fontSize: 13, background: plan.gradient, cursor: "not-allowed", opacity: 0.85, border: "none" }}>
-                    Launching Soon
-                  </button>
+                  {signupsOpen ? (
+                    <Link href={buildHref(plan.slug)} style={{ display: "block", textAlign: "center", padding: "11px 12px", borderRadius: 10, textDecoration: "none", color: "white", fontWeight: 800, fontSize: 13, background: plan.gradient }}>
+                      Get {plan.name}
+                    </Link>
+                  ) : (
+                    <button type="button" disabled style={{ display: "block", width: "100%", textAlign: "center", padding: "11px 12px", borderRadius: 10, textDecoration: "none", color: "white", fontWeight: 800, fontSize: 13, background: plan.gradient, cursor: "not-allowed", opacity: 0.85, border: "none" }}>
+                      Launching Soon
+                    </button>
+                  )}
                 </div>
               ))}
             </div>
@@ -1288,20 +1294,35 @@ export default function PricingPage() {
                   </div>
                 )}
 
-                <button
-                  type="button"
-                  disabled
-                  style={{
-                    display: "block", width: "100%", textAlign: "center", padding: "13px 18px", borderRadius: 12,
-                    background: selectedModules.length && !needsCoreModule ? "linear-gradient(135deg,#f97316,#ea580c)" : "rgba(255,255,255,.06)",
-                    color: "white", fontWeight: 800, fontSize: 14, textDecoration: "none",
-                    opacity: selectedModules.length && !needsCoreModule ? 0.85 : 0.5,
-                    border: selectedModules.length && !needsCoreModule ? "none" : "1px solid rgba(255,255,255,.1)",
-                    cursor: "not-allowed",
-                  }}
-                >
-                  Launching Soon
-                </button>
+                {signupsOpen ? (
+                  <Link
+                    href={selectedModules.length && !needsCoreModule ? buildCustomHref() : "#custom"}
+                    style={{
+                      display: "block", textAlign: "center", padding: "13px 18px", borderRadius: 12,
+                      background: selectedModules.length && !needsCoreModule ? "linear-gradient(135deg,#f97316,#ea580c)" : "rgba(255,255,255,.06)",
+                      color: "white", fontWeight: 800, fontSize: 14, textDecoration: "none",
+                      opacity: selectedModules.length && !needsCoreModule ? 1 : 0.5,
+                      border: selectedModules.length && !needsCoreModule ? "none" : "1px solid rgba(255,255,255,.1)",
+                    }}
+                  >
+                    {!selectedModules.length ? "Select modules above" : needsCoreModule ? "Pick a module that runs alone" : standaloneOnly ? "Continue with this app →" : "Continue →"}
+                  </Link>
+                ) : (
+                  <button
+                    type="button"
+                    disabled
+                    style={{
+                      display: "block", width: "100%", textAlign: "center", padding: "13px 18px", borderRadius: 12,
+                      background: selectedModules.length && !needsCoreModule ? "linear-gradient(135deg,#f97316,#ea580c)" : "rgba(255,255,255,.06)",
+                      color: "white", fontWeight: 800, fontSize: 14, textDecoration: "none",
+                      opacity: selectedModules.length && !needsCoreModule ? 0.85 : 0.5,
+                      border: selectedModules.length && !needsCoreModule ? "none" : "1px solid rgba(255,255,255,.1)",
+                      cursor: "not-allowed",
+                    }}
+                  >
+                    Launching Soon
+                  </button>
+                )}
                 <div style={{ fontSize: 11, color: "rgba(255,255,255,.22)", textAlign: "center", marginTop: 10 }}>
                   You&apos;ll confirm everything before payment
                 </div>
