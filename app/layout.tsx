@@ -342,10 +342,18 @@ export default async function RootLayout({
             for scrolling bugs whose real causes are now fixed: overflow on
             body/<main> and the dashboard shell's use of vh. */}
         <AnalyticsGate />
+        {/* The three theme decisions live in lib/themeConfig, not here — this
+            provider had `enableSystem` on while that file said the OS must not
+            decide, so a visitor on a light OS still opened white.
+
+            `forcedTheme` is what makes switching light off actually stick:
+            next-themes restores whatever is in localStorage otherwise, so
+            anyone who had already picked light would keep getting it. */}
         <ThemeProvider
           attribute="class"
-          defaultTheme="dark"
-          enableSystem
+          defaultTheme={DEFAULT_THEME}
+          enableSystem={ALLOW_LIGHT_THEME && FOLLOW_SYSTEM_THEME}
+          forcedTheme={ALLOW_LIGHT_THEME ? undefined : DEFAULT_THEME}
           disableTransitionOnChange
         >
           <Toaster
