@@ -4,60 +4,6 @@ import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { formatFromUSD } from "@/lib/currency-client";
 import { STANDALONE_MODULE_IDS } from "@/lib/customPlanPricing";
-import { useSignupsOpen } from "@/hooks/useSignupsOpen";
-import { AUTOMATION_ADDON_ENABLED } from "@/lib/addons";
-import { clientRegionHeaders } from "@/lib/clientRegion";
-
-/**
- * Every buy button on this page.
- *
- * Before launch it renders a disabled "Launching Soon"; once
- * NEXT_PUBLIC_SIGNUPS_OPEN is true it becomes the real link again. Going
- * through one component means launch day is a single environment variable
- * rather than five buttons someone has to remember to switch back — and it
- * cannot drift out of step with the redirects in proxy.ts, which read the same
- * flag.
- */
-function BuyCta({
-  href,
-  style,
-  disabled = false,
-  children,
-}: {
-  href: string;
-  style: React.CSSProperties;
-  /** Page-level reason to block, e.g. no modules picked yet. */
-  disabled?: boolean;
-  children: React.ReactNode;
-}) {
-  // Runtime, not build time: pressing Launch Now in the admin panel turns these
-  // into real links without a redeploy.
-  const signupsOpen = useSignupsOpen();
-
-  if (!signupsOpen) {
-    return (
-      <button
-        type="button"
-        disabled
-        style={{ ...style, cursor: "not-allowed", opacity: 0.85, border: "none" }}
-      >
-        Launching Soon
-      </button>
-    );
-  }
-  if (disabled) {
-    return (
-      <span style={{ ...style, cursor: "not-allowed", display: style.display || "block" }}>
-        {children}
-      </span>
-    );
-  }
-  return (
-    <Link href={href} style={style}>
-      {children}
-    </Link>
-  );
-}
 
 type BillingCycle = "monthly" | "yearly";
 type PlanPricing = {
@@ -66,51 +12,10 @@ type PlanPricing = {
   enterprise: { monthly: number; yearly: number };
 };
 
-// Fallbacks for the plan cards, used until /api/public/pricing answers. Keep in
-// step with DEFAULT_PLAN_HIGHLIGHTS in that route and with
-// PLAN_DEFAULT_PERMISSIONS in lib/planPermissions.ts.
-//
-// "🤖 Ask AI" on Starter is intentional: STARTER carries no AI permission by
-// default, the access is granted per-tenant from /admin/permissions. Do not
-// drop the bullet for looking unbacked by PLAN_DEFAULT_PERMISSIONS.
 const DEFAULT_HIGHLIGHTS = {
-  starter: [
-    "Up to 3 users",
-    "Sales & purchase invoices",
-    "Basic accounting & chart of accounts",
-    "Ledger & trial balance",
-    "Basic inventory",
-    "Expense management",
-    "Basic financial reports",
-    "Receivables & payables",
-    "🤖 Ask AI",
-    "Email support",
-  ],
-  professional: [
-    "Up to 10 users",
-    "Everything in Starter",
-    "Advanced inventory & barcode",
-    "Bank reconciliation",
-    "HR & Payroll",
-    "Trading control",
-    "Advanced & strategic reports",
-    "Multi-branch (up to 3)",
-    "🤖 AI Assistant (ask anything)",
-    "🤖 Smart invoice & expense AI",
-  ],
-  enterprise: [
-    "Up to 25 users",
-    "Everything in Professional",
-    "Multi-branch (up to 10)",
-    "Custom roles & approval workflows",
-    "Audit trail & system logs",
-    "Cost centers & multi-currency",
-    "API access, webhooks & custom integrations",
-    "Backup & restore",
-    "🤖 AI Business Operator — runs tasks for you",
-    "🤖 Forecasting, anomaly detection & cash-flow AI",
-    "Priority support 24/7 + dedicated account manager",
-  ],
+  starter:    ["Up to 3 users","Sales & purchase invoices","Ledger & trial balance","Basic reports","Chart of accounts","Email support","🤖 AI Chat"],
+  professional: ["Up to 10 users","Everything in Starter","Inventory management","Bank reconciliation","HR & Payroll","CRM + Advanced reports","🤖 AI Assistant (ask anything)","🤖 Smart invoice & expense AI"],
+  enterprise: ["Up to 25 users","Everything in Professional","API access","Integration-ready APIs & webhooks","Multi-currency","Priority support 24/7","🤖 AI Chat","🤖 AI Financial Insights","🤖 Smart Alerts & Anomaly Detection","🤖 Revenue Forecast","🤖 Market Intelligence","🤖 AI Business Advisor","🤖 Full AI Suite"],
 };
 
 const PLANS = [
@@ -159,8 +64,16 @@ const MODULE_CATEGORIES = [
 // whether the module only layers on top of something else.
 const STANDALONE_IDS = new Set<string>(STANDALONE_MODULE_IDS);
 
-// STANDALONE_APPS lived here — the copy for the "Run just one" grid. That grid
-// duplicated the module picker card-for-card, so both are gone.
+// Single-app pitches — what the account actually looks like when this is the
+// only module on it. Ordered by how often people ask for it on its own.
+const STANDALONE_APPS = [
+  { id: "hr_payroll",          label: "Payroll & HR",     icon: "👨‍💼", color: "#f472b6", points: ["Employees & attendance", "Monthly salary run + payslips", "Advance salary & loans"] },
+  { id: "crm",                 label: "CRM",              icon: "👥",   color: "#a5b4fc", points: ["Contacts & companies", "Sales pipeline & leads", "Interaction history"] },
+  { id: "inventory",           label: "Inventory",        icon: "📦",   color: "#38bdf8", points: ["Stock in / stock out", "GRN & barcode scanning", "Low-stock alerts"] },
+  { id: "accounting",          label: "Accounting",       icon: "📒",   color: "#818cf8", points: ["Invoices & vouchers", "Ledger & trial balance", "P&L and balance sheet"] },
+  { id: "trading",             label: "Trading Desk",     icon: "🔄",   color: "#fbbf24", points: ["Order desk & procurement", "Dispatch board", "Outstandings & conversions"] },
+  { id: "bank_reconciliation", label: "Bank & Payments",  icon: "🏦",   color: "#34d399", points: ["Statement import", "Discrepancy flagging", "Receipts & payment vouchers"] },
+];
 
 const DEFAULT_PUBLIC_PRICING: PlanPricing = {
   starter: { monthly: 49, yearly: 39 },
@@ -183,9 +96,6 @@ type Val = boolean | string | null;
 interface Feature { name: string; permKey?: string; starter: Val; pro: Val; enterprise: Val; tooltip?: string; }
 interface Category { id: string; icon: string; title: string; features: Feature[]; }
 
-// Every row here is enforced by PLAN_DEFAULT_PERMISSIONS in
-// lib/planPermissions.ts. When a row moves, the permission list moves with it —
-// `permKey` names the permission a row is backed by wherever one exists.
 const COMPARISON: Category[] = [
   {
     id: "platform",
@@ -193,22 +103,12 @@ const COMPARISON: Category[] = [
     title: "Core Platform",
     features: [
       { name: "Users", starter: "Up to 3", pro: "Up to 10", enterprise: "Up to 25" },
-      // No permKey: every company has its one branch, and MULTI_BRANCH is what
-      // unlocks a second — so the "1" on Starter is a limit, not a grant.
       { name: "Branches", starter: "1", pro: "3", enterprise: "10" },
-      { name: "Multi-currency", permKey: "MULTI_CURRENCY", starter: false, pro: false, enterprise: true },
       { name: "Custom domain (white-label)", starter: false, pro: false, enterprise: true },
-      { name: "API access", permKey: "API_ACCESS", starter: false, pro: false, enterprise: true },
-      { name: "Webhooks & integrations", permKey: "API_ACCESS", starter: false, pro: false, enterprise: true },
-      // No permKey: Starter and Pro both run on MANAGE_USERS (invite seats,
-      // assign the built-in roles). MANAGE_ROLES — custom roles — is the
-      // Enterprise row directly below.
-      { name: "Role-based permissions", starter: "Basic", pro: "Standard", enterprise: "Custom" },
-      { name: "Approval workflows", permKey: "MANAGE_APPROVALS", starter: false, pro: false, enterprise: true },
-      { name: "Cost centers", permKey: "MANAGE_COST_CENTERS", starter: false, pro: false, enterprise: true },
-      { name: "Custom roles", permKey: "MANAGE_ROLES", starter: false, pro: false, enterprise: true },
-      { name: "Audit trail & system logs", permKey: "VIEW_AUDIT_LOG", starter: false, pro: false, enterprise: true },
-      { name: "Backup & restore", permKey: "BACKUP_RESTORE", starter: false, pro: false, enterprise: true },
+      { name: "API access", starter: false, pro: false, enterprise: true },
+      { name: "Webhooks & integrations", starter: false, pro: false, enterprise: true },
+      { name: "Role-based permissions", starter: "Basic", pro: "Advanced", enterprise: "Custom" },
+      { name: "Audit trail", starter: false, pro: true, enterprise: true },
     ],
   },
   {
@@ -216,23 +116,15 @@ const COMPARISON: Category[] = [
     icon: "📒",
     title: "Accounting & Finance",
     features: [
-      { name: "Chart of accounts", permKey: "CREATE_ACCOUNTS", starter: true, pro: true, enterprise: true },
-      { name: "Journal vouchers (CPV/CRV)", permKey: "CREATE_JV", starter: true, pro: true, enterprise: true },
-      { name: "Ledger & trial balance", permKey: "VIEW_TRIAL_BALANCE_REPORT", starter: true, pro: true, enterprise: true },
-      // P&L and balance sheet are VIEW_PROFIT_LOSS_REPORT /
-      // VIEW_BALANCE_SHEET_REPORT, neither of which Starter has ever held.
-      { name: "Profit & loss statement", permKey: "VIEW_PROFIT_LOSS_REPORT", starter: false, pro: true, enterprise: true },
-      { name: "Balance sheet", permKey: "VIEW_BALANCE_SHEET_REPORT", starter: false, pro: true, enterprise: true },
-      { name: "Cash flow statement", permKey: "VIEW_PROFIT_LOSS_REPORT", starter: false, pro: true, enterprise: true },
-      { name: "Budget vs actual tracking", permKey: "BUDGET_PLANNING", starter: false, pro: true, enterprise: true },
-      { name: "Contra & petty cash", permKey: "MANAGE_PETTY_CASH", starter: true, pro: true, enterprise: true },
-      { name: "Credit & debit notes", permKey: "CREATE_CREDIT_NOTE", starter: false, pro: true, enterprise: true },
-      { name: "Loans & recurring entries", permKey: "MANAGE_LOANS", starter: false, pro: true, enterprise: true },
-      { name: "Fixed assets", permKey: "VIEW_FIXED_ASSETS", starter: false, pro: true, enterprise: true },
-      { name: "Multi-currency accounts", permKey: "MULTI_CURRENCY", starter: false, pro: false, enterprise: true },
-      // Financial year management is PRO+ in PLAN_DEFAULT_PERMISSIONS; this row
-      // said every plan had it.
-      { name: "Financial year management", permKey: "FINANCIAL_YEAR", starter: false, pro: true, enterprise: true },
+      { name: "Chart of accounts", starter: true, pro: true, enterprise: true },
+      { name: "Journal vouchers (CPV/CRV)", starter: true, pro: true, enterprise: true },
+      { name: "Ledger & trial balance", starter: true, pro: true, enterprise: true },
+      { name: "Profit & loss statement", starter: true, pro: true, enterprise: true },
+      { name: "Balance sheet", starter: true, pro: true, enterprise: true },
+      { name: "Cash flow statement", starter: false, pro: true, enterprise: true },
+      { name: "Budget vs actual tracking", starter: false, pro: true, enterprise: true },
+      { name: "Multi-currency accounts", starter: false, pro: false, enterprise: true },
+      { name: "Financial year management", starter: true, pro: true, enterprise: true },
     ],
   },
   {
@@ -240,12 +132,12 @@ const COMPARISON: Category[] = [
     icon: "🧾",
     title: "Invoicing & Sales",
     features: [
-      { name: "Sales invoices", permKey: "CREATE_SALES_INVOICE", starter: true, pro: true, enterprise: true },
-      { name: "Purchase invoices", permKey: "CREATE_PURCHASE_INVOICE", starter: true, pro: true, enterprise: true },
-      { name: "Quotations & proformas", permKey: "CREATE_QUOTATION", starter: true, pro: true, enterprise: true },
-      { name: "Delivery challans", permKey: "CREATE_DELIVERY_CHALLAN", starter: true, pro: true, enterprise: true },
-      { name: "Sale returns (credit notes)", permKey: "CREATE_SALE_RETURN", starter: true, pro: true, enterprise: true },
-      { name: "Recurring invoices", permKey: "MANAGE_RECURRING", starter: false, pro: true, enterprise: true },
+      { name: "Sales invoices", starter: true, pro: true, enterprise: true },
+      { name: "Purchase invoices", starter: true, pro: true, enterprise: true },
+      { name: "Quotations & proformas", starter: true, pro: true, enterprise: true },
+      { name: "Delivery challans", starter: true, pro: true, enterprise: true },
+      { name: "Sale returns (credit notes)", starter: true, pro: true, enterprise: true },
+      { name: "Recurring invoices", starter: false, pro: true, enterprise: true },
       { name: "PDF invoice branding", starter: "Basic", pro: "Custom logo", enterprise: "Full white-label" },
       { name: "Discount management", starter: true, pro: true, enterprise: true },
       { name: "Tax (GST/VAT/WHT) on invoices", starter: true, pro: true, enterprise: true },
@@ -257,39 +149,16 @@ const COMPARISON: Category[] = [
     icon: "📦",
     title: "Inventory & Stock",
     features: [
-      // Starter genuinely holds VIEW_INVENTORY, CREATE_ITEMS and
-      // CREATE_STOCK_RATE, so "no stock tracking at all" was never true. The
-      // real Pro upgrade is the tooling around it — barcode, price lists,
-      // warehouses and the inventory reports.
-      { name: "Item catalog", permKey: "VIEW_CATALOG", starter: true, pro: true, enterprise: true },
-      { name: "Stock tracking", permKey: "VIEW_INVENTORY", starter: "Basic", pro: "Advanced", enterprise: "Advanced" },
-      { name: "GRN (Goods Receipt)", permKey: "VIEW_INVENTORY", starter: true, pro: true, enterprise: true },
-      { name: "Purchase orders (PO tracking)", permKey: "CREATE_PURCHASE_ORDER", starter: true, pro: true, enterprise: true },
-      { name: "Barcode / QR scanning", permKey: "MANAGE_BARCODE", starter: false, pro: true, enterprise: true },
-      { name: "Price lists", permKey: "MANAGE_PRICE_LISTS", starter: false, pro: true, enterprise: true },
-      { name: "Promotions & discount engine", permKey: "MANAGE_PROMOTIONS", starter: false, pro: true, enterprise: true },
-      { name: "Reorder level alerts", permKey: "VIEW_LOW_STOCK", starter: false, pro: true, enterprise: true },
-      { name: "Warehouse management", permKey: "MULTI_BRANCH", starter: false, pro: true, enterprise: true },
-      { name: "Stock valuation (FIFO/Avg)", permKey: "VIEW_STOCK_LEDGER", starter: false, pro: true, enterprise: true },
-      { name: "Expiry tracking", permKey: "VIEW_INVENTORY_REPORTS", starter: false, pro: true, enterprise: true },
-      { name: "Dead stock detection", permKey: "VIEW_LOW_STOCK", starter: false, pro: true, enterprise: true },
-    ],
-  },
-  {
-    id: "trading",
-    icon: "🔄",
-    title: "Trading Control",
-    features: [
-      // The whole block was granted to Starter in code while never appearing on
-      // this page at all — the upgrade it is supposed to drive was invisible.
-      { name: "Trading overview", permKey: "TRADING_OVERVIEW", starter: false, pro: true, enterprise: true },
-      { name: "Order desk", permKey: "TRADING_ORDER_DESK", starter: false, pro: true, enterprise: true },
-      { name: "Procurement desk", permKey: "TRADING_PROCUREMENT", starter: false, pro: true, enterprise: true },
-      { name: "Stock control", permKey: "TRADING_STOCK_CONTROL", starter: false, pro: true, enterprise: true },
-      { name: "Outstandings", permKey: "TRADING_OUTSTANDINGS", starter: false, pro: true, enterprise: true },
-      { name: "Dispatch board", permKey: "TRADING_DISPATCH_BOARD", starter: false, pro: true, enterprise: true },
-      { name: "Conversion center", permKey: "TRADING_CONVERSION_CENTER", starter: false, pro: true, enterprise: true },
-      { name: "Trading analytics", permKey: "TRADING_ANALYTICS", starter: false, pro: true, enterprise: true },
+      { name: "Item catalog", starter: true, pro: true, enterprise: true },
+      { name: "Stock tracking", starter: false, pro: true, enterprise: true },
+      { name: "GRN (Goods Receipt)", starter: false, pro: true, enterprise: true },
+      { name: "Barcode / QR scanning", starter: false, pro: true, enterprise: true },
+      { name: "Reorder level alerts", starter: false, pro: true, enterprise: true },
+      { name: "Warehouse management", starter: false, pro: false, enterprise: true },
+      { name: "Stock valuation (FIFO/Avg)", starter: false, pro: true, enterprise: true },
+      { name: "Expiry tracking", starter: false, pro: true, enterprise: true },
+      { name: "Dead stock detection", starter: false, pro: true, enterprise: true },
+      { name: "Purchase orders (PO tracking)", starter: false, pro: true, enterprise: true },
     ],
   },
   {
@@ -297,15 +166,14 @@ const COMPARISON: Category[] = [
     icon: "🏦",
     title: "Banking & Payments",
     features: [
-      { name: "Bank account management", permKey: "PAYMENT_RECEIPTS", starter: true, pro: true, enterprise: true },
-      { name: "Bank reconciliation", permKey: "BANK_RECONCILIATION", starter: false, pro: true, enterprise: true },
-      { name: "Bank statement import", permKey: "BANK_RECONCILIATION", starter: false, pro: true, enterprise: true },
-      { name: "Bulk payments", permKey: "BULK_PAYMENTS", starter: false, pro: true, enterprise: true },
-      // Starter holds MANAGE_ADVANCE_PAYMENT — this row said otherwise.
-      { name: "Advance payments", permKey: "MANAGE_ADVANCE_PAYMENT", starter: true, pro: true, enterprise: true },
-      { name: "Payment receipts (CRV)", permKey: "PAYMENT_RECEIPTS", starter: true, pro: true, enterprise: true },
-      { name: "Expense vouchers (CPV)", permKey: "EXPENSE_VOUCHERS", starter: true, pro: true, enterprise: true },
-      { name: "Payment follow-up automation", permKey: "VIEW_PROFIT_LOSS_REPORT", starter: false, pro: true, enterprise: true },
+      { name: "Bank account management", starter: true, pro: true, enterprise: true },
+      { name: "Bank reconciliation", starter: false, pro: true, enterprise: true },
+      { name: "Bank statement import", starter: false, pro: true, enterprise: true },
+      { name: "Bulk payments", starter: false, pro: true, enterprise: true },
+      { name: "Advance payments", starter: false, pro: true, enterprise: true },
+      { name: "Payment receipts (CRV)", starter: true, pro: true, enterprise: true },
+      { name: "Expense vouchers (CPV)", starter: true, pro: true, enterprise: true },
+      { name: "Payment follow-up automation", starter: false, pro: true, enterprise: true },
     ],
   },
   {
@@ -313,19 +181,17 @@ const COMPARISON: Category[] = [
     icon: "📊",
     title: "Reports & Analytics",
     features: [
-      { name: "Basic reports (sales, purchases)", permKey: "VIEW_REPORTS", starter: true, pro: true, enterprise: true },
-      { name: "Ageing report (AR/AP)", permKey: "VIEW_AGEING_REPORT", starter: true, pro: true, enterprise: true },
-      { name: "Advanced financial reports", permKey: "VIEW_PROFIT_LOSS_REPORT", starter: false, pro: true, enterprise: true },
-      { name: "Inventory intelligence reports", permKey: "VIEW_INVENTORY_REPORTS", starter: false, pro: true, enterprise: true },
-      { name: "Customer profitability", permKey: "VIEW_SALES_REPORT", starter: false, pro: true, enterprise: true },
-      { name: "Salesman performance", permKey: "VIEW_SALES_REPORT", starter: false, pro: true, enterprise: true },
-      { name: "Discount analysis", permKey: "VIEW_SALES_REPORT", starter: false, pro: true, enterprise: true },
-      // Operations and strategic reports are Pro — there is no Enterprise-only
-      // permission behind them, and the sidebar now hands both to Pro.
-      { name: "Delivery & fulfillment reports", permKey: "VIEW_OUTWARD", starter: false, pro: true, enterprise: true },
-      { name: "Supplier performance reports", permKey: "VIEW_OUTWARD", starter: false, pro: true, enterprise: true },
-      { name: "Scenario planning & sales forecast", permKey: "VIEW_PROFIT_LOSS_REPORT", starter: false, pro: true, enterprise: true },
-      { name: "AI-powered revenue forecast", permKey: "AI_FORECAST", starter: false, pro: false, enterprise: true },
+      { name: "Basic reports (sales, purchases)", starter: true, pro: true, enterprise: true },
+      { name: "Ageing report (AR/AP)", starter: true, pro: true, enterprise: true },
+      { name: "Advanced financial reports", starter: false, pro: true, enterprise: true },
+      { name: "Inventory intelligence reports", starter: false, pro: true, enterprise: true },
+      { name: "Customer profitability", starter: false, pro: true, enterprise: true },
+      { name: "Salesman performance", starter: false, pro: true, enterprise: true },
+      { name: "Discount analysis", starter: false, pro: true, enterprise: true },
+      { name: "Delivery & fulfillment reports", starter: false, pro: false, enterprise: true },
+      { name: "Supplier performance reports", starter: false, pro: false, enterprise: true },
+      { name: "Sales forecast (AI-powered)", starter: false, pro: false, enterprise: true },
+      { name: "Scenario planning", starter: false, pro: false, enterprise: true },
       { name: "Export to Excel / PDF", starter: true, pro: true, enterprise: true },
     ],
   },
@@ -334,11 +200,11 @@ const COMPARISON: Category[] = [
     icon: "👥",
     title: "HR & Payroll",
     features: [
-      { name: "Employee management", permKey: "VIEW_HR_PAYROLL", starter: false, pro: true, enterprise: true },
-      { name: "Attendance tracking", permKey: "VIEW_HR_PAYROLL", starter: false, pro: true, enterprise: true },
-      { name: "Payroll processing", permKey: "VIEW_HR_PAYROLL", starter: false, pro: true, enterprise: true },
-      { name: "Advance salary", permKey: "VIEW_HR_PAYROLL", starter: false, pro: true, enterprise: true },
-      { name: "Leave management", permKey: "VIEW_HR_PAYROLL", starter: false, pro: true, enterprise: true },
+      { name: "Employee management", starter: false, pro: true, enterprise: true },
+      { name: "Attendance tracking", starter: false, pro: true, enterprise: true },
+      { name: "Payroll processing", starter: false, pro: true, enterprise: true },
+      { name: "Advance salary", starter: false, pro: true, enterprise: true },
+      { name: "Leave management", starter: false, pro: true, enterprise: true },
     ],
   },
   {
@@ -346,14 +212,14 @@ const COMPARISON: Category[] = [
     icon: "🤝",
     title: "CRM & Customer Hub",
     features: [
-      { name: "Customer management", permKey: "VIEW_ACCOUNTS", starter: true, pro: true, enterprise: true },
-      { name: "Supplier management", permKey: "VIEW_ACCOUNTS", starter: true, pro: true, enterprise: true },
-      { name: "Customer ledger / statement", permKey: "VIEW_LEDGER_REPORT", starter: true, pro: true, enterprise: true },
-      { name: "Sales pipeline (CRM)", permKey: "VIEW_CRM", starter: false, pro: true, enterprise: true },
-      { name: "Lead management", permKey: "VIEW_CRM", starter: false, pro: true, enterprise: true },
-      { name: "Interaction / activity log", permKey: "VIEW_CRM", starter: false, pro: true, enterprise: true },
-      { name: "Credit limit & risk rating", permKey: "VIEW_CRM", starter: false, pro: true, enterprise: true },
-      { name: "Bad debts tracking", permKey: "VIEW_PROFIT_LOSS_REPORT", starter: false, pro: true, enterprise: true },
+      { name: "Customer management", starter: true, pro: true, enterprise: true },
+      { name: "Supplier management", starter: true, pro: true, enterprise: true },
+      { name: "Customer ledger / statement", starter: true, pro: true, enterprise: true },
+      { name: "Sales pipeline (CRM)", starter: false, pro: true, enterprise: true },
+      { name: "Lead management", starter: false, pro: true, enterprise: true },
+      { name: "Interaction / activity log", starter: false, pro: true, enterprise: true },
+      { name: "Credit limit & risk rating", starter: false, pro: true, enterprise: true },
+      { name: "Bad debts tracking", starter: false, pro: true, enterprise: true },
     ],
   },
   {
@@ -362,9 +228,7 @@ const COMPARISON: Category[] = [
     title: "AI Features",
     features: [
       { name: "AI assistant (ask anything)",    permKey: "AI_ASSISTANT",             starter: false, pro: true,  enterprise: true },
-      // Bundled with Enterprise; Starter and Pro can buy it as the Business
-      // Automation add-on.
-      { name: "AI Business Operator",           permKey: "AI_BUSINESS_OPERATOR",     starter: false, pro: false, enterprise: true, tooltip: "An AI agent that runs tasks, answers business questions and suggests actions on its own. Included in Enterprise; available as an add-on on Starter and Professional." },
+      { name: "AI Business Operator",           permKey: "AI_BUSINESS_OPERATOR",     starter: false, pro: false, enterprise: true, tooltip: "An AI agent that can run tasks, answer business questions, and suggest actions autonomously" },
       { name: "Smart invoice suggestions",      permKey: "AI_SMART_SUGGESTIONS",     starter: false, pro: true,  enterprise: true },
       { name: "AI-powered sales forecast",      permKey: "AI_FORECAST",              starter: false, pro: false, enterprise: true },
       { name: "Anomaly & fraud detection",      permKey: "AI_ANOMALY_DETECTION",     starter: false, pro: false, enterprise: true },
@@ -379,11 +243,11 @@ const COMPARISON: Category[] = [
     title: "Tax & Compliance",
     features: [
       { name: "GST / VAT / WHT / FED", starter: true, pro: true, enterprise: true },
-      { name: "Tax summary report", permKey: "VIEW_FINANCIAL_REPORTS", starter: true, pro: true, enterprise: true },
-      { name: "Tax forecast", permKey: "VIEW_PROFIT_LOSS_REPORT", starter: false, pro: true, enterprise: true },
-      { name: "FBR / compliance docs", permKey: "TAX_CONFIGURATION", starter: false, pro: true, enterprise: true },
-      { name: "Audit & exception log", permKey: "VIEW_AUDIT_LOG", starter: false, pro: false, enterprise: true },
-      { name: "17+ tax type support", permKey: "TAX_CONFIGURATION", starter: false, pro: true, enterprise: true },
+      { name: "Tax summary report", starter: true, pro: true, enterprise: true },
+      { name: "Tax forecast", starter: false, pro: true, enterprise: true },
+      { name: "FBR / compliance docs", starter: false, pro: true, enterprise: true },
+      { name: "Audit & exception log", starter: false, pro: true, enterprise: true },
+      { name: "17+ tax type support", starter: false, pro: true, enterprise: true },
     ],
   },
   {
@@ -489,12 +353,9 @@ function UseCaseWizard() {
               ))}
             </div>
           </div>
-          <BuyCta
-            href={`/onboarding/signup/${chosen.plan}`}
-            style={{ background: `linear-gradient(135deg,${chosen.color},${chosen.color}bb)`, color: "#fff", padding: "10px 22px", borderRadius: 10, fontWeight: 700, fontSize: 14, textDecoration: "none", flexShrink: 0 }}
-          >
-            Start with {chosen.recommended} →
-          </BuyCta>
+          <button type="button" disabled style={{ background: `linear-gradient(135deg,${chosen.color},${chosen.color}bb)`, color: "#fff", padding: "10px 22px", borderRadius: 10, fontWeight: 700, fontSize: 14, textDecoration: "none", flexShrink: 0, cursor: "not-allowed", opacity: 0.8, border: "none" }}>
+            Launching Soon
+          </button>
         </div>
       )}
     </div>
@@ -518,9 +379,7 @@ export default function PricingPage() {
   const DEFAULT_PKR_PRICING = {
     starter:      { monthly: 3999,  yearly: 3199  }, // 3,999/mo → 20% off yearly = 3,199/mo
     professional: { monthly: 8999,  yearly: 7199  }, // 8,999/mo → 20% off yearly = 7,199/mo
-    // Was 14,999 while the live site served 19,999 from the saved PKR config —
-    // so any failure of /api/public/pricing quietly under-quoted Enterprise.
-    enterprise:   { monthly: 19999, yearly: 15999 }, // 19,999/mo → 20% off yearly = 15,999/mo
+    enterprise:   { monthly: 14999, yearly: 11999 }, // 14,999/mo → 20% off yearly = 11,999/mo
   };
   const [pkrPricing, setPkrPricing] = useState<{ starter: { monthly: number; yearly: number }; professional: { monthly: number; yearly: number }; enterprise: { monthly: number; yearly: number } } | null>(DEFAULT_PKR_PRICING);
   // Edge-detected country from /api/public/geo. Unlike `country` below it is
@@ -528,6 +387,7 @@ export default function PricingPage() {
   // thing allowed to unlock the PKR-native price list. Null until resolved →
   // global pricing shows first.
   const [geoCountry, setGeoCountry] = useState<string | null>(null);
+  const [pkrAddonPricing, setPkrAddonPricing] = useState<{ monthly: number; yearly: number } | null>({ monthly: 1800, yearly: 1440 });
   const [planLimits, setPlanLimits] = useState<Record<string, number | null>>(DEFAULT_PLAN_LIMITS);
   // Key must be "professional" (not "pro") — the render below reads
   // branchLimits.professional; before the /api/public/pricing fetch resolves,
@@ -560,7 +420,7 @@ export default function PricingPage() {
       // Pakistan price list from anywhere; /api/billing/checkout would then
       // charge USD, so the page was advertising a price it could not honour.
       try {
-        const res = await fetch("/api/public/pricing-region", { cache: "no-store", headers: clientRegionHeaders() });
+        const res = await fetch("/api/public/pricing-region", { cache: "no-store" });
         if (res.ok) {
           const d = await res.json();
           if (d?.currency) setCurrency(d.currency);
@@ -625,31 +485,26 @@ export default function PricingPage() {
             }));
           }
           if (d?.planHighlights) {
-            // The API keys the middle plan "pro"; PLANS keys it "professional",
-            // and the card reads planHighlights[plan.slug]. Spreading the raw
-            // response therefore added a "pro" entry nobody reads and left the
-            // Professional card permanently on its hardcoded fallback — admin
-            // edits to it did nothing. Normalise the key on the way in.
-            const { pro, ...rest } = d.planHighlights as Record<string, string[]>;
-            setPlanHighlights(h => ({ ...h, ...rest, ...(pro ? { professional: pro } : {}) }));
+            setPlanHighlights(h => ({ ...h, ...d.planHighlights }));
           }
           if (d?.pkrPricing) {
             setPkrPricing({
               starter:      { monthly: Number(d.pkrPricing.starter?.monthly      ?? 3999),  yearly: Math.round(Number(d.pkrPricing.starter?.yearly      ?? 38388)  / 12) },
               professional: { monthly: Number(d.pkrPricing.pro?.monthly          ?? 8999),  yearly: Math.round(Number(d.pkrPricing.pro?.yearly          ?? 86388)  / 12) },
-              enterprise:   { monthly: Number(d.pkrPricing.enterprise?.monthly   ?? 19999), yearly: Math.round(Number(d.pkrPricing.enterprise?.yearly   ?? 191988) / 12) },
+              enterprise:   { monthly: Number(d.pkrPricing.enterprise?.monthly   ?? 14999), yearly: Math.round(Number(d.pkrPricing.enterprise?.yearly   ?? 143988) / 12) },
             });
           }
-          // pkrAddonPricing was read here for the automation card's price. That
-          // card no longer shows one, so nothing on this page consumes it.
+          if (d?.pkrAddonPricing) {
+            setPkrAddonPricing({
+              monthly: Number(d.pkrAddonPricing.monthly ?? 1800),
+              yearly:  Math.round(Number(d.pkrAddonPricing.yearly ?? 17280) / 12),
+            });
+          }
         }
       } catch {}
       // Load live plan feature overrides from admin config
       try {
-        // Same region headers as the currency fetch — this endpoint now serves
-        // Pakistan the PKR Permissions table and everyone else the world one,
-        // and it must not race the cookie on a cold visit.
-        const pf = await fetch("/api/public/plan-features", { cache: "no-store", headers: clientRegionHeaders() });
+        const pf = await fetch("/api/public/plan-features", { cache: "no-store" });
         if (pf.ok) { const d = await pf.json(); if (d?.featureMap) setFeatureMap(d.featureMap); }
       } catch {}
     })();
@@ -674,44 +529,6 @@ export default function PricingPage() {
   );
   const customDisplayUsd = billing === "yearly" ? Math.round(customMonthly * (1 - yearlyDiscount / 100)) : customMonthly;
   const formatPrice = (usd: number) => formatFromUSD(usd, currency);
-  // Rupee totals are summed from the rupee rates, never converted from the USD
-  // subtotal — otherwise the line items and the headline would disagree.
-  const customPkrMonthly = useMemo(() => {
-    if (geoCountry !== "PK") return null;
-    let total = 0;
-    for (const m of customPlanData.modules) {
-      if (!selectedModules.includes(m.id)) continue;
-      const rate = Number(m?.pricePkr) || 0;
-      if (rate <= 0) return null; // A module with no rupee rate falls back to USD.
-      total += rate;
-    }
-    return total;
-  }, [selectedModules, customPlanData, geoCountry]);
-
-  /**
-   * What one module costs, for whoever is looking.
-   *
-   * Inside Pakistan this reads the module's own rupee rate — the same figure an
-   * admin types on Plans → PKR Pricing. Converting the USD price at the spot
-   * rate, which is what happened before, quoted a Pakistani visitor PKR 4,170
-   * for Accounting against a whole Starter plan at PKR 3,999.
-   */
-  const modulePkrRate = (m: any): number | null => {
-    if (!isPKUser) return null;
-    const monthly = Number(m?.pricePkr) || 0;
-    if (monthly <= 0) return null;
-    if (billing !== "yearly") return monthly;
-    const yearly = Number(m?.pricePkrYearly) || 0;
-    return yearly > 0 ? yearly : Math.round(monthly * (1 - yearlyDiscount / 100));
-  };
-  const formatModulePrice = (m: any) => {
-    const pkr = modulePkrRate(m);
-    if (pkr != null) return `₨${pkr.toLocaleString("en-PK")}`;
-    const usd = billing === "yearly"
-      ? (Number(m?.priceYearly) || Math.round(Number(m?.price) * (1 - yearlyDiscount / 100)))
-      : Number(m?.price) || 0;
-    return formatPrice(usd);
-  };
 
   // When country is PK and admin has set PKR prices, use those directly
   // Was `country === "PK" || currency === "PKR"` — the currency dropdown alone
@@ -728,52 +545,41 @@ export default function PricingPage() {
     }
     return formatPrice(usdPrice);
   };
-  // getAddonDisplayPrice / getAddonYearlySaving used to live here. The
-  // automation card is the only thing that ever called them and it no longer
-  // quotes a price, so they went with it rather than sitting here as the next
-  // person's "why is this unused?".
+  const getAddonDisplayPrice = (usdMonthly: number, usdYearly: number) => {
+    if (isPKUser && pkrAddonPricing) {
+      const amount = billing === "yearly" ? pkrAddonPricing.yearly : pkrAddonPricing.monthly;
+      return `₨${amount.toLocaleString("en-PK")}`;
+    }
+    return formatPrice(billing === "yearly" ? usdYearly : usdMonthly);
+  };
+  const getAddonYearlySaving = (usdDiffPerMonth: number) => {
+    if (isPKUser && pkrAddonPricing) {
+      const saving = (pkrAddonPricing.monthly - pkrAddonPricing.yearly) * 12;
+      return `₨${saving.toLocaleString("en-PK")}`;
+    }
+    return formatPrice(usdDiffPerMonth * 12);
+  };
 
-  // These were stubbed to `undefined` while every CTA was a dead "Launching
-  // Soon" button. BuyCta needs the real destinations again so that flipping
-  // NEXT_PUBLIC_SIGNUPS_OPEN is genuinely all it takes to go live.
-  const buildHref = (slug: string) =>
-    `/onboarding/signup/${slug}?cycle=${billing}&currency=${currency}&country=${country}`;
-  const buildCustomHref = () =>
-    `/onboarding/choose-plan?plan=custom&modules=${selectedModules.join(",")}&extraUsers=${extraUsers}&extraBranches=${extraBranches}&cycle=${billing}&currency=${currency}&country=${country}`;
+  const buildHref = (slug: string) => undefined;
+  const buildCustomHref = () => undefined;
   const toggleModule = (id: string) => setSelectedModules(p => p.includes(id) ? p.filter(x => x !== id) : [...p, id]);
-  // selectOnlyModule was the "Pick this only" handler on the removed grid.
+  // Single-app buy: clear everything else so the estimate shows exactly what
+  // that one module costs, and drop the seat/branch add-ons that only make
+  // sense on a bigger package.
+  const selectOnlyModule = (id: string) => {
+    setSelectedModules([id]);
+    setExtraUsers(0);
+    setExtraBranches(0);
+    if (typeof document !== "undefined") {
+      document.getElementById("custom")?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  };
   const isStandalone = (id: string) => STANDALONE_IDS.has(id);
   const standaloneOnly = selectedModules.length === 1 && isStandalone(selectedModules[0]);
   // A package of only layer-on modules cannot run — flag it instead of letting
   // someone check out into an empty app.
   const needsCoreModule = selectedModules.length > 0 && !selectedModules.some(isStandalone);
   const toggleCat = (id: string) => setOpenCats(p => { const n = new Set(p); n.has(id) ? n.delete(id) : n.add(id); return n; });
-
-  // ── What the comparison table actually renders ───────────────────────────
-  // A row's three cells come from the admin Permissions screen whenever the row
-  // names a permission; otherwise they are the hardcoded values in COMPARISON.
-  const resolveRow = (feat: Feature): [Val, Val, Val] => {
-    const override = feat.permKey ? featureMap[feat.permKey] : undefined;
-    return override
-      ? [override.starter, override.pro, override.enterprise]
-      : [feat.starter, feat.pro, feat.enterprise];
-  };
-  // Untick a permission on all three plans and the feature is not part of the
-  // product on any plan — so the row is dropped instead of rendering as three
-  // dashes, and a category left with no rows disappears with it. Rows the admin
-  // screen cannot reach (Users, Branches, support promises) always stay.
-  const isRowVisible = (feat: Feature) => {
-    if (!feat.permKey || featureMap[feat.permKey] === undefined) return true;
-    return resolveRow(feat).some(v => v !== false && v !== null);
-  };
-  const visibleComparison = useMemo(
-    () =>
-      COMPARISON
-        .map(cat => ({ ...cat, features: cat.features.filter(isRowVisible) }))
-        .filter(cat => cat.features.length > 0),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [featureMap]
-  );
   const usersLabel = (v: number | null | undefined) => (v === null || v === undefined ? "Unlimited" : `Up to ${v}`);
 
   const ff = "'Outfit','DM Sans',sans-serif";
@@ -789,6 +595,7 @@ export default function PricingPage() {
         @media(max-width:900px){
           .pg{grid-template-columns:1fr !important}
           .cg{grid-template-columns:1fr !important}
+          .sa-grid{grid-template-columns:repeat(2,1fr) !important}
         }
 
         /* Comparison table — sticky first column on mobile */
@@ -833,6 +640,7 @@ export default function PricingPage() {
           /* Custom plan */
           .cp-row{flex-direction:column !important;}
           .cp-sidebar{width:100% !important;position:static !important;top:auto !important;}
+          .sa-grid{grid-template-columns:1fr !important;}
           .mod-grid{grid-template-columns:1fr !important;}
 
           /* FAQ */
@@ -912,12 +720,9 @@ export default function PricingPage() {
                       {billing === "yearly" ? "Intro price for first 3 months, then yearly-plan monthly equivalent applies." : "Intro price for first 3 months, then regular monthly billing starts."}
                     </div> */}
                   </div>
-                  <BuyCta
-                    href={buildHref(plan.slug)}
-                    style={{ display: "block", width: "100%", textAlign: "center", padding: "12px 18px", borderRadius: 12, textDecoration: "none", color: "white", fontWeight: 800, background: plan.gradient, marginBottom: 22, fontSize: 14 }}
-                  >
-                    Continue with {plan.name}
-                  </BuyCta>
+                  <button type="button" disabled style={{ display: "block", width: "100%", textAlign: "center", padding: "12px 18px", borderRadius: 12, textDecoration: "none", color: "white", fontWeight: 800, background: plan.gradient, marginBottom: 22, fontSize: 14, cursor: "not-allowed", opacity: 0.85, border: "none" }}>
+                    Launching Soon
+                  </button>
                   {/* <div style={{ fontSize: 11, color: "rgba(255,255,255,.42)", marginTop: -12, marginBottom: 16, textAlign: "center" }}>
                     You&apos;ll be charged {formatPrice(regularPrice)}/mo after the first 3 months.
                   </div> */}
@@ -945,14 +750,93 @@ export default function PricingPage() {
           })}
         </div>
 
-        {/* The "Secure Checkout · Powered by Safepay / LemonSqueezy" strip with
-            the Visa / Mastercard / JazzCash / Easypaisa / Bank Transfer badges
-            used to sit here. Removed on request. The same reassurance already
-            appears at checkout, where it is the thing being reassured about. */}
+        {/* ── PAYMENT METHODS TRUST STRIP ─────────────────────── */}
+        <div style={{ marginBottom: 80 }}>
+          {currency === "PKR" ? (
+            /* ── PKR: Safepay ── */
+            <div style={{ borderRadius: 20, background: "rgba(255,255,255,.025)", border: "1px solid rgba(255,255,255,.07)", padding: "28px 32px" }}>
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 20 }}>
+                <div>
+                  <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#34d399" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                    <span style={{ fontSize: 13, fontWeight: 800, color: "#34d399" }}>Secure Checkout · Powered by Safepay</span>
+                  </div>
+                  <div style={{ fontSize: 12, color: "rgba(255,255,255,.35)" }}>256-bit SSL · PCI DSS compliant · No card data stored on our servers</div>
+                </div>
+                <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+                  {/* Visa */}
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "center", background: "#1A1F71", borderRadius: 8, padding: "6px 12px", height: 36 }}>
+                    <span style={{ fontSize: 13, fontWeight: 900, color: "#fff", letterSpacing: "-.5px", fontStyle: "italic" }}>VISA</span>
+                  </div>
+                  {/* Mastercard */}
+                  <div style={{ display: "flex", alignItems: "center", gap: -6, background: "rgba(255,255,255,.06)", border: "1px solid rgba(255,255,255,.1)", borderRadius: 8, padding: "6px 10px", height: 36 }}>
+                    <div style={{ width: 18, height: 18, borderRadius: "50%", background: "#EB001B", opacity: .9 }} />
+                    <div style={{ width: 18, height: 18, borderRadius: "50%", background: "#F79E1B", opacity: .9, marginLeft: -8 }} />
+                    <span style={{ fontSize: 11, fontWeight: 800, color: "rgba(255,255,255,.8)", marginLeft: 6 }}>Mastercard</span>
+                  </div>
+                  {/* JazzCash */}
+                  <div style={{ display: "flex", alignItems: "center", gap: 6, background: "#CC0000", borderRadius: 8, padding: "6px 12px", height: 36 }}>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="white"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/></svg>
+                    <span style={{ fontSize: 12, fontWeight: 800, color: "#fff" }}>JazzCash</span>
+                  </div>
+                  {/* Easypaisa */}
+                  <div style={{ display: "flex", alignItems: "center", gap: 6, background: "#44B549", borderRadius: 8, padding: "6px 12px", height: 36 }}>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="white"><circle cx="12" cy="12" r="10"/><path d="M8 12l3 3 5-5" stroke="#44B549" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                    <span style={{ fontSize: 12, fontWeight: 800, color: "#fff" }}>Easypaisa</span>
+                  </div>
+                  {/* Bank Transfer */}
+                  <div style={{ display: "flex", alignItems: "center", gap: 6, background: "rgba(255,255,255,.05)", border: "1px solid rgba(255,255,255,.1)", borderRadius: 8, padding: "6px 12px", height: 36 }}>
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.6)" strokeWidth="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                    <span style={{ fontSize: 12, fontWeight: 700, color: "rgba(255,255,255,.6)" }}>Bank Transfer</span>
+                    <span style={{ fontSize: 10, color: "rgba(255,255,255,.35)", fontWeight: 600 }}>IBFT</span>
+                  </div>
+                </div>
+              </div>
+              <div style={{ marginTop: 16, paddingTop: 14, borderTop: "1px solid rgba(255,255,255,.05)", display: "flex", alignItems: "center", gap: 20, flexWrap: "wrap" }}>
+                <span style={{ fontSize: 11, color: "rgba(255,255,255,.28)", fontWeight: 600 }}>All banks supported via 1Link network · HBL · UBL · Meezan · MCB · Faysal · Allied · and more</span>
+              </div>
+            </div>
+          ) : (
+            /* ── International: LemonSqueezy ── */
+            <div style={{ borderRadius: 20, background: "rgba(255,255,255,.025)", border: "1px solid rgba(255,255,255,.07)", padding: "28px 32px" }}>
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 20 }}>
+                <div>
+                  <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#34d399" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                    <span style={{ fontSize: 13, fontWeight: 800, color: "#34d399" }}>Secure Checkout · Powered by LemonSqueezy</span>
+                  </div>
+                  <div style={{ fontSize: 12, color: "rgba(255,255,255,.35)" }}>Merchant of Record · We handle tax, compliance & billing globally · 256-bit SSL</div>
+                </div>
+                <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+                  {/* Visa */}
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "center", background: "#1A1F71", borderRadius: 8, padding: "6px 12px", height: 36 }}>
+                    <span style={{ fontSize: 13, fontWeight: 900, color: "#fff", letterSpacing: "-.5px", fontStyle: "italic" }}>VISA</span>
+                  </div>
+                  {/* Mastercard */}
+                  <div style={{ display: "flex", alignItems: "center", gap: -6, background: "rgba(255,255,255,.06)", border: "1px solid rgba(255,255,255,.1)", borderRadius: 8, padding: "6px 10px", height: 36 }}>
+                    <div style={{ width: 18, height: 18, borderRadius: "50%", background: "#EB001B", opacity: .9 }} />
+                    <div style={{ width: 18, height: 18, borderRadius: "50%", background: "#F79E1B", opacity: .9, marginLeft: -8 }} />
+                    <span style={{ fontSize: 11, fontWeight: 800, color: "rgba(255,255,255,.8)", marginLeft: 6 }}>Mastercard</span>
+                  </div>
+                  {/* Amex */}
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "center", background: "#2E77BC", borderRadius: 8, padding: "6px 12px", height: 36 }}>
+                    <span style={{ fontSize: 12, fontWeight: 900, color: "#fff", letterSpacing: ".5px" }}>AMEX</span>
+                  </div>
+                  {/* PayPal */}
+                  <div style={{ display: "flex", alignItems: "center", gap: 5, background: "#003087", borderRadius: 8, padding: "6px 12px", height: 36 }}>
+                    <span style={{ fontSize: 14, fontWeight: 900, color: "#009cde", fontStyle: "italic" }}>P</span>
+                    <span style={{ fontSize: 12, fontWeight: 800, color: "#fff" }}>PayPal</span>
+                  </div>
+                </div>
+              </div>
+              <div style={{ marginTop: 16, paddingTop: 14, borderTop: "1px solid rgba(255,255,255,.05)", display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+                <span style={{ fontSize: 11, color: "rgba(255,255,255,.28)", fontWeight: 600 }}>Regional wallets auto-detected at checkout · Sales tax handled automatically · Invoices issued by LemonSqueezy LLC</span>
+              </div>
+            </div>
+          )}
+        </div>
 
         {/* ── AUTOMATION ADD-ON ────────────────────────────────── */}
-        {/* Hidden until it can actually be bought — see lib/addons.ts. */}
-        {AUTOMATION_ADDON_ENABLED && (
         <div style={{ marginBottom: 80 }}>
           <div style={{ textAlign: "center", marginBottom: 36 }}>
             <div style={{ display: "inline-flex", alignItems: "center", gap: 8, background: "rgba(124,58,237,.12)", border: "1px solid rgba(124,58,237,.28)", borderRadius: 100, padding: "5px 14px", fontSize: 12, color: "#a78bfa", fontWeight: 700, marginBottom: 16 }}>
@@ -962,7 +846,7 @@ export default function PricingPage() {
               Add Business Automation to any plan
             </h2>
             <p style={{ color: "rgba(255,255,255,.42)", fontSize: 15, maxWidth: 560, margin: "0 auto" }}>
-              Attach it to whatever you already pay for — Starter, Professional, Enterprise, or a custom package.
+              Flat {getAddonDisplayPrice(79, 69)}/month on top of whatever you already pay — Starter, Professional, Enterprise, or a custom package.
             </p>
           </div>
 
@@ -971,32 +855,35 @@ export default function PricingPage() {
             <div style={{ padding: "36px 40px" }}>
               <div className="addon-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 40, alignItems: "center" }}>
 
-                {/* Left: Pitch + CTA */}
+                {/* Left: Price + CTA */}
                 <div>
-                  {/* No price here on purpose. Automation is quoted with the
-                      plan it is attached to, so a number on this card would be
-                      a second, competing price for the same subscription. */}
-                  <div style={{ fontSize: 13, color: "#a78bfa", fontWeight: 700, marginBottom: 10 }}>AUTOMATION ADD-ON</div>
-                  <div style={{ fontSize: 26, fontWeight: 900, color: "#fff", letterSpacing: "-.02em", lineHeight: 1.25, marginBottom: 10 }}>
-                    Put the busywork on autopilot
+                  <div style={{ fontSize: 13, color: "#a78bfa", fontWeight: 700, marginBottom: 6 }}>AUTOMATION ADD-ON</div>
+                  <div style={{ display: "flex", alignItems: "baseline", gap: 8, marginBottom: 6 }}>
+                    <span style={{ fontSize: 52, fontWeight: 900, color: "#fff", letterSpacing: "-.03em" }}>{getAddonDisplayPrice(79, 69)}</span>
+                    <span style={{ fontSize: 14, color: "rgba(255,255,255,.4)" }}>/month</span>
                   </div>
-                  <div style={{ fontSize: 14, color: "rgba(255,255,255,.5)", lineHeight: 1.6, marginBottom: 10 }}>
-                    Chasing overdue invoices, watching stock levels and rebuilding the same reports every month — all of it runs on its own.
-                  </div>
+                  {/* The old line here repeated the same number the big price
+                      already shows. Say what the cycle actually costs instead. */}
+                  {billing === "yearly" ? (
+                    <div style={{ fontSize: 13, color: "#34d399", marginBottom: 8, fontWeight: 700 }}>
+                      Billed annually — save {getAddonYearlySaving(10)}/year vs monthly
+                    </div>
+                  ) : (
+                    <div style={{ fontSize: 13, color: "rgba(255,255,255,.5)", marginBottom: 8 }}>
+                      Billed monthly — pay yearly and it drops to {isPKUser && pkrAddonPricing ? `₨${pkrAddonPricing.yearly.toLocaleString("en-PK")}` : formatPrice(69)}/mo
+                    </div>
+                  )}
                   <div style={{ fontSize: 13, color: "rgba(255,255,255,.4)", marginBottom: 28 }}>
                     Add to any plan · Cancel anytime · No hidden fees
                   </div>
                   <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
-                    <BuyCta
-                      href="/onboarding/choose-plan?addon=automation"
-                      style={{
-                        padding: "12px 28px", borderRadius: 12, background: "linear-gradient(135deg,#7c3aed,#2563eb)",
-                        color: "#fff", textDecoration: "none", fontSize: 14, fontWeight: 700,
-                        boxShadow: "0 0 24px rgba(124,58,237,.35)",
-                      }}
-                    >
-                      Add to my plan →
-                    </BuyCta>
+                    <button type="button" disabled style={{
+                      padding: "12px 28px", borderRadius: 12, background: "linear-gradient(135deg,#7c3aed,#2563eb)",
+                      color: "#fff", textDecoration: "none", fontSize: 14, fontWeight: 700,
+                      boxShadow: "0 0 24px rgba(124,58,237,.35)", cursor: "not-allowed", opacity: 0.85, border: "none",
+                    }}>
+                      Launching Soon
+                    </button>
                     <Link href="/automation" style={{
                       padding: "12px 20px", borderRadius: 12, border: "1px solid rgba(255,255,255,.15)",
                       color: "rgba(255,255,255,.7)", textDecoration: "none", fontSize: 14, fontWeight: 600,
@@ -1026,22 +913,17 @@ export default function PricingPage() {
                 </div>
               </div>
 
-              {/* Value comparison bar.
-                  The dollar figures that used to sit here were hard-coded USD
-                  ($40, $30, $60 … "= $438+/mo vs our $79") — they ignored the
-                  visitor's currency and quoted an automation price this card
-                  deliberately no longer shows. The point stands without them. */}
+              {/* Value comparison bar */}
               <div className="val-bar" style={{ marginTop: 28, paddingTop: 24, borderTop: "1px solid rgba(255,255,255,.08)", display: "flex", alignItems: "center", gap: 20, flexWrap: "wrap" }}>
-                <span style={{ fontSize: 13, color: "rgba(255,255,255,.4)" }}>Replaces separate subscriptions for:</span>
-                {["AR reminder tools", "Reorder alerts", "Reporting tools", "Zapier", "Sheet sync"].map(t => (
-                  <span key={t} style={{ fontSize: 12, padding: "3px 10px", borderRadius: 6, background: "rgba(167,139,250,.1)", border: "1px solid rgba(167,139,250,.22)", color: "#c4b5fd" }}>{t}</span>
+                <span style={{ fontSize: 13, color: "rgba(255,255,255,.4)" }}>These tools cost separately:</span>
+                {["AR reminder tools $40", "Reorder alert add-ons $30", "Reporting tools $60", "Zapier $49", "Sheet sync $30"].map(t => (
+                  <span key={t} style={{ fontSize: 12, padding: "3px 10px", borderRadius: 6, background: "rgba(248,113,113,.1)", border: "1px solid rgba(248,113,113,.2)", color: "#fca5a5" }}>{t}</span>
                 ))}
-                <span style={{ fontSize: 13, fontWeight: 700, color: "#34d399" }}>— all in one add-on</span>
+                <span style={{ fontSize: 13, fontWeight: 700, color: "#34d399" }}>= {formatPrice(438)}+/mo vs our {getAddonDisplayPrice(79, 69)}</span>
               </div>
             </div>
           </div>
         </div>
-        )}
 
         {/* ── FEATURE COMPARISON TABLE ────────────────────────── */}
         <div style={{ marginBottom: 80 }}>
@@ -1068,7 +950,7 @@ export default function PricingPage() {
             </div>
 
             {/* Categories */}
-            {visibleComparison.map(cat => (
+            {COMPARISON.map(cat => (
               <div key={cat.id}>
                 {/* Category header — clickable */}
                 <button
@@ -1105,7 +987,11 @@ export default function PricingPage() {
                             <span style={{ fontSize: 13, fontWeight: 700, color: PLAN_COLORS[pi] }}>{lim === null ? "Unlimited" : lim === 1 ? "1 branch" : `Up to ${lim}`}</span>
                           </div>
                         ))
-                      : resolveRow(feat).map((v, pi) => (
+                      : ([
+                          feat.permKey && featureMap[feat.permKey] !== undefined ? featureMap[feat.permKey].starter : feat.starter,
+                          feat.permKey && featureMap[feat.permKey] !== undefined ? featureMap[feat.permKey].pro : feat.pro,
+                          feat.permKey && featureMap[feat.permKey] !== undefined ? featureMap[feat.permKey].enterprise : feat.enterprise,
+                        ] as Val[]).map((v, pi) => (
                           <div key={pi} style={{ padding: "13px 16px", textAlign: "center", borderLeft: "1px solid rgba(255,255,255,.04)", display: "flex", alignItems: "center", justifyContent: "center", background: PLANS[pi].featured ? "rgba(99,102,241,.03)" : "transparent" }}>
                             <Val v={v} color={PLAN_COLORS[pi]} />
                           </div>
@@ -1121,12 +1007,9 @@ export default function PricingPage() {
               <div style={{ padding: "24px 24px", fontSize: 13, fontWeight: 700, color: "rgba(255,255,255,.3)" }}>Ready to start?</div>
               {PLANS.map((plan) => (
                 <div key={plan.slug} style={{ padding: "20px 16px", borderLeft: "1px solid rgba(255,255,255,.06)", background: plan.featured ? "rgba(99,102,241,.06)" : "transparent" }}>
-                  <BuyCta
-                    href={buildHref(plan.slug)}
-                    style={{ display: "block", width: "100%", textAlign: "center", padding: "11px 12px", borderRadius: 10, textDecoration: "none", color: "white", fontWeight: 800, fontSize: 13, background: plan.gradient }}
-                  >
-                    Get {plan.name}
-                  </BuyCta>
+                  <button type="button" disabled style={{ display: "block", width: "100%", textAlign: "center", padding: "11px 12px", borderRadius: 10, textDecoration: "none", color: "white", fontWeight: 800, fontSize: 13, background: plan.gradient, cursor: "not-allowed", opacity: 0.85, border: "none" }}>
+                    Launching Soon
+                  </button>
                 </div>
               ))}
             </div>
@@ -1147,19 +1030,79 @@ export default function PricingPage() {
             </p>
           </div>
 
-          {/* The "Run just one" grid used to sit here: six cards for HR & Payroll,
-              CRM, Inventory, Accounting, Trading Desk and Bank & Payments, each
-              with its price and a "Pick this only" button. Every one of those six
-              is also a card in the picker directly below, at the same price — the
-              same modules rendered twice on one screen. The picker already badges
-              them RUNS ALONE and its estimate updates live, so the grid was a
-              duplicate with no extra information. */}
-          {/* Every module on the menu is now standalone, so the old sentence
-              singling out the RUNS ALONE ones drew a distinction that no longer
-              exists — the badge would have sat on all of them. */}
+          {/* ── STANDALONE APPS — one module, on its own ─────── */}
+          <div style={{ marginBottom: 36 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 14, flexWrap: "wrap" }}>
+              <span style={{ fontSize: 11, fontWeight: 800, color: "rgba(255,255,255,.3)", letterSpacing: ".08em", textTransform: "uppercase" }}>
+                🎯 Run just one
+              </span>
+              <span style={{ fontSize: 13, color: "rgba(255,255,255,.42)" }}>
+                These modules work on their own — no full accounting setup required.
+              </span>
+            </div>
+
+            <div className="sa-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 12 }}>
+              {STANDALONE_APPS.map(app => {
+                const mod = customPlanData.modules.find((m: any) => m.id === app.id);
+                if (!mod) return null;
+                const active = selectedModules.length === 1 && selectedModules[0] === app.id;
+                return (
+                  <button
+                    key={app.id}
+                    onClick={() => selectOnlyModule(app.id)}
+                    style={{
+                      textAlign: "left", padding: "18px 18px 16px", borderRadius: 16, cursor: "pointer",
+                      fontFamily: ff, color: "white", transition: "all .2s",
+                      border: `1.5px solid ${active ? app.color + "80" : "rgba(255,255,255,.07)"}`,
+                      background: active
+                        ? `linear-gradient(160deg,${app.color}1f,rgba(255,255,255,.02))`
+                        : "rgba(255,255,255,.025)",
+                    }}
+                  >
+                    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, marginBottom: 10 }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                        <span style={{ fontSize: 22, lineHeight: 1 }}>{app.icon}</span>
+                        <span style={{ fontSize: 14, fontWeight: 800, color: active ? app.color : "white" }}>{app.label}</span>
+                      </div>
+                      <span style={{ fontSize: 9, fontWeight: 800, letterSpacing: ".06em", padding: "3px 7px", borderRadius: 5, color: app.color, background: `${app.color}18`, border: `1px solid ${app.color}33`, whiteSpace: "nowrap" }}>
+                        STANDALONE
+                      </span>
+                    </div>
+                    <div style={{ display: "flex", flexDirection: "column", gap: 5, marginBottom: 12 }}>
+                      {app.points.map(p => (
+                        <div key={p} style={{ display: "flex", alignItems: "center", gap: 7, fontSize: 11.5, color: "rgba(255,255,255,.45)" }}>
+                          <svg width="9" height="9" viewBox="0 0 12 10" fill="none" style={{ flexShrink: 0 }}>
+                            <path d="M1 5.5L4.5 9 11 1" stroke={app.color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                          </svg>
+                          {p}
+                        </div>
+                      ))}
+                    </div>
+                    <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: 8, paddingTop: 11, borderTop: "1px solid rgba(255,255,255,.06)" }}>
+                      {/* Same base price the picker below shows — the yearly
+                          discount is applied once, in the estimate total. */}
+                      <span style={{ fontSize: 17, fontWeight: 900, color: app.color, letterSpacing: "-.02em" }}>
+                        {formatPrice(mod.price)}
+                        <span style={{ fontSize: 10, fontWeight: 500, color: "rgba(255,255,255,.3)" }}>/mo</span>
+                      </span>
+                      <span style={{ fontSize: 11, fontWeight: 700, color: active ? app.color : "rgba(255,255,255,.4)" }}>
+                        {active ? "✓ Selected" : "Pick this only →"}
+                      </span>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+
+            <div style={{ marginTop: 12, fontSize: 12, color: "rgba(255,255,255,.32)" }}>
+              Need only the automation tools? <Link href="/onboarding/choose-plan?addon=automation" style={{ color: "#a78bfa", textDecoration: "none", fontWeight: 700 }}>Business Automation is sold separately →</Link>
+            </div>
+          </div>
+
+          <div style={{ height: 1, background: "rgba(255,255,255,.06)", marginBottom: 32 }} />
+
           <div style={{ fontSize: 13, color: "rgba(255,255,255,.42)", marginBottom: 18, textAlign: "center" }}>
-            Tick anything below and the estimate updates live. Every module{" "}
-            <span style={{ color: "#34d399", fontWeight: 700 }}>runs on its own</span> — pick just one and that is your whole subscription.
+            …or build your own package — tick anything below and the estimate updates live.
           </div>
 
           <div className="cp-row" style={{ display: "flex", gap: 20, alignItems: "flex-start", flexWrap: "wrap" }}>
@@ -1195,7 +1138,7 @@ export default function PricingPage() {
                             <div style={{ fontSize: 11, color: "rgba(255,255,255,.38)", lineHeight: 1.5, marginBottom: 9 }}>{module.desc}</div>
                             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, flexWrap: "wrap" }}>
                               <div style={{ fontSize: 14, fontWeight: 800, color: sel ? "#f97316" : "rgba(255,255,255,.45)" }}>
-                                +{formatModulePrice(module)}<span style={{ fontSize: 10, fontWeight: 500, color: "rgba(255,255,255,.3)" }}>/mo</span>
+                                +{formatPrice(module.price)}<span style={{ fontSize: 10, fontWeight: 500, color: "rgba(255,255,255,.3)" }}>/mo</span>
                               </div>
                               {/* Says whether ticking only this box is already a
                                   working subscription, or whether it needs a
@@ -1218,13 +1161,9 @@ export default function PricingPage() {
                 );
               })}
 
-              {/* Seats & branches.
-                  This block was headed "Add-ons — Optional" while the module
-                  cards directly above it badge layer-on modules "ADD-ON" — two
-                  different meanings of the same word on one screen. These are
-                  quantities, not features, so they are Extras now. */}
+              {/* Add-ons */}
               <div style={{ padding: "20px 22px", borderRadius: 16, background: "rgba(255,255,255,.02)", border: "1px solid rgba(255,255,255,.07)", marginTop: 4 }}>
-                <div style={{ fontSize: 11, fontWeight: 800, color: "rgba(255,255,255,.3)", letterSpacing: ".08em", textTransform: "uppercase", marginBottom: 14 }}>Extras — Optional</div>
+                <div style={{ fontSize: 11, fontWeight: 800, color: "rgba(255,255,255,.3)", letterSpacing: ".08em", textTransform: "uppercase", marginBottom: 14 }}>Add-ons — Optional</div>
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
                   {[
                     { key: "users",    label: "Extra Users",    icon: "👥", color: "#a5b4fc", val: extraUsers,    set: setExtraUsers },
@@ -1264,13 +1203,13 @@ export default function PricingPage() {
                     {customPlanData.modules.filter((m: any) => selectedModules.includes(m.id)).map((m: any) => (
                       <div key={m.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                         <span style={{ fontSize: 12, color: "rgba(255,255,255,.55)" }}>{m.icon} {m.name}</span>
-                        <span style={{ fontSize: 12, fontWeight: 700, color: "rgba(255,255,255,.78)" }}>{formatModulePrice(m)}</span>
+                        <span style={{ fontSize: 12, fontWeight: 700, color: "rgba(255,255,255,.78)" }}>{formatPrice(m.price)}</span>
                       </div>
                     ))}
                   </div>
                 )}
 
-                {/* Extras breakdown — seats and branches */}
+                {/* Add-ons breakdown */}
                 {(extraUsers > 0 || extraBranches > 0) && (
                   <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 12, paddingTop: 10, borderTop: "1px solid rgba(255,255,255,.07)" }}>
                     {extraUsers > 0 && (
@@ -1292,33 +1231,24 @@ export default function PricingPage() {
                 <div style={{ borderTop: "1px solid rgba(249,115,22,.25)", paddingTop: 14, marginBottom: 16 }}>
                   {billing === "yearly" && customMonthly > 0 && (
                     <div style={{ fontSize: 11, color: "rgba(255,255,255,.35)", marginBottom: 4, display: "flex", justifyContent: "space-between" }}>
-                      <span>Subtotal</span>
-                      <span>{customPkrMonthly != null ? `₨${customPkrMonthly.toLocaleString("en-PK")}` : formatPrice(customMonthly)}/mo</span>
+                      <span>Subtotal</span><span>{formatPrice(customMonthly)}/mo</span>
                     </div>
                   )}
                   {billing === "yearly" && (
                     <div style={{ fontSize: 11, color: "#34d399", marginBottom: 6, display: "flex", justifyContent: "space-between", fontWeight: 700 }}>
                       <span>Yearly −{yearlyDiscount}%</span>
-                      <span>−{customPkrMonthly != null
-                        ? `₨${Math.round(customPkrMonthly * yearlyDiscount / 100).toLocaleString("en-PK")}`
-                        : formatPrice(Math.round(customMonthly * yearlyDiscount / 100))}</span>
+                      <span>−{formatPrice(Math.round(customMonthly * yearlyDiscount / 100))}</span>
                     </div>
                   )}
                   <div style={{ fontSize: 10, color: "rgba(255,255,255,.3)", marginBottom: 4 }}>
                     {billing === "yearly" ? "Per month, billed annually" : "Per month"}
                   </div>
                   <div style={{ fontSize: 42, fontWeight: 900, color: customMonthly > 0 ? "#f97316" : "rgba(255,255,255,.2)", lineHeight: 1, letterSpacing: "-1.5px" }}>
-                    {customMonthly <= 0
-                      ? "—"
-                      : customPkrMonthly != null
-                        ? `₨${(billing === "yearly" ? Math.round(customPkrMonthly * (1 - yearlyDiscount / 100)) : customPkrMonthly).toLocaleString("en-PK")}`
-                        : formatPrice(customDisplayUsd)}
+                    {customMonthly > 0 ? formatPrice(customDisplayUsd) : "—"}
                   </div>
                   {billing === "yearly" && customMonthly > 0 && (
                     <div style={{ fontSize: 11, color: "#34d399", marginTop: 6, fontWeight: 700 }}>
-                      Save {customPkrMonthly != null
-                        ? `₨${Math.round(customPkrMonthly * yearlyDiscount / 100 * 12).toLocaleString("en-PK")}`
-                        : formatPrice(Math.round(customMonthly * yearlyDiscount / 100 * 12))} per year
+                      Save {formatPrice(Math.round(customMonthly * yearlyDiscount / 100 * 12))} per year
                     </div>
                   )}
                 </div>
@@ -1329,25 +1259,20 @@ export default function PricingPage() {
                   </div>
                 )}
 
-                <BuyCta
-                  href={buildCustomHref()}
-                  disabled={!selectedModules.length || needsCoreModule}
+                <button
+                  type="button"
+                  disabled
                   style={{
                     display: "block", width: "100%", textAlign: "center", padding: "13px 18px", borderRadius: 12,
                     background: selectedModules.length && !needsCoreModule ? "linear-gradient(135deg,#f97316,#ea580c)" : "rgba(255,255,255,.06)",
                     color: "white", fontWeight: 800, fontSize: 14, textDecoration: "none",
-                    opacity: selectedModules.length && !needsCoreModule ? 1 : 0.5,
+                    opacity: selectedModules.length && !needsCoreModule ? 0.85 : 0.5,
                     border: selectedModules.length && !needsCoreModule ? "none" : "1px solid rgba(255,255,255,.1)",
+                    cursor: "not-allowed",
                   }}
                 >
-                  {!selectedModules.length
-                    ? "Select modules above"
-                    : needsCoreModule
-                      ? "Pick a module that runs alone"
-                      : standaloneOnly
-                        ? "Continue with this app →"
-                        : "Continue →"}
-                </BuyCta>
+                  Launching Soon
+                </button>
                 <div style={{ fontSize: 11, color: "rgba(255,255,255,.22)", textAlign: "center", marginTop: 10 }}>
                   You&apos;ll confirm everything before payment
                 </div>

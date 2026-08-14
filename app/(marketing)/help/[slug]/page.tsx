@@ -67,7 +67,7 @@ const ARTICLES: Record<string, {
       { type:"heading", text:"Professional Plan — Best for growing teams" },
       { type:"list", items:["Up to 3 companies", "Everything in Starter", "Bank reconciliation", "Advanced reports & analytics", "Role-based access control", "Up to 10 users", "Priority email support"] },
       { type:"heading", text:"Enterprise Plan — Best for large organizations" },
-      { type:"list", items:["Unlimited companies & branches", "Everything in Professional", "Integration-ready APIs & webhooks", "Unlimited users", "24/7 priority support", "SLA guarantee"] },
+      { type:"list", items:["Unlimited companies & branches", "Everything in Professional", "Custom integrations & API", "Dedicated onboarding manager", "Unlimited users", "24/7 priority support", "SLA guarantee"] },
       { type:"tip", text:"Start with Starter and upgrade anytime — your data and settings carry over automatically. There's no lock-in." },
       { type:"warning", text:"If you need multi-branch support or more than 10 users, go directly to Enterprise. Starter and Pro do not support unlimited branches." },
     ],
@@ -1619,7 +1619,7 @@ export default async function HelpArticlePage({
   return (
     <div style={{ minHeight:"100vh", background:"linear-gradient(180deg,#080c1e 0%,#0c0f2e 30%,#080c1e 100%)", color:"white", fontFamily:"'Outfit','DM Sans',sans-serif" }}>
       <style>{`
-        
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Lora:ital,wght@0,700;1,700&display=swap');
         *,*::before,*::after{box-sizing:border-box;}
         @keyframes orbDrift{0%,100%{transform:translate(0,0)}50%{transform:translate(16px,-14px)}}
         @keyframes fadeUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
