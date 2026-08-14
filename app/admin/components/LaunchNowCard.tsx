@@ -10,7 +10,8 @@
  *
  * The confetti is hand-rolled on a canvas rather than pulled from a package —
  * the site's CSP blocks external script hosts, and 40 lines of physics beats a
- * dependency for one animation.
+ * dependency for one animation. The pop sound is synthesised with Web Audio for
+ * the same reason: no asset to host, nothing for the CSP to block.
  */
 
 import { useCallback, useEffect, useRef, useState } from "react";
