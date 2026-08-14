@@ -11,8 +11,20 @@
  * remembers it.
  */
 
-/** The header toggle and the Appearance selector are available. */
-export const ALLOW_LIGHT_THEME = true;
+/**
+ * The header toggle and the Appearance selector are available.
+ *
+ * Off until the light palette is finished. Most of this app styles itself with
+ * inline `style={{…}}` objects carrying literal dark colours — white text,
+ * `rgba(255,255,255,.05)` panels, dark gradients — and those cannot respond to
+ * a theme class. On a light background the result is unusable rather than
+ * merely ugly: whole buttons render white-on-white and disappear.
+ *
+ * Turning this back on is a real piece of work, not a flag flip. Every screen
+ * has to move from literal colours onto the CSS variables in globals.css. Until
+ * that is done, dark is the only palette the product actually has.
+ */
+export const ALLOW_LIGHT_THEME = false;
 
 /** What a user sees before they have chosen anything. */
 export const DEFAULT_THEME = "dark" as const;
