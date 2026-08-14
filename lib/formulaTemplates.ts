@@ -40,7 +40,7 @@ export const FORMULA_TEMPLATES: FormulaTemplate[] = [
       // Side/bottom gusset. Defaults to 0 so a plain flat bag costs exactly
       // what it did before this input existed — only jobs that actually have a
       // gusset are affected.
-      { key: "gusset",       label: "Gusset",             unit: "in", defaultValue: 0,    askOnRun: true },
+      { key: "guezzet",       label: "Guezzet",             unit: "in", defaultValue: 0,    askOnRun: true },
       { key: "flap",         label: "Flap / seal",        unit: "in", defaultValue: 2.5,  askOnRun: true },
       { key: "gauge",        label: "Gauge / thickness",  unit: "",   defaultValue: 10,   askOnRun: true },
       { key: "materialRate", label: "Material rate",      unit: "per kg", defaultValue: 12.8, askOnRun: true },
@@ -58,7 +58,7 @@ export const FORMULA_TEMPLATES: FormulaTemplate[] = [
       { key: "rollWidth",   label: "Roll width used", expression: "bestFitStock(pieceWidth, stockWidths)", unit: "in" },
       // Gusset joins the length + flap sum and nothing else — every step below
       // reads baseCut, so they pick it up without being touched.
-      { key: "baseCut",     label: "Base cut length", expression: "pieceLength * 2 + flap + gusset", unit: "in" },
+      { key: "baseCut",     label: "Base cut length", expression: "pieceLength * 2 + flap + guezzet", unit: "in" },
       { key: "lengthFactor",label: "Length multiple", expression: "scaleToRange(baseCut, cutMin, cutMax)" },
       { key: "cutLength",   label: "Cut length",      expression: "baseCut * lengthFactor", unit: "in" },
       { key: "rollInches",  label: "Roll length",     expression: "convert(rollLength, m, in)", unit: "in" },
