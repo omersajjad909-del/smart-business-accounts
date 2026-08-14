@@ -362,7 +362,7 @@ function playLaunchSound() {
     void ctx.resume().catch(() => {});
 
     const master = ctx.createGain();
-    master.gain.value = 0.8;
+    master.gain.value = 2.8;
     master.connect(ctx.destination);
 
     const t0 = ctx.currentTime + 0.02;
