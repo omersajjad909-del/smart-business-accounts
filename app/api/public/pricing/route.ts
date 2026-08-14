@@ -104,14 +104,20 @@ const DEFAULT_CUSTOM_PLAN = {
   basePrice: 0,
   yearlyDiscount: 20,
   modules: [
-    // `pricePkr` is the Pakistan list price, edited in Admin → Plans → Module
-    // Pricing. It is a price in its own right — never the USD one converted.
-    { id: "accounting",          name: "Accounting & Invoicing",  price: 15, pricePkr: 2999, desc: "Ledger, invoices, vouchers, P&L, balance sheet",        icon: "📒", enabled: true,  category: "core", standalone: true },
-    { id: "inventory",           name: "Inventory Management",    price: 12, pricePkr: 2499, desc: "Stock tracking, GRN, barcode, low-stock alerts",         icon: "📦", enabled: true,  category: "core", standalone: true },
-    { id: "crm",                 name: "CRM",                     price: 15, pricePkr: 2999, desc: "Contacts, sales pipeline, interaction logs",             icon: "👥", enabled: true,  category: "core", standalone: true },
-    { id: "hr_payroll",          name: "HR & Payroll",            price: 20, pricePkr: 3999, desc: "Employees, attendance, payroll, advance salary",         icon: "👨‍💼", enabled: true,  category: "core", standalone: true },
-    { id: "trading",             name: "Trading Desk",            price: 18, pricePkr: 3499, desc: "Order desk, procurement, dispatch, outstandings",        icon: "🔄", enabled: true,  category: "core", standalone: true },
-    { id: "bank_reconciliation", name: "Bank Reconciliation",     price: 10, pricePkr: 1999, desc: "Statement import, discrepancy flagging, closing",        icon: "🏦", enabled: true,  category: "finance", standalone: true },
+    // Four rates per module, matching the three plans: monthly and annual
+    // per-month, in each currency. All four are edited in Admin → Plans (USD on
+    // Module Pricing, PKR on PKR Pricing). `pricePkr` is a price in its own
+    // right — never the USD one converted.
+    //
+    // The annual columns have to travel with the module. Without them the
+    // pricing page fell back to a flat 20% off, so the annual figure an admin
+    // typed was quietly ignored.
+    { id: "accounting",          name: "Accounting & Invoicing",  price: 15, priceYearly: 12, pricePkr: 2999, pricePkrYearly: 2399, desc: "Ledger, invoices, vouchers, P&L, balance sheet",        icon: "📒", enabled: true,  category: "core", standalone: true },
+    { id: "inventory",           name: "Inventory Management",    price: 12, priceYearly: 10, pricePkr: 2499, pricePkrYearly: 1999, desc: "Stock tracking, GRN, barcode, low-stock alerts",         icon: "📦", enabled: true,  category: "core", standalone: true },
+    { id: "crm",                 name: "CRM",                     price: 15, priceYearly: 12, pricePkr: 2999, pricePkrYearly: 2399, desc: "Contacts, sales pipeline, interaction logs",             icon: "👥", enabled: true,  category: "core", standalone: true },
+    { id: "hr_payroll",          name: "HR & Payroll",            price: 20, priceYearly: 16, pricePkr: 3999, pricePkrYearly: 3199, desc: "Employees, attendance, payroll, advance salary",         icon: "👨‍💼", enabled: true,  category: "core", standalone: true },
+    { id: "trading",             name: "Trading Desk",            price: 18, priceYearly: 14, pricePkr: 3499, pricePkrYearly: 2799, desc: "Order desk, procurement, dispatch, outstandings",        icon: "🔄", enabled: true,  category: "core", standalone: true },
+    { id: "bank_reconciliation", name: "Bank Reconciliation",     price: 10, priceYearly:  8, pricePkr: 1999, pricePkrYearly: 1599, desc: "Statement import, discrepancy flagging, closing",        icon: "🏦", enabled: true,  category: "finance", standalone: true },
     // The five layered modules (Tax & Compliance, Advanced Reports,
     // Multi-Branch, WhatsApp & SMS, API Access) were removed from the menu —
     // each needs a base module underneath to mean anything, and nothing stopped

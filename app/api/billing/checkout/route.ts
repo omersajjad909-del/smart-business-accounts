@@ -90,6 +90,11 @@ export async function POST(req: NextRequest) {
 
     let pricing = DEFAULT_PRICING;
     let seatPricing = DEFAULT_SEAT_PRICING;
+    // Custom-plan module rates as the admin saved them. The hardcoded table in
+    // lib/customPlanPricing is only the fallback: reading it here meant Admin →
+    // Plans → Module Pricing changed what /pricing quoted while checkout went
+    // on charging the old figure.
+    let savedCustomModules: any[] | null = null;
     try {
       const latest = await prisma.activityLog.findFirst({
         where: { action: "PLAN_CONFIG" },
@@ -100,8 +105,45 @@ export async function POST(req: NextRequest) {
         const cfg = JSON.parse(latest.details);
         if (cfg?.pricing) pricing = { ...pricing, ...cfg.pricing };
         if (cfg?.seatPricing) seatPricing = { ...seatPricing, ...cfg.seatPricing };
+        if (Array.isArray(cfg?.customPlan?.modules)) savedCustomModules = cfg.customPlan.modules;
       }
     } catch {}
+
+    /**
+     * What the chosen modules cost, in the currency this customer is being
+     * billed in and for the cycle they picked.
+     *
+     * Rupee rates are summed as rupees and converted once at the end, because
+     * Lemon Squeezy takes the charge in USD. Summing converted USD instead
+     * would bill a Pakistani customer the international rate — the page said
+     * Rs 5,498 while checkout asked for $27, which is Rs 7,506.
+     */
+    const customModuleAmount = (moduleIds: string[], forPakistan: boolean): number => {
+      const yearly = billingCycle === "YEARLY";
+      const rows = savedCustomModules;
+      const rateOf = (id: string): number | null => {
+        const saved = rows?.find((m: any) => m?.id === id);
+        if (saved) {
+          const v = forPakistan
+            ? (yearly ? Number(saved.pricePkrYearly) || 0 : Number(saved.pricePkr) || 0)
+            : (yearly ? Number(saved.priceYearly) || 0 : Number(saved.price) || 0);
+          if (v > 0) return v;
+        }
+        return getModuleRate(id, forPakistan ? "PKR" : "USD", yearly ? "YEARLY" : "MONTHLY");
+      };
+
+      let total = 0;
+      for (const id of moduleIds) {
+        const rate = rateOf(id);
+        // A module with no rate in this currency drops the whole selection back
+        // to the USD path rather than billing a partial total.
+        if (rate == null || rate <= 0) return 0;
+        total += rate;
+      }
+      if (total <= 0) return 0;
+      const perCycle = yearly ? total * 12 : total;
+      return forPakistan ? perCycle / PKR_PER_USD : perCycle;
+    };
 
     // Extra-seat billing applies to the base ERP plan's user count — not to
     // standalone add-ons like Automation, which are flat-priced.
@@ -119,7 +161,12 @@ export async function POST(req: NextRequest) {
     const seatAddonCycleAmount = billingCycle === "YEARLY" ? seatAddonPerMonth * 12 : seatAddonPerMonth;
     const companyCustomModules = parseCustomModules(company.activeModules || "");
     const effectiveCustomModules = companyCustomModules.length > 0 ? companyCustomModules : customModulesFromBody;
-    const computedCustomCycleAmount = getCustomPlanCycleAmountUsd(effectiveCustomModules, billingCycle);
+    // Pakistan is billed off the rupee card; everyone else off the USD one.
+    const customFromRates = customModuleAmount(effectiveCustomModules, pricingRegion.isPakistan);
+    const computedCustomCycleAmount =
+      customFromRates > 0
+        ? customFromRates
+        : getCustomPlanCycleAmountUsd(effectiveCustomModules, billingCycle);
     const finalCustomPrice =
       planCode === "CUSTOM"
         ? ((computedCustomCycleAmount > 0 ? computedCustomCycleAmount : (customPrice > 0 ? customPrice : 0)) + seatAddonCycleAmount)
