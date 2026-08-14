@@ -26,6 +26,29 @@ type Status = {
 
 const COLORS = ["#6366f1", "#8b5cf6", "#10b981", "#f59e0b", "#ef4444", "#38bdf8", "#f472b6"];
 
+/**
+ * One popper per edge of the screen. Angles are in degrees with 0 pointing
+ * right and -90 straight up; `along` places the muzzle somewhere on that edge
+ * so repeat waves do not all fire from the same spot.
+ */
+const SIDES = [
+  { name: "left",   at: (w: number, h: number, r: number) => [0, h * (0.3 + r * 0.55)], angle: -30,  spread: 48,  speed: 1 },
+  { name: "right",  at: (w: number, h: number, r: number) => [w, h * (0.3 + r * 0.55)], angle: -150, spread: 48,  speed: 1 },
+  { name: "bottom", at: (w: number, h: number, r: number) => [w * (0.1 + r * 0.8), h],  angle: -90,  spread: 66,  speed: 1.05 },
+  { name: "top",    at: (w: number, h: number, r: number) => [w * (0.1 + r * 0.8), 0],  angle: 90,   spread: 120, speed: 0.45 },
+];
+
+// Three volleys, so the celebration lasts a few seconds instead of a blink.
+const WAVES = [0, 700, 1400];
+const PER_SIDE = 34;
+const FADE_AFTER = 2400;
+
+type Piece = {
+  x: number; y: number; vx: number; vy: number;
+  size: number; color: string; rot: number; spin: number;
+  born: number; life: number;
+};
+
 function Confetti({ onDone }: { onDone: () => void }) {
   const ref = useRef<HTMLCanvasElement | null>(null);
 
@@ -47,40 +70,51 @@ function Confetti({ onDone }: { onDone: () => void }) {
     const W = () => window.innerWidth;
     const H = () => window.innerHeight;
 
-    // Two bursts from the lower corners, the way a party popper actually fires.
-    const pieces = Array.from({ length: 160 }, (_, i) => {
-      const fromLeft = i % 2 === 0;
-      const angle = (fromLeft ? -60 : -120) * (Math.PI / 180) + (Math.random() - 0.5) * 0.9;
-      const speed = 14 + Math.random() * 16;
-      return {
-        x: fromLeft ? 0 : W(),
-        y: H(),
-        vx: Math.cos(angle) * speed * (fromLeft ? 1 : -1) * -1,
-        vy: Math.sin(angle) * speed,
-        size: 6 + Math.random() * 7,
-        color: COLORS[Math.floor(Math.random() * COLORS.length)],
-        rot: Math.random() * Math.PI,
-        spin: (Math.random() - 0.5) * 0.3,
-        life: 1,
-      };
-    });
+    const pieces: Piece[] = [];
+
+    const spawn = () => {
+      const w = W(), h = H(), now = Date.now();
+      for (const s of SIDES) {
+        for (let i = 0; i < PER_SIDE; i++) {
+          const [x, y] = s.at(w, h, Math.random());
+          const a = (s.angle + (Math.random() - 0.5) * s.spread) * (Math.PI / 180);
+          const speed = (13 + Math.random() * 15) * s.speed;
+          pieces.push({
+            x, y,
+            vx: Math.cos(a) * speed,
+            vy: Math.sin(a) * speed,
+            size: 6 + Math.random() * 7,
+            color: COLORS[Math.floor(Math.random() * COLORS.length)],
+            rot: Math.random() * Math.PI,
+            spin: (Math.random() - 0.5) * 0.3,
+            born: now,
+            life: 1,
+          });
+        }
+      }
+    };
+
+    spawn();
+    const timers = WAVES.slice(1).map(delay => setTimeout(spawn, delay));
 
     let raf = 0;
     const start = Date.now();
+    const lastWave = WAVES[WAVES.length - 1];
 
     const frame = () => {
-      ctx.clearRect(0, 0, W(), H());
+      const w = W(), h = H(), now = Date.now();
+      ctx.clearRect(0, 0, w, h);
       let alive = false;
 
       for (const p of pieces) {
-        p.vy += 0.38;          // gravity
+        p.vy += 0.36;          // gravity
         p.vx *= 0.99;          // drag
         p.x += p.vx;
         p.y += p.vy;
         p.rot += p.spin;
-        if (Date.now() - start > 1600) p.life -= 0.016;
+        if (now - p.born > FADE_AFTER) p.life -= 0.012;
 
-        if (p.life > 0 && p.y < H() + 40) {
+        if (p.life > 0 && p.y < h + 40 && p.x > -120 && p.x < w + 120) {
           alive = true;
           ctx.save();
           ctx.globalAlpha = Math.max(0, p.life);
@@ -92,13 +126,16 @@ function Confetti({ onDone }: { onDone: () => void }) {
         }
       }
 
-      if (alive) raf = requestAnimationFrame(frame);
+      // Keep the loop running until the last volley has had its turn, even if
+      // the earlier pieces have all landed.
+      if (alive || now - start < lastWave + 400) raf = requestAnimationFrame(frame);
       else onDone();
     };
     raf = requestAnimationFrame(frame);
 
     return () => {
       cancelAnimationFrame(raf);
+      timers.forEach(t => clearTimeout(t));
       window.removeEventListener("resize", resize);
     };
   }, [onDone]);
@@ -109,6 +146,82 @@ function Confetti({ onDone }: { onDone: () => void }) {
       style={{ position: "fixed", inset: 0, width: "100%", height: "100%", pointerEvents: "none", zIndex: 10000 }}
     />
   );
+}
+
+/** A single party-popper report: a filtered noise crack over a low body thump. */
+function popAt(ctx: AudioContext, out: GainNode, t: number, level: number) {
+  const dur = 0.2;
+  const buf = ctx.createBuffer(1, Math.ceil(ctx.sampleRate * dur), ctx.sampleRate);
+  const data = buf.getChannelData(0);
+  for (let i = 0; i < data.length; i++) {
+    data[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / data.length, 3);
+  }
+  const noise = ctx.createBufferSource();
+  noise.buffer = buf;
+  const band = ctx.createBiquadFilter();
+  band.type = "bandpass";
+  band.Q.value = 0.8;
+  band.frequency.setValueAtTime(2000, t);
+  band.frequency.exponentialRampToValueAtTime(600, t + dur);
+  const ng = ctx.createGain();
+  ng.gain.setValueAtTime(level, t);
+  ng.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+  noise.connect(band).connect(ng).connect(out);
+  noise.start(t);
+
+  const body = ctx.createOscillator();
+  body.type = "sine";
+  body.frequency.setValueAtTime(420, t);
+  body.frequency.exponentialRampToValueAtTime(70, t + 0.12);
+  const bg = ctx.createGain();
+  bg.gain.setValueAtTime(level * 0.55, t);
+  bg.gain.exponentialRampToValueAtTime(0.0001, t + 0.15);
+  body.connect(bg).connect(out);
+  body.start(t);
+  body.stop(t + 0.16);
+}
+
+/** One note of the little rising fanfare that rides over the pops. */
+function chimeAt(ctx: AudioContext, out: GainNode, t: number, freq: number) {
+  const osc = ctx.createOscillator();
+  osc.type = "triangle";
+  osc.frequency.value = freq;
+  const g = ctx.createGain();
+  g.gain.setValueAtTime(0.0001, t);
+  g.gain.exponentialRampToValueAtTime(0.2, t + 0.02);
+  g.gain.exponentialRampToValueAtTime(0.0001, t + 0.9);
+  osc.connect(g).connect(out);
+  osc.start(t);
+  osc.stop(t + 0.95);
+}
+
+/**
+ * The sound of the launch: one pop per side, then two lighter rounds timed to
+ * the later confetti waves. Audio is decoration — if the browser refuses it
+ * (no Web Audio, blocked autoplay), the launch carries on silently.
+ */
+function playLaunchSound() {
+  try {
+    const AC = window.AudioContext || (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
+    if (!AC) return;
+    const ctx = new AC();
+    void ctx.resume().catch(() => {});
+
+    const master = ctx.createGain();
+    master.gain.value = 0.5;
+    master.connect(ctx.destination);
+
+    const t0 = ctx.currentTime + 0.02;
+    [0, 0.08, 0.16, 0.24].forEach((d, i) => popAt(ctx, master, t0 + d, 0.9 - i * 0.1));
+    [0.72, 0.81].forEach((d, i) => popAt(ctx, master, t0 + d, 0.65 - i * 0.1));
+    [1.42, 1.51].forEach((d, i) => popAt(ctx, master, t0 + d, 0.5 - i * 0.1));
+    [523.25, 659.25, 783.99, 1046.5].forEach((f, i) => chimeAt(ctx, master, t0 + 0.2 + i * 0.11, f));
+
+    // Let the tail ring out, then release the audio device.
+    setTimeout(() => { void ctx.close().catch(() => {}); }, 4500);
+  } catch {
+    /* no sound, no problem */
+  }
 }
 
 export default function LaunchNowCard() {
@@ -149,7 +262,7 @@ export default function LaunchNowCard() {
       if (!res.ok) { setError(d?.error || "Could not update launch status."); return; }
       setStatus(d);
       setConfirming(null);
-      if (live) setCelebrate(true);
+      if (live) { setCelebrate(true); playLaunchSound(); }
     } catch {
       setError("Could not update launch status.");
     } finally {
