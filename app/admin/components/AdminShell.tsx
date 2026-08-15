@@ -21,6 +21,7 @@ type AdminProfile = {
   name?: string;
   email?: string;
   role?: string;
+  avatar?: string | null;
   joined?: string;
 };
 
@@ -189,6 +190,11 @@ export default function AdminShell({ children }: { children: ReactNode }) {
   );
   const initials = String(profile?.name || user?.name || "AD")
     .split(" ").map((p) => p[0] || "").join("").slice(0, 2).toUpperCase();
+  // Initials are the fallback, not the design: once a photo is set in Settings
+  // it should be the face of the panel everywhere the badge appears.
+  const avatarFace = profile?.avatar
+    ? <img src={profile.avatar} alt="" className="fin-admin-avatarImg" />
+    : initials;
   const unreadCount = notifications.filter((n) => !n.isRead).length;
 
   async function markAllRead() {
@@ -266,8 +272,12 @@ export default function AdminShell({ children }: { children: ReactNode }) {
         {/* ── Sidebar ──────────────────────────────────────────────── */}
         <aside className={`fin-admin-sidebar${mobileOpen ? " is-open" : ""}`}>
           <div className="fin-admin-brandRow">
+            {/* Same mark and wordmark as the public navbar: /icon.png with
+                FinovaOS set in Lora. The panel used to invent its own gradient
+                "F" badge and gradient text, so the admin looked like a
+                different product from the site it runs. */}
             <div className="fin-admin-brand">
-              <div className="fin-admin-brandBadge">F</div>
+              <img src="/icon.png" alt="" className="fin-admin-brandLogo" />
               <div>
                 <div className="fin-admin-brandTitle">FinovaOS</div>
                 <div className="fin-admin-brandSub">Admin</div>
@@ -310,7 +320,7 @@ export default function AdminShell({ children }: { children: ReactNode }) {
           <header className="fin-admin-topbar">
             <div className="fin-admin-topbarLeft">
               <button type="button" className="fin-admin-menuBtn" onClick={() => setMobileOpen(true)}>
-                <img src="/icon1.png" alt="" className="w-12 h-12"/>
+                <img src="/icon.png" alt="" className="w-12 h-12"/>
               </button>
 
               <div className="fin-admin-mobileBrand">
@@ -384,7 +394,7 @@ export default function AdminShell({ children }: { children: ReactNode }) {
               {/* Profile */}
               <div className="fin-admin-menuWrap" ref={profileRef}>
                 <button type="button" className="fin-admin-profile" onClick={() => setProfileOpen((v) => !v)}>
-                  <div className="fin-admin-avatar fin-admin-avatar--small">{initials}</div>
+                  <div className="fin-admin-avatar fin-admin-avatar--small">{avatarFace}</div>
                   <div className="fin-admin-profileMeta">
                     <div className="fin-admin-userName">{profile?.name || user?.name || "Admin"}</div>
                     <div className="fin-admin-userRole">{activeLabel}</div>
@@ -393,7 +403,7 @@ export default function AdminShell({ children }: { children: ReactNode }) {
                 {profileOpen ? (
                   <div className="fin-admin-dropdown fin-admin-dropdown--profile">
                     <div className="fin-admin-profileCard">
-                      <div className="fin-admin-avatar">{initials}</div>
+                      <div className="fin-admin-avatar">{avatarFace}</div>
                       <div>
                         <strong>{profile?.name || user?.name || "Admin"}</strong>
                         <p>{profile?.email || user?.email || "admin@finovaos.com"}</p>
@@ -566,15 +576,9 @@ const shellStyles = `
   display:flex;align-items:center;justify-content:space-between;
   gap:10px;padding:8px 8px 14px;
 }
-.fin-admin-brand{display:flex;align-items:center;gap:11px;}
-.fin-admin-brandBadge{
-  width:36px;height:36px;border-radius:12px;
-  display:grid;place-items:center;
-  background:linear-gradient(135deg,var(--accent),var(--accent-2));
-  box-shadow:0 16px 30px rgba(124,58,237,.3);
-  color:#fff;font-size:14px;font-weight:800;flex-shrink:0;
-}
-.fin-admin-brandTitle{font-size:28px;line-height:1;font-weight:800;letter-spacing:-.05em;background:linear-gradient(135deg,#a78bfa,#818cf8,#38bdf8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.fin-admin-brand{display:flex;align-items:center;gap:9px;}
+.fin-admin-brandLogo{width:44px;height:44px;object-fit:contain;flex-shrink:0;}
+.fin-admin-brandTitle{font-family:'Lora',serif;font-size:22px;line-height:1;font-weight:700;letter-spacing:-.2px;color:#eef3ff;}
 .fin-admin-brandSub{margin-top:4px;font-size:12px;color:var(--text-soft);}
 .fin-admin-closeBtn,.fin-admin-menuBtn{
   display:none;align-items:center;justify-content:center;
@@ -623,8 +627,12 @@ const shellStyles = `
   display:flex;align-items:center;justify-content:center;
   background:linear-gradient(135deg,#6d28d9,#8b5cf6);
   color:#fff;font-size:13px;font-weight:800;letter-spacing:.06em;flex-shrink:0;
+  overflow:hidden;
 }
 .fin-admin-avatar--small{width:38px;height:38px;}
+/* Fills the badge whatever the photo's aspect ratio, so a wide crop cannot
+   letterbox inside the rounded square. */
+.fin-admin-avatarImg{width:100%;height:100%;object-fit:cover;display:block;}
 .fin-admin-userMeta{min-width:0;flex:1;}
 .fin-admin-userName{font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--text);}
 .fin-admin-userRole{margin-top:2px;font-size:11px;color:var(--text-muted);}
@@ -647,7 +655,7 @@ const shellStyles = `
 }
 .fin-admin-topbarLeft,.fin-admin-topbarRight{display:flex;align-items:center;gap:10px;min-width:0;}
 .fin-admin-mobileBrand{display:none;line-height:1;}
-.fin-admin-mobileBrandTitle{font-size:20px;font-weight:800;letter-spacing:-.04em;background:linear-gradient(135deg,#a78bfa,#818cf8,#38bdf8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.fin-admin-mobileBrandTitle{font-family:'Lora',serif;font-size:18px;font-weight:700;letter-spacing:-.2px;color:#eef3ff;}
 .fin-admin-mobileBrandSub{margin-top:1px;font-size:11px;color:var(--text-muted);}
 
 /* Search bar (button-styled) */

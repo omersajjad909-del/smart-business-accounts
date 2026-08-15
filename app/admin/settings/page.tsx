@@ -139,6 +139,45 @@ export default function AdminSettingsPage() {
     }
   }
 
+  /**
+   * Saves the cropped photo, or clears it when `next` is null. Sent on its own
+   * rather than folded into Save Profile: a photo is picked and confirmed in
+   * one gesture, and making the admin press a second button after cropping is
+   * how photos end up silently unsaved.
+   */
+  async function savePhoto(next: string | null) {
+    setUploadingPhoto(true);
+    setProfileMessage("");
+    setProfileError("");
+
+    try {
+      const response = await fetch("/api/admin/profile", {
+        method: "PATCH",
+        headers: getHeaders(),
+        credentials: "include",
+        body: JSON.stringify({ avatar: next }),
+      });
+      const data: ProfileResponse = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        throw new Error(data.error || "Unable to update photo.");
+      }
+
+      const saved = data.avatar ?? null;
+      setAvatar(saved);
+      updateStoredUser((current: any) => ({
+        ...current,
+        avatar: saved,
+        user: { ...(current?.user || {}), avatar: saved },
+      }));
+      setProfileMessage(next ? "Profile photo updated." : "Profile photo removed.");
+    } catch (error) {
+      setProfileError(error instanceof Error ? error.message : "Unable to update photo.");
+    } finally {
+      setUploadingPhoto(false);
+      setPendingPhoto(null);
+    }
+  }
+
   async function handlePasswordSubmit(event: FormEvent) {
     event.preventDefault();
     setSavingPassword(true);
@@ -178,12 +217,25 @@ export default function AdminSettingsPage() {
     }
   }
 
+  const initials = String(name || email || "AD")
+    .split(" ").map((p) => p[0] || "").join("").slice(0, 2).toUpperCase();
+
   return (
     <div style={{ fontFamily: "'Outfit','DM Sans',sans-serif", color: "white", paddingBottom: 40 }}>
+      <ImageAdjusterModal
+        open={!!pendingPhoto}
+        file={pendingPhoto}
+        title="Adjust Profile Photo"
+        description="Drag and zoom to center your face in the frame."
+        shape="circle"
+        onCancel={() => setPendingPhoto(null)}
+        onConfirm={savePhoto}
+      />
+
       <div style={{ marginBottom: 24 }}>
         <h1 style={{ margin: "0 0 6px", fontSize: 24, fontWeight: 800 }}>Admin Settings</h1>
         <p style={{ margin: 0, fontSize: 13, color: "rgba(255,255,255,.46)" }}>
-          Update your admin profile details and change your login password.
+          Update your admin photo, profile details and login password.
         </p>
       </div>
 
@@ -192,12 +244,48 @@ export default function AdminSettingsPage() {
           <div style={{ marginBottom: 18 }}>
             <div style={{ fontSize: 18, fontWeight: 800, marginBottom: 4 }}>Profile Details</div>
             <div style={{ fontSize: 12, color: "rgba(255,255,255,.42)" }}>
-              This controls the admin name and email shown in the admin panel.
+              This controls the admin photo, name and email shown in the admin panel.
             </div>
           </div>
 
           {profileError ? <div style={{ marginBottom: 14, padding: "11px 12px", borderRadius: 12, background: "rgba(239,68,68,.12)", border: "1px solid rgba(239,68,68,.25)", color: "#fca5a5", fontSize: 12, fontWeight: 700 }}>{profileError}</div> : null}
           {profileMessage ? <div style={{ marginBottom: 14, padding: "11px 12px", borderRadius: 12, background: "rgba(52,211,153,.12)", border: "1px solid rgba(52,211,153,.25)", color: "#86efac", fontSize: 12, fontWeight: 700 }}>{profileMessage}</div> : null}
+
+          {/* Photo. Saves on confirm, so it is deliberately outside the form
+              below — pressing Enter in Full Name must not resubmit it. */}
+          <div style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: 20 }}>
+            <div style={{ width: 84, height: 84, borderRadius: "50%", overflow: "hidden", background: "linear-gradient(135deg,#4f46e5,#818cf8)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 28, fontWeight: 800, flexShrink: 0 }}>
+              {avatar
+                ? <img src={avatar} alt="Admin profile" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                : initials}
+            </div>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ fontSize: 14, fontWeight: 700 }}>{name || email || "Admin"}</div>
+              <div style={{ fontSize: 12, color: "rgba(255,255,255,.42)", marginTop: 4 }}>
+                Shows in the sidebar and top bar. PNG or JPG, under 2MB.
+              </div>
+              <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginTop: 12 }}>
+                <label style={{ padding: "10px 14px", borderRadius: 12, border: "1px solid rgba(99,102,241,.35)", background: "rgba(99,102,241,.12)", color: "#c7d2fe", fontSize: 13, fontWeight: 800, cursor: loading || uploadingPhoto ? "not-allowed" : "pointer", opacity: loading || uploadingPhoto ? 0.65 : 1 }}>
+                  {uploadingPhoto ? "Saving..." : avatar ? "Change Photo" : "Upload Photo"}
+                  <input
+                    type="file"
+                    accept="image/*"
+                    style={{ display: "none" }}
+                    disabled={loading || uploadingPhoto}
+                    onChange={(e) => { setPendingPhoto(e.target.files?.[0] || null); e.target.value = ""; }}
+                  />
+                </label>
+                <button
+                  type="button"
+                  disabled={!avatar || uploadingPhoto}
+                  onClick={() => savePhoto(null)}
+                  style={{ padding: "10px 14px", borderRadius: 12, border: "1px solid rgba(255,255,255,.12)", background: "transparent", color: "rgba(255,255,255,.8)", fontSize: 13, fontWeight: 700, cursor: !avatar || uploadingPhoto ? "not-allowed" : "pointer", opacity: !avatar || uploadingPhoto ? 0.55 : 1 }}
+                >
+                  Remove
+                </button>
+              </div>
+            </div>
+          </div>
 
           <form onSubmit={handleProfileSubmit}>
             <div style={{ display: "grid", gap: 14 }}>
