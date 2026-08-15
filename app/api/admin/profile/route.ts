@@ -35,16 +35,32 @@ export async function GET(req: NextRequest) {
       },
     });
 
-    if (!user) {
+    const adminUser = user
+      ? null
+      : await (prisma as any).adminUser?.findUnique({
+          where: { id: userId },
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            active: true,
+            createdAt: true,
+            team: true,
+            isSuperAdmin: true,
+          },
+        });
+
+    const account = user ?? adminUser;
+    if (!account) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
     return NextResponse.json({
-      name: user.name,
-      email: user.email,
-      role: user.role,
-      avatar: user.avatar,
-      joined: user.createdAt.toISOString(),
+      name: account.name,
+      email: account.email,
+      role: user ? user.role : "ADMIN",
+      avatar: user ? user.avatar : null,
+      joined: (user ? user.createdAt : adminUser.createdAt).toISOString(),
     });
   } catch (error: any) {
     console.error("ADMIN_PROFILE_GET_ERROR:", error);
@@ -106,28 +122,67 @@ export async function PATCH(req: NextRequest) {
       }
     }
 
-    const user = await prisma.user.update({
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { id: true, name: true, email: true, role: true, avatar: true, createdAt: true },
+    });
+
+    const adminUser = user
+      ? null
+      : await (prisma as any).adminUser?.findUnique({
+          where: { id: userId },
+          select: { id: true, name: true, email: true, active: true, createdAt: true },
+        });
+
+    if (!user && !adminUser) {
+      return NextResponse.json({ error: "User not found" }, { status: 404 });
+    }
+
+    if (user) {
+      const updated = await prisma.user.update({
+        where: { id: userId },
+        data: {
+          ...(photoOnly ? {} : { name, email }),
+          ...(avatar !== undefined ? { avatar } : {}),
+        },
+        select: {
+          name: true,
+          email: true,
+          role: true,
+          avatar: true,
+          createdAt: true,
+        },
+      });
+
+      return NextResponse.json({
+        success: true,
+        name: updated.name,
+        email: updated.email,
+        role: updated.role,
+        avatar: updated.avatar,
+        joined: updated.createdAt.toISOString(),
+      });
+    }
+
+    const updated = await (prisma as any).adminUser.update({
       where: { id: userId },
       data: {
         ...(photoOnly ? {} : { name, email }),
-        ...(avatar !== undefined ? { avatar } : {}),
       },
       select: {
         name: true,
         email: true,
-        role: true,
-        avatar: true,
         createdAt: true,
       },
     });
 
     return NextResponse.json({
       success: true,
-      name: user.name,
-      email: user.email,
-      role: user.role,
-      avatar: user.avatar,
-      joined: user.createdAt.toISOString(),
+      name: updated.name,
+      email: updated.email,
+      role: "ADMIN",
+      avatar: null,
+      joined: updated.createdAt.toISOString(),
     });
   } catch (error: any) {
     console.error("ADMIN_PROFILE_PATCH_ERROR:", error);

@@ -26,31 +26,44 @@ export async function POST(req: NextRequest) {
 
     const user = await prisma.user.findUnique({
       where: { id: userId },
+      select: { id: true, password: true, email: true, role: true },
     });
 
-    if (!user) {
+    const adminUser = user
+      ? null
+      : await (prisma as any).adminUser?.findUnique({
+          where: { id: userId },
+          select: { id: true, passwordHash: true, email: true, name: true },
+        });
+
+    const account = user ?? adminUser;
+    if (!account) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
-    // Verify current password
-    const match = await bcrypt.compare(currentPassword, user.password);
+    const storedPassword = user ? user.password : adminUser.passwordHash;
+    const match = await bcrypt.compare(currentPassword, storedPassword);
     if (!match) {
       return NextResponse.json({ error: "Invalid current password" }, { status: 401 });
     }
 
-    // Hash new password
     const hashedPassword = await bcrypt.hash(newPassword, 12);
 
-    // Update password
-    const updatedUser = await prisma.user.update({
-      where: { id: userId },
-      data: { password: hashedPassword },
-    });
+    if (user) {
+      await prisma.user.update({
+        where: { id: userId },
+        data: { password: hashedPassword },
+      });
+    } else {
+      await (prisma as any).adminUser.update({
+        where: { id: userId },
+        data: { passwordHash: hashedPassword },
+      });
+    }
 
-    // Log the change
     await logAuditFromReq(req, {
       companyId: "admin",
-      entity: "User",
+      entity: user ? "User" : "AdminUser",
       entityId: userId,
       action: "UPDATE",
       description: `Admin changed their own password`,
