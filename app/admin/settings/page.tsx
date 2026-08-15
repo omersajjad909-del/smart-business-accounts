@@ -23,6 +23,14 @@ function getHeaders() {
   };
 }
 
+/**
+ * Tells the admin shell what changed, so the sidebar badge and the name in the
+ * top bar update as soon as they are saved instead of on the next page load.
+ */
+function announceProfile(detail: { name?: string; email?: string; avatar?: string | null }) {
+  window.dispatchEvent(new CustomEvent("admin-profile-updated", { detail }));
+}
+
 const cardStyle: React.CSSProperties = {
   background: "rgba(255,255,255,.03)",
   border: "1px solid rgba(255,255,255,.08)",
@@ -131,6 +139,7 @@ export default function AdminSettingsPage() {
 
       setRole(data.role || role);
       setJoined(data.joined || joined);
+      announceProfile({ name: data.name || name, email: data.email || email });
       setProfileMessage("Profile updated successfully.");
     } catch (error) {
       setProfileError(error instanceof Error ? error.message : "Unable to update profile.");
@@ -169,6 +178,7 @@ export default function AdminSettingsPage() {
         avatar: saved,
         user: { ...(current?.user || {}), avatar: saved },
       }));
+      announceProfile({ avatar: saved });
       setProfileMessage(next ? "Profile photo updated." : "Profile photo removed.");
     } catch (error) {
       setProfileError(error instanceof Error ? error.message : "Unable to update photo.");

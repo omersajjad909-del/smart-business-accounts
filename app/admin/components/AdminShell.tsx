@@ -176,6 +176,18 @@ export default function AdminShell({ children }: { children: ReactNode }) {
     })();
   }, [user?.id, user?.role]);
 
+  // The settings page saves the photo and name on its own and this shell only
+  // fetches the profile once, so without this the badge and name up here would
+  // keep showing the old values until the next full page load.
+  useEffect(() => {
+    const onProfileUpdated = (event: Event) => {
+      const detail = (event as CustomEvent<AdminProfile>).detail;
+      if (detail) setProfile((current) => ({ ...(current || {}), ...detail }));
+    };
+    window.addEventListener("admin-profile-updated", onProfileUpdated);
+    return () => window.removeEventListener("admin-profile-updated", onProfileUpdated);
+  }, []);
+
   const groupedItems = useMemo(
     () => ADMIN_NAV_GROUP_ORDER.map((group) => ({
       group,
