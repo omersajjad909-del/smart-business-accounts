@@ -51,16 +51,16 @@ export async function GET(req: NextRequest) {
     // What each company was last actually charged, from the invoice ledger.
     const lastCharge = new Map<string, { total: number; currency: string }>();
     try {
+      // `distinct` keeps only the first row per company under the ordering —
+      // one row each rather than the whole ledger pulled back to be filtered.
       const rows = await (prisma as any).platformInvoice.findMany({
         where: { status: { in: ["PAID", "PARTIALLY_REFUNDED"] } },
         orderBy: { issuedAt: "desc" },
+        distinct: ["companyId"],
         select: { companyId: true, total: true, currency: true },
       });
-      // Rows arrive newest-first, so the first one seen per company is the latest.
       for (const row of rows) {
-        if (!lastCharge.has(row.companyId)) {
-          lastCharge.set(row.companyId, { total: Number(row.total) || 0, currency: row.currency });
-        }
+        lastCharge.set(row.companyId, { total: Number(row.total) || 0, currency: row.currency });
       }
     } catch {
       // Ledger not migrated yet — fall back to list prices below.

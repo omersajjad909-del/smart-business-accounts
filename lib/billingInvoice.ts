@@ -174,14 +174,14 @@ export async function getCompanyBillingContext(companyId: string): Promise<Billi
     status: effectiveStatus,
   };
 
-  if (!effectiveStatus || effectiveStatus.toUpperCase() === "INACTIVE") {
-    return { ...base, invoices: [] };
-  }
-
   // The permanent ledger is the source of truth once a charge has been recorded
   // there: its numbers were allocated at payment time and never move. The
   // ActivityLog reconstruction below is only for charges predating the ledger
   // (and is why numbers used to be per-company and positional).
+  //
+  // Read before the INACTIVE check below: money already collected does not
+  // disappear when a subscription lapses, and a cancelled customer still needs
+  // last year's receipts for their own books.
   const ledgerRows = await listCompanyPlatformInvoices(companyId);
   if (ledgerRows.length > 0) {
     return {
@@ -193,13 +193,24 @@ export async function getCompanyBillingContext(companyId: string): Promise<Billi
         issuedAt: row.issuedAt,
         amount: Number(row.total) || 0,
         currency: String(row.currency || currency).toUpperCase(),
-        status: row.status === "PAID" ? "paid" : row.status === "VOID" ? "void" : "open",
+        // A refunded charge was still paid, so the customer's row stays "paid"
+        // (the PDF spells out the refund). Only a fully reversed or voided
+        // invoice drops out of the paid column.
+        status: row.status === "REFUNDED" || row.status === "VOID" ? "void"
+          : row.status === "OPEN" ? "open"
+          : "paid",
         plan: String(row.plan || effectivePlan).toUpperCase(),
         billingCycle: String(row.billingCycle || cycle).toUpperCase(),
         derived: false,
         ledger: row,
       })),
     };
+  }
+
+  // Nothing in the ledger. The derived fallback below invents an invoice from
+  // the plan's list price, which is only meaningful for a live subscription.
+  if (!effectiveStatus || effectiveStatus.toUpperCase() === "INACTIVE") {
+    return { ...base, invoices: [] };
   }
 
   // Real charges, when we have them. Deriving the amount from the plan's list
