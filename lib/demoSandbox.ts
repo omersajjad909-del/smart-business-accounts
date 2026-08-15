@@ -90,6 +90,22 @@ export async function countActiveSandboxes(): Promise<number> {
 }
 
 /**
+ * Sandboxes number themselves from their own sequence, in the 900000s.
+ *
+ * `Company.companyNo` defaults to the customer sequence, and the shelf above is
+ * rebuilt continuously — so leaving sandboxes on the default meant every rebuild
+ * consumed a customer number. Three real customers ended up as #100001, #100002
+ * and #100017 with the next signup heading for ~#100104. See
+ * prisma/migrations/manual_company_no_demo_split.sql.
+ */
+async function nextDemoCompanyNo(): Promise<number> {
+  const rows = await prisma.$queryRaw<{ no: bigint }[]>`
+    SELECT nextval('"Company_companyNo_demo_seq"') AS no
+  `;
+  return Number(rows[0].no);
+}
+
+/**
  * Take one warm sandbox off the shelf, atomically. SKIP LOCKED means two
  * visitors arriving at the same instant can never be handed the same company —
  * the second one either gets a different row or none, and falls back to
@@ -139,6 +155,7 @@ export async function prewarmSandboxes(
       try {
         const company = await prisma.company.create({
           data: {
+            companyNo: await nextDemoCompanyNo(),
             name: getDemoProfile(businessType).companyName,
             country: "PK",
             baseCurrency: "PKR",
@@ -227,6 +244,7 @@ export async function createDemoSandbox(
 
   const company = await prisma.company.create({
     data: {
+      companyNo: await nextDemoCompanyNo(),
       name: profile.companyName,
       country: "PK",
       baseCurrency: "PKR",
