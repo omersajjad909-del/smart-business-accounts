@@ -77,7 +77,7 @@ const inp: React.CSSProperties = {
 const lbl: React.CSSProperties = { fontSize: 11, fontWeight: 700, color: "#475569", textTransform: "uppercase", letterSpacing: ".06em", display: "block", marginBottom: 6 };
 
 /* ── Types ── */
-interface UserRow { id: string; name: string; email: string; role: string; active: boolean; }
+interface UserRow { id: string; name: string; email: string; role: string; active: boolean; avatar?: string | null; }
 interface Branch   { id: string; code: string; name: string; }
 interface RoleData  { role: string; permissions: string[]; }
 
@@ -114,7 +114,9 @@ export default function TeamAndPermissionsPage() {
   const [modal,   setModal]   = useState(false);
   const [editing, setEditing] = useState(false);
   const [saving,  setSaving]  = useState(false);
-  const [form,    setForm]    = useState({ id: "", name: "", email: "", password: "", role: "ACCOUNTANT", active: true });
+  const [form,    setForm]    = useState<{ id: string; name: string; email: string; password: string; role: string; active: boolean; avatar: string | null }>(
+    { id: "", name: "", email: "", password: "", role: "ACCOUNTANT", active: true, avatar: null }
+  );
   const [selBr,   setSelBr]   = useState<string[]>([]);
 
   /* invite */
@@ -207,11 +209,11 @@ export default function TeamAndPermissionsPage() {
 
   /* ── user CRUD ── */
   function openAdd() {
-    setForm({ id: "", name: "", email: "", password: "", role: "ACCOUNTANT", active: true });
+    setForm({ id: "", name: "", email: "", password: "", role: "ACCOUNTANT", active: true, avatar: null });
     setSelBr([]); setEditing(false); setModal(true);
   }
   function openEdit(u: UserRow) {
-    setForm({ id: u.id, name: u.name, email: u.email, password: "", role: u.role, active: u.active ?? true });
+    setForm({ id: u.id, name: u.name, email: u.email, password: "", role: u.role, active: u.active ?? true, avatar: u.avatar ?? null });
     setSelBr(branchMap[u.id] || []); setEditing(true); setModal(true);
   }
   async function saveUser(e: React.FormEvent) {
@@ -222,9 +224,13 @@ export default function TeamAndPermissionsPage() {
       const res = await fetch("/api/users", {
         method: editing ? "PUT" : "POST",
         headers: { "Content-Type": "application/json", ...h() },
-        body: JSON.stringify({ id: form.id || undefined, name: form.name, email: form.email, password: form.password, role: form.role, active: form.active }),
+        body: JSON.stringify({ id: form.id || undefined, name: form.name, email: form.email, password: form.password, role: form.role, active: form.active, avatar: form.avatar }),
       });
-      if (!res.ok) { toast.error("Failed to save"); return; }
+      if (!res.ok) {
+        const msg = await res.json().then(d => d?.error).catch(() => null);
+        toast.error(msg || "Failed to save");
+        return;
+      }
       const saved = await res.json();
       const uid = saved?.id || form.id;
       if (uid) {
@@ -247,6 +253,19 @@ export default function TeamAndPermissionsPage() {
       await fetch("/api/company/admin-control", { method: "POST", headers: { "Content-Type": "application/json", ...h() }, body: JSON.stringify({ branchAssignments: next }) });
       toast.success("User deleted!"); loadUsers(); loadBranchMap();
     }
+  }
+
+  /* ── profile photo ── */
+  // Read straight to a data URL, which is what the User row stores and what
+  // /api/me/avatar already produces when a member sets their own photo.
+  function pickAvatar(file: File | null) {
+    if (!file) return;
+    if (!file.type.startsWith("image/")) { toast.error("Please choose an image file"); return; }
+    if (file.size > 2 * 1024 * 1024) { toast.error("Image must be under 2MB"); return; }
+    const reader = new FileReader();
+    reader.onload = () => setForm(f => ({ ...f, avatar: String(reader.result) }));
+    reader.onerror = () => toast.error("Could not read that image");
+    reader.readAsDataURL(file);
   }
 
   /* ── invite ── */
@@ -436,8 +455,10 @@ export default function TeamAndPermissionsPage() {
                       onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
                       <td style={{ padding: "13px 16px" }}>
                         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                          <div style={{ width: 34, height: 34, borderRadius: "50%", background: rm.bg, border: `1px solid ${rm.border}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 800, color: rm.color, flexShrink: 0 }}>
-                            {u.name?.charAt(0).toUpperCase()}
+                          <div style={{ width: 34, height: 34, borderRadius: "50%", background: rm.bg, border: `1px solid ${rm.border}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 800, color: rm.color, flexShrink: 0, overflow: "hidden" }}>
+                            {u.avatar
+                              ? <img src={u.avatar} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                              : u.name?.charAt(0).toUpperCase()}
                           </div>
                           <span style={{ fontSize: 13, fontWeight: 600 }}>{u.name}</span>
                         </div>
@@ -861,6 +882,34 @@ export default function TeamAndPermissionsPage() {
             </div>
 
             <form onSubmit={saveUser} style={{ padding: isMobile ? "12px 11px" : "22px 24px", display: "flex", flexDirection: "column", gap: 16 }}>
+              {/* Profile photo. Members can set their own from the account menu;
+                  this lets an admin do it for someone who never got around to it. */}
+              <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+                <label htmlFor="member-avatar-input" title="Choose a photo" style={{ cursor: "pointer", flexShrink: 0 }}>
+                  <div style={{ width: 56, height: 56, borderRadius: "50%", background: roleMeta(form.role).bg, border: `1px solid ${roleMeta(form.role).border}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, fontWeight: 800, color: roleMeta(form.role).color, overflow: "hidden" }}>
+                    {form.avatar
+                      ? <img src={form.avatar} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                      : (form.name?.charAt(0).toUpperCase() || "?")}
+                  </div>
+                </label>
+                <div>
+                  <div style={{ fontSize: 12, fontWeight: 700, marginBottom: 6 }}>Profile Photo</div>
+                  <div style={{ display: "flex", gap: 7 }}>
+                    <label htmlFor="member-avatar-input" style={{ padding: "5px 13px", borderRadius: 7, border: "1px solid rgba(99,102,241,.3)", background: "rgba(99,102,241,.08)", color: "#818cf8", fontFamily: ff, fontSize: 11, fontWeight: 700, cursor: "pointer" }}>
+                      {form.avatar ? "Change" : "Upload"}
+                    </label>
+                    {form.avatar && (
+                      <button type="button" onClick={() => setForm(f => ({ ...f, avatar: null }))} style={{ padding: "5px 13px", borderRadius: 7, border: "1px solid rgba(248,113,113,.3)", background: "rgba(248,113,113,.06)", color: "#f87171", fontFamily: ff, fontSize: 11, fontWeight: 700, cursor: "pointer" }}>
+                        Remove
+                      </button>
+                    )}
+                  </div>
+                  <div style={{ fontSize: 10.5, color: "#475569", marginTop: 6 }}>JPG or PNG, under 2MB. Optional.</div>
+                </div>
+                <input id="member-avatar-input" type="file" accept="image/*" style={{ display: "none" }}
+                  onChange={e => { pickAvatar(e.target.files?.[0] || null); e.target.value = ""; }} />
+              </div>
+
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
                 <div>
                   <label style={lbl}>Full Name</label>
