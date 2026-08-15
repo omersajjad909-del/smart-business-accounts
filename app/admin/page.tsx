@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { getCurrentUser } from "@/lib/auth";
-import LaunchNowCard from "./components/LaunchNowCard";
 
 type DashboardPayload = {
   cards: {
