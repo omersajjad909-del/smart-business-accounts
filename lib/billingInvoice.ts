@@ -64,9 +64,9 @@ function fmtDate(date: Date | string | null | undefined): string {
   return `${String(d.getDate()).padStart(2, "0")}-${String(d.getMonth() + 1).padStart(2, "0")}-${d.getFullYear()}`;
 }
 
-function formatInvoiceDate(value: Date) {
-  return value.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
-}
+// DD-MM-YYYY, matching the renewal date and every other date on the billing
+// page. The invoice table was the one place still printing "Aug 15, 2026".
+const formatInvoiceDate = fmtDate;
 
 function buildInvoiceStatus(status?: string | null): BillingInvoice["status"] {
   switch ((status || "").toUpperCase()) {
