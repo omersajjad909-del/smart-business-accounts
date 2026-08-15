@@ -1,18 +1,22 @@
 "use client";
 
-const COMPANIES = [
-  { name: "Al-Raza Traders",       initials: "AR", color: "#6366f1", city: "Karachi" },
-  { name: "Gulf Star Trading",      initials: "GS", color: "#10b981", city: "Dubai" },
-  { name: "Metro Wholesale",        initials: "MW", color: "#f59e0b", city: "Lahore" },
-  { name: "MedPlus Pharmacy",       initials: "MP", color: "#3b82f6", city: "Islamabad" },
-  { name: "Sheikh Distributors",    initials: "SD", color: "#ec4899", city: "Lahore" },
-  { name: "Ali Construction Group", initials: "AC", color: "#8b5cf6", city: "Karachi" },
-  { name: "Noor Retail Co.",        initials: "NR", color: "#06b6d4", city: "Faisalabad" },
-  { name: "Horizon Pharma",         initials: "HP", color: "#f97316", city: "Multan" },
-  { name: "Royal Traders LLC",      initials: "RT", color: "#34d399", city: "Abu Dhabi" },
-  { name: "Summit Manufacturing",   initials: "SM", color: "#a78bfa", city: "Sialkot" },
-  { name: "Prime Distributors",     initials: "PD", color: "#fbbf24", city: "Peshawar" },
-  { name: "Star Import Export",     initials: "SI", color: "#38bdf8", city: "Karachi" },
+/* This strip used to scroll twelve "customer" companies with names and cities
+   — Al-Raza Traders, Gulf Star Trading, Royal Traders LLC and so on. None of
+   them are customers, and a buyer who searches one finds nothing. The marquee
+   now carries what the platform actually ships, which needs no vouching. */
+const CAPABILITIES = [
+  { name: "Double-Entry Accounting", icon: "📒", color: "#6366f1", sub: "Ledger · Trial Balance" },
+  { name: "Invoicing & Billing",     icon: "🧾", color: "#10b981", sub: "Quotes · Credit Notes" },
+  { name: "Inventory",               icon: "📦", color: "#f59e0b", sub: "Multi-warehouse · GRN" },
+  { name: "Bank Reconciliation",     icon: "🏦", color: "#3b82f6", sub: "Statement matching" },
+  { name: "HR & Payroll",            icon: "👥", color: "#ec4899", sub: "Payslips · EOBI" },
+  { name: "Multi-Branch",            icon: "🏢", color: "#8b5cf6", sub: "Per-branch P&L" },
+  { name: "Multi-Currency",          icon: "🌍", color: "#06b6d4", sub: "PKR · AED · USD" },
+  { name: "Tax Ready",               icon: "🧮", color: "#f97316", sub: "GST · VAT · WHT" },
+  { name: "Purchase Orders",         icon: "🛒", color: "#34d399", sub: "PO · GRN matching" },
+  { name: "CRM & Follow-ups",        icon: "💬", color: "#a78bfa", sub: "Leads · Receivables" },
+  { name: "Real-Time Reports",       icon: "📊", color: "#fbbf24", sub: "P&L · Balance Sheet" },
+  { name: "Role-Based Access",       icon: "🔐", color: "#38bdf8", sub: "Per-user permissions" },
 ];
 
 export default function TrustedBy() {
@@ -45,7 +49,7 @@ export default function TrustedBy() {
               invented while the product is pre-launch. Replaced with claims the
               platform itself backs. */}
           <p style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,.3)", letterSpacing: ".1em", textTransform: "uppercase", marginBottom: 16 }}>
-            ONE PLATFORM FOR BUSINESSES WORLDWIDE — LAUNCHING NOW
+            ONE PLATFORM, EVERY DEPARTMENT — LIVE SINCE AUGUST 2026
           </p>
 
           {/* Stats row */}
@@ -70,7 +74,7 @@ export default function TrustedBy() {
         {/* Scrolling logos */}
         <div style={{ overflow: "hidden", maskImage: "linear-gradient(90deg,transparent,black 10%,black 90%,transparent)", WebkitMaskImage: "linear-gradient(90deg,transparent,black 10%,black 90%,transparent)" }}>
           <div className="trust-scroll" style={{ display: "flex", gap: 16, width: "max-content" }}>
-            {[...COMPANIES, ...COMPANIES].map((c, i) => (
+            {[...CAPABILITIES, ...CAPABILITIES].map((c, i) => (
               <div key={i} style={{
                 display: "flex", alignItems: "center", gap: 10,
                 padding: "12px 20px", borderRadius: 12,
@@ -81,13 +85,13 @@ export default function TrustedBy() {
                   width: 32, height: 32, borderRadius: 8, flexShrink: 0,
                   background: `${c.color}22`, border: `1px solid ${c.color}44`,
                   display: "flex", alignItems: "center", justifyContent: "center",
-                  fontSize: 11, fontWeight: 800, color: c.color,
+                  fontSize: 15,
                 }}>
-                  {c.initials}
+                  {c.icon}
                 </div>
                 <div>
                   <div style={{ fontSize: 13, fontWeight: 700, color: "rgba(255,255,255,.8)" }}>{c.name}</div>
-                  <div style={{ fontSize: 10, color: "rgba(255,255,255,.3)" }}>{c.city}</div>
+                  <div style={{ fontSize: 10, color: "rgba(255,255,255,.3)" }}>{c.sub}</div>
                 </div>
               </div>
             ))}

@@ -126,7 +126,7 @@ const SOLUTIONS_CARDS = [
     glow: "rgba(167,139,250,.18)",
     border: "rgba(167,139,250,.28)",
     stats: [
-      { val: "50+",  label: "Modules" },
+      { val: "60+",  label: "Features" },
       { val: "PKR·AED·SAR", label: "Multi-Currency" },
     ],
   },

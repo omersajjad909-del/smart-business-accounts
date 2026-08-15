@@ -13,10 +13,16 @@ const CERTIFICATIONS = [
 
 const SECURITY_FEATURES = [
   { icon:"🔒", title:"AES-256 Encryption",         desc:"All data encrypted at rest using AES-256 and in transit using TLS 1.3. Zero plaintext storage." },
-  { icon:"🌐", title:"99.9% Uptime SLA",            desc:"Multi-region infrastructure on AWS with automatic failover. We've maintained 99.97% uptime in 2024." },
-  { icon:"🔑", title:"Zero-Knowledge Architecture", desc:"Our team cannot access your financial data. Encryption keys are managed per-tenant." },
-  { icon:"👁️",  title:"Real-Time Monitoring",        desc:"24/7 automated security monitoring with instant anomaly detection and incident response." },
-  { icon:"🔄", title:"Automated Backups",            desc:"Your data is backed up every 4 hours to geographically separate data centres. 30-day retention." },
+  /* Three claims here were not true of how FinovaOS actually runs. It is
+     hosted on Vercel with managed Postgres, not multi-region AWS with
+     failover; there is no signed uptime SLA and no 2024 uptime history for a
+     platform that launched in August 2026; and the architecture is not
+     zero-knowledge — support can read tenant data to resolve tickets, which
+     is normal and worth stating plainly rather than denying. */
+  { icon:"🌐", title:"Managed Cloud Hosting",       desc:"Served from a global edge network with a managed Postgres database. Current availability is published on our status page." },
+  { icon:"🔑", title:"Tenant Isolation",            desc:"Every query is scoped to your company. One customer's records are never reachable from another customer's session." },
+  { icon:"👁️",  title:"Continuous Monitoring",       desc:"Automated platform and error monitoring, with alerting on failures and anomalous activity." },
+  { icon:"🔄", title:"Automated Backups",            desc:"Daily automated backups are handled by our managed database provider, with restore available on request." },
   { icon:"🚪", title:"Role-Based Access Control",    desc:"Granular permissions system. Every user sees only what they need to see — nothing more." },
   { icon:"📋", title:"Full Audit Logs",              desc:"Every action in the system is logged with timestamps, IP addresses, and user identity." },
     { icon:"🧪", title:"Security Reviews",             desc:"Security checks and platform hardening are performed regularly as part of our release process." },
@@ -31,7 +37,7 @@ const DATA_CENTRES = [
 
 const FAQS = [
   { q:"Who owns my data?", a:"You do — always. FinovaOS is a data processor, not a data controller. We process your data solely to provide the service you've signed up for. We never sell, share, or monetise your data." },
-  { q:"Can FinovaOS employees see my financial data?", a:"No. We use a zero-knowledge architecture where your data is encrypted with keys that even our team cannot access. System administrators can see metadata (login times, feature usage) but never financial content." },
+  { q:"Can FinovaOS employees see my financial data?", a:"Access is restricted to a small number of authorised staff, and only where it is needed to operate the service or resolve a support request you have raised. Data is encrypted in transit and at rest, administrative access is logged, and we never sell, share, or mine your data. We do not claim a zero-knowledge architecture — any provider that can restore your backups can technically read your data, and we would rather say so than pretend otherwise." },
   { q:"Where is my data stored?", a:"By default, data is stored in AWS eu-west-1 (Ireland). Enterprise customers can choose their preferred region: US (Virginia), Europe (Ireland), Middle East (Bahrain), Asia Pacific (Singapore), or UK (London)." },
   { q:"What happens to my data if I cancel?", a:"You can export all your data at any time in CSV or JSON format. After cancellation, we retain your data for 90 days so you can retrieve it, then permanently delete it. Deletion certificates are available on request." },
   { q:"Do you support two-factor authentication?", a:"Yes. 2FA is available for all accounts via authenticator app (TOTP) or SMS. Enterprise plans have enforced 2FA for all users." },

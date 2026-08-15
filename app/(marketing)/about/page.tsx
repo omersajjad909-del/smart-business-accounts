@@ -672,7 +672,7 @@ export default function AboutPage() {
                 FinovaOS is Finova Forge's flagship product — a complete cloud-based business management platform covering accounting, inventory, HR, invoicing, CRM, payroll, and more. Built specifically for operational businesses that need real depth, not surface-level tools.
               </p>
               <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-                {["Cloud ERP", "50+ Modules", "6 Industries", "Weekly Releases"].map(t => (
+                {["Cloud ERP", "60+ Features", "6 Industries", "Weekly Releases"].map(t => (
                   <span key={t} style={{ fontSize: 10, fontWeight: 700, color: "rgba(99,102,241,.8)",
                     background: "rgba(99,102,241,.1)", border: "1px solid rgba(99,102,241,.25)",
                     borderRadius: 100, padding: "3px 10px" }}>{t}</span>

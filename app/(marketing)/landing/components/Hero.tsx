@@ -453,9 +453,12 @@ export default function Hero() {
                       <span style={{ fontSize:10, color:"#818cf8", fontWeight:600, cursor:"default" }}>{"View all ->"}</span>
                     </div>
                     {[
-                      { name:"Gulf Star Trading",   amount:"$12,400", status:"Paid",    color:"#34d399" },
-                      { name:"Al-Noor Distributors", amount:"$8,750",  status:"Pending", color:"#fbbf24" },
-                      { name:"Metro Wholesale Co.",  amount:"$21,100", status:"Paid",    color:"#34d399" },
+                      /* Sample data for the product preview. Deliberately
+                         generic — these used to carry the same company names
+                         the fake testimonials used, which made both look real. */
+                      { name:"Customer A — Trading", amount:"$12,400", status:"Paid",    color:"#34d399" },
+                      { name:"Customer B — Retail",  amount:"$8,750",  status:"Pending", color:"#fbbf24" },
+                      { name:"Customer C — Wholesale", amount:"$21,100", status:"Paid",  color:"#34d399" },
                     ].map((inv,i) => (
                       <div key={i} style={{
                         display:"flex", alignItems:"center", justifyContent:"space-between",
@@ -521,8 +524,12 @@ export default function Hero() {
         <div style={{ maxWidth:1220, margin:"0 auto", padding:"32px 28px" }}>
           <div className="hero-stats" style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:1 }}>
             {[
-              { n:"60+",         l:"Business Types", desc:"retail, clinics, trading & more", color:"#818cf8" },
-              { n:"99.9%",      l:"Uptime",       desc:"guaranteed SLA",                color:"#34d399" },
+              /* "60+ Business Types" contradicted the section further down the
+                 same page that reads "06 Focused Businesses now", and there is
+                 no signed uptime SLA to guarantee. Both replaced with figures
+                 the product backs: 6 live industries, 67 shipped features. */
+              { n:"6",           l:"Business Types", desc:"retail, trading, distribution, trade, manufacturing, travel", color:"#818cf8" },
+              { n:"60+",         l:"Features",       desc:"accounts, stock, HR, CRM & more",                             color:"#34d399" },
               { n:"Early Access",l:"Now Live",    desc:"limited spots available",        color:"#fbbf24" },
               { n:"< 2 min",    l:"Setup time",   desc:"from signup to first invoice",   color:"#60a5fa" },
             ].map((s, i) => (

@@ -186,7 +186,7 @@ export default function ModulesSection() {
             fontWeight: 700, color: "white",
             letterSpacing: "-1.5px", lineHeight: 1.1, marginBottom: 16,
           }}>
-            50+ modules. One platform.{" "}
+            60+ features. One platform.{" "}
             <span style={{ background: "linear-gradient(135deg,#818cf8,#6366f1,#a78bfa)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
               Zero add-ons.
             </span>

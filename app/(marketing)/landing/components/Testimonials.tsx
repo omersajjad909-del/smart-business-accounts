@@ -22,14 +22,11 @@ type Testimonial = {
   rating: number; planUsed: string | null; featured: boolean;
 };
 
-const FALLBACK: Testimonial[] = [
-  { id:"f1", name:"Ahmed Raza", company:"Al-Raza Traders", role:"Owner", message:"FinovaOS ne meri business completely transform kar di. Pehle 3 ghante lagte the monthly accounts close karne mein — ab 20 minute mein ho jata hai. Invoice errors bhi practically zero ho gayi hain.", rating:5, planUsed:"Professional", featured:true },
-  { id:"f2", name:"Fatima Sheikh", company:"Sheikh Distributors", role:"CFO", message:"Bank reconciliation jo pehle 2 din ka kaam tha, ab FinovaOS ek click mein kar deta hai. AI insights ne humein Rs. 8 lakh ki ek pending payment track karwai jo hum bhool gaye thay.", rating:5, planUsed:"Enterprise", featured:true },
-  { id:"f3", name:"Hassan Mahmood", company:"Metro Wholesale Co.", role:"MD", message:"12 employees ki payroll 10 minute mein process hoti hai. Pehle hamara accountant 2 din lagate tha. FinovaOS ne literally ek banda bachaya — ROI first month mein clear ho gaya.", rating:5, planUsed:"Professional", featured:false },
-  { id:"f4", name:"Sarah Johnson", company:"Gulf Star Trading LLC", role:"Finance Manager", message:"Multi-currency support is a game changer for us. We deal in AED, USD and PKR — FinovaOS handles all three seamlessly. The AI cash flow predictions saved us from a liquidity crunch last quarter.", rating:5, planUsed:"Enterprise", featured:false },
-  { id:"f5", name:"Usman Ali", company:"Ali Construction Group", role:"Director", message:"Multi-branch accounting pehle nightmare tha. Ab Karachi, Lahore aur Islamabad ki separate P&L ek dashboard pe dekhta hun. FinovaOS ki wajah se board meetings prepare karna bohot easy ho gaya.", rating:5, planUsed:"Enterprise", featured:false },
-  { id:"f6", name:"Priya Sharma", company:"MedPlus Pharmacy", role:"Owner", message:"Expiry tracking aur batch management — ye features mere liye game changer hain. Pehle expired stock ka pata hi nahi chalta tha. Ab FinovaOS alerts deta hai 30 din pehle. Zero wastage last 6 months mein.", rating:5, planUsed:"Professional", featured:false },
-];
+// No hard-coded testimonials. This section renders only what real customers
+// have actually submitted through /api/public/testimonials — until then it
+// shows the founder note below. Invented names and companies are trivially
+// checkable (a buyer Googles the company and finds nothing) and in several
+// markets they count as deceptive advertising.
 
 const COLORS = ["#818cf8","#34d399","#fbbf24","#f87171","#a78bfa","#06b6d4"];
 
@@ -104,14 +101,14 @@ export default function TestimonialsSection() {
       .then(d => {
         const all: Testimonial[] = d?.testimonials || [];
         setTotal(all.length);
-        // Featured first, max 3 on landing page
+        // Featured first, max 6 on landing page
         const sorted = [...all].sort((a,b) => (b.featured ? 1 : 0) - (a.featured ? 1 : 0));
-        setTestimonials(sorted.length > 0 ? sorted.slice(0,6) : FALLBACK);
+        setTestimonials(sorted.slice(0,6));
       })
-      .catch(() => setTestimonials(FALLBACK));
+      .catch(() => setTestimonials([]));
   }, []);
 
-  const display = testimonials.length > 0 ? testimonials : FALLBACK;
+  const display = testimonials;
   const hasMore  = total > 6;
 
   return (
@@ -146,14 +143,28 @@ export default function TestimonialsSection() {
           transition:"all .6s cubic-bezier(.22,1,.36,1)",
         }}>
           <div style={{ display:"inline-flex",alignItems:"center",gap:8, padding:"6px 16px",borderRadius:100,marginBottom:20, background:"rgba(251,191,36,.1)",border:"1.5px solid rgba(251,191,36,.22)" }}>
-            <span style={{fontSize:14}}>⭐</span>
-            <span style={{fontSize:11,fontWeight:700,color:"#fbbf24",letterSpacing:".08em"}}>CUSTOMER STORIES</span>
-          </div>
-          <h2 style={{ fontFamily:"'Lora',serif", fontSize:"clamp(30px,4vw,50px)", fontWeight:700, color:"white", letterSpacing:"-1.5px", lineHeight:1.1, marginBottom:16 }}>
-            Trusted by businesses{" "}
-            <span style={{background:"linear-gradient(135deg,#fbbf24,#f97316)",WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent"}}>
-              worldwide
+            <span style={{fontSize:14}}>{total > 0 ? "⭐" : "🚀"}</span>
+            <span style={{fontSize:11,fontWeight:700,color:"#fbbf24",letterSpacing:".08em"}}>
+              {total > 0 ? "CUSTOMER STORIES" : "NEWLY LAUNCHED"}
             </span>
+          </div>
+          {/* The headline can only claim what the review count backs up. */}
+          <h2 style={{ fontFamily:"'Lora',serif", fontSize:"clamp(30px,4vw,50px)", fontWeight:700, color:"white", letterSpacing:"-1.5px", lineHeight:1.1, marginBottom:16 }}>
+            {total > 0 ? (
+              <>
+                Trusted by businesses{" "}
+                <span style={{background:"linear-gradient(135deg,#fbbf24,#f97316)",WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent"}}>
+                  worldwide
+                </span>
+              </>
+            ) : (
+              <>
+                No borrowed reviews.{" "}
+                <span style={{background:"linear-gradient(135deg,#fbbf24,#f97316)",WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent"}}>
+                  Just the product.
+                </span>
+              </>
+            )}
           </h2>
           {total > 0 && (
             <div className="testi-proof" style={{display:"flex",alignItems:"center",justifyContent:"center",gap:16,flexWrap:"wrap"}}>
@@ -168,10 +179,68 @@ export default function TestimonialsSection() {
             {display.map((t,i) => <TestimonialCard key={t.id} t={t} i={i} vis={vis} />)}
           </div>
         ) : (
-          <div style={{ textAlign:"center", padding:"40px 0 60px", opacity: vis ? 1 : 0, transition:"opacity .6s ease" }}>
-            <div style={{ fontSize:32, marginBottom:12 }}>✍️</div>
-            <div style={{ fontSize:15, color:"rgba(255,255,255,.4)", fontWeight:600 }}>Be the first to share your experience</div>
-            <div style={{ fontSize:13, color:"rgba(255,255,255,.25)", marginTop:6 }}>Early access customers — your feedback shapes FinovaOS</div>
+          /* Founder note stands in until real customers publish reviews. */
+          <div style={{
+            maxWidth:760, margin:"0 auto 44px",
+            borderRadius:20, padding:"34px 32px",
+            background:"rgba(255,255,255,.04)",
+            border:"1px solid rgba(255,255,255,.08)",
+            boxShadow:"0 20px 50px rgba(0,0,0,.25)",
+            opacity: vis ? 1 : 0,
+            transform: vis ? "translateY(0)" : "translateY(20px)",
+            transition:"opacity .6s ease, transform .6s ease",
+          }}>
+            <div style={{ fontSize:30, lineHeight:1, color:"rgba(129,140,248,.45)", marginBottom:12 }}>&ldquo;</div>
+            <p style={{ fontSize:15.5, lineHeight:1.85, color:"rgba(255,255,255,.72)", margin:0 }}>
+              FinovaOS opened to customers in August 2026. It was built from a real business
+              problem, and it is early — so you will not find borrowed logos or five-star
+              quotes on this page. When our first customers publish their experience, it
+              appears here with their names on it. Until then, judge the product on the live
+              demo, not on testimonials.
+            </p>
+            <div style={{ display:"flex", alignItems:"center", gap:12, marginTop:22, paddingTop:18, borderTop:"1px solid rgba(255,255,255,.07)" }}>
+              <div style={{ width:38, height:38, borderRadius:"50%", flexShrink:0, background:"linear-gradient(135deg,#818cf8,#6366f1)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:13, fontWeight:800, color:"white" }}>
+                US
+              </div>
+              <div style={{ textAlign:"left" }}>
+                <div style={{ fontSize:13, fontWeight:700, color:"rgba(255,255,255,.9)" }}>Umer Sajjad</div>
+                <div style={{ fontSize:11, color:"rgba(255,255,255,.38)", marginTop:1 }}>Founder · FinovaOS</div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* First-cohort CTA — shown only while there are no reviews yet. */}
+        {display.length === 0 && (
+          <div style={{ textAlign:"center", opacity:vis?1:0, transition:"opacity .6s ease .25s" }}>
+            <div style={{ fontSize:13, color:"rgba(255,255,255,.35)", marginBottom:16 }}>
+              Be one of our first customers — and the first review on this page.
+            </div>
+            <div style={{ display:"inline-flex", gap:12, flexWrap:"wrap", justifyContent:"center" }}>
+              <Link href="/demo" style={{
+                display:"inline-flex", alignItems:"center", gap:8,
+                padding:"13px 30px", borderRadius:12, fontSize:14, fontWeight:700,
+                border:"1.5px solid rgba(255,255,255,.12)", background:"rgba(255,255,255,.04)",
+                color:"rgba(255,255,255,.75)", textDecoration:"none", transition:"all .25s",
+              }}
+                onMouseEnter={e=>{e.currentTarget.style.borderColor="rgba(255,255,255,.28)";e.currentTarget.style.color="white";}}
+                onMouseLeave={e=>{e.currentTarget.style.borderColor="rgba(255,255,255,.12)";e.currentTarget.style.color="rgba(255,255,255,.75)";}}
+              >
+                See the live demo
+              </Link>
+              <Link href="/signup" style={{
+                display:"inline-flex", alignItems:"center", gap:8,
+                padding:"13px 30px", borderRadius:12, fontSize:14, fontWeight:700,
+                border:"1.5px solid rgba(251,191,36,.3)",
+                background:"linear-gradient(135deg,rgba(251,191,36,.16),rgba(249,115,22,.12))",
+                color:"#fbbf24", textDecoration:"none", transition:"all .25s",
+              }}
+                onMouseEnter={e=>{e.currentTarget.style.borderColor="rgba(251,191,36,.55)";}}
+                onMouseLeave={e=>{e.currentTarget.style.borderColor="rgba(251,191,36,.3)";}}
+              >
+                Get Started →
+              </Link>
+            </div>
           </div>
         )}
 

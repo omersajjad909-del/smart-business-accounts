@@ -38,7 +38,6 @@ const ALL_POSTS: Record<string, any> = {
       { type:"p", text:"Bank charges: Your bank deducts fees that aren't in FinovaOS yet. Simply add them as an expense entry in FinovaOS and the reconciliation will match." },
       { type:"p", text:"Timing differences: A cheque you issued hasn't cleared yet. Mark it as 'outstanding' in FinovaOS — it will clear in the next period." },
       { type:"p", text:"Duplicate entries: You accidentally entered the same transaction twice. Delete the duplicate and reconcile." },
-      { type:"quote", text:"We used to spend 2 full days every month on bank reconciliation. With FinovaOS, our accountant finishes it in 25 minutes every Monday morning.", author:"James Thompson, CEO — Thompson Trading Co." },
       { type:"h2", text:"Best Practices" },
       { type:"list", items:[
         "Reconcile every month — never skip even one period",
@@ -74,7 +73,6 @@ const ALL_POSTS: Record<string, any> = {
         "Recurring invoices — set up once, generate on schedule",
         "Convert delivery challan to invoice with one click",
       ]},
-      { type:"quote", text:"Our invoice processing time went from 45 minutes per invoice to 8 minutes. That's 37 minutes saved, per invoice, every day.", author:"Finance Manager, Distribution Company" },
     ],
   },
 
@@ -104,7 +102,6 @@ const ALL_POSTS: Record<string, any> = {
         "Advance salary tracked and recovered over subsequent payrolls",
         "Employee documents vault — contracts, ID documents, degrees",
       ]},
-      { type:"quote", text:"Payroll pe pehle har month 2 din lagte thay. Ab template ek dafa set kiya hai, har month sirf review karke process karta hoon.", author:"HR Manager, Manufacturing Company" },
     ],
   },
 
@@ -132,7 +129,6 @@ const ALL_POSTS: Record<string, any> = {
         "Contact documents — proposals, contracts, agreements",
         "Notes — private or shared with team",
       ]},
-      { type:"quote", text:"Our sales team now sees outstanding payments against each customer directly in the CRM. Chasing overdue invoices has become much easier.", author:"Sales Director, Global Trading Co." },
     ],
   },
 
@@ -160,7 +156,6 @@ const ALL_POSTS: Record<string, any> = {
         "Delivery Challan before invoice",
         "Outward register for dispatch tracking",
       ]},
-      { type:"quote", text:"We had no idea we were running out of stock until customers called. Now FinovaOS alerts us when any item hits minimum stock level.", author:"Operations Manager, Wholesale Distributor" },
     ],
   },
 
@@ -188,7 +183,6 @@ const ALL_POSTS: Record<string, any> = {
         "Tax ID (NTN / STRN) tracking per customer and supplier",
         "Export to PDF or Excel for consultant hand-off",
       ]},
-      { type:"quote", text:"Our chartered accountant liked how organised the FinovaOS reports were. Everything he needed for tax filing was already tagged and grouped. Filing was much faster this year.", author:"CEO, Import/Export Company" },
     ],
   },
 
@@ -216,7 +210,6 @@ const ALL_POSTS: Record<string, any> = {
         "Cost center profitability reports",
         "Branch-level inventory management",
       ]},
-      { type:"quote", text:"We have branches across Europe and one in Dubai. Before FinovaOS, month-end consolidation took a week. Now it's instant — one click.", author:"CFO, Distribution Group" },
     ],
   },
 
@@ -244,7 +237,6 @@ const ALL_POSTS: Record<string, any> = {
         "Pipeline view — see all open quotes and their values",
         "Quote comparison — send multiple options to one customer",
       ]},
-      { type:"quote", text:"Our quote-to-invoice conversion used to take 30 minutes of re-entry. With FinovaOS it's one click. We close deals faster because customers get their invoice immediately.", author:"Sales Manager, Engineering Supplies" },
     ],
   },
 
@@ -281,7 +273,6 @@ const ALL_POSTS: Record<string, any> = {
         "Sales-focused teams — CRM without the full accounting suite",
         "Seasonal businesses — add/remove modules based on business cycle",
       ]},
-      { type:"quote", text:"We only needed invoicing and bank reconciliation. The Custom Plan saved us 60% compared to the Pro plan. We added HR when we hired our 5th employee.", author:"Founder, IT Services Company" },
     ],
   },
 
@@ -325,7 +316,6 @@ const ALL_POSTS: Record<string, any> = {
       ]},
       { type:"h2", text:"Exporting Reports" },
       { type:"p", text:"Every FinovaOS report can be exported as PDF, Excel, or CSV. Share with your accountant, submit to your tax authority, or attach to board meeting presentations. Reports can also be scheduled for automatic email delivery — weekly P&L to your phone every Monday morning." },
-      { type:"quote", text:"My accountant used to spend 3 days preparing reports for our board meeting. Now he pulls them from FinovaOS in 10 minutes. The board gets better information, faster.", author:"CEO, Manufacturing Company" },
     ],
   },
 
@@ -355,7 +345,6 @@ const ALL_POSTS: Record<string, any> = {
         "Bank CSV import + smart matching reconciliation",
         "Payroll module with configurable deductions (record EOBI/PESSI/tax as line items)",
       ]},
-      { type:"quote", text:"FinovaOS ne meri accounting ka setup easy kar diya. Invoices, expenses, aur bank reconciliation sab ek jagah — accountant ko sirf tax filing time pe report bhej deta hoon.", author:"Ahmed Raza, Owner — Al-Raza Traders, Karachi" },
     ],
   },
 
@@ -385,7 +374,6 @@ const ALL_POSTS: Record<string, any> = {
       { type:"p", text:"When you record a supplier payment, note the WHT amount as a deduction line. Run the Withholding Tax register monthly to get a full supplier-wise breakdown for your accountant to file on IRIS." },
       { type:"h2", text:"Step 5: Annual Accounts for the Income Tax Return" },
       { type:"p", text:"FinovaOS's Balance Sheet, Profit & Loss, and Cash Flow are ready to hand off to your tax consultant for your annual income tax return. Because everything ties back to individual transactions in FinovaOS, your consultant can drill down whenever the FBR asks a question." },
-      { type:"quote", text:"FBR ka kaam pehle sara Excel mein hota tha aur har month accountant ko purani entries dhoondni parti thi. Ab FinovaOS mein sab live rehta hai — jab report chahiye ek click pe mil jaati hai. Filing time bohot kam ho gaya.", author:"Hassan Mahmood, MD — Metro Wholesale Co., Lahore" },
     ],
   },
 
@@ -416,7 +404,6 @@ const ALL_POSTS: Record<string, any> = {
       { type:"p", text:"Many Pakistani businesses still use Peachtree or QuickBooks Desktop. These are capable but require local servers, IT maintenance, no easy remote access, and no built-in backups. FinovaOS is cloud-based — access from your phone, from any city, with automatic backups." },
       { type:"h2", text:"FinovaOS vs Manual Excel / WhatsApp Ledgers" },
       { type:"p", text:"Using Excel or WhatsApp for accounts is free but costs you in errors, time, and late payments. Moving to a real accounting system saves hours every week — no more spreadsheet-merging at month end, and invoices sit in one searchable place instead of scattered chat threads." },
-      { type:"quote", text:"Pehle hum Peachtree use karte thay. Server crash ho gaya aur 6 mahine ka data gum ho gaya. Ab FinovaOS use karte hain — cloud pe hai, data kabi delete nahi hoga.", author:"Usman Ali, Director — Ali Construction Group, Karachi" },
     ],
   },
 
@@ -446,7 +433,6 @@ const ALL_POSTS: Record<string, any> = {
       { type:"p", text:"Export the payroll summary and use it to run your bank's bulk salary transfer, or pay individually. Mark each salary as paid inside FinovaOS to keep employee ledgers and payables in sync." },
       { type:"h2", text:"Step 5: Year-End Reports for Tax" },
       { type:"p", text:"At year end, run the annual salary summary for each employee — total gross, total income tax deducted, EOBI contributions — and hand it to your tax consultant for FBR filings." },
-      { type:"quote", text:"12 employees ki payroll ab 10 minute mein process hoti hai. Pehle Excel mein baar baar formulas theek karta tha — ab bas month select karo, review karo, done.", author:"Hassan Mahmood, MD — Metro Wholesale Co." },
     ],
   },
 
@@ -474,7 +460,6 @@ const ALL_POSTS: Record<string, any> = {
       { type:"p", text:"Because expiries are visible at a glance, staff can pick the oldest batch first. Pair it with the standard inventory module — every purchase invoice adds stock and every sales invoice deducts it — to keep quantities honest." },
       { type:"h2", text:"Records for DRAP and Recalls" },
       { type:"p", text:"When an inspector or supplier asks which batch went where, the Batch and Stock Movement reports give you a clean trail: what came in, what went out, and current on-hand. Keeps you well-prepared for DRAP inspections without a paper register." },
-      { type:"quote", text:"Expired stock ka pata hi nahi chalta tha pehle. Ab FinovaOS ke Batch dashboard pe har month dekh leti hoon — kaunsi dawa ka expiry qareeb hai. Wastage bohot kam ho gaya.", author:"Priya Sharma, Owner — MedPlus Pharmacy, Islamabad" },
     ],
   },
 
@@ -510,7 +495,6 @@ const ALL_POSTS: Record<string, any> = {
       { type:"p", text:"Local data feels safer but is actually more vulnerable — hard drives fail, servers get stolen, offices flood. FinovaOS runs on managed cloud infrastructure with encrypted storage and regular backups, so a single hardware failure at your office doesn't wipe your accounts. Compare that with a Peachtree install on one desktop PC." },
       { type:"h2", text:"Cost Comparison" },
       { type:"p", text:"Desktop software's headline price often looks lower until you add the server, an IT person to keep it running, hardware refresh every few years, and the lost time from having no mobile access. Cloud subscriptions like FinovaOS bundle hosting, backups, and updates into a single predictable monthly cost — no capex, and you can add or remove users as your team changes." },
-      { type:"quote", text:"Humara server crash ho gaya aur 6 mahine ka data gaya. Tab samjha ke cloud accounting kyun zaroori hai. Ab FinovaOS pe hain — data cloud mein safe hai.", author:"Trader, Karachi — switched from Peachtree 2024" },
     ],
   },
 };

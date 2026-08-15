@@ -98,9 +98,11 @@ const BOTTOM_LINKS = [
   { label: "Status",  href: "/status" },
 ];
 
+// Kept to what the product can show. The old "99.9% Uptime" implied an SLA
+// that has not actually been signed with anyone.
 const STATS = [
-  { val: "50+",   label: "Modules",  color: "#818cf8" },
-  { val: "99.9%", label: "Uptime",   color: "#34d399" },
+  { val: "9",   label: "Modules",  color: "#818cf8" },
+  { val: "60+", label: "Features", color: "#34d399" },
 ];
 
 /** One footer link column — four of these replace the two long lists. */

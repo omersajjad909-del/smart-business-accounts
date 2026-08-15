@@ -16,10 +16,37 @@ function useInView(threshold = 0.12) {
   return [ref, vis] as const;
 }
 
-function CountUp({ to, suffix = "", duration = 1800, start }: { to: number; suffix?: string; duration?: number; start: boolean }) {
-  const [val, setVal] = useState(0);
+/**
+ * Counts up when scrolled into view — but renders the FINAL value by default.
+ * Starting at 0 meant that any visitor whose animation never ran (no JS, the
+ * server-rendered HTML, reduced-motion, a failed observer, a screenshot) read
+ * "0+ Modules" and "0.9% Uptime", which is worse than showing no stat at all.
+ * The count-up only engages when the number is still below the fold, so nobody
+ * ever watches a real figure reset itself to zero.
+ */
+function CountUp({ to, prefix = "", suffix = "", duration = 1800, start }: { to: number; prefix?: string; suffix?: string; duration?: number; start: boolean }) {
+  const ref = useRef<HTMLSpanElement>(null);
+  const [val, setVal] = useState(to);
+  const animatable = useRef(false);
+
   useEffect(() => {
-    if (!start) return;
+    const el = ref.current;
+    if (!el) return;
+    const reduced = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+    const offscreen = el.getBoundingClientRect().top > window.innerHeight;
+    if (reduced || !offscreen) return;
+    animatable.current = true;
+    setVal(0);
+  }, []);
+
+  useEffect(() => {
+    if (!animatable.current) return;
+    if (!start) {
+      // Safety net: if the observer never fires, land on the real number
+      // rather than sitting at zero forever.
+      const t = setTimeout(() => setVal(to), 4000);
+      return () => clearTimeout(t);
+    }
     let raf: number;
     const t0 = performance.now();
     const tick = (now: number) => {
@@ -31,14 +58,20 @@ function CountUp({ to, suffix = "", duration = 1800, start }: { to: number; suff
     raf = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(raf);
   }, [start, to, duration]);
-  return <>{val.toLocaleString()}{suffix}</>;
+
+  return <span ref={ref}>{prefix}{val.toLocaleString()}{suffix}</span>;
 }
 
+/* Every figure here has to be checkable in the product itself.
+   "40+ Countries" was the worst offender — FinovaOS launched in August 2026
+   and has customers in one. Uptime SLA numbers came out too: there is no
+   signed SLA to point at yet. What is left is countable: 9 module groups and
+   67 features in ModulesSection, 6 live industries in SolutionSection. */
 const STATS = [
-  { to: 40,  suffix: "+",   label: "Modules",      color: "#818cf8" },
-  { to: 99,  suffix: ".9%", label: "Uptime SLA",   color: "#34d399" },
-  { to: 40,  suffix: "+",   label: "Countries",    color: "#fbbf24" },
-  { to: 10,  suffix: " min",label: "Setup Time",   color: "#f87171" },
+  { to: 9,  suffix: "",     label: "Modules",         color: "#818cf8" },
+  { to: 60, suffix: "+",    label: "Features",        color: "#34d399" },
+  { to: 6,  suffix: "",     label: "Industries Live", color: "#fbbf24" },
+  { to: 2,  prefix: "< ", suffix: " min", label: "Setup Time", color: "#f87171" },
 ];
 
 const INCLUDES = [
@@ -246,10 +279,10 @@ export default function CTASection() {
           opacity: vis ? 1 : 0,
           transition: "opacity .6s ease .42s",
         }}>
-          {STATS.map(({ to, suffix, label, color }, i) => (
+          {STATS.map(({ to, prefix, suffix, label, color }, i) => (
             <div key={label} style={{ padding: "20px 30px", borderRight: i < STATS.length - 1 ? "1px solid rgba(255,255,255,.06)" : "none", textAlign: "center", minWidth: 110 }}>
               <div style={{ fontFamily: "'Lora',serif", fontSize: 24, fontWeight: 700, color, letterSpacing: "-.3px" }}>
-                <CountUp to={to} suffix={suffix} start={vis} duration={1600 + i * 200}/>
+                <CountUp to={to} prefix={prefix} suffix={suffix} start={vis} duration={1600 + i * 200}/>
               </div>
               <div style={{ fontSize: 11, color: "rgba(255,255,255,.28)", fontWeight: 500, marginTop: 3 }}>{label}</div>
             </div>
