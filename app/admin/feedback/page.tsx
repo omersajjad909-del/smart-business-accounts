@@ -294,7 +294,7 @@ export default function AdminFeedbackPage() {
 
             {(selected.name || selected.email) && (
               <div style={{ display: "flex", gap: 16, marginBottom: 20, fontSize: 12, color: "rgba(255,255,255,.4)" }}>
-                {selected.name && <span>👤 {selected.name}</span>}
+                {selected.name && <span>👤 {selected.name}{selected.role ? ` · ${selected.role}` : ""}</span>}
                 {selected.email && <span>✉️ {selected.email}</span>}
                 <span>📅 {new Date(selected.createdAt).toLocaleString()}</span>
               </div>

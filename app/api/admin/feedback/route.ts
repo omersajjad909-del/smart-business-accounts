@@ -90,7 +90,7 @@ export async function POST(req: NextRequest) {
       data: {
         name:     fb.name.trim(),
         company,
-        role:     null,
+        role:     fb.role?.trim() || null,
         message:  fb.message.trim(),
         rating:   fb.rating,
         planUsed,

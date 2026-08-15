@@ -2050,6 +2050,9 @@ model Feedback {
   publishConsent Boolean @default(false)
   email       String?                         // for public (non-logged-in) submissions
   name        String?
+  // Job title the reviewer wants shown beside their name on the public site
+  // ("CEO", "Accountant"). Only asked for on a review, always optional.
+  role        String?
   status      String    @default("open")      // open | in_review | resolved | closed
   priority    String    @default("normal")    // low | normal | high | urgent
   module      String?                         // affected module/feature

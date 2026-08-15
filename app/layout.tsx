@@ -137,6 +137,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
+    site: "@finovaos",
+    creator: "@finovaos",
     title: "FinovaOS - Global Accounting & Business Management Platform",
     description:
       "AI-powered cloud accounting for SMEs in Pakistan, the UAE & beyond.",

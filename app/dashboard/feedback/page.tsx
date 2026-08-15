@@ -93,6 +93,8 @@ export default function FeedbackPage() {
   const [rating,   setRating]   = useState(0);
   const [hoverStar, setHoverStar] = useState(0);
   const [publishConsent, setPublishConsent] = useState(false);
+  // Job title shown beside the name if this review is ever published.
+  const [role,     setRole]     = useState("");
   const [priority, setPriority] = useState("normal");
   const [module,   setModule]   = useState("");
   const [submitting, setSub]    = useState(false);
@@ -152,6 +154,7 @@ export default function FeedbackPage() {
           message: message.trim(),
           rating: ratingApplies ? rating : undefined,
           publishConsent: ratingApplies ? publishConsent : undefined,
+          role: ratingApplies && role.trim() ? role.trim() : undefined,
           priority,
           module: module || undefined,
           email: user?.email || undefined,
@@ -161,7 +164,7 @@ export default function FeedbackPage() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Failed");
       setDone({ id: data.id });
-      setSubject(""); setMessage(""); setPriority("normal"); setModule(""); setRating(0); setPublishConsent(false);
+      setSubject(""); setMessage(""); setPriority("normal"); setModule(""); setRating(0); setPublishConsent(false); setRole("");
     } catch (e: any) {
       setError(e.message);
     } finally { setSub(false); }
@@ -312,6 +315,22 @@ export default function FeedbackPage() {
                   {["Tap a star to rate", "Poor", "Fair", "Good", "Very good", "Excellent"][hoverStar || rating]}
                 </span>
               </div>
+              {/* Optional, and only useful on a published review — "Sana Malik,
+                  Finance Manager" reads better on the site than a bare name. */}
+              <div style={{ marginTop: "12px", maxWidth: "320px" }}>
+                <label style={{ ...labelStyle, marginBottom: "6px" }}>
+                  Your Role (optional)
+                </label>
+                <input
+                  type="text"
+                  value={role}
+                  onChange={e => setRole(e.target.value)}
+                  maxLength={60}
+                  placeholder="e.g. CEO, Accountant, Owner"
+                  style={inputStyle}
+                />
+              </div>
+
               {/* Explicit permission before anyone's words go on the public
                   site under their name. Without this the review is still read
                   by the team — it just never becomes a testimonial. */}

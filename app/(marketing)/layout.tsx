@@ -81,8 +81,8 @@ export async function generateMetadata(): Promise<Metadata> {
   },
   twitter: {
     card: "summary_large_image",
-    site: "@finova_io",
-    creator: "@finova_io",
+    site: "@finovaos",
+    creator: "@finovaos",
     images: [`${BASE}/icon.png`],
   },
   robots: { index: true, follow: true, googleBot: { index: true, follow: true, "max-image-preview": "large" } },

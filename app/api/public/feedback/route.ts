@@ -10,7 +10,7 @@ const db = prisma as any;
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { type, subject, message, email, name, priority, module: affectedModule, rating, publishConsent } = body;
+    const { type, subject, message, email, name, role, priority, module: affectedModule, rating, publishConsent } = body;
 
     if (!type || !subject?.trim() || !message?.trim())
       return NextResponse.json({ error: "type, subject and message are required" }, { status: 400 });
@@ -61,6 +61,9 @@ export async function POST(req: NextRequest) {
         publishConsent: ratingValue !== null && publishConsent === true,
         email: email?.toLowerCase().trim() || null,
         name: name?.trim() || null,
+        // Only a review is ever published, so a job title is pointless anywhere
+        // else. Capped so a stray paragraph cannot land on the public site.
+        role: ratingValue !== null ? (role?.trim().slice(0, 60) || null) : null,
         status: "open",
         priority: ["low","normal","high","urgent"].includes(priority) ? priority : "normal",
         module: affectedModule?.trim() || null,
