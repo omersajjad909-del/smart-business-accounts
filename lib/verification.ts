@@ -122,6 +122,20 @@ export async function getLatestVerificationLog(
   });
 }
 
+/**
+ * A fresh code and its deadline, with nowhere to store it.
+ *
+ * createVerificationCodeLog() below writes to ActivityLog, which is keyed by a
+ * companyId and a userId. A signup awaiting its first OTP has neither yet — the
+ * code lives on the PendingSignup row instead — so it needs the raw pair.
+ */
+export function newOtpCode() {
+  return {
+    code: String(randomInt(0, 1_000_000)).padStart(6, "0"),
+    expMs: Date.now() + OTP_TTL_MS,
+  };
+}
+
 export async function createVerificationCodeLog(params: {
   companyId: string;
   userId: string;

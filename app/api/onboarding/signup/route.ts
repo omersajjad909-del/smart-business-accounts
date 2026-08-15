@@ -2,13 +2,12 @@ import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 
 import { signJwt } from "@/lib/auth";
-import type { BusinessType } from "@/lib/businessModules";
 import { prisma } from "@/lib/prisma";
-import { currencyByCountry } from "@/lib/currency";
 import {
-  createVerificationCodeLog,
   getAvailableChannels,
   getMaskedTarget,
+  getOtpHash,
+  newOtpCode,
   normalizePhone,
   sendVerificationCode,
 } from "@/lib/verification";
@@ -17,6 +16,18 @@ import {
   parseCustomModules,
 } from "@/lib/customPlanPricing";
 
+/**
+ * Step one of signup: hold the submission, send a code, create nothing.
+ *
+ * This route used to write Company + User + UserCompany before the OTP was even
+ * sent. Two consequences, both bad: anyone could register a company under an
+ * address they did not own, and every abandoned attempt left a half-built tenant
+ * behind (which is also what pushed real customers from #100003 to #100017 —
+ * each one consumed a `Company.companyNo`).
+ *
+ * The form now rests on a PendingSignup row. /api/auth/verify/confirm is the
+ * only place that promotes it into real rows, and only once the code matches.
+ */
 export async function POST(req: NextRequest) {
   try {
     const {
@@ -50,6 +61,9 @@ export async function POST(req: NextRequest) {
     });
 
     if (existing) {
+      // Legacy cleanup. New signups never reach the User table before
+      // verification, but accounts half-built by the old flow still exist.
+      //
       // Everything the onboarding funnel itself writes. Reaching any of these
       // only proves the visitor started signing up — not that an account worth
       // protecting exists. Verifying the email logs several of them *and*
@@ -152,122 +166,81 @@ export async function POST(req: NextRequest) {
         ? getCustomPlanPerMonthForCycleUsd(customModuleIds, normalizedBillingCycle)
         : null;
 
-    const company = await prisma.company.create({
-      data: {
-        name: companyName,
-        isActive: true,
-        country: countryCode ? String(countryCode).toUpperCase() : "US",
-        // currencyByCountry returns null for countries it has no mapping for —
-        // fall back to USD rather than writing null into a non-nullable column.
-        baseCurrency: currencyByCountry(countryCode ? String(countryCode).toUpperCase() : "US") || "USD",
-        businessType: businessType ? String(businessType) as BusinessType : "trading",
-        businessSetupDone: Boolean(businessType),
-        plan: normalizedPlanCode,
-        subscriptionStatus: "INACTIVE",
-        activeModules: customModuleIds.length > 0 ? customModuleIds.join(",") : null,
-        customPrice: computedCustomPrice,
-      },
-    });
-
-    if (countryCode) {
-      await prisma.activityLog
-        .create({
-          data: {
-            companyId: company.id,
-            userId: null,
-            action: "COMPANY_COUNTRY_SET",
-            details: JSON.stringify({
-              country: String(countryCode).toUpperCase(),
-            }),
-          },
-        })
-        .catch(() => {});
-    }
-
-    const hash = await bcrypt.hash(password, 10);
-    const user = await prisma.user.create({
-      data: {
-        name,
-        email: emailNormalized,
-        password: hash,
-        role: "ADMIN",
-        defaultCompanyId: company.id,
-      },
-    });
-
-    await prisma.userCompany.create({
-      data: { userId: user.id, companyId: company.id, isDefault: true },
-    });
-
-    await prisma.activityLog
-      .create({
-        data: {
-          companyId: company.id,
-          userId: user.id,
-          action: "SIGNUP",
-          details: JSON.stringify({
-            email: user.email,
-            phone: phoneNormalized || null,
-            plan: normalizedPlanCode,
-            teamSize: teamSize || null,
-            referralSource: referralSource || null,
-          }),
-        },
-      })
-      .catch(() => {});
-
-    if (phoneNormalized) {
-      await prisma.activityLog
-        .create({
-          data: {
-            companyId: company.id,
-            userId: user.id,
-            action: "USER_PHONE_SET",
-            details: JSON.stringify({
-              phone: phoneNormalized,
-              source: "signup",
-            }),
-          },
-        })
-        .catch(() => {});
-    }
-
-    // Track referral if a referral code was provided
-    if (referralCode) {
-      try {
-        const referrer = await prisma.user.findUnique({
-          where: { referralCode: String(referralCode).toUpperCase().trim() },
-          select: { id: true },
-        });
-        if (referrer && referrer.id !== user.id) {
-          await prisma.referral.create({
-            data: {
-              referrerId:   referrer.id,
-              refereeEmail: user.email,
-              status:       "signed_up",
-            },
-          });
-        }
-      } catch { /* non-critical */ }
-    }
+    const planPath = String(normalizedPlanCode || "starter").toLowerCase();
+    const nextParams = new URLSearchParams();
+    nextParams.set("cycle", normalizedBillingCycle.toLowerCase());
+    if (customModuleIds.length > 0) nextParams.set("modules", customModuleIds.join(","));
+    if (computedCustomPrice !== null) nextParams.set("price", String(computedCustomPrice));
+    const next = `/onboarding/payment/${planPath}?${nextParams.toString()}`;
 
     const channel = "email";
-    const { code, expMs } = await createVerificationCodeLog({
-      companyId: company.id,
-      userId: user.id,
-      channel,
-      target: user.email,
+    const { code, expMs } = newOtpCode();
+
+    // Hashed before it rests anywhere, including this row — a PendingSignup leak
+    // must not hand over usable passwords.
+    const passwordHash = await bcrypt.hash(password, 10);
+
+    // Re-submitting the form replaces the previous attempt rather than stacking
+    // rows, so the newest code is always the only valid one.
+    const pending = await prisma.pendingSignup.upsert({
+      where: { email: emailNormalized },
+      update: {
+        payload: JSON.stringify({
+          companyName,
+          name,
+          passwordHash,
+          phone: phoneNormalized || null,
+          countryCode: countryCode ? String(countryCode).toUpperCase() : null,
+          businessType: businessType ? String(businessType) : null,
+          planCode: normalizedPlanCode,
+          billingCycle: normalizedBillingCycle,
+          customModuleIds,
+          customPrice: computedCustomPrice,
+          referralCode: referralCode || null,
+          teamSize: teamSize || null,
+          referralSource: referralSource || null,
+        }),
+        otpHash: getOtpHash(code),
+        otpExpiresAt: new Date(expMs),
+        channel,
+        attempts: 0,
+        lastSentAt: new Date(),
+      },
+      create: {
+        email: emailNormalized,
+        payload: JSON.stringify({
+          companyName,
+          name,
+          passwordHash,
+          phone: phoneNormalized || null,
+          countryCode: countryCode ? String(countryCode).toUpperCase() : null,
+          businessType: businessType ? String(businessType) : null,
+          planCode: normalizedPlanCode,
+          billingCycle: normalizedBillingCycle,
+          customModuleIds,
+          customPrice: computedCustomPrice,
+          referralCode: referralCode || null,
+          teamSize: teamSize || null,
+          referralSource: referralSource || null,
+        }),
+        otpHash: getOtpHash(code),
+        otpExpiresAt: new Date(expMs),
+        channel,
+      },
     });
 
     const sendResult = await sendVerificationCode({
-      name: user.name,
-      email: user.email,
+      name,
+      email: emailNormalized,
       phone: phoneNormalized,
       channel,
       code,
     });
 
     if (!sendResult.success) {
+      // Nothing durable was created, so drop the row rather than leaving a
+      // pending signup nobody can ever redeem.
+      await prisma.pendingSignup.delete({ where: { id: pending.id } }).catch(() => {});
       return NextResponse.json(
         {
           error: "We could not send the verification email. Please try again or contact support.",
@@ -276,37 +249,29 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const planPath = String(normalizedPlanCode || "starter").toLowerCase();
-    const nextParams = new URLSearchParams();
-    nextParams.set("cycle", normalizedBillingCycle.toLowerCase());
-    if (customModuleIds.length > 0) nextParams.set("modules", customModuleIds.join(","));
-    if (computedCustomPrice !== null) nextParams.set("price", String(computedCustomPrice));
-    const next = `/onboarding/payment/${planPath}?${nextParams.toString()}`;
-
     const verifyToken = signJwt({
-      userId: user.id,
-      companyId: company.id,
-      role: "ADMIN",
-      email: user.email,
+      pendingId: pending.id,
+      email: emailNormalized,
       phone: phoneNormalized || undefined,
+      role: "ADMIN",
       channel,
       next,
       exp: expMs,
     });
 
     const availableChannels = getAvailableChannels({
-      email: user.email,
+      email: emailNormalized,
       phone: phoneNormalized,
     });
 
     const res = NextResponse.json({
       needsVerification: true,
-      email: user.email,
+      email: emailNormalized,
       phone: phoneNormalized || "",
       availableChannels,
       verifyChannel: channel,
       verifyTarget: getMaskedTarget(channel, {
-        email: user.email,
+        email: emailNormalized,
         phone: phoneNormalized,
       }),
       next,

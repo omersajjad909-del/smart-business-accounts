@@ -4,11 +4,15 @@ import { signJwt, verifyJwt } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import {
   createVerificationCodeLog,
+  getAvailableChannels,
   getLatestVerificationLog,
   getMaskedTarget,
+  getOtpHash,
   getUserVerificationTargets,
   isUserVerified,
+  newOtpCode,
   OTP_TTL_MS,
+  safeJson,
   VerificationChannel,
   sendVerificationCode,
 } from "@/lib/verification";
@@ -39,6 +43,101 @@ export async function POST(req: NextRequest) {
 
     if (!email) {
       return NextResponse.json({ error: "Email required" }, { status: 400 });
+    }
+
+    // A signup awaiting its first code has no User row yet — it lives on
+    // PendingSignup until /api/auth/verify/confirm promotes it. Checked before
+    // the User lookup below, which would otherwise 404 the whole resend button.
+    const pending = await prisma.pendingSignup.findUnique({ where: { email } });
+    if (pending) {
+      const payload = safeJson(pending.payload) || {};
+      const pendingName = String(payload.name || "there");
+      const pendingPhone = payload.phone ? String(payload.phone) : null;
+      const channel: VerificationChannel =
+        requestedChannel === "sms" && pendingPhone ? "sms" : "email";
+
+      if (requestedChannel === "sms" && !pendingPhone) {
+        return NextResponse.json(
+          { error: "No phone number is available for SMS verification." },
+          { status: 400 },
+        );
+      }
+
+      const targets = { email: pending.email, phone: pendingPhone };
+      const existingToken = (() => {
+        const raw = req.cookies.get("sb_verify")?.value;
+        if (!raw) return null;
+        const decoded = verifyJwt(raw);
+        return decoded && decoded.pendingId === pending.id ? decoded : null;
+      })();
+      const nextPath = String(body?.next || existingToken?.next || "/dashboard");
+
+      // Same 20s floor the verified-user path uses, so mashing "Resend" cannot
+      // invalidate the code the visitor is already typing.
+      const throttled = Date.now() - pending.lastSentAt.getTime() < 20_000;
+      let expMs = pending.otpExpiresAt.getTime();
+
+      if (!throttled) {
+        const fresh = newOtpCode();
+        expMs = fresh.expMs;
+        await prisma.pendingSignup.update({
+          where: { id: pending.id },
+          data: {
+            otpHash: getOtpHash(fresh.code),
+            otpExpiresAt: new Date(fresh.expMs),
+            lastSentAt: new Date(),
+            channel,
+            // A new code deserves a new budget of tries.
+            attempts: 0,
+          },
+        });
+
+        const sent = await sendVerificationCode({
+          name: pendingName,
+          email: pending.email,
+          phone: pendingPhone,
+          channel,
+          code: fresh.code,
+        });
+
+        if (!sent.success) {
+          console.error("Verification send failed:", sent.error);
+          return NextResponse.json(
+            {
+              error:
+                sent.error ||
+                "We could not send the verification code. Please try again in a moment.",
+            },
+            { status: 500 },
+          );
+        }
+      }
+
+      const token = signJwt({
+        pendingId: pending.id,
+        email: pending.email,
+        phone: pendingPhone || undefined,
+        role: "ADMIN",
+        channel,
+        next: nextPath,
+        exp: expMs,
+      });
+
+      const res = NextResponse.json({
+        ok: true,
+        ...(throttled ? { throttled: true } : {}),
+        availableChannels: getAvailableChannels(targets),
+        verifyChannel: channel,
+        verifyTarget: getMaskedTarget(channel, targets),
+      });
+      res.cookies.set("sb_verify", token, {
+        httpOnly: true,
+        secure: true,
+        sameSite: "lax",
+        path: "/",
+        maxAge: 15 * 60,
+      });
+      return res;
     }
 
     const user = await prisma.user.findUnique({
