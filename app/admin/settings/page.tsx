@@ -2,11 +2,13 @@
 
 import { FormEvent, useEffect, useState } from "react";
 import { getCurrentUser, updateStoredUser } from "@/lib/auth";
+import ImageAdjusterModal from "@/components/ImageAdjusterModal";
 
 type ProfileResponse = {
   name?: string;
   email?: string;
   role?: string;
+  avatar?: string | null;
   joined?: string;
   error?: string;
   success?: boolean;
@@ -54,6 +56,10 @@ export default function AdminSettingsPage() {
   const [role, setRole] = useState("");
   const [joined, setJoined] = useState("");
 
+  const [avatar, setAvatar] = useState<string | null>(null);
+  const [pendingPhoto, setPendingPhoto] = useState<File | null>(null);
+  const [uploadingPhoto, setUploadingPhoto] = useState(false);
+
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -78,6 +84,7 @@ export default function AdminSettingsPage() {
         setName(data.name || "");
         setEmail(data.email || "");
         setRole(data.role || "");
+        setAvatar(data.avatar || null);
         setJoined(data.joined || "");
       } catch (error) {
         if (!active) return;
