@@ -2041,9 +2041,10 @@ model NewsletterSubscriber {
 
 model Feedback {
   id          String    @id @default(cuid())
-  type        String                          // complaint | suggestion | bug | general
+  type        String                          // feedback | complaint | suggestion | bug | general
   subject     String
   message     String    @db.Text
+  rating      Int?                            // 1-5 stars, only set on type "feedback"
   email       String?                         // for public (non-logged-in) submissions
   name        String?
   status      String    @default("open")      // open | in_review | resolved | closed
@@ -2052,6 +2053,9 @@ model Feedback {
   userId      String?
   companyId   String?
   adminNote   String?   @db.Text
+  // Set once an admin publishes this feedback as a public testimonial, so the
+  // same review cannot be published twice.
+  testimonialId String?
   resolvedAt  DateTime?
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt

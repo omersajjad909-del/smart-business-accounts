@@ -72,6 +72,9 @@ export default function FeedbackPage() {
   const [fbType,   setFbType]   = useState<FeedbackType>("feedback");
   const [subject,  setSubject]  = useState("");
   const [message,  setMessage]  = useState("");
+  // 0 = nothing picked yet. Stars start empty; the user chooses 1-5.
+  const [rating,   setRating]   = useState(0);
+  const [hoverStar, setHoverStar] = useState(0);
   const [priority, setPriority] = useState("normal");
   const [module,   setModule]   = useState("");
   const [submitting, setSub]    = useState(false);
@@ -82,6 +85,9 @@ export default function FeedbackPage() {
   const [companyInfo, setCompanyInfo] = useState<CompanyInfo | null>(null);
 
   const activeType = TYPES.find(t => t.id === fbType)!;
+  // Only "Share your experience" can become a public testimonial, so that is
+  // the only type that carries a star rating.
+  const ratingApplies = fbType === "feedback";
 
   function getHeaders() {
     const h: Record<string, string> = { "Content-Type": "application/json" };
@@ -108,7 +114,15 @@ export default function FeedbackPage() {
 
   async function submit() {
     if (!subject.trim()) { setError("Please enter a subject."); return; }
-    if (message.trim().length < 20) { setError("Message must be at least 20 characters."); return; }
+    // A rating must never travel on its own — the written review is what makes
+    // it meaningful, and it is what an admin reads before publishing it.
+    if (message.trim().length < 20) {
+      setError(ratingApplies && rating > 0
+        ? "Please write your review as well — a star rating alone cannot be submitted (minimum 20 characters)."
+        : "Message must be at least 20 characters.");
+      return;
+    }
+    if (ratingApplies && rating === 0) { setError("Please pick a star rating from 1 to 5."); return; }
     setSub(true); setError("");
     try {
       const res = await fetch("/api/public/feedback", {
@@ -118,6 +132,7 @@ export default function FeedbackPage() {
           type: fbType,
           subject: subject.trim(),
           message: message.trim(),
+          rating: ratingApplies ? rating : undefined,
           priority,
           module: module || undefined,
           email: user?.email || undefined,
@@ -127,7 +142,7 @@ export default function FeedbackPage() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Failed");
       setDone({ id: data.id });
-      setSubject(""); setMessage(""); setPriority("normal"); setModule("");
+      setSubject(""); setMessage(""); setPriority("normal"); setModule(""); setRating(0);
     } catch (e: any) {
       setError(e.message);
     } finally { setSub(false); }
@@ -225,6 +240,66 @@ export default function FeedbackPage() {
               ))}
             </div>
           </div>
+
+          {/* Star rating — only for "Share your experience", because that is
+              the only feedback type an admin can publish as a testimonial. */}
+          {ratingApplies && (
+            <div style={{
+              marginBottom: "14px", padding: "14px 16px", borderRadius: "10px",
+              background: "var(--app-bg)", border: "1px solid var(--border)",
+            }}>
+              <label style={{ ...labelStyle, marginBottom: "9px" }}>
+                Your Rating <span style={{ color: "#ef4444" }}>*</span>
+              </label>
+              <div style={{ display: "flex", alignItems: "center", gap: "12px", flexWrap: "wrap" }}>
+                <div
+                  style={{ display: "flex", gap: "4px" }}
+                  onMouseLeave={() => setHoverStar(0)}
+                  role="radiogroup"
+                  aria-label="Rate your experience from 1 to 5 stars"
+                >
+                  {[1, 2, 3, 4, 5].map(n => {
+                    const filled = n <= (hoverStar || rating);
+                    return (
+                      <button
+                        key={n}
+                        type="button"
+                        role="radio"
+                        aria-checked={rating === n}
+                        aria-label={`${n} star${n > 1 ? "s" : ""}`}
+                        onClick={() => setRating(n === rating ? 0 : n)}
+                        onMouseEnter={() => setHoverStar(n)}
+                        style={{
+                          background: "none", border: "none", padding: 0,
+                          cursor: "pointer", lineHeight: 0,
+                          transform: filled ? "scale(1.06)" : "scale(1)",
+                          transition: "transform .12s ease",
+                        }}
+                      >
+                        <svg width="27" height="27" viewBox="0 0 24 24"
+                          fill={filled ? "#fbbf24" : "none"}
+                          stroke={filled ? "#fbbf24" : "var(--text-muted)"}
+                          strokeWidth="1.6" strokeLinejoin="round">
+                          <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                        </svg>
+                      </button>
+                    );
+                  })}
+                </div>
+                <span style={{
+                  fontSize: "12px", fontWeight: 600,
+                  color: (hoverStar || rating) ? "#fbbf24" : "var(--text-muted)",
+                }}>
+                  {["Tap a star to rate", "Poor", "Fair", "Good", "Very good", "Excellent"][hoverStar || rating]}
+                </span>
+              </div>
+              <div style={{ fontSize: "11px", color: "var(--text-muted)", marginTop: "9px", lineHeight: 1.6 }}>
+                Your rating is submitted together with your written review below. Nothing is
+                published automatically — our team reviews it first, and it only appears on our
+                public testimonials page if you have approved it and we publish it.
+              </div>
+            </div>
+          )}
 
           {/* Subject */}
           <div style={{ marginBottom: "14px" }}>
