@@ -793,6 +793,11 @@ export default function PricingPage() {
                     <div style={{ width: 18, height: 18, borderRadius: "50%", background: "#F79E1B", opacity: .9, marginLeft: -8 }} />
                     <span style={{ fontSize: 11, fontWeight: 800, color: "rgba(255,255,255,.8)", marginLeft: 6 }}>Mastercard</span>
                   </div>
+                  {/* PayPak */}
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "center", background: "#0B3B60", borderRadius: 8, padding: "6px 12px", height: 36 }}>
+                    <span style={{ fontSize: 13, fontWeight: 900, color: "#fff", letterSpacing: "-.3px" }}>Pay</span>
+                    <span style={{ fontSize: 13, fontWeight: 900, color: "#6DBE45", letterSpacing: "-.3px" }}>Pak</span>
+                  </div>
                   {/* JazzCash */}
                   {/* <div style={{ display: "flex", alignItems: "center", gap: 6, background: "#CC0000", borderRadius: 8, padding: "6px 12px", height: 36 }}>
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="white"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/></svg>
