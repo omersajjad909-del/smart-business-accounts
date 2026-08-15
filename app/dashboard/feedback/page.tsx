@@ -75,6 +75,7 @@ export default function FeedbackPage() {
   // 0 = nothing picked yet. Stars start empty; the user chooses 1-5.
   const [rating,   setRating]   = useState(0);
   const [hoverStar, setHoverStar] = useState(0);
+  const [publishConsent, setPublishConsent] = useState(false);
   const [priority, setPriority] = useState("normal");
   const [module,   setModule]   = useState("");
   const [submitting, setSub]    = useState(false);
@@ -133,6 +134,7 @@ export default function FeedbackPage() {
           subject: subject.trim(),
           message: message.trim(),
           rating: ratingApplies ? rating : undefined,
+          publishConsent: ratingApplies ? publishConsent : undefined,
           priority,
           module: module || undefined,
           email: user?.email || undefined,
@@ -142,7 +144,7 @@ export default function FeedbackPage() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Failed");
       setDone({ id: data.id });
-      setSubject(""); setMessage(""); setPriority("normal"); setModule(""); setRating(0);
+      setSubject(""); setMessage(""); setPriority("normal"); setModule(""); setRating(0); setPublishConsent(false);
     } catch (e: any) {
       setError(e.message);
     } finally { setSub(false); }
@@ -293,11 +295,27 @@ export default function FeedbackPage() {
                   {["Tap a star to rate", "Poor", "Fair", "Good", "Very good", "Excellent"][hoverStar || rating]}
                 </span>
               </div>
-              <div style={{ fontSize: "11px", color: "var(--text-muted)", marginTop: "9px", lineHeight: 1.6 }}>
-                Your rating is submitted together with your written review below. Nothing is
-                published automatically — our team reviews it first, and it only appears on our
-                public testimonials page if you have approved it and we publish it.
-              </div>
+              {/* Explicit permission before anyone's words go on the public
+                  site under their name. Without this the review is still read
+                  by the team — it just never becomes a testimonial. */}
+              <label style={{
+                display: "flex", alignItems: "flex-start", gap: "9px",
+                marginTop: "12px", paddingTop: "12px",
+                borderTop: "1px solid var(--border)", cursor: "pointer",
+              }}>
+                <input
+                  type="checkbox"
+                  checked={publishConsent}
+                  onChange={e => setPublishConsent(e.target.checked)}
+                  style={{ marginTop: "2px", width: "15px", height: "15px", cursor: "pointer", accentColor: "#fbbf24", flexShrink: 0 }}
+                />
+                <span style={{ fontSize: "11.5px", color: "var(--text-muted)", lineHeight: 1.6 }}>
+                  You may publish this review publicly with my name
+                  {companyInfo?.name ? ` and company (${companyInfo.name})` : " and company"}.
+                  Optional — your feedback still reaches the team either way, and nothing is
+                  published until our team reviews it.
+                </span>
+              </label>
             </div>
           )}
 

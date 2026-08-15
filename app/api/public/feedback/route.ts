@@ -10,7 +10,7 @@ const db = prisma as any;
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { type, subject, message, email, name, priority, module: affectedModule } = body;
+    const { type, subject, message, email, name, priority, module: affectedModule, rating, publishConsent } = body;
 
     if (!type || !subject?.trim() || !message?.trim())
       return NextResponse.json({ error: "type, subject and message are required" }, { status: 400 });
@@ -20,6 +20,24 @@ export async function POST(req: NextRequest) {
 
     if (message.trim().length < 20)
       return NextResponse.json({ error: "Message must be at least 20 characters" }, { status: 400 });
+
+    // Star rating: only meaningful on "feedback", must be a whole 1-5, and is
+    // never accepted on its own — the 20-character check above already
+    // guarantees a written review accompanies it.
+    let ratingValue: number | null = null;
+    if (rating !== undefined && rating !== null && rating !== 0) {
+      if (type !== "feedback")
+        return NextResponse.json({ error: "A star rating can only be given on feedback" }, { status: 400 });
+
+      const n = Number(rating);
+      if (!Number.isInteger(n) || n < 1 || n > 5)
+        return NextResponse.json({ error: "Rating must be a whole number between 1 and 5" }, { status: 400 });
+
+      ratingValue = n;
+    }
+
+    if (type === "feedback" && ratingValue === null)
+      return NextResponse.json({ error: "Please pick a star rating from 1 to 5" }, { status: 400 });
 
     // Try to get logged-in user context
     let userId: string | null = null;
@@ -38,6 +56,9 @@ export async function POST(req: NextRequest) {
         type,
         subject: subject.trim(),
         message: message.trim(),
+        rating: ratingValue,
+        // Consent only means anything alongside a rating we could publish.
+        publishConsent: ratingValue !== null && publishConsent === true,
         email: email?.toLowerCase().trim() || null,
         name: name?.trim() || null,
         status: "open",

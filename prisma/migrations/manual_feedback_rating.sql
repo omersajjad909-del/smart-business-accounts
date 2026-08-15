@@ -5,6 +5,7 @@
 
 ALTER TABLE "Feedback" ADD COLUMN IF NOT EXISTS "rating" INTEGER;
 ALTER TABLE "Feedback" ADD COLUMN IF NOT EXISTS "testimonialId" TEXT;
+ALTER TABLE "Feedback" ADD COLUMN IF NOT EXISTS "publishConsent" BOOLEAN NOT NULL DEFAULT false;
 
 -- A rating is only ever valid as 1-5 stars.
 DO $$

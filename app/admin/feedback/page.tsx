@@ -8,11 +8,28 @@ const STATUS_COLORS: Record<string, string> = {
   closed:    "#64748b",
 };
 const TYPE_COLORS: Record<string, string> = {
+  feedback:   "#34d399",
   complaint:  "#f87171",
   suggestion: "#fbbf24",
   bug:        "#a78bfa",
-  general:    "#34d399",
+  general:    "#60a5fa",
 };
+
+/** Read-only star row for a submitted rating. */
+function Stars({ value, size = 13 }: { value: number; size?: number }) {
+  return (
+    <span style={{ display: "inline-flex", gap: 2, verticalAlign: "middle" }}>
+      {[1, 2, 3, 4, 5].map(n => (
+        <svg key={n} width={size} height={size} viewBox="0 0 24 24"
+          fill={n <= value ? "#fbbf24" : "none"}
+          stroke={n <= value ? "#fbbf24" : "rgba(255,255,255,.22)"}
+          strokeWidth="1.8" strokeLinejoin="round">
+          <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+        </svg>
+      ))}
+    </span>
+  );
+}
 const PRIORITY_COLORS: Record<string, string> = {
   low: "#64748b", normal: "#38bdf8", high: "#f59e0b", urgent: "#ef4444",
 };
@@ -155,7 +172,17 @@ export default function AdminFeedbackPage() {
                     {fb.type}
                   </span>
                 </td>
-                <td style={{ padding: "14px 16px", fontSize: 13, fontWeight: 600, maxWidth: 200 }}>{fb.subject}</td>
+                <td style={{ padding: "14px 16px", fontSize: 13, fontWeight: 600, maxWidth: 200 }}>
+                  {fb.subject}
+                  {fb.rating ? (
+                    <div style={{ marginTop: 4, display: "flex", alignItems: "center", gap: 6 }}>
+                      <Stars value={fb.rating} size={11} />
+                      {fb.testimonialId && (
+                        <span style={{ fontSize: 9, fontWeight: 800, color: "#34d399", letterSpacing: ".04em" }}>PUBLISHED</span>
+                      )}
+                    </div>
+                  ) : null}
+                </td>
                 <td style={{ padding: "14px 16px", fontSize: 12, color: "rgba(255,255,255,.5)" }}>{fb.name || fb.email || "—"}</td>
                 <td style={{ padding: "14px 16px" }}>
                   <span style={{ padding: "3px 10px", borderRadius: 20, fontSize: 11, fontWeight: 700, background: `${PRIORITY_COLORS[fb.priority]}18`, color: PRIORITY_COLORS[fb.priority] }}>
@@ -210,6 +237,60 @@ export default function AdminFeedbackPage() {
               <div style={{ fontSize: 12, color: "rgba(255,255,255,.35)", marginBottom: 8 }}>MESSAGE</div>
               <p style={{ margin: 0, fontSize: 13, color: "rgba(255,255,255,.7)", lineHeight: 1.8 }}>{selected.message}</p>
             </div>
+
+            {/* Rated review — the only kind that can become a testimonial. */}
+            {selected.rating ? (
+              <div style={{
+                background: "rgba(251,191,36,.05)", border: "1px solid rgba(251,191,36,.2)",
+                borderRadius: 12, padding: "16px", marginBottom: 20,
+              }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap", marginBottom: 10 }}>
+                  <Stars value={selected.rating} size={16} />
+                  <span style={{ fontSize: 13, fontWeight: 800, color: "#fbbf24" }}>{selected.rating} / 5</span>
+                  {selected.testimonialId ? (
+                    <span style={{ padding: "3px 10px", borderRadius: 20, fontSize: 10, fontWeight: 800, background: "rgba(52,211,153,.15)", color: "#34d399" }}>
+                      LIVE ON TESTIMONIALS
+                    </span>
+                  ) : selected.publishConsent ? (
+                    <span style={{ padding: "3px 10px", borderRadius: 20, fontSize: 10, fontWeight: 800, background: "rgba(56,189,248,.15)", color: "#38bdf8" }}>
+                      CONSENT GIVEN
+                    </span>
+                  ) : (
+                    <span style={{ padding: "3px 10px", borderRadius: 20, fontSize: 10, fontWeight: 800, background: "rgba(248,113,113,.15)", color: "#f87171" }}>
+                      NO CONSENT — CANNOT PUBLISH
+                    </span>
+                  )}
+                </div>
+
+                {selected.testimonialId ? (
+                  <button className="fb-btn" disabled={saving}
+                    onClick={() => update(selected.id, { action: "unpublish_testimonial", adminNote: note })}
+                    style={{ background: "rgba(248,113,113,.15)", color: "#f87171", border: "1px solid rgba(248,113,113,.3)", width: "100%" }}>
+                    {saving ? "..." : "Remove from public testimonials"}
+                  </button>
+                ) : (
+                  <>
+                    <button className="fb-btn" disabled={saving || !selected.publishConsent || !selected.name}
+                      onClick={() => update(selected.id, { action: "publish_testimonial", adminNote: note })}
+                      style={{
+                        background: "rgba(52,211,153,.15)", color: "#34d399",
+                        border: "1px solid rgba(52,211,153,.3)", width: "100%",
+                        opacity: (!selected.publishConsent || !selected.name) ? .35 : 1,
+                        cursor: (!selected.publishConsent || !selected.name) ? "not-allowed" : "pointer",
+                      }}>
+                      {saving ? "..." : "Approve & publish as testimonial"}
+                    </button>
+                    <div style={{ fontSize: 11, color: "rgba(255,255,255,.35)", marginTop: 8, lineHeight: 1.6 }}>
+                      {!selected.name
+                        ? "This submission has no reviewer name, so it cannot be published."
+                        : !selected.publishConsent
+                        ? "The reviewer did not tick the permission box. Ask them directly before publishing."
+                        : "Publishes exactly what the customer wrote, with their name and company, to the public testimonials page."}
+                    </div>
+                  </>
+                )}
+              </div>
+            ) : null}
 
             {(selected.name || selected.email) && (
               <div style={{ display: "flex", gap: 16, marginBottom: 20, fontSize: 12, color: "rgba(255,255,255,.4)" }}>

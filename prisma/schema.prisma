@@ -2045,6 +2045,9 @@ model Feedback {
   subject     String
   message     String    @db.Text
   rating      Int?                            // 1-5 stars, only set on type "feedback"
+  // The reviewer's explicit permission to publish this publicly under their
+  // name. Without it a review can be read internally but never published.
+  publishConsent Boolean @default(false)
   email       String?                         // for public (non-logged-in) submissions
   name        String?
   status      String    @default("open")      // open | in_review | resolved | closed
