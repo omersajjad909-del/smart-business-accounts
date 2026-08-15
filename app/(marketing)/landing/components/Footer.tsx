@@ -68,7 +68,7 @@ const SOCIALS_DEFAULT = [
     Icon: Twitter,
     key: "twitter",
     label: "X / Twitter",
-    href: "https://x.com/finovaforge",
+    href: "https://x.com/finovaos",
   },
   {
     Icon: Linkedin,

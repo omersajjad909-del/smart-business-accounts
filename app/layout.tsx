@@ -290,6 +290,7 @@ const organizationJsonLd = {
   sameAs: [
     "https://finovaforge.com",
     "https://www.finovaos.app",
+    "https://x.com/finovaos",
     "https://www.linkedin.com/in/umer-sajjad-657936417",
     "https://www.wikidata.org/wiki/Q140701786",
   ],

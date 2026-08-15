@@ -185,8 +185,8 @@ export const emailTemplates = {
             </div>
             <div class="social-links">
                 <a href="https://linkedin.com/company/finova-forge">in</a>
-                <a href="https://twitter.com/finovoas">𝕏</a>
-                <a href="https://facebook.com/finovoas">f</a>
+                <a href="https://x.com/finovaos">𝕏</a>
+                <a href="https://www.facebook.com/Finovaos">f</a>
             </div>
             <div class="footer-text" style="margin-top:16px;">
                 ${t.footerRights(new Date().getFullYear())}<br>
