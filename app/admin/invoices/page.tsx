@@ -358,22 +358,21 @@ export default function AdminInvoicesPage() {
                     <tr key={i.id} className="inv-row" style={{ cursor: "pointer" }} onClick={() => { setSelected(i); setTaxIdDraft(i.customerTaxId || ""); }}>
                       <td style={{ ...td, fontFamily: "monospace", fontWeight: 700, color: "rgba(255,255,255,.9)" }}>{i.number}</td>
                       <td style={td}>{fmtDate(i.issuedAt)}</td>
-                      {/* Snapshot name is the record; the live name appears only
-                          when it has drifted. The raw companyId is never printed
-                          here — `companyNo` is the readable reference, and the
-                          full id is one click away in the drawer. */}
+                      {/* The company's name as it is today. The name captured at
+                          the time of sale is still stored on the row and shown in
+                          the drawer and the CSV, but the list reads better with
+                          one name per company than with two.
+                          The raw companyId is never printed here — `companyNo` is
+                          the readable reference. */}
                       <td style={{ ...td, maxWidth: 230, whiteSpace: "normal" }}>
                         <div style={{ color: "rgba(255,255,255,.85)", fontWeight: 600 }}>
-                          {i.companyName || i.currentCompanyName || "—"}
+                          {i.currentCompanyName || i.companyName || "—"}
                           {i.companyNo != null && (
                             <span style={{ fontSize: 10.5, fontWeight: 600, color: "rgba(255,255,255,.28)" }}> · #{i.companyNo}</span>
                           )}
                         </div>
                         {i.customerEmail && (
                           <div style={{ fontSize: 11, color: "rgba(255,255,255,.32)" }}>{i.customerEmail}</div>
-                        )}
-                        {i.companyRenamed && (
-                          <div style={{ fontSize: 10.5, color: "#a5b4fc" }}>now: {i.currentCompanyName}</div>
                         )}
                       </td>
                       <td style={td}>
@@ -433,9 +432,11 @@ export default function AdminInvoicesPage() {
             </div>
 
             <Section title="Billed to">
-              <Row label="Company (at sale)" value={selected.companyName || "—"} />
+              <Row label="Company" value={selected.currentCompanyName || selected.companyName || "—"} />
+              {/* Only surfaced when the two disagree — the row it was invoiced
+                  under still matters if the payment is ever queried. */}
               {selected.companyRenamed && (
-                <Row label="Company (now)" value={selected.currentCompanyName || "—"} />
+                <Row label="Name on invoice" value={selected.companyName || "—"} />
               )}
               <Row label="Company No" value={selected.companyNo != null ? `#${selected.companyNo}` : "—"} />
               <Row label="Company ID" value={selected.companyId} mono />
