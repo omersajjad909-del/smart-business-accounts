@@ -28,17 +28,20 @@ const SECURITY_FEATURES = [
     { icon:"🧪", title:"Security Reviews",             desc:"Security checks and platform hardening are performed regularly as part of our release process." },
 ];
 
+/* This grid used to advertise four AWS regions with Ireland as primary and
+   implied customers could pick one. FinovaOS runs a single managed Postgres
+   database in ap-southeast-1 (Singapore), fronted by a global edge network.
+   Listing regions we do not run in is the kind of claim an enterprise buyer
+   checks during procurement. */
 const DATA_CENTRES = [
-  { region:"Europe",        provider:"AWS eu-west-1", location:"Ireland", flag:"🇮🇪", primary:true },
-  { region:"Asia Pacific",  provider:"AWS ap-south-1",location:"Mumbai",  flag:"🇮🇳", primary:false },
-  { region:"Middle East",   provider:"AWS me-south-1",location:"Bahrain", flag:"🇧🇭", primary:false },
-  { region:"Americas",      provider:"AWS us-east-1", location:"Virginia",flag:"🇺🇸", primary:false },
+  { region:"Primary database", provider:"ap-southeast-1", location:"Singapore",   flag:"🇸🇬", primary:true },
+  { region:"Application edge", provider:"global CDN",     location:"Worldwide",   flag:"🌍", primary:false },
 ];
 
 const FAQS = [
   { q:"Who owns my data?", a:"You do — always. FinovaOS is a data processor, not a data controller. We process your data solely to provide the service you've signed up for. We never sell, share, or monetise your data." },
   { q:"Can FinovaOS employees see my financial data?", a:"Access is restricted to a small number of authorised staff, and only where it is needed to operate the service or resolve a support request you have raised. Data is encrypted in transit and at rest, administrative access is logged, and we never sell, share, or mine your data. We do not claim a zero-knowledge architecture — any provider that can restore your backups can technically read your data, and we would rather say so than pretend otherwise." },
-  { q:"Where is my data stored?", a:"By default, data is stored in AWS eu-west-1 (Ireland). Enterprise customers can choose their preferred region: US (Virginia), Europe (Ireland), Middle East (Bahrain), Asia Pacific (Singapore), or UK (London)." },
+  { q:"Where is my data stored?", a:"Your data is stored in a managed Postgres database in Singapore (ap-southeast-1), and the application is served from a global edge network. We do not currently offer a choice of data region — if your organisation needs data residency in a specific country, contact us before signing up so we can tell you honestly whether we can meet it." },
   { q:"What happens to my data if I cancel?", a:"You can export all your data at any time in CSV or JSON format. After cancellation, we retain your data for 90 days so you can retrieve it, then permanently delete it. Deletion certificates are available on request." },
   { q:"Do you support two-factor authentication?", a:"Yes. 2FA is available for all accounts via authenticator app (TOTP) or SMS. Enterprise plans have enforced 2FA for all users." },
   { q:"How do you handle security incidents?", a:"We follow a documented incident response plan. In the event of a breach affecting your data, we notify affected customers within 72 hours as required by GDPR." },
