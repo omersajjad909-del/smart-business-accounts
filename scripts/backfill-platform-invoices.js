@@ -24,6 +24,10 @@ const COMMIT = process.argv.includes("--commit");
 // time instead. Two events with the SAME name are a genuine double charge.
 const DEDUPE_WINDOW_MS = 60 * 60 * 1000;
 
+// Must match SEQ_START in lib/platformInvoice.ts, or a backfill and a live
+// payment would mint numbers from two different ranges.
+const SEQ_START = 100001;
+
 function parseDetails(details) {
   try {
     return details ? JSON.parse(details) : null;
@@ -103,6 +107,17 @@ async function main() {
     (await prisma.company.findMany({ select: { id: true, name: true, country: true } }))
       .map((c) => [c.id, c]),
   );
+
+  // Historical PAYMENT_EVENT rows recorded no buyer email, so fall back to the
+  // company's owner — without it the admin ledger has nothing to show but a
+  // raw company UUID.
+  const ownerEmails = new Map();
+  for (const uc of await prisma.userCompany.findMany({
+    where: { user: { role: { in: ["ADMIN", "OWNER"] } } },
+    select: { companyId: true, user: { select: { name: true, email: true } } },
+  })) {
+    if (!ownerEmails.has(uc.companyId)) ownerEmails.set(uc.companyId, uc.user);
+  }
   const plans = new Map(
     (await prisma.subscription.findMany({ select: { companyId: true, plan: true, billingCycle: true } }))
       .map((s) => [s.companyId, s]),
@@ -117,11 +132,15 @@ async function main() {
       orderBy: { number: "desc" },
       select: { number: true },
     });
-    seqByYear.set(year, last ? Number(String(last.number).split("-")[2]) || 0 : 0);
+    const lastSeq = last ? Number(String(last.number).split("-")[2]) || 0 : 0;
+    // Never step below the live starting point — see SEQ_START in
+    // lib/platformInvoice.ts for why the sequence does not begin at 1.
+    seqByYear.set(year, Math.max(lastSeq, SEQ_START - 1));
   }
 
   let written = 0;
   let skipped = 0;
+  let enriched = 0;
 
   for (const charge of charges) {
     const providerEventId =
@@ -129,8 +148,25 @@ async function main() {
         ? `safepay:${charge.orderId || charge.logId}`
         : `lemon:${charge.orderId || charge.logId}`;
 
+    const owner = ownerEmails.get(charge.companyId);
+    const company = companyNames.get(charge.companyId);
+
     const existing = await prisma.platformInvoice.findUnique({ where: { providerEventId } });
     if (existing) {
+      // Fill in snapshot fields an earlier run could not resolve. Money, number
+      // and status are never touched — those are the immutable part of the
+      // record; this only completes who was billed.
+      const patch = {};
+      if (!existing.companyName && company?.name) patch.companyName = company.name;
+      if (!existing.customerEmail && owner?.email) patch.customerEmail = owner.email;
+      if (!existing.customerName && owner?.name) patch.customerName = owner.name;
+      if (!existing.customerCountry && company?.country) patch.customerCountry = company.country;
+
+      if (Object.keys(patch).length > 0) {
+        console.log(`  ${existing.number}  enrich → ${Object.keys(patch).join(", ")}`);
+        if (COMMIT) await prisma.platformInvoice.update({ where: { id: existing.id }, data: patch });
+        enriched++;
+      }
       skipped++;
       continue;
     }
@@ -140,13 +176,14 @@ async function main() {
     seqByYear.set(year, seq);
     const number = `INV-${year}-${String(seq).padStart(6, "0")}`;
 
-    const company = companyNames.get(charge.companyId);
     const sub = plans.get(charge.companyId);
 
     const row = {
       number,
       companyId: charge.companyId,
       companyName: company?.name || null,
+      customerName: owner?.name || null,
+      customerEmail: owner?.email || null,
       provider: charge.provider,
       providerEventId,
       providerOrderId: charge.orderId,
@@ -179,7 +216,8 @@ async function main() {
   }
 
   console.log(
-    `\n${COMMIT ? "Wrote" : "Would write"} ${written} invoice(s); ${skipped} already present.`,
+    `\n${COMMIT ? "Wrote" : "Would write"} ${written} invoice(s); ` +
+    `${skipped} already present${enriched > 0 ? ` (${enriched} enriched)` : ""}.`,
   );
   if (!COMMIT && written > 0) console.log("Re-run with --commit to apply.");
 }

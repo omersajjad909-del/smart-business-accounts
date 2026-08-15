@@ -82,6 +82,28 @@ export async function GET(req: NextRequest) {
       throw e;
     }
 
+    // The row stores the company name as it was at the time of sale, which is
+    // the correct thing for a tax record but useless for finding a company that
+    // has since been renamed. Attach the live name and the short `companyNo` so
+    // the UI can show both — and so it never has to fall back to printing a raw
+    // 36-character UUID at the admin.
+    const companies = await prisma.company.findMany({
+      where: { id: { in: Array.from(new Set(invoices.map((i) => i.companyId))) } },
+      select: { id: true, name: true, companyNo: true },
+    });
+    const companyById = new Map(companies.map((c) => [c.id, c]));
+
+    const rows = invoices.map((inv) => {
+      const live = companyById.get(inv.companyId);
+      return {
+        ...inv,
+        companyNo: live?.companyNo ?? null,
+        currentCompanyName: live?.name ?? null,
+        /** True when the company has been renamed since this invoice was issued. */
+        companyRenamed: Boolean(live?.name && inv.companyName && live.name !== inv.companyName),
+      };
+    });
+
     // Per-currency rollups, computed over the filtered set so the header always
     // describes exactly what is on screen.
     const byCurrency = new Map<string, { currency: string; gross: number; refunded: number; net: number; tax: number; count: number }>();

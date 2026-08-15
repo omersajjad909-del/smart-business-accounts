@@ -8,7 +8,14 @@ import { prisma } from "@/lib/prisma";
  * invoice number, and so the number is allocated once and never recomputed.
  */
 
-/** Zero-padding width of the per-year sequence. */
+/**
+ * The per-year sequence starts here rather than at 1. A number that reads
+ * "INV-2026-000002" tells every customer they are the second sale ever made;
+ * starting mid-range keeps invoice volume private, which is why almost every
+ * business does it. Six digits throughout also keeps the number's textual sort
+ * identical to its numeric one, which `nextInvoiceNumber` relies on.
+ */
+const SEQ_START = 100001;
 const SEQ_WIDTH = 6;
 const NUMBER_PREFIX = "INV";
 
@@ -54,10 +61,11 @@ function formatInvoiceNumber(year: number, seq: number) {
 }
 
 /**
- * Highest sequence issued so far this year, +1.
+ * Highest sequence issued so far this year, +1 — or SEQ_START for the year's
+ * first invoice.
  *
- * The sequence is zero-padded to a fixed width, so a lexicographic `desc` sort
- * is also a numeric one — no need to read every row to find the maximum.
+ * Every sequence is the same width, so a lexicographic `desc` sort is also a
+ * numeric one — no need to read every row to find the maximum.
  */
 async function nextInvoiceNumber(year: number): Promise<string> {
   const last = await (prisma as any).platformInvoice.findFirst({
@@ -66,8 +74,11 @@ async function nextInvoiceNumber(year: number): Promise<string> {
     select: { number: true },
   });
 
-  const lastSeq = last?.number ? Number(String(last.number).split("-")[2]) : 0;
-  return formatInvoiceNumber(year, (Number.isFinite(lastSeq) ? lastSeq : 0) + 1);
+  const lastSeq = last?.number ? Number(String(last.number).split("-")[2]) : NaN;
+  if (!Number.isFinite(lastSeq)) return formatInvoiceNumber(year, SEQ_START);
+  // Guards a year whose only rows predate SEQ_START, so the sequence steps up
+  // to the new range instead of colliding backwards into it.
+  return formatInvoiceNumber(year, Math.max(lastSeq + 1, SEQ_START));
 }
 
 /**
