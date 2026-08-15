@@ -150,6 +150,14 @@ function mergeCustomPlan(saved: unknown) {
   return { ...DEFAULT_CUSTOM_PLAN, ...savedPlan, modules: [...merged, ...Array.from(byId.values())] };
 }
 
+// This handler takes no request argument and touches no dynamic API, so Next
+// was free to evaluate it once at build time and serve that payload forever —
+// meaning prices edited in /admin only reached the public pricing page on the
+// next deploy. Every sibling that must answer live (geo, pricing-region,
+// signup-status, plan-features) already opts out the same way.
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export async function GET() {
   try {
     const [latest, pkrLatest] = await Promise.all([
