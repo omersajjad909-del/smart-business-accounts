@@ -41,6 +41,11 @@ type Invoice = {
   periodStart: string | null;
   periodEnd: string | null;
   issuedAt: string;
+  /** Short human company reference — shown instead of the 36-char companyId. */
+  companyNo: number | null;
+  /** The company's name today, which may differ from the snapshot above. */
+  currentCompanyName: string | null;
+  companyRenamed: boolean;
 };
 
 type CurrencyTotal = {
@@ -156,14 +161,16 @@ export default function AdminInvoicesPage() {
     if (invoices.length === 0) { toast.error("Nothing to export"); return; }
 
     const headers = [
-      "Invoice No", "Issued", "Company", "Company ID", "Customer", "Email", "Country", "Tax ID",
+      "Invoice No", "Issued", "Company", "Company Now", "Company No", "Company ID",
+      "Customer", "Email", "Country", "Tax ID",
       "Plan", "Cycle", "Provider", "Order Ref", "Subscription Ref",
       "Currency", "Subtotal", "Discount", "Tax Name", "Tax Rate %", "Tax Amount", "Total",
       "Refunded", "Net", "Status", "Card", "Period Start", "Period End",
     ];
 
     const rows = invoices.map((i) => [
-      i.number, fmtDate(i.issuedAt), i.companyName || "", i.companyId,
+      i.number, fmtDate(i.issuedAt),
+      i.companyName || "", i.currentCompanyName || "", i.companyNo ?? "", i.companyId,
       i.customerName || "", i.customerEmail || "", i.customerCountry || "", i.customerTaxId || "",
       i.plan, i.billingCycle, PROVIDER_LABEL[i.provider] || i.provider,
       i.providerOrderId || "", i.providerSubscriptionId || "",
@@ -351,9 +358,23 @@ export default function AdminInvoicesPage() {
                     <tr key={i.id} className="inv-row" style={{ cursor: "pointer" }} onClick={() => { setSelected(i); setTaxIdDraft(i.customerTaxId || ""); }}>
                       <td style={{ ...td, fontFamily: "monospace", fontWeight: 700, color: "rgba(255,255,255,.9)" }}>{i.number}</td>
                       <td style={td}>{fmtDate(i.issuedAt)}</td>
-                      <td style={{ ...td, maxWidth: 210, overflow: "hidden", textOverflow: "ellipsis" }}>
-                        <div style={{ color: "rgba(255,255,255,.85)", fontWeight: 600 }}>{i.companyName || "—"}</div>
-                        <div style={{ fontSize: 11, color: "rgba(255,255,255,.32)" }}>{i.customerEmail || i.companyId}</div>
+                      {/* Snapshot name is the record; the live name appears only
+                          when it has drifted. The raw companyId is never printed
+                          here — `companyNo` is the readable reference, and the
+                          full id is one click away in the drawer. */}
+                      <td style={{ ...td, maxWidth: 230, whiteSpace: "normal" }}>
+                        <div style={{ color: "rgba(255,255,255,.85)", fontWeight: 600 }}>
+                          {i.companyName || i.currentCompanyName || "—"}
+                          {i.companyNo != null && (
+                            <span style={{ fontSize: 10.5, fontWeight: 600, color: "rgba(255,255,255,.28)" }}> · #{i.companyNo}</span>
+                          )}
+                        </div>
+                        {i.customerEmail && (
+                          <div style={{ fontSize: 11, color: "rgba(255,255,255,.32)" }}>{i.customerEmail}</div>
+                        )}
+                        {i.companyRenamed && (
+                          <div style={{ fontSize: 10.5, color: "#a5b4fc" }}>now: {i.currentCompanyName}</div>
+                        )}
                       </td>
                       <td style={td}>
                         {i.plan}
@@ -412,7 +433,11 @@ export default function AdminInvoicesPage() {
             </div>
 
             <Section title="Billed to">
-              <Row label="Company" value={selected.companyName || "—"} />
+              <Row label="Company (at sale)" value={selected.companyName || "—"} />
+              {selected.companyRenamed && (
+                <Row label="Company (now)" value={selected.currentCompanyName || "—"} />
+              )}
+              <Row label="Company No" value={selected.companyNo != null ? `#${selected.companyNo}` : "—"} />
               <Row label="Company ID" value={selected.companyId} mono />
               <Row label="Contact" value={selected.customerName || "—"} />
               <Row label="Email" value={selected.customerEmail || "—"} />

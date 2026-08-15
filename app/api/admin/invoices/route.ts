@@ -119,7 +119,7 @@ export async function GET(req: NextRequest) {
     }
 
     return NextResponse.json({
-      invoices,
+      invoices: rows,
       totals: Array.from(byCurrency.values()).sort((a, b) => b.gross - a.gross),
       summary: {
         count: invoices.length,
