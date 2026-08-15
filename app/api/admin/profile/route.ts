@@ -1,6 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
+/**
+ * Profile photos are stored inline as data URLs on the user row, the same way
+ * /api/me/avatar stores the customer-side ones. That route authenticates off
+ * the JWT cookie; this panel authenticates off the x-user-id/x-user-role
+ * headers, so the admin photo rides along on this route rather than borrowing
+ * an auth scheme the admin pages do not use.
+ */
+const MAX_AVATAR_CHARS = 2_800_000;   // ~2MB once base64 is decoded
+
 export async function GET(req: NextRequest) {
   try {
     const userId = req.headers.get("x-user-id");
