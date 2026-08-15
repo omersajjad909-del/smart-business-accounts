@@ -123,8 +123,11 @@ export default function AdminDashboardPage() {
         </div>
       </section>
 
-      {/* Launch state is the first thing an operator should see on this page. */}
-      <LaunchNowCard />
+      {/* The Launch Now strip lived here until launch day. FinovaOS is live, so
+          the one button it existed for has been pressed and the card was taking
+          up the top of the dashboard to say so forever. The gate it moved is
+          untouched: /api/admin/launch still owns the switch, and lib/signupGate
+          still reads the row it wrote. */}
 
       {error ? (
         <section className="dash-card error-card">
