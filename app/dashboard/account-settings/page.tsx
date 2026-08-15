@@ -462,18 +462,33 @@ export default function AccountSettingsPage() {
             {passwordMessage && <Alert msg={passwordMessage} type="success" />}
 
             <form onSubmit={handlePasswordSubmit}>
+              {/* Same autocomplete hints as the admin settings form: without
+                  new-password here, the browser never offers to generate a
+                  strong one, and customers pick their own weak ones. */}
               <div style={{ display: "grid", gap: 14 }}>
+                {/* Which account the new password belongs to — hidden, but the
+                    password manager needs it to update the right saved entry. */}
+                <input
+                  type="text"
+                  name="username"
+                  autoComplete="username"
+                  value={email}
+                  readOnly
+                  aria-hidden="true"
+                  tabIndex={-1}
+                  style={{ display: "none" }}
+                />
                 <label>
                   <div style={{ fontSize: 11, fontWeight: 800, letterSpacing: ".08em", textTransform: "uppercase", color: "rgba(255,255,255,.36)", marginBottom: 8 }}>Current Password</div>
-                  <input type="password" value={currentPassword} onChange={(e) => setCurrentPassword(e.target.value)} style={inputStyle} placeholder="Enter current password" disabled={savingPassword} />
+                  <input type="password" autoComplete="current-password" value={currentPassword} onChange={(e) => setCurrentPassword(e.target.value)} style={inputStyle} placeholder="Enter current password" disabled={savingPassword} />
                 </label>
                 <label>
                   <div style={{ fontSize: 11, fontWeight: 800, letterSpacing: ".08em", textTransform: "uppercase", color: "rgba(255,255,255,.36)", marginBottom: 8 }}>New Password</div>
-                  <input type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} style={inputStyle} placeholder="Enter new password" disabled={savingPassword} />
+                  <input type="password" autoComplete="new-password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} style={inputStyle} placeholder="Enter new password" disabled={savingPassword} />
                 </label>
                 <label>
                   <div style={{ fontSize: 11, fontWeight: 800, letterSpacing: ".08em", textTransform: "uppercase", color: "rgba(255,255,255,.36)", marginBottom: 8 }}>Confirm Password</div>
-                  <input type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} style={inputStyle} placeholder="Confirm new password" disabled={savingPassword} />
+                  <input type="password" autoComplete="new-password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} style={inputStyle} placeholder="Confirm new password" disabled={savingPassword} />
                 </label>
                 <button type="submit" disabled={savingPassword}
                   style={{ marginTop: 4, padding: "12px 16px", borderRadius: 12, border: "1px solid rgba(56,189,248,.3)", background: "rgba(56,189,248,.14)", color: "#7dd3fc", fontSize: 14, fontWeight: 800, cursor: "pointer", opacity: savingPassword ? 0.65 : 1 }}>
