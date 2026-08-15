@@ -30,6 +30,7 @@ export async function GET(req: NextRequest) {
         name: true,
         email: true,
         role: true,
+        avatar: true,
         createdAt: true,
       },
     });
@@ -42,6 +43,7 @@ export async function GET(req: NextRequest) {
       name: user.name,
       email: user.email,
       role: user.role,
+      avatar: user.avatar,
       joined: user.createdAt.toISOString(),
     });
   } catch (error: any) {
@@ -64,32 +66,57 @@ export async function PATCH(req: NextRequest) {
     }
 
     const body = await req.json();
+
+    // A photo-only save must not have to resend name and email, and clearing
+    // the photo has to be distinguishable from not touching it: `null` means
+    // remove, absent means leave alone.
+    const photoOnly = body?.avatar !== undefined && body?.name === undefined && body?.email === undefined;
+
     const name = String(body?.name || "").trim();
     const email = String(body?.email || "").trim().toLowerCase();
 
-    if (!name || !email) {
+    if (!photoOnly && (!name || !email)) {
       return NextResponse.json({ error: "Name and email are required" }, { status: 400 });
     }
 
-    const emailOwner = await prisma.user.findFirst({
-      where: {
-        email,
-        NOT: { id: userId },
-      },
-      select: { id: true },
-    });
+    let avatar: string | null | undefined;
+    if (body?.avatar === null) {
+      avatar = null;
+    } else if (typeof body?.avatar === "string") {
+      if (!body.avatar.startsWith("data:image/")) {
+        return NextResponse.json({ error: "Photo must be an image" }, { status: 400 });
+      }
+      if (body.avatar.length > MAX_AVATAR_CHARS) {
+        return NextResponse.json({ error: "Photo must be under 2MB" }, { status: 400 });
+      }
+      avatar = body.avatar;
+    }
 
-    if (emailOwner) {
-      return NextResponse.json({ error: "Email is already in use" }, { status: 400 });
+    if (!photoOnly) {
+      const emailOwner = await prisma.user.findFirst({
+        where: {
+          email,
+          NOT: { id: userId },
+        },
+        select: { id: true },
+      });
+
+      if (emailOwner) {
+        return NextResponse.json({ error: "Email is already in use" }, { status: 400 });
+      }
     }
 
     const user = await prisma.user.update({
       where: { id: userId },
-      data: { name, email },
+      data: {
+        ...(photoOnly ? {} : { name, email }),
+        ...(avatar !== undefined ? { avatar } : {}),
+      },
       select: {
         name: true,
         email: true,
         role: true,
+        avatar: true,
         createdAt: true,
       },
     });
@@ -99,6 +126,7 @@ export async function PATCH(req: NextRequest) {
       name: user.name,
       email: user.email,
       role: user.role,
+      avatar: user.avatar,
       joined: user.createdAt.toISOString(),
     });
   } catch (error: any) {
