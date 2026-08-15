@@ -1,37 +1,33 @@
 /**
  * Signup gate.
  *
- * FinovaOS is introduced to the market but not selling yet, so every door that
- * would create a new account is closed and visitors are sent to the waitlist
- * instead — their interest is captured rather than lost.
+ * FinovaOS has launched, so the doors are OPEN by default. Signup pages,
+ * checkout and every "Get Started" CTA behave normally; the "Launching Soon"
+ * buttons and the waitlist CTA are gone because this flag now reads true
+ * without any environment variable being set.
  *
- * One switch controls all of it: `NEXT_PUBLIC_SIGNUPS_OPEN`. On launch day set
- * it to "true" in the production environment and everything below opens at
- * once — no code change, no redeploy of individual components.
+ * One switch still controls all of it: `NEXT_PUBLIC_SIGNUPS_OPEN`. The default
+ * flipped on launch — pre-launch a missing variable meant CLOSED, now it means
+ * OPEN. To shut the doors again (an incident, a pause on new signups) set the
+ * variable to exactly "false" in the production environment; nothing else has
+ * to change.
  *
  * The variable is NEXT_PUBLIC_ deliberately: the same value has to be readable
  * by proxy.ts, by API routes, and by client components that render CTAs. A
  * second server-only flag would be one more thing to keep in sync, and this is
  * not a secret — anyone can see whether signups are open by clicking one.
- *
- * Default is CLOSED. A deploy that forgets the variable should keep the doors
- * shut rather than quietly start taking money we cannot yet service.
  */
 
-export const SIGNUPS_OPEN = process.env.NEXT_PUBLIC_SIGNUPS_OPEN === "true";
+export const SIGNUPS_OPEN = process.env.NEXT_PUBLIC_SIGNUPS_OPEN !== "false";
 
 /**
  * The launch switch, moved to something a button can actually press.
  *
- * The environment variable still wins — it stays the deploy-time answer and
- * nothing about it changes. What it could never be is *flipped at runtime*: a
- * NEXT_PUBLIC_ value is baked into the client bundle at build time, so an admin
- * pressing "Launch Now" had no way to move it without a redeploy. So the gate
- * now also opens on a row written by /api/admin/launch.
- *
- * Default is still CLOSED, exactly as before. A missing row, a malformed row or
- * a database that will not answer all mean "not launched" — pre-launch is the
- * safe state, and this must never open the doors on its own.
+ * Kept for the admin "Launch Now" button, which writes this row. Now that the
+ * default above is OPEN the row is mostly historical: the only way to reach the
+ * database lookup below is to have explicitly set NEXT_PUBLIC_SIGNUPS_OPEN to
+ * "false", in which case a saved launch row can re-open the doors at runtime
+ * without a redeploy.
  */
 export const SITE_LAUNCHED_KEY = "siteLaunched";
 
