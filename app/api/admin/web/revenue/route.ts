@@ -13,11 +13,14 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
-    // Plan distribution (active companies)
+    // Plan distribution (active companies). Demo sandboxes carry plan
+    // ENTERPRISE + subscriptionStatus ACTIVE (lib/demoSandbox.ts), so they must
+    // be excluded here the same way /api/admin/dashboard already does — they are
+    // throwaway workspaces, not subscriptions.
     const active = await prisma.company.groupBy({
       by: ["plan"],
       _count: { plan: true },
-      where: { subscriptionStatus: "ACTIVE" },
+      where: { subscriptionStatus: "ACTIVE", isDemo: false, isActive: true },
     } as any);
     const dist = Object.fromEntries(active.map((a: any) => [String(a.plan || "STARTER").toUpperCase(), a._count.plan || 0]));
 

@@ -9,11 +9,16 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
-    // Count active companies by plan
+    // Count active companies by plan.
+    // Demo sandboxes are created as plan ENTERPRISE / subscriptionStatus ACTIVE
+    // (see lib/demoSandbox.ts) so the visitor can walk the whole product — with
+    // no isDemo filter here they were counted as paying Enterprise customers and
+    // inflated both "Active Accounts" and the Enterprise KPI. isActive:false
+    // covers purged/deactivated shells kept for the audit trail.
     const activeCompanies = await prisma.company.groupBy({
       by: ["plan"],
       _count: { plan: true },
-      where: { subscriptionStatus: "ACTIVE" },
+      where: { subscriptionStatus: "ACTIVE", isDemo: false, isActive: true },
     } as any);
 
     // MRR straight from Lemon Squeezy — see lib/lemonRevenue.ts for why the
