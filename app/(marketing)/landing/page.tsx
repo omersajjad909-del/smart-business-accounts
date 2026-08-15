@@ -87,6 +87,7 @@ const JSON_LD = {
       "sameAs": [
         "https://finovaforge.com",
         "https://www.finovaos.app",
+        "https://x.com/finovaos",
         "https://www.linkedin.com/in/umer-sajjad-657936417"
       ],
       "contactPoint": {
