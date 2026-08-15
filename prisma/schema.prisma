@@ -2369,3 +2369,29 @@ model SecurityIncident {
   @@index([detectedAt])
   @@index([severity])
 }
+
+/// A signup that has been submitted but not yet verified.
+///
+/// Company and User rows used to be written the moment the signup form was
+/// posted, before the OTP was even sent — so anyone could register a company
+/// under an address they did not control, and every abandoned attempt left a
+/// half-built tenant behind (and burned a `Company.companyNo`). Nothing is
+/// created in the real tables now until the code checks out; this row holds the
+/// submission in the meantime and is deleted the moment it is redeemed.
+///
+/// `payload` is the signup form as JSON, with the password already bcrypt-hashed
+/// — a plaintext password must never rest here.
+model PendingSignup {
+  id           String   @id @default(uuid())
+  email        String   @unique
+  payload      String   @db.Text
+  otpHash      String
+  otpExpiresAt DateTime
+  channel      String   @default("email")
+  /// Wrong codes so far. Guessing six digits is cheap without a ceiling.
+  attempts     Int      @default(0)
+  lastSentAt   DateTime @default(now())
+  createdAt    DateTime @default(now())
+
+  @@index([otpExpiresAt])
+}
