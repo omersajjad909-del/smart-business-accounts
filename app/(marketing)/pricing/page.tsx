@@ -794,21 +794,21 @@ export default function PricingPage() {
                     <span style={{ fontSize: 11, fontWeight: 800, color: "rgba(255,255,255,.8)", marginLeft: 6 }}>Mastercard</span>
                   </div>
                   {/* JazzCash */}
-                  <div style={{ display: "flex", alignItems: "center", gap: 6, background: "#CC0000", borderRadius: 8, padding: "6px 12px", height: 36 }}>
+                  {/* <div style={{ display: "flex", alignItems: "center", gap: 6, background: "#CC0000", borderRadius: 8, padding: "6px 12px", height: 36 }}>
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="white"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/></svg>
                     <span style={{ fontSize: 12, fontWeight: 800, color: "#fff" }}>JazzCash</span>
-                  </div>
+                  </div> */}
                   {/* Easypaisa */}
-                  <div style={{ display: "flex", alignItems: "center", gap: 6, background: "#44B549", borderRadius: 8, padding: "6px 12px", height: 36 }}>
+                  {/* <div style={{ display: "flex", alignItems: "center", gap: 6, background: "#44B549", borderRadius: 8, padding: "6px 12px", height: 36 }}>
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="white"><circle cx="12" cy="12" r="10"/><path d="M8 12l3 3 5-5" stroke="#44B549" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round"/></svg>
                     <span style={{ fontSize: 12, fontWeight: 800, color: "#fff" }}>Easypaisa</span>
-                  </div>
+                  </div> */}
                   {/* Bank Transfer */}
-                  <div style={{ display: "flex", alignItems: "center", gap: 6, background: "rgba(255,255,255,.05)", border: "1px solid rgba(255,255,255,.1)", borderRadius: 8, padding: "6px 12px", height: 36 }}>
+                  {/* <div style={{ display: "flex", alignItems: "center", gap: 6, background: "rgba(255,255,255,.05)", border: "1px solid rgba(255,255,255,.1)", borderRadius: 8, padding: "6px 12px", height: 36 }}>
                     <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.6)" strokeWidth="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
                     <span style={{ fontSize: 12, fontWeight: 700, color: "rgba(255,255,255,.6)" }}>Bank Transfer</span>
                     <span style={{ fontSize: 10, color: "rgba(255,255,255,.35)", fontWeight: 600 }}>IBFT</span>
-                  </div>
+                  </div> */}
                 </div>
               </div>
               <div style={{ marginTop: 16, paddingTop: 14, borderTop: "1px solid rgba(255,255,255,.05)", display: "flex", alignItems: "center", gap: 20, flexWrap: "wrap" }}>
