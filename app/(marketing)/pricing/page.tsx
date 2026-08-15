@@ -876,7 +876,8 @@ export default function PricingPage() {
           )}
         </div>
 
-        {/* ── AUTOMATION ADD-ON ────────────────────────────────── */}
+        {/* ── AUTOMATION ADD-ON (hidden — see SHOW_AUTOMATION_ADDON) ── */}
+        {SHOW_AUTOMATION_ADDON && (
         <div style={{ marginBottom: 80 }}>
           <div style={{ textAlign: "center", marginBottom: 36 }}>
             <div style={{ display: "inline-flex", alignItems: "center", gap: 8, background: "rgba(124,58,237,.12)", border: "1px solid rgba(124,58,237,.28)", borderRadius: 100, padding: "5px 14px", fontSize: 12, color: "#a78bfa", fontWeight: 700, marginBottom: 16 }}>
@@ -974,6 +975,7 @@ export default function PricingPage() {
             </div>
           </div>
         </div>
+        )}
 
         {/* ── FEATURE COMPARISON TABLE ────────────────────────── */}
         <div style={{ marginBottom: 80 }}>
@@ -1150,9 +1152,11 @@ export default function PricingPage() {
               })}
             </div>
 
-            <div style={{ marginTop: 12, fontSize: 12, color: "rgba(255,255,255,.32)" }}>
-              Need only the automation tools? <Link href="/onboarding/choose-plan?addon=automation" style={{ color: "#a78bfa", textDecoration: "none", fontWeight: 700 }}>Business Automation is sold separately →</Link>
-            </div>
+            {SHOW_AUTOMATION_ADDON && (
+              <div style={{ marginTop: 12, fontSize: 12, color: "rgba(255,255,255,.32)" }}>
+                Need only the automation tools? <Link href="/onboarding/choose-plan?addon=automation" style={{ color: "#a78bfa", textDecoration: "none", fontWeight: 700 }}>Business Automation is sold separately →</Link>
+              </div>
+            )}
           </div>
 
           <div style={{ height: 1, background: "rgba(255,255,255,.06)", marginBottom: 32 }} />
