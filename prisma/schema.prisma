@@ -2395,3 +2395,78 @@ model PendingSignup {
 
   @@index([otpExpiresAt])
 }
+
+// ================= PLATFORM BILLING INVOICES =================
+
+/// A permanent, immutable record of one payment FinovaOS collected for its own
+/// subscriptions — the platform's sales ledger, not a tenant's invoices.
+///
+/// Receipts used to be reconstructed on the fly from `ActivityLog` PAYMENT_EVENT
+/// rows, and the number was the row's position in that list. Two problems made
+/// those numbers unusable as tax records: the sequence was per-company, so every
+/// company's first payment was "INV-2026-001"; and it was positional, so an
+/// invoice was silently renumbered every time a newer payment arrived. A number
+/// on a document a customer has already downloaded can never move, so it is
+/// allocated once, here, and never recomputed.
+///
+/// Money columns are stored in `currency` — the currency the provider actually
+/// settled in (Lemon Squeezy and Stripe always USD, Safepay always PKR), which
+/// is not necessarily the currency the checkout page displayed.
+///
+/// Customer identity is snapshotted rather than joined: a tax record must keep
+/// showing who was billed at the time of sale, even after the company renames
+/// itself or the buyer changes their email.
+model PlatformInvoice {
+  id     String @id @default(cuid())
+  /// Global, gapless-per-year, immutable. "INV-2026-000001".
+  number String @unique
+
+  companyId   String
+  /// Snapshot — see model docs.
+  companyName String?
+
+  provider String // LEMONSQUEEZY | SAFEPAY | STRIPE | MANUAL
+  /// Idempotency key. A provider retrying its webhook must not mint a second
+  /// invoice number for a charge that already has one.
+  providerEventId        String? @unique
+  providerOrderId        String?
+  providerSubscriptionId String?
+
+  plan         String
+  billingCycle String @default("MONTHLY")
+
+  currency  String @default("USD")
+  subtotal  Float  @default(0)
+  discount  Float  @default(0)
+  /// Percentage, as the provider reported it (e.g. 17 for 17%).
+  taxRate   Float  @default(0)
+  taxAmount Float  @default(0)
+  /// "Sales Tax", "VAT", "GST" — whatever the provider charged under.
+  taxName   String?
+  total     Float  @default(0)
+
+  customerName    String?
+  customerEmail   String?
+  customerCountry String?
+  /// NTN / VAT / GST registration number, when the buyer supplied one.
+  customerTaxId   String?
+
+  cardBrand String?
+  cardLast4 String?
+
+  status         String    @default("PAID") // PAID | REFUNDED | PARTIALLY_REFUNDED | OPEN | VOID
+  refundedAmount Float     @default(0)
+  refundedAt     DateTime?
+
+  periodStart DateTime?
+  periodEnd   DateTime?
+
+  issuedAt  DateTime @default(now())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([companyId, issuedAt])
+  @@index([status, issuedAt])
+  @@index([provider, issuedAt])
+  @@index([issuedAt])
+}

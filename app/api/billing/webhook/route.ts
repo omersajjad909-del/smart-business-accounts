@@ -13,6 +13,7 @@ import {
   isSameCardCharge,
   parsePaymentEventDetails,
 } from "@/lib/billingInvoice";
+import { markPlatformInvoiceRefunded, recordPlatformInvoice } from "@/lib/platformInvoice";
 
 function safeDate(value: unknown) {
   if (!value) return null;
@@ -509,6 +510,14 @@ async function handleLemonWebhook(req: NextRequest, raw: string) {
       }).catch(() => {});
 
       if (refundedAmount > 0) {
+        // The ledger row keeps its number and stays in place — a refund is an
+        // amendment, never a deletion, because a filed tax return still has to
+        // reconcile against it.
+        await markPlatformInvoiceRefunded({
+          providerSubscriptionId: subscriptionId,
+          companyId,
+          amount: refundedAmount,
+        });
         await sendRefundConfirmationEmail(companyId, planCode, refundedAmount, refundedCurrency);
       }
     }
@@ -539,6 +548,11 @@ async function handleLemonWebhook(req: NextRequest, raw: string) {
     }).catch(() => {});
 
     if (refundedAmount > 0) {
+      await markPlatformInvoiceRefunded({
+        providerOrderId: String(payload?.data?.id || ""),
+        companyId,
+        amount: refundedAmount,
+      });
       await sendRefundConfirmationEmail(companyId, planCode, refundedAmount, refundedCurrency);
     }
   }
@@ -590,6 +604,43 @@ async function handleLemonWebhook(req: NextRequest, raw: string) {
     });
 
     if (!alreadyRecorded) {
+      // Permanent ledger row. Its number is allocated once, here, and is what
+      // the customer's PDF and the admin ledger both show from now on.
+      const invoiceCompany = await prisma.company.findUnique({
+        where: { id: companyId },
+        select: { name: true, country: true },
+      }).catch(() => null);
+
+      await recordPlatformInvoice({
+        companyId,
+        companyName: invoiceCompany?.name,
+        provider: "LEMONSQUEEZY",
+        // The order id is stable across both events of one charge; the
+        // subscription-invoice event falls back to its own id.
+        providerEventId: `lemon:${orderKey || payload?.data?.id || eventName}`,
+        providerOrderId: orderKey || null,
+        providerSubscriptionId: chargeSubscriptionId,
+        plan: planCode,
+        billingCycle,
+        currency,
+        // Lemon Squeezy reports every money field in minor units.
+        subtotal: Number(attrs?.subtotal ?? minorUnits) / 100,
+        discount: Number(attrs?.discount_total ?? 0) / 100,
+        taxRate: Number(attrs?.tax_rate ?? 0),
+        taxAmount: Number(attrs?.tax ?? 0) / 100,
+        taxName: attrs?.tax_name || null,
+        total: minorUnits / 100,
+        customerName: attrs?.user_name || null,
+        customerEmail: buyerEmail || null,
+        customerCountry: displayCountry || invoiceCompany?.country || null,
+        // No company-level tax registration is captured at signup yet, so this
+        // stays null until an admin fills it in on the ledger.
+        cardBrand: attrs?.card_brand || null,
+        cardLast4: attrs?.card_last_four || null,
+        periodEnd: safeDate(attrs?.renews_at),
+        issuedAt: safeDate(attrs?.created_at) || new Date(),
+      });
+
       await prisma.activityLog.create({
         data: {
           companyId, userId: null,
@@ -813,6 +864,27 @@ async function handleSafepayWebhook(req: NextRequest, raw: string) {
       displayCurrency: "PKR",
       displayCountry: "PK",
       invoiceAmount: amountPkr,
+    });
+
+    const safepayCompany = await prisma.company.findUnique({
+      where: { id: companyId },
+      select: { name: true },
+    }).catch(() => null);
+
+    // Safepay settles in PKR, so the ledger row is a rupee row — the admin
+    // screens total each currency separately rather than mixing them.
+    await recordPlatformInvoice({
+      companyId,
+      companyName: safepayCompany?.name,
+      provider: "SAFEPAY",
+      providerEventId: `safepay:${tracker || orderId}`,
+      providerOrderId: orderId || null,
+      plan: planCode,
+      billingCycle,
+      currency: "PKR",
+      total: amountPkr || 0,
+      customerCountry: "PK",
+      periodEnd: currentPeriodEnd,
     });
 
     await prisma.activityLog.create({

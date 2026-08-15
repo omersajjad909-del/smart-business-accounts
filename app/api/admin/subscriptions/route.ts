@@ -4,13 +4,19 @@ import { requireAdmin, logAdminAction } from "@/lib/adminAuth";
 
 export const runtime = "nodejs";
 
+/**
+ * List prices, used only when a company has never actually been charged.
+ * The real figure comes from the last invoice — a Pakistan-region Starter
+ * settles at ~$7.14, and reporting it as $49 overstated platform MRR by 7x.
+ */
 const MRR_MAP: Record<string, number> = {
   starter: 49,
+  professional: 99,
   pro: 99,
   enterprise: 249,
 };
 
-function getMrr(plan: string | null): number {
+function getListMrr(plan: string | null): number {
   if (!plan) return 0;
   return MRR_MAP[plan.toLowerCase()] ?? 0;
 }
@@ -42,16 +48,40 @@ export async function GET(req: NextRequest) {
       userCounts.map((uc) => [uc.companyId, uc._count.userId])
     );
 
-    const subscriptions = companies.map((c) => ({
-      id: c.id,
-      name: c.name,
-      plan: c.plan,
-      status: c.subscriptionStatus,
-      mrr: getMrr(c.plan),
-      currentPeriodEnd: c.currentPeriodEnd,
-      userCount: userCountMap.get(c.id) ?? 0,
-      createdAt: c.createdAt,
-    }));
+    // What each company was last actually charged, from the invoice ledger.
+    const lastCharge = new Map<string, { total: number; currency: string }>();
+    try {
+      const rows = await (prisma as any).platformInvoice.findMany({
+        where: { status: { in: ["PAID", "PARTIALLY_REFUNDED"] } },
+        orderBy: { issuedAt: "desc" },
+        select: { companyId: true, total: true, currency: true },
+      });
+      // Rows arrive newest-first, so the first one seen per company is the latest.
+      for (const row of rows) {
+        if (!lastCharge.has(row.companyId)) {
+          lastCharge.set(row.companyId, { total: Number(row.total) || 0, currency: row.currency });
+        }
+      }
+    } catch {
+      // Ledger not migrated yet — fall back to list prices below.
+    }
+
+    const subscriptions = companies.map((c) => {
+      const charged = lastCharge.get(c.id);
+      return {
+        id: c.id,
+        name: c.name,
+        plan: c.plan,
+        status: c.subscriptionStatus,
+        mrr: charged ? charged.total : getListMrr(c.plan),
+        currency: charged?.currency || "USD",
+        /** False when `mrr` is the plan's list price rather than a real charge. */
+        mrrFromInvoice: Boolean(charged),
+        currentPeriodEnd: c.currentPeriodEnd,
+        userCount: userCountMap.get(c.id) ?? 0,
+        createdAt: c.createdAt,
+      };
+    });
 
     return NextResponse.json({ subscriptions });
   } catch (e: any) {

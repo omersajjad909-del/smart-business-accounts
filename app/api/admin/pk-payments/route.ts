@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { sendPkPaymentStatusEmail } from "@/lib/email";
+import { recordPlatformInvoice } from "@/lib/platformInvoice";
 
 export const runtime = "nodejs";
 
@@ -36,7 +37,7 @@ export async function PATCH(req: NextRequest) {
       const periodEnd = new Date(now);
       periodEnd.setMonth(periodEnd.getMonth() + (updated.billingCycle === "yearly" ? 12 : 1));
 
-      await prisma.company.update({
+      const company = await prisma.company.update({
         where: { id: updated.companyId },
         data: {
           plan: updated.plan,
@@ -44,6 +45,26 @@ export async function PATCH(req: NextRequest) {
           currentPeriodEnd: periodEnd,
           cancelledAt: null,
         },
+        select: { name: true },
+      });
+
+      // A manually approved JazzCash/Easypaisa transfer is revenue like any
+      // other — it belongs in the same ledger, or the admin invoice list and
+      // the tax totals silently omit every Pakistani bank payment.
+      await recordPlatformInvoice({
+        companyId: updated.companyId,
+        companyName: company.name,
+        provider: "MANUAL",
+        providerEventId: `pkreq:${updated.id}`,
+        providerOrderId: updated.txId || null,
+        plan: updated.plan,
+        billingCycle: updated.billingCycle,
+        currency: "PKR",
+        total: Number(updated.amountPkr) || 0,
+        customerEmail: updated.email || null,
+        customerCountry: "PK",
+        periodEnd,
+        issuedAt: now,
       });
     }
 

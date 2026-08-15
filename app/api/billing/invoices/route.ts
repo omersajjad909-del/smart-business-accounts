@@ -12,8 +12,10 @@ export async function GET(req: NextRequest) {
     const ctx = await getCompanyBillingContext(companyId);
     if (!ctx) return apiError("Company not found", 404);
 
+    // `ledger` holds the raw PlatformInvoice row — internal detail the billing
+    // page does not need, so it is not shipped to the browser.
     return apiOk({
-      invoices: ctx.invoices.map(({ issuedAt, derived, ...invoice }) => invoice),
+      invoices: ctx.invoices.map(({ issuedAt, derived, ledger, ...invoice }) => invoice),
     });
   } catch (err) {
     console.error("[billing/invoices] Unexpected error:", err);

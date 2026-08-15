@@ -1,5 +1,6 @@
 import { signJwt, verifyJwt } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { listCompanyPlatformInvoices } from "@/lib/platformInvoice";
 
 const PLAN_PRICES: Record<string, number> = {
   STARTER: 49,
@@ -32,6 +33,8 @@ export type BillingInvoice = {
   billingCycle: string;
   /** True for a row derived from the plan's list price, not a recorded charge. */
   derived: boolean;
+  /** The PlatformInvoice row, when this invoice came from the permanent ledger. */
+  ledger?: any;
 };
 
 export function parsePaymentEventDetails(details: string | null | undefined): any {
@@ -175,6 +178,30 @@ export async function getCompanyBillingContext(companyId: string): Promise<Billi
     return { ...base, invoices: [] };
   }
 
+  // The permanent ledger is the source of truth once a charge has been recorded
+  // there: its numbers were allocated at payment time and never move. The
+  // ActivityLog reconstruction below is only for charges predating the ledger
+  // (and is why numbers used to be per-company and positional).
+  const ledgerRows = await listCompanyPlatformInvoices(companyId);
+  if (ledgerRows.length > 0) {
+    return {
+      ...base,
+      invoices: ledgerRows.map((row: any) => ({
+        id: `inv_${row.id}`,
+        number: row.number,
+        date: formatInvoiceDate(row.issuedAt),
+        issuedAt: row.issuedAt,
+        amount: Number(row.total) || 0,
+        currency: String(row.currency || currency).toUpperCase(),
+        status: row.status === "PAID" ? "paid" : row.status === "VOID" ? "void" : "open",
+        plan: String(row.plan || effectivePlan).toUpperCase(),
+        billingCycle: String(row.billingCycle || cycle).toUpperCase(),
+        derived: false,
+        ledger: row,
+      })),
+    };
+  }
+
   // Real charges, when we have them. Deriving the amount from the plan's list
   // price alone showed a $49.00 paid invoice to a customer whose card was
   // actually charged $7.14 — a receipt that disagrees with their statement.
@@ -264,11 +291,20 @@ export async function buildBillingInvoicePdfData(companyId: string, invoiceId: s
 
   const standardBase = PLAN_PRICES[invoice.plan] || 0;
   const standardAmount = invoice.billingCycle === "YEARLY" ? Math.round(standardBase * 12) : standardBase;
-  // Only a derived invoice can claim a discount: for a recorded charge the
-  // amount taken IS the line total. Comparing a PKR-region charge against the
-  // USD list price otherwise invented a "50% off" line that was never applied.
-  const discount = invoice.derived ? Math.max(0, standardAmount - invoice.amount) : 0;
-  const subtotal = invoice.derived ? standardAmount : invoice.amount;
+
+  // A ledger invoice carries the provider's own breakdown — the real subtotal,
+  // discount and tax that were charged. Only a derived row has to guess, and
+  // then only a discount: for a recorded charge the amount taken IS the line
+  // total. Comparing a PKR-region charge against the USD list price otherwise
+  // invented a "50% off" line that was never applied.
+  const ledger = invoice.ledger;
+  const subtotal = ledger
+    ? Number(ledger.subtotal) || invoice.amount
+    : invoice.derived ? standardAmount : invoice.amount;
+  const discount = ledger
+    ? Number(ledger.discount) || 0
+    : invoice.derived ? Math.max(0, standardAmount - invoice.amount) : 0;
+  const tax = ledger ? Number(ledger.taxAmount) || 0 : 0;
 
   return {
     invoiceNumber: invoice.number,
@@ -292,14 +328,20 @@ export async function buildBillingInvoicePdfData(companyId: string, invoiceId: s
         },
       ],
       subtotal,
-      tax: 0,
+      tax,
       discount,
       total: invoice.amount,
       currency: invoice.currency,
-      notes: discount > 0
-        ? "Subscription invoice for FinovaOS hosted billing. Launch offer applied: 50% off for first 3 months."
-        : "Subscription invoice for FinovaOS hosted billing.",
-      status: invoice.status === "paid" ? "PAID" : "OPEN",
+      notes: [
+        "Subscription invoice for FinovaOS hosted billing.",
+        discount > 0 && !ledger ? "Launch offer applied: 50% off for first 3 months." : "",
+        tax > 0 && ledger?.taxName ? `Includes ${ledger.taxName} at ${ledger.taxRate}%.` : "",
+        ledger?.status === "REFUNDED" ? "This payment has been refunded in full." : "",
+        ledger?.status === "PARTIALLY_REFUNDED"
+          ? `Partially refunded: ${ledger.currency} ${Number(ledger.refundedAmount).toFixed(2)}.`
+          : "",
+      ].filter(Boolean).join(" "),
+      status: ledger?.status === "REFUNDED" ? "REFUNDED" : invoice.status === "paid" ? "PAID" : "OPEN",
     },
   };
 }
