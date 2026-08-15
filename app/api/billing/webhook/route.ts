@@ -6,7 +6,13 @@ import { sendEmail } from "@/lib/email";
 import { emailTemplates } from "@/lib/emailTemplates";
 import { mapLemonSubscriptionStatus, verifyLemonSignature } from "@/lib/lemonsqueezy";
 import { mapSafepayEventToStatus, verifySafepaySignature } from "@/lib/safepay";
-import { createBillingInvoiceAccessToken, getHostedBillingInvoiceId } from "@/lib/billingInvoice";
+import {
+  PAYMENT_EVENT_DEDUPE_WINDOW_MS,
+  createBillingInvoiceAccessToken,
+  getHostedBillingInvoiceId,
+  isSameCardCharge,
+  parsePaymentEventDetails,
+} from "@/lib/billingInvoice";
 
 function safeDate(value: unknown) {
   if (!value) return null;
@@ -538,71 +544,108 @@ async function handleLemonWebhook(req: NextRequest, raw: string) {
   }
 
   if ((eventName === "order_created" || eventName === "subscription_payment_success") && companyId) {
-    await prisma.activityLog.create({
-      data: {
-        companyId, userId: null,
-        action: "PAYMENT_EVENT",
-        details: JSON.stringify({
-          provider: "LEMON_SQUEEZY", eventName,
-          // `total` is what the card was charged. This read `subtotal` first,
-          // which is the price *before* the discount — the launch-offer sale
-          // that actually collected $24.50 was recorded as $49.00.
-          amount: attrs?.total ?? attrs?.subtotal ?? null,
-          currency: attrs?.currency || "USD",
-          // Both order_created and subscription_payment_success fire for one
-          // payment, so readers must dedupe on this. Prefer the order id over
-          // the event's own id, which differs between the two events.
-          orderId: String(attrs?.order_id ?? payload?.data?.id ?? ""),
-          status: "paid",
-        }),
-      },
-    }).catch(() => {});
-
-    // Admin bell notification. Only the Pakistan gateway raised one before, so
-    // a Lemon Squeezy sale landed in the revenue figures with nothing in the
-    // bell — the $24.50 subscription went unannounced.
     const orderKey = String(attrs?.order_id ?? payload?.data?.id ?? "");
+    // `total` is what the card was charged. This read `subtotal` first, which
+    // is the price *before* the discount — the launch-offer sale that actually
+    // collected $24.50 was recorded as $49.00.
     const minorUnits = Number(attrs?.total ?? attrs?.subtotal ?? 0);
     const currency = String(attrs?.currency || "USD").toUpperCase();
     const buyerEmail = String(attrs?.user_email || attrs?.customer_email || "");
+    const chargeSubscriptionId = attrs?.subscription_id
+      ? String(attrs.subscription_id)
+      : eventName.startsWith("subscription_") ? String(payload?.data?.id || "") : null;
 
-    try {
-      // order_created and subscription_payment_success both fire for one
-      // payment, so key the notification on the order and skip the second.
-      const already = orderKey
-        ? await prisma.notification.findFirst({
-            where: { message: { contains: `#${orderKey}` } },
-            select: { id: true },
-          })
-        : null;
-
-      if (!already) {
-        const company = await prisma.company.findUnique({
-          where: { id: companyId },
-          select: { name: true },
-        }).catch(() => null);
-
-        const amountLabel =
-          Number.isFinite(minorUnits) && minorUnits > 0
-            ? `${currency} ${(minorUnits / 100).toFixed(2)}`
-            : "Payment";
-
-        await prisma.notification.create({
-          data: {
-            title: `💳 New Subscription: ${amountLabel}`,
-            message: [
-              company?.name || "Unknown company",
-              String(planCode || "").toUpperCase() || "PLAN",
-              buyerEmail,
-              `#${orderKey}`,
-            ].filter(Boolean).join(" · "),
-            type: "SUCCESS",
-            link: "/admin/subscriptions",
-            isRead: false,
+    // One card charge fires BOTH order_created and subscription_payment_success,
+    // and the two carry different ids (the order id vs the subscription-invoice
+    // id) — so keying on the id let both through, producing two invoice rows and
+    // two bell notifications for a single payment. Match on the money instead:
+    // same amount + currency from a *different* event name inside the window is
+    // the same charge. Two events with the SAME name stay separate, so a genuine
+    // double charge is still recorded and flagged below.
+    const recentPayments = Number.isFinite(minorUnits) && minorUnits > 0
+      ? await prisma.activityLog.findMany({
+          where: {
+            companyId,
+            action: "PAYMENT_EVENT",
+            createdAt: { gte: new Date(Date.now() - PAYMENT_EVENT_DEDUPE_WINDOW_MS) },
           },
-        });
-      }
-    } catch {}
+          orderBy: { createdAt: "desc" },
+          select: { createdAt: true, details: true },
+          take: 20,
+        }).catch(() => [])
+      : [];
+
+    const now = new Date();
+    const alreadyRecorded = recentPayments.some((log) => {
+      const det = parsePaymentEventDetails(log.details);
+      return isSameCardCharge(
+        {
+          eventName: det?.eventName,
+          amount: Number(det?.amount ?? 0),
+          currency: String(det?.currency || "USD").toUpperCase(),
+          at: log.createdAt,
+        },
+        { eventName, amount: minorUnits, currency, at: now },
+      );
+    });
+
+    if (!alreadyRecorded) {
+      await prisma.activityLog.create({
+        data: {
+          companyId, userId: null,
+          action: "PAYMENT_EVENT",
+          details: JSON.stringify({
+            provider: "LEMON_SQUEEZY", eventName,
+            amount: minorUnits,
+            currency,
+            orderId: orderKey,
+            // Read by the duplicate-charge detector above, which searched for a
+            // key this payload never carried and so never fired.
+            subscriptionId: chargeSubscriptionId,
+            status: "paid",
+          }),
+        },
+      }).catch(() => {});
+
+      // Admin bell notification. Only the Pakistan gateway raised one before, so
+      // a Lemon Squeezy sale landed in the revenue figures with nothing in the
+      // bell — the $24.50 subscription went unannounced.
+      try {
+        const already = orderKey
+          ? await prisma.notification.findFirst({
+              where: { message: { contains: `#${orderKey}` } },
+              select: { id: true },
+            })
+          : null;
+
+        if (!already) {
+          const company = await prisma.company.findUnique({
+            where: { id: companyId },
+            select: { name: true },
+          }).catch(() => null);
+
+          const amountLabel =
+            Number.isFinite(minorUnits) && minorUnits > 0
+              ? `${currency} ${(minorUnits / 100).toFixed(2)}`
+              : "Payment";
+
+          await prisma.notification.create({
+            data: {
+              title: `💳 New Subscription: ${amountLabel}`,
+              message: [
+                company?.name || "Unknown company",
+                String(planCode || "").toUpperCase() || "PLAN",
+                buyerEmail,
+                `#${orderKey}`,
+              ].filter(Boolean).join(" · "),
+              type: "SUCCESS",
+              link: "/admin/subscriptions",
+              isRead: false,
+            },
+          });
+        }
+      } catch {}
+    }
   }
 
   return apiOk({ received: true, provider: "lemonsqueezy" });

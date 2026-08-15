@@ -27,6 +27,7 @@ type PaymentMethodsResponse = {
 type Invoice = {
   id: string; number: string; date: string;
   amount: number; currency: string; status: "paid" | "open" | "void"; plan: string;
+  billingCycle?: string;
 };
 type Subscription = {
   plan: string; status: string; currentPeriodEnd: string | null;
@@ -151,7 +152,10 @@ const LEMON_ACCEPTED_METHODS = ["Visa", "Mastercard", "American Express", "Disco
 // — a hardcoded "$" prefix showed e.g. "$249.00 PKR" for PKR invoices.
 function formatInvoiceAmount(amount: number, currency: string) {
   const symbol = currency === "PKR" ? "₨" : currency === "USD" ? "$" : `${currency} `;
-  return `${symbol}${amount.toLocaleString()}${currency === "PKR" ? "" : ".00"}`;
+  // PKR is quoted in whole rupees, everything else keeps cents. Appending a
+  // literal ".00" rendered a real $7.14 charge as "$7.14.00".
+  const digits = currency === "PKR" ? 0 : 2;
+  return `${symbol}${amount.toLocaleString("en-US", { minimumFractionDigits: digits, maximumFractionDigits: digits })}`;
 }
 function formatCardNumber(val: string) { return val.replace(/\D/g,"").slice(0,16).replace(/(.{4})/g,"$1 ").trim(); }
 function formatExpiry(val: string) { const d = val.replace(/\D/g,"").slice(0,4); return d.length>2?d.slice(0,2)+"/"+d.slice(2):d; }
@@ -401,13 +405,34 @@ function BillingPage() {
           fetch("/api/public/pricing",          { cache:"no-store" }),
         ]);
 
+        // Parsed before the subscription block below, which prices itself off
+        // the newest recorded charge.
+        const invoiceList: Invoice[] = invRes.ok
+          ? (((await invRes.json())?.invoices as Invoice[]) || [])
+          : [];
+        setInvoices(invoiceList);
+
         if (meRes.ok) {
           const d = await meRes.json();
           const rawPlan = (d.plan || "STARTER").toUpperCase();
           // Addon codes are not base plans — treat as Enterprise (highest tier that would have addons)
           const planUpper = rawPlan.startsWith("ADDON-") ? "ENTERPRISE" : rawPlan;
           const amountMap: Record<string,number> = { STARTER:49, PRO:99, PROFESSIONAL:99, ENTERPRISE:249 };
-          setSubscription({ plan:planUpper, status:d.subscriptionStatus||"active", currentPeriodEnd:d.currentPeriodEnd||null, amount:amountMap[planUpper]??49, currency:"USD", introOfferClaimed:!!d.introOfferClaimed, billingCycle:d.billingCycle||"monthly" });
+          // What the card was actually charged, not the plan's international
+          // list price. A Pakistan-region Starter sale settles at ~$7.14, and
+          // the hardcoded map billed it on screen as "$49/mo" — a figure that
+          // matched neither the checkout page nor the invoice row below it.
+          const latestCharge = invoiceList[0];
+          const cycle = String(latestCharge?.billingCycle || d.billingCycle || "monthly").toLowerCase();
+          setSubscription({
+            plan: planUpper,
+            status: d.subscriptionStatus || "active",
+            currentPeriodEnd: d.currentPeriodEnd || null,
+            amount: latestCharge ? latestCharge.amount : (amountMap[planUpper] ?? 49),
+            currency: latestCharge?.currency || "USD",
+            introOfferClaimed: !!d.introOfferClaimed,
+            billingCycle: cycle === "yearly" ? "yearly" : "monthly",
+          });
           setExtraSeats(Math.max(0, Number(d.extraSeats || 0)));
           setTotalUsers(Number(d.totalUsers || 0));
           setEffectiveUserLimit(d.effectiveUserLimit ?? null);
@@ -417,7 +442,6 @@ function BillingPage() {
           setPaymentMeta(d);
           setPaymentMethods(d.paymentMethods || []);
         }
-        if (invRes.ok) { const d = await invRes.json(); setInvoices(d.invoices || []); }
         if (pricingRes.ok) {
           const d = await pricingRes.json();
           setPlanPricing({
@@ -682,7 +706,9 @@ function BillingPage() {
           { label:"Current Plan",   value: currentPlan.name,                          icon: currentPlan.icon, color: currentPlan.color },
           { label:"Status",         value: subscription?.status||"—",                 icon: "●",              color: "#34d399", isStatus:true },
           { label:"Next Renewal",   value: subscription?.currentPeriodEnd ? fmtDate(subscription.currentPeriodEnd) : "—", icon:"📅", color:"#fbbf24" },
-          { label:"Monthly Amount", value: subscription ? `$${subscription.amount}/mo` : "—",                 icon: "💰", color: "#38bdf8" },
+          { label: subscription?.billingCycle === "yearly" ? "Yearly Amount" : "Monthly Amount",
+            value: subscription ? `${formatInvoiceAmount(subscription.amount, subscription.currency)}/${subscription.billingCycle === "yearly" ? "yr" : "mo"}` : "—",
+            icon: "💰", color: "#38bdf8" },
         ].map(s => (
           <div key={s.label} style={{ padding: isMobile ? "12px 10px" : "17px 18px", borderRadius:16, background:"rgba(255,255,255,.03)", border:"1px solid rgba(255,255,255,.07)", display:"flex", alignItems:"center", gap:14 }}>
             <div style={{ width:40, height:40, borderRadius:12, background:`${s.color}18`, display:"flex", alignItems:"center", justifyContent:"center", fontSize:18, flexShrink:0 }}>{s.icon}</div>
@@ -721,7 +747,10 @@ function BillingPage() {
                 <div style={{ padding: isMobile ? "12px 11px" : "20px 24px", borderRadius:16, background:`linear-gradient(135deg,${currentPlan.gradFrom}18,${currentPlan.gradTo}10)`, border:`1px solid ${currentPlan.color}22`, textAlign:"center", minWidth:150 }}>
                   <div style={{ fontSize:30, marginBottom:6 }}>{currentPlan.icon}</div>
                   <div style={{ fontSize:19, fontWeight:900, color:currentPlan.color }}>{currentPlan.name}</div>
-                  <div style={{ fontSize:12, color:"rgba(255,255,255,.35)", marginTop:4 }}>${currentPlan.monthlyPrice}<span style={{ fontSize:11 }}>/mo</span></div>
+                  <div style={{ fontSize:12, color:"rgba(255,255,255,.35)", marginTop:4 }}>
+                    {subscription ? formatInvoiceAmount(subscription.amount, subscription.currency) : `$${currentPlan.monthlyPrice}`}
+                    <span style={{ fontSize:11 }}>/{subscription?.billingCycle === "yearly" ? "yr" : "mo"}</span>
+                  </div>
                   {isCanceled && <div style={{ marginTop:8, padding:"3px 10px", borderRadius:99, background:"rgba(239,68,68,.12)", border:"1px solid rgba(239,68,68,.22)", fontSize:10, fontWeight:700, color:"#f87171", display:"inline-block" }}>CANCELED</div>}
                 </div>
                 {/* Details */}
@@ -730,7 +759,7 @@ function BillingPage() {
                     { label:"Status",        node: <StatusBadge status={subscription?.status?.toLowerCase()||"active"} /> },
                     { label:"Billing Cycle", node: <span style={{ fontSize:14, fontWeight:800 }}>{subscription?.billingCycle==="yearly"?"Yearly":"Monthly"}</span> },
                     { label:"Renewal Date",  node: <span style={{ fontSize:14, fontWeight:800 }}>{subscription?.currentPeriodEnd ? fmtDate(subscription.currentPeriodEnd) : "—"}</span> },
-                    { label:"Currency",      node: <span style={{ fontSize:14, fontWeight:800 }}>USD</span> },
+                    { label:"Currency",      node: <span style={{ fontSize:14, fontWeight:800 }}>{subscription?.currency || "USD"}</span> },
                   ].map(r => (
                     <div key={r.label}>
                       <div style={{ fontSize:10, fontWeight:700, color:"rgba(255,255,255,.3)", letterSpacing:".06em", textTransform:"uppercase", marginBottom:7 }}>{r.label}</div>
