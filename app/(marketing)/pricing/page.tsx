@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { formatFromUSD } from "@/lib/currency-client";
 import { STANDALONE_MODULE_IDS } from "@/lib/customPlanPricing";
+import { signupHrefFor } from "@/lib/signupGate";
 import { useSignupsOpen } from "@/hooks/useSignupsOpen";
 
 type BillingCycle = "monthly" | "yearly";
@@ -585,6 +586,36 @@ export default function PricingPage() {
     return formatPrice(usdDiffPerMonth * 12);
   };
 
+  /**
+   * One module's list price, exactly as Admin → Plans set it.
+   *
+   * Admin stores four figures per module — USD monthly, USD annual-per-month,
+   * PKR monthly, PKR annual-per-month — and /api/public/pricing publishes all
+   * four. This page only ever read `price` (USD monthly) and ran it through FX,
+   * so a Pakistani visitor was quoted a converted international rate instead of
+   * the rupee price actually on file: PKR 4,170 for Accounting against the
+   * PKR 2,999 admin had set, more than a whole Starter plan. The yearly toggle
+   * did nothing here either. Both currencies and both cycles now come straight
+   * from the admin config, with the same fallbacks the server uses.
+   */
+  const getModuleDisplayPrice = (mod: any) => {
+    if (isPKUser) {
+      const pkr = billing === "yearly"
+        ? (mod.pricePkrYearly ?? mod.pricePkr)
+        : mod.pricePkr;
+      if (pkr != null) return `₨${Number(pkr).toLocaleString("en-PK")}`;
+    }
+    const usd = billing === "yearly"
+      ? (mod.priceYearly ?? Math.round(Number(mod.price) * (1 - yearlyDiscount / 100)))
+      : mod.price;
+    return formatPrice(Number(usd));
+  };
+
+  // Buying one standalone module is its own checkout — no seats, no branches,
+  // nothing else ticked.
+  const buildSingleModuleHref = (id: string) =>
+    `/onboarding/choose-plan?plan=custom&modules=${id}&extraUsers=0&extraBranches=0&cycle=${billing}&currency=${currency}&country=${country}`;
+
   const buildHref = (slug: string) => `/onboarding/signup/${slug}?cycle=${billing}&currency=${currency}&country=${country}`;
   const buildCustomHref = () => `/onboarding/choose-plan?plan=custom&modules=${selectedModules.join(",")}&extraUsers=${extraUsers}&extraBranches=${extraBranches}&cycle=${billing}&currency=${currency}&country=${country}`;
   const toggleModule = (id: string) => setSelectedModules(p => p.includes(id) ? p.filter(x => x !== id) : [...p, id]);
@@ -1103,18 +1134,15 @@ export default function PricingPage() {
               {STANDALONE_APPS.map(app => {
                 const mod = customPlanData.modules.find((m: any) => m.id === app.id);
                 if (!mod) return null;
-                const active = selectedModules.length === 1 && selectedModules[0] === app.id;
                 return (
-                  <button
+                  <Link
                     key={app.id}
-                    onClick={() => selectOnlyModule(app.id)}
+                    href={signupsOpen ? buildSingleModuleHref(app.id) : WAITLIST_HREF}
                     style={{
-                      textAlign: "left", padding: "18px 18px 16px", borderRadius: 16, cursor: "pointer",
-                      fontFamily: ff, color: "white", transition: "all .2s",
-                      border: `1.5px solid ${active ? app.color + "80" : "rgba(255,255,255,.07)"}`,
-                      background: active
-                        ? `linear-gradient(160deg,${app.color}1f,rgba(255,255,255,.02))`
-                        : "rgba(255,255,255,.025)",
+                      display: "block", textAlign: "left", padding: "18px 18px 16px", borderRadius: 16, cursor: "pointer",
+                      fontFamily: ff, color: "white", textDecoration: "none", transition: "all .2s",
+                      border: "1.5px solid rgba(255,255,255,.07)",
+                      background: "rgba(255,255,255,.025)",
                     }}
                   >
                     <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, marginBottom: 10 }}>
