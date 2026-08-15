@@ -93,7 +93,13 @@ export async function GET(req: NextRequest) {
       where: { userId },
       orderBy: { createdAt: "desc" },
       take: 10,
-      select: { id: true, type: true, subject: true, status: true, priority: true, createdAt: true },
+      select: {
+        id: true, type: true, subject: true, status: true, priority: true, createdAt: true,
+        // A review's own progress is separate from the ticket status: whether it
+        // carries a rating, whether the user allowed publishing, and whether an
+        // admin has actually published it as a testimonial.
+        rating: true, publishConsent: true, testimonialId: true,
+      },
     });
     return NextResponse.json({ items });
   } catch (e: any) {

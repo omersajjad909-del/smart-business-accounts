@@ -10,31 +10,35 @@ type FeedbackType = "feedback" | "complaint" | "suggestion" | "bug" | "general";
 
 const TYPES: {
   id: FeedbackType; label: string; icon: string; color: string;
-  desc: string; placeholder: string;
+  // "label" is the button text; "noun" is the same thing inside a sentence
+  // ("Your review has been submitted"), because the two rarely read alike.
+  noun: string; desc: string; placeholder: string;
 }[] = [
   {
-    id: "feedback", label: "Feedback", icon: "⭐", color: "#34d399",
-    desc: "Share your experience",
+    // This is the old "Write a Review" page in type form — rating, consent and
+    // all. There is no separate review page any more.
+    id: "feedback", label: "Write a Review", icon: "⭐", color: "#34d399",
+    noun: "review", desc: "Rate your experience",
     placeholder: "What do you like? What's working well? Share your overall experience with FinovaOS...",
   },
   {
     id: "complaint", label: "Complaint", icon: "⚠️", color: "#f87171",
-    desc: "Issue or problem",
+    noun: "complaint", desc: "Issue or problem",
     placeholder: "What happened? Which page, what went wrong, since when — describe in detail...",
   },
   {
     id: "suggestion", label: "Suggestion", icon: "💡", color: "#fbbf24",
-    desc: "New idea or improvement",
+    noun: "suggestion", desc: "New idea or improvement",
     placeholder: "What is your idea? What feature should be added or improved...",
   },
   {
     id: "bug", label: "Bug Report", icon: "🐛", color: "#a78bfa",
-    desc: "Technical error or glitch",
+    noun: "bug report", desc: "Technical error or glitch",
     placeholder: "Which page, what happened, what was expected, also mention browser/device...",
   },
   {
     id: "general", label: "General", icon: "💬", color: "#60a5fa",
-    desc: "Anything else",
+    noun: "message", desc: "Anything else",
     placeholder: "Share anything you'd like us to know...",
   },
 ];
@@ -63,7 +67,20 @@ const STATUS_META: Record<string, { label: string; color: string }> = {
 type HistoryItem = {
   id: string; type: string; subject: string;
   status: string; priority: string; createdAt: string;
+  rating?: number | null; publishConsent?: boolean; testimonialId?: string | null;
 };
+
+/**
+ * Where a submitted review stands on its way to the public site. Returns null
+ * for anything that is not a review, or a review the user never allowed us to
+ * publish — those are read by the team but never go anywhere public.
+ */
+function reviewStage(item: HistoryItem): { label: string; color: string } | null {
+  if (item.type !== "feedback" || !item.rating) return null;
+  if (item.testimonialId) return { label: "🌐 Live on website", color: "#34d399" };
+  if (item.publishConsent) return { label: "⏳ Awaiting approval", color: "#fbbf24" };
+  return { label: "🔒 Private review", color: "#64748b" };
+}
 
 export default function FeedbackPage() {
   const { isMobile } = useResponsive();
@@ -169,10 +186,10 @@ export default function FeedbackPage() {
       {/* Header */}
       <div style={{ marginBottom: "28px" }}>
         <h1 style={{ fontSize: "22px", fontWeight: 700, color: "var(--text-primary)", margin: 0 }}>
-          Feedback & Support
+          Feedback & Reviews
         </h1>
         <p style={{ fontSize: "13px", color: "var(--text-muted)", marginTop: "4px" }}>
-          Share your experience, report an issue, or suggest an improvement — we're listening
+          Write a review, report an issue, or suggest an improvement — we're listening
         </p>
       </div>
 
@@ -188,7 +205,7 @@ export default function FeedbackPage() {
             Received! Thank you
           </div>
           <div style={{ fontSize: "13px", color: "var(--text-muted)", marginBottom: "16px" }}>
-            Your {activeType.label} has been submitted. We'll review it shortly.
+            Your {activeType.noun} has been submitted. We'll review it shortly.
           </div>
           <div style={{
             display: "inline-block", padding: "4px 12px", borderRadius: "6px",
@@ -326,7 +343,7 @@ export default function FeedbackPage() {
               style={inputStyle}
               value={subject}
               onChange={e => setSubject(e.target.value)}
-              placeholder={`Brief title for your ${activeType.label.toLowerCase()}`}
+              placeholder={`Brief title for your ${activeType.noun}`}
             />
           </div>
 
@@ -518,9 +535,17 @@ export default function FeedbackPage() {
               const t = TYPES.find(x => x.id === item.type);
               const p = PRIORITIES.find(x => x.value === item.priority);
               const s = STATUS_META[item.status] || { label: item.status, color: "#64748b" };
+              const review = reviewStage(item);
+              const badge = (color: string): React.CSSProperties => ({
+                fontSize: "10px", fontWeight: 700, padding: "2px 8px",
+                borderRadius: "10px", whiteSpace: "nowrap",
+                background: `${color}15`, color,
+                border: `1px solid ${color}35`,
+              });
               return (
                 <div key={item.id} style={{
-                  display: "grid", gridTemplateColumns: "1fr auto auto auto",
+                  display: isMobile ? "block" : "grid",
+                  gridTemplateColumns: "1fr auto",
                   gap: "12px", alignItems: "center",
                   padding: "12px 14px", borderRadius: "9px",
                   background: "var(--app-bg)", border: "1px solid var(--border)",
@@ -531,41 +556,33 @@ export default function FeedbackPage() {
                       <span style={{ fontSize: "13px", fontWeight: 600, color: "var(--text-primary)" }}>
                         {item.subject}
                       </span>
+                      {/* The stars the user gave, so a review reads as a review at a glance. */}
+                      {item.rating ? (
+                        <span style={{ fontSize: "11px", color: "#fbbf24", letterSpacing: "1px" }}>
+                          {"★".repeat(item.rating)}<span style={{ opacity: .3 }}>{"★".repeat(5 - item.rating)}</span>
+                        </span>
+                      ) : null}
                     </div>
                     <div style={{ fontSize: "11px", color: "var(--text-muted)", marginTop: "2px", paddingLeft: "20px" }}>
                       #{item.id.slice(-8).toUpperCase()} · {fmtDate(item.createdAt)}
                     </div>
                   </div>
-                  {/* Priority */}
-                  <span style={{
-                    fontSize: "10px", fontWeight: 700, padding: "2px 8px",
-                    borderRadius: "10px", whiteSpace: "nowrap",
-                    background: `${p?.color || "#64748b"}15`,
-                    color: p?.color || "#64748b",
-                    border: `1px solid ${p?.color || "#64748b"}35`,
+                  {/* Badges wrap instead of forcing fixed columns, because a review
+                      carries one more of them than everything else does. */}
+                  <div style={{
+                    display: "flex", gap: "6px", flexWrap: "wrap",
+                    justifyContent: isMobile ? "flex-start" : "flex-end",
+                    marginTop: isMobile ? "9px" : 0, paddingLeft: isMobile ? "20px" : 0,
                   }}>
-                    {p?.label || item.priority}
-                  </span>
-                  {/* Type */}
-                  <span style={{
-                    fontSize: "10px", fontWeight: 700, padding: "2px 8px",
-                    borderRadius: "10px", whiteSpace: "nowrap",
-                    background: `${t?.color || "#64748b"}15`,
-                    color: t?.color || "#64748b",
-                    border: `1px solid ${t?.color || "#64748b"}35`,
-                  }}>
-                    {t?.label || item.type}
-                  </span>
-                  {/* Status */}
-                  <span style={{
-                    fontSize: "10px", fontWeight: 700, padding: "2px 8px",
-                    borderRadius: "10px", whiteSpace: "nowrap",
-                    background: `${s.color}15`,
-                    color: s.color,
-                    border: `1px solid ${s.color}35`,
-                  }}>
-                    {s.label}
-                  </span>
+                    <span style={badge(p?.color || "#64748b")}>
+                      {p?.label || item.priority}
+                    </span>
+                    <span style={{ ...badge(t?.color || "#64748b"), textTransform: "capitalize" }}>
+                      {t?.noun || item.type}
+                    </span>
+                    <span style={badge(s.color)}>{s.label}</span>
+                    {review && <span style={badge(review.color)}>{review.label}</span>}
+                  </div>
                 </div>
               );
             })}

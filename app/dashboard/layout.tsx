@@ -2635,8 +2635,7 @@ export default function DashboardLayout({
                       { icon:"🎨", label:"Appearance",       href:"/dashboard/settings/appearance" },
                       { icon:"👥", label:"Team Members",     href:"/dashboard/users" },
                       { icon:"🔔", label:"Notifications",    href:"/dashboard/notifications" },
-                      { icon:"⭐", label:"Write a Review",    href:"/dashboard/testimonial" },
-                      { icon:"💬", label:"Feedback & Support",href:"/dashboard/feedback" },
+                      { icon:"⭐", label:"Feedback & Reviews",href:"/dashboard/feedback" },
                     ].map(item => (
                       <a key={item.href} href={item.href} onClick={()=>setShowUserMenu(false)}
                         style={{display:"flex",alignItems:"center",gap:10,padding:"9px 12px",borderRadius:9,color:"rgba(255,255,255,0.65)",fontSize:12,fontWeight:500,textDecoration:"none",transition:"all .15s"}}
