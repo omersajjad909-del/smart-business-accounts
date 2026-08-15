@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
@@ -15,9 +15,9 @@ type PlanPricing = {
 };
 
 const DEFAULT_HIGHLIGHTS = {
-  starter:    ["Up to 3 users","Sales & purchase invoices","Ledger & trial balance","Basic reports","Chart of accounts","Email support","🤖 AI Chat"],
-  professional: ["Up to 10 users","Everything in Starter","Inventory management","Bank reconciliation","HR & Payroll","CRM + Advanced reports","🤖 AI Assistant (ask anything)","🤖 Smart invoice & expense AI"],
-  enterprise: ["Up to 25 users","Everything in Professional","API access","Integration-ready APIs & webhooks","Multi-currency","Priority support 24/7","🤖 AI Chat","🤖 AI Financial Insights","🤖 Smart Alerts & Anomaly Detection","🤖 Revenue Forecast","🤖 Market Intelligence","🤖 AI Business Advisor","🤖 Full AI Suite"],
+  starter:    ["Up to 3 users","Sales & purchase invoices","Ledger & trial balance","Basic reports","Chart of accounts","Email support","ðŸ¤– AI Chat"],
+  professional: ["Up to 10 users","Everything in Starter","Inventory management","Bank reconciliation","HR & Payroll","CRM + Advanced reports","ðŸ¤– AI Assistant (ask anything)","ðŸ¤– Smart invoice & expense AI"],
+  enterprise: ["Up to 25 users","Everything in Professional","API access","Integration-ready APIs & webhooks","Multi-currency","Priority support 24/7","ðŸ¤– AI Chat","ðŸ¤– AI Financial Insights","ðŸ¤– Smart Alerts & Anomaly Detection","ðŸ¤– Revenue Forecast","ðŸ¤– Market Intelligence","ðŸ¤– AI Business Advisor","ðŸ¤– Full AI Suite"],
 };
 
 const PLANS = [
@@ -55,10 +55,10 @@ const PLANS = [
 ];
 
 const MODULE_CATEGORIES = [
-  { id: "core",         label: "Core",         icon: "⚡", color: "#818cf8" },
-  { id: "finance",      label: "Finance",      icon: "💰", color: "#34d399" },
-  { id: "operations",   label: "Operations",   icon: "⚙️", color: "#38bdf8" },
-  { id: "integrations", label: "Integrations", icon: "🔗", color: "#f97316" },
+  { id: "core",         label: "Core",         icon: "âš¡", color: "#818cf8" },
+  { id: "finance",      label: "Finance",      icon: "ðŸ’°", color: "#34d399" },
+  { id: "operations",   label: "Operations",   icon: "âš™ï¸", color: "#38bdf8" },
+  { id: "integrations", label: "Integrations", icon: "ðŸ”—", color: "#f97316" },
 ];
 
 // Modules that are a finished product on their own. The picker uses this to
@@ -66,15 +66,15 @@ const MODULE_CATEGORIES = [
 // whether the module only layers on top of something else.
 const STANDALONE_IDS = new Set<string>(STANDALONE_MODULE_IDS);
 
-// Single-app pitches — what the account actually looks like when this is the
+// Single-app pitches â€” what the account actually looks like when this is the
 // only module on it. Ordered by how often people ask for it on its own.
 const STANDALONE_APPS = [
-  { id: "hr_payroll",          label: "Payroll & HR",     icon: "👨‍💼", color: "#f472b6", points: ["Employees & attendance", "Monthly salary run + payslips", "Advance salary & loans"] },
-  { id: "crm",                 label: "CRM",              icon: "👥",   color: "#a5b4fc", points: ["Contacts & companies", "Sales pipeline & leads", "Interaction history"] },
-  { id: "inventory",           label: "Inventory",        icon: "📦",   color: "#38bdf8", points: ["Stock in / stock out", "GRN & barcode scanning", "Low-stock alerts"] },
-  { id: "accounting",          label: "Accounting",       icon: "📒",   color: "#818cf8", points: ["Invoices & vouchers", "Ledger & trial balance", "P&L and balance sheet"] },
-  { id: "trading",             label: "Trading Desk",     icon: "🔄",   color: "#fbbf24", points: ["Order desk & procurement", "Dispatch board", "Outstandings & conversions"] },
-  { id: "bank_reconciliation", label: "Bank & Payments",  icon: "🏦",   color: "#34d399", points: ["Statement import", "Discrepancy flagging", "Receipts & payment vouchers"] },
+  { id: "hr_payroll",          label: "Payroll & HR",     icon: "ðŸ‘¨â€ðŸ’¼", color: "#f472b6", points: ["Employees & attendance", "Monthly salary run + payslips", "Advance salary & loans"] },
+  { id: "crm",                 label: "CRM",              icon: "ðŸ‘¥",   color: "#a5b4fc", points: ["Contacts & companies", "Sales pipeline & leads", "Interaction history"] },
+  { id: "inventory",           label: "Inventory",        icon: "ðŸ“¦",   color: "#38bdf8", points: ["Stock in / stock out", "GRN & barcode scanning", "Low-stock alerts"] },
+  { id: "accounting",          label: "Accounting",       icon: "ðŸ“’",   color: "#818cf8", points: ["Invoices & vouchers", "Ledger & trial balance", "P&L and balance sheet"] },
+  { id: "trading",             label: "Trading Desk",     icon: "ðŸ”„",   color: "#fbbf24", points: ["Order desk & procurement", "Dispatch board", "Outstandings & conversions"] },
+  { id: "bank_reconciliation", label: "Bank & Payments",  icon: "ðŸ¦",   color: "#34d399", points: ["Statement import", "Discrepancy flagging", "Receipts & payment vouchers"] },
 ];
 
 const DEFAULT_PUBLIC_PRICING: PlanPricing = {
@@ -93,7 +93,7 @@ const DEFAULT_SEAT_PRICING = {
   yearly: 6,
 };
 
-// ── FEATURE COMPARISON DATA ──────────────────────────────────────────────────
+// â”€â”€ FEATURE COMPARISON DATA â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 type Val = boolean | string | null;
 interface Feature { name: string; permKey?: string; starter: Val; pro: Val; enterprise: Val; tooltip?: string; }
 interface Category { id: string; icon: string; title: string; features: Feature[]; }
@@ -101,7 +101,7 @@ interface Category { id: string; icon: string; title: string; features: Feature[
 const COMPARISON: Category[] = [
   {
     id: "platform",
-    icon: "🏗️",
+    icon: "ðŸ—ï¸",
     title: "Core Platform",
     features: [
       { name: "Users", starter: "Up to 3", pro: "Up to 10", enterprise: "Up to 25" },
@@ -115,7 +115,7 @@ const COMPARISON: Category[] = [
   },
   {
     id: "accounting",
-    icon: "📒",
+    icon: "ðŸ“’",
     title: "Accounting & Finance",
     features: [
       { name: "Chart of accounts", starter: true, pro: true, enterprise: true },
@@ -131,7 +131,7 @@ const COMPARISON: Category[] = [
   },
   {
     id: "invoicing",
-    icon: "🧾",
+    icon: "ðŸ§¾",
     title: "Invoicing & Sales",
     features: [
       { name: "Sales invoices", starter: true, pro: true, enterprise: true },
@@ -148,7 +148,7 @@ const COMPARISON: Category[] = [
   },
   {
     id: "inventory",
-    icon: "📦",
+    icon: "ðŸ“¦",
     title: "Inventory & Stock",
     features: [
       { name: "Item catalog", starter: true, pro: true, enterprise: true },
@@ -165,7 +165,7 @@ const COMPARISON: Category[] = [
   },
   {
     id: "banking",
-    icon: "🏦",
+    icon: "ðŸ¦",
     title: "Banking & Payments",
     features: [
       { name: "Bank account management", starter: true, pro: true, enterprise: true },
@@ -180,7 +180,7 @@ const COMPARISON: Category[] = [
   },
   {
     id: "reports",
-    icon: "📊",
+    icon: "ðŸ“Š",
     title: "Reports & Analytics",
     features: [
       { name: "Basic reports (sales, purchases)", starter: true, pro: true, enterprise: true },
@@ -199,7 +199,7 @@ const COMPARISON: Category[] = [
   },
   {
     id: "hr",
-    icon: "👥",
+    icon: "ðŸ‘¥",
     title: "HR & Payroll",
     features: [
       { name: "Employee management", starter: false, pro: true, enterprise: true },
@@ -211,7 +211,7 @@ const COMPARISON: Category[] = [
   },
   {
     id: "crm",
-    icon: "🤝",
+    icon: "ðŸ¤",
     title: "CRM & Customer Hub",
     features: [
       { name: "Customer management", starter: true, pro: true, enterprise: true },
@@ -226,7 +226,7 @@ const COMPARISON: Category[] = [
   },
   {
     id: "ai",
-    icon: "🤖",
+    icon: "ðŸ¤–",
     title: "AI Features",
     features: [
       { name: "AI assistant (ask anything)",    permKey: "AI_ASSISTANT",             starter: false, pro: true,  enterprise: true },
@@ -241,7 +241,7 @@ const COMPARISON: Category[] = [
   },
   {
     id: "compliance",
-    icon: "📋",
+    icon: "ðŸ“‹",
     title: "Tax & Compliance",
     features: [
       { name: "GST / VAT / WHT / FED", starter: true, pro: true, enterprise: true },
@@ -254,7 +254,7 @@ const COMPARISON: Category[] = [
   },
   {
     id: "support",
-    icon: "🎯",
+    icon: "ðŸŽ¯",
     title: "Support & Onboarding",
     features: [
       { name: "Email support", starter: true, pro: true, enterprise: true },
@@ -271,7 +271,7 @@ const COMPARISON: Category[] = [
 
 
 /**
- * Business Automation add-on — hidden on the public pricing page.
+ * Business Automation add-on â€” hidden on the public pricing page.
  *
  * The section advertised a live price and an "Add to my plan" flow for a module
  * that is not selling yet. Kept behind this flag rather than deleted: flip it to
@@ -284,8 +284,8 @@ const FAQS = [
   { q: "Will prices automatically match my country?", a: "Yes. We detect your region and show localized display pricing. You can still change the currency manually at any time." },
   { q: "Is the charged currency the same as displayed?", a: "Displayed pricing is localized for convenience. Final billing currency is confirmed during checkout." },
   { q: "Can I build my own package?", a: "Yes. The Custom plan lets you pick only the modules you need and see an instant estimate." },
-  { q: "Can I buy just one module — payroll only, for example?", a: "Yes. Payroll & HR, CRM, Inventory, Accounting, Trading Desk and Bank & Payments each run on their own, so you can subscribe to a single one and pay only for that. Modules marked Add-on (Advanced Reports, Multi-Branch, WhatsApp & SMS, API Access, Tax & Compliance) layer on top of one of those." },
-  { q: "Can I add more modules later?", a: "Yes. Start with one module and add others whenever you need them — your data stays in the same account and billing adjusts from the next cycle." },
+  { q: "Can I buy just one module â€” payroll only, for example?", a: "Yes. Payroll & HR, CRM, Inventory, Accounting, Trading Desk and Bank & Payments each run on their own, so you can subscribe to a single one and pay only for that. Modules marked Add-on (Advanced Reports, Multi-Branch, WhatsApp & SMS, API Access, Tax & Compliance) layer on top of one of those." },
+  { q: "Can I add more modules later?", a: "Yes. Start with one module and add others whenever you need them â€” your data stays in the same account and billing adjusts from the next cycle." },
   ...(SHOW_AUTOMATION_ADDON
     ? [{ q: "Is Business Automation included in a plan?", a: "No, it is a separate add-on at a flat monthly price and can be attached to any plan, including a single-module package." }]
     : []),
@@ -293,7 +293,7 @@ const FAQS = [
   { q: "Can I see a demo before buying?", a: "Yes. Book a personalized demo and we'll walk you through everything for your business type. Contact us via live chat or the contact form." },
 ];
 
-// ── HELPERS ──────────────────────────────────────────────────────────────────
+// â”€â”€ HELPERS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 const PLAN_COLORS = ["#818cf8", "#a5b4fc", "#34d399"];
 
 function Check({ color }: { color: string }) {
@@ -318,20 +318,20 @@ function Val({ v, color }: { v: Val; color: string }) {
 
 const USE_CASES = [
   {
-    icon: "👤", label: "Solo / Freelancer",
+    icon: "ðŸ‘¤", label: "Solo / Freelancer",
     desc: "1-2 people, simple invoicing & expenses",
     recommended: "Starter", plan: "starter", color: "#818cf8",
     highlights: ["Unlimited invoices", "Ledger & P&L", "Basic reports", "Email support"],
   },
   {
-    icon: "🏢", label: "Small Team",
+    icon: "ðŸ¢", label: "Small Team",
     desc: "3-20 employees, need payroll & CRM",
     recommended: "Professional", plan: "professional", color: "#a5b4fc",
     highlights: ["Everything in Starter", "HR & Payroll", "Inventory", "CRM + Pipeline"],
     popular: true,
   },
   {
-    icon: "🌐", label: "Multi-Branch / Enterprise",
+    icon: "ðŸŒ", label: "Multi-Branch / Enterprise",
     desc: "Multiple locations, advanced reports & API",
     recommended: "Enterprise", plan: "enterprise", color: "#34d399",
     highlights: ["Everything in Pro", "Multi-branch", "API access", "Priority support"],
@@ -362,7 +362,7 @@ function UseCaseWizard() {
       {chosen && (
         <div style={{ background: `${chosen.color}0d`, border: `1px solid ${chosen.color}33`, borderRadius: 14, padding: "16px 20px", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 12 }}>
           <div>
-            <div style={{ fontSize: 13, color: chosen.color, fontWeight: 700, marginBottom: 6 }}>✓ We recommend: {chosen.recommended} Plan</div>
+            <div style={{ fontSize: 13, color: chosen.color, fontWeight: 700, marginBottom: 6 }}>âœ“ We recommend: {chosen.recommended} Plan</div>
             <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
               {chosen.highlights.map(h => (
                 <span key={h} style={{ fontSize: 12, color: "#94a3b8", background: "rgba(255,255,255,.05)", padding: "3px 10px", borderRadius: 20 }}>{h}</span>
@@ -371,7 +371,7 @@ function UseCaseWizard() {
           </div>
           {signupsOpen ? (
             <Link href={`/onboarding/signup/${chosen.plan}`} style={{ background: `linear-gradient(135deg,${chosen.color},${chosen.color}bb)`, color: "#fff", padding: "10px 22px", borderRadius: 10, fontWeight: 700, fontSize: 14, textDecoration: "none", flexShrink: 0 }}>
-              Start with {chosen.recommended} →
+              Start with {chosen.recommended} â†’
             </Link>
           ) : (
             <button type="button" disabled style={{ background: `linear-gradient(135deg,${chosen.color},${chosen.color}bb)`, color: "#fff", padding: "10px 22px", borderRadius: 10, fontWeight: 700, fontSize: 14, textDecoration: "none", flexShrink: 0, cursor: "not-allowed", opacity: 0.8, border: "none" }}>
@@ -387,7 +387,7 @@ function UseCaseWizard() {
 export default function PricingPage() {
   const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://usefinova.app";
   // Every buy button on this page hangs off this one flag, which the admin's
-  // Launch Now button moves at runtime — no redeploy, and no second gate to
+  // Launch Now button moves at runtime â€” no redeploy, and no second gate to
   // keep in sync with the landing page's.
   const signupsOpen = useSignupsOpen();
   const [billing, setBilling] = useState<BillingCycle>("monthly");
@@ -401,21 +401,21 @@ export default function PricingPage() {
   const [openCats, setOpenCats] = useState<Set<string>>(new Set(["platform", "accounting", "ai"]));
   const [featureMap, setFeatureMap] = useState<Record<string, { starter: boolean; pro: boolean; enterprise: boolean }>>({});
   const [publicPricing, setPublicPricing] = useState<PlanPricing>(DEFAULT_PUBLIC_PRICING);
-  // Admin-set PKR prices — hardcoded defaults, overridden by API if configured
+  // Admin-set PKR prices â€” hardcoded defaults, overridden by API if configured
   const DEFAULT_PKR_PRICING = {
-    starter:      { monthly: 3999,  yearly: 3199  }, // 3,999/mo → 20% off yearly = 3,199/mo
-    professional: { monthly: 8999,  yearly: 7199  }, // 8,999/mo → 20% off yearly = 7,199/mo
-    enterprise:   { monthly: 14999, yearly: 11999 }, // 14,999/mo → 20% off yearly = 11,999/mo
+    starter:      { monthly: 3999,  yearly: 3199  }, // 3,999/mo â†’ 20% off yearly = 3,199/mo
+    professional: { monthly: 8999,  yearly: 7199  }, // 8,999/mo â†’ 20% off yearly = 7,199/mo
+    enterprise:   { monthly: 14999, yearly: 11999 }, // 14,999/mo â†’ 20% off yearly = 11,999/mo
   };
   const [pkrPricing, setPkrPricing] = useState<{ starter: { monthly: number; yearly: number }; professional: { monthly: number; yearly: number }; enterprise: { monthly: number; yearly: number } } | null>(DEFAULT_PKR_PRICING);
   // Edge-detected country from /api/public/geo. Unlike `country` below it is
   // never seeded from localStorage or the currency dropdown, so it is the only
-  // thing allowed to unlock the PKR-native price list. Null until resolved →
+  // thing allowed to unlock the PKR-native price list. Null until resolved â†’
   // global pricing shows first.
   const [geoCountry, setGeoCountry] = useState<string | null>(null);
   const [pkrAddonPricing, setPkrAddonPricing] = useState<{ monthly: number; yearly: number } | null>({ monthly: 1800, yearly: 1440 });
   const [planLimits, setPlanLimits] = useState<Record<string, number | null>>(DEFAULT_PLAN_LIMITS);
-  // Key must be "professional" (not "pro") — the render below reads
+  // Key must be "professional" (not "pro") â€” the render below reads
   // branchLimits.professional; before the /api/public/pricing fetch resolves,
   // the initial state's "pro" key made that read undefined, showing a live
   // "Up to undefined" in the Branches comparison row.
@@ -425,17 +425,17 @@ export default function PricingPage() {
   const [customPlanData, setCustomPlanData] = useState<{ basePrice: number; yearlyDiscount: number; modules: any[] }>({
     basePrice: 0, yearlyDiscount: 20,
     modules: [
-      { id:"accounting", name:"Accounting & Invoicing", price:15, desc:"Ledger, invoices, vouchers, P&L, balance sheet", icon:"📒", enabled:true, category:"core" },
-      { id:"inventory", name:"Inventory Management", price:12, desc:"Stock tracking, GRN, barcode, low-stock alerts", icon:"📦", enabled:true, category:"core" },
-      { id:"crm", name:"CRM", price:15, desc:"Contacts, sales pipeline, interaction logs", icon:"👥", enabled:true, category:"core" },
-      { id:"hr_payroll", name:"HR & Payroll", price:20, desc:"Employees, attendance, payroll, advance salary", icon:"👨‍💼", enabled:true, category:"core" },
-      { id:"trading", name:"Trading Desk", price:18, desc:"Order desk, procurement, dispatch, outstandings", icon:"🔄", enabled:true, category:"core" },
-      { id:"bank_reconciliation", name:"Bank Reconciliation", price:10, desc:"Statement import, discrepancy flagging, closing", icon:"🏦", enabled:true, category:"finance" },
-      { id:"tax_filing", name:"Tax & Compliance", price:10, desc:"Tax summary, GST/VAT reports, compliance docs", icon:"🧾", enabled:true, category:"finance" },
-      { id:"reports", name:"Advanced Reports", price:8, desc:"Cash flow, profitability, annual statements", icon:"📈", enabled:true, category:"operations" },
-      { id:"multi_branch", name:"Multi-Branch", price:15, desc:"Branches, consolidated reports, branch access", icon:"🏢", enabled:true, category:"operations" },
-      { id:"whatsapp", name:"WhatsApp & SMS", price:8, desc:"Payment reminders, invoices via WhatsApp and SMS", icon:"💬", enabled:true, category:"integrations" },
-      { id:"api_access", name:"API Access", price:20, desc:"REST API, webhooks, third-party integrations", icon:"⚡", enabled:true, category:"integrations" },
+      { id:"accounting", name:"Accounting & Invoicing", price:15, desc:"Ledger, invoices, vouchers, P&L, balance sheet", icon:"ðŸ“’", enabled:true, category:"core" },
+      { id:"inventory", name:"Inventory Management", price:12, desc:"Stock tracking, GRN, barcode, low-stock alerts", icon:"ðŸ“¦", enabled:true, category:"core" },
+      { id:"crm", name:"CRM", price:15, desc:"Contacts, sales pipeline, interaction logs", icon:"ðŸ‘¥", enabled:true, category:"core" },
+      { id:"hr_payroll", name:"HR & Payroll", price:20, desc:"Employees, attendance, payroll, advance salary", icon:"ðŸ‘¨â€ðŸ’¼", enabled:true, category:"core" },
+      { id:"trading", name:"Trading Desk", price:18, desc:"Order desk, procurement, dispatch, outstandings", icon:"ðŸ”„", enabled:true, category:"core" },
+      { id:"bank_reconciliation", name:"Bank Reconciliation", price:10, desc:"Statement import, discrepancy flagging, closing", icon:"ðŸ¦", enabled:true, category:"finance" },
+      { id:"tax_filing", name:"Tax & Compliance", price:10, desc:"Tax summary, GST/VAT reports, compliance docs", icon:"ðŸ§¾", enabled:true, category:"finance" },
+      { id:"reports", name:"Advanced Reports", price:8, desc:"Cash flow, profitability, annual statements", icon:"ðŸ“ˆ", enabled:true, category:"operations" },
+      { id:"multi_branch", name:"Multi-Branch", price:15, desc:"Branches, consolidated reports, branch access", icon:"ðŸ¢", enabled:true, category:"operations" },
+      { id:"whatsapp", name:"WhatsApp & SMS", price:8, desc:"Payment reminders, invoices via WhatsApp and SMS", icon:"ðŸ’¬", enabled:true, category:"integrations" },
+      { id:"api_access", name:"API Access", price:20, desc:"REST API, webhooks, third-party integrations", icon:"âš¡", enabled:true, category:"integrations" },
     ],
   });
 
@@ -537,7 +537,7 @@ export default function PricingPage() {
   }, []);
 
   // The FINOVA_CURRENCY_EVENT listener that used to be here let any other
-  // component on the page push a currency into this one — another way the
+  // component on the page push a currency into this one â€” another way the
   // display could drift away from what checkout charges. Currency is now
   // resolved once, from the IP, and nothing may override it.
 
@@ -557,7 +557,7 @@ export default function PricingPage() {
   const formatPrice = (usd: number) => formatFromUSD(usd, currency);
 
   // When country is PK and admin has set PKR prices, use those directly
-  // Was `country === "PK" || currency === "PKR"` — the currency dropdown alone
+  // Was `country === "PK" || currency === "PKR"` â€” the currency dropdown alone
   // handed any visitor Pakistan's discounted price list. Regional pricing now
   // follows the edge-detected country only; the dropdown still does plain FX
   // conversion for everyone else.
@@ -567,30 +567,30 @@ export default function PricingPage() {
     if (isPKUser && pkrPricing) {
       const pkr = pkrPricing[slug];
       const amount = billing === "yearly" ? pkr.yearly : pkr.monthly;
-      return `₨${amount.toLocaleString("en-PK")}`;
+      return `â‚¨${amount.toLocaleString("en-PK")}`;
     }
     return formatPrice(usdPrice);
   };
   const getAddonDisplayPrice = (usdMonthly: number, usdYearly: number) => {
     if (isPKUser && pkrAddonPricing) {
       const amount = billing === "yearly" ? pkrAddonPricing.yearly : pkrAddonPricing.monthly;
-      return `₨${amount.toLocaleString("en-PK")}`;
+      return `â‚¨${amount.toLocaleString("en-PK")}`;
     }
     return formatPrice(billing === "yearly" ? usdYearly : usdMonthly);
   };
   const getAddonYearlySaving = (usdDiffPerMonth: number) => {
     if (isPKUser && pkrAddonPricing) {
       const saving = (pkrAddonPricing.monthly - pkrAddonPricing.yearly) * 12;
-      return `₨${saving.toLocaleString("en-PK")}`;
+      return `â‚¨${saving.toLocaleString("en-PK")}`;
     }
     return formatPrice(usdDiffPerMonth * 12);
   };
 
   /**
-   * One module's list price, exactly as Admin → Plans set it.
+   * One module's list price, exactly as Admin â†’ Plans set it.
    *
-   * Admin stores four figures per module — USD monthly, USD annual-per-month,
-   * PKR monthly, PKR annual-per-month — and /api/public/pricing publishes all
+   * Admin stores four figures per module â€” USD monthly, USD annual-per-month,
+   * PKR monthly, PKR annual-per-month â€” and /api/public/pricing publishes all
    * four. This page only ever read `price` (USD monthly) and ran it through FX,
    * so a Pakistani visitor was quoted a converted international rate instead of
    * the rupee price actually on file: PKR 4,170 for Accounting against the
@@ -603,7 +603,7 @@ export default function PricingPage() {
       const pkr = billing === "yearly"
         ? (mod.pricePkrYearly ?? mod.pricePkr)
         : mod.pricePkr;
-      if (pkr != null) return `₨${Number(pkr).toLocaleString("en-PK")}`;
+      if (pkr != null) return `â‚¨${Number(pkr).toLocaleString("en-PK")}`;
     }
     const usd = billing === "yearly"
       ? (mod.priceYearly ?? Math.round(Number(mod.price) * (1 - yearlyDiscount / 100)))
@@ -611,7 +611,7 @@ export default function PricingPage() {
     return formatPrice(Number(usd));
   };
 
-  // Buying one standalone module is its own checkout — no seats, no branches,
+  // Buying one standalone module is its own checkout â€” no seats, no branches,
   // nothing else ticked.
   const buildSingleModuleHref = (id: string) =>
     `/onboarding/choose-plan?plan=custom&modules=${id}&extraUsers=0&extraBranches=0&cycle=${billing}&currency=${currency}&country=${country}`;
@@ -632,7 +632,7 @@ export default function PricingPage() {
   };
   const isStandalone = (id: string) => STANDALONE_IDS.has(id);
   const standaloneOnly = selectedModules.length === 1 && isStandalone(selectedModules[0]);
-  // A package of only layer-on modules cannot run — flag it instead of letting
+  // A package of only layer-on modules cannot run â€” flag it instead of letting
   // someone check out into an empty app.
   const needsCoreModule = selectedModules.length > 0 && !selectedModules.some(isStandalone);
   const toggleCat = (id: string) => setOpenCats(p => { const n = new Set(p); n.has(id) ? n.delete(id) : n.add(id); return n; });
@@ -654,7 +654,7 @@ export default function PricingPage() {
           .sa-grid{grid-template-columns:repeat(2,1fr) !important}
         }
 
-        /* Comparison table — sticky first column on mobile */
+        /* Comparison table â€” sticky first column on mobile */
         @media(max-width:700px){
           .ct{overflow-x:auto !important;}
           .ct-inner{min-width:471px;}
@@ -706,7 +706,7 @@ export default function PricingPage() {
 
       <div className="pr-pad" style={{ maxWidth: 1180, margin: "0 auto", padding: "96px 24px 88px" }}>
 
-        {/* ── HERO ─────────────────────────────────────────── */}
+        {/* â”€â”€ HERO â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
         <div style={{ textAlign: "center", marginBottom: 48 }}>
           <div style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "6px 16px", borderRadius: 999, background: "rgba(129,140,248,.1)", border: "1px solid rgba(129,140,248,.25)", color: "#a5b4fc", fontSize: 12, fontWeight: 800, letterSpacing: ".04em", marginBottom: 22 }}>
             Localized Pricing
@@ -716,23 +716,23 @@ export default function PricingPage() {
             <span style={{ background: "linear-gradient(135deg,#818cf8,#c4b5fd)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>your region</span>
           </h1>
           <p style={{ maxWidth: 640, margin: "0 auto", color: "rgba(255,255,255,.48)", fontSize: 17, lineHeight: 1.65 }}>
-            {/* Was "PKR, INR, AED, and more" — we only ever bill in PKR or USD,
+            {/* Was "PKR, INR, AED, and more" â€” we only ever bill in PKR or USD,
                 so naming currencies we do not support promised too much. */}
             Prices are shown in the currency you will be billed in. <strong style={{ color: "rgba(255,255,255,.7)" }}>No hidden fees. Cancel anytime.</strong>
           </p>
         </div>
 
-        {/* ── BILLING TOGGLE + CURRENCY ─────────────────────── */}
+        {/* â”€â”€ BILLING TOGGLE + CURRENCY â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
         <div style={{ display: "flex", justifyContent: "center", gap: 12, flexWrap: "wrap", marginBottom: 12 }}>
           <div style={{ display: "inline-flex", background: "rgba(255,255,255,.05)", border: "1px solid rgba(255,255,255,.1)", borderRadius: 12, padding: 4 }}>
             {(["monthly", "yearly"] as const).map(cycle => (
               <button key={cycle} onClick={() => setBilling(cycle)} style={{ padding: "10px 24px", border: "none", borderRadius: 9, background: billing === cycle ? "linear-gradient(135deg,#6366f1,#4f46e5)" : "transparent", color: billing === cycle ? "white" : "rgba(255,255,255,.45)", cursor: "pointer", fontSize: 13, fontWeight: 800, fontFamily: ff }}>
-                {cycle === "monthly" ? "Monthly" : "Yearly  · Save 20%"}
+                {cycle === "monthly" ? "Monthly" : "Yearly  Â· Save 20%"}
               </button>
             ))}
           </div>
           {/* The 30-currency picker is gone. Billing happens in exactly two
-              currencies — PKR for Pakistan, USD everywhere else — decided by
+              currencies â€” PKR for Pakistan, USD everywhere else â€” decided by
               the visitor's IP, so offering a choice here could only ever
               disagree with what checkout charges. */}
         </div>
@@ -740,10 +740,10 @@ export default function PricingPage() {
             so spelling out "USD"/"PKR" only added noise. */}
         <div style={{ marginBottom: 40 }} />
 
-        {/* ── USE-CASE WIZARD ───────────────────────────────── */}
+        {/* â”€â”€ USE-CASE WIZARD â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
         <UseCaseWizard />
 
-        {/* ── PLAN CARDS ──────────────────────────────────────── */}
+        {/* â”€â”€ PLAN CARDS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
         <div className="pg" style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 20, marginBottom: 80 }}>
           {PLANS.map((plan) => {
             const pricingKey = plan.slug as keyof PlanPricing;
@@ -754,8 +754,8 @@ export default function PricingPage() {
             const pkrPlanKey = plan.slug as "starter" | "professional" | "enterprise";
             const useAdminPkr = isPKUser && pkrPricing != null;
             const pkrAmount = useAdminPkr ? (billing === "yearly" ? pkrPricing![pkrPlanKey].yearly : pkrPricing![pkrPlanKey].monthly) : 0;
-            const displayRegular = useAdminPkr ? `₨${pkrAmount.toLocaleString("en-PK")}` : formatPrice(regularPrice);
-            const displayIntro   = useAdminPkr ? `₨${Math.round(pkrAmount * 0.50).toLocaleString("en-PK")}` : formatPrice(introPrice);
+            const displayRegular = useAdminPkr ? `â‚¨${pkrAmount.toLocaleString("en-PK")}` : formatPrice(regularPrice);
+            const displayIntro   = useAdminPkr ? `â‚¨${Math.round(pkrAmount * 0.50).toLocaleString("en-PK")}` : formatPrice(introPrice);
             return (
               <div key={plan.slug} style={{ position: "relative", borderRadius: 22, background: plan.featured ? "linear-gradient(160deg,rgba(99,102,241,.16),rgba(255,255,255,.03))" : "rgba(255,255,255,.03)", border: `1.5px solid ${plan.border}`, overflow: "hidden", boxShadow: plan.featured ? "0 28px 80px rgba(99,102,241,.22)" : "0 10px 30px rgba(0,0,0,.16)" }}>
                 <div style={{ height: 3, background: plan.gradient }} />
@@ -812,18 +812,18 @@ export default function PricingPage() {
           })}
         </div>
 
-        {/* ── PAYMENT METHODS TRUST STRIP ─────────────────────── */}
+        {/* â”€â”€ PAYMENT METHODS TRUST STRIP â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
         <div style={{ marginBottom: 80 }}>
           {currency === "PKR" ? (
-            /* ── PKR: Safepay ── */
+            /* â”€â”€ PKR: Safepay â”€â”€ */
             <div style={{ borderRadius: 20, background: "rgba(255,255,255,.025)", border: "1px solid rgba(255,255,255,.07)", padding: "28px 32px" }}>
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 20 }}>
                 <div>
                   <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#34d399" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-                    <span style={{ fontSize: 13, fontWeight: 800, color: "#34d399" }}>Secure Checkout · Powered by Safepay</span>
+                    <span style={{ fontSize: 13, fontWeight: 800, color: "#34d399" }}>Secure Checkout Â· Powered by Safepay</span>
                   </div>
-                  <div style={{ fontSize: 12, color: "rgba(255,255,255,.35)" }}>256-bit SSL · PCI DSS compliant · No card data stored on our servers</div>
+                  <div style={{ fontSize: 12, color: "rgba(255,255,255,.35)" }}>256-bit SSL Â· PCI DSS compliant Â· No card data stored on our servers</div>
                 </div>
                 <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
                   {/* Visa */}
@@ -860,7 +860,7 @@ export default function PricingPage() {
                 </div>
               </div>
               <div style={{ marginTop: 16, paddingTop: 14, borderTop: "1px solid rgba(255,255,255,.05)", display: "flex", alignItems: "center", gap: 20, flexWrap: "wrap" }}>
-                <span style={{ fontSize: 11, color: "rgba(255,255,255,.28)", fontWeight: 600 }}>All banks supported via 1Link network · HBL · UBL · Meezan · MCB · Faysal · Allied · and more</span>
+                <span style={{ fontSize: 11, color: "rgba(255,255,255,.28)", fontWeight: 600 }}>All banks supported via 1Link network Â· HBL Â· UBL Â· Meezan Â· MCB Â· Faysal Â· Allied Â· and more</span>
                 <span style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 11, color: "rgba(255,255,255,.45)", fontWeight: 700, background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.08)", borderRadius: 6, padding: "4px 10px" }}>
                   <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.45)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
                   Only Pakistani-issued cards are accepted
@@ -868,15 +868,15 @@ export default function PricingPage() {
               </div>
             </div>
           ) : (
-            /* ── International: LemonSqueezy ── */
+            /* â”€â”€ International: LemonSqueezy â”€â”€ */
             <div style={{ borderRadius: 20, background: "rgba(255,255,255,.025)", border: "1px solid rgba(255,255,255,.07)", padding: "28px 32px" }}>
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 20 }}>
                 <div>
                   <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#34d399" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-                    <span style={{ fontSize: 13, fontWeight: 800, color: "#34d399" }}>Secure Checkout · Powered by LemonSqueezy</span>
+                    <span style={{ fontSize: 13, fontWeight: 800, color: "#34d399" }}>Secure Checkout Â· Powered by LemonSqueezy</span>
                   </div>
-                  <div style={{ fontSize: 12, color: "rgba(255,255,255,.35)" }}>Merchant of Record · We handle tax, compliance & billing globally · 256-bit SSL</div>
+                  <div style={{ fontSize: 12, color: "rgba(255,255,255,.35)" }}>Merchant of Record Â· We handle tax, compliance & billing globally Â· 256-bit SSL</div>
                 </div>
                 <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
                   {/* Visa */}
@@ -901,24 +901,24 @@ export default function PricingPage() {
                 </div>
               </div>
               <div style={{ marginTop: 16, paddingTop: 14, borderTop: "1px solid rgba(255,255,255,.05)", display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
-                <span style={{ fontSize: 11, color: "rgba(255,255,255,.28)", fontWeight: 600 }}>Regional wallets auto-detected at checkout · Sales tax handled automatically · Invoices issued by LemonSqueezy LLC</span>
+                <span style={{ fontSize: 11, color: "rgba(255,255,255,.28)", fontWeight: 600 }}>Regional wallets auto-detected at checkout Â· Sales tax handled automatically Â· Invoices issued by LemonSqueezy LLC</span>
               </div>
             </div>
           )}
         </div>
 
-        {/* ── AUTOMATION ADD-ON (hidden — see SHOW_AUTOMATION_ADDON) ── */}
+        {/* â”€â”€ AUTOMATION ADD-ON (hidden â€” see SHOW_AUTOMATION_ADDON) â”€â”€ */}
         {SHOW_AUTOMATION_ADDON && (
         <div style={{ marginBottom: 80 }}>
           <div style={{ textAlign: "center", marginBottom: 36 }}>
             <div style={{ display: "inline-flex", alignItems: "center", gap: 8, background: "rgba(124,58,237,.12)", border: "1px solid rgba(124,58,237,.28)", borderRadius: 100, padding: "5px 14px", fontSize: 12, color: "#a78bfa", fontWeight: 700, marginBottom: 16 }}>
-              ⚡ Power Add-On
+              âš¡ Power Add-On
             </div>
             <h2 style={{ fontSize: "clamp(24px,3.5vw,36px)", fontWeight: 900, letterSpacing: "-.02em", marginBottom: 10 }}>
               Add Business Automation to any plan
             </h2>
             <p style={{ color: "rgba(255,255,255,.42)", fontSize: 15, maxWidth: 560, margin: "0 auto" }}>
-              Flat {getAddonDisplayPrice(79, 69)}/month on top of whatever you already pay — Starter, Professional, Enterprise, or a custom package.
+              Flat {getAddonDisplayPrice(79, 69)}/month on top of whatever you already pay â€” Starter, Professional, Enterprise, or a custom package.
             </p>
           </div>
 
@@ -938,15 +938,15 @@ export default function PricingPage() {
                       already shows. Say what the cycle actually costs instead. */}
                   {billing === "yearly" ? (
                     <div style={{ fontSize: 13, color: "#34d399", marginBottom: 8, fontWeight: 700 }}>
-                      Billed annually — save {getAddonYearlySaving(10)}/year vs monthly
+                      Billed annually â€” save {getAddonYearlySaving(10)}/year vs monthly
                     </div>
                   ) : (
                     <div style={{ fontSize: 13, color: "rgba(255,255,255,.5)", marginBottom: 8 }}>
-                      Billed monthly — pay yearly and it drops to {isPKUser && pkrAddonPricing ? `₨${pkrAddonPricing.yearly.toLocaleString("en-PK")}` : formatPrice(69)}/mo
+                      Billed monthly â€” pay yearly and it drops to {isPKUser && pkrAddonPricing ? `â‚¨${pkrAddonPricing.yearly.toLocaleString("en-PK")}` : formatPrice(69)}/mo
                     </div>
                   )}
                   <div style={{ fontSize: 13, color: "rgba(255,255,255,.4)", marginBottom: 28 }}>
-                    Add to any plan · Cancel anytime · No hidden fees
+                    Add to any plan Â· Cancel anytime Â· No hidden fees
                   </div>
                   <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
                     {signupsOpen ? (
@@ -955,7 +955,7 @@ export default function PricingPage() {
                         color: "#fff", textDecoration: "none", fontSize: 14, fontWeight: 700,
                         boxShadow: "0 0 24px rgba(124,58,237,.35)",
                       }}>
-                        Add to my plan →
+                        Add to my plan â†’
                       </Link>
                     ) : (
                       <button type="button" disabled style={{
@@ -978,11 +978,11 @@ export default function PricingPage() {
                 {/* Right: Features grid */}
                 <div className="addon-feat" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
                   {[
-                    { icon: "🔔", label: "Invoice Reminders", sub: "Overdue invoice follow-up" },
-                    { icon: "📦", label: "Low Stock Alerts", sub: "Reorder before you run out" },
-                    { icon: "📊", label: "Scheduled Reports", sub: "P&L, Balance Sheet & more" },
-                    { icon: "🔗", label: "Zapier / Make", sub: "5,000+ app connects" },
-                    { icon: "📈", label: "Google Sheets Sync", sub: "1-click export" },
+                    { icon: "ðŸ””", label: "Invoice Reminders", sub: "Overdue invoice follow-up" },
+                    { icon: "ðŸ“¦", label: "Low Stock Alerts", sub: "Reorder before you run out" },
+                    { icon: "ðŸ“Š", label: "Scheduled Reports", sub: "P&L, Balance Sheet & more" },
+                    { icon: "ðŸ”—", label: "Zapier / Make", sub: "5,000+ app connects" },
+                    { icon: "ðŸ“ˆ", label: "Google Sheets Sync", sub: "1-click export" },
                   ].map(f => (
                     <div key={f.label} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 12px", borderRadius: 10, background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.07)" }}>
                       <span style={{ fontSize: 18, flexShrink: 0 }}>{f.icon}</span>
@@ -1008,11 +1008,11 @@ export default function PricingPage() {
         </div>
         )}
 
-        {/* ── FEATURE COMPARISON TABLE ────────────────────────── */}
+        {/* â”€â”€ FEATURE COMPARISON TABLE â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
         <div style={{ marginBottom: 80 }}>
           <div style={{ textAlign: "center", marginBottom: 40 }}>
             <h2 style={{ fontSize: "clamp(28px,4vw,42px)", fontWeight: 900, letterSpacing: "-.03em", marginBottom: 12 }}>Compare all features</h2>
-            <p style={{ color: "rgba(255,255,255,.4)", fontSize: 15 }}>Everything side by side — no surprises</p>
+            <p style={{ color: "rgba(255,255,255,.4)", fontSize: 15 }}>Everything side by side â€” no surprises</p>
           </div>
 
           {/* Sticky header row */}
@@ -1035,7 +1035,7 @@ export default function PricingPage() {
             {/* Categories */}
             {COMPARISON.map(cat => (
               <div key={cat.id}>
-                {/* Category header — clickable */}
+                {/* Category header â€” clickable */}
                 <button
                   className="ct-cat"
                   onClick={() => toggleCat(cat.id)}
@@ -1044,7 +1044,7 @@ export default function PricingPage() {
                   <div style={{ padding: "14px 24px", display: "flex", alignItems: "center", gap: 10, gridColumn: "1 / -1" }}>
                     <span style={{ fontSize: 16 }}>{cat.icon}</span>
                     <span style={{ fontSize: 13, fontWeight: 800, color: "rgba(255,255,255,.85)", letterSpacing: ".01em" }}>{cat.title}</span>
-                    <span style={{ marginLeft: "auto", fontSize: 11, color: "rgba(255,255,255,.3)", transition: "transform .2s", display: "inline-block", transform: openCats.has(cat.id) ? "rotate(180deg)" : "rotate(0deg)" }}>▼</span>
+                    <span style={{ marginLeft: "auto", fontSize: 11, color: "rgba(255,255,255,.3)", transition: "transform .2s", display: "inline-block", transform: openCats.has(cat.id) ? "rotate(180deg)" : "rotate(0deg)" }}>â–¼</span>
                   </div>
                 </button>
 
@@ -1106,27 +1106,27 @@ export default function PricingPage() {
           </div>
         </div>
 
-        {/* ── CUSTOM PLAN ──────────────────────────────────────── */}
+        {/* â”€â”€ CUSTOM PLAN â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
         <div id="custom" style={{ marginBottom: 80 }}>
           {/* Header */}
           <div style={{ textAlign: "center", marginBottom: 40 }}>
             <div style={{ display: "inline-flex", alignItems: "center", gap: 8, background: "rgba(249,115,22,.1)", border: "1px solid rgba(249,115,22,.25)", borderRadius: 100, padding: "5px 14px", fontSize: 12, color: "#f97316", fontWeight: 700, marginBottom: 16 }}>
-              🧩 Custom Plan
+              ðŸ§© Custom Plan
             </div>
             <h2 style={{ fontSize: "clamp(28px,4vw,42px)", fontWeight: 900, letterSpacing: "-.03em", marginBottom: 10 }}>Pay only for modules you need</h2>
             <p style={{ color: "rgba(255,255,255,.42)", fontSize: 15, maxWidth: 560, margin: "0 auto" }}>
-              Pick the exact features your business needs. No bloat, no unused modules — and if you only need one, buy just that one.
+              Pick the exact features your business needs. No bloat, no unused modules â€” and if you only need one, buy just that one.
             </p>
           </div>
 
-          {/* ── STANDALONE APPS — one module, on its own ─────── */}
+          {/* â”€â”€ STANDALONE APPS â€” one module, on its own â”€â”€â”€â”€â”€â”€â”€ */}
           <div style={{ marginBottom: 36 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 14, flexWrap: "wrap" }}>
               <span style={{ fontSize: 11, fontWeight: 800, color: "rgba(255,255,255,.3)", letterSpacing: ".08em", textTransform: "uppercase" }}>
-                🎯 Run just one
+                ðŸŽ¯ Run just one
               </span>
               <span style={{ fontSize: 13, color: "rgba(255,255,255,.42)" }}>
-                These modules work on their own — no full accounting setup required.
+                These modules work on their own â€” no full accounting setup required.
               </span>
             </div>
 
@@ -1137,7 +1137,7 @@ export default function PricingPage() {
                 return (
                   <Link
                     key={app.id}
-                    href={signupsOpen ? buildSingleModuleHref(app.id) : WAITLIST_HREF}
+                    href={signupHrefFor(signupsOpen, buildSingleModuleHref(app.id))}
                     style={{
                       display: "block", textAlign: "left", padding: "18px 18px 16px", borderRadius: 16, cursor: "pointer",
                       fontFamily: ff, color: "white", textDecoration: "none", transition: "all .2s",
@@ -1148,7 +1148,7 @@ export default function PricingPage() {
                     <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, marginBottom: 10 }}>
                       <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
                         <span style={{ fontSize: 22, lineHeight: 1 }}>{app.icon}</span>
-                        <span style={{ fontSize: 14, fontWeight: 800, color: active ? app.color : "white" }}>{app.label}</span>
+                        <span style={{ fontSize: 14, fontWeight: 800, color: "white" }}>{app.label}</span>
                       </div>
                       <span style={{ fontSize: 9, fontWeight: 800, letterSpacing: ".06em", padding: "3px 7px", borderRadius: 5, color: app.color, background: `${app.color}18`, border: `1px solid ${app.color}33`, whiteSpace: "nowrap" }}>
                         STANDALONE
@@ -1165,226 +1165,36 @@ export default function PricingPage() {
                       ))}
                     </div>
                     <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: 8, paddingTop: 11, borderTop: "1px solid rgba(255,255,255,.06)" }}>
-                      {/* Same base price the picker below shows — the yearly
-                          discount is applied once, in the estimate total. */}
+                      {/* Straight from Admin â†’ Plans, in the visitor's own
+                          currency and for the cycle the toggle is on. */}
                       <span style={{ fontSize: 17, fontWeight: 900, color: app.color, letterSpacing: "-.02em" }}>
-                        {formatPrice(mod.price)}
+                        {getModuleDisplayPrice(mod)}
                         <span style={{ fontSize: 10, fontWeight: 500, color: "rgba(255,255,255,.3)" }}>/mo</span>
                       </span>
-                      <span style={{ fontSize: 11, fontWeight: 700, color: active ? app.color : "rgba(255,255,255,.4)" }}>
-                        {active ? "✓ Selected" : "Pick this only →"}
+                      <span style={{ fontSize: 11, fontWeight: 700, color: app.color }}>
+                        {signupsOpen ? "Get this only â†’" : "Join the waitlist â†’"}
                       </span>
                     </div>
-                  </button>
+                    {billing === "yearly" && (
+                      <div style={{ fontSize: 10, color: "rgba(255,255,255,.3)", marginTop: 5 }}>
+                        billed annually
+                      </div>
+                    )}
+                  </Link>
                 );
               })}
             </div>
 
             {SHOW_AUTOMATION_ADDON && (
               <div style={{ marginTop: 12, fontSize: 12, color: "rgba(255,255,255,.32)" }}>
-                Need only the automation tools? <Link href="/onboarding/choose-plan?addon=automation" style={{ color: "#a78bfa", textDecoration: "none", fontWeight: 700 }}>Business Automation is sold separately →</Link>
+                Need only the automation tools? <Link href="/onboarding/choose-plan?addon=automation" style={{ color: "#a78bfa", textDecoration: "none", fontWeight: 700 }}>Business Automation is sold separately â†’</Link>
               </div>
             )}
           </div>
 
-          <div style={{ height: 1, background: "rgba(255,255,255,.06)", marginBottom: 32 }} />
-
-          <div style={{ fontSize: 13, color: "rgba(255,255,255,.42)", marginBottom: 18, textAlign: "center" }}>
-            …or build your own package — tick anything below and the estimate updates live.
-          </div>
-
-          <div className="cp-row" style={{ display: "flex", gap: 20, alignItems: "flex-start", flexWrap: "wrap" }}>
-            {/* Left — Module picker + add-ons */}
-            <div style={{ flex: "1 1 560px", minWidth: 0 }}>
-              {MODULE_CATEGORIES.map(cat => {
-                const catMods = customPlanData.modules.filter((m: any) => m.category === cat.id);
-                if (!catMods.length) return null;
-                return (
-                  <div key={cat.id} style={{ marginBottom: 22 }}>
-                    <div style={{ fontSize: 11, fontWeight: 800, color: "rgba(255,255,255,.3)", letterSpacing: ".08em", textTransform: "uppercase", marginBottom: 10, display: "flex", alignItems: "center", gap: 7 }}>
-                      <span style={{ color: cat.color }}>{cat.icon}</span>{cat.label}
-                    </div>
-                    <div className="mod-grid" style={{ display: "grid", gridTemplateColumns: "repeat(2,1fr)", gap: 10 }}>
-                      {catMods.map((module: any) => {
-                        const sel = selectedModules.includes(module.id);
-                        return (
-                          <button key={module.id} onClick={() => toggleModule(module.id)} style={{
-                            textAlign: "left", padding: "16px 18px", borderRadius: 14,
-                            border: `1.5px solid ${sel ? "rgba(249,115,22,.5)" : "rgba(255,255,255,.07)"}`,
-                            background: sel ? "rgba(249,115,22,.07)" : "rgba(255,255,255,.025)",
-                            color: "white", cursor: "pointer", fontFamily: ff, transition: "all .2s",
-                          }}>
-                            <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 8, marginBottom: 7 }}>
-                              <div style={{ display: "flex", alignItems: "center", gap: 9 }}>
-                                <span style={{ fontSize: 20, lineHeight: 1 }}>{module.icon}</span>
-                                <span style={{ fontSize: 13, fontWeight: 800, color: sel ? "#fb923c" : "white" }}>{module.name}</span>
-                              </div>
-                              <div style={{ flexShrink: 0, width: 20, height: 20, borderRadius: "50%", background: sel ? "#f97316" : "transparent", border: sel ? "none" : "1.5px solid rgba(255,255,255,.2)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                                {sel && <svg width="10" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5.5L4.5 9 11 1" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>}
-                              </div>
-                            </div>
-                            <div style={{ fontSize: 11, color: "rgba(255,255,255,.38)", lineHeight: 1.5, marginBottom: 9 }}>{module.desc}</div>
-                            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, flexWrap: "wrap" }}>
-                              <div style={{ fontSize: 14, fontWeight: 800, color: sel ? "#f97316" : "rgba(255,255,255,.45)" }}>
-                                +{formatPrice(module.price)}<span style={{ fontSize: 10, fontWeight: 500, color: "rgba(255,255,255,.3)" }}>/mo</span>
-                              </div>
-                              {/* Says whether ticking only this box is already a
-                                  working subscription, or whether it needs a
-                                  module underneath it. */}
-                              {isStandalone(module.id) ? (
-                                <span style={{ fontSize: 9, fontWeight: 800, letterSpacing: ".05em", padding: "3px 7px", borderRadius: 5, color: "#34d399", background: "rgba(52,211,153,.12)", border: "1px solid rgba(52,211,153,.25)" }}>
-                                  RUNS ALONE
-                                </span>
-                              ) : (
-                                <span style={{ fontSize: 9, fontWeight: 800, letterSpacing: ".05em", padding: "3px 7px", borderRadius: 5, color: "rgba(255,255,255,.35)", background: "rgba(255,255,255,.05)", border: "1px solid rgba(255,255,255,.1)" }}>
-                                  ADD-ON
-                                </span>
-                              )}
-                            </div>
-                          </button>
-                        );
-                      })}
-                    </div>
-                  </div>
-                );
-              })}
-
-              {/* Add-ons */}
-              <div style={{ padding: "20px 22px", borderRadius: 16, background: "rgba(255,255,255,.02)", border: "1px solid rgba(255,255,255,.07)", marginTop: 4 }}>
-                <div style={{ fontSize: 11, fontWeight: 800, color: "rgba(255,255,255,.3)", letterSpacing: ".08em", textTransform: "uppercase", marginBottom: 14 }}>Add-ons — Optional</div>
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
-                  {[
-                    { key: "users",    label: "Extra Users",    icon: "👥", color: "#a5b4fc", val: extraUsers,    set: setExtraUsers },
-                    { key: "branches", label: "Extra Branches", icon: "🏢", color: "#38bdf8", val: extraBranches, set: setExtraBranches },
-                  ].map(addon => (
-                    <div key={addon.key}>
-                      <div style={{ fontSize: 13, fontWeight: 700, color: "rgba(255,255,255,.65)", marginBottom: 4 }}>{addon.icon} {addon.label}</div>
-                      <div style={{ fontSize: 11, color: "rgba(255,255,255,.3)", marginBottom: 10 }}>+{formatPrice(seatRate)}/each/mo</div>
-                      <div style={{ display: "flex", alignItems: "center", background: "rgba(255,255,255,.05)", borderRadius: 10, border: "1px solid rgba(255,255,255,.09)", overflow: "hidden" }}>
-                        <button onClick={() => addon.set((v: number) => Math.max(0, v - 1))} style={{ padding: "9px 16px", background: "none", border: "none", color: "rgba(255,255,255,.5)", fontSize: 18, cursor: "pointer", fontFamily: ff, lineHeight: 1 }}>−</button>
-                        <input type="number" min="0" value={addon.val} onChange={e => addon.set(Math.max(0, parseInt(e.target.value) || 0))} style={{ flex: 1, background: "none", border: "none", color: addon.color, fontSize: 16, fontWeight: 800, textAlign: "center", outline: "none", fontFamily: ff, width: 0 }} />
-                        <button onClick={() => addon.set((v: number) => v + 1)} style={{ padding: "9px 16px", background: "none", border: "none", color: "rgba(255,255,255,.5)", fontSize: 18, cursor: "pointer", fontFamily: ff, lineHeight: 1 }}>+</button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-
-            {/* Right — Price summary */}
-            <div className="cp-sidebar" style={{ width: 320, flexShrink: 0, position: "sticky", top: 24 }}>
-              <div style={{ borderRadius: 20, background: "rgba(249,115,22,.07)", border: "1.5px solid rgba(249,115,22,.28)", padding: "22px 20px" }}>
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, marginBottom: 14 }}>
-                  <span style={{ fontSize: 10, fontWeight: 800, color: "#f97316", letterSpacing: ".06em", textTransform: "uppercase" }}>Your Estimate</span>
-                  {standaloneOnly && (
-                    <span style={{ fontSize: 9, fontWeight: 800, letterSpacing: ".05em", padding: "3px 7px", borderRadius: 5, color: "#34d399", background: "rgba(52,211,153,.12)", border: "1px solid rgba(52,211,153,.25)" }}>
-                      SINGLE APP
-                    </span>
-                  )}
-                </div>
-
-                {/* Modules breakdown */}
-                {selectedModules.length === 0 ? (
-                  <div style={{ fontSize: 12, color: "rgba(255,255,255,.28)", marginBottom: 14, fontStyle: "italic" }}>No modules selected yet</div>
-                ) : (
-                  <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 12 }}>
-                    {customPlanData.modules.filter((m: any) => selectedModules.includes(m.id)).map((m: any) => (
-                      <div key={m.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                        <span style={{ fontSize: 12, color: "rgba(255,255,255,.55)" }}>{m.icon} {m.name}</span>
-                        <span style={{ fontSize: 12, fontWeight: 700, color: "rgba(255,255,255,.78)" }}>{formatPrice(m.price)}</span>
-                      </div>
-                    ))}
-                  </div>
-                )}
-
-                {/* Add-ons breakdown */}
-                {(extraUsers > 0 || extraBranches > 0) && (
-                  <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 12, paddingTop: 10, borderTop: "1px solid rgba(255,255,255,.07)" }}>
-                    {extraUsers > 0 && (
-                      <div style={{ display: "flex", justifyContent: "space-between" }}>
-                        <span style={{ fontSize: 12, color: "rgba(255,255,255,.5)" }}>👥 {extraUsers} user{extraUsers > 1 ? "s" : ""} × {formatPrice(seatRate)}</span>
-                        <span style={{ fontSize: 12, fontWeight: 700, color: "#a5b4fc" }}>{formatPrice(extraUsers * seatRate)}</span>
-                      </div>
-                    )}
-                    {extraBranches > 0 && (
-                      <div style={{ display: "flex", justifyContent: "space-between" }}>
-                        <span style={{ fontSize: 12, color: "rgba(255,255,255,.5)" }}>🏢 {extraBranches} branch{extraBranches > 1 ? "es" : ""} × {formatPrice(seatRate)}</span>
-                        <span style={{ fontSize: 12, fontWeight: 700, color: "#38bdf8" }}>{formatPrice(extraBranches * seatRate)}</span>
-                      </div>
-                    )}
-                  </div>
-                )}
-
-                {/* Total */}
-                <div style={{ borderTop: "1px solid rgba(249,115,22,.25)", paddingTop: 14, marginBottom: 16 }}>
-                  {billing === "yearly" && customMonthly > 0 && (
-                    <div style={{ fontSize: 11, color: "rgba(255,255,255,.35)", marginBottom: 4, display: "flex", justifyContent: "space-between" }}>
-                      <span>Subtotal</span><span>{formatPrice(customMonthly)}/mo</span>
-                    </div>
-                  )}
-                  {billing === "yearly" && (
-                    <div style={{ fontSize: 11, color: "#34d399", marginBottom: 6, display: "flex", justifyContent: "space-between", fontWeight: 700 }}>
-                      <span>Yearly −{yearlyDiscount}%</span>
-                      <span>−{formatPrice(Math.round(customMonthly * yearlyDiscount / 100))}</span>
-                    </div>
-                  )}
-                  <div style={{ fontSize: 10, color: "rgba(255,255,255,.3)", marginBottom: 4 }}>
-                    {billing === "yearly" ? "Per month, billed annually" : "Per month"}
-                  </div>
-                  <div style={{ fontSize: 42, fontWeight: 900, color: customMonthly > 0 ? "#f97316" : "rgba(255,255,255,.2)", lineHeight: 1, letterSpacing: "-1.5px" }}>
-                    {customMonthly > 0 ? formatPrice(customDisplayUsd) : "—"}
-                  </div>
-                  {billing === "yearly" && customMonthly > 0 && (
-                    <div style={{ fontSize: 11, color: "#34d399", marginTop: 6, fontWeight: 700 }}>
-                      Save {formatPrice(Math.round(customMonthly * yearlyDiscount / 100 * 12))} per year
-                    </div>
-                  )}
-                </div>
-
-                {needsCoreModule && (
-                  <div style={{ marginBottom: 12, padding: "10px 12px", borderRadius: 10, background: "rgba(251,191,36,.08)", border: "1px solid rgba(251,191,36,.22)", fontSize: 11.5, color: "#fbbf24", lineHeight: 1.5 }}>
-                    Add one module marked <strong>Runs alone</strong> — the ones you picked layer on top of another module.
-                  </div>
-                )}
-
-                {signupsOpen ? (
-                  <Link
-                    href={selectedModules.length && !needsCoreModule ? buildCustomHref() : "#custom"}
-                    style={{
-                      display: "block", textAlign: "center", padding: "13px 18px", borderRadius: 12,
-                      background: selectedModules.length && !needsCoreModule ? "linear-gradient(135deg,#f97316,#ea580c)" : "rgba(255,255,255,.06)",
-                      color: "white", fontWeight: 800, fontSize: 14, textDecoration: "none",
-                      opacity: selectedModules.length && !needsCoreModule ? 1 : 0.5,
-                      border: selectedModules.length && !needsCoreModule ? "none" : "1px solid rgba(255,255,255,.1)",
-                    }}
-                  >
-                    {!selectedModules.length ? "Select modules above" : needsCoreModule ? "Pick a module that runs alone" : standaloneOnly ? "Continue with this app →" : "Continue →"}
-                  </Link>
-                ) : (
-                  <button
-                    type="button"
-                    disabled
-                    style={{
-                      display: "block", width: "100%", textAlign: "center", padding: "13px 18px", borderRadius: 12,
-                      background: selectedModules.length && !needsCoreModule ? "linear-gradient(135deg,#f97316,#ea580c)" : "rgba(255,255,255,.06)",
-                      color: "white", fontWeight: 800, fontSize: 14, textDecoration: "none",
-                      opacity: selectedModules.length && !needsCoreModule ? 0.85 : 0.5,
-                      border: selectedModules.length && !needsCoreModule ? "none" : "1px solid rgba(255,255,255,.1)",
-                      cursor: "not-allowed",
-                    }}
-                  >
-                    Launching Soon
-                  </button>
-                )}
-                <div style={{ fontSize: 11, color: "rgba(255,255,255,.22)", textAlign: "center", marginTop: 10 }}>
-                  You&apos;ll confirm everything before payment
-                </div>
-              </div>
-            </div>
-          </div>
         </div>
 
-        {/* ── FAQ ──────────────────────────────────────────────── */}
+        {/* â”€â”€ FAQ â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
         <div style={{ maxWidth: 820, margin: "0 auto 40px" }}>
           <div style={{ textAlign: "center", marginBottom: 24 }}>
             <h2 style={{ fontSize: "clamp(28px,4vw,38px)", fontWeight: 900, letterSpacing: "-.03em" }}>Frequently asked questions</h2>
@@ -1394,7 +1204,7 @@ export default function PricingPage() {
               <div key={faq.q} style={{ borderRadius: 16, border: `1px solid ${openFaq === idx ? "rgba(129,140,248,.35)" : "rgba(255,255,255,.08)"}`, background: openFaq === idx ? "rgba(99,102,241,.08)" : "rgba(255,255,255,.02)" }}>
                 <button onClick={() => setOpenFaq(openFaq === idx ? null : idx)} style={{ width: "100%", background: "none", border: "none", cursor: "pointer", textAlign: "left", padding: "18px 20px", color: "white", fontSize: 14, fontWeight: 800, fontFamily: ff, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                   {faq.q}
-                  <span style={{ fontSize: 12, color: "rgba(255,255,255,.35)", transform: openFaq === idx ? "rotate(180deg)" : "none", transition: "transform .2s" }}>▼</span>
+                  <span style={{ fontSize: 12, color: "rgba(255,255,255,.35)", transform: openFaq === idx ? "rotate(180deg)" : "none", transition: "transform .2s" }}>â–¼</span>
                 </button>
                 {openFaq === idx && <div style={{ padding: "0 20px 18px", color: "rgba(255,255,255,.5)", fontSize: 14, lineHeight: 1.65 }}>{faq.a}</div>}
               </div>
