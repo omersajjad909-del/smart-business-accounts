@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { aiUrl } from "@/lib/aiGateway";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
@@ -108,7 +109,7 @@ Rules:
     // ── Groq (primary — free, fast, supports JSON mode) ───────────────────────
     if (GROQ_API_KEY) {
       try {
-        const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+        const res = await fetch(aiUrl("groq", "chat/completions", "https://api.groq.com/openai/v1/chat/completions"), {
           method: "POST",
           headers: { "Content-Type": "application/json", Authorization: `Bearer ${GROQ_API_KEY}` },
           body: JSON.stringify({
@@ -139,7 +140,7 @@ Rules:
       if (OPENAI_PROJECT) headers["OpenAI-Project"] = OPENAI_PROJECT;
       if (OPENAI_ORG)     headers["OpenAI-Organization"] = OPENAI_ORG;
 
-      const response = await fetch("https://api.openai.com/v1/chat/completions", {
+      const response = await fetch(aiUrl("openai", "chat/completions", "https://api.openai.com/v1/chat/completions"), {
         method: "POST",
         headers,
         body: JSON.stringify({

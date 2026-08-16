@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { aiUrl } from "@/lib/aiGateway";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
@@ -12,7 +13,13 @@ const HAS_VISION_KEY  = Boolean(GEMINI_API_KEY || OPENAI_API_KEY);
 // Gemini Vision — extract JSON from receipt/invoice image
 async function geminiVisionExtract(base64: string, mimeType: string, prompt: string): Promise<string> {
   const res = await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`,
+    // Google AI Studio is the one provider whose own version prefix the gateway
+    // keeps, so "v1beta/..." travels through unchanged.
+    aiUrl(
+      "google-ai-studio",
+      `v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`,
+    ),
     {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -96,7 +103,7 @@ Rules:
       if (OPENAI_PROJECT) headers["OpenAI-Project"] = OPENAI_PROJECT;
       if (OPENAI_ORG)     headers["OpenAI-Organization"] = OPENAI_ORG;
 
-      const response = await fetch("https://api.openai.com/v1/chat/completions", {
+      const response = await fetch(aiUrl("openai", "chat/completions", "https://api.openai.com/v1/chat/completions"), {
         method: "POST",
         headers,
         body: JSON.stringify({

@@ -5,6 +5,7 @@
  */
 
 import { prisma } from "@/lib/prisma";
+import { aiUrl } from "@/lib/aiGateway";
 import { getMarketIntelligenceLocalReply, getBusinessAdvisorLocalReply } from "@/lib/marketIntelligence";
 import { groqRequest, HAS_GROQ, GROQ_KEY_COUNT } from "@/lib/groqKeyRotator";
 
@@ -1138,7 +1139,7 @@ export async function openAITextResponse(
   if (OPENAI_ORG) headers["OpenAI-Organization"] = OPENAI_ORG;
 
   try {
-    const responsesApi = await fetch("https://api.openai.com/v1/responses", {
+    const responsesApi = await fetch(aiUrl("openai", "responses", "https://api.openai.com/v1/responses"), {
       method: "POST",
       headers,
       body: JSON.stringify({ model: OPENAI_MODEL, input, max_output_tokens: maxTokens, temperature: 0.4 }),
@@ -1160,7 +1161,7 @@ export async function openAITextResponse(
       if (nestedText) return nestedText;
     }
 
-    const chatCompletions = await fetch("https://api.openai.com/v1/chat/completions", {
+    const chatCompletions = await fetch(aiUrl("openai", "chat/completions", "https://api.openai.com/v1/chat/completions"), {
       method: "POST",
       headers,
       body: JSON.stringify({ model: OPENAI_MODEL, messages: input, max_tokens: maxTokens, temperature: 0.4 }),
