@@ -80,7 +80,7 @@ const SOCIALS_DEFAULT = [
     Icon: Music2,
     key: "tiktok",
     label: "TikTok",
-    href: "https://tiktok.com/@finovaforge",
+    href: "https://tiktok.com/@finovaos",
   },
   {
     Icon: Youtube,

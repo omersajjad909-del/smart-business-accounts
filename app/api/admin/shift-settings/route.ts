@@ -25,7 +25,7 @@ export async function GET(req: NextRequest) {
     getCompanyAdminControlSettings(companyId),
     prisma.userCompany.findMany({
       where: { companyId },
-      include: { user: { select: { id: true, name: true, email: true, role: true, active: true } } },
+      include: { user: { select: { id: true, name: true, email: true, role: true, active: true, avatar: true } } },
     }),
   ]);
 
@@ -35,6 +35,7 @@ export async function GET(req: NextRequest) {
     email: m.user.email,
     role: m.user.role,
     active: m.user.active,
+    avatar: m.user.avatar,
     shift: settings.shiftSettings[m.user.id] ?? null,
   }));
 

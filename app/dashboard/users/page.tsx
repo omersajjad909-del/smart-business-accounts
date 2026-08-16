@@ -22,6 +22,7 @@ type ShiftSetting = {
 };
 type ShiftUserEntry = {
   id: string; name: string; email: string; role: string; active: boolean;
+  avatar?: string | null;
   shift: ShiftSetting | null;
 };
 
@@ -733,8 +734,10 @@ export default function TeamAndPermissionsPage() {
                   <div key={u.id} style={{ background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)", borderRadius: 14, overflow: "hidden" }}>
                     {/* Card header */}
                     <div onClick={() => setShiftExpanded(isOpen ? null : u.id)} style={{ display: "flex", alignItems: "center", gap: 14, padding: isMobile ? "12px 10px" : "14px 18px", cursor: "pointer", background: isOpen ? "rgba(99,102,241,.05)" : "transparent", transition: "background .12s" }}>
-                      <div style={{ width: 38, height: 38, borderRadius: "50%", background: rm.bg, border: `1px solid ${rm.border}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, fontWeight: 800, color: rm.color, flexShrink: 0 }}>
-                        {u.name?.[0]?.toUpperCase() || "?"}
+                      <div style={{ width: 38, height: 38, borderRadius: "50%", background: rm.bg, border: `1px solid ${rm.border}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, fontWeight: 800, color: rm.color, flexShrink: 0, overflow: "hidden" }}>
+                        {u.avatar
+                          ? <img src={u.avatar} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                          : (u.name?.[0]?.toUpperCase() || "?")}
                       </div>
                       <div style={{ flex: 1, minWidth: 0 }}>
                         <div style={{ fontWeight: 700, fontSize: 14 }}>{u.name}</div>
