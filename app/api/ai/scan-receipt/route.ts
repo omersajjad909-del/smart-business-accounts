@@ -17,8 +17,8 @@ async function geminiVisionExtract(base64: string, mimeType: string, prompt: str
     // keeps, so "v1beta/..." travels through unchanged.
     aiUrl(
       "google-ai-studio",
-      `v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`,
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`,
+      `v1beta/models/gemini-flash-latest:generateContent?key=${GEMINI_API_KEY}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${GEMINI_API_KEY}`,
     ),
     {
       method: "POST",
