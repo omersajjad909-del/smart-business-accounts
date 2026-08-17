@@ -2575,6 +2575,12 @@ export const CORE_DASHBOARD_FEATURES: DashboardFeatureDefinition[] = [
   { id: "CORE_AFFILIATE", label: "Affiliate Program", route: "/dashboard/affiliate", section: "Settings", core: true, permKey: "VIEW_SETTINGS", business: "service", businessLabel: "Core (all businesses)" },
   { id: "CORE_COMPANY_PROFILE", label: "Company Profile", route: "/dashboard/company-profile", section: "Settings", core: true, permKey: "VIEW_SETTINGS", business: "service", businessLabel: "Core (all businesses)" },
   { id: "CORE_NOTIFICATIONS", label: "Notifications", route: "/dashboard/notifications", section: "Settings", core: true, permKey: "VIEW_SETTINGS", business: "service", businessLabel: "Core (all businesses)" },
+  // The page, its API and the encrypted vault behind it already existed, but it
+  // was never listed here — so it never appeared in /admin/permissions and could
+  // not be assigned to a plan like every other page. Without it a tenant cannot
+  // set their own SMTP, and their invoices go out from the FinovaOS address
+  // instead of their own.
+  { id: "CORE_EMAIL_SETTINGS", label: "Email Settings", route: "/dashboard/email-settings", section: "Settings", core: true, permKey: "EMAIL_SETTINGS", business: "service", businessLabel: "Core (all businesses)" },
 ];
 
 // Core pages join the same list the sidebar, the admin grid and the route

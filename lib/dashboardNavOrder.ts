@@ -763,6 +763,7 @@ export const DASHBOARD_NAV_GROUPS: DashboardNavGroup[] = [
       "/dashboard/financial-year",
       "/dashboard/budget",
       "/dashboard/backup-restore",
+      "/dashboard/email-settings",
       "/dashboard/notifications",
       "/dashboard/account-settings",
       "/dashboard/billing",

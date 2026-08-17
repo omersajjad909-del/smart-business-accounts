@@ -237,6 +237,13 @@ export const PLAN_DEFAULT_PERMISSIONS: Record<string, PermissionValue[]> = {
     PERMISSIONS.PAYMENT_RECEIPTS,
     PERMISSIONS.EXPENSE_VOUCHERS,
 
+    // Every plan gets this. Sending a customer's invoices from the FinovaOS
+    // address rather than the customer's own is not an upsell lever, it is a
+    // deliverability and trust problem — SPF/DKIM never match, and the buyer
+    // sees a stranger's domain. It stays assignable per plan in
+    // /admin/permissions if that call is ever revisited.
+    PERMISSIONS.EMAIL_SETTINGS,
+
     // NO: Trading Control — it was fully open here while the pricing table sold
     //     it as an upgrade. Same story for AI_BUSINESS_OPERATOR, our most
     //     expensive feature, which Starter was getting for free.
@@ -338,12 +345,19 @@ export const PLAN_DEFAULT_PERMISSIONS: Record<string, PermissionValue[]> = {
     PERMISSIONS.AI_SMART_SUGGESTIONS,
     PERMISSIONS.AI_EXPENSE_CATEGORIZATION,
 
+    // Every plan gets this. Sending a customer's invoices from the FinovaOS
+    // address rather than the customer's own is not an upsell lever, it is a
+    // deliverability and trust problem — SPF/DKIM never match, and the buyer
+    // sees a stranger's domain. It stays assignable per plan in
+    // /admin/permissions if that call is ever revisited.
+    PERMISSIONS.EMAIL_SETTINGS,
+
     // Deliberately NOT in Pro — this is what Enterprise is for. An earlier pass
     // pushed all of these down into Pro, which left Enterprise as "Pro plus a
     // bigger user count", i.e. nothing anyone would upgrade for.
     //
     // Governance:  VIEW_AUDIT_LOG, VIEW_LOGS, MANAGE_ROLES, MANAGE_APPROVALS,
-    //              MANAGE_COST_CENTERS, BACKUP_RESTORE, EMAIL_SETTINGS
+    //              MANAGE_COST_CENTERS, BACKUP_RESTORE
     // Integration: API_ACCESS, MULTI_CURRENCY
     // AI:          AI_BUSINESS_OPERATOR (also sold as an add-on to lower
     //              plans), AI_FORECAST, AI_ANOMALY_DETECTION,

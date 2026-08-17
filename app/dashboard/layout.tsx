@@ -2201,6 +2201,10 @@ export default function DashboardLayout({
               {!isCustomPlan && hasPermission(currentUser, PERMISSIONS.FINANCIAL_YEAR) && <NavLink href="/dashboard/financial-year" pathname={pathname}>Financial Year</NavLink>}
               {!isCustomPlan && hasPermission(currentUser, PERMISSIONS.BUDGET_PLANNING) && <NavLink href="/dashboard/budget" pathname={pathname}>Budget Planning</NavLink>}
               {!isCustomPlan && hasPermission(currentUser, PERMISSIONS.BACKUP_RESTORE) && <NavLink href="/dashboard/backup-restore" pathname={pathname}>Backup & Restore</NavLink>}
+              {/* No !isCustomPlan guard: a Custom-plan tenant still sends invoices, so
+                  they still need to send them from their own address. The permission
+                  itself is what gates this, and it is assignable in /admin/permissions. */}
+              {hasPermission(currentUser, PERMISSIONS.EMAIL_SETTINGS) && <NavLink href="/dashboard/email-settings" pathname={pathname}>📧 Email Settings</NavLink>}
               {/* {(!isCustomPlan || hasCustomActiveModule("whatsapp")) && <NavLink href="/dashboard/notifications" pathname={pathname}>Notifications & SMS</NavLink>} */}
               <NavLink href="/dashboard/account-settings" pathname={pathname}>Account Settings</NavLink>
               <NavLink href="/dashboard/billing"   pathname={pathname}>💳 My Billing</NavLink>
