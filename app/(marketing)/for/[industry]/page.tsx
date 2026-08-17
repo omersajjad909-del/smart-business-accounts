@@ -11,6 +11,48 @@ interface BizType {
 /* ─── Industry-specific content ─── */
 
 const PAIN_POINTS: Record<string, { icon:string; text:string }[]> = {
+  trading: [
+    { icon:"📦", text:"Register stock and godown stock never match — shortages only surface at the annual stock-take" },
+    { icon:"💰", text:"Purchase rates change every few weeks, so margins get calculated on stale cost prices" },
+    { icon:"📒", text:"Part payments land against three or four invoices at once — nobody knows which bill is still open" },
+    { icon:"🧾", text:"Delivery challans, POs, and invoices live in separate books, so disputes take days to settle" },
+  ],
+  distribution: [
+    { icon:"🚚", text:"Van stock loaded in the morning is never reconciled against cash and invoices at night" },
+    { icon:"🏬", text:"Depot-to-depot transfers recorded on paper — head office sees the shortage weeks later" },
+    { icon:"🚦", text:"Retailers keep buying past their credit limit because the limit isn't enforced at billing" },
+    { icon:"📉", text:"Slow-moving and near-expiry stock sits at branches with no ageing report to catch it" },
+  ],
+  wholesale: [
+    { icon:"🏷️", text:"Every dealer has a different rate slab, and the correct rate lives in one person's memory" },
+    { icon:"💸", text:"Credit limits agreed verbally — exposure to a single dealer is discovered only after a default" },
+    { icon:"↩️", text:"Damaged-goods returns and scheme claims adjusted informally, so ledgers never tie out" },
+    { icon:"📊", text:"Ageing is a manual exercise, so recovery calls go to the wrong dealers in the wrong order" },
+  ],
+  retail: [
+    { icon:"🧾", text:"Counter sales written by hand — daily cash, card, and digital collections never reconcile" },
+    { icon:"📦", text:"Shelf stock and system stock drift apart because purchases and sales aren't linked live" },
+    { icon:"🏪", text:"Each outlet keeps its own book, so group-level sales and margin take days to consolidate" },
+    { icon:"👥", text:"Cashier shifts close without a shift report — shortages can't be traced to a person or hour" },
+  ],
+  import_company: [
+    { icon:"🚢", text:"Freight, duty, insurance, port charges, and clearing fees sit in separate emails and files" },
+    { icon:"💱", text:"Payments made in USD/EUR but booked at one fixed rate — exchange gain and loss is invisible" },
+    { icon:"📦", text:"Goods in transit aren't on the books, so stock and payables look wrong for weeks" },
+    { icon:"📉", text:"Landed cost is estimated, so the real margin on a consignment is known only after it is sold" },
+  ],
+  clearing_forwarding: [
+    { icon:"🗂️", text:"Costs from four vendors land against one consignment with no single job file to hold them" },
+    { icon:"💵", text:"Duty paid on the client's behalf gets mixed with your agency fee — the real income is unclear" },
+    { icon:"📄", text:"BL, GD, packing list, and delivery order tracked in WhatsApp — a missing document stalls clearance" },
+    { icon:"⏱️", text:"Demurrage and detention charges get absorbed because nobody billed them back in time" },
+  ],
+  manufacturing: [
+    { icon:"⚙️", text:"Raw material issued to the floor without a BOM — consumption is estimated, not recorded" },
+    { icon:"🏭", text:"Work-in-progress isn't valued, so the balance sheet misses everything sitting on the shop floor" },
+    { icon:"💰", text:"Labour and overhead never reach the product cost, so quoted prices are guesswork" },
+    { icon:"🗑️", text:"Scrap and rework are absorbed silently — the true wastage rate per batch is unknown" },
+  ],
   travel: [
     { icon:"📋", text:"Passenger details, PNRs, and visa statuses tracked in different WhatsApp chats and sheets" },
     { icon:"💸", text:"Service fees collected without proper invoices — no balance visibility per client" },
@@ -119,6 +161,13 @@ const PAIN_POINTS: Record<string, { icon:string; text:string }[]> = {
 };
 
 const WORKFLOWS: Record<string, string[]> = {
+  trading:             ["Supplier Quotation", "Purchase Order", "GRN & Stock In", "Sales Invoice", "Payment Collection", "Bank Reconciliation"],
+  distribution:        ["Supplier PO", "Warehouse GRN", "Route & Van Load-Out", "Delivery + Invoice", "Daily Route Settlement", "Depot P&L"],
+  wholesale:           ["Bulk Purchase", "Warehouse Stock In", "Dealer Order", "Slab-Priced Invoice", "Credit & Ageing Watch", "Recovery & Receipt"],
+  retail:              ["Purchase Order", "Stock In & Barcode", "POS Counter Sale", "Shift Cash Close", "Store Reconciliation", "Store-Wise P&L"],
+  import_company:      ["Proforma / Order", "LC or TT Opening", "Shipment & Transit", "Customs Clearance", "Landed Cost Costing", "Local or Export Sale"],
+  clearing_forwarding: ["Client Instruction", "Job File Opened", "Document Set Check", "Customs Clearance", "Cost & Duty Logged", "Agency Invoice & Job P&L"],
+  manufacturing:       ["Raw Material PO", "GRN & Store In", "Production Order", "BOM Issue & WIP", "Finished Goods In", "Costing & Customer Invoice"],
   travel:      ["Client Enquiry", "Quotation", "Booking & Docs", "Invoice", "Payment Collection", "Case Closed"],
   Commerce:    ["Purchase Order", "GRN (Goods Receipt)", "Inventory Update", "Sales Invoice", "Payment Collection", "Bank Reconciliation"],
   Services:    ["Client Brief", "Quotation / Agreement", "Work Delivery", "Invoice", "Payment Receipt", "Profit Review"],
@@ -143,6 +192,13 @@ const WORKFLOWS: Record<string, string[]> = {
 };
 
 const STATS: Record<string, { val:string; label:string }[]> = {
+  trading:             [{ val:"Per SKU", label:"Real margin visibility" }, { val:"87%", label:"Less reconciliation time" }, { val:"3×", label:"Faster month-end close" }],
+  distribution:        [{ val:"Per route", label:"Profit & settlement view" }, { val:"99%", label:"Van stock reconciliation" }, { val:"2 hrs", label:"Daily depot settlement" }],
+  wholesale:           [{ val:"Per dealer", label:"Rate & credit control" }, { val:"Zero", label:"Rate-slab billing errors" }, { val:"Instant", label:"Outstanding ageing view" }],
+  retail:              [{ val:"12 min", label:"Daily store close" }, { val:"100%", label:"Counter-to-stock accuracy" }, { val:"Live", label:"Multi-store stock view" }],
+  import_company:      [{ val:"Accurate", label:"Landed cost per shipment" }, { val:"Live", label:"Goods-in-transit visibility" }, { val:"Auto", label:"FX gain / loss posting" }],
+  clearing_forwarding: [{ val:"Per job", label:"Consignment profitability" }, { val:"Zero", label:"Unbilled reimbursables" }, { val:"100%", label:"Document set traceability" }],
+  manufacturing:       [{ val:"Per batch", label:"True cost per unit" }, { val:"18%", label:"Average margin improvement" }, { val:"Live", label:"WIP & scrap visibility" }],
   travel:      [{ val:"100%", label:"Passenger file visibility" }, { val:"Zero", label:"Missed visa follow-ups" }, { val:"3×", label:"Faster invoicing" }],
   Commerce:    [{ val:"87%", label:"Less reconciliation time" }, { val:"3×", label:"Faster month-end close" }, { val:"Zero", label:"Data entry errors" }],
   Services:    [{ val:"65%", label:"Faster invoice collection" }, { val:"Zero", label:"Missed billable expenses" }, { val:"1 day", label:"Monthly close (was 2 weeks)" }],
@@ -167,6 +223,76 @@ const STATS: Record<string, { val:string; label:string }[]> = {
 };
 
 const FEATURES: Record<string, { icon:string; title:string; desc:string }[]> = {
+  trading: [
+    { icon:"🧾", title:"Purchase Orders & GRN",       desc:"Raise POs, receive goods against them, and let stock and payables update in the same step." },
+    { icon:"📦", title:"Real-Time Stock Ledger",      desc:"Every issue, receipt, and adjustment is dated and traceable — item-wise and godown-wise." },
+    { icon:"💰", title:"Cost Price & Margin per SKU", desc:"Weighted-average or FIFO costing so the margin on each item reflects what you actually paid." },
+    { icon:"📒", title:"Party Ledger with Ageing",    desc:"Customer and supplier balances with 30/60/90-day buckets and full transaction history." },
+    { icon:"🔁", title:"Advance & Part Payments",     desc:"Allocate one receipt across several invoices — open balances stay correct automatically." },
+    { icon:"↩️", title:"Purchase & Sales Returns",    desc:"Debit and credit notes that reverse both the stock and the ledger in one entry." },
+    { icon:"🏦", title:"Bank Reconciliation",         desc:"Import the statement, auto-match entries, and review only what genuinely differs." },
+    { icon:"📊", title:"Profit by Item, Party & Month",desc:"See which SKUs, suppliers, and customers actually carry the business — not just turnover." },
+  ],
+  distribution: [
+    { icon:"🏬", title:"Multi-Depot Inventory",       desc:"Separate stock per depot with inter-depot transfer notes and a full transfer audit trail." },
+    { icon:"🚚", title:"Route & Van Load-Out",        desc:"Issue stock to a route or vehicle in the morning and track exactly what went out." },
+    { icon:"🧾", title:"Van Sales & Daily Settlement",desc:"Reconcile loaded stock against invoices, returns, and cash collected at day close." },
+    { icon:"🚦", title:"Retailer Credit Limits",      desc:"Set a limit per retailer and warn or block at billing before exposure grows." },
+    { icon:"🎁", title:"Schemes & Trade Discounts",   desc:"Apply free-goods schemes, slabs, and trade discounts consistently across every route." },
+    { icon:"📉", title:"Stock Ageing & Expiry",       desc:"Flag slow-moving and near-expiry stock at each depot before it becomes a write-off." },
+    { icon:"👥", title:"Salesman-Wise Performance",   desc:"Sales, recovery, and returns per salesman — commission calculated on real collections." },
+    { icon:"📊", title:"Route & Depot P&L",           desc:"Consolidated group view plus profitability for every individual route and branch." },
+  ],
+  wholesale: [
+    { icon:"🏷️", title:"Slab & Tier Pricing",        desc:"Rates by quantity slab, dealer category, or region — applied automatically at billing time." },
+    { icon:"👥", title:"Dealer Ledger & Statements",  desc:"A complete ledger per dealer, exportable as a statement to send on WhatsApp or email." },
+    { icon:"🧾", title:"Bulk Order to Invoice",       desc:"Convert large sales orders into invoices and delivery challans without re-keying a line." },
+    { icon:"🚦", title:"Credit Limit Enforcement",    desc:"Block or warn on orders that push a dealer past their approved limit or overdue days." },
+    { icon:"↩️", title:"Returns, Claims & Notes",     desc:"Record damaged goods, scheme claims, and adjustments against the correct dealer account." },
+    { icon:"📊", title:"Ageing & Recovery Priority",  desc:"30/60/90-day buckets so recovery effort goes to the accounts that actually matter." },
+    { icon:"🏬", title:"Warehouse Stock Control",     desc:"Bin-level stock, reorder alerts, and transfers between warehouses in one dashboard." },
+    { icon:"💹", title:"Dealer-Wise Profitability",   desc:"Net margin per dealer after discounts, schemes, and returns — not just gross sales." },
+  ],
+  retail: [
+    { icon:"🖥️", title:"POS Billing & Barcode",      desc:"Fast counter billing with barcode scanning, held bills, and multiple payment modes." },
+    { icon:"💵", title:"Shift & Cash Close",          desc:"Open and close cashier shifts with a report of cash, card, and digital collections." },
+    { icon:"📦", title:"Live Shelf & Store Stock",    desc:"Purchases and sales move stock instantly, so shelf and system counts stay together." },
+    { icon:"🏪", title:"Multi-Store Transfers",       desc:"Move stock between outlets with request, approval, and receipt — nothing goes untracked." },
+    { icon:"🎯", title:"Loyalty & Customer History",  desc:"Recognise repeat customers, track their purchase history, and run point-based loyalty." },
+    { icon:"🔔", title:"Reorder Level Alerts",        desc:"Automatic low-stock alerts per store so best-sellers never go empty on the shelf." },
+    { icon:"👥", title:"Staff Shifts & Commission",   desc:"Sales per cashier and per salesperson with commission calculated from actual bills." },
+    { icon:"📊", title:"Store-Wise P&L",              desc:"Compare revenue, cost, and margin across outlets side by side from one dashboard." },
+  ],
+  import_company: [
+    { icon:"🚢", title:"Shipment / Consignment File", desc:"One file per shipment — supplier, BL, container, ETA, and every related cost line." },
+    { icon:"🏦", title:"LC & TT Tracking",            desc:"Track letters of credit and telegraphic transfers, their margins, maturity, and retirement." },
+    { icon:"🛃", title:"Landed Cost Build-Up",        desc:"Apportion freight, duty, insurance, clearing, and port charges across items by value or weight." },
+    { icon:"📦", title:"Goods in Transit",            desc:"Keep in-transit consignments on the books, then convert to stock via GRN on clearance." },
+    { icon:"💱", title:"Multi-Currency & FX",         desc:"Buy in USD/EUR and sell locally, with exchange gain and loss posted automatically." },
+    { icon:"📤", title:"Export Invoice & Packing List",desc:"Generate export invoices, packing lists, and shipment documents from the same order." },
+    { icon:"📄", title:"Supplier & Bank Documents",   desc:"Keep proforma invoices, BLs, insurance covers, and bank advices attached to the shipment." },
+    { icon:"📊", title:"Shipment-Wise Profit",        desc:"Landed cost against realised sale value — margin per consignment, not just per month." },
+  ],
+  clearing_forwarding: [
+    { icon:"🗂️", title:"Job File per Consignment",   desc:"Open a job for every consignment — client, BL, container, mode, and all costs attached." },
+    { icon:"💵", title:"Reimbursable vs Agency Fee",  desc:"Money spent on behalf of a client stays separate from your service income and margin." },
+    { icon:"🛃", title:"Duty & Port Charge Log",      desc:"Duty, terminal handling, port dues, and examination charges recorded against the exact job." },
+    { icon:"📄", title:"Document Set Checklist",      desc:"BL, invoice, packing list, GD, and delivery order tracked per file so clearance never stalls." },
+    { icon:"🚚", title:"Transporter & Vendor Bills",  desc:"Capture haulier, labour, and warehouse bills and recover them on the client invoice." },
+    { icon:"⏱️", title:"Demurrage & Detention",      desc:"Log free-time expiry and charges as they accrue so nothing is absorbed unbilled." },
+    { icon:"📒", title:"Client Statements",           desc:"A running statement per client covering advances, disbursements, and agency invoices." },
+    { icon:"📊", title:"Job-Wise & Client P&L",       desc:"Profit on a file the day it clears, and profitability per client over any period." },
+  ],
+  manufacturing: [
+    { icon:"⚙️", title:"Bill of Materials (BOM)",    desc:"Define components, quantities, and wastage allowance per finished product and revision." },
+    { icon:"🏭", title:"Production Orders",           desc:"Plan a run, issue material against it, and record output — all linked to one order." },
+    { icon:"📦", title:"Raw Material & Store Control",desc:"Store-wise raw material stock with issue slips, returns to store, and reorder alerts." },
+    { icon:"🔄", title:"Work-in-Progress Valuation",  desc:"Value what is on the shop floor so your stock and balance sheet reflect reality." },
+    { icon:"💰", title:"Labour & Overhead Costing",   desc:"Add labour, machine, and overhead rates to material cost for a true cost per unit." },
+    { icon:"🗑️", title:"Scrap, Rework & Wastage",    desc:"Record scrap and rework per batch and see the real wastage percentage over time." },
+    { icon:"🔍", title:"Batch & Lot Traceability",    desc:"Trace a finished batch back to the exact raw material lots that went into it." },
+    { icon:"📊", title:"Product Profitability",       desc:"Compare cost per unit against selling price by product, batch, and period." },
+  ],
   travel: [
     { icon:"🎫", title:"Airline Ticket Desk",       desc:"Track booking refs, airlines, routes, travel dates, and PNRs per passenger file." },
     { icon:"🛂", title:"Visa Processing Cases",      desc:"Manage document check, submission, approval, and rejection per applicant." },
