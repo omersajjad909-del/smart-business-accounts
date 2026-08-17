@@ -2,8 +2,10 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
+import { ALL_POSTS as SHARED_POSTS } from "../posts";
+import { SEO_ARTICLES } from "../seo-articles";
 
-const ALL_POSTS: Record<string, any> = {
+const LOCAL_POSTS: Record<string, any> = {
   "bank-reconciliation-guide": {
     title: "The Complete Guide to Bank Reconciliation for SMEs in 2025",
     category: "accounting", categoryLabel: "Accounting Tips", color: "#818cf8",
