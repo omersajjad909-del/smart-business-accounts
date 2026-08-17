@@ -18,6 +18,8 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "businessType and plan required" }, { status: 400 });
   }
 
+  try {
+
   // Get real companyId — admin JWT may not include it
   let originCompanyId = payload.isTestMode ? payload.originCompanyId : payload.companyId;
   if (!originCompanyId) {
@@ -90,6 +92,10 @@ export async function POST(req: NextRequest) {
     userId,
     companyId: testCompanyId,
     role: "ADMIN",
+    // proxy.ts redirects any /admin page whose token lacks scope:"admin" to the
+    // login screen. This token overwrites sb_auth, so omitting the scope locked
+    // the admin out of the console the moment a test session started.
+    scope: "admin",
     isTestMode: true,
     originCompanyId,
     testBusinessType: businessType,
@@ -116,5 +122,15 @@ export async function POST(req: NextRequest) {
     maxAge: 8 * 60 * 60,
   });
 
-  return res;
+    return res;
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    console.error("[dev-test/launch] failed:", err);
+    // This route is admin-only, so returning the real reason is safe here and
+    // is the difference between a debuggable failure and a silent one.
+    return NextResponse.json(
+      { error: `Launch failed: ${message}` },
+      { status: 500 },
+    );
+  }
 }
