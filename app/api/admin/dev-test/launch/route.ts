@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getTokenFromRequest, verifyJwt, signJwt } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import bcrypt from "bcryptjs";
+import { randomUUID } from "crypto";
 
 const TEST_ACTION = "ADMIN_DEV_TEST_COMPANY";
 
@@ -19,10 +21,54 @@ export async function POST(req: NextRequest) {
   }
 
   try {
+    // A platform admin can come from either of two unrelated tables: a User row
+    // (super admin) or an AdminUser row (team member). Only a User id satisfies
+    // UserCompany_userId_fkey and ActivityLog's user relation, and the dashboard
+    // itself loads the session through prisma.user.findUnique — so an AdminUser
+    // id cannot drive a test session at all. That mismatch was the 500: the
+    // upsert below was handed an id that does not exist in "User".
+    //
+    // For a team member we therefore keep one dedicated, reusable test user
+    // alongside the test company. The email is derived from the admin id so
+    // this stays idempotent across launches, and .local is reserved so the
+    // address can never collide with or reach a real inbox.
+    const adminId = userId;
+    let sessionUserId = adminId;
+
+    const adminIsRealUser = await prisma.user.findUnique({
+      where: { id: adminId },
+      select: { id: true },
+    });
+
+    if (!adminIsRealUser) {
+      const shadowEmail = `devtest+${adminId}@finovaos.local`;
+      const adminName =
+        (await (prisma as any).adminUser?.findUnique({
+          where: { id: adminId },
+          select: { name: true },
+        }).catch(() => null))?.name || "Admin";
+
+      const shadowUser = await prisma.user.upsert({
+        where: { email: shadowEmail },
+        update: {},
+        create: {
+          name: `${adminName} (Dev Test)`,
+          email: shadowEmail,
+          // Never used to sign in — the session is minted directly below. A
+          // random hash keeps the column honest rather than leaving a guessable
+          // or empty credential on a role:"ADMIN" row.
+          password: await bcrypt.hash(randomUUID(), 10),
+          role: "ADMIN",
+        },
+        select: { id: true },
+      });
+      sessionUserId = shadowUser.id;
+    }
+
     // Get real companyId — admin JWT may not include it
     let originCompanyId = payload.isTestMode ? payload.originCompanyId : payload.companyId;
     if (!originCompanyId) {
-      const u = await prisma.user.findUnique({ where: { id: userId }, select: { defaultCompanyId: true } });
+      const u = await prisma.user.findUnique({ where: { id: sessionUserId }, select: { defaultCompanyId: true } });
       originCompanyId = u?.defaultCompanyId || null;
     }
 
@@ -30,7 +76,7 @@ export async function POST(req: NextRequest) {
     let testCompanyId: string | null = null;
     try {
       const log = await prisma.activityLog.findFirst({
-        where: { action: TEST_ACTION, userId },
+        where: { action: TEST_ACTION, userId: sessionUserId },
         orderBy: { createdAt: "desc" },
       });
       if (log?.details) {
@@ -46,7 +92,7 @@ export async function POST(req: NextRequest) {
     }
 
     if (!testCompanyId) {
-      const user = await prisma.user.findUnique({ where: { id: userId }, select: { name: true } });
+      const user = await prisma.user.findUnique({ where: { id: sessionUserId }, select: { name: true } });
       const testCompany = await prisma.company.create({
         data: {
           name: `${user?.name || "Admin"}'s`,
@@ -62,15 +108,15 @@ export async function POST(req: NextRequest) {
       testCompanyId = testCompany.id;
 
       await prisma.userCompany.upsert({
-        where: { userId_companyId: { userId, companyId: testCompanyId } },
-        create: { userId, companyId: testCompanyId, isDefault: false },
+        where: { userId_companyId: { userId: sessionUserId, companyId: testCompanyId } },
+        create: { userId: sessionUserId, companyId: testCompanyId, isDefault: false },
         update: {},
       });
 
       await prisma.activityLog.create({
         data: {
           action: TEST_ACTION,
-          userId,
+          userId: sessionUserId,
           companyId: testCompanyId,
           details: JSON.stringify({ testCompanyId }),
         },
@@ -88,7 +134,7 @@ export async function POST(req: NextRequest) {
     }
 
     const testToken = signJwt({
-      userId,
+      userId: sessionUserId,
       companyId: testCompanyId,
       role: "ADMIN",
       // proxy.ts redirects any /admin page whose token lacks scope:"admin" to the
