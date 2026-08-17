@@ -34,7 +34,7 @@ const INDUSTRIES = [
     phase: 1,
     emoji: "🚚",
     label: "Distribution",
-    title: "Distribution & Wholesale",
+    title: "Distribution & Route Sales",
     subtitle: "Multi-route, multi-warehouse — one dashboard.",
     color: "#34d399",
     glow: "rgba(52,211,153,.22)",
@@ -52,6 +52,32 @@ const INDUSTRIES = [
     ],
     quote: "Our 8 depot managers all work in the same system. Zero confusion, full visibility.",
     quoteName: "Ryan Kennedy", quoteTitle: "MD, Apex Distribution — Toronto",
+  },
+
+  // ── WHOLESALE ───────────────────────────────────────────────
+  {
+    id: "wholesale",
+    phase: 1,
+    emoji: "📦",
+    label: "Wholesale",
+    title: "Wholesale & Bulk Trading",
+    subtitle: "Slab pricing, dealer ledgers, and credit control — under one roof.",
+    color: "#f59e0b",
+    glow: "rgba(245,158,11,.22)",
+    dim:  "rgba(245,158,11,.08)",
+    border:"rgba(245,158,11,.3)",
+    pain: "Every dealer has a different rate, a different credit limit, and a different payment history — and it all lives in one person's head.",
+    stats: [{ val:"Per dealer", label:"Rate & credit control" },{ val:"100%", label:"Bulk order traceability" },{ val:"Instant", label:"Outstanding ageing view" }],
+    features:[
+      { icon:"🏷️", title:"Slab & Tier Pricing",       desc:"Set rates by quantity slab, dealer category, or region — applied automatically at billing." },
+      { icon:"👥", title:"Dealer & Party Ledgers",     desc:"Every dealer gets a full ledger — sales, returns, discounts, and payments in one view." },
+      { icon:"🧾", title:"Bulk Order to Invoice",      desc:"Convert bulk sales orders into invoices and delivery challans without re-entry." },
+      { icon:"🚦", title:"Credit Limit Enforcement",   desc:"Block or warn on orders that push a dealer past their approved credit limit." },
+      { icon:"↩️", title:"Sales Returns & Claims",     desc:"Record damaged-goods returns, scheme claims, and credit notes against the right dealer." },
+      { icon:"📊", title:"Ageing & Recovery Reports",  desc:"30/60/90-day ageing buckets so recovery calls target the right accounts first." },
+    ],
+    quote: "We deal with 300+ retailers on different rate slabs. FinovaOS applies the right price every single time.",
+    quoteName: "Daniel Weber", quoteTitle: "Director, Weber Wholesale — Hamburg",
   },
   {
     id: "manufacturing",
@@ -568,6 +594,32 @@ const INDUSTRIES = [
     quoteName: "ZamZam Imports", quoteTitle: "Import & Export",
   },
 
+  // ── CLEARING & FORWARDING ───────────────────────────────────
+  {
+    id: "clearing_forwarding",
+    phase: 1,
+    emoji: "🛃",
+    label: "Clearing & Forwarding",
+    title: "Clearing & Forwarding Agents",
+    subtitle: "Per-consignment job costing, agency billing, and document control.",
+    color: "#a78bfa",
+    glow: "rgba(167,139,250,.22)",
+    dim:  "rgba(167,139,250,.08)",
+    border:"rgba(167,139,250,.3)",
+    pain: "Duty paid on a client's behalf, port charges, demurrage, and your own agency fee all blur together — so nobody knows what a job actually earned.",
+    stats: [{ val:"Per job", label:"Consignment profitability" },{ val:"Zero", label:"Unbilled reimbursables" },{ val:"Live", label:"Consignment status board" }],
+    features:[
+      { icon:"🗂️", title:"Job / Consignment Files",    desc:"One file per consignment — BL number, container, client, and every cost attached to it." },
+      { icon:"💵", title:"Reimbursable vs Agency Fee", desc:"Separate money spent on the client's behalf from your own service income — no mixed margins." },
+      { icon:"🛃", title:"Duty & Port Charge Tracking",desc:"Log duty, port dues, terminal handling, and demurrage against the exact job." },
+      { icon:"📄", title:"Document Checklist",         desc:"BL, invoice, packing list, GD, and delivery order — tracked per file so nothing is missed." },
+      { icon:"🚚", title:"Transporter & Vendor Bills", desc:"Record haulier, labour, and warehouse bills and recover them on the client invoice." },
+      { icon:"📊", title:"Job-Wise P&L",               desc:"Instant profit per consignment and per client — before the file is even closed." },
+    ],
+    quote: "Every consignment used to be a guess at month end. Now I know the profit on a file the day it clears.",
+    quoteName: "Marcus Bell", quoteTitle: "Partner, Bell Clearing Services — Rotterdam",
+  },
+
   // ── EVENT MANAGEMENT ────────────────────────────────────────
   {
     id: "events",
@@ -650,6 +702,7 @@ const INDUSTRIES = [
 const WORKFLOWS: Record<string, string[]> = {
   trading:       ["Purchase Order", "Stock In (GRN)", "Sales Invoice", "Payment Collection", "Bank Reconcile"],
   distribution:  ["Supplier PO", "Warehouse Stock", "Route Assignment", "Delivery", "Daily Settlement"],
+  wholesale:     ["Bulk Purchase", "Warehouse Stock", "Dealer Order", "Slab Pricing Invoice", "Credit Recovery"],
   manufacturing: ["Raw Material PO", "Production Order", "BOM Consumption", "Finished Goods", "Customer Invoice"],
   services:      ["Client Quotation", "Agreement", "Work Delivery", "Invoice", "Payment Receipt"],
   retail:        ["Purchase Order", "Inventory Update", "POS Sale", "Daily Reconciliation", "Profit Reports"],
@@ -671,13 +724,14 @@ const WORKFLOWS: Record<string, string[]> = {
   saas:          ["Subscriber Signup", "Plan Assignment", "Auto-Invoice", "Payment", "Churn Tracking"],
   solar:         ["Site Survey", "Quotation", "Equipment PO", "Installation", "AMC Contract"],
   import:        ["LC / TT", "Shipment Booking", "Customs Clearance", "Landed Cost", "Local Sale"],
+  clearing_forwarding: ["Job File Open", "Document Check", "Customs Clearance", "Cost & Duty Log", "Agency Invoice"],
   events:        ["Client Booking", "Vendor Contracts", "Budget Tracking", "Event Delivery", "Final Invoice"],
   repair:        ["Device Intake", "Diagnosis", "Parts Order", "Repair", "Customer Bill"],
   franchise:     ["Outlet Setup", "Daily Operations", "Sales Report", "Royalty Calc", "Group P&L"],
 };
 
 const TAB_GROUPS = [
-  { label: "Commerce",     ids: ["trading","distribution","import","ecommerce"] },
+  { label: "Commerce",     ids: ["trading","distribution","wholesale","import","clearing_forwarding","ecommerce"] },
   { label: "Production",   ids: ["manufacturing","agriculture"] },
   { label: "F&B",          ids: ["restaurant","hotel"] },
   { label: "Services",     ids: ["services","travel","events"] },
@@ -715,6 +769,7 @@ function useVisible(threshold = 0.1) {
 const IND_BIZ_KEY: Record<string, string> = {
   trading:       "trading",
   distribution:  "distribution",
+  wholesale:     "wholesale",
   manufacturing: "manufacturing",
   services:      "service",
   retail:        "retail",
@@ -736,6 +791,7 @@ const IND_BIZ_KEY: Record<string, string> = {
   saas:          "saas_company",
   solar:         "solar_company",
   import:        "import_company",
+  clearing_forwarding: "clearing_forwarding",
   events:        "event_planner",
   repair:        "mobile_repair",
   franchise:     "chain_store",
@@ -1100,7 +1156,7 @@ function IndustrySection({ ind, index, isLive, onNotify }: { ind: typeof INDUSTR
                 </div>
               ) : (
                 <div style={{ display:"flex", gap:12, flexWrap:"wrap", alignItems:"center" }}>
-                  <Link href={`/onboarding/signup/starter?businessType=${ind.id}`} style={{
+                  <Link href={`/onboarding/signup/starter?businessType=${IND_BIZ_KEY[ind.id] || ind.id}`} style={{
                     display:"inline-flex", alignItems:"center", gap:8,
                     padding:"13px 28px", borderRadius:13,
                     background:`linear-gradient(135deg,${ind.color},${ind.color}cc)`,
@@ -1197,6 +1253,10 @@ export default function SolutionsPage() {
     const aliases: Record<string, string> = {
       import: "import",
       export: "import",
+      import_company: "import",
+      export_company: "import",
+      clearing: "clearing_forwarding",
+      cnf: "clearing_forwarding",
       travel: "travel",
       services: "services",
       events: "events",
