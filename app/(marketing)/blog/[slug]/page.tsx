@@ -501,10 +501,24 @@ const LOCAL_POSTS: Record<string, any> = {
   },
 };
 
+/**
+ * Three sources, deliberately layered:
+ *   SHARED_POSTS  — ../posts.ts. Also drives generateMetadata and the sitemap.
+ *                   Merging it here is what makes those sitemap slugs resolve;
+ *                   four of them previously 404'd because only the metadata
+ *                   layout could see them.
+ *   LOCAL_POSTS   — the older FinovaOS-centric posts written straight into this
+ *                   file. They override SHARED_POSTS where slugs collide, which
+ *                   preserves the existing published copy.
+ *   SEO_ARTICLES  — ../seo-articles.ts. Single source of truth, so these render
+ *                   the same content the index and metadata layout use.
+ */
+const ALL_POSTS: Record<string, any> = { ...SHARED_POSTS, ...LOCAL_POSTS, ...SEO_ARTICLES };
+
 const RELATED_BY_CATEGORY: Record<string, string[]> = {
   accounting: ["bank-reconciliation-guide","5","9","11"],
-  guides:     ["1","2","7","13"],
-  business:   ["6","8","10","12"],
+  guides:     ["1","2","7","13","manage-sales-inventory-accounting-one-system"],
+  business:   ["best-business-management-software-small-business","best-odoo-alternatives","best-quickbooks-alternatives","best-all-in-one-business-management-software","accounting-crm-inventory-software-small-business","business-management-software-wholesale","business-management-software-distributors","6","8","10","12"],
   product:    ["3","4","8","14"],
   fintech:    ["5","9","15"],
 };
@@ -634,6 +648,68 @@ export default function BlogDetailPage() {
               <p style={{ fontSize:16, color:"rgba(255,255,255,.75)", lineHeight:1.75, margin:"0 0 14px", fontStyle:"italic" }}>{block.text}</p>
               <div style={{ fontSize:13, color:post.color, fontWeight:700 }}>— {block.author}</div>
             </div>
+          );
+          // The direct answer to the title question, kept at the top of the
+          // article. This is the passage answer engines lift, so it is marked up
+          // as a self-contained block rather than folded into the intro prose.
+          if (block.type === "answer") return (
+            <div key={i} style={{ margin:"0 0 34px", padding:"26px 28px", borderRadius:18, background:`${post.color}12`, border:`1px solid ${post.color}35` }}>
+              <div style={{ fontSize:11, fontWeight:800, letterSpacing:".09em", color:post.color, marginBottom:12 }}>THE SHORT ANSWER</div>
+              <p style={{ fontSize:16.5, color:"rgba(255,255,255,.82)", lineHeight:1.8, margin:0, fontWeight:500 }}>{block.text}</p>
+            </div>
+          );
+          if (block.type === "h3") return (
+            <h3 key={i} style={{ fontSize:"clamp(16px,2.4vw,19px)", fontWeight:800, color:"rgba(255,255,255,.92)", letterSpacing:"-.01em", margin:"30px 0 10px" }}>
+              {block.text}
+            </h3>
+          );
+          if (block.type === "note") return (
+            <div key={i} style={{ margin:"28px 0", padding:"18px 22px", borderRadius:14, background:"rgba(255,255,255,.04)", borderLeft:"3px solid rgba(255,255,255,.22)" }}>
+              <p style={{ fontSize:14.5, color:"rgba(255,255,255,.55)", lineHeight:1.75, margin:0 }}>{block.text}</p>
+            </div>
+          );
+          if (block.type === "table") return (
+            <figure key={i} style={{ margin:"28px 0" }}>
+              {/* Wide tables scroll inside their own container so the page body never does. */}
+              <div style={{ overflowX:"auto", borderRadius:14, border:"1px solid rgba(255,255,255,.09)" }}>
+                <table style={{ width:"100%", borderCollapse:"collapse", minWidth:520, fontSize:13.5 }}>
+                  <thead>
+                    <tr>
+                      {block.headers.map((h: string, hi: number) => (
+                        <th key={hi} style={{ textAlign:"left", padding:"12px 14px", background:`${post.color}14`, color:post.color, fontWeight:800, fontSize:11.5, letterSpacing:".05em", textTransform:"uppercase", borderBottom:`1px solid ${post.color}30`, whiteSpace:"nowrap" }}>{h}</th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {block.rows.map((row: string[], ri: number) => (
+                      <tr key={ri} style={{ background: ri % 2 ? "rgba(255,255,255,.02)" : "transparent" }}>
+                        {row.map((cell: string, ci: number) => (
+                          <td key={ci} style={{ padding:"12px 14px", color: ci === 0 ? "rgba(255,255,255,.85)" : "rgba(255,255,255,.58)", fontWeight: ci === 0 ? 700 : 400, lineHeight:1.6, borderBottom:"1px solid rgba(255,255,255,.05)", verticalAlign:"top" }}>{cell}</td>
+                        ))}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+              {block.caption && (
+                <figcaption style={{ fontSize:12, color:"rgba(255,255,255,.32)", marginTop:9, fontStyle:"italic" }}>{block.caption}</figcaption>
+              )}
+            </figure>
+          );
+          // Mirrored into FAQPage JSON-LD by the metadata layout — keep the
+          // wording here identical to what is emitted there.
+          if (block.type === "faq") return (
+            <section key={i} style={{ margin:"44px 0 0" }}>
+              <h2 style={{ fontSize:"clamp(18px,3vw,24px)", fontWeight:800, color:"white", letterSpacing:"-.02em", fontFamily:"Lora,serif", margin:"0 0 18px" }}>
+                Frequently asked questions
+              </h2>
+              {block.items.map((f: { q: string; a: string }, fi: number) => (
+                <div key={fi} style={{ padding:"18px 0", borderTop:"1px solid rgba(255,255,255,.07)" }}>
+                  <h3 style={{ fontSize:15.5, fontWeight:800, color:"rgba(255,255,255,.9)", margin:"0 0 9px", lineHeight:1.45 }}>{f.q}</h3>
+                  <p style={{ fontSize:15, color:"rgba(255,255,255,.58)", lineHeight:1.8, margin:0 }}>{f.a}</p>
+                </div>
+              ))}
+            </section>
           );
           return null;
         })}

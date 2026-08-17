@@ -1,6 +1,7 @@
 "use client";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { SEO_ARTICLES } from "./seo-articles";
 
 const CATEGORIES = [
   { id: "all",        label: "All",            color: "#818cf8", bg: "#818cf820" },
@@ -20,7 +21,24 @@ const FEATURED = {
   date: "March 10, 2026", readTime: "8 min read",
 };
 
-const POSTS = [
+/**
+ * Buyer-intent articles, derived from seo-articles.ts rather than duplicated
+ * here — adding an article to that file is enough to list it.
+ */
+const SEO_POSTS = Object.values(SEO_ARTICLES).map(a => ({
+  slug: a.id,
+  title: a.title,
+  excerpt: a.excerpt,
+  category: a.category,
+  categoryLabel: a.categoryLabel,
+  author: a.author,
+  date: a.date.replace(/^(\w{3})\w*\s/, "$1 "),
+  readTime: a.readTime.replace(" read", ""),
+  color: a.color,
+  icon: a.icon,
+}));
+
+const LEGACY_POSTS = [
   { slug: "1", title: "How to Create and Send Professional Invoices with FinovaOS", excerpt: "From custom templates to automatic payment reminders — get paid faster using FinovaOS's invoicing module.", category: "guides", categoryLabel: "How-to Guides", author: "FinovaOS Team", date: "Mar 8, 2026", readTime: "5 min", color: "#34d399", icon: "📄" },
   { slug: "2", title: "FinovaOS HR & Payroll: A Practical Setup Guide", excerpt: "Set up employees, salary components, allowances, and deductions — with support for custom statutory rules per country.", category: "guides", categoryLabel: "How-to Guides", author: "FinovaOS Team", date: "Mar 6, 2026", readTime: "7 min", color: "#fbbf24", icon: "👥" },
   { slug: "3", title: "Using FinovaOS CRM to Convert More Leads into Paying Customers", excerpt: "Connect your customer relationships directly to your financial data — close deals faster.", category: "product", categoryLabel: "Product Features", author: "FinovaOS Team", date: "Mar 5, 2026", readTime: "5 min", color: "#818cf8", icon: "🎯" },
@@ -37,6 +55,8 @@ const POSTS = [
   { slug: "14", title: "Inventory Management for Pakistani Pharmacies: Batch, Expiry & DRAP", excerpt: "How pharmacy owners use FinovaOS to track batch numbers, expiry dates, and stay DRAP-compliant without manual registers.", category: "product", categoryLabel: "Product Features", author: "FinovaOS Team", date: "Jun 1, 2026", readTime: "6 min", color: "#06b6d4", icon: "💊" },
   { slug: "15", title: "Cloud Accounting vs Desktop Software for SMEs in 2026", excerpt: "Why Pakistani businesses are switching from Peachtree, QuickBooks Desktop and manual Excel to cloud-based accounting — and what to watch out for.", category: "fintech", categoryLabel: "Fintech", author: "FinovaOS Team", date: "May 28, 2026", readTime: "7 min", color: "#c4b5fd", icon: "☁️" },
 ];
+
+const POSTS = [...SEO_POSTS, ...LEGACY_POSTS];
 
 const catColor = (id: string) => CATEGORIES.find(c => c.id === id)?.color || "#818cf8";
 const catBg    = (id: string) => CATEGORIES.find(c => c.id === id)?.bg    || "#818cf820";

@@ -2,6 +2,7 @@
 // Next.js 13+ automatic sitemap generation
 
 import { MetadataRoute } from "next";
+import { SEO_ARTICLES } from "./(marketing)/blog/seo-articles";
 
 const BASE = process.env.NEXT_PUBLIC_BASE_URL || "https://www.finovaos.app";
 
@@ -85,6 +86,17 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.65,
   }));
 
+  // Buyer-intent articles. Derived from the data file so the sitemap cannot
+  // drift out of sync with what actually renders. Higher priority than the
+  // rest of the blog: these are the pages built to be found on search and
+  // cited by AI answer engines.
+  const seoArticlePages = Object.keys(SEO_ARTICLES).map(slug => ({
+    url: `${BASE}/blog/${slug}`,
+    lastModified: now,
+    changeFrequency: "monthly" as const,
+    priority: 0.75,
+  }));
+
   // Help articles
   const helpSlugs = ["getting-started", "invoicing", "inventory", "payroll", "bank-reconciliation", "reports"];
   const helpPages = helpSlugs.map(slug => ({
@@ -94,5 +106,5 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.55,
   }));
 
-  return [...staticPages, ...extraPages, ...blogPages, ...helpPages];
+  return [...staticPages, ...extraPages, ...seoArticlePages, ...blogPages, ...helpPages];
 }
