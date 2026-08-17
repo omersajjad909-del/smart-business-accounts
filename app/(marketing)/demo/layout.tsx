@@ -24,7 +24,10 @@ export const metadata: Metadata = {
     description: "Choose your business type and explore a live FinovaOS demo workspace.",
     images: [`${BASE}/icon.png`],
   },
-  alternates: { canonical: `${BASE}/demo` },
+  // No canonical here on purpose. A hardcoded canonical in a nested layout
+  // applies to the whole subtree, so this one made /demo/start declare itself
+  // a duplicate of /demo. The (marketing) layout already derives a per-pathname
+  // canonical from x-pathname, which is correct for the parent and every child.
 };
 
 export default function DemoLayout({ children }: { children: React.ReactNode }) {

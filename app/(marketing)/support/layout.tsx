@@ -5,7 +5,10 @@ const BASE = process.env.NEXT_PUBLIC_BASE_URL || "https://www.finovaos.app";
 export const metadata: Metadata = {
   title: "Support Center — FinovaOS",
   description: "Get help with FinovaOS. Browse FAQs, contact our support team, or submit a ticket. We typically respond within a few hours.",
-  alternates: { canonical: `${BASE}/support` },
+  // No canonical here on purpose. A hardcoded canonical in a nested layout
+  // applies to the whole subtree, so this one made /support/ticket declare itself
+  // a duplicate of /support. The (marketing) layout already derives a per-pathname
+  // canonical from x-pathname, which is correct for the parent and every child.
   openGraph: {
     title: "Support Center — FinovaOS",
     description: "Get help with FinovaOS. Browse FAQs or contact our support team.",

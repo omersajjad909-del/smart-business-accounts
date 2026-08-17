@@ -98,7 +98,11 @@ export default function sitemap(): MetadataRoute.Sitemap {
   }));
 
   // Help articles
-  const helpSlugs = ["getting-started", "invoicing", "inventory", "payroll", "bank-reconciliation", "reports"];
+  // Must be real keys of ARTICLES in app/(marketing)/help/[slug]/page.tsx.
+  // "invoicing", "inventory", "payroll" and "reports" were category names, not
+  // article slugs — all four 404'd, and a submitted URL that 404s is dead
+  // crawl budget. These are the real articles covering the same topics.
+  const helpSlugs = ["getting-started", "create-invoice", "stock-entries", "run-payroll", "bank-reconciliation", "export-reports"];
   const helpPages = helpSlugs.map(slug => ({
     url: `${BASE}/help/${slug}`,
     lastModified: now,
