@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { headers } from "next/headers";
 
 const FORGE_URL = "https://finovaforge.com";
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "https://www.finovaos.app";
@@ -7,7 +8,31 @@ const FORGE_DESCRIPTION =
   "Finova Forge is a software company building intelligent, industry-specific business tools — trading, wholesale, manufacturing, distribution, restaurant, retail, import/export, construction, hospital, school, pharmacy, and more. Creators of FinovaOS.";
 const FORGE_OG_IMAGE = "/FinovaForge.png";
 
-export const metadata: Metadata = {
+/**
+ * Forge content is served from two hostnames: finovaforge.com (rewritten onto
+ * /forge/* by proxy.ts) and www.finovaos.app/forge/*. Every page here used to
+ * declare the same `canonical: FORGE_URL`, so ~26 distinct URLs all claimed to
+ * be https://finovaforge.com. Google discards a canonical that self-evidently
+ * cannot be true for that many pages and re-clusters them itself, which is what
+ * Search Console reports as "Duplicate without user-selected canonical".
+ *
+ * Each page now self-canonicalises onto finovaforge.com — the domain this
+ * content was always meant to own. proxy.ts stamps x-pathname *before* the
+ * rewrite, so it holds the public path: `/about` on finovaforge.com and
+ * `/forge/about` on finovaos.app. Both normalise to the same canonical, which
+ * is what collapses the cross-domain duplication onto one URL.
+ */
+function forgeCanonical(pathname: string): string {
+  const path = pathname.replace(/^\/forge(?=\/|$)/, "");
+  // finovaforge.com/ is rewritten to /forge/home, so /home *is* the root page.
+  const publicPath = path === "" || path === "/" || path === "/home" ? "" : path;
+  return `${FORGE_URL}${publicPath}`;
+}
+
+export async function generateMetadata(): Promise<Metadata> {
+  const pathname = (await headers()).get("x-pathname") ?? "/";
+
+  return {
   metadataBase: new URL(FORGE_URL),
   title: FORGE_TITLE,
   description: FORGE_DESCRIPTION,
@@ -69,9 +94,10 @@ export const metadata: Metadata = {
     images: [FORGE_OG_IMAGE],
   },
   alternates: {
-    canonical: FORGE_URL,
+    canonical: forgeCanonical(pathname),
   },
-};
+  };
+}
 
 const forgeOrganizationJsonLd = {
   "@context": "https://schema.org",
@@ -101,7 +127,7 @@ const forgeOrganizationJsonLd = {
     "@type": "Person",
     name: "Umer Sajjad",
     jobTitle: "Founder & CEO",
-    url: `${BASE_URL}/forge/about`,
+    url: `${FORGE_URL}/about`,
     sameAs: ["https://www.linkedin.com/in/umer-sajjad-657936417"],
   },
   contactPoint: {
@@ -127,11 +153,11 @@ const forgePersonJsonLd = {
     name: "Finova Forge",
     url: FORGE_URL,
   },
-  url: `${BASE_URL}/forge/about`,
+  url: `${FORGE_URL}/about`,
   sameAs: [
     "https://www.linkedin.com/in/umer-sajjad-657936417",
     "https://www.wikidata.org/wiki/Q140701676",
-    `${BASE_URL}/forge/about`,
+    `${FORGE_URL}/about`,
     `${BASE_URL}/about`,
   ],
   address: {

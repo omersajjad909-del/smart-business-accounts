@@ -2,6 +2,8 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import type { Metadata } from "next";
 
+const BASE = process.env.NEXT_PUBLIC_BASE_URL || "https://www.finovaos.app";
+
 /* ─────────────────────────────────────────────
    MODULE DATA
 ───────────────────────────────────────────── */
@@ -320,6 +322,11 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   return {
     title: `${m.title} — FinovaOS`,
     description: m.description,
+    // Without this every /features/<slug> page inherits the parent layout's
+    // hardcoded `canonical: ${BASE}/features`, so all 11 detail pages — each
+    // of them listed in sitemap.ts — told Google they were duplicates of the
+    // features index and dropped themselves out of the index.
+    alternates: { canonical: `${BASE}/features/${m.slug}` },
   };
 }
 

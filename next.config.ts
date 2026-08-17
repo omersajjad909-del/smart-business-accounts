@@ -47,7 +47,9 @@ const nextConfig: NextConfig = {
       {
         source: "/forge",
         destination: "/forge/home",
-        permanent: false,
+        // 301, not 302. A temporary redirect leaves /forge indexable in its own
+        // right, so Google kept it clustered against /forge/home as a duplicate.
+        permanent: true,
       },
     ];
   },
@@ -60,6 +62,20 @@ const nextConfig: NextConfig = {
       // Private paths: block indexing via header (belt-and-suspenders with robots.txt)
       {
         source: "/(auth|admin|dashboard|onboarding)/:path*",
+        headers: [{ key: "X-Robots-Tag", value: "noindex, nofollow" }],
+      },
+      // Transactional document viewers and account-setup screens. These return
+      // 200 with no canonical, and the three /view/* pages render the same
+      // empty shell when opened without their query params — which is the
+      // "Duplicate without user-selected canonical" cluster Search Console
+      // flagged. None of them are search destinations.
+      //
+      // Header-only on purpose, with no matching robots.txt Disallow: a
+      // disallowed URL is never fetched, so Google would never see the noindex
+      // and the already-indexed duplicates would sit there indefinitely.
+      // Crawlable + noindex is what actually gets them dropped.
+      {
+        source: "/(view|business-setup|billing)/:path*",
         headers: [{ key: "X-Robots-Tag", value: "noindex, nofollow" }],
       },
       {
