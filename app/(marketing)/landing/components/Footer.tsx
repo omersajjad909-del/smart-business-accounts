@@ -249,7 +249,7 @@ export default function Footer() {
             column used to carry a stats bar, contact details and a CTA card,
             which made it run several times taller than the link columns and
             left a large empty block across the rest of the row. */}
-        <div className="ft-grid" style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: "48px 40px", marginBottom: 64 }}>
+        <div className="ft-grid" style={{ display: "grid", gridTemplateColumns: "1.5fr 1fr 1fr 1fr 1fr", gap: "48px 40px", marginBottom: 64 }}>
 
           {/* Brand column */}
           <div className="ft-brand">
@@ -269,8 +269,11 @@ export default function Footer() {
               Invoicing, inventory, accounting, payroll, and more — unified in one platform built for businesses of every size.
             </p>
 
-            {/* Social row */}
-            <div style={{ display: "flex", gap: 8, marginBottom: 32, flexWrap: "wrap" }}>
+            {/* Social row — six 36px icons plus their gaps need ~256px, so this
+                stays on one line only while the brand column is wider than the
+                link columns. That is why the grid above is not a flat 1fr each:
+                equal fifths left the column at ~202px and wrapped the row. */}
+            <div style={{ display: "flex", gap: 8, marginBottom: 32, flexWrap: "nowrap" }}>
               {SOCIALS.map(({ Icon, href, label }) => (
                 <a key={label} href={href} className="ft-social" aria-label={label} target="_blank" rel="noopener noreferrer">
                   <Icon size={15}/>
