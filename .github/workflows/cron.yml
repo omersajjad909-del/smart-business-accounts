@@ -1,0 +1,134 @@
+# Scheduled jobs for FinovaOS.
+#
+# These used to live in vercel.json, but Vercel's Hobby plan caps cron jobs at
+# two, so they were removed (see commits f4d8992b / 8d297eaf) and every
+# background job silently stopped running — backups, dunning, subscription
+# lifecycle, reminders, all of it. GitHub Actions has no such cap and is free
+# for public repos, so the schedule lives here instead.
+#
+# Each route is a plain GET guarded by `Authorization: Bearer $CRON_SECRET`,
+# and each returns immediately (fire-and-forget) while the real work continues
+# in the background. A 2xx therefore means "accepted", not "finished".
+#
+# Times are UTC. Pakistan is UTC+5, so 02:00 UTC = 07:00 PKT.
+#
+# Setup — both are required:
+#   1. Repo → Settings → Secrets and variables → Actions → New repository secret
+#        CRON_SECRET   (must be byte-identical to the same variable in Vercel)
+#   2. Nothing else. BASE_URL below is public and needs no secret.
+#
+# To run one job by hand: Actions tab → "Scheduled Jobs" → Run workflow →
+# pick the job name from the dropdown.
+
+name: Scheduled Jobs
+
+on:
+  schedule:
+    - cron: "*/10 * * * *"   # demo-cleanup
+    - cron: "0 * * * *"      # breach-notify, uptime-probe
+    - cron: "0 2 * * *"      # backup
+    - cron: "0 5 * * *"      # subscriptions-lifecycle
+    - cron: "0 6 * * *"      # inventory-reorder, retention-reminders
+    - cron: "0 7 * * *"      # automation-lifecycle
+    - cron: "0 8 * * *"      # automation-lifecycle-trigger, demo-reminders
+    - cron: "0 9 * * *"      # dunning
+    - cron: "0 10 * * *"     # sms-reminder
+    - cron: "0 15 * * *"     # platform-dunning
+    - cron: "0 9 * * 1"      # tax-fbr (Mondays)
+  workflow_dispatch:
+    inputs:
+      job:
+        description: "Which job to run (or 'all')"
+        required: true
+        default: all
+        type: choice
+        options:
+          - all
+          - automation-lifecycle
+          - automation-lifecycle-trigger
+          - backup
+          - breach-notify
+          - demo-cleanup
+          - demo-reminders
+          - dunning
+          - inventory-reorder
+          - platform-dunning
+          - retention-reminders
+          - sms-reminder
+          - subscriptions-lifecycle
+          - tax-fbr
+          - uptime-probe
+
+# A long-running backup must never overlap with the next tick of the same job.
+concurrency:
+  group: scheduled-jobs-${{ github.event.schedule || inputs.job }}
+  cancel-in-progress: false
+
+env:
+  BASE_URL: https://www.finovaos.app
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Resolve which endpoints this trigger owns
+        id: pick
+        run: |
+          case "${{ github.event.schedule }}" in
+            "*/10 * * * *") jobs="demo-cleanup" ;;
+            "0 * * * *")    jobs="breach-notify uptime-probe" ;;
+            "0 2 * * *")    jobs="backup" ;;
+            "0 5 * * *")    jobs="subscriptions-lifecycle" ;;
+            "0 6 * * *")    jobs="inventory-reorder retention-reminders" ;;
+            "0 7 * * *")    jobs="automation-lifecycle" ;;
+            "0 8 * * *")    jobs="automation-lifecycle-trigger demo-reminders" ;;
+            "0 9 * * *")    jobs="dunning" ;;
+            "0 10 * * *")   jobs="sms-reminder" ;;
+            "0 15 * * *")   jobs="platform-dunning" ;;
+            "0 9 * * 1")    jobs="tax-fbr" ;;
+            *)
+              # Manual run (workflow_dispatch): no github.event.schedule is set.
+              if [ "${{ inputs.job }}" = "all" ]; then
+                jobs="automation-lifecycle automation-lifecycle-trigger backup breach-notify demo-cleanup demo-reminders dunning inventory-reorder platform-dunning retention-reminders sms-reminder subscriptions-lifecycle tax-fbr uptime-probe"
+              else
+                jobs="${{ inputs.job }}"
+              fi
+              ;;
+          esac
+          echo "jobs=$jobs" >> "$GITHUB_OUTPUT"
+          echo "Will run: $jobs"
+
+      - name: Call endpoints
+        env:
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+        run: |
+          if [ -z "$CRON_SECRET" ]; then
+            echo "::error::CRON_SECRET repository secret is not set. Add it under Settings → Secrets and variables → Actions."
+            exit 1
+          fi
+
+          failed=""
+          for job in ${{ steps.pick.outputs.jobs }}; do
+            url="$BASE_URL/api/cron/$job"
+            # -f alone hides the response body, which is where the error text
+            # is; capture the body and the status separately so a failure is
+            # actually diagnosable from the Actions log.
+            code=$(curl -sS -o /tmp/body.txt -w '%{http_code}' \
+                        --max-time 120 --retry 2 --retry-delay 10 \
+                        -H "Authorization: Bearer $CRON_SECRET" \
+                        "$url" || echo "000")
+            body=$(head -c 500 /tmp/body.txt)
+
+            if [ "$code" -ge 200 ] && [ "$code" -lt 300 ]; then
+              echo "✅ $job → $code  $body"
+            else
+              echo "::error::$job → HTTP $code  $body"
+              failed="$failed $job"
+            fi
+          done
+
+          if [ -n "$failed" ]; then
+            echo "::error::Failed jobs:$failed"
+            exit 1
+          fi
