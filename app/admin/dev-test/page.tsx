@@ -84,9 +84,26 @@ export default function DevTestPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ businessType: selectedBiz, plan: selectedPlan }),
       });
-      if (!r.ok) { const d = await r.json(); alert(d.error || "Launch failed"); setLaunching(false); return; }
+      if (!r.ok) {
+        // The body is not guaranteed to be JSON: a crashed route or an edge
+        // error page returns HTML, and r.json() on that throws — which landed
+        // in the empty catch below and showed the user nothing at all.
+        const raw = await r.text();
+        let msg = raw;
+        try { msg = JSON.parse(raw).error || raw; } catch {}
+        alert(`Launch failed (HTTP ${r.status})
+
+${msg.slice(0, 500)}`);
+        setLaunching(false);
+        return;
+      }
       window.location.href = "/dashboard";
-    } catch { setLaunching(false); }
+    } catch (err) {
+      // Never swallow this. The empty catch that used to be here is exactly why
+      // clicking Launch appeared to do nothing whatsoever.
+      alert(`Launch failed: ${err instanceof Error ? err.message : String(err)}`);
+      setLaunching(false);
+    }
   }
 
   async function clearData() {

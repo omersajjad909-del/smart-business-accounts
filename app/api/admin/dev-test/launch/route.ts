@@ -19,108 +19,107 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-
-  // Get real companyId — admin JWT may not include it
-  let originCompanyId = payload.isTestMode ? payload.originCompanyId : payload.companyId;
-  if (!originCompanyId) {
-    const u = await prisma.user.findUnique({ where: { id: userId }, select: { defaultCompanyId: true } });
-    originCompanyId = u?.defaultCompanyId || null;
-  }
-
-  // Find existing test company for this admin
-  let testCompanyId: string | null = null;
-  try {
-    const log = await prisma.activityLog.findFirst({
-      where: { action: TEST_ACTION, userId },
-      orderBy: { createdAt: "desc" },
-    });
-    if (log?.details) {
-      const d = JSON.parse(log.details);
-      testCompanyId = d.testCompanyId || null;
+    // Get real companyId — admin JWT may not include it
+    let originCompanyId = payload.isTestMode ? payload.originCompanyId : payload.companyId;
+    if (!originCompanyId) {
+      const u = await prisma.user.findUnique({ where: { id: userId }, select: { defaultCompanyId: true } });
+      originCompanyId = u?.defaultCompanyId || null;
     }
-  } catch {}
 
-  // Verify company still exists
-  if (testCompanyId) {
-    const exists = await prisma.company.findUnique({ where: { id: testCompanyId } });
-    if (!exists) testCompanyId = null;
-  }
+    // Find existing test company for this admin
+    let testCompanyId: string | null = null;
+    try {
+      const log = await prisma.activityLog.findFirst({
+        where: { action: TEST_ACTION, userId },
+        orderBy: { createdAt: "desc" },
+      });
+      if (log?.details) {
+        const d = JSON.parse(log.details);
+        testCompanyId = d.testCompanyId || null;
+      }
+    } catch {}
 
-  if (!testCompanyId) {
-    const user = await prisma.user.findUnique({ where: { id: userId }, select: { name: true } });
-    const testCompany = await prisma.company.create({
-      data: {
-        name: `${user?.name || "Admin"}'s`,
-        isActive: true,
-        country: "PK",
-        baseCurrency: "PKR",
-        businessType: String(businessType),
-        plan: String(plan).toUpperCase(),
-        businessSetupDone: true,
-        subscriptionStatus: "ACTIVE",
-      },
+    // Verify company still exists
+    if (testCompanyId) {
+      const exists = await prisma.company.findUnique({ where: { id: testCompanyId } });
+      if (!exists) testCompanyId = null;
+    }
+
+    if (!testCompanyId) {
+      const user = await prisma.user.findUnique({ where: { id: userId }, select: { name: true } });
+      const testCompany = await prisma.company.create({
+        data: {
+          name: `${user?.name || "Admin"}'s`,
+          isActive: true,
+          country: "PK",
+          baseCurrency: "PKR",
+          businessType: String(businessType),
+          plan: String(plan).toUpperCase(),
+          businessSetupDone: true,
+          subscriptionStatus: "ACTIVE",
+        },
+      });
+      testCompanyId = testCompany.id;
+
+      await prisma.userCompany.upsert({
+        where: { userId_companyId: { userId, companyId: testCompanyId } },
+        create: { userId, companyId: testCompanyId, isDefault: false },
+        update: {},
+      });
+
+      await prisma.activityLog.create({
+        data: {
+          action: TEST_ACTION,
+          userId,
+          companyId: testCompanyId,
+          details: JSON.stringify({ testCompanyId }),
+        },
+      });
+    } else {
+      await prisma.company.update({
+        where: { id: testCompanyId },
+        data: {
+          businessType: String(businessType),
+          plan: String(plan).toUpperCase(),
+          businessSetupDone: true,
+          subscriptionStatus: "ACTIVE",
+        },
+      });
+    }
+
+    const testToken = signJwt({
+      userId,
+      companyId: testCompanyId,
+      role: "ADMIN",
+      // proxy.ts redirects any /admin page whose token lacks scope:"admin" to the
+      // login screen. This token overwrites sb_auth, so omitting the scope locked
+      // the admin out of the console the moment a test session started.
+      scope: "admin",
+      isTestMode: true,
+      originCompanyId,
+      testBusinessType: businessType,
+      testPlan: plan,
     });
-    testCompanyId = testCompany.id;
 
-    await prisma.userCompany.upsert({
-      where: { userId_companyId: { userId, companyId: testCompanyId } },
-      create: { userId, companyId: testCompanyId, isDefault: false },
-      update: {},
-    });
+    const res = NextResponse.json({ ok: true, testCompanyId });
 
-    await prisma.activityLog.create({
-      data: {
-        action: TEST_ACTION,
-        userId,
-        companyId: testCompanyId,
-        details: JSON.stringify({ testCompanyId }),
-      },
-    });
-  } else {
-    await prisma.company.update({
-      where: { id: testCompanyId },
-      data: {
-        businessType: String(businessType),
-        plan: String(plan).toUpperCase(),
-        businessSetupDone: true,
-        subscriptionStatus: "ACTIVE",
-      },
-    });
-  }
+    if (token) {
+      res.cookies.set("sb_auth_backup", token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "lax",
+        path: "/",
+        maxAge: 24 * 60 * 60,
+      });
+    }
 
-  const testToken = signJwt({
-    userId,
-    companyId: testCompanyId,
-    role: "ADMIN",
-    // proxy.ts redirects any /admin page whose token lacks scope:"admin" to the
-    // login screen. This token overwrites sb_auth, so omitting the scope locked
-    // the admin out of the console the moment a test session started.
-    scope: "admin",
-    isTestMode: true,
-    originCompanyId,
-    testBusinessType: businessType,
-    testPlan: plan,
-  });
-
-  const res = NextResponse.json({ ok: true, testCompanyId });
-
-  if (token) {
-    res.cookies.set("sb_auth_backup", token, {
+    res.cookies.set("sb_auth", testToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
       path: "/",
-      maxAge: 24 * 60 * 60,
+      maxAge: 8 * 60 * 60,
     });
-  }
-
-  res.cookies.set("sb_auth", testToken, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "lax",
-    path: "/",
-    maxAge: 8 * 60 * 60,
-  });
 
     return res;
   } catch (err) {
