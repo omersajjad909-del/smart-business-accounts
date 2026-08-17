@@ -390,6 +390,11 @@ export default function DashboardLayout({
     setIsMobileMenuOpen(false);
   }, [pathname]);
 
+  // Mobile drawer is full-width — an icon-only rail has no place there
+  useEffect(() => {
+    if (isMobileViewport) setSidebarCollapsed(false);
+  }, [isMobileViewport]);
+
   // Close panels on outside click
   useEffect(() => {
     if (!showNotifPanel && !showHelpPanel && !showUserMenu) return;
@@ -2231,7 +2236,7 @@ export default function DashboardLayout({
         {/* ---- SIDEBAR FOOTER — Collapse button only ---- */}
         <div style={{borderTop:"1px solid var(--border)",background:"var(--panel-bg-2)"}}>
           <button
-            onClick={()=>setSidebarCollapsed(v=>!v)}
+            onClick={()=>{ if (isMobileViewport) setIsMobileMenuOpen(false); else setSidebarCollapsed(v=>!v); }}
             style={{
               width:"100%",display:"flex",alignItems:"center",gap:10,
               padding: sidebarCollapsed ? "12px 8px" : "11px 14px",
@@ -2243,12 +2248,16 @@ export default function DashboardLayout({
             onMouseLeave={e=>{e.currentTarget.style.background="transparent";e.currentTarget.style.color="var(--text-muted)";}}
           >
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-              {sidebarCollapsed
-                ? <><line x1="3" y1="12" x2="21" y2="12"/><polyline points="14 5 21 12 14 19"/></>
-                : <><line x1="3" y1="12" x2="21" y2="12"/><polyline points="10 5 3 12 10 19"/></>
+              {isMobileViewport
+                ? <><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></>
+                : sidebarCollapsed
+                  ? <><line x1="3" y1="12" x2="21" y2="12"/><polyline points="14 5 21 12 14 19"/></>
+                  : <><line x1="3" y1="12" x2="21" y2="12"/><polyline points="10 5 3 12 10 19"/></>
               }
             </svg>
-            {!sidebarCollapsed && <span style={{fontSize:12,fontWeight:600}}>Collapse</span>}
+            {(isMobileViewport || !sidebarCollapsed) && (
+              <span style={{fontSize:12,fontWeight:600}}>{isMobileViewport ? "Close Menu" : "Collapse"}</span>
+            )}
           </button>
         </div>
 
