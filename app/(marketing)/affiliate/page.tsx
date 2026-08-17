@@ -17,10 +17,13 @@ const HOW_IT_WORKS = [
   { step:"04", icon:"💰", title:"Get paid monthly",       desc:"Commissions are paid on the 1st of each month via bank transfer, PayPal, or crypto — your choice." },
 ];
 
-const TESTIMONIALS = [
-  { name:"David Chen", role:"Accounting Consultant, Singapore", avatar:"DC", gradient:"linear-gradient(135deg,#4f46e5,#7c3aed)", quote:"I recommended FinovaOS to 12 of my clients last year. Made $8,400 in commissions — completely passive income on top of my consulting fees." },
-  { name:"Fatima Al-Rashid", role:"Business Coach, Dubai", avatar:"FA", gradient:"linear-gradient(135deg,#0891b2,#06b6d4)", quote:"My audience is SME owners. FinovaOS fits perfectly. My affiliate income now covers my entire content creation costs." },
-];
+// No testimonials here until there are real ones to quote. The two that used to
+// sit in this file named people who do not exist and credited them with earnings
+// ($8,400 in commissions) from a program that had never paid anyone — it was not
+// wired up at all. Invented endorsements are the same class of problem as the
+// fabricated aggregateRating removed from the landing page: a reader is misled,
+// and Google treats manufactured social proof as spam. Add this section back
+// when a real affiliate has been paid and agrees to be quoted.
 
 function useInView() {
   const ref = useRef<HTMLDivElement>(null);
@@ -221,27 +224,6 @@ function AffiliateProgramPage() {
               </div>
             </div>
             <div style={{ fontSize:11, color:"rgba(255,255,255,.25)", textAlign:"center", marginTop:12 }}>Based on 25% commission rate. Actual earnings may vary.</div>
-          </div>
-        </div>
-      </Section>
-
-      {/* Testimonials */}
-      <Section>
-        <div style={{ maxWidth:900, margin:"0 auto", padding:"0 24px 80px" }}>
-          <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(340px,1fr))", gap:20 }}>
-            {TESTIMONIALS.map(t=>(
-              <div key={t.name} style={{ background:"rgba(255,255,255,.03)", borderRadius:18, border:"1px solid rgba(255,255,255,.07)", padding:"28px 24px" }}>
-                <div style={{ fontSize:28, color:"#fbbf24", marginBottom:14 }}>"</div>
-                <p style={{ fontSize:14, color:"rgba(255,255,255,.6)", lineHeight:1.75, margin:"0 0 20px", fontStyle:"italic" }}>{t.quote}</p>
-                <div style={{ display:"flex", gap:12, alignItems:"center" }}>
-                  <div style={{ width:42, height:42, borderRadius:12, background:t.gradient, display:"flex", alignItems:"center", justifyContent:"center", fontSize:13, fontWeight:800, color:"white" }}>{t.avatar}</div>
-                  <div>
-                    <div style={{ fontSize:13, fontWeight:700, color:"white" }}>{t.name}</div>
-                    <div style={{ fontSize:11, color:"rgba(255,255,255,.35)" }}>{t.role}</div>
-                  </div>
-                </div>
-              </div>
-            ))}
           </div>
         </div>
       </Section>
