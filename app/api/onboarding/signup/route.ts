@@ -3,6 +3,7 @@ import bcrypt from "bcryptjs";
 
 import { signJwt } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { claimReferral, REF_COOKIE } from "@/lib/affiliateTracking";
 import {
   getAvailableChannels,
   getMaskedTarget,
@@ -54,6 +55,11 @@ export async function POST(req: NextRequest) {
     }
 
     const emailNormalized = String(email).trim().toLowerCase();
+
+    // Affiliate attribution. Claimed here rather than after verification so the
+    // link survives a visitor who abandons and comes back: the claim is keyed
+    // on the email, and claimReferral is first-touch and idempotent.
+    await claimReferral(emailNormalized, req.cookies.get(REF_COOKIE)?.value).catch(() => {});
     const phoneNormalized = normalizePhone(phone);
 
     const existing = await prisma.user.findUnique({

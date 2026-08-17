@@ -1,8 +1,34 @@
 import type { Metadata } from "next";
+import { AFFILIATE_PROGRAM_LIVE } from "@/lib/affiliateProgram";
 
 const BASE = process.env.NEXT_PUBLIC_BASE_URL || "https://www.finovaos.app";
 
-export const metadata: Metadata = {
+// Search snippets outlive the page they were written for. While the program is
+// off, a title promising "Earn 20–35% Recurring Commission" would put an offer
+// in Google's results that the page itself does not make — misleading to a
+// reader and, to Google, a title that does not match the content.
+const COMING_SOON_METADATA: Metadata = {
+  title: "Affiliate Program — Coming Soon",
+  description:
+    "The FinovaOS affiliate program is not open yet. We're finishing referral tracking and monthly payouts first, so every partner is paid accurately from their first referral.",
+  openGraph: {
+    title: "FinovaOS Affiliate Program — Coming Soon",
+    description: "Not open yet. We're building referral tracking and payouts properly first.",
+    url: `${BASE}/affiliate`,
+    siteName: "FinovaOS",
+    images: [{ url: `${BASE}/icon.png`, width: 1200, height: 630, alt: "FinovaOS Affiliate Program" }],
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "FinovaOS Affiliate Program — Coming Soon",
+    description: "Not open yet. We're building referral tracking and payouts properly first.",
+    images: [`${BASE}/icon.png`],
+  },
+  alternates: { canonical: `${BASE}/affiliate` },
+};
+
+const LIVE_METADATA: Metadata = {
   title: "Affiliate Program — Earn 20–35% Recurring Commission",
   description:
     "Join FinovaOS's affiliate program and earn 20–35% recurring commission on every business you refer. Instant dashboard, monthly payouts, no earnings cap. Starter to Elite tiers available.",
@@ -32,6 +58,8 @@ export const metadata: Metadata = {
   },
   alternates: { canonical: `${BASE}/affiliate` },
 };
+
+export const metadata: Metadata = AFFILIATE_PROGRAM_LIVE ? LIVE_METADATA : COMING_SOON_METADATA;
 
 export default function AffiliateLayout({ children }: { children: React.ReactNode }) {
   return <>{children}</>;

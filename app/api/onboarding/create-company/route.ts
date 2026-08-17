@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import * as bcrypt from "bcryptjs";
+import { claimReferral, REF_COOKIE } from "@/lib/affiliateTracking";
 
 export async function POST(req: NextRequest) {
   try {
@@ -26,6 +27,10 @@ export async function POST(req: NextRequest) {
         { status: 409 }
       );
     }
+
+    // Affiliate attribution — see lib/affiliateTracking.ts. First touch wins and
+    // the call is idempotent, so running it on every signup attempt is safe.
+    await claimReferral(adminEmail, req.cookies.get(REF_COOKIE)?.value).catch(() => {});
 
     // Hash password
     const hashedPassword = await bcrypt.hash(adminPassword, 10);

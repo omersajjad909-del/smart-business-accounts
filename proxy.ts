@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getTokenFromRequest, verifyJwt } from "@/lib/auth";
+import { REF_COOKIE, REF_COOKIE_MAX_AGE, normalizeTrackingCode } from "@/lib/affiliateTracking";
 import {
   WAITLIST_PATH,
   getSignupsOpen,
@@ -356,6 +357,23 @@ export async function proxy(req: NextRequest) {
 
   const res = NextResponse.next({ request: { headers } });
   res.headers.set("Content-Security-Policy", csp);
+
+  // ── Affiliate attribution ────────────────────────────────────────────────
+  // An affiliate link is just /whatever?ref=CODE. The visitor almost never
+  // signs up on that first page view, so the code is parked in a cookie and
+  // read again at signup. First touch wins: an existing cookie is never
+  // overwritten, so the affiliate who actually earned the click keeps it.
+  const ref = normalizeTrackingCode(req.nextUrl.searchParams.get("ref"));
+  if (ref && !req.cookies.get(REF_COOKIE)) {
+    res.cookies.set(REF_COOKIE, ref, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      path: "/",
+      maxAge: REF_COOKIE_MAX_AGE,
+    });
+  }
+
   return res;
 }
 

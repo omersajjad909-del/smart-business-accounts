@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { randomBytes } from "crypto";
+import { AFFILIATE_APPLICATIONS_OPEN, AFFILIATE_PROGRAM_LIVE } from "@/lib/affiliateProgram";
 
 function genCode(): string {
   return randomBytes(4).toString("hex").toUpperCase();
@@ -8,6 +9,17 @@ function genCode(): string {
 
 export async function POST(req: NextRequest) {
   try {
+    // Hiding the form is not the same as closing the door — this endpoint is
+    // public, so it has to refuse on its own rather than trust the UI. Without
+    // this an application could still be filed against a program that pays
+    // nothing yet, and we would owe someone an answer we do not have.
+    if (!AFFILIATE_PROGRAM_LIVE && !AFFILIATE_APPLICATIONS_OPEN) {
+      return NextResponse.json(
+        { error: "The affiliate program is not open yet." },
+        { status: 503 },
+      );
+    }
+
     const data = await req.json() as { name?: string; email?: string; website?: string; audience?: string };
     if (!data.name || !data.email) return NextResponse.json({ error: "Name and email required" }, { status: 400 });
 

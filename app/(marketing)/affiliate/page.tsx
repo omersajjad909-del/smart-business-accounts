@@ -1,6 +1,7 @@
 "use client";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
+import { AFFILIATE_PROGRAM_LIVE } from "@/lib/affiliateProgram";
 
 const TIERS = [
   { name:"Starter",    referrals:"1–5",   commission:"20%", monthly:"$200", color:"#818cf8", glow:"rgba(129,140,248,.15)", icon:"🌱" },
@@ -40,7 +41,51 @@ function Section({ children, style, id }: { children: React.ReactNode; style?: R
   );
 }
 
+/**
+ * Everything below the flag is the finished program page. It renders only once
+ * AFFILIATE_PROGRAM_LIVE is turned on — see lib/affiliateProgram.ts for why it
+ * is currently off. Kept intact rather than deleted so launching is a one-line
+ * change, not a rebuild.
+ */
+function ComingSoon() {
+  const ff = "'Outfit','DM Sans',sans-serif";
+  return (
+    <main style={{ fontFamily: ff, minHeight: "70vh", display: "flex", alignItems: "center", justifyContent: "center", padding: "clamp(64px,12vw,120px) clamp(20px,5vw,32px)", textAlign: "center" }}>
+      <div style={{ maxWidth: 620 }}>
+        <div style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "6px 16px", borderRadius: 100, background: "rgba(129,140,248,.1)", border: "1px solid rgba(129,140,248,.25)", marginBottom: 28 }}>
+          <span style={{ fontSize: 11, fontWeight: 700, color: "#a5b4fc", letterSpacing: ".08em" }}>COMING SOON</span>
+        </div>
+        <h1 style={{ fontSize: "clamp(32px,6vw,56px)", fontWeight: 900, letterSpacing: "-2px", lineHeight: 1.05, margin: "0 0 20px", color: "var(--text-primary)" }}>
+          Our affiliate program isn&apos;t open yet
+        </h1>
+        <p style={{ fontSize: "clamp(15px,2.2vw,18px)", lineHeight: 1.75, color: "var(--text-secondary)", margin: "0 0 16px" }}>
+          We&apos;re building it properly first — tracking, commission tiers and
+          monthly payouts — so that everyone who sends us a customer is paid
+          accurately, from the first referral.
+        </p>
+        <p style={{ fontSize: "clamp(15px,2.2vw,18px)", lineHeight: 1.75, color: "var(--text-secondary)", margin: "0 0 40px" }}>
+          We&apos;d rather open late than take your traffic and get your payout wrong.
+        </p>
+        <div style={{ display: "flex", gap: 14, justifyContent: "center", flexWrap: "wrap" }}>
+          <Link href="/pricing" style={{ padding: "14px 30px", borderRadius: 12, textDecoration: "none", background: "linear-gradient(135deg,#6366f1,#4f46e5)", color: "white", fontWeight: 800, fontSize: 15 }}>
+            View Pricing {"→"}
+          </Link>
+          <Link href="/contact" style={{ padding: "14px 26px", borderRadius: 12, textDecoration: "none", border: "1px solid var(--border)", color: "var(--text-primary)", fontWeight: 700, fontSize: 15 }}>
+            Talk to us
+          </Link>
+        </div>
+      </div>
+    </main>
+  );
+}
+
 export default function AffiliatePage() {
+  if (!AFFILIATE_PROGRAM_LIVE) return <ComingSoon />;
+
+  return <AffiliateProgramPage />;
+}
+
+function AffiliateProgramPage() {
   const [heroVis,  setHeroVis]  = useState(false);
   const [refs,     setRefs]     = useState(10);
   const [plan,     setPlan]     = useState(99);

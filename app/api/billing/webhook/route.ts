@@ -1,5 +1,6 @@
 import { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { recordAffiliateConversion } from "@/lib/affiliateTracking";
 import { apiError, apiOk } from "@/lib/apiError";
 import { createHmac, timingSafeEqual } from "crypto";
 import { sendEmail } from "@/lib/email";
@@ -19,6 +20,37 @@ function safeDate(value: unknown) {
   if (!value) return null;
   const date = new Date(String(value));
   return Number.isNaN(date.getTime()) ? null : date;
+}
+
+/**
+ * Credit the affiliate who referred this company, if there was one.
+ *
+ * Runs after the plan is live rather than at signup, because a commission is
+ * owed on money received, not on an account being created. recordAffiliateConversion
+ * is idempotent per company, so the renewal webhooks that follow every billing
+ * cycle cannot pay the same referral twice. Failures are swallowed on purpose:
+ * a broken payout calculation must never roll back a successful subscription.
+ */
+async function creditReferringAffiliate(companyId: string, planCode: string, amount?: number | null) {
+  try {
+    const owner = await getCompanyOwner(companyId);
+    const email = owner?.user?.email;
+    if (!email) return;
+
+    const result = await recordAffiliateConversion({
+      companyId,
+      customerEmail: email,
+      customerName: owner?.user?.name,
+      plan: planCode,
+      planAmount: amount ?? null,
+    });
+
+    if (result.recorded) {
+      console.log(`[affiliate] conversion recorded for company ${companyId}: ${result.commissionAmt}`);
+    }
+  } catch (err) {
+    console.error("[affiliate] failed to record conversion:", err);
+  }
 }
 
 async function applySuccessfulPlanUpdate(params: {
@@ -104,6 +136,8 @@ async function applySuccessfulPlanUpdate(params: {
       pricePerMonth: typeof params.invoiceAmount === "number" ? params.invoiceAmount : 0,
     },
   });
+
+  await creditReferringAffiliate(params.companyId, normalizedPlan, params.invoiceAmount);
 }
 
 // ─── Shared helpers ───────────────────────────────────────────────────────────
