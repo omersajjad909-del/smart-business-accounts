@@ -245,10 +245,11 @@ export default function Footer() {
           <span style={{ fontSize: 13, color: "rgba(255,255,255,.25)" }}>— All-in-one platform for modern businesses</span>
         </div>
 
-        {/* Brand + four link columns, all five given equal width. The brand
-            column used to carry a stats bar, contact details and a CTA card,
-            which made it run several times taller than the link columns and
-            left a large empty block across the rest of the row. */}
+        {/* Brand + four link columns. The brand column used to carry a stats
+            bar, contact details and a CTA card, which made it run several times
+            taller than the link columns and left a large empty block across the
+            rest of the row. Those are gone; the 1.5fr that remains is the width
+            the social row needs to stay on a single line. */}
         <div className="ft-grid" style={{ display: "grid", gridTemplateColumns: "1.5fr 1fr 1fr 1fr 1fr", gap: "48px 40px", marginBottom: 64 }}>
 
           {/* Brand column */}
