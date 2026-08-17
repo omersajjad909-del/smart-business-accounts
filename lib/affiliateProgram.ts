@@ -12,7 +12,7 @@
  * promise nobody can be held to. Flip AFFILIATE_PROGRAM_LIVE to true to launch;
  * nothing else needs to change.
  */
-export const AFFILIATE_PROGRAM_LIVE = true;
+export const AFFILIATE_PROGRAM_LIVE = false;
 
 /**
  * Whether applications are accepted while the program is not yet live.
