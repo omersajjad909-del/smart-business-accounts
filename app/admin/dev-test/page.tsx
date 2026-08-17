@@ -91,9 +91,7 @@ export default function DevTestPage() {
         const raw = await r.text();
         let msg = raw;
         try { msg = JSON.parse(raw).error || raw; } catch {}
-        alert(`Launch failed (HTTP ${r.status})
-
-${msg.slice(0, 500)}`);
+        alert(`Launch failed (HTTP ${r.status})\n\n${msg.slice(0, 500)}`);
         setLaunching(false);
         return;
       }
