@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Facebook, Instagram, Linkedin, Mail, Phone, Globe, ArrowRight, Zap, Twitter, Youtube, Music2 } from "lucide-react";
+import { Facebook, Instagram, Linkedin, Globe, Zap, Twitter, Youtube, Music2 } from "lucide-react";
 import { useEffect, useState } from "react";
 
 // Four balanced columns. The legal links used to sit inside Company, which
@@ -100,11 +100,6 @@ const BOTTOM_LINKS = [
 
 // Kept to what the product can show. The old "99.9% Uptime" implied an SLA
 // that has not actually been signed with anyone.
-const STATS = [
-  { val: "9",   label: "Modules",  color: "#818cf8" },
-  { val: "60+", label: "Features", color: "#34d399" },
-];
-
 /** One footer link column — four of these replace the two long lists. */
 function LinkColumn({
   title,
@@ -200,24 +195,6 @@ export default function Footer() {
         }
         .ft-bot-link:hover { color: rgba(255,255,255,.6); }
 
-        .ft-cta-btn {
-          display: inline-flex; align-items: center; gap: 6px;
-          padding: 9px 16px; border-radius: 10px;
-          background: linear-gradient(135deg, #6366f1, #4f46e5);
-          color: white; font-size: 12.5px; font-weight: 700;
-          text-decoration: none; font-family: 'Outfit', sans-serif;
-          box-shadow: 0 4px 14px rgba(99,102,241,.3);
-          transition: all .22s; border: none; cursor: pointer;
-        }
-        .ft-cta-btn:hover {
-          transform: translateY(-2px);
-          box-shadow: 0 8px 24px rgba(99,102,241,.45);
-          background: linear-gradient(135deg, #818cf8, #6366f1);
-        }
-
-        .ft-contact-item:hover .ft-contact-icon { transform: scale(1.1); }
-        .ft-contact-icon { transition: transform .2s; }
-
         /* Five columns only fit on a wide screen; below that the brand block
            takes a full row and the four link columns wrap under it. */
         @media (max-width: 1100px) {
@@ -231,16 +208,10 @@ export default function Footer() {
         @media (max-width: 600px) {
           .ft-grid { grid-template-columns: 1fr 1fr !important; gap: 28px 20px !important; }
           .ft-brand { grid-column: 1 / -1; }
-          .ft-cta-card { display: none !important; }
-          .ft-contact-items { flex-direction: row !important; flex-wrap: wrap !important; gap: 10px !important; }
           .ft-bottom-inner { flex-direction: column !important; align-items: center !important; gap: 12px !important; text-align: center; }
           .ft-bottom-links { justify-content: center !important; flex-wrap: wrap; gap: 10px 16px !important; }
-          .ft-stats-row { justify-content: flex-start !important; }
           .ft-main-pad { padding: 48px 16px 0 !important; }
           .ft-top-strip { margin-bottom: 32px !important; }
-        }
-        @media (max-width: 380px) {
-          .ft-stats-box { padding: 8px 10px !important; }
         }
       `}</style>
 
@@ -274,9 +245,11 @@ export default function Footer() {
           <span style={{ fontSize: 13, color: "rgba(255,255,255,.25)" }}>— All-in-one platform for modern businesses</span>
         </div>
 
-        {/* Brand + four link columns. Contact and the CTA sit under the brand
-            so the link columns stay even instead of one running to 14 rows. */}
-        <div className="ft-grid" style={{ display: "grid", gridTemplateColumns: "2.1fr 1fr 1fr 1fr 1fr", gap: "48px 40px", marginBottom: 64 }}>
+        {/* Brand + four link columns, all five given equal width. The brand
+            column used to carry a stats bar, contact details and a CTA card,
+            which made it run several times taller than the link columns and
+            left a large empty block across the rest of the row. */}
+        <div className="ft-grid" style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: "48px 40px", marginBottom: 64 }}>
 
           {/* Brand column */}
           <div className="ft-brand">
@@ -305,67 +278,6 @@ export default function Footer() {
               ))}
             </div>
 
-            {/* Stats bar */}
-            <div className="ft-stats-row" style={{ display: "flex", gap: 2, flexWrap: "wrap" }}>
-              {STATS.map(({ val, label, color }, i) => (
-                <div key={label} className="ft-stats-box" style={{
-                  padding: "10px 18px", textAlign: "center",
-                  background: "rgba(255,255,255,.025)",
-                  border: "1px solid rgba(255,255,255,.06)",
-                  borderRadius: i === 0 ? "12px 0 0 12px" : i === STATS.length - 1 ? "0 12px 12px 0" : 0,
-                  borderLeft: i > 0 ? "none" : undefined,
-                }}>
-                  <div style={{ fontFamily: "'Lora', serif", fontSize: 15, fontWeight: 700, color, letterSpacing: "-.2px" }}>{val}</div>
-                  <div style={{ fontSize: 9.5, color: "rgba(255,255,255,.25)", marginTop: 2, fontWeight: 600, letterSpacing: ".05em", textTransform: "uppercase" }}>{label}</div>
-                </div>
-              ))}
-            </div>
-
-            {/* Contact — moved out of its own column so the four link columns
-                line up evenly across the row. */}
-            <div className="ft-contact-items" style={{ display: "flex", flexDirection: "column", gap: 12, marginTop: 30 }}>
-              {[
-                { Icon: Mail,  text: "hello@finovaos.app", color: "#818cf8", href: "mailto:hello@finovaos.app" },
-                { Icon: Phone, text: "+92 317-8653693", color: "#34d399", href: "https://wa.me/923047653693" },
-
-              ].map(({ Icon, text, color, href }) => (
-                <a key={text} href={href} className="ft-contact-item" style={{ display: "flex", alignItems: "center", gap: 10, textDecoration: "none" }}>
-                  <div className="ft-contact-icon" style={{
-                    width: 32, height: 32, borderRadius: 9, flexShrink: 0,
-                    background: `${color}14`, border: `1px solid ${color}28`,
-                    display: "flex", alignItems: "center", justifyContent: "center", color,
-                  }}>
-                    <Icon size={13}/>
-                  </div>
-                  <span style={{ fontSize: 13, color: "rgba(255,255,255,.42)", lineHeight: 1.4 }}>{text}</span>
-                </a>
-              ))}
-            </div>
-
-            {/* CTA card — kept from the old contact column so the footer still
-                has a conversion path. */}
-            <div className="ft-cta-card" style={{
-              borderRadius: 14, padding: "16px 18px", marginTop: 24, maxWidth: 340,
-              background: "linear-gradient(135deg,rgba(99,102,241,.1),rgba(79,70,229,.06))",
-              border: "1px solid rgba(99,102,241,.2)",
-              position: "relative", overflow: "hidden",
-            }}>
-              <div aria-hidden style={{ position: "absolute", top: -30, right: -30, width: 100, height: 100, borderRadius: "50%", background: "radial-gradient(circle,rgba(99,102,241,.14),transparent 70%)", pointerEvents: "none" }}/>
-              <p style={{ fontSize: 13.5, color: "rgba(255,255,255,.75)", fontWeight: 600, margin: "0 0 5px", lineHeight: 1.3 }}>
-                Take Control of Your Business Today
-              </p>
-              <p style={{ fontSize: 11.5, color: "rgba(255,255,255,.32)", margin: "0 0 14px", lineHeight: 1.55 }}>
-                Automate invoicing, payments, and reporting — with real-time AI insights.
-              </p>
-              <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-                <Link href="/pricing" className="ft-cta-btn">
-                  View Pricing <ArrowRight size={13}/>
-                </Link>
-                <Link href="/demo" className="ft-cta-btn" style={{ background: "rgba(255,255,255,.06)", boxShadow: "none" }}>
-                  Book a Demo
-                </Link>
-              </div>
-            </div>
           </div>
 
           <LinkColumn title="Product"   color="#818cf8" links={PRODUCT_LINKS} />
