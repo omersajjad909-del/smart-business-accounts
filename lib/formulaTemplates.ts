@@ -43,7 +43,7 @@ export const FORMULA_TEMPLATES: FormulaTemplate[] = [
       { key: "guezzet",       label: "Guezzet",             unit: "in", defaultValue: 0,    askOnRun: true },
       { key: "flap",         label: "Flap / seal",        unit: "in", defaultValue: 2.5,  askOnRun: true },
       { key: "gauge",        label: "Gauge / thickness",  unit: "",   defaultValue: 10,   askOnRun: true },
-      { key: "materialRate", label: "Material rate",      unit: "per kg", defaultValue: 12.8, askOnRun: true },
+      { key: "materialRate", label: "Material rate",      unit: "per mm", defaultValue: 12.0, askOnRun: true },
       { key: "rollLength",   label: "Roll length",        unit: "m",  defaultValue: 100 },
       { key: "stockWidths",  label: "Stock widths sold",  unit: "in", isList: true, listValue: [48, 50, 52, 54, 56, 58, 60] },
       { key: "cutMin",       label: "Cutting range — min", unit: "in", defaultValue: 30 },
