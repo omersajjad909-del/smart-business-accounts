@@ -2480,3 +2480,210 @@ model PlatformInvoice {
   @@index([provider, issuedAt])
   @@index([issuedAt])
 }
+
+// ─── AI Prospecting (outbound client acquisition for FinovaOS itself) ─────────
+// Platform-level, not tenant-scoped: these rows belong to FinovaOS the vendor,
+// not to any Company using FinovaOS. Pipeline is:
+//   discover → enrich → score → draft → HUMAN REVIEW → send → track → Lead
+// Nothing leaves the building without a row in OutreachEmail flipping to
+// "approved" by a real admin. See docs/AI-PROSPECTING.md.
+
+model OutreachCampaign {
+  id      String @id @default(uuid())
+  name    String
+  /// The natural-language brief the admin typed, kept verbatim for audit.
+  command String @db.Text
+  /// Parsed brief: { industries, countries, cities, employeeMin, employeeMax,
+  /// targetCount, language, tone, valueAngle, excludeDomains }
+  brief   Json
+
+  /// draft | discovering | enriching | scoring | drafting | review | sending
+  /// | paused | done | failed
+  status      String  @default("draft")
+  targetCount Int     @default(100)
+  /// Hard ceiling on emails sent per calendar day for this campaign.
+  dailyCap    Int     @default(40)
+  /// Verified sending identity, e.g. "Umer <umer@finovaos-outreach.com>".
+  sendFrom    String?
+  /// Rolling counters: { discovered, enriched, scored, drafted, approved,
+  /// rejected, sent, replied, bounced }
+  progress    Json?
+  lastError   String? @db.Text
+  createdBy   String?
+
+  startedAt   DateTime?
+  completedAt DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  prospects ProspectCompany[]
+  emails    OutreachEmail[]
+
+  @@index([status, createdAt])
+}
+
+model ProspectCompany {
+  id         String           @id @default(uuid())
+  campaignId String
+  campaign   OutreachCampaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+
+  name    String
+  domain  String?
+  website String?
+  /// Mapped onto a FinovaOS business type id from lib/businessTypes.ts.
+  industry String?
+  country  String?
+  city     String?
+  address  String?
+  lat      Float?
+  lng      Float?
+  phone    String?
+
+  employeeCount   Int?
+  employeeBand    String? // 1-10 | 11-50 | 51-200 | 201-500 | 500+
+  warehouseCount  Int?
+  locationCount   Int?
+  /// [{ name, address, type: "hq" | "warehouse" | "branch" | "outlet" }]
+  branches        Json?
+  revenueBand     String?
+  /// What they appear to run today — the strongest displacement signal we have.
+  currentSoftware String?
+
+  /// sample | google-places | apollo | csv | manual
+  source     String
+  sourceRef  String?
+  /// Raw provider payload + scraped website facts, kept for re-scoring later.
+  enrichment Json?
+  enrichedAt DateTime?
+
+  score          Int? // 0-100
+  /// { fit, size, multiLocation, softwareGap, reachability, aiJudgement }
+  scoreBreakdown Json?
+  tier           String? // A | B | C | D
+  scoreReason    String? @db.Text
+  scoredAt       DateTime?
+
+  /// discovered | enriched | scored | drafted | pending_review | approved
+  /// | rejected | queued | sent | replied | bounced | converted | skipped
+  status       String  @default("discovered")
+  rejectReason String?
+  /// Set once this prospect answers and becomes a real Lead row.
+  leadId       String?
+
+  contacts ProspectContact[]
+  emails   OutreachEmail[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  /// One row per company per campaign — reruns update instead of duplicating.
+  @@unique([campaignId, domain])
+  @@index([campaignId, status])
+  @@index([campaignId, tier])
+  @@index([campaignId, score])
+}
+
+model ProspectContact {
+  id         String          @id @default(uuid())
+  prospectId String
+  prospect   ProspectCompany @relation(fields: [prospectId], references: [id], onDelete: Cascade)
+
+  name      String?
+  title     String?
+  email     String
+  phone     String?
+  linkedin  String?
+  isPrimary Boolean @default(false)
+
+  /// unverified | valid | risky | invalid | catch_all — anything but "valid"
+  /// is held back from sending, because bounces cost domain reputation.
+  verifyStatus String    @default("unverified")
+  verifiedAt   DateTime?
+
+  createdAt DateTime @default(now())
+
+  @@index([prospectId])
+  @@index([email])
+}
+
+model OutreachEmail {
+  id         String           @id @default(uuid())
+  campaignId String
+  campaign   OutreachCampaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  prospectId String
+  prospect   ProspectCompany  @relation(fields: [prospectId], references: [id], onDelete: Cascade)
+  contactId  String?
+
+  /// 1 = first touch, 2+ = follow-ups in the sequence.
+  step     Int    @default(1)
+  toEmail  String
+  toName   String?
+  subject  String
+  bodyText String @db.Text
+  bodyHtml String @db.Text
+  language String @default("en")
+
+  aiModel     String?
+  generatedAt DateTime?
+
+  /// draft | pending_review | approved | rejected | queued | sent | failed
+  /// | bounced | replied | unsubscribed
+  status        String    @default("draft")
+  reviewedBy    String?
+  reviewedAt    DateTime?
+  /// True when the admin changed the copy before approving.
+  editedByHuman Boolean   @default(false)
+  rejectReason  String?
+
+  scheduledFor DateTime?
+  sentAt       DateTime?
+  providerId   String?
+  failReason   String?
+
+  openedAt  DateTime?
+  clickedAt DateTime?
+  repliedAt DateTime?
+  openCount Int       @default(0)
+
+  /// Powers the one-click unsubscribe link; required by CAN-SPAM and PECR.
+  unsubToken String @unique @default(uuid())
+
+  events OutreachEvent[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([campaignId, status])
+  @@index([status, scheduledFor])
+  @@index([prospectId, step])
+  @@index([toEmail])
+}
+
+model OutreachEvent {
+  id      String        @id @default(uuid())
+  emailId String
+  email   OutreachEmail @relation(fields: [emailId], references: [id], onDelete: Cascade)
+
+  /// queued | sent | delivered | open | click | reply | bounce | complaint
+  /// | unsubscribe
+  type String
+  meta Json?
+
+  createdAt DateTime @default(now())
+
+  @@index([emailId, createdAt])
+  @@index([type, createdAt])
+}
+
+model OutreachSuppression {
+  id     String  @id @default(uuid())
+  email  String  @unique
+  domain String?
+  /// unsubscribed | bounced | complained | manual | existing_customer
+  reason String
+  note   String?
+
+  createdAt DateTime @default(now())
+
+  @@index([domain])
+}
