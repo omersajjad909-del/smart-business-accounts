@@ -60,12 +60,14 @@ export async function POST(req: NextRequest) {
   const results: { companyId: string; status: string; error?: string }[] = [];
   for (const c of companies) {
     try {
-      await createCompanyBackup(c.id, {
+      const r = await createCompanyBackup(c.id, {
         backupType: "MANUAL",
         createdBy: admin.id,
         keepLast: 10,
       });
-      results.push({ companyId: c.id, status: "success" });
+      // "unchanged" means the data matched the existing snapshot, so nothing new
+      // was stored — that is a successful check, not a skipped company.
+      results.push({ companyId: c.id, status: r.deduped ? "unchanged" : "success" });
     } catch (err: any) {
       console.error(`[admin] backup failed for ${c.id}:`, err);
       results.push({ companyId: c.id, status: "failed", error: String(err?.message || err) });
@@ -73,18 +75,22 @@ export async function POST(req: NextRequest) {
   }
 
   const failed = results.filter((r) => r.status === "failed").length;
+  const unchanged = results.filter((r) => r.status === "unchanged").length;
+  const created = results.filter((r) => r.status === "success").length;
 
   await logAdminAction({
     adminId: admin.id,
     adminEmail: admin.email,
     action: "RUN_BACKUP",
     targetType: "System",
-    details: { companies: companies.length, failed },
+    details: { companies: companies.length, created, unchanged, failed },
   });
 
   return NextResponse.json({
     ok: failed === 0,
-    ran: results.length - failed,
+    ran: created + unchanged,
+    created,
+    unchanged,
     failed,
     results,
   });

@@ -137,8 +137,12 @@ export default function BackupRestorePage() {
         toast.error(`Backup finished with ${d.failed} failure${d.failed > 1 ? "s" : ""} (${d.ran} succeeded).`, { id: t });
       } else if (d.ran === 0) {
         toast.success(d.message || "No active companies to back up.", { id: t });
+      } else if (d.created === 0) {
+        // Every company matched its existing snapshot — nothing was stored twice.
+        toast.success(`All ${d.unchanged} compan${d.unchanged > 1 ? "ies" : "y"} already up to date — no new snapshots needed.`, { id: t });
       } else {
-        toast.success(`Backup complete — ${d.ran} compan${d.ran > 1 ? "ies" : "y"} snapshotted.`, { id: t });
+        const tail = d.unchanged ? `, ${d.unchanged} unchanged` : "";
+        toast.success(`Backup complete — ${d.created} new snapshot${d.created > 1 ? "s" : ""}${tail}.`, { id: t });
       }
       await load();
     } catch (e: any) {

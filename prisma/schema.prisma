@@ -1029,11 +1029,19 @@ model SystemBackup {
   fileSize   Int?
   backupType String // FULL | PARTIAL
   status     String // PENDING | COMPLETED | FAILED
-  metadata   String? // JSON string
+  metadata   String? // Snapshot payload: plain JSON, or "gz:<base64>" when compressed
   createdAt  DateTime @default(now())
   createdBy  String?
 
+  // SHA-256 of the snapshot contents (timestamp excluded). A backup run that
+  // produces an identical hash re-stamps verifiedAt on the existing row instead
+  // of storing the same megabyte again.
+  contentHash String?
+  // Last time a backup run confirmed this snapshot still matches live data.
+  verifiedAt  DateTime?
+
   @@index([companyId, createdAt, status])
+  @@index([companyId, contentHash])
 }
 
 model BackupSchedule {

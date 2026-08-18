@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { resolveCompanyId } from "@/lib/tenant";
+import { unpackSnapshot } from "@/lib/backup";
 
 export async function GET(req: NextRequest) {
   const userRole = req.headers.get("x-user-role");
@@ -22,11 +23,15 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: "Backup not found or data unavailable" }, { status: 404 });
   }
 
-  return new NextResponse(backup.metadata, {
+  // Snapshots are stored gzipped; the download is always plain JSON so the file
+  // stays re-uploadable through the restore-from-file flow.
+  const json = unpackSnapshot(backup.metadata);
+
+  return new NextResponse(json, {
     headers: {
       "Content-Type": "application/json",
       "Content-Disposition": `attachment; filename="${backup.fileName}"`,
-      "Content-Length": String(Buffer.byteLength(backup.metadata, "utf8")),
+      "Content-Length": String(Buffer.byteLength(json, "utf8")),
     },
   });
 }

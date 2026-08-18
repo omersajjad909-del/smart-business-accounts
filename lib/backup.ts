@@ -1,3 +1,5 @@
+import { createHash } from "crypto";
+import { gzipSync, gunzipSync } from "zlib";
 import { prisma } from "@/lib/prisma";
 import {
   BACKUP_TABLES,
@@ -13,7 +15,43 @@ export type BackupResult = {
   fileSize: number;
   jsonStr: string;
   counts: Record<string, number>;
+  /** True when the data was unchanged and an existing snapshot was reused. */
+  deduped: boolean;
 };
+
+/** Marker for a gzipped payload stored in the metadata text column. */
+const GZIP_PREFIX = "gz:";
+
+/**
+ * Snapshots are stored compressed. The column is TEXT, so the gzip bytes are
+ * base64'd — that costs back a third of the saving, but the format stays
+ * readable by any client and old plain-JSON rows keep working untouched.
+ */
+function packSnapshot(jsonStr: string): string {
+  return GZIP_PREFIX + gzipSync(Buffer.from(jsonStr, "utf8"), { level: 9 }).toString("base64");
+}
+
+/** Reverse of packSnapshot; passes plain JSON straight through. */
+export function unpackSnapshot(stored: string): string {
+  if (!stored.startsWith(GZIP_PREFIX)) return stored;
+  return gunzipSync(Buffer.from(stored.slice(GZIP_PREFIX.length), "base64")).toString("utf8");
+}
+
+/** Parse a stored snapshot, compressed or not. */
+export function readSnapshot(stored: string): any {
+  return JSON.parse(unpackSnapshot(stored));
+}
+
+/**
+ * Fingerprint of what a snapshot actually contains.
+ *
+ * exportedAt is deliberately excluded — it changes on every run and would make
+ * every snapshot look unique, which is exactly the duplicate-storage problem.
+ */
+function snapshotHash(exportData: Record<string, any>): string {
+  const { exportedAt, ...content } = exportData;
+  return createHash("sha256").update(JSON.stringify(content)).digest("hex");
+}
 
 export type RestoreResult = {
   companyId: string;
@@ -37,6 +75,11 @@ function delegate(client: any, model: string) {
  *
  * Coverage is defined by BACKUP_TABLES — the same list restore writes back, so
  * the two can never drift apart again.
+ *
+ * If the collected data is byte-identical to the company's newest snapshot,
+ * nothing new is stored: the existing row's verifiedAt is re-stamped and its id
+ * is returned. Pressing "Run Backup Now" three times therefore leaves one
+ * snapshot per company, not three copies of the same megabyte.
  */
 export async function createCompanyBackup(
   companyId: string,
@@ -67,24 +110,61 @@ export async function createCompanyBackup(
         counts[table.key] = 0;
         continue;
       }
-      const rows = await model.findMany({ where: table.where(companyId) });
+      // Stable ordering keeps the hash meaningful: without it Postgres may hand
+      // back the same rows in a different order and every run would look changed.
+      const rows = await model.findMany({ where: table.where(companyId), orderBy: { id: "asc" } });
       exportData[table.key] = rows;
       counts[table.key] = rows.length;
     }
 
     const jsonStr = JSON.stringify(exportData);
-    const fileSize = Buffer.byteLength(jsonStr, "utf8");
+    const packed = packSnapshot(jsonStr);
+    // fileSize is what the row actually occupies, since the UI reports it as
+    // "Storage Used" — not the size of the JSON once expanded again.
+    const fileSize = Buffer.byteLength(packed, "utf8");
+    const contentHash = snapshotHash(exportData);
+
+    // Has this exact content already been stored for this company?
+    const twin = await prisma.systemBackup.findFirst({
+      where: { companyId, status: "COMPLETED", contentHash, NOT: { id: backup.id } },
+      orderBy: { createdAt: "desc" },
+      select: { id: true, fileName: true, fileSize: true },
+    });
+
+    if (twin) {
+      // Drop the placeholder row and just note that the old snapshot is current.
+      await prisma.systemBackup.delete({ where: { id: backup.id } }).catch(() => {});
+      await prisma.systemBackup.update({
+        where: { id: twin.id },
+        data: { verifiedAt: now },
+      });
+      return {
+        companyId,
+        backupId: twin.id,
+        fileName: twin.fileName,
+        fileSize: twin.fileSize ?? fileSize,
+        jsonStr,
+        counts,
+        deduped: true,
+      };
+    }
 
     await prisma.systemBackup.update({
       where: { id: backup.id },
-      data: { status: "COMPLETED", fileSize, metadata: jsonStr },
+      data: {
+        status: "COMPLETED",
+        fileSize,
+        contentHash,
+        verifiedAt: now,
+        metadata: packed,
+      },
     });
 
     if (opts.keepLast && opts.keepLast > 0) {
       await pruneCompanyBackups(companyId, backupType, opts.keepLast);
     }
 
-    return { companyId, backupId: backup.id, fileName, fileSize, jsonStr, counts };
+    return { companyId, backupId: backup.id, fileName, fileSize, jsonStr, counts, deduped: false };
   } catch (err: any) {
     await prisma.systemBackup
       .update({

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireAdmin, logAdminAction } from "@/lib/adminAuth";
-import { restoreCompanyBackup } from "@/lib/backup";
+import { restoreCompanyBackup, readSnapshot } from "@/lib/backup";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
@@ -52,7 +52,7 @@ export async function POST(req: NextRequest) {
 
   let data: any;
   try {
-    data = JSON.parse(backup.metadata);
+    data = readSnapshot(backup.metadata);
   } catch {
     return NextResponse.json({ error: "Backup data is corrupted" }, { status: 500 });
   }
