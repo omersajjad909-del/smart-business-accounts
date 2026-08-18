@@ -13,40 +13,56 @@ type BackupEntry = {
   createdAt: string;
 };
 
+function formatBytes(bytes: number | null | undefined) {
+  if (!bytes || bytes <= 0) return "—";
+  if (bytes < 1024) return `${bytes} B`;
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+  if (bytes < 1024 * 1024 * 1024) return `${(bytes / 1024 / 1024).toFixed(2)} MB`;
+  return `${(bytes / 1024 / 1024 / 1024).toFixed(2)} GB`;
+}
+
 export default function BackupRestorePage() {
   const [restoring, setRestoring] = useState<string | null>(null);
   const [backupStatus, setBackupStatus] = useState<string | null>(null);
   const [lastBackupAt, setLastBackupAt] = useState<string | null>(null);
   const [backups, setBackups] = useState<BackupEntry[]>([]);
+  const [totalBytes, setTotalBytes] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [running, setRunning] = useState(false);
 
-  useEffect(() => {
-    (async () => {
-      try {
-        const u = getCurrentUser();
-        const headers: Record<string, string> = {};
-        if (u?.role) headers["x-user-role"] = u.role;
-        if (u?.id) headers["x-user-id"] = u.id;
-        const r = await fetch("/api/admin/system/health", { headers, cache: "no-store" });
-        if (r.ok) {
-          const d = await r.json();
-          setBackupStatus(d.backupStatus ?? null);
-          setLastBackupAt(d.lastBackupAt ?? null);
-          if (d.lastBackupAt) {
-            setBackups([{
-              id: "bk-latest",
-              name: `Backup — ${new Date(d.lastBackupAt).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}`,
-              size: "—",
-              type: "full",
-              status: d.backupStatus?.toLowerCase() === "failed" ? "failed" : "complete",
-              createdAt: d.lastBackupAt,
-            }]);
-          }
-        }
-      } catch {}
-      finally { setLoading(false); }
-    })();
-  }, []);
+  async function load() {
+    try {
+      const u = getCurrentUser();
+      const headers: Record<string, string> = {};
+      if (u?.role) headers["x-user-role"] = u.role;
+      if (u?.id) headers["x-user-id"] = u.id;
+
+      const r = await fetch("/api/admin/system/backup", { headers, cache: "no-store" });
+      if (r.ok) {
+        const d = await r.json();
+        const rows: BackupEntry[] = (d.backups || []).map((b: any) => ({
+          id: b.id,
+          name: b.companyName ? `${b.companyName} — ${b.fileName}` : b.fileName,
+          size: formatBytes(b.fileSize),
+          type: String(b.backupType).toUpperCase() === "PARTIAL" ? "incremental" : "full",
+          status:
+            String(b.status).toUpperCase() === "FAILED"
+              ? "failed"
+              : String(b.status).toUpperCase() === "PENDING"
+              ? "running"
+              : "complete",
+          createdAt: b.createdAt,
+        }));
+        setBackups(rows);
+        setTotalBytes(d.totalBytes || 0);
+        setBackupStatus(d.backups?.[0]?.status ?? null);
+        setLastBackupAt(d.backups?.[0]?.createdAt ?? null);
+      }
+    } catch {}
+    finally { setLoading(false); }
+  }
+
+  useEffect(() => { load(); }, []);
 
   function handleRestore(id: string) {
     setRestoring(id);
@@ -54,8 +70,33 @@ export default function BackupRestorePage() {
     setTimeout(() => setRestoring(null), 3000);
   }
 
-  function handleRunBackup() {
-    toast.success("Backup queued — check status in a few minutes.");
+  async function handleRunBackup() {
+    if (running) return;
+    setRunning(true);
+    const t = toast.loading("Running backup…");
+    try {
+      const u = getCurrentUser();
+      const headers: Record<string, string> = { "Content-Type": "application/json" };
+      if (u?.role) headers["x-user-role"] = u.role;
+      if (u?.id) headers["x-user-id"] = u.id;
+
+      const r = await fetch("/api/admin/system/backup", { method: "POST", headers });
+      const d = await r.json().catch(() => ({}));
+      if (!r.ok) throw new Error(d?.error || "Backup failed");
+
+      if (d.failed > 0) {
+        toast.error(`Backup finished with ${d.failed} failure${d.failed > 1 ? "s" : ""} (${d.ran} succeeded).`, { id: t });
+      } else if (d.ran === 0) {
+        toast.success(d.message || "No active companies to back up.", { id: t });
+      } else {
+        toast.success(`Backup complete — ${d.ran} compan${d.ran > 1 ? "ies" : "y"} snapshotted.`, { id: t });
+      }
+      await load();
+    } catch (e: any) {
+      toast.error(e?.message || "Backup failed", { id: t });
+    } finally {
+      setRunning(false);
+    }
   }
 
   return (
@@ -67,9 +108,9 @@ export default function BackupRestorePage() {
           <h1 className="bk-title">Backup &amp; Restore</h1>
           <p className="bk-subtitle">Manage system backups, schedule automatic snapshots, and restore from a previous checkpoint.</p>
         </div>
-        <button type="button" className="bk-primary-btn" onClick={handleRunBackup}>
+        <button type="button" className="bk-primary-btn" onClick={handleRunBackup} disabled={running}>
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-          Run Backup Now
+          {running ? "Running…" : "Run Backup Now"}
         </button>
       </div>
 
@@ -78,7 +119,7 @@ export default function BackupRestorePage() {
         <div className="bk-stat-card">
           <div className="bk-stat-label">Backup Status</div>
           <div className={`bk-stat-value${backupStatus?.toLowerCase() === "failed" ? "" : " bk-stat-value--green"}`}>
-            {loading ? "—" : backupStatus ?? "Unknown"}
+            {loading ? "—" : backupStatus ?? "No backups yet"}
           </div>
           <div className="bk-stat-sub">Latest snapshot</div>
         </div>
@@ -91,8 +132,8 @@ export default function BackupRestorePage() {
         </div>
         <div className="bk-stat-card">
           <div className="bk-stat-label">Storage Used</div>
-          <div className="bk-stat-value">—</div>
-          <div className="bk-stat-sub">Not tracked yet</div>
+          <div className="bk-stat-value" style={{ fontSize: 22 }}>{loading ? "—" : formatBytes(totalBytes)}</div>
+          <div className="bk-stat-sub">Across all snapshots</div>
         </div>
         <div className="bk-stat-card">
           <div className="bk-stat-label">Total Backups</div>
@@ -105,14 +146,14 @@ export default function BackupRestorePage() {
       <div className="bk-card bk-storage-card">
         <div className="bk-storage-head">
           <span className="bk-section-title">Storage Overview</span>
-          <span className="bk-storage-pct">— Used</span>
+          <span className="bk-storage-pct">{loading ? "—" : formatBytes(totalBytes)} Used</span>
         </div>
         <div className="bk-storage-track">
           <div className="bk-storage-fill" style={{ width: "0%" }} />
         </div>
         <div className="bk-storage-legend">
-          <span><i style={{ background: "#8b5cf6" }} />Used (— GB)</span>
-          <span><i style={{ background: "rgba(148,163,184,.25)" }} />Free (— GB)</span>
+          <span><i style={{ background: "#8b5cf6" }} />Used ({loading ? "—" : formatBytes(totalBytes)})</span>
+          <span><i style={{ background: "rgba(148,163,184,.25)" }} />{backups.length} snapshot{backups.length !== 1 ? "s" : ""}</span>
         </div>
       </div>
 
@@ -191,6 +232,7 @@ const pageStyles = `
   transition:opacity .15s;white-space:nowrap;
 }
 .bk-primary-btn:hover{opacity:.88;}
+.bk-primary-btn:disabled{opacity:.55;cursor:not-allowed;}
 .bk-stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-bottom:16px;}
 .bk-stat-card{
   background:var(--panel);border:1px solid var(--border);

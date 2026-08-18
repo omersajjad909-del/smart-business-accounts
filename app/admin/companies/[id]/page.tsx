@@ -10,7 +10,7 @@ type Company = {
   stripeCustomerId: string | null; currentPeriodEnd: string | null;
   createdAt: string; businessType: string | null; businessSetupDone: boolean;
 };
-type User = { id: string; name: string | null; email: string; role: string; joinedAt: string };
+type User = { id: string; name: string | null; email: string; phone?: string | null; role: string; joinedAt: string };
 type Activity = { action: string; createdAt: string; userId: string | null };
 type Payload = {
   company: Company; users: User[]; roleCounts: Record<string, number>;
@@ -226,10 +226,10 @@ export default function CompanyDetailPage({ params }: { params: Promise<{ id: st
               <div style={{ fontSize: 13, color: "rgba(255,255,255,.3)", textAlign: "center", padding: "24px 0" }}>No users found.</div>
             ) : (
               <div style={{ overflowX: "auto" }}>
-                <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 480 }}>
+                <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 600 }}>
                   <thead>
                     <tr>
-                      {["Email", "Name", "Role", "Joined"].map(h => (
+                      {["Email", "Name", "Phone", "Role", "Joined"].map(h => (
                         <th key={h} style={{ padding: "10px 12px", textAlign: "left", fontSize: 10, fontWeight: 800, letterSpacing: ".08em", color: "rgba(255,255,255,.3)", textTransform: "uppercase", borderBottom: `1px solid ${BORDER}` }}>{h}</th>
                       ))}
                     </tr>
@@ -241,6 +241,9 @@ export default function CompanyDetailPage({ params }: { params: Promise<{ id: st
                         onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
                         <td style={{ padding: "12px 12px", fontSize: 12, color: "#38bdf8", fontFamily: "monospace" }}>{u.email}</td>
                         <td style={{ padding: "12px 12px", fontSize: 13, color: "#cbd5e1" }}>{u.name || "—"}</td>
+                        <td style={{ padding: "12px 12px", fontSize: 12, fontFamily: "monospace", color: u.phone ? "#cbd5e1" : "rgba(255,255,255,.3)" }}>
+                          {u.phone ? <a href={`tel:${u.phone}`} style={{ color: "#38bdf8", textDecoration: "none" }}>{u.phone}</a> : "—"}
+                        </td>
                         <td style={{ padding: "12px 12px" }}><RoleBadge role={u.role} /></td>
                         <td style={{ padding: "12px 12px", fontSize: 12, color: "rgba(255,255,255,.35)" }}>{timeAgo(u.joinedAt)}</td>
                       </tr>

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireAdmin, logAdminAction } from "@/lib/adminAuth";
 import { getCompanyExtraSeats, getEffectiveUserLimitForCompany } from "@/lib/companySeatLimit";
+import { getStoredPhoneForUser } from "@/lib/verification";
 
 export async function GET(
   req: NextRequest,
@@ -47,10 +48,19 @@ export async function GET(
       orderBy: { createdAt: "desc" },
     });
 
-    const users = userCompanies.map((uc: any) => ({
+    // Phone lives in the signup activity log, not on User — see
+    // getStoredPhoneForUser. Never blocks the page if a lookup fails.
+    const phones = await Promise.all(
+      userCompanies.map((uc: any) =>
+        getStoredPhoneForUser(uc.user.id).catch(() => null)
+      )
+    );
+
+    const users = userCompanies.map((uc: any, i: number) => ({
       id: uc.user.id,
       name: uc.user.name,
       email: uc.user.email,
+      phone: phones[i] || null,
       role: uc.user.role,
       joinedAt: uc.createdAt,
     }));

@@ -198,7 +198,7 @@ export default function AdminDashboardPage() {
             ))}
           </ul>
           <div className="system-meta">
-            <span>Backup: <b>{loading ? "—" : data?.systemHealth.backupStatus || "UNKNOWN"}</b></span>
+            <span>Backup: <b>{loading ? "—" : data?.systemHealth.backupStatus || "NEVER RUN"}</b></span>
             <span>Last backup: <b>{formatDateTime(data?.systemHealth.lastBackupAt)}</b></span>
           </div>
           <a href="/admin/system" className="system-health-btn">View System Health</a>

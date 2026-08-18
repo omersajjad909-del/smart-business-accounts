@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse, after } from "next/server";
 import { prisma } from "@/lib/prisma";
 import nodemailer from "nodemailer";
+import { createCompanyBackup, getBackupTargetCompanies, type BackupResult } from "@/lib/backup";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
@@ -28,111 +29,77 @@ async function runBackups() {
   const schedules = await prisma.backupSchedule.findMany({
     where: { isActive: true },
   });
+  const scheduledCompanyIds = new Set(schedules.map((s) => s.companyId));
+
+  // Companies due today per their own schedule…
+  const dueCompanyIds = new Set(
+    schedules
+      .filter(
+        (s) =>
+          s.frequency === "DAILY" ||
+          (s.frequency === "WEEKLY" && s.dayOfWeek === dayOfWeek) ||
+          (s.frequency === "MONTHLY" && s.dayOfMonth === dayOfMonth)
+      )
+      .map((s) => s.companyId)
+  );
+
+  // …plus every live company that never configured one. Without this fallback
+  // the cron backed up nothing at all (no tenant has a BackupSchedule row), so
+  // the admin dashboard reported "Backup: UNKNOWN" forever.
+  const allCompanies = await getBackupTargetCompanies();
+  for (const c of allCompanies) {
+    if (!scheduledCompanyIds.has(c.id)) dueCompanyIds.add(c.id);
+  }
 
   const results: { companyId: string; status: string; error?: string }[] = [];
 
-  for (const schedule of schedules) {
-    // Check if backup should run today
-    const shouldRun =
-      schedule.frequency === "DAILY" ||
-      (schedule.frequency === "WEEKLY" && schedule.dayOfWeek === dayOfWeek) ||
-      (schedule.frequency === "MONTHLY" && schedule.dayOfMonth === dayOfMonth);
-
-    if (!shouldRun) continue;
-
+  for (const companyId of dueCompanyIds) {
     try {
-      const companyId = schedule.companyId;
-
-      // Collect all company data
-      const [
-        accounts, items, vouchers, salesInvoices, purchaseInvoices,
-        purchaseOrders, bankAccounts, budgets, recurringTransactions,
-        financialYears, branches, costCenters, currencies, taxConfigs,
-        expenseVouchers, paymentReceipts, employees, payrolls, loans,
-        pettyCash, fixedAssets, crmContacts, opportunities,
-      ] = await Promise.all([
-        prisma.account.findMany({ where: { companyId } }),
-        prisma.itemNew.findMany({ where: { companyId } }),
-        prisma.voucher.findMany({ where: { companyId }, include: { entries: true } }),
-        prisma.salesInvoice.findMany({ where: { companyId }, include: { items: true } }),
-        prisma.purchaseInvoice.findMany({ where: { companyId }, include: { items: true } }),
-        prisma.purchaseOrder.findMany({ where: { companyId }, include: { items: true } }),
-        prisma.bankAccount.findMany({ where: { companyId } }),
-        prisma.budget.findMany({ where: { companyId } }),
-        prisma.recurringTransaction.findMany({ where: { companyId } }),
-        prisma.financialYear.findMany({ where: { companyId } }),
-        prisma.branch.findMany({ where: { companyId } }),
-        prisma.costCenter.findMany({ where: { companyId } }),
-        prisma.currency.findMany({ where: { companyId } }),
-        prisma.taxConfiguration.findMany({ where: { companyId } }),
-        prisma.expenseVoucher.findMany({ where: { companyId }, include: { items: true } }),
-        prisma.paymentReceipt.findMany({ where: { companyId } }),
-        (prisma as any).employee?.findMany({ where: { companyId } }).catch(() => []),
-        (prisma as any).payroll?.findMany({ where: { companyId } }).catch(() => []),
-        (prisma as any).loan?.findMany({ where: { companyId } }).catch(() => []),
-        (prisma as any).pettyCash?.findMany({ where: { companyId } }).catch(() => []),
-        (prisma as any).fixedAsset?.findMany({ where: { companyId } }).catch(() => []),
-        (prisma as any).contact?.findMany({ where: { companyId } }).catch(() => []),
-        (prisma as any).opportunity?.findMany({ where: { companyId } }).catch(() => []),
-      ]);
-
-      const exportData = {
-        companyId,
-        exportedAt: today.toISOString(),
-        version: "2.0",
-        accounts, items, vouchers, salesInvoices, purchaseInvoices,
-        purchaseOrders, bankAccounts, budgets, recurringTransactions,
-        financialYears, branches, costCenters, currencies, taxConfigs,
-        expenseVouchers, paymentReceipts, employees, payrolls, loans,
-        pettyCash, fixedAssets, crmContacts, opportunities,
-      };
-
-      const jsonStr = JSON.stringify(exportData);
-      const fileSize = Buffer.byteLength(jsonStr, "utf8");
-      const timestamp = today.toISOString().replace(/[:.]/g, "-");
-      const fileName = `backup-${companyId.slice(0, 8)}-${timestamp}.json`;
-
-      // Save to DB
-      await prisma.systemBackup.create({
-        data: {
-          companyId,
-          fileName,
-          fileSize,
-          backupType: "SCHEDULED",
-          status: "COMPLETED",
-          metadata: jsonStr,
-          createdBy: "CRON",
-        },
+      const result = await createCompanyBackup(companyId, {
+        backupType: "SCHEDULED",
+        createdBy: "CRON",
+        keepLast: 30,
       });
 
-      // Update schedule lastRun
-      await prisma.backupSchedule.update({
-        where: { companyId },
-        data: { lastRunAt: today },
-      });
+      if (scheduledCompanyIds.has(companyId)) {
+        await prisma.backupSchedule
+          .update({ where: { companyId }, data: { lastRunAt: today } })
+          .catch(() => {});
+      }
 
-      // Send backup via email if configured
-      const smtpUser = process.env.SMTP_USER;
-      const smtpPass = process.env.SMTP_PASS;
-      const adminEmail = process.env.EMAIL_ADMIN || smtpUser;
+      await emailBackup(result, today);
+      results.push({ companyId, status: "success" });
+    } catch (err: any) {
+      console.error(`Backup failed for ${companyId}:`, err);
+      results.push({ companyId, status: "failed", error: err.message });
+    }
+  }
 
-      if (smtpUser && smtpPass && adminEmail) {
-        try {
-          const transport = nodemailer.createTransport({
-            host: process.env.SMTP_HOST || "smtp.gmail.com",
-            port: parseInt(process.env.SMTP_PORT || "587"),
-            secure: process.env.SMTP_SECURE === "true",
-            auth: { user: smtpUser, pass: smtpPass },
-          });
+  console.log(`[cron] backup complete: ${results.length} runs`, results);
+}
 
-          const fileSizeMB = (fileSize / 1024 / 1024).toFixed(2);
-          const dateStr = today.toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" });
+async function emailBackup(result: BackupResult, today: Date) {
+  const smtpUser = process.env.SMTP_USER;
+  const smtpPass = process.env.SMTP_PASS;
+  const adminEmail = process.env.EMAIL_ADMIN || smtpUser;
+  if (!smtpUser || !smtpPass || !adminEmail) return;
 
-          await transport.sendMail({
-            from: `"FinovaOS Backup" <${smtpUser}>`,
-            to: adminEmail,
-            subject: `✅ FinovaOS Auto Backup — ${dateStr}`,
-            html: `
+  try {
+    const transport = nodemailer.createTransport({
+      host: process.env.SMTP_HOST || "smtp.gmail.com",
+      port: parseInt(process.env.SMTP_PORT || "587"),
+      secure: process.env.SMTP_SECURE === "true",
+      auth: { user: smtpUser, pass: smtpPass },
+    });
+
+    const fileSizeMB = (result.fileSize / 1024 / 1024).toFixed(2);
+    const dateStr = today.toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" });
+
+    await transport.sendMail({
+      from: `"FinovaOS Backup" <${smtpUser}>`,
+      to: adminEmail,
+      subject: `✅ FinovaOS Auto Backup — ${dateStr}`,
+      html: `
               <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:24px;background:#f8fafc;border-radius:12px;">
                 <h2 style="color:#0f172a;margin:0 0 16px;">🗄️ Scheduled Backup Complete</h2>
                 <p style="color:#475569;font-size:14px;">Your FinovaOS database backup has been created successfully.</p>
@@ -143,7 +110,7 @@ async function runBackups() {
                   </tr>
                   <tr>
                     <td style="padding:10px 14px;font-weight:700;font-size:13px;color:#475569;">File</td>
-                    <td style="padding:10px 14px;font-size:13px;color:#0f172a;">${fileName}</td>
+                    <td style="padding:10px 14px;font-size:13px;color:#0f172a;">${result.fileName}</td>
                   </tr>
                   <tr style="background:#e2e8f0;">
                     <td style="padding:10px 14px;font-weight:700;font-size:13px;color:#475569;">Size</td>
@@ -152,7 +119,7 @@ async function runBackups() {
                   <tr>
                     <td style="padding:10px 14px;font-weight:700;font-size:13px;color:#475569;">Records</td>
                     <td style="padding:10px 14px;font-size:13px;color:#0f172a;">
-                      ${accounts.length} accounts · ${(salesInvoices as any[]).length} invoices · ${(vouchers as any[]).length} vouchers · ${(items as any[]).length} items
+                      ${result.counts.accounts} accounts · ${result.counts.salesInvoices} invoices · ${result.counts.vouchers} vouchers · ${result.counts.items} items
                     </td>
                   </tr>
                 </table>
@@ -163,37 +130,16 @@ async function runBackups() {
                 <p style="color:#94a3b8;font-size:11px;">FinovaOS · Automated Backup System</p>
               </div>
             `,
-            attachments: [
-              {
-                filename: fileName,
-                content: jsonStr,
-                contentType: "application/json",
-              },
-            ],
-          });
-        } catch (emailErr) {
-          console.error("Backup email failed:", emailErr);
-          // Don't fail the backup if email fails
-        }
-      }
-
-      // Keep only last 30 backups per company (cleanup old ones)
-      const allBackups = await prisma.systemBackup.findMany({
-        where: { companyId, backupType: "SCHEDULED" },
-        orderBy: { createdAt: "desc" },
-        select: { id: true },
-      });
-      if (allBackups.length > 30) {
-        const toDelete = allBackups.slice(30).map((b) => b.id);
-        await prisma.systemBackup.deleteMany({ where: { id: { in: toDelete } } });
-      }
-
-      results.push({ companyId, status: "success" });
-    } catch (err: any) {
-      console.error(`Backup failed for ${schedule.companyId}:`, err);
-      results.push({ companyId: schedule.companyId, status: "failed", error: err.message });
-    }
+      attachments: [
+        {
+          filename: result.fileName,
+          content: result.jsonStr,
+          contentType: "application/json",
+        },
+      ],
+    });
+  } catch (emailErr) {
+    console.error("Backup email failed:", emailErr);
+    // Don't fail the backup if email fails
   }
-
-  console.log(`[cron] backup complete: ${results.length} runs`, results);
 }

@@ -296,7 +296,9 @@ export async function GET(req: NextRequest) {
     const systemChecks = [
       { label: "API Errors (24h)", ok: apiErrors24h === 0 },
       { label: "Login Failures (24h)", ok: failedLogins24h < 10 },
-      { label: "Latest Backup", ok: String(latestBackup?.status || "").toUpperCase() !== "FAILED" },
+      // No snapshot at all is not a passing state — it means the backup cron has
+      // never produced anything, which is exactly what a health check is for.
+      { label: "Latest Backup", ok: String(latestBackup?.status || "").toUpperCase() === "COMPLETED" },
       { label: "Revenue Logs", ok: paymentLogs.length >= 0 },
     ];
     const healthyChecks = systemChecks.filter((item) => item.ok).length;
@@ -323,7 +325,7 @@ export async function GET(req: NextRequest) {
       })),
       systemHealth: {
         percent: healthPercent,
-        backupStatus: latestBackup?.status || "UNKNOWN",
+        backupStatus: latestBackup?.status || "NEVER RUN",
         lastBackupAt: latestBackup?.createdAt?.toISOString() || null,
         checks: systemChecks,
       },
