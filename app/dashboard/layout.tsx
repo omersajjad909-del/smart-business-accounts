@@ -395,6 +395,17 @@ export default function DashboardLayout({
     if (isMobileViewport) setSidebarCollapsed(false);
   }, [isMobileViewport]);
 
+  // The topbar (and its hamburger) is hidden on the mobile dashboard home, so
+  // the menu button lives inside the page's own header instead. It reaches the
+  // drawer through this event rather than a context, because the page is a
+  // child route and cannot see the layout's state.
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const open = () => setIsMobileMenuOpen(true);
+    window.addEventListener("finova:open-sidebar", open);
+    return () => window.removeEventListener("finova:open-sidebar", open);
+  }, []);
+
   // Close panels on outside click
   useEffect(() => {
     if (!showNotifPanel && !showHelpPanel && !showUserMenu) return;
