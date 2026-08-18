@@ -487,6 +487,13 @@ model Company {
   isDemo        Boolean   @default(false)
   demoExpiresAt DateTime? // Hard deadline; the cleanup cron deletes anything past it
 
+  // Internal test workspace, created by an admin from /admin/dev-test. Kept
+  // apart from isDemo on purpose: a demo sandbox is claimable by any visitor
+  // and is deleted by the cleanup sweep, which would pull an admin's test
+  // workspace out from under them mid-test. This flag only hides the row from
+  // the customer lists and metrics.
+  isInternalTest Boolean @default(false)
+
   // CCPA compliance
   ccpaOptOut   Boolean   @default(false)
   ccpaOptOutAt DateTime?
