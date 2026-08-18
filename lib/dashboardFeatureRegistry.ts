@@ -2549,6 +2549,7 @@ export const CORE_DASHBOARD_FEATURES: DashboardFeatureDefinition[] = [
   { id: "CORE_OWNER_DASHBOARD", label: "Owner Dashboard", route: "/dashboard/owner-dashboard", section: "AI & Automation", core: true, permKey: "VIEW_DASHBOARD", business: "service", businessLabel: "Core (all businesses)" },
   { id: "CORE_BUSINESS_GUIDE", label: "Business Guide", route: "/dashboard/business-guide", section: "AI & Automation", core: true, permKey: "VIEW_DASHBOARD", business: "service", businessLabel: "Core (all businesses)" },
   // ── Admin ──
+  { id: "CORE_COMPANY_PROFILE", label: "Company Profile", route: "/dashboard/company-profile", section: "Admin", core: true, permKey: "MANAGE_USERS", business: "service", businessLabel: "Core (all businesses)" },
   { id: "CORE_ADMIN_CONTROL", label: "Admin Control Center", route: "/dashboard/admin-control", section: "Admin", core: true, permKey: "MANAGE_USERS", business: "service", businessLabel: "Core (all businesses)" },
   { id: "CORE_CHAT", label: "Support Inbox", route: "/dashboard/chat", section: "Admin", core: true, permKey: "MANAGE_USERS", business: "service", businessLabel: "Core (all businesses)" },
   { id: "CORE_BUSINESS_FEATURES", label: "Business Features", route: "/dashboard/business-features", section: "Admin", core: true, permKey: "MANAGE_USERS", business: "service", businessLabel: "Core (all businesses)" },
@@ -2573,8 +2574,11 @@ export const CORE_DASHBOARD_FEATURES: DashboardFeatureDefinition[] = [
   { id: "CORE_SECURITY_ACCESS", label: "Security & Access", route: "/dashboard/security-access", section: "Settings", core: true, permKey: "VIEW_SETTINGS", business: "service", businessLabel: "Core (all businesses)" },
   { id: "CORE_INTEGRATIONS", label: "Integrations", route: "/dashboard/integrations", section: "Settings", core: true, permKey: "API_ACCESS", business: "service", businessLabel: "Core (all businesses)" },
   { id: "CORE_AFFILIATE", label: "Affiliate Program", route: "/dashboard/affiliate", section: "Settings", core: true, permKey: "VIEW_SETTINGS", business: "service", businessLabel: "Core (all businesses)" },
-  { id: "CORE_COMPANY_PROFILE", label: "Company Profile", route: "/dashboard/company-profile", section: "Settings", core: true, permKey: "VIEW_SETTINGS", business: "service", businessLabel: "Core (all businesses)" },
   { id: "CORE_NOTIFICATIONS", label: "Notifications", route: "/dashboard/notifications", section: "Settings", core: true, permKey: "VIEW_SETTINGS", business: "service", businessLabel: "Core (all businesses)" },
+  // Reachable only from the user dropdown before, which the mobile topbar does
+  // not render — so on a phone there was no way in at all. It has a sidebar
+  // entry now, and a registry row so Plans → Pages & Modules can assign it.
+  { id: "CORE_FEEDBACK", label: "Feedback & Reviews", route: "/dashboard/feedback", section: "Settings", core: true, permKey: "VIEW_SETTINGS", business: "service", businessLabel: "Core (all businesses)" },
   // The page, its API and the encrypted vault behind it already existed, but it
   // was never listed here — so it never appeared in /admin/permissions and could
   // not be assigned to a plan like every other page. Without it a tenant cannot

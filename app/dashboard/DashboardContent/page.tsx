@@ -1344,49 +1344,10 @@ export default function DashboardContent() {
           style={{
             display: "flex",
             alignItems: "flex-start",
-            gap: 10,
+            gap: 12,
             minWidth: 0,
           }}
         >
-          {/* Menu — the layout hides its topbar (and hamburger) on the mobile
-              home, so this is the only way into the sidebar from here besides
-              the bottom nav. The layout listens for this event. */}
-          <button
-            type="button"
-            aria-label="Open menu"
-            onClick={() =>
-              window.dispatchEvent(new Event("finova:open-sidebar"))
-            }
-            style={{
-              width: 40,
-              height: 40,
-              borderRadius: 13,
-              background: "rgba(255,255,255,0.05)",
-              border: "1px solid rgba(255,255,255,0.1)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              color: "var(--text-primary)",
-              cursor: "pointer",
-              flexShrink: 0,
-              marginTop: 6,
-            }}
-          >
-            <svg
-              width="19"
-              height="19"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2.2"
-              strokeLinecap="round"
-            >
-              <line x1="3" y1="6" x2="21" y2="6" />
-              <line x1="3" y1="12" x2="21" y2="12" />
-              <line x1="3" y1="18" x2="21" y2="18" />
-            </svg>
-          </button>
-
           {/* Avatar — profile photo, then company logo, then initials */}
           <div
             style={{
@@ -1433,9 +1394,6 @@ export default function DashboardContent() {
                 letterSpacing: "-.45px",
                 lineHeight: 1.05,
                 marginBottom: 6,
-                whiteSpace: "nowrap",
-                overflow: "hidden",
-                textOverflow: "ellipsis",
               }}
             >
               {uName} 👋

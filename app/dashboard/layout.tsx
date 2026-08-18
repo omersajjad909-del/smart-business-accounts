@@ -395,17 +395,6 @@ export default function DashboardLayout({
     if (isMobileViewport) setSidebarCollapsed(false);
   }, [isMobileViewport]);
 
-  // The topbar (and its hamburger) is hidden on the mobile dashboard home, so
-  // the menu button lives inside the page's own header instead. It reaches the
-  // drawer through this event rather than a context, because the page is a
-  // child route and cannot see the layout's state.
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    const open = () => setIsMobileMenuOpen(true);
-    window.addEventListener("finova:open-sidebar", open);
-    return () => window.removeEventListener("finova:open-sidebar", open);
-  }, []);
-
   // Close panels on outside click
   useEffect(() => {
     if (!showNotifPanel && !showHelpPanel && !showUserMenu) return;
@@ -2164,10 +2153,16 @@ export default function DashboardLayout({
               open={openSection === "admin"}
               onToggle={() => toggle("admin")}
             >
+              {/* Company Profile, Notifications and Feedback used to live only in
+                  the topbar avatar dropdown, which the mobile topbar never
+                  renders — so on a phone they were unreachable. They are sidebar
+                  entries now, and each is a row in Plans → Pages & Modules, so
+                  the plan still decides who sees them. */}
+              {currentUser?.role === "ADMIN" && <NavLink href="/dashboard/company-profile" pathname={pathname}>🏢 Company Profile</NavLink>}
               <NavLink href="/dashboard/admin-control" pathname={pathname}>Admin Control Center</NavLink>
               <NavLink href="/dashboard/chat" pathname={pathname}>💬 Support Inbox</NavLink>
               <NavLink href="/dashboard/business-features" pathname={pathname}>⚡ Business Features</NavLink>
-              <NavLink href="/dashboard/notifications-config" pathname={pathname}>💬 Notifications</NavLink>
+              <NavLink href="/dashboard/notifications-config" pathname={pathname}>💬 Notification Settings</NavLink>
               <NavLink href="/dashboard/shortcuts" pathname={pathname}>Keyboard Shortcuts</NavLink>
               {/* <NavLink href="/dashboard/users" pathname={pathname}>Users & Permissions</NavLink>
               <NavLink href="/dashboard/users" pathname={pathname}>Roles & Permissions</NavLink> */}
@@ -2216,10 +2211,11 @@ export default function DashboardLayout({
                   they still need to send them from their own address. The permission
                   itself is what gates this, and it is assignable in /admin/permissions. */}
               {hasPermission(currentUser, PERMISSIONS.EMAIL_SETTINGS) && <NavLink href="/dashboard/email-settings" pathname={pathname}>📧 Email Settings</NavLink>}
-              {/* {(!isCustomPlan || hasCustomActiveModule("whatsapp")) && <NavLink href="/dashboard/notifications" pathname={pathname}>Notifications & SMS</NavLink>} */}
+              <NavLink href="/dashboard/notifications" pathname={pathname}>🔔 Notifications</NavLink>
               <NavLink href="/dashboard/account-settings" pathname={pathname}>Account Settings</NavLink>
               <NavLink href="/dashboard/billing"   pathname={pathname}>💳 My Billing</NavLink>
               <NavLink href="/dashboard/settings/appearance" pathname={pathname}>🎨 Appearance</NavLink>
+              <NavLink href="/dashboard/feedback" pathname={pathname}>⭐ Feedback & Reviews</NavLink>
               <NavLink href="/dashboard/settings/holidays"   pathname={pathname}>🎉 Public Holidays</NavLink>
               {!isCustomPlan && <NavLink href="/dashboard/security-access" pathname={pathname}>Security & Access</NavLink>}
               {hasPermission(currentUser, PERMISSIONS.API_ACCESS) && <NavLink href="/dashboard/integrations" pathname={pathname}>Integrations</NavLink>}
