@@ -1,4 +1,10 @@
 import { prisma } from "@/lib/prisma";
+import {
+  BACKUP_TABLES,
+  BACKUP_FORMAT_VERSION,
+  normalizeSnapshot,
+  type BackupTable,
+} from "@/lib/backupTables";
 
 export type BackupResult = {
   companyId: string;
@@ -6,13 +12,21 @@ export type BackupResult = {
   fileName: string;
   fileSize: number;
   jsonStr: string;
-  counts: {
-    accounts: number;
-    items: number;
-    vouchers: number;
-    salesInvoices: number;
-  };
+  counts: Record<string, number>;
 };
+
+export type RestoreResult = {
+  companyId: string;
+  restored: Record<string, number>;
+  totalRows: number;
+  safetyBackupId: string | null;
+};
+
+/** Prisma delegate for a manifest entry, or null if the model is not generated. */
+function delegate(client: any, model: string) {
+  const d = client?.[model];
+  return d && typeof d.findMany === "function" ? d : null;
+}
 
 /**
  * Snapshot one company's data into a SystemBackup row.
@@ -20,6 +34,9 @@ export type BackupResult = {
  * The record is created up-front as PENDING so a crash mid-collection still
  * leaves a visible trail, then flipped to COMPLETED / FAILED. Callers get the
  * raw JSON back so they can email or download it without re-reading the blob.
+ *
+ * Coverage is defined by BACKUP_TABLES — the same list restore writes back, so
+ * the two can never drift apart again.
  */
 export async function createCompanyBackup(
   companyId: string,
@@ -36,48 +53,24 @@ export async function createCompanyBackup(
   });
 
   try {
-    const [
-      accounts, items, vouchers, salesInvoices, purchaseInvoices,
-      purchaseOrders, bankAccounts, budgets, recurringTransactions,
-      financialYears, branches, costCenters, currencies, taxConfigs,
-      expenseVouchers, paymentReceipts, employees, payrolls, loans,
-      pettyCash, fixedAssets, crmContacts, opportunities,
-    ] = await Promise.all([
-      prisma.account.findMany({ where: { companyId } }),
-      prisma.itemNew.findMany({ where: { companyId } }),
-      prisma.voucher.findMany({ where: { companyId }, include: { entries: true } }),
-      prisma.salesInvoice.findMany({ where: { companyId }, include: { items: true } }),
-      prisma.purchaseInvoice.findMany({ where: { companyId }, include: { items: true } }),
-      prisma.purchaseOrder.findMany({ where: { companyId }, include: { items: true } }),
-      prisma.bankAccount.findMany({ where: { companyId } }),
-      prisma.budget.findMany({ where: { companyId } }),
-      prisma.recurringTransaction.findMany({ where: { companyId } }),
-      prisma.financialYear.findMany({ where: { companyId } }),
-      prisma.branch.findMany({ where: { companyId } }),
-      prisma.costCenter.findMany({ where: { companyId } }),
-      prisma.currency.findMany({ where: { companyId } }),
-      prisma.taxConfiguration.findMany({ where: { companyId } }),
-      prisma.expenseVoucher.findMany({ where: { companyId }, include: { items: true } }),
-      prisma.paymentReceipt.findMany({ where: { companyId } }),
-      (prisma as any).employee?.findMany({ where: { companyId } }).catch(() => []),
-      (prisma as any).payroll?.findMany({ where: { companyId } }).catch(() => []),
-      (prisma as any).loan?.findMany({ where: { companyId } }).catch(() => []),
-      (prisma as any).pettyCash?.findMany({ where: { companyId } }).catch(() => []),
-      (prisma as any).fixedAsset?.findMany({ where: { companyId } }).catch(() => []),
-      (prisma as any).contact?.findMany({ where: { companyId } }).catch(() => []),
-      (prisma as any).opportunity?.findMany({ where: { companyId } }).catch(() => []),
-    ]);
-
-    const exportData = {
+    const exportData: Record<string, any> = {
       companyId,
       exportedAt: now.toISOString(),
-      version: "2.0",
-      accounts, items, vouchers, salesInvoices, purchaseInvoices,
-      purchaseOrders, bankAccounts, budgets, recurringTransactions,
-      financialYears, branches, costCenters, currencies, taxConfigs,
-      expenseVouchers, paymentReceipts, employees, payrolls, loans,
-      pettyCash, fixedAssets, crmContacts, opportunities,
+      version: BACKUP_FORMAT_VERSION,
     };
+    const counts: Record<string, number> = {};
+
+    for (const table of BACKUP_TABLES) {
+      const model = delegate(prisma as any, table.model);
+      if (!model) {
+        exportData[table.key] = [];
+        counts[table.key] = 0;
+        continue;
+      }
+      const rows = await model.findMany({ where: table.where(companyId) });
+      exportData[table.key] = rows;
+      counts[table.key] = rows.length;
+    }
 
     const jsonStr = JSON.stringify(exportData);
     const fileSize = Buffer.byteLength(jsonStr, "utf8");
@@ -91,19 +84,7 @@ export async function createCompanyBackup(
       await pruneCompanyBackups(companyId, backupType, opts.keepLast);
     }
 
-    return {
-      companyId,
-      backupId: backup.id,
-      fileName,
-      fileSize,
-      jsonStr,
-      counts: {
-        accounts: accounts.length,
-        items: (items as any[]).length,
-        vouchers: (vouchers as any[]).length,
-        salesInvoices: (salesInvoices as any[]).length,
-      },
-    };
+    return { companyId, backupId: backup.id, fileName, fileSize, jsonStr, counts };
   } catch (err: any) {
     await prisma.systemBackup
       .update({
@@ -113,6 +94,133 @@ export async function createCompanyBackup(
       .catch(() => {});
     throw err;
   }
+}
+
+/**
+ * Replace one company's data with the contents of a snapshot.
+ *
+ * Three things make this safe, and all three were missing before:
+ *
+ *  1. A safety snapshot of the CURRENT data is taken first, so even a restore
+ *     of the wrong file is undoable.
+ *  2. The wipe and the re-insert run inside ONE transaction. Previously the
+ *     delete ran unguarded and every failed insert was swallowed with a
+ *     console.warn, so a half-finished restore left the company gutted.
+ *  3. Deletes walk BACKUP_TABLES in reverse and inserts walk it forward, so
+ *     nothing is ever deleted that the snapshot cannot put back.
+ *
+ * Row ids are preserved, which is what keeps foreign keys between documents
+ * (voucher → receipt, PO → invoice, reconciliation → statement) intact.
+ */
+export async function restoreCompanyBackup(
+  companyId: string,
+  raw: any,
+  opts: { safetyBackup?: boolean; createdBy?: string | null; timeoutMs?: number } = {}
+): Promise<RestoreResult> {
+  const data = normalizeSnapshot(raw);
+
+  // 1 ─ Safety net first. If this fails the restore does not start at all.
+  let safetyBackupId: string | null = null;
+  if (opts.safetyBackup !== false) {
+    const safety = await createCompanyBackup(companyId, {
+      backupType: "PRE_RESTORE",
+      createdBy: opts.createdBy ?? null,
+      keepLast: 5,
+    });
+    safetyBackupId = safety.backupId;
+  }
+
+  const restored: Record<string, number> = {};
+
+  // 2 ─ Everything below is one transaction: it either all lands or none does.
+  await prisma.$transaction(
+    async (tx) => {
+      // Wipe children before parents.
+      for (const table of [...BACKUP_TABLES].reverse()) {
+        const model = delegate(tx as any, table.model);
+        if (!model) continue;
+        await model.deleteMany({ where: table.where(companyId) });
+      }
+
+      // Re-insert parents before children.
+      for (const table of BACKUP_TABLES) {
+        const rows = data[table.key];
+        if (!rows?.length) {
+          restored[table.key] = 0;
+          continue;
+        }
+        const model = delegate(tx as any, table.model);
+        if (!model) {
+          restored[table.key] = 0;
+          continue;
+        }
+        const payload = table.hasCompanyId
+          ? rows.map((r: any) => ({ ...r, companyId }))
+          : rows;
+        restored[table.key] = await insertRows(model, payload, table);
+      }
+    },
+    {
+      maxWait: 15_000,
+      timeout: opts.timeoutMs ?? 120_000,
+    }
+  );
+
+  const totalRows = Object.values(restored).reduce((a, b) => a + b, 0);
+  return { companyId, restored, totalRows, safetyBackupId };
+}
+
+/**
+ * Insert one table's rows.
+ *
+ * Accounts hold a parentId pointing at another account, so a single ordered
+ * pass can hit a child before its parent. Rather than special-casing that one
+ * table, any rows rejected on a pass are retried on the next one; progress
+ * stalling means the rows are genuinely broken and the error is raised so the
+ * transaction rolls back.
+ */
+async function insertRows(model: any, rows: any[], table: BackupTable): Promise<number> {
+  try {
+    const res = await model.createMany({ data: rows });
+    return res?.count ?? rows.length;
+  } catch {
+    // Fall through to the per-row passes below, which produce a precise error.
+  }
+
+  let pending = rows;
+  let inserted = 0;
+  let lastError: any = null;
+
+  while (pending.length) {
+    const failed: any[] = [];
+    lastError = null;
+
+    for (const row of pending) {
+      try {
+        await model.create({ data: row });
+        inserted++;
+      } catch (err: any) {
+        lastError = err;
+        failed.push(row);
+      }
+    }
+
+    // No row got in this pass — the remainder cannot be salvaged.
+    if (failed.length === pending.length) {
+      throw new Error(
+        `${table.label}: ${failed.length} row(s) could not be restored — ${String(
+          lastError?.message || lastError
+        )
+          .split("\n")
+          .filter(Boolean)
+          .slice(-1)[0]
+          ?.trim()}`
+      );
+    }
+    pending = failed;
+  }
+
+  return inserted;
 }
 
 /** Drop everything past the newest `keepLast` snapshots of one type. */
