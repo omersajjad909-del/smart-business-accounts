@@ -38,6 +38,7 @@ export const ADMIN_NAV_ITEMS: AdminNavItem[] = [
   // ── MARKETING ─────────────────────────────────────────────────────────────
   { id: "crm",              label: "CRM",               href: "/admin/crm",                 group: "Marketing", short: "CR", icon: "briefcase" },
   { id: "leads",            label: "Leads",             href: "/admin/leads",               group: "Marketing", short: "LD", icon: "target" },
+  { id: "prospecting",      label: "AI Prospecting",    href: "/admin/prospecting",         group: "Marketing", short: "AP", icon: "target", badge: "AI" },
   { id: "broadcasts",       label: "Broadcasts",        href: "/admin/broadcasts",          group: "Marketing", short: "BR", icon: "megaphone" },
   { id: "newsletter",       label: "Newsletter",        href: "/admin/newsletter",          group: "Marketing", short: "NL", icon: "mail" },
   { id: "social",           label: "Social",            href: "/admin/social",              group: "Marketing", short: "SO", icon: "share" },
