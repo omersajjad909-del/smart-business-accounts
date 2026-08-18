@@ -107,7 +107,9 @@ export default function BackupRestorePage() {
   }
 
   async function restoreBackup(id: string, fileName: string) {
-    if (!await confirmToast(`Restore from "${fileName}"?\n\nThis will REPLACE all current data. Are you sure?`)) return;
+    if (!await confirmToast(`Restore from "${fileName}"?\n\nThis will REPLACE all current data.
+
+A safety snapshot is taken first, so this can be rolled back.`)) return;
     setRestoringId(id);
     try {
       const res = await fetch("/api/backup/restore", {
@@ -131,7 +133,9 @@ export default function BackupRestorePage() {
 
   async function restoreFromFile() {
     if (!uploadFile) return;
-    if (!await confirmToast(`Restore from "${uploadFile.name}"?\n\nThis will REPLACE all current data. This cannot be undone.`)) return;
+    if (!await confirmToast(`Restore from "${uploadFile.name}"?\n\nThis will REPLACE all current data.
+
+A safety snapshot is taken first, so this can be rolled back.`)) return;
     setUploading(true);
     try {
       const text = await uploadFile.text();

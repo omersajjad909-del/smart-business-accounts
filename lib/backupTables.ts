@@ -33,13 +33,18 @@ export type BackupTable = {
    * different workspace than the one it came from).
    */
   hasCompanyId: boolean;
+  /**
+   * Name of a column pointing at another row of the SAME table (Account.parentId).
+   * Restore depth-orders these so a parent always lands before its children.
+   */
+  selfParent?: string;
 };
 
 export const BACKUP_TABLES: BackupTable[] = [
   // ── Masters ───────────────────────────────────────────────────────────────
-  // Account.parentId is a self-reference, so restore inserts accounts over
-  // several passes until every parent exists (see restoreCompanyBackup).
-  { key: "accounts", model: "account", label: "Accounts", hasCompanyId: true, where: (c) => ({ companyId: c }) },
+  // Account.parentId is a self-reference, so restore depth-orders these rows
+  // before inserting (see orderBySelfParent in lib/backup.ts).
+  { key: "accounts", model: "account", label: "Accounts", hasCompanyId: true, selfParent: "parentId", where: (c) => ({ companyId: c }) },
   { key: "items", model: "itemNew", label: "Items", hasCompanyId: true, where: (c) => ({ companyId: c }) },
 
   // ── Banking masters ───────────────────────────────────────────────────────

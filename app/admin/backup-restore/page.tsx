@@ -2,16 +2,28 @@
 
 import { useEffect, useState } from "react";
 import { getCurrentUser } from "@/lib/auth";
+import { confirmToast } from "@/lib/toast-feedback";
 import toast from "react-hot-toast";
 
 type BackupEntry = {
   id: string;
   name: string;
+  fileName: string;
+  companyId: string;
+  companyName: string | null;
   size: string;
-  type: "full" | "incremental";
+  type: "full" | "incremental" | "safety";
   status: "complete" | "running" | "failed";
   createdAt: string;
 };
+
+/** PRE_RESTORE snapshots are the automatic undo point taken before a restore. */
+function backupKind(backupType: string): BackupEntry["type"] {
+  const t = String(backupType).toUpperCase();
+  if (t === "PRE_RESTORE") return "safety";
+  if (t === "PARTIAL") return "incremental";
+  return "full";
+}
 
 function formatBytes(bytes: number | null | undefined) {
   if (!bytes || bytes <= 0) return "—";
@@ -42,9 +54,12 @@ export default function BackupRestorePage() {
         const d = await r.json();
         const rows: BackupEntry[] = (d.backups || []).map((b: any) => ({
           id: b.id,
-          name: b.companyName ? `${b.companyName} — ${b.fileName}` : b.fileName,
+          name: b.companyName || "Unknown company",
+          fileName: b.fileName,
+          companyId: b.companyId,
+          companyName: b.companyName ?? null,
           size: formatBytes(b.fileSize),
-          type: String(b.backupType).toUpperCase() === "PARTIAL" ? "incremental" : "full",
+          type: backupKind(b.backupType),
           status:
             String(b.status).toUpperCase() === "FAILED"
               ? "failed"
@@ -64,10 +79,44 @@ export default function BackupRestorePage() {
 
   useEffect(() => { load(); }, []);
 
-  function handleRestore(id: string) {
-    setRestoring(id);
-    toast.success("Restore initiated — this may take a few minutes.");
-    setTimeout(() => setRestoring(null), 3000);
+  async function handleRestore(backup: BackupEntry) {
+    if (restoring) return;
+
+    const label = backup.companyName || "this company";
+    const ok = await confirmToast(
+      `Restore "${backup.fileName}" into ${label}?\n\n` +
+        `Company ID: ${backup.companyId}\n\n` +
+        `Everything that company currently holds will be replaced by this snapshot. ` +
+        `A safety snapshot of the current data is taken first, and if anything goes ` +
+        `wrong the whole restore is rolled back.`,
+      "Restore tenant data"
+    );
+    if (!ok) return;
+
+    setRestoring(backup.id);
+    const t = toast.loading(`Restoring ${label}…`);
+    try {
+      const u = getCurrentUser();
+      const headers: Record<string, string> = { "Content-Type": "application/json" };
+      if (u?.role) headers["x-user-role"] = u.role;
+      if (u?.id) headers["x-user-id"] = u.id;
+
+      const r = await fetch("/api/admin/system/backup/restore", {
+        method: "POST",
+        headers,
+        // Echo the company id back so a stale row cannot restore into the wrong tenant.
+        body: JSON.stringify({ backupId: backup.id, confirmCompanyId: backup.companyId }),
+      });
+      const d = await r.json().catch(() => ({}));
+      if (!r.ok) throw new Error(d?.error || "Restore failed");
+
+      toast.success(d.message || `${label} restored.`, { id: t, duration: 6000 });
+      await load();
+    } catch (e: any) {
+      toast.error(e?.message || "Restore failed", { id: t, duration: 8000 });
+    } finally {
+      setRestoring(null);
+    }
   }
 
   async function handleRunBackup() {
@@ -167,7 +216,9 @@ export default function BackupRestorePage() {
           <table className="bk-table">
             <thead>
               <tr>
-                <th>Backup Name</th>
+                <th>Company</th>
+                <th>Company ID</th>
+                <th>Backup File</th>
                 <th>Type</th>
                 <th>Size</th>
                 <th>Status</th>
@@ -177,17 +228,33 @@ export default function BackupRestorePage() {
             </thead>
             <tbody>
               {loading && (
-                <tr><td colSpan={6} style={{ textAlign: "center", padding: 32, color: "rgba(255,255,255,.35)", fontSize: 13 }}>Loading…</td></tr>
+                <tr><td colSpan={8} style={{ textAlign: "center", padding: 32, color: "rgba(255,255,255,.35)", fontSize: 13 }}>Loading…</td></tr>
               )}
               {!loading && backups.length === 0 && (
-                <tr><td colSpan={6} style={{ textAlign: "center", padding: 32, color: "rgba(255,255,255,.3)", fontSize: 13 }}>No backup records available.</td></tr>
+                <tr><td colSpan={8} style={{ textAlign: "center", padding: 32, color: "rgba(255,255,255,.3)", fontSize: 13 }}>No backup records available.</td></tr>
               )}
               {backups.map((backup) => (
                 <tr key={backup.id}>
                   <td className="bk-name">{backup.name}</td>
                   <td>
+                    {/* Full id, click to copy — so a bad restore can be traced back
+                        to an exact company without guessing from the name. */}
+                    <button
+                      type="button"
+                      className="bk-cid"
+                      title={`Copy company ID ${backup.companyId}`}
+                      onClick={() => {
+                        navigator.clipboard?.writeText(backup.companyId);
+                        toast.success("Company ID copied");
+                      }}
+                    >
+                      {backup.companyId}
+                    </button>
+                  </td>
+                  <td className="bk-file">{backup.fileName}</td>
+                  <td>
                     <span className={`bk-type-badge bk-type-badge--${backup.type}`}>
-                      {backup.type === "full" ? "Full" : "Incremental"}
+                      {backup.type === "full" ? "Full" : backup.type === "safety" ? "Pre-restore" : "Incremental"}
                     </span>
                   </td>
                   <td className="bk-size">{backup.size}</td>
@@ -203,7 +270,7 @@ export default function BackupRestorePage() {
                         type="button"
                         className="bk-restore-btn"
                         disabled={restoring !== null}
-                        onClick={() => handleRestore(backup.id)}
+                        onClick={() => handleRestore(backup)}
                       >
                         {restoring === backup.id ? "Restoring…" : "Restore"}
                       </button>
@@ -256,7 +323,7 @@ const pageStyles = `
 .bk-list-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:14px;}
 .bk-count{font-size:12px;color:var(--text-muted);}
 .bk-table-wrap{overflow-x:auto;}
-.bk-table{width:100%;border-collapse:collapse;min-width:640px;}
+.bk-table{width:100%;border-collapse:collapse;min-width:940px;}
 .bk-table th{
   padding:12px 14px;text-align:left;font-size:11px;font-weight:800;
   letter-spacing:.08em;text-transform:uppercase;color:var(--text-muted);
@@ -268,7 +335,17 @@ const pageStyles = `
 }
 .bk-table tbody tr:last-child td{border-bottom:none;}
 .bk-table tbody tr:hover{background:var(--bg-soft);}
-.bk-name{font-weight:600;color:var(--text);}
+.bk-name{font-weight:600;color:var(--text);white-space:nowrap;}
+.bk-file{color:var(--text-muted);font-size:12px;}
+.bk-cid{
+  font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
+  font-size:11px;letter-spacing:.02em;
+  padding:3px 8px;border-radius:8px;
+  border:1px solid var(--border);background:var(--bg-soft);
+  color:var(--text-soft);cursor:pointer;white-space:nowrap;
+  transition:border-color .12s,color .12s;
+}
+.bk-cid:hover{border-color:#8b5cf6;color:#a78bfa;}
 .bk-size{color:var(--text-muted);}
 .bk-date{color:var(--text-muted);}
 .bk-type-badge{
@@ -277,6 +354,7 @@ const pageStyles = `
 }
 .bk-type-badge--full{background:rgba(99,102,241,.16);color:#818cf8;}
 .bk-type-badge--incremental{background:rgba(20,184,166,.14);color:#2dd4bf;}
+.bk-type-badge--safety{background:rgba(251,191,36,.14);color:#fbbf24;}
 .bk-status-badge{
   display:inline-flex;padding:3px 9px;border-radius:999px;font-size:11px;font-weight:700;
 }

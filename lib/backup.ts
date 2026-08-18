@@ -162,7 +162,7 @@ export async function restoreCompanyBackup(
     },
     {
       maxWait: 15_000,
-      timeout: opts.timeoutMs ?? 120_000,
+      timeout: opts.timeoutMs ?? 50_000,
     }
   );
 
@@ -170,57 +170,61 @@ export async function restoreCompanyBackup(
   return { companyId, restored, totalRows, safetyBackupId };
 }
 
+/** Postgres caps bind parameters per statement, so long tables go in slices. */
+const INSERT_CHUNK = 500;
+
 /**
  * Insert one table's rows.
  *
- * Accounts hold a parentId pointing at another account, so a single ordered
- * pass can hit a child before its parent. Rather than special-casing that one
- * table, any rows rejected on a pass are retried on the next one; progress
- * stalling means the rows are genuinely broken and the error is raised so the
- * transaction rolls back.
+ * No retry loop here on purpose: inside a Postgres transaction the first failed
+ * statement aborts the whole transaction, so a "skip and retry" pass could never
+ * work. Rows are ordered correctly up-front instead, and a genuine failure is
+ * allowed to propagate — that is what triggers the rollback.
  */
 async function insertRows(model: any, rows: any[], table: BackupTable): Promise<number> {
-  try {
-    const res = await model.createMany({ data: rows });
-    return res?.count ?? rows.length;
-  } catch {
-    // Fall through to the per-row passes below, which produce a precise error.
-  }
-
-  let pending = rows;
+  const ordered = table.selfParent ? orderBySelfParent(rows, table.selfParent) : rows;
   let inserted = 0;
-  let lastError: any = null;
 
-  while (pending.length) {
-    const failed: any[] = [];
-    lastError = null;
-
-    for (const row of pending) {
-      try {
-        await model.create({ data: row });
-        inserted++;
-      } catch (err: any) {
-        lastError = err;
-        failed.push(row);
-      }
+  for (let i = 0; i < ordered.length; i += INSERT_CHUNK) {
+    const chunk = ordered.slice(i, i + INSERT_CHUNK);
+    try {
+      const res = await model.createMany({ data: chunk });
+      inserted += res?.count ?? chunk.length;
+    } catch (err: any) {
+      const detail = String(err?.message || err)
+        .split("\n")
+        .map((l: string) => l.trim())
+        .filter(Boolean)
+        .slice(-1)[0];
+      throw new Error(`${table.label}: could not be restored — ${detail}`);
     }
-
-    // No row got in this pass — the remainder cannot be salvaged.
-    if (failed.length === pending.length) {
-      throw new Error(
-        `${table.label}: ${failed.length} row(s) could not be restored — ${String(
-          lastError?.message || lastError
-        )
-          .split("\n")
-          .filter(Boolean)
-          .slice(-1)[0]
-          ?.trim()}`
-      );
-    }
-    pending = failed;
   }
 
   return inserted;
+}
+
+/**
+ * Depth-order rows whose parent lives in the same table (Account.parentId), so
+ * a parent is always inserted before the children that point at it.
+ */
+function orderBySelfParent(rows: any[], field: string): any[] {
+  const byId = new Map<string, any>(rows.map((r) => [r.id, r]));
+  const out: any[] = [];
+  const placed = new Set<string>();
+  const onPath = new Set<string>();
+
+  const visit = (row: any) => {
+    if (!row || placed.has(row.id) || onPath.has(row.id)) return; // onPath guards cycles
+    onPath.add(row.id);
+    const parentId = row[field];
+    if (parentId && byId.has(parentId)) visit(byId.get(parentId));
+    onPath.delete(row.id);
+    placed.add(row.id);
+    out.push(row);
+  };
+
+  for (const row of rows) visit(row);
+  return out;
 }
 
 /** Drop everything past the newest `keepLast` snapshots of one type. */
