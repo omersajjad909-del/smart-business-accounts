@@ -93,33 +93,44 @@ export async function POST(req: NextRequest) {
 
     if (!testCompanyId) {
       const user = await prisma.user.findUnique({ where: { id: sessionUserId }, select: { name: true } });
-      const testCompany = await prisma.company.create({
-        data: {
-          name: `${user?.name || "Admin"}'s`,
-          isActive: true,
-          country: "PK",
-          baseCurrency: "PKR",
-          businessType: String(businessType),
-          plan: String(plan).toUpperCase(),
-          businessSetupDone: true,
-          subscriptionStatus: "ACTIVE",
-        },
-      });
-      testCompanyId = testCompany.id;
 
-      await prisma.userCompany.upsert({
-        where: { userId_companyId: { userId: sessionUserId, companyId: testCompanyId } },
-        create: { userId: sessionUserId, companyId: testCompanyId, isDefault: false },
-        update: {},
-      });
+      // All three writes or none. Previously the company was created first and
+      // the UserCompany link could then fail on its foreign key, leaving an
+      // orphaned company behind — and because the ActivityLog marker never got
+      // written either, the next launch could not find it and made another one.
+      // Six dead "Admin's" companies accumulated in the customer list that way.
+      testCompanyId = await prisma.$transaction(async (tx) => {
+        const testCompany = await tx.company.create({
+          data: {
+            name: `${user?.name || "Admin"}'s (Test)`,
+            isActive: true,
+            country: "PK",
+            baseCurrency: "PKR",
+            businessType: String(businessType),
+            plan: String(plan).toUpperCase(),
+            businessSetupDone: true,
+            subscriptionStatus: "ACTIVE",
+            // Keeps it out of the customer list, admin metrics and revenue.
+            isInternalTest: true,
+          },
+        });
 
-      await prisma.activityLog.create({
-        data: {
-          action: TEST_ACTION,
-          userId: sessionUserId,
-          companyId: testCompanyId,
-          details: JSON.stringify({ testCompanyId }),
-        },
+        await tx.userCompany.upsert({
+          where: { userId_companyId: { userId: sessionUserId, companyId: testCompany.id } },
+          create: { userId: sessionUserId, companyId: testCompany.id, isDefault: false },
+          update: {},
+        });
+
+        await tx.activityLog.create({
+          data: {
+            action: TEST_ACTION,
+            userId: sessionUserId,
+            companyId: testCompany.id,
+            details: JSON.stringify({ testCompanyId: testCompany.id }),
+          },
+        });
+
+        return testCompany.id;
       });
     } else {
       await prisma.company.update({

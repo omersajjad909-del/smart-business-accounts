@@ -23,6 +23,7 @@ type Row = {
   aiScore?: number;
   aiHealth?: string;
   businessType?: string | null;
+  isInternalTest?: boolean;
 };
 
 const BUSINESS_TYPES = [
@@ -281,14 +282,21 @@ export default function AdminCompaniesPage() {
   const [filterStatus,  setFilterStatus]  = useState("ALL");
   const [filterHealth,  setFilterHealth]  = useState("ALL");
   const [filterBizType, setFilterBizType] = useState("ALL");
+  const [showTest,      setShowTest]      = useState(false);
+  const [testCount,     setTestCount]     = useState(0);
 
-  useEffect(() => { load(); }, []);
+  useEffect(() => { load(); }, [showTest]);
 
   async function load() {
     setLoading(true);
     try {
-      const r = await fetch("/api/admin/companies/all", { cache: "no-store", credentials: "include" });
-      if (r.ok) { const j = await r.json(); setRows(j.rows || []); }
+      const url = `/api/admin/companies/all${showTest ? "?includeTest=1" : ""}`;
+      const r = await fetch(url, { cache: "no-store", credentials: "include" });
+      if (r.ok) {
+        const j = await r.json();
+        setRows(j.rows || []);
+        setTestCount(j.testCount || 0);
+      }
       else setRows([]);
     } catch { setRows([]); }
     setLoading(false);
@@ -454,6 +462,20 @@ export default function AdminCompaniesPage() {
           <option value="ALL">All Business Types</option>
           {BUSINESS_TYPES.map(t => <option key={t} value={t}>{BIZ_LABELS[t] || t}</option>)}
         </select>
+        {(testCount > 0 || showTest) && (
+          <button
+            type="button"
+            onClick={() => setShowTest(v => !v)}
+            title="Workspaces created from Dev Test. Hidden from this list and from all dashboard metrics."
+            style={{
+              padding: "9px 14px", borderRadius: 10, fontSize: 13, fontWeight: 700, cursor: "pointer",
+              background: showTest ? "rgba(251,146,60,.16)" : "rgba(255,255,255,.05)",
+              border: `1px solid ${showTest ? "rgba(251,146,60,.4)" : "rgba(255,255,255,.1)"}`,
+              color: showTest ? "#fdba74" : "#94a3b8",
+            }}>
+            {showTest ? "Hide" : "Show"} test workspaces ({testCount})
+          </button>
+        )}
       </div>
 
       {/* Table */}
@@ -487,7 +509,14 @@ export default function AdminCompaniesPage() {
                       </span>
                     </td>
                     <td style={{ padding: "13px 10px" }}>
-                      <div style={{ fontWeight: 700, fontSize: 14, color: "white" }}>{c.name}</div>
+                      <div style={{ fontWeight: 700, fontSize: 14, color: "white", display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+                        {c.name}
+                        {c.isInternalTest && (
+                          <span style={{ padding: "2px 8px", borderRadius: 20, background: "rgba(251,146,60,.16)", border: "1px solid rgba(251,146,60,.35)", color: "#fdba74", fontSize: 10, fontWeight: 800, letterSpacing: ".05em" }}>
+                            TEST
+                          </span>
+                        )}
+                      </div>
                       {c.ownerEmail && <div style={{ fontSize: 11, color: "#64748b", marginTop: 2 }}>{c.ownerEmail}</div>}
                     </td>
                     <td style={{ padding: "13px 10px" }}>

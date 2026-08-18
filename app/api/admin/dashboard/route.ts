@@ -88,8 +88,9 @@ export async function GET(req: NextRequest) {
     ] = await Promise.all([
       prisma.company.findMany({
         // Every metric on this page is derived from this list, so demo
-        // sandboxes would show up as signups, active plans and revenue seats.
-        where: { isDemo: false },
+        // sandboxes and the admin's own test workspaces would show up as
+        // signups, active plans and revenue seats.
+        where: { isDemo: false, isInternalTest: false },
         orderBy: { createdAt: "desc" },
         select: {
           id: true,

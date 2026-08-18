@@ -6,10 +6,14 @@ export async function GET(req: NextRequest) {
   try {
     const admin = requireAdmin(req);
     if (admin instanceof NextResponse) return admin;
+    // Admin's own test workspaces are hidden by default but still reachable,
+    // so they can be inspected and deleted rather than being invisible.
+    const includeTest = req.nextUrl.searchParams.get("includeTest") === "1";
+
     const companies = await prisma.company.findMany({
       // Demo sandboxes are throwaway workspaces, not customers — listing them
       // here would bury the real accounts under a rolling set of demo copies.
-      where: { isDemo: false },
+      where: { isDemo: false, ...(includeTest ? {} : { isInternalTest: false }) },
       orderBy: { createdAt: "desc" },
       select: {
         id: true,
@@ -26,7 +30,13 @@ export async function GET(req: NextRequest) {
         createdAt: true,
         isActive: true,
         businessType: true,
+        isInternalTest: true,
       },
+    });
+
+    // So the UI can offer the toggle only when there is something behind it.
+    const testCount = await prisma.company.count({
+      where: { isDemo: false, isInternalTest: true },
     });
 
     // Users count per company
@@ -114,7 +124,7 @@ export async function GET(req: NextRequest) {
       };
     });
 
-    return NextResponse.json({ rows });
+    return NextResponse.json({ rows, testCount, includingTest: includeTest });
   } catch (e: any) {
     return NextResponse.json({ error: e.message }, { status: 500 });
   }
