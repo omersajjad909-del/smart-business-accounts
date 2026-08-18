@@ -37,6 +37,7 @@ export default function BackupRestorePage() {
   const [restoring, setRestoring] = useState<string | null>(null);
   const [backupStatus, setBackupStatus] = useState<string | null>(null);
   const [lastBackupAt, setLastBackupAt] = useState<string | null>(null);
+  const [lastCheckedAt, setLastCheckedAt] = useState<string | null>(null);
   const [backups, setBackups] = useState<BackupEntry[]>([]);
   const [totalBytes, setTotalBytes] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -72,6 +73,10 @@ export default function BackupRestorePage() {
         setTotalBytes(d.totalBytes || 0);
         setBackupStatus(d.backups?.[0]?.status ?? null);
         setLastBackupAt(d.backups?.[0]?.createdAt ?? null);
+        // Newest confirmation across all snapshots — a backup run that found no
+        // changes updates this without creating a row.
+        const checks = (d.backups || []).map((b: any) => b.verifiedAt).filter(Boolean).sort();
+        setLastCheckedAt(checks.length ? checks[checks.length - 1] : null);
       }
     } catch {}
     finally { setLoading(false); }
@@ -181,7 +186,12 @@ export default function BackupRestorePage() {
           <div className="bk-stat-value" style={{ fontSize: 18 }}>
             {loading ? "—" : lastBackupAt ? new Date(lastBackupAt).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" }) : "Never"}
           </div>
-          <div className="bk-stat-sub">{lastBackupAt ? new Date(lastBackupAt).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" }) : "—"}</div>
+          <div className="bk-stat-sub">
+            {lastBackupAt ? new Date(lastBackupAt).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" }) : "—"}
+            {lastCheckedAt && (
+              <> · checked {new Date(lastCheckedAt).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" })}</>
+            )}
+          </div>
         </div>
         <div className="bk-stat-card">
           <div className="bk-stat-label">Storage Used</div>

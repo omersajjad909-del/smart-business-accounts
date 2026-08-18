@@ -23,6 +23,7 @@ export async function GET(req: NextRequest) {
       status: true,
       createdAt: true,
       createdBy: true,
+      verifiedAt: true,
       // metadata deliberately excluded — it holds the whole snapshot
     },
   });
