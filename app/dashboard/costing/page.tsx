@@ -5,6 +5,15 @@
 // shown alongside the answer — a number nobody can check is a number nobody
 // will trust on a quotation.
 //
+// The screen is deliberately shaped like the paper it replaces: numbered
+// sections down the left in the order an operator fills them, the answer and
+// its working down the right. Nothing on this page needs a "calculate" press —
+// the result follows the typing.
+//
+// Two printouts come off it, because a factory uses them in two different
+// hands: the cost sheet goes to whoever quotes, the working sheet goes to
+// whoever cuts. They print separately for that reason.
+//
 // A result can be saved as a sheet. The sheet stores the formula version and
 // the inputs used, so a quote given last month still shows the cost it was
 // quoted at even after the formula moves on.
@@ -26,6 +35,7 @@ import {
   type FormulaInput,
   type FormulaStep,
   type FormulaOutput,
+  type FormulaRun,
 } from "@/lib/formulaEngine";
 
 const CARD = "rgba(255,255,255,.03)";
@@ -50,6 +60,35 @@ const btn = (primary = false): React.CSSProperties => ({
   border: primary ? "none" : `1px solid ${BORDER}`,
   color: primary ? "white" : "rgba(255,255,255,.7)",
 });
+
+/* Layout lives in CSS so the page can stack on a small screen, and so the
+   print sheets can hide the whole app without knowing anything about it. */
+const CSS = `
+.cxWrap{max-width:1240px;margin:0 auto;padding:24px 18px 90px}
+.cxCols{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:20px;align-items:start}
+.cxSide{position:sticky;top:16px;display:flex;flex-direction:column;gap:14px}
+.cxForm{display:flex;flex-direction:column;gap:14px}
+.cxFields{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.cxStats{display:grid;grid-template-columns:repeat(auto-fill,minmax(145px,1fr));gap:14px}
+@media(max-width:1080px){
+  .cxCols{grid-template-columns:1fr}
+  .cxSide{position:static}
+}
+@media(max-width:620px){.cxFields{grid-template-columns:1fr}}
+.cxPrint{display:none}
+@media print{
+  /* The app stays in the DOM but off the paper; only the sheet is inked. */
+  body *{visibility:hidden !important}
+  .cxPrint,.cxPrint *{visibility:visible !important}
+  .cxPrint{display:block !important;position:absolute;left:0;top:0;width:100%;
+    margin:0;background:#fff;color:#000}
+  /* The dashboard's scrolling pane would otherwise clip the sheet to one screen. */
+  html,body{overflow:visible !important;height:auto !important}
+  .dashboard-content-scroll,.dashboard-content-inner{overflow:visible !important;height:auto !important}
+  .cxPrint table{page-break-inside:auto}
+  .cxPrint tr{page-break-inside:avoid}
+}
+`;
 
 /** Inventory the BOM builder can point at — the same rows purchasing uses. */
 type StockItem = { id: string; name: string; unit: string; unitCost: number };
@@ -85,6 +124,12 @@ function fmt(v: unknown, decimals = 2): string {
     : v.toLocaleString(undefined, { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
 }
 
+/** DD-MM-YYYY, the format every other printed document in the app uses. */
+function today(): string {
+  const d = new Date();
+  return `${String(d.getDate()).padStart(2, "0")}-${String(d.getMonth() + 1).padStart(2, "0")}-${d.getFullYear()}`;
+}
+
 function CostingInner() {
   const params = useSearchParams();
   const formulaStore = useBusinessRecords("costing_formula");
@@ -95,6 +140,8 @@ function CostingInner() {
   const [sheetName, setSheetName] = useState("");
   const [savedNote, setSavedNote] = useState("");
   const [showWorking, setShowWorking] = useState(true);
+  // Which sheet is being sent to the printer — the quote, or the cutting detail.
+  const [printKind, setPrintKind] = useState<"cost" | "working" | null>(null);
 
   /* ── BOM builder ── */
   const bomStore = useBusinessRecords("bom");
@@ -145,6 +192,17 @@ function CostingInner() {
     () => (selected ? runFormula(selected.formula, values) : null),
     [selected, values],
   );
+
+  // The print sheet has to be in the DOM before the print dialog opens, so the
+  // printing waits one paint after the state that renders it.
+  useEffect(() => {
+    if (!printKind) return;
+    const timer = window.setTimeout(() => {
+      window.print();
+      setPrintKind(null);
+    }, 60);
+    return () => window.clearTimeout(timer);
+  }, [printKind]);
 
   const askedInputs = selected?.formula.inputs.filter((i) => i.askOnRun !== false) ?? [];
   const fixedInputs = selected?.formula.inputs.filter((i) => i.askOnRun === false) ?? [];
@@ -266,9 +324,38 @@ function CostingInner() {
     }
   }
 
+  /** One field, whether it holds a single number or a list of sizes. */
+  const field = (inp: FormulaInput) => (
+    <div key={inp.key}>
+      <label style={labelStyle}>
+        {inp.label || inp.key}
+        {inp.unit && <span style={{ color: "rgba(255,255,255,.28)" }}> · {inp.unit}</span>}
+      </label>
+      {inp.isList ? (
+        <input
+          value={(values[inp.key] as number[] | undefined)?.join(", ") ?? ""}
+          onChange={(e) => setValues((v) => ({
+            ...v,
+            [inp.key]: e.target.value.split(",").map((n) => Number(n.trim())).filter((n) => Number.isFinite(n)),
+          }))}
+          placeholder="48, 50, 52"
+          style={inputStyle}
+        />
+      ) : (
+        <input type="number" step="any"
+          value={String(values[inp.key] ?? "")}
+          onChange={(e) => setValues((v) => ({ ...v, [inp.key]: Number(e.target.value) }))}
+          style={inputStyle}
+        />
+      )}
+    </div>
+  );
+
   return (
-    <div style={{ fontFamily: FONT, color: "white", padding: "24px 20px 80px", maxWidth: 1180, margin: "0 auto" }}>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 16, flexWrap: "wrap", marginBottom: 22 }}>
+    <div className="cxWrap" style={{ fontFamily: FONT, color: "white" }}>
+      <style>{CSS}</style>
+
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 16, flexWrap: "wrap", marginBottom: 20 }}>
         <div>
           <h1 style={{ fontSize: 23, fontWeight: 800, margin: "0 0 4px" }}>Costing</h1>
           <p style={{ fontSize: 13.5, color: "rgba(255,255,255,.42)", margin: 0 }}>
@@ -290,11 +377,10 @@ function CostingInner() {
           <Link href="/dashboard/costing/formulas" style={{ ...btn(true), textDecoration: "none" }}>Create a formula →</Link>
         </div>
       ) : (
-        <div style={{ display: "grid", gridTemplateColumns: "minmax(0,1fr) minmax(0,1.25fr)", gap: 22, alignItems: "start" }}>
-          {/* ── Inputs ── */}
-          <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-            <div style={{ background: CARD, border: `1px solid ${BORDER}`, borderRadius: 14, padding: 18 }}>
-              <label style={labelStyle}>Formula</label>
+        <div className="cxCols">
+          {/* ── Left: the job, in the order it is filled ── */}
+          <div className="cxForm">
+            <Card n={1} title="Formula" hint="Which costing this job uses.">
               <select value={selectedId} onChange={(e) => setSelectedId(e.target.value)} style={{ ...inputStyle, fontFamily: FONT }}>
                 {formulas.map((f) => (
                   <option key={f.id} value={f.id}>{f.formula.category} — {f.formula.name}</option>
@@ -305,72 +391,32 @@ function CostingInner() {
                   {selected.formula.description}
                 </p>
               )}
-            </div>
+            </Card>
 
             {selected && (
-              <div style={{ background: CARD, border: `1px solid ${BORDER}`, borderRadius: 14, padding: 18 }}>
-                <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 14 }}>Enter the job</div>
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
-                  {askedInputs.map((inp) => (
-                    <div key={inp.key}>
-                      <label style={labelStyle}>
-                        {inp.label || inp.key}
-                        {inp.unit && <span style={{ color: "rgba(255,255,255,.28)" }}> · {inp.unit}</span>}
-                      </label>
-                      {inp.isList ? (
-                        <input
-                          value={(values[inp.key] as number[] | undefined)?.join(", ") ?? ""}
-                          onChange={(e) => setValues((v) => ({
-                            ...v,
-                            [inp.key]: e.target.value.split(",").map((n) => Number(n.trim())).filter((n) => Number.isFinite(n)),
-                          }))}
-                          style={inputStyle}
-                        />
-                      ) : (
-                        <input type="number" step="any"
-                          value={String(values[inp.key] ?? "")}
-                          onChange={(e) => setValues((v) => ({ ...v, [inp.key]: Number(e.target.value) }))}
-                          style={inputStyle}
-                        />
-                      )}
-                    </div>
-                  ))}
+              <Card n={2} title="Enter the job" hint="The result updates as you type — no calculate button to press.">
+                <div className="cxFields">
+                  {askedInputs.map(field)}
                 </div>
-
-                {fixedInputs.length > 0 && (
-                  <details style={{ marginTop: 16 }}>
-                    <summary style={{ ...labelStyle, cursor: "pointer", marginBottom: 0 }}>
-                      Settings ({fixedInputs.length})
-                    </summary>
-                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginTop: 12 }}>
-                      {fixedInputs.map((inp) => (
-                        <div key={inp.key}>
-                          <label style={labelStyle}>
-                            {inp.label || inp.key}
-                            {inp.unit && <span style={{ color: "rgba(255,255,255,.28)" }}> · {inp.unit}</span>}
-                          </label>
-                          {inp.isList ? (
-                            <input
-                              value={(values[inp.key] as number[] | undefined)?.join(", ") ?? ""}
-                              onChange={(e) => setValues((v) => ({
-                                ...v,
-                                [inp.key]: e.target.value.split(",").map((n) => Number(n.trim())).filter((n) => Number.isFinite(n)),
-                              }))}
-                              style={inputStyle}
-                            />
-                          ) : (
-                            <input type="number" step="any"
-                              value={String(values[inp.key] ?? "")}
-                              onChange={(e) => setValues((v) => ({ ...v, [inp.key]: Number(e.target.value) }))}
-                              style={inputStyle}
-                            />
-                          )}
-                        </div>
-                      ))}
-                    </div>
-                  </details>
+                {!askedInputs.length && (
+                  <div style={{ fontSize: 12.5, color: "rgba(255,255,255,.3)" }}>
+                    This formula asks for nothing — every input is fixed below.
+                  </div>
                 )}
-              </div>
+              </Card>
+            )}
+
+            {selected && fixedInputs.length > 0 && (
+              <Card n={3} title="Settings" hint="Constants of the trade. Change them only when your supplier does.">
+                <details>
+                  <summary style={{ ...labelStyle, cursor: "pointer", marginBottom: 0 }}>
+                    Show {fixedInputs.length} setting{fixedInputs.length === 1 ? "" : "s"}
+                  </summary>
+                  <div className="cxFields" style={{ marginTop: 12 }}>
+                    {fixedInputs.map(field)}
+                  </div>
+                </details>
+              </Card>
             )}
 
             {recentSheets.length > 0 && (
@@ -392,42 +438,57 @@ function CostingInner() {
             )}
           </div>
 
-          {/* ── Result ── */}
-          <div style={{ display: "flex", flexDirection: "column", gap: 16, position: "sticky", top: 16 }}>
+          {/* ── Right: the answer, its working, and what to do with it ── */}
+          <div className="cxSide">
             {run && !run.ok && (
               <div style={{ padding: "12px 15px", borderRadius: 11, background: "rgba(248,113,113,.1)", border: "1px solid rgba(248,113,113,.28)", color: "#f87171", fontSize: 13 }}>
                 {run.error}
               </div>
             )}
 
+            {/* The answer and every other number it comes with, in one card
+                rather than two stacked ones. */}
             {primary && (
               <div style={{
-                borderRadius: 16, padding: "26px 24px",
+                borderRadius: 16, overflow: "hidden",
                 background: "linear-gradient(135deg,rgba(52,211,153,.11),rgba(16,185,129,.04))",
                 border: "1px solid rgba(52,211,153,.26)",
               }}>
-                <div style={{ fontSize: 11.5, fontWeight: 700, letterSpacing: ".08em", textTransform: "uppercase", color: "rgba(52,211,153,.8)", marginBottom: 8 }}>
-                  {primary.label || primary.key}
-                </div>
-                <div style={{ fontFamily: MONO, fontSize: 38, fontWeight: 800, color: "#34d399", lineHeight: 1.05, fontVariantNumeric: "tabular-nums" }}>
-                  {fmt(run?.values[primary.key])}
-                  <span style={{ fontSize: 15, color: "rgba(255,255,255,.32)", marginLeft: 8, fontWeight: 600 }}>{primary.unit}</span>
-                </div>
-              </div>
-            )}
+                <div style={{ padding: "24px 22px 20px" }}>
+                  <div style={{ fontSize: 11.5, fontWeight: 700, letterSpacing: ".08em", textTransform: "uppercase", color: "rgba(52,211,153,.8)", marginBottom: 8 }}>
+                    {primary.label || primary.key}
+                  </div>
+                  <div style={{ fontFamily: MONO, fontSize: 38, fontWeight: 800, color: "#34d399", lineHeight: 1.05, fontVariantNumeric: "tabular-nums" }}>
+                    {fmt(run?.values[primary.key])}
+                    <span style={{ fontSize: 15, color: "rgba(255,255,255,.32)", marginLeft: 8, fontWeight: 600 }}>{primary.unit}</span>
+                  </div>
 
-            {outputs.length > 1 && (
-              <div style={{ background: CARD, border: `1px solid ${BORDER}`, borderRadius: 14, padding: 18 }}>
-                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(150px,1fr))", gap: 14 }}>
-                  {outputs.filter((o) => o.key !== primary?.key).map((o) => (
-                    <div key={o.key}>
-                      <div style={{ fontSize: 11.5, color: "rgba(255,255,255,.4)", marginBottom: 3 }}>{o.label || o.key}</div>
-                      <div style={{ fontFamily: MONO, fontSize: 16, fontWeight: 700, fontVariantNumeric: "tabular-nums" }}>
-                        {fmt(run?.values[o.key])}
-                        <span style={{ fontSize: 10.5, color: "rgba(255,255,255,.28)", marginLeft: 4 }}>{o.unit}</span>
-                      </div>
+                  {outputs.length > 1 && (
+                    <div className="cxStats" style={{ marginTop: 20, paddingTop: 18, borderTop: "1px solid rgba(52,211,153,.18)" }}>
+                      {outputs.filter((o) => o.key !== primary?.key).map((o) => (
+                        <div key={o.key}>
+                          <div style={{ fontSize: 11.5, color: "rgba(255,255,255,.4)", marginBottom: 3 }}>{o.label || o.key}</div>
+                          <div style={{ fontFamily: MONO, fontSize: 16, fontWeight: 700, fontVariantNumeric: "tabular-nums" }}>
+                            {fmt(run?.values[o.key])}
+                            <span style={{ fontSize: 10.5, color: "rgba(255,255,255,.28)", marginLeft: 4 }}>{o.unit}</span>
+                          </div>
+                        </div>
+                      ))}
                     </div>
-                  ))}
+                  )}
+                </div>
+
+                {/* Two prints, because two people use them. */}
+                <div style={{
+                  display: "flex", gap: 9, flexWrap: "wrap", padding: "12px 22px 16px",
+                  borderTop: "1px solid rgba(52,211,153,.18)",
+                }}>
+                  <button onClick={() => setPrintKind("cost")} disabled={!run} style={{ ...btn(), opacity: run ? 1 : .5 }}>
+                    🖨 Print cost sheet
+                  </button>
+                  <button onClick={() => setPrintKind("working")} disabled={!run} style={{ ...btn(), opacity: run ? 1 : .5 }}>
+                    🖨 Print working sheet
+                  </button>
                 </div>
               </div>
             )}
@@ -525,7 +586,7 @@ function CostingInner() {
                       </div>
                     )}
 
-                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+                    <div className="cxFields">
                       <div>
                         <label style={labelStyle}>Finished product</label>
                         <select value={bomForm.finishedItemId}
@@ -596,6 +657,166 @@ function CostingInner() {
           </div>
         </div>
       )}
+
+      {/* Off-screen until the print dialog opens. */}
+      {printKind && selected && run && (
+        <PrintSheet
+          kind={printKind}
+          formula={selected.formula}
+          title={sheetName.trim() || selected.formula.name}
+          values={values}
+          run={run}
+          outputs={outputs}
+          primaryKey={primary?.key}
+        />
+      )}
+    </div>
+  );
+}
+
+/* ─────────────────────────── Printed sheets ─────────────────────────── */
+
+const P_TH: React.CSSProperties = {
+  textAlign: "left", fontSize: 10, letterSpacing: ".06em", textTransform: "uppercase",
+  color: "#555", borderBottom: "1px solid #999", padding: "6px 8px", fontWeight: 700,
+};
+const P_TD: React.CSSProperties = {
+  fontSize: 12, color: "#000", borderBottom: "1px solid #e2e2e2", padding: "6px 8px",
+};
+const P_NUM: React.CSSProperties = { ...P_TD, textAlign: "right", fontFamily: MONO, whiteSpace: "nowrap" };
+
+/**
+ * The quote and the cutting detail print separately: whoever prices a job and
+ * whoever cuts it are rarely the same person, and neither wants the other's
+ * page.
+ */
+function PrintSheet({ kind, formula, title, values, run, outputs, primaryKey }: {
+  kind: "cost" | "working";
+  formula: CostingFormula;
+  title: string;
+  values: Record<string, number | number[]>;
+  run: FormulaRun;
+  outputs: FormulaOutput[];
+  primaryKey?: string;
+}) {
+  return (
+    <div className="cxPrint">
+      <div style={{ fontFamily: FONT, color: "#000", background: "#fff", padding: "16px 20px" }}>
+        <div style={{ borderBottom: "2px solid #000", paddingBottom: 10, marginBottom: 16 }}>
+          <div style={{ fontSize: 20, fontWeight: 800 }}>{title}</div>
+          <div style={{ fontSize: 11, color: "#555", marginTop: 4 }}>
+            {kind === "cost" ? "Cost sheet" : "Working sheet — cutting detail"} ·{" "}
+            {formula.category} · {formula.name} · v{formula.version} · {today()}
+          </div>
+        </div>
+
+        {kind === "cost" ? (
+          <>
+            <SheetTitle>Job entered</SheetTitle>
+            <table style={{ width: "100%", borderCollapse: "collapse", marginBottom: 20 }}>
+              <thead>
+                <tr><th style={P_TH}>Input</th><th style={{ ...P_TH, textAlign: "right" }}>Value</th><th style={P_TH}>Unit</th></tr>
+              </thead>
+              <tbody>
+                {formula.inputs.map((i) => (
+                  <tr key={i.key}>
+                    <td style={P_TD}>{i.label || i.key}</td>
+                    <td style={P_NUM}>{fmt(values[i.key])}</td>
+                    <td style={{ ...P_TD, width: 70, color: "#666" }}>{i.unit ?? ""}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+
+            <SheetTitle>Cost summary</SheetTitle>
+            <table style={{ width: "100%", borderCollapse: "collapse" }}>
+              <tbody>
+                {outputs.map((o) => {
+                  const main = o.key === primaryKey;
+                  return (
+                    <tr key={o.key}>
+                      <td style={{ ...P_TD, fontWeight: main ? 800 : 400, fontSize: main ? 14 : 12 }}>
+                        {o.label || o.key}
+                      </td>
+                      <td style={{ ...P_NUM, fontWeight: main ? 800 : 600, fontSize: main ? 15 : 12 }}>
+                        {fmt(run.values[o.key])}
+                      </td>
+                      <td style={{ ...P_TD, width: 70, color: "#666" }}>{o.unit ?? ""}</td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </>
+        ) : (
+          <>
+            <SheetTitle>Step by step</SheetTitle>
+            <table style={{ width: "100%", borderCollapse: "collapse", marginBottom: 20 }}>
+              <thead>
+                <tr>
+                  <th style={P_TH}>Step</th>
+                  <th style={P_TH}>How</th>
+                  <th style={{ ...P_TH, textAlign: "right" }}>Value</th>
+                  <th style={P_TH}>Unit</th>
+                </tr>
+              </thead>
+              <tbody>
+                {run.steps.map((s) => (
+                  <tr key={s.key}>
+                    <td style={P_TD}>{s.label}</td>
+                    <td style={{ ...P_TD, fontFamily: MONO, fontSize: 10.5, color: "#555" }}>{s.expression}</td>
+                    <td style={P_NUM}>{s.error ? "error" : fmt(s.value)}</td>
+                    <td style={{ ...P_TD, width: 60, color: "#666" }}>{s.unit ?? ""}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+
+            <SheetTitle>Key numbers</SheetTitle>
+            <table style={{ width: "100%", borderCollapse: "collapse" }}>
+              <tbody>
+                {outputs.map((o) => (
+                  <tr key={o.key}>
+                    <td style={P_TD}>{o.label || o.key}</td>
+                    <td style={{ ...P_NUM, fontWeight: 700 }}>{fmt(run.values[o.key])}</td>
+                    <td style={{ ...P_TD, width: 70, color: "#666" }}>{o.unit ?? ""}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function SheetTitle({ children }: { children: React.ReactNode }) {
+  return (
+    <div style={{ fontSize: 12, fontWeight: 800, letterSpacing: ".06em", textTransform: "uppercase", color: "#000", margin: "0 0 8px" }}>
+      {children}
+    </div>
+  );
+}
+
+/** A numbered card — the paper form this screen replaces was numbered too. */
+function Card({ n, title, hint, children }: {
+  n: number; title: string; hint: string; children: React.ReactNode;
+}) {
+  return (
+    <div style={{ background: CARD, border: `1px solid ${BORDER}`, borderRadius: 14, padding: 18 }}>
+      <div style={{ display: "flex", gap: 11, alignItems: "flex-start", marginBottom: 14 }}>
+        <span style={{
+          width: 24, height: 24, flexShrink: 0, borderRadius: 8, marginTop: 1,
+          background: "rgba(99,102,241,.16)", color: "#a5b4fc",
+          fontSize: 12, fontWeight: 700, display: "grid", placeItems: "center",
+        }}>{n}</span>
+        <div>
+          <div style={{ fontSize: 14, fontWeight: 700 }}>{title}</div>
+          <div style={{ fontSize: 11.5, color: "rgba(255,255,255,.35)", marginTop: 2 }}>{hint}</div>
+        </div>
+      </div>
+      {children}
     </div>
   );
 }
