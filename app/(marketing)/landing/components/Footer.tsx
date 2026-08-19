@@ -11,6 +11,7 @@ import { useEffect, useState } from "react";
 const PRODUCT_LINKS = [
   { label: "Core Features",      href: "/features" },
   { label: "Pricing Plans",      href: "/pricing" },
+  { label: "Join the Waitlist",  href: "/waitlist" },
   { label: "ROI Calculator",     href: "/roi-calculator" },
   { label: "Release Notes",      href: "/updates" },
   { label: "Changelog",          href: "/changelog" },
