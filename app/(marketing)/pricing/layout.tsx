@@ -22,14 +22,14 @@ export const metadata: Metadata = {
       "Starter ($49/mo), Professional ($99/mo), Enterprise ($249/mo). No hidden fees. Cancel anytime.",
     url: `${BASE}/pricing`,
     siteName: "FinovaOS",
-    images: [{ url: `${BASE}/icon.png`, width: 1200, height: 630, alt: "FinovaOS Pricing Plans" }],
+    images: [{ url: `${BASE}/pricing/opengraph-image`, width: 1200, height: 630, alt: "FinovaOS Pricing Plans" }],
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
     title: "FinovaOS Pricing — Plans from $49/month",
     description: "Starter · Professional · Enterprise. Transparent pricing, no hidden fees.",
-    images: [`${BASE}/icon.png`],
+    images: [`${BASE}/pricing/opengraph-image`],
   },
   alternates: { canonical: `${BASE}/pricing` },
 };
