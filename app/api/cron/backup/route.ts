@@ -1,13 +1,15 @@
 import { NextRequest, NextResponse, after } from "next/server";
 import { prisma } from "@/lib/prisma";
-import nodemailer from "nodemailer";
-import { createCompanyBackup, getBackupTargetCompanies, type BackupResult } from "@/lib/backup";
+import { createCompanyBackup, getBackupTargetCompanies } from "@/lib/backup";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
 
 // Cron: daily at 02:00 UTC. Fire-and-forget: response returns immediately
-// while backup snapshots are created + emailed in the background.
+// while backup snapshots are created in the background.
+//
+// Snapshots live in the database only — no notification email is sent. Backups
+// are pulled on demand from Dashboard → Backup & Restore.
 export async function GET(req: NextRequest) {
   const authHeader = req.headers.get("authorization");
   if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
@@ -55,7 +57,7 @@ async function runBackups() {
 
   for (const companyId of dueCompanyIds) {
     try {
-      const result = await createCompanyBackup(companyId, {
+      await createCompanyBackup(companyId, {
         backupType: "SCHEDULED",
         createdBy: "CRON",
         keepLast: 30,
@@ -67,7 +69,6 @@ async function runBackups() {
           .catch(() => {});
       }
 
-      await emailBackup(result, today);
       results.push({ companyId, status: "success" });
     } catch (err: any) {
       console.error(`Backup failed for ${companyId}:`, err);
