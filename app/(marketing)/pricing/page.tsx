@@ -370,7 +370,7 @@ function UseCaseWizard() {
             </div>
           </div>
           {signupsOpen ? (
-            <Link href={`/onboarding/signup/${chosen.plan}`} style={{ background: `linear-gradient(135deg,${chosen.color},${chosen.color}bb)`, color: "#fff", padding: "10px 22px", borderRadius: 10, fontWeight: 700, fontSize: 14, textDecoration: "none", flexShrink: 0 }}>
+            <Link href={`/onboarding/signup/${chosen.plan}`} onClick={() => trackEvent("pricing_plan_click", { plan: chosen.plan, placement: "use_case_wizard" })} style={{ background: `linear-gradient(135deg,${chosen.color},${chosen.color}bb)`, color: "#fff", padding: "10px 22px", borderRadius: 10, fontWeight: 700, fontSize: 14, textDecoration: "none", flexShrink: 0 }}>
               Start with {chosen.recommended} →
             </Link>
           ) : (
