@@ -38,6 +38,46 @@ export async function GET(req: NextRequest) {
       lastBackupAt = b?.createdAt || null;
     } catch {}
 
+    // The Services table used to hard-code "ok" for the database, email and the
+    // payment gateway under a heading that reads "Real-time service
+    // availability" — including "Stripe operational" on a platform whose live
+    // subscriptions run through LemonSqueezy. A status panel that cannot report
+    // a problem is worse than no panel, so these three are measured now.
+
+    // Round-trip of a trivial query, which is what "database responding" means
+    // here. A thrown error leaves latency null and the row reads as down.
+    let dbLatencyMs: number | null = null;
+    try {
+      const startedAt = Date.now();
+      await prisma.$queryRaw`SELECT 1`;
+      dbLatencyMs = Date.now() - startedAt;
+    } catch {}
+
+    // Which transport is configured, not whether a send would succeed — probing
+    // that would mean sending mail on every page refresh.
+    const emailProvider = process.env.RESEND_API_KEY
+      ? "Resend"
+      : process.env.SMTP_HOST && process.env.SMTP_USER
+      ? "SMTP"
+      : null;
+
+    const configuredGateways = [
+      process.env.LEMONSQUEEZY_API_KEY ? "LemonSqueezy" : null,
+      process.env.STRIPE_SECRET_KEY ? "Stripe" : null,
+      process.env.SAFEPAY_SECRET_KEY ? "Safepay" : null,
+    ].filter((g): g is string => g !== null);
+
+    // The gateway that most recently actually processed a subscription — the
+    // honest answer to "which payment provider is this platform on".
+    let liveGateway: string | null = null;
+    try {
+      const latest = await prisma.subscription.findFirst({
+        orderBy: { updatedAt: "desc" },
+        select: { provider: true },
+      });
+      liveGateway = latest?.provider || null;
+    } catch {}
+
     const queueFailures24h = 0;
 
     return NextResponse.json({
@@ -46,6 +86,10 @@ export async function GET(req: NextRequest) {
       backupStatus,
       lastBackupAt,
       queueFailures24h,
+      dbLatencyMs,
+      emailProvider,
+      configuredGateways,
+      liveGateway,
     });
   } catch (e: any) {
     return NextResponse.json({ error: e.message }, { status: 500 });
