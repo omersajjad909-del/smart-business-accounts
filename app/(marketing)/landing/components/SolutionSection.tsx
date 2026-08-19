@@ -63,11 +63,18 @@ const PAINS = [
   },
 ] as const;
 
-const FOCUSED_INDUSTRIES = [
+/**
+ * The canonical industry list. Exported because the hero's "Business Types"
+ * stat has to count the same thing this section renders — it was hard-coded
+ * once and immediately drifted (the stat said 7 while this list held 6).
+ */
+export const FOCUSED_INDUSTRIES = [
   {
     icon: "🏪",
     label: "Retail Store",
     slug: "retail",
+    /** Compact name for the hero's Business Types caption. */
+    short: "retail",
     color: "#ec4899",
     audience: "For marts, stores, and growing multi-branch retail businesses.",
     desc: "FinovaOS helps retail teams sell faster, track stock branch-wise, run promotions, manage customer loyalty, and print receipts in the right format.",
@@ -78,6 +85,8 @@ const FOCUSED_INDUSTRIES = [
     icon: "📦",
     label: "Trading / Wholesale",
     slug: "trading",
+    /** Compact name for the hero's Business Types caption. */
+    short: "trading",
     color: "#38bdf8",
     audience: "For wholesalers and trading businesses handling procurement and dispatch.",
     desc: "Run quotations, convert orders, manage procurement, control inventory, and follow outstanding balances from one trading-focused desk.",
@@ -88,6 +97,8 @@ const FOCUSED_INDUSTRIES = [
     icon: "🚚",
     label: "Distribution",
     slug: "distribution",
+    /** Compact name for the hero's Business Types caption. */
+    short: "distribution",
     color: "#8b5cf6",
     audience: "For route-based distributors delivering into the market every day.",
     desc: "Coordinate warehouse, routes, stock-on-van, deliveries, and collections with a workflow built for market coverage and route discipline.",
@@ -98,6 +109,8 @@ const FOCUSED_INDUSTRIES = [
     icon: "🚢",
     label: "Import / Export",
     slug: "trade",
+    /** Compact name for the hero's Business Types caption. */
+    short: "import/export",
     color: "#14b8a6",
     audience: "For importers, exporters, and international trading companies.",
     desc: "Prepare commercial documents, track shipments, manage LC and TT activity, and keep trade costing and rebate visibility under control.",
@@ -108,6 +121,8 @@ const FOCUSED_INDUSTRIES = [
     icon: "🏭",
     label: "Manufacturing",
     slug: "manufacturing",
+    /** Compact name for the hero's Business Types caption. */
+    short: "manufacturing",
     color: "#f59e0b",
     audience: "For production businesses converting raw materials into finished goods.",
     desc: "Manage BOMs, production orders, work orders, finished goods, and quality processes with a manufacturing-ready operating flow.",
@@ -118,6 +133,8 @@ const FOCUSED_INDUSTRIES = [
     icon: "✈️",
     label: "Travel Agency",
     slug: "travel",
+    /** Compact name for the hero's Business Types caption. */
+    short: "travel",
     color: "#38bdf8",
     audience: "For travel agencies and visa consultants managing passenger files and service billing.",
     desc: "Track airline tickets, PNRs, travel dates, visa cases, quotations, and customer follow-up from one travel operations desk.",

@@ -8,6 +8,18 @@ type HealthData = {
   backupStatus: string | null;
   lastBackupAt: string | null;
   queueFailures24h: number;
+  dbLatencyMs: number | null;
+  emailProvider: string | null;
+  configuredGateways: string[];
+  liveGateway: string | null;
+};
+
+/** Provider codes are stored upper-case; show them the way people write them. */
+const GATEWAY_LABELS: Record<string, string> = {
+  LEMONSQUEEZY: "LemonSqueezy",
+  STRIPE: "Stripe",
+  SAFEPAY: "Safepay",
+  SWITCHNOW: "SwitchNow",
 };
 
 const F = "'Outfit','Inter',sans-serif";
@@ -171,15 +183,40 @@ export default function AdminSystemPage() {
         <div style={{ display: "grid", gridTemplateColumns: "1fr auto 1fr", gap: 16, fontSize: 11, fontWeight: 800, letterSpacing: ".08em", color: "rgba(255,255,255,.3)", textTransform: "uppercase", paddingBottom: 10, borderBottom: `1px solid ${BORDER}` }}>
           <span>Service</span><span style={{ textAlign: "center" }}>Status</span><span style={{ textAlign: "right" }}>Detail</span>
         </div>
-        <ServiceRow name="Database (PostgreSQL)" status="ok" detail="Response &lt; 10ms" />
+        {/* Every row below reports a measured value. Nothing here is allowed to
+            claim "ok" on its own — see app/api/admin/system/health/route.ts.
+            The 1s database bound is loose on purpose: the measurement can
+            include cold pool connect, and a panel sitting on a permanent yellow
+            warning teaches everyone to ignore it. */}
+        <ServiceRow
+          name="Database (PostgreSQL)"
+          status={!h ? "ok" : h.dbLatencyMs == null ? "error" : h.dbLatencyMs > 1000 ? "warn" : "ok"}
+          detail={!h ? "Checking…" : h.dbLatencyMs == null ? "Not responding" : `Response ${h.dbLatencyMs}ms`}
+        />
         <ServiceRow name="API Server" status={h && h.apiErrors24h > 10 ? "warn" : "ok"} detail={h ? `${h.apiErrors24h} errors in 24h` : "Checking…"} />
-        <ServiceRow name="Email Service" status="ok" detail="SendGrid connected" />
+        <ServiceRow
+          name="Email Service"
+          status={!h ? "ok" : h.emailProvider ? "ok" : "error"}
+          detail={!h ? "Checking…" : h.emailProvider ? `${h.emailProvider} configured` : "No transport configured"}
+        />
         <ServiceRow
           name="Backup System"
           status={!h ? "ok" : h.backupStatus?.toLowerCase() === "failed" ? "error" : h.backupStatus ? "ok" : "warn"}
           detail={h?.lastBackupAt ? fmt(h.lastBackupAt) : "No backup found"}
         />
-        <ServiceRow name="Payment Gateway" status="ok" detail="Stripe operational" />
+        <ServiceRow
+          name="Payment Gateway"
+          status={!h ? "ok" : h.configuredGateways.length ? "ok" : "error"}
+          detail={
+            !h
+              ? "Checking…"
+              : !h.configuredGateways.length
+              ? "None configured"
+              : h.liveGateway
+              ? `${GATEWAY_LABELS[h.liveGateway] || h.liveGateway} — last processed`
+              : `${h.configuredGateways.join(", ")} configured`
+          }
+        />
         <div style={{ paddingTop: 10, fontSize: 12, color: "rgba(255,255,255,.25)", textAlign: "right" }}>
           Updated: {lastRefresh.toLocaleTimeString()}
         </div>

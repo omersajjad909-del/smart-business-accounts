@@ -46,6 +46,9 @@ export async function GET(req: NextRequest) {
 
     // Round-trip of a trivial query, which is what "database responding" means
     // here. A thrown error leaves latency null and the row reads as down.
+    // Note the figure includes connection setup when the pool is cold
+    // (DATABASE_URL runs through pgbouncer with connection_limit=1), so the
+    // page's warn threshold is deliberately loose — see app/admin/system/page.tsx.
     let dbLatencyMs: number | null = null;
     try {
       const startedAt = Date.now();

@@ -3,6 +3,10 @@ import Link from "next/link";
 import React, { useEffect, useRef, useState } from "react";
 import { signupHrefFor } from "@/lib/signupGate";
 import { useSignupsOpen } from "@/hooks/useSignupsOpen";
+import { FOCUSED_INDUSTRIES } from "./SolutionSection";
+
+/** Compact industry names, so the stat's caption always matches the list. */
+const INDUSTRY_SUMMARY = FOCUSED_INDUSTRIES.map((i) => i.short).join(", ");
 
 /* ── Animated counter ── */
 function useCounter(target: number, duration = 1800, active = false) {
@@ -527,8 +531,12 @@ export default function Hero() {
               /* "60+ Business Types" contradicted the section further down the
                  same page that reads "06 Focused Businesses now", and there is
                  no signed uptime SLA to guarantee. Both replaced with figures
-                 the product backs: 6 live industries, 67 shipped features. */
-              { n:"7",           l:"Business Types", desc:"retail, trading, distribution, import/export, manufacturing", color:"#818cf8" },
+                 the product backs: the live industries, 60+ shipped features.
+
+                 The count and the list are read off FOCUSED_INDUSTRIES rather
+                 than typed here, because a hard-coded number drifted from it
+                 the moment the list changed. */
+              { n:String(FOCUSED_INDUSTRIES.length), l:"Business Types", desc:INDUSTRY_SUMMARY, color:"#818cf8" },
               { n:"60+",         l:"Features",       desc:"accounts, stock, HR, CRM & more",                             color:"#34d399" },
               { n:"Early Access",l:"Now Live",    desc:"limited spots available",        color:"#fbbf24" },
               { n:"< 2 min",    l:"Setup time",   desc:"from signup to first invoice",   color:"#60a5fa" },
@@ -536,7 +544,7 @@ export default function Hero() {
               <div key={s.l} className="stat-pill" style={{
                 padding:"20px 28px", cursor:"default",
                 borderRight: i < 3 ? "1px solid rgba(255,255,255,.05)" : "none",
-              }}> 
+              }}>
                 <div style={{ fontSize:28, fontWeight:900, color:s.color, letterSpacing:"-1px", marginBottom:4 }}>{s.n}</div>
                 <div style={{ fontSize:13, fontWeight:700, color:"rgba(255,255,255,.7)", marginBottom:2 }}>{s.l}</div>
                 <div style={{ fontSize:11, color:"rgba(255,255,255,.28)", fontWeight:500 }}>{s.desc}</div>
