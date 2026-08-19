@@ -52,6 +52,9 @@ export default function WaitlistPage() {
         throw new Error(data?.error || "Failed to join waitlist.");
       }
 
+      // Only after the API confirms — a failed submit must not count as a lead.
+      trackEvent("waitlist_submit", { source: "website-waitlist" });
+
       setSuccess(data?.message || "You're on the list.");
       setName("");
       setEmail("");
