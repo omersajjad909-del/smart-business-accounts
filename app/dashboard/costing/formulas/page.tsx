@@ -65,6 +65,11 @@ const CSS = `
 .fxBar .grow{flex:1;min-width:180px}
 .fxCols{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:20px;align-items:start}
 .fxSide{display:flex;flex-direction:column;gap:14px;position:sticky;top:82px}
+/* Simple keeps a row down to what a trade actually thinks about — the name,
+   the unit, the number. Detailed adds the machinery: keys, type, ask, roles. */
+.fxInS{display:grid;grid-template-columns:1.7fr .5fr 1fr auto;gap:8px;align-items:center}
+.fxStepS{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center}
+.fxOutS{display:grid;grid-template-columns:1.1fr 1.6fr auto auto;gap:8px;align-items:center}
 .fxIn{display:grid;grid-template-columns:1.05fr 1.3fr .6fr .95fr 1.05fr auto auto;gap:8px;align-items:center}
 .fxOut{display:grid;grid-template-columns:1.05fr 1.3fr .6fr 1.1fr auto auto;gap:8px;align-items:center}
 .fxStep{display:grid;grid-template-columns:1.05fr 1.3fr .6fr auto;gap:8px;align-items:center}
@@ -77,7 +82,7 @@ const CSS = `
 /* Under 768px the dashboard's own topbar is sticky against the window, so the
    action bar parks below it instead of covering it. */
 @media(max-width:767px){
-  .fxIn,.fxOut,.fxStep{grid-template-columns:1fr 1fr}
+  .fxIn,.fxOut,.fxStep,.fxInS,.fxOutS{grid-template-columns:1fr 1fr}
   .fxHeadRow{display:none}
   .fxBar{top:52px;z-index:9}
 }
@@ -116,6 +121,22 @@ function toDraft(record: BusinessRecord): Draft {
   };
 }
 
+/**
+ * Keys the editor invented for a brand-new row. While a key still looks like
+ * this, nothing can be referring to it yet, so it is safe to rewrite from the
+ * label — which is how Simple view gets away with never showing keys at all.
+ */
+const AUTO_KEY = /^(input|step)\d+$/;
+
+function keyFromLabel(label: string, taken: string[]): string | null {
+  const words = label.trim().toLowerCase().replace(/[^a-z0-9]+/g, " ").split(/\s+/).filter(Boolean);
+  if (!words.length) return null;
+  const key = words[0] + words.slice(1).map((w) => w[0].toUpperCase() + w.slice(1)).join("");
+  if (validateKey(key)) return null;      // reserved word, or starts with a digit
+  if (taken.includes(key)) return null;   // already used by another row
+  return key;
+}
+
 function fmt(v: unknown): string {
   if (Array.isArray(v)) return `[${v.join(", ")}]`;
   if (typeof v !== "number") return "—";
@@ -133,6 +154,9 @@ export default function FormulasPage() {
   const [err, setErr] = useState("");
   // Which formula box was used last — a key chip types itself in there.
   const [activeStep, setActiveStep] = useState<number | null>(null);
+  // Simple hides the plumbing (keys, type, ask, roles) and shows a trade the
+  // three things it cares about. Detailed is the full table.
+  const [detailed, setDetailed] = useState(false);
 
   const formulas = useMemo(
     () => store.records.map((r) => ({ record: r, draft: toDraft(r) })),
@@ -226,6 +250,33 @@ export default function FormulasPage() {
     );
     const emptyLists = d.inputs.filter((i) => i.isList && !(i.listValue ?? []).length);
 
+    /* Simple view never shows a key, so the label writes one — but only while
+       the key is still the placeholder the editor invented, never over a key a
+       step could already be using. */
+    const setInputLabel = (i: number, text: string) => patch((x) => {
+      const row = x.inputs[i];
+      const auto = !row.key || AUTO_KEY.test(row.key);
+      row.label = text;
+      if (!auto) return;
+      const taken = x.inputs.filter((_, j) => j !== i).map((r) => r.key).concat(x.steps.map((r) => r.key));
+      const next = keyFromLabel(text, taken);
+      if (next) row.key = next;
+    });
+
+    const setStepLabel = (i: number, text: string) => patch((x) => {
+      const row = x.steps[i];
+      const auto = !row.key || AUTO_KEY.test(row.key);
+      const before = row.key;
+      row.label = text;
+      if (!auto) return;
+      const taken = x.steps.filter((_, j) => j !== i).map((r) => r.key).concat(x.inputs.map((r) => r.key));
+      const next = keyFromLabel(text, taken);
+      if (!next) return;
+      row.key = next;
+      // An output already pointing at the placeholder follows it across.
+      x.outputs.forEach((o) => { if (o.key === before) o.key = next; });
+    });
+
     // Appends a key to whichever formula box was last used, so an author never
     // has to remember or retype a key.
     const insertKey = (k: string) => {
@@ -255,6 +306,16 @@ export default function FormulasPage() {
             style={{ ...input, width: "auto", minWidth: 150 }}>
             {FORMULA_CATEGORIES.map((c) => <option key={c} value={c}>{c}</option>)}
           </select>
+          <div style={{ display: "flex", gap: 3, padding: 3, borderRadius: 11, background: "rgba(255,255,255,.05)", border: `1px solid ${BORDER}` }}>
+            {([["Simple", false], ["Detailed", true]] as const).map(([text, on]) => (
+              <button key={text} onClick={() => setDetailed(on)} style={{
+                padding: "6px 12px", borderRadius: 8, fontSize: 12.5, fontWeight: 600,
+                cursor: "pointer", fontFamily: FONT, border: "none",
+                background: detailed === on ? "rgba(99,102,241,.28)" : "transparent",
+                color: detailed === on ? "#c7d2fe" : "rgba(255,255,255,.45)",
+              }}>{text}</button>
+            ))}
+          </div>
           <button onClick={close} style={btn()}>Cancel</button>
           <button onClick={save} disabled={saving} style={{ ...btn("primary"), opacity: saving ? .6 : 1 }}>
             {saving ? "Saving…" : editing.id ? "Save new version" : "Create formula"}
@@ -285,7 +346,7 @@ export default function FormulasPage() {
               title="Inputs"
               hint="What the operator types in, or a constant your trade always uses."
               onAdd={() => patch((x) => { x.inputs.push({ key: `input${x.inputs.length + 1}`, label: "", defaultValue: 0, askOnRun: true }); })}
-              head={
+              head={detailed ? (
                 <div className="fxIn fxHeadRow">
                   <div className="fxHead">Key (used in steps)</div>
                   <div className="fxHead">Shown as</div>
@@ -295,15 +356,54 @@ export default function FormulasPage() {
                   <div className="fxHead">Ask</div>
                   <div />
                 </div>
-              }
+              ) : (
+                <div className="fxInS fxHeadRow">
+                  <div className="fxHead">Name</div>
+                  <div className="fxHead">Unit</div>
+                  <div className="fxHead">Value</div>
+                  <div />
+                </div>
+              )}
             >
               {d.inputs.map((inp, i) => {
                 const badList = !!inp.isList && !(inp.listValue ?? []).length;
+
+                const valueCell = inp.isList ? (
+                  <input value={(inp.listValue ?? []).join(", ")}
+                    onChange={(e) => patch((x) => {
+                      x.inputs[i].listValue = e.target.value.split(",").map((n) => Number(n.trim())).filter((n) => Number.isFinite(n));
+                    })}
+                    placeholder="48, 50, 52"
+                    style={{ ...monoInput, borderColor: badList ? "rgba(251,191,36,.55)" : BORDER }}/>
+                ) : (
+                  <input type="number" step="any" value={inp.defaultValue ?? 0}
+                    onChange={(e) => patch((x) => { x.inputs[i].defaultValue = Number(e.target.value); })}
+                    style={monoInput}/>
+                );
+
+                const removeBtn = (
+                  <button title="Remove" onClick={() => patch((x) => { x.inputs.splice(i, 1); })}
+                    style={{ ...btn("danger"), padding: "8px 10px", fontSize: 12 }}>✕</button>
+                );
+
+                if (!detailed) {
+                  return (
+                    <div className="fxInS" key={i}>
+                      <input value={inp.label} onChange={(e) => setInputLabel(i, e.target.value)}
+                        placeholder="Piece width" style={input}/>
+                      <input value={inp.unit ?? ""} onChange={(e) => patch((x) => { x.inputs[i].unit = e.target.value; })}
+                        placeholder="in" style={input}/>
+                      {valueCell}
+                      {removeBtn}
+                    </div>
+                  );
+                }
+
                 return (
                   <div className="fxIn" key={i}>
                     <input value={inp.key} onChange={(e) => patch((x) => { x.inputs[i].key = e.target.value; })}
                       placeholder="pieceWidth" style={monoInput}/>
-                    <input value={inp.label} onChange={(e) => patch((x) => { x.inputs[i].label = e.target.value; })}
+                    <input value={inp.label} onChange={(e) => setInputLabel(i, e.target.value)}
                       placeholder="Piece width" style={input}/>
                     <input value={inp.unit ?? ""} onChange={(e) => patch((x) => { x.inputs[i].unit = e.target.value; })}
                       placeholder="in" style={input}/>
@@ -322,18 +422,7 @@ export default function FormulasPage() {
                       <option value="number">Number</option>
                       <option value="list">List</option>
                     </select>
-                    {inp.isList ? (
-                      <input value={(inp.listValue ?? []).join(", ")}
-                        onChange={(e) => patch((x) => {
-                          x.inputs[i].listValue = e.target.value.split(",").map((n) => Number(n.trim())).filter((n) => Number.isFinite(n));
-                        })}
-                        placeholder="48, 50, 52"
-                        style={{ ...monoInput, borderColor: badList ? "rgba(251,191,36,.55)" : BORDER }}/>
-                    ) : (
-                      <input type="number" step="any" value={inp.defaultValue ?? 0}
-                        onChange={(e) => patch((x) => { x.inputs[i].defaultValue = Number(e.target.value); })}
-                        style={monoInput}/>
-                    )}
+                    {valueCell}
                     <button
                       title={inp.askOnRun
                         ? "The operator is asked for this on every run"
@@ -343,11 +432,16 @@ export default function FormulasPage() {
                         color: inp.askOnRun ? "#34d399" : "rgba(255,255,255,.35)" }}>
                       {inp.askOnRun ? "Ask" : "Fixed"}
                     </button>
-                    <button title="Remove" onClick={() => patch((x) => { x.inputs.splice(i, 1); })}
-                      style={{ ...btn("danger"), padding: "8px 10px", fontSize: 12 }}>✕</button>
+                    {removeBtn}
                   </div>
                 );
               })}
+              {!detailed && (
+                <div style={{ fontSize: 11.5, color: "rgba(255,255,255,.28)", lineHeight: 1.6, paddingTop: 4 }}>
+                  Switch to <strong style={{ color: "rgba(255,255,255,.45)" }}>Detailed</strong> above to rename keys,
+                  turn an input into a list of stock sizes, or stop the operator being asked for it.
+                </div>
+              )}
             </Section>
 
             {/* Steps */}
@@ -356,14 +450,14 @@ export default function FormulasPage() {
               title="Steps"
               hint="Each step can use the inputs and every step above it. Order matters."
               onAdd={() => patch((x) => { x.steps.push({ key: `step${x.steps.length + 1}`, label: "", expression: "" }); })}
-              head={
+              head={detailed ? (
                 <div className="fxStep fxHeadRow">
                   <div className="fxHead">Key</div>
                   <div className="fxHead">Shown as</div>
                   <div className="fxHead">Unit</div>
                   <div />
                 </div>
-              }
+              ) : null}
             >
               {d.steps.map((st, i) => {
                 const result = stepValues.get(st.key);
@@ -375,16 +469,25 @@ export default function FormulasPage() {
                     background: stepErr ? "rgba(248,113,113,.06)" : "rgba(255,255,255,.02)",
                     border: `1px solid ${stepErr ? "rgba(248,113,113,.3)" : BORDER}`,
                   }}>
-                    <div className="fxStep">
-                      <input value={st.key} onChange={(e) => patch((x) => { x.steps[i].key = e.target.value; })}
-                        placeholder="key" style={monoInput}/>
-                      <input value={st.label} onChange={(e) => patch((x) => { x.steps[i].label = e.target.value; })}
-                        placeholder="What this step works out" style={input}/>
-                      <input value={st.unit ?? ""} onChange={(e) => patch((x) => { x.steps[i].unit = e.target.value; })}
-                        placeholder="unit" style={input}/>
-                      <button title="Remove" onClick={() => patch((x) => { x.steps.splice(i, 1); })}
-                        style={{ ...btn("danger"), padding: "8px 10px", fontSize: 12 }}>✕</button>
-                    </div>
+                    {detailed ? (
+                      <div className="fxStep">
+                        <input value={st.key} onChange={(e) => patch((x) => { x.steps[i].key = e.target.value; })}
+                          placeholder="key" style={monoInput}/>
+                        <input value={st.label} onChange={(e) => setStepLabel(i, e.target.value)}
+                          placeholder="What this step works out" style={input}/>
+                        <input value={st.unit ?? ""} onChange={(e) => patch((x) => { x.steps[i].unit = e.target.value; })}
+                          placeholder="unit" style={input}/>
+                        <button title="Remove" onClick={() => patch((x) => { x.steps.splice(i, 1); })}
+                          style={{ ...btn("danger"), padding: "8px 10px", fontSize: 12 }}>✕</button>
+                      </div>
+                    ) : (
+                      <div className="fxStepS">
+                        <input value={st.label} onChange={(e) => setStepLabel(i, e.target.value)}
+                          placeholder="What this step works out" style={input}/>
+                        <button title="Remove" onClick={() => patch((x) => { x.steps.splice(i, 1); })}
+                          style={{ ...btn("danger"), padding: "8px 10px", fontSize: 12 }}>✕</button>
+                      </div>
+                    )}
                     <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
                       <span style={{
                         width: 22, height: 22, flexShrink: 0, borderRadius: 7,
@@ -420,7 +523,7 @@ export default function FormulasPage() {
               title="Outputs"
               hint="Which values the result screen shows — and what they mean to the rest of the system."
               onAdd={() => patch((x) => { x.outputs.push({ key: "", label: "", role: "none" }); })}
-              head={
+              head={detailed ? (
                 <div className="fxOut fxHeadRow">
                   <div className="fxHead">Value</div>
                   <div className="fxHead">Shown as</div>
@@ -429,28 +532,70 @@ export default function FormulasPage() {
                   <div className="fxHead">Main</div>
                   <div />
                 </div>
-              }
+              ) : (
+                <div className="fxOutS fxHeadRow">
+                  <div className="fxHead">Value</div>
+                  <div className="fxHead">Shown as</div>
+                  <div className="fxHead">Main</div>
+                  <div />
+                </div>
+              )}
             >
-              {d.outputs.map((out, i) => (
-                <div className="fxOut" key={i}>
-                  <select value={out.key} onChange={(e) => patch((x) => { x.outputs[i].key = e.target.value; })} style={monoInput}>
+              {d.outputs.map((out, i) => {
+                const picker = (
+                  <select value={out.key} onChange={(e) => patch((x) => {
+                    x.outputs[i].key = e.target.value;
+                    // A fresh output takes the name and unit of what it shows.
+                    if (!x.outputs[i].label) {
+                      const src = [...x.inputs, ...x.steps].find((r) => r.key === e.target.value);
+                      if (src) {
+                        x.outputs[i].label = src.label || src.key;
+                        if (!x.outputs[i].unit) x.outputs[i].unit = src.unit;
+                      }
+                    }
+                  })} style={monoInput}>
                     <option value="">— pick —</option>
-                    {[...d.inputs, ...d.steps].map((r) => <option key={r.key} value={r.key}>{r.key}</option>)}
+                    {[...d.inputs, ...d.steps].map((r) => (
+                      <option key={r.key} value={r.key}>{detailed ? r.key : (r.label || r.key)}</option>
+                    ))}
                   </select>
+                );
+                const labelBox = (
                   <input value={out.label} onChange={(e) => patch((x) => { x.outputs[i].label = e.target.value; })}
                     placeholder="Cost per piece" style={input}/>
-                  <input value={out.unit ?? ""} onChange={(e) => patch((x) => { x.outputs[i].unit = e.target.value; })}
-                    placeholder="Rs" style={input}/>
-                  <select value={out.role ?? "none"} onChange={(e) => patch((x) => { x.outputs[i].role = e.target.value as OutputRole; })} style={input}>
-                    {(Object.keys(ROLE_LABELS) as OutputRole[]).map((r) => <option key={r} value={r}>{ROLE_LABELS[r]}</option>)}
-                  </select>
+                );
+                const starBtn = (
                   <button title="Show as the headline number" onClick={() => patch((x) => {
                     x.outputs.forEach((o, j) => { o.primary = j === i ? !o.primary : false; });
                   })} style={{ ...iconBtn, padding: "8px 11px", color: out.primary ? "#fbbf24" : "rgba(255,255,255,.35)" }}>★</button>
+                );
+                const removeBtn = (
                   <button title="Remove" onClick={() => patch((x) => { x.outputs.splice(i, 1); })}
                     style={{ ...btn("danger"), padding: "8px 10px", fontSize: 12 }}>✕</button>
-                </div>
-              ))}
+                );
+
+                if (!detailed) {
+                  return (
+                    <div className="fxOutS" key={i}>
+                      {picker}{labelBox}{starBtn}{removeBtn}
+                    </div>
+                  );
+                }
+
+                return (
+                  <div className="fxOut" key={i}>
+                    {picker}
+                    {labelBox}
+                    <input value={out.unit ?? ""} onChange={(e) => patch((x) => { x.outputs[i].unit = e.target.value; })}
+                      placeholder="Rs" style={input}/>
+                    <select value={out.role ?? "none"} onChange={(e) => patch((x) => { x.outputs[i].role = e.target.value as OutputRole; })} style={input}>
+                      {(Object.keys(ROLE_LABELS) as OutputRole[]).map((r) => <option key={r} value={r}>{ROLE_LABELS[r]}</option>)}
+                    </select>
+                    {starBtn}
+                    {removeBtn}
+                  </div>
+                );
+              })}
             </Section>
           </div>
 
