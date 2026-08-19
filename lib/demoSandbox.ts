@@ -45,27 +45,27 @@ export const DEMO_MAX_CONCURRENT = 25;
  * actually unlocks. These are the codes Company.plan already carries, which is
  * what /api/me/bootstrap resolves pages and permissions from — so picking one
  * here gates the demo exactly the way a paying tenant on that plan is gated,
- * straight out of Admin -> Plans.
+ * straight out of Admin → Plans.
  */
-export const DEMO_PLANS = ['STARTER', 'PRO', 'ENTERPRISE'] as const;
+export const DEMO_PLANS = ["STARTER", "PRO", "ENTERPRISE"] as const;
 export type DemoPlan = (typeof DEMO_PLANS)[number];
 
 /** Unchanged default: the full product, the way the demo has always opened. */
-export const DEMO_DEFAULT_PLAN: DemoPlan = 'ENTERPRISE';
+export const DEMO_DEFAULT_PLAN: DemoPlan = "ENTERPRISE";
 
 /** Anything unrecognised falls back to the default rather than 403-ing a visitor. */
 export function normalizeDemoPlan(plan: unknown): DemoPlan {
-  const code = String(plan || '').trim().toUpperCase();
-  // /pricing and the signup flow both call the middle plan 'PROFESSIONAL'.
-  const canonical = code === 'PROFESSIONAL' ? 'PRO' : code;
+  const code = String(plan || "").trim().toUpperCase();
+  // /pricing and the signup flow both call the middle plan "PROFESSIONAL".
+  const canonical = code === "PROFESSIONAL" ? "PRO" : code;
   return (DEMO_PLANS as readonly string[]).includes(canonical)
     ? (canonical as DemoPlan)
     : DEMO_DEFAULT_PLAN;
 }
 
 export function isDemoPlan(plan: unknown): boolean {
-  const code = String(plan || '').trim().toUpperCase();
-  return code === 'PROFESSIONAL' || (DEMO_PLANS as readonly string[]).includes(code);
+  const code = String(plan || "").trim().toUpperCase();
+  return code === "PROFESSIONAL" || (DEMO_PLANS as readonly string[]).includes(code);
 }
 
 export { DEMO_BUSINESS_TYPES, isDemoBusinessType };
@@ -145,10 +145,14 @@ async function nextDemoCompanyNo(): Promise<number> {
 async function claimIdleSandbox(
   businessType: DemoBusinessType,
   expiresAt: Date,
+  plan: DemoPlan,
 ): Promise<string | null> {
   try {
+    // The shelf is seeded on ENTERPRISE, so the plan the visitor picked has to
+    // be stamped on as part of the same claim — a follow-up UPDATE would leave
+    // a window where the sandbox is live on the wrong plan.
     const rows = await prisma.$queryRaw<{ id: string }[]>`
-      UPDATE "Company" SET "demoExpiresAt" = ${expiresAt}
+      UPDATE "Company" SET "demoExpiresAt" = ${expiresAt}, "plan" = ${plan}
       WHERE id = (
         SELECT id FROM "Company"
         WHERE "isDemo" = true
@@ -226,6 +230,8 @@ export interface DemoSandbox {
   companyId: string;
   userId: string;
   businessType: DemoBusinessType;
+  /** Plan the sandbox company runs on — what gates its pages and modules. */
+  plan: DemoPlan;
   companyName: string;
   token: string;
   expiresAt: Date;
@@ -239,15 +245,16 @@ export interface DemoSandbox {
  */
 export async function createDemoSandbox(
   businessType: DemoBusinessType,
-  opts: { minutes?: number } = {},
+  opts: { minutes?: number; plan?: string } = {},
 ): Promise<DemoSandbox> {
   const profile = getDemoProfile(businessType);
   const user = await getOrCreateDemoUser();
   const minutes = Math.max(5, Math.min(opts.minutes ?? DEMO_SESSION_MINUTES, 240));
   const expiresAt = new Date(Date.now() + minutes * 60_000);
+  const plan = normalizeDemoPlan(opts.plan ?? DEMO_DEFAULT_PLAN);
 
   // Warm sandbox available? Hand it over as-is — it is already seeded.
-  const claimedId = await claimIdleSandbox(businessType, expiresAt);
+  const claimedId = await claimIdleSandbox(businessType, expiresAt, plan);
   if (claimedId) {
     const token = signJwt({
       userId: user.id,
@@ -266,6 +273,7 @@ export async function createDemoSandbox(
       companyId: claimedId,
       userId: user.id,
       businessType,
+      plan,
       companyName: profile.companyName,
       token,
       expiresAt,
@@ -281,8 +289,9 @@ export async function createDemoSandbox(
       baseCurrency: "PKR",
       businessType,
       businessSetupDone: true,
-      // Everything unlocked so the visitor can walk the whole product.
-      plan: "ENTERPRISE",
+      // The plan the visitor picked on /demo. Defaults to ENTERPRISE — the
+      // whole product — so a caller that does not care keeps the old behaviour.
+      plan,
       subscriptionStatus: "ACTIVE",
       isDemo: true,
       demoExpiresAt: expiresAt,
@@ -320,6 +329,7 @@ export async function createDemoSandbox(
       companyId: company.id,
       userId: user.id,
       businessType,
+      plan,
       companyName: profile.companyName,
       token,
       expiresAt,

@@ -7,6 +7,7 @@ import {
   isDemoBusinessType,
   isDemoCredential,
   isDemoPassword,
+  normalizeDemoPlan,
 } from "@/lib/demoSandbox";
 import { DEMO_BUSINESS_TYPES } from "@/lib/demoSeed";
 import { rateLimitAsync } from "@/lib/rateLimit";
@@ -21,8 +22,18 @@ export const maxDuration = 60;
  * for the chosen business, so concurrent visitors never share data. Credentials
  * are optional here — the demo page starts sessions directly — but when they
  * are supplied they must be the published demo pair.
+ *
+ * `plan` is the plan the visitor picked on /demo. It lands on Company.plan, so
+ * the sandbox is gated by whatever Admin → Plans grants that plan — the point
+ * being that a visitor can walk Starter, Pro and Enterprise for real instead of
+ * always being dropped into the full product.
  */
-async function start(req: NextRequest, businessType: string | null, creds: { email?: string; password?: string }) {
+async function start(
+  req: NextRequest,
+  businessType: string | null,
+  plan: string | null,
+  creds: { email?: string; password?: string },
+) {
   const ip = req.headers.get("x-forwarded-for") || "unknown";
   const rl = await rateLimitAsync(`demo-start:${ip}`, 5, 60_000);
   if (!rl.allowed) {
@@ -55,7 +66,7 @@ async function start(req: NextRequest, businessType: string | null, creds: { ema
 
   let sandbox;
   try {
-    sandbox = await createDemoSandbox(businessType);
+    sandbox = await createDemoSandbox(businessType, { plan: normalizeDemoPlan(plan) });
   } catch (e) {
     console.error("DEMO SANDBOX ERROR:", e);
     return NextResponse.json({ message: "Could not prepare the demo. Please try again." }, { status: 500 });
@@ -76,7 +87,9 @@ async function start(req: NextRequest, businessType: string | null, creds: { ema
       id: sandbox.companyId,
       name: sandbox.companyName,
       businessType: sandbox.businessType,
+      plan: sandbox.plan,
     },
+    plan: sandbox.plan,
     sessionEndsAt: endsAt,
     minutes: DEMO_SESSION_MINUTES,
   });
@@ -92,7 +105,7 @@ async function start(req: NextRequest, businessType: string | null, creds: { ema
   // Read by DemoSessionTimer to show the countdown and drive the wipe on exit.
   res.cookies.set(
     "finova_demo",
-    JSON.stringify({ companyId: sandbox.companyId, endsAt }),
+    JSON.stringify({ companyId: sandbox.companyId, endsAt, plan: sandbox.plan }),
     { ...cookieOpts, httpOnly: false },
   );
 
@@ -104,9 +117,17 @@ export async function POST(req: NextRequest) {
   const businessType =
     (typeof body?.businessType === "string" ? body.businessType : null) ||
     req.nextUrl.searchParams.get("businessType");
-  return start(req, businessType, { email: body?.email, password: body?.password });
+  const plan =
+    (typeof body?.plan === "string" ? body.plan : null) ||
+    req.nextUrl.searchParams.get("plan");
+  return start(req, businessType, plan, { email: body?.email, password: body?.password });
 }
 
 export async function GET(req: NextRequest) {
-  return start(req, req.nextUrl.searchParams.get("businessType"), {});
+  return start(
+    req,
+    req.nextUrl.searchParams.get("businessType"),
+    req.nextUrl.searchParams.get("plan"),
+    {},
+  );
 }
