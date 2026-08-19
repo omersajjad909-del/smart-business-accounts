@@ -130,7 +130,7 @@ export default function NotificationsPage() {
       const h = getHeaders();
       const res = await fetch("/api/notifications/test", { method: "POST", headers: h, body: JSON.stringify({ channel: ch, phone: testDest }) });
       const d = await res.json();
-      setTestResult({ ok: !!d.success, msg: d.success ? `Test ${ch} message sent successfully!` : (d.error || "Failed to send") + (d.companyId ? ` [cid:${d.companyId}]` : "") });
+      setTestResult({ ok: !!d.success, msg: d.success ? `Test ${ch} message sent successfully!` : (d.error || "Failed to send") + (d.companyNo != null ? ` [company #${d.companyNo}]` : "") });
     } catch {
       setTestResult({ ok: false, msg: "Network error" });
     } finally {

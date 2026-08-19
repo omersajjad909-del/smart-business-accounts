@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/adminAuth";
-import { getCompanyNoMap, resolveCompanyId } from "@/lib/companyRefServer";
+import { getCompanyNoMap, resolveCompanyRef } from "@/lib/companyRefServer";
 
 export const runtime = "nodejs";
 
@@ -18,7 +18,7 @@ export async function GET(req: NextRequest) {
     // Accepts a companyNo ("100004") as well as a UUID, since companyNo is now
     // the only company identifier the admin UI shows.
     const companyRefParam = searchParams.get("companyId") || null;
-    const companyId = companyRefParam ? await resolveCompanyId(companyRefParam) : null;
+    const companyId = companyRefParam ? await resolveCompanyRef(companyRefParam) : null;
 
     const where: any = {};
     if (action)     where.action     = { contains: action, mode: "insensitive" };

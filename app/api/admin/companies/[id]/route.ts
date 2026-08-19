@@ -3,7 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { requireAdmin, logAdminAction } from "@/lib/adminAuth";
 import { getCompanyExtraSeats, getEffectiveUserLimitForCompany } from "@/lib/companySeatLimit";
 import { getStoredPhoneForUser } from "@/lib/verification";
-import { resolveCompanyId } from "@/lib/companyRefServer";
+import { resolveCompanyRef } from "@/lib/companyRefServer";
 
 export async function GET(
   req: NextRequest,
@@ -16,7 +16,7 @@ export async function GET(
     // The route param is a companyNo ("100004") on every link the admin UI
     // renders now; a raw UUID still resolves so old bookmarks keep working.
     const { id: ref } = await params;
-    const id = await resolveCompanyId(ref);
+    const id = await resolveCompanyRef(ref);
     if (!id) {
       return NextResponse.json({ error: "Not found" }, { status: 404 });
     }
@@ -128,7 +128,7 @@ export async function PATCH(
     if (admin instanceof NextResponse) return admin;
 
     const { id: ref } = await params;
-    const id = await resolveCompanyId(ref);
+    const id = await resolveCompanyRef(ref);
     if (!id) {
       return NextResponse.json({ error: "Not found" }, { status: 404 });
     }

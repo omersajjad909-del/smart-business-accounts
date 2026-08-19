@@ -9,13 +9,17 @@ import { isCompanyNoRef } from "@/lib/companyRef";
 /**
  * Turn a URL/param ref into the real `Company.id`.
  *
+ * Named `resolveCompanyRef`, not `resolveCompanyId`, because `lib/tenant.ts`
+ * already owns that name for a different job — deriving the caller's own
+ * company from a request. This one converts an identifier the UI handed us.
+ *
  * Accepts either form on purpose: new links carry the companyNo, but UUID
  * links already live in bookmarks, emails and old audit rows, so they keep
  * resolving. Returns null only when a numeric ref matches no company — a
  * UUID-shaped ref is handed back untouched and left for the caller's own
  * lookup to 404 on.
  */
-export async function resolveCompanyId(ref: string): Promise<string | null> {
+export async function resolveCompanyRef(ref: string): Promise<string | null> {
   const trimmed = String(ref || "").trim();
   if (!trimmed) return null;
   if (!isCompanyNoRef(trimmed)) return trimmed;

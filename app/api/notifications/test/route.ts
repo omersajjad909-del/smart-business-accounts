@@ -3,6 +3,7 @@ import { sendWhatsApp } from "@/lib/whatsapp";
 import { sendSms } from "@/lib/sms";
 import { sendEmail } from "@/lib/email";
 import { resolveCompanyId } from "@/lib/tenant";
+import { getCompanyNoMap } from "@/lib/companyRefServer";
 
 export async function POST(req: NextRequest) {
   try {
@@ -12,7 +13,17 @@ export async function POST(req: NextRequest) {
 
     if (channel === "whatsapp") {
       const result = await sendWhatsApp(companyId || "", { to: phone, type: "text", text: testMsg });
-      return NextResponse.json({ success: result.success, error: result.success ? null : result.error, companyId });
+      // The failure hint the page appends is a company identifier the user may
+      // quote back to support, so it has to be the same "#100004" they see
+      // everywhere else — never the UUID.
+      const companyNo = companyId
+        ? (await getCompanyNoMap([companyId])).get(companyId) ?? null
+        : null;
+      return NextResponse.json({
+        success: result.success,
+        error: result.success ? null : result.error,
+        companyNo,
+      });
     }
 
     if (channel === "sms") {
