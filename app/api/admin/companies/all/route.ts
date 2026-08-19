@@ -38,6 +38,7 @@ export async function GET(req: NextRequest) {
     // gateway's id arrived on the activating webhook, so the UI needs the
     // provider to label it honestly — see billingCustomerIdLabel.
     const subs = await prisma.subscription.findMany({
+      where: { companyId: { in: companies.map((c) => c.id) } },
       select: { companyId: true, provider: true },
     });
     const providerMap = new Map(subs.map((sub) => [sub.companyId, sub.provider]));

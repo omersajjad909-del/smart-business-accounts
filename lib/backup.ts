@@ -67,6 +67,20 @@ function delegate(client: any, model: string) {
 }
 
 /**
+ * The company token inside a backup filename.
+ *
+ * companyNo whenever the company still exists; a UUID slice only as a fallback
+ * for a snapshot whose company row is already gone, so the file stays
+ * traceable instead of losing its owner entirely.
+ */
+export async function backupFileNameRef(companyId: string): Promise<string> {
+  const company = await prisma.company
+    .findUnique({ where: { id: companyId }, select: { companyNo: true } })
+    .catch(() => null);
+  return company?.companyNo != null ? String(company.companyNo) : companyId.slice(0, 8);
+}
+
+/**
  * Snapshot one company's data into a SystemBackup row.
  *
  * The record is created up-front as PENDING so a crash mid-collection still
@@ -81,20 +95,6 @@ function delegate(client: any, model: string) {
  * is returned. Pressing "Run Backup Now" three times therefore leaves one
  * snapshot per company, not three copies of the same megabyte.
  */
-/**
- * The company token inside a backup filename.
- *
- * companyNo whenever the company still exists; a UUID slice only as a fallback
- * for a snapshot whose company row is already gone, so the file stays
- * traceable instead of losing its owner entirely.
- */
-export async function backupFileNameRef(companyId: string): Promise<string> {
-  const company = await prisma.company
-    .findUnique({ where: { id: companyId }, select: { companyNo: true } })
-    .catch(() => null);
-  return company?.companyNo != null ? String(company.companyNo) : companyId.slice(0, 8);
-}
-
 export async function createCompanyBackup(
   companyId: string,
   opts: { backupType?: string; createdBy?: string | null; keepLast?: number } = {}
