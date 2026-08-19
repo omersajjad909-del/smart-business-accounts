@@ -178,7 +178,7 @@ function ChangePlanModal({ company, onClose, onSaved }: {
               style={{ ...selectStyle, resize: "none", height: "auto" }} />
           </div>
           <div style={{ padding: "10px 14px", borderRadius: 10, background: "rgba(251,191,36,.06)", border: "1px solid rgba(251,191,36,.2)", fontSize: 12, color: "#fbbf24", lineHeight: 1.6 }}>
-            ⚠️ This changes the plan immediately in the database. Stripe billing is not affected — handle billing separately.
+            ⚠️ This changes the plan immediately in the database. Gateway billing is not affected — handle billing separately.
           </div>
           <div style={{ display: "flex", gap: 10 }}>
             <button onClick={onClose} style={{ flex: 1, padding: "11px", borderRadius: 12, background: "rgba(255,255,255,.06)", border: "1px solid rgba(255,255,255,.1)", color: "#94a3b8", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>Cancel</button>

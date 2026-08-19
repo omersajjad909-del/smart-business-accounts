@@ -275,7 +275,7 @@ export default function CompanyDetailPage({ params }: { params: Promise<{ id: st
                 </select>
               </div>
               <div style={{ padding: "10px 14px", borderRadius: 10, background: "rgba(251,191,36,.06)", border: "1px solid rgba(251,191,36,.2)", fontSize: 11, color: "#fbbf24", lineHeight: 1.5 }}>
-                ⚠️ Changes plan in DB immediately. Stripe billing not affected.
+                ⚠️ Changes plan in DB immediately. Gateway billing not affected.
               </div>
               <button onClick={handleSave} disabled={saving} style={{ padding: "11px", borderRadius: 12, border: "none", cursor: saving ? "wait" : "pointer", background: saving ? "#4338ca" : "linear-gradient(135deg,#4f46e5,#7c3aed)", color: "white", fontSize: 13, fontWeight: 700, opacity: saving ? 0.7 : 1 }}>
                 {saving ? "Saving…" : "Save Changes"}
