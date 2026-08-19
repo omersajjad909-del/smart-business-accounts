@@ -3,7 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { requireAdmin, logAdminAction } from "@/lib/adminAuth";
 import { getCompanyExtraSeats, getEffectiveUserLimitForCompany } from "@/lib/companySeatLimit";
 import { getStoredPhoneForUser } from "@/lib/verification";
-import { resolveCompanyId } from "@/lib/companyRef";
+import { resolveCompanyId } from "@/lib/companyRefServer";
 
 export async function GET(
   req: NextRequest,

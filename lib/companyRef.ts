@@ -1,7 +1,7 @@
-import { prisma } from "@/lib/prisma";
-
 /**
- * One company identifier for every screen.
+ * One company identifier for every screen. Client-safe — no prisma here, so
+ * "use client" pages can import it. The DB-backed resolvers live in
+ * `lib/companyRefServer.ts`.
  *
  * A company carries two identifiers: `Company.id` — a UUID primary key that
  * the foreign keys of ~100 tables point at — and `Company.companyNo`, a short
@@ -20,31 +20,7 @@ import { prisma } from "@/lib/prisma";
 
 /** A ref is a companyNo when it is all digits — UUIDs always carry hyphens. */
 export function isCompanyNoRef(ref: string): boolean {
-  return /^\d+$/.test(ref.trim());
-}
-
-/**
- * Turn a URL/param ref into the real `Company.id`.
- *
- * Accepts either form on purpose: new links carry the companyNo, but UUID
- * links already live in bookmarks, emails and old audit rows, so they keep
- * resolving. Returns null only when a numeric ref matches no company — a
- * UUID-shaped ref is handed back untouched and left for the caller's own
- * lookup to 404 on.
- */
-export async function resolveCompanyId(ref: string): Promise<string | null> {
-  const trimmed = String(ref || "").trim();
-  if (!trimmed) return null;
-  if (!isCompanyNoRef(trimmed)) return trimmed;
-
-  const companyNo = Number(trimmed);
-  if (!Number.isSafeInteger(companyNo)) return null;
-
-  const company = await prisma.company.findUnique({
-    where: { companyNo },
-    select: { id: true },
-  });
-  return company?.id ?? null;
+  return /^\d+$/.test(String(ref || "").trim());
 }
 
 /** The ref to put in a link: `/admin/companies/100004`. */
@@ -68,24 +44,21 @@ export function formatCompanyNo(
 }
 
 /**
- * companyId → companyNo for a batch of rows.
+ * What to call the provider customer ID on screen.
  *
- * Rows in other tables (backups, logs, audit entries, payment requests) store
- * the company UUID, so any list built from them needs this to render `#100004`
- * instead of leaking the UUID. Missing companies are simply absent from the
- * map — callers fall back through `formatCompanyNo`.
+ * The DB column is named `stripeCustomerId` for historical reasons, but it
+ * holds whichever gateway's customer id arrived on the webhook that activated
+ * the subscription — a LemonSqueezy `customer_id` is a plain integer
+ * ("9629773"), a Stripe one is "cus_…". Labelling all of them "Stripe" made a
+ * LemonSqueezy id look like corrupt Stripe data, so the label follows the
+ * provider actually on file.
  */
-export async function getCompanyNoMap(
-  companyIds: (string | null | undefined)[]
-): Promise<Map<string, number>> {
-  const ids = Array.from(
-    new Set(companyIds.filter((id): id is string => typeof id === "string" && id.length > 0))
-  );
-  if (!ids.length) return new Map();
-
-  const companies = await prisma.company.findMany({
-    where: { id: { in: ids } },
-    select: { id: true, companyNo: true },
-  });
-  return new Map(companies.map((c) => [c.id, c.companyNo]));
+export function billingCustomerIdLabel(provider?: string | null): string {
+  switch (String(provider || "").toUpperCase()) {
+    case "LEMONSQUEEZY": return "LemonSqueezy Customer ID";
+    case "STRIPE":       return "Stripe Customer ID";
+    case "SAFEPAY":      return "Safepay Customer ID";
+    case "SWITCHNOW":    return "SwitchNow Customer ID";
+    default:             return "Billing Customer ID";
+  }
 }

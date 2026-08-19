@@ -528,7 +528,7 @@ export default function Hero() {
                  same page that reads "06 Focused Businesses now", and there is
                  no signed uptime SLA to guarantee. Both replaced with figures
                  the product backs: 6 live industries, 67 shipped features. */
-              { n:"6",           l:"Business Types", desc:"retail, trading, distribution, trade, manufacturing, travel", color:"#818cf8" },
+              { n:"7",           l:"Business Types", desc:"retail, trading, distribution, import/export, manufacturing", color:"#818cf8" },
               { n:"60+",         l:"Features",       desc:"accounts, stock, HR, CRM & more",                             color:"#34d399" },
               { n:"Early Access",l:"Now Live",    desc:"limited spots available",        color:"#fbbf24" },
               { n:"< 2 min",    l:"Setup time",   desc:"from signup to first invoice",   color:"#60a5fa" },
@@ -536,7 +536,7 @@ export default function Hero() {
               <div key={s.l} className="stat-pill" style={{
                 padding:"20px 28px", cursor:"default",
                 borderRight: i < 3 ? "1px solid rgba(255,255,255,.05)" : "none",
-              }}>
+              }}> 
                 <div style={{ fontSize:28, fontWeight:900, color:s.color, letterSpacing:"-1px", marginBottom:4 }}>{s.n}</div>
                 <div style={{ fontSize:13, fontWeight:700, color:"rgba(255,255,255,.7)", marginBottom:2 }}>{s.l}</div>
                 <div style={{ fontSize:11, color:"rgba(255,255,255,.28)", fontWeight:500 }}>{s.desc}</div>
