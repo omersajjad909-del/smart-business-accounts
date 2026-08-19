@@ -4,6 +4,12 @@
 // Where costing formulas are written. Categories on top, formulas inside them,
 // and an editor that shows every step's value as you type — a formula you
 // cannot see running is a formula you cannot debug.
+//
+// The editor is laid out as four numbered stages (describe → inputs → steps →
+// outputs) with a labelled header above every grid, because an unlabelled row
+// of four identical boxes is the fastest way to get a formula wrong. The two
+// things that used to break a formula silently — a scalar input flipped to a
+// list, and a list left empty — now name themselves at the top of the page.
 
 import { useMemo, useState } from "react";
 import Link from "next/link";
@@ -46,6 +52,36 @@ const btn = (kind: "primary" | "ghost" | "danger" = "ghost"): React.CSSPropertie
   color: kind === "danger" ? "#f87171" : kind === "primary" ? "white" : "rgba(255,255,255,.7)",
   ...(kind === "primary" ? { border: "none" } : {}),
 });
+const iconBtn: React.CSSProperties = { ...btn(), padding: "8px 10px", fontSize: 12 };
+
+/* Grid shapes live in CSS, not inline styles, so the column headers and the
+   rows below them stay locked together and the whole editor can stack on a
+   narrow screen. */
+const CSS = `
+.fxWrap{max-width:1240px;margin:0 auto;padding:0 18px 90px}
+.fxBar{position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:10px;
+  padding:14px 0;margin-bottom:14px;background:rgba(8,11,20,.88);
+  backdrop-filter:blur(14px);border-bottom:1px solid ${BORDER};flex-wrap:wrap}
+.fxBar .grow{flex:1;min-width:180px}
+.fxCols{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:20px;align-items:start}
+.fxSide{display:flex;flex-direction:column;gap:14px;position:sticky;top:82px}
+.fxIn{display:grid;grid-template-columns:1.05fr 1.3fr .6fr .95fr 1.05fr auto auto;gap:8px;align-items:center}
+.fxOut{display:grid;grid-template-columns:1.05fr 1.3fr .6fr 1.1fr auto auto;gap:8px;align-items:center}
+.fxStep{display:grid;grid-template-columns:1.05fr 1.3fr .6fr auto;gap:8px;align-items:center}
+.fxHead{font-size:9.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
+  color:rgba(255,255,255,.32);padding:0 2px 3px}
+@media(max-width:1080px){
+  .fxCols{grid-template-columns:1fr}
+  .fxSide{position:static}
+}
+/* Under 768px the dashboard's own topbar is sticky against the window, so the
+   action bar parks below it instead of covering it. */
+@media(max-width:767px){
+  .fxIn,.fxOut,.fxStep{grid-template-columns:1fr 1fr}
+  .fxHeadRow{display:none}
+  .fxBar{top:52px;z-index:9}
+}
+`;
 
 const ROLE_LABELS: Record<OutputRole, string> = {
   none: "—",
@@ -95,6 +131,8 @@ export default function FormulasPage() {
   const [editing, setEditing] = useState<{ id: string | null; draft: Draft } | null>(null);
   const [saving, setSaving] = useState(false);
   const [err, setErr] = useState("");
+  // Which formula box was used last — a key chip types itself in there.
+  const [activeStep, setActiveStep] = useState<number | null>(null);
 
   const formulas = useMemo(
     () => store.records.map((r) => ({ record: r, draft: toDraft(r) })),
@@ -125,6 +163,8 @@ export default function FormulasPage() {
     });
   }
 
+  function close() { setEditing(null); setErr(""); setActiveStep(null); }
+
   async function save() {
     if (!editing) return;
     const d = editing.draft;
@@ -139,6 +179,14 @@ export default function FormulasPage() {
     const keys = [...d.inputs, ...d.steps].map((r) => r.key);
     const dupe = keys.find((k, i) => keys.indexOf(k) !== i);
     if (dupe) { setErr(`"${dupe}" is used twice — every input and step needs its own key.`); return; }
+
+    // A list input with nothing in it evaluates to [] and takes every step that
+    // reads it down with it, so it is caught here rather than at run time.
+    const emptyList = d.inputs.find((i) => i.isList && !(i.listValue ?? []).length);
+    if (emptyList) {
+      setErr(`"${emptyList.label || emptyList.key}" is set to List but has no values — type them like 48, 50, 52, or set it back to Number.`);
+      return;
+    }
 
     for (const step of d.steps) {
       const syntax = checkExpression(step.expression);
@@ -162,7 +210,7 @@ export default function FormulasPage() {
       };
       if (editing.id) await store.update(editing.id, payload);
       else await store.create(payload);
-      setEditing(null);
+      close();
     } catch (e) {
       setErr(e instanceof Error ? e.message : "Could not save the formula.");
     } finally {
@@ -176,108 +224,191 @@ export default function FormulasPage() {
     const stepValues = new Map<string, StepResult>(
       preview?.steps.map((s): [string, StepResult] => [s.key, s]) ?? [],
     );
+    const emptyLists = d.inputs.filter((i) => i.isList && !(i.listValue ?? []).length);
+
+    // Appends a key to whichever formula box was last used, so an author never
+    // has to remember or retype a key.
+    const insertKey = (k: string) => {
+      if (activeStep === null) return;
+      patch((x) => {
+        const st = x.steps[activeStep];
+        if (!st) return;
+        st.expression = st.expression.trim() ? `${st.expression.trimEnd()} ${k}` : k;
+      });
+    };
 
     return (
-      <div style={{ fontFamily: FONT, color: "white", padding: "24px 20px 80px", maxWidth: 1180, margin: "0 auto" }}>
-        <button onClick={() => { setEditing(null); setErr(""); }} style={{ ...btn(), marginBottom: 20 }}>
-          ← Back to formulas
-        </button>
+      <div className="fxWrap" style={{ fontFamily: FONT, color: "white" }}>
+        <style>{CSS}</style>
 
-        <div style={{ display: "grid", gridTemplateColumns: "minmax(0,1.55fr) minmax(0,1fr)", gap: 22, alignItems: "start" }}>
+        {/* ── Action bar: name, category and Save always in reach ── */}
+        <div className="fxBar">
+          <button onClick={close} style={iconBtn} title="Back to formulas">←</button>
+          <input
+            value={d.name}
+            onChange={(e) => patch((x) => { x.name = e.target.value; })}
+            placeholder="Name this formula — e.g. PVC Bag — Simple"
+            className="grow"
+            style={{ ...input, fontSize: 15, fontWeight: 700, padding: "10px 13px" }}
+          />
+          <select value={d.category} onChange={(e) => patch((x) => { x.category = e.target.value; })}
+            style={{ ...input, width: "auto", minWidth: 150 }}>
+            {FORMULA_CATEGORIES.map((c) => <option key={c} value={c}>{c}</option>)}
+          </select>
+          <button onClick={close} style={btn()}>Cancel</button>
+          <button onClick={save} disabled={saving} style={{ ...btn("primary"), opacity: saving ? .6 : 1 }}>
+            {saving ? "Saving…" : editing.id ? "Save new version" : "Create formula"}
+          </button>
+        </div>
+
+        {err && <Banner tone="error" text={err} />}
+        {!err && emptyLists.map((i) => (
+          <Banner
+            key={i.key}
+            tone="warn"
+            text={`"${i.label || i.key}" is set to List but has no values yet. Type the sizes like 48, 50, 52 — or set its Type back to Number.`}
+          />
+        ))}
+
+        <div className="fxCols">
           {/* ── Left: definition ── */}
-          <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
-            <div style={{ background: CARD, border: `1px solid ${BORDER}`, borderRadius: 14, padding: 18 }}>
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 200px", gap: 12, marginBottom: 12 }}>
-                <div>
-                  <label style={label}>Formula name</label>
-                  <input value={d.name} onChange={(e) => patch((x) => { x.name = e.target.value; })}
-                    placeholder="PVC Bag — Simple" style={input}/>
-                </div>
-                <div>
-                  <label style={label}>Category</label>
-                  <select value={d.category} onChange={(e) => patch((x) => { x.category = e.target.value; })} style={input}>
-                    {FORMULA_CATEGORIES.map((c) => <option key={c} value={c}>{c}</option>)}
-                  </select>
-                </div>
-              </div>
-              <label style={label}>What it is for</label>
+          <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+
+            <Section n={1} title="What it is for" hint="One line an operator can read before running it.">
               <input value={d.description ?? ""} onChange={(e) => patch((x) => { x.description = e.target.value; })}
                 placeholder="Bags cut from a roll — change stock widths to match your supplier" style={input}/>
-            </div>
+            </Section>
 
             {/* Inputs */}
             <Section
+              n={2}
               title="Inputs"
               hint="What the operator types in, or a constant your trade always uses."
               onAdd={() => patch((x) => { x.inputs.push({ key: `input${x.inputs.length + 1}`, label: "", defaultValue: 0, askOnRun: true }); })}
+              head={
+                <div className="fxIn fxHeadRow">
+                  <div className="fxHead">Key (used in steps)</div>
+                  <div className="fxHead">Shown as</div>
+                  <div className="fxHead">Unit</div>
+                  <div className="fxHead">Type</div>
+                  <div className="fxHead">Value</div>
+                  <div className="fxHead">Ask</div>
+                  <div />
+                </div>
+              }
             >
-              {d.inputs.map((inp, i) => (
-                <div key={i} style={{ display: "grid", gridTemplateColumns: "1.1fr 1.3fr .7fr 1fr auto", gap: 8, alignItems: "center" }}>
-                  <input value={inp.key} onChange={(e) => patch((x) => { x.inputs[i].key = e.target.value; })}
-                    placeholder="key" style={monoInput}/>
-                  <input value={inp.label} onChange={(e) => patch((x) => { x.inputs[i].label = e.target.value; })}
-                    placeholder="Label" style={input}/>
-                  <input value={inp.unit ?? ""} onChange={(e) => patch((x) => { x.inputs[i].unit = e.target.value; })}
-                    placeholder="unit" style={input}/>
-                  {inp.isList ? (
-                    <input value={(inp.listValue ?? []).join(", ")}
+              {d.inputs.map((inp, i) => {
+                const badList = !!inp.isList && !(inp.listValue ?? []).length;
+                return (
+                  <div className="fxIn" key={i}>
+                    <input value={inp.key} onChange={(e) => patch((x) => { x.inputs[i].key = e.target.value; })}
+                      placeholder="pieceWidth" style={monoInput}/>
+                    <input value={inp.label} onChange={(e) => patch((x) => { x.inputs[i].label = e.target.value; })}
+                      placeholder="Piece width" style={input}/>
+                    <input value={inp.unit ?? ""} onChange={(e) => patch((x) => { x.inputs[i].unit = e.target.value; })}
+                      placeholder="in" style={input}/>
+                    {/* Was a bare "[ ]" toggle. A named choice, because getting
+                        this wrong hands a list to a step that wants a number. */}
+                    <select
+                      value={inp.isList ? "list" : "number"}
                       onChange={(e) => patch((x) => {
-                        x.inputs[i].listValue = e.target.value.split(",").map((n) => Number(n.trim())).filter((n) => Number.isFinite(n));
+                        const isList = e.target.value === "list";
+                        x.inputs[i].isList = isList;
+                        if (isList && !x.inputs[i].listValue) x.inputs[i].listValue = [];
                       })}
-                      placeholder="48, 50, 52" style={monoInput}/>
-                  ) : (
-                    <input type="number" step="any" value={inp.defaultValue ?? 0}
-                      onChange={(e) => patch((x) => { x.inputs[i].defaultValue = Number(e.target.value); })}
-                      style={monoInput}/>
-                  )}
-                  <div style={{ display: "flex", gap: 4 }}>
-                    <button title="List of sizes" onClick={() => patch((x) => {
-                      x.inputs[i].isList = !x.inputs[i].isList;
-                      if (x.inputs[i].isList && !x.inputs[i].listValue) x.inputs[i].listValue = [];
-                    })} style={{ ...btn(), padding: "7px 9px", fontSize: 11, color: inp.isList ? "#818cf8" : "rgba(255,255,255,.4)" }}>
-                      [ ]
+                      style={{ ...input, color: inp.isList ? "#a5b4fc" : "white" }}
+                      title="Number = one value. List = several stock sizes to choose between."
+                    >
+                      <option value="number">Number</option>
+                      <option value="list">List</option>
+                    </select>
+                    {inp.isList ? (
+                      <input value={(inp.listValue ?? []).join(", ")}
+                        onChange={(e) => patch((x) => {
+                          x.inputs[i].listValue = e.target.value.split(",").map((n) => Number(n.trim())).filter((n) => Number.isFinite(n));
+                        })}
+                        placeholder="48, 50, 52"
+                        style={{ ...monoInput, borderColor: badList ? "rgba(251,191,36,.55)" : BORDER }}/>
+                    ) : (
+                      <input type="number" step="any" value={inp.defaultValue ?? 0}
+                        onChange={(e) => patch((x) => { x.inputs[i].defaultValue = Number(e.target.value); })}
+                        style={monoInput}/>
+                    )}
+                    <button
+                      title={inp.askOnRun
+                        ? "The operator is asked for this on every run"
+                        : "Fixed — sits under Settings when the formula runs"}
+                      onClick={() => patch((x) => { x.inputs[i].askOnRun = !x.inputs[i].askOnRun; })}
+                      style={{ ...iconBtn, padding: "8px 9px", fontSize: 11,
+                        color: inp.askOnRun ? "#34d399" : "rgba(255,255,255,.35)" }}>
+                      {inp.askOnRun ? "Ask" : "Fixed"}
                     </button>
                     <button title="Remove" onClick={() => patch((x) => { x.inputs.splice(i, 1); })}
-                      style={{ ...btn("danger"), padding: "7px 9px", fontSize: 11 }}>✕</button>
+                      style={{ ...btn("danger"), padding: "8px 10px", fontSize: 12 }}>✕</button>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </Section>
 
             {/* Steps */}
             <Section
+              n={3}
               title="Steps"
               hint="Each step can use the inputs and every step above it. Order matters."
               onAdd={() => patch((x) => { x.steps.push({ key: `step${x.steps.length + 1}`, label: "", expression: "" }); })}
+              head={
+                <div className="fxStep fxHeadRow">
+                  <div className="fxHead">Key</div>
+                  <div className="fxHead">Shown as</div>
+                  <div className="fxHead">Unit</div>
+                  <div />
+                </div>
+              }
             >
               {d.steps.map((st, i) => {
                 const result = stepValues.get(st.key);
                 const stepErr = result?.error;
                 return (
-                  <div key={i} style={{ display: "flex", flexDirection: "column", gap: 5 }}>
-                    <div style={{ display: "grid", gridTemplateColumns: "1.1fr 1.3fr .7fr auto", gap: 8 }}>
+                  <div key={i} style={{
+                    display: "flex", flexDirection: "column", gap: 7,
+                    padding: 11, borderRadius: 11,
+                    background: stepErr ? "rgba(248,113,113,.06)" : "rgba(255,255,255,.02)",
+                    border: `1px solid ${stepErr ? "rgba(248,113,113,.3)" : BORDER}`,
+                  }}>
+                    <div className="fxStep">
                       <input value={st.key} onChange={(e) => patch((x) => { x.steps[i].key = e.target.value; })}
                         placeholder="key" style={monoInput}/>
                       <input value={st.label} onChange={(e) => patch((x) => { x.steps[i].label = e.target.value; })}
-                        placeholder="Label" style={input}/>
+                        placeholder="What this step works out" style={input}/>
                       <input value={st.unit ?? ""} onChange={(e) => patch((x) => { x.steps[i].unit = e.target.value; })}
                         placeholder="unit" style={input}/>
-                      <button onClick={() => patch((x) => { x.steps.splice(i, 1); })}
-                        style={{ ...btn("danger"), padding: "7px 9px", fontSize: 11 }}>✕</button>
+                      <button title="Remove" onClick={() => patch((x) => { x.steps.splice(i, 1); })}
+                        style={{ ...btn("danger"), padding: "8px 10px", fontSize: 12 }}>✕</button>
                     </div>
                     <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-                      <input value={st.expression} onChange={(e) => patch((x) => { x.steps[i].expression = e.target.value; })}
+                      <span style={{
+                        width: 22, height: 22, flexShrink: 0, borderRadius: 7,
+                        background: "rgba(99,102,241,.16)", color: "#a5b4fc",
+                        fontSize: 11, fontWeight: 700, display: "grid", placeItems: "center",
+                      }}>{i + 1}</span>
+                      <span style={{ fontFamily: MONO, color: "rgba(255,255,255,.3)", fontSize: 14 }}>=</span>
+                      <input value={st.expression}
+                        onFocus={() => setActiveStep(i)}
+                        onChange={(e) => patch((x) => { x.steps[i].expression = e.target.value; })}
                         placeholder="materialCost + labour"
                         style={{ ...monoInput, borderColor: stepErr ? "rgba(248,113,113,.5)" : BORDER }}/>
                       <div style={{
-                        minWidth: 110, textAlign: "right", fontFamily: MONO, fontSize: 12.5,
+                        minWidth: 108, textAlign: "right", fontFamily: MONO, fontSize: 12.5,
                         fontVariantNumeric: "tabular-nums",
                         color: stepErr ? "#f87171" : "#34d399", fontWeight: 700,
                       }}>
                         {stepErr ? "error" : fmt(result?.value)}
+                        {!stepErr && st.unit && (
+                          <span style={{ fontSize: 10, color: "rgba(255,255,255,.3)", marginLeft: 4 }}>{st.unit}</span>
+                        )}
                       </div>
                     </div>
-                    {stepErr && <div style={{ fontSize: 11.5, color: "#f87171" }}>{stepErr}</div>}
+                    {stepErr && <div style={{ fontSize: 11.5, color: "#f87171", paddingLeft: 30 }}>{stepErr}</div>}
                   </div>
                 );
               })}
@@ -285,50 +416,56 @@ export default function FormulasPage() {
 
             {/* Outputs */}
             <Section
+              n={4}
               title="Outputs"
               hint="Which values the result screen shows — and what they mean to the rest of the system."
               onAdd={() => patch((x) => { x.outputs.push({ key: "", label: "", role: "none" }); })}
+              head={
+                <div className="fxOut fxHeadRow">
+                  <div className="fxHead">Value</div>
+                  <div className="fxHead">Shown as</div>
+                  <div className="fxHead">Unit</div>
+                  <div className="fxHead">Means</div>
+                  <div className="fxHead">Main</div>
+                  <div />
+                </div>
+              }
             >
               {d.outputs.map((out, i) => (
-                <div key={i} style={{ display: "grid", gridTemplateColumns: "1.1fr 1.2fr 1.1fr auto auto", gap: 8, alignItems: "center" }}>
+                <div className="fxOut" key={i}>
                   <select value={out.key} onChange={(e) => patch((x) => { x.outputs[i].key = e.target.value; })} style={monoInput}>
                     <option value="">— pick —</option>
                     {[...d.inputs, ...d.steps].map((r) => <option key={r.key} value={r.key}>{r.key}</option>)}
                   </select>
                   <input value={out.label} onChange={(e) => patch((x) => { x.outputs[i].label = e.target.value; })}
-                    placeholder="Label" style={input}/>
+                    placeholder="Cost per piece" style={input}/>
+                  <input value={out.unit ?? ""} onChange={(e) => patch((x) => { x.outputs[i].unit = e.target.value; })}
+                    placeholder="Rs" style={input}/>
                   <select value={out.role ?? "none"} onChange={(e) => patch((x) => { x.outputs[i].role = e.target.value as OutputRole; })} style={input}>
                     {(Object.keys(ROLE_LABELS) as OutputRole[]).map((r) => <option key={r} value={r}>{ROLE_LABELS[r]}</option>)}
                   </select>
                   <button title="Show as the headline number" onClick={() => patch((x) => {
                     x.outputs.forEach((o, j) => { o.primary = j === i ? !o.primary : false; });
-                  })} style={{ ...btn(), padding: "7px 10px", fontSize: 11, color: out.primary ? "#fbbf24" : "rgba(255,255,255,.35)" }}>★</button>
-                  <button onClick={() => patch((x) => { x.outputs.splice(i, 1); })}
-                    style={{ ...btn("danger"), padding: "7px 9px", fontSize: 11 }}>✕</button>
+                  })} style={{ ...iconBtn, padding: "8px 11px", color: out.primary ? "#fbbf24" : "rgba(255,255,255,.35)" }}>★</button>
+                  <button title="Remove" onClick={() => patch((x) => { x.outputs.splice(i, 1); })}
+                    style={{ ...btn("danger"), padding: "8px 10px", fontSize: 12 }}>✕</button>
                 </div>
               ))}
             </Section>
-
-            {err && (
-              <div style={{ padding: "11px 14px", borderRadius: 10, background: "rgba(248,113,113,.1)", border: "1px solid rgba(248,113,113,.28)", color: "#f87171", fontSize: 13 }}>
-                {err}
-              </div>
-            )}
-
-            <div style={{ display: "flex", gap: 10 }}>
-              <button onClick={save} disabled={saving} style={{ ...btn("primary"), opacity: saving ? .6 : 1 }}>
-                {saving ? "Saving…" : editing.id ? "Save new version" : "Create formula"}
-              </button>
-              <button onClick={() => { setEditing(null); setErr(""); }} style={btn()}>Cancel</button>
-            </div>
           </div>
 
-          {/* ── Right: live preview + function reference ── */}
-          <div style={{ display: "flex", flexDirection: "column", gap: 16, position: "sticky", top: 16 }}>
+          {/* ── Right: live preview, the keys in scope, function reference ── */}
+          <div className="fxSide">
             <div style={{ background: CARD, border: `1px solid ${BORDER}`, borderRadius: 14, padding: 18 }}>
               <div style={{ ...label, marginBottom: 12 }}>Live result</div>
               {preview?.ok === false && (
-                <div style={{ fontSize: 12, color: "#f87171", marginBottom: 10 }}>{preview.error}</div>
+                <div style={{
+                  fontSize: 12, color: "#f87171", marginBottom: 12, lineHeight: 1.6,
+                  padding: "9px 11px", borderRadius: 9,
+                  background: "rgba(248,113,113,.09)", border: "1px solid rgba(248,113,113,.25)",
+                }}>
+                  {preview.error}
+                </div>
               )}
               <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
                 {d.outputs.filter((o) => o.key).map((o) => (
@@ -355,10 +492,35 @@ export default function FormulasPage() {
               </div>
             </div>
 
+            {/* Every name a step is allowed to mention, with what it holds right
+                now. Clicking one types it into the formula box last used. */}
+            <div style={{ background: CARD, border: `1px solid ${BORDER}`, borderRadius: 14, padding: 18 }}>
+              <div style={{ ...label, marginBottom: 4 }}>Values you can use</div>
+              <div style={{ fontSize: 11.5, color: "rgba(255,255,255,.32)", marginBottom: 12, lineHeight: 1.6 }}>
+                {activeStep === null
+                  ? "Click a step's formula box, then click a name to add it."
+                  : `Click a name to add it to step ${activeStep + 1}.`}
+              </div>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+                {[...d.inputs, ...d.steps].filter((r) => r.key).map((r) => (
+                  <button key={r.key} onClick={() => insertKey(r.key)} title={r.label || r.key}
+                    style={{
+                      ...btn(), padding: "6px 9px", fontSize: 11.5, fontFamily: MONO,
+                      cursor: activeStep === null ? "default" : "pointer",
+                      opacity: activeStep === null ? .5 : 1,
+                      color: "#a5b4fc", display: "flex", gap: 6, alignItems: "baseline",
+                    }}>
+                    {r.key}
+                    <span style={{ color: "rgba(255,255,255,.35)" }}>{fmt(preview?.values[r.key])}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+
             <details style={{ background: CARD, border: `1px solid ${BORDER}`, borderRadius: 14, padding: 18 }}>
               <summary style={{ ...label, marginBottom: 0, cursor: "pointer" }}>Functions you can use</summary>
-              <div style={{ display: "flex", flexDirection: "column", gap: 11, marginTop: 14 }}>
-                {FUNCTIONS.filter((f) => f.name !== "convert" || true).map((f) => (
+              <div style={{ display: "flex", flexDirection: "column", gap: 11, marginTop: 14, maxHeight: 380, overflowY: "auto" }}>
+                {FUNCTIONS.map((f) => (
                   <div key={f.name}>
                     <div style={{ fontFamily: MONO, fontSize: 12, color: "#818cf8" }}>{f.signature}</div>
                     <div style={{ fontSize: 11.5, color: "rgba(255,255,255,.38)", lineHeight: 1.6 }}>{f.description}</div>
@@ -446,6 +608,19 @@ export default function FormulasPage() {
   );
 }
 
+function Banner({ tone, text }: { tone: "error" | "warn"; text: string }) {
+  const c = tone === "error" ? "248,113,113" : "251,191,36";
+  return (
+    <div style={{
+      padding: "11px 14px", borderRadius: 10, marginBottom: 12,
+      background: `rgba(${c},.1)`, border: `1px solid rgba(${c},.28)`,
+      color: `rgb(${c})`, fontSize: 13, lineHeight: 1.6,
+    }}>
+      {text}
+    </div>
+  );
+}
+
 function CategoryBox({ label: text, count, active, onClick }: {
   label: string; count: number; active: boolean; onClick: () => void;
 }) {
@@ -464,18 +639,27 @@ function CategoryBox({ label: text, count, active, onClick }: {
   );
 }
 
-function Section({ title, hint, onAdd, children }: {
-  title: string; hint: string; onAdd: () => void; children: React.ReactNode;
+function Section({ n, title, hint, onAdd, head, children }: {
+  n: number; title: string; hint: string;
+  onAdd?: () => void; head?: React.ReactNode; children: React.ReactNode;
 }) {
   return (
     <div style={{ background: CARD, border: `1px solid ${BORDER}`, borderRadius: 14, padding: 18 }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 12, marginBottom: 14 }}>
-        <div>
-          <div style={{ fontSize: 14, fontWeight: 700 }}>{title}</div>
-          <div style={{ fontSize: 11.5, color: "rgba(255,255,255,.35)", marginTop: 2 }}>{hint}</div>
+        <div style={{ display: "flex", gap: 11, alignItems: "flex-start" }}>
+          <span style={{
+            width: 24, height: 24, flexShrink: 0, borderRadius: 8, marginTop: 1,
+            background: "rgba(99,102,241,.16)", color: "#a5b4fc",
+            fontSize: 12, fontWeight: 700, display: "grid", placeItems: "center",
+          }}>{n}</span>
+          <div>
+            <div style={{ fontSize: 14, fontWeight: 700 }}>{title}</div>
+            <div style={{ fontSize: 11.5, color: "rgba(255,255,255,.35)", marginTop: 2 }}>{hint}</div>
+          </div>
         </div>
-        <button onClick={onAdd} style={{ ...btn(), padding: "7px 12px", fontSize: 12 }}>+ Add</button>
+        {onAdd && <button onClick={onAdd} style={{ ...btn(), padding: "7px 12px", fontSize: 12, whiteSpace: "nowrap" }}>+ Add</button>}
       </div>
+      {head}
       <div style={{ display: "flex", flexDirection: "column", gap: 9 }}>{children}</div>
     </div>
   );
