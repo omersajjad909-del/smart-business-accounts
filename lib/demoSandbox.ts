@@ -37,6 +37,37 @@ export const DEMO_SESSION_MINUTES = 30;
  */
 export const DEMO_MAX_CONCURRENT = 25;
 
+/**
+ * The plans a visitor may run the demo on.
+ *
+ * A sandbox used to be hardcoded to ENTERPRISE, so every visitor saw the whole
+ * product and had no way to find out what the plan they are about to buy
+ * actually unlocks. These are the codes Company.plan already carries, which is
+ * what /api/me/bootstrap resolves pages and permissions from — so picking one
+ * here gates the demo exactly the way a paying tenant on that plan is gated,
+ * straight out of Admin -> Plans.
+ */
+export const DEMO_PLANS = ['STARTER', 'PRO', 'ENTERPRISE'] as const;
+export type DemoPlan = (typeof DEMO_PLANS)[number];
+
+/** Unchanged default: the full product, the way the demo has always opened. */
+export const DEMO_DEFAULT_PLAN: DemoPlan = 'ENTERPRISE';
+
+/** Anything unrecognised falls back to the default rather than 403-ing a visitor. */
+export function normalizeDemoPlan(plan: unknown): DemoPlan {
+  const code = String(plan || '').trim().toUpperCase();
+  // /pricing and the signup flow both call the middle plan 'PROFESSIONAL'.
+  const canonical = code === 'PROFESSIONAL' ? 'PRO' : code;
+  return (DEMO_PLANS as readonly string[]).includes(canonical)
+    ? (canonical as DemoPlan)
+    : DEMO_DEFAULT_PLAN;
+}
+
+export function isDemoPlan(plan: unknown): boolean {
+  const code = String(plan || '').trim().toUpperCase();
+  return code === 'PROFESSIONAL' || (DEMO_PLANS as readonly string[]).includes(code);
+}
+
 export { DEMO_BUSINESS_TYPES, isDemoBusinessType };
 export type { DemoBusinessType };
 
