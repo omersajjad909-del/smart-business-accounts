@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { sendPkPaymentStatusEmail } from "@/lib/email";
 import { recordPlatformInvoice } from "@/lib/platformInvoice";
+import { getCompanyNoMap } from "@/lib/companyRefServer";
 
 export const runtime = "nodejs";
 
@@ -11,7 +12,15 @@ export async function GET() {
       orderBy: { createdAt: "desc" },
       take: 200,
     });
-    return NextResponse.json({ requests });
+    // The row stores the company UUID, but the admin UI only ever shows
+    // companyNo — see lib/companyRef.ts.
+    const companyNos = await getCompanyNoMap(requests.map((r: any) => r.companyId));
+    return NextResponse.json({
+      requests: requests.map((r: any) => ({
+        ...r,
+        companyNo: r.companyId ? companyNos.get(r.companyId) ?? null : null,
+      })),
+    });
   } catch (err) {
     console.error("[admin/pk-payments] GET error:", err);
     return NextResponse.json({ error: "Failed to load requests" }, { status: 500 });

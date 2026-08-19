@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
+import { formatCompanyNo } from "@/lib/companyRef";
 
 type PkRequest = {
   id: string;
@@ -14,6 +15,7 @@ type PkRequest = {
   status: string;
   adminNote: string | null;
   companyId: string | null;
+  companyNo: number | null;
   userId: string | null;
   createdAt: string;
 };
@@ -133,7 +135,7 @@ export default function PkPaymentsPage() {
                         ["TX ID",   req.txId],
                         ["Amount",  `PKR ${req.amountPkr.toLocaleString()}`],
                         ["Plan",    `${req.plan} · ${req.billingCycle}`],
-                        ["Company", req.companyId || "—"],
+                        ["Company", req.companyId ? formatCompanyNo(req.companyNo, req.companyId) : "—"],
                       ].map(([lbl, val]) => (
                         <div key={lbl}>
                           <div style={{ fontSize: 9, color: "rgba(255,255,255,.3)", textTransform: "uppercase", letterSpacing: ".06em", marginBottom: 2 }}>{lbl}</div>
