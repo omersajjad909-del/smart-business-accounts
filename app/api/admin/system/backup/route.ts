@@ -18,7 +18,7 @@ export async function GET(req: NextRequest) {
       isInternalTest: false,
       NOT: { name: { startsWith: "ZZ_" } },
     },
-    select: { id: true, name: true },
+    select: { id: true, name: true, companyNo: true },
   });
 
   const visibleCompanyIds = visibleCompanies.map((c) => c.id);
@@ -44,6 +44,9 @@ export async function GET(req: NextRequest) {
   });
 
   const nameById = new Map(visibleCompanies.map((c) => [c.id, c.name]));
+  // Backup rows store the company UUID; the UI shows only companyNo, so the
+  // short number has to ride along with every row.
+  const companyNoById = new Map(visibleCompanies.map((c) => [c.id, c.companyNo]));
   const seenCompanyIds = new Set<string>();
   const latestBackups = backups.filter((backup) => {
     if (seenCompanyIds.has(backup.companyId)) return false;
@@ -60,8 +63,16 @@ export async function GET(req: NextRequest) {
     .catch(() => null);
 
   return NextResponse.json({
-    backups: latestBackups.map((b) => ({ ...b, companyName: nameById.get(b.companyId) || null })),
-    history: backups.map((b) => ({ ...b, companyName: nameById.get(b.companyId) || null })),
+    backups: latestBackups.map((b) => ({
+      ...b,
+      companyName: nameById.get(b.companyId) || null,
+      companyNo: companyNoById.get(b.companyId) ?? null,
+    })),
+    history: backups.map((b) => ({
+      ...b,
+      companyName: nameById.get(b.companyId) || null,
+      companyNo: companyNoById.get(b.companyId) ?? null,
+    })),
     companyCount: visibleCompanyIds.length,
     totalCount: totals?._count?._all ?? backups.length,
     totalBytes: totals?._sum?.fileSize ?? 0,

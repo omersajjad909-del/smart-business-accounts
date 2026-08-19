@@ -34,6 +34,14 @@ export async function GET(req: NextRequest) {
       },
     });
 
+    // The customer-id column is named stripeCustomerId but holds whichever
+    // gateway's id arrived on the activating webhook, so the UI needs the
+    // provider to label it honestly — see billingCustomerIdLabel.
+    const subs = await prisma.subscription.findMany({
+      select: { companyId: true, provider: true },
+    });
+    const providerMap = new Map(subs.map((sub) => [sub.companyId, sub.provider]));
+
     // So the UI can offer the toggle only when there is something behind it.
     const testCount = await prisma.company.count({
       where: { isDemo: false, isInternalTest: true },
@@ -120,6 +128,7 @@ export async function GET(req: NextRequest) {
         ownerName: owner?.name || null,
         aiScore,
         aiHealth,
+        billingProvider: providerMap.get(c.id) || null,
         // ownerPassword intentionally omitted — never expose password hashes
       };
     });

@@ -4,12 +4,16 @@ import { useEffect, useState } from "react";
 import { getCurrentUser } from "@/lib/auth";
 import { confirmToast } from "@/lib/toast-feedback";
 import toast from "react-hot-toast";
+import { formatCompanyNo } from "@/lib/companyRef";
 
 type BackupEntry = {
   id: string;
   name: string;
   fileName: string;
+  // companyId is the internal UUID — kept only for the restore call's
+  // confirmCompanyId guard. Never rendered; companyNo is what the admin sees.
   companyId: string;
+  companyNo: number | null;
   companyName: string | null;
   size: string;
   type: "full" | "incremental" | "safety";
@@ -63,6 +67,7 @@ export default function BackupRestorePage() {
             name: b.companyName || "Unknown company",
             fileName: b.fileName,
             companyId: b.companyId,
+            companyNo: b.companyNo ?? null,
             companyName: b.companyName ?? null,
             size: formatBytes(b.fileSize),
             type: backupKind(b.backupType),
@@ -105,7 +110,7 @@ export default function BackupRestorePage() {
     const label = backup.companyName || "this company";
     const ok = await confirmToast(
       `Restore "${backup.fileName}" into ${label}?\n\n` +
-        `Company ID: ${backup.companyId}\n\n` +
+        `Company ID: ${formatCompanyNo(backup.companyNo, backup.companyId)}\n\n` +
         `Everything that company currently holds will be replaced by this snapshot. ` +
         `A safety snapshot of the current data is taken first, and if anything goes ` +
         `wrong the whole restore is rolled back.`,
@@ -280,13 +285,13 @@ export default function BackupRestorePage() {
                     <button
                       type="button"
                       className="bk-cid"
-                      title={`Copy company ID ${backup.companyId}`}
+                      title={`Copy company ID ${formatCompanyNo(backup.companyNo, backup.companyId)}`}
                       onClick={() => {
-                        navigator.clipboard?.writeText(backup.companyId);
+                        navigator.clipboard?.writeText(formatCompanyNo(backup.companyNo, backup.companyId));
                         toast.success("Company ID copied");
                       }}
                     >
-                      {backup.companyId}
+                      {formatCompanyNo(backup.companyNo, backup.companyId)}
                     </button>
                   </td>
                   <td className="bk-file">{backup.fileName}</td>

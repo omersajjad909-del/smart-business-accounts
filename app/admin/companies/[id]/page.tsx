@@ -3,11 +3,12 @@ import { use, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { getCurrentUser } from "@/lib/auth";
 import toast from "react-hot-toast";
+import { formatCompanyNo, billingCustomerIdLabel } from "@/lib/companyRef";
 
 type Company = {
   id: string; companyNo?: number | null; name: string; country: string | null; baseCurrency: string | null;
   plan: string | null; activeModules: string | null; subscriptionStatus: string | null;
-  stripeCustomerId: string | null; currentPeriodEnd: string | null;
+  stripeCustomerId: string | null; billingProvider?: string | null; currentPeriodEnd: string | null;
   createdAt: string; businessType: string | null; businessSetupDone: boolean;
 };
 type User = { id: string; name: string | null; email: string; phone?: string | null; role: string; joinedAt: string };
@@ -182,7 +183,7 @@ export default function CompanyDetailPage({ params }: { params: Promise<{ id: st
           )}
         </div>
         <div style={{ marginTop: 6, fontSize: 12, color: "rgba(255,255,255,.3)" }}>
-          ID: <span style={{ fontFamily: "monospace", color: "rgba(255,255,255,.4)" }}>#{company.companyNo ?? "—"}</span>
+          ID: <span style={{ fontFamily: "monospace", color: "rgba(255,255,255,.4)" }}>{formatCompanyNo(company.companyNo, company.id)}</span>
         </div>
       </div>
 
@@ -214,7 +215,7 @@ export default function CompanyDetailPage({ params }: { params: Promise<{ id: st
               <InfoRow label="Business Type" value={company.businessType?.replace(/_/g, " ")} />
               <InfoRow label="Setup Complete" value={company.businessSetupDone ? "✅ Yes" : "⏳ No"} />
               <InfoRow label="Renewal Date" value={company.currentPeriodEnd ? new Date(company.currentPeriodEnd).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" }) : null} />
-              <InfoRow label="Stripe Customer ID" value={company.stripeCustomerId} mono />
+              <InfoRow label={billingCustomerIdLabel(company.billingProvider)} value={company.stripeCustomerId} mono />
               <InfoRow label="Active Modules" value={company.activeModules || "Default"} />
             </div>
           </div>

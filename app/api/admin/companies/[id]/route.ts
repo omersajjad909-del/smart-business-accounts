@@ -44,6 +44,13 @@ export async function GET(
       return NextResponse.json({ error: "Not found" }, { status: 404 });
     }
 
+    // stripeCustomerId holds whichever gateway's id arrived on the activating
+    // webhook, so ship the provider along and let the UI label it honestly.
+    const sub = await prisma.subscription.findUnique({
+      where: { companyId: id },
+      select: { provider: true },
+    });
+
     // Users with roles for this company — NO password field
     const userCompanies = await prisma.userCompany.findMany({
       where: { companyId: id },
@@ -98,7 +105,7 @@ export async function GET(
     const effectiveUserLimit = await getEffectiveUserLimitForCompany(id, company.plan);
 
     return NextResponse.json({
-      company,
+      company: { ...company, billingProvider: sub?.provider || null },
       users,
       roleCounts,
       lastLogin: lastLogin?.createdAt || null,

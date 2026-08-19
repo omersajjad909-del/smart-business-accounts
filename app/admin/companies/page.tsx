@@ -3,6 +3,7 @@ import { confirmToast, alertToast } from "@/lib/toast-feedback";
 import { useEffect, useState } from "react";
 import { getCurrentUser, setCurrentUser } from "@/lib/auth";
 import { getAppUrl } from "@/lib/domains";
+import { companyRef, formatCompanyNo, billingCustomerIdLabel } from "@/lib/companyRef";
 import toast from "react-hot-toast";
 
 type Row = {
@@ -13,6 +14,7 @@ type Row = {
   plan?: string | null;
   subscriptionStatus?: string | null;
   stripeCustomerId?: string | null;
+  billingProvider?: string | null;
   currentPeriodEnd?: string | null;
   usersCount: number;
   branches: number;
@@ -207,7 +209,7 @@ function DetailRow({ company, onImpersonate }: { company: Row; onImpersonate: (i
     { label: "Owner Name",         value: company.ownerName    || "—", mono: false, key: "name"   },
     { label: "Owner Email",        value: company.ownerEmail   || "—", mono: true,  key: "email"  },
     { label: "Business Type",      value: BIZ_LABELS[company.businessType || ""] || company.businessType || "—", mono: false, key: "biztype" },
-    { label: "Stripe Customer ID", value: company.stripeCustomerId || "—", mono: true, key: "stripe" },
+    { label: billingCustomerIdLabel(company.billingProvider), value: company.stripeCustomerId || "—", mono: true, key: "stripe" },
     { label: "Renewal Date",       value: company.currentPeriodEnd ? new Date(company.currentPeriodEnd).toLocaleDateString(undefined, { day:"numeric", month:"short", year:"numeric" }) : "—", mono: false, key: "renewal" },
     { label: "Last Login",         value: company.lastLogin ? new Date(company.lastLogin).toLocaleString(undefined, { month:"short", day:"numeric", hour:"2-digit", minute:"2-digit" }) : "Never", mono: false, key: "login" },
     { label: "Country",            value: company.country      || "—", mono: false, key: "country" },
@@ -505,7 +507,7 @@ export default function AdminCompaniesPage() {
                     </td>
                     <td style={{ padding: "13px 10px", whiteSpace: "nowrap" }}>
                       <span style={{ fontSize: 12, fontWeight: 800, color: "#38bdf8", fontFamily: "monospace", background: "rgba(56,189,248,.08)", border: "1px solid rgba(56,189,248,.2)", borderRadius: 6, padding: "3px 8px" }}>
-                        #{c.companyNo || "—"}
+                        {formatCompanyNo(c.companyNo, c.id)}
                       </span>
                     </td>
                     <td style={{ padding: "13px 10px" }}>
@@ -534,7 +536,7 @@ export default function AdminCompaniesPage() {
                     </td>
                     <td style={{ padding: "13px 10px", textAlign: "right" }}>
                       <div style={{ display: "flex", gap: 5, justifyContent: "flex-end" }}>
-                        <a href={`/admin/companies/${c.id}`}
+                        <a href={`/admin/companies/${companyRef(c)}`}
                           style={{ padding: "5px 9px", borderRadius: 8, background: "rgba(56,189,248,.1)", border: "1px solid rgba(56,189,248,.2)", color: "#38bdf8", fontSize: 11, fontWeight: 700, textDecoration: "none", display: "inline-flex", alignItems: "center" }}>
                           Details
                         </a>

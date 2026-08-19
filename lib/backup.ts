@@ -81,6 +81,20 @@ function delegate(client: any, model: string) {
  * is returned. Pressing "Run Backup Now" three times therefore leaves one
  * snapshot per company, not three copies of the same megabyte.
  */
+/**
+ * The company token inside a backup filename.
+ *
+ * companyNo whenever the company still exists; a UUID slice only as a fallback
+ * for a snapshot whose company row is already gone, so the file stays
+ * traceable instead of losing its owner entirely.
+ */
+export async function backupFileNameRef(companyId: string): Promise<string> {
+  const company = await prisma.company
+    .findUnique({ where: { id: companyId }, select: { companyNo: true } })
+    .catch(() => null);
+  return company?.companyNo != null ? String(company.companyNo) : companyId.slice(0, 8);
+}
+
 export async function createCompanyBackup(
   companyId: string,
   opts: { backupType?: string; createdBy?: string | null; keepLast?: number } = {}
@@ -89,7 +103,10 @@ export async function createCompanyBackup(
   const createdBy = opts.createdBy ?? null;
   const now = new Date();
   const timestamp = now.toISOString().replace(/[:.]/g, "-");
-  const fileName = `backup-${companyId.slice(0, 8)}-${timestamp}.json`;
+  // The name carries companyNo, not a UUID slice: the filename is read off a
+  // screen next to the company's "#100004" badge, and two truncated UUIDs are
+  // impossible to tell apart when a tenant name is duplicated.
+  const fileName = `backup-${await backupFileNameRef(companyId)}-${timestamp}.json`;
 
   const backup = await prisma.systemBackup.create({
     data: { companyId, fileName, backupType, status: "PENDING", createdBy },
