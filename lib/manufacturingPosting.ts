@@ -43,6 +43,13 @@ export const MFG_ACCOUNTS = {
   FINISHED_GOODS:     { code: "1202", name: "Finished Goods",     type: "Asset" },
   FACTORY_LABOUR:     { code: "5101", name: "Factory Labour",     type: "Expense" },
   FACTORY_OVERHEAD:   { code: "5102", name: "Manufacturing Overhead", type: "Expense" },
+  /**
+   * Part-used units sitting on the shop floor — the 0.34 of a roll left over
+   * when a run needed 12.66 rolls and 13 whole ones had to come off the rack.
+   * It is still the company's material, so it stays an asset instead of being
+   * buried in the cost of the batch that happened to open the roll.
+   */
+  MATERIAL_REMNANTS:  { code: "1203", name: "Material Remnants", type: "Asset" },
 } as const;
 
 export const INVENTORY_TXN_TYPES = {
@@ -68,18 +75,60 @@ export const COST_BEARING_INBOUND_TYPES = [
   "OPENING",
 ] as const;
 
-export type BomLine = { itemId: string; qty: number };
+export type BomLine = {
+  itemId: string;
+  qty: number;
+  /**
+   * Whether a part-used unit of this material survives the run.
+   *
+   * True for anything cut from a continuous piece — rolls, sheets, fabric: a
+   * run that needs 12.66 rolls takes 13 off the rack and the balance of the
+   * thirteenth stays usable, so the next small order does not have to open a
+   * new one. False (the default, and what every BOM did before) for discrete
+   * material like screws, where two thirds of a screw is scrap, not stock.
+   */
+  divisible?: boolean;
+};
 
 export type BomLineCost = BomLine & {
   itemName: string;
   unit: string;
   /** Weighted-average cost per unit, falling back to the item's purchase rate. */
   unitCost: number;
-  /** Quantity actually needed for this run, after scaling. */
+  /** Exact, unrounded quantity the run consumes. */
+  exactQty: number;
+  /** Whole units that must leave stock — what availability is checked against. */
   requiredQty: number;
+  /** Drawn from already-open pieces instead of from stock. */
+  fromRemnantQty: number;
+  fromRemnantCost: number;
+  /** Part of the last whole unit that survives this run as a new open piece. */
+  leftoverQty: number;
+  leftoverCost: number;
   availableQty: number;
+  /** What this line actually charges to the batch — leftover excluded. */
   lineCost: number;
+  /** Where this item's stock is, when the chosen warehouse cannot cover the run. */
+  elsewhere?: { location: string; qty: number }[];
 };
+
+/** One part-used piece of material, held as a BusinessRecord. */
+export type RemnantPiece = {
+  id: string;
+  itemId: string;
+  qty: number;
+  unitCost: number;
+  location: string;
+};
+
+/** BusinessRecord category the open pieces live in. */
+export const MATERIAL_REMNANT_CATEGORY = "material_remnant";
+
+/** Below this a remnant is float dust, not material. */
+const REMNANT_EPSILON = 1e-6;
+
+const round6 = (n: number) => Math.round(n * 1e6) / 1e6;
+const round2 = (n: number) => Math.round(n * 100) / 100;
 
 export class ManufacturingError extends Error {
   status: number;
@@ -105,7 +154,11 @@ export function readBomLines(data: unknown): { lines: BomLine[]; usable: boolean
     const itemId = String((entry as { itemId?: unknown })?.itemId || "").trim();
     const qty = Number((entry as { qty?: unknown })?.qty);
     if (!itemId || !Number.isFinite(qty) || qty <= 0) continue;
-    lines.push({ itemId, qty });
+    lines.push({
+      itemId,
+      qty,
+      divisible: (entry as { divisible?: unknown })?.divisible === true,
+    });
   }
   return { lines, usable: lines.length > 0 };
 }
