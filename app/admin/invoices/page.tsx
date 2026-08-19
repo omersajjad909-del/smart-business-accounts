@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import toast from "react-hot-toast";
 import DateInput from "@/app/dashboard/reports/_components/DateInput";
+import { formatCompanyNo } from "@/lib/companyRef";
 
 /**
  * The platform's sales ledger.
@@ -438,8 +439,10 @@ export default function AdminInvoicesPage() {
               {selected.companyRenamed && (
                 <Row label="Name on invoice" value={selected.companyName || "—"} />
               )}
-              <Row label="Company No" value={selected.companyNo != null ? `#${selected.companyNo}` : "—"} />
-              <Row label="Company ID" value={selected.companyId} mono />
+              {/* One company identifier, the same one every other screen shows.
+                  The internal UUID is deliberately not surfaced — see
+                  lib/companyRef.ts. */}
+              <Row label="Company ID" value={formatCompanyNo(selected.companyNo, selected.companyId)} mono />
               <Row label="Contact" value={selected.customerName || "—"} />
               <Row label="Email" value={selected.customerEmail || "—"} />
               <Row label="Country" value={selected.customerCountry || "—"} />

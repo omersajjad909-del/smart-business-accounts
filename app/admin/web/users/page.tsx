@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { getCurrentUser } from "@/lib/auth";
+import { companyRef } from "@/lib/companyRef";
 
 type Row = {
   userId: string;
@@ -9,6 +10,7 @@ type Row = {
   email: string;
   role: string;
   companyId: string | null;
+  companyNo: number | null;
   companyName: string;
   lastLogin: string;
   ip: string;
@@ -179,7 +181,7 @@ export default function WebUsersPage() {
                   {/* Company */}
                   <td style={{ padding: "13px 16px" }}>
                     {r.companyName && r.companyId ? (
-                      <a href={`/admin/companies/${r.companyId}`} className="wu-link" style={{ color: "#818cf8", fontSize: 13, fontWeight: 600, textDecoration: "none" }}>
+                      <a href={`/admin/companies/${companyRef({ id: r.companyId, companyNo: r.companyNo })}`} className="wu-link" style={{ color: "#818cf8", fontSize: 13, fontWeight: 600, textDecoration: "none" }}>
                         {r.companyName}
                       </a>
                     ) : (

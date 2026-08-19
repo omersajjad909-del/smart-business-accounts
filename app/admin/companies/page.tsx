@@ -440,7 +440,7 @@ export default function AdminCompaniesPage() {
 
       {/* Filters */}
       <div style={{ display: "flex", gap: 10, marginBottom: 16, flexWrap: "wrap" }}>
-        <input value={q} onChange={e => setQ(e.target.value)} placeholder="🔍  Search company, email, country, Stripe ID..."
+        <input value={q} onChange={e => setQ(e.target.value)} placeholder="🔍  Search company, #ID, email, country, billing ID..."
           style={{ flex: 1, minWidth: 220, padding: "9px 14px", borderRadius: 10, background: "rgba(255,255,255,.05)", border: "1px solid rgba(255,255,255,.1)", color: "white", fontSize: 13, outline: "none" }} />
         <select value={filterPlan} onChange={e => setFilterPlan(e.target.value)}
           style={{ padding: "9px 14px", borderRadius: 10, background: "rgba(255,255,255,.05)", border: "1px solid rgba(255,255,255,.1)", color: "#94a3b8", fontSize: 13, outline: "none", cursor: "pointer" }}>

@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { getCurrentUser } from "@/lib/auth";
 import toast from "react-hot-toast";
+import { billingCustomerIdLabel } from "@/lib/companyRef";
 
 type Company = {
   id: string;
@@ -10,6 +11,7 @@ type Company = {
   plan?: string | null;
   subscriptionStatus?: string | null;
   stripeCustomerId?: string | null;
+  billingProvider?: string | null;
   currentPeriodEnd?: string | null;
   cancelledAt?: string | null;
   dataRetentionUntil?: string | null;
@@ -415,7 +417,7 @@ export default function AdminSubscriptionsPage() {
 
       {/* Filters */}
       <div style={{ display: "flex", gap: 10, marginBottom: 16, flexWrap: "wrap" }}>
-        <input value={q} onChange={e => setQ(e.target.value)} placeholder="🔍  Search company or Stripe ID…"
+        <input value={q} onChange={e => setQ(e.target.value)} placeholder="🔍  Search company or billing ID…"
           style={{ flex: 1, minWidth: 200, padding: "9px 14px", borderRadius: 10, background: "rgba(255,255,255,.05)", border: "1px solid rgba(255,255,255,.1)", color: "white", fontSize: 13, outline: "none" }} />
         <select value={filterStatus} onChange={e => setFilterStatus(e.target.value)}
           style={{ padding: "9px 14px", borderRadius: 10, background: "rgba(255,255,255,.05)", border: "1px solid rgba(255,255,255,.1)", color: "#94a3b8", fontSize: 13, outline: "none", cursor: "pointer" }}>
@@ -431,7 +433,7 @@ export default function AdminSubscriptionsPage() {
         <table style={{ width: "100%", borderCollapse: "collapse" }}>
           <thead>
             <tr style={{ background: "rgba(255,255,255,.04)" }}>
-              {["Company", "Plan", "Status", "Renewal / Retention", "Stripe ID", "Actions"].map(h => (
+              {["Company", "Plan", "Status", "Renewal / Retention", "Billing ID", "Actions"].map(h => (
                 <th key={h} style={{ padding: "12px 16px", textAlign: h === "Actions" ? "right" : "left", fontSize: 10, fontWeight: 800, color: "#475569", letterSpacing: ".07em", borderBottom: "1px solid rgba(255,255,255,.07)" }}>{h.toUpperCase()}</th>
               ))}
             </tr>
@@ -486,7 +488,10 @@ export default function AdminSubscriptionsPage() {
                       </div>
                     ) : <span style={{ color: "#334155" }}>—</span>}
                   </td>
-                  <td style={{ padding: "14px 16px", fontSize: 11, color: "#334155", fontFamily: "monospace" }}>
+                  {/* One column, many gateways — the header stays generic and the
+                      hover title names the provider actually on file. */}
+                  <td style={{ padding: "14px 16px", fontSize: 11, color: "#334155", fontFamily: "monospace" }}
+                      title={c.stripeCustomerId ? `${billingCustomerIdLabel(c.billingProvider)}: ${c.stripeCustomerId}` : undefined}>
                     {c.stripeCustomerId ? `${c.stripeCustomerId.slice(0, 18)}…` : "—"}
                   </td>
                   <td style={{ padding: "14px 16px", textAlign: "right" }}>
