@@ -11,9 +11,25 @@ export async function GET(req: NextRequest) {
   const admin = requireAdmin(req);
   if (admin instanceof NextResponse) return admin;
 
+  const visibleCompanies = await prisma.company.findMany({
+    where: {
+      isActive: true,
+      isDemo: false,
+      isInternalTest: false,
+      NOT: { name: { startsWith: "ZZ_" } },
+    },
+    select: { id: true, name: true },
+  });
+
+  const visibleCompanyIds = visibleCompanies.map((c) => c.id);
+  const backupWhere = {
+    companyId: { in: visibleCompanyIds.length ? visibleCompanyIds : ["__none__"] },
+  };
+
   const backups = await prisma.systemBackup.findMany({
+    where: backupWhere,
     orderBy: { createdAt: "desc" },
-    take: 50,
+    take: 200,
     select: {
       id: true,
       companyId: true,
@@ -24,31 +40,35 @@ export async function GET(req: NextRequest) {
       createdAt: true,
       createdBy: true,
       verifiedAt: true,
-      // metadata deliberately excluded — it holds the whole snapshot
     },
   });
 
-  const companyIds = Array.from(new Set(backups.map((b) => b.companyId)));
-  const companies = companyIds.length
-    ? await prisma.company.findMany({
-        where: { id: { in: companyIds } },
-        select: { id: true, name: true },
-      })
-    : [];
-  const nameById = new Map(companies.map((c) => [c.id, c.name]));
+  const nameById = new Map(visibleCompanies.map((c) => [c.id, c.name]));
+  const seenCompanyIds = new Set<string>();
+  const latestBackups = backups.filter((backup) => {
+    if (seenCompanyIds.has(backup.companyId)) return false;
+    seenCompanyIds.add(backup.companyId);
+    return true;
+  });
 
   const totals = await prisma.systemBackup
-    .aggregate({ _sum: { fileSize: true }, _count: { _all: true } })
+    .aggregate({
+      where: backupWhere,
+      _sum: { fileSize: true },
+      _count: { _all: true },
+    })
     .catch(() => null);
 
   return NextResponse.json({
-    backups: backups.map((b) => ({ ...b, companyName: nameById.get(b.companyId) || null })),
+    backups: latestBackups.map((b) => ({ ...b, companyName: nameById.get(b.companyId) || null })),
+    history: backups.map((b) => ({ ...b, companyName: nameById.get(b.companyId) || null })),
+    companyCount: visibleCompanyIds.length,
     totalCount: totals?._count?._all ?? backups.length,
     totalBytes: totals?._sum?.fileSize ?? 0,
   });
 }
 
-/** "Run Backup Now" — snapshots every live company. */
+/** "Run Backup Now" - snapshots every live company. */
 export async function POST(req: NextRequest) {
   const admin = requireAdmin(req);
   if (admin instanceof NextResponse) return admin;
@@ -66,8 +86,6 @@ export async function POST(req: NextRequest) {
         createdBy: admin.id,
         keepLast: 10,
       });
-      // "unchanged" means the data matched the existing snapshot, so nothing new
-      // was stored — that is a successful check, not a skipped company.
       results.push({ companyId: c.id, status: r.deduped ? "unchanged" : "success" });
     } catch (err: any) {
       console.error(`[admin] backup failed for ${c.id}:`, err);
