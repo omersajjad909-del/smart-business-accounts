@@ -2,8 +2,17 @@
 
 import { useEffect, useState } from "react";
 import { getCurrentUser } from "@/lib/auth";
+import { companyRef } from "@/lib/companyRef";
 
 type UsageRow = Record<string, string | number | null>;
+
+/** Links carry companyNo, never the UUID — see lib/companyRef.ts. */
+function rowRef(row: UsageRow): string {
+  return companyRef({
+    id: String(row.id || ""),
+    companyNo: row.companyNo == null ? null : Number(row.companyNo),
+  });
+}
 
 function formatDate(value: string | number | null) {
   if (!value) return "Never";
@@ -111,7 +120,7 @@ export default function AdminUsagePage() {
                   <tr key={String(row.id || i)} className="u-row">
                     <td style={{ ...tdStyle, color: "rgba(255,255,255,.3)", fontSize: 12, width: 28 }}>{i + 1}</td>
                     <td style={tdStyle}>
-                      <a href={`/admin/companies/${row.id}`} style={{ color: "#818cf8", fontWeight: 700, fontSize: 13, textDecoration: "none" }} className="u-link">
+                      <a href={`/admin/companies/${rowRef(row)}`} style={{ color: "#818cf8", fontWeight: 700, fontSize: 13, textDecoration: "none" }} className="u-link">
                         {String(row.name || "—")}
                       </a>
                     </td>
@@ -146,7 +155,7 @@ export default function AdminUsagePage() {
                 {risk.map((row, i) => (
                   <tr key={String(row.id || i)} className="u-row">
                     <td style={tdStyle}>
-                      <a href={`/admin/companies/${row.id}`} style={{ color: "#f87171", fontWeight: 700, fontSize: 13, textDecoration: "none" }} className="u-link">
+                      <a href={`/admin/companies/${rowRef(row)}`} style={{ color: "#f87171", fontWeight: 700, fontSize: 13, textDecoration: "none" }} className="u-link">
                         {String(row.name || "—")}
                       </a>
                     </td>
@@ -183,7 +192,7 @@ export default function AdminUsagePage() {
               {highInvoice.map((row, i) => (
                 <tr key={String(row.id || i)} className="u-row">
                   <td style={tdStyle}>
-                    <a href={`/admin/companies/${row.id}`} style={{ color: "#fbbf24", fontWeight: 700, fontSize: 13, textDecoration: "none" }} className="u-link">
+                    <a href={`/admin/companies/${rowRef(row)}`} style={{ color: "#fbbf24", fontWeight: 700, fontSize: 13, textDecoration: "none" }} className="u-link">
                       {String(row.name || "—")}
                     </a>
                   </td>

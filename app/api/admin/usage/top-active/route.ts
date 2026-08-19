@@ -10,7 +10,7 @@ export async function GET(req: NextRequest) {
 
     const [companies, sessions, activities, loginLogs] = await Promise.all([
       prisma.company.findMany({
-        select: { id: true, name: true, country: true, subscriptionStatus: true },
+        select: { id: true, companyNo: true, name: true, country: true, subscriptionStatus: true },
       }),
       prisma.session.groupBy({
         by: ["companyId"],
@@ -54,6 +54,7 @@ export async function GET(req: NextRequest) {
         const logins7d = loginCount.get(company.id) || 0;
         return {
           id: company.id,
+          companyNo: company.companyNo,
           name: company.name,
           country: company.country || null,
           activity: sessions7d + actions7d + logins7d,

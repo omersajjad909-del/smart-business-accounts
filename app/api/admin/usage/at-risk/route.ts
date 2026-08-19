@@ -11,7 +11,7 @@ export async function GET(req: NextRequest) {
 
     const [companies, sessionAgg, activityAgg, loginAgg] = await Promise.all([
       prisma.company.findMany({
-        select: { id: true, name: true, plan: true, subscriptionStatus: true, createdAt: true },
+        select: { id: true, companyNo: true, name: true, plan: true, subscriptionStatus: true, createdAt: true },
       }),
       prisma.session.groupBy({
         by: ["companyId"],
@@ -55,6 +55,7 @@ export async function GET(req: NextRequest) {
         const lastSeen = latestByCompany.get(company.id) || null;
         return {
           id: company.id,
+          companyNo: company.companyNo,
           name: company.name,
           plan: company.plan || "STARTER",
           subscriptionStatus: company.subscriptionStatus || "ACTIVE",

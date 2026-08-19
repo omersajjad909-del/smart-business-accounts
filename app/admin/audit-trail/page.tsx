@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState, useCallback } from "react";
+import { formatCompanyNo } from "@/lib/companyRef";
 
 type LogEntry = {
   id: string;
@@ -10,6 +11,7 @@ type LogEntry = {
   targetId?: string | null;
   targetLabel?: string | null;
   companyId?: string | null;
+  companyNo?: number | null;
   details?: string | null;
   createdAt: string;
 };
@@ -149,7 +151,7 @@ export default function AdminAuditTrailPage() {
                       {log.targetLabel || log.targetId || log.targetType}
                     </div>
                     <div style={{ fontSize: 11, color: "#475569", marginTop: 2 }}>
-                      {log.targetType}{log.companyId ? ` · Company ID: ${log.companyId.slice(0, 8)}…` : ""}
+                      {log.targetType}{log.companyId ? ` · Company ID: ${formatCompanyNo(log.companyNo, log.companyId)}` : ""}
                     </div>
                   </div>
                   {/* Admin */}

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { getCurrentUser } from "@/lib/auth";
+import { companyRef } from "@/lib/companyRef";
 
 type SessionRow = {
   userId: string;
@@ -9,6 +10,7 @@ type SessionRow = {
   email: string;
   role: string;
   companyId: string;
+  companyNo: number | null;
   companyName: string;
   lastLogin: string;
   ip: string;
@@ -156,7 +158,7 @@ export default function AdminSessionsPage() {
                   </td>
                   <td style={td}>
                     {s.companyName ? (
-                      <a href={`/admin/companies/${s.companyId}`} style={{ color: "#818cf8", fontSize: 13, fontWeight: 600, textDecoration: "none" }} className="ss-link">
+                      <a href={`/admin/companies/${companyRef({ id: s.companyId, companyNo: s.companyNo })}`} style={{ color: "#818cf8", fontSize: 13, fontWeight: 600, textDecoration: "none" }} className="ss-link">
                         {s.companyName}
                       </a>
                     ) : (

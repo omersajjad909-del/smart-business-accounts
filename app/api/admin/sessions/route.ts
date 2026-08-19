@@ -11,7 +11,7 @@ export async function GET(req: NextRequest) {
     const sessions = await prisma.session.findMany({
       include: {
         user: { select: { name: true, email: true, role: true } },
-        company: { select: { name: true } },
+        company: { select: { name: true, companyNo: true } },
       },
       orderBy: { createdAt: "desc" },
       distinct: ["userId"],
@@ -24,6 +24,7 @@ export async function GET(req: NextRequest) {
       email: s.user?.email || "",
       role: s.user?.role || "",
       companyId: s.companyId || "",
+      companyNo: s.company?.companyNo ?? null,
       companyName: s.company?.name || "",
       lastLogin: s.createdAt,
       ip: s.ip || "",

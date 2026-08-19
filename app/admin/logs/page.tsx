@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { PageHeader, Section } from "@/components/AdminUI";
 import { getCurrentUser } from "@/lib/auth";
+import { formatCompanyNo } from "@/lib/companyRef";
 
 export default function AdminLogsPage() {
   const [rows, setRows] = useState<any[] | null>(null);
@@ -59,7 +60,7 @@ export default function AdminLogsPage() {
                 ) : rows.map((l, i) => (
                   <tr key={i} className="border-t">
                     <td className="p-2">{new Date(l.createdAt).toLocaleString()}</td>
-                    <td className="p-2">{l.companyId || "-"}</td>
+                    <td className="p-2">{l.companyId ? formatCompanyNo(l.companyNo, l.companyId) : "-"}</td>
                     <td className="p-2">{l.userId || "-"}</td>
                     <td className="p-2">{l.action}</td>
                     <td className="p-2"><pre className="whitespace-pre-wrap max-w-[60ch]">{truncate(JSON.stringify(l.details || ""))}</pre></td>

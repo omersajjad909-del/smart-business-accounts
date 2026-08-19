@@ -6,6 +6,7 @@ import {
   isSensitiveLogAction,
   redactLogs,
 } from "@/lib/logRedaction";
+import { getCompanyNoMap } from "@/lib/companyRefServer";
 
 /**
  * Two callers share this route:
@@ -74,10 +75,18 @@ export async function GET(req: NextRequest) {
       }),
     );
 
+    // companyNo rides along so the table can show "#100004" instead of the UUID,
+    // and is attached before the search filter so admins can search by it.
+    const companyNos = await getCompanyNoMap(logs.map((l) => l.companyId));
+    const withCompanyNo = logs.map((l) => ({
+      ...l,
+      companyNo: l.companyId ? companyNos.get(l.companyId) ?? null : null,
+    }));
+
     const needle = q.toLowerCase();
     const filtered = needle
-      ? logs.filter((l) => JSON.stringify(l).toLowerCase().includes(needle))
-      : logs;
+      ? withCompanyNo.filter((l) => JSON.stringify(l).toLowerCase().includes(needle))
+      : withCompanyNo;
 
     return NextResponse.json({ rows: filtered });
   } catch (e: unknown) {

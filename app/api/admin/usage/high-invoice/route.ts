@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { formatCompanyNo } from "@/lib/companyRef";
 
 export async function GET(req: NextRequest) {
   try {
@@ -15,13 +16,16 @@ export async function GET(req: NextRequest) {
     } as any);
     const ids = invs.map((g: any) => g.companyId).filter(Boolean) as string[];
     const companies = ids.length
-      ? await prisma.company.findMany({ where: { id: { in: ids } }, select: { id: true, name: true, country: true } })
+      ? await prisma.company.findMany({ where: { id: { in: ids } }, select: { id: true, companyNo: true, name: true, country: true } })
       : [];
     const map = new Map(companies.map(c => [c.id, c]));
     const rows = invs
       .map((g: any) => ({
         id: g.companyId,
-        name: map.get(g.companyId)?.name || g.companyId,
+        companyNo: map.get(g.companyId)?.companyNo ?? null,
+        // Never fall back to the UUID for a display name — a deleted company
+        // shows its short number instead. See lib/companyRef.ts.
+        name: map.get(g.companyId)?.name || formatCompanyNo(map.get(g.companyId)?.companyNo, g.companyId),
         country: map.get(g.companyId)?.country || null,
         invoices: g._count.id || 0,
         amount: Number(g._sum.total || 0),
