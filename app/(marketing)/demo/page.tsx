@@ -15,6 +15,39 @@ const DEMO_MINUTES = 30;
 
 const BUSINESSES = DEMO_BUSINESSES;
 
+/**
+ * The three plans a visitor can open the demo on.
+ *
+ * Nothing about a plan is defined here — names, prices and bullets all come
+ * from Admin → Plans through the public config routes, the same source the
+ * /pricing page renders from. These are only the codes Company.plan carries,
+ * plus a fallback for the first paint and for a config that has never been
+ * saved.
+ */
+type DemoPlanCode = "STARTER" | "PRO" | "ENTERPRISE";
+const PLAN_CODES: DemoPlanCode[] = ["STARTER", "PRO", "ENTERPRISE"];
+const PLAN_CONFIG_KEY: Record<DemoPlanCode, "starter" | "pro" | "enterprise"> = {
+  STARTER: "starter",
+  PRO: "pro",
+  ENTERPRISE: "enterprise",
+};
+const FALLBACK_PLAN_NAMES: Record<DemoPlanCode, string> = {
+  STARTER: "Starter",
+  PRO: "Professional",
+  ENTERPRISE: "Enterprise",
+};
+const PLAN_BLURB: Record<DemoPlanCode, string> = {
+  STARTER: "The everyday books — invoices, ledger, expenses.",
+  PRO: "Adds inventory depth, CRM, payroll and the reporting suite.",
+  ENTERPRISE: "Everything, including branches, audit trail and the AI operator.",
+};
+
+// Opens on the full product, as the demo always has — a visitor who never
+// touches the picker sees no less than before.
+const DEFAULT_PLAN: DemoPlanCode = "ENTERPRISE";
+
+type PlanPrice = { monthly: number; currency: "USD" | "PKR" };
+
 
 const CATEGORY_COLORS: Record<string, string> = {
   Commerce: "#38bdf8",
@@ -48,10 +81,73 @@ export default function DemoPage() {
   const [launching, setLaunching] = useState<string | null>(null);
   const [launchError, setLaunchError] = useState<string | null>(null);
 
+  // Plan the demo workspace will open on. Everything the picker shows is
+  // whatever Admin → Plans currently holds — see loadPlanCatalogue below.
+  const [selectedPlan, setSelectedPlan] = useState<DemoPlanCode>(DEFAULT_PLAN);
+  const [planNames, setPlanNames] = useState<Record<DemoPlanCode, string>>(FALLBACK_PLAN_NAMES);
+  const [planPrices, setPlanPrices] = useState<Record<DemoPlanCode, PlanPrice> | null>(null);
+  const [planHighlights, setPlanHighlights] = useState<Record<DemoPlanCode, string[]>>({
+    STARTER: [], PRO: [], ENTERPRISE: [],
+  });
+
   // Seed from hardcoded values so there's no flash on load
   const [liveStatusMap, setLiveStatusMap] = useState<Record<string, string>>(
     Object.fromEntries(BUSINESSES.map(b => [b.liveBusinessType, b.demoAvailable ? "live" : "coming_soon"]))
   );
+
+  /**
+   * Pulls the live plan catalogue.
+   *
+   *   /api/public/plan-config    → the plan names an admin typed
+   *   /api/public/pricing        → prices + the bullet list per plan
+   *   /api/public/pricing-region → whether this visitor is priced in PKR
+   *
+   * Same three routes the /pricing page uses, so the demo can never advertise
+   * a plan differently from the page that sells it. A failure here just leaves
+   * the fallback names standing — the picker still works.
+   */
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      const [pricing, config, region] = await Promise.all([
+        fetch("/api/public/pricing", { cache: "no-store" }).then(r => r.json()).catch(() => null),
+        fetch("/api/public/plan-config", { cache: "no-store" }).then(r => r.json()).catch(() => null),
+        fetch("/api/public/pricing-region", { cache: "no-store" }).then(r => r.json()).catch(() => null),
+      ]);
+      if (cancelled) return;
+
+      if (Array.isArray(config?.plans)) {
+        const named = { ...FALLBACK_PLAN_NAMES };
+        for (const code of PLAN_CODES) {
+          const match = config.plans.find((pl: any) => pl?.code === PLAN_CONFIG_KEY[code]);
+          if (match?.name && typeof match.name === "string") named[code] = match.name;
+        }
+        setPlanNames(named);
+      }
+
+      if (pricing?.pricing) {
+        // PKR visitors see the PKR table when the admin has filled one in,
+        // exactly as /pricing decides it.
+        const usePkr = !!region?.isPakistan && !!pricing.pkrPricing;
+        const table = usePkr ? pricing.pkrPricing : pricing.pricing;
+        const currency: PlanPrice["currency"] = usePkr ? "PKR" : "USD";
+        setPlanPrices({
+          STARTER: { monthly: Number(table?.starter?.monthly ?? 0), currency },
+          PRO: { monthly: Number(table?.pro?.monthly ?? 0), currency },
+          ENTERPRISE: { monthly: Number(table?.enterprise?.monthly ?? 0), currency },
+        });
+      }
+
+      if (pricing?.planHighlights) {
+        setPlanHighlights({
+          STARTER: Array.isArray(pricing.planHighlights.starter) ? pricing.planHighlights.starter : [],
+          PRO: Array.isArray(pricing.planHighlights.pro) ? pricing.planHighlights.pro : [],
+          ENTERPRISE: Array.isArray(pricing.planHighlights.enterprise) ? pricing.planHighlights.enterprise : [],
+        });
+      }
+    })();
+    return () => { cancelled = true; };
+  }, []);
 
   useEffect(() => {
     fetch("/api/public/business-module-status", { cache: "no-store" })
@@ -89,7 +185,7 @@ export default function DemoPage() {
       const res = await fetch("/api/demo/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ businessType: biz.liveBusinessType }),
+        body: JSON.stringify({ businessType: biz.liveBusinessType, plan: selectedPlan }),
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) {
@@ -123,6 +219,8 @@ export default function DemoPage() {
         .cat-btn { transition: background .15s, color .15s, border-color .15s; cursor: pointer; border:1px solid transparent; }
         .cat-btn:hover { border-color: rgba(255,255,255,.2); }
         .launch-btn { transition: transform .18s, filter .18s; cursor: pointer; border:none; font-family:inherit; }
+        .plan-card { transition: transform .18s, border-color .18s, box-shadow .18s; }
+        .plan-card:hover { transform: translateY(-3px); border-color: rgba(255,255,255,.22); }
         .launch-btn:hover:not(:disabled) { transform: translateY(-2px); filter: brightness(1.06); }
         .mod-chip { transition: background .14s, border-color .14s; }
         .mod-chip:hover { background: rgba(255,255,255,.07); }
@@ -157,6 +255,7 @@ export default function DemoPage() {
             text-align:center;
           }
           .demo-module-grid,
+          .demo-plan-grid,
           .demo-ai-metric-grid{
             grid-template-columns:1fr !important;
           }
@@ -303,6 +402,76 @@ export default function DemoPage() {
         {biz && (
           <div id="biz-detail" style={{ animation: "fadeUp .35s ease both" }}>
 
+            {/* ─── Plan picker ───
+                The sandbox is built on the plan chosen here, so the workspace
+                that opens is gated by exactly what Admin → Plans grants that
+                plan — same pages, same modules a paying tenant on it gets.
+                Before this every demo ran on Enterprise, which showed the whole
+                product to someone about to buy Starter. */}
+            <div style={{ marginBottom: 22, padding: "24px 24px 22px", borderRadius: 24, background: "rgba(255,255,255,.025)", border: "1px solid rgba(255,255,255,.07)" }}>
+              <div style={{ display: "flex", alignItems: "baseline", gap: 10, flexWrap: "wrap", marginBottom: 4 }}>
+                <div style={{ fontSize: 18, fontWeight: 900, letterSpacing: -0.4 }}>Which plan do you want to test?</div>
+                <div style={{ fontSize: 12, fontWeight: 700, color: biz.color }}>{biz.label}</div>
+              </div>
+              <div style={{ fontSize: 13, color: "rgba(255,255,255,.42)", lineHeight: 1.6, marginBottom: 18 }}>
+                Your demo workspace opens locked to this plan — the same pages, modules and limits a paying
+                customer gets on it. Switch plan and start again any time to compare.
+              </div>
+
+              <div className="demo-plan-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3,minmax(0,1fr))", gap: 12 }}>
+                {PLAN_CODES.map((code) => {
+                  const active = selectedPlan === code;
+                  const price = planPrices?.[code];
+                  const bullets = (planHighlights[code] || []).slice(0, 4);
+                  return (
+                    <button
+                      key={code}
+                      type="button"
+                      className="plan-card"
+                      onClick={() => setSelectedPlan(code)}
+                      aria-pressed={active}
+                      style={{
+                        textAlign: "left",
+                        cursor: "pointer",
+                        fontFamily: FONT,
+                        padding: "18px 18px 16px",
+                        borderRadius: 20,
+                        background: active ? `linear-gradient(135deg,${biz.color}16,rgba(255,255,255,.03))` : "rgba(255,255,255,.03)",
+                        border: `1.5px solid ${active ? biz.color : "rgba(255,255,255,.08)"}`,
+                        boxShadow: active ? `0 14px 34px ${biz.color}22` : "none",
+                        color: "#fff",
+                      }}
+                    >
+                      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, marginBottom: 8 }}>
+                        <div style={{ fontSize: 15, fontWeight: 900, color: active ? biz.color : "#fff" }}>{planNames[code]}</div>
+                        <span style={{ width: 16, height: 16, borderRadius: "50%", flexShrink: 0, border: `1.5px solid ${active ? biz.color : "rgba(255,255,255,.25)"}`, background: active ? biz.color : "transparent", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 10, fontWeight: 900, color: "#07091a" }}>
+                          {active ? "✓" : ""}
+                        </span>
+                      </div>
+
+                      {price && price.monthly > 0 && (
+                        <div style={{ fontSize: 13, fontWeight: 800, color: "rgba(255,255,255,.72)", marginBottom: 8 }}>
+                          {price.currency === "PKR" ? `Rs ${price.monthly.toLocaleString()}` : `${price.monthly}`}
+                          <span style={{ fontSize: 11, fontWeight: 600, color: "rgba(255,255,255,.35)" }}> /month</span>
+                        </div>
+                      )}
+
+                      <div style={{ fontSize: 11.5, color: "rgba(255,255,255,.4)", lineHeight: 1.55, marginBottom: bullets.length ? 10 : 0 }}>
+                        {PLAN_BLURB[code]}
+                      </div>
+
+                      {bullets.map((f) => (
+                        <div key={f} style={{ display: "flex", gap: 7, alignItems: "flex-start", fontSize: 11.5, color: "rgba(255,255,255,.5)", lineHeight: 1.5, marginTop: 5 }}>
+                          <span style={{ color: active ? biz.color : "rgba(255,255,255,.3)", fontWeight: 900 }}>·</span>
+                          <span>{f}</span>
+                        </div>
+                      ))}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
             {/* Header */}
             <div className="demo-detail-header" style={{ display: "flex", alignItems: "center", gap: 18, marginBottom: 28, padding: "28px 28px", background: `linear-gradient(135deg,${biz.color}12,rgba(255,255,255,.02))`, border: `1px solid ${biz.color}25`, borderRadius: 24 }}>
               <div style={{ width: 72, height: 72, borderRadius: 20, background: biz.gradient, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 36, flexShrink: 0, boxShadow: `0 10px 30px ${biz.color}40` }}>
@@ -338,7 +507,9 @@ export default function DemoPage() {
                     opacity: launching && launching !== biz.liveBusinessType ? 0.5 : 1,
                   }}
                 >
-                  {launching === biz.liveBusinessType ? "Preparing your workspace…" : "▶ Start Demo Now"}
+                  {launching === biz.liveBusinessType
+                    ? "Preparing your workspace…"
+                    : `▶ Start ${planNames[selectedPlan]} Demo`}
                 </button>
                 <button
                   className="launch-btn"
@@ -369,8 +540,9 @@ export default function DemoPage() {
 
             {isDemoLive(biz.liveBusinessType) && (
               <div style={{ marginTop: -8, marginBottom: 20, padding: "14px 18px", borderRadius: 16, background: "rgba(16,185,129,.07)", border: "1px solid rgba(16,185,129,.2)", color: "rgba(255,255,255,.72)", fontSize: 13, lineHeight: 1.7 }}>
-                Opens a private {DEMO_MINUTES}-minute workspace already loaded with customers, suppliers, stock,
-                posted invoices, payroll and live dashboard figures — yours alone, and wiped the moment you leave.
+                Opens a private {DEMO_MINUTES}-minute workspace on the <strong style={{ color: "#fff" }}>{planNames[selectedPlan]}</strong> plan,
+                already loaded with customers, suppliers, stock, posted invoices, payroll and live dashboard figures —
+                yours alone, and wiped the moment you leave.
                 Sign-in is <strong style={{ color: "#fff" }}>{DEMO_EMAIL}</strong> / <strong style={{ color: "#fff" }}>{DEMO_PASSWORD}</strong> if you would rather log in yourself.
               </div>
             )}
