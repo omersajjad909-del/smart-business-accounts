@@ -64,6 +64,10 @@ export async function GET(req: NextRequest) {
     // The quote must price the run exactly the way completing it will, so the
     // screen shows the real cost — conversion cost and warehouse included.
     const conversion = readBomConversion(bomData);
+    // Same precedence the posting path uses, so the quote can never price
+    // against one warehouse and the run then consume from another.
+    const location =
+      searchParams.get("location") || String(orderData.location || "").trim() || "MAIN";
     const priced = await priceProductionRun({
       companyId,
       bomLines: lines,
@@ -71,12 +75,13 @@ export async function GET(req: NextRequest) {
       producedQty,
       labourPerBatch: conversion.labourPerBatch,
       overheadPerBatch: conversion.overheadPerBatch,
-      location: searchParams.get("location") || "MAIN",
+      location,
     });
 
     return NextResponse.json({
       producedQty,
       remaining: Math.max(ordered - done, 0),
+      location,
       ...priced,
     });
   } catch (e: unknown) {

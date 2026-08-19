@@ -239,6 +239,130 @@ export async function getAverageCosts(
 }
 
 /**
+ * Open pieces of material, oldest first.
+ *
+ * A run that needs 12.66 rolls has to take 13 off the rack, and the balance of
+ * the thirteenth used to disappear into the cost of that batch: the next order
+ * for ten bags started by opening a fourteenth roll. The balance is now kept
+ * here instead, and the next run eats it before it touches stock.
+ *
+ * Held as BusinessRecords rather than InventoryTxn rows because
+ * `InventoryTxn.qty` is an Int — 0.34 of a roll cannot be written to it.
+ */
+export async function readOpenRemnants(
+  db: Db,
+  companyId: string,
+  itemIds: string[],
+  location?: string | null,
+): Promise<Map<string, RemnantPiece[]>> {
+  const out = new Map<string, RemnantPiece[]>();
+  if (!itemIds.length) return out;
+
+  const rows = await db.businessRecord.findMany({
+    where: {
+      companyId,
+      category: MATERIAL_REMNANT_CATEGORY,
+      status: "open",
+      refId: { in: itemIds },
+    },
+    orderBy: { createdAt: "asc" },
+  });
+
+  for (const row of rows) {
+    const d = (row.data ?? {}) as Record<string, unknown>;
+    const qty = Number(d.qty);
+    if (!Number.isFinite(qty) || qty <= REMNANT_EPSILON) continue;
+    const at = String(d.location || "MAIN");
+    // An open roll sits in one warehouse; a run drawing on another cannot use it.
+    if (location && at !== location) continue;
+    const itemId = String(d.itemId || row.refId || "");
+    if (!itemId) continue;
+    const list = out.get(itemId) ?? [];
+    list.push({ id: row.id, itemId, qty, unitCost: Number(d.unitCost) || 0, location: at });
+    out.set(itemId, list);
+  }
+  return out;
+}
+
+export type LinePlan = {
+  exactQty: number;
+  fromRemnantQty: number;
+  fromRemnantCost: number;
+  /** Which open pieces to draw down, and by how much. */
+  takes: { recordId: string; qty: number }[];
+  /** Whole units that must leave stock. */
+  issueQty: number;
+  leftoverQty: number;
+  leftoverCost: number;
+  /** What the batch is charged — the leftover is not part of it. */
+  materialCost: number;
+};
+
+/**
+ * Works out where one BOM line's material comes from.
+ *
+ * Pure arithmetic, no database — both the quote and the posting run it, so the
+ * screen can never promise a different consumption from the one that happens.
+ *
+ *   non-divisible : whole units, exactly as it always worked.
+ *   divisible     : open pieces first, then whole units off the rack, and the
+ *                   unused part of the last one comes back as a new open piece.
+ */
+export function planLineConsumption(opts: {
+  exactQty: number;
+  divisible: boolean;
+  unitCost: number;
+  remnants: RemnantPiece[];
+}): LinePlan {
+  const need = round6(Math.max(0, opts.exactQty));
+
+  if (!opts.divisible) {
+    const issueQty = Math.ceil(need);
+    return {
+      exactQty: need,
+      fromRemnantQty: 0,
+      fromRemnantCost: 0,
+      takes: [],
+      issueQty,
+      leftoverQty: 0,
+      leftoverCost: 0,
+      materialCost: issueQty * opts.unitCost,
+    };
+  }
+
+  let remaining = need;
+  const takes: { recordId: string; qty: number }[] = [];
+  let fromRemnantQty = 0;
+  let fromRemnantCost = 0;
+
+  for (const piece of opts.remnants) {
+    if (remaining <= REMNANT_EPSILON) break;
+    const use = Math.min(piece.qty, remaining);
+    if (use <= REMNANT_EPSILON) continue;
+    takes.push({ recordId: piece.id, qty: round6(use) });
+    fromRemnantQty = round6(fromRemnantQty + use);
+    // Each piece is valued at what it cost when it was set aside, not at
+    // today's average — the value was fixed the day the roll was opened.
+    fromRemnantCost += use * piece.unitCost;
+    remaining = round6(remaining - use);
+  }
+
+  const issueQty = Math.ceil(round6(remaining));
+  const leftoverQty = round6(issueQty - remaining);
+
+  return {
+    exactQty: need,
+    fromRemnantQty,
+    fromRemnantCost,
+    takes,
+    issueQty,
+    leftoverQty,
+    leftoverCost: leftoverQty * opts.unitCost,
+    materialCost: fromRemnantCost + remaining * opts.unitCost,
+  };
+}
+
+/**
  * Conversion cost the BOM declares for one batch.
  *
  * Production used to cost material only, so a PVC bag that took a roll plus an
@@ -301,6 +425,25 @@ export async function ensureAccount(
   return created.id;
 }
 
+export type PricedRun = {
+  lines: BomLineCost[];
+  /** Charged to the batch: open pieces used, plus the part of the whole units consumed. */
+  materialCost: number;
+  /** Value of the whole units that leave stock — materialCost plus what is set aside. */
+  stockIssueCost: number;
+  remnantUsedCost: number;
+  remnantCreatedCost: number;
+  /** Open pieces to draw down when this run is actually posted. */
+  remnantTakes: { recordId: string; qty: number }[];
+  labourCost: number;
+  overheadCost: number;
+  totalCost: number;
+  unitCost: number;
+  shortages: BomLineCost[];
+  /** Warehouses holding any of this BOM's material, so the run can be pointed at one. */
+  availableLocations: string[];
+};
+
 /**
  * Prices one production run without writing anything — used by the UI to show
  * the cost and the shortages before the user commits.
@@ -321,75 +464,129 @@ export async function priceProductionRun(opts: {
   /** Warehouse the run draws on. Omit to look at every location. */
   location?: string | null;
   client?: Db;
-}): Promise<{
-  lines: BomLineCost[];
-  materialCost: number;
-  labourCost: number;
-  overheadCost: number;
-  totalCost: number;
-  unitCost: number;
-  shortages: BomLineCost[];
-}> {
+}): Promise<PricedRun> {
   const db = (opts.client ?? prisma) as Db;
   const { companyId, bomLines, producedQty, location } = opts;
   const bomYield = opts.bomYield > 0 ? opts.bomYield : 1;
   const scale = producedQty / bomYield;
 
   const itemIds = bomLines.map((l) => l.itemId);
-  const [items, stock, costs] = await Promise.all([
+  const [items, stock, costs, remnants] = await Promise.all([
     db.itemNew.findMany({
       where: { companyId, id: { in: itemIds } },
       select: { id: true, name: true, unit: true },
     }),
     getStockOnHand(db, companyId, itemIds, location),
     getAverageCosts(db, companyId, itemIds, location),
+    readOpenRemnants(db, companyId, itemIds, location),
   ]);
   const byId = new Map(items.map((i) => [i.id, i]));
 
+  // A line can appear twice in one BOM; the open pieces it eats must not be
+  // promised to both. Draw down a working copy as the lines are planned.
+  const pool = new Map<string, RemnantPiece[]>();
+  for (const [itemId, pieces] of remnants) pool.set(itemId, pieces.map((x) => ({ ...x })));
+
+  const takes: { recordId: string; qty: number }[] = [];
   const lines: BomLineCost[] = bomLines.map((line) => {
     const item = byId.get(line.itemId);
     const unitCost = costs.get(line.itemId) ?? 0;
-    // Materials are consumed in whole units — InventoryTxn.qty is an Int, and a
-    // half-issued unit is not a thing a storekeeper can hand over.
-    const requiredQty = Math.ceil(line.qty * scale);
+    const available = pool.get(line.itemId) ?? [];
+
+    const plan = planLineConsumption({
+      exactQty: line.qty * scale,
+      divisible: line.divisible === true,
+      unitCost,
+      remnants: available,
+    });
+
+    for (const take of plan.takes) {
+      const piece = available.find((x) => x.id === take.recordId);
+      if (piece) piece.qty = round6(piece.qty - take.qty);
+      takes.push(take);
+    }
+
     return {
       itemId: line.itemId,
       qty: line.qty,
+      divisible: line.divisible === true,
       itemName: item?.name ?? "(deleted item)",
       unit: item?.unit ?? "",
       unitCost,
-      requiredQty,
+      exactQty: plan.exactQty,
+      requiredQty: plan.issueQty,
+      fromRemnantQty: plan.fromRemnantQty,
+      fromRemnantCost: round2(plan.fromRemnantCost),
+      leftoverQty: plan.leftoverQty,
+      leftoverCost: round2(plan.leftoverCost),
       availableQty: stock.get(line.itemId) ?? 0,
-      lineCost: requiredQty * unitCost,
+      lineCost: round2(plan.materialCost),
     };
   });
 
-  const materialCost = lines.reduce((s, l) => s + l.lineCost, 0);
+  const materialCost = round2(lines.reduce((sum, l) => sum + l.lineCost, 0));
+  // The full value leaving stock — the batch is charged the consumed part and
+  // the remnant account holds the rest, so the two must be tracked apart.
+  const stockIssueCost = round2(lines.reduce((sum, l) => sum + l.requiredQty * l.unitCost, 0));
+  const remnantUsedCost = round2(lines.reduce((sum, l) => sum + l.fromRemnantCost, 0));
+  const remnantCreatedCost = round2(lines.reduce((sum, l) => sum + l.leftoverCost, 0));
 
   // Conversion cost scales with the run unless the operator gave an actual.
-  const round2 = (n: number) => Math.round(n * 100) / 100;
   const labourCost = round2(
     opts.labourCost != null ? Number(opts.labourCost) || 0 : (opts.labourPerBatch || 0) * scale,
   );
   const overheadCost = round2(
     opts.overheadCost != null ? Number(opts.overheadCost) || 0 : (opts.overheadPerBatch || 0) * scale,
   );
-  const totalCost = materialCost + labourCost + overheadCost;
+  const totalCost = round2(materialCost + labourCost + overheadCost);
+
+  const shortages = lines.filter((l) => l.availableQty < l.requiredQty);
+
+  // "Not enough material" is nearly always the material sitting in another
+  // warehouse. Rather than leaving the operator to guess, say where it is and
+  // hand the screen the list of warehouses worth pointing the run at.
+  const byLocation = await db.inventoryTxn.groupBy({
+    by: ["itemId", "location"],
+    where: { companyId, itemId: { in: itemIds } },
+    _sum: { qty: true },
+  });
+  for (const line of shortages) {
+    line.elsewhere = byLocation
+      .filter((r) => r.itemId === line.itemId && r.location !== location && (r._sum.qty ?? 0) > 0)
+      .map((r) => ({ location: r.location, qty: r._sum.qty ?? 0 }));
+  }
+  const availableLocations = [
+    ...new Set([
+      ...(location ? [location] : []),
+      ...byLocation.filter((r) => (r._sum.qty ?? 0) > 0).map((r) => r.location),
+    ]),
+  ];
 
   return {
     lines,
     materialCost,
+    stockIssueCost,
+    remnantUsedCost,
+    remnantCreatedCost,
+    remnantTakes: takes,
     labourCost,
     overheadCost,
     totalCost,
     unitCost: producedQty > 0 ? totalCost / producedQty : 0,
-    shortages: lines.filter((l) => l.availableQty < l.requiredQty),
+    shortages,
+    availableLocations,
   };
 }
 
 export type CompletedRun = {
   producedQty: number;
   materialCost: number;
+  /** Value of open pieces this run consumed instead of taking from stock. */
+  remnantUsedCost: number;
+  /** Value set aside as a new open piece for the next run. */
+  remnantCreatedCost: number;
+  /** Part-units left over, per material. */
+  remnantsCreated: { itemId: string; itemName: string; qty: number; unit: string }[];
   labourCost: number;
   overheadCost: number;
   totalCost: number;
@@ -427,7 +624,6 @@ export async function completeProductionRun(opts: {
   }
   const date = opts.date ? new Date(opts.date) : new Date();
   if (Number.isNaN(date.getTime())) throw new ManufacturingError("Invalid date");
-  const location = opts.location || "MAIN";
 
   return prisma.$transaction(async (tx) => {
     const order = await tx.businessRecord.findFirst({
@@ -436,6 +632,10 @@ export async function completeProductionRun(opts: {
     if (!order) throw new ManufacturingError("Production order not found", 404);
 
     const orderData = (order.data ?? {}) as Record<string, unknown>;
+    // The warehouse the order was raised against, unless this run says otherwise.
+    // Defaulting straight to MAIN was why a run could report a shortage while the
+    // material sat, purchased and counted, in the warehouse the order named.
+    const location = opts.location || String(orderData.location || "").trim() || "MAIN";
     const orderedQty = Number(orderData.quantity ?? 0);
     const alreadyDone = Number(orderData.completed ?? 0);
     if (orderedQty > 0 && alreadyDone + producedQty > orderedQty) {
@@ -493,6 +693,8 @@ export async function completeProductionRun(opts: {
     }
 
     // ── 1. Material out of stock ──
+    // `amount` is the whole value that leaves stock, not what the batch is
+    // charged — for a divisible line the two differ by the piece set aside.
     for (const line of priced.lines) {
       if (line.requiredQty <= 0) continue;
       await tx.inventoryTxn.create({
@@ -503,8 +705,54 @@ export async function completeProductionRun(opts: {
           itemId: line.itemId,
           qty: -line.requiredQty,
           rate: line.unitCost,
-          amount: line.lineCost,
+          amount: round2(line.requiredQty * line.unitCost),
           location,
+        },
+      });
+    }
+
+    // ── 1b. Open pieces this run ate ──
+    for (const take of priced.remnantTakes) {
+      const piece = await tx.businessRecord.findFirst({
+        where: { id: take.recordId, companyId, category: MATERIAL_REMNANT_CATEGORY },
+      });
+      if (!piece) continue;
+      const pieceData = (piece.data ?? {}) as Record<string, unknown>;
+      const left = round6(Number(pieceData.qty || 0) - take.qty);
+      const unitCost = Number(pieceData.unitCost) || 0;
+      const spent = left <= REMNANT_EPSILON;
+      await tx.businessRecord.update({
+        where: { id: piece.id },
+        data: {
+          status: spent ? "consumed" : "open",
+          amount: spent ? 0 : round2(left * unitCost),
+          data: { ...pieceData, qty: spent ? 0 : left },
+        },
+      });
+    }
+
+    // ── 1c. What is left of the last whole unit stays usable ──
+    for (const line of priced.lines) {
+      if (line.leftoverQty <= REMNANT_EPSILON) continue;
+      await tx.businessRecord.create({
+        data: {
+          companyId,
+          branchId: opts.branchId || null,
+          category: MATERIAL_REMNANT_CATEGORY,
+          title: line.itemName,
+          status: "open",
+          // refId keys the lookup, so the next run finds it in one query.
+          refId: line.itemId,
+          date,
+          amount: line.leftoverCost,
+          data: {
+            itemId: line.itemId,
+            qty: line.leftoverQty,
+            unit: line.unit,
+            unitCost: line.unitCost,
+            location,
+            sourceOrderId: order.id,
+          },
         },
       });
     }
@@ -528,14 +776,21 @@ export async function completeProductionRun(opts: {
     // This used to be MFG_ACCOUNTS.RAW_MATERIAL_STOCK (1200) while purchase
     // invoices debit Stock/Inventory, so issuing material drove 1200 negative
     // and left the purchased value stranded in Stock/Inventory forever.
-    const [rawMaterialAccountId, wipAccountId, finishedAccountId, labourAccountId, overheadAccountId] =
-      await Promise.all([
-        resolveInventoryAccountId(tx, companyId),
-        ensureAccount(tx, companyId, MFG_ACCOUNTS.WORK_IN_PROGRESS),
-        resolveFinishedGoodsAccountId(tx, companyId),
-        ensureAccount(tx, companyId, MFG_ACCOUNTS.FACTORY_LABOUR),
-        ensureAccount(tx, companyId, MFG_ACCOUNTS.FACTORY_OVERHEAD),
-      ]);
+    const [
+      rawMaterialAccountId,
+      wipAccountId,
+      finishedAccountId,
+      labourAccountId,
+      overheadAccountId,
+      remnantAccountId,
+    ] = await Promise.all([
+      resolveInventoryAccountId(tx, companyId),
+      ensureAccount(tx, companyId, MFG_ACCOUNTS.WORK_IN_PROGRESS),
+      resolveFinishedGoodsAccountId(tx, companyId),
+      ensureAccount(tx, companyId, MFG_ACCOUNTS.FACTORY_LABOUR),
+      ensureAccount(tx, companyId, MFG_ACCOUNTS.FACTORY_OVERHEAD),
+      ensureAccount(tx, companyId, MFG_ACCOUNTS.MATERIAL_REMNANTS),
+    ]);
 
     // Was `count() + 1` / `+ 2`, which repeated a number as soon as any MFG
     // voucher was deleted — the count dropped while the highest number did not.
@@ -545,9 +800,15 @@ export async function completeProductionRun(opts: {
     const receiptVoucherNo = `MFG-${nextMfg + 1}`;
     const branchId = opts.branchId || null;
 
+    // What the open-piece account gains on this run: the part of the last whole
+    // unit that survives, less whatever open pieces the run consumed. Derived
+    // from the two posted figures rather than summed independently, so the
+    // voucher balances to the paisa however the rounding falls.
+    const remnantDelta = round2(priced.stockIssueCost - priced.materialCost);
+
     // A zero-cost run (nothing ever received, no purchase rate set) would post a
     // pair of zero vouchers that clutter the ledger and say nothing.
-    if (priced.totalCost > 0) {
+    if (priced.totalCost > 0 || remnantDelta !== 0) {
       await tx.voucher.create({
         data: {
           companyId, branchId,
@@ -563,7 +824,15 @@ export async function completeProductionRun(opts: {
               // factory already expensed. Crediting those expense accounts is
               // the absorption step: the cost stops being a period expense and
               // follows the goods until they are sold.
-              { companyId, accountId: rawMaterialAccountId, amount: -priced.materialCost },
+              //
+              // Stock is credited with every whole unit that left the rack. The
+              // batch only bears what it burned; the balance of the last roll
+              // moves sideways into Material Remnants and waits for the next run
+              // instead of inflating this one.
+              { companyId, accountId: rawMaterialAccountId, amount: -priced.stockIssueCost },
+              ...(remnantDelta !== 0
+                ? [{ companyId, accountId: remnantAccountId, amount: remnantDelta }]
+                : []),
               ...(priced.labourCost > 0
                 ? [{ companyId, accountId: labourAccountId, amount: -priced.labourCost }]
                 : []),
@@ -636,6 +905,11 @@ export async function completeProductionRun(opts: {
     return {
       producedQty,
       materialCost: priced.materialCost,
+      remnantUsedCost: priced.remnantUsedCost,
+      remnantCreatedCost: priced.remnantCreatedCost,
+      remnantsCreated: priced.lines
+        .filter((l) => l.leftoverQty > REMNANT_EPSILON)
+        .map((l) => ({ itemId: l.itemId, itemName: l.itemName, qty: l.leftoverQty, unit: l.unit })),
       labourCost: priced.labourCost,
       overheadCost: priced.overheadCost,
       totalCost: priced.totalCost,

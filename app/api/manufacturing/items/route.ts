@@ -15,7 +15,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { resolveCompanyId } from "@/lib/tenant";
-import { getStockOnHand, getAverageCosts } from "@/lib/manufacturingPosting";
+import { getStockOnHand, getAverageCosts, readOpenRemnants } from "@/lib/manufacturingPosting";
 
 const WRITE_ROLES = new Set(["ADMIN", "ACCOUNTANT", "MANAGER"]);
 const CATEGORIES = new Set(["RAW_MATERIAL", "FINISHED", "TRADING", "SERVICE"]);
@@ -39,19 +39,26 @@ export async function GET(req: NextRequest) {
     });
 
     const ids = items.map((i) => i.id);
-    const [stock, costs] = await Promise.all([
+    const [stock, costs, remnants] = await Promise.all([
       getStockOnHand(prisma, companyId, ids),
       getAverageCosts(prisma, companyId, ids),
+      readOpenRemnants(prisma, companyId, ids),
     ]);
 
     return NextResponse.json(
       items.map((item) => {
         const currentStock = stock.get(item.id) ?? 0;
         const unitCost = costs.get(item.id) ?? item.purchaseRate;
+        // Part-used pieces are real material a small order can run on, so the
+        // screen has to show them next to the whole units on the rack.
+        const pieces = remnants.get(item.id) ?? [];
+        const openRemnant = Math.round(pieces.reduce((sum, r) => sum + r.qty, 0) * 1e6) / 1e6;
         return {
           ...item,
           currentStock,
           unitCost,
+          openRemnant,
+          openRemnantValue: Math.round(pieces.reduce((sum, r) => sum + r.qty * r.unitCost, 0) * 100) / 100,
           stockValue: currentStock * unitCost,
           isLow: currentStock <= item.minStock,
         };

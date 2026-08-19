@@ -20,7 +20,18 @@ const inputStyle: React.CSSProperties = {
   borderRadius: 8, padding: "9px 12px", color: "#fff", boxSizing: "border-box",
 };
 
-type LineDraft = { itemId: string; qty: string };
+type LineDraft = {
+  itemId: string;
+  qty: string;
+  /**
+   * Roll, sheet, fabric — material where the unused part of the last unit is
+   * still material. A run needing 12.66 rolls takes 13 off the rack and the
+   * balance is held as an open piece for the next order, instead of being
+   * buried in the cost of this batch. Off for anything discrete: two thirds
+   * of a screw is scrap, not stock.
+   */
+  divisible: boolean;
+};
 
 export default function BOMPage() {
   const { isMobile } = useResponsive();
@@ -33,7 +44,7 @@ export default function BOMPage() {
   const [formError, setFormError] = useState("");
   const [saving, setSaving] = useState(false);
   const [form, setForm] = useState({ finishedItemId: "", version: "v1.0", yieldUnits: 1, labourPerBatch: 0, overheadPerBatch: 0 });
-  const [lines, setLines] = useState<LineDraft[]>([{ itemId: "", qty: "" }]);
+  const [lines, setLines] = useState<LineDraft[]>([{ itemId: "", qty: "", divisible: false }]);
 
   const boms = useMemo(() => bomStore.records.map(mapBomRecord), [bomStore.records]);
   const orders = useMemo(() => productionStore.records.map(mapProductionOrderRecord), [productionStore.records]);
@@ -83,7 +94,7 @@ export default function BOMPage() {
         setFormError("Every material line needs a quantity greater than zero.");
         return;
       }
-      cleaned.push({ itemId: line.itemId, qty });
+      cleaned.push({ itemId: line.itemId, qty, divisible: line.divisible });
     }
     if (!cleaned.length) { setFormError("Add at least one material."); return; }
 
@@ -108,7 +119,7 @@ export default function BOMPage() {
       });
       setShowModal(false);
       setForm({ finishedItemId: "", version: "v1.0", yieldUnits: 1, labourPerBatch: 0, overheadPerBatch: 0 });
-      setLines([{ itemId: "", qty: "" }]);
+      setLines([{ itemId: "", qty: "", divisible: false }]);
     } catch (e) {
       setFormError(e instanceof Error ? e.message : "Could not save the BOM.");
     } finally {
@@ -290,15 +301,19 @@ export default function BOMPage() {
                         {item ? `Rs. ${Math.round(qty * item.unitCost).toLocaleString()}` : "—"}
                       </div>
                       <button
-                        onClick={() => setLines((c) => (c.length === 1 ? [{ itemId: "", qty: "" }] : c.filter((_, i) => i !== index)))}
+                        onClick={() => setLines((c) => (c.length === 1 ? [{ itemId: "", qty: "", divisible: false }] : c.filter((_, i) => i !== index)))}
                         title="Remove line"
                         style={{ background: "transparent", border: `1px solid ${border}`, borderRadius: 8, color: "rgba(255,255,255,.45)", cursor: "pointer", padding: "8px 0" }}
                       >×</button>
+                      <label style={{ gridColumn: "span 4", display: "flex", alignItems: "center", gap: 8, fontSize: 11.5, color: "rgba(255,255,255,.45)", cursor: "pointer", margin: "-2px 0 4px" }}>
+                        <input type="checkbox" checked={line.divisible} onChange={(e) => setLine(index, { divisible: e.target.checked })} />
+                        Roll / sheet material — keep the part-used {item?.unit || "unit"} as open stock for the next run
+                      </label>
                     </div>
                   );
                 })}
               </div>
-              <button onClick={() => setLines((c) => [...c, { itemId: "", qty: "" }])} style={{ marginTop: 10, padding: "7px 14px", borderRadius: 8, background: "rgba(255,255,255,.05)", border: `1px solid ${border}`, color: "rgba(255,255,255,.65)", fontSize: 12, fontWeight: 600, cursor: "pointer" }}>
+              <button onClick={() => setLines((c) => [...c, { itemId: "", qty: "", divisible: false }])} style={{ marginTop: 10, padding: "7px 14px", borderRadius: 8, background: "rgba(255,255,255,.05)", border: `1px solid ${border}`, color: "rgba(255,255,255,.65)", fontSize: 12, fontWeight: 600, cursor: "pointer" }}>
                 + Add material
               </button>
             </div>

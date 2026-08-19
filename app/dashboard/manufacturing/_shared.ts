@@ -39,7 +39,7 @@ export type ManufacturingBom = {
   /** Legacy free-text material names — kept so pre-existing BOMs still render. */
   materials: string[];
   /** Structured lines against real items. Empty on BOMs made before costing. */
-  lines: { itemId: string; qty: number }[];
+  lines: { itemId: string; qty: number; divisible?: boolean }[];
   finishedItemId: string;
   unitCost: number;
   yieldUnits: number;
@@ -116,8 +116,12 @@ export function mapBomRecord(record: BusinessRecord): ManufacturingBom {
       .map((item) => item.trim())
       .filter(Boolean),
     lines: Array.isArray(record.data?.lines)
-      ? (record.data.lines as { itemId?: unknown; qty?: unknown }[])
-          .map((line) => ({ itemId: String(line?.itemId || ""), qty: Number(line?.qty) || 0 }))
+      ? (record.data.lines as { itemId?: unknown; qty?: unknown; divisible?: unknown }[])
+          .map((line) => ({
+            itemId: String(line?.itemId || ""),
+            qty: Number(line?.qty) || 0,
+            divisible: line?.divisible === true,
+          }))
           .filter((line) => line.itemId && line.qty > 0)
       : [],
     finishedItemId: String(record.data?.finishedItemId || ""),
@@ -206,29 +210,52 @@ export type ManufacturingItem = {
   minStock: number;
   currentStock: number;
   unitCost: number;
+  /** Part-used pieces (open rolls) waiting to be finished off. */
+  openRemnant: number;
+  openRemnantValue: number;
   stockValue: number;
   isLow: boolean;
 };
 
 /** One material line of a BOM: a real item and how much of it a batch consumes. */
-export type BomLineInput = { itemId: string; qty: number };
+export type BomLineInput = {
+  itemId: string;
+  qty: number;
+  /** Roll/sheet material: the unused part of the last unit stays usable. */
+  divisible?: boolean;
+};
 
 export type PricedBomLine = BomLineInput & {
   itemName: string;
   unit: string;
   unitCost: number;
+  /** Exact consumption before it is rounded up to whole units. */
+  exactQty: number;
+  /** Whole units that leave stock. */
   requiredQty: number;
+  fromRemnantQty: number;
+  fromRemnantCost: number;
+  leftoverQty: number;
+  leftoverCost: number;
   availableQty: number;
   lineCost: number;
+  elsewhere?: { location: string; qty: number }[];
 };
 
 export type ProductionRunQuote = {
   producedQty: number;
   remaining: number;
+  location?: string;
   lines: PricedBomLine[];
+  materialCost: number;
+  labourCost: number;
+  overheadCost: number;
+  remnantUsedCost: number;
+  remnantCreatedCost: number;
   totalCost: number;
   unitCost: number;
   shortages: PricedBomLine[];
+  availableLocations?: string[];
   error?: string;
   needsBomLines?: boolean;
 };
@@ -238,13 +265,26 @@ export async function loadManufacturingItems(category?: "RAW_MATERIAL" | "FINISH
   return fetchJson<ManufacturingItem[]>(`/api/manufacturing/items${query}`, []);
 }
 
-export async function quoteProductionRun(productionOrderId: string, qty?: number): Promise<ProductionRunQuote | null> {
+export async function quoteProductionRun(
+  productionOrderId: string,
+  qty?: number,
+  location?: string,
+): Promise<ProductionRunQuote | null> {
   const params = new URLSearchParams({ productionOrderId });
   if (qty && qty > 0) params.set("qty", String(qty));
+  if (location) params.set("location", location);
   try {
     const res = await fetch(`/api/manufacturing/production-orders/complete?${params}`, { cache: "no-store" });
     const body = await res.json();
-    if (!res.ok) return { ...body, lines: [], shortages: [], totalCost: 0, unitCost: 0, producedQty: 0, remaining: 0 };
+    if (!res.ok) {
+      return {
+        ...body,
+        lines: [], shortages: [],
+        materialCost: 0, labourCost: 0, overheadCost: 0,
+        remnantUsedCost: 0, remnantCreatedCost: 0,
+        totalCost: 0, unitCost: 0, producedQty: 0, remaining: 0,
+      };
+    }
     return body as ProductionRunQuote;
   } catch {
     return null;
