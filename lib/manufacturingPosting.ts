@@ -768,7 +768,9 @@ export async function completeProductionRun(opts: {
               // batch only bears what it burned; the balance of the last roll
               // moves sideways into Material Remnants and waits for the next run
               // instead of inflating this one.
-              { companyId, accountId: rawMaterialAccountId, amount: -priced.stockIssueCost },
+              ...(priced.stockIssueCost !== 0
+                ? [{ companyId, accountId: rawMaterialAccountId, amount: -priced.stockIssueCost }]
+                : []),
               ...(remnantDelta !== 0
                 ? [{ companyId, accountId: remnantAccountId, amount: remnantDelta }]
                 : []),
