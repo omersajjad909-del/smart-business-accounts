@@ -287,6 +287,29 @@ export async function readOpenRemnants(
 
 
 /**
+ * Conversion cost the BOM declares for one batch.
+ *
+ * Production used to cost material only, so a PVC bag that took a roll plus an
+ * hour of labour and machine time was valued at the roll alone. Finished goods
+ * went onto the balance sheet too cheap, and the labour stayed in the P&L as a
+ * period expense in the month it was paid rather than following the goods.
+ */
+export function readBomConversion(data: unknown): {
+  labourPerBatch: number;
+  overheadPerBatch: number;
+} {
+  const d = (data ?? {}) as Record<string, unknown>;
+  const num = (v: unknown) => {
+    const n = Number(v);
+    return Number.isFinite(n) && n > 0 ? n : 0;
+  };
+  return {
+    labourPerBatch: num(d.labourPerBatch),
+    overheadPerBatch: num(d.overheadPerBatch),
+  };
+}
+
+/**
  * Finds a company's account, creating it if the chart predates it.
  *
  * Name is checked before code because the codes are not unique across business
@@ -364,6 +387,12 @@ export async function priceProductionRun(opts: {
   overheadCost?: number;
   /** Warehouse the run draws on. Omit to look at every location. */
   location?: string | null;
+  /**
+   * Look up where else the material is. Worth a query when a human is about
+   * to read the answer; pure overhead inside the posting transaction, which
+   * runs against a remote database on a clock.
+   */
+  withLocationHints?: boolean;
   client?: Db;
 }): Promise<PricedRun> {
   const db = (opts.client ?? prisma) as Db;
@@ -446,22 +475,24 @@ export async function priceProductionRun(opts: {
   // "Not enough material" is nearly always the material sitting in another
   // warehouse. Rather than leaving the operator to guess, say where it is and
   // hand the screen the list of warehouses worth pointing the run at.
-  const byLocation = await db.inventoryTxn.groupBy({
-    by: ["itemId", "location"],
-    where: { companyId, itemId: { in: itemIds } },
-    _sum: { qty: true },
-  });
-  for (const line of shortages) {
-    line.elsewhere = byLocation
-      .filter((r) => r.itemId === line.itemId && r.location !== location && (r._sum.qty ?? 0) > 0)
-      .map((r) => ({ location: r.location, qty: r._sum.qty ?? 0 }));
+  const availableLocations: string[] = location ? [location] : [];
+  if (opts.withLocationHints !== false) {
+    const byLocation = await db.inventoryTxn.groupBy({
+      by: ["itemId", "location"],
+      where: { companyId, itemId: { in: itemIds } },
+      _sum: { qty: true },
+    });
+    for (const line of shortages) {
+      line.elsewhere = byLocation
+        .filter((r) => r.itemId === line.itemId && r.location !== location && (r._sum.qty ?? 0) > 0)
+        .map((r) => ({ location: r.location, qty: r._sum.qty ?? 0 }));
+    }
+    for (const row of byLocation) {
+      if ((row._sum.qty ?? 0) > 0 && !availableLocations.includes(row.location)) {
+        availableLocations.push(row.location);
+      }
+    }
   }
-  const availableLocations = [
-    ...new Set([
-      ...(location ? [location] : []),
-      ...byLocation.filter((r) => (r._sum.qty ?? 0) > 0).map((r) => r.location),
-    ]),
-  ];
 
   return {
     lines,
@@ -526,6 +557,12 @@ export async function completeProductionRun(opts: {
   const date = opts.date ? new Date(opts.date) : new Date();
   if (Number.isNaN(date.getTime())) throw new ManufacturingError("Invalid date");
 
+  // Prisma's default interactive-transaction budget is five seconds, and this
+  // one legitimately needs more: it prices the run, writes an issue row per
+  // material, draws down open pieces, receives the finished goods, resolves six
+  // accounts and posts two vouchers — every one a round trip to a database that
+  // is not on this machine. A run that overran simply failed with
+  // "Transaction already closed" and the operator saw nothing produced.
   return prisma.$transaction(async (tx) => {
     const order = await tx.businessRecord.findFirst({
       where: { id: productionOrderId, companyId, category: "production_order" },
@@ -583,6 +620,7 @@ export async function completeProductionRun(opts: {
       // Material is consumed out of one warehouse, so availability and cost are
       // read from that warehouse rather than from company-wide totals.
       location,
+      withLocationHints: false,
       client: tx,
     });
 
@@ -821,5 +859,5 @@ export async function completeProductionRun(opts: {
       batchNo,
       finishedItemId,
     };
-  });
+  }, { timeout: 30_000, maxWait: 15_000 });
 }

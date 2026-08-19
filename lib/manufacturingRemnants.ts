@@ -108,26 +108,3 @@ export function planLineConsumption(opts: {
     materialCost: fromRemnantCost + remaining * opts.unitCost,
   };
 }
-
-/**
- * Conversion cost the BOM declares for one batch.
- *
- * Production used to cost material only, so a PVC bag that took a roll plus an
- * hour of labour and machine time was valued at the roll alone. Finished goods
- * went onto the balance sheet too cheap, and the labour stayed in the P&L as a
- * period expense in the month it was paid rather than following the goods.
- */
-export function readBomConversion(data: unknown): {
-  labourPerBatch: number;
-  overheadPerBatch: number;
-} {
-  const d = (data ?? {}) as Record<string, unknown>;
-  const num = (v: unknown) => {
-    const n = Number(v);
-    return Number.isFinite(n) && n > 0 ? n : 0;
-  };
-  return {
-    labourPerBatch: num(d.labourPerBatch),
-    overheadPerBatch: num(d.overheadPerBatch),
-  };
-}
