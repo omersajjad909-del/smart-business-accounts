@@ -617,6 +617,17 @@ export default function PricingPage() {
     `/onboarding/choose-plan?plan=custom&modules=${id}&extraUsers=0&extraBranches=0&cycle=${billing}&currency=${currency}&country=${country}`;
 
   const buildHref = (slug: string) => `/onboarding/signup/${slug}?cycle=${billing}&currency=${currency}&country=${country}`;
+
+  // /pricing has the strongest engagement on the site but nothing measured what
+  // people did there. `placement` separates the big cards from the compact
+  // comparison table so it is clear which one actually drives signups.
+  const trackPlanClick = (slug: string, placement: string) =>
+    trackEvent("pricing_plan_click", {
+      plan: slug,
+      placement,
+      billing_cycle: billing,
+      currency,
+    });
   const buildCustomHref = () => `/onboarding/choose-plan?plan=custom&modules=${selectedModules.join(",")}&extraUsers=${extraUsers}&extraBranches=${extraBranches}&cycle=${billing}&currency=${currency}&country=${country}`;
   const toggleModule = (id: string) => setSelectedModules(p => p.includes(id) ? p.filter(x => x !== id) : [...p, id]);
   // Single-app buy: clear everything else so the estimate shows exactly what
@@ -777,7 +788,7 @@ export default function PricingPage() {
                     </div> */}
                   </div>
                   {signupsOpen ? (
-                    <Link href={buildHref(plan.slug)} style={{ display: "block", textAlign: "center", padding: "12px 18px", borderRadius: 12, textDecoration: "none", color: "white", fontWeight: 800, background: plan.gradient, marginBottom: 22, fontSize: 14 }}>
+                    <Link href={buildHref(plan.slug)} onClick={() => trackPlanClick(plan.slug, "plan_card")} style={{ display: "block", textAlign: "center", padding: "12px 18px", borderRadius: 12, textDecoration: "none", color: "white", fontWeight: 800, background: plan.gradient, marginBottom: 22, fontSize: 14 }}>
                       Continue with {plan.name}
                     </Link>
                   ) : (
@@ -1091,7 +1102,7 @@ export default function PricingPage() {
               {PLANS.map((plan) => (
                 <div key={plan.slug} style={{ padding: "20px 16px", borderLeft: "1px solid rgba(255,255,255,.06)", background: plan.featured ? "rgba(99,102,241,.06)" : "transparent" }}>
                   {signupsOpen ? (
-                    <Link href={buildHref(plan.slug)} style={{ display: "block", textAlign: "center", padding: "11px 12px", borderRadius: 10, textDecoration: "none", color: "white", fontWeight: 800, fontSize: 13, background: plan.gradient }}>
+                    <Link href={buildHref(plan.slug)} onClick={() => trackPlanClick(plan.slug, "comparison_table")} style={{ display: "block", textAlign: "center", padding: "11px 12px", borderRadius: 10, textDecoration: "none", color: "white", fontWeight: 800, fontSize: 13, background: plan.gradient }}>
                       Get {plan.name}
                     </Link>
                   ) : (

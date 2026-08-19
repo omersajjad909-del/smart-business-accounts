@@ -12,6 +12,7 @@ import { clearCurrentUser, getCurrentUser } from "@/lib/auth";
 import { clientRegionHeaders } from "@/lib/clientRegion";
 import PasswordChecklist from "@/components/PasswordChecklist";
 import { MIN_PASSWORD_LENGTH } from "@/lib/passwordPolicy";
+import { trackEvent, trackEventOnce } from "@/lib/analytics";
 
 /* â”€â”€â”€ Country dial codes â”€â”€â”€ */
 /* ─── Phone number format groups per country ─── */
@@ -359,6 +360,12 @@ export default function SignupByPlanPage() {
     [searchParams]
   );
 
+  // Top of the signup funnel: the visitor reached the form for a specific plan.
+  // trackEventOnce guards against re-renders re-firing it.
+  useEffect(() => {
+    trackEventOnce("signup_start", { plan: planCode, billing_cycle: billingCycle });
+  }, [planCode, billingCycle]);
+
   useEffect(() => {
     (async () => {
       try {
@@ -593,6 +600,14 @@ export default function SignupByPlanPage() {
       });
       const data = await res.json();
       if (!res.ok) { setError(data?.error || "Signup failed. Please try again."); setLoading(false); return; }
+
+      // Account created. Fired before the redirects below, because navigating
+      // away can tear the page down before a later call would reach GA.
+      trackEvent("signup_complete", {
+        plan: planCode,
+        billing_cycle: billingCycle,
+        requires_verification: Boolean(data?.needsVerification),
+      });
 
       // Clear any previous session/demo data to ensure fresh login
       try {

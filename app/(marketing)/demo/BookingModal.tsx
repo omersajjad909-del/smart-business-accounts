@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
+import { trackEvent } from "@/lib/analytics";
 
 const FONT = "'Outfit','Inter',sans-serif";
 
@@ -89,6 +90,8 @@ export default function BookingModal({
       if (!r.ok) {
         setError(d.error || "Booking failed");
       } else {
+        // Confirmed booking only — errors above must not count as conversions.
+        trackEvent("demo_booking", { business_type: businessType });
         setConfirmed(d.booking);
       }
     } catch (e: any) {
