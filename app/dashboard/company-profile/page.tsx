@@ -8,6 +8,7 @@ import { CURRENCY_LABEL, SUPPORTED_CURRENCIES, currencyByCountry } from "@/lib/c
 import Link from "next/link";
 import ImageAdjusterModal from "@/components/ImageAdjusterModal";
 import { dispatchCompanyProfileUpdated, dispatchUserProfileUpdated } from "@/lib/dashboardProfileEvents";
+import { dataUrlToFile } from "@/lib/dataUrl";
 import { useResponsive } from "@/hooks/useResponsive";
 
 type CompanyData = {
@@ -79,8 +80,7 @@ export default function CompanyProfilePage() {
     setLogoUploading(true);
     setSaveMsg(null);
     try {
-      const blob = await (await fetch(dataUrl)).blob();
-      const file = new File([blob], "company-logo.png", { type: blob.type || "image/png" });
+      const file = dataUrlToFile(dataUrl, "company-logo.png");
       const fd = new FormData();
       fd.append("logo", file);
       const r = await fetch("/api/company/logo", { method: "POST", body: fd });
@@ -112,8 +112,8 @@ export default function CompanyProfilePage() {
         setSaveMsg({ text: d.error || "Failed to upload logo", ok: false });
         setTimeout(() => setSaveMsg(null), 3000);
       }
-    } catch {
-      setSaveMsg({ text: "Failed to upload logo", ok: false });
+    } catch (e: any) {
+      setSaveMsg({ text: e?.message ? `Failed to upload logo: ${e.message}` : "Failed to upload logo", ok: false });
       setTimeout(() => setSaveMsg(null), 3000);
     } finally {
       setLogoUploading(false);

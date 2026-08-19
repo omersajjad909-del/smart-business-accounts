@@ -22,6 +22,7 @@ import AppearanceApplier from "@/components/AppearanceApplier";
 import { hasModule as baseHasModule, type BusinessType } from "@/lib/businessModules";
 import { findDashboardFeatureByRoute } from "@/lib/dashboardFeatureRegistry";
 import { FINOVA_COMPANY_PROFILE_UPDATED, FINOVA_USER_PROFILE_UPDATED } from "@/lib/dashboardProfileEvents";
+import { dataUrlToFile } from "@/lib/dataUrl";
 
 // Deferred out of the main dashboard bundle — each is only relevant in a rare
 // path (avatar cropping, demo-account sessions), not needed for first paint
@@ -313,10 +314,8 @@ export default function DashboardLayout({
   async function uploadAvatarFromAdjustedImage(dataUrl: string) {
     try {
       setAvatarUploading(true);
-      const response = await fetch(dataUrl);
-      const blob = await response.blob();
       const formData = new FormData();
-      formData.append("avatar", new File([blob], "avatar.png", { type: blob.type || "image/png" }));
+      formData.append("avatar", dataUrlToFile(dataUrl, "avatar.png"));
       const uploadRes = await fetch("/api/me/avatar", { method: "POST", body: formData });
       if (!uploadRes.ok) return;
       const data = await uploadRes.json();
