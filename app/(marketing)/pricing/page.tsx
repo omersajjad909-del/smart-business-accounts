@@ -6,6 +6,7 @@ import { formatFromUSD } from "@/lib/currency-client";
 import { STANDALONE_MODULE_IDS } from "@/lib/customPlanPricing";
 import { signupHrefFor } from "@/lib/signupGate";
 import { useSignupsOpen } from "@/hooks/useSignupsOpen";
+import { trackEvent } from "@/lib/analytics";
 
 type BillingCycle = "monthly" | "yearly";
 type PlanPricing = {
