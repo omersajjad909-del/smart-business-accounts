@@ -463,18 +463,20 @@ export default function AdminUsersPage() {
                         </button>
                       </td>
                       <td className="users-date">{formatDate(u.createdAt)}</td>
-                      <td>
-                        <button className="users-edit-btn" onClick={() => openEdit(u)}>
-                          Edit
-                        </button>
-                        {!PROTECTED_EMAILS.includes(u.email) && u.id !== currentUser?.id && (
-                          <button
-                            onClick={() => deleteUser(u)}
-                            style={{ marginLeft: 6, padding: "4px 10px", borderRadius: 7, border: "1px solid rgba(239,68,68,.3)", background: "rgba(239,68,68,.08)", color: "#f87171", fontSize: 12, fontWeight: 600, cursor: "pointer" }}
-                          >
-                            Delete
+                      <td className="users-actions-cell">
+                        <div className="users-actions">
+                          <button className="users-edit-btn" onClick={() => openEdit(u)}>
+                            Edit
                           </button>
+                        {!PROTECTED_EMAILS.includes(u.email) && u.id !== currentUser?.id && (
+                            <button
+                              className="users-delete-btn"
+                              onClick={() => deleteUser(u)}
+                            >
+                              Delete
+                            </button>
                         )}
+                        </div>
                       </td>
                     </tr>
                   );
@@ -717,6 +719,16 @@ const styles = `
   cursor:pointer;font-family:inherit;transition:all .14s ease;
 }
 .users-edit-btn:hover{background:var(--bg-soft);border-color:rgba(139,92,246,.4);color:#c4b5fd;}
+.users-actions-cell{white-space:nowrap;}
+.users-actions{
+  display:flex;align-items:center;gap:8px;justify-content:flex-start;flex-wrap:nowrap;
+}
+.users-delete-btn{
+  padding:6px 14px;border-radius:10px;border:1px solid rgba(239,68,68,.3);
+  background:rgba(239,68,68,.08);color:#f87171;font-size:12px;font-weight:700;
+  cursor:pointer;font-family:inherit;transition:all .14s ease;white-space:nowrap;
+}
+.users-delete-btn:hover{background:rgba(239,68,68,.14);border-color:rgba(239,68,68,.45);}
 
 .users-empty{padding:48px;text-align:center;color:var(--text-muted);}
 .users-empty-cell{text-align:center;padding:48px 0!important;color:var(--text-muted);border-bottom:none!important;}
