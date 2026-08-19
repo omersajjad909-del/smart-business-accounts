@@ -33,6 +33,10 @@ export default function ProductionOrdersPage() {
   const [running, setRunning] = useState(false);
   const [runError, setRunError] = useState("");
   const [allowShort, setAllowShort] = useState(false);
+  // Which warehouse the run consumes from. A run pinned to MAIN while the
+  // rolls were received into SHOP reported a shortage with the material in
+  // the building, so it is now picked here and priced against that store.
+  const [runLocation, setRunLocation] = useState("MAIN");
   const [form, setForm] = useState({
     product: "",
     bomId: "",
@@ -40,6 +44,7 @@ export default function ProductionOrdersPage() {
     plannedDate: new Date().toISOString().slice(0, 10),
     assignedTo: "",
     notes: "",
+    location: "MAIN",
   });
 
   const orders = useMemo(() => orderStore.records.map(mapProductionOrderRecord), [orderStore.records]);
@@ -78,6 +83,7 @@ export default function ProductionOrdersPage() {
         notes: form.notes,
         bomId: selectedBom?.id || "",
         bomVersion: selectedBom?.version || "",
+        location: form.location,
       },
     });
     setShowModal(false);
@@ -88,6 +94,7 @@ export default function ProductionOrdersPage() {
       plannedDate: new Date().toISOString().slice(0, 10),
       assignedTo: "",
       notes: "",
+      location: "MAIN",
     });
     setFormError("");
   }
@@ -113,17 +120,20 @@ export default function ProductionOrdersPage() {
     setRunError("");
     setRunQuote(null);
     setQuoting(true);
+    // Let the server pick the warehouse first — it knows the one the order
+    // was raised against, which is the one the operator meant.
     const quote = await quoteProductionRun(order.id, remaining);
     setQuoting(false);
     if (!quote) { setRunError("Could not reach the server."); return; }
     if (quote.error) { setRunError(quote.error); return; }
+    setRunLocation(quote.location || "MAIN");
     setRunQuote(quote);
   }
 
-  async function requote(qty: number) {
+  async function requote(qty: number, location = runLocation) {
     if (!runOrder || qty <= 0) return;
     setQuoting(true);
-    const quote = await quoteProductionRun(runOrder.id, qty);
+    const quote = await quoteProductionRun(runOrder.id, qty, location);
     setQuoting(false);
     if (quote && !quote.error) setRunQuote(quote);
   }
@@ -136,13 +146,27 @@ export default function ProductionOrdersPage() {
       const res = await fetch("/api/manufacturing/production-orders/complete", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ productionOrderId: runOrder.id, producedQty: runQty, allowNegativeStock: allowShort }),
+        body: JSON.stringify({
+          productionOrderId: runOrder.id,
+          producedQty: runQty,
+          allowNegativeStock: allowShort,
+          location: runLocation,
+        }),
       });
       const body = await res.json();
       if (!res.ok) throw new Error(body?.error || "Could not complete the run.");
       toast.success(
         `${body.producedQty} units received · batch ${body.batchNo} · Rs. ${Math.round(body.totalCost).toLocaleString()} to Finished Goods`,
       );
+      // The part-roll that survived is the whole point of the change — say so,
+      // or the operator will still think it was thrown away.
+      const kept = (body.remnantsCreated ?? []) as { itemName: string; qty: number; unit: string }[];
+      if (kept.length) {
+        toast(
+          `Kept as open stock: ${kept.map((r) => `${Number(r.qty).toFixed(2)}${r.unit} ${r.itemName}`).join(", ")}`,
+          { icon: "♻️" },
+        );
+      }
       setRunOrder(null);
       setRunQuote(null);
       await Promise.all([orderStore.refetch?.(), goodsStore.refetch?.()]);
@@ -261,7 +285,14 @@ export default function ProductionOrdersPage() {
                 <label style={{ display: "block", fontSize: 12, color: "rgba(255,255,255,.45)", marginBottom: 6 }}>Planned Date</label>
                 <input type="date" value={form.plannedDate} onChange={(e) => setForm((current) => ({ ...current, plannedDate: e.target.value }))} style={{ width: "100%", background: bg, border: `1px solid ${border}`, borderRadius: 8, padding: "9px 12px", color: "#fff", boxSizing: "border-box" }} />
               </div>
-              <div style={{ gridColumn: "span 2" }}>
+              <div>
+                <label style={{ display: "block", fontSize: 12, color: "rgba(255,255,255,.45)", marginBottom: 6 }}>Consume from</label>
+                <select value={form.location} onChange={(e) => setForm((current) => ({ ...current, location: e.target.value }))} style={{ width: "100%", background: "#161b27", border: `1px solid ${border}`, borderRadius: 8, padding: "9px 12px", color: "#fff" }}>
+                  <option value="MAIN">Main</option>
+                  <option value="SHOP">Shop</option>
+                </select>
+              </div>
+              <div>
                 <label style={{ display: "block", fontSize: 12, color: "rgba(255,255,255,.45)", marginBottom: 6 }}>Assigned To</label>
                 <input value={form.assignedTo} onChange={(e) => setForm((current) => ({ ...current, assignedTo: e.target.value }))} style={{ width: "100%", background: bg, border: `1px solid ${border}`, borderRadius: 8, padding: "9px 12px", color: "#fff", boxSizing: "border-box" }} />
               </div>
@@ -293,14 +324,28 @@ export default function ProductionOrdersPage() {
               <div style={{ marginBottom: 14, padding: "10px 12px", borderRadius: 8, background: "rgba(239,68,68,.14)", border: "1px solid rgba(239,68,68,.28)", color: "#fca5a5", fontSize: 12, lineHeight: 1.6 }}>{runError}</div>
             )}
 
-            <div style={{ marginBottom: 16 }}>
-              <label style={{ display: "block", fontSize: 12, color: "rgba(255,255,255,.45)", marginBottom: 6 }}>Units finished in this run</label>
-              <input
-                type="number" min={1} value={runQty}
-                onChange={(e) => setRunQty(Math.max(1, Number(e.target.value) || 1))}
-                onBlur={(e) => requote(Math.max(1, Number(e.target.value) || 1))}
-                style={{ width: 180, background: bg, border: `1px solid ${border}`, borderRadius: 8, padding: "9px 12px", color: "#fff", boxSizing: "border-box" }}
-              />
+            <div style={{ display: "flex", gap: 14, flexWrap: "wrap", marginBottom: 16 }}>
+              <div>
+                <label style={{ display: "block", fontSize: 12, color: "rgba(255,255,255,.45)", marginBottom: 6 }}>Units finished in this run</label>
+                <input
+                  type="number" min={1} value={runQty}
+                  onChange={(e) => setRunQty(Math.max(1, Number(e.target.value) || 1))}
+                  onBlur={(e) => requote(Math.max(1, Number(e.target.value) || 1))}
+                  style={{ width: 180, background: bg, border: `1px solid ${border}`, borderRadius: 8, padding: "9px 12px", color: "#fff", boxSizing: "border-box" }}
+                />
+              </div>
+              <div>
+                <label style={{ display: "block", fontSize: 12, color: "rgba(255,255,255,.45)", marginBottom: 6 }}>Consume from</label>
+                <select
+                  value={runLocation}
+                  onChange={(e) => { setRunLocation(e.target.value); requote(runQty, e.target.value); }}
+                  style={{ width: 180, background: "#161b27", border: `1px solid ${border}`, borderRadius: 8, padding: "9px 12px", color: "#fff", boxSizing: "border-box" }}
+                >
+                  {[...new Set([runLocation, ...(runQuote?.availableLocations ?? [])])].map((loc) => (
+                    <option key={loc} value={loc}>{loc}</option>
+                  ))}
+                </select>
+              </div>
             </div>
 
             {quoting && <div style={{ fontSize: 13, color: "rgba(255,255,255,.4)", padding: "12px 0" }}>Costing this run…</div>}
@@ -311,7 +356,7 @@ export default function ProductionOrdersPage() {
                   <table style={{ width: "100%", borderCollapse: "collapse" }}>
                     <thead>
                       <tr style={{ background: "rgba(255,255,255,.03)" }}>
-                        {["Material", "Needed", "In stock", "Cost"].map((h, i) => (
+                        {["Material", "Needs", "Open stock", "Off the rack", "Cost"].map((h, i) => (
                           <th key={h} style={{ padding: "10px 14px", fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,.4)", textTransform: "uppercase", letterSpacing: ".05em", textAlign: i === 0 ? "left" : "right" }}>{h}</th>
                         ))}
                       </tr>
@@ -321,9 +366,24 @@ export default function ProductionOrdersPage() {
                         const short = line.availableQty < line.requiredQty;
                         return (
                           <tr key={line.itemId} style={{ borderTop: `1px solid ${border}` }}>
-                            <td style={{ padding: "10px 14px", fontSize: 12.5 }}>{line.itemName}</td>
-                            <td style={{ padding: "10px 14px", fontSize: 12.5, textAlign: "right", fontWeight: 700 }}>{line.requiredQty}{line.unit}</td>
-                            <td style={{ padding: "10px 14px", fontSize: 12.5, textAlign: "right", color: short ? "#fca5a5" : "rgba(255,255,255,.55)", fontWeight: short ? 700 : 400 }}>{line.availableQty}{line.unit}</td>
+                            <td style={{ padding: "10px 14px", fontSize: 12.5 }}>
+                              {line.itemName}
+                              {line.leftoverQty > 0 && (
+                                <div style={{ fontSize: 11, color: "#34d399", marginTop: 3 }}>
+                                  {line.leftoverQty.toFixed(2)}{line.unit} stays as open stock
+                                </div>
+                              )}
+                            </td>
+                            <td style={{ padding: "10px 14px", fontSize: 12.5, textAlign: "right", color: "rgba(255,255,255,.62)" }}>{line.exactQty.toFixed(2)}{line.unit}</td>
+                            <td style={{ padding: "10px 14px", fontSize: 12.5, textAlign: "right", color: line.fromRemnantQty > 0 ? "#34d399" : "rgba(255,255,255,.25)" }}>
+                              {line.fromRemnantQty > 0 ? `${line.fromRemnantQty.toFixed(2)}${line.unit}` : "—"}
+                            </td>
+                            <td style={{ padding: "10px 14px", fontSize: 12.5, textAlign: "right", fontWeight: 700 }}>
+                              {line.requiredQty}{line.unit}
+                              <div style={{ fontSize: 11, fontWeight: 400, color: short ? "#fca5a5" : "rgba(255,255,255,.35)", marginTop: 3 }}>
+                                have {line.availableQty}{line.unit}
+                              </div>
+                            </td>
                             <td style={{ padding: "10px 14px", fontSize: 12.5, textAlign: "right", color: "rgba(255,255,255,.62)" }}>Rs. {Math.round(line.lineCost).toLocaleString()}</td>
                           </tr>
                         );
@@ -334,7 +394,18 @@ export default function ProductionOrdersPage() {
 
                 {runQuote.shortages.length > 0 && (
                   <div style={{ marginBottom: 14, padding: "12px 14px", borderRadius: 10, background: "rgba(239,68,68,.1)", border: "1px solid rgba(239,68,68,.26)" }}>
-                    <div style={{ fontSize: 12.5, color: "#fca5a5", fontWeight: 700, marginBottom: 6 }}>Not enough material for {runQuote.shortages.length} item(s)</div>
+                    <div style={{ fontSize: 12.5, color: "#fca5a5", fontWeight: 700, marginBottom: 6 }}>Not enough material in {runLocation} for {runQuote.shortages.length} item(s)</div>
+                    {runQuote.shortages.some((l) => (l.elsewhere?.length ?? 0) > 0) && (
+                      <div style={{ fontSize: 12, color: "rgba(255,255,255,.6)", marginBottom: 8, lineHeight: 1.7 }}>
+                        {runQuote.shortages.filter((l) => (l.elsewhere?.length ?? 0) > 0).map((l) => (
+                          <div key={l.itemId}>
+                            {l.itemName} is in{" "}
+                            {l.elsewhere!.map((e) => `${e.location} (${e.qty}${l.unit})`).join(", ")}
+                            {" "}— switch “Consume from” instead of producing short.
+                          </div>
+                        ))}
+                      </div>
+                    )}
                     <label style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 12, color: "rgba(255,255,255,.55)", cursor: "pointer" }}>
                       <input type="checkbox" checked={allowShort} onChange={(e) => setAllowShort(e.target.checked)} />
                       Produce anyway — stock will go negative until the purchase is entered
@@ -344,17 +415,41 @@ export default function ProductionOrdersPage() {
 
                 <div style={{ padding: "14px 16px", borderRadius: 12, background: "rgba(34,197,94,.08)", border: "1px solid rgba(34,197,94,.22)", marginBottom: 8 }}>
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 8 }}>
-                    <span style={{ fontSize: 12.5, color: "rgba(255,255,255,.5)" }}>Total material cost</span>
+                    <span style={{ fontSize: 12.5, color: "rgba(255,255,255,.5)" }}>Total cost of this run</span>
                     <span style={{ fontSize: 18, fontWeight: 800, color: "#22c55e" }}>Rs. {Math.round(runQuote.totalCost).toLocaleString()}</span>
                   </div>
                   <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, color: "rgba(255,255,255,.42)" }}>
-                    <span>Per unit</span><span>Rs. {Math.round(runQuote.unitCost).toLocaleString()}</span>
+                    <span>Material</span><span>Rs. {Math.round(runQuote.materialCost).toLocaleString()}</span>
+                  </div>
+                  {runQuote.labourCost > 0 && (
+                    <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, color: "rgba(255,255,255,.42)" }}>
+                      <span>Labour</span><span>Rs. {Math.round(runQuote.labourCost).toLocaleString()}</span>
+                    </div>
+                  )}
+                  {runQuote.overheadCost > 0 && (
+                    <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, color: "rgba(255,255,255,.42)" }}>
+                      <span>Overhead</span><span>Rs. {Math.round(runQuote.overheadCost).toLocaleString()}</span>
+                    </div>
+                  )}
+                  {runQuote.remnantUsedCost > 0 && (
+                    <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, color: "#34d399" }}>
+                      <span>…of which from open stock</span><span>Rs. {Math.round(runQuote.remnantUsedCost).toLocaleString()}</span>
+                    </div>
+                  )}
+                  {runQuote.remnantCreatedCost > 0 && (
+                    <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, color: "#34d399" }}>
+                      <span>Kept back as open stock</span><span>Rs. {Math.round(runQuote.remnantCreatedCost).toLocaleString()}</span>
+                    </div>
+                  )}
+                  <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, color: "rgba(255,255,255,.55)", fontWeight: 700, marginTop: 6 }}>
+                    <span>Per unit</span><span>Rs. {runQuote.unitCost.toFixed(2)}</span>
                   </div>
                 </div>
 
                 <div style={{ fontSize: 11.5, color: "rgba(255,255,255,.35)", lineHeight: 1.7, marginBottom: 16 }}>
-                  Dr Work In Progress → Cr Raw Material Stock, then Dr Finished Goods → Cr Work In Progress.
-                  Material leaves stock, {runQty} × {runOrder.product} arrives at cost.
+                  Dr Work In Progress → Cr Stock/Inventory, then Dr Finished Goods → Cr Work In Progress.
+                  Whole units leave {runLocation}; anything left of the last one moves to Material Remnants
+                  instead of being charged to this batch. {runQty} × {runOrder.product} arrives at cost.
                 </div>
               </>
             )}

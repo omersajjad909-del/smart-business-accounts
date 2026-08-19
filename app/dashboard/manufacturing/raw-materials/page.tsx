@@ -129,7 +129,7 @@ export default function RawMaterialsPage() {
           <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 640 }}>
             <thead>
               <tr style={{ background: "rgba(255,255,255,.03)" }}>
-                {["Item", "Unit", "In Stock", "Avg Cost", "Stock Value", isRaw ? "Used in BOMs" : "Sale Rate"].map((h, i) => (
+                {["Item", "Unit", "In Stock", "Open Stock", "Avg Cost", "Stock Value", isRaw ? "Used in BOMs" : "Sale Rate"].map((h, i) => (
                   <th key={h} style={{ padding: "12px 16px", fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,.4)", textTransform: "uppercase", letterSpacing: ".05em", textAlign: i >= 2 ? "right" : "left" }}>{h}</th>
                 ))}
               </tr>
@@ -146,6 +146,10 @@ export default function RawMaterialsPage() {
                     {item.currentStock}
                     {item.isLow && <span style={{ marginLeft: 6, fontSize: 10, padding: "2px 6px", borderRadius: 5, background: "rgba(239,68,68,.15)", color: "#fca5a5" }}>LOW</span>}
                   </td>
+                  {/* Part-used rolls a small order can run on without opening a new one. */}
+                  <td style={{ padding: "12px 16px", fontSize: 13, textAlign: "right", color: item.openRemnant > 0 ? "#34d399" : "rgba(255,255,255,.25)" }}>
+                    {item.openRemnant > 0 ? `${item.openRemnant.toFixed(2)}${item.unit}` : "—"}
+                  </td>
                   <td style={{ padding: "12px 16px", fontSize: 13, textAlign: "right", color: "rgba(255,255,255,.62)" }}>Rs. {Math.round(item.unitCost).toLocaleString()}</td>
                   <td style={{ padding: "12px 16px", fontSize: 13, textAlign: "right", fontWeight: 700, color: "#22c55e" }}>Rs. {Math.round(item.stockValue).toLocaleString()}</td>
                   <td style={{ padding: "12px 16px", fontSize: 13, textAlign: "right", color: "rgba(255,255,255,.5)" }}>
@@ -154,12 +158,12 @@ export default function RawMaterialsPage() {
                 </tr>
               ))}
               {!loading && items.length === 0 && (
-                <tr><td colSpan={6} style={{ padding: 36, textAlign: "center", color: "rgba(255,255,255,.28)", fontSize: 13 }}>
+                <tr><td colSpan={7} style={{ padding: 36, textAlign: "center", color: "rgba(255,255,255,.28)", fontSize: 13 }}>
                   No {isRaw ? "raw materials" : "finished products"} yet.
                 </td></tr>
               )}
               {loading && (
-                <tr><td colSpan={6} style={{ padding: 36, textAlign: "center", color: "rgba(255,255,255,.28)", fontSize: 13 }}>Loading…</td></tr>
+                <tr><td colSpan={7} style={{ padding: 36, textAlign: "center", color: "rgba(255,255,255,.28)", fontSize: 13 }}>Loading…</td></tr>
               )}
             </tbody>
           </table>
