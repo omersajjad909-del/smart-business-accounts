@@ -27,7 +27,7 @@ import { safeEncryptField } from "@/lib/fieldEncrypt";
  * idle sandbox that does not match, so a deploy plus one cron tick is all it
  * takes for the shelf to rebuild itself.
  */
-export const DEMO_SEED_VERSION = "demo-seed-v2";
+export const DEMO_SEED_VERSION = "demo-seed-v3";
 
 export const DEMO_BUSINESS_TYPES = [
   "trading",
@@ -583,6 +583,8 @@ export async function seedDemoCompany(
         type,
         partyType,
         openDate: daysAgo(120),
+        openDebit: 0,
+        openCredit: 0,
       };
     },
   );
@@ -687,6 +689,13 @@ export async function seedDemoCompany(
   };
 
   // ── Ledger accumulator ────────────────────────────────────────────────
+  // Two ledgers exist. `ledger` fills LedgerEntry, which only this seed writes
+  // and no screen reads; `vouchers` / `voucherEntries` fill Voucher and
+  // VoucherEntry, which is what the trial balance, the ledger report and every
+  // posting in the app actually use. Anything that must show up in a report
+  // has to be in the second pair.
+  const vouchers: any[] = [];
+  const voucherEntries: any[] = [];
   const ledger: LedgerRow[] = [];
   const post = (
     accCode: string | { id: string },
@@ -732,6 +741,41 @@ export async function seedDemoCompany(
     openingCash + openingBank + openingStock + openingReceivable - openingPayable,
     "Owner's capital introduced",
     openingDate,
+  );
+
+  // Parties keep their opening balance on the account master — that is what the
+  // ageing and credit-limit screens read — so capital has to carry the other
+  // side of it there as well. Without this the demo's trial balance opened with
+  // receivables and payables and nothing against them, 50,000 out before a
+  // single transaction.
+  const capitalRow = coaRows.find((a) => a.code === A.CAPITAL);
+  if (capitalRow) capitalRow.openCredit = round2(openingReceivable - openingPayable);
+
+  // Cash, bank and stock are posted as a real voucher rather than only into the
+  // LedgerEntry accumulator above, which no report opens. The party balances are
+  // deliberately left out — they are on the master, and counting them twice is
+  // exactly the trap this pair of ledgers sets.
+  const openingVoucherId = randomUUID();
+  vouchers.push({
+    id: openingVoucherId,
+    companyId,
+    branchId: mainBranch,
+    voucherNo: "OB-1",
+    type: "OPENING",
+    date: openingDate,
+    narration: "Opening balances",
+  });
+  voucherEntries.push(
+    { id: randomUUID(), companyId, voucherId: openingVoucherId, accountId: accountId[A.CASH], amount: round2(openingCash) },
+    { id: randomUUID(), companyId, voucherId: openingVoucherId, accountId: accountId[A.BANK], amount: round2(openingBank) },
+    { id: randomUUID(), companyId, voucherId: openingVoucherId, accountId: accountId[A.STOCK], amount: round2(openingStock) },
+    {
+      id: randomUUID(),
+      companyId,
+      voucherId: openingVoucherId,
+      accountId: accountId[A.CAPITAL],
+      amount: -round2(openingCash + openingBank + openingStock),
+    },
   );
 
   // Opening stock as inventory movement so stock reports have a starting point.
@@ -985,8 +1029,6 @@ export async function seedDemoCompany(
   }
 
   // ── Receipts against sales ────────────────────────────────────────────
-  const vouchers: any[] = [];
-  const voucherEntries: any[] = [];
   const receipts: any[] = [];
 
   for (let i = 0; i < 5; i++) {
