@@ -68,6 +68,10 @@ These exist because the failure each one prevents is expensive and slow to undo.
   with `status === "approved"`, which only a human sets.
 - **Master switch.** `OUTREACH_SENDING_ENABLED` defaults to false. Until it is
   `true`, the cron job is a no-op.
+- **Separate sending domain, enforced in code.** Cold mail goes through
+  `transport.ts`, never `lib/email.ts`, and the batch is blocked outright if the
+  from-address lands on the transactional domain. Checked once per batch, so a
+  misconfiguration cannot mark a queue of good prospects as failed.
 - **Two caps.** `OUTREACH_GLOBAL_DAILY_CAP` across everything, plus a per-campaign
   `dailyCap`. The send rate is cron frequency × `OUTREACH_PER_RUN`, so it cannot
   be accelerated by clicking harder.
@@ -112,6 +116,9 @@ pipeline still runs end to end on placeholder data.
 | `OUTREACH_SENDING_ENABLED` | Master switch, default false | — |
 | `OUTREACH_GLOBAL_DAILY_CAP` | Ceiling across all campaigns | — |
 | `OUTREACH_PER_RUN` | Emails per cron invocation | — |
+| `OUTREACH_FROM_EMAIL` | Sending identity. **Not** a finovaos.app address | — |
+| `OUTREACH_SMTP_HOST/_PORT/_SECURE/_USER/_PASS` | The outreach-only mail provider | varies |
+| `OUTREACH_ALLOW_PRIMARY_DOMAIN` | Escape hatch, default false. Leave it false | — |
 
 ### 3. Sending domain — do this before turning sending on
 
@@ -120,11 +127,22 @@ invoices and billing receipts; a spam complaint against it takes those down too.
 Also note Resend's terms do not permit cold outreach, so the existing
 `RESEND_API_KEY` path is for transactional mail only.
 
+This is enforced, not just advised. `lib/prospecting/transport.ts` is a separate
+mailer from `lib/email.ts`, and it refuses to send when `OUTREACH_FROM_EMAIL` is
+missing or sits on `RESEND_FROM_DOMAIN` / the `SMTP_FROM` domain. There is no
+fallback to the transactional path — a misconfigured outreach domain stops the
+batch with an explanation rather than borrowing the domain that works.
+
 1. Register a separate domain, e.g. `finovaos-outreach.com`.
 2. Set SPF, DKIM and DMARC on it.
 3. Warm it for 2–3 weeks: 5 emails/day, rising to 40.
-4. Point `SMTP_*` at a provider that allows cold outreach (Instantly, Smartlead,
-   or your own Amazon SES) and set `OUTREACH_SENDING_ENABLED=true`.
+4. Point `OUTREACH_SMTP_*` and `OUTREACH_FROM_EMAIL` at a provider that allows
+   cold outreach (Instantly, Smartlead, or your own Amazon SES). Leave the
+   `SMTP_*` block alone — that is transactional mail and must stay separate.
+5. Set `OUTREACH_SENDING_ENABLED=true`.
+
+`node -r dotenv/config scripts/verify-env.js` checks all of the above once the
+master switch is on, and `/admin/prospecting` shows the same status live.
 
 ### 4. Cron
 
@@ -166,6 +184,7 @@ freshly warmed domain.
 | `lib/prospecting/scoring.ts` | 70 deterministic + 30 AI |
 | `lib/prospecting/drafting.ts` | Email copy + the compliant HTML wrapper |
 | `lib/prospecting/sending.ts` | Every send guard, cap and suppression check |
+| `lib/prospecting/transport.ts` | The outreach-only mailer, and the domain guard |
 | `lib/prospecting/pipeline.ts` | Batch orchestrator |
 | `app/admin/prospecting/page.tsx` | The console |
 | `app/api/admin/prospecting/*` | Campaign CRUD, run, review queue |
