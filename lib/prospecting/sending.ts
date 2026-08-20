@@ -11,7 +11,7 @@
  */
 
 import { prisma } from "@/lib/prisma";
-import { sendEmail } from "@/lib/email";
+import { sendOutreachEmail, outreachTransportProblem } from "./transport";
 
 const db = prisma as any;
 
@@ -133,6 +133,17 @@ export async function sendApprovedBatch(options: {
     return result;
   }
 
+  // Checked once per batch rather than per email: if the outreach domain is not
+  // set up, every email in the queue would fail for the same reason, and each
+  // failure would mark a good prospect as permanently failed.
+  if (!dryRun) {
+    const transportProblem = outreachTransportProblem();
+    if (transportProblem) {
+      result.blocked = transportProblem;
+      return result;
+    }
+  }
+
   const globalSent = await sentTodayCount();
   const globalRemaining = globalDailyCap() - globalSent;
   if (!dryRun && globalRemaining <= 0) {
@@ -202,11 +213,15 @@ export async function sendApprovedBatch(options: {
         continue;
       }
 
-      const delivery = await sendEmail({
+      const delivery = await sendOutreachEmail({
         to: email.toEmail,
         subject: email.subject,
         html: email.bodyHtml,
         text: email.bodyText,
+        from: campaign.sendFrom,
+        unsubscribeUrl: email.unsubToken
+          ? `${baseUrl().replace(/\/$/, "")}/api/public/outreach-unsubscribe?token=${email.unsubToken}`
+          : null,
       });
 
       if (delivery.success) {

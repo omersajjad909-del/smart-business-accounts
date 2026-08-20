@@ -21,6 +21,8 @@ type Readiness = {
   globalDailyCap: number;
   postalAddressSet: boolean;
   postalAddress: string;
+  /** Null when the outreach domain is ready; otherwise why a send is refused. */
+  sendingTransportProblem: string | null;
 };
 
 type Campaign = {
@@ -472,6 +474,7 @@ function ReadinessBar({ readiness }: { readiness: Readiness }) {
     { ok: readiness.contactFinder, label: "Contact finder", fix: "Set HUNTER_API_KEY to get named decision makers" },
     { ok: readiness.emailVerification, label: "Email verification", fix: "Set ZEROBOUNCE_API_KEY — unverified addresses stay blocked" },
     { ok: readiness.postalAddressSet, label: "Postal address", fix: "Set OUTREACH_POSTAL_ADDRESS — legally required in the footer" },
+    { ok: !readiness.sendingTransportProblem, label: "Outreach domain", fix: readiness.sendingTransportProblem || "" },
     { ok: readiness.sendingEnabled, label: `Sending (cap ${readiness.globalDailyCap}/day)`, fix: "Set OUTREACH_SENDING_ENABLED=true when the domain is warmed" },
   ];
 

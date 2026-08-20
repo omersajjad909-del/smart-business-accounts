@@ -4,6 +4,8 @@ import { requireAdmin, logAdminAction } from "@/lib/adminAuth";
 import { parseCommandToBrief, describeBrief } from "@/lib/prospecting/brief";
 import { availableProviders, activeProvider } from "@/lib/prospecting/discovery";
 import { sendingEnabled, globalDailyCap, postalAddress } from "@/lib/prospecting/sending";
+import { outreachTransportProblem } from "@/lib/prospecting/transport";
+import { hasUsableAIKey } from "@/lib/marketingAutopilotAI";
 
 export const runtime = "nodejs";
 
@@ -18,11 +20,14 @@ function readiness() {
     usingSampleData: provider === "sample",
     emailVerification: Boolean(process.env.ZEROBOUNCE_API_KEY),
     contactFinder: Boolean(process.env.HUNTER_API_KEY),
-    aiConfigured: Boolean(process.env.ANTHROPIC_API_KEY || process.env.OPENAI_API_KEY),
+    // A placeholder key is not a key — hasUsableAIKey rejects "YOUR_..." so the
+    // console does not report AI as ready when every call would 401.
+    aiConfigured: hasUsableAIKey(process.env.ANTHROPIC_API_KEY) || hasUsableAIKey(process.env.OPENAI_API_KEY),
     sendingEnabled: sendingEnabled(),
     globalDailyCap: globalDailyCap(),
     postalAddressSet: Boolean(process.env.OUTREACH_POSTAL_ADDRESS),
     postalAddress: postalAddress(),
+    sendingTransportProblem: outreachTransportProblem(),
   };
 }
 
