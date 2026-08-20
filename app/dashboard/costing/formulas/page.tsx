@@ -172,6 +172,21 @@ export default function FormulasPage() {
 
   const visible = category ? formulas.filter((f) => f.draft.category === category) : formulas;
 
+  /* Worked examples. The one belonging to the category you are standing in
+     leads; the rest fold away below it. Picking one opens it as a brand-new
+     formula — the template itself is never touched. */
+  const ownTemplates = FORMULA_TEMPLATES.filter((t) => !category || t.category === category);
+  const otherTemplates = category ? FORMULA_TEMPLATES.filter((t) => t.category !== category) : [];
+
+  const templateCard = (t: (typeof FORMULA_TEMPLATES)[number]) => (
+    <button key={t.templateId}
+      onClick={() => setEditing({ id: null, draft: { ...structuredClone(t), name: t.name } })}
+      style={{ ...btn(), display: "block", textAlign: "left", padding: "13px 15px", lineHeight: 1.5 }}>
+      <div style={{ fontSize: 13, fontWeight: 700, color: "white", marginBottom: 3 }}>{t.name}</div>
+      <div style={{ fontSize: 11.5, color: "rgba(255,255,255,.38)", fontWeight: 400 }}>{t.summary}</div>
+    </button>
+  );
+
   /* ── live evaluation of the draft ── */
   const preview = useMemo(() => {
     if (!editing) return null;
@@ -709,45 +724,79 @@ export default function FormulasPage() {
 
       {store.loading ? (
         <div style={{ color: "rgba(255,255,255,.3)", fontSize: 13 }}>Loading…</div>
-      ) : visible.length ? (
-        <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-          {visible.map(({ record, draft }) => (
-            <div key={record.id} style={{
-              background: CARD, border: `1px solid ${BORDER}`, borderRadius: 12,
-              padding: "14px 16px", display: "flex", alignItems: "center", gap: 14, flexWrap: "wrap",
-            }}>
-              <div style={{ flex: 1, minWidth: 220 }}>
-                <div style={{ fontSize: 14.5, fontWeight: 700 }}>{draft.name}</div>
-                <div style={{ fontSize: 12, color: "rgba(255,255,255,.35)", marginTop: 2 }}>
-                  {draft.category} · {draft.inputs.length} inputs · {draft.steps.length} steps · v{draft.version}
-                </div>
-              </div>
-              <Link href={`/dashboard/costing?formula=${record.id}`} style={{ ...btn(), textDecoration: "none" }}>Run</Link>
-              <button onClick={() => setEditing({ id: record.id, draft })} style={btn()}>Edit</button>
-              <button onClick={() => { if (confirm(`Delete "${draft.name}"?`)) store.remove(record.id); }}
-                style={btn("danger")}>Delete</button>
-            </div>
-          ))}
-        </div>
       ) : (
-        <div style={{ background: CARD, border: `1px dashed ${BORDER}`, borderRadius: 14, padding: "34px 24px", textAlign: "center" }}>
-          <p style={{ fontSize: 14, color: "rgba(255,255,255,.45)", margin: "0 0 6px" }}>
-            No formulas here yet.
-          </p>
-          <p style={{ fontSize: 12.5, color: "rgba(255,255,255,.3)", margin: "0 0 20px" }}>
-            Start from a worked example and change it to match your own trade.
-          </p>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(230px,1fr))", gap: 10, textAlign: "left" }}>
-            {FORMULA_TEMPLATES.filter((t) => !category || t.category === category).map((t) => (
-              <button key={t.templateId}
-                onClick={() => setEditing({ id: null, draft: { ...structuredClone(t), name: t.name } })}
+        <>
+          {visible.length > 0 && (
+            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+              {visible.map(({ record, draft }) => (
+                <div key={record.id} style={{
+                  background: CARD, border: `1px solid ${BORDER}`, borderRadius: 12,
+                  padding: "14px 16px", display: "flex", alignItems: "center", gap: 14, flexWrap: "wrap",
+                }}>
+                  <div style={{ flex: 1, minWidth: 220 }}>
+                    <div style={{ fontSize: 14.5, fontWeight: 700 }}>{draft.name}</div>
+                    <div style={{ fontSize: 12, color: "rgba(255,255,255,.35)", marginTop: 2 }}>
+                      {draft.category} · {draft.inputs.length} inputs · {draft.steps.length} steps · v{draft.version}
+                    </div>
+                  </div>
+                  <Link href={`/dashboard/costing?formula=${record.id}`} style={{ ...btn(), textDecoration: "none" }}>Run</Link>
+                  <button onClick={() => setEditing({ id: record.id, draft })} style={btn()}>Edit</button>
+                  {/* A copy opens as a brand-new formula, so the original keeps
+                      running untouched while the sizes are changed on the copy. */}
+                  <button
+                    onClick={() => setEditing({
+                      id: null,
+                      draft: { ...structuredClone(draft), name: `${draft.name} (copy)`, version: 1 },
+                    })}
+                    style={btn()}>Duplicate</button>
+                  <button onClick={() => { if (confirm(`Delete "${draft.name}"?`)) store.remove(record.id); }}
+                    style={btn("danger")}>Delete</button>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* Always on the page, not only while a category is empty. A trade
+              that has one formula usually needs a second one the same week, so
+              a category is never capped at the first one written. */}
+          <div style={{
+            background: CARD, border: `1px dashed ${BORDER}`, borderRadius: 14,
+            padding: "22px 20px", marginTop: visible.length ? 22 : 0,
+          }}>
+            <div style={{ fontSize: 14.5, fontWeight: 700, marginBottom: 3 }}>
+              {visible.length ? "Add another formula" : "No formulas here yet"}
+            </div>
+            <p style={{ fontSize: 12.5, color: "rgba(255,255,255,.35)", margin: "0 0 18px", lineHeight: 1.6 }}>
+              Start from a worked example and change it to match your own trade — or start from blank.
+              A category holds as many formulas as you need.
+            </p>
+
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(230px,1fr))", gap: 10 }}>
+              <button
+                onClick={() => setEditing({ id: null, draft: emptyDraft(category || "General") })}
                 style={{ ...btn(), display: "block", textAlign: "left", padding: "13px 15px", lineHeight: 1.5 }}>
-                <div style={{ fontSize: 13, fontWeight: 700, color: "white", marginBottom: 3 }}>{t.name}</div>
-                <div style={{ fontSize: 11.5, color: "rgba(255,255,255,.38)", fontWeight: 400 }}>{t.summary}</div>
+                <div style={{ fontSize: 13, fontWeight: 700, color: "white", marginBottom: 3 }}>Blank formula</div>
+                <div style={{ fontSize: 11.5, color: "rgba(255,255,255,.38)", fontWeight: 400 }}>
+                  One input, one step, one output. Build it up yourself.
+                </div>
               </button>
-            ))}
+              {ownTemplates.map(templateCard)}
+            </div>
+
+            {/* The other trades stay reachable but folded away, so the category
+                you are standing in is what you see first. */}
+            {otherTemplates.length > 0 && (
+              <details style={{ marginTop: 14 }}>
+                <summary style={{ ...label, marginBottom: 0, cursor: "pointer" }}>
+                  Examples from other trades ({otherTemplates.length})
+                </summary>
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(230px,1fr))", gap: 10, marginTop: 12 }}>
+                  {otherTemplates.map(templateCard)}
+                </div>
+              </details>
+            )}
           </div>
-        </div>
+        </>
       )}
     </div>
   );
