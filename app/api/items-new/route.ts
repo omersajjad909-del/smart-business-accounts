@@ -83,7 +83,9 @@ export async function POST(req: NextRequest) {
       data: {
         companyId,
         code: `I-${nextNumber}`,
-        name: body.name,
+        // Upper-cased here as well as in the form, so a name arriving from
+        // the CSV import or the API lands the same way one typed by hand does.
+        name: String(body.name).toUpperCase(),
         category: body.category || "TRADING",
         unit: body.unit,
         rate: Number(body.rate) || 0,
@@ -137,7 +139,7 @@ export async function PUT(req: NextRequest) {
     const updated = await prisma.itemNew.updateMany({
       where: { id, companyId },
       data: {
-        name,
+        name: String(name).toUpperCase(),
         category: category || "TRADING",
         unit,
         rate: Number(rate) || 0,

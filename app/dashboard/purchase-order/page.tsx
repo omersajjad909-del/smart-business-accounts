@@ -17,9 +17,10 @@ import {
   rateFormulaPrintColumns,
   rateFormulaPrintValues,
   rateFormulaLineIncomplete,
+  focusRateFormulaCell,
   type RateFormulaMeta,
 } from "@/components/RateFormulaCells";
-import { computeRateFromFormula, emptyRateFormulaMeta, metaFromItem, readRateFormulaMeta } from "@/lib/rateFormula";
+import { computeRateFromFormula, emptyRateFormulaMeta, metaFromItem, rateFormulaFocusKey, readRateFormulaMeta } from "@/lib/rateFormula";
 import type { RateFormulaValue } from "@/lib/rateFormula";
 
 const FONT = "'Outfit','Inter',sans-serif";
@@ -458,6 +459,7 @@ export default function PurchaseOrderPage() {
                               copy[i].meta = meta;
                               const r = computeRateFromFormula(rf, meta);
                               if (r.rate != null) copy[i].rate = String(r.rate);
+                              focusRateFormulaCell(i, rateFormulaFocusKey(rf));
                             }
                             if (i === copy.length - 1) copy.push(emptyRow());
                             setRows(copy);
@@ -518,6 +520,7 @@ export default function PurchaseOrderPage() {
                               copy[i].meta = meta;
                               const r = computeRateFromFormula(rf, meta);
                               if (r.rate != null) copy[i].rate = String(r.rate);
+                              focusRateFormulaCell(i, rateFormulaFocusKey(rf));
                             }
                                   if (i === copy.length - 1) copy.push(emptyRow());
                                   setRows(copy);
@@ -529,7 +532,7 @@ export default function PurchaseOrderPage() {
                               </td>
                               <td style={{ padding: isMobile ? "8px 8px" : "6px 7px", fontSize: 12, color: MUTED, width: 72 }}>{(r as any).sku || "—"}</td>
                               {rfActive && (
-                                <RateFormulaRowCells settings={rf} meta={r.meta} onChange={(key, value) => updateRowMeta(i, key, value)} />
+                                <RateFormulaRowCells settings={rf} meta={r.meta} rowIndex={i} onChange={(key, value) => updateRowMeta(i, key, value)} />
                               )}
                               <td style={{ padding: isMobile ? "8px 8px" : "6px 7px", width: 68 }}><input type="number" value={r.qty} onChange={e => updateRow(i, "qty", e.target.value)} placeholder="0" style={inp({ padding: isMobile ? "8px 8px" : "5px 7px", textAlign: "right", fontSize: 13 })} /></td>
                               <td style={{ padding: isMobile ? "8px 8px" : "6px 7px", fontSize: 12, color: MUTED, width: 52 }}>{(r as any).unit || "—"}</td>

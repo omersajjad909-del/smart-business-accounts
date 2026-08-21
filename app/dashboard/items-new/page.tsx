@@ -176,7 +176,17 @@ export default function ItemsNewPage() {
         <div style={{ display:"grid", gridTemplateColumns:"2fr 1fr 1fr", gap:12, marginBottom:12 }}>
           <div>
             <div style={{ fontSize:11, color:MUTED, marginBottom:5 }}>Item Name *</div>
-            <input style={INPUT} placeholder="e.g. Any item" value={name} onChange={e=>setName(e.target.value)} />
+            {/* Item names are upper-cased as they are typed, not just styled
+                that way: an item list where CRYSTAL and Crystal are two
+                different rows is a list nobody can search. Caps Lock stops
+                mattering. */}
+            <input
+              style={{ ...INPUT, textTransform: "uppercase" }}
+              placeholder="e.g. ANY ITEM"
+              value={name}
+              autoCapitalize="characters"
+              onChange={e=>setName(e.target.value.toUpperCase())}
+            />
           </div>
           <div>
             <div style={{ fontSize:11, color:MUTED, marginBottom:5 }}>Category *</div>

@@ -42,6 +42,29 @@ function readInput(field: RateFormulaField, raw: string): RateFormulaValue {
   return Number.isFinite(n) ? n : "";
 }
 
+/** Marks a cell so the item-pick handler can find it again. */
+const cellId = (rowIndex: number | undefined, key: string) =>
+  rowIndex === undefined ? undefined : `rf-${rowIndex}-${key}`;
+
+/**
+ * Puts the cursor in one line's column and selects what is there, so the
+ * operator types over it rather than behind it.
+ *
+ * Called right after an item is picked, which is the same tick React re-renders
+ * the row in — hence the frame's delay. A missing cell is not an error: the
+ * company may have removed that column since, and a document that quietly does
+ * not move the cursor is far better than one that throws.
+ */
+export function focusRateFormulaCell(rowIndex: number, key: string | null) {
+  if (!key || typeof document === "undefined") return;
+  requestAnimationFrame(() => {
+    const el = document.getElementById(`rf-${rowIndex}-${key}`) as HTMLInputElement | null;
+    if (!el) return;
+    el.focus();
+    el.select?.();
+  });
+}
+
 function cellInput(extra?: CSSProperties): CSSProperties {
   return {
     padding: "5px 6px",
@@ -94,11 +117,14 @@ export function RateFormulaRowCells({
   meta,
   onChange,
   disabled,
+  rowIndex,
 }: {
   settings: RateFormulaSettings;
   meta: RateFormulaMeta | undefined;
   onChange: (key: string, value: RateFormulaValue) => void;
   disabled?: boolean;
+  /** Pass the line's index to let focusRateFormulaCell() find these inputs. */
+  rowIndex?: number;
 }) {
   return (
     <>
@@ -109,6 +135,7 @@ export function RateFormulaRowCells({
         return (
           <td key={f.key} style={{ padding: "7px 8px", width: f.width }}>
             <input
+              id={cellId(rowIndex, f.key)}
               type={isText ? "text" : "number"}
               value={value}
               disabled={disabled}
@@ -170,11 +197,13 @@ export function RateFormulaMobileFields({
   meta,
   onChange,
   disabled,
+  rowIndex,
 }: {
   settings: RateFormulaSettings;
   meta: RateFormulaMeta | undefined;
   onChange: (key: string, value: RateFormulaValue) => void;
   disabled?: boolean;
+  rowIndex?: number;
 }) {
   return (
     <>
@@ -196,6 +225,7 @@ export function RateFormulaMobileFields({
               {f.unit ? ` (${f.unit})` : ""}
             </div>
             <input
+              id={cellId(rowIndex, f.key)}
               type={isText ? "text" : "number"}
               value={meta?.[f.key] ?? ""}
               disabled={disabled}

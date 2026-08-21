@@ -60,6 +60,17 @@ export type RateFormulaField = {
   showOnPrint: boolean;
   /** Blocks saving the document while empty. */
   required: boolean;
+  /**
+   * The cursor lands in this column the moment an item is picked on a document
+   * line.
+   *
+   * Most columns are a property of the item and come across with it. One
+   * usually is not — a PHR reading belongs to the batch being ordered, not to
+   * the product — so it is the one thing the operator still has to type. Naming
+   * it here means the keyboard is already there instead of the operator
+   * reaching for the mouse on every line. At most one column may claim it.
+   */
+  focusOnPick: boolean;
 };
 
 /** Longest a text column's value may be — a code, not a paragraph. */
@@ -169,14 +180,17 @@ export const RATE_FORMULA_PRESETS: Array<{
       rateEditable: true,
       expression: "rtmm * gauge * width * length / divisor",
       fields: [
-        { key: "gauge",  label: "Gauge",   unit: "",       kind: "number", defaultValue: 0,  width: 60, affectsRate: true,  showOnPrint: true, required: true },
-        { key: "width",  label: "Width",   unit: "in",     kind: "number", defaultValue: 0,  width: 60, affectsRate: true,  showOnPrint: true, required: true },
-        { key: "length", label: "Length",  unit: "m",      kind: "number", defaultValue: 0,  width: 60, affectsRate: true,  showOnPrint: true, required: true },
-        { key: "phr",    label: "PHR",     unit: "",       kind: "number", defaultValue: 0,  width: 55, affectsRate: false, showOnPrint: true, required: false },
+        { key: "gauge",  label: "Gauge",   unit: "",       kind: "number", defaultValue: 0,  width: 60, affectsRate: true,  showOnPrint: true, required: true,  focusOnPick: false },
+        { key: "width",  label: "Width",   unit: "in",     kind: "number", defaultValue: 0,  width: 60, affectsRate: true,  showOnPrint: true, required: true,  focusOnPick: false },
+        { key: "length", label: "Length",  unit: "m",      kind: "number", defaultValue: 0,  width: 60, affectsRate: true,  showOnPrint: true, required: true,  focusOnPick: false },
+        // PHR belongs to the batch being ordered, not to the product, so it is
+        // typed on every order. 30 is the middle of the usual 22–32 range — a
+        // starting point, and where the cursor lands after picking an item.
+        { key: "phr",    label: "PHR",     unit: "",       kind: "number", defaultValue: 30, width: 55, affectsRate: false, showOnPrint: true, required: false, focusOnPick: true },
         // A shade is a code, not a quantity — "15-L", "15-F". Text, so the
         // suffix survives, and never part of the maths.
-        { key: "shade",  label: "Shade #", unit: "",       kind: "text",   defaultValue: "", width: 65, affectsRate: false, showOnPrint: true, required: false },
-        { key: "rtmm",   label: "RT/MM",   unit: "per mm", kind: "number", defaultValue: 0,  width: 60, affectsRate: true,  showOnPrint: true, required: true },
+        { key: "shade",  label: "Shade #", unit: "",       kind: "text",   defaultValue: "", width: 65, affectsRate: false, showOnPrint: true, required: false, focusOnPick: false },
+        { key: "rtmm",   label: "RT/MM",   unit: "per mm", kind: "number", defaultValue: 0,  width: 60, affectsRate: true,  showOnPrint: true, required: true,  focusOnPick: false },
       ],
     },
   },
@@ -211,6 +225,7 @@ function normalizeField(raw: unknown): RateFormulaField | null {
     affectsRate: kind === "text" ? false : f.affectsRate !== false,
     showOnPrint: f.showOnPrint !== false,
     required: Boolean(f.required),
+    focusOnPick: Boolean(f.focusOnPick),
   };
 }
 
@@ -229,6 +244,15 @@ export function normalizeRateFormula(value: unknown): RateFormulaSettings {
       return true;
     })
     .slice(0, 12); // a document line has to stay readable
+
+  // The cursor can only land in one place. If more than one column claims it,
+  // the first wins — silently, because there is nothing sensible to ask.
+  let focusTaken = false;
+  for (const f of fields) {
+    if (!f.focusOnPick) continue;
+    if (focusTaken) f.focusOnPick = false;
+    focusTaken = true;
+  }
 
   const docsRaw = (parsed.documents && typeof parsed.documents === "object")
     ? parsed.documents as Partial<RateFormulaDocMap>
@@ -250,6 +274,11 @@ export function normalizeRateFormula(value: unknown): RateFormulaSettings {
 }
 
 /* ──────────────────────── Asking questions ─────────────────── */
+
+/** The column the cursor jumps to after an item is picked, if any. */
+export function rateFormulaFocusKey(settings: RateFormulaSettings): string | null {
+  return settings.fields.find((f) => f.focusOnPick)?.key ?? null;
+}
 
 /** True only when this company should see formula columns on this document. */
 export function isRateFormulaActive(

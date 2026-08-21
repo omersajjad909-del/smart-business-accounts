@@ -17,9 +17,10 @@ import {
   rateFormulaPrintColumns,
   rateFormulaPrintValues,
   rateFormulaLineIncomplete,
+  focusRateFormulaCell,
   type RateFormulaMeta,
 } from "@/components/RateFormulaCells";
-import { computeRateFromFormula, emptyRateFormulaMeta, metaFromItem, readRateFormulaMeta } from "@/lib/rateFormula";
+import { computeRateFromFormula, emptyRateFormulaMeta, metaFromItem, rateFormulaFocusKey, readRateFormulaMeta } from "@/lib/rateFormula";
 import type { RateFormulaValue } from "@/lib/rateFormula";
 
 const FONT = "'Outfit','Inter',sans-serif";
@@ -153,6 +154,7 @@ export default function GRNPage() {
       copy[idx] = { ...copy[idx], meta };
       const r = computeRateFromFormula(rf, meta);
       if (r.rate != null) copy[idx].rate = String(r.rate);
+      focusRateFormulaCell(idx, rateFormulaFocusKey(rf));
       return copy;
     });
   }
@@ -437,7 +439,7 @@ export default function GRNPage() {
                                 </select>
                               </td>
                               {rfActive && (
-                                <RateFormulaRowCells settings={rf} meta={row.meta} onChange={(key, value) => updateRowMeta(idx, key, value)} />
+                                <RateFormulaRowCells settings={rf} meta={row.meta} rowIndex={idx} onChange={(key, value) => updateRowMeta(idx, key, value)} />
                               )}
                               <td style={{ padding: "6px 8px" }}><input type="number" value={row.orderedQty} onChange={e => updateRow(idx, "orderedQty", e.target.value)} placeholder="0" style={inp({ padding: "5px 7px", textAlign: "center", color: MUTED })} /></td>
                               <td style={{ padding: "6px 8px" }}><input type="number" value={row.receivedQty} onChange={e => updateRow(idx, "receivedQty", e.target.value)} placeholder="0" style={inp({ padding: "5px 7px", textAlign: "center", color: isShort ? "#fbbf24" : "#34d399", fontWeight: 700 })} /></td>

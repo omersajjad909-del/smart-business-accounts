@@ -23,9 +23,10 @@ import {
   rateFormulaPrintColumns,
   rateFormulaPrintValues,
   rateFormulaLineIncomplete,
+  focusRateFormulaCell,
   type RateFormulaMeta,
 } from "@/components/RateFormulaCells";
-import { computeRateFromFormula, emptyRateFormulaMeta, metaFromItem, readRateFormulaMeta } from "@/lib/rateFormula";
+import { computeRateFromFormula, emptyRateFormulaMeta, metaFromItem, rateFormulaFocusKey, readRateFormulaMeta } from "@/lib/rateFormula";
 import type { RateFormulaValue } from "@/lib/rateFormula";
 
 
@@ -319,6 +320,7 @@ function SalesInvoiceContent() {
       copy[idx].meta = meta;
       const r = computeRateFromFormula(rf, meta);
       if (r.rate != null) copy[idx].rate = r.rate;
+      focusRateFormulaCell(idx, rateFormulaFocusKey(rf));
     }
     if (idx === copy.length - 1) copy.push(emptyRow());
     setRows(copy);
@@ -902,7 +904,7 @@ function SalesInvoiceContent() {
                                   </td>
                                   <td style={{ padding: "6px 7px", fontSize: 12, color: "var(--text-muted)", width: 72 }}>{r.sku || "—"}</td>
                                   {rfActive && (
-                                    <RateFormulaRowCells settings={rf} meta={r.meta} onChange={(key, value) => updateRowMeta(i, key, value)} />
+                                    <RateFormulaRowCells settings={rf} meta={r.meta} rowIndex={i} onChange={(key, value) => updateRowMeta(i, key, value)} />
                                   )}
                                   <td style={{ padding: "6px 7px", width: 68 }}>
                                     <input type="number" style={{ ...inputStyle, padding: "5px 7px", textAlign: "right", fontSize: 13 }} value={r.qty} onChange={e => updateRow(i, "qty", e.target.value)} placeholder="0" />

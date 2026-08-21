@@ -170,6 +170,7 @@ const blankField = (): RateFormulaField => ({
   width: 60,
   affectsRate: true,
   showOnPrint: true,
+  focusOnPick: false,
   required: false,
 });
 
@@ -628,6 +629,29 @@ export default function RateFormulaPage() {
                     style={{ accentColor: ACCENT }}
                   />
                   Must be filled
+                </label>
+                <label
+                  title="The cursor lands here the moment an item is picked on a document line."
+                  style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12.5, color: TEXT, cursor: "pointer" }}
+                >
+                  <input
+                    type="checkbox"
+                    checked={f.focusOnPick}
+                    onChange={(e) =>
+                      // Only one column can hold the cursor, so ticking one
+                      // unticks the rest rather than leaving two claims for
+                      // normalizeRateFormula to arbitrate silently.
+                      setSettings((s) => ({
+                        ...s,
+                        fields: s.fields.map((other, j) => ({
+                          ...other,
+                          focusOnPick: e.target.checked ? j === i : false,
+                        })),
+                      }))
+                    }
+                    style={{ accentColor: ACCENT }}
+                  />
+                  Cursor jumps here after picking an item
                 </label>
                 {keyErrors[i] && (
                   <span style={{ fontSize: 12, color: "#f87171", fontWeight: 600 }}>{keyErrors[i]}</span>
