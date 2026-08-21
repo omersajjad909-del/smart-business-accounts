@@ -25,10 +25,10 @@ model Account {
   phone       String?
   email       String?
   address     String?
-  ntn         String?   // National Tax Number
-  strn        String?   // Sales Tax Reg. No.
-  bankIban    String?   // IBAN / Bank Account No.
-  description String?   // Internal notes
+  ntn         String? // National Tax Number
+  strn        String? // Sales Tax Reg. No.
+  bankIban    String? // IBAN / Bank Account No.
+  description String? // Internal notes
   openDate    DateTime?
   openDebit   Float     @default(0)
   openCredit  Float     @default(0)
@@ -46,14 +46,14 @@ model Account {
   saleReturns      SaleReturn[]      @relation("SaleReturnCustomer")
 
   // Phase 1 Relations
-  bankAccounts    BankAccount[]
-  paymentReceipts PaymentReceipt[]
-  expenseVouchers ExpenseVoucher[] @relation("ExpenseAccount")
-  paymentVouchers ExpenseVoucher[] @relation("PaymentAccount")
-  taxAccounts     TaxAccount[]
-  advancePayments AdvancePayment[] @relation("SupplierAdvances")
-  creditNotes     CreditNote[]     @relation("CreditNoteAccount")
-  debitNotes      DebitNote[]      @relation("DebitNoteAccount")
+  bankAccounts      BankAccount[]
+  paymentReceipts   PaymentReceipt[]
+  expenseVouchers   ExpenseVoucher[]   @relation("ExpenseAccount")
+  paymentVouchers   ExpenseVoucher[]   @relation("PaymentAccount")
+  taxAccounts       TaxAccount[]
+  advancePayments   AdvancePayment[]   @relation("SupplierAdvances")
+  creditNotes       CreditNote[]       @relation("CreditNoteAccount")
+  debitNotes        DebitNote[]        @relation("DebitNoteAccount")
   loans             Loan[]             @relation("LoanAccount")
   goodsReceiptNotes GoodsReceiptNote[] @relation("GRNSupplier")
 
@@ -80,11 +80,11 @@ model ItemNew {
 
   code         String
   name         String
-  category     String   @default("TRADING")  // TRADING | RAW_MATERIAL | FINISHED | SERVICE
+  category     String   @default("TRADING") // TRADING | RAW_MATERIAL | FINISHED | SERVICE
   unit         String
-  rate         Float    @default(0)           // Sale Rate
-  purchaseRate Float    @default(0)           // Cost / Purchase Rate
-  taxRate      Float    @default(0)           // GST / Sales Tax %
+  rate         Float    @default(0) // Sale Rate
+  purchaseRate Float    @default(0) // Cost / Purchase Rate
+  taxRate      Float    @default(0) // GST / Sales Tax %
   minStock     Int      @default(0)
   barcode      String?  @unique
   description  String?
@@ -130,11 +130,11 @@ model PurchaseOrder {
   approvedAt      DateTime?
   approvalRemarks String?
 
-  paymentTerms    String?
-  notes           String?
-  discount        Float?    @default(0)
-  discountType    String?   @default("flat")
-  freight         Float?    @default(0)
+  paymentTerms String?
+  notes        String?
+  discount     Float?  @default(0)
+  discountType String? @default("flat")
+  freight      Float?  @default(0)
 
   supplierId String
   supplier   Account @relation("PurchaseSupplier", fields: [supplierId], references: [id])
@@ -158,6 +158,10 @@ model PurchaseOrderItem {
 
   po   PurchaseOrder @relation(fields: [poId], references: [id])
   item ItemNew       @relation(fields: [itemId], references: [id])
+  // Formula-driven line dimensions (gauge, width, length…) when the company
+  // has set up a rate formula. Null for every ordinary line, so nothing that
+  // does not use the feature is touched. See lib/rateFormula.ts.
+  meta Json?
 }
 
 model PurchaseInvoice {
@@ -221,6 +225,10 @@ model PurchaseInvoiceItem {
 
   invoice PurchaseInvoice @relation(fields: [invoiceId], references: [id])
   item    ItemNew         @relation(fields: [itemId], references: [id])
+  // Formula-driven line dimensions (gauge, width, length…) when the company
+  // has set up a rate formula. Null for every ordinary line, so nothing that
+  // does not use the feature is touched. See lib/rateFormula.ts.
+  meta    Json?
 
   @@index([invoiceId])
   @@index([itemId])
@@ -248,6 +256,10 @@ model InventoryTxn {
   item ItemNew @relation(fields: [itemId], references: [id])
 
   createdAt DateTime @default(now())
+  // Formula-driven line dimensions (gauge, width, length…) when the company
+  // has set up a rate formula. Null for every ordinary line, so nothing that
+  // does not use the feature is touched. See lib/rateFormula.ts.
+  meta      Json?
 
   @@index([companyId, itemId])
   @@index([companyId, date])
@@ -279,14 +291,14 @@ model SalesInvoice {
   salesmanId String?
   salesman   User?   @relation("SalesmanInvoices", fields: [salesmanId], references: [id])
 
-  driverName      String?
-  vehicleNo       String?
-  location        String?   @default("MAIN")
-  linkedSoId      String?
+  driverName String?
+  vehicleNo  String?
+  location   String? @default("MAIN")
+  linkedSoId String?
 
-  discount        Float?    @default(0)
-  discountType    String?   @default("flat")
-  freight         Float?    @default(0)
+  discount        Float?  @default(0)
+  discountType    String? @default("flat")
+  freight         Float?  @default(0)
   notes           String?
   termsConditions String?
   reference       String?
@@ -320,6 +332,10 @@ model SalesInvoiceItem {
 
   invoice SalesInvoice @relation(fields: [invoiceId], references: [id])
   item    ItemNew      @relation(fields: [itemId], references: [id])
+  // Formula-driven line dimensions (gauge, width, length…) when the company
+  // has set up a rate formula. Null for every ordinary line, so nothing that
+  // does not use the feature is touched. See lib/rateFormula.ts.
+  meta    Json?
 
   @@index([invoiceId])
   @@index([itemId])
@@ -403,9 +419,9 @@ model SaleReturn {
   vehicleNo    String?
   remarks      String?
   notes        String?
-  discount     Float?  @default(0)
-  discountType String? @default("flat")
-  freight      Float?  @default(0)
+  discount     Float?           @default(0)
+  discountType String?          @default("flat")
+  freight      Float?           @default(0)
   reference    String?
   items        SaleReturnItem[]
 
@@ -424,6 +440,10 @@ model SaleReturnItem {
 
   saleReturn SaleReturn @relation(fields: [returnId], references: [id])
   item       ItemNew    @relation(fields: [itemId], references: [id])
+  // Formula-driven line dimensions (gauge, width, length…) when the company
+  // has set up a rate formula. Null for every ordinary line, so nothing that
+  // does not use the feature is touched. See lib/rateFormula.ts.
+  meta       Json?
 }
 
 model Outward {
@@ -452,35 +472,39 @@ model OutwardItem {
 
   outward Outward @relation(fields: [outwardId], references: [id])
   item    ItemNew @relation(fields: [itemId], references: [id])
+  // Formula-driven line dimensions (gauge, width, length…) when the company
+  // has set up a rate formula. Null for every ordinary line, so nothing that
+  // does not use the feature is touched. See lib/rateFormula.ts.
+  meta    Json?
 }
 
 model Company {
-  id        String  @id @default(uuid())
-  companyNo Int     @unique @default(autoincrement())
-  name      String
-  code      String?
-  isActive  Boolean @default(true)
-  country   String?  @default("United States")
-  baseCurrency String @default("USD")
-  plan      String   @default("STARTER")
-  businessType  String  @default("trading") // trading|manufacturing|distribution|retail|service|restaurant|real_estate|construction
-  businessSetupDone Boolean @default(false)
-  activeModules String? // Comma separated IDs for Custom plan
-  customPrice   Float?
-  subscriptionStatus String? @default("ACTIVE")
-  stripeCustomerId   String?
-  currentPeriodEnd    DateTime?
-  cancelledAt        DateTime?  // Timestamp when subscription was cancelled
-  dataRetentionUntil DateTime?  // 90 days after cancellation — hard delete after this date
-  paymentFailedAt    DateTime?  // First failed platform payment in current streak — cleared on next success. Drives platform-dunning cron (7d → READ_ONLY, 30d → SUSPENDED per ToS)
+  id                        String    @id @default(uuid())
+  companyNo                 Int       @unique @default(autoincrement())
+  name                      String
+  code                      String?
+  isActive                  Boolean   @default(true)
+  country                   String?   @default("United States")
+  baseCurrency              String    @default("USD")
+  plan                      String    @default("STARTER")
+  businessType              String    @default("trading") // trading|manufacturing|distribution|retail|service|restaurant|real_estate|construction
+  businessSetupDone         Boolean   @default(false)
+  activeModules             String? // Comma separated IDs for Custom plan
+  customPrice               Float?
+  subscriptionStatus        String?   @default("ACTIVE")
+  stripeCustomerId          String?
+  currentPeriodEnd          DateTime?
+  cancelledAt               DateTime? // Timestamp when subscription was cancelled
+  dataRetentionUntil        DateTime? // 90 days after cancellation — hard delete after this date
+  paymentFailedAt           DateTime? // First failed platform payment in current streak — cleared on next success. Drives platform-dunning cron (7d → READ_ONLY, 30d → SUSPENDED per ToS)
   retentionReminder14SentAt DateTime? // Set when 14-day pre-deletion reminder email sent (idempotency guard)
   retentionReminder3SentAt  DateTime? // Set when 3-day final warning email sent (idempotency guard)
-  fraudRisk          String?    @default("NONE") // NONE | LOW | MEDIUM | HIGH — updated by fraud monitor
-  flaggedAt          DateTime?  // When admin manually flagged this company
-  flagNote           String?    // Admin note explaining the flag
-  logoUrl   String?  // Company logo — stored as base64 data URL OR Supabase Storage URL
-  brandColor String?  // Preset key from the 8-color brand palette (e.g. "teal", "indigo", "purple")
-  createdAt DateTime @default(now())
+  fraudRisk                 String?   @default("NONE") // NONE | LOW | MEDIUM | HIGH — updated by fraud monitor
+  flaggedAt                 DateTime? // When admin manually flagged this company
+  flagNote                  String? // Admin note explaining the flag
+  logoUrl                   String? // Company logo — stored as base64 data URL OR Supabase Storage URL
+  brandColor                String? // Preset key from the 8-color brand palette (e.g. "teal", "indigo", "purple")
+  createdAt                 DateTime  @default(now())
 
   // Demo sandbox — one throwaway company per demo visitor. Seeded from the
   // golden dataset in lib/demoSeed.ts, wiped when the session ends or expires.
@@ -693,7 +717,7 @@ model User {
   loginLogs        LoginLog[]       @relation("UserLoginLogs")
   sessions         Session[]
 
-  avatar    String?  // Profile photo stored as base64 data URL
+  avatar        String? // Profile photo stored as base64 data URL
   salesInvoices SalesInvoice[] @relation("SalesmanInvoices")
 
   // 2FA / TOTP
@@ -701,7 +725,7 @@ model User {
   twoFactorSecret  String?
 
   // Referral
-  referralCode String? @unique
+  referralCode String?    @unique
   referrals    Referral[] @relation("ReferrerUser")
 
   // Preferred language
@@ -787,12 +811,12 @@ model BankAccount {
   plaidAccessToken String?
   plaidItemId      String?
   institutionId    String?
-  isPlaidLinked    Boolean  @default(false)
+  isPlaidLinked    Boolean @default(false)
 
-  createdAt     DateTime @default(now())
-  updatedAt DateTime @default(now()) @updatedAt
-  deletedAt     DateTime?
-  deletedBy     String?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @default(now()) @updatedAt
+  deletedAt DateTime?
+  deletedBy String?
 
   @@index([companyId])
 }
@@ -1067,14 +1091,14 @@ model Branch {
   companyId String
   company   Company @relation(fields: [companyId], references: [id])
 
-  code      String
-  name      String
-  city      String?
-  address   String?
-  phone     String?
+  code        String
+  name        String
+  city        String?
+  address     String?
+  phone       String?
   managerName String?
-  isActive  Boolean  @default(true)
-  createdAt DateTime @default(now())
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
 
   purchaseOrders    PurchaseOrder[]
   purchaseInvoices  PurchaseInvoice[]
@@ -1219,10 +1243,10 @@ model Employee {
   advances    AdvanceSalary[]
   documents   EmployeeDocument[]
 
-  @@index([department, isActive])
-  @@index([email])
   @@unique([companyId, employeeId])
   @@unique([companyId, email])
+  @@index([department, isActive])
+  @@index([email])
 }
 
 model Attendance {
@@ -1348,10 +1372,10 @@ model Contact {
   documents     ContactDocument[]
   notes         ContactNote[]
 
+  @@unique([companyId, email])
   @@index([type, isActive])
   @@index([email, phone])
   @@index([branchId])
-  @@unique([companyId, email])
 }
 
 model Interaction {
@@ -1452,14 +1476,14 @@ model Quotation {
   approvedAt      DateTime?
   approvalRemarks String?
 
-  @@unique([quotationNo, companyId])
-
   customerId   String?
   customer     Account? @relation("QuotationCustomer", fields: [customerId], references: [id])
   customerName String? // For ad-hoc customers
 
   items     QuotationItem[]
   createdAt DateTime        @default(now())
+
+  @@unique([quotationNo, companyId])
 }
 
 model QuotationItem {
@@ -1472,6 +1496,10 @@ model QuotationItem {
 
   quotation Quotation @relation(fields: [quotationId], references: [id], onDelete: Cascade)
   item      ItemNew   @relation(fields: [itemId], references: [id])
+  // Formula-driven line dimensions (gauge, width, length…) when the company
+  // has set up a rate formula. Null for every ordinary line, so nothing that
+  // does not use the feature is touched. See lib/rateFormula.ts.
+  meta      Json?
 }
 
 model DeliveryChallan {
@@ -1512,6 +1540,10 @@ model DeliveryChallanItem {
 
   challan DeliveryChallan @relation(fields: [challanId], references: [id], onDelete: Cascade)
   item    ItemNew         @relation(fields: [itemId], references: [id])
+  // Formula-driven line dimensions (gauge, width, length…) when the company
+  // has set up a rate formula. Null for every ordinary line, so nothing that
+  // does not use the feature is touched. See lib/rateFormula.ts.
+  meta    Json?
 }
 
 // ================= FEATURE 9: ADVANCE PAYMENT TO SUPPLIERS =================
@@ -1566,8 +1598,8 @@ model Subscription {
   stripeSubscriptionId String? @unique
 
   // Safepay-specific fields
-  safepayTracker       String? // Safepay tracker token for current billing period
-  safepayOrderId       String? // Our order reference sent to Safepay
+  safepayTracker String? // Safepay tracker token for current billing period
+  safepayOrderId String? // Our order reference sent to Safepay
 
   currentPeriodStart DateTime?
   currentPeriodEnd   DateTime?
@@ -1684,45 +1716,49 @@ model Notification {
 // =================== GRN (GOODS RECEIPT NOTE) ===================
 
 model GoodsReceiptNote {
-  id           String      @id @default(uuid())
-  companyId    String
-  company      Company     @relation(fields: [companyId], references: [id])
-  branchId     String?
-  branch       Branch?     @relation(fields: [branchId], references: [id])
+  id        String  @id @default(uuid())
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id])
+  branchId  String?
+  branch    Branch? @relation(fields: [branchId], references: [id])
 
-  grnNo        String
-  date         DateTime
-  poId         String?
-  po           PurchaseOrder? @relation(fields: [poId], references: [id])
-  supplierId   String
-  supplier     Account     @relation("GRNSupplier", fields: [supplierId], references: [id])
+  grnNo      String
+  date       DateTime
+  poId       String?
+  po         PurchaseOrder? @relation(fields: [poId], references: [id])
+  supplierId String
+  supplier   Account        @relation("GRNSupplier", fields: [supplierId], references: [id])
 
-  remarks      String?
-  status       String      @default("DRAFT") // DRAFT | RECEIVED | PARTIAL | CANCELLED
+  remarks String?
+  status  String  @default("DRAFT") // DRAFT | RECEIVED | PARTIAL | CANCELLED
 
-  items        GoodsReceiptNoteItem[]
+  items GoodsReceiptNoteItem[]
 
-  createdAt    DateTime    @default(now())
-  createdBy    String?
-  deletedAt    DateTime?
-  deletedBy    String?
+  createdAt DateTime  @default(now())
+  createdBy String?
+  deletedAt DateTime?
+  deletedBy String?
 
   @@index([companyId])
   @@index([date])
 }
 
 model GoodsReceiptNoteItem {
-  id        String           @id @default(uuid())
-  grnId     String
-  grn       GoodsReceiptNote @relation(fields: [grnId], references: [id], onDelete: Cascade)
-  itemId    String
-  item      ItemNew          @relation(fields: [itemId], references: [id])
+  id     String           @id @default(uuid())
+  grnId  String
+  grn    GoodsReceiptNote @relation(fields: [grnId], references: [id], onDelete: Cascade)
+  itemId String
+  item   ItemNew          @relation(fields: [itemId], references: [id])
 
   orderedQty  Int
   receivedQty Int
   rate        Float
   amount      Float
   remarks     String?
+  // Formula-driven line dimensions (gauge, width, length…) when the company
+  // has set up a rate formula. Null for every ordinary line, so nothing that
+  // does not use the feature is touched. See lib/rateFormula.ts.
+  meta        Json?
 }
 
 // ─── Live Chat ───────────────────────────────────────────────────────────────
@@ -1743,7 +1779,7 @@ model ChatMessage {
   id             String           @id @default(uuid())
   conversationId String
   conversation   ChatConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
-  sender         String           // customer | bot | agent
+  sender         String // customer | bot | agent
   text           String           @db.Text
   createdAt      DateTime         @default(now())
 }
@@ -1757,7 +1793,7 @@ model AdminUser {
   passwordHash String
   isSuperAdmin Boolean   @default(false)
   allowedPages String    @default("[]") // JSON array of page names
-  team         String?   // e.g. "Contact Team", "Marketing Team"
+  team         String? // e.g. "Contact Team", "Marketing Team"
   active       Boolean   @default(true)
   createdAt    DateTime  @default(now())
   lastLoginAt  DateTime?
@@ -1766,24 +1802,24 @@ model AdminUser {
 // ─── Coupons ──────────────────────────────────────────────────────────────────
 
 model Coupon {
-  id           String             @id @default(uuid())
-  code         String             @unique
-  type         String             // percent | fixed
+  id           String    @id @default(uuid())
+  code         String    @unique
+  type         String // percent | fixed
   value        Float
   maxUses      Int?
-  usedCount    Int                @default(0)
+  usedCount    Int       @default(0)
   expiresAt    DateTime?
-  applicableTo String?            // null = all | starter | pro | enterprise
+  applicableTo String? // null = all | starter | pro | enterprise
 
   // Targeting — all null = open to everyone
-  allowedEmails        String?   // JSON array of user emails e.g. ["ali@co.com","sara@x.com"]
-  allowedCompanyIds    String?   // JSON array of company IDs
-  allowedBusinessTypes String?   // JSON array of business type slugs e.g. ["trading","distribution"]
-  allowedCountries     String?   // JSON array of ISO country codes e.g. ["PK","AE","SA"]
+  allowedEmails        String? // JSON array of user emails e.g. ["ali@co.com","sara@x.com"]
+  allowedCompanyIds    String? // JSON array of company IDs
+  allowedBusinessTypes String? // JSON array of business type slugs e.g. ["trading","distribution"]
+  allowedCountries     String? // JSON array of ISO country codes e.g. ["PK","AE","SA"]
 
-  active       Boolean            @default(true)
-  createdAt    DateTime           @default(now())
-  redemptions  CouponRedemption[]
+  active      Boolean            @default(true)
+  createdAt   DateTime           @default(now())
+  redemptions CouponRedemption[]
 }
 
 model CouponRedemption {
@@ -1801,7 +1837,7 @@ model EmailLog {
   id        String   @id @default(uuid())
   to        String
   subject   String
-  status    String   // sent | failed
+  status    String // sent | failed
   error     String?
   createdAt DateTime @default(now())
 }
@@ -1832,7 +1868,7 @@ model Affiliate {
   tier            String    @default("STARTER") // STARTER | GROWTH | PRO | ELITE
   trackingCode    String    @unique
   commissionRate  Float     @default(0.20)
-  payoutMethod    String?   // bank | paypal | crypto | jazzcash | easypaisa
+  payoutMethod    String? // bank | paypal | crypto | jazzcash | easypaisa
   payoutDetails   String?
   totalEarned     Float     @default(0)
   totalPaid       Float     @default(0)
@@ -1843,8 +1879,8 @@ model Affiliate {
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
 
-  conversions     AffiliateConversion[]
-  payouts         AffiliatePayout[]
+  conversions AffiliateConversion[]
+  payouts     AffiliatePayout[]
 
   @@index([email])
   @@index([trackingCode])
@@ -1896,7 +1932,7 @@ model Testimonial {
   rating    Int      @default(5)
   avatar    String?
   planUsed  String?
-  status    String   @default("PENDING")   // PENDING | PUBLISHED | REJECTED
+  status    String   @default("PENDING") // PENDING | PUBLISHED | REJECTED
   featured  Boolean  @default(false)
   userId    String?
   companyId String?
@@ -1908,7 +1944,7 @@ model Testimonial {
 
 model SiteVisit {
   id          String   @id @default(cuid())
-  sessionId   String   // anonymous browser session ID
+  sessionId   String // anonymous browser session ID
   page        String
   referrer    String?
   utmSource   String?
@@ -1918,13 +1954,13 @@ model SiteVisit {
   countryName String?
   city        String?
   flag        String?
-  device      String?  // mobile | desktop | tablet
+  device      String? // mobile | desktop | tablet
   browser     String?
   os          String?
   ip          String?
   lat         Float?
   lon         Float?
-  duration    Int?     // seconds on page
+  duration    Int? // seconds on page
   visitedAt   DateTime @default(now())
 
   @@index([sessionId])
@@ -1936,50 +1972,49 @@ model SiteVisit {
 // ─── Leads ────────────────────────────────────────────────────────────────────
 
 model Lead {
-  id          String    @id @default(uuid())
-  name        String
-  email       String
-  phone       String?
-  company     String?
-  message     String?
-  source      String?   // contact-form | demo-request | manual | visitor | newsletter
-  status      String    @default("new") // new | contacted | demo | proposal | converted | lost
-  priority    String    @default("medium") // low | medium | high
-  notes       String?   @db.Text
-  followUpAt  DateTime?
-  assignedTo  String?   // user name or email
-  country     String?
-  sessionId   String?   // link to SiteVisit sessions
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  id         String    @id @default(uuid())
+  name       String
+  email      String
+  phone      String?
+  company    String?
+  message    String?
+  source     String? // contact-form | demo-request | manual | visitor | newsletter
+  status     String    @default("new") // new | contacted | demo | proposal | converted | lost
+  priority   String    @default("medium") // low | medium | high
+  notes      String?   @db.Text
+  followUpAt DateTime?
+  assignedTo String? // user name or email
+  country    String?
+  sessionId  String? // link to SiteVisit sessions
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
 
   @@index([status])
   @@index([createdAt])
   @@index([email])
 }
 
-
 // ─── Business Records (generic store for all business types) ──────────────────
 // Handles: hospital patients/appointments, salon bookings, gym memberships,
 // real-estate tenants/leases, law cases, IT projects/sprints, etc.
 
 model BusinessRecord {
-  id          String   @id @default(uuid())
-  companyId   String
-  company     Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  branchId    String?
+  id        String  @id @default(uuid())
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  branchId  String?
 
-  category    String   // e.g. "patient", "appointment", "member", "case", "tenant"
-  subCategory String?  // e.g. "lab", "hair", "criminal" — optional sub-grouping
-  title       String   // searchable display name
-  status      String   @default("active")
-  refId       String?  // link to another BusinessRecord (e.g. appointment → patient)
-  data        Json     // all business-specific fields as JSON
-  amount      Float?   // for financial records (rent, billing, membership fee, etc.)
+  category    String // e.g. "patient", "appointment", "member", "case", "tenant"
+  subCategory String? // e.g. "lab", "hair", "criminal" — optional sub-grouping
+  title       String // searchable display name
+  status      String    @default("active")
+  refId       String? // link to another BusinessRecord (e.g. appointment → patient)
+  data        Json // all business-specific fields as JSON
+  amount      Float? // for financial records (rent, billing, membership fee, etc.)
   date        DateTime? // for date-based records (appointment date, hearing date, etc.)
 
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([companyId, category])
   @@index([companyId, category, status])
@@ -2023,7 +2058,7 @@ model TeamInvite {
 model BusinessWaitlist {
   id           String    @id @default(cuid())
   email        String
-  businessType String                       // e.g. "manufacturing", "hospital"
+  businessType String // e.g. "manufacturing", "hospital"
   name         String?
   createdAt    DateTime  @default(now())
   notified     Boolean   @default(false)
@@ -2039,13 +2074,13 @@ model BusinessWaitlist {
 // Stores emails of website visitors / users who subscribed for news & offers
 
 model NewsletterSubscriber {
-  id              String    @id @default(cuid())
-  email           String    @unique
-  name            String?
-  source          String?                       // "landing" | "footer" | "pricing" | "blog" | "app"
-  status          String    @default("active")  // active | unsubscribed
-  createdAt       DateTime  @default(now())
-  unsubscribedAt  DateTime?
+  id             String    @id @default(cuid())
+  email          String    @unique
+  name           String?
+  source         String? // "landing" | "footer" | "pricing" | "blog" | "app"
+  status         String    @default("active") // active | unsubscribed
+  createdAt      DateTime  @default(now())
+  unsubscribedAt DateTime?
 
   @@index([status])
   @@index([createdAt])
@@ -2055,31 +2090,31 @@ model NewsletterSubscriber {
 // Separate from Testimonial — covers complaints, bug reports, suggestions
 
 model Feedback {
-  id          String    @id @default(cuid())
-  type        String                          // feedback | complaint | suggestion | bug | general
-  subject     String
-  message     String    @db.Text
-  rating      Int?                            // 1-5 stars, only set on type "feedback"
+  id             String    @id @default(cuid())
+  type           String // feedback | complaint | suggestion | bug | general
+  subject        String
+  message        String    @db.Text
+  rating         Int? // 1-5 stars, only set on type "feedback"
   // The reviewer's explicit permission to publish this publicly under their
   // name. Without it a review can be read internally but never published.
-  publishConsent Boolean @default(false)
-  email       String?                         // for public (non-logged-in) submissions
-  name        String?
+  publishConsent Boolean   @default(false)
+  email          String? // for public (non-logged-in) submissions
+  name           String?
   // Job title the reviewer wants shown beside their name on the public site
   // ("CEO", "Accountant"). Only asked for on a review, always optional.
-  role        String?
-  status      String    @default("open")      // open | in_review | resolved | closed
-  priority    String    @default("normal")    // low | normal | high | urgent
-  module      String?                         // affected module/feature
-  userId      String?
-  companyId   String?
-  adminNote   String?   @db.Text
+  role           String?
+  status         String    @default("open") // open | in_review | resolved | closed
+  priority       String    @default("normal") // low | normal | high | urgent
+  module         String? // affected module/feature
+  userId         String?
+  companyId      String?
+  adminNote      String?   @db.Text
   // Set once an admin publishes this feedback as a public testimonial, so the
   // same review cannot be published twice.
-  testimonialId String?
-  resolvedAt  DateTime?
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  testimonialId  String?
+  resolvedAt     DateTime?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
 
   @@index([status, createdAt])
   @@index([type])
@@ -2091,14 +2126,14 @@ model Feedback {
 
 model AdminActionLog {
   id          String   @id @default(uuid())
-  adminId     String                       // AdminUser.id or super-admin User.id
+  adminId     String // AdminUser.id or super-admin User.id
   adminEmail  String
-  action      String                       // CHANGE_PLAN | IMPERSONATE | DELETE_USER | UPDATE_COMPANY | etc.
-  targetType  String                       // Company | User | Subscription | etc.
+  action      String // CHANGE_PLAN | IMPERSONATE | DELETE_USER | UPDATE_COMPANY | etc.
+  targetType  String // Company | User | Subscription | etc.
   targetId    String?
-  targetLabel String?                      // Company name or user email for quick display
-  companyId   String?                      // Affected company (if applicable)
-  details     String?  @db.Text           // JSON snapshot of before/after or extra context
+  targetLabel String? // Company name or user email for quick display
+  companyId   String? // Affected company (if applicable)
+  details     String?  @db.Text // JSON snapshot of before/after or extra context
   createdAt   DateTime @default(now())
 
   @@index([adminId, createdAt])
@@ -2129,14 +2164,14 @@ model BulkPaymentRow {
   batchId String
   batch   BulkPaymentBatch @relation(fields: [batchId], references: [id], onDelete: Cascade)
 
-  partyName  String
-  partyType  String   @default("other") // supplier | employee | other
-  amount     Float
-  reference  String?
-  method     String   @default("bank") // bank | cash | cheque
-  status     String   @default("PENDING") // PENDING | APPROVED | PROCESSED | FAILED
-  note       String?
-  createdAt  DateTime @default(now())
+  partyName String
+  partyType String   @default("other") // supplier | employee | other
+  amount    Float
+  reference String?
+  method    String   @default("bank") // bank | cash | cheque
+  status    String   @default("PENDING") // PENDING | APPROVED | PROCESSED | FAILED
+  note      String?
+  createdAt DateTime @default(now())
 
   @@index([batchId, status])
 }
@@ -2148,17 +2183,16 @@ model PaymentFollowUpLog {
   companyId String
   company   Company @relation(fields: [companyId], references: [id])
 
-  invoiceId  String  // SalesInvoice.id
-  status     String  @default("PENDING") // PENDING | CONTACTED | PROMISED | PAID
-  note       String? @db.Text
-  updatedBy  String? // User.id
-  updatedAt  DateTime @updatedAt
-  createdAt  DateTime @default(now())
+  invoiceId String // SalesInvoice.id
+  status    String   @default("PENDING") // PENDING | CONTACTED | PROMISED | PAID
+  note      String?  @db.Text
+  updatedBy String? // User.id
+  updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now())
 
   @@unique([companyId, invoiceId])
   @@index([companyId, status])
 }
-
 
 // ================= ADMIN PLATFORM MODULES =================
 
@@ -2178,7 +2212,7 @@ model AdminTaxPreset {
   country     String
   countryCode String
   region      String?
-  taxType     String   // GST | VAT | SALES_TAX | WHT | INCOME_TAX | EXCISE | CUSTOM
+  taxType     String // GST | VAT | SALES_TAX | WHT | INCOME_TAX | EXCISE | CUSTOM
   name        String
   code        String   @unique
   rate        Float
@@ -2245,11 +2279,11 @@ model PkPaymentRequest {
 // ================= STATUS SUBSCRIBERS =================
 
 model StatusSubscriber {
-  id          String   @id @default(uuid())
-  email       String   @unique
-  confirmed   Boolean  @default(false)
-  token       String   @unique @default(uuid())
-  createdAt   DateTime @default(now())
+  id        String   @id @default(uuid())
+  email     String   @unique
+  confirmed Boolean  @default(false)
+  token     String   @unique @default(uuid())
+  createdAt DateTime @default(now())
 }
 
 // ================= HOLIDAYS =================
@@ -2269,13 +2303,13 @@ model Holiday {
 // ================= USER PREFERENCES =================
 
 model UserPreferences {
-  id              String   @id @default(cuid())
-  userId          String   @unique
-  themeMode       String   @default("auto")         // "light" | "dark" | "auto"
-  density         String   @default("comfortable")  // "compact" | "comfortable"
-  sidebarDefault  String   @default("expanded")     // "expanded" | "collapsed"
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  id             String   @id @default(cuid())
+  userId         String   @unique
+  themeMode      String   @default("auto") // "light" | "dark" | "auto"
+  density        String   @default("comfortable") // "compact" | "comfortable"
+  sidebarDefault String   @default("expanded") // "expanded" | "collapsed"
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 }
 
 // ================= WEBHOOK IDEMPOTENCY =================
@@ -2293,22 +2327,22 @@ model WebhookEvent {
 // ================= DEMO BOOKINGS =================
 
 model DemoBooking {
-  id              String   @id @default(cuid())
-  businessType    String
-  slotStart       DateTime
-  slotEnd         DateTime
-  name            String
-  email           String
-  phone           String?
-  company         String?
-  status          String   @default("PENDING")
-  accessToken     String   @unique @default(cuid())
-  startedAt       DateTime?
-  endedAt         DateTime?
-  cleanedUp       Boolean  @default(false)
-  demoCompanyId   String?
-  reminderSentAt  DateTime?
-  createdAt       DateTime @default(now())
+  id             String    @id @default(cuid())
+  businessType   String
+  slotStart      DateTime
+  slotEnd        DateTime
+  name           String
+  email          String
+  phone          String?
+  company        String?
+  status         String    @default("PENDING")
+  accessToken    String    @unique @default(cuid())
+  startedAt      DateTime?
+  endedAt        DateTime?
+  cleanedUp      Boolean   @default(false)
+  demoCompanyId  String?
+  reminderSentAt DateTime?
+  createdAt      DateTime  @default(now())
 
   @@unique([slotStart, businessType])
   @@index([email])
@@ -2322,19 +2356,19 @@ model GdprRequest {
   id          String    @id @default(cuid())
   companyId   String
   userId      String
-  type        String    // EXPORT | DELETE | RESTRICT | PORTABILITY
+  type        String // EXPORT | DELETE | RESTRICT | PORTABILITY
   status      String    @default("PENDING") // PENDING | PROCESSING | COMPLETED | REJECTED
   requestedAt DateTime  @default(now())
   completedAt DateTime?
   rejectedAt  DateTime?
   rejectedBy  String?
   adminNote   String?   @db.Text
-  downloadUrl String?   // For EXPORT requests — signed URL to data archive
+  downloadUrl String? // For EXPORT requests — signed URL to data archive
   ipAddress   String?
   userAgent   String?
 
   company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  user    User    @relation(fields: [userId],    references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([companyId, status])
   @@index([userId, requestedAt])
@@ -2348,7 +2382,7 @@ model GdprRequest {
 
 model UptimeCheck {
   id        String   @id @default(cuid())
-  serviceId String   // "web" | "api" | "db" | "reports" | "email" | "backups" | "cdn" | "search"
+  serviceId String // "web" | "api" | "db" | "reports" | "email" | "backups" | "cdn" | "search"
   ok        Boolean
   latencyMs Int?
   error     String?
@@ -2364,31 +2398,31 @@ model UptimeCheck {
 // The /api/cron/breach-notify cron notifies subscribers before deadlineAt.
 
 model SecurityIncident {
-  id            String    @id @default(cuid())
+  id String @id @default(cuid())
 
   // What happened
-  severity      String    // "P1" | "P2" | "P3" | "P4"
-  category      String    // "DATA_BREACH" | "UNAUTHORIZED_ACCESS" | "SYSTEM_OUTAGE" | "OTHER"
+  severity      String // "P1" | "P2" | "P3" | "P4"
+  category      String // "DATA_BREACH" | "UNAUTHORIZED_ACCESS" | "SYSTEM_OUTAGE" | "OTHER"
   title         String
-  summary       String    @db.Text
-  affectedScope String?   @db.Text // e.g. "all users", "companies in EU region"
+  summary       String  @db.Text
+  affectedScope String? @db.Text // e.g. "all users", "companies in EU region"
 
   // Lifecycle
-  status        String    @default("DETECTED") // DETECTED | NOTIFYING | NOTIFIED | RESOLVED
-  detectedAt    DateTime  @default(now())
-  deadlineAt    DateTime  // detectedAt + 72h — enforced by breach-notify cron
-  notifiedAt    DateTime? // When user-facing notification actually fired
-  resolvedAt    DateTime?
-  resolution    String?   @db.Text
+  status     String    @default("DETECTED") // DETECTED | NOTIFYING | NOTIFIED | RESOLVED
+  detectedAt DateTime  @default(now())
+  deadlineAt DateTime // detectedAt + 72h — enforced by breach-notify cron
+  notifiedAt DateTime? // When user-facing notification actually fired
+  resolvedAt DateTime?
+  resolution String?   @db.Text
 
   // Notification tracking
-  notificationCount Int   @default(0)
+  notificationCount Int     @default(0)
   lastNotifyError   String?
 
   // Audit
-  createdBy     String?   // Admin userId who logged the incident
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  createdBy String? // Admin userId who logged the incident
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([status, deadlineAt])
   @@index([detectedAt])
@@ -2450,7 +2484,7 @@ model PlatformInvoice {
   /// Snapshot — see model docs.
   companyName String?
 
-  provider String // LEMONSQUEEZY | SAFEPAY | STRIPE | MANUAL
+  provider               String // LEMONSQUEEZY | SAFEPAY | STRIPE | MANUAL
   /// Idempotency key. A provider retrying its webhook must not mint a second
   /// invoice number for a charge that already has one.
   providerEventId        String? @unique
@@ -2460,15 +2494,15 @@ model PlatformInvoice {
   plan         String
   billingCycle String @default("MONTHLY")
 
-  currency  String @default("USD")
-  subtotal  Float  @default(0)
-  discount  Float  @default(0)
+  currency  String  @default("USD")
+  subtotal  Float   @default(0)
+  discount  Float   @default(0)
   /// Percentage, as the provider reported it (e.g. 17 for 17%).
-  taxRate   Float  @default(0)
-  taxAmount Float  @default(0)
+  taxRate   Float   @default(0)
+  taxAmount Float   @default(0)
   /// "Sales Tax", "VAT", "GST" — whatever the provider charged under.
   taxName   String?
-  total     Float  @default(0)
+  total     Float   @default(0)
 
   customerName    String?
   customerEmail   String?
@@ -2542,9 +2576,9 @@ model ProspectCompany {
   campaignId String
   campaign   OutreachCampaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
 
-  name    String
-  domain  String?
-  website String?
+  name     String
+  domain   String?
+  website  String?
   /// Mapped onto a FinovaOS business type id from lib/businessTypes.ts.
   industry String?
   country  String?
@@ -2575,7 +2609,7 @@ model ProspectCompany {
   /// { fit, size, multiLocation, softwareGap, reachability, aiJudgement }
   scoreBreakdown Json?
   tier           String? // A | B | C | D
-  scoreReason    String? @db.Text
+  scoreReason    String?   @db.Text
   scoredAt       DateTime?
 
   /// discovered | enriched | scored | drafted | pending_review | approved
@@ -2630,13 +2664,13 @@ model OutreachEmail {
   contactId  String?
 
   /// 1 = first touch, 2+ = follow-ups in the sequence.
-  step     Int    @default(1)
+  step     Int     @default(1)
   toEmail  String
   toName   String?
   subject  String
-  bodyText String @db.Text
-  bodyHtml String @db.Text
-  language String @default("en")
+  bodyText String  @db.Text
+  bodyHtml String  @db.Text
+  language String  @default("en")
 
   aiModel     String?
   generatedAt DateTime?

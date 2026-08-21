@@ -1,5 +1,10 @@
 import { prisma } from "@/lib/prisma";
 import { unstable_cache } from "next/cache";
+import {
+  DEFAULT_RATE_FORMULA,
+  normalizeRateFormula,
+  type RateFormulaSettings,
+} from "@/lib/rateFormula";
 
 export type BranchAssignmentMap = Record<string, string[]>;
 
@@ -128,6 +133,11 @@ export type AdminControlSettings = {
   shiftSettings: ShiftSettingsMap;
   features: BusinessFeatureFlags;
   loyaltySettings: LoyaltySettings;
+  /**
+   * Formula-driven line rates. Absent for every company that has not set one
+   * up, which normalises to `enabled: false` and leaves every document alone.
+   */
+  rateFormula: RateFormulaSettings;
 };
 
 export const DEFAULT_ADMIN_CONTROL_SETTINGS: AdminControlSettings = {
@@ -184,6 +194,7 @@ export const DEFAULT_ADMIN_CONTROL_SETTINGS: AdminControlSettings = {
   shiftSettings: {},
   features: { ...DEFAULT_FEATURE_FLAGS },
   loyaltySettings: { ...DEFAULT_LOYALTY_SETTINGS },
+  rateFormula: { ...DEFAULT_RATE_FORMULA, documents: { ...DEFAULT_RATE_FORMULA.documents } },
 };
 
 function normalizeSettings(value: unknown): AdminControlSettings {
@@ -278,6 +289,7 @@ function normalizeSettings(value: unknown): AdminControlSettings {
         } satisfies ShiftSetting,
       ])
     ),
+    rateFormula: normalizeRateFormula(parsed.rateFormula),
   };
 }
 
@@ -348,6 +360,15 @@ export async function saveCompanyAdminControlSettings(
     loyaltySettings: {
       ...current.loyaltySettings,
       ...(patch.loyaltySettings || {}),
+    },
+    rateFormula: {
+      ...current.rateFormula,
+      ...(patch.rateFormula || {}),
+      // `fields` and `documents` are replaced wholesale, not merged: deleting a
+      // column or switching a document off has to actually delete it, and a
+      // shallow merge of an array would leave the old tail behind.
+      fields: patch.rateFormula?.fields ?? current.rateFormula.fields,
+      documents: patch.rateFormula?.documents ?? current.rateFormula.documents,
     },
   });
 
