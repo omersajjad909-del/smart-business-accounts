@@ -18,10 +18,10 @@ import {
   rateFormulaPrintValues,
   rateFormulaLineIncomplete,
   rateFormulaColumnsWidth,
-  focusRateFormulaCell,
+  rateFormulaEnterHandler,
   type RateFormulaMeta,
 } from "@/components/RateFormulaCells";
-import { computeRateFromFormula, emptyRateFormulaMeta, metaFromItem, rateFormulaFocusKey, readRateFormulaMeta } from "@/lib/rateFormula";
+import { computeRateFromFormula, emptyRateFormulaMeta, metaFromItem, readRateFormulaMeta } from "@/lib/rateFormula";
 import type { RateFormulaValue } from "@/lib/rateFormula";
 
 const FONT = "'Outfit','Inter',sans-serif";
@@ -460,7 +460,6 @@ export default function PurchaseOrderPage() {
                               copy[i].meta = meta;
                               const r = computeRateFromFormula(rf, meta);
                               if (r.rate != null) copy[i].rate = String(r.rate);
-                              focusRateFormulaCell(i, rateFormulaFocusKey(rf));
                             }
                             if (i === copy.length - 1) copy.push(emptyRow());
                             setRows(copy);
@@ -521,7 +520,6 @@ export default function PurchaseOrderPage() {
                               copy[i].meta = meta;
                               const r = computeRateFromFormula(rf, meta);
                               if (r.rate != null) copy[i].rate = String(r.rate);
-                              focusRateFormulaCell(i, rateFormulaFocusKey(rf));
                             }
                                   if (i === copy.length - 1) copy.push(emptyRow());
                                   setRows(copy);

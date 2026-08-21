@@ -24,10 +24,10 @@ import {
   rateFormulaPrintValues,
   rateFormulaLineIncomplete,
   rateFormulaColumnsWidth,
-  focusRateFormulaCell,
+  rateFormulaEnterHandler,
   type RateFormulaMeta,
 } from "@/components/RateFormulaCells";
-import { computeRateFromFormula, emptyRateFormulaMeta, metaFromItem, rateFormulaFocusKey, readRateFormulaMeta } from "@/lib/rateFormula";
+import { computeRateFromFormula, emptyRateFormulaMeta, metaFromItem, readRateFormulaMeta } from "@/lib/rateFormula";
 import type { RateFormulaValue } from "@/lib/rateFormula";
 
 
@@ -321,7 +321,6 @@ function SalesInvoiceContent() {
       copy[idx].meta = meta;
       const r = computeRateFromFormula(rf, meta);
       if (r.rate != null) copy[idx].rate = r.rate;
-      focusRateFormulaCell(idx, rateFormulaFocusKey(rf));
     }
     if (idx === copy.length - 1) copy.push(emptyRow());
     setRows(copy);

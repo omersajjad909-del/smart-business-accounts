@@ -23,10 +23,10 @@ import {
   rateFormulaPrintValues,
   rateFormulaLineIncomplete,
   rateFormulaColumnsWidth,
-  focusRateFormulaCell,
+  rateFormulaEnterHandler,
   type RateFormulaMeta,
 } from "@/components/RateFormulaCells";
-import { computeRateFromFormula, emptyRateFormulaMeta, metaFromItem, rateFormulaFocusKey, readRateFormulaMeta } from "@/lib/rateFormula";
+import { computeRateFromFormula, emptyRateFormulaMeta, metaFromItem, readRateFormulaMeta } from "@/lib/rateFormula";
 import type { RateFormulaValue } from "@/lib/rateFormula";
 
 type Supplier = { id: string; name: string; partyType: string };
@@ -1218,7 +1218,6 @@ const [searchTerm, setSearchTerm] = useState("");
                                           copy[i].meta = meta;
                                           const r = computeRateFromFormula(rf, meta);
                                           if (r.rate != null) copy[i].rate = r.rate;
-                                          focusRateFormulaCell(i, rateFormulaFocusKey(rf));
                                         }
                                         if (i === copy.length - 1) copy.push(emptyRow());
                                         setRows(copy);

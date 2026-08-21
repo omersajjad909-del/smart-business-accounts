@@ -50,10 +50,10 @@ const cellId = (rowIndex: number | undefined, key: string) =>
  * Puts the cursor in one line's column and selects what is there, so the
  * operator types over it rather than behind it.
  *
- * Called right after an item is picked, which is the same tick React re-renders
- * the row in — hence the frame's delay. A missing cell is not an error: the
- * company may have removed that column since, and a document that quietly does
- * not move the cursor is far better than one that throws.
+ * Called in the same tick React re-renders the row in — hence the frame's
+ * delay. A missing cell is not an error: the company may have removed that
+ * column since, and a document that quietly does not move the cursor is far
+ * better than one that throws.
  */
 export function focusRateFormulaCell(rowIndex: number, key: string | null) {
   if (!key || typeof document === "undefined") return;
@@ -64,6 +64,46 @@ export function focusRateFormulaCell(rowIndex: number, key: string | null) {
     el.select?.();
   });
 }
+
+/**
+ * Enter on an item picker jumps to the column the company nominated.
+ *
+ * Two things make this necessary. The dashboard installs a global Enter
+ * handler that walks to the next focusable element in DOM order, which from an
+ * item select is the first formula column — never the one that actually needs
+ * typing. And the jump cannot hang off the select's `change` event instead:
+ * a closed `<select>` fires `change` on every arrow key and every letter typed
+ * to find an option, so the cursor would be yanked away mid-search.
+ *
+ * Enter is the moment the operator has settled on an item, and the only moment
+ * the jump is wanted. Propagation is stopped so the global handler does not
+ * then walk the cursor on from where this put it.
+ */
+export function rateFormulaEnterHandler(
+  settings: RateFormulaSettings,
+  active: boolean,
+  rowIndex: number
+) {
+  return (e: KeyboardEvent | { key: string; shiftKey: boolean; preventDefault(): void; stopPropagation(): void }) => {
+    if (!active || e.key !== "Enter" || e.shiftKey) return;
+    const key = settings.fields.find((f) => f.focusOnPick)?.key;
+    if (!key) return; // no column claims the cursor — leave Enter alone
+    e.preventDefault();
+    e.stopPropagation();
+    focusRateFormulaCell(rowIndex, key);
+  };
+}
+
+/**
+ * Smallest an input may get before it stops being usable.
+ *
+ * A document grid can carry twenty columns, and `table-layout: auto` treats a
+ * `width` on a cell as a suggestion — under pressure it will squeeze the
+ * narrowest column to a few pixels. A `min-width` on the input itself is not a
+ * suggestion, so the column holds its ground and the row scrolls sideways
+ * instead of collapsing into a box nothing can be typed into.
+ */
+const MIN_CELL_WIDTH = 58;
 
 function cellInput(extra?: CSSProperties): CSSProperties {
   return {
@@ -77,6 +117,7 @@ function cellInput(extra?: CSSProperties): CSSProperties {
     textAlign: "right",
     outline: "none",
     width: "100%",
+    minWidth: MIN_CELL_WIDTH,
     boxSizing: "border-box",
     ...extra,
   };
@@ -100,8 +141,8 @@ export function RateFormulaHeadCells({ settings }: { settings: RateFormulaSettin
             letterSpacing: 0.5,
             whiteSpace: "nowrap",
             borderBottom: `1px solid ${BORDER}`,
-            width: f.width,
-            minWidth: f.width,
+            width: Math.max(f.width, MIN_CELL_WIDTH),
+            minWidth: Math.max(f.width, MIN_CELL_WIDTH),
           }}
         >
           {f.label}
@@ -134,7 +175,7 @@ export function RateFormulaRowCells({
         const missing = f.required && value === "";
         const isText = f.kind === "text";
         return (
-          <td key={f.key} style={{ padding: "7px 8px", width: f.width, minWidth: f.width }}>
+          <td key={f.key} style={{ padding: "7px 8px", width: Math.max(f.width, MIN_CELL_WIDTH), minWidth: Math.max(f.width, MIN_CELL_WIDTH) }}>
             <input
               id={cellId(rowIndex, f.key)}
               type={isText ? "text" : "number"}
@@ -286,7 +327,10 @@ export function RateFormulaHint({
  * its own `minWidth` and lets the row scroll sideways instead.
  */
 export function rateFormulaColumnsWidth(settings: RateFormulaSettings): number {
-  return settings.fields.reduce((sum, f) => sum + f.width + 16, 0);
+  return settings.fields.reduce(
+    (sum, f) => sum + Math.max(f.width, MIN_CELL_WIDTH) + 16,
+    0
+  );
 }
 
 /** Column definitions for the shared A4 print document. */
