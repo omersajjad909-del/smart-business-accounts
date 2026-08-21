@@ -97,6 +97,8 @@ const SITEMAP = [
       { label: "Privacy Policy", href: "/legal/privacy", desc: "Data collection & usage" },
       { label: "Cookie Policy", href: "/legal/cookies", desc: "Cookie usage, analytics, and preferences" },
       { label: "Terms of Service", href: "/legal/terms", desc: "Usage terms & conditions" },
+      { label: "Refund Policy", href: "/legal/refund", desc: "Refund eligibility & how to request one" },
+      { label: "Service Delivery Policy", href: "/legal/delivery", desc: "How and when your subscription is activated" },
       { label: "Security", href: "/security", desc: "Security practices & compliance" },
       { label: "Support Center", href: "/support", desc: "Help docs & contact" },
       { label: "Careers", href: "/careers", desc: "Join our team" },
