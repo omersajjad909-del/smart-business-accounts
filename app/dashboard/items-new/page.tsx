@@ -44,6 +44,8 @@ type Item = {
   unit: string; rate: number; purchaseRate: number; taxRate: number;
   minStock: number; barcode?: string | null; description?: string | null;
   imageUrl?: string | null;
+  /** Saved rate-formula dimensions. See lib/rateFormula.ts. */
+  meta?: unknown;
 };
 
 // ── Page ──────────────────────────────────────────────────────────────────────
@@ -69,6 +71,11 @@ export default function ItemsNewPage() {
   // who has not set one up.
   const { settings: rf, active: rfActive } = useRateFormula("items");
   const [meta,        setMeta]        = useState<RateFormulaMeta>({});
+  // The item being edited is held whole, not just its meta: the settings
+  // arrive one request after the first render, and Edit clicked before they
+  // land would otherwise read the item's dimensions against an empty column
+  // list, show blanks, and save those blanks over the real values.
+  const [editingItem, setEditingItem] = useState<Item | null>(null);
   const [editingId,   setEditingId]   = useState<string | null>(null);
   const [search,      setSearch]      = useState("");
   const [filterCat,   setFilterCat]   = useState("ALL");
@@ -88,10 +95,16 @@ export default function ItemsNewPage() {
 
   useEffect(() => { loadItems(); }, []);
 
+  // Re-derived whenever the form switches item, and once more when the settings
+  // finally arrive — so an Edit clicked in the first moments of a page load
+  // still ends up showing what the item actually holds.
   useEffect(() => {
-    if (rfActive) setMeta(m => (Object.keys(m).length ? m : emptyRateFormulaMeta(rf)));
+    if (!rfActive) return;
+    setMeta(editingItem
+      ? readRateFormulaMeta(rf, editingItem.meta)
+      : emptyRateFormulaMeta(rf));
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [rfActive]);
+  }, [rfActive, editingItem]);
 
   function resetForm() {
     setEditingId(null); setName(""); setCategory("TRADING"); setUnit("");
