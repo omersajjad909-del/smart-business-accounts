@@ -23,6 +23,7 @@ import {
   rateFormulaPrintColumns,
   rateFormulaPrintValues,
   rateFormulaLineIncomplete,
+  rateFormulaColumnsWidth,
   focusRateFormulaCell,
   type RateFormulaMeta,
 } from "@/components/RateFormulaCells";
@@ -860,7 +861,7 @@ function SalesInvoiceContent() {
                       </div>
                     ) : (
                       <div style={{ overflowX: "auto" }}>
-                        <table style={{ width: "100%", borderCollapse: "collapse" }}>
+                        <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 820 + (rfActive ? rateFormulaColumnsWidth(rf) : 0) }}>
                           <thead>
                             <tr style={{ borderBottom: "2px solid var(--border)" }}>
                               {["#","Item / Description","SKU"].map((h,hi) => (

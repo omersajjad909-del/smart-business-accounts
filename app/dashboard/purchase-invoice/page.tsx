@@ -22,6 +22,7 @@ import {
   rateFormulaPrintColumns,
   rateFormulaPrintValues,
   rateFormulaLineIncomplete,
+  rateFormulaColumnsWidth,
   focusRateFormulaCell,
   type RateFormulaMeta,
 } from "@/components/RateFormulaCells";
@@ -1176,7 +1177,7 @@ const [searchTerm, setSearchTerm] = useState("");
                       </div>
                     ) : (
                       <div style={{ overflowX: "auto" }}>
-                        <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 700 }}>
+                        <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 700 + (rfActive ? rateFormulaColumnsWidth(rf) : 0) }}>
                           <thead>
                             <tr style={{ background: "rgba(99,102,241,.04)" }}>
                               {["#","SKU / Code","Product Name"].map((h, hi) => (

@@ -101,6 +101,7 @@ export function RateFormulaHeadCells({ settings }: { settings: RateFormulaSettin
             whiteSpace: "nowrap",
             borderBottom: `1px solid ${BORDER}`,
             width: f.width,
+            minWidth: f.width,
           }}
         >
           {f.label}
@@ -133,7 +134,7 @@ export function RateFormulaRowCells({
         const missing = f.required && value === "";
         const isText = f.kind === "text";
         return (
-          <td key={f.key} style={{ padding: "7px 8px", width: f.width }}>
+          <td key={f.key} style={{ padding: "7px 8px", width: f.width, minWidth: f.width }}>
             <input
               id={cellId(rowIndex, f.key)}
               type={isText ? "text" : "number"}
@@ -274,6 +275,18 @@ export function RateFormulaHint({
       {parts.join(" × ")} ÷ {settings.divisor}
     </div>
   );
+}
+
+/**
+ * How much horizontal room these columns need, in px.
+ *
+ * A document grid already carries a dozen columns; adding six more without
+ * telling the table makes every narrow one collapse to a few pixels, and an
+ * input you cannot see is an input you cannot type in. Each grid adds this to
+ * its own `minWidth` and lets the row scroll sideways instead.
+ */
+export function rateFormulaColumnsWidth(settings: RateFormulaSettings): number {
+  return settings.fields.reduce((sum, f) => sum + f.width + 16, 0);
 }
 
 /** Column definitions for the shared A4 print document. */

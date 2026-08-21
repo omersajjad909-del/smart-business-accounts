@@ -17,6 +17,7 @@ import {
   rateFormulaPrintColumns,
   rateFormulaPrintValues,
   rateFormulaLineIncomplete,
+  rateFormulaColumnsWidth,
   focusRateFormulaCell,
   type RateFormulaMeta,
 } from "@/components/RateFormulaCells";
@@ -413,7 +414,7 @@ export default function GRNPage() {
                   </div>
                 ) : (
                   <div style={{ overflowX: "auto" }}>
-                    <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 540, fontSize: 13 }}>
+                    <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 540 + (rfActive ? rateFormulaColumnsWidth(rf) + 94 : 0), fontSize: 13 }}>
                       <thead>
                         <tr style={{ background: "rgba(99,102,241,0.07)" }}>
                           {[["#","left",30],["Item","left","auto"]].map(([h,a,w]) => (
