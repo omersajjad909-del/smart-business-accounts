@@ -473,7 +473,7 @@ export default function RateFormulaPage() {
               <div
                 style={{
                   display: "grid",
-                  gridTemplateColumns: isMobile ? "1fr 1fr" : "1.1fr 1fr .8fr .8fr .7fr auto",
+                  gridTemplateColumns: isMobile ? "1fr 1fr" : "1.1fr 1fr .85fr .7fr .8fr .7fr auto",
                   gap: 10,
                   alignItems: "end",
                 }}
@@ -506,12 +506,39 @@ export default function RateFormulaPage() {
                   />
                 </div>
                 <div>
+                  <div style={labelStyle()}>Type</div>
+                  <select
+                    style={inp()}
+                    value={f.kind}
+                    onChange={(e) => {
+                      const kind = e.target.value as RateFormulaFieldKind;
+                      // Switching to text drops the column out of the maths and
+                      // resets the default, because "0" is not a sensible
+                      // starting value for a code like 15-L.
+                      setField(i, kind === "text"
+                        ? { kind, affectsRate: false, defaultValue: "" }
+                        : { kind, defaultValue: 0 });
+                    }}
+                  >
+                    <option value="number">Number</option>
+                    <option value="text">Text</option>
+                  </select>
+                </div>
+                <div>
                   <div style={labelStyle()}>Default</div>
                   <input
-                    type="number"
+                    type={f.kind === "text" ? "text" : "number"}
                     style={inp()}
                     value={f.defaultValue}
-                    onChange={(e) => setField(i, { defaultValue: Number(e.target.value) || 0 })}
+                    maxLength={f.kind === "text" ? RATE_FORMULA_TEXT_MAX : undefined}
+                    onChange={(e) =>
+                      setField(i, {
+                        defaultValue: f.kind === "text"
+                          ? e.target.value
+                          : Number(e.target.value) || 0,
+                      })
+                    }
+                    placeholder={f.kind === "text" ? "e.g. 15-L" : "0"}
                   />
                 </div>
                 <div>
@@ -565,10 +592,18 @@ export default function RateFormulaPage() {
               </div>
 
               <div style={{ display: "flex", gap: 16, flexWrap: "wrap", marginTop: 11 }}>
-                <label style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12.5, color: TEXT, cursor: "pointer" }}>
+                <label
+                  title={f.kind === "text" ? "A text column cannot be part of the maths." : undefined}
+                  style={{
+                    display: "flex", alignItems: "center", gap: 6, fontSize: 12.5,
+                    color: f.kind === "text" ? MUTED : TEXT,
+                    cursor: f.kind === "text" ? "not-allowed" : "pointer",
+                  }}
+                >
                   <input
                     type="checkbox"
                     checked={f.affectsRate}
+                    disabled={f.kind === "text"}
                     onChange={(e) => setField(i, { affectsRate: e.target.checked })}
                     style={{ accentColor: ACCENT }}
                   />
