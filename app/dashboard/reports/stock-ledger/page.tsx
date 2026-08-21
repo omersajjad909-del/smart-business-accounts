@@ -5,11 +5,18 @@ import { useEffect, useState } from "react";
 import { getCurrentUser } from "@/lib/auth";
 import DateInput from "@/app/dashboard/reports/_components/DateInput";
 import { useResponsive } from "@/hooks/useResponsive";
+import { useRateFormula } from "@/hooks/useRateFormula";
+import { readRateFormulaMeta } from "@/lib/rateFormula";
 
 const ff = "'Outfit','Inter',sans-serif";
 
 type Item = { id: string; name: string; description?: string | null };
-type Row  = { date: string; type: string; party: string; inQty: number; outQty: number; balanceQty: number };
+type Row  = {
+  date: string; type: string; party: string; inQty: number; outQty: number; balanceQty: number;
+  rate?: number;
+  /** Dimensions the movement was priced from, when a rate formula is in use. */
+  meta?: unknown;
+};
 
 function typeBadge(type: string) {
   const map: Record<string, { bg: string; color: string }> = {
@@ -30,6 +37,11 @@ function typeBadge(type: string) {
 
 export default function StockLedgerPage() {
   const { isMobile } = useResponsive();
+  // A roll that came in at 7 gauge × 56" is a different thing from one at
+  // 5 × 48, even though both are one line of the same item. Showing the
+  // dimensions is the difference between a ledger you can reconcile against
+  // the supplier's bill and one you cannot.
+  const { settings: rf, active: rfActive } = useRateFormula("inventory");
   const today = new Date().toISOString().slice(0, 10);
   const [items,  setItems]  = useState<Item[]>([]);
   const [itemId, setItemId] = useState("");
@@ -182,12 +194,18 @@ export default function StockLedgerPage() {
         <table style={{ width: "100%", borderCollapse: "collapse", fontFamily: ff }}>
           <thead>
             <tr style={{ background: "rgba(255,255,255,.04)", borderBottom: "1px solid rgba(255,255,255,.08)" }}>
-              {(["DATE", "PARTY / DESCRIPTION", "TYPE", "IN (+)", "OUT (−)", "BALANCE"] as string[]).map((h, i) => (
-                <th key={h} style={{
+              {([
+                "DATE",
+                "PARTY / DESCRIPTION",
+                "TYPE",
+                ...(rfActive ? rf.fields.map(f => f.label.toUpperCase()) : []),
+                "IN (+)", "OUT (−)", "BALANCE",
+              ] as string[]).map((h, i, all) => (
+                <th key={h + i} style={{
                   padding: "11px 16px",
                   fontSize: 10, fontWeight: 700, letterSpacing: ".07em", color: "rgba(255,255,255,.4)",
-                  textAlign: i >= 3 ? "right" : "left",
-                  borderRight: i < 5 ? "1px solid rgba(255,255,255,.05)" : "none",
+                  textAlign: i >= all.length - 3 ? "right" : "left",
+                  borderRight: i < all.length - 1 ? "1px solid rgba(255,255,255,.05)" : "none",
                   whiteSpace: "nowrap",
                 }}>
                   {h}
@@ -198,7 +216,7 @@ export default function StockLedgerPage() {
           <tbody>
             {loading ? (
               <tr>
-                <td colSpan={6} style={{ padding: "52px 0", textAlign: "center" }}>
+                <td colSpan={rfActive ? 6 + rf.fields.length : 6} style={{ padding: "52px 0", textAlign: "center" }}>
                   <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 12, color: "rgba(255,255,255,.3)" }}>
                     <div style={{ width: 28, height: 28, borderRadius: "50%", border: "2.5px solid rgba(99,102,241,.25)", borderTopColor: "#6366f1", animation: "spin 0.8s linear infinite" }} />
                     <span style={{ fontSize: 13 }}>Fetching ledger…</span>
@@ -207,7 +225,7 @@ export default function StockLedgerPage() {
               </tr>
             ) : rows.length === 0 ? (
               <tr>
-                <td colSpan={6} style={{ padding: "60px 0", textAlign: "center" }}>
+                <td colSpan={rfActive ? 6 + rf.fields.length : 6} style={{ padding: "60px 0", textAlign: "center" }}>
                   <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 10, color: "rgba(255,255,255,.22)" }}>
                     <div style={{ fontSize: 40, opacity: 0.5 }}>📊</div>
                     <div style={{ fontSize: 14, fontWeight: 700 }}>
@@ -233,6 +251,14 @@ export default function StockLedgerPage() {
                   <td style={{ padding: "11px 16px", borderRight: "1px solid rgba(255,255,255,.04)", background: "transparent" }}>
                     {typeBadge(r.type)}
                   </td>
+                  {rfActive && (() => {
+                    const meta = readRateFormulaMeta(rf, r.meta);
+                    return rf.fields.map(f => (
+                      <td key={f.key} style={{ padding: "11px 16px", fontSize: 12, textAlign: "center", color: meta[f.key] === "" ? "rgba(255,255,255,.2)" : "#e2e8f0", borderRight: "1px solid rgba(255,255,255,.04)", background: "transparent", whiteSpace: "nowrap" }}>
+                        {meta[f.key] === "" ? "—" : meta[f.key]}
+                      </td>
+                    ));
+                  })()}
                   <td style={{ padding: "11px 16px", textAlign: "right", fontSize: 13, fontWeight: 700, color: r.inQty ? "#34d399" : "rgba(255,255,255,.2)", borderRight: "1px solid rgba(255,255,255,.04)", background: "transparent" }}>
                     {r.inQty ? `+${r.inQty.toLocaleString()}` : "—"}
                   </td>
@@ -251,7 +277,7 @@ export default function StockLedgerPage() {
           {!loading && rows.length > 0 && (
             <tfoot>
               <tr style={{ background: "rgba(99,102,241,.08)", borderTop: "1px solid rgba(99,102,241,.2)" }}>
-                <td colSpan={3} style={{ padding: "12px 16px", fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,.45)", textTransform: "uppercase", letterSpacing: ".06em", textAlign: "right" }}>
+                <td colSpan={rfActive ? 3 + rf.fields.length : 3} style={{ padding: "12px 16px", fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,.45)", textTransform: "uppercase", letterSpacing: ".06em", textAlign: "right" }}>
                   Current Period Totals
                 </td>
                 <td style={{ padding: "12px 16px", textAlign: "right", fontSize: 14, fontWeight: 800, color: "#34d399", borderLeft: "1px solid rgba(255,255,255,.06)" }}>

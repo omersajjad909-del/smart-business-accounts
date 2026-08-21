@@ -824,6 +824,7 @@ export default function RateFormulaPage() {
                 patch({ documents: { ...settings.documents, [d.key]: v } })
               }
               label={d.label}
+              note={d.note}
             />
           ))}
         </div>

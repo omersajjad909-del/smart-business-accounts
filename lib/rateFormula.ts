@@ -45,19 +45,26 @@ export type RateFormulaField = {
   required: boolean;
 };
 
-/** Documents the formula can drive. Each is opt-in. */
+/**
+ * Documents the formula can drive. Each is opt-in.
+ *
+ * Only documents whose grid actually renders the columns belong here — a
+ * checkbox that saves a preference nothing reads is worse than no checkbox.
+ * Add the entry at the same time as the wiring, not before.
+ */
 export const RATE_FORMULA_DOCS = [
-  { key: "purchaseOrder",   label: "Purchase Order",      route: "/dashboard/purchase-order" },
-  { key: "grn",             label: "GRN / Goods Receipt", route: "/dashboard/grn" },
-  { key: "purchaseInvoice", label: "Purchase Invoice",    route: "/dashboard/purchase-invoice" },
-  { key: "purchaseReturn",  label: "Purchase Return",     route: "/dashboard/purchase-return" },
-  { key: "salesOrder",      label: "Sales Order",         route: "/dashboard/sales-order" },
-  { key: "salesInvoice",    label: "Sales Invoice",       route: "/dashboard/sales-invoice" },
-  { key: "saleReturn",      label: "Sale Return",         route: "/dashboard/sale-return" },
-  { key: "quotation",       label: "Quotation",           route: "/dashboard/quotation" },
-  { key: "deliveryChallan", label: "Delivery Challan",    route: "/dashboard/delivery-challan" },
-  { key: "outward",         label: "Outward / Dispatch",  route: "/dashboard/outward" },
-  { key: "inventory",       label: "Inventory & Stock",   route: "/dashboard/inventory" },
+  { key: "purchaseOrder",   label: "Purchase Order",      route: "/dashboard/purchase-order",
+    note: "Columns on every order line; the rate is worked out as you type." },
+  { key: "grn",             label: "GRN / Goods Receipt", route: "/dashboard/grn",
+    note: "Carries the order's values across, or takes fresh ones on arrival." },
+  { key: "purchaseInvoice", label: "Purchase Invoice",    route: "/dashboard/purchase-invoice",
+    note: "Inherits from the order or GRN it was raised against." },
+  { key: "salesInvoice",    label: "Sales Invoice",       route: "/dashboard/sales-invoice",
+    note: "Columns on every invoice line; the rate is worked out as you type." },
+  { key: "saleReturn",      label: "Sale Return",         route: "/dashboard/sale-return",
+    note: "Shows what the invoice was priced at — read-only, so a return cannot disagree with the sale." },
+  { key: "inventory",       label: "Stock Ledger",        route: "/dashboard/reports/stock-ledger",
+    note: "Every stock movement shows the dimensions it was priced from." },
 ] as const;
 
 export type RateFormulaDocKey = (typeof RATE_FORMULA_DOCS)[number]["key"];
@@ -92,13 +99,8 @@ export const DEFAULT_RATE_FORMULA_DOCS: RateFormulaDocMap = {
   purchaseOrder: false,
   grn: false,
   purchaseInvoice: false,
-  purchaseReturn: false,
-  salesOrder: false,
   salesInvoice: false,
   saleReturn: false,
-  quotation: false,
-  deliveryChallan: false,
-  outward: false,
   inventory: false,
 };
 
