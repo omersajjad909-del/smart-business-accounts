@@ -24,7 +24,7 @@ import {
   rateFormulaLineIncomplete,
   type RateFormulaMeta,
 } from "@/components/RateFormulaCells";
-import { computeRateFromFormula, emptyRateFormulaMeta, readRateFormulaMeta } from "@/lib/rateFormula";
+import { computeRateFromFormula, emptyRateFormulaMeta, metaFromItem, readRateFormulaMeta } from "@/lib/rateFormula";
 import type { RateFormulaValue } from "@/lib/rateFormula";
 
 type Supplier = { id: string; name: string; partyType: string };
@@ -94,7 +94,7 @@ type TaxConfig = {
   description?: string;
 };
 
-type InventoryItem = { id: string; name: string; barcode?: string; purchaseRate?: number; unit?: string; code?: string; description?: string };
+type InventoryItem = { id: string; name: string; barcode?: string; purchaseRate?: number; unit?: string; code?: string; description?: string; meta?: unknown };
 
 type Currency = {
   id: string;
@@ -270,6 +270,11 @@ const [searchTerm, setSearchTerm] = useState("");
       setRows(updated);
     } else {
       const newRow: Row = { ...emptyRow(), itemId: found.id, name: found.name, description: found.description || "", qty: 1, rate: rfActive ? "" : (found.purchaseRate || ""), unit: found.unit || "", sku: found.code || "" };
+      if (rfActive) {
+        newRow.meta = metaFromItem(rf, (found as any).meta, newRow.meta);
+        const r = computeRateFromFormula(rf, newRow.meta);
+        if (r.rate != null) newRow.rate = r.rate;
+      }
       const last = rows[rows.length - 1];
       if (!last.itemId && last.qty === "" && last.rate === "") {
         setRows([...rows.slice(0, -1), newRow, emptyRow()]);
@@ -361,7 +366,7 @@ const [searchTerm, setSearchTerm] = useState("");
     fetch("/api/items-new", { headers: requestHeaders })
       .then(r => r.json())
       .then(data => {
-        if (Array.isArray(data)) setAllInventoryItems(data.map((i: any) => ({ id: i.id, name: i.name, barcode: i.barcode || "", purchaseRate: i.purchaseRate ?? 0, unit: i.unit || "", code: i.code || "", description: i.description || "" })));
+        if (Array.isArray(data)) setAllInventoryItems(data.map((i: any) => ({ id: i.id, name: i.name, barcode: i.barcode || "", purchaseRate: i.purchaseRate ?? 0, unit: i.unit || "", code: i.code || "", description: i.description || "", meta: i.meta ?? null })));
       })
       .catch(() => {});
   }, []);
@@ -1206,6 +1211,12 @@ const [searchTerm, setSearchTerm] = useState("");
                                         // here would overwrite a computed line rate the moment
                                         // the operator corrected the item.
                                         copy[i] = { ...copy[i], itemId: item.id, name: item.name, description: item.description || "", sku: item.code || "", unit: item.unit || "", ...(rfActive ? {} : { rate: item.purchaseRate || "" }) };
+                                        if (rfActive) {
+                                          const meta = metaFromItem(rf, (item as any).meta, copy[i].meta);
+                                          copy[i].meta = meta;
+                                          const r = computeRateFromFormula(rf, meta);
+                                          if (r.rate != null) copy[i].rate = r.rate;
+                                        }
                                         if (i === copy.length - 1) copy.push(emptyRow());
                                         setRows(copy);
                                       } else {

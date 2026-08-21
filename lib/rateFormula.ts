@@ -291,6 +291,28 @@ export function readRateFormulaMeta(
   return out;
 }
 
+/**
+ * Line values for a freshly picked item.
+ *
+ * The item's saved defaults win, because picking an item is the operator saying
+ * "this is that product" — a stale gauge left over from the previous item on
+ * the line would be worse than useless. Columns the item has nothing for keep
+ * whatever is already on the line.
+ */
+export function metaFromItem(
+  settings: RateFormulaSettings,
+  itemMeta: unknown,
+  currentMeta: Record<string, RateFormulaValue> | undefined
+): Record<string, RateFormulaValue> {
+  const fromItem = readRateFormulaMeta(settings, itemMeta);
+  const out: Record<string, RateFormulaValue> = {};
+  for (const f of settings.fields) {
+    const saved = fromItem[f.key];
+    out[f.key] = saved === "" ? (currentMeta?.[f.key] ?? "") : saved;
+  }
+  return out;
+}
+
 /* ─────────────────────────── Maths ─────────────────────────── */
 
 export type RateFormulaResult = {

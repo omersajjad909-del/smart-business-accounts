@@ -1,8 +1,9 @@
 ﻿﻿﻿import { NextResponse, NextRequest } from "next/server";
-import { PrismaClient } from "@prisma/client";
+import { Prisma, PrismaClient } from "@prisma/client";
 import { resolveCompanyId } from "@/lib/tenant";
 import { logActivity } from "@/lib/audit";
 import { prisma } from "@/lib/prisma";
+import { sanitizeLineMeta } from "@/lib/rateFormula";
 
 export async function GET(req: NextRequest) {
   try {
@@ -92,6 +93,8 @@ export async function POST(req: NextRequest) {
         barcode: body.barcode ? String(body.barcode).trim() : null,
         description: body.description || "",
         imageUrl: body.imageUrl || null,
+        // The item's usual rate-formula dimensions, if the company runs one.
+        meta: sanitizeLineMeta(body.meta),
       },
     });
 
@@ -125,7 +128,7 @@ export async function PUT(req: NextRequest) {
     }
     const userId = req.headers.get("x-user-id");
     const body = await req.json();
-    const { id, name, category, unit, rate, purchaseRate, taxRate, minStock, barcode, description, imageUrl } = body;
+    const { id, name, category, unit, rate, purchaseRate, taxRate, minStock, barcode, description, imageUrl, meta } = body;
 
     if (!id || !name || !unit) {
       return NextResponse.json({ error: "ID, Name & Unit required" }, { status: 400 });
@@ -144,6 +147,9 @@ export async function PUT(req: NextRequest) {
         barcode: barcode ? String(barcode).trim() : null,
         description: description || "",
         imageUrl: imageUrl !== undefined ? (imageUrl || null) : undefined,
+        // Undefined leaves the column as it was, which is what a company with
+        // no rate formula sends and what an older client would send too.
+        meta: meta === undefined ? undefined : (sanitizeLineMeta(meta) ?? Prisma.DbNull),
       },
     });
 

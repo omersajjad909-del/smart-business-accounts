@@ -25,7 +25,7 @@ import {
   rateFormulaLineIncomplete,
   type RateFormulaMeta,
 } from "@/components/RateFormulaCells";
-import { computeRateFromFormula, emptyRateFormulaMeta, readRateFormulaMeta } from "@/lib/rateFormula";
+import { computeRateFromFormula, emptyRateFormulaMeta, metaFromItem, readRateFormulaMeta } from "@/lib/rateFormula";
 import type { RateFormulaValue } from "@/lib/rateFormula";
 
 
@@ -35,7 +35,7 @@ const accent = "#6366f1";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 type Account = { id: string; name: string; email?: string; phone?: string; address?: string; city?: string; ntn?: string; strn?: string };
-type Item = { id: string; name: string; code?: string; unit?: string; description?: string; availableQty: number; barcode?: string; salePrice?: number; taxRate?: number };
+type Item = { id: string; name: string; code?: string; unit?: string; description?: string; availableQty: number; barcode?: string; salePrice?: number; taxRate?: number; meta?: unknown };
 type Row = { itemId: string; name: string; description: string; availableQty: number; qty: number | ""; rate: number | ""; discountPercent: number | ""; taxPercent: number | ""; unit: string; sku: string; isManual?: boolean;
   /** Rate-formula dimensions, when this company uses one. See lib/rateFormula.ts. */
   meta?: RateFormulaMeta };
@@ -190,7 +190,7 @@ function SalesInvoiceContent() {
     });
     fetch("/api/items-new", { headers: h }).then(r => r.json()).then(d => {
       const list = Array.isArray(d) ? d : [];
-      setItems(list.map((i: any) => ({ id: i.id, name: i.name, code: i.code || "", unit: i.unit || "", description: i.description || "", availableQty: 0, barcode: i.barcode || "", salePrice: i.rate ?? 0, taxRate: i.taxRate ?? 0 })));
+      setItems(list.map((i: any) => ({ id: i.id, name: i.name, code: i.code || "", unit: i.unit || "", description: i.description || "", availableQty: 0, barcode: i.barcode || "", salePrice: i.rate ?? 0, taxRate: i.taxRate ?? 0, meta: i.meta ?? null })));
     });
     fetch("/api/tax-configuration").then(r => r.json()).then(d => setTaxes(Array.isArray(d) ? d : [])).catch(() => {});
     fetch("/api/users", { headers: h }).then(r => r.ok ? r.json() : []).then(d => setTeamMembers((Array.isArray(d) ? d : []).map((u: any) => ({ id: u.id, name: u.name })))).catch(() => {});
@@ -314,6 +314,12 @@ function SalesInvoiceContent() {
     // With a formula running the rate belongs to the formula, so the item's
     // stored sale price must not overwrite a computed line rate.
     copy[idx] = { ...copy[idx], itemId: item.id, name: item.name, description: item.description || "", availableQty: item.availableQty, qty: "", rate: rfActive ? copy[idx].rate : (item.salePrice || ""), discountPercent: "", taxPercent: item.taxRate || "", unit: item.unit || "", sku: item.code || "", isManual: false };
+    if (rfActive) {
+      const meta = metaFromItem(rf, (item as any).meta, copy[idx].meta);
+      copy[idx].meta = meta;
+      const r = computeRateFromFormula(rf, meta);
+      if (r.rate != null) copy[idx].rate = r.rate;
+    }
     if (idx === copy.length - 1) copy.push(emptyRow());
     setRows(copy);
   }

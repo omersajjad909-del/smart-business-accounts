@@ -19,7 +19,7 @@ import {
   rateFormulaLineIncomplete,
   type RateFormulaMeta,
 } from "@/components/RateFormulaCells";
-import { computeRateFromFormula, emptyRateFormulaMeta, readRateFormulaMeta } from "@/lib/rateFormula";
+import { computeRateFromFormula, emptyRateFormulaMeta, metaFromItem, readRateFormulaMeta } from "@/lib/rateFormula";
 import type { RateFormulaValue } from "@/lib/rateFormula";
 
 const FONT = "'Outfit','Inter',sans-serif";
@@ -140,6 +140,22 @@ export default function GRNPage() {
     setRows(prev => prev.some(r => r.meta) ? prev : prev.map(r => ({ ...r, meta: emptyRateFormulaMeta(rf) })));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [rfActive]);
+
+  /** Picking an item pulls its saved dimensions onto the line. */
+  function selectGrnItem(idx: number, itemId: string) {
+    updateRow(idx, "itemId", itemId);
+    if (!rfActive) return;
+    const item = allItems.find((x: any) => x.id === itemId);
+    if (!item) return;
+    setRows(prev => {
+      const copy = [...prev];
+      const meta = metaFromItem(rf, item.meta, copy[idx]?.meta);
+      copy[idx] = { ...copy[idx], meta };
+      const r = computeRateFromFormula(rf, meta);
+      if (r.rate != null) copy[idx].rate = String(r.rate);
+      return copy;
+    });
+  }
 
   function updateRow(idx: number, field: keyof GRNItem, value: string) {
     const u = [...rows];
@@ -376,7 +392,7 @@ export default function GRNPage() {
                             <span style={{ fontSize: 11, fontWeight: 700, color: MUTED, textTransform: "uppercase" as const }}>Item {idx + 1}</span>
                             <button onClick={() => setRows(rows.filter((_, i) => i !== idx))} disabled={rows.length === 1} style={{ background: "none", border: "none", cursor: rows.length === 1 ? "not-allowed" : "pointer", color: "#f87171", fontSize: 18, lineHeight: 1, padding: 0, opacity: rows.length === 1 ? 0.3 : 1 }}>×</button>
                           </div>
-                          <select value={row.itemId} onChange={e => updateRow(idx, "itemId", e.target.value)} style={{ ...inp({ marginBottom: 8 }) }}>
+                          <select value={row.itemId} onChange={e => selectGrnItem(idx, e.target.value)} style={{ ...inp({ marginBottom: 8 }) }}>
                             <option value="">— Select Item —</option>
                             {allItems.map((it: any) => <option key={it.id} value={it.id}>{it.name}</option>)}
                           </select>
@@ -415,7 +431,7 @@ export default function GRNPage() {
                             <tr key={idx} style={{ borderTop: `1px solid ${BORDER}` }}>
                               <td style={{ padding: "6px 8px", color: MUTED, fontSize: 12 }}>{idx + 1}</td>
                               <td style={{ padding: "6px 8px" }}>
-                                <select value={row.itemId} onChange={e => updateRow(idx, "itemId", e.target.value)} style={inp({ padding: "6px 10px" })}>
+                                <select value={row.itemId} onChange={e => selectGrnItem(idx, e.target.value)} style={inp({ padding: "6px 10px" })}>
                                   <option value="">Select Item</option>
                                   {allItems.map((it: any) => <option key={it.id} value={it.id}>{it.name}</option>)}
                                 </select>

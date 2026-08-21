@@ -19,7 +19,7 @@ import {
   rateFormulaLineIncomplete,
   type RateFormulaMeta,
 } from "@/components/RateFormulaCells";
-import { computeRateFromFormula, emptyRateFormulaMeta, readRateFormulaMeta } from "@/lib/rateFormula";
+import { computeRateFromFormula, emptyRateFormulaMeta, metaFromItem, readRateFormulaMeta } from "@/lib/rateFormula";
 import type { RateFormulaValue } from "@/lib/rateFormula";
 
 const FONT = "'Outfit','Inter',sans-serif";
@@ -453,6 +453,12 @@ export default function PurchaseOrderPage() {
                             if (!it) return;
                             const copy = [...rows];
                             copy[i] = { ...copy[i], itemId: it.id, name: it.name, desc: it.description || "", rate: rfActive ? copy[i].rate : String(it.purchaseRate || it.rate || ""), unit: it.unit || "", sku: it.code || "" };
+                            if (rfActive) {
+                              const meta = metaFromItem(rf, it.meta, copy[i].meta);
+                              copy[i].meta = meta;
+                              const r = computeRateFromFormula(rf, meta);
+                              if (r.rate != null) copy[i].rate = String(r.rate);
+                            }
                             if (i === copy.length - 1) copy.push(emptyRow());
                             setRows(copy);
                           }} style={{ ...inp({ marginBottom: 8 }) }}>
@@ -507,6 +513,12 @@ export default function PurchaseOrderPage() {
                                   if (!it) return;
                                   const copy = [...rows];
                                   copy[i] = { ...copy[i], itemId: it.id, name: it.name, desc: it.description || "", rate: rfActive ? copy[i].rate : String(it.purchaseRate || it.rate || ""), unit: it.unit || "", sku: it.code || "" };
+                            if (rfActive) {
+                              const meta = metaFromItem(rf, it.meta, copy[i].meta);
+                              copy[i].meta = meta;
+                              const r = computeRateFromFormula(rf, meta);
+                              if (r.rate != null) copy[i].rate = String(r.rate);
+                            }
                                   if (i === copy.length - 1) copy.push(emptyRow());
                                   setRows(copy);
                                 }} style={{ ...inp({ padding: isMobile ? "8px 8px" : "5px 7px", fontSize: 13 }) }}>
