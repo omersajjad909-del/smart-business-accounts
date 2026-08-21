@@ -23,6 +23,20 @@ import { checkExpression, runFormula, validateKey } from "@/lib/formulaEngine";
 
 /* ─────────────────────────── Shape ─────────────────────────── */
 
+/**
+ * How a column is typed in.
+ *
+ * "text" exists because trade codes are not numbers. A shade is "15-L" or
+ * "15-F"; a batch is "B/2026-04". Forcing those through a number box either
+ * loses the suffix or stops the operator entering what is printed on the
+ * supplier's bill. A text column can never feed the rate — there is no
+ * arithmetic to do on "15-L" — so the two travel together.
+ */
+export type RateFormulaFieldKind = "number" | "text";
+
+/** What one column holds on one line. "" means the operator left it blank. */
+export type RateFormulaValue = number | string | "";
+
 /** One column the operator types on each document line. */
 export type RateFormulaField = {
   /** Identifier used inside the expression. Letters, digits, underscore. */
@@ -31,19 +45,25 @@ export type RateFormulaField = {
   label: string;
   /** Free text, shown as a hint. "mm", "in", "m" — display only. */
   unit: string;
-  /** Pre-filled on a fresh line. */
-  defaultValue: number;
+  /** Number box or free text. Defaults to a number box. */
+  kind: RateFormulaFieldKind;
+  /** Pre-filled on a fresh line. A string when `kind` is "text". */
+  defaultValue: RateFormulaValue;
   /** Grid/print column width in px. */
   width: number;
   /**
-   * false = recorded and printed but not part of the maths. A shade number or
-   * a PHR reading belongs on the bill without touching the rate.
+   * false = recorded and printed but not part of the maths. A shade code or
+   * a PHR reading belongs on the bill without touching the rate. Always false
+   * for a text column.
    */
   affectsRate: boolean;
   showOnPrint: boolean;
   /** Blocks saving the document while empty. */
   required: boolean;
 };
+
+/** Longest a text column's value may be — a code, not a paragraph. */
+export const RATE_FORMULA_TEXT_MAX = 32;
 
 /**
  * Documents the formula can drive. Each is opt-in.
@@ -143,12 +163,14 @@ export const RATE_FORMULA_PRESETS: Array<{
       rateEditable: true,
       expression: "rtmm * gauge * width * length / divisor",
       fields: [
-        { key: "gauge",  label: "Gauge",   unit: "",       defaultValue: 0, width: 60, affectsRate: true,  showOnPrint: true, required: true },
-        { key: "width",  label: "Width",   unit: "in",     defaultValue: 0, width: 60, affectsRate: true,  showOnPrint: true, required: true },
-        { key: "length", label: "Length",  unit: "m",      defaultValue: 0, width: 60, affectsRate: true,  showOnPrint: true, required: true },
-        { key: "phr",    label: "PHR",     unit: "",       defaultValue: 0, width: 55, affectsRate: false, showOnPrint: true, required: false },
-        { key: "shade",  label: "Shade #", unit: "",       defaultValue: 0, width: 60, affectsRate: false, showOnPrint: true, required: false },
-        { key: "rtmm",   label: "RT/MM",   unit: "per mm", defaultValue: 0, width: 60, affectsRate: true,  showOnPrint: true, required: true },
+        { key: "gauge",  label: "Gauge",   unit: "",       kind: "number", defaultValue: 0,  width: 60, affectsRate: true,  showOnPrint: true, required: true },
+        { key: "width",  label: "Width",   unit: "in",     kind: "number", defaultValue: 0,  width: 60, affectsRate: true,  showOnPrint: true, required: true },
+        { key: "length", label: "Length",  unit: "m",      kind: "number", defaultValue: 0,  width: 60, affectsRate: true,  showOnPrint: true, required: true },
+        { key: "phr",    label: "PHR",     unit: "",       kind: "number", defaultValue: 0,  width: 55, affectsRate: false, showOnPrint: true, required: false },
+        // A shade is a code, not a quantity — "15-L", "15-F". Text, so the
+        // suffix survives, and never part of the maths.
+        { key: "shade",  label: "Shade #", unit: "",       kind: "text",   defaultValue: "", width: 65, affectsRate: false, showOnPrint: true, required: false },
+        { key: "rtmm",   label: "RT/MM",   unit: "per mm", kind: "number", defaultValue: 0,  width: 60, affectsRate: true,  showOnPrint: true, required: true },
       ],
     },
   },
@@ -166,13 +188,21 @@ function normalizeField(raw: unknown): RateFormulaField | null {
   const f = raw as Partial<RateFormulaField>;
   const key = String(f.key || "").trim();
   if (validateKey(key)) return null; // unusable as an identifier — drop it
+
+  const kind: RateFormulaFieldKind = f.kind === "text" ? "text" : "number";
+
   return {
     key,
     label: String(f.label || key),
     unit: String(f.unit || ""),
-    defaultValue: num(f.defaultValue, 0),
+    kind,
+    defaultValue: kind === "text"
+      ? String(f.defaultValue ?? "").slice(0, RATE_FORMULA_TEXT_MAX)
+      : num(f.defaultValue, 0),
     width: Math.min(200, Math.max(40, Math.round(num(f.width, 60)))),
-    affectsRate: f.affectsRate !== false,
+    // A text column can never feed the rate, whatever the stored flag says —
+    // the expression would be handed "15-L" and fail on every line.
+    affectsRate: kind === "text" ? false : f.affectsRate !== false,
     showOnPrint: f.showOnPrint !== false,
     required: Boolean(f.required),
   };
@@ -229,8 +259,8 @@ export function isRateFormulaActive(
 /** A blank line's starting values. */
 export function emptyRateFormulaMeta(
   settings: RateFormulaSettings
-): Record<string, number | ""> {
-  const out: Record<string, number | ""> = {};
+): Record<string, RateFormulaValue> {
+  const out: Record<string, RateFormulaValue> = {};
   for (const f of settings.fields) out[f.key] = f.defaultValue || "";
   return out;
 }
@@ -239,12 +269,18 @@ export function emptyRateFormulaMeta(
 export function readRateFormulaMeta(
   settings: RateFormulaSettings,
   meta: unknown
-): Record<string, number | ""> {
+): Record<string, RateFormulaValue> {
   const source = (meta && typeof meta === "object") ? meta as Record<string, unknown> : {};
-  const out: Record<string, number | ""> = {};
+  const out: Record<string, RateFormulaValue> = {};
   for (const f of settings.fields) {
     const raw = source[f.key];
-    out[f.key] = raw === "" || raw === null || raw === undefined ? "" : num(raw, 0);
+    if (raw === "" || raw === null || raw === undefined) {
+      out[f.key] = "";
+    } else if (f.kind === "text") {
+      out[f.key] = String(raw).slice(0, RATE_FORMULA_TEXT_MAX);
+    } else {
+      out[f.key] = num(raw, 0);
+    }
   }
   return out;
 }
@@ -274,7 +310,10 @@ export function computeRateFromFormula(
 
   const provided: Record<string, number> = { divisor: settings.divisor };
   for (const field of settings.fields) {
-    provided[field.key] = num(values[field.key], 0);
+    // Text columns are still declared to the engine — as 0 — so an expression
+    // that names one gets a clean "not a number" outcome rather than an
+    // "unknown name" error the author would have no way to read.
+    provided[field.key] = field.kind === "text" ? 0 : num(values[field.key], 0);
   }
 
   // A rate-affecting field left blank means the operator is still typing, not
@@ -327,24 +366,43 @@ export function rateFormulaLineAmount(rate: number, qty: number): number {
  * Cleans a line's `meta` before it reaches the database.
  *
  * The client sends this, so it is not to be trusted with the shape of a JSONB
- * column: it is flattened to plain numbers under identifier-safe keys, capped
- * in size, and reduced to `undefined` when there is nothing worth storing.
- * `undefined` rather than `null` because that is what Prisma reads as "leave
- * this column alone", which on a create is the NULL every ordinary line has —
- * a company that does not use the feature stays byte-identical to before.
+ * column: it is flattened to plain numbers and short strings under
+ * identifier-safe keys, capped in size, and reduced to `undefined` when there
+ * is nothing worth storing. `undefined` rather than `null` because that is what
+ * Prisma reads as "leave this column alone", which on a create is the NULL
+ * every ordinary line has — a company that does not use the feature stays
+ * byte-identical to before.
+ *
+ * Strings are kept because a trade code is not a number: a shade is "15-L",
+ * a batch is "B/2026-04". They are trimmed and length-capped rather than
+ * rejected, so a stray paste cannot grow the row.
  */
-export function sanitizeLineMeta(raw: unknown): Record<string, number> | undefined {
+export function sanitizeLineMeta(
+  raw: unknown
+): Record<string, number | string> | undefined {
   if (!raw || typeof raw !== "object" || Array.isArray(raw)) return undefined;
 
-  const out: Record<string, number> = {};
+  const out: Record<string, number | string> = {};
   let count = 0;
   for (const [key, value] of Object.entries(raw as Record<string, unknown>)) {
     if (count >= 12) break;
     if (validateKey(key)) continue;
     if (value === "" || value === null || value === undefined) continue;
-    const n = Number(value);
-    if (!Number.isFinite(n)) continue;
-    out[key] = n;
+
+    if (typeof value === "number") {
+      if (!Number.isFinite(value)) continue;
+      out[key] = value;
+    } else if (typeof value === "string") {
+      const trimmed = value.trim().slice(0, RATE_FORMULA_TEXT_MAX);
+      if (!trimmed) continue;
+      // A string that is plainly a number is stored as one, so a line typed
+      // into a number column and a line pulled from an older document compare
+      // and total the same way.
+      const n = Number(trimmed);
+      out[key] = Number.isFinite(n) && trimmed !== "" ? n : trimmed;
+    } else {
+      continue; // booleans, nested objects, arrays — not a line value
+    }
     count++;
   }
 
