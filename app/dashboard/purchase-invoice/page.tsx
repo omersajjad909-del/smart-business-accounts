@@ -398,7 +398,7 @@ const [searchTerm, setSearchTerm] = useState("");
     const linkedGrns = allGrns.filter((grn) => grn.po?.id === po.id);
 
     if (linkedGrns.length > 0) {
-      const receivedByItem = new Map<string, { qty: number; rate: number; name: string; description: string }>();
+      const receivedByItem = new Map<string, { qty: number; rate: number; name: string; description: string; meta?: RateFormulaMeta }>();
       linkedGrns.forEach((grn) => {
         grn.items.forEach((item) => {
           const current = receivedByItem.get(item.itemId) || {
@@ -406,6 +406,7 @@ const [searchTerm, setSearchTerm] = useState("");
             rate: item.rate,
             name: item.item?.name || po.items.find((pi) => pi.itemId === item.itemId)?.item.name || "",
             description: item.item?.description || po.items.find((pi) => pi.itemId === item.itemId)?.item.description || "",
+            ...(rfActive ? { meta: readRateFormulaMeta(rf, (item as any).meta) } : {}),
           };
           current.qty += Number(item.receivedQty || 0);
           if (!current.rate && item.rate) current.rate = item.rate;
@@ -432,6 +433,7 @@ const [searchTerm, setSearchTerm] = useState("");
             description: item.description || "",
             qty: remainingQty,
             rate: item.rate,
+            ...(rfActive && item.meta ? { meta: item.meta } : {}),
           };
         })
         .filter((row) => row.qty > 0);
@@ -444,6 +446,7 @@ const [searchTerm, setSearchTerm] = useState("");
         description: pi.item.description || "",
         qty: Math.max(0, pi.qty - pi.invoicedQty),
         rate: pi.rate,
+        ...(rfActive ? { meta: readRateFormulaMeta(rf, (pi as any).meta) } : {}),
       }))
       .filter((row) => row.qty > 0);
   }

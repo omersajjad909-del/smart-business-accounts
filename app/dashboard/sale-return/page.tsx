@@ -8,6 +8,15 @@ import { getCurrentUser } from "@/lib/auth";
 import { PrintActionBar } from "@/components/print/PrintActionBar";
 import { PrintDocA4, PrintPaperWrapper } from "@/components/print/PrintDocA4";
 import { useResponsive } from "@/hooks/useResponsive";
+import { useRateFormula } from "@/hooks/useRateFormula";
+import {
+  RateFormulaHeadCells,
+  RateFormulaReadonlyCells,
+  rateFormulaPrintColumns,
+  rateFormulaPrintValues,
+  type RateFormulaMeta,
+} from "@/components/RateFormulaCells";
+import { readRateFormulaMeta } from "@/lib/rateFormula";
 
 const FONT  = "'Outfit','Inter',sans-serif";
 const ACCENT = "#f87171";
@@ -26,7 +35,15 @@ function Label({ children }: { children: React.ReactNode }) {
 function fmt(n: number) { return n.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
 
 type Invoice = { id: string; invoiceNo: string; customerName: string; customerId: string };
-type Row     = { itemId: string; name: string; qty: number | ""; rate: number; maxQty: number; discountPercent: number | ""; taxPercent: number | "" };
+type Row     = {
+  itemId: string; name: string; qty: number | ""; rate: number; maxQty: number;
+  discountPercent: number | ""; taxPercent: number | "";
+  /**
+   * Inherited from the invoice line being returned, never retyped — a return
+   * has to agree with the sale it reverses. See lib/rateFormula.ts.
+   */
+  meta?: RateFormulaMeta;
+};
 type SaleReturn = {
   id: string; returnNo: string; date: string;
   customerId: string; customer?: { name: string };
@@ -36,13 +53,14 @@ type SaleReturn = {
 };
 type SavedData = {
   returnNo: string; date: string; customerName: string; invoiceNo: string;
-  items: { name: string; qty: number; rate: number }[];
+  items: { name: string; qty: number; rate: number; meta?: RateFormulaMeta }[];
   total: number; freight: number; netTotal: number;
   driverName: string; vehicleNo: string; remarks: string;
 };
 
 export default function SalesReturnPage() {
   const { isMobile } = useResponsive();
+  const { settings: rf, active: rfActive } = useRateFormula("saleReturn");
   const today = new Date().toISOString().slice(0, 10);
   const user  = getCurrentUser();
 
@@ -98,7 +116,7 @@ export default function SalesReturnPage() {
       if (data.items?.length === 0) { toast("This invoice is fully returned"); setInvoiceId(""); setRows([]); return; }
       setCustomerName(data.customerName || "");
       setCustomerId(data.customerId || "");
-      setRows((data.items || []).map((it: any) => ({ ...it, discountPercent: "", taxPercent: "" })));
+      setRows((data.items || []).map((it: any) => ({ ...it, discountPercent: "", taxPercent: "", ...(rfActive ? { meta: readRateFormulaMeta(rf, it.meta) } : {}) })));
     } catch (e: any) { toast.error("Error: " + e.message); }
   }, [invoices]);
 
@@ -182,7 +200,7 @@ export default function SalesReturnPage() {
     setDiscount(ret2.discount ?? ""); setDiscountType(ret2.discountType || "flat");
     setNotes(ret2.notes || ""); setReference(ret2.reference || "");
     setDriverName(ret.driverName || ""); setVehicleNo(ret.vehicleNo || ""); setRemarks(ret.remarks || "");
-    setRows(ret.items.map(it => ({ itemId: it.itemId || "", name: it.item?.name || "", qty: it.qty, rate: it.rate, maxQty: it.qty, discountPercent: it.discountPercent ?? "", taxPercent: it.taxPercent ?? "" })));
+    setRows(ret.items.map((it: any) => ({ itemId: it.itemId || "", name: it.item?.name || "", qty: it.qty, rate: it.rate, maxQty: it.qty, discountPercent: it.discountPercent ?? "", taxPercent: it.taxPercent ?? "", ...(rfActive ? { meta: readRateFormulaMeta(rf, it.meta) } : {}) })));
     setShowForm(true); setShowList(false);
   }
 
@@ -337,8 +355,10 @@ export default function SalesReturnPage() {
                         <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 540 }}>
                           <thead>
                             <tr style={{ background: "rgba(248,113,113,0.06)" }}>
-                              {["Item", "Max Qty", "Return Qty", "Rate", "Disc%", "Tax%", "Amount", "×"].map((h, hi) => (
-                                <th key={hi} style={{ padding: isMobile ? "8px 8px" : "10px 8px", textAlign: hi >= 3 ? "right" : "left", color: MUTED, fontWeight: 700, fontSize: 10.5, textTransform: "uppercase", letterSpacing: 0.6 }}>{h}</th>
+                              <th style={{ padding: isMobile ? "8px 8px" : "10px 8px", textAlign: "left", color: MUTED, fontWeight: 700, fontSize: 10.5, textTransform: "uppercase", letterSpacing: 0.6 }}>Item</th>
+                              {rfActive && <RateFormulaHeadCells settings={rf} />}
+                              {["Max Qty", "Return Qty", "Rate", "Disc%", "Tax%", "Amount", "×"].map((h, hi) => (
+                                <th key={hi} style={{ padding: isMobile ? "8px 8px" : "10px 8px", textAlign: hi >= 2 ? "right" : "left", color: MUTED, fontWeight: 700, fontSize: 10.5, textTransform: "uppercase", letterSpacing: 0.6 }}>{h}</th>
                               ))}
                             </tr>
                           </thead>
@@ -350,6 +370,7 @@ export default function SalesReturnPage() {
                               return (
                                 <tr key={i} style={{ borderTop: `1px solid ${BORDER}` }}>
                                   <td style={{ padding: "8px", fontWeight: 600, fontSize: 13, minWidth: 120 }}>{r.name}</td>
+                                  {rfActive && <RateFormulaReadonlyCells settings={rf} meta={r.meta} />}
                                   <td style={{ padding: "8px", textAlign: "left", fontWeight: 700, color: "#60a5fa", fontSize: 13 }}>{r.maxQty}</td>
                                   <td style={{ padding: isMobile ? "8px 8px" : "6px 8px", width: 90 }}><input type="number" min={0} max={r.maxQty} value={r.qty} onChange={e => updateRow(i, "qty", e.target.value)} style={inp({ padding: isMobile ? "8px 8px" : "5px 7px", textAlign: "right", fontSize: 13, borderColor: "rgba(248,113,113,0.4)" })} /></td>
                                   <td style={{ padding: "8px", textAlign: "right", fontSize: 13, color: MUTED, width: 80 }}>{fmt(r.rate)}</td>
@@ -486,6 +507,7 @@ export default function SalesReturnPage() {
                 columns={[
                   { key: "no", label: "#", align: "center", width: 30 },
                   { key: "name", label: "Description" },
+                  ...(rfActive ? rateFormulaPrintColumns(rf) : []),
                   { key: "qty", label: "Qty", align: "center", width: 70 },
                   { key: "rate", label: "Rate", align: "right", width: 80 },
                   { key: "amount", label: "Amount", align: "right", width: 90 },
@@ -493,6 +515,7 @@ export default function SalesReturnPage() {
                 rows={savedData.items.map((it, idx) => ({
                   no: idx + 1,
                   name: it.name,
+                  ...(rfActive ? rateFormulaPrintValues(rf, (it as any).meta) : {}),
                   qty: it.qty,
                   rate: fmt(it.rate),
                   amount: fmt(it.qty * it.rate),

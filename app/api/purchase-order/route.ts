@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
+import { sanitizeLineMeta } from "@/lib/rateFormula";
 
 import { resolveCompanyId, resolveBranchId, resolveBranchIdOrDefault } from "@/lib/tenant";
 export async function POST(req: NextRequest) {
@@ -45,6 +46,7 @@ export async function POST(req: NextRequest) {
           rate: Number(i.rate || 0),
           discountPercent: Number(i.discountPercent || 0),
           taxPercent: Number(i.taxPercent || 0),
+          meta: sanitizeLineMeta(i.meta),
         })),
       },
     },
@@ -165,6 +167,7 @@ export async function PUT(req: NextRequest) {
             rate: Number(i.rate || 0),
             discountPercent: Number(i.discountPercent || 0),
             taxPercent: Number(i.taxPercent || 0),
+            meta: sanitizeLineMeta(i.meta),
           })),
         },
       },

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
+import { sanitizeLineMeta } from "@/lib/rateFormula";
 import { resolveCompanyId, resolveBranchId, resolveBranchIdOrDefault } from "@/lib/tenant";
 import { postCogsVoucher, type Db } from "@/lib/cogsPosting";
 type SaleReturn = Prisma.SaleReturnGetPayload<{
@@ -136,6 +137,7 @@ export async function POST(req: NextRequest) {
             discountPercent: Number(i.discountPercent || 0),
             taxPercent: Number(i.taxPercent || 0),
             amount: lineBase - lineDisc + lineTax,
+            meta: sanitizeLineMeta(i.meta),
           };
         }),
       },
@@ -249,6 +251,7 @@ export async function PUT(req: NextRequest) {
               qty: Number(i.qty),
               rate: Number(i.rate),
               amount: Number(i.qty) * Number(i.rate),
+              meta: sanitizeLineMeta(i.meta),
             })),
           },
         },

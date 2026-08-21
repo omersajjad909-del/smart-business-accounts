@@ -8,6 +8,18 @@ import { getCurrentUser } from "@/lib/auth";
 import { PrintActionBar } from "@/components/print/PrintActionBar";
 import { PrintDocA4, PrintPaperWrapper } from "@/components/print/PrintDocA4";
 import { useResponsive } from "@/hooks/useResponsive";
+import { useRateFormula } from "@/hooks/useRateFormula";
+import {
+  RateFormulaHeadCells,
+  RateFormulaRowCells,
+  RateFormulaMobileFields,
+  RateFormulaHint,
+  rateFormulaPrintColumns,
+  rateFormulaPrintValues,
+  rateFormulaLineIncomplete,
+  type RateFormulaMeta,
+} from "@/components/RateFormulaCells";
+import { computeRateFromFormula, emptyRateFormulaMeta, readRateFormulaMeta } from "@/lib/rateFormula";
 
 const FONT = "'Outfit','Inter',sans-serif";
 const ACCENT = "#6366f1";
@@ -71,7 +83,10 @@ export default function PurchaseOrderPage() {
   const [discountType, setDiscountType] = useState("flat");
   const [freight, setFreight] = useState("");
   const [approvalStatus, setApprovalStatus] = useState("PENDING");
-  const emptyRow = () => ({ itemId: "", name: "", desc: "", qty: "", rate: "", discountPercent: "", taxPercent: "", unit: "", sku: "" });
+  // Companies that price a line from a calculation get extra columns and a
+  // computed rate. Everyone else gets exactly the grid that was here before.
+  const { settings: rf, active: rfActive } = useRateFormula("purchaseOrder");
+  const emptyRow = () => ({ itemId: "", name: "", desc: "", qty: "", rate: "", discountPercent: "", taxPercent: "", unit: "", sku: "", meta: (rfActive ? emptyRateFormulaMeta(rf) : undefined) as RateFormulaMeta | undefined });
   const [rows, setRows] = useState([emptyRow()]);
   const [saving, setSaving] = useState(false);
   // "none" | "a4" | "58mm"
@@ -130,6 +145,30 @@ export default function PurchaseOrderPage() {
     if (i === copy.length - 1 && val !== "" && val != null) copy.push(emptyRow());
     setRows(copy);
   }
+  /**
+   * One formula column changed on one line. The rate is re-derived from the
+   * whole line rather than patched, so a correction to any column lands on
+   * the rate immediately — which is the entire point of the feature.
+   */
+  function updateRowMeta(i: number, key: string, value: number | "") {
+    const copy = [...rows];
+    const meta = { ...(copy[i].meta || {}), [key]: value };
+    copy[i] = { ...copy[i], meta };
+    const result = computeRateFromFormula(rf, meta);
+    if (result.rate != null) (copy[i] as any).rate = String(result.rate);
+    if (i === copy.length - 1 && value !== "") copy.push(emptyRow());
+    setRows(copy);
+  }
+
+  // The settings arrive one request after the first render, so rows built
+  // before then have no meta. Backfilling here rather than blocking the form
+  // on the lookup keeps the page usable for companies that never turn it on.
+  useEffect(() => {
+    if (!rfActive) return;
+    setRows(prev => prev.some(r => r.meta) ? prev : prev.map(r => ({ ...r, meta: emptyRateFormulaMeta(rf) })));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [rfActive]);
+
   function removeRow(i: number) { if (rows.length > 1) setRows(rows.filter((_, idx) => idx !== i)); }
 
   const subTotal = rows.reduce((s, r) => s + (r.qty && r.rate ? Number(r.qty) * Number(r.rate) : 0), 0);
@@ -141,12 +180,18 @@ export default function PurchaseOrderPage() {
   async function savePO() {
     const clean = rows.filter(r => r.itemId && r.qty);
     if (!supplierId || !clean.length) { toast.error("Supplier and items are required"); return; }
+    if (rfActive) {
+      for (let i = 0; i < clean.length; i++) {
+        const missing = rateFormulaLineIncomplete(rf, clean[i].meta);
+        if (missing) { toast.error(`Line ${i + 1}: ${missing.label} is required`); return; }
+      }
+    }
     setSaving(true);
     try {
       const method = editing ? "PUT" : "POST";
       const body = editing
-        ? { id: editing.id, poNo, supplierId, date, dueDate: dueDate || null, remarks, notes: notes || null, approvalStatus, paymentTerms: paymentTerms || null, discount: Number(discount) || 0, discountType, freight: Number(freight) || 0, items: clean.map((r: any) => ({ ...r, discountPercent: Number(r.discountPercent) || 0, taxPercent: Number(r.taxPercent) || 0 })) }
-        : { poNo, supplierId, date, dueDate: dueDate || null, remarks, notes: notes || null, approvalStatus, paymentTerms: paymentTerms || null, discount: Number(discount) || 0, discountType, freight: Number(freight) || 0, items: clean.map((r: any) => ({ ...r, discountPercent: Number(r.discountPercent) || 0, taxPercent: Number(r.taxPercent) || 0 })) };
+        ? { id: editing.id, poNo, supplierId, date, dueDate: dueDate || null, remarks, notes: notes || null, approvalStatus, paymentTerms: paymentTerms || null, discount: Number(discount) || 0, discountType, freight: Number(freight) || 0, items: clean.map((r: any) => ({ ...r, discountPercent: Number(r.discountPercent) || 0, taxPercent: Number(r.taxPercent) || 0, meta: rfActive ? (r.meta || null) : null })) }
+        : { poNo, supplierId, date, dueDate: dueDate || null, remarks, notes: notes || null, approvalStatus, paymentTerms: paymentTerms || null, discount: Number(discount) || 0, discountType, freight: Number(freight) || 0, items: clean.map((r: any) => ({ ...r, discountPercent: Number(r.discountPercent) || 0, taxPercent: Number(r.taxPercent) || 0, meta: rfActive ? (r.meta || null) : null })) };
       const res = await fetch("/api/purchase-order", {
         method, headers: { "Content-Type": "application/json", "x-user-role": user?.role || "ADMIN" },
         body: JSON.stringify(body),
@@ -166,7 +211,7 @@ export default function PurchaseOrderPage() {
     setDueDate(po2.dueDate ? new Date(po2.dueDate).toISOString().slice(0, 10) : "");
     setRemarks(po.remarks || ""); setNotes(po2.notes || ""); setApprovalStatus(po.approvalStatus || "PENDING");
     setPaymentTerms(po2.paymentTerms || ""); setDiscount(po2.discount ?? ""); setDiscountType(po2.discountType || "flat"); setFreight(po2.freight ?? "");
-    setRows(po.items.map((it: any) => ({ itemId: it.itemId || it.item?.id || "", name: it.item?.name || "", desc: it.item?.description || "", qty: it.qty.toString(), rate: it.rate.toString(), discountPercent: it.discountPercent ?? "", taxPercent: it.taxPercent ?? "", unit: it.item?.unit || "", sku: it.item?.code || "" })));
+    setRows(po.items.map((it: any) => ({ itemId: it.itemId || it.item?.id || "", name: it.item?.name || "", desc: it.item?.description || "", qty: it.qty.toString(), rate: it.rate.toString(), discountPercent: it.discountPercent ?? "", taxPercent: it.taxPercent ?? "", unit: it.item?.unit || "", sku: it.item?.code || "", meta: (rfActive ? readRateFormulaMeta(rf, it.meta) : undefined) as RateFormulaMeta | undefined })));
     setShowForm(true); setShowList(false); setPreview(false); setPrintMode("none");
   }
 
@@ -406,7 +451,7 @@ export default function PurchaseOrderPage() {
                             const it = items.find((x: any) => x.id === e.target.value);
                             if (!it) return;
                             const copy = [...rows];
-                            copy[i] = { ...copy[i], itemId: it.id, name: it.name, desc: it.description || "", rate: String(it.purchaseRate || it.rate || ""), unit: it.unit || "", sku: it.code || "" };
+                            copy[i] = { ...copy[i], itemId: it.id, name: it.name, desc: it.description || "", rate: rfActive ? copy[i].rate : String(it.purchaseRate || it.rate || ""), unit: it.unit || "", sku: it.code || "" };
                             if (i === copy.length - 1) copy.push(emptyRow());
                             setRows(copy);
                           }} style={{ ...inp({ marginBottom: 8 }) }}>
@@ -415,6 +460,9 @@ export default function PurchaseOrderPage() {
                           </select>
                           {(r as any).sku && <div style={{ fontSize: 11, color: MUTED, marginBottom: 6 }}>SKU: {(r as any).sku}{(r as any).unit ? ` | Unit: ${(r as any).unit}` : ""}</div>}
                           <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: 8 }}>
+                            {rfActive && (
+                              <RateFormulaMobileFields settings={rf} meta={r.meta} onChange={(key, value) => updateRowMeta(i, key, value)} />
+                            )}
                             {(["qty","rate","discountPercent","taxPercent"] as const).map(k => (
                               <div key={k}><div style={{ fontSize: 10, color: MUTED, fontWeight: 700, marginBottom: 3, textTransform: "uppercase" }}>{k === "qty" ? "Qty" : k === "rate" ? "Unit Price" : k === "discountPercent" ? "Disc %" : "Tax %"}</div>
                                 <input type="number" value={(r as any)[k]} onChange={e => updateRow(i, k, e.target.value)} placeholder="0" style={inp({ textAlign: "right" })} /></div>
@@ -430,8 +478,12 @@ export default function PurchaseOrderPage() {
                     <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
                       <thead>
                         <tr style={{ borderBottom: `2px solid ${BORDER}` }}>
-                          {["#","Item / Description","SKU","Qty","Unit","Unit Price","Disc %","Tax %","Total",""].map((h,hi) => (
-                            <th key={h+hi} style={{ padding: isMobile ? "8px 8px" : "8px 7px", fontSize: 10, fontWeight: 700, color: MUTED, textTransform: "uppercase", letterSpacing: 0.4, textAlign: hi >= 3 && hi <= 8 ? "right" : "left", whiteSpace: "nowrap" }}>{h}</th>
+                          {["#","Item / Description","SKU"].map((h,hi) => (
+                            <th key={h+hi} style={{ padding: isMobile ? "8px 8px" : "8px 7px", fontSize: 10, fontWeight: 700, color: MUTED, textTransform: "uppercase", letterSpacing: 0.4, textAlign: "left", whiteSpace: "nowrap" }}>{h}</th>
+                          ))}
+                          {rfActive && <RateFormulaHeadCells settings={rf} />}
+                          {["Qty","Unit","Unit Price","Disc %","Tax %","Total",""].map((h,hi) => (
+                            <th key={"t"+h+hi} style={{ padding: isMobile ? "8px 8px" : "8px 7px", fontSize: 10, fontWeight: 700, color: MUTED, textTransform: "uppercase", letterSpacing: 0.4, textAlign: hi <= 5 ? "right" : "left", whiteSpace: "nowrap" }}>{h}</th>
                           ))}
                         </tr>
                       </thead>
@@ -453,7 +505,7 @@ export default function PurchaseOrderPage() {
                                   const it = items.find((x: any) => x.id === e.target.value);
                                   if (!it) return;
                                   const copy = [...rows];
-                                  copy[i] = { ...copy[i], itemId: it.id, name: it.name, desc: it.description || "", rate: String(it.purchaseRate || it.rate || ""), unit: it.unit || "", sku: it.code || "" };
+                                  copy[i] = { ...copy[i], itemId: it.id, name: it.name, desc: it.description || "", rate: rfActive ? copy[i].rate : String(it.purchaseRate || it.rate || ""), unit: it.unit || "", sku: it.code || "" };
                                   if (i === copy.length - 1) copy.push(emptyRow());
                                   setRows(copy);
                                 }} style={{ ...inp({ padding: isMobile ? "8px 8px" : "5px 7px", fontSize: 13 }) }}>
@@ -463,9 +515,15 @@ export default function PurchaseOrderPage() {
                                 {r.desc && <div style={{ fontSize: 11, color: MUTED, marginTop: 2, paddingLeft: 2 }}>{r.desc}</div>}
                               </td>
                               <td style={{ padding: isMobile ? "8px 8px" : "6px 7px", fontSize: 12, color: MUTED, width: 72 }}>{(r as any).sku || "—"}</td>
+                              {rfActive && (
+                                <RateFormulaRowCells settings={rf} meta={r.meta} onChange={(key, value) => updateRowMeta(i, key, value)} />
+                              )}
                               <td style={{ padding: isMobile ? "8px 8px" : "6px 7px", width: 68 }}><input type="number" value={r.qty} onChange={e => updateRow(i, "qty", e.target.value)} placeholder="0" style={inp({ padding: isMobile ? "8px 8px" : "5px 7px", textAlign: "right", fontSize: 13 })} /></td>
                               <td style={{ padding: isMobile ? "8px 8px" : "6px 7px", fontSize: 12, color: MUTED, width: 52 }}>{(r as any).unit || "—"}</td>
-                              <td style={{ padding: isMobile ? "8px 8px" : "6px 7px", width: 94 }}><input type="number" value={r.rate} onChange={e => updateRow(i, "rate", e.target.value)} placeholder="0.00" style={inp({ padding: isMobile ? "8px 8px" : "5px 7px", textAlign: "right", fontSize: 13 })} /></td>
+                              <td style={{ padding: isMobile ? "8px 8px" : "6px 7px", width: 94 }}>
+                                <input type="number" value={r.rate} onChange={e => updateRow(i, "rate", e.target.value)} readOnly={rfActive && !rf.rateEditable} title={rfActive && !rf.rateEditable ? "Worked out by your rate formula" : undefined} placeholder="0.00" style={inp({ padding: isMobile ? "8px 8px" : "5px 7px", textAlign: "right", fontSize: 13, ...(rfActive && !rf.rateEditable ? { opacity: 0.75, cursor: "not-allowed" } : {}) })} />
+                                {rfActive && <RateFormulaHint settings={rf} meta={r.meta} />}
+                              </td>
                               <td style={{ padding: isMobile ? "8px 8px" : "6px 7px", width: 66 }}><input type="number" value={(r as any).discountPercent} onChange={e => updateRow(i, "discountPercent", e.target.value)} placeholder="0" style={inp({ padding: isMobile ? "8px 8px" : "5px 7px", textAlign: "right", fontSize: 13 })} /></td>
                               <td style={{ padding: isMobile ? "8px 8px" : "6px 7px", width: 66 }}><input type="number" value={(r as any).taxPercent} onChange={e => updateRow(i, "taxPercent", e.target.value)} placeholder="0" style={inp({ padding: isMobile ? "8px 8px" : "5px 7px", textAlign: "right", fontSize: 13 })} /></td>
                               <td style={{ padding: isMobile ? "8px 8px" : "6px 7px", textAlign: "right", fontWeight: 600, fontSize: 13, width: 94, whiteSpace: "nowrap" }}>{lineBase > 0 ? (lineBase - lineDisc + lineTax).toLocaleString() : <span style={{ color: MUTED }}>—</span>}</td>
@@ -616,6 +674,7 @@ export default function PurchaseOrderPage() {
             columns={[
               { key: "no", label: "#", align: "center", width: 30 },
               { key: "name", label: "Item" },
+              ...(rfActive ? rateFormulaPrintColumns(rf) : []),
               { key: "qty", label: "Qty", align: "center", width: 60 },
               { key: "unit", label: "Unit", align: "center", width: 60 },
               { key: "rate", label: "Rate", align: "right", width: 80 },
@@ -624,6 +683,7 @@ export default function PurchaseOrderPage() {
             rows={filledRows.map((r, i) => ({
               no: i + 1,
               name: r.name,
+              ...(rfActive ? rateFormulaPrintValues(rf, r.meta) : {}),
               qty: r.qty,
               unit: (r as any).unit || "—",
               rate: Number(r.rate).toLocaleString(),

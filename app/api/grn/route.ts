@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { sanitizeLineMeta } from "@/lib/rateFormula";
 import { resolveCompanyId, resolveBranchId, resolveBranchIdOrDefault } from "@/lib/tenant";
 
 export async function GET(req: NextRequest) {
@@ -74,13 +75,14 @@ export async function POST(req: NextRequest) {
         status: "RECEIVED",
         createdBy: userId,
         items: {
-          create: items.map((i: { itemId: string; orderedQty: number; receivedQty: number; rate: number; remarks?: string }) => ({
+          create: items.map((i: { itemId: string; orderedQty: number; receivedQty: number; rate: number; remarks?: string; meta?: unknown }) => ({
             itemId: i.itemId,
             orderedQty: i.orderedQty,
             receivedQty: i.receivedQty,
             rate: i.rate,
             amount: i.receivedQty * i.rate,
             remarks: i.remarks,
+            meta: sanitizeLineMeta(i.meta),
           })),
         },
       },

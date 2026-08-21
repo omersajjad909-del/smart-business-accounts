@@ -108,6 +108,42 @@ export function RateFormulaRowCells({
   );
 }
 
+/**
+ * Body cells for a document that inherits its line values rather than typing
+ * them — a return goes back at the rate and the dimensions the original
+ * invoice was priced at, so letting the operator edit them here would let a
+ * return disagree with the sale it reverses.
+ */
+export function RateFormulaReadonlyCells({
+  settings,
+  meta,
+}: {
+  settings: RateFormulaSettings;
+  meta: RateFormulaMeta | undefined;
+}) {
+  return (
+    <>
+      {settings.fields.map((f) => {
+        const value = meta?.[f.key];
+        return (
+          <td
+            key={f.key}
+            style={{
+              padding: "8px",
+              width: f.width,
+              textAlign: "center",
+              fontSize: 12.5,
+              color: value === "" || value === undefined ? MUTED : TEXT,
+            }}
+          >
+            {value === "" || value === undefined ? "—" : value}
+          </td>
+        );
+      })}
+    </>
+  );
+}
+
 /** The same inputs stacked, for a document's mobile card layout. */
 export function RateFormulaMobileFields({
   settings,

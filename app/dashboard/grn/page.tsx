@@ -8,6 +8,18 @@ import { getCurrentUser } from "@/lib/auth";
 import { PrintActionBar } from "@/components/print/PrintActionBar";
 import { PrintDocA4, PrintPaperWrapper } from "@/components/print/PrintDocA4";
 import { useResponsive } from "@/hooks/useResponsive";
+import { useRateFormula } from "@/hooks/useRateFormula";
+import {
+  RateFormulaHeadCells,
+  RateFormulaRowCells,
+  RateFormulaMobileFields,
+  RateFormulaHint,
+  rateFormulaPrintColumns,
+  rateFormulaPrintValues,
+  rateFormulaLineIncomplete,
+  type RateFormulaMeta,
+} from "@/components/RateFormulaCells";
+import { computeRateFromFormula, emptyRateFormulaMeta, readRateFormulaMeta } from "@/lib/rateFormula";
 
 const FONT = "'Outfit','Inter',sans-serif";
 const ACCENT = "#6366f1";
@@ -17,7 +29,11 @@ const TEXT  = "var(--text-primary)";
 const MUTED = "var(--text-muted)";
 const BG    = "var(--app-bg)";
 
-type GRNItem = { itemId: string; name: string; orderedQty: string; receivedQty: string; rate: string; remarks: string };
+type GRNItem = {
+  itemId: string; name: string; orderedQty: string; receivedQty: string; rate: string; remarks: string;
+  /** Rate-formula dimensions, when this company uses one. See lib/rateFormula.ts. */
+  meta?: RateFormulaMeta;
+};
 type GRN = { id: string; grnNo: string; date: string; status: string; supplier?: { name: string }; po?: { poNo: string } | null; items: Array<{ item: { name: string }; orderedQty: number; receivedQty: number; rate: number }> };
 type PO  = { id: string; poNo: string; supplier: { id: string; name: string }; items: Array<{ itemId: string; item: { id: string; name: string }; qty: number; rate: number }> };
 
@@ -36,6 +52,9 @@ function Label({ children }: { children: React.ReactNode }) {
 
 export default function GRNPage() {
   const { isMobile } = useResponsive();
+  // Companies that price a line from a calculation get extra columns and a
+  // computed rate. Everyone else gets exactly the grid that was here before.
+  const { settings: rf, active: rfActive } = useRateFormula("grn");
   const today = new Date().toISOString().slice(0, 10);
   const user  = getCurrentUser();
 
@@ -93,8 +112,33 @@ export default function GRNPage() {
     const po = pos.find(p => p.id === id);
     if (!po) return;
     setSupplierId(po.supplier.id);
-    setRows(po.items.map(i => ({ itemId: i.itemId, name: i.item.name, orderedQty: String(i.qty), receivedQty: String(i.qty), rate: String(i.rate || ""), remarks: "" })));
+    setRows(po.items.map((i: any) => ({ itemId: i.itemId, name: i.item.name, orderedQty: String(i.qty), receivedQty: String(i.qty), rate: String(i.rate || ""), remarks: "", ...(rfActive ? { meta: readRateFormulaMeta(rf, i.meta) } : {}) })));
   }
+
+  /**
+   * One formula column changed on one line. The rate is re-derived from the
+   * whole line rather than patched, so a correction to any column lands on the
+   * rate immediately — which is the entire point of the feature.
+   */
+  function updateRowMeta(idx: number, key: string, value: number | "") {
+    const copy = [...rows];
+    const meta = { ...(copy[idx].meta || {}), [key]: value };
+    copy[idx] = { ...copy[idx], meta };
+    const result = computeRateFromFormula(rf, meta);
+    if (result.rate != null) copy[idx].rate = String(result.rate);
+    if (idx === copy.length - 1 && value !== "")
+      copy.push({ itemId: "", name: "", orderedQty: "", receivedQty: "", rate: "", remarks: "", meta: emptyRateFormulaMeta(rf) });
+    setRows(copy);
+  }
+
+  // The settings arrive one request after the first render, so rows built
+  // before then have no meta. Backfilling here rather than blocking the form
+  // on the lookup keeps the page usable for companies that never turn it on.
+  useEffect(() => {
+    if (!rfActive) return;
+    setRows(prev => prev.some(r => r.meta) ? prev : prev.map(r => ({ ...r, meta: emptyRateFormulaMeta(rf) })));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [rfActive]);
 
   function updateRow(idx: number, field: keyof GRNItem, value: string) {
     const u = [...rows];
@@ -114,6 +158,12 @@ export default function GRNPage() {
 
   async function handleSubmit() {
     const filledItems = rows.filter(r => r.itemId && r.receivedQty);
+    if (rfActive) {
+      for (let i = 0; i < filledItems.length; i++) {
+        const missing = rateFormulaLineIncomplete(rf, filledItems[i].meta);
+        if (missing) { toast.error(`Line ${i + 1}: ${missing.label} is required`); return; }
+      }
+    }
     if (!grnNo || !supplierId || filledItems.length === 0) {
       toast.error("GRN No, Supplier, and at least one item are required"); return;
     }
@@ -121,7 +171,7 @@ export default function GRNPage() {
     try {
       const res = await fetch("/api/grn", {
         method: "POST", headers: bh(),
-        body: JSON.stringify({ grnNo, date, poId: poId || null, supplierId, remarks, items: filledItems.map(r => ({ itemId: r.itemId, orderedQty: Number(r.orderedQty) || 0, receivedQty: Number(r.receivedQty), rate: Number(r.rate) || 0, remarks: r.remarks })) }),
+        body: JSON.stringify({ grnNo, date, poId: poId || null, supplierId, remarks, items: filledItems.map(r => ({ itemId: r.itemId, orderedQty: Number(r.orderedQty) || 0, receivedQty: Number(r.receivedQty), rate: Number(r.rate) || 0, remarks: r.remarks, meta: rfActive ? (r.meta || null) : null })) }),
       });
       if (!res.ok) { const e = await res.json(); throw new Error(e.error || "Failed"); }
       toast.success("GRN saved successfully!");
@@ -330,9 +380,12 @@ export default function GRNPage() {
                             {allItems.map((it: any) => <option key={it.id} value={it.id}>{it.name}</option>)}
                           </select>
                           <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr 1fr", gap: 8 }}>
+                            {rfActive && (
+                              <RateFormulaMobileFields settings={rf} meta={row.meta} onChange={(key, value) => updateRowMeta(idx, key, value)} />
+                            )}
                             <div><Label>Ordered</Label><input type="number" value={row.orderedQty} onChange={e => updateRow(idx, "orderedQty", e.target.value)} placeholder="0" style={inp({ textAlign: "center" })} /></div>
                             <div><Label><span style={{ color: isShort ? "#fbbf24" : "#34d399" }}>Received</span></Label><input type="number" value={row.receivedQty} onChange={e => updateRow(idx, "receivedQty", e.target.value)} placeholder="0" style={inp({ textAlign: "center", color: isShort ? "#fbbf24" : "#34d399", fontWeight: 700 })} /></div>
-                            <div><Label>Rate</Label><input type="number" value={row.rate} onChange={e => updateRow(idx, "rate", e.target.value)} placeholder="0.00" style={inp({ textAlign: "right" })} /></div>
+                            <div><Label>Rate</Label><input type="number" value={row.rate} onChange={e => updateRow(idx, "rate", e.target.value)} readOnly={rfActive && !rf.rateEditable} placeholder="0.00" style={inp({ textAlign: "right", ...(rfActive && !rf.rateEditable ? { opacity: 0.75 } : {}) })} /></div>
                           </div>
                           {amt > 0 && <div style={{ textAlign: "right", fontWeight: 700, fontSize: 13, marginTop: 6, color: ACCENT }}>= {amt.toLocaleString()}</div>}
                         </div>
@@ -344,8 +397,12 @@ export default function GRNPage() {
                     <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 540, fontSize: 13 }}>
                       <thead>
                         <tr style={{ background: "rgba(99,102,241,0.07)" }}>
-                          {[["#","left",30],["Item","left","auto"],["Ordered","center",90],["Received","center",90],["Note","left",120],["","center",30]].map(([h,a,w]) => (
+                          {[["#","left",30],["Item","left","auto"]].map(([h,a,w]) => (
                             <th key={h as string} style={{ padding: "10px 8px", textAlign: a as any, color: MUTED, fontWeight: 700, fontSize: 10, textTransform: "uppercase" as const, letterSpacing: 0.6, width: w as any }}>{h}</th>
+                          ))}
+                          {rfActive && <RateFormulaHeadCells settings={rf} />}
+                          {[["Ordered","center",90],["Received","center",90],...(rfActive ? [["Rate","right",94] as const] : []),["Note","left",120],["","center",30]].map(([h,a,w]) => (
+                            <th key={"t" + (h as string)} style={{ padding: "10px 8px", textAlign: a as any, color: MUTED, fontWeight: 700, fontSize: 10, textTransform: "uppercase" as const, letterSpacing: 0.6, width: w as any }}>{h}</th>
                           ))}
                         </tr>
                       </thead>
@@ -362,8 +419,17 @@ export default function GRNPage() {
                                   {allItems.map((it: any) => <option key={it.id} value={it.id}>{it.name}</option>)}
                                 </select>
                               </td>
+                              {rfActive && (
+                                <RateFormulaRowCells settings={rf} meta={row.meta} onChange={(key, value) => updateRowMeta(idx, key, value)} />
+                              )}
                               <td style={{ padding: "6px 8px" }}><input type="number" value={row.orderedQty} onChange={e => updateRow(idx, "orderedQty", e.target.value)} placeholder="0" style={inp({ padding: "5px 7px", textAlign: "center", color: MUTED })} /></td>
                               <td style={{ padding: "6px 8px" }}><input type="number" value={row.receivedQty} onChange={e => updateRow(idx, "receivedQty", e.target.value)} placeholder="0" style={inp({ padding: "5px 7px", textAlign: "center", color: isShort ? "#fbbf24" : "#34d399", fontWeight: 700 })} /></td>
+                              {rfActive && (
+                                <td style={{ padding: "6px 8px", width: 94 }}>
+                                  <input type="number" value={row.rate} onChange={e => updateRow(idx, "rate", e.target.value)} readOnly={!rf.rateEditable} title={!rf.rateEditable ? "Worked out by your rate formula" : undefined} placeholder="0.00" style={inp({ padding: "5px 7px", textAlign: "right", ...(rf.rateEditable ? {} : { opacity: 0.75, cursor: "not-allowed" }) })} />
+                                  <RateFormulaHint settings={rf} meta={row.meta} />
+                                </td>
+                              )}
                               <td style={{ padding: "6px 8px" }}><input value={row.remarks} onChange={e => updateRow(idx, "remarks", e.target.value)} placeholder="Note..." style={inp({ padding: "5px 8px", fontSize: 12 })} /></td>
                               <td style={{ padding: "6px 8px" }}><button onClick={() => setRows(rows.filter((_, i) => i !== idx))} disabled={rows.length === 1} style={{ background: "none", border: "none", cursor: "pointer", color: "#f87171", fontSize: 16, padding: 0, opacity: rows.length === 1 ? 0.3 : 1 }}>×</button></td>
                             </tr>
@@ -451,6 +517,7 @@ export default function GRNPage() {
             columns={[
               { key: "no", label: "#", align: "center", width: 30 },
               { key: "name", label: "Item" },
+              ...(rfActive ? rateFormulaPrintColumns(rf) : []),
               { key: "ordered", label: "Ordered", align: "center", width: 70 },
               { key: "received", label: "Received", align: "center", width: 70 },
               { key: "rate", label: "Rate", align: "right", width: 80 },
@@ -459,6 +526,7 @@ export default function GRNPage() {
             rows={filledRows.map((r, i) => ({
               no: i + 1,
               name: r.name,
+              ...(rfActive ? rateFormulaPrintValues(rf, r.meta) : {}),
               ordered: r.orderedQty || "—",
               received: r.receivedQty,
               rate: Number(r.rate).toLocaleString(),

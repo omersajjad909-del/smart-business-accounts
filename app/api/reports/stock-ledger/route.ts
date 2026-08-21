@@ -17,6 +17,12 @@ type StockLedgerRow = {
   inQty: number;
   outQty: number;
   balanceQty: number;
+  rate: number;
+  /**
+   * The dimensions the movement was priced from, when the company runs a rate
+   * formula. Null on every ordinary movement. See lib/rateFormula.ts.
+   */
+  meta: unknown;
 };
 
 const _rows: StockLedgerRow[] = [];
@@ -79,6 +85,8 @@ export async function GET(req: NextRequest) {
       inQty: runningBalance > 0 ? runningBalance : 0,
       outQty: runningBalance < 0 ? Math.abs(runningBalance) : 0,
       balanceQty: runningBalance,
+      rate: 0,
+      meta: null,
     });
 
     // 3. LOOP THROUGH TRANSACTIONS
@@ -117,6 +125,8 @@ export async function GET(req: NextRequest) {
       inQty: t.qty > 0 ? t.qty : 0,
       outQty: t.qty < 0 ? Math.abs(t.qty) : 0,
       balanceQty: runningBalance,
+      rate: Number(t.rate || 0),
+      meta: t.meta ?? null,
     };
   })
 );
