@@ -73,6 +73,11 @@ export const RATE_FORMULA_TEXT_MAX = 32;
  * Add the entry at the same time as the wiring, not before.
  */
 export const RATE_FORMULA_DOCS = [
+  // First in the list on purpose: this is where the operator starts. Setting an
+  // item's usual gauge and width once means every document that picks the item
+  // starts filled in, instead of the same six numbers being retyped per line.
+  { key: "items",           label: "Item Coding",         route: "/dashboard/items-new",
+    note: "Save each item's usual values once — every document fills them in when the item is picked." },
   { key: "purchaseOrder",   label: "Purchase Order",      route: "/dashboard/purchase-order",
     note: "Columns on every order line; the rate is worked out as you type." },
   { key: "grn",             label: "GRN / Goods Receipt", route: "/dashboard/grn",
@@ -116,6 +121,7 @@ export type RateFormulaSettings = {
 };
 
 export const DEFAULT_RATE_FORMULA_DOCS: RateFormulaDocMap = {
+  items: false,
   purchaseOrder: false,
   grn: false,
   purchaseInvoice: false,

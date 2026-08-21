@@ -23,7 +23,8 @@ BEGIN
     'SaleReturnItem',
     'DeliveryChallanItem',
     'OutwardItem',
-    'InventoryTxn'
+    'InventoryTxn',
+    'ItemNew'
   ]
   LOOP
     IF EXISTS (
