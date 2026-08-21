@@ -2,6 +2,9 @@
 import { confirmToast } from "@/lib/toast-feedback";
 import toast from "react-hot-toast";
 import { useEffect, useState } from "react";
+import { useRateFormula } from "@/hooks/useRateFormula";
+import { RateFormulaMobileFields, type RateFormulaMeta } from "@/components/RateFormulaCells";
+import { emptyRateFormulaMeta, readRateFormulaMeta, type RateFormulaValue } from "@/lib/rateFormula";
 import { getCurrentUser } from "@/lib/auth";
 import ImageUpload from "@/components/ImageUpload";
 import { useResponsive } from "@/hooks/useResponsive";
@@ -60,6 +63,12 @@ export default function ItemsNewPage() {
   const [description, setDescription] = useState("");
   const [imageUrl,    setImageUrl]    = useState<string | null>(null);
   const [saving,      setSaving]      = useState(false);
+  // An item's usual dimensions, saved once here so every document that picks
+  // the item starts filled in rather than asking for the same six numbers on
+  // every line. Empty for companies with no rate formula, which is everyone
+  // who has not set one up.
+  const { settings: rf, active: rfActive } = useRateFormula("items");
+  const [meta,        setMeta]        = useState<RateFormulaMeta>({});
   const [editingId,   setEditingId]   = useState<string | null>(null);
   const [search,      setSearch]      = useState("");
   const [filterCat,   setFilterCat]   = useState("ALL");
@@ -79,10 +88,16 @@ export default function ItemsNewPage() {
 
   useEffect(() => { loadItems(); }, []);
 
+  useEffect(() => {
+    if (rfActive) setMeta(m => (Object.keys(m).length ? m : emptyRateFormulaMeta(rf)));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [rfActive]);
+
   function resetForm() {
     setEditingId(null); setName(""); setCategory("TRADING"); setUnit("");
     setRate(""); setPurchaseRate(""); setTaxRate(""); setMinStock("");
     setBarcode(""); setDescription(""); setImageUrl(null);
+    setMeta(rfActive ? emptyRateFormulaMeta(rf) : {});
   }
 
   async function saveItem() {
@@ -93,7 +108,8 @@ export default function ItemsNewPage() {
         method: editingId ? "PUT" : "POST",
         headers: { "Content-Type":"application/json", ...headers },
         body: JSON.stringify({ id:editingId, name:name.trim(), category, unit,
-          rate, purchaseRate, taxRate, minStock, barcode, description, imageUrl }),
+          rate, purchaseRate, taxRate, minStock, barcode, description, imageUrl,
+          meta: rfActive ? meta : null }),
       });
       if (!res.ok) { const e = await res.json(); throw new Error(e.error || "Save failed"); }
       resetForm();
@@ -110,6 +126,7 @@ export default function ItemsNewPage() {
     setTaxRate(String(item.taxRate || "")); setMinStock(String(item.minStock || ""));
     setBarcode(item.barcode || ""); setDescription(item.description || "");
     setImageUrl(item.imageUrl || null);
+    setMeta(rfActive ? readRateFormulaMeta(rf, (item as any).meta) : {});
     window.scrollTo({ top:0, behavior:"smooth" });
   }
 
@@ -231,6 +248,26 @@ export default function ItemsNewPage() {
             <input style={{...INPUT, borderColor:"rgba(248,113,113,0.2)"}} type="number" placeholder="0" value={minStock} onChange={e=>setMinStock(e.target.value)} />
           </div>
         </div>
+
+        {/* Row 2b: Rate-formula defaults — only for a company that uses one */}
+        {rfActive && (
+          <div style={{ border:`1px solid ${BORDER}`, borderRadius:10, padding:"12px 14px", marginBottom:12 }}>
+            <div style={{ fontSize:11, fontWeight:800, color:ACCENT, textTransform:"uppercase", letterSpacing:.6, marginBottom:3 }}>
+              {rf.profileName || "Rate Formula"} — usual values
+            </div>
+            <div style={{ fontSize:11, color:MUTED, marginBottom:10, lineHeight:1.5 }}>
+              Fill what this item normally is. Every invoice, order and GRN starts with these
+              and works the rate out by itself — still editable line by line.
+            </div>
+            <div style={{ display:"grid", gridTemplateColumns: isMobile ? "1fr 1fr" : `repeat(${Math.min(rf.fields.length, 6)}, 1fr)`, gap:12 }}>
+              <RateFormulaMobileFields
+                settings={rf}
+                meta={meta}
+                onChange={(key: string, value: RateFormulaValue) => setMeta(m => ({ ...m, [key]: value }))}
+              />
+            </div>
+          </div>
+        )}
 
         {/* Row 3: Barcode + Description */}
         <div style={{ display:"grid", gridTemplateColumns:"1fr 2fr", gap:12, marginBottom:12 }}>
