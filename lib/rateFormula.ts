@@ -334,7 +334,10 @@ export function computeRateFromFormula(
           key: f.key,
           label: f.label,
           unit: f.unit,
-          defaultValue: f.defaultValue,
+          // The engine only speaks numbers. A text column's default is a code,
+          // so it is declared as 0 — `provided` above already pins it to 0 too,
+          // and the validator refuses any expression that names one.
+          defaultValue: typeof f.defaultValue === "number" ? f.defaultValue : 0,
         })),
       ],
       steps: [{ key: "computedRate", label: "Rate", expression }],

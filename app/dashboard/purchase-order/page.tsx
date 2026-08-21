@@ -20,6 +20,7 @@ import {
   type RateFormulaMeta,
 } from "@/components/RateFormulaCells";
 import { computeRateFromFormula, emptyRateFormulaMeta, readRateFormulaMeta } from "@/lib/rateFormula";
+import type { RateFormulaValue } from "@/lib/rateFormula";
 
 const FONT = "'Outfit','Inter',sans-serif";
 const ACCENT = "#6366f1";
@@ -150,7 +151,7 @@ export default function PurchaseOrderPage() {
    * whole line rather than patched, so a correction to any column lands on
    * the rate immediately — which is the entire point of the feature.
    */
-  function updateRowMeta(i: number, key: string, value: number | "") {
+  function updateRowMeta(i: number, key: string, value: RateFormulaValue) {
     const copy = [...rows];
     const meta = { ...(copy[i].meta || {}), [key]: value };
     copy[i] = { ...copy[i], meta };

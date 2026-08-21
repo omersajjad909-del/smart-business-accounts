@@ -20,6 +20,7 @@ import {
   type RateFormulaMeta,
 } from "@/components/RateFormulaCells";
 import { computeRateFromFormula, emptyRateFormulaMeta, readRateFormulaMeta } from "@/lib/rateFormula";
+import type { RateFormulaValue } from "@/lib/rateFormula";
 
 const FONT = "'Outfit','Inter',sans-serif";
 const ACCENT = "#6366f1";
@@ -120,7 +121,7 @@ export default function GRNPage() {
    * whole line rather than patched, so a correction to any column lands on the
    * rate immediately — which is the entire point of the feature.
    */
-  function updateRowMeta(idx: number, key: string, value: number | "") {
+  function updateRowMeta(idx: number, key: string, value: RateFormulaValue) {
     const copy = [...rows];
     const meta = { ...(copy[idx].meta || {}), [key]: value };
     copy[idx] = { ...copy[idx], meta };

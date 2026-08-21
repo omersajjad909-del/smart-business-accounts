@@ -25,6 +25,7 @@ import {
   type RateFormulaMeta,
 } from "@/components/RateFormulaCells";
 import { computeRateFromFormula, emptyRateFormulaMeta, readRateFormulaMeta } from "@/lib/rateFormula";
+import type { RateFormulaValue } from "@/lib/rateFormula";
 
 type Supplier = { id: string; name: string; partyType: string };
 
@@ -499,7 +500,7 @@ const [searchTerm, setSearchTerm] = useState("");
    * whole line rather than patched, so a correction to any column lands on the
    * rate immediately — which is the entire point of the feature.
    */
-  function updateRowMeta(index: number, key: string, value: number | "") {
+  function updateRowMeta(index: number, key: string, value: RateFormulaValue) {
     const copy = [...rows];
     const meta = { ...(copy[index].meta || {}), [key]: value };
     copy[index] = { ...copy[index], meta };
