@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
+import { sanitizeLineMeta } from "@/lib/rateFormula";
 
 import { apiHasPermission } from "@/lib/apiPermission";
 import { PERMISSIONS } from "@/lib/permissions";
@@ -249,6 +250,7 @@ export async function POST(req: NextRequest) {
               discountPercent: i.discountPercent || 0,
               taxPercent: i.taxPercent || 0,
               amount: lineBase - lineDisc + lineTax,
+              meta: sanitizeLineMeta(i.meta),
             };
           }),
         },
@@ -308,6 +310,7 @@ export async function POST(req: NextRequest) {
           rate: i.rate,
           amount: i.qty * i.rate,
           location,
+          meta: sanitizeLineMeta(i.meta),
         },
       });
     }
@@ -449,6 +452,7 @@ export async function PUT(req: NextRequest) {
             rate: Number(oldItem.rate),
             amount: Number(oldItem.qty) * Number(oldItem.rate),
             location: existing.location || "MAIN",
+            meta: oldItem.meta ?? undefined,
           },
         });
       }
@@ -485,6 +489,7 @@ export async function PUT(req: NextRequest) {
                 discountPercent: i.discountPercent || 0,
                 taxPercent: i.taxPercent || 0,
                 amount: lineBase - lineDisc + lineTax,
+                meta: sanitizeLineMeta(i.meta),
               };
             }),
           },
@@ -509,6 +514,7 @@ export async function PUT(req: NextRequest) {
             rate: Number(i.rate),
             amount: Number(i.qty) * Number(i.rate),
             location: _location || "MAIN",
+            meta: sanitizeLineMeta(i.meta),
           },
         });
       }
@@ -637,6 +643,7 @@ export async function DELETE(req: NextRequest) {
             rate: Number(oldItem.rate),
             amount: Number(oldItem.qty) * Number(oldItem.rate),
             location: existing.location || "MAIN",
+            meta: oldItem.meta ?? undefined,
           },
         });
       }

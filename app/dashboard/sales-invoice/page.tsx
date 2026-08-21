@@ -14,6 +14,18 @@ import { PrintActionBar } from "@/components/print/PrintActionBar";
 import { PrintDocA4, PrintPaperWrapper } from "@/components/print/PrintDocA4";
 import type { PrintColumn, PrintTotalsLine } from "@/components/print/PrintDocA4";
 import { useResponsive } from "@/hooks/useResponsive";
+import { useRateFormula } from "@/hooks/useRateFormula";
+import {
+  RateFormulaHeadCells,
+  RateFormulaRowCells,
+  RateFormulaMobileFields,
+  RateFormulaHint,
+  rateFormulaPrintColumns,
+  rateFormulaPrintValues,
+  rateFormulaLineIncomplete,
+  type RateFormulaMeta,
+} from "@/components/RateFormulaCells";
+import { computeRateFromFormula, emptyRateFormulaMeta, readRateFormulaMeta } from "@/lib/rateFormula";
 
 
 // ─── Design tokens ────────────────────────────────────────────────────────────
@@ -23,7 +35,9 @@ const accent = "#6366f1";
 // ─── Types ───────────────────────────────────────────────────────────────────
 type Account = { id: string; name: string; email?: string; phone?: string; address?: string; city?: string; ntn?: string; strn?: string };
 type Item = { id: string; name: string; code?: string; unit?: string; description?: string; availableQty: number; barcode?: string; salePrice?: number; taxRate?: number };
-type Row = { itemId: string; name: string; description: string; availableQty: number; qty: number | ""; rate: number | ""; discountPercent: number | ""; taxPercent: number | ""; unit: string; sku: string; isManual?: boolean };
+type Row = { itemId: string; name: string; description: string; availableQty: number; qty: number | ""; rate: number | ""; discountPercent: number | ""; taxPercent: number | ""; unit: string; sku: string; isManual?: boolean;
+  /** Rate-formula dimensions, when this company uses one. See lib/rateFormula.ts. */
+  meta?: RateFormulaMeta };
 type SalesInvoice = {
   id: string; invoiceNo: string; date: string; customerId: string;
   customer?: { name: string }; total: number;
@@ -117,7 +131,10 @@ function SalesInvoiceContent() {
   const [paymentMethod, setPaymentMethod] = useState("");
   const [paymentTerms, setPaymentTerms] = useState("");
   const [dueDate, setDueDate]           = useState("");
-  const emptyRow = (): Row => ({ itemId: "", name: "", description: "", availableQty: 0, qty: "", rate: "", discountPercent: "", taxPercent: "", unit: "", sku: "", isManual: false });
+  // Companies that price a line from a calculation get extra columns and a
+  // computed rate. Everyone else gets exactly the grid that was here before.
+  const { settings: rf, active: rfActive } = useRateFormula("salesInvoice");
+  const emptyRow = (): Row => ({ itemId: "", name: "", description: "", availableQty: 0, qty: "", rate: "", discountPercent: "", taxPercent: "", unit: "", sku: "", isManual: false, ...(rfActive ? { meta: emptyRateFormulaMeta(rf) } : {}) });
   const [rows, setRows]                 = useState<Row[]>([emptyRow()]);
   const [freight, setFreight]           = useState<number | "">("");
   const [discount, setDiscount]         = useState<number | "">("");
@@ -293,7 +310,9 @@ function SalesInvoiceContent() {
     }
     const item = items.find(i => i.id === itemId);
     if (!item) return;
-    copy[idx] = { ...copy[idx], itemId: item.id, name: item.name, description: item.description || "", availableQty: item.availableQty, qty: "", rate: item.salePrice || "", discountPercent: "", taxPercent: item.taxRate || "", unit: item.unit || "", sku: item.code || "", isManual: false };
+    // With a formula running the rate belongs to the formula, so the item's
+    // stored sale price must not overwrite a computed line rate.
+    copy[idx] = { ...copy[idx], itemId: item.id, name: item.name, description: item.description || "", availableQty: item.availableQty, qty: "", rate: rfActive ? copy[idx].rate : (item.salePrice || ""), discountPercent: "", taxPercent: item.taxRate || "", unit: item.unit || "", sku: item.code || "", isManual: false };
     if (idx === copy.length - 1) copy.push(emptyRow());
     setRows(copy);
   }
@@ -304,6 +323,30 @@ function SalesInvoiceContent() {
     if (idx === copy.length - 1 && val !== "") copy.push(emptyRow());
     setRows(copy);
   }
+
+  /**
+   * One formula column changed on one line. The rate is re-derived from the
+   * whole line rather than patched, so a correction to any column lands on
+   * the rate immediately — which is the entire point of the feature.
+   */
+  function updateRowMeta(idx: number, key: string, value: number | "") {
+    const copy = [...rows];
+    const meta = { ...(copy[idx].meta || {}), [key]: value };
+    copy[idx] = { ...copy[idx], meta };
+    const result = computeRateFromFormula(rf, meta);
+    if (result.rate != null) copy[idx].rate = result.rate;
+    if (idx === copy.length - 1 && value !== "") copy.push(emptyRow());
+    setRows(copy);
+  }
+
+  // The settings arrive one request after the first render, so rows built
+  // before then have no meta. Backfilling here rather than blocking the form
+  // on the lookup keeps the page usable for companies that never turn it on.
+  useEffect(() => {
+    if (!rfActive) return;
+    setRows(prev => prev.some(r => r.meta) ? prev : prev.map(r => ({ ...r, meta: emptyRateFormulaMeta(rf) })));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [rfActive]);
 
   function removeRow(idx: number) { if (rows.length > 1) setRows(rows.filter((_, i) => i !== idx)); }
 
@@ -323,6 +366,12 @@ function SalesInvoiceContent() {
   async function saveInvoice() {
     const clean = rows.filter(r => r.itemId && r.qty && r.rate);
     if (!customerId || !clean.length) { toast.error("Customer and items are required."); return; }
+    if (rfActive) {
+      for (let i = 0; i < clean.length; i++) {
+        const missing = rateFormulaLineIncomplete(rf, clean[i].meta);
+        if (missing) { toast.error(`Line ${i + 1}: ${missing.label} is required`); return; }
+      }
+    }
     setSaving(true);
     try {
       const method = editing ? "PUT" : "POST";
@@ -331,7 +380,7 @@ function SalesInvoiceContent() {
         freight: freight || 0, discount: discount || 0, discountType,
         notes: notes || null, termsConditions: termsConditions || null, reference: reference || null,
         paymentMethod: paymentMethod || null, paymentTerms: paymentTerms || null,
-        items: clean.map(r => ({ itemId: r.itemId, qty: Number(r.qty), rate: Number(r.rate), discountPercent: Number(r.discountPercent) || 0, taxPercent: Number(r.taxPercent) || 0 })),
+        items: clean.map(r => ({ itemId: r.itemId, qty: Number(r.qty), rate: Number(r.rate), discountPercent: Number(r.discountPercent) || 0, taxPercent: Number(r.taxPercent) || 0, meta: rfActive ? (r.meta || null) : null })),
         applyTax, taxConfigId: applyTax ? selectedTaxId : null,
         currencyId: currencyId || null, exchangeRate,
         soId: (!editing && linkedSoId) ? linkedSoId : undefined,
@@ -358,7 +407,7 @@ function SalesInvoiceContent() {
     setDiscount(inv2.discount ?? ""); setDiscountType(inv2.discountType || "flat"); setFreight(inv2.freight ?? "");
     setNotes(inv2.notes || ""); setTermsConditions(inv2.termsConditions || ""); setReference(inv2.reference || "");
     setPaymentMethod(inv2.paymentMethod || ""); setPaymentTerms(inv2.paymentTerms || "");
-    setRows(inv.items.map((it: any) => ({ itemId: it.itemId || it.item?.id || "", name: it.item?.name || "", description: it.item?.description || "", availableQty: it.qty || 0, qty: it.qty.toString(), rate: it.rate.toString(), discountPercent: it.discountPercent ?? "", taxPercent: it.taxPercent ?? "", unit: it.item?.unit || "", sku: it.item?.code || "" })));
+    setRows(inv.items.map((it: any) => ({ itemId: it.itemId || it.item?.id || "", name: it.item?.name || "", description: it.item?.description || "", availableQty: it.qty || 0, qty: it.qty.toString(), rate: it.rate.toString(), discountPercent: it.discountPercent ?? "", taxPercent: it.taxPercent ?? "", unit: it.item?.unit || "", sku: it.item?.code || "", ...(rfActive ? { meta: readRateFormulaMeta(rf, it.meta) } : {}) })));
     setShowForm(true); setShowList(false);
   }
 
@@ -785,10 +834,13 @@ function SalesInvoiceContent() {
                               )}
                               {r.sku && !r.isManual && <div style={{ fontSize: 11, color: "var(--text-muted)", marginBottom: 6 }}>SKU: {r.sku}{r.unit ? ` | Unit: ${r.unit}` : ""}</div>}
                               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
+                                {rfActive && (
+                                  <RateFormulaMobileFields settings={rf} meta={r.meta} onChange={(key, value) => updateRowMeta(i, key, value)} />
+                                )}
                                 {(["qty","rate","discountPercent","taxPercent"] as const).map(k => (
                                   <div key={k}>
                                     <div style={{ fontSize: 10, color: "var(--text-muted)", fontWeight: 700, marginBottom: 3, textTransform: "uppercase" }}>{k === "qty" ? "Qty" : k === "rate" ? "Unit Price" : k === "discountPercent" ? "Disc %" : "Tax %"}</div>
-                                    <input type="number" style={{ ...inputStyle, textAlign: "right" }} value={r[k]} onChange={e => updateRow(i, k, e.target.value)} placeholder="0" />
+                                    <input type="number" style={{ ...inputStyle, textAlign: "right", ...(rfActive && k === "rate" && !rf.rateEditable ? { opacity: 0.75 } : {}) }} value={r[k]} onChange={e => updateRow(i, k, e.target.value)} readOnly={rfActive && k === "rate" && !rf.rateEditable} placeholder="0" />
                                   </div>
                                 ))}
                               </div>
@@ -802,8 +854,12 @@ function SalesInvoiceContent() {
                         <table style={{ width: "100%", borderCollapse: "collapse" }}>
                           <thead>
                             <tr style={{ borderBottom: "2px solid var(--border)" }}>
-                              {["#","Item / Description","SKU","Qty","Unit","Unit Price","Disc %","Tax %","Total",""].map((h,hi) => (
-                                <th key={h+hi} style={{ padding: "8px 7px", fontSize: 10, fontWeight: 700, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: 0.4, textAlign: hi >= 3 && hi <= 8 ? "right" : "left", whiteSpace: "nowrap" }}>{h}</th>
+                              {["#","Item / Description","SKU"].map((h,hi) => (
+                                <th key={h+hi} style={{ padding: "8px 7px", fontSize: 10, fontWeight: 700, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: 0.4, textAlign: "left", whiteSpace: "nowrap" }}>{h}</th>
+                              ))}
+                              {rfActive && <RateFormulaHeadCells settings={rf} />}
+                              {["Qty","Unit","Unit Price","Disc %","Tax %","Total",""].map((h,hi) => (
+                                <th key={"t"+h+hi} style={{ padding: "8px 7px", fontSize: 10, fontWeight: 700, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: 0.4, textAlign: hi <= 5 ? "right" : "left", whiteSpace: "nowrap" }}>{h}</th>
                               ))}
                             </tr>
                           </thead>
@@ -838,12 +894,16 @@ function SalesInvoiceContent() {
                                     {r.description && !r.isManual && <div style={{ fontSize: 11, color: "var(--text-muted)", marginTop: 2, paddingLeft: 2 }}>{r.description}</div>}
                                   </td>
                                   <td style={{ padding: "6px 7px", fontSize: 12, color: "var(--text-muted)", width: 72 }}>{r.sku || "—"}</td>
+                                  {rfActive && (
+                                    <RateFormulaRowCells settings={rf} meta={r.meta} onChange={(key, value) => updateRowMeta(i, key, value)} />
+                                  )}
                                   <td style={{ padding: "6px 7px", width: 68 }}>
                                     <input type="number" style={{ ...inputStyle, padding: "5px 7px", textAlign: "right", fontSize: 13 }} value={r.qty} onChange={e => updateRow(i, "qty", e.target.value)} placeholder="0" />
                                   </td>
                                   <td style={{ padding: "6px 7px", fontSize: 12, color: "var(--text-muted)", width: 52 }}>{r.unit || "—"}</td>
                                   <td style={{ padding: "6px 7px", width: 94 }}>
-                                    <input type="number" style={{ ...inputStyle, padding: "5px 7px", textAlign: "right", fontSize: 13 }} value={r.rate} onChange={e => updateRow(i, "rate", e.target.value)} placeholder="0.00" />
+                                    <input type="number" style={{ ...inputStyle, padding: "5px 7px", textAlign: "right", fontSize: 13, ...(rfActive && !rf.rateEditable ? { opacity: 0.75, cursor: "not-allowed" } : {}) }} value={r.rate} onChange={e => updateRow(i, "rate", e.target.value)} readOnly={rfActive && !rf.rateEditable} title={rfActive && !rf.rateEditable ? "Worked out by your rate formula" : undefined} placeholder="0.00" />
+                                    {rfActive && <RateFormulaHint settings={rf} meta={r.meta} />}
                                   </td>
                                   <td style={{ padding: "6px 7px", width: 66 }}>
                                     <input type="number" style={{ ...inputStyle, padding: "5px 7px", textAlign: "right", fontSize: 13 }} value={r.discountPercent} onChange={e => updateRow(i, "discountPercent", e.target.value)} placeholder="0" />
@@ -1052,6 +1112,7 @@ function SalesInvoiceContent() {
                     : [
                         { key: "no", label: "#", align: "center", width: 30 },
                         { key: "name", label: "Description" },
+                        ...(rfActive ? rateFormulaPrintColumns(rf) : []),
                         { key: "qty", label: "Qty", align: "center", width: 60 },
                         { key: "unit", label: "Unit", align: "center", width: 60 },
                         { key: "rate", label: "Rate", align: "right", width: 80 },
@@ -1061,6 +1122,7 @@ function SalesInvoiceContent() {
                   rows={invItems.map((r: any, i: number) => ({
                     no: i + 1,
                     name: r.item?.name || r.name || "—",
+                    ...(rfActive ? rateFormulaPrintValues(rf, r.meta) : {}),
                     qty: r.qty,
                     unit: r.item?.unit || "",
                     rate: Number(r.rate).toLocaleString(),
