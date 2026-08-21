@@ -11,7 +11,12 @@
 // the grid is byte-for-byte what it always was.
 
 import type { CSSProperties } from "react";
-import type { RateFormulaField, RateFormulaSettings } from "@/lib/rateFormula";
+import { RATE_FORMULA_TEXT_MAX } from "@/lib/rateFormula";
+import type {
+  RateFormulaField,
+  RateFormulaSettings,
+  RateFormulaValue,
+} from "@/lib/rateFormula";
 
 const FONT = "'Outfit','Inter',sans-serif";
 const ACCENT = "#6366f1";
@@ -21,7 +26,21 @@ const MUTED = "var(--text-muted)";
 const BG = "var(--app-bg)";
 
 /** The values one line carries, keyed by the company's column keys. */
-export type RateFormulaMeta = Record<string, number | "">;
+export type RateFormulaMeta = Record<string, RateFormulaValue>;
+
+/**
+ * Turns what the operator typed into what the line stores.
+ *
+ * A number column keeps a real number so the formula can multiply it; a text
+ * column keeps the string exactly as typed, because "15-L" loses its meaning
+ * the moment anything tries to make a number of it.
+ */
+function readInput(field: RateFormulaField, raw: string): RateFormulaValue {
+  if (raw === "") return "";
+  if (field.kind === "text") return raw.slice(0, RATE_FORMULA_TEXT_MAX);
+  const n = Number(raw);
+  return Number.isFinite(n) ? n : "";
+}
 
 function cellInput(extra?: CSSProperties): CSSProperties {
   return {

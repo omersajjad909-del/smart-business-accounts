@@ -444,13 +444,28 @@ export function validateRateFormula(settings: RateFormulaSettings): RateFormulaP
     return problems;
   }
 
+  // A text column named in the expression is always a mistake, and a quiet one:
+  // it resolves to 0, so the rate comes out 0 (or the whole product does) with
+  // no error anywhere. Say so plainly instead.
+  for (const f of settings.fields) {
+    if (f.kind !== "text") continue;
+    if (new RegExp(`\\b${f.key}\\b`).test(expression)) {
+      problems.push({
+        field: "expression",
+        message: `"${f.key}" is a text column, so it cannot be part of the maths. Switch it to Number, or take it out of the formula.`,
+      });
+    }
+  }
+
   // Every name in the expression has to resolve, or a line silently shows no
   // rate at data-entry time with nothing on screen explaining why. Probing with
   // 1s rather than the defaults keeps a legitimate divide-by-a-default-of-0 from
   // being reported as a formula error.
   const probe = computeRateFromFormula(
     settings,
-    Object.fromEntries(settings.fields.map((f) => [f.key, f.defaultValue || 1]))
+    Object.fromEntries(
+      settings.fields.map((f) => [f.key, f.kind === "text" ? f.defaultValue : f.defaultValue || 1])
+    )
   );
   if (!probe.ok && probe.error) {
     problems.push({ field: "expression", message: probe.error });
