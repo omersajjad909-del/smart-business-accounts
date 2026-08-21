@@ -198,9 +198,8 @@ export default function RateFormulaPage() {
       .catch(() => {})
       .finally(() => setLoading(false));
     // requestHeaders is derived from the session user and does not change while
-    // the page is open; refetching on every render would hammer the endpoint.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    // the page is open, so this runs once on mount.
+  }, [requestHeaders]);
 
   const patch = (p: Partial<RateFormulaSettings>) => setSettings((s) => ({ ...s, ...p }));
 
