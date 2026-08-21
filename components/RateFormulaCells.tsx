@@ -97,7 +97,7 @@ export function RateFormulaRowCells({
 }: {
   settings: RateFormulaSettings;
   meta: RateFormulaMeta | undefined;
-  onChange: (key: string, value: number | "") => void;
+  onChange: (key: string, value: RateFormulaValue) => void;
   disabled?: boolean;
 }) {
   return (
@@ -105,20 +105,21 @@ export function RateFormulaRowCells({
       {settings.fields.map((f) => {
         const value = meta?.[f.key] ?? "";
         const missing = f.required && value === "";
+        const isText = f.kind === "text";
         return (
           <td key={f.key} style={{ padding: "7px 8px", width: f.width }}>
             <input
-              type="number"
+              type={isText ? "text" : "number"}
               value={value}
               disabled={disabled}
-              onChange={(e) =>
-                onChange(f.key, e.target.value === "" ? "" : Number(e.target.value))
-              }
-              placeholder={f.defaultValue ? String(f.defaultValue) : "0"}
+              maxLength={isText ? RATE_FORMULA_TEXT_MAX : undefined}
+              onChange={(e) => onChange(f.key, readInput(f, e.target.value))}
+              placeholder={f.defaultValue ? String(f.defaultValue) : isText ? "" : "0"}
               title={f.unit ? `${f.label} — ${f.unit}` : f.label}
-              style={cellInput(
-                missing ? { borderColor: "rgba(248,113,113,.55)" } : undefined
-              )}
+              style={cellInput({
+                ...(isText ? { textAlign: "center" as const } : {}),
+                ...(missing ? { borderColor: "rgba(248,113,113,.55)" } : {}),
+              })}
             />
           </td>
         );
@@ -172,38 +173,40 @@ export function RateFormulaMobileFields({
 }: {
   settings: RateFormulaSettings;
   meta: RateFormulaMeta | undefined;
-  onChange: (key: string, value: number | "") => void;
+  onChange: (key: string, value: RateFormulaValue) => void;
   disabled?: boolean;
 }) {
   return (
     <>
-      {settings.fields.map((f) => (
-        <div key={f.key}>
-          <div
-            style={{
-              fontSize: 10.5,
-              color: MUTED,
-              fontWeight: 700,
-              marginBottom: 5,
-              textTransform: "uppercase",
-              letterSpacing: 0.6,
-            }}
-          >
-            {f.label}
-            {f.unit ? ` (${f.unit})` : ""}
+      {settings.fields.map((f) => {
+        const isText = f.kind === "text";
+        return (
+          <div key={f.key}>
+            <div
+              style={{
+                fontSize: 10.5,
+                color: MUTED,
+                fontWeight: 700,
+                marginBottom: 5,
+                textTransform: "uppercase",
+                letterSpacing: 0.6,
+              }}
+            >
+              {f.label}
+              {f.unit ? ` (${f.unit})` : ""}
+            </div>
+            <input
+              type={isText ? "text" : "number"}
+              value={meta?.[f.key] ?? ""}
+              disabled={disabled}
+              maxLength={isText ? RATE_FORMULA_TEXT_MAX : undefined}
+              onChange={(e) => onChange(f.key, readInput(f, e.target.value))}
+              placeholder={f.defaultValue ? String(f.defaultValue) : isText ? "" : "0"}
+              style={cellInput({ padding: "7px 9px" })}
+            />
           </div>
-          <input
-            type="number"
-            value={meta?.[f.key] ?? ""}
-            disabled={disabled}
-            onChange={(e) =>
-              onChange(f.key, e.target.value === "" ? "" : Number(e.target.value))
-            }
-            placeholder={f.defaultValue ? String(f.defaultValue) : "0"}
-            style={cellInput({ padding: "7px 9px" })}
-          />
-        </div>
-      ))}
+        );
+      })}
     </>
   );
 }

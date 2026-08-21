@@ -163,6 +163,7 @@ const blankField = (): RateFormulaField => ({
   key: "",
   label: "",
   unit: "",
+  kind: "number",
   defaultValue: 0,
   width: 60,
   affectsRate: true,
