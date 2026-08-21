@@ -22,10 +22,12 @@ import {
   DEFAULT_RATE_FORMULA,
   RATE_FORMULA_DOCS,
   RATE_FORMULA_PRESETS,
+  RATE_FORMULA_TEXT_MAX,
   computeRateFromFormula,
   normalizeRateFormula,
   validateRateFormula,
   type RateFormulaField,
+  type RateFormulaFieldKind,
   type RateFormulaSettings,
 } from "@/lib/rateFormula";
 import { validateKey } from "@/lib/formulaEngine";
@@ -632,7 +634,9 @@ export default function RateFormulaPage() {
                 )}
                 {!f.affectsRate && !keyErrors[i] && (
                   <span style={{ fontSize: 12, color: MUTED }}>
-                    Recorded and printed, but not part of the maths.
+                    {f.kind === "text"
+                      ? "Free text — letters and numbers both, e.g. 15-L. Recorded and printed, never part of the maths."
+                      : "Recorded and printed, but not part of the maths."}
                   </span>
                 )}
               </div>
@@ -777,15 +781,21 @@ export default function RateFormulaPage() {
                   <div style={labelStyle()}>
                     {f.label || f.key}
                     {f.unit ? ` (${f.unit})` : ""}
+                    {f.kind === "text" && (
+                      <span style={{ color: MUTED, fontWeight: 600 }}> — text</span>
+                    )}
                   </div>
                   <input
-                    type="number"
+                    type={f.kind === "text" ? "text" : "number"}
                     style={inp()}
                     value={testValues[f.key] ?? ""}
+                    maxLength={f.kind === "text" ? RATE_FORMULA_TEXT_MAX : undefined}
                     onChange={(e) =>
                       setTestValues((v) => ({ ...v, [f.key]: e.target.value }))
                     }
-                    placeholder={f.defaultValue ? String(f.defaultValue) : "0"}
+                    placeholder={
+                      f.defaultValue ? String(f.defaultValue) : f.kind === "text" ? "e.g. 15-L" : "0"
+                    }
                   />
                 </div>
               ))}
