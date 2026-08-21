@@ -21,7 +21,7 @@ const SECTIONS = [
       },
       {
         sub: "Who This Applies To",
-        body: "This policy applies to all customers who purchase a FinovaOS subscription directly through our platform. Payments are processed by LemonSqueezy, our trusted third-party payment provider. This policy governs refunds for subscription fees only — it does not apply to any third-party services or integrations you may have purchased separately.",
+        body: "This policy applies to all customers who purchase a FinovaOS subscription directly through our platform. Payments made from Pakistan are processed in PKR by Safepay, and international payments are processed in USD by LemonSqueezy — both are trusted third-party payment providers. This policy applies identically regardless of which provider handled your payment. This policy governs refunds for subscription fees only — it does not apply to any third-party services or integrations you may have purchased separately.",
       },
     ],
   },
@@ -117,7 +117,7 @@ const SECTIONS = [
       },
       {
         sub: "Step 3 — Approval & Processing",
-        body: "Once approved, we will initiate the refund through LemonSqueezy, our payment processor. Refunds are returned to the original payment method used at the time of purchase.",
+        body: "Once approved, we will initiate the refund through the payment provider that processed your original transaction — Safepay for payments made in PKR from Pakistan, or LemonSqueezy for international payments in USD. Refunds are returned to the original payment method used at the time of purchase.",
       },
       {
         sub: "Step 4 — Bank Processing Time",
@@ -183,7 +183,7 @@ const SECTIONS = [
       },
       {
         sub: "Payment Processor",
-        body: "All refunds are processed through LemonSqueezy, our third-party payment provider, and are subject to their processing timelines and policies. FinovaOS initiates refunds promptly upon approval but cannot control the exact timeline of funds clearing your bank, which may vary by card issuer or financial institution.",
+        body: "All refunds are processed through the third-party payment provider that handled your original payment — Safepay for PKR payments from Pakistan, or LemonSqueezy for international USD payments — and are subject to that provider's processing timelines and policies. FinovaOS initiates refunds promptly upon approval but cannot control the exact timeline of funds clearing your bank, which may vary by card issuer or financial institution.",
       },
     ],
   },
@@ -525,6 +525,14 @@ export default function RefundPolicyPage() {
                   color:"rgba(255,255,255,.55)", fontWeight:600, fontSize:13, textDecoration:"none",
                 }}>
                   🔏 Privacy Policy →
+                </Link>
+                <Link href="/legal/delivery" style={{
+                  display:"inline-flex", alignItems:"center", gap:7,
+                  padding:"9px 16px", borderRadius:10,
+                  background:"rgba(255,255,255,.04)", border:"1px solid rgba(255,255,255,.1)",
+                  color:"rgba(255,255,255,.55)", fontWeight:600, fontSize:13, textDecoration:"none",
+                }}>
+                  📦 Service Delivery →
                 </Link>
               </div>
             </div>

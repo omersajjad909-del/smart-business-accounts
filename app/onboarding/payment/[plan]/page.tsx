@@ -785,6 +785,39 @@ export default function PaymentPage() {
                     <>🔒 Proceed &amp; Verify →</>
                   )}
                 </button>
+
+                {/* Policies — shown at the point of payment, not just in the site footer.
+                    Opened in a new tab so reading a policy never discards the checkout. */}
+                <div style={{ marginTop:16, paddingTop:16, borderTop:"1px solid rgba(255,255,255,.07)" }}>
+                  <p style={{ fontSize:11.5, color:"rgba(255,255,255,.38)", lineHeight:1.7, margin:"0 0 10px" }}>
+                    By continuing you agree to our Terms of Service and confirm you have read our
+                    Privacy Policy, Refund Policy and Service Delivery Policy. This is a recurring
+                    subscription that renews automatically until cancelled — you can cancel at any time
+                    from your billing settings.
+                  </p>
+                  <div style={{ display:"flex", gap:8, flexWrap:"wrap" }}>
+                    {[
+                      { label: "📋 Terms of Service", href: "/legal/terms" },
+                      { label: "🔏 Privacy Policy",   href: "/legal/privacy" },
+                      { label: "↩️ Refund Policy",    href: "/legal/refund" },
+                      { label: "📦 Service Delivery", href: "/legal/delivery" },
+                      { label: "🛟 Contact Support",  href: "/contact" },
+                    ].map(l => (
+                      <a key={l.href} href={l.href} target="_blank" rel="noopener noreferrer"
+                        style={{
+                          padding:"6px 11px", borderRadius:9,
+                          background:"rgba(255,255,255,.04)", border:"1px solid rgba(255,255,255,.1)",
+                          color:"rgba(255,255,255,.5)", fontSize:11, fontWeight:600, textDecoration:"none",
+                          transition:"all .2s",
+                        }}
+                        onMouseEnter={e => { e.currentTarget.style.color = "rgba(255,255,255,.85)"; e.currentTarget.style.borderColor = "rgba(255,255,255,.22)"; }}
+                        onMouseLeave={e => { e.currentTarget.style.color = "rgba(255,255,255,.5)"; e.currentTarget.style.borderColor = "rgba(255,255,255,.1)"; }}
+                      >
+                        {l.label}
+                      </a>
+                    ))}
+                  </div>
+                </div>
               </div>
 
               {/* ── RIGHT: Order Summary ── */}

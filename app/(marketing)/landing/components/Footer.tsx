@@ -44,6 +44,7 @@ const LEGAL_LINKS = [
   { label: "Privacy Policy",     href: "/legal/privacy" },
   { label: "Terms of Service",   href: "/legal/terms" },
   { label: "Refund Policy",      href: "/legal/refund" },
+  { label: "Service Delivery",   href: "/legal/delivery" },
   { label: "Cookie Policy",      href: "/legal/cookies" },
   { label: "SLA",                href: "/legal/sla" },
   { label: "DPA",                href: "/legal/dpa" },
@@ -94,6 +95,8 @@ const SOCIALS_DEFAULT = [
 const BOTTOM_LINKS = [
   { label: "Privacy", href: "/legal/privacy" },
   { label: "Terms",   href: "/legal/terms" },
+  { label: "Refund",  href: "/legal/refund" },
+  { label: "Delivery", href: "/legal/delivery" },
   { label: "Cookies", href: "/legal/cookies" },
   { label: "Sitemap", href: "/all-pages" },
   { label: "Status",  href: "/status" },

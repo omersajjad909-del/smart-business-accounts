@@ -110,6 +110,7 @@ export default function ItemsNewPage() {
     setEditingId(null); setName(""); setCategory("TRADING"); setUnit("");
     setRate(""); setPurchaseRate(""); setTaxRate(""); setMinStock("");
     setBarcode(""); setDescription(""); setImageUrl(null);
+    setEditingItem(null);
     setMeta(rfActive ? emptyRateFormulaMeta(rf) : {});
   }
 
@@ -139,7 +140,8 @@ export default function ItemsNewPage() {
     setTaxRate(String(item.taxRate || "")); setMinStock(String(item.minStock || ""));
     setBarcode(item.barcode || ""); setDescription(item.description || "");
     setImageUrl(item.imageUrl || null);
-    setMeta(rfActive ? readRateFormulaMeta(rf, (item as any).meta) : {});
+    setEditingItem(item);
+    setMeta(rfActive ? readRateFormulaMeta(rf, item.meta) : {});
     window.scrollTo({ top:0, behavior:"smooth" });
   }
 
