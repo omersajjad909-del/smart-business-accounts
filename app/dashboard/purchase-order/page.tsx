@@ -484,15 +484,24 @@ export default function PurchaseOrderPage() {
                   </div>
                 ) : (
                   <div style={{ overflowX: "auto", maxWidth: "100%" }}>
-                    <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13, minWidth: 820 + (rfActive ? rateFormulaColumnsWidth(rf) : 0) }}>
+                    {/* 46 line no + 150 item + 64 qty + 90 rate + 92 total + 34
+                        delete, plus cell padding — the floor at which every
+                        input is still usable. Formula columns add their own. */}
+                    <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13, minWidth: 560 + (rfActive ? rateFormulaColumnsWidth(rf) : 0) }}>
                       <thead>
                         <tr style={{ borderBottom: `2px solid ${BORDER}` }}>
-                          {["#","Item / Description","SKU"].map((h,hi) => (
+                          {/* SKU rides under the line number and the unit under
+                              the item name. Both are read-only labels, so they
+                              cost a whole column each for nothing — and with the
+                              formula columns in play those two columns are the
+                              difference between a grid that fits and one the
+                              operator has to scroll sideways. */}
+                          {["#","Item / Description"].map((h,hi) => (
                             <th key={h+hi} style={{ padding: isMobile ? "8px 8px" : "8px 7px", fontSize: 10, fontWeight: 700, color: MUTED, textTransform: "uppercase", letterSpacing: 0.4, textAlign: "left", whiteSpace: "nowrap" }}>{h}</th>
                           ))}
                           {rfActive && <RateFormulaHeadCells settings={rf} />}
-                          {["Qty","Unit","Unit Price","Disc %","Tax %","Total",""].map((h,hi) => (
-                            <th key={"t"+h+hi} style={{ padding: isMobile ? "8px 8px" : "8px 7px", fontSize: 10, fontWeight: 700, color: MUTED, textTransform: "uppercase", letterSpacing: 0.4, textAlign: hi <= 5 ? "right" : "left", whiteSpace: "nowrap" }}>{h}</th>
+                          {["Qty","Unit Price","Total",""].map((h,hi) => (
+                            <th key={"t"+h+hi} style={{ padding: isMobile ? "8px 8px" : "8px 7px", fontSize: 10, fontWeight: 700, color: MUTED, textTransform: "uppercase", letterSpacing: 0.4, textAlign: hi <= 2 ? "right" : "left", whiteSpace: "nowrap" }}>{h}</th>
                           ))}
                         </tr>
                       </thead>
@@ -508,8 +517,15 @@ export default function PurchaseOrderPage() {
                               onMouseEnter={e => { const btn = (e.currentTarget as HTMLElement).querySelector(".row-del-btn") as HTMLElement; if (btn) btn.style.opacity = "1"; }}
                               onMouseLeave={e => { const btn = (e.currentTarget as HTMLElement).querySelector(".row-del-btn") as HTMLElement; if (btn) btn.style.opacity = "0"; }}
                             >
-                              <td style={{ padding: isMobile ? "8px 8px" : "6px 7px", fontSize: 12, color: MUTED, width: 28 }}>{i + 1}</td>
-                              <td style={{ padding: isMobile ? "8px 8px" : "6px 7px", minWidth: 140 }}>
+                              <td style={{ padding: isMobile ? "8px 8px" : "6px 7px", fontSize: 12, color: MUTED, width: 46, verticalAlign: "top" }}>
+                                <div style={{ paddingTop: 6 }}>{i + 1}</div>
+                                {(r as any).sku && (
+                                  <div style={{ fontSize: 9.5, color: ACCENT, fontFamily: "monospace", fontWeight: 700, marginTop: 1 }}>
+                                    {(r as any).sku}
+                                  </div>
+                                )}
+                              </td>
+                              <td style={{ padding: isMobile ? "8px 8px" : "6px 7px", minWidth: 150 }}>
                                 <select value={r.itemId} onKeyDown={rateFormulaEnterHandler(rf, rfActive, i)} onChange={e => {
                                   const it = items.find((x: any) => x.id === e.target.value);
                                   if (!it) return;
@@ -527,21 +543,26 @@ export default function PurchaseOrderPage() {
                                   <option value="">— Select —</option>
                                   {items.map((it: any) => <option key={it.id} value={it.id}>{it.name}</option>)}
                                 </select>
-                                {r.desc && <div style={{ fontSize: 11, color: MUTED, marginTop: 2, paddingLeft: 2 }}>{r.desc}</div>}
+                                {(r.desc || (r as any).unit) && (
+                                  <div style={{ fontSize: 10.5, color: MUTED, marginTop: 2, paddingLeft: 2, display: "flex", gap: 8 }}>
+                                    {(r as any).unit && <span>Unit: {(r as any).unit}</span>}
+                                    {r.desc && <span>{r.desc}</span>}
+                                  </div>
+                                )}
                               </td>
-                              <td style={{ padding: isMobile ? "8px 8px" : "6px 7px", fontSize: 12, color: MUTED, width: 72 }}>{(r as any).sku || "—"}</td>
                               {rfActive && (
                                 <RateFormulaRowCells settings={rf} meta={r.meta} rowIndex={i} onChange={(key, value) => updateRowMeta(i, key, value)} />
                               )}
-                              <td style={{ padding: isMobile ? "8px 8px" : "6px 7px", width: 68 }}><input type="number" value={r.qty} onChange={e => updateRow(i, "qty", e.target.value)} placeholder="0" style={inp({ padding: isMobile ? "8px 8px" : "5px 7px", textAlign: "right", fontSize: 13 })} /></td>
-                              <td style={{ padding: isMobile ? "8px 8px" : "6px 7px", fontSize: 12, color: MUTED, width: 52 }}>{(r as any).unit || "—"}</td>
-                              <td style={{ padding: isMobile ? "8px 8px" : "6px 7px", width: 94 }}>
+                              <td style={{ padding: isMobile ? "8px 8px" : "6px 7px", width: 64 }}><input type="number" value={r.qty} onChange={e => updateRow(i, "qty", e.target.value)} placeholder="0" style={inp({ padding: isMobile ? "8px 8px" : "5px 7px", textAlign: "right", fontSize: 13 })} /></td>
+                              <td style={{ padding: isMobile ? "8px 8px" : "6px 7px", width: 90 }}>
                                 <input type="number" value={r.rate} onChange={e => updateRow(i, "rate", e.target.value)} readOnly={rfActive && !rf.rateEditable} title={rfActive && !rf.rateEditable ? "Worked out by your rate formula" : undefined} placeholder="0.00" style={inp({ padding: isMobile ? "8px 8px" : "5px 7px", textAlign: "right", fontSize: 13, ...(rfActive && !rf.rateEditable ? { opacity: 0.75, cursor: "not-allowed" } : {}) })} />
                                 {rfActive && <RateFormulaHint settings={rf} meta={r.meta} />}
                               </td>
-                              <td style={{ padding: isMobile ? "8px 8px" : "6px 7px", width: 66 }}><input type="number" value={(r as any).discountPercent} onChange={e => updateRow(i, "discountPercent", e.target.value)} placeholder="0" style={inp({ padding: isMobile ? "8px 8px" : "5px 7px", textAlign: "right", fontSize: 13 })} /></td>
-                              <td style={{ padding: isMobile ? "8px 8px" : "6px 7px", width: 66 }}><input type="number" value={(r as any).taxPercent} onChange={e => updateRow(i, "taxPercent", e.target.value)} placeholder="0" style={inp({ padding: isMobile ? "8px 8px" : "5px 7px", textAlign: "right", fontSize: 13 })} /></td>
-                              <td style={{ padding: isMobile ? "8px 8px" : "6px 7px", textAlign: "right", fontWeight: 600, fontSize: 13, width: 94, whiteSpace: "nowrap" }}>{lineBase > 0 ? (lineBase - lineDisc + lineTax).toLocaleString() : <span style={{ color: MUTED }}>—</span>}</td>
+                              {/* Per-line Disc % and Tax % are no longer typed on
+                                  this grid. The values still travel with the row
+                                  and the order-level Discount in the summary panel
+                                  is untouched — only the two columns are gone. */}
+                              <td style={{ padding: isMobile ? "8px 8px" : "6px 7px", textAlign: "right", fontWeight: 600, fontSize: 13, width: 92, whiteSpace: "nowrap" }}>{lineBase > 0 ? (lineBase - lineDisc + lineTax).toLocaleString() : <span style={{ color: MUTED }}>—</span>}</td>
                               {/* DELETE — hover only, NOT in tab order, NEVER triggered by Enter */}
                               <td style={{ padding: isMobile ? "8px 8px" : "6px 4px", width: 34, textAlign: "center" }}>
                                 {rows.length > 1 && !isEmpty && (
