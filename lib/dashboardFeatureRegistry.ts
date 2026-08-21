@@ -2325,6 +2325,20 @@ export const DASHBOARD_FEATURE_DEFS: DashboardFeatureDefinition[] = [
     section: "Purchases",
     businessTypes: ["trading", "wholesale", "distribution"],
   },
+  // Trading only, on purpose. A rate that falls out of gauge × width × length
+  // is a trading-house habit; a salon or a clinic has nothing to put in those
+  // columns, and the page would only be one more thing to ignore.
+  {
+    id: "TRADING_RATE_FORMULA",
+    label: "Rate Formula",
+    route: "/dashboard/rate-formula",
+    business: "trading",
+    businessLabel: "Trading",
+    section: "Settings",
+    businessTypes: ["trading"],
+    description:
+      "Price a line from your own calculation — rate per mm × gauge × width × length ÷ 54 — instead of a flat rate.",
+  },
 
   // ── WHOLESALE ────────────────────────────────────────────────
   {

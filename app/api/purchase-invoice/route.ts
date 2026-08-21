@@ -6,6 +6,7 @@ import { PERMISSIONS } from "@/lib/permissions";
 import { apiHasPermission } from "@/lib/apiPermission";
 import { requireActiveSubscription } from "@/lib/subscriptionGuard";
 import { logAuditFromReq } from "@/lib/auditLogger";
+import { sanitizeLineMeta } from "@/lib/rateFormula";
 
 /* ================= GET: Pending POs for Selection OR All Purchase Invoices ================= */
 export async function GET(req: NextRequest) {
@@ -211,6 +212,7 @@ export async function POST(req: NextRequest) {
               discountPercent: Number(i.discountPercent || 0),
               taxPercent: Number(i.taxPercent || 0),
               amount: lineBase - lineDisc + lineTax,
+              meta: sanitizeLineMeta(i.meta),
               };
             }),
           },
@@ -249,6 +251,9 @@ export async function POST(req: NextRequest) {
             location: location || "MAIN",
             partyId: supplierId,
             companyId,
+            // Carried onto the stock movement too, so an inventory report can
+            // show the same dimensions the invoice line was priced from.
+            meta: sanitizeLineMeta(i.meta),
           },
         });
 
@@ -386,6 +391,7 @@ export async function PUT(req: NextRequest) {
           rate: Number(oldItem.rate),
           amount: Number(oldItem.qty) * Number(oldItem.rate),
           location: _location || "MAIN",
+          meta: oldItem.meta ?? undefined,
         },
       });
     }
@@ -405,6 +411,7 @@ export async function PUT(req: NextRequest) {
             qty: Number(i.qty),
             rate: Number(i.rate),
             amount: Number(i.qty) * Number(i.rate),
+            meta: sanitizeLineMeta(i.meta),
           })),
         },
       },
@@ -428,6 +435,7 @@ export async function PUT(req: NextRequest) {
           location: _location || "MAIN",
           partyId: existing.supplierId,
           companyId,
+          meta: sanitizeLineMeta(i.meta),
         },
       });
     }
@@ -533,6 +541,7 @@ export async function DELETE(req: NextRequest) {
           rate: Number(oldItem.rate),
           amount: Number(oldItem.qty) * Number(oldItem.rate),
           location: "MAIN",
+          meta: oldItem.meta ?? undefined,
         },
       });
     }

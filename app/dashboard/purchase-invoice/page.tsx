@@ -13,6 +13,18 @@ import { getCurrentUser } from "@/lib/auth";
 
 import { QRCodeSVG } from "qrcode.react";
 import { useResponsive } from "@/hooks/useResponsive";
+import { useRateFormula } from "@/hooks/useRateFormula";
+import {
+  RateFormulaHeadCells,
+  RateFormulaRowCells,
+  RateFormulaMobileFields,
+  RateFormulaHint,
+  rateFormulaPrintColumns,
+  rateFormulaPrintValues,
+  rateFormulaLineIncomplete,
+  type RateFormulaMeta,
+} from "@/components/RateFormulaCells";
+import { computeRateFromFormula, emptyRateFormulaMeta, readRateFormulaMeta } from "@/lib/rateFormula";
 
 type Supplier = { id: string; name: string; partyType: string };
 
@@ -69,6 +81,8 @@ type Row = {
   taxPercent: number | "";
   unit: string;
   sku: string;
+  /** Rate-formula dimensions, when this company uses one. See lib/rateFormula.ts. */
+  meta?: RateFormulaMeta;
 };
 
 type TaxConfig = {
@@ -167,6 +181,11 @@ function PurchaseInvoiceContent() {
     "x-company-id": user?.companyId || "",
   };
 
+  // Companies that price a line from a calculation — rate per mm × gauge ×
+  // width × length ÷ 54 and the like — get extra columns and a computed rate.
+  // Everyone else gets exactly the grid that was here before.
+  const { settings: rf, active: rfActive } = useRateFormula("purchaseInvoice");
+
   const [suppliers, setSuppliers] = useState<Supplier[]>([]);
   const [allPOs, setAllPOs] = useState<PurchaseOrder[]>([]);
   const [allGrns, setAllGrns] = useState<GRN[]>([]);
@@ -231,7 +250,11 @@ const [searchTerm, setSearchTerm] = useState("");
   const [expiryDate, setExpiryDate] = useState("");
   const [paymentTerms, setPaymentTerms] = useState("");
   const [advancePayment, setAdvancePayment] = useState<number | "">();
-  const emptyRow = (): Row => ({ itemId: "", name: "", description: "", qty: "", rate: "", discountPercent: "", taxPercent: "", unit: "", sku: "" });
+  const emptyRow = (): Row => ({
+    itemId: "", name: "", description: "", qty: "", rate: "",
+    discountPercent: "", taxPercent: "", unit: "", sku: "",
+    ...(rfActive ? { meta: emptyRateFormulaMeta(rf) } : {}),
+  });
 
   function handlePIScan(e: React.KeyboardEvent<HTMLInputElement>) {
     if (e.key !== "Enter") return;
@@ -245,7 +268,7 @@ const [searchTerm, setSearchTerm] = useState("");
       updated[existingIdx] = { ...updated[existingIdx], qty: Number(updated[existingIdx].qty || 0) + 1 };
       setRows(updated);
     } else {
-      const newRow: Row = { itemId: found.id, name: found.name, description: found.description || "", qty: 1, rate: found.purchaseRate || "", discountPercent: "", taxPercent: "", unit: found.unit || "", sku: found.code || "" };
+      const newRow: Row = { ...emptyRow(), itemId: found.id, name: found.name, description: found.description || "", qty: 1, rate: rfActive ? "" : (found.purchaseRate || ""), unit: found.unit || "", sku: found.code || "" };
       const last = rows[rows.length - 1];
       if (!last.itemId && last.qty === "" && last.rate === "") {
         setRows([...rows.slice(0, -1), newRow, emptyRow()]);
@@ -468,6 +491,38 @@ const [searchTerm, setSearchTerm] = useState("");
     setRows(copy);
   }
 
+  /**
+   * One formula column changed on one line. The rate is re-derived from the
+   * whole line rather than patched, so a correction to any column lands on the
+   * rate immediately — which is the entire point of the feature.
+   */
+  function updateRowMeta(index: number, key: string, value: number | "") {
+    const copy = [...rows];
+    const meta = { ...(copy[index].meta || {}), [key]: value };
+    copy[index] = { ...copy[index], meta };
+
+    const result = computeRateFromFormula(rf, meta);
+    if (result.rate != null) copy[index].rate = result.rate;
+
+    if (index === copy.length - 1 && value !== "") copy.push(emptyRow());
+    setRows(copy);
+  }
+
+  // The settings arrive one request after the first render, so rows built
+  // before then have no meta. Backfilling here rather than blocking the whole
+  // form on the lookup keeps the page usable for the companies — the large
+  // majority — that never turn the formula on.
+  useEffect(() => {
+    if (!rfActive) return;
+    setRows(prev =>
+      prev.some(r => r.meta)
+        ? prev
+        : prev.map(r => ({ ...r, meta: emptyRateFormulaMeta(rf) }))
+    );
+    // `rf` is stable once loaded — it comes from a per-tab cache.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [rfActive]);
+
   const subtotal = rows.reduce((s, r) => s + (Number(r.qty) * Number(r.rate) || 0), 0);
   const perItemDiscountAmt = rows.reduce((s, r) => s + ((Number(r.qty) * Number(r.rate) || 0) * (Number(r.discountPercent) || 0) / 100), 0);
   const perItemTaxAmt = rows.reduce((s, r) => {
@@ -489,6 +544,16 @@ const [searchTerm, setSearchTerm] = useState("");
       return;
     }
 
+    if (rfActive) {
+      for (let i = 0; i < clean.length; i++) {
+        const missing = rateFormulaLineIncomplete(rf, clean[i].meta);
+        if (missing) {
+          toast.error(`Line ${i + 1}: ${missing.label} is required`);
+          return;
+        }
+      }
+    }
+
     setSaving(true);
     try {
       const method = editing ? "PUT" : "POST";
@@ -505,7 +570,14 @@ const [searchTerm, setSearchTerm] = useState("");
         reference: reference || null,
         paymentMethod: paymentMethod || null,
         paymentTerms: paymentTerms || null,
-        items: clean.map((r: any) => ({ ...r, discountPercent: Number(r.discountPercent) || 0, taxPercent: Number(r.taxPercent) || 0 })),
+        items: clean.map((r: any) => ({
+          ...r,
+          discountPercent: Number(r.discountPercent) || 0,
+          taxPercent: Number(r.taxPercent) || 0,
+          // Null, not an empty object, when no formula is running — a company
+          // that does not use the feature leaves the column untouched.
+          meta: rfActive ? (r.meta || null) : null,
+        })),
         applyTax,
         taxConfigId: applyTax ? selectedTaxId : null,
         currencyId: currencyId || null,
@@ -588,6 +660,7 @@ const [searchTerm, setSearchTerm] = useState("");
                 taxPercent: it.taxPercent ?? "",
                 unit: it.item?.unit || "",
                 sku: it.item?.code || "",
+                ...(rfActive ? { meta: readRateFormulaMeta(rf, it.meta) } : {}),
               })));
             }
           } catch {}
@@ -640,6 +713,7 @@ const [searchTerm, setSearchTerm] = useState("");
       taxPercent: it.taxPercent ?? "",
       unit: it.item?.unit || "",
       sku: it.item?.code || "",
+      ...(rfActive ? { meta: readRateFormulaMeta(rf, it.meta) } : {}),
     })));
     setShowForm(true);
     setShowList(false);
@@ -1075,8 +1149,15 @@ const [searchTerm, setSearchTerm] = useState("");
                             <div style={{ fontWeight: 700, color: TEXT, marginBottom: 4 }}>{r.name || <span style={{ color: MUTED, fontStyle: "italic" }}>—</span>}</div>
                             {r.sku && <div style={{ fontSize: 10, color: ACCENT, fontFamily: "monospace", marginBottom: 6 }}>{r.sku}</div>}
                             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
+                              {rfActive && (
+                                <RateFormulaMobileFields
+                                  settings={rf}
+                                  meta={r.meta}
+                                  onChange={(key, value) => updateRowMeta(i, key, value)}
+                                />
+                              )}
                               <div><div style={labelStyle()}>Qty</div><input type="number" value={r.qty} onChange={e => updateRow(i, "qty", e.target.value)} style={inp({ padding: "7px 9px", textAlign: "right" })} /></div>
-                              <div><div style={labelStyle()}>Unit Cost</div><input type="number" value={r.rate} onChange={e => updateRow(i, "rate", e.target.value)} style={inp({ padding: "7px 9px", textAlign: "right" })} /></div>
+                              <div><div style={labelStyle()}>Unit Cost</div><input type="number" value={r.rate} onChange={e => updateRow(i, "rate", e.target.value)} readOnly={rfActive && !rf.rateEditable} style={inp({ padding: "7px 9px", textAlign: "right", ...(rfActive && !rf.rateEditable ? { opacity: 0.75 } : {}) })} /></div>
                               <div><div style={labelStyle()}>Disc%</div><input type="number" value={r.discountPercent} onChange={e => updateRow(i, "discountPercent", e.target.value)} style={inp({ padding: "7px 9px", textAlign: "right" })} /></div>
                               <div><div style={labelStyle()}>Tax%</div><input type="number" value={r.taxPercent} onChange={e => updateRow(i, "taxPercent", e.target.value)} style={inp({ padding: "7px 9px", textAlign: "right" })} /></div>
                             </div>
@@ -1088,8 +1169,12 @@ const [searchTerm, setSearchTerm] = useState("");
                         <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 700 }}>
                           <thead>
                             <tr style={{ background: "rgba(99,102,241,.04)" }}>
-                              {["#","SKU / Code","Product Name","Unit","Qty","Unit Cost","Disc%","Tax%","Total",""].map((h, hi) => (
-                                <th key={hi} style={{ padding: "9px 8px", textAlign: hi >= 4 && hi < 9 ? "right" : hi === 9 ? "center" : "left", color: MUTED, fontWeight: 700, fontSize: 10, textTransform: "uppercase" as const, letterSpacing: 0.5, whiteSpace: "nowrap", borderBottom: `1px solid ${BORDER}` }}>{h}</th>
+                              {["#","SKU / Code","Product Name"].map((h, hi) => (
+                                <th key={hi} style={{ padding: "9px 8px", textAlign: "left", color: MUTED, fontWeight: 700, fontSize: 10, textTransform: "uppercase" as const, letterSpacing: 0.5, whiteSpace: "nowrap", borderBottom: `1px solid ${BORDER}` }}>{h}</th>
+                              ))}
+                              {rfActive && <RateFormulaHeadCells settings={rf} />}
+                              {["Unit","Qty","Unit Cost","Disc%","Tax%","Total",""].map((h, hi) => (
+                                <th key={`t${hi}`} style={{ padding: "9px 8px", textAlign: hi === 0 ? "left" : hi === 6 ? "center" : "right", color: MUTED, fontWeight: 700, fontSize: 10, textTransform: "uppercase" as const, letterSpacing: 0.5, whiteSpace: "nowrap", borderBottom: `1px solid ${BORDER}` }}>{h}</th>
                               ))}
                             </tr>
                           </thead>
@@ -1112,7 +1197,11 @@ const [searchTerm, setSearchTerm] = useState("");
                                       const item = allInventoryItems.find(it => it.id === e.target.value);
                                       if (item) {
                                         const copy = [...rows];
-                                        copy[i] = { ...copy[i], itemId: item.id, name: item.name, description: item.description || "", sku: item.code || "", unit: item.unit || "", rate: item.purchaseRate || "" };
+                                        // With a formula running, the rate belongs to the
+                                        // formula — pulling the item's stored purchase rate in
+                                        // here would overwrite a computed line rate the moment
+                                        // the operator corrected the item.
+                                        copy[i] = { ...copy[i], itemId: item.id, name: item.name, description: item.description || "", sku: item.code || "", unit: item.unit || "", ...(rfActive ? {} : { rate: item.purchaseRate || "" }) };
                                         if (i === copy.length - 1) copy.push(emptyRow());
                                         setRows(copy);
                                       } else {
@@ -1126,11 +1215,32 @@ const [searchTerm, setSearchTerm] = useState("");
                                     </select>
                                     {r.description && <div style={{ fontSize: 10, color: MUTED, marginTop: 2, paddingLeft: 2 }}>{r.description}</div>}
                                   </td>
+                                  {rfActive && (
+                                    <RateFormulaRowCells
+                                      settings={rf}
+                                      meta={r.meta}
+                                      onChange={(key, value) => updateRowMeta(i, key, value)}
+                                    />
+                                  )}
                                   <td style={{ padding: "7px 8px", width: 64 }}>
                                     <input value={r.unit} onChange={e => updateRow(i, "unit", e.target.value)} placeholder="pcs" style={inp({ padding: "5px 6px", fontSize: 12, textAlign: "center" })} />
                                   </td>
                                   <td style={{ padding: "7px 8px", width: 76 }}><input type="number" value={r.qty} onChange={e => updateRow(i, "qty", e.target.value)} placeholder="0" style={inp({ padding: "5px 7px", textAlign: "right", fontSize: 12.5 })} /></td>
-                                  <td style={{ padding: "7px 8px", width: 96 }}><input type="number" value={r.rate} onChange={e => updateRow(i, "rate", e.target.value)} placeholder="0.00" style={inp({ padding: "5px 7px", textAlign: "right", fontSize: 12.5 })} /></td>
+                                  <td style={{ padding: "7px 8px", width: 96 }}>
+                                    <input
+                                      type="number"
+                                      value={r.rate}
+                                      onChange={e => updateRow(i, "rate", e.target.value)}
+                                      readOnly={rfActive && !rf.rateEditable}
+                                      title={rfActive && !rf.rateEditable ? "Worked out by your rate formula" : undefined}
+                                      placeholder="0.00"
+                                      style={inp({
+                                        padding: "5px 7px", textAlign: "right", fontSize: 12.5,
+                                        ...(rfActive && !rf.rateEditable ? { opacity: 0.75, cursor: "not-allowed" } : {}),
+                                      })}
+                                    />
+                                    {rfActive && <RateFormulaHint settings={rf} meta={r.meta} />}
+                                  </td>
                                   <td style={{ padding: "7px 8px", width: 64 }}><input type="number" value={r.discountPercent} onChange={e => updateRow(i, "discountPercent", e.target.value)} placeholder="0" style={inp({ padding: "5px 7px", textAlign: "right", fontSize: 12.5 })} /></td>
                                   <td style={{ padding: "7px 8px", width: 64 }}><input type="number" value={r.taxPercent} onChange={e => updateRow(i, "taxPercent", e.target.value)} placeholder="0" style={inp({ padding: "5px 7px", textAlign: "right", fontSize: 12.5 })} /></td>
                                   <td style={{ padding: "7px 8px", textAlign: "right", fontWeight: 700, fontSize: 13, width: 96, color: lineTotal > 0 ? TEXT : MUTED, whiteSpace: "nowrap" }}>{lineTotal > 0 ? lineTotal.toLocaleString() : "—"}</td>
@@ -1363,6 +1473,7 @@ const [searchTerm, setSearchTerm] = useState("");
                 columns={[
                   { key: "no", label: "#", align: "center", width: 30 },
                   { key: "name", label: "Item Description" },
+                  ...(rfActive ? rateFormulaPrintColumns(rf) : []),
                   { key: "qty", label: "Qty", align: "center", width: 50 },
                   { key: "unit", label: "Unit", align: "center", width: 50 },
                   { key: "rate", label: "Rate", align: "right", width: 75 },
@@ -1374,6 +1485,7 @@ const [searchTerm, setSearchTerm] = useState("");
                   return {
                     no: i + 1,
                     name: r.name,
+                    ...(rfActive ? rateFormulaPrintValues(rf, r.meta) : {}),
                     qty: r.qty,
                     unit: r.unit || "—",
                     rate: Number(r.rate).toLocaleString(),

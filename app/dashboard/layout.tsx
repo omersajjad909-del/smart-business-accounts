@@ -17,6 +17,7 @@ import { hasPermission as baseHasPermission } from "@/lib/hasPermission";
 import { PERMISSIONS } from "@/lib/permissions";
 import { useGlobalEnterNavigation } from "@/hooks/useGlobalEnterNavigation";
 import { useAutoLogout } from "@/hooks/useAutoLogout";
+import { fetchRateFormula } from "@/hooks/useRateFormula";
 import { ModeToggle } from "@/components/mode-toggle";
 import AppearanceApplier from "@/components/AppearanceApplier";
 import { hasModule as baseHasModule, type BusinessType } from "@/lib/businessModules";
@@ -247,6 +248,10 @@ export default function DashboardLayout({
       "trading"
   );
   const [companyPlan, setCompanyPlan] = useState("STARTER");
+  // Set once the company has finished configuring its rate formula and asked
+  // for the link to go away. Defaults to false, so a failed lookup shows the
+  // link rather than hiding a page nobody can then find.
+  const [rateFormulaHidden, setRateFormulaHidden] = useState(false);
   const [userAvatar, setUserAvatar] = useState<string | null>(null);
   const [avatarUploading, setAvatarUploading] = useState(false);
   const [branches, setBranches] = useState<Branch[]>([]);
@@ -393,6 +398,18 @@ export default function DashboardLayout({
   useEffect(() => {
     if (isMobileViewport) setSidebarCollapsed(false);
   }, [isMobileViewport]);
+
+  // Only trading companies can see the Rate Formula link at all, so only they
+  // pay for the lookup. The response is cached per tab and shared with the
+  // document pages, which need the same settings anyway.
+  useEffect(() => {
+    if (businessType !== "trading") return;
+    let alive = true;
+    fetchRateFormula()
+      .then((s) => { if (alive) setRateFormulaHidden(s.hidden); })
+      .catch(() => {});
+    return () => { alive = false; };
+  }, [businessType]);
 
   // Close panels on outside click
   useEffect(() => {
@@ -1990,6 +2007,10 @@ export default function DashboardLayout({
                   Trading Control copy answered to a toggle that was not next to
                   it. One route, one link. */}
               {hasDashboardFeature("TRADING_PURCHASE_REQUISITION") && <NavLink href="/dashboard/purchase-requisition" pathname={pathname}>Purchase Requisition</NavLink>}
+              {/* A company sets its rate formula up once and then ticks "hide"
+                  so nobody nudges it later. The route stays open — hiding the
+                  link must not lock anyone out of their own configuration. */}
+              {hasDashboardFeature("TRADING_RATE_FORMULA") && !rateFormulaHidden && <NavLink href="/dashboard/rate-formula" pathname={pathname}>Rate Formula</NavLink>}
             </NavGroup>
           )}
 

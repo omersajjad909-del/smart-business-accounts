@@ -319,6 +319,36 @@ export function rateFormulaLineAmount(rate: number, qty: number): number {
   return (Number(rate) || 0) * (Number(qty) || 0);
 }
 
+/* ────────────────────── Server-side line meta ──────────────── */
+
+/**
+ * Cleans a line's `meta` before it reaches the database.
+ *
+ * The client sends this, so it is not to be trusted with the shape of a JSONB
+ * column: it is flattened to plain numbers under identifier-safe keys, capped
+ * in size, and reduced to `undefined` when there is nothing worth storing.
+ * `undefined` rather than `null` because that is what Prisma reads as "leave
+ * this column alone", which on a create is the NULL every ordinary line has —
+ * a company that does not use the feature stays byte-identical to before.
+ */
+export function sanitizeLineMeta(raw: unknown): Record<string, number> | undefined {
+  if (!raw || typeof raw !== "object" || Array.isArray(raw)) return undefined;
+
+  const out: Record<string, number> = {};
+  let count = 0;
+  for (const [key, value] of Object.entries(raw as Record<string, unknown>)) {
+    if (count >= 12) break;
+    if (validateKey(key)) continue;
+    if (value === "" || value === null || value === undefined) continue;
+    const n = Number(value);
+    if (!Number.isFinite(n)) continue;
+    out[key] = n;
+    count++;
+  }
+
+  return count ? out : undefined;
+}
+
 /* ─────────────────────── Editor validation ─────────────────── */
 
 export type RateFormulaProblem = {
