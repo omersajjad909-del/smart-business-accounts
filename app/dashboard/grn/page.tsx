@@ -394,7 +394,7 @@ export default function GRNPage() {
                             <span style={{ fontSize: 11, fontWeight: 700, color: MUTED, textTransform: "uppercase" as const }}>Item {idx + 1}</span>
                             <button onClick={() => setRows(rows.filter((_, i) => i !== idx))} disabled={rows.length === 1} style={{ background: "none", border: "none", cursor: rows.length === 1 ? "not-allowed" : "pointer", color: "#f87171", fontSize: 18, lineHeight: 1, padding: 0, opacity: rows.length === 1 ? 0.3 : 1 }}>×</button>
                           </div>
-                          <select value={row.itemId} onChange={e => selectGrnItem(idx, e.target.value)} style={{ ...inp({ marginBottom: 8 }) }}>
+                          <select value={row.itemId} onKeyDown={rateFormulaEnterHandler(rf, rfActive, idx)} onChange={e => selectGrnItem(idx, e.target.value)} style={{ ...inp({ marginBottom: 8 }) }}>
                             <option value="">— Select Item —</option>
                             {allItems.map((it: any) => <option key={it.id} value={it.id}>{it.name}</option>)}
                           </select>
@@ -433,7 +433,7 @@ export default function GRNPage() {
                             <tr key={idx} style={{ borderTop: `1px solid ${BORDER}` }}>
                               <td style={{ padding: "6px 8px", color: MUTED, fontSize: 12 }}>{idx + 1}</td>
                               <td style={{ padding: "6px 8px" }}>
-                                <select value={row.itemId} onChange={e => selectGrnItem(idx, e.target.value)} style={inp({ padding: "6px 10px" })}>
+                                <select value={row.itemId} onKeyDown={rateFormulaEnterHandler(rf, rfActive, idx)} onChange={e => selectGrnItem(idx, e.target.value)} style={inp({ padding: "6px 10px" })}>
                                   <option value="">Select Item</option>
                                   {allItems.map((it: any) => <option key={it.id} value={it.id}>{it.name}</option>)}
                                 </select>

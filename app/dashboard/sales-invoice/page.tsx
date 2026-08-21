@@ -835,7 +835,7 @@ function SalesInvoiceContent() {
                                   <button onClick={() => { const c=[...rows]; c[i]={...emptyRow()}; setRows(c); }} style={{ background:"none", border:"none", color:"var(--text-muted)", cursor:"pointer", fontSize:16 }}>⊗</button>
                                 </div>
                               ) : (
-                                <select style={{ ...inputStyle, marginBottom: 8 }} value={r.itemId} onChange={e => selectItem(i, e.target.value)}>
+                                <select style={{ ...inputStyle, marginBottom: 8 }} value={r.itemId} onKeyDown={rateFormulaEnterHandler(rf, rfActive, i)} onChange={e => selectItem(i, e.target.value)}>
                                   <option value="">— Select Item —</option>
                                   <option value="__manual__">✎ Type manually...</option>
                                   {items.map(it => <option key={it.id} value={it.id}>{it.name}</option>)}
@@ -894,7 +894,7 @@ function SalesInvoiceContent() {
                                         <button title="Switch to catalog" onClick={() => { const c=[...rows]; c[i]={...emptyRow()}; setRows(c); }} style={{ background:"none", border:"none", color:"var(--text-muted)", cursor:"pointer", fontSize:14, padding:"0 2px" }}>⊗</button>
                                       </div>
                                     ) : (
-                                      <select style={{ ...inputStyle, padding: "5px 7px", fontSize: 13 }} value={r.itemId} onChange={e => selectItem(i, e.target.value)}>
+                                      <select style={{ ...inputStyle, padding: "5px 7px", fontSize: 13 }} value={r.itemId} onKeyDown={rateFormulaEnterHandler(rf, rfActive, i)} onChange={e => selectItem(i, e.target.value)}>
                                         <option value="">— Select —</option>
                                         <option value="__manual__">✎ Type manually...</option>
                                         {items.map(it => <option key={it.id} value={it.id}>{it.name}</option>)}

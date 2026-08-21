@@ -1204,7 +1204,7 @@ const [searchTerm, setSearchTerm] = useState("");
                                     {r.sku ? <span style={{ fontFamily: "monospace", fontSize: 11, color: ACCENT, fontWeight: 700 }}>{r.sku}</span> : <span style={{ color: MUTED, fontSize: 11 }}>—</span>}
                                   </td>
                                   <td style={{ padding: "7px 8px", minWidth: 160 }}>
-                                    <select value={r.itemId} onChange={e => {
+                                    <select value={r.itemId} onKeyDown={rateFormulaEnterHandler(rf, rfActive, i)} onChange={e => {
                                       const item = allInventoryItems.find(it => it.id === e.target.value);
                                       if (item) {
                                         const copy = [...rows];

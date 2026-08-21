@@ -450,7 +450,7 @@ export default function PurchaseOrderPage() {
                               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg>
                             </button>
                           </div>
-                          <select value={r.itemId} onChange={e => {
+                          <select value={r.itemId} onKeyDown={rateFormulaEnterHandler(rf, rfActive, i)} onChange={e => {
                             const it = items.find((x: any) => x.id === e.target.value);
                             if (!it) return;
                             const copy = [...rows];
@@ -510,7 +510,7 @@ export default function PurchaseOrderPage() {
                             >
                               <td style={{ padding: isMobile ? "8px 8px" : "6px 7px", fontSize: 12, color: MUTED, width: 28 }}>{i + 1}</td>
                               <td style={{ padding: isMobile ? "8px 8px" : "6px 7px", minWidth: 140 }}>
-                                <select value={r.itemId} onChange={e => {
+                                <select value={r.itemId} onKeyDown={rateFormulaEnterHandler(rf, rfActive, i)} onChange={e => {
                                   const it = items.find((x: any) => x.id === e.target.value);
                                   if (!it) return;
                                   const copy = [...rows];
