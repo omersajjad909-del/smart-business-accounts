@@ -324,7 +324,7 @@ export default function PurchaseOrderPage() {
       {/* ── List View ── */}
       {showList && (
         <div className="no-print" style={{ background: PANEL, border: `1px solid ${BORDER}`, borderRadius: 14, overflow: "hidden", marginBottom: 24 }}>
-          <div style={{ overflowX: "auto" }}>
+          <div style={{ overflowX: "auto", maxWidth: "100%" }}>
             <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
               <thead>
                 <tr style={{ background: "rgba(99,102,241,0.07)", borderBottom: `1px solid ${BORDER}` }}>
@@ -394,7 +394,7 @@ export default function PurchaseOrderPage() {
       {/* ── Form ── */}
       {showForm && !preview && (
         <div className="no-print">
-          <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 320px", gap: 20, alignItems: "start" }}>
+          <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "minmax(0, 1fr) 320px", gap: 20, alignItems: "start" }}>
 
             {/* LEFT COLUMN */}
             <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
@@ -483,7 +483,7 @@ export default function PurchaseOrderPage() {
                     })}
                   </div>
                 ) : (
-                  <div style={{ overflowX: "auto" }}>
+                  <div style={{ overflowX: "auto", maxWidth: "100%" }}>
                     <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13, minWidth: 820 + (rfActive ? rateFormulaColumnsWidth(rf) : 0) }}>
                       <thead>
                         <tr style={{ borderBottom: `2px solid ${BORDER}` }}>

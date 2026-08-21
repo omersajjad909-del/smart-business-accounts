@@ -20,7 +20,12 @@ export function useGlobalEnterNavigation() {
           
           // Get all focusable elements in the current form or document
           const scope = form || document.body;
-          const selector = 'input:not([disabled]):not([type="hidden"]), select:not([disabled]), textarea:not([disabled]), button:not([disabled])';
+          // tabindex="-1" means "keyboard navigation skips this" — a row's
+          // hover-only delete button says exactly that. Walking onto one parks
+          // the cursor on a destructive control and stops Enter dead, because
+          // this handler only moves on from inputs and selects. Honour the
+          // opt-out and keep going to the next real field.
+          const selector = 'input:not([disabled]):not([type="hidden"]):not([tabindex="-1"]), select:not([disabled]):not([tabindex="-1"]), textarea:not([disabled]):not([tabindex="-1"]), button:not([disabled]):not([tabindex="-1"])';
           const elements = Array.from(scope.querySelectorAll(selector)) as HTMLElement[];
           
           const index = elements.indexOf(target);

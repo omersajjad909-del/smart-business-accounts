@@ -963,7 +963,7 @@ const [searchTerm, setSearchTerm] = useState("");
             <div style={{ fontWeight: 700, fontSize: 14 }}>All Purchase Invoices</div>
             <input value={searchTerm} onChange={e => setSearchTerm(e.target.value)} placeholder="Search by invoice #, supplier…" style={{ ...inp({ width: 260, padding: "7px 12px", fontSize: 12.5 }) }} />
           </div>
-          <div style={{ overflowX: "auto" }}>
+          <div style={{ overflowX: "auto", maxWidth: "100%" }}>
             <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13, minWidth: 700 }}>
               <thead>
                 <tr style={{ background: "rgba(99,102,241,0.05)" }}>
@@ -1138,7 +1138,7 @@ const [searchTerm, setSearchTerm] = useState("");
               </div>
 
               {/* ── MAIN 2-COL LAYOUT ── */}
-              <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 340px", gap: 16, alignItems: "start" }}>
+              <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "minmax(0, 1fr) 340px", gap: 16, alignItems: "start" }}>
 
                 {/* LEFT: Items + Notes */}
                 <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
@@ -1176,7 +1176,7 @@ const [searchTerm, setSearchTerm] = useState("");
                         ))}
                       </div>
                     ) : (
-                      <div style={{ overflowX: "auto" }}>
+                      <div style={{ overflowX: "auto", maxWidth: "100%" }}>
                         <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 700 + (rfActive ? rateFormulaColumnsWidth(rf) : 0) }}>
                           <thead>
                             <tr style={{ background: "rgba(99,102,241,.04)" }}>
@@ -1263,7 +1263,7 @@ const [searchTerm, setSearchTerm] = useState("");
                                   <td style={{ padding: "7px 8px", width: 64 }}><input type="number" value={r.taxPercent} onChange={e => updateRow(i, "taxPercent", e.target.value)} placeholder="0" style={inp({ padding: "5px 7px", textAlign: "right", fontSize: 12.5 })} /></td>
                                   <td style={{ padding: "7px 8px", textAlign: "right", fontWeight: 700, fontSize: 13, width: 96, color: lineTotal > 0 ? TEXT : MUTED, whiteSpace: "nowrap" }}>{lineTotal > 0 ? lineTotal.toLocaleString() : "—"}</td>
                                   <td style={{ padding: "7px 8px", width: 28, textAlign: "center" }}>
-                                    <button onClick={() => { if (rows.length > 1) setRows(rows.filter((_, idx) => idx !== i)); }} style={{ background: "none", border: "none", color: "#f87171", cursor: "pointer", fontSize: 16, padding: 2, opacity: rows.length === 1 ? 0.2 : 0.6, lineHeight: 1 }} disabled={rows.length === 1}>×</button>
+                                    <button tabIndex={-1} onClick={() => { if (rows.length > 1) setRows(rows.filter((_, idx) => idx !== i)); }} style={{ background: "none", border: "none", color: "#f87171", cursor: "pointer", fontSize: 16, padding: 2, opacity: rows.length === 1 ? 0.2 : 0.6, lineHeight: 1 }} disabled={rows.length === 1}>×</button>
                                   </td>
                                 </tr>
                               );

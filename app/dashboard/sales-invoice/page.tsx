@@ -675,7 +675,7 @@ function SalesInvoiceContent() {
         {/* ── Invoices List ── */}
         {showList && (
           <div style={{ ...panelStyle, padding: 0, overflow: "hidden", marginBottom: 24 }}>
-            <div style={{ overflowX: "auto" }}>
+            <div style={{ overflowX: "auto", maxWidth: "100%" }}>
             <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 760 }}>
               <thead>
                 <tr style={{ borderBottom: "1px solid var(--border)" }}>
@@ -746,7 +746,7 @@ function SalesInvoiceContent() {
 
             {/* ── Entry Form ── */}
             {!preview && (
-              <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 340px", gap: 20, alignItems: "start" }}>
+              <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "minmax(0, 1fr) 340px", gap: 20, alignItems: "start" }}>
 
                 {/* LEFT COLUMN */}
                 <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
@@ -827,7 +827,7 @@ function SalesInvoiceContent() {
                             <div key={i} style={{ border: "1px solid var(--border)", borderRadius: 10, padding: 12, marginBottom: 10, background: "var(--panel-bg)" }}>
                               <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8 }}>
                                 <span style={{ fontSize: 11, fontWeight: 700, color: "var(--text-muted)", textTransform: "uppercase" }}>Item {i + 1}</span>
-                                <button style={{ background: "none", border: "none", color: "var(--danger)", cursor: "pointer", fontSize: 18, padding: 0 }} onClick={() => removeRow(i)} disabled={rows.length === 1}>×</button>
+                                <button tabIndex={-1} style={{ background: "none", border: "none", color: "var(--danger)", cursor: "pointer", fontSize: 18, padding: 0 }} onClick={() => removeRow(i)} disabled={rows.length === 1}>×</button>
                               </div>
                               {r.isManual ? (
                                 <div style={{ display: "flex", gap: 4, marginBottom: 8 }}>
@@ -859,7 +859,7 @@ function SalesInvoiceContent() {
                         })}
                       </div>
                     ) : (
-                      <div style={{ overflowX: "auto" }}>
+                      <div style={{ overflowX: "auto", maxWidth: "100%" }}>
                         <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 820 + (rfActive ? rateFormulaColumnsWidth(rf) : 0) }}>
                           <thead>
                             <tr style={{ borderBottom: "2px solid var(--border)" }}>
@@ -922,7 +922,7 @@ function SalesInvoiceContent() {
                                   </td>
                                   <td style={{ padding: "6px 7px", textAlign: "right", fontWeight: 600, fontSize: 13, width: 94, whiteSpace: "nowrap" }}>{fmt(lineTaxable + lineTax)}</td>
                                   <td style={{ padding: "6px 7px", width: 30 }}>
-                                    <button style={{ background: "none", border: "none", color: "var(--danger)", cursor: "pointer", fontSize: 17, padding: 0 }} onClick={() => removeRow(i)} disabled={rows.length === 1}>×</button>
+                                    <button tabIndex={-1} style={{ background: "none", border: "none", color: "var(--danger)", cursor: "pointer", fontSize: 17, padding: 0 }} onClick={() => removeRow(i)} disabled={rows.length === 1}>×</button>
                                   </td>
                                 </tr>
                               );
