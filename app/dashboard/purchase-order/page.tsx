@@ -169,8 +169,7 @@ export default function PurchaseOrderPage() {
   useEffect(() => {
     if (!rfActive) return;
     setRows(prev => prev.some(r => r.meta) ? prev : prev.map(r => ({ ...r, meta: emptyRateFormulaMeta(rf) })));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [rfActive]);
+  }, [rfActive, rf]);
 
   function removeRow(i: number) { if (rows.length > 1) setRows(rows.filter((_, idx) => idx !== i)); }
 
