@@ -986,6 +986,39 @@ function BillingPage() {
               );
             })}
           </div>
+
+          {/* Policies — this tab is the real checkout entry point: the Upgrade
+              buttons above hand off straight to the payment provider, so the
+              terms have to be readable here rather than only in the site footer.
+              New tab, so opening one never discards the billing page. */}
+          <div style={{ marginTop:20, padding: isMobile ? "14px 12px" : "18px 22px", borderRadius:14, background:"rgba(255,255,255,.02)", border:"1px solid rgba(255,255,255,.06)" }}>
+            <div style={{ fontSize:10, fontWeight:700, color:"rgba(255,255,255,.28)", letterSpacing:".08em", textTransform:"uppercase", marginBottom:10 }}>
+              Before You Subscribe
+            </div>
+            <p style={{ fontSize:12, color:"rgba(255,255,255,.42)", lineHeight:1.7, margin:"0 0 12px" }}>
+              Selecting a plan takes you to our secure payment provider. By subscribing you agree to
+              our Terms of Service and confirm you have read our Privacy Policy, Refund Policy and
+              Service Delivery Policy. Subscriptions renew automatically until cancelled — you can
+              cancel at any time from this page, and your access continues until the end of the paid period.
+            </p>
+            <div style={{ display:"flex", flexWrap:"wrap", gap:8 }}>
+              {[
+                { label: "📋 Terms of Service", href: "/legal/terms" },
+                { label: "🔏 Privacy Policy",   href: "/legal/privacy" },
+                { label: "↩️ Refund Policy",    href: "/legal/refund" },
+                { label: "📦 Service Delivery", href: "/legal/delivery" },
+                { label: "🛟 Contact Support",  href: "/contact" },
+              ].map(l => (
+                <a key={l.href} href={l.href} target="_blank" rel="noopener noreferrer"
+                  style={{ padding:"5px 12px", borderRadius:8, background:"rgba(255,255,255,.04)", border:"1px solid rgba(255,255,255,.08)", fontSize:11, fontWeight:600, color:"rgba(255,255,255,.5)", textDecoration:"none", transition:"all .15s" }}
+                  onMouseEnter={e => { e.currentTarget.style.color = "rgba(255,255,255,.85)"; e.currentTarget.style.borderColor = "rgba(255,255,255,.2)"; }}
+                  onMouseLeave={e => { e.currentTarget.style.color = "rgba(255,255,255,.5)"; e.currentTarget.style.borderColor = "rgba(255,255,255,.08)"; }}
+                >
+                  {l.label}
+                </a>
+              ))}
+            </div>
+          </div>
         </div>
       )}
 
