@@ -35,21 +35,33 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  // A fresh secret each time the enrolment screen is opened — an abandoned
-  // half-finished enrolment must not leave a usable secret behind.
-  const secret = generateSecret();
+  // Reuse the pending secret if enrolment was already started.
+  //
+  // Minting a fresh one on every visit looked tidier, but it meant a page
+  // refresh — or one mistyped code followed by "Start over" — silently
+  // invalidated the QR already sitting in the admin's authenticator. Every
+  // subsequent code then failed with "Invalid or expired code" and no amount
+  // of retrying could recover, because the phone and the database were holding
+  // different secrets.
+  //
+  // Nothing is weakened by keeping it: the secret is only reachable with a
+  // password-verified pending cookie, and whoever holds that could simply ask
+  // for a new secret anyway.
+  const secret = account.totpSecret || generateSecret();
   const otpAuthUrl = keyuri(account.email, "FinovaOS Admin", secret);
 
-  if (source === "team") {
-    await (prisma as any).adminUser.update({
-      where: { id: account.id },
-      data: { totpSecret: secret, totpEnabled: false },
-    });
-  } else {
-    await prisma.user.update({
-      where: { id: account.id },
-      data: { twoFactorSecret: secret, twoFactorEnabled: false },
-    });
+  if (secret !== account.totpSecret) {
+    if (source === "team") {
+      await (prisma as any).adminUser.update({
+        where: { id: account.id },
+        data: { totpSecret: secret, totpEnabled: false },
+      });
+    } else {
+      await prisma.user.update({
+        where: { id: account.id },
+        data: { twoFactorSecret: secret, twoFactorEnabled: false },
+      });
+    }
   }
 
   return NextResponse.json({ secret, otpAuthUrl });
