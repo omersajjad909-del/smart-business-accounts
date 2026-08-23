@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
-import { requireAdmin, revokeAdminSessions } from "@/lib/adminAuth";
+import { requireAdmin } from "@/lib/adminAuth";
 import { SUPER_ADMIN_ONLY_PAGES, normalizeAllowedPages } from "@/lib/adminPages";
 import { ADMIN_NAV_ITEMS } from "@/app/admin/admin-nav";
 
