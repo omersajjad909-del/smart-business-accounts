@@ -288,6 +288,7 @@ export default function ItemsNewPage() {
               <RateFormulaMobileFields
                 settings={rf}
                 meta={meta}
+                context="item"
                 onChange={(key: string, value: RateFormulaValue) => setMeta(m => ({ ...m, [key]: value }))}
               />
             </div>

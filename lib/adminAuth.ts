@@ -39,6 +39,7 @@ import {
   SUPER_ADMIN_ONLY_PAGES,
   adminPageForApiPath,
   isAlwaysAllowedAdminApi,
+  normalizeAllowedPages,
 } from "@/lib/adminPages";
 
 /** Admin sessions are short — the blast radius of a stolen one is total. */
@@ -185,7 +186,7 @@ function parseAllowedPages(raw: unknown): string[] | null {
   if (typeof raw !== "string") return [];
   try {
     const parsed = JSON.parse(raw);
-    return Array.isArray(parsed) ? parsed.map(String) : [];
+    return Array.isArray(parsed) ? normalizeAllowedPages(parsed.map(String)) : [];
   } catch {
     return [];
   }

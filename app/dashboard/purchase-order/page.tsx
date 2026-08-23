@@ -511,7 +511,11 @@ export default function PurchaseOrderPage() {
                           const isEmpty = !r.itemId && !r.qty && !r.rate;
                           return (
                             <tr key={i}
-                              style={{ borderBottom: `1px solid ${BORDER}`, position: "relative" }}
+                              // Top-aligned so the item select and every input start on the
+                              // same line. The item cell is taller than the rest — SKU and
+                              // unit hang beneath it — and middle alignment let that extra
+                              // height push the other boxes half a line out of step.
+                              style={{ borderBottom: `1px solid ${BORDER}`, position: "relative", verticalAlign: "top" }}
                               onMouseEnter={e => { const btn = (e.currentTarget as HTMLElement).querySelector(".row-del-btn") as HTMLElement; if (btn) btn.style.opacity = "1"; }}
                               onMouseLeave={e => { const btn = (e.currentTarget as HTMLElement).querySelector(".row-del-btn") as HTMLElement; if (btn) btn.style.opacity = "0"; }}
                             >
@@ -559,7 +563,9 @@ export default function PurchaseOrderPage() {
                                   this grid. The values still travel with the row
                                   and the order-level Discount in the summary panel
                                   is untouched — only the two columns are gone. */}
-                              <td style={{ padding: isMobile ? "8px 8px" : "6px 7px", textAlign: "right", fontWeight: 600, fontSize: 13, width: 92, whiteSpace: "nowrap" }}>{lineBase > 0 ? (lineBase - lineDisc + lineTax).toLocaleString() : <span style={{ color: MUTED }}>—</span>}</td>
+                              {/* Plain text in a row of inputs: the extra top padding
+                                  lines it up with the text inside the boxes beside it. */}
+                              <td style={{ padding: isMobile ? "8px 8px" : "12px 7px 6px", textAlign: "right", fontWeight: 600, fontSize: 13, width: 92, whiteSpace: "nowrap" }}>{lineBase > 0 ? (lineBase - lineDisc + lineTax).toLocaleString() : <span style={{ color: MUTED }}>—</span>}</td>
                               {/* DELETE — hover only, NOT in tab order, NEVER triggered by Enter */}
                               <td style={{ padding: isMobile ? "8px 8px" : "6px 4px", width: 34, textAlign: "center" }}>
                                 {rows.length > 1 && !isEmpty && (

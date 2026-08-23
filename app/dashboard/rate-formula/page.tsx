@@ -171,6 +171,7 @@ const blankField = (): RateFormulaField => ({
   affectsRate: true,
   showOnPrint: true,
   focusOnPick: false,
+  lockedToItem: false,
   required: false,
 });
 
@@ -652,6 +653,24 @@ export default function RateFormulaPage() {
                     style={{ accentColor: ACCENT }}
                   />
                   Cursor jumps here after picking an item
+                </label>
+                <label
+                  title="Set this on the item master. Documents show it and print it, but cannot change it."
+                  style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12.5, color: TEXT, cursor: "pointer" }}
+                >
+                  <input
+                    type="checkbox"
+                    checked={f.lockedToItem}
+                    onChange={(e) =>
+                      // A column cannot both be typed per document and be fixed
+                      // by the item, so claiming the cursor releases the lock.
+                      setField(i, e.target.checked
+                        ? { lockedToItem: true, focusOnPick: false }
+                        : { lockedToItem: false })
+                    }
+                    style={{ accentColor: ACCENT }}
+                  />
+                  Set on the item, read-only on documents
                 </label>
                 {keyErrors[i] && (
                   <span style={{ fontSize: 12, color: "#f87171", fontWeight: 600 }}>{keyErrors[i]}</span>

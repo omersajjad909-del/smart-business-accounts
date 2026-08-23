@@ -12,6 +12,43 @@
  * ticked in Admin Team is the same string checked here.
  */
 
+/**
+ * Page ids that were stored before the nav settled on its current spelling.
+ *
+ * `allowedPages` was only ever read by the sidebar, so a typo cost nothing and
+ * a few rows carry ids that match no nav item. Now that the list is enforced,
+ * those would silently lock the member out of pages they were granted — so the
+ * old spellings are translated rather than dropped.
+ */
+const LEGACY_PAGE_IDS: Record<string, string> = {
+  apikeys: "api-keys",
+  flags: "feature-flags",
+  emaillogs: "email-logs",
+  featureflags: "feature-flags",
+  businessmodules: "business-modules",
+  businesstypes: "business-types",
+  paymentmethods: "payment-methods",
+  pagevisibility: "page-visibility",
+  securityincidents: "security-incidents",
+  signupanalytics: "signup-analytics",
+  taxrates: "tax-rates",
+  audittrail: "audit-trail",
+  backuprestore: "backup-restore",
+  websettings: "web-settings",
+  pkpayments: "pk-payments",
+};
+
+/** Canonicalise a stored `allowedPages` list to current nav ids. */
+export function normalizeAllowedPages(pages: string[]): string[] {
+  const out = new Set<string>();
+  for (const raw of pages) {
+    const id = String(raw).trim();
+    if (!id) continue;
+    out.add(LEGACY_PAGE_IDS[id.toLowerCase()] ?? id);
+  }
+  return [...out];
+}
+
 /** Pages only a super admin may reach, however `allowedPages` is configured. */
 export const SUPER_ADMIN_ONLY_PAGES = new Set<string>([
   "team", // creating/disabling other admins

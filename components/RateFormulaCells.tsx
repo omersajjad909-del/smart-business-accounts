@@ -174,6 +174,9 @@ export function RateFormulaRowCells({
         const value = meta?.[f.key] ?? "";
         const missing = f.required && value === "";
         const isText = f.kind === "text";
+        // Locked columns are set on the item master. They still show and still
+        // print here; they are simply not the line's to change.
+        const locked = f.lockedToItem;
         return (
           <td key={f.key} style={{ padding: "7px 8px", width: Math.max(f.width, MIN_CELL_WIDTH), minWidth: Math.max(f.width, MIN_CELL_WIDTH) }}>
             <input
@@ -181,13 +184,16 @@ export function RateFormulaRowCells({
               type={isText ? "text" : "number"}
               value={value}
               disabled={disabled}
+              readOnly={locked}
+              tabIndex={locked ? -1 : undefined}
               maxLength={isText ? RATE_FORMULA_TEXT_MAX : undefined}
               onChange={(e) => onChange(f.key, readInput(f, e.target.value))}
-              placeholder={f.defaultValue ? String(f.defaultValue) : isText ? "" : "0"}
-              title={f.unit ? `${f.label} — ${f.unit}` : f.label}
+              placeholder={locked ? "—" : f.defaultValue ? String(f.defaultValue) : isText ? "" : "0"}
+              title={locked ? `${f.label} — set on the item` : f.unit ? `${f.label} — ${f.unit}` : f.label}
               style={cellInput({
                 ...(isText ? { textAlign: "center" as const } : {}),
-                ...(missing ? { borderColor: "rgba(248,113,113,.55)" } : {}),
+                ...(locked ? { opacity: 0.7, cursor: "default", background: "transparent" } : {}),
+                ...(missing && !locked ? { borderColor: "rgba(248,113,113,.55)" } : {}),
               })}
             />
           </td>
@@ -240,17 +246,26 @@ export function RateFormulaMobileFields({
   onChange,
   disabled,
   rowIndex,
+  context,
 }: {
   settings: RateFormulaSettings;
   meta: RateFormulaMeta | undefined;
   onChange: (key: string, value: RateFormulaValue) => void;
   disabled?: boolean;
   rowIndex?: number;
+  /**
+   * "item" is the item master, the one place a locked column is set. Anywhere
+   * else the lock applies. Defaults to a document, so forgetting the prop
+   * errs towards read-only rather than towards a silently editable field.
+   */
+  context?: "document" | "item";
 }) {
+  const onItemForm = context === "item";
   return (
     <>
       {settings.fields.map((f) => {
         const isText = f.kind === "text";
+        const locked = f.lockedToItem && !onItemForm;
         return (
           <div key={f.key}>
             <div
@@ -265,16 +280,22 @@ export function RateFormulaMobileFields({
             >
               {f.label}
               {f.unit ? ` (${f.unit})` : ""}
+              {locked && <span style={{ fontWeight: 600 }}> — from item</span>}
             </div>
             <input
               id={cellId(rowIndex, f.key)}
               type={isText ? "text" : "number"}
               value={meta?.[f.key] ?? ""}
               disabled={disabled}
+              readOnly={locked}
+              tabIndex={locked ? -1 : undefined}
               maxLength={isText ? RATE_FORMULA_TEXT_MAX : undefined}
               onChange={(e) => onChange(f.key, readInput(f, e.target.value))}
-              placeholder={f.defaultValue ? String(f.defaultValue) : isText ? "" : "0"}
-              style={cellInput({ padding: "7px 9px" })}
+              placeholder={locked ? "—" : f.defaultValue ? String(f.defaultValue) : isText ? "" : "0"}
+              style={cellInput({
+                padding: "7px 9px",
+                ...(locked ? { opacity: 0.7, cursor: "default", background: "transparent" } : {}),
+              })}
             />
           </div>
         );

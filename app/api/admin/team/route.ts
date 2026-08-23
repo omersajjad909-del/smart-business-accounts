@@ -1,7 +1,24 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
-import { requireAdmin } from "@/lib/adminAuth";
+import { requireAdmin, revokeAdminSessions } from "@/lib/adminAuth";
+import { SUPER_ADMIN_ONLY_PAGES, normalizeAllowedPages } from "@/lib/adminPages";
+import { ADMIN_NAV_ITEMS } from "@/app/admin/admin-nav";
+
+/**
+ * Accept only ids that name a real page, and never one reserved for super
+ * admins — granting "team" to a team member would be a privilege escalation
+ * written straight into the database, even though requireAdmin would still
+ * refuse it at request time.
+ */
+const KNOWN_PAGE_IDS = new Set(ADMIN_NAV_ITEMS.map((i) => i.id));
+function sanitizePages(input: unknown): string {
+  const list = Array.isArray(input) ? input.map(String) : [];
+  const clean = normalizeAllowedPages(list).filter(
+    (id) => KNOWN_PAGE_IDS.has(id) && !SUPER_ADMIN_ONLY_PAGES.has(id),
+  );
+  return JSON.stringify(clean);
+}
 
 export const runtime = "nodejs";
 
@@ -68,7 +85,7 @@ export async function POST(req: NextRequest) {
         email: email.toLowerCase().trim(),
         passwordHash,
         team: team || null,
-        allowedPages: JSON.stringify(Array.isArray(allowedPages) ? allowedPages : []),
+        allowedPages: sanitizePages(allowedPages),
         active: true,
         isSuperAdmin: false,
       },
@@ -98,9 +115,14 @@ export async function PATCH(req: NextRequest) {
     const data: any = {};
     if (name         !== undefined) data.name         = name;
     if (team         !== undefined) data.team         = team;
-    if (allowedPages !== undefined) data.allowedPages = JSON.stringify(allowedPages);
+    if (allowedPages !== undefined) data.allowedPages = sanitizePages(allowedPages);
     if (active       !== undefined) data.active       = Boolean(active);
     if (password)                   data.passwordHash = await bcrypt.hash(password, 12);
+
+    if (password || active === false || allowedPages !== undefined) {
+      data.tokenVersion = { increment: 1 };
+      if (password) data.passwordChangedAt = new Date();
+    }
 
     const updated = await (prisma as any).adminUser.update({ where: { id }, data });
     return NextResponse.json({ success: true, member: { id: updated.id, name: updated.name, active: updated.active } });

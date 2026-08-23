@@ -309,7 +309,12 @@ export function emptyRateFormulaMeta(
   settings: RateFormulaSettings
 ): Record<string, RateFormulaValue> {
   const out: Record<string, RateFormulaValue> = {};
-  for (const f of settings.fields) out[f.key] = f.defaultValue || "";
+  for (const f of settings.fields) {
+    // The column the cursor lands in is by definition the one typed per
+    // document, so it starts empty however its default is set. Anything else
+    // hands the operator a number to delete before typing their own.
+    out[f.key] = f.focusOnPick ? "" : (f.defaultValue || "");
+  }
   return out;
 }
 
@@ -349,6 +354,9 @@ export function metaFromItem(
   const fromItem = readRateFormulaMeta(settings, itemMeta);
   const out: Record<string, RateFormulaValue> = {};
   for (const f of settings.fields) {
+    // The typed-per-document column is cleared rather than filled, so the
+    // cursor that lands there lands on an empty box.
+    if (f.focusOnPick) { out[f.key] = ""; continue; }
     const saved = fromItem[f.key];
     out[f.key] = saved === "" ? (currentMeta?.[f.key] ?? "") : saved;
   }
@@ -541,4 +549,8 @@ export function validateRateFormula(settings: RateFormulaSettings): RateFormulaP
     )
   );
   if (!probe.ok && probe.error) {
-    problems.push({ field: "expression", message:
+    problems.push({ field: "expression", message: probe.error });
+  }
+
+  return problems;
+}

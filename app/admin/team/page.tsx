@@ -1,8 +1,27 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { getCurrentUser } from "@/lib/auth";
+import { ADMIN_NAV_GROUP_ORDER, ADMIN_NAV_ITEMS } from "@/app/admin/admin-nav";
+import { SUPER_ADMIN_ONLY_PAGES, normalizeAllowedPages } from "@/lib/adminPages";
 import toast from "react-hot-toast";
+
+/**
+ * Pages a team member can be granted. Super-admin-only pages are left out —
+ * ticking them would do nothing, because the API refuses them to anyone who is
+ * not a super admin whatever this list says.
+ */
+const GRANTABLE_PAGES = ADMIN_NAV_ITEMS.filter((i) => !SUPER_ADMIN_ONLY_PAGES.has(i.id));
+
+function parsePages(raw: string | null | undefined): string[] {
+  if (!raw) return [];
+  try {
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? normalizeAllowedPages(parsed.map(String)) : [];
+  } catch {
+    return [];
+  }
+}
 
 type Member = {
   id: string;
@@ -39,6 +58,44 @@ export default function AdminTeamPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [team, setTeam] = useState("");
+  const [newPages, setNewPages] = useState<string[]>(["dashboard"]);
+
+  // Which member row has its page list open, and the working copy being edited.
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editPages, setEditPages] = useState<string[]>([]);
+  const [savingPages, setSavingPages] = useState(false);
+
+  const grouped = useMemo(
+    () => ADMIN_NAV_GROUP_ORDER
+      .map((group) => ({ group, items: GRANTABLE_PAGES.filter((i) => i.group === group) }))
+      .filter((g) => g.items.length > 0),
+    [],
+  );
+
+  function openPages(m: Member) {
+    if (editingId === m.id) { setEditingId(null); return; }
+    setEditingId(m.id);
+    setEditPages(parsePages(m.allowedPages));
+  }
+
+  async function savePages(m: Member) {
+    setSavingPages(true);
+    try {
+      const r = await fetch("/api/admin/team", {
+        method: "PATCH",
+        headers: authHeaders(),
+        body: JSON.stringify({ id: m.id, allowedPages: editPages }),
+      });
+      if (!r.ok) throw new Error("Update failed");
+      toast.success("Page access updated");
+      setEditingId(null);
+      load();
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Update failed");
+    } finally {
+      setSavingPages(false);
+    }
+  }
 
   async function load() {
     setLoading(true);
@@ -65,12 +122,12 @@ export default function AdminTeamPage() {
       const r = await fetch("/api/admin/team", {
         method: "POST",
         headers: authHeaders(),
-        body: JSON.stringify({ name, email, password, team, allowedPages: [] }),
+        body: JSON.stringify({ name, email, password, team, allowedPages: newPages }),
       });
       const d = await r.json();
       if (!r.ok) throw new Error(d.error || "Create failed");
       toast.success("Team member added");
-      setName(""); setEmail(""); setPassword(""); setTeam("");
+      setName(""); setEmail(""); setPassword(""); setTeam(""); setNewPages(["dashboard"]);
       setShowForm(false);
       load();
     } catch (e) {
@@ -113,6 +170,42 @@ export default function AdminTeamPage() {
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Delete failed");
     }
+  }
+
+  function PagePicker({ value, onChange }: { value: string[]; onChange: (v: string[]) => void }) {
+    const toggle = (id: string) =>
+      onChange(value.includes(id) ? value.filter((x) => x !== id) : [...value, id]);
+    return (
+      <div>
+        <div style={{ display: "flex", gap: 8, marginBottom: 10 }}>
+          <button type="button" className="tm-btn-sm" style={pickBtn}
+            onClick={() => onChange(GRANTABLE_PAGES.map((i) => i.id))}>Select all</button>
+          <button type="button" className="tm-btn-sm" style={pickBtn}
+            onClick={() => onChange([])}>Clear</button>
+          <span style={{ fontSize: 11, color: "rgba(255,255,255,.35)", alignSelf: "center" }}>
+            {value.length} of {GRANTABLE_PAGES.length} selected
+          </span>
+        </div>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(210px,1fr))", gap: 14 }}>
+          {grouped.map(({ group, items: gItems }) => (
+            <div key={group}>
+              <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: ".08em", color: "rgba(255,255,255,.3)", marginBottom: 6 }}>
+                {group.toUpperCase()}
+              </div>
+              {gItems.map((item) => (
+                <label key={item.id} style={{ display: "flex", alignItems: "center", gap: 8, padding: "4px 0", fontSize: 12, cursor: "pointer" }}>
+                  <input type="checkbox" checked={value.includes(item.id)} onChange={() => toggle(item.id)} />
+                  <span style={{ color: value.includes(item.id) ? "white" : "rgba(255,255,255,.5)" }}>{item.label}</span>
+                </label>
+              ))}
+            </div>
+          ))}
+        </div>
+        <p style={{ margin: "10px 0 0", fontSize: 11, color: "rgba(255,255,255,.3)" }}>
+          Team, API Keys, Backup &amp; Restore and Dev Test are super-admin only and cannot be granted here.
+        </p>
+      </div>
+    );
   }
 
   const filtered = search.trim()
@@ -171,6 +264,11 @@ export default function AdminTeamPage() {
               <input className="tm-inp" value={team} onChange={e => setTeam(e.target.value)} placeholder="Support, Ops, Growth…" />
             </div>
           </div>
+          <div style={{ marginTop: 18, paddingTop: 16, borderTop: "1px solid rgba(255,255,255,.06)" }}>
+            <label style={{ ...label, marginBottom: 10 }}>Pages this member can open</label>
+            <PagePicker value={newPages} onChange={setNewPages} />
+          </div>
+
           <div style={{ marginTop: 18 }}>
             <button className="tm-btn" onClick={createMember} disabled={creating}
               style={{ background: "linear-gradient(135deg,#6366f1,#4f46e5)", color: "white" }}>
@@ -188,17 +286,17 @@ export default function AdminTeamPage() {
         <table style={{ width: "100%", borderCollapse: "collapse" }}>
           <thead>
             <tr style={{ borderBottom: "1px solid rgba(255,255,255,.07)" }}>
-              {["Name","Email","Team","Status","Last Login","Actions"].map(h => (
+              {["Name","Email","Team","Pages","Status","Last Login","Actions"].map(h => (
                 <th key={h} style={th}>{h.toUpperCase()}</th>
               ))}
             </tr>
           </thead>
           <tbody>
             {loading ? (
-              <tr><td colSpan={6} style={empty}>Loading…</td></tr>
+              <tr><td colSpan={7} style={empty}>Loading…</td></tr>
             ) : filtered.length === 0 ? (
-              <tr><td colSpan={6} style={empty}>No team members yet</td></tr>
-            ) : filtered.map(m => (
+              <tr><td colSpan={7} style={empty}>No team members yet</td></tr>
+            ) : filtered.flatMap(m => [
               <tr key={m.id} style={{ borderBottom: "1px solid rgba(255,255,255,.04)" }}>
                 <td style={{ ...td, fontWeight: 700 }}>
                   {m.name}
@@ -206,6 +304,15 @@ export default function AdminTeamPage() {
                 </td>
                 <td style={{ ...td, color: "rgba(255,255,255,.6)" }}>{m.email}</td>
                 <td style={td}>{m.team || "—"}</td>
+                <td style={td}>
+                  {m.isSuperAdmin ? (
+                    <span style={{ fontSize: 11, color: "rgba(255,255,255,.4)" }}>All pages</span>
+                  ) : (
+                    <button className="tm-btn-sm" onClick={() => openPages(m)} style={pickBtn}>
+                      {parsePages(m.allowedPages).length} pages
+                    </button>
+                  )}
+                </td>
                 <td style={td}>
                   <span style={{ padding: "3px 10px", borderRadius: 20, fontSize: 11, fontWeight: 700,
                     background: m.active ? "rgba(52,211,153,.15)" : "rgba(148,163,184,.15)",
@@ -232,8 +339,28 @@ export default function AdminTeamPage() {
                     )}
                   </div>
                 </td>
-              </tr>
-            ))}
+              </tr>,
+              editingId === m.id ? (
+                <tr key={m.id + "-pages"} style={{ borderBottom: "1px solid rgba(255,255,255,.04)", background: "rgba(255,255,255,.02)" }}>
+                  <td colSpan={7} style={{ padding: "18px 16px" }}>
+                    <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 12 }}>
+                      Page access — {m.name}
+                    </div>
+                    <PagePicker value={editPages} onChange={setEditPages} />
+                    <div style={{ marginTop: 14, display: "flex", gap: 8 }}>
+                      <button className="tm-btn" onClick={() => savePages(m)} disabled={savingPages}
+                        style={{ background: "linear-gradient(135deg,#6366f1,#4f46e5)", color: "white" }}>
+                        {savingPages ? "Saving…" : "Save access"}
+                      </button>
+                      <button className="tm-btn" onClick={() => setEditingId(null)}
+                        style={{ background: "rgba(255,255,255,.06)", color: "rgba(255,255,255,.6)" }}>
+                        Cancel
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ) : null,
+            ])}
           </tbody>
         </table>
       </div>
@@ -245,6 +372,7 @@ const th: React.CSSProperties = { padding: "12px 16px", textAlign: "left", fontS
 const td: React.CSSProperties = { padding: "13px 16px", fontSize: 13 };
 const empty: React.CSSProperties = { padding: 40, textAlign: "center", color: "rgba(255,255,255,.3)" };
 const label: React.CSSProperties = { fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,.35)", display: "block", marginBottom: 6 };
+const pickBtn: React.CSSProperties = { background: "rgba(129,140,248,.15)", color: "#a5b4fc" };
 
 const css = `
   .tm-inp { width:100%; background:rgba(255,255,255,.04); border:1.5px solid rgba(255,255,255,.1); border-radius:10px; padding:10px 12px; color:white; font-family:inherit; font-size:13px; outline:none; box-sizing:border-box; }
