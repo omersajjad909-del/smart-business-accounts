@@ -21,7 +21,7 @@ const FORGE_HOSTS = ["finovaforge.com", "www.finovaforge.com"];
  * On the app domain /admin and the admin APIs render an ordinary 404 — the
  * same page any nonexistent URL gets, so probing cannot tell the difference.
  */
-const ADMIN_HOSTS = (process.env.ADMIN_HOST || "ikj.finovaos.app")
+const ADMIN_HOSTS = (process.env.ADMIN_HOST || "")
   .split(",")
   .map((h) => h.trim().toLowerCase())
   .filter(Boolean);
@@ -175,7 +175,13 @@ export async function proxy(req: NextRequest) {
   const onAdminHost = ADMIN_HOSTS.includes(host);
   // Never enforced on localhost or preview URLs — there is only one hostname
   // there and the console still has to be reachable.
-  const hostSplitEnforced = ADMIN_HOSTS.length > 0 && !isLocalHost(host);
+  //
+  // In production the split holds even when ADMIN_HOST is unset: everything
+  // 404s rather than quietly falling back to serving the console on the app
+  // domain. A forgotten environment variable then shows up as "the console is
+  // gone" — which gets fixed — instead of a silently exposed /admin.
+  const hostSplitEnforced =
+    !isLocalHost(host) && (ADMIN_HOSTS.length > 0 || process.env.NODE_ENV === "production");
 
   if (onAdminHost) {
     // The admin host serves the console and nothing else. No marketing site,
