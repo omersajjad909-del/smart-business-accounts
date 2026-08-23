@@ -125,8 +125,6 @@ export default function AdminSecurityPage() {
     toast.success("Locked. The password will be asked for again.");
   }
 
-  const lockedCount = cfg?.pages.length ?? 0;
-
   if (loading) {
     return <div style={{ padding: 40, color: "rgba(255,255,255,.4)" }}>Loading…</div>;
   }

@@ -6,7 +6,10 @@
  * Signing in gets you into the console. This adds an extra password on top of
  * whichever pages a super admin picks — so even a signed-in admin has to type
  * it before Revenue, Companies, Backup, or whatever else is ticked, will open.
- * Unlocking lasts 30 minutes and then the pages close again by themselves.
+ *
+ * It behaves like an app lock on a phone: one page at a time, and the page
+ * re-locks the moment it is left or the tab is closed. The point is that a
+ * stolen console session is not by itself enough to read the locked pages.
  *
  * Stored as an ActivityLog row (newest wins), the same way the admin settings
  * and the company security policy are stored, so this needs no migration.

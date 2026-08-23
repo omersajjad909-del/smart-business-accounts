@@ -5,14 +5,60 @@ import HelpfulWidget from "@/components/HelpfulWidget";
 
 const BASE = process.env.NEXT_PUBLIC_BASE_URL || "https://www.finovaos.app";
 
+/**
+ * Per-article metadata.
+ *
+ * This used to return the canonical and nothing else, which meant every one of
+ * the ~55 articles inherited the Help Center layout title and description
+ * verbatim. Googlebot saw a few dozen URLs with identical titles and identical
+ * descriptions, grouped them, and reported the lot as "Duplicate without
+ * user-selected canonical" — the canonical was there, it just was not trusted
+ * against that much sameness. Each article now describes itself.
+ */
 export async function generateMetadata({
   params,
 }: {
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
+  const article = ARTICLES[slug];
+  const url = `${BASE}/help/${slug}`;
+
+  if (!article) {
+    return {
+      title: "Article not found",
+      robots: { index: false, follow: true },
+      alternates: { canonical: url },
+    };
+  }
+
+  // The intro block is written as the article summary, so it doubles as the
+  // meta description. Markdown bold markers have to come out first.
+  const intro = article.content.find(b => b.type === "intro")?.text ?? "";
+  const description =
+    (intro || `${article.title} — a step-by-step FinovaOS guide.`)
+      .replace(/**/g, "")
+      .slice(0, 300);
+
   return {
-    alternates: { canonical: `${BASE}/help/${slug}` },
+    title: article.title,
+    description,
+    keywords: [article.title, article.category, "FinovaOS help", "FinovaOS guide"],
+    openGraph: {
+      title: article.title,
+      description,
+      url,
+      siteName: "FinovaOS",
+      type: "article",
+      images: [{ url: `${BASE}/icon.png`, width: 1200, height: 630, alt: article.title }],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: article.title,
+      description,
+      images: [`${BASE}/icon.png`],
+    },
+    alternates: { canonical: url },
   };
 }
 

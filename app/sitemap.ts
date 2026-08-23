@@ -3,6 +3,7 @@
 
 import { MetadataRoute } from "next";
 import { SEO_ARTICLES } from "./(marketing)/blog/seo-articles";
+import { LIVE_TYPES } from "@/lib/businessModules";
 
 const BASE = process.env.NEXT_PUBLIC_BASE_URL || "https://www.finovaos.app";
 
@@ -98,12 +99,23 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.75,
   }));
 
-  // Help articles
-  // Must be real keys of ARTICLES in app/(marketing)/help/[slug]/page.tsx.
-  // "invoicing", "inventory", "payroll" and "reports" were category names, not
-  // article slugs — all four 404'd, and a submitted URL that 404s is dead
-  // crawl budget. These are the real articles covering the same topics.
-  const helpSlugs = ["getting-started", "create-invoice", "stock-entries", "run-payroll", "bank-reconciliation", "export-reports"];
+  // Help articles.
+  // Every key of ARTICLES in app/(marketing)/help/[slug]/page.tsx. Google was
+  // already crawling these; leaving them out of the sitemap meant it had to
+  // guess at the canonical, which is how "?helpful=yes|no" variants ended up
+  // competing with the real article URLs.
+  const helpSlugs = [
+    "add-branch", "add-employees", "add-products", "attendance", "balance-sheet", "bank-reconciliation",
+    "branch-roles", "cancel-subscription", "cash-flow", "chart-of-accounts", "choose-plan", "company-profile",
+    "connect-bank", "consolidated-pl", "cpv", "create-account", "create-invoice", "credit-notes",
+    "crv", "data-export", "delete-account", "download-invoices", "export-reports", "first-invoice",
+    "getting-started", "grn", "import-statements", "inventory-valuation", "invite-team", "journal-entries",
+    "leave-management", "match-transactions", "multi-company", "multiple-accounts", "payslips", "period-locking",
+    "pl-statement", "purchase-orders", "quotation-invoice", "record-payment", "recurring-invoices", "run-payroll",
+    "salary-advance", "scheduled-reports", "send-invoice", "stock-alerts", "stock-entries", "stock-reports",
+    "stock-transfer", "switch-company", "tax-summary", "trial-balance", "unmatched-transactions", "update-payment",
+    "upgrade-plan",
+  ];
   const helpPages = helpSlugs.map(slug => ({
     url: `${BASE}/help/${slug}`,
     lastModified: now,
@@ -111,5 +123,17 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.55,
   }));
 
-  return [...staticPages, ...extraPages, ...seoArticlePages, ...blogPages, ...helpPages];
+  // Industry landing pages. Only the industries that are actually live get
+  // submitted — the coming-soon ones still carry a self-referencing canonical
+  // (see app/(marketing)/for/[industry]/layout.tsx) but they are thin, so
+  // pushing ~90 of them at Google would invite the duplicate-content problem
+  // this sitemap is meant to help solve.
+  const industryPages = LIVE_TYPES.map(id => ({
+    url: `${BASE}/for/${id}`,
+    lastModified: now,
+    changeFrequency: "monthly" as const,
+    priority: 0.7,
+  }));
+
+  return [...staticPages, ...extraPages, ...seoArticlePages, ...blogPages, ...helpPages, ...industryPages];
 }
