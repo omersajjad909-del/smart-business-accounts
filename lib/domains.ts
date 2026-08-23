@@ -14,13 +14,6 @@ export function getAppUrl() {
   return normalizeUrl(process.env.NEXT_PUBLIC_APP_URL, DEFAULT_APP_URL);
 }
 
-export function getAdminUrl() {
-  return normalizeUrl(
-    process.env.NEXT_PUBLIC_ADMIN_URL,
-    `${getMarketingUrl().replace("://", "://admin.")}`,
-  );
-}
-
 export function getApiUrl() {
   return normalizeUrl(
     process.env.NEXT_PUBLIC_API_URL,

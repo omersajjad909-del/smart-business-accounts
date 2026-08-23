@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { BUSINESS_PHASE_CONFIG } from "@/lib/businessModules";
+import { getAppUrl } from "@/lib/domains";
 
 const PLANS = [
   { id: "STARTER",    label: "Starter",    color: "#818cf8", emoji: "🚀" },
@@ -95,7 +96,13 @@ export default function DevTestPage() {
         setLaunching(false);
         return;
       }
-      window.location.href = "/dashboard";
+      // The console is on its own hostname; the session cookie set by the
+      // launch route does not reach the app domain. Hand the token over the
+      // same way "Open as Owner" does.
+      const launched = await r.json().catch(() => ({} as any));
+      window.location.href = launched?.token
+        ? `${getAppUrl()}/api/auth/impersonate-handoff?token=${encodeURIComponent(launched.token)}`
+        : `${getAppUrl()}/dashboard`;
     } catch (err) {
       // Never swallow this. The empty catch that used to be here is exactly why
       // clicking Launch appeared to do nothing whatsoever.

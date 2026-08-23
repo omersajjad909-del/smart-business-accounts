@@ -37,17 +37,24 @@ function isLocalHost(host: string): boolean {
   );
 }
 
-/** Paths the admin host is allowed to serve. Everything else there 404s. */
+/**
+ * Paths the admin host is allowed to serve. Everything else there 404s.
+ *
+ * Pages are the strict part: no marketing site, no tenant dashboard, no
+ * onboarding — a visitor who guesses the hostname finds only a login box.
+ * APIs stay open because several console screens legitimately call endpoints
+ * outside /api/admin (automation, chat, invitations), and those endpoints are
+ * reachable on the app domain regardless, so refusing them here would break
+ * the console without hiding anything.
+ */
 function isAdminHostPath(pathname: string): boolean {
   return (
     pathname === "/admin" ||
     pathname.startsWith("/admin/") ||
-    pathname.startsWith("/api/admin/") ||
+    pathname.startsWith("/api/") ||
     pathname.startsWith("/_next/") ||
-    pathname.startsWith("/api/track/") ||
-    pathname === "/favicon.ico" ||
-    pathname === "/icon.png" ||
-    pathname === "/robots.txt"
+    // Static assets: any path ending in a file extension.
+    /\.[a-z0-9]+$/i.test(pathname)
   );
 }
 

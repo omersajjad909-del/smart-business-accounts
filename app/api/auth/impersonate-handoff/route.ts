@@ -30,11 +30,14 @@ export async function GET(req: NextRequest) {
     return NextResponse.redirect(loginUrl);
   }
 
-  const decoded = verifyJwt(token) as { impersonatedBy?: string; exp?: number } | null;
+  const decoded = verifyJwt(token) as
+    | { impersonatedBy?: string; isTestMode?: boolean; exp?: number }
+    | null;
 
-  // Only accept tokens actually minted for impersonation — a normal user token
-  // must not be usable to bootstrap a session through this endpoint.
-  if (!decoded || !decoded.impersonatedBy) {
+  // Only accept tokens actually minted for one of the two admin hand-offs —
+  // impersonation, or a dev-test session. A normal user token must not be
+  // usable to bootstrap a session through this endpoint.
+  if (!decoded || !(decoded.impersonatedBy || decoded.isTestMode === true)) {
     loginUrl.searchParams.set("error", "invalid_token");
     return NextResponse.redirect(loginUrl);
   }

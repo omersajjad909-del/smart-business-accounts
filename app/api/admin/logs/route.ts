@@ -7,6 +7,7 @@ import {
   redactLogs,
 } from "@/lib/logRedaction";
 import { getCompanyNoMap } from "@/lib/companyRefServer";
+import { requireAdmin } from "@/lib/adminAuth";
 
 /**
  * Two callers share this route:
@@ -20,15 +21,22 @@ import { getCompanyNoMap } from "@/lib/companyRefServer";
  */
 export async function GET(req: NextRequest) {
   try {
-    const payload = verifyJwt(getTokenFromRequest(req) || "");
-    if (!payload) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    // Platform console first: it signs in with `sb_admin`, a different cookie
+    // from the tenant one, so the two callers are told apart by which cookie
+    // they present rather than by a claim inside a shared token.
+    const admin = await requireAdmin(req, { page: "logs" });
+    const isPlatformAdmin = !(admin instanceof NextResponse);
 
-    const isPlatformAdmin = payload.scope === "admin";
-    const sessionCompanyId = String(payload.companyId || payload.defaultCompanyId || "");
-    const isTenantAdmin = String(payload.role || "").toUpperCase() === "ADMIN" && !!sessionCompanyId;
-
-    if (!isPlatformAdmin && !isTenantAdmin) {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    let sessionCompanyId = "";
+    if (!isPlatformAdmin) {
+      const payload = verifyJwt(getTokenFromRequest(req) || "");
+      if (!payload) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      sessionCompanyId = String(payload.companyId || payload.defaultCompanyId || "");
+      const isTenantAdmin =
+        String(payload.role || "").toUpperCase() === "ADMIN" && !!sessionCompanyId;
+      if (!isTenantAdmin) {
+        return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+      }
     }
 
     const { searchParams } = new URL(req.url);

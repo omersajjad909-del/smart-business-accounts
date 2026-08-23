@@ -5,8 +5,9 @@ const BASE = process.env.NEXT_PUBLIC_BASE_URL || "https://www.finovaos.app";
 
 /** Private surfaces. Applied to every crawler, including the AI ones. */
 const PRIVATE_PATHS = [
-  "/admin",
-  "/admin/",
+  // "/admin" is deliberately absent. The console is not served on this domain
+  // at all — it 404s here — so listing it would only point at something that
+  // is meant to be unadvertised. See ADMIN_HOST in proxy.ts.
   "/dashboard",
   "/dashboard/",
   "/api/",
