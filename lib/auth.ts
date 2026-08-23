@@ -221,17 +221,40 @@ export function verifyJwt(
   }
 }
 
-export function getTokenFromRequest(req: Request): string | null {
+/**
+ * Cookie names.
+ *
+ * The admin console gets its OWN cookie. Sharing `sb_auth` with the tenant app
+ * meant one stolen or confused cookie reached both, and `sameSite:"lax"` had to
+ * stay loose for the marketing site. `sb_admin` is written `sameSite:"strict"`
+ * and is only ever minted by /api/admin/auth/2fa/verify.
+ */
+export const AUTH_COOKIE = "sb_auth";
+export const ADMIN_COOKIE = "sb_admin";
+/** Short-lived cookie that holds a password-verified, not-yet-OTP-verified admin. */
+export const ADMIN_PENDING_COOKIE = "sb_admin_pending";
+
+export function getCookieFromRequest(req: Request, name: string): string | null {
   try {
     const cookieHeader = req.headers.get("cookie") || "";
     const parts = cookieHeader.split(";").map((c) => c.trim());
+    const prefix = `${name}=`;
     for (const part of parts) {
-      if (part.startsWith("sb_auth=")) {
-        return decodeURIComponent(part.substring("sb_auth=".length));
+      if (part.startsWith(prefix)) {
+        return decodeURIComponent(part.substring(prefix.length));
       }
     }
     return null;
   } catch {
     return null;
   }
+}
+
+export function getTokenFromRequest(req: Request): string | null {
+  return getCookieFromRequest(req, AUTH_COOKIE);
+}
+
+/** The platform admin console session — never falls back to `sb_auth`. */
+export function getAdminTokenFromRequest(req: Request): string | null {
+  return getCookieFromRequest(req, ADMIN_COOKIE);
 }

@@ -728,6 +728,10 @@ model User {
   twoFactorEnabled Boolean @default(false)
   twoFactorSecret  String?
 
+  // Platform-admin console session revocation. Bumped on password change or
+  // deactivation so live `scope:"admin"` tokens stop verifying immediately.
+  adminTokenVersion Int @default(0)
+
   // Referral
   referralCode String?    @unique
   referrals    Referral[] @relation("ReferrerUser")
@@ -1801,6 +1805,24 @@ model AdminUser {
   active       Boolean   @default(true)
   createdAt    DateTime  @default(now())
   lastLoginAt  DateTime?
+
+  // -- Mandatory TOTP (authenticator app, 30s rotating code) --------------
+  // Enrolment happens on first login: the secret is stored while
+  // `totpEnabled` is still false, and only flips to true once the admin has
+  // proved they can read a live code off their authenticator.
+  totpSecret  String?
+  totpEnabled Boolean @default(false)
+
+  // -- Brute-force lockout ------------------------------------------------
+  // Per-account, so it survives an attacker rotating IPs. Reset on success.
+  failedAttempts Int       @default(0)
+  lockedUntil    DateTime?
+
+  // -- Session revocation -------------------------------------------------
+  // Every admin token carries `tv`; bumping this invalidates every live
+  // session for the account (password change, disable, sign-out-everywhere).
+  tokenVersion      Int       @default(0)
+  passwordChangedAt DateTime?
 }
 
 // ─── Coupons ──────────────────────────────────────────────────────────────────
