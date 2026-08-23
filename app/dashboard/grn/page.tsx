@@ -13,7 +13,6 @@ import {
   RateFormulaHeadCells,
   RateFormulaRowCells,
   RateFormulaMobileFields,
-  RateFormulaHint,
   rateFormulaPrintColumns,
   rateFormulaPrintValues,
   rateFormulaLineIncomplete,
@@ -446,7 +445,6 @@ export default function GRNPage() {
                               {rfActive && (
                                 <td style={{ padding: "6px 8px", width: 94 }}>
                                   <input type="number" value={row.rate} onChange={e => updateRow(idx, "rate", e.target.value)} readOnly={!rf.rateEditable} title={!rf.rateEditable ? "Worked out by your rate formula" : undefined} placeholder="0.00" style={inp({ padding: "5px 7px", textAlign: "right", ...(rf.rateEditable ? {} : { opacity: 0.75, cursor: "not-allowed" }) })} />
-                                  <RateFormulaHint settings={rf} meta={row.meta} />
                                 </td>
                               )}
                               <td style={{ padding: "6px 8px" }}><input value={row.remarks} onChange={e => updateRow(idx, "remarks", e.target.value)} placeholder="Note..." style={inp({ padding: "5px 8px", fontSize: 12 })} /></td>

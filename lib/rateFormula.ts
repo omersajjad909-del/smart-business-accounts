@@ -69,8 +69,19 @@ export type RateFormulaField = {
    * the product — so it is the one thing the operator still has to type. Naming
    * it here means the keyboard is already there instead of the operator
    * reaching for the mouse on every line. At most one column may claim it.
+   *
+   * Such a column is also never pre-filled — not from its own default, not
+   * from the item. Landing the cursor on a value the operator must replace
+   * anyway only invites a stale number surviving into the order.
    */
   focusOnPick: boolean;
+  /**
+   * The value is a property of the item and is set on the item, not typed on
+   * the line. It still shows on every document and still prints; it is simply
+   * read-only there, so a shade code cannot drift between the item master and
+   * the order that quotes it.
+   */
+  lockedToItem: boolean;
 };
 
 /** Longest a text column's value may be — a code, not a paragraph. */
@@ -180,17 +191,18 @@ export const RATE_FORMULA_PRESETS: Array<{
       rateEditable: true,
       expression: "rtmm * gauge * width * length / divisor",
       fields: [
-        { key: "gauge",  label: "Gauge",   unit: "",       kind: "number", defaultValue: 0,  width: 60, affectsRate: true,  showOnPrint: true, required: true,  focusOnPick: false },
-        { key: "width",  label: "Width",   unit: "in",     kind: "number", defaultValue: 0,  width: 60, affectsRate: true,  showOnPrint: true, required: true,  focusOnPick: false },
-        { key: "length", label: "Length",  unit: "m",      kind: "number", defaultValue: 0,  width: 60, affectsRate: true,  showOnPrint: true, required: true,  focusOnPick: false },
+        { key: "gauge",  label: "Gauge",   unit: "",       kind: "number", defaultValue: 0, width: 60, affectsRate: true,  showOnPrint: true, required: true,  focusOnPick: false, lockedToItem: false },
+        { key: "width",  label: "Width",   unit: "in",     kind: "number", defaultValue: 0, width: 60, affectsRate: true,  showOnPrint: true, required: true,  focusOnPick: false, lockedToItem: false },
+        { key: "length", label: "Length",  unit: "m",      kind: "number", defaultValue: 0, width: 60, affectsRate: true,  showOnPrint: true, required: true,  focusOnPick: false, lockedToItem: false },
         // PHR belongs to the batch being ordered, not to the product, so it is
-        // typed on every order. 30 is the middle of the usual 22–32 range — a
-        // starting point, and where the cursor lands after picking an item.
-        { key: "phr",    label: "PHR",     unit: "",       kind: "number", defaultValue: 30, width: 55, affectsRate: false, showOnPrint: true, required: false, focusOnPick: true },
+        // typed on every order — blank on a fresh line, and where the cursor
+        // lands after picking an item.
+        { key: "phr",    label: "PHR",     unit: "",       kind: "number", defaultValue: 0, width: 55, affectsRate: false, showOnPrint: true, required: false, focusOnPick: true,  lockedToItem: false },
         // A shade is a code, not a quantity — "15-L", "15-F". Text, so the
-        // suffix survives, and never part of the maths.
-        { key: "shade",  label: "Shade #", unit: "",       kind: "text",   defaultValue: "", width: 65, affectsRate: false, showOnPrint: true, required: false, focusOnPick: false },
-        { key: "rtmm",   label: "RT/MM",   unit: "per mm", kind: "number", defaultValue: 0,  width: 60, affectsRate: true,  showOnPrint: true, required: true,  focusOnPick: false },
+        // suffix survives; never part of the maths; and set on the item, so an
+        // order can never quote a shade the item master does not carry.
+        { key: "shade",  label: "Shade #", unit: "",       kind: "text",   defaultValue: "", width: 65, affectsRate: false, showOnPrint: true, required: false, focusOnPick: false, lockedToItem: true },
+        { key: "rtmm",   label: "RT/MM",   unit: "per mm", kind: "number", defaultValue: 0, width: 60, affectsRate: true,  showOnPrint: true, required: true,  focusOnPick: false, lockedToItem: false },
       ],
     },
   },
@@ -226,6 +238,7 @@ function normalizeField(raw: unknown): RateFormulaField | null {
     showOnPrint: f.showOnPrint !== false,
     required: Boolean(f.required),
     focusOnPick: Boolean(f.focusOnPick),
+    lockedToItem: Boolean(f.lockedToItem),
   };
 }
 
@@ -528,8 +541,4 @@ export function validateRateFormula(settings: RateFormulaSettings): RateFormulaP
     )
   );
   if (!probe.ok && probe.error) {
-    problems.push({ field: "expression", message: probe.error });
-  }
-
-  return problems;
-}
+    problems.push({ field: "expression", message:

@@ -32,6 +32,9 @@ const ImageAdjusterModal = dynamic(() => import("@/components/ImageAdjusterModal
 const DemoSessionTimer   = dynamic(() => import("@/components/DemoSessionTimer"),   { ssr: false });
 const GlobalSearch       = dynamic(() => import("@/components/GlobalSearch"),       { ssr: false });
 
+/** Where this browser remembers whether the sidebar is collapsed. */
+const SIDEBAR_COLLAPSED_KEY = "finova.sidebarCollapsed";
+
 // Context to pass sidebarCollapsed + expand function to nav components
 const SidebarCtx = createContext<{ collapsed: boolean; expand: () => void; canShowHref: (href: string) => boolean }>({
   collapsed: false,
@@ -229,7 +232,28 @@ export default function DashboardLayout({
   // SIDEBAR STATES — single accordion state for top-level sections
   const [openSection, setOpenSection] = useState<string | null>(null);
   const toggle = (id: string) => setOpenSection(p => p === id ? null : id);
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  /**
+   * Collapsed or not, remembered across navigations.
+   *
+   * This used to be plain `useState(false)`, so every page opened with the
+   * sidebar expanded again — and Settings → Appearance had a "Sidebar default"
+   * choice that was written to the database, stamped on `<html>` by
+   * AppearanceApplier, and then read by nobody. On a wide document grid the
+   * 260px it costs is the difference between a table that fits and one that
+   * scrolls, so the choice has to stick.
+   *
+   * Read synchronously from localStorage so the first paint is already right;
+   * the saved preference fills in below for a browser that has never been told.
+   */
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(() => {
+    if (typeof window === "undefined") return false;
+    try {
+      const stored = window.localStorage.getItem(SIDEBAR_COLLAPSED_KEY);
+      if (stored === "1") return true;
+      if (stored === "0") return false;
+    } catch {}
+    return document.documentElement.getAttribute("data-sidebar-default") === "collapsed";
+  });
   const SW = sidebarCollapsed ? 64 : 260;
   // Sub-group states (independent within their parent section)
   const [openCatalog, setOpenCatalog] = useState(false);
@@ -397,6 +421,33 @@ export default function DashboardLayout({
   // Mobile drawer is full-width — an icon-only rail has no place there
   useEffect(() => {
     if (isMobileViewport) setSidebarCollapsed(false);
+  }, [isMobileViewport]);
+
+  // Remember the choice for the next page. Not written on mobile, where the
+  // value above is forced rather than chosen.
+  useEffect(() => {
+    if (isMobileViewport) return;
+    try {
+      window.localStorage.setItem(SIDEBAR_COLLAPSED_KEY, sidebarCollapsed ? "1" : "0");
+    } catch {}
+  }, [sidebarCollapsed, isMobileViewport]);
+
+  // A browser that has never been told falls back to the saved preference,
+  // which AppearanceApplier stamps on <html> once it has fetched it.
+  useEffect(() => {
+    if (isMobileViewport) return;
+    try {
+      if (window.localStorage.getItem(SIDEBAR_COLLAPSED_KEY) !== null) return;
+    } catch { return; }
+    const observer = new MutationObserver(() => {
+      const attr = document.documentElement.getAttribute("data-sidebar-default");
+      if (attr === "collapsed" || attr === "expanded") {
+        setSidebarCollapsed(attr === "collapsed");
+        observer.disconnect();
+      }
+    });
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ["data-sidebar-default"] });
+    return () => observer.disconnect();
   }, [isMobileViewport]);
 
   // Only trading companies can see the Rate Formula link at all, so only they

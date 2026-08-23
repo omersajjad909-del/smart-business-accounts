@@ -19,7 +19,6 @@ import {
   RateFormulaHeadCells,
   RateFormulaRowCells,
   RateFormulaMobileFields,
-  RateFormulaHint,
   rateFormulaPrintColumns,
   rateFormulaPrintValues,
   rateFormulaLineIncomplete,
@@ -912,7 +911,6 @@ function SalesInvoiceContent() {
                                   <td style={{ padding: "6px 7px", fontSize: 12, color: "var(--text-muted)", width: 52 }}>{r.unit || "—"}</td>
                                   <td style={{ padding: "6px 7px", width: 94 }}>
                                     <input type="number" style={{ ...inputStyle, padding: "5px 7px", textAlign: "right", fontSize: 13, ...(rfActive && !rf.rateEditable ? { opacity: 0.75, cursor: "not-allowed" } : {}) }} value={r.rate} onChange={e => updateRow(i, "rate", e.target.value)} readOnly={rfActive && !rf.rateEditable} title={rfActive && !rf.rateEditable ? "Worked out by your rate formula" : undefined} placeholder="0.00" />
-                                    {rfActive && <RateFormulaHint settings={rf} meta={r.meta} />}
                                   </td>
                                   <td style={{ padding: "6px 7px", width: 66 }}>
                                     <input type="number" style={{ ...inputStyle, padding: "5px 7px", textAlign: "right", fontSize: 13 }} value={r.discountPercent} onChange={e => updateRow(i, "discountPercent", e.target.value)} placeholder="0" />

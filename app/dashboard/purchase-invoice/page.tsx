@@ -18,7 +18,6 @@ import {
   RateFormulaHeadCells,
   RateFormulaRowCells,
   RateFormulaMobileFields,
-  RateFormulaHint,
   rateFormulaPrintColumns,
   rateFormulaPrintValues,
   rateFormulaLineIncomplete,
@@ -1257,7 +1256,6 @@ const [searchTerm, setSearchTerm] = useState("");
                                         ...(rfActive && !rf.rateEditable ? { opacity: 0.75, cursor: "not-allowed" } : {}),
                                       })}
                                     />
-                                    {rfActive && <RateFormulaHint settings={rf} meta={r.meta} />}
                                   </td>
                                   <td style={{ padding: "7px 8px", width: 64 }}><input type="number" value={r.discountPercent} onChange={e => updateRow(i, "discountPercent", e.target.value)} placeholder="0" style={inp({ padding: "5px 7px", textAlign: "right", fontSize: 12.5 })} /></td>
                                   <td style={{ padding: "7px 8px", width: 64 }}><input type="number" value={r.taxPercent} onChange={e => updateRow(i, "taxPercent", e.target.value)} placeholder="0" style={inp({ padding: "5px 7px", textAlign: "right", fontSize: 12.5 })} /></td>

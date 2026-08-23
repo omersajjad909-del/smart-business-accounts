@@ -13,7 +13,6 @@ import {
   RateFormulaHeadCells,
   RateFormulaRowCells,
   RateFormulaMobileFields,
-  RateFormulaHint,
   rateFormulaPrintColumns,
   rateFormulaPrintValues,
   rateFormulaLineIncomplete,
@@ -555,7 +554,6 @@ export default function PurchaseOrderPage() {
                               <td style={{ padding: isMobile ? "8px 8px" : "6px 7px", width: 64 }}><input type="number" value={r.qty} onChange={e => updateRow(i, "qty", e.target.value)} placeholder="0" style={inp({ padding: isMobile ? "8px 8px" : "5px 7px", textAlign: "right", fontSize: 13 })} /></td>
                               <td style={{ padding: isMobile ? "8px 8px" : "6px 7px", width: 90 }}>
                                 <input type="number" value={r.rate} onChange={e => updateRow(i, "rate", e.target.value)} readOnly={rfActive && !rf.rateEditable} title={rfActive && !rf.rateEditable ? "Worked out by your rate formula" : undefined} placeholder="0.00" style={inp({ padding: isMobile ? "8px 8px" : "5px 7px", textAlign: "right", fontSize: 13, ...(rfActive && !rf.rateEditable ? { opacity: 0.75, cursor: "not-allowed" } : {}) })} />
-                                {rfActive && <RateFormulaHint settings={rf} meta={r.meta} />}
                               </td>
                               {/* Per-line Disc % and Tax % are no longer typed on
                                   this grid. The values still travel with the row
