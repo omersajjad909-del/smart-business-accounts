@@ -23,7 +23,17 @@ const FORGE_HOSTS = ["finovaforge.com", "www.finovaforge.com"];
  */
 const ADMIN_HOSTS = (process.env.ADMIN_HOST || "")
   .split(",")
-  .map((h) => h.trim().toLowerCase())
+  // Forgiving about how the value was typed: "https://pvc.example.app/",
+  // "PVC.example.app" and "pvc.example.app:443" all mean the same host, and a
+  // near-miss here silently 404s the whole console.
+  .map((h) =>
+    h
+      .trim()
+      .toLowerCase()
+      .replace(/^[a-z]+:\/\//, "")
+      .replace(/\/.*$/, "")
+      .split(":")[0],
+  )
   .filter(Boolean);
 
 /** Hosts where the split is not enforced, so local dev and previews still work. */
