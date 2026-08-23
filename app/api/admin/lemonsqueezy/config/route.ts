@@ -16,7 +16,7 @@ function isSet(val: string) {
 }
 
 export async function GET(req: NextRequest) {
-  const admin = requireAdmin(req);
+  const admin = await requireAdmin(req);
   if (admin instanceof NextResponse) return admin;
 
   const apiKey     = env("LEMONSQUEEZY_API_KEY");

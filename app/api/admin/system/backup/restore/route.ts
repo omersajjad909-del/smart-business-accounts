@@ -15,7 +15,7 @@ export const maxDuration = 60;
  * exactly why the admin panel could not restore anyone's data.
  */
 export async function POST(req: NextRequest) {
-  const admin = requireAdmin(req);
+  const admin = await requireAdmin(req);
   if (admin instanceof NextResponse) return admin;
 
   const { backupId, confirmCompanyId } = await req.json().catch(() => ({} as any));

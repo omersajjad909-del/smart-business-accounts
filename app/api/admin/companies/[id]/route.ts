@@ -10,7 +10,7 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const admin = requireAdmin(req);
+    const admin = await requireAdmin(req);
     if (admin instanceof NextResponse) return admin;
 
     // The route param is a companyNo ("100004") on every link the admin UI
@@ -124,7 +124,7 @@ export async function PATCH(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const admin = requireAdmin(req);
+    const admin = await requireAdmin(req);
     if (admin instanceof NextResponse) return admin;
 
     const { id: ref } = await params;

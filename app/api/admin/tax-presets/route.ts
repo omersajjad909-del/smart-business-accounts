@@ -90,7 +90,7 @@ async function seedDefaultsIfEmpty() {
 
 export async function GET(req: NextRequest) {
   try {
-    const admin = requireAdmin(req);
+    const admin = await requireAdmin(req);
     if (admin instanceof NextResponse) return admin;
 
     const presets = await seedDefaultsIfEmpty();
@@ -108,7 +108,7 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
-    const admin = requireAdmin(req);
+    const admin = await requireAdmin(req);
     if (admin instanceof NextResponse) return admin;
     await ensureAdminTaxPresetTable();
     const body = await req.json();
@@ -134,7 +134,7 @@ export async function POST(req: NextRequest) {
 
 export async function PUT(req: NextRequest) {
   try {
-    const admin = requireAdmin(req);
+    const admin = await requireAdmin(req);
     if (admin instanceof NextResponse) return admin;
     await ensureAdminTaxPresetTable();
     const id = req.nextUrl.searchParams.get("id");
@@ -159,7 +159,7 @@ export async function PUT(req: NextRequest) {
 
 export async function DELETE(req: NextRequest) {
   try {
-    const admin = requireAdmin(req);
+    const admin = await requireAdmin(req);
     if (admin instanceof NextResponse) return admin;
     await ensureAdminTaxPresetTable();
     const id = req.nextUrl.searchParams.get("id");

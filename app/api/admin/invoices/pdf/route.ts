@@ -15,7 +15,7 @@ export const runtime = "nodejs";
  */
 export async function GET(req: NextRequest): Promise<Response> {
   try {
-    const admin = requireAdmin(req);
+    const admin = await requireAdmin(req);
     if (admin instanceof NextResponse) return admin;
 
     const id = new URL(req.url).searchParams.get("id");

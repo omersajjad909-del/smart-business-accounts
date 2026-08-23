@@ -21,7 +21,7 @@ export const runtime = "nodejs";
 export async function POST(req: NextRequest) {
   try {
     // 1. Verify admin identity
-    const admin = requireAdmin(req);
+    const admin = await requireAdmin(req);
     if (admin instanceof NextResponse) return admin;
 
     const body = await req.json();

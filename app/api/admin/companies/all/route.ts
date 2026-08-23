@@ -4,7 +4,7 @@ import { requireAdmin, logAdminAction } from "@/lib/adminAuth";
 
 export async function GET(req: NextRequest) {
   try {
-    const admin = requireAdmin(req);
+    const admin = await requireAdmin(req);
     if (admin instanceof NextResponse) return admin;
     // Admin's own test workspaces are hidden by default but still reachable,
     // so they can be inspected and deleted rather than being invisible.

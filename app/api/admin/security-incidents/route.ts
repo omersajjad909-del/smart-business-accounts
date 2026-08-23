@@ -10,7 +10,7 @@ const CATEGORIES = ["DATA_BREACH", "UNAUTHORIZED_ACCESS", "SYSTEM_OUTAGE", "OTHE
 const STATUSES = ["DETECTED", "NOTIFYING", "NOTIFIED", "RESOLVED"] as const;
 
 export async function GET(req: NextRequest) {
-  const admin = requireAdmin(req);
+  const admin = await requireAdmin(req);
   if (admin instanceof NextResponse) return admin;
 
   const url = new URL(req.url);
@@ -40,7 +40,7 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
-  const admin = requireAdmin(req);
+  const admin = await requireAdmin(req);
   if (admin instanceof NextResponse) return admin;
 
   const body = await req.json().catch(() => ({}));
@@ -93,7 +93,7 @@ export async function POST(req: NextRequest) {
 }
 
 export async function PATCH(req: NextRequest) {
-  const admin = requireAdmin(req);
+  const admin = await requireAdmin(req);
   if (admin instanceof NextResponse) return admin;
 
   const body = await req.json().catch(() => ({}));

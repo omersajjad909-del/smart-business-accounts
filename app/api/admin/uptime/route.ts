@@ -19,7 +19,7 @@ const SERVICES = ["web", "api", "db", "reports", "email", "backups", "cdn", "sea
 const WINDOWS: Record<string, number> = { "24h": 24, "7d": 24 * 7, "30d": 24 * 30 };
 
 export async function GET(req: NextRequest) {
-  const admin = requireAdmin(req);
+  const admin = await requireAdmin(req);
   if (admin instanceof NextResponse) return admin;
 
   const url = new URL(req.url);

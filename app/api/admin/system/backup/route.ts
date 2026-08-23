@@ -8,7 +8,7 @@ export const maxDuration = 60;
 
 /** Backup history across the whole platform, for /admin/backup-restore. */
 export async function GET(req: NextRequest) {
-  const admin = requireAdmin(req);
+  const admin = await requireAdmin(req);
   if (admin instanceof NextResponse) return admin;
 
   const visibleCompanies = await prisma.company.findMany({
@@ -81,7 +81,7 @@ export async function GET(req: NextRequest) {
 
 /** "Run Backup Now" - snapshots every live company. */
 export async function POST(req: NextRequest) {
-  const admin = requireAdmin(req);
+  const admin = await requireAdmin(req);
   if (admin instanceof NextResponse) return admin;
 
   const companies = await getBackupTargetCompanies();

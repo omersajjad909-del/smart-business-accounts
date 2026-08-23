@@ -54,7 +54,7 @@ function growthPct(current: number, previous: number): number {
 
 export async function GET(req: NextRequest) {
   try {
-    const admin = requireAdmin(req);
+    const admin = await requireAdmin(req);
     if (admin instanceof NextResponse) return admin;
 
     const now = new Date();

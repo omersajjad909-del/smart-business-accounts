@@ -13,7 +13,7 @@ const SENDER_TITLE = process.env.OUTREACH_SENDER_TITLE || "Founder";
 
 /** The review queue: every drafted email waiting on a human decision. */
 export async function GET(req: NextRequest) {
-  const admin = requireAdmin(req);
+  const admin = await requireAdmin(req);
   if (admin instanceof NextResponse) return admin;
 
   try {
@@ -72,7 +72,7 @@ export async function GET(req: NextRequest) {
 
 /** Approve, reject, or edit-and-approve a single email. */
 export async function PATCH(req: NextRequest) {
-  const admin = requireAdmin(req);
+  const admin = await requireAdmin(req);
   if (admin instanceof NextResponse) return admin;
 
   try {
@@ -174,7 +174,7 @@ export async function PATCH(req: NextRequest) {
  * everything in the database" is not an action this endpoint offers.
  */
 export async function POST(req: NextRequest) {
-  const admin = requireAdmin(req);
+  const admin = await requireAdmin(req);
   if (admin instanceof NextResponse) return admin;
 
   try {

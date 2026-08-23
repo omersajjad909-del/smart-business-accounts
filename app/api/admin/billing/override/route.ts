@@ -17,7 +17,7 @@ const ALLOWED_ACTIONS = ["EXTEND_TRIAL", "GRANT_FREE_ACCESS", "RESET_INTRO_OFFER
 
 export async function POST(req: NextRequest) {
   try {
-    const admin = requireAdmin(req);
+    const admin = await requireAdmin(req);
     if (admin instanceof NextResponse) return admin;
     const adminId = admin.id;
 
@@ -147,7 +147,7 @@ export async function POST(req: NextRequest) {
 
 /* GET — fetch override history for a company */
 export async function GET(req: NextRequest) {
-  const admin = requireAdmin(req);
+  const admin = await requireAdmin(req);
   if (admin instanceof NextResponse) return admin;
 
   const companyId = req.nextUrl.searchParams.get("companyId");

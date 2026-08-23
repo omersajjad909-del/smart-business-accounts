@@ -7,7 +7,7 @@ import {
 } from "@/lib/companyCommsConfig";
 import { getTokenFromRequest, verifyJwt } from "@/lib/auth";
 
-function requireAdmin(req: NextRequest) {
+function await requireAdmin(req: NextRequest) {
   const token = getTokenFromRequest(req);
   if (!token) return false;
   const payload = verifyJwt(token);

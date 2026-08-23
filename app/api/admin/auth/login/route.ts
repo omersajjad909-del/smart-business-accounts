@@ -1,132 +1,161 @@
+/**
+ * POST /api/admin/auth/login  — step 1 of 2.
+ *
+ * Verifying the password no longer signs anyone in. It mints a short-lived,
+ * OTP-pending cookie and tells the client which step comes next:
+ *
+ *   { step: "enrol" }  first login — scan the QR at /api/admin/auth/2fa/setup
+ *   { step: "otp"   }  authenticator already enrolled — enter the 6-digit code
+ *
+ * The full `sb_admin` session is only ever minted by /api/admin/auth/2fa/verify.
+ */
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
-import { signJwt } from "@/lib/auth";
-import { rateLimit } from "@/lib/rateLimit";
+import { rateLimitAsync } from "@/lib/rateLimit";
+import {
+  findAdminByEmail,
+  logAdminAuthEvent,
+  mintAdminPendingToken,
+  setAdminPendingCookie,
+} from "@/lib/adminAuth";
 
 export const runtime = "nodejs";
 
-// Normalized error — never reveal whether email exists or not
+/** Never reveal whether the email exists, or which half of the pair was wrong. */
 const INVALID_CREDS = { message: "Invalid credentials" };
 
-/** Admin-panel sessions are short-lived; the blast radius of a stolen one is total. */
-const ADMIN_SESSION_TTL_MS = 12 * 60 * 60 * 1000;
+/** Per-account lockout. Rotating IPs does not get an attacker past this. */
+const MAX_FAILED_ATTEMPTS = 5;
+const LOCKOUT_MS = 15 * 60 * 1000;
 
 /**
- * Decide whether a `User` row is a *platform* super admin rather than just the
- * ADMIN (owner) of some tenant company.
- *
- * Preferred: an explicit `SUPER_ADMIN_EMAILS` allowlist (comma-separated).
- * Fallback, so nobody is locked out of an existing deployment before that env
- * var is set: the account must not belong to any company. Real platform admins
- * are standalone rows; every tenant owner has at least one UserCompany link.
- *
- * Set SUPER_ADMIN_EMAILS in production and this fallback stops being used.
+ * A real bcrypt hash of a random string, compared against when the account
+ * does not exist. Without it, "unknown email" returns in ~1ms and "wrong
+ * password" in ~100ms, which is a working account-enumeration oracle.
  */
-async function isPlatformSuperAdmin(userId: string, email: string): Promise<boolean> {
-  const allowlist = (process.env.SUPER_ADMIN_EMAILS || "")
-    .split(",")
-    .map((e) => e.trim().toLowerCase())
-    .filter(Boolean);
+const DUMMY_HASH = "$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy";
 
-  if (allowlist.length > 0) return allowlist.includes(email.toLowerCase());
-
-  const membership = await prisma.userCompany.count({ where: { userId } });
-  return membership === 0;
+function clientIp(req: NextRequest): string {
+  return (
+    req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+    req.headers.get("x-real-ip") ||
+    "unknown"
+  );
 }
 
 export async function POST(req: NextRequest) {
   try {
-    // ── Rate limiting: max 10 attempts per IP per 15 minutes ────────────────
-    const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim()
-      || req.headers.get("x-real-ip")
-      || "unknown";
-    const rl = rateLimit(`admin_login:${ip}`, 10, 15 * 60 * 1000);
-    if (!rl.allowed) {
+    const ip = clientIp(req);
+    const userAgent = req.headers.get("user-agent");
+
+    // Upstash-backed when configured, so the limit is shared across every
+    // serverless instance rather than reset by whichever one answers.
+    const ipLimit = await rateLimitAsync(`admin_login_ip:${ip}`, 10, 15 * 60 * 1000);
+    if (!ipLimit.allowed) {
       return NextResponse.json(
         { message: "Too many login attempts. Try again in 15 minutes." },
-        { status: 429, headers: { "Retry-After": "900" } }
+        { status: 429, headers: { "Retry-After": "900" } },
       );
     }
 
-    let body;
-    try { body = JSON.parse(await req.text()); }
-    catch { return NextResponse.json({ message: "Invalid JSON" }, { status: 400 }); }
+    let body: any;
+    try {
+      body = JSON.parse(await req.text());
+    } catch {
+      return NextResponse.json({ message: "Invalid JSON" }, { status: 400 });
+    }
 
-    const email    = (body.email    || "").toString().toLowerCase().trim();
-    const password = (body.password || "").toString();
-    if (!email || !password)
+    const email = (body?.email || "").toString().toLowerCase().trim();
+    const password = (body?.password || "").toString();
+    if (!email || !password) {
       return NextResponse.json({ message: "Email and password required" }, { status: 400 });
-
-    // ── 1. Try Super Admin (User table) ──────────────────────────────────────
-    // `User.role === "ADMIN"` only means "owner of a company" — it is the
-    // tenant-admin role. On its own it let every customer's company owner sign
-    // into the platform admin panel with their normal password. A User row now
-    // only counts as a platform super admin when it is explicitly allowlisted.
-    const superAdmin = await prisma.user.findUnique({ where: { email } });
-    if (superAdmin && superAdmin.role === "ADMIN" && (await isPlatformSuperAdmin(superAdmin.id, email))) {
-      const match = await bcrypt.compare(password, superAdmin.password);
-      if (!match) return NextResponse.json(INVALID_CREDS, { status: 401 });
-      if (!superAdmin.active) {
-        return NextResponse.json({ message: "Account is disabled." }, { status: 403 });
-      }
-
-      const token = await signJwt(
-        {
-          id: superAdmin.id,
-          email: superAdmin.email,
-          role: "ADMIN",
-          name: superAdmin.name,
-          scope: "admin",
-          isSuperAdmin: true,
-        },
-        { ttlMs: ADMIN_SESSION_TTL_MS },
-      );
-      const response = NextResponse.json({
-        success: true,
-        user: { id: superAdmin.id, name: superAdmin.name, email: superAdmin.email, role: "ADMIN", isSuperAdmin: true, allowedPages: null },
-      });
-      response.cookies.set("sb_auth", token, { httpOnly: true, secure: process.env.NODE_ENV === "production", sameSite: "lax", path: "/" });
-      return response;
     }
 
-    // ── 2. Try Team Member (AdminUser table) ─────────────────────────────────
-    const teamMember = await (prisma as any).adminUser?.findUnique({ where: { email } });
-    if (teamMember) {
-      if (!teamMember.active)
-        return NextResponse.json({ message: "Account is disabled. Contact super admin." }, { status: 403 });
-
-      const match = await bcrypt.compare(password, teamMember.passwordHash);
-      if (!match) return NextResponse.json(INVALID_CREDS, { status: 401 });
-
-      await (prisma as any).adminUser.update({ where: { id: teamMember.id }, data: { lastLoginAt: new Date() } });
-
-      const token = await signJwt(
-        {
-          id: teamMember.id,
-          email: teamMember.email,
-          role: "ADMIN",
-          name: teamMember.name,
-          scope: "admin",
-          isSuperAdmin: Boolean(teamMember.isSuperAdmin),
-        },
-        { ttlMs: ADMIN_SESSION_TTL_MS },
+    const emailLimit = await rateLimitAsync(`admin_login_email:${email}`, 10, 15 * 60 * 1000);
+    if (!emailLimit.allowed) {
+      return NextResponse.json(
+        { message: "Too many login attempts. Try again in 15 minutes." },
+        { status: 429, headers: { "Retry-After": "900" } },
       );
-
-      let allowedPages: string[] = [];
-      try { allowedPages = JSON.parse(teamMember.allowedPages || "[]"); } catch {}
-
-      const response = NextResponse.json({
-        success: true,
-        user: { id: teamMember.id, name: teamMember.name, email: teamMember.email, role: "ADMIN", isSuperAdmin: teamMember.isSuperAdmin, team: teamMember.team, allowedPages },
-      });
-      response.cookies.set("sb_auth", token, { httpOnly: true, secure: process.env.NODE_ENV === "production", sameSite: "lax", path: "/" });
-      return response;
     }
 
-    // Always return same error regardless of whether email exists (prevent user enumeration)
-    return NextResponse.json(INVALID_CREDS, { status: 401 });
-  } catch (e: any) {
+    const account = await findAdminByEmail(email);
+
+    if (!account) {
+      await bcrypt.compare(password, DUMMY_HASH); // equalise response time
+      await logAdminAuthEvent({ email, action: "LOGIN_FAILED", ip, userAgent, details: { reason: "no_account" } });
+      return NextResponse.json(INVALID_CREDS, { status: 401 });
+    }
+
+    if (account.lockedUntil && account.lockedUntil.getTime() > Date.now()) {
+      const minutes = Math.ceil((account.lockedUntil.getTime() - Date.now()) / 60000);
+      await logAdminAuthEvent({ email, action: "LOGIN_LOCKED", ip, userAgent, adminId: account.id });
+      return NextResponse.json(
+        { message: `Account locked. Try again in ${minutes} minute${minutes === 1 ? "" : "s"}.` },
+        { status: 423 },
+      );
+    }
+
+    const match = await bcrypt.compare(password, account.passwordHash || DUMMY_HASH);
+    if (!match) {
+      await registerFailure(account.id, account.source, account.failedAttempts);
+      await logAdminAuthEvent({ email, action: "LOGIN_FAILED", ip, userAgent, adminId: account.id, details: { reason: "bad_password" } });
+      return NextResponse.json(INVALID_CREDS, { status: 401 });
+    }
+
+    // Checked only after the password, so a disabled account is not a way to
+    // confirm that an address is registered.
+    if (!account.active) {
+      await logAdminAuthEvent({ email, action: "LOGIN_FAILED", ip, userAgent, adminId: account.id, details: { reason: "disabled" } });
+      return NextResponse.json({ message: "Account is disabled." }, { status: 403 });
+    }
+
+    await clearFailures(account.id, account.source);
+
+    const needsEnrolment = !account.totpEnabled;
+    const pending = mintAdminPendingToken({
+      id: account.id,
+      email: account.email,
+      name: account.name,
+      isSuperAdmin: account.isSuperAdmin,
+      source: account.source,
+      tokenVersion: account.tokenVersion,
+      enrol: needsEnrolment,
+    });
+
+    const res = NextResponse.json({
+      success: true,
+      step: needsEnrolment ? "enrol" : "otp",
+      email: account.email,
+    });
+    setAdminPendingCookie(res, pending);
+    return res;
+  } catch {
     return NextResponse.json({ message: "Internal server error" }, { status: 500 });
   }
+}
+
+async function registerFailure(id: string, source: "platform" | "team", current: number) {
+  if (source !== "team") return; // platform admins are covered by the IP+email limiter
+  const next = current + 1;
+  try {
+    await (prisma as any).adminUser.update({
+      where: { id },
+      data: {
+        failedAttempts: next,
+        lockedUntil: next >= MAX_FAILED_ATTEMPTS ? new Date(Date.now() + LOCKOUT_MS) : null,
+      },
+    });
+  } catch {}
+}
+
+async function clearFailures(id: string, source: "platform" | "team") {
+  if (source !== "team") return;
+  try {
+    await (prisma as any).adminUser.update({
+      where: { id },
+      data: { failedAttempts: 0, lockedUntil: null },
+    });
+  } catch {}
 }
