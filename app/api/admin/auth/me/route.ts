@@ -9,7 +9,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireAdmin } from "@/lib/adminAuth";
 import { SUPER_ADMIN_ONLY_PAGES } from "@/lib/adminPages";
-import { UNLOCK_COOKIE, getAdminPageLock, hasValidUnlock } from "@/lib/adminPageLock";
+import { UNLOCK_COOKIE, getAdminPageLock, unlockedPageFrom } from "@/lib/adminPageLock";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -19,12 +19,14 @@ export async function GET(req: NextRequest) {
   if (admin instanceof NextResponse) return admin;
 
   const lock = await getAdminPageLock();
-  const unlocked =
-    lock.enabled && hasValidUnlock(req.cookies.get(UNLOCK_COOKIE)?.value, admin.id, lock);
+  // Which single page this browser currently has open, if any.
+  const unlockedPage = lock.enabled
+    ? unlockedPageFrom(req.cookies.get(UNLOCK_COOKIE)?.value, admin.id, lock)
+    : null;
 
   return NextResponse.json({
     lockedPages: lock.enabled ? lock.pages : [],
-    unlocked,
+    unlockedPage,
     user: {
       id: admin.id,
       name: admin.name,

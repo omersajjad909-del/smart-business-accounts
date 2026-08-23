@@ -24,7 +24,8 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
   // Which pages carry the extra page password, and whether this browser has
   // already typed it. Both come from the server on every navigation.
   const [lockedPages, setLockedPages] = useState<string[]>([]);
-  const [unlocked, setUnlocked] = useState(false);
+  // The single page this browser currently has open, if any.
+  const [unlockedPage, setUnlockedPage] = useState<string | null>(null);
 
   // The gate is the httpOnly `sb_admin` cookie, verified server-side on every
   // request. This call is how the UI *learns* the answer — it is not the lock.
@@ -48,7 +49,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
             superAdminOnlyPages: data.superAdminOnlyPages || [],
           });
           setLockedPages(Array.isArray(data.lockedPages) ? data.lockedPages : []);
-          setUnlocked(Boolean(data.unlocked));
+          setUnlockedPage(data.unlockedPage ?? null);
           setCurrentUser({ ...data.user, role: "ADMIN", companyId: "system" });
         }
       } catch {
@@ -67,6 +68,32 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
     document.body.style.background = "";
   }, []);
 
+  // ── Re-lock on leaving the page ──────────────────────────────────────────
+  // A phone's app lock closes the moment you leave the app; this is the same
+  // idea. Navigating anywhere else drops the unlock immediately, so coming
+  // back asks for the password again.
+  useEffect(() => {
+    if (!unlockedPage || unlockedPage === currentPage) return;
+    setUnlockedPage(null);
+    fetch("/api/admin/security/unlock", { method: "DELETE", keepalive: true }).catch(() => {});
+  }, [currentPage, unlockedPage]);
+
+  // Closing or reloading the tab counts as leaving too. sendBeacon is the only
+  // request the browser reliably lets through during unload; if it does not
+  // make it, the token's own short expiry is the backstop.
+  useEffect(() => {
+    if (!unlockedPage) return;
+    const relock = () => {
+      try {
+        navigator.sendBeacon?.("/api/admin/security/unlock?relock=1", new Blob([], { type: "text/plain" }));
+      } catch {
+        /* the token expires on its own */
+      }
+    };
+    window.addEventListener("pagehide", relock);
+    return () => window.removeEventListener("pagehide", relock);
+  }, [unlockedPage]);
+
   useEffect(() => {
     if (isLoginPage || !checked) return;
     if (!state?.session) {
@@ -82,7 +109,8 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
   }, [checked, state, isLoginPage, pathname, router]);
 
   const currentPage = adminPageForConsolePath(pathname || "/admin");
-  const needsUnlock = !isLoginPage && lockedPages.includes(currentPage) && !unlocked;
+  const needsUnlock =
+    !isLoginPage && lockedPages.includes(currentPage) && unlockedPage !== currentPage;
 
   if (isLoginPage) return <>{children}</>;
 
@@ -106,7 +134,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
   }
 
   return (
-    <AdminSessionProvider value={{ ...state, lockedPages, unlocked }}>
+    <AdminSessionProvider value={{ ...state, lockedPages, unlockedPage }}>
       <Toaster position="top-right" />
       <AdminShell>
         {needsUnlock ? (
@@ -114,7 +142,8 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
             pageLabel={
               ADMIN_NAV_ITEMS.find((i) => i.id === currentPage)?.label || "This page"
             }
-            onUnlocked={() => setUnlocked(true)}
+            pageId={currentPage}
+            onUnlocked={() => setUnlockedPage(currentPage)}
             onCancel={() => router.replace("/admin")}
           />
         ) : (

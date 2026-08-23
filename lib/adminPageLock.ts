@@ -21,8 +21,14 @@ import { signJwt, verifyJwt } from "@/lib/auth";
 
 export const ADMIN_PAGE_LOCK_ACTION = "ADMIN_PAGE_LOCK";
 export const UNLOCK_COOKIE = "sb_admin_unlock";
-/** How long one password entry keeps the locked pages open. */
-export const UNLOCK_TTL_MS = 30 * 60 * 1000;
+/**
+ * Hard ceiling on one unlock — a safety net, not the normal lifetime.
+ *
+ * The console re-locks the moment you navigate away from the page or close the
+ * tab, the way a phone's app lock does. This cap only matters when that signal
+ * never arrives (a crashed tab, a killed browser), so it is deliberately short.
+ */
+export const UNLOCK_TTL_MS = 10 * 60 * 1000;
 
 /**
  * The lock screen itself can never be locked — it is the only way back in for
@@ -153,24 +159,47 @@ export async function verifyLockPassword(lock: AdminPageLock, password: string):
 
 // ─── Unlock token ───────────────────────────────────────────────────────────
 
-/** Bound to one admin and one config version; unlocks every locked page. */
-export function mintUnlockToken(adminId: string, lock: AdminPageLock): string {
+/**
+ * Bound to one admin, one config version, and ONE page.
+ *
+ * Per-page on purpose: unlocking Companies must not also open Revenue. Only
+ * one page is unlocked at a time — minting a new token replaces the old one,
+ * so stepping from one locked page to another asks again.
+ */
+export function mintUnlockToken(adminId: string, lock: AdminPageLock, page: string): string {
   return signJwt(
-    { scope: "admin_unlock", aid: adminId, fp: lockFingerprint(lock) },
+    { scope: "admin_unlock", aid: adminId, fp: lockFingerprint(lock), page },
     { ttlMs: UNLOCK_TTL_MS },
   );
 }
 
+/** Does this cookie unlock `page` for this admin, right now? */
 export function hasValidUnlock(
   rawToken: string | null | undefined,
   adminId: string,
   lock: AdminPageLock,
+  page: string,
 ): boolean {
   if (!rawToken) return false;
   const payload = verifyJwt(rawToken, { maxAgeMs: UNLOCK_TTL_MS });
   if (!payload || payload.scope !== "admin_unlock") return false;
   if (payload.aid !== adminId) return false;
+  if (payload.page !== page) return false;
   return payload.fp === lockFingerprint(lock);
+}
+
+/** Which page, if any, the cookie currently unlocks. */
+export function unlockedPageFrom(
+  rawToken: string | null | undefined,
+  adminId: string,
+  lock: AdminPageLock,
+): string | null {
+  if (!rawToken) return null;
+  const payload = verifyJwt(rawToken, { maxAgeMs: UNLOCK_TTL_MS });
+  if (!payload || payload.scope !== "admin_unlock") return null;
+  if (payload.aid !== adminId) return null;
+  if (payload.fp !== lockFingerprint(lock)) return null;
+  return typeof payload.page === "string" ? payload.page : null;
 }
 
 export function setUnlockCookie(res: NextResponse, token: string) {

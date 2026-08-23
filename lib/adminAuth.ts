@@ -399,7 +399,7 @@ export async function requireAdmin(
   const lock = await getAdminPageLock();
   if (isPageLocked(lock, page)) {
     const unlockToken = req.cookies.get(UNLOCK_COOKIE)?.value;
-    if (!hasValidUnlock(unlockToken, ctx.id, lock)) {
+    if (!hasValidUnlock(unlockToken, ctx.id, lock, page as string)) {
       return NextResponse.json(
         { error: "This section is password protected", locked: true, page },
         { status: 423 },

@@ -351,7 +351,7 @@ export default function AdminShell({ children }: { children: ReactNode }) {
                           {item.icon ? ICONS[item.icon] : item.short}
                         </span>
                         <span className="fin-admin-navText">{item.label}</span>
-                        {lockedPageIds.has(item.id) && !adminSession.unlocked ? (
+                        {lockedPageIds.has(item.id) && adminSession.unlockedPage !== item.id ? (
                           <span className="fin-admin-navBadge" title="Password protected">🔒</span>
                         ) : null}
                         {item.badge ? <span className="fin-admin-navBadge">{item.badge}</span> : null}

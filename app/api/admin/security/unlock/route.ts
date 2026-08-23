@@ -13,6 +13,7 @@ import { rateLimitAsync } from "@/lib/rateLimit";
 import {
   clearUnlockCookie,
   getAdminPageLock,
+  isPageLocked,
   mintUnlockToken,
   setUnlockCookie,
   verifyLockPassword,
@@ -24,6 +25,14 @@ export const dynamic = "force-dynamic";
 export async function POST(req: NextRequest) {
   const admin = await requireAdmin(req, { anyPage: true });
   if (admin instanceof NextResponse) return admin;
+
+  // `navigator.sendBeacon` can only issue a POST, so the unload path re-locks
+  // through this flag rather than the DELETE below.
+  if (req.nextUrl.searchParams.get("relock") === "1") {
+    const res = NextResponse.json({ success: true });
+    clearUnlockCookie(res);
+    return res;
+  }
 
   // A short password guarded only by a signed-in session still deserves a
   // ceiling on how fast it can be guessed.
@@ -41,13 +50,21 @@ export async function POST(req: NextRequest) {
   }
 
   let password = "";
+  let page = "";
   try {
-    password = String(JSON.parse(await req.text())?.password || "");
+    const body = JSON.parse(await req.text());
+    password = String(body?.password || "");
+    page = String(body?.page || "");
   } catch {
     return NextResponse.json({ error: "Invalid request" }, { status: 400 });
   }
   if (!password) {
     return NextResponse.json({ error: "Password required" }, { status: 400 });
+  }
+  // One page per unlock. Asking for a page that is not locked would mint a
+  // token that opens nothing, so it is rejected rather than silently accepted.
+  if (!isPageLocked(lock, page)) {
+    return NextResponse.json({ error: "That page is not locked" }, { status: 400 });
   }
 
   if (!(await verifyLockPassword(lock, password))) {
@@ -56,20 +73,22 @@ export async function POST(req: NextRequest) {
       adminEmail: admin.email,
       action: "ADMIN_PAGE_UNLOCK_FAILED",
       targetType: "AdminSecurity",
-      targetLabel: admin.email,
+      targetId: page,
+      targetLabel: `${admin.email} → ${page}`,
     });
     return NextResponse.json({ error: "Wrong password" }, { status: 401 });
   }
 
-  const res = NextResponse.json({ success: true, pages: lock.pages });
-  setUnlockCookie(res, mintUnlockToken(admin.id, lock));
+  const res = NextResponse.json({ success: true, page });
+  setUnlockCookie(res, mintUnlockToken(admin.id, lock, page));
 
   await logAdminAction({
     adminId: admin.id,
     adminEmail: admin.email,
     action: "ADMIN_PAGE_UNLOCKED",
     targetType: "AdminSecurity",
-    targetLabel: `${lock.pages.length} pages`,
+    targetId: page,
+    targetLabel: page,
   });
 
   return res;

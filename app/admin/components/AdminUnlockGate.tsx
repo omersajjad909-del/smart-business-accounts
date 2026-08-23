@@ -11,10 +11,13 @@
 import { useEffect, useRef, useState } from "react";
 
 export default function AdminUnlockGate({
+  pageId,
   pageLabel,
   onUnlocked,
   onCancel,
 }: {
+  /** Nav id of the page being opened — the unlock is granted for this one only. */
+  pageId: string;
   pageLabel: string;
   onUnlocked: () => void;
   onCancel: () => void;
@@ -37,7 +40,7 @@ export default function AdminUnlockGate({
       const r = await fetch("/api/admin/security/unlock", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ password }),
+        body: JSON.stringify({ password, page: pageId }),
       });
       const d = await r.json();
       if (!r.ok) {
@@ -83,7 +86,7 @@ export default function AdminUnlockGate({
           {pageLabel} is protected
         </h2>
         <p style={{ margin: "0 0 22px", fontSize: 13, color: "rgba(255,255,255,.4)", lineHeight: 1.6 }}>
-          Enter the page password to continue. It stays unlocked for 30 minutes.
+          Enter the page password to continue. It locks again as soon as you leave.
         </p>
 
         {error && (

@@ -125,6 +125,8 @@ export default function AdminSecurityPage() {
     toast.success("Locked. The password will be asked for again.");
   }
 
+  const lockedCount = cfg?.pages.length ?? 0;
+
   if (loading) {
     return <div style={{ padding: 40, color: "rgba(255,255,255,.4)" }}>Loading…</div>;
   }
@@ -136,9 +138,10 @@ export default function AdminSecurityPage() {
       <div style={{ marginBottom: 28 }}>
         <h1 style={{ margin: "0 0 6px", fontSize: 24, fontWeight: 800 }}>Admin Security</h1>
         <p style={{ margin: 0, fontSize: 13, color: "rgba(255,255,255,.4)", maxWidth: 680, lineHeight: 1.6 }}>
-          A second password, inside the console. Tick the pages that should ask for it —
-          even an admin who is already signed in has to type it before those pages open.
-          One correct entry keeps them open for 30 minutes, then they close again.
+          A second password, inside the console — like an app lock on a phone. Tick the
+          pages that should ask for it: even an admin who is already signed in has to type
+          it before those pages open, and they lock again the moment the page is left or
+          the tab is closed. Each page is unlocked on its own.
         </p>
       </div>
 
@@ -252,8 +255,8 @@ export default function AdminSecurityPage() {
           <span style={{ fontSize: 14, fontWeight: 700 }}>Turn the page lock on</span>
         </label>
         <p style={{ ...hint, marginTop: 8 }}>
-          Saving signs out every current unlock, including your own — the password will be
-          asked for again on the next locked page you open.
+          Saving closes every page anyone currently has open, including your own — the
+          password will be asked for again on the next locked page.
         </p>
 
         <div style={{ marginTop: 18, display: "flex", gap: 10, flexWrap: "wrap" }}>
