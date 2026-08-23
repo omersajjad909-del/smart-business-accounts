@@ -530,8 +530,7 @@ const [searchTerm, setSearchTerm] = useState("");
         : prev.map(r => ({ ...r, meta: emptyRateFormulaMeta(rf) }))
     );
     // `rf` is stable once loaded — it comes from a per-tab cache.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [rfActive]);
+  }, [rfActive, rf]);
 
   const subtotal = rows.reduce((s, r) => s + (Number(r.qty) * Number(r.rate) || 0), 0);
   const perItemDiscountAmt = rows.reduce((s, r) => s + ((Number(r.qty) * Number(r.rate) || 0) * (Number(r.discountPercent) || 0) / 100), 0);

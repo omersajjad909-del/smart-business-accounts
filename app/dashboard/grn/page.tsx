@@ -139,8 +139,7 @@ export default function GRNPage() {
   useEffect(() => {
     if (!rfActive) return;
     setRows(prev => prev.some(r => r.meta) ? prev : prev.map(r => ({ ...r, meta: emptyRateFormulaMeta(rf) })));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [rfActive]);
+  }, [rfActive, rf]);
 
   /** Picking an item pulls its saved dimensions onto the line. */
   function selectGrnItem(idx: number, itemId: string) {

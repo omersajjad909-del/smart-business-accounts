@@ -353,8 +353,7 @@ function SalesInvoiceContent() {
   useEffect(() => {
     if (!rfActive) return;
     setRows(prev => prev.some(r => r.meta) ? prev : prev.map(r => ({ ...r, meta: emptyRateFormulaMeta(rf) })));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [rfActive]);
+  }, [rfActive, rf]);
 
   function removeRow(idx: number) { if (rows.length > 1) setRows(rows.filter((_, i) => i !== idx)); }
 

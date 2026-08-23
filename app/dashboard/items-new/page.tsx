@@ -103,8 +103,7 @@ export default function ItemsNewPage() {
     setMeta(editingItem
       ? readRateFormulaMeta(rf, editingItem.meta)
       : emptyRateFormulaMeta(rf));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [rfActive, editingItem]);
+  }, [rfActive, rf, editingItem]);
 
   function resetForm() {
     setEditingId(null); setName(""); setCategory("TRADING"); setUnit("");
