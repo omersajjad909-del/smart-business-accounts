@@ -36,6 +36,12 @@ import {
 } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import {
+  UNLOCK_COOKIE,
+  getAdminPageLock,
+  hasValidUnlock,
+  isPageLocked,
+} from "@/lib/adminPageLock";
+import {
   SUPER_ADMIN_ONLY_PAGES,
   adminPageForApiPath,
   isAlwaysAllowedAdminApi,
@@ -387,6 +393,19 @@ export async function requireAdmin(
   const page = opts.page ?? adminPageForApiPath(pathname);
   const authorised = canAccessPage(ctx, page);
   if (!authorised) return deny(403, "You do not have access to this section");
+
+  // Extra page password, on top of being signed in. 423 rather than 403 so the
+  // console can tell "you may not have this" apart from "ask for the password".
+  const lock = await getAdminPageLock();
+  if (isPageLocked(lock, page)) {
+    const unlockToken = req.cookies.get(UNLOCK_COOKIE)?.value;
+    if (!hasValidUnlock(unlockToken, ctx.id, lock)) {
+      return NextResponse.json(
+        { error: "This section is password protected", locked: true, page },
+        { status: 423 },
+      );
+    }
+  }
 
   return ctx;
 }

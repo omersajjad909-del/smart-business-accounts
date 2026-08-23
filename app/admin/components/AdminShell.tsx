@@ -80,6 +80,11 @@ export default function AdminShell({ children }: { children: ReactNode }) {
 
   // Only the pages this admin is actually cleared for. The API enforces the
   // same list, so this is about not showing a menu of links that all 403.
+  const lockedPageIds = useMemo(
+    () => new Set(adminSession.lockedPages || []),
+    [adminSession.lockedPages],
+  );
+
   const visibleNavItems = useMemo(
     () => ADMIN_NAV_ITEMS.filter((item) => canOpenPage(adminSession, item.id)),
     [adminSession],
@@ -346,6 +351,9 @@ export default function AdminShell({ children }: { children: ReactNode }) {
                           {item.icon ? ICONS[item.icon] : item.short}
                         </span>
                         <span className="fin-admin-navText">{item.label}</span>
+                        {lockedPageIds.has(item.id) && !adminSession.unlocked ? (
+                          <span className="fin-admin-navBadge" title="Password protected">🔒</span>
+                        ) : null}
                         {item.badge ? <span className="fin-admin-navBadge">{item.badge}</span> : null}
                       </Link>
                     );

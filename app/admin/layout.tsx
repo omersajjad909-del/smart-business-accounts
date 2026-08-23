@@ -4,6 +4,8 @@ import { ReactNode, useEffect, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { Toaster } from "react-hot-toast";
 import AdminShell from "@/app/admin/components/AdminShell";
+import AdminUnlockGate from "@/app/admin/components/AdminUnlockGate";
+import { ADMIN_NAV_ITEMS } from "@/app/admin/admin-nav";
 import {
   AdminSessionProvider,
   canOpenPage,
@@ -19,6 +21,10 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
 
   const [state, setState] = useState<AdminSessionValue | null>(null);
   const [checked, setChecked] = useState(false);
+  // Which pages carry the extra page password, and whether this browser has
+  // already typed it. Both come from the server on every navigation.
+  const [lockedPages, setLockedPages] = useState<string[]>([]);
+  const [unlocked, setUnlocked] = useState(false);
 
   // The gate is the httpOnly `sb_admin` cookie, verified server-side on every
   // request. This call is how the UI *learns* the answer — it is not the lock.
@@ -41,6 +47,8 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
             session: data.user,
             superAdminOnlyPages: data.superAdminOnlyPages || [],
           });
+          setLockedPages(Array.isArray(data.lockedPages) ? data.lockedPages : []);
+          setUnlocked(Boolean(data.unlocked));
           setCurrentUser({ ...data.user, role: "ADMIN", companyId: "system" });
         }
       } catch {
@@ -73,6 +81,9 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
     }
   }, [checked, state, isLoginPage, pathname, router]);
 
+  const currentPage = adminPageForConsolePath(pathname || "/admin");
+  const needsUnlock = !isLoginPage && lockedPages.includes(currentPage) && !unlocked;
+
   if (isLoginPage) return <>{children}</>;
 
   if (!checked || !state?.session) {
@@ -95,9 +106,21 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
   }
 
   return (
-    <AdminSessionProvider value={state}>
+    <AdminSessionProvider value={{ ...state, lockedPages, unlocked }}>
       <Toaster position="top-right" />
-      <AdminShell>{children}</AdminShell>
+      <AdminShell>
+        {needsUnlock ? (
+          <AdminUnlockGate
+            pageLabel={
+              ADMIN_NAV_ITEMS.find((i) => i.id === currentPage)?.label || "This page"
+            }
+            onUnlocked={() => setUnlocked(true)}
+            onCancel={() => router.replace("/admin")}
+          />
+        ) : (
+          children
+        )}
+      </AdminShell>
     </AdminSessionProvider>
   );
 }

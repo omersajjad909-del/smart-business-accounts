@@ -25,11 +25,17 @@ export type AdminSession = {
 export type AdminSessionValue = {
   session: AdminSession | null;
   superAdminOnlyPages: string[];
+  /** Pages behind the extra page password (see /admin/security). */
+  lockedPages?: string[];
+  /** Whether this browser has already entered that password. */
+  unlocked?: boolean;
 };
 
 const AdminSessionContext = createContext<AdminSessionValue>({
   session: null,
   superAdminOnlyPages: [],
+  lockedPages: [],
+  unlocked: false,
 });
 
 export const AdminSessionProvider = AdminSessionContext.Provider;

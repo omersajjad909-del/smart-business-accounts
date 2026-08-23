@@ -51,6 +51,7 @@ export function normalizeAllowedPages(pages: string[]): string[] {
 
 /** Pages only a super admin may reach, however `allowedPages` is configured. */
 export const SUPER_ADMIN_ONLY_PAGES = new Set<string>([
+  "admin-security", // who must type a page password, and what it is
   "team", // creating/disabling other admins
   "api-keys", // platform credentials
   "backup-restore", // full database export/import
@@ -111,6 +112,7 @@ const API_PATH_TO_PAGE: Array<[string, string]> = [
   ["/api/admin/page-visibility", "page-visibility"],
   ["/api/admin/fraud", "fraud"],
   ["/api/admin/security-incidents", "security-incidents"],
+  ["/api/admin/security", "admin-security"],
   ["/api/admin/uptime", "uptime"],
   ["/api/admin/system", "system"],
   ["/api/admin/launch", "system"],
@@ -162,5 +164,8 @@ export function adminPageForConsolePath(pathname: string): string {
   // Two-segment pages that have their own nav entry.
   if (rest.startsWith("geo/countries")) return "geo-countries";
   if (rest.startsWith("chat")) return "support-inbox";
+  // /admin/security-incidents is its own page; /admin/security is the lock
+  // screen, whose id is prefixed so it cannot be confused with the former.
+  if (rest === "security" || rest.startsWith("security/")) return "admin-security";
   return rest.split("/")[0];
 }

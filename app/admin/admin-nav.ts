@@ -65,6 +65,7 @@ export const ADMIN_NAV_ITEMS: AdminNavItem[] = [
   { id: "system",           label: "System Health",     href: "/admin/system",              group: "System",    short: "SY", icon: "shield" },
   { id: "uptime",           label: "Uptime",            href: "/admin/uptime",              group: "System",    short: "UP", icon: "activity" },
   { id: "security-incidents", label: "Security Incidents", href: "/admin/security-incidents",  group: "System",    short: "SC", icon: "alert" },
+  { id: "admin-security",   label: "Admin Security",    href: "/admin/security",            group: "System",    short: "AS", icon: "lock" },
   { id: "backup-restore",   label: "Backup & Restore",  href: "/admin/backup-restore",      group: "System",    short: "BK", icon: "archive" },
 
   // ── OTHERS ────────────────────────────────────────────────────────────────
