@@ -56,9 +56,20 @@ export function generateSecret(bytes = 20): string {
   return base32Encode(randomBytes(bytes));
 }
 
-/** Build an otpauth:// URI for QR code display */
+/**
+ * Build an otpauth:// URI for QR code display.
+ *
+ * The label is `issuer:account` with each half encoded separately and a
+ * LITERAL colon between them. Encoding the colon itself as %3A is permitted by
+ * the Key URI spec, but several authenticators — Apple Passwords among them —
+ * then read the whole thing as one opaque account name and quietly decline to
+ * save the entry, which looks to the user like the scan simply did nothing.
+ *
+ * `algorithm`, `digits` and `period` are the defaults every app assumes; they
+ * are spelled out so an app that does read them cannot pick anything else.
+ */
 export function keyuri(account: string, issuer: string, secret: string): string {
-  const label = encodeURIComponent(`${issuer}:${account}`);
+  const label = `${encodeURIComponent(issuer)}:${encodeURIComponent(account)}`;
   return `otpauth://totp/${label}?secret=${secret}&issuer=${encodeURIComponent(issuer)}&algorithm=SHA1&digits=6&period=30`;
 }
 
