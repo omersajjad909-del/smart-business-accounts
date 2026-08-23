@@ -370,7 +370,17 @@ export async function requireAdmin(
     return deny(403, "Super admin access required");
   }
 
-  const pathname = req.nextUrl?.pathname || "";
+  // `nextUrl` is absent when a handler is typed as taking a plain `Request`,
+  // so fall back to the raw URL rather than silently authorising nothing.
+  let pathname = req.nextUrl?.pathname || "";
+  if (!pathname) {
+    try {
+      pathname = new URL(req.url).pathname;
+    } catch {
+      pathname = "";
+    }
+  }
+
   if (opts.anyPage || isAlwaysAllowedAdminApi(pathname)) return ctx;
 
   const page = opts.page ?? adminPageForApiPath(pathname);

@@ -6,6 +6,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { clearCurrentUser, getCurrentUser } from "@/lib/auth";
 import { ADMIN_NAV_GROUP_ORDER, ADMIN_NAV_ITEMS } from "@/app/admin/admin-nav";
+import { canOpenPage, useAdminSession } from "@/app/admin/admin-session";
 import { ALLOW_LIGHT_THEME } from "@/lib/themeConfig";
 
 type AdminNotification = {
@@ -75,6 +76,30 @@ export default function AdminShell({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const router   = useRouter();
   const user     = getCurrentUser();
+  const adminSession = useAdminSession();
+
+  // Only the pages this admin is actually cleared for. The API enforces the
+  // same list, so this is about not showing a menu of links that all 403.
+  const visibleNavItems = useMemo(
+    () => ADMIN_NAV_ITEMS.filter((item) => canOpenPage(adminSession, item.id)),
+    [adminSession],
+  );
+
+  // Clears the httpOnly cookie server-side. Wiping sessionStorage alone left
+  // the real session alive — the next visit to /admin walked straight back in.
+  async function signOut() {
+    try {
+      await fetch("/api/admin/auth/logout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ everywhere: false }),
+      });
+    } catch {
+      // Falling through still clears the client and sends them to /admin/login.
+    }
+    clearCurrentUser();
+    window.location.href = "/admin/login";
+  }
 
   const [mobileOpen, setMobileOpen] = useState(false);
   const [quickOpen,  setQuickOpen]  = useState(false);
@@ -100,14 +125,14 @@ export default function AdminShell({ children }: { children: ReactNode }) {
   const [searchQuery, setSearchQuery] = useState("");
   const searchInputRef = useRef<HTMLInputElement>(null);
   const searchResults  = useMemo(() => {
-    if (!searchQuery.trim()) return ADMIN_NAV_ITEMS.slice(0, 6);
+    if (!searchQuery.trim()) return visibleNavItems.slice(0, 6);
     const q = searchQuery.toLowerCase();
-    return ADMIN_NAV_ITEMS.filter(
+    return visibleNavItems.filter(
       (item) =>
         item.label.toLowerCase().includes(q) ||
         item.group.toLowerCase().includes(q)
     ).slice(0, 8);
-  }, [searchQuery]);
+  }, [searchQuery, visibleNavItems]);
 
   function openSearch() {
     setSearchOpen(true);
@@ -189,15 +214,19 @@ export default function AdminShell({ children }: { children: ReactNode }) {
   }, []);
 
   const groupedItems = useMemo(
-    () => ADMIN_NAV_GROUP_ORDER.map((group) => ({
-      group,
-      items: ADMIN_NAV_ITEMS.filter((item) => item.group === group),
-    })),
-    []
+    () => ADMIN_NAV_GROUP_ORDER
+      .map((group) => ({
+        group,
+        items: visibleNavItems.filter((item) => item.group === group),
+      }))
+      // A group whose every page is off-limits should not leave an empty
+      // heading behind in the sidebar.
+      .filter((g) => g.items.length > 0),
+    [visibleNavItems]
   );
 
-  const activeLabel = ADMIN_NAV_ITEMS.find((item) => isActivePath(pathname, item.href))?.label || "Dashboard";
-  const mobilePrimary = ADMIN_NAV_ITEMS.filter((item) =>
+  const activeLabel = visibleNavItems.find((item) => isActivePath(pathname, item.href))?.label || "Dashboard";
+  const mobilePrimary = visibleNavItems.filter((item) =>
     ["dashboard", "companies", "users"].includes(item.id)
   );
   const initials = String(profile?.name || user?.name || "AD")
@@ -430,7 +459,7 @@ export default function AdminShell({ children }: { children: ReactNode }) {
                       <button
                         type="button"
                         className="fin-admin-linkRow fin-admin-linkRow--danger"
-                        onClick={() => { clearCurrentUser(); window.location.href = "/admin/login"; }}
+                        onClick={() => { void signOut(); }}
                       >Sign Out</button>
                     </div>
                   </div>

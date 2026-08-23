@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getTokenFromRequest, verifyJwt } from "@/lib/auth";
+import { getAdminTokenFromRequest, getTokenFromRequest, verifyJwt } from "@/lib/auth";
 import { REF_COOKIE, REF_COOKIE_MAX_AGE, normalizeTrackingCode } from "@/lib/affiliateTracking";
 import {
   WAITLIST_PATH,
@@ -9,6 +9,75 @@ import {
 } from "@/lib/signupGate";
 
 const FORGE_HOSTS = ["finovaforge.com", "www.finovaforge.com"];
+
+/**
+ * The admin console lives on its own, deliberately unguessable hostname.
+ *
+ * `admin.<domain>` is the first thing any scanner tries, so the console is not
+ * served there — or anywhere on the public app domain. Set ADMIN_HOST (comma
+ * separated if you need more than one) and point that DNS record at the same
+ * deployment; nothing else about the app changes.
+ *
+ * On the app domain /admin and the admin APIs render an ordinary 404 — the
+ * same page any nonexistent URL gets, so probing cannot tell the difference.
+ */
+const ADMIN_HOSTS = (process.env.ADMIN_HOST || "ikj.finovaos.app")
+  .split(",")
+  .map((h) => h.trim().toLowerCase())
+  .filter(Boolean);
+
+/** Hosts where the split is not enforced, so local dev and previews still work. */
+function isLocalHost(host: string): boolean {
+  return (
+    host === "localhost" ||
+    host === "127.0.0.1" ||
+    host === "0.0.0.0" ||
+    host.endsWith(".local") ||
+    host.endsWith(".vercel.app")
+  );
+}
+
+/** Paths the admin host is allowed to serve. Everything else there 404s. */
+function isAdminHostPath(pathname: string): boolean {
+  return (
+    pathname === "/admin" ||
+    pathname.startsWith("/admin/") ||
+    pathname.startsWith("/api/admin/") ||
+    pathname.startsWith("/_next/") ||
+    pathname.startsWith("/api/track/") ||
+    pathname === "/favicon.ico" ||
+    pathname === "/icon.png" ||
+    pathname === "/robots.txt"
+  );
+}
+
+/**
+ * `/api/admin/*` is two things at once: the platform console AND a handful of
+ * tenant-facing endpoints the customer dashboard has always called. Only these
+ * prefixes are the tenant kind — they are company-scoped and do their own
+ * permission checks. Everything else under /api/admin requires an admin
+ * session and is invisible from the app domain.
+ */
+const TENANT_ADMIN_API = [
+  "/api/admin/roles",
+  "/api/admin/user-permissions",
+  "/api/admin/notifications",
+  "/api/admin/shift-settings",
+  "/api/admin/cleanup-vouchers",
+  "/api/admin/logs", // company-scoped for tenant callers, see the route
+  "/api/admin/dev-test/",
+  "/api/admin/cron/", // scheduler-authenticated, not cookie-authenticated
+];
+
+/** Render the standard Next 404 — indistinguishable from any unknown URL. */
+function notFound(req: NextRequest): NextResponse {
+  const url = req.nextUrl.clone();
+  url.pathname = "/__not-found";
+  url.search = "";
+  const res = NextResponse.rewrite(url);
+  res.headers.set("X-Robots-Tag", "noindex, nofollow");
+  return res;
+}
 
 // Per-request CSP nonce — server components read it from the x-nonce header.
 // Base64 (RFC 4648) so it's safe inside CSP header + HTML attributes.
@@ -90,6 +159,33 @@ export async function proxy(req: NextRequest) {
   }
   // ───────────────────────────────────────────────────────────────
 
+  // ── Admin console hostname split ─────────────────────────────────────────
+  // Decided before anything else touches the request, so neither host can be
+  // talked into serving the other's routes.
+  const pathname = req.nextUrl.pathname || "";
+  const isAdminPath = pathname === "/admin" || pathname.startsWith("/admin/");
+  const isAdminApiPath = pathname.startsWith("/api/admin/");
+  const onAdminHost = ADMIN_HOSTS.includes(host);
+  // Never enforced on localhost or preview URLs — there is only one hostname
+  // there and the console still has to be reachable.
+  const hostSplitEnforced = ADMIN_HOSTS.length > 0 && !isLocalHost(host);
+
+  if (onAdminHost) {
+    // The admin host serves the console and nothing else. No marketing site,
+    // no tenant dashboard, no tenant APIs.
+    if (pathname === "/") {
+      return NextResponse.redirect(new URL("/admin", req.url));
+    }
+    if (!isAdminHostPath(pathname)) return notFound(req);
+  } else if (hostSplitEnforced && (isAdminPath || isAdminApiPath)) {
+    // The app domain does not admit that a console exists. Tenant-facing
+    // endpoints that happen to sit under /api/admin stay reachable — they are
+    // listed in TENANT_ADMIN_API below and are company-scoped, not platform.
+    const tenantFacing =
+      isAdminApiPath && TENANT_ADMIN_API.some((p) => pathname.startsWith(p));
+    if (!tenantFacing) return notFound(req);
+  }
+
   const headers = new Headers(req.headers);
   headers.set("x-nonce", nonce);
   headers.set("x-pathname", req.nextUrl.pathname);
@@ -130,41 +226,45 @@ export async function proxy(req: NextRequest) {
   // NOTE: No cookie fallback — all auth must come through verified JWT (sb_auth cookie).
   // The old "user" cookie fallback was removed because it allowed role spoofing.
 
-  const pathname = req.nextUrl.pathname || "";
-
-  // ── Platform admin console isolation ─────────────────────────────────────
-  // `/api/admin/*` is two things at once: the platform (super-admin) console
-  // AND a handful of tenant-facing endpoints the dashboard has always called.
-  // Because ADMIN is also the tenant-owner role and both logins share the
-  // sb_auth cookie, a customer's own session used to satisfy every one of the
-  // ~55 routes that just check `role === "ADMIN"` — i.e. full cross-tenant
-  // access. Only tokens minted by /api/admin/auth/login carry `scope: "admin"`;
-  // everything not on the tenant list below now requires one.
-  const TENANT_ADMIN_API = [
-    "/api/admin/auth/login",
-    "/api/admin/roles",
-    "/api/admin/user-permissions",
-    "/api/admin/notifications",
-    "/api/admin/shift-settings",
-    "/api/admin/cleanup-vouchers",
-    "/api/admin/logs", // company-scoped for tenant callers, see the route
-    "/api/admin/tax-presets",
-    "/api/admin/dev-test/",
-    "/api/admin/cron/", // scheduler-authenticated, not cookie-authenticated
-  ];
-  if (
-    pathname.startsWith("/api/admin/") &&
-    !TENANT_ADMIN_API.some((p) => pathname.startsWith(p)) &&
-    decoded?.scope !== "admin"
-  ) {
-    return NextResponse.json({ error: "Admin authentication required" }, { status: 403 });
+  // ── Admin identity ───────────────────────────────────────────────────────
+  // Read from `sb_admin`, which only /api/admin/auth/2fa/verify mints, and only
+  // once the authenticator code has been accepted (`otp: true`). On admin
+  // paths these headers replace anything the tenant cookie set, so a route that
+  // reads x-user-id for its audit log records the admin rather than whichever
+  // tenant session happened to be open in the same browser.
+  let adminClaims: Record<string, any> | null = null;
+  if (isAdminPath || isAdminApiPath) {
+    const adminToken = getAdminTokenFromRequest(req as any);
+    if (adminToken) {
+      const claims = verifyJwt(adminToken);
+      if (claims && claims.scope === "admin" && claims.otp === true && claims.id) {
+        adminClaims = claims;
+        headers.set("x-user-id", String(claims.id));
+        headers.set("x-user-role", "ADMIN");
+        if (claims.name) headers.set("x-user-name", String(claims.name));
+        headers.set("x-company-id", "system");
+      }
+    }
   }
-  // Admin console *pages* likewise.
-  if (
-    pathname.startsWith("/admin") &&
-    !pathname.startsWith("/admin/login") &&
-    decoded?.scope !== "admin"
-  ) {
+
+  // ── Platform admin console gate ──────────────────────────────────────────
+  // The console has its own cookie (`sb_admin`), minted only after both the
+  // password and the authenticator code have been accepted. A tenant session
+  // — even a company owner whose role is also "ADMIN" — carries `sb_auth` and
+  // can never satisfy this. Every route re-checks the same thing server-side
+  // via lib/adminAuth, so this edge check is a fast reject, not the guard.
+  const adminAuthed = Boolean(adminClaims);
+
+  if (isAdminApiPath && !TENANT_ADMIN_API.some((pp) => pathname.startsWith(pp))) {
+    // The two-step sign-in endpoints must stay open — they are what mints the
+    // session in the first place. Everything else needs a completed one.
+    const isAdminAuthEndpoint = pathname.startsWith("/api/admin/auth/");
+    if (!isAdminAuthEndpoint && !adminAuthed) {
+      return NextResponse.json({ error: "Admin authentication required" }, { status: 401 });
+    }
+  }
+
+  if (isAdminPath && pathname !== "/admin/login" && !adminAuthed) {
     const url = req.nextUrl.clone();
     url.pathname = "/admin/login";
     url.search = "";
@@ -193,12 +293,13 @@ export async function proxy(req: NextRequest) {
     }
   }
 
-  // Require auth for app pages
+  // Require auth for app pages.
+  // `/admin` is deliberately absent: the admin console authenticates with
+  // `sb_admin` and was handled above. Including it here sent signed-in admins
+  // to the *tenant* /login for want of an `sb_auth` cookie they never have.
   const needsAuth =
     (pathname.startsWith("/dashboard") ||
-    pathname.startsWith("/onboarding") ||
-    pathname.startsWith("/admin")) &&
-    !pathname.startsWith("/admin/login") &&
+    pathname.startsWith("/onboarding")) &&
     !pathname.startsWith("/onboarding/signup") &&
     !pathname.startsWith("/onboarding/choose-plan") &&
     !pathname.startsWith("/onboarding/payment") &&
@@ -270,7 +371,10 @@ export async function proxy(req: NextRequest) {
     "/api/auth/magic",
     "/api/auth/verify",
     "/api/onboarding/signup",
-    "/api/admin/auth/login",
+    // The whole admin sign-in flow: password step, authenticator enrolment,
+    // OTP verification, sign-out. Each authenticates itself from its own
+    // short-lived cookie; none of them has a company context to require.
+    "/api/admin/auth/",
     "/api/email-verification",
     "/api/test-db",
     "/api/test-login",
@@ -357,6 +461,12 @@ export async function proxy(req: NextRequest) {
 
   const res = NextResponse.next({ request: { headers } });
   res.headers.set("Content-Security-Policy", csp);
+  // Nothing on the admin host should ever reach a search index or a referrer
+  // log on the way out of it.
+  if (onAdminHost || isAdminPath) {
+    res.headers.set("X-Robots-Tag", "noindex, nofollow, noarchive");
+    res.headers.set("Referrer-Policy", "no-referrer");
+  }
 
   // ── Affiliate attribution ────────────────────────────────────────────────
   // An affiliate link is just /whatever?ref=CODE. The visitor almost never

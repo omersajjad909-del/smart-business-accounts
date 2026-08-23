@@ -1,20 +1,58 @@
 "use client";
 
-import { ReactNode, useEffect, useSyncExternalStore } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { Toaster } from "react-hot-toast";
-import { getCurrentUser } from "@/lib/auth";
 import AdminShell from "@/app/admin/components/AdminShell";
-
-const subscribeToHydration = () => () => {};
+import {
+  AdminSessionProvider,
+  canOpenPage,
+  type AdminSessionValue,
+} from "@/app/admin/admin-session";
+import { adminPageForConsolePath } from "@/lib/adminPages";
+import { clearCurrentUser, setCurrentUser } from "@/lib/auth";
 
 export default function AdminLayout({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
   const isLoginPage = pathname === "/admin/login";
-  const hydrated = useSyncExternalStore(subscribeToHydration, () => true, () => false);
-  const user = !hydrated || isLoginPage ? null : getCurrentUser();
-  const isAuthorized = isLoginPage ? true : !!user && user.role === "ADMIN";
+
+  const [state, setState] = useState<AdminSessionValue | null>(null);
+  const [checked, setChecked] = useState(false);
+
+  // The gate is the httpOnly `sb_admin` cookie, verified server-side on every
+  // request. This call is how the UI *learns* the answer — it is not the lock.
+  useEffect(() => {
+    if (isLoginPage) {
+      setChecked(true);
+      return;
+    }
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await fetch("/api/admin/auth/me", { cache: "no-store" });
+        if (cancelled) return;
+        if (!res.ok) {
+          clearCurrentUser();
+          setState({ session: null, superAdminOnlyPages: [] });
+        } else {
+          const data = await res.json();
+          setState({
+            session: data.user,
+            superAdminOnlyPages: data.superAdminOnlyPages || [],
+          });
+          setCurrentUser({ ...data.user, role: "ADMIN", companyId: "system" });
+        }
+      } catch {
+        if (!cancelled) setState({ session: null, superAdminOnlyPages: [] });
+      } finally {
+        if (!cancelled) setChecked(true);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [isLoginPage, pathname]);
 
   useEffect(() => {
     document.documentElement.style.background = "";
@@ -22,15 +60,22 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
   }, []);
 
   useEffect(() => {
-    if (!hydrated || isLoginPage || isAuthorized) return;
-    router.replace("/admin/login");
-  }, [hydrated, isAuthorized, isLoginPage, router]);
+    if (isLoginPage || !checked) return;
+    if (!state?.session) {
+      router.replace("/admin/login");
+      return;
+    }
+    // A page this admin is not ticked for: send them somewhere they can use
+    // rather than letting the screen render and every request under it 403.
+    const page = adminPageForConsolePath(pathname || "/admin");
+    if (page !== "dashboard" && !canOpenPage(state, page)) {
+      router.replace("/admin");
+    }
+  }, [checked, state, isLoginPage, pathname, router]);
 
-  if (isLoginPage) {
-    return <>{children}</>;
-  }
+  if (isLoginPage) return <>{children}</>;
 
-  if (!hydrated || !isAuthorized) {
+  if (!checked || !state?.session) {
     return (
       <div
         style={{
@@ -50,9 +95,9 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
   }
 
   return (
-    <>
+    <AdminSessionProvider value={state}>
       <Toaster position="top-right" />
       <AdminShell>{children}</AdminShell>
-    </>
+    </AdminSessionProvider>
   );
 }
