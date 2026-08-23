@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
+import { requireAdmin } from "@/lib/adminAuth";
 
 export const runtime = "nodejs";
 
@@ -15,6 +16,8 @@ function isAdmin(req: NextRequest) {
 // this page is only equipped to manage AdminUser rows (see PATCH/DELETE).
 export async function GET(req: NextRequest) {
   try {
+    const admin = await requireAdmin(req);
+    if (admin instanceof NextResponse) return admin;
     if (!isAdmin(req)) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     const [teamMembers, platformAdmins] = await Promise.all([
       (prisma as any).adminUser.findMany({
@@ -48,6 +51,8 @@ export async function GET(req: NextRequest) {
 // POST — create team member
 export async function POST(req: NextRequest) {
   try {
+    const admin = await requireAdmin(req);
+    if (admin instanceof NextResponse) return admin;
     if (!isAdmin(req)) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     const { name, email, password, team, allowedPages } = await req.json();
     if (!name || !email || !password)
@@ -77,6 +82,8 @@ export async function POST(req: NextRequest) {
 // PATCH — update (allowedPages, active, team, name, password)
 export async function PATCH(req: NextRequest) {
   try {
+    const admin = await requireAdmin(req);
+    if (admin instanceof NextResponse) return admin;
     if (!isAdmin(req)) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     const { id, name, team, allowedPages, active, password } = await req.json();
     if (!id) return NextResponse.json({ error: "id required" }, { status: 400 });
@@ -105,6 +112,8 @@ export async function PATCH(req: NextRequest) {
 // DELETE — remove team member
 export async function DELETE(req: NextRequest) {
   try {
+    const admin = await requireAdmin(req);
+    if (admin instanceof NextResponse) return admin;
     if (!isAdmin(req)) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     const id = new URL(req.url).searchParams.get("id");
     if (!id) return NextResponse.json({ error: "id required" }, { status: 400 });

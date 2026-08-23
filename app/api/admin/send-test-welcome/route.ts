@@ -1,8 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { sendEmail } from "@/lib/email";
 import { emailTemplates } from "@/lib/emailTemplates";
+import { requireAdmin } from "@/lib/adminAuth";
 
 export async function POST(req: NextRequest) {
+  const admin = await requireAdmin(req, { superAdmin: true });
+  if (admin instanceof NextResponse) return admin;
   const role = req.headers.get("x-user-role") || "";
   if (role.toUpperCase() !== "ADMIN")
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });

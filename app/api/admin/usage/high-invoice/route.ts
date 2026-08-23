@@ -1,9 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { formatCompanyNo } from "@/lib/companyRef";
+import { requireAdmin } from "@/lib/adminAuth";
 
 export async function GET(req: NextRequest) {
   try {
+    const admin = await requireAdmin(req);
+    if (admin instanceof NextResponse) return admin;
     const role = String(req.headers.get("x-user-role") || "").toUpperCase();
     if (role !== "ADMIN") return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 

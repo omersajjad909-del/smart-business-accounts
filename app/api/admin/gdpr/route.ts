@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { sendEmail } from "@/lib/email";
+import { requireAdmin } from "@/lib/adminAuth";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
@@ -8,6 +9,8 @@ export const maxDuration = 60;
 // GET /api/admin/gdpr — List all pending GDPR requests (admin only)
 export async function GET(req: NextRequest) {
   try {
+    const admin = await requireAdmin(req, { superAdmin: true });
+    if (admin instanceof NextResponse) return admin;
     const adminRole = req.headers.get("x-user-role");
     if (adminRole !== "ADMIN" && adminRole !== "SUPER_ADMIN") {
       return NextResponse.json({ error: "Admin access required" }, { status: 403 });
@@ -50,6 +53,8 @@ export async function GET(req: NextRequest) {
 // PATCH /api/admin/gdpr — Process a GDPR request (approve/reject)
 export async function PATCH(req: NextRequest) {
   try {
+    const admin = await requireAdmin(req, { superAdmin: true });
+    if (admin instanceof NextResponse) return admin;
     const adminId = req.headers.get("x-user-id");
     const adminRole = req.headers.get("x-user-role");
 

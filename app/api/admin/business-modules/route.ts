@@ -18,6 +18,7 @@ import { prisma } from "@/lib/prisma";
 import { getTokenFromRequest, verifyJwt } from "@/lib/auth";
 import { BUSINESS_PHASE_CONFIG } from "@/lib/businessModules";
 import { sendEmail } from "@/lib/email";
+import { requireAdmin } from "@/lib/adminAuth";
 
 const ACTION_KEY = "BUSINESS_MODULE_CONFIG";
 const prismaAny = prisma as any;
@@ -165,6 +166,8 @@ async function notifyWaitlist(businessType: string): Promise<number> {
 
 // ── GET ────────────────────────────────────────────────────────
 export async function GET(req: NextRequest) {
+  const admin = await requireAdmin(req);
+  if (admin instanceof NextResponse) return admin;
   if (!isAdmin(req)) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
   const overrides = await loadOverrides();
@@ -211,6 +214,8 @@ export async function GET(req: NextRequest) {
 
 // ── POST ───────────────────────────────────────────────────────
 export async function POST(req: NextRequest) {
+  const admin = await requireAdmin(req);
+  if (admin instanceof NextResponse) return admin;
   if (!isAdmin(req)) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
   const body = await req.json();

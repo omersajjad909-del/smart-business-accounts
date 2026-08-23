@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { requireAdmin } from "@/lib/adminAuth";
 
 export const runtime = "nodejs";
 
@@ -141,6 +142,8 @@ async function postToLinkedIn(
 
 export async function POST(req: NextRequest) {
   try {
+    const admin = await requireAdmin(req);
+    if (admin instanceof NextResponse) return admin;
     if (!isAdmin(req)) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
     const { text, mediaUrl, platforms, scheduleAt } = await req.json() as {
@@ -204,6 +207,8 @@ export async function POST(req: NextRequest) {
 
 export async function GET(req: NextRequest) {
   try {
+    const admin = await requireAdmin(req);
+    if (admin instanceof NextResponse) return admin;
     if (!isAdmin(req)) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
     const posts = await prisma.activityLog.findMany({

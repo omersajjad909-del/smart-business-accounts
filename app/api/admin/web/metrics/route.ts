@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getTokenFromRequest, verifyJwt } from "@/lib/auth";
 import { fetchLemonOrders, revenueForMonth, revenueFromPaymentLogs, ym } from "@/lib/lemonRevenue";
+import { requireAdmin } from "@/lib/adminAuth";
 
 async function safeCount(fn: () => Promise<number>): Promise<number> {
   try { return await fn(); } catch { return 0; }
@@ -10,6 +11,8 @@ async function safeCount(fn: () => Promise<number>): Promise<number> {
 
 export async function GET(req: NextRequest) {
   try {
+    const admin = await requireAdmin(req);
+    if (admin instanceof NextResponse) return admin;
     let role = String(req.headers.get("x-user-role") || "").toUpperCase();
     if (role !== "ADMIN") {
       const token = getTokenFromRequest(req as any);

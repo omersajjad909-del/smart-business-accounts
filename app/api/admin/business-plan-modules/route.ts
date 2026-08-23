@@ -26,6 +26,7 @@ import {
   readSavedDashboardFeatureFlags,
   resolvePlanWideFeatureFlags,
 } from "@/lib/dashboardFeatureRegistry";
+import { requireAdmin } from "@/lib/adminAuth";
 
 // Two independent copies of this config, chosen by ?scope=.
 //   WORLD — Plans → Pages & Modules       (every non-Pakistan company)
@@ -55,6 +56,8 @@ function isAdmin(req: NextRequest) {
 }
 
 export async function GET(req: NextRequest) {
+  const admin = await requireAdmin(req);
+  if (admin instanceof NextResponse) return admin;
   if (!isAdmin(req)) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
   try {
@@ -93,6 +96,8 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
+  const admin = await requireAdmin(req);
+  if (admin instanceof NextResponse) return admin;
   if (!isAdmin(req)) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
   try {

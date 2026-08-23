@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { PLAN_DEFAULT_PERMISSIONS } from "@/lib/planPermissions";
+import { requireAdmin } from "@/lib/adminAuth";
 
 /**
  * POST /api/admin/sync-plan-permissions
@@ -13,6 +14,8 @@ import { PLAN_DEFAULT_PERMISSIONS } from "@/lib/planPermissions";
  */
 export async function POST(req: NextRequest) {
   try {
+    const admin = await requireAdmin(req, { superAdmin: true });
+    if (admin instanceof NextResponse) return admin;
     const userRole = req.headers.get("x-user-role");
     if (userRole !== "ADMIN") {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });

@@ -3,11 +3,14 @@ import { prisma } from "@/lib/prisma";
 import { sendPkPaymentStatusEmail } from "@/lib/email";
 import { recordPlatformInvoice } from "@/lib/platformInvoice";
 import { getCompanyNoMap } from "@/lib/companyRefServer";
+import { requireAdmin } from "@/lib/adminAuth";
 
 export const runtime = "nodejs";
 
-export async function GET() {
+export async function GET(req: NextRequest) {
   try {
+    const admin = await requireAdmin(req);
+    if (admin instanceof NextResponse) return admin;
     const requests = await (prisma as any).pkPaymentRequest.findMany({
       orderBy: { createdAt: "desc" },
       take: 200,
@@ -29,6 +32,8 @@ export async function GET() {
 
 export async function PATCH(req: NextRequest) {
   try {
+    const admin = await requireAdmin(req);
+    if (admin instanceof NextResponse) return admin;
     const { id, status, adminNote } = await req.json();
 
     if (!id || !["APPROVED", "REJECTED"].includes(status)) {

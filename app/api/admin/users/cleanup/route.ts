@@ -1,9 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { requireAdmin } from "@/lib/adminAuth";
 
 // DELETE orphan users — users who have NO company association
 export async function POST(req: NextRequest) {
   try {
+    const admin = await requireAdmin(req, { superAdmin: true });
+    if (admin instanceof NextResponse) return admin;
     const role = String(req.headers.get("x-user-role") || "").toUpperCase();
     if (role !== "ADMIN") return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
@@ -45,6 +48,8 @@ export async function POST(req: NextRequest) {
 // GET — just count orphans without deleting
 export async function GET(req: NextRequest) {
   try {
+    const admin = await requireAdmin(req, { superAdmin: true });
+    if (admin instanceof NextResponse) return admin;
     const role = String(req.headers.get("x-user-role") || "").toUpperCase();
     if (role !== "ADMIN") return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 

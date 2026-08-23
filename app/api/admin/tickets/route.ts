@@ -2,6 +2,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getTokenFromRequest, verifyJwt } from "@/lib/auth";
+import { requireAdmin } from "@/lib/adminAuth";
 
 function isAdmin(req: NextRequest) {
   const role = String(req.headers.get("x-user-role") || "").toUpperCase();
@@ -14,6 +15,8 @@ function isAdmin(req: NextRequest) {
 }
 
 export async function GET(req: NextRequest) {
+  const admin = await requireAdmin(req);
+  if (admin instanceof NextResponse) return admin;
   if (!isAdmin(req)) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   try {
     // Try SupportTicket model first, fallback to ActivityLog
@@ -51,6 +54,8 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
+  const admin = await requireAdmin(req);
+  if (admin instanceof NextResponse) return admin;
   if (!isAdmin(req)) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   try {
     const { action, ticketId, message, status } = await req.json();

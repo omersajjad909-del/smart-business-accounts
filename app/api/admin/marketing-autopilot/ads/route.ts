@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { generateMarketingText, getErrorMessage } from "@/lib/marketingAutopilotAI";
+import { requireAdmin } from "@/lib/adminAuth";
 
 const NICHE_MAP: Record<string, string> = {
   trading:        "traders and trading businesses who manage stock and buy/sell goods",
@@ -19,6 +20,8 @@ const REGION_TARGETING: Record<string, string> = {
 
 export async function POST(req: NextRequest) {
   try {
+    const admin = await requireAdmin(req);
+    if (admin instanceof NextResponse) return admin;
     const role = req.headers.get("x-user-role") || "";
     if (role.toUpperCase() !== "ADMIN")
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });

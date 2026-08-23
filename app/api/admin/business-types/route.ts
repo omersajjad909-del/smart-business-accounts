@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { verifyJwt } from "@/lib/auth";
 import { ALL_BUSINESS_TYPES } from "@/lib/businessTypes";
+import { requireAdmin } from "@/lib/adminAuth";
 
 const CONFIG_ACTION = "BUSINESS_TYPES_CONFIG";
 
@@ -24,6 +25,8 @@ async function getConfig(): Promise<string[]> {
 
 // GET — return all business types with live status
 export async function GET(req: NextRequest) {
+  const admin = await requireAdmin(req);
+  if (admin instanceof NextResponse) return admin;
   const token = req.cookies.get("sb_auth")?.value;
   if (!token) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   const payload = verifyJwt(token);
@@ -42,6 +45,8 @@ export async function GET(req: NextRequest) {
 
 // POST — save updated liveIds list
 export async function POST(req: NextRequest) {
+  const admin = await requireAdmin(req);
+  if (admin instanceof NextResponse) return admin;
   const token = req.cookies.get("sb_auth")?.value;
   if (!token) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   const payload = verifyJwt(token);

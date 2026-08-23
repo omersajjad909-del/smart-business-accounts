@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { requireAdmin } from "@/lib/adminAuth";
 
 export const runtime = "nodejs";
 
@@ -9,6 +10,8 @@ function isAdmin(req: NextRequest): boolean {
 
 export async function GET(req: NextRequest) {
   try {
+    const admin = await requireAdmin(req);
+    if (admin instanceof NextResponse) return admin;
     if (!isAdmin(req)) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
@@ -26,6 +29,8 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
+    const admin = await requireAdmin(req);
+    if (admin instanceof NextResponse) return admin;
     if (!isAdmin(req)) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
@@ -59,6 +64,8 @@ export async function POST(req: NextRequest) {
 
 export async function PATCH(req: NextRequest) {
   try {
+    const admin = await requireAdmin(req);
+    if (admin instanceof NextResponse) return admin;
     if (!isAdmin(req)) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }

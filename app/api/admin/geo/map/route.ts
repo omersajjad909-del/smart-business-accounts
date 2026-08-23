@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getTokenFromRequest, verifyJwt } from "@/lib/auth";
 import { getCountryCenter, isFiniteCoordinate } from "@/lib/geoMapData";
+import { requireAdmin } from "@/lib/adminAuth";
 
 function safeDecode(val: string | null | undefined): string | null {
   if (!val) return null;
@@ -20,6 +21,8 @@ function isAdmin(req: NextRequest) {
 }
 
 export async function GET(req: NextRequest) {
+  const admin = await requireAdmin(req);
+  if (admin instanceof NextResponse) return admin;
   if (!isAdmin(req)) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }

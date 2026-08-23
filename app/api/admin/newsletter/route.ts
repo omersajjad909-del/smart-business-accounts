@@ -6,6 +6,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getTokenFromRequest, verifyJwt } from "@/lib/auth";
 import { sendEmail } from "@/lib/email";
+import { requireAdmin } from "@/lib/adminAuth";
 
 const db = prisma as any;
 
@@ -19,6 +20,8 @@ function isAdmin(req: NextRequest) {
 }
 
 export async function GET(req: NextRequest) {
+  const admin = await requireAdmin(req);
+  if (admin instanceof NextResponse) return admin;
   if (!isAdmin(req)) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
   const { searchParams } = new URL(req.url);
@@ -61,6 +64,8 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
+  const admin = await requireAdmin(req);
+  if (admin instanceof NextResponse) return admin;
   if (!isAdmin(req)) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
   const { subject, html, preview } = await req.json();

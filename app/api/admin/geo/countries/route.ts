@@ -8,6 +8,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getTokenFromRequest, verifyJwt } from "@/lib/auth";
 import { COUNTRIES } from "@/lib/countries";
+import { requireAdmin } from "@/lib/adminAuth";
 
 // Full country name (uppercase) → ISO 2-letter code, built from COUNTRIES list
 const NAME_TO_CODE: Record<string, string> = {};
@@ -33,6 +34,8 @@ const COUNTRY_NAMES: Record<string,string> = {
 
 export async function GET(req: NextRequest) {
   try {
+    const admin = await requireAdmin(req);
+    if (admin instanceof NextResponse) return admin;
     // Auth check
     let role = String(req.headers.get("x-user-role") || "").toUpperCase();
     if (role !== "ADMIN") {

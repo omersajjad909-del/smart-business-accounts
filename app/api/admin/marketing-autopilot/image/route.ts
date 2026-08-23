@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import OpenAI from "openai";
 import { generateMarketingText, getErrorMessage, hasUsableAIKey } from "@/lib/marketingAutopilotAI";
+import { requireAdmin } from "@/lib/adminAuth";
 
 
 const MODEL  = (process.env.DALLE_MODEL   || "dall-e-3") as "dall-e-3" | "dall-e-2";
@@ -10,6 +11,8 @@ const QUALITY = (process.env.DALLE_QUALITY || "standard") as "standard" | "hd";
 /* ─── POST: generate image for a social media post ─── */
 export async function POST(req: NextRequest) {
   try {
+    const admin = await requireAdmin(req);
+    if (admin instanceof NextResponse) return admin;
     const role = req.headers.get("x-user-role") || "";
     if (role.toUpperCase() !== "ADMIN")
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });

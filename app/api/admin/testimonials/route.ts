@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { requireAdmin } from "@/lib/adminAuth";
 
 function isAdmin(req: NextRequest) {
   return String(req.headers.get("x-user-role") || "").toUpperCase() === "ADMIN";
@@ -9,6 +10,8 @@ const db = prisma as any;
 
 // GET - list testimonials, filter by ?status=PENDING|PUBLISHED|REJECTED
 export async function GET(req: NextRequest) {
+  const admin = await requireAdmin(req);
+  if (admin instanceof NextResponse) return admin;
   if (!isAdmin(req)) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   try {
     const status = req.nextUrl.searchParams.get("status");
@@ -25,6 +28,8 @@ export async function GET(req: NextRequest) {
 
 // POST - admin manually adds a testimonial (auto-published)
 export async function POST(req: NextRequest) {
+  const admin = await requireAdmin(req);
+  if (admin instanceof NextResponse) return admin;
   if (!isAdmin(req)) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   try {
     const { name, company, role, message, rating, avatar, planUsed, featured } = await req.json();
@@ -51,6 +56,8 @@ export async function POST(req: NextRequest) {
 
 // PATCH - approve/reject/update
 export async function PATCH(req: NextRequest) {
+  const admin = await requireAdmin(req);
+  if (admin instanceof NextResponse) return admin;
   if (!isAdmin(req)) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   try {
     const { id, action, ...updates } = await req.json();
@@ -81,6 +88,8 @@ export async function PATCH(req: NextRequest) {
 
 // DELETE
 export async function DELETE(req: NextRequest) {
+  const admin = await requireAdmin(req);
+  if (admin instanceof NextResponse) return admin;
   if (!isAdmin(req)) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   try {
     const id = req.nextUrl.searchParams.get("id");

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { requireAdmin } from "@/lib/adminAuth";
 
 /**
  * Profile photos are stored inline as data URLs on the user row, the same way
@@ -12,6 +13,8 @@ const MAX_AVATAR_CHARS = 2_800_000;   // ~2MB once base64 is decoded
 
 export async function GET(req: NextRequest) {
   try {
+    const admin = await requireAdmin(req, { anyPage: true });
+    if (admin instanceof NextResponse) return admin;
     const userId = req.headers.get("x-user-id");
     const userRole = req.headers.get("x-user-role");
 
@@ -70,6 +73,8 @@ export async function GET(req: NextRequest) {
 
 export async function PATCH(req: NextRequest) {
   try {
+    const admin = await requireAdmin(req, { anyPage: true });
+    if (admin instanceof NextResponse) return admin;
     const userId = req.headers.get("x-user-id");
     const userRole = req.headers.get("x-user-role");
 

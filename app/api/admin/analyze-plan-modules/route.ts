@@ -18,6 +18,7 @@ import {
   DASHBOARD_FEATURE_DEFS,
   DashboardFeaturePlanCode
 } from "@/lib/dashboardFeatureRegistry";
+import { requireAdmin } from "@/lib/adminAuth";
 
 type PlanCode = "STARTER" | "PRO" | "ENTERPRISE";
 
@@ -59,6 +60,8 @@ function isAdmin(req: NextRequest): boolean {
 }
 
 export async function GET(req: NextRequest): Promise<NextResponse> {
+  const admin = await requireAdmin(req);
+  if (admin instanceof NextResponse) return admin;
   if (!isAdmin(req)) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
@@ -203,6 +206,8 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
  *   sourceType=trading|manufacturing — which type to copy from (default: trading)
  */
 export async function POST(req: NextRequest): Promise<NextResponse> {
+  const admin = await requireAdmin(req);
+  if (admin instanceof NextResponse) return admin;
   if (!isAdmin(req)) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }

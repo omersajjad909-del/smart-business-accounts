@@ -5,6 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { getTokenFromRequest, verifyJwt } from "@/lib/auth";
 import { sendEmail } from "@/lib/email";
 import { sendWhatsApp } from "@/lib/whatsapp";
+import { requireAdmin } from "@/lib/adminAuth";
 
 function isAdmin(req: NextRequest) {
   const token = getTokenFromRequest(req as any);
@@ -51,6 +52,8 @@ function audienceWhere(audience: string, plan?: string) {
 }
 
 export async function GET(req: NextRequest) {
+  const admin = await requireAdmin(req);
+  if (admin instanceof NextResponse) return admin;
   if (!isAdmin(req)) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   try {
     const logs = await prisma.activityLog.findMany({
@@ -69,6 +72,8 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
+  const admin = await requireAdmin(req);
+  if (admin instanceof NextResponse) return admin;
   if (!isAdmin(req)) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   try {
     const { subject, body, audience, plan, channel = "email" } = await req.json();

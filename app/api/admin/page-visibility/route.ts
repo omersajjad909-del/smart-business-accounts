@@ -12,6 +12,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getTokenFromRequest, verifyJwt } from "@/lib/auth";
 import { DASHBOARD_FEATURE_DEFS } from "@/lib/dashboardFeatureRegistry";
+import { requireAdmin } from "@/lib/adminAuth";
 
 const LOG_KEY = "PAGE_VISIBILITY_CONFIG";
 
@@ -42,6 +43,8 @@ async function saveHidden(hidden: string[]) {
 }
 
 export async function GET(req: NextRequest) {
+  const admin = await requireAdmin(req);
+  if (admin instanceof NextResponse) return admin;
   if (!isAdmin(req)) return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
 
   const hidden = new Set(await loadHidden());
@@ -61,6 +64,8 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
+  const admin = await requireAdmin(req);
+  if (admin instanceof NextResponse) return admin;
   if (!isAdmin(req)) return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
 
   const body = await req.json();

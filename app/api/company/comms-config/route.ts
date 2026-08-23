@@ -7,7 +7,7 @@ import {
 } from "@/lib/companyCommsConfig";
 import { getTokenFromRequest, verifyJwt } from "@/lib/auth";
 
-function await requireAdmin(req: NextRequest) {
+function isTenantAdmin(req: NextRequest) {
   const token = getTokenFromRequest(req);
   if (!token) return false;
   const payload = verifyJwt(token);
@@ -21,7 +21,7 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: "Company required" }, { status: 400 });
     }
 
-    if (!requireAdmin(req)) {
+    if (!isTenantAdmin(req)) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
@@ -40,7 +40,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Company required" }, { status: 400 });
     }
 
-    if (!requireAdmin(req)) {
+    if (!isTenantAdmin(req)) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 

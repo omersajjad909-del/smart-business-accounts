@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { requireAdmin } from "@/lib/adminAuth";
 
 function isAdmin(req: NextRequest) {
   return req.headers.get("x-user-role")?.toUpperCase() === "ADMIN";
@@ -23,6 +24,8 @@ async function ensureTable() {
 /* ─── GET: list all companies + addon status ─── */
 export async function GET(req: NextRequest) {
   try {
+    const admin = await requireAdmin(req);
+    if (admin instanceof NextResponse) return admin;
     if (!isAdmin(req))
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
@@ -70,6 +73,8 @@ export async function GET(req: NextRequest) {
 /* ─── POST: enable / update addon for a company ─── */
 export async function POST(req: NextRequest) {
   try {
+    const admin = await requireAdmin(req);
+    if (admin instanceof NextResponse) return admin;
     if (!isAdmin(req))
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
@@ -98,6 +103,8 @@ export async function POST(req: NextRequest) {
 /* ─── DELETE: remove addon ─── */
 export async function DELETE(req: NextRequest) {
   try {
+    const admin = await requireAdmin(req);
+    if (admin instanceof NextResponse) return admin;
     if (!isAdmin(req))
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
