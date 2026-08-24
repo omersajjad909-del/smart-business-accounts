@@ -75,6 +75,8 @@ const CSS = `
 .fxStep{display:grid;grid-template-columns:1.05fr 1.3fr .6fr auto;gap:8px;align-items:center}
 .fxHead{font-size:9.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
   color:rgba(255,255,255,.32);padding:0 2px 3px}
+.fxFormulaTitle{flex:1 1 220px;min-width:220px;word-break:normal;overflow-wrap:anywhere}
+.fxFormulaActions{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
 @media(max-width:1080px){
   .fxCols{grid-template-columns:1fr}
   .fxSide{position:static}
@@ -85,6 +87,10 @@ const CSS = `
   .fxIn,.fxOut,.fxStep,.fxInS,.fxOutS{grid-template-columns:1fr 1fr}
   .fxHeadRow{display:none}
   .fxBar{top:52px;z-index:9}
+  .fxFormulaCard{align-items:stretch!important}
+  .fxFormulaTitle{flex-basis:100%!important;min-width:0!important;width:100%!important;word-break:normal!important}
+  .fxFormulaActions{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr));width:100%}
+  .fxFormulaActions>*{width:100%;text-align:center}
 }
 `;
 
@@ -729,16 +735,17 @@ export default function FormulasPage() {
           {visible.length > 0 && (
             <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
               {visible.map(({ record, draft }) => (
-                <div key={record.id} style={{
+                <div key={record.id} className="fxFormulaCard" style={{
                   background: CARD, border: `1px solid ${BORDER}`, borderRadius: 12,
                   padding: "14px 16px", display: "flex", alignItems: "center", gap: 14, flexWrap: "wrap",
                 }}>
-                  <div style={{ flex: 1, minWidth: 220 }}>
+                  <div className="fxFormulaTitle">
                     <div style={{ fontSize: 14.5, fontWeight: 700 }}>{draft.name}</div>
                     <div style={{ fontSize: 12, color: "rgba(255,255,255,.35)", marginTop: 2 }}>
                       {draft.category} · {draft.inputs.length} inputs · {draft.steps.length} steps · v{draft.version}
                     </div>
                   </div>
+                  <div className="fxFormulaActions">
                   <Link href={`/dashboard/costing?formula=${record.id}`} style={{ ...btn(), textDecoration: "none" }}>Run</Link>
                   <button onClick={() => setEditing({ id: record.id, draft })} style={btn()}>Edit</button>
                   {/* A copy opens as a brand-new formula, so the original keeps
@@ -751,6 +758,7 @@ export default function FormulasPage() {
                     style={btn()}>Duplicate</button>
                   <button onClick={() => { if (confirm(`Delete "${draft.name}"?`)) store.remove(record.id); }}
                     style={btn("danger")}>Delete</button>
+                  </div>
                 </div>
               ))}
             </div>
