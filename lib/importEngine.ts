@@ -295,9 +295,32 @@ export const FIELD_ALIASES: Record<string, string[]> = {
   minStock: ["min stock", "minstock", "reorder level", "reorder point", "minimum qty", "safety stock"],
   barcode: ["barcode", "bar code", "ean", "upc"],
 
-  debit: ["debit", "dr", "opening debit", "opendebit", "debit amount", "debit balance"],
-  credit: ["credit", "cr", "opening credit", "opencredit", "credit amount", "credit balance"],
-  balance: ["balance", "opening balance", "openingbalance", "closing balance", "amount", "net balance", "begin balance", "ending balance"],
+  // Closing before opening, deliberately.
+  //
+  // A period trial balance carries all three pairs — Opening Debit, Trans.
+  // Debit, Closing Debit — and the one that becomes an opening balance in the
+  // new system is the CLOSING balance in the old one on the cutover date. That
+  // is the whole idea of a cutover: yesterday's closing is today's opening.
+  //
+  // Listed the other way round, a file with both columns silently imported the
+  // position at the *start* of the old system's reporting period, which on a
+  // three-year report is years of movement missing. It reconciles against
+  // nothing and there is no error to notice — the numbers are simply wrong.
+  debit: [
+    "closing debit", "closing dr", "closing balance debit",
+    "debit", "dr", "debit amount", "debit balance",
+    "opening debit", "opendebit",
+  ],
+  credit: [
+    "closing credit", "closing cr", "closing balance credit",
+    "credit", "cr", "credit amount", "credit balance",
+    "opening credit", "opencredit",
+  ],
+  balance: [
+    "closing balance", "closingbalance", "ending balance",
+    "balance", "amount", "net balance",
+    "opening balance", "openingbalance", "begin balance",
+  ],
 
   qty: ["qty", "quantity", "stock", "on hand", "onhand", "closing qty", "closing stock", "balance qty", "quantity on hand", "available qty"],
   location: ["location", "warehouse", "godown", "store", "subinventory", "site"],
@@ -601,6 +624,62 @@ export function readOpeningBalanceRow(row: CsvRow): {
     return { value, warning: "Row has both a debit and a credit — both were kept" };
   }
   return { value };
+}
+
+/**
+ * Marks the subtotal rows in a hierarchical trial balance so they are not
+ * imported alongside the accounts they add up.
+ *
+ * A period trial balance out of a Forms-based system prints the tree, not the
+ * leaves:
+ *
+ *     03        SHORT TERM LIABILITIES     18,709,249     <- group
+ *     0303        EMPLOYEES                18,709,249     <- sub-group
+ *     03030001      AKRAM (SALARY)             49,000     <- real account
+ *     03030002      YASIR (SALARY)             51,000     <- real account
+ *
+ * Import all of it and every figure is counted three times. The trial balance
+ * would at least come out visibly wrong, but only after somebody has written
+ * five thousand rows into a live company.
+ *
+ * A code alone is not proof: in a flat scheme 100, 1001 and 1002 can all be
+ * real accounts, and prefix-matching would throw away 100. So the test is
+ * arithmetic — a row is a subtotal when its net equals the net of everything
+ * filed underneath it. A genuine account whose code happens to be a prefix of
+ * another will not add up, and is only warned about.
+ */
+export function flagSummaryRows(rows: MappedRow<OpeningBalanceRow>[]): {
+  summaries: number;
+} {
+  const coded = rows.filter((r) => !r.error && r.value?.code);
+  if (coded.length < 2) return { summaries: 0 };
+
+  const net = (r: MappedRow<OpeningBalanceRow>) => r.value.debit - r.value.credit;
+  let summaries = 0;
+
+  for (const row of coded) {
+    const code = row.value.code;
+    const children = coded.filter(
+      (other) => other !== row && other.value.code.length > code.length && other.value.code.startsWith(code),
+    );
+    if (children.length === 0) continue;
+
+    const childTotal = children.reduce((sum, c) => sum + net(c), 0);
+    // Tolerance rather than equality: these totals are printed to the rupee
+    // and re-parsed from text, so a few paisa of drift is not a difference.
+    if (Math.abs(childTotal - net(row)) < 1) {
+      row.error =
+        `Group total for ${children.length} account${children.length === 1 ? "" : "s"} below it — ` +
+        `importing it as well would count the same money twice`;
+      summaries += 1;
+    } else if (!row.warning) {
+      row.warning =
+        `${children.length} account${children.length === 1 ? "" : "s"} sit under this code. ` +
+        `Check this is a real account and not a heading.`;
+    }
+  }
+
+  return { summaries };
 }
 
 export type OpeningStockRow = {

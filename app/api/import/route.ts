@@ -30,6 +30,7 @@ import {
   readOpeningBalanceRow,
   readOpeningStockRow,
   readOpenDocumentRow,
+  flagSummaryRows,
   type ImportDataType,
   type MappedRow,
   type AccountRow,
@@ -576,6 +577,19 @@ export async function POST(req: NextRequest) {
     }
 
     const mapped = mapForType(dataType, parsed.rows);
+
+    // Whole-file pass, so it cannot live in a per-row reader: a hierarchical
+    // trial balance prints group subtotals as ordinary rows, and importing
+    // those alongside their children counts the same money two or three times.
+    // Runs before both the preview and the commit, so the operator sees the
+    // rows that will be held back and why.
+    if (dataType === "opening_balances") {
+      const { summaries } = flagSummaryRows(mapped.rows as MappedRow<OpeningBalanceRow>[]);
+      if (summaries > 0) {
+        mapped.ok -= summaries;
+        mapped.failed += summaries;
+      }
+    }
 
     // ── Dry run: interpret, check against the database, write nothing ──
     if (body.dryRun) {
