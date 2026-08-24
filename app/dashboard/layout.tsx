@@ -2260,6 +2260,35 @@ export default function DashboardLayout({
           </NavGroup>
           )}
 
+          {/* ── IMPORT DATA ──
+              Bringing a decade of history off an old system is the first thing
+              a new customer does, and until now the only way to any of it was a
+              single link buried on the Integrations page — the wizard, the
+              opening balances screen and the templates were all effectively
+              unreachable. They live together here because they are one job done
+              in one order, not four unrelated screens.
+
+              No permission wrapper: each link is gated by its own registry
+              feature (CORE_IMPORT_*), which ships on for every plan and is
+              switchable per plan in /admin/permissions. NavGroup hides itself
+              when a plan leaves none of them on. */}
+          <NavGroup
+            title="Import Data"
+            icon={<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>}
+            open={openSection === "importdata"}
+            onToggle={() => toggle("importdata")}
+          >
+            <NavLink href="/dashboard/import" pathname={pathname}>📥 Import Center</NavLink>
+            <NavLink href="/dashboard/import-wizard" pathname={pathname}>🧙 Import Wizard</NavLink>
+            {/* Opening Balances keeps its home under Accounting — it is a manual
+                entry screen as much as an import one — but it is also step 5 of
+                the migration, so it is reachable from here too. Gated on its own
+                CORE_OPENING_BALANCES feature either way, so listing it twice
+                changes nothing about who can see it. */}
+            <NavLink href="/dashboard/opening-balances" pathname={pathname}>⚖️ Opening Balances</NavLink>
+            <NavLink href="/dashboard/import/oracle-guide" pathname={pathname}>📖 Migration Guide</NavLink>
+          </NavGroup>
+
           {/* ── SETTINGS ── */}
           {showSettingsSection && (
             <NavGroup

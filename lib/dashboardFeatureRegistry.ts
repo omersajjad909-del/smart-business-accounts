@@ -2599,6 +2599,24 @@ export const CORE_DASHBOARD_FEATURES: DashboardFeatureDefinition[] = [
   // set their own SMTP, and their invoices go out from the FinovaOS address
   // instead of their own.
   { id: "CORE_EMAIL_SETTINGS", label: "Email Settings", route: "/dashboard/email-settings", section: "Settings", core: true, permKey: "EMAIL_SETTINGS", business: "service", businessLabel: "Core (all businesses)" },
+
+  // ── Import Data ──
+  // Migration off an old system is the first thing a new customer does and the
+  // thing every sale turns on: a factory ten years into Oracle will not move
+  // until it can see its own chart of accounts land intact. The pages existed
+  // and the wizard worked, but none of them was registered here and none was in
+  // the sidebar — the only way in was one link buried on the Integrations page,
+  // so in practice they did not exist.
+  //
+  // Deliberately no permKey. Every other core page inherits the permission that
+  // matched what /pricing sells, which would put migration behind a plan tier;
+  // a customer cannot evaluate the product until their data is inside it, so
+  // these ship on for Starter, Pro, Enterprise and Custom alike. An admin can
+  // still switch any of them off per plan in /admin/permissions, which is the
+  // whole point of them being here rather than hard-coded into the sidebar.
+  { id: "CORE_IMPORT_HUB", label: "Import Data", route: "/dashboard/import", section: "Import Data", core: true, business: "service", businessLabel: "Core (all businesses)", description: "Migration home — every import step in the order it has to be done." },
+  { id: "CORE_IMPORT_WIZARD", label: "Import Wizard", route: "/dashboard/import-wizard", section: "Import Data", core: true, business: "service", businessLabel: "Core (all businesses)", description: "Upload a CSV from Oracle, QuickBooks, Xero, Sage or Tally, preview how it was read, then commit." },
+  { id: "CORE_IMPORT_ORACLE_GUIDE", label: "Migration Guide", route: "/dashboard/import/oracle-guide", section: "Import Data", core: true, business: "service", businessLabel: "Core (all businesses)", description: "The cutover plan, and the SQL to pull each file out of Oracle." },
 ];
 
 // Core pages join the same list the sidebar, the admin grid and the route

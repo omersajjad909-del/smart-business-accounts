@@ -2,25 +2,11 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { resolveCompanyId } from "@/lib/tenant";
 import { safeEncryptField } from "@/lib/fieldEncrypt";
-
-type Row = Record<string, string>;
-
-function parseCsv(text: string): Row[] {
-  const lines = text.split(/\r?\n/).filter((l) => l.trim().length > 0);
-  if (lines.length === 0) return [];
-  const headers = lines[0].split(",").map((h) => h.trim());
-  const rows: Row[] = [];
-
-  for (let i = 1; i < lines.length; i += 1) {
-    const cols = lines[i].split(",").map((c) => c.trim().replace(/^"|"$/g, ""));
-    const row: Row = {};
-    headers.forEach((h, idx) => {
-      row[h] = cols[idx] ?? "";
-    });
-    rows.push(row);
-  }
-  return rows;
-}
+// The hand-rolled parser this file used to carry split on every comma, so
+// "M/s Ali Traders, Karachi" became two columns and shifted every value after
+// it one place left — the balance saved was not the balance in the file.
+// See lib/csvParse.ts.
+import { parseCsv, parseAmount, parseImportDate } from "@/lib/csvParse";
 
 export async function POST(req: NextRequest) {
   const role = req.headers.get("x-user-role")?.toUpperCase();
@@ -39,7 +25,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "CSV payload required" }, { status: 400 });
     }
 
-    const rows = parseCsv(body.csv);
+    const { rows } = parseCsv(body.csv);
     if (rows.length === 0) {
       return NextResponse.json({ error: "No rows found" }, { status: 400 });
     }
@@ -73,11 +59,11 @@ export async function POST(req: NextRequest) {
           type,
           city: r.city || null,
           phone: r.phone ? safeEncryptField(r.phone) : null,
-          openDebit: r.openDebit ? Number(r.openDebit) : 0,
-          openCredit: r.openCredit ? Number(r.openCredit) : 0,
-          openDate: r.openDate ? new Date(r.openDate) : undefined,
-          creditDays: r.creditDays ? Number(r.creditDays) : 0,
-          creditLimit: r.creditLimit ? Number(r.creditLimit) : 0,
+          openDebit: parseAmount(r.openDebit),
+          openCredit: parseAmount(r.openCredit),
+          openDate: parseImportDate(r.openDate) ?? undefined,
+          creditDays: Math.round(parseAmount(r.creditDays)),
+          creditLimit: parseAmount(r.creditLimit),
         },
       });
       created += 1;

@@ -1,24 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { resolveCompanyId } from "@/lib/tenant";
-
-type Row = Record<string, string>;
-
-function parseCsv(text: string): Row[] {
-  const lines = text.split(/\r?\n/).filter((l) => l.trim().length > 0);
-  if (lines.length === 0) return [];
-  const headers = lines[0].split(",").map((h) => h.trim());
-  const rows: Row[] = [];
-  for (let i = 1; i < lines.length; i += 1) {
-    const cols = lines[i].split(",").map((c) => c.trim().replace(/^"|"$/g, ""));
-    const row: Row = {};
-    headers.forEach((h, idx) => {
-      row[h] = cols[idx] ?? "";
-    });
-    rows.push(row);
-  }
-  return rows;
-}
+// Shared reader. Balances arrive as "1,234.56" and "(500)" from every real
+// accounting system; Number() reads the first as NaN and the second as NaN too,
+// and parseFloat reads "1,234.56" as 1. See lib/csvParse.ts.
+import { parseCsv } from "@/lib/csvParse";
+import { readOpeningBalanceRow } from "@/lib/importEngine";
 
 export async function POST(req: NextRequest) {
   const role = req.headers.get("x-user-role")?.toUpperCase();
@@ -39,7 +26,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "CSV payload required" }, { status: 400 });
     }
 
-    const rows = parseCsv(csv);
+    const { rows } = parseCsv(csv);
     if (rows.length === 0) {
       return NextResponse.json({ error: "No rows found" }, { status: 400 });
     }
@@ -49,21 +36,33 @@ export async function POST(req: NextRequest) {
     const errors: string[] = [];
 
     for (const r of rows) {
-      const code = (r.code || r.accountCode || "").trim();
-      const debit = Number(r.debit || r.openDebit || 0);
-      const credit = Number(r.credit || r.openCredit || 0);
-      if (!code) {
+      // One reader shared with /api/import, so a file that previews cleanly in
+      // the wizard behaves identically when it is committed here.
+      const { value, error } = readOpeningBalanceRow(r);
+      const { code, name, debit, credit } = value;
+      if (error) {
         skipped += 1;
         continue;
       }
       try {
-        const acc = await prisma.account.findFirst({
-          where: { code, companyId },
-          select: { id: true },
-        });
+        // Code first, name second. A trial balance exported off a report screen
+        // often carries the account name and no code at all, and refusing those
+        // rows was why a perfectly good Oracle TB imported as zero updates.
+        const byCode = code
+          ? await prisma.account.findFirst({
+              where: { code, companyId, deletedAt: null },
+              select: { id: true },
+            })
+          : null;
+        const acc = byCode ?? (name
+          ? await prisma.account.findFirst({
+              where: { companyId, deletedAt: null, name: { equals: name, mode: "insensitive" } },
+              select: { id: true },
+            })
+          : null);
         if (!acc) {
           skipped += 1;
-          errors.push(`Account not found: ${code}`);
+          errors.push(`Account not found: ${code || name}`);
           continue;
         }
         await prisma.account.update({
@@ -72,7 +71,7 @@ export async function POST(req: NextRequest) {
         });
         updated += 1;
       } catch (e: any) {
-        errors.push(`Failed for ${code}: ${e.message}`);
+        errors.push(`Failed for ${code || name}: ${e.message}`);
         skipped += 1;
       }
     }

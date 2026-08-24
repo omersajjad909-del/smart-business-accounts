@@ -2,25 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { resolveCompanyId } from "@/lib/tenant";
 import { logActivity } from "@/lib/audit";
-
-type Row = Record<string, string>;
-
-function parseCsv(text: string): Row[] {
-  const lines = text.split(/\r?\n/).filter((l) => l.trim().length > 0);
-  if (lines.length === 0) return [];
-  const headers = lines[0].split(",").map((h) => h.trim());
-  const rows: Row[] = [];
-
-  for (let i = 1; i < lines.length; i += 1) {
-    const cols = lines[i].split(",").map((c) => c.trim().replace(/^"|"$/g, ""));
-    const row: Row = {};
-    headers.forEach((h, idx) => {
-      row[h] = cols[idx] ?? "";
-    });
-    rows.push(row);
-  }
-  return rows;
-}
+// Shared reader — an item named "Bag, 11x11" used to arrive as two columns and
+// take its rate from the wrong one. See lib/csvParse.ts.
+import { parseCsv, parseAmount } from "@/lib/csvParse";
 
 export async function POST(req: NextRequest) {
   const role = req.headers.get("x-user-role")?.toUpperCase();
@@ -40,7 +24,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "CSV payload required" }, { status: 400 });
     }
 
-    const rows = parseCsv(body.csv);
+    const { rows } = parseCsv(body.csv);
     if (rows.length === 0) {
       return NextResponse.json({ error: "No rows found" }, { status: 400 });
     }
@@ -73,8 +57,8 @@ export async function POST(req: NextRequest) {
           code: code || `I-${Date.now()}`,
           name,
           unit,
-          rate: r.rate ? Number(r.rate) : 0,
-          minStock: r.minStock ? Number(r.minStock) : 0,
+          rate: parseAmount(r.rate),
+          minStock: Math.max(0, Math.round(parseAmount(r.minStock))),
           barcode: r.barcode ? String(r.barcode).trim() : null,
           description: r.description || "",
         },
