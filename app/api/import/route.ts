@@ -216,29 +216,30 @@ async function writeAccounts(
     const v = row.value;
     try {
       const existing = lookup(index, v.code, v.name);
-      const data: Record<string, unknown> = {
+      // `undefined` rather than a conditional spread, because Prisma reads it
+      // the way both branches need: on update it means "leave this alone", and
+      // on create it means "use the column default". A masters file with no
+      // city column must not blank the city somebody already typed in, and a
+      // file with no balance column must not zero an opening balance.
+      const data = {
         name: v.name,
         type: v.type,
         partyType: v.partyType,
-        ...(v.description ? { description: v.description } : {}),
-        ...(v.email ? { email: v.email } : {}),
-        // Phone numbers sit in the encrypted-field set like every other party
-        // phone in the product; importing them in clear would be the one place
-        // they were not.
-        ...(v.phone ? { phone: safeEncryptField(v.phone) } : {}),
-        ...(v.city ? { city: v.city } : {}),
-        ...(v.address ? { address: v.address } : {}),
-        ...(v.ntn ? { ntn: v.ntn } : {}),
-        ...(v.strn ? { strn: v.strn } : {}),
-        ...(v.creditLimit != null ? { creditLimit: v.creditLimit } : {}),
-        ...(v.creditDays != null ? { creditDays: v.creditDays } : {}),
+        description: v.description || undefined,
+        email: v.email || undefined,
+        // Party phones sit in the encrypted-field set like every other one in
+        // the product; importing them in clear would be the single place they
+        // were not.
+        phone: v.phone ? safeEncryptField(v.phone) : undefined,
+        city: v.city || undefined,
+        address: v.address || undefined,
+        ntn: v.ntn || undefined,
+        strn: v.strn || undefined,
+        creditLimit: v.creditLimit ?? undefined,
+        creditDays: v.creditDays ?? undefined,
+        openDebit: v.openDebit || v.openCredit ? v.openDebit : undefined,
+        openCredit: v.openDebit || v.openCredit ? v.openCredit : undefined,
       };
-      // Opening balances only come across when the file actually carried them;
-      // a masters file with no balance column must not zero what is already set.
-      if (v.openDebit || v.openCredit) {
-        data.openDebit = v.openDebit;
-        data.openCredit = v.openCredit;
-      }
 
       if (existing) {
         await prisma.account.update({ where: { id: existing.id }, data });
@@ -249,7 +250,7 @@ async function writeAccounts(
       sequence += 1;
       const code = v.code || `${prefix}-${String(sequence).padStart(4, "0")}`;
       const created = await prisma.account.create({
-        data: { companyId, code, ...(data as any) },
+        data: { companyId, code, ...data },
         select: { id: true, code: true, name: true },
       });
       index.byCode.set(code.trim().toLowerCase(), { id: created.id, name: created.name });
@@ -308,7 +309,7 @@ async function writeItems(companyId: string, mapped: MappedRow<ItemRow>[]): Prom
 
 async function writeOpeningBalances(
   companyId: string,
-  mapped: MappedRow<any>[],
+  mapped: MappedRow<OpeningBalanceRow>[],
   openDate: Date,
 ): Promise<Outcome> {
   const outcome = emptyOutcome(mapped.length);
@@ -351,7 +352,7 @@ async function writeOpeningBalances(
  */
 async function writeOpeningStock(
   companyId: string,
-  mapped: MappedRow<any>[],
+  mapped: MappedRow<OpeningStockRow>[],
   date: Date,
 ): Promise<Outcome> {
   const outcome = emptyOutcome(mapped.length);
@@ -418,7 +419,7 @@ async function writeOpeningStock(
 async function writeOpenDocuments(
   companyId: string,
   branchId: string | null,
-  mapped: MappedRow<any>[],
+  mapped: MappedRow<OpenDocumentRow>[],
   kind: "invoice" | "bill",
 ): Promise<Outcome> {
   const outcome = emptyOutcome(mapped.length);
@@ -436,6 +437,15 @@ async function writeOpenDocuments(
   for (const row of mapped) {
     if (row.error || !row.value) { outcome.skipped += 1; continue; }
     const v = row.value;
+    // readOpenDocumentRow already rejects a row with no readable date, so this
+    // is belt and braces — but a document with no date cannot be aged, and
+    // defaulting it to today would silently put a 2019 invoice in the current
+    // bucket, which is worse than skipping it.
+    if (!v.date) {
+      outcome.skipped += 1;
+      note(outcome, row.line, `${v.docNo} has no readable date`);
+      continue;
+    }
     const hit = lookup(index, "", v.party);
     if (!hit) {
       outcome.skipped += 1;
@@ -569,7 +579,11 @@ export async function POST(req: NextRequest) {
 
     // ── Dry run: interpret, check against the database, write nothing ──
     if (body.dryRun) {
-      const tally = await annotateAgainstDb(companyId, dataType, mapped.rows);
+      // Every row shape carries some subset of code / name / party, which is
+      // all annotation reads.
+      const tally = await annotateAgainstDb(
+        companyId, dataType, mapped.rows as MappedRow<Identifiable>[],
+      );
       const def = findDataType(dataType);
       return NextResponse.json({
         preview: true,
@@ -597,34 +611,41 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Invalid cutover date" }, { status: 400 });
     }
 
+    // `mapForType` returns the union of every row shape, so each branch narrows
+    // to the one its reader actually produced. The pairing of data type to
+    // reader is fixed in `mapForType` directly above, which is what makes each
+    // of these assertions safe.
+    const rows = mapped.rows;
     let outcome: Outcome;
     switch (dataType) {
       case "accounts":
-        outcome = await writeAccounts(companyId, mapped.rows, "account");
+        outcome = await writeAccounts(companyId, rows as MappedRow<AccountRow>[], "account");
         break;
       case "customers":
-        outcome = await writeAccounts(companyId, mapped.rows, "customer");
+        outcome = await writeAccounts(companyId, rows as MappedRow<AccountRow>[], "customer");
         break;
       case "suppliers":
-        outcome = await writeAccounts(companyId, mapped.rows, "supplier");
+        outcome = await writeAccounts(companyId, rows as MappedRow<AccountRow>[], "supplier");
         break;
       case "items":
-        outcome = await writeItems(companyId, mapped.rows);
+        outcome = await writeItems(companyId, rows as MappedRow<ItemRow>[]);
         break;
       case "opening_balances":
-        outcome = await writeOpeningBalances(companyId, mapped.rows, date);
+        outcome = await writeOpeningBalances(companyId, rows as MappedRow<OpeningBalanceRow>[], date);
         break;
       case "opening_stock":
-        outcome = await writeOpeningStock(companyId, mapped.rows, date);
+        outcome = await writeOpeningStock(companyId, rows as MappedRow<OpeningStockRow>[], date);
         break;
       case "open_invoices":
         outcome = await writeOpenDocuments(
-          companyId, await resolveBranchIdOrDefault(req, companyId), mapped.rows, "invoice",
+          companyId, await resolveBranchIdOrDefault(req, companyId),
+          rows as MappedRow<OpenDocumentRow>[], "invoice",
         );
         break;
       case "open_bills":
         outcome = await writeOpenDocuments(
-          companyId, await resolveBranchIdOrDefault(req, companyId), mapped.rows, "bill",
+          companyId, await resolveBranchIdOrDefault(req, companyId),
+          rows as MappedRow<OpenDocumentRow>[], "bill",
         );
         break;
       default:

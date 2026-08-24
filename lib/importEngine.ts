@@ -257,11 +257,15 @@ export function findDataType(id: string): ImportDataTypeDef | null {
  * file carrying both "Account Code" and "Code" resolves to the specific one.
  */
 export const FIELD_ALIASES: Record<string, string[]> = {
+  // Deliberately no bare "no", "number" or "id" at the end. Those match by
+  // containment against half the columns in a real export — "NTN Number" and
+  // "Invoice Number" both contain "number" — and the account code silently
+  // becoming the tax number is the kind of error nobody finds until an audit.
   code: [
-    "code", "account code", "accountcode", "acct code", "ledger code", "gl code",
-    "segment1", "account number", "acno", "a/c code", "party code", "customer code",
-    "supplier code", "vendor code", "item code", "sku", "stock code", "part no",
-    "partno", "product code", "no", "number", "id",
+    "item code", "account code", "accountcode", "acct code", "ledger code", "gl code",
+    "party code", "customer code", "supplier code", "vendor code", "product code",
+    "stock code", "account number", "acno", "a/c code", "part no", "partno",
+    "segment1", "sku", "code",
   ],
   name: [
     "name", "account name", "accountname", "ledger name", "gl account name",
@@ -355,12 +359,21 @@ export function normalizePartyType(raw: string, hint?: "customer" | "supplier"):
   if (!s) return "GENERAL";
 
   const has = (...needles: string[]) => needles.some((n) => s.includes(n));
+  /**
+   * Whole-word test, for the two-letter abbreviations only.
+   *
+   * "AR" and "AP" as substrings are a trap: SHARE CAPITAL contains AR, and
+   * CAPITAL contains AP, so a substring test filed share capital under
+   * customers and the balance sheet showed the owner's equity as a debtor.
+   */
+  const hasWord = (...needles: string[]) =>
+    needles.some((n) => new RegExp(`\\b${n}\\b`).test(s));
 
   // Order matters: "ACCOUNTS RECEIVABLE" contains both "RECEIVABLE" and
   // "ACCOUNT", and "ACCUMULATED DEPRECIATION" must not be read as an asset.
   if (has("ACCUM", "DEPREC")) return "ACCUMULATED DEPRECIATION";
-  if (has("RECEIVABLE", "DEBTOR", "CUSTOMER", "SUNDRY DR", "TRADE DEBT", "AR")) return "CUSTOMER";
-  if (has("PAYABLE", "CREDITOR", "SUPPLIER", "VENDOR", "SUNDRY CR", "TRADE CRED", "AP")) return "SUPPLIER";
+  if (has("RECEIVABLE", "DEBTOR", "CUSTOMER", "SUNDRY DR", "TRADE DEBT") || hasWord("AR")) return "CUSTOMER";
+  if (has("PAYABLE", "CREDITOR", "SUPPLIER", "VENDOR", "SUNDRY CR", "TRADE CRED") || hasWord("AP")) return "SUPPLIER";
   if (has("BANK")) return "BANKS";
   if (has("CASH", "PETTY")) return "CASH";
   if (has("FIXED ASSET", "PLANT", "MACHINERY", "EQUIPMENT", "VEHICLE", "BUILDING", "FURNITURE", "PROPERTY")) return "FIXED ASSETS";
@@ -470,10 +483,12 @@ export function readAccountRow(row: CsvRow, hint?: "customer" | "supplier"): {
   const rawType = field(row, "type");
   const partyType = normalizePartyType(rawType, hint);
 
-  // A source that gives one signed balance instead of two columns: positive is
-  // a debit, negative a credit, which is the convention every one of them uses.
-  const debit = parseAmount(field(row, "debit"));
-  const credit = parseAmount(field(row, "credit"));
+  // As in readOpeningBalanceRow: a headed Debit/Credit column has already said
+  // which side it is, so a parenthesised amount there is Oracle's formatting,
+  // not a sign flip. Only an unheaded single balance column uses the sign —
+  // positive a debit, negative a credit, which is what all of them emit.
+  const debit = Math.abs(parseAmount(field(row, "debit")));
+  const credit = Math.abs(parseAmount(field(row, "credit")));
   const balanceRaw = field(row, "balance");
   let openDebit = debit;
   let openCredit = credit;
@@ -559,22 +574,25 @@ export function readOpeningBalanceRow(row: CsvRow): {
   const code = field(row, "code").trim();
   const name = field(row, "name").trim();
 
-  const debit = parseAmount(field(row, "debit"));
-  const credit = parseAmount(field(row, "credit"));
+  // A column headed Debit or Credit has already declared its side, so the sign
+  // is formatting rather than meaning. Oracle prints every amount on a trial
+  // balance in parentheses when the report is defined that way, and reading
+  // "(3,410,900)" in the CREDIT column as a debit flips the entry, doubles the
+  // error and leaves a trial balance out by twice the amount.
+  const debit = Math.abs(parseAmount(field(row, "debit")));
+  const credit = Math.abs(parseAmount(field(row, "credit")));
   const balanceRaw = field(row, "balance");
 
   let finalDebit = debit;
   let finalCredit = credit;
+
+  // A single unheaded balance column is the opposite case: there the sign is
+  // the only thing saying which side the amount belongs on.
   if (!debit && !credit && balanceRaw) {
     const balance = parseAmount(balanceRaw);
     if (balance >= 0) finalDebit = balance;
     else finalCredit = Math.abs(balance);
   }
-
-  // A single column that came through negative: a debit of -500 is a credit of
-  // 500, and writing it as a negative debit would show the wrong side.
-  if (finalDebit < 0) { finalCredit += Math.abs(finalDebit); finalDebit = 0; }
-  if (finalCredit < 0) { finalDebit += Math.abs(finalCredit); finalCredit = 0; }
 
   const value: OpeningBalanceRow = { code, name, debit: finalDebit, credit: finalCredit };
 

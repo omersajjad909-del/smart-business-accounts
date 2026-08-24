@@ -148,21 +148,63 @@ export function normalizeHeader(header: string): string {
 }
 
 /**
+ * The same header as separated words, padded with spaces so a containment test
+ * is a whole-word test. "PRIMARY_PHONE_NUMBER" becomes " primary phone number ".
+ */
+function headerWords(header: string): string {
+  const raw = String(header || "");
+  const noBom = raw.startsWith(BOM) ? raw.slice(1) : raw;
+  return ` ${noBom.trim().toLowerCase().replace(/[\s_\-.]+/g, " ").replace(/\s+/g, " ")} `;
+}
+
+/**
  * Reads a row by any of several possible column names.
  *
  * Every source spells the same column differently - "Ledger Name", "Account
  * Name", "ACCOUNT_NAME", "Name" - and asking for them one at a time is what
  * made each importer grow its own mapping table.
+ *
+ * Two passes, because an exact list can never be long enough. Oracle in
+ * particular decorates its columns: the phone is `PRIMARY_PHONE_NUMBER`, the
+ * unit `PRIMARY_UOM_CODE`, the outstanding `AMOUNT_DUE_REMAINING`. No
+ * hand-written alias list catches all of those, and a customer whose phone
+ * numbers silently did not import is a customer who stops trusting the rest.
+ *
+ *   1. exact match on the squashed header
+ *   2. whole-word containment on the spaced header
+ *
+ * Containment is by whole word on purpose. A plain substring test matches
+ * "code" inside "barcode" and files every barcode as an account code; " code "
+ * matches inside " bar code " and not inside " barcode ".
+ *
+ * Candidates are tried in order within each pass, so an alias list written
+ * specific-to-generic resolves "Item Code" to the item code rather than to
+ * whatever else happens to contain the word.
  */
 export function pick(row: CsvRow, ...candidates: string[]): string {
-  const normalized = new Map<string, string>();
-  for (const [key, value] of Object.entries(row)) {
-    normalized.set(normalizeHeader(key), value);
+  const entries = Object.entries(row);
+
+  // Pass 1 — exact, on the squashed header.
+  const squashed = new Map<string, string>();
+  for (const [key, value] of entries) {
+    const k = normalizeHeader(key);
+    if (!squashed.has(k)) squashed.set(k, value);
   }
   for (const candidate of candidates) {
-    const hit = normalized.get(normalizeHeader(candidate));
+    const hit = squashed.get(normalizeHeader(candidate));
     if (hit !== undefined && hit !== "") return hit;
   }
+
+  // Pass 2 — whole-word containment, on the spaced header.
+  const worded = entries.map(([key, value]) => [headerWords(key), value] as const);
+  for (const candidate of candidates) {
+    const needle = headerWords(candidate);
+    if (needle.trim() === "") continue;
+    for (const [header, value] of worded) {
+      if (header.includes(needle) && value !== "") return value;
+    }
+  }
+
   return "";
 }
 
