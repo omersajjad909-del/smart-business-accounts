@@ -65,16 +65,37 @@ const btn = (primary = false): React.CSSProperties => ({
    print sheets can hide the whole app without knowing anything about it. */
 const CSS = `
 .cxWrap{max-width:1240px;margin:0 auto;padding:24px 18px 90px}
+.cxHeader{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap;margin-bottom:20px}
+.cxHeaderAction{display:inline-flex;text-decoration:none}
 .cxCols{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:20px;align-items:start}
 .cxSide{position:sticky;top:16px;display:flex;flex-direction:column;gap:14px}
 .cxForm{display:flex;flex-direction:column;gap:14px}
 .cxFields{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .cxStats{display:grid;grid-template-columns:repeat(auto-fill,minmax(145px,1fr));gap:14px}
+.cxRecentRow{display:flex;justify-content:space-between;gap:10px;font-size:12.5px}
+.cxRecentTitle{color:rgba(255,255,255,.55);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cxActionRow{display:flex;gap:9px;flex-wrap:wrap}
+.cxWorkingRow{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;padding:8px 10px;border-radius:7px}
+.cxSectionHead{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.cxPrimaryValue{font-family:${MONO};font-size:38px;font-weight:800;color:#34d399;line-height:1.05;font-variant-numeric:tabular-nums}
 @media(max-width:1080px){
   .cxCols{grid-template-columns:1fr}
   .cxSide{position:static}
 }
-@media(max-width:620px){.cxFields{grid-template-columns:1fr}}
+@media(max-width:620px){
+  .cxWrap{padding:18px 14px 72px}
+  .cxHeaderAction{width:100%}
+  .cxHeaderAction,.cxHeaderAction > *{justify-content:center;width:100%}
+  .cxFields{grid-template-columns:1fr}
+  .cxStats{grid-template-columns:1fr}
+  .cxRecentRow{flex-direction:column;align-items:flex-start}
+  .cxRecentTitle{white-space:normal}
+  .cxActionRow{flex-direction:column}
+  .cxActionRow > *{width:100%}
+  .cxWorkingRow{grid-template-columns:1fr;gap:6px}
+  .cxSectionHead{align-items:flex-start}
+  .cxPrimaryValue{font-size:30px}
+}
 .cxPrint{display:none}
 @media print{
   /* The app stays in the DOM but off the paper; only the sheet is inked. */
@@ -355,7 +376,7 @@ function CostingInner() {
     <div className="cxWrap" style={{ fontFamily: FONT, color: "white" }}>
       <style>{CSS}</style>
 
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 16, flexWrap: "wrap", marginBottom: 20 }}>
+      <div className="cxHeader">
         <div>
           <h1 style={{ fontSize: 23, fontWeight: 800, margin: "0 0 4px" }}>Costing</h1>
           <p style={{ fontSize: 13.5, color: "rgba(255,255,255,.42)", margin: 0 }}>
@@ -363,7 +384,7 @@ function CostingInner() {
             <Link href="/dashboard/costing/formulas" style={{ color: "#818cf8" }}>formulas</Link>.
           </p>
         </div>
-        <Link href="/dashboard/costing/formulas" style={{ ...btn(), textDecoration: "none" }}>Manage formulas</Link>
+        <Link className="cxHeaderAction" href="/dashboard/costing/formulas" style={{ ...btn(), textDecoration: "none" }}>Manage formulas</Link>
       </div>
 
       {formulaStore.loading ? (
@@ -424,8 +445,8 @@ function CostingInner() {
                 <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 12 }}>Recent sheets</div>
                 <div style={{ display: "flex", flexDirection: "column", gap: 7 }}>
                   {recentSheets.map((s) => (
-                    <div key={s.id} style={{ display: "flex", justifyContent: "space-between", gap: 10, fontSize: 12.5 }}>
-                      <span style={{ color: "rgba(255,255,255,.55)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                    <div key={s.id} className="cxRecentRow">
+                      <span className="cxRecentTitle">
                         {s.title}
                       </span>
                       <span style={{ fontFamily: MONO, color: "#34d399", fontWeight: 700, flexShrink: 0, fontVariantNumeric: "tabular-nums" }}>
@@ -458,7 +479,7 @@ function CostingInner() {
                   <div style={{ fontSize: 11.5, fontWeight: 700, letterSpacing: ".08em", textTransform: "uppercase", color: "rgba(52,211,153,.8)", marginBottom: 8 }}>
                     {primary.label || primary.key}
                   </div>
-                  <div style={{ fontFamily: MONO, fontSize: 38, fontWeight: 800, color: "#34d399", lineHeight: 1.05, fontVariantNumeric: "tabular-nums" }}>
+                  <div className="cxPrimaryValue">
                     {fmt(run?.values[primary.key])}
                     <span style={{ fontSize: 15, color: "rgba(255,255,255,.32)", marginLeft: 8, fontWeight: 600 }}>{primary.unit}</span>
                   </div>
@@ -479,8 +500,8 @@ function CostingInner() {
                 </div>
 
                 {/* Two prints, because two people use them. */}
-                <div style={{
-                  display: "flex", gap: 9, flexWrap: "wrap", padding: "12px 22px 16px",
+                <div className="cxActionRow" style={{
+                  padding: "12px 22px 16px",
                   borderTop: "1px solid rgba(52,211,153,.18)",
                 }}>
                   <button onClick={() => setPrintKind("cost")} disabled={!run} style={{ ...btn(), opacity: run ? 1 : .5 }}>
@@ -504,9 +525,7 @@ function CostingInner() {
               {showWorking && (
                 <div style={{ display: "flex", flexDirection: "column", gap: 1 }}>
                   {run?.steps.map((s) => (
-                    <div key={s.key} style={{
-                      display: "grid", gridTemplateColumns: "minmax(0,1fr) auto", gap: 12,
-                      padding: "8px 10px", borderRadius: 7,
+                    <div key={s.key} className="cxWorkingRow" style={{
                       background: s.error ? "rgba(248,113,113,.08)" : "transparent",
                     }}>
                       <div style={{ minWidth: 0 }}>
@@ -533,7 +552,7 @@ function CostingInner() {
             {selected && (
               <div style={{ background: CARD, border: `1px solid ${BORDER}`, borderRadius: 14, padding: 18 }}>
                 <label style={labelStyle}>Save this as a sheet</label>
-                <div style={{ display: "flex", gap: 9, flexWrap: "wrap" }}>
+                <div className="cxActionRow">
                   <input value={sheetName} onChange={(e) => setSheetName(e.target.value)}
                     placeholder="PVC bag 11.5 × 11 — Ali Traders"
                     style={{ ...inputStyle, fontFamily: FONT, flex: 1, minWidth: 180 }}/>
@@ -552,7 +571,7 @@ function CostingInner() {
             {/* ── Turn the result into something the factory can produce against ── */}
             {selected && run?.ok && (
               <div style={{ background: CARD, border: `1px solid ${BORDER}`, borderRadius: 14, padding: 18 }}>
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
+                <div className="cxSectionHead">
                   <div>
                     <div style={{ fontSize: 14, fontWeight: 700 }}>Produce this</div>
                     <div style={{ fontSize: 12, color: "rgba(255,255,255,.35)", marginTop: 3 }}>
@@ -644,7 +663,7 @@ function CostingInner() {
                       Material cost is read from stock when the run is priced, so the BOM follows what you actually paid.
                     </div>
 
-                    <div style={{ display: "flex", gap: 9 }}>
+                    <div className="cxActionRow">
                       <button onClick={createBom} disabled={bomSaving} style={{ ...btn(true), opacity: bomSaving ? .6 : 1 }}>
                         {bomSaving ? "Creating…" : "Create BOM"}
                       </button>
