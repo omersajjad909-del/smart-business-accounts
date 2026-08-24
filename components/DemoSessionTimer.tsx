@@ -75,7 +75,7 @@ export default function DemoSessionTimer() {
 
   return (
     <>
-      <div style={{
+      <div className="demo-session-timer" style={{
         position: "fixed", bottom: 24, right: 24, zIndex: 9998,
         display: "flex", alignItems: "center", gap: 10, padding: "12px 16px",
         borderRadius: 16, background: bg, border: `1px solid ${border}`,
@@ -159,6 +159,12 @@ export default function DemoSessionTimer() {
         @keyframes demoPulse {
           0%, 100% { opacity: 1; transform: scale(1); }
           50% { opacity: .5; transform: scale(1.3); }
+        }
+        @media (max-width: 767px) {
+          .demo-session-timer {
+            bottom: calc(92px + env(safe-area-inset-bottom)) !important;
+            right: 16px !important;
+          }
         }
       `}</style>
     </>
