@@ -644,9 +644,16 @@ export function readOpeningBalanceRow(row: CsvRow): {
  *
  * A code alone is not proof: in a flat scheme 100, 1001 and 1002 can all be
  * real accounts, and prefix-matching would throw away 100. So the test is
- * arithmetic — a row is a subtotal when its net equals the net of everything
- * filed underneath it. A genuine account whose code happens to be a prefix of
- * another will not add up, and is only warned about.
+ * arithmetic — a row is a subtotal when its net equals the net of its direct
+ * children. A genuine account whose code happens to be a prefix of another
+ * will not add up, and is only warned about.
+ *
+ * The residual case is a flat chart where a parent-looking code's balance
+ * coincidentally equals the children's — 100 at 50,000 above 1001 at 30,000
+ * and 1002 at 20,000. That row is held back wrongly. It is an acceptable
+ * trade: this runs in the dry run, so the row appears in the preview with the
+ * reason and the operator decides, and the alternative failure — silently
+ * importing every subtotal — doubles a live trial balance instead.
  */
 export function flagSummaryRows(rows: MappedRow<OpeningBalanceRow>[]): {
   summaries: number;
@@ -659,18 +666,30 @@ export function flagSummaryRows(rows: MappedRow<OpeningBalanceRow>[]): {
 
   for (const row of coded) {
     const code = row.value.code;
-    const children = coded.filter(
+    const descendants = coded.filter(
       (other) => other !== row && other.value.code.length > code.length && other.value.code.startsWith(code),
     );
-    if (children.length === 0) continue;
+    if (descendants.length === 0) continue;
+
+    // Direct children only. Summing every descendant would add the
+    // intermediate groups to the leaves under them and double-count inside the
+    // check itself — which is how the top-level "03" row came out at twice its
+    // own figure and escaped as a real account.
+    const children = descendants.filter(
+      (d) => !descendants.some(
+        (p) => p !== d && d.value.code.length > p.value.code.length && d.value.code.startsWith(p.value.code),
+      ),
+    );
 
     const childTotal = children.reduce((sum, c) => sum + net(c), 0);
     // Tolerance rather than equality: these totals are printed to the rupee
     // and re-parsed from text, so a few paisa of drift is not a difference.
     if (Math.abs(childTotal - net(row)) < 1) {
       row.error =
-        `Group total for ${children.length} account${children.length === 1 ? "" : "s"} below it — ` +
-        `importing it as well would count the same money twice`;
+        `Looks like a group total for the ${children.length} account` +
+        `${children.length === 1 ? "" : "s"} coded under ${code} — importing it too would ` +
+        `count the same money twice. If it is a real account, give it a code that is not ` +
+        `the start of another one.`;
       summaries += 1;
     } else if (!row.warning) {
       row.warning =
