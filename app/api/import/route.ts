@@ -570,6 +570,11 @@ export async function POST(req: NextRequest) {
         { status: 400 },
       );
     }
+
+    const shape = describeNonTabular(parsed);
+    if (shape) {
+      return NextResponse.json({ error: shape }, { status: 400 });
+    }
     if (parsed.rows.length > MAX_ROWS) {
       return NextResponse.json(
         { error: `${parsed.rows.length.toLocaleString()} rows is too many for one file. Split it into files of ${MAX_ROWS.toLocaleString()} rows or fewer.` },
