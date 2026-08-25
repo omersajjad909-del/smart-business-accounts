@@ -674,9 +674,17 @@ function SalesInvoiceContent() {
           body * { visibility: hidden !important; }
           .print-area, .print-area * { visibility: visible !important; }
           .print-area { position: fixed; inset: 0; }
-          /* The bottom margin is the app-wide "Powered by FinovaOS" footer's
-             room; without it the last row of the bill prints under it. */
-          @page { margin: 8mm 10mm 20mm; }
+
+          /* The on-screen preview is a second copy of the same bill. Hiding it
+             is not enough — hidden still occupies its full A4 of height, which
+             pushed the sheet count to two, and a fixed .print-area repeats on
+             every sheet it makes. So on paper the preview leaves the layout
+             altogether and the bill prints once. */
+          .print-paper-wrapper { display: none !important; }
+
+          /* The document prints "Powered by FinovaOS" at its own foot, so the
+             page footer stands down here and no margin is reserved for it. */
+          @page { margin: 8mm 10mm; }
         }
         @media screen { .print-area { display: none; } }
       `}</style>
