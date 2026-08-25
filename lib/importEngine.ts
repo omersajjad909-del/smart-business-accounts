@@ -395,6 +395,14 @@ export const FIELD_ALIASES: Record<string, string[]> = {
     "reference", "ref", "cheque no", "chq no", "chq", "against", "notes", "memo",
   ],
 
+  // Every stock report prints a value column beside the quantity, and plenty
+  // of them print no unit rate at all — the rate is left to be divided out.
+  // "amount" sits last: on an open-invoice file it means something else, but
+  // this key is only read by the opening-stock reader.
+  stockValue: [
+    "stock value", "closing value", "closing amount", "total value", "cost value",
+    "inventory value", "value", "amount",
+  ],
   qty: ["qty", "quantity", "stock", "on hand", "onhand", "closing qty", "closing stock", "balance qty", "quantity on hand", "available qty"],
   location: ["location", "warehouse", "godown", "store", "subinventory", "site"],
 
@@ -665,6 +673,12 @@ export function readItemRow(row: CsvRow): { value: ItemRow; error?: string; warn
   };
 
   if (!name) return { value, error: "No item name in this row" };
+  if (!field(row, "unit").trim()) {
+    // Silently filing a roll as PCS is the kind of thing nobody notices until
+    // the first stock report, by which point every movement is in the wrong
+    // unit and there is no clean way back.
+    return { value, warning: "No unit in this row — filed as PCS" };
+  }
   return { value };
 }
 
@@ -1022,7 +1036,24 @@ export function readOpeningStockRow(row: CsvRow): {
   // InventoryTxn.qty is an Int. Rounding here rather than at the write means
   // the preview shows the number that will actually be stored.
   const qty = Math.round(exactQty);
-  const rate = parseAmount(field(row, "purchaseRate")) || parseAmount(field(row, "rate"));
+  let rate = parseAmount(field(row, "purchaseRate")) || parseAmount(field(row, "rate"));
+
+  // A stock report that gives quantity and value but no rate still knows what
+  // the stock cost — it is one division away. Worth doing here rather than
+  // leaving it: opening stock imported at zero cost silently sets the weighted
+  // average to nothing, and every margin calculated afterwards is wrong by the
+  // whole cost of goods.
+  //
+  // Divided by the exact quantity, not the rounded one, so the unit cost is the
+  // report's own figure rather than one bent by the rounding.
+  let rateFromValue = false;
+  if (!rate && exactQty) {
+    const stockValue = parseAmount(field(row, "stockValue"));
+    if (stockValue) {
+      rate = Math.abs(stockValue / exactQty);
+      rateFromValue = true;
+    }
+  }
 
   const value: OpeningStockRow = {
     code,
@@ -1038,6 +1069,12 @@ export function readOpeningStockRow(row: CsvRow): {
     return { value, warning: `Quantity ${exactQty} rounded to ${qty} — stock is held in whole units` };
   }
   if (rate <= 0) return { value, warning: "No cost given — stock comes in at zero value" };
+  if (rateFromValue) {
+    return {
+      value,
+      warning: `No rate column — cost of ${rate.toFixed(2)} worked out from the value`,
+    };
+  }
   return { value };
 }
 
