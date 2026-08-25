@@ -14,6 +14,7 @@
  * GET returns the sources and data types the wizard renders.
  */
 
+import { randomUUID } from "node:crypto";
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { resolveCompanyId, resolveBranchIdOrDefault } from "@/lib/tenant";
@@ -50,6 +51,14 @@ const WRITE_ROLES = new Set(["ADMIN", "ACCOUNTANT"]);
 const PREVIEW_ROWS = 25;
 /** Beyond this a single file is refused — split it instead of timing out. */
 const MAX_ROWS = 20000;
+/**
+ * Ledger history is the exception. It is one row per posting rather than one
+ * per account, so a single export covering every party for five years is
+ * six figures of rows and there is nothing sensible to split it on — splitting
+ * by date would cut each party off from the opening line the writer needs.
+ * The rows are also the cheapest kind, written in batches of 500.
+ */
+const MAX_LEDGER_ROWS = 250000;
 
 type Outcome = {
   total: number;
@@ -560,7 +569,18 @@ async function writeLedgerHistory(
   }
 
   const suspense = await ensureSuspenseAccount(companyId);
-  let posted = false;
+
+  // Five hundred parties over five years is six figures of vouchers, and a
+  // create() per row is a round trip per row. Everything is collected first and
+  // written in batches; the ids are generated here so the two entries can point
+  // at their voucher before either exists.
+  type PendingVoucher = {
+    id: string; companyId: string; branchId?: string;
+    voucherNo: string; type: string; date: Date; narration: string;
+  };
+  const vouchers: PendingVoucher[] = [];
+  const entries: { companyId: string; voucherId: string; accountId: string; amount: number }[] = [];
+  const lines: number[] = [];
 
   for (const rows of groups.values()) {
     const first = rows[0].value;
@@ -573,18 +593,41 @@ async function writeLedgerHistory(
       continue;
     }
 
-    // The opening line is what makes the rest of the file safe to post.
+    // Where this party stood before the file starts. Getting it wrong is the
+    // one error that cannot be spotted afterwards — the ledger still adds up,
+    // it is just wrong by the opening — so it is taken from the file two ways
+    // and refused when the file says neither.
     const openingRows = rows.filter((r) => r.value.isOpening);
-    if (openingRows.length === 0) {
+    const firstPosting = rows.find((r) => !r.value.isOpening)?.value ?? null;
+    let openDebit = 0;
+    let openCredit = 0;
+    let openDate: Date | undefined;
+
+    if (openingRows.length > 0) {
+      openDebit = openingRows[0].value.debit;
+      openCredit = openingRows[0].value.credit;
+      openDate = openingRows[0].value.date ?? undefined;
+    } else if (firstPosting && firstPosting.balanceAfter !== null) {
+      // No B/F line — which is normal for a ledger run from the account's
+      // inception — but the running balance column answers the same question:
+      // the balance after the first posting, less that posting itself. An
+      // account opened inside the period comes out at zero, which is right.
+      const before = Number(
+        (firstPosting.balanceAfter - (firstPosting.debit - firstPosting.credit)).toFixed(2),
+      );
+      openDebit = before > 0 ? before : 0;
+      openCredit = before < 0 ? -before : 0;
+      openDate = firstPosting.date ?? undefined;
+    } else {
       outcome.skipped += rows.length;
       note(
         outcome,
         rows[0].line,
-        `"${name || code}" has no opening / B/F line — importing without it would count the balance twice`,
+        `"${name || code}" has no opening / B/F line and no running-balance column — ` +
+          `without one of the two, importing it would count the balance twice`,
       );
       continue;
     }
-    const opening = openingRows[0].value;
 
     // What is already on this account, so a second run of the same file writes
     // nothing rather than doubling the party.
@@ -602,11 +645,7 @@ async function writeLedgerHistory(
     try {
       await prisma.account.update({
         where: { id: hit.id },
-        data: {
-          openDebit: opening.debit,
-          openCredit: opening.credit,
-          openDate: opening.date ?? undefined,
-        },
+        data: { openDebit, openCredit, openDate },
       });
       outcome.updated += 1;
     } catch (e) {
@@ -638,29 +677,41 @@ async function writeLedgerHistory(
       if (seen.has(key)) { outcome.skipped += 1; continue; }
       seen.add(key);
 
-      try {
-        await prisma.voucher.create({
-          data: {
-            companyId,
-            branchId: branchId ?? undefined,
-            voucherNo,
-            type: v.voucherType || "JV",
-            date: v.date,
-            narration: v.narration || "Imported from previous system",
-            entries: {
-              create: [
-                { companyId, accountId: hit.id, amount },
-                { companyId, accountId: suspense.id, amount: -amount },
-              ],
-            },
-          },
-        });
-        outcome.imported += 1;
-        posted = true;
-      } catch (e) {
-        outcome.skipped += 1;
-        note(outcome, row.line, e instanceof Error ? e.message : "Could not post this voucher");
-      }
+      const voucherId = randomUUID();
+      vouchers.push({
+        id: voucherId,
+        companyId,
+        branchId: branchId ?? undefined,
+        voucherNo,
+        type: v.voucherType || "JV",
+        date: v.date,
+        narration: v.narration || "Imported from previous system",
+      });
+      // Two per voucher, in this order, which is what lets the flush below
+      // slice the entries alongside their vouchers without a lookup.
+      entries.push({ companyId, voucherId, accountId: hit.id, amount });
+      entries.push({ companyId, voucherId, accountId: suspense.id, amount: -amount });
+      lines.push(row.line);
+    }
+  }
+
+  // Vouchers and their entries go in together, so a chunk that fails leaves no
+  // half-written voucher behind — a one-legged entry is a broken trial balance
+  // that nothing in the app would flag.
+  const CHUNK = 500;
+  let posted = false;
+  for (let i = 0; i < vouchers.length; i += CHUNK) {
+    const slice = vouchers.slice(i, i + CHUNK);
+    try {
+      await prisma.$transaction([
+        prisma.voucher.createMany({ data: slice }),
+        prisma.voucherEntry.createMany({ data: entries.slice(i * 2, (i + slice.length) * 2) }),
+      ]);
+      outcome.imported += slice.length;
+      posted = true;
+    } catch (e) {
+      outcome.skipped += slice.length;
+      note(outcome, lines[i] ?? 0, e instanceof Error ? e.message : "Could not post this batch of vouchers");
     }
   }
 
@@ -866,9 +917,10 @@ export async function POST(req: NextRequest) {
     if (shape) {
       return NextResponse.json({ error: shape }, { status: 400 });
     }
-    if (parsed.rows.length > MAX_ROWS) {
+    const rowCap = dataType === "ledger_history" ? MAX_LEDGER_ROWS : MAX_ROWS;
+    if (parsed.rows.length > rowCap) {
       return NextResponse.json(
-        { error: `${parsed.rows.length.toLocaleString()} rows is too many for one file. Split it into files of ${MAX_ROWS.toLocaleString()} rows or fewer.` },
+        { error: `${parsed.rows.length.toLocaleString()} rows is too many for one file. Split it into files of ${rowCap.toLocaleString()} rows or fewer.` },
         { status: 400 },
       );
     }
