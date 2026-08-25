@@ -65,6 +65,65 @@ function note(outcome: Outcome, line: number, message: string) {
   if (outcome.errors.length < 50) outcome.errors.push(`Row ${line}: ${message}`);
 }
 
+/* ─────────────────────── Shape of the file ─────────────────────── */
+
+/**
+ * Refuses a file whose first line is not a heading row, with an explanation of
+ * what to do instead. Returns null when the file looks tabular.
+ *
+ * Reporting tools do not all export a grid. Some write one line per printed
+ * page, with every field on that page flattened into it in layout order, so
+ * the first line comes out as a heading row followed by the whole of page one —
+ * amounts, account names, "Report Total:" and all. Parsed as a table that gives
+ * a plausible-looking result: a large column count, a row per page, and every
+ * row carrying the repeated page header as its values.
+ *
+ * That case previously reached the preview reporting "359 rows, 359 will
+ * import, 0 skipped", because every row had a name and no rule it broke — the
+ * name was just the literal text "A c c o u n t D e s c r i p t i o n". Pressing
+ * Import would have created hundreds of accounts named after a column heading.
+ * A preview that cannot tell the operator the file is unusable is worse than no
+ * preview, since it invites the very click it exists to prevent.
+ *
+ * A heading is text. Numbers, money and blanks in the heading row mean the
+ * first line is data, or the file was never a grid.
+ */
+function describeNonTabular(parsed: { headers: string[]; rows: CsvRow[] }): string | null {
+  const headers = parsed.headers;
+  if (headers.length === 0) return "The file has no heading row.";
+
+  const looksNumeric = (h: string) => /^[\s(]*[-+]?[\d,. ]+\)?$/.test(h.trim()) && /\d/.test(h);
+  const blanks = headers.filter((h) => h.trim() === "").length;
+  const numeric = headers.filter(looksNumeric).length;
+
+  if (numeric + blanks > headers.length / 5) {
+    return (
+      `The first line of this file is not a row of column headings — ${numeric} of its ` +
+      `${headers.length} values are amounts. This usually means the report was exported ` +
+      `one line per printed page rather than one line per row. Look for a plain list or ` +
+      `"listing" version of the report, export that, and check in a text editor that the ` +
+      `first line reads like headings (Code, Account Description, …) before uploading.`
+    );
+  }
+
+  // The same tell from the other side: a page-per-line export repeats the page
+  // header inside every line, so every row carries identical leading values.
+  if (parsed.rows.length >= 3) {
+    const first = headers[0];
+    const sample = parsed.rows.slice(0, 20);
+    const identical = sample.every((r) => r[first] === sample[0][first] && (r[first] ?? "") !== "");
+    if (identical && sample[0][first]?.trim().toLowerCase() === String(first).trim().toLowerCase()) {
+      return (
+        `Every row in this file repeats the column headings instead of holding data — the ` +
+        `first column reads "${first}" on all of them. The report was exported one line per ` +
+        `printed page. Export a plain list version of the report instead.`
+      );
+    }
+  }
+
+  return null;
+}
+
 /* ─────────────────────────── Lookups ─────────────────────────── */
 
 /**
