@@ -295,6 +295,30 @@ export function PrintPaperWrapper({ children }: { children: React.ReactNode }) {
            washed the cell rules out to nothing. These have to out-specify it,
            hence the long selectors: a printed bill is black ink on white paper
            whatever the screen around it is wearing. */
+        /* A4 is about 718 CSS pixels wide once the margins are off, so every
+           "@media (max-width: 767px)" rule the dashboard has for phones fires
+           on paper as well. One of them turns every table into a horizontally
+           scrolling block — which on paper shrinks the grid to its content and
+           strands the totals against the left margin. A printed document is
+           not a small screen: it gets its tables back. */
+        html.dark .dashboard-root .print-doc-a4 table,
+        html:not(.dark) .dashboard-root .print-doc-a4 table,
+        .print-doc-a4 table {
+          display: table !important;
+          overflow: visible !important;
+          min-width: 0 !important;
+        }
+        html.dark .dashboard-root .print-doc-a4 .pdoc-grid,
+        html:not(.dark) .dashboard-root .print-doc-a4 .pdoc-grid,
+        .print-doc-a4 .pdoc-grid { width: 100% !important; table-layout: auto !important; }
+        html.dark .dashboard-root .print-doc-a4 .pdoc-totals,
+        html:not(.dark) .dashboard-root .print-doc-a4 .pdoc-totals,
+        .print-doc-a4 .pdoc-totals { width: auto !important; }
+        /* Same block wraps every flex row it can find; the letterhead, the
+           header box and the signature row are meant to stay on one line. */
+        .print-doc-a4 [style*="display:flex"],
+        .print-doc-a4 [style*="display: flex"] { flex-wrap: nowrap !important; }
+
         html.dark .dashboard-root .print-doc-a4 .pdoc-grid th,
         html:not(.dark) .dashboard-root .print-doc-a4 .pdoc-grid th,
         .print-doc-a4 .pdoc-grid th {
