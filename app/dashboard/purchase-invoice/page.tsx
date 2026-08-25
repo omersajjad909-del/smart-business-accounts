@@ -26,7 +26,7 @@ import {
   rateFormulaEnterHandler,
   type RateFormulaMeta,
 } from "@/components/RateFormulaCells";
-import { computeRateFromFormula, emptyRateFormulaMeta, metaFromItem, readRateFormulaMeta } from "@/lib/rateFormula";
+import { computeRateFromFormula, emptyRateFormulaMeta, itemPickerLabel, metaFromItem, readRateFormulaMeta } from "@/lib/rateFormula";
 import type { RateFormulaValue } from "@/lib/rateFormula";
 
 type Supplier = { id: string; name: string; partyType: string };
@@ -1230,6 +1230,7 @@ const [searchTerm, setSearchTerm] = useState("");
                                       }
                                     }}
                                       onKeyDown={rateFormulaEnterHandler(rf, rfActive, i)}
+                                      label={rfActive ? itemPickerLabel : undefined}
                                       style={{ ...inp({ padding: "5px 7px", fontSize: 12.5 }), fontWeight: r.itemId ? 600 : 400 }}
                                       allowManual={false}
                                       placeholder="Type to search — e.g. e1060"

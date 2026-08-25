@@ -21,7 +21,7 @@ import {
   rateFormulaEnterHandler,
   type RateFormulaMeta,
 } from "@/components/RateFormulaCells";
-import { computeRateFromFormula, emptyRateFormulaMeta, metaFromItem, readRateFormulaMeta } from "@/lib/rateFormula";
+import { computeRateFromFormula, emptyRateFormulaMeta, itemPickerLabel, metaFromItem, readRateFormulaMeta } from "@/lib/rateFormula";
 import type { RateFormulaValue } from "@/lib/rateFormula";
 
 const FONT = "'Outfit','Inter',sans-serif";
@@ -398,6 +398,7 @@ export default function GRNPage() {
                             value={row.itemId}
                             onChange={(__picked: string) => selectGrnItem(idx, __picked)}
                             onKeyDown={rateFormulaEnterHandler(rf, rfActive, idx)}
+                            label={rfActive ? itemPickerLabel : undefined}
                             style={{ ...inp({ marginBottom: 8 }) }}
                             allowManual={false}
                             placeholder="Type to search — e.g. e1060"
@@ -442,6 +443,7 @@ export default function GRNPage() {
                                   value={row.itemId}
                                   onChange={(__picked: string) => selectGrnItem(idx, __picked)}
                                   onKeyDown={rateFormulaEnterHandler(rf, rfActive, idx)}
+                                  label={rfActive ? itemPickerLabel : undefined}
                                   style={inp({ padding: "6px 10px" })}
                                   allowManual={false}
                                   placeholder="Type to search — e.g. e1060"

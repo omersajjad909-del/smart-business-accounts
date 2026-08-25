@@ -27,7 +27,7 @@ import {
   rateFormulaEnterHandler,
   type RateFormulaMeta,
 } from "@/components/RateFormulaCells";
-import { computeRateFromFormula, emptyRateFormulaMeta, metaFromItem, readRateFormulaMeta } from "@/lib/rateFormula";
+import { computeRateFromFormula, emptyRateFormulaMeta, itemPickerLabel, metaFromItem, readRateFormulaMeta } from "@/lib/rateFormula";
 import type { RateFormulaValue } from "@/lib/rateFormula";
 
 
@@ -848,6 +848,7 @@ function SalesInvoiceContent() {
                                     value={r.itemId}
                                     onChange={(id) => selectItem(i, id)}
                                     onKeyDown={rateFormulaEnterHandler(rf, rfActive, i)}
+                                    label={rfActive ? itemPickerLabel : undefined}
                                     placeholder="Type to search — e.g. e1060"
                                     style={inputStyle}
                                   />
@@ -911,6 +912,7 @@ function SalesInvoiceContent() {
                                         value={r.itemId}
                                         onChange={(id) => selectItem(i, id)}
                                         onKeyDown={rateFormulaEnterHandler(rf, rfActive, i)}
+                                        label={rfActive ? itemPickerLabel : undefined}
                                         placeholder="Type to search — e.g. e1060"
                                         style={{ ...inputStyle, padding: "8px 10px", fontSize: 13.5 }}
                                       />

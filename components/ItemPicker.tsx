@@ -40,6 +40,13 @@ type Props = {
   onChange: (id: string) => void;
   /** Passed the key event once the picker has finished with it. */
   onKeyDown?: (e: { key: string; shiftKey: boolean; preventDefault(): void; stopPropagation(): void }) => void;
+  /**
+   * How a picked item reads in the closed cell. A document that carries the
+   * dimensions in their own columns shortens it to the product name; the list
+   * below is left alone, because there the dimensions are the only thing
+   * telling two near-identical rolls apart.
+   */
+  label?: (item: PickerItem) => string;
   allowManual?: boolean;
   placeholder?: string;
   style?: React.CSSProperties;
@@ -47,7 +54,7 @@ type Props = {
 };
 
 export function ItemPicker({
-  items, value, onChange, onKeyDown,
+  items, value, onChange, onKeyDown, label,
   allowManual = true, placeholder = "Type to search…", style, autoFocus,
 }: Props) {
   const [open, setOpen] = useState(false);
@@ -131,13 +138,14 @@ export function ItemPicker({
     }
   }
 
-  const shown = open ? query : selected?.name ?? "";
+  const selectedLabel = selected ? (label ? label(selected) : selected.name) : "";
+  const shown = open ? query : selectedLabel;
 
   return (
     <div ref={boxRef} style={{ position: "relative" }}>
       <input
         value={shown}
-        placeholder={selected ? selected.name : placeholder}
+        placeholder={selected ? selectedLabel : placeholder}
         autoFocus={autoFocus}
         spellCheck={false}
         onFocus={() => { setOpen(true); setQuery(""); }}

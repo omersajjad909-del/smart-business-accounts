@@ -495,6 +495,15 @@ export function itemSpecFromText(
   return out;
 }
 
+/** The specification, one word at a time, as a name carries it. */
+const SPEC_TOKENS: RegExp[] = [
+  /^\d+(?:\.\d+)?(?:G|GA|GAUGE)$/,                       // 12G
+  /^\d+(?:\.\d+)?(?:IN|INCH|INCHES|MM|CM|FT|M|"|”)$/,     // 60in, 1500MM
+  /^L\d+(?:\.\d+)?$/,                                    // L100
+  /^PHR\d+(?:\.\d+)?$/,                                  // PHR26
+  /^\d{1,3}-[A-Z][A-Z0-9]{0,5}$/,                          // 15-L
+];
+
 /**
  * One item's name with its specification taken off the end: "B2 BLUE 10G 60in
  * L50 Blue PHR26" reads as "B2 BLUE".
@@ -507,17 +516,9 @@ export function itemSpecFromText(
  * the full name, because there the dimensions are the only thing telling two
  * rolls apart.
  */
-const SPEC_TOKENS: RegExp[] = [
-  /^d+(?:.d+)?(?:G|GA|GAUGE)$/,                       // 12G
-  /^d+(?:.d+)?(?:IN|INCH|INCHES|MM|CM|FT|M|"|”)$/,     // 60in, 1500MM
-  /^Ld+(?:.d+)?$/,                                    // L100
-  /^PHRd+(?:.d+)?$/,                                  // PHR26
-  /^d{1,3}-[A-Z][A-Z0-9]{0,5}$/,                          // 15-L
-];
-
 export function itemNameWithoutSpec(name: string): string {
   const whole = String(name ?? "").trim();
-  const parts = whole.split(/s+/);
+  const parts = whole.split(/\s+/);
   if (parts.length < 2) return whole;
 
   // Walked from the end, because that is the end the specification was added
@@ -588,6 +589,9 @@ export function metaFromItem(
   }
   return out;
 }
+
+/** Ready to hand to <ItemPicker label={…}> on a formula document. */
+export const itemPickerLabel = (item: { name: string }) => itemNameWithoutSpec(item.name);
 
 /* ─────────────────────────── Maths ─────────────────────────── */
 
