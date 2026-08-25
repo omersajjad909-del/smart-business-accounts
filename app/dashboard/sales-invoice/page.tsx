@@ -683,9 +683,11 @@ function SalesInvoiceContent() {
              the duplicate. Gone from the layout, the bill prints once. */
           .si-screen, .print-paper-wrapper, .no-print { display: none !important; }
 
-          /* The document prints "Powered by FinovaOS" at its own foot, so the
-             page footer stands down here and no margin is reserved for it. */
-          @page { margin: 8mm 10mm; }
+          /* Portrait, stated outright: a bill is a portrait document, and
+             this page shares its @page with whatever else the app declares.
+             The document prints "Powered by FinovaOS" at its own foot, so no
+             bottom margin is reserved for the page footer. */
+          @page { size: A4 portrait; margin: 8mm 10mm; }
         }
         @media screen { .print-area { display: none; } }
       `}</style>

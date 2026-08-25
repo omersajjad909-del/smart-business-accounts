@@ -115,6 +115,14 @@ export default function LedgerReportPage() {
   return (
     <div className="ledger-print-root" style={{ fontFamily: "'Outfit','Inter',sans-serif", color: "rgba(255,255,255,.85)" }}>
 
+      {/*
+        A ledger is a wide document and prints sideways. @page cannot be aimed
+        at one class, so this used to sit in app/globals.css — where it turned
+        every sheet the whole app printed, invoices included, on its side.
+        Kept here it only exists while this page is on screen.
+      */}
+      <style>{`@media print { @page { size: A4 landscape; margin: 10mm; } }`}</style>
+
       {/* ── MODAL ── */}
       {showModal && (
         <div style={{

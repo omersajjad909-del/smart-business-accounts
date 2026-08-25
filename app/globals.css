@@ -985,13 +985,13 @@ html.fnv-lock-scroll body {
   }
 }
 
-/* Ledger reports print as a standalone, monochrome accounting document. */
-@media print {
-  @page {
-    size: landscape;
-    margin: 10mm;
-  }
+/* Ledger reports print as a standalone, monochrome accounting document.
 
+   The landscape @page that used to live here has moved into the ledger page
+   itself: @page cannot be scoped to a class, so declaring it in the app-wide
+   sheet turned every print in the product sideways — invoices, vouchers and
+   all. Everything else prints portrait, which is what a bill is. */
+@media print {
   body:has(.ledger-print-root),
   .ledger-print-root,
   .ledger-print-content,
