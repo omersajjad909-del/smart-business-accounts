@@ -1,5 +1,6 @@
 "use client";
 import { fmtDate } from "@/lib/dateUtils";
+import { ItemPicker } from "@/components/ItemPicker";
 import { DateInput } from "@/app/dashboard/reports/_components/DateInput";
 import { confirmToast, alertToast } from "@/lib/toast-feedback";
 import { PrintActionBar } from "@/components/print/PrintActionBar";
@@ -1202,8 +1203,11 @@ const [searchTerm, setSearchTerm] = useState("");
                                     {r.sku ? <span style={{ fontFamily: "monospace", fontSize: 11, color: ACCENT, fontWeight: 700 }}>{r.sku}</span> : <span style={{ color: MUTED, fontSize: 11 }}>—</span>}
                                   </td>
                                   <td style={{ padding: "7px 8px", minWidth: 160 }}>
-                                    <select value={r.itemId} onKeyDown={rateFormulaEnterHandler(rf, rfActive, i)} onChange={e => {
-                                      const item = allInventoryItems.find(it => it.id === e.target.value);
+                                    <ItemPicker
+                                      items={allInventoryItems as any}
+                                      value={r.itemId}
+                                      onChange={(__picked: string) => {
+                                      const item = allInventoryItems.find(it => it.id === __picked);
                                       if (item) {
                                         const copy = [...rows];
                                         // With a formula running, the rate belongs to the
@@ -1224,10 +1228,12 @@ const [searchTerm, setSearchTerm] = useState("");
                                         copy[i] = { ...copy[i], itemId: "", name: "", sku: "", unit: "" };
                                         setRows(copy);
                                       }
-                                    }} style={{ ...inp({ padding: "5px 7px", fontSize: 12.5 }), fontWeight: r.itemId ? 600 : 400 }}>
-                                      <option value="">— Select Item —</option>
-                                      {allInventoryItems.map(it => <option key={it.id} value={it.id}>{it.name}</option>)}
-                                    </select>
+                                    }}
+                                      onKeyDown={rateFormulaEnterHandler(rf, rfActive, i)}
+                                      style={{ ...inp({ padding: "5px 7px", fontSize: 12.5 }), fontWeight: r.itemId ? 600 : 400 }}
+                                      allowManual={false}
+                                      placeholder="Type to search — e.g. e1060"
+                                    />
                                     {r.description && <div style={{ fontSize: 10, color: MUTED, marginTop: 2, paddingLeft: 2 }}>{r.description}</div>}
                                   </td>
                                   {rfActive && (
