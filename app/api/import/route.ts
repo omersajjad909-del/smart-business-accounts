@@ -673,9 +673,14 @@ async function writeLedgerHistory(
       }
 
       const voucherNo = v.voucherNo || `LEG-${dayKey(v.date)}-${row.line}`;
+      // Matched against what was in the database before this run only, never
+      // against what this run has already queued. A ledger legitimately repeats
+      // a posting — the same cash voucher number entered twice on one day for
+      // two amounts is normal — and adding to the set as we go would drop the
+      // second of any genuine pair while doing nothing extra about re-runs,
+      // which are caught by the rows already on the account.
       const key = `${voucherNo}|${dayKey(v.date)}|${amount.toFixed(2)}`;
       if (seen.has(key)) { outcome.skipped += 1; continue; }
-      seen.add(key);
 
       const voucherId = randomUUID();
       vouchers.push({
