@@ -264,8 +264,14 @@ export const FIELD_ALIASES: Record<string, string[]> = {
   code: [
     "item code", "account code", "accountcode", "acct code", "ledger code", "gl code",
     "party code", "customer code", "supplier code", "vendor code", "product code",
-    "stock code", "account number", "acno", "a/c code", "part no", "partno",
-    "segment1", "sku", "code",
+    "stock code", "account number", "acno",
+    // AHC SOFT heads this column "A\C Code", with a backslash. normalizeHeader
+    // strips spaces, dots, dashes and underscores but not slashes, so both
+    // spellings have to be listed to be matched exactly. Without them the
+    // containment pass falls through to the neighbouring "S. Code" serial
+    // column, and every account is coded by its row number.
+    "a/c code", "a\\c code", "ac code",
+    "part no", "partno", "segment1", "sku", "code",
   ],
   name: [
     "name", "account name", "accountname", "ledger name", "gl account name",
@@ -273,10 +279,24 @@ export const FIELD_ALIASES: Record<string, string[]> = {
     "supplier name", "vendor name", "contact name", "item name", "product name",
     "stock item", "particulars", "title", "description",
   ],
+  // The inner of the two head levels. Subcontinental packages — AHC SOFT among
+  // them — file an account under two: a Control Head of SUPPLIERS or BANK
+  // ACCOUNTS, inside a Main/Head Title of SHORT TERM LIABILITIES or CURRENT
+  // ASSETS. The inner one is read first because it is the one that says what
+  // the account *is*: SUPPLIERS gives a supplier, where the outer head would
+  // only have given a generic liability.
   type: [
-    "type", "account type", "accounttype", "account category", "category",
-    "group", "ledger group", "under", "parent group", "class", "account class",
+    "control head", "sub head", "subhead",
+    "account type", "accounttype", "type", "account category", "category",
+    "group", "ledger group", "under", "class", "account class",
     "nature", "gl type",
+  ],
+  // The outer head, used only when the inner one says nothing useful — a
+  // Control Head of EMPLOYEES means little on its own, but SHORT TERM
+  // LIABILITIES above it settles it. See readAccountRow.
+  typeGroup: [
+    "main head title", "head title", "main head", "mainhead",
+    "parent group", "main group", "primary group", "head",
   ],
   description: ["description", "notes", "remarks", "narration", "comments", "memo"],
 
@@ -284,9 +304,16 @@ export const FIELD_ALIASES: Record<string, string[]> = {
   email: ["email", "e-mail", "email address", "mail"],
   city: ["city", "town", "location city"],
   address: ["address", "address1", "address line 1", "street", "billing address", "postal address"],
-  ntn: ["ntn", "national tax number", "tax number", "tax id", "taxid", "tin"],
-  strn: ["strn", "sales tax number", "gst no", "gstin", "sales tax reg", "srtn"],
-  creditLimit: ["credit limit", "creditlimit", "limit"],
+  // "ntn no" and "str no" carry the dotted forms: AHC SOFT heads these columns
+  // "N.T.N. NO." and "S.T.R. NO.", which squash to "ntnno" and "strno" once the
+  // dots go. Without these two the tax numbers imported blank and nobody would
+  // notice until the first sales tax invoice went out without an NTN on it.
+  ntn: ["ntn", "ntn no", "ntn number", "national tax number", "tax number", "tax id", "taxid", "tin"],
+  strn: ["strn", "strn no", "str no", "str number", "sales tax number", "gst no", "gstin", "sales tax reg", "srtn"],
+  // "credit amount" belongs here, not on the credit balance: on an account
+  // master it is the ceiling the party may run up, printed next to the days
+  // they get to clear it.
+  creditLimit: ["credit limit", "creditlimit", "credit amount", "limit"],
   creditDays: ["credit days", "creditdays", "payment terms days", "terms days", "days"],
 
   unit: ["unit", "uom", "unit of measure", "primary unit", "base unit", "measure"],
@@ -306,15 +333,24 @@ export const FIELD_ALIASES: Record<string, string[]> = {
   // position at the *start* of the old system's reporting period, which on a
   // three-year report is years of movement missing. It reconciles against
   // nothing and there is no error to notice — the numbers are simply wrong.
+  // "debit amount" / "credit amount" sit last on purpose. On an account master
+  // screen those headings mean the credit *limit*, not a balance — AHC SOFT
+  // prints "Days" and "Credit Amount" side by side, which is a limit and its
+  // terms. Ranked above "opendebit" they hijacked a chart-of-accounts file
+  // whose real balance columns were "Open. Debit" / "Open. Credit". Left at the
+  // bottom, a file that genuinely heads its balances "Debit Amount" still
+  // resolves, through the whole-word containment pass on "debit".
   debit: [
     "closing debit", "closing dr", "closing balance debit",
-    "debit", "dr", "debit amount", "debit balance",
-    "opening debit", "opendebit",
+    "debit", "dr", "debit balance",
+    "opening debit", "opendebit", "open debit",
+    "debit amount",
   ],
   credit: [
     "closing credit", "closing cr", "closing balance credit",
-    "credit", "cr", "credit amount", "credit balance",
-    "opening credit", "opencredit",
+    "credit", "cr", "credit balance",
+    "opening credit", "opencredit", "open credit",
+    "credit amount",
   ],
   balance: [
     "closing balance", "closingbalance", "ending balance",
@@ -403,7 +439,12 @@ export function normalizePartyType(raw: string, hint?: "customer" | "supplier"):
   if (has("STOCK", "INVENTOR", "GOODS", "MATERIAL")) return "STOCK";
   if (has("CAPITAL", "EQUITY", "RESERVE", "RETAINED", "SHARE")) return "EQUITY";
   if (has("INCOME", "REVENUE", "SALES", "TURNOVER", "EARNING")) return "INCOME";
-  if (has("EXPENSE", "COST", "PURCHASE", "SALAR", "WAGE", "RENT", "UTILIT", "OVERHEAD", "COGS")) return "EXPENSE";
+  // RENT whole-word: it hides inside CURRENT, so "CURRENT ASSETS" — the head
+  // every bank and cash account in a subcontinental chart sits under — was
+  // being classified as an expense. WAGE and COST get the same treatment for
+  // the same reason.
+  if (has("EXPENSE", "PURCHASE", "SALAR", "UTILIT", "OVERHEAD", "COGS")
+      || hasWord("RENT", "RENTAL", "COST", "WAGE", "WAGES")) return "EXPENSE";
   if (has("LIABILIT", "LOAN", "PAYABLE", "PROVISION", "ACCRUAL", "TAX", "DUTY")) return "LIABILITIES";
   if (has("ASSET", "ADVANCE", "DEPOSIT", "PREPAID")) return "GENERAL";
 
@@ -503,8 +544,15 @@ export function readAccountRow(row: CsvRow, hint?: "customer" | "supplier"): {
   warning?: string;
 } {
   const name = field(row, "name").trim();
+
+  // Two chances at classifying the account, inner head then outer. A chart
+  // that carries only one type column simply has nothing in the second.
   const rawType = field(row, "type");
-  const partyType = normalizePartyType(rawType, hint);
+  const rawGroup = field(row, "typeGroup");
+  let partyType = normalizePartyType(rawType, hint);
+  if (!hint && partyType === "GENERAL" && rawGroup) {
+    partyType = normalizePartyType(rawGroup);
+  }
 
   // As in readOpeningBalanceRow: a headed Debit/Credit column has already said
   // which side it is, so a parenthesised amount there is Oracle's formatting,
@@ -543,8 +591,9 @@ export function readAccountRow(row: CsvRow, hint?: "customer" | "supplier"): {
   };
 
   if (!name) return { value, error: "No account name in this row" };
-  if (!hint && rawType && partyType === "GENERAL") {
-    return { value, warning: `Group "${rawType}" was not recognised — filed under General` };
+  if (!hint && (rawType || rawGroup) && partyType === "GENERAL") {
+    const tried = [rawType, rawGroup].filter(Boolean).join(" / ");
+    return { value, warning: `Group "${tried}" was not recognised — filed under General` };
   }
   return { value };
 }
@@ -624,6 +673,65 @@ export function readOpeningBalanceRow(row: CsvRow): {
     return { value, warning: "Row has both a debit and a credit — both were kept" };
   }
   return { value };
+}
+
+/**
+ * Classifies accounts from the group rows above them, when the file carries no
+ * type column at all.
+ *
+ * A period trial balance is usually just Code, Description and amounts — there
+ * is no "Account Type" to read, so every row resolves to GENERAL and lands in
+ * the chart as an asset. Three hundred suppliers, every expense and all the
+ * sales filed as assets is not a chart of accounts, it is a mess somebody has
+ * to unpick by hand.
+ *
+ * But the classification is in the file, spelled out in the group rows:
+ *
+ *     03        SHORT TERM LIABILITIES     <- says what 0303* is
+ *     0303        EMPLOYEES
+ *     03030001      AKRAM (SALARY)         <- inherits: a liability
+ *
+ * So each unclassified account walks up its own code, nearest ancestor first,
+ * and takes the first grouping that means something. Nearest-first matters:
+ * under CURRENT ASSETS, a SUPPLIERS control head should still win and make the
+ * row a supplier rather than a bare asset.
+ *
+ * Only fills in rows that resolved to GENERAL, so a file that does carry a type
+ * column is left alone.
+ */
+export function inheritGroupsFromHierarchy(rows: MappedRow<AccountRow>[]): {
+  classified: number;
+} {
+  const coded = rows.filter((r) => !r.error && r.value?.code);
+  let classified = 0;
+
+  for (const row of coded) {
+    if (row.value.partyType !== "GENERAL") continue;
+
+    const code = row.value.code;
+    const ancestors = coded
+      .filter(
+        (other) =>
+          other !== row &&
+          other.value.code.length < code.length &&
+          code.startsWith(other.value.code),
+      )
+      .sort((a, b) => b.value.code.length - a.value.code.length);
+
+    for (const ancestor of ancestors) {
+      const inherited = normalizePartyType(ancestor.value.name);
+      if (inherited === "GENERAL") continue;
+      row.value.partyType = inherited;
+      row.value.type = typeForPartyType(inherited);
+      // Replaces the "not recognised, filed under General" note, which is no
+      // longer true and would only worry the person reading the preview.
+      row.warning = `Filed under "${ancestor.value.name}" from code ${ancestor.value.code}`;
+      classified += 1;
+      break;
+    }
+  }
+
+  return { classified };
 }
 
 /**

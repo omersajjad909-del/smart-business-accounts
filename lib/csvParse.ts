@@ -140,11 +140,19 @@ export function parseCsv(input: string, opts?: { delimiter?: string }): ParsedCs
   return { headers, rows, delimiter };
 }
 
-/** Header text reduced to something two spellings of the same column share. */
+/**
+ * Header text reduced to something two spellings of the same column share.
+ *
+ * Slashes count as separators alongside spaces, dots, dashes and underscores.
+ * Forms-era packages punctuate their headings — "Main / Head Title", "A\C
+ * Code", "N.T.N. NO." — and leaving the slash in meant "Main / Head Title"
+ * squashed to "main/headtitle", matching no alias anyone would think to write.
+ * Dropping it also lets "a/c code", "a\c code" and "ac code" converge.
+ */
 export function normalizeHeader(header: string): string {
   const raw = String(header || "");
   const noBom = raw.startsWith(BOM) ? raw.slice(1) : raw;
-  return noBom.trim().toLowerCase().replace(/[\s_\-.]+/g, "");
+  return noBom.trim().toLowerCase().replace(/[\s_\-./\\]+/g, "");
 }
 
 /**
@@ -154,7 +162,7 @@ export function normalizeHeader(header: string): string {
 function headerWords(header: string): string {
   const raw = String(header || "");
   const noBom = raw.startsWith(BOM) ? raw.slice(1) : raw;
-  return ` ${noBom.trim().toLowerCase().replace(/[\s_\-.]+/g, " ").replace(/\s+/g, " ")} `;
+  return ` ${noBom.trim().toLowerCase().replace(/[\s_\-./\\]+/g, " ").replace(/\s+/g, " ")} `;
 }
 
 /**

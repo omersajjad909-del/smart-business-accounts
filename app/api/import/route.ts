@@ -31,6 +31,7 @@ import {
   readOpeningStockRow,
   readOpenDocumentRow,
   flagSummaryRows,
+  inheritGroupsFromHierarchy,
   type ImportDataType,
   type MappedRow,
   type AccountRow,
@@ -589,6 +590,13 @@ export async function POST(req: NextRequest) {
         mapped.ok -= summaries;
         mapped.failed += summaries;
       }
+    }
+
+    // Also a whole-file pass. A trial balance exported as a chart of accounts
+    // carries no type column, so every row reads as GENERAL; the group rows
+    // above each account are the only statement of what it is.
+    if (dataType === "accounts") {
+      inheritGroupsFromHierarchy(mapped.rows as MappedRow<AccountRow>[]);
     }
 
     // ── Dry run: interpret, check against the database, write nothing ──
