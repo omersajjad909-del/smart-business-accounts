@@ -446,6 +446,15 @@ function ImportWizardInner() {
             ))}
           </div>
 
+          {preview.reshaped && (
+            <div style={{
+              ...card, borderColor: "rgba(99,102,241,.32)", background: "rgba(99,102,241,.08)",
+              padding: "13px 16px", marginBottom: 14, fontSize: 12.5, lineHeight: 1.65,
+            }}>
+              <b>File reshaped.</b> {preview.reshaped}
+            </div>
+          )}
+
           <div style={{ ...card, padding: "12px 16px", marginBottom: 14, fontSize: 12, color: "var(--text-muted)" }}>
             Read as <b style={{ color: "var(--text-primary)" }}>{preview.dataTypeName}</b> ·
             delimiter <code style={{ fontFamily: MONO }}>{preview.delimiter}</code> ·
