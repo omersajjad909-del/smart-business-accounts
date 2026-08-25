@@ -20,7 +20,11 @@ import { prisma } from "@/lib/prisma";
 import { resolveCompanyId, resolveBranchIdOrDefault } from "@/lib/tenant";
 import { safeEncryptField } from "@/lib/fieldEncrypt";
 import { parseCsv, type CsvRow } from "@/lib/csvParse";
-import { flattenRepeatedReportExport, flattenLedgerExport } from "@/lib/reportFlatten";
+import {
+  flattenRepeatedReportExport,
+  flattenLedgerExport,
+  flattenHeaderPrefixExport,
+} from "@/lib/reportFlatten";
 import {
   IMPORT_SOURCES,
   IMPORT_DATA_TYPES,
@@ -913,8 +917,15 @@ export async function POST(req: NextRequest) {
     // The party-ledger shape is checked first because it is the more specific
     // of the two: it insists on its own markers on every line, so anything else
     // falls straight through to the general unwrapper.
-    const asLedger = flattenLedgerExport(body.csv);
-    const flattened = asLedger.converted ? asLedger : flattenRepeatedReportExport(body.csv);
+    // Tried most specific first. Each one insists on its own shape and hands
+    // the file back untouched when it is not that shape, so the order only
+    // decides which gets to look first, never what a file is read as.
+    const shapes = [flattenLedgerExport, flattenRepeatedReportExport, flattenHeaderPrefixExport];
+    let flattened = { text: body.csv, converted: false } as ReturnType<typeof flattenLedgerExport>;
+    for (const shape of shapes) {
+      const result = shape(body.csv);
+      if (result.converted) { flattened = result; break; }
+    }
     const parsed = parseCsv(flattened.text);
     if (parsed.rows.length === 0) {
       return NextResponse.json(

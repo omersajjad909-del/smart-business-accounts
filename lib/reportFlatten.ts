@@ -328,3 +328,74 @@ export function flattenLedgerExport(input: string): FlattenResult {
 
   return { text: toCsv(LEDGER_HEADERS, rows), converted: true, note, headers: LEDGER_HEADERS };
 }
+
+
+/* ─────────────── Headings in front, footer behind ─────────────── */
+
+/**
+ * The plainest of the three flattened shapes: the column headings repeated in
+ * front of every record, the record itself, and the report footer behind it.
+ * A stock report comes out like this —
+ *
+ *   Item Code | Quality | Gauge | Width | Lngth | shade | PHR | Unit | Bal Qty | Rate | Value |
+ *   965 | CRYSTAL SUPER CLEAR (DIAMOND) | 4 | 48 | 100 | 15-L | 24 | Rolls | 19 | 3,697.78 | 70,258 |
+ *   Total: | 12,959 | 74,344,180
+ *
+ * — eleven headings, then exactly eleven fields, then a footer that is the same
+ * on every line. Nothing has to be worked out about which column is which: the
+ * report named them all, and they line up one for one.
+ *
+ * flattenRepeatedReportExport cannot read it. That one is built for a report
+ * with grouping frames, so it hunts for a name followed by a fixed run of
+ * figures — and a Unit column of "Rolls" sitting in the middle of the numbers
+ * ends the run every time. It gives up and hands the file back, which is the
+ * right thing for it to do and the reason this function exists.
+ *
+ * Two checks keep the two apart, and both have to hold:
+ *
+ *   - The field straight after the headings varies from line to line. It is the
+ *     record's first column. On a trial balance the report totals sit in that
+ *     position, identical the whole way down.
+ *   - Everything past the second block is identical on every line, because a
+ *     footer is a footer. On a trial balance the group codes and group totals
+ *     are there instead, and they vary.
+ */
+export function flattenHeaderPrefixExport(input: string): FlattenResult {
+  const unchanged: FlattenResult = { text: input, converted: false };
+
+  const { records } = parseCsvRecords(input);
+  if (records.length < 3) return unchanged;
+
+  const width = repeatedHeadingWidth(records);
+  if (width < 3) return unchanged;
+
+  // Every record has to be the same length, or the two blocks cannot be said to
+  // line up and there is nothing exact left to read.
+  const length = records[0].length;
+  if (records.some((r) => r.length !== length)) return unchanged;
+  if (length < width * 2) return unchanged;
+
+  // The record's own first column. Identical the whole way down means this is
+  // not a record at all — see the note above.
+  const firstCell = records[0][width] ?? "";
+  if (records.every((r) => (r[width] ?? "") === firstCell)) return unchanged;
+
+  // The footer, if there is one.
+  for (let i = width * 2; i < length; i += 1) {
+    const cell = records[0][i] ?? "";
+    if (!records.every((r) => (r[i] ?? "") === cell)) return unchanged;
+  }
+
+  const headers = records[0].slice(0, width).map(unspaceHeading);
+  if (headers.some((h) => !h)) return unchanged;
+
+  const rows = records.map((r) => r.slice(width, width * 2).map((f) => f.trim()));
+
+  const footer = length > width * 2 ? " The report footer was dropped." : "";
+  const note =
+    `This file was exported with the column headings repeated in front of every ` +
+    `record. ${rows.length.toLocaleString()} records were unwrapped into ` +
+    `${headers.length} columns.${footer}`;
+
+  return { text: toCsv(headers, rows), converted: true, note, headers };
+}
