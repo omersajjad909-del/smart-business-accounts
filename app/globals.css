@@ -1021,7 +1021,7 @@ html.fnv-lock-scroll body {
   }
 
   .ledger-print-toolbar,
-  .ledger-print-root .print\\:hidden {
+  .ledger-print-root .print\:hidden {
     display: none !important;
   }
 
