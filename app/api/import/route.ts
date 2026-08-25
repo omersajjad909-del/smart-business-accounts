@@ -443,6 +443,21 @@ async function writeOpeningStock(
   });
   const alreadyOpened = new Set(existing.map((r) => `${r.itemId}@${r.location}`));
 
+  // One item can hold several lines on a stock report. A PVC code is fixed by
+  // quality, gauge, width, length and shade, and the report then splits it again
+  // by PHR — code 975 comes out twice, 20 rolls at 26 PHR and 5 at 22. Both are
+  // the same item here, because stock is held per item and location.
+  //
+  // Written a line at a time the first would be created and the second refused
+  // as a duplicate opening, quietly losing five rolls. So the file is added up
+  // first and each item written once, at the cost the whole quantity averages
+  // out to.
+  type Bucket = {
+    line: number; itemId: string; itemName: string;
+    location: string; qty: number; value: number; rows: number;
+  };
+  const buckets = new Map<string, Bucket>();
+
   for (const row of mapped) {
     if (row.error || !row.value) { outcome.skipped += 1; continue; }
     const v = row.value;
@@ -452,32 +467,59 @@ async function writeOpeningStock(
       note(outcome, row.line, `No item matches "${v.code || v.name}"`);
       continue;
     }
+    const key = `${hit.id}@${v.location}`;
+    const bucket = buckets.get(key);
+    if (bucket) {
+      bucket.qty += v.qty;
+      bucket.value += v.qty * v.rate;
+      bucket.rows += 1;
+    } else {
+      buckets.set(key, {
+        line: row.line, itemId: hit.id, itemName: hit.name,
+        location: v.location, qty: v.qty, value: v.qty * v.rate, rows: 1,
+      });
+    }
+  }
+
+  for (const [key, b] of buckets) {
     // Running the same file twice is a normal thing to do during a migration
     // dry run; doubling everybody's opening stock is not.
-    const key = `${hit.id}@${v.location}`;
     if (alreadyOpened.has(key)) {
-      outcome.skipped += 1;
-      note(outcome, row.line, `${hit.name} already has opening stock at ${v.location}`);
+      outcome.skipped += b.rows;
+      note(outcome, b.line, `${b.itemName} already has opening stock at ${b.location}`);
       continue;
     }
+    if (b.qty === 0) {
+      outcome.skipped += b.rows;
+      note(outcome, b.line, `${b.itemName} nets to zero quantity — nothing to bring in`);
+      continue;
+    }
+    // Weighted average, not the last line's rate: two lots of the same item at
+    // different costs have one cost between them once they are in the godown.
+    const rate = Math.round((b.value / b.qty) * 10000) / 10000;
     try {
       await prisma.inventoryTxn.create({
         data: {
           companyId,
           type: "OPENING",
           date,
-          itemId: hit.id,
-          qty: v.qty,
-          rate: v.rate,
-          amount: Math.round(v.qty * v.rate * 100) / 100,
-          location: v.location,
+          itemId: b.itemId,
+          qty: b.qty,
+          rate,
+          amount: Math.round(b.value * 100) / 100,
+          location: b.location,
         },
       });
       alreadyOpened.add(key);
-      outcome.imported += 1;
+      // Every line that went into the bucket was imported, even though they
+      // share one movement — counting one would report rows as missing.
+      outcome.imported += b.rows;
+      if (b.rows > 1) {
+        note(outcome, b.line, `${b.itemName}: ${b.rows} lines combined into ${b.qty} at ${rate}`);
+      }
     } catch (e) {
-      outcome.skipped += 1;
-      note(outcome, row.line, e instanceof Error ? e.message : "Could not write the stock row");
+      outcome.skipped += b.rows;
+      note(outcome, b.line, e instanceof Error ? e.message : "Could not write the stock row");
     }
   }
   return outcome;

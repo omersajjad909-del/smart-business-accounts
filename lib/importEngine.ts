@@ -288,7 +288,7 @@ export const FIELD_ALIASES: Record<string, string[]> = {
     "name", "account name", "accountname", "ledger name", "gl account name",
     "account description", "description of account", "party name", "customer name",
     "supplier name", "vendor name", "contact name", "item name", "product name",
-    "stock item", "particulars", "title", "description",
+    "stock item", "particulars", "title", "quality", "description",
   ],
   // The inner of the two head levels. Subcontinental packages — AHC SOFT among
   // them — file an account under two: a Control Head of SUPPLIERS or BANK
@@ -327,6 +327,13 @@ export const FIELD_ALIASES: Record<string, string[]> = {
   creditLimit: ["credit limit", "creditlimit", "credit amount", "limit"],
   creditDays: ["credit days", "creditdays", "payment terms days", "terms days", "days"],
 
+  // The dimensions a PVC roll is identified by. They are the same five the
+  // rate formula prices a line from (lib/rateFormula.ts), which is no
+  // coincidence — that feature was built for this stock.
+  gauge: ["gauge", "guage", "gage"],
+  dimWidth: ["width", "wid"],
+  dimLength: ["length", "lngth", "lenght", "len"],
+  shade: ["shade", "shade #", "shade no", "colour", "color"],
   unit: ["unit", "uom", "unit of measure", "primary unit", "base unit", "measure"],
   rate: ["rate", "sale rate", "selling price", "sales price", "unit price", "price", "list price", "mrp"],
   purchaseRate: ["purchase rate", "purchaserate", "cost", "cost price", "unit cost", "buying price", "purchase price", "std cost", "standard cost"],
@@ -656,8 +663,44 @@ export type ItemRow = {
 
 const ITEM_CATEGORIES = new Set(["TRADING", "RAW_MATERIAL", "FINISHED", "SERVICE"]);
 
+/**
+ * The dimensions that make one roll a different thing from another, appended
+ * to the description so an item is identifiable on its own.
+ *
+ * On a PVC stock report the description column is the quality — "CRYSTAL SUPER
+ * CLEAR (DIAMOND)" — and it is shared. Codes 965 and 966 are both that
+ * quality; one is 48 inches wide and the other 54. Imported on the description
+ * alone they arrive as two rows with the same name, and the person picking an
+ * item on an invoice has no way to tell which is which.
+ *
+ * PHR is deliberately left out. One item code carries several PHR rows — 975
+ * appears at 26 and at 22 — so folding it into the name would split one item
+ * into several and leave the stock of each wrong.
+ */
+export function itemSpecLabel(row: CsvRow): string {
+  const gauge = field(row, "gauge").trim();
+  const width = field(row, "dimWidth").trim();
+  const length = field(row, "dimLength").trim();
+  const shade = field(row, "shade").trim();
+
+  const parts: string[] = [];
+  if (gauge) parts.push(`${gauge}G`);
+  if (width) parts.push(`${width}in`);
+  if (length) parts.push(`L${length}`);
+  if (shade) parts.push(shade);
+  return parts.join(" ");
+}
+
+/** Description plus its dimensions, when the file carries any. */
+function composedItemName(row: CsvRow): string {
+  const base = field(row, "name").trim();
+  const spec = itemSpecLabel(row);
+  if (!base) return spec;
+  return spec ? `${base} ${spec}` : base;
+}
+
 export function readItemRow(row: CsvRow): { value: ItemRow; error?: string; warning?: string } {
-  const name = field(row, "name").trim();
+  const name = composedItemName(row);
   const rawCategory = pick(row, "category", "item category", "item type", "type").toUpperCase().replace(/[\s-]+/g, "_");
   const category = ITEM_CATEGORIES.has(rawCategory) ? rawCategory : "TRADING";
 
@@ -1031,7 +1074,7 @@ export function readOpeningStockRow(row: CsvRow): {
   warning?: string;
 } {
   const code = field(row, "code").trim();
-  const name = field(row, "name").trim();
+  const name = composedItemName(row);
   const exactQty = parseAmount(field(row, "qty"));
   // InventoryTxn.qty is an Int. Rounding here rather than at the write means
   // the preview shows the number that will actually be stored.
