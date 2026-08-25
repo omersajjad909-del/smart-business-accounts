@@ -18,6 +18,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
   const isLoginPage = pathname === "/admin/login";
+  const currentPage = adminPageForConsolePath(pathname || "/admin");
 
   const [state, setState] = useState<AdminSessionValue | null>(null);
   const [checked, setChecked] = useState(false);
@@ -107,8 +108,6 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
       router.replace("/admin");
     }
   }, [checked, state, isLoginPage, pathname, router]);
-
-  const currentPage = adminPageForConsolePath(pathname || "/admin");
   const needsUnlock =
     !isLoginPage && lockedPages.includes(currentPage) && unlockedPage !== currentPage;
 

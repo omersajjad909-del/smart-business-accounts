@@ -2852,7 +2852,8 @@ export function resolveDashboardFeaturesForCompany(opts: {
     // Constrain to pages the business type actually owns, so a stale saved id
     // cannot hand a pharmacy a trading-only page.
     const owned = new Set(dashboardFeaturesForBusinessType(opts.businessType).map((f) => f.id));
-    return healSavedFeatureList(scoped, planKey).filter((id) => owned.has(id));
+    const healed = addUnseenRegistryFeatures(scoped, byBusiness, planKey);
+    return healSavedFeatureList(healed, planKey).filter((id) => owned.has(id));
   }
   const planList = opts.planFlags[plan] ?? opts.planFlags[plan.toLowerCase()] ?? null;
   return planList ? healSavedFeatureList(planList, planKey) : null;
