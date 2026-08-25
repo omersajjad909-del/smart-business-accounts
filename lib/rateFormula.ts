@@ -496,6 +496,48 @@ export function itemSpecFromText(
 }
 
 /**
+ * One item's name with its specification taken off the end: "B2 BLUE 10G 60in
+ * L50 Blue PHR26" reads as "B2 BLUE".
+ *
+ * On a document that runs the formula every one of those figures already has
+ * its own column, so carrying them in the item cell as well leaves the one
+ * thing the operator is actually reading — which product this is — buried at
+ * the front of a line too long for the cell. The name itself is untouched:
+ * this is how it is shown, not what it is. The picker's own list still shows
+ * the full name, because there the dimensions are the only thing telling two
+ * rolls apart.
+ */
+const SPEC_TOKENS: RegExp[] = [
+  /^d+(?:.d+)?(?:G|GA|GAUGE)$/,                       // 12G
+  /^d+(?:.d+)?(?:IN|INCH|INCHES|MM|CM|FT|M|"|”)$/,     // 60in, 1500MM
+  /^Ld+(?:.d+)?$/,                                    // L100
+  /^PHRd+(?:.d+)?$/,                                  // PHR26
+  /^d{1,3}-[A-Z][A-Z0-9]{0,5}$/,                          // 15-L
+];
+
+export function itemNameWithoutSpec(name: string): string {
+  const whole = String(name ?? "").trim();
+  const parts = whole.split(/s+/);
+  if (parts.length < 2) return whole;
+
+  // Walked from the end, because that is the end the specification was added
+  // to. The first word is never touched — a name is not a specification.
+  let cut = parts.length;
+  let unknownRun = 0;
+  for (let i = parts.length - 1; i > 0; i--) {
+    const token = parts[i].toUpperCase();
+    if (SPEC_TOKENS.some((re) => re.test(token))) { cut = i; unknownRun = 0; continue; }
+    // A shade is whatever the mill calls it — "Blue", "Light Grey" — so a word
+    // or two that means nothing to us may sit inside the specification. It
+    // only comes off if a dimension turns up behind it; on its own it is part
+    // of the name.
+    if (unknownRun < 2) { unknownRun++; continue; }
+    break;
+  }
+  return cut >= parts.length ? whole : parts.slice(0, cut).join(" ");
+}
+
+/**
  * Everything an item itself knows about its dimensions: what was saved on it,
  * and — for the columns it has nothing real for — what its name says.
  *
