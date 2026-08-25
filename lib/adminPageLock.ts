@@ -211,7 +211,8 @@ export function setUnlockCookie(res: NextResponse, token: string) {
     secure: process.env.NODE_ENV === "production",
     sameSite: "strict",
     path: "/",
-    maxAge: Math.floor(UNLOCK_TTL_MS / 1000),
+    // Session cookie, like the admin session itself: a closed browser must
+    // never come back to an already-unlocked page.
   });
 }
 

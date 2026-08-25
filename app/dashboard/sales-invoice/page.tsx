@@ -651,7 +651,9 @@ function SalesInvoiceContent() {
       rate: Number(r.rate).toLocaleString(),
       amount: (Number(r.qty) * Number(r.rate)).toLocaleString("en-US", { minimumFractionDigits: 2 }),
     })),
-    totalsLines: [
+    // A delivery note carries goods, not money: the columns above already
+    // drop the rate, and the totals go with them.
+    totalsLines: previewMode === "DELIVERY" ? [] : [
       ...(invSubtotal > 0 ? [{ label: "Total:", value: invSubtotal }] : []),
       ...(invDiscount > 0 ? [{ label: "Discount:", value: -invDiscount }] : []),
       ...(invTax > 0 ? [{ label: "Tax:", value: invTax }] : []),
@@ -672,7 +674,9 @@ function SalesInvoiceContent() {
           body * { visibility: hidden !important; }
           .print-area, .print-area * { visibility: visible !important; }
           .print-area { position: fixed; inset: 0; }
-          @page { margin: 8mm 10mm; }
+          /* The bottom margin is the app-wide "Powered by FinovaOS" footer's
+             room; without it the last row of the bill prints under it. */
+          @page { margin: 8mm 10mm 20mm; }
         }
         @media screen { .print-area { display: none; } }
       `}</style>

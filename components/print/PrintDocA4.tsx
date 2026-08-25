@@ -261,10 +261,8 @@ export function PrintDocA4({
         <div className="pdoc-label" style={{ textAlign: "center", fontSize: 8, marginTop: 14 }}>{footerNote}</div>
       )}
 
-      {/* Every document this system prints says where it came from. */}
-      <div className="pdoc-powered" style={{ textAlign: "center", fontSize: 8, marginTop: 6, color: "#777", letterSpacing: 0.4 }}>
-        Powered by <b>FinovaOS</b>
-      </div>
+      {/* "Powered by FinovaOS" is printed on every page by the app-wide
+          print footer in app/globals.css, so it is not repeated here. */}
     </div>
   );
 }

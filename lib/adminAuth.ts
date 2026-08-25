@@ -48,8 +48,14 @@ import {
   normalizeAllowedPages,
 } from "@/lib/adminPages";
 
-/** Admin sessions are short — the blast radius of a stolen one is total. */
-export const ADMIN_SESSION_TTL_MS = 8 * 60 * 60 * 1000;
+/**
+ * Admin sessions are short — the blast radius of a stolen one is total.
+ *
+ * Two limits, and whichever comes first wins:
+ *   • this one, enforced by the token's own `exp`, which the server checks;
+ *   • closing the browser, because the cookie below is a session cookie.
+ */
+export const ADMIN_SESSION_TTL_MS = 2 * 60 * 60 * 1000;
 /** Password verified, OTP not yet entered. Long enough to open an authenticator. */
 export const ADMIN_PENDING_TTL_MS = 5 * 60 * 1000;
 
@@ -138,7 +144,11 @@ export function setAdminCookie(res: NextResponse, token: string) {
     // itself — no cross-site navigation needs to carry this cookie.
     sameSite: "strict",
     path: "/",
-    maxAge: Math.floor(ADMIN_SESSION_TTL_MS / 1000),
+    // No maxAge and no expires on purpose: that makes this a *session* cookie,
+    // which the browser throws away when it closes. Signing in again is then
+    // required after every browser restart, not merely after the token expires.
+    // The token's own `exp` is still the server-side limit — a browser that is
+    // never closed does not get an endless session.
   });
   clearAdminPendingCookie(res);
 }
