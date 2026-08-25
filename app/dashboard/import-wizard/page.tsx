@@ -44,6 +44,13 @@ const DATE_LABEL: Partial<Record<ImportDataType, string>> = {
   opening_stock: "Cutover date — the stock count is as at this date",
 };
 
+/**
+ * Ledger history is per party, and a ledger printed for one party names it in
+ * the report header rather than in a column — which the export drops. Typed
+ * here it stands in for every row that has no party of its own.
+ */
+const PARTY_TYPES = new Set<ImportDataType>(["ledger_history"]);
+
 type PreviewRow = {
   line: number;
   value: Record<string, unknown> | null;
@@ -86,6 +93,7 @@ function ImportWizardInner() {
   const [csv, setCsv] = useState("");
   const [fileName, setFileName] = useState("");
   const [date, setDate] = useState(() => new Date().toISOString().slice(0, 10));
+  const [party, setParty] = useState("");
 
   const [busy, setBusy] = useState(false);
   const [preview, setPreview] = useState<Preview | null>(null);
@@ -164,7 +172,7 @@ function ImportWizardInner() {
         method: "POST",
         credentials: "include",
         headers: { "Content-Type": "application/json", ...headers() },
-        body: JSON.stringify({ csv, source: source || "csv", dataType, date }),
+        body: JSON.stringify({ csv, source: source || "csv", dataType, date, party }),
       });
       const body = await res.json();
       if (!res.ok) throw new Error(body?.error || "Import failed.");
@@ -355,6 +363,30 @@ function ImportWizardInner() {
                 resize: "vertical", outline: "none",
               }}
             />
+
+            {PARTY_TYPES.has(typeDef.id) && (
+              <div style={{ marginTop: 14, maxWidth: 360 }}>
+                <label style={{ display: "block", fontSize: 11.5, color: "var(--text-muted)", marginBottom: 6, fontWeight: 600 }}>
+                  Party this ledger belongs to — name or code, exactly as it is in your accounts
+                </label>
+                <input
+                  value={party}
+                  onChange={(e) => setParty(e.target.value)}
+                  placeholder="US TRADERS"
+                  spellCheck={false}
+                  style={{
+                    width: "100%", boxSizing: "border-box", padding: "9px 12px", borderRadius: 9,
+                    background: "var(--app-bg)", border: "1px solid var(--border)",
+                    color: "var(--text-primary)", fontSize: 13, fontFamily: FONT, outline: "none",
+                  }}
+                />
+                <div style={{ fontSize: 11, color: "var(--text-muted)", marginTop: 6, lineHeight: 1.5 }}>
+                  Leave blank if the file already carries a party column. The file must start with the
+                  party&rsquo;s opening / B/F line, or it is refused — that line replaces the opening
+                  balance imported at cutover, which is what stops the balance being counted twice.
+                </div>
+              </div>
+            )}
 
             {DATE_LABEL[typeDef.id] && (
               <div style={{ marginTop: 14, maxWidth: 260 }}>

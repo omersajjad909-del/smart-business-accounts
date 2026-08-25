@@ -471,6 +471,221 @@ async function writeOpeningStock(
 }
 
 /**
+ * The account the other half of every legacy entry goes to.
+ *
+ * Not the real bank, not the real sales account. Those already carry their
+ * cutover opening balance, and posting five years of movement on top of an
+ * opening that already contains it counts the same money twice. The party is
+ * the only account whose opening gets rolled back, so the party is the only
+ * account that may receive the history.
+ *
+ * The contra therefore lands in one clearing account, whose own opening is set
+ * — at the end of the import — to exactly cancel what was posted to it. It
+ * carries a balance through the historical years, which is honest: it stands
+ * for the rest of the old system, which was not imported. It reaches zero on
+ * the cutover date, so the trial balance from cutover onwards is untouched.
+ */
+const SUSPENSE_CODE = "LEGACY-SUSPENSE";
+const SUSPENSE_NAME = "LEGACY MIGRATION SUSPENSE";
+
+async function ensureSuspenseAccount(companyId: string) {
+  const existing = await prisma.account.findFirst({
+    where: { companyId, code: SUSPENSE_CODE, deletedAt: null },
+    select: { id: true },
+  });
+  if (existing) return existing;
+  return prisma.account.create({
+    data: {
+      companyId,
+      code: SUSPENSE_CODE,
+      name: SUSPENSE_NAME,
+      type: "EQUITY",
+      partyType: "EQUITY",
+      description:
+        "Holds the other side of imported ledger history. Nets to zero on the cutover date.",
+    },
+    select: { id: true },
+  });
+}
+
+const dayKey = (d: Date) => d.toISOString().slice(0, 10);
+
+/**
+ * A party's ledger from the old system, posted as real vouchers.
+ *
+ * Real ones, deliberately — not an archive table nothing reads. The ledger
+ * report (app/api/reports/ledger/route.ts) builds its running balance from
+ * `account.openDebit/openCredit` plus every VoucherEntry, so history written
+ * this way sits in the same column as the vouchers written tomorrow and the
+ * balance carries straight through the cutover with no seam.
+ *
+ * Two things make that safe:
+ *
+ *  1. The B/F line replaces the party's opening balance. The opening imported
+ *     at cutover already *is* the sum of this history; leaving it in place and
+ *     posting the history behind it would double every party. So the opening
+ *     is rolled back to where the file starts, and the postings bring it
+ *     forward to the same number it had before. A party whose file carries no
+ *     B/F line is refused rather than doubled.
+ *
+ *  2. The contra leg goes to the suspense account above, never to the bank or
+ *     the sales account named on the voucher. A party ledger prints one side
+ *     only; the bank it appears to name is a cheque number, not an account.
+ *
+ * Re-running the same file is a no-op: a row is skipped when a voucher with
+ * the same number, date and amount is already on the party.
+ */
+async function writeLedgerHistory(
+  companyId: string,
+  branchId: string | null,
+  mapped: MappedRow<LedgerHistoryRow>[],
+  fallbackParty: string,
+): Promise<Outcome> {
+  const outcome = emptyOutcome(mapped.length);
+  const index = await loadAccountIndex(companyId);
+
+  // Grouped by party, so a file holding one party and a file holding fifty go
+  // down the same path.
+  const groups = new Map<string, MappedRow<LedgerHistoryRow>[]>();
+  for (const row of mapped) {
+    if (row.error || !row.value) { outcome.skipped += 1; continue; }
+    const key = (row.value.partyCode || row.value.party || fallbackParty).trim().toLowerCase();
+    if (!key) {
+      outcome.skipped += 1;
+      note(outcome, row.line, "No party on this row, and no party given for the file");
+      continue;
+    }
+    const list = groups.get(key);
+    if (list) list.push(row); else groups.set(key, [row]);
+  }
+
+  const suspense = await ensureSuspenseAccount(companyId);
+  let posted = false;
+
+  for (const rows of groups.values()) {
+    const first = rows[0].value;
+    const code = first.partyCode;
+    const name = first.party || fallbackParty;
+    const hit = lookup(index, code, name);
+    if (!hit) {
+      outcome.skipped += rows.length;
+      note(outcome, rows[0].line, `No account matches "${code || name}" — import the party first`);
+      continue;
+    }
+
+    // The opening line is what makes the rest of the file safe to post.
+    const openingRows = rows.filter((r) => r.value.isOpening);
+    if (openingRows.length === 0) {
+      outcome.skipped += rows.length;
+      note(
+        outcome,
+        rows[0].line,
+        `"${name || code}" has no opening / B/F line — importing without it would count the balance twice`,
+      );
+      continue;
+    }
+    const opening = openingRows[0].value;
+
+    // What is already on this account, so a second run of the same file writes
+    // nothing rather than doubling the party.
+    const seen = new Set<string>();
+    const existing = await prisma.voucherEntry.findMany({
+      where: { accountId: hit.id, voucher: { companyId, deletedAt: null } },
+      select: { amount: true, voucher: { select: { voucherNo: true, date: true } } },
+    });
+    for (const e of existing) {
+      seen.add(
+        `${e.voucher.voucherNo}|${dayKey(new Date(e.voucher.date))}|${Number(e.amount).toFixed(2)}`,
+      );
+    }
+
+    try {
+      await prisma.account.update({
+        where: { id: hit.id },
+        data: {
+          openDebit: opening.debit,
+          openCredit: opening.credit,
+          openDate: opening.date ?? undefined,
+        },
+      });
+      outcome.updated += 1;
+    } catch (e) {
+      outcome.skipped += rows.length;
+      note(
+        outcome,
+        openingRows[0].line,
+        e instanceof Error ? e.message : "Could not roll the opening balance back",
+      );
+      continue;
+    }
+
+    for (const row of rows) {
+      const v = row.value;
+      if (v.isOpening) continue;
+      if (!v.date) { outcome.skipped += 1; continue; }
+
+      // A row carrying both sides is a formatting artefact rather than a contra
+      // entry — the net is what the old ledger's running balance moved by.
+      const amount = Number((v.debit - v.credit).toFixed(2));
+      if (amount === 0) {
+        outcome.skipped += 1;
+        note(outcome, row.line, "Debit and credit cancel out — nothing to post");
+        continue;
+      }
+
+      const voucherNo = v.voucherNo || `LEG-${dayKey(v.date)}-${row.line}`;
+      const key = `${voucherNo}|${dayKey(v.date)}|${amount.toFixed(2)}`;
+      if (seen.has(key)) { outcome.skipped += 1; continue; }
+      seen.add(key);
+
+      try {
+        await prisma.voucher.create({
+          data: {
+            companyId,
+            branchId: branchId ?? undefined,
+            voucherNo,
+            type: v.voucherType || "JV",
+            date: v.date,
+            narration: v.narration || "Imported from previous system",
+            entries: {
+              create: [
+                { companyId, accountId: hit.id, amount },
+                { companyId, accountId: suspense.id, amount: -amount },
+              ],
+            },
+          },
+        });
+        outcome.imported += 1;
+        posted = true;
+      } catch (e) {
+        outcome.skipped += 1;
+        note(outcome, row.line, e instanceof Error ? e.message : "Could not post this voucher");
+      }
+    }
+  }
+
+  // Read back from the database rather than accumulated in the loop above, so
+  // a second run over the same file lands on the same number instead of
+  // doubling it, and a partly-failed run still leaves the trial balance square.
+  if (posted) {
+    const agg = await prisma.voucherEntry.aggregate({
+      where: { accountId: suspense.id, voucher: { companyId, deletedAt: null } },
+      _sum: { amount: true },
+    });
+    const net = Number(agg._sum.amount ?? 0);
+    await prisma.account.update({
+      where: { id: suspense.id },
+      data: {
+        openDebit: net < 0 ? Number((-net).toFixed(2)) : 0,
+        openCredit: net > 0 ? Number(net.toFixed(2)) : 0,
+      },
+    });
+  }
+
+  return outcome;
+}
+
+/**
  * Open invoices and bills, as documents with no lines.
  *
  * Deliberately no voucher and no stock movement. The receivables *balance*
@@ -572,6 +787,8 @@ async function readBody(req: NextRequest): Promise<{
   dataType: string;
   dryRun: boolean;
   date: string;
+  /** Party for a ledger-history file that names its party in the report header, not a column. */
+  party: string;
   error?: string;
 }> {
   const contentType = req.headers.get("content-type") || "";
@@ -586,17 +803,19 @@ async function readBody(req: NextRequest): Promise<{
       dataType: String(form.get("dataType") || ""),
       dryRun: String(form.get("dryRun") || "") === "true",
       date: String(form.get("date") || ""),
+      party: String(form.get("party") || ""),
     };
   }
 
   const json = await req.json().catch(() => null);
-  if (!json) return { csv: "", source: "csv", dataType: "", dryRun: false, date: "", error: "Invalid request body" };
+  if (!json) return { csv: "", source: "csv", dataType: "", dryRun: false, date: "", party: "", error: "Invalid request body" };
   return {
     csv: String(json.csv || ""),
     source: String(json.source || "csv"),
     dataType: String(json.dataType || ""),
     dryRun: json.dryRun === true,
     date: String(json.date || ""),
+    party: String(json.party || ""),
   };
 }
 
@@ -744,6 +963,12 @@ export async function POST(req: NextRequest) {
         outcome = await writeOpenDocuments(
           companyId, await resolveBranchIdOrDefault(req, companyId),
           rows as MappedRow<OpenDocumentRow>[], "bill",
+        );
+        break;
+      case "ledger_history":
+        outcome = await writeLedgerHistory(
+          companyId, await resolveBranchIdOrDefault(req, companyId),
+          rows as MappedRow<LedgerHistoryRow>[], body.party.trim(),
         );
         break;
       default:
