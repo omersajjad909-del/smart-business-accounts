@@ -416,16 +416,11 @@ const TIGHT_ONLY = new Set(["IN", "M", "G", "GA", "FT", "YD", '"']);
 
 type SpecHit = { value: number | string; start: number; end: number };
 
-function escapeSpecWord(word: string): string {
-  return word.replace(/[.*+?^${}()|[\]\\"]/g, "\/**
- * Line values for a freshly picked item.");
-}
-
 /** A number wearing one of these unit words: 12G, 60in, 1500 MM. */
 function findUnitNumber(text: string, words: string[]): SpecHit | null {
   for (const word of words) {
-    const gap = TIGHT_ONLY.has(word) ? "" : "\s*";
-    const re = new RegExp(`(\d+(?:\.\d+)?)${gap}${escapeSpecWord(word)}(?![A-Z0-9])`);
+    const gap = TIGHT_ONLY.has(word) ? "" : "\\s*";
+    const re = new RegExp(`(\\d+(?:\\.\\d+)?)${gap}${word}(?![A-Z0-9])`);
     const m = re.exec(text);
     if (m) return { value: Number(m[1]), start: m.index, end: m.index + m[0].length };
   }
@@ -434,7 +429,7 @@ function findUnitNumber(text: string, words: string[]): SpecHit | null {
 
 /** A number behind its tag: L100, PHR26. */
 function findTaggedNumber(text: string, tag: string): SpecHit | null {
-  const m = new RegExp(`(?:^|[^A-Z0-9])(${tag}\s*(\d+(?:\.\d+)?))(?![A-Z0-9])`).exec(text);
+  const m = new RegExp(`(?:^|[^A-Z0-9])(${tag}\\s*(\\d+(?:\\.\\d+)?))(?![A-Z0-9])`).exec(text);
   if (!m) return null;
   const start = m.index + m[0].length - m[1].length;
   return { value: Number(m[2]), start, end: start + m[1].length };
