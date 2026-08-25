@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useResponsive } from "@/hooks/useResponsive";
+import { PRINT_TEMPLATES } from "@/components/print/printTemplates";
 
 const isMobile = false;
 
@@ -361,9 +362,7 @@ export default function BusinessSettingsPage() {
               </Field>
               <Field label="Invoice Template">
                 <select value={print.invoiceTemplate} onChange={e=>setPrint(p=>({...p,invoiceTemplate:e.target.value}))} style={inp()}>
-                  <option value="classic">Classic</option>
-                  <option value="compact">Compact</option>
-                  <option value="modern">Modern</option>
+                  {PRINT_TEMPLATES.map(t => <option key={t.id} value={t.id}>{t.name}</option>)}
                 </select>
               </Field>
               <Field label="Invoice Footer Note">
