@@ -1,9 +1,0 @@
-Item Code	Quality	Gauge	Width	Lngth	shade	PHR	Unit	Bal Qty	Rate	Value	988	TRANSPARENT PLASTIC	3	54	100	20	48	Rolls	 0	 3,855.00	 0	Total:	 12,959	 74,344,180	
-Item Code	Quality	Gauge	Width	Lngth	shade	PHR	Unit	Bal Qty	Rate	Value	988	TRANSPARENT PLASTIC	3	54	100	20	42	Rolls	 0	 3,855.00	 0	Total:	 12,959	 74,344,180	
-Item Code	Quality	Gauge	Width	Lngth	shade	PHR	Unit	Bal Qty	Rate	Value	1	TPT FROSTED	4	54	50	cream	44	Rolls	 1	 6,112.00	 6,112	Total:	 12,959	 74,344,180	
-Item Code	Quality	Gauge	Width	Lngth	shade	PHR	Unit	Bal Qty	Rate	Value	1000	PVC NON-STICK	4	60	100	15-L	26	Rolls	 33	 0.00	 0	Total:	 12,959	 74,344,180	
-Item Code	Quality	Gauge	Width	Lngth	shade	PHR	Unit	Bal Qty	Rate	Value	965	CRYSTAL SUPER CLEAR (DIAMOND)	4	48	100	15-L	24	Rolls	 19	 3,697.78	 70,258	Total:	 12,959	 74,344,180	
-Item Code	Quality	Gauge	Width	Lngth	shade	PHR	Unit	Bal Qty	Rate	Value	965	CRYSTAL SUPER CLEAR (DIAMOND)	4	48	100	15-L	22	Rolls	 0	 3,697.78	 0	Total:	 12,959	 74,344,180	
-Item Code	Quality	Gauge	Width	Lngth	shade	PHR	Unit	Bal Qty	Rate	Value	966	CRYSTAL SUPER CLEAR (DIAMOND)	4	54	100	15-L	22	Rolls	 22	 4,160.00	 91,520	Total:	 12,959	 74,344,180	
-Item Code	Quality	Gauge	Width	Lngth	shade	PHR	Unit	Bal Qty	Rate	Value	975	PVC NON-STICK	4	54	100	15-L	26	Rolls	 20	 4,280.00	 85,600	Total:	 12,959	 74,344,180	
-Item Code	Quality	Gauge	Width	Lngth	shade	PHR	Unit	Bal Qty	Rate	Value	975	PVC NON-STICK	4	54	100	15-L	22	Rolls	 5	 4,280.00	 21,400	Total:	 12,959	 74,344,180	
