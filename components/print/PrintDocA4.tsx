@@ -62,6 +62,14 @@ export interface PrintDocA4Props {
   // Totals rows (flexible)
   totalsLines: PrintTotalsLine[];
 
+  /**
+   * Counted, not costed: how many rolls, how many bags, how many lines. It
+   * sits beside the money at the foot of the sheet because that is the pair a
+   * storekeeper checks a delivery against — the amount is for the office, the
+   * quantity is for the gate.
+   */
+  summaryFields?: { label: string; value: string }[];
+
   // Footer
   notes?: string;
   terms?: string;
@@ -115,6 +123,7 @@ export function PrintDocA4({
   columns,
   rows,
   totalsLines,
+  summaryFields = [],
   notes,
   terms,
   footerNote,
@@ -220,30 +229,45 @@ export function PrintDocA4({
         </tbody>
       </table>
 
-      {/* ── Totals, against the right margin where they are read ── */}
-      <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 14 }}>
-        <table className="pdoc-totals" style={{ borderCollapse: "collapse", minWidth: 210 }}>
-          <tbody>
-            {totalsLines.map((line, i) => (
-              <tr key={i}>
-                <td className={line.borderTop ? "pdoc-ruled" : undefined} style={{ padding: "2px 12px 2px 0", textAlign: "right", fontSize: line.bold ? 11 : 9.5, fontWeight: line.bold ? 700 : 400, borderTop: line.borderTop ? RULE : undefined }}>
-                  {line.label}
-                </td>
-                <td className={line.borderTop ? "pdoc-ruled" : undefined} style={{ padding: "2px 0", textAlign: "right", fontSize: line.bold ? 11 : 9.5, fontWeight: line.bold ? 700 : 400, minWidth: 88, borderTop: line.borderTop ? RULE : undefined }}>
-                  {fmt(line.value)}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-
       {/* ── The foot of the sheet ────────────────────────────────────
           Pushed to the bottom of the page rather than left hanging under
           the last line item: a bill is signed at the foot of the paper,
           and on a three-line order the signatures would otherwise sit
           half way up an empty page. */}
       <div style={{ marginTop: "auto", paddingTop: 18 }}>
+
+        {/* What was counted, and what it comes to. Both boxed and level with
+            each other, the way the old bill closed the page off. */}
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", gap: 24, marginBottom: 16 }}>
+          {summaryFields.length > 0 ? (
+            <table className="pdoc-summary" style={{ borderCollapse: "collapse", border: RULE }}>
+              <tbody>
+                {summaryFields.map((f, i) => (
+                  <tr key={i}>
+                    <td className="pdoc-label" style={{ padding: "3px 10px 3px 8px", fontSize: 9, whiteSpace: "nowrap" }}>{f.label} :</td>
+                    <td style={{ padding: "3px 12px 3px 0", fontSize: 10.5, fontWeight: 700, whiteSpace: "nowrap", textAlign: "right" }}>{f.value}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          ) : <div />}
+
+          <table className="pdoc-totals" style={{ borderCollapse: "collapse", minWidth: 210 }}>
+            <tbody>
+              {totalsLines.map((line, i) => (
+                <tr key={i}>
+                  <td className={line.borderTop ? "pdoc-ruled" : undefined} style={{ padding: "2px 12px 2px 0", textAlign: "right", fontSize: line.bold ? 11 : 9.5, fontWeight: line.bold ? 700 : 400, borderTop: line.borderTop ? RULE : undefined }}>
+                    {line.label}
+                  </td>
+                  <td className={line.borderTop ? "pdoc-ruled" : undefined} style={{ padding: "2px 0", textAlign: "right", fontSize: line.bold ? 11 : 9.5, fontWeight: line.bold ? 700 : 400, minWidth: 88, borderTop: line.borderTop ? RULE : undefined }}>
+                    {fmt(line.value)}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
         {terms && (
           <div style={{ fontSize: 8.5, lineHeight: 1.5, whiteSpace: "pre-wrap", marginBottom: 12 }}>
             <span className="pdoc-label" style={{ fontWeight: 700 }}>Terms: </span>{terms}
@@ -345,6 +369,18 @@ export function PrintPaperWrapper({ children }: { children: React.ReactNode }) {
         html.dark .dashboard-root .print-doc-a4 .pdoc-totals td.pdoc-ruled,
         html:not(.dark) .dashboard-root .print-doc-a4 .pdoc-totals td.pdoc-ruled,
         .print-doc-a4 .pdoc-totals td.pdoc-ruled { border-top: 1px solid #111 !important; }
+
+        /* The counted summary is boxed as a whole, not cell by cell. */
+        html.dark .dashboard-root .print-doc-a4 .pdoc-summary,
+        html:not(.dark) .dashboard-root .print-doc-a4 .pdoc-summary,
+        .print-doc-a4 .pdoc-summary { width: auto !important; border: 1px solid #111 !important; }
+        html.dark .dashboard-root .print-doc-a4 .pdoc-summary td,
+        html:not(.dark) .dashboard-root .print-doc-a4 .pdoc-summary td,
+        .print-doc-a4 .pdoc-summary td {
+          color: #111 !important;
+          border: 0 !important;
+          background-color: transparent !important;
+        }
 
         html.dark .dashboard-root .print-doc-a4 tr:hover td,
         .print-doc-a4 tr:hover td { background-color: transparent !important; }

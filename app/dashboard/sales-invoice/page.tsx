@@ -594,6 +594,13 @@ function SalesInvoiceContent() {
   const invTax      = savedInvoice ? (Number(savedInvoice.taxAmount) || 0) : totalTax;
   const invFreight  = savedInvoice ? (Number(savedInvoice.freight) || 0) : (freight === "" ? 0 : Number(freight));
 
+  // Rolls on the bill, and the unit they are counted in — named only when the
+  // whole bill is in one unit, because "6" of rolls and metres together is a
+  // number that means nothing.
+  const invQty = invItems.reduce((sum: number, r: any) => sum + (Number(r.qty) || 0), 0);
+  const invQtyUnits = Array.from(new Set(invItems.map((r: any) => String(r.item?.unit || r.unit || "").trim()).filter(Boolean)));
+  const invQtyUnit = invQtyUnits.length === 1 ? invQtyUnits[0] : "";
+
   /**
    * The document, built once and used twice: what the preview shows is the
    * paper that comes out of the printer. It used to be two different layouts
@@ -651,13 +658,24 @@ function SalesInvoiceContent() {
       rate: Number(r.rate).toLocaleString(),
       amount: (Number(r.qty) * Number(r.rate)).toLocaleString("en-US", { minimumFractionDigits: 2 }),
     })),
+    // What was counted. The gate checks the rolls against this line without
+    // reading a single figure of money, and a delivery note keeps it too —
+    // that is the only thing a delivery note is about.
+    summaryFields: [
+      { label: "Total Qty", value: `${invQty.toLocaleString()}${invQtyUnit ? ` ${invQtyUnit}` : ""}` },
+      { label: "Items", value: String(invItems.length) },
+    ],
     // A delivery note carries goods, not money: the columns above already
     // drop the rate, and the totals go with them.
+    //
+    // Freight prints whether or not it was charged. A bill that simply omits
+    // the line leaves the customer working out for themselves whether the
+    // carriage was in the rate, and this trade has always shown the nil.
     totalsLines: previewMode === "DELIVERY" ? [] : [
-      ...(invSubtotal > 0 ? [{ label: "Total:", value: invSubtotal }] : []),
+      { label: "Total:", value: invSubtotal },
       ...(invDiscount > 0 ? [{ label: "Discount:", value: -invDiscount }] : []),
       ...(invTax > 0 ? [{ label: "Tax:", value: invTax }] : []),
-      ...(invFreight > 0 ? [{ label: "Freight:", value: invFreight }] : []),
+      { label: "Freight:", value: invFreight },
       { label: "Net Bill:", value: invTotal, bold: true, borderTop: true },
     ],
     notes: savedInvoice?.notes || notes,
