@@ -14,6 +14,7 @@ import { PrintActionBar } from "@/components/print/PrintActionBar";
 import { PrintDocA4, PrintPaperWrapper } from "@/components/print/PrintDocA4";
 import type { PrintColumn, PrintTotalsLine } from "@/components/print/PrintDocA4";
 import { useResponsive } from "@/hooks/useResponsive";
+import { ItemPicker } from "@/components/ItemPicker";
 import { useRateFormula } from "@/hooks/useRateFormula";
 import {
   RateFormulaHeadCells,
@@ -833,11 +834,16 @@ function SalesInvoiceContent() {
                                   <button onClick={() => { const c=[...rows]; c[i]={...emptyRow()}; setRows(c); }} style={{ background:"none", border:"none", color:"var(--text-muted)", cursor:"pointer", fontSize:16 }}>⊗</button>
                                 </div>
                               ) : (
-                                <select style={{ ...inputStyle, marginBottom: 8 }} value={r.itemId} onKeyDown={rateFormulaEnterHandler(rf, rfActive, i)} onChange={e => selectItem(i, e.target.value)}>
-                                  <option value="">— Select Item —</option>
-                                  <option value="__manual__">✎ Type manually...</option>
-                                  {items.map(it => <option key={it.id} value={it.id}>{it.name}</option>)}
-                                </select>
+                                <div style={{ marginBottom: 8 }}>
+                                  <ItemPicker
+                                    items={items}
+                                    value={r.itemId}
+                                    onChange={(id) => selectItem(i, id)}
+                                    onKeyDown={rateFormulaEnterHandler(rf, rfActive, i)}
+                                    placeholder="Type to search — e.g. e1060"
+                                    style={inputStyle}
+                                  />
+                                </div>
                               )}
                               {r.sku && !r.isManual && <div style={{ fontSize: 11, color: "var(--text-muted)", marginBottom: 6 }}>SKU: {r.sku}{r.unit ? ` | Unit: ${r.unit}` : ""}</div>}
                               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
@@ -858,15 +864,15 @@ function SalesInvoiceContent() {
                       </div>
                     ) : (
                       <div style={{ overflowX: "auto", maxWidth: "100%" }}>
-                        <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 820 + (rfActive ? rateFormulaColumnsWidth(rf) : 0) }}>
+                        <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 1020 + (rfActive ? rateFormulaColumnsWidth(rf) : 0) }}>
                           <thead>
                             <tr style={{ borderBottom: "2px solid var(--border)" }}>
                               {["#","Item / Description","SKU"].map((h,hi) => (
-                                <th key={h+hi} style={{ padding: "8px 7px", fontSize: 10, fontWeight: 700, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: 0.4, textAlign: "left", whiteSpace: "nowrap" }}>{h}</th>
+                                <th key={h+hi} style={{ padding: "11px 12px", fontSize: 10.5, fontWeight: 700, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: 0.5, textAlign: "left", whiteSpace: "nowrap" }}>{h}</th>
                               ))}
                               {rfActive && <RateFormulaHeadCells settings={rf} />}
                               {["Qty","Unit","Unit Price","Disc %","Tax %","Total",""].map((h,hi) => (
-                                <th key={"t"+h+hi} style={{ padding: "8px 7px", fontSize: 10, fontWeight: 700, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: 0.4, textAlign: hi <= 5 ? "right" : "left", whiteSpace: "nowrap" }}>{h}</th>
+                                <th key={"t"+h+hi} style={{ padding: "11px 12px", fontSize: 10.5, fontWeight: 700, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: 0.5, textAlign: hi <= 5 ? "right" : "left", whiteSpace: "nowrap" }}>{h}</th>
                               ))}
                             </tr>
                           </thead>
@@ -878,8 +884,8 @@ function SalesInvoiceContent() {
                               const lineTax = lineTaxable * (Number(r.taxPercent) || 0) / 100;
                               return (
                                 <tr key={i} style={{ borderBottom: "1px solid var(--border)" }}>
-                                  <td style={{ padding: "6px 7px", fontSize: 12, color: "var(--text-muted)", width: 28 }}>{i + 1}</td>
-                                  <td style={{ padding: "6px 7px", minWidth: 180 }}>
+                                  <td style={{ padding: "9px 12px", fontSize: 12.5, color: "var(--text-muted)", width: 34 }}>{i + 1}</td>
+                                  <td style={{ padding: "9px 12px", minWidth: 300 }}>
                                     {r.isManual ? (
                                       <div style={{ display: "flex", gap: 4, alignItems: "center" }}>
                                         <input
@@ -892,27 +898,30 @@ function SalesInvoiceContent() {
                                         <button title="Switch to catalog" onClick={() => { const c=[...rows]; c[i]={...emptyRow()}; setRows(c); }} style={{ background:"none", border:"none", color:"var(--text-muted)", cursor:"pointer", fontSize:14, padding:"0 2px" }}>⊗</button>
                                       </div>
                                     ) : (
-                                      <select style={{ ...inputStyle, padding: "5px 7px", fontSize: 13 }} value={r.itemId} onKeyDown={rateFormulaEnterHandler(rf, rfActive, i)} onChange={e => selectItem(i, e.target.value)}>
-                                        <option value="">— Select —</option>
-                                        <option value="__manual__">✎ Type manually...</option>
-                                        {items.map(it => <option key={it.id} value={it.id}>{it.name}</option>)}
-                                      </select>
+                                      <ItemPicker
+                                        items={items}
+                                        value={r.itemId}
+                                        onChange={(id) => selectItem(i, id)}
+                                        onKeyDown={rateFormulaEnterHandler(rf, rfActive, i)}
+                                        placeholder="Type to search — e.g. e1060"
+                                        style={{ ...inputStyle, padding: "8px 10px", fontSize: 13.5 }}
+                                      />
                                     )}
                                     {r.description && !r.isManual && <div style={{ fontSize: 11, color: "var(--text-muted)", marginTop: 2, paddingLeft: 2 }}>{r.description}</div>}
                                   </td>
-                                  <td style={{ padding: "6px 7px", fontSize: 12, color: "var(--text-muted)", width: 72 }}>{r.sku || "—"}</td>
+                                  <td style={{ padding: "9px 12px", fontSize: 12.5, fontFamily: "ui-monospace, monospace", color: "var(--text-muted)", width: 86, whiteSpace: "nowrap" }}>{r.sku || "—"}</td>
                                   {rfActive && (
                                     <RateFormulaRowCells settings={rf} meta={r.meta} rowIndex={i} onChange={(key, value) => updateRowMeta(i, key, value)} />
                                   )}
-                                  <td style={{ padding: "6px 7px", width: 68 }}>
-                                    <input type="number" style={{ ...inputStyle, padding: "5px 7px", textAlign: "right", fontSize: 13 }} value={r.qty} onChange={e => updateRow(i, "qty", e.target.value)} placeholder="0" />
+                                  <td style={{ padding: "9px 12px", width: 82 }}>
+                                    <input type="number" style={{ ...inputStyle, padding: "8px 10px", textAlign: "right", fontSize: 13.5 }} value={r.qty} onChange={e => updateRow(i, "qty", e.target.value)} placeholder="0" />
                                   </td>
-                                  <td style={{ padding: "6px 7px", fontSize: 12, color: "var(--text-muted)", width: 52 }}>{r.unit || "—"}</td>
-                                  <td style={{ padding: "6px 7px", width: 94 }}>
-                                    <input type="number" style={{ ...inputStyle, padding: "5px 7px", textAlign: "right", fontSize: 13, ...(rfActive && !rf.rateEditable ? { opacity: 0.75, cursor: "not-allowed" } : {}) }} value={r.rate} onChange={e => updateRow(i, "rate", e.target.value)} readOnly={rfActive && !rf.rateEditable} title={rfActive && !rf.rateEditable ? "Worked out by your rate formula" : undefined} placeholder="0.00" />
+                                  <td style={{ padding: "9px 12px", fontSize: 12.5, color: "var(--text-muted)", width: 62 }}>{r.unit || "—"}</td>
+                                  <td style={{ padding: "9px 12px", width: 112 }}>
+                                    <input type="number" style={{ ...inputStyle, padding: "8px 10px", textAlign: "right", fontSize: 13.5, ...(rfActive && !rf.rateEditable ? { opacity: 0.75, cursor: "not-allowed" } : {}) }} value={r.rate} onChange={e => updateRow(i, "rate", e.target.value)} readOnly={rfActive && !rf.rateEditable} title={rfActive && !rf.rateEditable ? "Worked out by your rate formula" : undefined} placeholder="0.00" />
                                   </td>
-                                  <td style={{ padding: "6px 7px", width: 66 }}>
-                                    <input type="number" style={{ ...inputStyle, padding: "5px 7px", textAlign: "right", fontSize: 13 }} value={r.discountPercent} onChange={e => updateRow(i, "discountPercent", e.target.value)} placeholder="0" />
+                                  <td style={{ padding: "9px 12px", width: 78 }}>
+                                    <input type="number" style={{ ...inputStyle, padding: "8px 10px", textAlign: "right", fontSize: 13.5 }} value={r.discountPercent} onChange={e => updateRow(i, "discountPercent", e.target.value)} placeholder="0" />
                                   </td>
                                   <td style={{ padding: "6px 7px", width: 66 }}>
                                     <input type="number" style={{ ...inputStyle, padding: "5px 7px", textAlign: "right", fontSize: 13 }} value={r.taxPercent} onChange={e => updateRow(i, "taxPercent", e.target.value)} placeholder="0" />
