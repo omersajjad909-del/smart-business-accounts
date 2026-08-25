@@ -2104,6 +2104,7 @@ export default function DashboardLayout({
               {hasPermission(currentUser, PERMISSIONS.VIEW_FINANCIAL_REPORTS) && <NavLink href="/dashboard/reports/tax-summary" pathname={pathname}>Tax Summary</NavLink>}
               {hasPermission(currentUser, PERMISSIONS.VIEW_FINANCIAL_REPORTS) && <NavLink href="/dashboard/customer-statement" pathname={pathname}>Customer Statement</NavLink>}
               {hasPermission(currentUser, PERMISSIONS.VIEW_FINANCIAL_REPORTS) && <NavLink href="/dashboard/supplier-statement" pathname={pathname}>Supplier Statement</NavLink>}
+              {hasPermission(currentUser, PERMISSIONS.VIEW_AGEING_REPORT) && <NavLink href="/dashboard/reports/ageing" pathname={pathname}>Ageing Report</NavLink>}
             </NavGroup>
           )}
 
@@ -2149,6 +2150,7 @@ export default function DashboardLayout({
               <NavLink href="/dashboard/reports/stock/expiry" pathname={pathname}>Expiry Tracking</NavLink>
               <NavLink href="/dashboard/reports/stock/valuation" pathname={pathname}>Stock Valuation</NavLink>
               <NavLink href="/dashboard/reports/stock/warehouse" pathname={pathname}>Warehouse Stock</NavLink>
+              {hasPermission(currentUser, PERMISSIONS.VIEW_SALES_REPORT) && <NavLink href="/dashboard/reports/sales" pathname={pathname}>Sales Report</NavLink>}
             </NavGroup>
           )}
 
@@ -2160,7 +2162,6 @@ export default function DashboardLayout({
               open={openSection === "salesAnalytics"}
               onToggle={() => toggle("salesAnalytics")}
             >
-              {hasPermission(currentUser, PERMISSIONS.VIEW_SALES_REPORT) && <NavLink href="/dashboard/reports/sales" pathname={pathname}>Sales Report</NavLink>}
               <NavLink href="/dashboard/reports/customer-profitability" pathname={pathname}>Customer Profitability</NavLink>
               <NavLink href="/dashboard/reports/salesman-performance" pathname={pathname}>Salesman Performance</NavLink>
               <NavLink href="/dashboard/reports/discount-analysis" pathname={pathname}>Discount Analysis</NavLink>
@@ -2178,9 +2179,8 @@ export default function DashboardLayout({
               open={openSection === "receivablesPayables"}
               onToggle={() => toggle("receivablesPayables")}
             >
-              {/* Ageing and payment history are the Starter-tier basics here;
-                  follow-up, bad debts and credit analysis are the Pro upgrade. */}
-              {hasPermission(currentUser, PERMISSIONS.VIEW_AGEING_REPORT) && <NavLink href="/dashboard/reports/ageing" pathname={pathname}>Ageing Report</NavLink>}
+              {/* Payment history is a Starter-tier basic; follow-up, bad debts
+                  and credit analysis are the Pro upgrade. */}
               <NavLink href="/dashboard/reports/payment-history" pathname={pathname}>Payment History</NavLink>
               {hasPermission(currentUser, PERMISSIONS.VIEW_PROFIT_LOSS_REPORT) && <NavLink href="/dashboard/payment-followup" pathname={pathname}>Payment Follow-up</NavLink>}
               {hasPermission(currentUser, PERMISSIONS.VIEW_PROFIT_LOSS_REPORT) && <NavLink href="/dashboard/reports/bad-debts" pathname={pathname}>Bad Debts</NavLink>}
