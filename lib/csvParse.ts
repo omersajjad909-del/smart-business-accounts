@@ -77,10 +77,37 @@ function detectDelimiter(text: string): string {
  * that splits the text into lines first.
  */
 export function parseCsv(input: string, opts?: { delimiter?: string }): ParsedCsv {
+  const { records, delimiter } = parseCsvRecords(input, opts);
+  if (records.length === 0) return { headers: [], rows: [], delimiter };
+
+  const headers = records[0].map((h) => h.trim());
+  const rows: CsvRow[] = [];
+  for (let i = 1; i < records.length; i += 1) {
+    const cells = records[i];
+    const row: CsvRow = {};
+    headers.forEach((h, idx) => { row[h] = (cells[idx] ?? "").trim(); });
+    rows.push(row);
+  }
+
+  return { headers, rows, delimiter };
+}
+
+/**
+ * The same reader, stopping one step earlier: every record as a raw array of
+ * fields, with no header row taken off the front.
+ *
+ * Needed because not every export is a table. A report writer that flattens its
+ * layout onto one line per record has to be examined field by field before
+ * anything can be called a heading — see lib/reportFlatten.ts.
+ */
+export function parseCsvRecords(
+  input: string,
+  opts?: { delimiter?: string },
+): { records: string[][]; delimiter: string } {
   // Left in place the BOM becomes part of the first header name, so "code"
   // arrives as an invisible-prefixed string and never matches anything.
   const text = input.startsWith(BOM) ? input.slice(1) : input;
-  if (!text.trim()) return { headers: [], rows: [], delimiter: opts?.delimiter || "," };
+  if (!text.trim()) return { records: [], delimiter: opts?.delimiter || "," };
 
   const delimiter = opts?.delimiter || detectDelimiter(text);
 
