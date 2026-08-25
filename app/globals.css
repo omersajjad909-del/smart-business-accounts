@@ -955,13 +955,13 @@ html.fnv-lock-scroll body {
   }
 }
 
-/* ── Print footer: Powered by FinovaOS ──────────────────────────────────── */
+/* ── Print footer: Powered by Finov aOS ──────────────────────────────────── */
 @media print {
   @page {
     margin-bottom: 28mm;
   }
   body::after {
-    content: "Powered by FinovaOS";
+    content: "Powered by Finova OS";
     position: fixed;
     bottom: 0;
     left: 0;
