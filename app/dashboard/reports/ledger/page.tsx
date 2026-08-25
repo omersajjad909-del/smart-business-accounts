@@ -113,7 +113,7 @@ export default function LedgerReportPage() {
   };
 
   return (
-    <div style={{ fontFamily: "'Outfit','Inter',sans-serif", color: "rgba(255,255,255,.85)" }}>
+    <div className="ledger-print-root" style={{ fontFamily: "'Outfit','Inter',sans-serif", color: "rgba(255,255,255,.85)" }}>
 
       {/* ── MODAL ── */}
       {showModal && (
@@ -281,10 +281,10 @@ export default function LedgerReportPage() {
 
       {/* ── Report (shown after modal) ── */}
       {!showModal && (
-        <div style={{ maxWidth: 1100, margin: "0 auto" }}>
+        <div className="ledger-print-content" style={{ maxWidth: 1100, margin: "0 auto" }}>
 
           {/* Top bar */}
-          <div style={{ marginBottom: 12, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+          <div className="ledger-print-toolbar" style={{ marginBottom: 12, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
             <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
               <div style={{ width: 4, height: 28, borderRadius: 2, background: "linear-gradient(180deg,#818cf8,#6366f1)" }}/>
               <h1 style={{ fontSize: 22, fontWeight: 800, letterSpacing: "-.4px", margin: 0 }}>Ledger Report</h1>
@@ -314,7 +314,7 @@ export default function LedgerReportPage() {
           </div>
 
           {/* Report document */}
-          <div style={{
+          <div className="ledger-print-document" style={{
             background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.08)",
             borderRadius: 16, overflow: "hidden",
           }}>
