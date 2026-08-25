@@ -124,7 +124,7 @@ export function PrintDocA4({
     .filter(Boolean).join("   ");
 
   return (
-    <div className="print-doc-a4" style={{ width: "210mm", minHeight: "297mm", boxSizing: "border-box", margin: "0 auto", background: "#fff", color: "#111", padding: "10mm 10mm 8mm" }}>
+    <div className="print-doc-a4" style={{ width: "210mm", minHeight: "297mm", boxSizing: "border-box", margin: "0 auto", background: "#fff", color: "#111", padding: "10mm 10mm 8mm", display: "flex", flexDirection: "column" }}>
 
       {/* ── Letterhead: who is billing, and what this is ─────────── */}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 10 }}>
@@ -238,31 +238,40 @@ export function PrintDocA4({
         </table>
       </div>
 
-      {/* ── Terms, where a bill keeps them: small, at the foot ───── */}
-      {terms && (
-        <div style={{ fontSize: 8.5, lineHeight: 1.5, whiteSpace: "pre-wrap", marginBottom: 12 }}>
-          <span className="pdoc-label" style={{ fontWeight: 700 }}>Terms: </span>{terms}
+      {/* ── The foot of the sheet ────────────────────────────────────
+          Pushed to the bottom of the page rather than left hanging under
+          the last line item: a bill is signed at the foot of the paper,
+          and on a three-line order the signatures would otherwise sit
+          half way up an empty page. */}
+      <div style={{ marginTop: "auto", paddingTop: 18 }}>
+        {terms && (
+          <div style={{ fontSize: 8.5, lineHeight: 1.5, whiteSpace: "pre-wrap", marginBottom: 12 }}>
+            <span className="pdoc-label" style={{ fontWeight: 700 }}>Terms: </span>{terms}
+          </div>
+        )}
+
+        {signatureLabels && signatureLabels.length > 0 && (
+          <div style={{ display: "flex", justifyContent: "space-between", gap: 30 }}>
+            {signatureLabels.map((lbl) => (
+              <div key={lbl} style={{ flex: 1, textAlign: "center" }}>
+                <div className="pdoc-sig-line" style={{ borderTop: "1px solid #111", margin: "0 auto 4px", maxWidth: 150 }} />
+                <div className="pdoc-label" style={{ fontSize: 8.5 }}>{lbl}</div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {footerNote && (
+          <div className="pdoc-label" style={{ textAlign: "center", fontSize: 8, marginTop: 14 }}>{footerNote}</div>
+        )}
+
+        {/* Every document this system prints says where it came from. The
+            app-wide print footer stands down when this line is on the page
+            (see app/globals.css) so it is never printed twice. */}
+        <div className="pdoc-powered" style={{ textAlign: "center", fontSize: 8.5, marginTop: 6, letterSpacing: 0.4 }}>
+          Powered by <b>FinovaOS</b>
         </div>
-      )}
-
-      {/* ── Signatures ───────────────────────────────────────────── */}
-      {signatureLabels && signatureLabels.length > 0 && (
-        <div style={{ display: "flex", justifyContent: "space-between", gap: 30, marginTop: 26 }}>
-          {signatureLabels.map((lbl) => (
-            <div key={lbl} style={{ flex: 1, textAlign: "center" }}>
-              <div className="pdoc-sig-line" style={{ borderTop: "1px solid #111", margin: "0 auto 4px", maxWidth: 150 }} />
-              <div className="pdoc-label" style={{ fontSize: 8.5 }}>{lbl}</div>
-            </div>
-          ))}
-        </div>
-      )}
-
-      {footerNote && (
-        <div className="pdoc-label" style={{ textAlign: "center", fontSize: 8, marginTop: 14 }}>{footerNote}</div>
-      )}
-
-      {/* "Powered by FinovaOS" is printed on every page by the app-wide
-          print footer in app/globals.css, so it is not repeated here. */}
+      </div>
     </div>
   );
 }
