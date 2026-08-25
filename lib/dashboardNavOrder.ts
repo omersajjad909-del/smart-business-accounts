@@ -737,7 +737,6 @@ export const DASHBOARD_NAV_GROUPS: DashboardNavGroup[] = [
     title: "Admin",
     routes: [
       "/dashboard/admin-control",
-      "/dashboard/chat",
       "/dashboard/business-features",
       "/dashboard/notifications-config",
       "/dashboard/shortcuts",

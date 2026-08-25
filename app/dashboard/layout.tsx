@@ -2231,7 +2231,6 @@ export default function DashboardLayout({
                   the plan still decides who sees them. */}
               {currentUser?.role === "ADMIN" && <NavLink href="/dashboard/company-profile" pathname={pathname}>🏢 Company Profile</NavLink>}
               <NavLink href="/dashboard/admin-control" pathname={pathname}>Admin Control Center</NavLink>
-              <NavLink href="/dashboard/chat" pathname={pathname}>💬 Support Inbox</NavLink>
               <NavLink href="/dashboard/business-features" pathname={pathname}>⚡ Business Features</NavLink>
               <NavLink href="/dashboard/notifications-config" pathname={pathname}>💬 Notification Settings</NavLink>
               <NavLink href="/dashboard/shortcuts" pathname={pathname}>Keyboard Shortcuts</NavLink>

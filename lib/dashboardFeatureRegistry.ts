@@ -2565,7 +2565,6 @@ export const CORE_DASHBOARD_FEATURES: DashboardFeatureDefinition[] = [
   // ── Admin ──
   { id: "CORE_COMPANY_PROFILE", label: "Company Profile", route: "/dashboard/company-profile", section: "Admin", core: true, permKey: "MANAGE_USERS", business: "service", businessLabel: "Core (all businesses)" },
   { id: "CORE_ADMIN_CONTROL", label: "Admin Control Center", route: "/dashboard/admin-control", section: "Admin", core: true, permKey: "MANAGE_USERS", business: "service", businessLabel: "Core (all businesses)" },
-  { id: "CORE_CHAT", label: "Support Inbox", route: "/dashboard/chat", section: "Admin", core: true, permKey: "MANAGE_USERS", business: "service", businessLabel: "Core (all businesses)" },
   { id: "CORE_BUSINESS_FEATURES", label: "Business Features", route: "/dashboard/business-features", section: "Admin", core: true, permKey: "MANAGE_USERS", business: "service", businessLabel: "Core (all businesses)" },
   { id: "CORE_NOTIFICATIONS_CONFIG", label: "Notification Settings", route: "/dashboard/notifications-config", section: "Admin", core: true, permKey: "MANAGE_USERS", business: "service", businessLabel: "Core (all businesses)" },
   { id: "CORE_SHORTCUTS", label: "Keyboard Shortcuts", route: "/dashboard/shortcuts", section: "Admin", core: true, permKey: "VIEW_DASHBOARD", business: "service", businessLabel: "Core (all businesses)" },
