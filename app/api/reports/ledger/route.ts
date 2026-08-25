@@ -27,7 +27,7 @@ export async function GET(req: NextRequest) {
 
     const account = await prisma.account.findFirst({
       where: { id: accountId, companyId },
-      select: { id: true, openDebit: true, openCredit: true },
+      select: { id: true, openDebit: true, openCredit: true, openDate: true },
     });
     if (!account) return NextResponse.json(balanceOnly ? { balance: 0 } : []);
 
@@ -69,9 +69,20 @@ export async function GET(req: NextRequest) {
     // ── 3. Build running balance rows ──
     let runningBalance = openingBal;
 
+    // Dated the day the opening actually applies to, not the day the report
+    // was asked to start. A ledger run from 2014 on an account whose opening
+    // was set at 31-07-2023 read as if nothing happened for nine years. Only
+    // when the whole opening comes from the master, though — once vouchers
+    // before the period are folded in, the composite belongs to no one date
+    // and the start of the period is the only honest label.
+    const openingDate =
+      openingFromVouchers === 0 && account.openDate
+        ? new Date(account.openDate)
+        : fromDate;
+
     const finalRows = [
       {
-        date:      fromDate.toISOString().slice(0, 10),
+        date:      openingDate.toISOString().slice(0, 10),
         voucherNo: "---",
         narration: "OPENING BALANCE B/F",
         debit:     openingBal > 0 ? openingBal  : 0,

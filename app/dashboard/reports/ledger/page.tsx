@@ -82,6 +82,11 @@ export default function LedgerReportPage() {
     } finally { setLoading(false); }
   }
 
+  // The API always returns the opening as row 0, so the body is everything
+  // after it. It is rendered as a row of its own below rather than only as the
+  // figure in the header — a ledger that starts at 497,075 with no line saying
+  // where 329,405 of it came from reads as though the report lost something.
+  const openingRow  = rows.length ? rows[0] : null;
   const dataRows    = rows.slice(1);
   const totalDebit  = dataRows.reduce((s, r) => s + (r.debit  || 0), 0);
   const totalCredit = dataRows.reduce((s, r) => s + (r.credit || 0), 0);
@@ -291,7 +296,7 @@ export default function LedgerReportPage() {
                 fontSize: 12, fontWeight: 600, fontFamily: "inherit",
               }}>⟵ Change Account</button>
               {rows.length > 0 && (
-                <button onClick={() => exportToCSV(dataRows.map(r => ({
+                <button onClick={() => exportToCSV([...(openingRow ? [openingRow] : []), ...dataRows].map(r => ({
                   Date: r.date, "Voucher #": r.voucherNo, Narration: r.narration,
                   Debit: r.debit || 0, Credit: r.credit || 0, Balance: r.balance,
                 })), "ledger-report")} style={{
@@ -366,13 +371,28 @@ export default function LedgerReportPage() {
                   </tr>
                 </thead>
                 <tbody>
+                  {!loading && openingRow && (
+                    <tr style={{
+                      borderBottom: "1px solid rgba(255,255,255,.08)",
+                      background: "rgba(99,102,241,.07)",
+                    }}>
+                      <td style={{ padding: "11px 16px", color: "rgba(255,255,255,.55)", fontSize: 12, borderRight: "1px solid rgba(255,255,255,.04)", whiteSpace: "nowrap" }}>{openingRow.date}</td>
+                      <td style={{ padding: "11px 16px", color: "rgba(255,255,255,.3)", fontWeight: 600, fontSize: 12, borderRight: "1px solid rgba(255,255,255,.04)", whiteSpace: "nowrap" }}>OP</td>
+                      <td style={{ padding: "11px 16px", color: "rgba(255,255,255,.8)", fontWeight: 700, borderRight: "1px solid rgba(255,255,255,.04)", maxWidth: 360 }}>Opening Balance</td>
+                      <td style={{ padding: "11px 16px", textAlign: "right", fontWeight: 700, color: openingRow.debit ? "#34d399" : "rgba(255,255,255,.18)", borderRight: "1px solid rgba(255,255,255,.04)", whiteSpace: "nowrap" }}>{openingRow.debit ? fmt(openingRow.debit) : "—"}</td>
+                      <td style={{ padding: "11px 16px", textAlign: "right", fontWeight: 700, color: openingRow.credit ? "#f87171" : "rgba(255,255,255,.18)", borderRight: "1px solid rgba(255,255,255,.04)", whiteSpace: "nowrap" }}>{openingRow.credit ? fmt(openingRow.credit) : "—"}</td>
+                      <td style={{ padding: "11px 16px", textAlign: "right", fontWeight: 800, whiteSpace: "nowrap", color: openingRow.balance >= 0 ? "#34d399" : "#f87171" }}>
+                        {fmt(openingRow.balance, cur)} <span style={{ fontSize: 10, opacity: .7 }}>{openingRow.balance >= 0 ? "Dr" : "Cr"}</span>
+                      </td>
+                    </tr>
+                  )}
                   {loading ? (
                     <tr><td colSpan={6} style={{ padding: "60px 0", textAlign: "center", color: "rgba(255,255,255,.25)", fontSize: 13 }}>
                       Loading transactions…
                     </td></tr>
                   ) : dataRows.length === 0 ? (
-                    <tr><td colSpan={6} style={{ padding: "60px 0", textAlign: "center", color: "rgba(255,255,255,.2)", fontSize: 13 }}>
-                      No transactions found for this period
+                    <tr><td colSpan={6} style={{ padding: "40px 0", textAlign: "center", color: "rgba(255,255,255,.2)", fontSize: 13 }}>
+                      No transactions in this period
                     </td></tr>
                   ) : dataRows.map((r, i) => (
                     <tr key={i} style={{
@@ -394,7 +414,7 @@ export default function LedgerReportPage() {
                     </tr>
                   ))}
                 </tbody>
-                {dataRows.length > 0 && (
+                {rows.length > 0 && (
                   <tfoot>
                     <tr style={{ borderTop: "1px solid rgba(255,255,255,.12)", background: "rgba(99,102,241,.06)" }}>
                       <td colSpan={3} style={{ padding: "12px 16px", fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,.35)", letterSpacing: ".06em", textTransform: "uppercase" }}>Period Totals</td>
