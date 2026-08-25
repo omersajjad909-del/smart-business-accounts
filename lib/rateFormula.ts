@@ -496,38 +496,53 @@ export function itemSpecFromText(
 }
 
 /**
+ * Everything an item itself knows about its dimensions: what was saved on it,
+ * and — for the columns it has nothing real for — what its name says.
+ *
+ * A saved zero counts as nothing. No roll is 0 gauge, so a zero is an item
+ * that predates the columns rather than a measurement, and the name behind it
+ * is the better answer.
+ */
+export function itemMetaWithName(
+  settings: RateFormulaSettings,
+  itemMeta: unknown,
+  itemText?: string
+): Record<string, RateFormulaValue> {
+  const saved = readRateFormulaMeta(settings, itemMeta);
+  const read = itemText ? itemSpecFromText(settings, itemText) : {};
+  const out: Record<string, RateFormulaValue> = {};
+  for (const f of settings.fields) {
+    const value = saved[f.key];
+    const isReal = value !== "" && !(f.kind === "number" && Number(value) === 0);
+    const fallback = read[f.key];
+    out[f.key] = isReal || fallback === undefined || fallback === "" ? value : fallback;
+  }
+  return out;
+}
+
+/**
  * Line values for a freshly picked item.
  *
- * The item's saved defaults win, because picking an item is the operator saying
- * "this is that product" — a stale gauge left over from the previous item on
- * the line would be worse than useless. What the item has nothing saved for is
- * read out of its name, which is where this trade has always kept it. Only
- * when neither knows anything does the line keep what it already had.
- *
- * A saved zero counts as knowing nothing: no roll is 0 gauge, and an item
- * carrying one is an item that was created before the columns existed — the
- * name behind it is the better answer.
+ * The item wins, because picking an item is the operator saying "this is that
+ * product" — a stale gauge left over from the previous item on the line would
+ * be worse than useless. Only what the item knows nothing about, by its meta
+ * or by its name, keeps whatever is already on the line.
  */
 export function metaFromItem(
   settings: RateFormulaSettings,
   itemMeta: unknown,
   currentMeta: Record<string, RateFormulaValue> | undefined,
-  /** The item's name, and anything else describing it — its description, code. */
+  /** The item's name, and its description — whatever the trade wrote the spec into. */
   itemText?: string
 ): Record<string, RateFormulaValue> {
-  const fromItem = readRateFormulaMeta(settings, itemMeta);
-  const fromName = itemText ? itemSpecFromText(settings, itemText) : {};
+  const known = itemMetaWithName(settings, itemMeta, itemText);
   const out: Record<string, RateFormulaValue> = {};
   for (const f of settings.fields) {
     // The typed-per-document column is cleared rather than filled, so the
     // cursor that lands there lands on an empty box.
     if (f.focusOnPick) { out[f.key] = ""; continue; }
-    const saved = fromItem[f.key];
-    const read = fromName[f.key];
-    const savedIsReal = saved !== "" && !(f.kind === "number" && Number(saved) === 0);
-    if (savedIsReal) out[f.key] = saved;
-    else if (read !== undefined && read !== "") out[f.key] = read;
-    else out[f.key] = saved === "" ? (currentMeta?.[f.key] ?? "") : saved;
+    const value = known[f.key];
+    out[f.key] = value === "" ? (currentMeta?.[f.key] ?? "") : value;
   }
   return out;
 }

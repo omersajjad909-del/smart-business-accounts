@@ -286,7 +286,15 @@ function SalesInvoiceContent() {
         i.id === scanCode
       );
       if (found) {
-        const newRow: Row = { itemId: found.id, name: found.name, description: found.description || "", availableQty: found.availableQty, qty: 1, rate: found.salePrice || "", discountPercent: "", taxPercent: found.taxRate || "", unit: found.unit || "", sku: found.code || "" };
+        const newRow: Row = { itemId: found.id, name: found.name, description: found.description || "", availableQty: found.availableQty, qty: 1, rate: rfActive ? "" : (found.salePrice || ""), discountPercent: "", taxPercent: found.taxRate || "", unit: found.unit || "", sku: found.code || "" };
+        // A scanned line is a picked line. Without this it arrived with no
+        // dimensions and the item's stored sale price, so the one line nobody
+        // typed was the one line the formula had not priced.
+        if (rfActive) {
+          newRow.meta = metaFromItem(rf, (found as any).meta, emptyRateFormulaMeta(rf), `${found.name || ""} ${found.description || ""}`);
+          const r = computeRateFromFormula(rf, newRow.meta);
+          if (r.rate != null) newRow.rate = r.rate;
+        }
         const last = rows[rows.length - 1];
         const existing = rows.findIndex(r => r.itemId === found.id);
         if (existing >= 0) {
@@ -317,7 +325,7 @@ function SalesInvoiceContent() {
     // stored sale price must not overwrite a computed line rate.
     copy[idx] = { ...copy[idx], itemId: item.id, name: item.name, description: item.description || "", availableQty: item.availableQty, qty: "", rate: rfActive ? copy[idx].rate : (item.salePrice || ""), discountPercent: "", taxPercent: item.taxRate || "", unit: item.unit || "", sku: item.code || "", isManual: false };
     if (rfActive) {
-      const meta = metaFromItem(rf, (item as any).meta, copy[idx].meta);
+      const meta = metaFromItem(rf, (item as any).meta, copy[idx].meta, `${item.name || ""} ${item.description || ""}`);
       copy[idx].meta = meta;
       const r = computeRateFromFormula(rf, meta);
       if (r.rate != null) copy[idx].rate = r.rate;

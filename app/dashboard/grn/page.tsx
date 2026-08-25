@@ -150,7 +150,7 @@ export default function GRNPage() {
     if (!item) return;
     setRows(prev => {
       const copy = [...prev];
-      const meta = metaFromItem(rf, item.meta, copy[idx]?.meta);
+      const meta = metaFromItem(rf, item.meta, copy[idx]?.meta, `${item.name || ""} ${item.description || ""}`);
       copy[idx] = { ...copy[idx], meta };
       const r = computeRateFromFormula(rf, meta);
       if (r.rate != null) copy[idx].rate = String(r.rate);

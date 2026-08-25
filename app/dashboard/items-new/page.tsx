@@ -4,7 +4,7 @@ import toast from "react-hot-toast";
 import { useEffect, useState } from "react";
 import { useRateFormula } from "@/hooks/useRateFormula";
 import { RateFormulaMobileFields, type RateFormulaMeta } from "@/components/RateFormulaCells";
-import { emptyRateFormulaMeta, readRateFormulaMeta, type RateFormulaValue } from "@/lib/rateFormula";
+import { emptyRateFormulaMeta, itemMetaWithName, type RateFormulaValue } from "@/lib/rateFormula";
 import { getCurrentUser } from "@/lib/auth";
 import ImageUpload from "@/components/ImageUpload";
 import { useResponsive } from "@/hooks/useResponsive";
@@ -101,7 +101,7 @@ export default function ItemsNewPage() {
   useEffect(() => {
     if (!rfActive) return;
     setMeta(editingItem
-      ? readRateFormulaMeta(rf, editingItem.meta)
+      ? itemMetaWithName(rf, editingItem.meta, `${editingItem.name || ""} ${editingItem.description || ""}`)
       : emptyRateFormulaMeta(rf));
   }, [rfActive, rf, editingItem]);
 
@@ -140,7 +140,10 @@ export default function ItemsNewPage() {
     setBarcode(item.barcode || ""); setDescription(item.description || "");
     setImageUrl(item.imageUrl || null);
     setEditingItem(item);
-    setMeta(rfActive ? readRateFormulaMeta(rf, item.meta) : {});
+    // An item imported from the old system keeps its dimensions in its name
+    // and nowhere else. Reading them into the boxes means the first save of
+    // that item puts them where every document can find them.
+    setMeta(rfActive ? itemMetaWithName(rf, item.meta, `${item.name || ""} ${item.description || ""}`) : {});
     window.scrollTo({ top:0, behavior:"smooth" });
   }
 

@@ -1,6 +1,5 @@
 "use client";
 import { fmtDate } from "@/lib/dateUtils";
-import { ItemPicker } from "@/components/ItemPicker";
 import { DateInput } from "@/app/dashboard/reports/_components/DateInput";
 import { confirmToast } from "@/lib/toast-feedback";
 import toast from "react-hot-toast";
@@ -305,14 +304,10 @@ export default function SalesReturnPage() {
                     <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 12, color: TEXT }}>Invoice & Customer</div>
                     <div style={{ marginBottom: 10 }}>
                       <Label>Select Invoice (F7/F8)</Label>
-                      <ItemPicker
-                        items={invoices as any}
-                        value={invoiceId}
-                        onChange={(__picked: string) => handleInvoiceChange(__picked)}
-                        style={inp()}
-                        allowManual={false}
-                        placeholder="Type to search — e.g. e1060"
-                      />
+                      <select style={inp()} value={invoiceId} onChange={e => handleInvoiceChange(e.target.value)}>
+                        <option value="">— Choose Invoice —</option>
+                        {invoices.map(i => <option key={i.id} value={i.id}>{i.invoiceNo} — {i.customerName}</option>)}
+                      </select>
                     </div>
                     {customerName && (
                       <div style={{ padding: isMobile ? "8px 8px" : "10px 12px", background: "rgba(248,113,113,0.06)", borderRadius: 8, border: `1px solid rgba(248,113,113,0.25)` }}>

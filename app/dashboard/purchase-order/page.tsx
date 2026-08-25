@@ -458,7 +458,7 @@ export default function PurchaseOrderPage() {
                             const copy = [...rows];
                             copy[i] = { ...copy[i], itemId: it.id, name: it.name, desc: it.description || "", rate: rfActive ? copy[i].rate : String(it.purchaseRate || it.rate || ""), unit: it.unit || "", sku: it.code || "" };
                             if (rfActive) {
-                              const meta = metaFromItem(rf, it.meta, copy[i].meta);
+                              const meta = metaFromItem(rf, it.meta, copy[i].meta, `${it.name || ""} ${it.description || ""}`);
                               copy[i].meta = meta;
                               const r = computeRateFromFormula(rf, meta);
                               if (r.rate != null) copy[i].rate = String(r.rate);
@@ -543,7 +543,7 @@ export default function PurchaseOrderPage() {
                                   const copy = [...rows];
                                   copy[i] = { ...copy[i], itemId: it.id, name: it.name, desc: it.description || "", rate: rfActive ? copy[i].rate : String(it.purchaseRate || it.rate || ""), unit: it.unit || "", sku: it.code || "" };
                             if (rfActive) {
-                              const meta = metaFromItem(rf, it.meta, copy[i].meta);
+                              const meta = metaFromItem(rf, it.meta, copy[i].meta, `${it.name || ""} ${it.description || ""}`);
                               copy[i].meta = meta;
                               const r = computeRateFromFormula(rf, meta);
                               if (r.rate != null) copy[i].rate = String(r.rate);

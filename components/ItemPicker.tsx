@@ -24,6 +24,9 @@ export type PickerItem = {
   name: string;
   code?: string | null;
   unit?: string | null;
+  /** Shown under the name and searched with it — some catalogues carry the
+   *  specification here rather than in the name. */
+  description?: string | null;
 };
 
 /** Beyond this the list is cut — nobody reads past it, and rendering costs. */
@@ -58,7 +61,10 @@ export function ItemPicker({
   // Built once per catalogue rather than per keystroke — a few thousand items
   // times a few characters a second is enough to feel it otherwise.
   const indexed = useMemo(
-    () => items.map((item) => ({ item, keys: itemSearchKeys(item.name, item.code) })),
+    () => items.map((item) => ({
+      item,
+      keys: itemSearchKeys(item.name, item.code, item.description),
+    })),
     [items],
   );
 
@@ -178,7 +184,14 @@ export function ItemPicker({
                 fontFamily: "ui-monospace, monospace", fontSize: 11.5,
                 color: "var(--text-muted, rgba(255,255,255,.4))", minWidth: 62,
               }}>{item.code || "—"}</span>
-              <span style={{ fontSize: 13, color: "var(--text-primary, #fff)" }}>{item.name}</span>
+              <span style={{ fontSize: 13, color: "var(--text-primary, #fff)" }}>
+                {item.name}
+                {item.description ? (
+                  <span style={{ color: "var(--text-muted, rgba(255,255,255,.4))", fontSize: 11.5 }}>
+                    {" "}· {item.description}
+                  </span>
+                ) : null}
+              </span>
               {item.unit && (
                 <span style={{ fontSize: 11, color: "var(--text-muted, rgba(255,255,255,.35))", marginLeft: "auto", paddingLeft: 12 }}>
                   {item.unit}
