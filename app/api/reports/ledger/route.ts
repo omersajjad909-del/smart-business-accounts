@@ -31,7 +31,7 @@ export async function GET(req: NextRequest) {
     });
     if (!account) return NextResponse.json(balanceOnly ? { balance: 0 } : []);
 
-    const fromDate = from ? new Date(from + "T00:00:00") : new Date("2024-01-01");
+    const fromDate = from ? new Date(from + "T00:00:00") : new Date("2014-01-01");
     const toDate   = to   ? new Date(to   + "T23:59:59.999") : new Date();
 
     // ── 1. Opening balance: master opening + all voucher entries before period ──

@@ -25,7 +25,7 @@ export default function LedgerReportPage() {
   const today = new Date().toISOString().slice(0, 10);
   const [accounts,    setAccounts]    = useState<Account[]>([]);
   const [accountId,   setAccountId]   = useState("");
-  const [fromDate,    setFromDate]    = useState("2026-01-01");
+  const [fromDate,    setFromDate]    = useState("2014-01-01");
   const [toDate,      setToDate]      = useState(today);
   const [rows,        setRows]        = useState<LedgerRow[]>([]);
   const [loading,     setLoading]     = useState(false);
