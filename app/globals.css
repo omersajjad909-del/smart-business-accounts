@@ -975,10 +975,12 @@ html.fnv-lock-scroll body {
     letter-spacing: 0.04em;
   }
 
-  /* A document that already prints the line at the foot of the sheet — see
-     components/print/PrintDocA4.tsx — does not get it a second time from the
-     page footer. Every other print in the app still does. */
-  body:has(.print-doc-a4)::after {
+  /* Only when the printed sheet IS a PrintDocA4 does the page footer stand
+     down — that document prints the line itself, at the foot of the paper.
+     The selector is deliberately narrow: most document pages merely hold a
+     PrintDocA4 on screen as a preview and print their own markup, and those
+     prints still need this footer. */
+  body:has(.print-area .print-doc-a4)::after {
     content: none;
   }
 }
