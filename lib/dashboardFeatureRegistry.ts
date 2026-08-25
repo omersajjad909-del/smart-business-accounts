@@ -2828,6 +2828,41 @@ export function resolvePlanWideFeatureFlags(
  * Returning `null` means "no restriction configured" — callers treat that as
  * full access, which is what the sidebar already does for a null feature set.
  */
+/**
+ * Adds pages that reached the registry after this grid was last saved.
+ *
+ * The business-type grid is a whitelist, so a page added to the registry later
+ * is simply absent from it and reads as "not in your plan" — it never appears
+ * in the sidebar and its URL bounces back to /dashboard. The plan-wide path
+ * has always been healed for this by `healSavedPlanFeatureFlags`; the
+ * business-scoped path was not, so any company whose admin had ever saved a
+ * per-business grid stopped receiving new pages entirely. `healSavedFeatureList`
+ * did not cover it either: it returns early the moment it sees any CORE_ id,
+ * which every post-2025 grid has.
+ *
+ * "Unseen" is judged across every plan of this business type, not just the one
+ * being resolved. A page an admin deliberately unticked for Starter is still
+ * listed under Pro, so it counts as seen and stays off for Starter — only a
+ * page that appears in no plan at all is genuinely new and gets the default.
+ */
+function addUnseenRegistryFeatures(
+  scoped: string[],
+  byBusiness: Record<string, string[]> | undefined,
+  planKey: DashboardFeaturePlanCode,
+): string[] {
+  const known = new Set<string>();
+  for (const list of Object.values(byBusiness || {})) {
+    if (Array.isArray(list)) for (const id of list) known.add(id);
+  }
+  if (known.size === 0) return scoped;
+
+  const unseen = DASHBOARD_FEATURE_IDS.filter((id) => !known.has(id));
+  if (unseen.length === 0) return scoped;
+
+  const byDefault = new Set(createDefaultDashboardFeatureFlags()[planKey] || []);
+  return Array.from(new Set([...scoped, ...unseen.filter((id) => byDefault.has(id))]));
+}
+
 export function resolveDashboardFeaturesForCompany(opts: {
   businessType: string;
   planCode: string;
