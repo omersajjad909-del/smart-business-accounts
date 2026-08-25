@@ -152,19 +152,10 @@ export function parseCsvRecords(
 
   // Drop rows that are entirely empty - a trailing newline produces one, and
   // Oracle spool files pad the end with blanks.
-  const nonEmpty = records.filter((r) => r.some((c) => c.trim() !== ""));
-  if (nonEmpty.length === 0) return { headers: [], rows: [], delimiter };
-
-  const headers = nonEmpty[0].map((h) => h.trim());
-  const rows: CsvRow[] = [];
-  for (let i = 1; i < nonEmpty.length; i += 1) {
-    const cells = nonEmpty[i];
-    const row: CsvRow = {};
-    headers.forEach((h, idx) => { row[h] = (cells[idx] ?? "").trim(); });
-    rows.push(row);
-  }
-
-  return { headers, rows, delimiter };
+  return {
+    records: records.filter((r) => r.some((c) => c.trim() !== "")),
+    delimiter,
+  };
 }
 
 /**
