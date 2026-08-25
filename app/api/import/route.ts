@@ -38,6 +38,7 @@ import {
   readOpenDocumentRow,
   readLedgerHistoryRow,
   flagSummaryRows,
+  flagAmbiguousItemCodes,
   inheritGroupsFromHierarchy,
   type ImportDataType,
   type MappedRow,
@@ -1000,6 +1001,16 @@ export async function POST(req: NextRequest) {
       if (summaries > 0) {
         mapped.ok -= summaries;
         mapped.failed += summaries;
+      }
+    }
+
+    // Whole-file pass: one code standing for two items cannot be seen from
+    // inside a single row.
+    if (dataType === "items") {
+      const { flagged } = flagAmbiguousItemCodes(mapped.rows as MappedRow<ItemRow>[]);
+      if (flagged > 0) {
+        mapped.ok -= flagged;
+        mapped.failed += flagged;
       }
     }
 

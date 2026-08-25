@@ -334,6 +334,7 @@ export const FIELD_ALIASES: Record<string, string[]> = {
   dimWidth: ["width", "wid"],
   dimLength: ["length", "lngth", "lenght", "len"],
   shade: ["shade", "shade #", "shade no", "colour", "color"],
+  phr: ["phr", "p.h.r", "parts per hundred"],
   unit: ["unit", "uom", "unit of measure", "primary unit", "base unit", "measure"],
   rate: ["rate", "sale rate", "selling price", "sales price", "unit price", "price", "list price", "mrp"],
   purchaseRate: ["purchase rate", "purchaserate", "cost", "cost price", "unit cost", "buying price", "purchase price", "std cost", "standard cost"],
@@ -673,21 +674,55 @@ const ITEM_CATEGORIES = new Set(["TRADING", "RAW_MATERIAL", "FINISHED", "SERVICE
  * alone they arrive as two rows with the same name, and the person picking an
  * item on an invoice has no way to tell which is which.
  *
- * PHR is deliberately left out. One item code carries several PHR rows — 975
- * appears at 26 and at 22 — so folding it into the name would split one item
- * into several and leave the stock of each wrong.
+ * PHR is part of it too, because stock is wanted per PHR. That has a
+ * consequence the code has to follow: 975 at 26 PHR and 975 at 22 PHR are two
+ * items now, and they cannot both be item 975. See composedItemCode.
  */
+/**
+ * PHR as it identifies stock, or "" when the file does not say.
+ *
+ * A zero is read as unsaid rather than as a formulation of nothing, so the
+ * rows that leave it blank all stay one item instead of splitting off into a
+ * separate "PHR0" of their own.
+ */
+function readPhr(row: CsvRow): string {
+  const raw = field(row, "phr").trim();
+  if (!raw || parseAmount(raw) === 0) return "";
+  return raw;
+}
+
+/**
+ * The item code, split by PHR when the file carries one.
+ *
+ * Stock is held per item, so wanting stock per PHR means PHR has to be part
+ * of what an item is. The old system did not work that way — it codes by
+ * quality, gauge, width, length and shade, then lists each PHR under that one
+ * code — so importing on the code alone would file both PHR rows of 975 as
+ * the same item and the second would overwrite the first.
+ *
+ * 975 at 22 PHR therefore becomes 975-22. The original code stays readable at
+ * the front, which is what anybody searching for it will type.
+ */
+export function composedItemCode(row: CsvRow): string {
+  const base = field(row, "code").trim();
+  const phr = readPhr(row);
+  if (!base) return base;
+  return phr ? `${base}-${phr}` : base;
+}
+
 export function itemSpecLabel(row: CsvRow): string {
   const gauge = field(row, "gauge").trim();
   const width = field(row, "dimWidth").trim();
   const length = field(row, "dimLength").trim();
   const shade = field(row, "shade").trim();
+  const phr = readPhr(row);
 
   const parts: string[] = [];
   if (gauge) parts.push(`${gauge}G`);
   if (width) parts.push(`${width}in`);
   if (length) parts.push(`L${length}`);
   if (shade) parts.push(shade);
+  if (phr) parts.push(`PHR${phr}`);
   return parts.join(" ");
 }
 
@@ -724,7 +759,7 @@ export function readItemRow(row: CsvRow): { value: ItemRow; error?: string; warn
   }
 
   const value: ItemRow = {
-    code: field(row, "code").trim(),
+    code: composedItemCode(row),
     name,
     unit: field(row, "unit").trim() || "PCS",
     rate,
@@ -748,6 +783,43 @@ export function readItemRow(row: CsvRow): { value: ItemRow; error?: string; warn
     return { value, warning: "No unit in this row — filed as PCS" };
   }
   return { value };
+}
+
+
+/**
+ * Refuses a file in which one code stands for two different items.
+ *
+ * composedItemCode assumes that a code plus its PHR names exactly one thing —
+ * true of the stock this was written for, where a code fixes the quality,
+ * gauge, width, length and shade and only PHR varies beneath it. It is an
+ * assumption about somebody else's data, though, not a fact, and the way it
+ * fails is silent: two items share a code, the second overwrites the first on
+ * import, and one product quietly leaves the catalogue with its stock.
+ *
+ * So it is checked instead of trusted. A code carrying more than one name
+ * stops those rows, names both, and leaves the rest of the file importable.
+ */
+export function flagAmbiguousItemCodes(rows: MappedRow<ItemRow>[]): { flagged: number } {
+  const namesByCode = new Map<string, Set<string>>();
+  for (const row of rows) {
+    if (row.error || !row.value?.code) continue;
+    const code = row.value.code.trim().toLowerCase();
+    const seen = namesByCode.get(code) ?? new Set<string>();
+    seen.add(row.value.name.trim().toLowerCase());
+    namesByCode.set(code, seen);
+  }
+
+  let flagged = 0;
+  for (const row of rows) {
+    if (row.error || !row.value?.code) continue;
+    const names = namesByCode.get(row.value.code.trim().toLowerCase());
+    if (!names || names.size < 2) continue;
+    row.error =
+      `Code "${row.value.code}" is shared by ${names.size} different items — ` +
+      `they would overwrite each other. Give them separate codes first.`;
+    flagged += 1;
+  }
+  return { flagged };
 }
 
 export type OpeningBalanceRow = {
@@ -1098,7 +1170,7 @@ export function readOpeningStockRow(row: CsvRow): {
   error?: string;
   warning?: string;
 } {
-  const code = field(row, "code").trim();
+  const code = composedItemCode(row);
   const name = composedItemName(row);
   const exactQty = parseAmount(field(row, "qty"));
   // InventoryTxn.qty is an Int. Rounding here rather than at the write means
