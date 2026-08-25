@@ -19,7 +19,7 @@ import { prisma } from "@/lib/prisma";
 import { resolveCompanyId, resolveBranchIdOrDefault } from "@/lib/tenant";
 import { safeEncryptField } from "@/lib/fieldEncrypt";
 import { parseCsv, type CsvRow } from "@/lib/csvParse";
-import { flattenRepeatedReportExport } from "@/lib/reportFlatten";
+import { flattenRepeatedReportExport, flattenLedgerExport } from "@/lib/reportFlatten";
 import {
   IMPORT_SOURCES,
   IMPORT_DATA_TYPES,
@@ -849,7 +849,11 @@ export async function POST(req: NextRequest) {
     // Some report writers flatten their layout onto one line per record instead
     // of writing a grid. Recognise and unwrap that before anything else looks at
     // the file; anything unrecognised comes back untouched.
-    const flattened = flattenRepeatedReportExport(body.csv);
+    // The party-ledger shape is checked first because it is the more specific
+    // of the two: it insists on its own markers on every line, so anything else
+    // falls straight through to the general unwrapper.
+    const asLedger = flattenLedgerExport(body.csv);
+    const flattened = asLedger.converted ? asLedger : flattenRepeatedReportExport(body.csv);
     const parsed = parseCsv(flattened.text);
     if (parsed.rows.length === 0) {
       return NextResponse.json(

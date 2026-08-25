@@ -821,6 +821,12 @@ export type LedgerHistoryRow = {
   narration: string;
   debit: number;
   credit: number;
+  /**
+   * The running balance printed after this posting, when the ledger has that
+   * column. It is what lets a file with no B/F line still be imported safely:
+   * the opening is the first row's balance less the first row's own posting.
+   */
+  balanceAfter: number | null;
   /** The B/F line at the top, which sets the account's opening rather than posting. */
   isOpening: boolean;
 };
@@ -876,17 +882,20 @@ export function readLedgerHistoryRow(row: CsvRow, line = 0): {
     looksLikeOpening(narration, voucherType, voucherNo) ||
     (line === 1 && !voucherNo && !voucherType && !!(debit || credit));
 
-  // Only the opening line may fall back to the running-balance column. On a
-  // transaction row that column is the balance *after* the posting, and
-  // reading it as the amount would post the running total on every line.
-  if (isOpening && !debit && !credit) {
-    const balance = parseAmount(field(row, "balance"));
-    if (balance >= 0) debit = balance;
-    else credit = Math.abs(balance);
+  const balanceRaw = field(row, "balance").trim();
+  const balanceAfter = balanceRaw ? parseAmount(balanceRaw) : null;
+
+  // Only the opening line may take its *amount* from the balance column. On a
+  // transaction row that column is the balance after the posting, and reading
+  // it as the amount would post the running total on every line.
+  if (isOpening && !debit && !credit && balanceAfter !== null) {
+    if (balanceAfter >= 0) debit = balanceAfter;
+    else credit = Math.abs(balanceAfter);
   }
 
   const value: LedgerHistoryRow = {
-    party, partyCode, date, voucherNo, voucherType, narration, debit, credit, isOpening,
+    party, partyCode, date, voucherNo, voucherType, narration,
+    debit, credit, balanceAfter, isOpening,
   };
 
   // An undated B/F line still carries the number that matters, and the party

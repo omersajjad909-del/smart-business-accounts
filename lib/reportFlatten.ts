@@ -196,3 +196,135 @@ export function flattenRepeatedReportExport(input: string): FlattenResult {
 
   return { text: toCsv(outHeaders, outRows), converted: true, note, headers: outHeaders };
 }
+
+
+/* ───────────────────── Party ledgers ───────────────────── */
+
+/** Lowercased, with everything that is not a letter or a digit removed. */
+function squash(value: string): string {
+  return String(value ?? "").toLowerCase().replace(/[^a-z0-9]/g, "");
+}
+
+/** dd-mm-yy, dd/mm/yyyy, dd-MON-yy — the shapes a ledger prints a date in. */
+function isDateish(value: string): boolean {
+  const s = String(value ?? "").trim();
+  return /^\d{1,2}[-/.]\d{1,2}[-/.]\d{2,4}$/.test(s) || /^\d{1,2}[-/ ][A-Za-z]{3,}[-/ ]\d{2,4}$/.test(s);
+}
+
+/** Where a field with this squashed heading sits in the record, or -1. */
+function indexOfLabel(record: string[], label: string): number {
+  return record.findIndex((f) => squash(f) === label);
+}
+
+const LEDGER_HEADERS = [
+  "code", "party", "voucherNo", "voucherType", "date", "narration", "debit", "credit", "balance",
+];
+
+/**
+ * A party ledger exported one line per posting, with the whole report wrapped
+ * around each one.
+ *
+ * The same Forms-era flattening as flattenRepeatedReportExport above, but a
+ * different shape, and the general function cannot read it: the second field is
+ * the account code, which is all digits, so the repeated-prefix scan stops
+ * after one column and gives up.
+ *
+ * Every line looks like this — headings, footer and all, repeated in full:
+ *
+ *   A/c Code: | 04070233 | Account Title: | US BUTTONS FAISALABAD |
+ *   Num &Type | Date | N a r r a t i o n | D e b i t | C r e d i t | B a l a n c e |
+ *   401 | CRV | 25-11-24 | CASH | 0 | 16,000 | -16,000 | Cr |
+ *   Credit Amount : | 0 | Credit Days : | Total | Balance:- | … | Statement Ended …
+ *
+ * Which is far better than it looks. The account code and title are on *every
+ * line*, so one export covering five hundred parties needs no splitting and no
+ * file-per-party: each posting already says whose it is. That is the whole
+ * reason this function exists — exporting five hundred ledgers by hand is not
+ * a migration plan.
+ *
+ * The posting itself is found by its date rather than by counting fields. A
+ * blank narration would shift every column after it, and counting from the left
+ * would then read the debit as the narration and the credit as the debit, on
+ * exactly the rows nobody checks.
+ */
+export function flattenLedgerExport(input: string): FlattenResult {
+  const unchanged: FlattenResult = { text: input, converted: false };
+
+  const { records } = parseCsvRecords(input);
+  if (records.length < 2) return unchanged;
+
+  // Every line has to carry the markers, not most of them. A file where only
+  // some do is a different report that happens to share a word.
+  const marked = records.filter(
+    (r) => indexOfLabel(r, "accode") !== -1 && indexOfLabel(r, "accounttitle") !== -1,
+  );
+  if (marked.length !== records.length) return unchanged;
+
+  const rows: string[][] = [];
+
+  for (const record of records) {
+    const codeAt = indexOfLabel(record, "accode");
+    const titleAt = indexOfLabel(record, "accounttitle");
+    const code = (record[codeAt + 1] ?? "").trim();
+    const party = (record[titleAt + 1] ?? "").trim();
+    if (!code && !party) return unchanged;
+
+    // The posting sits between the last column heading and the first footer
+    // label. Both are fixed text on every line, so the window is exact rather
+    // than guessed at.
+    const headingEnd = indexOfLabel(record, "balance");
+    if (headingEnd === -1) return unchanged;
+    const footerAt = indexOfLabel(record, "creditamount");
+    const run = record
+      .slice(headingEnd + 1, footerAt === -1 ? record.length : footerAt)
+      .map((f) => f.trim());
+
+    const dateAt = run.findIndex(isDateish);
+    // A ledger that has been run for a party with no postings still prints the
+    // headings and the footer. Nothing between them is not a failure, it is an
+    // empty ledger, so the line is dropped rather than the file refused.
+    if (dateAt === -1) continue;
+    if (dateAt < 2) return unchanged;
+
+    const voucherNo = run[dateAt - 2] ?? "";
+    const voucherType = run[dateAt - 1] ?? "";
+    const date = run[dateAt];
+
+    const rest = run.slice(dateAt + 1).filter((f) => f !== "");
+    // Narration only when the field after the date is text. On a row with no
+    // narration the debit follows the date directly.
+    const hasNarration = rest.length > 0 && isTextish(rest[0]) && !isAmountish(rest[0]);
+    const narration = hasNarration ? rest[0] : "";
+    const figures = rest.slice(hasNarration ? 1 : 0);
+
+    const debit = figures[0] ?? "";
+    const credit = figures[1] ?? "";
+    let balance = figures[2] ?? "";
+    if (!isAmountish(debit) || !isAmountish(credit)) return unchanged;
+
+    // AHC prints the running balance signed *and* suffixed — "-16,000" then
+    // "Cr". Other layouts print it unsigned and lean on the suffix alone. The
+    // suffix is authoritative either way, because the writer works out a
+    // party's opening from the first line's balance minus its own posting, and
+    // an unsigned credit balance read as a debit puts the opening out by twice
+    // the amount.
+    const marker = squash(figures[3] ?? "");
+    if (balance && (marker === "cr" || marker === "dr")) {
+      const bare = balance.replace(/^[-+]/, "");
+      balance = marker === "cr" ? `-${bare}` : bare;
+    }
+
+    rows.push([code, party, voucherNo, voucherType, date, narration, debit, credit, balance]);
+  }
+
+  if (rows.length === 0) return unchanged;
+
+  const parties = new Set(rows.map((r) => r[0] || r[1])).size;
+  const note =
+    `This ledger was exported one line per posting with the report layout ` +
+    `wrapped around it. ${rows.length.toLocaleString()} postings were unwrapped ` +
+    `for ${parties.toLocaleString()} ${parties === 1 ? "party" : "parties"} — ` +
+    `the account code on every line is what makes one file cover them all.`;
+
+  return { text: toCsv(LEDGER_HEADERS, rows), converted: true, note, headers: LEDGER_HEADERS };
+}
