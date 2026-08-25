@@ -4,24 +4,14 @@
  */
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { getTokenFromRequest, verifyJwt } from "@/lib/auth";
 import { requireAdmin } from "@/lib/adminAuth";
 
 const db = prisma as any;
 
-function isAdmin(req: NextRequest) {
-  const role = String(req.headers.get("x-user-role") || "").toUpperCase();
-  if (role === "ADMIN") return true;
-  try {
-    const p = verifyJwt(getTokenFromRequest(req as any)!);
-    return String((p as any)?.role || "").toUpperCase() === "ADMIN";
-  } catch { return false; }
-}
 
 export async function GET(req: NextRequest) {
   const admin = await requireAdmin(req);
   if (admin instanceof NextResponse) return admin;
-  if (!isAdmin(req)) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
   const { searchParams } = new URL(req.url);
   const status = searchParams.get("status");
@@ -59,7 +49,6 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   const admin = await requireAdmin(req);
   if (admin instanceof NextResponse) return admin;
-  if (!isAdmin(req)) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
   const { id, status, priority, adminNote, action } = await req.json();
   if (!id) return NextResponse.json({ error: "id required" }, { status: 400 });
