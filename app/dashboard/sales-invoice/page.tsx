@@ -612,7 +612,7 @@ function SalesInvoiceContent() {
     logoUrl: printPrefs.logoUrl,
     docTitle: previewMode === "DELIVERY" ? "DELIVERY NOTE" : "SALES INVOICE",
     docNo: invNo,
-    date: invDate,
+    date: fmtDate(invDate),
     status: paymentTerms || paymentMethod || undefined,
     partyLabel: "Bill To",
     partyName: invCustomer,
