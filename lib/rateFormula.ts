@@ -338,6 +338,168 @@ export function readRateFormulaMeta(
   return out;
 }
 
+/* ─────────────── Dimensions read out of the item's name ────────────── */
+
+/**
+ * The trade writes a roll's dimensions into its name long before anybody types
+ * them into a settings screen: "CRYSTAL SUPER CLEAR (DIAMOND) 12G 60in L100
+ * 15-L" is a gauge, a width, a length and a shade, spelled the way the old
+ * system's export spells them. Items arriving that way carry no saved `meta`
+ * at all, so every document line opened with gauge 0, width 0, length 0 and
+ * the operator copying three numbers back out of the name they had just
+ * picked — with the rate stuck at 0 until they did.
+ *
+ * So a column with nothing saved for it reads the name instead. The convention
+ * is the one lib/importEngine.ts writes and lib/itemSearch.ts searches against:
+ * a number wearing its unit — 12G, 60in, L100, PHR26 — and a shade code such
+ * as 15-L. Nothing else is guessed at; a blank box is a better answer than a
+ * wrong dimension.
+ */
+export type ItemSpecRole = "gauge" | "width" | "length" | "phr" | "shade";
+
+/** What a company might have called each dimension. Spelling as typed. */
+const SPEC_ROLE_WORDS: Array<[ItemSpecRole, string[]]> = [
+  ["gauge",  ["gauge", "guage", "gage", "thickness", "micron"]],
+  ["width",  ["width", "wdith"]],
+  ["length", ["length", "lenght", "lengh"]],
+  ["phr",    ["phr"]],
+  ["shade",  ["shade", "colour", "color"]],
+];
+
+/**
+ * Which dimension one of the company's columns is, judged by what they called
+ * it. A column we cannot place — "RT/MM", "Rolls per bale" — is left out of
+ * this entirely rather than filled from a number that happened to be nearby.
+ */
+export function itemSpecRole(field: RateFormulaField): ItemSpecRole | null {
+  const hay = `${field.key} ${field.label}`.toLowerCase().replace(/[^a-z]/g, "");
+  if (!hay) return null;
+  for (const [role, words] of SPEC_ROLE_WORDS) {
+    if (words.some((word) => hay.includes(word))) return role;
+  }
+  return null;
+}
+
+/** Unit words as a name writes them, longest first so "IN" cannot eat "INCH". */
+const SPEC_UNIT_WORDS: Record<string, string[]> = {
+  in: ["INCHES", "INCH", "IN", '"'],
+  mm: ["MM"],
+  cm: ["CM"],
+  m:  ["METRES", "METERS", "METRE", "METER", "MTRS", "MTR", "M"],
+  ft: ["FEET", "FOOT", "FT"],
+  yd: ["YARDS", "YARD", "YDS", "YD"],
+  kg: ["KGS", "KG"],
+  g:  ["GAUGE", "GA", "G"],
+};
+
+/**
+ * Unit words a role's number may be wearing: whatever the column itself is
+ * labelled in, then the trade's own spelling as a fallback. A company that
+ * types its widths in mm gets "1500mm" read, and still gets "60in" read on the
+ * items that predate the change.
+ */
+function roleUnitWords(role: ItemSpecRole, unit: string): string[] {
+  const own = SPEC_UNIT_WORDS[String(unit || "").trim().toLowerCase()] ?? [];
+  const usual =
+    role === "gauge"  ? SPEC_UNIT_WORDS.g :
+    role === "width"  ? SPEC_UNIT_WORDS.in :
+    role === "length" ? SPEC_UNIT_WORDS.m : [];
+  return [...own, ...usual.filter((word) => !own.includes(word))];
+}
+
+/**
+ * Unit words short enough to be an English word in their own right. "60 IN
+ * STOCK" is not sixty inches, so these are only read when they sit tight
+ * against their number — which is how a spec is written anyway.
+ */
+const TIGHT_ONLY = new Set(["IN", "M", "G", "GA", "FT", "YD", '"']);
+
+type SpecHit = { value: number | string; start: number; end: number };
+
+function escapeSpecWord(word: string): string {
+  return word.replace(/[.*+?^${}()|[\]\\"]/g, "\/**
+ * Line values for a freshly picked item.");
+}
+
+/** A number wearing one of these unit words: 12G, 60in, 1500 MM. */
+function findUnitNumber(text: string, words: string[]): SpecHit | null {
+  for (const word of words) {
+    const gap = TIGHT_ONLY.has(word) ? "" : "\s*";
+    const re = new RegExp(`(\d+(?:\.\d+)?)${gap}${escapeSpecWord(word)}(?![A-Z0-9])`);
+    const m = re.exec(text);
+    if (m) return { value: Number(m[1]), start: m.index, end: m.index + m[0].length };
+  }
+  return null;
+}
+
+/** A number behind its tag: L100, PHR26. */
+function findTaggedNumber(text: string, tag: string): SpecHit | null {
+  const m = new RegExp(`(?:^|[^A-Z0-9])(${tag}\s*(\d+(?:\.\d+)?))(?![A-Z0-9])`).exec(text);
+  if (!m) return null;
+  const start = m.index + m[0].length - m[1].length;
+  return { value: Number(m[2]), start, end: start + m[1].length };
+}
+
+/**
+ * A shade code: 15-L, 15-F, 7-BL. The letter is required — "975-22" is an item
+ * code split by its PHR, not a shade, and reading it as one would print a
+ * number where the shade belongs on every line of the bill.
+ */
+function findShadeCode(text: string): SpecHit | null {
+  const m = /(?:^|[^A-Z0-9])(\d{1,3}-[A-Z][A-Z0-9]{0,5})(?![A-Z0-9-])/.exec(text);
+  if (!m) return null;
+  const start = m.index + m[0].length - m[1].length;
+  return { value: m[1], start, end: start + m[1].length };
+}
+
+/**
+ * Reads one item's name for the company's own columns.
+ *
+ * Dimensions are taken in the order a spec is written and each figure is
+ * blanked as it is taken, so one number can never be claimed by two columns —
+ * on "12G 60in L100" the width cannot also read 12.
+ */
+export function itemSpecFromText(
+  settings: RateFormulaSettings,
+  text: string
+): Record<string, RateFormulaValue> {
+  const out: Record<string, RateFormulaValue> = {};
+  let rest = String(text ?? "").toUpperCase();
+  if (!rest.trim()) return out;
+
+  // First column to claim a role keeps it. Two columns both called "width"
+  // tell us nothing about which of them the name's one width belongs to.
+  const byRole = new Map<ItemSpecRole, RateFormulaField>();
+  for (const f of settings.fields) {
+    const role = itemSpecRole(f);
+    if (role && !byRole.has(role)) byRole.set(role, f);
+  }
+  if (!byRole.size) return out;
+
+  // PHR and the shade first: both are tagged, and taking them out of the way
+  // stops "PHR26" being read as a gauge of 26 by whatever looks next.
+  for (const role of ["phr", "shade", "gauge", "width", "length"] as ItemSpecRole[]) {
+    const f = byRole.get(role);
+    if (!f) continue;
+
+    const hit =
+      role === "phr"    ? findTaggedNumber(rest, "PHR") :
+      role === "shade"  ? findShadeCode(rest) :
+      role === "length" ? (findTaggedNumber(rest, "L") ?? findUnitNumber(rest, roleUnitWords(role, f.unit))) :
+                          findUnitNumber(rest, roleUnitWords(role, f.unit));
+    if (!hit) continue;
+    rest = rest.slice(0, hit.start) + " ".repeat(hit.end - hit.start) + rest.slice(hit.end);
+
+    if (f.kind === "text") {
+      out[f.key] = String(hit.value).slice(0, RATE_FORMULA_TEXT_MAX);
+    } else {
+      const n = Number(hit.value);
+      if (Number.isFinite(n)) out[f.key] = n;
+    }
+  }
+  return out;
+}
+
 /**
  * Line values for a freshly picked item.
  *
