@@ -704,18 +704,43 @@ export function readItemRow(row: CsvRow): { value: ItemRow; error?: string; warn
   const rawCategory = pick(row, "category", "item category", "item type", "type").toUpperCase().replace(/[\s-]+/g, "_");
   const category = ITEM_CATEGORIES.has(rawCategory) ? rawCategory : "TRADING";
 
+  // A column headed plainly "Rate" means the selling price on an item master
+  // and the cost on a stock report, and the two files are told apart by the
+  // quantity column only a stock report has. Read the wrong way round, every
+  // item is put on sale at what it cost — the invoice defaults to cost price
+  // and the margin is zero on paper, which nobody queries because the number
+  // looks like a real price.
+  //
+  // Only a bare "Rate" is moved. A file that names its column Sale Rate or
+  // Selling Price has said what it means and is taken at its word.
+  let rate = parseAmount(field(row, "rate"));
+  let purchaseRate = parseAmount(field(row, "purchaseRate"));
+  const namedSaleRate = pick(row, "sale rate", "selling price", "sales price", "list price", "mrp").trim();
+  const isStockFile = field(row, "qty").trim() !== "";
+  const rateIsReallyCost = isStockFile && !namedSaleRate && !purchaseRate && rate > 0;
+  if (rateIsReallyCost) {
+    purchaseRate = rate;
+    rate = 0;
+  }
+
   const value: ItemRow = {
     code: field(row, "code").trim(),
     name,
     unit: field(row, "unit").trim() || "PCS",
-    rate: parseAmount(field(row, "rate")),
-    purchaseRate: parseAmount(field(row, "purchaseRate")),
+    rate,
+    purchaseRate,
     category,
     minStock: Math.max(0, Math.round(parseAmount(field(row, "minStock")))),
     barcode: field(row, "barcode").trim(),
   };
 
   if (!name) return { value, error: "No item name in this row" };
+  if (rateIsReallyCost) {
+    return {
+      value,
+      warning: `"Rate" read as the cost, not the sale price — set sale rates separately`,
+    };
+  }
   if (!field(row, "unit").trim()) {
     // Silently filing a roll as PCS is the kind of thing nobody notices until
     // the first stock report, by which point every movement is in the wrong
