@@ -440,9 +440,14 @@ async function writeOpeningStock(
 
   const existing = await prisma.inventoryTxn.findMany({
     where: { companyId, type: "OPENING" },
-    select: { itemId: true, location: true },
+    select: { itemId: true, location: true, date: true },
   });
   const alreadyOpened = new Set(existing.map((r) => `${r.itemId}@${r.location}`));
+
+  // The date the godown was last counted, if it ever was.
+  const openedBefore = existing.length > 0
+    ? new Date(Math.min(...existing.map((r) => new Date(r.date).getTime())))
+    : null;
 
   // One item can hold several lines on a stock report. A PVC code is fixed by
   // quality, gauge, width, length and shade, and the report then splits it again
@@ -482,6 +487,8 @@ async function writeOpeningStock(
     }
   }
 
+  let openedNow = 0;
+
   for (const [key, b] of buckets) {
     // Running the same file twice is a normal thing to do during a migration
     // dry run; doubling everybody's opening stock is not.
@@ -515,6 +522,7 @@ async function writeOpeningStock(
       // Every line that went into the bucket was imported, even though they
       // share one movement — counting one would report rows as missing.
       outcome.imported += b.rows;
+      openedNow += 1;
       if (b.rows > 1) {
         note(outcome, b.line, `${b.itemName}: ${b.rows} lines combined into ${b.qty} at ${rate}`);
       }
@@ -523,6 +531,30 @@ async function writeOpeningStock(
       note(outcome, b.line, e instanceof Error ? e.message : "Could not write the stock row");
     }
   }
+
+  // An item sitting at zero on cutover day is skipped, correctly — there is
+  // nothing to bring in. The trap is what happens next: stock arrives a week
+  // later, the same report is exported again, and this time that item has a
+  // quantity. Re-run, it would be written as OPENING and dated back to the
+  // cutover, so a purchase made after the cutover appears to have been in the
+  // godown all along. Every item that was already opened is refused, so the
+  // file looks like it behaved — only the new ones slip through, and those are
+  // exactly the wrong ones.
+  //
+  // Not blocked, because opening a godown in batches is a real thing to do on a
+  // migration. Said out loud, because the two cases are indistinguishable from
+  // here and only the operator knows which one this is.
+  if (openedNow > 0 && openedBefore) {
+    note(
+      outcome,
+      0,
+      `${openedNow} item(s) opened now, but this company already had opening stock ` +
+        `from ${openedBefore.toISOString().slice(0, 10)}. Opening stock is what was in ` +
+        `the godown on the cutover date. If this stock arrived after that, cancel and ` +
+        `enter it as a purchase instead.`,
+    );
+  }
+
   return outcome;
 }
 
