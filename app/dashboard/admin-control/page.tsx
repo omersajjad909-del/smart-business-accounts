@@ -7,13 +7,14 @@ import { COUNTRIES as ALL_COUNTRIES, sortCountries } from "@/lib/countries";
 import { CURRENCY_LABEL, SUPPORTED_CURRENCIES, currencyByCountry } from "@/lib/currency-client";
 import Link from "next/link";
 import { useResponsive } from "@/hooks/useResponsive";
+import { PRINT_TEMPLATES, normalizePrintTemplate } from "@/components/print/printTemplates";
 
 /* ─── types ─── */
 type Branch = { id: string; code: string; name: string; city?: string | null; isActive: boolean; address?: string; latitude?: number | null; longitude?: number | null; geoSource?: "exact" | "manual" | "country" | "unset" };
 type UserRow = { id: string; name: string; email: string; role: string; active: boolean; permissions?: { permission: string }[] };
 type RoleRow = { role: string; permissions: string[] };
 type CompanyRow = { name: string; country?: string | null; baseCurrency?: string | null; plan?: string | null };
-type PrintPreferences = { paperSize: "A4" | "THERMAL_80MM" | "THERMAL_58MM"; invoiceTemplate: "classic" | "compact" | "modern"; receiptTemplate: "standard" | "mart" | "restaurant"; defaultOutput: "pdf" | "browser-print"; showLogo: boolean; showPhone: boolean; showAddress: boolean; showTaxNumber: boolean; logoUrl: string; headerNote: string; footerNote: string; thermalFontSize: "sm" | "md" | "lg" };
+type PrintPreferences = { paperSize: "A4" | "THERMAL_80MM" | "THERMAL_58MM"; invoiceTemplate: "classic" | "minimal" | "bold" | "modern" | "compact"; receiptTemplate: "standard" | "mart" | "restaurant"; defaultOutput: "pdf" | "browser-print"; showLogo: boolean; showPhone: boolean; showAddress: boolean; showTaxNumber: boolean; logoUrl: string; headerNote: string; footerNote: string; thermalFontSize: "sm" | "md" | "lg" };
 type TaxProfile = { taxIdLabel: string; taxIdValue: string; vatNumber: string; gstNumber: string; registrationNote: string };
 type CompanyIdentityProfile = { legalName: string; legalAddress: string; city: string; state: string; postalCode: string; website: string; latitude: number | null; longitude: number | null; geoSource: "exact" | "manual" | "country" | "unset" };
 type InvoiceContactProfile = { contactName: string; email: string; phone: string; supportEmail: string; supportPhone: string };
@@ -466,8 +467,15 @@ export default function AdminControlPage() {
                 <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(3,1fr)", gap: 14, marginBottom: 14 }}>
                   <Field label="Invoice Template">
                     <select style={inp} value={settings.printPreferences.invoiceTemplate} onChange={e => setSettings(s => ({ ...s, printPreferences: { ...s.printPreferences, invoiceTemplate: e.target.value as PrintPreferences["invoiceTemplate"] } }))}>
-                      <option value="classic">Classic</option><option value="compact">Compact</option><option value="modern">Modern</option>
+                      {PRINT_TEMPLATES.map(t => <option key={t.id} value={t.id}>{t.name}</option>)}
                     </select>
+                    {/* Say what the choice costs before it is made: most of
+                        these bills come off a black-and-white laser, where a
+                        colour template prints grey and a solid one drinks
+                        toner every single sheet. */}
+                    <div style={{ fontSize: 11, color: MUTED, marginTop: 6, lineHeight: 1.5 }}>
+                      {(PRINT_TEMPLATES.find(t => t.id === normalizePrintTemplate(settings.printPreferences.invoiceTemplate))?.summary) || ""}
+                    </div>
                   </Field>
                   <Field label="Receipt Template">
                     <select style={inp} value={settings.printPreferences.receiptTemplate} onChange={e => setSettings(s => ({ ...s, printPreferences: { ...s.printPreferences, receiptTemplate: e.target.value as PrintPreferences["receiptTemplate"] } }))}>

@@ -162,7 +162,7 @@ function SalesInvoiceContent() {
   const [siQueryIdx,     setSiQueryIdx]     = useState(-1);
 
   // ── Logo / print prefs ──
-  const [printPrefs, setPrintPrefs] = useState({ showLogo: true, logoUrl: "", headerNote: "", footerNote: "Thank you for your business." });
+  const [printPrefs, setPrintPrefs] = useState({ showLogo: true, logoUrl: "", headerNote: "", footerNote: "Thank you for your business.", invoiceTemplate: "classic" });
 
   // ── Init ──
   useEffect(() => {
@@ -617,6 +617,8 @@ function SalesInvoiceContent() {
     companyPhone: companyInfo?.phone,
     showLogo: printPrefs.showLogo,
     logoUrl: printPrefs.logoUrl,
+    // The look the company chose in Admin -> Print & Branding.
+    template: printPrefs.invoiceTemplate,
     docTitle: previewMode === "DELIVERY" ? "DELIVERY NOTE" : "SALES INVOICE",
     docNo: invNo,
     date: fmtDate(invDate),

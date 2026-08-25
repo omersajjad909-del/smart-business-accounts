@@ -10,7 +10,8 @@ export type BranchAssignmentMap = Record<string, string[]>;
 
 export type PrintPreferences = {
   paperSize: "A4" | "THERMAL_80MM" | "THERMAL_58MM";
-  invoiceTemplate: "classic" | "compact" | "modern";
+  /** See components/print/printTemplates.ts. "compact" is the older name for "minimal". */
+  invoiceTemplate: "classic" | "minimal" | "bold" | "modern" | "compact";
   receiptTemplate: "standard" | "mart" | "restaurant";
   defaultOutput: "pdf" | "browser-print";
   showLogo: boolean;
