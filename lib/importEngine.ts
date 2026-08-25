@@ -836,8 +836,16 @@ const OPENING_MARKERS = [
   "balance brought", "carried forward", "previous balance", "last year",
 ];
 
-function looksLikeOpening(...fields: string[]): boolean {
-  const hay = fields.join(" ").toLowerCase();
+/** Voucher types that mean "this is where the account stood", not a posting. */
+const OPENING_TYPES = new Set(["OP", "OB", "OPB", "BF", "B/F"]);
+
+function looksLikeOpening(voucherType: string, ...fields: string[]): boolean {
+  // AHC types its B/F line OP and narrates it "Opening Balance", so either one
+  // alone would do. Both are checked because a ledger whose narration column
+  // was left blank still has to be recognised — read as a posting, that line
+  // would post the whole opening balance a second time.
+  if (OPENING_TYPES.has(voucherType.trim().toUpperCase())) return true;
+  const hay = [voucherType, ...fields].join(" ").toLowerCase();
   return OPENING_MARKERS.some((m) => hay.includes(m));
 }
 
@@ -879,7 +887,7 @@ export function readLedgerHistoryRow(row: CsvRow, line = 0): {
   // reading that one as an opening would wipe the balance and replace it with
   // a single adjustment.
   const isOpening =
-    looksLikeOpening(narration, voucherType, voucherNo) ||
+    looksLikeOpening(voucherType, narration, voucherNo) ||
     (line === 1 && !voucherNo && !voucherType && !!(debit || credit));
 
   const balanceRaw = field(row, "balance").trim();

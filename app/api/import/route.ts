@@ -672,7 +672,12 @@ async function writeLedgerHistory(
         continue;
       }
 
-      const voucherNo = v.voucherNo || `LEG-${dayKey(v.date)}-${row.line}`;
+      // AHC prints the number and the type in one column — "401 CRV" — and our
+      // ledger report has no type column of its own, so they are folded into
+      // the number. It reads the way the operator remembers it, and a legacy
+      // "CRV-401" cannot be mistaken for a voucher this system numbered itself.
+      const rawNo = v.voucherNo || String(row.line);
+      const voucherNo = v.voucherType ? `${v.voucherType}-${rawNo}` : rawNo;
       // Matched against what was in the database before this run only, never
       // against what this run has already queued. A ledger legitimately repeats
       // a posting — the same cash voucher number entered twice on one day for
