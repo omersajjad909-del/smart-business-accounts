@@ -222,14 +222,14 @@ export function PrintDocA4({
 
       {/* ── Totals, against the right margin where they are read ── */}
       <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 14 }}>
-        <table style={{ borderCollapse: "collapse", minWidth: 210 }}>
+        <table className="pdoc-totals" style={{ borderCollapse: "collapse", minWidth: 210 }}>
           <tbody>
             {totalsLines.map((line, i) => (
               <tr key={i}>
-                <td style={{ padding: "2px 12px 2px 0", textAlign: "right", fontSize: line.bold ? 11 : 9.5, fontWeight: line.bold ? 700 : 400, borderTop: line.borderTop ? RULE : undefined }}>
+                <td className={line.borderTop ? "pdoc-ruled" : undefined} style={{ padding: "2px 12px 2px 0", textAlign: "right", fontSize: line.bold ? 11 : 9.5, fontWeight: line.bold ? 700 : 400, borderTop: line.borderTop ? RULE : undefined }}>
                   {line.label}
                 </td>
-                <td style={{ padding: "2px 0", textAlign: "right", fontSize: line.bold ? 11 : 9.5, fontWeight: line.bold ? 700 : 400, minWidth: 88, borderTop: line.borderTop ? RULE : undefined }}>
+                <td className={line.borderTop ? "pdoc-ruled" : undefined} style={{ padding: "2px 0", textAlign: "right", fontSize: line.bold ? 11 : 9.5, fontWeight: line.bold ? 700 : 400, minWidth: 88, borderTop: line.borderTop ? RULE : undefined }}>
                   {fmt(line.value)}
                 </td>
               </tr>
@@ -288,9 +288,45 @@ export function PrintPaperWrapper({ children }: { children: React.ReactNode }) {
           color: #111 !important;
         }
         .print-doc-a4 { background: #fff !important; }
+
+        /* The document sits inside the dashboard, and the dashboard's dark
+           theme repaints every table it can reach — "html.dark .dashboard-root
+           th" turned this grid's headings into translucent white on white and
+           washed the cell rules out to nothing. These have to out-specify it,
+           hence the long selectors: a printed bill is black ink on white paper
+           whatever the screen around it is wearing. */
+        html.dark .dashboard-root .print-doc-a4 .pdoc-grid th,
+        html:not(.dark) .dashboard-root .print-doc-a4 .pdoc-grid th,
+        .print-doc-a4 .pdoc-grid th {
+          background-color: #f2f2f2 !important;
+          color: #111 !important;
+          border: 1px solid #111 !important;
+        }
+        html.dark .dashboard-root .print-doc-a4 .pdoc-grid td,
+        html:not(.dark) .dashboard-root .print-doc-a4 .pdoc-grid td,
+        .print-doc-a4 .pdoc-grid td {
+          color: #111 !important;
+          border: 1px solid #111 !important;
+          background-color: transparent !important;
+        }
+        /* The totals stand free of the grid: one rule above the net figure
+           and nothing else, so they are left unboxed. */
+        html.dark .dashboard-root .print-doc-a4 .pdoc-totals td,
+        html:not(.dark) .dashboard-root .print-doc-a4 .pdoc-totals td,
+        .print-doc-a4 .pdoc-totals td {
+          color: #111 !important;
+          border: 0 !important;
+          background-color: transparent !important;
+        }
+        html.dark .dashboard-root .print-doc-a4 .pdoc-totals td.pdoc-ruled,
+        html:not(.dark) .dashboard-root .print-doc-a4 .pdoc-totals td.pdoc-ruled,
+        .print-doc-a4 .pdoc-totals td.pdoc-ruled { border-top: 1px solid #111 !important; }
+
+        html.dark .dashboard-root .print-doc-a4 tr:hover td,
+        .print-doc-a4 tr:hover td { background-color: transparent !important; }
+
         .print-doc-a4 .pdoc-label { color: #555 !important; }
         .print-doc-a4 .pdoc-powered { color: #777 !important; }
-        .print-doc-a4 .pdoc-grid th { background: #f2f2f2 !important; }
 
         @media screen {
           .print-paper-wrapper {
@@ -308,7 +344,9 @@ export function PrintPaperWrapper({ children }: { children: React.ReactNode }) {
           .print-doc-a4 {
             box-shadow: none !important;
             width: auto !important;
-            min-height: 0 !important;
+            /* Fills the sheet so the signatures sit at the foot of the paper,
+               not under the last line item. */
+            min-height: 100% !important;
             padding: 0 !important;
           }
           .print-doc-a4 .pdoc-label { color: #333 !important; }

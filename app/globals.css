@@ -955,13 +955,13 @@ html.fnv-lock-scroll body {
   }
 }
 
-/* ── Print footer: Powered by Finov aOS ──────────────────────────────────── */
+/* ── Print footer: Powered by FinovaOS ──────────────────────────────────── */
 @media print {
   @page {
     margin-bottom: 28mm;
   }
   body::after {
-    content: "Powered by Finova OS";
+    content: "Powered by FinovaOS";
     position: fixed;
     bottom: 0;
     left: 0;
@@ -973,6 +973,13 @@ html.fnv-lock-scroll body {
     border-top: 1px solid #e5e7eb;
     font-family: 'Outfit', 'Inter', Arial, sans-serif;
     letter-spacing: 0.04em;
+  }
+
+  /* A document that already prints the line at the foot of the sheet — see
+     components/print/PrintDocA4.tsx — does not get it a second time from the
+     page footer. Every other print in the app still does. */
+  body:has(.print-doc-a4)::after {
+    content: none;
   }
 }
 
