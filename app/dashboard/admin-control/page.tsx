@@ -25,6 +25,45 @@ type TabId = "general" | "print" | "branches" | "team" | "permissions" | "financ
 
 /* ─── defaults ─── */
 const DEFAULT_PRINT: PrintPreferences = { paperSize: "A4", invoiceTemplate: "classic", receiptTemplate: "standard", defaultOutput: "pdf", showLogo: true, showPhone: true, showAddress: true, showTaxNumber: true, logoUrl: "", headerNote: "", footerNote: "Thank you for your business.", thermalFontSize: "md" };
+
+/** Longest side a stored logo is kept at, and the size it must come in under. */
+const LOGO_MAX_EDGE = 400;
+const LOGO_MAX_BYTES = 400 * 1024;
+
+function readFileAsDataUrl(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => typeof reader.result === "string" ? resolve(reader.result) : reject(new Error("unreadable"));
+    reader.onerror = () => reject(new Error("unreadable"));
+    reader.readAsDataURL(file);
+  });
+}
+
+/** Draws the picture down to size and hands back what to store. */
+function shrinkImageToDataUrl(file: File, maxEdge: number): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const url = URL.createObjectURL(file);
+    const img = new Image();
+    img.onload = () => {
+      URL.revokeObjectURL(url);
+      const scale = Math.min(1, maxEdge / Math.max(img.width, img.height));
+      const w = Math.max(1, Math.round(img.width * scale));
+      const h = Math.max(1, Math.round(img.height * scale));
+      const canvas = document.createElement("canvas");
+      canvas.width = w; canvas.height = h;
+      const ctx = canvas.getContext("2d");
+      if (!ctx) { reject(new Error("no canvas")); return; }
+      ctx.drawImage(img, 0, 0, w, h);
+      // A logo's transparent background is worth keeping, but not at any size:
+      // a photographed signboard saved as PNG is megabytes where the same
+      // picture as JPEG is tens of kilobytes.
+      const png = canvas.toDataURL("image/png");
+      resolve(png.length <= LOGO_MAX_BYTES ? png : canvas.toDataURL("image/jpeg", 0.85));
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); reject(new Error("decode failed")); };
+    img.src = url;
+  });
+}
 const DEFAULT_TAX: TaxProfile = { taxIdLabel: "NTN / Tax ID", taxIdValue: "", vatNumber: "", gstNumber: "", registrationNote: "" };
 const DEFAULT_IDENTITY: CompanyIdentityProfile = { legalName: "", legalAddress: "", city: "", state: "", postalCode: "", website: "", latitude: null, longitude: null, geoSource: "unset" };
 const DEFAULT_CONTACT: InvoiceContactProfile = { contactName: "", email: "", phone: "", supportEmail: "", supportPhone: "" };
@@ -168,9 +207,14 @@ export default function AdminControlPage() {
     setSaving(true);
     try {
       const res = await fetch("/api/company/admin-control", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ printPreferences: settings.printPreferences }) });
-      if (!res.ok) throw new Error();
+      // Say what actually went wrong. A silent "Failed to save." is how a logo
+      // that was simply too big looked like a broken upload.
+      if (!res.ok) {
+        const body = await res.json().catch(() => null);
+        throw new Error(body?.error || (res.status === 413 ? "That logo is too large to store." : `Save failed (${res.status}).`));
+      }
       flash("Print settings saved.");
-    } catch { flash("Failed to save.", false); } finally { setSaving(false); }
+    } catch (e) { flash(e instanceof Error ? e.message : "Failed to save.", false); } finally { setSaving(false); }
   }
 
   async function saveFinance() {
@@ -235,11 +279,30 @@ export default function AdminControlPage() {
     else flash("Failed to delete.", false);
   }
 
+  /**
+   * The logo is kept inside the company's settings JSON, and that JSON is
+   * saved in a single request. A picture straight off a phone is three or four
+   * megabytes, which as base64 is larger still — so the file read fine, the
+   * preview appeared, and the save then failed on the request size with
+   * nothing to show for it. That is the "logo won't upload".
+   *
+   * The picture is therefore shrunk here, before it is ever stored. 400px on
+   * its longest side is well past what a 12mm mark on a bill needs, and lands
+   * around 40KB instead of four megabytes. An SVG is left alone when it is
+   * small — vector artwork prints sharper than anything rasterised.
+   */
   async function handleLogoUpload(file: File | null) {
-    if (!file || !file.type.startsWith("image/")) return;
-    const reader = new FileReader();
-    reader.onload = () => { if (typeof reader.result === "string") setSettings(s => ({ ...s, printPreferences: { ...s.printPreferences, logoUrl: reader.result as string } })); };
-    reader.readAsDataURL(file);
+    if (!file) return;
+    if (!file.type.startsWith("image/")) { flash("That file is not an image.", false); return; }
+    try {
+      const dataUrl = file.type === "image/svg+xml" && file.size <= LOGO_MAX_BYTES
+        ? await readFileAsDataUrl(file)
+        : await shrinkImageToDataUrl(file, LOGO_MAX_EDGE);
+      setSettings(s => ({ ...s, printPreferences: { ...s.printPreferences, logoUrl: dataUrl } }));
+      flash("Logo loaded — press Save Print Settings to keep it.");
+    } catch {
+      flash("Could not read that image. Try a PNG or JPG.", false);
+    }
   }
 
   async function createInstantBackup() {
