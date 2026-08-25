@@ -42,6 +42,7 @@ export default function AdminFeedbackPage() {
   const [loading, setLoad]    = useState(true);
   const [status, setStatus]   = useState("");
   const [type, setType]       = useState("");
+  const [search, setSearch]   = useState("");
   const [page, setPage]       = useState(1);
   const [selected, setSelected] = useState<any | null>(null);
   const [note, setNote]       = useState("");
@@ -53,6 +54,7 @@ export default function AdminFeedbackPage() {
       const params = new URLSearchParams({ page: String(page) });
       if (status) params.set("status", status);
       if (type)   params.set("type", type);
+      if (search.trim()) params.set("search", search.trim());
       const r = await fetch(`/api/admin/feedback?${params}`);
       const d = await r.json();
       setItems(d.items || []);
@@ -62,7 +64,7 @@ export default function AdminFeedbackPage() {
     } finally { setLoad(false); }
   }
 
-  useEffect(() => { load(); }, [status, type, page]);
+  useEffect(() => { load(); }, [status, type, page, search]);
 
   async function update(id: string, patch: any) {
     setSaving(true);
@@ -128,6 +130,14 @@ export default function AdminFeedbackPage() {
 
       {/* Filters */}
       <div style={{ display: "flex", gap: 10, marginBottom: 20, flexWrap: "wrap" }}>
+        <input
+          className="fb-sel"
+          value={search}
+          onChange={e => { setSearch(e.target.value); setPage(1); }}
+          placeholder="Search ticket, subject, name, email..."
+          aria-label="Search feedback and complaints"
+          style={{ minWidth: 280 }}
+        />
         <select className="fb-sel" value={status} onChange={e => { setStatus(e.target.value); setPage(1); }}>
           <option value="">All Status</option>
           <option value="open">Open</option>

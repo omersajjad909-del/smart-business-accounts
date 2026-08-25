@@ -16,12 +16,22 @@ export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const status = searchParams.get("status");
   const type   = searchParams.get("type");
+  const search = searchParams.get("search")?.trim();
   const page   = Math.max(1, Number(searchParams.get("page") || 1));
   const limit  = 25;
 
   const where: any = {};
   if (status) where.status = status;
   if (type)   where.type   = type;
+  if (search) {
+    where.OR = [
+      { id: { contains: search, mode: "insensitive" } },
+      { subject: { contains: search, mode: "insensitive" } },
+      { message: { contains: search, mode: "insensitive" } },
+      { name: { contains: search, mode: "insensitive" } },
+      { email: { contains: search, mode: "insensitive" } },
+    ];
+  }
 
   const [items, total] = await Promise.all([
     db.feedback.findMany({
