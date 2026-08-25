@@ -675,12 +675,13 @@ function SalesInvoiceContent() {
           .print-area, .print-area * { visibility: visible !important; }
           .print-area { position: fixed; inset: 0; }
 
-          /* The on-screen preview is a second copy of the same bill. Hiding it
-             is not enough — hidden still occupies its full A4 of height, which
-             pushed the sheet count to two, and a fixed .print-area repeats on
-             every sheet it makes. So on paper the preview leaves the layout
-             altogether and the bill prints once. */
-          .print-paper-wrapper { display: none !important; }
+          /* The whole screen — the form, the list, and the preview, which is a
+             second copy of this very bill — leaves the layout on paper rather
+             than merely going invisible. Invisible still takes up its height,
+             and that height ran the job onto a second sheet; the .print-area
+             is fixed, so it repeated itself onto that sheet as well. That is
+             the duplicate. Gone from the layout, the bill prints once. */
+          .si-screen, .print-paper-wrapper, .no-print { display: none !important; }
 
           /* The document prints "Powered by FinovaOS" at its own foot, so the
              page footer stands down here and no margin is reserved for it. */
@@ -690,7 +691,7 @@ function SalesInvoiceContent() {
       `}</style>
 
       {/* ══════════════════════════ SCREEN UI ══════════════════════════ */}
-      <div style={{ padding: isMobile ? "12px 10px" : "24px 28px", fontFamily: ff, color: "var(--text-primary)", maxWidth: 1200 }}>
+      <div className="si-screen" style={{ padding: isMobile ? "12px 10px" : "24px 28px", fontFamily: ff, color: "var(--text-primary)", maxWidth: 1200 }}>
 
         {/* Header */}
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: isMobile ? "flex-start" : "center", marginBottom: 24, gap: 10, flexWrap: "wrap" }}>
