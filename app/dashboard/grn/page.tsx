@@ -1,5 +1,6 @@
 "use client";
 import { fmtDate } from "@/lib/dateUtils";
+import { ItemPicker } from "@/components/ItemPicker";
 import { DateInput } from "@/app/dashboard/reports/_components/DateInput";
 import { confirmToast } from "@/lib/toast-feedback";
 import { useEffect, useState } from "react";
@@ -392,10 +393,15 @@ export default function GRNPage() {
                             <span style={{ fontSize: 11, fontWeight: 700, color: MUTED, textTransform: "uppercase" as const }}>Item {idx + 1}</span>
                             <button onClick={() => setRows(rows.filter((_, i) => i !== idx))} disabled={rows.length === 1} style={{ background: "none", border: "none", cursor: rows.length === 1 ? "not-allowed" : "pointer", color: "#f87171", fontSize: 18, lineHeight: 1, padding: 0, opacity: rows.length === 1 ? 0.3 : 1 }}>×</button>
                           </div>
-                          <select value={row.itemId} onKeyDown={rateFormulaEnterHandler(rf, rfActive, idx)} onChange={e => selectGrnItem(idx, e.target.value)} style={{ ...inp({ marginBottom: 8 }) }}>
-                            <option value="">— Select Item —</option>
-                            {allItems.map((it: any) => <option key={it.id} value={it.id}>{it.name}</option>)}
-                          </select>
+                          <ItemPicker
+                            items={allItems as any}
+                            value={row.itemId}
+                            onChange={(__picked: string) => selectGrnItem(idx, __picked)}
+                            onKeyDown={rateFormulaEnterHandler(rf, rfActive, idx)}
+                            style={{ ...inp({ marginBottom: 8 }) }}
+                            allowManual={false}
+                            placeholder="Type to search — e.g. e1060"
+                          />
                           <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr 1fr", gap: 8 }}>
                             {rfActive && (
                               <RateFormulaMobileFields settings={rf} meta={row.meta} onChange={(key, value) => updateRowMeta(idx, key, value)} />
@@ -431,10 +437,15 @@ export default function GRNPage() {
                             <tr key={idx} style={{ borderTop: `1px solid ${BORDER}` }}>
                               <td style={{ padding: "6px 8px", color: MUTED, fontSize: 12 }}>{idx + 1}</td>
                               <td style={{ padding: "6px 8px" }}>
-                                <select value={row.itemId} onKeyDown={rateFormulaEnterHandler(rf, rfActive, idx)} onChange={e => selectGrnItem(idx, e.target.value)} style={inp({ padding: "6px 10px" })}>
-                                  <option value="">Select Item</option>
-                                  {allItems.map((it: any) => <option key={it.id} value={it.id}>{it.name}</option>)}
-                                </select>
+                                <ItemPicker
+                                  items={allItems as any}
+                                  value={row.itemId}
+                                  onChange={(__picked: string) => selectGrnItem(idx, __picked)}
+                                  onKeyDown={rateFormulaEnterHandler(rf, rfActive, idx)}
+                                  style={inp({ padding: "6px 10px" })}
+                                  allowManual={false}
+                                  placeholder="Type to search — e.g. e1060"
+                                />
                               </td>
                               {rfActive && (
                                 <RateFormulaRowCells settings={rf} meta={row.meta} rowIndex={idx} onChange={(key, value) => updateRowMeta(idx, key, value)} />

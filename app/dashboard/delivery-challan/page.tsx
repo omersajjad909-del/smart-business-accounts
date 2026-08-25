@@ -1,5 +1,6 @@
 "use client";
 import { fmtDate } from "@/lib/dateUtils";
+import { ItemPicker } from "@/components/ItemPicker";
 import { DateInput } from "@/app/dashboard/reports/_components/DateInput";
 import { confirmToast, alertToast } from "@/lib/toast-feedback";
 import { PrintActionBar } from "@/components/print/PrintActionBar";
@@ -579,14 +580,13 @@ const [searchTerm, _setSearchTerm] = useState("");
                     {rows.map((r, i) => (
                       <tr key={i}>
                         <td className="border p-2">
-                          <select className="w-full" value={r.itemId} onChange={e => selectItem(i, e.target.value)}>
-                            <option value="">Select Item</option>
-                            {items.map(it => (
-                              <option key={it.id} value={it.id}>
-                                {it.name} ({it.description})
-                              </option>
-                            ))}
-                          </select>
+                          <ItemPicker
+                            items={items as any}
+                            value={r.itemId}
+                            onChange={(__picked: string) => selectItem(i, __picked)}
+                            allowManual={false}
+                            placeholder="Type to search — e.g. e1060"
+                          />
                         </td>
                         <td className="border p-2">
                           <input type="number" value={r.qty} className="w-full text-center" onChange={e => updateRow(i, "qty", e.target.value)} />

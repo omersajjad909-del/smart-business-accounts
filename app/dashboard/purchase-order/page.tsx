@@ -1,5 +1,6 @@
 "use client";
 import { fmtDate } from "@/lib/dateUtils";
+import { ItemPicker } from "@/components/ItemPicker";
 import { DateInput } from "@/app/dashboard/reports/_components/DateInput";
 import { confirmToast } from "@/lib/toast-feedback";
 import { useEffect, useState } from "react";
@@ -448,8 +449,11 @@ export default function PurchaseOrderPage() {
                               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg>
                             </button>
                           </div>
-                          <select value={r.itemId} onKeyDown={rateFormulaEnterHandler(rf, rfActive, i)} onChange={e => {
-                            const it = items.find((x: any) => x.id === e.target.value);
+                          <ItemPicker
+                            items={items as any}
+                            value={r.itemId}
+                            onChange={(__picked: string) => {
+                            const it = items.find((x: any) => x.id === __picked);
                             if (!it) return;
                             const copy = [...rows];
                             copy[i] = { ...copy[i], itemId: it.id, name: it.name, desc: it.description || "", rate: rfActive ? copy[i].rate : String(it.purchaseRate || it.rate || ""), unit: it.unit || "", sku: it.code || "" };
@@ -461,10 +465,12 @@ export default function PurchaseOrderPage() {
                             }
                             if (i === copy.length - 1) copy.push(emptyRow());
                             setRows(copy);
-                          }} style={{ ...inp({ marginBottom: 8 }) }}>
-                            <option value="">— Select Item —</option>
-                            {items.map((it: any) => <option key={it.id} value={it.id}>{it.name}</option>)}
-                          </select>
+                          }}
+                            onKeyDown={rateFormulaEnterHandler(rf, rfActive, i)}
+                            style={{ ...inp({ marginBottom: 8 }) }}
+                            allowManual={false}
+                            placeholder="Type to search — e.g. e1060"
+                          />
                           {(r as any).sku && <div style={{ fontSize: 11, color: MUTED, marginBottom: 6 }}>SKU: {(r as any).sku}{(r as any).unit ? ` | Unit: ${(r as any).unit}` : ""}</div>}
                           <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: 8 }}>
                             {rfActive && (
@@ -528,8 +534,11 @@ export default function PurchaseOrderPage() {
                                 )}
                               </td>
                               <td style={{ padding: isMobile ? "8px 8px" : "6px 7px", minWidth: 150 }}>
-                                <select value={r.itemId} onKeyDown={rateFormulaEnterHandler(rf, rfActive, i)} onChange={e => {
-                                  const it = items.find((x: any) => x.id === e.target.value);
+                                <ItemPicker
+                                  items={items as any}
+                                  value={r.itemId}
+                                  onChange={(__picked: string) => {
+                                  const it = items.find((x: any) => x.id === __picked);
                                   if (!it) return;
                                   const copy = [...rows];
                                   copy[i] = { ...copy[i], itemId: it.id, name: it.name, desc: it.description || "", rate: rfActive ? copy[i].rate : String(it.purchaseRate || it.rate || ""), unit: it.unit || "", sku: it.code || "" };
@@ -541,10 +550,12 @@ export default function PurchaseOrderPage() {
                             }
                                   if (i === copy.length - 1) copy.push(emptyRow());
                                   setRows(copy);
-                                }} style={{ ...inp({ padding: isMobile ? "8px 8px" : "5px 7px", fontSize: 13 }) }}>
-                                  <option value="">— Select —</option>
-                                  {items.map((it: any) => <option key={it.id} value={it.id}>{it.name}</option>)}
-                                </select>
+                                }}
+                                  onKeyDown={rateFormulaEnterHandler(rf, rfActive, i)}
+                                  style={{ ...inp({ padding: isMobile ? "8px 8px" : "5px 7px", fontSize: 13 }) }}
+                                  allowManual={false}
+                                  placeholder="Type to search — e.g. e1060"
+                                />
                                 {(r.desc || (r as any).unit) && (
                                   <div style={{ fontSize: 10.5, color: MUTED, marginTop: 2, paddingLeft: 2, display: "flex", gap: 8 }}>
                                     {(r as any).unit && <span>Unit: {(r as any).unit}</span>}

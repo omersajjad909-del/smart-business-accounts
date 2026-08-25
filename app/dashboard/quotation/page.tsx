@@ -1,5 +1,6 @@
 "use client";
 import { fmtDate } from "@/lib/dateUtils";
+import { ItemPicker } from "@/components/ItemPicker";
 import { DateInput } from "@/app/dashboard/reports/_components/DateInput";
 import { confirmToast, alertToast } from "@/lib/toast-feedback";
 import { PrintActionBar } from "@/components/print/PrintActionBar";
@@ -654,10 +655,14 @@ export default function QuotationPage() {
                         <span style={{ fontSize: 11, fontWeight: 700, color: "var(--text-muted)", textTransform: "uppercase" }}>Item {i + 1}</span>
                         <button onClick={() => removeRow(i)} disabled={rows.length === 1} style={{ background: "transparent", border: "none", cursor: rows.length === 1 ? "not-allowed" : "pointer", color: rows.length === 1 ? "var(--text-muted)" : "#f87171", fontSize: 18, lineHeight: 1, padding: 0 }}>×</button>
                       </div>
-                      <select style={{ width: "100%", padding: isMobile ? "8px 8px" : "9px 13px", borderRadius: 8, border: "1.5px solid var(--border)", background: "var(--app-bg)", color: "var(--text-primary)", fontSize: 13, marginBottom: 8, boxSizing: "border-box" as const }} value={r.itemId} onChange={e => selectItem(i, e.target.value)}>
-                        <option value="">— Select Item —</option>
-                        {items.map(it => <option key={it.id} value={it.id}>{it.name}{it.description ? ` (${it.description})` : ""}</option>)}
-                      </select>
+                      <ItemPicker
+                        items={items as any}
+                        value={r.itemId}
+                        onChange={(__picked: string) => selectItem(i, __picked)}
+                        style={{ width: "100%", padding: isMobile ? "8px 8px" : "9px 13px", borderRadius: 8, border: "1.5px solid var(--border)", background: "var(--app-bg)", color: "var(--text-primary)", fontSize: 13, marginBottom: 8, boxSizing: "border-box" as const }}
+                        allowManual={false}
+                        placeholder="Type to search — e.g. e1060"
+                      />
                       <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: 8 }}>
                         <div>
                           <div style={{ fontSize: 10, color: "var(--text-muted)", fontWeight: 700, marginBottom: 4, textTransform: "uppercase" }}>Qty</div>
@@ -690,10 +695,14 @@ export default function QuotationPage() {
                       {rows.map((r, i) => (
                         <tr key={i} style={{ borderTop: "1px solid var(--border)" }}>
                           <td style={{ padding: isMobile ? "8px 8px" : "8px 10px" }}>
-                            <select style={{ width: "100%", padding: isMobile ? "8px 8px" : "7px 10px", borderRadius: 8, border: "1.5px solid var(--border)", background: "var(--app-bg)", color: "var(--text-primary)", fontSize: 13 }} value={r.itemId} onChange={e => selectItem(i, e.target.value)}>
-                              <option value="">— Select Item —</option>
-                              {items.map(it => <option key={it.id} value={it.id}>{it.name}{it.description ? ` (${it.description})` : ""}</option>)}
-                            </select>
+                            <ItemPicker
+                              items={items as any}
+                              value={r.itemId}
+                              onChange={(__picked: string) => selectItem(i, __picked)}
+                              style={{ width: "100%", padding: isMobile ? "8px 8px" : "7px 10px", borderRadius: 8, border: "1.5px solid var(--border)", background: "var(--app-bg)", color: "var(--text-primary)", fontSize: 13 }}
+                              allowManual={false}
+                              placeholder="Type to search — e.g. e1060"
+                            />
                           </td>
                           <td style={{ padding: isMobile ? "8px 8px" : "8px 6px", width: 100 }}>
                             <input type="number" value={r.qty} onChange={e => updateRow(i, "qty", e.target.value)} style={{ width: "100%", padding: isMobile ? "8px 8px" : "7px 8px", borderRadius: 8, border: "1.5px solid var(--border)", background: "var(--app-bg)", color: "var(--text-primary)", fontSize: 13, textAlign: "center" as const }} />
