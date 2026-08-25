@@ -682,6 +682,9 @@ export async function POST(req: NextRequest) {
         dataTypeName: def?.name ?? dataType,
         headers: parsed.headers,
         delimiter: parsed.delimiter === "\t" ? "tab" : parsed.delimiter,
+        // Says so when the file was not a table and had to be unwrapped, so
+        // nobody is left wondering why the columns are not the ones they saw.
+        reshaped: flattened.converted ? flattened.note : undefined,
         total: mapped.rows.length,
         ok: tally.ok,
         failed: tally.failed,

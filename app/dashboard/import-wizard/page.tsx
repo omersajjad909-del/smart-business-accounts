@@ -64,6 +64,7 @@ type Preview = {
   warnings: number;
   rows: PreviewRow[];
   issues: { line: number; error: string }[];
+  reshaped?: string;
 };
 
 type Result = {
