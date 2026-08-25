@@ -705,10 +705,51 @@ export function inheritGroupsFromHierarchy(rows: MappedRow<AccountRow>[]): {
   const coded = rows.filter((r) => !r.error && r.value?.code);
   let classified = 0;
 
-  for (const row of coded) {
-    if (row.value.partyType !== "GENERAL") continue;
+  const hasDescendants = (row: MappedRow<AccountRow>) =>
+    coded.some(
+      (other) =>
+        other !== row &&
+        other.value.code.length > row.value.code.length &&
+        other.value.code.startsWith(row.value.code),
+    );
 
+  const set = (row: MappedRow<AccountRow>, partyType: string, why: string) => {
+    row.value.partyType = partyType;
+    row.value.type = typeForPartyType(partyType);
+    // Replaces the "not recognised, filed under General" note, which is no
+    // longer true and would only worry whoever is reading the preview.
+    row.warning = why;
+    classified += 1;
+  };
+
+  // Shortest code first, so a heading is settled before anything under it asks
+  // what it is. Do it in file order instead and 03050003 inherits from 0305
+  // while 0305 is still unclassified, and every supplier lands as a plain
+  // liability.
+  const ordered = [...coded].sort((a, b) => a.value.code.length - b.value.code.length);
+
+  for (const row of ordered) {
+    if (row.value.partyType !== "GENERAL") continue;
     const code = row.value.code;
+
+    // A row with accounts filed under it is a heading, and a heading's name is
+    // its category — SUPPLIERS, BANK ACCOUNTS, INCOME. Read it off the name.
+    //
+    // Restricted to headings on purpose. Classifying ordinary accounts by their
+    // own name would file a customer called "Cash & Carry Traders" under Cash,
+    // and a supplier called "United Bank Suppliers" under Banks. A heading
+    // never has that problem, because a heading is only ever a category.
+    if (hasDescendants(row)) {
+      const own = normalizePartyType(row.value.name);
+      if (own !== "GENERAL") {
+        set(row, own, `Read as a heading: "${row.value.name}"`);
+        continue;
+      }
+    }
+
+    // Otherwise inherit, nearest ancestor first: under CURRENT ASSETS a
+    // CUSTOMERS control head should still win and make this a customer rather
+    // than a bare asset.
     const ancestors = coded
       .filter(
         (other) =>
@@ -719,14 +760,13 @@ export function inheritGroupsFromHierarchy(rows: MappedRow<AccountRow>[]): {
       .sort((a, b) => b.value.code.length - a.value.code.length);
 
     for (const ancestor of ancestors) {
-      const inherited = normalizePartyType(ancestor.value.name);
+      // Ancestors are already settled, so read the resolved value rather than
+      // re-deriving it from the name.
+      const inherited = ancestor.value.partyType !== "GENERAL"
+        ? ancestor.value.partyType
+        : normalizePartyType(ancestor.value.name);
       if (inherited === "GENERAL") continue;
-      row.value.partyType = inherited;
-      row.value.type = typeForPartyType(inherited);
-      // Replaces the "not recognised, filed under General" note, which is no
-      // longer true and would only worry the person reading the preview.
-      row.warning = `Filed under "${ancestor.value.name}" from code ${ancestor.value.code}`;
-      classified += 1;
+      set(row, inherited, `Filed under "${ancestor.value.name}" (code ${ancestor.value.code})`);
       break;
     }
   }
