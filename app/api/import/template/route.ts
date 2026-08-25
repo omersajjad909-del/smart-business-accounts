@@ -47,6 +47,13 @@ const EXAMPLES: Record<ImportDataType, string[][]> = {
   open_bills: [
     ["PO-2024-0044", "Star Polymers (Pvt) Ltd", "20-JAN-2024", "19-FEB-2024", "310000"],
   ],
+  // The B/F line first, and with no voucher number, because that is the row the
+  // reader has to find before it will post anything else in the file.
+  ledger_history: [
+    ["M/s Ali Traders, Karachi", "CUS-0001", "01-07-2021", "", "", "OPENING BALANCE", "1250000", "0"],
+    ["M/s Ali Traders, Karachi", "CUS-0001", "25-11-2023", "100", "CPV", "CHQ # 16950229", "800000", "0"],
+    ["M/s Ali Traders, Karachi", "CUS-0001", "28-11-2023", "181", "SV", "Bill # 26", "0", "5910290"],
+  ],
 };
 
 export async function GET(req: NextRequest) {

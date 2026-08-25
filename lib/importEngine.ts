@@ -848,7 +848,7 @@ function looksLikeOpening(...fields: string[]): boolean {
  * not a posting, it is where the account stood before the file starts, and
  * posting it as a voucher would count the opening twice over.
  */
-export function readLedgerHistoryRow(row: CsvRow): {
+export function readLedgerHistoryRow(row: CsvRow, line = 0): {
   value: LedgerHistoryRow;
   error?: string;
   warning?: string;
@@ -867,9 +867,14 @@ export function readLedgerHistoryRow(row: CsvRow): {
   let debit = Math.abs(parseAmount(field(row, "debit")));
   let credit = Math.abs(parseAmount(field(row, "credit")));
 
+  // The positional fallback is limited to the first row on purpose. A ledger
+  // whose B/F line is labelled nothing at all is common; a *later* row with no
+  // voucher number is common too — an adjustment somebody keyed by hand — and
+  // reading that one as an opening would wipe the balance and replace it with
+  // a single adjustment.
   const isOpening =
     looksLikeOpening(narration, voucherType, voucherNo) ||
-    (!voucherNo && !voucherType && !!(debit || credit));
+    (line === 1 && !voucherNo && !voucherType && !!(debit || credit));
 
   // Only the opening line may fall back to the running-balance column. On a
   // transaction row that column is the balance *after* the posting, and
@@ -884,7 +889,10 @@ export function readLedgerHistoryRow(row: CsvRow): {
     party, partyCode, date, voucherNo, voucherType, narration, debit, credit, isOpening,
   };
 
-  if (!date) {
+  // An undated B/F line still carries the number that matters, and the party
+  // master keeps its existing openDate. A transaction without a date cannot be
+  // placed in the ledger at all.
+  if (!date && !isOpening) {
     if (rawDate) return { value, error: `Could not read the date "${rawDate}"` };
     return { value, error: "No date in this row" };
   }

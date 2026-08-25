@@ -202,7 +202,7 @@ function mapForType(dataType: ImportDataType, rows: CsvRow[]) {
     case "open_bills":
       return mapRows(rows, (r) => readOpenDocumentRow(r, "bill"));
     case "ledger_history":
-      return mapRows(rows, (r) => readLedgerHistoryRow(r));
+      return mapRows(rows, (r, line) => readLedgerHistoryRow(r, line));
     default:
       return mapRows(rows, () => ({ value: null, error: "Unsupported data type" }));
   }
