@@ -143,7 +143,8 @@ export type ImportDataType =
   | "opening_balances"
   | "opening_stock"
   | "open_invoices"
-  | "open_bills";
+  | "open_bills"
+  | "ledger_history";
 
 export type ImportDataTypeDef = {
   id: ImportDataType;
@@ -240,6 +241,16 @@ export const IMPORT_DATA_TYPES: ImportDataTypeDef[] = [
     required: ["billNo", "supplier"],
     order: 8,
     why: "Same as above, on the payables side.",
+  },
+  {
+    id: "ledger_history",
+    name: "Party Ledger History",
+    icon: "📜",
+    desc: "Years of CRV / CPV / SV rows from a party's old ledger, posted as real vouchers",
+    template: ["party", "code", "date", "voucherNo", "voucherType", "narration", "debit", "credit"],
+    required: ["date"],
+    order: 9,
+    why: "Brings the old system's transactions into the ledger, so vouchers you write from today carry on from them.",
   },
 ];
 
@@ -356,6 +367,32 @@ export const FIELD_ALIASES: Record<string, string[]> = {
     "closing balance", "closingbalance", "ending balance",
     "balance", "amount", "net balance",
     "opening balance", "openingbalance", "begin balance",
+  ],
+
+  // ── Ledger history ──
+  //
+  // Kept apart from invoiceNo/description on purpose. A party ledger prints a
+  // voucher number and an invoice number in the same row — "V.No 181" against
+  // "Bill # 26" — and the one that identifies the posting is the voucher. Read
+  // through the invoiceNo list the two swap places on half the rows and the
+  // same voucher imports twice under two numbers.
+  voucherNo: [
+    "voucher no", "voucherno", "voucher number", "voucher #", "vou no", "vouno",
+    "v no", "vno", "v.no", "v. no", "tran no", "transaction no", "trn no",
+    "entry no", "doc no", "document no", "slip no", "ref no",
+  ],
+  // CRV / CPV / SV / GPV / JV — the letters that say which side of the books
+  // the other half of the entry came from. "type" sits last because a chart of
+  // accounts uses the same heading for something else entirely; on a ledger
+  // export there is no account type column, so the fallback is safe here.
+  voucherType: [
+    "voucher type", "vouchertype", "vou type", "v type", "v.type", "vtype",
+    "tran type", "transaction type", "trans type", "doc type", "entry type",
+    "voucher code", "vou code", "type", "tt",
+  ],
+  narration: [
+    "narration", "particulars", "description", "details", "remarks",
+    "reference", "ref", "cheque no", "chq no", "chq", "against", "notes", "memo",
   ],
 
   qty: ["qty", "quantity", "stock", "on hand", "onhand", "closing qty", "closing stock", "balance qty", "quantity on hand", "available qty"],
@@ -772,6 +809,98 @@ export function inheritGroupsFromHierarchy(rows: MappedRow<AccountRow>[]): {
   }
 
   return { classified };
+}
+
+export type LedgerHistoryRow = {
+  /** Party the row belongs to. Blank when the file is one party per file. */
+  party: string;
+  partyCode: string;
+  date: Date | null;
+  voucherNo: string;
+  voucherType: string;
+  narration: string;
+  debit: number;
+  credit: number;
+  /** The B/F line at the top, which sets the account's opening rather than posting. */
+  isOpening: boolean;
+};
+
+const OPENING_MARKERS = [
+  "opening", "op bal", "opbal", "b/f", "bf", "b / f", "brought forward",
+  "balance brought", "carried forward", "previous balance", "last year",
+];
+
+function looksLikeOpening(...fields: string[]): boolean {
+  const hay = fields.join(" ").toLowerCase();
+  return OPENING_MARKERS.some((m) => hay.includes(m));
+}
+
+/**
+ * One line of a party's ledger from the old system.
+ *
+ * A ledger prints one side of a double entry: the party's. The row says the
+ * party was debited 800,000 on a CPV; it does not say which bank the cheque
+ * left. The voucher type is what carries that — see writeLedgerHistory in
+ * app/api/import/route.ts, which is where the second leg is decided. The
+ * reader's job stops at getting the party's own side right.
+ *
+ * The B/F line at the top is flagged rather than read as a transaction. It is
+ * not a posting, it is where the account stood before the file starts, and
+ * posting it as a voucher would count the opening twice over.
+ */
+export function readLedgerHistoryRow(row: CsvRow): {
+  value: LedgerHistoryRow;
+  error?: string;
+  warning?: string;
+} {
+  const party = field(row, "party").trim();
+  const partyCode = field(row, "code").trim();
+  const voucherNo = field(row, "voucherNo").trim();
+  const voucherType = field(row, "voucherType").trim().toUpperCase();
+  const narration = field(row, "narration").trim();
+  const rawDate = field(row, "date");
+  const date = parseImportDate(rawDate);
+
+  // Same reasoning as readOpeningBalanceRow: a column headed Debit has already
+  // declared its side, so a bracketed or minus-signed amount under it is
+  // formatting, not a credit.
+  let debit = Math.abs(parseAmount(field(row, "debit")));
+  let credit = Math.abs(parseAmount(field(row, "credit")));
+
+  const isOpening =
+    looksLikeOpening(narration, voucherType, voucherNo) ||
+    (!voucherNo && !voucherType && !!(debit || credit));
+
+  // Only the opening line may fall back to the running-balance column. On a
+  // transaction row that column is the balance *after* the posting, and
+  // reading it as the amount would post the running total on every line.
+  if (isOpening && !debit && !credit) {
+    const balance = parseAmount(field(row, "balance"));
+    if (balance >= 0) debit = balance;
+    else credit = Math.abs(balance);
+  }
+
+  const value: LedgerHistoryRow = {
+    party, partyCode, date, voucherNo, voucherType, narration, debit, credit, isOpening,
+  };
+
+  if (!date) {
+    if (rawDate) return { value, error: `Could not read the date "${rawDate}"` };
+    return { value, error: "No date in this row" };
+  }
+  if (!debit && !credit) {
+    return { value, error: "Row has neither a debit nor a credit amount" };
+  }
+  if (debit && credit) {
+    return { value, warning: "Row has both a debit and a credit — the larger side was posted" };
+  }
+  if (!isOpening && !voucherType) {
+    return {
+      value,
+      warning: "No voucher type on this row — the other side of the entry goes to suspense",
+    };
+  }
+  return { value };
 }
 
 /**

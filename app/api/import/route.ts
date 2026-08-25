@@ -31,6 +31,7 @@ import {
   readOpeningBalanceRow,
   readOpeningStockRow,
   readOpenDocumentRow,
+  readLedgerHistoryRow,
   flagSummaryRows,
   inheritGroupsFromHierarchy,
   type ImportDataType,
@@ -40,6 +41,7 @@ import {
   type OpeningBalanceRow,
   type OpeningStockRow,
   type OpenDocumentRow,
+  type LedgerHistoryRow,
 } from "@/lib/importEngine";
 
 const WRITE_ROLES = new Set(["ADMIN", "ACCOUNTANT"]);
@@ -199,6 +201,8 @@ function mapForType(dataType: ImportDataType, rows: CsvRow[]) {
       return mapRows(rows, (r) => readOpenDocumentRow(r, "invoice"));
     case "open_bills":
       return mapRows(rows, (r) => readOpenDocumentRow(r, "bill"));
+    case "ledger_history":
+      return mapRows(rows, (r) => readLedgerHistoryRow(r));
     default:
       return mapRows(rows, () => ({ value: null, error: "Unsupported data type" }));
   }
