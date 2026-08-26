@@ -557,6 +557,9 @@ textarea{resize:vertical;line-height:1.55}
 .email-card header{display:flex;justify-content:space-between;gap:16px;align-items:flex-start}
 .email-card header strong{display:block;font-size:15px}
 .email-card header span{display:block;margin-top:4px;color:rgba(148,163,184,.72);font-size:12px}
+.email-card header .contact-row{color:rgba(226,232,240,.9)}
+.email-card header .contact-row a{color:#4ade80;text-decoration:none;font-weight:600}
+.email-card header .contact-row a:hover{text-decoration:underline}
 .email-card a{color:#93c5fd}
 .score-block{display:flex;align-items:center;gap:10px}
 .score-block strong{font-size:26px;line-height:1}
