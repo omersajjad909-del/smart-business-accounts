@@ -65,11 +65,53 @@ export function buildMultilingualPrompt(originalPrompt: string, language: AILang
   return `${originalPrompt}\n\nIMPORTANT: Write your entire response in ${langName}. Do not include any English text unless it is a proper noun, brand name, or technical term that has no ${langName} equivalent.`;
 }
 
+/**
+ * Azure OpenAI (Microsoft Foundry) client, or null when it is not configured.
+ *
+ * The Foundry endpoint ends in `/openai/v1`, which is OpenAI-API compatible, so
+ * the standard SDK works with a baseURL swap. Azure authenticates with an
+ * `api-key` header rather than a bearer token, hence the explicit header.
+ *
+ * `model` here is the DEPLOYMENT name chosen in Foundry, not the catalogue
+ * name — deploying `gpt-5.6-sol` as "finovaos-text" means the call must say
+ * "finovaos-text".
+ */
+export function azureOpenAIClient(): OpenAI | null {
+  const endpoint = process.env.AZURE_OPENAI_ENDPOINT?.trim();
+  const key = process.env.AZURE_OPENAI_API_KEY?.trim();
+  if (!endpoint || !hasUsableAIKey(key)) return null;
+
+  return new OpenAI({
+    apiKey: key,
+    baseURL: endpoint.replace(/\/+$/, ""),
+    defaultHeaders: { "api-key": key as string },
+  });
+}
+
 export async function generateMarketingText(prompt: string, maxTokens: number, language: AILanguage = "en") {
   const localizedPrompt = buildMultilingualPrompt(prompt, language);
   const anthropicKey = process.env.ANTHROPIC_API_KEY;
   const openaiKey = process.env.OPENAI_API_KEY;
   const errors: string[] = [];
+
+  // Azure first: that is where the credit sits. Falling through to a directly
+  // billed provider would quietly spend real money while the credit expires.
+  const azure = azureOpenAIClient();
+  const azureDeployment = process.env.AZURE_OPENAI_DEPLOYMENT?.trim();
+  if (azure && azureDeployment) {
+    try {
+      const response = await azure.chat.completions.create({
+        model: azureDeployment,
+        max_tokens: maxTokens,
+        messages: [{ role: "user", content: localizedPrompt }],
+      });
+      const text = response.choices[0]?.message?.content?.trim();
+      if (text) return text;
+      errors.push("Azure OpenAI returned an empty response.");
+    } catch (error: unknown) {
+      errors.push(providerErrorMessage(error));
+    }
+  }
 
   if (hasUsableAIKey(anthropicKey)) {
     try {
@@ -105,8 +147,10 @@ export async function generateMarketingText(prompt: string, maxTokens: number, l
     }
   }
 
-  if (!hasUsableAIKey(anthropicKey) && !hasUsableAIKey(openaiKey)) {
-    throw new Error("No usable AI API key configured. Set ANTHROPIC_API_KEY or OPENAI_API_KEY.");
+  if (!azure && !hasUsableAIKey(anthropicKey) && !hasUsableAIKey(openaiKey)) {
+    throw new Error(
+      "No usable AI API key configured. Set AZURE_OPENAI_ENDPOINT + AZURE_OPENAI_API_KEY + AZURE_OPENAI_DEPLOYMENT, or ANTHROPIC_API_KEY, or OPENAI_API_KEY.",
+    );
   }
 
   throw new Error(errors.find(Boolean) || "AI generation failed.");

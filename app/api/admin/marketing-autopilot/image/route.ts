@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import OpenAI from "openai";
-import { generateMarketingText, getErrorMessage, hasUsableAIKey } from "@/lib/marketingAutopilotAI";
+import { azureOpenAIClient, generateMarketingText, getErrorMessage, hasUsableAIKey } from "@/lib/marketingAutopilotAI";
 import { requireAdmin } from "@/lib/adminAuth";
 
 
@@ -19,8 +19,18 @@ export async function POST(req: NextRequest) {
 
     const { postText, niche, platform, style } = await req.json();
     if (!postText) return NextResponse.json({ error: "postText required" }, { status: 400 });
-    if (!hasUsableAIKey(process.env.OPENAI_API_KEY)) {
-      return NextResponse.json({ error: "OpenAI API key not configured for image generation" }, { status: 500 });
+
+    // Azure (Microsoft Foundry) first — that is where the credit is. Falls back
+    // to a direct OpenAI key only when Azure is not configured.
+    const azure = azureOpenAIClient();
+    const azureImageDeployment = process.env.AZURE_OPENAI_IMAGE_DEPLOYMENT?.trim();
+    const useAzure = Boolean(azure && azureImageDeployment);
+
+    if (!useAzure && !hasUsableAIKey(process.env.OPENAI_API_KEY)) {
+      return NextResponse.json(
+        { error: "No image provider configured. Set AZURE_OPENAI_ENDPOINT + AZURE_OPENAI_API_KEY + AZURE_OPENAI_IMAGE_DEPLOYMENT, or OPENAI_API_KEY." },
+        { status: 500 },
+      );
     }
 
     // Step 1 — use the configured text model to write a precise DALL-E prompt
