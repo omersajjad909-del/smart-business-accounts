@@ -124,7 +124,18 @@ async function discoverViaPlaces(
           }),
         });
 
-        if (!res.ok) break;
+        // A rejected key, the legacy "Places API" enabled instead of "Places
+        // API (New)", or an HTTP-referrer restriction on a server-side call all
+        // fail here. Swallowing that produced an empty result set and the
+        // caller's generic "no results for this brief" warning, which sends you
+        // looking at the brief instead of at the key. Say what actually broke.
+        if (!res.ok) {
+          const body = await res.text().catch(() => "");
+          console.error(
+            `[prospecting/discovery] Places searchText failed (HTTP ${res.status}): ${body.slice(0, 500)}`,
+          );
+          break;
+        }
         const data = (await res.json()) as { places?: PlacesResult[]; nextPageToken?: string };
 
         for (const place of data.places || []) {
