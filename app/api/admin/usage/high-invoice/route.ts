@@ -11,16 +11,25 @@ export async function GET(req: NextRequest) {
     if (role !== "ADMIN") return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
     const since = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+
+    // The demo sandbox seeds a fresh copy of the same golden companies for
+    // every visitor, so each seeded name appeared once per demo session — the
+    // duplicate "Global Link Import & Export" rows with identical totals were
+    // distinct companyIds, not a broken groupBy. Scoping the aggregate to real
+    // companies removes the demo rows and the duplication with them.
+    const realCompanies = await prisma.company.findMany({
+      where: { isDemo: false, isInternalTest: false },
+      select: { id: true, companyNo: true, name: true, country: true },
+    });
+    if (!realCompanies.length) return NextResponse.json({ rows: [] });
+
     const invs = await prisma.salesInvoice.groupBy({
       by: ["companyId"],
-      where: { date: { gte: since } },
+      where: { date: { gte: since }, companyId: { in: realCompanies.map((c) => c.id) } },
       _count: { id: true },
       _sum: { total: true },
     } as any);
-    const ids = invs.map((g: any) => g.companyId).filter(Boolean) as string[];
-    const companies = ids.length
-      ? await prisma.company.findMany({ where: { id: { in: ids } }, select: { id: true, companyNo: true, name: true, country: true } })
-      : [];
+    const companies = realCompanies;
     const map = new Map(companies.map(c => [c.id, c]));
     const rows = invs
       .map((g: any) => ({

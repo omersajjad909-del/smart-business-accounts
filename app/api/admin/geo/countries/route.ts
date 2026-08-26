@@ -7,26 +7,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getTokenFromRequest, verifyJwt } from "@/lib/auth";
-import { COUNTRIES } from "@/lib/countries";
+import { countryName, normalizeCountryCode } from "@/lib/countries";
 import { requireAdmin } from "@/lib/adminAuth";
-
-// Full country name (uppercase) → ISO 2-letter code, built from COUNTRIES list
-const NAME_TO_CODE: Record<string, string> = {};
-for (const c of COUNTRIES) NAME_TO_CODE[c.name.toUpperCase()] = c.code;
-
-function normalizeCountryCode(raw: string): string {
-  const upper = raw.toUpperCase().trim();
-  // Already a valid 2-letter ISO code
-  if (/^[A-Z]{2}$/.test(upper)) return upper;
-  // Full name like "PAKISTAN" → "PK"
-  return NAME_TO_CODE[upper] || upper;
-}
-
-// Country code → name map for display. Built from the same COUNTRIES list the
-// rest of the app uses — a hardcoded subset here left every country outside it
-// (Oman, and 165 others) rendering as its bare ISO code in the table.
-const COUNTRY_NAMES: Record<string, string> = {};
-for (const c of COUNTRIES) COUNTRY_NAMES[c.code] = c.name;
 
 export async function GET(req: NextRequest) {
   try {
@@ -134,7 +116,7 @@ export async function GET(req: NextRequest) {
     const rows = allCodes
       .map(code => ({
         country:        code,
-        countryName:    COUNTRY_NAMES[code] || code,
+        countryName:    countryName(code),
         companies:      companyByCountry[code]?.size  || 0,
         activeUsers30d: userByCountry[code]?.size     || 0,
       }))

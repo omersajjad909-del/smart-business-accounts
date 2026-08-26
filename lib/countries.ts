@@ -201,3 +201,30 @@ export const COUNTRIES: Country[] = [
 export function sortCountries(arr: Country[] = COUNTRIES): Country[] {
   return arr.slice().sort((a, b) => a.name.localeCompare(b.name));
 }
+
+/**
+ * `Company.country` is not consistent: some rows hold an ISO code ("PK"),
+ * others the full name ("Pakistan"), because different signup paths wrote it.
+ * Any report that groups by the raw column therefore splits one country into
+ * two rows. Normalise through here before using the value as a grouping key.
+ */
+const NAME_TO_CODE: Record<string, string> = {};
+const CODE_TO_NAME: Record<string, string> = {};
+for (const c of COUNTRIES) {
+  NAME_TO_CODE[c.name.toUpperCase()] = c.code;
+  CODE_TO_NAME[c.code] = c.name;
+}
+
+/** "PK" | "pakistan" | " Pakistan " → "PK". Unknown input is returned upper-cased. */
+export function normalizeCountryCode(raw: string | null | undefined): string {
+  const upper = String(raw || "").toUpperCase().trim();
+  if (!upper) return "";
+  if (/^[A-Z]{2}$/.test(upper)) return upper;
+  return NAME_TO_CODE[upper] || upper;
+}
+
+/** "PK" → "Pakistan". Falls back to the code itself so nothing renders blank. */
+export function countryName(code: string | null | undefined): string {
+  const c = String(code || "").toUpperCase().trim();
+  return CODE_TO_NAME[c] || c;
+}

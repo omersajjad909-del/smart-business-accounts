@@ -12,7 +12,11 @@ export async function GET(req: NextRequest) {
     const since = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
 
     const [companies, sessions, activities, loginLogs] = await Promise.all([
+      // Demo sandboxes are the busiest "companies" on the platform — they are
+      // seeded with a full dataset and hit hard for a few minutes — so without
+      // this filter they crowd real customers out of the top 10 entirely.
       prisma.company.findMany({
+        where: { isDemo: false, isInternalTest: false },
         select: { id: true, companyNo: true, name: true, country: true, subscriptionStatus: true },
       }),
       prisma.session.groupBy({

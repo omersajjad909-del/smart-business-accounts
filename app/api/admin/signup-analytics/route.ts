@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getTokenFromRequest, verifyJwt } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { countryName, normalizeCountryCode } from "@/lib/countries";
 import { requireAdmin } from "@/lib/adminAuth";
 
 function isAdmin(req: NextRequest) {
@@ -24,12 +25,19 @@ export async function GET(req: NextRequest) {
       orderBy: { createdAt: "desc" },
       take: 2000,
     }),
+    // Demo sandboxes and internal test workspaces are not signups. Their flags
+    // are selected rather than filtered in the query so a log pointing at one
+    // can be skipped outright below — filtering here would instead have made
+    // demo signups fall through to the "Not specified"/"Unknown" buckets.
     prisma.company.findMany({
-      select: { id: true, businessType: true, plan: true, country: true },
+      select: { id: true, businessType: true, plan: true, country: true, isDemo: true, isInternalTest: true },
     }),
   ]);
 
   const companyMap = new Map(companies.map(c => [c.id, c]));
+  const demoCompanyIds = new Set(
+    companies.filter(c => c.isDemo || c.isInternalTest).map(c => c.id)
+  );
 
   const referralCounts: Record<string, number> = {};
   const teamSizeCounts: Record<string, number> = {};
@@ -38,7 +46,9 @@ export async function GET(req: NextRequest) {
   const countryCounts: Record<string, number> = {};
   const signupsByDay: Record<string, number> = {};
 
-  for (const log of logs) {
+  const realLogs = logs.filter(l => !(l.companyId && demoCompanyIds.has(l.companyId)));
+
+  for (const log of realLogs) {
     try {
       const d = JSON.parse(log.details || "{}");
       const company = log.companyId ? companyMap.get(log.companyId) : null;
@@ -55,7 +65,11 @@ export async function GET(req: NextRequest) {
       const bt = company?.businessType || "Not specified";
       businessTypeCounts[bt] = (businessTypeCounts[bt] || 0) + 1;
 
-      const country = company?.country || "Unknown";
+      // Company.country holds "PK" on some rows and "Pakistan" on others, so
+      // grouping by the raw value listed one country twice. Normalise to the
+      // ISO code first, then label it once.
+      const code = normalizeCountryCode(company?.country);
+      const country = code ? countryName(code) : "Unknown";
       countryCounts[country] = (countryCounts[country] || 0) + 1;
 
       const day = log.createdAt.toISOString().slice(0, 10);
@@ -67,7 +81,7 @@ export async function GET(req: NextRequest) {
     Object.entries(obj).sort((a, b) => b[1] - a[1]).map(([label, count]) => ({ label, count }));
 
   return NextResponse.json({
-    total: logs.length,
+    total: realLogs.length,
     referralSources: toSorted(referralCounts),
     teamSizes: toSorted(teamSizeCounts),
     plans: toSorted(planCounts),

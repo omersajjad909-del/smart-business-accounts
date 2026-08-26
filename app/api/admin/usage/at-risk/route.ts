@@ -13,7 +13,10 @@ export async function GET(req: NextRequest) {
     const cutoff = new Date(Date.now() - days * 24 * 60 * 60 * 1000);
 
     const [companies, sessionAgg, activityAgg, loginAgg] = await Promise.all([
+      // An expired demo sandbox has no logins by definition, so every one of
+      // them would report as an at-risk customer about to churn.
       prisma.company.findMany({
+        where: { isDemo: false, isInternalTest: false },
         select: { id: true, companyNo: true, name: true, plan: true, subscriptionStatus: true, createdAt: true },
       }),
       prisma.session.groupBy({
