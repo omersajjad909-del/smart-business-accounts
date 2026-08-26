@@ -67,10 +67,32 @@ Write ONLY the image prompt, nothing else. Keep it under 150 words.`, 400);
     });
 
   } catch (e: unknown) {
-    // OpenAI content policy errors
-    if (typeof e === "object" && e && "status" in e && e.status === 400) {
-      return NextResponse.json({ error: "Image prompt was rejected by content policy. Try different post text." }, { status: 400 });
+    // A 400 from OpenAI is NOT always a content-policy rejection — a key
+    // without image permissions, an org not verified for image generation, or
+    // a model the account cannot reach all land here too. Reporting every one
+    // of them as "try different post text" sends you rewriting copy that was
+    // never the problem, so pass OpenAI's own message through.
+    const err = e as { status?: number; code?: string; error?: { message?: string; code?: string }; message?: string };
+    const detail = err?.error?.message || err?.message || "";
+    const code = err?.error?.code || err?.code || "";
+
+    if (err?.status === 400) {
+      const isPolicy =
+        /content[_ ]policy|safety system|rejected as a result of our safety/i.test(detail) ||
+        code === "content_policy_violation";
+
+      return NextResponse.json(
+        {
+          error: isPolicy
+            ? "Image prompt was rejected by content policy. Try different post text."
+            : `OpenAI rejected the image request: ${detail || "no detail returned"}`,
+          openaiCode: code || null,
+        },
+        { status: 400 },
+      );
     }
+
+    console.error("[marketing-autopilot/image] generation failed:", err?.status, code, detail);
     return NextResponse.json({ error: getErrorMessage(e, "Image generation failed") }, { status: 500 });
   }
 }
