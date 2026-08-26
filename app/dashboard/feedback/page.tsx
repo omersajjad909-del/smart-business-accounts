@@ -303,6 +303,29 @@ export default function FeedbackPage() {
 
       {!done && (
         <div style={card}>
+          {editingId && (
+            <div style={{
+              display: "flex", alignItems: "center", justifyContent: "space-between",
+              gap: "12px", flexWrap: "wrap",
+              marginBottom: "18px", padding: "10px 14px", borderRadius: "9px",
+              background: "rgba(129,140,248,.10)", border: "1px solid rgba(129,140,248,.30)",
+            }}>
+              <span style={{ fontSize: "12.5px", color: "#a5b4fc" }}>
+                ✎ Editing your earlier submission <b>#{editingId.slice(-8).toUpperCase()}</b> — saving replaces it rather than adding a new one.
+              </span>
+              <button
+                onClick={cancelEditing}
+                style={{
+                  background: "transparent", border: "1px solid rgba(255,255,255,.18)",
+                  color: "var(--text-muted)", borderRadius: "7px", padding: "5px 12px",
+                  fontSize: "12px", cursor: "pointer", fontFamily: "inherit", whiteSpace: "nowrap",
+                }}
+              >
+                Cancel edit
+              </button>
+            </div>
+          )}
+
           {/* Type selector */}
           <div style={{ marginBottom: "22px" }}>
             <label style={labelStyle}>Select Type</label>
@@ -310,7 +333,9 @@ export default function FeedbackPage() {
               {TYPES.map(t => (
                 <button
                   key={t.id}
-                  onClick={() => { setFbType(t.id); setError(""); }}
+                  onClick={() => { if (editingId) return; setFbType(t.id); setError(""); }}
+                  disabled={!!editingId && t.id !== fbType}
+                  title={editingId ? "The type cannot be changed on an edit" : undefined}
                   style={{
                     padding: "12px 8px", borderRadius: "10px", cursor: "pointer",
                     background: fbType === t.id ? `${t.color}18` : "var(--app-bg)",
@@ -608,7 +633,9 @@ export default function FeedbackPage() {
               transition: "all .2s",
             }}
           >
-            {submitting ? "Submitting…" : `${activeType.icon} Submit`}
+            {submitting
+              ? (editingId ? "Saving…" : "Submitting…")
+              : `${activeType.icon} ${editingId ? "Save Changes" : "Submit"}`}
           </button>
         </div>
       )}
