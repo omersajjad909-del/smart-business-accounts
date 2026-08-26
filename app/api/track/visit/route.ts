@@ -113,8 +113,12 @@ export async function POST(req: NextRequest) {
       country: geo.country || "XX",
       countryName: geo.countryName || "Unknown",
       city: geo.city || "Unknown",
-      lat: geo.lat || 0,
-      lon: geo.lon || 0,
+      // geoFromHeaders resolves country/city from edge headers but never
+      // coordinates, so these were always written as 0/0 — and (0, 0) is a real
+      // place (Null Island, off West Africa), which is where every visitor was
+      // being pinned on the geo map. Store null: "unknown" is not a location.
+      lat: geo.lat || null,
+      lon: geo.lon || null,
       flag: geo.flag || "GL",
       device,
       browser,

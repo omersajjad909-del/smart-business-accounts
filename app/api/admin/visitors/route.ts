@@ -1,7 +1,6 @@
 // FILE: app/api/admin/visitors/route.ts
 // Returns aggregated visitor data for admin panel
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
 import { getTokenFromRequest, verifyJwt } from "@/lib/auth";
 import { getCountryCenter } from "@/lib/geoMapData";
 import { readSiteVisits } from "@/lib/siteVisits";

@@ -36,6 +36,19 @@ const num = (v: unknown): number | null => {
   return Number.isFinite(n) ? n : null;
 };
 
+/**
+ * Rows written before the tracker stopped defaulting coordinates hold (0, 0),
+ * which is Null Island — a real point in the Atlantic, so those visits were
+ * drawn there as "exact" pins. Treat the pair as absent, and let the caller
+ * fall back to the country centre like any other unlocated visit.
+ */
+const coords = (rawLat: unknown, rawLon: unknown): { lat: number | null; lon: number | null } => {
+  const lat = num(rawLat);
+  const lon = num(rawLon);
+  if (lat === 0 && lon === 0) return { lat: null, lon: null };
+  return { lat, lon };
+};
+
 const str = (v: unknown): string | null => {
   const s = v == null ? "" : String(v);
   return s ? s : null;
@@ -79,8 +92,7 @@ export async function readSiteVisits(since: Date, take = 5000): Promise<SiteVisi
     flag:        str(v.flag),
     device:      str(v.device),
     browser:     str(v.browser),
-    lat:         num(v.lat),
-    lon:         num(v.lon),
+    ...coords(v.lat, v.lon),
     visitedAt:   v.visitedAt,
   }));
 
@@ -97,8 +109,7 @@ export async function readSiteVisits(since: Date, take = 5000): Promise<SiteVisi
         flag:        str(d.flag),
         device:      str(d.device),
         browser:     str(d.browser),
-        lat:         num(d.lat),
-        lon:         num(d.lon),
+        ...coords(d.lat, d.lon),
         // The logged payload carries its own visitedAt; createdAt is the same
         // moment and is the reliable fallback if the JSON is malformed.
         visitedAt:   d.visitedAt ? new Date(d.visitedAt) : log.createdAt,
