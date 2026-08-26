@@ -28,17 +28,30 @@ export async function GET(req: NextRequest) {
   }
 
   try {
-    const [companies, branches, logs, visits] = await Promise.all([
-      prisma.company.findMany({
-        select: { id: true, name: true, country: true, businessType: true, plan: true, baseCurrency: true },
-        orderBy: { createdAt: "desc" },
-      }),
+    // Demo sandboxes and internal test workspaces are not customers. Pinning
+    // them put seeded names ("Fast Track Distribution", "Mega Wholesale Depot")
+    // on the map and made the counters disagree with the company list. Same
+    // filter as /api/admin/companies/all and /api/admin/dashboard.
+    const companies = await prisma.company.findMany({
+      where: { isDemo: false, isInternalTest: false },
+      select: { id: true, name: true, country: true, businessType: true, plan: true, baseCurrency: true },
+      orderBy: { createdAt: "desc" },
+    });
+    const realCompanyIds = companies.map((c) => c.id);
+
+    const [branches, logs, visits] = await Promise.all([
+      // Branch has no isDemo of its own — it inherits it from its company, so
+      // scoping to the filtered company ids is what keeps demo depots off the map.
       prisma.branch.findMany({
+        where: { companyId: { in: realCompanyIds } },
         select: { id: true, companyId: true, code: true, name: true, city: true, isActive: true },
         orderBy: { createdAt: "desc" },
       }),
+      // These logs carry the exact lat/lon each pin is placed by. Unscoped, a
+      // burst of demo-sandbox logs could fill the 5000 budget and push a real
+      // company's coordinates out — dropping it back to a country-centre pin.
       prisma.activityLog.findMany({
-        where: { action: "COMPANY_ADMIN_CONTROL" },
+        where: { action: "COMPANY_ADMIN_CONTROL", companyId: { in: realCompanyIds } },
         select: { companyId: true, details: true, createdAt: true },
         orderBy: { createdAt: "desc" },
         take: 5000,

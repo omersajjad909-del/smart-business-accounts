@@ -22,15 +22,11 @@ function normalizeCountryCode(raw: string): string {
   return NAME_TO_CODE[upper] || upper;
 }
 
-// Country code → name map for display
-const COUNTRY_NAMES: Record<string,string> = {
-  PK:"Pakistan", AE:"UAE", IN:"India", SA:"Saudi Arabia", GB:"United Kingdom",
-  US:"United States", BD:"Bangladesh", QA:"Qatar", TR:"Turkey", NG:"Nigeria",
-  EG:"Egypt", KE:"Kenya", ZA:"South Africa", AU:"Australia", SG:"Singapore",
-  MY:"Malaysia", ID:"Indonesia", PH:"Philippines", JP:"Japan", CN:"China",
-  DE:"Germany", FR:"France", IT:"Italy", ES:"Spain", NL:"Netherlands",
-  CA:"Canada", MX:"Mexico", BR:"Brazil", AR:"Argentina", CO:"Colombia",
-};
+// Country code → name map for display. Built from the same COUNTRIES list the
+// rest of the app uses — a hardcoded subset here left every country outside it
+// (Oman, and 165 others) rendering as its bare ISO code in the table.
+const COUNTRY_NAMES: Record<string, string> = {};
+for (const c of COUNTRIES) COUNTRY_NAMES[c.code] = c.name;
 
 export async function GET(req: NextRequest) {
   try {
@@ -46,9 +42,18 @@ export async function GET(req: NextRequest) {
     }
 
     // 1. Company.country
+    // Demo sandboxes and internal test workspaces are not customers — counting
+    // them here inflated "Total Companies" to a number that never matched the
+    // company list, and dropped fake pins on the map. Same filter as
+    // /api/admin/companies/all and /api/admin/dashboard.
     const companies = await prisma.company.findMany({
+      where: { isDemo: false, isInternalTest: false },
       select: { id: true, country: true },
     });
+
+    // Every downstream source (activity logs, sessions) is keyed by companyId,
+    // so this set is what keeps a demo company from sneaking back in via them.
+    const realCompanyIds = new Set(companies.map((c) => c.id));
 
     const countryByCompany = new Map<string, string>();
     for (const c of companies) {
@@ -64,7 +69,8 @@ export async function GET(req: NextRequest) {
         select: { companyId: true, details: true },
       });
       for (const l of countryLogs) {
-        if (!l.companyId || countryByCompany.has(l.companyId)) continue;
+        if (!l.companyId || !realCompanyIds.has(l.companyId)) continue;
+        if (countryByCompany.has(l.companyId)) continue;
         try {
           const d = l.details ? JSON.parse(l.details) : null;
           const raw = String(d?.country || d?.country_code || "");
@@ -103,6 +109,9 @@ export async function GET(req: NextRequest) {
     // Build active users per country (from session)
     const userByCountry: Record<string, Set<string>> = {};
     for (const s of sessions) {
+      // A demo visitor's session would otherwise re-add its throwaway company
+      // to the country tally and count the sandbox user as an active user.
+      if (s.companyId && !realCompanyIds.has(s.companyId)) continue;
       // Try session.country first, then company country
       const rawCode = String(s.country || "");
       let code = rawCode ? normalizeCountryCode(rawCode) : "";

@@ -44,13 +44,16 @@ export default function LeafletMap({ pins, color }: Props) {
       maxZoom: 14,
     });
 
-    // Dark CartoDB tiles — no API key needed
-    L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png", {
-      subdomains: "abcd",
+    // CARTO's dark_all basemap used to be keyless; it now stamps
+    // "API KEY REQUIRED" across every tile, which made the map unreadable.
+    // OSM's standard tiles need no key, so the dark look comes from a CSS
+    // filter on the tile pane instead (see .fin-geo-tiles below).
+    L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
       maxZoom: 19,
+      className: "fin-geo-tiles",
     }).addTo(map);
 
-    L.control.attribution({ prefix: "© CartoDB © OSM" }).addTo(map);
+    L.control.attribution({ prefix: "© OpenStreetMap" }).addTo(map);
 
     const layer = L.layerGroup().addTo(map);
     mapRef.current  = map;
@@ -136,6 +139,12 @@ export default function LeafletMap({ pins, color }: Props) {
         .finova-geo-popup .leaflet-popup-content { margin: 12px 14px; }
         .finova-geo-popup .leaflet-popup-tip { background: #0f172a; }
         .leaflet-container { background: #060d1e; }
+        /* Dark basemap without a tile-provider key: invert OSM's light tiles,
+           then rotate the hue back so water reads blue rather than orange.
+           Applied to the tile layer only, so the pins keep their real colors. */
+        .fin-geo-tiles {
+          filter: invert(1) hue-rotate(180deg) brightness(.92) contrast(.9) saturate(.75);
+        }
       `}</style>
       <div ref={containerRef} style={{ width: "100%", height: "520px", borderRadius: 20, overflow: "hidden" }} />
     </>
