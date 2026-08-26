@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getTokenFromRequest, verifyJwt } from "@/lib/auth";
 import { getCountryCenter, isFiniteCoordinate } from "@/lib/geoMapData";
+import { readSiteVisits } from "@/lib/siteVisits";
 import { requireAdmin } from "@/lib/adminAuth";
 
 function safeDecode(val: string | null | undefined): string | null {
@@ -56,12 +57,9 @@ export async function GET(req: NextRequest) {
         orderBy: { createdAt: "desc" },
         take: 5000,
       }),
-      (prisma as any).siteVisit.findMany({
-        where: { visitedAt: { gte: new Date(Date.now() - 30 * 86400 * 1000) } },
-        select: { lat: true, lon: true, country: true, countryName: true, city: true, flag: true, page: true, device: true, visitedAt: true },
-        orderBy: { visitedAt: "desc" },
-        take: 1000,
-      }).catch(() => []),
+      // Same two-source read as /api/admin/visitors, so the map and the Web
+      // Metrics counters can never disagree about how much traffic there was.
+      readSiteVisits(new Date(Date.now() - 30 * 86400 * 1000), 1000).catch(() => []),
     ]);
 
     const settingsByCompany = new Map<string, any>();

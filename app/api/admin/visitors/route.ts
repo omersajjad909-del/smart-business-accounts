@@ -4,6 +4,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getTokenFromRequest, verifyJwt } from "@/lib/auth";
 import { getCountryCenter } from "@/lib/geoMapData";
+import { readSiteVisits } from "@/lib/siteVisits";
 import { requireAdmin } from "@/lib/adminAuth";
 
 function isAdmin(req: NextRequest) {
@@ -30,29 +31,11 @@ export async function GET(req: NextRequest) {
   const since = getRangeDate(range);
 
   try {
-    let visits: any[] = [];
-
-    // Try SiteVisit model first
-    try {
-      visits = await (prisma as any).siteVisit.findMany({
-        where: { visitedAt: { gte: since } },
-        select: { country:true, countryName:true, city:true, flag:true, device:true, browser:true, page:true, sessionId:true, visitedAt:true, lat:true, lon:true },
-        orderBy: { visitedAt: "desc" },
-        take: 5000,
-      });
-    } catch {
-      // Fallback: ActivityLog SITE_VISIT entries
-      const logs = await prisma.activityLog.findMany({
-        where: { action: "SITE_VISIT", createdAt: { gte: since } },
-        select: { details: true, createdAt: true },
-        orderBy: { createdAt: "desc" },
-        take: 5000,
-      });
-      visits = logs.map(l => {
-        try { return { ...JSON.parse(l.details||"{}"), visitedAt: l.createdAt }; }
-        catch { return null; }
-      }).filter(Boolean);
-    }
+    // Reads BOTH storage locations — the old try/catch here only looked at
+    // ActivityLog when the SiteVisit query threw, and it never threw, so the
+    // entire backlog written during the tracking bug was invisible.
+    // See lib/siteVisits.ts.
+    const visits: any[] = await readSiteVisits(since);
 
     // If live — return raw visits for map dots
     if (range === "live") {

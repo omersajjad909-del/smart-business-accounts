@@ -2,6 +2,17 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getTokenFromRequest, verifyJwt } from "@/lib/auth";
 import { requireAdmin } from "@/lib/adminAuth";
+import { readSiteVisits } from "@/lib/siteVisits";
+
+/** Distinct browser sessions since `from`, across both visit stores. */
+async function countUniqueVisitors(from: Date): Promise<number> {
+  try {
+    const rows = await readSiteVisits(from, 20000);
+    return new Set(rows.map((r) => r.sessionId).filter(Boolean)).size;
+  } catch {
+    return 0;
+  }
+}
 
 function isAdmin(req: NextRequest) {
   const role = String(req.headers.get("x-user-role") || "").toUpperCase();
@@ -32,18 +43,15 @@ export async function GET(req: NextRequest) {
     companies,
     paymentLogs,
   ] = await Promise.all([
-    // All unique site visitors (all time)
-    (prisma as any).siteVisit.groupBy({
-      by: ["sessionId"],
-      _count: { sessionId: true },
-    }).then((r: any[]) => r.length).catch(() => 0),
+    // All unique site visitors (all time). Counted through readSiteVisits
+    // rather than a groupBy on SiteVisit alone, because the visits written
+    // during the tracking bug live in ActivityLog — a groupBy here would put
+    // the top of the funnel at 0 and make every conversion rate meaningless.
+    // See lib/siteVisits.ts.
+    countUniqueVisitors(new Date(0)),
 
     // Recent unique visitors
-    (prisma as any).siteVisit.groupBy({
-      by: ["sessionId"],
-      where: { visitedAt: { gte: since } },
-      _count: { sessionId: true },
-    }).then((r: any[]) => r.length).catch(() => 0),
+    countUniqueVisitors(since),
 
     // Signups with details
     prisma.activityLog.findMany({

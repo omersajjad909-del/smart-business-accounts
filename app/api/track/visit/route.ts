@@ -103,12 +103,16 @@ export async function POST(req: NextRequest) {
         }
       : geoFromHeaders(req);
 
+    // NOTE: every field here must exist on the SiteVisit model. `region` used
+    // to be included and does not — Prisma rejected the whole create, so every
+    // single visit silently fell through to the ActivityLog fallback below,
+    // while the admin pages kept reading SiteVisit. Writes went to one table,
+    // reads came from another, and Web Metrics showed 0 forever.
     const visitData = {
       ip: ip.slice(0, 45),
       country: geo.country || "XX",
       countryName: geo.countryName || "Unknown",
       city: geo.city || "Unknown",
-      region: geo.region || "",
       lat: geo.lat || 0,
       lon: geo.lon || 0,
       flag: geo.flag || "GL",
@@ -122,11 +126,15 @@ export async function POST(req: NextRequest) {
 
     try {
       await (prisma as any).siteVisit.create({ data: visitData });
-    } catch {
+    } catch (err) {
+      // Only reached if the SiteVisit table itself is unavailable. Log loudly:
+      // a silent fallback here is what hid the bug above for so long.
+      console.error("[track/visit] SiteVisit write failed, falling back to ActivityLog:", err);
       await prisma.activityLog.create({
         data: {
           action: "SITE_VISIT",
-          details: JSON.stringify(visitData),
+          // region is kept here on purpose — this payload is free-form JSON.
+          details: JSON.stringify({ ...visitData, region: geo.region || "" }),
         },
       });
     }
