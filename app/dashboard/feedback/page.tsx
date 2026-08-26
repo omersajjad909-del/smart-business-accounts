@@ -109,6 +109,31 @@ export default function FeedbackPage() {
   // the only type that carries a star rating.
   const ratingApplies = fbType === "feedback";
 
+  /**
+   * A review is somebody telling us how it is going. It is not a ticket, so it
+   * is not triaged: nothing to rank by urgency, nothing to route to a module,
+   * and no title the writer was going to think of anyway. Asked for all three,
+   * the form reads like a support desk and the review never gets written.
+   *
+   * A complaint and a bug are tickets, and there the same three fields are what
+   * make them answerable.
+   */
+  /**
+   * A title for a review that was not given one: its first sentence, trimmed.
+   * The support list shows submissions by subject, and a blank row there is a
+   * review nobody opens.
+   */
+  function derivedSubject(): string {
+    const firstSentence = message.trim().split(/(?<=[.!?])\s|\n/)[0] || message.trim();
+    const short = firstSentence.slice(0, 70).trim();
+    if (short) return short + (firstSentence.length > 70 ? "…" : "");
+    return ratingApplies && rating > 0 ? `${rating}-star review` : "Feedback";
+  }
+
+  const triageApplies = fbType === "complaint" || fbType === "bug";
+  const moduleApplies = fbType !== "feedback";
+  const subjectRequired = fbType !== "feedback";
+
   function getHeaders() {
     const h: Record<string, string> = { "Content-Type": "application/json" };
     if (user?.id)        h["x-user-id"]    = user.id;
@@ -133,7 +158,7 @@ export default function FeedbackPage() {
   }, [done]);
 
   async function submit() {
-    if (!subject.trim()) { setError("Please enter a subject."); return; }
+    if (subjectRequired && !subject.trim()) { setError("Please enter a subject."); return; }
     // A rating must never travel on its own — the written review is what makes
     // it meaningful, and it is what an admin reads before publishing it.
     if (message.trim().length < 20) {
@@ -150,7 +175,7 @@ export default function FeedbackPage() {
         headers: getHeaders(),
         body: JSON.stringify({
           type: fbType,
-          subject: subject.trim(),
+          subject: subject.trim() || derivedSubject(),
           message: message.trim(),
           rating: ratingApplies ? rating : undefined,
           publishConsent: ratingApplies ? publishConsent : undefined,
@@ -357,17 +382,26 @@ export default function FeedbackPage() {
 
           {/* Subject */}
           <div style={{ marginBottom: "14px" }}>
-            <label style={labelStyle}>Subject <span style={{ color: "#ef4444" }}>*</span></label>
+            <label style={labelStyle}>
+              Subject{subjectRequired
+                ? <span style={{ color: "#ef4444" }}> *</span>
+                : <span style={{ color: "var(--text-muted)", fontWeight: 400 }}> (optional)</span>}
+            </label>
             <input
               style={inputStyle}
               value={subject}
               onChange={e => setSubject(e.target.value)}
-              placeholder={`Brief title for your ${activeType.noun}`}
+              placeholder={subjectRequired
+                ? `Brief title for your ${activeType.noun}`
+                : "Leave it blank and we'll take it from your review"}
             />
           </div>
 
-          {/* Priority + Module row */}
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "14px", marginBottom: "14px" }}>
+          {/* Priority + Module row. Both are for tickets; a review has neither,
+              and a suggestion is routed but not ranked. */}
+          {(triageApplies || moduleApplies) && (
+          <div style={{ display: "grid", gridTemplateColumns: triageApplies && moduleApplies ? "1fr 1fr" : "1fr", gap: "14px", marginBottom: "14px" }}>
+            {triageApplies && (
             <div>
               <label style={labelStyle}>Priority</label>
               <div style={{ display: "flex", gap: "6px" }}>
@@ -389,6 +423,8 @@ export default function FeedbackPage() {
                 ))}
               </div>
             </div>
+            )}
+            {moduleApplies && (
             <div>
               <label style={labelStyle}>Affected Module (optional)</label>
               <select
@@ -400,7 +436,9 @@ export default function FeedbackPage() {
                 {MODULES.map(m => <option key={m} value={m}>{m}</option>)}
               </select>
             </div>
+            )}
           </div>
+          )}
 
           {/* Message */}
           <div style={{ marginBottom: "20px" }}>
