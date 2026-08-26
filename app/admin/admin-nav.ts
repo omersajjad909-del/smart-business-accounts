@@ -18,11 +18,6 @@ export const ADMIN_NAV_ITEMS: AdminNavItem[] = [
   { id: "plans",            label: "Plans",             href: "/admin/plans",               group: "Main",      short: "PL", icon: "layers" },
   { id: "business-modules", label: "Modules",           href: "/admin/business-modules",    group: "Main",      short: "BM", icon: "box" },
 
-  // ── BUSINESS ──────────────────────────────────────────────────────────────
-  { id: "tax-rates",        label: "Tax Rates",         href: "/admin/tax-rates",           group: "Business",  short: "TX", icon: "list" },
-  { id: "currencies",       label: "Currencies",        href: "/admin/currencies",          group: "Business",  short: "CU", icon: "globe" },
-  { id: "payment-methods",  label: "Payment Methods",   href: "/admin/payment-methods",     group: "Business",  short: "PM", icon: "credit-card" },
-
   // ── ANALYTICS ─────────────────────────────────────────────────────────────
   { id: "revenue",          label: "Revenue",           href: "/admin/revenue",             group: "Analytics", short: "RV", icon: "chart" },
   { id: "geo",              label: "Geo Analytics",     href: "/admin/geo",                 group: "Analytics", short: "GE", icon: "globe" },
@@ -81,4 +76,4 @@ export const ADMIN_NAV_ITEMS: AdminNavItem[] = [
   { id: "dev-test",         label: "Dev Test",          href: "/admin/dev-test",            group: "Others",    short: "DV", icon: "code",   badge: "DEV" },
 ];
 
-export const ADMIN_NAV_GROUP_ORDER = ["Main", "Business", "Analytics", "Marketing", "System", "Others"] as const;
+export const ADMIN_NAV_GROUP_ORDER = ["Main", "Analytics", "Marketing", "System", "Others"] as const;
