@@ -75,7 +75,8 @@ Write ONLY the image prompt, nothing else. Keep it under 150 words.`, 400);
     return NextResponse.json({
       url:          imageUrl,
       imagePrompt,  // return so admin can see what prompt was used
-      model:        MODEL,
+      model:        useAzure ? azureImageDeployment : MODEL,
+      provider:     useAzure ? "azure" : "openai",
       size:         SIZE,
     });
 
