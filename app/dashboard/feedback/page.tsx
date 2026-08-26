@@ -146,13 +146,18 @@ export default function FeedbackPage() {
     return h;
   }
 
-  useEffect(() => {
-    const h = getHeaders();
-    fetch("/api/public/feedback", { headers: h })
+  /** Pulled out of the effect so a save can refresh the list it just changed. */
+  function loadHistory() {
+    return fetch("/api/public/feedback", { headers: getHeaders() })
       .then(r => r.ok ? r.json() : { items: [] })
       .then(d => setHistory(d.items || []))
       .catch(() => {})
       .finally(() => setLoadingH(false));
+  }
+
+  useEffect(() => {
+    const h = getHeaders();
+    loadHistory();
 
     fetch("/api/me/company", { headers: h })
       .then(r => r.ok ? r.json() : null)
