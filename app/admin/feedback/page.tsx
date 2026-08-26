@@ -228,7 +228,10 @@ export default function AdminFeedbackPage() {
       )}
 
       {/* Detail Modal */}
-      {selected && (
+      {selected && (() => {
+        // "feedback" is the review type — see TYPES in app/dashboard/feedback.
+        const isReview = selected.type === "feedback";
+        return (
         <div className="overlay" onClick={e => e.target === e.currentTarget && setSelected(null)}>
           <div className="modal" style={{ animation: "fadeUp .3s ease" }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 20 }}>
@@ -236,7 +239,7 @@ export default function AdminFeedbackPage() {
                 <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 8 }}>
                   <span style={{ padding: "3px 10px", borderRadius: 20, fontSize: 11, fontWeight: 700, background: `${TYPE_COLORS[selected.type]}18`, color: TYPE_COLORS[selected.type] }}>{selected.type}</span>
                   <span style={{ padding: "3px 10px", borderRadius: 20, fontSize: 11, fontWeight: 700, background: `${STATUS_COLORS[selected.status]}18`, color: STATUS_COLORS[selected.status] }}>{selected.status.replace("_"," ")}</span>
-                  <span style={{ padding: "3px 10px", borderRadius: 20, fontSize: 11, fontWeight: 700, background: `${PRIORITY_COLORS[selected.priority]}18`, color: PRIORITY_COLORS[selected.priority] }}>{selected.priority}</span>
+                  {!isReview && <span style={{ padding: "3px 10px", borderRadius: 20, fontSize: 11, fontWeight: 700, background: `${PRIORITY_COLORS[selected.priority]}18`, color: PRIORITY_COLORS[selected.priority] }}>{selected.priority}</span>}
                 </div>
                 <h2 style={{ margin: 0, fontSize: 18, fontWeight: 800 }}>{selected.subject}</h2>
               </div>
@@ -316,14 +319,26 @@ export default function AdminFeedbackPage() {
               <textarea className="fb-textarea" rows={3} value={note} onChange={e => setNote(e.target.value)} placeholder="Internal note visible to admins only..." />
             </div>
 
-            {/* Actions */}
+            {/* Actions.
+                A complaint or a bug is triaged, worked and resolved, and all four
+                buttons mean something. A review is none of those — there is
+                nothing to fix and nothing to resolve, and "Mark Resolved" on a
+                five-star review reads as though somebody treated it as a fault.
+                It still has to leave the open count once it has been read, so
+                the two that mean that are kept and relabelled. */}
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginBottom: 12 }}>
-              {[
-                { label: "Mark In Review", status: "in_review", color: "#fbbf24" },
-                { label: "Mark Resolved",  status: "resolved",  color: "#34d399" },
-                { label: "Close",          status: "closed",    color: "#64748b" },
-                { label: "Re-open",        status: "open",      color: "#f87171" },
-              ].map(a => (
+              {(isReview
+                ? [
+                    { label: "Mark as Read",  status: "closed", color: "#34d399" },
+                    { label: "Move Back",     status: "open",   color: "#64748b" },
+                  ]
+                : [
+                    { label: "Mark In Review", status: "in_review", color: "#fbbf24" },
+                    { label: "Mark Resolved",  status: "resolved",  color: "#34d399" },
+                    { label: "Close",          status: "closed",    color: "#64748b" },
+                    { label: "Re-open",        status: "open",      color: "#f87171" },
+                  ]
+              ).map(a => (
                 <button key={a.status} className="fb-btn" onClick={() => update(selected.id, { status: a.status, adminNote: note })}
                   disabled={saving || selected.status === a.status}
                   style={{ background: `${a.color}20`, color: a.color, border: `1px solid ${a.color}30`, opacity: selected.status === a.status ? .35 : 1 }}>
@@ -332,7 +347,8 @@ export default function AdminFeedbackPage() {
               ))}
             </div>
 
-            {/* Priority */}
+            {/* Priority — a queue position, which a review does not have. */}
+            {!isReview && (
             <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
               <span style={{ fontSize: 11, color: "rgba(255,255,255,.35)", alignSelf: "center" }}>Priority:</span>
               {["low","normal","high","urgent"].map(p => (
@@ -343,9 +359,11 @@ export default function AdminFeedbackPage() {
                 </button>
               ))}
             </div>
+            )}
           </div>
         </div>
-      )}
+        );
+      })()}
     </div>
   );
 }
