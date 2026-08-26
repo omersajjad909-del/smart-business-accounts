@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { formatCompanyNo } from "@/lib/companyRef";
+import { countryName, normalizeCountryCode } from "@/lib/countries";
 import { requireAdmin } from "@/lib/adminAuth";
 
 export async function GET(req: NextRequest) {
@@ -29,8 +30,7 @@ export async function GET(req: NextRequest) {
       _count: { id: true },
       _sum: { total: true },
     } as any);
-    const companies = realCompanies;
-    const map = new Map(companies.map(c => [c.id, c]));
+    const map = new Map(realCompanies.map(c => [c.id, c]));
     const rows = invs
       .map((g: any) => ({
         id: g.companyId,
@@ -38,7 +38,9 @@ export async function GET(req: NextRequest) {
         // Never fall back to the UUID for a display name — a deleted company
         // shows its short number instead. See lib/companyRef.ts.
         name: map.get(g.companyId)?.name || formatCompanyNo(map.get(g.companyId)?.companyNo, g.companyId),
-        country: map.get(g.companyId)?.country || null,
+        // Raw Company.country is "PK" on some rows and "Pakistan" on others —
+        // this table showed both spellings side by side. Label it once.
+        country: countryName(normalizeCountryCode(map.get(g.companyId)?.country)) || null,
         invoices: g._count.id || 0,
         amount: Number(g._sum.total || 0),
       }))

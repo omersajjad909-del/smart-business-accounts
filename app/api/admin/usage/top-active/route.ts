@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { countryName, normalizeCountryCode } from "@/lib/countries";
 import { requireAdmin } from "@/lib/adminAuth";
 
 export async function GET(req: NextRequest) {
@@ -63,7 +64,9 @@ export async function GET(req: NextRequest) {
           id: company.id,
           companyNo: company.companyNo,
           name: company.name,
-          country: company.country || null,
+          // Same normalisation as the High Invoice table below it, so one
+          // country cannot appear as "PK" in one card and "Pakistan" in another.
+          country: countryName(normalizeCountryCode(company.country)) || null,
           activity: sessions7d + actions7d + logins7d,
           sessions7d,
           actions7d,
