@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import { unstable_cache } from "next/cache";
+import { revalidateTag, unstable_cache } from "next/cache";
 import {
   DEFAULT_RATE_FORMULA,
   normalizeRateFormula,
@@ -294,26 +294,41 @@ function normalizeSettings(value: unknown): AdminControlSettings {
   };
 }
 
-const _cachedGetAdminControlSettings = unstable_cache(
-  async (companyId: string): Promise<AdminControlSettings> => {
-    const latest = await prisma.activityLog.findFirst({
-      where: { companyId, action: "COMPANY_ADMIN_CONTROL" },
-      orderBy: { createdAt: "desc" },
-      select: { details: true },
-    });
-    if (!latest?.details) return DEFAULT_ADMIN_CONTROL_SETTINGS;
-    try {
-      return normalizeSettings(JSON.parse(latest.details));
-    } catch {
-      return DEFAULT_ADMIN_CONTROL_SETTINGS;
-    }
-  },
-  ["company-admin-control-settings"],
-  { revalidate: 60 }
-);
+/** Cache tag for one company's settings, so a save can drop exactly its own. */
+const settingsTag = (companyId: string) => `company-admin-control:${companyId}`;
+
+/**
+ * Built per company rather than once, because unstable_cache reads its `tags`
+ * when the wrapper is created — a tag naming the company cannot be written
+ * inside a single shared wrapper.
+ *
+ * Without a tag the only way out of the cache was to wait for the sixty second
+ * revalidate. That is long enough for somebody to upload a logo, press Save,
+ * open an invoice, see the old settings, and conclude the upload had failed —
+ * then do it again, and see it fail again.
+ */
+function cachedSettingsFor(companyId: string) {
+  return unstable_cache(
+    async (): Promise<AdminControlSettings> => {
+      const latest = await prisma.activityLog.findFirst({
+        where: { companyId, action: "COMPANY_ADMIN_CONTROL" },
+        orderBy: { createdAt: "desc" },
+        select: { details: true },
+      });
+      if (!latest?.details) return DEFAULT_ADMIN_CONTROL_SETTINGS;
+      try {
+        return normalizeSettings(JSON.parse(latest.details));
+      } catch {
+        return DEFAULT_ADMIN_CONTROL_SETTINGS;
+      }
+    },
+    ["company-admin-control-settings", companyId],
+    { revalidate: 60, tags: [settingsTag(companyId)] }
+  );
+}
 
 export async function getCompanyAdminControlSettings(companyId: string): Promise<AdminControlSettings> {
-  return _cachedGetAdminControlSettings(companyId);
+  return cachedSettingsFor(companyId)();
 }
 
 export async function saveCompanyAdminControlSettings(
@@ -381,6 +396,17 @@ export async function saveCompanyAdminControlSettings(
       details: JSON.stringify(next),
     },
   });
+
+  // Guarded because revalidateTag needs a request to be in progress. Every
+  // caller today is a route handler, but a seed or a script has no request and
+  // would throw here rather than saving.
+  try {
+    // Next 16 wants to be told how stale the entry may stay. Zero, because
+    // the point is that the next read sees what was just saved.
+    revalidateTag(settingsTag(companyId), { expire: 0 });
+  } catch {
+    // Nothing to drop outside a request — the sixty second revalidate covers it.
+  }
 
   return next;
 }
