@@ -46,6 +46,8 @@ type Prospect = {
   website: string | null;
   domain: string | null;
   industry: string | null;
+  phone: string | null;
+  address: string | null;
   city: string | null;
   country: string | null;
   employeeCount: number | null;
@@ -387,6 +389,20 @@ export default function AdminProspectingPage() {
                         {[p.industry, p.city, p.country].filter(Boolean).join(" · ")}
                         {p.website && <> · <a href={p.website} target="_blank" rel="noreferrer noopener">website</a></>}
                       </span>
+                      {p.phone && (
+                        <span className="contact-row">
+                          <a href={`tel:${p.phone.replace(/[^\d+]/g, "")}`}>{p.phone}</a>
+                          {" · "}
+                          <a
+                            href={`https://wa.me/${p.phone.replace(/[^\d]/g, "")}`}
+                            target="_blank"
+                            rel="noreferrer noopener"
+                          >
+                            WhatsApp
+                          </a>
+                          {p.address && <> · <span title={p.address}>{p.address}</span></>}
+                        </span>
+                      )}
                     </div>
                     <div className="score-block">
                       <span className={`tier tier-${p.tier || "D"}`}>{p.tier || "?"}</span>

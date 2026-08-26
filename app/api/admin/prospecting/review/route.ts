@@ -47,6 +47,11 @@ export async function GET(req: NextRequest) {
           prospect: {
             select: {
               id: true, name: true, website: true, domain: true, industry: true,
+              // Places returns these and they are stored, but the select left
+              // them out — so the queue could never show a number to call.
+              // Email is not the only way to work this list, and in PK/Gulf it
+              // is rarely the best one.
+              phone: true, address: true,
               city: true, country: true, employeeCount: true, warehouseCount: true,
               locationCount: true, currentSoftware: true, score: true, tier: true,
               scoreBreakdown: true, scoreReason: true, source: true,
