@@ -42,7 +42,12 @@ export const ADMIN_NAV_ITEMS: AdminNavItem[] = [
   { id: "broadcasts",       label: "Broadcasts",        href: "/admin/broadcasts",          group: "Marketing", short: "BR", icon: "megaphone" },
   { id: "newsletter",       label: "Newsletter",        href: "/admin/newsletter",          group: "Marketing", short: "NL", icon: "mail" },
   { id: "social",           label: "Social",            href: "/admin/social",              group: "Marketing", short: "SO", icon: "share" },
-  { id: "feedback",         label: "Feedback",          href: "/admin/feedback",            group: "Marketing", short: "FB", icon: "message" },
+  { id: "feedback",         label: "All Feedback",      href: "/admin/feedback",            group: "Marketing", short: "FB", icon: "message" },
+  // One route, scoped by ?type=. See SCOPES in app/admin/feedback/page.tsx.
+  { id: "fb-reviews",       label: "Reviews",           href: "/admin/feedback?type=feedback",   group: "Marketing", short: "RV", icon: "star" },
+  { id: "fb-complaints",    label: "Complaints",        href: "/admin/feedback?type=complaint",  group: "Marketing", short: "CP", icon: "message" },
+  { id: "fb-suggestions",   label: "Suggestions",       href: "/admin/feedback?type=suggestion", group: "Marketing", short: "SG", icon: "message" },
+  { id: "fb-bugs",          label: "Bug Reports",       href: "/admin/feedback?type=bug",        group: "Marketing", short: "BG", icon: "message" },
   { id: "testimonials",     label: "Testimonials",      href: "/admin/testimonials",        group: "Marketing", short: "TS", icon: "star" },
   { id: "affiliates",       label: "Affiliates",        href: "/admin/affiliates",          group: "Marketing", short: "AF", icon: "share" },
   { id: "referrals",        label: "Referrals",         href: "/admin/referrals",           group: "Marketing", short: "RF", icon: "users" },

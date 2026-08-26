@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
 
 const STATUS_COLORS: Record<string, string> = {
   open:      "#f87171",
@@ -34,7 +35,50 @@ const PRIORITY_COLORS: Record<string, string> = {
   low: "#64748b", normal: "#38bdf8", high: "#f59e0b", urgent: "#ef4444",
 };
 
+
+/** What each sidebar entry calls itself, and what it says it is for. */
+const SCOPES: Record<string, { title: string; subtitle: string }> = {
+  "": {
+    title: "Feedback & Complaints",
+    subtitle: "Everything users and visitors have sent, of every kind.",
+  },
+  feedback: {
+    title: "Reviews",
+    subtitle: "Star ratings and written reviews. Publish the ones whose writer gave permission.",
+  },
+  complaint: {
+    title: "Complaints",
+    subtitle: "Something went wrong for somebody. Triage, work, resolve.",
+  },
+  suggestion: {
+    title: "Suggestions",
+    subtitle: "Ideas and requests for things that do not exist yet.",
+  },
+  bug: {
+    title: "Bug Reports",
+    subtitle: "Technical faults, with the module and the browser they happened on.",
+  },
+  general: {
+    title: "General Messages",
+    subtitle: "Everything that is not a review, a complaint, a suggestion or a bug.",
+  },
+};
+
 export default function AdminFeedbackPage() {
+  /**
+   * One page per topic, served by one route.
+   *
+   * A review, a complaint and a bug report are read by different people and
+   * looked for at different times, so each gets its own entry in the sidebar
+   * and its own heading. They are the same rows in the same table underneath —
+   * four copies of this page would be four places to fix the next bug in it.
+   *
+   * No ?type= at all is the old combined inbox, still reachable and still
+   * showing everything.
+   */
+  const scope = useSearchParams().get("type") || "";
+  const scopeMeta = SCOPES[scope] ?? SCOPES[""];
+
   const [items, setItems]     = useState<any[]>([]);
   const [total, setTotal]     = useState(0);
   const [stats, setStats]     = useState<any[]>([]);
@@ -53,7 +97,10 @@ export default function AdminFeedbackPage() {
     try {
       const params = new URLSearchParams({ page: String(page) });
       if (status) params.set("status", status);
-      if (type)   params.set("type", type);
+      // The URL's scope is not a filter the operator can clear — it is which
+      // page they are on.
+      if (scope)     params.set("type", scope);
+      else if (type) params.set("type", type);
       if (search.trim()) params.set("search", search.trim());
       const r = await fetch(`/api/admin/feedback?${params}`);
       const d = await r.json();
@@ -64,7 +111,7 @@ export default function AdminFeedbackPage() {
     } finally { setLoad(false); }
   }
 
-  useEffect(() => { load(); }, [status, type, page, search]);
+  useEffect(() => { load(); }, [status, type, page, search, scope]);
 
   async function update(id: string, patch: any) {
     setSaving(true);
@@ -98,9 +145,9 @@ export default function AdminFeedbackPage() {
 
       {/* Header */}
       <div style={{ marginBottom: 28 }}>
-        <h1 style={{ margin: "0 0 4px", fontSize: 24, fontWeight: 800 }}>Feedback & Complaints</h1>
+        <h1 style={{ margin: "0 0 4px", fontSize: 24, fontWeight: 800 }}>{scopeMeta.title}</h1>
         <p style={{ margin: 0, fontSize: 13, color: "rgba(255,255,255,.4)" }}>
-          User and visitor complaints, suggestions, and bug reports.
+          {scopeMeta.subtitle}
         </p>
       </div>
 
@@ -119,7 +166,8 @@ export default function AdminFeedbackPage() {
         ))}
       </div>
 
-      {/* Type breakdown */}
+      {/* Type breakdown — nothing to break down once the page is one type. */}
+      {!scope && (
       <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginBottom: 24 }}>
         {byType.map((t: any) => (
           <div key={t.type} style={{ padding: "6px 14px", borderRadius: 20, background: `${TYPE_COLORS[t.type] || "#818cf8"}15`, border: `1px solid ${TYPE_COLORS[t.type] || "#818cf8"}30`, fontSize: 12, fontWeight: 700, color: TYPE_COLORS[t.type] || "#818cf8" }}>
@@ -127,6 +175,7 @@ export default function AdminFeedbackPage() {
           </div>
         ))}
       </div>
+      )}
 
       {/* Filters */}
       <div style={{ display: "flex", gap: 10, marginBottom: 20, flexWrap: "wrap" }}>
