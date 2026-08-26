@@ -60,18 +60,13 @@ export async function GET(req: NextRequest) {
       });
       if (!inv) return NextResponse.json({ error: "Not found" }, { status: 404 });
       
+      // Spread rather than listed. A hand-written list of fields stops being
+      // complete the next time a column is added, and the way it fails is by
+      // quietly emptying that column on the next edit: the form is given no
+      // shipping charge, so it holds none, so it saves none.
       return NextResponse.json({
-        id: inv.id,
-        invoiceNo: inv.invoiceNo,
-        customerId: inv.customerId,
+        ...inv,
         customerName: inv.customer?.name || "Unknown",
-        date: inv.date,
-        total: inv.total,
-        items: inv.items,
-        customer: inv.customer,
-        driverName: inv.driverName,
-        vehicleNo: inv.vehicleNo,
-        // location removed (not on SalesInvoice)
       });
     }
 
@@ -102,17 +97,11 @@ export async function GET(req: NextRequest) {
       orderBy: { date: "desc" }
     });
 
+    // Same reasoning as the single invoice above: the list is what the edit
+    // form is opened from, so anything missing here is blanked on save.
     const formattedInvoices = invoices.map((inv: SalesInvoiceFull) => ({
-      id: inv.id,
-      invoiceNo: inv.invoiceNo,
-      customerId: inv.customerId,
+      ...inv,
       customerName: inv.customer?.name || "Unknown",
-      date: inv.date,
-      total: inv.total,
-      items: inv.items,
-      customer: inv.customer,
-      driverName: inv.driverName,
-      vehicleNo: inv.vehicleNo,
     }));
 
 
