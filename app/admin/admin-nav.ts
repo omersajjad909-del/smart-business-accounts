@@ -15,12 +15,10 @@ export const ADMIN_NAV_ITEMS: AdminNavItem[] = [
   { id: "users",            label: "Users",             href: "/admin/users",               group: "Main",      short: "US", icon: "users" },
   { id: "subscriptions",    label: "Subscriptions",     href: "/admin/subscriptions",       group: "Main",      short: "SB", icon: "credit-card" },
   { id: "invoices",         label: "Invoices",          href: "/admin/invoices",            group: "Main",      short: "IN", icon: "list", badge: "NEW" },
-  { id: "pk-payments",      label: "PK Payments 🇵🇰",   href: "/admin/pk-payments",         group: "Main",      short: "PK", icon: "credit-card", badge: "PK" },
   { id: "plans",            label: "Plans",             href: "/admin/plans",               group: "Main",      short: "PL", icon: "layers" },
   { id: "business-modules", label: "Modules",           href: "/admin/business-modules",    group: "Main",      short: "BM", icon: "box" },
 
-  // ── BUSINESS (exactly 4 items matching design) ────────────────────────────
-  { id: "products",         label: "Products",          href: "/admin/products",            group: "Business",  short: "PR", icon: "box" },
+  // ── BUSINESS ──────────────────────────────────────────────────────────────
   { id: "tax-rates",        label: "Tax Rates",         href: "/admin/tax-rates",           group: "Business",  short: "TX", icon: "list" },
   { id: "currencies",       label: "Currencies",        href: "/admin/currencies",          group: "Business",  short: "CU", icon: "globe" },
   { id: "payment-methods",  label: "Payment Methods",   href: "/admin/payment-methods",     group: "Business",  short: "PM", icon: "credit-card" },

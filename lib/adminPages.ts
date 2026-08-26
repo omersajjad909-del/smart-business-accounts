@@ -35,7 +35,6 @@ const LEGACY_PAGE_IDS: Record<string, string> = {
   audittrail: "audit-trail",
   backuprestore: "backup-restore",
   websettings: "web-settings",
-  pkpayments: "pk-payments",
 };
 
 /** Canonicalise a stored `allowedPages` list to current nav ids. */
@@ -75,7 +74,6 @@ const API_PATH_TO_PAGE: Array<[string, string]> = [
   ["/api/admin/subscriptions", "subscriptions"],
   ["/api/admin/billing", "subscriptions"],
   ["/api/admin/invoices", "invoices"],
-  ["/api/admin/pk-payments", "pk-payments"],
   ["/api/admin/pkr-plan-config", "plans"],
   ["/api/admin/plan-config", "plans"],
   ["/api/admin/custom-plans", "plans"],
@@ -84,7 +82,6 @@ const API_PATH_TO_PAGE: Array<[string, string]> = [
   ["/api/admin/business-plan-modules", "business-modules"],
   ["/api/admin/business-modules", "business-modules"],
   ["/api/admin/module-prices", "business-modules"],
-  ["/api/admin/product-categories", "products"],
   ["/api/admin/platform-currencies", "currencies"],
   ["/api/admin/payment-gateways", "payment-methods"],
   ["/api/admin/lemonsqueezy", "payment-methods"],
