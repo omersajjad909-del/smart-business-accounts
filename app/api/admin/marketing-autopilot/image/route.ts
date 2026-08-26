@@ -55,18 +55,21 @@ Requirements:
 
 Write ONLY the image prompt, nothing else. Keep it under 150 words.`, 400);
 
-    // Step 2 — generate image with DALL-E 3
-    const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
-    const response = await openai.images.generate({
-      model:   MODEL,
-      prompt:  `${imagePrompt}. Professional business marketing graphic, no text or typography, clean composition.`,
-      n:       1,
-      size:    SIZE,
-      quality: QUALITY,
-      style:   "vivid",
-    });
+    // Step 2 — generate the image
+    const client = useAzure ? azure! : new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+    const fullPrompt = `${imagePrompt}. Professional business marketing graphic, no text or typography, clean composition.`;
 
-    const imageUrl = response.data?.[0]?.url;
+    // `quality` and `style` are DALL-E-3 specific. Azure deployments of other
+    // image models reject them outright, so only send them on the direct path.
+    const response = await client.images.generate(
+      useAzure
+        ? { model: azureImageDeployment!, prompt: fullPrompt, n: 1, size: SIZE }
+        : { model: MODEL, prompt: fullPrompt, n: 1, size: SIZE, quality: QUALITY, style: "vivid" },
+    );
+
+    // Azure image models commonly return base64 rather than a hosted URL.
+    const first = response.data?.[0];
+    const imageUrl = first?.url || (first?.b64_json ? `data:image/png;base64,${first.b64_json}` : undefined);
     if (!imageUrl) return NextResponse.json({ error: "Image generation failed" }, { status: 500 });
 
     return NextResponse.json({
