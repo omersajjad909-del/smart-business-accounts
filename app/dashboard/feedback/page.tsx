@@ -67,6 +67,8 @@ const STATUS_META: Record<string, { label: string; color: string }> = {
 type HistoryItem = {
   id: string; type: string; subject: string;
   status: string; priority: string; createdAt: string;
+  // Carried so a submission can be reopened in the form it was written in.
+  message?: string; role?: string | null; module?: string | null;
   rating?: number | null; publishConsent?: boolean; testimonialId?: string | null;
 };
 
@@ -93,6 +95,8 @@ export default function FeedbackPage() {
   const [rating,   setRating]   = useState(0);
   const [hoverStar, setHoverStar] = useState(0);
   const [publishConsent, setPublishConsent] = useState(false);
+  /** Id of the submission being corrected. Null while writing a new one. */
+  const [editingId, setEditingId] = useState<string | null>(null);
   // Job title shown beside the name if this review is ever published.
   const [role,     setRole]     = useState("");
   const [priority, setPriority] = useState("normal");
@@ -157,6 +161,35 @@ export default function FeedbackPage() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [done]);
 
+  /**
+   * Reopens a submission in the form it was written in.
+   *
+   * Consent is why this is here. The publish box is off by default, and a
+   * review written without it could not be published and could not be fixed —
+   * the only way to give permission was to write the whole review again.
+   */
+  function startEditing(item: HistoryItem) {
+    setEditingId(item.id);
+    setFbType(item.type as FeedbackType);
+    setSubject(item.subject || "");
+    setMessage(item.message || "");
+    setRating(item.rating || 0);
+    setPublishConsent(item.publishConsent === true);
+    setRole(item.role || "");
+    setModule(item.module || "");
+    setPriority(item.priority || "normal");
+    setDone(null);
+    setError("");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  function cancelEditing() {
+    setEditingId(null);
+    setSubject(""); setMessage(""); setRating(0);
+    setPublishConsent(false); setRole(""); setModule(""); setPriority("normal");
+    setError("");
+  }
+
   async function submit() {
     if (subjectRequired && !subject.trim()) { setError("Please enter a subject."); return; }
     // A rating must never travel on its own — the written review is what makes
@@ -170,10 +203,15 @@ export default function FeedbackPage() {
     if (ratingApplies && rating === 0) { setError("Please pick a star rating from 1 to 5."); return; }
     setSub(true); setError("");
     try {
+      // An edit changes only what the writer wrote. Type is not among them:
+      // a review and a complaint are read by different people and counted in
+      // different places, and switching one into the other after the fact would
+      // move it out from under whoever is already handling it.
       const res = await fetch("/api/public/feedback", {
-        method: "POST",
+        method: editingId ? "PATCH" : "POST",
         headers: getHeaders(),
         body: JSON.stringify({
+          id: editingId || undefined,
           type: fbType,
           subject: subject.trim() || derivedSubject(),
           message: message.trim(),
@@ -188,8 +226,10 @@ export default function FeedbackPage() {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Failed");
-      setDone({ id: data.id });
+      setDone({ id: data.id || editingId });
+      setEditingId(null);
       setSubject(""); setMessage(""); setPriority("normal"); setModule(""); setRating(0); setPublishConsent(false); setRole("");
+      loadHistory();
     } catch (e: any) {
       setError(e.message);
     } finally { setSub(false); }
@@ -639,6 +679,19 @@ export default function FeedbackPage() {
                     </span>
                     <span style={badge(s.color)}>{s.label}</span>
                     {review && <span style={badge(review.color)}>{review.label}</span>}
+                    {/* Not offered once it is on the public site — at that point
+                        the words are published and changing them underneath is
+                        the team's call, not a quiet edit. */}
+                    {!item.testimonialId && (
+                      <button
+                        onClick={() => startEditing(item)}
+                        style={{
+                          ...badge("#818cf8"), cursor: "pointer", fontFamily: "inherit",
+                        }}
+                      >
+                        ✎ Edit
+                      </button>
+                    )}
                   </div>
                 </div>
               );
