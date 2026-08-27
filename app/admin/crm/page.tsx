@@ -64,6 +64,7 @@ const STATUS_BG: Record<string, string> = {
   converted: "rgba(52,211,153,.18)",
   lost: "rgba(248,113,113,.18)",
 };
+const PRIORITIES = ["low", "medium", "high"] as const;
 const PRIORITY_COLORS: Record<string, string> = { low: "#6ee7b7", medium: "#fbbf24", high: "#f87171" };
 
 function adminHeaders(json = false) {
@@ -109,6 +110,11 @@ export default function AdminCrmPage() {
   const [source, setSource] = useState("all");
   const [country, setCountry] = useState("all");
   const [facets, setFacets] = useState<Facets>({ sources: [], countries: [] });
+  /** Unsaved note text, per lead id. Absent once the server has it. */
+  const [noteDrafts, setNoteDrafts] = useState<Record<string, string>>({});
+  const [noteState, setNoteState] = useState<Record<string, "saving" | "saved" | "error">>({});
+  /** Per-card save failures, so a rejected edit is never silent. */
+  const [rowError, setRowError] = useState<Record<string, string>>({});
   const [form, setForm] = useState({
     name: "",
     email: "",
@@ -164,15 +170,81 @@ export default function AdminCrmPage() {
     Promise.all([loadVisitors(), loadLeads()]).finally(() => setLoading(false));
   }, [ready, loadVisitors, loadLeads]);
 
-  async function patchLead(id: string, patch: Record<string, unknown>) {
-    const response = await fetch("/api/admin/leads", {
-      method: "PATCH",
-      headers: adminHeaders(true),
-      body: JSON.stringify({ id, ...patch }),
-    });
-    if (!response.ok) return;
-    const data = await response.json();
-    setLeads((current) => current.map((lead) => (lead.id === id ? data.lead : lead)));
+  /**
+   * Update one field on one lead.
+   *
+   * This used to swallow every failure — `if (!response.ok) return`. A note
+   * typed into a card and rejected by the server looked exactly like a note
+   * that saved: the text stayed on screen because the textarea was
+   * uncontrolled, and it was gone on the next reload. Failures are now
+   * returned to the caller and shown on the card.
+   */
+  async function patchLead(id: string, patch: Record<string, unknown>): Promise<boolean> {
+    try {
+      const response = await fetch("/api/admin/leads", {
+        method: "PATCH",
+        headers: adminHeaders(true),
+        body: JSON.stringify({ id, ...patch }),
+      });
+      if (!response.ok) {
+        const problem = await response.json().catch(() => null);
+        setRowError((current) => ({ ...current, [id]: problem?.error || `Could not save (${response.status})` }));
+        return false;
+      }
+      const data = await response.json();
+      setLeads((current) => current.map((lead) => (lead.id === id ? data.lead : lead)));
+      setRowError((current) => {
+        const next = { ...current };
+        delete next[id];
+        return next;
+      });
+      return true;
+    } catch (error) {
+      setRowError((current) => ({
+        ...current,
+        [id]: error instanceof Error ? error.message : "Could not reach the server",
+      }));
+      return false;
+    }
+  }
+
+  /**
+   * Save the note on a card.
+   *
+   * Kept separate from `patchLead` so the textarea can show what happened. The
+   * draft is held locally while typing and dropped once the server confirms,
+   * so the field always falls back to what is actually stored.
+   */
+  async function saveNote(id: string) {
+    const draft = noteDrafts[id];
+    if (draft === undefined) return;
+    const stored = leads.find((lead) => lead.id === id)?.notes || "";
+    if (draft === stored) {
+      setNoteDrafts((current) => {
+        const next = { ...current };
+        delete next[id];
+        return next;
+      });
+      return;
+    }
+
+    setNoteState((current) => ({ ...current, [id]: "saving" }));
+    const ok = await patchLead(id, { notes: draft });
+    setNoteState((current) => ({ ...current, [id]: ok ? "saved" : "error" }));
+    if (ok) {
+      setNoteDrafts((current) => {
+        const next = { ...current };
+        delete next[id];
+        return next;
+      });
+      setTimeout(() => {
+        setNoteState((current) => {
+          const next = { ...current };
+          delete next[id];
+          return next;
+        });
+      }, 2000);
+    }
   }
 
   async function removeLead(id: string) {
@@ -410,7 +482,74 @@ export default function AdminCrmPage() {
                       </button>
                     ))}
                   </div>
-                  <textarea defaultValue={lead.notes || ""} placeholder="Notes..." onBlur={(e) => patchLead(lead.id, { notes: e.currentTarget.value })} style={{ width: "100%", minHeight: 70, padding: "10px 12px", borderRadius: 10, border: "1px solid rgba(255,255,255,.1)", background: "rgba(255,255,255,.05)", color: "white", resize: "vertical", marginBottom: 10 }} />
+                  {/* Priority and the follow-up date used to be set once, at
+                      creation, and never again — so moving a lead up the list
+                      or pushing a call to next week meant deleting it and
+                      typing it in a second time. Both patch in place now. */}
+                  <div style={{ display: "flex", gap: 10, flexWrap: "wrap", alignItems: "flex-end", marginBottom: 10 }}>
+                    <div>
+                      <div style={{ fontSize: 10, fontWeight: 800, color: "rgba(255,255,255,.3)", marginBottom: 4 }}>PRIORITY</div>
+                      <div style={{ display: "flex", gap: 4 }}>
+                        {PRIORITIES.map((item) => (
+                          <button key={item} type="button" onClick={() => patchLead(lead.id, { priority: item })} style={{ fontSize: 10, fontWeight: lead.priority === item ? 800 : 600, padding: "5px 9px", borderRadius: 8, border: "none", cursor: "pointer", textTransform: "capitalize", background: lead.priority === item ? `${PRIORITY_COLORS[item]}22` : "rgba(255,255,255,.05)", color: lead.priority === item ? PRIORITY_COLORS[item] : "rgba(255,255,255,.34)" }}>
+                            {item}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                    <div style={{ flex: 1, minWidth: 150 }}>
+                      <div style={{ fontSize: 10, fontWeight: 800, color: "rgba(255,255,255,.3)", marginBottom: 4 }}>FOLLOW UP</div>
+                      <div style={{ display: "flex", gap: 5, alignItems: "center" }}>
+                        {/* Keyed on the stored value so the field re-renders
+                            after a patch instead of holding the old date. */}
+                        <DateInput
+                          key={`${lead.id}-${lead.followUpAt || "none"}`}
+                          value={toDateValue(lead.followUpAt)}
+                          onChange={(iso) => patchLead(lead.id, { followUpAt: iso })}
+                          style={{ flex: 1, minWidth: 0, padding: "7px 10px", borderRadius: 8, border: "1px solid rgba(255,255,255,.1)", background: "rgba(255,255,255,.05)", color: "white", fontSize: 12 }}
+                        />
+                        {lead.followUpAt ? (
+                          // DateInput only fires on a complete date, so an
+                          // emptied field would never reach the server. Clearing
+                          // needs its own control.
+                          <button type="button" title="Clear the follow-up date" onClick={() => patchLead(lead.id, { followUpAt: null })} style={{ padding: "6px 9px", borderRadius: 8, border: "1px solid rgba(255,255,255,.1)", background: "rgba(255,255,255,.05)", color: "rgba(255,255,255,.4)", fontSize: 12, cursor: "pointer", lineHeight: 1 }}>
+                            ×
+                          </button>
+                        ) : null}
+                      </div>
+                    </div>
+                  </div>
+                  {/* Controlled, not `defaultValue`. An uncontrolled textarea
+                      kept showing text the server had rejected, and never
+                      picked up a value that arrived after it mounted — which
+                      is why saved notes came back blank on reload. */}
+                  <div style={{ marginBottom: 10 }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 4 }}>
+                      <span style={{ fontSize: 10, fontWeight: 800, color: "rgba(255,255,255,.3)" }}>NOTES</span>
+                      <span style={{ fontSize: 10, fontWeight: 700, color: noteState[lead.id] === "error" ? "#f87171" : noteState[lead.id] === "saved" ? "#34d399" : "rgba(255,255,255,.3)" }}>
+                        {noteState[lead.id] === "saving" ? "Saving…"
+                          : noteState[lead.id] === "saved" ? "Saved"
+                          : noteState[lead.id] === "error" ? "Not saved"
+                          : noteDrafts[lead.id] !== undefined ? "Unsaved — click outside to save"
+                          : ""}
+                      </span>
+                    </div>
+                    <textarea
+                      value={noteDrafts[lead.id] ?? (lead.notes || "")}
+                      placeholder="What was said, what they need, what you promised…"
+                      onChange={(e) => {
+                        const text = e.target.value;
+                        setNoteDrafts((current) => ({ ...current, [lead.id]: text }));
+                      }}
+                      onBlur={() => saveNote(lead.id)}
+                      style={{ width: "100%", minHeight: 70, padding: "10px 12px", borderRadius: 10, border: `1px solid ${noteState[lead.id] === "error" ? "rgba(248,113,113,.45)" : "rgba(255,255,255,.1)"}`, background: "rgba(255,255,255,.05)", color: "white", resize: "vertical" }}
+                    />
+                  </div>
+                  {rowError[lead.id] ? (
+                    <div style={{ fontSize: 11, color: "#fca5a5", background: "rgba(248,113,113,.08)", border: "1px solid rgba(248,113,113,.28)", borderRadius: 9, padding: "8px 11px", marginBottom: 10, lineHeight: 1.55 }}>
+                      {rowError[lead.id]}
+                    </div>
+                  ) : null}
                   <div style={{ display: "flex", justifyContent: "space-between", gap: 8 }}>
                     <span style={{ fontSize: 11, color: "rgba(255,255,255,.3)" }}>{fmtDate(lead.createdAt)}</span>
                     <button type="button" onClick={() => removeLead(lead.id)} style={{ padding: "5px 10px", borderRadius: 8, border: "1px solid rgba(248,113,113,.25)", background: "rgba(248,113,113,.08)", color: "#f87171", fontSize: 11, fontWeight: 700, cursor: "pointer" }}>
