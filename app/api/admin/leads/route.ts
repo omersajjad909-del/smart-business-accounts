@@ -94,15 +94,28 @@ export async function POST(req: NextRequest) {
       status,
     } = body;
 
-    if (!name || !email) {
-      return NextResponse.json({ error: "name and email required" }, { status: 400 });
+    // A name plus at least one way to reach them. Email used to be mandatory,
+    // which quietly excluded the leads this page exists for: a trader met at a
+    // market gives a phone number and nothing else. A lead with no contact
+    // detail at all is still refused — that is a note, not a lead.
+    const cleanEmail = email ? String(email).trim().toLowerCase() : "";
+    const cleanPhone = phone ? String(phone).trim() : "";
+
+    if (!name || !String(name).trim()) {
+      return NextResponse.json({ error: "name is required" }, { status: 400 });
+    }
+    if (!cleanEmail && !cleanPhone) {
+      return NextResponse.json(
+        { error: "Give an email or a phone number — at least one way to reach them" },
+        { status: 400 },
+      );
     }
 
     const lead = await db.lead.create({
       data: {
         name: String(name).trim(),
-        email: String(email).trim().toLowerCase(),
-        phone: phone?.trim() || null,
+        email: cleanEmail || null,
+        phone: cleanPhone || null,
         company: company?.trim() || null,
         message: message?.trim() || null,
         source: source?.trim() || "manual",
