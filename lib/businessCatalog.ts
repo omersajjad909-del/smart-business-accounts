@@ -92,6 +92,49 @@ export const DEMO_BUSINESSES: DemoBusiness[] = [
     sampleDocs: ["Quotation", "Sales Invoice", "Delivery Challan", "Customer Statement", "Purchase Order"],
   },
   {
+    id: "manufacturing",
+    liveBusinessType: "manufacturing",
+    demoAvailable: true,
+    icon: "🏭",
+    label: "Manufacturing",
+    category: "Production",
+    tagline: "Know what every unit costs you to make.",
+    description:
+      "For factories, furniture and steel works, garments units and any workshop that turns raw material into finished goods.",
+    color: "#f59e0b",
+    gradient: "linear-gradient(135deg,#d97706,#f59e0b)",
+    modules: ["Bill of Materials", "Production Orders", "Work Orders", "Raw Material Stock", "Finished Goods", "Quality Checks", "WIP Accounting", "Cost Reports"],
+    workflow: [
+      { step: "Buy raw material", detail: "Purchase invoice adds it to stock at real cost" },
+      { step: "Build the BOM", detail: "Pick the product and exactly what one batch consumes" },
+      { step: "Raise a production order", detail: "Quantity, planned date, assigned team" },
+      { step: "Record production", detail: "See the costed preview, then confirm — material leaves stock, finished goods arrive" },
+      { step: "Sell it", detail: "Finished goods invoice out of the same stock, margin already known" },
+    ],
+    insights: [
+      "Per-unit cost calculated from live material rates, not typed in",
+      "Work In Progress and Finished Goods balances move on every run",
+      "Shortages caught before the run, with the exact quantity missing",
+      "Batch numbers link finished goods back to the order that made them",
+    ],
+    aiFeatures: [
+      "Material shortage warnings before a run is committed",
+      "Cost drift alerts when a material's average price moves",
+      "Production output and yield summaries",
+    ],
+    proof: [
+      "Material issue and finished goods receipt post to the ledger automatically",
+      "Dr Work In Progress → Cr Raw Material Stock, then Dr Finished Goods → Cr WIP",
+      "Stock and accounts always agree — one transaction, both sides",
+    ],
+    highlights: [
+      { label: "Per-unit cost", value: "Live", sub: "from real material rates" },
+      { label: "WIP posting", value: "Automatic", sub: "on every completed run" },
+      { label: "Shortage check", value: "Before commit", sub: "with exact quantities" },
+    ],
+    sampleDocs: ["Bill of Materials", "Production Order", "Material Issue Note", "Finished Goods Batch", "Production Cost Sheet"],
+  },
+  {
     // Wholesale has its own seeded sandbox now (dealer network, bulk cartons),
     // so it no longer piggy-backs on the trading workspace.
     id: "wholesale",
@@ -258,50 +301,7 @@ export const DEMO_BUSINESSES: DemoBusiness[] = [
     ],
     sampleDocs: ["Job File", "Clearance Invoice", "Port Charges Sheet", "Client Statement", "Delivery Order"],
   },
-  {
-    id: "manufacturing",
-    liveBusinessType: "manufacturing",
-    demoAvailable: true,
-    icon: "🏭",
-    label: "Manufacturing",
-    category: "Production",
-    tagline: "Know what every unit costs you to make.",
-    description:
-      "For factories, furniture and steel works, garments units and any workshop that turns raw material into finished goods.",
-    color: "#f59e0b",
-    gradient: "linear-gradient(135deg,#d97706,#f59e0b)",
-    modules: ["Bill of Materials", "Production Orders", "Work Orders", "Raw Material Stock", "Finished Goods", "Quality Checks", "WIP Accounting", "Cost Reports"],
-    workflow: [
-      { step: "Buy raw material", detail: "Purchase invoice adds it to stock at real cost" },
-      { step: "Build the BOM", detail: "Pick the product and exactly what one batch consumes" },
-      { step: "Raise a production order", detail: "Quantity, planned date, assigned team" },
-      { step: "Record production", detail: "See the costed preview, then confirm — material leaves stock, finished goods arrive" },
-      { step: "Sell it", detail: "Finished goods invoice out of the same stock, margin already known" },
-    ],
-    insights: [
-      "Per-unit cost calculated from live material rates, not typed in",
-      "Work In Progress and Finished Goods balances move on every run",
-      "Shortages caught before the run, with the exact quantity missing",
-      "Batch numbers link finished goods back to the order that made them",
-    ],
-    aiFeatures: [
-      "Material shortage warnings before a run is committed",
-      "Cost drift alerts when a material's average price moves",
-      "Production output and yield summaries",
-    ],
-    proof: [
-      "Material issue and finished goods receipt post to the ledger automatically",
-      "Dr Work In Progress → Cr Raw Material Stock, then Dr Finished Goods → Cr WIP",
-      "Stock and accounts always agree — one transaction, both sides",
-    ],
-    highlights: [
-      { label: "Per-unit cost", value: "Live", sub: "from real material rates" },
-      { label: "WIP posting", value: "Automatic", sub: "on every completed run" },
-      { label: "Shortage check", value: "Before commit", sub: "with exact quantities" },
-    ],
-    sampleDocs: ["Bill of Materials", "Production Order", "Material Issue Note", "Finished Goods Batch", "Production Cost Sheet"],
-  },
-];
+  ];
 
 // ── Helpers the public surfaces use ─────────────────────────────────────────
 
