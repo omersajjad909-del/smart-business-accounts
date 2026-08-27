@@ -141,14 +141,7 @@ export default function ChurnRadarPage() {
                   <div key={c.companyId} className="ai-row" style={{
                     borderTop: i === 0 ? "none" : "1px solid rgba(255,255,255,.05)",
                   }}>
-                    <div
-                      onClick={() => setOpen(isOpen ? null : c.companyId)}
-                      style={{
-                        display: "grid",
-                        gridTemplateColumns: "minmax(160px,2fr) 92px 92px 140px auto",
-                        gap: 14, alignItems: "center", padding: "14px 20px", cursor: "pointer",
-                      }}
-                    >
+                    <div className="ai-listrow" onClick={() => setOpen(isOpen ? null : c.companyId)}>
                       <div style={{ minWidth: 0 }}>
                         <div style={{ fontSize: 13.5, fontWeight: 700, color: "#f8fafc", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                           {c.name}

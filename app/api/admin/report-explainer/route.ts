@@ -148,7 +148,9 @@ function slice(report: ReportId, c: FinancialContext): string {
       lines.push(...pl(), ``, ...rec(), ``, ...pay(), ``, ...inv());
   }
 
-  return lines.filter((l) => l !== undefined).join("\n");
+  // Blank strings are deliberate paragraph breaks in the fact sheet, so nothing
+  // is filtered out here.
+  return lines.join("\n");
 }
 
 export async function GET(req: NextRequest) {

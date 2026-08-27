@@ -151,7 +151,7 @@ export default function MigrationWizardPage() {
           }}
         />
 
-        <div style={{ display: "grid", gridTemplateColumns: "minmax(0,1fr) minmax(0,1.4fr)", gap: 12, marginTop: 14 }}>
+        <div className="ai-two" style={{ marginTop: 14 }}>
           <div>
             <div style={{ fontSize: 11, fontWeight: 800, color: "rgba(255,255,255,.35)", marginBottom: 6 }}>
               WHAT IS THIS FILE? (OPTIONAL)

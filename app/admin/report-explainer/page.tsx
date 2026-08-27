@@ -186,7 +186,7 @@ export default function ReportExplainerPage() {
       {busy ? <Loading label="Reading the numbers…" /> : null}
 
       {result ? (
-        <div style={{ display: "grid", gridTemplateColumns: "minmax(0,1.15fr) minmax(0,1fr)", gap: 18, alignItems: "start" }}>
+        <div className="ai-split">
           <Section
             title={`${chosen?.name || "Customer"} — ${activeReport?.name || result.report}`}
             right={<CopyButton text={result.explanation} />}

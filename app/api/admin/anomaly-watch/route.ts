@@ -115,10 +115,12 @@ async function runChecks(companyIds: string[], names: Map<string, string>): Prom
 
   /* ── duplicate invoice numbers ───────────────────────────────────────── */
   try {
+    // `invoiceNo` has to appear in `_count` as well as in `having` — Prisma
+    // rejects a having filter on a field it was not asked to count.
     const dupes = await db.salesInvoice.groupBy({
       by: ["companyId", "invoiceNo"],
       where: { ...scope, deletedAt: null },
-      _count: { _all: true },
+      _count: { invoiceNo: true },
       having: { invoiceNo: { _count: { gt: 1 } } },
     });
     for (const d of dupes.slice(0, 200)) {
@@ -128,7 +130,7 @@ async function runChecks(companyIds: string[], names: Map<string, string>): Prom
         companyId: d.companyId,
         companyName: nameOf(d.companyId),
         reference: d.invoiceNo,
-        detail: `${d._count._all} invoices share this number`,
+        detail: `${d._count.invoiceNo} invoices share this number`,
         date: null,
       });
     }
@@ -141,7 +143,7 @@ async function runChecks(companyIds: string[], names: Map<string, string>): Prom
     const dupes = await db.account.groupBy({
       by: ["companyId", "code"],
       where: { ...scope, deletedAt: null },
-      _count: { _all: true },
+      _count: { code: true },
       having: { code: { _count: { gt: 1 } } },
     });
     for (const d of dupes.slice(0, 200)) {
@@ -151,7 +153,7 @@ async function runChecks(companyIds: string[], names: Map<string, string>): Prom
         companyId: d.companyId,
         companyName: nameOf(d.companyId),
         reference: d.code,
-        detail: `${d._count._all} accounts share this code`,
+        detail: `${d._count.code} accounts share this code`,
         date: null,
       });
     }

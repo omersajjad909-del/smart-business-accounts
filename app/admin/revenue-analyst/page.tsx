@@ -136,7 +136,7 @@ export default function RevenueAnalystPage() {
             </div>
           ) : null}
 
-          <div style={{ display: "grid", gridTemplateColumns: "minmax(0,1.1fr) minmax(0,1fr)", gap: 18, alignItems: "start" }}>
+          <div className="ai-split">
             {/* ── conversation ── */}
             <div style={{ ...card, display: "flex", flexDirection: "column", minHeight: 460 }}>
               <div style={{ fontSize: 15, fontWeight: 800, marginBottom: 16, color: "#f8fafc" }}>

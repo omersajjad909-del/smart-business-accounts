@@ -59,6 +59,47 @@ export const aiKitCss = `
   input::placeholder, textarea::placeholder { color: rgba(255,255,255,.25); }
   .ai-row:hover { background: rgba(255,255,255,.03); }
   @keyframes ai-spin { to { transform: rotate(360deg); } }
+
+  /* Two-column layouts (an answer beside the figures it came from). Inline
+     styles cannot carry a media query, and the admin console is used on a
+     phone, so the split lives here and stacks below 1000px. */
+  .ai-split {
+    display: grid;
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+    gap: 18px;
+    align-items: start;
+  }
+  @media (max-width: 1000px) {
+    .ai-split { grid-template-columns: minmax(0, 1fr); }
+  }
+
+  /* A pair of form fields side by side, stacking on a narrow screen. */
+  .ai-two {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 12px;
+  }
+  @media (max-width: 720px) {
+    .ai-two { grid-template-columns: minmax(0, 1fr); }
+  }
+
+  /* The churn/queue row: name, band, wait, score, chevron. Below 820px the
+     fixed columns no longer fit and the row would scroll the whole page
+     sideways, so it becomes a stack. */
+  .ai-listrow {
+    display: grid;
+    grid-template-columns: minmax(140px, 2fr) 92px 92px 140px auto;
+    gap: 14px;
+    align-items: center;
+    padding: 14px 20px;
+    cursor: pointer;
+  }
+  @media (max-width: 820px) {
+    .ai-listrow {
+      grid-template-columns: minmax(0, 1fr) auto;
+      row-gap: 9px;
+    }
+  }
 `;
 
 /* ── fetch ───────────────────────────────────────────────────────────────── */

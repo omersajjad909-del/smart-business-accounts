@@ -12,7 +12,7 @@
 import { useCallback, useEffect, useState } from "react";
 import {
   Button, CopyButton, Empty, ErrorNote, Loading, PageHeader, Pill, Prose,
-  ReviewNotice, Section, adminApi, aiKitCss, card, fmtDate, getJson,
+  ReviewNotice, Section, adminApi, aiKitCss, fmtDate, getJson,
   inputStyle, pageStyle, postJson,
 } from "@/app/admin/components/AiKit";
 
@@ -133,7 +133,7 @@ export default function SeoEnginePage() {
               style={inputStyle}
             />
           </div>
-          <div style={{ display: "grid", gridTemplateColumns: "minmax(0,1fr) minmax(0,1fr)", gap: 11 }}>
+          <div className="ai-two">
             <div>
               <div style={{ fontSize: 11, fontWeight: 800, color: "rgba(255,255,255,.35)", marginBottom: 6 }}>
                 WHO IS SEARCHING IT (OPTIONAL)

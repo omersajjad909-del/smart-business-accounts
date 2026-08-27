@@ -101,12 +101,14 @@ export default function CompetitorWatchPage() {
       {error ? <ErrorNote onDismiss={() => setError(null)}>{error}</ErrorNote> : null}
 
       <Section title="Check a competitor">
-        <div style={{ display: "grid", gridTemplateColumns: "minmax(0,1fr) minmax(0,2fr) auto", gap: 10, alignItems: "end" }}>
-          <div>
+        <div style={{
+          display: "flex", gap: 10, alignItems: "flex-end", flexWrap: "wrap",
+        }}>
+          <div style={{ flex: "1 1 180px", minWidth: 0 }}>
             <div style={{ fontSize: 11, fontWeight: 800, color: "rgba(255,255,255,.35)", marginBottom: 6 }}>NAME</div>
             <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Xero" style={inputStyle} />
           </div>
-          <div>
+          <div style={{ flex: "2 1 300px", minWidth: 0 }}>
             <div style={{ fontSize: 11, fontWeight: 800, color: "rgba(255,255,255,.35)", marginBottom: 6 }}>PRICING PAGE URL</div>
             <input value={url} onChange={(e) => setUrl(e.target.value)} placeholder="https://www.xero.com/pk/pricing-plans/" style={inputStyle} />
           </div>
