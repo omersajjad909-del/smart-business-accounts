@@ -6,7 +6,8 @@ import { getCurrentUser } from "@/lib/auth";
 type Lead = {
   id: string;
   name: string;
-  email: string;
+  /** Null for leads recorded by hand from a call or a market visit. */
+  email?: string | null;
   phone?: string | null;
   company?: string | null;
   source?: string | null;
@@ -15,6 +16,15 @@ type Lead = {
   followUpAt?: string | null;
   createdAt: string;
 };
+
+/** DD-MM-YYYY, the format used everywhere else in the product. */
+function fmtDate(value?: string | null) {
+  if (!value) return "-";
+  const d = new Date(value);
+  if (Number.isNaN(d.getTime())) return "-";
+  const p = (n: number) => String(n).padStart(2, "0");
+  return `${p(d.getDate())}-${p(d.getMonth() + 1)}-${d.getFullYear()}`;
+}
 
 type LeadSummary = {
   total: number;
@@ -134,13 +144,15 @@ export default function AdminLeadsPage() {
                   <tr key={lead.id}>
                     <td>
                       <strong>{lead.name}</strong>
-                      <span>{lead.email}</span>
+                      <span>{lead.email || lead.phone || "No contact detail"}</span>
                     </td>
                     <td>{lead.company || "-"}</td>
                     <td>{lead.source || "manual"}</td>
                     <td><Badge tone={lead.priority === "high" ? "orange" : lead.priority === "low" ? "blue" : "purple"}>{lead.priority || "medium"}</Badge></td>
                     <td><Badge tone={lead.status === "converted" ? "green" : lead.status === "lost" ? "slate" : "purple"}>{lead.status || "new"}</Badge></td>
-                    <td>{lead.followUpAt ? new Date(lead.followUpAt).toLocaleDateString("en-US") : "-"}</td>
+                    {/* en-US rendered this as 8/27/2026. Everything else in the
+                        product shows DD-MM-YYYY. */}
+                    <td>{lead.followUpAt ? fmtDate(lead.followUpAt) : "-"}</td>
                   </tr>
                 ))}
               </tbody>
