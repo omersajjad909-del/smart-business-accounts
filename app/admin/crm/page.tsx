@@ -83,6 +83,7 @@ export default function AdminCrmPage() {
   const [status, setStatus] = useState("all");
   const [showForm, setShowForm] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [formError, setFormError] = useState<string | null>(null);
   const [form, setForm] = useState({
     name: "",
     email: "",
@@ -158,13 +159,20 @@ export default function AdminCrmPage() {
   async function createLead(event: React.FormEvent) {
     event.preventDefault();
     setSaving(true);
+    setFormError(null);
     try {
       const response = await fetch("/api/admin/leads", {
         method: "POST",
         headers: adminHeaders(true),
         body: JSON.stringify({ ...form, followUpAt: form.followUpAt || null }),
       });
-      if (!response.ok) return;
+      if (!response.ok) {
+        // This used to `return` in silence, so a rejected lead looked exactly
+        // like a saved one — you closed the form and it was simply gone.
+        const problem = await response.json().catch(() => null);
+        setFormError(problem?.error || `Could not save (${response.status})`);
+        return;
+      }
       const data = await response.json();
       setLeads((current) => [data.lead, ...current]);
       setShowForm(false);
@@ -187,6 +195,11 @@ export default function AdminCrmPage() {
     }),
     [leads],
   );
+
+  // The same rule the API enforces on POST: a name, and at least one contact
+  // detail. Email alone used to be mandatory, which made this form useless for
+  // anyone met in person.
+  const canSubmit = Boolean(form.name.trim() && (form.email.trim() || form.phone.trim()));
 
   if (!ready) return null;
 
@@ -442,7 +455,18 @@ export default function AdminCrmPage() {
                     which is what the API already expects. */}
                 <DateInput value={form.followUpAt} onChange={(iso) => setForm((current) => ({ ...current, followUpAt: iso }))} style={{ width: "100%", padding: "10px 12px", borderRadius: 10, border: "1px solid rgba(255,255,255,.1)", background: "rgba(255,255,255,.05)", color: "white" }} />
               </div>
-              <button type="submit" disabled={saving || !form.name.trim() || !form.email.trim()} style={{ padding: "11px 14px", borderRadius: 10, border: "none", background: "linear-gradient(135deg,#4f46e5,#7c3aed)", color: "white", fontSize: 13, fontWeight: 800, cursor: "pointer", opacity: saving || !form.name.trim() || !form.email.trim() ? 0.55 : 1 }}>
+              {formError ? (
+                <div style={{ fontSize: 12, color: "#fca5a5", background: "rgba(248,113,113,.08)", border: "1px solid rgba(248,113,113,.3)", borderRadius: 10, padding: "10px 13px", lineHeight: 1.6 }}>
+                  {formError}
+                </div>
+              ) : null}
+              {/* Mirrors the server rule exactly: a name, and one way to reach
+                  them. A disabled button that disagrees with the API is worse
+                  than no validation at all. */}
+              <div style={{ fontSize: 11, color: canSubmit ? "rgba(255,255,255,.3)" : "rgba(251,191,36,.75)", lineHeight: 1.6 }}>
+                {canSubmit ? "Ready to save." : "Needs a name, plus an email or a phone number."}
+              </div>
+              <button type="submit" disabled={saving || !canSubmit} style={{ padding: "11px 14px", borderRadius: 10, border: "none", background: "linear-gradient(135deg,#4f46e5,#7c3aed)", color: "white", fontSize: 13, fontWeight: 800, cursor: saving || !canSubmit ? "not-allowed" : "pointer", opacity: saving || !canSubmit ? 0.55 : 1 }}>
                 {saving ? "Saving..." : "Create Lead"}
               </button>
             </form>
