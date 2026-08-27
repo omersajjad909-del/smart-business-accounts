@@ -256,7 +256,9 @@ async function runChecks(companyIds: string[], names: Map<string, string>): Prom
         where: { id: { in: negative.map((n: any) => n.itemId) } },
         select: { id: true, code: true, name: true },
       });
-      const itemOf = new Map(items.map((i: any) => [i.id, i]));
+      const itemOf = new Map<string, { id: string; code: string; name: string }>(
+        items.map((i: any) => [i.id as string, i]),
+      );
       for (const n of negative) {
         const item = itemOf.get(n.itemId);
         out.push({
