@@ -7,7 +7,9 @@ import DateInput from "@/app/dashboard/reports/_components/DateInput";
 type Lead = {
   id: string;
   name: string;
-  email: string;
+  /** Null for anyone recorded from a market visit or a call — see the POST
+   *  handler: a lead needs a name plus an email OR a phone, not both. */
+  email?: string | null;
   phone?: string | null;
   company?: string | null;
   message?: string | null;
@@ -336,7 +338,11 @@ export default function AdminCrmPage() {
                   <div style={{ display: "flex", justifyContent: "space-between", gap: 12, marginBottom: 10 }}>
                     <div>
                       <div style={{ fontSize: 15, fontWeight: 800, color: "white" }}>{lead.name}</div>
-                      <div style={{ fontSize: 12, color: "rgba(255,255,255,.52)", marginTop: 3 }}>{lead.email}</div>
+                      {/* Whichever contact detail exists. A lead from a market
+                          visit has a phone and no email, and a blank line here
+                          would read as missing data rather than as a phone
+                          number sitting one row down. */}
+                      <div style={{ fontSize: 12, color: "rgba(255,255,255,.52)", marginTop: 3 }}>{lead.email || lead.phone || "No contact detail"}</div>
                       {lead.company ? <div style={{ fontSize: 11, color: "rgba(255,255,255,.34)", marginTop: 4 }}>Company: {lead.company}</div> : null}
                     </div>
                     <div style={{ display: "flex", flexDirection: "column", gap: 6, alignItems: "flex-end" }}>
