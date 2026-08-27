@@ -388,9 +388,9 @@ export default function AdminCrmPage() {
                 </div>
                 <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                   {pipeline[item].map((lead) => (
-                    <div key={lead.id} onClick={() => { setTab("leads"); setSearch(lead.email); }} style={{ borderRadius: 12, padding: "10px 12px", background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.08)", cursor: "pointer" }}>
+                    <div key={lead.id} onClick={() => { setTab("leads"); setSearch(lead.email || lead.phone || lead.name); }} style={{ borderRadius: 12, padding: "10px 12px", background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.08)", cursor: "pointer" }}>
                       <div style={{ fontSize: 12, fontWeight: 800, color: "white" }}>{lead.name}</div>
-                      <div style={{ fontSize: 11, color: "rgba(255,255,255,.42)", marginTop: 2 }}>{lead.company || lead.email}</div>
+                      <div style={{ fontSize: 11, color: "rgba(255,255,255,.42)", marginTop: 2 }}>{lead.company || lead.email || lead.phone}</div>
                       <div style={{ display: "flex", justifyContent: "space-between", gap: 8, marginTop: 8 }}>
                         <span style={{ fontSize: 10, color: PRIORITY_COLORS[lead.priority] || "#fbbf24", fontWeight: 800 }}>{lead.priority}</span>
                         <span style={{ fontSize: 10, color: "rgba(255,255,255,.28)" }}>{lead.source || "lead"}</span>
