@@ -85,6 +85,20 @@ function toDateValue(value?: string | null): string {
   return value ? String(value).slice(0, 10) : "";
 }
 
+/**
+ * What the notes box shows before anyone has written a note.
+ *
+ * `message` is what the lead arrived with — the line typed when they were added,
+ * or the text a waitlist signup generated. `notes` is the running log of what
+ * has been said since. Leaving the log blank when the card already carries a
+ * sentence meant retyping it before you could add to it, so the message seeds
+ * the box instead. It is only a starting point: nothing is written to the notes
+ * column until the box is edited and left.
+ */
+function noteSeed(lead: Lead): string {
+  return lead.notes || lead.message || "";
+}
+
 const EMPTY_FORM = {
   name: "", email: "", phone: "", company: "", message: "",
   source: "manual", priority: "medium", assignedTo: "", country: "", followUpAt: "",
@@ -513,7 +527,11 @@ export default function AdminCrmPage() {
                       <span style={{ fontSize: 11, fontWeight: 800, color: PRIORITY_COLORS[lead.priority] || "#fbbf24" }}>{lead.priority}</span>
                     </div>
                   </div>
-                  {lead.message ? <div style={{ fontSize: 12, lineHeight: 1.6, color: "rgba(255,255,255,.45)", background: "rgba(255,255,255,.03)", borderRadius: 10, padding: "10px 12px", marginBottom: 10 }}>{lead.message}</div> : null}
+                  {/* Only worth its own box once the notes below say something
+                      different. While the notes are empty the message is
+                      already sitting in them, and printing it twice on one card
+                      reads as two facts when it is one. */}
+                  {lead.message && lead.notes ? <div style={{ fontSize: 12, lineHeight: 1.6, color: "rgba(255,255,255,.45)", background: "rgba(255,255,255,.03)", borderRadius: 10, padding: "10px 12px", marginBottom: 10 }}>{lead.message}</div> : null}
                   <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 10 }}>
                     {lead.source ? <span style={{ fontSize: 10, padding: "3px 8px", borderRadius: 8, background: "rgba(255,255,255,.06)", color: "rgba(255,255,255,.45)" }}>{lead.source}</span> : null}
                     {lead.country ? <span style={{ fontSize: 10, padding: "3px 8px", borderRadius: 8, background: "rgba(255,255,255,.06)", color: "rgba(255,255,255,.45)" }}>{lead.country}</span> : null}
@@ -576,11 +594,12 @@ export default function AdminCrmPage() {
                           : noteState[lead.id] === "saved" ? "Saved"
                           : noteState[lead.id] === "error" ? "Not saved"
                           : noteDrafts[lead.id] !== undefined ? "Unsaved — click outside to save"
+                          : !lead.notes && lead.message ? "From the message — add to it"
                           : ""}
                       </span>
                     </div>
                     <textarea
-                      value={noteDrafts[lead.id] ?? (lead.notes || "")}
+                      value={noteDrafts[lead.id] ?? noteSeed(lead)}
                       placeholder="What was said, what they need, what you promised…"
                       onChange={(e) => {
                         const text = e.target.value;
