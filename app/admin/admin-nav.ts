@@ -28,10 +28,32 @@ export const ADMIN_NAV_ITEMS: AdminNavItem[] = [
   { id: "audit-trail",      label: "Audit Trail",       href: "/admin/audit-trail",         group: "Analytics", short: "AT", icon: "list" },
   { id: "web",              label: "Web Metrics",       href: "/admin/web",                 group: "Analytics", short: "WB", icon: "monitor" },
 
+  // ── AI ────────────────────────────────────────────────────────────────────
+  // Grouped together rather than filed under the area each one serves. They
+  // share a shape — read the live data, rank it, draft the thing you would have
+  // written by hand — and someone who wants "the AI that helps with X" looks for
+  // the AI, not for X. AI Prospecting moved here from Marketing for the same
+  // reason; its id and route are unchanged, so permissions carry over.
+  { id: "prospecting",         label: "AI Prospecting",     href: "/admin/prospecting",           group: "AI", short: "AP", icon: "target",    badge: "AI" },
+  { id: "migration-wizard",    label: "Migration Wizard",   href: "/admin/migration-wizard",      group: "AI", short: "MW", icon: "box",       badge: "AI" },
+  { id: "support-copilot",     label: "Support Copilot",    href: "/admin/support-copilot",       group: "AI", short: "SC", icon: "message",   badge: "AI" },
+  { id: "churn-radar",         label: "Churn Radar",        href: "/admin/churn-radar",           group: "AI", short: "CR", icon: "pulse",     badge: "AI" },
+  { id: "upgrade-finder",      label: "Upgrade Finder",     href: "/admin/upgrade-finder",        group: "AI", short: "UF", icon: "layers",    badge: "AI" },
+  { id: "demo-watchdog",       label: "Demo Watchdog",      href: "/admin/demo-watchdog",         group: "AI", short: "DW", icon: "target",    badge: "AI" },
+  { id: "onboarding-assistant", label: "Onboarding Assist", href: "/admin/onboarding-assistant",  group: "AI", short: "OA", icon: "spark",     badge: "AI" },
+  { id: "anomaly-watch",       label: "Anomaly Watch",      href: "/admin/anomaly-watch",         group: "AI", short: "AW", icon: "alert",     badge: "AI" },
+  { id: "revenue-analyst",     label: "Revenue Analyst",    href: "/admin/revenue-analyst",       group: "AI", short: "RA", icon: "chart",     badge: "AI" },
+  { id: "report-explainer",    label: "Report Explainer",   href: "/admin/report-explainer",      group: "AI", short: "RE", icon: "list",      badge: "AI" },
+  { id: "feedback-miner",      label: "Feedback Miner",     href: "/admin/feedback-miner",        group: "AI", short: "FM", icon: "message",   badge: "AI" },
+  { id: "objection-library",   label: "Objection Library",  href: "/admin/objection-library",     group: "AI", short: "OL", icon: "briefcase", badge: "AI" },
+  { id: "case-study-generator", label: "Case Studies AI",   href: "/admin/case-study-generator",  group: "AI", short: "CS", icon: "star",      badge: "AI" },
+  { id: "seo-engine",          label: "SEO / GEO Engine",   href: "/admin/seo-engine",            group: "AI", short: "SE", icon: "globe",     badge: "AI" },
+  { id: "competitor-watch",    label: "Competitor Watch",   href: "/admin/competitor-watch",      group: "AI", short: "CW", icon: "monitor",   badge: "AI" },
+  { id: "error-triage",        label: "Error Triage",       href: "/admin/error-triage",          group: "AI", short: "ET", icon: "code",      badge: "AI" },
+
   // ── MARKETING ─────────────────────────────────────────────────────────────
   { id: "crm",              label: "CRM",               href: "/admin/crm",                 group: "Marketing", short: "CR", icon: "briefcase" },
   { id: "leads",            label: "Leads",             href: "/admin/leads",               group: "Marketing", short: "LD", icon: "target" },
-  { id: "prospecting",      label: "AI Prospecting",    href: "/admin/prospecting",         group: "Marketing", short: "AP", icon: "target", badge: "AI" },
   { id: "broadcasts",       label: "Broadcasts",        href: "/admin/broadcasts",          group: "Marketing", short: "BR", icon: "megaphone" },
   { id: "newsletter",       label: "Newsletter",        href: "/admin/newsletter",          group: "Marketing", short: "NL", icon: "mail" },
   { id: "social",           label: "Social",            href: "/admin/social",              group: "Marketing", short: "SO", icon: "share" },
@@ -76,4 +98,4 @@ export const ADMIN_NAV_ITEMS: AdminNavItem[] = [
   { id: "dev-test",         label: "Dev Test",          href: "/admin/dev-test",            group: "Others",    short: "DV", icon: "code",   badge: "DEV" },
 ];
 
-export const ADMIN_NAV_GROUP_ORDER = ["Main", "Analytics", "Marketing", "System", "Others"] as const;
+export const ADMIN_NAV_GROUP_ORDER = ["Main", "AI", "Analytics", "Marketing", "System", "Others"] as const;

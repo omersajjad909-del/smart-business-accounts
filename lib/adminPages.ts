@@ -64,6 +64,28 @@ export const SUPER_ADMIN_ONLY_PAGES = new Set<string>([
  * never silently reachable by a scoped team member.
  */
 const API_PATH_TO_PAGE: Array<[string, string]> = [
+  // ── AI console ──
+  // Each AI page owns exactly one endpoint of the same name, so a team member
+  // granted "Churn Radar" can call the churn endpoint and nothing else. Missing
+  // entries here fail closed to super-admin-only, which would have made every
+  // one of these pages silently dead for scoped admins.
+  ["/api/admin/prospecting", "prospecting"],
+  ["/api/admin/migration-wizard", "migration-wizard"],
+  ["/api/admin/support-copilot", "support-copilot"],
+  ["/api/admin/churn-radar", "churn-radar"],
+  ["/api/admin/upgrade-finder", "upgrade-finder"],
+  ["/api/admin/demo-watchdog", "demo-watchdog"],
+  ["/api/admin/onboarding-assistant", "onboarding-assistant"],
+  ["/api/admin/anomaly-watch", "anomaly-watch"],
+  ["/api/admin/revenue-analyst", "revenue-analyst"],
+  ["/api/admin/report-explainer", "report-explainer"],
+  ["/api/admin/feedback-miner", "feedback-miner"],
+  ["/api/admin/objection-library", "objection-library"],
+  ["/api/admin/case-study-generator", "case-study-generator"],
+  ["/api/admin/seo-engine", "seo-engine"],
+  ["/api/admin/competitor-watch", "competitor-watch"],
+  ["/api/admin/error-triage", "error-triage"],
+
   ["/api/admin/geo/countries", "geo-countries"],
   ["/api/admin/geo", "geo"],
   ["/api/admin/companies", "companies"],
@@ -87,7 +109,6 @@ const API_PATH_TO_PAGE: Array<[string, string]> = [
   ["/api/admin/visitors", "web"],
   ["/api/admin/web", "web"],
   ["/api/admin/leads", "leads"],
-  ["/api/admin/prospecting", "prospecting"],
   ["/api/admin/broadcasts", "broadcasts"],
   ["/api/admin/newsletter", "newsletter"],
   ["/api/admin/social", "social"],
