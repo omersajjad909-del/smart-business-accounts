@@ -1998,9 +1998,14 @@ model SiteVisit {
 // ─── Leads ────────────────────────────────────────────────────────────────────
 
 model Lead {
-  id         String    @id @default(uuid())
-  name       String
-  email      String
+  id   String @id @default(uuid())
+  name String
+  /// Optional since the leads that matter most arrive without one. A trader met
+  /// at a market or an Anjuman session gives a phone number, not an email — and
+  /// a required email meant those could not be recorded at all. The API still
+  /// insists on at least one way to reach the person; see the POST handler in
+  /// app/api/admin/leads/route.ts.
+  email      String?
   phone      String?
   company    String?
   message    String?
