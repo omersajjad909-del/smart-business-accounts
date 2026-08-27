@@ -29,6 +29,7 @@ export async function GET(req: NextRequest) {
     const status = req.nextUrl.searchParams.get("status");
     const priority = req.nextUrl.searchParams.get("priority");
     const source = req.nextUrl.searchParams.get("source");
+    const country = req.nextUrl.searchParams.get("country");
     const q = (req.nextUrl.searchParams.get("q") || "").trim();
     const take = Number(req.nextUrl.searchParams.get("take") || 500);
 
@@ -36,6 +37,10 @@ export async function GET(req: NextRequest) {
     if (status && status !== "all") where.status = status;
     if (priority && priority !== "all") where.priority = priority;
     if (source && source !== "all") where.source = source;
+    // Country matters once outreach runs in more than one market at a time —
+    // a Pakistan follow-up list and a US follow-up list are different days of
+    // work and should not be read as one queue.
+    if (country && country !== "all") where.country = country;
     if (q) {
       where.OR = [
         { name: { contains: q, mode: "insensitive" } },
@@ -63,7 +68,26 @@ export async function GET(req: NextRequest) {
       highPriority: leads.filter((lead: any) => lead.priority === "high").length,
     };
 
-    return NextResponse.json({ leads, summary });
+    // Filter options come from the WHOLE table, not from the filtered result.
+    // Built from the result set instead, choosing "Pakistan" would empty the
+    // country dropdown of every other country and strand you there.
+    const [sourceGroups, countryGroups] = await Promise.all([
+      db.lead.groupBy({ by: ["source"], _count: { _all: true } }).catch(() => []),
+      db.lead.groupBy({ by: ["country"], _count: { _all: true } }).catch(() => []),
+    ]);
+
+    const facets = {
+      sources: sourceGroups
+        .filter((row: any) => row.source)
+        .map((row: any) => ({ value: row.source as string, count: row._count._all as number }))
+        .sort((a: any, b: any) => b.count - a.count),
+      countries: countryGroups
+        .filter((row: any) => row.country)
+        .map((row: any) => ({ value: row.country as string, count: row._count._all as number }))
+        .sort((a: any, b: any) => b.count - a.count),
+    };
+
+    return NextResponse.json({ leads, summary, facets });
   } catch (e: any) {
     return NextResponse.json({ error: e.message }, { status: 500 });
   }

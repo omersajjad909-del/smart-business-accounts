@@ -23,6 +23,12 @@ type Lead = {
   createdAt: string;
 };
 
+/** Filter options, counted across the whole table rather than the current page. */
+type Facets = {
+  sources: Array<{ value: string; count: number }>;
+  countries: Array<{ value: string; count: number }>;
+};
+
 type VisitorStats = {
   totalVisits: number;
   uniqueVisitors: number;
@@ -73,6 +79,20 @@ function fmtDate(value?: string | null) {
   return value ? new Date(value).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" }) : "—";
 }
 
+/** A stored timestamp as the YYYY-MM-DD that DateInput expects. */
+function toDateValue(value?: string | null): string {
+  return value ? String(value).slice(0, 10) : "";
+}
+
+const filterSelect: React.CSSProperties = {
+  padding: "9px 12px",
+  borderRadius: 10,
+  border: "1px solid rgba(255,255,255,.1)",
+  background: "rgba(255,255,255,.05)",
+  color: "white",
+  cursor: "pointer",
+};
+
 export default function AdminCrmPage() {
   const [tab, setTab] = useState<"visitors" | "leads" | "pipeline">("visitors");
   const [ready, setReady] = useState(false);
@@ -86,6 +106,9 @@ export default function AdminCrmPage() {
   const [showForm, setShowForm] = useState(false);
   const [saving, setSaving] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
+  const [source, setSource] = useState("all");
+  const [country, setCountry] = useState("all");
+  const [facets, setFacets] = useState<Facets>({ sources: [], countries: [] });
   const [form, setForm] = useState({
     name: "",
     email: "",
@@ -122,6 +145,8 @@ export default function AdminCrmPage() {
   const loadLeads = useCallback(async () => {
     const params = new URLSearchParams();
     if (status !== "all") params.set("status", status);
+    if (source !== "all") params.set("source", source);
+    if (country !== "all") params.set("country", country);
     if (search.trim()) params.set("q", search.trim());
     const response = await fetch(`/api/admin/leads?${params.toString()}`, { headers: adminHeaders() });
     if (response.status === 403) {
@@ -130,7 +155,8 @@ export default function AdminCrmPage() {
     }
     const data = await response.json();
     setLeads(data.leads || []);
-  }, [search, status]);
+    if (data.facets) setFacets(data.facets);
+  }, [search, status, source, country]);
 
   useEffect(() => {
     if (!ready) return;
@@ -327,10 +353,30 @@ export default function AdminCrmPage() {
             </div>
             <div style={{ display: "flex", gap: 8, marginBottom: 16, flexWrap: "wrap" }}>
               <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search name, email, company, phone" style={{ flex: 1, minWidth: 220, padding: "9px 12px", borderRadius: 10, border: "1px solid rgba(255,255,255,.1)", background: "rgba(255,255,255,.05)", color: "white" }} />
-              <select value={status} onChange={(e) => setStatus(e.target.value)} style={{ padding: "9px 12px", borderRadius: 10, border: "1px solid rgba(255,255,255,.1)", background: "rgba(255,255,255,.05)", color: "white" }}>
+              <select value={status} onChange={(e) => setStatus(e.target.value)} style={filterSelect}>
                 <option value="all">All Status</option>
                 {STATUSES.map((item) => <option key={item} value={item}>{item}</option>)}
               </select>
+              {/* Country and source, counted across the whole table. Running
+                  outreach in two markets at once made one flat list unusable —
+                  a Pakistan call list and a US email list are different days. */}
+              <select value={country} onChange={(e) => setCountry(e.target.value)} style={filterSelect}>
+                <option value="all">All Countries</option>
+                {facets.countries.map((item) => (
+                  <option key={item.value} value={item.value}>{item.value} ({item.count})</option>
+                ))}
+              </select>
+              <select value={source} onChange={(e) => setSource(e.target.value)} style={filterSelect}>
+                <option value="all">All Sources</option>
+                {facets.sources.map((item) => (
+                  <option key={item.value} value={item.value}>{item.value} ({item.count})</option>
+                ))}
+              </select>
+              {status !== "all" || country !== "all" || source !== "all" || search.trim() ? (
+                <button type="button" onClick={() => { setStatus("all"); setCountry("all"); setSource("all"); setSearch(""); }} style={{ padding: "9px 12px", borderRadius: 10, border: "1px solid rgba(255,255,255,.1)", background: "rgba(255,255,255,.05)", color: "rgba(255,255,255,.5)", fontSize: 12, cursor: "pointer" }}>
+                  Clear filters
+                </button>
+              ) : null}
             </div>
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(330px,1fr))", gap: 14 }}>
               {leads.map((lead) => (
