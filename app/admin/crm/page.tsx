@@ -597,9 +597,17 @@ export default function AdminCrmPage() {
                   ) : null}
                   <div style={{ display: "flex", justifyContent: "space-between", gap: 8 }}>
                     <span style={{ fontSize: 11, color: "rgba(255,255,255,.3)" }}>{fmtDate(lead.createdAt)}</span>
-                    <button type="button" onClick={() => removeLead(lead.id)} style={{ padding: "5px 10px", borderRadius: 8, border: "1px solid rgba(248,113,113,.25)", background: "rgba(248,113,113,.08)", color: "#f87171", fontSize: 11, fontWeight: 700, cursor: "pointer" }}>
-                      Delete
-                    </button>
+                    <div style={{ display: "flex", gap: 6 }}>
+                      {/* Everything the card cannot change in place — name, phone,
+                          company, what they said, country. Opens the same modal
+                          the Add button uses, prefilled. */}
+                      <button type="button" onClick={() => openEdit(lead)} style={{ padding: "5px 12px", borderRadius: 8, border: "1px solid rgba(129,140,248,.35)", background: "rgba(99,102,241,.12)", color: "#a5b4fc", fontSize: 11, fontWeight: 700, cursor: "pointer" }}>
+                        Edit
+                      </button>
+                      <button type="button" onClick={() => removeLead(lead.id)} style={{ padding: "5px 10px", borderRadius: 8, border: "1px solid rgba(248,113,113,.25)", background: "rgba(248,113,113,.08)", color: "#f87171", fontSize: 11, fontWeight: 700, cursor: "pointer" }}>
+                        Delete
+                      </button>
+                    </div>
                   </div>
                 </div>
               ))}
