@@ -85,6 +85,11 @@ function toDateValue(value?: string | null): string {
   return value ? String(value).slice(0, 10) : "";
 }
 
+const EMPTY_FORM = {
+  name: "", email: "", phone: "", company: "", message: "",
+  source: "manual", priority: "medium", assignedTo: "", country: "", followUpAt: "",
+};
+
 const filterSelect: React.CSSProperties = {
   padding: "9px 12px",
   borderRadius: 10,
@@ -115,6 +120,8 @@ export default function AdminCrmPage() {
   const [noteState, setNoteState] = useState<Record<string, "saving" | "saved" | "error">>({});
   /** Per-card save failures, so a rejected edit is never silent. */
   const [rowError, setRowError] = useState<Record<string, string>>({});
+  /** Null while adding; the lead id while editing. Same modal either way. */
+  const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState({
     name: "",
     email: "",
@@ -256,15 +263,50 @@ export default function AdminCrmPage() {
     if (response.ok) setLeads((current) => current.filter((lead) => lead.id !== id));
   }
 
-  async function createLead(event: React.FormEvent) {
+  function closeForm() {
+    setShowForm(false);
+    setEditingId(null);
+    setFormError(null);
+    setForm(EMPTY_FORM);
+  }
+
+  /** Open the same modal on an existing lead, prefilled. */
+  function openEdit(lead: Lead) {
+    setEditingId(lead.id);
+    setFormError(null);
+    setForm({
+      name: lead.name || "",
+      email: lead.email || "",
+      phone: lead.phone || "",
+      company: lead.company || "",
+      message: lead.message || "",
+      source: lead.source || "manual",
+      priority: lead.priority || "medium",
+      assignedTo: lead.assignedTo || "",
+      country: lead.country || "",
+      followUpAt: toDateValue(lead.followUpAt),
+    });
+    setShowForm(true);
+  }
+
+  /**
+   * One handler for both. Add and edit share every field, and a second form
+   * would be a second place to forget a field when one is added.
+   */
+  async function submitLead(event: React.FormEvent) {
     event.preventDefault();
     setSaving(true);
     setFormError(null);
     try {
+      const editing = Boolean(editingId);
       const response = await fetch("/api/admin/leads", {
-        method: "POST",
+        method: editing ? "PATCH" : "POST",
         headers: adminHeaders(true),
-        body: JSON.stringify({ ...form, followUpAt: form.followUpAt || null }),
+        body: JSON.stringify({
+          ...(editing ? { id: editingId } : {}),
+          ...form,
+          followUpAt: form.followUpAt || null,
+        }),
       });
       if (!response.ok) {
         // This used to `return` in silence, so a rejected lead looked exactly
@@ -274,9 +316,12 @@ export default function AdminCrmPage() {
         return;
       }
       const data = await response.json();
-      setLeads((current) => [data.lead, ...current]);
-      setShowForm(false);
-      setForm({ name: "", email: "", phone: "", company: "", message: "", source: "manual", priority: "medium", assignedTo: "", country: "", followUpAt: "" });
+      setLeads((current) =>
+        editing
+          ? current.map((lead) => (lead.id === editingId ? data.lead : lead))
+          : [data.lead, ...current],
+      );
+      closeForm();
     } finally {
       setSaving(false);
     }
@@ -325,7 +370,7 @@ export default function AdminCrmPage() {
                 <option value="30d">Last 30 days</option>
               </select>
             ) : (
-              <button type="button" onClick={() => setShowForm(true)} style={{ padding: "9px 16px", borderRadius: 10, border: "none", background: "linear-gradient(135deg,#4f46e5,#7c3aed)", color: "white", fontSize: 12, fontWeight: 800, cursor: "pointer" }}>
+              <button type="button" onClick={() => { setEditingId(null); setForm(EMPTY_FORM); setFormError(null); setShowForm(true); }} style={{ padding: "9px 16px", borderRadius: 10, border: "none", background: "linear-gradient(135deg,#4f46e5,#7c3aed)", color: "white", fontSize: 12, fontWeight: 800, cursor: "pointer" }}>
                 Add Lead
               </button>
             )}
@@ -600,10 +645,10 @@ export default function AdminCrmPage() {
             {/* Sticky so the title and the close button stay reachable while
                 scrolling a long form. */}
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 18, position: "sticky", top: 0, background: "#0e1132", paddingTop: 28, paddingBottom: 12, zIndex: 1 }}>
-              <h2 style={{ margin: 0, fontSize: 18, fontWeight: 900 }}>Add Lead</h2>
-              <button type="button" onClick={() => setShowForm(false)} style={{ background: "none", border: "none", color: "rgba(255,255,255,.45)", fontSize: 22, cursor: "pointer" }}>×</button>
+              <h2 style={{ margin: 0, fontSize: 18, fontWeight: 900 }}>{editingId ? "Edit Lead" : "Add Lead"}</h2>
+              <button type="button" onClick={closeForm} style={{ background: "none", border: "none", color: "rgba(255,255,255,.45)", fontSize: 22, cursor: "pointer" }}>×</button>
             </div>
-            <form onSubmit={createLead} style={{ display: "grid", gap: 12 }}>
+            <form onSubmit={submitLead} style={{ display: "grid", gap: 12 }}>
               {[
                 ["name", "Name *", "Full name"],
                 // Neither of these is starred: the rule is one OR the other,
@@ -658,7 +703,7 @@ export default function AdminCrmPage() {
                 {canSubmit ? "Ready to save." : "Needs a name, plus an email or a phone number."}
               </div>
               <button type="submit" disabled={saving || !canSubmit} style={{ padding: "11px 14px", borderRadius: 10, border: "none", background: "linear-gradient(135deg,#4f46e5,#7c3aed)", color: "white", fontSize: 13, fontWeight: 800, cursor: saving || !canSubmit ? "not-allowed" : "pointer", opacity: saving || !canSubmit ? 0.55 : 1 }}>
-                {saving ? "Saving..." : "Create Lead"}
+                {saving ? "Saving..." : editingId ? "Save changes" : "Create Lead"}
               </button>
             </form>
           </div>
