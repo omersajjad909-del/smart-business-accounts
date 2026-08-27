@@ -388,15 +388,23 @@ export default function AdminCrmPage() {
 
       {showForm ? (
         <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.72)", backdropFilter: "blur(8px)", display: "flex", alignItems: "center", justifyContent: "center", padding: 24, zIndex: 1000 }}>
-          <div style={{ width: "100%", maxWidth: 520, borderRadius: 20, background: "#0e1132", border: "1px solid rgba(255,255,255,.1)", padding: "28px 28px" }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 18 }}>
+          {/* The panel is taller than a laptop screen once every field is in it,
+              and without a height cap the overlay simply clipped the bottom —
+              the follow-up date and the submit button were unreachable. Cap it
+              to the viewport minus the overlay padding and let it scroll. */}
+          <div style={{ width: "100%", maxWidth: 520, borderRadius: 20, background: "#0e1132", border: "1px solid rgba(255,255,255,.1)", padding: "0 28px 28px", maxHeight: "calc(100vh - 48px)", overflowY: "auto" }}>
+            {/* Sticky so the title and the close button stay reachable while
+                scrolling a long form. */}
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 18, position: "sticky", top: 0, background: "#0e1132", paddingTop: 28, paddingBottom: 12, zIndex: 1 }}>
               <h2 style={{ margin: 0, fontSize: 18, fontWeight: 900 }}>Add Lead</h2>
               <button type="button" onClick={() => setShowForm(false)} style={{ background: "none", border: "none", color: "rgba(255,255,255,.45)", fontSize: 22, cursor: "pointer" }}>×</button>
             </div>
             <form onSubmit={createLead} style={{ display: "grid", gap: 12 }}>
               {[
                 ["name", "Name *", "Full name"],
-                ["email", "Email *", "lead@company.com"],
+                // Neither of these is starred: the rule is one OR the other,
+                // and a star on both would say something that is not true.
+                ["email", "Email", "lead@company.com"],
                 ["phone", "Phone", "+92 ..."],
                 ["company", "Company", "Company name"],
                 ["assignedTo", "Assigned To", "Owner or rep"],
