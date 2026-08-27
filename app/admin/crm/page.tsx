@@ -85,18 +85,12 @@ function toDateValue(value?: string | null): string {
   return value ? String(value).slice(0, 10) : "";
 }
 
-/**
- * What the notes box shows before anyone has written a note.
- *
- * `message` is what the lead arrived with — the line typed when they were added,
- * or the text a waitlist signup generated. `notes` is the running log of what
- * has been said since. Leaving the log blank when the card already carries a
- * sentence meant retyping it before you could add to it, so the message seeds
- * the box instead. It is only a starting point: nothing is written to the notes
- * column until the box is edited and left.
- */
-function noteSeed(lead: Lead): string {
-  return lead.notes || lead.message || "";
+/** The two free-text fields a card lets you edit in place. */
+type TextField = "message" | "notes";
+
+/** Draft key. One card holds an unsaved draft per field, not one in total. */
+function draftKey(id: string, field: TextField): string {
+  return `${id}:${field}`;
 }
 
 const EMPTY_FORM = {
@@ -129,9 +123,9 @@ export default function AdminCrmPage() {
   const [source, setSource] = useState("all");
   const [country, setCountry] = useState("all");
   const [facets, setFacets] = useState<Facets>({ sources: [], countries: [] });
-  /** Unsaved note text, per lead id. Absent once the server has it. */
-  const [noteDrafts, setNoteDrafts] = useState<Record<string, string>>({});
-  const [noteState, setNoteState] = useState<Record<string, "saving" | "saved" | "error">>({});
+  /** Unsaved text, keyed by lead id + field. Absent once the server has it. */
+  const [drafts, setDrafts] = useState<Record<string, string>>({});
+  const [draftState, setDraftState] = useState<Record<string, "saving" | "saved" | "error">>({});
   /** Per-card save failures, so a rejected edit is never silent. */
   const [rowError, setRowError] = useState<Record<string, string>>({});
   /** Null while adding; the lead id while editing. Same modal either way. */
@@ -230,42 +224,83 @@ export default function AdminCrmPage() {
   }
 
   /**
-   * Save the note on a card.
+   * Save one free-text field on a card.
    *
    * Kept separate from `patchLead` so the textarea can show what happened. The
    * draft is held locally while typing and dropped once the server confirms,
    * so the field always falls back to what is actually stored.
+   *
+   * Message and notes share this because they behave identically — only the
+   * column differs.
    */
-  async function saveNote(id: string) {
-    const draft = noteDrafts[id];
+  async function saveTextField(id: string, field: TextField) {
+    const key = draftKey(id, field);
+    const draft = drafts[key];
     if (draft === undefined) return;
-    const stored = leads.find((lead) => lead.id === id)?.notes || "";
+
+    const stored = leads.find((lead) => lead.id === id)?.[field] || "";
     if (draft === stored) {
-      setNoteDrafts((current) => {
+      setDrafts((current) => {
         const next = { ...current };
-        delete next[id];
+        delete next[key];
         return next;
       });
       return;
     }
 
-    setNoteState((current) => ({ ...current, [id]: "saving" }));
-    const ok = await patchLead(id, { notes: draft });
-    setNoteState((current) => ({ ...current, [id]: ok ? "saved" : "error" }));
+    setDraftState((current) => ({ ...current, [key]: "saving" }));
+    const ok = await patchLead(id, { [field]: draft });
+    setDraftState((current) => ({ ...current, [key]: ok ? "saved" : "error" }));
     if (ok) {
-      setNoteDrafts((current) => {
+      setDrafts((current) => {
         const next = { ...current };
-        delete next[id];
+        delete next[key];
         return next;
       });
       setTimeout(() => {
-        setNoteState((current) => {
+        setDraftState((current) => {
           const next = { ...current };
-          delete next[id];
+          delete next[key];
           return next;
         });
       }, 2000);
     }
+  }
+
+  /**
+   * One labelled, self-saving textarea.
+   *
+   * Controlled rather than `defaultValue`: an uncontrolled textarea kept showing
+   * text the server had rejected, and never picked up a value that arrived after
+   * it mounted — which is why saved notes came back blank on reload.
+   */
+  function renderTextField(lead: Lead, field: TextField, label: string, placeholder: string) {
+    const key = draftKey(lead.id, field);
+    const state = draftState[key];
+    return (
+      <div style={{ marginBottom: 10 }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 4 }}>
+          <span style={{ fontSize: 10, fontWeight: 800, color: "rgba(255,255,255,.3)" }}>{label}</span>
+          <span style={{ fontSize: 10, fontWeight: 700, color: state === "error" ? "#f87171" : state === "saved" ? "#34d399" : "rgba(255,255,255,.3)" }}>
+            {state === "saving" ? "Saving…"
+              : state === "saved" ? "Saved"
+              : state === "error" ? "Not saved"
+              : drafts[key] !== undefined ? "Unsaved — click outside to save"
+              : ""}
+          </span>
+        </div>
+        <textarea
+          value={drafts[key] ?? (lead[field] || "")}
+          placeholder={placeholder}
+          onChange={(e) => {
+            const text = e.target.value;
+            setDrafts((current) => ({ ...current, [key]: text }));
+          }}
+          onBlur={() => saveTextField(lead.id, field)}
+          style={{ width: "100%", minHeight: 70, padding: "10px 12px", borderRadius: 10, border: `1px solid ${state === "error" ? "rgba(248,113,113,.45)" : "rgba(255,255,255,.1)"}`, background: "rgba(255,255,255,.05)", color: "white", resize: "vertical" }}
+        />
+      </div>
+    );
   }
 
   async function removeLead(id: string) {
@@ -527,11 +562,9 @@ export default function AdminCrmPage() {
                       <span style={{ fontSize: 11, fontWeight: 800, color: PRIORITY_COLORS[lead.priority] || "#fbbf24" }}>{lead.priority}</span>
                     </div>
                   </div>
-                  {/* Only worth its own box once the notes below say something
-                      different. While the notes are empty the message is
-                      already sitting in them, and printing it twice on one card
-                      reads as two facts when it is one. */}
-                  {lead.message && lead.notes ? <div style={{ fontSize: 12, lineHeight: 1.6, color: "rgba(255,255,255,.45)", background: "rgba(255,255,255,.03)", borderRadius: 10, padding: "10px 12px", marginBottom: 10 }}>{lead.message}</div> : null}
+                  {/* The message used to be printed here read-only. It is an
+                      editable box further down now, alongside notes, so there
+                      is one place to read it and the same place to fix it. */}
                   <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 10 }}>
                     {lead.source ? <span style={{ fontSize: 10, padding: "3px 8px", borderRadius: 8, background: "rgba(255,255,255,.06)", color: "rgba(255,255,255,.45)" }}>{lead.source}</span> : null}
                     {lead.country ? <span style={{ fontSize: 10, padding: "3px 8px", borderRadius: 8, background: "rgba(255,255,255,.06)", color: "rgba(255,255,255,.45)" }}>{lead.country}</span> : null}
@@ -582,33 +615,11 @@ export default function AdminCrmPage() {
                       </div>
                     </div>
                   </div>
-                  {/* Controlled, not `defaultValue`. An uncontrolled textarea
-                      kept showing text the server had rejected, and never
-                      picked up a value that arrived after it mounted — which
-                      is why saved notes came back blank on reload. */}
-                  <div style={{ marginBottom: 10 }}>
-                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 4 }}>
-                      <span style={{ fontSize: 10, fontWeight: 800, color: "rgba(255,255,255,.3)" }}>NOTES</span>
-                      <span style={{ fontSize: 10, fontWeight: 700, color: noteState[lead.id] === "error" ? "#f87171" : noteState[lead.id] === "saved" ? "#34d399" : "rgba(255,255,255,.3)" }}>
-                        {noteState[lead.id] === "saving" ? "Saving…"
-                          : noteState[lead.id] === "saved" ? "Saved"
-                          : noteState[lead.id] === "error" ? "Not saved"
-                          : noteDrafts[lead.id] !== undefined ? "Unsaved — click outside to save"
-                          : !lead.notes && lead.message ? "From the message — add to it"
-                          : ""}
-                      </span>
-                    </div>
-                    <textarea
-                      value={noteDrafts[lead.id] ?? noteSeed(lead)}
-                      placeholder="What was said, what they need, what you promised…"
-                      onChange={(e) => {
-                        const text = e.target.value;
-                        setNoteDrafts((current) => ({ ...current, [lead.id]: text }));
-                      }}
-                      onBlur={() => saveNote(lead.id)}
-                      style={{ width: "100%", minHeight: 70, padding: "10px 12px", borderRadius: 10, border: `1px solid ${noteState[lead.id] === "error" ? "rgba(248,113,113,.45)" : "rgba(255,255,255,.1)"}`, background: "rgba(255,255,255,.05)", color: "white", resize: "vertical" }}
-                    />
-                  </div>
+                  {/* Two separate things, each editable where you read it.
+                      Message is why the lead exists; notes are the running log
+                      of what has been said since. */}
+                  {renderTextField(lead, "message", "MESSAGE", "What they do, what they asked for…")}
+                  {renderTextField(lead, "notes", "NOTES", "What was said, what they need, what you promised…")}
                   {rowError[lead.id] ? (
                     <div style={{ fontSize: 11, color: "#fca5a5", background: "rgba(248,113,113,.08)", border: "1px solid rgba(248,113,113,.28)", borderRadius: 9, padding: "8px 11px", marginBottom: 10, lineHeight: 1.55 }}>
                       {rowError[lead.id]}
