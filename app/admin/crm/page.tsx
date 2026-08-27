@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { getCurrentUser } from "@/lib/auth";
+import DateInput from "@/app/dashboard/reports/_components/DateInput";
 
 type Lead = {
   id: string;
@@ -426,7 +427,12 @@ export default function AdminCrmPage() {
               </div>
               <div>
                 <label style={{ fontSize: 11, color: "rgba(255,255,255,.42)", fontWeight: 700, display: "block", marginBottom: 5 }}>Follow Up Date</label>
-                <input type="date" value={form.followUpAt} onChange={(e) => setForm((current) => ({ ...current, followUpAt: e.target.value }))} style={{ width: "100%", padding: "10px 12px", borderRadius: 10, border: "1px solid rgba(255,255,255,.1)", background: "rgba(255,255,255,.05)", color: "white" }} />
+                {/* DD-MM-YYYY, like every other date field in the product. The
+                    native picker this replaced rendered whatever the browser
+                    locale said, so the same field read 08/27 to one person and
+                    27/08 to the next. DateInput holds YYYY-MM-DD internally,
+                    which is what the API already expects. */}
+                <DateInput value={form.followUpAt} onChange={(iso) => setForm((current) => ({ ...current, followUpAt: iso }))} style={{ width: "100%", padding: "10px 12px", borderRadius: 10, border: "1px solid rgba(255,255,255,.1)", background: "rgba(255,255,255,.05)", color: "white" }} />
               </div>
               <button type="submit" disabled={saving || !form.name.trim() || !form.email.trim()} style={{ padding: "11px 14px", borderRadius: 10, border: "none", background: "linear-gradient(135deg,#4f46e5,#7c3aed)", color: "white", fontSize: 13, fontWeight: 800, cursor: "pointer", opacity: saving || !form.name.trim() || !form.email.trim() ? 0.55 : 1 }}>
                 {saving ? "Saving..." : "Create Lead"}
