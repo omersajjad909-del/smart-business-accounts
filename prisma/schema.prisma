@@ -1241,7 +1241,7 @@ model Employee {
   salary          Float
   salaryFrequency String // MONTHLY | WEEKLY | HOURLY
   accountId       String? // Link to per-employee Salary Payable account in Chart of Accounts
-  biometricId     String?   // Enrollment / User ID inside the fingerprint machine
+  biometricId     String? // Enrollment / User ID inside the fingerprint machine
   shiftStart      String?   @default("09:00") // Default shift start "HH:MM" — auto-fills attendance
   shiftEnd        String?   @default("18:00") // Default shift end "HH:MM"
   isActive        Boolean   @default(true)
@@ -1278,6 +1278,77 @@ model Attendance {
 
   @@unique([employeeId, date])
   @@index([employeeId, date])
+}
+
+// ================= BIOMETRIC ATTENDANCE DEVICES =================
+
+/// A physical fingerprint / face attendance machine (ZKTeco, eSSL, Hikvision …).
+/// Punches reach us one of three ways, see the "mode" field:
+///   BRIDGE — a small agent on the office LAN polls the device and POSTs to us
+///   PUSH   — the device itself calls /iclock/cdata (ZKTeco ADMS)
+///   IMPORT — CSV/XLS exported from the vendor software, uploaded by hand
+model BiometricDevice {
+  id        String  @id @default(uuid())
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  name         String
+  serialNumber String // Machine ka SN — PUSH mode isi se device pehchanta hai
+  brand        String  @default("ZKTECO") // ZKTECO | ESSL | HIKVISION | SUPREMA | OTHER
+  mode         String  @default("BRIDGE") // BRIDGE | PUSH | IMPORT
+  location     String?
+  ipAddress    String?
+
+  /// The ingest key is only ever shown once, at creation. We keep a SHA-256 of
+  /// it plus a short prefix so the UI can tell two keys apart.
+  apiKeyHash   String
+  apiKeyPrefix String
+
+  /// Machines report wall-clock time with no zone. Minutes to subtract to get
+  /// UTC (Pakistan = 300).
+  tzOffsetMin Int     @default(300)
+  isActive    Boolean @default(true)
+
+  lastSeenAt  DateTime?
+  lastPunchAt DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  punches AttendancePunch[]
+
+  @@unique([companyId, serialNumber])
+  @@index([apiKeyHash])
+  @@index([companyId, isActive])
+}
+
+/// One raw scan off a machine. Kept forever and untouched — the daily
+/// Attendance row is derived from these, so a rules change can be replayed.
+model AttendancePunch {
+  id        String  @id @default(uuid())
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  deviceId String
+  device   BiometricDevice @relation(fields: [deviceId], references: [id], onDelete: Cascade)
+
+  /// Enrollment number as the machine knows it. Resolved to employeeId when a
+  /// mapping exists; unmapped punches are kept and re-resolved later.
+  biometricId String
+  employeeId  String?
+  employee    Employee? @relation(fields: [employeeId], references: [id], onDelete: SetNull)
+
+  punchTime  DateTime
+  direction  String   @default("AUTO") // IN | OUT | AUTO
+  verifyMode String? // FP | FACE | CARD | PIN
+  source     String   @default("BRIDGE") // BRIDGE | PUSH | IMPORT | MANUAL
+  raw        String?
+  processed  Boolean  @default(false)
+  createdAt  DateTime @default(now())
+
+  @@unique([deviceId, biometricId, punchTime])
+  @@index([companyId, punchTime])
+  @@index([employeeId, punchTime])
+  @@index([companyId, processed])
 }
 
 model Leave {
@@ -2003,8 +2074,8 @@ model SiteVisit {
 // ─── Leads ────────────────────────────────────────────────────────────────────
 
 model Lead {
-  id   String @id @default(uuid())
-  name String
+  id         String    @id @default(uuid())
+  name       String
   /// Optional since the leads that matter most arrive without one. A trader met
   /// at a market or an Anjuman session gives a phone number, not an email — and
   /// a required email meant those could not be recorded at all. The API still
