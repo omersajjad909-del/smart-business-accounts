@@ -1069,7 +1069,6 @@ function SalesInvoiceContent() {
                                     items={items}
                                     value={r.itemId}
                                     onChange={(id) => selectItem(i, id)}
-                                    onKeyDown={rateFormulaEnterHandler(rf, rfActive, i, () => lastPickedMeta.current, rtmmFieldKey)}
                                     label={rfActive ? itemPickerLabel : undefined}
                                     previewFields={rfActive ? pickerPreviewFields : []}
                                     previewValues={rfActive ? itemPreviewValues : undefined}
@@ -1108,9 +1107,13 @@ function SalesInvoiceContent() {
                               {["#","Item / Description"].map((h,hi) => (
                                 <th key={h+hi} style={{ padding: "10px 8px", fontSize: 10.5, fontWeight: 800, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: 0.5, textAlign: "left", whiteSpace: "nowrap" }}>{h}</th>
                               ))}
-                              {rfActive && <RateFormulaHeadCells settings={rf} />}
-                              {["Qty","Unit","Unit Price","Total",""].map((h,hi) => (
+                              {rfActive && <RateFormulaHeadCells settings={formulaBeforeQty} />}
+                              {["Unit","Qty"].map((h,hi) => (
                                 <th key={"t"+h+hi} style={{ padding: "10px 6px", fontSize: 10.5, fontWeight: 800, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: 0.5, textAlign: hi <= 5 ? "right" : "left", whiteSpace: "nowrap" }}>{h}</th>
+                              ))}
+                              {rfActive && rtmmFormula.fields.length > 0 && <RateFormulaHeadCells settings={rtmmFormula} />}
+                              {["Unit Price","Total",""].map((h,hi) => (
+                                <th key={"tail"+h+hi} style={{ padding: "10px 6px", fontSize: 10.5, fontWeight: 800, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: 0.5, textAlign: hi <= 5 ? "right" : "left", whiteSpace: "nowrap" }}>{h}</th>
                               ))}
                             </tr>
                           </thead>
@@ -1145,7 +1148,6 @@ function SalesInvoiceContent() {
                                         items={items}
                                         value={r.itemId}
                                         onChange={(id) => selectItem(i, id)}
-                                        onKeyDown={rateFormulaEnterHandler(rf, rfActive, i, () => lastPickedMeta.current, rtmmFieldKey)}
                                         label={rfActive ? itemPickerLabel : undefined}
                                         previewFields={rfActive ? pickerPreviewFields : []}
                                         previewValues={rfActive ? itemPreviewValues : undefined}
@@ -1157,12 +1159,15 @@ function SalesInvoiceContent() {
                                     {r.description && !r.isManual && <div style={{ fontSize: 11, color: "var(--text-muted)", marginTop: 2, paddingLeft: 2 }}>{r.description}</div>}
                                   </td>
                                   {rfActive && (
-                                    <RateFormulaRowCells settings={rf} meta={r.meta} rowIndex={i} onChange={(key, value) => updateRowMeta(i, key, value)} />
+                                    <RateFormulaRowCells settings={formulaBeforeQty} meta={r.meta} rowIndex={i} onChange={(key, value) => updateRowMeta(i, key, value)} />
                                   )}
-                                  <td style={{ padding: "9px 6px", width: 96, borderTop: "1px solid var(--border)", borderBottom: "1px solid var(--border)" }}>
-                                    <input type="number" style={{ ...inputStyle, padding: "9px 11px", textAlign: "right", fontSize: 14.5, fontWeight: 700 }} value={r.qty} onChange={e => updateRow(i, "qty", e.target.value)} placeholder="0" />
-                                  </td>
                                   <td style={{ padding: "9px 6px", fontSize: 12, color: "var(--text-muted)", width: 54, borderTop: "1px solid var(--border)", borderBottom: "1px solid var(--border)" }}>{r.unit || "—"}</td>
+                                  <td style={{ padding: "9px 6px", width: 96, borderTop: "1px solid var(--border)", borderBottom: "1px solid var(--border)" }}>
+                                    <input id={`sales-invoice-qty-${i}`} type="number" style={{ ...inputStyle, padding: "9px 11px", textAlign: "right", fontSize: 14.5, fontWeight: 700 }} value={r.qty} onChange={e => updateRow(i, "qty", e.target.value)} onKeyDown={e => moveQtyFocusToRtmm(e, i)} placeholder="0" />
+                                  </td>
+                                  {rfActive && rtmmFormula.fields.length > 0 && (
+                                    <RateFormulaRowCells settings={rtmmFormula} meta={r.meta} rowIndex={i} onChange={(key, value) => updateRowMeta(i, key, value)} />
+                                  )}
                                   <td style={{ padding: "9px 6px", width: 82, borderTop: "1px solid var(--border)", borderBottom: "1px solid var(--border)" }}>
                                     <input type="number" style={{ ...inputStyle, padding: "6px 7px", textAlign: "right", fontSize: 13, ...(rfActive && !rf.rateEditable ? { opacity: 0.75, cursor: "not-allowed" } : {}) }} value={r.rate} onChange={e => updateRow(i, "rate", e.target.value)} readOnly={rfActive && !rf.rateEditable} title={rfActive && !rf.rateEditable ? "Worked out by your rate formula" : undefined} placeholder="0.00" />
                                   </td>
