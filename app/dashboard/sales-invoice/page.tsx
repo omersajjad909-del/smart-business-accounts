@@ -878,11 +878,11 @@ function SalesInvoiceContent() {
             </div> */}
 
             {/* ── Entry Form ── */}
+            {/* The items grid is the widest thing on this page, so nothing sits
+                beside it any more. The three reference boxes and the invoice
+                meta / totals column share one strip across the top; the table
+                and the payment panels below run the full width. */}
             {!preview && (
-              {/* The items grid is the widest thing on this page, so nothing
-                  sits beside it any more. The three reference boxes and the
-                  invoice meta / totals column share one strip across the top;
-                  the table and the payment panels below run the full width. */}
               <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
 
                 <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "minmax(0, 1fr) 340px", gap: 20, alignItems: "start" }}>
