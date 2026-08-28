@@ -115,7 +115,7 @@ export function rateFormulaEnterHandler(
  * suggestion, so the column holds its ground and the row scrolls sideways
  * instead of collapsing into a box nothing can be typed into.
  */
-const MIN_CELL_WIDTH = 64;
+const MIN_CELL_WIDTH = 52;
 
 function cellInput(extra?: CSSProperties): CSSProperties {
   return {

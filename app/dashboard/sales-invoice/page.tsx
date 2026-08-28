@@ -1096,7 +1096,7 @@ function SalesInvoiceContent() {
                             row number, which is where it was asked for and buys
                             back ~110px so the whole grid fits without scrolling
                             sideways. */}
-                        <table style={{ width: "max-content", minWidth: "100%", tableLayout: "auto", borderCollapse: "separate", borderSpacing: "0 6px" }}>
+                        <table style={{ width: "100%", minWidth: 0, tableLayout: "auto", borderCollapse: "separate", borderSpacing: "0 6px" }}>
                           <thead>
                             <tr style={{ borderBottom: "1px solid var(--border)" }}>
                               {["#","Item / Description"].map((h,hi) => (
