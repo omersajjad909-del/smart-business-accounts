@@ -24,7 +24,6 @@ import {
   rateFormulaPrintColumns,
   rateFormulaPrintValues,
   rateFormulaLineIncomplete,
-  rateFormulaEnterHandler,
   focusRateFormulaCell,
   type RateFormulaMeta,
 } from "@/components/RateFormulaCells";
@@ -148,12 +147,19 @@ function SalesInvoiceContent() {
   // Companies that price a line from a calculation get extra columns and a
   // computed rate. Everyone else gets exactly the grid that was here before.
   const { settings: rf, active: rfActive } = useRateFormula("salesInvoice");
-  // Product specifications (gauge, width, length, PHR and shade) are carried
-  // in from the selected item. The one value the operator enters per invoice
-  // line is RT/MM, so both mouse and Enter selections land there directly.
+  // Product specifications arrive with the item. The operator enters Qty and
+  // then RT/MM, so RT/MM is the only formula field placed after Qty here.
   const rtmmFieldKey = useMemo(
     () => rf.fields.find((field) => /rt\s*\/?\s*mm/i.test(`${field.key} ${field.label}`))?.key ?? null,
     [rf],
+  );
+  const formulaBeforeQty = useMemo(
+    () => ({ ...rf, fields: rf.fields.filter((field) => field.key !== rtmmFieldKey) }),
+    [rf, rtmmFieldKey],
+  );
+  const rtmmFormula = useMemo(
+    () => ({ ...rf, fields: rtmmFieldKey ? rf.fields.filter((field) => field.key === rtmmFieldKey) : [] }),
+    [rf, rtmmFieldKey],
   );
   const emptyRow = (): Row => ({ itemId: "", name: "", description: "", availableQty: 0, qty: "", rate: "", discountPercent: "", taxPercent: "", unit: "", sku: "", isManual: false, ...(rfActive ? { meta: emptyRateFormulaMeta(rf) } : {}) });
   const [rows, setRows]                 = useState<Row[]>([emptyRow()]);
@@ -360,7 +366,22 @@ function SalesInvoiceContent() {
     }
     if (idx === copy.length - 1) copy.push(emptyRow());
     setRows(copy);
-    if (rfActive && rtmmFieldKey) focusRateFormulaCell(idx, rtmmFieldKey);
+    focusInvoiceQty(idx);
+  }
+
+  function focusInvoiceQty(idx: number) {
+    requestAnimationFrame(() => {
+      const input = document.getElementById(`sales-invoice-qty-${idx}`) as HTMLInputElement | null;
+      input?.focus();
+      input?.select();
+    });
+  }
+
+  function moveQtyFocusToRtmm(e: React.KeyboardEvent<HTMLInputElement>, idx: number) {
+    if (!rfActive || !rtmmFieldKey || e.key !== "Enter" || e.shiftKey) return;
+    e.preventDefault();
+    e.stopPropagation();
+    focusRateFormulaCell(idx, rtmmFieldKey);
   }
 
   function updateRow(idx: number, key: keyof Pick<Row, "qty" | "rate" | "discountPercent" | "taxPercent">, val: string) {

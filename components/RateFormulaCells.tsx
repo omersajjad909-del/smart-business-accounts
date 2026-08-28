@@ -89,21 +89,17 @@ export function rateFormulaEnterHandler(
    * committed the new row — the caller keeps the freshly resolved values in a
    * ref and hands them over here.
    */
-  pickedMeta?: () => RateFormulaMeta | null | undefined,
-  /** A document may nominate a known operational field (for example RT/MM). */
-  preferredKey?: string | null,
+  pickedMeta?: () => RateFormulaMeta | null | undefined
 ) {
   return (e: KeyboardEvent | { key: string; shiftKey: boolean; preventDefault(): void; stopPropagation(): void }) => {
     if (!active || e.key !== "Enter" || e.shiftKey) return;
-    const key = preferredKey || settings.fields.find((f) => f.focusOnPick)?.key;
+    const key = settings.fields.find((f) => f.focusOnPick)?.key;
     if (!key) return; // no column claims the cursor — leave Enter alone
     // The item just picked may have answered that column itself. Parking the
     // cursor on a filled box makes the operator tab past a number they never
     // needed to touch, so let Enter walk on to the next thing that is blank.
     const already = pickedMeta?.()?.[key];
-    // A document-level preferred field is intentional even when it has its
-    // default value (RT/MM commonly starts as 0 and must be overwritten).
-    if (!preferredKey && already !== undefined && already !== "") return;
+    if (already !== undefined && already !== "") return;
     e.preventDefault();
     e.stopPropagation();
     focusRateFormulaCell(rowIndex, key);
