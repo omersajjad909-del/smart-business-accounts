@@ -1,0 +1,10 @@
+{
+  "serverUrl": "https://app.finovaos.app",
+  "deviceKey": "fbd_paste_the_key_shown_when_you_registered_the_device",
+  "deviceIp": "192.168.1.201",
+  "devicePort": 4370,
+  "pollSeconds": 120,
+  "batchSize": 500,
+  "clearAfterSync": false,
+  "timeoutMs": 15000
+}

@@ -1,0 +1,17 @@
+{
+  "name": "finovaos-biometric-bridge",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Pulls attendance scans off a LAN fingerprint machine and posts them to FinovaOS.",
+  "main": "bridge.js",
+  "scripts": {
+    "start": "node bridge.js",
+    "once": "node bridge.js --once"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "node-zklib": "^0.3.1"
+  }
+}
