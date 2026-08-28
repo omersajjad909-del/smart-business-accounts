@@ -1013,16 +1013,7 @@ function SalesInvoiceContent() {
                             row number, which is where it was asked for and buys
                             back ~110px so the whole grid fits without scrolling
                             sideways. */}
-                        <table style={{ width: "100%", minWidth: 0, tableLayout: "fixed", borderCollapse: "separate", borderSpacing: "0 6px" }}>
-                          <colgroup>
-                            <col style={{ width: 34 }} />
-                            <col style={{ width: "27%" }} />
-                            {rfActive && rf.fields.map((field) => <col key={field.key} style={{ width: Math.max(field.width, 54) }} />)}
-                            <col style={{ width: 48 }} />
-                            <col style={{ width: 82 }} />
-                            <col style={{ width: 82 }} />
-                            <col style={{ width: 26 }} />
-                          </colgroup>
+                        <table style={{ width: "100%", minWidth: 0, tableLayout: "auto", borderCollapse: "separate", borderSpacing: "0 6px" }}>
                           <thead>
                             <tr style={{ borderBottom: "1px solid var(--border)" }}>
                               {["#","Item / Description"].map((h,hi) => (
