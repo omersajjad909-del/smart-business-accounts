@@ -825,7 +825,7 @@ function SalesInvoiceContent() {
         {showForm && (
           <>
             {/* Action bar */}
-            <div style={{ ...panelStyle, marginBottom: 20, display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 12 }}>
+            {/* <div style={{ ...panelStyle, marginBottom: 20, display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 12 }}>
               <div>
                 <div style={{ fontSize: 18, fontWeight: 700 }}>
                   {preview ? invNo : (editing ? `Edit Invoice — ${invoiceNo}` : `New Invoice — ${invoiceNo}`)}
@@ -854,7 +854,7 @@ function SalesInvoiceContent() {
                   ]}
                 />
               )}
-            </div>
+            </div> */}
 
             {/* ── Entry Form ── */}
             {!preview && (
