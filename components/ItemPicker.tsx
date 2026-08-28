@@ -169,7 +169,7 @@ export function ItemPicker({
   const selectedLabel = selected ? (label ? label(selected) : selected.name) : "";
   const shown = open ? query : selectedLabel;
   const previewColumns = previewFields.length
-    ? `minmax(170px, 2fr) repeat(${previewFields.length}, minmax(54px, 1fr)) minmax(48px, .6fr)`
+    ? `minmax(150px, 1.4fr) repeat(${previewFields.length}, minmax(56px, 1fr)) minmax(52px, .7fr)`
     : "minmax(170px, 1fr) minmax(62px, auto) minmax(48px, auto)";
 
   return (
@@ -230,10 +230,18 @@ export function ItemPicker({
                 whiteSpace: "nowrap",
               }}
             >
-              <span style={{
-                fontFamily: "ui-monospace, monospace", fontSize: 11.5,
-                color: "var(--text-muted, rgba(255,255,255,.4))", minWidth: 62,
-              }}>{previewFields.length ? item.name : (item.code || "—")}</span>
+              <span
+                title={item.name}
+                style={{
+                  fontFamily: "ui-monospace, monospace", fontSize: 12.5,
+                  // With the dimensions in their own columns the full name is
+                  // the same figures written twice, and it overflowed into the
+                  // Gauge column. The shortened label is what the picked cell
+                  // shows too, so the list and the line read alike.
+                  color: previewFields.length ? "var(--text-primary, #fff)" : "var(--text-muted, rgba(255,255,255,.4))",
+                  minWidth: 62, overflow: "hidden", textOverflow: "ellipsis",
+                }}
+              >{previewFields.length ? (label ? label(item) : item.name) : (item.code || "—")}</span>
               {!previewFields.length && <span style={{ fontSize: 13, color: "var(--text-primary, #fff)" }}>
                 {item.name}
                 {item.description ? (

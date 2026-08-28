@@ -1086,10 +1086,10 @@ function SalesInvoiceContent() {
                                   {rfActive && (
                                     <RateFormulaRowCells settings={rf} meta={r.meta} rowIndex={i} onChange={(key, value) => updateRowMeta(i, key, value)} />
                                   )}
-                                  <td style={{ padding: "9px 6px", width: 58, borderTop: "1px solid var(--border)", borderBottom: "1px solid var(--border)" }}>
-                                    <input type="number" style={{ ...inputStyle, padding: "6px 7px", textAlign: "right", fontSize: 13 }} value={r.qty} onChange={e => updateRow(i, "qty", e.target.value)} placeholder="0" />
+                                  <td style={{ padding: "9px 6px", width: 96, borderTop: "1px solid var(--border)", borderBottom: "1px solid var(--border)" }}>
+                                    <input type="number" style={{ ...inputStyle, padding: "9px 11px", textAlign: "right", fontSize: 14.5, fontWeight: 700 }} value={r.qty} onChange={e => updateRow(i, "qty", e.target.value)} placeholder="0" />
                                   </td>
-                                  <td style={{ padding: "9px 6px", fontSize: 12, color: "var(--text-muted)", width: 48, borderTop: "1px solid var(--border)", borderBottom: "1px solid var(--border)" }}>{r.unit || "—"}</td>
+                                  <td style={{ padding: "9px 6px", fontSize: 12, color: "var(--text-muted)", width: 54, borderTop: "1px solid var(--border)", borderBottom: "1px solid var(--border)" }}>{r.unit || "—"}</td>
                                   <td style={{ padding: "9px 6px", width: 82, borderTop: "1px solid var(--border)", borderBottom: "1px solid var(--border)" }}>
                                     <input type="number" style={{ ...inputStyle, padding: "6px 7px", textAlign: "right", fontSize: 13, ...(rfActive && !rf.rateEditable ? { opacity: 0.75, cursor: "not-allowed" } : {}) }} value={r.rate} onChange={e => updateRow(i, "rate", e.target.value)} readOnly={rfActive && !rf.rateEditable} title={rfActive && !rf.rateEditable ? "Worked out by your rate formula" : undefined} placeholder="0.00" />
                                   </td>

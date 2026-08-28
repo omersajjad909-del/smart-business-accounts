@@ -448,6 +448,44 @@ function findShadeCode(text: string): SpecHit | null {
 }
 
 /**
+ * Words that turn up where a shade does but are not one — the packaging or the
+ * unit, written into the name.
+ */
+const NOT_A_SHADE = new Set([
+  "ROLL","ROLLS","PCS","PC","PIECE","PIECES","NOS","NO","SET","SETS",
+  "KG","KGS","GM","GRAM","MTR","MTRS","METER","METERS","METRE","METRES",
+  "SHEET","SHEETS","BAG","BAGS","BOX","BOXES","BUNDLE","BUNDLES","PKT","PACK",
+]);
+
+/**
+ * A shade written as a word rather than a code: the "Blue" in
+ * "B2 BLUE 10G 50in L50 Blue PHR28".
+ *
+ * Only a word standing BEHIND a dimension counts. The same colour is usually in
+ * the product name too — "B2 BLUE …" — and reading that one would stamp a shade
+ * on every line whether the mill stated one or not.
+ */
+function findShadeWord(text: string): SpecHit | null {
+  const tokens: Array<{ word: string; start: number }> = [];
+  const scan = /S+/g;
+  let m: RegExpExecArray | null;
+  while ((m = scan.exec(text)) !== null) tokens.push({ word: m[0], start: m.index });
+
+  const isSpec = (word: string) => SPEC_TOKENS.some((re) => re.test(word));
+  const firstSpec = tokens.findIndex((t) => isSpec(t.word));
+  if (firstSpec < 0) return null;
+
+  for (let i = tokens.length - 1; i > firstSpec; i--) {
+    const { word, start } = tokens[i];
+    if (isSpec(word)) continue;
+    if (!/^[A-Z][A-Z]+$/.test(word)) continue;
+    if (NOT_A_SHADE.has(word)) continue;
+    return { value: word, start, end: start + word.length };
+  }
+  return null;
+}
+
+/**
  * Reads one item's name for the company's own columns.
  *
  * Dimensions are taken in the order a spec is written and each figure is
@@ -479,7 +517,7 @@ export function itemSpecFromText(
 
     const hit =
       role === "phr"    ? findTaggedNumber(rest, "PHR") :
-      role === "shade"  ? findShadeCode(rest) :
+      role === "shade"  ? (findShadeCode(rest) ?? findShadeWord(rest)) :
       role === "length" ? (findTaggedNumber(rest, "L") ?? findUnitNumber(rest, roleUnitWords(role, f.unit))) :
                           findUnitNumber(rest, roleUnitWords(role, f.unit));
     if (!hit) continue;
