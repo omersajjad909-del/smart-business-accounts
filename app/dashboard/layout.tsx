@@ -257,6 +257,9 @@ export default function DashboardLayout({
    * `null` on manualCollapse means "no override, follow the rule above".
    */
   const [navPinned, setNavPinned]           = useState(false);
+  // Set by handleNavClick so the route-change effect can tell a sidebar
+  // navigation apart from one started anywhere else on the page.
+  const navClickRef = useRef(false);
   const [navHover, setNavHover]             = useState(false);
   const [manualCollapse, setManualCollapse] = useState<boolean | null>(null);
   /**
@@ -485,7 +488,6 @@ export default function DashboardLayout({
    * the cursor leaves; the next nav link click releases the pin and the route
    * rule collapses it again.
    */
-  const navClickRef = useRef(false);
   const handleNavClick = useCallback(() => {
     navClickRef.current = true;
     setManualCollapse(null);
