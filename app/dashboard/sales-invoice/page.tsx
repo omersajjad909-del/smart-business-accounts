@@ -1120,13 +1120,13 @@ function SalesInvoiceContent() {
                               const lineTax = lineTaxable * (Number(r.taxPercent) || 0) / 100;
                               return (
                                 <tr key={i} style={{ background: "var(--panel-bg)" }}>
-                                  <td style={{ padding: "9px 8px", fontSize: 12.5, color: "var(--text-muted)", verticalAlign: "top", borderTop: "1px solid var(--border)", borderBottom: "1px solid var(--border)" }}>
+                                  <td style={{ padding: "13px 8px", fontSize: 12.5, color: "var(--text-muted)", verticalAlign: "top", borderTop: "1px solid var(--border)", borderBottom: "1px solid var(--border)" }}>
                                     <div style={{ lineHeight: 1.3, paddingTop: 7 }}>{i + 1}</div>
                                     {r.sku && !r.isManual && (
                                       <div title={`SKU ${r.sku}`} style={{ fontSize: 9.5, fontFamily: "ui-monospace, monospace", color: "var(--text-muted)", opacity: 0.75, marginTop: 1, maxWidth: 46, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{r.sku}</div>
                                     )}
                                   </td>
-                                  <td style={{ padding: "9px 8px", width: "27%", minWidth: 0, overflow: "visible", borderTop: "1px solid var(--border)", borderBottom: "1px solid var(--border)" }}>
+                                  <td style={{ padding: "13px 8px", width: "27%", minWidth: 0, overflow: "visible", borderTop: "1px solid var(--border)", borderBottom: "1px solid var(--border)" }}>
                                     {r.isManual ? (
                                       <div style={{ display: "flex", gap: 4, alignItems: "center" }}>
                                         <input
@@ -1156,18 +1156,18 @@ function SalesInvoiceContent() {
                                   {rfActive && (
                                     <RateFormulaRowCells settings={formulaBeforeQty} meta={r.meta} rowIndex={i} onChange={(key, value) => updateRowMeta(i, key, value)} />
                                   )}
-                                  <td style={{ padding: "9px 6px", fontSize: 12, color: "var(--text-muted)", width: 54, borderTop: "1px solid var(--border)", borderBottom: "1px solid var(--border)" }}>{r.unit || "—"}</td>
-                                  <td style={{ padding: "9px 6px", width: 96, minWidth: 88, borderTop: "1px solid var(--border)", borderBottom: "1px solid var(--border)" }}>
-                                    <input id={`sales-invoice-qty-${i}`} type="number" style={{ ...inputStyle, padding: "9px 11px", textAlign: "right", fontSize: 14.5, fontWeight: 700 }} value={r.qty} onChange={e => updateRow(i, "qty", e.target.value)} onKeyDown={e => moveQtyFocusToRtmm(e, i)} placeholder="0" />
+                                  <td style={{ padding: "13px 6px", fontSize: 12, color: "var(--text-muted)", width: 54, borderTop: "1px solid var(--border)", borderBottom: "1px solid var(--border)" }}>{r.unit || "—"}</td>
+                                  <td style={{ padding: "13px 6px", width: 96, minWidth: 88, borderTop: "1px solid var(--border)", borderBottom: "1px solid var(--border)" }}>
+                                    <input id={`sales-invoice-qty-${i}`} type="number" style={{ ...inputStyle, padding: "12px 11px", textAlign: "right", fontSize: 14.5, fontWeight: 700 }} value={r.qty} onChange={e => updateRow(i, "qty", e.target.value)} onKeyDown={e => moveQtyFocusToRtmm(e, i)} placeholder="0" />
                                   </td>
                                   {rfActive && rtmmFormula.fields.length > 0 && (
                                     <RateFormulaRowCells settings={rtmmFormula} meta={r.meta} rowIndex={i} onChange={(key, value) => updateRowMeta(i, key, value)} />
                                   )}
-                                  <td style={{ padding: "9px 6px", width: 82, borderTop: "1px solid var(--border)", borderBottom: "1px solid var(--border)" }}>
+                                  <td style={{ padding: "13px 6px", width: 82, borderTop: "1px solid var(--border)", borderBottom: "1px solid var(--border)" }}>
                                     <input type="number" style={{ ...inputStyle, padding: "6px 7px", textAlign: "right", fontSize: 13, ...(rfActive && !rf.rateEditable ? { opacity: 0.75, cursor: "not-allowed" } : {}) }} value={r.rate} onChange={e => updateRow(i, "rate", e.target.value)} readOnly={rfActive && !rf.rateEditable} title={rfActive && !rf.rateEditable ? "Worked out by your rate formula" : undefined} placeholder="0.00" />
                                   </td>
-                                  <td style={{ padding: "9px 6px", textAlign: "right", fontWeight: 700, fontSize: 13, width: 82, whiteSpace: "nowrap", borderTop: "1px solid var(--border)", borderBottom: "1px solid var(--border)" }}>{fmt(lineTaxable + lineTax)}</td>
-                                  <td style={{ padding: "9px 4px", width: 26, borderTop: "1px solid var(--border)", borderBottom: "1px solid var(--border)", borderRight: "1px solid var(--border)" }}>
+                                  <td style={{ padding: "13px 6px", textAlign: "right", fontWeight: 700, fontSize: 13, width: 82, whiteSpace: "nowrap", borderTop: "1px solid var(--border)", borderBottom: "1px solid var(--border)" }}>{fmt(lineTaxable + lineTax)}</td>
+                                  <td style={{ padding: "13px 4px", width: 26, borderTop: "1px solid var(--border)", borderBottom: "1px solid var(--border)", borderRight: "1px solid var(--border)" }}>
                                     <button tabIndex={-1} style={{ background: "none", border: "none", color: "var(--danger)", cursor: "pointer", fontSize: 17, padding: 0 }} onClick={() => removeRow(i)} disabled={rows.length === 1}>×</button>
                                   </td>
                                 </tr>
