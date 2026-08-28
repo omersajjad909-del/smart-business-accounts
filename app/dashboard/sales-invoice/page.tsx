@@ -995,9 +995,9 @@ function SalesInvoiceContent() {
                                 {rfActive && (
                                   <RateFormulaMobileFields settings={rf} meta={r.meta} onChange={(key, value) => updateRowMeta(i, key, value)} />
                                 )}
-                                {(["qty","rate","discountPercent","taxPercent"] as const).map(k => (
+                                {(["qty","rate"] as const).map(k => (
                                   <div key={k}>
-                                    <div style={{ fontSize: 10, color: "var(--text-muted)", fontWeight: 700, marginBottom: 3, textTransform: "uppercase" }}>{k === "qty" ? "Qty" : k === "rate" ? "Unit Price" : k === "discountPercent" ? "Disc %" : "Tax %"}</div>
+                                    <div style={{ fontSize: 10, color: "var(--text-muted)", fontWeight: 700, marginBottom: 3, textTransform: "uppercase" }}>{k === "qty" ? "Qty" : "Unit Price"}</div>
                                     <input type="number" style={{ ...inputStyle, textAlign: "right", ...(rfActive && k === "rate" && !rf.rateEditable ? { opacity: 0.75 } : {}) }} value={r[k]} onChange={e => updateRow(i, k, e.target.value)} readOnly={rfActive && k === "rate" && !rf.rateEditable} placeholder="0" />
                                   </div>
                                 ))}
@@ -1008,7 +1008,7 @@ function SalesInvoiceContent() {
                         })}
                       </div>
                     ) : (
-                      <div style={{ overflow: "hidden", maxWidth: "100%" }}>
+                      <div style={{ overflow: "visible", maxWidth: "100%" }}>
                         {/* SKU has no column of its own any more — it sits under the
                             row number, which is where it was asked for and buys
                             back ~110px so the whole grid fits without scrolling
@@ -1018,11 +1018,8 @@ function SalesInvoiceContent() {
                             <col style={{ width: 34 }} />
                             <col style={{ width: "27%" }} />
                             {rfActive && rf.fields.map((field) => <col key={field.key} style={{ width: Math.max(field.width, 54) }} />)}
-                            <col style={{ width: 58 }} />
                             <col style={{ width: 48 }} />
                             <col style={{ width: 82 }} />
-                            <col style={{ width: 58 }} />
-                            <col style={{ width: 58 }} />
                             <col style={{ width: 82 }} />
                             <col style={{ width: 26 }} />
                           </colgroup>
@@ -1032,7 +1029,7 @@ function SalesInvoiceContent() {
                                 <th key={h+hi} style={{ padding: "10px 8px", fontSize: 10.5, fontWeight: 800, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: 0.5, textAlign: "left", whiteSpace: "nowrap" }}>{h}</th>
                               ))}
                               {rfActive && <RateFormulaHeadCells settings={rf} />}
-                              {["Qty","Unit","Unit Price","Disc %","Tax %","Total",""].map((h,hi) => (
+                              {["Qty","Unit","Unit Price","Total",""].map((h,hi) => (
                                 <th key={"t"+h+hi} style={{ padding: "10px 6px", fontSize: 10.5, fontWeight: 800, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: 0.5, textAlign: hi <= 5 ? "right" : "left", whiteSpace: "nowrap" }}>{h}</th>
                               ))}
                             </tr>
@@ -1051,7 +1048,7 @@ function SalesInvoiceContent() {
                                       <div title={`SKU ${r.sku}`} style={{ fontSize: 9.5, fontFamily: "ui-monospace, monospace", color: "var(--text-muted)", opacity: 0.75, marginTop: 1, maxWidth: 46, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{r.sku}</div>
                                     )}
                                   </td>
-                                  <td style={{ padding: "9px 8px", width: "27%", minWidth: 0, overflow: "hidden", borderTop: "1px solid var(--border)", borderBottom: "1px solid var(--border)" }}>
+                                  <td style={{ padding: "9px 8px", width: "27%", minWidth: 0, overflow: "visible", borderTop: "1px solid var(--border)", borderBottom: "1px solid var(--border)" }}>
                                     {r.isManual ? (
                                       <div style={{ display: "flex", gap: 4, alignItems: "center" }}>
                                         <input
@@ -1086,12 +1083,6 @@ function SalesInvoiceContent() {
                                   <td style={{ padding: "9px 6px", fontSize: 12, color: "var(--text-muted)", width: 48, borderTop: "1px solid var(--border)", borderBottom: "1px solid var(--border)" }}>{r.unit || "—"}</td>
                                   <td style={{ padding: "9px 6px", width: 82, borderTop: "1px solid var(--border)", borderBottom: "1px solid var(--border)" }}>
                                     <input type="number" style={{ ...inputStyle, padding: "6px 7px", textAlign: "right", fontSize: 13, ...(rfActive && !rf.rateEditable ? { opacity: 0.75, cursor: "not-allowed" } : {}) }} value={r.rate} onChange={e => updateRow(i, "rate", e.target.value)} readOnly={rfActive && !rf.rateEditable} title={rfActive && !rf.rateEditable ? "Worked out by your rate formula" : undefined} placeholder="0.00" />
-                                  </td>
-                                  <td style={{ padding: "9px 6px", width: 58, borderTop: "1px solid var(--border)", borderBottom: "1px solid var(--border)" }}>
-                                    <input type="number" style={{ ...inputStyle, padding: "6px 7px", textAlign: "right", fontSize: 13 }} value={r.discountPercent} onChange={e => updateRow(i, "discountPercent", e.target.value)} placeholder="0" />
-                                  </td>
-                                  <td style={{ padding: "9px 6px", width: 58, borderTop: "1px solid var(--border)", borderBottom: "1px solid var(--border)" }}>
-                                    <input type="number" style={{ ...inputStyle, padding: "5px 7px", textAlign: "right", fontSize: 13 }} value={r.taxPercent} onChange={e => updateRow(i, "taxPercent", e.target.value)} placeholder="0" />
                                   </td>
                                   <td style={{ padding: "9px 6px", textAlign: "right", fontWeight: 700, fontSize: 13, width: 82, whiteSpace: "nowrap", borderTop: "1px solid var(--border)", borderBottom: "1px solid var(--border)" }}>{fmt(lineTaxable + lineTax)}</td>
                                   <td style={{ padding: "9px 4px", width: 26, borderTop: "1px solid var(--border)", borderBottom: "1px solid var(--border)", borderRight: "1px solid var(--border)" }}>
