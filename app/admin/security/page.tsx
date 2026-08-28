@@ -63,7 +63,15 @@ export default function AdminSecurityPage() {
   }, [cfg]);
 
   const toggle = (id: string) =>
-    setPages((prev) => (prev.includes(id) ? prev.filter((p) => p !== id) : [...prev, id]));
+    setPages((prev) => {
+      const next = prev.includes(id) ? prev.filter((p) => p !== id) : [...prev, id];
+      // Ticking a page while a password is in hand means "lock this". The
+      // separate on switch below is easy to miss, and saving without it stored
+      // the ticked pages with the lock still off — those pages then opened as
+      // normal and nothing said why.
+      if (next.length > 0 && (password || cfg?.passwordSet)) setEnabled(true);
+      return next;
+    });
 
   async function save() {
     if (password && password.length < 6) {
@@ -92,7 +100,16 @@ export default function AdminSecurityPage() {
       });
       const d = await r.json();
       if (!r.ok) throw new Error(d.error || "Save failed");
-      toast.success("Saved. Everyone must enter the password again.");
+      // The save can legitimately store "lock off"; a plain "Saved" made that
+      // look like the lock had just been turned on.
+      if (d.enabled) {
+        toast.success("Saved. Everyone must enter the password again.");
+      } else {
+        toast("Saved — but the lock is still OFF. Tick “Turn the page lock on” and save again.", {
+          icon: "⚠️",
+          duration: 6000,
+        });
+      }
       setPassword("");
       setConfirmPassword("");
       load();
@@ -189,7 +206,10 @@ export default function AdminSecurityPage() {
               type="password"
               autoComplete="new-password"
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              onChange={(e) => {
+                setPassword(e.target.value);
+                if (e.target.value && pages.length > 0) setEnabled(true);
+              }}
               placeholder={cfg?.passwordSet ? "•••••• (unchanged)" : "••••••"}
             />
           </div>
@@ -256,6 +276,25 @@ export default function AdminSecurityPage() {
           Saving closes every page anyone currently has open, including your own — the
           password will be asked for again on the next locked page.
         </p>
+
+        {!enabled && pages.length > 0 && (password || cfg?.passwordSet) ? (
+          <div
+            style={{
+              marginTop: 12,
+              background: "rgba(251,191,36,.1)",
+              border: "1px solid rgba(251,191,36,.3)",
+              borderRadius: 10,
+              padding: "10px 14px",
+              fontSize: 12,
+              color: "#fbbf24",
+              lineHeight: 1.6,
+            }}
+          >
+            This switch is off, so saving now leaves the {pages.length} ticked page
+            {pages.length === 1 ? "" : "s"} open to every admin — the password will not be
+            asked for. Turn it on to make the lock take effect.
+          </div>
+        ) : null}
 
         <div style={{ marginTop: 18, display: "flex", gap: 10, flexWrap: "wrap" }}>
           <button
