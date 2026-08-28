@@ -41,11 +41,13 @@ const SidebarCtx = createContext<{
   expand: () => void;
   canShowHref: (href: string) => boolean;
   onNavigate: () => void;
+  onSectionOpen: () => void;
 }>({
   collapsed: false,
   expand: () => {},
   canShowHref: () => true,
   onNavigate: () => {},
+  onSectionOpen: () => {},
 });
 
 const apiCache = new Map<string, { expires: number; promise: Promise<any> }>();
@@ -257,9 +259,6 @@ export default function DashboardLayout({
    * `null` on manualCollapse means "no override, follow the rule above".
    */
   const [navPinned, setNavPinned]           = useState(false);
-  // Set by handleNavClick so the route-change effect can tell a sidebar
-  // navigation apart from one started anywhere else on the page.
-  const navClickRef = useRef(false);
   const [navHover, setNavHover]             = useState(false);
   const [manualCollapse, setManualCollapse] = useState<boolean | null>(null);
   // Written once baseCollapsed is derived below, so the keyboard shortcut and
@@ -423,9 +422,9 @@ export default function DashboardLayout({
     if (typeof window === "undefined") return false;
     return window.matchMedia("(max-width: 767px)").matches;
   });
-  // The desktop topbar can be tucked away without changing the page's vertical
-  // position. Its 56px slot remains in the shell and only the restore control
-  // is shown there, so invoices and tables never jump when it is toggled.
+  // The desktop topbar can be tucked away. When it is, it keeps NO height at
+  // all — the page content moves up to the very top and the restore / close
+  // controls float over it, because a reserved empty band read as a bug.
   const [topbarCollapsed, setTopbarCollapsed] = useState(false);
   const pathname = usePathname();
   const isMobileDashboardHome = isMobileViewport && pathname === "/dashboard";
@@ -433,7 +432,7 @@ export default function DashboardLayout({
 
   /**
    * The width the page layout reserves. Derived, not stored: the route decides,
-   * a nav click or the home screen pins it open, and the footer button can
+   * opening a section pins it open for that browse, and the footer button can
    * override it until the next navigation.
    */
   const baseCollapsed = isMobileViewport
@@ -460,11 +459,7 @@ export default function DashboardLayout({
   useEffect(() => {
     setManualCollapse(null);
     setNavHover(false);
-    // A page reached any other way — the "+ New" button, a link inside a
-    // report, a redirect — is not a sidebar click, so the pin does not carry
-    // over and the route rule collapses the rail.
-    if (navClickRef.current) navClickRef.current = false;
-    else setNavPinned(false);
+    setNavPinned(false);
   }, [pathname]);
 
   // NOTE: Settings -> Appearance "Sidebar default" no longer gates this. The
@@ -472,14 +467,22 @@ export default function DashboardLayout({
   // preference on top of it meant the sidebar never auto-collapsed at all.
 
   /**
-   * A nav link click pins the sidebar open so it does not snap shut the moment
-   * the cursor leaves; the next nav link click releases the pin and the route
-   * rule collapses it again.
+   * Opening a section (Sales & Purchase, Inventory, …) pins the rail open so
+   * it does not snap shut while you are reading down the list — the cursor
+   * leaving the aside for a moment no longer costs you the menu.
+   */
+  const handleSectionClick = useCallback(() => {
+    setNavPinned(true);
+  }, []);
+
+  /**
+   * Clicking an actual page link is the end of that browse: the page opens and
+   * the rail goes back to the route rule, which collapses it everywhere except
+   * the dashboard home.
    */
   const handleNavClick = useCallback(() => {
-    navClickRef.current = true;
     setManualCollapse(null);
-    setNavPinned(p => !p);
+    setNavPinned(false);
   }, []);
 
   /* ══════════ CLOSE PAGE (✕) + unsaved-changes guard ══════════ */
@@ -1336,7 +1339,7 @@ export default function DashboardLayout({
         </div>
 
         {/* ---- NAV ---- */}
-        <SidebarCtx.Provider value={{ collapsed: sidebarCollapsed, expand: () => setManualCollapse(false), canShowHref: canShowDashboardHref, onNavigate: handleNavClick }}>
+        <SidebarCtx.Provider value={{ collapsed: sidebarCollapsed, expand: () => setManualCollapse(false), canShowHref: canShowDashboardHref, onNavigate: handleNavClick, onSectionOpen: handleSectionClick }}>
         {/* overscrollBehavior:"contain" so dragging past the end of the menu
             does not carry on and scroll the page behind the open drawer. */}
         <nav style={{flex:1,overflowY:"auto",overscrollBehavior:"contain",padding:"8px 8px",paddingBottom:80}}>
@@ -2608,15 +2611,21 @@ export default function DashboardLayout({
       <main style={{flex:1,display:"flex",flexDirection:"column",minHeight:"100dvh",minWidth:0,marginLeft:isMobileViewport ? 0 : SW,transition:"margin-left .25s ease"}}>
 
         {/* ---- TOPBAR ---- */}
+        {/* A hidden navbar keeps NO height at all — the page content starts at
+            the very top and the two controls float over it. Anything that
+            still occupied the flow left a 56px empty band exactly where the
+            bar used to be. */}
         {!isMobileDashboardHome && (
         <div
-          style={{
-            background:topbarCollapsed && !isMobileViewport
-              ? "transparent"
-              : isMobileViewport
-              ? "rgba(10,15,35,0.97)"
-              : "var(--panel-bg)",
-            borderBottom:topbarCollapsed && !isMobileViewport ? "none" : "1px solid var(--border)",
+          style={topbarCollapsed && !isMobileViewport ? {
+            position:"sticky", top:0, zIndex:12,
+            height:0, minHeight:0, padding:0, margin:0,
+            background:"transparent", border:"none",
+            display:"flex", justifyContent:"flex-end",
+            overflow:"visible", pointerEvents:"none",
+          } : {
+            background: isMobileViewport ? "rgba(10,15,35,0.97)" : "var(--panel-bg)",
+            borderBottom:"1px solid var(--border)",
             padding:isMobileViewport ? "10px 14px" : "8px 12px",
             minHeight:isMobileViewport ? 52 : 56,
             display:"flex",
@@ -2629,27 +2638,52 @@ export default function DashboardLayout({
             boxShadow:isMobileViewport ? "0 1px 0 rgba(255,255,255,0.05)" : "none",
           }}
           className="print:hidden sm:px-4"
+          data-nav-shell
         >
 
           {topbarCollapsed && !isMobileViewport ? (
-            <button
-              type="button"
-              onClick={() => setTopbarCollapsed(false)}
-              aria-label="Show navigation bar"
-              title="Show navigation bar"
-              style={{
-                width:36,height:36,borderRadius:10,border:"1px solid rgba(var(--accent-rgb),.35)",
-                background:"var(--panel-bg)",color:"var(--accent)",cursor:"pointer",
-                display:"flex",alignItems:"center",justifyContent:"center",marginLeft:"auto",
-                boxShadow:"0 4px 16px rgba(0,0,0,.2)",transition:"transform .15s, background .15s",
-              }}
-              onMouseEnter={e=>{e.currentTarget.style.transform="translateY(-1px)";e.currentTarget.style.background="rgba(var(--accent-rgb),.12)";}}
-              onMouseLeave={e=>{e.currentTarget.style.transform="none";e.currentTarget.style.background="var(--panel-bg)";}}
-            >
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M12 19V5"/><path d="m6 11 6-6 6 6"/>
-              </svg>
-            </button>
+            <div style={{position:"absolute",top:8,right:12,display:"flex",gap:8,pointerEvents:"auto"}}>
+              <button
+                type="button"
+                onClick={() => setTopbarCollapsed(false)}
+                aria-label="Show navigation bar"
+                title="Show navigation bar"
+                style={{
+                  width:36,height:36,borderRadius:10,border:"1px solid rgba(var(--accent-rgb),.35)",
+                  background:"var(--panel-bg)",color:"var(--accent)",cursor:"pointer",
+                  display:"flex",alignItems:"center",justifyContent:"center",
+                  boxShadow:"0 4px 16px rgba(0,0,0,.2)",transition:"transform .15s, background .15s",
+                }}
+                onMouseEnter={e=>{e.currentTarget.style.transform="translateY(-1px)";e.currentTarget.style.background="rgba(var(--accent-rgb),.12)";}}
+                onMouseLeave={e=>{e.currentTarget.style.transform="none";e.currentTarget.style.background="var(--panel-bg)";}}
+              >
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M12 19V5"/><path d="m6 11 6-6 6 6"/>
+                </svg>
+              </button>
+              {/* The ✕ has to survive here too — hiding the bar used to take the
+                  only way of closing the page with it. */}
+              {!isDashboardHome && (
+                <button
+                  type="button"
+                  onClick={requestClosePage}
+                  aria-label="Close this page"
+                  title="Close this page"
+                  style={{
+                    width:36,height:36,borderRadius:10,border:"1px solid rgba(248,113,113,.4)",
+                    background:"var(--panel-bg)",color:"#f87171",cursor:"pointer",
+                    display:"flex",alignItems:"center",justifyContent:"center",
+                    boxShadow:"0 4px 16px rgba(0,0,0,.2)",transition:"transform .15s, background .15s",
+                  }}
+                  onMouseEnter={e=>{e.currentTarget.style.transform="translateY(-1px)";e.currentTarget.style.background="rgba(248,113,113,.16)";}}
+                  onMouseLeave={e=>{e.currentTarget.style.transform="none";e.currentTarget.style.background="var(--panel-bg)";}}
+                >
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round">
+                    <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+                  </svg>
+                </button>
+              )}
+            </div>
           ) : isMobileViewport ? (
             <>
               {/* Hamburger */}
@@ -3378,7 +3412,7 @@ function NavGroup({ title, icon, open, onToggle, children }: {
   onToggle: () => void;
   children: React.ReactNode;
 }) {
-  const { collapsed, expand, canShowHref } = useContext(SidebarCtx);
+  const { collapsed, expand, canShowHref, onSectionOpen } = useContext(SidebarCtx);
   const displayTitle = cleanNavLabel(title);
 
   // Every NavLink hides itself when the plan does not include its page, so a
@@ -3395,7 +3429,7 @@ function NavGroup({ title, icon, open, onToggle, children }: {
     return (
       <div
         title={displayTitle}
-        onClick={() => { expand(); onToggle(); }}
+        onClick={() => { expand(); onSectionOpen(); onToggle(); }}
         style={{
           display:"flex", alignItems:"center", justifyContent:"center",
           width:44, height:36, borderRadius:8, margin:"1px auto", cursor:"pointer",
@@ -3415,7 +3449,7 @@ function NavGroup({ title, icon, open, onToggle, children }: {
     <div style={{marginBottom:2}}>
       {/* Section header button */}
       <div
-        onClick={onToggle}
+        onClick={() => { onSectionOpen(); onToggle(); }}
         style={{
           display:"flex",alignItems:"center",gap:9,padding:"8px 10px",
           borderRadius:10,cursor:"pointer",userSelect:"none",transition:"all .15s",
@@ -3446,11 +3480,12 @@ function NavSubGroup({ title, open, onToggle, children }: {
   onToggle: () => void;
   children: React.ReactNode;
 }) {
+  const { onSectionOpen } = useContext(SidebarCtx);
   const displayTitle = cleanNavLabel(title);
   return (
     <div style={{marginBottom:2}}>
       <div
-        onClick={onToggle}
+        onClick={() => { onSectionOpen(); onToggle(); }}
         style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"5px 8px",borderRadius:6,cursor:"pointer",userSelect:"none",transition:"background .15s"}}
         onMouseEnter={e=>{e.currentTarget.style.background="var(--sidebar-hover-bg)";}}
         onMouseLeave={e=>{e.currentTarget.style.background="transparent";}}
