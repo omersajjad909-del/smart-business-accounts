@@ -336,6 +336,89 @@ export function parseImportDate(raw: unknown): Date | null {
   return Number.isNaN(fallback.getTime()) ? null : fallback;
 }
 
+/* ─────────────────────── Splitting a big file ─────────────────────── */
+
+export type CsvChunk = {
+  /** The heading row plus this chunk's rows — a complete little CSV of its own. */
+  text: string;
+  /** Data rows that came before this chunk, so row numbers stay true to the original file. */
+  lineOffset: number;
+  /** Data rows carried by this chunk. */
+  rows: number;
+};
+
+/**
+ * Cuts one CSV into several, each carrying the original heading row.
+ *
+ * A serverless request body tops out around four and a half megabytes and the
+ * function itself around five minutes, which between them put a ceiling on the
+ * import that had nothing to do with the importer: a distributor's item master
+ * or ten years of one party's ledger simply never arrived. Splitting in the
+ * browser — where the whole file already is — lifts both limits at once,
+ * because each piece is its own small, fast request and the operator gets a
+ * progress bar instead of a spinner that eventually times out.
+ *
+ * The split has to be quote-aware for the same reason the parser does. An
+ * address field containing a newline is one row; cutting on it would hand the
+ * server half a row as a whole record and put every value one column out. So
+ * record boundaries are found the same way the parser finds them, and a chunk
+ * is a slice of the *original text* between two of them — never a re-serialised
+ * one, which would risk changing a value on the way through.
+ *
+ * `lineOffset` counts blank-filtered data rows, matching what `parseCsv` drops,
+ * so "Row 8,214" in an error means row 8,214 of the file the operator has open.
+ */
+export function splitCsvChunks(input: string, rowsPerChunk: number): CsvChunk[] {
+  const text = input.startsWith(BOM) ? input.slice(1) : input;
+  if (!text.trim()) return [];
+
+  const delimiter = detectDelimiter(text);
+
+  // [start, end) of each physical record, end stopping before the line break.
+  const spans: { start: number; end: number }[] = [];
+  let start = 0;
+  let inQuotes = false;
+  for (let i = 0; i < text.length; i += 1) {
+    const ch = text[i];
+    // A doubled quote inside a quoted field toggles twice and nets out, so a
+    // plain toggle keeps the right parity without a special case.
+    if (ch === '"') { inQuotes = !inQuotes; continue; }
+    if (inQuotes) continue;
+    if (ch === "\r" || ch === "\n") {
+      spans.push({ start, end: i });
+      if (ch === "\r" && text[i + 1] === "\n") i += 1;
+      start = i + 1;
+    }
+  }
+  if (start < text.length) spans.push({ start, end: text.length });
+  if (spans.length < 2) return [];
+
+  const header = text.slice(spans[0].start, spans[0].end);
+
+  // The same rows `parseCsvRecords` throws away: a trailing newline makes one,
+  // and a spool file pads its end with them. Counted out here so the offsets
+  // agree with the row numbers the server reports.
+  const blank = (span: { start: number; end: number }) => {
+    const raw = text.slice(span.start, span.end);
+    return raw.split(delimiter).every((cell) => cell.replace(/"/g, "").trim() === "");
+  };
+
+  const data = spans.slice(1).filter((span) => !blank(span));
+  if (data.length === 0) return [];
+
+  const size = Math.max(1, rowsPerChunk);
+  const chunks: CsvChunk[] = [];
+  for (let i = 0; i < data.length; i += size) {
+    const slice = data.slice(i, i + size);
+    chunks.push({
+      text: `${header}\n${text.slice(slice[0].start, slice[slice.length - 1].end)}`,
+      lineOffset: i,
+      rows: slice.length,
+    });
+  }
+  return chunks;
+}
+
 /** Quotes a value for a CSV we generate, so our own templates round-trip. */
 export function csvCell(value: unknown): string {
   const s = String(value ?? "");
