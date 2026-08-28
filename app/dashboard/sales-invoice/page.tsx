@@ -1228,28 +1228,6 @@ function SalesInvoiceContent() {
               </div>
             )}
 
-
-            {/* ── Shortcuts Bar ── */}
-            {!preview && (
-              <div style={{ display: "flex", gap: 6, marginTop: 16, flexWrap: "wrap" }}>
-                {(siQueryMode ? [
-                  { key: "F8", label: "Execute Query", color: "#facc15" },
-                  { key: "Esc", label: "Cancel Query", color: undefined },
-                ] : siQueryIdx >= 0 ? [
-                  { key: "F7", label: "New Query", color: accent },
-                  { key: "PageDown", label: "Next Invoice", color: undefined },
-                  { key: "PageUp", label: "Prev Invoice", color: undefined },
-                ] : [
-                  { key: "F7", label: "Query Mode", color: accent },
-                ]).map(s => (
-                  <div key={s.key} style={{ display: "flex", alignItems: "center", gap: 4, background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 6, padding: "4px 10px" }}>
-                    <span style={{ background: s.color ? `${s.color}22` : "rgba(255,255,255,.06)", color: s.color || "var(--text-muted)", borderRadius: 4, padding: "1px 7px", fontSize: 10, fontWeight: 800, fontFamily: "monospace", border: `1px solid ${s.color ? `${s.color}44` : "var(--border)"}` }}>{s.key}</span>
-                    <span style={{ fontSize: 11, color: "var(--text-muted)" }}>{s.label}</span>
-                  </div>
-                ))}
-              </div>
-            )}
-
         {/* ── Invoice Preview (screen) ── */}
             {preview && (
               <PrintPaperWrapper>
