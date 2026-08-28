@@ -566,6 +566,16 @@ export default function DashboardLayout({
     leaveToDashboard();
   }
 
+  // Esc answers the dialog with Cancel, the way the desktop app did.
+  useEffect(() => {
+    if (!closeConfirm) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && !closeSaving) { e.preventDefault(); setCloseConfirm(false); }
+    };
+    window.addEventListener("keydown", onKey, true);
+    return () => window.removeEventListener("keydown", onKey, true);
+  }, [closeConfirm, closeSaving]);
+
   /** "Yes" — save what has been entered so far, then close. */
   async function saveThenClose() {
     setCloseSaving(true);
@@ -1209,6 +1219,69 @@ export default function DashboardLayout({
         </div>
       )}
 
+      {/* ═══ UNSAVED CHANGES — asked by the topbar ✕ ═══ */}
+      {closeConfirm && (
+        <div
+          style={{position:"fixed",inset:0,zIndex:100000,background:"rgba(3,6,20,0.72)",backdropFilter:"blur(3px)",display:"flex",alignItems:"center",justifyContent:"center",padding:16}}
+          onClick={() => { if (!closeSaving) setCloseConfirm(false); }}
+        >
+          <div
+            role="dialog"
+            aria-modal="true"
+            onClick={e => e.stopPropagation()}
+            style={{
+              width:"100%",maxWidth:420,borderRadius:16,overflow:"hidden",
+              background:"var(--panel-bg)",border:"1px solid var(--border)",
+              boxShadow:"0 30px 80px rgba(0,0,0,0.6)",
+              fontFamily:"'Outfit','Inter',sans-serif",
+            }}
+          >
+            <div style={{padding:"22px 24px 18px",display:"flex",gap:14,alignItems:"flex-start"}}>
+              <div style={{width:42,height:42,borderRadius:12,flexShrink:0,background:"rgba(251,191,36,0.12)",border:"1px solid rgba(251,191,36,0.3)",display:"flex",alignItems:"center",justifyContent:"center",color:"#fbbf24"}}>
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+                  <line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+                </svg>
+              </div>
+              <div style={{minWidth:0}}>
+                <div style={{fontSize:15,fontWeight:800,color:"var(--text-primary)",marginBottom:6}}>
+                  Do you want to save the changes you have made?
+                </div>
+                <div style={{fontSize:12.5,lineHeight:1.6,color:"var(--text-muted)"}}>
+                  <b style={{color:"var(--text-primary)"}}>Yes</b> saves what you have entered so far and closes the page.
+                  <b style={{color:"var(--text-primary)"}}> No</b> closes without saving anything.
+                  <b style={{color:"var(--text-primary)"}}> Cancel</b> keeps you on this page.
+                </div>
+              </div>
+            </div>
+            <div style={{display:"flex",gap:10,justifyContent:"flex-end",padding:"14px 20px",borderTop:"1px solid var(--border)",background:"var(--panel-bg-2)",flexWrap:"wrap"}}>
+              <button
+                onClick={saveThenClose}
+                disabled={closeSaving}
+                autoFocus
+                style={{minWidth:96,padding:"9px 18px",borderRadius:10,border:"none",cursor:closeSaving?"wait":"pointer",fontSize:13,fontWeight:700,fontFamily:"inherit",color:"#fff",background:"linear-gradient(135deg,var(--accent),var(--accent-strong))",opacity:closeSaving?0.7:1,boxShadow:"0 3px 12px rgba(var(--accent-rgb),.35)"}}
+              >
+                {closeSaving ? "Saving…" : "Yes"}
+              </button>
+              <button
+                onClick={leaveToDashboard}
+                disabled={closeSaving}
+                style={{minWidth:96,padding:"9px 18px",borderRadius:10,cursor:closeSaving?"not-allowed":"pointer",fontSize:13,fontWeight:700,fontFamily:"inherit",background:"transparent",border:"1px solid rgba(248,113,113,0.35)",color:"#f87171",opacity:closeSaving?0.5:1}}
+              >
+                No
+              </button>
+              <button
+                onClick={() => setCloseConfirm(false)}
+                disabled={closeSaving}
+                style={{minWidth:96,padding:"9px 18px",borderRadius:10,cursor:closeSaving?"not-allowed":"pointer",fontSize:13,fontWeight:700,fontFamily:"inherit",background:"transparent",border:"1px solid var(--border)",color:"var(--text-muted)",opacity:closeSaving?0.5:1}}
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* MOBILE OVERLAY */}
       {isMobileViewport && isMobileMenuOpen && (
         <div
@@ -1218,10 +1291,14 @@ export default function DashboardLayout({
       )}
 
       {/* ═══════════════ SIDEBAR ═══════════════ */}
-      <aside style={{
+      <aside
+        data-nav-shell
+        onMouseEnter={() => { if (!isMobileViewport) setNavHover(true); }}
+        onMouseLeave={() => { if (!isMobileViewport) setNavHover(false); }}
+        style={{
         position:"fixed",
         top:0, left:0, bottom:0,
-        width: isMobileViewport ? "min(82vw, 320px)" : SW,
+        width: isMobileViewport ? "min(82vw, 320px)" : asideW,
         background:"var(--sidebar-bg)",
         borderRight:"1px solid var(--sidebar-border)",
         display:"flex",
@@ -1230,7 +1307,12 @@ export default function DashboardLayout({
         transform: isMobileViewport
           ? (isMobileMenuOpen ? "translateX(0)" : "translateX(-100%)")
           : "translateX(0)",
-        transition:"width .25s ease, transform .3s ease",
+        transition:"width .25s ease, transform .3s ease, box-shadow .25s ease",
+        // While peeking, the rail is wider than the space the page reserved for
+        // it, so give it a shadow to read as a panel floating over the content.
+        boxShadow: (!isMobileViewport && baseCollapsed && navHover)
+          ? "12px 0 32px rgba(0,0,0,0.45)"
+          : "none",
         overflow:"hidden",
       }}
       >
@@ -2635,6 +2717,17 @@ export default function DashboardLayout({
                   </div>
                 )}
               </div>
+              {/* Close page (✕) */}
+              {!isDashboardHome && (
+                <button
+                  onClick={requestClosePage}
+                  aria-label="Close this page"
+                  style={{marginLeft:6,width:38,height:38,borderRadius:11,background:"rgba(248,113,113,0.10)",border:"1px solid rgba(248,113,113,0.28)",display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",color:"#f87171",flexShrink:0}}>
+                  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round">
+                    <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+                  </svg>
+                </button>
+              )}
             </>
           ) : (
             <>
@@ -2957,6 +3050,22 @@ export default function DashboardLayout({
                 <path d="M12 5v14"/><path d="m18 13-6 6-6-6"/>
               </svg>
             </button>
+
+            {/* ---- CLOSE PAGE (✕) — back to the dashboard ---- */}
+            {!isDashboardHome && (
+              <button
+                onClick={requestClosePage}
+                title="Close this page"
+                aria-label="Close this page"
+                style={{width:34,height:34,borderRadius:9,background:"rgba(248,113,113,0.10)",border:"1px solid rgba(248,113,113,0.25)",display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",transition:"all .15s",color:"#f87171",flexShrink:0}}
+                onMouseEnter={e=>{e.currentTarget.style.background="rgba(248,113,113,0.22)";e.currentTarget.style.borderColor="rgba(248,113,113,0.5)";}}
+                onMouseLeave={e=>{e.currentTarget.style.background="rgba(248,113,113,0.10)";e.currentTarget.style.borderColor="rgba(248,113,113,0.25)";}}
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round">
+                  <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+                </svg>
+              </button>
+            )}
           </div>
             </>
           )}
@@ -3038,7 +3147,9 @@ export default function DashboardLayout({
               </div>
             )}
 
-            {children}
+            <PageCloseGuardCtx.Provider value={{ register: registerPageGuard }}>
+              {children}
+            </PageCloseGuardCtx.Provider>
           </div>
         </div>
 
@@ -3223,13 +3334,13 @@ function NavDirectLink({ href, icon, children, pathname, exact }: {
   pathname: string;
   exact?: boolean;
 }) {
-  const { collapsed, expand } = useContext(SidebarCtx);
+  const { collapsed, onNavigate } = useContext(SidebarCtx);
   const active = exact ? pathname === href : (pathname === href || pathname.startsWith(href + "/"));
   const label = typeof children === "string" ? cleanNavLabel(children) : children;
 
   if (collapsed) {
     return (
-      <Link prefetch={false} href={href} title={typeof label === "string" ? label : ""}
+      <Link prefetch={false} href={href} title={typeof label === "string" ? label : ""} onClick={onNavigate}
         style={{display:"flex",alignItems:"center",justifyContent:"center",width:44,height:36,borderRadius:9,margin:"1px auto",cursor:"pointer",color:active?"var(--accent)":"var(--sidebar-link-muted)",background:active?"rgba(var(--accent-rgb),0.15)":"transparent",textDecoration:"none",transition:"all .15s"}}
         onMouseEnter={e=>{e.currentTarget.style.background=active?"rgba(var(--accent-rgb),0.18)":"rgba(255,255,255,0.06)";}}
         onMouseLeave={e=>{e.currentTarget.style.background=active?"rgba(var(--accent-rgb),0.15)":"transparent";}}
@@ -3238,7 +3349,7 @@ function NavDirectLink({ href, icon, children, pathname, exact }: {
   }
 
   return (
-    <Link prefetch={false} href={href}
+    <Link prefetch={false} href={href} onClick={onNavigate}
       style={{display:"flex",alignItems:"center",gap:9,padding:"8px 10px",borderRadius:10,fontSize:13,fontWeight:active?700:500,color:active?"var(--accent)":"var(--sidebar-link)",background:active?"rgba(var(--accent-rgb),0.15)":"transparent",textDecoration:"none",transition:"all .15s",marginBottom:2}}
       onMouseEnter={e=>{if(!active){e.currentTarget.style.background="rgba(255,255,255,0.06)";e.currentTarget.style.color="var(--sidebar-link-hover)";}}}
       onMouseLeave={e=>{if(!active){e.currentTarget.style.background="transparent";e.currentTarget.style.color="var(--sidebar-link)";}}}
@@ -3363,7 +3474,7 @@ function NavLink({ href, children, pathname }: {
   children: React.ReactNode;
   pathname: string;
 }) {
-  const { collapsed, canShowHref } = useContext(SidebarCtx);
+  const { collapsed, canShowHref, onNavigate } = useContext(SidebarCtx);
   if (!canShowHref(href)) return null;
   const active = pathname === href || (href !== "/dashboard" && pathname.startsWith(href));
   const displayChildren = typeof children === "string" ? cleanNavLabel(children) : children;
@@ -3405,6 +3516,7 @@ function NavLink({ href, children, pathname }: {
       <Link
         href={href}
         prefetch={false}
+        onClick={onNavigate}
         title={typeof displayChildren === "string" ? displayChildren : ""}
         style={{
           display:"flex", alignItems:"center", justifyContent:"center",
@@ -3425,6 +3537,7 @@ function NavLink({ href, children, pathname }: {
     <Link
       href={href}
       prefetch={false}
+      onClick={onNavigate}
       style={{
         display:"flex",alignItems:"center",gap:8,padding:"7px 10px",borderRadius:9,fontSize:12.5,
         color: active ? "var(--accent)" : "var(--sidebar-link)",
