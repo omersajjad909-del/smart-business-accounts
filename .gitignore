@@ -51,3 +51,9 @@ prisma/.env
 .env.bak*
 .env.backup*
 .env.*.bak
+
+# Biometric bridge — holds a device ingest key and its sync high-water mark
+scripts/biometric-bridge/config.json
+scripts/biometric-bridge/.bridge-state.json
+scripts/biometric-bridge/node_modules/
+scripts/biometric-bridge/bridge.log

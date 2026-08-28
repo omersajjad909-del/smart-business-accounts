@@ -224,7 +224,33 @@ export async function processPunches(
     cell.ids.push(p.id);
   }
 
+  // Read every attendance row this run could touch in one query. A month-long
+  // reprocess for a 200-person company is thousands of employee-days, and one
+  // findUnique each turns a replay into a several-minute round-trip storm.
+  const allDates = Array.from(
+    new Set(Array.from(buckets.values()).flatMap((byDay) => Array.from(byDay.keys())))
+  ).map(dayStart);
+
+  const existingRows = allDates.length
+    ? await prisma.attendance.findMany({
+        where: { companyId, employeeId: { in: Array.from(buckets.keys()) }, date: { in: allDates } },
+        select: { id: true, employeeId: true, date: true, status: true },
+      })
+    : [];
+  const existingByKey = new Map(
+    existingRows.map((r) => [`${r.employeeId}|${r.date.toISOString()}`, r])
+  );
+
   const processedIds: string[] = [];
+  const toCreate: {
+    companyId: string;
+    employeeId: string;
+    date: Date;
+    status: string;
+    checkIn: Date;
+    checkOut: Date | null;
+    remarks: string;
+  }[] = [];
 
   for (const [employeeId, byDay] of buckets) {
     const emp = empById.get(employeeId)!;
@@ -245,10 +271,7 @@ export async function processPunches(
       const { status, note } = decideStatus(checkInMinutes, workedMs, emp, settings);
 
       const date = dayStart(key);
-      const existing = await prisma.attendance.findUnique({
-        where: { employeeId_date: { employeeId, date } },
-        select: { id: true, status: true, remarks: true },
-      });
+      const existing = existingByKey.get(`${employeeId}|${date.toISOString()}`);
 
       if (existing && PROTECTED_STATUSES.has(existing.status)) {
         result.skippedProtected += 1;
@@ -257,17 +280,26 @@ export async function processPunches(
       }
 
       const remarks = `${AUTO_REMARK_PREFIX} · ${cell.device} · ${note}`;
-      const data = { status, checkIn, checkOut, remarks };
 
       if (existing) {
-        await prisma.attendance.update({ where: { id: existing.id }, data });
+        await prisma.attendance.update({
+          where: { id: existing.id },
+          data: { status, checkIn, checkOut, remarks },
+        });
         result.updated += 1;
       } else {
-        await prisma.attendance.create({ data: { ...data, companyId, employeeId, date } });
+        toCreate.push({ companyId, employeeId, date, status, checkIn, checkOut, remarks });
         result.created += 1;
       }
       processedIds.push(...cell.ids);
     }
+  }
+
+  if (toCreate.length > 0) {
+    // skipDuplicates covers the race where a second ingest for the same day
+    // landed between the lookup above and here.
+    const res = await prisma.attendance.createMany({ data: toCreate, skipDuplicates: true });
+    result.created = res.count;
   }
 
   if (processedIds.length > 0) {

@@ -157,7 +157,9 @@ export function parseDeviceTime(value: string, tzOffsetMin: number): Date | null
     return Number.isNaN(d.getTime()) ? null : d;
   }
 
-  const m = s.match(/^(\d{4})-(\d{2})-(\d{2})[T ](\d{2}):(\d{2})(?::(\d{2}))?/);
+  // Single-digit months and hours show up in hand-edited exports, so accept
+  // 1-2 digits everywhere rather than dropping the row.
+  const m = s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})[T ](\d{1,2}):(\d{1,2})(?::(\d{1,2}))?/);
   if (!m) {
     const d = new Date(s);
     return Number.isNaN(d.getTime()) ? null : d;
