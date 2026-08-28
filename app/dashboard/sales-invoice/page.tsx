@@ -2,7 +2,7 @@
 import { fmtDate } from "@/lib/dateUtils";
 import { DateInput } from "@/app/dashboard/reports/_components/DateInput";
 import { confirmToast } from "@/lib/toast-feedback";
-import { Suspense, useCallback, useEffect, useState } from "react";
+import { Suspense, useCallback, useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import toast from "react-hot-toast";
 import dynamic from "next/dynamic";
@@ -27,7 +27,7 @@ import {
   rateFormulaEnterHandler,
   type RateFormulaMeta,
 } from "@/components/RateFormulaCells";
-import { computeRateFromFormula, emptyRateFormulaMeta, itemMetaWithName, itemNameWithoutSpec, itemPickerLabel, metaFromItem, readRateFormulaMeta } from "@/lib/rateFormula";
+import { computeRateFromFormula, emptyRateFormulaMeta, itemMetaWithName, itemNameWithoutSpec, itemPickerLabel, itemSpecRole, metaFromItem, readRateFormulaMeta } from "@/lib/rateFormula";
 import type { RateFormulaValue } from "@/lib/rateFormula";
 
 
@@ -37,7 +37,9 @@ const accent = "#6366f1";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 type Account = { id: string; name: string; email?: string; phone?: string; address?: string; city?: string; ntn?: string; strn?: string };
-type Item = { id: string; name: string; code?: string; unit?: string; description?: string; availableQty: number; barcode?: string; salePrice?: number; taxRate?: number; meta?: unknown };
+type Item = { id: string; name: string; code?: string; unit?: string; description?: string; availableQty: number; barcode?: string; salePrice?: number; taxRate?: number; meta?: unknown;
+  /** Received, sold and balance from InventoryTxn — /api/items-new?withStock=1. */
+  stockIn?: number; stockOut?: number; stockBal?: number };
 type Row = { itemId: string; name: string; description: string; availableQty: number; qty: number | ""; rate: number | ""; discountPercent: number | ""; taxPercent: number | ""; unit: string; sku: string; isManual?: boolean;
   /** Rate-formula dimensions, when this company uses one. See lib/rateFormula.ts. */
   meta?: RateFormulaMeta };
@@ -190,9 +192,18 @@ function SalesInvoiceContent() {
       const list = Array.isArray(d) ? d : d.accounts || [];
       setCustomers(list.filter((a: any) => a.partyType === "CUSTOMER"));
     });
-    fetch("/api/items-new", { headers: h }).then(r => r.json()).then(d => {
+    // withStock=1: the picker shows received / sold / balance and can hide
+    // whatever the godown has none of, the way the old sale-billing screen did.
+    fetch("/api/items-new?withStock=1", { headers: h }).then(r => r.json()).then(d => {
       const list = Array.isArray(d) ? d : [];
-      setItems(list.map((i: any) => ({ id: i.id, name: i.name, code: i.code || "", unit: i.unit || "", description: i.description || "", availableQty: 0, barcode: i.barcode || "", salePrice: i.rate ?? 0, taxRate: i.taxRate ?? 0, meta: i.meta ?? null })));
+      setItems(list.map((i: any) => ({
+        id: i.id, name: i.name, code: i.code || "", unit: i.unit || "",
+        description: i.description || "", barcode: i.barcode || "",
+        salePrice: i.rate ?? 0, taxRate: i.taxRate ?? 0, meta: i.meta ?? null,
+        stockIn: Number(i.stockIn ?? 0), stockOut: Number(i.stockOut ?? 0),
+        stockBal: Number(i.stockBal ?? 0),
+        availableQty: Number(i.stockBal ?? 0),
+      })));
     });
     fetch("/api/tax-configuration").then(r => r.json()).then(d => setTaxes(Array.isArray(d) ? d : [])).catch(() => {});
     fetch("/api/users", { headers: h }).then(r => r.ok ? r.json() : []).then(d => setTeamMembers((Array.isArray(d) ? d : []).map((u: any) => ({ id: u.id, name: u.name })))).catch(() => {});
@@ -389,6 +400,26 @@ function SalesInvoiceContent() {
    *
    * useCallback so ItemPicker can key its own cache on it.
    */
+  /**
+   * Only the columns an item can actually answer. A column we cannot place —
+   * RT/MM, which is worked out per line — has nothing to show in a catalogue
+   * list and printed a "—" down the whole dropdown.
+   */
+  const pickerPreviewFields = useMemo(
+    () => rf.fields.filter((field) => itemSpecRole(field)).map((field) => ({ key: field.key, label: field.label })),
+    [rf],
+  );
+
+  /** Received / sold / balance for the picker's stock columns. */
+  const itemStockValues = useCallback(
+    (item: { id: string }) => {
+      const found = items.find((i) => i.id === item.id);
+      if (!found || found.stockBal === undefined) return null;
+      return { received: found.stockIn ?? 0, sold: found.stockOut ?? 0, balance: found.stockBal };
+    },
+    [items],
+  );
+
   const itemPreviewValues = useCallback(
     (item: { id: string; name: string; description?: string | null; meta?: unknown }) =>
       itemMetaWithName(rf, item.meta, `${item.name || ""} ${item.description || ""}`) as Record<string, unknown>,
@@ -1000,8 +1031,9 @@ function SalesInvoiceContent() {
                                     onChange={(id) => selectItem(i, id)}
                                     onKeyDown={rateFormulaEnterHandler(rf, rfActive, i)}
                                     label={rfActive ? itemPickerLabel : undefined}
-                                    previewFields={rfActive ? rf.fields.map((field) => ({ key: field.key, label: field.label })) : []}
+                                    previewFields={rfActive ? pickerPreviewFields : []}
                                     previewValues={rfActive ? itemPreviewValues : undefined}
+                                    stockValues={itemStockValues}
                                     // placeholder="Type to search — e.g. e1060"
                                     style={inputStyle}
                                   />
@@ -1075,8 +1107,9 @@ function SalesInvoiceContent() {
                                         onChange={(id) => selectItem(i, id)}
                                         onKeyDown={rateFormulaEnterHandler(rf, rfActive, i)}
                                         label={rfActive ? itemPickerLabel : undefined}
-                                        previewFields={rfActive ? rf.fields.map((field) => ({ key: field.key, label: field.label })) : []}
+                                        previewFields={rfActive ? pickerPreviewFields : []}
                                         previewValues={rfActive ? itemPreviewValues : undefined}
+                                        stockValues={itemStockValues}
                                         // placeholder="Type to search — e.g. e1060"
                                         style={{ ...inputStyle, padding: "6px 8px", fontSize: 13 }}
                                       />

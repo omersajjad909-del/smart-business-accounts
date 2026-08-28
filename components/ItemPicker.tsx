@@ -68,12 +68,20 @@ type Props = {
    * item is picked and the two agree.
    */
   previewValues?: (item: PickerItem) => Record<string, unknown>;
+  /**
+   * What is on the floor for one item: received, sold, and what is left.
+   *
+   * Given these, the list grows the three columns the old sale-billing screen
+   * carried and offers to hide anything with nothing left — picking a roll the
+   * godown does not have is the mistake this catches.
+   */
+  stockValues?: (item: PickerItem) => { received: number; sold: number; balance: number } | null;
 };
 
 export function ItemPicker({
   items, value, onChange, onKeyDown, label,
   allowManual = true, placeholder = "Type to search…", style, autoFocus,
-  previewFields = [], previewValues,
+  previewFields = [], previewValues, stockValues,
 }: Props) {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
@@ -103,17 +111,41 @@ export function ItemPicker({
     return map;
   }, [items, previewValues, previewFields.length]);
 
+  const stockMap = useMemo(() => {
+    if (!stockValues) return null;
+    const map = new Map<string, { received: number; sold: number; balance: number }>();
+    for (const item of items) {
+      const row = stockValues(item);
+      if (row) map.set(item.id, row);
+    }
+    return map;
+  }, [items, stockValues]);
+
+  /** Whether anything in this catalogue is actually in stock. */
+  const anyInStock = useMemo(() => {
+    if (!stockMap) return false;
+    for (const row of stockMap.values()) if (row.balance > 0) return true;
+    return false;
+  }, [stockMap]);
+
+  // On by default when the company posts its stock, off when nothing has a
+  // balance — a filter that empties the list is worse than no filter.
+  const [inStockOnly, setInStockOnly] = useState(true);
+  const stockFilterOn = Boolean(stockMap) && anyInStock && inStockOnly;
+
   const matches = useMemo(() => {
-    if (!query.trim()) return indexed.slice(0, MAX_VISIBLE).map((r) => r.item);
+    const keep = (item: PickerItem) =>
+      !stockFilterOn || (stockMap?.get(item.id)?.balance ?? 0) > 0;
+    const wanted = query.trim();
     const out: PickerItem[] = [];
     for (const row of indexed) {
-      if (itemMatches(query, row.keys)) {
-        out.push(row.item);
-        if (out.length >= MAX_VISIBLE) break;
-      }
+      if (!keep(row.item)) continue;
+      if (wanted && !itemMatches(wanted, row.keys)) continue;
+      out.push(row.item);
+      if (out.length >= MAX_VISIBLE) break;
     }
     return out;
-  }, [indexed, query]);
+  }, [indexed, query, stockFilterOn, stockMap]);
 
   useEffect(() => { setCursor(0); }, [query]);
 
@@ -168,8 +200,9 @@ export function ItemPicker({
 
   const selectedLabel = selected ? (label ? label(selected) : selected.name) : "";
   const shown = open ? query : selectedLabel;
+  const showStock = Boolean(stockMap);
   const previewColumns = previewFields.length
-    ? `minmax(150px, 1.4fr) repeat(${previewFields.length}, minmax(56px, 1fr)) minmax(52px, .7fr)`
+    ? `minmax(150px, 1.4fr) repeat(${previewFields.length}, minmax(56px, 1fr)) minmax(52px, .7fr)${showStock ? " repeat(3, minmax(58px, .8fr))" : ""}`
     : "minmax(170px, 1fr) minmax(62px, auto) minmax(48px, auto)";
 
   return (
@@ -202,11 +235,32 @@ export function ItemPicker({
             padding: 4,
           }}
         >
+          {showStock && anyInStock && (
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, padding: "6px 10px 7px", borderBottom: "1px solid var(--border, rgba(255,255,255,.12))" }}>
+              <span style={{ fontSize: 11, color: "var(--text-muted, rgba(255,255,255,.5))" }}>
+                {matches.length} shown{inStockOnly ? " — in stock" : ""}
+              </span>
+              <label
+                onMouseDown={(e) => e.preventDefault()}
+                style={{ display: "inline-flex", alignItems: "center", gap: 6, fontSize: 11, cursor: "pointer", color: "var(--text-muted, rgba(255,255,255,.6))" }}
+              >
+                <input
+                  type="checkbox"
+                  checked={inStockOnly}
+                  onChange={(e) => setInStockOnly(e.target.checked)}
+                  style={{ accentColor: "var(--accent, #6366f1)", cursor: "pointer" }}
+                />
+                In stock only
+              </label>
+            </div>
+          )}
+
           {previewFields.length > 0 && (
             <div style={{ display: "grid", gridTemplateColumns: previewColumns, gap: 8, padding: "7px 10px", borderBottom: "1px solid var(--border, rgba(255,255,255,.12))", color: "var(--text-muted, rgba(255,255,255,.5))", fontSize: 10, fontWeight: 800, textTransform: "uppercase", letterSpacing: ".04em" }}>
               <span>Quality / Item</span>
               {previewFields.map((field) => <span key={field.key} style={{ textAlign: "center" }}>{field.label}</span>)}
               <span style={{ textAlign: "right" }}>Unit</span>
+              {showStock && <><span style={{ textAlign: "right" }}>R.Qty</span><span style={{ textAlign: "right" }}>Sold</span><span style={{ textAlign: "right" }}>Bal</span></>}
             </div>
           )}
 
@@ -257,11 +311,29 @@ export function ItemPicker({
                 const text = raw === undefined || raw === null || raw === "" ? "—" : String(raw);
                 return <span key={field.key} style={{ textAlign: "center", fontSize: 12, color: text === "—" ? "var(--text-muted, rgba(255,255,255,.35))" : "var(--text-primary, #fff)" }}>{text}</span>;
               })}
-              {item.unit && (
+              {(item.unit || previewFields.length > 0) && (
                 <span style={{ fontSize: 11, color: "var(--text-muted, rgba(255,255,255,.35))", marginLeft: previewFields.length ? 0 : "auto", paddingLeft: previewFields.length ? 0 : 12, textAlign: previewFields.length ? "right" : undefined }}>
-                  {item.unit}
+                  {item.unit || "—"}
                 </span>
               )}
+              {showStock && (() => {
+                const st = stockMap?.get(item.id);
+                const cell = (n: number | undefined, tone?: string) => (
+                  <span style={{ textAlign: "right", fontSize: 12, fontVariantNumeric: "tabular-nums", color: tone ?? "var(--text-muted, rgba(255,255,255,.55))" }}>
+                    {n === undefined ? "—" : n.toLocaleString()}
+                  </span>
+                );
+                return (
+                  <>
+                    {cell(st?.received)}
+                    {cell(st?.sold)}
+                    {/* The one figure the operator is really reading: what is
+                        left. Red at zero so an out-of-stock roll cannot be
+                        picked by accident when the filter is switched off. */}
+                    {cell(st?.balance, (st?.balance ?? 0) > 0 ? "var(--text-primary, #fff)" : "var(--danger, #f87171)")}
+                  </>
+                );
+              })()}
             </div>
           ))}
 
