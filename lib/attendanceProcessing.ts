@@ -1,10 +1,10 @@
 import { prisma } from "@/lib/prisma";
 import {
-  atTime,
   dayKey,
   dayStart,
   getBiometricSettings,
   inDeviceZone,
+  shiftMinutes,
   type BiometricSettings,
 } from "@/lib/biometric";
 
@@ -86,29 +86,41 @@ function collapse(times: Date[], dedupeMinutes: number): Date[] {
   return out;
 }
 
+/**
+ * @param checkInMinutes  minutes past midnight on the *device's* clock
+ * @param workedMs        real elapsed time, so it needs no zone at all
+ *
+ * Lateness is a wall-clock question ("did they arrive after 9?") and is decided
+ * in minutes-of-day. Comparing Date objects here would depend on the server's
+ * own timezone, which is UTC in production and local in dev — the same punch
+ * would come out on time on Vercel and five hours late on a laptop.
+ */
 function decideStatus(
-  checkIn: Date,
-  checkOut: Date | null,
+  checkInMinutes: number,
+  workedMs: number | null,
   emp: EmployeeRow,
-  key: string,
   settings: BiometricSettings
 ): { status: string; note: string } {
-  const shiftStart = atTime(key, emp.shiftStart || DEFAULT_SHIFT_START);
-
-  if (!checkOut) {
+  if (workedMs === null) {
     return { status: "PRESENT", note: "no check-out recorded" };
   }
 
-  const workedHours = (checkOut.getTime() - checkIn.getTime()) / 3_600_000;
+  const workedHours = workedMs / 3_600_000;
   if (workedHours < settings.halfDayHours) {
     return { status: "HALF_DAY", note: `${workedHours.toFixed(1)}h worked` };
   }
 
-  if (shiftStart) {
-    const lateAfter = new Date(shiftStart.getTime() + settings.graceMinutes * 60_000);
-    if (checkIn.getTime() > lateAfter.getTime()) {
-      const lateBy = Math.round((checkIn.getTime() - shiftStart.getTime()) / 60_000);
-      return { status: "LATE", note: `${lateBy} min late` };
+  const start = shiftMinutes(emp.shiftStart || DEFAULT_SHIFT_START);
+  if (start !== null) {
+    // A night shift starting at 21:00 and entered at 00:30 is early, not
+    // 20 hours late — roll the arrival past midnight into the same day.
+    const arrival =
+      isNightShift(emp) && checkInMinutes < settings.nightShiftCutoffHour * 60
+        ? checkInMinutes + 1440
+        : checkInMinutes;
+
+    if (arrival > start + settings.graceMinutes) {
+      return { status: "LATE", note: `${arrival - start} min late` };
     }
   }
 
@@ -225,11 +237,12 @@ export async function processPunches(
       const checkIn = times[0];
       const checkOut = times.length > 1 ? times[times.length - 1] : null;
 
-      // The shift is wall-clock, so compare against the device's own clock
-      // rather than the server's (Vercel runs UTC, the machine sits in Karachi).
+      // Read the arrival on the device's own clock; the hours worked are a
+      // plain elapsed difference and need no zone.
       const localIn = inDeviceZone(checkIn, cell.tzOffsetMin);
-      const localOut = checkOut ? inDeviceZone(checkOut, cell.tzOffsetMin) : null;
-      const { status, note } = decideStatus(localIn, localOut, emp, key, settings);
+      const checkInMinutes = localIn.getUTCHours() * 60 + localIn.getUTCMinutes();
+      const workedMs = checkOut ? checkOut.getTime() - checkIn.getTime() : null;
+      const { status, note } = decideStatus(checkInMinutes, workedMs, emp, settings);
 
       const date = dayStart(key);
       const existing = await prisma.attendance.findUnique({
@@ -281,7 +294,7 @@ export async function finalizeDay(
   if (!settings.autoAbsent) return { marked: 0, skipped: "autoAbsent is off" };
 
   const date = dayStart(key);
-  if (weeklyOffDays.includes(date.getDay())) return { marked: 0, skipped: "weekly off" };
+  if (weeklyOffDays.includes(date.getUTCDay())) return { marked: 0, skipped: "weekly off" };
 
   const holiday = await prisma.holiday.findFirst({ where: { companyId, date } });
   if (holiday) return { marked: 0, skipped: `holiday: ${holiday.name}` };

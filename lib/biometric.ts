@@ -113,28 +113,33 @@ export async function getBiometricSettings(companyId: string): Promise<Biometric
    Time helpers
    ──────────────────────────────────────────────────────────── */
 
-/** "YYYY-MM-DD" for a Date, read in the server's local zone. */
+/** "YYYY-MM-DD" for a Date, read in UTC. */
 export function dayKey(d: Date): string {
-  const yyyy = d.getFullYear();
-  const mm = String(d.getMonth() + 1).padStart(2, "0");
-  const dd = String(d.getDate()).padStart(2, "0");
+  const yyyy = d.getUTCFullYear();
+  const mm = String(d.getUTCMonth() + 1).padStart(2, "0");
+  const dd = String(d.getUTCDate()).padStart(2, "0");
   return `${yyyy}-${mm}-${dd}`;
 }
 
-/** Midnight of the given day key — the shape `Attendance.date` is stored in. */
+/**
+ * Midnight of the given day key — the shape `Attendance.date` is stored in.
+ *
+ * UTC, not server-local, because that is what `new Date("2026-08-28")` produces
+ * and every attendance row written by hand went in through that path. A
+ * server-local midnight here would sit a few hours off those rows and the
+ * upsert would miss them, quietly doubling the calendar.
+ */
 export function dayStart(key: string): Date {
   const [y, m, d] = key.split("-").map(Number);
-  return new Date(y, (m || 1) - 1, d || 1, 0, 0, 0, 0);
+  return new Date(Date.UTC(y, (m || 1) - 1, d || 1, 0, 0, 0, 0));
 }
 
-/** Combine a day key with an "HH:MM" shift string. */
-export function atTime(key: string, hhmm: string | null | undefined): Date | null {
+/** Minutes past midnight for an "HH:MM" shift string. */
+export function shiftMinutes(hhmm: string | null | undefined): number | null {
   if (!hhmm) return null;
   const [h, m] = hhmm.split(":").map((v) => parseInt(v, 10));
   if (Number.isNaN(h)) return null;
-  const d = dayStart(key);
-  d.setHours(h, Number.isNaN(m) ? 0 : m, 0, 0);
-  return d;
+  return h * 60 + (Number.isNaN(m) ? 0 : m);
 }
 
 /**

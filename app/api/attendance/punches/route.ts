@@ -32,7 +32,7 @@ export async function GET(req: NextRequest) {
       if (from) where.punchTime.gte = dayStart(from);
       if (to) {
         const end = dayStart(to);
-        end.setHours(23, 59, 59, 999);
+        end.setUTCHours(23, 59, 59, 999);
         where.punchTime.lte = end;
       }
     }
@@ -114,7 +114,7 @@ export async function POST(req: NextRequest) {
 
     const from = dayStart(fromRaw);
     const to = dayStart(toRaw);
-    to.setHours(23, 59, 59, 999);
+    to.setUTCHours(23, 59, 59, 999);
 
     const result = await processPunches(companyId, { from, to, onlyUnprocessed: false });
     return NextResponse.json({ action: "reprocess", ...result });
