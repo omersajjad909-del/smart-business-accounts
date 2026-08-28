@@ -82,12 +82,24 @@ export function focusRateFormulaCell(rowIndex: number, key: string | null) {
 export function rateFormulaEnterHandler(
   settings: RateFormulaSettings,
   active: boolean,
-  rowIndex: number
+  rowIndex: number,
+  /**
+   * The values the line is about to carry. Read through a function because the
+   * picker calls this straight after its own onChange, before React has
+   * committed the new row — the caller keeps the freshly resolved values in a
+   * ref and hands them over here.
+   */
+  pickedMeta?: () => RateFormulaMeta | null | undefined
 ) {
   return (e: KeyboardEvent | { key: string; shiftKey: boolean; preventDefault(): void; stopPropagation(): void }) => {
     if (!active || e.key !== "Enter" || e.shiftKey) return;
     const key = settings.fields.find((f) => f.focusOnPick)?.key;
     if (!key) return; // no column claims the cursor — leave Enter alone
+    // The item just picked may have answered that column itself. Parking the
+    // cursor on a filled box makes the operator tab past a number they never
+    // needed to touch, so let Enter walk on to the next thing that is blank.
+    const already = pickedMeta?.()?.[key];
+    if (already !== undefined && already !== "") return;
     e.preventDefault();
     e.stopPropagation();
     focusRateFormulaCell(rowIndex, key);

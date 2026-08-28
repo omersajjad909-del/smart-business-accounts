@@ -622,11 +622,15 @@ export function metaFromItem(
   const known = itemMetaWithName(settings, itemMeta, itemText);
   const out: Record<string, RateFormulaValue> = {};
   for (const f of settings.fields) {
-    // The typed-per-document column is cleared rather than filled, so the
-    // cursor that lands there lands on an empty box.
-    if (f.focusOnPick) { out[f.key] = ""; continue; }
     const value = known[f.key];
-    out[f.key] = value === "" ? (currentMeta?.[f.key] ?? "") : value;
+    const itemKnows = value !== "" && value !== undefined;
+    // The typed-per-document column is cleared rather than filled, so the
+    // cursor that lands there lands on an empty box — but only when the item
+    // genuinely has nothing to say. An item whose name already carries "PHR24"
+    // knows its own PHR, and asking the operator to type it back in is the
+    // opposite of what that column is for.
+    if (f.focusOnPick && !itemKnows) { out[f.key] = ""; continue; }
+    out[f.key] = itemKnows ? value : (currentMeta?.[f.key] ?? "");
   }
   return out;
 }
