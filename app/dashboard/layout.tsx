@@ -1,7 +1,7 @@
 "use client";
 import { fmtDate } from "@/lib/dateUtils";
 
-import { useEffect, useLayoutEffect, useState, useRef, Suspense, createContext, useContext, Children, isValidElement } from "react";
+import { useEffect, useLayoutEffect, useState, useRef, useCallback, Suspense, createContext, useContext, Children, isValidElement } from "react";
 import type { ReactNode } from "react";
 import Link from "next/link";
 import dynamic from "next/dynamic";
@@ -24,6 +24,7 @@ import { hasModule as baseHasModule, type BusinessType } from "@/lib/businessMod
 import { findDashboardFeatureByRoute } from "@/lib/dashboardFeatureRegistry";
 import { FINOVA_COMPANY_PROFILE_UPDATED, FINOVA_USER_PROFILE_UPDATED } from "@/lib/dashboardProfileEvents";
 import { dataUrlToFile } from "@/lib/dataUrl";
+import { PageCloseGuardCtx, type PageCloseGuard } from "@/components/PageCloseGuard";
 
 // Deferred out of the main dashboard bundle — each is only relevant in a rare
 // path (avatar cropping, demo-account sessions), not needed for first paint
@@ -32,14 +33,19 @@ const ImageAdjusterModal = dynamic(() => import("@/components/ImageAdjusterModal
 const DemoSessionTimer   = dynamic(() => import("@/components/DemoSessionTimer"),   { ssr: false });
 const GlobalSearch       = dynamic(() => import("@/components/GlobalSearch"),       { ssr: false });
 
-/** Where this browser remembers whether the sidebar is collapsed. */
-const SIDEBAR_COLLAPSED_KEY = "finova.sidebarCollapsed";
-
-// Context to pass sidebarCollapsed + expand function to nav components
-const SidebarCtx = createContext<{ collapsed: boolean; expand: () => void; canShowHref: (href: string) => boolean }>({
+// Context to pass sidebarCollapsed + expand function to nav components.
+// onNavigate fires when a nav link is actually clicked, which is what pins the
+// sidebar open across the navigation that follows.
+const SidebarCtx = createContext<{
+  collapsed: boolean;
+  expand: () => void;
+  canShowHref: (href: string) => boolean;
+  onNavigate: () => void;
+}>({
   collapsed: false,
   expand: () => {},
   canShowHref: () => true,
+  onNavigate: () => {},
 });
 
 const apiCache = new Map<string, { expires: number; promise: Promise<any> }>();
@@ -233,28 +239,38 @@ export default function DashboardLayout({
   const [openSection, setOpenSection] = useState<string | null>(null);
   const toggle = (id: string) => setOpenSection(p => p === id ? null : id);
   /**
-   * Collapsed or not, remembered across navigations.
+   * Sidebar open / closed.
    *
-   * This used to be plain `useState(false)`, so every page opened with the
-   * sidebar expanded again — and Settings → Appearance had a "Sidebar default"
-   * choice that was written to the database, stamped on `<html>` by
-   * AppearanceApplier, and then read by nobody. On a wide document grid the
-   * 260px it costs is the difference between a table that fits and one that
-   * scrolls, so the choice has to stick.
+   * The rule the owner asked for, matching the desktop billing software the
+   * staff came from:
+   *   - /dashboard, the home screen, always opens with the sidebar expanded.
+   *   - Every other page starts collapsed to the 64px icon rail, so a wide
+   *     document grid gets the whole window.
+   *   - Hovering the rail peeks it open as an OVERLAY - the content margin
+   *     follows `baseCollapsed`, never the hover state, so nothing reflows
+   *     under the cursor.
+   *   - Clicking a nav link pins it open; the next nav link click releases the
+   *     pin. "Open until you click a 2nd page".
+   *   - The footer Collapse button (and the toggle_sidebar shortcut) overrides
+   *     all of that for the current page only; navigating hands control back.
    *
-   * Read synchronously from localStorage so the first paint is already right;
-   * the saved preference fills in below for a browser that has never been told.
+   * `null` on manualCollapse means "no override, follow the rule above".
    */
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(() => {
-    if (typeof window === "undefined") return false;
-    try {
-      const stored = window.localStorage.getItem(SIDEBAR_COLLAPSED_KEY);
-      if (stored === "1") return true;
-      if (stored === "0") return false;
-    } catch {}
-    return document.documentElement.getAttribute("data-sidebar-default") === "collapsed";
-  });
-  const SW = sidebarCollapsed ? 64 : 260;
+  const [navPinned, setNavPinned]           = useState(false);
+  const [navHover, setNavHover]             = useState(false);
+  const [manualCollapse, setManualCollapse] = useState<boolean | null>(null);
+  /**
+   * Settings -> Appearance "Sidebar default", stamped on <html> by
+   * AppearanceApplier. "expanded" opts a company out of the auto-collapse
+   * entirely; anything else leaves the route rule in charge.
+   */
+  const [sidebarDefault, setSidebarDefault] = useState<string | null>(null);
+  // Written once baseCollapsed is derived below, so the keyboard shortcut and
+  // the footer button can flip the override without depending on render order.
+  const baseCollapsedRef = useRef(false);
+  const toggleSidebar = useCallback(() => {
+    setManualCollapse(() => !baseCollapsedRef.current);
+  }, []);
   // Sub-group states (independent within their parent section)
   const [openCatalog, setOpenCatalog] = useState(false);
   const [openInventory, setOpenInventory] = useState(false);
@@ -410,45 +426,169 @@ export default function DashboardLayout({
     if (typeof window === "undefined") return false;
     return window.matchMedia("(max-width: 767px)").matches;
   });
+  // The desktop topbar can be tucked away without changing the page's vertical
+  // position. Its 56px slot remains in the shell and only the restore control
+  // is shown there, so invoices and tables never jump when it is toggled.
+  const [topbarCollapsed, setTopbarCollapsed] = useState(false);
   const pathname = usePathname();
   const isMobileDashboardHome = isMobileViewport && pathname === "/dashboard";
+  const isDashboardHome = pathname === "/dashboard";
+
+  /**
+   * The width the page layout reserves. Derived, not stored: the route decides,
+   * a nav click or the home screen pins it open, and the footer button can
+   * override it until the next navigation.
+   */
+  const baseCollapsed = isMobileViewport
+    ? false
+    : manualCollapse !== null
+      ? manualCollapse
+      : !(isDashboardHome || navPinned || sidebarDefault === "expanded");
+  baseCollapsedRef.current = baseCollapsed;
+  /** What the sidebar actually paints — the hover peek only widens the aside. */
+  const sidebarCollapsed = baseCollapsed && !navHover;
+  const SW      = baseCollapsed     ? 64 : 260;  // reserved (content margin)
+  const asideW  = sidebarCollapsed  ? 64 : 260;  // painted (overlays on hover)
 
   // Close mobile menu when route changes
   useEffect(() => {
     setIsMobileMenuOpen(false);
   }, [pathname]);
 
-  // Mobile drawer is full-width — an icon-only rail has no place there
+  /**
+   * Every navigation hands control back to the route rule: the manual override
+   * is per-page, and a hover left over from the click that caused the
+   * navigation would otherwise keep the rail stuck open.
+   */
   useEffect(() => {
-    if (isMobileViewport) setSidebarCollapsed(false);
-  }, [isMobileViewport]);
+    setManualCollapse(null);
+    setNavHover(false);
+  }, [pathname]);
 
-  // Remember the choice for the next page. Not written on mobile, where the
-  // value above is forced rather than chosen.
+  // Appearance -> "Sidebar default". AppearanceApplier stamps it on <html>
+  // after its fetch resolves, so watch for it rather than reading once.
   useEffect(() => {
-    if (isMobileViewport) return;
-    try {
-      window.localStorage.setItem(SIDEBAR_COLLAPSED_KEY, sidebarCollapsed ? "1" : "0");
-    } catch {}
-  }, [sidebarCollapsed, isMobileViewport]);
-
-  // A browser that has never been told falls back to the saved preference,
-  // which AppearanceApplier stamps on <html> once it has fetched it.
-  useEffect(() => {
-    if (isMobileViewport) return;
-    try {
-      if (window.localStorage.getItem(SIDEBAR_COLLAPSED_KEY) !== null) return;
-    } catch { return; }
-    const observer = new MutationObserver(() => {
-      const attr = document.documentElement.getAttribute("data-sidebar-default");
-      if (attr === "collapsed" || attr === "expanded") {
-        setSidebarCollapsed(attr === "collapsed");
-        observer.disconnect();
-      }
-    });
+    const read = () => setSidebarDefault(document.documentElement.getAttribute("data-sidebar-default"));
+    read();
+    const observer = new MutationObserver(read);
     observer.observe(document.documentElement, { attributes: true, attributeFilter: ["data-sidebar-default"] });
     return () => observer.disconnect();
-  }, [isMobileViewport]);
+  }, []);
+
+  /**
+   * A nav link click pins the sidebar open so it does not snap shut the moment
+   * the cursor leaves; the next nav link click releases the pin and the route
+   * rule collapses it again.
+   */
+  const handleNavClick = useCallback(() => {
+    setManualCollapse(null);
+    setNavPinned(p => !p);
+  }, []);
+
+  /* ══════════ CLOSE PAGE (✕) + unsaved-changes guard ══════════ */
+
+  // The page currently mounted may register how to answer "is there unsaved
+  // work?" and "save it" — see components/PageCloseGuard.tsx.
+  const pageGuardRef = useRef<PageCloseGuard | null>(null);
+  const registerPageGuard = useCallback((guard: PageCloseGuard, remove?: boolean) => {
+    if (remove) {
+      // Identity-checked: a page unmounting after the next one registered must
+      // not clear the new page in guard.
+      if (pageGuardRef.current === guard) pageGuardRef.current = null;
+    } else {
+      pageGuardRef.current = guard;
+    }
+  }, []);
+
+  /**
+   * Fallback for the pages that have not opted in: did anything inside the
+   * content pane actually receive typing since this route loaded? Coarse, but
+   * it never claims unsaved work on a page the user only read.
+   */
+  const typedSinceNavRef = useRef(false);
+  const [closeConfirm, setCloseConfirm] = useState(false);
+  const [closeSaving, setCloseSaving]   = useState(false);
+
+  useEffect(() => {
+    typedSinceNavRef.current = false;
+    setCloseConfirm(false);
+    setCloseSaving(false);
+  }, [pathname]);
+
+  useEffect(() => {
+    const onEdit = (e: Event) => {
+      const target = e.target as HTMLElement | null;
+      // Search box, branch switcher and the sidebar itself are chrome, not the
+      // document the user is filling in.
+      if (!target || typeof target.closest !== "function") return;
+      if (target.closest("[data-nav-shell]")) return;
+      typedSinceNavRef.current = true;
+    };
+    document.addEventListener("input", onEdit, true);
+    document.addEventListener("change", onEdit, true);
+    return () => {
+      document.removeEventListener("input", onEdit, true);
+      document.removeEventListener("change", onEdit, true);
+    };
+  }, []);
+
+  function pageHasUnsavedWork(): boolean {
+    const guard = pageGuardRef.current;
+    if (guard) {
+      try { return !!guard.isDirty(); } catch { return false; }
+    }
+    return typedSinceNavRef.current;
+  }
+
+  /** The page own save control, for pages that did not register a guard. */
+  function findPageSaveButton(): HTMLElement | null {
+    const root = document.querySelector(".dashboard-content-scroll");
+    if (!root) return null;
+    const explicit = root.querySelector<HTMLElement>("[data-page-save]");
+    if (explicit) return explicit;
+    const buttons = Array.from(root.querySelectorAll<HTMLButtonElement>("button"));
+    return buttons.find(b =>
+      !b.disabled && /^(save|create|update|submit|post)/i.test((b.textContent || "").trim())
+    ) || null;
+  }
+
+  function leaveToDashboard() {
+    setCloseConfirm(false);
+    setCloseSaving(false);
+    typedSinceNavRef.current = false;
+    pageGuardRef.current = null;
+    router.push("/dashboard");
+  }
+
+  function requestClosePage() {
+    if (isDashboardHome) return;
+    if (pageHasUnsavedWork()) { setCloseConfirm(true); return; }
+    leaveToDashboard();
+  }
+
+  /** "Yes" — save what has been entered so far, then close. */
+  async function saveThenClose() {
+    setCloseSaving(true);
+    try {
+      const guard = pageGuardRef.current;
+      if (guard?.save) {
+        const ok = await guard.save();
+        // An explicit false means validation or the request failed — the page
+        // stays open with the error the page itself raised.
+        if (ok === false) { setCloseSaving(false); return; }
+      } else {
+        const btn = findPageSaveButton();
+        if (btn) {
+          btn.click();
+          await new Promise(r => setTimeout(r, 900));
+        }
+      }
+    } catch {
+      setCloseSaving(false);
+      return;
+    }
+    leaveToDashboard();
+  }
 
   // Only trading companies can see the Rate Formula link at all, so only they
   // pay for the lookup. The response is cached per tab and shared with the
@@ -584,7 +724,7 @@ export default function DashboardLayout({
       }
       if (match.action === "toggle_sidebar") {
         e.preventDefault();
-        setSidebarCollapsed(v => !v);
+        toggleSidebar();
         return;
       }
 
@@ -1114,7 +1254,7 @@ export default function DashboardLayout({
         </div>
 
         {/* ---- NAV ---- */}
-        <SidebarCtx.Provider value={{ collapsed: sidebarCollapsed, expand: () => setSidebarCollapsed(false), canShowHref: canShowDashboardHref }}>
+        <SidebarCtx.Provider value={{ collapsed: sidebarCollapsed, expand: () => setManualCollapse(false), canShowHref: canShowDashboardHref, onNavigate: handleNavClick }}>
         {/* overscrollBehavior:"contain" so dragging past the end of the menu
             does not carry on and scroll the page behind the open drawer. */}
         <nav style={{flex:1,overflowY:"auto",overscrollBehavior:"contain",padding:"8px 8px",paddingBottom:80}}>
@@ -2346,7 +2486,7 @@ export default function DashboardLayout({
         {/* ---- SIDEBAR FOOTER — Collapse button only ---- */}
         <div style={{borderTop:"1px solid var(--border)",background:"var(--panel-bg-2)"}}>
           <button
-            onClick={()=>{ if (isMobileViewport) setIsMobileMenuOpen(false); else setSidebarCollapsed(v=>!v); }}
+            onClick={()=>{ if (isMobileViewport) setIsMobileMenuOpen(false); else toggleSidebar(); }}
             style={{
               width:"100%",display:"flex",alignItems:"center",gap:10,
               padding: sidebarCollapsed ? "12px 8px" : "11px 14px",
@@ -2389,10 +2529,12 @@ export default function DashboardLayout({
         {!isMobileDashboardHome && (
         <div
           style={{
-            background:isMobileViewport
+            background:topbarCollapsed && !isMobileViewport
+              ? "transparent"
+              : isMobileViewport
               ? "rgba(10,15,35,0.97)"
               : "var(--panel-bg)",
-            borderBottom:"1px solid var(--border)",
+            borderBottom:topbarCollapsed && !isMobileViewport ? "none" : "1px solid var(--border)",
             padding:isMobileViewport ? "10px 14px" : "8px 12px",
             minHeight:isMobileViewport ? 52 : 56,
             display:"flex",
@@ -2407,8 +2549,26 @@ export default function DashboardLayout({
           className="print:hidden sm:px-4"
         >
 
-          {/* MOBILE: clean single-row header */}
-          {isMobileViewport ? (
+          {topbarCollapsed && !isMobileViewport ? (
+            <button
+              type="button"
+              onClick={() => setTopbarCollapsed(false)}
+              aria-label="Show navigation bar"
+              title="Show navigation bar"
+              style={{
+                width:36,height:36,borderRadius:10,border:"1px solid rgba(var(--accent-rgb),.35)",
+                background:"var(--panel-bg)",color:"var(--accent)",cursor:"pointer",
+                display:"flex",alignItems:"center",justifyContent:"center",marginLeft:"auto",
+                boxShadow:"0 4px 16px rgba(0,0,0,.2)",transition:"transform .15s, background .15s",
+              }}
+              onMouseEnter={e=>{e.currentTarget.style.transform="translateY(-1px)";e.currentTarget.style.background="rgba(var(--accent-rgb),.12)";}}
+              onMouseLeave={e=>{e.currentTarget.style.transform="none";e.currentTarget.style.background="var(--panel-bg)";}}
+            >
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M12 19V5"/><path d="m6 11 6-6 6 6"/>
+              </svg>
+            </button>
+          ) : isMobileViewport ? (
             <>
               {/* Hamburger */}
               <button onClick={()=>setIsMobileMenuOpen(true)} style={{width:36,height:36,borderRadius:10,background:"rgba(255,255,255,0.05)",border:"1px solid rgba(255,255,255,0.07)",display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",color:"rgba(255,255,255,0.6)",flexShrink:0,marginRight:10}}>
@@ -2778,6 +2938,25 @@ export default function DashboardLayout({
                 </>
               )}
             </div>
+
+            {/* Keep this at the far end, after the company-profile user menu. */}
+            <button
+              type="button"
+              onClick={() => setTopbarCollapsed(true)}
+              aria-label="Hide navigation bar"
+              title="Hide navigation bar"
+              style={{
+                width:34,height:34,borderRadius:9,border:"1px solid rgba(255,255,255,.08)",
+                background:"rgba(255,255,255,.05)",color:"var(--text-muted)",cursor:"pointer",
+                display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,transition:"all .15s",
+              }}
+              onMouseEnter={e=>{e.currentTarget.style.background="rgba(var(--accent-rgb),.14)";e.currentTarget.style.borderColor="rgba(var(--accent-rgb),.35)";e.currentTarget.style.color="var(--accent)";}}
+              onMouseLeave={e=>{e.currentTarget.style.background="rgba(255,255,255,.05)";e.currentTarget.style.borderColor="rgba(255,255,255,.08)";e.currentTarget.style.color="var(--text-muted)";}}
+            >
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M12 5v14"/><path d="m18 13-6 6-6-6"/>
+              </svg>
+            </button>
           </div>
             </>
           )}
