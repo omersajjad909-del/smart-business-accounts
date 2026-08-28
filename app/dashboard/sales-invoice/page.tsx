@@ -883,9 +883,13 @@ function SalesInvoiceContent() {
                 meta / totals column share one strip across the top; the table
                 and the payment panels below run the full width. */}
             {!preview && (
-              <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
+              <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "minmax(0, 1fr) 320px", gap: 16, alignItems: "start" }}>
 
-                <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "minmax(0, 1fr) 340px", gap: 20, alignItems: "start" }}>
+                {/* LEFT COLUMN — everything the invoice is built from. The items
+                    grid sits in here, between the three reference boxes above
+                    it and the payment panels below, and takes every pixel the
+                    340px meta column does not. */}
+                <div style={{ display: "flex", flexDirection: "column", gap: 16, minWidth: 0 }}>
 
                   {/* Customer + Business + Scan — three across */}
                   <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(3, minmax(0, 1fr))", gap: 14, alignItems: "stretch" }}>
@@ -949,98 +953,6 @@ function SalesInvoiceContent() {
                   </div>
 
                   </div>
-
-                {/* RIGHT COLUMN */}
-                <div style={{ display: "flex", flexDirection: "column", gap: 16, position: isMobile ? "static" : "sticky", top: 24 }}>
-
-                  {/* Invoice Header */}
-                  <div style={panelStyle}>
-                    <div style={{ fontSize: 10, fontWeight: 700, color: "var(--text-muted)", letterSpacing: 1, textTransform: "uppercase", marginBottom: 6 }}>Sales Invoice</div>
-                    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
-                      <div style={{ fontSize: 19, fontWeight: 800, fontFamily: "monospace" }}>{invoiceNo || "—"}</div>
-                      <span style={{ fontSize: 11, fontWeight: 700, padding: "3px 10px", borderRadius: 20, background: "var(--accent-soft)", color: "var(--accent)", border: "1px solid var(--accent)" }}>DRAFT</span>
-                    </div>
-                    <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-                      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
-                        <div><label style={labelStyle}>Invoice Date</label><DateInput value={date} onChange={setDate} style={inputStyle} /></div>
-                        <div><label style={labelStyle}>Due Date</label><DateInput value={dueDate} onChange={setDueDate} style={inputStyle} /></div>
-                      </div>
-                      <div><label style={labelStyle}>Currency</label>
-                        <select style={inputStyle} value={currencyId} onChange={e => { const cid = e.target.value; setCurrencyId(cid); const cur = currencies.find(c => c.id === cid); if (cur) setExchangeRate(cur.exchangeRate || 1); }}>
-                          <option value="">Base Currency</option>
-                          {currencies.map(c => <option key={c.id} value={c.id}>{c.code} — {c.name}</option>)}
-                        </select>
-                      </div>
-                      {currencyId && <div><label style={labelStyle}>Exchange Rate</label><input type="number" style={inputStyle} value={exchangeRate} onChange={e => setExchangeRate(Number(e.target.value))} /></div>}
-                      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
-                        <div><label style={labelStyle}>Sales Person</label>
-                          <select style={inputStyle} value={salesmanId} onChange={e => setSalesmanId(e.target.value)}>
-                            <option value="">— None —</option>
-                            {teamMembers.map(m => <option key={m.id} value={m.id}>{m.name}</option>)}
-                          </select>
-                        </div>
-                        <div><label style={labelStyle}>Reference</label><input style={inputStyle} value={reference} onChange={e => setReference(e.target.value)} placeholder="PO-2024-…" /></div>
-                      </div>
-                      <div><label style={labelStyle}>Location</label>
-                        <select style={inputStyle} value={location} onChange={e => setLocation(e.target.value)}>
-                          <option value="MAIN">Main</option>
-                          <option value="SHOP">Shop</option>
-                        </select>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Totals */}
-                  <div style={panelStyle}>
-                    <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                      <div style={{ display: "flex", justifyContent: "space-between", fontSize: 13 }}>
-                        <span style={{ color: "var(--text-muted)" }}>Subtotal</span><span>{fmt(subtotal)}</span>
-                      </div>
-                      {perItemDiscountAmt > 0 && <div style={{ display: "flex", justifyContent: "space-between", fontSize: 13, color: "var(--danger)" }}><span>Item Discounts</span><span>— {fmt(perItemDiscountAmt)}</span></div>}
-                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: 13 }}>
-                        <span style={{ color: "var(--text-muted)" }}>Discount</span>
-                        <div style={{ display: "flex", gap: 5 }}>
-                          <select style={{ ...inputStyle, width: 58, padding: "3px 6px", fontSize: 12 }} value={discountType} onChange={e => setDiscountType(e.target.value as "flat" | "percent")}>
-                            <option value="flat">Flat</option><option value="percent">%</option>
-                          </select>
-                          <input type="number" style={{ ...inputStyle, width: 78, padding: "3px 7px", fontSize: 12, textAlign: "right" }} value={discount} onChange={e => setDiscount(e.target.value === "" ? "" : Number(e.target.value))} placeholder="0" />
-                        </div>
-                      </div>
-                      {discountAmt > 0 && <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, color: "var(--danger)" }}><span>Discount Amount</span><span>— {fmt(discountAmt)}</span></div>}
-                      <div style={{ display: "flex", justifyContent: "space-between", fontSize: 13, borderTop: "1px solid var(--border)", paddingTop: 8 }}>
-                        <span style={{ color: "var(--text-muted)" }}>Taxable Amount</span><span>{fmt(taxableAmount)}</span>
-                      </div>
-                      {perItemTaxAmt > 0 && <div style={{ display: "flex", justifyContent: "space-between", fontSize: 13, color: "var(--warning)" }}><span>Total Tax</span><span>{fmt(perItemTaxAmt)}</span></div>}
-                      <div style={{ borderTop: "1px solid var(--border)", paddingTop: 8 }}>
-                        <button style={{ ...btnGhost, width: "100%", fontSize: 12, padding: "5px 10px", background: applyTax ? "var(--accent-soft)" : "transparent", color: applyTax ? "var(--accent)" : "var(--text-muted)", borderColor: applyTax ? "var(--accent)" : "var(--border)" }}
-                          onClick={() => { setApplyTax(!applyTax); if (!applyTax) setSelectedTaxId(""); }}>
-                          {applyTax ? "✔ Global Tax Applied" : "+ Add Global Tax"}</button>
-                        {applyTax && (
-                          <select style={{ ...inputStyle, marginTop: 8 }} value={selectedTaxId} onChange={e => setSelectedTaxId(e.target.value)}>
-                            <option value="">— Select Tax —</option>
-                            {taxes.map(t => <option key={t.id} value={t.id}>{t.taxType} ({t.taxCode}) — {t.taxRate}%</option>)}
-                          </select>
-                        )}
-                        {applyTax && selectedTax && <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, color: "var(--accent)", marginTop: 6 }}><span>{selectedTax.taxType} ({selectedTax.taxRate}%)</span><span>{fmt(globalTaxAmt)}</span></div>}
-                      </div>
-                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: 13 }}>
-                        <span style={{ color: "var(--text-muted)" }}>Shipping Charges</span>
-                        <input type="number" style={{ ...inputStyle, width: 100, padding: "3px 7px", fontSize: 12, textAlign: "right" }} value={freight} onChange={e => setFreight(e.target.value === "" ? "" : Number(e.target.value))} placeholder="0.00" />
-                      </div>
-                      <div style={{ display: "flex", justifyContent: "space-between", borderTop: "2px solid var(--border)", paddingTop: 12, fontSize: 18, fontWeight: 800 }}>
-                        <span>Grand Total</span>
-                        <span style={{ color: "var(--accent)" }}>{fmt(netTotal)}</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Save Buttons */}
-                  <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                    <button style={{ ...btnPrimary, width: "100%", padding: "12px", fontSize: 15 }} onClick={saveInvoice} disabled={saving}>{saving ? "Saving…" : editing ? "Update Invoice" : "Save & Preview"}</button>
-                    <button style={{ ...btnGhost, width: "100%", padding: "10px" }} onClick={() => { setShowForm(false); setEditing(null); resetForm(); }}>Cancel</button>
-                  </div>
-                </div>
-                </div>
 
                   {/* Items Table — its own tighter padding: the grid is the widest
                       thing on the page, so the 20px the other panels use is
@@ -1222,6 +1134,98 @@ function SalesInvoiceContent() {
                     </div>
                   </div>
 
+                </div>
+
+                {/* RIGHT COLUMN */}
+                <div style={{ display: "flex", flexDirection: "column", gap: 16, position: isMobile ? "static" : "sticky", top: 24 }}>
+
+                  {/* Invoice Header */}
+                  <div style={panelStyle}>
+                    <div style={{ fontSize: 10, fontWeight: 700, color: "var(--text-muted)", letterSpacing: 1, textTransform: "uppercase", marginBottom: 6 }}>Sales Invoice</div>
+                    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
+                      <div style={{ fontSize: 19, fontWeight: 800, fontFamily: "monospace" }}>{invoiceNo || "—"}</div>
+                      <span style={{ fontSize: 11, fontWeight: 700, padding: "3px 10px", borderRadius: 20, background: "var(--accent-soft)", color: "var(--accent)", border: "1px solid var(--accent)" }}>DRAFT</span>
+                    </div>
+                    <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+                        <div><label style={labelStyle}>Invoice Date</label><DateInput value={date} onChange={setDate} style={inputStyle} /></div>
+                        <div><label style={labelStyle}>Due Date</label><DateInput value={dueDate} onChange={setDueDate} style={inputStyle} /></div>
+                      </div>
+                      <div><label style={labelStyle}>Currency</label>
+                        <select style={inputStyle} value={currencyId} onChange={e => { const cid = e.target.value; setCurrencyId(cid); const cur = currencies.find(c => c.id === cid); if (cur) setExchangeRate(cur.exchangeRate || 1); }}>
+                          <option value="">Base Currency</option>
+                          {currencies.map(c => <option key={c.id} value={c.id}>{c.code} — {c.name}</option>)}
+                        </select>
+                      </div>
+                      {currencyId && <div><label style={labelStyle}>Exchange Rate</label><input type="number" style={inputStyle} value={exchangeRate} onChange={e => setExchangeRate(Number(e.target.value))} /></div>}
+                      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+                        <div><label style={labelStyle}>Sales Person</label>
+                          <select style={inputStyle} value={salesmanId} onChange={e => setSalesmanId(e.target.value)}>
+                            <option value="">— None —</option>
+                            {teamMembers.map(m => <option key={m.id} value={m.id}>{m.name}</option>)}
+                          </select>
+                        </div>
+                        <div><label style={labelStyle}>Reference</label><input style={inputStyle} value={reference} onChange={e => setReference(e.target.value)} placeholder="PO-2024-…" /></div>
+                      </div>
+                      <div><label style={labelStyle}>Location</label>
+                        <select style={inputStyle} value={location} onChange={e => setLocation(e.target.value)}>
+                          <option value="MAIN">Main</option>
+                          <option value="SHOP">Shop</option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Totals */}
+                  <div style={panelStyle}>
+                    <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                      <div style={{ display: "flex", justifyContent: "space-between", fontSize: 13 }}>
+                        <span style={{ color: "var(--text-muted)" }}>Subtotal</span><span>{fmt(subtotal)}</span>
+                      </div>
+                      {perItemDiscountAmt > 0 && <div style={{ display: "flex", justifyContent: "space-between", fontSize: 13, color: "var(--danger)" }}><span>Item Discounts</span><span>— {fmt(perItemDiscountAmt)}</span></div>}
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: 13 }}>
+                        <span style={{ color: "var(--text-muted)" }}>Discount</span>
+                        <div style={{ display: "flex", gap: 5 }}>
+                          <select style={{ ...inputStyle, width: 58, padding: "3px 6px", fontSize: 12 }} value={discountType} onChange={e => setDiscountType(e.target.value as "flat" | "percent")}>
+                            <option value="flat">Flat</option><option value="percent">%</option>
+                          </select>
+                          <input type="number" style={{ ...inputStyle, width: 78, padding: "3px 7px", fontSize: 12, textAlign: "right" }} value={discount} onChange={e => setDiscount(e.target.value === "" ? "" : Number(e.target.value))} placeholder="0" />
+                        </div>
+                      </div>
+                      {discountAmt > 0 && <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, color: "var(--danger)" }}><span>Discount Amount</span><span>— {fmt(discountAmt)}</span></div>}
+                      <div style={{ display: "flex", justifyContent: "space-between", fontSize: 13, borderTop: "1px solid var(--border)", paddingTop: 8 }}>
+                        <span style={{ color: "var(--text-muted)" }}>Taxable Amount</span><span>{fmt(taxableAmount)}</span>
+                      </div>
+                      {perItemTaxAmt > 0 && <div style={{ display: "flex", justifyContent: "space-between", fontSize: 13, color: "var(--warning)" }}><span>Total Tax</span><span>{fmt(perItemTaxAmt)}</span></div>}
+                      <div style={{ borderTop: "1px solid var(--border)", paddingTop: 8 }}>
+                        <button style={{ ...btnGhost, width: "100%", fontSize: 12, padding: "5px 10px", background: applyTax ? "var(--accent-soft)" : "transparent", color: applyTax ? "var(--accent)" : "var(--text-muted)", borderColor: applyTax ? "var(--accent)" : "var(--border)" }}
+                          onClick={() => { setApplyTax(!applyTax); if (!applyTax) setSelectedTaxId(""); }}>
+                          {applyTax ? "✔ Global Tax Applied" : "+ Add Global Tax"}</button>
+                        {applyTax && (
+                          <select style={{ ...inputStyle, marginTop: 8 }} value={selectedTaxId} onChange={e => setSelectedTaxId(e.target.value)}>
+                            <option value="">— Select Tax —</option>
+                            {taxes.map(t => <option key={t.id} value={t.id}>{t.taxType} ({t.taxCode}) — {t.taxRate}%</option>)}
+                          </select>
+                        )}
+                        {applyTax && selectedTax && <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, color: "var(--accent)", marginTop: 6 }}><span>{selectedTax.taxType} ({selectedTax.taxRate}%)</span><span>{fmt(globalTaxAmt)}</span></div>}
+                      </div>
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: 13 }}>
+                        <span style={{ color: "var(--text-muted)" }}>Shipping Charges</span>
+                        <input type="number" style={{ ...inputStyle, width: 100, padding: "3px 7px", fontSize: 12, textAlign: "right" }} value={freight} onChange={e => setFreight(e.target.value === "" ? "" : Number(e.target.value))} placeholder="0.00" />
+                      </div>
+                      <div style={{ display: "flex", justifyContent: "space-between", borderTop: "2px solid var(--border)", paddingTop: 12, fontSize: 18, fontWeight: 800 }}>
+                        <span>Grand Total</span>
+                        <span style={{ color: "var(--accent)" }}>{fmt(netTotal)}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Save Buttons */}
+                  <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                    <button style={{ ...btnPrimary, width: "100%", padding: "12px", fontSize: 15 }} onClick={saveInvoice} disabled={saving}>{saving ? "Saving…" : editing ? "Update Invoice" : "Save & Preview"}</button>
+                    <button style={{ ...btnGhost, width: "100%", padding: "10px" }} onClick={() => { setShowForm(false); setEditing(null); resetForm(); }}>Cancel</button>
+                  </div>
+                </div>
               </div>
             )}
 
