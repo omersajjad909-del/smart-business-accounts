@@ -946,9 +946,11 @@ function SalesInvoiceContent() {
                     </div>
                   </div>
 
-                  {/* Items Table */}
-                  <div style={panelStyle}>
-                    <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 14 }}>Invoice Items</div>
+                  {/* Items Table — its own tighter padding: the grid is the widest
+                      thing on the page, so the 20px the other panels use is
+                      20px the columns do not get. */}
+                  <div style={{ ...panelStyle, padding: isMobile ? 14 : "14px 10px" }}>
+                    <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 10, paddingLeft: isMobile ? 0 : 4 }}>Invoice Items</div>
                     {isMobile ? (
                       <div>
                         {rows.map((r, i) => {
