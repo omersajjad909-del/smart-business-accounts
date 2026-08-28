@@ -144,6 +144,12 @@ function ImportWizardInner() {
   const [preview, setPreview] = useState<Preview | null>(null);
   const [result, setResult] = useState<Result | null>(null);
   const [error, setError] = useState("");
+  const [notice, setNotice] = useState("");
+  const [progress, setProgress] = useState<Progress | null>(null);
+  const [plan, setPlan] = useState<ImportPlan | null>(null);
+  const [resume, setResume] = useState<Resume | null>(null);
+
+  useEffect(() => { setResume(loadResume()); }, []);
 
   // Deep link from the Import Center rows: land on the file step with the data
   // type already chosen, since that is the choice the operator just made there.
@@ -170,70 +176,204 @@ function ImportWizardInner() {
   );
 
   async function readFile(file: File) {
-    // Excel writes .xlsx by default and the operator will try it. Say what to
-    // do rather than failing with an unreadable wall of binary.
-    if (/\.(xlsx|xls)$/i.test(file.name)) {
+    setError("");
+    setNotice("");
+    setPreview(null);
+    setResult(null);
+    setPlan(null);
+
+    // An Excel workbook is read here rather than sent back to Excel to be
+    // re-saved. That round trip is where a phone number loses its leading zero
+    // and a date turns into whatever the machine's locale prefers, so the file
+    // that arrives is worse than the one that was exported.
+    if (/\.xlsx$/i.test(file.name)) {
+      try {
+        const workbook = await readXlsx(await file.arrayBuffer());
+        setFileName(file.name);
+        setCsv(workbook.csv);
+        setNotice(
+          `Read sheet "${workbook.sheetName}" out of the workbook` +
+            (workbook.sheetNames.length > 1
+              ? ` (of ${workbook.sheetNames.length}: ${workbook.sheetNames.join(", ")}). ` +
+                `Only the first sheet is read — if the data is on another one, move it to the front or save that sheet as CSV.`
+              : ".") +
+            " Check the preview before importing.",
+        );
+      } catch (e) {
+        setError(
+          `That workbook could not be read here (${e instanceof Error ? e.message : "unknown format"}). ` +
+            `Open it in Excel and use File → Save As → CSV UTF-8, then upload the .csv.`,
+        );
+      }
+      return;
+    }
+
+    // .xls is the old binary format, which is a different thing entirely and
+    // not worth reading badly.
+    if (/\.xls$/i.test(file.name)) {
       setError(
-        "That is an Excel workbook. Open it in Excel and use File → Save As → CSV UTF-8, then upload the .csv.",
+        "That is an old-format .xls workbook. Open it in Excel and use File → Save As → CSV UTF-8 (or .xlsx), then upload that.",
       );
       return;
     }
-    setError("");
+
     setFileName(file.name);
     setCsv(await file.text());
-    setPreview(null);
-    setResult(null);
   }
+
+  /** One request. The chunk carries everything the server cannot see for itself. */
+  const send = useCallback(
+    async (chunk: ImportChunk, current: ImportPlan, dryRun: boolean) => {
+      const res = await fetch("/api/import", {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json", ...headers() },
+        body: JSON.stringify({
+          csv: chunk.text,
+          source: source || "csv",
+          dataType,
+          dryRun,
+          date: dryRun ? "" : date,
+          party,
+          lineOffset: chunk.lineOffset,
+          chunkIndex: chunk.index,
+          chunkCount: current.chunks.length,
+          ambiguousCodes: current.ambiguousCodes,
+          continuedParties: chunk.continuedParties,
+        }),
+      });
+      const body = await res.json();
+      if (!res.ok) throw new Error(body?.error || "The server refused the file.");
+      return body;
+    },
+    [headers, source, dataType, date, party],
+  );
 
   async function runPreview() {
     if (!dataType) { setError("Pick what you are importing first."); return; }
     if (!csv.trim()) { setError("Upload a file, or paste the rows in."); return; }
+
     setBusy(true);
     setError("");
     try {
-      const res = await fetch("/api/import", {
-        method: "POST",
-        credentials: "include",
-        headers: { "Content-Type": "application/json", ...headers() },
-        body: JSON.stringify({ csv, source: source || "csv", dataType, dryRun: true }),
-      });
-      const body = await res.json();
-      if (!res.ok) throw new Error(body?.error || "Could not read the file.");
-      setPreview(body);
+      const built = planImport(csv, dataType, party.trim());
+      if (built.error) throw new Error(built.error);
+      setPlan(built);
+
+      // Every chunk is read, not just the first. A preview that had only looked
+      // at the first five thousand rows would report "0 will be skipped" on a
+      // file whose trouble starts at row nine thousand, which is the one number
+      // the operator is about to trust.
+      let merged: Preview | null = null;
+      for (const chunk of built.chunks) {
+        setProgress({
+          label: built.chunks.length > 1 ? "Checking the file" : "Reading the file",
+          done: chunk.index - 1,
+          total: built.chunks.length,
+        });
+        const part = (await send(chunk, built, true)) as Preview;
+        merged = merged
+          ? {
+              ...merged,
+              total: merged.total + part.total,
+              ok: merged.ok + part.ok,
+              failed: merged.failed + part.failed,
+              warnings: merged.warnings + part.warnings,
+              // The rows shown come from the top of the file, which is where a
+              // mis-read column shows itself. The issues list keeps collecting
+              // across the whole file, because the row that breaks an import is
+              // rarely near the top.
+              issues: merged.issues.concat(part.issues).slice(0, 200),
+            }
+          : part;
+      }
+      if (!merged) throw new Error("The file has no rows to read.");
+
+      setPreview({ ...merged, reshaped: built.reshaped ?? merged.reshaped });
       setStep(4);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Could not read the file.");
     } finally {
+      setProgress(null);
       setBusy(false);
     }
   }
 
-  async function commit() {
-    if (!preview) return;
+  async function commit(from = 0) {
+    if (!preview || !plan) return;
     setBusy(true);
     setError("");
+
+    const running: Result = {
+      success: true,
+      total: from > 0 ? resume?.outcome.total ?? 0 : 0,
+      imported: from > 0 ? resume?.outcome.imported ?? 0 : 0,
+      updated: from > 0 ? resume?.outcome.updated ?? 0 : 0,
+      skipped: from > 0 ? resume?.outcome.skipped ?? 0 : 0,
+      errors: [],
+    };
+
     try {
-      const res = await fetch("/api/import", {
-        method: "POST",
-        credentials: "include",
-        headers: { "Content-Type": "application/json", ...headers() },
-        body: JSON.stringify({ csv, source: source || "csv", dataType, date, party }),
-      });
-      const body = await res.json();
-      if (!res.ok) throw new Error(body?.error || "Import failed.");
-      setResult(body);
+      for (const chunk of plan.chunks.slice(from)) {
+        setProgress({
+          label: plan.chunks.length > 1 ? "Importing" : "Writing to your books",
+          done: chunk.index - 1,
+          total: plan.chunks.length,
+        });
+        const part = (await send(chunk, plan, false)) as Result;
+        running.total += part.total;
+        running.imported += part.imported;
+        running.updated += part.updated;
+        running.skipped += part.skipped;
+        running.errors = running.errors.concat(part.errors).slice(0, 200);
+
+        // Written after every chunk, so an interruption loses at most the one
+        // that was in flight — and that one is safe to send again, because
+        // every writer matches on what is already there before it creates.
+        if (plan.chunks.length > 1 && dataType) {
+          saveResume({
+            fileName, dataType, chunkCount: plan.chunks.length, totalRows: plan.totalRows,
+            done: chunk.index,
+            outcome: {
+              imported: running.imported, updated: running.updated,
+              skipped: running.skipped, total: running.total,
+            },
+            at: Date.now(),
+          });
+        }
+      }
+      saveResume(null);
+      setResume(null);
+      setResult(running);
       setStep(5);
-      toast.success(`${body.imported + body.updated} rows imported`);
+      toast.success(`${(running.imported + running.updated).toLocaleString("en-PK")} rows imported`);
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Import failed.");
+      setError(
+        `${e instanceof Error ? e.message : "Import failed."}` +
+          (plan.chunks.length > 1
+            ? " The rows already written are saved. Pick the same file again to carry on from where this stopped."
+            : ""),
+      );
     } finally {
+      setProgress(null);
       setBusy(false);
     }
   }
+
+  /** True when the file on screen is the one a half-finished import was using. */
+  const resumable =
+    resume !== null &&
+    plan !== null &&
+    resume.dataType === dataType &&
+    resume.fileName === fileName &&
+    resume.chunkCount === plan.chunks.length &&
+    resume.totalRows === plan.totalRows &&
+    resume.done < plan.chunks.length;
 
   function restart() {
     setStep(1); setSource(""); setDataType(""); setCsv(""); setFileName("");
-    setPreview(null); setResult(null); setError("");
+    setPreview(null); setResult(null); setError(""); setNotice("");
+    setPlan(null); setProgress(null);
   }
 
   /* ── Chrome ─────────────────────────────────────────────────── */
