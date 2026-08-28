@@ -3114,8 +3114,11 @@ export default function DashboardLayout({
             toolbar, has nowhere to go. Mobile therefore scrolls the page
             itself; the bottom nav is position:fixed and the 80px padding below
             keeps content clear of it. */}
-        <div style={{flex:1,overflowY:isMobileViewport ? "visible" : "auto",padding:isMobileViewport ? "10px 10px" : "16px 12px",paddingBottom: isMobileViewport ? "80px" : "16px"}} className="dashboard-content-scroll sm:px-4 sm:py-5 lg:px-6">
-          <div style={{width:"100%",maxWidth:1280,margin:"0 auto"}} className="dashboard-content-inner">
+        {/* Edge to edge. The 1280px cap plus 12px of side padding was costing a
+            wide document grid ~40px a side, which is exactly what pushed the
+            invoice table into a horizontal scroll. */}
+        <div style={{flex:1,overflowY:isMobileViewport ? "visible" : "auto",padding:isMobileViewport ? "10px 8px" : "14px 6px",paddingBottom: isMobileViewport ? "80px" : "14px"}} className="dashboard-content-scroll">
+          <div style={{width:"100%",maxWidth:"100%",margin:0}} className="dashboard-content-inner">
             {currentUser?.email === "finovaos.app@gmail.com" && (
               <div style={{
                 display:"flex", alignItems:"center", justifyContent:"space-between",
