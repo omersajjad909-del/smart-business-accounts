@@ -1015,7 +1015,7 @@ function SalesInvoiceContent() {
                         <table style={{ width: "100%", minWidth: 0, tableLayout: "fixed", borderCollapse: "collapse" }}>
                           <thead>
                             <tr style={{ borderBottom: "2px solid var(--border)" }}>
-                              {["#","Item / Description"].map((h,hi) => (
+                              {["#","Item"].map((h,hi) => (
                                 <th key={h+hi} style={{ padding: "9px 6px", fontSize: 10.5, fontWeight: 700, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: 0.5, textAlign: "left", whiteSpace: "nowrap" }}>{h}</th>
                               ))}
                               {rfActive && <RateFormulaHeadCells settings={rf} />}
