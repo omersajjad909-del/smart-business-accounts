@@ -262,12 +262,6 @@ export default function DashboardLayout({
   const navClickRef = useRef(false);
   const [navHover, setNavHover]             = useState(false);
   const [manualCollapse, setManualCollapse] = useState<boolean | null>(null);
-  /**
-   * Settings -> Appearance "Sidebar default", stamped on <html> by
-   * AppearanceApplier. "expanded" opts a company out of the auto-collapse
-   * entirely; anything else leaves the route rule in charge.
-   */
-  const [sidebarDefault, setSidebarDefault] = useState<string | null>(null);
   // Written once baseCollapsed is derived below, so the keyboard shortcut and
   // the footer button can flip the override without depending on render order.
   const baseCollapsedRef = useRef(false);
@@ -446,7 +440,7 @@ export default function DashboardLayout({
     ? false
     : manualCollapse !== null
       ? manualCollapse
-      : !(isDashboardHome || navPinned || sidebarDefault === "expanded");
+      : !(isDashboardHome || navPinned);
   baseCollapsedRef.current = baseCollapsed;
   /** What the sidebar actually paints — the hover peek only widens the aside. */
   const sidebarCollapsed = baseCollapsed && !navHover;
@@ -473,15 +467,9 @@ export default function DashboardLayout({
     else setNavPinned(false);
   }, [pathname]);
 
-  // Appearance -> "Sidebar default". AppearanceApplier stamps it on <html>
-  // after its fetch resolves, so watch for it rather than reading once.
-  useEffect(() => {
-    const read = () => setSidebarDefault(document.documentElement.getAttribute("data-sidebar-default"));
-    read();
-    const observer = new MutationObserver(read);
-    observer.observe(document.documentElement, { attributes: true, attributeFilter: ["data-sidebar-default"] });
-    return () => observer.disconnect();
-  }, []);
+  // NOTE: Settings -> Appearance "Sidebar default" no longer gates this. The
+  // route rule above IS the default now, and honouring a saved "expanded"
+  // preference on top of it meant the sidebar never auto-collapsed at all.
 
   /**
    * A nav link click pins the sidebar open so it does not snap shut the moment
