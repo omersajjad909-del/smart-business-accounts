@@ -50,11 +50,28 @@ import {
   type LedgerHistoryRow,
 } from "@/lib/importEngine";
 
+/**
+ * Long enough for the largest slice the wizard will send, and inside what every
+ * hosting tier allows. The wizard cuts a big file into pieces precisely so that
+ * no single request has to run near this — a slice that needs more than a
+ * minute is a slice that was sent too large, not a limit to raise.
+ */
+export const maxDuration = 60;
+
 const WRITE_ROLES = new Set(["ADMIN", "ACCOUNTANT"]);
 
 /** Rows shown in the preview. Enough to spot a mis-read column, not a dump. */
 const PREVIEW_ROWS = 25;
-/** Beyond this a single file is refused — split it instead of timing out. */
+/**
+ * Rows one *request* may carry. Not a limit on the file any more: the wizard
+ * cuts anything larger into slices of `CHUNK_ROWS` and sends them one after
+ * another, so a two-hundred-thousand-row item master arrives as forty requests
+ * that each answer in a second or two.
+ *
+ * This ceiling now only catches a caller that ignored the chunking — a script
+ * posting straight at the endpoint — and it is set where a single request still
+ * comfortably finishes.
+ */
 const MAX_ROWS = 20000;
 /**
  * Ledger history is the exception. It is one row per posting rather than one
@@ -64,6 +81,24 @@ const MAX_ROWS = 20000;
  * The rows are also the cheapest kind, written in batches of 500.
  */
 const MAX_LEDGER_ROWS = 250000;
+
+/**
+ * Data types whose checks read the whole file at once and cannot be shown a
+ * slice of it.
+ *
+ * A hierarchical trial balance is only recognisable as hierarchical when the
+ * group row and the accounts under it are in front of the same pass; cut the
+ * file between them and the group row stops looking like a subtotal and gets
+ * imported as a real account, doubling the money it stood for. The same goes
+ * for a chart of accounts, where an account takes its category from a heading
+ * that may be thousands of rows above it.
+ *
+ * Neither is ever the big file — a chart of accounts and a trial balance are
+ * one row per account, and thirty thousand accounts is a large multinational.
+ * So they are refused rather than silently degraded, and the caller is told to
+ * send the file whole.
+ */
+const WHOLE_FILE_TYPES = new Set<ImportDataType>(["accounts", "opening_balances"]);
 
 type Outcome = {
   total: number;
@@ -197,28 +232,28 @@ function lookup<T>(
 /* ─────────────────────────── Mapping ─────────────────────────── */
 
 /** Runs the reader for one data type. No database, no writes. */
-function mapForType(dataType: ImportDataType, rows: CsvRow[]) {
+function mapForType(dataType: ImportDataType, rows: CsvRow[], lineOffset = 0) {
   switch (dataType) {
     case "accounts":
-      return mapRows(rows, (r) => readAccountRow(r));
+      return mapRows(rows, (r) => readAccountRow(r), lineOffset);
     case "customers":
-      return mapRows(rows, (r) => readAccountRow(r, "customer"));
+      return mapRows(rows, (r) => readAccountRow(r, "customer"), lineOffset);
     case "suppliers":
-      return mapRows(rows, (r) => readAccountRow(r, "supplier"));
+      return mapRows(rows, (r) => readAccountRow(r, "supplier"), lineOffset);
     case "items":
-      return mapRows(rows, (r) => readItemRow(r));
+      return mapRows(rows, (r) => readItemRow(r), lineOffset);
     case "opening_balances":
-      return mapRows(rows, (r) => readOpeningBalanceRow(r));
+      return mapRows(rows, (r) => readOpeningBalanceRow(r), lineOffset);
     case "opening_stock":
-      return mapRows(rows, (r) => readOpeningStockRow(r));
+      return mapRows(rows, (r) => readOpeningStockRow(r), lineOffset);
     case "open_invoices":
-      return mapRows(rows, (r) => readOpenDocumentRow(r, "invoice"));
+      return mapRows(rows, (r) => readOpenDocumentRow(r, "invoice"), lineOffset);
     case "open_bills":
-      return mapRows(rows, (r) => readOpenDocumentRow(r, "bill"));
+      return mapRows(rows, (r) => readOpenDocumentRow(r, "bill"), lineOffset);
     case "ledger_history":
-      return mapRows(rows, (r, line) => readLedgerHistoryRow(r, line));
+      return mapRows(rows, (r, line) => readLedgerHistoryRow(r, line), lineOffset);
     default:
-      return mapRows(rows, () => ({ value: null, error: "Unsupported data type" }));
+      return mapRows(rows, () => ({ value: null, error: "Unsupported data type" }), lineOffset);
   }
 }
 
@@ -628,9 +663,12 @@ async function writeLedgerHistory(
   branchId: string | null,
   mapped: MappedRow<LedgerHistoryRow>[],
   fallbackParty: string,
+  /** Party keys already opened by an earlier slice of the same file. */
+  continuedParties: string[] = [],
 ): Promise<Outcome> {
   const outcome = emptyOutcome(mapped.length);
   const index = await loadAccountIndex(companyId);
+  const continued = new Set(continuedParties.map((p) => p.trim().toLowerCase()));
 
   // Grouped by party, so a file holding one party and a file holding fifty go
   // down the same path.
@@ -661,7 +699,7 @@ async function writeLedgerHistory(
   const entries: { companyId: string; voucherId: string; accountId: string; amount: number }[] = [];
   const lines: number[] = [];
 
-  for (const rows of groups.values()) {
+  for (const [key, rows] of groups) {
     const first = rows[0].value;
     const code = first.partyCode;
     const name = first.party || fallbackParty;
@@ -676,13 +714,20 @@ async function writeLedgerHistory(
     // one error that cannot be spotted afterwards — the ledger still adds up,
     // it is just wrong by the opening — so it is taken from the file two ways
     // and refused when the file says neither.
+    //
+    // Unless an earlier slice of this same file already settled it, in which
+    // case these rows are the continuation of a ledger whose head has been
+    // read, and the opening is not theirs to touch.
+    const carriedOver = continued.has(key);
     const openingRows = rows.filter((r) => r.value.isOpening);
     const firstPosting = rows.find((r) => !r.value.isOpening)?.value ?? null;
     let openDebit = 0;
     let openCredit = 0;
     let openDate: Date | undefined;
 
-    if (openingRows.length > 0) {
+    if (carriedOver) {
+      // Nothing to decide, and nothing to write to the account.
+    } else if (openingRows.length > 0) {
       openDebit = openingRows[0].value.debit;
       openCredit = openingRows[0].value.credit;
       openDate = openingRows[0].value.date ?? undefined;
@@ -721,20 +766,22 @@ async function writeLedgerHistory(
       );
     }
 
-    try {
-      await prisma.account.update({
-        where: { id: hit.id },
-        data: { openDebit, openCredit, openDate },
-      });
-      outcome.updated += 1;
-    } catch (e) {
-      outcome.skipped += rows.length;
-      note(
-        outcome,
-        openingRows[0].line,
-        e instanceof Error ? e.message : "Could not roll the opening balance back",
-      );
-      continue;
+    if (!carriedOver) {
+      try {
+        await prisma.account.update({
+          where: { id: hit.id },
+          data: { openDebit, openCredit, openDate },
+        });
+        outcome.updated += 1;
+      } catch (e) {
+        outcome.skipped += rows.length;
+        note(
+          outcome,
+          (openingRows[0] ?? rows[0]).line,
+          e instanceof Error ? e.message : "Could not roll the opening balance back",
+        );
+        continue;
+      }
     }
 
     for (const row of rows) {
@@ -921,7 +968,7 @@ async function writeOpenDocuments(
 
 /* ─────────────────────────── Route ─────────────────────────── */
 
-async function readBody(req: NextRequest): Promise<{
+type ImportBody = {
   csv: string;
   source: string;
   dataType: string;
@@ -929,8 +976,60 @@ async function readBody(req: NextRequest): Promise<{
   date: string;
   /** Party for a ledger-history file that names its party in the report header, not a column. */
   party: string;
+  /**
+   * Data rows of the original file that came before this slice. Zero for a file
+   * sent whole. Row numbers in every message are reported against the original,
+   * so "Row 41,208" is a row the operator can find in their own export.
+   */
+  lineOffset: number;
+  /** How many slices the file was cut into. One means it was sent whole. */
+  chunkCount: number;
+  /** Which slice this is, from one. */
+  chunkIndex: number;
+  /**
+   * Item codes a full-file scan found to be shared by two items. Only the
+   * sender has seen the whole file once it has been cut up, so the finding
+   * travels with each slice. See `scanAmbiguousItemCodes`.
+   */
+  ambiguousCodes: string[];
+  /**
+   * Parties whose ledger rows began in an earlier slice.
+   *
+   * A party's opening balance is decided once, from the B/F line or the running
+   * balance at the top of its ledger. A second slice carrying more of the same
+   * party has neither at its head — its first row is a posting from the middle
+   * of the year — so left to itself it would either refuse the party for having
+   * no opening, or worse, read that mid-year balance as one and overwrite the
+   * opening the first slice got right. Naming the parties that are already
+   * under way says: post these rows, the opening is settled.
+   */
+  continuedParties: string[];
   error?: string;
-}> {
+};
+
+const EMPTY_BODY: ImportBody = {
+  csv: "", source: "csv", dataType: "", dryRun: false, date: "", party: "",
+  lineOffset: 0, chunkCount: 1, chunkIndex: 1, ambiguousCodes: [], continuedParties: [],
+};
+
+/** A count from an untrusted caller, kept sane and non-negative. */
+function counted(raw: unknown, fallback: number): number {
+  const n = Number(raw);
+  return Number.isFinite(n) && n >= 0 ? Math.floor(n) : fallback;
+}
+
+function stringList(raw: unknown): string[] {
+  if (Array.isArray(raw)) return raw.map(String);
+  if (typeof raw === "string" && raw.trim()) {
+    try {
+      const parsed = JSON.parse(raw);
+      return Array.isArray(parsed) ? parsed.map(String) : [];
+    } catch { return []; }
+  }
+  return [];
+}
+
+async function readBody(req: NextRequest): Promise<ImportBody> {
   const contentType = req.headers.get("content-type") || "";
 
   if (contentType.includes("multipart/form-data")) {
@@ -944,11 +1043,16 @@ async function readBody(req: NextRequest): Promise<{
       dryRun: String(form.get("dryRun") || "") === "true",
       date: String(form.get("date") || ""),
       party: String(form.get("party") || ""),
+      lineOffset: counted(form.get("lineOffset"), 0),
+      chunkCount: Math.max(1, counted(form.get("chunkCount"), 1)),
+      chunkIndex: Math.max(1, counted(form.get("chunkIndex"), 1)),
+      ambiguousCodes: stringList(form.get("ambiguousCodes")),
+      continuedParties: stringList(form.get("continuedParties")),
     };
   }
 
   const json = await req.json().catch(() => null);
-  if (!json) return { csv: "", source: "csv", dataType: "", dryRun: false, date: "", party: "", error: "Invalid request body" };
+  if (!json) return { ...EMPTY_BODY, error: "Invalid request body" };
   return {
     csv: String(json.csv || ""),
     source: String(json.source || "csv"),
@@ -956,6 +1060,11 @@ async function readBody(req: NextRequest): Promise<{
     dryRun: json.dryRun === true,
     date: String(json.date || ""),
     party: String(json.party || ""),
+    lineOffset: counted(json.lineOffset, 0),
+    chunkCount: Math.max(1, counted(json.chunkCount, 1)),
+    chunkIndex: Math.max(1, counted(json.chunkIndex, 1)),
+    ambiguousCodes: stringList(json.ambiguousCodes),
+    continuedParties: stringList(json.continuedParties),
   };
 }
 
@@ -986,6 +1095,21 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "The file is empty" }, { status: 400 });
     }
 
+    if (body.chunkCount > 1 && WHOLE_FILE_TYPES.has(dataType)) {
+      const def = findDataType(dataType);
+      return NextResponse.json(
+        {
+          error:
+            `${def?.name ?? dataType} has to be imported as one file. Its checks read the ` +
+            `whole chart at once — which rows are group totals, and which heading each ` +
+            `account sits under — and neither question can be answered from part of the ` +
+            `file. Send the export whole; one row per account is never large enough to ` +
+            `need splitting.`,
+        },
+        { status: 400 },
+      );
+    }
+
     // Some report writers flatten their layout onto one line per record instead
     // of writing a grid. Recognise and unwrap that before anything else looks at
     // the file; anything unrecognised comes back untouched.
@@ -995,11 +1119,19 @@ export async function POST(req: NextRequest) {
     // Tried most specific first. Each one insists on its own shape and hands
     // the file back untouched when it is not that shape, so the order only
     // decides which gets to look first, never what a file is read as.
+    //
+    // Skipped for a slice. A file that needs unwrapping is unwrapped in the
+    // browser before it is cut up, because these readers look for markers
+    // across the whole export and a slice would only show them part of it.
+    // Running them again here would be at best a no-op and at worst a second
+    // reshape of text that has already been reshaped once.
     const shapes = [flattenLedgerExport, flattenRepeatedReportExport, flattenHeaderPrefixExport];
     let flattened = { text: body.csv, converted: false } as ReturnType<typeof flattenLedgerExport>;
-    for (const shape of shapes) {
-      const result = shape(body.csv);
-      if (result.converted) { flattened = result; break; }
+    if (body.chunkCount === 1) {
+      for (const shape of shapes) {
+        const result = shape(body.csv);
+        if (result.converted) { flattened = result; break; }
+      }
     }
     const parsed = parseCsv(flattened.text);
     if (parsed.rows.length === 0) {
@@ -1016,12 +1148,12 @@ export async function POST(req: NextRequest) {
     const rowCap = dataType === "ledger_history" ? MAX_LEDGER_ROWS : MAX_ROWS;
     if (parsed.rows.length > rowCap) {
       return NextResponse.json(
-        { error: `${parsed.rows.length.toLocaleString()} rows is too many for one file. Split it into files of ${rowCap.toLocaleString()} rows or fewer.` },
+        { error: `${parsed.rows.length.toLocaleString()} rows is too many for one request. The Import Wizard splits a file this size automatically — upload it there rather than posting it here, or send it in pieces of ${rowCap.toLocaleString()} rows or fewer.` },
         { status: 400 },
       );
     }
 
-    const mapped = mapForType(dataType, parsed.rows);
+    const mapped = mapForType(dataType, parsed.rows, body.lineOffset);
 
     // Whole-file pass, so it cannot live in a per-row reader: a hierarchical
     // trial balance prints group subtotals as ordinary rows, and importing
@@ -1039,7 +1171,9 @@ export async function POST(req: NextRequest) {
     // Whole-file pass: one code standing for two items cannot be seen from
     // inside a single row.
     if (dataType === "items") {
-      const { flagged } = flagAmbiguousItemCodes(mapped.rows as MappedRow<ItemRow>[]);
+      const { flagged } = flagAmbiguousItemCodes(
+        mapped.rows as MappedRow<ItemRow>[], body.ambiguousCodes,
+      );
       if (flagged > 0) {
         mapped.ok -= flagged;
         mapped.failed += flagged;
@@ -1131,6 +1265,7 @@ export async function POST(req: NextRequest) {
         outcome = await writeLedgerHistory(
           companyId, await resolveBranchIdOrDefault(req, companyId),
           rows as MappedRow<LedgerHistoryRow>[], body.party.trim(),
+          body.continuedParties,
         );
         break;
       default:

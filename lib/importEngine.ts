@@ -539,6 +539,15 @@ export type MapReport<T> = {
 export function mapRows<T>(
   rows: CsvRow[],
   mapper: (row: CsvRow, line: number) => { value: T; error?: string; warning?: string },
+  /**
+   * Data rows that came before these in the file this slice was cut from.
+   *
+   * Carried rather than added afterwards because a reader is allowed to care
+   * which row it is looking at: a party ledger reads an unlabelled first row as
+   * the brought-forward line, and a second slice whose rows started numbering
+   * from one again would post its opening balance a second time.
+   */
+  lineOffset = 0,
 ): MapReport<T> {
   const out: MappedRow<T>[] = [];
   let ok = 0;
@@ -546,7 +555,7 @@ export function mapRows<T>(
   let warnings = 0;
 
   rows.forEach((row, index) => {
-    const line = index + 1;
+    const line = index + 1 + lineOffset;
     try {
       const result = mapper(row, line);
       const mapped: MappedRow<T> = { line, value: result.value };
@@ -799,7 +808,17 @@ export function readItemRow(row: CsvRow): { value: ItemRow; error?: string; warn
  * So it is checked instead of trusted. A code carrying more than one name
  * stops those rows, names both, and leaves the rest of the file importable.
  */
-export function flagAmbiguousItemCodes(rows: MappedRow<ItemRow>[]): { flagged: number } {
+export function flagAmbiguousItemCodes(
+  rows: MappedRow<ItemRow>[],
+  /**
+   * Codes a full-file scan already found to be shared, for the case where
+   * `rows` is one slice of a file too big to send in a single request. Without
+   * it, two items sharing a code would pass unnoticed whenever the split
+   * happened to fall between them — the check would be looking at half a file
+   * and reporting on all of it. See `scanAmbiguousItemCodes`.
+   */
+  knownAmbiguous?: Iterable<string>,
+): { flagged: number } {
   const namesByCode = new Map<string, Set<string>>();
   for (const row of rows) {
     if (row.error || !row.value?.code) continue;
@@ -809,17 +828,93 @@ export function flagAmbiguousItemCodes(rows: MappedRow<ItemRow>[]): { flagged: n
     namesByCode.set(code, seen);
   }
 
+  const known = new Set<string>();
+  for (const code of knownAmbiguous ?? []) known.add(code.trim().toLowerCase());
+
   let flagged = 0;
   for (const row of rows) {
     if (row.error || !row.value?.code) continue;
-    const names = namesByCode.get(row.value.code.trim().toLowerCase());
-    if (!names || names.size < 2) continue;
+    const code = row.value.code.trim().toLowerCase();
+    const names = namesByCode.get(code);
+    const count = names?.size ?? 0;
+    if (count < 2 && !known.has(code)) continue;
     row.error =
-      `Code "${row.value.code}" is shared by ${names.size} different items — ` +
+      `Code "${row.value.code}" is shared by ${Math.max(count, 2)} different items — ` +
       `they would overwrite each other. Give them separate codes first.`;
     flagged += 1;
   }
   return { flagged };
+}
+
+/**
+ * The codes a whole item file uses for more than one item.
+ *
+ * Runs in the browser, over the complete file, before it is cut into request-
+ * sized pieces — the one check here that cannot survive being shown a slice.
+ * The result travels with every piece so each one is judged against the whole
+ * file it came from.
+ *
+ * Reads through the same two composers the row reader uses, so a code assembled
+ * from several columns is the same string on both sides.
+ */
+export function scanAmbiguousItemCodes(rows: CsvRow[]): string[] {
+  const namesByCode = new Map<string, Set<string>>();
+  for (const row of rows) {
+    const code = composedItemCode(row).trim().toLowerCase();
+    if (!code) continue;
+    const seen = namesByCode.get(code) ?? new Set<string>();
+    seen.add(composedItemName(row).trim().toLowerCase());
+    namesByCode.set(code, seen);
+  }
+  return [...namesByCode].filter(([, names]) => names.size > 1).map(([code]) => code);
+}
+
+/**
+ * Parent and direct-child links for a coded chart, read off the codes alone.
+ *
+ * Both whole-file passes below need the same thing — who sits under whom in a
+ * scheme where `0303` is the head of `03030001` — and both used to work it out
+ * by scanning every other row for each row they looked at. That is fine for the
+ * two-hundred-line trial balance it was written against and quadratic for a
+ * real one: an Oracle EBS chart of thirty thousand combinations is nine hundred
+ * million comparisons, twice over, inside a request that has to answer in
+ * seconds. It did not fail loudly, it just never came back.
+ *
+ * Built once instead, by asking each code for its longest proper prefix that is
+ * itself a code — the nearest ancestor. That is one map lookup per character of
+ * the code, so the whole tree costs a pass over the file rather than a pass over
+ * the file per row.
+ *
+ * Duplicate codes keep the first row as the ancestor, which is what the scan
+ * did too: it required a *longer* code to count as a descendant, so a row never
+ * parented its own twin.
+ */
+function buildCodeTree<T>(coded: T[], codeOf: (row: T) => string): {
+  parentOf: Map<T, T | null>;
+  childrenOf: Map<T, T[]>;
+} {
+  const byCode = new Map<string, T>();
+  for (const row of coded) {
+    const code = codeOf(row);
+    if (!byCode.has(code)) byCode.set(code, row);
+  }
+
+  const parentOf = new Map<T, T | null>();
+  const childrenOf = new Map<T, T[]>();
+  for (const row of coded) childrenOf.set(row, []);
+
+  for (const row of coded) {
+    const code = codeOf(row);
+    let parent: T | null = null;
+    for (let len = code.length - 1; len >= 1; len -= 1) {
+      const hit = byCode.get(code.slice(0, len));
+      if (hit !== undefined && hit !== row) { parent = hit; break; }
+    }
+    parentOf.set(row, parent);
+    if (parent) childrenOf.get(parent)?.push(row);
+  }
+
+  return { parentOf, childrenOf };
 }
 
 export type OpeningBalanceRow = {
@@ -896,13 +991,9 @@ export function inheritGroupsFromHierarchy(rows: MappedRow<AccountRow>[]): {
   const coded = rows.filter((r) => !r.error && r.value?.code);
   let classified = 0;
 
+  const { parentOf, childrenOf } = buildCodeTree(coded, (r) => r.value.code);
   const hasDescendants = (row: MappedRow<AccountRow>) =>
-    coded.some(
-      (other) =>
-        other !== row &&
-        other.value.code.length > row.value.code.length &&
-        other.value.code.startsWith(row.value.code),
-    );
+    (childrenOf.get(row)?.length ?? 0) > 0;
 
   const set = (row: MappedRow<AccountRow>, partyType: string, why: string) => {
     row.value.partyType = partyType;
@@ -921,7 +1012,6 @@ export function inheritGroupsFromHierarchy(rows: MappedRow<AccountRow>[]): {
 
   for (const row of ordered) {
     if (row.value.partyType !== "GENERAL") continue;
-    const code = row.value.code;
 
     // A row with accounts filed under it is a heading, and a heading's name is
     // its category — SUPPLIERS, BANK ACCOUNTS, INCOME. Read it off the name.
@@ -940,25 +1030,22 @@ export function inheritGroupsFromHierarchy(rows: MappedRow<AccountRow>[]): {
 
     // Otherwise inherit, nearest ancestor first: under CURRENT ASSETS a
     // CUSTOMERS control head should still win and make this a customer rather
-    // than a bare asset.
-    const ancestors = coded
-      .filter(
-        (other) =>
-          other !== row &&
-          other.value.code.length < code.length &&
-          code.startsWith(other.value.code),
-      )
-      .sort((a, b) => b.value.code.length - a.value.code.length);
-
-    for (const ancestor of ancestors) {
+    // than a bare asset. Walking the parent chain visits exactly the rows whose
+    // code is a proper prefix of this one, nearest first, because a chart's
+    // prefixes are closed under shortening — every prefix of `code` is also a
+    // prefix of the longer prefixes above it.
+    let ancestor = parentOf.get(row) ?? null;
+    while (ancestor) {
       // Ancestors are already settled, so read the resolved value rather than
       // re-deriving it from the name.
       const inherited = ancestor.value.partyType !== "GENERAL"
         ? ancestor.value.partyType
         : normalizePartyType(ancestor.value.name);
-      if (inherited === "GENERAL") continue;
-      set(row, inherited, `Filed under "${ancestor.value.name}" (code ${ancestor.value.code})`);
-      break;
+      if (inherited !== "GENERAL") {
+        set(row, inherited, `Filed under "${ancestor.value.name}" (code ${ancestor.value.code})`);
+        break;
+      }
+      ancestor = parentOf.get(ancestor) ?? null;
     }
   }
 
@@ -1120,22 +1207,16 @@ export function flagSummaryRows(rows: MappedRow<OpeningBalanceRow>[]): {
   const net = (r: MappedRow<OpeningBalanceRow>) => r.value.debit - r.value.credit;
   let summaries = 0;
 
+  // Direct children only. Summing every descendant would add the intermediate
+  // groups to the leaves under them and double-count inside the check itself —
+  // which is how the top-level "03" row came out at twice its own figure and
+  // escaped as a real account.
+  const { childrenOf } = buildCodeTree(coded, (r) => r.value.code);
+
   for (const row of coded) {
     const code = row.value.code;
-    const descendants = coded.filter(
-      (other) => other !== row && other.value.code.length > code.length && other.value.code.startsWith(code),
-    );
-    if (descendants.length === 0) continue;
-
-    // Direct children only. Summing every descendant would add the
-    // intermediate groups to the leaves under them and double-count inside the
-    // check itself — which is how the top-level "03" row came out at twice its
-    // own figure and escaped as a real account.
-    const children = descendants.filter(
-      (d) => !descendants.some(
-        (p) => p !== d && d.value.code.length > p.value.code.length && d.value.code.startsWith(p.value.code),
-      ),
-    );
+    const children = childrenOf.get(row) ?? [];
+    if (children.length === 0) continue;
 
     const childTotal = children.reduce((sum, c) => sum + net(c), 0);
     // Tolerance rather than equality: these totals are printed to the rupee

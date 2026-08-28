@@ -28,6 +28,8 @@ import {
   type ImportSourceId,
   type ImportDataType,
 } from "@/lib/importEngine";
+import { planImport, type ImportChunk, type ImportPlan } from "@/lib/importChunker";
+import { readXlsx } from "@/lib/xlsxRead";
 
 const FONT = "'Outfit','Inter',sans-serif";
 const MONO = "ui-monospace,'Cascadia Code','SF Mono',Consolas,monospace";
@@ -82,6 +84,49 @@ type Result = {
   skipped: number;
   errors: string[];
 };
+
+/** What a long upload is doing, so a big file is not a frozen button. */
+type Progress = { label: string; done: number; total: number };
+
+/**
+ * Where a part-finished import got to, kept so closing the tab mid-migration
+ * does not mean starting a two-hundred-thousand-row file again.
+ *
+ * The file itself is not kept — it is far too big for browser storage and it is
+ * the operator's own file, sitting where they left it. What is kept is enough
+ * to recognise it when they pick it again, and the point to carry on from.
+ */
+type Resume = {
+  fileName: string;
+  dataType: ImportDataType;
+  chunkCount: number;
+  totalRows: number;
+  /** Chunks already committed. The next request starts here. */
+  done: number;
+  outcome: { imported: number; updated: number; skipped: number; total: number };
+  at: number;
+};
+
+const RESUME_KEY = "finova.import.resume";
+
+function loadResume(): Resume | null {
+  try {
+    const raw = localStorage.getItem(RESUME_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as Resume;
+    // A week is longer than any migration takes and short enough that a stale
+    // offer never appears next to an unrelated file.
+    if (!parsed?.fileName || Date.now() - (parsed.at ?? 0) > 7 * 864e5) return null;
+    return parsed;
+  } catch { return null; }
+}
+
+function saveResume(state: Resume | null) {
+  try {
+    if (state) localStorage.setItem(RESUME_KEY, JSON.stringify(state));
+    else localStorage.removeItem(RESUME_KEY);
+  } catch { /* private browsing, or storage switched off — resume is a convenience */ }
+}
 
 function ImportWizardInner() {
   const { isMobile } = useResponsive();

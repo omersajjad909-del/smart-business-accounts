@@ -25,6 +25,7 @@ import {
   rateFormulaPrintValues,
   rateFormulaLineIncomplete,
   rateFormulaEnterHandler,
+  focusRateFormulaCell,
   type RateFormulaMeta,
 } from "@/components/RateFormulaCells";
 import { computeRateFromFormula, emptyRateFormulaMeta, itemMetaWithName, itemNameWithoutSpec, itemPickerLabel, itemSpecRole, metaFromItem, readRateFormulaMeta } from "@/lib/rateFormula";
@@ -147,6 +148,13 @@ function SalesInvoiceContent() {
   // Companies that price a line from a calculation get extra columns and a
   // computed rate. Everyone else gets exactly the grid that was here before.
   const { settings: rf, active: rfActive } = useRateFormula("salesInvoice");
+  // Product specifications (gauge, width, length, PHR and shade) are carried
+  // in from the selected item. The one value the operator enters per invoice
+  // line is RT/MM, so both mouse and Enter selections land there directly.
+  const rtmmFieldKey = useMemo(
+    () => rf.fields.find((field) => /rt\s*\/?\s*mm/i.test(`${field.key} ${field.label}`))?.key ?? null,
+    [rf],
+  );
   const emptyRow = (): Row => ({ itemId: "", name: "", description: "", availableQty: 0, qty: "", rate: "", discountPercent: "", taxPercent: "", unit: "", sku: "", isManual: false, ...(rfActive ? { meta: emptyRateFormulaMeta(rf) } : {}) });
   const [rows, setRows]                 = useState<Row[]>([emptyRow()]);
   const [freight, setFreight]           = useState<number | "">("");
@@ -352,6 +360,7 @@ function SalesInvoiceContent() {
     }
     if (idx === copy.length - 1) copy.push(emptyRow());
     setRows(copy);
+    if (rfActive && rtmmFieldKey) focusRateFormulaCell(idx, rtmmFieldKey);
   }
 
   function updateRow(idx: number, key: keyof Pick<Row, "qty" | "rate" | "discountPercent" | "taxPercent">, val: string) {
@@ -1039,7 +1048,7 @@ function SalesInvoiceContent() {
                                     items={items}
                                     value={r.itemId}
                                     onChange={(id) => selectItem(i, id)}
-                                    onKeyDown={rateFormulaEnterHandler(rf, rfActive, i, () => lastPickedMeta.current)}
+                                    onKeyDown={rateFormulaEnterHandler(rf, rfActive, i, () => lastPickedMeta.current, rtmmFieldKey)}
                                     label={rfActive ? itemPickerLabel : undefined}
                                     previewFields={rfActive ? pickerPreviewFields : []}
                                     previewValues={rfActive ? itemPreviewValues : undefined}
@@ -1052,7 +1061,7 @@ function SalesInvoiceContent() {
                               {r.sku && !r.isManual && <div style={{ fontSize: 11, color: "var(--text-muted)", marginBottom: 6 }}>SKU: {r.sku}{r.unit ? ` | Unit: ${r.unit}` : ""}</div>}
                               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
                                 {rfActive && (
-                                  <RateFormulaMobileFields settings={rf} meta={r.meta} onChange={(key, value) => updateRowMeta(i, key, value)} />
+                                  <RateFormulaMobileFields settings={rf} meta={r.meta} rowIndex={i} onChange={(key, value) => updateRowMeta(i, key, value)} />
                                 )}
                                 {(["qty","rate"] as const).map(k => (
                                   <div key={k}>
@@ -1115,7 +1124,7 @@ function SalesInvoiceContent() {
                                         items={items}
                                         value={r.itemId}
                                         onChange={(id) => selectItem(i, id)}
-                                        onKeyDown={rateFormulaEnterHandler(rf, rfActive, i, () => lastPickedMeta.current)}
+                                        onKeyDown={rateFormulaEnterHandler(rf, rfActive, i, () => lastPickedMeta.current, rtmmFieldKey)}
                                         label={rfActive ? itemPickerLabel : undefined}
                                         previewFields={rfActive ? pickerPreviewFields : []}
                                         previewValues={rfActive ? itemPreviewValues : undefined}

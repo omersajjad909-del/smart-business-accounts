@@ -368,7 +368,17 @@ export type CsvChunk = {
  * `lineOffset` counts blank-filtered data rows, matching what `parseCsv` drops,
  * so "Row 8,214" in an error means row 8,214 of the file the operator has open.
  */
-export function splitCsvChunks(input: string, rowsPerChunk: number): CsvChunk[] {
+export function splitCsvChunks(
+  input: string,
+  rowsPerChunk: number,
+  /**
+   * One key per data row, in file order, marking rows that must not be
+   * separated — a party's ledger, where the balance at the top of it governs
+   * every row below. A chunk runs past its row target rather than cut a run of
+   * equal keys in half. Omit when every row stands alone.
+   */
+  groupKeys?: string[],
+): CsvChunk[] {
   const text = input.startsWith(BOM) ? input.slice(1) : input;
   if (!text.trim()) return [];
 
@@ -408,13 +418,22 @@ export function splitCsvChunks(input: string, rowsPerChunk: number): CsvChunk[] 
 
   const size = Math.max(1, rowsPerChunk);
   const chunks: CsvChunk[] = [];
-  for (let i = 0; i < data.length; i += size) {
-    const slice = data.slice(i, i + size);
+  let from = 0;
+  while (from < data.length) {
+    let to = Math.min(from + size, data.length);
+    // Walk the cut forward until the key on either side of it differs, so a
+    // party is never handed to two requests unless it is bigger than a chunk on
+    // its own — which the caller is told about through `continuedParties`.
+    if (groupKeys) {
+      while (to < data.length && groupKeys[to] === groupKeys[to - 1]) to += 1;
+    }
+    const slice = data.slice(from, to);
     chunks.push({
       text: `${header}\n${text.slice(slice[0].start, slice[slice.length - 1].end)}`,
-      lineOffset: i,
+      lineOffset: from,
       rows: slice.length,
     });
+    from = to;
   }
   return chunks;
 }
