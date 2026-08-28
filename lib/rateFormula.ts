@@ -457,6 +457,15 @@ const NOT_A_SHADE = new Set([
   "SHEET","SHEETS","BAG","BAGS","BOX","BOXES","BUNDLE","BUNDLES","PKT","PACK",
 ]);
 
+// The legacy catalogue sometimes puts the colour before the dimensions, e.g.
+// "B2 WHITE 10G 60in L50 PHR26". These are unambiguous colour names, unlike
+// a general product word such as "Crystal", so they are safe to carry into
+// the Shade # column when no trailing shade code was supplied.
+const KNOWN_SHADE_WORDS = new Set([
+  "WHITE", "BLACK", "BLUE", "RED", "GREEN", "YELLOW", "ORANGE", "BROWN",
+  "GREY", "GRAY", "PINK", "PURPLE", "VIOLET", "BEIGE", "CREAM", "IVORY",
+]);
+
 /**
  * A shade written as a word rather than a code: the "Blue" in
  * "B2 BLUE 10G 50in L50 Blue PHR28".
@@ -467,7 +476,7 @@ const NOT_A_SHADE = new Set([
  */
 function findShadeWord(text: string): SpecHit | null {
   const tokens: Array<{ word: string; start: number }> = [];
-  const scan = /S+/g;
+  const scan = /\S+/g;
   let m: RegExpExecArray | null;
   while ((m = scan.exec(text)) !== null) tokens.push({ word: m[0], start: m.index });
 
@@ -481,6 +490,12 @@ function findShadeWord(text: string): SpecHit | null {
     if (!/^[A-Z][A-Z]+$/.test(word)) continue;
     if (NOT_A_SHADE.has(word)) continue;
     return { value: word, start, end: start + word.length };
+  }
+  // A known colour immediately before the dimensions is also a shade. This is
+  // common in the existing PVC list and avoids a blank Shade # for B2 WHITE.
+  for (let i = firstSpec - 1; i >= 0; i--) {
+    const { word, start } = tokens[i];
+    if (KNOWN_SHADE_WORDS.has(word)) return { value: word, start, end: start + word.length };
   }
   return null;
 }

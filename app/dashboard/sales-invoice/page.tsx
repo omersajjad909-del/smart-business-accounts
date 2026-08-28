@@ -2,7 +2,7 @@
 import { fmtDate } from "@/lib/dateUtils";
 import { DateInput } from "@/app/dashboard/reports/_components/DateInput";
 import { confirmToast } from "@/lib/toast-feedback";
-import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Suspense, useCallback, useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import toast from "react-hot-toast";
 import dynamic from "next/dynamic";
@@ -104,14 +104,6 @@ function SalesInvoiceContent() {
   // ── Data ──
   const [customers, setCustomers]   = useState<Account[]>([]);
   const [items, setItems]           = useState<Item[]>([]);
-  /**
-   * What the line got from the item that was just picked.
-   *
-   * The picker fires Enter straight after its onChange, before React has
-   * committed the new row, so the Enter handler cannot read `rows` to find out
-   * whether the item already answered the nominated column.
-   */
-  const lastPickedMeta = useRef<RateFormulaMeta | null>(null);
   const [invoices, setInvoices]     = useState<SalesInvoice[]>([]);
   const [taxes, setTaxes]           = useState<TaxConfig[]>([]);
   const [currencies, setCurrencies] = useState<Currency[]>([]);
@@ -360,7 +352,6 @@ function SalesInvoiceContent() {
     if (rfActive) {
       const meta = metaFromItem(rf, (item as any).meta, copy[idx].meta, `${item.name || ""} ${item.description || ""}`);
       copy[idx].meta = meta;
-      lastPickedMeta.current = meta;
       const r = computeRateFromFormula(rf, meta);
       if (r.rate != null) copy[idx].rate = r.rate;
     }
@@ -371,9 +362,13 @@ function SalesInvoiceContent() {
 
   function focusInvoiceQty(idx: number) {
     requestAnimationFrame(() => {
-      const input = document.getElementById(`sales-invoice-qty-${idx}`) as HTMLInputElement | null;
-      input?.focus();
-      input?.select();
+      // Wait for the picker to close and the table row to commit before
+      // moving focus; otherwise Enter can leave the caret in RT/MM.
+      requestAnimationFrame(() => {
+        const input = document.getElementById(`sales-invoice-qty-${idx}`) as HTMLInputElement | null;
+        input?.focus();
+        input?.select();
+      });
     });
   }
 
