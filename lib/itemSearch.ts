@@ -14,6 +14,12 @@
 // has to be built rather than borrowed. The trick is only this: strip the unit
 // letters that sit between the numbers, and "10G 60in L50" becomes "106050",
 // which is what the operator is typing at.
+//
+// The same habit reaches for punctuation. A quality written "CRYSTAL SUPER
+// CLEAR (DIAMOND)" ends in a bracket, so `)1060` is the operator's shorthand
+// for it exactly as `e1060` is for WHITE. That only works if the bracket is
+// still there to match against, which is why every item is keyed twice: once
+// flattened to letters and digits, and once with its punctuation standing.
 
 /**
  * Unit words as they appear wedged between two numbers. Longest first, because
@@ -25,6 +31,11 @@ const UNIT_TOKENS = ["phr", "pcs", "mm", "cm", "in", "kg", "ga", "g", "l", "m"];
 /** Lowercase, letters and digits only. */
 function alnum(value: string): string {
   return String(value ?? "").toLowerCase().replace(/[^a-z0-9]/g, "");
+}
+
+/** Lowercase with the spaces closed up but the punctuation left standing. */
+function marked(value: string): string {
+  return String(value ?? "").toLowerCase().replace(/\s+/g, "");
 }
 
 /** True when the whole run is unit words and nothing else. */
@@ -53,32 +64,60 @@ function stripUnits(key: string): string {
   );
 }
 
+/** One string and, when the units fall out of it, the shortened one as well. */
+function bothForms(text: string): string[] {
+  if (!text) return [];
+  const stripped = stripUnits(text);
+  return stripped === text ? [text] : [text, stripped];
+}
+
 /**
- * What one item is searched against: its text as written, and again with the
- * unit letters taken out. Both, because "white" has to keep working as well as
- * "e1060".
+ * What one item is searched against.
+ *
+ * `plain` is the text flattened to letters and digits — what a query without
+ * punctuation is held to. `marked` keeps the brackets, dashes and slashes, so
+ * a query that carries one is answered by the items that carry it too.
+ *
+ * Both are also stored with the unit letters taken out, because "white" has to
+ * keep working as well as "e1060".
  */
-export function itemSearchKeys(...parts: Array<string | undefined | null>): string[] {
-  const full = alnum(parts.filter(Boolean).join(" "));
-  if (!full) return [];
-  const stripped = stripUnits(full);
-  return stripped === full ? [full] : [full, stripped];
+export type ItemSearchKeys = { plain: string[]; marked: string[] };
+
+export function itemSearchKeys(...parts: Array<string | undefined | null>): ItemSearchKeys {
+  const joined = parts.filter(Boolean).join(" ");
+  return { plain: bothForms(alnum(joined)), marked: bothForms(marked(joined)) };
+}
+
+/** Punctuation the operator is only ending a sentence with, never aiming at. */
+function trimNoise(word: string): string {
+  return word.replace(/[.,;:]+$/, "");
 }
 
 /**
  * Every word of the query has to appear somewhere in the item, so "white 60"
  * narrows in the order the person thinks of it rather than the order the name
  * happens to be written in.
+ *
+ * A word carrying punctuation is matched against the punctuated key alone.
+ * Flattening it instead is what once made `)1060` mean plain `1060`, which is
+ * every 10-gauge 60-inch roll in the godown rather than the one quality whose
+ * name ends in that bracket.
  */
-export function itemMatches(query: string, keys: string[]): boolean {
+export function itemMatches(query: string, keys: ItemSearchKeys): boolean {
   const words = String(query ?? "").trim().split(/\s+/).filter(Boolean);
   if (words.length === 0) return true;
-  if (keys.length === 0) return false;
 
   return words.every((word) => {
-    const needle = alnum(word);
+    const lowered = trimNoise(word.toLowerCase());
+    if (!lowered) return true;
+
+    const punctuated = /[^a-z0-9]/.test(lowered);
+    const pool = punctuated ? keys.marked : keys.plain;
+    if (pool.length === 0) return false;
+
+    const needle = punctuated ? lowered : alnum(lowered);
     if (!needle) return true;
     const bare = stripUnits(needle);
-    return keys.some((key) => key.includes(needle) || (bare !== needle && key.includes(bare)));
+    return pool.some((key) => key.includes(needle) || (bare !== needle && key.includes(bare)));
   });
 }

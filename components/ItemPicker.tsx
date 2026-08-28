@@ -201,8 +201,11 @@ export function ItemPicker({
   const selectedLabel = selected ? (label ? label(selected) : selected.name) : "";
   const shown = open ? query : selectedLabel;
   const showStock = Boolean(stockMap);
+  // The quality is the column being read; the rest are two or three figures
+  // each. Given the room, "CRYSTAL SUPER CLEAR (DIAMOND)" has to arrive whole —
+  // cut to "CRYSTAL SUPER CLEAR …" two different qualities read alike.
   const previewColumns = previewFields.length
-    ? `minmax(150px, 1.4fr) repeat(${previewFields.length}, minmax(56px, 1fr)) minmax(52px, .7fr)${showStock ? " repeat(3, minmax(58px, .8fr))" : ""}`
+    ? `minmax(260px, 2.6fr) repeat(${previewFields.length}, minmax(56px, 1fr)) minmax(52px, .7fr)${showStock ? " repeat(3, minmax(58px, .8fr))" : ""}`
     : "minmax(170px, 1fr) minmax(62px, auto) minmax(48px, auto)";
 
   return (
