@@ -24,7 +24,7 @@ export type PickerItem = {
   name: string;
   code?: string | null;
   unit?: string | null;
-  meta?: Record<string, unknown> | null;
+  meta?: unknown;
   /** Shown under the name and searched with it — some catalogues carry the
    *  specification here rather than in the name. */
   description?: string | null;
@@ -216,7 +216,10 @@ export function ItemPicker({
                   </span>
                 ) : null}
               </span>}
-              {previewFields.map((field) => <span key={field.key} style={{ textAlign: "center", fontSize: 12, color: "var(--text-primary, #fff)" }}>{String(item.meta?.[field.key] ?? "—")}</span>)}
+              {previewFields.map((field) => {
+                const metadata = item.meta && typeof item.meta === "object" ? item.meta as Record<string, unknown> : null;
+                return <span key={field.key} style={{ textAlign: "center", fontSize: 12, color: "var(--text-primary, #fff)" }}>{String(metadata?.[field.key] ?? "—")}</span>;
+              })}
               {item.unit && (
                 <span style={{ fontSize: 11, color: "var(--text-muted, rgba(255,255,255,.35))", marginLeft: previewFields.length ? 0 : "auto", paddingLeft: previewFields.length ? 0 : 12, textAlign: previewFields.length ? "right" : undefined }}>
                   {item.unit}
