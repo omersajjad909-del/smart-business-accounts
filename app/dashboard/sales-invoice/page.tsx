@@ -1091,12 +1091,12 @@ function SalesInvoiceContent() {
                         })}
                       </div>
                     ) : (
-                      <div style={{ overflow: "visible", maxWidth: "100%" }}>
+                      <div style={{ overflowX: "auto", maxWidth: "100%" }}>
                         {/* SKU has no column of its own any more — it sits under the
                             row number, which is where it was asked for and buys
                             back ~110px so the whole grid fits without scrolling
                             sideways. */}
-                        <table style={{ width: "100%", minWidth: 0, tableLayout: "auto", borderCollapse: "separate", borderSpacing: "0 6px" }}>
+                        <table style={{ width: "max-content", minWidth: "100%", tableLayout: "auto", borderCollapse: "separate", borderSpacing: "0 6px" }}>
                           <thead>
                             <tr style={{ borderBottom: "1px solid var(--border)" }}>
                               {["#","Item / Description"].map((h,hi) => (
@@ -1157,7 +1157,7 @@ function SalesInvoiceContent() {
                                     <RateFormulaRowCells settings={formulaBeforeQty} meta={r.meta} rowIndex={i} onChange={(key, value) => updateRowMeta(i, key, value)} />
                                   )}
                                   <td style={{ padding: "9px 6px", fontSize: 12, color: "var(--text-muted)", width: 54, borderTop: "1px solid var(--border)", borderBottom: "1px solid var(--border)" }}>{r.unit || "—"}</td>
-                                  <td style={{ padding: "9px 6px", width: 96, borderTop: "1px solid var(--border)", borderBottom: "1px solid var(--border)" }}>
+                                  <td style={{ padding: "9px 6px", width: 96, minWidth: 88, borderTop: "1px solid var(--border)", borderBottom: "1px solid var(--border)" }}>
                                     <input id={`sales-invoice-qty-${i}`} type="number" style={{ ...inputStyle, padding: "9px 11px", textAlign: "right", fontSize: 14.5, fontWeight: 700 }} value={r.qty} onChange={e => updateRow(i, "qty", e.target.value)} onKeyDown={e => moveQtyFocusToRtmm(e, i)} placeholder="0" />
                                   </td>
                                   {rfActive && rtmmFormula.fields.length > 0 && (
