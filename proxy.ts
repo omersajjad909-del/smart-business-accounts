@@ -431,6 +431,11 @@ export async function proxy(req: NextRequest) {
     // why successful checkouts never activated (status stayed INACTIVE, no
     // invoices). The route verifies each provider's HMAC signature itself.
     "/api/billing/webhook",
+    // Fingerprint / face attendance machines. The bridge agent runs unattended
+    // on an office PC, and the machines themselves cannot be made to send a
+    // cookie, so both authenticate with a per-device ingest key that the route
+    // verifies itself (x-device-key here, the serial number on /iclock).
+    "/api/attendance/ingest",
   ];
   const isApi = pathname.startsWith("/api/");
   const isPublic = publicApi.some((p) => pathname.startsWith(p));
