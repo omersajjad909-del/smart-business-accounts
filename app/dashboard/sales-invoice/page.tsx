@@ -1002,7 +1002,7 @@ function SalesInvoiceContent() {
                                     label={rfActive ? itemPickerLabel : undefined}
                                     previewFields={rfActive ? rf.fields.map((field) => ({ key: field.key, label: field.label })) : []}
                                     previewValues={rfActive ? itemPreviewValues : undefined}
-                                    placeholder="Type to search — e.g. e1060"
+                                    // placeholder="Type to search — e.g. e1060"
                                     style={inputStyle}
                                   />
                                 </div>

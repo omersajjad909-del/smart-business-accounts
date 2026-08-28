@@ -470,7 +470,7 @@ export default function PurchaseOrderPage() {
                             label={rfActive ? itemPickerLabel : undefined}
                             style={{ ...inp({ marginBottom: 8 }) }}
                             allowManual={false}
-                            placeholder="Type to search — e.g. e1060"
+                            // placeholder="Type to search — e.g. e1060"
                           />
                           {(r as any).sku && <div style={{ fontSize: 11, color: MUTED, marginBottom: 6 }}>SKU: {(r as any).sku}{(r as any).unit ? ` | Unit: ${(r as any).unit}` : ""}</div>}
                           <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: 8 }}>
@@ -556,7 +556,7 @@ export default function PurchaseOrderPage() {
                                   label={rfActive ? itemPickerLabel : undefined}
                                   style={{ ...inp({ padding: isMobile ? "8px 8px" : "5px 7px", fontSize: 13 }) }}
                                   allowManual={false}
-                                  placeholder="Type to search — e.g. e1060"
+                                  // placeholder="Type to search — e.g. e1060"
                                 />
                                 {(r.desc || (r as any).unit) && (
                                   <div style={{ fontSize: 10.5, color: MUTED, marginTop: 2, paddingLeft: 2, display: "flex", gap: 8 }}>

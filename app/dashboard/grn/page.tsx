@@ -401,7 +401,7 @@ export default function GRNPage() {
                             label={rfActive ? itemPickerLabel : undefined}
                             style={{ ...inp({ marginBottom: 8 }) }}
                             allowManual={false}
-                            placeholder="Type to search — e.g. e1060"
+                            // placeholder="Type to search — e.g. e1060"
                           />
                           <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr 1fr", gap: 8 }}>
                             {rfActive && (

@@ -1233,7 +1233,7 @@ const [searchTerm, setSearchTerm] = useState("");
                                       label={rfActive ? itemPickerLabel : undefined}
                                       style={{ ...inp({ padding: "5px 7px", fontSize: 12.5 }), fontWeight: r.itemId ? 600 : 400 }}
                                       allowManual={false}
-                                      placeholder="Type to search — e.g. e1060"
+                                      // placeholder="Type to search — e.g. e1060"
                                     />
                                     {r.description && <div style={{ fontSize: 10, color: MUTED, marginTop: 2, paddingLeft: 2 }}>{r.description}</div>}
                                   </td>

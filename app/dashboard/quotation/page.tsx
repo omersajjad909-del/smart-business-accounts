@@ -661,7 +661,7 @@ export default function QuotationPage() {
                         onChange={(__picked: string) => selectItem(i, __picked)}
                         style={{ width: "100%", padding: isMobile ? "8px 8px" : "9px 13px", borderRadius: 8, border: "1.5px solid var(--border)", background: "var(--app-bg)", color: "var(--text-primary)", fontSize: 13, marginBottom: 8, boxSizing: "border-box" as const }}
                         allowManual={false}
-                        placeholder="Type to search — e.g. e1060"
+                        // placeholder="Type to search — e.g. e1060"
                       />
                       <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: 8 }}>
                         <div>
@@ -701,7 +701,7 @@ export default function QuotationPage() {
                               onChange={(__picked: string) => selectItem(i, __picked)}
                               style={{ width: "100%", padding: isMobile ? "8px 8px" : "7px 10px", borderRadius: 8, border: "1.5px solid var(--border)", background: "var(--app-bg)", color: "var(--text-primary)", fontSize: 13 }}
                               allowManual={false}
-                              placeholder="Type to search — e.g. e1060"
+                              // placeholder="Type to search — e.g. e1060"
                             />
                           </td>
                           <td style={{ padding: isMobile ? "8px 8px" : "8px 6px", width: 100 }}>

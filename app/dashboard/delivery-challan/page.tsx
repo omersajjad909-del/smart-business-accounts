@@ -585,7 +585,7 @@ const [searchTerm, _setSearchTerm] = useState("");
                             value={r.itemId}
                             onChange={(__picked: string) => selectItem(i, __picked)}
                             allowManual={false}
-                            placeholder="Type to search — e.g. e1060"
+                            // placeholder="Type to search — e.g. e1060"
                           />
                         </td>
                         <td className="border p-2">
