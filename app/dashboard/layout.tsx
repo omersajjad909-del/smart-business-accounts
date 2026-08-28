@@ -1498,6 +1498,7 @@ export default function DashboardLayout({
               <NavLink href="/dashboard/hr-payroll" pathname={pathname}>Overview</NavLink>
               <NavLink href="/dashboard/employees" pathname={pathname}>Employees</NavLink>
               <NavLink href="/dashboard/attendance" pathname={pathname}>Attendance</NavLink>
+              <NavLink href="/dashboard/attendance/devices" pathname={pathname}>Attendance Devices</NavLink>
               <NavLink href="/dashboard/payroll" pathname={pathname}>Payroll</NavLink>
               <NavLink href="/dashboard/advance-salary" pathname={pathname}>Advance Salary</NavLink>
             </NavGroup>

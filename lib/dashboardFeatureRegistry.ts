@@ -2500,6 +2500,7 @@ export const CORE_DASHBOARD_FEATURES: DashboardFeatureDefinition[] = [
   { id: "CORE_HR_PAYROLL", label: "HR Overview", route: "/dashboard/hr-payroll", section: "HR & Payroll", core: true, permKey: "VIEW_HR_PAYROLL", business: "service", businessLabel: "Core (all businesses)" },
   { id: "CORE_EMPLOYEES", label: "Employees", route: "/dashboard/employees", section: "HR & Payroll", core: true, permKey: "VIEW_HR_PAYROLL", business: "service", businessLabel: "Core (all businesses)" },
   { id: "CORE_ATTENDANCE", label: "Attendance", route: "/dashboard/attendance", section: "HR & Payroll", core: true, permKey: "VIEW_HR_PAYROLL", business: "service", businessLabel: "Core (all businesses)" },
+  { id: "CORE_ATTENDANCE_DEVICES", label: "Attendance Devices", route: "/dashboard/attendance/devices", section: "HR & Payroll", core: true, permKey: "VIEW_HR_PAYROLL", business: "service", businessLabel: "Core (all businesses)", description: "Fingerprint / face machines, employee enrollment mapping and the raw punch log" },
   { id: "CORE_PAYROLL", label: "Payroll", route: "/dashboard/payroll", section: "HR & Payroll", core: true, permKey: "VIEW_HR_PAYROLL", business: "service", businessLabel: "Core (all businesses)" },
   { id: "CORE_ADVANCE_SALARY", label: "Advance Salary", route: "/dashboard/advance-salary", section: "HR & Payroll", core: true, permKey: "VIEW_HR_PAYROLL", business: "service", businessLabel: "Core (all businesses)" },
   // ── Financial Reports ──
