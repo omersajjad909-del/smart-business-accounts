@@ -984,6 +984,7 @@ function SalesInvoiceContent() {
                                     onChange={(id) => selectItem(i, id)}
                                     onKeyDown={rateFormulaEnterHandler(rf, rfActive, i)}
                                     label={rfActive ? itemPickerLabel : undefined}
+                                    previewFields={rfActive ? rf.fields.map((field) => ({ key: field.key, label: field.label })) : []}
                                     placeholder="Type to search — e.g. e1060"
                                     style={inputStyle}
                                   />
@@ -1057,6 +1058,7 @@ function SalesInvoiceContent() {
                                         onChange={(id) => selectItem(i, id)}
                                         onKeyDown={rateFormulaEnterHandler(rf, rfActive, i)}
                                         label={rfActive ? itemPickerLabel : undefined}
+                                        previewFields={rfActive ? rf.fields.map((field) => ({ key: field.key, label: field.label })) : []}
                                         placeholder="Type to search — e.g. e1060"
                                         style={{ ...inputStyle, padding: "6px 8px", fontSize: 13 }}
                                       />

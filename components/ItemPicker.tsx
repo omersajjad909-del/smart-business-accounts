@@ -24,6 +24,7 @@ export type PickerItem = {
   name: string;
   code?: string | null;
   unit?: string | null;
+  meta?: Record<string, unknown> | null;
   /** Shown under the name and searched with it — some catalogues carry the
    *  specification here rather than in the name. */
   description?: string | null;
@@ -51,11 +52,13 @@ type Props = {
   placeholder?: string;
   style?: React.CSSProperties;
   autoFocus?: boolean;
+  previewFields?: Array<{ key: string; label: string }>;
 };
 
 export function ItemPicker({
   items, value, onChange, onKeyDown, label,
   allowManual = true, placeholder = "Type to search…", style, autoFocus,
+  previewFields = [],
 }: Props) {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
@@ -140,6 +143,9 @@ export function ItemPicker({
 
   const selectedLabel = selected ? (label ? label(selected) : selected.name) : "";
   const shown = open ? query : selectedLabel;
+  const previewColumns = previewFields.length
+    ? `minmax(170px, 2fr) repeat(${previewFields.length}, minmax(54px, 1fr)) minmax(48px, .6fr)`
+    : "minmax(170px, 1fr) minmax(62px, auto) minmax(48px, auto)";
 
   return (
     <div ref={boxRef} style={{ position: "relative" }}>
@@ -170,6 +176,14 @@ export function ItemPicker({
             padding: 4,
           }}
         >
+          {previewFields.length > 0 && (
+            <div style={{ display: "grid", gridTemplateColumns: previewColumns, gap: 8, padding: "7px 10px", borderBottom: "1px solid var(--border, rgba(255,255,255,.12))", color: "var(--text-muted, rgba(255,255,255,.5))", fontSize: 10, fontWeight: 800, textTransform: "uppercase", letterSpacing: ".04em" }}>
+              <span>Quality / Item</span>
+              {previewFields.map((field) => <span key={field.key} style={{ textAlign: "center" }}>{field.label}</span>)}
+              <span style={{ textAlign: "right" }}>Unit</span>
+            </div>
+          )}
+
           {matches.length === 0 && !allowManual && (
             <div style={{ padding: "10px 12px", fontSize: 12.5, color: "var(--text-muted)" }}>
               Nothing matches “{query}”
@@ -182,7 +196,9 @@ export function ItemPicker({
               onMouseDown={(e) => { e.preventDefault(); take(item.id); }}
               onMouseEnter={() => setCursor(index)}
               style={{
-                display: "flex", alignItems: "baseline", gap: 10,
+                display: previewFields.length ? "grid" : "flex",
+                gridTemplateColumns: previewFields.length ? previewColumns : undefined,
+                alignItems: "center", gap: 8,
                 padding: "7px 10px", borderRadius: 7, cursor: "pointer",
                 background: index === cursor ? "var(--accent-soft, rgba(99,102,241,.16))" : "transparent",
                 whiteSpace: "nowrap",
@@ -191,17 +207,18 @@ export function ItemPicker({
               <span style={{
                 fontFamily: "ui-monospace, monospace", fontSize: 11.5,
                 color: "var(--text-muted, rgba(255,255,255,.4))", minWidth: 62,
-              }}>{item.code || "—"}</span>
-              <span style={{ fontSize: 13, color: "var(--text-primary, #fff)" }}>
+              }}>{previewFields.length ? item.name : (item.code || "—")}</span>
+              {!previewFields.length && <span style={{ fontSize: 13, color: "var(--text-primary, #fff)" }}>
                 {item.name}
                 {item.description ? (
                   <span style={{ color: "var(--text-muted, rgba(255,255,255,.4))", fontSize: 11.5 }}>
                     {" "}· {item.description}
                   </span>
                 ) : null}
-              </span>
+              </span>}
+              {previewFields.map((field) => <span key={field.key} style={{ textAlign: "center", fontSize: 12, color: "var(--text-primary, #fff)" }}>{String(item.meta?.[field.key] ?? "—")}</span>)}
               {item.unit && (
-                <span style={{ fontSize: 11, color: "var(--text-muted, rgba(255,255,255,.35))", marginLeft: "auto", paddingLeft: 12 }}>
+                <span style={{ fontSize: 11, color: "var(--text-muted, rgba(255,255,255,.35))", marginLeft: previewFields.length ? 0 : "auto", paddingLeft: previewFields.length ? 0 : 12, textAlign: previewFields.length ? "right" : undefined }}>
                   {item.unit}
                 </span>
               )}
