@@ -523,7 +523,10 @@ export function itemSpecFromText(
     if (!hit) continue;
     rest = rest.slice(0, hit.start) + " ".repeat(hit.end - hit.start) + rest.slice(hit.end);
 
-    if (f.kind === "text") {
+    // A shade is always a label — "White", "15-L" — whatever the column was
+    // declared as. Putting it through Number() because someone set the column
+    // to numeric is how it ended up blank on every line.
+    if (f.kind === "text" || role === "shade") {
       out[f.key] = String(hit.value).slice(0, RATE_FORMULA_TEXT_MAX);
     } else {
       const n = Number(hit.value);
