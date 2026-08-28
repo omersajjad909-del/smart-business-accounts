@@ -734,7 +734,7 @@ function SalesInvoiceContent() {
       `}</style>
 
       {/* ══════════════════════════ SCREEN UI ══════════════════════════ */}
-      <div className="si-screen" style={{ padding: isMobile ? "12px 10px" : "24px 28px", fontFamily: ff, color: "var(--text-primary)", maxWidth: 1200 }}>
+      <div className="si-screen" style={{ width: "100%", boxSizing: "border-box", padding: isMobile ? "12px 10px" : "24px 28px", fontFamily: ff, color: "var(--text-primary)" }}>
 
         {/* Header */}
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: isMobile ? "flex-start" : "center", marginBottom: 24, gap: 10, flexWrap: "wrap" }}>
@@ -1008,12 +1008,12 @@ function SalesInvoiceContent() {
                         })}
                       </div>
                     ) : (
-                      <div style={{ overflowX: "auto", maxWidth: "100%" }}>
+                      <div style={{ overflow: "hidden", maxWidth: "100%" }}>
                         {/* SKU has no column of its own any more — it sits under the
                             row number, which is where it was asked for and buys
                             back ~110px so the whole grid fits without scrolling
                             sideways. */}
-                        <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 760 + (rfActive ? rateFormulaColumnsWidth(rf) : 0) }}>
+                        <table style={{ width: "100%", minWidth: 0, tableLayout: "fixed", borderCollapse: "collapse" }}>
                           <thead>
                             <tr style={{ borderBottom: "2px solid var(--border)" }}>
                               {["#","Item / Description"].map((h,hi) => (
@@ -1039,7 +1039,7 @@ function SalesInvoiceContent() {
                                       <div title={`SKU ${r.sku}`} style={{ fontSize: 9.5, fontFamily: "ui-monospace, monospace", color: "var(--text-muted)", opacity: 0.75, marginTop: 1, maxWidth: 46, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{r.sku}</div>
                                     )}
                                   </td>
-                                  <td style={{ padding: "6px 6px", minWidth: 190 }}>
+                                  <td style={{ padding: "6px 6px", width: "27%", minWidth: 0, overflow: "hidden" }}>
                                     {r.isManual ? (
                                       <div style={{ display: "flex", gap: 4, alignItems: "center" }}>
                                         <input
