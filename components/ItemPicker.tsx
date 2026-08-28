@@ -230,7 +230,10 @@ export function ItemPicker({
           ref={listRef}
           style={{
             position: "absolute", zIndex: 60, top: "calc(100% + 4px)", left: 0,
-            minWidth: "100%", maxWidth: previewFields.length ? 880 : 520,
+            minWidth: "100%",
+            // Shrink-to-fit up to the ceiling: the box takes only what the
+            // longest name asks for, and stops short of the window edge.
+            maxWidth: previewFields.length ? "min(1180px, calc(100vw - 40px))" : 520,
             maxHeight: 420, overflowY: "auto",
             background: "var(--panel-bg, #14161c)",
             border: "1px solid var(--border, rgba(255,255,255,.14))",
