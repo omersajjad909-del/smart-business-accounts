@@ -557,6 +557,8 @@ model Company {
   outwards              Outward[]
   employees             Employee[]
   attendances           Attendance[]
+  biometricDevices      BiometricDevice[]
+  attendancePunches     AttendancePunch[]
   payrolls              Payroll[]
   advanceSalaries       AdvanceSalary[]
   contacts              Contact[]
@@ -1239,6 +1241,7 @@ model Employee {
   salary          Float
   salaryFrequency String // MONTHLY | WEEKLY | HOURLY
   accountId       String? // Link to per-employee Salary Payable account in Chart of Accounts
+  biometricId     String?   // Enrollment / User ID inside the fingerprint machine
   shiftStart      String?   @default("09:00") // Default shift start "HH:MM" — auto-fills attendance
   shiftEnd        String?   @default("18:00") // Default shift end "HH:MM"
   isActive        Boolean   @default(true)
@@ -1246,6 +1249,7 @@ model Employee {
   updatedAt       DateTime  @updatedAt
 
   attendances Attendance[]
+  punches     AttendancePunch[]
   leaves      Leave[]
   payroll     Payroll[]
   advances    AdvanceSalary[]
@@ -1253,6 +1257,7 @@ model Employee {
 
   @@unique([companyId, employeeId])
   @@unique([companyId, email])
+  @@unique([companyId, biometricId])
   @@index([department, isActive])
   @@index([email])
 }
