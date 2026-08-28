@@ -30,8 +30,13 @@ export type PickerItem = {
   description?: string | null;
 };
 
-/** Beyond this the list is cut — nobody reads past it, and rendering costs. */
-const MAX_VISIBLE = 60;
+/**
+ * Beyond this the list is cut — rendering a few thousand rows costs more than
+ * anyone gains from them. 60 was far too tight for a real catalogue: opening
+ * the picker on a 300-item import showed only the first letter group ("B2 …")
+ * with no way to scroll to the rest.
+ */
+const MAX_VISIBLE = 400;
 
 const MANUAL = "__manual__";
 
@@ -53,12 +58,22 @@ type Props = {
   style?: React.CSSProperties;
   autoFocus?: boolean;
   previewFields?: Array<{ key: string; label: string }>;
+  /**
+   * What to show in those preview columns for one item.
+   *
+   * Without this the columns read `item.meta` directly, which is empty for
+   * every catalogue that writes the specification into the item NAME
+   * ("B2 BLUE 10G 50in L50 Blue PHR28") rather than into saved columns — so
+   * every cell rendered as "—". Pass the same reader the row uses when the
+   * item is picked and the two agree.
+   */
+  previewValues?: (item: PickerItem) => Record<string, unknown>;
 };
 
 export function ItemPicker({
   items, value, onChange, onKeyDown, label,
   allowManual = true, placeholder = "Type to search…", style, autoFocus,
-  previewFields = [],
+  previewFields = [], previewValues,
 }: Props) {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
@@ -77,6 +92,16 @@ export function ItemPicker({
     })),
     [items],
   );
+
+  // Resolved once per catalogue. Reading the spec out of a name is regex work,
+  // and doing it inside the row render would repeat it for every visible row on
+  // every keystroke.
+  const previewMap = useMemo(() => {
+    if (!previewValues || previewFields.length === 0) return null;
+    const map = new Map<string, Record<string, unknown>>();
+    for (const item of items) map.set(item.id, previewValues(item));
+    return map;
+  }, [items, previewValues, previewFields.length]);
 
   const matches = useMemo(() => {
     if (!query.trim()) return indexed.slice(0, MAX_VISIBLE).map((r) => r.item);
@@ -169,7 +194,8 @@ export function ItemPicker({
           ref={listRef}
           style={{
             position: "absolute", zIndex: 60, top: "calc(100% + 4px)", left: 0,
-            minWidth: "100%", maxWidth: 520, maxHeight: 320, overflowY: "auto",
+            minWidth: "100%", maxWidth: previewFields.length ? 880 : 520,
+            maxHeight: 420, overflowY: "auto",
             background: "var(--panel-bg, #14161c)",
             border: "1px solid var(--border, rgba(255,255,255,.14))",
             borderRadius: 10, boxShadow: "0 18px 40px rgba(0,0,0,.45)",
@@ -217,8 +243,11 @@ export function ItemPicker({
                 ) : null}
               </span>}
               {previewFields.map((field) => {
+                const resolved = previewMap?.get(item.id);
                 const metadata = item.meta && typeof item.meta === "object" ? item.meta as Record<string, unknown> : null;
-                return <span key={field.key} style={{ textAlign: "center", fontSize: 12, color: "var(--text-primary, #fff)" }}>{String(metadata?.[field.key] ?? "—")}</span>;
+                const raw = resolved?.[field.key] ?? metadata?.[field.key];
+                const text = raw === undefined || raw === null || raw === "" ? "—" : String(raw);
+                return <span key={field.key} style={{ textAlign: "center", fontSize: 12, color: text === "—" ? "var(--text-muted, rgba(255,255,255,.35))" : "var(--text-primary, #fff)" }}>{text}</span>;
               })}
               {item.unit && (
                 <span style={{ fontSize: 11, color: "var(--text-muted, rgba(255,255,255,.35))", marginLeft: previewFields.length ? 0 : "auto", paddingLeft: previewFields.length ? 0 : 12, textAlign: previewFields.length ? "right" : undefined }}>
@@ -230,7 +259,7 @@ export function ItemPicker({
 
           {matches.length >= MAX_VISIBLE && (
             <div style={{ padding: "6px 10px", fontSize: 11, color: "var(--text-muted)" }}>
-              Showing the first {MAX_VISIBLE} — keep typing to narrow it.
+              Showing the first {MAX_VISIBLE} of {items.length} — keep typing to narrow it.
             </div>
           )}
 

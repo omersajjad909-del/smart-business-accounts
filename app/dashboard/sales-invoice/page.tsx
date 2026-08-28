@@ -2,7 +2,7 @@
 import { fmtDate } from "@/lib/dateUtils";
 import { DateInput } from "@/app/dashboard/reports/_components/DateInput";
 import { confirmToast } from "@/lib/toast-feedback";
-import { Suspense, useEffect, useState } from "react";
+import { Suspense, useCallback, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import toast from "react-hot-toast";
 import dynamic from "next/dynamic";
@@ -27,7 +27,7 @@ import {
   rateFormulaEnterHandler,
   type RateFormulaMeta,
 } from "@/components/RateFormulaCells";
-import { computeRateFromFormula, emptyRateFormulaMeta, itemNameWithoutSpec, itemPickerLabel, metaFromItem, readRateFormulaMeta } from "@/lib/rateFormula";
+import { computeRateFromFormula, emptyRateFormulaMeta, itemMetaWithName, itemNameWithoutSpec, itemPickerLabel, metaFromItem, readRateFormulaMeta } from "@/lib/rateFormula";
 import type { RateFormulaValue } from "@/lib/rateFormula";
 
 
@@ -378,6 +378,22 @@ function SalesInvoiceContent() {
   const globalTaxAmt  = applyTax && selectedTax ? (taxableAmount * selectedTax.taxRate / 100) : 0;
   const totalTax      = perItemTaxAmt + globalTaxAmt;
   const netTotal      = taxableAmount + totalTax + (freight === "" ? 0 : Number(freight));
+
+  /**
+   * What the picker dropdown shows in its Gauge / Width / Length / … columns.
+   *
+   * Exactly the reader the row uses when the item is picked, so the numbers in
+   * the list are the numbers the line will get. Reading item.meta alone left
+   * every column as "—" for this catalogue, where the spec lives in the item
+   * name ("B2 BLUE 10G 50in L50 Blue PHR28") and not in saved columns.
+   *
+   * useCallback so ItemPicker can key its own cache on it.
+   */
+  const itemPreviewValues = useCallback(
+    (item: { id: string; name: string; description?: string | null; meta?: unknown }) =>
+      itemMetaWithName(rf, item.meta, `${item.name || ""} ${item.description || ""}`) as Record<string, unknown>,
+    [rf],
+  );
 
   /**
    * The topbar ✕ asks before throwing away a half-typed invoice. Dirty means
@@ -985,6 +1001,7 @@ function SalesInvoiceContent() {
                                     onKeyDown={rateFormulaEnterHandler(rf, rfActive, i)}
                                     label={rfActive ? itemPickerLabel : undefined}
                                     previewFields={rfActive ? rf.fields.map((field) => ({ key: field.key, label: field.label })) : []}
+                                    previewValues={rfActive ? itemPreviewValues : undefined}
                                     placeholder="Type to search — e.g. e1060"
                                     style={inputStyle}
                                   />
@@ -1059,6 +1076,7 @@ function SalesInvoiceContent() {
                                         onKeyDown={rateFormulaEnterHandler(rf, rfActive, i)}
                                         label={rfActive ? itemPickerLabel : undefined}
                                         previewFields={rfActive ? rf.fields.map((field) => ({ key: field.key, label: field.label })) : []}
+                                        previewValues={rfActive ? itemPreviewValues : undefined}
                                         placeholder="Type to search — e.g. e1060"
                                         style={{ ...inputStyle, padding: "6px 8px", fontSize: 13 }}
                                       />
