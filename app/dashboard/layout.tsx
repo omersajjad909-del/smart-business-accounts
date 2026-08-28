@@ -1,7 +1,7 @@
 "use client";
 import { fmtDate } from "@/lib/dateUtils";
 
-import { useEffect, useLayoutEffect, useState, useRef, useCallback, Suspense, createContext, useContext, Children, isValidElement } from "react";
+import { useEffect, useLayoutEffect, useState, useRef, useCallback, useMemo, Suspense, createContext, useContext, Children, isValidElement } from "react";
 import type { ReactNode } from "react";
 import Link from "next/link";
 import dynamic from "next/dynamic";
@@ -463,6 +463,11 @@ export default function DashboardLayout({
   useEffect(() => {
     setManualCollapse(null);
     setNavHover(false);
+    // A page reached any other way — the "+ New" button, a link inside a
+    // report, a redirect — is not a sidebar click, so the pin does not carry
+    // over and the route rule collapses the rail.
+    if (navClickRef.current) navClickRef.current = false;
+    else setNavPinned(false);
   }, [pathname]);
 
   // Appearance -> "Sidebar default". AppearanceApplier stamps it on <html>
@@ -480,7 +485,9 @@ export default function DashboardLayout({
    * the cursor leaves; the next nav link click releases the pin and the route
    * rule collapses it again.
    */
+  const navClickRef = useRef(false);
   const handleNavClick = useCallback(() => {
+    navClickRef.current = true;
     setManualCollapse(null);
     setNavPinned(p => !p);
   }, []);
@@ -499,6 +506,9 @@ export default function DashboardLayout({
       pageGuardRef.current = guard;
     }
   }, []);
+  // Stable identity: the provider value must not change on every shell render,
+  // or every guarded page would re-render whenever the sidebar is hovered.
+  const pageGuardRegistry = useMemo(() => ({ register: registerPageGuard }), [registerPageGuard]);
 
   /**
    * Fallback for the pages that have not opted in: did anything inside the
@@ -3147,7 +3157,7 @@ export default function DashboardLayout({
               </div>
             )}
 
-            <PageCloseGuardCtx.Provider value={{ register: registerPageGuard }}>
+            <PageCloseGuardCtx.Provider value={pageGuardRegistry}>
               {children}
             </PageCloseGuardCtx.Provider>
           </div>
