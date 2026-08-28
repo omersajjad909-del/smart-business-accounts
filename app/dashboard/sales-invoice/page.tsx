@@ -24,7 +24,6 @@ import {
   rateFormulaPrintColumns,
   rateFormulaPrintValues,
   rateFormulaLineIncomplete,
-  rateFormulaColumnsWidth,
   rateFormulaEnterHandler,
   type RateFormulaMeta,
 } from "@/components/RateFormulaCells";
