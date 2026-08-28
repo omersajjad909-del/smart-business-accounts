@@ -410,15 +410,16 @@ function SalesInvoiceContent() {
     [rf],
   );
 
-  /** Received / sold / balance for the picker's stock columns. */
-  const itemStockValues = useCallback(
-    (item: { id: string }) => {
-      const found = items.find((i) => i.id === item.id);
-      if (!found || found.stockBal === undefined) return null;
-      return { received: found.stockIn ?? 0, sold: found.stockOut ?? 0, balance: found.stockBal };
-    },
-    [items],
-  );
+  /**
+   * Received / sold / balance for the picker's stock columns. The picker hands
+   * back the very object it was given, so this reads the row rather than
+   * looking it up — a find() here would be a scan of the catalogue per row.
+   */
+  const itemStockValues = useCallback((item: { id: string }) => {
+    const row = item as Item;
+    if (row.stockBal === undefined) return null;
+    return { received: row.stockIn ?? 0, sold: row.stockOut ?? 0, balance: row.stockBal };
+  }, []);
 
   const itemPreviewValues = useCallback(
     (item: { id: string; name: string; description?: string | null; meta?: unknown }) =>
