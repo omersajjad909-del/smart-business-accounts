@@ -3,7 +3,7 @@ import { fmtDate } from "@/lib/dateUtils";
 import { ItemPicker } from "@/components/ItemPicker";
 import { DateInput } from "@/app/dashboard/reports/_components/DateInput";
 import { confirmToast } from "@/lib/toast-feedback";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
 import { getCurrentUser } from "@/lib/auth";
 import { PrintActionBar } from "@/components/print/PrintActionBar";
@@ -89,6 +89,14 @@ export default function PurchaseOrderPage() {
   // Companies that price a line from a calculation get extra columns and a
   // computed rate. Everyone else gets exactly the grid that was here before.
   const { settings: rf, active: rfActive } = useRateFormula("purchaseOrder");
+  /**
+   * What the line got from the item that was just picked. The picker fires
+   * Enter straight after its onChange, before React has committed the new row,
+   * so the Enter handler cannot read the rows to find out whether the item
+   * already answered the nominated column.
+   */
+  const lastPickedMeta = useRef<Record<string, any> | null>(null);
+
   const emptyRow = () => ({ itemId: "", name: "", desc: "", qty: "", rate: "", discountPercent: "", taxPercent: "", unit: "", sku: "", meta: (rfActive ? emptyRateFormulaMeta(rf) : undefined) as RateFormulaMeta | undefined });
   const [rows, setRows] = useState([emptyRow()]);
   const [saving, setSaving] = useState(false);
@@ -459,6 +467,7 @@ export default function PurchaseOrderPage() {
                             copy[i] = { ...copy[i], itemId: it.id, name: it.name, desc: it.description || "", rate: rfActive ? copy[i].rate : String(it.purchaseRate || it.rate || ""), unit: it.unit || "", sku: it.code || "" };
                             if (rfActive) {
                               const meta = metaFromItem(rf, it.meta, copy[i].meta, `${it.name || ""} ${it.description || ""}`);
+                              lastPickedMeta.current = meta;
                               copy[i].meta = meta;
                               const r = computeRateFromFormula(rf, meta);
                               if (r.rate != null) copy[i].rate = String(r.rate);
@@ -466,7 +475,7 @@ export default function PurchaseOrderPage() {
                             if (i === copy.length - 1) copy.push(emptyRow());
                             setRows(copy);
                           }}
-                            onKeyDown={rateFormulaEnterHandler(rf, rfActive, i)}
+                            onKeyDown={rateFormulaEnterHandler(rf, rfActive, i, () => lastPickedMeta.current)}
                             label={rfActive ? itemPickerLabel : undefined}
                             style={{ ...inp({ marginBottom: 8 }) }}
                             allowManual={false}
@@ -552,7 +561,7 @@ export default function PurchaseOrderPage() {
                                   if (i === copy.length - 1) copy.push(emptyRow());
                                   setRows(copy);
                                 }}
-                                  onKeyDown={rateFormulaEnterHandler(rf, rfActive, i)}
+                                  onKeyDown={rateFormulaEnterHandler(rf, rfActive, i, () => lastPickedMeta.current)}
                                   label={rfActive ? itemPickerLabel : undefined}
                                   style={{ ...inp({ padding: isMobile ? "8px 8px" : "5px 7px", fontSize: 13 }) }}
                                   allowManual={false}

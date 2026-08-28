@@ -188,6 +188,14 @@ function PurchaseInvoiceContent() {
   // width × length ÷ 54 and the like — get extra columns and a computed rate.
   // Everyone else gets exactly the grid that was here before.
   const { settings: rf, active: rfActive } = useRateFormula("purchaseInvoice");
+  /**
+   * What the line got from the item that was just picked. The picker fires
+   * Enter straight after its onChange, before React has committed the new row,
+   * so the Enter handler cannot read the rows to find out whether the item
+   * already answered the nominated column.
+   */
+  const lastPickedMeta = useRef<Record<string, any> | null>(null);
+
 
   const [suppliers, setSuppliers] = useState<Supplier[]>([]);
   const [allPOs, setAllPOs] = useState<PurchaseOrder[]>([]);
@@ -1217,6 +1225,7 @@ const [searchTerm, setSearchTerm] = useState("");
                                         copy[i] = { ...copy[i], itemId: item.id, name: item.name, description: item.description || "", sku: item.code || "", unit: item.unit || "", ...(rfActive ? {} : { rate: item.purchaseRate || "" }) };
                                         if (rfActive) {
                                           const meta = metaFromItem(rf, (item as any).meta, copy[i].meta, `${item.name || ""} ${item.description || ""}`);
+                                          lastPickedMeta.current = meta;
                                           copy[i].meta = meta;
                                           const r = computeRateFromFormula(rf, meta);
                                           if (r.rate != null) copy[i].rate = r.rate;
@@ -1229,7 +1238,7 @@ const [searchTerm, setSearchTerm] = useState("");
                                         setRows(copy);
                                       }
                                     }}
-                                      onKeyDown={rateFormulaEnterHandler(rf, rfActive, i)}
+                                      onKeyDown={rateFormulaEnterHandler(rf, rfActive, i, () => lastPickedMeta.current)}
                                       label={rfActive ? itemPickerLabel : undefined}
                                       style={{ ...inp({ padding: "5px 7px", fontSize: 12.5 }), fontWeight: r.itemId ? 600 : 400 }}
                                       allowManual={false}

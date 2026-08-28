@@ -3,7 +3,7 @@ import { fmtDate } from "@/lib/dateUtils";
 import { ItemPicker } from "@/components/ItemPicker";
 import { DateInput } from "@/app/dashboard/reports/_components/DateInput";
 import { confirmToast } from "@/lib/toast-feedback";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
 import { getCurrentUser } from "@/lib/auth";
 import { PrintActionBar } from "@/components/print/PrintActionBar";
@@ -58,6 +58,14 @@ export default function GRNPage() {
   // Companies that price a line from a calculation get extra columns and a
   // computed rate. Everyone else gets exactly the grid that was here before.
   const { settings: rf, active: rfActive } = useRateFormula("grn");
+  /**
+   * What the line got from the item that was just picked. The picker fires
+   * Enter straight after its onChange, before React has committed the new row,
+   * so the Enter handler cannot read the rows to find out whether the item
+   * already answered the nominated column.
+   */
+  const lastPickedMeta = useRef<Record<string, any> | null>(null);
+
   const today = new Date().toISOString().slice(0, 10);
   const user  = getCurrentUser();
 
@@ -151,6 +159,7 @@ export default function GRNPage() {
     setRows(prev => {
       const copy = [...prev];
       const meta = metaFromItem(rf, item.meta, copy[idx]?.meta, `${item.name || ""} ${item.description || ""}`);
+      lastPickedMeta.current = meta;
       copy[idx] = { ...copy[idx], meta };
       const r = computeRateFromFormula(rf, meta);
       if (r.rate != null) copy[idx].rate = String(r.rate);
@@ -397,7 +406,7 @@ export default function GRNPage() {
                             items={allItems as any}
                             value={row.itemId}
                             onChange={(__picked: string) => selectGrnItem(idx, __picked)}
-                            onKeyDown={rateFormulaEnterHandler(rf, rfActive, idx)}
+                            onKeyDown={rateFormulaEnterHandler(rf, rfActive, idx, () => lastPickedMeta.current)}
                             label={rfActive ? itemPickerLabel : undefined}
                             style={{ ...inp({ marginBottom: 8 }) }}
                             allowManual={false}
@@ -442,7 +451,7 @@ export default function GRNPage() {
                                   items={allItems as any}
                                   value={row.itemId}
                                   onChange={(__picked: string) => selectGrnItem(idx, __picked)}
-                                  onKeyDown={rateFormulaEnterHandler(rf, rfActive, idx)}
+                                  onKeyDown={rateFormulaEnterHandler(rf, rfActive, idx, () => lastPickedMeta.current)}
                                   label={rfActive ? itemPickerLabel : undefined}
                                   style={inp({ padding: "6px 10px" })}
                                   allowManual={false}
