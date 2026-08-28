@@ -15,6 +15,7 @@ import { PrintDocA4, PrintPaperWrapper } from "@/components/print/PrintDocA4";
 import type { PrintColumn, PrintTotalsLine } from "@/components/print/PrintDocA4";
 import { useResponsive } from "@/hooks/useResponsive";
 import { ItemPicker } from "@/components/ItemPicker";
+import { usePageCloseGuard } from "@/components/PageCloseGuard";
 import { useRateFormula } from "@/hooks/useRateFormula";
 import {
   RateFormulaHeadCells,
@@ -379,13 +380,32 @@ function SalesInvoiceContent() {
   const totalTax      = perItemTaxAmt + globalTaxAmt;
   const netTotal      = taxableAmount + totalTax + (freight === "" ? 0 : Number(freight));
 
-  async function saveInvoice() {
+  /**
+   * The topbar ✕ asks before throwing away a half-typed invoice. Dirty means
+   * the form is on screen with something entered that has not been posted yet
+   * — once it saves, the page flips to the preview and there is nothing to
+   * lose. saveInvoice is hoisted, so it is safe to reference from here.
+   */
+  usePageCloseGuard({
+    isDirty: () =>
+      showForm && !preview &&
+      (!!customerId || !!notes || !!reference || !!termsConditions ||
+       rows.some(r => r.itemId || r.qty || r.rate)),
+    save: () => saveInvoice(),
+  });
+
+  /**
+   * Returns true only when the invoice actually reached the server, so the
+   * shell close dialog ("Yes" on unsaved changes) can keep the page open when
+   * validation or the request fails instead of throwing the work away.
+   */
+  async function saveInvoice(): Promise<boolean> {
     const clean = rows.filter(r => r.itemId && r.qty && r.rate);
-    if (!customerId || !clean.length) { toast.error("Customer and items are required."); return; }
+    if (!customerId || !clean.length) { toast.error("Customer and items are required."); return false; }
     if (rfActive) {
       for (let i = 0; i < clean.length; i++) {
         const missing = rateFormulaLineIncomplete(rf, clean[i].meta);
-        if (missing) { toast.error(`Line ${i + 1}: ${missing.label} is required`); return; }
+        if (missing) { toast.error(`Line ${i + 1}: ${missing.label} is required`); return false; }
       }
     }
     setSaving(true);
@@ -410,7 +430,8 @@ function SalesInvoiceContent() {
       await loadInvoices();
       if (editing) { setEditing(null); setShowForm(false); setShowList(true); }
       toast.success("Invoice saved!");
-    } catch (e: any) { toast.error("Failed: " + (e.message || "Unknown error")); }
+      return true;
+    } catch (e: any) { toast.error("Failed: " + (e.message || "Unknown error")); return false; }
     finally { setSaving(false); }
   }
 
