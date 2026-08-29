@@ -518,13 +518,25 @@ export default function DashboardLayout({
     setCloseSaving(false);
   }, [pathname]);
 
+  const isReadOnlyReportingPage = useCallback(() => {
+    return (
+      pathname === "/dashboard/reports" ||
+      pathname.startsWith("/dashboard/reports/") ||
+      pathname.startsWith("/dashboard/trial-balance") ||
+      pathname.startsWith("/dashboard/audit-trail")
+    );
+  }, [pathname]);
+
   useEffect(() => {
     const onEdit = (e: Event) => {
       const target = e.target as HTMLElement | null;
       // Search box, branch switcher and the sidebar itself are chrome, not the
-      // document the user is filling in.
+      // document the user is filling in. Read-only report pages also never
+      // create or change business data, so they should never trigger the save
+      // warning.
       if (!target || typeof target.closest !== "function") return;
       if (target.closest("[data-nav-shell]")) return;
+      if (isReadOnlyReportingPage()) return;
       typedSinceNavRef.current = true;
     };
     document.addEventListener("input", onEdit, true);
@@ -533,9 +545,10 @@ export default function DashboardLayout({
       document.removeEventListener("input", onEdit, true);
       document.removeEventListener("change", onEdit, true);
     };
-  }, []);
+  }, [isReadOnlyReportingPage]);
 
   function pageHasUnsavedWork(): boolean {
+    if (isReadOnlyReportingPage()) return false;
     const guard = pageGuardRef.current;
     if (guard) {
       try { return !!guard.isDirty(); } catch { return false; }
@@ -565,6 +578,10 @@ export default function DashboardLayout({
 
   function requestClosePage() {
     if (isDashboardHome) return;
+    if (isReadOnlyReportingPage()) {
+      leaveToDashboard();
+      return;
+    }
     // The page gets first refusal: the sales invoice preview, for one, closes
     // back onto the invoice it is printing instead of leaving for the dashboard.
     try { if (pageGuardRef.current?.close?.()) return; } catch { /* fall through */ }
