@@ -57,6 +57,7 @@ type PurchaseInvoice = {
   date: string;
   supplierId: string;
   poId?: string | null;
+  grnId?: string | null;
   supplier?: { name: string };
   total: number;
   approvalStatus?: string;
@@ -65,6 +66,9 @@ type PurchaseInvoice = {
 
 type GRN = {
   id: string;
+  grnNo: string;
+  supplierId: string;
+  supplier?: { id: string; name: string } | null;
   po?: { id: string; poNo: string } | null;
   items: Array<{
     itemId: string;
@@ -200,7 +204,7 @@ function PurchaseInvoiceContent() {
   const [suppliers, setSuppliers] = useState<Supplier[]>([]);
   const [allPOs, setAllPOs] = useState<PurchaseOrder[]>([]);
   const [allGrns, setAllGrns] = useState<GRN[]>([]);
-  const [filteredPOs, setFilteredPOs] = useState<PurchaseOrder[]>([]);
+  const [filteredGRNs, setFilteredGRNs] = useState<GRN[]>([]);
   const [invoices, setInvoices] = useState<PurchaseInvoice[]>([]);
   const [showList, setShowList] = useState(false);
   const [showForm, setShowForm] = useState(true);
@@ -212,6 +216,7 @@ const [searchTerm, setSearchTerm] = useState("");
   const [supplierId, setSupplierId] = useState("");
   const [supplierName, setSupplierName] = useState("");
   const [selectedPoId, setSelectedPoId] = useState("");
+  const [selectedGrnId, setSelectedGrnId] = useState("");
   const [invoiceId, setInvoiceId] = useState("");
   const [date, setDate] = useState(today);
   const [location, setLocation] = useState("MAIN");
@@ -410,6 +415,24 @@ const [searchTerm, setSearchTerm] = useState("");
     }
   }
 
+  function getInvoiceableRowsForGrn(grn: GRN) {
+    const invoicedByItem = new Map<string, number>();
+    invoices
+      .filter((invoice) => invoice.grnId === grn.id && (!editing || invoice.id !== editing.id))
+      .forEach((invoice) => invoice.items.forEach((item) => {
+        if (item.itemId) invoicedByItem.set(item.itemId, (invoicedByItem.get(item.itemId) || 0) + Number(item.qty || 0));
+      }));
+
+    return grn.items.map((item) => ({
+      itemId: item.itemId,
+      name: item.item?.name || "",
+      description: item.item?.description || "",
+      qty: Math.max(0, Number(item.receivedQty || 0) - (invoicedByItem.get(item.itemId) || 0)),
+      rate: item.rate,
+      ...(rfActive ? { meta: readRateFormulaMeta(rf, (item as any).meta) } : {}),
+    })).filter((row) => row.qty > 0);
+  }
+
   function getInvoiceableRowsForPo(po: PurchaseOrder) {
     const linkedGrns = allGrns.filter((grn) => grn.po?.id === po.id);
 
@@ -472,28 +495,26 @@ const [searchTerm, setSearchTerm] = useState("");
     const s = suppliers.find(x => x.id === id);
     setSupplierName(s?.name || "");
     setSelectedPoId("");
+    setSelectedGrnId("");
     setRows([emptyRow()]);
   }
 
   useEffect(() => {
     if (!supplierId) {
-      setFilteredPOs([]);
+      setFilteredGRNs([]);
       return;
     }
 
-    const pos = allPOs.filter((po) => {
-      const poSupplierId = po.supplierId || po.supplier?.id || "";
-      if (poSupplierId !== supplierId) return false;
-      return getInvoiceableRowsForPo(po).length > 0;
-    });
+    const grns = allGrns.filter((grn) => grn.supplierId === supplierId && getInvoiceableRowsForGrn(grn).length > 0);
 
-    setFilteredPOs(pos);
+    setFilteredGRNs(grns);
 
-    if (selectedPoId && !pos.some((po) => po.id === selectedPoId)) {
+    if (selectedGrnId && !grns.some((grn) => grn.id === selectedGrnId)) {
       setSelectedPoId("");
+      setSelectedGrnId("");
       setRows([emptyRow()]);
     }
-  }, [supplierId, allPOs, allGrns, invoices, editing, selectedPoId]);
+  }, [supplierId, allGrns, invoices, editing, selectedGrnId]);
 
   function handlePoSelection(poId: string) {
     setSelectedPoId(poId);
@@ -501,6 +522,15 @@ const [searchTerm, setSearchTerm] = useState("");
     if (!po) return;
     const nextRows = getInvoiceableRowsForPo(po);
     setRows(nextRows.length > 0 ? nextRows.map(r => ({ ...emptyRow(), ...r })) : [emptyRow()]);
+  }
+
+  function handleGrnSelection(grnId: string) {
+    setSelectedGrnId(grnId);
+    const grn = filteredGRNs.find((entry) => entry.id === grnId);
+    if (!grn) { setSelectedPoId(""); setRows([emptyRow()]); return; }
+    setSelectedPoId(grn.po?.id || "");
+    const nextRows = getInvoiceableRowsForGrn(grn);
+    setRows(nextRows.length ? nextRows.map((row) => ({ ...emptyRow(), ...row })) : [emptyRow()]);
   }
 
   function updateRow(index: number, key: keyof Row, value: any) {
@@ -578,6 +608,7 @@ const [searchTerm, setSearchTerm] = useState("");
       const baseBody = {
         supplierId,
         poId: selectedPoId,
+        grnId: selectedGrnId || null,
         date,
         dueDate: dueDate || null,
         location,
@@ -712,6 +743,8 @@ const [searchTerm, setSearchTerm] = useState("");
     setInvoiceId(inv.invoiceNo);
     setSupplierId(inv.supplierId);
     setSupplierName(inv.supplier?.name || "");
+    setSelectedGrnId(inv2.grnId || "");
+    setSelectedPoId(inv.poId || "");
     setApprovalStatus(inv.approvalStatus || "PENDING");
     setDate(new Date(inv.date).toISOString().slice(0, 10));
     setDueDate(inv2.dueDate ? new Date(inv2.dueDate).toISOString().slice(0, 10) : "");
@@ -761,6 +794,7 @@ const [searchTerm, setSearchTerm] = useState("");
     setSupplierId("");
     setSupplierName("");
     setSelectedPoId("");
+    setSelectedGrnId("");
     setDate(today);
     setDueDate("");
     setLocation("MAIN");
@@ -1106,10 +1140,10 @@ const [searchTerm, setSearchTerm] = useState("");
                       </select>
                     </div>
                     <div>
-                      <div style={labelStyle()}>Against PO</div>
-                      <select value={selectedPoId} onChange={e => handlePoSelection(e.target.value)} style={inp({ padding: "7px 10px", fontSize: 12.5 })}>
+                      <div style={labelStyle()}>Against GRN</div>
+                      <select value={selectedGrnId} onChange={e => handleGrnSelection(e.target.value)} style={inp({ padding: "7px 10px", fontSize: 12.5 })}>
                         <option value="">— No PO —</option>
-                        {filteredPOs.map(p => <option key={p.id} value={p.id}>{p.poNo}</option>)}
+                        {filteredGRNs.map(grn => <option key={grn.id} value={grn.id}>{grn.grnNo}{grn.po?.poNo ? ` · ${grn.po.poNo}` : ""}</option>)}
                       </select>
                     </div>
                     <div>

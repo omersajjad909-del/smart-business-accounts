@@ -106,6 +106,7 @@ export async function POST(req: NextRequest) {
     const {
       supplierId,
       poId,
+      grnId,
       date,
       dueDate = null,
       items,
@@ -129,12 +130,40 @@ export async function POST(req: NextRequest) {
     }
 
     await ensureOpenPeriod(prisma, companyId, new Date(date));
+    const tx = prisma;
 
     const validItems = items.filter((i: any) => Number(i.qty) > 0 && i.itemId);
 
+    // An invoice can only bill stock that was actually received on its GRN.
+    // The UI pre-fills these lines; this server check prevents a handcrafted
+    // request from attaching an unrelated supplier/item to the GRN.
+    let grn: { id: string; poId: string | null; supplierId: string; items: { itemId: string; receivedQty: number }[] } | null = null;
+    if (grnId) {
+      grn = await tx.goodsReceiptNote.findFirst({
+        where: { id: grnId, companyId, deletedAt: null },
+        include: { items: true },
+      });
+      if (!grn || grn.supplierId !== supplierId) {
+        return NextResponse.json({ error: "Selected GRN does not belong to this supplier" }, { status: 400 });
+      }
+      const received = new Map(grn.items.map((line) => [line.itemId, Number(line.receivedQty)]));
+      const alreadyInvoiced = await tx.purchaseInvoice.findMany({
+        where: { companyId, grnId, deletedAt: null }, include: { items: true },
+      });
+      const billed = new Map<string, number>();
+      for (const invoice of alreadyInvoiced) for (const line of invoice.items) {
+        billed.set(line.itemId, (billed.get(line.itemId) || 0) + Number(line.qty));
+      }
+      for (const line of validItems) {
+        const remaining = (received.get(line.itemId) || 0) - (billed.get(line.itemId) || 0);
+        if (Number(line.qty) > remaining) {
+          return NextResponse.json({ error: `Invoice quantity for a GRN item cannot exceed remaining received quantity (${remaining})` }, { status: 400 });
+        }
+      }
+    }
+
     // 2. Start Transaction (Disabled due to Supabase connection issues)
     // const result = await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
-    const tx = prisma;
       
       // A. Find the supplier and inventory account.
       const supplier = await tx.account.findFirst({ where: { id: supplierId, companyId } });
@@ -188,7 +217,8 @@ export async function POST(req: NextRequest) {
           date: new Date(date),
           dueDate: dueDate ? new Date(dueDate) : null,
           supplierId,
-          poId: poId || null,
+          poId: grn?.poId || poId || null,
+          grnId: grnId || null,
           companyId,
           branchId,
           total: netTotal,
@@ -339,6 +369,7 @@ export async function PUT(req: NextRequest) {
     const {
       id,
       supplierId: _supplierId,
+      grnId,
       date,
       items,
       location: _location,
@@ -406,6 +437,7 @@ export async function PUT(req: NextRequest) {
       where: { id },
       data: {
         date: new Date(date),
+        grnId: grnId || null,
         total: netTotal,
         approvalStatus,
         taxConfigId: applyTax ? taxConfigId : null,

@@ -184,6 +184,11 @@ model PurchaseInvoice {
   poId String?
   po   PurchaseOrder? @relation(fields: [poId], references: [id])
 
+  // A purchase invoice is raised against what physically arrived, not merely
+  // what was ordered. The PO is retained too for the PO → GRN → invoice trail.
+  grnId String?
+  grn   GoodsReceiptNote? @relation(fields: [grnId], references: [id])
+
   supplierId String
   supplier   Account @relation("PurchaseSupplier", fields: [supplierId], references: [id])
 
@@ -215,6 +220,7 @@ model PurchaseInvoice {
   @@index([companyId, date])
   @@index([companyId, branchId, deletedAt, date])
   @@index([companyId, supplierId])
+  @@index([companyId, grnId])
 }
 
 model PurchaseInvoiceItem {
@@ -1824,6 +1830,7 @@ model GoodsReceiptNote {
   status  String  @default("DRAFT") // DRAFT | RECEIVED | PARTIAL | CANCELLED
 
   items GoodsReceiptNoteItem[]
+  purchaseInvoices PurchaseInvoice[]
 
   createdAt DateTime  @default(now())
   createdBy String?
