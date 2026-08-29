@@ -260,7 +260,6 @@ export default function GRNPage() {
 
   function doPrint(mode: "a4" | "58mm") { setPrintMode(mode); setTimeout(() => window.print(), 150); }
 
-  const totalAmt  = rows.reduce((s, r) => s + (Number(r.receivedQty) || 0) * (Number(r.rate) || 0), 0);
   const filledRows = rows.filter(r => r.name && r.receivedQty);
   const supplierName = suppliers.find(s => s.id === supplierId)?.name || "";
   const poRef = pos.find(p => p.id === poId)?.poNo || "";
@@ -268,7 +267,6 @@ export default function GRNPage() {
   function shareWhatsApp() {
     let msg = `*GOODS RECEIPT NOTE: ${grnNo}*\nDate: ${fmtDate(date)}\nSupplier: ${supplierName}`;
     if (poRef) msg += `\nPO Ref: ${poRef}`;
-    msg += `\n\nTotal: ${totalAmt.toLocaleString()}`;
     window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, "_blank");
   }
 
@@ -282,7 +280,7 @@ export default function GRNPage() {
         type: "generic",
         to: email,
         subject: `Goods Receipt Note ${grnNo}`,
-        html: `<p>Dear ${supplierName},</p><p>Please find your Goods Receipt Note <strong>${grnNo}</strong> dated ${fmtDate(date)}.</p><p>Total received value: ${totalAmt.toLocaleString()}</p>`,
+        html: `<p>Dear ${supplierName},</p><p>Please find your Goods Receipt Note <strong>${grnNo}</strong> dated ${fmtDate(date)}.</p>`,
       }),
     }).then(r => r.ok ? toast.success("Email sent!") : toast.error("Email failed")).catch(() => toast.error("Email failed"));
   }
@@ -427,6 +425,20 @@ export default function GRNPage() {
                 </div>
               </div>
 
+              {/* Inward header details — these travel with the GRN and appear on print. */}
+              <div style={{ background: PANEL, border: `1px solid ${BORDER}`, borderRadius: 12, padding: 18 }}>
+                <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 12, color: TEXT }}>Inward & Transport Details</div>
+                <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(3, minmax(0, 1fr))", gap: 12 }}>
+                  <div><Label>Party Bill #</Label><input value={partyBillNo} onChange={e => setPartyBillNo(e.target.value)} placeholder="Supplier bill #" style={inp()} /></div>
+                  <div><Label>Purchase Type</Label><select value={purchaseType} onChange={e => setPurchaseType(e.target.value as "CASH" | "CREDIT")} style={inp()}><option value="CREDIT">Credit</option><option value="CASH">Cash</option></select></div>
+                  <div><Label>Bilty #</Label><input value={biltyNo} onChange={e => setBiltyNo(e.target.value)} placeholder="Bilty / LR #" style={inp()} /></div>
+                  <div><Label>Location</Label><input value={location} onChange={e => setLocation(e.target.value)} placeholder="Godown / location" style={inp()} /></div>
+                  <div><Label>Cargo</Label><input value={cargo} onChange={e => setCargo(e.target.value)} placeholder="Cargo details" style={inp()} /></div>
+                  <div><Label>Driver</Label><input value={driver} onChange={e => setDriver(e.target.value)} placeholder="Driver name" style={inp()} /></div>
+                  <div><Label>Vehicle #</Label><input value={vehicleNo} onChange={e => setVehicleNo(e.target.value)} placeholder="Vehicle number" style={inp()} /></div>
+                </div>
+              </div>
+
               {/* Items Table */}
               <div style={{ background: PANEL, border: `1px solid ${BORDER}`, borderRadius: 12, overflow: "hidden" }}>
                 <div style={{ padding: "12px 16px", borderBottom: `1px solid ${BORDER}`, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
@@ -436,7 +448,6 @@ export default function GRNPage() {
                 {isMobile ? (
                   <div style={{ padding: "10px 14px" }}>
                     {rows.map((row, idx) => {
-                      const amt = (Number(row.receivedQty) || 0) * (Number(row.rate) || 0);
                       const isShort = row.orderedQty && row.receivedQty && Number(row.receivedQty) < Number(row.orderedQty);
                       return (
                         <div key={idx} style={{ border: `1px solid ${BORDER}`, borderRadius: 10, padding: "12px 14px", marginBottom: 10 }}>
@@ -461,9 +472,7 @@ export default function GRNPage() {
                             )}
                             <div><Label>Ordered</Label><input type="number" value={row.orderedQty} onChange={e => updateRow(idx, "orderedQty", e.target.value)} placeholder="0" style={inp({ textAlign: "center" })} /></div>
                             <div><Label><span style={{ color: isShort ? "#fbbf24" : "#34d399" }}>Received</span></Label><input type="number" value={row.receivedQty} onChange={e => updateRow(idx, "receivedQty", e.target.value)} placeholder="0" style={inp({ textAlign: "center", color: isShort ? "#fbbf24" : "#34d399", fontWeight: 700 })} /></div>
-                            <div><Label>Rate</Label><input type="number" value={row.rate} onChange={e => updateRow(idx, "rate", e.target.value)} readOnly={rfActive && !rf.rateEditable} placeholder="0.00" style={inp({ textAlign: "right", ...(rfActive && !rf.rateEditable ? { opacity: 0.75 } : {}) })} /></div>
                           </div>
-                          {amt > 0 && <div style={{ textAlign: "right", fontWeight: 700, fontSize: 13, marginTop: 6, color: ACCENT }}>= {amt.toLocaleString()}</div>}
                         </div>
                       );
                     })}
@@ -484,7 +493,6 @@ export default function GRNPage() {
                       </thead>
                       <tbody>
                         {rows.map((row, idx) => {
-                          const amt = (Number(row.receivedQty) || 0) * (Number(row.rate) || 0);
                           const isShort = row.orderedQty && row.receivedQty && Number(row.receivedQty) < Number(row.orderedQty);
                           return (
                             <tr key={idx} style={{ borderTop: `1px solid ${BORDER}` }}>
@@ -584,15 +592,22 @@ export default function GRNPage() {
             date={fmtDate(date)}
             partyLabel="Supplier"
             partyName={supplierName || "—"}
-            metaFields={poRef ? [{ label: "PO Reference", value: poRef }] : []}
+            metaFields={[
+              ...(poRef ? [{ label: "PO Reference", value: poRef }] : []),
+              ...(partyBillNo ? [{ label: "Party Bill #", value: partyBillNo }] : []),
+              ...(biltyNo ? [{ label: "Bilty #", value: biltyNo }] : []),
+              ...(purchaseType ? [{ label: "Purchase Type", value: purchaseType }] : []),
+              ...(location ? [{ label: "Location", value: location }] : []),
+              ...(cargo ? [{ label: "Cargo", value: cargo }] : []),
+              ...(driver ? [{ label: "Driver", value: driver }] : []),
+              ...(vehicleNo ? [{ label: "Vehicle #", value: vehicleNo }] : []),
+            ]}
             columns={[
               { key: "no", label: "#", align: "center", width: 30 },
               { key: "name", label: "Item" },
               ...(rfActive ? rateFormulaPrintColumns(rf) : []),
               { key: "ordered", label: "Ordered", align: "center", width: 70 },
               { key: "received", label: "Received", align: "center", width: 70 },
-              { key: "rate", label: "Rate", align: "right", width: 80 },
-              { key: "amount", label: "Amount", align: "right", width: 90 },
             ]}
             rows={filledRows.map((r, i) => ({
               no: i + 1,
@@ -600,12 +615,8 @@ export default function GRNPage() {
               ...(rfActive ? rateFormulaPrintValues(rf, r.meta) : {}),
               ordered: r.orderedQty || "—",
               received: r.receivedQty,
-              rate: Number(r.rate).toLocaleString(),
-              amount: ((Number(r.receivedQty) || 0) * (Number(r.rate) || 0)).toLocaleString(),
             }))}
-            totalsLines={[
-              { label: "Total Received Amount:", value: totalAmt, bold: true, borderTop: true },
-            ]}
+            totalsLines={[]}
             notes={remarks || undefined}
             signatureLabels={["Received By", "Verified By"]}
           />
@@ -638,20 +649,13 @@ export default function GRNPage() {
             <div style={{ display: "flex", justifyContent: "space-between", fontWeight: 700, borderBottom: "1px solid #000", paddingBottom: 2, marginBottom: 3 }}>
               <span style={{ flex: 2 }}>Item</span>
               <span style={{ width: 24, textAlign: "right" }}>Rcv</span>
-              <span style={{ width: 40, textAlign: "right" }}>Rate</span>
-              <span style={{ width: 44, textAlign: "right" }}>Amt</span>
             </div>
             {filledRows.map((r, i) => (
               <div key={i} style={{ display: "flex", marginBottom: 2 }}>
                 <span style={{ flex: 2, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", maxWidth: 76 }}>{r.name}</span>
                 <span style={{ width: 24, textAlign: "right" }}>{r.receivedQty}</span>
-                <span style={{ width: 40, textAlign: "right" }}>{Number(r.rate).toLocaleString()}</span>
-                <span style={{ width: 44, textAlign: "right", fontWeight: 700 }}>{((Number(r.receivedQty)||0)*(Number(r.rate)||0)).toLocaleString()}</span>
               </div>
             ))}
-          </div>
-          <div style={{ fontSize: 10, borderTop: "1px solid #000", paddingTop: 4, display: "flex", justifyContent: "space-between", fontWeight: 900 }}>
-            <span>TOTAL:</span><span>{totalAmt.toLocaleString()}</span>
           </div>
           {remarks && <div style={{ fontSize: 8, borderTop: "1px dashed #555", paddingTop: 3, marginTop: 4 }}><span style={{ fontWeight: 700 }}>Note: </span>{remarks}</div>}
           <div style={{ textAlign: "center", fontSize: 8, borderTop: "1px dashed #555", paddingTop: 4, marginTop: 4 }}>
