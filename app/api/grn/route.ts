@@ -157,7 +157,28 @@ export async function POST(req: NextRequest) {
     return NextResponse.json(grn, { status: 201 });
   } catch (error) {
     console.error("GRN POST failed:", error);
-    return NextResponse.json({ error: "GRN save failed" }, { status: 500 });
+    // A flat "GRN save failed" was all this used to say, which is why a schema
+    // drift — the Inward & Transport columns existed in the Prisma schema but
+    // were never added to the database — read as a mystery 500 on screen for as
+    // long as it did. Prisma's own diagnosis is worth passing on: these are the
+    // codes an operator or an admin can actually act on.
+    const e = error as { code?: string; meta?: { column?: string } };
+    if (e?.code === "P2022") {
+      return NextResponse.json(
+        {
+          error: `Database is missing the "${e.meta?.column ?? "unknown"}" column — a migration in prisma/migrations has not been run yet.`,
+          code: e.code,
+        },
+        { status: 500 },
+      );
+    }
+    if (e?.code === "P2003") {
+      return NextResponse.json(
+        { error: "This GRN points at an item, supplier or PO that no longer exists.", code: e.code },
+        { status: 400 },
+      );
+    }
+    return NextResponse.json({ error: "GRN save failed", code: e?.code ?? null }, { status: 500 });
   }
 }
 
