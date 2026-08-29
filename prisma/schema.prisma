@@ -86,7 +86,7 @@ model ItemNew {
   purchaseRate Float    @default(0) // Cost / Purchase Rate
   taxRate      Float    @default(0) // GST / Sales Tax %
   minStock     Int      @default(0)
-  barcode      String?  @unique
+  barcode      String?
   description  String?
   imageUrl     String?
   createdAt    DateTime @default(now())
@@ -111,6 +111,10 @@ model ItemNew {
   // ordinary item. See lib/rateFormula.ts.
   meta                 Json?
 
+  // Scoped to the company, not global. A bare `@unique` here meant one tenant
+  // typing barcode "12345678" locked that barcode out of every other company
+  // on the platform — and leaked the fact that it was taken.
+  @@unique([companyId, barcode])
   @@index([companyId, deletedAt])
   @@index([companyId, name])
 }
