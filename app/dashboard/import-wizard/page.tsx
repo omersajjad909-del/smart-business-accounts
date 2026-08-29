@@ -275,7 +275,20 @@ function ImportWizardInner() {
       // at the first five thousand rows would report "0 will be skipped" on a
       // file whose trouble starts at row nine thousand, which is the one number
       // the operator is about to trust.
-      let merged: Preview | null = null;
+      //
+      // The first chunk supplies everything that describes the file as a whole
+      // — the headings, the delimiter, and the rows shown, which come from the
+      // top of the file because that is where a mis-read column shows itself.
+      // The counts are added up across every chunk, and the issue list keeps
+      // collecting, because the row that breaks an import is rarely near the
+      // top.
+      let first: Preview | undefined;
+      let total = 0;
+      let ok = 0;
+      let failed = 0;
+      let warnings = 0;
+      const issues: Preview["issues"] = [];
+
       for (const chunk of built.chunks) {
         setProgress({
           label: built.chunks.length > 1 ? "Checking the file" : "Reading the file",
@@ -283,27 +296,23 @@ function ImportWizardInner() {
           total: built.chunks.length,
         });
         const part = (await send(chunk, built, true)) as Preview;
-        const soFar: Preview | null = merged;
-        if (soFar === null) {
-          merged = part;
-        } else {
-          merged = {
-            ...soFar,
-            total: soFar.total + part.total,
-            ok: soFar.ok + part.ok,
-            failed: soFar.failed + part.failed,
-            warnings: soFar.warnings + part.warnings,
-            // The rows shown come from the top of the file, which is where a
-            // mis-read column shows itself. The issues list keeps collecting
-            // across the whole file, because the row that breaks an import is
-            // rarely near the top.
-            issues: soFar.issues.concat(part.issues).slice(0, 200),
-          };
+        if (!first) first = part;
+        total += part.total;
+        ok += part.ok;
+        failed += part.failed;
+        warnings += part.warnings;
+        for (const issue of part.issues) {
+          if (issues.length >= 200) break;
+          issues.push(issue);
         }
       }
-      if (!merged) throw new Error("The file has no rows to read.");
+      if (!first) throw new Error("The file has no rows to read.");
 
-      setPreview({ ...merged, reshaped: built.reshaped ?? merged.reshaped });
+      setPreview({
+        ...first,
+        total, ok, failed, warnings, issues,
+        reshaped: built.reshaped ?? first.reshaped,
+      });
       setStep(4);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Could not read the file.");
