@@ -35,7 +35,7 @@ export const FORMULA_TEMPLATES: FormulaTemplate[] = [
     description:
       "For anything cut from a roll: PVC and PE bags, laminate pouches, sleeves. Change the stock widths and the density divisor to match your supplier.",
     inputs: [
-      { key: "pieceWidth",   label: "Piece width",        unit: "in", defaultValue: 11.5, askOnRun: true },
+      { key: "pieceWidth",   label: "Width",        unit: "in", defaultValue: 11.5, askOnRun: true },
       { key: "pieceLength",  label: "Piece length",       unit: "in", defaultValue: 11,   askOnRun: true },
       // Side/bottom gusset. Defaults to 0 so a plain flat bag costs exactly
       // what it did before this input existed — only jobs that actually have a
@@ -127,7 +127,7 @@ export const FORMULA_TEMPLATES: FormulaTemplate[] = [
     version: 1,
     summary: "Ups per parent sheet in both grain directions, plus makeready waste and ink.",
     inputs: [
-      { key: "pieceW",      label: "Piece width",         unit: "in", defaultValue: 3.5, askOnRun: true },
+      { key: "pieceW",      label: "Width",         unit: "in", defaultValue: 3.5, askOnRun: true },
       { key: "pieceH",      label: "Piece height",        unit: "in", defaultValue: 2,   askOnRun: true },
       { key: "sheetW",      label: "Parent sheet width",  unit: "in", defaultValue: 25 },
       { key: "sheetH",      label: "Parent sheet height", unit: "in", defaultValue: 36 },

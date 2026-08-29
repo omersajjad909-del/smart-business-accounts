@@ -411,7 +411,7 @@ export default function FormulasPage() {
                   return (
                     <div className="fxInS" key={i}>
                       <input value={inp.label} onChange={(e) => setInputLabel(i, e.target.value)}
-                        placeholder="Piece width" style={input}/>
+                        placeholder="Width" style={input}/>
                       <input value={inp.unit ?? ""} onChange={(e) => patch((x) => { x.inputs[i].unit = e.target.value; })}
                         placeholder="in" style={input}/>
                       {valueCell}
@@ -425,7 +425,7 @@ export default function FormulasPage() {
                     <input value={inp.key} onChange={(e) => patch((x) => { x.inputs[i].key = e.target.value; })}
                       placeholder="pieceWidth" style={monoInput}/>
                     <input value={inp.label} onChange={(e) => setInputLabel(i, e.target.value)}
-                      placeholder="Piece width" style={input}/>
+                      placeholder="Width" style={input}/>
                     <input value={inp.unit ?? ""} onChange={(e) => patch((x) => { x.inputs[i].unit = e.target.value; })}
                       placeholder="in" style={input}/>
                     {/* Was a bare "[ ]" toggle. A named choice, because getting
