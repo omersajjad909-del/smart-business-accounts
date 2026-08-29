@@ -242,7 +242,17 @@ export default function GRNPage() {
         method: "POST", headers: bh(),
         body: JSON.stringify({ grnNo, date, poId: poId || null, supplierId, remarks, partyBillNo, purchaseType, biltyNo, location, cargo, driver, vehicleNo, items: filledItems.map(r => ({ itemId: r.itemId, orderedQty: Number(r.orderedQty) || 0, receivedQty: Number(r.receivedQty), rate: Number(r.rate) || 0, remarks: r.remarks, meta: rfActive ? (r.meta || null) : null })) }),
       });
-      if (!res.ok) { const e = await res.json(); throw new Error(e.error || "Failed"); }
+      if (!res.ok) {
+        const raw = await res.text();
+        let message = "Failed to save GRN";
+        try {
+          const parsed = JSON.parse(raw);
+          message = parsed?.error || message;
+        } catch {
+          if (raw.trim()) message = raw.slice(0, 240);
+        }
+        throw new Error(message);
+      }
       toast.success("GRN saved successfully!");
       setPreview(true);
       loadGRNs();
