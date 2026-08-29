@@ -72,6 +72,7 @@ export default function GRNPage() {
   const [suppliers, setSuppliers] = useState<any[]>([]);
   const [allItems,  setAllItems]  = useState<any[]>([]);
   const [pos,       setPos]       = useState<PO[]>([]);
+  const allPosRef = useRef<PO[]>([]);
   const [grns,      setGrns]      = useState<GRN[]>([]);
   const [showList,  setShowList]  = useState(false);
   const [saving,    setSaving]    = useState(false);
@@ -99,7 +100,11 @@ export default function GRNPage() {
       setSuppliers(list.filter((a: any) => a.partyType === "SUPPLIER"));
     }).catch(() => {});
     fetch("/api/items-new",     { headers: bh() }).then(r => r.json()).then(d => setAllItems(Array.isArray(d) ? d : [])).catch(() => {});
-    fetch("/api/purchase-order",{ headers: bh() }).then(r => r.json()).then(d => setPos(Array.isArray(d) ? d : [])).catch(() => {});
+    fetch("/api/purchase-order",{ headers: bh() }).then(r => r.json()).then(d => {
+      const records = Array.isArray(d) ? d : [];
+      allPosRef.current = records;
+      setPos(records);
+    }).catch(() => {});
     loadGRNs();
     loadNextGrnNo();
   }, []);
@@ -132,7 +137,8 @@ export default function GRNPage() {
 
   function handleSupplierSelect(id: string) {
     setSupplierId(id);
-    const matches = pos.filter((p) => p.supplier.id === id);
+    const matches = allPosRef.current.filter((p) => p.supplier.id === id);
+    setPos(matches);
     if (matches.length === 1) handlePOSelect(matches[0].id);
     else {
       setPoId("");
@@ -526,17 +532,6 @@ export default function GRNPage() {
                 <div style={{ fontSize: 17, fontWeight: 800, fontFamily: "monospace", color: ACCENT, marginBottom: 16 }}>{grnNo || "Auto #"}</div>
                 <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
                   <div><Label>Receipt Date</Label><DateInput value={date} onChange={setDate} style={inp()} /></div>
-                </div>
-              </div>
-
-              {/* Totals */}
-              <div style={{ background: PANEL, border: `1px solid ${BORDER}`, borderRadius: 12, padding: 18 }}>
-                <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                  <div style={{ display: "flex", justifyContent: "space-between", fontSize: 13 }}><span style={{ color: MUTED }}>Items</span><span>{rows.filter(r => r.itemId && r.receivedQty).length} line(s)</span></div>
-                  <div style={{ display: "flex", justifyContent: "space-between", borderTop: `2px solid ${BORDER}`, paddingTop: 12, fontSize: 18, fontWeight: 800 }}>
-                    <span>Total Value</span>
-                    <span style={{ color: ACCENT }}>{totalAmt.toLocaleString()}</span>
-                  </div>
                 </div>
               </div>
 
