@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
+import { baseRate, toBase } from "@/lib/fx";
 import { sanitizeLineMeta } from "@/lib/rateFormula";
 
 import { apiHasPermission } from "@/lib/apiPermission";
@@ -271,6 +272,13 @@ export async function POST(req: NextRequest) {
       });
     }
 
+    // The ledger is in the company's own currency, whatever the invoice was
+    // raised in. See lib/fx.ts — computed once so both legs are exactly equal.
+    const invoiceBase = toBase(
+      total + freight + taxAmount,
+      baseRate(currencyId, exchangeRate),
+    );
+
     await prisma.voucher.create({
       data: {
         companyId,
@@ -281,8 +289,8 @@ export async function POST(req: NextRequest) {
         narration: "Sales Invoice",
         entries: {
           create: [
-            { companyId, accountId: customerId, amount: total + freight + taxAmount },
-            { companyId, accountId: salesAcc.id, amount: -(total + freight + taxAmount) },
+            { companyId, accountId: customerId, amount: invoiceBase },
+            { companyId, accountId: salesAcc.id, amount: -invoiceBase },
           ],
         },
       },
@@ -519,10 +527,16 @@ export async function PUT(req: NextRequest) {
         });
         if (salesAcc) {
           const customerId = _customerId || existing.customerId;
+          // Same conversion as the create path — an edit that changed the rate
+          // has to re-post the ledger at the new one, not leave the old figure.
+          const editedBase = toBase(
+            total + Number(freight) + taxAmount,
+            baseRate(currencyId, exchangeRate),
+          );
           await tx.voucherEntry.createMany({
             data: [
-              { voucherId: voucher.id, companyId, accountId: customerId, amount: total + Number(freight) + taxAmount },
-              { voucherId: voucher.id, companyId, accountId: salesAcc.id, amount: -(total + Number(freight) + taxAmount) },
+              { voucherId: voucher.id, companyId, accountId: customerId, amount: editedBase },
+              { voucherId: voucher.id, companyId, accountId: salesAcc.id, amount: -editedBase },
             ],
           });
         }

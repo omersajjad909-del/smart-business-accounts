@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from "@/lib/prisma";
 
+import { baseRate, toBase } from "@/lib/fx";
 import { z } from "zod";
 import { resolveCompanyId, resolveBranchId, resolveBranchIdOrDefault } from "@/lib/tenant";
 import { ensureOpenPeriod } from "@/lib/financialLock";
@@ -186,6 +187,13 @@ export async function POST(req: NextRequest) {
       }
     }
 
+    // The receipt keeps the figure the customer actually paid; the ledger, the
+    // bank balance and the statement are all in the company's own currency.
+    // Neither the bank account nor the cash account is denominated in anything
+    // else — there is no currency on BankAccount — so a foreign receipt lands
+    // in them converted, which is also what makes the two legs agree.
+    const receiptBase = toBase(amountNum, baseRate(currencyId, exchangeRate));
+
     // Create voucher and payment receipt in transaction
     const result = await prisma.$transaction(async (tx: any) => {
       // 1. Create voucher (like CRV)
@@ -199,8 +207,8 @@ export async function POST(req: NextRequest) {
           branchId,
           entries: {
             create: [
-              { accountId: party.id, amount: -amountNum }, // Customer debit (they owe less)
-              { accountId: paymentAccount.id, amount: amountNum }, // Cash/Bank credit (we received)
+              { accountId: party.id, amount: -receiptBase }, // Customer debit (they owe less)
+              { accountId: paymentAccount.id, amount: receiptBase }, // Cash/Bank credit (we received)
             ],
           },
         },

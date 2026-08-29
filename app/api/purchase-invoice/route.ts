@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { resolveCompanyId, resolveBranchId, resolveBranchIdOrDefault } from "@/lib/tenant";
+import { baseRate, toBase } from "@/lib/fx";
 import { ensureOpenPeriod } from "@/lib/financialLock";
 import { PERMISSIONS } from "@/lib/permissions";
 import { apiHasPermission } from "@/lib/apiPermission";
@@ -279,6 +280,7 @@ export async function POST(req: NextRequest) {
       }
 
       // F. Create the accounting voucher (double entry) and debit inventory (asset).
+      const billBase = toBase(netTotal, baseRate(currencyId, exchangeRate));
       await tx.voucher.create({
         data: {
           voucherNo: invoiceNo,
@@ -289,8 +291,10 @@ export async function POST(req: NextRequest) {
           branchId,
           entries: {
             create: [
-              { accountId: inventoryAcc.id, amount: netTotal, companyId }, // Debit Inventory (Asset)
-              { accountId: supplier.id, amount: -netTotal, companyId },    // Credit Supplier
+              // In the company's own currency, whatever the bill was raised in.
+              // One conversion for both legs, so they cannot round apart.
+              { accountId: inventoryAcc.id, amount: billBase, companyId }, // Debit Inventory (Asset)
+              { accountId: supplier.id, amount: -billBase, companyId },    // Credit Supplier
             ],
           },
         },
@@ -456,10 +460,13 @@ export async function PUT(req: NextRequest) {
         },
       });
       if (inventoryAcc) {
+        // Same conversion as the create path — an edit that changed the rate
+        // has to re-post the ledger at the new one.
+        const editedBase = toBase(netTotal, baseRate(currencyId, exchangeRate));
         await tx.voucherEntry.createMany({
           data: [
-            { voucherId: voucher.id, companyId, accountId: inventoryAcc.id, amount: netTotal },
-            { voucherId: voucher.id, companyId, accountId: existing.supplierId, amount: -netTotal },
+            { voucherId: voucher.id, companyId, accountId: inventoryAcc.id, amount: editedBase },
+            { voucherId: voucher.id, companyId, accountId: existing.supplierId, amount: -editedBase },
           ],
         });
       }
