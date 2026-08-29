@@ -2617,6 +2617,12 @@ export const CORE_DASHBOARD_FEATURES: DashboardFeatureDefinition[] = [
   { id: "CORE_IMPORT_HUB", label: "Import Data", route: "/dashboard/import", section: "Import Data", core: true, business: "service", businessLabel: "Core (all businesses)", description: "Migration home — every import step in the order it has to be done." },
   { id: "CORE_IMPORT_WIZARD", label: "Import Wizard", route: "/dashboard/import-wizard", section: "Import Data", core: true, business: "service", businessLabel: "Core (all businesses)", description: "Upload a CSV from Oracle, QuickBooks, Xero, Sage or Tally, preview how it was read, then commit." },
   { id: "CORE_IMPORT_ORACLE_GUIDE", label: "Migration Guide", route: "/dashboard/import/oracle-guide", section: "Import Data", core: true, business: "service", businessLabel: "Core (all businesses)", description: "The cutover plan, and the SQL to pull each file out of Oracle." },
+  // Registered at the folder, not per system. `findDashboardFeatureByRoute`
+  // matches on longest prefix, so this one entry covers the hub, every
+  // /guide/<system> page and the column reference — which is what we want: a
+  // customer either gets the migration documentation or does not, and an admin
+  // switching it off per plan should not have to tick seven boxes to do it.
+  { id: "CORE_IMPORT_GUIDES", label: "Import Guides", route: "/dashboard/import/guide", section: "Import Data", core: true, business: "service", businessLabel: "Core (all businesses)", description: "Per-system export instructions — the exact report and options for each of the nine files, plus the full column reference." },
 ];
 
 // Core pages join the same list the sidebar, the admin grid and the route

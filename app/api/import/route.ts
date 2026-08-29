@@ -49,6 +49,7 @@ import {
   type OpenDocumentRow,
   type LedgerHistoryRow,
 } from "@/lib/importEngine";
+import { WHOLE_FILE_TYPES } from "@/lib/importChunker";
 
 /**
  * Long enough for the largest slice the wizard will send, and inside what every
@@ -97,8 +98,17 @@ const MAX_LEDGER_ROWS = 250000;
  * one row per account, and thirty thousand accounts is a large multinational.
  * So they are refused rather than silently degraded, and the caller is told to
  * send the file whole.
+ *
+ * Taken from the splitter rather than restated here. The two have to agree
+ * exactly: a type the splitter cuts up and this rejects is a file that uploads
+ * and then fails at the last step, having already written the earlier slices.
  */
-const WHOLE_FILE_TYPES = new Set<ImportDataType>(["accounts", "opening_balances"]);
+const WHOLE_FILE_SET = new Set<ImportDataType>(WHOLE_FILE_TYPES);
+
+/** Files whose code column is a ledger account code, and may be a flexfield combination. */
+const SEGMENTED_TYPES = new Set<ImportDataType>([
+  "accounts", "customers", "suppliers", "opening_balances", "ledger_history",
+]);
 
 type Outcome = {
   total: number;
@@ -1004,12 +1014,30 @@ type ImportBody = {
    * under way says: post these rows, the opening is settled.
    */
   continuedParties: string[];
+  /**
+   * Which piece of a segmented account code is the account.
+   *
+   * An Oracle EBS code is a flexfield combination — 01-000-1110-0000 is company,
+   * cost centre, natural account, future use — and only one segment of it names
+   * an account. Imported whole, the same account arrives once per cost centre:
+   * a chart of four hundred accounts becomes twelve thousand, all of them called
+   * the same thing, and the trial balance is unreadable.
+   *
+   * Anyone who can query the database exports `segment3` and never meets this.
+   * Anyone who can only run the standard report gets the whole combination and
+   * cannot change it — so it is cut here instead. Zero means take it whole,
+   * which is what every other system needs.
+   */
+  codeSegment: number;
+  /** What the segments are separated by. Hyphen on every EBS install we have seen. */
+  codeSeparator: string;
   error?: string;
 };
 
 const EMPTY_BODY: ImportBody = {
   csv: "", source: "csv", dataType: "", dryRun: false, date: "", party: "",
   lineOffset: 0, chunkCount: 1, chunkIndex: 1, ambiguousCodes: [], continuedParties: [],
+  codeSegment: 0, codeSeparator: "-",
 };
 
 /** A count from an untrusted caller, kept sane and non-negative. */
@@ -1048,6 +1076,8 @@ async function readBody(req: NextRequest): Promise<ImportBody> {
       chunkIndex: Math.max(1, counted(form.get("chunkIndex"), 1)),
       ambiguousCodes: stringList(form.get("ambiguousCodes")),
       continuedParties: stringList(form.get("continuedParties")),
+      codeSegment: counted(form.get("codeSegment"), 0),
+      codeSeparator: String(form.get("codeSeparator") || "-"),
     };
   }
 
@@ -1065,7 +1095,46 @@ async function readBody(req: NextRequest): Promise<ImportBody> {
     chunkIndex: Math.max(1, counted(json.chunkIndex, 1)),
     ambiguousCodes: stringList(json.ambiguousCodes),
     continuedParties: stringList(json.continuedParties),
+    codeSegment: counted(json.codeSegment, 0),
+    codeSeparator: String(json.codeSeparator || "-"),
   };
+}
+
+/**
+ * Replaces each row's code with one segment of it.
+ *
+ * Runs before every whole-file pass, because those passes read codes as a tree
+ * — `0303` is the head of `03030001` — and a combination code has no tree in it
+ * until the account segment has been cut out of it.
+ *
+ * A row whose code has fewer segments than asked for is left alone rather than
+ * blanked. That is usually the report's own total line, and emptying its code
+ * would turn a row that gets held back into a row that imports as a nameless
+ * account.
+ */
+function applyCodeSegment(
+  dataType: ImportDataType,
+  rows: MappedRow<{ code?: string; partyCode?: string }>[],
+  segment: number,
+  separator: string,
+) {
+  // Ledger accounts only. A flexfield combination is a GL account code; an item
+  // code that happens to contain a hyphen is just an item code, and cutting it
+  // would also put the code the server writes out of step with the duplicate
+  // scan the browser ran over the whole file before splitting it.
+  if (!SEGMENTED_TYPES.has(dataType)) return;
+  if (segment < 1) return;
+  const sep = separator || "-";
+  for (const row of rows) {
+    if (!row.value) continue;
+    for (const key of ["code", "partyCode"] as const) {
+      const raw = row.value[key];
+      if (!raw) continue;
+      const parts = String(raw).split(sep);
+      if (parts.length < segment) continue;
+      row.value[key] = parts[segment - 1].trim();
+    }
+  }
 }
 
 export async function POST(req: NextRequest) {
@@ -1095,7 +1164,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "The file is empty" }, { status: 400 });
     }
 
-    if (body.chunkCount > 1 && WHOLE_FILE_TYPES.has(dataType)) {
+    if (body.chunkCount > 1 && WHOLE_FILE_SET.has(dataType)) {
       const def = findDataType(dataType);
       return NextResponse.json(
         {
@@ -1154,6 +1223,14 @@ export async function POST(req: NextRequest) {
     }
 
     const mapped = mapForType(dataType, parsed.rows, body.lineOffset);
+
+    // Before the whole-file passes below, which read codes as a hierarchy.
+    applyCodeSegment(
+      dataType,
+      mapped.rows as MappedRow<{ code?: string; partyCode?: string }>[],
+      body.codeSegment,
+      body.codeSeparator,
+    );
 
     // Whole-file pass, so it cannot live in a per-row reader: a hierarchical
     // trial balance prints group subtotals as ordinary rows, and importing

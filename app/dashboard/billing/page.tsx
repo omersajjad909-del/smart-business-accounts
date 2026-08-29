@@ -9,6 +9,7 @@ import { useSearchParams } from "next/navigation";
 import toast from "react-hot-toast";
 import { getCurrentUser } from "@/lib/auth";
 import { useResponsive } from "@/hooks/useResponsive";
+import { SubscriptionReceiptPrinter, type SubscriptionReceiptData } from "./_components/SubscriptionReceiptPrinter";
 
 /* ─── Types ──────────────────────────────────────────── */
 type PaymentMethod = {
@@ -369,6 +370,9 @@ function BillingPage() {
   const [loading,           setLoading]            = useState(true);
   const [checkingOut,       setCheckingOut]        = useState<string | null>(null);
   const [showUpgradeBanner, setShowUpgradeBanner]  = useState(upgraded);
+  const [companyName,       setCompanyName]        = useState("");
+  const [receiptClosed,     setReceiptClosed]      = useState(false);
+  const [receiptInvoiceId,  setReceiptInvoiceId]   = useState<string | null>(null);
   const [activeTab,         setActiveTab]          = useState<"overview"|"methods"|"invoices"|"plans">(isRequired ? "plans" : "overview");
   const [extraSeats,        setExtraSeats]         = useState(0);
   const [seatPricing,       setSeatPricing]        = useState({ monthly: 7, yearly: 6 });
@@ -414,6 +418,7 @@ function BillingPage() {
 
         if (meRes.ok) {
           const d = await meRes.json();
+          setCompanyName(String(d.name || ""));
           const rawPlan = (d.plan || "STARTER").toUpperCase();
           // Addon codes are not base plans — treat as Enterprise (highest tier that would have addons)
           const planUpper = rawPlan.startsWith("ADDON-") ? "ENTERPRISE" : rawPlan;
@@ -571,6 +576,42 @@ function BillingPage() {
   const paymentNote = paymentMeta?.note || "";
   const acceptedMethods = paymentManagedExternally ? LEMON_ACCEPTED_METHODS : DIRECT_ACCEPTED_METHODS;
 
+  /* ── Post-payment receipt ──────────────────────────────
+     The printer animation is a receipt for money that actually moved, so it is
+     gated on a live subscription plus a paid invoice row — not on
+     ?upgrade=success, which only says the customer came back from the
+     provider's checkout. Shown once per invoice: reloading the success URL, or
+     revisiting Billing later, must not reprint the same charge. */
+  const latestPaidInvoice  = invoices.find(i => String(i.status).toLowerCase() === "paid") || null;
+  const subscriptionIsLive = ["active", "trialing"].includes(String(subscription?.status || "").toLowerCase());
+  const defaultCard        = paymentMethods.find(pm => pm.isDefault) || paymentMethods[0] || null;
+
+  useEffect(() => {
+    if (!upgraded || receiptClosed || receiptInvoiceId) return;
+    if (!latestPaidInvoice || !subscriptionIsLive) return;
+    const key = `fnv-receipt-shown:${latestPaidInvoice.id}`;
+    try {
+      if (window.sessionStorage.getItem(key) === "1") return;
+      window.sessionStorage.setItem(key, "1");
+    } catch { /* storage blocked (private window) — fall through and show it */ }
+    setReceiptInvoiceId(latestPaidInvoice.id);
+  }, [upgraded, receiptClosed, receiptInvoiceId, latestPaidInvoice, subscriptionIsLive]);
+
+  const receiptData: SubscriptionReceiptData | null = latestPaidInvoice ? {
+    companyName:     companyName || "Your company",
+    planLabel:       `${currentPlan.name} Plan`,
+    billingCycle:    latestPaidInvoice.billingCycle || subscription?.billingCycle || "monthly",
+    invoiceNo:       latestPaidInvoice.number || latestPaidInvoice.id,
+    paidAt:          latestPaidInvoice.date,
+    total:           latestPaidInvoice.amount,
+    currency:        latestPaidInvoice.currency,
+    // The provider settles a single gross figure — no subtotal/tax split is
+    // recorded, so those rows stay off the paper rather than being invented.
+    paymentMethod:   defaultCard ? `${cardBrandLabel(defaultCard.brand)} •••• ${defaultCard.last4}` : null,
+    nextBillingDate: subscription?.currentPeriodEnd || null,
+    emailedTo:       getCurrentUser()?.email || null,
+  } : null;
+
   function openPaymentMethodFlow() {
     // Lemon Squeezy mints a signed link for changing the card on file. Sending
     // the customer there is the actual "update my card" flow — the old branch
@@ -627,6 +668,15 @@ function BillingPage() {
         @media(max-width:860px){.bill-stats{grid-template-columns:repeat(2,1fr)!important}.bill-plans{grid-template-columns:1fr!important}.bill-sub-inner{flex-direction:column!important}}
         @media(max-width:540px){.bill-stats{grid-template-columns:1fr!important}}
       `}</style>
+
+      {/* ── Payment receipt, printed once when the charge is confirmed ── */}
+      {receiptInvoiceId && receiptData && (
+        <SubscriptionReceiptPrinter
+          data={receiptData}
+          open={!receiptClosed}
+          onClose={() => setReceiptClosed(true)}
+        />
+      )}
 
       {/* ── Paywall Banner (shown when redirected without active subscription) ── */}
       {isRequired && (

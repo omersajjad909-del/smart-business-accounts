@@ -26,7 +26,15 @@
 
 /* ─────────────────────────── ZIP ─────────────────────────── */
 
-type ZipEntry = { name: string; offset: number; method: number; size: number };
+type ZipEntry = {
+  name: string;
+  offset: number;
+  method: number;
+  /** Bytes on disk. Says where this entry's deflate stream ends. */
+  compressedSize: number;
+  /** Bytes once inflated. Says how much of the stream belongs to this entry. */
+  size: number;
+};
 
 /**
  * The central directory, read back to front the way the format intends.
@@ -55,13 +63,14 @@ function readZipIndex(buf: ArrayBuffer): Map<string, ZipEntry> {
   for (let i = 0; i < count; i += 1) {
     if (view.getUint32(pos, true) !== 0x02014b50) break;
     const method = view.getUint16(pos + 10, true);
-    const size = view.getUint32(pos + 20, true);
+    const compressedSize = view.getUint32(pos + 20, true);
+    const size = view.getUint32(pos + 24, true);
     const nameLen = view.getUint16(pos + 28, true);
     const extraLen = view.getUint16(pos + 30, true);
     const commentLen = view.getUint16(pos + 32, true);
     const offset = view.getUint32(pos + 42, true);
     const name = new TextDecoder().decode(bytes.subarray(pos + 46, pos + 46 + nameLen));
-    entries.set(name, { name, method, size, offset });
+    entries.set(name, { name, method, compressedSize, size, offset });
     pos += 46 + nameLen + extraLen + commentLen;
   }
   return entries;
@@ -82,13 +91,15 @@ async function readZipEntry(buf: ArrayBuffer, entry: ZipEntry): Promise<string> 
   }
   if (entry.method !== 8) throw new Error(`unsupported compression (${entry.method})`);
 
-  // A ZIP holds a raw deflate stream with no zlib wrapper around it.
-  const compressed = bytes.subarray(start);
+  // A ZIP holds a raw deflate stream with no zlib wrapper around it. Sliced to
+  // this entry's own compressed length: the next entry's bytes follow it
+  // immediately, and feeding those to the decompressor is how a reader that
+  // otherwise works throws on the second file it opens.
+  const compressed = bytes.subarray(start, start + entry.compressedSize);
   const stream = new Blob([compressed as unknown as BlobPart])
     .stream()
     .pipeThrough(new DecompressionStream("deflate-raw"));
-  // The stream runs past the end of this entry into the next one; the entry's
-  // own uncompressed size says where to stop.
+
   const out = new Uint8Array(entry.size);
   let written = 0;
   const reader = stream.getReader();

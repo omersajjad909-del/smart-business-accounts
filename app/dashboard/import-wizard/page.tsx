@@ -53,6 +53,14 @@ const DATE_LABEL: Partial<Record<ImportDataType, string>> = {
  */
 const PARTY_TYPES = new Set<ImportDataType>(["ledger_history"]);
 
+/**
+ * Files whose code column is a ledger account code, and so may arrive as an
+ * Oracle flexfield combination. Mirrors SEGMENTED_TYPES in the route.
+ */
+const SEGMENTED_TYPES = new Set<ImportDataType>([
+  "accounts", "customers", "suppliers", "opening_balances", "ledger_history",
+]);
+
 type PreviewRow = {
   line: number;
   value: Record<string, unknown> | null;
@@ -139,6 +147,8 @@ function ImportWizardInner() {
   const [fileName, setFileName] = useState("");
   const [date, setDate] = useState(() => new Date().toISOString().slice(0, 10));
   const [party, setParty] = useState("");
+  /** 0 = take the code whole. See `codeSegment` in app/api/import/route.ts. */
+  const [codeSegment, setCodeSegment] = useState(0);
 
   const [busy, setBusy] = useState(false);
   const [preview, setPreview] = useState<Preview | null>(null);
@@ -240,13 +250,14 @@ function ImportWizardInner() {
           chunkCount: current.chunks.length,
           ambiguousCodes: current.ambiguousCodes,
           continuedParties: chunk.continuedParties,
+          codeSegment,
         }),
       });
       const body = await res.json();
       if (!res.ok) throw new Error(body?.error || "The server refused the file.");
       return body;
     },
-    [headers, source, dataType, date, party],
+    [headers, source, dataType, date, party, codeSegment],
   );
 
   async function runPreview() {
@@ -272,20 +283,23 @@ function ImportWizardInner() {
           total: built.chunks.length,
         });
         const part = (await send(chunk, built, true)) as Preview;
-        merged = merged
-          ? {
-              ...merged,
-              total: merged.total + part.total,
-              ok: merged.ok + part.ok,
-              failed: merged.failed + part.failed,
-              warnings: merged.warnings + part.warnings,
-              // The rows shown come from the top of the file, which is where a
-              // mis-read column shows itself. The issues list keeps collecting
-              // across the whole file, because the row that breaks an import is
-              // rarely near the top.
-              issues: merged.issues.concat(part.issues).slice(0, 200),
-            }
-          : part;
+        const soFar: Preview | null = merged;
+        if (soFar === null) {
+          merged = part;
+        } else {
+          merged = {
+            ...soFar,
+            total: soFar.total + part.total,
+            ok: soFar.ok + part.ok,
+            failed: soFar.failed + part.failed,
+            warnings: soFar.warnings + part.warnings,
+            // The rows shown come from the top of the file, which is where a
+            // mis-read column shows itself. The issues list keeps collecting
+            // across the whole file, because the row that breaks an import is
+            // rarely near the top.
+            issues: soFar.issues.concat(part.issues).slice(0, 200),
+          };
+        }
       }
       if (!merged) throw new Error("The file has no rows to read.");
 
@@ -433,6 +447,47 @@ function ImportWizardInner() {
         }}>{error}</div>
       )}
 
+      {notice && !error && (
+        <div style={{
+          ...card, borderColor: "rgba(99,102,241,.3)", background: "rgba(99,102,241,.08)",
+          padding: "12px 16px", marginBottom: 18, fontSize: 12.5, lineHeight: 1.65,
+          color: "var(--text-muted)",
+        }}>{notice}</div>
+      )}
+
+      {/* A big file is many requests. Saying which one is in flight is the
+          difference between a slow import and an import that looks stuck. */}
+      {progress && (
+        <div style={{ ...card, padding: "14px 16px", marginBottom: 18 }}>
+          <div style={{
+            display: "flex", justifyContent: "space-between", gap: 12,
+            fontSize: 12.5, marginBottom: 9, flexWrap: "wrap",
+          }}>
+            <span style={{ fontWeight: 700 }}>
+              {progress.label}
+              {progress.total > 1 && ` — part ${Math.min(progress.done + 1, progress.total)} of ${progress.total}`}
+            </span>
+            <span style={{ color: "var(--text-muted)", fontFamily: MONO }}>
+              {Math.round((progress.done / Math.max(progress.total, 1)) * 100)}%
+            </span>
+          </div>
+          <div style={{ height: 7, borderRadius: 999, background: "var(--app-bg)", overflow: "hidden" }}>
+            <div style={{
+              height: "100%", borderRadius: 999, background: "#6366f1",
+              width: `${(progress.done / Math.max(progress.total, 1)) * 100}%`,
+              transition: "width .25s ease",
+            }} />
+          </div>
+          {progress.total > 1 && (
+            <div style={{ fontSize: 11.5, color: "var(--text-muted)", marginTop: 8, lineHeight: 1.6 }}>
+              The file was too large for one request, so it is being sent in {progress.total} parts.
+              Leave this tab open — if it is interrupted, everything already written is kept and
+              you can carry on from the same point.
+            </div>
+          )}
+        </div>
+      )}
+
       {/* ── Step 1: source ── */}
       {step === 1 && (
         <div style={{ ...card, padding: isMobile ? "16px 14px" : "22px 24px" }}>
@@ -460,6 +515,13 @@ function ImportWizardInner() {
                 </span>
               </button>
             ))}
+          </div>
+          <div style={{ marginTop: 14, fontSize: 12, color: "var(--text-muted)", lineHeight: 1.7 }}>
+            Not sure which report to run in your old system?{" "}
+            <Link href="/dashboard/import/guide" style={{ color: "#818cf8", fontWeight: 700 }}>
+              The import guides
+            </Link>{" "}
+            name the exact screen and options for every file, in each of these systems.
           </div>
         </div>
       )}
@@ -519,16 +581,17 @@ function ImportWizardInner() {
             }}>
               <input
                 type="file"
-                accept=".csv,.txt,text/csv,text/plain"
+                accept=".csv,.txt,.xlsx,text/csv,text/plain,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
                 style={{ display: "none" }}
                 onChange={(e) => { const f = e.target.files?.[0]; if (f) readFile(f); }}
               />
               <div style={{ fontSize: 26, marginBottom: 6 }}>📄</div>
               <div style={{ fontSize: 13.5, fontWeight: 700, marginBottom: 3 }}>
-                {fileName || "Choose a CSV file"}
+                {fileName || "Choose a CSV or Excel file"}
               </div>
               <div style={{ fontSize: 11.5, color: "var(--text-muted)" }}>
-                Comma, semicolon or tab separated. Excel: File → Save As → CSV UTF-8.
+                .csv (comma, semicolon or tab separated) or .xlsx — an Excel workbook is read
+                directly, no Save As needed. Any size: a large file is sent in parts.
               </div>
             </label>
 
@@ -569,6 +632,37 @@ function ImportWizardInner() {
                   Leave blank if the file already carries a party column. The file must start with the
                   party&rsquo;s opening / B/F line, or it is refused — that line replaces the opening
                   balance imported at cutover, which is what stops the balance being counted twice.
+                </div>
+              </div>
+            )}
+
+            {SEGMENTED_TYPES.has(typeDef.id) && (
+              <div style={{ marginTop: 14, maxWidth: 460 }}>
+                <label style={{
+                  display: "block", fontSize: 11.5, color: "var(--text-muted)",
+                  marginBottom: 6, fontWeight: 600,
+                }}>
+                  Account codes look like <code style={{ fontFamily: MONO }}>01-000-1110-0000</code>?
+                </label>
+                <select
+                  value={codeSegment}
+                  onChange={(e) => setCodeSegment(Number(e.target.value))}
+                  style={{
+                    width: "100%", boxSizing: "border-box", padding: "9px 12px", borderRadius: 9,
+                    background: "var(--app-bg)", border: "1px solid var(--border)",
+                    color: "var(--text-primary)", fontSize: 13, fontFamily: FONT, outline: "none",
+                  }}
+                >
+                  <option value={0}>No — use the code exactly as it is (normal)</option>
+                  {[1, 2, 3, 4, 5, 6].map((n) => (
+                    <option key={n} value={n}>Yes — use segment {n} as the account code</option>
+                  ))}
+                </select>
+                <div style={{ fontSize: 11, color: "var(--text-muted)", marginTop: 6, lineHeight: 1.6 }}>
+                  Only for Oracle EBS and systems like it, where a code is a combination of company,
+                  cost centre and account. The account is usually segment 3. Left whole, the same
+                  account arrives once per cost centre — four hundred accounts become twelve
+                  thousand. The preview shows the codes after the cut, so check them there.
                 </div>
               </div>
             )}
@@ -621,6 +715,12 @@ function ImportWizardInner() {
                 <ol style={{ margin: 0, paddingLeft: 18, fontSize: 12, color: "var(--text-muted)", lineHeight: 1.75 }}>
                   {sourceDef.steps.map((s) => <li key={s}>{s}</li>)}
                 </ol>
+                <Link href={`/dashboard/import/guide/${sourceDef.id}`} style={{
+                  display: "inline-block", marginTop: 11, fontSize: 12,
+                  fontWeight: 700, color: "#818cf8", textDecoration: "none",
+                }}>
+                  The exact report for {typeDef.name}, and what to set on it →
+                </Link>
               </div>
             )}
             <div style={{ ...card, padding: "16px 18px" }}>
@@ -676,6 +776,10 @@ function ImportWizardInner() {
             Read as <b style={{ color: "var(--text-primary)" }}>{preview.dataTypeName}</b> ·
             delimiter <code style={{ fontFamily: MONO }}>{preview.delimiter}</code> ·
             columns found: {preview.headers.join(", ") || "none"}
+            {plan && plan.chunks.length > 1 && (
+              <> · read in <b style={{ color: "var(--text-primary)" }}>{plan.chunks.length} parts</b>,
+                because the file is larger than one request can carry</>
+            )}
           </div>
 
           {/* The rows, as they were understood */}
@@ -759,12 +863,42 @@ function ImportWizardInner() {
             </div>
           )}
 
+          {resumable && resume && (
+            <div style={{
+              ...card, borderColor: "rgba(245,158,11,.32)", background: "rgba(245,158,11,.07)",
+              padding: "16px 18px", marginBottom: 14,
+            }}>
+              <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 6, color: "#f59e0b" }}>
+                This file was already partly imported
+              </div>
+              <div style={{ fontSize: 12.5, color: "var(--text-muted)", lineHeight: 1.7, marginBottom: 12 }}>
+                {resume.done} of {resume.chunkCount} parts went in before it stopped —{" "}
+                {(resume.outcome.imported + resume.outcome.updated).toLocaleString("en-PK")} rows are
+                already in your books. Carry on from part {resume.done + 1}, or start the file again:
+                nothing is duplicated either way, because every row is matched against what is
+                already there before it is written.
+              </div>
+              <div style={{ display: "flex", gap: 9, flexWrap: "wrap" }}>
+                <button onClick={() => commit(resume.done)} disabled={busy} style={{
+                  padding: "10px 18px", borderRadius: 9, border: "none", background: "#f59e0b",
+                  color: "#1c1917", fontSize: 12.5, fontWeight: 700,
+                  cursor: busy ? "not-allowed" : "pointer", fontFamily: FONT,
+                }}>Carry on from part {resume.done + 1}</button>
+                <button onClick={() => { saveResume(null); setResume(null); }} disabled={busy} style={{
+                  padding: "10px 18px", borderRadius: 9, fontSize: 12.5,
+                  background: "transparent", border: "1px solid var(--border)",
+                  color: "var(--text-muted)", cursor: busy ? "not-allowed" : "pointer", fontFamily: FONT,
+                }}>Start the file again</button>
+              </div>
+            </div>
+          )}
+
           <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-            <button onClick={commit} disabled={busy || preview.ok === 0} style={{
+            <button onClick={() => commit(0)} disabled={busy || preview.ok === 0 || resumable} style={{
               padding: "12px 24px", borderRadius: 10, border: "none",
-              background: busy || preview.ok === 0 ? "rgba(34,197,94,.4)" : "#22c55e",
+              background: busy || preview.ok === 0 || resumable ? "rgba(34,197,94,.4)" : "#22c55e",
               color: "#fff", fontSize: 13.5, fontWeight: 700,
-              cursor: busy || preview.ok === 0 ? "not-allowed" : "pointer", fontFamily: FONT,
+              cursor: busy || preview.ok === 0 || resumable ? "not-allowed" : "pointer", fontFamily: FONT,
             }}>
               {busy ? "Importing…" : `Import ${preview.ok.toLocaleString("en-PK")} rows`}
             </button>

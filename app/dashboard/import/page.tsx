@@ -95,12 +95,23 @@ export default function ImportCenterPage() {
             the bills still unpaid. History before that date stays in the old system, which you keep
             read-only. Run both in parallel for a month or two before you switch off.
           </div>
-          <Link href="/dashboard/import/oracle-guide" style={{
-            display: "inline-block", marginTop: 10, fontSize: 12.5, fontWeight: 700,
-            color: "#818cf8", textDecoration: "none",
-          }}>
-            Read the full migration guide (with the Oracle SQL) →
-          </Link>
+          <div style={{ display: "flex", gap: 16, marginTop: 10, flexWrap: "wrap" }}>
+            <Link href="/dashboard/import/oracle-guide" style={{
+              fontSize: 12.5, fontWeight: 700, color: "#818cf8", textDecoration: "none",
+            }}>
+              The cutover plan →
+            </Link>
+            <Link href="/dashboard/import/guide" style={{
+              fontSize: 12.5, fontWeight: 700, color: "#818cf8", textDecoration: "none",
+            }}>
+              How to export from your system →
+            </Link>
+            <Link href="/dashboard/import/guide/fields" style={{
+              fontSize: 12.5, fontWeight: 700, color: "#818cf8", textDecoration: "none",
+            }}>
+              Column reference →
+            </Link>
+          </div>
         </div>
       </div>
 
