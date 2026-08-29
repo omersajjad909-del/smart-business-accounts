@@ -41,6 +41,7 @@ type Props = {
 
   allowManual?: boolean;
   placeholder?: string;
+  inputId?: string;
   style?: React.CSSProperties;
   autoFocus?: boolean;
 
@@ -70,6 +71,7 @@ export function ItemPicker({
   label,
   allowManual = true,
   placeholder = "Type to search…",
+  inputId,
   style,
   autoFocus,
   previewFields = [],
@@ -549,6 +551,7 @@ export function ItemPicker({
       ---------------------------------------------------- */}
 
       <input
+        id={inputId}
         value={shown}
         placeholder={
           selected

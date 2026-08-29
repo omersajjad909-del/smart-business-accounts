@@ -85,9 +85,8 @@ export default function GRNPage() {
   const [supplierId, setSupplierId] = useState("");
   const [remarks,    setRemarks]    = useState("");
   const [notes,      setNotes]      = useState("");
-  const [rows, setRows] = useState<GRNItem[]>([
-    { itemId: "", name: "", orderedQty: "", receivedQty: "", rate: "", remarks: "" },
-  ]);
+  const emptyRow = (): GRNItem => ({ itemId: "", name: "", orderedQty: "", receivedQty: "", rate: "", remarks: "", ...(rfActive ? { meta: emptyRateFormulaMeta(rf) } : {}) });
+  const [rows, setRows] = useState<GRNItem[]>([emptyRow()]);
 
   function bh(): Record<string, string> {
     return { "Content-Type": "application/json", "x-company-id": user?.companyId || "", "x-user-role": user?.role || "", "x-user-id": user?.id || "" };
@@ -117,13 +116,40 @@ export default function GRNPage() {
     } catch {}
   }
 
+  const supplierPOs = supplierId ? pos.filter((p) => p.supplier.id === supplierId) : [];
+  const selectedPO = pos.find((p) => p.id === poId);
+  const allowedItems = selectedPO
+    ? allItems.filter((item: any) => selectedPO.items.some((line) => line.itemId === item.id))
+    : allItems;
+
+  function focusItemRow(index: number) {
+    requestAnimationFrame(() => {
+      const input = document.getElementById(`grn-item-${index}`) as HTMLInputElement | null;
+      input?.focus();
+      input?.select();
+    });
+  }
+
+  function handleSupplierSelect(id: string) {
+    setSupplierId(id);
+    const matches = pos.filter((p) => p.supplier.id === id);
+    if (matches.length === 1) handlePOSelect(matches[0].id);
+    else {
+      setPoId("");
+      setRows([emptyRow()]);
+    }
+  }
+
   function handlePOSelect(id: string) {
     setPoId(id);
-    if (!id) return;
+    if (!id) { setRows([emptyRow()]); return; }
     const po = pos.find(p => p.id === id);
     if (!po) return;
     setSupplierId(po.supplier.id);
-    setRows(po.items.map((i: any) => ({ itemId: i.itemId, name: i.item.name, orderedQty: String(i.qty), receivedQty: String(i.qty), rate: String(i.rate || ""), remarks: "", ...(rfActive ? { meta: readRateFormulaMeta(rf, i.meta) } : {}) })));
+    setRows([
+      ...po.items.map((i: any) => ({ itemId: i.itemId, name: i.item.name, orderedQty: String(i.qty), receivedQty: "", rate: String(i.rate || ""), remarks: "", ...(rfActive ? { meta: readRateFormulaMeta(rf, i.meta) } : {}) })),
+      emptyRow(),
+    ]);
   }
 
   /**
@@ -172,13 +198,13 @@ export default function GRNPage() {
     u[idx] = { ...u[idx], [field]: value };
     if (field === "itemId") { const f = allItems.find((it: any) => it.id === value); if (f) u[idx].name = f.name; }
     if (idx === u.length - 1 && value !== "")
-      u.push({ itemId: "", name: "", orderedQty: "", receivedQty: "", rate: "", remarks: "" });
+      u.push(emptyRow());
     setRows(u);
   }
 
   function resetForm() {
     setDate(today); setPoId(""); setSupplierId(""); setRemarks(""); setNotes("");
-    setRows([{ itemId: "", name: "", orderedQty: "", receivedQty: "", rate: "", remarks: "" }]);
+    setRows([emptyRow()]);
     setPreview(false);
     loadNextGrnNo();
   }
@@ -351,7 +377,7 @@ export default function GRNPage() {
               <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: 16 }}>
                 <div style={{ background: PANEL, border: `1px solid ${BORDER}`, borderRadius: 12, padding: 18 }}>
                   <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 12, color: TEXT }}>Supplier Details</div>
-                  <select value={supplierId} onChange={e => setSupplierId(e.target.value)} style={{ ...inp(), marginBottom: 10 }}>
+                  <select value={supplierId} onChange={e => handleSupplierSelect(e.target.value)} style={{ ...inp(), marginBottom: 10 }}>
                     <option value="">— Select Supplier —</option>
                     {suppliers.map((s: any) => <option key={s.id} value={s.id}>{s.name}</option>)}
                   </select>
@@ -403,11 +429,12 @@ export default function GRNPage() {
                             <button onClick={() => setRows(rows.filter((_, i) => i !== idx))} disabled={rows.length === 1} style={{ background: "none", border: "none", cursor: rows.length === 1 ? "not-allowed" : "pointer", color: "#f87171", fontSize: 18, lineHeight: 1, padding: 0, opacity: rows.length === 1 ? 0.3 : 1 }}>×</button>
                           </div>
                           <ItemPicker
-                            items={allItems as any}
+                            items={allowedItems as any}
                             value={row.itemId}
                             onChange={(__picked: string) => selectGrnItem(idx, __picked)}
                             onKeyDown={rateFormulaEnterHandler(rf, rfActive, idx, () => lastPickedMeta.current)}
                             label={rfActive ? itemPickerLabel : undefined}
+                            inputId={`grn-item-${idx}`}
                             style={{ ...inp({ marginBottom: 8 }) }}
                             allowManual={false}
                             // placeholder="Type to search — e.g. e1060"
@@ -448,11 +475,12 @@ export default function GRNPage() {
                               <td style={{ padding: "6px 8px", color: MUTED, fontSize: 12 }}>{idx + 1}</td>
                               <td style={{ padding: "6px 8px" }}>
                                 <ItemPicker
-                                  items={allItems as any}
+                                  items={allowedItems as any}
                                   value={row.itemId}
                                   onChange={(__picked: string) => selectGrnItem(idx, __picked)}
                                   onKeyDown={rateFormulaEnterHandler(rf, rfActive, idx, () => lastPickedMeta.current)}
                                   label={rfActive ? itemPickerLabel : undefined}
+                                  inputId={`grn-item-${idx}`}
                                   style={inp({ padding: "6px 10px" })}
                                   allowManual={false}
                                   placeholder="Type to search — e.g. e1060"
@@ -468,7 +496,7 @@ export default function GRNPage() {
                                   <input type="number" value={row.rate} onChange={e => updateRow(idx, "rate", e.target.value)} readOnly={!rf.rateEditable} title={!rf.rateEditable ? "Worked out by your rate formula" : undefined} placeholder="0.00" style={inp({ padding: "5px 7px", textAlign: "right", ...(rf.rateEditable ? {} : { opacity: 0.75, cursor: "not-allowed" }) })} />
                                 </td>
                               )}
-                              <td style={{ padding: "6px 8px" }}><input value={row.remarks} onChange={e => updateRow(idx, "remarks", e.target.value)} placeholder="Note..." style={inp({ padding: "5px 8px", fontSize: 12 })} /></td>
+                              <td style={{ padding: "6px 8px" }}><input value={row.remarks} onChange={e => updateRow(idx, "remarks", e.target.value)} onKeyDown={e => { if (e.key === "Enter") { e.preventDefault(); e.stopPropagation(); focusItemRow(idx + 1); } }} placeholder="Note..." style={inp({ padding: "5px 8px", fontSize: 12 })} /></td>
                               <td style={{ padding: "6px 8px" }}><button onClick={() => setRows(rows.filter((_, i) => i !== idx))} disabled={rows.length === 1} style={{ background: "none", border: "none", cursor: "pointer", color: "#f87171", fontSize: 16, padding: 0, opacity: rows.length === 1 ? 0.3 : 1 }}>×</button></td>
                             </tr>
                           );
