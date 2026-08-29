@@ -767,9 +767,13 @@ function SalesInvoiceContent() {
       : [
           { key: "no", label: "#", align: "center" as const, width: 26 },
           { key: "name", label: "Description" },
-          ...(rfActive ? rateFormulaPrintColumns(rf) : []),
+          ...(rfActive ? rateFormulaPrintColumns(formulaBeforeQty) : []),
           { key: "qty", label: "Qty", align: "center" as const, width: 46 },
           { key: "unit", label: "Unit", align: "center" as const, width: 46 },
+          // RT/MM is entered after Qty on the grid, so the bill reads it in the
+          // same place: past the count and its unit, right before the rate it
+          // is what produces.
+          ...(rfActive ? rateFormulaPrintColumns(rtmmFormula) : []),
           { key: "rate", label: "Rate", align: "right" as const, width: 68 },
           { key: "amount", label: "Amount", align: "right" as const, width: 80 },
         ],
