@@ -137,7 +137,9 @@ export default function GRNPage() {
 
   function handleSupplierSelect(id: string) {
     setSupplierId(id);
-    const matches = allPosRef.current.filter((p) => p.supplier.id === id);
+    const matches = allPosRef.current.filter((p) =>
+      p.supplier.id === id && !["RECEIVED", "COMPLETED", "CANCELLED"].includes(p.status || "")
+    );
     setPos(matches);
     if (matches.length === 1) handlePOSelect(matches[0].id);
     else {
