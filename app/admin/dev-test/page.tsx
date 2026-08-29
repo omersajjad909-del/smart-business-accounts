@@ -102,7 +102,7 @@ export default function DevTestPage() {
       const launched = await r.json().catch(() => ({} as any));
       window.location.href = launched?.token
         ? `${getAppUrl()}/api/auth/impersonate-handoff?token=${encodeURIComponent(launched.token)}`
-        : `${getAppUrl()}/dashboard`;
+        : "/api/admin/dev-test/open";
     } catch (err) {
       // Never swallow this. The empty catch that used to be here is exactly why
       // clicking Launch appeared to do nothing whatsoever.
@@ -172,7 +172,7 @@ export default function DevTestPage() {
             >
               {clearing ? "Clearing…" : "🗑 Clear All Data"}
             </button>
-            <a href={`${getAppUrl()}/dashboard`} style={{ padding:"7px 16px", borderRadius:8, border:"1px solid rgba(52,211,153,.3)", background:"rgba(52,211,153,.1)", color:"#34d399", fontSize:12, fontWeight:700, textDecoration:"none", display:"flex", alignItems:"center" }}>
+            <a href="/api/admin/dev-test/open" style={{ padding:"7px 16px", borderRadius:8, border:"1px solid rgba(52,211,153,.3)", background:"rgba(52,211,153,.1)", color:"#34d399", fontSize:12, fontWeight:700, textDecoration:"none", display:"flex", alignItems:"center" }}>
               Open Dashboard →
             </a>
           </div>
