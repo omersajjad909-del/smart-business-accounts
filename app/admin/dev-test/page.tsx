@@ -172,7 +172,7 @@ export default function DevTestPage() {
             >
               {clearing ? "Clearing…" : "🗑 Clear All Data"}
             </button>
-            <a href="/dashboard" style={{ padding:"7px 16px", borderRadius:8, border:"1px solid rgba(52,211,153,.3)", background:"rgba(52,211,153,.1)", color:"#34d399", fontSize:12, fontWeight:700, textDecoration:"none", display:"flex", alignItems:"center" }}>
+            <a href={`${getAppUrl()}/dashboard`} style={{ padding:"7px 16px", borderRadius:8, border:"1px solid rgba(52,211,153,.3)", background:"rgba(52,211,153,.1)", color:"#34d399", fontSize:12, fontWeight:700, textDecoration:"none", display:"flex", alignItems:"center" }}>
               Open Dashboard →
             </a>
           </div>
