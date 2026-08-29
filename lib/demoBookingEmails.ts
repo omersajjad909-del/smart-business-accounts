@@ -68,7 +68,7 @@ export async function sendBookingConfirmation(booking: {
       </td></tr>
       <tr><td style="padding:0 18px 16px">
         <div style="font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:#6b7280;font-weight:700;margin-bottom:4px">Duration</div>
-        <div style="font-size:14px;color:#111827">30 minutes</div>
+        <div style="font-size:14px;color:#111827">1 hour</div>
       </td></tr>
     </table>
 

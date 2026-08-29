@@ -3,7 +3,7 @@ import { prisma } from "@/lib/prisma";
 
 const BUSINESS_HOURS_START = 9;
 const BUSINESS_HOURS_END = 18;
-const SLOT_MINUTES = 30;
+const SLOT_MINUTES = 60;
 
 function buildSlots(dateStr: string): { start: Date; end: Date; label: string }[] {
   const [y, m, d] = dateStr.split("-").map(Number);

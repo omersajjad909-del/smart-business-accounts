@@ -29,7 +29,7 @@ const DEMO_USER_NAME = "Demo User";
 const DEMO_ROLE = "ADMIN";
 
 /** How long a demo session lasts. Matches the booking slot length. */
-export const DEMO_SESSION_MINUTES = 30;
+export const DEMO_SESSION_MINUTES = 60;
 
 /**
  * Ceiling on live sandboxes. Not a capacity limit — each sandbox is only a few

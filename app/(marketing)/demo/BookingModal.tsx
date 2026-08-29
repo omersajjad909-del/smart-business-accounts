@@ -133,7 +133,7 @@ export default function BookingModal({
             </div>
             <div style={{ fontSize: 20, fontWeight: 900, letterSpacing: -0.4 }}>{businessLabel}</div>
             <div style={{ fontSize: 12, color: "rgba(255,255,255,.5)", marginTop: 4 }}>
-              30-minute session · Test data will be reset after
+              1-hour session · Test data will be reset after
             </div>
           </div>
           <button onClick={onClose} aria-label="Close" style={{
@@ -160,7 +160,7 @@ export default function BookingModal({
               — {new Date(confirmed.slotEnd).toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit" })}.
             </div>
             <div style={{ padding: "14px 16px", borderRadius: 12, background: "rgba(99,102,241,.08)", border: "1px solid rgba(99,102,241,.2)", fontSize: 12.5, color: "rgba(255,255,255,.65)", lineHeight: 1.7, marginBottom: 20 }}>
-              Save the access link below — you&apos;ll use it at your booked time to enter the demo workspace. The demo automatically ends after 30 minutes and all test data is deleted.
+              Save the access link below — you&apos;ll use it at your booked time to enter the demo workspace. The demo automatically ends after 1 hour and all test data is deleted.
             </div>
             <div style={{ padding: "12px 14px", borderRadius: 10, background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.08)", fontSize: 12, color: "rgba(255,255,255,.7)", fontFamily: "monospace", wordBreak: "break-all", marginBottom: 16 }}>
               {typeof window !== "undefined" ? `${window.location.origin}${startLink}` : startLink}
@@ -222,7 +222,7 @@ export default function BookingModal({
 
             {/* Slots */}
             <div style={{ fontSize: 11, fontWeight: 800, color: "rgba(255,255,255,.5)", textTransform: "uppercase", letterSpacing: ".07em", marginBottom: 10 }}>
-              Pick a 30-minute slot
+              Pick a 1-hour slot
             </div>
             {slotsLoading ? (
               <div style={{ padding: "40px 20px", textAlign: "center", color: "rgba(255,255,255,.35)", fontSize: 13 }}>
@@ -310,7 +310,7 @@ export default function BookingModal({
             </button>
 
             <div style={{ fontSize: 11, color: "rgba(255,255,255,.35)", textAlign: "center", marginTop: 14, lineHeight: 1.6 }}>
-              You&apos;ll get an instant access link. The demo runs for exactly 30 minutes and all test data resets afterwards.
+              You&apos;ll get an instant access link. The demo runs for exactly 1 hour and all test data resets afterwards.
             </div>
           </div>
         )}

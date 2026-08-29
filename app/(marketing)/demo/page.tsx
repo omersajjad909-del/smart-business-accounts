@@ -11,7 +11,7 @@ const FONT = "'Outfit','Inter',sans-serif";
 // uses the same pair but lands in their own sandbox.
 const DEMO_EMAIL = "demo@finovaos.app";
 const DEMO_PASSWORD = "12345678";
-const DEMO_MINUTES = 30;
+const DEMO_MINUTES = 60;
 
 const BUSINESSES = DEMO_BUSINESSES;
 
@@ -70,7 +70,7 @@ const TRUST_STATS = [
   { value: "7",            label: "Live Demos",       icon: "🏢" },
   { value: "Early Access", label: "Limited Spots",    icon: "🚀" },
   { value: "No signup",    label: "To Start",         icon: "⚡" },
-  { value: "30 min",       label: "Full Access",      icon: "⏱️" },
+  { value: "1 hour",       label: "Full Access",      icon: "⏱️" },
 ];
 
 export default function DemoPage() {
@@ -665,7 +665,7 @@ export default function DemoPage() {
                   <div style={{ marginTop: 18, padding: "16px 18px", borderRadius: 16, background: `${biz.color}10`, border: `1px solid ${biz.color}25` }}>
                     <div style={{ fontSize: 12, fontWeight: 800, color: biz.color, marginBottom: 6 }}>🚀 Want to try it yourself?</div>
                     <div style={{ fontSize: 13, color: "rgba(255,255,255,.55)", lineHeight: 1.6 }}>
-                      Book a 30-minute live session using the button at the top of this page. You&apos;ll get instant access to a real dashboard pre-configured for {biz.label}.
+                      Book a 1-hour live session using the button at the top of this page. You&apos;ll get instant access to a real dashboard pre-configured for {biz.label}.
                     </div>
                   </div>
                 </div>

@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { sendBookingConfirmation } from "@/lib/demoBookingEmails";
 
-const SLOT_MINUTES = 30;
+const SLOT_MINUTES = 60;
 
 const ALLOWED_TYPES = new Set([
   "trading",
