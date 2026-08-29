@@ -260,7 +260,7 @@ export async function POST(req: NextRequest) {
         await tx.bankAccount.update({
           where: { id: bankAccountRecord.id },
           data: {
-            balance: { increment: amountNum },
+            balance: { increment: receiptBase },
           },
         });
 
@@ -270,7 +270,7 @@ export async function POST(req: NextRequest) {
             bankAccountId: bankAccountRecord.id,
             statementNo: `STMT-${Date.now()}`,
             date: new Date(date),
-            amount: amountNum, // Positive for receipt
+            amount: receiptBase, // Positive for receipt
             description: narration || `Receipt ${receiptNo} from ${party.name}`,
             referenceNo: receiptNo,
             isReconciled: true,
@@ -284,7 +284,7 @@ export async function POST(req: NextRequest) {
             bankAccountId: bankAccountRecord.id,
             statementNo: `STMT-${Date.now()}`,
             date: new Date(date),
-            amount: amountNum,
+            amount: receiptBase,
             description: narration || `Cheque ${referenceNo || receiptNo} from ${party.name}`,
             referenceNo: receiptNo,
             isReconciled: false,
@@ -383,9 +383,15 @@ export async function PUT(req: NextRequest) {
           },
         });
         if (stmt?.bankAccount?.id) {
+          // The statement line, not the receipt. `PaymentReceipt.amount` is the
+          // figure on the cheque, in whatever currency it was written; the
+          // statement line was already converted to the company's currency when
+          // the cheque was recorded, and the bank balance is kept in that. Read
+          // back from the receipt and a foreign cheque clears at its face value
+          // into a rupee balance.
           await prisma.bankAccount.update({
             where: { id: stmt.bankAccount.id },
-            data: { balance: { increment: Number(current.amount || 0) } },
+            data: { balance: { increment: Number(stmt.amount || 0) } },
           });
           await prisma.bankStatement.update({
             where: { id: stmt.id },

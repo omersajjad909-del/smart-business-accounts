@@ -414,6 +414,24 @@ export const FIELD_ALIASES: Record<string, string[]> = {
   qty: ["qty", "quantity", "stock", "on hand", "onhand", "closing qty", "closing stock", "balance qty", "quantity on hand", "available qty"],
   location: ["location", "warehouse", "godown", "store", "subinventory", "site"],
 
+  // ── Foreign currency ──
+  //
+  // A document raised in another currency carries two numbers: the one printed
+  // on it, and what that came to in the company's own money. Only the second
+  // belongs in the ledger — see lib/fx.ts — so a file that names a currency has
+  // to name a rate too, or the amount cannot be posted at all.
+  //
+  // "curr" and "ccy" are the two abbreviations every one of these systems uses.
+  // Nothing shorter is listed: a bare "cur" matches "Current Balance".
+  currency: ["currency", "currency code", "curr code", "curr", "ccy", "fx currency", "trx currency", "invoice currency"],
+  // Deliberately not "rate". On an item file "rate" is the selling price, and
+  // on a stock file it is the unit cost; borrowing it here would price an
+  // exchange rate off a product's rate column on any file that has both.
+  fxRate: [
+    "exchange rate", "exchangerate", "fx rate", "conversion rate", "conv rate",
+    "currency rate", "rate of exchange", "roe", "exch rate",
+  ],
+
   invoiceNo: ["invoice no", "invoiceno", "invoice number", "invoice #", "bill no", "billno", "bill number", "doc no", "document number", "trx number", "transaction number", "voucher no", "reference"],
   party: ["customer", "customer name", "supplier", "supplier name", "vendor", "vendor name", "party", "party name", "account name", "bill to", "name"],
   date: ["date", "invoice date", "bill date", "document date", "trx date", "transaction date", "gl date"],
@@ -1305,7 +1323,47 @@ export type OpenDocumentRow = {
   date: Date | null;
   dueDate: Date | null;
   amount: number;
+  /** Blank when the document is in the company's own currency, which is most of them. */
+  currency: string;
+  /** Multiplier onto the company's currency. 1 when there is nothing to convert. */
+  fxRate: number;
 };
+
+/**
+ * The currency a row is written in, and the rate that brings it into the books.
+ *
+ * A migration imports a *position*, so what is written here is the converted
+ * figure and not the foreign one — a receivables ageing has to add up to the
+ * receivables control account on the trial balance, and it cannot do that if
+ * half its rows are in dollars. The original figures stay in the old system,
+ * which stays readable; that is the whole premise of a cutover.
+ *
+ * A currency with no rate beside it is refused rather than assumed to be one.
+ * Assuming par on a dollar invoice understates it by a factor of the rate and
+ * nothing about the resulting number looks wrong.
+ */
+function readCurrency(row: CsvRow): { currency: string; fxRate: number; error?: string } {
+  const currency = field(row, "currency").trim().toUpperCase();
+  const rawRate = field(row, "fxRate").trim();
+  const rate = rawRate ? parseAmount(rawRate) : 0;
+
+  if (!currency && !rawRate) return { currency: "", fxRate: 1 };
+
+  // A rate on its own is honoured: a single-currency export from a system that
+  // prints "1.00" in an exchange-rate column is common and harmless.
+  if (!currency) return { currency: "", fxRate: rate > 0 ? rate : 1 };
+
+  if (!rawRate || rate <= 0) {
+    return {
+      currency, fxRate: 0,
+      error:
+        `Row is in ${currency} but carries no exchange rate. Add a rate column — ` +
+        `what one ${currency} was worth in your own currency on the document's date — ` +
+        `or convert the amounts before importing.`,
+    };
+  }
+  return { currency, fxRate: rate };
+}
 
 export function readOpenDocumentRow(row: CsvRow, kind: "invoice" | "bill"): {
   value: OpenDocumentRow;
@@ -1318,10 +1376,15 @@ export function readOpenDocumentRow(row: CsvRow, kind: "invoice" | "bill"): {
   const date = parseImportDate(rawDate);
   const dueDate = parseImportDate(field(row, "dueDate"));
   const amount = parseAmount(field(row, "amount"));
+  const fx = readCurrency(row);
 
-  const value: OpenDocumentRow = { docNo, party, date, dueDate, amount };
+  const value: OpenDocumentRow = {
+    docNo, party, date, dueDate, amount,
+    currency: fx.currency, fxRate: fx.fxRate,
+  };
 
   const label = kind === "invoice" ? "invoice" : "bill";
+  if (fx.error) return { value, error: fx.error };
   if (!docNo) return { value, error: `No ${label} number in this row` };
   if (!party) return { value, error: `No ${kind === "invoice" ? "customer" : "supplier"} in this row` };
   if (amount === 0) return { value, error: "Outstanding amount is zero — this document is not open" };
