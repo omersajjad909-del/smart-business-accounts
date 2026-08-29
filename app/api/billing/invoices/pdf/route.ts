@@ -1,16 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import {
+  buildBillingInvoicePdfData,
+  verifyBillingInvoiceAccessToken,
+} from "@/lib/billingInvoice";
 import { generateInvoicePdf } from "@/lib/invoicePdf";
 
 export const runtime = "nodejs";
-
-const PLAN_PRICES: Record<string, number> = {
-  STARTER: 49,
-  PROFESSIONAL: 99,
-  PRO: 99,
-  ENTERPRISE: 249,
-  CUSTOM: 0,
-};
 
 async function resolveCompanyId(req: NextRequest): Promise<string | null> {
   const companyId = req.headers.get("x-company-id");
@@ -26,110 +22,43 @@ async function resolveCompanyId(req: NextRequest): Promise<string | null> {
   return user?.defaultCompanyId || null;
 }
 
-function fmtDate(date: Date | string | null | undefined): string {
-  if (!date) return "";
-  const d = typeof date === "string" ? new Date(date) : date;
-  return `${String(d.getDate()).padStart(2, "0")}-${String(d.getMonth() + 1).padStart(2, "0")}-${d.getFullYear()}`;
-}
-
 export async function GET(req: NextRequest): Promise<Response> {
   try {
-    const companyId = await resolveCompanyId(req);
-    if (!companyId) {
-      return NextResponse.json({ error: "Company required" }, { status: 400 });
-    }
-
     const url = new URL(req.url);
     const invoiceId = url.searchParams.get("invoiceId");
     if (!invoiceId) {
       return NextResponse.json({ error: "invoiceId is required" }, { status: 400 });
     }
 
-    if (invoiceId !== `sub_${companyId}`) {
+    // Browser downloads resolve the company through authenticated headers.
+    // Payment-confirmation receipts use a short-lived, invoice-scoped token.
+    const access = verifyBillingInvoiceAccessToken(url.searchParams.get("token") || "");
+    const requestCompanyId = await resolveCompanyId(req);
+    if (access && access.invoiceId !== invoiceId) {
+      return NextResponse.json({ error: "Invoice not found" }, { status: 404 });
+    }
+    if (requestCompanyId && access && requestCompanyId !== access.companyId) {
       return NextResponse.json({ error: "Invoice not found" }, { status: 404 });
     }
 
-    const [company, subscription] = await Promise.all([
-      prisma.company.findUnique({
-        where: { id: companyId },
-        select: {
-          // Company has no address/phone/email/billingCycle fields — selecting
-          // them threw a PrismaClientValidationError on every request, which
-          // this route's catch block silently turned into the generic
-          // "Failed to generate invoice PDF" error. billingCycle lives on
-          // Subscription (already queried below and used as the source).
-          name: true,
-          plan: true,
-          currentPeriodEnd: true,
-          subscriptionStatus: true,
-          createdAt: true,
-        },
-      }),
-      prisma.subscription.findUnique({
-        where: { companyId },
-        select: {
-          plan: true,
-          billingCycle: true,
-          pricePerMonth: true,
-          currentPeriodEnd: true,
-          provider: true,
-        },
-      }),
-    ]);
-
-    if (!company) {
-      return NextResponse.json({ error: "Company not found" }, { status: 404 });
+    const companyId = requestCompanyId || access?.companyId;
+    if (!companyId) {
+      return NextResponse.json({ error: "Company required" }, { status: 400 });
     }
 
-    const effectivePlan = (subscription?.plan || company.plan || "STARTER").toUpperCase();
-    const effectiveBillingCycle = (subscription?.billingCycle || "MONTHLY").toUpperCase();
-    const paidAmount = subscription?.pricePerMonth || PLAN_PRICES[effectivePlan] || 0;
-    const amount = effectiveBillingCycle === "YEARLY" ? Math.round(paidAmount * 12) : paidAmount;
-    const standardBaseAmount = PLAN_PRICES[effectivePlan] || 0;
-    const standardAmount = effectiveBillingCycle === "YEARLY" ? Math.round(standardBaseAmount * 12) : standardBaseAmount;
-    const discount = Math.max(0, standardAmount - amount);
-    const periodEnd = subscription?.currentPeriodEnd || company.currentPeriodEnd || company.createdAt;
-    const invoiceNumber = `INV-${new Date(periodEnd).getFullYear()}-001`;
+    // Shared with the invoice-list route. It supports permanent ledger ids
+    // (`inv_…`) as well as legacy derived ids (`sub_…`).
+    const built = await buildBillingInvoicePdfData(companyId, invoiceId);
+    if (!built) {
+      return NextResponse.json({ error: "Invoice not found" }, { status: 404 });
+    }
 
-    const pdfData = {
-      invoiceNumber,
-      invoiceDate: fmtDate(periodEnd),
-      dueDate: "",
-      companyName: "Finova Forge",
-      companyAddress: "FinovaOS, Business Suite",
-      companyPhone: process.env.SUPPORT_PHONE || "",
-      companyEmail: process.env.SUPPORT_EMAIL || "support@finovaforge.com",
-      customerName: company.name,
-      customerAddress: "",
-      customerPhone: "",
-      items: [
-        {
-          name: `${effectivePlan} subscription (${effectiveBillingCycle.toLowerCase()})`,
-          qty: 1,
-          rate: effectiveBillingCycle === "YEARLY" ? standardAmount : standardBaseAmount,
-          amount: standardAmount,
-        },
-      ],
-      subtotal: standardAmount,
-      tax: 0,
-      discount,
-      total: amount,
-      // pricePerMonth is stored in the currency the provider settles in —
-      // Safepay in PKR, LemonSqueezy/Stripe always in USD. Labelling it with
-      // company.baseCurrency showed "PKR 249" for what was really a $249 charge.
-      currency: subscription?.provider === "SAFEPAY" ? "PKR" : "USD",
-      notes: discount > 0
-        ? "Subscription invoice for FinovaOS hosted billing. Launch offer applied: 50% off for first 3 months."
-        : "Subscription invoice for FinovaOS hosted billing.",
-      status: company.subscriptionStatus?.toUpperCase() === "ACTIVE" ? "PAID" : "OPEN",
-    };
-
-    const pdfBuffer = await generateInvoicePdf(pdfData);
+    const pdfBuffer = await generateInvoicePdf(built.pdfData);
     return new NextResponse(new Uint8Array(pdfBuffer), {
       status: 200,
       headers: {
         "Content-Type": "application/pdf",
-        "Content-Disposition": `attachment; filename="invoice-${invoiceNumber}.pdf"`,
+        "Content-Disposition": `attachment; filename="invoice-${built.invoiceNumber}.pdf"`,
         "Content-Length": String(pdfBuffer.length),
       },
     });
