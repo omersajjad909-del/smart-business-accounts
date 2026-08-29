@@ -1,10 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { resolveCompanyId, resolveBranchId } from "@/lib/tenant";
-
-type Bill = { numType: string; date: Date; narration: string; amount: number };
-
-const EPS = 0.005;
+import { BILL_EPS, billDays, collectPartyBills, settleBills } from "@/lib/billAgeing";
 
 export async function GET(req: NextRequest) {
   try {
@@ -44,75 +41,43 @@ export async function GET(req: NextRequest) {
       orderBy: { voucher: { date: "asc" } },
     });
 
-    const bills: Bill[] = [];
-    let availableCredit = 0;
+    const { bills, credit } = collectPartyBills({
+      entries,
+      // Master opening balance — the same one the ledger carries forward.
+      opening:     Number(customer.openDebit || 0) - Number(customer.openCredit || 0),
+      openingDate: customer.openDate ? new Date(customer.openDate) : null,
+      asOn,
+      side: "RECEIVABLE",
+    });
 
-    // Master opening balance — the same one the ledger carries forward.
-    const opening     = Number(customer.openDebit || 0) - Number(customer.openCredit || 0);
-    const openingDate = customer.openDate ? new Date(customer.openDate) : null;
-    if (!openingDate || openingDate <= asOn) {
-      if (opening > 0) {
-        bills.push({
-          numType:   "---",
-          date:      openingDate ?? (entries[0] ? new Date(entries[0].voucher.date) : asOn),
-          narration: "OPENING BALANCE B/F",
-          amount:    opening,
-        });
-      } else if (opening < 0) {
-        availableCredit += Math.abs(opening);
-      }
-    }
-
-    for (const e of entries) {
-      const amount = Number(e.amount);
-      const v = e.voucher;
-      if (amount > 0) {
-        // Debit on a customer = amount receivable = a bill.
-        bills.push({
-          numType:   v.voucherNo || v.type || "JV",
-          date:      new Date(v.date),
-          narration: v.narration || `Voucher # ${v.voucherNo}`,
-          amount,
-        });
-      } else if (amount < 0) {
-        // Credit = receipt / return — adjusted oldest-bill-first below.
-        availableCredit += Math.abs(amount);
-      }
-    }
-
-    bills.sort((a, b) => a.date.getTime() - b.date.getTime());
+    const { settled, unapplied } = settleBills(bills, credit);
 
     let runningBalance = 0;
     const rows: any[] = [];
 
-    for (const bill of bills) {
-      let billBalance = bill.amount;
-      const applied = Math.min(availableCredit, billBalance);
-      availableCredit -= applied;
-      billBalance     -= applied;
-      if (billBalance <= EPS) continue;
-
-      runningBalance += billBalance;
+    for (const bill of settled) {
+      if (bill.balance <= BILL_EPS) continue;
+      runningBalance += bill.balance;
       rows.push({
         numType:      bill.numType,
         date:         bill.date.toISOString().slice(0, 10),
         narration:    bill.narration,
         billAmount:   bill.amount,
-        billBalance,
-        days:         Math.max(0, Math.floor((asOn.getTime() - bill.date.getTime()) / 86400000)),
+        billBalance:  bill.balance,
+        days:         billDays(bill.date, asOn),
         totalBalance: runningBalance,
       });
     }
 
     // Receipts beyond every bill — shown so the report ties back to the ledger.
-    if (availableCredit > EPS) {
-      runningBalance -= availableCredit;
+    if (unapplied > BILL_EPS) {
+      runningBalance -= unapplied;
       rows.push({
         numType:      "---",
         date:         asOn.toISOString().slice(0, 10),
         narration:    "UNADJUSTED CREDIT / ADVANCE",
-        billAmount:   -availableCredit,
-        billBalance:  -availableCredit,
+        billAmount:   -unapplied,
+        billBalance:  -unapplied,
         days:         0,
         totalBalance: runningBalance,
       });
