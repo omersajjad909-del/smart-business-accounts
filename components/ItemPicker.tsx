@@ -514,6 +514,29 @@ export function ItemPicker({
         }`
       : "minmax(170px, 1fr) minmax(62px, auto) minmax(48px, auto)";
 
+  // ------------------------------------------------------------
+  // Where the panel goes
+  // ------------------------------------------------------------
+
+  const viewportH =
+    typeof window === "undefined" ? 900 : window.innerHeight;
+  const viewportW =
+    typeof window === "undefined" ? 1440 : window.innerWidth;
+
+  const roomBelow = anchor ? viewportH - anchor.bottom - 12 : 0;
+  const roomAbove = anchor ? anchor.top - 12 : 0;
+
+  // Only flip when below is genuinely cramped and above has more room.
+  const dropUp =
+    Boolean(anchor) &&
+    roomBelow < Math.min(pickerHeight, 320) &&
+    roomAbove > roomBelow;
+
+  const panelHeight = Math.max(
+    MIN_HEIGHT,
+    Math.min(pickerHeight, dropUp ? roomAbove : roomBelow)
+  );
+
   return (
     <div
       ref={boxRef}
@@ -556,30 +579,34 @@ export function ItemPicker({
           PICKER
       ---------------------------------------------------- */}
 
-      {open && (
+      {open && anchor && createPortal(
         <div
+          ref={panelRef}
           style={{
-            position: "absolute",
-            zIndex: 60,
-            top: "calc(100% + 4px)",
-            left: 0,
+            position: "fixed",
+            zIndex: 4000,
 
-            minWidth: "100%",
+            // Below the cell when there is room, above it when there isn't.
+            ...(dropUp
+              ? { bottom: viewportH - anchor.top + 4 }
+              : { top: anchor.bottom + 4 }),
 
-            maxWidth:
-              previewFields.length
-                ? "min(1180px, calc(100vw - 40px))"
-                : 520,
+            left: anchor.left,
+
+            minWidth: anchor.width,
+
+            maxWidth: Math.max(
+              320,
+              Math.min(
+                previewFields.length ? 1180 : 520,
+                viewportW - anchor.left - 16
+              )
+            ),
 
             /*
              * THIS IS THE RESIZABLE HEIGHT
              */
-            height: `${pickerHeight}px`,
-
-            minHeight: `${MIN_HEIGHT}px`,
-
-            maxHeight:
-              "calc(100vh - 160px)",
+            height: `${panelHeight}px`,
 
             background:
               "var(--panel-bg, #14161c)",
@@ -1201,7 +1228,8 @@ export function ItemPicker({
               }}
             />
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );
