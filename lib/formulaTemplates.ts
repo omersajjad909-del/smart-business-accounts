@@ -36,7 +36,7 @@ export const FORMULA_TEMPLATES: FormulaTemplate[] = [
       "For anything cut from a roll: PVC and PE bags, laminate pouches, sleeves. Change the stock widths and the density divisor to match your supplier.",
     inputs: [
       { key: "pieceWidth",   label: "Width",        unit: "in", defaultValue: 11.5, askOnRun: true },
-      { key: "pieceLength",  label: "Piece length",       unit: "in", defaultValue: 11,   askOnRun: true },
+      { key: "pieceLength",  label: "Length",       unit: "in", defaultValue: 11,   askOnRun: true },
       // Side/bottom gusset. Defaults to 0 so a plain flat bag costs exactly
       // what it did before this input existed — only jobs that actually have a
       // gusset are affected.
