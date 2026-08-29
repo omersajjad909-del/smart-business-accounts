@@ -86,6 +86,13 @@ export default function GRNPage() {
   const [supplierId, setSupplierId] = useState("");
   const [remarks,    setRemarks]    = useState("");
   const [notes,      setNotes]      = useState("");
+  const [partyBillNo, setPartyBillNo] = useState("");
+  const [purchaseType, setPurchaseType] = useState<"CASH" | "CREDIT">("CREDIT");
+  const [biltyNo, setBiltyNo] = useState("");
+  const [location, setLocation] = useState("");
+  const [cargo, setCargo] = useState("");
+  const [driver, setDriver] = useState("");
+  const [vehicleNo, setVehicleNo] = useState("");
   const emptyRow = (): GRNItem => ({ itemId: "", name: "", orderedQty: "", receivedQty: "", rate: "", remarks: "", ...(rfActive ? { meta: emptyRateFormulaMeta(rf) } : {}) });
   const [rows, setRows] = useState<GRNItem[]>([emptyRow()]);
 
@@ -212,6 +219,7 @@ export default function GRNPage() {
 
   function resetForm() {
     setDate(today); setPoId(""); setSupplierId(""); setRemarks(""); setNotes("");
+    setPartyBillNo(""); setPurchaseType("CREDIT"); setBiltyNo(""); setLocation(""); setCargo(""); setDriver(""); setVehicleNo("");
     setRows([emptyRow()]);
     setPreview(false);
     loadNextGrnNo();
@@ -232,7 +240,7 @@ export default function GRNPage() {
     try {
       const res = await fetch("/api/grn", {
         method: "POST", headers: bh(),
-        body: JSON.stringify({ grnNo, date, poId: poId || null, supplierId, remarks, items: filledItems.map(r => ({ itemId: r.itemId, orderedQty: Number(r.orderedQty) || 0, receivedQty: Number(r.receivedQty), rate: Number(r.rate) || 0, remarks: r.remarks, meta: rfActive ? (r.meta || null) : null })) }),
+        body: JSON.stringify({ grnNo, date, poId: poId || null, supplierId, remarks, partyBillNo, purchaseType, biltyNo, location, cargo, driver, vehicleNo, items: filledItems.map(r => ({ itemId: r.itemId, orderedQty: Number(r.orderedQty) || 0, receivedQty: Number(r.receivedQty), rate: Number(r.rate) || 0, remarks: r.remarks, meta: rfActive ? (r.meta || null) : null })) }),
       });
       if (!res.ok) { const e = await res.json(); throw new Error(e.error || "Failed"); }
       toast.success("GRN saved successfully!");
