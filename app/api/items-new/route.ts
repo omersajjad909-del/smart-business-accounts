@@ -146,7 +146,10 @@ export async function POST(req: NextRequest) {
   } catch (e: any) {
     console.error("ITEMS-NEW POST ERROR:", e);
     if (e.code === "P2002") {
-      return NextResponse.json({ error: "Barcode or Code already exists" }, { status: 400 });
+      return NextResponse.json(
+        { error: "This barcode is already used by another item in your company" },
+        { status: 400 },
+      );
     }
     return NextResponse.json({ error: e.message || "Save failed" }, { status: 500 });
   }
