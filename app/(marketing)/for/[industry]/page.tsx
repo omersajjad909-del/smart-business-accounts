@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
+import { formatFromUSD } from "@/lib/currency-client";
 
 interface BizType {
   id: string; label: string; icon: string;
@@ -1019,8 +1020,7 @@ export default function IndustryPage() {
   }
 
   function fmtPrice(usd:number) {
-    try { const { formatFromUSD } = require("@/lib/currency"); return formatFromUSD(usd,currency); }
-    catch { return `$${usd}`; }
+    return formatFromUSD(usd, currency);
   }
 
   const ff = "'Outfit','DM Sans',sans-serif";
