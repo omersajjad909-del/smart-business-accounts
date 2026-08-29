@@ -1158,7 +1158,7 @@ function SalesInvoiceContent() {
                                   )}
                                   <td style={{ padding: "13px 6px", fontSize: 12, color: "var(--text-muted)", width: 54, borderTop: "1px solid var(--border)", borderBottom: "1px solid var(--border)" }}>{r.unit || "—"}</td>
                                   <td style={{ padding: "13px 6px", width: 96, minWidth: 88, borderTop: "1px solid var(--border)", borderBottom: "1px solid var(--border)" }}>
-                                    <input id={`sales-invoice-qty-${i}`} type="number" style={{ ...inputStyle, padding: "12px 11px", textAlign: "right", fontSize: 14.5, fontWeight: 700 }} value={r.qty} onChange={e => updateRow(i, "qty", e.target.value)} onKeyDown={e => moveQtyFocusToRtmm(e, i)} placeholder="0" />
+                                    <input id={`sales-invoice-qty-${i}`} type="number" style={{ ...inputStyle, padding: "6px 7px", textAlign: "right", fontSize: 13, fontWeight: 700 }} value={r.qty} onChange={e => updateRow(i, "qty", e.target.value)} onKeyDown={e => moveQtyFocusToRtmm(e, i)} placeholder="0" />
                                   </td>
                                   {rfActive && rtmmFormula.fields.length > 0 && (
                                     <RateFormulaRowCells settings={rtmmFormula} meta={r.meta} rowIndex={i} onChange={(key, value) => updateRowMeta(i, key, value)} />

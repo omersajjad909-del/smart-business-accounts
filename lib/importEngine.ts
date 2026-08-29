@@ -227,7 +227,7 @@ export const IMPORT_DATA_TYPES: ImportDataTypeDef[] = [
     name: "Open Sales Invoices",
     icon: "🧾",
     desc: "Unpaid customer invoices, so receivables ageing works from day one",
-    template: ["invoiceNo", "customer", "date", "dueDate", "amount"],
+    template: ["invoiceNo", "customer", "date", "dueDate", "amount", "currency", "fxRate"],
     required: ["invoiceNo", "customer"],
     order: 7,
     why: "Ageing needs the individual bills, not just the party total.",
@@ -237,7 +237,7 @@ export const IMPORT_DATA_TYPES: ImportDataTypeDef[] = [
     name: "Open Purchase Bills",
     icon: "📄",
     desc: "Unpaid supplier bills, so payables ageing works from day one",
-    template: ["billNo", "supplier", "date", "dueDate", "amount"],
+    template: ["billNo", "supplier", "date", "dueDate", "amount", "currency", "fxRate"],
     required: ["billNo", "supplier"],
     order: 8,
     why: "Same as above, on the payables side.",
@@ -247,7 +247,7 @@ export const IMPORT_DATA_TYPES: ImportDataTypeDef[] = [
     name: "Party Ledger History",
     icon: "📜",
     desc: "Years of CRV / CPV / SV rows from a party's old ledger, posted as real vouchers",
-    template: ["party", "code", "date", "voucherNo", "voucherType", "narration", "debit", "credit"],
+    template: ["party", "code", "date", "voucherNo", "voucherType", "narration", "debit", "credit", "currency", "fxRate"],
     required: ["date"],
     order: 9,
     why: "Brings the old system's transactions into the ledger, so vouchers you write from today carry on from them.",
@@ -1088,6 +1088,10 @@ export type LedgerHistoryRow = {
   balanceAfter: number | null;
   /** The B/F line at the top, which sets the account's opening rather than posting. */
   isOpening: boolean;
+  /** Blank when the ledger is in the company's own currency. */
+  currency: string;
+  /** Multiplier onto the company's currency. 1 when there is nothing to convert. */
+  fxRate: number;
 };
 
 const OPENING_MARKERS = [
@@ -1160,10 +1164,13 @@ export function readLedgerHistoryRow(row: CsvRow, line = 0): {
     else credit = Math.abs(balanceAfter);
   }
 
+  const fx = readCurrency(row);
   const value: LedgerHistoryRow = {
     party, partyCode, date, voucherNo, voucherType, narration,
     debit, credit, balanceAfter, isOpening,
+    currency: fx.currency, fxRate: fx.fxRate,
   };
+  if (fx.error) return { value, error: fx.error };
 
   // An undated B/F line still carries the number that matters, and the party
   // master keeps its existing openDate. A transaction without a date cannot be

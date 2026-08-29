@@ -51,6 +51,9 @@ const ALSO_READ: Partial<Record<string, string[]>> = {
   ledger_history: ["balance", "party"],
 };
 
+/** Columns worth calling out on the page even though they are rarely present. */
+const FX_TYPES = new Set(["open_invoices", "open_bills", "ledger_history"]);
+
 function Pill({ children, tone }: { children: React.ReactNode; tone?: "required" | "plain" }) {
   return (
     <span style={{
@@ -161,6 +164,23 @@ function TypeBlock({ def, isMobile }: { def: ImportDataTypeDef; isMobile: boolea
           </tbody>
         </table>
       </div>
+
+      {FX_TYPES.has(def.id) && (
+        <div style={{
+          padding: "12px 18px", borderTop: "1px solid var(--border)",
+          background: "rgba(99,102,241,.06)",
+          fontSize: 11.5, color: "var(--text-muted)", lineHeight: 1.7,
+        }}>
+          <b style={{ color: "var(--text-primary)" }}>Foreign currency.</b> If some rows were
+          raised in another currency, add a <code style={{ fontFamily: MONO }}>currency</code> and
+          an <code style={{ fontFamily: MONO }}>fxRate</code> column. The amount is converted at
+          that rate before it reaches your books, so the ageing still agrees with the control
+          account on your trial balance; the original figure is written into the document&rsquo;s
+          notes. A row that names a currency with no rate beside it is refused rather than posted
+          at par — assuming par understates a dollar figure by the whole exchange rate and nothing
+          about the result looks wrong.
+        </div>
+      )}
 
       {extras.length > 0 && (
         <div style={{

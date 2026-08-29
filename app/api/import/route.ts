@@ -50,6 +50,7 @@ import {
   type LedgerHistoryRow,
 } from "@/lib/importEngine";
 import { WHOLE_FILE_TYPES } from "@/lib/importChunker";
+import { toBase } from "@/lib/fx";
 
 /**
  * Long enough for the largest slice the wizard will send, and inside what every
@@ -738,16 +739,28 @@ async function writeLedgerHistory(
     if (carriedOver) {
       // Nothing to decide, and nothing to write to the account.
     } else if (openingRows.length > 0) {
-      openDebit = openingRows[0].value.debit;
-      openCredit = openingRows[0].value.credit;
+      // Converted, like every other figure that reaches the ledger. A dollar
+      // ledger's brought-forward line is a dollar figure; written to the
+      // account as it stands it would set the opening balance to a two-hundred-
+      // and-eightieth of what the party actually owed.
+      const openRate = openingRows[0].value.fxRate;
+      openDebit = toBase(openingRows[0].value.debit, openRate);
+      openCredit = toBase(openingRows[0].value.credit, openRate);
       openDate = openingRows[0].value.date ?? undefined;
     } else if (firstPosting && firstPosting.balanceAfter !== null) {
       // No B/F line — which is normal for a ledger run from the account's
       // inception — but the running balance column answers the same question:
       // the balance after the first posting, less that posting itself. An
       // account opened inside the period comes out at zero, which is right.
-      const before = Number(
-        (firstPosting.balanceAfter - (firstPosting.debit - firstPosting.credit)).toFixed(2),
+      // Worked out in the ledger's own currency first, then converted once —
+      // the balance column and the posting beside it are both foreign figures,
+      // and subtracting a converted amount from an unconverted balance would
+      // give a number that is neither.
+      const before = toBase(
+        Number(
+          (firstPosting.balanceAfter - (firstPosting.debit - firstPosting.credit)).toFixed(2),
+        ),
+        firstPosting.fxRate,
       );
       openDebit = before > 0 ? before : 0;
       openCredit = before < 0 ? -before : 0;
@@ -801,7 +814,9 @@ async function writeLedgerHistory(
 
       // A row carrying both sides is a formatting artefact rather than a contra
       // entry — the net is what the old ledger's running balance moved by.
-      const amount = Number((v.debit - v.credit).toFixed(2));
+      // Netted in the ledger's own currency, then converted once, so the two
+      // legs of the entry below are the same number with opposite signs.
+      const amount = toBase(Number((v.debit - v.credit).toFixed(2)), v.fxRate);
       if (amount === 0) {
         outcome.skipped += 1;
         note(outcome, row.line, "Debit and credit cancel out — nothing to post");
@@ -936,6 +951,16 @@ async function writeOpenDocuments(
       note(outcome, row.line, `${v.docNo} already exists`);
       continue;
     }
+    // Stored converted, not as the document was written. Ageing has to add up
+    // to the receivables control account on the trial balance, and it cannot do
+    // that with dollars and rupees in the same column. What the document said
+    // is recorded in the note, so nobody has to go back to the old system to
+    // find out why a figure is what it is.
+    const total = toBase(v.amount, v.fxRate);
+    const origin = v.currency
+      ? `Opening balance — migrated from previous system. Raised as ${v.currency} ${v.amount.toLocaleString("en-US")} at ${v.fxRate}.`
+      : "Opening balance — migrated from previous system";
+
     try {
       if (kind === "invoice") {
         await prisma.salesInvoice.create({
@@ -944,10 +969,10 @@ async function writeOpenDocuments(
             invoiceNo: v.docNo,
             date: v.date,
             dueDate: v.dueDate,
-            total: v.amount,
+            total,
             customerId: hit.id,
             approvalStatus: "APPROVED",
-            notes: "Opening balance — migrated from previous system",
+            notes: origin,
             reference: v.docNo,
           },
         });
@@ -958,10 +983,10 @@ async function writeOpenDocuments(
             invoiceNo: v.docNo,
             date: v.date,
             dueDate: v.dueDate,
-            total: v.amount,
+            total,
             supplierId: hit.id,
             approvalStatus: "APPROVED",
-            notes: "Opening balance — migrated from previous system",
+            notes: origin,
             reference: v.docNo,
           },
         });

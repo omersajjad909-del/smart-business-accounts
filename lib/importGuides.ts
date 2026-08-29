@@ -834,6 +834,8 @@ export const FIELD_NOTES: Record<string, string> = {
   amount: "The amount still outstanding — not the original invoice total, unless nothing has been paid against it.",
   voucherNo: "The voucher number on a ledger row. Kept apart from the invoice number on purpose: a ledger prints both, and the voucher is the one that identifies the posting.",
   voucherType: "CRV, CPV, SV, GPV, JV — the letters that say where the other half of the entry came from. Without one, the other side goes to suspense.",
+  currency: "The currency the document was raised in — USD, EUR, AED. Leave it out when the file is already in your own currency, which is the usual case. A row that names a currency must carry a rate beside it, or it is refused rather than posted at par.",
+  fxRate: "What one unit of that currency was worth in your own, on the document's date — 280 for a USD document in a PKR company. The amount is converted at this rate before it reaches the ledger, so receivables ageing still adds up to the receivables account on the trial balance. The original figure is kept in the document's notes.",
   narration: "Particulars, description or remarks against a ledger row.",
   gauge: "PVC roll gauge. One of the five dimensions the rate formula prices a line from.",
   dimWidth: "Roll width.",
