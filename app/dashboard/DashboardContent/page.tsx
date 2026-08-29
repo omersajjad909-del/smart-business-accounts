@@ -42,8 +42,18 @@ interface DashStats {
     description: string;
     amount: number;
     date: string;
+    status?: "PAID" | "PARTIAL" | "UNPAID";
   }[];
 }
+// A bill is only "Paid" once receipts on the party account cover it — the
+// dashboard-summary route works that out from the ledger. Anything without a
+// status (an older cached payload) is left unlabelled rather than guessed at.
+const PAY_STATUS = {
+  PAID:    { label: "Paid",    bg: "rgba(16,185,129,.12)",  color: "#10b981" },
+  PARTIAL: { label: "Partial", bg: "rgba(251,191,36,.12)",  color: "#fbbf24" },
+  UNPAID:  { label: "Unpaid",  bg: "rgba(248,113,113,.12)", color: "#f87171" },
+} as const;
+
 interface ChartPoint {
   label: string;
   Revenue: number;
@@ -2362,15 +2372,20 @@ export default function DashboardContent() {
                         marginTop: 2,
                       }}
                     >
-                      {tx.date} ·{" "}
-                      <span
-                        style={{
-                          color: isInv ? "#10b981" : "#f87171",
-                          fontWeight: 600,
-                        }}
-                      >
-                        {isInv ? "Received" : "Paid"}
-                      </span>
+                      {tx.date}
+                      {tx.status && PAY_STATUS[tx.status] ? (
+                        <>
+                          {" · "}
+                          <span
+                            style={{
+                              color: PAY_STATUS[tx.status].color,
+                              fontWeight: 600,
+                            }}
+                          >
+                            {PAY_STATUS[tx.status].label}
+                          </span>
+                        </>
+                      ) : null}
                     </div>
                   </div>
                   {/* Amount */}
@@ -2755,12 +2770,13 @@ export default function DashboardContent() {
                       borderRadius: 20,
                       fontSize: 10,
                       fontWeight: 700,
-                      background: "rgba(16,185,129,.12)",
-                      color: "#10b981",
+                      background: PAY_STATUS[tx.status ?? "UNPAID"].bg,
+                      color: PAY_STATUS[tx.status ?? "UNPAID"].color,
                       display: "inline-block",
+                      textAlign: "center",
                     }}
                   >
-                    Paid
+                    {PAY_STATUS[tx.status ?? "UNPAID"].label}
                   </span>
                 </div>
               );

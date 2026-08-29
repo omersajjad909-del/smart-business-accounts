@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { resolveCompanyId, resolveBranchId } from "@/lib/tenant";
 import { Prisma } from "@prisma/client";
+import { billStatus, collectPartyBills, settleBills } from "@/lib/billAgeing";
 
 // Helper: SUM of invoices with currency conversion via CurrencyTransaction
 // Uses COALESCE: if a CurrencyTransaction exists → amountInBase; else → total (already base currency)
@@ -217,13 +218,13 @@ export async function GET(req: NextRequest) {
         where: { companyId, deletedAt: null, ...(branchId ? { branchId } : {}) },
         orderBy: { createdAt: "desc" },
         take: 5,
-        select: { id: true, invoiceNo: true, total: true, createdAt: true },
+        select: { id: true, invoiceNo: true, total: true, createdAt: true, customerId: true },
       }),
       prisma.purchaseInvoice.findMany({
         where: { companyId, deletedAt: null, ...(branchId ? { branchId } : {}) },
         orderBy: { createdAt: "desc" },
         take: 3,
-        select: { id: true, invoiceNo: true, total: true, createdAt: true },
+        select: { id: true, invoiceNo: true, total: true, createdAt: true, supplierId: true },
       }),
     ]);
 
@@ -240,19 +241,93 @@ export async function GET(req: NextRequest) {
       : [];
     const ctMap = new Map(recentCurrencies.map((c) => [c.transactionId, c.amountInBase]));
 
+    // Payment status is not a column on the invoice — a bill is settled by a
+    // CRV/CPV landing on the same party account, so the ledger is the only
+    // place that knows. Settle each party's bills oldest-first (the rule the
+    // ageing report uses) and read the balance off the invoice's own voucher.
+    // The row used to say "Paid" no matter what.
+    const partyIds = Array.from(
+      new Set(
+        [
+          ...recentSales.map((s) => s.customerId),
+          ...recentPurchases.map((p) => p.supplierId),
+        ].filter(Boolean) as string[],
+      ),
+    );
+
+    const [partyAccounts, partyEntries] = partyIds.length
+      ? await Promise.all([
+          prisma.account.findMany({
+            where: { id: { in: partyIds }, companyId },
+            select: { id: true, openDebit: true, openCredit: true, openDate: true },
+          }),
+          prisma.voucherEntry.findMany({
+            where: {
+              accountId: { in: partyIds },
+              voucher: { companyId, ...(branchId ? { branchId } : {}) },
+            },
+            include: {
+              voucher: { select: { date: true, voucherNo: true, narration: true, type: true } },
+            },
+            orderBy: { voucher: { date: "asc" } },
+          }),
+        ])
+      : [[], []];
+
+    const asOnNow = new Date();
+    // partyId → invoiceNo → outstanding balance on that bill
+    const balanceByParty = new Map<string, Map<string, number>>();
+
+    for (const account of partyAccounts) {
+      const entries = partyEntries.filter((e) => e.accountId === account.id);
+      const isCustomer = recentSales.some((s) => s.customerId === account.id);
+      const master = Number(account.openDebit || 0) - Number(account.openCredit || 0);
+
+      const { bills, credit } = collectPartyBills({
+        entries,
+        opening: isCustomer ? master : -master,
+        openingDate: account.openDate ? new Date(account.openDate) : null,
+        asOn: asOnNow,
+        side: isCustomer ? "RECEIVABLE" : "PAYABLE",
+      });
+
+      const { settled } = settleBills(bills, credit);
+      const byNo = new Map<string, number>();
+      for (const bill of settled) {
+        byNo.set(bill.numType, (byNo.get(bill.numType) ?? 0) + bill.balance);
+      }
+      balanceByParty.set(account.id, byNo);
+    }
+
+    // An invoice posts its voucher under voucherNo = invoiceNo.
+    const statusOf = (partyId: string | null, invoiceNo: string, amount: number) => {
+      const byNo = partyId ? balanceByParty.get(partyId) : undefined;
+      const balance = byNo?.get(invoiceNo);
+      if (balance === undefined) return "UNPAID";
+      return billStatus(amount, balance);
+    };
+
     const recentActivity = [
-      ...recentSales.map((s) => ({
-        type: "invoice",
-        description: `Sales Invoice ${s.invoiceNo}`,
-        amount: Number(ctMap.get(s.id) ?? s.total ?? 0),
-        date: s.createdAt.toISOString().slice(0, 10),
-      })),
-      ...recentPurchases.map((p) => ({
-        type: "purchase",
-        description: `Purchase Invoice ${p.invoiceNo}`,
-        amount: Number(ctMap.get(p.id) ?? p.total ?? 0),
-        date: p.createdAt.toISOString().slice(0, 10),
-      })),
+      ...recentSales.map((s) => {
+        const amount = Number(ctMap.get(s.id) ?? s.total ?? 0);
+        return {
+          type: "invoice",
+          description: `Sales Invoice ${s.invoiceNo}`,
+          amount,
+          date: s.createdAt.toISOString().slice(0, 10),
+          status: statusOf(s.customerId, s.invoiceNo, amount),
+        };
+      }),
+      ...recentPurchases.map((p) => {
+        const amount = Number(ctMap.get(p.id) ?? p.total ?? 0);
+        return {
+          type: "purchase",
+          description: `Purchase Invoice ${p.invoiceNo}`,
+          amount,
+          date: p.createdAt.toISOString().slice(0, 10),
+          status: statusOf(p.supplierId, p.invoiceNo, amount),
+        };
+      }),
     ]
       .sort((a, b) => b.date.localeCompare(a.date))
       .slice(0, 8);
