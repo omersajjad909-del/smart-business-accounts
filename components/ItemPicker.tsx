@@ -9,6 +9,7 @@
  */
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { itemMatches, itemSearchKeys } from "@/lib/itemSearch";
 
 export type PickerItem = {
@@ -101,6 +102,19 @@ export function ItemPicker({
 
   const boxRef = useRef<HTMLDivElement>(null);
   const listRef = useRef<HTMLDivElement>(null);
+  const panelRef = useRef<HTMLDivElement>(null);
+
+  /*
+   * The picker is rendered into <body> and positioned by hand: the line
+   * grid it sits in clips overflow, so an absolutely positioned panel was
+   * being cut down to its first row.
+   */
+  const [anchor, setAnchor] = useState<{
+    top: number;
+    left: number;
+    bottom: number;
+    width: number;
+  } | null>(null);
 
   const selected = useMemo(
     () =>
@@ -247,6 +261,39 @@ export function ItemPicker({
   }, [query]);
 
   // ------------------------------------------------------------
+  // Track the input's position on screen
+  // ------------------------------------------------------------
+
+  useEffect(() => {
+    if (!open) return;
+
+    const measure = () => {
+      const el = boxRef.current;
+      if (!el) return;
+
+      const r = el.getBoundingClientRect();
+
+      setAnchor({
+        top: r.top,
+        left: r.left,
+        bottom: r.bottom,
+        width: r.width,
+      });
+    };
+
+    measure();
+
+    // Capture phase: the invoice grid scrolls inside its own panel.
+    window.addEventListener("scroll", measure, true);
+    window.addEventListener("resize", measure);
+
+    return () => {
+      window.removeEventListener("scroll", measure, true);
+      window.removeEventListener("resize", measure);
+    };
+  }, [open]);
+
+  // ------------------------------------------------------------
   // Close when clicking outside
   // ------------------------------------------------------------
 
@@ -254,11 +301,12 @@ export function ItemPicker({
     if (!open) return;
 
     const away = (e: MouseEvent) => {
+      const target = e.target as Node;
+
       if (
         boxRef.current &&
-        !boxRef.current.contains(
-          e.target as Node
-        )
+        !boxRef.current.contains(target) &&
+        !panelRef.current?.contains(target)
       ) {
         setOpen(false);
       }
