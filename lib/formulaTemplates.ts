@@ -50,7 +50,8 @@ export const FORMULA_TEMPLATES: FormulaTemplate[] = [
       { key: "cutMax",       label: "Cutting range — max", unit: "in", defaultValue: 50 },
       { key: "cutAllowance", label: "Allowance per cut",  unit: "in", defaultValue: 0.75 },
       { key: "densityDiv",   label: "Weight divisor",     unit: "",   defaultValue: 54 },
-      { key: "labour",       label: "Labour per piece",   unit: "Rs", defaultValue: 3, askOnRun: true },
+      { key: "labour",       label: "Labour",             unit: "Rs", defaultValue: 3, askOnRun: true },
+      { key: "buttonTape",   label: "Button / Tape",      unit: "Rs", defaultValue: 0, askOnRun: true },
       { key: "orderQty",     label: "Order quantity",     unit: "pcs", defaultValue: 10000, askOnRun: true },
     ],
     steps: [
@@ -64,7 +65,9 @@ export const FORMULA_TEMPLATES: FormulaTemplate[] = [
       { key: "rollInches",  label: "Roll length",     expression: "convert(rollLength, m, in)", unit: "in" },
       { key: "repeats",     label: "Repeats per roll",expression: "floor(rollInches / (cutLength + cutAllowance))" },
       { key: "piecesPerRoll", label: "Pieces per roll", expression: "repeats * acrossCount * lengthFactor", unit: "pcs" },
-      { key: "rollCost",    label: "Roll cost",       expression: "materialRate * gauge * rollWidth * rollLength / densityDiv", unit: "Rs" },
+      // Button/tape is an extra cost for each roll, so it is included before
+      // the roll cost is divided down to a per-piece and order cost.
+      { key: "rollCost",    label: "Roll cost",       expression: "materialRate * gauge * rollWidth * rollLength / densityDiv + buttonTape", unit: "Rs" },
       { key: "materialPerPc", label: "Material per piece", expression: "rollCost / piecesPerRoll", unit: "Rs" },
       { key: "costPerPc",   label: "Cost per piece",  expression: "materialPerPc + labour", unit: "Rs" },
       { key: "rollsNeeded", label: "Rolls required",  expression: "orderQty / piecesPerRoll" },
