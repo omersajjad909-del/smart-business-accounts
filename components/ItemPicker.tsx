@@ -153,10 +153,54 @@ export function ItemPicker({
   useEffect(() => {
     if (!open) return;
     const away = (e: MouseEvent) => {
-      if (boxRef.current && !boxRef.current.contains(e.target as Node)) setOpen(false);
+      const t = e.target as Node;
+      // The list is portalled to <body>, so it is no longer a descendant of
+      // boxRef — without this second check every click inside the dropdown
+      // would close it before the row could be picked.
+      if (boxRef.current?.contains(t)) return;
+      if (listRef.current?.contains(t)) return;
+      setOpen(false);
     };
     document.addEventListener("mousedown", away);
     return () => document.removeEventListener("mousedown", away);
+  }, [open]);
+
+  /**
+   * Where to draw the list, in viewport coordinates.
+   *
+   * The list used to be `position: absolute` inside the row. Every document's
+   * item table is wrapped in `overflowX: "auto"` so a wide grid can scroll
+   * sideways — and CSS resolves the other axis to `auto` alongside it, so that
+   * wrapper clipped the dropdown to the height of one table row. The wrapper
+   * has been flipped between `visible`, `hidden` and `auto` three times trying
+   * to have both; portalling to <body> is what actually gives both, because the
+   * list is no longer inside the scroll container to be clipped by.
+   */
+  const [anchor, setAnchor] = useState<{ left: number; width: number; below: number; above: number; top: number; bottom: number } | null>(null);
+
+  useEffect(() => {
+    if (!open) { setAnchor(null); return; }
+    const measure = () => {
+      const el = boxRef.current;
+      if (!el) return;
+      const r = el.getBoundingClientRect();
+      setAnchor({
+        left: r.left,
+        width: r.width,
+        top: r.bottom + 4,
+        bottom: window.innerHeight - r.top + 4,
+        below: window.innerHeight - r.bottom - 16,
+        above: r.top - 16,
+      });
+    };
+    measure();
+    // Capture phase: the table's own scroll container also has to move the list.
+    window.addEventListener("scroll", measure, true);
+    window.addEventListener("resize", measure);
+    return () => {
+      window.removeEventListener("scroll", measure, true);
+      window.removeEventListener("resize", measure);
+    };
   }, [open]);
 
   // Keeps the highlighted row in view when it is walked past the fold.
