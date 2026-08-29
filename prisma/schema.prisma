@@ -1814,6 +1814,13 @@ model GoodsReceiptNote {
   supplier   Account        @relation("GRNSupplier", fields: [supplierId], references: [id])
 
   remarks String?
+  partyBillNo String?
+  purchaseType String? // CASH | CREDIT
+  biltyNo String?
+  location String?
+  cargo String?
+  driver String?
+  vehicleNo String?
   status  String  @default("DRAFT") // DRAFT | RECEIVED | PARTIAL | CANCELLED
 
   items GoodsReceiptNoteItem[]

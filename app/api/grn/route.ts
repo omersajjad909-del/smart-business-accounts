@@ -53,7 +53,7 @@ export async function POST(req: NextRequest) {
   const branchId = await resolveBranchIdOrDefault(req, companyId);
   const userId = req.headers.get("x-user-id") || undefined;
 
-  const { grnNo, date, poId, supplierId, items, remarks } = await req.json();
+  const { grnNo, date, poId, supplierId, items, remarks, partyBillNo, purchaseType, biltyNo, location, cargo, driver, vehicleNo } = await req.json();
 
   if (!grnNo || !date || !supplierId || !items?.length) {
     return NextResponse.json({ error: "GRN No, date, supplier, and items required" }, { status: 400 });
@@ -72,6 +72,13 @@ export async function POST(req: NextRequest) {
         poId: poId || null,
         supplierId,
         remarks,
+        partyBillNo: partyBillNo || null,
+        purchaseType: purchaseType === "CASH" || purchaseType === "CREDIT" ? purchaseType : null,
+        biltyNo: biltyNo || null,
+        location: location || null,
+        cargo: cargo || null,
+        driver: driver || null,
+        vehicleNo: vehicleNo || null,
         status: "RECEIVED",
         createdBy: userId,
         items: {
