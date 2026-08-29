@@ -234,7 +234,7 @@ export function ItemPicker({
             // Shrink-to-fit up to the ceiling: the box takes only what the
             // longest name asks for, and stops short of the window edge.
             maxWidth: previewFields.length ? "min(1180px, calc(100vw - 40px))" : 520,
-            maxHeight: 420, overflowY: "auto",
+            maxHeight: "min(620px, calc(100vh - 160px))", overflowY: "auto",
             background: "var(--panel-bg, #14161c)",
             border: "1px solid var(--border, rgba(255,255,255,.14))",
             borderRadius: 10, boxShadow: "0 18px 40px rgba(0,0,0,.45)",
