@@ -14,6 +14,12 @@ export type PageCloseGuard = {
    * failed, request errored); anything else counts as saved.
    */
   save?: () => Promise<boolean | void> | boolean | void;
+  /**
+   * Handle the ✕ inside the page. Return `true` when the click was consumed
+   * — a print preview stepping back to the document it was printing, say —
+   * and the shell leaves the route alone. Anything else closes as usual.
+   */
+  close?: () => boolean;
 };
 
 export type PageCloseGuardRegistry = {
@@ -48,6 +54,7 @@ export function usePageCloseGuard(guard: PageCloseGuard) {
     const stable: PageCloseGuard = {
       isDirty: () => latest.current.isDirty(),
       save: () => latest.current.save?.(),
+      close: () => !!latest.current.close?.(),
     };
     register(stable);
     // Identity is passed back on unmount so a page that unmounts *after* the

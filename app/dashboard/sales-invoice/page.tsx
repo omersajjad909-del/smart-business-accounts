@@ -115,6 +115,8 @@ function SalesInvoiceContent() {
   const [editing, setEditing]     = useState<SalesInvoice | null>(null);
   const [preview, setPreview]     = useState(false);
   const [printMode, setPrintMode] = useState<"a4" | "55mm">("a4");
+  const [printMenu, setPrintMenu] = useState(false);
+  const [sendMenu,  setSendMenu]  = useState(false);
   const [previewMode, setPreviewMode] = useState<"INVOICE" | "DELIVERY">("INVOICE");
   const [loading, setLoading]     = useState(true);
 
@@ -473,6 +475,11 @@ function SalesInvoiceContent() {
       (!!customerId || !!notes || !!reference || !!termsConditions ||
        rows.some(r => r.itemId || r.qty || r.rate)),
     save: () => saveInvoice(),
+    /**
+     * The topbar ✕ closes the print preview and lands back on the invoice it
+     * was printing; only from the plain page does it leave for the dashboard.
+     */
+    close: () => { if (preview) { setPreview(false); return true; } return false; },
   });
 
   /**
@@ -541,6 +548,19 @@ function SalesInvoiceContent() {
     setDiscount(""); setNotes(""); setTermsConditions(""); setReference(""); setPaymentMethod(""); setPaymentTerms("");
     setRows([emptyRow()]);
     setApplyTax(false); setSelectedTaxId(""); setPreview(false); setSavedInvoice(null);
+  }
+
+  /** The print areas only exist in preview, so printing before it prints blank paper. */
+  function doPrint(mode: "a4" | "55mm") {
+    if (!preview) { toast.error("Save the invoice first — printing works from the preview."); return; }
+    setPrintMode(mode);
+    setTimeout(() => window.print(), 100);
+  }
+
+  /** Sending needs an invoice on the server to attach. */
+  function requireSaved() {
+    if (!savedInvoice) { toast.error("Save the invoice first."); return false; }
+    return true;
   }
 
   async function sendInvoiceEmail() {
@@ -681,6 +701,8 @@ function SalesInvoiceContent() {
   const labelStyle: React.CSSProperties = { fontSize: 11, color: "var(--text-muted)", fontWeight: 600, marginBottom: 5, display: "block", textTransform: "uppercase", letterSpacing: 0.5 };
   const btnPrimary: React.CSSProperties = { background: accent, color: "#fff", border: "none", borderRadius: 8, padding: "9px 20px", fontFamily: ff, fontSize: 14, fontWeight: 600, cursor: "pointer" };
   const btnGhost: React.CSSProperties = { background: "transparent", color: "var(--text-muted)", border: "1px solid var(--border)", borderRadius: 8, padding: "9px 16px", fontFamily: ff, fontSize: 14, cursor: "pointer" };
+  const menuPanel: React.CSSProperties = { position: "absolute", top: "calc(100% + 6px)", minWidth: 200, background: "var(--card-bg)", border: "1px solid var(--border)", borderRadius: 10, padding: "6px 0", zIndex: 50, boxShadow: "0 8px 32px rgba(0,0,0,.35)" };
+  const menuItem: React.CSSProperties = { display: "flex", alignItems: "center", gap: 10, width: "100%", background: "none", border: "none", padding: "10px 16px", cursor: "pointer", color: "var(--text-primary)", fontSize: 13, fontFamily: ff, textAlign: "left" };
   const selectedCustomer = customers.find(c => c.id === customerId);
 
   if (!canCreate) return <div style={{ padding: 40, textAlign: "center", color: "var(--text-muted)", fontFamily: ff }}>Access Denied</div>;
@@ -836,16 +858,45 @@ function SalesInvoiceContent() {
                 <button onClick={siExitQuery} style={{ padding: "4px 10px", borderRadius: 6, background: "rgba(248,113,113,.08)", border: "1px solid rgba(248,113,113,.2)", color: "#f87171", fontSize: 11, cursor: "pointer", fontFamily: ff }}>✕</button>
               </div>
             )}
-            <button style={{ ...btnGhost, background: siQueryMode ? "rgba(250,204,21,.1)" : undefined, color: siQueryMode ? "#facc15" : undefined, borderColor: siQueryMode ? "rgba(250,204,21,.3)" : undefined }} onClick={siQueryMode ? siExitQuery : siEnterQuery}>
-              <span style={{ background: siQueryMode ? "#facc15" : accent, color: "#fff", borderRadius: 3, padding: "0 5px", fontSize: 10, fontWeight: 800, marginRight: 5 }}>F7</span>
-              {siQueryMode ? "Cancel Query" : "Query Mode"}
-            </button>
-            <button style={btnGhost} onClick={() => { setShowList(!showList); if (!showList) { setShowForm(false); loadInvoices(); } else setShowForm(true); }}>
-              {showList ? "Hide List" : "Show List"}
-            </button>
-            <button style={btnPrimary} onClick={() => { setShowForm(true); setShowList(false); resetForm(); loadInvoices(); siExitQuery(); }}>
-              + New Invoice
-            </button>
+            {/* ── Print ▾ — A4 or the 55mm short slip ── */}
+            <div style={{ position: "relative" }}>
+              <button style={btnGhost} onClick={() => { setSendMenu(false); setPrintMenu(o => !o); }}>
+                🖨️ Print <span style={{ fontSize: 10, opacity: .7, marginLeft: 4 }}>▾</span>
+              </button>
+              {printMenu && (
+                <>
+                  <div onClick={() => setPrintMenu(false)} style={{ position: "fixed", inset: 0, zIndex: 49 }} />
+                  <div style={{ ...menuPanel, left: 0 }}>
+                    <button style={menuItem} onClick={() => { setPrintMenu(false); doPrint("a4"); }}>
+                      <span style={{ fontSize: 15, minWidth: 20 }}>🖨️</span>A4
+                    </button>
+                    <button style={menuItem} onClick={() => { setPrintMenu(false); doPrint("55mm"); }}>
+                      <span style={{ fontSize: 15, minWidth: 20 }}>🧾</span>55mm (Short)
+                    </button>
+                  </div>
+                </>
+              )}
+            </div>
+
+            {/* ── Send ▾ — WhatsApp or email ── */}
+            <div style={{ position: "relative" }}>
+              <button style={btnPrimary} onClick={() => { setPrintMenu(false); setSendMenu(o => !o); }}>
+                Send <span style={{ fontSize: 10, opacity: .8, marginLeft: 4 }}>▾</span>
+              </button>
+              {sendMenu && (
+                <>
+                  <div onClick={() => setSendMenu(false)} style={{ position: "fixed", inset: 0, zIndex: 49 }} />
+                  <div style={{ ...menuPanel, right: 0 }}>
+                    <button style={menuItem} onClick={() => { setSendMenu(false); if (requireSaved()) shareWhatsApp(); }}>
+                      <span style={{ fontSize: 15, minWidth: 20 }}>💬</span>WhatsApp
+                    </button>
+                    <button style={{ ...menuItem, opacity: sendingEmail ? .5 : 1 }} disabled={sendingEmail} onClick={() => { setSendMenu(false); if (requireSaved()) sendInvoiceEmail(); }}>
+                      <span style={{ fontSize: 15, minWidth: 20 }}>✉️</span>{sendingEmail ? "Email…" : "Email"}
+                    </button>
+                  </div>
+                </>
+              )}
+            </div>
           </div>
         </div>
 

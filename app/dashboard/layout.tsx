@@ -565,6 +565,9 @@ export default function DashboardLayout({
 
   function requestClosePage() {
     if (isDashboardHome) return;
+    // The page gets first refusal: the sales invoice preview, for one, closes
+    // back onto the invoice it is printing instead of leaving for the dashboard.
+    try { if (pageGuardRef.current?.close?.()) return; } catch { /* fall through */ }
     if (pageHasUnsavedWork()) { setCloseConfirm(true); return; }
     leaveToDashboard();
   }
