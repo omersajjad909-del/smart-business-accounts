@@ -100,14 +100,32 @@ export default function GRNPage() {
     return { "Content-Type": "application/json", "x-company-id": user?.companyId || "", "x-user-role": user?.role || "", "x-user-id": user?.id || "" };
   }
 
+  async function parseJsonResponse<T = any>(response: Response): Promise<T | null> {
+    const text = await response.text();
+    if (!text || !text.trim()) return null;
+    try {
+      return JSON.parse(text) as T;
+    } catch {
+      return null;
+    }
+  }
+
   useEffect(() => {
-    fetch("/api/me/company").then(r => r.ok ? r.json() : null).then(d => { if (d) setCompanyInfo(d); }).catch(() => {});
-    fetch("/api/accounts?partyType=SUPPLIER", { headers: bh() }).then(r => r.json()).then(d => {
+    fetch("/api/me/company").then(async (r) => {
+      const d = await parseJsonResponse(r);
+      if (d) setCompanyInfo(d);
+    }).catch(() => {});
+    fetch("/api/accounts?partyType=SUPPLIER", { headers: bh() }).then(async (r) => {
+      const d = await parseJsonResponse(r);
       const list = Array.isArray(d) ? d : [];
       setSuppliers(list.filter((a: any) => a.partyType === "SUPPLIER"));
     }).catch(() => {});
-    fetch("/api/items-new",     { headers: bh() }).then(r => r.json()).then(d => setAllItems(Array.isArray(d) ? d : [])).catch(() => {});
-    fetch("/api/purchase-order",{ headers: bh() }).then(r => r.json()).then(d => {
+    fetch("/api/items-new",     { headers: bh() }).then(async (r) => {
+      const d = await parseJsonResponse(r);
+      setAllItems(Array.isArray(d) ? d : []);
+    }).catch(() => {});
+    fetch("/api/purchase-order",{ headers: bh() }).then(async (r) => {
+      const d = await parseJsonResponse(r);
       const records = Array.isArray(d) ? d : [];
       allPosRef.current = records;
       setPos(records);
@@ -116,14 +134,20 @@ export default function GRNPage() {
     loadNextGrnNo();
   }, []);
 
-  function loadGRNs() {
-    fetch("/api/grn", { headers: bh() }).then(r => r.json()).then(d => setGrns(Array.isArray(d) ? d : [])).catch(() => {});
+  async function loadGRNs() {
+    try {
+      const r = await fetch("/api/grn", { headers: bh() });
+      const d = await parseJsonResponse(r);
+      setGrns(Array.isArray(d) ? d : []);
+    } catch {
+      setGrns([]);
+    }
   }
 
   async function loadNextGrnNo() {
     try {
       const r = await fetch("/api/grn?nextNo=true", { headers: bh() });
-      const d = await r.json();
+      const d = await parseJsonResponse(r);
       if (d?.grnNo) setGrnNo(d.grnNo);
     } catch {}
   }
