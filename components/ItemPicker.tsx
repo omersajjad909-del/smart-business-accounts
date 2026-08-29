@@ -5,19 +5,10 @@
  * take it.
  *
  * Replaces a plain <select>. With a few thousand rolls in the catalogue a
- * native dropdown is a wall of near-identical names — "B2 WHITE 10G 60in L50
- * White PHR26" sits between two others that differ only in the last number —
- * and its type-ahead matches from the first character, so there is no way to
- * reach one except by scrolling.
- *
- * Enter is passed on to the caller once a pick is made, which is what carries
- * the cursor into the PHR cell (rateFormulaEnterHandler). Choosing an item and
- * typing its PHR is one uninterrupted run of keys, the way it was on the old
- * green screen.
+ * native dropdown is a wall of near-identical names.
  */
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { createPortal } from "react-dom";
 import { itemMatches, itemSearchKeys } from "@/lib/itemSearch";
 
 export type PickerItem = {
@@ -26,17 +17,9 @@ export type PickerItem = {
   code?: string | null;
   unit?: string | null;
   meta?: unknown;
-  /** Shown under the name and searched with it — some catalogues carry the
-   *  specification here rather than in the name. */
   description?: string | null;
 };
 
-/**
- * Beyond this the list is cut — rendering a few thousand rows costs more than
- * anyone gains from them. 60 was far too tight for a real catalogue: opening
- * the picker on a 300-item import showed only the first letter group ("B2 …")
- * with no way to scroll to the rest.
- */
 const MAX_VISIBLE = 400;
 
 const MANUAL = "__manual__";
@@ -45,170 +28,343 @@ type Props = {
   items: PickerItem[];
   value: string;
   onChange: (id: string) => void;
-  /** Passed the key event once the picker has finished with it. */
-  onKeyDown?: (e: { key: string; shiftKey: boolean; preventDefault(): void; stopPropagation(): void }) => void;
-  /**
-   * How a picked item reads in the closed cell. A document that carries the
-   * dimensions in their own columns shortens it to the product name; the list
-   * below is left alone, because there the dimensions are the only thing
-   * telling two near-identical rolls apart.
-   */
+
+  onKeyDown?: (e: {
+    key: string;
+    shiftKey: boolean;
+    preventDefault(): void;
+    stopPropagation(): void;
+  }) => void;
+
   label?: (item: PickerItem) => string;
+
   allowManual?: boolean;
   placeholder?: string;
   style?: React.CSSProperties;
   autoFocus?: boolean;
-  previewFields?: Array<{ key: string; label: string }>;
-  /**
-   * What to show in those preview columns for one item.
-   *
-   * Without this the columns read `item.meta` directly, which is empty for
-   * every catalogue that writes the specification into the item NAME
-   * ("B2 BLUE 10G 50in L50 Blue PHR28") rather than into saved columns — so
-   * every cell rendered as "—". Pass the same reader the row uses when the
-   * item is picked and the two agree.
-   */
-  previewValues?: (item: PickerItem) => Record<string, unknown>;
-  /**
-   * What is on the floor for one item: received, sold, and what is left.
-   *
-   * Given these, the list grows the three columns the old sale-billing screen
-   * carried and offers to hide anything with nothing left — picking a roll the
-   * godown does not have is the mistake this catches.
-   */
-  stockValues?: (item: PickerItem) => { received: number; sold: number; balance: number } | null;
+
+  previewFields?: Array<{
+    key: string;
+    label: string;
+  }>;
+
+  previewValues?: (
+    item: PickerItem
+  ) => Record<string, unknown>;
+
+  stockValues?: (
+    item: PickerItem
+  ) => {
+    received: number;
+    sold: number;
+    balance: number;
+  } | null;
 };
 
 export function ItemPicker({
-  items, value, onChange, onKeyDown, label,
-  allowManual = true, placeholder = "Type to search…", style, autoFocus,
-  previewFields = [], previewValues, stockValues,
+  items,
+  value,
+  onChange,
+  onKeyDown,
+  label,
+  allowManual = true,
+  placeholder = "Type to search…",
+  style,
+  autoFocus,
+  previewFields = [],
+  previewValues,
+  stockValues,
 }: Props) {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
   const [cursor, setCursor] = useState(0);
+
+  /*
+   * ------------------------------------------------------------
+   * RESIZABLE PICKER
+   * ------------------------------------------------------------
+   *
+   * Default height = 620px
+   * Minimum height = 220px
+   *
+   * User can drag the handle at the bottom to resize.
+   */
+  const DEFAULT_HEIGHT = 620;
+  const MIN_HEIGHT = 220;
+
+  const [pickerHeight, setPickerHeight] =
+    useState(DEFAULT_HEIGHT);
+
+  const resizingRef = useRef(false);
+  const resizeStartYRef = useRef(0);
+  const resizeStartHeightRef = useRef(DEFAULT_HEIGHT);
+
   const boxRef = useRef<HTMLDivElement>(null);
   const listRef = useRef<HTMLDivElement>(null);
 
-  const selected = useMemo(() => items.find((i) => i.id === value) ?? null, [items, value]);
-
-  // Built once per catalogue rather than per keystroke — a few thousand items
-  // times a few characters a second is enough to feel it otherwise.
-  const indexed = useMemo(
-    () => items.map((item) => ({
-      item,
-      keys: itemSearchKeys(item.name, item.code, item.description),
-    })),
-    [items],
+  const selected = useMemo(
+    () =>
+      items.find((i) => i.id === value) ?? null,
+    [items, value]
   );
 
-  // Resolved once per catalogue. Reading the spec out of a name is regex work,
-  // and doing it inside the row render would repeat it for every visible row on
-  // every keystroke.
+  // ------------------------------------------------------------
+  // Search index
+  // ------------------------------------------------------------
+
+  const indexed = useMemo(
+    () =>
+      items.map((item) => ({
+        item,
+        keys: itemSearchKeys(
+          item.name,
+          item.code,
+          item.description
+        ),
+      })),
+    [items]
+  );
+
+  // ------------------------------------------------------------
+  // Preview values
+  // ------------------------------------------------------------
+
   const previewMap = useMemo(() => {
-    if (!previewValues || previewFields.length === 0) return null;
-    const map = new Map<string, Record<string, unknown>>();
-    for (const item of items) map.set(item.id, previewValues(item));
+    if (!previewValues || previewFields.length === 0) {
+      return null;
+    }
+
+    const map = new Map<
+      string,
+      Record<string, unknown>
+    >();
+
+    for (const item of items) {
+      map.set(
+        item.id,
+        previewValues(item)
+      );
+    }
+
     return map;
-  }, [items, previewValues, previewFields.length]);
+  }, [
+    items,
+    previewValues,
+    previewFields.length,
+  ]);
+
+  // ------------------------------------------------------------
+  // Stock values
+  // ------------------------------------------------------------
 
   const stockMap = useMemo(() => {
     if (!stockValues) return null;
-    const map = new Map<string, { received: number; sold: number; balance: number }>();
+
+    const map = new Map<
+      string,
+      {
+        received: number;
+        sold: number;
+        balance: number;
+      }
+    >();
+
     for (const item of items) {
       const row = stockValues(item);
-      if (row) map.set(item.id, row);
+
+      if (row) {
+        map.set(item.id, row);
+      }
     }
+
     return map;
   }, [items, stockValues]);
 
-  /** Whether anything in this catalogue is actually in stock. */
   const anyInStock = useMemo(() => {
     if (!stockMap) return false;
-    for (const row of stockMap.values()) if (row.balance > 0) return true;
+
+    for (const row of stockMap.values()) {
+      if (row.balance > 0) {
+        return true;
+      }
+    }
+
     return false;
   }, [stockMap]);
 
-  // On by default when the company posts its stock, off when nothing has a
-  // balance — a filter that empties the list is worse than no filter.
-  const [inStockOnly, setInStockOnly] = useState(true);
-  const stockFilterOn = Boolean(stockMap) && anyInStock && inStockOnly;
+  const [inStockOnly, setInStockOnly] =
+    useState(true);
+
+  const stockFilterOn =
+    Boolean(stockMap) &&
+    anyInStock &&
+    inStockOnly;
+
+  // ------------------------------------------------------------
+  // Filtered items
+  // ------------------------------------------------------------
 
   const matches = useMemo(() => {
     const keep = (item: PickerItem) =>
-      !stockFilterOn || (stockMap?.get(item.id)?.balance ?? 0) > 0;
+      !stockFilterOn ||
+      (stockMap?.get(item.id)?.balance ?? 0) > 0;
+
     const wanted = query.trim();
+
     const out: PickerItem[] = [];
+
     for (const row of indexed) {
       if (!keep(row.item)) continue;
-      if (wanted && !itemMatches(wanted, row.keys)) continue;
-      out.push(row.item);
-      if (out.length >= MAX_VISIBLE) break;
-    }
-    return out;
-  }, [indexed, query, stockFilterOn, stockMap]);
 
-  useEffect(() => { setCursor(0); }, [query]);
+      if (
+        wanted &&
+        !itemMatches(wanted, row.keys)
+      ) {
+        continue;
+      }
+
+      out.push(row.item);
+
+      if (out.length >= MAX_VISIBLE) {
+        break;
+      }
+    }
+
+    return out;
+  }, [
+    indexed,
+    query,
+    stockFilterOn,
+    stockMap,
+  ]);
+
+  // ------------------------------------------------------------
+  // Reset cursor on search
+  // ------------------------------------------------------------
+
+  useEffect(() => {
+    setCursor(0);
+  }, [query]);
+
+  // ------------------------------------------------------------
+  // Close when clicking outside
+  // ------------------------------------------------------------
 
   useEffect(() => {
     if (!open) return;
+
     const away = (e: MouseEvent) => {
-      const t = e.target as Node;
-      // The list is portalled to <body>, so it is no longer a descendant of
-      // boxRef — without this second check every click inside the dropdown
-      // would close it before the row could be picked.
-      if (boxRef.current?.contains(t)) return;
-      if (listRef.current?.contains(t)) return;
-      setOpen(false);
+      if (
+        boxRef.current &&
+        !boxRef.current.contains(
+          e.target as Node
+        )
+      ) {
+        setOpen(false);
+      }
     };
-    document.addEventListener("mousedown", away);
-    return () => document.removeEventListener("mousedown", away);
-  }, [open]);
 
-  /**
-   * Where to draw the list, in viewport coordinates.
-   *
-   * The list used to be `position: absolute` inside the row. Every document's
-   * item table is wrapped in `overflowX: "auto"` so a wide grid can scroll
-   * sideways — and CSS resolves the other axis to `auto` alongside it, so that
-   * wrapper clipped the dropdown to the height of one table row. The wrapper
-   * has been flipped between `visible`, `hidden` and `auto` three times trying
-   * to have both; portalling to <body> is what actually gives both, because the
-   * list is no longer inside the scroll container to be clipped by.
-   */
-  const [anchor, setAnchor] = useState<{ left: number; width: number; below: number; above: number; top: number; bottom: number } | null>(null);
+    document.addEventListener(
+      "mousedown",
+      away
+    );
 
-  useEffect(() => {
-    if (!open) { setAnchor(null); return; }
-    const measure = () => {
-      const el = boxRef.current;
-      if (!el) return;
-      const r = el.getBoundingClientRect();
-      setAnchor({
-        left: r.left,
-        width: r.width,
-        top: r.bottom + 4,
-        bottom: window.innerHeight - r.top + 4,
-        below: window.innerHeight - r.bottom - 16,
-        above: r.top - 16,
-      });
-    };
-    measure();
-    // Capture phase: the table's own scroll container also has to move the list.
-    window.addEventListener("scroll", measure, true);
-    window.addEventListener("resize", measure);
     return () => {
-      window.removeEventListener("scroll", measure, true);
-      window.removeEventListener("resize", measure);
+      document.removeEventListener(
+        "mousedown",
+        away
+      );
     };
   }, [open]);
 
-  // Keeps the highlighted row in view when it is walked past the fold.
+  // ------------------------------------------------------------
+  // Keep highlighted row visible
+  // ------------------------------------------------------------
+
   useEffect(() => {
     if (!open || !listRef.current) return;
-    const row = listRef.current.children[cursor] as HTMLElement | undefined;
-    row?.scrollIntoView({ block: "nearest" });
+
+    const row =
+      listRef.current.children[
+        cursor
+      ] as HTMLElement | undefined;
+
+    row?.scrollIntoView({
+      block: "nearest",
+    });
   }, [cursor, open]);
+
+  // ------------------------------------------------------------
+  // RESIZE HANDLERS
+  // ------------------------------------------------------------
+
+  function startResize(
+    e: React.PointerEvent<HTMLDivElement>
+  ) {
+    e.preventDefault();
+    e.stopPropagation();
+
+    resizingRef.current = true;
+
+    resizeStartYRef.current = e.clientY;
+    resizeStartHeightRef.current =
+      pickerHeight;
+
+    e.currentTarget.setPointerCapture(
+      e.pointerId
+    );
+  }
+
+  function moveResize(
+    e: React.PointerEvent<HTMLDivElement>
+  ) {
+    if (!resizingRef.current) return;
+
+    e.preventDefault();
+
+    const delta =
+      e.clientY -
+      resizeStartYRef.current;
+
+    let newHeight =
+      resizeStartHeightRef.current +
+      delta;
+
+    // Minimum
+    newHeight = Math.max(
+      MIN_HEIGHT,
+      newHeight
+    );
+
+    // Maximum available viewport height
+    const maxHeight =
+      window.innerHeight - 160;
+
+    newHeight = Math.min(
+      maxHeight,
+      newHeight
+    );
+
+    setPickerHeight(newHeight);
+  }
+
+  function stopResize(
+    e: React.PointerEvent<HTMLDivElement>
+  ) {
+    resizingRef.current = false;
+
+    try {
+      e.currentTarget.releasePointerCapture(
+        e.pointerId
+      );
+    } catch {
+      // Pointer capture may already have been released.
+    }
+  }
+
+  // ------------------------------------------------------------
+  // Select item
+  // ------------------------------------------------------------
 
   function take(id: string) {
     onChange(id);
@@ -216,198 +372,787 @@ export function ItemPicker({
     setOpen(false);
   }
 
-  function keyDown(e: React.KeyboardEvent<HTMLInputElement>) {
-    if (e.key === "ArrowDown" || e.key === "ArrowUp") {
+  // ------------------------------------------------------------
+  // Keyboard handling
+  // ------------------------------------------------------------
+
+  function keyDown(
+    e: React.KeyboardEvent<HTMLInputElement>
+  ) {
+    if (
+      e.key === "ArrowDown" ||
+      e.key === "ArrowUp"
+    ) {
       e.preventDefault();
-      if (!open) { setOpen(true); return; }
-      const last = matches.length - 1 + (allowManual ? 1 : 0);
-      setCursor((c) => Math.max(0, Math.min(last, c + (e.key === "ArrowDown" ? 1 : -1))));
+
+      if (!open) {
+        setOpen(true);
+        return;
+      }
+
+      const last =
+        matches.length -
+        1 +
+        (allowManual ? 1 : 0);
+
+      setCursor((c) =>
+        Math.max(
+          0,
+          Math.min(
+            last,
+            c +
+              (e.key === "ArrowDown"
+                ? 1
+                : -1)
+          )
+        )
+      );
+
       return;
     }
-    if (e.key === "Escape") { setOpen(false); return; }
+
+    if (e.key === "Escape") {
+      setOpen(false);
+      return;
+    }
+
     if (e.key === "Enter") {
       if (open) {
-        const manualRow = allowManual && cursor === matches.length;
-        const hit = manualRow ? MANUAL : matches[cursor]?.id;
+        const manualRow =
+          allowManual &&
+          cursor === matches.length;
+
+        const hit = manualRow
+          ? MANUAL
+          : matches[cursor]?.id;
+
         if (hit) {
           e.preventDefault();
+
           take(hit);
-          // Handed on so the cursor lands in the next cell, exactly as it did
-          // when this was a <select>.
+
           onKeyDown?.(e);
+
           return;
         }
       }
+
       onKeyDown?.(e);
-      return;
     }
   }
 
-  const selectedLabel = selected ? (label ? label(selected) : selected.name) : "";
-  const shown = open ? query : selectedLabel;
+  // ------------------------------------------------------------
+  // Display
+  // ------------------------------------------------------------
+
+  const selectedLabel = selected
+    ? label
+      ? label(selected)
+      : selected.name
+    : "";
+
+  const shown = open
+    ? query
+    : selectedLabel;
+
   const showStock = Boolean(stockMap);
-  // The quality is the column being read; the rest are two or three figures
-  // each. Given the room, "CRYSTAL SUPER CLEAR (DIAMOND)" has to arrive whole —
-  // cut to "CRYSTAL SUPER CLEAR …" two different qualities read alike.
-  const previewColumns = previewFields.length
-    ? `minmax(260px, 2.6fr) repeat(${previewFields.length}, minmax(56px, 1fr)) minmax(52px, .7fr)${showStock ? " repeat(3, minmax(58px, .8fr))" : ""}`
-    : "minmax(170px, 1fr) minmax(62px, auto) minmax(48px, auto)";
+
+  const previewColumns =
+    previewFields.length
+      ? `minmax(260px, 2.6fr) repeat(${previewFields.length}, minmax(56px, 1fr)) minmax(52px, .7fr)${
+          showStock
+            ? " repeat(3, minmax(58px, .8fr))"
+            : ""
+        }`
+      : "minmax(170px, 1fr) minmax(62px, auto) minmax(48px, auto)";
 
   return (
-    <div ref={boxRef} style={{ position: "relative" }}>
+    <div
+      ref={boxRef}
+      style={{
+        position: "relative",
+      }}
+    >
+      {/* ----------------------------------------------------
+          INPUT
+      ---------------------------------------------------- */}
+
       <input
         value={shown}
-        placeholder={selected ? selectedLabel : placeholder}
+        placeholder={
+          selected
+            ? selectedLabel
+            : placeholder
+        }
         autoFocus={autoFocus}
         spellCheck={false}
-        onFocus={() => { setOpen(true); setQuery(""); }}
-        onChange={(e) => { setQuery(e.target.value); setOpen(true); }}
+        onFocus={() => {
+          setOpen(true);
+          setQuery("");
+        }}
+        onChange={(e) => {
+          setQuery(e.target.value);
+          setOpen(true);
+        }}
         onKeyDown={keyDown}
         style={{
-          width: "100%", boxSizing: "border-box", outline: "none",
+          width: "100%",
+          boxSizing: "border-box",
+          outline: "none",
           textOverflow: "ellipsis",
           ...style,
         }}
       />
 
+      {/* ----------------------------------------------------
+          PICKER
+      ---------------------------------------------------- */}
+
       {open && (
         <div
-          ref={listRef}
           style={{
-            position: "absolute", zIndex: 60, top: "calc(100% + 4px)", left: 0,
+            position: "absolute",
+            zIndex: 60,
+            top: "calc(100% + 4px)",
+            left: 0,
+
             minWidth: "100%",
-            // Shrink-to-fit up to the ceiling: the box takes only what the
-            // longest name asks for, and stops short of the window edge.
-            maxWidth: previewFields.length ? "min(1180px, calc(100vw - 40px))" : 520,
-            maxHeight: "min(620px, calc(100vh - 160px))", overflowY: "auto",
-            background: "var(--panel-bg, #14161c)",
-            border: "1px solid var(--border, rgba(255,255,255,.14))",
-            borderRadius: 10, boxShadow: "0 18px 40px rgba(0,0,0,.45)",
+
+            maxWidth:
+              previewFields.length
+                ? "min(1180px, calc(100vw - 40px))"
+                : 520,
+
+            /*
+             * THIS IS THE RESIZABLE HEIGHT
+             */
+            height: `${pickerHeight}px`,
+
+            minHeight: `${MIN_HEIGHT}px`,
+
+            maxHeight:
+              "calc(100vh - 160px)",
+
+            background:
+              "var(--panel-bg, #14161c)",
+
+            border:
+              "1px solid var(--border, rgba(255,255,255,.14))",
+
+            borderRadius: 10,
+
+            boxShadow:
+              "0 18px 40px rgba(0,0,0,.45)",
+
             padding: 4,
+
+            /*
+             * Important:
+             * Outer box does NOT scroll.
+             * Inner list below handles scrolling.
+             */
+            overflow: "hidden",
+
+            boxSizing: "border-box",
           }}
         >
-          {showStock && anyInStock && (
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, padding: "6px 10px 7px", borderBottom: "1px solid var(--border, rgba(255,255,255,.12))" }}>
-              <span style={{ fontSize: 11, color: "var(--text-muted, rgba(255,255,255,.5))" }}>
-                {matches.length} shown{inStockOnly ? " — in stock" : ""}
-              </span>
-              <label
-                onMouseDown={(e) => e.preventDefault()}
-                style={{ display: "inline-flex", alignItems: "center", gap: 6, fontSize: 11, cursor: "pointer", color: "var(--text-muted, rgba(255,255,255,.6))" }}
-              >
-                <input
-                  type="checkbox"
-                  checked={inStockOnly}
-                  onChange={(e) => setInStockOnly(e.target.checked)}
-                  style={{ accentColor: "var(--accent, #6366f1)", cursor: "pointer" }}
-                />
-                In stock only
-              </label>
-            </div>
-          )}
+          {/* ------------------------------------------------
+              SCROLLABLE CONTENT
+          ------------------------------------------------ */}
 
-          {previewFields.length > 0 && (
-            <div style={{ display: "grid", gridTemplateColumns: previewColumns, gap: 8, padding: "7px 10px", borderBottom: "1px solid var(--border, rgba(255,255,255,.12))", color: "var(--text-muted, rgba(255,255,255,.5))", fontSize: 10, fontWeight: 800, textTransform: "uppercase", letterSpacing: ".04em" }}>
-              <span>Quality / Item</span>
-              {previewFields.map((field) => <span key={field.key} style={{ textAlign: "center" }}>{field.label}</span>)}
-              <span style={{ textAlign: "right" }}>Unit</span>
-              {showStock && <><span style={{ textAlign: "right" }}>R.Qty</span><span style={{ textAlign: "right" }}>Sold</span><span style={{ textAlign: "right" }}>Bal</span></>}
-            </div>
-          )}
+          <div
+            ref={listRef}
+            style={{
+              height: "100%",
+              overflowY: "auto",
+              overflowX: "hidden",
+              paddingBottom: 14,
+            }}
+          >
+            {/* ------------------------------------------------
+                STOCK FILTER
+            ------------------------------------------------ */}
 
-          {matches.length === 0 && !allowManual && (
-            <div style={{ padding: "10px 12px", fontSize: 12.5, color: "var(--text-muted)" }}>
-              Nothing matches “{query}”
-            </div>
-          )}
-
-          {matches.map((item, index) => (
-            <div
-              key={item.id}
-              onMouseDown={(e) => { e.preventDefault(); take(item.id); }}
-              onMouseEnter={() => setCursor(index)}
-              style={{
-                display: previewFields.length ? "grid" : "flex",
-                gridTemplateColumns: previewFields.length ? previewColumns : undefined,
-                alignItems: "center", gap: 8,
-                padding: "7px 10px", borderRadius: 7, cursor: "pointer",
-                background: index === cursor ? "var(--accent-soft, rgba(99,102,241,.16))" : "transparent",
-                whiteSpace: "nowrap",
-              }}
-            >
-              <span
-                title={item.name}
+            {showStock && anyInStock && (
+              <div
                 style={{
-                  fontFamily: "ui-monospace, monospace", fontSize: 12.5,
-                  // With the dimensions in their own columns the full name is
-                  // the same figures written twice, and it overflowed into the
-                  // Gauge column. The shortened label is what the picked cell
-                  // shows too, so the list and the line read alike.
-                  color: previewFields.length ? "var(--text-primary, #fff)" : "var(--text-muted, rgba(255,255,255,.4))",
-                  minWidth: 62, overflow: "hidden", textOverflow: "ellipsis",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent:
+                    "space-between",
+                  gap: 8,
+                  padding:
+                    "6px 10px 7px",
+                  borderBottom:
+                    "1px solid var(--border, rgba(255,255,255,.12))",
                 }}
-              >{previewFields.length ? (label ? label(item) : item.name) : (item.code || "—")}</span>
-              {!previewFields.length && <span style={{ fontSize: 13, color: "var(--text-primary, #fff)" }}>
-                {item.name}
-                {item.description ? (
-                  <span style={{ color: "var(--text-muted, rgba(255,255,255,.4))", fontSize: 11.5 }}>
-                    {" "}· {item.description}
-                  </span>
-                ) : null}
-              </span>}
-              {previewFields.map((field) => {
-                const resolved = previewMap?.get(item.id);
-                const metadata = item.meta && typeof item.meta === "object" ? item.meta as Record<string, unknown> : null;
-                const raw = resolved?.[field.key] ?? metadata?.[field.key];
-                const text = raw === undefined || raw === null || raw === "" ? "—" : String(raw);
-                return <span key={field.key} style={{ textAlign: "center", fontSize: 12, color: text === "—" ? "var(--text-muted, rgba(255,255,255,.35))" : "var(--text-primary, #fff)" }}>{text}</span>;
-              })}
-              {(item.unit || previewFields.length > 0) && (
-                <span style={{ fontSize: 11, color: "var(--text-muted, rgba(255,255,255,.35))", marginLeft: previewFields.length ? 0 : "auto", paddingLeft: previewFields.length ? 0 : 12, textAlign: previewFields.length ? "right" : undefined }}>
-                  {item.unit || "—"}
+              >
+                <span
+                  style={{
+                    fontSize: 11,
+                    color:
+                      "var(--text-muted, rgba(255,255,255,.5))",
+                  }}
+                >
+                  {matches.length} shown
+                  {inStockOnly
+                    ? " — in stock"
+                    : ""}
                 </span>
-              )}
-              {showStock && (() => {
-                const st = stockMap?.get(item.id);
-                const cell = (n: number | undefined, tone?: string) => (
-                  <span style={{ textAlign: "right", fontSize: 12, fontVariantNumeric: "tabular-nums", color: tone ?? "var(--text-muted, rgba(255,255,255,.55))" }}>
-                    {n === undefined ? "—" : n.toLocaleString()}
-                  </span>
-                );
-                return (
+
+                <label
+                  onMouseDown={(e) =>
+                    e.preventDefault()
+                  }
+                  style={{
+                    display:
+                      "inline-flex",
+                    alignItems:
+                      "center",
+                    gap: 6,
+                    fontSize: 11,
+                    cursor:
+                      "pointer",
+                    color:
+                      "var(--text-muted, rgba(255,255,255,.6))",
+                  }}
+                >
+                  <input
+                    type="checkbox"
+                    checked={
+                      inStockOnly
+                    }
+                    onChange={(e) =>
+                      setInStockOnly(
+                        e.target.checked
+                      )
+                    }
+                    style={{
+                      accentColor:
+                        "var(--accent, #6366f1)",
+                      cursor:
+                        "pointer",
+                    }}
+                  />
+
+                  In stock only
+                </label>
+              </div>
+            )}
+
+            {/* ------------------------------------------------
+                TABLE HEADER
+            ------------------------------------------------ */}
+
+            {previewFields.length >
+              0 && (
+              <div
+                style={{
+                  display: "grid",
+                  gridTemplateColumns:
+                    previewColumns,
+                  gap: 8,
+                  padding:
+                    "7px 10px",
+                  borderBottom:
+                    "1px solid var(--border, rgba(255,255,255,.12))",
+                  color:
+                    "var(--text-muted, rgba(255,255,255,.5))",
+                  fontSize: 10,
+                  fontWeight: 800,
+                  textTransform:
+                    "uppercase",
+                  letterSpacing:
+                    ".04em",
+                  position:
+                    "sticky",
+                  top: 0,
+                  zIndex: 2,
+                  background:
+                    "var(--panel-bg, #14161c)",
+                }}
+              >
+                <span>
+                  Quality / Item
+                </span>
+
+                {previewFields.map(
+                  (field) => (
+                    <span
+                      key={
+                        field.key
+                      }
+                      style={{
+                        textAlign:
+                          "center",
+                      }}
+                    >
+                      {
+                        field.label
+                      }
+                    </span>
+                  )
+                )}
+
+                <span
+                  style={{
+                    textAlign:
+                      "right",
+                  }}
+                >
+                  Unit
+                </span>
+
+                {showStock && (
                   <>
-                    {cell(st?.received)}
-                    {cell(st?.sold)}
-                    {/* The one figure the operator is really reading: what is
-                        left. Red at zero so an out-of-stock roll cannot be
-                        picked by accident when the filter is switched off. */}
-                    {cell(st?.balance, (st?.balance ?? 0) > 0 ? "var(--text-primary, #fff)" : "var(--danger, #f87171)")}
+                    <span
+                      style={{
+                        textAlign:
+                          "right",
+                      }}
+                    >
+                      R.Qty
+                    </span>
+
+                    <span
+                      style={{
+                        textAlign:
+                          "right",
+                      }}
+                    >
+                      Sold
+                    </span>
+
+                    <span
+                      style={{
+                        textAlign:
+                          "right",
+                      }}
+                    >
+                      Bal
+                    </span>
                   </>
-                );
-              })()}
-            </div>
-          ))}
+                )}
+              </div>
+            )}
 
-          {matches.length >= MAX_VISIBLE && (
-            <div style={{ padding: "6px 10px", fontSize: 11, color: "var(--text-muted)" }}>
-              Showing the first {MAX_VISIBLE} of {items.length} — keep typing to narrow it.
-            </div>
-          )}
+            {/* ------------------------------------------------
+                NO RESULTS
+            ------------------------------------------------ */}
 
-          {allowManual && (
+            {matches.length === 0 &&
+              !allowManual && (
+                <div
+                  style={{
+                    padding:
+                      "10px 12px",
+                    fontSize: 12.5,
+                    color:
+                      "var(--text-muted)",
+                  }}
+                >
+                  Nothing matches “
+                  {query}”
+                </div>
+              )}
+
+            {/* ------------------------------------------------
+                ITEMS
+            ------------------------------------------------ */}
+
+            {matches.map(
+              (item, index) => (
+                <div
+                  key={item.id}
+                  onMouseDown={(e) => {
+                    e.preventDefault();
+                    take(item.id);
+                  }}
+                  onMouseEnter={() =>
+                    setCursor(index)
+                  }
+                  style={{
+                    display:
+                      previewFields.length
+                        ? "grid"
+                        : "flex",
+
+                    gridTemplateColumns:
+                      previewFields.length
+                        ? previewColumns
+                        : undefined,
+
+                    alignItems:
+                      "center",
+
+                    gap: 8,
+
+                    padding:
+                      "7px 10px",
+
+                    borderRadius: 7,
+
+                    cursor:
+                      "pointer",
+
+                    background:
+                      index === cursor
+                        ? "var(--accent-soft, rgba(99,102,241,.16))"
+                        : "transparent",
+
+                    whiteSpace:
+                      "nowrap",
+                  }}
+                >
+                  {/* QUALITY / ITEM */}
+
+                  <span
+                    title={item.name}
+                    style={{
+                      fontFamily:
+                        "ui-monospace, monospace",
+
+                      fontSize: 12.5,
+
+                      color:
+                        previewFields.length
+                          ? "var(--text-primary, #fff)"
+                          : "var(--text-muted, rgba(255,255,255,.4))",
+
+                      minWidth: 62,
+
+                      overflow:
+                        "hidden",
+
+                      textOverflow:
+                        "ellipsis",
+                    }}
+                  >
+                    {previewFields.length
+                      ? label
+                        ? label(item)
+                        : item.name
+                      : item.code ||
+                        "—"}
+                  </span>
+
+                  {/* NAME */}
+
+                  {!previewFields.length && (
+                    <span
+                      style={{
+                        fontSize: 13,
+                        color:
+                          "var(--text-primary, #fff)",
+                      }}
+                    >
+                      {item.name}
+
+                      {item.description ? (
+                        <span
+                          style={{
+                            color:
+                              "var(--text-muted, rgba(255,255,255,.4))",
+
+                            fontSize:
+                              11.5,
+                          }}
+                        >
+                          {" "}
+                          ·{" "}
+                          {
+                            item.description
+                          }
+                        </span>
+                      ) : null}
+                    </span>
+                  )}
+
+                  {/* PREVIEW FIELDS */}
+
+                  {previewFields.map(
+                    (field) => {
+                      const resolved =
+                        previewMap?.get(
+                          item.id
+                        );
+
+                      const metadata =
+                        item.meta &&
+                        typeof item.meta ===
+                          "object"
+                          ? (item.meta as Record<
+                              string,
+                              unknown
+                            >)
+                          : null;
+
+                      const raw =
+                        resolved?.[
+                          field.key
+                        ] ??
+                        metadata?.[
+                          field.key
+                        ];
+
+                      const text =
+                        raw ===
+                          undefined ||
+                        raw === null ||
+                        raw === ""
+                          ? "—"
+                          : String(raw);
+
+                      return (
+                        <span
+                          key={
+                            field.key
+                          }
+                          style={{
+                            textAlign:
+                              "center",
+
+                            fontSize: 12,
+
+                            color:
+                              text ===
+                              "—"
+                                ? "var(--text-muted, rgba(255,255,255,.35))"
+                                : "var(--text-primary, #fff)",
+                          }}
+                        >
+                          {text}
+                        </span>
+                      );
+                    }
+                  )}
+
+                  {/* UNIT */}
+
+                  {(item.unit ||
+                    previewFields.length >
+                      0) && (
+                    <span
+                      style={{
+                        fontSize: 11,
+
+                        color:
+                          "var(--text-muted, rgba(255,255,255,.35))",
+
+                        marginLeft:
+                          previewFields.length
+                            ? 0
+                            : "auto",
+
+                        paddingLeft:
+                          previewFields.length
+                            ? 0
+                            : 12,
+
+                        textAlign:
+                          previewFields.length
+                            ? "right"
+                            : undefined,
+                      }}
+                    >
+                      {item.unit ||
+                        "—"}
+                    </span>
+                  )}
+
+                  {/* STOCK */}
+
+                  {showStock &&
+                    (() => {
+                      const st =
+                        stockMap?.get(
+                          item.id
+                        );
+
+                      const cell = (
+                        n:
+                          | number
+                          | undefined,
+                        tone?: string
+                      ) => (
+                        <span
+                          style={{
+                            textAlign:
+                              "right",
+
+                            fontSize: 12,
+
+                            fontVariantNumeric:
+                              "tabular-nums",
+
+                            color:
+                              tone ??
+                              "var(--text-muted, rgba(255,255,255,.55))",
+                          }}
+                        >
+                          {n ===
+                          undefined
+                            ? "—"
+                            : n.toLocaleString()}
+                        </span>
+                      );
+
+                      return (
+                        <>
+                          {cell(
+                            st?.received
+                          )}
+
+                          {cell(
+                            st?.sold
+                          )}
+
+                          {cell(
+                            st?.balance,
+                            (st?.balance ??
+                              0) > 0
+                              ? "var(--text-primary, #fff)"
+                              : "var(--danger, #f87171)"
+                          )}
+                        </>
+                      );
+                    })()}
+                </div>
+              )
+            )}
+
+            {/* ------------------------------------------------
+                MAX VISIBLE MESSAGE
+            ------------------------------------------------ */}
+
+            {matches.length >=
+              MAX_VISIBLE && (
+              <div
+                style={{
+                  padding:
+                    "6px 10px",
+                  fontSize: 11,
+                  color:
+                    "var(--text-muted)",
+                }}
+              >
+                Showing the first{" "}
+                {MAX_VISIBLE} of{" "}
+                {items.length} —
+                keep typing to narrow
+                it.
+              </div>
+            )}
+
+            {/* ------------------------------------------------
+                MANUAL
+            ------------------------------------------------ */}
+
+            {allowManual && (
+              <div
+                onMouseDown={(e) => {
+                  e.preventDefault();
+                  take(MANUAL);
+                }}
+                onMouseEnter={() =>
+                  setCursor(
+                    matches.length
+                  )
+                }
+                style={{
+                  padding:
+                    "7px 10px",
+
+                  borderTop:
+                    "1px solid var(--border, rgba(255,255,255,.08))",
+
+                  marginTop: 4,
+
+                  borderRadius: 7,
+
+                  cursor:
+                    "pointer",
+
+                  fontSize: 12.5,
+
+                  color:
+                    "var(--text-muted, rgba(255,255,255,.5))",
+
+                  background:
+                    cursor ===
+                    matches.length
+                      ? "var(--accent-soft, rgba(99,102,241,.16))"
+                      : "transparent",
+                }}
+              >
+                ✎ Type manually…
+              </div>
+            )}
+          </div>
+
+          {/* ------------------------------------------------
+              RESIZE HANDLE
+          ------------------------------------------------
+          
+              Isko bottom par mouse se drag karein.
+          ------------------------------------------------ */}
+
+          <div
+            onPointerDown={
+              startResize
+            }
+            onPointerMove={
+              moveResize
+            }
+            onPointerUp={
+              stopResize
+            }
+            onPointerCancel={
+              stopResize
+            }
+            style={{
+              position:
+                "absolute",
+
+              bottom: 0,
+              left: 0,
+              right: 0,
+
+              height: 10,
+
+              cursor:
+                "ns-resize",
+
+              zIndex: 10,
+
+              display: "flex",
+              alignItems:
+                "center",
+              justifyContent:
+                "center",
+
+              background:
+                "transparent",
+
+              touchAction:
+                "none",
+            }}
+          >
+            {/* Visual grip */}
+
             <div
-              onMouseDown={(e) => { e.preventDefault(); take(MANUAL); }}
-              onMouseEnter={() => setCursor(matches.length)}
               style={{
-                padding: "7px 10px", borderRadius: 7, cursor: "pointer", fontSize: 12.5,
-                borderTop: "1px solid var(--border, rgba(255,255,255,.08))", marginTop: 4,
-                color: "var(--text-muted, rgba(255,255,255,.5))",
-                background: cursor === matches.length ? "var(--accent-soft, rgba(99,102,241,.16))" : "transparent",
+                width: 42,
+                height: 4,
+                borderRadius: 999,
+
+                background:
+                  "var(--border, rgba(255,255,255,.28))",
+
+                opacity: 0.8,
               }}
-            >
-              ✎ Type manually…
-            </div>
-          )}
+            />
+          </div>
         </div>
       )}
     </div>
