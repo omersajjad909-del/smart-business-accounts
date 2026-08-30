@@ -103,8 +103,28 @@ export async function POST(req: NextRequest) {
       // written either, the next launch could not find it and made another one.
       // Six dead "Admin's" companies accumulated in the customer list that way.
       testCompanyId = await prisma.$transaction(async (tx) => {
+        // Test workspaces draw from their own sequence, exactly as demo
+        // sandboxes do.
+        //
+        // A test workspace is a full Company row — the schema has no lighter
+        // way to represent a tenant — but it is not a customer, and taking its
+        // number from the customer sequence spent one of theirs every time an
+        // admin launched a test. That is what put the visible gap between
+        // #100004 and #100015: the numbers in between went to workspaces that
+        // no customer will ever see. Demo sandboxes were split out into the
+        // 900000s for this same reason; this is the 800000s half of that fix.
+        //
+        // Falls back to the column default when the sequence has not been
+        // created yet, so this route keeps working on a database where
+        // manual_company_no_test_split.sql has not been applied.
+        const testCompanyNo = await tx
+          .$queryRaw<{ no: bigint }[]>`SELECT nextval('"Company_companyNo_test_seq"') AS no`
+          .then((rows) => Number(rows[0].no))
+          .catch(() => null);
+
         const testCompany = await tx.company.create({
           data: {
+            ...(testCompanyNo ? { companyNo: testCompanyNo } : {}),
             name: `${user?.name || "Admin"}'s (Test)`,
             isActive: true,
             country: "PK",
