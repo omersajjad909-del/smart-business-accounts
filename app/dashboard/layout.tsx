@@ -2106,6 +2106,25 @@ export default function DashboardLayout({
               </NavGroup>
             )}
 
+          {/* ââ INVESTOR / PROFIT SHARING ââ */}
+          {hasModule(businessType, "investor_parties") && (
+            <NavGroup
+              title="Investors"
+              icon={<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 17l6-6 4 4 8-8"/><path d="M17 7h4v4"/><path d="M3 21h18"/></svg>}
+              open={openSection === "investors"}
+              onToggle={() => toggle("investors")}
+            >
+              {hasDashboardFeature("INVESTOR_OVERVIEW") && <NavLink href="/dashboard/investors" pathname={pathname}>Overview</NavLink>}
+              {hasDashboardFeature("INVESTOR_PARTIES") && <NavLink href="/dashboard/investors/parties" pathname={pathname}>Parties</NavLink>}
+              {hasDashboardFeature("INVESTOR_CAPITAL") && <NavLink href="/dashboard/investors/capital" pathname={pathname}>Capital</NavLink>}
+              {hasDashboardFeature("INVESTOR_GRADES") && <NavLink href="/dashboard/investors/grades" pathname={pathname}>Profit Terms</NavLink>}
+              {hasDashboardFeature("INVESTOR_PRODUCTION") && <NavLink href="/dashboard/investors/production" pathname={pathname}>Production</NavLink>}
+              {hasDashboardFeature("INVESTOR_SETTLEMENTS") && <NavLink href="/dashboard/investors/settlements" pathname={pathname}>Settlements</NavLink>}
+              {hasDashboardFeature("INVESTOR_STATEMENT") && <NavLink href="/dashboard/investors/statement" pathname={pathname}>Statement</NavLink>}
+              {hasDashboardFeature("INVESTOR_REPORTS") && <NavLink href="/dashboard/investors/reports" pathname={pathname}>Reports</NavLink>}
+            </NavGroup>
+          )}
+
           {/* ── IMPORT / EXPORT ── */}
           {hasModule(businessType, "shipments") && (
             <NavGroup title="Import / Export" icon={<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>} open={openSection === "shipments"} onToggle={() => toggle("shipments")}>

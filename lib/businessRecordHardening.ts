@@ -1,6 +1,6 @@
 type BusinessRecordMeta = {
   label: string;
-  business: "retail" | "distribution" | "trading" | "manufacturing" | "service" | "generic";
+  business: "retail" | "distribution" | "trading" | "manufacturing" | "service" | "investor" | "generic";
 };
 
 const CATEGORY_META: Record<string, BusinessRecordMeta> = {
@@ -25,6 +25,12 @@ const CATEGORY_META: Record<string, BusinessRecordMeta> = {
   service_project: { label: "Service Project", business: "service" },
   service_delivery: { label: "Service Delivery", business: "service" },
   service_timesheet: { label: "Service Timesheet", business: "service" },
+
+  investor_party: { label: "Investor Party", business: "investor" },
+  investor_capital: { label: "Investor Capital Entry", business: "investor" },
+  investor_grade: { label: "Investor Profit Grade", business: "investor" },
+  investor_production: { label: "Investor Production Line", business: "investor" },
+  investor_settlement: { label: "Investor Settlement", business: "investor" },
 };
 
 export type SanitizedBusinessRecordInput = {

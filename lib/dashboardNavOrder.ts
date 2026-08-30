@@ -89,6 +89,7 @@ export const DASHBOARD_NAV_GROUPS: DashboardNavGroup[] = [
       "/dashboard/hr-payroll",
       "/dashboard/employees",
       "/dashboard/attendance",
+      "/dashboard/attendance/devices",
       "/dashboard/payroll",
       "/dashboard/advance-salary",
     ],
@@ -507,6 +508,19 @@ export const DASHBOARD_NAV_GROUPS: DashboardNavGroup[] = [
     ],
   },
   {
+    title: "Investors",
+    routes: [
+      "/dashboard/investors",
+      "/dashboard/investors/parties",
+      "/dashboard/investors/capital",
+      "/dashboard/investors/grades",
+      "/dashboard/investors/production",
+      "/dashboard/investors/settlements",
+      "/dashboard/investors/statement",
+      "/dashboard/investors/reports",
+    ],
+  },
+  {
     title: "Import / Export",
     routes: [
       "/dashboard/trade",
@@ -643,6 +657,7 @@ export const DASHBOARD_NAV_GROUPS: DashboardNavGroup[] = [
       "/dashboard/stock-movements",
       "/dashboard/product-categories",
       "/dashboard/purchase-requisition",
+      "/dashboard/rate-formula",
     ],
   },
   {
@@ -665,6 +680,7 @@ export const DASHBOARD_NAV_GROUPS: DashboardNavGroup[] = [
       "/dashboard/reports/tax-summary",
       "/dashboard/customer-statement",
       "/dashboard/supplier-statement",
+      "/dashboard/reports/ageing",
     ],
   },
   {
@@ -693,12 +709,12 @@ export const DASHBOARD_NAV_GROUPS: DashboardNavGroup[] = [
       "/dashboard/reports/stock/expiry",
       "/dashboard/reports/stock/valuation",
       "/dashboard/reports/stock/warehouse",
+      "/dashboard/reports/sales",
     ],
   },
   {
     title: "Sales Analytics",
     routes: [
-      "/dashboard/reports/sales",
       "/dashboard/reports/customer-profitability",
       "/dashboard/reports/salesman-performance",
       "/dashboard/reports/discount-analysis",
@@ -710,7 +726,6 @@ export const DASHBOARD_NAV_GROUPS: DashboardNavGroup[] = [
   {
     title: "Receivables & Payables",
     routes: [
-      "/dashboard/reports/ageing",
       "/dashboard/reports/payment-history",
       "/dashboard/payment-followup",
       "/dashboard/reports/bad-debts",
@@ -736,6 +751,7 @@ export const DASHBOARD_NAV_GROUPS: DashboardNavGroup[] = [
   {
     title: "Admin",
     routes: [
+      "/dashboard/company-profile",
       "/dashboard/admin-control",
       "/dashboard/business-features",
       "/dashboard/notifications-config",
@@ -754,6 +770,15 @@ export const DASHBOARD_NAV_GROUPS: DashboardNavGroup[] = [
     ],
   },
   {
+    title: "Import Data",
+    routes: [
+      "/dashboard/import",
+      "/dashboard/import-wizard",
+      "/dashboard/opening-balances",
+      "/dashboard/import/oracle-guide",
+    ],
+  },
+  {
     title: "Settings",
     routes: [
       "/dashboard/branches",
@@ -767,6 +792,7 @@ export const DASHBOARD_NAV_GROUPS: DashboardNavGroup[] = [
       "/dashboard/account-settings",
       "/dashboard/billing",
       "/dashboard/settings/appearance",
+      "/dashboard/feedback",
       "/dashboard/settings/holidays",
       "/dashboard/security-access",
       "/dashboard/integrations",

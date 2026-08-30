@@ -26,6 +26,7 @@ export const ALL_BUSINESS_TYPES: BusinessType[] = [
   { id: "services",         label: "Services",                 icon: "🛠️", phase: 1, liveByDefault: true,  category: "Services",      description: "Project billing, retainers, and expense tracking" },
   { id: "enterprise",       label: "Enterprise / Holding",     icon: "🏢", phase: 1, liveByDefault: true,  category: "Corporate",     description: "Multi-company group with consolidated reporting" },
   { id: "general",          label: "General Business",         icon: "💼", phase: 1, liveByDefault: true,  category: "General",       description: "All-purpose accounting for any small or medium business" },
+  { id: "investor",         label: "Investor / Profit Sharing", icon: "🤝", phase: 1, liveByDefault: true,  category: "Finance",       description: "Capital placed in another business — output, share, and settlement" },
 
   // ── PHASE 2 ───────────────────────────────────────────────────
   { id: "manufacturing",    label: "Manufacturing",            icon: "🏭", phase: 2, liveByDefault: false, category: "Production",    description: "BOM, production orders, work orders, and finished goods" },

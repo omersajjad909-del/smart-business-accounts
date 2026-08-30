@@ -4,7 +4,7 @@ import { PLAN_DEFAULT_PERMISSIONS } from "@/lib/planPermissions";
 
 export type DashboardFeaturePlanCode = "STARTER" | "PRO" | "ENTERPRISE" | "CUSTOM";
 
-export type DashboardBusinessGroup = "retail" | "distribution" | "trading" | "wholesale" | "manufacturing" | "service" | "restaurant" | "healthcare" | "real_estate" | "construction" | "school" | "hotel" | "pharmacy" | "transport" | "trade" | "ecommerce" | "salon" | "gym" | "agriculture" | "ngo" | "law_firm" | "it" | "automotive" | "repair" | "maintenance" | "media" | "subscriptions" | "isp" | "solar" | "events" | "rentals" | "travel" | "firm" | "franchise";
+export type DashboardBusinessGroup = "retail" | "distribution" | "trading" | "wholesale" | "manufacturing" | "service" | "restaurant" | "healthcare" | "real_estate" | "construction" | "school" | "hotel" | "pharmacy" | "transport" | "trade" | "ecommerce" | "salon" | "gym" | "agriculture" | "ngo" | "law_firm" | "it" | "automotive" | "repair" | "maintenance" | "media" | "subscriptions" | "isp" | "solar" | "events" | "rentals" | "travel" | "firm" | "franchise" | "investor";
 
 export type DashboardFeatureDefinition = {
   id: string;
@@ -2411,6 +2411,18 @@ export const DASHBOARD_FEATURE_DEFS: DashboardFeatureDefinition[] = [
   { id: "AI_GL_SUGGEST",      label: "GL Auto-Code",            route: "/dashboard/ai?tab=gl-suggest",      business: "trading", businessLabel: "AI Intelligence", section: "Analytics", description: "Automatically suggest general ledger codes for transactions." },
   { id: "AI_EXPENSE_CAT",     label: "Expense Categories",      route: "/dashboard/ai?tab=expense-cat",     business: "trading", businessLabel: "AI Intelligence", section: "Analytics", description: "AI-powered expense categorization for better tracking." },
   { id: "AI_DUPLICATE",       label: "Duplicate Detection",     route: "/dashboard/ai?tab=duplicate",       business: "trading", businessLabel: "AI Intelligence", section: "Analytics", description: "Find and flag duplicate transactions and invoices." },
+
+  // ââ Investor / Profit Sharing ââââââââââââââââââââââââââââââââââââââââââ
+  // Every page carries its own key so a plan can sell the statement without
+  // exposing the capital ledger that sits behind it.
+  { id: "INVESTOR_OVERVIEW",    label: "Overview",     route: "/dashboard/investors",             section: "Control Center", businessLabel: "Investor / Profit Sharing", business: "investor", businessTypes: ["investor"], description: "Every party on one row, with the four figures that decide anything." },
+  { id: "INVESTOR_PARTIES",     label: "Parties",      route: "/dashboard/investors/parties",     section: "Setup",          businessLabel: "Investor / Profit Sharing", business: "investor", businessTypes: ["investor"], description: "The businesses the money sits in, and how often each settles." },
+  { id: "INVESTOR_CAPITAL",     label: "Capital",      route: "/dashboard/investors/capital",     section: "Setup",          businessLabel: "Investor / Profit Sharing", business: "investor", businessTypes: ["investor"], description: "Money placed and money taken back out, kept apart from profit." },
+  { id: "INVESTOR_GRADES",      label: "Profit Terms", route: "/dashboard/investors/grades",      section: "Setup",          businessLabel: "Investor / Profit Sharing", business: "investor", businessTypes: ["investor"], description: "What each grade pays and from which day, with full rate history." },
+  { id: "INVESTOR_PRODUCTION",  label: "Production",   route: "/dashboard/investors/production",  section: "Each Cycle",     businessLabel: "Investor / Profit Sharing", business: "investor", businessTypes: ["investor"], description: "A whole cycle of output entered in one pass, priced by date." },
+  { id: "INVESTOR_SETTLEMENTS", label: "Settlements",  route: "/dashboard/investors/settlements", section: "Each Cycle",     businessLabel: "Investor / Profit Sharing", business: "investor", businessTypes: ["investor"], description: "Close a cycle: earned, received, and what carries forward." },
+  { id: "INVESTOR_STATEMENT",   label: "Statement",    route: "/dashboard/investors/statement",   section: "Each Cycle",     businessLabel: "Investor / Profit Sharing", business: "investor", businessTypes: ["investor"], description: "The printable page handed to the party running the business." },
+  { id: "INVESTOR_REPORTS",     label: "Reports",      route: "/dashboard/investors/reports",     section: "Reports",        businessLabel: "Investor / Profit Sharing", business: "investor", businessTypes: ["investor"], description: "Production, monthly summary, capital and return, settlement history." },
 ];
 
 
