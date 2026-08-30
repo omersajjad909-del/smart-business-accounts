@@ -1,64 +1,17 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import Link from "next/link";
-import HelpfulWidget from "@/components/HelpfulWidget";
 
 const BASE = process.env.NEXT_PUBLIC_BASE_URL || "https://www.finovaos.app";
 
-/**
- * Per-article metadata.
- *
- * This used to return the canonical and nothing else, which meant every one of
- * the ~55 articles inherited the Help Center layout title and description
- * verbatim. Googlebot saw a few dozen URLs with identical titles and identical
- * descriptions, grouped them, and reported the lot as "Duplicate without
- * user-selected canonical" — the canonical was there, it just was not trusted
- * against that much sameness. Each article now describes itself.
- */
 export async function generateMetadata({
   params,
 }: {
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const article = ARTICLES[slug];
-  const url = `${BASE}/help/${slug}`;
-
-  if (!article) {
-    return {
-      title: "Article not found",
-      robots: { index: false, follow: true },
-      alternates: { canonical: url },
-    };
-  }
-
-  // The intro block is written as the article summary, so it doubles as the
-  // meta description. Markdown bold markers have to come out first.
-  const intro = article.content.find(b => b.type === "intro")?.text ?? "";
-  const description =
-    (intro || `${article.title} — a step-by-step FinovaOS guide.`)
-      .replace(/**/g, "")
-      .slice(0, 300);
-
   return {
-    title: article.title,
-    description,
-    keywords: [article.title, article.category, "FinovaOS help", "FinovaOS guide"],
-    openGraph: {
-      title: article.title,
-      description,
-      url,
-      siteName: "FinovaOS",
-      type: "article",
-      images: [{ url: `${BASE}/icon.png`, width: 1200, height: 630, alt: article.title }],
-    },
-    twitter: {
-      card: "summary_large_image",
-      title: article.title,
-      description,
-      images: [`${BASE}/icon.png`],
-    },
-    alternates: { canonical: url },
+    alternates: { canonical: `${BASE}/help/${slug}` },
   };
 }
 
@@ -1768,6 +1721,26 @@ export default async function HelpArticlePage({
           </a>
         </div>
 
+      </div>
+    </div>
+  );
+}
+
+/* ─── Client component for helpful widget ─── */
+// Isko alag file mein rakh sakte ho: components/HelpfulWidget.tsx
+// Ya inline "use client" ke saath use karo
+function HelpfulWidget() {
+  // Server component mein useState nahi chalta
+  // Isko alag client component mein move karo:
+  // "use client"
+  // import { useState } from "react"
+  // export default function HelpfulWidget() { ... }
+  return (
+    <div style={{ borderRadius:16, padding:"20px 22px", background:"rgba(255,255,255,.03)", border:"1px solid rgba(255,255,255,.07)", marginBottom:32, display:"flex", alignItems:"center", justifyContent:"space-between", flexWrap:"wrap", gap:14 }}>
+      <span style={{ fontSize:14, fontWeight:600, color:"rgba(255,255,255,.45)" }}>Was this article helpful?</span>
+      <div style={{ display:"flex", gap:8 }}>
+        <a href="?helpful=yes" style={{ padding:"8px 18px", borderRadius:10, background:"rgba(52,211,153,.08)", border:"1.5px solid rgba(52,211,153,.25)", color:"#34d399", fontSize:13, fontWeight:600, textDecoration:"none" }}>👍 Yes</a>
+        <a href="?helpful=no"  style={{ padding:"8px 18px", borderRadius:10, background:"rgba(248,113,113,.08)", border:"1.5px solid rgba(248,113,113,.2)",  color:"#f87171", fontSize:13, fontWeight:600, textDecoration:"none" }}>👎 No</a>
       </div>
     </div>
   );
