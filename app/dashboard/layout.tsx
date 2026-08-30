@@ -2121,7 +2121,20 @@ export default function DashboardLayout({
               {hasDashboardFeature("INVESTOR_PRODUCTION") && <NavLink href="/dashboard/investors/production" pathname={pathname}>Production</NavLink>}
               {hasDashboardFeature("INVESTOR_SETTLEMENTS") && <NavLink href="/dashboard/investors/settlements" pathname={pathname}>Settlements</NavLink>}
               {hasDashboardFeature("INVESTOR_STATEMENT") && <NavLink href="/dashboard/investors/statement" pathname={pathname}>Statement</NavLink>}
-              {hasDashboardFeature("INVESTOR_REPORTS") && <NavLink href="/dashboard/investors/reports" pathname={pathname}>Reports</NavLink>}
+            </NavGroup>
+          )}
+
+          {hasModule(businessType, "investor_reports") && hasDashboardFeature("INVESTOR_REPORTS") && (
+            <NavGroup
+              title="Reports"
+              icon={<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M4 19V5"/><path d="M4 19h16"/><path d="M8 16v-5"/><path d="M12 16V8"/><path d="M16 16v-9"/></svg>}
+              open={openSection === "investor_reports"}
+              onToggle={() => toggle("investor_reports")}
+            >
+              <NavLink href="/dashboard/investors/reports?view=production" pathname={pathname}>Production</NavLink>
+              <NavLink href="/dashboard/investors/reports?view=monthly" pathname={pathname}>Monthly Summary</NavLink>
+              <NavLink href="/dashboard/investors/reports?view=return" pathname={pathname}>Capital & Return</NavLink>
+              <NavLink href="/dashboard/investors/reports?view=history" pathname={pathname}>Settlement History</NavLink>
             </NavGroup>
           )}
 

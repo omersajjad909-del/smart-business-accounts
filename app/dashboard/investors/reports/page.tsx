@@ -8,7 +8,8 @@
 // whether the man on the other side pays on time — and it answers it with a
 // number rather than a feeling.
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { useResponsive } from "@/hooks/useResponsive";
 import { useBusinessRecords } from "@/lib/useBusinessRecords";
 import { DateInput } from "../../reports/_components/DateInput";
@@ -51,6 +52,10 @@ import {
 
 type ReportKey = "production" | "monthly" | "return" | "history";
 
+function isReportKey(value: string | null): value is ReportKey {
+  return value === "production" || value === "monthly" || value === "return" || value === "history";
+}
+
 const REPORTS: { key: ReportKey; label: string; blurb: string }[] = [
   { key: "production", label: "Production", blurb: "Every line in the window, by date and grade." },
   { key: "monthly", label: "Monthly Summary", blurb: "Month by month: how much was made and what it earned." },
@@ -60,6 +65,7 @@ const REPORTS: { key: ReportKey; label: string; blurb: string }[] = [
 
 export default function InvestorReportsPage() {
   const { isMobile } = useResponsive();
+  const searchParams = useSearchParams();
   const { records: partyRecords } = useBusinessRecords(CAT.party);
   const { records: capitalRecords } = useBusinessRecords(CAT.capital);
   const { records: productionRecords, loading } = useBusinessRecords(CAT.production);
@@ -77,6 +83,10 @@ export default function InvestorReportsPage() {
   const unit = party?.unit || "kg";
 
   const [report, setReport] = useState<ReportKey>("production");
+  useEffect(() => {
+    const view = searchParams.get("view");
+    if (isReportKey(view)) setReport(view);
+  }, [searchParams]);
   const [fromEdit, setFromEdit] = useState("");
   const [to, setTo] = useState(todayISO());
 
