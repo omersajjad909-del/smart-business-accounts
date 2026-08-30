@@ -184,6 +184,14 @@ export type ManualInvoiceInput = {
   /** The agreed line total, before discount and tax. */
   amount: number;
   discount?: number | null;
+  /**
+   * An agreed discount expressed the way the deal was — "50% off every month"
+   * — rather than as a figure someone worked out by hand. Wins over `discount`
+   * when both arrive. Kept as a percentage so the invoice can print the rate
+   * next to the money, and so a plan price change does not silently turn a half
+   * -price deal into something else.
+   */
+  discountPercent?: number | null;
   /** Percentage, e.g. 17 for 17%. */
   taxRate?: number | null;
   taxName?: string | null;
@@ -237,7 +245,15 @@ export async function createManualPlatformInvoice(
     return { ok: false, error: `amount cannot exceed ${MAX_MANUAL_AMOUNT.toLocaleString()}` };
   }
 
-  const discount = round2(Number(input.discount) || 0);
+  const hasPercent = input.discountPercent !== null && input.discountPercent !== undefined;
+  const discountPercent = Number(input.discountPercent) || 0;
+  if (hasPercent && (!Number.isFinite(discountPercent) || discountPercent < 0 || discountPercent > 100)) {
+    return { ok: false, error: "discountPercent must be between 0 and 100" };
+  }
+
+  const discount = hasPercent
+    ? round2((amount * discountPercent) / 100)
+    : round2(Number(input.discount) || 0);
   if (discount < 0) return { ok: false, error: "discount cannot be negative" };
   if (discount > amount) return { ok: false, error: "discount cannot exceed the amount" };
 

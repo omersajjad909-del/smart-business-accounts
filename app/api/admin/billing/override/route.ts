@@ -155,6 +155,7 @@ export async function POST(req: NextRequest) {
           currency: payload?.currency,
           amount: Number(payload?.amount),
           discount: payload?.discount,
+          discountPercent: payload?.discountPercent,
           taxRate: payload?.taxRate,
           taxName: payload?.taxName,
           customerName: company.name,

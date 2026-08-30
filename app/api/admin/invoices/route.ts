@@ -212,6 +212,7 @@ export async function POST(req: NextRequest) {
       currency: body.currency,
       amount: Number(body.amount),
       discount: body.discount,
+      discountPercent: body.discountPercent,
       taxRate: body.taxRate,
       taxName: body.taxName,
       customerName: body.customerName || billingUser?.name || company.name,

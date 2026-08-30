@@ -63,6 +63,28 @@ function addYearsISO(years: number): string {
   return d.toISOString().slice(0, 10);
 }
 
+/**
+ * Today plus N months. setMonth clamps a short month for us — a grant made on
+ * 31 January runs to 28 February rather than silently rolling into March.
+ */
+function addMonthsISO(months: number): string {
+  const d = new Date();
+  const day = d.getDate();
+  d.setMonth(d.getMonth() + months);
+  if (d.getDate() < day) d.setDate(0);
+  return d.toISOString().slice(0, 10);
+}
+
+/** The access-period presets, shortest first. A monthly deal lives at the top. */
+const GRANT_PRESETS: { label: string; iso: () => string }[] = [
+  { label: "1 month",  iso: () => addMonthsISO(1) },
+  { label: "3 months", iso: () => addMonthsISO(3) },
+  { label: "6 months", iso: () => addMonthsISO(6) },
+  { label: "1 year",   iso: () => addYearsISO(1) },
+  { label: "2 years",  iso: () => addYearsISO(2) },
+  { label: "3 years",  iso: () => addYearsISO(3) },
+];
+
 function isoToDisplay(iso: string): string {
   if (!iso || iso.length < 10) return "—";
   const [y, m, d] = iso.slice(0, 10).split("-");
@@ -92,6 +114,8 @@ function OverrideModal({ company, onClose, onDone }: {
   );
   const [amount, setAmount]   = useState("");
   const [taxRate, setTaxRate] = useState(0);
+  const [discountPct, setDiscountPct] = useState(0);
+  const [billingCycle, setBillingCycle] = useState("MONTHLY");
   const [saving, setSaving] = useState(false);
   const [history, setHistory] = useState<OverrideLog[]>([]);
   const [loadingHist, setLoadingHist] = useState(false);
@@ -122,7 +146,15 @@ function OverrideModal({ company, onClose, onDone }: {
       if (action === "GRANT_FREE_ACCESS") {
         payload = { until, plan };
         if (recordInvoice) {
-          payload = { ...payload, recordInvoice: true, currency, amount: Number(amount), taxRate };
+          payload = {
+            ...payload,
+            recordInvoice: true,
+            currency,
+            amount: Number(amount),
+            discountPercent: discountPct,
+            taxRate,
+            billingCycle,
+          };
         }
       }
       if (action === "SET_STATUS")      payload = { status };
@@ -156,10 +188,15 @@ function OverrideModal({ company, onClose, onDone }: {
     setSaving(false);
   }
 
-  // Mirrors the server's own arithmetic so the admin sees the figure that will
-  // be written, not one the page invented.
-  const invoiceNet = Math.round(((Number(amount) || 0) * (1 + taxRate / 100)) * 100) / 100;
-  const invoiceIncomplete = recordInvoice && !(Number(amount) > 0);
+  // Mirrors the server's own arithmetic, in the same order, so the admin sees
+  // the figure that will be written rather than one the page invented.
+  const round2 = (n: number) => Math.round(n * 100) / 100;
+  const invoiceGross    = Number(amount) || 0;
+  const invoiceDiscount = round2((invoiceGross * discountPct) / 100);
+  const invoiceTaxable  = round2(invoiceGross - invoiceDiscount);
+  const invoiceTax      = round2((invoiceTaxable * taxRate) / 100);
+  const invoiceNet      = round2(invoiceTaxable + invoiceTax);
+  const invoiceIncomplete = recordInvoice && !(invoiceGross > 0);
 
   const inputStyle: React.CSSProperties = {
     width: "100%", padding: "10px 12px", borderRadius: 10,
@@ -225,13 +262,13 @@ function OverrideModal({ company, onClose, onDone }: {
                 <div>
                   <label style={{ fontSize: 11, fontWeight: 700, color: "#475569", letterSpacing: ".06em", display: "block", marginBottom: 6 }}>ACCESS ENDS ON</label>
                   <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
-                    {[1, 2, 3].map(y => {
-                      const iso = addYearsISO(y);
+                    {GRANT_PRESETS.map(preset => {
+                      const iso = preset.iso();
                       const on = until === iso;
                       return (
-                        <button key={y} onClick={() => setUntil(iso)}
-                          style={{ padding: "7px 16px", borderRadius: 10, border: `1px solid ${on ? "#818cf8" : "rgba(255,255,255,.1)"}`, background: on ? "rgba(99,102,241,.2)" : "transparent", color: on ? "#818cf8" : "#64748b", fontSize: 12, fontWeight: 700, cursor: "pointer" }}>
-                          {y} year{y > 1 ? "s" : ""}
+                        <button key={preset.label} onClick={() => setUntil(iso)}
+                          style={{ padding: "7px 14px", borderRadius: 10, border: `1px solid ${on ? "#818cf8" : "rgba(255,255,255,.1)"}`, background: on ? "rgba(99,102,241,.2)" : "transparent", color: on ? "#818cf8" : "#64748b", fontSize: 12, fontWeight: 700, cursor: "pointer" }}>
+                          {preset.label}
                         </button>
                       );
                     })}
@@ -300,9 +337,35 @@ function OverrideModal({ company, onClose, onDone }: {
                           </select>
                         </div>
                         <div style={{ flex: 1 }}>
-                          <label style={{ fontSize: 11, fontWeight: 700, color: "#475569", letterSpacing: ".06em", display: "block", marginBottom: 6 }}>AMOUNT (BEFORE TAX)</label>
+                          {/* The standard price, not what they pay. An agreed
+                              discount belongs on the invoice as a discount, so
+                              the customer can see the deal they were given. */}
+                          <label style={{ fontSize: 11, fontWeight: 700, color: "#475569", letterSpacing: ".06em", display: "block", marginBottom: 6 }}>STANDARD PRICE</label>
                           <input type="number" min={0} step="0.01" value={amount} onChange={e => setAmount(e.target.value)}
-                            placeholder="e.g. 150000" style={inputStyle} />
+                            placeholder="e.g. 12000" style={inputStyle} />
+                        </div>
+                        <div style={{ width: 150 }}>
+                          <label style={{ fontSize: 11, fontWeight: 700, color: "#475569", letterSpacing: ".06em", display: "block", marginBottom: 6 }}>PERIOD</label>
+                          <select value={billingCycle} onChange={e => setBillingCycle(e.target.value)} style={inputStyle}>
+                            <option value="MONTHLY">Monthly</option>
+                            <option value="YEARLY">Yearly</option>
+                          </select>
+                        </div>
+                      </div>
+
+                      <div style={{ display: "flex", gap: 10 }}>
+                        <div style={{ flex: 1 }}>
+                          <label style={{ fontSize: 11, fontWeight: 700, color: "#475569", letterSpacing: ".06em", display: "block", marginBottom: 6 }}>DISCOUNT %</label>
+                          <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
+                            {[0, 25, 50].map(p => (
+                              <button key={p} onClick={() => setDiscountPct(p)}
+                                style={{ padding: "9px 12px", borderRadius: 10, border: `1px solid ${discountPct === p ? "#22c55e" : "rgba(255,255,255,.1)"}`, background: discountPct === p ? "rgba(34,197,94,.15)" : "transparent", color: discountPct === p ? "#22c55e" : "#64748b", fontSize: 12, fontWeight: 700, cursor: "pointer", whiteSpace: "nowrap" }}>
+                                {p === 0 ? "None" : `${p}%`}
+                              </button>
+                            ))}
+                            <input type="number" min={0} max={100} step="0.01" value={discountPct} onChange={e => setDiscountPct(Number(e.target.value))}
+                              style={{ ...inputStyle, width: 70, textAlign: "center" }} />
+                          </div>
                         </div>
                         <div style={{ width: 90 }}>
                           <label style={{ fontSize: 11, fontWeight: 700, color: "#475569", letterSpacing: ".06em", display: "block", marginBottom: 6 }}>TAX %</label>
@@ -310,11 +373,33 @@ function OverrideModal({ company, onClose, onDone }: {
                             style={{ ...inputStyle, textAlign: "center" }} />
                         </div>
                       </div>
-                      <div style={{ fontSize: 11, color: "#475569", lineHeight: 1.7 }}>
-                        Invoice total: <span style={{ color: "#22c55e", fontWeight: 700 }}>{currency} {invoiceNet.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
-                        {taxRate > 0 && <> — {Number(amount) || 0} + {taxRate}% tax</>}
-                        <br />
-                        Covers today through <span style={{ color: "#94a3b8" }}>{isoToDisplay(until)}</span>, marked PAID.
+
+                      {/* The invoice as the customer will read it, line by line. */}
+                      <div style={{ padding: "12px 14px", borderRadius: 10, background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.06)", fontSize: 11.5, color: "#64748b", lineHeight: 1.9 }}>
+                        <div style={{ display: "flex", justifyContent: "space-between" }}>
+                          <span>{plan} subscription ({billingCycle.toLowerCase()})</span>
+                          <span>{currency} {invoiceGross.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                        </div>
+                        {discountPct > 0 && (
+                          <div style={{ display: "flex", justifyContent: "space-between", color: "#22c55e" }}>
+                            <span>Discount ({discountPct}%)</span>
+                            <span>− {currency} {invoiceDiscount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                          </div>
+                        )}
+                        {taxRate > 0 && (
+                          <div style={{ display: "flex", justifyContent: "space-between" }}>
+                            <span>Tax ({taxRate}%)</span>
+                            <span>{currency} {invoiceTax.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                          </div>
+                        )}
+                        <div style={{ display: "flex", justifyContent: "space-between", marginTop: 6, paddingTop: 6, borderTop: "1px solid rgba(255,255,255,.07)", color: "white", fontWeight: 800 }}>
+                          <span>Total</span>
+                          <span style={{ color: "#22c55e" }}>{currency} {invoiceNet.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                        </div>
+                        <div style={{ marginTop: 8, fontSize: 11, color: "#475569" }}>
+                          Covers today through <span style={{ color: "#94a3b8" }}>{isoToDisplay(until)}</span>, marked PAID.
+                          {billingCycle === "MONTHLY" && " Nothing renews this automatically — repeat it next month."}
+                        </div>
                       </div>
                     </div>
                   )}

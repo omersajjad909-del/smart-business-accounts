@@ -346,6 +346,13 @@ export async function buildBillingInvoicePdfData(companyId: string, invoiceId: s
       notes: [
         "Subscription invoice for FinovaOS hosted billing.",
         discount > 0 && !ledger ? "Launch offer applied: 50% off for first 3 months." : "",
+        // A discount agreed as a rate — "half price every month" — is only
+        // meaningful to the customer as a rate, so the percentage is derived
+        // back out of the money rather than the money being left to speak for
+        // itself. Derived, not stored: the ledger keeps amounts, not terms.
+        discount > 0 && ledger && subtotal > 0
+          ? `Discount applied: ${Math.round((discount / subtotal) * 1000) / 10}% off the standard price.`
+          : "",
         tax > 0 && ledger?.taxName ? `Includes ${ledger.taxName} at ${ledger.taxRate}%.` : "",
         ledger?.status === "REFUNDED" ? "This payment has been refunded in full." : "",
         ledger?.status === "PARTIALLY_REFUNDED"
