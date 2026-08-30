@@ -27,7 +27,7 @@ import { safeEncryptField } from "@/lib/fieldEncrypt";
  * idle sandbox that does not match, so a deploy plus one cron tick is all it
  * takes for the shelf to rebuild itself.
  */
-export const DEMO_SEED_VERSION = "demo-seed-v3";
+export const DEMO_SEED_VERSION = "demo-seed-v4";
 
 export const DEMO_BUSINESS_TYPES = [
   "trading",
@@ -37,6 +37,7 @@ export const DEMO_BUSINESS_TYPES = [
   "clearing_forwarding",
   "wholesale",
   "manufacturing",
+  "investor",
 ] as const;
 
 export type DemoBusinessType = (typeof DEMO_BUSINESS_TYPES)[number];
@@ -122,6 +123,20 @@ const COMMON_ACCOUNTS: AccountRow[] = [
 // ── The six Phase 1 businesses ──────────────────────────────────────────────
 
 const PROFILES: Record<DemoBusinessType, DemoProfile> = {
+  investor: {
+    label: "Investor / Profit Sharing",
+    emoji: "🤝",
+    companyName: "Amanat Investment Partners",
+    taxRate: 0,
+    itemCategory: "INVESTMENT",
+    branches: [["MAIN", "Main Office — Lahore", "Lahore"]],
+    customers: [["Pak Board Mills", "Lahore", 10, 0], ["Green Fibre Works", "Faisalabad", 15, 0]],
+    suppliers: [["Professional Services", "Lahore", 0]],
+    items: [["INV-001", "Working Capital Placement", "LOT", 1, 1, 1, 0]],
+    employees: [["Ayesha", "Khan", "Investment Manager", "Finance", 145000], ["Hamza", "Ali", "Settlement Officer", "Finance", 95000]],
+    extraAccounts: [["1100", "Investment Capital Deployed", "ASSET", "GENERAL"], ["4100", "Profit Share Income", "INCOME", "INCOME"]],
+    expenses: [["Investment due diligence", A.OFFICE, 35000, "OTHER"], ["Professional advisory fee", A.OFFICE, 22000, "OTHER"]],
+  },
   trading: {
     label: "Trading",
     emoji: "🛒",
@@ -1353,6 +1368,41 @@ export async function seedDemoCompany(
     };
   });
 
+  // The Investor workspace is driven by BusinessRecord rather than the shared
+  // sales tables. Seed a complete, believable cycle so its overview, statement
+  // and reports are useful on the first click instead of looking unfinished.
+  const investorRows = (() => {
+    if (businessType !== "investor") return [];
+    const partyId = randomUUID();
+    const gradeId = randomUUID();
+    const closedSettlementId = randomUUID();
+    const openSettlementId = randomUUID();
+    const party = {
+      id: partyId, companyId, category: "investor_party", title: "Pak Board Mills", status: "active", date: daysAgo(90),
+      data: { business: "Paper board manufacturing", cycleDays: 15, profitModel: "per_unit", sharePercent: 0, unit: "kg" },
+    };
+    const grade = {
+      id: gradeId, companyId, category: "investor_grade", title: "Premium Board", status: "active", refId: partyId, amount: 3.5, date: daysAgo(90),
+      data: { unit: "kg", sortOrder: 1, history: [{ rate: 3.5, from: daysAgo(90).toISOString().slice(0, 10) }] },
+    };
+    const capital = [
+      { id: randomUUID(), companyId, category: "investor_capital", title: "Initial working capital", status: "posted", refId: partyId, amount: 1800000, date: daysAgo(85), data: { kind: "invest" } },
+      { id: randomUUID(), companyId, category: "investor_capital", title: "Additional production capital", status: "posted", refId: partyId, amount: 450000, date: daysAgo(42), data: { kind: "invest" } },
+    ];
+    const production = [
+      [26, 142000, closedSettlementId], [21, 136500, closedSettlementId], [11, 151800, openSettlementId], [4, 148200, openSettlementId],
+    ].map(([ago, qty, settlementId]) => ({
+      id: randomUUID(), companyId, category: "investor_production", title: "Premium Board", status: "posted", refId: partyId,
+      amount: Number(qty) * 3.5, date: daysAgo(Number(ago)),
+      data: { gradeId, gradeName: "Premium Board", qty, rate: 3.5, baseProfit: 0, settlementId },
+    }));
+    const settlements = [
+      { id: closedSettlementId, companyId, category: "investor_settlement", title: "Cycle #1 — settled", status: "closed", refId: partyId, amount: 974750, date: daysAgo(16), data: { cycleNo: 1, fromDate: daysAgo(30).toISOString().slice(0, 10), toDate: daysAgo(16).toISOString().slice(0, 10), totalQty: 278500, openingBalance: 0, cashReceived: 974750, closingBalance: 0 } },
+      { id: openSettlementId, companyId, category: "investor_settlement", title: "Cycle #2 — due", status: "open", refId: partyId, amount: 1050000, date: daysAgo(1), data: { cycleNo: 2, fromDate: daysAgo(15).toISOString().slice(0, 10), toDate: daysAgo(1).toISOString().slice(0, 10), totalQty: 300000, openingBalance: 0, cashReceived: 600000, closingBalance: 450000 } },
+    ];
+    return [party, grade, ...capital, ...production, ...settlements];
+  })();
+
   // ── Write everything, in FK order, as one batch ───────────────────────
   await prisma.$transaction([
     prisma.branch.createMany({ data: branchRows }),
@@ -1384,7 +1434,7 @@ export async function seedDemoCompany(
     prisma.contact.createMany({ data: contacts }),
     prisma.bankStatement.createMany({ data: bankStatements }),
     prisma.ledgerEntry.createMany({ data: ledger }),
-    prisma.businessRecord.createMany({ data: [...warehouseRows, ...transferRows] }),
+    prisma.businessRecord.createMany({ data: [...warehouseRows, ...transferRows, ...investorRows] }),
   ]);
 
   const totalDebit = round2(ledger.reduce((s, l) => s + l.debit, 0));

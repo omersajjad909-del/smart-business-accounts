@@ -35,7 +35,8 @@ export type DemoBusinessId =
   | "retail"
   | "import_company"
   | "clearing_forwarding"
-  | "manufacturing";
+  | "manufacturing"
+  | "investor";
 
 export type DemoBusiness = {
   id: DemoBusinessId;
@@ -58,6 +59,39 @@ export type DemoBusiness = {
 };
 
 export const DEMO_BUSINESSES: DemoBusiness[] = [
+  {
+    id: "investor",
+    liveBusinessType: "investor",
+    demoAvailable: true,
+    icon: "🤝",
+    label: "Investor / Profit Sharing",
+    category: "Finance",
+    tagline: "See every rupee invested, earned, paid, and carried forward.",
+    description:
+      "For investors funding a business on per-unit returns or an agreed profit share, with a clear settlement trail for every cycle.",
+    color: "#14b8a6",
+    gradient: "linear-gradient(135deg,#0f766e,#2dd4bf)",
+    modules: ["Investor Parties", "Capital Register", "Profit Terms", "Production Entries", "Cycle Settlements", "Investor Statement", "Return Reports", "Audit Trail"],
+    workflow: [
+      { step: "Set up the party", detail: "Record the business, return model, unit, and settlement cycle" },
+      { step: "Record capital", detail: "Keep every investment and withdrawal in one capital register" },
+      { step: "Enter production", detail: "Capture output at the agreed per-unit rate or period profit" },
+      { step: "Close the cycle", detail: "Calculate profit due, cash received, and any carried balance" },
+    ],
+    insights: ["Capital at risk and withdrawals by party", "Profit due, paid, and outstanding by settlement cycle", "Return percentage based on the capital actually deployed"],
+    aiFeatures: [
+      "🤖 Highlights overdue settlements and carried balances",
+      "📈 Summarizes return trends across investment parties",
+      "⚠️ Flags output recorded without an agreed profit rate",
+    ],
+    proof: ["Per-unit and percentage profit models in one workflow", "Production amounts are frozen at the rate valid on that date", "A printable investor statement for every party"],
+    highlights: [
+      { label: "Capital position", value: "Live", sub: "Invested less withdrawals" },
+      { label: "Profit calculation", value: "Per cycle", sub: "Due, paid, and carried forward" },
+      { label: "Investor statement", value: "Printable", sub: "A clear record to hand over" },
+    ],
+    sampleDocs: ["Investor Party", "Capital Entry", "Profit Terms", "Production Register", "Settlement Statement"],
+  },
   {
     id: "trading",
     liveBusinessType: "trading",

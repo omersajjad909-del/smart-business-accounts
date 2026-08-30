@@ -60,6 +60,7 @@ const CATEGORY_COLORS: Record<string, string> = {
   Projects: "#fb923c",
   Property: "#f472b6",
   Trade: "#4ade80",
+  Finance: "#14b8a6",
 };
 
 const CATEGORIES = Array.from(new Set(BUSINESSES.map((b) => b.category)));
@@ -67,7 +68,7 @@ const CATEGORIES = Array.from(new Set(BUSINESSES.map((b) => b.category)));
 // "60+ Business Types" was the old catalogue count while this page showed one
 // live demo — a number the page itself contradicted.
 const TRUST_STATS = [
-  { value: "7",            label: "Live Demos",       icon: "🏢" },
+  { value: "8",            label: "Live Demos",       icon: "🏢" },
   { value: "Early Access", label: "Limited Spots",    icon: "🚀" },
   { value: "No signup",    label: "To Start",         icon: "⚡" },
   { value: "1 hour",       label: "Full Access",      icon: "⏱️" },
