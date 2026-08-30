@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireAdmin, logAdminAction } from "@/lib/adminAuth";
 import { createManualPlatformInvoice } from "@/lib/platformInvoice";
+import { sendManualInvoiceEmail } from "@/lib/manualInvoiceEmail";
 
 export const runtime = "nodejs";
 

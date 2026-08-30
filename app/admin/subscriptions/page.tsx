@@ -168,11 +168,18 @@ function OverrideModal({ company, onClose, onDone }: {
         const invoice = j?.result?.invoice;
         const invoiceError = j?.result?.invoiceError;
         if (invoice) {
-          toast.success(
-            invoice.duplicate
-              ? `Access granted — invoice ${invoice.number} already existed for this period`
-              : `Access granted — invoice ${invoice.number} recorded`,
-          );
+          if (invoice.duplicate) {
+            toast.success(`Access granted — invoice ${invoice.number} already existed for this period`);
+          } else if (invoice.emailedTo) {
+            toast.success(`Access granted — invoice ${invoice.number} recorded and emailed to ${invoice.emailedTo}`);
+          } else {
+            // The invoice is written and visible on their billing page either
+            // way; only the receipt did not go out.
+            toast.success(
+              `Access granted — invoice ${invoice.number} recorded, but the email failed: ${invoice.emailError || "no address on file"}`,
+              { duration: 8000 },
+            );
+          }
         } else if (invoiceError) {
           // Not a failure of the grant, which is already applied.
           toast.error(`Access granted, but the invoice failed: ${invoiceError}`, { duration: 8000 });
