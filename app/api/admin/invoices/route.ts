@@ -262,7 +262,12 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    return NextResponse.json({ invoice: result.invoice, duplicate: result.duplicate });
+    return NextResponse.json({
+      invoice: result.invoice,
+      duplicate: result.duplicate,
+      emailedTo: emailed.sent ? emailed.to : null,
+      emailError: emailed.sent ? null : (emailed as any).error || null,
+    });
   } catch (e: any) {
     console.error("[admin/invoices] POST error:", e);
     return NextResponse.json({ error: e?.message || "Failed to create invoice" }, { status: 500 });
