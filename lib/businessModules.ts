@@ -1758,6 +1758,11 @@ export const BUSINESS_PHASE_CONFIG: Record<string, { phase: 1|2|3|4; status: Pha
   import_company:       { phase:1, status:"live",        category:"Commerce",          label:"Import / Export",         emoji:"🚢", description:"Import & export — customs, LC/TT, shipping, foreign buyers & local sales" },
   clearing_forwarding:  { phase:1, status:"live",        category:"Commerce",          label:"Clearing & Forwarding",   emoji:"🛃", description:"Freight forwarding, customs documentation" },
 
+  // ── Phase 1 — LIVE (Finance) ────────────────────────────────
+  // Not a trade: the investor buys nothing and sells nothing. He funds a
+  // business and holds a claim on its output, so he needs his own type.
+  investor:             { phase:1, status:"live",        category:"Finance",           label:"Investor / Profit Sharing", emoji:"🤝", description:"Capital placed in another business — track output, take a share, settle each cycle" },
+
   // ── Phase 2 — COMING SOON (Production + Retail + Food) ──────
   manufacturing:        { phase:1, status:"live",        category:"Production",        label:"Manufacturing",           emoji:"🏭", description:"BOM, production orders, work orders, finished goods" },
   food_processing:      { phase:2, status:"coming_soon", category:"Production",        label:"Food Processing",         emoji:"🥫", description:"Recipe-based production, batch tracking, food costing" },
