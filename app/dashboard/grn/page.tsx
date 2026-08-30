@@ -483,10 +483,19 @@ export default function GRNPage() {
           <h1 style={{ fontSize: 24, fontWeight: 800, margin: 0, letterSpacing: -0.5 }}>Goods Receipt Note</h1>
           <p style={{ margin: "3px 0 0", fontSize: 13, color: MUTED }}>{grns.length} total GRNs</p>
         </div>
-        <div style={{ display: "flex", gap: 8 }}>
+        <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+          <button onClick={enterQuery}
+            title="Search saved GRNs"
+            style={{ padding: "9px 14px", borderRadius: 8, border: `1px solid ${BORDER}`, background: queryMode ? "rgba(250,204,21,.15)" : PANEL, color: queryMode ? "#facc15" : TEXT, fontFamily: FONT, fontSize: 13, fontWeight: 600, cursor: "pointer", display: "flex", alignItems: "center", gap: 7 }}>
+            <span style={{ background: queryMode ? "#facc15" : "rgba(99,102,241,.15)", color: queryMode ? "#000" : ACCENT, borderRadius: 3, padding: "1px 5px", fontSize: 10, fontWeight: 800 }}>F7</span>
+            Query Mode
+          </button>
+          {/* Two buttons used to sit here, both reading "New GRN" — one kept the
+              draft on screen and one wiped it, and neither said so. The first is
+              the way back to whatever you were filling in. */}
           <button onClick={() => { setShowList(!showList); if (!showList) { setPreview(false); } }}
             style={{ padding: "9px 18px", borderRadius: 8, border: `1px solid ${BORDER}`, background: showList ? "rgba(99,102,241,0.12)" : PANEL, color: showList ? ACCENT : TEXT, fontFamily: FONT, fontSize: 13, fontWeight: 600, cursor: "pointer" }}>
-            {showList ? "New GRN" : `View All GRNs (${grns.length})`}
+            {showList ? "← Back to Form" : `View All GRNs (${grns.length})`}
           </button>
           {showList && (
             <button onClick={() => { setShowList(false); resetForm(); }}
@@ -496,6 +505,67 @@ export default function GRNPage() {
           )}
         </div>
       </div>
+
+      {/* ── Query bar (F7) ── */}
+      {queryMode && (
+        <div className="no-print" style={{ background: "rgba(250,204,21,.07)", border: "1px solid rgba(250,204,21,.3)", borderRadius: 12, padding: "14px 16px", marginBottom: 18 }}>
+          <div style={{ fontSize: 11, fontWeight: 800, color: "#facc15", textTransform: "uppercase", letterSpacing: 0.7, marginBottom: 10 }}>
+            Query Mode — fill any field, then press F8
+          </div>
+          <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr 1fr auto", gap: 10, alignItems: "end" }}>
+            <div>
+              <Label>GRN No</Label>
+              <input value={queryGrnNo} onChange={e => setQueryGrnNo(e.target.value)} placeholder="GRN-301" autoFocus
+                onKeyDown={e => { if (e.key === "F8" || e.key === "Enter") { e.preventDefault(); executeQuery(); } if (e.key === "Escape") exitQuery(); }}
+                style={inp()} />
+            </div>
+            <div>
+              <Label>Date</Label>
+              <DateInput value={queryDate} onChange={setQueryDate} style={inp()} />
+            </div>
+            <div>
+              <Label>Supplier</Label>
+              <input value={queryParty} onChange={e => setQueryParty(e.target.value)} placeholder="Any part of the name"
+                onKeyDown={e => { if (e.key === "F8" || e.key === "Enter") { e.preventDefault(); executeQuery(); } if (e.key === "Escape") exitQuery(); }}
+                style={inp()} />
+            </div>
+            <div style={{ display: "flex", gap: 8 }}>
+              <button onClick={executeQuery}
+                style={{ padding: "9px 16px", borderRadius: 8, border: "none", background: "#facc15", color: "#000", fontFamily: FONT, fontSize: 12.5, fontWeight: 800, cursor: "pointer", whiteSpace: "nowrap" }}>
+                F8 Execute
+              </button>
+              <button onClick={exitQuery}
+                style={{ padding: "9px 14px", borderRadius: 8, border: `1px solid ${BORDER}`, background: PANEL, color: MUTED, fontFamily: FONT, fontSize: 12.5, fontWeight: 600, cursor: "pointer" }}>
+                Esc
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── Query results: step through what the search found ── */}
+      {queryIdx >= 0 && queryResults.length > 0 && (
+        <div className="no-print" style={{ display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap", background: PANEL, border: `1px solid ${BORDER}`, borderRadius: 10, padding: "9px 14px", marginBottom: 16 }}>
+          <span style={{ fontSize: 12.5, color: MUTED }}>
+            Result <strong style={{ color: TEXT }}>{queryIdx + 1}</strong> of {queryResults.length} —{" "}
+            <strong style={{ color: ACCENT, fontFamily: "monospace" }}>{queryResults[queryIdx]?.grnNo}</strong>
+          </span>
+          <div style={{ display: "flex", gap: 6, marginLeft: "auto" }}>
+            <button onClick={() => queryNavTo(queryIdx - 1)} disabled={queryIdx === 0}
+              style={{ padding: "5px 12px", borderRadius: 6, border: `1px solid ${BORDER}`, background: "transparent", color: queryIdx === 0 ? MUTED : TEXT, fontFamily: FONT, fontSize: 11.5, fontWeight: 700, cursor: queryIdx === 0 ? "not-allowed" : "pointer", opacity: queryIdx === 0 ? .4 : 1 }}>
+              ← PgUp
+            </button>
+            <button onClick={() => queryNavTo(queryIdx + 1)} disabled={queryIdx >= queryResults.length - 1}
+              style={{ padding: "5px 12px", borderRadius: 6, border: `1px solid ${BORDER}`, background: "transparent", color: queryIdx >= queryResults.length - 1 ? MUTED : TEXT, fontFamily: FONT, fontSize: 11.5, fontWeight: 700, cursor: queryIdx >= queryResults.length - 1 ? "not-allowed" : "pointer", opacity: queryIdx >= queryResults.length - 1 ? .4 : 1 }}>
+              PgDn →
+            </button>
+            <button onClick={exitQuery}
+              style={{ padding: "5px 12px", borderRadius: 6, border: `1px solid ${BORDER}`, background: "transparent", color: MUTED, fontFamily: FONT, fontSize: 11.5, fontWeight: 700, cursor: "pointer" }}>
+              Clear
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* ── List View ── */}
       {showList && (
