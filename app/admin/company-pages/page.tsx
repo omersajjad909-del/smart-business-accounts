@@ -55,6 +55,24 @@ function headers() {
   };
 }
 
+/**
+ * Read a response that is supposed to be JSON but might not be.
+ *
+ * A route that throws returns an empty 500, and calling .json() on that reports
+ * "Unexpected end of JSON input" — an error about parsing that tells you
+ * nothing about the request that failed. Surfacing the status instead at least
+ * names what happened.
+ */
+async function readJson(r: Response): Promise<any> {
+  const text = await r.text();
+  if (!text) throw new Error(`Server returned ${r.status} with no message`);
+  try {
+    return JSON.parse(text);
+  } catch {
+    throw new Error(text.slice(0, 200));
+  }
+}
+
 const inputStyle: React.CSSProperties = {
   padding: "9px 14px",
   borderRadius: 10,

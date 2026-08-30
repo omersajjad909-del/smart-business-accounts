@@ -170,6 +170,19 @@ export async function POST(req: NextRequest) {
   const admin = await requireAdmin(req);
   if (admin instanceof NextResponse) return admin;
 
+  try {
+    return await handlePost(req, admin);
+  } catch (e) {
+    // An unhandled throw here returns a body-less 500, and the browser reports
+    // it as "Unexpected end of JSON input" — which says nothing about what
+    // actually broke. Always answer with JSON.
+    const message = e instanceof Error ? e.message : "Could not save the override";
+    console.error("[company-page-overrides] POST failed:", e);
+    return NextResponse.json({ error: message }, { status: 500 });
+  }
+}
+
+async function handlePost(req: NextRequest, admin: { id: string; email: string }) {
   const body = await req.json().catch(() => null);
   const ref = String(body?.companyId || "").trim();
   if (!ref) return NextResponse.json({ error: "companyId required" }, { status: 400 });
@@ -199,10 +212,15 @@ export async function POST(req: NextRequest) {
     next = setCompanyPageOverride(ctx.overrides, id, state);
   }
 
+  // No userId here on purpose. ActivityLog.userId is a foreign key into User,
+  // and an admin is not always a User: requireAdmin resolves a team admin out
+  // of the AdminUser table, whose id exists nowhere in User. Writing it made
+  // the insert fail the constraint and the route returned an empty 500. Who did
+  // it is recorded properly below, in AdminActionLog, where adminId is a plain
+  // string that covers both kinds of admin.
   await prisma.activityLog.create({
     data: {
       companyId: ctx.companyId,
-      userId: admin.id,
       action: COMPANY_PAGE_OVERRIDES_ACTION,
       details: JSON.stringify(next),
     },
