@@ -39,6 +39,13 @@ type Props = {
 
   label?: (item: PickerItem) => string;
 
+  /**
+   * A short badge on each row — the quantity a purchase order is expecting,
+   * say. `label` cannot serve this: it is only read when `previewFields` are
+   * given, and it replaces the row's text rather than adding to it.
+   */
+  note?: (item: PickerItem) => string | null | undefined;
+
   allowManual?: boolean;
   placeholder?: string;
   inputId?: string;
@@ -69,6 +76,7 @@ export function ItemPicker({
   onChange,
   onKeyDown,
   label,
+  note,
   allowManual = true,
   placeholder = "Type to search…",
   inputId,
@@ -1019,6 +1027,34 @@ export function ItemPicker({
                       );
                     }
                   )}
+
+                  {/* NOTE */}
+
+                  {(() => {
+                    const text =
+                      note?.(item);
+                    if (!text) return null;
+                    return (
+                      <span
+                        style={{
+                          fontSize: 11,
+                          fontWeight: 700,
+                          marginLeft: 10,
+                          padding:
+                            "1px 7px",
+                          borderRadius: 5,
+                          whiteSpace:
+                            "nowrap",
+                          background:
+                            "rgba(52,211,153,.12)",
+                          color:
+                            "#34d399",
+                        }}
+                      >
+                        {text}
+                      </span>
+                    );
+                  })()}
 
                   {/* UNIT */}
 

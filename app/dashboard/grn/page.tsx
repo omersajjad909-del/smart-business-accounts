@@ -158,6 +158,19 @@ export default function GRNPage() {
     ? allItems.filter((item: any) => selectedPO.items.some((line) => line.itemId === item.id))
     : allItems;
 
+  /**
+   * The badge on each row of the item picker.
+   *
+   * With the table no longer pre-filled, this is where the order becomes
+   * visible: open the list against a PO and every item carries what was ordered,
+   * so the operator can match the delivery note against it before choosing.
+   * Null when no PO is linked — a direct receipt has nothing to compare to.
+   */
+  const grnOrderedNote = (item: { id: string }) => {
+    const line = selectedPO?.items.find((l) => l.itemId === item.id);
+    return line ? `ordered ${line.qty}` : null;
+  };
+
   function focusItemRow(index: number) {
     requestAnimationFrame(() => {
       const input = document.getElementById(`grn-item-${index}`) as HTMLInputElement | null;
@@ -179,16 +192,25 @@ export default function GRNPage() {
     }
   }
 
+  /**
+   * Choosing a PO no longer writes its lines into the table.
+   *
+   * A goods receipt records what physically arrived, which is rarely the whole
+   * order: half the lines turn up, one is short, one was never sent. Filling
+   * the table with the full order meant the operator's job was to delete rows
+   * and zero out quantities — and a line left at its ordered figure by mistake
+   * booked stock that never came through the gate.
+   *
+   * The table starts empty. The PO still does its work: it narrows the item
+   * list to what was ordered, shows each item's ordered quantity in the picker,
+   * and hands that quantity over the moment an item is chosen.
+   */
   function handlePOSelect(id: string) {
     setPoId(id);
-    if (!id) { setRows([emptyRow()]); return; }
+    setRows([emptyRow()]);
+    if (!id) return;
     const po = pos.find(p => p.id === id);
-    if (!po) return;
-    setSupplierId(po.supplier.id);
-    setRows([
-      ...po.items.map((i: any) => ({ itemId: i.itemId, name: i.item.name, orderedQty: String(i.qty), receivedQty: "", rate: String(i.rate || ""), remarks: "", ...(rfActive ? { meta: readRateFormulaMeta(rf, i.meta) } : {}) })),
-      emptyRow(),
-    ]);
+    if (po) setSupplierId(po.supplier.id);
   }
 
   /**
@@ -218,6 +240,25 @@ export default function GRNPage() {
   /** Picking an item pulls its saved dimensions onto the line. */
   function selectGrnItem(idx: number, itemId: string) {
     updateRow(idx, "itemId", itemId);
+
+    // The ordered quantity travels with the item rather than being laid out in
+    // advance: pick the item, and what the PO expects is already in the Ordered
+    // column. Received is left blank on purpose — that is the one figure the
+    // operator has to read off the delivery themselves.
+    const poLine = selectedPO?.items.find((line: any) => line.itemId === itemId) as any;
+    if (poLine) {
+      setRows(prev => {
+        const copy = [...prev];
+        if (!copy[idx]) return prev;
+        copy[idx] = {
+          ...copy[idx],
+          orderedQty: String(poLine.qty ?? ""),
+          rate: String(poLine.rate || copy[idx].rate || ""),
+        };
+        return copy;
+      });
+    }
+
     if (!rfActive) return;
     const item = allItems.find((x: any) => x.id === itemId);
     if (!item) return;
@@ -495,6 +536,7 @@ export default function GRNPage() {
                             onChange={(__picked: string) => selectGrnItem(idx, __picked)}
                             onKeyDown={rateFormulaEnterHandler(rf, rfActive, idx, () => lastPickedMeta.current)}
                             label={rfActive ? itemPickerLabel : undefined}
+                            note={grnOrderedNote}
                             inputId={`grn-item-${idx}`}
                             style={{ ...inp({ marginBottom: 8 }) }}
                             allowManual={false}
@@ -538,6 +580,7 @@ export default function GRNPage() {
                                   onChange={(__picked: string) => selectGrnItem(idx, __picked)}
                                   onKeyDown={rateFormulaEnterHandler(rf, rfActive, idx, () => lastPickedMeta.current)}
                                   label={rfActive ? itemPickerLabel : undefined}
+                                  note={grnOrderedNote}
                                   inputId={`grn-item-${idx}`}
                                   style={inp({ padding: "6px 10px" })}
                                   allowManual={false}
