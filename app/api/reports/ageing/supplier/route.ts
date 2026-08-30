@@ -1,7 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { resolveCompanyId } from "@/lib/tenant";
-import { BILL_EPS, billDays, collectPartyBills, settleBills } from "@/lib/billAgeing";
+import {
+  BILL_EPS,
+  asOnWindow,
+  billDays,
+  collectPartyBills,
+  creditFilter,
+  settleBills,
+} from "@/lib/billAgeing";
 
 export async function GET(req: NextRequest) {
   try {
@@ -15,15 +22,19 @@ export async function GET(req: NextRequest) {
 
     const supplierId = req.nextUrl.searchParams.get("supplierId");
     const asOnParam  = req.nextUrl.searchParams.get("date");
-    if (!supplierId) return NextResponse.json([]);
+    if (!supplierId) return NextResponse.json({ rows: [] });
 
     const supplier = await prisma.account.findFirst({
       where: { id: supplierId, companyId },
-      select: { id: true, openDebit: true, openCredit: true, openDate: true },
+      select: {
+        id: true, openDebit: true, openCredit: true, openDate: true,
+        creditDays: true, creditLimit: true,
+      },
     });
-    if (!supplier) return NextResponse.json([]);
+    if (!supplier) return NextResponse.json({ rows: [] });
 
-    const asOn = asOnParam ? new Date(asOnParam + "T23:59:59.999") : new Date();
+    const asOnKey = asOnParam || new Date().toISOString().slice(0, 10);
+    const { before, lastDay } = asOnWindow(asOnKey);
 
     // Same rule as the customer side: every posting on the party account is a
     // bill or a payment. A purchase invoice posts its own voucher, so reading
@@ -32,7 +43,7 @@ export async function GET(req: NextRequest) {
     const entries = await prisma.voucherEntry.findMany({
       where: {
         accountId: supplierId,
-        voucher: { date: { lte: asOn }, companyId },
+        voucher: { date: { lt: before }, companyId },
       },
       include: { voucher: { select: { date: true, voucherNo: true, narration: true, type: true } } },
       orderBy: { voucher: { date: "asc" } },
@@ -43,17 +54,28 @@ export async function GET(req: NextRequest) {
       // A credit opening on a supplier is money owed.
       opening:     Number(supplier.openCredit || 0) - Number(supplier.openDebit || 0),
       openingDate: supplier.openDate ? new Date(supplier.openDate) : null,
-      asOn,
+      asOn: lastDay,
       side: "PAYABLE",
     });
 
     const { settled, unapplied } = settleBills(bills, credit);
 
+    const open = settled.filter(b => b.balance > BILL_EPS);
+    const outstanding = open.reduce((s, b) => s + b.balance, 0) - unapplied;
+
+    const terms = creditFilter({
+      creditDays:  supplier.creditDays ?? null,
+      creditLimit: supplier.creditLimit ?? null,
+      outstanding,
+    });
+
     let runningBalance = 0;
     const rows: any[] = [];
 
-    for (const bill of settled) {
-      if (bill.balance <= BILL_EPS) continue;
+    for (const bill of open) {
+      const days = billDays(bill.date, lastDay);
+      if (!terms.shows(days)) continue;
+
       runningBalance += bill.balance;
       rows.push({
         numType:      bill.numType,
@@ -61,17 +83,18 @@ export async function GET(req: NextRequest) {
         narration:    bill.narration,
         billAmount:   bill.amount,
         billBalance:  bill.balance,
-        days:         billDays(bill.date, asOn),
+        days,
         totalBalance: runningBalance,
       });
     }
 
-    // Payments beyond every bill — shown so the report ties back to the ledger.
+    // Payments beyond every bill — nothing is owed, so the credit terms have
+    // no say in whether this is reported.
     if (unapplied > BILL_EPS) {
       runningBalance -= unapplied;
       rows.push({
         numType:      "---",
-        date:         asOn.toISOString().slice(0, 10),
+        date:         lastDay.toISOString().slice(0, 10),
         narration:    "ADVANCE PAID / UNADJUSTED",
         billAmount:   -unapplied,
         billBalance:  -unapplied,
@@ -80,9 +103,17 @@ export async function GET(req: NextRequest) {
       });
     }
 
-    return NextResponse.json(rows);
+    return NextResponse.json({
+      rows,
+      creditDays:  supplier.creditDays ?? null,
+      creditLimit: supplier.creditLimit ?? null,
+      outstanding,
+      openBills:   open.length,
+      hasTerms:    terms.hasTerms,
+      overLimit:   terms.overLimit,
+    });
   } catch (e) {
     console.error("❌ SUPPLIER AGEING ERROR:", e);
-    return NextResponse.json([]);
+    return NextResponse.json({ rows: [] });
   }
 }

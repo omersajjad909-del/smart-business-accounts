@@ -89,9 +89,53 @@ export function settleBills(
   return { settled, unapplied: available };
 }
 
-/** Whole days a bill has been outstanding as on the report date. */
-export function billDays(billDate: Date, asOn: Date): number {
-  return Math.max(0, Math.floor((asOn.getTime() - billDate.getTime()) / 86400000));
+/** Calendar day of a timestamp, as stored (voucher dates are UTC midnight). */
+export function dayKey(d: Date): string {
+  return d.toISOString().slice(0, 10);
+}
+
+/**
+ * "As on 29-AUG" is the position at the *start* of 29-AUG: the day's own
+ * entries are not in it yet, and the newest day it can age against is 28-AUG.
+ * That is the convention the old desktop ageing uses, and matching it is what
+ * removes the one-day drift between the two reports.
+ */
+export function asOnWindow(asOnKey: string): { before: Date; lastDay: Date } {
+  const before = new Date(asOnKey + "T00:00:00.000Z");
+  return { before, lastDay: new Date(before.getTime() - 86400000) };
+}
+
+/** Whole days a bill has been outstanding, counted on calendar days. */
+export function billDays(billDate: Date, lastDay: Date): number {
+  const from = Date.parse(dayKey(billDate) + "T00:00:00.000Z");
+  const to   = Date.parse(dayKey(lastDay)  + "T00:00:00.000Z");
+  return Math.max(0, Math.round((to - from) / 86400000));
+}
+
+/**
+ * Which bills a party's credit terms make worth reporting. Either breach puts
+ * a bill on the report: bills older than the agreed credit days, and — once
+ * the party's whole outstanding is over the credit amount — every bill.
+ * A party with no terms set is not filtered at all.
+ */
+export function creditFilter(opts: {
+  creditDays: number | null;
+  creditLimit: number | null;
+  outstanding: number;
+}) {
+  const hasDays   = !!opts.creditDays && opts.creditDays > 0;
+  const hasLimit  = !!opts.creditLimit && opts.creditLimit > 0;
+  const overLimit = hasLimit && opts.outstanding > (opts.creditLimit as number) + BILL_EPS;
+
+  return {
+    hasTerms: hasDays || hasLimit,
+    overLimit,
+    /** true when this bill has to be shown */
+    shows: (days: number) =>
+      !hasDays && !hasLimit
+        ? true
+        : overLimit || (hasDays && days > (opts.creditDays as number)),
+  };
 }
 
 export type BillStatus = "PAID" | "PARTIAL" | "UNPAID";

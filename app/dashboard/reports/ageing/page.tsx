@@ -8,6 +8,7 @@ import { useResponsive } from "@/hooks/useResponsive";
 
 interface Party { id: string; name: string; partyType: string; code?: string; }
 interface AgeingRow { numType:string; date:string; narration:string; billAmount:number; billBalance:number; days:number; totalBalance:number; }
+interface AgeingMeta { creditDays:number|null; creditLimit:number|null; outstanding:number; openBills:number; hasTerms:boolean; overLimit:boolean; }
 
 const fmt = (n: number) => Math.abs(n).toLocaleString(undefined, { minimumFractionDigits:2, maximumFractionDigits:2 });
 const todayStr = () => new Date().toISOString().slice(0, 10);
@@ -30,6 +31,7 @@ export default function AgeingReportPage() {
   const [partyName,      setPartyName]      = useState("");
   const [parties,        setParties]        = useState<Party[]>([]);
   const [data,           setData]           = useState<AgeingRow[]>([]);
+  const [meta,           setMeta]           = useState<AgeingMeta | null>(null);
   const [loading,        setLoading]        = useState(false);
   const [partiesLoading, setPartiesLoading] = useState(false);
   const [error,          setError]          = useState<string | null>(null);
@@ -60,7 +62,7 @@ export default function AgeingReportPage() {
   async function loadData(overrideId?: string) {
     const id = overrideId || partyId;
     if (!id) return;
-    setLoading(true); setData([]); setError(null);
+    setLoading(true); setData([]); setMeta(null); setError(null);
     setShowModal(false);
     const url = type === "customer"
       ? `/api/reports/ageing/customer?date=${asOnDate}&customerId=${id}`
@@ -69,14 +71,18 @@ export default function AgeingReportPage() {
       const res = await fetch(url, { headers: getHeaders(), credentials:"include" });
       const json = await res.json();
       if (!res.ok) { setError(json.error || "Failed to load ageing data"); return; }
-      setData(Array.isArray(json) ? json : []);
+      setData(Array.isArray(json?.rows) ? json.rows : []);
+      setMeta(Array.isArray(json) ? null : json);
     } catch { setError("Network error"); }
     finally { setLoading(false); }
   }
 
   const totalBillAmount  = data.reduce((s,r)=>s+r.billAmount,0);
   const totalBillBalance = data.reduce((s,r)=>s+r.billBalance,0);
-  const totalBalance     = data.length > 0 ? data[data.length-1].totalBalance : 0;
+  // The old desktop report prints the party's full balance under a filtered
+  // list — the rows answer "what is overdue", the total answers "what is owed".
+  const totalBalance     = meta ? meta.outstanding : (data.length > 0 ? data[data.length-1].totalBalance : 0);
+  const hiddenBills      = meta ? Math.max(0, meta.openBills - data.filter(r => r.billBalance > 0).length) : 0;
 
   const inputStyle: React.CSSProperties = { width:"100%", padding:"11px 14px", borderRadius:10, fontSize:14, background:"rgba(255,255,255,.06)", border:"1px solid rgba(255,255,255,.12)", color:"white", outline:"none", fontFamily:"inherit", boxSizing:"border-box" };
   const thStyle: React.CSSProperties = { padding:"10px 14px", textAlign:"left", fontSize:11, color:"rgba(255,255,255,.35)", textTransform:"uppercase", letterSpacing:.7, borderBottom:"1px solid rgba(255,255,255,.07)", fontWeight:600, whiteSpace:"nowrap", background:"rgba(255,255,255,.02)" };
@@ -181,6 +187,12 @@ export default function AgeingReportPage() {
             <div><div style={{ fontSize:10, fontWeight:700, color:"rgba(255,255,255,.35)", textTransform:"uppercase", letterSpacing:".08em" }}>Party</div><div style={{ fontSize:15, fontWeight:800, color:"#fbbf24", marginTop:3 }}>{partyName}</div></div>
             <div><div style={{ fontSize:10, fontWeight:700, color:"rgba(255,255,255,.35)", textTransform:"uppercase", letterSpacing:".08em" }}>Type</div><div style={{ fontSize:14, fontWeight:700, color:"rgba(255,255,255,.7)", marginTop:3, textTransform:"capitalize" }}>{type}</div></div>
             <div><div style={{ fontSize:10, fontWeight:700, color:"rgba(255,255,255,.35)", textTransform:"uppercase", letterSpacing:".08em" }}>As On</div><div style={{ fontSize:14, fontWeight:700, color:"rgba(255,255,255,.7)", marginTop:3 }}>{asOnDate}</div></div>
+            {meta?.creditDays ? (
+              <div><div style={{ fontSize:10, fontWeight:700, color:"rgba(255,255,255,.35)", textTransform:"uppercase", letterSpacing:".08em" }}>Credit Days</div><div style={{ fontSize:14, fontWeight:700, color:"rgba(255,255,255,.7)", marginTop:3 }}>{meta.creditDays}</div></div>
+            ) : null}
+            {meta?.creditLimit ? (
+              <div><div style={{ fontSize:10, fontWeight:700, color:"rgba(255,255,255,.35)", textTransform:"uppercase", letterSpacing:".08em" }}>Credit Amount</div><div style={{ fontSize:14, fontWeight:700, color:meta.overLimit ? "#f87171" : "rgba(255,255,255,.7)", marginTop:3 }}>{fmt(meta.creditLimit)}</div></div>
+            ) : null}
           </div>
 
           {error && <div style={{ background:"rgba(239,68,68,.08)", border:"1px solid rgba(239,68,68,.2)", borderRadius:10, padding:"12px 16px", marginBottom:20, color:"#f87171", fontSize:13 }}>{error}</div>}
@@ -203,7 +215,11 @@ export default function AgeingReportPage() {
                   </thead>
                   <tbody>
                     {data.length === 0 ? (
-                      <tr><td colSpan={7} style={{ padding: isMobile ? "22px 10px" : "40px 14px", textAlign:"center", color:"rgba(255,255,255,.2)", fontSize:13 }}>No outstanding bills found</td></tr>
+                      <tr><td colSpan={7} style={{ padding: isMobile ? "22px 10px" : "40px 14px", textAlign:"center", color:"rgba(255,255,255,.2)", fontSize:13 }}>
+                        {meta && meta.hasTerms && meta.openBills > 0
+                          ? `Within credit terms — ${meta.openBills} open bill${meta.openBills > 1 ? "s" : ""}, none past the agreed days or amount`
+                          : "No outstanding bills found"}
+                      </td></tr>
                     ) : data.map((r, i) => {
                       const dayColor = r.days>90?"#f87171":r.days>60?"#fb923c":r.days>30?"#fbbf24":"rgba(255,255,255,.7)";
                       return (
@@ -234,6 +250,13 @@ export default function AgeingReportPage() {
                   )}
                 </table>
               </div>
+            </div>
+          )}
+
+          {/* Bills the credit terms kept off the list still count towards the total */}
+          {!loading && hiddenBills > 0 && (
+            <div style={{ marginTop:12, fontSize:12, color:"rgba(255,255,255,.4)" }}>
+              {hiddenBills} bill{hiddenBills > 1 ? "s" : ""} within credit terms not listed — included in the total balance.
             </div>
           )}
 
