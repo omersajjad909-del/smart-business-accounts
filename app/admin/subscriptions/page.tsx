@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { getCurrentUser } from "@/lib/auth";
 import toast from "react-hot-toast";
 import { billingCustomerIdLabel } from "@/lib/companyRef";
+import DateInput from "@/app/dashboard/reports/_components/DateInput";
 
 type Company = {
   id: string;
@@ -55,6 +56,19 @@ function StatusBadge({ status }: { status?: string | null }) {
 /* ── Override Modal ─────────────────────────────────── */
 type ActionType = "EXTEND_TRIAL" | "GRANT_FREE_ACCESS" | "RESET_INTRO_OFFER" | "SET_STATUS" | "ADD_NOTE";
 
+/** Today plus N whole years, as YYYY-MM-DD. Leap years take care of themselves. */
+function addYearsISO(years: number): string {
+  const d = new Date();
+  d.setFullYear(d.getFullYear() + years);
+  return d.toISOString().slice(0, 10);
+}
+
+function isoToDisplay(iso: string): string {
+  if (!iso || iso.length < 10) return "—";
+  const [y, m, d] = iso.slice(0, 10).split("-");
+  return d && m && y ? `${d}-${m}-${y}` : "—";
+}
+
 function OverrideModal({ company, onClose, onDone }: {
   company: Company;
   onClose: () => void;
@@ -62,6 +76,10 @@ function OverrideModal({ company, onClose, onDone }: {
 }) {
   const [action, setAction] = useState<ActionType>("EXTEND_TRIAL");
   const [days, setDays]     = useState(30);
+  // A granted period is agreed as a date, so it is held as one. Adding years
+  // with setFullYear keeps a grant that crosses a leap year on the date the
+  // contract names — counting 1095 days would land a day short.
+  const [until, setUntil]   = useState(() => addYearsISO(1));
   const [plan, setPlan]     = useState(company.plan?.toUpperCase() || "PRO");
   const [status, setStatus] = useState("ACTIVE");
   const [note, setNote]     = useState("");
@@ -92,7 +110,7 @@ function OverrideModal({ company, onClose, onDone }: {
 
       let payload: any = {};
       if (action === "EXTEND_TRIAL")    payload = { days };
-      if (action === "GRANT_FREE_ACCESS") payload = { days, plan };
+      if (action === "GRANT_FREE_ACCESS") payload = { until, plan };
       if (action === "SET_STATUS")      payload = { status };
 
       const r = await fetch("/api/admin/billing/override", {
@@ -168,27 +186,50 @@ function OverrideModal({ company, onClose, onDone }: {
           {/* Action-specific fields */}
           {(action === "EXTEND_TRIAL" || action === "GRANT_FREE_ACCESS") && (
             <div style={{ padding: "18px", borderRadius: 14, background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)", display: "flex", flexDirection: "column", gap: 14 }}>
-              <div>
-                <label style={{ fontSize: 11, fontWeight: 700, color: "#475569", letterSpacing: ".06em", display: "block", marginBottom: 6 }}>DURATION (DAYS)</label>
-                <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-                  {/* A trial is measured in days; a prepaid offline deal is sold
-                      in years, so each action gets the presets it actually uses. */}
-                  {(action === "GRANT_FREE_ACCESS"
-                    ? [{ d: 30, label: "30d" }, { d: 90, label: "90d" }, { d: 365, label: "1 year" }, { d: 730, label: "2 years" }, { d: 1095, label: "3 years" }]
-                    : [7, 14, 30, 60, 90].map(d => ({ d, label: `${d}d` }))
-                  ).map(({ d, label }) => (
-                    <button key={d} onClick={() => setDays(d)}
-                      style={{ padding: "7px 16px", borderRadius: 10, border: `1px solid ${days === d ? "#818cf8" : "rgba(255,255,255,.1)"}`, background: days === d ? "rgba(99,102,241,.2)" : "transparent", color: days === d ? "#818cf8" : "#64748b", fontSize: 12, fontWeight: 700, cursor: "pointer" }}>
-                      {label}
-                    </button>
-                  ))}
-                  <input type="number" min={1} max={action === "GRANT_FREE_ACCESS" ? 1825 : 365} value={days} onChange={e => setDays(Number(e.target.value))}
-                    style={{ ...inputStyle, width: 80, textAlign: "center" }} />
+              {/* A trial is a length of time; a prepaid deal is a date in a
+                  contract. They are asked for differently because they are
+                  different things. */}
+              {action === "GRANT_FREE_ACCESS" ? (
+                <div>
+                  <label style={{ fontSize: 11, fontWeight: 700, color: "#475569", letterSpacing: ".06em", display: "block", marginBottom: 6 }}>ACCESS ENDS ON</label>
+                  <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
+                    {[1, 2, 3].map(y => {
+                      const iso = addYearsISO(y);
+                      const on = until === iso;
+                      return (
+                        <button key={y} onClick={() => setUntil(iso)}
+                          style={{ padding: "7px 16px", borderRadius: 10, border: `1px solid ${on ? "#818cf8" : "rgba(255,255,255,.1)"}`, background: on ? "rgba(99,102,241,.2)" : "transparent", color: on ? "#818cf8" : "#64748b", fontSize: 12, fontWeight: 700, cursor: "pointer" }}>
+                          {y} year{y > 1 ? "s" : ""}
+                        </button>
+                      );
+                    })}
+                    <div style={{ width: 150 }}>
+                      <DateInput value={until} onChange={setUntil} style={{ ...inputStyle, textAlign: "center" }} />
+                    </div>
+                  </div>
+                  <div style={{ fontSize: 11, color: "#475569", marginTop: 8, lineHeight: 1.6 }}>
+                    Full access through <span style={{ color: "#94a3b8" }}>{isoToDisplay(until)}</span>, that whole day included.
+                    After it, writing stops and read-only export stays open for 30 days.
+                  </div>
                 </div>
-                <div style={{ fontSize: 11, color: "#475569", marginTop: 8 }}>
-                  New end date: <span style={{ color: "#94a3b8" }}>{(() => { const d = new Date(); d.setDate(d.getDate() + days); return d.toLocaleDateString(undefined, { weekday: "short", day: "numeric", month: "short", year: "numeric" }); })()}</span>
+              ) : (
+                <div>
+                  <label style={{ fontSize: 11, fontWeight: 700, color: "#475569", letterSpacing: ".06em", display: "block", marginBottom: 6 }}>DURATION (DAYS)</label>
+                  <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                    {[7, 14, 30, 60, 90].map(d => (
+                      <button key={d} onClick={() => setDays(d)}
+                        style={{ padding: "7px 16px", borderRadius: 10, border: `1px solid ${days === d ? "#818cf8" : "rgba(255,255,255,.1)"}`, background: days === d ? "rgba(99,102,241,.2)" : "transparent", color: days === d ? "#818cf8" : "#64748b", fontSize: 12, fontWeight: 700, cursor: "pointer" }}>
+                        {d}d
+                      </button>
+                    ))}
+                    <input type="number" min={1} max={365} value={days} onChange={e => setDays(Number(e.target.value))}
+                      style={{ ...inputStyle, width: 80, textAlign: "center" }} />
+                  </div>
+                  <div style={{ fontSize: 11, color: "#475569", marginTop: 8 }}>
+                    New end date: <span style={{ color: "#94a3b8" }}>{(() => { const d = new Date(); d.setDate(d.getDate() + days); return d.toLocaleDateString(undefined, { weekday: "short", day: "numeric", month: "short", year: "numeric" }); })()}</span>
+                  </div>
                 </div>
-              </div>
+              )}
 
               {action === "GRANT_FREE_ACCESS" && (
                 <div>
