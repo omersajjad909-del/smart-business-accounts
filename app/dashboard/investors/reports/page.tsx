@@ -146,6 +146,24 @@ export default function InvestorReportsPage() {
       isMobile={isMobile}
       actions={<Btn onClick={() => window.print()}>Print</Btn>}
     >
+      <style>{`
+        .investor-report-print-heading { display: none; }
+        @media print {
+          @page { size: A4; margin: 14mm; }
+          html, body { background: #fff !important; color: #000 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+          body * { visibility: hidden !important; }
+          #investor-report-print, #investor-report-print * { visibility: visible !important; }
+          #investor-report-print { position: absolute; inset: 0; width: 100%; box-sizing: border-box; color: #000 !important; background: #fff !important; font-family: Arial, sans-serif !important; }
+          #investor-report-print * { color: #000 !important; background: transparent !important; border-color: #000 !important; box-shadow: none !important; text-shadow: none !important; }
+          #investor-report-print .investor-report-print-heading { display: block !important; border-bottom: 2px solid #000 !important; padding-bottom: 10px; margin-bottom: 18px; }
+          #investor-report-print section { border: 1px solid #000 !important; border-radius: 0 !important; break-inside: avoid; }
+          #investor-report-print table { width: 100% !important; min-width: 0 !important; }
+          #investor-report-print thead { display: table-header-group; }
+          #investor-report-print tr { break-inside: avoid; }
+        }
+      `}</style>
+
+      <div className="no-print">
       <Tabs active="/dashboard/investors/reports" />
 
       <div style={{ display: "flex", flexWrap: "wrap", gap: 12, alignItems: "flex-end", marginBottom: 18 }}>
@@ -184,6 +202,17 @@ export default function InvestorReportsPage() {
           );
         })}
       </div>
+
+      </div>
+
+      <div id="investor-report-print">
+        <div className="investor-report-print-heading">
+          <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: ".12em", textTransform: "uppercase" }}>FinovaOS · Investor Report</div>
+          <h1 style={{ margin: "6px 0 0", fontSize: 22 }}>{REPORTS.find((item) => item.key === report)?.label}</h1>
+          <div style={{ marginTop: 5, fontSize: 12 }}>
+            {party?.name || "—"}{party?.business ? " · " + party.business : ""} · {fmtDate(from)} to {fmtDate(to)}
+          </div>
+        </div>
 
       {report === "production" && (
         <Panel title="Production" hint={REPORTS[0].blurb}>
@@ -362,6 +391,7 @@ export default function InvestorReportsPage() {
           </TableWrap>
         </Panel>
       )}
+      </div>
     </PageShell>
   );
 }
