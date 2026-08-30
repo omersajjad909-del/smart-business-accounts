@@ -508,6 +508,12 @@ model Company {
   subscriptionStatus        String?   @default("ACTIVE")
   stripeCustomerId          String?
   currentPeriodEnd          DateTime?
+  // Set only when an admin grants access by hand â an offline deal paid by
+  // bank transfer, not through a payment gateway. Gateway subscribers leave
+  // this null. Once it passes, the guards stop the account: without it a
+  // three-year deal simply never ended, because nothing reads
+  // currentPeriodEnd and the dunning cron only looks at failed payments.
+  accessGrantedUntil        DateTime?
   cancelledAt               DateTime? // Timestamp when subscription was cancelled
   dataRetentionUntil        DateTime? // 90 days after cancellation — hard delete after this date
   paymentFailedAt           DateTime? // First failed platform payment in current streak — cleared on next success. Drives platform-dunning cron (7d → READ_ONLY, 30d → SUSPENDED per ToS)
