@@ -100,6 +100,11 @@ async function applySuccessfulPlanUpdate(params: {
       plan: normalizedPlan,
       subscriptionStatus: params.status,
       currentPeriodEnd: params.currentPeriodEnd || undefined,
+      // A gateway subscription supersedes any hand-granted period. A company
+      // that started on an offline deal and later put a card on file would
+      // otherwise still be carrying the old grant date, and the guards would
+      // close a paying account the day that date passed.
+      accessGrantedUntil: null,
       ...(params.providerCustomerId ? { stripeCustomerId: params.providerCustomerId } : {}),
       ...(params.displayCurrency    ? { baseCurrency: params.displayCurrency }         : {}),
       ...(params.displayCountry     ? { country: params.displayCountry }               : {}),
