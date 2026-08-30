@@ -106,9 +106,35 @@ export default function InvestorStatementPage() {
     >
       <style>{`
         @media print {
+          @page { size: A4; margin: 14mm; }
+          html, body {
+            background: #fff !important;
+            color: #000 !important;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+          }
           body * { visibility: hidden !important; }
           #investor-statement, #investor-statement * { visibility: visible !important; }
-          #investor-statement { position: absolute; left: 0; top: 0; width: 100%; padding: 0; color: #000; }
+          #investor-statement {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+            box-sizing: border-box;
+            padding: 0;
+            color: #000 !important;
+            background: #fff !important;
+            border: 1px solid #000 !important;
+            border-radius: 0 !important;
+            box-shadow: none !important;
+          }
+          #investor-statement * {
+            color: #000 !important;
+            background: transparent !important;
+            border-color: #000 !important;
+            box-shadow: none !important;
+            text-shadow: none !important;
+          }
           #investor-statement .no-print { display: none !important; }
         }
       `}</style>
