@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireAdmin, logAdminAction } from "@/lib/adminAuth";
+import { createManualPlatformInvoice } from "@/lib/platformInvoice";
 
 /*
   POST /api/admin/billing/override
@@ -122,17 +123,68 @@ export async function POST(req: NextRequest) {
         );
       }
 
+      const grantedPlan = (plan || company.plan || "PRO").toUpperCase();
+
       result = await prisma.company.update({
         where: { id: companyId },
         data: {
           subscriptionStatus: "ACTIVE",
-          plan: (plan || company.plan || "PRO").toUpperCase(),
+          plan: grantedPlan,
           currentPeriodEnd: newEnd,
           // The date the guards actually enforce. currentPeriodEnd is read by
           // no guard, so without this the grant never ends.
           accessGrantedUntil: newEnd,
         },
       });
+
+      // The paperwork half of the same deal.
+      //
+      // Granting access records what the customer may do and nothing about what
+      // they paid, so an offline deal left the ledger empty — and an empty
+      // ledger makes the customer's billing page fall back to a row derived
+      // from the plan's USD list price. A customer who paid in rupees by bank
+      // transfer was shown a dollar receipt for a figure nobody had agreed. The
+      // invoice is written here, against the same dates as the grant, so the
+      // two can never describe different deals.
+      if (payload?.recordInvoice) {
+        const invoiceResult = await createManualPlatformInvoice({
+          companyId,
+          companyName: company.name,
+          plan: grantedPlan,
+          billingCycle: payload?.billingCycle || "YEARLY",
+          currency: payload?.currency,
+          amount: Number(payload?.amount),
+          discount: payload?.discount,
+          taxRate: payload?.taxRate,
+          taxName: payload?.taxName,
+          customerName: company.name,
+          customerCountry: company.country || null,
+          customerTaxId: payload?.customerTaxId,
+          status: "PAID",
+          periodStart: new Date(),
+          periodEnd: newEnd,
+          // Re-applying the same grant must not mint a second number, but
+          // moving the end date is a new deal and gets its own invoice.
+          reference: `grant:${companyId}:${newEnd.toISOString().slice(0, 10)}`,
+        });
+
+        if (invoiceResult.ok) {
+          result = {
+            ...result,
+            invoice: {
+              number: invoiceResult.invoice.number,
+              total: invoiceResult.invoice.total,
+              currency: invoiceResult.invoice.currency,
+              duplicate: invoiceResult.duplicate,
+            },
+          };
+        } else {
+          // The grant is already applied and must not be rolled back over a
+          // bookkeeping failure — but the admin has to know the invoice is
+          // missing, or they will believe the customer has one.
+          result = { ...result, invoiceError: invoiceResult.error };
+        }
+      }
     }
 
     /* ── RESET_INTRO_OFFER ── */

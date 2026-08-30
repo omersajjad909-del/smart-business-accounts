@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { requireAdmin } from "@/lib/adminAuth";
+import { requireAdmin, logAdminAction } from "@/lib/adminAuth";
+import { createManualPlatformInvoice } from "@/lib/platformInvoice";
 
 export const runtime = "nodejs";
 
@@ -139,6 +140,124 @@ export async function GET(req: NextRequest) {
  * Admin-editable fields only. The number, amounts and provider references are
  * immutable — an invoice a customer has already downloaded cannot be rewritten.
  */
+/** "2026-08-30" → a Date, or null. Anything else is rejected upstream. */
+function parseDay(value: unknown, endOfDay = false): Date | null | "invalid" {
+  const raw = typeof value === "string" ? value.trim() : "";
+  if (!raw) return null;
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(raw)) return "invalid";
+  const date = new Date(`${raw}T${endOfDay ? "23:59:59.999" : "00:00:00.000"}Z`);
+  return Number.isNaN(date.getTime()) ? "invalid" : date;
+}
+
+/**
+ * POST — write one invoice by hand.
+ *
+ * The ledger is otherwise only ever written by the payment webhook, which means
+ * a deal settled offline (a multi-year licence paid by bank transfer) leaves no
+ * invoice at all — and the customer's billing page then shows a row derived
+ * from the plan's USD list price instead of what they actually paid. This is
+ * the way that money gets a real number, and the same row is what the customer
+ * downloads as a PDF.
+ *
+ * Idempotent on `reference`: the same reference twice returns the first
+ * invoice rather than minting a second number for one payment.
+ */
+export async function POST(req: NextRequest) {
+  try {
+    const admin = await requireAdmin(req);
+    if (admin instanceof NextResponse) return admin;
+
+    const body = await req.json().catch(() => null);
+    if (!body || typeof body !== "object") {
+      return NextResponse.json({ error: "A JSON body is required" }, { status: 400 });
+    }
+
+    const companyId = String(body.companyId || "").trim();
+    if (!companyId) return NextResponse.json({ error: "companyId is required" }, { status: 400 });
+
+    const company = await prisma.company.findUnique({
+      where: { id: companyId },
+      select: { id: true, name: true, country: true, plan: true },
+    });
+    if (!company) return NextResponse.json({ error: "Company not found" }, { status: 404 });
+
+    const periodStart = parseDay(body.periodStart);
+    const periodEnd = parseDay(body.periodEnd, true);
+    const issuedAt = parseDay(body.issuedAt);
+    for (const [label, parsed] of [["periodStart", periodStart], ["periodEnd", periodEnd], ["issuedAt", issuedAt]] as const) {
+      if (parsed === "invalid") {
+        return NextResponse.json({ error: `${label} must be a date in YYYY-MM-DD form` }, { status: 400 });
+      }
+    }
+
+    // Best effort only — the invoice is addressed to the company, and the email
+    // is there so the admin ledger stays searchable by the person who paid.
+    const billingUser = body.customerEmail
+      ? null
+      : await prisma.user
+          .findFirst({
+            where: { companies: { some: { companyId } }, active: true },
+            orderBy: { createdAt: "asc" },
+            select: { email: true, name: true },
+          })
+          .catch(() => null);
+
+    const result = await createManualPlatformInvoice({
+      companyId,
+      // Snapshot, deliberately: a renamed company must not rewrite the name on
+      // an invoice already issued.
+      companyName: company.name,
+      plan: String(body.plan || company.plan || "STARTER"),
+      billingCycle: body.billingCycle,
+      currency: body.currency,
+      amount: Number(body.amount),
+      discount: body.discount,
+      taxRate: body.taxRate,
+      taxName: body.taxName,
+      customerName: body.customerName || billingUser?.name || company.name,
+      customerEmail: body.customerEmail || billingUser?.email || null,
+      customerCountry: body.customerCountry || company.country || null,
+      customerTaxId: body.customerTaxId,
+      status: body.status,
+      periodStart: periodStart as Date | null,
+      periodEnd: periodEnd as Date | null,
+      issuedAt: (issuedAt as Date | null) || undefined,
+      reference: body.reference,
+    });
+
+    if (!result.ok) {
+      return NextResponse.json(
+        { error: result.error, migrationRequired: result.migrationRequired || false },
+        { status: result.migrationRequired ? 503 : 400 },
+      );
+    }
+
+    if (!result.duplicate) {
+      await logAdminAction({
+        adminId: admin.id,
+        adminEmail: admin.email,
+        action: "CREATE_MANUAL_INVOICE",
+        targetType: "PlatformInvoice",
+        targetId: result.invoice.id,
+        targetLabel: result.invoice.number,
+        companyId,
+        details: {
+          number: result.invoice.number,
+          currency: result.invoice.currency,
+          total: result.invoice.total,
+          plan: result.invoice.plan,
+          note: typeof body.note === "string" ? body.note : null,
+        },
+      });
+    }
+
+    return NextResponse.json({ invoice: result.invoice, duplicate: result.duplicate });
+  } catch (e: any) {
+    console.error("[admin/invoices] POST error:", e);
+    return NextResponse.json({ error: e?.message || "Failed to create invoice" }, { status: 500 });
+  }
+}
+
 export async function PATCH(req: NextRequest) {
   try {
     const admin = await requireAdmin(req);

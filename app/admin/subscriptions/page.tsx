@@ -83,6 +83,15 @@ function OverrideModal({ company, onClose, onDone }: {
   const [plan, setPlan]     = useState(company.plan?.toUpperCase() || "PRO");
   const [status, setStatus] = useState("ACTIVE");
   const [note, setNote]     = useState("");
+  // The invoice half of an offline deal. Off by default: a genuinely free
+  // grant — a partner account, an apology — has no money behind it and must
+  // not put a paid invoice in the ledger.
+  const [recordInvoice, setRecordInvoice] = useState(false);
+  const [currency, setCurrency] = useState(
+    (company.country || "").toLowerCase().includes("pakistan") ? "PKR" : "USD",
+  );
+  const [amount, setAmount]   = useState("");
+  const [taxRate, setTaxRate] = useState(0);
   const [saving, setSaving] = useState(false);
   const [history, setHistory] = useState<OverrideLog[]>([]);
   const [loadingHist, setLoadingHist] = useState(false);
@@ -110,7 +119,12 @@ function OverrideModal({ company, onClose, onDone }: {
 
       let payload: any = {};
       if (action === "EXTEND_TRIAL")    payload = { days };
-      if (action === "GRANT_FREE_ACCESS") payload = { until, plan };
+      if (action === "GRANT_FREE_ACCESS") {
+        payload = { until, plan };
+        if (recordInvoice) {
+          payload = { ...payload, recordInvoice: true, currency, amount: Number(amount), taxRate };
+        }
+      }
       if (action === "SET_STATUS")      payload = { status };
 
       const r = await fetch("/api/admin/billing/override", {
@@ -119,7 +133,20 @@ function OverrideModal({ company, onClose, onDone }: {
       });
       const j = await r.json();
       if (r.ok) {
-        toast.success(`Override applied: ${action}`);
+        const invoice = j?.result?.invoice;
+        const invoiceError = j?.result?.invoiceError;
+        if (invoice) {
+          toast.success(
+            invoice.duplicate
+              ? `Access granted — invoice ${invoice.number} already existed for this period`
+              : `Access granted — invoice ${invoice.number} recorded`,
+          );
+        } else if (invoiceError) {
+          // Not a failure of the grant, which is already applied.
+          toast.error(`Access granted, but the invoice failed: ${invoiceError}`, { duration: 8000 });
+        } else {
+          toast.success(`Override applied: ${action}`);
+        }
         onDone();
         onClose();
       } else {
@@ -128,6 +155,11 @@ function OverrideModal({ company, onClose, onDone }: {
     } catch { toast.error("Something went wrong"); }
     setSaving(false);
   }
+
+  // Mirrors the server's own arithmetic so the admin sees the figure that will
+  // be written, not one the page invented.
+  const invoiceNet = Math.round(((Number(amount) || 0) * (1 + taxRate / 100)) * 100) / 100;
+  const invoiceIncomplete = recordInvoice && !(Number(amount) > 0);
 
   const inputStyle: React.CSSProperties = {
     width: "100%", padding: "10px 12px", borderRadius: 10,
@@ -239,6 +271,55 @@ function OverrideModal({ company, onClose, onDone }: {
                   </select>
                 </div>
               )}
+
+              {/* A paid offline deal needs both halves: the access, and the
+                  invoice for what was paid for it. Without the invoice the
+                  customer's billing page falls back to the plan's USD list
+                  price, which is not what they were charged. */}
+              {action === "GRANT_FREE_ACCESS" && (
+                <div style={{ borderTop: "1px solid rgba(255,255,255,.07)", paddingTop: 14 }}>
+                  <label style={{ display: "flex", alignItems: "flex-start", gap: 10, cursor: "pointer" }}>
+                    <input type="checkbox" checked={recordInvoice} onChange={e => setRecordInvoice(e.target.checked)}
+                      style={{ width: 15, height: 15, marginTop: 2, accentColor: "#22c55e", cursor: "pointer" }} />
+                    <span>
+                      <span style={{ fontSize: 13, fontWeight: 700, color: recordInvoice ? "#22c55e" : "white" }}>Record an invoice for this deal</span>
+                      <span style={{ display: "block", fontSize: 11, color: "#475569", marginTop: 3, lineHeight: 1.6 }}>
+                        Writes a real numbered invoice for the money actually received. The customer sees it on their
+                        billing page and can download the PDF. Leave off for a genuinely free grant.
+                      </span>
+                    </span>
+                  </label>
+
+                  {recordInvoice && (
+                    <div style={{ marginTop: 14, display: "flex", flexDirection: "column", gap: 12 }}>
+                      <div style={{ display: "flex", gap: 10 }}>
+                        <div style={{ width: 110 }}>
+                          <label style={{ fontSize: 11, fontWeight: 700, color: "#475569", letterSpacing: ".06em", display: "block", marginBottom: 6 }}>CURRENCY</label>
+                          <select value={currency} onChange={e => setCurrency(e.target.value)} style={inputStyle}>
+                            {["PKR", "USD", "AED", "GBP", "EUR", "SAR"].map(c => <option key={c} value={c}>{c}</option>)}
+                          </select>
+                        </div>
+                        <div style={{ flex: 1 }}>
+                          <label style={{ fontSize: 11, fontWeight: 700, color: "#475569", letterSpacing: ".06em", display: "block", marginBottom: 6 }}>AMOUNT (BEFORE TAX)</label>
+                          <input type="number" min={0} step="0.01" value={amount} onChange={e => setAmount(e.target.value)}
+                            placeholder="e.g. 150000" style={inputStyle} />
+                        </div>
+                        <div style={{ width: 90 }}>
+                          <label style={{ fontSize: 11, fontWeight: 700, color: "#475569", letterSpacing: ".06em", display: "block", marginBottom: 6 }}>TAX %</label>
+                          <input type="number" min={0} max={100} step="0.01" value={taxRate} onChange={e => setTaxRate(Number(e.target.value))}
+                            style={{ ...inputStyle, textAlign: "center" }} />
+                        </div>
+                      </div>
+                      <div style={{ fontSize: 11, color: "#475569", lineHeight: 1.7 }}>
+                        Invoice total: <span style={{ color: "#22c55e", fontWeight: 700 }}>{currency} {invoiceNet.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                        {taxRate > 0 && <> — {Number(amount) || 0} + {taxRate}% tax</>}
+                        <br />
+                        Covers today through <span style={{ color: "#94a3b8" }}>{isoToDisplay(until)}</span>, marked PAID.
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           )}
 
@@ -270,9 +351,9 @@ function OverrideModal({ company, onClose, onDone }: {
           {/* Apply button */}
           <div style={{ display: "flex", gap: 10 }}>
             <button onClick={onClose} style={{ flex: 1, padding: "12px", borderRadius: 12, background: "rgba(255,255,255,.05)", border: "1px solid rgba(255,255,255,.1)", color: "#64748b", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>Cancel</button>
-            <button onClick={apply} disabled={saving || (action === "ADD_NOTE" && !note.trim())}
-              style={{ flex: 2, padding: "12px", borderRadius: 12, background: saving ? "#4338ca" : `linear-gradient(135deg,${selected.color},${selected.color}bb)`, border: "none", color: "white", fontSize: 13, fontWeight: 700, cursor: saving ? "wait" : "pointer", opacity: saving ? .7 : 1 }}>
-              {saving ? "Applying…" : `Apply — ${selected.label}`}
+            <button onClick={apply} disabled={saving || (action === "ADD_NOTE" && !note.trim()) || invoiceIncomplete}
+              style={{ flex: 2, padding: "12px", borderRadius: 12, background: saving ? "#4338ca" : `linear-gradient(135deg,${selected.color},${selected.color}bb)`, border: "none", color: "white", fontSize: 13, fontWeight: 700, cursor: saving ? "wait" : invoiceIncomplete ? "not-allowed" : "pointer", opacity: saving || invoiceIncomplete ? .55 : 1 }}>
+              {saving ? "Applying…" : invoiceIncomplete ? "Enter the invoice amount" : `Apply — ${selected.label}`}
             </button>
           </div>
 

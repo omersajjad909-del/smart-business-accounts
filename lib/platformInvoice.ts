@@ -88,8 +88,15 @@ async function nextInvoiceNumber(year: number): Promise<string> {
  * a webhook retry is a no-op rather than a second invoice for one charge.
  * Returns null if the ledger table has not been migrated yet — callers treat
  * invoicing as best-effort so a missing table can never fail a payment webhook.
+ *
+ * `strict` reverses that for callers where the invoice IS the job: an admin
+ * writing one by hand has to be told it failed, not handed a silent null and a
+ * success toast. Webhooks pass nothing and keep the swallowing behaviour.
  */
-export async function recordPlatformInvoice(input: PlatformInvoiceInput) {
+export async function recordPlatformInvoice(
+  input: PlatformInvoiceInput,
+  opts: { strict?: boolean } = {},
+) {
   const issuedAt = input.issuedAt || new Date();
   const year = issuedAt.getFullYear();
   const total = Number(input.total) || 0;
@@ -152,10 +159,167 @@ export async function recordPlatformInvoice(input: PlatformInvoiceInput) {
         // Otherwise it was the number — take the next one.
       }
     }
+    if (opts.strict) {
+      throw new Error("Could not allocate an invoice number after 6 attempts — try again");
+    }
     return null;
   } catch (err) {
     console.error("[platformInvoice] Failed to record invoice:", err);
+    if (opts.strict) throw err;
     return null;
+  }
+}
+
+const round2 = (n: number) => Math.round((Number(n) || 0) * 100) / 100;
+
+/** A typo ceiling. No single subscription line is worth more than this. */
+const MAX_MANUAL_AMOUNT = 100_000_000;
+
+export type ManualInvoiceInput = {
+  companyId: string;
+  companyName?: string | null;
+  plan?: string | null;
+  billingCycle?: string | null;
+  currency?: string | null;
+  /** The agreed line total, before discount and tax. */
+  amount: number;
+  discount?: number | null;
+  /** Percentage, e.g. 17 for 17%. */
+  taxRate?: number | null;
+  taxName?: string | null;
+  customerName?: string | null;
+  customerEmail?: string | null;
+  customerCountry?: string | null;
+  customerTaxId?: string | null;
+  periodStart?: Date | null;
+  periodEnd?: Date | null;
+  issuedAt?: Date | null;
+  /** PAID for money already received, OPEN for an invoice still to be settled. */
+  status?: string | null;
+  /**
+   * Idempotency key, scoped to manual invoices. The same reference twice hands
+   * back the first invoice instead of minting a second number — a double-click
+   * on "Record invoice", or the same offline deal applied twice, must not put
+   * two numbers in a ledger that a tax return is filed against.
+   */
+  reference?: string | null;
+};
+
+export type ManualInvoiceResult =
+  | { ok: true; invoice: any; duplicate: boolean }
+  | { ok: false; error: string; migrationRequired?: boolean };
+
+/**
+ * An invoice for money that never passed through a payment gateway.
+ *
+ * Offline deals — a three-year licence paid by bank transfer — leave no webhook
+ * behind, so nothing was ever written to the ledger for them. The customer's
+ * billing page then falls through to its derived row, which invents an invoice
+ * from the plan's USD list price: a receipt that disagrees with what was
+ * actually paid, in a currency that was never charged. Writing a real row here
+ * is what stops that, because `getCompanyBillingContext` prefers the ledger
+ * over anything it can derive.
+ *
+ * Tax is computed rather than accepted, so the stored breakdown always adds up:
+ * subtotal − discount + tax = total.
+ */
+export async function createManualPlatformInvoice(
+  input: ManualInvoiceInput,
+): Promise<ManualInvoiceResult> {
+  const companyId = String(input.companyId || "").trim();
+  if (!companyId) return { ok: false, error: "companyId is required" };
+
+  const amount = round2(Number(input.amount));
+  if (!Number.isFinite(amount) || amount <= 0) {
+    return { ok: false, error: "amount must be greater than 0" };
+  }
+  if (amount > MAX_MANUAL_AMOUNT) {
+    return { ok: false, error: `amount cannot exceed ${MAX_MANUAL_AMOUNT.toLocaleString()}` };
+  }
+
+  const discount = round2(Number(input.discount) || 0);
+  if (discount < 0) return { ok: false, error: "discount cannot be negative" };
+  if (discount > amount) return { ok: false, error: "discount cannot exceed the amount" };
+
+  const taxRate = Number(input.taxRate) || 0;
+  if (!Number.isFinite(taxRate) || taxRate < 0 || taxRate > 100) {
+    return { ok: false, error: "taxRate must be between 0 and 100" };
+  }
+
+  const currency = String(input.currency || "USD").trim().toUpperCase();
+  if (!/^[A-Z]{3}$/.test(currency)) {
+    return { ok: false, error: "currency must be a 3-letter code, e.g. PKR or USD" };
+  }
+
+  const status = String(input.status || "PAID").trim().toUpperCase();
+  if (status !== "PAID" && status !== "OPEN") {
+    return { ok: false, error: "status must be PAID or OPEN" };
+  }
+
+  const periodStart = input.periodStart ?? null;
+  const periodEnd = input.periodEnd ?? null;
+  for (const [label, d] of [["periodStart", periodStart], ["periodEnd", periodEnd], ["issuedAt", input.issuedAt ?? null]] as const) {
+    if (d && Number.isNaN(d.getTime())) return { ok: false, error: `${label} is not a real date` };
+  }
+  if (periodStart && periodEnd && periodEnd.getTime() < periodStart.getTime()) {
+    return { ok: false, error: "periodEnd cannot be before periodStart" };
+  }
+
+  const taxable = round2(amount - discount);
+  const taxAmount = round2((taxable * taxRate) / 100);
+  const total = round2(taxable + taxAmount);
+
+  const reference = String(input.reference || "").trim();
+  const providerEventId = reference ? `manual:${reference}` : null;
+
+  try {
+    if (providerEventId) {
+      const existing = await (prisma as any).platformInvoice.findUnique({ where: { providerEventId } });
+      if (existing) return { ok: true, invoice: existing, duplicate: true };
+    }
+
+    const invoice = await recordPlatformInvoice(
+      {
+        companyId,
+        companyName: input.companyName || null,
+        provider: "MANUAL",
+        providerEventId,
+        plan: String(input.plan || "STARTER").toUpperCase(),
+        billingCycle: String(input.billingCycle || "YEARLY").toUpperCase(),
+        currency,
+        subtotal: amount,
+        discount,
+        taxRate,
+        taxAmount,
+        taxName: input.taxName || (taxRate > 0 ? "Sales Tax" : null),
+        total,
+        customerName: input.customerName || null,
+        customerEmail: input.customerEmail || null,
+        customerCountry: input.customerCountry || null,
+        customerTaxId: input.customerTaxId || null,
+        status,
+        periodStart,
+        periodEnd,
+        issuedAt: input.issuedAt || new Date(),
+      },
+      { strict: true },
+    );
+
+    if (!invoice) return { ok: false, error: "Invoice was not written" };
+    return { ok: true, invoice, duplicate: false };
+  } catch (e: any) {
+    // The ledger ships as a manual migration, so "table missing" is a real
+    // possibility on an environment that has not had it pasted in yet. Say so
+    // by name instead of returning a generic failure the admin cannot act on.
+    const message = String(e?.message || "");
+    if (e?.code === "P2021" || message.includes("does not exist")) {
+      return {
+        ok: false,
+        migrationRequired: true,
+        error: "PlatformInvoice table not found — run prisma/migrations/manual_platform_invoices.sql",
+      };
+    }
+    return { ok: false, error: message || "Failed to create invoice" };
   }
 }
 
