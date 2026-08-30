@@ -43,6 +43,13 @@ export type ManufacturingBom = {
   finishedItemId: string;
   unitCost: number;
   yieldUnits: number;
+  /**
+   * Conversion cost per batch. Stored since costing arrived but never mapped
+   * out again, so reopening a BOM to correct it silently dropped the labour and
+   * overhead back to zero and the unit cost fell with them.
+   */
+  labourPerBatch: number;
+  overheadPerBatch: number;
 };
 
 export type ManufacturingProductionOrder = {
@@ -127,6 +134,8 @@ export function mapBomRecord(record: BusinessRecord): ManufacturingBom {
     finishedItemId: String(record.data?.finishedItemId || ""),
     unitCost: record.amount || 0,
     yieldUnits: Number(record.data?.yield || 1),
+    labourPerBatch: Number(record.data?.labourPerBatch) || 0,
+    overheadPerBatch: Number(record.data?.overheadPerBatch) || 0,
   };
 }
 
