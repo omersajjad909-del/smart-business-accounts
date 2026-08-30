@@ -24,6 +24,7 @@ import {
   tdStyle,
   thStyle,
   MUTED,
+  labelStyle,
 } from "../_ui";
 
 export default function InvestorPartiesPage() {
@@ -91,34 +92,37 @@ export default function InvestorPartiesPage() {
         title="Add a party"
         hint="Cycle days is how often accounts are settled — ten days is the usual arrangement. The profit model decides how every production line is priced, so it is worth getting right at the start."
       >
-        <div style={{ display: "flex", flexWrap: "wrap", gap: 12, alignItems: "flex-end" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(0, 1fr))", gap: 12 }}>
           <Field label="Party name">
             <input style={inp()} value={name} onChange={(e) => setName(e.target.value)} placeholder="Rehman Textile Mills" />
           </Field>
           <Field label="Business">
             <input style={inp()} value={business} onChange={(e) => setBusiness(e.target.value)} placeholder="Yarn from waste cloth" />
           </Field>
-          <Field label="Cycle days" width={110}>
+          <Field label="Cycle days">
             <input style={inp()} type="number" step="any" value={cycleDays} onChange={(e) => setCycleDays(e.target.value)} />
           </Field>
-          <Field label="Profit model" width={170}>
+          <Field label="Profit model">
             <select style={inp()} value={model} onChange={(e) => setModel(e.target.value as ProfitModel)}>
               <option value="per_unit">Fixed rate per unit</option>
               <option value="percentage">Share of profit</option>
             </select>
           </Field>
           {model === "percentage" ? (
-            <Field label="Your share %" width={120}>
+            <Field label="Your share %">
               <input style={inp()} type="number" step="any" value={sharePercent} onChange={(e) => setSharePercent(e.target.value)} placeholder="30" />
             </Field>
           ) : (
-            <Field label="Unit" width={100}>
+            <Field label="Unit">
               <input style={inp()} value={unit} onChange={(e) => setUnit(e.target.value)} placeholder="kg" />
             </Field>
           )}
-          <Btn onClick={save} disabled={saving}>
-            {saving ? "Saving…" : "Add Party"}
-          </Btn>
+          <div style={{ minWidth: 0 }}>
+            <span style={labelStyle()}>Action</span>
+            <Btn onClick={save} disabled={saving} fullWidth>
+              {saving ? "Saving…" : "Add Party"}
+            </Btn>
+          </div>
         </div>
       </Panel>
 

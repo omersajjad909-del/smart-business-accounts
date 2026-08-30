@@ -69,6 +69,7 @@ export function Btn({
   disabled,
   type = "button",
   small,
+  fullWidth,
 }: {
   children: React.ReactNode;
   onClick?: () => void;
@@ -76,6 +77,7 @@ export function Btn({
   disabled?: boolean;
   type?: "button" | "submit";
   small?: boolean;
+  fullWidth?: boolean;
 }) {
   const bg = tone === "accent" ? ACCENT : "transparent";
   const color = tone === "accent" ? "#04231f" : tone === "danger" ? "#f87171" : MUTED;
@@ -97,6 +99,7 @@ export function Btn({
         cursor: disabled ? "not-allowed" : "pointer",
         opacity: disabled ? 0.5 : 1,
         whiteSpace: "nowrap",
+        width: fullWidth ? "100%" : undefined,
       }}
     >
       {children}
