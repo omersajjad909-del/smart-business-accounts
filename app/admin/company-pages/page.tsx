@@ -107,7 +107,7 @@ export default function CompanyPagesAdmin() {
       const r = await fetch(`/api/admin/company-page-overrides?companyId=${encodeURIComponent(ref)}`, {
         headers: headers(), credentials: "include", cache: "no-store",
       });
-      const j = await r.json();
+      const j = await readJson(r);
       if (!r.ok) throw new Error(j?.error || "Could not load");
       setData(j);
     } catch (e) {
@@ -128,7 +128,7 @@ export default function CompanyPagesAdmin() {
         method: "POST", headers: headers(), credentials: "include",
         body: JSON.stringify({ companyId: companyRef, id, state }),
       });
-      const j = await r.json();
+      const j = await readJson(r);
       if (!r.ok) throw new Error(j?.error || "Could not save");
       await load(companyRef);
       toast.success(state === "default" ? "Back to the plan default" : state === "on" ? "Page switched on" : "Page switched off");
@@ -148,7 +148,7 @@ export default function CompanyPagesAdmin() {
         method: "POST", headers: headers(), credentials: "include",
         body: JSON.stringify({ companyId: companyRef, action: "RESET" }),
       });
-      if (!r.ok) throw new Error((await r.json())?.error || "Could not reset");
+      if (!r.ok) throw new Error((await readJson(r))?.error || "Could not reset");
       await load(companyRef);
       toast.success("Exceptions cleared");
     } catch (e) {
