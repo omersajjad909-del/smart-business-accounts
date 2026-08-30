@@ -171,13 +171,18 @@ function OverrideModal({ company, onClose, onDone }: {
               <div>
                 <label style={{ fontSize: 11, fontWeight: 700, color: "#475569", letterSpacing: ".06em", display: "block", marginBottom: 6 }}>DURATION (DAYS)</label>
                 <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-                  {[7, 14, 30, 60, 90].map(d => (
+                  {/* A trial is measured in days; a prepaid offline deal is sold
+                      in years, so each action gets the presets it actually uses. */}
+                  {(action === "GRANT_FREE_ACCESS"
+                    ? [{ d: 30, label: "30d" }, { d: 90, label: "90d" }, { d: 365, label: "1 year" }, { d: 730, label: "2 years" }, { d: 1095, label: "3 years" }]
+                    : [7, 14, 30, 60, 90].map(d => ({ d, label: `${d}d` }))
+                  ).map(({ d, label }) => (
                     <button key={d} onClick={() => setDays(d)}
                       style={{ padding: "7px 16px", borderRadius: 10, border: `1px solid ${days === d ? "#818cf8" : "rgba(255,255,255,.1)"}`, background: days === d ? "rgba(99,102,241,.2)" : "transparent", color: days === d ? "#818cf8" : "#64748b", fontSize: 12, fontWeight: 700, cursor: "pointer" }}>
-                      {d}d
+                      {label}
                     </button>
                   ))}
-                  <input type="number" min={1} max={365} value={days} onChange={e => setDays(Number(e.target.value))}
+                  <input type="number" min={1} max={action === "GRANT_FREE_ACCESS" ? 1825 : 365} value={days} onChange={e => setDays(Number(e.target.value))}
                     style={{ ...inputStyle, width: 80, textAlign: "center" }} />
                 </div>
                 <div style={{ fontSize: 11, color: "#475569", marginTop: 8 }}>
