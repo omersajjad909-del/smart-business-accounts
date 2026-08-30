@@ -35,7 +35,9 @@ export type BusinessType =
   // Rental Business
   | "equipment_rental" | "property_rental" | "generator_rental"
   // Franchise
-  | "chain_store" | "franchise_restaurant" | "franchise_brand";
+  | "chain_store" | "franchise_restaurant" | "franchise_brand"
+  // Investment / profit sharing
+  | "investor";
 
 export type ModuleKey =
   | "dashboard" | "ai_assistant"
@@ -100,6 +102,11 @@ export type ModuleKey =
   | "import_costing" | "export_rebate" | "freight" | "containers"
   | "hs_codes" | "commercial_invoice" | "packing_list"
   | "cert_of_origin" | "export_docs" | "trade_analytics" | "export_performance"
+  // Investor / profit sharing. One key per page, so a plan can hand out the
+  // statement without the capital ledger that sits behind it.
+  | "investor_parties" | "investor_capital" | "investor_grades"
+  | "investor_production" | "investor_settlements"
+  | "investor_statement" | "investor_reports"
   // Phase 1 — Clearing & Forwarding specific
   | "cnf_jobs";
 
@@ -253,6 +260,40 @@ export const BUSINESS_TYPES: BusinessTypeMeta[] = [
       { label: "View BOM", href: "/dashboard/manufacturing/bom", icon: "🗂️", color: "#fbbf24" },
       { label: "Raw Material Purchase", href: "/dashboard/purchase-invoice", icon: "📦", color: "#34d399" },
       { label: "Dispatch Goods", href: "/dashboard/delivery-challan", icon: "🚚", color: "#38bdf8" },
+    ],
+  },
+
+
+  // \x{2500}\x{2500} INVESTOR / PROFIT SHARING \x{2500}\x{2500}\x{2500}\x{2500}\x{2500}\x{2500}\x{2500}\x{2500}\x{2500}\x{2500}\x{2500}\x{2500}\x{2500}\x{2500}
+  // The investor does not run the factory and never owns the goods. What he
+  // owns is a claim on output \x{2014} so many rupees per kg produced, or a slice of
+  // the profit \x{2014} and trading and manufacturing both make him fill in stock,
+  // suppliers and invoices that have nothing to do with that claim.
+  {
+    id: "investor", label: "Investor / Profit Sharing", icon: "\x{1F91D}", emoji: "\x{1F91D}",
+    description: "Capital placed in someone else\x27s business \x{2014} track output, take a share",
+    tagline: "Capital \x{2192} Production \x{2192} Share",
+    color: "#14b8a6", gradient: "linear-gradient(135deg,#0d9488,#2dd4bf)", category: "Finance",
+    modules: [...CORE_P1, "investor_parties","investor_capital","investor_grades","investor_production","investor_settlements","investor_statement","investor_reports","audit_trail"],
+    defaultAccounts: [
+      ...COMMON_ACCOUNTS,
+      { code: "1300", name: "Investment in Partnership", type: "Asset" },
+      { code: "1301", name: "Profit Receivable", type: "Asset" },
+      { code: "3200", name: "Drawings", type: "Equity" },
+      { code: "4200", name: "Share of Profit", type: "Revenue" },
+      { code: "5200", name: "Investment Loss", type: "Expense" },
+    ],
+    kpis: [
+      { key: "invested_capital",    label: "Capital Invested",     icon: "\x{1F4B0}", color: "#14b8a6" },
+      { key: "production_month",    label: "This Month Produced",  icon: "\x{2696}\x{FE0F}", color: "#38bdf8" },
+      { key: "profit_month",        label: "This Month Share",     icon: "\x{1F4C8}", color: "#34d399" },
+      { key: "outstanding_balance", label: "Outstanding",          icon: "\x{1F9FE}", color: "#fbbf24" },
+    ],
+    quickActions: [
+      { label: "Enter Production",  href: "/dashboard/investors/production",  icon: "\x{2696}\x{FE0F}", color: "#38bdf8" },
+      { label: "Close Settlement",  href: "/dashboard/investors/settlements", icon: "\x{1F91D}", color: "#14b8a6" },
+      { label: "Print Statement",   href: "/dashboard/investors/statement",   icon: "\x{1F9FE}", color: "#fbbf24" },
+      { label: "Record Capital",    href: "/dashboard/investors/capital",     icon: "\x{1F4B0}", color: "#34d399" },
     ],
   },
 
