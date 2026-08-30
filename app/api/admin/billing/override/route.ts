@@ -15,6 +15,10 @@ import { requireAdmin, logAdminAction } from "@/lib/adminAuth";
 
 const ALLOWED_ACTIONS = ["EXTEND_TRIAL", "GRANT_FREE_ACCESS", "RESET_INTRO_OFFER", "SET_STATUS", "SET_EXTRA_SEATS", "ADD_NOTE"];
 
+// Five years. Long enough for any prepaid deal worth signing, short enough that
+// a typo cannot hand out access for a decade.
+const MAX_GRANT_DAYS = 1825;
+
 export async function POST(req: NextRequest) {
   try {
     const admin = await requireAdmin(req);
@@ -56,10 +60,15 @@ export async function POST(req: NextRequest) {
     }
 
     /* ── GRANT_FREE_ACCESS ── */
+    // Also the way an offline multi-year deal is entered: a customer who pays
+    // by bank transfer for two or three years never touches a payment gateway,
+    // so their access is granted here instead. The old 365-day ceiling meant a
+    // three-year deal had to be re-granted every year from memory, and a missed
+    // renewal locked out a customer who had already paid in full.
     if (action === "GRANT_FREE_ACCESS") {
       const { days, plan } = payload || {};
-      if (!days || days < 1 || days > 365) {
-        return NextResponse.json({ error: "days must be 1–365" }, { status: 400 });
+      if (!days || days < 1 || days > MAX_GRANT_DAYS) {
+        return NextResponse.json({ error: `days must be 1–${MAX_GRANT_DAYS}` }, { status: 400 });
       }
       const newEnd = new Date();
       newEnd.setDate(newEnd.getDate() + Number(days));
@@ -70,6 +79,9 @@ export async function POST(req: NextRequest) {
           subscriptionStatus: "ACTIVE",
           plan: (plan || company.plan || "PRO").toUpperCase(),
           currentPeriodEnd: newEnd,
+          // The date the guards actually enforce. currentPeriodEnd is read by
+          // no guard, so without this the grant never ends.
+          accessGrantedUntil: newEnd,
         },
       });
     }
@@ -89,9 +101,17 @@ export async function POST(req: NextRequest) {
       if (!status || !VALID.includes(status.toUpperCase())) {
         return NextResponse.json({ error: "Invalid status" }, { status: 400 });
       }
+      const nextStatus = status.toUpperCase();
       result = await prisma.company.update({
         where: { id: companyId },
-        data: { subscriptionStatus: status.toUpperCase() },
+        data: {
+          subscriptionStatus: nextStatus,
+          // Putting an account back to ACTIVE by hand clears any grant that had
+          // already run out. Leaving a stale date behind would let the guards
+          // close the account again the moment the next request came in, and
+          // the admin who just reactivated it would have no idea why.
+          ...(nextStatus === "ACTIVE" ? { accessGrantedUntil: null } : {}),
+        },
       });
     }
 

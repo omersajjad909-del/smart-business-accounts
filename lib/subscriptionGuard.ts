@@ -22,6 +22,37 @@ function inReadOnlyGracePeriod(status: string, cancelledAt: Date | null): boolea
   return daysSinceCancel <= 30;
 }
 
+/**
+ * How far past a hand-granted access period we are.
+ *
+ * Only a manual grant — an offline deal paid by bank transfer — sets this
+ * date, so a gateway subscriber is never touched by it: their renewal webhook
+ * keeps billing moving and the column stays null. It exists because nothing
+ * else ends a granted period. `subscriptionStatus` is what the guards read,
+ * `currentPeriodEnd` is read by no guard at all, and platform-dunning only
+ * reacts to failed payments — so a company granted three years stayed ACTIVE
+ * for good.
+ *
+ * Expiry gets the same shape as a cancellation: writes stop at once, reads
+ * survive 30 days so the customer can export what is theirs while a renewal
+ * is being agreed, and after that the account is closed.
+ */
+function manualGrantState(until: Date | null | undefined): "ok" | "grace" | "expired" {
+  if (!until) return "ok";
+  const overdueMs = Date.now() - until.getTime();
+  if (overdueMs <= 0) return "ok";
+  return overdueMs <= 30 * 24 * 60 * 60 * 1000 ? "grace" : "expired";
+}
+
+function grantEndedMessage(until: Date, grace: boolean): string {
+  const d = String(until.getDate()).padStart(2, "0");
+  const m = String(until.getMonth() + 1).padStart(2, "0");
+  const on = d + "-" + m + "-" + until.getFullYear();
+  return grace
+    ? "Your access period ended on " + on + ". Read-only export stays open for 30 days; renew to restore full access."
+    : "Your access period ended on " + on + ". Please renew to continue.";
+}
+
 export async function requireEntitlement(req: Request, entitlement: string) {
   const companyId = await resolveCompanyId(req as any);
   if (!companyId) {
@@ -30,7 +61,7 @@ export async function requireEntitlement(req: Request, entitlement: string) {
 
   const company = await prisma.company.findUnique({
     where: { id: companyId },
-    select: { plan: true, subscriptionStatus: true, cancelledAt: true },
+    select: { plan: true, subscriptionStatus: true, cancelledAt: true, accessGrantedUntil: true },
   });
 
   const plan   = (company?.plan || "STARTER").toUpperCase();
@@ -48,6 +79,20 @@ export async function requireEntitlement(req: Request, entitlement: string) {
           : "Subscription inactive. Please upgrade your plan.",
       },
       { status: 402 }
+    );
+  }
+
+  // A hand-granted period that has run out ends access even though the status
+  // still reads ACTIVE — nothing else moves it off ACTIVE.
+  const grantedUntil = company?.accessGrantedUntil ?? null;
+  const grantState = manualGrantState(grantedUntil);
+  if (grantedUntil && grantState !== "ok") {
+    if (grantState === "grace" && isReadOnlyRequest(req.method)) {
+      return null;
+    }
+    return NextResponse.json(
+      { error: grantEndedMessage(grantedUntil, grantState === "grace") },
+      { status: 402 },
     );
   }
 
@@ -110,7 +155,7 @@ export async function requireActiveSubscription(req: Request) {
   }
   const company = await prisma.company.findUnique({
     where: { id: companyId },
-    select: { subscriptionStatus: true, cancelledAt: true },
+    select: { subscriptionStatus: true, cancelledAt: true, accessGrantedUntil: true },
   });
   const status = (company?.subscriptionStatus || "ACTIVE").toUpperCase();
   if (!ALLOWED_STATUSES.includes(status)) {
@@ -124,6 +169,20 @@ export async function requireActiveSubscription(req: Request) {
           : "Subscription inactive. Please renew your plan.",
       },
       { status: 402 }
+    );
+  }
+
+  // A hand-granted period that has run out ends access even though the status
+  // still reads ACTIVE — nothing else moves it off ACTIVE.
+  const grantedUntil = company?.accessGrantedUntil ?? null;
+  const grantState = manualGrantState(grantedUntil);
+  if (grantedUntil && grantState !== "ok") {
+    if (grantState === "grace" && isReadOnlyRequest(req.method)) {
+      return null;
+    }
+    return NextResponse.json(
+      { error: grantEndedMessage(grantedUntil, grantState === "grace") },
+      { status: 402 },
     );
   }
   return null;

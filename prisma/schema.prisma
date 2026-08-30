@@ -508,7 +508,7 @@ model Company {
   subscriptionStatus        String?   @default("ACTIVE")
   stripeCustomerId          String?
   currentPeriodEnd          DateTime?
-  // Set only when an admin grants access by hand â an offline deal paid by
+  // Set only when an admin grants access by hand — an offline deal paid by
   // bank transfer, not through a payment gateway. Gateway subscribers leave
   // this null. Once it passes, the guards stop the account: without it a
   // three-year deal simply never ended, because nothing reads
