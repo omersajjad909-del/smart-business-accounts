@@ -810,6 +810,19 @@ export async function sendEmail(options: {
         subject: options.subject,
         html: options.html,
         ...(options.text ? { text: options.text } : {}),
+        // Attachments were accepted by this function's signature but only ever
+        // forwarded on the SMTP path below, so every platform email — the ones
+        // with no companyId, which is exactly the invoice receipts — silently
+        // arrived without its PDF. Resend takes the same {filename, content}
+        // shape; a Buffer has to go over the wire as base64.
+        ...(options.attachments?.length
+          ? {
+              attachments: options.attachments.map((a) => ({
+                filename: a.filename,
+                content: Buffer.isBuffer(a.content) ? a.content.toString('base64') : a.content,
+              })),
+            }
+          : {}),
         headers: {
           'List-Unsubscribe': `<https://finovaos.app/unsubscribe>`,
           'X-Entity-Ref-ID': Date.now().toString(),

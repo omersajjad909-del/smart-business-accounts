@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireAdmin, logAdminAction } from "@/lib/adminAuth";
 import { createManualPlatformInvoice } from "@/lib/platformInvoice";
+import { sendManualInvoiceEmail } from "@/lib/manualInvoiceEmail";
 
 /*
   POST /api/admin/billing/override
@@ -170,6 +171,17 @@ export async function POST(req: NextRequest) {
         });
 
         if (invoiceResult.ok) {
+          // Only on a freshly written invoice. A duplicate means this exact
+          // period was already invoiced and emailed; sending again would be a
+          // second receipt for one payment.
+          const emailed = invoiceResult.duplicate
+            ? { sent: false as const }
+            : await sendManualInvoiceEmail({
+                companyId,
+                invoiceId: invoiceResult.invoice.id,
+                toEmail: invoiceResult.invoice.customerEmail,
+              });
+
           result = {
             ...result,
             invoice: {
@@ -177,6 +189,8 @@ export async function POST(req: NextRequest) {
               total: invoiceResult.invoice.total,
               currency: invoiceResult.invoice.currency,
               duplicate: invoiceResult.duplicate,
+              emailedTo: emailed.sent ? emailed.to : null,
+              emailError: emailed.sent ? null : (emailed as any).error || null,
             },
           };
         } else {

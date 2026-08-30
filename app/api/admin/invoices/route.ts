@@ -233,6 +233,16 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // Same rule as the grant flow: a duplicate was already invoiced and
+    // emailed, so it must not produce a second receipt.
+    const emailed = result.duplicate
+      ? { sent: false as const }
+      : await sendManualInvoiceEmail({
+          companyId,
+          invoiceId: result.invoice.id,
+          toEmail: result.invoice.customerEmail,
+        });
+
     if (!result.duplicate) {
       await logAdminAction({
         adminId: admin.id,
