@@ -77,11 +77,16 @@ async function loadCompanyContext(companyRef: string) {
     ? "PRO"
     : String(company.plan || "STARTER").toUpperCase();
 
-  // Same order the dashboard itself resolves in — see /api/me/bootstrap.
-  const dashboardFlagsMap =
+  // Same order the dashboard itself resolves in — see /api/me/bootstrap, which
+  // aliases resolvePlanWideFeatureFlags as normalizeDashboardFeatureFlags. This
+  // screen has to agree with what the customer actually sees, so the two read
+  // the same configs through the same functions.
+  const savedFeatureFlags =
     (isPkrCompany ? readSavedDashboardFeatureFlags(pkrPlanConfigLog?.details) : null) ??
-    readSavedDashboardFeatureFlags(planConfigLog?.details) ??
-    resolvePlanWideFeatureFlags(null);
+    readSavedDashboardFeatureFlags(planConfigLog?.details);
+  const dashboardFlagsMap: Record<string, string[]> = savedFeatureFlags
+    ? resolvePlanWideFeatureFlags(savedFeatureFlags)
+    : resolvePlanWideFeatureFlags();
 
   const worldPageFlags = readPageConfig(businessPlanModulesLog?.details);
   const pkrPageFlags = readPageConfig(pkrBusinessPlanModulesLog?.details);
