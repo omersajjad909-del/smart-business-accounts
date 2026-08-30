@@ -205,6 +205,7 @@ function PurchaseInvoiceContent() {
   const [allPOs, setAllPOs] = useState<PurchaseOrder[]>([]);
   const [allGrns, setAllGrns] = useState<GRN[]>([]);
   const [filteredGRNs, setFilteredGRNs] = useState<GRN[]>([]);
+  const [showAllSuppliers, setShowAllSuppliers] = useState(false);
   const [invoices, setInvoices] = useState<PurchaseInvoice[]>([]);
   const [showList, setShowList] = useState(false);
   const [showForm, setShowForm] = useState(true);
@@ -498,6 +499,32 @@ const [searchTerm, setSearchTerm] = useState("");
     setSelectedGrnId("");
     setRows([emptyRow()]);
   }
+
+  /**
+   * Suppliers with goods received that nobody has billed yet.
+   *
+   * Raising a purchase invoice is normally the last step of a receipt, so the
+   * useful list is the short one: who has delivered and is still waiting to be
+   * invoiced. The full list stays one click away — a supplier can be billed
+   * without any GRN at all (see the direct-invoice path, where poId and grnId
+   * are both null), and hiding them would make that impossible.
+   */
+  const suppliersAwaitingInvoice = suppliers.filter((supplier) =>
+    allGrns.some((grn) => grn.supplierId === supplier.id && getInvoiceableRowsForGrn(grn).length > 0),
+  );
+  const supplierOptions = showAllSuppliers ? suppliers : suppliersAwaitingInvoice;
+
+  /**
+   * What is still billable on the chosen receipt, per item — received less
+   * whatever earlier invoices already took. Shown on every row of the picker so
+   * the quantity is read off the list rather than looked up elsewhere.
+   */
+  const grnRemainingNote = (item: { id: string }) => {
+    const grn = filteredGRNs.find((entry) => entry.id === selectedGrnId);
+    if (!grn) return null;
+    const row = getInvoiceableRowsForGrn(grn).find((r) => r.itemId === item.id);
+    return row ? `${row.qty} pending` : null;
+  };
 
   useEffect(() => {
     if (!supplierId) {
@@ -1059,10 +1086,24 @@ const [searchTerm, setSearchTerm] = useState("");
                     </div>
                     <div style={{ fontSize: 10.5, fontWeight: 800, color: MUTED, textTransform: "uppercase" as const, letterSpacing: 0.7 }}>Supplier Details</div>
                   </div>
-                  <select value={supplierId} onChange={e => handleSupplierChange(e.target.value)} style={{ ...inp({ marginBottom: 8 }) }}>
+                  <select value={supplierId} onChange={e => handleSupplierChange(e.target.value)} style={{ ...inp({ marginBottom: 6 }) }}>
                     <option value="">— Select Supplier —</option>
-                    {suppliers.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
+                    {supplierOptions.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
                   </select>
+                  <label style={{ display: "flex", alignItems: "center", gap: 7, fontSize: 11.5, color: MUTED, marginBottom: 8, cursor: "pointer" }}>
+                    <input
+                      type="checkbox"
+                      checked={showAllSuppliers}
+                      onChange={e => setShowAllSuppliers(e.target.checked)}
+                      style={{ accentColor: ACCENT, cursor: "pointer" }}
+                    />
+                    Show all suppliers
+                    {!showAllSuppliers && (
+                      <span style={{ color: "var(--text-muted)" }}>
+                        — {suppliersAwaitingInvoice.length} awaiting invoice
+                      </span>
+                    )}
+                  </label>
                   {supplierId && (() => {
                     const s = suppliers.find(x => x.id === supplierId) as any;
                     if (!s) return null;
@@ -1274,6 +1315,7 @@ const [searchTerm, setSearchTerm] = useState("");
                                     }}
                                       onKeyDown={rateFormulaEnterHandler(rf, rfActive, i, () => lastPickedMeta.current)}
                                       label={rfActive ? itemPickerLabel : undefined}
+                                      note={grnRemainingNote}
                                       style={{ ...inp({ padding: "5px 7px", fontSize: 12.5 }), fontWeight: r.itemId ? 600 : 400 }}
                                       allowManual={false}
                                       // placeholder="Type to search — e.g. e1060"
