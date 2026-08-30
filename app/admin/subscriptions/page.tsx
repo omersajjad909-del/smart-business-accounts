@@ -461,6 +461,18 @@ function OverrideModal({ company, onClose, onDone }: {
                           {new Date(log.createdAt).toLocaleDateString(undefined, { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" })}
                         </div>
                       </div>
+                      {/* A recurring deal is re-entered by hand every period, so
+                          the terms it was last billed on are the one thing the
+                          next admin needs — spelled out rather than left inside
+                          a JSON dump for someone to squint at. */}
+                      {parsed.payload?.recordInvoice && (
+                        <div style={{ fontSize: 11, color: "#22c55e", marginTop: 4 }}>
+                          🧾 Invoiced {parsed.payload.currency} {Number(parsed.payload.amount || 0).toLocaleString()}
+                          {Number(parsed.payload.discountPercent) > 0 && ` · ${parsed.payload.discountPercent}% off`}
+                          {Number(parsed.payload.taxRate) > 0 && ` · ${parsed.payload.taxRate}% tax`}
+                          {parsed.payload.billingCycle && ` · ${String(parsed.payload.billingCycle).toLowerCase()}`}
+                        </div>
+                      )}
                       {(parsed.payload || parsed.previousPlan) && (
                         <div style={{ fontSize: 10, color: "#334155", marginTop: 4, fontFamily: "monospace" }}>
                           {parsed.previousPlan && `${parsed.previousPlan} → `}
