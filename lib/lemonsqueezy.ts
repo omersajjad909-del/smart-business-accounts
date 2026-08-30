@@ -66,6 +66,19 @@ export function resolveLemonVariantId(
   const pkKey = `${normalizedPlan}_${cycle}_PK`;
   if (isPakistan && exactMap[pkKey]) return exactMap[pkKey];
 
+  // Falling back is not harmless: the global variant is the full international
+  // price, so a missing _PK id quietly charges a Pakistani customer several
+  // times the advertised PKR rate. It stays a fallback rather than a hard
+  // failure — a checkout that works at the wrong price is still recoverable,
+  // one that 500s is not — but it must never happen unnoticed. This became the
+  // main Pakistan path when Safepay checkout was gated off pending approval.
+  if (isPakistan) {
+    console.warn(
+      `[lemonsqueezy] No LEMONSQUEEZY_VARIANT_${normalizedPlan}_${cycle}_PK configured — ` +
+        `falling back to the global variant, which charges the full international price.`,
+    );
+  }
+
   return exactMap[`${normalizedPlan}_${cycle}`] || "";
 }
 

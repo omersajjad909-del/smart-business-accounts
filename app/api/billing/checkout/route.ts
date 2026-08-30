@@ -5,7 +5,7 @@ import { apiError, apiOk } from "@/lib/apiError";
 import { getRuntimeAppUrl } from "@/lib/domains";
 import { resolvePricingRegion } from "@/lib/geoCountry";
 import { createLemonCheckout, hasLemonSqueezyConfig } from "@/lib/lemonsqueezy";
-import { createSafepayCheckout, hasSafepayConfig, usdToPkr } from "@/lib/safepay";
+import { createSafepayCheckout, isSafepayCheckoutEnabled, usdToPkr } from "@/lib/safepay";
 import { getCompanyExtraSeats } from "@/lib/companySeatLimit";
 import { getCustomPlanCycleAmountUsd, getModuleRate, parseCustomModules } from "@/lib/customPlanPricing";
 import { FX_USD } from "@/lib/currency";
@@ -188,7 +188,11 @@ export async function POST(req: NextRequest) {
     // request actually came from — the opposite of the rule we now follow.
     const isPkrCustomer = pricingRegion.isPakistan;
 
-    if (isPkrCustomer && hasSafepayConfig()) {
+    // Gated on approval, not just on credentials — see isSafepayCheckoutEnabled.
+    // While the merchant account is under review this is false, and Pakistan
+    // falls through to the Lemon Squeezy branch below, which selects the _PK
+    // variants carrying the same PKR-equivalent prices.
+    if (isPkrCustomer && isSafepayCheckoutEnabled()) {
       const base      = getRuntimeAppUrl(req.nextUrl.origin);
       const amountPkr = usdToPkr(finalCustomPrice > 0 ? finalCustomPrice : planBasePerMonth);
       const orderId   = `fnv-${companyId}-${Date.now()}`;

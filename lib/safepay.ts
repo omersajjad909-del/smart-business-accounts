@@ -22,6 +22,28 @@ export function hasSafepayConfig() {
   return Boolean(env("SAFEPAY_API_KEY") && env("SAFEPAY_WEBHOOK_SECRET"));
 }
 
+/**
+ * Whether Safepay may take a live customer's payment.
+ *
+ * Credentials alone are not permission. The merchant account is still in
+ * Safepay's due-diligence review, so the keys on this deployment are sandbox
+ * ones — and having them present routed every Pakistani customer to a checkout
+ * that either fails outright ("Failed to create Safepay checkout session") or,
+ * worse, succeeds against sandbox.safepay.pk and takes no real money while
+ * looking like it did. Until approval lands, Pakistan checks out through Lemon
+ * Squeezy's _PK variants, which carry the same PKR-equivalent prices.
+ *
+ * Deliberately opt-in rather than opt-out: an unapproved gateway must not
+ * become reachable just because someone left a key in the environment. Set
+ * SAFEPAY_CHECKOUT_ENABLED=true once the account is live to switch back.
+ *
+ * This gates checkout only. The webhook keeps verifying and processing
+ * whatever Safepay sends, so a sandbox test still settles correctly.
+ */
+export function isSafepayCheckoutEnabled() {
+  return hasSafepayConfig() && env("SAFEPAY_CHECKOUT_ENABLED").toLowerCase() === "true";
+}
+
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 export type SafepayCheckoutInput = {
