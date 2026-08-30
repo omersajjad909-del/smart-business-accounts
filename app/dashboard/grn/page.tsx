@@ -37,7 +37,18 @@ type GRNItem = {
   /** Rate-formula dimensions, when this company uses one. See lib/rateFormula.ts. */
   meta?: RateFormulaMeta;
 };
-type GRN = { id: string; grnNo: string; date: string; status: string; supplier?: { name: string }; po?: { poNo: string } | null; items: Array<{ item: { name: string }; orderedQty: number; receivedQty: number; rate: number }> };
+type GRN = {
+  id: string; grnNo: string; date: string; status: string;
+  supplierId?: string; poId?: string | null;
+  supplier?: { id?: string; name: string };
+  po?: { poNo: string } | null;
+  // The list endpoint returns whole records, so a row carries everything the
+  // form needs to show it again — no second fetch to open one.
+  remarks?: string | null; partyBillNo?: string | null; purchaseType?: string | null;
+  biltyNo?: string | null; location?: string | null; cargo?: string | null;
+  driver?: string | null; vehicleNo?: string | null;
+  items: Array<{ itemId?: string; item: { name: string }; orderedQty: number; receivedQty: number; rate: number; remarks?: string | null; meta?: unknown }>;
+};
 type PO  = { id: string; poNo: string; supplier: { id: string; name: string }; items: Array<{ itemId: string; item: { id: string; name: string }; qty: number; rate: number }> };
 
 const STATUS_COLORS: Record<string, { bg: string; text: string; border: string }> = {
@@ -170,6 +181,98 @@ export default function GRNPage() {
     const line = selectedPO?.items.find((l) => l.itemId === item.id);
     return line ? `ordered ${line.qty}` : null;
   };
+
+  /**
+   * Open a saved receipt.
+   *
+   * It opens read-only, in the same preview the form hands you after saving —
+   * so it prints identically to the day it was raised. There is deliberately no
+   * edit: a GRN books stock the moment it is saved, so changing one has to
+   * reverse and re-post those movements, and the API has no PUT to do that.
+   * Correcting a receipt today means deleting it and raising it again.
+   */
+  function openGrn(grn: GRN) {
+    setGrnNo(grn.grnNo);
+    setDate(String(grn.date || "").slice(0, 10));
+    setSupplierId(grn.supplierId || grn.supplier?.id || "");
+    setPoId(grn.poId || "");
+    setRemarks(grn.remarks || "");
+    setPartyBillNo(grn.partyBillNo || "");
+    setPurchaseType(grn.purchaseType === "CASH" ? "CASH" : "CREDIT");
+    setBiltyNo(grn.biltyNo || "");
+    setLocation(grn.location || "");
+    setCargo(grn.cargo || "");
+    setDriver(grn.driver || "");
+    setVehicleNo(grn.vehicleNo || "");
+    setRows(
+      grn.items.map((line) => ({
+        itemId: line.itemId || "",
+        name: line.item?.name || "",
+        orderedQty: String(line.orderedQty ?? ""),
+        receivedQty: String(line.receivedQty ?? ""),
+        rate: String(line.rate ?? ""),
+        remarks: line.remarks || "",
+        ...(rfActive ? { meta: readRateFormulaMeta(rf, line.meta) } : {}),
+      })),
+    );
+    setShowList(false);
+    setPreview(true);
+  }
+
+  // ── Query mode (F7 / F8) ──────────────────────────────────────────────────
+  const [queryMode, setQueryMode] = useState(false);
+  const [queryGrnNo, setQueryGrnNo] = useState("");
+  const [queryDate, setQueryDate] = useState("");
+  const [queryParty, setQueryParty] = useState("");
+  const [queryResults, setQueryResults] = useState<GRN[]>([]);
+  const [queryIdx, setQueryIdx] = useState(-1);
+
+  function enterQuery() {
+    setQueryMode(true);
+    setQueryGrnNo(""); setQueryDate(""); setQueryParty("");
+    setQueryResults([]); setQueryIdx(-1);
+  }
+  function exitQuery() { setQueryMode(false); setQueryIdx(-1); setQueryResults([]); }
+
+  function runQuery(no: string, dateQ: string, party: string): GRN[] {
+    const n = no.trim().toLowerCase();
+    const p = party.trim().toLowerCase();
+    const d = dateQ.trim();
+    return grns.filter((g) => {
+      if (n && !g.grnNo.toLowerCase().includes(n)) return false;
+      if (p && !(g.supplier?.name || "").toLowerCase().includes(p)) return false;
+      if (d && String(g.date || "").slice(0, 10) !== d) return false;
+      return true;
+    });
+  }
+
+  function queryNavTo(idx: number) {
+    if (idx < 0 || idx >= queryResults.length) return;
+    setQueryIdx(idx);
+    openGrn(queryResults[idx]);
+  }
+
+  function executeQuery() {
+    const results = runQuery(queryGrnNo, queryDate, queryParty);
+    if (results.length === 0) { toast.error("No GRNs match that search"); return; }
+    setQueryResults(results);
+    setQueryIdx(0);
+    setQueryMode(false);
+    openGrn(results[0]);
+    toast.success(`${results.length} GRN${results.length > 1 ? "s" : ""} found — ${results[0].grnNo}`);
+  }
+
+  useEffect(() => {
+    function onKey(e: KeyboardEvent) {
+      if (e.key === "F7") { e.preventDefault(); enterQuery(); }
+      if (e.key === "Escape" && queryMode) { e.preventDefault(); exitQuery(); }
+      if (e.key === "PageDown" && queryIdx >= 0) { e.preventDefault(); queryNavTo(queryIdx + 1); }
+      if (e.key === "PageUp" && queryIdx >= 0) { e.preventDefault(); queryNavTo(queryIdx - 1); }
+    }
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [queryMode, queryIdx, queryResults, grns]);
 
   function focusItemRow(index: number) {
     requestAnimationFrame(() => {
