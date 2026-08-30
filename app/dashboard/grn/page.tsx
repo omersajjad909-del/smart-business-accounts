@@ -591,7 +591,12 @@ export default function GRNPage() {
                     <tr key={grn.id} style={{ borderBottom: `1px solid ${BORDER}`, transition: "background .12s" }}
                       onMouseEnter={e => (e.currentTarget as HTMLElement).style.background = "rgba(99,102,241,0.05)"}
                       onMouseLeave={e => (e.currentTarget as HTMLElement).style.background = "transparent"}>
-                      <td style={{ padding: "13px 16px", fontWeight: 700, color: ACCENT, fontFamily: "monospace", fontSize: 13 }}>{grn.grnNo}</td>
+                      <td style={{ padding: "13px 16px" }}>
+                        <button onClick={() => openGrn(grn)} title="Open this GRN"
+                          style={{ background: "none", border: "none", padding: 0, fontWeight: 700, color: ACCENT, fontFamily: "monospace", fontSize: 13, cursor: "pointer", textDecoration: "underline", textUnderlineOffset: 3 }}>
+                          {grn.grnNo}
+                        </button>
+                      </td>
                       <td style={{ padding: "13px 16px", color: MUTED, fontSize: 12 }}>{fmtDate(grn.date)}</td>
                       <td style={{ padding: "13px 16px", fontWeight: 600 }}>{grn.supplier?.name || "—"}</td>
                       <td style={{ padding: "13px 16px", color: MUTED, fontSize: 12, fontFamily: "monospace" }}>{grn.po?.poNo || "—"}</td>
@@ -600,9 +605,12 @@ export default function GRNPage() {
                       </td>
                       <td style={{ padding: "13px 16px", color: MUTED }}>{grn.items.length} items</td>
                       <td style={{ padding: "13px 16px" }}>
-                        {user?.role === "ADMIN" && (
-                          <button onClick={() => handleDelete(grn.id)} style={{ padding: "5px 13px", borderRadius: 6, border: "1px solid rgba(248,113,113,0.35)", background: "rgba(248,113,113,0.07)", color: "#f87171", fontFamily: FONT, fontSize: 11, fontWeight: 700, cursor: "pointer" }}>Delete</button>
-                        )}
+                        <span style={{ display: "inline-flex", gap: 6 }}>
+                          <button onClick={() => openGrn(grn)} style={{ padding: "5px 13px", borderRadius: 6, border: `1px solid ${BORDER}`, background: "rgba(99,102,241,0.07)", color: ACCENT, fontFamily: FONT, fontSize: 11, fontWeight: 700, cursor: "pointer" }}>Open</button>
+                          {user?.role === "ADMIN" && (
+                            <button onClick={() => handleDelete(grn.id)} style={{ padding: "5px 13px", borderRadius: 6, border: "1px solid rgba(248,113,113,0.35)", background: "rgba(248,113,113,0.07)", color: "#f87171", fontFamily: FONT, fontSize: 11, fontWeight: 700, cursor: "pointer" }}>Delete</button>
+                          )}
+                        </span>
                       </td>
                     </tr>
                   );
