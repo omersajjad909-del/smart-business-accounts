@@ -62,6 +62,34 @@ export async function GET(req: NextRequest) {
     })
     .catch(() => null);
 
+  // An admin-granted subscription — an offline deal, paid by bank transfer.
+  //
+  // There is no gateway behind it, so the branch below (which knows only
+  // "gateway subscription" or "nothing") told a fully paid-up customer
+  // "No active subscription yet — a card is collected at checkout", directly
+  // under a green Active badge and a paid invoice. Answered on its own terms
+  // instead: no card is stored, and that is correct rather than incomplete.
+  const grant = await prisma.company
+    .findUnique({ where: { id: companyId }, select: { accessGrantedUntil: true } })
+    .catch(() => null);
+
+  const onManualBilling =
+    !subscription?.stripeSubscriptionId &&
+    Boolean(grant?.accessGrantedUntil && grant.accessGrantedUntil.getTime() > Date.now());
+
+  if (onManualBilling) {
+    return NextResponse.json({
+      provider: "MANUAL",
+      managedExternally: false,
+      manualBilling: true,
+      paymentMethods: [],
+      paymentMethod: null,
+      defaultId: null,
+      updateUrl: null,
+      note: "This workspace is billed directly by arrangement — we issue your invoice each period and no card is stored here.",
+    });
+  }
+
   const provider = subscription?.provider || (hasLemonSqueezyConfig() ? "LEMONSQUEEZY" : "INTERNAL");
 
   if (provider !== "LEMONSQUEEZY" || !subscription?.stripeSubscriptionId) {
