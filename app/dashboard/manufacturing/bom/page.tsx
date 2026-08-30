@@ -45,6 +45,8 @@ export default function BOMPage() {
   const [saving, setSaving] = useState(false);
   const [form, setForm] = useState({ finishedItemId: "", version: "v1.0", yieldUnits: 1, labourPerBatch: 0, overheadPerBatch: 0 });
   const [lines, setLines] = useState<LineDraft[]>([{ itemId: "", qty: "", divisible: false }]);
+  /** The BOM being edited, or "" while a new one is being drafted. */
+  const [editingId, setEditingId] = useState("");
 
   const boms = useMemo(() => bomStore.records.map(mapBomRecord), [bomStore.records]);
   const orders = useMemo(() => productionStore.records.map(mapProductionOrderRecord), [productionStore.records]);
@@ -81,6 +83,58 @@ export default function BOMPage() {
     setLines((current) => current.map((line, i) => (i === index ? { ...line, ...patch } : line)));
   }
 
+  function resetForm() {
+    setForm({ finishedItemId: "", version: "v1.0", yieldUnits: 1, labourPerBatch: 0, overheadPerBatch: 0 });
+    setLines([{ itemId: "", qty: "", divisible: false }]);
+    setEditingId("");
+    setFormError("");
+  }
+
+  function startNew() {
+    resetForm();
+    setShowModal(true);
+  }
+
+  /**
+   * Reopen a saved BOM in the same form that built it.
+   *
+   * Everything is loaded back, including the quantities — the material list is
+   * where a wrong figure hides, and until now the only way to correct one was
+   * to build the whole BOM again. That is how the two "Simple Bag (48)" rows
+   * appeared: one at 13 rolls, one at 16, with nothing saying which is current.
+   */
+  function startEdit(bom: { id: string; finishedItemId: string; version: string; yieldUnits: number; lines: { itemId: string; qty: number; divisible: boolean }[]; labourPerBatch?: number; overheadPerBatch?: number }) {
+    setEditingId(bom.id);
+    setForm({
+      finishedItemId: bom.finishedItemId,
+      version: bom.version || "v1.0",
+      yieldUnits: bom.yieldUnits || 1,
+      labourPerBatch: Number(bom.labourPerBatch) || 0,
+      overheadPerBatch: Number(bom.overheadPerBatch) || 0,
+    });
+    setLines(
+      bom.lines.length
+        ? bom.lines.map((l) => ({ itemId: l.itemId, qty: String(l.qty), divisible: l.divisible }))
+        : [{ itemId: "", qty: "", divisible: false }],
+    );
+    setFormError("");
+    setShowModal(true);
+  }
+
+  async function removeBom(bom: { id: string; product: string }, linkedOrders: number) {
+    // A BOM that production orders were costed against is not junk to be thrown
+    // away — deleting it leaves those orders pointing at nothing.
+    const warning = linkedOrders > 0
+      ? `${bom.product} is used by ${linkedOrders} production order${linkedOrders > 1 ? "s" : ""}. Deleting it leaves them without the recipe they were costed from.\n\nDelete anyway?`
+      : `Delete the BOM for ${bom.product}?`;
+    if (!window.confirm(warning)) return;
+    try {
+      await bomStore.remove(bom.id);
+    } catch (e) {
+      setFormError(e instanceof Error ? e.message : "Could not delete the BOM.");
+    }
+  }
+
   async function save() {
     const finished = itemsById.get(form.finishedItemId);
     if (!finished) { setFormError("Pick the finished product this BOM makes."); return; }
@@ -100,26 +154,34 @@ export default function BOMPage() {
 
     setFormError("");
     setSaving(true);
-    try {
-      await bomStore.create({
-        title: finished.name,
-        status: "active",
-        amount: draftCost.unitCost,
-        data: {
+    const payload = {
+      title: finished.name,
+      status: "active",
+      amount: draftCost.unitCost,
+      data: {
           version: form.version.trim() || "v1.0",
           yield: form.yieldUnits,
           finishedItemId: finished.id,
           lines: cleaned,
           labourPerBatch: Number(form.labourPerBatch) || 0,
           overheadPerBatch: Number(form.overheadPerBatch) || 0,
-          // Kept so older readers and the control centre still render a
-          // material summary without having to resolve item ids.
-          materials: cleaned.map((l) => itemsById.get(l.itemId)?.name).filter(Boolean).join(", "),
-        },
-      });
+        // Kept so older readers and the control centre still render a
+        // material summary without having to resolve item ids.
+        materials: cleaned.map((l) => itemsById.get(l.itemId)?.name).filter(Boolean).join(", "),
+      },
+    };
+
+    try {
+      // Editing corrects the BOM in place rather than adding another one. A new
+      // record per correction is what leaves two rows for the same product with
+      // no way to tell which the factory is actually working to.
+      if (editingId) {
+        await bomStore.update(editingId, payload);
+      } else {
+        await bomStore.create(payload);
+      }
       setShowModal(false);
-      setForm({ finishedItemId: "", version: "v1.0", yieldUnits: 1, labourPerBatch: 0, overheadPerBatch: 0 });
-      setLines([{ itemId: "", qty: "", divisible: false }]);
+      resetForm();
     } catch (e) {
       setFormError(e instanceof Error ? e.message : "Could not save the BOM.");
     } finally {
@@ -138,7 +200,7 @@ export default function BOMPage() {
             What each finished product consumes. Cost is calculated from live material rates.
           </p>
         </div>
-        <button onClick={() => { setShowModal(true); setFormError(""); }} style={{ padding: "10px 20px", borderRadius: 10, border: "none", background: "#f97316", color: "#fff", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>
+        <button onClick={startNew} style={{ padding: "10px 20px", borderRadius: 10, border: "none", background: "#f97316", color: "#fff", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>
           + New BOM
         </button>
       </div>
@@ -181,6 +243,16 @@ export default function BOMPage() {
                   <div style={{ textAlign: "right" }}>
                     <div style={{ color: "#22c55e", fontSize: 15, fontWeight: 800 }}>Rs. {Math.round(bom.unitCost).toLocaleString()}</div>
                     <div style={{ fontSize: 11, color: "rgba(255,255,255,.35)" }}>per unit</div>
+                    <div style={{ display: "flex", gap: 6, marginTop: 9, justifyContent: "flex-end" }}>
+                      <button onClick={() => startEdit(bom)}
+                        style={{ padding: "4px 11px", borderRadius: 7, border: `1px solid ${border}`, background: "rgba(255,255,255,.04)", color: "rgba(255,255,255,.75)", fontFamily: "inherit", fontSize: 11.5, fontWeight: 700, cursor: "pointer" }}>
+                        Edit
+                      </button>
+                      <button onClick={() => removeBom(bom, linkedOrders)}
+                        style={{ padding: "4px 11px", borderRadius: 7, border: "1px solid rgba(239,68,68,.35)", background: "rgba(239,68,68,.08)", color: "#fca5a5", fontFamily: "inherit", fontSize: 11.5, fontWeight: 700, cursor: "pointer" }}>
+                        Delete
+                      </button>
+                    </div>
                   </div>
                 </div>
                 {bom.lines.length ? (
@@ -246,7 +318,7 @@ export default function BOMPage() {
       {showModal && (
         <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.7)", zIndex: 50, display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }}>
           <div style={{ background: "#161b27", border: `1px solid ${border}`, borderRadius: 16, padding: 30, width: 580, maxHeight: "90vh", overflowY: "auto", fontFamily: ff }}>
-            <h2 style={{ margin: "0 0 20px", fontSize: 18, fontWeight: 700 }}>New Bill of Materials</h2>
+            <h2 style={{ margin: "0 0 20px", fontSize: 18, fontWeight: 700 }}>{editingId ? "Edit Bill of Materials" : "New Bill of Materials"}</h2>
             {formError && <div style={{ marginBottom: 14, padding: "10px 12px", borderRadius: 8, background: "rgba(239,68,68,.14)", border: "1px solid rgba(239,68,68,.28)", color: "#fca5a5", fontSize: 12 }}>{formError}</div>}
 
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
@@ -333,9 +405,9 @@ export default function BOMPage() {
 
             <div style={{ display: "flex", gap: 12, marginTop: 18 }}>
               <button onClick={save} disabled={saving} style={{ flex: 1, padding: "11px 0", background: saving ? "rgba(249,115,22,.5)" : "#f97316", border: "none", borderRadius: 8, color: "#fff", fontSize: 14, fontWeight: 700, cursor: saving ? "not-allowed" : "pointer" }}>
-                {saving ? "Saving…" : "Create BOM"}
+                {saving ? "Saving…" : editingId ? "Save Changes" : "Create BOM"}
               </button>
-              <button onClick={() => { setShowModal(false); setFormError(""); }} style={{ padding: "11px 24px", background: "transparent", border: `1px solid ${border}`, borderRadius: 8, color: "rgba(255,255,255,.65)", cursor: "pointer" }}>Cancel</button>
+              <button onClick={() => { setShowModal(false); resetForm(); }} style={{ padding: "11px 24px", background: "transparent", border: `1px solid ${border}`, borderRadius: 8, color: "rgba(255,255,255,.65)", cursor: "pointer" }}>Cancel</button>
             </div>
           </div>
         </div>
