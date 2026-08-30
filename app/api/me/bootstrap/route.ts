@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { getTokenFromRequest, verifyJwt } from "@/lib/auth";
 import { resolvePlanPermissions, PLAN_DEFAULT_PERMISSIONS } from "@/lib/planPermissions";
 import { DASHBOARD_FEATURE_IDS, createDefaultDashboardFeatureFlags, readSavedDashboardFeatureFlags, resolveDashboardFeaturesForCompany, healSavedFeatureList, healSavedPlanFeatureFlags, resolvePlanWideFeatureFlags } from "@/lib/dashboardFeatureRegistry";
+import { COMPANY_PAGE_OVERRIDES_ACTION, applyCompanyPageOverrides, parseCompanyPageOverrides } from "@/lib/companyPageOverrides";
 import { BUSINESS_PHASE_CONFIG } from "@/lib/businessModules";
 import { currencyByCountry } from "@/lib/currency";
 import { getCompanyAdminControlSettings } from "@/lib/companyAdminControl";
@@ -73,6 +74,7 @@ export async function GET(req: NextRequest) {
       adminControl,
       businessPlanModulesLog,
       pkrBusinessPlanModulesLog,
+      companyPageOverrideLog,
     ] = await Promise.all([
       prisma.user.findUnique({
         where: { id: userId },
@@ -135,6 +137,11 @@ export async function GET(req: NextRequest) {
       }).catch(() => null),
       prisma.activityLog.findFirst({
         where: { action: "PKR_BUSINESS_PLAN_MODULES_CONFIG" },
+        orderBy: { createdAt: "desc" },
+        select: { details: true },
+      }).catch(() => null),
+      prisma.activityLog.findFirst({
+        where: { companyId, action: COMPANY_PAGE_OVERRIDES_ACTION },
         orderBy: { createdAt: "desc" },
         select: { details: true },
       }).catch(() => null),
@@ -260,7 +267,17 @@ export async function GET(req: NextRequest) {
       fallbackBusinessFlags: fallbackPageFlags,
     });
 
-    // Global page-visibility hides apply on top of whichever list won.
+    // One company's agreed exceptions, on top of what the plan decided. This is
+    // where a single Starter customer gets Ledger without every other Starter
+    // company getting it. Set in /admin/company-pages.
+    dashboardFeatures = applyCompanyPageOverrides(
+      dashboardFeatures,
+      parseCompanyPageOverrides(companyPageOverrideLog?.details),
+      String(company.businessType || ""),
+    );
+
+    // Global page-visibility hides apply on top of whichever list won — last,
+    // so a retired or broken page cannot be revived by a company exception.
     if (dashboardFeatures && pageVisibilityLog?.details) {
       try {
         const hidden = new Set(JSON.parse(pageVisibilityLog.details) as string[]);

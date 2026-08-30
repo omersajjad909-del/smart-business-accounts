@@ -17,6 +17,9 @@ export const ADMIN_NAV_ITEMS: AdminNavItem[] = [
   { id: "invoices",         label: "Invoices",          href: "/admin/invoices",            group: "Main",      short: "IN", icon: "list", badge: "NEW" },
   { id: "plans",            label: "Plans",             href: "/admin/plans",               group: "Main",      short: "PL", icon: "layers" },
   { id: "business-modules", label: "Modules",           href: "/admin/business-modules",    group: "Main",      short: "BM", icon: "box" },
+  // Sits beside Plans on purpose: Plans sets the rule for everyone on a plan,
+  // this records the exceptions for one company.
+  { id: "company-pages",    label: "Company Pages",     href: "/admin/company-pages",       group: "Main",      short: "CP", icon: "monitor" },
 
   // ── ANALYTICS ─────────────────────────────────────────────────────────────
   { id: "revenue",          label: "Revenue",           href: "/admin/revenue",             group: "Analytics", short: "RV", icon: "chart" },
