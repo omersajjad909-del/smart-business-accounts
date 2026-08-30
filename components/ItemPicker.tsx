@@ -467,26 +467,34 @@ export function ItemPicker({
     }
 
     if (e.key === "Enter") {
-      if (open) {
-        const manualRow =
-          allowManual &&
-          cursor === matches.length;
-
-        const hit = manualRow
-          ? MANUAL
-          : matches[cursor]?.id;
-
-        if (hit) {
-          e.preventDefault();
-
-          take(hit);
-
-          onKeyDown?.(e);
-
-          return;
-        }
+      // Closed list: this is the keystroke that asks for it. It does not fall
+      // through to the parent, so the row does not advance — the operator gets
+      // the list they just asked for, and the next Enter picks from it.
+      if (!open) {
+        e.preventDefault();
+        setOpen(true);
+        return;
       }
 
+      const manualRow =
+        allowManual &&
+        cursor === matches.length;
+
+      const hit = manualRow
+        ? MANUAL
+        : matches[cursor]?.id;
+
+      if (hit) {
+        e.preventDefault();
+
+        take(hit);
+
+        onKeyDown?.(e);
+
+        return;
+      }
+
+      // Open, but nothing under the cursor to take — let the row advance.
       onKeyDown?.(e);
     }
   }
@@ -561,9 +569,16 @@ export function ItemPicker({
         autoFocus={autoFocus}
         spellCheck={false}
         onFocus={() => {
-          setOpen(true);
+          // Arriving here does not open the list any more.
+          //
+          // Enter from the cell before lands focus in this one, and the list
+          // used to spring open on that same keystroke — covering the qty and
+          // rate fields on every single pass down the row, whether or not the
+          // operator wanted to change the item. Opening is now something asked
+          // for: press Enter again, start typing, or click.
           setQuery("");
         }}
+        onMouseDown={() => setOpen(true)}
         onChange={(e) => {
           setQuery(e.target.value);
           setOpen(true);
