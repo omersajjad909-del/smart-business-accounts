@@ -239,3 +239,49 @@ export function mapLemonSubscriptionStatus(status: string) {
       return "INACTIVE";
   }
 }
+
+/**
+ * Cancels a subscription at Lemon Squeezy.
+ *
+ * Nothing did this before. `/api/billing/cancel` wrote CANCELLED into our own
+ * Company row and stopped there, so the customer saw a cancelled account while
+ * Lemon Squeezy went on charging their card every month — the one failure mode
+ * in a billing system that is never recoverable by an apology.
+ *
+ * Lemon's DELETE does not end the subscription on the spot: it flips it to
+ * "cancelled" and lets the period already paid for run out, which is the right
+ * behaviour and matches our own 30-day read-only window.
+ *
+ * A 404 counts as success. It means the subscription is already gone at their
+ * end, and a cancel that cannot find anything to cancel has nothing left to do.
+ */
+export async function cancelLemonSubscription(
+  subscriptionId: string,
+): Promise<{ ok: true } | { ok: false; error: string }> {
+  const apiKey = env("LEMONSQUEEZY_API_KEY");
+  if (!apiKey) return { ok: false, error: "Lemon Squeezy is not configured." };
+  if (!subscriptionId) return { ok: false, error: "No subscription id to cancel." };
+
+  try {
+    const response = await fetch(`https://api.lemonsqueezy.com/v1/subscriptions/${subscriptionId}`, {
+      method: "DELETE",
+      headers: {
+        Accept: "application/vnd.api+json",
+        "Content-Type": "application/vnd.api+json",
+        Authorization: `Bearer ${apiKey}`,
+      },
+    });
+
+    if (response.ok || response.status === 404) return { ok: true };
+
+    const body = await response.json().catch(() => ({} as any));
+    const detail =
+      body?.errors?.[0]?.detail ||
+      body?.errors?.[0]?.title ||
+      body?.message ||
+      `Lemon Squeezy returned ${response.status}`;
+    return { ok: false, error: String(detail) };
+  } catch (e: any) {
+    return { ok: false, error: e?.message || "Could not reach Lemon Squeezy" };
+  }
+}

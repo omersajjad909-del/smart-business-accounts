@@ -5,7 +5,7 @@ import { apiError, apiOk } from "@/lib/apiError";
 import { createHmac, timingSafeEqual } from "crypto";
 import { sendEmail } from "@/lib/email";
 import { emailTemplates } from "@/lib/emailTemplates";
-import { mapLemonSubscriptionStatus, verifyLemonSignature } from "@/lib/lemonsqueezy";
+import { cancelLemonSubscription, mapLemonSubscriptionStatus, verifyLemonSignature } from "@/lib/lemonsqueezy";
 import { mapSafepayEventToStatus, verifySafepaySignature } from "@/lib/safepay";
 import {
   PAYMENT_EVENT_DEDUPE_WINDOW_MS,
@@ -92,6 +92,55 @@ async function applySuccessfulPlanUpdate(params: {
       `.catch(() => {});
     }
     return;
+  }
+
+  // Moving between gateways — Pakistan going from Lemon Squeezy to Safepay.
+  //
+  // The card cannot be carried across, so the customer checks out again on the
+  // new provider and this is the moment the old subscription has to be stopped.
+  // Done here rather than when they start the switch, because the only safe
+  // order is new-provider-paid first, old-provider-cancelled second: cancelling
+  // up front risks a lapse if the new checkout is abandoned, while leaving it
+  // running bills them twice, every month, on two cards.
+  const incomingProvider = String(params.provider || "LEMONSQUEEZY").toUpperCase();
+  if (incomingProvider !== "LEMONSQUEEZY") {
+    const previous = await prisma.subscription
+      .findUnique({
+        where: { companyId: params.companyId },
+        select: { provider: true, stripeSubscriptionId: true },
+      })
+      .catch(() => null);
+
+    if (
+      previous?.stripeSubscriptionId &&
+      String(previous.provider).toUpperCase() === "LEMONSQUEEZY"
+    ) {
+      const cancelled = await cancelLemonSubscription(previous.stripeSubscriptionId);
+      await prisma.activityLog.create({
+        data: {
+          companyId: params.companyId,
+          userId: null,
+          action: cancelled.ok ? "PROVIDER_SWITCH_OLD_CANCELLED" : "PROVIDER_SWITCH_CANCEL_FAILED",
+          details: JSON.stringify({
+            from: "LEMONSQUEEZY",
+            to: incomingProvider,
+            subscriptionId: previous.stripeSubscriptionId,
+            ...(cancelled.ok ? {} : { error: cancelled.error }),
+            at: new Date().toISOString(),
+          }),
+        },
+      }).catch(() => {});
+
+      if (!cancelled.ok) {
+        // The new subscription is already paid for, so this must not throw —
+        // the customer keeps their access. The log above is the admin's cue to
+        // cancel the old one by hand before the next billing date.
+        console.error(
+          `[webhook] Provider switch: could not cancel Lemon subscription ${previous.stripeSubscriptionId} ` +
+            `for company ${params.companyId} — cancel it manually to avoid double billing. ${cancelled.error}`,
+        );
+      }
+    }
   }
 
   await prisma.company.update({

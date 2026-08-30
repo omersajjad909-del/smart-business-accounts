@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { resolveCompanyId } from "@/lib/tenant";
 import { hasLemonSqueezyConfig } from "@/lib/lemonsqueezy";
+import { isSafepayCheckoutEnabled } from "@/lib/safepay";
+import { resolvePricingRegion } from "@/lib/geoCountry";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -69,13 +71,46 @@ export async function GET(req: NextRequest) {
   // "No active subscription yet — a card is collected at checkout", directly
   // under a green Active badge and a paid invoice. Answered on its own terms
   // instead: no card is stored, and that is correct rather than incomplete.
-  const grant = await prisma.company
-    .findUnique({ where: { id: companyId }, select: { accessGrantedUntil: true } })
+  const company = await prisma.company
+    .findUnique({ where: { id: companyId }, select: { accessGrantedUntil: true, country: true } })
     .catch(() => null);
+
+  /**
+   * Whether the customer should be offered a fresh checkout on the plan they
+   * already have — normally a no-op, and so normally hidden.
+   *
+   * Two cases need it, and neither had any route through the UI: an offline
+   * customer moving onto a card, and a Pakistani customer moving from Lemon
+   * Squeezy to Safepay once that gateway is live. In both, the plan is not
+   * changing, so the Plans tab — which disables the button on the current plan
+   * — offered nothing, and the only way through was to buy a *different* plan.
+   */
+  function reCheckout(): { canReCheckout: boolean; reCheckoutLabel: string | null; reCheckoutReason: string | null } {
+    if (!subscription?.stripeSubscriptionId) {
+      return {
+        canReCheckout: true,
+        reCheckoutLabel: "Pay by card",
+        reCheckoutReason: "Move this workspace onto card billing. Your data and settings stay exactly as they are.",
+      };
+    }
+    // Region is resolved server-side from the request, the same way checkout
+    // does it — a client-supplied country must not decide who gets Safepay.
+    const region = resolvePricingRegion(req, company?.country || null);
+    const wouldUseSafepay = region.isPakistan && isSafepayCheckoutEnabled();
+    if (wouldUseSafepay && String(subscription.provider).toUpperCase() === "LEMONSQUEEZY") {
+      return {
+        canReCheckout: true,
+        reCheckoutLabel: "Switch to local payment",
+        reCheckoutReason:
+          "Pay in rupees through Safepay instead of an international card. Your current subscription is cancelled automatically once the new one is paid — you are never billed twice.",
+      };
+    }
+    return { canReCheckout: false, reCheckoutLabel: null, reCheckoutReason: null };
+  }
 
   const onManualBilling =
     !subscription?.stripeSubscriptionId &&
-    Boolean(grant?.accessGrantedUntil && grant.accessGrantedUntil.getTime() > Date.now());
+    Boolean(company?.accessGrantedUntil && company.accessGrantedUntil.getTime() > Date.now());
 
   if (onManualBilling) {
     return NextResponse.json({
@@ -86,6 +121,7 @@ export async function GET(req: NextRequest) {
       paymentMethod: null,
       defaultId: null,
       updateUrl: null,
+      ...reCheckout(),
       note: "This workspace is billed directly by arrangement — we issue your invoice each period and no card is stored here.",
     });
   }
@@ -98,6 +134,7 @@ export async function GET(req: NextRequest) {
       managedExternally: provider === "LEMONSQUEEZY",
       paymentMethod: null,
       updateUrl: null,
+      ...reCheckout(),
       note:
         provider === "LEMONSQUEEZY"
           ? "No active subscription yet — a card is collected at checkout."
