@@ -581,6 +581,9 @@ function BillingPage() {
   const paymentUpdateUrl = paymentMeta?.updateUrl || null;
   const paymentNote = paymentMeta?.note || "";
   const paymentManualBilling = Boolean(paymentMeta?.manualBilling);
+  const canReCheckout        = Boolean(paymentMeta?.canReCheckout);
+  const reCheckoutLabel      = paymentMeta?.reCheckoutLabel || "Continue on card";
+  const reCheckoutReason     = paymentMeta?.reCheckoutReason || "";
   const acceptedMethods = paymentManagedExternally ? LEMON_ACCEPTED_METHODS : DIRECT_ACCEPTED_METHODS;
 
   /* ── Post-payment receipt ──────────────────────────────
@@ -628,9 +631,17 @@ function BillingPage() {
       window.open(paymentUpdateUrl, "_blank", "noopener,noreferrer");
       return;
     }
-    if (paymentManagedExternally) {
+    // An offline account has no card and no hosted portal, so the internal
+    // add-card form below is a dead end for it — there is no processor behind
+    // that form. The real route onto a card is a checkout, which lives on the
+    // Plans tab.
+    if (paymentManagedExternally || paymentManualBilling || canReCheckout) {
       setActiveTab("plans");
-      toast("Payment methods are collected during secure checkout.");
+      toast(
+        paymentManualBilling
+          ? "Choose your plan to move onto card billing — your data stays as it is."
+          : "Payment methods are collected during secure checkout.",
+      );
       return;
     }
     if (paymentProvider === "INTERNAL" && paymentNote.toLowerCase().includes("not configured")) {
@@ -1045,10 +1056,32 @@ function BillingPage() {
                     {plan.features.map(f => <div key={f} style={{ display:"flex", alignItems:"center", gap:8, fontSize:12, color:"rgba(255,255,255,.7)" }}><span style={{ color:"#34d399", flexShrink:0 }}>✓</span>{f}</div>)}
                     {plan.notIncluded.map(f => <div key={f} style={{ display:"flex", alignItems:"center", gap:8, fontSize:12, color:"rgba(255,255,255,.22)" }}><span style={{ flexShrink:0, opacity:.4 }}>✕</span>{f}</div>)}
                   </div>
-                  <button onClick={() => !isCurrent && handleCheckout(plan.code, billing==="annual"?"yearly":"monthly")} disabled={isCurrent||!!checkingOut}
-                    style={{ width:"100%", padding:"12px", borderRadius:12, border:"none", fontSize:13, fontWeight:700, cursor:isCurrent?"default":"pointer", fontFamily:"inherit", transition:"all .2s", background:isCurrent?"rgba(255,255,255,.06)":`linear-gradient(135deg,${plan.gradFrom},${plan.gradTo})`, color:isCurrent?"rgba(255,255,255,.3)":"white", boxShadow:isCurrent?"none":`0 4px 20px ${plan.color}28`, opacity: checkingOut && checkingOut !== plan.code ? 0.5 : 1 }}>
-                    {checkingOut===plan.code ? "Processing..." : isCurrent ? "Current Plan" : isHigher ? `Upgrade to ${plan.name} →` : isLower ? `Downgrade to ${plan.name}` : `Select ${plan.name}`}
-                  </button>
+                  {/* The current plan is normally a dead end — there is nothing
+                      to buy. It stops being one when the customer needs to
+                      change HOW they pay rather than what they pay for: coming
+                      off an offline arrangement onto a card, or moving from an
+                      international card to Safepay. Same plan, same price, new
+                      payment route. */}
+                  {(() => {
+                    const offerReCheckout = isCurrent && canReCheckout;
+                    const locked = (isCurrent && !offerReCheckout) || !!checkingOut;
+                    return (
+                      <button onClick={() => { if (!isCurrent || offerReCheckout) handleCheckout(plan.code, billing==="annual"?"yearly":"monthly"); }} disabled={locked}
+                        style={{ width:"100%", padding:"12px", borderRadius:12, border:"none", fontSize:13, fontWeight:700, cursor:locked?"default":"pointer", fontFamily:"inherit", transition:"all .2s", background:locked?"rgba(255,255,255,.06)":`linear-gradient(135deg,${plan.gradFrom},${plan.gradTo})`, color:locked?"rgba(255,255,255,.3)":"white", boxShadow:locked?"none":`0 4px 20px ${plan.color}28`, opacity: checkingOut && checkingOut !== plan.code ? 0.5 : 1 }}>
+                        {checkingOut===plan.code ? "Processing..."
+                          : offerReCheckout ? reCheckoutLabel
+                          : isCurrent ? "Current Plan"
+                          : isHigher ? `Upgrade to ${plan.name} →`
+                          : isLower ? `Downgrade to ${plan.name}`
+                          : `Select ${plan.name}`}
+                      </button>
+                    );
+                  })()}
+                  {isCurrent && canReCheckout && reCheckoutReason && (
+                    <div style={{ marginTop:9, fontSize:11, color:"rgba(255,255,255,.42)", lineHeight:1.55 }}>
+                      {reCheckoutReason}
+                    </div>
+                  )}
                 </div>
               );
             })}
