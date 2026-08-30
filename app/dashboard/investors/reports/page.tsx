@@ -178,31 +178,6 @@ export default function InvestorReportsPage() {
         </Field>
       </div>
 
-      <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 18 }}>
-        {REPORTS.map((r) => {
-          const on = r.key === report;
-          return (
-            <button
-              key={r.key}
-              onClick={() => setReport(r.key)}
-              style={{
-                padding: "7px 14px",
-                borderRadius: 8,
-                fontSize: 12.5,
-                fontWeight: 700,
-                cursor: "pointer",
-                fontFamily: "'Outfit','Inter',sans-serif",
-                border: "1px solid " + (on ? ACCENT : BORDER),
-                background: on ? ACCENT : "transparent",
-                color: on ? "#04231f" : MUTED,
-              }}
-            >
-              {r.label}
-            </button>
-          );
-        })}
-      </div>
-
       </div>
 
       <div id="investor-report-print">

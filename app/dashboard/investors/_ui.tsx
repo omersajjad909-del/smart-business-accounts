@@ -6,7 +6,6 @@
 // two, a plain table. The controls live here so a change to spacing or focus
 // styling lands on every page at once.
 
-import Link from "next/link";
 import { investorAccent } from "./_shared";
 
 export const FONT = "'Outfit','Inter',sans-serif";
@@ -273,43 +272,9 @@ export function PageShell({
   );
 }
 
-const TABS: { href: string; label: string }[] = [
-  { href: "/dashboard/investors", label: "Overview" },
-  { href: "/dashboard/investors/parties", label: "Parties" },
-  { href: "/dashboard/investors/capital", label: "Capital" },
-  { href: "/dashboard/investors/grades", label: "Profit Terms" },
-  { href: "/dashboard/investors/production", label: "Production" },
-  { href: "/dashboard/investors/settlements", label: "Settlements" },
-  { href: "/dashboard/investors/statement", label: "Statement" },
-  { href: "/dashboard/investors/reports", label: "Reports" },
-];
-
-export function Tabs({ active }: { active: string }) {
-  return (
-    <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 18 }}>
-      {TABS.map((t) => {
-        const on = t.href === active;
-        return (
-          <Link
-            key={t.href}
-            href={t.href}
-            style={{
-              padding: "6px 12px",
-              borderRadius: 7,
-              fontSize: 12.5,
-              fontWeight: 700,
-              textDecoration: "none",
-              border: "1px solid " + (on ? ACCENT : BORDER),
-              background: on ? ACCENT : "transparent",
-              color: on ? "#04231f" : MUTED,
-            }}
-          >
-            {t.label}
-          </Link>
-        );
-      })}
-    </div>
-  );
+/** Investor navigation lives in the dashboard sidebar. */
+export function Tabs(_props: { active: string }) {
+  return null;
 }
 
 export function PartyPicker({
