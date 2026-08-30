@@ -19,6 +19,42 @@ const ALLOWED_ACTIONS = ["EXTEND_TRIAL", "GRANT_FREE_ACCESS", "RESET_INTRO_OFFER
 // a typo cannot hand out access for a decade.
 const MAX_GRANT_DAYS = 1825;
 
+/**
+ * When a granted period ends.
+ *
+ * A contract names a date, not a number of days, and counting days gets that
+ * date wrong: 1095 days after 30 Aug 2026 is 29 Aug 2029, not 30 Aug, because
+ * 2028 is a leap year. A customer who paid for three years would lose the last
+ * day of them. So a real deal sends `until` and the date is stored exactly as
+ * agreed — as the last moment of that day, so the whole of it is theirs.
+ *
+ * `days` still works, for quick grants and for anything already calling this.
+ */
+function resolveGrantEnd(payload: { until?: unknown; days?: unknown } | null | undefined):
+  | { end: Date }
+  | { error: string } {
+  const rawUntil = typeof payload?.until === "string" ? payload.until.trim() : "";
+
+  if (rawUntil) {
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(rawUntil)) {
+      return { error: "until must be a date in YYYY-MM-DD form" };
+    }
+    const end = new Date(`${rawUntil}T23:59:59.999Z`);
+    if (Number.isNaN(end.getTime())) {
+      return { error: "until is not a real date" };
+    }
+    return { end };
+  }
+
+  const days = Number(payload?.days);
+  if (!days || days < 1 || days > MAX_GRANT_DAYS) {
+    return { error: `days must be 1–${MAX_GRANT_DAYS}` };
+  }
+  const end = new Date();
+  end.setDate(end.getDate() + days);
+  return { end };
+}
+
 export async function POST(req: NextRequest) {
   try {
     const admin = await requireAdmin(req);
@@ -66,12 +102,25 @@ export async function POST(req: NextRequest) {
     // three-year deal had to be re-granted every year from memory, and a missed
     // renewal locked out a customer who had already paid in full.
     if (action === "GRANT_FREE_ACCESS") {
-      const { days, plan } = payload || {};
-      if (!days || days < 1 || days > MAX_GRANT_DAYS) {
-        return NextResponse.json({ error: `days must be 1–${MAX_GRANT_DAYS}` }, { status: 400 });
+      const { plan } = payload || {};
+
+      const resolved = resolveGrantEnd(payload);
+      if ("error" in resolved) {
+        return NextResponse.json({ error: resolved.error }, { status: 400 });
       }
-      const newEnd = new Date();
-      newEnd.setDate(newEnd.getDate() + Number(days));
+      const newEnd = resolved.end;
+
+      if (newEnd.getTime() <= Date.now()) {
+        return NextResponse.json({ error: "That end date has already passed" }, { status: 400 });
+      }
+      const furthest = new Date();
+      furthest.setDate(furthest.getDate() + MAX_GRANT_DAYS);
+      if (newEnd.getTime() > furthest.getTime()) {
+        return NextResponse.json(
+          { error: `Access cannot be granted more than ${MAX_GRANT_DAYS} days ahead` },
+          { status: 400 },
+        );
+      }
 
       result = await prisma.company.update({
         where: { id: companyId },
