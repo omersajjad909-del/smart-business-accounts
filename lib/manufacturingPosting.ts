@@ -470,7 +470,7 @@ export async function priceProductionRun(opts: {
   );
   const totalCost = round2(materialCost + labourCost + overheadCost);
 
-  const shortages = lines.filter((l) => l.availableQty < l.requiredQty);
+  const shortages = lines.filter((l) => l.availableQty + REMNANT_EPSILON < l.requiredQty);
 
   // "Not enough material" is nearly always the material sitting in another
   // warehouse. Rather than leaving the operator to guess, say where it is and

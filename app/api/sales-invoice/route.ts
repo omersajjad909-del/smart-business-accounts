@@ -11,6 +11,12 @@ import { ensureOpenPeriod } from "@/lib/financialLock";
 import { requireActiveSubscription } from "@/lib/subscriptionGuard";
 import { logAuditFromReq } from "@/lib/auditLogger";
 import { postCogsVoucher, removeCogsVoucher, type Db } from "@/lib/cogsPosting";
+
+// Quantities are weights now, not counts: a kilogram invoice can ask for
+// 0.1 + 0.2 of what a 0.3 receipt put into stock, and in binary floating point
+// that reads as short by 5.5e-17. Compare with a tolerance so an exact sale of
+// the whole balance is never refused as insufficient.
+const QTY_EPSILON = 1e-6;
 type SalesInvoiceNoOnly = Prisma.SalesInvoiceGetPayload<{
   select: { invoiceNo: true };
 }>;
@@ -192,7 +198,7 @@ export async function POST(req: NextRequest) {
         const available = Number(agg._sum.qty ?? 0);
         const required = Number(i.qty);
         // Only block if stock has ever been tracked (available !== 0) AND is insufficient
-        if (available > 0 && available < required) {
+        if (available > 0 && available + QTY_EPSILON < required) {
           const itm = await prisma.itemNew.findUnique({ where: { id: i.itemId }, select: { name: true } });
           return NextResponse.json(
             { error: `Insufficient stock for "${itm?.name || i.itemId}". Available: ${available}, Required: ${required}` },
