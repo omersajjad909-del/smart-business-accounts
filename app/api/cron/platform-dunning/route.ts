@@ -5,9 +5,18 @@ import { sendEmail } from "@/lib/email";
 export const runtime = "nodejs";
 export const maxDuration = 60;
 
+// Two independent platform-access sweeps, both daily.
+//
 // Platform dunning state machine — Terms of Service promise:
 //   * 7 days after first failed platform payment  → READ_ONLY
 //   * 30 days after first failed platform payment → SUSPENDED
+//
+// Manual grant expiry — the offline equivalent, keyed on accessGrantedUntil:
+//   * the day a granted period ends → READ_ONLY
+//   * 30 days after that            → INACTIVE
+// It lives here rather than in a cron of its own because this route is already
+// scheduled daily; a new route would need its own cron-job.org entry, and an
+// access gate that silently never runs is worse than no gate at all.
 //
 // Fire-and-forget so the response returns immediately (well under
 // cron-job.org's 30s timeout) while the transition sweep continues in the
@@ -26,6 +35,15 @@ export async function GET(req: NextRequest) {
       console.log("[cron] platform-dunning complete:", result);
     } catch (err: any) {
       console.error("[cron] platform-dunning error:", err);
+    }
+
+    // Runs even if the dunning sweep above threw — the two are independent
+    // states and one failing must not leave the other unenforced.
+    try {
+      const result = await processExpiredManualGrants();
+      console.log("[cron] manual-grant-expiry complete:", result);
+    } catch (err: any) {
+      console.error("[cron] manual-grant-expiry error:", err);
     }
   });
 
@@ -136,6 +154,94 @@ async function processPlatformDunning() {
     scanned: rows.length,
     transitionedToReadOnly,
     transitionedToSuspended,
+    skipped,
+  };
+}
+
+// ─── Manual grant expiry ──────────────────────────────────────────────────────
+
+/** Read-only window after a granted period ends, matching the cancellation one. */
+const GRANT_GRACE_DAYS = 30;
+const EXPIRED_STATE = "INACTIVE";
+
+/**
+ * Closes access when a hand-granted period runs out.
+ *
+ * `GRANT_FREE_ACCESS` writes `accessGrantedUntil` and sets the company ACTIVE,
+ * and nothing ever moved it back — so the date was real but unenforced almost
+ * everywhere. `subscriptionGuard` does read it, but only 6 of the ~526 API
+ * routes call that guard, and the dashboard's own paywall tests
+ * `subscriptionStatus`, which stayed ACTIVE forever. A customer given 30 days
+ * kept full use of the product after day 30.
+ *
+ * Rather than add a second gate, this moves the account onto the status the
+ * product already understands: READ_ONLY for the grace window, then INACTIVE.
+ * Both the paywall and the guard then do the right thing on their own.
+ *
+ * No email is sent. The admin already sees these accounts in the "expiring
+ * within 7 days" banner on /admin/subscriptions, and a manual deal is renewed
+ * by a conversation, not by a payment link.
+ */
+async function processExpiredManualGrants() {
+  let transitionedToReadOnly = 0;
+  let transitionedToInactive = 0;
+  let skipped = 0;
+
+  const now = Date.now();
+  const DAY = 24 * 60 * 60 * 1000;
+
+  // A gateway subscriber never has this set, and the billing webhook clears it
+  // when someone converts to a paid plan — so this only ever sees offline deals
+  // whose agreed period has already passed.
+  const rows = await prisma.company.findMany({
+    where: { accessGrantedUntil: { not: null, lt: new Date() } },
+    select: { id: true, subscriptionStatus: true, accessGrantedUntil: true },
+  }).catch((err: any) => {
+    console.error("[cron] manual-grant-expiry query failed:", err?.message || err);
+    return [] as { id: string; subscriptionStatus: string | null; accessGrantedUntil: Date | null }[];
+  });
+
+  for (const row of rows) {
+    if (!row.accessGrantedUntil) { skipped++; continue; }
+    const currentStatus = (row.subscriptionStatus || "").toUpperCase();
+
+    // Suspension is the terminal state of the payment-failure ladder above.
+    // Nothing here should pull an account back out of it.
+    if (currentStatus === SUSPENDED_STATE) { skipped++; continue; }
+
+    const daysPastEnd = (now - row.accessGrantedUntil.getTime()) / DAY;
+    const target = daysPastEnd > GRANT_GRACE_DAYS ? EXPIRED_STATE : READ_ONLY_STATE;
+
+    // Already where it belongs — the sweep runs daily and must be a no-op on
+    // every run after the first.
+    if (currentStatus === target) { skipped++; continue; }
+
+    await prisma.company.update({
+      where: { id: row.id },
+      data:  { subscriptionStatus: target },
+    }).catch(() => {});
+
+    await prisma.activityLog.create({
+      data: {
+        companyId: row.id, userId: null,
+        action: target === EXPIRED_STATE ? "GRANT_EXPIRED_CLOSED" : "GRANT_EXPIRED_READ_ONLY",
+        details: JSON.stringify({
+          fromStatus: currentStatus,
+          toStatus: target,
+          accessGrantedUntil: row.accessGrantedUntil,
+          daysPastEnd: Math.floor(daysPastEnd),
+        }),
+      },
+    }).catch(() => {});
+
+    if (target === EXPIRED_STATE) transitionedToInactive++;
+    else transitionedToReadOnly++;
+  }
+
+  return {
+    scanned: rows.length,
+    transitionedToReadOnly,
+    transitionedToInactive,
     skipped,
   };
 }

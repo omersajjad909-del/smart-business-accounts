@@ -964,13 +964,21 @@ export default function DashboardLayout({
     }
   }, [ready, currentUser?.companyId, router]);
 
-  // Paywall: block dashboard until subscription is ACTIVE
+  // Paywall: block dashboard until subscription is ACTIVE.
+  //
+  // READ_ONLY is deliberately let through. It is the grace state on both
+  // ladders — 7 days after a failed platform payment, and the 30 days after a
+  // hand-granted period ends — and both promise the customer that they can
+  // still sign in and export what is theirs. Bouncing them to /dashboard/billing
+  // took that away, which for an offline deal is a customer who has paid, is
+  // mid-renewal, and cannot reach their own books. Writes stay blocked by
+  // subscriptionGuard on the server; this only decides whether they can look.
   useEffect(() => {
     if (!ready || !subInfo) return;
     const status = subInfo.status.toUpperCase();
-    const isActive = status === "ACTIVE";
+    const canBrowse = status === "ACTIVE" || status === "TRIALING" || status === "READ_ONLY";
     const onBilling = pathname.startsWith("/dashboard/billing");
-    if (!isActive && !onBilling) {
+    if (!canBrowse && !onBilling) {
       router.replace("/dashboard/billing?required=1");
     }
   }, [ready, subInfo, pathname, router]);
@@ -3233,6 +3241,19 @@ export default function DashboardLayout({
                   >
                     ✕ Exit Test Mode
                   </button>
+                </div>
+              </div>
+            )}
+
+            {/* Read-only grace. Without this the app looks entirely normal
+                while saves are being refused, and the customer has no way to
+                tell why — the status is the only thing that changed. */}
+            {subInfo?.status?.toUpperCase() === "READ_ONLY" && (
+              <div style={{ margin:"0 0 16px", padding:"12px 16px", borderRadius:12, background:"rgba(249,115,22,.08)", border:"1px solid rgba(249,115,22,.25)", display:"flex", alignItems:"center", gap:10 }}>
+                <span style={{ fontSize:18 }}>🔒</span>
+                <div style={{ fontSize:13, color:"#fb923c", lineHeight:1.6 }}>
+                  <strong>Read-only mode.</strong> Your access period has ended — you can still view and export
+                  everything, but new records cannot be saved. Contact us to renew and full access comes straight back.
                 </div>
               </div>
             )}
