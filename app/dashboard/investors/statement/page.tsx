@@ -106,7 +106,14 @@ export default function InvestorStatementPage() {
     >
       <style>{`
         @media print {
-          @page { size: A4; margin: 14mm; }
+          @page { 
+            size: A4; 
+            margin: 14mm; 
+            margin-bottom: 0;
+          }
+          @page :first {
+            margin-bottom: 14mm;
+          }
           html, body {
             background: #fff !important;
             color: #000 !important;
