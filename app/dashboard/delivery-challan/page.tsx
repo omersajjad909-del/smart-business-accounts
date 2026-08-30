@@ -589,7 +589,7 @@ const [searchTerm, _setSearchTerm] = useState("");
                           />
                         </td>
                         <td className="border p-2">
-                          <input type="number" value={r.qty} className="w-full text-center" onChange={e => updateRow(i, "qty", e.target.value)} />
+                          <input type="number" step="any" value={r.qty} className="w-full text-center" onChange={e => updateRow(i, "qty", e.target.value)} />
                         </td>
                         <td className="border p-2">
                           <input type="number" value={r.rate} className="w-full text-center" onChange={e => updateRow(i, "rate", e.target.value)} placeholder="Optional" />

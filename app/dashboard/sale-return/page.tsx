@@ -342,7 +342,7 @@ export default function SalesReturnPage() {
                             <div style={{ fontWeight: 700, color: TEXT, marginBottom: 6 }}>{r.name}</div>
                             <div style={{ fontSize: 11, color: MUTED, marginBottom: 8 }}>Max returnable: <strong style={{ color: "#60a5fa" }}>{r.maxQty}</strong></div>
                             <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: 8 }}>
-                              <div><Label>Return Qty</Label><input type="number" min={0} max={r.maxQty} value={r.qty} onChange={e => updateRow(i, "qty", e.target.value)} style={inp({ textAlign: "right", borderColor: "rgba(248,113,113,0.4)" })} /></div>
+                              <div><Label>Return Qty</Label><input type="number" step="any" min={0} max={r.maxQty} value={r.qty} onChange={e => updateRow(i, "qty", e.target.value)} style={inp({ textAlign: "right", borderColor: "rgba(248,113,113,0.4)" })} /></div>
                               <div><Label>Rate</Label><div style={{ ...inp(), background: "transparent" }}>{fmt(r.rate)}</div></div>
                               <div><Label>Disc%</Label><input type="number" value={r.discountPercent} onChange={e => updateRow(i, "discountPercent", e.target.value)} style={inp({ textAlign: "right" })} /></div>
                               <div><Label>Tax%</Label><input type="number" value={r.taxPercent} onChange={e => updateRow(i, "taxPercent", e.target.value)} style={inp({ textAlign: "right" })} /></div>
@@ -372,7 +372,7 @@ export default function SalesReturnPage() {
                                   <td style={{ padding: "8px", fontWeight: 600, fontSize: 13, minWidth: 120 }}>{r.name}</td>
                                   {rfActive && <RateFormulaReadonlyCells settings={rf} meta={r.meta} />}
                                   <td style={{ padding: "8px", textAlign: "left", fontWeight: 700, color: "#60a5fa", fontSize: 13 }}>{r.maxQty}</td>
-                                  <td style={{ padding: isMobile ? "8px 8px" : "6px 8px", width: 90 }}><input type="number" min={0} max={r.maxQty} value={r.qty} onChange={e => updateRow(i, "qty", e.target.value)} style={inp({ padding: isMobile ? "8px 8px" : "5px 7px", textAlign: "right", fontSize: 13, borderColor: "rgba(248,113,113,0.4)" })} /></td>
+                                  <td style={{ padding: isMobile ? "8px 8px" : "6px 8px", width: 90 }}><input type="number" step="any" min={0} max={r.maxQty} value={r.qty} onChange={e => updateRow(i, "qty", e.target.value)} style={inp({ padding: isMobile ? "8px 8px" : "5px 7px", textAlign: "right", fontSize: 13, borderColor: "rgba(248,113,113,0.4)" })} /></td>
                                   <td style={{ padding: "8px", textAlign: "right", fontSize: 13, color: MUTED, width: 80 }}>{fmt(r.rate)}</td>
                                   <td style={{ padding: isMobile ? "8px 8px" : "6px 8px", width: 72 }}><input type="number" value={r.discountPercent} onChange={e => updateRow(i, "discountPercent", e.target.value)} placeholder="0" style={inp({ padding: isMobile ? "8px 8px" : "5px 7px", textAlign: "right", fontSize: 13 })} /></td>
                                   <td style={{ padding: isMobile ? "8px 8px" : "6px 8px", width: 72 }}><input type="number" value={r.taxPercent} onChange={e => updateRow(i, "taxPercent", e.target.value)} placeholder="0" style={inp({ padding: isMobile ? "8px 8px" : "5px 7px", textAlign: "right", fontSize: 13 })} /></td>

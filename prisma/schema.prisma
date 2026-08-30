@@ -158,9 +158,9 @@ model PurchaseOrderItem {
   id              String @id @default(uuid())
   poId            String
   itemId          String
-  qty             Int
+  qty             Float
   rate            Float
-  invoicedQty     Int    @default(0)
+  invoicedQty     Float    @default(0)
   discountPercent Float  @default(0)
   taxPercent      Float  @default(0)
 
@@ -231,7 +231,7 @@ model PurchaseInvoiceItem {
   id              String @id @default(uuid())
   invoiceId       String
   itemId          String
-  qty             Int
+  qty             Float
   rate            Float
   amount          Float
   discountPercent Float  @default(0)
@@ -257,7 +257,7 @@ model InventoryTxn {
   date DateTime
 
   itemId    String
-  qty       Int
+  qty       Float
   rate      Float
   amount    Float
   accountId String?
@@ -338,7 +338,7 @@ model SalesInvoiceItem {
   id              String @id @default(uuid())
   invoiceId       String
   itemId          String
-  qty             Int
+  qty             Float
   rate            Float
   amount          Float
   discountPercent Float  @default(0)
@@ -446,7 +446,7 @@ model SaleReturnItem {
   id              String @id @default(uuid())
   returnId        String
   itemId          String
-  qty             Int
+  qty             Float
   rate            Float
   amount          Float
   discountPercent Float  @default(0)
@@ -480,7 +480,7 @@ model OutwardItem {
   id        String @id @default(uuid())
   outwardId String // ØµØ±Ù ÛŒÛ Ø§ÛŒÚ© Ù„Ø§Ø¦Ù† ÛÙˆÙ†ÛŒ Ú†Ø§ÛÛŒÛ’
   itemId    String
-  qty       Int
+  qty       Float
   rate      Float?
   amount    Float?
 
@@ -1584,7 +1584,7 @@ model QuotationItem {
   id          String @id @default(uuid())
   quotationId String
   itemId      String
-  qty         Int
+  qty         Float
   rate        Float
   amount      Float
 
@@ -1629,7 +1629,7 @@ model DeliveryChallanItem {
   id        String @id @default(uuid())
   challanId String
   itemId    String
-  qty       Int
+  qty       Float
   rate      Float? // Optional in Challan
 
   challan DeliveryChallan @relation(fields: [challanId], references: [id], onDelete: Cascade)
@@ -1852,8 +1852,8 @@ model GoodsReceiptNoteItem {
   itemId String
   item   ItemNew          @relation(fields: [itemId], references: [id])
 
-  orderedQty  Int
-  receivedQty Int
+  orderedQty  Float
+  receivedQty Float
   rate        Float
   amount      Float
   remarks     String?

@@ -457,7 +457,7 @@ export default function OutwardPage() {
                   <td className="p-2 text-center border bg-gray-50">{r.maxQty}</td>
                   <td className="p-2 border">
                     <input
-                      type="number"
+                      type="number" step="any"
                       className="w-full p-2 text-center font-black bg-yellow-50"
                       value={r.qty}
                       onChange={e => updateRow(i, "qty", Number(e.target.value))}

@@ -1208,7 +1208,7 @@ const [searchTerm, setSearchTerm] = useState("");
                                   onChange={(key, value) => updateRowMeta(i, key, value)}
                                 />
                               )}
-                              <div><div style={labelStyle()}>Qty</div><input type="number" value={r.qty} onChange={e => updateRow(i, "qty", e.target.value)} style={inp({ padding: "7px 9px", textAlign: "right" })} /></div>
+                              <div><div style={labelStyle()}>Qty</div><input type="number" step="any" value={r.qty} onChange={e => updateRow(i, "qty", e.target.value)} style={inp({ padding: "7px 9px", textAlign: "right" })} /></div>
                               <div><div style={labelStyle()}>Unit Cost</div><input type="number" value={r.rate} onChange={e => updateRow(i, "rate", e.target.value)} readOnly={rfActive && !rf.rateEditable} style={inp({ padding: "7px 9px", textAlign: "right", ...(rfActive && !rf.rateEditable ? { opacity: 0.75 } : {}) })} /></div>
                               <div><div style={labelStyle()}>Disc%</div><input type="number" value={r.discountPercent} onChange={e => updateRow(i, "discountPercent", e.target.value)} style={inp({ padding: "7px 9px", textAlign: "right" })} /></div>
                               <div><div style={labelStyle()}>Tax%</div><input type="number" value={r.taxPercent} onChange={e => updateRow(i, "taxPercent", e.target.value)} style={inp({ padding: "7px 9px", textAlign: "right" })} /></div>
@@ -1291,7 +1291,7 @@ const [searchTerm, setSearchTerm] = useState("");
                                   <td style={{ padding: "7px 8px", width: 64 }}>
                                     <input value={r.unit} onChange={e => updateRow(i, "unit", e.target.value)} placeholder="pcs" style={inp({ padding: "5px 6px", fontSize: 12, textAlign: "center" })} />
                                   </td>
-                                  <td style={{ padding: "7px 8px", width: 76 }}><input type="number" value={r.qty} onChange={e => updateRow(i, "qty", e.target.value)} placeholder="0" style={inp({ padding: "5px 7px", textAlign: "right", fontSize: 12.5 })} /></td>
+                                  <td style={{ padding: "7px 8px", width: 76 }}><input type="number" step="any" value={r.qty} onChange={e => updateRow(i, "qty", e.target.value)} placeholder="0" style={inp({ padding: "5px 7px", textAlign: "right", fontSize: 12.5 })} /></td>
                                   <td style={{ padding: "7px 8px", width: 96 }}>
                                     <input
                                       type="number"

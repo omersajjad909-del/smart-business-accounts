@@ -504,8 +504,8 @@ export default function GRNPage() {
                             {rfActive && (
                               <RateFormulaMobileFields settings={rf} meta={row.meta} onChange={(key, value) => updateRowMeta(idx, key, value)} />
                             )}
-                            <div><Label>Ordered</Label><input type="number" value={row.orderedQty} onChange={e => updateRow(idx, "orderedQty", e.target.value)} placeholder="0" style={inp({ textAlign: "center" })} /></div>
-                            <div><Label><span style={{ color: isShort ? "#fbbf24" : "#34d399" }}>Received</span></Label><input type="number" value={row.receivedQty} onChange={e => updateRow(idx, "receivedQty", e.target.value)} placeholder="0" style={inp({ textAlign: "center", color: isShort ? "#fbbf24" : "#34d399", fontWeight: 700 })} /></div>
+                            <div><Label>Ordered</Label><input type="number" step="any" value={row.orderedQty} onChange={e => updateRow(idx, "orderedQty", e.target.value)} placeholder="0" style={inp({ textAlign: "center" })} /></div>
+                            <div><Label><span style={{ color: isShort ? "#fbbf24" : "#34d399" }}>Received</span></Label><input type="number" step="any" value={row.receivedQty} onChange={e => updateRow(idx, "receivedQty", e.target.value)} placeholder="0" style={inp({ textAlign: "center", color: isShort ? "#fbbf24" : "#34d399", fontWeight: 700 })} /></div>
                           </div>
                         </div>
                       );
@@ -547,8 +547,8 @@ export default function GRNPage() {
                               {rfActive && (
                                 <RateFormulaRowCells settings={rf} meta={row.meta} rowIndex={idx} onChange={(key, value) => updateRowMeta(idx, key, value)} />
                               )}
-                              <td style={{ padding: "6px 8px" }}><input type="number" value={row.orderedQty} onChange={e => updateRow(idx, "orderedQty", e.target.value)} placeholder="0" style={inp({ padding: "5px 7px", textAlign: "center", color: MUTED })} /></td>
-                              <td style={{ padding: "6px 8px" }}><input type="number" value={row.receivedQty} onChange={e => updateRow(idx, "receivedQty", e.target.value)} placeholder="0" style={inp({ padding: "5px 7px", textAlign: "center", color: isShort ? "#fbbf24" : "#34d399", fontWeight: 700 })} /></td>
+                              <td style={{ padding: "6px 8px" }}><input type="number" step="any" value={row.orderedQty} onChange={e => updateRow(idx, "orderedQty", e.target.value)} placeholder="0" style={inp({ padding: "5px 7px", textAlign: "center", color: MUTED })} /></td>
+                              <td style={{ padding: "6px 8px" }}><input type="number" step="any" value={row.receivedQty} onChange={e => updateRow(idx, "receivedQty", e.target.value)} placeholder="0" style={inp({ padding: "5px 7px", textAlign: "center", color: isShort ? "#fbbf24" : "#34d399", fontWeight: 700 })} /></td>
                               {rfActive && (
                                 <td style={{ padding: "6px 8px", width: 94 }}>
                                   <input type="number" value={row.rate} onChange={e => updateRow(idx, "rate", e.target.value)} readOnly={!rf.rateEditable} title={!rf.rateEditable ? "Worked out by your rate formula" : undefined} placeholder="0.00" style={inp({ padding: "5px 7px", textAlign: "right", ...(rf.rateEditable ? {} : { opacity: 0.75, cursor: "not-allowed" }) })} />

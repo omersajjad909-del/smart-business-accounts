@@ -666,7 +666,7 @@ export default function QuotationPage() {
                       <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: 8 }}>
                         <div>
                           <div style={{ fontSize: 10, color: "var(--text-muted)", fontWeight: 700, marginBottom: 4, textTransform: "uppercase" }}>Qty</div>
-                          <input type="number" value={r.qty} onChange={e => updateRow(i, "qty", e.target.value)} style={{ width: "100%", padding: isMobile ? "8px 8px" : "9px 13px", borderRadius: 8, border: "1.5px solid var(--border)", background: "var(--app-bg)", color: "var(--text-primary)", fontSize: 13, textAlign: "right" as const, boxSizing: "border-box" as const }} />
+                          <input type="number" step="any" value={r.qty} onChange={e => updateRow(i, "qty", e.target.value)} style={{ width: "100%", padding: isMobile ? "8px 8px" : "9px 13px", borderRadius: 8, border: "1.5px solid var(--border)", background: "var(--app-bg)", color: "var(--text-primary)", fontSize: 13, textAlign: "right" as const, boxSizing: "border-box" as const }} />
                         </div>
                         <div>
                           <div style={{ fontSize: 10, color: "var(--text-muted)", fontWeight: 700, marginBottom: 4, textTransform: "uppercase" }}>Rate</div>
@@ -705,7 +705,7 @@ export default function QuotationPage() {
                             />
                           </td>
                           <td style={{ padding: isMobile ? "8px 8px" : "8px 6px", width: 100 }}>
-                            <input type="number" value={r.qty} onChange={e => updateRow(i, "qty", e.target.value)} style={{ width: "100%", padding: isMobile ? "8px 8px" : "7px 8px", borderRadius: 8, border: "1.5px solid var(--border)", background: "var(--app-bg)", color: "var(--text-primary)", fontSize: 13, textAlign: "center" as const }} />
+                            <input type="number" step="any" value={r.qty} onChange={e => updateRow(i, "qty", e.target.value)} style={{ width: "100%", padding: isMobile ? "8px 8px" : "7px 8px", borderRadius: 8, border: "1.5px solid var(--border)", background: "var(--app-bg)", color: "var(--text-primary)", fontSize: 13, textAlign: "center" as const }} />
                           </td>
                           <td style={{ padding: isMobile ? "8px 8px" : "8px 6px", width: 130 }}>
                             <input type="number" value={r.rate} onChange={e => updateRow(i, "rate", e.target.value)} style={{ width: "100%", padding: isMobile ? "8px 8px" : "7px 8px", borderRadius: 8, border: "1.5px solid var(--border)", background: "var(--app-bg)", color: "var(--text-primary)", fontSize: 13, textAlign: "right" as const }} />
