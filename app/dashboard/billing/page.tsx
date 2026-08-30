@@ -24,6 +24,8 @@ type PaymentMethodsResponse = {
   /** Lemon Squeezy hosted "update payment method" link, signed and short-lived. */
   updateUrl?: string | null;
   note?: string;
+  /** Billed offline by arrangement — no gateway, and no card to store. */
+  manualBilling?: boolean;
 };
 type Invoice = {
   id: string; number: string; date: string;
