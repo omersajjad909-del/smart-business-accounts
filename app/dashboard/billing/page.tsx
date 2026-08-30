@@ -576,6 +576,7 @@ function BillingPage() {
   // Signed, short-lived Lemon Squeezy link for replacing the card on file.
   const paymentUpdateUrl = paymentMeta?.updateUrl || null;
   const paymentNote = paymentMeta?.note || "";
+  const paymentManualBilling = Boolean(paymentMeta?.manualBilling);
   const acceptedMethods = paymentManagedExternally ? LEMON_ACCEPTED_METHODS : DIRECT_ACCEPTED_METHODS;
 
   /* ── Post-payment receipt ──────────────────────────────
@@ -725,23 +726,33 @@ function BillingPage() {
       })()}
 
       {/* ── Page header ── */}
-      {(paymentManagedExternally || paymentNote) && (
-        <div style={{ marginBottom:20, padding: isMobile ? "12px 10px" : "14px 18px", borderRadius:16, background:paymentManagedExternally?"rgba(99,102,241,.10)":"rgba(251,191,36,.09)", border:paymentManagedExternally?"1px solid rgba(99,102,241,.24)":"1px solid rgba(251,191,36,.24)", display:"flex", alignItems:"flex-start", gap:12 }}>
-          <div style={{ width:36, height:36, borderRadius:12, background:paymentManagedExternally?"rgba(99,102,241,.14)":"rgba(251,191,36,.14)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:18, flexShrink:0 }}>
-            {paymentManagedExternally ? "🔐" : "ℹ️"}
-          </div>
-          <div>
-            <div style={{ fontSize:14, fontWeight:800, color:paymentManagedExternally?"#a5b4fc":"#fcd34d", marginBottom:4 }}>
-              {paymentManagedExternally ? "Hosted billing is active" : "Billing setup is partial"}
+      {/* Three states, not two. An offline account is fully set up — it just
+          has no card — so it gets its own reassuring banner instead of being
+          told its billing is "partial". */}
+      {(paymentManagedExternally || paymentManualBilling || paymentNote) && (() => {
+        const tone = paymentManualBilling
+          ? { accent: "#34d399", rgb: "52,211,153", icon: "🧾", title: "Billed by arrangement" }
+          : paymentManagedExternally
+            ? { accent: "#a5b4fc", rgb: "99,102,241", icon: "🔐", title: "Hosted billing is active" }
+            : { accent: "#fcd34d", rgb: "251,191,36", icon: "ℹ️", title: "Billing setup is partial" };
+        return (
+          <div style={{ marginBottom:20, padding: isMobile ? "12px 10px" : "14px 18px", borderRadius:16, background:`rgba(${tone.rgb},.10)`, border:`1px solid rgba(${tone.rgb},.24)`, display:"flex", alignItems:"flex-start", gap:12 }}>
+            <div style={{ width:36, height:36, borderRadius:12, background:`rgba(${tone.rgb},.14)`, display:"flex", alignItems:"center", justifyContent:"center", fontSize:18, flexShrink:0 }}>
+              {tone.icon}
             </div>
-            <div style={{ fontSize:12, color:"rgba(255,255,255,.62)", lineHeight:1.6 }}>
-              {paymentManagedExternally
-                ? `${paymentNote} The card is added on the provider checkout page, not inside this form.`
-                : paymentNote}
+            <div>
+              <div style={{ fontSize:14, fontWeight:800, color:tone.accent, marginBottom:4 }}>
+                {tone.title}
+              </div>
+              <div style={{ fontSize:12, color:"rgba(255,255,255,.62)", lineHeight:1.6 }}>
+                {paymentManagedExternally && !paymentManualBilling
+                  ? `${paymentNote} The card is added on the provider checkout page, not inside this form.`
+                  : paymentNote}
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        );
+      })()}
       <div style={{ display:"flex", alignItems:"flex-start", justifyContent:"space-between", marginBottom:24, flexWrap:"wrap", gap:12 }}>
         <div>
           <h1 style={{ margin:0, fontSize:24, fontWeight:800, letterSpacing:"-0.6px" }}>Billing &amp; Payments</h1>
