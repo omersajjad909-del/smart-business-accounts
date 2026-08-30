@@ -175,6 +175,7 @@ export async function GET(req: NextRequest) {
     paymentMethods,
     defaultId: paymentMethods[0]?.id ?? null,
     updateUrl,
+    ...reCheckout(),
     subscriptionStatus: attrs?.status || subscription.status || null,
     renewsAt: attrs?.renews_at || null,
     note: updateUrl

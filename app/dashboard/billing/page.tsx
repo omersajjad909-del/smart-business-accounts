@@ -26,6 +26,10 @@ type PaymentMethodsResponse = {
   note?: string;
   /** Billed offline by arrangement — no gateway, and no card to store. */
   manualBilling?: boolean;
+  /** Offer a fresh checkout on the plan they already have. See the route. */
+  canReCheckout?: boolean;
+  reCheckoutLabel?: string | null;
+  reCheckoutReason?: string | null;
 };
 type Invoice = {
   id: string; number: string; date: string;
