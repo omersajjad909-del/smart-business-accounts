@@ -6,6 +6,7 @@ import {
   mapBomRecord,
   mapProductionOrderRecord,
   loadManufacturingItems,
+  type ManufacturingBom,
   type ManufacturingItem,
   type BomLineInput,
 } from "../_shared";
@@ -103,7 +104,7 @@ export default function BOMPage() {
    * to build the whole BOM again. That is how the two "Simple Bag (48)" rows
    * appeared: one at 13 rolls, one at 16, with nothing saying which is current.
    */
-  function startEdit(bom: { id: string; finishedItemId: string; version: string; yieldUnits: number; lines: { itemId: string; qty: number; divisible: boolean }[]; labourPerBatch?: number; overheadPerBatch?: number }) {
+  function startEdit(bom: ManufacturingBom) {
     setEditingId(bom.id);
     setForm({
       finishedItemId: bom.finishedItemId,
@@ -114,7 +115,7 @@ export default function BOMPage() {
     });
     setLines(
       bom.lines.length
-        ? bom.lines.map((l) => ({ itemId: l.itemId, qty: String(l.qty), divisible: l.divisible }))
+        ? bom.lines.map((l) => ({ itemId: l.itemId, qty: String(l.qty), divisible: l.divisible === true }))
         : [{ itemId: "", qty: "", divisible: false }],
     );
     setFormError("");
