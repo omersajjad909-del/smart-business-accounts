@@ -7,7 +7,7 @@
 // them and six months later nobody can say whether the original stake has come
 // home. Profit never touches this page.
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import toast from "react-hot-toast";
 import { useResponsive } from "@/hooks/useResponsive";
 import { useBusinessRecords } from "@/lib/useBusinessRecords";
@@ -37,10 +37,12 @@ export default function InvestorCapitalPage() {
   const { records, loading, create, remove } = useBusinessRecords(CAT.capital);
 
   const parties = useMemo(() => partyRecords.map(mapParty).filter((p) => p.status === "active"), [partyRecords]);
-  const [partyId, setPartyId] = useState("");
-  useEffect(() => {
-    if (!partyId && parties.length) setPartyId(parties[0].id);
-  }, [parties, partyId]);
+  // The picker sits on the first party until one is chosen. Deriving that
+  // rather than writing it back through an effect keeps a render out of the
+  // cycle and stops the selection fighting a slow first load.
+  const [pickedParty, setPickedParty] = useState("");
+  const partyId = pickedParty || parties[0]?.id || "";
+  const setPartyId = setPickedParty;
 
   const entries = useMemo(
     () =>

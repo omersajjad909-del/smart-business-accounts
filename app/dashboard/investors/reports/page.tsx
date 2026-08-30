@@ -8,7 +8,7 @@
 // whether the man on the other side pays on time — and it answers it with a
 // number rather than a feeling.
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { useResponsive } from "@/hooks/useResponsive";
 import { useBusinessRecords } from "@/lib/useBusinessRecords";
 import { DateInput } from "../../reports/_components/DateInput";
@@ -66,24 +66,26 @@ export default function InvestorReportsPage() {
   const { records: settlementRecords } = useBusinessRecords(CAT.settlement);
 
   const parties = useMemo(() => partyRecords.map(mapParty), [partyRecords]);
-  const [partyId, setPartyId] = useState("");
-  useEffect(() => {
-    if (!partyId && parties.length) setPartyId(parties[0].id);
-  }, [parties, partyId]);
+  // The picker sits on the first party until one is chosen. Deriving that
+  // rather than writing it back through an effect keeps a render out of the
+  // cycle and stops the selection fighting a slow first load.
+  const [pickedParty, setPickedParty] = useState("");
+  const partyId = pickedParty || parties[0]?.id || "";
+  const setPartyId = setPickedParty;
 
   const party = parties.find((p) => p.id === partyId);
   const unit = party?.unit || "kg";
 
   const [report, setReport] = useState<ReportKey>("production");
-  const [from, setFrom] = useState("");
+  const [fromEdit, setFromEdit] = useState("");
   const [to, setTo] = useState(todayISO());
 
   const capital = useMemo(() => capitalRecords.map(mapCapital).filter((c) => c.partyId === partyId), [capitalRecords, partyId]);
   const capTotals = useMemo(() => capitalTotals(capital), [capital]);
 
-  useEffect(() => {
-    if (!from && capTotals.firstDate) setFrom(capTotals.firstDate);
-  }, [capTotals.firstDate, from]);
+  // Default the window to the day the first rupee went in.
+  const from = fromEdit || capTotals.firstDate || "";
+  const setFrom = setFromEdit;
 
   const allProduction = useMemo(() => productionRecords.map(mapProduction).filter((l) => l.partyId === partyId), [productionRecords, partyId]);
   const production = useMemo(

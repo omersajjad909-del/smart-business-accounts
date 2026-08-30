@@ -7,7 +7,7 @@
 // bottom, not a one-record-at-a-time form. Each line prices itself from the
 // rate in force on its own date and then keeps that rate for good.
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import toast from "react-hot-toast";
 import { useResponsive } from "@/hooks/useResponsive";
 import { useBusinessRecords } from "@/lib/useBusinessRecords";
@@ -57,10 +57,12 @@ export default function InvestorProductionPage() {
   const { records, loading, create, remove } = useBusinessRecords(CAT.production);
 
   const parties = useMemo(() => partyRecords.map(mapParty).filter((p) => p.status === "active"), [partyRecords]);
-  const [partyId, setPartyId] = useState("");
-  useEffect(() => {
-    if (!partyId && parties.length) setPartyId(parties[0].id);
-  }, [parties, partyId]);
+  // The picker sits on the first party until one is chosen. Deriving that
+  // rather than writing it back through an effect keeps a render out of the
+  // cycle and stops the selection fighting a slow first load.
+  const [pickedParty, setPickedParty] = useState("");
+  const partyId = pickedParty || parties[0]?.id || "";
+  const setPartyId = setPickedParty;
 
   const party = parties.find((p) => p.id === partyId);
   const byPercentage = party?.profitModel === "percentage";
@@ -104,7 +106,6 @@ export default function InvestorProductionPage() {
       amount += p.amount;
     }
     return { qty: round2(qty), amount: round2(amount) };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [rows, grades, party]);
 
   const unsettledTotals = useMemo(() => {

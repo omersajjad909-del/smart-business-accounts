@@ -8,7 +8,7 @@
 // was actually paid, and carries the difference forward. That carried figure
 // is the only number either side needs to argue about.
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import toast from "react-hot-toast";
 import { useResponsive } from "@/hooks/useResponsive";
 import { useBusinessRecords } from "@/lib/useBusinessRecords";
@@ -51,10 +51,12 @@ export default function InvestorSettlementsPage() {
   const { records, loading, create, remove } = useBusinessRecords(CAT.settlement);
 
   const parties = useMemo(() => partyRecords.map(mapParty).filter((p) => p.status === "active"), [partyRecords]);
-  const [partyId, setPartyId] = useState("");
-  useEffect(() => {
-    if (!partyId && parties.length) setPartyId(parties[0].id);
-  }, [parties, partyId]);
+  // The picker sits on the first party until one is chosen. Deriving that
+  // rather than writing it back through an effect keeps a render out of the
+  // cycle and stops the selection fighting a slow first load.
+  const [pickedParty, setPickedParty] = useState("");
+  const partyId = pickedParty || parties[0]?.id || "";
+  const setPartyId = setPickedParty;
 
   const party = parties.find((p) => p.id === partyId);
 
@@ -73,23 +75,24 @@ export default function InvestorSettlementsPage() {
   const openingBalance = lastSettlement ? lastSettlement.closingBalance : 0;
   const nextCycleNo = (lastSettlement?.cycleNo || 0) + 1;
 
-  const [fromDate, setFromDate] = useState("");
+  const [fromEdit, setFromEdit] = useState("");
   const [toDate, setToDate] = useState(todayISO());
   const [cash, setCash] = useState("");
   const [closing, setClosing] = useState(false);
 
   // A new cycle starts the day after the last one ended, so nothing falls
   // between two settlements and nothing is counted twice.
-  useEffect(() => {
+  const suggestedFrom = useMemo(() => {
     if (!lastSettlement) {
       const earliest = lines.filter((l) => !l.settlementId).map((l) => l.date).sort()[0];
-      setFromDate(earliest || todayISO());
-      return;
+      return earliest || todayISO();
     }
     const next = new Date(lastSettlement.toDate + "T00:00:00Z");
     next.setUTCDate(next.getUTCDate() + 1);
-    setFromDate(next.toISOString().slice(0, 10));
+    return next.toISOString().slice(0, 10);
   }, [lastSettlement, lines]);
+  const fromDate = fromEdit || suggestedFrom;
+  const setFromDate = setFromEdit;
 
   const inRange = useMemo(
     () => lines.filter((l) => !l.settlementId && l.date >= fromDate && l.date <= toDate),
