@@ -136,6 +136,23 @@ export default function PaymentPage() {
     }
   }, [plan, router]);
 
+  // Back on the payment step returns to the company-information form rather
+  // than wherever history happens to point. Signup replaces its own entry and
+  // the OTP page hands off with a full navigation, so router.back() lands on
+  // pricing and the user loses the details they came back to correct. The
+  // add-on is bought from the dashboard, not the signup flow, so it keeps the
+  // plain history step.
+  const goBack = () => {
+    if (plan === "addon-automation") { router.back(); return; }
+    const qs = new URLSearchParams();
+    qs.set("cycle", urlCycle);
+    for (const key of ["modules", "price", "currency", "country", "businessType", "ref"]) {
+      const val = searchParams.get(key);
+      if (val) qs.set(key, val);
+    }
+    router.push(`/onboarding/signup/${plan}?${qs.toString()}`);
+  };
+
   const [billingCycle, setBillingCycle] = useState<"monthly"|"yearly">(urlCycle);
   // Seeded to global pricing and replaced by /api/public/pricing-region below.
   // Deliberately not read from `?currency=` / `?country=` any more — those are
@@ -588,7 +605,7 @@ export default function PaymentPage() {
             <span style={{ fontSize:17, fontWeight:700, letterSpacing:"-.3px" }}>FinovaOS</span>
           </div>
           <div className="pay-steps"><Steps current={step} finalLabel={pendingRealPayment ? "Checkout" : "Done"} /></div>
-          <button onClick={() => step===1 ? router.back() : setStep(1)}
+          <button onClick={() => step===1 ? goBack() : setStep(1)}
             style={{ fontSize:12, fontWeight:600, color:"rgba(255,255,255,.45)", padding:"7px 14px", borderRadius:9, border:"1.5px solid rgba(255,255,255,.1)", background:"rgba(255,255,255,.04)", cursor:"pointer", fontFamily:"inherit" }}>
             ← Back
           </button>
