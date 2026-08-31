@@ -4,7 +4,7 @@ import { computePayroll } from "@/lib/payrollCalc";
 
 async function main() {
   const emps = await prisma.employee.findMany({
-    where: { isActive: true },
+    where: { isActive: true, companyId: "9806c891-d1bd-4ff5-93b5-2665ca576540" },
     select: { id: true, employeeId: true, firstName: true, lastName: true, salary: true, companyId: true },
     orderBy: { employeeId: "asc" },
   });
