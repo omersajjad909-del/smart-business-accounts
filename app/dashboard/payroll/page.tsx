@@ -2,6 +2,7 @@
 import { confirmToast } from "@/lib/toast-feedback";
 import toast from "react-hot-toast";
 import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { getCurrentUser } from "@/lib/auth";
 import { useResponsive } from "@/hooks/useResponsive";
 
@@ -487,10 +488,12 @@ export default function PayrollPage() {
         const generatedAt = new Date().toLocaleString("en-GB", { day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" });
         const totalEmployees = payroll.length;
 
-        return (
-        <div style={{ position: "fixed", inset: 0, background: "rgba(9, 12, 30, 0.85)", backdropFilter: "blur(6px)", zIndex: 50, display: "flex", flexDirection: "column", alignItems: "center", overflowY: "auto", padding: isMobile ? "13px 10px" : "24px 16px" }}>
+        // Rendered straight into <body> so the print stylesheet can display:none
+        // every other top-level box instead of merely hiding it.
+        return createPortal(
+        <div id="payroll-print-portal" style={{ position: "fixed", inset: 0, background: "rgba(9, 12, 30, 0.85)", backdropFilter: "blur(6px)", zIndex: 50, display: "flex", flexDirection: "column", alignItems: "center", overflowY: "auto", padding: isMobile ? "13px 10px" : "24px 16px" }}>
           {/* Toolbar */}
-          <div style={{ display: "flex", width: "100%", maxWidth: 900, justifyContent: "space-between", marginBottom: 18, alignItems: "center" }}>
+          <div className="print-toolbar" style={{ display: "flex", width: "100%", maxWidth: 900, justifyContent: "space-between", marginBottom: 18, alignItems: "center" }}>
             <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
               <div style={{ color: "rgba(255,255,255,.5)", fontSize: 11, fontWeight: 700, letterSpacing: ".08em", textTransform: "uppercase", fontFamily: ff }}>Print Preview</div>
               <div style={{ color: "#fff", fontSize: 15, fontWeight: 700, fontFamily: ff }}>{monthLabel}</div>
@@ -515,9 +518,19 @@ export default function PayrollPage() {
             #payroll-printable td { border-color: #e2e8f0 !important; }
             @media print {
               @page { size: A4; margin: 0; }
-              body * { visibility: hidden !important; }
-              #payroll-printable, #payroll-printable * { visibility: visible !important; }
-              #payroll-printable { position: fixed; inset: 0; margin: 0 !important; box-shadow: none !important; background: #fff !important; color: #0f172a !important; }
+              /* Hide the app shell outright. visibility:hidden left the hidden boxes
+                 occupying their full height, so the document stayed taller than one
+                 sheet and Chrome repainted the position:fixed paper on every extra
+                 page — one Print came out as two identical copies. display:none plus
+                 a paper that stays in normal flow prints only the pages the report
+                 actually needs. */
+              html, body { height: auto !important; overflow: visible !important; margin: 0 !important; padding: 0 !important; background: #fff !important; }
+              body > *:not(#payroll-print-portal) { display: none !important; }
+              #payroll-print-portal { position: static !important; display: block !important; overflow: visible !important; padding: 0 !important; background: none !important; backdrop-filter: none !important; }
+              #payroll-print-portal .print-toolbar { display: none !important; }
+              #payroll-printable { position: static !important; width: 100% !important; max-width: none !important; min-height: 0 !important; margin: 0 !important; border-radius: 0 !important; box-shadow: none !important; background: #fff !important; color: #0f172a !important; }
+              #payroll-printable { overflow: visible !important; }
+              #payroll-printable tr { page-break-inside: avoid; break-inside: avoid; }
               #payroll-printable * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
               /* Ensure signatures appear in a single horizontal row when printing */
               #payroll-printable .signature-grid { grid-template-columns: 1fr 1fr 1fr !important; }
@@ -658,7 +671,8 @@ export default function PayrollPage() {
               </div>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
         );
       })()}
     </div>
