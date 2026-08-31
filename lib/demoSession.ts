@@ -8,7 +8,10 @@
  * actually ran for two hours. One constant, imported by both.
  */
 
-export const DEMO_SESSION_MINUTES = 120;
+// Typed as `number`, not left to narrow to its literal — the two labels below
+// branch on the value, and a literal type turns each of those checks into a
+// compile error the day the number is changed.
+export const DEMO_SESSION_MINUTES: number = 120;
 
 /** The same length written the way a visitor reads it: "2-hour", "45-minute". */
 export const DEMO_SESSION_LABEL =
