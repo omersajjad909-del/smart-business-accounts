@@ -147,6 +147,12 @@ export function mapSafepayEventToStatus(event: string): "ACTIVE" | "PAST_DUE" | 
     case "payment:created":
     case "payment:success":
     case "payment.success":
+    // Safepay's Payments 2.0 event set spells this one 'succeeded'. The v1
+    // integration (/order/v1/init) fires payment:created instead, but the
+    // sandbox dashboard offers both, so accept either rather than letting a
+    // paid order fall through to INACTIVE and silently do nothing.
+    case "payment.succeeded":
+    case "payment:succeeded":
     case "subscription:activated":
       return "ACTIVE";
     case "payment:failed":
