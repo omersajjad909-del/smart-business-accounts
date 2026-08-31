@@ -516,6 +516,21 @@ export default function PayrollPage() {
                Win it back with an ID selector, on-screen and when printing. */
             #payroll-printable th { background: transparent !important; color: #0f172a !important; }
             #payroll-printable td { border-color: #e2e8f0 !important; }
+            /* <body> carries .app-root, so the responsive safety net in globals.css
+               (.app-root table { display:block; overflow-x:auto } plus nowrap cells)
+               also lands on this printable paper. A sheet has nothing to scroll, so
+               that simply cut the Next Month column off the right edge. Pin the table
+               back to a real table box that always fits the page width. */
+            #payroll-printable table { display: table !important; table-layout: fixed !important; width: 100% !important; min-width: 0 !important; max-width: 100% !important; overflow: visible !important; }
+            #payroll-printable thead { display: table-header-group !important; }
+            #payroll-printable tbody { display: table-row-group !important; }
+            #payroll-printable tfoot { display: table-row-group !important; }
+            #payroll-printable tr { display: table-row !important; }
+            #payroll-printable th, #payroll-printable td { white-space: nowrap !important; overflow: hidden !important; text-overflow: ellipsis; }
+            /* Employee and Reason are the only free-text columns - let them wrap
+               instead of stealing width from the figures. */
+            #payroll-printable th:nth-child(2), #payroll-printable td:nth-child(2),
+            #payroll-printable th:nth-child(5), #payroll-printable td:nth-child(5) { white-space: normal !important; overflow-wrap: anywhere; }
             @media print {
               @page { size: A4; margin: 0; }
               /* Hide the app shell outright. visibility:hidden left the hidden boxes
@@ -575,6 +590,16 @@ export default function PayrollPage() {
             {/* Table */}
             <div style={{ padding: isMobile ? "13px 18px" : "24px 40px" }}>
               <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 12 }}>
+                <colgroup>
+                  <col style={{ width: "7%"  }} />{/* ID         */}
+                  <col style={{ width: "17%" }} />{/* Employee   */}
+                  <col style={{ width: "10%" }} />{/* Basic      */}
+                  <col style={{ width: "11%" }} />{/* Deductions */}
+                  <col style={{ width: "21%" }} />{/* Reason     */}
+                  <col style={{ width: "11%" }} />{/* Pay        */}
+                  <col style={{ width: "11%" }} />{/* Paid       */}
+                  <col style={{ width: "12%" }} />{/* Next Month */}
+                </colgroup>
                 <thead>
                   <tr>
                     {[
