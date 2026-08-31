@@ -267,7 +267,7 @@ export async function getEmployeeAdvanceState(
   companyId: string,
   employeeId: string
 ): Promise<EmployeeAdvanceState> {
-  return prisma.$transaction((tx) => computeEmployeeAdvanceState(tx, companyId, employeeId));
+  return computeEmployeeAdvanceState(prisma, companyId, employeeId);
 }
 
 export async function getEmployeeCarryForward(
@@ -275,7 +275,7 @@ export async function getEmployeeCarryForward(
   employeeId: string,
   monthYear: string
 ): Promise<number> {
-  const state = await prisma.$transaction((tx) => computeEmployeeAdvanceState(tx, companyId, employeeId));
+  const state = await computeEmployeeAdvanceState(prisma, companyId, employeeId);
   return carryIntoMonth(state.carries, monthYear);
 }
 
