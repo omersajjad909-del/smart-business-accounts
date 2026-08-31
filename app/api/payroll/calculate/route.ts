@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { resolveCompanyId } from "@/lib/tenant";
 import { computePayroll, DEFAULT_RATES, type PayrollRates } from "@/lib/payrollCalc";
+import { getEmployeeCarryForward } from "@/lib/payrollAdvanceRecovery";
 
 // GET /api/payroll/calculate?employeeId=X&monthYear=YYYY-MM[&workingDays=N&otHours=8&otMultiplier=1.5]
 // Reads attendance for the given month and returns suggested payroll numbers.

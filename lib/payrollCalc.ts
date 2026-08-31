@@ -126,15 +126,18 @@ export function computePayroll(params: {
 
   otTotal = Math.round(otTotal * 100) / 100;
 
-  const absentDeduction  = round2(counts.absent   * perDay);
-  const halfDayDeduction = round2(counts.halfDay  * perDay / 2);
-  const grossDeduction   = round2(absentDeduction + halfDayDeduction);
-  const otCredit         = round2(otTotal * perHour * rates.otMultiplier);
+  // Every rupee figure is rounded to whole rupees. Payroll is settled in notes,
+  // not paisas, and the fractional tails were leaking into deductions and the
+  // carry-forward balance (a 999.67 that should simply read 1,000).
+  const absentDeduction  = money(counts.absent   * perDay);
+  const halfDayDeduction = money(counts.halfDay  * perDay / 2);
+  const grossDeduction   = money(absentDeduction + halfDayDeduction);
+  const otCredit         = money(otTotal * perHour * rates.otMultiplier);
 
-  const netDeduction  = round2(Math.max(0, grossDeduction - otCredit));
-  const otAllowance   = round2(Math.max(0, otCredit       - grossDeduction));
+  const netDeduction  = money(Math.max(0, grossDeduction - otCredit));
+  const otAllowance   = money(Math.max(0, otCredit       - grossDeduction));
 
-  const suggestedNetSalary = round2(params.baseSalary + otAllowance - netDeduction);
+  const suggestedNetSalary = money(params.baseSalary + otAllowance - netDeduction);
 
   const reasonBits: string[] = [];
   if (counts.absent)  reasonBits.push(`${counts.absent} absent (Rs. ${fmt(absentDeduction)})`);
@@ -160,7 +163,7 @@ export function computePayroll(params: {
     counts,
     overtime: { totalHours: otTotal, daysWithOT },
     rates: {
-      perDay: round2(perDay),
+      perDay: money(perDay),
       perHour: round2(perHour),
       otMultiplier: rates.otMultiplier,
       workingDaysPerMonth: rates.workingDaysPerMonth,
@@ -182,6 +185,8 @@ export function computePayroll(params: {
 }
 
 function round2(n: number) { return Math.round(n * 100) / 100; }
+/** Payroll money is always whole rupees. */
+export function money(n: number) { return Math.round(Number(n) || 0); }
 function fmt(n: number) {
-  return n.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  return money(n).toLocaleString(undefined, { maximumFractionDigits: 0 });
 }

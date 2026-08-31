@@ -1,7 +1,9 @@
 import type { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
+import { computePayroll, money } from "@/lib/payrollCalc";
 
 type PayrollAdvanceTx = Prisma.TransactionClient;
+type DbClient = PayrollAdvanceTx | typeof prisma;
 
 export type AdvanceRecoveryRow = {
   advanceId: string;
@@ -11,29 +13,124 @@ export type AdvanceRecoveryRow = {
   status: "DEDUCTED" | "PENDING";
 };
 
+export type MonthCarry = {
+  monthYear: string;   // the payroll month this carry closes
+  carryOut: number;    // rupees still owed going into the next month
+};
+
+export type EmployeeAdvanceState = {
+  rows: AdvanceRecoveryRow[];
+  carries: MonthCarry[];
+};
+
 function hasAdvanceReason(reason?: string | null) {
   return String(reason || "").toLowerCase().includes("advance");
 }
 
-async function calculateEmployeeAdvanceRecoveryRows(
-  tx: PayrollAdvanceTx,
+function monthOf(date: Date) {
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
+}
+
+function shiftHours(start?: string | null, end?: string | null): number | null {
+  if (!start || !end) return null;
+  const [sh, sm] = String(start).split(":").map(Number);
+  const [eh, em] = String(end).split(":").map(Number);
+  if ([sh, sm, eh, em].some((n) => !Number.isFinite(n))) return null;
+  let mins = (eh * 60 + em) - (sh * 60 + sm);
+  if (mins <= 0) mins += 24 * 60; // shift crosses midnight
+  return mins / 60;
+}
+
+/**
+ * Attendance-driven deduction (absent + half-day, offset by OT) per payroll
+ * month. This is the slice of a month's deduction that was never advance
+ * recovery, so it must not be charged against an outstanding advance.
+ */
+async function attendanceDeductionByMonth(
+  tx: DbClient,
+  companyId: string,
+  employeeId: string,
+  salaryByMonth: Map<string, number>
+): Promise<Map<string, number>> {
+  const out = new Map<string, number>();
+  const months = [...salaryByMonth.keys()].sort();
+  if (!months.length) return out;
+
+  const employee = (await tx.employee.findFirst({
+    where: { id: employeeId, companyId },
+    select: { shiftStart: true, shiftEnd: true } as any,
+  })) as any;
+  const shiftLen = shiftHours(employee?.shiftStart, employee?.shiftEnd);
+
+  const [y0, m0] = months[0].split("-").map(Number);
+  const [y1, m1] = months[months.length - 1].split("-").map(Number);
+  const rows = await tx.attendance.findMany({
+    where: {
+      companyId,
+      employeeId,
+      date: { gte: new Date(y0, m0 - 1, 1), lt: new Date(y1, m1, 1) },
+    },
+    select: { date: true, status: true, checkIn: true, checkOut: true },
+    orderBy: { date: "asc" },
+  });
+
+  const byMonth = new Map<string, typeof rows>();
+  for (const row of rows) {
+    const key = monthOf(row.date);
+    const bucket = byMonth.get(key);
+    if (bucket) bucket.push(row);
+    else byMonth.set(key, [row]);
+  }
+
+  for (const month of months) {
+    const computed = computePayroll({
+      employeeId,
+      monthYear: month,
+      baseSalary: salaryByMonth.get(month) || 0,
+      attendance: byMonth.get(month) || [],
+      rates: shiftLen && shiftLen > 0 && shiftLen <= 24 ? { standardHoursPerDay: shiftLen } : undefined,
+    });
+    out.set(month, computed.breakdown.netDeduction);
+  }
+  return out;
+}
+
+/**
+ * Replays every payroll month in order to work out how much of each advance has
+ * genuinely been recovered from salary, plus the balance the employee carries
+ * into the following month.
+ *
+ * Three rules keep the two debts separate so the payroll screen can show them as
+ * distinct lines (Prev Bal + Advance + Absent) instead of one blended number:
+ *
+ * 1. A payroll row may only recover advances that already existed when it was
+ *    entered (or that explicitly target that month or earlier). Without this an
+ *    older month's deduction silently ate an advance taken weeks later.
+ * 2. The advance-recoverable slice of a deduction is the deduction minus the
+ *    parts that were never advance recovery — this month's attendance deduction
+ *    and the balance carried in from last month.
+ * 3. Cash paid beyond what the month actually earned is NOT advance debt. It is
+ *    the month's closing balance and carries forward on its own; folding it into
+ *    an advance balance is what made the two amounts collapse into one.
+ */
+async function computeEmployeeAdvanceState(
+  tx: DbClient,
   companyId: string,
   employeeId: string
-): Promise<AdvanceRecoveryRow[]> {
+): Promise<EmployeeAdvanceState> {
   const advances = await tx.advanceSalary.findMany({
     where: { companyId, employeeId, deletedAt: null },
-    select: { id: true, amount: true },
+    select: { id: true, amount: true, date: true, monthYear: true, createdAt: true },
     orderBy: [{ date: "asc" }, { createdAt: "asc" }],
   });
 
-  if (!advances.length) return [];
-
   const rows = advances.map((advance) => ({
     advanceId: advance.id,
-    amount: Number(advance.amount || 0),
+    amount: money(advance.amount || 0),
     recovered: 0,
-    balance: Number(advance.amount || 0),
-    status: "PENDING" as const,
+    balance: money(advance.amount || 0),
+    targetMonth: advance.monthYear || null,
+    createdAt: advance.createdAt,
   }));
 
   const payrolls = await tx.payroll.findMany({
@@ -45,71 +142,114 @@ async function calculateEmployeeAdvanceRecoveryRows(
       deductions: true,
       deductionReason: true,
       additionalCash: true,
+      createdAt: true,
     },
     orderBy: { monthYear: "asc" },
   });
 
+  if (!payrolls.length) return { rows: rows.map(finalizeRow), carries: [] };
+
+  const salaryByMonth = new Map<string, number>(
+    payrolls.map((payroll) => [payroll.monthYear, Number(payroll.baseSalary || 0)])
+  );
+  const attendanceDeduction = await attendanceDeductionByMonth(tx, companyId, employeeId, salaryByMonth);
+
+  const carries: MonthCarry[] = [];
+  let carryIn = 0;
+
   for (const payroll of payrolls) {
-    if (!hasAdvanceReason(payroll.deductionReason)) continue;
+    const grossSalary = money(Number(payroll.baseSalary || 0) + Number(payroll.allowances || 0));
+    const deductions  = money(payroll.deductions || 0);
+    const cashPaid    = money(payroll.additionalCash || 0);
 
-    const grossSalary = Number(payroll.baseSalary || 0) + Number(payroll.allowances || 0);
-    let remainingDeductionIntent = Number(payroll.deductions || 0);
-    if (remainingDeductionIntent <= 0) continue;
+    // Slice the deduction: attendance + last month's balance first, advance last.
+    const nonAdvanceDeduction = Math.min(
+      deductions,
+      money(attendanceDeduction.get(payroll.monthYear) || 0) + carryIn
+    );
+    let advanceIntent = hasAdvanceReason(payroll.deductionReason)
+      ? Math.max(0, deductions - nonAdvanceDeduction)
+      : 0;
 
-    const affectedRows: AdvanceRecoveryRow[] = [];
-    for (const row of rows) {
-      if (remainingDeductionIntent <= 0) break;
-      if (row.balance <= 0) continue;
+    let advanceShortfall = 0;
 
-      const allocated = Math.min(row.balance, remainingDeductionIntent);
-      row.balance -= allocated;
-      affectedRows.push({ ...row, balance: allocated });
-      remainingDeductionIntent -= allocated;
+    if (advanceIntent > 0) {
+      const eligible = rows.filter((row) =>
+        row.balance > 0 &&
+        // Rule 1 — on the books when this payroll was entered, or explicitly
+        // targeted at this month or an earlier one.
+        ((row.targetMonth !== null && row.targetMonth <= payroll.monthYear) ||
+          row.createdAt.getTime() <= payroll.createdAt.getTime())
+      );
+
+      const allocations: Array<{ advanceId: string; allocated: number }> = [];
+      for (const row of eligible) {
+        if (advanceIntent <= 0) break;
+        const allocated = Math.min(row.balance, advanceIntent);
+        row.balance -= allocated;
+        advanceIntent -= allocated;
+        allocations.push({ advanceId: row.advanceId, allocated });
+      }
+
+      // An advance can only be recovered out of salary that actually exists.
+      let salaryAvailable = Math.max(0, grossSalary - nonAdvanceDeduction);
+      for (const allocation of allocations) {
+        const row = rows.find((candidate) => candidate.advanceId === allocation.advanceId);
+        if (!row) continue;
+        const recoveredNow = Math.min(allocation.allocated, salaryAvailable);
+        salaryAvailable -= recoveredNow;
+        row.recovered += recoveredNow;
+
+        // Whatever the salary could not cover stays outstanding on the advance.
+        const notRecovered = allocation.allocated - recoveredNow;
+        row.balance += notRecovered;
+        advanceShortfall += notRecovered;
+      }
     }
 
-    const intendedAdvanceDeduction = affectedRows.reduce((sum, row) => sum + row.balance, 0);
-    if (intendedAdvanceDeduction <= 0) continue;
-
-    const nonAdvanceDeduction = Math.max(0, Number(payroll.deductions || 0) - intendedAdvanceDeduction);
-    let salaryAvailableForAdvance = Math.max(0, grossSalary - nonAdvanceDeduction);
-
-    for (const affected of affectedRows) {
-      const row = rows.find((candidate) => candidate.advanceId === affected.advanceId);
-      if (!row) continue;
-
-      const recoveredNow = Math.min(affected.balance, salaryAvailableForAdvance);
-      row.recovered += recoveredNow;
-      salaryAvailableForAdvance -= recoveredNow;
-
-      const notRecoveredFromSalary = affected.balance - recoveredNow;
-      row.balance += notRecoveredFromSalary;
-    }
-
-    // Extra cash only becomes new debt when it exceeds what the employee actually
-    // earned this month (netSalary). Paying out exactly what they're owed — even
-    // after an advance deduction fully cleared — is a normal settlement, not a
-    // fresh loan, and must not resurrect an already-recovered advance.
-    const netSalary = grossSalary - Number(payroll.deductions || 0);
-    const entitlement = Math.max(0, netSalary);
-    let extraCashCarry = Math.max(0, Number(payroll.additionalCash || 0) - entitlement);
-    for (let index = affectedRows.length - 1; index >= 0 && extraCashCarry > 0; index--) {
-      const row = rows.find((candidate) => candidate.advanceId === affectedRows[index].advanceId);
-      if (!row) continue;
-      row.balance += extraCashCarry;
-      extraCashCarry = 0;
-    }
+    // Closing balance for the month. The slice already held on an advance
+    // balance (advanceShortfall) is excluded so it is never counted twice.
+    carryIn = Math.max(0, money(deductions + cashPaid - grossSalary - advanceShortfall));
+    carries.push({ monthYear: payroll.monthYear, carryOut: carryIn });
   }
 
-  return rows.map((row) => {
-    const recovered = Math.min(row.amount, Math.max(0, row.recovered));
-    const balance = Math.max(0, row.balance);
-    return {
-      ...row,
-      recovered,
-      balance,
-      status: balance <= 0.01 ? "DEDUCTED" : "PENDING",
-    };
-  });
+  return { rows: rows.map(finalizeRow), carries };
+}
+
+function finalizeRow(row: {
+  advanceId: string;
+  amount: number;
+  recovered: number;
+  balance: number;
+}): AdvanceRecoveryRow {
+  const recovered = money(Math.min(row.amount, Math.max(0, row.recovered)));
+  const balance = money(Math.max(0, row.balance));
+  return {
+    advanceId: row.advanceId,
+    amount: row.amount,
+    recovered,
+    balance,
+    status: balance <= 0 ? "DEDUCTED" : "PENDING",
+  };
+}
+
+/** Balance owed coming *into* `monthYear`, taken from the latest earlier payroll month. */
+export function carryIntoMonth(carries: MonthCarry[], monthYear: string): number {
+  let carry = 0;
+  for (const row of carries) {
+    if (row.monthYear >= monthYear) break;
+    carry = row.carryOut;
+  }
+  return carry;
+}
+
+export async function getEmployeeCarryForward(
+  companyId: string,
+  employeeId: string,
+  monthYear: string
+): Promise<number> {
+  const state = await computeEmployeeAdvanceState(prisma, companyId, employeeId);
+  return carryIntoMonth(state.carries, monthYear);
 }
 
 // Reconciling and reading were previously two separate transactions that each
@@ -121,7 +261,7 @@ export async function reconcileEmployeeAdvanceRecoveries(
   employeeId: string
 ): Promise<AdvanceRecoveryRow[]> {
   return prisma.$transaction(async (tx) => {
-    const rows = await calculateEmployeeAdvanceRecoveryRows(tx, companyId, employeeId);
+    const { rows } = await computeEmployeeAdvanceState(tx, companyId, employeeId);
     if (!rows.length) return rows;
 
     await tx.advanceSalary.updateMany({
