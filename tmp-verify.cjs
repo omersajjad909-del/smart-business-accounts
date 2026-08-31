@@ -479,10 +479,10 @@ function carryIntoMonth(carries, monthYear) {
   return carry;
 }
 async function getEmployeeAdvanceState(companyId, employeeId) {
-  return prisma.$transaction((tx) => computeEmployeeAdvanceState(tx, companyId, employeeId));
+  return computeEmployeeAdvanceState(prisma, companyId, employeeId);
 }
 async function getEmployeeCarryForward(companyId, employeeId, monthYear) {
-  const state = await prisma.$transaction((tx) => computeEmployeeAdvanceState(tx, companyId, employeeId));
+  const state = await computeEmployeeAdvanceState(prisma, companyId, employeeId);
   return carryIntoMonth(state.carries, monthYear);
 }
 
