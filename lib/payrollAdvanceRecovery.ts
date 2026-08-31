@@ -1,10 +1,28 @@
 import { prisma } from "@/lib/prisma";
 import { computePayroll, money } from "@/lib/payrollCalc";
 
-// The shared client is $extends()-wrapped, so its transaction callback hands back
-// an extended client rather than a plain Prisma.TransactionClient. Derive the type
-// from $transaction itself so every caller lines up.
-type DbClient = Parameters<Parameters<typeof prisma.$transaction>[0]>[0];
+type AdvanceRecord = { id: string; amount: number; date: Date; monthYear: string | null; createdAt: Date };
+type PayrollRecord = {
+  monthYear: string;
+  baseSalary: number;
+  allowances: number;
+  deductions: number;
+  deductionReason: string | null;
+  additionalCash: number;
+  createdAt: Date;
+};
+type AttendanceRecord = { date: Date; status: string; checkIn: Date | null; checkOut: Date | null };
+
+// Structural, so the read-only callers can pass the shared client straight in and
+// the reconciler can pass its transaction client. Wrapping the reads in an
+// interactive transaction just to satisfy a nominal type was timing out against
+// the pooled connection (P2028) — reads never needed one.
+type DbClient = {
+  advanceSalary: { findMany(args: any): Promise<AdvanceRecord[]> };
+  payroll:       { findMany(args: any): Promise<PayrollRecord[]> };
+  employee:      { findFirst(args: any): Promise<any> };
+  attendance:    { findMany(args: any): Promise<AttendanceRecord[]> };
+};
 
 export type AdvanceRecoveryRow = {
   advanceId: string;
