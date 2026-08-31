@@ -1,6 +1,7 @@
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
 import { signJwt } from "@/lib/auth";
+import { DEMO_SESSION_MINUTES } from "@/lib/demoSession";
 import {
   DEMO_BUSINESS_TYPES,
   DEMO_SEED_VERSION,
@@ -28,8 +29,12 @@ export const DEMO_PASSWORD = "12345678";
 const DEMO_USER_NAME = "Demo User";
 const DEMO_ROLE = "ADMIN";
 
-/** How long a demo session lasts. Matches the booking slot length. */
-export const DEMO_SESSION_MINUTES = 60;
+/**
+ * How long a demo session lasts. Lives in lib/demoSession.ts so the marketing
+ * page — a client component that cannot import this module — reads the same
+ * number instead of keeping its own.
+ */
+export { DEMO_SESSION_MINUTES } from "@/lib/demoSession";
 
 /**
  * Ceiling on live sandboxes. Not a capacity limit — each sandbox is only a few

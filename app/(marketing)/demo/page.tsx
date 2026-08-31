@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { setStoredDemoBusinessPreference } from "@/lib/auth";
 import BookingModal from "./BookingModal";
 import { DEMO_BUSINESSES, type DemoBusiness, type DemoBusinessId } from "@/lib/businessCatalog";
+import { DEMO_SESSION_LABEL, DEMO_SESSION_DURATION_TEXT } from "@/lib/demoSession";
 
 const FONT = "'Outfit','Inter',sans-serif";
 
@@ -11,7 +12,8 @@ const FONT = "'Outfit','Inter',sans-serif";
 // uses the same pair but lands in their own sandbox.
 const DEMO_EMAIL = "demo@finovaos.app";
 const DEMO_PASSWORD = "12345678";
-const DEMO_MINUTES = 60;
+// Session length lives in lib/demoSession.ts — this page used to carry its own
+// copy, so the promised length and the real one could drift apart.
 
 const BUSINESSES = DEMO_BUSINESSES;
 
@@ -71,7 +73,7 @@ const TRUST_STATS = [
   { value: "8",            label: "Live Demos",       icon: "🏢" },
   { value: "Early Access", label: "Limited Spots",    icon: "🚀" },
   { value: "No signup",    label: "To Start",         icon: "⚡" },
-  { value: "1 hour",       label: "Full Access",      icon: "⏱️" },
+  { value: DEMO_SESSION_DURATION_TEXT, label: "Full Access",      icon: "⏱️" },
 ];
 
 export default function DemoPage() {
@@ -286,7 +288,7 @@ export default function DemoPage() {
         {/* The page now lists only what actually opens. A grid of "coming soon"
             cards next to live ones just made a visitor guess which was which. */}
         <p style={{ fontSize: 17, color: "rgba(255,255,255,.5)", lineHeight: 1.8, maxWidth: 620, margin: "0 auto 32px" }}>
-          {BUSINESSES.length} business types, all live right now. Each one opens a private {DEMO_MINUTES}-minute
+          {BUSINESSES.length} business types, all live right now. Each one opens a private {DEMO_SESSION_LABEL}
           workspace configured for your industry — real customers, stock, posted invoices and payroll already
           loaded, so you can test it like it is your own business.
         </p>
@@ -541,7 +543,7 @@ export default function DemoPage() {
 
             {isDemoLive(biz.liveBusinessType) && (
               <div style={{ marginTop: -8, marginBottom: 20, padding: "14px 18px", borderRadius: 16, background: "rgba(16,185,129,.07)", border: "1px solid rgba(16,185,129,.2)", color: "rgba(255,255,255,.72)", fontSize: 13, lineHeight: 1.7 }}>
-                Opens a private {DEMO_MINUTES}-minute workspace on the <strong style={{ color: "#fff" }}>{planNames[selectedPlan]}</strong> plan,
+                Opens a private {DEMO_SESSION_LABEL} workspace on the <strong style={{ color: "#fff" }}>{planNames[selectedPlan]}</strong> plan,
                 already loaded with customers, suppliers, stock, posted invoices, payroll and live dashboard figures —
                 yours alone, and wiped the moment you leave.
                 Sign-in is <strong style={{ color: "#fff" }}>{DEMO_EMAIL}</strong> / <strong style={{ color: "#fff" }}>{DEMO_PASSWORD}</strong> if you would rather log in yourself.
@@ -723,7 +725,7 @@ export default function DemoPage() {
                 Hit <strong style={{ color: biz.color }}>▶ Start Demo Now</strong> and you land in a real dashboard pre-configured for {biz.label} —
                 customers, suppliers, stock, posted invoices and a payroll run already in place. Create your own invoices,
                 run payroll, check the reports. The workspace is yours alone, and everything you do is wiped when the
-                {" "}{DEMO_MINUTES} minutes are up. Prefer a guided walkthrough? Book a slot instead.
+                {" "}{DEMO_SESSION_DURATION_TEXT} are up. Prefer a guided walkthrough? Book a slot instead.
               </div>
               <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
                 {[
