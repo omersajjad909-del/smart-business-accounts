@@ -78,7 +78,18 @@ export async function GET(req: NextRequest) {
       rates,
     });
 
+    // Unpaid balance rolled over from the last payroll month. It is deliberately
+    // NOT part of any advance balance, so the payroll screen can list it as its
+    // own "Prev Bal" line on top of this month's advance and absence deductions.
+    let carryForward = 0;
+    try {
+      carryForward = await getEmployeeCarryForward(companyId, employeeId, monthYear);
+    } catch (carryErr: any) {
+      console.error("Carry-forward lookup failed (non-fatal):", carryErr?.message || carryErr);
+    }
+
     return NextResponse.json({
+      carryForward,
       employee: {
         id: employee.id,
         name: `${employee.firstName || ""} ${employee.lastName || ""}`.trim(),

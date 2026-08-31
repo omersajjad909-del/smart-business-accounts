@@ -23,13 +23,20 @@ export async function GET(req: NextRequest) {
 
     const where: any = {};
     where.companyId = companyId;
+    where.deletedAt = null;
     if (employeeId) where.employeeId = employeeId;
     if (status) where.status = status;
-    
+
     if (monthYear) {
+      // An advance taken *after* the month being paid must not show up as a
+      // deduction for that month — e.g. an August advance being pulled into a
+      // July payroll run. Undated (monthYear: null) advances are matched on the
+      // day they were handed out instead.
+      const [y, m] = monthYear.split("-").map(Number);
+      const monthEnd = Number.isFinite(y) && Number.isFinite(m) ? new Date(y, m, 1) : null;
       where.OR = [
         { monthYear: monthYear },
-        { monthYear: null }
+        { monthYear: null, ...(monthEnd ? { date: { lt: monthEnd } } : {}) }
       ];
     }
 

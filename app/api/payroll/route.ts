@@ -8,6 +8,7 @@ import {
   deleteVoucherByTag,
 } from "@/lib/payrollAccounting";
 import { reconcileEmployeeAdvanceRecoveries } from "@/lib/payrollAdvanceRecovery";
+import { money } from "@/lib/payrollCalc";
 
 // GET: Fetch payroll records
 export async function GET(req: NextRequest) {
@@ -79,21 +80,28 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // Payroll is settled in whole rupees — store it that way so paisa tails never
+    // leak into the deduction or the carry-forward balance shown next month.
+    const baseAmount   = money(baseSalary);
+    const allowAmount  = money(allowances);
+    const dedAmount    = money(deductions);
+    const cashAmount   = money(additionalCash);
+
     // Net Salary should be strictly Earnings - Deductions.
-    // Additional Cash is a payment/advance that reduces the balance (or increases debt), 
+    // Additional Cash is a payment/advance that reduces the balance (or increases debt),
     // calculated dynamically as (NetSalary - AdditionalCash).
-    const netSalary = baseSalary + (allowances || 0) - (deductions || 0);
+    const netSalary = baseAmount + allowAmount - dedAmount;
 
     const payroll = await prisma.payroll.create({
       data: {
         companyId,
         employeeId,
         monthYear,
-        baseSalary,
-        allowances: allowances || 0,
-        deductions: deductions || 0,
+        baseSalary: baseAmount,
+        allowances: allowAmount,
+        deductions: dedAmount,
         deductionReason: deductionReason || null,
-        additionalCash: additionalCash || 0,
+        additionalCash: cashAmount,
         netSalary,
       },
     });
@@ -162,11 +170,16 @@ export async function PUT(req: NextRequest) {
     const existing = await prisma.payroll.findFirst({ where: { id, companyId } });
     if (!existing) return NextResponse.json({ error: "Payroll not found" }, { status: 404 });
 
+    // Whole rupees only — same rule as create.
+    for (const field of ["baseSalary", "allowances", "deductions", "additionalCash"] as const) {
+      if (body[field] !== undefined) body[field] = money(body[field]);
+    }
+
     // Recalculate netSalary if needed
     if (body.baseSalary || body.allowances || body.deductions || body.additionalCash !== undefined) {
-      body.netSalary = (body.baseSalary ?? existing.baseSalary) +
-                       (body.allowances ?? existing.allowances) -
-                       (body.deductions ?? existing.deductions);
+      body.netSalary = money(body.baseSalary ?? existing.baseSalary) +
+                       money(body.allowances ?? existing.allowances) -
+                       money(body.deductions ?? existing.deductions);
     }
 
     const wasUnpaid = existing.paymentStatus !== "PAID";

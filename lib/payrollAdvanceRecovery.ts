@@ -1,9 +1,10 @@
-import type { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { computePayroll, money } from "@/lib/payrollCalc";
 
-type PayrollAdvanceTx = Prisma.TransactionClient;
-type DbClient = PayrollAdvanceTx | typeof prisma;
+// The shared client is $extends()-wrapped, so its transaction callback hands back
+// an extended client rather than a plain Prisma.TransactionClient. Derive the type
+// from $transaction itself so every caller lines up.
+type DbClient = Parameters<Parameters<typeof prisma.$transaction>[0]>[0];
 
 export type AdvanceRecoveryRow = {
   advanceId: string;
@@ -243,12 +244,20 @@ export function carryIntoMonth(carries: MonthCarry[], monthYear: string): number
   return carry;
 }
 
+/** Read-only view of an employee's advance balances and month-end carry-forwards. */
+export async function getEmployeeAdvanceState(
+  companyId: string,
+  employeeId: string
+): Promise<EmployeeAdvanceState> {
+  return prisma.$transaction((tx) => computeEmployeeAdvanceState(tx, companyId, employeeId));
+}
+
 export async function getEmployeeCarryForward(
   companyId: string,
   employeeId: string,
   monthYear: string
 ): Promise<number> {
-  const state = await computeEmployeeAdvanceState(prisma, companyId, employeeId);
+  const state = await prisma.$transaction((tx) => computeEmployeeAdvanceState(tx, companyId, employeeId));
   return carryIntoMonth(state.carries, monthYear);
 }
 

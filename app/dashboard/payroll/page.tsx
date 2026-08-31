@@ -17,7 +17,8 @@ interface Payroll {
   employee: { firstName: string; lastName: string; employeeId: string };
 }
 
-function fmt(n: number) { return n.toLocaleString("en-PK"); }
+// Payroll is settled in whole rupees — never show a paisa tail (999.67 → 1,000).
+function fmt(n: number) { return Math.round(Number(n) || 0).toLocaleString("en-PK"); }
 
 export default function PayrollPage() {
   const { isMobile } = useResponsive();
@@ -85,31 +86,17 @@ export default function PayrollPage() {
       ]);
       const advData  = await advRes.json();
       const calcData = calcRes.ok ? await calcRes.json() : null;
-      const advTotal = Array.isArray(advData)
+      const advTotal = Math.round(Array.isArray(advData)
         ? advData.reduce((sum: number, advance: any) => sum + Number(advance.balance ?? advance.amount ?? 0), 0)
-        : 0;
+        : 0);
       setDetectedAdv(advTotal);
 
-      // Previous month unpaid balance — only for shortfalls NOT already tracked
-      // by the advance balance above. If last month's negative balance came from
-      // an advance deduction, that outstanding amount is already carried forward
-      // via the advance's own `balance` field (rolled into advTotal), so adding
-      // it again here would double-count the same debt.
-      let prevDeduction = 0;
-      try {
-        const [yr, mo] = form.monthYear.split("-").map(Number);
-        let py = yr, pm = mo - 1; if (pm === 0) { pm = 12; py--; }
-        const prevStr = `${py}-${String(pm).padStart(2,"0")}`;
-        const prevRes  = await fetch(`/api/payroll?employeeId=${form.employeeId}&monthYear=${prevStr}`, { cache: "no-store" });
-        const prevData = await prevRes.json();
-        if (Array.isArray(prevData) && prevData.length > 0) {
-          const rec = prevData[0];
-          const wasAdvanceDeduction = String(rec.deductionReason || "").toLowerCase().includes("advance");
-          const prevNet = rec.baseSalary + (rec.allowances || 0) - (rec.deductions || 0);
-          const prevBal = prevNet - (rec.additionalCash || 0);
-          if (prevBal < 0 && !wasAdvanceDeduction) prevDeduction = Math.abs(prevBal);
-        }
-      } catch {}
+      // Last month's unpaid balance, worked out server-side by the same engine
+      // that tracks advance recovery. It only ever contains debt that is NOT
+      // already sitting on an advance balance (an advance the salary could not
+      // cover stays on the advance), so it adds cleanly on top of advTotal
+      // instead of double-counting it.
+      const prevDeduction = Math.round(Number(calcData?.carryForward) || 0);
 
       // Attendance-driven numbers (absent + half-day deduction offset by OT credit)
       let attDeduction = 0;
@@ -118,8 +105,8 @@ export default function PayrollPage() {
 
       if (calcData?.breakdown) {
         const bd = calcData.breakdown;
-        attDeduction = Number(bd.netDeduction) || 0;
-        otAllowance  = Number(bd.otAllowance)  || 0;
+        attDeduction = Math.round(Number(bd.netDeduction) || 0);
+        otAllowance  = Math.round(Number(bd.otAllowance)  || 0);
         setAttSummary({
           present: calcData.counts.present,
           absent:  calcData.counts.absent,
@@ -151,10 +138,10 @@ export default function PayrollPage() {
         setAttSummary(null);
       }
 
-      if (prevDeduction > 0) parts.unshift(`Prev Bal: ${prevDeduction}`);
+      if (prevDeduction > 0) parts.unshift(`Prev Bal: ${fmt(prevDeduction)}`);
       if (advTotal > 0)      parts.push("Advance");
 
-      const totalDeduction = advTotal + attDeduction + prevDeduction;
+      const totalDeduction = Math.round(advTotal + attDeduction + prevDeduction);
       const shouldUpdate   = totalDeduction > 0 || otAllowance > 0;
       if (shouldUpdate) {
         setForm(p => ({
