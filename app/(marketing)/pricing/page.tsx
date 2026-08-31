@@ -705,14 +705,15 @@ export default function PricingPage() {
           {PLANS.map((plan) => {
             const pricingKey = plan.slug as keyof PlanPricing;
             const regularPrice = billing === "yearly" ? publicPricing[pricingKey].yearly : publicPricing[pricingKey].monthly;
-            const introPrice = Math.round(regularPrice * 0.50);
 
             // Use admin-set PKR prices when visitor is from Pakistan
             const pkrPlanKey = plan.slug as "starter" | "professional" | "enterprise";
             const useAdminPkr = isPKUser && pkrPricing != null;
             const pkrAmount = useAdminPkr ? (billing === "yearly" ? pkrPricing![pkrPlanKey].yearly : pkrPricing![pkrPlanKey].monthly) : 0;
             const displayRegular = useAdminPkr ? `₨${pkrAmount.toLocaleString("en-PK")}` : formatPrice(regularPrice);
-            const displayIntro   = useAdminPkr ? `₨${Math.round(pkrAmount * 0.50).toLocaleString("en-PK")}` : formatPrice(introPrice);
+            // Monthly list price — shown struck through on the yearly tab so the
+            // 20% saving reads without an intro-offer badge.
+            const displayMonthly = useAdminPkr ? `₨${pkrPricing![pkrPlanKey].monthly.toLocaleString("en-PK")}` : formatPrice(publicPricing[pricingKey].monthly);
             return (
               <div key={plan.slug} style={{ position: "relative", borderRadius: 22, background: plan.featured ? "linear-gradient(160deg,rgba(99,102,241,.16),rgba(255,255,255,.03))" : "rgba(255,255,255,.03)", border: `1.5px solid ${plan.border}`, overflow: "hidden", boxShadow: plan.featured ? "0 28px 80px rgba(99,102,241,.22)" : "0 10px 30px rgba(0,0,0,.16)" }}>
                 <div style={{ height: 3, background: plan.gradient }} />
@@ -721,17 +722,19 @@ export default function PricingPage() {
                   <div style={{ fontSize: 22, fontWeight: 900, marginBottom: 6 }}>{plan.name}</div>
                   <div style={{ fontSize: 13, color: "rgba(255,255,255,.42)", lineHeight: 1.5, minHeight: 40 }}>{plan.tagline}</div>
                   <div style={{ margin: "24px 0" }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
-                      <span style={{ fontSize: 11, color: "rgba(255,255,255,.55)", textTransform: "uppercase", letterSpacing: ".06em", fontWeight: 800 }}>Now</span>
-                      <span style={{ padding: "2px 8px", borderRadius: 6, background: "rgba(249,115,22,.18)", border: "1px solid rgba(249,115,22,.4)", fontSize: 10, fontWeight: 800, color: "#fb923c" }}>50% OFF x 3 months</span>
+                    {billing === "yearly" && (
+                      <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
+                        <span style={{ fontSize: 13, fontWeight: 700, color: "rgba(255,255,255,.35)", textDecoration: "line-through" }}>{displayMonthly}</span>
+                        <span style={{ padding: "2px 8px", borderRadius: 6, background: "rgba(34,197,94,.16)", border: "1px solid rgba(34,197,94,.38)", fontSize: 10, fontWeight: 800, color: "#4ade80" }}>SAVE 20%</span>
+                      </div>
+                    )}
+                    <div style={{ display: "flex", alignItems: "baseline", gap: 5 }}>
+                      <span style={{ fontSize: 42, fontWeight: 900, color: plan.color, letterSpacing: "-.03em", lineHeight: 1 }}>{displayRegular}</span>
+                      <span style={{ fontSize: 14, fontWeight: 700, color: "rgba(255,255,255,.42)" }}>/mo</span>
                     </div>
-                    <div style={{ fontSize: 42, fontWeight: 900, color: plan.color, letterSpacing: "-.03em", lineHeight: 1 }}>{displayIntro}</div>
-                    <div style={{ fontSize: 13, color: "rgba(255,255,255,.92)", marginTop: 6, fontWeight: 700 }}>
-                      Then {displayRegular}/mo
+                    <div style={{ fontSize: 12.5, color: "rgba(255,255,255,.45)", marginTop: 8 }}>
+                      {billing === "yearly" ? "Billed annually — 20% off the monthly price" : "Billed monthly — pay yearly and save 20%"}
                     </div>
-                    {/* <div style={{ fontSize: 11, color: "rgba(255,255,255,.36)", marginTop: 6 }}>
-                      {billing === "yearly" ? "Intro price for first 3 months, then yearly-plan monthly equivalent applies." : "Intro price for first 3 months, then regular monthly billing starts."}
-                    </div> */}
                   </div>
                   {signupsOpen ? (
                     <Link href={buildHref(plan.slug)} style={{ display: "block", textAlign: "center", padding: "12px 18px", borderRadius: 12, textDecoration: "none", color: "white", fontWeight: 800, background: plan.gradient, marginBottom: 22, fontSize: 14 }}>
@@ -742,9 +745,6 @@ export default function PricingPage() {
                       Launching Soon
                     </button>
                   )}
-                  {/* <div style={{ fontSize: 11, color: "rgba(255,255,255,.42)", marginTop: -12, marginBottom: 16, textAlign: "center" }}>
-                    You&apos;ll be charged {formatPrice(regularPrice)}/mo after the first 3 months.
-                  </div> */}
                   <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
                     {(planHighlights[plan.slug] ?? DEFAULT_HIGHLIGHTS[plan.slug as keyof typeof DEFAULT_HIGHLIGHTS] ?? []).map((f: string, idx: number) => (
                       <div key={idx} style={{ display: "flex", alignItems: "center", gap: 10 }}>
