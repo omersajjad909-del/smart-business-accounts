@@ -136,6 +136,23 @@ export default function InvestorReportsPage() {
     return inWindow.map((l) => lotResult(l, allProduction));
   }, [lotRecords, partyId, from, to, allProduction]);
 
+  /**
+   * Output in the window that no lot claims.
+   *
+   * The table above is built lot by lot, so a production line saved without one
+   * never reaches it — and its earning is missing from the profit total. On a
+   * screen that would be a detail; this is the page that gets printed and handed
+   * to the party, so it has to say so rather than quietly under-report.
+   */
+  const unlinked = useMemo(() => {
+    const open = allProduction.filter((l) => !l.lotId && l.date >= from && l.date <= to);
+    return {
+      count: open.length,
+      qty: round2(open.reduce((s, l) => s + l.qty, 0)),
+      share: round2(open.reduce((s, l) => s + l.amount, 0)),
+    };
+  }, [allProduction, from, to]);
+
   const lotSums = useMemo(() => {
     const totals = lotTotals(lotRows.map((r) => r.lot));
     let producedFromLots = 0;
@@ -508,6 +525,27 @@ export default function InvestorReportsPage() {
             {!loading && lotRows.length === 0 && <Empty>No material recorded in this window.</Empty>}
             {loading && <Empty>Loading…</Empty>}
           </TableWrap>
+          {unlinked.count > 0 && (
+            <div
+              style={{
+                marginTop: 14,
+                border: "1px solid #fbbf2455",
+                borderRadius: 10,
+                padding: "12px 14px",
+                fontSize: 12.5,
+                lineHeight: 1.6,
+                color: "#fbbf24",
+                maxWidth: 620,
+              }}
+            >
+              Also produced in this window but not tied to any lot: <strong>{fmtQty(unlinked.qty)} {unit}</strong> across{" "}
+              {unlinked.count} line{unlinked.count === 1 ? "" : "s"}, earning <strong>{fmtMoney(unlinked.share)}</strong>. That is not
+              counted in the table above, so your total earning for this window is{" "}
+              <strong>{fmtMoney(round2(lotSums.share + unlinked.share))}</strong>. Tie those lines to a lot on the Production page to
+              bring them in.
+            </div>
+          )}
+
           <p style={{ fontSize: 12.5, color: MUTED, lineHeight: 1.6, marginTop: 14, maxWidth: 620 }}>
             The window picks the lots by the day the material came in. Output is counted whenever it was spun, so a batch lifted at
             the end of the window still shows the kilos it went on to produce. Profit per {unit} is your own earning under the agreed
