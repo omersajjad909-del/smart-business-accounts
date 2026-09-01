@@ -182,6 +182,20 @@ export function mapGrade(r: BusinessRecord): Grade {
   };
 }
 
+export function mapLot(r: BusinessRecord): Lot {
+  return {
+    id: r.id,
+    partyId: str(r.refId),
+    date: day(r.date),
+    lotNo: str(r.data?.lotNo),
+    material: r.title,
+    value: num(r.amount),
+    qty: num(r.data?.qty),
+    note: str(r.data?.note),
+    status: r.status || "open",
+  };
+}
+
 export function mapProduction(r: BusinessRecord): ProductionLine {
   return {
     id: r.id,
@@ -193,6 +207,7 @@ export function mapProduction(r: BusinessRecord): ProductionLine {
     rate: num(r.data?.rate),
     baseProfit: num(r.data?.baseProfit),
     amount: num(r.amount),
+    lotId: str(r.data?.lotId),
     settlementId: str(r.data?.settlementId),
   };
 }
@@ -246,6 +261,75 @@ export function lineAmount(party: Party | undefined, qty: number, rate: number, 
     return round2((baseProfit * (party.sharePercent || 0)) / 100);
   }
   return round2(qty * rate);
+}
+
+export type LotResult = {
+  lot: Lot;
+  /** What a unit of raw material cost — value ÷ weight taken in. */
+  costPerUnit: number;
+  producedQty: number;
+  share: number;
+  /** Output against input. Under 100% is normal: waste, moisture, trimmings. */
+  recoveryPct: number;
+  /** The investor's own earning per unit produced, across every grade in the lot. */
+  sharePerUnit: number;
+  lineCount: number;
+};
+
+/**
+ * Tie one material batch to the output that came out of it.
+ *
+ * Deliberately reads production rather than storing its own totals. Delete a
+ * production line, correct a quantity, sweep a cycle into a settlement — the
+ * lot re-reads and stays true. A stored total would have gone stale the first
+ * time someone fixed a typo.
+ */
+export function lotResult(lot: Lot, lines: ProductionLine[]): LotResult {
+  let producedQty = 0;
+  let share = 0;
+  let lineCount = 0;
+  for (const line of lines) {
+    if (line.lotId !== lot.id) continue;
+    producedQty += line.qty;
+    share += line.amount;
+    lineCount += 1;
+  }
+  return {
+    lot,
+    costPerUnit: lot.qty > 0 ? round2(lot.value / lot.qty) : 0,
+    producedQty: round2(producedQty),
+    share: round2(share),
+    recoveryPct: lot.qty > 0 ? round2((producedQty / lot.qty) * 100) : 0,
+    sharePerUnit: producedQty > 0 ? round2(share / producedQty) : 0,
+    lineCount,
+  };
+}
+
+export function lotTotals(lots: Lot[]) {
+  let value = 0;
+  let qty = 0;
+  for (const l of lots) {
+    value += l.value;
+    qty += l.qty;
+  }
+  return { value: round2(value), qty: round2(qty), count: lots.length };
+}
+
+/**
+ * The next lot number for a party.
+ *
+ * Numbered off the highest one already used rather than the count, so deleting
+ * a lot never hands its number to a different batch — the number on a printed
+ * statement has to stay pointing at the same material for good.
+ */
+export function nextLotNo(existing: Lot[]): string {
+  let max = 0;
+  for (const l of existing) {
+    const digits = String(l.lotNo).replace(/[^0-9]/g, "");
+    const n = Number(digits);
+    if (digits && Number.isFinite(n) && n > max) max = n;
+  }
+  return "LOT-" + String(max + 1).padStart(3, "0");
 }
 
 export function capitalTotals(entries: CapitalEntry[]) {

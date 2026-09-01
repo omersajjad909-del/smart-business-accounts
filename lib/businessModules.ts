@@ -105,7 +105,7 @@ export type ModuleKey =
   // Investor / profit sharing. One key per page, so a plan can hand out the
   // statement without the capital ledger that sits behind it.
   | "investor_parties" | "investor_capital" | "investor_grades"
-  | "investor_production" | "investor_settlements"
+  | "investor_lots" | "investor_production" | "investor_settlements"
   | "investor_statement" | "investor_reports"
   // Phase 1 — Clearing & Forwarding specific
   | "cnf_jobs";
@@ -274,7 +274,7 @@ export const BUSINESS_TYPES: BusinessTypeMeta[] = [
     description: "Capital placed in someone else's business — track output, take a share",
     tagline: "Capital → Production → Share",
     color: "#14b8a6", gradient: "linear-gradient(135deg,#0d9488,#2dd4bf)", category: "Finance",
-    modules: [...CORE_P1, "investor_parties","investor_capital","investor_grades","investor_production","investor_settlements","investor_statement","investor_reports","audit_trail"],
+    modules: [...CORE_P1, "investor_parties","investor_capital","investor_grades","investor_lots","investor_production","investor_settlements","investor_statement","investor_reports","audit_trail"],
     defaultAccounts: [
       ...COMMON_ACCOUNTS,
       { code: "1300", name: "Investment in Partnership", type: "Asset" },
@@ -290,6 +290,7 @@ export const BUSINESS_TYPES: BusinessTypeMeta[] = [
       { key: "outstanding_balance", label: "Outstanding",          icon: "🧾", color: "#fbbf24" },
     ],
     quickActions: [
+      { label: "Record Material",   href: "/dashboard/investors/lots",        icon: "📦", color: "#a78bfa" },
       { label: "Enter Production",  href: "/dashboard/investors/production",  icon: "⚖️", color: "#38bdf8" },
       { label: "Close Settlement",  href: "/dashboard/investors/settlements", icon: "🤝", color: "#14b8a6" },
       { label: "Print Statement",   href: "/dashboard/investors/statement",   icon: "🧾", color: "#fbbf24" },

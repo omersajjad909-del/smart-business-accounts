@@ -2126,6 +2126,7 @@ export default function DashboardLayout({
               {hasDashboardFeature("INVESTOR_PARTIES") && <NavLink href="/dashboard/investors/parties" pathname={pathname}>Parties</NavLink>}
               {hasDashboardFeature("INVESTOR_CAPITAL") && <NavLink href="/dashboard/investors/capital" pathname={pathname}>Capital</NavLink>}
               {hasDashboardFeature("INVESTOR_GRADES") && <NavLink href="/dashboard/investors/grades" pathname={pathname}>Profit Terms</NavLink>}
+              {hasDashboardFeature("INVESTOR_LOTS") && <NavLink href="/dashboard/investors/lots" pathname={pathname}>Material In</NavLink>}
               {hasDashboardFeature("INVESTOR_PRODUCTION") && <NavLink href="/dashboard/investors/production" pathname={pathname}>Production</NavLink>}
               {hasDashboardFeature("INVESTOR_SETTLEMENTS") && <NavLink href="/dashboard/investors/settlements" pathname={pathname}>Settlements</NavLink>}
               {hasDashboardFeature("INVESTOR_STATEMENT") && <NavLink href="/dashboard/investors/statement" pathname={pathname}>Statement</NavLink>}

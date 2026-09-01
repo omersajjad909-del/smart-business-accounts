@@ -29,6 +29,7 @@ const CATEGORY_META: Record<string, BusinessRecordMeta> = {
   investor_party: { label: "Investor Party", business: "investor" },
   investor_capital: { label: "Investor Capital Entry", business: "investor" },
   investor_grade: { label: "Investor Profit Grade", business: "investor" },
+  investor_lot: { label: "Investor Material Lot", business: "investor" },
   investor_production: { label: "Investor Production Line", business: "investor" },
   investor_settlement: { label: "Investor Settlement", business: "investor" },
 };

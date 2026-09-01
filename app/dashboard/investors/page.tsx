@@ -16,6 +16,7 @@ import {
   fmtMoney,
   fmtQty,
   mapCapital,
+  mapLot,
   mapParty,
   mapProduction,
   mapSettlement,
@@ -29,11 +30,13 @@ export default function InvestorOverviewPage() {
   const { isMobile } = useResponsive();
   const { records: partyRecords, loading } = useBusinessRecords(CAT.party);
   const { records: capitalRecords } = useBusinessRecords(CAT.capital);
+  const { records: lotRecords } = useBusinessRecords(CAT.lot);
   const { records: productionRecords } = useBusinessRecords(CAT.production);
   const { records: settlementRecords } = useBusinessRecords(CAT.settlement);
 
   const parties = useMemo(() => partyRecords.map(mapParty).filter((p) => p.status === "active"), [partyRecords]);
   const capital = useMemo(() => capitalRecords.map(mapCapital), [capitalRecords]);
+  const lots = useMemo(() => lotRecords.map(mapLot), [lotRecords]);
   const production = useMemo(() => productionRecords.map(mapProduction), [productionRecords]);
   const settlements = useMemo(() => settlementRecords.map(mapSettlement), [settlementRecords]);
 
@@ -45,12 +48,15 @@ export default function InvestorOverviewPage() {
         const caps = capitalTotals(capital.filter((c) => c.partyId === p.id));
         const lines = production.filter((l) => l.partyId === p.id);
         const monthLines = lines.filter((l) => monthKey(l.date) === thisMonth);
+        const monthLots = lots.filter((l) => l.partyId === p.id && monthKey(l.date) === thisMonth);
         const cycles = settlements.filter((s) => s.partyId === p.id).sort((a, b) => b.cycleNo - a.cycleNo);
         const last = cycles[0];
         const open = lines.filter((l) => !l.settlementId);
         return {
           party: p,
           net: caps.net,
+          monthMaterial: round2(monthLots.reduce((s, l) => s + l.value, 0)),
+          monthMaterialQty: round2(monthLots.reduce((s, l) => s + l.qty, 0)),
           monthQty: round2(monthLines.reduce((s, l) => s + l.qty, 0)),
           monthEarned: round2(monthLines.reduce((s, l) => s + l.amount, 0)),
           openEarned: round2(open.reduce((s, l) => s + l.amount, 0)),
@@ -61,12 +67,14 @@ export default function InvestorOverviewPage() {
           overdue: last ? daysBetween(last.toDate, todayISO()) > p.cycleDays : open.length > 0,
         };
       }),
-    [parties, capital, production, settlements, thisMonth],
+    [parties, capital, lots, production, settlements, thisMonth],
   );
 
   const totals = useMemo(
     () => ({
       net: round2(rows.reduce((s, r) => s + r.net, 0)),
+      monthMaterial: round2(rows.reduce((s, r) => s + r.monthMaterial, 0)),
+      monthMaterialQty: round2(rows.reduce((s, r) => s + r.monthMaterialQty, 0)),
       monthQty: round2(rows.reduce((s, r) => s + r.monthQty, 0)),
       monthEarned: round2(rows.reduce((s, r) => s + r.monthEarned, 0)),
       outstanding: round2(rows.reduce((s, r) => s + r.outstanding, 0)),
@@ -85,6 +93,8 @@ export default function InvestorOverviewPage() {
       <Tiles
         items={[
           { label: "Capital placed", value: fmtMoney(totals.net) },
+          { label: "Material in this month", value: fmtMoney(totals.monthMaterial) },
+          { label: "Weight in this month", value: fmtQty(totals.monthMaterialQty) },
           { label: "Produced this month", value: fmtQty(totals.monthQty) },
           { label: "Your share this month", value: fmtMoney(totals.monthEarned), tone: "#2dd4bf" },
           { label: "Outstanding", value: fmtMoney(totals.outstanding), tone: totals.outstanding > 0 ? "#fbbf24" : undefined },
@@ -164,9 +174,10 @@ export default function InvestorOverviewPage() {
             { n: 1, t: "Parties", d: "Who holds the money and how often you settle.", href: "/dashboard/investors/parties", once: true },
             { n: 2, t: "Capital", d: "What went in, what came back out.", href: "/dashboard/investors/capital", once: true },
             { n: 3, t: "Profit Terms", d: "What each grade pays, and from which day.", href: "/dashboard/investors/grades", once: true },
-            { n: 4, t: "Production", d: "A whole cycle typed in one pass.", href: "/dashboard/investors/production", once: false },
-            { n: 5, t: "Settlements", d: "Earned, paid, carried forward.", href: "/dashboard/investors/settlements", once: false },
-            { n: 6, t: "Statement", d: "The page you hand over.", href: "/dashboard/investors/statement", once: false },
+            { n: 4, t: "Material In", d: "What the money bought — value and weight.", href: "/dashboard/investors/lots", once: false },
+            { n: 5, t: "Production", d: "A whole cycle typed in one pass.", href: "/dashboard/investors/production", once: false },
+            { n: 6, t: "Settlements", d: "Earned, paid, carried forward.", href: "/dashboard/investors/settlements", once: false },
+            { n: 7, t: "Statement", d: "The page you hand over.", href: "/dashboard/investors/statement", once: false },
           ].map((s) => (
             <Link
               key={s.n}

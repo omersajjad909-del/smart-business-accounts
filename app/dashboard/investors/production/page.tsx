@@ -19,6 +19,7 @@ import {
   fmtQty,
   lineAmount,
   mapGrade,
+  mapLot,
   mapParty,
   mapProduction,
   rateOn,
@@ -42,18 +43,19 @@ import {
   MUTED,
 } from "../_ui";
 
-type Row = { key: string; date: string; gradeId: string; qty: string; baseProfit: string };
+type Row = { key: string; date: string; gradeId: string; lotId: string; qty: string; baseProfit: string };
 
 let rowSeq = 0;
-function blankRow(date: string, gradeId: string): Row {
+function blankRow(date: string, gradeId: string, lotId = ""): Row {
   rowSeq += 1;
-  return { key: "r" + rowSeq, date, gradeId, qty: "", baseProfit: "" };
+  return { key: "r" + rowSeq, date, gradeId, lotId, qty: "", baseProfit: "" };
 }
 
 export default function InvestorProductionPage() {
   const { isMobile } = useResponsive();
   const { records: partyRecords } = useBusinessRecords(CAT.party);
   const { records: gradeRecords } = useBusinessRecords(CAT.grade);
+  const { records: lotRecords } = useBusinessRecords(CAT.lot);
   const { records, loading, create, remove } = useBusinessRecords(CAT.production);
 
   const parties = useMemo(() => partyRecords.map(mapParty).filter((p) => p.status === "active"), [partyRecords]);
@@ -75,6 +77,22 @@ export default function InvestorProductionPage() {
         .sort((a, b) => a.sortOrder - b.sortOrder || a.name.localeCompare(b.name)),
     [gradeRecords, partyId],
   );
+
+  // Newest material first: a cycle being typed up almost always belongs to the
+  // last lot that came in, so the one the user wants is at the top of the list.
+  const lots = useMemo(
+    () =>
+      lotRecords
+        .map(mapLot)
+        .filter((l) => l.partyId === partyId)
+        .sort((a, b) => (a.date < b.date ? 1 : a.date > b.date ? -1 : a.lotNo < b.lotNo ? 1 : -1)),
+    [lotRecords, partyId],
+  );
+  const lotLabel = useMemo(() => {
+    const map = new Map<string, string>();
+    for (const l of lots) map.set(l.id, (l.lotNo || "Lot") + (l.material ? " · " + l.material : ""));
+    return map;
+  }, [lots]);
 
   const lines = useMemo(
     () =>
@@ -124,7 +142,7 @@ export default function InvestorProductionPage() {
 
   function addRow() {
     const last = rows[rows.length - 1];
-    setRows((prev) => [...prev, blankRow(last?.date || todayISO(), last?.gradeId || "")]);
+    setRows((prev) => [...prev, blankRow(last?.date || todayISO(), last?.gradeId || "", last?.lotId || "")]);
   }
 
   async function saveAll() {
@@ -151,6 +169,7 @@ export default function InvestorProductionPage() {
           date: row.date,
           data: {
             gradeId: row.gradeId,
+            lotId: row.lotId,
             qty: p.qty,
             rate: p.rate,
             baseProfit: p.base,
@@ -158,7 +177,7 @@ export default function InvestorProductionPage() {
           },
         });
       }
-      setRows([blankRow(todayISO(), grades[0]?.id || "")]);
+      setRows([blankRow(todayISO(), grades[0]?.id || "", rows[rows.length - 1]?.lotId || "")]);
       toast.success(ready.length + " line" + (ready.length === 1 ? "" : "s") + " saved");
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Could not save");
@@ -195,9 +214,10 @@ export default function InvestorProductionPage() {
         step={1}
         title="Enter the cycle"
         hint={
-          byPercentage
+          (byPercentage
             ? "Enter what was produced and the profit the business made for that entry — your share is worked out at " + (party?.sharePercent || 0) + "%."
-            : "Rate fills itself from the grade's history for that date. A blank rate means no rate was in force yet."
+            : "Rate fills itself from the grade's history for that date. A blank rate means no rate was in force yet.") +
+          " Pick the lot the output came from and Material In will show what that batch turned into — leaving it blank costs you nothing but the trace."
         }
         right={<Btn small tone="ghost" onClick={addRow}>+ Row</Btn>}
       >
@@ -207,6 +227,7 @@ export default function InvestorProductionPage() {
               <tr>
                 <th style={{ ...thStyle, width: 150 }}>Date</th>
                 <th style={thStyle}>Grade</th>
+                <th style={thStyle}>Lot</th>
                 <th style={{ ...thStyle, textAlign: "right", width: 110 }}>Qty ({party?.unit || "kg"})</th>
                 <th style={{ ...thStyle, textAlign: "right", width: 130 }}>{byPercentage ? "Business profit" : "Rate"}</th>
                 <th style={{ ...thStyle, textAlign: "right", width: 120 }}>Your share</th>
@@ -227,6 +248,16 @@ export default function InvestorProductionPage() {
                         {grades.map((g) => (
                           <option key={g.id} value={g.id}>
                             {g.name}
+                          </option>
+                        ))}
+                      </select>
+                    </td>
+                    <td style={tdStyle}>
+                      <select style={inp({ padding: "6px 9px" })} value={row.lotId} onChange={(e) => setRow(row.key, { lotId: e.target.value })}>
+                        <option value="">No lot</option>
+                        {lots.map((l) => (
+                          <option key={l.id} value={l.id}>
+                            {lotLabel.get(l.id)}
                           </option>
                         ))}
                       </select>
@@ -269,7 +300,7 @@ export default function InvestorProductionPage() {
                 );
               })}
               <tr>
-                <td style={{ ...tdStyle, fontWeight: 700 }} colSpan={2}>
+                <td style={{ ...tdStyle, fontWeight: 700 }} colSpan={3}>
                   Draft total
                 </td>
                 <td style={{ ...numTd, fontWeight: 700 }}>{fmtQty(draftTotals.qty)}</td>
@@ -297,6 +328,7 @@ export default function InvestorProductionPage() {
               <tr>
                 <th style={thStyle}>Date</th>
                 <th style={thStyle}>Grade</th>
+                <th style={thStyle}>Lot</th>
                 <th style={{ ...thStyle, textAlign: "right" }}>Qty</th>
                 <th style={{ ...thStyle, textAlign: "right" }}>Rate</th>
                 <th style={{ ...thStyle, textAlign: "right" }}>Share</th>
@@ -309,6 +341,7 @@ export default function InvestorProductionPage() {
                 <tr key={l.id}>
                   <td style={tdStyle}>{fmtDate(l.date)}</td>
                   <td style={tdStyle}>{l.gradeName}</td>
+                  <td style={{ ...tdStyle, color: l.lotId ? undefined : MUTED }}>{lotLabel.get(l.lotId) || "—"}</td>
                   <td style={numTd}>{fmtQty(l.qty)}</td>
                   <td style={numTd}>{byPercentage ? fmtMoney(l.baseProfit) : fmtMoney(l.rate)}</td>
                   <td style={{ ...numTd, fontWeight: 700 }}>{fmtMoney(l.amount)}</td>

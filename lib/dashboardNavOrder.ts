@@ -514,6 +514,7 @@ export const DASHBOARD_NAV_GROUPS: DashboardNavGroup[] = [
       "/dashboard/investors/parties",
       "/dashboard/investors/capital",
       "/dashboard/investors/grades",
+      "/dashboard/investors/lots",
       "/dashboard/investors/production",
       "/dashboard/investors/settlements",
       "/dashboard/investors/statement",
