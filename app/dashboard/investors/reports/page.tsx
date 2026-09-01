@@ -20,7 +20,10 @@ import {
   fmtDate,
   fmtMoney,
   fmtQty,
+  lotResult,
+  lotTotals,
   mapCapital,
+  mapLot,
   mapParty,
   mapProduction,
   mapSettlement,
@@ -50,17 +53,22 @@ import {
   MUTED,
 } from "../_ui";
 
-type ReportKey = "production" | "monthly" | "return" | "history";
+type ReportKey = "production" | "monthly" | "return" | "history" | "material";
 
 function isReportKey(value: string | null): value is ReportKey {
-  return value === "production" || value === "monthly" || value === "return" || value === "history";
+  return (
+    value === "production" || value === "monthly" || value === "return" || value === "history" || value === "material"
+  );
 }
 
+// Appended rather than slotted in beside Production: the blurbs below are read
+// by index, and reordering this array would silently relabel four panels.
 const REPORTS: { key: ReportKey; label: string; blurb: string }[] = [
   { key: "production", label: "Production", blurb: "Every line in the window, by date and grade." },
   { key: "monthly", label: "Monthly Summary", blurb: "Month by month: how much was made and what it earned." },
   { key: "return", label: "Capital & Return", blurb: "What the money earned against what was placed." },
   { key: "history", label: "Settlement History", blurb: "Cycle by cycle, including how long the cash took." },
+  { key: "material", label: "Material & Profit", blurb: "Each batch of material against what it produced and what it paid you." },
 ];
 
 export default function InvestorReportsPage() {
@@ -68,6 +76,7 @@ export default function InvestorReportsPage() {
   const searchParams = useSearchParams();
   const { records: partyRecords } = useBusinessRecords(CAT.party);
   const { records: capitalRecords } = useBusinessRecords(CAT.capital);
+  const { records: lotRecords } = useBusinessRecords(CAT.lot);
   const { records: productionRecords, loading } = useBusinessRecords(CAT.production);
   const { records: settlementRecords } = useBusinessRecords(CAT.settlement);
 
@@ -114,6 +123,37 @@ export default function InvestorReportsPage() {
 
   const earned = round2(production.reduce((s, l) => s + l.amount, 0));
   const produced = round2(production.reduce((s, l) => s + l.qty, 0));
+
+  // Lots are picked by the window, but their output is read from every line
+  // ever entered rather than the windowed set. Material lifted on the last day
+  // of the window is spun after it, and windowing the output would report a
+  // recovery of nothing on a batch that ran perfectly well.
+  const lotRows = useMemo(() => {
+    const inWindow = lotRecords
+      .map(mapLot)
+      .filter((l) => l.partyId === partyId && l.date >= from && l.date <= to)
+      .sort((a, b) => (a.date < b.date ? 1 : a.date > b.date ? -1 : a.lotNo < b.lotNo ? 1 : -1));
+    return inWindow.map((l) => lotResult(l, allProduction));
+  }, [lotRecords, partyId, from, to, allProduction]);
+
+  const lotSums = useMemo(() => {
+    const totals = lotTotals(lotRows.map((r) => r.lot));
+    let producedFromLots = 0;
+    let share = 0;
+    for (const r of lotRows) {
+      producedFromLots += r.producedQty;
+      share += r.share;
+    }
+    return {
+      value: totals.value,
+      qty: totals.qty,
+      produced: round2(producedFromLots),
+      share: round2(share),
+      recovery: totals.qty > 0 ? round2((producedFromLots / totals.qty) * 100) : 0,
+      perUnit: producedFromLots > 0 ? round2(share / producedFromLots) : 0,
+      costPerUnit: totals.qty > 0 ? round2(totals.value / totals.qty) : 0,
+    };
+  }, [lotRows]);
 
   const monthly = useMemo(() => {
     const map = new Map<string, { key: string; qty: number; amount: number; grades: Map<string, number> }>();
@@ -364,6 +404,78 @@ export default function InvestorReportsPage() {
             </table>
             {settlements.length === 0 && <Empty>No cycle closed yet for this party.</Empty>}
           </TableWrap>
+        </Panel>
+      )}
+
+      {report === "material" && (
+        <Panel title="Material & Profit" hint={REPORTS[4].blurb}>
+          <Tiles
+            items={[
+              { label: "Material in", value: fmtMoney(lotSums.value) },
+              { label: "Weight in", value: fmtQty(lotSums.qty) + " " + unit },
+              { label: "Cost per " + unit, value: fmtMoney(lotSums.costPerUnit) },
+              { label: "Produced", value: fmtQty(lotSums.produced) + " " + unit },
+              { label: "Your profit", value: fmtMoney(lotSums.share), tone: "#2dd4bf" },
+              { label: "Profit per " + unit, value: fmtMoney(lotSums.perUnit), tone: "#2dd4bf" },
+            ]}
+          />
+          <TableWrap>
+            <table style={{ ...tableStyle, minWidth: 860 }}>
+              <thead>
+                <tr>
+                  <th style={thStyle}>Lot #</th>
+                  <th style={thStyle}>Date</th>
+                  <th style={thStyle}>Material</th>
+                  <th style={{ ...thStyle, textAlign: "right" }}>Value</th>
+                  <th style={{ ...thStyle, textAlign: "right" }}>In ({unit})</th>
+                  <th style={{ ...thStyle, textAlign: "right" }}>Cost/{unit}</th>
+                  <th style={{ ...thStyle, textAlign: "right" }}>Produced</th>
+                  <th style={{ ...thStyle, textAlign: "right" }}>Recovery</th>
+                  <th style={{ ...thStyle, textAlign: "right" }}>Your profit</th>
+                  <th style={{ ...thStyle, textAlign: "right" }}>Profit/{unit}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {lotRows.map((r) => (
+                  <tr key={r.lot.id}>
+                    <td style={{ ...tdStyle, fontWeight: 700 }}>{r.lot.lotNo || "-"}</td>
+                    <td style={tdStyle}>{fmtDate(r.lot.date)}</td>
+                    <td style={tdStyle}>{r.lot.material}</td>
+                    <td style={numTd}>{fmtMoney(r.lot.value)}</td>
+                    <td style={numTd}>{fmtQty(r.lot.qty)}</td>
+                    <td style={numTd}>{fmtMoney(r.costPerUnit)}</td>
+                    <td style={numTd}>{r.lineCount > 0 ? fmtQty(r.producedQty) : "-"}</td>
+                    <td style={{ ...numTd, color: r.lineCount === 0 ? MUTED : r.recoveryPct >= 100 ? undefined : "#fbbf24" }}>
+                      {r.lineCount > 0 ? fmtQty(r.recoveryPct) + "%" : "not yet"}
+                    </td>
+                    <td style={{ ...numTd, fontWeight: 700 }}>{fmtMoney(r.share)}</td>
+                    <td style={numTd}>{r.producedQty > 0 ? fmtMoney(r.sharePerUnit) : "-"}</td>
+                  </tr>
+                ))}
+                {lotRows.length > 0 && (
+                  <tr>
+                    <td style={{ ...tdStyle, fontWeight: 800 }} colSpan={3}>
+                      Total
+                    </td>
+                    <td style={{ ...numTd, fontWeight: 800 }}>{fmtMoney(lotSums.value)}</td>
+                    <td style={{ ...numTd, fontWeight: 800 }}>{fmtQty(lotSums.qty)}</td>
+                    <td style={{ ...numTd, fontWeight: 800 }}>{fmtMoney(lotSums.costPerUnit)}</td>
+                    <td style={{ ...numTd, fontWeight: 800 }}>{fmtQty(lotSums.produced)}</td>
+                    <td style={{ ...numTd, fontWeight: 800 }}>{lotSums.recovery > 0 ? fmtQty(lotSums.recovery) + "%" : "-"}</td>
+                    <td style={{ ...numTd, fontWeight: 800 }}>{fmtMoney(lotSums.share)}</td>
+                    <td style={{ ...numTd, fontWeight: 800 }}>{fmtMoney(lotSums.perUnit)}</td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+            {!loading && lotRows.length === 0 && <Empty>No material recorded in this window.</Empty>}
+            {loading && <Empty>Loading…</Empty>}
+          </TableWrap>
+          <p style={{ fontSize: 12.5, color: MUTED, lineHeight: 1.6, marginTop: 14, maxWidth: 620 }}>
+            The window picks the lots by the day the material came in. Output is counted whenever it was spun, so a batch lifted at
+            the end of the window still shows the kilos it went on to produce. Profit per {unit} is your own earning under the agreed
+            rates — it is not the factory&apos;s margin on the goods.
+          </p>
         </Panel>
       )}
       </div>

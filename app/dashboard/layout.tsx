@@ -2140,6 +2140,7 @@ export default function DashboardLayout({
               open={openSection === "investor_reports"}
               onToggle={() => toggle("investor_reports")}
             >
+              <NavLink href="/dashboard/investors/reports?view=material" pathname={pathname}>Material &amp; Profit</NavLink>
               <NavLink href="/dashboard/investors/reports?view=production" pathname={pathname}>Production</NavLink>
               <NavLink href="/dashboard/investors/reports?view=monthly" pathname={pathname}>Monthly Summary</NavLink>
               <NavLink href="/dashboard/investors/reports?view=return" pathname={pathname}>Capital & Return</NavLink>
