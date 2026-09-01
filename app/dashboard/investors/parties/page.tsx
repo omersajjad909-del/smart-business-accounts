@@ -97,7 +97,7 @@ export default function InvestorPartiesPage() {
             <input style={inp()} value={name} onChange={(e) => setName(e.target.value)} placeholder="Rehman Textile Mills" />
           </Field>
           <Field label="Business">
-            <input style={inp()} value={business} onChange={(e) => setBusiness(e.target.value)} placeholder="Yarn from waste cloth" />
+            <input style={inp()} value={business} onChange={(e) => setBusiness(e.target.value)} placeholder="Business description" />
           </Field>
           <Field label="Cycle days">
             <input style={inp()} type="number" step="any" value={cycleDays} onChange={(e) => setCycleDays(e.target.value)} />
