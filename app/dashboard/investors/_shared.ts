@@ -263,6 +263,16 @@ export function lineAmount(party: Party | undefined, qty: number, rate: number, 
   return round2(qty * rate);
 }
 
+/** One grade's contribution to a lot, so a blended per-kg figure can be read back. */
+export type LotGradeSlice = {
+  gradeId: string;
+  name: string;
+  qty: number;
+  share: number;
+  /** Share ÷ qty for this grade alone — the rate actually paid on these kilos. */
+  rate: number;
+};
+
 export type LotResult = {
   lot: Lot;
   /** What a unit of raw material cost — value ÷ weight taken in. */
@@ -279,6 +289,14 @@ export type LotResult = {
    * a line booked against the wrong lot, and the entry screens defend it.
    */
   remaining: number;
+  /**
+   * The grades that made up this lot, heaviest first.
+   *
+   * A lot's profit per kg is a weighted average — 8 a kilo on most of the
+   * weight and 2 on a little of it reads as 7.28, and that number explains
+   * nothing on its own. This is what turns it back into a sentence.
+   */
+  grades: LotGradeSlice[];
   lineCount: number;
 };
 
@@ -294,12 +312,28 @@ export function lotResult(lot: Lot, lines: ProductionLine[]): LotResult {
   let producedQty = 0;
   let share = 0;
   let lineCount = 0;
+  // Grouped by id rather than name: two grades can be spelled the same after a
+  // rename, and merging them would blur two different rates into one row.
+  const byGrade = new Map<string, { gradeId: string; name: string; qty: number; share: number }>();
   for (const line of lines) {
     if (line.lotId !== lot.id) continue;
     producedQty += line.qty;
     share += line.amount;
     lineCount += 1;
+    const slice = byGrade.get(line.gradeId) || { gradeId: line.gradeId, name: line.gradeName, qty: 0, share: 0 };
+    slice.qty += line.qty;
+    slice.share += line.amount;
+    byGrade.set(line.gradeId, slice);
   }
+  const grades: LotGradeSlice[] = Array.from(byGrade.values())
+    .map((g) => ({
+      gradeId: g.gradeId,
+      name: g.name,
+      qty: round2(g.qty),
+      share: round2(g.share),
+      rate: g.qty > 0 ? round2(g.share / g.qty) : 0,
+    }))
+    .sort((a, b) => b.qty - a.qty);
   return {
     lot,
     costPerUnit: lot.qty > 0 ? round2(lot.value / lot.qty) : 0,
@@ -308,6 +342,7 @@ export function lotResult(lot: Lot, lines: ProductionLine[]): LotResult {
     recoveryPct: lot.qty > 0 ? round2((producedQty / lot.qty) * 100) : 0,
     sharePerUnit: producedQty > 0 ? round2(share / producedQty) : 0,
     remaining: round2(lot.qty - producedQty),
+    grades,
     lineCount,
   };
 }

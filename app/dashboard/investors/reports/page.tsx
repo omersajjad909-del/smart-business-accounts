@@ -436,22 +436,59 @@ export default function InvestorReportsPage() {
                 </tr>
               </thead>
               <tbody>
-                {lotRows.map((r) => (
+                {lotRows.map((r) => [
                   <tr key={r.lot.id}>
-                    <td style={{ ...tdStyle, fontWeight: 700 }}>{r.lot.lotNo || "-"}</td>
-                    <td style={tdStyle}>{fmtDate(r.lot.date)}</td>
-                    <td style={tdStyle}>{r.lot.material}</td>
-                    <td style={numTd}>{fmtMoney(r.lot.value)}</td>
-                    <td style={numTd}>{fmtQty(r.lot.qty)}</td>
-                    <td style={numTd}>{fmtMoney(r.costPerUnit)}</td>
-                    <td style={numTd}>{r.lineCount > 0 ? fmtQty(r.producedQty) : "-"}</td>
-                    <td style={{ ...numTd, color: r.lineCount === 0 ? MUTED : r.recoveryPct >= 100 ? undefined : "#fbbf24" }}>
+                    <td style={{ ...tdStyle, fontWeight: 700, borderBottom: r.grades.length > 0 ? "none" : tdStyle.borderBottom }}>
+                      {r.lot.lotNo || "-"}
+                    </td>
+                    <td style={{ ...tdStyle, borderBottom: r.grades.length > 0 ? "none" : tdStyle.borderBottom }}>
+                      {fmtDate(r.lot.date)}
+                    </td>
+                    <td style={{ ...tdStyle, borderBottom: r.grades.length > 0 ? "none" : tdStyle.borderBottom }}>{r.lot.material}</td>
+                    <td style={{ ...numTd, borderBottom: r.grades.length > 0 ? "none" : numTd.borderBottom }}>
+                      {fmtMoney(r.lot.value)}
+                    </td>
+                    <td style={{ ...numTd, borderBottom: r.grades.length > 0 ? "none" : numTd.borderBottom }}>{fmtQty(r.lot.qty)}</td>
+                    <td style={{ ...numTd, borderBottom: r.grades.length > 0 ? "none" : numTd.borderBottom }}>
+                      {fmtMoney(r.costPerUnit)}
+                    </td>
+                    <td style={{ ...numTd, borderBottom: r.grades.length > 0 ? "none" : numTd.borderBottom }}>
+                      {r.lineCount > 0 ? fmtQty(r.producedQty) : "-"}
+                    </td>
+                    <td
+                      style={{
+                        ...numTd,
+                        borderBottom: r.grades.length > 0 ? "none" : numTd.borderBottom,
+                        color: r.lineCount === 0 ? MUTED : r.recoveryPct > 100 ? "#f87171" : r.recoveryPct === 100 ? undefined : "#fbbf24",
+                      }}
+                    >
                       {r.lineCount > 0 ? fmtQty(r.recoveryPct) + "%" : "not yet"}
                     </td>
-                    <td style={{ ...numTd, fontWeight: 700 }}>{fmtMoney(r.share)}</td>
-                    <td style={numTd}>{r.producedQty > 0 ? fmtMoney(r.sharePerUnit) : "-"}</td>
-                  </tr>
-                ))}
+                    <td style={{ ...numTd, fontWeight: 700, borderBottom: r.grades.length > 0 ? "none" : numTd.borderBottom }}>
+                      {fmtMoney(r.share)}
+                    </td>
+                    <td style={{ ...numTd, borderBottom: r.grades.length > 0 ? "none" : numTd.borderBottom }}>
+                      {r.producedQty > 0 ? fmtMoney(r.sharePerUnit) : "-"}
+                    </td>
+                  </tr>,
+                  // The arithmetic behind the blended per-kg figure, spelled out
+                  // on the row it belongs to. Without it the reader has to be
+                  // told how 8, 6 and 2 a kilo become 7.28.
+                  r.grades.length > 0 ? (
+                    <tr key={r.lot.id + "-grades"}>
+                      <td style={tdStyle} />
+                      <td style={{ ...tdStyle, color: MUTED, fontSize: 12, paddingTop: 0 }} colSpan={9}>
+                        {r.grades
+                          .map((g) =>
+                            party?.profitModel === "percentage"
+                              ? g.name + " " + fmtQty(g.qty) + " → " + fmtMoney(g.share)
+                              : g.name + " " + fmtQty(g.qty) + " × " + fmtMoney(g.rate) + " = " + fmtMoney(g.share),
+                          )
+                          .join("   ·   ")}
+                      </td>
+                    </tr>
+                  ) : null,
+                ])}
                 {lotRows.length > 0 && (
                   <tr>
                     <td style={{ ...tdStyle, fontWeight: 800 }} colSpan={3}>
