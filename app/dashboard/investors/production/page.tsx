@@ -219,7 +219,11 @@ export default function InvestorProductionPage() {
           },
         });
       }
-      setRows([blankRow(todayISO(), grades[0]?.id || "", rows[rows.length - 1]?.lotId || "")]);
+      // A saved cycle leaves the form exactly as the page opens it: today's
+      // date and nothing else. Carrying the last grade and lot forward saved a
+      // click but left a filled-in form that had already been submitted — and
+      // when the lot it carried was finished, it handed back a dead choice.
+      setRows([blankRow(todayISO(), "")]);
       toast.success(ready.length + " line" + (ready.length === 1 ? "" : "s") + " saved");
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Could not save");
