@@ -370,7 +370,7 @@ export default function BusinessGuidePage() {
     <div style={{ fontFamily:"'Outfit','DM Sans',sans-serif", padding:"0 0 60px" }}>
       <style>{`
         @keyframes skshimmer { 0%{background-position:-400px 0} 100%{background-position:400px 0} }
-        .sk { border-radius:10px; background:linear-gradient(90deg,rgba(255,255,255,.04) 25%,rgba(255,255,255,.08) 50%,rgba(255,255,255,.04) 75%); background-size:800px 100%; animation:skshimmer 1.4s infinite linear; }
+        .sk { border-radius:10px; background:linear-gradient(90deg,rgba(255,255,255,.04) 25%,rgba(255,255,255,.08) 50%,rgba(255,255,255,.04) 50%); background-size:800px 100%; animation:skshimmer 1.4s infinite linear; }
       `}</style>
       {/* Hero skeleton */}
       <div style={{ borderRadius:24, padding: isMobile ? "18px 16px" : "32px 36px", marginBottom:24, background:"rgba(255,255,255,.03)", border:"1px solid rgba(255,255,255,.08)" }}>

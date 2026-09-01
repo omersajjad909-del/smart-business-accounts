@@ -141,7 +141,7 @@ const SOLUTIONS_CARDS = [
     glow: "rgba(251,191,36,.14)",
     border: "rgba(251,191,36,.25)",
     stats: [
-      { val: "75%", label: "OFF First 3mo" },
+      { val: "50%", label: "OFF First 3mo" },
       { val: "24/7", label: "Support" },
     ],
   },

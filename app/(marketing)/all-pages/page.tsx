@@ -268,7 +268,7 @@ export default function AllPagesPage() {
                   <span style={{ display:"block", fontStyle:"italic",
                     background:"linear-gradient(135deg,#a5b4fc,#818cf8)",
                     WebkitBackgroundClip:"text", WebkitTextFillColor:"transparent",
-                    fontSize:"75%" }}>
+                    fontSize:"50%" }}>
                     Every page, at a glance.
                   </span>
                 </h1>

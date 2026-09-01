@@ -144,7 +144,7 @@ function StatCard({ label, value, note, accent, icon }: { label: string; value: 
       padding: isMobile ? "12px 10px" : "20px 22px",
       boxShadow: "0 8px 28px rgba(0,0,0,.2)",
     }}>
-      <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 80, background: `radial-gradient(ellipse at top, ${accent}14, transparent 75%)`, pointerEvents: "none" }} />
+      <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 80, background: `radial-gradient(ellipse at top, ${accent}14, transparent 50%)`, pointerEvents: "none" }} />
       <div style={{ position: "relative" }}>
         <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between" }}>
           <div style={{ fontSize: 10.5, color: T.dim, textTransform: "uppercase", letterSpacing: ".13em", fontWeight: 700 }}>{label}</div>

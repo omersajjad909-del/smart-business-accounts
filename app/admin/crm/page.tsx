@@ -492,7 +492,7 @@ export default function AdminCrmPage() {
                 <div style={{ fontSize: 12, fontWeight: 800, color: "rgba(255,255,255,.42)", marginBottom: 12, textTransform: "uppercase", letterSpacing: ".06em" }}>Top Pages</div>
                 {(visitorStats?.topPages || []).slice(0, 8).map((page) => (
                   <div key={page.page} style={{ display: "flex", justifyContent: "space-between", gap: 12, padding: "7px 0", borderBottom: "1px solid rgba(255,255,255,.05)" }}>
-                    <span style={{ fontSize: 12, color: "rgba(255,255,255,.56)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", maxWidth: "75%" }}>{page.page}</span>
+                    <span style={{ fontSize: 12, color: "rgba(255,255,255,.56)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", maxWidth: "50%" }}>{page.page}</span>
                     <span style={{ fontSize: 12, fontWeight: 800, color: "#818cf8" }}>{page.visits}</span>
                   </div>
                 ))}

@@ -73,7 +73,7 @@ const KB: [RegExp, string][] = [
    "FinovaOS API & Integrations:\n\n• Full REST API access (Enterprise plan)\n• Webhook support for real-time sync\n• CSV & Excel import/export on all plans\n• Self-configurable connectors for eCommerce, payment gateways, and banks\n\nSee the API docs at finovaos.app/docs 🔌"],
 
   [/why finova|better than|compare|versus|\bvs\b|quickbooks|xero|competitor|best accounting|alternative|kon sa software/i,
-   "Why FinovaOS over QuickBooks / Xero?\n\n• All-in-one: Accounting + HR + Inventory + CRM in ONE platform\n• Built for Pakistan: PKR pricing, Urdu support\n• 75% cheaper than international alternatives\n• Local support team available in Urdu/English\n• No hidden per-module fees\n• 14-day money-back guarantee\n\nSwitch with full data migration support! 🏆"],
+   "Why FinovaOS over QuickBooks / Xero?\n\n• All-in-one: Accounting + HR + Inventory + CRM in ONE platform\n• Built for Pakistan: PKR pricing, Urdu support\n• 50% cheaper than international alternatives\n• Local support team available in Urdu/English\n• No hidden per-module fees\n• 14-day money-back guarantee\n\nSwitch with full data migration support! 🏆"],
 
   [/\bgst\b|sales.?tax|withholding|\bfbr\b|\bntn\b|\bwht\b|income.?tax|\bvat\b|tax.?rate|tax.?setup/i,
    "FinovaOS Tax Management:\n\n• GST/Sales Tax on invoices (any rate)\n• Withholding Tax (WHT) management\n• FBR-compliant reporting\n• Multiple tax rates & categories\n• Tax-inclusive & tax-exclusive pricing\n• Tax Summary report (PDF/Excel export)\n• Input/Output tax tracking\n\nDashboard → Reports → Tax Summary 📋"],

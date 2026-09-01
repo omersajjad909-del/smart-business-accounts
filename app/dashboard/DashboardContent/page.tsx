@@ -297,7 +297,7 @@ function AIInsightPanel({
           transform: "translate(-50%,-60%)",
           width: 130, height: 130,
           borderRadius: "50%",
-          background: "radial-gradient(circle, rgba(139,92,246,.55) 0%, rgba(99,102,241,.25) 50%, transparent 75%)",
+          background: "radial-gradient(circle, rgba(139,92,246,.55) 0%, rgba(99,102,241,.25) 50%, transparent 50%)",
           filter: "blur(18px)",
         }} />
         {/* Sparkles */}

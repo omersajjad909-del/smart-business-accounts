@@ -214,7 +214,7 @@ function OverrideModal({ company, onClose, onDone }: {
   const ACTIONS: { key: ActionType; icon: string; label: string; desc: string; color: string }[] = [
     { key: "EXTEND_TRIAL",      icon: "⏱️", label: "Extend Trial",       desc: "Set status to TRIALING + extend end date",          color: "#06b6d4" },
     { key: "GRANT_FREE_ACCESS", icon: "🎁", label: "Grant Free Access",   desc: "Set ACTIVE + choose plan for N days, no charge",     color: "#22c55e" },
-    { key: "RESET_INTRO_OFFER", icon: "🔄", label: "Reset 75% Offer",     desc: "Let them use the intro offer again",                  color: "#fbbf24" },
+    { key: "RESET_INTRO_OFFER", icon: "🔄", label: "Reset 50% Offer",     desc: "Let them use the intro offer again",                  color: "#fbbf24" },
     { key: "SET_STATUS",        icon: "🔧", label: "Override Status",      desc: "Manually force any subscription status",             color: "#818cf8" },
     { key: "ADD_NOTE",          icon: "📝", label: "Add Internal Note",    desc: "Log a note to audit trail (no DB change)",           color: "#64748b" },
   ];
@@ -428,7 +428,7 @@ function OverrideModal({ company, onClose, onDone }: {
 
           {action === "RESET_INTRO_OFFER" && (
             <div style={{ padding: "14px 16px", borderRadius: 12, background: "rgba(251,191,36,.06)", border: "1px solid rgba(251,191,36,.2)", fontSize: 13, color: "#fbbf24" }}>
-              ⚠️ This will delete the BILLING_OFFER_CLAIM log for this company. They will be able to use the 75% intro offer again on their next checkout.
+              ⚠️ This will delete the BILLING_OFFER_CLAIM log for this company. They will be able to use the 50% intro offer again on their next checkout.
             </div>
           )}
 

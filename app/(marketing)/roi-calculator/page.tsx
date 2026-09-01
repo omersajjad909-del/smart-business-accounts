@@ -52,7 +52,7 @@ export default function ROICalculatorPage() {
   const fmt = (n: number) => `${sym} ${Math.round(n * fx).toLocaleString()}`;
 
   // Savings calculations
-  const accountingTimeSaved  = accountingHrs * 0.75; // 75% reduction
+  const accountingTimeSaved  = accountingHrs * 0.75; // 50% reduction
   const accountingMonthlySave = accountingTimeSaved * 4.33 * hourlyRate;
 
   const payrollTimeSavedHrs  = employees > 0 ? Math.min(employees * 0.5, 8) : 0;
