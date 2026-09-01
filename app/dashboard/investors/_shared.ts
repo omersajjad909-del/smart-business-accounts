@@ -18,6 +18,7 @@ export const CAT = {
   party: "investor_party",
   capital: "investor_capital",
   grade: "investor_grade",
+  lot: "investor_lot",
   production: "investor_production",
   settlement: "investor_settlement",
 } as const;
@@ -66,6 +67,30 @@ export type Grade = {
   status: string;
 };
 
+/**
+ * A batch of raw material the factory took in against this investor's money.
+ *
+ * The investor buys nothing and owns nothing, so this is not a stock ledger.
+ * It is the other half of a sentence he could only half read: he already sees
+ * that 9,400 kg came out and what his share of it was, but not that it came
+ * out of 25,00,000 of material weighing 10,000 kg. Production lines point back
+ * at a lot, and the two halves finally read as one.
+ */
+export type Lot = {
+  id: string;
+  partyId: string;
+  date: string;
+  lotNo: string;
+  /** What was lifted — jersey, pillow waste, whatever the mill calls it. */
+  material: string;
+  /** What that material cost. */
+  value: number;
+  /** Weight taken in, in the party's unit. */
+  qty: number;
+  note: string;
+  status: string;
+};
+
 export type ProductionLine = {
   id: string;
   partyId: string;
@@ -78,6 +103,12 @@ export type ProductionLine = {
   /** Period profit of the business — only used by the percentage model. */
   baseProfit: number;
   amount: number;
+  /**
+   * The material batch this output came out of. Blank on every line entered
+   * before lots existed, and blank stays legal — the share is still correct
+   * without it, the line just cannot be traced back to a purchase.
+   */
+  lotId: string;
   settlementId: string;
 };
 
