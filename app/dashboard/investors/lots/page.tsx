@@ -254,7 +254,7 @@ export default function InvestorLotsPage() {
             <input style={inp()} value={lotNo} onChange={(e) => setLotNo(e.target.value)} placeholder={suggestedNo} />
           </Field>
           <Field label="Material">
-            <input style={inp()} value={material} onChange={(e) => setMaterial(e.target.value)} placeholder="Jersey, pillow waste…" />
+            <input style={inp()} value={material} onChange={(e) => setMaterial(e.target.value)} placeholder="Material description" />
           </Field>
           <Field label="Value" width={isMobile ? "100%" : 150}>
             <input
