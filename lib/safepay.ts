@@ -4,8 +4,11 @@ import { createHmac, timingSafeEqual } from "crypto";
 // Adjust these if Safepay updates their endpoints.
 const SANDBOX_BASE  = "https://sandbox.api.getsafepay.com";
 const PROD_BASE     = "https://api.getsafepay.com";
-const SANDBOX_CHECKOUT = "https://sandbox.safepay.pk/checkout";
-const PROD_CHECKOUT    = "https://www.safepay.pk/checkout";
+// Hosted checkout ("components") is served from Safepay's own API host. It was
+// pointed at safepay.pk, which never served this flow at all — the buyer got a
+// dead host instead of a card form.
+const SANDBOX_CHECKOUT = "https://sandbox.api.getsafepay.com/components";
+const PROD_CHECKOUT    = "https://www.getsafepay.com/components";
 
 function env(name: string) {
   return process.env[name]?.trim() || "";
@@ -16,6 +19,11 @@ function getBase() {
 }
 function getCheckoutBase() {
   return env("SAFEPAY_ENVIRONMENT") === "production" ? PROD_CHECKOUT : SANDBOX_CHECKOUT;
+}
+
+/** The literal Safepay expects in the init body and the `env` query param. */
+function getEnvName() {
+  return env("SAFEPAY_ENVIRONMENT") === "production" ? "production" : "sandbox";
 }
 
 export function hasSafepayConfig() {
@@ -71,49 +79,64 @@ export async function createSafepayCheckout(input: SafepayCheckoutInput): Promis
   const apiKey = env("SAFEPAY_API_KEY");
   if (!apiKey) throw new Error("Safepay is not configured.");
 
+  // /order/v1/init authenticates on the body, not on a header. Sending the key
+  // as `Authorization: Bearer` made Safepay answer 417 with "Expected required
+  // but got for field: Client / Environment" — the key was never read at all.
+  //
+  // It also accepts only these four fields. order_id, metadata, success_url,
+  // cancel_url and customer were all being posted here and all silently
+  // dropped (init echoes back `metadata: null`); the ones that matter travel on
+  // the checkout URL below instead.
   const body = {
-    intent: "PAYFAST",
-    mode: "payment",
-    currency: "PKR",
-    amount: Math.round(input.amountPkr),   // Safepay expects integer rupees
-    order_id: input.orderId,
-    cancel_url: input.cancelUrl,
-    success_url: input.successUrl,
-    metadata: {
-      company_id:    input.companyId,
-      user_id:       input.userId || "",
-      plan_code:     input.planCode,
-      billing_cycle: input.billingCycle,
-    },
-    ...(input.customerEmail ? { customer: { email: input.customerEmail, name: input.customerName || "" } } : {}),
+    client:      apiKey,
+    environment: getEnvName(),
+    currency:    "PKR",
+    amount:      Math.round(input.amountPkr),   // Safepay expects whole rupees
   };
 
   const response = await fetch(`${getBase()}/order/v1/init`, {
     method:  "POST",
-    headers: {
-      "Content-Type":  "application/json",
-      "Authorization": `Bearer ${apiKey}`,
-    },
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body),
   });
 
   const json = await response.json().catch(() => ({}));
   if (!response.ok) {
+    // Safepay reports failures under `status`, not at the top level. Reading
+    // only the top level turned every error into the same useless
+    // "Failed to create Safepay checkout session." with the real reason
+    // discarded, so keep the status code and whatever Safepay actually said.
     const detail =
+      (Array.isArray(json?.status?.errors) && json.status.errors.length
+        ? json.status.errors.join("; ")
+        : null) ||
+      json?.status?.message ||
       json?.message ||
       json?.error ||
       json?.errors?.[0]?.message ||
       "Failed to create Safepay checkout session.";
-    throw new Error(detail);
+    throw new Error(`Safepay init failed (HTTP ${response.status}): ${detail}`);
   }
 
-  // Safepay returns the tracker token in data.tracker.token
-  const tracker = json?.data?.tracker?.token || json?.tracker?.token || json?.token;
+  // Init returns the tracker token at data.token.
+  const tracker =
+    json?.data?.token || json?.data?.tracker?.token || json?.tracker?.token || json?.token;
   if (!tracker) {
     throw new Error("Safepay checkout tracker token was missing in response.");
   }
 
-  const checkoutUrl = `${getCheckoutBase()}?tracker=${tracker}&source=custom`;
+  // Everything init refused to store rides on the redirect instead. order_id
+  // is load-bearing: it is the only place the webhook can recover which
+  // company paid, via the `fnv-<companyId>-<ts>` pattern.
+  const params = new URLSearchParams({
+    env:          getEnvName(),
+    beacon:       String(tracker),
+    source:       "finovaos",
+    order_id:     input.orderId,
+    redirect_url: input.successUrl,
+    cancel_url:   input.cancelUrl,
+  });
+  const checkoutUrl = `${getCheckoutBase()}?${params.toString()}`;
 
   return { checkoutUrl, tracker: String(tracker), orderId: input.orderId };
 }

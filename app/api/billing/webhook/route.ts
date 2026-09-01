@@ -922,8 +922,37 @@ async function handleSafepayWebhook(req: NextRequest, raw: string) {
   }
   if (!companyId) return apiError("Missing company_id in Safepay webhook", 400);
 
-  const planCode     = String(meta?.plan_code     || "STARTER").toUpperCase();
-  const billingCycle = String(meta?.billing_cycle || "MONTHLY").toUpperCase() === "YEARLY" ? "YEARLY" : "MONTHLY";
+  // Safepay's /order/v1/init accepts no metadata — it answers `metadata: null`
+  // and forgets it — so plan and cycle cannot survive the round trip the way
+  // they do with Lemon Squeezy. Defaulting instead meant every Safepay buyer
+  // landed on STARTER/MONTHLY no matter what they picked and paid for.
+  // createSafepayCheckout already logged the real values against this tracker,
+  // so read them back before falling back.
+  let planCode = String(meta?.plan_code || "").toUpperCase();
+  let cycleRaw = String(meta?.billing_cycle || "").toUpperCase();
+
+  if (!planCode || !cycleRaw) {
+    const needle = tracker || orderId;
+    const logged = needle
+      ? await prisma.activityLog
+          .findFirst({
+            where: { companyId, action: "BILLING_CHECKOUT_CREATED", details: { contains: needle } },
+            orderBy: { createdAt: "desc" },
+            select: { details: true },
+          })
+          .catch(() => null)
+      : null;
+    if (logged?.details) {
+      try {
+        const d = JSON.parse(logged.details);
+        if (!planCode) planCode = String(d?.planCode || "").toUpperCase();
+        if (!cycleRaw) cycleRaw = String(d?.billingCycle || "").toUpperCase();
+      } catch {}
+    }
+  }
+
+  if (!planCode) planCode = "STARTER";
+  const billingCycle = cycleRaw === "YEARLY" ? "YEARLY" : "MONTHLY";
 
   // Idempotency — use tracker or orderId as the unique event key
   const eventKey = `${event}:${tracker || orderId}`;
