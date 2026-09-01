@@ -51,7 +51,7 @@ export default function InvestorLotsPage() {
   const { isMobile } = useResponsive();
   const { records: partyRecords } = useBusinessRecords(CAT.party);
   const { records: productionRecords } = useBusinessRecords(CAT.production);
-  const { records, loading, create, remove } = useBusinessRecords(CAT.lot);
+  const { records, loading, create, update, remove } = useBusinessRecords(CAT.lot);
 
   const parties = useMemo(() => partyRecords.map(mapParty).filter((p) => p.status === "active"), [partyRecords]);
   // The picker sits on the first party until one is chosen. Deriving that
@@ -142,6 +142,51 @@ export default function InvestorLotsPage() {
       toast.error(e instanceof Error ? e.message : "Could not save");
     } finally {
       setSaving(false);
+    }
+  }
+
+  // Correcting a lot in place rather than through a second screen: the numbers
+  // arrive from the mill by phone and get typed wrong, and the man fixing a
+  // weight wants to see the rest of the row while he does it.
+  const [editId, setEditId] = useState("");
+  const [edit, setEdit] = useState({ date: "", lotNo: "", material: "", value: "", qty: "", note: "" });
+  const [savingEdit, setSavingEdit] = useState(false);
+
+  const editCost = useMemo(() => {
+    const v = Number(edit.value) || 0;
+    const q = Number(edit.qty) || 0;
+    return q > 0 ? round2(v / q) : 0;
+  }, [edit.value, edit.qty]);
+
+  function startEdit(lot: (typeof lots)[number]) {
+    setEditId(lot.id);
+    setEdit({
+      date: lot.date,
+      lotNo: lot.lotNo,
+      material: lot.material,
+      value: String(lot.value),
+      qty: String(lot.qty),
+      note: lot.note,
+    });
+  }
+
+  async function saveEdit() {
+    if (!(Number(edit.value) > 0)) return toast.error("Enter what the material cost");
+    if (!(Number(edit.qty) > 0)) return toast.error("Enter the weight taken in");
+    setSavingEdit(true);
+    try {
+      await update(editId, {
+        title: edit.material.trim() || "Material",
+        amount: Number(edit.value),
+        date: edit.date,
+        data: { lotNo: edit.lotNo.trim(), qty: Number(edit.qty), note: edit.note.trim() },
+      });
+      setEditId("");
+      toast.success("Lot updated");
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Could not update");
+    } finally {
+      setSavingEdit(false);
     }
   }
 
@@ -266,30 +311,97 @@ export default function InvestorLotsPage() {
               </tr>
             </thead>
             <tbody>
-              {results.map((r) => (
-                <tr key={r.lot.id}>
-                  <td style={{ ...tdStyle, fontWeight: 700 }}>{r.lot.lotNo || "-"}</td>
-                  <td style={tdStyle}>{fmtDate(r.lot.date)}</td>
-                  <td style={tdStyle}>
-                    {r.lot.material}
-                    {r.lot.note && <div style={{ fontSize: 11.5, color: MUTED, marginTop: 2 }}>{r.lot.note}</div>}
-                  </td>
-                  <td style={numTd}>{fmtMoney(r.lot.value)}</td>
-                  <td style={numTd}>{fmtQty(r.lot.qty)}</td>
-                  <td style={numTd}>{fmtMoney(r.costPerUnit)}</td>
-                  <td style={numTd}>{r.lineCount > 0 ? fmtQty(r.producedQty) : "-"}</td>
-                  <td style={{ ...numTd, color: r.lineCount === 0 ? MUTED : r.recoveryPct >= 100 ? undefined : "#fbbf24" }}>
-                    {r.lineCount > 0 ? fmtQty(r.recoveryPct) + "%" : "not yet"}
-                  </td>
-                  <td style={{ ...numTd, fontWeight: 700, color: r.share > 0 ? "#2dd4bf" : undefined }}>{fmtMoney(r.share)}</td>
-                  <td style={numTd}>{r.producedQty > 0 ? fmtMoney(r.sharePerUnit) : "-"}</td>
-                  <td style={{ ...tdStyle, textAlign: "right" }}>
-                    <Btn small tone="danger" onClick={() => del(r.lot.id, r.lineCount)}>
-                      Delete
-                    </Btn>
-                  </td>
-                </tr>
-              ))}
+              {results.map((r) =>
+                editId === r.lot.id ? (
+                  <tr key={r.lot.id}>
+                    <td style={tdStyle}>
+                      <input
+                        style={inp({ padding: "6px 9px" })}
+                        value={edit.lotNo}
+                        onChange={(e) => setEdit({ ...edit, lotNo: e.target.value })}
+                        placeholder="Lot #"
+                      />
+                    </td>
+                    <td style={tdStyle}>
+                      <DateInput value={edit.date} onChange={(v) => setEdit({ ...edit, date: v })} style={inp({ padding: "6px 9px" })} />
+                    </td>
+                    <td style={tdStyle}>
+                      <input
+                        style={inp({ padding: "6px 9px" })}
+                        value={edit.material}
+                        onChange={(e) => setEdit({ ...edit, material: e.target.value })}
+                        placeholder="Material"
+                      />
+                      <input
+                        style={inp({ padding: "6px 9px", marginTop: 6, fontSize: 12.5 })}
+                        value={edit.note}
+                        onChange={(e) => setEdit({ ...edit, note: e.target.value })}
+                        placeholder="Note"
+                      />
+                    </td>
+                    <td style={tdStyle}>
+                      <input
+                        style={inp({ padding: "6px 9px", textAlign: "right" })}
+                        type="number"
+                        step="any"
+                        value={edit.value}
+                        onChange={(e) => setEdit({ ...edit, value: e.target.value })}
+                      />
+                    </td>
+                    <td style={tdStyle}>
+                      <input
+                        style={inp({ padding: "6px 9px", textAlign: "right" })}
+                        type="number"
+                        step="any"
+                        value={edit.qty}
+                        onChange={(e) => setEdit({ ...edit, qty: e.target.value })}
+                      />
+                    </td>
+                    <td style={numTd}>{editCost > 0 ? fmtMoney(editCost) : "-"}</td>
+                    {/* Output is not editable here — it belongs to the production
+                        lines, and letting it be typed over would put two different
+                        answers in the system for the same kilos. */}
+                    <td style={numTd}>{r.lineCount > 0 ? fmtQty(r.producedQty) : "-"}</td>
+                    <td style={{ ...numTd, color: MUTED }}>{r.lineCount > 0 ? fmtQty(r.recoveryPct) + "%" : "not yet"}</td>
+                    <td style={numTd}>{fmtMoney(r.share)}</td>
+                    <td style={numTd}>{r.producedQty > 0 ? fmtMoney(r.sharePerUnit) : "-"}</td>
+                    <td style={{ ...tdStyle, textAlign: "right", whiteSpace: "nowrap" }}>
+                      <Btn small onClick={saveEdit} disabled={savingEdit}>
+                        {savingEdit ? "Saving…" : "Save"}
+                      </Btn>{" "}
+                      <Btn small tone="ghost" onClick={() => setEditId("")}>
+                        Cancel
+                      </Btn>
+                    </td>
+                  </tr>
+                ) : (
+                  <tr key={r.lot.id}>
+                    <td style={{ ...tdStyle, fontWeight: 700 }}>{r.lot.lotNo || "-"}</td>
+                    <td style={tdStyle}>{fmtDate(r.lot.date)}</td>
+                    <td style={tdStyle}>
+                      {r.lot.material}
+                      {r.lot.note && <div style={{ fontSize: 11.5, color: MUTED, marginTop: 2 }}>{r.lot.note}</div>}
+                    </td>
+                    <td style={numTd}>{fmtMoney(r.lot.value)}</td>
+                    <td style={numTd}>{fmtQty(r.lot.qty)}</td>
+                    <td style={numTd}>{fmtMoney(r.costPerUnit)}</td>
+                    <td style={numTd}>{r.lineCount > 0 ? fmtQty(r.producedQty) : "-"}</td>
+                    <td style={{ ...numTd, color: r.lineCount === 0 ? MUTED : r.recoveryPct >= 100 ? undefined : "#fbbf24" }}>
+                      {r.lineCount > 0 ? fmtQty(r.recoveryPct) + "%" : "not yet"}
+                    </td>
+                    <td style={{ ...numTd, fontWeight: 700, color: r.share > 0 ? "#2dd4bf" : undefined }}>{fmtMoney(r.share)}</td>
+                    <td style={numTd}>{r.producedQty > 0 ? fmtMoney(r.sharePerUnit) : "-"}</td>
+                    <td style={{ ...tdStyle, textAlign: "right", whiteSpace: "nowrap" }}>
+                      <Btn small tone="ghost" onClick={() => startEdit(r.lot)}>
+                        Edit
+                      </Btn>{" "}
+                      <Btn small tone="danger" onClick={() => del(r.lot.id, r.lineCount)}>
+                        Delete
+                      </Btn>
+                    </td>
+                  </tr>
+                ),
+              )}
               {results.length > 0 && (
                 <tr>
                   <td style={{ ...tdStyle, fontWeight: 700 }} colSpan={3}>
