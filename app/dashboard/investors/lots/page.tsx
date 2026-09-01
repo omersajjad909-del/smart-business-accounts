@@ -294,7 +294,7 @@ export default function InvestorLotsPage() {
         }
       >
         <TableWrap>
-          <table style={{ ...tableStyle, minWidth: 900 }}>
+          <table style={{ ...tableStyle, minWidth: 1000 }}>
             <thead>
               <tr>
                 <th style={thStyle}>Lot #</th>
