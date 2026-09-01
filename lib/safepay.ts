@@ -4,11 +4,17 @@ import { createHmac, timingSafeEqual } from "crypto";
 // Adjust these if Safepay updates their endpoints.
 const SANDBOX_BASE  = "https://sandbox.api.getsafepay.com";
 const PROD_BASE     = "https://api.getsafepay.com";
-// Hosted checkout ("components") is served from Safepay's own API host. It was
-// pointed at safepay.pk, which never served this flow at all — the buyer got a
-// dead host instead of a card form.
-const SANDBOX_CHECKOUT = "https://sandbox.api.getsafepay.com/components";
-const PROD_CHECKOUT    = "https://www.getsafepay.com/components";
+// Hosted checkout lives on Safepay's own API host. Two earlier values were
+// both dead ends, so don't "restore" either from an old doc or gist:
+//   safepay.pk/checkout  — that domain never served this flow.
+//   .../components       — Safepay retired it; it now answers 301 to
+//                          getsafepay.pk, dropping the buyer on the marketing
+//                          site mid-purchase. Still what the public gists and
+//                          the netlify docs tell you to use.
+// /checkout/pay is what actually serves the checkout app today (verified
+// against sandbox: a bogus path returns a different, smaller shell).
+const SANDBOX_CHECKOUT = "https://sandbox.api.getsafepay.com/checkout/pay";
+const PROD_CHECKOUT    = "https://api.getsafepay.com/checkout/pay";
 
 function env(name: string) {
   return process.env[name]?.trim() || "";
