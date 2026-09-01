@@ -173,6 +173,14 @@ export default function InvestorLotsPage() {
   async function saveEdit() {
     if (!(Number(edit.value) > 0)) return toast.error("Enter what the material cost");
     if (!(Number(edit.qty) > 0)) return toast.error("Enter the weight taken in");
+    // Shrinking a lot below what it has already produced would create the same
+    // impossible reading from the other side, so it is refused here too.
+    const produced = results.find((r) => r.lot.id === editId)?.producedQty || 0;
+    if (Number(edit.qty) < produced) {
+      return toast.error(
+        "This lot has already produced " + fmtQty(produced) + " " + unit + ". Its weight cannot be set below that.",
+      );
+    }
     setSavingEdit(true);
     try {
       await update(editId, {
@@ -383,10 +391,33 @@ export default function InvestorLotsPage() {
                       {r.lot.note && <div style={{ fontSize: 11.5, color: MUTED, marginTop: 2 }}>{r.lot.note}</div>}
                     </td>
                     <td style={numTd}>{fmtMoney(r.lot.value)}</td>
-                    <td style={numTd}>{fmtQty(r.lot.qty)}</td>
+                    <td style={numTd}>
+                      {fmtQty(r.lot.qty)}
+                      {r.lot.qty > 0 && (
+                        <div style={{ fontSize: 11.5, color: r.remaining < 0 ? "#f87171" : MUTED, fontWeight: 600, marginTop: 2 }}>
+                          {r.remaining > 0
+                            ? fmtQty(r.remaining) + " left"
+                            : r.remaining === 0
+                              ? "full"
+                              : fmtQty(-r.remaining) + " over"}
+                        </div>
+                      )}
+                    </td>
                     <td style={numTd}>{fmtMoney(r.costPerUnit)}</td>
                     <td style={numTd}>{r.lineCount > 0 ? fmtQty(r.producedQty) : "-"}</td>
-                    <td style={{ ...numTd, color: r.lineCount === 0 ? MUTED : r.recoveryPct >= 100 ? undefined : "#fbbf24" }}>
+                    <td
+                      style={{
+                        ...numTd,
+                        color:
+                          r.lineCount === 0
+                            ? MUTED
+                            : r.recoveryPct > 100
+                              ? "#f87171"
+                              : r.recoveryPct === 100
+                                ? undefined
+                                : "#fbbf24",
+                      }}
+                    >
                       {r.lineCount > 0 ? fmtQty(r.recoveryPct) + "%" : "not yet"}
                     </td>
                     <td style={{ ...numTd, fontWeight: 700, color: r.share > 0 ? "#2dd4bf" : undefined }}>{fmtMoney(r.share)}</td>

@@ -18,6 +18,7 @@ import {
   fmtMoney,
   fmtQty,
   lineAmount,
+  lotResult,
   mapGrade,
   mapLot,
   mapParty,
@@ -104,6 +105,13 @@ export default function InvestorProductionPage() {
   );
   const unsettled = useMemo(() => lines.filter((l) => !l.settlementId), [lines]);
 
+  /** Weight left in each lot after everything already saved against it. */
+  const lotLeft = useMemo(() => {
+    const map = new Map<string, number>();
+    for (const l of lots) map.set(l.id, lotResult(l, lines).remaining);
+    return map;
+  }, [lots, lines]);
+
   const [rows, setRows] = useState<Row[]>([blankRow(todayISO(), "")]);
   const [saving, setSaving] = useState(false);
 
@@ -125,6 +133,30 @@ export default function InvestorProductionPage() {
     }
     return { qty: round2(qty), amount: round2(amount) };
   }, [rows, grades, party]);
+
+  /**
+   * Lots this draft would overdraw.
+   *
+   * Summed per lot across the whole draft rather than checked row by row:
+   * three rows of 8,000 kg against a 20,000 kg lot are each fine on their own
+   * and wrong together, and row-by-row validation would wave all three through.
+   */
+  const lotOverflow = useMemo(() => {
+    const adding = new Map<string, number>();
+    for (const r of rows) {
+      if (!r.lotId) continue;
+      adding.set(r.lotId, (adding.get(r.lotId) || 0) + (Number(r.qty) || 0));
+    }
+    const over: { lotNo: string; left: number; adding: number }[] = [];
+    for (const [id, qty] of Array.from(adding.entries())) {
+      const lot = lots.find((l) => l.id === id);
+      // A lot with no weight recorded has nothing to overdraw.
+      if (!lot || lot.qty <= 0 || qty <= 0) continue;
+      const left = lotLeft.get(id) ?? 0;
+      if (qty > left) over.push({ lotNo: lot.lotNo || "That lot", left: Math.max(0, round2(left)), adding: round2(qty) });
+    }
+    return over;
+  }, [rows, lots, lotLeft]);
 
   const unsettledTotals = useMemo(() => {
     let qty = 0;
@@ -155,6 +187,16 @@ export default function InvestorProductionPage() {
       const first = unpriced[0];
       const name = grades.find((g) => g.id === first.gradeId)?.name || "that grade";
       return toast.error("No rate for " + name + " on " + fmtDate(first.date) + ". Add a rate starting on or before that date.");
+    }
+
+    if (lotOverflow.length > 0) {
+      const o = lotOverflow[0];
+      const u = party?.unit || "kg";
+      return toast.error(
+        o.left > 0
+          ? o.lotNo + " has only " + fmtQty(o.left) + " " + u + " left, but this draft adds " + fmtQty(o.adding) + " " + u + "."
+          : o.lotNo + " is finished — its whole weight is already produced. Pick another lot.",
+      );
     }
 
     setSaving(true);
@@ -255,11 +297,18 @@ export default function InvestorProductionPage() {
                     <td style={tdStyle}>
                       <select style={inp({ padding: "6px 9px" })} value={row.lotId} onChange={(e) => setRow(row.key, { lotId: e.target.value })}>
                         <option value="">No lot</option>
-                        {lots.map((l) => (
-                          <option key={l.id} value={l.id}>
-                            {lotLabel.get(l.id)}
-                          </option>
-                        ))}
+                        {lots.map((l) => {
+                          const left = l.qty > 0 ? (lotLeft.get(l.id) ?? 0) : 0;
+                          const full = l.qty > 0 && left <= 0;
+                          return (
+                            // A finished lot stays visible but cannot be chosen — hiding it
+                            // would leave the user hunting for a lot he knows exists.
+                            <option key={l.id} value={l.id} disabled={full && row.lotId !== l.id}>
+                              {lotLabel.get(l.id)}
+                              {l.qty > 0 ? (full ? " · full" : " · " + fmtQty(left) + " left") : ""}
+                            </option>
+                          );
+                        })}
                       </select>
                     </td>
                     <td style={tdStyle}>
@@ -311,8 +360,19 @@ export default function InvestorProductionPage() {
             </tbody>
           </table>
         </TableWrap>
+        {lotOverflow.length > 0 && (
+          <p style={{ margin: "12px 0 0", fontSize: 12.5, color: "#fbbf24", lineHeight: 1.55 }}>
+            {lotOverflow.map((o) =>
+              o.left > 0
+                ? o.lotNo + " has " + fmtQty(o.left) + " " + (party?.unit || "kg") + " left, this draft adds " + fmtQty(o.adding) + "."
+                : o.lotNo + " is finished — its whole weight is already produced.",
+            ).join("  ")}{" "}
+            A lot cannot produce more than the weight that went into it.
+          </p>
+        )}
+
         <div style={{ display: "flex", gap: 10, marginTop: 14, flexWrap: "wrap" }}>
-          <Btn onClick={saveAll} disabled={saving || !partyId}>
+          <Btn onClick={saveAll} disabled={saving || !partyId || lotOverflow.length > 0}>
             {saving ? "Saving…" : "Save Lines"}
           </Btn>
           <Btn tone="ghost" onClick={addRow}>

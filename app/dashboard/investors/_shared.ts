@@ -273,6 +273,12 @@ export type LotResult = {
   recoveryPct: number;
   /** The investor's own earning per unit produced, across every grade in the lot. */
   sharePerUnit: number;
+  /**
+   * Weight still unspoken for. A mill cannot spin more yarn than the waste it
+   * was handed, so this going negative is never a real event — it is a typo, or
+   * a line booked against the wrong lot, and the entry screens defend it.
+   */
+  remaining: number;
   lineCount: number;
 };
 
@@ -301,6 +307,7 @@ export function lotResult(lot: Lot, lines: ProductionLine[]): LotResult {
     share: round2(share),
     recoveryPct: lot.qty > 0 ? round2((producedQty / lot.qty) * 100) : 0,
     sharePerUnit: producedQty > 0 ? round2(share / producedQty) : 0,
+    remaining: round2(lot.qty - producedQty),
     lineCount,
   };
 }
