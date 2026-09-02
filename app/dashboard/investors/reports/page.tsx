@@ -9,7 +9,7 @@
 // number rather than a feeling.
 
 import { useEffect, useMemo, useState } from "react";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useResponsive } from "@/hooks/useResponsive";
 import { useBusinessRecords } from "@/lib/useBusinessRecords";
 import { DateInput } from "../../reports/_components/DateInput";
@@ -50,6 +50,7 @@ import {
   thStyle,
   ACCENT,
   BORDER,
+  FONT,
   MUTED,
   TEXT,
 } from "../_ui";
@@ -74,6 +75,7 @@ const REPORTS: { key: ReportKey; label: string; blurb: string }[] = [
 
 export default function InvestorReportsPage() {
   const { isMobile } = useResponsive();
+  const router = useRouter();
   const searchParams = useSearchParams();
   const { records: partyRecords } = useBusinessRecords(CAT.party);
   const { records: capitalRecords } = useBusinessRecords(CAT.capital);
@@ -208,10 +210,21 @@ export default function InvestorReportsPage() {
   const delays = settlements.map((s) => daysBetween(s.toDate, s.settledOn)).filter((d) => d >= 0);
   const avgDelay = delays.length ? Math.round(delays.reduce((a, b) => a + b, 0) / delays.length) : 0;
 
+  const current = REPORTS.find((item) => item.key === report) || REPORTS[0];
+
+  /** Switch reports and leave the address bar telling the truth about it. */
+  function pickReport(key: ReportKey) {
+    setReport(key);
+    router.replace("/dashboard/investors/reports?view=" + key, { scroll: false });
+  }
+
   return (
     <PageShell
-      title="Reports"
-      subtitle="Four views on the same records. The window applies to production; return is measured over the whole life of the investment."
+      // The heading names the report being read, not the screen it lives on.
+      // Five views shared one title of "Reports", so the only way to tell which
+      // one was open was to go back and look at the sidebar.
+      title={current.label}
+      subtitle={current.blurb}
       isMobile={isMobile}
       actions={<Btn onClick={() => window.print()}>Print</Btn>}
     >
@@ -239,6 +252,37 @@ export default function InvestorReportsPage() {
       <div className="no-print">
       <Tabs active="/dashboard/investors/reports" />
 
+      {/* The five reports laid out in the open. Which one is being read used to
+          be answerable only from the sidebar, and switching meant going back
+          there for it. */}
+      <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 18 }}>
+        {REPORTS.map((item) => {
+          const active = item.key === report;
+          return (
+            <button
+              key={item.key}
+              type="button"
+              onClick={() => pickReport(item.key)}
+              title={item.blurb}
+              style={{
+                border: "1.5px solid " + (active ? ACCENT : BORDER),
+                background: active ? ACCENT : "transparent",
+                color: active ? "#04231f" : MUTED,
+                borderRadius: 999,
+                padding: "7px 15px",
+                fontFamily: FONT,
+                fontSize: 12.5,
+                fontWeight: 700,
+                cursor: "pointer",
+                whiteSpace: "nowrap",
+              }}
+            >
+              {item.label}
+            </button>
+          );
+        })}
+      </div>
+
       <div style={{ display: "flex", flexWrap: "wrap", gap: 12, alignItems: "flex-end", marginBottom: 18 }}>
         <Field label="Party" width={240}>
           <PartyPicker parties={parties} value={partyId} onChange={setPartyId} />
@@ -263,7 +307,7 @@ export default function InvestorReportsPage() {
         </div>
 
       {report === "production" && (
-        <Panel title="Production" hint={REPORTS[0].blurb}>
+        <Panel>
           <Tiles
             items={[
               { label: "Lines", value: String(production.length) },
@@ -303,7 +347,7 @@ export default function InvestorReportsPage() {
       )}
 
       {report === "monthly" && (
-        <Panel title="Monthly Summary" hint={REPORTS[1].blurb}>
+        <Panel>
           <TableWrap>
             <table style={tableStyle}>
               <thead>
@@ -369,10 +413,7 @@ export default function InvestorReportsPage() {
       )}
 
       {report === "return" && (
-        <Panel
-          title="Capital & Return"
-          hint="Measured from the day the first rupee went in, over everything earned since. Annualised by simple scaling, not compounding."
-        >
+        <Panel hint="Measured from the day the first rupee went in, over everything earned since. Annualised by simple scaling, not compounding.">
           <div
             style={{
               background: "var(--panel-bg)",
@@ -423,7 +464,7 @@ export default function InvestorReportsPage() {
       )}
 
       {report === "history" && (
-        <Panel title="Settlement History" hint={REPORTS[3].blurb}>
+        <Panel>
           <Tiles
             items={[
               { label: "Cycles closed", value: String(settlements.length) },
@@ -469,7 +510,7 @@ export default function InvestorReportsPage() {
       )}
 
       {report === "material" && (
-        <Panel title="Material & Profit" hint={REPORTS[4].blurb}>
+        <Panel>
           <Tiles
             items={[
               { label: "Material in", value: fmtMoney(lotSums.value) },

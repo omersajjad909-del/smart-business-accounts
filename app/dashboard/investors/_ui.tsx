@@ -114,11 +114,13 @@ export function Panel({
   right,
 }: {
   step?: number;
-  title: string;
+  /** Optional: a panel whose page heading already names it leaves this off. */
+  title?: string;
   hint?: string;
   children: React.ReactNode;
   right?: React.ReactNode;
 }) {
+  const hasHeader = step !== undefined || Boolean(title) || Boolean(right);
   return (
     <section
       style={{
@@ -129,6 +131,7 @@ export function Panel({
         marginBottom: 18,
       }}
     >
+      {hasHeader && (
       <div style={{ display: "flex", alignItems: "flex-start", gap: 12, marginBottom: hint ? 4 : 12 }}>
         {step !== undefined && (
           <span
@@ -149,9 +152,14 @@ export function Panel({
             {step}
           </span>
         )}
-        <h2 style={{ margin: 0, fontSize: 15.5, fontWeight: 700, color: TEXT, flex: 1 }}>{title}</h2>
+        {title ? (
+          <h2 style={{ margin: 0, fontSize: 15.5, fontWeight: 700, color: TEXT, flex: 1 }}>{title}</h2>
+        ) : (
+          <span style={{ flex: 1 }} />
+        )}
         {right}
       </div>
+      )}
       {hint && (
         <p style={{ margin: "0 0 14px", fontSize: 12.5, color: MUTED, lineHeight: 1.55, paddingLeft: step !== undefined ? 36 : 0 }}>
           {hint}
