@@ -51,6 +51,7 @@ import {
   ACCENT,
   BORDER,
   MUTED,
+  TEXT,
 } from "../_ui";
 
 type ReportKey = "production" | "monthly" | "return" | "history" | "material";
@@ -98,6 +99,17 @@ export default function InvestorReportsPage() {
   }, [searchParams]);
   const [fromEdit, setFromEdit] = useState("");
   const [to, setTo] = useState(todayISO());
+
+  // Which lots have their grade breakdown open. A set rather than a single id,
+  // so two lots can be held side by side while they are compared.
+  const [openLots, setOpenLots] = useState<Set<string>>(new Set());
+  const toggleLot = (id: string) =>
+    setOpenLots((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
 
   const capital = useMemo(() => capitalRecords.map(mapCapital).filter((c) => c.partyId === partyId), [capitalRecords, partyId]);
   const capTotals = useMemo(() => capitalTotals(capital), [capital]);
