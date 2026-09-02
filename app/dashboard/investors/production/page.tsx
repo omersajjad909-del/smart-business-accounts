@@ -173,8 +173,12 @@ export default function InvestorProductionPage() {
   }
 
   function addRow() {
+    // Only the date carries down. Copying the grade and lot too meant a new row
+    // arrived already filled in, and a pre-filled row is one that gets saved
+    // without being read — the whole point of a second row is that it holds
+    // something different from the first.
     const last = rows[rows.length - 1];
-    setRows((prev) => [...prev, blankRow(last?.date || todayISO(), last?.gradeId || "", last?.lotId || "")]);
+    setRows((prev) => [...prev, blankRow(last?.date || todayISO(), "")]);
   }
 
   async function saveAll() {
