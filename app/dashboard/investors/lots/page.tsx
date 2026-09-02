@@ -311,7 +311,7 @@ export default function InvestorLotsPage() {
               type="number"
               step="any"
               value={value}
-              onChange={(e) => setValue(e.target.value)}
+              onChange={(e) => typeValue(e.target.value)}
               placeholder="0"
             />
           </Field>
@@ -321,14 +321,19 @@ export default function InvestorLotsPage() {
               type="number"
               step="any"
               value={qty}
-              onChange={(e) => setQty(e.target.value)}
+              onChange={(e) => typeQty(e.target.value)}
               placeholder="0"
             />
           </Field>
-          <Field label={"Cost per " + unit} width={isMobile ? "100%" : 120}>
-            <div style={{ ...inp({ textAlign: "right" }), background: "transparent", fontWeight: 700, fontVariantNumeric: "tabular-nums" }}>
-              {draftCost > 0 ? fmtMoney(draftCost) : "-"}
-            </div>
+          <Field label={"Cost per " + unit} width={isMobile ? "100%" : 130}>
+            <input
+              style={inp({ textAlign: "right" })}
+              type="number"
+              step="any"
+              value={rate}
+              onChange={(e) => typeRate(e.target.value)}
+              placeholder="0"
+            />
           </Field>
         </div>
         <div style={{ display: "flex", flexWrap: "wrap", gap: 12, alignItems: "flex-end", marginTop: 12 }}>
