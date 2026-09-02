@@ -453,59 +453,155 @@ export default function InvestorReportsPage() {
                 </tr>
               </thead>
               <tbody>
-                {lotRows.map((r) => [
-                  <tr key={r.lot.id}>
-                    <td style={{ ...tdStyle, fontWeight: 700, borderBottom: r.grades.length > 0 ? "none" : tdStyle.borderBottom }}>
-                      {r.lot.lotNo || "-"}
-                    </td>
-                    <td style={{ ...tdStyle, borderBottom: r.grades.length > 0 ? "none" : tdStyle.borderBottom }}>
-                      {fmtDate(r.lot.date)}
-                    </td>
-                    <td style={{ ...tdStyle, borderBottom: r.grades.length > 0 ? "none" : tdStyle.borderBottom }}>{r.lot.material}</td>
-                    <td style={{ ...numTd, borderBottom: r.grades.length > 0 ? "none" : numTd.borderBottom }}>
-                      {fmtMoney(r.lot.value)}
-                    </td>
-                    <td style={{ ...numTd, borderBottom: r.grades.length > 0 ? "none" : numTd.borderBottom }}>{fmtQty(r.lot.qty)}</td>
-                    <td style={{ ...numTd, borderBottom: r.grades.length > 0 ? "none" : numTd.borderBottom }}>
-                      {fmtMoney(r.costPerUnit)}
-                    </td>
-                    <td style={{ ...numTd, borderBottom: r.grades.length > 0 ? "none" : numTd.borderBottom }}>
-                      {r.lineCount > 0 ? fmtQty(r.producedQty) : "-"}
-                    </td>
-                    <td
-                      style={{
-                        ...numTd,
-                        borderBottom: r.grades.length > 0 ? "none" : numTd.borderBottom,
-                        color: r.lineCount === 0 ? MUTED : r.recoveryPct > 100 ? "#f87171" : r.recoveryPct === 100 ? undefined : "#fbbf24",
-                      }}
-                    >
-                      {r.lineCount > 0 ? fmtQty(r.recoveryPct) + "%" : "not yet"}
-                    </td>
-                    <td style={{ ...numTd, fontWeight: 700, borderBottom: r.grades.length > 0 ? "none" : numTd.borderBottom }}>
-                      {fmtMoney(r.share)}
-                    </td>
-                    <td style={{ ...numTd, borderBottom: r.grades.length > 0 ? "none" : numTd.borderBottom }}>
-                      {r.producedQty > 0 ? fmtMoney(r.sharePerUnit) : "-"}
-                    </td>
-                  </tr>,
-                  // The arithmetic behind the blended per-kg figure, spelled out
-                  // on the row it belongs to. Without it the reader has to be
-                  // told how 8, 6 and 2 a kilo become 7.28.
-                  r.grades.length > 0 ? (
-                    <tr key={r.lot.id + "-grades"}>
-                      <td style={tdStyle} />
-                      <td style={{ ...tdStyle, color: MUTED, fontSize: 12, paddingTop: 0 }} colSpan={9}>
-                        {r.grades
-                          .map((g) =>
-                            party?.profitModel === "percentage"
-                              ? g.name + " " + fmtQty(g.qty) + " → " + fmtMoney(g.share)
-                              : g.name + " " + fmtQty(g.qty) + " × " + fmtMoney(g.rate) + " = " + fmtMoney(g.share),
-                          )
-                          .join("   ·   ")}
+                {lotRows.map((r) => {
+                  const open = openLots.has(r.lot.id);
+                  return [
+                    <tr key={r.lot.id}>
+                      <td style={{ ...tdStyle, fontWeight: 700 }}>
+                        {r.grades.length > 0 && (
+                          <button
+                            type="button"
+                            className="lot-toggle"
+                            onClick={() => toggleLot(r.lot.id)}
+                            aria-expanded={open}
+                            title={open ? "Hide grades" : "Show grades"}
+                            style={{
+                              border: "1px solid " + BORDER,
+                              background: "transparent",
+                              color: open ? ACCENT : MUTED,
+                              borderRadius: 6,
+                              width: 20,
+                              height: 20,
+                              lineHeight: 1,
+                              fontSize: 10,
+                              cursor: "pointer",
+                              marginRight: 7,
+                              padding: 0,
+                            }}
+                          >
+                            {open ? "▾" : "▸"}
+                          </button>
+                        )}
+                        {r.lot.lotNo || "-"}
                       </td>
-                    </tr>
-                  ) : null,
-                ])}
+                      <td style={tdStyle}>{fmtDate(r.lot.date)}</td>
+                      <td style={tdStyle}>{r.lot.material}</td>
+                      <td style={numTd}>{fmtMoney(r.lot.value)}</td>
+                      <td style={numTd}>{fmtQty(r.lot.qty)}</td>
+                      <td style={numTd}>{fmtMoney(r.costPerUnit)}</td>
+                      <td style={numTd}>{r.lineCount > 0 ? fmtQty(r.producedQty) : "-"}</td>
+                      <td
+                        style={{
+                          ...numTd,
+                          color:
+                            r.lineCount === 0 ? MUTED : r.recoveryPct > 100 ? "#f87171" : r.recoveryPct === 100 ? undefined : "#fbbf24",
+                        }}
+                      >
+                        {r.lineCount > 0 ? fmtQty(r.recoveryPct) + "%" : "not yet"}
+                      </td>
+                      <td style={{ ...numTd, fontWeight: 700 }}>{fmtMoney(r.share)}</td>
+                      <td style={numTd}>{r.producedQty > 0 ? fmtMoney(r.sharePerUnit) : "-"}</td>
+                    </tr>,
+                    // Always rendered, only hidden — a collapsed row that does not
+                    // exist cannot be brought back by print CSS, and this page is
+                    // printed and handed over. On paper every lot opens itself.
+                    r.grades.length > 0 ? (
+                      <tr key={r.lot.id + "-grades"} className="lot-detail" style={{ display: open ? undefined : "none" }}>
+                        <td style={{ ...tdStyle, padding: "0 12px 14px 12px" }} colSpan={10}>
+                          <table style={{ borderCollapse: "collapse", fontSize: 12.5, minWidth: 420 }}>
+                            <thead>
+                              <tr>
+                                <th style={{ ...thStyle, borderBottom: "none", padding: "6px 14px 6px 0" }}>Grade</th>
+                                <th style={{ ...thStyle, borderBottom: "none", padding: "6px 14px 6px 0", textAlign: "right" }}>
+                                  Qty ({unit})
+                                </th>
+                                {party?.profitModel !== "percentage" && (
+                                  <th style={{ ...thStyle, borderBottom: "none", padding: "6px 14px 6px 0", textAlign: "right" }}>
+                                    Rate
+                                  </th>
+                                )}
+                                <th style={{ ...thStyle, borderBottom: "none", padding: "6px 14px 6px 0", textAlign: "right" }}>
+                                  Profit
+                                </th>
+                                <th style={{ ...thStyle, borderBottom: "none", padding: "6px 0", textAlign: "right" }}>Of lot</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {r.grades.map((g) => (
+                                <tr key={g.gradeId}>
+                                  <td style={{ padding: "5px 14px 5px 0", color: TEXT }}>{g.name}</td>
+                                  <td style={{ padding: "5px 14px 5px 0", textAlign: "right", fontVariantNumeric: "tabular-nums" }}>
+                                    {fmtQty(g.qty)}
+                                  </td>
+                                  {party?.profitModel !== "percentage" && (
+                                    <td style={{ padding: "5px 14px 5px 0", textAlign: "right", fontVariantNumeric: "tabular-nums" }}>
+                                      {fmtMoney(g.rate)}
+                                    </td>
+                                  )}
+                                  <td
+                                    style={{
+                                      padding: "5px 14px 5px 0",
+                                      textAlign: "right",
+                                      fontVariantNumeric: "tabular-nums",
+                                      fontWeight: 600,
+                                    }}
+                                  >
+                                    {fmtMoney(g.share)}
+                                  </td>
+                                  <td style={{ padding: "5px 0", textAlign: "right", color: MUTED, fontVariantNumeric: "tabular-nums" }}>
+                                    {r.producedQty > 0 ? fmtQty(round2((g.qty / r.producedQty) * 100)) + "%" : "-"}
+                                  </td>
+                                </tr>
+                              ))}
+                              {/* The line that answers "where did 5.47 come from". */}
+                              <tr>
+                                <td style={{ padding: "7px 14px 0 0", fontWeight: 700, borderTop: "1px solid " + BORDER }}>
+                                  {r.lot.lotNo || "Lot"} total
+                                </td>
+                                <td
+                                  style={{
+                                    padding: "7px 14px 0 0",
+                                    textAlign: "right",
+                                    fontWeight: 700,
+                                    borderTop: "1px solid " + BORDER,
+                                    fontVariantNumeric: "tabular-nums",
+                                  }}
+                                >
+                                  {fmtQty(r.producedQty)}
+                                </td>
+                                {party?.profitModel !== "percentage" && (
+                                  <td
+                                    style={{
+                                      padding: "7px 14px 0 0",
+                                      textAlign: "right",
+                                      color: MUTED,
+                                      borderTop: "1px solid " + BORDER,
+                                      fontVariantNumeric: "tabular-nums",
+                                    }}
+                                  >
+                                    {fmtMoney(r.sharePerUnit)} avg
+                                  </td>
+                                )}
+                                <td
+                                  style={{
+                                    padding: "7px 14px 0 0",
+                                    textAlign: "right",
+                                    fontWeight: 800,
+                                    borderTop: "1px solid " + BORDER,
+                                    fontVariantNumeric: "tabular-nums",
+                                  }}
+                                >
+                                  {fmtMoney(r.share)}
+                                </td>
+                                <td style={{ padding: "7px 0 0", borderTop: "1px solid " + BORDER }} />
+                              </tr>
+                            </tbody>
+                          </table>
+                        </td>
+                      </tr>
+                    ) : null,
+                  ];
+                })}
                 {lotRows.length > 0 && (
                   <tr>
                     <td style={{ ...tdStyle, fontWeight: 800 }} colSpan={3}>
