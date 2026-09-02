@@ -407,7 +407,7 @@ export default function InvestorLotsPage() {
                         type="number"
                         step="any"
                         value={edit.value}
-                        onChange={(e) => setEdit({ ...edit, value: e.target.value })}
+                        onChange={(e) => editValue(e.target.value)}
                       />
                     </td>
                     <td style={tdStyle}>
@@ -416,10 +416,18 @@ export default function InvestorLotsPage() {
                         type="number"
                         step="any"
                         value={edit.qty}
-                        onChange={(e) => setEdit({ ...edit, qty: e.target.value })}
+                        onChange={(e) => editQty(e.target.value)}
                       />
                     </td>
-                    <td style={numTd}>{editCost > 0 ? fmtMoney(editCost) : "-"}</td>
+                    <td style={tdStyle}>
+                      <input
+                        style={inp({ padding: "6px 9px", textAlign: "right" })}
+                        type="number"
+                        step="any"
+                        value={edit.rate}
+                        onChange={(e) => editRate(e.target.value)}
+                      />
+                    </td>
                     {/* Output is not editable here — it belongs to the production
                         lines, and letting it be typed over would put two different
                         answers in the system for the same kilos. */}
