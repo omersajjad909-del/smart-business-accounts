@@ -320,8 +320,36 @@ export default function InvestorReportsPage() {
                     <td style={{ ...tdStyle, fontWeight: 700 }}>{monthLabel(m.key)}</td>
                     <td style={numTd}>{fmtQty(m.qty)}</td>
                     <td style={{ ...numTd, fontWeight: 700 }}>{fmtMoney(m.amount)}</td>
-                    <td style={{ ...tdStyle, color: MUTED, fontSize: 12.5 }}>
-                      {[...m.grades.entries()].map(([g, q]) => g + " " + fmtQty(q)).join("  ·  ") || "-"}
+                    {/* One chip per grade, heaviest first. The same facts ran
+                        together as dot-separated text and read as a paragraph
+                        rather than a list; separated, the eye finds a grade. */}
+                    <td style={tdStyle}>
+                      {m.grades.size === 0 ? (
+                        <span style={{ color: MUTED }}>-</span>
+                      ) : (
+                        <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+                          {[...m.grades.entries()]
+                            .sort((a, b) => b[1] - a[1])
+                            .map(([g, q]) => (
+                              <span
+                                key={g}
+                                style={{
+                                  display: "inline-flex",
+                                  alignItems: "baseline",
+                                  gap: 7,
+                                  border: "1px solid " + BORDER,
+                                  borderRadius: 999,
+                                  padding: "3px 11px",
+                                  fontSize: 12,
+                                  whiteSpace: "nowrap",
+                                }}
+                              >
+                                <span style={{ color: MUTED }}>{g}</span>
+                                <strong style={{ color: TEXT, fontVariantNumeric: "tabular-nums" }}>{fmtQty(q)}</strong>
+                              </span>
+                            ))}
+                        </div>
+                      )}
                     </td>
                   </tr>
                 ))}
