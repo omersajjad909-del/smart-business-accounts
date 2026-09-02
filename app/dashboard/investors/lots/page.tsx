@@ -108,15 +108,42 @@ export default function InvestorLotsPage() {
   const [material, setMaterial] = useState("");
   const [value, setValue] = useState("");
   const [qty, setQty] = useState("");
+  const [rate, setRate] = useState("");
   const [note, setNote] = useState("");
   const [saving, setSaving] = useState(false);
 
-  const suggestedNo = useMemo(() => nextLotNo(lots), [lots]);
-  const draftCost = useMemo(() => {
-    const v = Number(value) || 0;
+  /**
+   * Value, weight and cost per unit are three views of two numbers, and the
+   * mill quotes whichever it feels like — 52 a kilo on one lot, 60 on the next,
+   * a lump sum on the one after. So all three are typed. Whichever of value and
+   * rate was touched last is the one that stays put; the other is worked out
+   * from the weight. Only value and weight are stored, so the rate still reads
+   * back off them and the record keeps one truth rather than two.
+   */
+  const [lastTyped, setLastTyped] = useState<"value" | "rate">("value");
+
+  function typeValue(v: string) {
+    setLastTyped("value");
+    setValue(v);
     const q = Number(qty) || 0;
-    return q > 0 ? round2(v / q) : 0;
-  }, [value, qty]);
+    setRate(v !== "" && q > 0 ? String(round2(Number(v) / q)) : "");
+  }
+
+  function typeRate(r: string) {
+    setLastTyped("rate");
+    setRate(r);
+    const q = Number(qty) || 0;
+    setValue(r !== "" && q > 0 ? String(round2(Number(r) * q)) : "");
+  }
+
+  function typeQty(q: string) {
+    setQty(q);
+    const n = Number(q) || 0;
+    if (lastTyped === "rate") setValue(rate !== "" && n > 0 ? String(round2(Number(rate) * n)) : "");
+    else setRate(value !== "" && n > 0 ? String(round2(Number(value) / n)) : "");
+  }
+
+  const suggestedNo = useMemo(() => nextLotNo(lots), [lots]);
 
   async function save() {
     if (!partyId) return toast.error("Add a party first");
@@ -136,6 +163,7 @@ export default function InvestorLotsPage() {
       setMaterial("");
       setValue("");
       setQty("");
+      setRate("");
       setNote("");
       toast.success("Material recorded");
     } catch (e) {
@@ -149,23 +177,44 @@ export default function InvestorLotsPage() {
   // arrive from the mill by phone and get typed wrong, and the man fixing a
   // weight wants to see the rest of the row while he does it.
   const [editId, setEditId] = useState("");
-  const [edit, setEdit] = useState({ date: "", lotNo: "", material: "", value: "", qty: "", note: "" });
+  const [edit, setEdit] = useState({ date: "", lotNo: "", material: "", value: "", qty: "", rate: "", note: "" });
+  const [editLastTyped, setEditLastTyped] = useState<"value" | "rate">("value");
   const [savingEdit, setSavingEdit] = useState(false);
 
-  const editCost = useMemo(() => {
-    const v = Number(edit.value) || 0;
+  // The same tie as the entry row above, because a lot first typed in as a lump
+  // sum has to be correctable to the rate the mill actually quoted, and the man
+  // correcting it is on the phone, not at a calculator.
+  function editValue(v: string) {
+    setEditLastTyped("value");
     const q = Number(edit.qty) || 0;
-    return q > 0 ? round2(v / q) : 0;
-  }, [edit.value, edit.qty]);
+    setEdit({ ...edit, value: v, rate: v !== "" && q > 0 ? String(round2(Number(v) / q)) : "" });
+  }
+
+  function editRate(r: string) {
+    setEditLastTyped("rate");
+    const q = Number(edit.qty) || 0;
+    setEdit({ ...edit, rate: r, value: r !== "" && q > 0 ? String(round2(Number(r) * q)) : "" });
+  }
+
+  function editQty(q: string) {
+    const n = Number(q) || 0;
+    if (editLastTyped === "rate") {
+      setEdit({ ...edit, qty: q, value: edit.rate !== "" && n > 0 ? String(round2(Number(edit.rate) * n)) : "" });
+    } else {
+      setEdit({ ...edit, qty: q, rate: edit.value !== "" && n > 0 ? String(round2(Number(edit.value) / n)) : "" });
+    }
+  }
 
   function startEdit(lot: (typeof lots)[number]) {
     setEditId(lot.id);
+    setEditLastTyped("value");
     setEdit({
       date: lot.date,
       lotNo: lot.lotNo,
       material: lot.material,
       value: String(lot.value),
       qty: String(lot.qty),
+      rate: lot.qty > 0 ? String(round2(lot.value / lot.qty)) : "",
       note: lot.note,
     });
   }
