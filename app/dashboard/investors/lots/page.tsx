@@ -290,9 +290,9 @@ export default function InvestorLotsPage() {
         step={1}
         title="Record material"
         hint={
-          "Enter it the way the mill tells it to you: this much money of material came in, weighing this much. Cost per " +
+          "Enter it the way the mill tells it to you — a lump sum for the material, or a rate per " +
           unit +
-          " works itself out."
+          ". Type the weight and either one, and the other fills itself in."
         }
       >
         <div style={{ display: "flex", flexWrap: "wrap", gap: 12, alignItems: "flex-end" }}>
