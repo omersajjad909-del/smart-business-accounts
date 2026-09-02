@@ -5,6 +5,12 @@ import { PERMISSIONS } from "@/lib/permissions";
 import Link from "next/link";
 import { getCurrentUser, getStoredDemoBusinessPreference } from "@/lib/auth";
 import { BUSINESS_TYPES, type BusinessType } from "@/lib/businessModules";
+import {
+  getDashboardLayout,
+  type DashboardKpi,
+  type DashboardOpsMetric,
+  type MetricSource,
+} from "@/lib/dashboardLayouts";
 import { CURRENCY_SYMBOL } from "@/lib/currency-client";
 import DemoBusinessShowcase from "./DemoBusinessShowcase";
 import { useResponsive } from "@/hooks/useResponsive";
@@ -32,6 +38,9 @@ interface DashStats {
   revenueGrowth: number;
   expensesGrowth: number;
   profitGrowth: number;
+  receivables: number;
+  payables: number;
+  stockValue: number;
   overdueAmount: number;
   invoicesPending: number;
   revenueHistory: number[];
@@ -539,6 +548,9 @@ export default function DashboardContent() {
     revenueGrowth: 0,
     expensesGrowth: 0,
     profitGrowth: 0,
+    receivables: 0,
+    payables: 0,
+    stockValue: 0,
     overdueAmount: 0,
     invoicesPending: 0,
     revenueHistory: [],
@@ -550,6 +562,10 @@ export default function DashboardContent() {
   const [donut, setDonut] = useState<ExpSlice[]>([]);
   const [loading, setLoad] = useState(true);
   const [period, setPeriod] = useState<"month" | "quarter" | "year" | "all">("month");
+  // Industry-specific counters (patients, tables, production orders…) pulled
+  // from the business type's own control-center endpoint. Null until loaded,
+  // and stays null for business types that have no vertical endpoint.
+  const [verticalSummary, setVerticalSummary] = useState<Record<string, number> | null>(null);
 
   useEffect(() => {
     if (allowed !== true) return;
@@ -593,6 +609,9 @@ export default function DashboardContent() {
             revenueGrowth:  Number(d.revenueGrowth  ?? 0),
             expensesGrowth: Number(d.expensesGrowth ?? 0),
             profitGrowth:   Number(d.profitGrowth   ?? 0),
+            receivables: Number(d.receivables || 0),
+            payables:    Number(d.payables    || 0),
+            stockValue:  Number(d.stockValue  || 0),
             overdueAmount: Number(d.overdueAmount || 0),
             invoicesPending: Number(d.invoicesPending || 0),
             revenueHistory: Array.isArray(d.revenueHistory)
@@ -712,6 +731,37 @@ export default function DashboardContent() {
     })();
   }, [allowed, period]);
 
+  // ── Vertical control-center counters ──
+  // Each business type's dashboard shows its own operational numbers, so the
+  // layout config decides which endpoint (if any) to call. Below-the-fold —
+  // it never blocks the financial cards.
+  useEffect(() => {
+    if (allowed !== true) return;
+    const endpoint = getDashboardLayout(businessType).verticalEndpoint;
+    if (!endpoint) {
+      setVerticalSummary(null);
+      return;
+    }
+    const user = getCurrentUser();
+    if (!user?.companyId) return;
+    const h: Record<string, string> = { "x-company-id": user.companyId };
+    if (user.role) h["x-user-role"] = user.role;
+    if (user.id) h["x-user-id"] = user.id;
+    let cancelled = false;
+    fetch(endpoint, { headers: h, cache: "no-store" })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => {
+        if (cancelled || !d?.summary) return;
+        const nums: Record<string, number> = {};
+        for (const [k, v] of Object.entries(d.summary)) nums[k] = Number(v) || 0;
+        setVerticalSummary(nums);
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, [allowed, businessType]);
+
   useEffect(() => {
     if (storedUser?.email !== "finovaos.app@gmail.com") return;
     const p = getStoredDemoBusinessPreference() as BusinessType | null;
@@ -770,10 +820,38 @@ export default function DashboardContent() {
       .slice(0, 2)
       .map((part) => part[0]?.toUpperCase() || "")
       .join("") || "U";
+  /* ── Per-business dashboard layout ──
+     Which cards, counters, shortcuts and chart labels this industry sees.
+     A business type without its own entry falls back to the generic
+     financial layout. See lib/dashboardLayouts.ts. */
+  const layout = getDashboardLayout(businessType);
+
+  // Resolves a config metric against whichever payload it declared.
+  // Returns null while its source has not loaded yet, so the card can
+  // show "—" instead of a misleading zero.
+  const readMetric = (source: MetricSource, metric: string): number | null => {
+    if (source === "core") {
+      const v = (stats as unknown as Record<string, unknown>)[metric];
+      return typeof v === "number" ? v : null;
+    }
+    if (source === "today") {
+      if (!todayStats) return null;
+      const v = (todayStats as unknown as Record<string, unknown>)[metric];
+      return typeof v === "number" ? v : null;
+    }
+    if (!verticalSummary) return null;
+    return typeof verticalSummary[metric] === "number" ? verticalSummary[metric] : null;
+  };
+
+  const formatMetric = (value: number | null, format: string) => {
+    if (value === null) return "—";
+    if (format === "currency") return `${cur} ${fmt(value)}`;
+    if (format === "percent")
+      return `${Number.isInteger(value) ? value : value.toFixed(1)}%`;
+    return value.toLocaleString();
+  };
+
   const profC = stats.profit >= 0 ? "#10b981" : "#ef4444";
-  const grC  = stats.revenueGrowth  >= 0 ? "#10b981" : "#ef4444";
-  const expC = stats.expensesGrowth >= 0 ? "#ef4444" : "#10b981"; // expenses up = bad (red)
-  const prfC = stats.profitGrowth   >= 0 ? "#10b981" : "#ef4444";
   const MO = [
     "Jan",
     "Feb",
@@ -807,32 +885,9 @@ export default function DashboardContent() {
           ]
         : [];
 
-  const QA = [
-    {
-      label: "+ Invoice",
-      href: "/dashboard/sales-invoice",
-      bg: "linear-gradient(135deg,#6366f1,#4f46e5)",
-      icon: "📄",
-    },
-    {
-      label: "+ Sale",
-      href: "/dashboard/sales-order",
-      bg: "linear-gradient(135deg,#38bdf8,#0ea5e9)",
-      icon: "🛒",
-    },
-    {
-      label: "+ Expense",
-      href: "/dashboard/expense-vouchers",
-      bg: "linear-gradient(135deg,#f59e0b,#d97706)",
-      icon: "💰",
-    },
-    {
-      label: "+ Product",
-      href: "/dashboard/items-new",
-      bg: "linear-gradient(135deg,#10b981,#059669)",
-      icon: "📦",
-    },
-  ];
+  // Quick actions come from the business type's layout — a hospital gets
+  // "New Patient", a factory gets "New Production Order".
+  const QA = layout.actions;
 
   const TT = {
     contentStyle: {
@@ -859,6 +914,12 @@ export default function DashboardContent() {
         @media(max-width:500px){.db-kpi{grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:12px;}}
         @media(max-width:500px){.db-kpi-bal{grid-column:1/-1;}}
 
+        .db-ops{margin-bottom:20px;}
+        .db-ops-title{font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--text-muted);margin-bottom:8px;}
+        .db-ops-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(158px,1fr));gap:10px;}
+        .db-ops-cell{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:12px;background:var(--panel-bg);border:1px solid var(--border);text-decoration:none;transition:transform .15s,border-color .15s;}
+        a.db-ops-cell:hover{transform:translateY(-2px);border-color:rgba(255,255,255,.18);}
+
         .db-mid{display:grid;grid-template-columns:2fr 1fr;gap:16px;margin-bottom:20px;min-height:340px;}
         @media(max-width:960px){.db-mid{grid-template-columns:1fr;}}
 
@@ -875,6 +936,7 @@ export default function DashboardContent() {
           .db-mo-grid   {display:grid!important;}
           .db-mo-legacy-head{display:none!important;}
           .db-kpi{display:none!important;}
+          .db-ops{display:none!important;}
           .db-mid{display:none!important;}
           .db-bot{display:none!important;}
           .db-deskqa{display:none!important;}
@@ -1039,250 +1101,171 @@ export default function DashboardContent() {
         </div>
       </div>
 
-      {/* ── 4 KPI Cards ── */}
+      {/* ── KPI cards ──
+           Which four numbers appear here is decided by the business type's
+           layout, not hardcoded. See lib/dashboardLayouts.ts. */}
       <div className="db-kpi">
-        {/* Balance */}
-        <div
-          className="db-card db-kpi-bal"
-          style={{
+        {layout.kpis.map((kpi: DashboardKpi, idx: number) => {
+          const value = readMetric(kpi.source, kpi.metric);
+          const accent = kpi.key === "profit" ? profC : kpi.color;
+          const delta = kpi.deltaMetric
+            ? Number((stats as unknown as Record<string, number>)[kpi.deltaMetric] || 0)
+            : null;
+          const deltaColor =
+            delta === null
+              ? accent
+              : kpi.deltaTone === "up-bad"
+                ? delta >= 0
+                  ? "#ef4444"
+                  : "#10b981"
+                : delta >= 0
+                  ? "#10b981"
+                  : "#ef4444";
+          const cardStyle: React.CSSProperties = {
             borderRadius: 16,
             padding: isMobile ? "8px 8px" : "20px 22px",
-            background:
-              "linear-gradient(135deg,rgba(99,102,241,.14),rgba(79,70,229,.07))",
-            border: "1px solid rgba(99,102,241,.22)",
-          }}
-        >
-          <div
-            style={{
-              display: "flex",
-              alignItems: "flex-start",
-              justifyContent: "space-between",
-              marginBottom: isMobile ? 6 : 14,
-            }}
-          >
-            <span
-              style={{
-                fontSize: isMobile ? 9 : 12,
-                fontWeight: 600,
-                color: "rgba(99,102,241,.8)",
-              }}
-            >
-              Total Balance
-            </span>
-            <div
-              style={{
-                width: isMobile ? 28 : 38,
-                height: isMobile ? 28 : 38,
-                borderRadius: 11,
-                background: "rgba(99,102,241,.18)",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                fontSize: isMobile ? 13 : 17,
-              }}
-            >
-              💳
+            background: `${accent}12`,
+            border: `1px solid ${accent}33`,
+            display: "block",
+            textDecoration: "none",
+          };
+          const className = `db-card${idx === 0 ? " db-kpi-bal" : ""}`;
+          const body = (
+            <>
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "flex-start",
+                  justifyContent: "space-between",
+                  marginBottom: isMobile ? 6 : 14,
+                }}
+              >
+                <span
+                  style={{
+                    fontSize: isMobile ? 9 : 12,
+                    fontWeight: 600,
+                    color: `${accent}cc`,
+                  }}
+                >
+                  {kpi.label}
+                </span>
+                <div
+                  style={{
+                    width: isMobile ? 28 : 38,
+                    height: isMobile ? 28 : 38,
+                    borderRadius: 11,
+                    background: `${accent}2e`,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    fontSize: isMobile ? 13 : 17,
+                  }}
+                >
+                  {kpi.key === "profit" && value !== null && value < 0 ? "📉" : kpi.icon}
+                </div>
+              </div>
+              <div
+                style={{
+                  fontSize: isMobile ? 16 : 26,
+                  fontWeight: 900,
+                  color: accent,
+                  letterSpacing: "-1px",
+                  marginBottom: isMobile ? 4 : 8,
+                }}
+              >
+                {formatMetric(value, kpi.format)}
+              </div>
+              {delta !== null ? (
+                <div style={{ fontSize: isMobile ? 9 : 11, fontWeight: 700, color: deltaColor }}>
+                  {delta >= 0 ? "↑" : "↓"} {Math.abs(delta).toFixed(1)}%{" "}
+                  <span style={{ color: "var(--text-muted)", fontWeight: 400 }}>
+                    vs last month
+                  </span>
+                </div>
+              ) : (
+                <div
+                  style={{
+                    fontSize: isMobile ? 9 : 11,
+                    fontWeight: 600,
+                    color: "var(--text-muted)",
+                  }}
+                >
+                  {kpi.caption || " "}
+                </div>
+              )}
+            </>
+          );
+          return kpi.href ? (
+            <Link key={kpi.key} href={kpi.href} className={className} style={cardStyle}>
+              {body}
+            </Link>
+          ) : (
+            <div key={kpi.key} className={className} style={cardStyle}>
+              {body}
             </div>
-          </div>
-          <div
-            style={{
-              fontSize: isMobile ? 20 : 26,
-              fontWeight: 900,
-              color: "#818cf8",
-              letterSpacing: "-1px",
-              marginBottom: isMobile ? 4 : 8,
-            }}
-          >
-            {cur} {fmt(stats.cashBalance)}
-          </div>
-          <div style={{ fontSize: isMobile ? 9 : 11, fontWeight: 700, color: grC }}>
-            {stats.revenueGrowth >= 0 ? "↑" : "↓"}{" "}
-            {Math.abs(stats.revenueGrowth).toFixed(1)}%{" "}
-            <span style={{ color: "var(--text-muted)", fontWeight: 400 }}>
-              vs last month
-            </span>
-          </div>
-        </div>
-        {/* Revenue */}
-        <div
-          className="db-card"
-          style={{
-            borderRadius: 16,
-            padding: isMobile ? "8px 8px" : "20px 22px",
-            background: "rgba(16,185,129,.07)",
-            border: "1px solid rgba(16,185,129,.2)",
-          }}
-        >
-          <div
-            style={{
-              display: "flex",
-              alignItems: "flex-start",
-              justifyContent: "space-between",
-              marginBottom: isMobile ? 6 : 14,
-            }}
-          >
-            <span
-              style={{
-                fontSize: isMobile ? 9 : 12,
-                fontWeight: 600,
-                color: "rgba(16,185,129,.8)",
-              }}
-            >
-              Total Revenue
-            </span>
-            <div
-              style={{
-                width: isMobile ? 28 : 38,
-                height: isMobile ? 28 : 38,
-                borderRadius: 11,
-                background: "rgba(16,185,129,.15)",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                fontSize: isMobile ? 13 : 17,
-              }}
-            >
-              📈
-            </div>
-          </div>
-          <div
-            style={{
-              fontSize: isMobile ? 16 : 26,
-              fontWeight: 900,
-              color: "#10b981",
-              letterSpacing: "-1px",
-              marginBottom: isMobile ? 4 : 8,
-            }}
-          >
-            {cur} {fmt(stats.revenue)}
-          </div>
-          <div style={{ fontSize: isMobile ? 9 : 11, fontWeight: 700, color: grC }}>
-            {stats.revenueGrowth >= 0 ? "↑" : "↓"}{" "}
-            {Math.abs(stats.revenueGrowth).toFixed(1)}%{" "}
-            <span style={{ color: "var(--text-muted)", fontWeight: 400 }}>
-              vs last month
-            </span>
-          </div>
-        </div>
-        {/* Expenses */}
-        <div
-          className="db-card"
-          style={{
-            borderRadius: 16,
-            padding: isMobile ? "8px 8px" : "20px 22px",
-            background: "rgba(248,113,113,.07)",
-            border: "1px solid rgba(248,113,113,.2)",
-          }}
-        >
-          <div
-            style={{
-              display: "flex",
-              alignItems: "flex-start",
-              justifyContent: "space-between",
-              marginBottom: isMobile ? 6 : 14,
-            }}
-          >
-            <span
-              style={{
-                fontSize: isMobile ? 9 : 12,
-                fontWeight: 600,
-                color: "rgba(248,113,113,.8)",
-              }}
-            >
-              Total Expenses
-            </span>
-            <div
-              style={{
-                width: isMobile ? 28 : 38,
-                height: isMobile ? 28 : 38,
-                borderRadius: 11,
-                background: "rgba(248,113,113,.15)",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                fontSize: isMobile ? 13 : 17,
-              }}
-            >
-              📉
-            </div>
-          </div>
-          <div
-            style={{
-              fontSize: isMobile ? 16 : 26,
-              fontWeight: 900,
-              color: "#f87171",
-              letterSpacing: "-1px",
-              marginBottom: isMobile ? 4 : 8,
-            }}
-          >
-            {cur} {fmt(stats.expenses)}
-          </div>
-          <div style={{ fontSize: isMobile ? 9 : 11, fontWeight: 700, color: expC }}>
-            {stats.expensesGrowth >= 0 ? "↑" : "↓"}{" "}
-            {Math.abs(stats.expensesGrowth).toFixed(1)}%{" "}
-            <span style={{ color: "var(--text-muted)", fontWeight: 400 }}>
-              vs last month
-            </span>
-          </div>
-        </div>
-        {/* Profit */}
-        <div
-          className="db-card"
-          style={{
-            borderRadius: 16,
-            padding: isMobile ? "8px 8px" : "20px 22px",
-            background: `${profC}0f`,
-            border: `1px solid ${profC}28`,
-          }}
-        >
-          <div
-            style={{
-              display: "flex",
-              alignItems: "flex-start",
-              justifyContent: "space-between",
-              marginBottom: isMobile ? 6 : 14,
-            }}
-          >
-            <span
-              style={{ fontSize: isMobile ? 9 : 12, fontWeight: 600, color: `${profC}cc` }}
-            >
-              Profit This Month
-            </span>
-            <div
-              style={{
-                width: isMobile ? 28 : 38,
-                height: isMobile ? 28 : 38,
-                borderRadius: 11,
-                background: `${profC}18`,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                fontSize: isMobile ? 13 : 17,
-              }}
-            >
-              {stats.profit >= 0 ? "🚀" : "📉"}
-            </div>
-          </div>
-          <div
-            style={{
-              fontSize: isMobile ? 16 : 26,
-              fontWeight: 900,
-              color: profC,
-              letterSpacing: "-1px",
-              marginBottom: isMobile ? 4 : 8,
-            }}
-          >
-            {cur} {fmt(stats.profit)}
-          </div>
-          <div style={{ fontSize: isMobile ? 9 : 11, fontWeight: 700, color: prfC }}>
-            {stats.profitGrowth >= 0 ? "↑" : "↓"}{" "}
-            {Math.abs(stats.profitGrowth).toFixed(1)}%{" "}
-            <span style={{ color: "var(--text-muted)", fontWeight: 400 }}>
-              vs last month
-            </span>
-          </div>
-        </div>
+          );
+        })}
       </div>
+
+      {/* ── Operations strip ──
+           The counters this industry actually runs on — open work orders on a
+           factory dashboard, pending labs on a hospital one. */}
+      {layout.opsStrip.length > 0 && (
+        <div className="db-ops">
+          <div className="db-ops-title">{layout.opsTitle}</div>
+          <div className="db-ops-grid">
+            {layout.opsStrip.map((metric: DashboardOpsMetric) => {
+              const value = readMetric(metric.source, metric.metric);
+              const inner = (
+                <>
+                  <span style={{ fontSize: 18, lineHeight: 1, flexShrink: 0 }}>
+                    {metric.icon}
+                  </span>
+                  <span style={{ minWidth: 0 }}>
+                    <span
+                      style={{
+                        display: "block",
+                        fontSize: 16,
+                        fontWeight: 900,
+                        color: metric.color,
+                        letterSpacing: "-.5px",
+                        lineHeight: 1.1,
+                        whiteSpace: "nowrap",
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                      }}
+                    >
+                      {formatMetric(value, metric.format)}
+                    </span>
+                    <span
+                      style={{
+                        display: "block",
+                        fontSize: 10,
+                        fontWeight: 700,
+                        color: "var(--text-muted)",
+                        textTransform: "uppercase",
+                        letterSpacing: ".04em",
+                        marginTop: 3,
+                      }}
+                    >
+                      {metric.label}
+                    </span>
+                  </span>
+                </>
+              );
+              return metric.href ? (
+                <Link key={metric.label} href={metric.href} className="db-ops-cell">
+                  {inner}
+                </Link>
+              ) : (
+                <div key={metric.label} className="db-ops-cell">
+                  {inner}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
 
       {/* ════════════════════════════════════════
            MOBILE ONLY — Full redesign
@@ -1865,7 +1848,7 @@ export default function DashboardContent() {
               color: "var(--text-primary)",
             }}
           >
-            Business Overview
+            {layout.chart.title}
           </div>
           <Link
             prefetch={false}
@@ -1902,8 +1885,8 @@ export default function DashboardContent() {
             }}
           >
             {[
-              ["Revenue", "#818cf8"],
-              ["Expenses", "#f87171"],
+              [layout.chart.revenueLabel, "#818cf8"],
+              [layout.chart.expensesLabel, "#f87171"],
               ["Profit", "#10b981"],
             ].map(([l, c]) => (
               <span
@@ -2017,37 +2000,18 @@ export default function DashboardContent() {
             </div>
           )}
         </div>
-        {/* Today's stat tiles — 2×2 grid */}
+        {/* Operations tiles — 2×2 grid, same per-industry counters the
+            desktop ops strip shows. */}
         <div
           className="db-grid-exempt"
           style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}
         >
-          {[
-            {
-              l: "Today's Sales",
-              v: todayStats ? `${cur} ${fmt(todayStats.todaySales)}` : "—",
-              c: "#10b981",
-              icon: "🛍️",
-            },
-            {
-              l: "Orders Today",
-              v: todayStats ? String(todayStats.todayOrders) : "—",
-              c: "#818cf8",
-              icon: "📦",
-            },
-            {
-              l: "Pending Invoices",
-              v: todayStats ? String(todayStats.pendingCount) : "—",
-              c: "#f59e0b",
-              icon: "🧾",
-            },
-            {
-              l: "Low Stock Items",
-              v: todayStats ? String(todayStats.lowStockCount) : "—",
-              c: "#f87171",
-              icon: "⚠️",
-            },
-          ].map((it, i) => (
+          {layout.opsStrip.slice(0, 4).map((metric) => ({
+            l: metric.label,
+            v: formatMetric(readMetric(metric.source, metric.metric), metric.format),
+            c: metric.color,
+            icon: metric.icon,
+          })).map((it, i) => (
             <div
               key={i}
               style={{
@@ -2421,7 +2385,7 @@ export default function DashboardContent() {
                 color: "var(--text-primary)",
               }}
             >
-              Business Overview
+              {layout.chart.title}
             </div>
             <div
               style={{
@@ -2433,8 +2397,8 @@ export default function DashboardContent() {
               }}
             >
               {[
-                ["Revenue", "#818cf8"],
-                ["Expenses", "#f87171"],
+                [layout.chart.revenueLabel, "#818cf8"],
+                [layout.chart.expensesLabel, "#f87171"],
                 ["Profit", "#10b981"],
               ].map(([l, c]) => (
                 <span

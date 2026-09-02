@@ -84,6 +84,7 @@ export async function getSummary(companyId: string, branchId: string | null, per
     topCustomerRaw,
     recentSales,
     recentPurchases,
+    [stockValueRow],
   ] = await Promise.all([
     revenueSQL("SalesInvoice", companyId, branchId, startDate, now),
     revenueSQL("PurchaseInvoice", companyId, branchId, startDate, now),
@@ -132,6 +133,20 @@ export async function getSummary(companyId: string, branchId: string | null, per
       take: 3,
       select: { id: true, invoiceNo: true, total: true, createdAt: true },
     }),
+    // Inventory valued at cost — the "Stock Value" KPI on the trading,
+    // retail and distribution dashboards.
+    prisma.$queryRaw<[{ total: number }]>`
+      SELECT COALESCE(SUM(GREATEST(COALESCE(stock.qty, 0), 0) * i."purchaseRate"), 0)::float AS total
+      FROM "ItemNew" i
+      LEFT JOIN (
+        SELECT "itemId", COALESCE(SUM("qty"), 0)::float AS qty
+        FROM "InventoryTxn"
+        WHERE "companyId" = ${companyId}
+        GROUP BY "itemId"
+      ) stock ON stock."itemId" = i."id"
+      WHERE i."companyId" = ${companyId}
+        AND i."deletedAt" IS NULL
+    `,
   ]);
 
   const revenue = Number(revenueRow.total || 0);
@@ -188,6 +203,7 @@ export async function getSummary(companyId: string, branchId: string | null, per
     receivables: Number(receivablesRow.total || 0),
     payables: Number(payablesRow.total || 0),
     cashBalance: Number(bankAgg._sum.balance || 0),
+    stockValue: Number(stockValueRow.total || 0),
     overdueAmount: Math.round(Number(overdueRow.total || 0)),
     invoicesPending: Number(overdueRow.count || 0),
     revenueHistory,
