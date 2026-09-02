@@ -229,6 +229,10 @@ export default function InvestorReportsPage() {
           #investor-report-print table { width: 100% !important; min-width: 0 !important; }
           #investor-report-print thead { display: table-header-group; }
           #investor-report-print tr { break-inside: avoid; }
+          /* On paper there is nothing to click, so every lot opens itself and
+             the little caret that opened it goes away. */
+          #investor-report-print .lot-detail { display: table-row !important; }
+          #investor-report-print .lot-toggle { display: none !important; }
         }
       `}</style>
 
@@ -654,11 +658,11 @@ export default function InvestorReportsPage() {
             </div>
           )}
 
-          <p style={{ fontSize: 12.5, color: MUTED, lineHeight: 1.6, marginTop: 14, maxWidth: 620 }}>
+          {/* <p style={{ fontSize: 12.5, color: MUTED, lineHeight: 1.6, marginTop: 14, maxWidth: 620 }}>
             The window picks the lots by the day the material came in. Output is counted whenever it was spun, so a batch lifted at
             the end of the window still shows the kilos it went on to produce. Profit per {unit} is your own earning under the agreed
             rates — it is not the factory&apos;s margin on the goods.
-          </p>
+          </p> */}
         </Panel>
       )}
       </div>
