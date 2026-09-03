@@ -71,6 +71,11 @@ export const FORMULA_TEMPLATES: FormulaTemplate[] = [
       { key: "materialPerPc", label: "Material per piece", expression: "rollCost / piecesPerRoll", unit: "Rs" },
       { key: "costPerPc",   label: "Cost per piece",  expression: "materialPerPc + labour", unit: "Rs" },
       { key: "rollsNeeded", label: "Rolls required",  expression: "orderQty / piecesPerRoll" },
+      // You can only buy whole rolls, so the fractional part of rollsNeeded is
+      // never actually used up — it comes back off the last roll as leftover
+      // stock, not scrap.
+      { key: "rollsToBuy",     label: "Rolls to buy",         expression: "ceil(rollsNeeded)" },
+      { key: "leftoverStockM", label: "Leftover into stock",  expression: "(rollsToBuy - rollsNeeded) * rollLength", unit: "m" },
       { key: "wasteM",      label: "Waste per roll",  expression: "(rollInches - repeats * (cutLength + cutAllowance)) / 39.37", unit: "m" },
       { key: "orderCost",   label: "Order total",     expression: "costPerPc * orderQty", unit: "Rs" },
     ],
@@ -81,6 +86,8 @@ export const FORMULA_TEMPLATES: FormulaTemplate[] = [
       { key: "cutLength",     label: "Cut length",      unit: "in" },
       { key: "rollCost",      label: "Roll cost",       unit: "Rs",  role: "cost_per_batch" },
       { key: "rollsNeeded",   label: "Rolls required" },
+      { key: "rollsToBuy",       label: "Rolls to buy" },
+      { key: "leftoverStockM",   label: "Leftover → waste stock", unit: "m" },
       { key: "wasteM",        label: "Waste per roll",  unit: "m",   role: "waste_qty" },
       { key: "orderCost",     label: "Order total",     unit: "Rs" },
     ],
