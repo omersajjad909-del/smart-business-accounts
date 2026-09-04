@@ -70,15 +70,6 @@ export default function ProductionOrdersPage() {
     () => labourRows.reduce((sum, r) => sum + (Number(r.qty) || 0) * (Number(r.rate) || 0), 0),
     [labourRows],
   );
-  // Named workers are costed by their own qty, not the run's produced qty —
-  // if the two disagree, some pieces would leave stock with nobody credited
-  // for making them, so the run is blocked until they match.
-  const labourQtyAssigned = useMemo(
-    () => labourRows.reduce((sum, r) => sum + (Number(r.qty) || 0), 0),
-    [labourRows],
-  );
-  const hasLabourRows = labourRows.some((r) => r.labourId);
-  const labourQtyMismatch = hasLabourRows && labourQtyAssigned !== runQty;
 
   /**
    * The dialog asks for two different quantities and they are easy to confuse:
@@ -206,21 +197,12 @@ export default function ProductionOrdersPage() {
 
   async function confirmRun() {
     if (!runOrder) return;
-    const labourAssignments = labourRows
-      .filter((r) => r.labourId && Number(r.qty) > 0 && Number(r.rate) >= 0)
-      .map((r) => ({ labourId: r.labourId, qty: Number(r.qty), rate: Number(r.rate) }));
-    const assignedQty = labourAssignments.reduce((sum, a) => sum + a.qty, 0);
-    if (labourAssignments.length && assignedQty !== runQty) {
-      setRunError(
-        assignedQty < runQty
-          ? `${runQty - assignedQty} of ${runQty} units aren't assigned to a worker yet — add them to a row above or remove the worker rows to use the BOM's labour estimate instead.`
-          : `Workers add up to ${assignedQty} units, more than the ${runQty} being recorded in this run — fix the split before confirming.`,
-      );
-      return;
-    }
     setRunning(true);
     setRunError("");
     try {
+      const labourAssignments = labourRows
+        .filter((r) => r.labourId && Number(r.qty) > 0 && Number(r.rate) >= 0)
+        .map((r) => ({ labourId: r.labourId, qty: Number(r.qty), rate: Number(r.rate) }));
       const res = await fetch("/api/manufacturing/production-orders/complete", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -545,14 +527,8 @@ export default function ProductionOrdersPage() {
                   <button onClick={addLabourRow} style={{ marginTop: 8, padding: "6px 12px", borderRadius: 8, background: "rgba(255,255,255,.05)", border: `1px solid ${border}`, color: "rgba(255,255,255,.65)", fontSize: 11.5, fontWeight: 600, cursor: "pointer" }}>
                     + Add worker
                   </button>
-                  {hasLabourRows && (
-                    <div style={{ fontSize: 11.5, fontWeight: 700, marginTop: 8, color: labourQtyMismatch ? "#fca5a5" : "#34d399" }}>
-                      Assigned {labourQtyAssigned} of {runQty} units to workers
-                      {labourQtyMismatch && ` — ${Math.abs(runQty - labourQtyAssigned)} ${labourQtyAssigned < runQty ? "unassigned" : "over-assigned"}`}
-                    </div>
-                  )}
                   <div style={{ fontSize: 11, color: "rgba(255,255,255,.32)", marginTop: 8 }}>
-                    Assigning workers here charges what's actually owed to each of them instead of the BOM's flat labour estimate below. If you name workers, their quantities must add up to the units finished in this run.
+                    Assigning workers here charges what's actually owed to each of them instead of the BOM's flat labour estimate below.
                   </div>
                 </div>
 
@@ -629,19 +605,11 @@ export default function ProductionOrdersPage() {
             <div style={{ display: "flex", gap: 12 }}>
               <button
                 onClick={confirmRun}
-<<<<<<< HEAD
-                disabled={running || quoting || !runQuote || (runQuote.shortages.length > 0 && !allowShort) || labourQtyMismatch}
-                style={{
-                  flex: 1, padding: "11px 0", border: "none", borderRadius: 8, color: "#fff", fontSize: 14, fontWeight: 700,
-                  background: running || !runQuote || (runQuote.shortages.length > 0 && !allowShort) || labourQtyMismatch ? "rgba(34,197,94,.35)" : "#22c55e",
-                  cursor: running || !runQuote || labourQtyMismatch ? "not-allowed" : "pointer",
-=======
                 disabled={running || quoting || !runQuote || labourPieces?.over === true || (runQuote.shortages.length > 0 && !allowShort)}
                 style={{
                   flex: 1, padding: "11px 0", border: "none", borderRadius: 8, color: "#fff", fontSize: 14, fontWeight: 700,
                   background: running || !runQuote || labourPieces?.over === true || (runQuote.shortages.length > 0 && !allowShort) ? "rgba(34,197,94,.35)" : "#22c55e",
                   cursor: running || !runQuote ? "not-allowed" : "pointer",
->>>>>>> origin/main
                 }}
               >
                 {running ? "Recording…" : "Confirm production"}
@@ -654,4 +622,3 @@ export default function ProductionOrdersPage() {
     </div>
   );
 }
-
