@@ -1669,6 +1669,7 @@ export default function DashboardLayout({
               {hasDashboardFeature("MANUFACTURING_OVERVIEW") && <NavLink href="/dashboard/manufacturing" pathname={pathname}>Manufacturing Overview</NavLink>}
               {hasDashboardFeature("MANUFACTURING_BOM") && <NavLink href="/dashboard/manufacturing/bom" pathname={pathname}>Bill of Materials</NavLink>}
               {hasDashboardFeature("MANUFACTURING_PRODUCTION_ORDERS") && <NavLink href="/dashboard/manufacturing/production-orders" pathname={pathname}>Production Orders</NavLink>}
+              {hasDashboardFeature("MANUFACTURING_PRODUCTION_ORDERS") && <NavLink href="/dashboard/manufacturing/labour" pathname={pathname}>Labour</NavLink>}
               {hasDashboardFeature("MANUFACTURING_WORK_ORDERS") && <NavLink href="/dashboard/manufacturing/work-orders" pathname={pathname}>Work Orders</NavLink>}
               {hasDashboardFeature("MANUFACTURING_RAW_MATERIALS") && <NavLink href="/dashboard/manufacturing/raw-materials" pathname={pathname}>Raw Materials</NavLink>}
               {hasDashboardFeature("MANUFACTURING_FINISHED_GOODS") && <NavLink href="/dashboard/manufacturing/finished-goods" pathname={pathname}>Finished Goods</NavLink>}

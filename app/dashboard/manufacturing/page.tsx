@@ -42,6 +42,7 @@ export default function ManufacturingOverviewPage() {
         {[
           { href: "/dashboard/manufacturing/bom", label: "BOM" },
           { href: "/dashboard/manufacturing/production-orders", label: "Production Orders" },
+          { href: "/dashboard/manufacturing/labour", label: "Labour" },
           { href: "/dashboard/manufacturing/work-orders", label: "Work Orders" },
           { href: "/dashboard/manufacturing/raw-materials", label: "Raw Materials" },
           { href: "/dashboard/manufacturing/analytics", label: "Analytics" },

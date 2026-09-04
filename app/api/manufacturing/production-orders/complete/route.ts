@@ -115,6 +115,16 @@ export async function POST(req: NextRequest) {
       // Optional actuals — omit and the BOM's per-batch figures are scaled.
       labourCost: body.labourCost != null ? Number(body.labourCost) : undefined,
       overheadCost: body.overheadCost != null ? Number(body.overheadCost) : undefined,
+      // Named workers for this run — see lib/manufacturingPosting.ts.
+      labourAssignments: Array.isArray(body.labourAssignments)
+        ? body.labourAssignments
+            .map((a: { labourId?: unknown; qty?: unknown; rate?: unknown }) => ({
+              labourId: String(a?.labourId || ""),
+              qty: Number(a?.qty),
+              rate: Number(a?.rate),
+            }))
+            .filter((a: { labourId: string; qty: number; rate: number }) => a.labourId && a.qty > 0 && a.rate >= 0)
+        : undefined,
     });
 
     return NextResponse.json({ success: true, ...result });

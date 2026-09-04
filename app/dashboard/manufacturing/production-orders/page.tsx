@@ -2,7 +2,7 @@
 
 import toast from "react-hot-toast";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useBusinessRecords } from "@/lib/useBusinessRecords";
 import {
   mapBomRecord, mapFinishedGoodsRecord, mapProductionOrderRecord, mapWorkOrderRecord,
@@ -16,6 +16,9 @@ const border = "rgba(255,255,255,0.07)";
 const statusColor: Record<string, string> = { planned: "#818cf8", in_progress: "#f59e0b", running: "#f59e0b", completed: "#22c55e", cancelled: "#6b7280" };
 
 type ProductionOrder = ReturnType<typeof mapProductionOrderRecord>;
+
+type Labour = { id: string; name: string; code: string; ratePerUnit: number };
+type LabourRow = { labourId: string; qty: string; rate: string };
 
 export default function ProductionOrdersPage() {
   const { isMobile } = useResponsive();
@@ -33,6 +36,10 @@ export default function ProductionOrdersPage() {
   const [running, setRunning] = useState(false);
   const [runError, setRunError] = useState("");
   const [allowShort, setAllowShort] = useState(false);
+  // Who actually made this run's pieces — posts to their own payable instead
+  // of the flat "Factory Labour" line the BOM estimates with.
+  const [labourList, setLabourList] = useState<Labour[]>([]);
+  const [labourRows, setLabourRows] = useState<LabourRow[]>([]);
   // Which warehouse the run consumes from. A run pinned to MAIN while the
   // rolls were received into SHOP reported a shortage with the material in
   // the building, so it is now picked here and priced against that store.
@@ -51,6 +58,30 @@ export default function ProductionOrdersPage() {
   const boms = useMemo(() => bomStore.records.map(mapBomRecord), [bomStore.records]);
   const finishedGoods = useMemo(() => goodsStore.records.map(mapFinishedGoodsRecord), [goodsStore.records]);
   const workOrders = useMemo(() => workStore.records.map(mapWorkOrderRecord), [workStore.records]);
+
+  useEffect(() => {
+    fetch("/api/manufacturing/labour", { cache: "no-store" })
+      .then((r) => r.json())
+      .then((list) => setLabourList(Array.isArray(list) ? list : []))
+      .catch(() => setLabourList([]));
+  }, []);
+
+  const labourTotal = useMemo(
+    () => labourRows.reduce((sum, r) => sum + (Number(r.qty) || 0) * (Number(r.rate) || 0), 0),
+    [labourRows],
+  );
+
+  function addLabourRow() {
+    setLabourRows((rows) => [...rows, { labourId: "", qty: "", rate: "" }]);
+  }
+
+  function setLabourRow(index: number, patch: Partial<LabourRow>) {
+    setLabourRows((rows) => rows.map((r, i) => (i === index ? { ...r, ...patch } : r)));
+  }
+
+  function removeLabourRow(index: number) {
+    setLabourRows((rows) => rows.filter((_, i) => i !== index));
+  }
 
   async function save() {
     if (!form.product.trim()) {
@@ -119,6 +150,7 @@ export default function ProductionOrdersPage() {
     setRunQty(remaining);
     setRunError("");
     setRunQuote(null);
+    setLabourRows([]);
     setQuoting(true);
     // Let the server pick the warehouse first — it knows the one the order
     // was raised against, which is the one the operator meant.
@@ -143,6 +175,9 @@ export default function ProductionOrdersPage() {
     setRunning(true);
     setRunError("");
     try {
+      const labourAssignments = labourRows
+        .filter((r) => r.labourId && Number(r.qty) > 0 && Number(r.rate) >= 0)
+        .map((r) => ({ labourId: r.labourId, qty: Number(r.qty), rate: Number(r.rate) }));
       const res = await fetch("/api/manufacturing/production-orders/complete", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -151,6 +186,7 @@ export default function ProductionOrdersPage() {
           producedQty: runQty,
           allowNegativeStock: allowShort,
           location: runLocation,
+          ...(labourAssignments.length ? { labourAssignments } : {}),
         }),
       });
       const body = await res.json();
@@ -413,17 +449,58 @@ export default function ProductionOrdersPage() {
                   </div>
                 )}
 
+                <div style={{ border: `1px solid ${border}`, borderRadius: 12, padding: "14px 16px", marginBottom: 14 }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
+                    <span style={{ fontSize: 13, fontWeight: 700 }}>Labour for this run</span>
+                    {labourTotal > 0 && (
+                      <span style={{ fontSize: 12.5, fontWeight: 700, color: "#22c55e" }}>Rs. {Math.round(labourTotal).toLocaleString()}</span>
+                    )}
+                  </div>
+                  {!labourList.length && (
+                    <div style={{ fontSize: 12, color: "rgba(255,255,255,.35)", marginBottom: 8 }}>
+                      No labour added yet — add one on the <a href="/dashboard/manufacturing/labour" style={{ color: "#fb923c", fontWeight: 700 }}>Labour</a> page.
+                    </div>
+                  )}
+                  <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                    {labourRows.map((row, index) => (
+                      <div key={index} style={{ display: "grid", gridTemplateColumns: "1fr 90px 100px 28px", gap: 8, alignItems: "center" }}>
+                        <select
+                          value={row.labourId}
+                          onChange={(e) => {
+                            const picked = labourList.find((l) => l.id === e.target.value);
+                            setLabourRow(index, { labourId: e.target.value, rate: picked ? String(picked.ratePerUnit) : row.rate });
+                          }}
+                          style={{ background: bg, border: `1px solid ${border}`, borderRadius: 8, padding: "8px 10px", color: "#fff", fontSize: 12.5 }}
+                        >
+                          <option value="">— Worker —</option>
+                          {labourList.map((l) => <option key={l.id} value={l.id}>{l.name}</option>)}
+                        </select>
+                        <input type="number" min={0} step="any" placeholder="Pcs" value={row.qty} onChange={(e) => setLabourRow(index, { qty: e.target.value })} style={{ background: bg, border: `1px solid ${border}`, borderRadius: 8, padding: "8px 10px", color: "#fff", fontSize: 12.5 }} />
+                        <input type="number" min={0} step="any" placeholder="Rate/pc" value={row.rate} onChange={(e) => setLabourRow(index, { rate: e.target.value })} style={{ background: bg, border: `1px solid ${border}`, borderRadius: 8, padding: "8px 10px", color: "#fff", fontSize: 12.5 }} />
+                        <button onClick={() => removeLabourRow(index)} title="Remove" style={{ background: "transparent", border: `1px solid ${border}`, borderRadius: 8, color: "rgba(255,255,255,.45)", cursor: "pointer", padding: "7px 0" }}>×</button>
+                      </div>
+                    ))}
+                  </div>
+                  <button onClick={addLabourRow} style={{ marginTop: 8, padding: "6px 12px", borderRadius: 8, background: "rgba(255,255,255,.05)", border: `1px solid ${border}`, color: "rgba(255,255,255,.65)", fontSize: 11.5, fontWeight: 600, cursor: "pointer" }}>
+                    + Add worker
+                  </button>
+                  <div style={{ fontSize: 11, color: "rgba(255,255,255,.32)", marginTop: 8 }}>
+                    Assigning workers here charges what's actually owed to each of them instead of the BOM's flat labour estimate below.
+                  </div>
+                </div>
+
                 <div style={{ padding: "14px 16px", borderRadius: 12, background: "rgba(34,197,94,.08)", border: "1px solid rgba(34,197,94,.22)", marginBottom: 8 }}>
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 8 }}>
                     <span style={{ fontSize: 12.5, color: "rgba(255,255,255,.5)" }}>Total cost of this run</span>
-                    <span style={{ fontSize: 18, fontWeight: 800, color: "#22c55e" }}>Rs. {Math.round(runQuote.totalCost).toLocaleString()}</span>
+                    <span style={{ fontSize: 18, fontWeight: 800, color: "#22c55e" }}>Rs. {Math.round(labourRows.length ? runQuote.totalCost - runQuote.labourCost + labourTotal : runQuote.totalCost).toLocaleString()}</span>
                   </div>
                   <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, color: "rgba(255,255,255,.42)" }}>
                     <span>Material</span><span>Rs. {Math.round(runQuote.materialCost).toLocaleString()}</span>
                   </div>
                   {runQuote.labourCost > 0 && (
                     <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, color: "rgba(255,255,255,.42)" }}>
-                      <span>Labour</span><span>Rs. {Math.round(runQuote.labourCost).toLocaleString()}</span>
+                      <span>Labour {labourRows.length ? "(assigned above)" : "(BOM estimate)"}</span>
+                      <span>Rs. {Math.round(labourRows.length ? labourTotal : runQuote.labourCost).toLocaleString()}</span>
                     </div>
                   )}
                   {runQuote.overheadCost > 0 && (

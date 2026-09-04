@@ -70,6 +70,18 @@ export const MFG_ACCOUNTS = {
   MATERIAL_REMNANTS:  { code: "1203", name: "Material Remnants", type: "Asset" },
 } as const;
 
+/**
+ * Piece-rate labour payable — a person, not a period expense.
+ *
+ * FACTORY_LABOUR above absorbs conversion cost with no idea who did the work,
+ * so nothing was ever owed to anyone specifically and there was nothing to pay
+ * off at month end. When a run names the workers who produced it, each gets
+ * their own sub-account under this parent instead.
+ */
+export const LABOUR_ACCOUNTS = {
+  PAYABLE_PARENT: { code: "LAB-PAY", name: "Labour Payable", type: "Liability" },
+} as const;
+
 export const INVENTORY_TXN_TYPES = {
   /** Raw material leaving stock into a production run. */
   PRODUCTION_ISSUE: "PRODUCTION_ISSUE",
@@ -385,6 +397,13 @@ export async function priceProductionRun(opts: {
   /** Absolute overrides for this run, if the operator entered actuals. */
   labourCost?: number;
   overheadCost?: number;
+  /**
+   * Piece-rate workers named for this run. When given, labour cost is the sum
+   * of qty × rate and takes precedence over both `labourCost` and the BOM's
+   * `labourPerBatch` — the whole point is that it is what was actually paid
+   * out, not an estimate.
+   */
+  labourAssignments?: { labourId: string; qty: number; rate: number }[];
   /** Warehouse the run draws on. Omit to look at every location. */
   location?: string | null;
   /**
@@ -461,9 +480,15 @@ export async function priceProductionRun(opts: {
   const remnantUsedCost = round2(lines.reduce((sum, l) => sum + l.fromRemnantCost, 0));
   const remnantCreatedCost = round2(lines.reduce((sum, l) => sum + l.leftoverCost, 0));
 
-  // Conversion cost scales with the run unless the operator gave an actual.
+  // Conversion cost scales with the run unless the operator gave an actual —
+  // and named workers beat both: they are what was actually agreed to pay.
+  const namedAssignments = (opts.labourAssignments ?? []).filter(
+    (a) => a.labourId && Number.isFinite(a.qty) && a.qty > 0 && Number.isFinite(a.rate) && a.rate >= 0,
+  );
   const labourCost = round2(
-    opts.labourCost != null ? Number(opts.labourCost) || 0 : (opts.labourPerBatch || 0) * scale,
+    namedAssignments.length
+      ? namedAssignments.reduce((sum, a) => sum + a.qty * a.rate, 0)
+      : opts.labourCost != null ? Number(opts.labourCost) || 0 : (opts.labourPerBatch || 0) * scale,
   );
   const overheadCost = round2(
     opts.overheadCost != null ? Number(opts.overheadCost) || 0 : (opts.overheadPerBatch || 0) * scale,
@@ -548,6 +573,8 @@ export async function completeProductionRun(opts: {
   /** Actual conversion cost for this run; overrides what the BOM declares. */
   labourCost?: number;
   overheadCost?: number;
+  /** Piece-rate workers named for this run — see priceProductionRun. */
+  labourAssignments?: { labourId: string; qty: number; rate: number }[];
 }): Promise<CompletedRun> {
   const { companyId, productionOrderId } = opts;
   const producedQty = Math.floor(Number(opts.producedQty));
@@ -617,12 +644,20 @@ export async function completeProductionRun(opts: {
       overheadPerBatch: conversion.overheadPerBatch,
       labourCost: opts.labourCost,
       overheadCost: opts.overheadCost,
+      labourAssignments: opts.labourAssignments,
       // Material is consumed out of one warehouse, so availability and cost are
       // read from that warehouse rather than from company-wide totals.
       location,
       withLocationHints: false,
       client: tx,
     });
+
+    // Named workers only, and only the well-formed ones priceProductionRun
+    // actually priced — a malformed row must not silently vanish the labour
+    // cost from the voucher while still being "used" for the total above.
+    const namedAssignments = (opts.labourAssignments ?? []).filter(
+      (a) => a.labourId && Number.isFinite(a.qty) && a.qty > 0 && Number.isFinite(a.rate) && a.rate >= 0,
+    );
 
     if (priced.shortages.length && !opts.allowNegativeStock) {
       const detail = priced.shortages
@@ -719,17 +754,43 @@ export async function completeProductionRun(opts: {
       rawMaterialAccountId,
       wipAccountId,
       finishedAccountId,
-      labourAccountId,
       overheadAccountId,
       remnantAccountId,
     ] = await Promise.all([
       resolveInventoryAccountId(tx, companyId),
       ensureAccount(tx, companyId, MFG_ACCOUNTS.WORK_IN_PROGRESS),
       resolveFinishedGoodsAccountId(tx, companyId),
-      ensureAccount(tx, companyId, MFG_ACCOUNTS.FACTORY_LABOUR),
       ensureAccount(tx, companyId, MFG_ACCOUNTS.FACTORY_OVERHEAD),
       ensureAccount(tx, companyId, MFG_ACCOUNTS.MATERIAL_REMNANTS),
     ]);
+
+    // Named workers get their own payable account (created at labour-creation
+    // time — see app/api/manufacturing/labour). No names given, and the run
+    // falls back to the single company-wide expense account exactly like
+    // before, so every BOM/order that predates this feature still posts
+    // identically.
+    let labourCreditLines: { companyId: string; accountId: string; amount: number }[];
+    if (namedAssignments.length) {
+      const labourRecords = await tx.businessRecord.findMany({
+        where: { id: { in: namedAssignments.map((a) => a.labourId) }, companyId, category: "labour" },
+        select: { id: true, title: true, data: true },
+      });
+      const labourById = new Map(labourRecords.map((r) => [r.id, r]));
+      labourCreditLines = [];
+      for (const a of namedAssignments) {
+        const record = labourById.get(a.labourId);
+        const accountId = record ? String((record.data as Record<string, unknown> | null)?.accountId || "") : "";
+        if (!accountId) continue; // Deleted/unlinked labour — skip rather than fail the whole run.
+        labourCreditLines.push({ companyId, accountId, amount: -round2(a.qty * a.rate) });
+      }
+    } else {
+      const labourAccountId = priced.labourCost > 0
+        ? await ensureAccount(tx, companyId, MFG_ACCOUNTS.FACTORY_LABOUR)
+        : "";
+      labourCreditLines = priced.labourCost > 0
+        ? [{ companyId, accountId: labourAccountId, amount: -priced.labourCost }]
+        : [];
+    }
 
     // Was `count() + 1` / `+ 2`, which repeated a number as soon as any MFG
     // voucher was deleted — the count dropped while the highest number did not.
@@ -774,9 +835,7 @@ export async function completeProductionRun(opts: {
               ...(remnantDelta !== 0
                 ? [{ companyId, accountId: remnantAccountId, amount: remnantDelta }]
                 : []),
-              ...(priced.labourCost > 0
-                ? [{ companyId, accountId: labourAccountId, amount: -priced.labourCost }]
-                : []),
+              ...labourCreditLines,
               ...(priced.overheadCost > 0
                 ? [{ companyId, accountId: overheadAccountId, amount: -priced.overheadCost }]
                 : []),
@@ -839,6 +898,9 @@ export async function completeProductionRun(opts: {
           completed,
           lastRunAt: date.toISOString(),
           lastRunCost: priced.totalCost,
+          ...(namedAssignments.length
+            ? { lastRunLabour: namedAssignments.map((a) => ({ labourId: a.labourId, qty: a.qty, rate: a.rate })) }
+            : {}),
         },
       },
     });
