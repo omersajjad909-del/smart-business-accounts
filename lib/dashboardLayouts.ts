@@ -232,6 +232,30 @@ export const DASHBOARD_LAYOUTS: Partial<Record<BusinessType, DashboardLayout>> =
     ],
     chart: { title: "Collections vs Operating Cost", revenueLabel: "Collections", expensesLabel: "Cost" },
   },
+  // ── INVESTOR / PROFIT SHARING ──────────────────────────────
+  investor: {
+    opsTitle: "Portfolio today",
+    verticalEndpoint: "/api/investors/control-center",
+    kpis: [
+      { key: "capital_placed", label: "Capital Placed",     icon: "💰", color: "#14b8a6", source: "vertical", metric: "capitalPlaced",     format: "currency", caption: "Net money at work",     href: "/dashboard/investors/capital" },
+      { key: "month_earned",   label: "This Month's Share", icon: "📈", color: "#10b981", source: "vertical", metric: "monthEarned",       format: "currency", caption: "Earned so far this month", href: "/dashboard/investors/production" },
+      { key: "outstanding",    label: "Outstanding",        icon: "🧾", color: "#fbbf24", source: "vertical", metric: "outstandingBalance", format: "currency", caption: "Owed to you",           href: "/dashboard/investors/settlements" },
+      { key: "active_parties", label: "Active Investments", icon: "🤝", color: "#818cf8", source: "vertical", metric: "activeParties",      format: "number",   caption: "Parties holding capital", href: "/dashboard/investors/parties" },
+    ],
+    opsStrip: [
+      { label: "Overdue Settlements",  icon: "⏰", color: "#f87171", source: "vertical", metric: "overdueSettlements",  format: "number",   href: "/dashboard/investors/settlements" },
+      { label: "Open Production Lines", icon: "🏭", color: "#38bdf8", source: "vertical", metric: "openProductionLines", format: "number",   href: "/dashboard/investors/production" },
+      { label: "Capital Invested",     icon: "📥", color: "#34d399", source: "vertical", metric: "capitalInvested",     format: "currency", href: "/dashboard/investors/capital" },
+      { label: "Capital Withdrawn",    icon: "📤", color: "#fb7185", source: "vertical", metric: "capitalWithdrawn",    format: "currency", href: "/dashboard/investors/capital" },
+    ],
+    actions: [
+      { label: "Add Capital",       href: "/dashboard/investors/capital",     icon: "💰", bg: GR.teal   },
+      { label: "Record Production", href: "/dashboard/investors/production",  icon: "🏭", bg: GR.sky    },
+      { label: "Settle Cycle",      href: "/dashboard/investors/settlements", icon: "🧾", bg: GR.amber  },
+      { label: "View Statement",    href: "/dashboard/investors/statement",   icon: "📄", bg: GR.indigo },
+    ],
+    chart: { title: "Capital vs Returns", revenueLabel: "Returns", expensesLabel: "Capital" },
+  },
 };
 
 export function getDashboardLayout(businessType: string | null | undefined): DashboardLayout {
