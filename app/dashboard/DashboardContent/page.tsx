@@ -566,6 +566,12 @@ export default function DashboardContent() {
   // from the business type's own control-center endpoint. Null until loaded,
   // and stays null for business types that have no vertical endpoint.
   const [verticalSummary, setVerticalSummary] = useState<Record<string, number> | null>(null);
+  // Read inside the below-the-fold secondary-chart fetch, which resolves on
+  // its own timer — a plain closure over `businessType` could fire with a
+  // stale value if the business type changes mid-flight, so this ref is kept
+  // current on every render instead.
+  const businessTypeRef = useRef(businessType);
+  businessTypeRef.current = businessType;
 
   useEffect(() => {
     if (allowed !== true) return;
@@ -665,7 +671,7 @@ export default function DashboardContent() {
           .then((r) => (r.ok ? r.json() : null))
           .then((secondary) => {
             if (!secondary) return;
-            if (secondary.charts) {
+            if (secondary.charts && getDashboardLayout(businessTypeRef.current).chartSource !== "vertical") {
               const ch = secondary.charts;
               const sA = ch.salesTrend || [],
                 pA = ch.purchasesTrend || [];
@@ -755,6 +761,19 @@ export default function DashboardContent() {
         const nums: Record<string, number> = {};
         for (const [k, v] of Object.entries(d.summary)) nums[k] = Number(v) || 0;
         setVerticalSummary(nums);
+
+        if (getDashboardLayout(businessType).chartSource === "vertical" && Array.isArray(d.monthlyTrend)) {
+          const MN = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+          setChart(
+            (d.monthlyTrend as { month: string; invested: number; earned: number }[]).map((row) => {
+              const [yr, mo] = String(row.month).split("-");
+              const label = MN[parseInt(mo, 10) - 1] ? `${MN[parseInt(mo, 10) - 1]} ${yr}` : row.month;
+              const rv = Number(row.earned) || 0;
+              const ex = Number(row.invested) || 0;
+              return { label, Revenue: rv, Expenses: ex, Profit: rv - ex };
+            }),
+          );
+        }
       })
       .catch(() => {});
     return () => {

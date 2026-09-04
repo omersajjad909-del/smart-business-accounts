@@ -70,6 +70,14 @@ export interface DashboardLayout {
   opsStrip: DashboardOpsMetric[];
   actions: DashboardAction[];
   chart: { title: string; revenueLabel: string; expensesLabel: string };
+  /**
+   * Trend chart data source. Every business type defaults to "core" — the
+   * company's sales/purchases trend, just relabeled. Set to "vertical" when
+   * sales invoices aren't what this business is about (e.g. an investor has
+   * no sales) — the chart then reads `monthlyTrend` off the same
+   * verticalEndpoint response instead, mapped to {label, Revenue, Expenses}.
+   */
+  chartSource?: "core" | "vertical";
 }
 
 const GR = {
@@ -255,6 +263,7 @@ export const DASHBOARD_LAYOUTS: Partial<Record<BusinessType, DashboardLayout>> =
       { label: "View Statement",    href: "/dashboard/investors/statement",   icon: "📄", bg: GR.indigo },
     ],
     chart: { title: "Capital vs Returns", revenueLabel: "Returns", expensesLabel: "Capital" },
+    chartSource: "vertical",
   },
 };
 

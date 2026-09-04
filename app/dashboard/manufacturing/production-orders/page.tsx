@@ -533,7 +533,7 @@ export default function ProductionOrdersPage() {
                 {labourPieces?.under && (
                   <div style={{ padding: "12px 14px", borderRadius: 12, background: "rgba(251,191,36,.1)", border: "1px solid rgba(251,191,36,.3)", marginBottom: 14 }}>
                     <div style={{ fontSize: 12.5, color: "#fbbf24", fontWeight: 700, marginBottom: 5 }}>
-                      This run finishes {runQty.toLocaleString()} pieces, but {labourPieces.name} is paid for {labourPieces.most.toLocaleString()}
+                      This run finishes {runQty.toLocaleString()} pieces, but workers are paid for {labourPieces.total.toLocaleString()} in total
                     </div>
                     <div style={{ fontSize: 11.5, color: "rgba(255,255,255,.5)", lineHeight: 1.7 }}>
                       Confirm is blocked until this matches — {runQty.toLocaleString()} would be received into
@@ -541,21 +541,21 @@ export default function ProductionOrdersPage() {
                       {runOrder.quantity > 0 && runQty >= runOrder.quantity - runOrder.completed
                         ? ", which closes it — the balance could never be produced against it again"
                         : ""}
-                      {" "}while only {labourPieces.most.toLocaleString()} pieces were actually paid for.
-                      {" "}If only {labourPieces.most.toLocaleString()} were made, set the run to that; if the full {runQty.toLocaleString()} were made, raise the worker&apos;s pieces to match.
+                      {" "}while workers are only paid for {labourPieces.total.toLocaleString()} pieces combined.
+                      {" "}If only {labourPieces.total.toLocaleString()} were made, set the run to that; if the full {runQty.toLocaleString()} were made, add or raise worker rows until their pieces add up to it.
                     </div>
                     <button
-                      onClick={() => { setRunQty(labourPieces.most); requote(labourPieces.most); }}
+                      onClick={() => { setRunQty(labourPieces.total); requote(labourPieces.total); }}
                       style={{ marginTop: 9, padding: "6px 12px", borderRadius: 8, background: "rgba(251,191,36,.16)", border: "1px solid rgba(251,191,36,.4)", color: "#fcd34d", fontSize: 11.5, fontWeight: 700, cursor: "pointer" }}
                     >
-                      Set run to {labourPieces.most.toLocaleString()}
+                      Set run to {labourPieces.total.toLocaleString()}
                     </button>
                   </div>
                 )}
                 {labourPieces?.over && (
                   <div style={{ padding: "12px 14px", borderRadius: 12, background: "rgba(239,68,68,.12)", border: "1px solid rgba(239,68,68,.3)", marginBottom: 14, fontSize: 12.5, color: "#fca5a5", lineHeight: 1.7 }}>
-                    {labourPieces.name} is paid for {labourPieces.most.toLocaleString()} pieces but this run only
-                    finishes {runQty.toLocaleString()}. Raise the run, or lower the worker&apos;s pieces.
+                    Workers are paid for {labourPieces.total.toLocaleString()} pieces combined but this run only
+                    finishes {runQty.toLocaleString()}. Raise the run, or lower the workers&apos; pieces so they add up to {runQty.toLocaleString()}.
                   </div>
                 )}
 

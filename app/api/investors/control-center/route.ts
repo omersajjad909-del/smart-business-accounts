@@ -129,6 +129,20 @@ export async function GET(req: NextRequest) {
 
   const openProductionLines = production.filter((l) => !l.settlementId).length;
 
+  // Last 6 months of capital-in vs earned-share, for the dashboard trend
+  // chart — this business has no sales invoices, so the generic
+  // revenue/expenses chart has nothing to show; this is what replaces it.
+  const monthlyTrend: { month: string; invested: number; earned: number }[] = [];
+  const cursor = new Date();
+  cursor.setUTCDate(1);
+  for (let i = 5; i >= 0; i--) {
+    const d = new Date(Date.UTC(cursor.getUTCFullYear(), cursor.getUTCMonth() - i, 1));
+    const m = d.toISOString().slice(0, 7);
+    const invested = capital.filter((c) => c.kind === "invest" && monthKey(c.date) === m).reduce((s, c) => s + c.amount, 0);
+    const earned = production.filter((l) => monthKey(l.date) === m).reduce((s, l) => s + l.amount, 0);
+    monthlyTrend.push({ month: m, invested: round2(invested), earned: round2(earned) });
+  }
+
   return NextResponse.json({
     summary: {
       activeParties: parties.length,
@@ -140,5 +154,6 @@ export async function GET(req: NextRequest) {
       overdueSettlements,
       openProductionLines,
     },
+    monthlyTrend,
   });
 }
