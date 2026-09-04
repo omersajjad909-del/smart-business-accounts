@@ -71,6 +71,31 @@ export default function ProductionOrdersPage() {
     [labourRows],
   );
 
+  /**
+   * The dialog asks for two different quantities and they are easy to confuse:
+   * "Units finished in this run" is what the order gets credited with, while a
+   * worker row is only what that worker is paid for. Entering the day's output
+   * against the worker and leaving the run at the order's full remainder books
+   * the whole order as made while paying for part of it — the order closes and
+   * the unmade pieces are never produced again.
+   *
+   * The busiest row is the one worth comparing: with several workers on one run
+   * they are usually stages (cut, print, stitch) and each does all the pieces,
+   * so the largest row is what the run actually made.
+   */
+  const labourPieces = useMemo(() => {
+    const rows = labourRows.filter((r) => r.labourId && Number(r.qty) > 0);
+    if (!rows.length) return null;
+    const most = Math.max(...rows.map((r) => Number(r.qty)));
+    const busiest = rows.find((r) => Number(r.qty) === most);
+    return {
+      most,
+      name: labourList.find((l) => l.id === busiest?.labourId)?.name ?? "This worker",
+      over: most > runQty,
+      under: most < runQty,
+    };
+  }, [labourRows, labourList, runQty]);
+
   function addLabourRow() {
     setLabourRows((rows) => [...rows, { labourId: "", qty: "", rate: "" }]);
   }
@@ -489,6 +514,34 @@ export default function ProductionOrdersPage() {
                   </div>
                 </div>
 
+                {/* The two quantities disagree — say so before the order closes. */}
+                {labourPieces?.under && (
+                  <div style={{ padding: "12px 14px", borderRadius: 12, background: "rgba(251,191,36,.1)", border: "1px solid rgba(251,191,36,.3)", marginBottom: 14 }}>
+                    <div style={{ fontSize: 12.5, color: "#fbbf24", fontWeight: 700, marginBottom: 5 }}>
+                      This run finishes {runQty.toLocaleString()} pieces, but {labourPieces.name} is paid for {labourPieces.most.toLocaleString()}
+                    </div>
+                    <div style={{ fontSize: 11.5, color: "rgba(255,255,255,.5)", lineHeight: 1.7 }}>
+                      All {runQty.toLocaleString()} will be received into finished goods and charged to this order
+                      {runOrder.quantity > 0 && runQty >= runOrder.quantity - runOrder.completed
+                        ? ", which closes it — the balance can never be produced against it again."
+                        : "."}
+                      {" "}If only {labourPieces.most.toLocaleString()} were actually made, set the run to that.
+                    </div>
+                    <button
+                      onClick={() => { setRunQty(labourPieces.most); requote(labourPieces.most); }}
+                      style={{ marginTop: 9, padding: "6px 12px", borderRadius: 8, background: "rgba(251,191,36,.16)", border: "1px solid rgba(251,191,36,.4)", color: "#fcd34d", fontSize: 11.5, fontWeight: 700, cursor: "pointer" }}
+                    >
+                      Set run to {labourPieces.most.toLocaleString()}
+                    </button>
+                  </div>
+                )}
+                {labourPieces?.over && (
+                  <div style={{ padding: "12px 14px", borderRadius: 12, background: "rgba(239,68,68,.12)", border: "1px solid rgba(239,68,68,.3)", marginBottom: 14, fontSize: 12.5, color: "#fca5a5", lineHeight: 1.7 }}>
+                    {labourPieces.name} is paid for {labourPieces.most.toLocaleString()} pieces but this run only
+                    finishes {runQty.toLocaleString()}. Raise the run, or lower the worker&apos;s pieces.
+                  </div>
+                )}
+
                 <div style={{ padding: "14px 16px", borderRadius: 12, background: "rgba(34,197,94,.08)", border: "1px solid rgba(34,197,94,.22)", marginBottom: 8 }}>
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 8 }}>
                     <span style={{ fontSize: 12.5, color: "rgba(255,255,255,.5)" }}>Total cost of this run</span>
@@ -534,10 +587,10 @@ export default function ProductionOrdersPage() {
             <div style={{ display: "flex", gap: 12 }}>
               <button
                 onClick={confirmRun}
-                disabled={running || quoting || !runQuote || (runQuote.shortages.length > 0 && !allowShort)}
+                disabled={running || quoting || !runQuote || labourPieces?.over === true || (runQuote.shortages.length > 0 && !allowShort)}
                 style={{
                   flex: 1, padding: "11px 0", border: "none", borderRadius: 8, color: "#fff", fontSize: 14, fontWeight: 700,
-                  background: running || !runQuote || (runQuote.shortages.length > 0 && !allowShort) ? "rgba(34,197,94,.35)" : "#22c55e",
+                  background: running || !runQuote || labourPieces?.over === true || (runQuote.shortages.length > 0 && !allowShort) ? "rgba(34,197,94,.35)" : "#22c55e",
                   cursor: running || !runQuote ? "not-allowed" : "pointer",
                 }}
               >
