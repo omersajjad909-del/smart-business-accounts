@@ -74,27 +74,24 @@ export default function ProductionOrdersPage() {
   /**
    * The dialog asks for two different quantities and they are easy to confuse:
    * "Units finished in this run" is what the order gets credited with, while a
-   * worker row is only what that worker is paid for. Entering the day's output
-   * against the worker and leaving the run at the order's full remainder books
-   * the whole order as made while paying for part of it — the order closes and
-   * the unmade pieces are never produced again.
-   *
-   * The busiest row is the one worth comparing: with several workers on one run
-   * they are usually stages (cut, print, stitch) and each does all the pieces,
-   * so the largest row is what the run actually made.
+   * worker row is only the pieces that worker was paid for. Several workers
+   * usually split one run between them (2,500 pieces each toward a 5,000-piece
+   * day), so what should equal the run is the total across every row — not any
+   * single row. Entering the day's output against one worker and leaving the
+   * run at the order's full remainder books the whole order as made while
+   * paying for part of it — the order closes and the unmade pieces are never
+   * produced again.
    */
   const labourPieces = useMemo(() => {
     const rows = labourRows.filter((r) => r.labourId && Number(r.qty) > 0);
     if (!rows.length) return null;
-    const most = Math.max(...rows.map((r) => Number(r.qty)));
-    const busiest = rows.find((r) => Number(r.qty) === most);
+    const total = rows.reduce((sum, r) => sum + Number(r.qty), 0);
     return {
-      most,
-      name: labourList.find((l) => l.id === busiest?.labourId)?.name ?? "This worker",
-      over: most > runQty,
-      under: most < runQty,
+      total,
+      over: total > runQty,
+      under: total < runQty,
     };
-  }, [labourRows, labourList, runQty]);
+  }, [labourRows, runQty]);
 
   function addLabourRow() {
     setLabourRows((rows) => [...rows, { labourId: "", qty: "", rate: "" }]);
