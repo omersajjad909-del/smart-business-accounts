@@ -609,6 +609,23 @@ export async function completeProductionRun(opts: {
       );
     }
 
+    // Two quantities reach this call: the units the run finishes, and the pieces
+    // each named worker is paid for. They are not the same number and the screen
+    // asks for them in two separate boxes, so an operator who types the day's
+    // output into the worker row leaves the run itself at the order's full
+    // remainder — closing the whole order while paying for part of it. Nobody
+    // can make more pieces than the run finished, so that direction is always a
+    // typo: refuse it here rather than let it close the order.
+    for (const assignment of opts.labourAssignments ?? []) {
+      const assigned = Number(assignment?.qty);
+      if (Number.isFinite(assigned) && assigned > producedQty) {
+        throw new ManufacturingError(
+          `A worker is assigned ${assigned} pieces but this run only finishes ${producedQty} — ` +
+            `raise "Units finished in this run", or lower the worker's pieces`,
+        );
+      }
+    }
+
     const bomId = String(orderData.bomId || "");
     if (!bomId) throw new ManufacturingError("This production order has no BOM attached");
     const bom = await tx.businessRecord.findFirst({

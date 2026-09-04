@@ -80,6 +80,31 @@ export default function ProductionOrdersPage() {
   const hasLabourRows = labourRows.some((r) => r.labourId);
   const labourQtyMismatch = hasLabourRows && labourQtyAssigned !== runQty;
 
+  /**
+   * The dialog asks for two different quantities and they are easy to confuse:
+   * "Units finished in this run" is what the order gets credited with, while a
+   * worker row is only what that worker is paid for. Entering the day's output
+   * against the worker and leaving the run at the order's full remainder books
+   * the whole order as made while paying for part of it — the order closes and
+   * the unmade pieces are never produced again.
+   *
+   * The busiest row is the one worth comparing: with several workers on one run
+   * they are usually stages (cut, print, stitch) and each does all the pieces,
+   * so the largest row is what the run actually made.
+   */
+  const labourPieces = useMemo(() => {
+    const rows = labourRows.filter((r) => r.labourId && Number(r.qty) > 0);
+    if (!rows.length) return null;
+    const most = Math.max(...rows.map((r) => Number(r.qty)));
+    const busiest = rows.find((r) => Number(r.qty) === most);
+    return {
+      most,
+      name: labourList.find((l) => l.id === busiest?.labourId)?.name ?? "This worker",
+      over: most > runQty,
+      under: most < runQty,
+    };
+  }, [labourRows, labourList, runQty]);
+
   function addLabourRow() {
     setLabourRows((rows) => [...rows, { labourId: "", qty: "", rate: "" }]);
   }
@@ -247,7 +272,7 @@ export default function ProductionOrdersPage() {
         {[
           { label: "Total Orders", value: orders.length, color: "#f97316" },
           { label: "Planned", value: orders.filter((item) => item.status === "planned").length, color: "#818cf8" },
-          { label: "In Progress", value: orders.filter((item) => item.status === "in_progress").length, color: "#f59e0b" },
+          { label: "In Progress", value: orders.filter((item) => item.status === "in_progress" || item.status === "running").length, color: "#f59e0b" },
           { label: "Completed To FG", value: orders.filter((item) => item.status === "completed").length, color: "#22c55e" },
         ].map((card) => (
           <div key={card.label} style={{ background: bg, border: `1px solid ${border}`, borderRadius: 14, padding: isMobile ? "12px 10px" : "18px 20px" }}>
@@ -261,6 +286,9 @@ export default function ProductionOrdersPage() {
         {orders.map((order) => {
           const linkedBom = boms.find((item) => item.id === order.bomId) || boms.find((item) => item.product === order.product);
           const progress = order.quantity > 0 ? Math.round((order.completed / order.quantity) * 100) : 0;
+          // What is still owed on the order. The bar alone is easy to misread at
+          // a glance; the count says plainly that the order is not finished.
+          const remaining = Math.max(order.quantity - order.completed, 0);
           const fgCreated = finishedGoods.some((item) => item.productionOrderId === order.orderId);
           const linkedWorkOrders = workOrders.filter((item) => item.linkedProductionOrderId === order.orderId);
           const incompleteWorkOrders = linkedWorkOrders.filter((item) => item.status !== "completed").length;
@@ -270,7 +298,10 @@ export default function ProductionOrdersPage() {
                 <div>
                   <div style={{ fontSize: 15, fontWeight: 800 }}>{order.product}</div>
                   <div style={{ fontSize: 12, color: "rgba(255,255,255,.42)", marginTop: 4 }}>
-                    {order.orderId} • BOM {linkedBom?.version || order.bomVersion || "Not linked"} • Qty {order.completed}/{order.quantity}
+                    {order.orderId} • BOM {linkedBom?.version || order.bomVersion || "Not linked"} • Qty {order.completed.toLocaleString()}/{order.quantity.toLocaleString()}
+                    {remaining > 0 && order.status !== "cancelled" && (
+                      <span style={{ color: "#fbbf24", fontWeight: 700 }}> • {remaining.toLocaleString()} left to make</span>
+                    )}
                   </div>
                 </div>
                 <div style={{ fontSize: 11, fontWeight: 800, color: statusColor[order.status] || "#94a3b8" }}>{order.status.replace("_", " ").toUpperCase()}</div>
@@ -289,7 +320,9 @@ export default function ProductionOrdersPage() {
                 )}
                 {(order.status === "in_progress" || order.status === "running") && (
                   <button onClick={() => openCompleteDialog(order)} style={{ padding: "7px 14px", background: "rgba(34,197,94,.15)", border: "1px solid rgba(34,197,94,.3)", color: "#22c55e", borderRadius: 8, fontSize: 12, fontWeight: 700, cursor: "pointer" }}>
-                    Record production →
+                    {order.completed > 0 && remaining > 0
+                      ? `Run remaining ${remaining.toLocaleString()} →`
+                      : "Record production →"}
                   </button>
                 )}
                 {order.status !== "completed" && order.status !== "cancelled" && (
@@ -387,6 +420,16 @@ export default function ProductionOrdersPage() {
                   onBlur={(e) => requote(Math.max(1, Number(e.target.value) || 1))}
                   style={{ width: 180, background: bg, border: `1px solid ${border}`, borderRadius: 8, padding: "9px 12px", color: "#fff", boxSizing: "border-box" }}
                 />
+                {/* The box opens on the whole balance, which is right for a run
+                    that finishes the order and wrong for a day that finishes
+                    part of it. Say what happens to the rest so a short day is
+                    not typed in as a full one. */}
+                <div style={{ fontSize: 11, color: "rgba(255,255,255,.35)", marginTop: 6, width: 180, lineHeight: 1.6 }}>
+                  {runOrder.completed > 0
+                    ? `${runOrder.completed.toLocaleString()} done, ${Math.max(runOrder.quantity - runOrder.completed, 0).toLocaleString()} left of ${runOrder.quantity.toLocaleString()}.`
+                    : `Order is for ${runOrder.quantity.toLocaleString()}.`}{" "}
+                  Enter only what was finished — the rest stays open for the next run.
+                </div>
               </div>
               <div>
                 <label style={{ display: "block", fontSize: 12, color: "rgba(255,255,255,.45)", marginBottom: 6 }}>Consume from</label>
@@ -513,6 +556,34 @@ export default function ProductionOrdersPage() {
                   </div>
                 </div>
 
+                {/* The two quantities disagree — say so before the order closes. */}
+                {labourPieces?.under && (
+                  <div style={{ padding: "12px 14px", borderRadius: 12, background: "rgba(251,191,36,.1)", border: "1px solid rgba(251,191,36,.3)", marginBottom: 14 }}>
+                    <div style={{ fontSize: 12.5, color: "#fbbf24", fontWeight: 700, marginBottom: 5 }}>
+                      This run finishes {runQty.toLocaleString()} pieces, but {labourPieces.name} is paid for {labourPieces.most.toLocaleString()}
+                    </div>
+                    <div style={{ fontSize: 11.5, color: "rgba(255,255,255,.5)", lineHeight: 1.7 }}>
+                      All {runQty.toLocaleString()} will be received into finished goods and charged to this order
+                      {runOrder.quantity > 0 && runQty >= runOrder.quantity - runOrder.completed
+                        ? ", which closes it — the balance can never be produced against it again."
+                        : "."}
+                      {" "}If only {labourPieces.most.toLocaleString()} were actually made, set the run to that.
+                    </div>
+                    <button
+                      onClick={() => { setRunQty(labourPieces.most); requote(labourPieces.most); }}
+                      style={{ marginTop: 9, padding: "6px 12px", borderRadius: 8, background: "rgba(251,191,36,.16)", border: "1px solid rgba(251,191,36,.4)", color: "#fcd34d", fontSize: 11.5, fontWeight: 700, cursor: "pointer" }}
+                    >
+                      Set run to {labourPieces.most.toLocaleString()}
+                    </button>
+                  </div>
+                )}
+                {labourPieces?.over && (
+                  <div style={{ padding: "12px 14px", borderRadius: 12, background: "rgba(239,68,68,.12)", border: "1px solid rgba(239,68,68,.3)", marginBottom: 14, fontSize: 12.5, color: "#fca5a5", lineHeight: 1.7 }}>
+                    {labourPieces.name} is paid for {labourPieces.most.toLocaleString()} pieces but this run only
+                    finishes {runQty.toLocaleString()}. Raise the run, or lower the worker&apos;s pieces.
+                  </div>
+                )}
+
                 <div style={{ padding: "14px 16px", borderRadius: 12, background: "rgba(34,197,94,.08)", border: "1px solid rgba(34,197,94,.22)", marginBottom: 8 }}>
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 8 }}>
                     <span style={{ fontSize: 12.5, color: "rgba(255,255,255,.5)" }}>Total cost of this run</span>
@@ -558,11 +629,19 @@ export default function ProductionOrdersPage() {
             <div style={{ display: "flex", gap: 12 }}>
               <button
                 onClick={confirmRun}
+<<<<<<< HEAD
                 disabled={running || quoting || !runQuote || (runQuote.shortages.length > 0 && !allowShort) || labourQtyMismatch}
                 style={{
                   flex: 1, padding: "11px 0", border: "none", borderRadius: 8, color: "#fff", fontSize: 14, fontWeight: 700,
                   background: running || !runQuote || (runQuote.shortages.length > 0 && !allowShort) || labourQtyMismatch ? "rgba(34,197,94,.35)" : "#22c55e",
                   cursor: running || !runQuote || labourQtyMismatch ? "not-allowed" : "pointer",
+=======
+                disabled={running || quoting || !runQuote || labourPieces?.over === true || (runQuote.shortages.length > 0 && !allowShort)}
+                style={{
+                  flex: 1, padding: "11px 0", border: "none", borderRadius: 8, color: "#fff", fontSize: 14, fontWeight: 700,
+                  background: running || !runQuote || labourPieces?.over === true || (runQuote.shortages.length > 0 && !allowShort) ? "rgba(34,197,94,.35)" : "#22c55e",
+                  cursor: running || !runQuote ? "not-allowed" : "pointer",
+>>>>>>> origin/main
                 }}
               >
                 {running ? "Recording…" : "Confirm production"}

@@ -93,6 +93,92 @@ export const FORMULA_TEMPLATES: FormulaTemplate[] = [
     ],
   },
 
+  {
+    templateId: "two-panel-bag",
+    name: "Two-panel bag (different front & back material)",
+    category: "Packaging",
+    version: 1,
+    summary:
+      "A bag whose two faces come off two different rolls — frosty front, PVC back. Each face is costed on its own roll, then the two per-piece costs are added.",
+    description:
+      "Use this instead of Roll → Pieces when the front and back are not the same film. Roll → Pieces cuts one panel of 'length x 2' out of a single roll; here the back is cut at length + flap from its own roll and the front at length from another, each with its own rate, gauge and stock widths.",
+    inputs: [
+      { key: "bagWidth",     label: "Bag width",            unit: "in", defaultValue: 12,   askOnRun: true },
+      { key: "bagLength",    label: "Bag length",           unit: "in", defaultValue: 15,   askOnRun: true },
+      { key: "flap",         label: "Flap / seal (back only)", unit: "in", defaultValue: 2.5, askOnRun: true },
+      // Gusset rides on the back panel, the same way it rides on the base cut
+      // in Roll → Pieces. Zero by default so a plain two-panel bag is unaffected.
+      { key: "guezzet",      label: "Guezzet (back only)",  unit: "in", defaultValue: 0,    askOnRun: true },
+
+      { key: "backRate",     label: "Back material rate",   unit: "per mm", defaultValue: 12, askOnRun: true },
+      { key: "backGauge",    label: "Back gauge",           unit: "",   defaultValue: 10,   askOnRun: true },
+      { key: "backWidths",   label: "Back stock widths",    unit: "in", isList: true, listValue: [48, 50, 52, 54, 56, 58, 60] },
+
+      { key: "frontRate",    label: "Front material rate",  unit: "per mm", defaultValue: 15, askOnRun: true },
+      { key: "frontGauge",   label: "Front gauge",          unit: "",   defaultValue: 8,    askOnRun: true },
+      { key: "frontWidths",  label: "Front stock widths",   unit: "in", isList: true, listValue: [48, 50, 52, 54, 56, 58, 60] },
+
+      { key: "rollLength",   label: "Roll length",          unit: "m",  defaultValue: 100 },
+      { key: "cutMin",       label: "Cutting range — min",  unit: "in", defaultValue: 30 },
+      { key: "cutMax",       label: "Cutting range — max",  unit: "in", defaultValue: 50 },
+      { key: "cutAllowance", label: "Allowance per cut",    unit: "in", defaultValue: 0.75 },
+      { key: "densityDiv",   label: "Weight divisor",       unit: "",   defaultValue: 54 },
+      { key: "labour",       label: "Labour",               unit: "Rs", defaultValue: 3,  askOnRun: true },
+      // Per piece, not per roll as in Roll → Pieces: there are two rolls here,
+      // so loading it onto either one would charge the bag twice or not at all.
+      { key: "buttonTape",   label: "Button / Tape",        unit: "Rs", defaultValue: 0,  askOnRun: true },
+      { key: "orderQty",     label: "Order quantity",       unit: "pcs", defaultValue: 10000, askOnRun: true },
+    ],
+    steps: [
+      { key: "rollInches",    label: "Roll length",           expression: "convert(rollLength, m, in)", unit: "in" },
+
+      /* Back panel — 1 width x (1 length + flap) */
+      { key: "backAcross",    label: "Back panels across",    expression: "bestFitCount(bagWidth, backWidths)" },
+      { key: "backRollWidth", label: "Back roll width used",  expression: "bestFitStock(bagWidth, backWidths)", unit: "in" },
+      { key: "backBaseCut",   label: "Back base cut",         expression: "bagLength + flap + guezzet", unit: "in" },
+      { key: "backFactor",    label: "Back length multiple",  expression: "scaleToRange(backBaseCut, cutMin, cutMax)" },
+      { key: "backCutLength", label: "Back cut length",       expression: "backBaseCut * backFactor", unit: "in" },
+      { key: "backRepeats",   label: "Back repeats per roll", expression: "floor(rollInches / (backCutLength + cutAllowance))" },
+      { key: "backPerRoll",   label: "Back panels per roll",  expression: "backRepeats * backAcross * backFactor", unit: "pcs" },
+      { key: "backRollCost",  label: "Back roll cost",        expression: "backRate * backGauge * backRollWidth * rollLength / densityDiv", unit: "Rs" },
+      { key: "backPerPc",     label: "Back cost per bag",     expression: "backRollCost / backPerRoll", unit: "Rs" },
+
+      /* Front panel — 1 width x 1 length, no flap */
+      { key: "frontAcross",    label: "Front panels across",    expression: "bestFitCount(bagWidth, frontWidths)" },
+      { key: "frontRollWidth", label: "Front roll width used",  expression: "bestFitStock(bagWidth, frontWidths)", unit: "in" },
+      { key: "frontBaseCut",   label: "Front base cut",         expression: "bagLength", unit: "in" },
+      { key: "frontFactor",    label: "Front length multiple",  expression: "scaleToRange(frontBaseCut, cutMin, cutMax)" },
+      { key: "frontCutLength", label: "Front cut length",       expression: "frontBaseCut * frontFactor", unit: "in" },
+      { key: "frontRepeats",   label: "Front repeats per roll", expression: "floor(rollInches / (frontCutLength + cutAllowance))" },
+      { key: "frontPerRoll",   label: "Front panels per roll",  expression: "frontRepeats * frontAcross * frontFactor", unit: "pcs" },
+      { key: "frontRollCost",  label: "Front roll cost",        expression: "frontRate * frontGauge * frontRollWidth * rollLength / densityDiv", unit: "Rs" },
+      { key: "frontPerPc",     label: "Front cost per bag",     expression: "frontRollCost / frontPerRoll", unit: "Rs" },
+
+      /* The bag */
+      { key: "materialPerPc", label: "Material per bag",  expression: "backPerPc + frontPerPc", unit: "Rs" },
+      { key: "costPerPc",     label: "Cost per bag",      expression: "materialPerPc + labour + buttonTape", unit: "Rs" },
+      { key: "backRolls",     label: "Back rolls required",  expression: "orderQty / backPerRoll" },
+      { key: "frontRolls",    label: "Front rolls required", expression: "orderQty / frontPerRoll" },
+      { key: "backWasteM",    label: "Back waste per roll",  expression: "(rollInches - backRepeats * (backCutLength + cutAllowance)) / 39.37", unit: "m" },
+      { key: "frontWasteM",   label: "Front waste per roll", expression: "(rollInches - frontRepeats * (frontCutLength + cutAllowance)) / 39.37", unit: "m" },
+      { key: "orderCost",     label: "Order total",       expression: "costPerPc * orderQty", unit: "Rs" },
+    ],
+    outputs: [
+      { key: "costPerPc",    label: "Cost per bag",         unit: "Rs",  role: "cost_per_unit", primary: true },
+      { key: "backPerPc",    label: "Back cost per bag",    unit: "Rs" },
+      { key: "frontPerPc",   label: "Front cost per bag",   unit: "Rs" },
+      { key: "backPerRoll",  label: "Back panels per roll", unit: "pcs", role: "units_per_batch" },
+      { key: "frontPerRoll", label: "Front panels per roll", unit: "pcs" },
+      { key: "backCutLength",  label: "Back cut length",    unit: "in" },
+      { key: "frontCutLength", label: "Front cut length",   unit: "in" },
+      { key: "backRollCost", label: "Back roll cost",       unit: "Rs",  role: "cost_per_batch" },
+      { key: "backRolls",    label: "Back rolls required" },
+      { key: "frontRolls",   label: "Front rolls required" },
+      { key: "backWasteM",   label: "Back waste per roll",  unit: "m",   role: "waste_qty" },
+      { key: "orderCost",    label: "Order total",          unit: "Rs" },
+    ],
+  },
+
   /* ─────────────────────── Textile & Garments ─────────────────────── */
   {
     templateId: "garment-fabric",
