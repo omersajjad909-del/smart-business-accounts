@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { Suspense, useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { useBusinessRecords } from "@/lib/useBusinessRecords";
 import {
   mapBomRecord,
@@ -34,8 +35,9 @@ type LineDraft = {
   divisible: boolean;
 };
 
-export default function BOMPage() {
+function BOMPageInner() {
   const { isMobile } = useResponsive();
+  const params = useSearchParams();
   const bomStore = useBusinessRecords("bom");
   const productionStore = useBusinessRecords("production_order");
 
@@ -48,6 +50,37 @@ export default function BOMPage() {
   const [lines, setLines] = useState<LineDraft[]>([{ itemId: "", qty: "", divisible: false }]);
   /** The BOM being edited, or "" while a new one is being drafted. */
   const [editingId, setEditingId] = useState("");
+  /**
+   * Set when this draft arrived from the Costing page's "Create BOM" button —
+   * carries the units/labour it already worked out, and gets stamped onto the
+   * saved BOM so a batch cost can be traced back to the formula run. Cleared
+   * by resetForm()/startEdit() so it never leaks onto an unrelated BOM.
+   */
+  const [formulaMeta, setFormulaMeta] = useState<{ id: string; name: string; version: number } | null>(null);
+
+  // Deep-linked from Costing → "Create BOM →". The formula already knows the
+  // units per batch and the conversion cost; only the finished product and
+  // the materials it consumes are still the operator's to pick, because the
+  // formula has no idea which real inventory items they map to.
+  useEffect(() => {
+    const formulaId = params.get("formulaId");
+    if (!formulaId) return;
+    const yieldUnits = Number(params.get("yieldUnits"));
+    const labourPerBatch = Number(params.get("labourPerBatch"));
+    setForm((c) => ({
+      ...c,
+      version: params.get("version") || c.version,
+      yieldUnits: Number.isFinite(yieldUnits) && yieldUnits > 0 ? yieldUnits : c.yieldUnits,
+      labourPerBatch: Number.isFinite(labourPerBatch) && labourPerBatch >= 0 ? labourPerBatch : c.labourPerBatch,
+    }));
+    setFormulaMeta({
+      id: formulaId,
+      name: params.get("formulaName") || "",
+      version: Number(params.get("formulaVersion")) || 1,
+    });
+    setShowModal(true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const boms = useMemo(() => bomStore.records.map(mapBomRecord), [bomStore.records]);
   const orders = useMemo(() => productionStore.records.map(mapProductionOrderRecord), [productionStore.records]);
@@ -88,6 +121,7 @@ export default function BOMPage() {
     setForm({ finishedItemId: "", version: "v1.0", yieldUnits: 1, labourPerBatch: 0, overheadPerBatch: 0 });
     setLines([{ itemId: "", qty: "", divisible: false }]);
     setEditingId("");
+    setFormulaMeta(null);
     setFormError("");
   }
 
@@ -118,6 +152,7 @@ export default function BOMPage() {
         ? bom.lines.map((l) => ({ itemId: l.itemId, qty: String(l.qty), divisible: l.divisible === true }))
         : [{ itemId: "", qty: "", divisible: false }],
     );
+    setFormulaMeta(bom.formulaId ? { id: bom.formulaId, name: bom.formulaName || "", version: bom.formulaVersion || 1 } : null);
     setFormError("");
     setShowModal(true);
   }
@@ -169,6 +204,10 @@ export default function BOMPage() {
         // Kept so older readers and the control centre still render a
         // material summary without having to resolve item ids.
         materials: cleaned.map((l) => itemsById.get(l.itemId)?.name).filter(Boolean).join(", "),
+        // Traceability back to the formula run this BOM's units/labour came from.
+        ...(formulaMeta
+          ? { formulaId: formulaMeta.id, formulaName: formulaMeta.name, formulaVersion: formulaMeta.version }
+          : {}),
       },
     };
 
@@ -319,7 +358,13 @@ export default function BOMPage() {
       {showModal && (
         <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.7)", zIndex: 50, display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }}>
           <div style={{ background: "#161b27", border: `1px solid ${border}`, borderRadius: 16, padding: 30, width: 580, maxHeight: "90vh", overflowY: "auto", fontFamily: ff }}>
-            <h2 style={{ margin: "0 0 20px", fontSize: 18, fontWeight: 700 }}>{editingId ? "Edit Bill of Materials" : "New Bill of Materials"}</h2>
+            <h2 style={{ margin: "0 0 12px", fontSize: 18, fontWeight: 700 }}>{editingId ? "Edit Bill of Materials" : "New Bill of Materials"}</h2>
+            {formulaMeta && (
+              <div style={{ marginBottom: 14, padding: "10px 12px", borderRadius: 8, background: "rgba(129,140,248,.1)", border: "1px solid rgba(129,140,248,.28)", color: "rgba(255,255,255,.7)", fontSize: 12, lineHeight: 1.6 }}>
+                Filled in from <strong>{formulaMeta.name || "the formula"}</strong>: Units per batch and Labour per batch below.
+                Still yours to pick — the <strong>Finished Product</strong> this makes, and the <strong>Materials consumed per batch</strong> list at the bottom.
+              </div>
+            )}
             {formError && <div style={{ marginBottom: 14, padding: "10px 12px", borderRadius: 8, background: "rgba(239,68,68,.14)", border: "1px solid rgba(239,68,68,.28)", color: "#fca5a5", fontSize: 12 }}>{formError}</div>}
 
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
@@ -414,5 +459,13 @@ export default function BOMPage() {
         </div>
       )}
     </div>
+  );
+}
+
+export default function BOMPage() {
+  return (
+    <Suspense fallback={<div style={{ padding: 40, color: "rgba(255,255,255,.35)", fontFamily: ff }}>Loading…</div>}>
+      <BOMPageInner />
+    </Suspense>
   );
 }

@@ -50,6 +50,10 @@ export type ManufacturingBom = {
    */
   labourPerBatch: number;
   overheadPerBatch: number;
+  /** Set when this BOM was created from a costing formula's "Produce this" — traces a batch cost back to the run that worked it out. */
+  formulaId?: string;
+  formulaName?: string;
+  formulaVersion?: number;
 };
 
 export type ManufacturingProductionOrder = {
@@ -136,6 +140,9 @@ export function mapBomRecord(record: BusinessRecord): ManufacturingBom {
     yieldUnits: Number(record.data?.yield || 1),
     labourPerBatch: Number(record.data?.labourPerBatch) || 0,
     overheadPerBatch: Number(record.data?.overheadPerBatch) || 0,
+    formulaId: record.data?.formulaId ? String(record.data.formulaId) : undefined,
+    formulaName: record.data?.formulaName ? String(record.data.formulaName) : undefined,
+    formulaVersion: record.data?.formulaVersion != null ? Number(record.data.formulaVersion) : undefined,
   };
 }
 

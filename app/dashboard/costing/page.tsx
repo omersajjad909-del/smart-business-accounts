@@ -121,19 +121,6 @@ const CSS = `
 }
 `;
 
-/** Inventory the BOM builder can point at — the same rows purchasing uses. */
-type StockItem = { id: string; name: string; unit: string; unitCost: number };
-
-async function loadItems(category: "RAW_MATERIAL" | "FINISHED"): Promise<StockItem[]> {
-  try {
-    const res = await fetch(`/api/manufacturing/items?category=${category}`, { cache: "no-store" });
-    if (!res.ok) return [];
-    return (await res.json()) as StockItem[];
-  } catch {
-    return [];
-  }
-}
-
 function toFormula(record: BusinessRecord): CostingFormula {
   const d = (record.data ?? {}) as Record<string, unknown>;
   return {
@@ -173,25 +160,6 @@ function CostingInner() {
   const [showWorking, setShowWorking] = useState(true);
   // Which sheet is being sent to the printer — the quote, or the cutting detail.
   const [printKind, setPrintKind] = useState<"cost" | "working" | null>(null);
-
-  /* ── BOM builder ── */
-  const bomStore = useBusinessRecords("bom");
-  const [rawItems, setRawItems] = useState<StockItem[]>([]);
-  const [finishedItems, setFinishedItems] = useState<StockItem[]>([]);
-  const [bomOpen, setBomOpen] = useState(false);
-  const [bomSaving, setBomSaving] = useState(false);
-  const [bomError, setBomError] = useState("");
-  const [bomDone, setBomDone] = useState("");
-  const [bomForm, setBomForm] = useState({
-    finishedItemId: "", materialItemId: "", materialQty: 1,
-    version: "v1.0", yieldUnits: 1, labourPerBatch: 0, overheadPerBatch: 0,
-    divisible: true,
-  });
-
-  useEffect(() => {
-    loadItems("RAW_MATERIAL").then(setRawItems);
-    loadItems("FINISHED").then(setFinishedItems);
-  }, []);
 
   const formulas = useMemo(
     () => formulaStore.records.map((r) => ({ id: r.id, formula: toFormula(r) })),
@@ -290,70 +258,26 @@ function CostingInner() {
     return { unitsPerBatch, costPerBatch, costPerUnit, conversion };
   }, [selected, run]);
 
-  function openBomBuilder() {
-    setBomError("");
-    setBomDone("");
-    setBomForm((current) => ({
-      ...current,
-      yieldUnits: bomSeed?.unitsPerBatch ? Math.max(1, Math.round(bomSeed.unitsPerBatch)) : 1,
-      labourPerBatch: bomSeed?.conversion ?? 0,
-      version: `v${selected?.formula.version ?? 1}.0`,
-    }));
-    setBomOpen(true);
-  }
-
   /**
-   * Writes the BOM the factory produces against.
-   *
-   * Deliberately the same record shape Manufacturing → BOM writes, so a BOM
-   * born here is not a second kind of BOM: it opens, edits and produces
-   * exactly like a hand-made one. What it carries extra is where it came
-   * from, so a wrong batch cost can be traced back to the formula run.
+   * Sends the operator to the real Bill of Materials page instead of building
+   * a second, look-alike BOM form here — two screens that both said "Create
+   * BOM" but filled in different fields left people unsure which one to use.
+   * What the formula already worked out (units per batch, the conversion
+   * cost) rides along as query params so the BOM page opens pre-filled;
+   * picking the finished product and the materials it actually consumes
+   * still happens there, once, the same way for every BOM.
    */
-  async function createBom() {
-    const finished = finishedItems.find((i) => i.id === bomForm.finishedItemId);
-    const material = rawItems.find((i) => i.id === bomForm.materialItemId);
-    if (!finished) { setBomError("Pick the finished product this makes."); return; }
-    if (!material) { setBomError("Pick the raw material it is made from."); return; }
-    if (bomForm.materialQty <= 0) { setBomError("Material quantity must be greater than zero."); return; }
-    if (bomForm.yieldUnits <= 0) { setBomError("Units per batch must be greater than zero."); return; }
-
-    // Costed from what the material actually costs in stock, not from the rate
-    // typed into the formula — the quote is an estimate, the BOM is the book.
-    const batchCost =
-      bomForm.materialQty * material.unitCost +
-      (Number(bomForm.labourPerBatch) || 0) +
-      (Number(bomForm.overheadPerBatch) || 0);
-
-    setBomError("");
-    setBomSaving(true);
-    try {
-      await bomStore.create({
-        title: finished.name,
-        status: "active",
-        amount: batchCost / bomForm.yieldUnits,
-        data: {
-          version: bomForm.version.trim() || "v1.0",
-          yield: bomForm.yieldUnits,
-          finishedItemId: finished.id,
-          lines: [{ itemId: material.id, qty: bomForm.materialQty, divisible: bomForm.divisible }],
-          labourPerBatch: Number(bomForm.labourPerBatch) || 0,
-          overheadPerBatch: Number(bomForm.overheadPerBatch) || 0,
-          materials: material.name,
-          // Traceability back to the run that produced these numbers.
-          formulaId: selected?.id ?? null,
-          formulaName: selected?.formula.name ?? null,
-          formulaVersion: selected?.formula.version ?? null,
-        },
-      });
-      setBomDone(`BOM created for ${finished.name} — ${bomForm.yieldUnits} per batch`);
-      setBomOpen(false);
-    } catch (e) {
-      setBomError(e instanceof Error ? e.message : "Could not create the BOM.");
-    } finally {
-      setBomSaving(false);
-    }
-  }
+  const bomHref = useMemo(() => {
+    if (!selected) return "/dashboard/manufacturing/bom";
+    const qs = new URLSearchParams();
+    qs.set("formulaId", selected.id);
+    qs.set("formulaName", selected.formula.name);
+    qs.set("formulaVersion", String(selected.formula.version));
+    qs.set("version", `v${selected.formula.version}.0`);
+    if (bomSeed?.unitsPerBatch != null) qs.set("yieldUnits", String(Math.max(1, Math.round(bomSeed.unitsPerBatch))));
+    if (bomSeed?.conversion != null) qs.set("labourPerBatch", String(bomSeed.conversion));
+    return `/dashboard/manufacturing/bom?${qs.toString()}`;
+  }, [selected, bomSeed]);
 
   /** One field, whether it holds a single number or a list of sizes. */
   const field = (inp: FormulaInput) => (
@@ -578,109 +502,29 @@ function CostingInner() {
               </div>
             )}
 
-            {/* ── Turn the result into something the factory can produce against ── */}
+            {/* ── Turn the result into something the factory can produce against ──
+                This used to open a second, cut-down BOM form right here — its own
+                "Finished product"/"Raw material" pair, no room for more than one
+                material line, and no way to tell it apart from the real BOM
+                screen. Two screens both saying "Create BOM" is what left people
+                unsure which fields belonged where; now there is only one BOM
+                screen, and this button hands it what the formula already
+                worked out. */}
             {selected && run?.ok && (
               <div style={{ background: CARD, border: `1px solid ${BORDER}`, borderRadius: 14, padding: 18 }}>
                 <div className="cxSectionHead">
                   <div>
                     <div style={{ fontSize: 14, fontWeight: 700 }}>Produce this</div>
-                    <div style={{ fontSize: 12, color: "rgba(255,255,255,.35)", marginTop: 3 }}>
-                      Creates the BOM the shop floor runs against, with these numbers already in it.
+                    <div style={{ fontSize: 12, color: "rgba(255,255,255,.35)", marginTop: 3, maxWidth: 480 }}>
+                      Opens Manufacturing → Bill of Materials with the units per batch and labour cost
+                      this run worked out already filled in. Pick the finished product and add the
+                      material(s) it consumes there — same screen every BOM is built on.
                     </div>
                   </div>
-                  {!bomOpen && (
-                    <button onClick={openBomBuilder} style={btn(true)}>Create BOM →</button>
-                  )}
+                  <Link href={bomHref} style={{ ...btn(true), textDecoration: "none", display: "inline-flex", alignItems: "center" }}>
+                    Create BOM →
+                  </Link>
                 </div>
-
-                {bomDone && (
-                  <div style={{ fontSize: 12.5, color: "#34d399", marginTop: 12 }}>
-                    {bomDone} · <Link href="/dashboard/manufacturing/production-orders" style={{ color: "#818cf8" }}>raise a production order →</Link>
-                  </div>
-                )}
-
-                {bomOpen && (
-                  <div style={{ marginTop: 16, display: "flex", flexDirection: "column", gap: 12 }}>
-                    {bomError && (
-                      <div style={{ padding: "10px 12px", borderRadius: 9, background: "rgba(248,113,113,.1)", border: "1px solid rgba(248,113,113,.28)", color: "#f87171", fontSize: 12.5 }}>
-                        {bomError}
-                      </div>
-                    )}
-
-                    {(!finishedItems.length || !rawItems.length) && (
-                      <div style={{ padding: "10px 12px", borderRadius: 9, background: "rgba(251,191,36,.1)", border: "1px solid rgba(251,191,36,.26)", color: "#fbbf24", fontSize: 12.5, lineHeight: 1.6 }}>
-                        You need the item first — a raw material to consume and a finished product to make.
-                        Add them in{" "}
-                        <Link href="/dashboard/manufacturing/raw-materials" style={{ color: "#fcd34d" }}>Manufacturing → Raw Materials</Link>.
-                      </div>
-                    )}
-
-                    <div className="cxFields">
-                      <div>
-                        <label style={labelStyle}>Finished product</label>
-                        <select value={bomForm.finishedItemId}
-                          onChange={(e) => setBomForm((c) => ({ ...c, finishedItemId: e.target.value }))}
-                          style={{ ...inputStyle, fontFamily: FONT }}>
-                          <option value="">— Select —</option>
-                          {finishedItems.map((i) => <option key={i.id} value={i.id}>{i.name}</option>)}
-                        </select>
-                      </div>
-                      <div>
-                        <label style={labelStyle}>Raw material</label>
-                        <select value={bomForm.materialItemId}
-                          onChange={(e) => setBomForm((c) => ({ ...c, materialItemId: e.target.value }))}
-                          style={{ ...inputStyle, fontFamily: FONT }}>
-                          <option value="">— Select —</option>
-                          {rawItems.map((i) => <option key={i.id} value={i.id}>{i.name} · Rs. {Math.round(i.unitCost).toLocaleString()}/{i.unit}</option>)}
-                        </select>
-                      </div>
-                      <div>
-                        <label style={labelStyle}>Material per batch</label>
-                        <input type="number" min={0} step="any" value={bomForm.materialQty}
-                          onChange={(e) => setBomForm((c) => ({ ...c, materialQty: Number(e.target.value) }))}
-                          style={inputStyle} />
-                      </div>
-                      <div>
-                        <label style={labelStyle}>Units per batch</label>
-                        <input type="number" min={1} value={bomForm.yieldUnits}
-                          onChange={(e) => setBomForm((c) => ({ ...c, yieldUnits: Number(e.target.value) }))}
-                          style={inputStyle} />
-                      </div>
-                      <div>
-                        <label style={labelStyle}>Labour per batch</label>
-                        <input type="number" min={0} step="any" value={bomForm.labourPerBatch}
-                          onChange={(e) => setBomForm((c) => ({ ...c, labourPerBatch: Number(e.target.value) }))}
-                          style={inputStyle} />
-                      </div>
-                      <div>
-                        <label style={labelStyle}>Overhead per batch</label>
-                        <input type="number" min={0} step="any" value={bomForm.overheadPerBatch}
-                          onChange={(e) => setBomForm((c) => ({ ...c, overheadPerBatch: Number(e.target.value) }))}
-                          style={inputStyle} />
-                      </div>
-                    </div>
-
-                    <label style={{ display: "flex", alignItems: "flex-start", gap: 8, fontSize: 12, color: "rgba(255,255,255,.5)", cursor: "pointer", lineHeight: 1.6 }}>
-                      <input type="checkbox" checked={bomForm.divisible} style={{ marginTop: 3 }}
-                        onChange={(e) => setBomForm((c) => ({ ...c, divisible: e.target.checked }))} />
-                      Roll / sheet material — a run needing 12.66 rolls takes 13 and the balance stays
-                      as open stock for the next order, instead of being charged to this batch.
-                    </label>
-
-                    <div style={{ fontSize: 11.5, color: "rgba(255,255,255,.3)", lineHeight: 1.7 }}>
-                      {bomSeed?.unitsPerBatch != null && <>Units per batch came from the formula ({fmt(bomSeed.unitsPerBatch)}). </>}
-                      {bomSeed?.conversion != null && <>Labour is cost per unit × units per batch − batch material cost. </>}
-                      Material cost is read from stock when the run is priced, so the BOM follows what you actually paid.
-                    </div>
-
-                    <div className="cxActionRow">
-                      <button onClick={createBom} disabled={bomSaving} style={{ ...btn(true), opacity: bomSaving ? .6 : 1 }}>
-                        {bomSaving ? "Creating…" : "Create BOM"}
-                      </button>
-                      <button onClick={() => setBomOpen(false)} style={btn()}>Cancel</button>
-                    </div>
-                  </div>
-                )}
               </div>
             )}
           </div>
