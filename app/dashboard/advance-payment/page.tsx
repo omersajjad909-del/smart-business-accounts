@@ -341,7 +341,7 @@ export default function AdvancePaymentPage() {
           </div>
           <div style={{ display: "flex", gap: 10 }}>
             <button type="submit" disabled={saving} style={{ background: "#22c55e", color: "#fff", border: "none", borderRadius: 8, padding: "10px 24px", fontFamily: ff, fontSize: 14, fontWeight: 700, cursor: saving ? "not-allowed" : "pointer", opacity: saving ? 0.7 : 1 }}>
-              {saving ? "Adjusting…" : "Adjust Advance"}
+              {saving ? "Adjusing…" : "Adjust Advance"}
             </button>
             <button type="button" onClick={() => { setShowAdjForm(false); setSelAdvance(null); }} style={{ background: "transparent", border: "1px solid var(--border)", borderRadius: 8, padding: "10px 20px", fontFamily: ff, fontSize: 14, color: "var(--text-muted)", cursor: "pointer" }}>Cancel</button>
           </div>
