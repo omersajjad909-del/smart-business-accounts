@@ -539,11 +539,13 @@ export default function ProductionOrdersPage() {
                       This run finishes {runQty.toLocaleString()} pieces, but {labourPieces.name} is paid for {labourPieces.most.toLocaleString()}
                     </div>
                     <div style={{ fontSize: 11.5, color: "rgba(255,255,255,.5)", lineHeight: 1.7 }}>
-                      All {runQty.toLocaleString()} will be received into finished goods and charged to this order
+                      Confirm is blocked until this matches — {runQty.toLocaleString()} would be received into
+                      finished goods and charged to this order
                       {runOrder.quantity > 0 && runQty >= runOrder.quantity - runOrder.completed
-                        ? ", which closes it — the balance can never be produced against it again."
-                        : "."}
-                      {" "}If only {labourPieces.most.toLocaleString()} were actually made, set the run to that.
+                        ? ", which closes it — the balance could never be produced against it again"
+                        : ""}
+                      {" "}while only {labourPieces.most.toLocaleString()} pieces were actually paid for.
+                      {" "}If only {labourPieces.most.toLocaleString()} were made, set the run to that; if the full {runQty.toLocaleString()} were made, raise the worker&apos;s pieces to match.
                     </div>
                     <button
                       onClick={() => { setRunQty(labourPieces.most); requote(labourPieces.most); }}
@@ -605,10 +607,10 @@ export default function ProductionOrdersPage() {
             <div style={{ display: "flex", gap: 12 }}>
               <button
                 onClick={confirmRun}
-                disabled={running || quoting || !runQuote || labourPieces?.over === true || (runQuote.shortages.length > 0 && !allowShort)}
+                disabled={running || quoting || !runQuote || labourPieces?.over === true || labourPieces?.under === true || (runQuote.shortages.length > 0 && !allowShort)}
                 style={{
                   flex: 1, padding: "11px 0", border: "none", borderRadius: 8, color: "#fff", fontSize: 14, fontWeight: 700,
-                  background: running || !runQuote || labourPieces?.over === true || (runQuote.shortages.length > 0 && !allowShort) ? "rgba(34,197,94,.35)" : "#22c55e",
+                  background: running || !runQuote || labourPieces?.over === true || labourPieces?.under === true || (runQuote.shortages.length > 0 && !allowShort) ? "rgba(34,197,94,.35)" : "#22c55e",
                   cursor: running || !runQuote ? "not-allowed" : "pointer",
                 }}
               >
