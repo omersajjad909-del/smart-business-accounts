@@ -254,7 +254,7 @@ export default function ProductionOrdersPage() {
         {[
           { label: "Total Orders", value: orders.length, color: "#f97316" },
           { label: "Planned", value: orders.filter((item) => item.status === "planned").length, color: "#818cf8" },
-          { label: "In Progress", value: orders.filter((item) => item.status === "in_progress").length, color: "#f59e0b" },
+          { label: "In Progress", value: orders.filter((item) => item.status === "in_progress" || item.status === "running").length, color: "#f59e0b" },
           { label: "Completed To FG", value: orders.filter((item) => item.status === "completed").length, color: "#22c55e" },
         ].map((card) => (
           <div key={card.label} style={{ background: bg, border: `1px solid ${border}`, borderRadius: 14, padding: isMobile ? "12px 10px" : "18px 20px" }}>
@@ -268,6 +268,9 @@ export default function ProductionOrdersPage() {
         {orders.map((order) => {
           const linkedBom = boms.find((item) => item.id === order.bomId) || boms.find((item) => item.product === order.product);
           const progress = order.quantity > 0 ? Math.round((order.completed / order.quantity) * 100) : 0;
+          // What is still owed on the order. The bar alone is easy to misread at
+          // a glance; the count says plainly that the order is not finished.
+          const remaining = Math.max(order.quantity - order.completed, 0);
           const fgCreated = finishedGoods.some((item) => item.productionOrderId === order.orderId);
           const linkedWorkOrders = workOrders.filter((item) => item.linkedProductionOrderId === order.orderId);
           const incompleteWorkOrders = linkedWorkOrders.filter((item) => item.status !== "completed").length;
@@ -277,7 +280,10 @@ export default function ProductionOrdersPage() {
                 <div>
                   <div style={{ fontSize: 15, fontWeight: 800 }}>{order.product}</div>
                   <div style={{ fontSize: 12, color: "rgba(255,255,255,.42)", marginTop: 4 }}>
-                    {order.orderId} • BOM {linkedBom?.version || order.bomVersion || "Not linked"} • Qty {order.completed}/{order.quantity}
+                    {order.orderId} • BOM {linkedBom?.version || order.bomVersion || "Not linked"} • Qty {order.completed.toLocaleString()}/{order.quantity.toLocaleString()}
+                    {remaining > 0 && order.status !== "cancelled" && (
+                      <span style={{ color: "#fbbf24", fontWeight: 700 }}> • {remaining.toLocaleString()} left to make</span>
+                    )}
                   </div>
                 </div>
                 <div style={{ fontSize: 11, fontWeight: 800, color: statusColor[order.status] || "#94a3b8" }}>{order.status.replace("_", " ").toUpperCase()}</div>
@@ -296,7 +302,9 @@ export default function ProductionOrdersPage() {
                 )}
                 {(order.status === "in_progress" || order.status === "running") && (
                   <button onClick={() => openCompleteDialog(order)} style={{ padding: "7px 14px", background: "rgba(34,197,94,.15)", border: "1px solid rgba(34,197,94,.3)", color: "#22c55e", borderRadius: 8, fontSize: 12, fontWeight: 700, cursor: "pointer" }}>
-                    Record production →
+                    {order.completed > 0 && remaining > 0
+                      ? `Run remaining ${remaining.toLocaleString()} →`
+                      : "Record production →"}
                   </button>
                 )}
                 {order.status !== "completed" && order.status !== "cancelled" && (
@@ -394,6 +402,16 @@ export default function ProductionOrdersPage() {
                   onBlur={(e) => requote(Math.max(1, Number(e.target.value) || 1))}
                   style={{ width: 180, background: bg, border: `1px solid ${border}`, borderRadius: 8, padding: "9px 12px", color: "#fff", boxSizing: "border-box" }}
                 />
+                {/* The box opens on the whole balance, which is right for a run
+                    that finishes the order and wrong for a day that finishes
+                    part of it. Say what happens to the rest so a short day is
+                    not typed in as a full one. */}
+                <div style={{ fontSize: 11, color: "rgba(255,255,255,.35)", marginTop: 6, width: 180, lineHeight: 1.6 }}>
+                  {runOrder.completed > 0
+                    ? `${runOrder.completed.toLocaleString()} done, ${Math.max(runOrder.quantity - runOrder.completed, 0).toLocaleString()} left of ${runOrder.quantity.toLocaleString()}.`
+                    : `Order is for ${runOrder.quantity.toLocaleString()}.`}{" "}
+                  Enter only what was finished — the rest stays open for the next run.
+                </div>
               </div>
               <div>
                 <label style={{ display: "block", fontSize: 12, color: "rgba(255,255,255,.45)", marginBottom: 6 }}>Consume from</label>
