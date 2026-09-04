@@ -277,7 +277,7 @@ const [searchTerm, setSearchTerm] = useState("");
     if (e.key !== "Enter") return;
     e.preventDefault();
     if (!scanCode.trim()) return;
-    const found = allInventoryItems.find(i => i.barcode === scanCode || i.id === scanCode || i.code === scanCode);
+    const found = pickerItems.find(i => i.barcode === scanCode || i.id === scanCode || i.code === scanCode);
     if (!found) { toast.error(`Item not found: ${scanCode}`); setScanCode(""); return; }
     const existingIdx = rows.findIndex(r => r.itemId === found.id);
     if (existingIdx >= 0) {
@@ -526,6 +526,17 @@ const [searchTerm, setSearchTerm] = useState("");
     return row ? `${row.qty} pending` : null;
   };
 
+  /**
+   * Once a GRN is picked, the item picker should only offer what that receipt
+   * actually contains — a supplier's whole catalogue is not what was
+   * delivered. Without a GRN (direct invoice, per the comment on
+   * `suppliersAwaitingInvoice` above), the full inventory stays available.
+   */
+  const selectedGrnForItems = selectedGrnId ? allGrns.find((grn) => grn.id === selectedGrnId) : null;
+  const pickerItems = selectedGrnForItems
+    ? allInventoryItems.filter((item) => selectedGrnForItems.items.some((line) => line.itemId === item.id))
+    : allInventoryItems;
+
   useEffect(() => {
     if (!supplierId) {
       setFilteredGRNs([]);
@@ -542,14 +553,6 @@ const [searchTerm, setSearchTerm] = useState("");
       setRows([emptyRow()]);
     }
   }, [supplierId, allGrns, invoices, editing, selectedGrnId]);
-
-  function handlePoSelection(poId: string) {
-    setSelectedPoId(poId);
-    const po = filteredPOs.find(p => p.id === poId);
-    if (!po) return;
-    const nextRows = getInvoiceableRowsForPo(po);
-    setRows(nextRows.length > 0 ? nextRows.map(r => ({ ...emptyRow(), ...r })) : [emptyRow()]);
-  }
 
   function handleGrnSelection(grnId: string) {
     setSelectedGrnId(grnId);
@@ -1287,7 +1290,7 @@ const [searchTerm, setSearchTerm] = useState("");
                                   </td>
                                   <td style={{ padding: "7px 8px", minWidth: 160 }}>
                                     <ItemPicker
-                                      items={allInventoryItems as any}
+                                      items={pickerItems as any}
                                       value={r.itemId}
                                       onChange={(__picked: string) => {
                                       const item = allInventoryItems.find(it => it.id === __picked);
