@@ -98,14 +98,24 @@ const CSS = `
 }
 .cxPrint{display:none}
 @media print{
-  /* The app stays in the DOM but off the paper; only the sheet is inked. */
-  body *{visibility:hidden !important}
-  .cxPrint,.cxPrint *{visibility:visible !important}
-  .cxPrint{display:block !important;position:absolute;left:0;top:0;width:100%;
+  /* Hiding the rest of the app with visibility:hidden left its boxes in the
+     layout, so the sheet's one page of print sat atop several blank ones the
+     size of the dashboard behind it. display:none takes the hidden elements
+     out of flow instead — the same fix as the ledger print root, in
+     app/globals.css. */
+  body:has(.cxPrint){background:#fff !important}
+  .cxWrap:has(.cxPrint) > *:not(.cxPrint){display:none !important}
+  .cxPrint{display:block !important;position:static;width:100%;
     margin:0;background:#fff;color:#000}
-  /* The dashboard's scrolling pane would otherwise clip the sheet to one screen. */
-  html,body{overflow:visible !important;height:auto !important}
-  .dashboard-content-scroll,.dashboard-content-inner{overflow:visible !important;height:auto !important}
+  .dashboard-root:has(.cxPrint){display:block !important;min-height:auto !important}
+  .dashboard-root:has(.cxPrint) > aside,
+  .dashboard-root:has(.cxPrint) main > :not(.dashboard-content-scroll),
+  .dashboard-root:has(.cxPrint) .dashboard-content-inner > :not(:has(.cxPrint)){display:none !important}
+  .dashboard-root:has(.cxPrint) main,
+  .dashboard-root:has(.cxPrint) .dashboard-content-scroll,
+  .dashboard-root:has(.cxPrint) .dashboard-content-inner{
+    display:block !important;min-height:auto !important;margin:0 !important;
+    max-width:none !important;overflow:visible !important;padding:0 !important;width:100% !important}
   .cxPrint table{page-break-inside:auto}
   .cxPrint tr{page-break-inside:avoid}
 }
