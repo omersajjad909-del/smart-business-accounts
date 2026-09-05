@@ -68,6 +68,148 @@ const DEFAULT_CITIES: Record<string, string[]> = {
   NG: ["Lagos"], KE: ["Nairobi"], EG: ["Cairo"], NZ: ["Auckland"],
 };
 
+/** Centroid [lat, lng] for every city named in DEFAULT_CITIES above, so
+ * Overpass (which needs a point + radius, not a city name) can run without a
+ * geocoding API. Approximate on purpose — a 20km search radius absorbs it. */
+const CITY_COORDS: Record<string, [number, number]> = {
+  Karachi: [24.8607, 67.0011], Lahore: [31.5497, 74.3436], Faisalabad: [31.4504, 73.135],
+  Sialkot: [32.4945, 74.5229], Islamabad: [33.6844, 73.0479], Gujranwala: [32.1877, 74.1945],
+  Multan: [30.1575, 71.5249],
+  Dubai: [25.2048, 55.2708], Sharjah: [25.3463, 55.4209], "Abu Dhabi": [24.4539, 54.3773], Ajman: [25.4052, 55.5136],
+  Riyadh: [24.7136, 46.6753], Jeddah: [21.4858, 39.1925], Dammam: [26.4207, 50.0888],
+  Doha: [25.2854, 51.531], Muscat: [23.5859, 58.4059], Manama: [26.2285, 50.586], "Kuwait City": [29.3759, 47.9774],
+  Mumbai: [19.076, 72.8777], Delhi: [28.7041, 77.1025], Ahmedabad: [23.0225, 72.5714], Surat: [21.1702, 72.8311],
+  Dhaka: [23.8103, 90.4125], Chittagong: [22.3569, 91.7832], Colombo: [6.9271, 79.8612],
+  Houston: [29.7604, -95.3698], Chicago: [41.8781, -87.6298], Miami: [25.7617, -80.1918],
+  Toronto: [43.6532, -79.3832], Sydney: [-33.8688, 151.2093], "Kuala Lumpur": [3.139, 101.6869],
+  Singapore: [1.3521, 103.8198], Johannesburg: [-26.2041, 28.0473], Lagos: [6.5244, 3.3792],
+  Nairobi: [-1.2921, 36.8219], Cairo: [30.0444, 31.2357], Auckland: [-36.8485, 174.7633],
+};
+
+/**
+ * Name-search keywords per FinovaOS industry id, tuned toward what a small
+ * manufacturer/trader actually puts in its OSM listing name. Falls back to
+ * the plain industry label when nothing more specific is known.
+ */
+const OVERPASS_KEYWORDS: Record<string, string[]> = {
+  manufacturing: ["plastic", "PVC", "polymer", "injection molding", "extrusion", "factory", "mills", "industries"],
+  chemical: ["chemical", "plastic", "PVC", "resin", "polymer"],
+  trading: ["trading", "traders", "general trading", "impex"],
+  distribution: ["distributor", "distribution", "logistics"],
+  wholesale: ["wholesale", "wholesaler", "traders"],
+  import_company: ["import", "importers", "trading"],
+  export_company: ["export", "exporters", "trading"],
+  hardware: ["hardware", "building materials", "steel"],
+  garments: ["garments", "textile", "apparel"],
+  textile_mill: ["textile mill", "textile", "spinning", "weaving"],
+  steel_mill: ["steel", "rolling mill", "metal works"],
+  food_processing: ["food processing", "foods", "cannery"],
+  cold_storage: ["cold storage", "cold store"],
+  construction: ["construction", "builders", "contractors"],
+  pharmacy: ["pharmacy", "chemist", "medical store"],
+  supermarket: ["supermarket", "grocery", "mart"],
+  retail: ["store", "shop", "retail"],
+};
+
+function overpassKeywordsFor(brief: CampaignBrief): string[] {
+  const words = brief.industries.flatMap((id) => OVERPASS_KEYWORDS[id] || [labelFor(id)]);
+  return [...new Set(words)];
+}
+
+function escapeOverpassRegex(word: string): string {
+  return word.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+type OverpassElement = {
+  type: string;
+  id: number;
+  lat?: number;
+  lon?: number;
+  center?: { lat?: number; lon?: number };
+  tags?: Record<string, string>;
+};
+
+/**
+ * OpenStreetMap Overpass — free, no key, real currently-mapped businesses.
+ * Coverage in South Asia/Gulf is patchier than Google Places (OSM is
+ * volunteer-mapped), so this is tried first because it costs nothing, not
+ * because it is more complete; Places/Apollo pick up whatever it misses.
+ */
+async function discoverViaOverpass(
+  brief: CampaignBrief,
+  limit: number,
+): Promise<DiscoveredCompany[]> {
+  const out: DiscoveredCompany[] = [];
+  const seen = new Set<string>();
+  const keywords = overpassKeywordsFor(brief);
+  const regex = keywords.map(escapeOverpassRegex).join("|");
+  if (!regex) return out;
+
+  for (const { city, country } of citiesFor(brief)) {
+    if (out.length >= limit) break;
+    const coords = CITY_COORDS[city];
+    if (!coords) continue;
+    const [lat, lon] = coords;
+
+    const query = `[out:json][timeout:25];
+(
+  nwr["name"~"${regex}",i](around:20000,${lat},${lon});
+);
+out center ${Math.min(limit - out.length, 100)};`;
+
+    try {
+      const res = await fetch("https://overpass-api.de/api/interpreter", {
+        method: "POST",
+        headers: { "Content-Type": "text/plain" },
+        body: query,
+      });
+      if (!res.ok) {
+        console.error(`[prospecting/discovery] Overpass query failed (HTTP ${res.status}) for ${city}`);
+        continue;
+      }
+      const data = (await res.json()) as { elements?: OverpassElement[] };
+
+      for (const el of data.elements || []) {
+        if (out.length >= limit) break;
+        const tags = el.tags || {};
+        const name = tags.name?.trim();
+        if (!name) continue;
+
+        const website = tags.website || tags["contact:website"] || null;
+        const domain = normaliseDomain(website);
+        const dedupeKey = domain || `${name.toLowerCase()}|${city.toLowerCase()}`;
+        if (seen.has(dedupeKey)) continue;
+        seen.add(dedupeKey);
+
+        const address =
+          [tags["addr:housenumber"], tags["addr:street"], tags["addr:city"] || city]
+            .filter(Boolean)
+            .join(", ") || null;
+
+        out.push({
+          name,
+          domain,
+          website,
+          industry: brief.industries[0] || null,
+          country,
+          city,
+          address,
+          lat: el.lat ?? el.center?.lat ?? null,
+          lng: el.lon ?? el.center?.lon ?? null,
+          phone: tags.phone || tags["contact:phone"] || null,
+          source: "overpass",
+          sourceRef: `${el.type}/${el.id}`,
+          raw: tags as Record<string, unknown>,
+        });
+      }
+    } catch (error) {
+      console.error(`[prospecting/discovery] Overpass request errored for ${city}:`, error);
+    }
+  }
+
+  return out;
+}
+
 function citiesFor(brief: CampaignBrief): Array<{ city: string; country: string }> {
   const out: Array<{ city: string; country: string }> = [];
   for (const country of brief.countries) {
@@ -344,7 +486,9 @@ export async function discoverCompanies(
           ? await discoverViaPlaces(brief, remaining)
           : provider === "apollo"
             ? await discoverViaApollo(brief, remaining)
-            : discoverSample(brief, remaining);
+            : provider === "overpass"
+              ? await discoverViaOverpass(brief, remaining)
+              : discoverSample(brief, remaining);
 
       for (const company of batch) {
         const key = company.domain || `${company.name.toLowerCase()}|${company.city || ""}`;
