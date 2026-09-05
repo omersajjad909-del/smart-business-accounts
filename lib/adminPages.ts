@@ -70,6 +70,7 @@ const API_PATH_TO_PAGE: Array<[string, string]> = [
   // entries here fail closed to super-admin-only, which would have made every
   // one of these pages silently dead for scoped admins.
   ["/api/admin/prospecting", "prospecting"],
+  ["/api/admin/market-scanner", "market-scanner"],
   ["/api/admin/migration-wizard", "migration-wizard"],
   ["/api/admin/support-copilot", "support-copilot"],
   ["/api/admin/churn-radar", "churn-radar"],

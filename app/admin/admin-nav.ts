@@ -38,6 +38,7 @@ export const ADMIN_NAV_ITEMS: AdminNavItem[] = [
   // the AI, not for X. AI Prospecting moved here from Marketing for the same
   // reason; its id and route are unchanged, so permissions carry over.
   { id: "prospecting",         label: "AI Prospecting",     href: "/admin/prospecting",           group: "AI", short: "AP", icon: "target",    badge: "AI" },
+  { id: "market-scanner",      label: "Market Scanner",     href: "/admin/market-scanner",        group: "AI", short: "MS", icon: "radar",     badge: "AI" },
   { id: "migration-wizard",    label: "Migration Wizard",   href: "/admin/migration-wizard",      group: "AI", short: "MW", icon: "box",       badge: "AI" },
   { id: "support-copilot",     label: "Support Copilot",    href: "/admin/support-copilot",       group: "AI", short: "SC", icon: "message",   badge: "AI" },
   { id: "churn-radar",         label: "Churn Radar",        href: "/admin/churn-radar",           group: "AI", short: "CR", icon: "pulse",     badge: "AI" },

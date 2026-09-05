@@ -133,10 +133,20 @@ function parseAtomEntries(xml: string): FeedEntry[] {
   return entries;
 }
 
-async function fetchSubredditFeed(subreddit: string): Promise<FeedEntry[]> {
+async function fetchSubredditFeed(subreddit: string, attempt = 1): Promise<FeedEntry[]> {
   const res = await fetch(`https://www.reddit.com/r/${subreddit}/new/.rss?limit=40`, {
     headers: { "User-Agent": REDDIT_UA },
   });
+
+  if (res.status === 429 && attempt < 3) {
+    // Unauthenticated Reddit is generous on the first hit and strict after —
+    // back off hard rather than burn the rest of the run on 429s.
+    const wait = 8000 * attempt;
+    console.warn(`[market-scanner] r/${subreddit} rate-limited, retrying in ${wait}ms`);
+    await new Promise((resolve) => setTimeout(resolve, wait));
+    return fetchSubredditFeed(subreddit, attempt + 1);
+  }
+
   if (!res.ok) {
     console.error(`[market-scanner] r/${subreddit} feed failed: HTTP ${res.status}`);
     return [];
@@ -186,9 +196,10 @@ export async function scanReddit(): Promise<{ signals: ScannedSignal[]; scanned:
       });
     }
 
-    // Same courtesy gap as the old JSON approach: don't hammer ten subreddits
-    // back to back from one IP.
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    // Unauthenticated Reddit rate-limits per-IP fairly aggressively — observed
+    // 429s even at 6-8s spacing from a datacenter IP during testing. This errs
+    // slow on purpose: a daily cron has no reason to rush ten requests.
+    await new Promise((resolve) => setTimeout(resolve, 12000));
   }
 
   return { signals, scanned };
