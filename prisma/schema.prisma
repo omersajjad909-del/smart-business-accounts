@@ -2878,3 +2878,41 @@ model OutreachSuppression {
 
   @@index([domain])
 }
+
+/// AI Growth Department, Agent #1 — public pain signals a human should read
+/// and, per docs/growth/manual-lead-round.md, reply to publicly before ever
+/// sending a DM. This table only stores what the scanner found; it never
+/// contacts anyone itself. Platform-level, like the prospecting tables above.
+model MarketSignal {
+  id String @id @default(uuid())
+
+  /// "reddit" today; a future job-board or review-site source is a new value,
+  /// not a new table.
+  source     String
+  subreddit  String?
+  /// The source's own post id, e.g. Reddit's base36 id — how a rerun knows
+  /// this signal already exists instead of storing it twice.
+  externalId String
+
+  url      String
+  title    String  @db.Text
+  snippet  String? @db.Text
+  author   String?
+
+  /// Keyword arrays from the vocabulary in manual-lead-round.md.
+  matchedIndustry Json?
+  matchedPain     Json?
+  matchedSoftware Json?
+  /// A = software-pain + industry (highest), B = costing-pain + industry
+  /// (strong), C = software-pain alone (maybe, verify industry by hand).
+  tier String
+
+  /// new | reviewed | replied | ignored — set by the admin reading the queue.
+  status String @default("new")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([source, externalId])
+  @@index([tier, status, createdAt])
+}
