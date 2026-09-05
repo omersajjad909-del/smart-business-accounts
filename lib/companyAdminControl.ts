@@ -69,6 +69,26 @@ export type BranchGeoProfile = {
   geoSource: "exact" | "manual" | "country" | "unset";
 };
 
+export type FbrEInvoiceSettings = {
+  enabled: boolean;
+  environment: "sandbox" | "production";
+  bearerToken: string; // Token issued from the seller's FBR IRIS / PRAL account
+  sellerNtn: string; // NTN or CNIC registered with FBR
+  sellerBusinessName: string;
+  sellerProvince: string;
+  sellerAddress: string;
+};
+
+export const DEFAULT_FBR_SETTINGS: FbrEInvoiceSettings = {
+  enabled: false,
+  environment: "sandbox",
+  bearerToken: "",
+  sellerNtn: "",
+  sellerBusinessName: "",
+  sellerProvince: "",
+  sellerAddress: "",
+};
+
 export type BusinessFeatureFlags = {
   advancedPurchasing:   boolean;  // PO → GRN → Purchase Invoice full flow
   multiWarehouse:       boolean;  // Warehouses, Stock Transfers
@@ -139,6 +159,8 @@ export type AdminControlSettings = {
    * up, which normalises to `enabled: false` and leaves every document alone.
    */
   rateFormula: RateFormulaSettings;
+  /** FBR digital e-invoicing gateway credentials. Absent means disabled. */
+  fbrSettings: FbrEInvoiceSettings;
 };
 
 export const DEFAULT_ADMIN_CONTROL_SETTINGS: AdminControlSettings = {
@@ -196,6 +218,7 @@ export const DEFAULT_ADMIN_CONTROL_SETTINGS: AdminControlSettings = {
   features: { ...DEFAULT_FEATURE_FLAGS },
   loyaltySettings: { ...DEFAULT_LOYALTY_SETTINGS },
   rateFormula: { ...DEFAULT_RATE_FORMULA, documents: { ...DEFAULT_RATE_FORMULA.documents } },
+  fbrSettings: { ...DEFAULT_FBR_SETTINGS },
 };
 
 function normalizeSettings(value: unknown): AdminControlSettings {
@@ -223,6 +246,9 @@ function normalizeSettings(value: unknown): AdminControlSettings {
     : {};
   const featuresRaw = (parsed.features && typeof parsed.features === "object")
     ? parsed.features as Partial<BusinessFeatureFlags>
+    : {};
+  const fbrSettingsRaw = (parsed.fbrSettings && typeof parsed.fbrSettings === "object")
+    ? parsed.fbrSettings as Partial<FbrEInvoiceSettings>
     : {};
 
   return {
@@ -291,6 +317,11 @@ function normalizeSettings(value: unknown): AdminControlSettings {
       ])
     ),
     rateFormula: normalizeRateFormula(parsed.rateFormula),
+    fbrSettings: {
+      ...DEFAULT_FBR_SETTINGS,
+      ...fbrSettingsRaw,
+      environment: fbrSettingsRaw.environment === "production" ? "production" : "sandbox",
+    },
   };
 }
 
@@ -385,6 +416,10 @@ export async function saveCompanyAdminControlSettings(
       // shallow merge of an array would leave the old tail behind.
       fields: patch.rateFormula?.fields ?? current.rateFormula.fields,
       documents: patch.rateFormula?.documents ?? current.rateFormula.documents,
+    },
+    fbrSettings: {
+      ...current.fbrSettings,
+      ...(patch.fbrSettings || {}),
     },
   });
 

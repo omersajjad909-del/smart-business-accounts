@@ -324,6 +324,17 @@ model SalesInvoice {
   approvedAt      DateTime?
   approvalRemarks String?
 
+  // FBR digital e-invoicing (Pakistan). Left untouched (all null, status
+  // NOT_FILED) for every company that never opens the E-Invoice page — see
+  // lib/fbrEInvoice.ts and app/dashboard/e-invoice.
+  fbrStatus      String?   @default("NOT_FILED") // NOT_FILED | FILED | FAILED
+  fbrInvoiceNo   String? // Invoice number FBR's gateway assigned on success
+  fbrIrn         String? // Invoice Reference Number encoded into the printed QR
+  fbrQrPayload   String? // Raw string the QR code on the invoice encodes
+  fbrFiledAt     DateTime?
+  fbrResponse    Json? // Last raw gateway response (success or error), for support/audit
+  fbrScenarioId  String? // Sandbox-only scenario id used for the test submission
+
   createdAt DateTime  @default(now())
   deletedAt DateTime?
   deletedBy String?

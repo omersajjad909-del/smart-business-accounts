@@ -1441,6 +1441,7 @@ export default function DashboardLayout({
               {hasPermission(currentUser, PERMISSIONS.CREATE_SALES_INVOICE) && <NavLink href="/dashboard/sales-order" pathname={pathname}>Sales Order</NavLink>}
               {hasPermission(currentUser, PERMISSIONS.CREATE_DELIVERY_CHALLAN) && <NavLink href="/dashboard/delivery-challan" pathname={pathname}>Delivery Challan</NavLink>}
               {hasPermission(currentUser, PERMISSIONS.CREATE_SALES_INVOICE) && <NavLink href="/dashboard/sales-invoice" pathname={pathname}>Sales Invoice</NavLink>}
+              {hasPermission(currentUser, PERMISSIONS.CREATE_SALES_INVOICE) && <NavLink href="/dashboard/e-invoice" pathname={pathname}>E-Invoice (FBR)</NavLink>}
               {hasPermission(currentUser, PERMISSIONS.CREATE_SALE_RETURN) && <NavLink href="/dashboard/sale-return" pathname={pathname}>Sale Return</NavLink>}
               {/* Both had a module toggle and a working page but no way in. */}
               {hasPermission(currentUser, PERMISSIONS.CREATE_DELIVERY_CHALLAN) && hasModule(businessType, "outward") && <NavLink href="/dashboard/outward" pathname={pathname}>Outward / Dispatch</NavLink>}
@@ -1560,6 +1561,7 @@ export default function DashboardLayout({
               onToggle={() => toggle("retailSales")}
             >
               <NavLink href="/dashboard/sales-invoice" pathname={pathname}>🧾 Sales Invoices</NavLink>
+              <NavLink href="/dashboard/e-invoice" pathname={pathname}>📶 E-Invoice (FBR)</NavLink>
               <NavLink href="/dashboard/sale-return" pathname={pathname}>↩️ Sales Returns</NavLink>
               <NavLink href="/dashboard/quotation" pathname={pathname}>📄 Quotations</NavLink>
               <NavLink href="/dashboard/delivery-challan" pathname={pathname}>🚚 Delivery Challan</NavLink>
