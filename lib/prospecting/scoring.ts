@@ -8,7 +8,7 @@
  * the whole stage.
  */
 
-import { generateMarketingText } from "@/lib/marketingAutopilotAI";
+import { generateProspectingText } from "./ai";
 import { icpFitScore, FINOVA_PITCH, ENTRENCHED_SOFTWARE, SOFTWARE_GAP_SIGNALS } from "./icp";
 import { tierFor } from "./types";
 import type { EnrichmentResult, ScoreBreakdown, ScoreResult } from "./types";
@@ -115,7 +115,7 @@ Return ONLY this JSON, no prose, no markdown fence:
 { "points": 0-30, "reason": "one sentence, max 25 words, naming the specific evidence" }`;
 
   try {
-    const raw = await generateMarketingText(prompt, 300);
+    const raw = await generateProspectingText(prompt, 300);
     const match = raw.match(/\{[\s\S]*\}/);
     if (!match) return { points: 12, reason: "AI judgement unavailable — deterministic score only." };
     const parsed = JSON.parse(match[0]) as { points?: unknown; reason?: unknown };

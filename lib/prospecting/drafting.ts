@@ -9,7 +9,7 @@
  * FinovaOS has no free trial. The ask is always a walkthrough or a demo call.
  */
 
-import { generateMarketingText } from "@/lib/marketingAutopilotAI";
+import { generateProspectingText } from "./ai";
 import { FINOVA_PITCH, painFor } from "./icp";
 import type { CampaignBrief, DraftedEmail } from "./types";
 import type { ScorableProspect } from "./scoring";
@@ -154,7 +154,7 @@ Return ONLY this JSON, no prose, no markdown fence:
   "personalisationHook": "the one specific fact about this company you used"
 }`;
 
-  const raw = await generateMarketingText(prompt, 1200);
+  const raw = await generateProspectingText(prompt, 1200);
   const match = raw.match(/\{[\s\S]*\}/);
   if (!match) throw new Error("Model did not return a JSON email draft.");
 

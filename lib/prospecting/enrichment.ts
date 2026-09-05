@@ -12,7 +12,7 @@
  * memory — but every number it returns is still bounds-checked below.
  */
 
-import { generateMarketingText } from "@/lib/marketingAutopilotAI";
+import { generateProspectingText } from "./ai";
 import { SOFTWARE_GAP_SIGNALS, ENTRENCHED_SOFTWARE } from "./icp";
 import { bandForEmployees } from "./types";
 import type { DiscoveredCompany, EnrichmentResult } from "./types";
@@ -150,7 +150,7 @@ Return ONLY this JSON object, no prose, no markdown fence:
 }`;
 
   try {
-    const raw = await generateMarketingText(prompt, 1200);
+    const raw = await generateProspectingText(prompt, 1200);
     const match = raw.match(/\{[\s\S]*\}/);
     return match ? (JSON.parse(match[0]) as ExtractedFacts) : {};
   } catch {

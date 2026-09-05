@@ -7,7 +7,7 @@
  * 50,000 prospects must not reach the discovery stage.
  */
 
-import { generateMarketingText } from "@/lib/marketingAutopilotAI";
+import { generateProspectingText } from "./ai";
 import { ALL_BUSINESS_TYPES } from "@/lib/businessTypes";
 import { ALLOWED_OUTREACH_COUNTRIES } from "./icp";
 import type { CampaignBrief } from "./types";
@@ -161,7 +161,7 @@ Return ONLY this JSON object, no prose, no markdown fence:
 Rules: if a city is named, also include its country. If no country is named at all, use ["PK"]. If no industry is clearly named, infer the closest ones rather than returning an empty list.`;
 
   try {
-    const raw = await generateMarketingText(prompt, 900);
+    const raw = await generateProspectingText(prompt, 900);
     const match = raw.match(/\{[\s\S]*\}/);
     if (!match) return parseBriefLocally(command);
     return sanitiseBrief(JSON.parse(match[0]) as Record<string, unknown>);

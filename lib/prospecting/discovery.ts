@@ -17,10 +17,15 @@
 import type { CampaignBrief, DiscoveredCompany } from "./types";
 import { ALL_BUSINESS_TYPES } from "@/lib/businessTypes";
 
-export type DiscoveryProvider = "sample" | "google-places" | "apollo";
+export type DiscoveryProvider = "sample" | "google-places" | "apollo" | "overpass";
 
+/**
+ * Overpass goes first: it is free (OpenStreetMap, no key, no per-call cost),
+ * so a campaign is fully funded by real data before a paid provider is ever
+ * touched. Places/Apollo only fill in what Overpass could not find.
+ */
 export function availableProviders(): DiscoveryProvider[] {
-  const list: DiscoveryProvider[] = [];
+  const list: DiscoveryProvider[] = ["overpass"];
   if (process.env.GOOGLE_PLACES_API_KEY) list.push("google-places");
   if (process.env.APOLLO_API_KEY) list.push("apollo");
   list.push("sample");
