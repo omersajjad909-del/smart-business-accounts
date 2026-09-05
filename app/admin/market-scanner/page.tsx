@@ -62,13 +62,12 @@ export default function MarketScannerPage() {
     setError(null);
     setScanResult(null);
     try {
-      const result = await postJson<{ scanned: number; found: number; stored: number }>(
-        "/api/admin/market-scanner",
-      );
-      setScanResult(
-        `Scanned ${result.scanned} posts across ${TARGET_SUBREDDIT_COUNT} subreddits — ${result.found} matched the vocabulary, ${result.stored} were new.`,
-      );
-      load();
+      // The scan itself runs 2-3 minutes (ten subreddits, paced to stay under
+      // Reddit's rate limit) — far longer than a browser request should block
+      // on, so the server starts it in the background and returns immediately.
+      await postJson<{ started: boolean }>("/api/admin/market-scanner");
+      setScanResult("Scan started — it paces itself to avoid Reddit's rate limit, so it takes 2-3 minutes. This list will refresh automatically.");
+      setTimeout(load, 150_000);
     } catch (e) {
       setError((e as Error).message);
     } finally {
@@ -190,5 +189,3 @@ export default function MarketScannerPage() {
     </div>
   );
 }
-
-const TARGET_SUBREDDIT_COUNT = 10;

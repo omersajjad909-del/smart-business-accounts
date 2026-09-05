@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest, NextResponse, after } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireAdmin, logAdminAction } from "@/lib/adminAuth";
 import { scanAndStore } from "@/lib/prospecting/marketScanner";
@@ -32,27 +32,37 @@ export async function GET(req: NextRequest) {
   return NextResponse.json({ signals, counts });
 }
 
-/** Manually trigger a scan — the cron does this daily, this is for "run it now". */
+/**
+ * Manually trigger a scan — the cron does this daily, this is for "run it now".
+ *
+ * A full pass over ten subreddits, each paced to stay under Reddit's per-IP
+ * rate limit, runs 2-3 minutes — longer than a browser request or the
+ * platform's proxy will wait for a response (a synchronous version of this
+ * handler 504'd in practice). So this returns immediately and finishes the
+ * scan in the background, same as the cron route; the admin page tells the
+ * operator to check back rather than blocking on a spinner that would time out.
+ */
 export async function POST(req: NextRequest) {
   const admin = await requireAdmin(req);
   if (admin instanceof NextResponse) return admin;
 
-  try {
-    const result = await scanAndStore();
-    await logAdminAction({
-      adminId: admin.id,
-      adminEmail: admin.email,
-      action: "MARKET_SCAN_RUN",
-      targetType: "MarketSignal",
-      details: result,
-    });
-    return NextResponse.json({ ok: true, ...result });
-  } catch (error) {
-    return NextResponse.json(
-      { error: error instanceof Error ? error.message : "Scan failed." },
-      { status: 500 },
-    );
-  }
+  after(async () => {
+    try {
+      const result = await scanAndStore();
+      await logAdminAction({
+        adminId: admin.id,
+        adminEmail: admin.email,
+        action: "MARKET_SCAN_RUN",
+        targetType: "MarketSignal",
+        details: result,
+      });
+      console.log(`[admin] market-scan: scanned=${result.scanned} found=${result.found} stored=${result.stored}`);
+    } catch (error) {
+      console.error("[admin] market-scan error:", error);
+    }
+  });
+
+  return NextResponse.json({ ok: true, started: true });
 }
 
 /** Marks a signal reviewed/replied/ignored — the human decision this table exists for. */
