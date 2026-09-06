@@ -28,6 +28,20 @@ export const TARGET_SUBREDDITS = [
   "ERP", "Accounting", "Bookkeeping", "Entrepreneur", "pakistan", "dubai",
 ];
 
+/**
+ * All ten in one run reliably hits Reddit's per-IP rate limit after the first
+ * three or four — confirmed by hand: 429s appear before the run ever finishes.
+ * Splitting into groups and running each on its own cron schedule (see
+ * app/api/cron/market-scan/route.ts) keeps every request comfortably under
+ * that limit and, spread across the day, covers more subreddits overall than
+ * one large burst does.
+ */
+export const SUBREDDIT_GROUPS: Record<string, string[]> = {
+  "1": ["injectionmolding", "manufacturing", "smallbusiness"],
+  "2": ["QuickBooks", "ERP", "Accounting"],
+  "3": ["Bookkeeping", "Entrepreneur", "pakistan", "dubai"],
+};
+
 // ─── Vocabulary — from docs/growth/manual-lead-round.md ───────────────────────
 // A lead is A (industry) + B (pain) in the same post, or C (software pain)
 // alone as a weaker "maybe, verify industry" signal. B alone or A alone is
