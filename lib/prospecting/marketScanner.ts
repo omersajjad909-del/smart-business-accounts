@@ -183,11 +183,13 @@ export type ScannedSignal = {
   tier: "A" | "B" | "C";
 };
 
-export async function scanReddit(): Promise<{ signals: ScannedSignal[]; scanned: number }> {
+export async function scanReddit(
+  subreddits: string[] = TARGET_SUBREDDITS,
+): Promise<{ signals: ScannedSignal[]; scanned: number }> {
   const signals: ScannedSignal[] = [];
   let scanned = 0;
 
-  for (const subreddit of TARGET_SUBREDDITS) {
+  for (const subreddit of subreddits) {
     const entries = await fetchSubredditFeed(subreddit);
     scanned += entries.length;
 
@@ -220,8 +222,10 @@ export async function scanReddit(): Promise<{ signals: ScannedSignal[]; scanned:
 }
 
 /** Persists newly-found signals. Never overwrites one a human may have already reviewed. */
-export async function scanAndStore(): Promise<{ scanned: number; found: number; stored: number }> {
-  const { signals, scanned } = await scanReddit();
+export async function scanAndStore(
+  subreddits: string[] = TARGET_SUBREDDITS,
+): Promise<{ scanned: number; found: number; stored: number }> {
+  const { signals, scanned } = await scanReddit(subreddits);
   let stored = 0;
 
   for (const signal of signals) {
