@@ -223,19 +223,22 @@ export default function DashboardLayout({
   const [ready, setReady] = useState(false);
   const [allowedPlanPerms, setAllowedPlanPerms] = useState<Set<string> | null>(null);
   const [allowedDashboardFeatures, setAllowedDashboardFeatures] = useState<Set<string> | null>(null);
+  const [bizFeatures, setBizFeatures] = useState<Record<string, boolean>>({});
   // Company policy says every user must have 2FA and this one does not yet.
   // The login is allowed through — Security & Access is the only place 2FA can
   // be enrolled, so blocking it there would lock the user out of the fix.
   const [mustEnable2FA, setMustEnable2FA] = useState(false);
 
-  // No bizFeatures state any more. The BusinessFeatureFlags from
-  // /dashboard/business-features used to gate 13 sidebar links on top of the
-  // plan config, and every flag defaults to false — so pages an admin had
-  // switched ON for a plan in /admin/plans (Warehouses, Warehouse Transfers,
-  // Product Variants, Batch & Serial, Credit Limits, Promotions, Tax & GST,
-  // Notifications, Retail Stock Transfer) stayed invisible with no way to tell
-  // why from that screen. Page access has one source of truth: /admin/plans
-  // plus the page's permission. Do not reintroduce a second gate here.
+  // bizFeatures used to gate 13 sidebar links on top of the plan config, and
+  // every flag defaulted to false — so pages an admin had switched ON for a
+  // plan in /admin/plans (Warehouses, Warehouse Transfers, Product Variants,
+  // Batch & Serial, Credit Limits, Promotions, Tax & GST, Notifications,
+  // Retail Stock Transfer) stayed invisible with no way to tell why from that
+  // screen. That blanket gate was removed — /admin/plans plus the page's
+  // permission is the one source of truth for those. Only advancedPurchasing
+  // (below) is wired back in: it's the one flag with a UI that specifically
+  // promises to switch the purchasing flow, not just unlock a page. Do not
+  // widen this to the other flags without solving the /admin/plans conflict.
 
   // SIDEBAR STATES — single accordion state for top-level sections
   const [openSection, setOpenSection] = useState<string | null>(null);
@@ -840,6 +843,8 @@ export default function DashboardLayout({
         if (Array.isArray(d.dashboardFeatures)) setAllowedDashboardFeatures(new Set(d.dashboardFeatures));
         else setAllowedDashboardFeatures(null);
 
+        setBizFeatures(d.bizFeatures && typeof d.bizFeatures === "object" ? d.bizFeatures : {});
+
         setMustEnable2FA(d.mustEnable2FA === true);
 
       } catch {
@@ -1432,9 +1437,9 @@ export default function DashboardLayout({
               onToggle={() => toggle("sales")}
             >
               <NavLink href="/dashboard/invoices" pathname={pathname}>🧾 View All Invoices</NavLink>
-              {/* ── Purchase Flow ── */}
-              {hasPermission(currentUser, PERMISSIONS.CREATE_PURCHASE_ORDER) && <NavLink href="/dashboard/purchase-order" pathname={pathname}>Purchase Order</NavLink>}
-              {hasPermission(currentUser, PERMISSIONS.VIEW_INVENTORY) && <NavLink href="/dashboard/grn" pathname={pathname}>GRN (Goods Receipt)</NavLink>}
+              {/* ── Purchase Flow ── PO/GRN only shown when Advanced Purchasing is on (Business Features); off = direct Purchase Invoice entry */}
+              {bizFeatures.advancedPurchasing && hasPermission(currentUser, PERMISSIONS.CREATE_PURCHASE_ORDER) && <NavLink href="/dashboard/purchase-order" pathname={pathname}>Purchase Order</NavLink>}
+              {bizFeatures.advancedPurchasing && hasPermission(currentUser, PERMISSIONS.VIEW_INVENTORY) && <NavLink href="/dashboard/grn" pathname={pathname}>GRN (Goods Receipt)</NavLink>}
               {hasPermission(currentUser, PERMISSIONS.CREATE_PURCHASE_INVOICE) && <NavLink href="/dashboard/purchase-invoice" pathname={pathname}>Purchase Invoice</NavLink>}
               {/* ── Sales Flow ── */}
               {hasPermission(currentUser, PERMISSIONS.CREATE_QUOTATION) && <NavLink href="/dashboard/quotation" pathname={pathname}>Quotation</NavLink>}
@@ -1575,8 +1580,8 @@ export default function DashboardLayout({
               open={openSection === "retailPurchases"}
               onToggle={() => toggle("retailPurchases")}
             >
-              <NavLink href="/dashboard/purchase-order" pathname={pathname}>📦 Purchase Orders</NavLink>
-              <NavLink href="/dashboard/grn" pathname={pathname}>📥 GRN (Goods Receipt)</NavLink>
+              {bizFeatures.advancedPurchasing && <NavLink href="/dashboard/purchase-order" pathname={pathname}>📦 Purchase Orders</NavLink>}
+              {bizFeatures.advancedPurchasing && <NavLink href="/dashboard/grn" pathname={pathname}>📥 GRN (Goods Receipt)</NavLink>}
               <NavLink href="/dashboard/purchase-invoice" pathname={pathname}>🧾 Purchase Invoices</NavLink>
               <NavLink href="/dashboard/purchase-return" pathname={pathname}>↩️ Purchase Returns</NavLink>
               <NavLink href="/dashboard/cpv" pathname={pathname}>💸 Supplier Payments</NavLink>
