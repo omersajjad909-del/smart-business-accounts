@@ -238,6 +238,20 @@ const [searchTerm, setSearchTerm] = useState("");
     setOrigin(window.location.origin);
   }, []);
 
+  /**
+   * With Advanced Purchasing off, this screen is the whole purchase flow —
+   * PO + GRN + invoice in one — so it shouldn't gate suppliers to only those
+   * with an open GRN, or surface the GRN field at all. Advanced mode keeps
+   * today's GRN-matching behavior.
+   */
+  const [advancedPurchasing, setAdvancedPurchasing] = useState(false);
+  useEffect(() => {
+    fetch("/api/me/bootstrap", { cache: "no-store" })
+      .then(res => (res.ok ? res.json() : null))
+      .then(d => { if (d?.bizFeatures?.advancedPurchasing) setAdvancedPurchasing(true); })
+      .catch(() => {});
+  }, []);
+
   const [sendingEmail, setSendingEmail] = useState(false);
   const [savedInvoiceId, setSavedInvoiceId] = useState<string | null>(null);
   
@@ -512,7 +526,7 @@ const [searchTerm, setSearchTerm] = useState("");
   const suppliersAwaitingInvoice = suppliers.filter((supplier) =>
     allGrns.some((grn) => grn.supplierId === supplier.id && getInvoiceableRowsForGrn(grn).length > 0),
   );
-  const supplierOptions = showAllSuppliers ? suppliers : suppliersAwaitingInvoice;
+  const supplierOptions = !advancedPurchasing || showAllSuppliers ? suppliers : suppliersAwaitingInvoice;
 
   /**
    * What is still billable on the chosen receipt, per item — received less
@@ -1093,20 +1107,22 @@ const [searchTerm, setSearchTerm] = useState("");
                     <option value="">— Select Supplier —</option>
                     {supplierOptions.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
                   </select>
-                  <label style={{ display: "flex", alignItems: "center", gap: 7, fontSize: 11.5, color: MUTED, marginBottom: 8, cursor: "pointer" }}>
-                    <input
-                      type="checkbox"
-                      checked={showAllSuppliers}
-                      onChange={e => setShowAllSuppliers(e.target.checked)}
-                      style={{ accentColor: ACCENT, cursor: "pointer" }}
-                    />
-                    Show all suppliers
-                    {!showAllSuppliers && (
-                      <span style={{ color: "var(--text-muted)" }}>
-                        — {suppliersAwaitingInvoice.length} awaiting invoice
-                      </span>
-                    )}
-                  </label>
+                  {advancedPurchasing && (
+                    <label style={{ display: "flex", alignItems: "center", gap: 7, fontSize: 11.5, color: MUTED, marginBottom: 8, cursor: "pointer" }}>
+                      <input
+                        type="checkbox"
+                        checked={showAllSuppliers}
+                        onChange={e => setShowAllSuppliers(e.target.checked)}
+                        style={{ accentColor: ACCENT, cursor: "pointer" }}
+                      />
+                      Show all suppliers
+                      {!showAllSuppliers && (
+                        <span style={{ color: "var(--text-muted)" }}>
+                          — {suppliersAwaitingInvoice.length} awaiting invoice
+                        </span>
+                      )}
+                    </label>
+                  )}
                   {supplierId && (() => {
                     const s = suppliers.find(x => x.id === supplierId) as any;
                     if (!s) return null;
@@ -1183,13 +1199,15 @@ const [searchTerm, setSearchTerm] = useState("");
                         <option value="SHOP">Shop</option>
                       </select>
                     </div>
-                    <div>
-                      <div style={labelStyle()}>Against GRN</div>
-                      <select value={selectedGrnId} onChange={e => handleGrnSelection(e.target.value)} style={inp({ padding: "7px 10px", fontSize: 12.5 })}>
-                        <option value="">— No PO —</option>
-                        {filteredGRNs.map(grn => <option key={grn.id} value={grn.id}>{grn.grnNo}{grn.po?.poNo ? ` · ${grn.po.poNo}` : ""}</option>)}
-                      </select>
-                    </div>
+                    {advancedPurchasing && (
+                      <div>
+                        <div style={labelStyle()}>Against GRN</div>
+                        <select value={selectedGrnId} onChange={e => handleGrnSelection(e.target.value)} style={inp({ padding: "7px 10px", fontSize: 12.5 })}>
+                          <option value="">— No GRN —</option>
+                          {filteredGRNs.map(grn => <option key={grn.id} value={grn.id}>{grn.grnNo}{grn.po?.poNo ? ` · ${grn.po.poNo}` : ""}</option>)}
+                        </select>
+                      </div>
+                    )}
                     <div>
                       <div style={labelStyle()}>Currency</div>
                       <select style={inp({ padding: "7px 10px", fontSize: 12.5 })} value={currencyId} onChange={e => { const id = e.target.value; setCurrencyId(id); const c = currencies.find(c => c.id === id); if (c) setExchangeRate(c.exchangeRate || 1); }}>
