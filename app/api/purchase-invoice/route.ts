@@ -230,7 +230,7 @@ export async function POST(req: NextRequest) {
           paymentMethod,
           paymentTerms,
           approvalStatus: "PENDING",
-          taxConfigId: applyTax ? taxConfigId : null,
+          taxConfigId: applyTax && taxConfigId ? taxConfigId : null,
           items: {
             create: validItems.map((i: any) => {
               const lineBase = Number(i.qty) * Number(i.rate);
@@ -440,7 +440,7 @@ export async function PUT(req: NextRequest) {
         grnId: grnId || null,
         total: netTotal,
         approvalStatus,
-        taxConfigId: applyTax ? taxConfigId : null,
+        taxConfigId: applyTax && taxConfigId ? taxConfigId : null,
         items: {
           create: validItems.map((i: any) => ({
             itemId: i.itemId,

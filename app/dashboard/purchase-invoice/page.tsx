@@ -672,7 +672,7 @@ const [searchTerm, setSearchTerm] = useState("");
           meta: rfActive ? (r.meta || null) : null,
         })),
         applyTax,
-        taxConfigId: applyTax ? selectedTaxId : null,
+        taxConfigId: applyTax && selectedTaxId ? selectedTaxId : null,
         currencyId: currencyId || null,
         exchangeRate,
         approvalStatus,
