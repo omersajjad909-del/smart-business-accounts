@@ -271,7 +271,7 @@ export default function Footer() {
             </Link>
 
             <p style={{ fontSize: 13.5, color: "rgba(255,255,255,.36)", lineHeight: 1.85, marginBottom: 28, maxWidth: 310 }}>
-              Invoicing, inventory, accounting, payroll, and more — unified in one platform built for businesses of every size.
+              Invoicing, inventory, accounting, payroll, and more — unified in one platform built for businesses of every size. FinovaOS (also written Finova OS) is built and run by Finova Forge.
             </p>
 
             {/* Social row — six 36px icons plus their gaps need ~256px, so this
