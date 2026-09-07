@@ -1724,88 +1724,7 @@ export default function DashboardContent() {
             margin: "0 auto",
           }}
         >
-          {[
-            {
-              label: "+ Invoice",
-              href: "/dashboard/sales-invoice",
-              bg: "linear-gradient(135deg,#6366f1,#4f46e5)",
-              icon: (
-                <svg
-                  width="22"
-                  height="22"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="white"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                >
-                  <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
-                  <polyline points="14 2 14 8 20 8" />
-                  <line x1="16" y1="13" x2="8" y2="13" />
-                  <line x1="16" y1="17" x2="8" y2="17" />
-                </svg>
-              ),
-            },
-            {
-              label: "+ Sale",
-              href: "/dashboard/sales-invoice",
-              bg: "linear-gradient(135deg,#0ea5e9,#0284c7)",
-              icon: (
-                <svg
-                  width="22"
-                  height="22"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="white"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                >
-                  <circle cx="9" cy="21" r="1" />
-                  <circle cx="20" cy="21" r="1" />
-                  <path d="M1 1h4l2.68 13.39a2 2 0 001.97 1.61h9.72a2 2 0 001.97-1.61L23 6H6" />
-                </svg>
-              ),
-            },
-            {
-              label: "+ Expense",
-              href: "/dashboard/expense-vouchers",
-              bg: "linear-gradient(135deg,#f59e0b,#d97706)",
-              icon: (
-                <svg
-                  width="22"
-                  height="22"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="white"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                >
-                  <rect x="1" y="4" width="22" height="16" rx="2" />
-                  <line x1="1" y1="10" x2="23" y2="10" />
-                </svg>
-              ),
-            },
-            {
-              label: "+ Product",
-              href: "/dashboard/items-new",
-              bg: "linear-gradient(135deg,#10b981,#059669)",
-              icon: (
-                <svg
-                  width="22"
-                  height="22"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="white"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                >
-                  <path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z" />
-                  <polyline points="3.27 6.96 12 12.01 20.73 6.96" />
-                  <line x1="12" y1="22.08" x2="12" y2="12" />
-                </svg>
-              ),
-            },
-          ].map((q, i) => (
+          {QA.map((q, i) => (
             <Link
               prefetch={false}
               key={i}
@@ -1829,6 +1748,7 @@ export default function DashboardContent() {
                   justifyContent: "center",
                   boxShadow: "0 4px 16px rgba(0,0,0,.25)",
                   flexShrink: 0,
+                  fontSize: 24,
                 }}
               >
                 {q.icon}
