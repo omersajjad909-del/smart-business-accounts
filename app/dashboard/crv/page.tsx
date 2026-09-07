@@ -84,7 +84,11 @@ function printReceipt(entry: EntryRow, voucherNo: string, date: string, mode: st
     body{font-family:Arial,sans-serif;padding:20mm 15mm;max-width:80mm;margin:0 auto;font-size:12px}
     .center{text-align:center} .bold{font-weight:700} .line{border-top:1px dashed #000;margin:10px 0}
     .row{display:flex;justify-content:space-between;margin:4px 0}
+    .no-print{position:fixed;top:10px;right:10px;display:flex;gap:6px;z-index:999}
+    .no-print button{background:#111;color:#fff;border:none;padding:8px 14px;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;box-shadow:0 4px 12px rgba(0,0,0,.2)}
+    @media print{.no-print{display:none}}
   </style></head><body>
+  <div class="no-print"><button onclick="window.print()">🖨 Print / PDF</button></div>
   <div class="center bold" style="font-size:15px">${co}</div>
   <div class="center" style="font-size:10px;letter-spacing:1px">CASH RECEIPT</div>
   <div class="line"></div>
@@ -118,8 +122,11 @@ function printVoucher(entries: EntryRow[], voucherNo: string, date: string, mode
     .amt{text-align:right;font-weight:700;color:#166534}
     .sig{border-top:2px solid #111;padding-top:4px;font-size:9px;font-weight:700;text-transform:uppercase;text-align:center;width:120px}
     .sigs{display:flex;justify-content:space-between;margin-top:48px}
-    @media print{body{padding:8mm}}
+    .no-print{position:fixed;top:16px;right:16px;display:flex;gap:8px;z-index:999}
+    .no-print button{background:#111;color:#fff;border:none;padding:10px 18px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;box-shadow:0 4px 12px rgba(0,0,0,.2)}
+    @media print{body{padding:8mm}.no-print{display:none}}
   </style></head><body>
+  <div class="no-print"><button onclick="window.print()">🖨 Print / Save as PDF</button></div>
   <div class="hdr">
     <div><div class="co">${co}</div><div style="font-size:10px;color:#666;letter-spacing:2px">INTERNAL ACCOUNTING VOUCHER</div></div>
     <div><div class="rh">CASH RECEIPT VOUCHER</div>
