@@ -714,6 +714,11 @@ export default function PricingPage() {
             // Monthly list price — shown struck through on the yearly tab so the
             // 20% saving reads without an intro-offer badge.
             const displayMonthly = useAdminPkr ? `₨${pkrPricing![pkrPlanKey].monthly.toLocaleString("en-PK")}` : formatPrice(publicPricing[pricingKey].monthly);
+            // Launch offer — 50% off, monthly billing only (matches the
+            // homepage pricing section and the onboarding/signup page; it
+            // doesn't stack with the yearly 20% discount).
+            const introAmount = Math.round((useAdminPkr ? pkrAmount : regularPrice) * 0.5);
+            const displayIntro = useAdminPkr ? `₨${introAmount.toLocaleString("en-PK")}` : formatPrice(introAmount);
             return (
               <div key={plan.slug} style={{ position: "relative", borderRadius: 22, background: plan.featured ? "linear-gradient(160deg,rgba(99,102,241,.16),rgba(255,255,255,.03))" : "rgba(255,255,255,.03)", border: `1.5px solid ${plan.border}`, overflow: "hidden", boxShadow: plan.featured ? "0 28px 80px rgba(99,102,241,.22)" : "0 10px 30px rgba(0,0,0,.16)" }}>
                 <div style={{ height: 3, background: plan.gradient }} />
@@ -722,18 +727,23 @@ export default function PricingPage() {
                   <div style={{ fontSize: 22, fontWeight: 900, marginBottom: 6 }}>{plan.name}</div>
                   <div style={{ fontSize: 13, color: "rgba(255,255,255,.42)", lineHeight: 1.5, minHeight: 40 }}>{plan.tagline}</div>
                   <div style={{ margin: "24px 0" }}>
-                    {billing === "yearly" && (
+                    {billing === "yearly" ? (
                       <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
                         <span style={{ fontSize: 13, fontWeight: 700, color: "rgba(255,255,255,.35)", textDecoration: "line-through" }}>{displayMonthly}</span>
                         <span style={{ padding: "2px 8px", borderRadius: 6, background: "rgba(34,197,94,.16)", border: "1px solid rgba(34,197,94,.38)", fontSize: 10, fontWeight: 800, color: "#4ade80" }}>SAVE 20%</span>
                       </div>
+                    ) : (
+                      <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
+                        <span style={{ fontSize: 13, fontWeight: 700, color: "rgba(255,255,255,.35)", textDecoration: "line-through" }}>{displayRegular}</span>
+                        <span style={{ padding: "2px 8px", borderRadius: 6, background: "rgba(249,115,22,.2)", border: "1px solid rgba(249,115,22,.4)", fontSize: 10, fontWeight: 800, color: "#fb923c" }}>50% OFF × 3 months</span>
+                      </div>
                     )}
                     <div style={{ display: "flex", alignItems: "baseline", gap: 5 }}>
-                      <span style={{ fontSize: 42, fontWeight: 900, color: plan.color, letterSpacing: "-.03em", lineHeight: 1 }}>{displayRegular}</span>
+                      <span style={{ fontSize: 42, fontWeight: 900, color: plan.color, letterSpacing: "-.03em", lineHeight: 1 }}>{billing === "yearly" ? displayRegular : displayIntro}</span>
                       <span style={{ fontSize: 14, fontWeight: 700, color: "rgba(255,255,255,.42)" }}>/mo</span>
                     </div>
                     <div style={{ fontSize: 12.5, color: "rgba(255,255,255,.45)", marginTop: 8 }}>
-                      {billing === "yearly" ? "Billed annually — 20% off the monthly price" : "Billed monthly — pay yearly and save 20%"}
+                      {billing === "yearly" ? "Billed annually — 20% off the monthly price" : "First 3 months discounted, then full monthly billing — or switch to yearly and save 20%"}
                     </div>
                   </div>
                   {signupsOpen ? (
