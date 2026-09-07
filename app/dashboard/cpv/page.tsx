@@ -165,7 +165,7 @@ export default function CPVPage() {
       setPickerLoading(true);
       try {
         const r = await fetch("/api/accounts?search=", { headers: h() });
-        if (r.ok) { const data = await r.json(); if (Array.isArray(data)) setPickerAccts(data.filter((x: any) => x.partyType !== "CUSTOMER")); }
+        if (r.ok) { const data = await r.json(); if (Array.isArray(data)) setPickerAccts(data); }
       } catch {}
       setPickerLoading(false);
     }
@@ -331,7 +331,7 @@ export default function CPVPage() {
             {queryMode ? "🔍 QUERY MODE — CPV" : "Cash Payment Voucher (CPV)"}
           </h1>
           <p style={{ margin:"4px 0 0", fontSize:12, color: queryMode ? "rgba(250,204,21,.5)" : "rgba(255,255,255,.35)" }}>
-            {queryMode ? "Enter search criteria then press F8 to execute" : "Make cash or bank payments to suppliers, e-commerce sites, or banks"}
+            {queryMode ? "Enter search criteria then press F8 to execute" : "Make cash or bank payments to suppliers, banks, or customers (e.g. refunds)"}
           </p>
         </div>
         <div style={{ display:"flex", alignItems:"center", gap:10 }}>
