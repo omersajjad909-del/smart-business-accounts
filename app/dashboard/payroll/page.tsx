@@ -210,12 +210,16 @@ export default function PayrollPage() {
       .row{display:flex;justify-content:space-between;margin-bottom:10px;border-bottom:1px dashed #eee;padding-bottom:5px}
       .label{font-weight:bold;color:#000}.amt{font-family:monospace}
       .footer{margin-top:40px;text-align:center;font-size:.8em;color:#000}
+      .no-print{position:fixed;top:16px;right:16px;display:flex;gap:8px;z-index:999}
+      .no-print button{background:#111;color:#fff;border:none;padding:10px 18px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;box-shadow:0 4px 12px rgba(0,0,0,.2)}
       @media print{
         body{border:none;margin:0;padding:20mm;max-width:none}
         *{color:#000 !important;background:transparent !important;-webkit-print-color-adjust:exact !important}
         .row{border-bottom:1px dashed #000}
+        .no-print{display:none}
       }
     </style></head><body>
+    <div class="no-print"><button onclick="window.print()">🖨 Print / Save as PDF</button></div>
     <div style="text-align:center;margin-bottom:30px;border-bottom:2px solid #000;padding-bottom:10px">
     ${companyName ? `<div style="font-weight:bold;font-size:1.15em;margin-bottom:6px">${companyName}</div>` : ""}
     <h1 style="margin:0">Payslip</h1><p style="margin:4px 0 0">Period: ${p.monthYear}</p></div>
