@@ -9,6 +9,7 @@ import { useSearchParams } from "next/navigation";
 import toast from "react-hot-toast";
 import { getCurrentUser } from "@/lib/auth";
 import { useResponsive } from "@/hooks/useResponsive";
+import { FX_USD, CURRENCY_SYMBOLS } from "@/lib/currency-client";
 import { SubscriptionReceiptPrinter, type SubscriptionReceiptData } from "./_components/SubscriptionReceiptPrinter";
 
 /* ─── Types ──────────────────────────────────────────── */
@@ -392,6 +393,12 @@ function BillingPage() {
     professional: { monthly: 99, yearly: 79 },
     enterprise: { monthly: 249, yearly: 199 },
   });
+  // Admin-set flat PKR list prices for the 3 plans (null until /api/public/pricing
+  // resolves, or if no PKR config has been saved) — same source the public
+  // /pricing page reads, so a Pakistan company sees the price it will actually
+  // be quoted rather than the international USD figure.
+  const [pkrPricing,        setPkrPricing]         = useState<PlanPricingMap | null>(null);
+  const [isPkCompany,       setIsPkCompany]        = useState(false);
 
   useEffect(() => {
     if (seatsAdded && seatsQtyParam > 0) {
@@ -447,6 +454,7 @@ function BillingPage() {
           setExtraSeats(Math.max(0, Number(d.extraSeats || 0)));
           setTotalUsers(Number(d.totalUsers || 0));
           setEffectiveUserLimit(d.effectiveUserLimit ?? null);
+          setIsPkCompany(String(d.baseCurrency || "").toUpperCase() === "PKR");
         }
         if (pmRes.ok)  {
           const d: PaymentMethodsResponse = await pmRes.json();
@@ -473,6 +481,22 @@ function BillingPage() {
             monthly: Number(d?.seatPricing?.monthly ?? 7),
             yearly: Math.round(Number(d?.seatPricing?.yearly ?? 72) / 12),
           });
+          if (d?.pkrPricing) {
+            setPkrPricing({
+              starter: {
+                monthly: Number(d.pkrPricing?.starter?.monthly ?? 4999),
+                yearly: Math.round(Number(d.pkrPricing?.starter?.yearly ?? 47988) / 12),
+              },
+              professional: {
+                monthly: Number(d.pkrPricing?.pro?.monthly ?? 9999),
+                yearly: Math.round(Number(d.pkrPricing?.pro?.yearly ?? 95988) / 12),
+              },
+              enterprise: {
+                monthly: Number(d.pkrPricing?.enterprise?.monthly ?? 24999),
+                yearly: Math.round(Number(d.pkrPricing?.enterprise?.yearly ?? 239988) / 12),
+              },
+            });
+          }
         }
       } catch { /* silent */ }
       setLoading(false);
@@ -1028,8 +1052,17 @@ function BillingPage() {
             {PLANS.map(plan => {
               const isCurrent = currentPlanCode === plan.code;
               const pricingKey = plan.code === "ENTERPRISE" ? "enterprise" : plan.code === "PROFESSIONAL" ? "professional" : "starter";
-              const basePrice  = planPricing[pricingKey][billing === "annual" ? "yearly" : "monthly"];
-              const seatAddon  = extraSeats > 0 ? (extraSeats * seatPricing[billing === "annual" ? "yearly" : "monthly"]) : 0;
+              // Pakistan-based companies see the admin-set flat PKR list price
+              // (same figures the public /pricing page quotes) instead of the
+              // international USD price. Extra-seat add-ons have no PKR list
+              // price yet, so they're converted at the display FX rate just for
+              // this card — the checkout step prices seats independently.
+              const showPkr    = isPkCompany && !!pkrPricing;
+              const currencySym = showPkr ? (CURRENCY_SYMBOLS.PKR || "₨") : "$";
+              const cycle      = billing === "annual" ? "yearly" : "monthly";
+              const basePrice  = showPkr ? pkrPricing![pricingKey][cycle] : planPricing[pricingKey][cycle];
+              const seatAddonUsd = extraSeats > 0 ? (extraSeats * seatPricing[cycle]) : 0;
+              const seatAddon  = showPkr ? Math.round(seatAddonUsd * (FX_USD.PKR || 278)) : seatAddonUsd;
               const price      = basePrice + seatAddon;
               const planIdx   = PLANS.findIndex(p=>p.code===plan.code);
               const curIdx    = PLANS.findIndex(p=>p.code===currentPlanCode);
@@ -1043,15 +1076,19 @@ function BillingPage() {
                   <div style={{ fontSize:28, marginBottom:8 }}>{plan.icon}</div>
                   <h3 style={{ margin:"0 0 4px", fontSize:18, fontWeight:800 }}>{plan.name}</h3>
                   <div style={{ display:"flex", alignItems:"baseline", gap:4, marginBottom:4 }}>
-                    <span style={{ fontSize:30, fontWeight:900, color:plan.color }}>${price}</span>
+                    <span style={{ fontSize:30, fontWeight:900, color:plan.color }}>{currencySym}{price.toLocaleString("en-US")}</span>
                     <span style={{ fontSize:12, color:"rgba(255,255,255,.35)" }}>/ mo{billing==="annual"?" · billed annually":""}</span>
                   </div>
                   {seatAddon > 0 && (
                     <div style={{ fontSize:11, color:"rgba(110,231,183,.95)", marginBottom:8, fontWeight:700 }}>
-                      Includes {extraSeats} extra seats (+${seatAddon}/mo)
+                      Includes {extraSeats} extra seats (+{currencySym}{seatAddon.toLocaleString("en-US")}/mo)
                     </div>
                   )}
-                  {billing==="annual" && <div style={{ fontSize:11, color:"rgba(52,211,153,.7)", marginBottom:14, fontWeight:600 }}>Save ${Math.max(0, Math.round((planPricing[pricingKey].monthly - planPricing[pricingKey].yearly) * 12))}/year</div>}
+                  {billing==="annual" && (() => {
+                    const src = showPkr ? pkrPricing![pricingKey] : planPricing[pricingKey];
+                    const yearlySaving = Math.max(0, Math.round((src.monthly - src.yearly) * 12));
+                    return <div style={{ fontSize:11, color:"rgba(52,211,153,.7)", marginBottom:14, fontWeight:600 }}>Save {currencySym}{yearlySaving.toLocaleString("en-US")}/year</div>;
+                  })()}
                   <div style={{ display:"flex", flexDirection:"column", gap:7, marginBottom:22, marginTop:billing==="annual"?0:14 }}>
                     {plan.features.map(f => <div key={f} style={{ display:"flex", alignItems:"center", gap:8, fontSize:12, color:"rgba(255,255,255,.7)" }}><span style={{ color:"#34d399", flexShrink:0 }}>✓</span>{f}</div>)}
                     {plan.notIncluded.map(f => <div key={f} style={{ display:"flex", alignItems:"center", gap:8, fontSize:12, color:"rgba(255,255,255,.22)" }}><span style={{ flexShrink:0, opacity:.4 }}>✕</span>{f}</div>)}
