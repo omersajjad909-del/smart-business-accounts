@@ -1505,8 +1505,8 @@ export default function DashboardLayout({
               onToggle={() => toggle("accounting")}
             >
               {hasPermission(currentUser, PERMISSIONS.CREATE_ACCOUNTS) && <NavLink href="/dashboard/accounts" pathname={pathname}>Chart of Accounts</NavLink>}
-              {hasPermission(currentUser, PERMISSIONS.CREATE_CPV) && <NavLink href="/dashboard/cpv" pathname={pathname}>CPV (Cash Payment)</NavLink>}
-              {hasPermission(currentUser, PERMISSIONS.CREATE_CRV) && <NavLink href="/dashboard/crv" pathname={pathname}>Receipts (CRV)</NavLink>}
+              {hasPermission(currentUser, PERMISSIONS.CREATE_CPV) && <NavLink href="/dashboard/cpv" pathname={pathname}>Cash Payment Voucher (CPV)</NavLink>}
+              {hasPermission(currentUser, PERMISSIONS.CREATE_CRV) && <NavLink href="/dashboard/crv" pathname={pathname}>Cash Receipt Voucher (CRV)</NavLink>}
               {hasPermission(currentUser, PERMISSIONS.VIEW_ACCOUNTING) && <NavLink href="/dashboard/jv" pathname={pathname}>Journal Voucher (JV)</NavLink>}
               {hasPermission(currentUser, PERMISSIONS.MANAGE_OPENING_BALANCES) && <NavLink href="/dashboard/opening-balances" pathname={pathname}>Opening Balances</NavLink>}
               {hasPermission(currentUser, PERMISSIONS.VIEW_ACCOUNTING) && <NavLink href="/dashboard/advance-payment" pathname={pathname}>Advance Payment</NavLink>}
