@@ -341,11 +341,12 @@ function CostingInner() {
     qs.set("version", `v${selected.formula.version}.0`);
     if (bomSeed?.unitsPerBatch != null) qs.set("yieldUnits", String(Math.max(1, Math.round(bomSeed.unitsPerBatch))));
     if (bomSeed?.labourPerBatch != null) qs.set("labourPerBatch", String(bomSeed.labourPerBatch));
-    // Parts and other non-labour charges ride across separately and land in
-    // Overhead, named, so the batch still costs what the formula said while the
-    // operator moves them onto a material line.
+    // Parts and other non-labour charges ride across named but unassigned —
+    // never dropped into Overhead. Overhead is a manual field the operator
+    // types themselves; a bought-in part belongs on a material line instead,
+    // so the BOM page only uses this to prompt for that, not to fill a field.
     if (bomSeed?.otherPerBatch) {
-      qs.set("overheadPerBatch", String(bomSeed.otherPerBatch));
+      qs.set("pendingChargeAmount", String(bomSeed.otherPerBatch));
       if (bomSeed.otherLabel) qs.set("chargeLabel", bomSeed.otherLabel);
     }
     return `/dashboard/manufacturing/bom?${qs.toString()}`;

@@ -59,9 +59,10 @@ function BOMPageInner() {
   const [formulaMeta, setFormulaMeta] = useState<{ id: string; name: string; version: number } | null>(null);
   /**
    * The non-labour charge the formula sent across — buttons, tape, a bought-in
-   * part. It is prefilled into Overhead so the batch still costs what the
-   * formula quoted, and named here so the operator can move it onto a material
-   * line and clear the overhead.
+   * part. Never written into Overhead: Overhead per batch stays a manual field
+   * the operator types themselves. This is only named here so the operator is
+   * prompted to add it as its own line under Materials consumed per batch,
+   * with a real quantity and item, until then it is simply not costed in.
    */
   const [charge, setCharge] = useState<{ label: string; perBatch: number } | null>(null);
 
@@ -74,17 +75,18 @@ function BOMPageInner() {
     if (!formulaId) return;
     const yieldUnits = Number(params.get("yieldUnits"));
     const labourPerBatch = Number(params.get("labourPerBatch"));
-    const overheadPerBatch = Number(params.get("overheadPerBatch"));
+    const pendingChargeAmount = Number(params.get("pendingChargeAmount"));
     const chargeLabel = params.get("chargeLabel") || "";
     setForm((c) => ({
       ...c,
       version: params.get("version") || c.version,
       yieldUnits: Number.isFinite(yieldUnits) && yieldUnits > 0 ? yieldUnits : c.yieldUnits,
       labourPerBatch: Number.isFinite(labourPerBatch) && labourPerBatch >= 0 ? labourPerBatch : c.labourPerBatch,
-      overheadPerBatch: Number.isFinite(overheadPerBatch) && overheadPerBatch >= 0 ? overheadPerBatch : c.overheadPerBatch,
+      // Overhead per batch is left untouched here — it stays whatever the
+      // operator types, never auto-filled from the formula.
     }));
-    if (Number.isFinite(overheadPerBatch) && overheadPerBatch > 0) {
-      setCharge({ label: chargeLabel || "Other per-unit charges", perBatch: overheadPerBatch });
+    if (Number.isFinite(pendingChargeAmount) && pendingChargeAmount > 0) {
+      setCharge({ label: chargeLabel || "Other per-unit charges", perBatch: pendingChargeAmount });
     }
     setFormulaMeta({
       id: formulaId,
@@ -384,10 +386,9 @@ function BOMPageInner() {
             )}
             {charge && (
               <div style={{ marginBottom: 14, padding: "10px 12px", borderRadius: 8, background: "rgba(251,191,36,.09)", border: "1px solid rgba(251,191,36,.3)", color: "rgba(255,255,255,.72)", fontSize: 12, lineHeight: 1.6 }}>
-                <strong style={{ color: "#fbbf24" }}>{charge.label}</strong> — Rs {charge.perBatch.toLocaleString()} per batch — is not labour, so it is sitting in
-                {" "}<strong>Overhead per batch</strong> for now and the batch still costs what the formula quoted.
-                If you stock it as an item, add it under <strong>Materials consumed per batch</strong> below and set the overhead back to 0 —
-                then the cost follows the live purchase rate and the stock actually moves when a batch is made.
+                <strong style={{ color: "#fbbf24" }}>{charge.label}</strong> — Rs {charge.perBatch.toLocaleString()} per batch — is not labour, and it has <strong>not</strong> been added to this batch's cost.
+                Add it as its own line under <strong>Materials consumed per batch</strong> below — pick the item and set its quantity —
+                so the cost follows the live purchase rate and the stock actually moves when a batch is made. It will never be added to Overhead automatically.
               </div>
             )}
             {formError && <div style={{ marginBottom: 14, padding: "10px 12px", borderRadius: 8, background: "rgba(239,68,68,.14)", border: "1px solid rgba(239,68,68,.28)", color: "#fca5a5", fontSize: 12 }}>{formError}</div>}
