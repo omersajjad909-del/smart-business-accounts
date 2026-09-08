@@ -154,15 +154,15 @@ export async function loadBusinessFacts(monthsBack = 12): Promise<BusinessFacts>
   }));
 
   const activeSubs = subs.filter((s: any) => String(s.status).toUpperCase() === "ACTIVE");
-  // `pricePerMonth` is taken at its name for every billing cycle. A yearly
-  // subscription that stored its annual price in that field would inflate MRR
-  // twelvefold and there is no way to tell from the row which it did, so the
-  // assumption is stated in the caveats rather than guessed at here.
+  // `pricePerMonth` is taken at its name for every billing cycle, which the
+  // billing webhook now guarantees: a yearly charge is divided by 12 before it
+  // is stored (see monthlyRate in app/api/billing/webhook/route.ts), so a
+  // yearly subscription no longer inflates MRR twelvefold.
   const mrr = activeSubs.reduce((sum: number, s: any) => sum + (s.pricePerMonth || 0), 0);
   if (activeSubs.some((s: any) => String(s.billingCycle).toUpperCase() === "YEARLY")) {
     caveats.push(
-      "MRR treats Subscription.pricePerMonth as a monthly figure for yearly plans too. " +
-      "If a yearly subscription stored its annual price in that field, MRR is overstated for it."
+      "MRR divides a yearly plan's charge down to a monthly figure. Rows written before " +
+      "the webhook normalised that, and any set by hand, may still hold an annual price."
     );
   }
 
