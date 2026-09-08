@@ -1436,10 +1436,15 @@ export async function seedDemoCompany(
     prisma.bankAccount.create({ data: bankRow }),
     prisma.purchaseOrder.createMany({ data: purchaseOrders }),
     prisma.purchaseOrderItem.createMany({ data: purchaseOrderItems }),
-    prisma.purchaseInvoice.createMany({ data: purchaseInvoices }),
-    prisma.purchaseInvoiceItem.createMany({ data: purchaseItems }),
+    // GRNs before the invoices that bill them: PurchaseInvoice.grnId points at
+    // GoodsReceiptNote, so writing the invoices first violated
+    // PurchaseInvoice_grnId_fkey and took the whole transaction — and with it
+    // every attempt to start a demo — down with P2003. The reverse order is
+    // safe because nothing on a GRN points back at an invoice.
     prisma.goodsReceiptNote.createMany({ data: grns }),
     prisma.goodsReceiptNoteItem.createMany({ data: grnItems }),
+    prisma.purchaseInvoice.createMany({ data: purchaseInvoices }),
+    prisma.purchaseInvoiceItem.createMany({ data: purchaseItems }),
     prisma.salesInvoice.createMany({ data: salesInvoices }),
     prisma.salesInvoiceItem.createMany({ data: salesItems }),
     prisma.quotation.createMany({ data: quotations }),
