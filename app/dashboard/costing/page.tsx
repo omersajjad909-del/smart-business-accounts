@@ -96,8 +96,15 @@ const CSS = `
   .cxSectionHead{align-items:flex-start}
   .cxPrimaryValue{font-size:30px}
 }
+.cxHalfGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px 18px}
 .cxPrint{display:none}
 @media print{
+  @page{size:A4;margin:12mm}
+  /* The cost sheet is a slip, not a document: the quoted number and the
+     handful that justify it. Boxed to half the printable height of A4 so two
+     jobs fit on one sheet and the slip can be torn along the dashed line. */
+  .cxHalf{box-sizing:border-box;height:130mm;overflow:hidden;
+    padding-bottom:8mm;border-bottom:1px dashed #bbb;page-break-inside:avoid}
   /* Hiding the rest of the app with visibility:hidden left its boxes in the
      layout, so the sheet's one page of print sat atop several blank ones the
      size of the dashboard behind it. display:none takes the hidden elements
