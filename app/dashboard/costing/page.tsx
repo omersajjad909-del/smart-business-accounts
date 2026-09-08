@@ -105,6 +105,7 @@ const CSS = `
      app/globals.css. */
   body:has(.cxPrint){background:#fff !important}
   .cxWrap:has(.cxPrint) > *:not(.cxPrint){display:none !important}
+  .cxWrap:has(.cxPrint){max-width:none !important;margin:0 !important;padding:0 !important}
   .cxPrint{display:block !important;position:static;width:100%;
     margin:0;background:#fff;color:#000}
   .dashboard-root:has(.cxPrint){display:block !important;min-height:auto !important}
