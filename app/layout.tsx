@@ -40,6 +40,27 @@ const GOOGLE_SITE_VERIFICATION =
   process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION || undefined;
 const BRAND_ICON_PATH = "/icon.png";
 
+/**
+ * Every spelling of the product name, for schema.org `alternateName`.
+ *
+ * A search engine has no way to know on its own that "finovaos", "finova os"
+ * and "finova" name the same product — the tokens split differently, and with
+ * no prior signal Google falls back to the split it has seen most often
+ * ("finova os") and serves whatever already ranks for that. Declaring the
+ * variants on the WebSite, Organization and SoftwareApplication nodes is the
+ * machine-readable half of teaching it the mapping. The other half is off-page
+ * and cannot be done from here: brand mentions and inbound links that spell it
+ * "FinovaOS" while pointing at this domain.
+ */
+const BRAND_ALTERNATE_NAMES = [
+  "Finova OS",
+  "finovaos",
+  "Finova",
+  "FinovaOS App",
+  "Finova OS Accounting Software",
+  "finovaos.app",
+];
+
 export const metadata: Metadata = {
   metadataBase: new URL(BASE_URL),
   title: {
@@ -49,8 +70,11 @@ export const metadata: Metadata = {
   description:
     "FinovaOS — cloud ERP & accounting software purpose-built for trading, wholesale, manufacturing, distribution, restaurant, retail, import/export, construction, and service businesses. Invoicing, inventory, HR, payroll, CRM, bank reconciliation — all in one platform.",
   keywords: [
-    // Brand
-    "FinovaOS", "Finova Forge", "FinovaOS accounting",
+    // Brand — one entry per spelling people actually type into a search box.
+    "FinovaOS", "Finova OS", "finovaos", "Finova",
+    "finovaos app", "finovaos.app", "FinovaOS accounting",
+    "Finova OS accounting software", "Finova OS ERP",
+    "Finova Forge",
     // Core platform
     "cloud accounting software", "cloud ERP", "AI accounting software", "AI ERP",
     "business management software", "online accounting", "smart accounting software",
@@ -179,6 +203,7 @@ const softwareApplicationJsonLd = {
   "@type": "SoftwareApplication",
   "@id": `${BASE_URL}/#software`,
   name: "FinovaOS",
+  alternateName: BRAND_ALTERNATE_NAMES,
   applicationCategory: "BusinessApplication",
   operatingSystem: "Web",
   description: "FinovaOS — cloud ERP & accounting software purpose-built for trading, wholesale, manufacturing, distribution, restaurant, retail, import/export, construction, hospital, school, pharmacy, transport, real estate, and service businesses.",
@@ -258,7 +283,7 @@ const organizationJsonLd = {
   "@type": "Organization",
   "@id": `${BASE_URL}/#organization`,
   name: "Finova Forge",
-  alternateName: ["FinovaOS", "Finova Forge Pakistan"],
+  alternateName: ["FinovaOS", ...BRAND_ALTERNATE_NAMES, "Finova Forge Pakistan"],
   url: "https://finovaforge.com",
   logo: {
     "@type": "ImageObject",
@@ -301,9 +326,11 @@ const organizationJsonLd = {
 const websiteJsonLd = {
   "@context": "https://schema.org",
   "@type": "WebSite",
+  "@id": `${BASE_URL}/#website`,
   name: "FinovaOS",
+  alternateName: BRAND_ALTERNATE_NAMES,
   url: BASE_URL,
-  description: "Cloud accounting software for modern SMEs.",
+  description: "FinovaOS — also written Finova OS — is cloud accounting and ERP software for modern SMEs.",
   publisher: { "@id": `${BASE_URL}/#organization` },
   potentialAction: {
     "@type": "SearchAction",

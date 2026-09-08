@@ -109,6 +109,29 @@ export async function POST(req: NextRequest) {
         include: { items: true },
       });
 
+      // The goods physically arrive on the GRN, so this is where they enter
+      // stock. The purchase invoice that bills this receipt is accounting only
+      // and posts no movement of its own — app/api/purchase-invoice skips its
+      // stock-in whenever the invoice carries a grnId. Without that pairing the
+      // same delivery would land on the rack twice.
+      const receivedLines = created.items.filter((line) => Number(line.receivedQty) > 0);
+      if (receivedLines.length) {
+        await tx.inventoryTxn.createMany({
+          data: receivedLines.map((line) => ({
+            companyId,
+            type: "GRN",
+            date: new Date(date),
+            itemId: line.itemId,
+            qty: Number(line.receivedQty),
+            rate: Number(line.rate),
+            amount: Number(line.receivedQty) * Number(line.rate),
+            location: location || "MAIN",
+            partyId: supplierId,
+            meta: sanitizeLineMeta(line.meta),
+          })),
+        });
+      }
+
       // GRN ke against PO ka status update karo
       if (poId) {
         const po = await tx.purchaseOrder.findFirst({
@@ -194,9 +217,52 @@ export async function DELETE(req: NextRequest) {
   if (!companyId) return NextResponse.json({ error: "Company required" }, { status: 400 });
   const branchId = await resolveBranchId(req, companyId);
 
-  await prisma.goodsReceiptNote.update({
-    where: { id, companyId, ...(branchId ? { branchId } : {}) },
-    data: { deletedAt: new Date(), deletedBy: req.headers.get("x-user-id") || undefined },
+  const grn = await prisma.goodsReceiptNote.findFirst({
+    where: { id, companyId, deletedAt: null, ...(branchId ? { branchId } : {}) },
+    include: { items: true },
+  });
+  if (!grn) return NextResponse.json({ error: "GRN not found" }, { status: 404 });
+
+  // Goods that are already billed cannot be un-received behind the invoice's
+  // back — the payable would then stand against stock that no longer exists.
+  // The invoice has to go first.
+  const billed = await prisma.purchaseInvoice.count({
+    where: { companyId, grnId: id, deletedAt: null },
+  });
+  if (billed > 0) {
+    return NextResponse.json(
+      { error: "This GRN is already billed on a purchase invoice. Delete that invoice first." },
+      { status: 400 },
+    );
+  }
+
+  const deletedBy = req.headers.get("x-user-id") || undefined;
+
+  await prisma.$transaction(async (tx) => {
+    // The receipt put this stock on the rack, so deleting it has to take the
+    // same quantity back off — at the rate it came in at, or the weighted
+    // average cost would drift every time a receipt was corrected.
+    const receivedLines = grn.items.filter((line) => Number(line.receivedQty) > 0);
+    if (receivedLines.length) {
+      await tx.inventoryTxn.createMany({
+        data: receivedLines.map((line) => ({
+          companyId,
+          type: "GRN_REVERSAL",
+          date: new Date(),
+          itemId: line.itemId,
+          qty: -Number(line.receivedQty),
+          rate: Number(line.rate),
+          amount: Number(line.receivedQty) * Number(line.rate),
+          location: grn.location || "MAIN",
+          partyId: grn.supplierId,
+        })),
+      });
+    }
+
+    await tx.goodsReceiptNote.update({
+      where: { id },
+      data: { deletedAt: new Date(), deletedBy },
+    });
   });
 
   return NextResponse.json({ success: true });

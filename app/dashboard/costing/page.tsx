@@ -96,8 +96,15 @@ const CSS = `
   .cxSectionHead{align-items:flex-start}
   .cxPrimaryValue{font-size:30px}
 }
+.cxHalfGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px 18px}
 .cxPrint{display:none}
 @media print{
+  @page{size:A4;margin:12mm}
+  /* The cost sheet is a slip, not a document: the quoted number and the
+     handful that justify it. Boxed to half the printable height of A4 so two
+     jobs fit on one sheet and the slip can be torn along the dashed line. */
+  .cxHalf{box-sizing:border-box;height:130mm;overflow:hidden;
+    padding-bottom:8mm;border-bottom:1px dashed #bbb;page-break-inside:avoid}
   /* Hiding the rest of the app with visibility:hidden left its boxes in the
      layout, so the sheet's one page of print sat atop several blank ones the
      size of the dashboard behind it. display:none takes the hidden elements
@@ -106,8 +113,11 @@ const CSS = `
   body:has(.cxPrint){background:#fff !important}
   .cxWrap:has(.cxPrint) > *:not(.cxPrint){display:none !important}
   .cxWrap:has(.cxPrint){max-width:none !important;margin:0 !important;padding:0 !important}
+  /* These go to a mono office printer. grayscale() on the one print root is
+     the guarantee: whatever colour a label or theme brings with it, the sheet
+     leaves as black on white rather than as a washed-out tint. */
   .cxPrint{display:block !important;position:static;width:100%;
-    margin:0;background:#fff;color:#000}
+    margin:0;background:#fff;color:#000;filter:grayscale(1)}
   .dashboard-root:has(.cxPrint){display:block !important;min-height:auto !important}
   .dashboard-root:has(.cxPrint) > aside,
   .dashboard-root:has(.cxPrint) main > :not(.dashboard-content-scroll),
@@ -141,6 +151,21 @@ function fmt(v: unknown, decimals = 2): string {
   return Math.abs(v % 1) < 1e-9
     ? v.toLocaleString()
     : v.toLocaleString(undefined, { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
+}
+
+/**
+ * A charge whose name reads as work rather than as a part. The formula adds its
+ * per-unit charges straight onto the cost-per-unit line — "materialPerPc +
+ * labour + buttonTape" names both of them — but only the labour one belongs in
+ * the BOM's Labour per batch. Sending the pair across as one figure overstated
+ * labour and hid a bought-in part the BOM should have been consuming.
+ */
+const LABOUR_CHARGE = /lab(o|ou)r|wage|stitch|sewing|making/i;
+
+/** A charge is money. An input measured in pcs or inches is a dimension. */
+function isMoneyUnit(unit?: string): boolean {
+  const u = (unit ?? "").trim();
+  return u === "" || /^(rs\.?|pkr|₨|usd|\$)$/i.test(u);
 }
 
 /** DD-MM-YYYY, the format every other printed document in the app uses. */
@@ -251,12 +276,51 @@ function CostingInner() {
     const costPerBatch = valueFor("cost_per_batch");
     const costPerUnit = valueFor("cost_per_unit");
     // Whatever the formula charges beyond the material is the conversion cost —
-    // labour, machine time — and that is what the BOM carries per batch.
+    // labour, bought-in parts, machine time — and that is what the BOM carries
+    // per batch, split below into the labour part and the rest.
     const conversion =
       unitsPerBatch != null && costPerBatch != null && costPerUnit != null
         ? Math.max(0, Math.round((costPerUnit * unitsPerBatch - costPerBatch) * 100) / 100)
         : null;
-    return { unitsPerBatch, costPerBatch, costPerUnit, conversion };
+
+    // The charges are named in the cost-per-unit expression: every identifier
+    // there that is an input of this formula is a per-unit charge, valued by
+    // this run. Anything nested inside another step stays out of it — those are
+    // the material workings, not charges.
+    const unitKey = selected.formula.outputs.find((o) => o.role === "cost_per_unit")?.key;
+    const unitStep = selected.formula.steps.find((s) => s.key === unitKey);
+    const inputByKey = new Map(selected.formula.inputs.map((i) => [i.key, i]));
+    const charges: { key: string; label: string; perUnit: number }[] = [];
+    for (const token of unitStep?.expression.match(/[A-Za-z_][A-Za-z0-9_]*/g) ?? []) {
+      const input = inputByKey.get(token);
+      if (!input || input.isList || !isMoneyUnit(input.unit) || charges.some((c) => c.key === token)) continue;
+      const value = run.values[token];
+      if (typeof value !== "number" || !Number.isFinite(value) || value <= 0) continue;
+      charges.push({ key: token, label: input.label || token, perUnit: value });
+    }
+    const isLabour = (c: { key: string; label: string }) =>
+      LABOUR_CHARGE.test(c.key) || LABOUR_CHARGE.test(c.label);
+    const labourPerUnit = charges.filter(isLabour).reduce((sum, c) => sum + c.perUnit, 0);
+    const otherCharges = charges.filter((c) => !isLabour(c));
+
+    // No charge could be named — the whole conversion goes across as labour,
+    // the way it always did, rather than being silently relabelled.
+    const labourPerBatch =
+      conversion == null
+        ? null
+        : unitsPerBatch != null && labourPerUnit > 0
+          ? Math.min(conversion, Math.round(labourPerUnit * unitsPerBatch * 100) / 100)
+          : conversion;
+    const otherPerBatch =
+      conversion != null && labourPerBatch != null
+        ? Math.round((conversion - labourPerBatch) * 100) / 100
+        : null;
+
+    return {
+      unitsPerBatch, costPerBatch, costPerUnit, conversion,
+      labourPerBatch, otherPerBatch,
+      otherLabel: otherCharges.map((c) => c.label).join(" + "),
+    };
   }, [selected, run]);
 
   /**
@@ -276,7 +340,14 @@ function CostingInner() {
     qs.set("formulaVersion", String(selected.formula.version));
     qs.set("version", `v${selected.formula.version}.0`);
     if (bomSeed?.unitsPerBatch != null) qs.set("yieldUnits", String(Math.max(1, Math.round(bomSeed.unitsPerBatch))));
-    if (bomSeed?.conversion != null) qs.set("labourPerBatch", String(bomSeed.conversion));
+    if (bomSeed?.labourPerBatch != null) qs.set("labourPerBatch", String(bomSeed.labourPerBatch));
+    // Parts and other non-labour charges ride across separately and land in
+    // Overhead, named, so the batch still costs what the formula said while the
+    // operator moves them onto a material line.
+    if (bomSeed?.otherPerBatch) {
+      qs.set("overheadPerBatch", String(bomSeed.otherPerBatch));
+      if (bomSeed.otherLabel) qs.set("chargeLabel", bomSeed.otherLabel);
+    }
     return `/dashboard/manufacturing/bom?${qs.toString()}`;
   }, [selected, bomSeed]);
 
@@ -538,7 +609,6 @@ function CostingInner() {
           kind={printKind}
           formula={selected.formula}
           title={sheetName.trim() || selected.formula.name}
-          values={values}
           run={run}
           outputs={outputs}
           primaryKey={primary?.key}
@@ -564,102 +634,111 @@ const P_NUM: React.CSSProperties = { ...P_TD, textAlign: "right", fontFamily: MO
  * whoever cuts it are rarely the same person, and neither wants the other's
  * page.
  */
-function PrintSheet({ kind, formula, title, values, run, outputs, primaryKey }: {
+function PrintSheet({ kind, formula, title, run, outputs, primaryKey }: {
   kind: "cost" | "working";
   formula: CostingFormula;
   title: string;
-  values: Record<string, number | number[]>;
   run: FormulaRun;
   outputs: FormulaOutput[];
   primaryKey?: string;
 }) {
+  /* The cost sheet is the result card off the screen and nothing more: the
+     answer, the numbers standing behind it, and enough heading to know which
+     job it belongs to. Boxed to half an A4 so it goes out with the quote as a
+     slip — the inputs table it used to carry was a page nobody read. */
+  if (kind === "cost") {
+    const main = outputs.find((o) => o.key === primaryKey) ?? outputs[0];
+    const rest = outputs.filter((o) => o.key !== main?.key);
+    return (
+      <div className="cxPrint">
+        <div className="cxHalf" style={{ fontFamily: FONT, color: "#000", background: "#fff" }}>
+          <div style={{
+            display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 14,
+            borderBottom: "2px solid #000", paddingBottom: 8, marginBottom: 14,
+          }}>
+            <div>
+              <div style={{ fontSize: 17, fontWeight: 800 }}>{title}</div>
+              <div style={{ fontSize: 10, color: "#555", marginTop: 3 }}>
+                Cost sheet · {formula.category} · {formula.name} · v{formula.version}
+              </div>
+            </div>
+            <div style={{ fontSize: 10, color: "#555", whiteSpace: "nowrap", paddingTop: 4 }}>{today()}</div>
+          </div>
+
+          {main && (
+            <div style={{ marginBottom: 16 }}>
+              <div style={{ fontSize: 9.5, fontWeight: 700, letterSpacing: ".09em", textTransform: "uppercase", color: "#555", marginBottom: 3 }}>
+                {main.label || main.key}
+              </div>
+              <div style={{ fontFamily: MONO, fontSize: 34, fontWeight: 800, lineHeight: 1.05, fontVariantNumeric: "tabular-nums" }}>
+                {fmt(run.values[main.key])}
+                <span style={{ fontSize: 13, color: "#666", marginLeft: 7, fontWeight: 600 }}>{main.unit ?? ""}</span>
+              </div>
+            </div>
+          )}
+
+          {rest.length > 0 && (
+            <div className="cxHalfGrid" style={{ borderTop: "1px solid #ddd", paddingTop: 14 }}>
+              {rest.map((o) => (
+                <div key={o.key}>
+                  <div style={{ fontSize: 9.5, color: "#666", marginBottom: 2 }}>{o.label || o.key}</div>
+                  <div style={{ fontFamily: MONO, fontSize: 13.5, fontWeight: 700, fontVariantNumeric: "tabular-nums" }}>
+                    {fmt(run.values[o.key])}
+                    <span style={{ fontSize: 9.5, color: "#777", marginLeft: 3 }}>{o.unit ?? ""}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="cxPrint">
       <div style={{ fontFamily: FONT, color: "#000", background: "#fff", padding: "16px 20px" }}>
         <div style={{ borderBottom: "2px solid #000", paddingBottom: 10, marginBottom: 16 }}>
           <div style={{ fontSize: 20, fontWeight: 800 }}>{title}</div>
           <div style={{ fontSize: 11, color: "#555", marginTop: 4 }}>
-            {kind === "cost" ? "Cost sheet" : "Working sheet — cutting detail"} ·{" "}
-            {formula.category} · {formula.name} · v{formula.version} · {today()}
+            Working sheet — cutting detail · {formula.category} · {formula.name} · v{formula.version} · {today()}
           </div>
         </div>
 
-        {kind === "cost" ? (
-          <>
-            <SheetTitle>Job entered</SheetTitle>
-            <table style={{ width: "100%", borderCollapse: "collapse", marginBottom: 20 }}>
-              <thead>
-                <tr><th style={P_TH}>Input</th><th style={{ ...P_TH, textAlign: "right" }}>Value</th><th style={P_TH}>Unit</th></tr>
-              </thead>
-              <tbody>
-                {formula.inputs.map((i) => (
-                  <tr key={i.key}>
-                    <td style={P_TD}>{i.label || i.key}</td>
-                    <td style={P_NUM}>{fmt(values[i.key])}</td>
-                    <td style={{ ...P_TD, width: 70, color: "#666" }}>{i.unit ?? ""}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+        <SheetTitle>Step by step</SheetTitle>
+        <table style={{ width: "100%", borderCollapse: "collapse", marginBottom: 20 }}>
+          <thead>
+            <tr>
+              <th style={P_TH}>Step</th>
+              <th style={P_TH}>How</th>
+              <th style={{ ...P_TH, textAlign: "right" }}>Value</th>
+              <th style={P_TH}>Unit</th>
+            </tr>
+          </thead>
+          <tbody>
+            {run.steps.map((s) => (
+              <tr key={s.key}>
+                <td style={P_TD}>{s.label}</td>
+                <td style={{ ...P_TD, fontFamily: MONO, fontSize: 10.5, color: "#555" }}>{s.expression}</td>
+                <td style={P_NUM}>{s.error ? "error" : fmt(s.value)}</td>
+                <td style={{ ...P_TD, width: 60, color: "#666" }}>{s.unit ?? ""}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
 
-            <SheetTitle>Cost summary</SheetTitle>
-            <table style={{ width: "100%", borderCollapse: "collapse" }}>
-              <tbody>
-                {outputs.map((o) => {
-                  const main = o.key === primaryKey;
-                  return (
-                    <tr key={o.key}>
-                      <td style={{ ...P_TD, fontWeight: main ? 800 : 400, fontSize: main ? 14 : 12 }}>
-                        {o.label || o.key}
-                      </td>
-                      <td style={{ ...P_NUM, fontWeight: main ? 800 : 600, fontSize: main ? 15 : 12 }}>
-                        {fmt(run.values[o.key])}
-                      </td>
-                      <td style={{ ...P_TD, width: 70, color: "#666" }}>{o.unit ?? ""}</td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </>
-        ) : (
-          <>
-            <SheetTitle>Step by step</SheetTitle>
-            <table style={{ width: "100%", borderCollapse: "collapse", marginBottom: 20 }}>
-              <thead>
-                <tr>
-                  <th style={P_TH}>Step</th>
-                  <th style={P_TH}>How</th>
-                  <th style={{ ...P_TH, textAlign: "right" }}>Value</th>
-                  <th style={P_TH}>Unit</th>
-                </tr>
-              </thead>
-              <tbody>
-                {run.steps.map((s) => (
-                  <tr key={s.key}>
-                    <td style={P_TD}>{s.label}</td>
-                    <td style={{ ...P_TD, fontFamily: MONO, fontSize: 10.5, color: "#555" }}>{s.expression}</td>
-                    <td style={P_NUM}>{s.error ? "error" : fmt(s.value)}</td>
-                    <td style={{ ...P_TD, width: 60, color: "#666" }}>{s.unit ?? ""}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-
-            <SheetTitle>Key numbers</SheetTitle>
-            <table style={{ width: "100%", borderCollapse: "collapse" }}>
-              <tbody>
-                {outputs.map((o) => (
-                  <tr key={o.key}>
-                    <td style={P_TD}>{o.label || o.key}</td>
-                    <td style={{ ...P_NUM, fontWeight: 700 }}>{fmt(run.values[o.key])}</td>
-                    <td style={{ ...P_TD, width: 70, color: "#666" }}>{o.unit ?? ""}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </>
-        )}
+        <SheetTitle>Key numbers</SheetTitle>
+        <table style={{ width: "100%", borderCollapse: "collapse" }}>
+          <tbody>
+            {outputs.map((o) => (
+              <tr key={o.key}>
+                <td style={P_TD}>{o.label || o.key}</td>
+                <td style={{ ...P_NUM, fontWeight: 700 }}>{fmt(run.values[o.key])}</td>
+                <td style={{ ...P_TD, width: 70, color: "#666" }}>{o.unit ?? ""}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
     </div>
   );

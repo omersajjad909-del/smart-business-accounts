@@ -146,6 +146,13 @@ async function nextDemoCompanyNo(): Promise<number> {
  * visitors arriving at the same instant can never be handed the same company —
  * the second one either gets a different row or none, and falls back to
  * building a fresh sandbox.
+ *
+ * Only shelf items built by the current seed are claimable. Retiring the old
+ * ones was left entirely to the cleanup cron, so between a seed change and the
+ * next sweep every visitor was handed data the seed had already fixed — which
+ * is how the demo kept opening without Purchase Orders or GRNs long after the
+ * seed started writing them. Skipping a stale row here falls through to a
+ * fresh seed, so the demo self-heals even if the sweep never runs.
  */
 async function claimIdleSandbox(
   businessType: DemoBusinessType,
@@ -163,6 +170,7 @@ async function claimIdleSandbox(
         WHERE "isDemo" = true
           AND "demoExpiresAt" IS NULL
           AND "businessType" = ${businessType}
+          AND "code" = ${DEMO_SEED_VERSION}
         ORDER BY "createdAt" ASC
         FOR UPDATE SKIP LOCKED
         LIMIT 1

@@ -1,5 +1,6 @@
 /**
- * GET /api/manufacturing/items?category=RAW_MATERIAL|FINISHED
+ * GET /api/manufacturing/items?category=RAW_MATERIAL|FINISHED|TRADING|SERVICE
+ * Several may be asked for at once: ?category=RAW_MATERIAL,TRADING
  *
  * The real inventory a factory works with, with live stock and average cost.
  *
@@ -26,11 +27,18 @@ export async function GET(req: NextRequest) {
     if (!companyId) return NextResponse.json({ error: "Company required" }, { status: 400 });
 
     const { searchParams } = new URL(req.url);
-    const requested = String(searchParams.get("category") || "").toUpperCase();
-    const category = CATEGORIES.has(requested) ? requested : null;
+    // A BOM consumes bought-in parts (buttons, zips, fittings) as readily as
+    // raw material, and those are usually filed as trading goods — so the
+    // caller says which categories it wants rather than being held to one.
+    const requested = String(searchParams.get("category") || "")
+      .toUpperCase()
+      .split(",")
+      .map((c) => c.trim())
+      .filter((c) => CATEGORIES.has(c));
+    const categories = Array.from(new Set(requested));
 
     const items = await prisma.itemNew.findMany({
-      where: { companyId, deletedAt: null, ...(category ? { category } : {}) },
+      where: { companyId, deletedAt: null, ...(categories.length ? { category: { in: categories } } : {}) },
       select: {
         id: true, code: true, name: true, unit: true, category: true,
         purchaseRate: true, rate: true, minStock: true,

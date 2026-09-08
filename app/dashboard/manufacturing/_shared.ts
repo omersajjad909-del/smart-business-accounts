@@ -276,8 +276,13 @@ export type ProductionRunQuote = {
   needsBomLines?: boolean;
 };
 
-export async function loadManufacturingItems(category?: "RAW_MATERIAL" | "FINISHED"): Promise<ManufacturingItem[]> {
-  const query = category ? `?category=${category}` : "";
+export type ItemCategory = "RAW_MATERIAL" | "FINISHED" | "TRADING" | "SERVICE";
+
+export async function loadManufacturingItems(
+  category?: ItemCategory | ItemCategory[],
+): Promise<ManufacturingItem[]> {
+  const wanted = category ? (Array.isArray(category) ? category : [category]) : [];
+  const query = wanted.length ? `?category=${wanted.join(",")}` : "";
   return fetchJson<ManufacturingItem[]>(`/api/manufacturing/items${query}`, []);
 }
 

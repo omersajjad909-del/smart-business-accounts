@@ -27,7 +27,7 @@ import { safeEncryptField } from "@/lib/fieldEncrypt";
  * idle sandbox that does not match, so a deploy plus one cron tick is all it
  * takes for the shelf to rebuild itself.
  */
-export const DEMO_SEED_VERSION = "demo-seed-v4";
+export const DEMO_SEED_VERSION = "demo-seed-v5";
 
 export const DEMO_BUSINESS_TYPES = [
   "trading",
@@ -830,6 +830,15 @@ export async function seedDemoCompany(
     const invId = randomUUID();
     let net = 0;
 
+    // The first two purchases are shown the long way round — PO raised, goods
+    // received on a GRN, invoice billed against that GRN. Stock enters on the
+    // receipt for those, exactly as app/api/grn posts it, so the demo matches
+    // what a visitor sees when they receive goods themselves. The other four
+    // are direct invoices and carry their own stock in.
+    const viaGrn = i < 2;
+    const poId = viaGrn ? randomUUID() : null;
+    const grnId = viaGrn ? randomUUID() : null;
+
     for (let l = 0; l < lineCount; l++) {
       const it = items[(i * 3 + l) % items.length];
       // Purchase volume is deliberately kept below sales volume — a demo that
@@ -851,7 +860,7 @@ export async function seedDemoCompany(
         inventoryTxns.push({
           id: randomUUID(),
           companyId,
-          type: "PURCHASE",
+          type: viaGrn ? "GRN" : "PURCHASE",
           date,
           itemId: it.id,
           qty,
@@ -874,6 +883,8 @@ export async function seedDemoCompany(
       date,
       dueDate: new Date(date.getTime() + 30 * day),
       supplierId: supplier.id,
+      poId,
+      grnId,
       total,
       taxConfigId,
       approvalStatus: "APPROVED",
@@ -887,8 +898,7 @@ export async function seedDemoCompany(
     post({ id: supplier.id }, 0, total, `Purchase PI-${1001 + i}`, date, { invoiceId: invId });
 
     // First two purchases carry a PO + GRN so those pages are populated too.
-    if (i < 2) {
-      const poId = randomUUID();
+    if (viaGrn) {
       purchaseOrders.push({
         id: poId,
         companyId,
@@ -901,7 +911,6 @@ export async function seedDemoCompany(
         approvalStatus: "APPROVED",
         supplierId: supplier.id,
       });
-      const grnId = randomUUID();
       grns.push({
         id: grnId,
         companyId,
@@ -1403,8 +1412,22 @@ export async function seedDemoCompany(
     return [party, grade, ...capital, ...production, ...settlements];
   })();
 
+  // Business feature flags live in the newest COMPANY_ADMIN_CONTROL activity
+  // log row (see lib/companyAdminControl.ts). They default to off, and
+  // advancedPurchasing off is what hid Purchase Order and GRN from the demo's
+  // sidebar even though both pages, their APIs and their seeded rows were all
+  // there. A demo that seeds POs and GRNs has to show the screens that read
+  // them. Only the flags that are demonstrated are set; the rest normalise
+  // back to the defaults.
+  const featureFlagRow = {
+    action: "COMPANY_ADMIN_CONTROL",
+    companyId,
+    details: JSON.stringify({ features: { advancedPurchasing: true } }),
+  };
+
   // ── Write everything, in FK order, as one batch ───────────────────────
   await prisma.$transaction([
+    prisma.activityLog.create({ data: featureFlagRow }),
     prisma.branch.createMany({ data: branchRows }),
     prisma.account.createMany({ data: accountRows }),
     prisma.itemNew.createMany({ data: itemRows }),

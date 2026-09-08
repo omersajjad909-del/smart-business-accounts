@@ -57,6 +57,13 @@ function BOMPageInner() {
    * by resetForm()/startEdit() so it never leaks onto an unrelated BOM.
    */
   const [formulaMeta, setFormulaMeta] = useState<{ id: string; name: string; version: number } | null>(null);
+  /**
+   * The non-labour charge the formula sent across — buttons, tape, a bought-in
+   * part. It is prefilled into Overhead so the batch still costs what the
+   * formula quoted, and named here so the operator can move it onto a material
+   * line and clear the overhead.
+   */
+  const [charge, setCharge] = useState<{ label: string; perBatch: number } | null>(null);
 
   // Deep-linked from Costing → "Create BOM →". The formula already knows the
   // units per batch and the conversion cost; only the finished product and
@@ -67,12 +74,18 @@ function BOMPageInner() {
     if (!formulaId) return;
     const yieldUnits = Number(params.get("yieldUnits"));
     const labourPerBatch = Number(params.get("labourPerBatch"));
+    const overheadPerBatch = Number(params.get("overheadPerBatch"));
+    const chargeLabel = params.get("chargeLabel") || "";
     setForm((c) => ({
       ...c,
       version: params.get("version") || c.version,
       yieldUnits: Number.isFinite(yieldUnits) && yieldUnits > 0 ? yieldUnits : c.yieldUnits,
       labourPerBatch: Number.isFinite(labourPerBatch) && labourPerBatch >= 0 ? labourPerBatch : c.labourPerBatch,
+      overheadPerBatch: Number.isFinite(overheadPerBatch) && overheadPerBatch >= 0 ? overheadPerBatch : c.overheadPerBatch,
     }));
+    if (Number.isFinite(overheadPerBatch) && overheadPerBatch > 0) {
+      setCharge({ label: chargeLabel || "Other per-unit charges", perBatch: overheadPerBatch });
+    }
     setFormulaMeta({
       id: formulaId,
       name: params.get("formulaName") || "",
@@ -90,7 +103,10 @@ function BOMPageInner() {
   );
 
   useEffect(() => {
-    loadManufacturingItems("RAW_MATERIAL").then(setRawMaterials);
+    // Trading goods too: a button, a zip, a bought-in fitting is consumed by a
+    // batch exactly like raw material, and stocking it as a trading good is the
+    // normal way to file a part you buy finished.
+    loadManufacturingItems(["RAW_MATERIAL", "TRADING"]).then(setRawMaterials);
     loadManufacturingItems("FINISHED").then(setFinishedItems);
   }, []);
 
@@ -122,6 +138,7 @@ function BOMPageInner() {
     setLines([{ itemId: "", qty: "", divisible: false }]);
     setEditingId("");
     setFormulaMeta(null);
+    setCharge(null);
     setFormError("");
   }
 
@@ -363,6 +380,14 @@ function BOMPageInner() {
               <div style={{ marginBottom: 14, padding: "10px 12px", borderRadius: 8, background: "rgba(129,140,248,.1)", border: "1px solid rgba(129,140,248,.28)", color: "rgba(255,255,255,.7)", fontSize: 12, lineHeight: 1.6 }}>
                 Filled in from <strong>{formulaMeta.name || "the formula"}</strong>: Units per batch and Labour per batch below.
                 Still yours to pick — the <strong>Finished Product</strong> this makes, and the <strong>Materials consumed per batch</strong> list at the bottom.
+              </div>
+            )}
+            {charge && (
+              <div style={{ marginBottom: 14, padding: "10px 12px", borderRadius: 8, background: "rgba(251,191,36,.09)", border: "1px solid rgba(251,191,36,.3)", color: "rgba(255,255,255,.72)", fontSize: 12, lineHeight: 1.6 }}>
+                <strong style={{ color: "#fbbf24" }}>{charge.label}</strong> — Rs {charge.perBatch.toLocaleString()} per batch — is not labour, so it is sitting in
+                {" "}<strong>Overhead per batch</strong> for now and the batch still costs what the formula quoted.
+                If you stock it as an item, add it under <strong>Materials consumed per batch</strong> below and set the overhead back to 0 —
+                then the cost follows the live purchase rate and the stock actually moves when a batch is made.
               </div>
             )}
             {formError && <div style={{ marginBottom: 14, padding: "10px 12px", borderRadius: 8, background: "rgba(239,68,68,.14)", border: "1px solid rgba(239,68,68,.28)", color: "#fca5a5", fontSize: 12 }}>{formError}</div>}

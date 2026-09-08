@@ -65,11 +65,16 @@ export const FORMULA_TEMPLATES: FormulaTemplate[] = [
       { key: "rollInches",  label: "Roll length",     expression: "convert(rollLength, m, in)", unit: "in" },
       { key: "repeats",     label: "Repeats per roll",expression: "floor(rollInches / (cutLength + cutAllowance))" },
       { key: "piecesPerRoll", label: "Pieces per roll", expression: "repeats * acrossCount * lengthFactor", unit: "pcs" },
-      // Button/tape is an extra cost for each roll, so it is included before
-      // the roll cost is divided down to a per-piece and order cost.
-      { key: "rollCost",    label: "Roll cost",       expression: "materialRate * gauge * rollWidth * rollLength / densityDiv + buttonTape", unit: "Rs" },
+      // Roll cost is the film and nothing else — what the roll weighs times
+      // what the material sells for.
+      { key: "rollCost",    label: "Roll cost",       expression: "materialRate * gauge * rollWidth * rollLength / densityDiv", unit: "Rs" },
       { key: "materialPerPc", label: "Material per piece", expression: "rollCost / piecesPerRoll", unit: "Rs" },
-      { key: "costPerPc",   label: "Cost per piece",  expression: "materialPerPc + labour", unit: "Rs" },
+      // Button/tape is fitted to each piece, so it is priced per piece next to
+      // labour. It used to be added once to the whole roll, where a 790-piece
+      // roll divided Rs. 2.40 of buttons down to three paisa a bag and the
+      // charge may as well not have been entered — the two-panel template
+      // below always costed it this way.
+      { key: "costPerPc",   label: "Cost per piece",  expression: "materialPerPc + labour + buttonTape", unit: "Rs" },
       { key: "rollsNeeded", label: "Rolls required",  expression: "orderQty / piecesPerRoll" },
       // You can only buy whole rolls, so the fractional part of rollsNeeded is
       // never actually used up — it comes back off the last roll as leftover
