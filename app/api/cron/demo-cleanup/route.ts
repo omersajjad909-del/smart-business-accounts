@@ -45,5 +45,21 @@ export async function GET(req: NextRequest) {
     prisma.company.count({ where: { isDemo: true, demoExpiresAt: null } }),
   ]);
 
-  return NextResponse.json({ swept, failed, bookingsClosed, prewarm, remaining, idle });
+  // A shelf that refuses to fill is reported as a number and nothing else, so
+  // the one person who could fix it is left reading "failed: 16". The reasons
+  // are logged now (see recordDemoFailure) and this endpoint already sits
+  // behind CRON_SECRET, so it is the right place to hand them back.
+  const failures =
+    prewarm.failed > 0
+      ? (
+          await prisma.activityLog.findMany({
+            where: { action: "DEMO_SANDBOX_FAILED" },
+            orderBy: { createdAt: "desc" },
+            take: 3,
+            select: { details: true },
+          })
+        ).map((row) => row.details)
+      : [];
+
+  return NextResponse.json({ swept, failed, bookingsClosed, prewarm, failures, remaining, idle });
 }

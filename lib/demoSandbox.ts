@@ -119,6 +119,34 @@ export async function getOrCreateDemoUser() {
  */
 export const DEMO_PREWARM_PER_TYPE = 2;
 
+/**
+ * Why a sandbox could not be built, written where it can actually be read.
+ *
+ * A seed that throws is caught in three places and answered with the same
+ * sentence to the visitor — "Could not prepare the demo" — while the reason
+ * goes to a server console nobody is watching. That is how a broken demo
+ * survived a whole afternoon: the shelf silently refused to fill, every visitor
+ * fell through to a live seed, and every live seed hit the same error. The row
+ * lands in the activity log, so it shows up on System Logs and can be read back
+ * out of the database without shell access to the host.
+ *
+ * companyId stays null on purpose: the half-built company is destroyed on the
+ * way out of the catch, and a row pointing at it would fail its foreign key.
+ */
+async function recordDemoFailure(context: string, error: unknown): Promise<void> {
+  const message = error instanceof Error ? `${error.name}: ${error.message}` : String(error);
+  try {
+    await prisma.activityLog.create({
+      data: {
+        action: "DEMO_SANDBOX_FAILED",
+        details: `${context} — ${message}`.slice(0, 900),
+      },
+    });
+  } catch {
+    // Diagnostics must never be the thing that breaks the request they explain.
+  }
+}
+
 export async function countActiveSandboxes(): Promise<number> {
   return prisma.company.count({
     where: { isDemo: true, demoExpiresAt: { gt: new Date() } },
@@ -229,6 +257,7 @@ export async function prewarmSandboxes(
         // Log it — a silent catch here once hid a seeder crash that left one
         // whole business type without any warm sandboxes.
         console.error(`[demo] prewarm failed for ${businessType}:`, e);
+        await recordDemoFailure(`prewarm ${businessType}`, e);
         // An empty shell left on the shelf would be handed to a visitor as a
         // blank workspace, which is worse than making them wait for a seed.
         if (createdId) await destroyDemoSandbox(createdId).catch(() => {});
@@ -351,6 +380,7 @@ export async function createDemoSandbox(
   } catch (e) {
     // A half-seeded company would show a broken product to the next visitor
     // who happened to land on it, so tear it down before rethrowing.
+    await recordDemoFailure(`start ${businessType}`, e);
     await destroyDemoSandbox(company.id).catch(() => {});
     throw e;
   }
