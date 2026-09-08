@@ -269,9 +269,14 @@ export async function POST(req: NextRequest) {
         const po = await tx.purchaseOrder.findFirst({ where: { id: poId, companyId } });
         if (!po) throw new Error("Purchase order not found");
       }
+      // An invoice billing a GRN posts no stock: the goods went onto the rack
+      // when they were received, and app/api/grn wrote that movement. Only a
+      // direct invoice — no GRN in front of it — brings its own stock in.
+      const stockOnInvoice = !grnId;
+
       for (const i of validItems) {
         // 1. Add stock into inventory (stock in).
-        await tx.inventoryTxn.create({
+        if (stockOnInvoice) await tx.inventoryTxn.create({
           data: {
             type: "PURCHASE",
             date: new Date(date),
@@ -413,8 +418,11 @@ export async function PUT(req: NextRequest) {
 
     const tx = prisma;
 
-    // Reverse old inventory txns (PURCHASE stored positive qty; reversal removes stock)
-    for (const oldItem of existing.items) {
+    // Reverse old inventory txns (PURCHASE stored positive qty; reversal
+    // removes stock). Only what this invoice actually posted: a GRN-billed
+    // invoice never put the stock in, so reversing it would drive the rack
+    // negative for goods still sitting in the store.
+    for (const oldItem of existing.grnId ? [] : existing.items) {
       if (!oldItem.itemId) continue;
       await tx.inventoryTxn.create({
         data: {
@@ -458,8 +466,9 @@ export async function PUT(req: NextRequest) {
       },
     });
 
-    // Create new inventory transactions for updated items
-    for (const i of validItems) {
+    // Create new inventory transactions for updated items — again, only when
+    // the invoice is the document that carries the stock.
+    for (const i of grnId ? [] : validItems) {
       await tx.inventoryTxn.create({
         data: {
           type: "PURCHASE",
@@ -567,8 +576,9 @@ export async function DELETE(req: NextRequest) {
       return NextResponse.json({ error: "Invoice not found" }, { status: 404 });
     }
 
-    // Reverse inventory transactions on delete
-    for (const oldItem of existingPI.items) {
+    // Reverse inventory transactions on delete — nothing to reverse when the
+    // stock came in on a GRN, which stays received after the invoice is gone.
+    for (const oldItem of existingPI.grnId ? [] : existingPI.items) {
       if (!oldItem.itemId) continue;
       await tx.inventoryTxn.create({
         data: {
