@@ -908,6 +908,23 @@ export default function DashboardContent() {
   // "New Patient", a factory gets "New Production Order".
   const QA = layout.actions;
 
+  // Mobile hero card mirrors the desktop KPI grid it replaces below 767px —
+  // same four business-type KPIs (lib/dashboardLayouts.ts), not a hardcoded
+  // Total Balance/Revenue/Expenses/Profit set that only fit the default layout.
+  const heroKpi = layout.kpis[0];
+  const heroValue = readMetric(heroKpi.source, heroKpi.metric);
+  const heroDelta = heroKpi.deltaMetric
+    ? Number((stats as unknown as Record<string, number>)[heroKpi.deltaMetric] || 0)
+    : null;
+  const heroDeltaGood =
+    heroDelta !== null && (heroKpi.deltaTone === "up-bad" ? heroDelta < 0 : heroDelta >= 0);
+  const heroRest = layout.kpis.slice(1, 4).map((kpi) => ({
+    l: kpi.label,
+    v: readMetric(kpi.source, kpi.metric),
+    format: kpi.format,
+    c: kpi.key === "profit" ? profC : kpi.color,
+  }));
+
   const TT = {
     contentStyle: {
       background: "#0f1629",
@@ -1565,7 +1582,7 @@ export default function DashboardContent() {
                 marginBottom: 6,
               }}
             >
-              Total Balance
+              {heroKpi.label}
             </div>
             <div
               style={{
@@ -1576,37 +1593,43 @@ export default function DashboardContent() {
                 lineHeight: 1,
               }}
             >
-              {cur} {fmt(stats.cashBalance)}
+              {formatMetric(heroValue, heroKpi.format)}
             </div>
-            <div
-              style={{
-                fontSize: 12,
-                fontWeight: 700,
-                color: stats.revenueGrowth >= 0 ? "#86efac" : "#fca5a5",
-                marginTop: 6,
-                display: "flex",
-                alignItems: "center",
-                gap: 4,
-              }}
-            >
-              <svg
-                width="12"
-                height="12"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="3"
+            {heroDelta !== null ? (
+              <div
+                style={{
+                  fontSize: 12,
+                  fontWeight: 700,
+                  color: heroDeltaGood ? "#86efac" : "#fca5a5",
+                  marginTop: 6,
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 4,
+                }}
               >
-                <polyline
-                  points={
-                    stats.revenueGrowth >= 0
-                      ? "23 6 13.5 15.5 8.5 10.5 1 18"
-                      : "1 6 10.5 15.5 15.5 10.5 23 18"
-                  }
-                />
-              </svg>
-              {Math.abs(stats.revenueGrowth).toFixed(1)}% vs last month
-            </div>
+                <svg
+                  width="12"
+                  height="12"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="3"
+                >
+                  <polyline
+                    points={
+                      heroDelta >= 0
+                        ? "23 6 13.5 15.5 8.5 10.5 1 18"
+                        : "1 6 10.5 15.5 15.5 10.5 23 18"
+                    }
+                  />
+                </svg>
+                {Math.abs(heroDelta).toFixed(1)}% vs last month
+              </div>
+            ) : heroKpi.caption ? (
+              <div style={{ fontSize: 12, fontWeight: 600, color: "rgba(255,255,255,.5)", marginTop: 6 }}>
+                {heroKpi.caption}
+              </div>
+            ) : null}
           </div>
           <div
             style={{
@@ -1619,21 +1642,10 @@ export default function DashboardContent() {
               justifyContent: "center",
               backdropFilter: "blur(8px)",
               border: "1px solid rgba(255,255,255,.2)",
+              fontSize: 22,
             }}
           >
-            <svg
-              width="22"
-              height="22"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="white"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <rect x="1" y="4" width="22" height="16" rx="2" />
-              <line x1="1" y1="10" x2="23" y2="10" />
-            </svg>
+            {heroKpi.icon}
           </div>
         </div>
         {/* Bottom stats row */}
@@ -1650,15 +1662,7 @@ export default function DashboardContent() {
             position: "relative",
           }}
         >
-          {[
-            { l: "Revenue", v: stats.revenue, c: "#86efac" },
-            { l: "Expenses", v: stats.expenses, c: "#fca5a5" },
-            {
-              l: "Profit",
-              v: stats.profit,
-              c: profC == "#10b981" ? "#86efac" : "#fca5a5",
-            },
-          ].map((s, i) => (
+          {heroRest.map((s, i) => (
             <div key={i} style={{ minWidth: 0 }}>
               <div
                 style={{
@@ -1684,7 +1688,7 @@ export default function DashboardContent() {
                   textOverflow: "ellipsis",
                 }}
               >
-                {cur} {fmt(s.v)}
+                {formatMetric(s.v, s.format)}
               </div>
             </div>
           ))}
