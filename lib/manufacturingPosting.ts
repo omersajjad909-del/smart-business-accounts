@@ -101,6 +101,7 @@ export const INVENTORY_TXN_TYPES = {
  */
 export const COST_BEARING_INBOUND_TYPES = [
   "PURCHASE",
+  "GRN",
   "PRODUCTION_RECEIPT",
   "OPENING",
 ] as const;
