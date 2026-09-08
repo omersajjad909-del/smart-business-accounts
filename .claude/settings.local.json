@@ -194,7 +194,11 @@
       "PowerShell(Get-ChildItem -Path \"d:\\\\projects\\\\smart-business-accounts\\\\app\" -Recurse -Directory | Select-Object FullName | ForEach-Object { $_.FullName.Replace\\('d:\\\\projects\\\\smart-business-accounts\\\\', ''\\) })",
       "PowerShell(Get-ChildItem -Path \"d:\\\\projects\\\\smart-business-accounts\\\\lib\" -Recurse -Directory | Select-Object FullName | ForEach-Object { $_.FullName.Replace\\('d:\\\\projects\\\\smart-business-accounts\\\\', ''\\) })",
       "PowerShell(Get-ChildItem -Path \"d:\\\\projects\\\\smart-business-accounts\\\\public\" -Recurse | Where-Object { -not $_.PSIsContainer } | Select-Object @{Name=\"Path\"; Expression={$_.FullName.Replace\\('d:\\\\projects\\\\smart-business-accounts\\\\', ''\\)}} | Head -50)",
-      "Bash(node -e \"const p = require\\('./package.json'\\); console.log\\(JSON.stringify\\({scripts: p.scripts, dependencies: Object.keys\\(p.dependencies || {}\\).filter\\(d => d.includes\\('openai'\\) || d.includes\\('anthropic'\\) || d.includes\\('next'\\) || d.includes\\('prisma'\\)\\)}, null, 2\\)\\)\")"
+      "Bash(node -e \"const p = require\\('./package.json'\\); console.log\\(JSON.stringify\\({scripts: p.scripts, dependencies: Object.keys\\(p.dependencies || {}\\).filter\\(d => d.includes\\('openai'\\) || d.includes\\('anthropic'\\) || d.includes\\('next'\\) || d.includes\\('prisma'\\)\\)}, null, 2\\)\\)\")",
+      "Read(//Users/umersajjad/Finova/**)",
+      "Bash(rm -v lib/core/theme/app_theme.dart lib/core/theme/app_colors.dart lib/core/theme/app_spacing.dart lib/widgets/app_card.dart lib/widgets/app_badge.dart lib/screens/main/app_home.dart lib/screens/customers.dart)",
+      "Bash(flutter analyze *)",
+      "Bash(cd /Users/umersajjad/Finova && grep -rn \"app_theme.dart\\\\|app_colors.dart\\\\|app_spacing.dart\\\\|app_card.dart\\\\|app_badge.dart\\\\|screens/main/app_home.dart\\\\|screens/customers.dart\" lib --include=\"*.dart\" || echo \"no references found\")"
     ],
     "additionalDirectories": [
       "d:\\projects\\smart-business-accounts\\lib",
