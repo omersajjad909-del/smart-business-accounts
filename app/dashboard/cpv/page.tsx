@@ -13,7 +13,7 @@ type BankAcc  = { id: string; name: string };
 type EntryRow = { id: number; accountId: string; accountCode: string; accountName: string; amount: string; narration: string };
 type Voucher  = {
   id: string; voucherNo: string; date: string; narration: string;
-  paymentMode: string; paymentAccId: string; paymentAccName: string; totalAmount: number;
+  paymentMode: string; paymentAccId: string; paymentAccName: string; bankAccountId?: string; totalAmount: number;
   entries: { accountId: string; accountName: string; accountCode: string; amount: number; narration: string }[];
 };
 
@@ -130,6 +130,9 @@ export default function CPVPage() {
   const [bankId,    setBankId]    = useState("");
   const [narration, setNarration] = useState("");
   const [entries,   setEntries]   = useState<EntryRow[]>(initRows);
+  // The voucher currently loaded from the database — set while a saved CPV is
+  // open, so Save updates that record instead of posting a fresh one.
+  const [editing,   setEditing]   = useState<Voucher | null>(null);
 
   // ── Query Mode (F7 / F8) ────────────────────────────────────────────────────
   const [queryMode,    setQueryMode]    = useState(false);
@@ -178,11 +181,12 @@ export default function CPVPage() {
 
   // ── Query Mode helpers ───────────────────────────────────────────────────────
   function applyVoucher(v: Voucher) {
+    setEditing(v);
     setDate(v.date);
     setMode(v.paymentMode as "CASH" | "BANK");
     setNarration(v.narration || "");
     if (v.paymentMode === "BANK") {
-      setBankId(bankAccs.find(b => b.name === v.paymentAccName)?.id || "");
+      setBankId(v.bankAccountId || bankAccs.find(b => b.name === v.paymentAccName)?.id || "");
     } else { setBankId(""); }
     const loaded: EntryRow[] = v.entries.map(e => ({
       id: nextId++, accountId: e.accountId, accountCode: e.accountCode,
@@ -196,7 +200,25 @@ export default function CPVPage() {
     setQueryMode(true); setQueryCpvNo(""); setQueryDate(""); setQueryParty("");
     setQueryResults([]); setQueryIdx(-1);
   }
-  function exitQueryMode() { setQueryMode(false); setQueryIdx(-1); setQueryResults([]); }
+  function exitQueryMode() {
+    setQueryMode(false);
+    if (editing) resetForm(); else { setQueryIdx(-1); setQueryResults([]); }
+  }
+
+  function resetForm() {
+    setEditing(null); setEntries(initRows()); setNarration("");
+    setMode("CASH"); setBankId(""); setDate(today);
+    setQueryIdx(-1); setQueryResults([]);
+  }
+
+  async function refreshVouchers(): Promise<Voucher[]> {
+    try {
+      const r = await fetch("/api/cpv", { headers: h() });
+      const v = await r.json();
+      if (Array.isArray(v)) { setVouchers(v); return v; }
+    } catch {}
+    return [];
+  }
 
   function executeQuery(cpvNo: string, dateQ: string, party: string) {
     const results = runQuery(vouchers, cpvNo, dateQ, party);
@@ -222,7 +244,7 @@ export default function CPVPage() {
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pickerOpen, queryMode, queryIdx, queryResults]);
+  }, [pickerOpen, queryMode, queryIdx, queryResults, editing]);
 
   function confirmPicker(acc: Account) {
     if (pickerRowId === null) return;
@@ -247,9 +269,7 @@ export default function CPVPage() {
   function removeRow(id: number) { setEntries(prev => prev.length > 1 ? prev.filter(e => e.id !== id) : prev); }
 
   const total = entries.reduce((s, e) => s + (Number(e.amount) || 0), 0);
-  const previewVoucherNo = queryIdx >= 0
-    ? (queryResults[queryIdx]?.voucherNo || `CPV-${vouchers.length + 1}`)
-    : `CPV-${vouchers.length + 1}`;
+  const previewVoucherNo = editing?.voucherNo || `CPV-${vouchers.length + 1}`;
 
   async function save() {
     const valid = entries.filter(e => e.accountId && Number(e.amount) > 0);
@@ -257,15 +277,41 @@ export default function CPVPage() {
     if (mode === "BANK" && !bankId) { toast.error("Please select a bank account"); return; }
     setSaving(true);
     try {
+      const open = editing;
       const r = await fetch("/api/cpv", {
-        method: "POST", headers: h(),
-        body: JSON.stringify({ date, paymentMode: mode, bankAccountId: bankId || undefined, narration, entries: valid.map(e => ({ accountId: e.accountId, amount: Number(e.amount), narration: e.narration })) }),
+        method: open ? "PUT" : "POST", headers: h(),
+        body: JSON.stringify({ ...(open ? { id: open.id } : {}), date, paymentMode: mode, bankAccountId: bankId || undefined, narration, entries: valid.map(e => ({ accountId: e.accountId, amount: Number(e.amount), narration: e.narration })) }),
       });
       const d = await r.json();
-      if (!r.ok) throw new Error(d.error);
-      toast.success(`CPV ${d.voucherNo} saved successfully!`);
-      setEntries(initRows()); setNarration(""); setMode("CASH"); setBankId("");
-      fetch("/api/cpv", { headers: h() }).then(r => r.json()).then(v => Array.isArray(v) && setVouchers(v));
+      if (!r.ok) throw new Error(d.error || "Could not save the voucher");
+      if (open) {
+        toast.success(`CPV ${d.voucherNo} updated successfully!`);
+        const list = await refreshVouchers();
+        const fresh = list.find(x => x.id === open.id);
+        // stay on the record the user was editing, now showing what was stored
+        if (fresh) { setQueryResults(prev => prev.map(x => x.id === fresh.id ? fresh : x)); applyVoucher(fresh); }
+        else resetForm();
+      } else {
+        toast.success(`CPV ${d.voucherNo} saved successfully!`);
+        resetForm();
+        await refreshVouchers();
+      }
+    } catch (e: any) { toast.error(e.message); }
+    finally { setSaving(false); }
+  }
+
+  async function deleteVoucher() {
+    if (!editing) return;
+    if (!window.confirm(`Delete ${editing.voucherNo} permanently?\n\nIts ledger entries will be removed from every report.`)) return;
+    const target = editing;
+    setSaving(true);
+    try {
+      const r = await fetch(`/api/cpv?id=${target.id}`, { method: "DELETE", headers: h() });
+      const d = await r.json().catch(() => ({}));
+      if (!r.ok) throw new Error(d.error || "Could not delete the voucher");
+      toast.success(`${target.voucherNo} deleted`);
+      resetForm();
+      await refreshVouchers();
     } catch (e: any) { toast.error(e.message); }
     finally { setSaving(false); }
   }
@@ -347,6 +393,8 @@ export default function CPVPage() {
               </span>
               <button onClick={() => navTo(queryIdx + 1)} disabled={queryIdx === queryResults.length - 1}
                 style={{ padding:"4px 10px", borderRadius:6, background:"rgba(255,255,255,.06)", border:"1px solid rgba(255,255,255,.1)", color:queryIdx===queryResults.length-1?"rgba(255,255,255,.2)":"rgba(255,255,255,.7)", fontSize:13, cursor:queryIdx===queryResults.length-1?"default":"pointer", fontFamily:ff }}>▶</button>
+              <button onClick={deleteVoucher} disabled={saving || !editing} title="Delete this voucher and its ledger entries"
+                style={{ padding:"4px 10px", borderRadius:6, background:"rgba(248,113,113,.14)", border:"1px solid rgba(248,113,113,.35)", color:"#f87171", fontSize:11, fontWeight:700, cursor:(saving||!editing)?"default":"pointer", fontFamily:ff, opacity:(saving||!editing)?0.5:1 }}>🗑 Delete</button>
               <button onClick={exitQueryMode}
                 style={{ padding:"4px 10px", borderRadius:6, background:"rgba(248,113,113,.08)", border:"1px solid rgba(248,113,113,.2)", color:"#f87171", fontSize:11, cursor:"pointer", fontFamily:ff }}>✕ Clear</button>
             </div>
@@ -412,7 +460,18 @@ export default function CPVPage() {
       )}
 
       {/* ── FORM ── */}
-      <div style={{ background:"rgba(255,255,255,.03)", border:"1px solid rgba(255,255,255,.08)", borderRadius:16, padding:24, marginBottom:24, display: queryMode ? "none" : undefined }}>
+      <div style={{ background:"rgba(255,255,255,.03)", border:`1px solid ${editing ? "rgba(250,204,21,.35)" : "rgba(255,255,255,.08)"}`, borderRadius:16, padding:24, marginBottom:24, display: queryMode ? "none" : undefined }}>
+        {editing && (
+          <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", flexWrap:"wrap", gap:10, marginBottom:18, padding:"9px 14px", borderRadius:10, background:"rgba(250,204,21,.07)", border:"1px solid rgba(250,204,21,.25)" }}>
+            <span style={{ fontSize:12, color:"#facc15", fontWeight:700 }}>
+              ✎ Editing {editing.voucherNo} — row changes are saved only when you press “Update CPV”.
+            </span>
+            <button onClick={resetForm}
+              style={{ padding:"4px 12px", borderRadius:6, background:"rgba(255,255,255,.05)", border:"1px solid rgba(255,255,255,.12)", color:"rgba(255,255,255,.5)", fontSize:11, cursor:"pointer", fontFamily:ff }}>
+              Cancel edit
+            </button>
+          </div>
+        )}
         <div style={{ display:"grid", gridTemplateColumns: isMobile ? "1fr 1fr" : "160px 160px 1fr 2fr", gap:14, marginBottom:20 }}>
           <div><label style={lbl}>Date</label><DateInput value={date} onChange={setDate} style={inp} /></div>
           <div>
@@ -503,8 +562,8 @@ export default function CPVPage() {
               🖨 Print Voucher
             </button>
             <button onClick={save} disabled={saving || total <= 0}
-              style={{ padding:"10px 28px", borderRadius:9, background:`linear-gradient(135deg,${BLUE},#4f46e5)`, border:"none", color:"white", fontSize:14, fontWeight:800, cursor:"pointer", fontFamily:ff, opacity:(saving||total<=0)?0.6:1, boxShadow:`0 4px 16px rgba(99,102,241,.3)` }}>
-              {saving ? "Saving…" : "Save CPV"}
+              style={{ padding:"10px 28px", borderRadius:9, background: editing ? "linear-gradient(135deg,#facc15,#ca8a04)" : `linear-gradient(135deg,${BLUE},#4f46e5)`, border:"none", color: editing ? "#000" : "white", fontSize:14, fontWeight:800, cursor:"pointer", fontFamily:ff, opacity:(saving||total<=0)?0.6:1, boxShadow: editing ? "0 4px 16px rgba(250,204,21,.25)" : `0 4px 16px rgba(99,102,241,.3)` }}>
+              {saving ? (editing ? "Updating…" : "Saving…") : (editing ? "Update CPV" : "Save CPV")}
             </button>
           </div>
         </div>
