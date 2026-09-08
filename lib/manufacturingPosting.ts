@@ -403,8 +403,14 @@ export async function priceProductionRun(opts: {
    * of qty × rate and takes precedence over both `labourCost` and the BOM's
    * `labourPerBatch` — the whole point is that it is what was actually paid
    * out, not an estimate.
+   *
+   * `operation` names the job the money is for — cutting, button, packing. One
+   * run passes through several of them, each done by different people on the
+   * same pieces, so the same 10,000 bags legitimately carry three sets of
+   * rows. Pricing does not care which is which; it is the screen's per-job
+   * piece check and the ledger's narration that need the name.
    */
-  labourAssignments?: { labourId: string; qty: number; rate: number }[];
+  labourAssignments?: { labourId: string; qty: number; rate: number; operation?: string }[];
   /** Warehouse the run draws on. Omit to look at every location. */
   location?: string | null;
   /**
@@ -575,7 +581,7 @@ export async function completeProductionRun(opts: {
   labourCost?: number;
   overheadCost?: number;
   /** Piece-rate workers named for this run — see priceProductionRun. */
-  labourAssignments?: { labourId: string; qty: number; rate: number }[];
+  labourAssignments?: { labourId: string; qty: number; rate: number; operation?: string }[];
 }): Promise<CompletedRun> {
   const { companyId, productionOrderId } = opts;
   const producedQty = Math.floor(Number(opts.producedQty));
@@ -814,6 +820,18 @@ export async function completeProductionRun(opts: {
     // voucher was deleted — the count dropped while the highest number did not.
     const nextMfg = await nextVoucherNo(tx, companyId, "MFG", "MFG");
     const orderLabel = String(orderData.orderId || order.title);
+    // The jobs this run paid for, named on the voucher itself. A voucher that
+    // carries three credits to three different people says nothing about which
+    // job each was for, and VoucherEntry has no narration of its own — so the
+    // list rides on the voucher's.
+    const operationLabel = (() => {
+      const names: string[] = [];
+      for (const a of namedAssignments) {
+        const op = String(a.operation || "").trim();
+        if (op && !names.includes(op)) names.push(op);
+      }
+      return names.length ? ` — ${names.join(", ")}` : "";
+    })();
     const issueVoucherNo = `MFG-${nextMfg}`;
     const receiptVoucherNo = `MFG-${nextMfg + 1}`;
     const branchId = opts.branchId || null;
@@ -833,7 +851,7 @@ export async function completeProductionRun(opts: {
           voucherNo: issueVoucherNo,
           type: "MFG",
           date,
-          narration: `Material and conversion cost charged to production ${orderLabel}`,
+          narration: `Material and conversion cost charged to production ${orderLabel}${operationLabel}`,
           entries: {
             create: [
               // WIP absorbs the full cost of the run …
@@ -917,7 +935,17 @@ export async function completeProductionRun(opts: {
           lastRunAt: date.toISOString(),
           lastRunCost: priced.totalCost,
           ...(namedAssignments.length
-            ? { lastRunLabour: namedAssignments.map((a) => ({ labourId: a.labourId, qty: a.qty, rate: a.rate })) }
+            ? {
+                lastRunLabour: namedAssignments.map((a) => ({
+                  labourId: a.labourId,
+                  qty: a.qty,
+                  rate: a.rate,
+                  // Kept so the screen can offer the jobs this company actually
+                  // runs the next time somebody completes an order, and so a
+                  // labour report has something to group by.
+                  operation: String(a.operation || "").trim(),
+                })),
+              }
             : {}),
         },
       },
