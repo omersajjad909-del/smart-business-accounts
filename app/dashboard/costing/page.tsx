@@ -152,6 +152,21 @@ function fmt(v: unknown, decimals = 2): string {
     : v.toLocaleString(undefined, { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
 }
 
+/**
+ * A charge whose name reads as work rather than as a part. The formula adds its
+ * per-unit charges straight onto the cost-per-unit line — "materialPerPc +
+ * labour + buttonTape" names both of them — but only the labour one belongs in
+ * the BOM's Labour per batch. Sending the pair across as one figure overstated
+ * labour and hid a bought-in part the BOM should have been consuming.
+ */
+const LABOUR_CHARGE = /lab(o|ou)r|wage|stitch|sewing|making/i;
+
+/** A charge is money. An input measured in pcs or inches is a dimension. */
+function isMoneyUnit(unit?: string): boolean {
+  const u = (unit ?? "").trim();
+  return u === "" || /^(rs\.?|pkr|₨|usd|\$)$/i.test(u);
+}
+
 /** DD-MM-YYYY, the format every other printed document in the app uses. */
 function today(): string {
   const d = new Date();
@@ -260,12 +275,51 @@ function CostingInner() {
     const costPerBatch = valueFor("cost_per_batch");
     const costPerUnit = valueFor("cost_per_unit");
     // Whatever the formula charges beyond the material is the conversion cost —
-    // labour, machine time — and that is what the BOM carries per batch.
+    // labour, bought-in parts, machine time — and that is what the BOM carries
+    // per batch, split below into the labour part and the rest.
     const conversion =
       unitsPerBatch != null && costPerBatch != null && costPerUnit != null
         ? Math.max(0, Math.round((costPerUnit * unitsPerBatch - costPerBatch) * 100) / 100)
         : null;
-    return { unitsPerBatch, costPerBatch, costPerUnit, conversion };
+
+    // The charges are named in the cost-per-unit expression: every identifier
+    // there that is an input of this formula is a per-unit charge, valued by
+    // this run. Anything nested inside another step stays out of it — those are
+    // the material workings, not charges.
+    const unitKey = selected.formula.outputs.find((o) => o.role === "cost_per_unit")?.key;
+    const unitStep = selected.formula.steps.find((s) => s.key === unitKey);
+    const inputByKey = new Map(selected.formula.inputs.map((i) => [i.key, i]));
+    const charges: { key: string; label: string; perUnit: number }[] = [];
+    for (const token of unitStep?.expression.match(/[A-Za-z_][A-Za-z0-9_]*/g) ?? []) {
+      const input = inputByKey.get(token);
+      if (!input || input.isList || !isMoneyUnit(input.unit) || charges.some((c) => c.key === token)) continue;
+      const value = run.values[token];
+      if (typeof value !== "number" || !Number.isFinite(value) || value <= 0) continue;
+      charges.push({ key: token, label: input.label || token, perUnit: value });
+    }
+    const isLabour = (c: { key: string; label: string }) =>
+      LABOUR_CHARGE.test(c.key) || LABOUR_CHARGE.test(c.label);
+    const labourPerUnit = charges.filter(isLabour).reduce((sum, c) => sum + c.perUnit, 0);
+    const otherCharges = charges.filter((c) => !isLabour(c));
+
+    // No charge could be named — the whole conversion goes across as labour,
+    // the way it always did, rather than being silently relabelled.
+    const labourPerBatch =
+      conversion == null
+        ? null
+        : unitsPerBatch != null && labourPerUnit > 0
+          ? Math.min(conversion, Math.round(labourPerUnit * unitsPerBatch * 100) / 100)
+          : conversion;
+    const otherPerBatch =
+      conversion != null && labourPerBatch != null
+        ? Math.round((conversion - labourPerBatch) * 100) / 100
+        : null;
+
+    return {
+      unitsPerBatch, costPerBatch, costPerUnit, conversion,
+      labourPerBatch, otherPerBatch,
+      otherLabel: otherCharges.map((c) => c.label).join(" + "),
+    };
   }, [selected, run]);
 
   /**
@@ -285,7 +339,14 @@ function CostingInner() {
     qs.set("formulaVersion", String(selected.formula.version));
     qs.set("version", `v${selected.formula.version}.0`);
     if (bomSeed?.unitsPerBatch != null) qs.set("yieldUnits", String(Math.max(1, Math.round(bomSeed.unitsPerBatch))));
-    if (bomSeed?.conversion != null) qs.set("labourPerBatch", String(bomSeed.conversion));
+    if (bomSeed?.labourPerBatch != null) qs.set("labourPerBatch", String(bomSeed.labourPerBatch));
+    // Parts and other non-labour charges ride across separately and land in
+    // Overhead, named, so the batch still costs what the formula said while the
+    // operator moves them onto a material line.
+    if (bomSeed?.otherPerBatch) {
+      qs.set("overheadPerBatch", String(bomSeed.otherPerBatch));
+      if (bomSeed.otherLabel) qs.set("chargeLabel", bomSeed.otherLabel);
+    }
     return `/dashboard/manufacturing/bom?${qs.toString()}`;
   }, [selected, bomSeed]);
 
