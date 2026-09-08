@@ -32,6 +32,11 @@ export async function GET(req: NextRequest) {
       orderBy: { date: "desc" },
     });
 
+    // Bank vouchers store the bank's ledger account; the edit form needs the
+    // BankAccount row it belongs to so it can preselect the right bank.
+    const banks = await prisma.bankAccount.findMany({ where: { companyId }, select: { id: true, accountId: true } });
+    const bankByAccount = new Map(banks.map((b: any) => [b.accountId, b.id]));
+
     const formatted = vouchers.map((v: any) => {
       // cash/bank = negative (credit)
       const cashEntry = v.entries.find((e: any) => e.amount < 0);
@@ -56,6 +61,7 @@ export async function GET(req: NextRequest) {
         paymentMode:    cashEntry?.account?.name?.toLowerCase().includes("cash") ? "CASH" : "BANK",
         paymentAccId:   cashEntry?.accountId || "",
         paymentAccName: cashEntry?.account?.name || "",
+        bankAccountId:  (cashEntry && bankByAccount.get(cashEntry.accountId)) || "",
         totalAmount:    total,
         entries:        partyEntries,
       };
@@ -164,7 +170,7 @@ export async function POST(req: Request) {
 // A CPV that was posted by another document (a payment receipt, an expense
 // voucher) is that document's ledger side, not a standalone voucher — editing
 // or deleting it here would leave the source paid/unpaid figures lying.
-async function loadEditable(id: string, companyId: string) {
+async function loadEditable(id: string, companyId: string): Promise<{ voucher: any; error?: string; status?: number }> {
   const voucher = await prisma.voucher.findFirst({
     where: { id, companyId, type: "CPV", deletedAt: null },
     include: {
@@ -173,12 +179,13 @@ async function loadEditable(id: string, companyId: string) {
       expenseVouchers: { where: { deletedAt: null }, select: { voucherNo: true } },
     },
   });
-  if (!voucher) return { error: "Voucher not found", status: 404 as const };
+  if (!voucher) return { voucher: null, error: "Voucher not found", status: 404 };
   if (voucher.paymentReceipts.length || voucher.expenseVouchers.length) {
     const src = voucher.paymentReceipts[0]?.receiptNo || voucher.expenseVouchers[0]?.voucherNo;
     return {
+      voucher: null,
       error: `This voucher was posted from ${src} — edit or delete it there instead.`,
-      status: 409 as const,
+      status: 409,
     };
   }
   return { voucher };
@@ -223,8 +230,8 @@ export async function PUT(req: NextRequest) {
     }
 
     const found = await loadEditable(id, companyId);
-    if (found.error) return NextResponse.json({ error: found.error }, { status: found.status });
-    const existing = found.voucher!;
+    if (found.error) return NextResponse.json({ error: found.error }, { status: found.status || 400 });
+    const existing = found.voucher;
 
     const totalAmount = validEntries.reduce((s: number, e: any) => s + Number(e.amount), 0);
 
@@ -302,8 +309,8 @@ export async function DELETE(req: NextRequest) {
     if (!id) return NextResponse.json({ error: "ID required" }, { status: 400 });
 
     const found = await loadEditable(id, companyId);
-    if (found.error) return NextResponse.json({ error: found.error }, { status: found.status });
-    const existing = found.voucher!;
+    if (found.error) return NextResponse.json({ error: found.error }, { status: found.status || 400 });
+    const existing = found.voucher;
 
     await prisma.$transaction(async (tx: any) => {
       await restoreBankBalance(tx, existing.entries, companyId);
