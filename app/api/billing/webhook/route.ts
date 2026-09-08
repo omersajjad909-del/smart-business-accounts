@@ -23,6 +23,81 @@ function safeDate(value: unknown) {
 }
 
 /**
+ * A charge, expressed as the monthly rate the rest of the app reads it as.
+ *
+ * `Subscription.pricePerMonth` is consumed as a true per-month figure:
+ * lib/billingInvoice.ts multiplies it by 12 to derive a yearly invoice, and the
+ * admin MRR totals (churn-radar, businessFacts) sum it straight across
+ * companies. Storing a yearly charge whole would read as twelve months of MRR
+ * from a single customer.
+ */
+function monthlyRate(chargedTotal: number, billingCycle: string) {
+  return String(billingCycle || "MONTHLY").toUpperCase() === "YEARLY"
+    ? chargedTotal / 12
+    : chargedTotal;
+}
+
+/**
+ * Money actually collected, written onto the Subscription row.
+ *
+ * Both fields sat at their 0 defaults for every customer. The only writer was
+ * applySuccessfulPlanUpdate, which runs on `subscription_created` /
+ * `subscription_updated` — and those LemonSqueezy payloads are subscription
+ * objects that carry no `subtotal`, so the amount was always null and the
+ * write always skipped. The figure is only ever known on the payment events,
+ * so it is recorded from there instead.
+ *
+ * Must be called inside the caller's once-per-charge guard: `totalPaid`
+ * accumulates, so a replayed or duplicated webhook would otherwise count the
+ * same charge twice.
+ *
+ * Amounts are stored in the provider's settlement currency — USD for
+ * LemonSqueezy, PKR for Safepay — which is the convention lib/billingInvoice.ts
+ * already applies when it labels the figure.
+ */
+async function applyChargeToSubscriptionTotals(params: {
+  companyId: string;
+  chargedTotal: number;
+  billingCycle: string;
+}) {
+  if (!Number.isFinite(params.chargedTotal) || params.chargedTotal <= 0) return;
+
+  await prisma.subscription.update({
+    where: { companyId: params.companyId },
+    data: {
+      pricePerMonth: monthlyRate(params.chargedTotal, params.billingCycle),
+      totalPaid: { increment: params.chargedTotal },
+      // Read by admin/error-triage and churn-radar, which had nothing to read:
+      // no code path wrote either field. A successful charge ends the streak.
+      lastPaymentAttempt: new Date(),
+      failedPayments: 0,
+    },
+  }).catch(() => {});
+}
+
+/**
+ * Reverse a refunded charge out of `totalPaid`.
+ *
+ * `pricePerMonth` is deliberately left alone — it is the current rate of the
+ * plan, not a running total, and a refund does not change what the plan costs.
+ * Floored at zero so a refund of a charge that predates this accounting cannot
+ * drive the lifetime figure negative.
+ */
+async function reverseRefundFromSubscriptionTotals(companyId: string, refundedAmount: number) {
+  if (!Number.isFinite(refundedAmount) || refundedAmount <= 0) return;
+
+  const current = await prisma.subscription
+    .findUnique({ where: { companyId }, select: { totalPaid: true } })
+    .catch(() => null);
+  if (!current) return;
+
+  await prisma.subscription.update({
+    where: { companyId },
+    data: { totalPaid: Math.max(0, Number(current.totalPaid || 0) - refundedAmount) },
+  }).catch(() => {});
+}
+
+/**
  * Credit the affiliate who referred this company, if there was one.
  *
  * Runs after the plan is live rather than at signup, because a commission is
@@ -174,7 +249,9 @@ async function applySuccessfulPlanUpdate(params: {
       ...(params.providerSubscriptionId ? { stripeSubscriptionId: params.providerSubscriptionId } : {}),
       ...(params.safepayTracker         ? { safepayTracker: params.safepayTracker }               : {}),
       ...(params.safepayOrderId         ? { safepayOrderId: params.safepayOrderId }               : {}),
-      ...(typeof params.invoiceAmount === "number" ? { pricePerMonth: params.invoiceAmount } : {}),
+      ...(typeof params.invoiceAmount === "number"
+        ? { pricePerMonth: monthlyRate(params.invoiceAmount, normalizedCycle) }
+        : {}),
     },
     create: {
       companyId: params.companyId,
@@ -187,7 +264,10 @@ async function applySuccessfulPlanUpdate(params: {
       stripeSubscriptionId: params.providerSubscriptionId || undefined,
       safepayTracker: params.safepayTracker || undefined,
       safepayOrderId: params.safepayOrderId || undefined,
-      pricePerMonth: typeof params.invoiceAmount === "number" ? params.invoiceAmount : 0,
+      pricePerMonth:
+        typeof params.invoiceAmount === "number"
+          ? monthlyRate(params.invoiceAmount, normalizedCycle)
+          : 0,
     },
   });
 
@@ -554,6 +634,17 @@ async function handleLemonWebhook(req: NextRequest, raw: string) {
         }).catch(() => {});
       }
 
+      // Counterpart to the reset in applyChargeToSubscriptionTotals. Both
+      // fields feed admin/error-triage and churn-radar, and neither had a
+      // writer, so every account read as "0 failed payments" no matter what.
+      await prisma.subscription.update({
+        where: { companyId },
+        data: {
+          failedPayments: { increment: 1 },
+          lastPaymentAttempt: new Date(),
+        },
+      }).catch(() => {});
+
       await prisma.activityLog.create({
         data: {
           companyId, userId: null,
@@ -606,6 +697,7 @@ async function handleLemonWebhook(req: NextRequest, raw: string) {
           companyId,
           amount: refundedAmount,
         });
+        await reverseRefundFromSubscriptionTotals(companyId, refundedAmount);
         await sendRefundConfirmationEmail(companyId, planCode, refundedAmount, refundedCurrency);
       }
     }
@@ -641,6 +733,7 @@ async function handleLemonWebhook(req: NextRequest, raw: string) {
         companyId,
         amount: refundedAmount,
       });
+      await reverseRefundFromSubscriptionTotals(companyId, refundedAmount);
       await sendRefundConfirmationEmail(companyId, planCode, refundedAmount, refundedCurrency);
     }
   }
@@ -727,6 +820,13 @@ async function handleLemonWebhook(req: NextRequest, raw: string) {
         cardLast4: attrs?.card_last_four || null,
         periodEnd: safeDate(attrs?.renews_at),
         issuedAt: safeDate(attrs?.created_at) || new Date(),
+      });
+
+      // Inside the dedupe guard on purpose — see applyChargeToSubscriptionTotals.
+      await applyChargeToSubscriptionTotals({
+        companyId,
+        chargedTotal: minorUnits / 100,
+        billingCycle,
       });
 
       await prisma.activityLog.create({
@@ -1002,6 +1102,13 @@ async function handleSafepayWebhook(req: NextRequest, raw: string) {
       total: amountPkr || 0,
       customerCountry: "PK",
       periodEnd: currentPeriodEnd,
+    });
+
+    // Deduped by the alreadyProcessed("safepay", eventKey) guard above.
+    await applyChargeToSubscriptionTotals({
+      companyId,
+      chargedTotal: amountPkr || 0,
+      billingCycle,
     });
 
     await prisma.activityLog.create({
