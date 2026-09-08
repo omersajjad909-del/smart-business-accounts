@@ -44,6 +44,9 @@ export default function ProductionOrdersPage() {
   // rolls were received into SHOP reported a shortage with the material in
   // the building, so it is now picked here and priced against that store.
   const [runLocation, setRunLocation] = useState("MAIN");
+  // The day the pieces were actually made — defaults to today but stays
+  // editable so a run entered late still lands on the shift that made it.
+  const [runDate, setRunDate] = useState(new Date().toISOString().slice(0, 10));
   const [form, setForm] = useState({
     product: "",
     bomId: "",
@@ -170,6 +173,7 @@ export default function ProductionOrdersPage() {
     const remaining = Math.max(order.quantity - order.completed, 1);
     setRunOrder(order);
     setRunQty(remaining);
+    setRunDate(new Date().toISOString().slice(0, 10));
     setRunError("");
     setRunQuote(null);
     setLabourRows([]);
@@ -208,6 +212,7 @@ export default function ProductionOrdersPage() {
           producedQty: runQty,
           allowNegativeStock: allowShort,
           location: runLocation,
+          date: runDate,
           ...(labourAssignments.length ? { labourAssignments } : {}),
         }),
       });
@@ -397,7 +402,7 @@ export default function ProductionOrdersPage() {
                   type="number" min={1} value={runQty}
                   onChange={(e) => setRunQty(Math.max(1, Number(e.target.value) || 1))}
                   onBlur={(e) => requote(Math.max(1, Number(e.target.value) || 1))}
-                  style={{ width: 180, background: bg, border: `1px solid ${border}`, borderRadius: 8, padding: "9px 12px", color: "#fff", boxSizing: "border-box" }}
+                  style={{ width: 180, height: 38, background: bg, border: `1px solid ${border}`, borderRadius: 8, padding: "9px 12px", fontSize: 14, color: "#fff", boxSizing: "border-box" }}
                 />
                 {/* The box opens on the whole balance, which is right for a run
                     that finishes the order and wrong for a day that finishes
@@ -415,12 +420,20 @@ export default function ProductionOrdersPage() {
                 <select
                   value={runLocation}
                   onChange={(e) => { setRunLocation(e.target.value); requote(runQty, e.target.value); }}
-                  style={{ width: 180, background: "#161b27", border: `1px solid ${border}`, borderRadius: 8, padding: "9px 12px", color: "#fff", boxSizing: "border-box" }}
+                  style={{ width: 180, height: 38, background: "#161b27", border: `1px solid ${border}`, borderRadius: 8, padding: "9px 12px", fontSize: 14, color: "#fff", boxSizing: "border-box" }}
                 >
                   {[...new Set([runLocation, ...(runQuote?.availableLocations ?? [])])].map((loc) => (
                     <option key={loc} value={loc}>{loc}</option>
                   ))}
                 </select>
+              </div>
+              <div>
+                <label style={{ display: "block", fontSize: 12, color: "rgba(255,255,255,.45)", marginBottom: 6 }}>Production date</label>
+                <input
+                  type="date" value={runDate}
+                  onChange={(e) => setRunDate(e.target.value)}
+                  style={{ width: 180, height: 38, background: bg, border: `1px solid ${border}`, borderRadius: 8, padding: "9px 12px", fontSize: 14, color: "#fff", boxSizing: "border-box" }}
+                />
               </div>
             </div>
 
