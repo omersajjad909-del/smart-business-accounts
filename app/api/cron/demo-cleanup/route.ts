@@ -6,11 +6,19 @@ export const runtime = "nodejs";
 export const maxDuration = 60;
 
 /**
- * Cron: every 10 minutes.
+ * Cron: once a day (see vercel.json).
  *
  * Most visitors close the tab instead of pressing "End demo", so nothing else
  * ever cleans those sandboxes up. This is the sweep that actually keeps the
  * database from filling with abandoned demo companies.
+ *
+ * Daily is not the frequency this wants — ten minutes is — but a Hobby account
+ * may only run daily crons, and Vercel rejects the whole deployment rather
+ * than quietly slowing a shorter schedule down. Nothing breaks in between: a
+ * sandbox built by an older seed can no longer be handed to a visitor (see
+ * claimIdleSandbox), so a stale shelf falls through to a fresh seed instead of
+ * serving stale data. Expired companies simply linger until the next sweep.
+ * Put it back on a ten-minute schedule if this account moves to Pro.
  */
 export async function GET(req: NextRequest) {
   if (req.headers.get("authorization") !== `Bearer ${process.env.CRON_SECRET}`) {

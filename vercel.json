@@ -8,7 +8,7 @@
     },
     {
       "path": "/api/cron/demo-cleanup",
-      "schedule": "*/10 * * * *"
+      "schedule": "30 2 * * *"
     }
   ]
 }
