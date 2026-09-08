@@ -164,7 +164,7 @@ export default function AdminAffiliatesPage() {
                       {a.status !== "SUSPENDED" && (
                         <button className="af-btn" onClick={() => updateAffiliate(a.id, { status: "SUSPENDED" })} style={{ background: "rgba(148,163,184,.15)", color: "#94a3b8" }}>Suspend</button>
                       )}
-                      {a.status !== "REJECTED" && (
+                      {a.status !== "REJETED" && (
                         <button className="af-btn" onClick={() => updateAffiliate(a.id, { status: "REJECTED" })} style={{ background: "rgba(248,113,113,.15)", color: "#f87171" }}>Reject</button>
                       )}
                     </div>
