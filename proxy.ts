@@ -372,6 +372,15 @@ export async function proxy(req: NextRequest) {
     "/api/media",
   ];
 
+  // The one settings write a demo is meant to make. Business Features is the
+  // screen that switches Advanced Purchasing, Multi-Warehouse, Approvals and
+  // the rest on, so a visitor who cannot flip those toggles cannot see what
+  // the product actually does — they just read a page of descriptions. It sits
+  // under /api/company, which the block above froze wholesale. The route
+  // narrows a demo's patch down to the feature flags, so company identity,
+  // bank details and the FBR credentials stay as read-only as before.
+  const DEMO_WRITABLE_API = ["/api/company/admin-control"];
+
   // Answered with a plausible success, but nothing leaves the building.
   const DEMO_SILENCED_API = [
     "/api/email/send",
@@ -454,7 +463,11 @@ export async function proxy(req: NextRequest) {
         { status: 403 },
       );
     }
-    if (req.method !== "GET" && DEMO_READONLY_API.some((p) => pathname.startsWith(p))) {
+    if (
+      req.method !== "GET" &&
+      DEMO_READONLY_API.some((p) => pathname.startsWith(p)) &&
+      !DEMO_WRITABLE_API.some((p) => pathname.startsWith(p))
+    ) {
       return NextResponse.json(
         { error: "Read-only in the demo", demo: true },
         { status: 403 },

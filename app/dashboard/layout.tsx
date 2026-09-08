@@ -855,6 +855,16 @@ export default function DashboardLayout({
       }
     };
     load();
+
+    // Business Features writes the very flags this sidebar reads, and bootstrap
+    // is fetched once on mount — so switching Advanced Purchasing on saved
+    // fine and then changed nothing on screen until the next full page load,
+    // which reads as the save having failed. That screen fires this event after
+    // a successful save; re-running bootstrap is what makes Purchase Order and
+    // GRN appear in the nav straight away.
+    const onFeaturesSaved = () => { load(); };
+    window.addEventListener("biz-features-saved", onFeaturesSaved);
+    return () => window.removeEventListener("biz-features-saved", onFeaturesSaved);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

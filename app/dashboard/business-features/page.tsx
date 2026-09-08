@@ -328,7 +328,11 @@ export default function BusinessFeaturesPage() {
       });
       if (!res.ok) throw new Error();
       setSaved({ ...features });
-      toast.success("Business features saved! Sidebar will update on next page load.");
+      // The sidebar reads these flags from /api/me/bootstrap, which the
+      // dashboard layout fetches once on mount. Tell it to re-read rather than
+      // asking the user to reload the page themselves.
+      window.dispatchEvent(new Event("biz-features-saved"));
+      toast.success("Business features saved — the sidebar has been updated.");
     } catch { toast.error("Failed to save"); }
     finally { setSaving(false); }
   }
