@@ -591,8 +591,12 @@ function IssueTab({
             </select>
           </div>
           <div>
-            <label style={label}>Kahan se</label>
+            <label style={label}>Kahan se (apna godown)</label>
             <input style={input} value={sourceLocation} onChange={(e) => setSourceLocation(e.target.value)} />
+            <div style={{ fontSize: 11, color: dim, marginTop: 4, lineHeight: 1.45 }}>
+              Aap ka apna store. Thekedar ki location alag se nahi banani —
+              {worker ? <span style={{ color: teal }}> {worker.jobLocation}</span> : " JW:CODE"} khud ban jati hai.
+            </div>
           </div>
           <div>
             <label style={label}>Kya banega (finished item)</label>
