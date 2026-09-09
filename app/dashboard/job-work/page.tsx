@@ -551,6 +551,27 @@ function IssueTab({
     }
   };
 
+  // Landing on a form whose first dropdown is empty, with nothing saying where
+  // the entries come from, is a dead end — so say it, and hand over the button.
+  if (!workers.length) {
+    return (
+      <div style={{ ...card, borderLeft: `3px solid ${amber}` }}>
+        <div style={{ fontSize: 11, fontWeight: 800, letterSpacing: 1, color: amber, marginBottom: 10 }}>
+          PEHLA QADAM
+        </div>
+        <div style={{ fontSize: 15, fontWeight: 700, marginBottom: 6 }}>Abhi koi thekedar add nahi hua</div>
+        <p style={{ fontSize: 13.5, color: dim, margin: "0 0 16px", maxWidth: 620, lineHeight: 1.6 }}>
+          Challan banane se pehle kam se kam ek thekedar chahiye. Uske code se hi uski stock location
+          (<span style={{ color: teal }}>JW:CODE</span>) aur uska payable account banta hai — dono khud ban jate hain,
+          aap ko alag se kuch nahi banana.
+        </p>
+        <button style={btn()} onClick={onGoToWorkers}>
+          Thekedar add karein →
+        </button>
+      </div>
+    );
+  }
+
   return (
     <>
       <Section
