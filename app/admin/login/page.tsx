@@ -109,20 +109,11 @@ export default function AdminLoginPage() {
         return;
       }
       setPassword("");
-      if (data.step === "enrol") {
-        // Fetch the secret straight away so the QR is on screen with the form.
-        const setupRes = await fetch("/api/admin/auth/2fa/setup", { method: "POST" });
-        const setup = await setupRes.json();
-        if (!setupRes.ok) {
-          setError(setup.error || "Could not start authenticator setup");
-          return;
-        }
-        setSecret(setup.secret);
-        setOtpAuthUrl(setup.otpAuthUrl);
-        setStep("enrol");
-      } else {
-        setStep("otp");
-      }
+      // The password is the whole sign-in now — no OTP step. Cosmetic only:
+      // the sidebar re-reads /api/admin/auth/me and every API call is
+      // authorised from the signed cookie, not from this.
+      setCurrentUser({ ...data.user, companyId: "system" });
+      router.push("/admin");
     } catch (err: any) {
       setError(err?.message || "Network error");
     } finally {
