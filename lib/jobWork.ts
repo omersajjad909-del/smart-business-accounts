@@ -542,11 +542,31 @@ export function priceJobWorkReceipt(opts: {
   for (const line of opts.challan.lines) {
     const balance = balanceOf(line);
     const ret = askedReturn.get(line.itemId) ?? 0;
-    // Nothing said about consumption means "this run finished the material" —
-    // the common case, and the one an operator should not have to retype.
+    // What to assume when the operator says nothing about consumption.
+    //
+    // "Everything left was burnt" is wrong, and expensively so. A job needing
+    // 12.5 rolls has 13 whole rolls sent out, because half a roll cannot leave
+    // the rack; the balance of the thirteenth is good material that is still
+    // on the worker's floor. Consuming it silently buried its cost in this
+    // batch — the per-piece cost came out too high, and the roll then vanished
+    // from every report even though it physically exists.
+    //
+    // So when the line declares a standard, that standard is the assumption:
+    // consume what the pieces should have taken and leave the rest showing as
+    // a balance the worker still holds. Real over-consumption is then a number
+    // somebody types, which is exactly when it should be charged back.
+    //
+    // With no standard there is nothing to reason from, and finishing the
+    // material stays the assumption it always was.
+    const standardCon =
+      line.standardPerPc && line.standardPerPc > 0
+        ? round6(line.standardPerPc * goodQty)
+        : null;
     const con = askedConsume.has(line.itemId)
       ? askedConsume.get(line.itemId)!
-      : round6(Math.max(0, balance - ret));
+      : standardCon !== null
+        ? round6(Math.min(standardCon, Math.max(0, balance - ret)))
+        : round6(Math.max(0, balance - ret));
 
     if (round6(con + ret) > balance + 1e-6) {
       shortages.push({ itemName: line.itemName, asked: round6(con + ret), balance, unit: line.unit });
