@@ -131,7 +131,7 @@ export default function LabourPage() {
         <div>
           <h1 style={{ fontSize: 22, fontWeight: 800, margin: "0 0 4px" }}>Labour</h1>
           <p style={{ fontSize: 13, color: "rgba(255,255,255,.42)", margin: 0 }}>
-            Piece-rate workers. Assign them to a production run and what they're owed posts to their own ledger.
+            Piece-rate workers. Assign them to a production run and what they&apos;re owed posts to their own ledger.
           </p>
         </div>
         <button onClick={openAdd} style={{ padding: "10px 20px", borderRadius: 10, border: "none", background: "#f97316", color: "#fff", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>
