@@ -582,7 +582,7 @@ function IssueTab({
           <div>
             <label style={label}>Job worker</label>
             <select style={input} value={workerId} onChange={(e) => setWorkerId(e.target.value)}>
-              <option value="">— chunein —</option>
+              <option value="">— select —</option>
               {workers.map((w) => (
                 <option key={w.id} value={w.id}>
                   {w.name} ({w.code})
@@ -601,7 +601,7 @@ function IssueTab({
           <div>
             <label style={label}>What will be made (finished item)</label>
             <select style={input} value={finishedItemId} onChange={(e) => setFinishedItemId(e.target.value)}>
-              <option value="">— chunein —</option>
+              <option value="">— select —</option>
               {finished.map((i) => (
                 <option key={i.id} value={i.id}>
                   {i.name}
@@ -810,7 +810,7 @@ function ReceiveTab({ challans, busy, setBusy, setMsg, refresh }: Setter & { cha
           <div>
             <label style={label}>Challan</label>
             <select style={input} value={challanId} onChange={(e) => setChallanId(e.target.value)}>
-              <option value="">— chunein —</option>
+              <option value="">— select —</option>
               {challans.map((c) => (
                 <option key={c.id} value={c.id}>
                   {c.challanNo} · {c.workerName} · {c.finishedItemName || "?"}
