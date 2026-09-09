@@ -274,6 +274,7 @@ export default function JobWorkPage() {
       )}
       {tab === "issue" && (
         <IssueTab
+          onGoToWorkers={() => setTab("workers")}
           workers={workers}
           items={items}
           challans={challans}
@@ -496,7 +497,8 @@ function IssueTab({
   setBusy,
   setMsg,
   refresh,
-}: Setter & { workers: Worker[]; items: Item[]; challans: Challan[] }) {
+  onGoToWorkers,
+}: Setter & { workers: Worker[]; items: Item[]; challans: Challan[]; onGoToWorkers: () => void }) {
   const [workerId, setWorkerId] = useState("");
   const [finishedItemId, setFinishedItemId] = useState("");
   const [sourceLocation, setSourceLocation] = useState("MAIN");
