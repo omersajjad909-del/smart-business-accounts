@@ -737,6 +737,10 @@ function ReceiveTab({ challans, busy, setBusy, setMsg, refresh }: Setter & { cha
   const [freight, setFreight] = useState("");
   const [jobCharges, setJobCharges] = useState("");
   const [returns, setReturns] = useState<Record<string, string>>({});
+  // Blank means "use the standard" — see priceJobWorkReceipt. Kept separate
+  // from returns because the two answer different questions: what was burnt,
+  // and what physically came back.
+  const [consumes, setConsumes] = useState<Record<string, string>>({});
   const [priced, setPriced] = useState<Priced | null>(null);
 
   const challan = challans.find((c) => c.id === challanId) || null;
@@ -744,6 +748,7 @@ function ReceiveTab({ challans, busy, setBusy, setMsg, refresh }: Setter & { cha
   useEffect(() => {
     setPriced(null);
     setReturns({});
+    setConsumes({});
     setGoodQty("");
     setJobCharges("");
   }, [challanId]);
@@ -758,8 +763,13 @@ function ReceiveTab({ challans, busy, setBusy, setMsg, refresh }: Setter & { cha
     const returned = Object.entries(returns)
       .map(([itemId, v]) => ({ itemId, qty: Number(v) }))
       .filter((r) => r.qty > 0);
+    const consumed = Object.entries(consumes)
+      .filter(([, v]) => String(v).trim() !== "")
+      .map(([itemId, v]) => ({ itemId, qty: Number(v) }))
+      .filter((c) => Number.isFinite(c.qty) && c.qty >= 0);
     const params = new URLSearchParams({ challanId, goodQty: String(Number(goodQty)) });
     if (returned.length) params.set("returned", JSON.stringify(returned));
+    if (consumed.length) params.set("consumed", JSON.stringify(consumed));
     if (Number(freight) > 0) params.set("freight", String(Number(freight)));
     if (jobCharges !== "" && Number(jobCharges) >= 0) params.set("jobCharges", String(Number(jobCharges)));
 
@@ -773,7 +783,7 @@ function ReceiveTab({ challans, busy, setBusy, setMsg, refresh }: Setter & { cha
       cancelled = true;
       clearTimeout(t);
     };
-  }, [challanId, goodQty, freight, jobCharges, returns]);
+  }, [challanId, goodQty, freight, jobCharges, returns, consumes]);
 
   const submit = async () => {
     if (!challanId) return setMsg({ kind: "err", text: "Select a challan" });
@@ -783,10 +793,15 @@ function ReceiveTab({ challans, busy, setBusy, setMsg, refresh }: Setter & { cha
       const returned = Object.entries(returns)
         .map(([itemId, v]) => ({ itemId, qty: Number(v) }))
         .filter((r) => r.qty > 0);
+      const consumed = Object.entries(consumes)
+        .filter(([, v]) => String(v).trim() !== "")
+        .map(([itemId, v]) => ({ itemId, qty: Number(v) }))
+        .filter((c) => Number.isFinite(c.qty) && c.qty >= 0);
       const r = await post("/api/job-work/receipts", {
         challanId,
         goodQty: Number(goodQty),
         returned,
+        ...(consumed.length ? { consumed } : {}),
         freight: Number(freight) || 0,
         ...(jobCharges !== "" ? { jobCharges: Number(jobCharges) } : {}),
       });

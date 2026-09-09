@@ -527,7 +527,11 @@ export function priceJobWorkReceipt(opts: {
   const askedReturn = new Map<string, number>();
   for (const c of opts.consumed || []) {
     const q = Number(c.qty);
-    if (c.itemId && Number.isFinite(q) && q > 0) askedConsume.set(c.itemId, round6(q));
+    // Zero is a real answer here, not a missing one: "the worker burnt none of
+    // this material" has to be distinguishable from "say nothing and let the
+    // standard decide", or a line the operator deliberately zeroed would
+    // silently fall back to consuming the whole balance.
+    if (c.itemId && Number.isFinite(q) && q >= 0) askedConsume.set(c.itemId, round6(q));
   }
   for (const r of opts.returned || []) {
     const q = Number(r.qty);
