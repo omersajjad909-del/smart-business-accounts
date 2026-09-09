@@ -70,7 +70,7 @@ export async function GET(req: NextRequest) {
     const record = await prisma.businessRecord.findFirst({
       where: { id: challanId, companyId, category: JOB_WORK_CATEGORIES.CHALLAN },
     });
-    if (!record) return NextResponse.json({ error: "Challan nahi mila" }, { status: 404 });
+    if (!record) return NextResponse.json({ error: "Challan not found" }, { status: 404 });
 
     const challan = readChallan(record);
     const priced = priceJobWorkReceipt({

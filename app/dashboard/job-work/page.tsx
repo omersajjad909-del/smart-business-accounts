@@ -594,7 +594,7 @@ function IssueTab({
             <label style={label}>From (your godown)</label>
             <input style={input} value={sourceLocation} onChange={(e) => setSourceLocation(e.target.value)} />
             <div style={{ fontSize: 11, color: dim, marginTop: 4, lineHeight: 1.45 }}>
-              Your own store. The job worker's location is not something you create —
+              Your own store. The job worker&apos;s location is not something you create —
               {worker ? <span style={{ color: teal }}> {worker.jobLocation}</span> : " JW:CODE"} is made for you.
             </div>
           </div>
@@ -980,7 +980,7 @@ function LedgerTab({ ledger }: { ledger: { workers: LedgerWorker[]; totalValue: 
           </div>
         </div>
         <div style={{ fontSize: 12.5, color: dim, maxWidth: 460, lineHeight: 1.55 }}>
-          This is your current asset, not the job worker's. It should agree with account <b style={{ color: "#fff" }}>1204 Stock at Job Worker</b> on the balance sheet.
+          This is your current asset, not the job worker&apos;s. It should agree with account <b style={{ color: "#fff" }}>1204 Stock at Job Worker</b> on the balance sheet.
         </div>
       </div>
 
