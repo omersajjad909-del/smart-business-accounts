@@ -292,6 +292,13 @@ export default function DashboardLayout({
   // for the link to go away. Defaults to false, so a failed lookup shows the
   // link rather than hiding a page nobody can then find.
   const [rateFormulaHidden, setRateFormulaHidden] = useState(false);
+  // Job Work is still under test and must not appear for a demo sandbox or a
+  // real customer. The answer comes from the server rather than from a plan
+  // flag or business type, because /api/job-work/status is the same authority
+  // every job-work endpoint enforces — a link that shows here can never point
+  // at a page whose API would refuse the company. Defaults to false: a failed
+  // lookup hides the link, which is the safe direction for an unreleased page.
+  const [jobWorkEnabled, setJobWorkEnabled] = useState(false);
   const [userAvatar, setUserAvatar] = useState<string | null>(null);
   const [avatarUploading, setAvatarUploading] = useState(false);
   const [branches, setBranches] = useState<Branch[]>([]);
@@ -377,6 +384,21 @@ export default function DashboardLayout({
     }
   }
 
+
+  useEffect(() => {
+    let cancelled = false;
+    fetch("/api/job-work/status", { cache: "no-store" })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => {
+        if (!cancelled) setJobWorkEnabled(d?.enabled === true);
+      })
+      .catch(() => {
+        /* Unreleased page — staying hidden is the right failure. */
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -1696,6 +1718,23 @@ export default function DashboardLayout({
               {hasDashboardFeature("MANUFACTURING_FINISHED_GOODS") && <NavLink href="/dashboard/manufacturing/finished-goods" pathname={pathname}>Finished Goods</NavLink>}
               {hasDashboardFeature("MANUFACTURING_WASTAGE") && <NavLink href="/dashboard/manufacturing/wastage" pathname={pathname}>Wastage</NavLink>}
               {hasDashboardFeature("MANUFACTURING_QUALITY") && <NavLink href="/dashboard/manufacturing/quality" pathname={pathname}>Quality Control</NavLink>}
+            </NavGroup>
+          )}
+          {/* Job Work — material sent out to a thekedar and the pieces that come
+              back. Its own group rather than a Manufacturing sub-item on purpose:
+              the Manufacturing group only renders for a business type that has
+              the "bom" module, and a merchant manufacturer who owns no machines
+              is usually set up as trading — which would have hidden the page from
+              exactly the company it was built for. Gated purely on the server's
+              own answer, so it exists only inside an internal test workspace. */}
+          {jobWorkEnabled && (
+            <NavGroup
+              title="Job Work"
+              icon={<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 7l9-4 9 4v10l-9 4-9-4z"/><path d="M3 7l9 4 9-4"/><line x1="12" y1="11" x2="12" y2="21"/></svg>}
+              open={openSection === "jobwork"}
+              onToggle={() => toggle("jobwork")}
+            >
+              <NavLink href="/dashboard/job-work" pathname={pathname}>Thekedar / Job Work</NavLink>
             </NavGroup>
           )}
           {/* Its own group rather than a Manufacturing sub-item, but the two
