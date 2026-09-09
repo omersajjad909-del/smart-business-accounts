@@ -369,9 +369,11 @@ export async function requireAdmin(
   if (Number(payload.tv ?? 0) !== account.tokenVersion) {
     return deny(401, "Session revoked — please sign in again");
   }
-  if (!account.totpEnabled) {
-    return deny(403, "Two-factor authentication must be set up before continuing");
-  }
+  // Two-factor is no longer part of admin sign-in — the password alone mints
+  // the session (see app/api/admin/auth/login). This guard used to lock out
+  // every account that had not enrolled an authenticator, which would now be
+  // all of them. `payload.otp` above stays: it is what separates a real admin
+  // token from the short-lived pre-auth one, and mintAdminToken still sets it.
 
   const ctx: AdminContext = {
     id: account.id,

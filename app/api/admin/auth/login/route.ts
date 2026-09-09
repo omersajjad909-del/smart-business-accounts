@@ -1,13 +1,17 @@
 /**
- * POST /api/admin/auth/login  — step 1 of 2.
+ * POST /api/admin/auth/login — the whole sign-in, in one step.
  *
- * Verifying the password no longer signs anyone in. It mints a short-lived,
- * OTP-pending cookie and tells the client which step comes next:
+ * A correct password mints the `sb_admin` session directly. There is no OTP
+ * step: two-factor was removed from the admin console at the owner's request,
+ * because it was being re-entered many times a day.
  *
- *   { step: "enrol" }  first login — scan the QR at /api/admin/auth/2fa/setup
- *   { step: "otp"   }  authenticator already enrolled — enter the 6-digit code
+ * What still stands between this endpoint and an attacker: per-IP and
+ * per-email rate limits, per-account lockout after repeated failures, constant
+ * response time on unknown accounts, and a session that dies with the browser.
  *
- * The full `sb_admin` session is only ever minted by /api/admin/auth/2fa/verify.
+ * The /api/admin/auth/2fa/* endpoints are still present but unreachable —
+ * they only accept the pre-auth cookie, which nothing mints any more. Putting
+ * the OTP step back means restoring the pending-token branch below.
  */
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
@@ -16,8 +20,8 @@ import { rateLimitAsync } from "@/lib/rateLimit";
 import {
   findAdminByEmail,
   logAdminAuthEvent,
-  mintAdminPendingToken,
-  setAdminPendingCookie,
+  mintAdminToken,
+  setAdminCookie,
 } from "@/lib/adminAuth";
 
 export const runtime = "nodejs";
@@ -113,23 +117,44 @@ export async function POST(req: NextRequest) {
 
     await clearFailures(account.id, account.source);
 
-    const needsEnrolment = !account.totpEnabled;
-    const pending = mintAdminPendingToken({
+    const token = mintAdminToken({
       id: account.id,
       email: account.email,
       name: account.name,
       isSuperAdmin: account.isSuperAdmin,
       source: account.source,
       tokenVersion: account.tokenVersion,
-      enrol: needsEnrolment,
     });
+
+    // `lastLoginAt` used to be stamped by the OTP step, which no longer runs.
+    // Losing it would leave the admin list showing every team member as having
+    // never signed in.
+    if (account.source === "team") {
+      try {
+        await (prisma as any).adminUser.update({
+          where: { id: account.id },
+          data: { lastLoginAt: new Date() },
+        });
+      } catch {
+        // A missing column must not cost somebody their session.
+      }
+    }
 
     const res = NextResponse.json({
       success: true,
-      step: needsEnrolment ? "enrol" : "otp",
-      email: account.email,
+      step: "done",
+      user: {
+        id: account.id,
+        name: account.name,
+        email: account.email,
+        role: "ADMIN",
+        isSuperAdmin: account.isSuperAdmin,
+        allowedPages: account.allowedPages,
+        source: account.source,
+      },
     });
-    setAdminPendingCookie(res, pending);
+    setAdminCookie(res, token);
+    await logAdminAuthEvent({ email: account.email, action: "LOGIN_SUCCESS", ip, userAgent, adminId: account.id });
     return res;
   } catch {
     return NextResponse.json({ message: "Internal server error" }, { status: 500 });
