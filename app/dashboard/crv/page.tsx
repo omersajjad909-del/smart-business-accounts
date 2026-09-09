@@ -88,7 +88,7 @@ function printReceipt(entry: EntryRow, voucherNo: string, date: string, mode: st
     .no-print button{background:#111;color:#fff;border:none;padding:8px 14px;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;box-shadow:0 4px 12px rgba(0,0,0,.2)}
     @media print{.no-print{display:none}}
   </style></head><body>
-  <div class="no-print"><button onclick="window.print()">🖨 Print / PDF</button></div>
+  <div class="no-print"><button id="print-btn">🖨 Print / PDF</button></div>
   <div class="center bold" style="font-size:15px">${co}</div>
   <div class="center" style="font-size:10px;letter-spacing:1px">CASH RECEIPT</div>
   <div class="line"></div>
@@ -101,8 +101,14 @@ function printReceipt(entry: EntryRow, voucherNo: string, date: string, mode: st
   <div class="line"></div>
   ${entry.narration ? `<div style="font-size:11px;margin-top:6px">Narration: ${entry.narration}</div>` : ""}
   <div style="margin-top:20px;text-align:center;font-size:9px">Powered by FinovaOS</div>
-  <script>window.print();<\/script></body></html>`);
+  </body></html>`);
   w.document.close();
+  // about:blank inherits this page's CSP, so an inline onclick/<script> here is
+  // silently blocked. Wiring the print from this already-trusted script instead
+  // isn't a "script element" under script-src, so it actually runs.
+  w.document.getElementById("print-btn")?.addEventListener("click", () => w.print());
+  w.focus();
+  w.print();
 }
 
 function printVoucher(entries: EntryRow[], voucherNo: string, date: string, mode: string, totalAmt: number, company: any, narration: string) {
@@ -126,7 +132,7 @@ function printVoucher(entries: EntryRow[], voucherNo: string, date: string, mode
     .no-print button{background:#111;color:#fff;border:none;padding:10px 18px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;box-shadow:0 4px 12px rgba(0,0,0,.2)}
     @media print{body{padding:8mm}.no-print{display:none}}
   </style></head><body>
-  <div class="no-print"><button onclick="window.print()">🖨 Print / Save as PDF</button></div>
+  <div class="no-print"><button id="print-btn">🖨 Print / Save as PDF</button></div>
   <div class="hdr">
     <div><div class="co">${co}</div><div style="font-size:10px;color:#666;letter-spacing:2px">INTERNAL ACCOUNTING VOUCHER</div></div>
     <div><div class="rh">CASH RECEIPT VOUCHER</div>
@@ -147,8 +153,14 @@ function printVoucher(entries: EntryRow[], voucherNo: string, date: string, mode
   ${narration ? `<div style="margin-top:14px;padding:10px;background:#f9fafb;border:1px solid #e5e7eb;font-size:12px"><b>Narration:</b> ${narration}</div>` : ""}
   <div class="sigs"><div class="sig">Prepared By</div><div class="sig">Reviewed By</div><div class="sig">Approved By</div></div>
   <div style="margin-top:20px;text-align:center;font-size:9px;color:#aaa;border-top:1px solid #eee;padding-top:8px">Auto-generated — FinovaOS — ${new Date().toLocaleString()}</div>
-  <script>window.print();<\/script></body></html>`);
+  </body></html>`);
   w.document.close();
+  // about:blank inherits this page's CSP, so an inline onclick/<script> here is
+  // silently blocked. Wiring the print from this already-trusted script instead
+  // isn't a "script element" under script-src, so it actually runs.
+  w.document.getElementById("print-btn")?.addEventListener("click", () => w.print());
+  w.focus();
+  w.print();
 }
 
 export default function CRVPage() {

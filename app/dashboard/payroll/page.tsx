@@ -219,7 +219,7 @@ export default function PayrollPage() {
         .no-print{display:none}
       }
     </style></head><body>
-    <div class="no-print"><button onclick="window.print()">🖨 Print / Save as PDF</button></div>
+    <div class="no-print"><button id="print-btn">🖨 Print / Save as PDF</button></div>
     <div style="text-align:center;margin-bottom:30px;border-bottom:2px solid #000;padding-bottom:10px">
     ${companyName ? `<div style="font-weight:bold;font-size:1.15em;margin-bottom:6px">${companyName}</div>` : ""}
     <h1 style="margin:0">Payslip</h1><p style="margin:4px 0 0">Period: ${p.monthYear}</p></div>
@@ -242,7 +242,14 @@ export default function PayrollPage() {
     </div>
     <div class="footer"><p>System Generated Payslip</p></div>
     <div style="margin-top:32px;border-top:1px solid #eee;padding-top:8px;text-align:center;font-size:10px;color:#000">Powered by FinovaOS</div>
-    <script>window.print();</script></body></html>`;
+    </body></html>`;
+    // innerHTML never executes embedded <script> tags, and about:blank inherits
+    // this page's CSP anyway — so neither the auto-print nor the button's inline
+    // onclick ever ran. Wiring the print from this already-trusted script
+    // instead isn't a "script element" under script-src, so it actually runs.
+    w.document.getElementById("print-btn")?.addEventListener("click", () => w.print());
+    w.focus();
+    w.print();
   }
 
   const totalBasic   = payroll.reduce((s, p) => s + p.baseSalary, 0);
