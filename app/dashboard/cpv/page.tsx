@@ -94,7 +94,7 @@ function printVoucher(entries: EntryRow[], voucherNo: string, date: string, mode
     .no-print button{background:#111;color:#fff;border:none;padding:10px 18px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;box-shadow:0 4px 12px rgba(0,0,0,.2)}
     @media print{body{padding:8mm}.no-print{display:none}}
   </style></head><body>
-  <div class="no-print"><button onclick="window.print()">🖨 Print / Save as PDF</button></div>
+  <div class="no-print"><button id="print-btn">🖨 Print / Save as PDF</button></div>
   <div class="hdr">
     <div><div class="co">${co}</div><div style="font-size:10px;color:#666;letter-spacing:2px">INTERNAL ACCOUNTING VOUCHER</div></div>
     <div><div class="rh">CASH PAYMENT VOUCHER</div>
@@ -111,8 +111,16 @@ function printVoucher(entries: EntryRow[], voucherNo: string, date: string, mode
   ${narration ? `<div style="margin-top:14px;padding:10px;background:#f9fafb;border:1px solid #e5e7eb;font-size:12px"><b>Narration:</b> ${narration}</div>` : ""}
   <div class="sigs"><div class="sig">Prepared By</div><div class="sig">Reviewed By</div><div class="sig">Approved By</div></div>
   <div style="margin-top:20px;text-align:center;font-size:9px;color:#aaa;border-top:1px solid #eee;padding-top:8px">Auto-generated — FinovaOS — ${new Date().toLocaleString()}</div>
-  <script>window.print();<\/script></body></html>`);
+  </body></html>`);
   w.document.close();
+  // about:blank popups inherit this page's CSP, which has no nonce for markup
+  // written in here — an inline onclick or <script> tag is silently blocked, so
+  // both the button and an auto-print used to do nothing. Wiring the print call
+  // from this already-trusted script instead isn't a "script element" under
+  // script-src, so it runs.
+  w.document.getElementById("print-btn")?.addEventListener("click", () => w.print());
+  w.focus();
+  w.print();
 }
 
 export default function CPVPage() {
