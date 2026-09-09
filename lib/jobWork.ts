@@ -523,7 +523,6 @@ export function priceJobWorkReceipt(opts: {
     throw new JobWorkError("Receive ki gayi quantity sifar se zyada honi chahiye");
   }
 
-  const byItem = new Map(opts.challan.lines.map((l) => [l.itemId, l]));
   const askedConsume = new Map<string, number>();
   const askedReturn = new Map<string, number>();
   for (const c of opts.consumed || []) {
