@@ -1,15 +1,15 @@
 "use client";
 
 /**
- * Admin sign-in — two steps, always.
+ * Admin sign-in — email + password, straight in.
  *
- *   1. email + password  →  /api/admin/auth/login
- *   2. 6-digit authenticator code  →  /api/admin/auth/2fa/verify
+ * Two-factor was removed at the owner's request: it was being re-entered many
+ * times a day. /api/admin/auth/login now mints the session itself.
  *
- * An account with no authenticator yet is sent through enrolment between the
- * two: it shows a QR code once, and the same 6-digit field completes both the
- * enrolment and the sign-in. There is no way to skip step 2 — the password
- * step only returns a 5-minute pre-auth cookie, never a session.
+ * The enrolment and code screens below are still here but unreachable — `step`
+ * never leaves "password". They are kept rather than deleted so putting OTP
+ * back is a matter of restoring the two-step branch in submitPassword, not
+ * rebuilding the UI.
  */
 
 import { useCallback, useEffect, useRef, useState } from "react";
