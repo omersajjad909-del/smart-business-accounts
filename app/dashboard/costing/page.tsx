@@ -37,6 +37,7 @@ import {
   type FormulaOutput,
   type FormulaRun,
 } from "@/lib/formulaEngine";
+import { buildJobWorkSeed, jobWorkHrefFrom, planIssue } from "@/lib/jobWorkSeed";
 
 const CARD = "rgba(255,255,255,.03)";
 const BORDER = "rgba(255,255,255,.09)";
@@ -190,6 +191,23 @@ function CostingInner() {
   // job costs, decided per quote rather than baked into the costing itself.
   const [profitMode, setProfitMode] = useState<"amount" | "percent">("percent");
   const [profitValue, setProfitValue] = useState<number>(0);
+  // Job work is still gated to internal test workspaces, so the second button
+  // asks the same authority the module itself enforces rather than guessing
+  // from a plan flag or business type. False until told otherwise — an
+  // unreleased path staying hidden is the safe failure.
+  const [jobWorkEnabled, setJobWorkEnabled] = useState(false);
+  useEffect(() => {
+    let cancelled = false;
+    fetch("/api/job-work/status", { cache: "no-store" })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => {
+        if (!cancelled) setJobWorkEnabled(d?.enabled === true);
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const formulas = useMemo(
     () => formulaStore.records.map((r) => ({ id: r.id, formula: toFormula(r) })),
@@ -366,6 +384,24 @@ function CostingInner() {
     }
     return `/dashboard/manufacturing/bom?${qs.toString()}`;
   }, [selected, bomSeed]);
+
+  /**
+   * The same run, read for the other road.
+   *
+   * A merchant manufacturer owns no machines, so "Create BOM" leads nowhere for
+   * them — but the costing is identical, and so is the arithmetic underneath.
+   * What differs is only where the material goes next.
+   */
+  const jobWorkSeed = useMemo(
+    () => (selected ? buildJobWorkSeed(selected.id, selected.formula, run) : null),
+    [selected, run],
+  );
+  const jobWorkHref = useMemo(() => jobWorkHrefFrom(jobWorkSeed), [jobWorkSeed]);
+  /** What this run means in whole rolls, shown so the split is visible up front. */
+  const jobWorkPlan = useMemo(
+    () => planIssue(jobWorkSeed?.stdPerPc ?? null, jobWorkSeed?.orderQty ?? 0),
+    [jobWorkSeed],
+  );
 
   /** One field, whether it holds a single number or a list of sizes. */
   const field = (inp: FormulaInput) => (
@@ -649,6 +685,42 @@ function CostingInner() {
                     Create BOM →
                   </Link>
                 </div>
+
+                {/* The second road. Same formula, same numbers — the work simply
+                    happens on somebody else's machines, so the material goes out
+                    on a challan instead of into a production order. Shown only
+                    where job work is switched on; a company that does everything
+                    in-house never sees a choice it does not have. */}
+                {jobWorkEnabled && jobWorkSeed && (
+                  <div style={{ marginTop: 16, paddingTop: 16, borderTop: `1px solid ${BORDER}` }}>
+                    <div className="cxSectionHead">
+                      <div>
+                        <div style={{ fontSize: 14, fontWeight: 700 }}>Get it made outside</div>
+                        <div style={{ fontSize: 12, color: "rgba(255,255,255,.35)", marginTop: 3, maxWidth: 480 }}>
+                          No machines of your own? Opens Job Work → Issue Challan with the standard
+                          this formula worked out already filled in — so consumption is never typed
+                          in by hand. Pick the job worker and the material there.
+                        </div>
+                        {jobWorkSeed.stdPerPc != null && (
+                          <div style={{ fontFamily: MONO, fontSize: 11.5, color: "rgba(255,255,255,.45)", marginTop: 9, lineHeight: 1.7 }}>
+                            {jobWorkSeed.unitsPerBatch != null && (
+                              <>1 batch = {Math.round(jobWorkSeed.unitsPerBatch * 100) / 100} pcs · std/pc = {jobWorkSeed.stdPerPc}<br /></>
+                            )}
+                            {jobWorkPlan && (
+                              <>
+                                needs {jobWorkPlan.needed} · issue {jobWorkPlan.toIssue} whole ·{" "}
+                                <span style={{ color: "#5eead4" }}>{jobWorkPlan.leftover} left over, not waste</span>
+                              </>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                      <Link href={jobWorkHref} style={{ ...btn(false), textDecoration: "none", display: "inline-flex", alignItems: "center" }}>
+                        Create with Job Worker →
+                      </Link>
+                    </div>
+                  </div>
+                )}
               </div>
             )}
           </div>

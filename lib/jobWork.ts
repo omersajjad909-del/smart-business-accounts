@@ -172,6 +172,28 @@ export type JobWorkChallanLine = {
   returnedQty: number;
 };
 
+/**
+ * What the costing formula said, stamped on the challan at issue time.
+ *
+ * Stamped rather than referenced, exactly as a costing sheet stamps its own
+ * version: the formula can be corrected next week without rewriting what this
+ * job was raised against. It is what the receipt compares reality to — and
+ * without it, "how much should this have taken?" has no answer six months on.
+ */
+export type ChallanFormula = {
+  formulaId: string;
+  formulaName: string;
+  formulaVersion: number;
+  stdPerPc: number | null;
+  unitsPerBatch: number | null;
+  costPerUnit: number | null;
+  wastePerBatch: number | null;
+  /** Exact material the job needs — 12.6, fractional on purpose. */
+  expectedNeeded: number | null;
+  /** Part of the last whole unit the job never touches — 0.4. Stock, not scrap. */
+  expectedLeftover: number | null;
+};
+
 export type JobWorkChallan = {
   id: string;
   challanNo: string;
@@ -192,6 +214,8 @@ export type JobWorkChallan = {
   lines: JobWorkChallanLine[];
   /** Value of material still lying with the worker under this challan. */
   balanceValue: number;
+  /** What the costing formula said, when this challan came from one. */
+  formula: ChallanFormula | null;
 };
 
 /* ─────────────────────────── Reading ─────────────────────────── */
@@ -211,6 +235,27 @@ function lineOf(raw: unknown): JobWorkChallanLine | null {
     ...(Number.isFinite(standard) && standard > 0 ? { standardPerPc: standard } : {}),
     consumedQty: Number(l.consumedQty) || 0,
     returnedQty: Number(l.returnedQty) || 0,
+  };
+}
+
+function readChallanFormula(raw: unknown): ChallanFormula | null {
+  const f = (raw ?? {}) as Record<string, unknown>;
+  const formulaId = String(f.formulaId || "").trim();
+  if (!formulaId) return null;
+  const num = (v: unknown) => {
+    const n = Number(v);
+    return Number.isFinite(n) ? n : null;
+  };
+  return {
+    formulaId,
+    formulaName: String(f.formulaName || ""),
+    formulaVersion: num(f.formulaVersion) ?? 1,
+    stdPerPc: num(f.stdPerPc),
+    unitsPerBatch: num(f.unitsPerBatch),
+    costPerUnit: num(f.costPerUnit),
+    wastePerBatch: num(f.wastePerBatch),
+    expectedNeeded: num(f.expectedNeeded),
+    expectedLeftover: num(f.expectedLeftover),
   };
 }
 
@@ -250,6 +295,7 @@ export function readChallan(record: {
     notes: String(d.notes || ""),
     lines,
     balanceValue,
+    formula: readChallanFormula(d.formula),
   };
 }
 
@@ -283,6 +329,11 @@ export async function issueToJobWorker(opts: {
   ratePerPc?: number;
   allowedWastagePct?: number;
   notes?: string;
+  /**
+   * What the costing formula worked out, when the challan came from one.
+   * Stamped onto the record so the receipt can hold reality against it.
+   */
+  formula?: Partial<ChallanFormula> | null;
   /** Send anyway when the warehouse is short — the shortfall shows as negative stock. */
   allowNegativeStock?: boolean;
 }): Promise<IssueResult> {
@@ -457,6 +508,7 @@ export async function issueToJobWorker(opts: {
                 : Number(workerData.allowedWastagePct) || 0,
             notes: String(opts.notes || "").slice(0, 500),
             issueVoucherNo: voucherNo,
+            formula: opts.formula?.formulaId ? opts.formula : null,
             lines,
           },
         },
