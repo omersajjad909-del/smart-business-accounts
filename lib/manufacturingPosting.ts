@@ -104,6 +104,12 @@ export const COST_BEARING_INBOUND_TYPES = [
   "GRN",
   "PRODUCTION_RECEIPT",
   "OPENING",
+  // Finished pieces back from a thekedar, valued at material + his charge +
+  // freight — a real cost, exactly like a production receipt. Its counterpart
+  // JOB_ISSUE_IN is deliberately absent: moving material to a job worker is a
+  // transfer, not a purchase, and averaging it in would count the same rolls
+  // twice. See lib/jobWork.ts.
+  "JOB_RECEIPT",
 ] as const;
 
 export type BomLine = {
