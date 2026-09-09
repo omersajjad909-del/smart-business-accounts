@@ -6,11 +6,19 @@ export const runtime = "nodejs";
 export const maxDuration = 60;
 
 /**
- * Cron: every 10 minutes.
+ * Cron: once a day (see vercel.json).
  *
  * Most visitors close the tab instead of pressing "End demo", so nothing else
  * ever cleans those sandboxes up. This is the sweep that actually keeps the
  * database from filling with abandoned demo companies.
+ *
+ * Daily is not the frequency this wants — ten minutes is — but a Hobby account
+ * may only run daily crons, and Vercel rejects the whole deployment rather
+ * than quietly slowing a shorter schedule down. Nothing breaks in between: a
+ * sandbox built by an older seed can no longer be handed to a visitor (see
+ * claimIdleSandbox), so a stale shelf falls through to a fresh seed instead of
+ * serving stale data. Expired companies simply linger until the next sweep.
+ * Put it back on a ten-minute schedule if this account moves to Pro.
  */
 export async function GET(req: NextRequest) {
   if (req.headers.get("authorization") !== `Bearer ${process.env.CRON_SECRET}`) {
@@ -45,5 +53,21 @@ export async function GET(req: NextRequest) {
     prisma.company.count({ where: { isDemo: true, demoExpiresAt: null } }),
   ]);
 
-  return NextResponse.json({ swept, failed, bookingsClosed, prewarm, remaining, idle });
+  // A shelf that refuses to fill is reported as a number and nothing else, so
+  // the one person who could fix it is left reading "failed: 16". The reasons
+  // are logged now (see recordDemoFailure) and this endpoint already sits
+  // behind CRON_SECRET, so it is the right place to hand them back.
+  const failures =
+    prewarm.failed > 0
+      ? (
+          await prisma.activityLog.findMany({
+            where: { action: "DEMO_SANDBOX_FAILED" },
+            orderBy: { createdAt: "desc" },
+            take: 3,
+            select: { details: true },
+          })
+        ).map((row) => row.details)
+      : [];
+
+  return NextResponse.json({ swept, failed, bookingsClosed, prewarm, failures, remaining, idle });
 }

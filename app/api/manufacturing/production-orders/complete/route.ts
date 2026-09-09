@@ -118,10 +118,14 @@ export async function POST(req: NextRequest) {
       // Named workers for this run — see lib/manufacturingPosting.ts.
       labourAssignments: Array.isArray(body.labourAssignments)
         ? body.labourAssignments
-            .map((a: { labourId?: unknown; qty?: unknown; rate?: unknown }) => ({
+            .map((a: { labourId?: unknown; qty?: unknown; rate?: unknown; operation?: unknown }) => ({
               labourId: String(a?.labourId || ""),
               qty: Number(a?.qty),
               rate: Number(a?.rate),
+              // Which job on the line this row paid for. Free text — every
+              // trade names its own steps — but short enough to read on a
+              // voucher narration.
+              operation: String(a?.operation || "").trim().slice(0, 40),
             }))
             .filter((a: { labourId: string; qty: number; rate: number }) => a.labourId && a.qty > 0 && a.rate >= 0)
         : undefined,

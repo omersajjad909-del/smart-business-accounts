@@ -18,7 +18,7 @@ const statusColor: Record<string, string> = { planned: "#818cf8", in_progress: "
 type ProductionOrder = ReturnType<typeof mapProductionOrderRecord>;
 
 type Labour = { id: string; name: string; code: string; ratePerUnit: number };
-type LabourRow = { labourId: string; qty: string; rate: string };
+type LabourRow = { labourId: string; operation: string; qty: string; rate: string };
 
 export default function ProductionOrdersPage() {
   const { isMobile } = useResponsive();
@@ -77,27 +77,62 @@ export default function ProductionOrdersPage() {
   /**
    * The dialog asks for two different quantities and they are easy to confuse:
    * "Units finished in this run" is what the order gets credited with, while a
-   * worker row is only the pieces that worker was paid for. Several workers
-   * usually split one run between them (2,500 pieces each toward a 5,000-piece
-   * day), so what should equal the run is the total across every row — not any
-   * single row. Entering the day's output against one worker and leaving the
-   * run at the order's full remainder books the whole order as made while
-   * paying for part of it — the order closes and the unmade pieces are never
-   * produced again.
+   * worker row is only the pieces that worker was paid for. Entering the day's
+   * output against one worker and leaving the run at the order's full remainder
+   * books the whole order as made while paying for part of it — the order
+   * closes and the unmade pieces are never produced again. So the pieces have
+   * to add up to the run.
+   *
+   * They add up *per job*, not across the whole list. The same bags pass
+   * through several hands on the way out — cut and sealed by two people, then
+   * buttoned by two more, then cleaned and packed — and every one of those
+   * hands is paid for all 10,000 pieces. Summing every row against the run was
+   * why that could not be recorded: four rows of 5,000 on a 10,000 run read as
+   * 20,000 and locked the button, which pushed the whole trade into inventing a
+   * half-finished item and a second production order for what is one order and
+   * one product. Each job is checked on its own now; rows with no job named are
+   * one group between them, which is exactly the old behaviour.
    */
   const labourPieces = useMemo(() => {
     const rows = labourRows.filter((r) => r.labourId && Number(r.qty) > 0);
     if (!rows.length) return null;
-    const total = rows.reduce((sum, r) => sum + Number(r.qty), 0);
+    const byOperation = new Map<string, number>();
+    for (const row of rows) {
+      const key = row.operation.trim() || "Labour";
+      byOperation.set(key, (byOperation.get(key) || 0) + Number(row.qty));
+    }
+    const groups = Array.from(byOperation, ([operation, total]) => ({ operation, total }));
     return {
-      total,
-      over: total > runQty,
-      under: total < runQty,
+      groups,
+      over: groups.filter((g) => g.total > runQty),
+      under: groups.filter((g) => g.total < runQty),
+      /** Only one job on this run — the "set the run to what was made" shortcut still makes sense. */
+      soleTotal: groups.length === 1 ? groups[0].total : null,
     };
   }, [labourRows, runQty]);
 
+  const labourBlocked = (labourPieces?.over.length ?? 0) > 0 || (labourPieces?.under.length ?? 0) > 0;
+
+  /**
+   * The jobs this company has actually paid for before, offered as you type.
+   * Every trade names its own steps, so nothing is hardcoded — the list builds
+   * itself out of the runs already completed.
+   */
+  const operationSuggestions = useMemo(() => {
+    const seen = new Set<string>();
+    for (const record of orderStore.records) {
+      const last = (record.data as { lastRunLabour?: { operation?: unknown }[] } | undefined)?.lastRunLabour;
+      if (!Array.isArray(last)) continue;
+      for (const assignment of last) {
+        const operation = String(assignment?.operation || "").trim();
+        if (operation) seen.add(operation);
+      }
+    }
+    return Array.from(seen).sort((a, b) => a.localeCompare(b));
+  }, [orderStore.records]);
+
   function addLabourRow() {
-    setLabourRows((rows) => [...rows, { labourId: "", qty: "", rate: "" }]);
+    setLabourRows((rows) => [...rows, { labourId: "", operation: "", qty: "", rate: "" }]);
   }
 
   function setLabourRow(index: number, patch: Partial<LabourRow>) {
@@ -203,7 +238,7 @@ export default function ProductionOrdersPage() {
     try {
       const labourAssignments = labourRows
         .filter((r) => r.labourId && Number(r.qty) > 0 && Number(r.rate) >= 0)
-        .map((r) => ({ labourId: r.labourId, qty: Number(r.qty), rate: Number(r.rate) }));
+        .map((r) => ({ labourId: r.labourId, qty: Number(r.qty), rate: Number(r.rate), operation: r.operation.trim() }));
       const res = await fetch("/api/manufacturing/production-orders/complete", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -516,7 +551,7 @@ export default function ProductionOrdersPage() {
                   )}
                   <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                     {labourRows.map((row, index) => (
-                      <div key={index} style={{ display: "grid", gridTemplateColumns: "1fr 90px 100px 28px", gap: 8, alignItems: "center" }}>
+                      <div key={index} style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr 1fr" : "1fr 1fr 84px 92px 28px", gap: 8, alignItems: "center" }}>
                         <select
                           value={row.labourId}
                           onChange={(e) => {
@@ -528,47 +563,61 @@ export default function ProductionOrdersPage() {
                           <option value="">— Worker —</option>
                           {labourList.map((l) => <option key={l.id} value={l.id}>{l.name}</option>)}
                         </select>
+                        <input
+                          list="production-operations"
+                          placeholder="Job — e.g. Button"
+                          value={row.operation}
+                          onChange={(e) => setLabourRow(index, { operation: e.target.value })}
+                          style={{ background: bg, border: `1px solid ${border}`, borderRadius: 8, padding: "8px 10px", color: "#fff", fontSize: 12.5 }}
+                        />
                         <input type="number" min={0} step="any" placeholder="Pcs" value={row.qty} onChange={(e) => setLabourRow(index, { qty: e.target.value })} style={{ background: bg, border: `1px solid ${border}`, borderRadius: 8, padding: "8px 10px", color: "#fff", fontSize: 12.5 }} />
                         <input type="number" min={0} step="any" placeholder="Rate/pc" value={row.rate} onChange={(e) => setLabourRow(index, { rate: e.target.value })} style={{ background: bg, border: `1px solid ${border}`, borderRadius: 8, padding: "8px 10px", color: "#fff", fontSize: 12.5 }} />
-                        <button onClick={() => removeLabourRow(index)} title="Remove" style={{ background: "transparent", border: `1px solid ${border}`, borderRadius: 8, color: "rgba(255,255,255,.45)", cursor: "pointer", padding: "7px 0" }}>×</button>
+                        <button onClick={() => removeLabourRow(index)} title="Remove" style={{ background: "transparent", border: `1px solid ${border}`, borderRadius: 8, color: "rgba(255,255,255,.45)", cursor: "pointer", padding: "7px 0", gridColumn: isMobile ? "1 / -1" : "auto" }}>×</button>
                       </div>
                     ))}
                   </div>
+                  <datalist id="production-operations">
+                    {operationSuggestions.map((operation) => <option key={operation} value={operation} />)}
+                  </datalist>
                   <button onClick={addLabourRow} style={{ marginTop: 8, padding: "6px 12px", borderRadius: 8, background: "rgba(255,255,255,.05)", border: `1px solid ${border}`, color: "rgba(255,255,255,.65)", fontSize: 11.5, fontWeight: 600, cursor: "pointer" }}>
                     + Add worker
                   </button>
-                  <div style={{ fontSize: 11, color: "rgba(255,255,255,.32)", marginTop: 8 }}>
-                    Assigning workers here charges what's actually owed to each of them instead of the BOM's flat labour estimate below.
+                  <div style={{ fontSize: 11, color: "rgba(255,255,255,.32)", marginTop: 8, lineHeight: 1.7 }}>
+                    Assigning workers here charges what&apos;s actually owed to each of them instead of the BOM&apos;s flat labour estimate below.
+                    Name the job each row is for — cutting, button, packing — and the same pieces can go through every job on this one run.
+                    Each job&apos;s pieces have to add up to the run on their own.
                   </div>
                 </div>
 
-                {/* The two quantities disagree — say so before the order closes. */}
-                {labourPieces?.under && (
+                {/* A job's pieces disagree with the run — say so before the order closes. */}
+                {labourPieces && labourPieces.under.length > 0 && (
                   <div style={{ padding: "12px 14px", borderRadius: 12, background: "rgba(251,191,36,.1)", border: "1px solid rgba(251,191,36,.3)", marginBottom: 14 }}>
                     <div style={{ fontSize: 12.5, color: "#fbbf24", fontWeight: 700, marginBottom: 5 }}>
-                      This run finishes {runQty.toLocaleString()} pieces, but workers are paid for {labourPieces.total.toLocaleString()} in total
+                      This run finishes {runQty.toLocaleString()} pieces, but {labourPieces.under.map((g) => `${g.operation} is paid for ${g.total.toLocaleString()}`).join("; ")}
                     </div>
                     <div style={{ fontSize: 11.5, color: "rgba(255,255,255,.5)", lineHeight: 1.7 }}>
-                      Confirm is blocked until this matches — {runQty.toLocaleString()} would be received into
+                      Confirm is blocked until every job adds up to {runQty.toLocaleString()} — that is what would be received into
                       finished goods and charged to this order
                       {runOrder.quantity > 0 && runQty >= runOrder.quantity - runOrder.completed
                         ? ", which closes it — the balance could never be produced against it again"
-                        : ""}
-                      {" "}while workers are only paid for {labourPieces.total.toLocaleString()} pieces combined.
-                      {" "}If only {labourPieces.total.toLocaleString()} were made, set the run to that; if the full {runQty.toLocaleString()} were made, add or raise worker rows until their pieces add up to it.
+                        : ""}.
+                      {" "}Add the workers who did the rest of that job, or lower the run to what was really finished.
                     </div>
-                    <button
-                      onClick={() => { setRunQty(labourPieces.total); requote(labourPieces.total); }}
-                      style={{ marginTop: 9, padding: "6px 12px", borderRadius: 8, background: "rgba(251,191,36,.16)", border: "1px solid rgba(251,191,36,.4)", color: "#fcd34d", fontSize: 11.5, fontWeight: 700, cursor: "pointer" }}
-                    >
-                      Set run to {labourPieces.total.toLocaleString()}
-                    </button>
+                    {labourPieces.soleTotal != null && (
+                      <button
+                        onClick={() => { setRunQty(labourPieces.soleTotal as number); requote(labourPieces.soleTotal as number); }}
+                        style={{ marginTop: 9, padding: "6px 12px", borderRadius: 8, background: "rgba(251,191,36,.16)", border: "1px solid rgba(251,191,36,.4)", color: "#fcd34d", fontSize: 11.5, fontWeight: 700, cursor: "pointer" }}
+                      >
+                        Set run to {labourPieces.soleTotal.toLocaleString()}
+                      </button>
+                    )}
                   </div>
                 )}
-                {labourPieces?.over && (
+                {labourPieces && labourPieces.over.length > 0 && (
                   <div style={{ padding: "12px 14px", borderRadius: 12, background: "rgba(239,68,68,.12)", border: "1px solid rgba(239,68,68,.3)", marginBottom: 14, fontSize: 12.5, color: "#fca5a5", lineHeight: 1.7 }}>
-                    Workers are paid for {labourPieces.total.toLocaleString()} pieces combined but this run only
-                    finishes {runQty.toLocaleString()}. Raise the run, or lower the workers&apos; pieces so they add up to {runQty.toLocaleString()}.
+                    {labourPieces.over.map((g) => `${g.operation} is paid for ${g.total.toLocaleString()} pieces`).join("; ")} but this run only
+                    finishes {runQty.toLocaleString()}. Raise the run, or lower that job&apos;s pieces so it adds up to {runQty.toLocaleString()}.
+                    {" "}Two different jobs on the same pieces are fine — give each row its own job name.
                   </div>
                 )}
 
@@ -617,10 +666,10 @@ export default function ProductionOrdersPage() {
             <div style={{ display: "flex", gap: 12 }}>
               <button
                 onClick={confirmRun}
-                disabled={running || quoting || !runQuote || labourPieces?.over === true || labourPieces?.under === true || (runQuote.shortages.length > 0 && !allowShort)}
+                disabled={running || quoting || !runQuote || labourBlocked || (runQuote.shortages.length > 0 && !allowShort)}
                 style={{
                   flex: 1, padding: "11px 0", border: "none", borderRadius: 8, color: "#fff", fontSize: 14, fontWeight: 700,
-                  background: running || !runQuote || labourPieces?.over === true || labourPieces?.under === true || (runQuote.shortages.length > 0 && !allowShort) ? "rgba(34,197,94,.35)" : "#22c55e",
+                  background: running || !runQuote || labourBlocked || (runQuote.shortages.length > 0 && !allowShort) ? "rgba(34,197,94,.35)" : "#22c55e",
                   cursor: running || !runQuote ? "not-allowed" : "pointer",
                 }}
               >

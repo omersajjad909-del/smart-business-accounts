@@ -2,6 +2,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { getCurrentUser } from "@/lib/auth";
 import { useResponsive } from "@/hooks/useResponsive";
+import { AFFILIATE_PROGRAM_LIVE } from "@/lib/affiliateProgram";
 
 const isMobile = false;
 
@@ -124,6 +125,10 @@ export default function AffiliateDashboardPage() {
 
   const load = useCallback(async () => {
     if (!user) return;
+    // Nothing to load while the program is closed — the notice below is the
+    // whole page, and asking the API for a profile nobody can have only makes
+    // the closed state flicker through a spinner first.
+    if (!AFFILIATE_PROGRAM_LIVE) { setLoading(false); return; }
     setLoading(true);
     try {
       const res = await fetch("/api/affiliates/me", { headers: getHeaders(user) });
@@ -173,6 +178,26 @@ export default function AffiliateDashboardPage() {
     color: "#e2e8f0",
     padding: isMobile ? "16px" : "32px",
   };
+
+  // The program is off (lib/affiliateProgram.ts), so this page says so rather
+  // than inviting a customer to apply. The sidebar link is gone too; this guard
+  // is for anyone who kept the URL or a bookmark from when it was showing.
+  if (!AFFILIATE_PROGRAM_LIVE) return (
+    <div style={{ ...s, display: "flex", alignItems: "center", justifyContent: "center" }}>
+      <div style={{ textAlign: "center", maxWidth: 520 }}>
+        <div style={{ fontSize: 56, marginBottom: 16 }}>🤝</div>
+        <div style={{ display: "inline-block", padding: "5px 14px", borderRadius: 100, background: "rgba(129,140,248,.1)", border: "1px solid rgba(129,140,248,.25)", fontSize: 11, fontWeight: 700, color: "#a5b4fc", letterSpacing: ".08em", marginBottom: 18 }}>
+          COMING SOON
+        </div>
+        <h2 style={{ fontSize: 24, fontWeight: 700, marginBottom: 10 }}>Our affiliate program isn&apos;t open yet</h2>
+        <p style={{ color: "#94a3b8", lineHeight: 1.7 }}>
+          We&apos;re finishing tracking, commission tiers and monthly payouts first, so that
+          everyone who sends us a customer is paid accurately from the first referral.
+          There is nothing to sign up for today.
+        </p>
+      </div>
+    </div>
+  );
 
   if (loading) return (
     <div style={{ ...s, display: "flex", alignItems: "center", justifyContent: "center" }}>

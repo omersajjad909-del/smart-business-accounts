@@ -22,6 +22,7 @@ import { ModeToggle } from "@/components/mode-toggle";
 import AppearanceApplier from "@/components/AppearanceApplier";
 import { hasModule as baseHasModule, type BusinessType } from "@/lib/businessModules";
 import { findDashboardFeatureByRoute } from "@/lib/dashboardFeatureRegistry";
+import { AFFILIATE_PROGRAM_LIVE } from "@/lib/affiliateProgram";
 import { FINOVA_COMPANY_PROFILE_UPDATED, FINOVA_USER_PROFILE_UPDATED } from "@/lib/dashboardProfileEvents";
 import { dataUrlToFile } from "@/lib/dataUrl";
 import { PageCloseGuardCtx, type PageCloseGuard } from "@/components/PageCloseGuard";
@@ -2628,7 +2629,12 @@ export default function DashboardLayout({
               <NavLink href="/dashboard/settings/holidays"   pathname={pathname}>🎉 Public Holidays</NavLink>
               {!isCustomPlan && <NavLink href="/dashboard/security-access" pathname={pathname}>Security & Access</NavLink>}
               {hasPermission(currentUser, PERMISSIONS.API_ACCESS) && <NavLink href="/dashboard/integrations" pathname={pathname}>Integrations</NavLink>}
-              <NavLink href="/dashboard/affiliate" pathname={pathname}>🤝 Affiliate Program</NavLink>
+              {/* Hidden until the program actually launches. lib/affiliateProgram.ts
+                  is the single switch — the public /affiliate page already reads it
+                  and shows Coming Soon — but this link never did, so a tenant was
+                  being offered a 20–35% recurring commission that is not on sale
+                  yet and could not be paid out. */}
+              {AFFILIATE_PROGRAM_LIVE && <NavLink href="/dashboard/affiliate" pathname={pathname}>🤝 Affiliate Program</NavLink>}
             </NavGroup>
           )}
 

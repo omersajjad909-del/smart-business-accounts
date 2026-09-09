@@ -1,10 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { AFFILIATE_PROGRAM_LIVE } from "@/lib/affiliateProgram";
 
 export const runtime = "nodejs";
 
 export async function GET(req: NextRequest) {
   try {
+    // The program is closed (lib/affiliateProgram.ts). Answering with a profile
+    // would put commission figures and a referral link in front of a customer
+    // for something that is not on sale, so the whole surface stays shut —
+    // screen, sidebar link and this endpoint — until the flag flips.
+    if (!AFFILIATE_PROGRAM_LIVE) return NextResponse.json({ affiliate: null, programLive: false });
+
     const userId = req.headers.get("x-user-id");
     if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
@@ -52,6 +59,10 @@ export async function GET(req: NextRequest) {
 
 export async function PUT(req: NextRequest) {
   try {
+    if (!AFFILIATE_PROGRAM_LIVE) {
+      return NextResponse.json({ error: "The affiliate program is not open yet" }, { status: 403 });
+    }
+
     const userId = req.headers.get("x-user-id");
     if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 

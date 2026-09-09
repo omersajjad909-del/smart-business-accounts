@@ -1,0 +1,43 @@
+# What never needs to reach a deployment.
+#
+# The CLI uploads the working directory, and without this file that came to
+# 28,000+ files — over Vercel's 15,000 limit, so `vercel --prod` refused to
+# deploy at all. Almost all of it was .claude (26,000 files of local agent
+# session data) and a stray .next - Copy. Neither has anything to do with the
+# build, and the session data has no business leaving this machine.
+#
+# Same syntax as .gitignore. Keep this conservative: anything the build reads —
+# app, lib, components, hooks, prisma, public, middleware, config — must stay.
+
+# Local agent + editor state
+.claude
+.vscode
+.idea
+
+# Build output and caches — Vercel builds from source
+.next
+.next - Copy
+out
+tsconfig.tsbuildinfo
+*.tsbuildinfo
+
+# Dependencies — installed on the build machine, at any depth
+node_modules
+
+# Version control
+.git
+.gitignore
+
+# Local database dumps and backups
+backups
+
+# Scratch files that accumulated in the project root
+tmp-*
+build-output.txt
+admin-v2-build.txt
+*.log
+
+# Local secrets. Vercel injects the project's own environment variables, so
+# shipping these would only risk overriding them with a developer's machine.
+.env
+.env.*

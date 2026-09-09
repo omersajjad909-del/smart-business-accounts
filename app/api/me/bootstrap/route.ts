@@ -18,6 +18,9 @@ const DEFAULT_SHORTCUTS = [
   { id: "inventory", keys: ["Alt","V"], label: "Inventory",          action: "navigate", route: "/dashboard/inventory",        enabled: true },
 ];
 
+/** The one page a demo sandbox is never allowed to lose — see below. */
+const DEMO_ALWAYS_ON_FEATURE = "CORE_BUSINESS_FEATURES";
+
 function normalizePlanPermissions(saved: Record<string, string[]> = {}) {
   const get = (k: string): string[] => saved[k] || saved[k.toLowerCase()] || [];
   const hasAny = ["STARTER","PRO","ENTERPRISE","CUSTOM"].some(k => Array.isArray(get(k)) && get(k).length > 0);
@@ -96,7 +99,7 @@ export async function GET(req: NextRequest) {
           id: true, name: true, country: true, baseCurrency: true,
           plan: true, subscriptionStatus: true, activeModules: true,
           currentPeriodEnd: true, businessType: true, businessSetupDone: true,
-          logoUrl: true, createdAt: true,
+          logoUrl: true, createdAt: true, isDemo: true,
         },
       }),
       prisma.branch.findMany({
@@ -275,6 +278,21 @@ export async function GET(req: NextRequest) {
       parseCompanyPageOverrides(companyPageOverrideLog?.details),
       String(company.businessType || ""),
     );
+
+    // A demo sandbox always keeps Business Features.
+    //
+    // The demo is built around that screen: proxy.ts opens
+    // /api/company/admin-control to a demo session precisely so a visitor can
+    // flip Advanced Purchasing, Multi-Warehouse and the rest and watch the
+    // product change shape. It is a core page carried by all three plans by
+    // default, but a saved Pages & Modules grid decides in the end — and a grid
+    // that predates the page, or simply leaves it unticked for one business
+    // type, took the sidebar link away and had the page guard bounce anyone who
+    // typed the URL. Applied before the global hides below, so a page retired
+    // platform-wide stays retired here too.
+    if (company?.isDemo && dashboardFeatures && !dashboardFeatures.includes(DEMO_ALWAYS_ON_FEATURE)) {
+      dashboardFeatures = [...dashboardFeatures, DEMO_ALWAYS_ON_FEATURE];
+    }
 
     // Global page-visibility hides apply on top of whichever list won — last,
     // so a retired or broken page cannot be revived by a company exception.
