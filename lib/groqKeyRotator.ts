@@ -124,6 +124,104 @@ export async function groqRequest(
   return null;
 }
 
+// ─── Tool-calling variant ──────────────────────────────────────────────────────
+
+export interface GroqToolCall {
+  id: string;
+  name: string;
+  arguments: string;
+}
+
+export interface GroqToolResult {
+  content: string | null;
+  toolCalls: GroqToolCall[] | null;
+}
+
+type GToolMessage = {
+  role: string;
+  content: string | null;
+  tool_calls?: { id: string; type: "function"; function: { name: string; arguments: string } }[];
+  tool_call_id?: string;
+};
+
+/**
+ * Same key-rotation/exhaustion behavior as groqRequest(), but sends a `tools`
+ * array and surfaces `tool_calls` from the response instead of only `.content`
+ * — groqRequest() itself is left untouched since 13+ existing callers depend
+ * on its plain-string return.
+ */
+export async function groqRequestWithTools(
+  messages: GToolMessage[],
+  model: string,
+  maxTokens: number,
+  temperature: number,
+  tools: Array<{ type: "function"; function: { name: string; description: string; parameters: object } }> | null,
+  signal?: AbortSignal,
+): Promise<GroqToolResult | null> {
+  if (_keys.length === 0) return null;
+
+  for (const key of _keys) {
+    if (_exhausted.has(key)) continue;
+
+    let res: Response;
+    try {
+      res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${key}`,
+        },
+        body: JSON.stringify({
+          model,
+          messages,
+          max_tokens: maxTokens,
+          temperature,
+          ...(tools ? { tools, tool_choice: "auto" } : {}),
+        }),
+        signal,
+      });
+    } catch {
+      continue;
+    }
+
+    if (res.ok) {
+      const json = (await res.json().catch(() => null)) as {
+        choices?: Array<{ message?: { content?: string | null; tool_calls?: Array<{ id: string; function: { name: string; arguments: string } }> } }>;
+      } | null;
+      const message = json?.choices?.[0]?.message;
+      const content = message?.content?.trim() || null;
+      const toolCalls = message?.tool_calls?.length
+        ? message.tool_calls.map((tc) => ({ id: tc.id, name: tc.function.name, arguments: tc.function.arguments }))
+        : null;
+      if (content || toolCalls) return { content, toolCalls };
+      // Empty response — treat as soft failure, try next key
+      continue;
+    }
+
+    if (res.status === 429 || res.status === 402) {
+      _exhausted.add(key);
+      const remaining = _keys.length - _exhausted.size;
+      console.warn(`[GroqRotator] Key …${key.slice(-6)} quota reached — ${remaining} key(s) remaining today`);
+      continue;
+    }
+
+    if (res.status === 401) {
+      _exhausted.add(key);
+      console.warn(`[GroqRotator] Key …${key.slice(-6)} returned 401 (invalid)`);
+      continue;
+    }
+
+    console.warn(`[GroqRotator] Key …${key.slice(-6)} returned ${res.status} — skipping request`);
+    return null;
+  }
+
+  const allExhausted = _keys.every((k) => _exhausted.has(k));
+  if (allExhausted) {
+    console.warn("[GroqRotator] All Groq keys exhausted for today — falling back to OpenAI");
+  }
+  return null;
+}
+
 /** Status snapshot — useful for admin/debug endpoints */
 export function groqStatus() {
   return {

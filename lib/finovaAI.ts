@@ -7,7 +7,8 @@
 import { prisma } from "@/lib/prisma";
 import { aiUrl } from "@/lib/aiGateway";
 import { getMarketIntelligenceLocalReply, getBusinessAdvisorLocalReply } from "@/lib/marketIntelligence";
-import { groqRequest, HAS_GROQ, GROQ_KEY_COUNT } from "@/lib/groqKeyRotator";
+import { groqRequest, groqRequestWithTools, HAS_GROQ, GROQ_KEY_COUNT } from "@/lib/groqKeyRotator";
+import { FINOVA_TOOLS, runFinovaTool } from "@/lib/finovaAITools";
 
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 const OPENAI_MODEL = "gpt-4o-mini";
@@ -584,6 +585,29 @@ FINANCIAL CONTEXT (injected per request)
 The real-time financial data for this company is provided in the user message context below. Use it to answer precisely.
 `;
 
+// Appended only for the chat path (finovaChat), which is the only caller that
+// passes `tools` — kept separate from FINOVA_SYSTEM_PROMPT so the 8+ other
+// generator functions (generateInsights, generateForecast, etc.) that reuse
+// that constant without tools are unaffected.
+export const FINOVA_TOOL_INSTRUCTIONS = `
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+TOOL USAGE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+You have tools to look up specific, named business records that are NOT in the financial summary above:
+products, BOMs, production/work orders, invoices, quotations, delivery challans, purchase orders,
+customers/suppliers, employees, payroll/attendance/leave, bank accounts/statements, and vouchers/notes/budgets.
+
+Rules:
+1. Whenever the user names or numbers a SPECIFIC entity (a product, invoice number, employee, customer,
+   BOM, PO, bank account, etc.), call the matching tool instead of answering generically or from the
+   summary above. Example: "BOM for product Bravo" → call get_bom_details, not a generic BOM explanation.
+2. If a tool returns no match (found: false), say so plainly — never invent numbers, materials, or names.
+3. Chain tools if needed (e.g. find the item, then its stock) but stop once you have enough to answer.
+4. Only skip tools and answer generically when no tool applies (e.g. "how do I create a BOM" — a process
+   question, not about a specific product).
+5. Once you have your answer, respond following the FORMATTING RULES above — do not narrate tool calls.
+`;
+
 // ─── Financial Context Builder ────────────────────────────────────────────────
 export interface FinancialContext {
   company: {
@@ -1094,6 +1118,21 @@ ${ctx.topExpenses.length > 0 ? ctx.topExpenses.map((e, i) => `${i + 1}. ${e.cate
 
 RECENT INVOICES:
 ${ctx.recentInvoices.length > 0 ? ctx.recentInvoices.map((inv) => `• ${inv.ref} — ${inv.customer} — ${formatCurrency(inv.amount, ctx.company.currency)} — ${inv.status} (${inv.daysAgo}d ago)`).join("\n") : "No recent invoices."}
+
+TOP PRODUCTS (This Year):
+${ctx.topProducts.length > 0 ? ctx.topProducts.map((p, i) => `${i + 1}. ${p.name}: ${formatCurrency(p.revenue, c)} (${p.qty} units)`).join("\n") : "No product sales data yet."}
+
+SLOW MOVING ITEMS:
+${ctx.slowMovingItems.length > 0 ? ctx.slowMovingItems.map((i) => `• ${i.name} — ${i.lastSaleDays}d since last sale, stock: ${i.stock}`).join("\n") : "None flagged."}
+
+DEAD STOCK:
+${ctx.deadStockItems.length > 0 ? ctx.deadStockItems.map((i) => `• ${i.name} — stock: ${i.stock}, value: ${formatCurrency(i.value, c)}`).join("\n") : "None flagged."}
+
+MONTHLY TREND (Last 6 Months):
+${ctx.monthlyRevenue.map((m) => `• ${m.month}: revenue ${formatCurrency(m.revenue, c)}, expenses ${formatCurrency(m.expenses, c)}, profit ${formatCurrency(m.profit, c)}`).join("\n")}
+
+CUSTOMER PAYMENT BEHAVIOR:
+${ctx.customerPaymentHistory.length > 0 ? ctx.customerPaymentHistory.slice(0, 5).map((cp) => `• ${cp.name}: avg ${cp.avgDaysToPay}d to pay, ${cp.overdueCount} overdue`).join("\n") : "No payment history yet."}
 `;
 }
 
@@ -1177,6 +1216,98 @@ export async function openAITextResponse(
     return json.choices?.[0]?.message?.content?.trim() || "";
   } catch (error) {
     console.error("OpenAI chat request failed:", error);
+    throw error;
+  } finally {
+    clearTimeout(timeoutId);
+  }
+}
+
+export type LLMMessage =
+  | { role: "system" | "user" | "assistant"; content: string }
+  | { role: "assistant"; content: string | null; tool_calls: { id: string; type: "function"; function: { name: string; arguments: string } }[] }
+  | { role: "tool"; tool_call_id: string; content: string };
+
+interface ChatToolResult {
+  content: string | null;
+  toolCalls: { id: string; name: string; arguments: string }[] | null;
+}
+
+/**
+ * Tool-calling counterpart to openAITextResponse() — additive, not a
+ * replacement, so existing non-tool callers of openAITextResponse are
+ * untouched. Both providers go through Chat Completions only here (unlike
+ * openAITextResponse's Responses-API-first path for OpenAI): the Responses
+ * API's function-call message shape differs from tool_calls/role:"tool", and
+ * using one shape for both providers keeps the tool loop below simple.
+ */
+async function openAIChatWithTools(
+  system: string,
+  messages: LLMMessage[],
+  tools: typeof FINOVA_TOOLS,
+  maxTokens = 1200,
+): Promise<ChatToolResult> {
+  if (!HAS_AI_KEY) throw new Error("No AI provider configured. Set GROQ_API_KEY or OPENAI_API_KEY.");
+
+  const input = [{ role: "system" as const, content: system }, ...messages];
+  // Groq/OpenAI reject a `tools`/`tool_choice` pair when tools is empty, so the
+  // "final forced answer" call (tools: []) omits both fields entirely instead.
+  const toolDefs = tools.length
+    ? tools.map((t) => ({ type: "function" as const, function: { name: t.name, description: t.description, parameters: t.parameters } }))
+    : null;
+
+  if (HAS_GROQ_KEY) {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 18000);
+    try {
+      const result = await groqRequestWithTools(input, GROQ_MODEL, maxTokens, 0.3, toolDefs, controller.signal);
+      if (result && (result.content || result.toolCalls)) return result;
+      console.warn("[FinovaAI] Groq tool-call failed — falling back to OpenAI");
+    } catch (err) {
+      console.warn("[FinovaAI] Groq tool-call error, falling back to OpenAI:", err);
+    } finally {
+      clearTimeout(timeoutId);
+    }
+  }
+
+  if (!OPENAI_API_KEY) throw new Error("Groq failed and OPENAI_API_KEY is not set.");
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 18000);
+  const headers: Record<string, string> = {
+    "Content-Type": "application/json",
+    Authorization: `Bearer ${OPENAI_API_KEY}`,
+  };
+  if (OPENAI_PROJECT) headers["OpenAI-Project"] = OPENAI_PROJECT;
+  if (OPENAI_ORG) headers["OpenAI-Organization"] = OPENAI_ORG;
+
+  try {
+    const res = await fetch(aiUrl("openai", "chat/completions", "https://api.openai.com/v1/chat/completions"), {
+      method: "POST",
+      headers,
+      body: JSON.stringify({
+        model: OPENAI_MODEL,
+        messages: input,
+        ...(toolDefs ? { tools: toolDefs, tool_choice: "auto" } : {}),
+        max_tokens: maxTokens,
+        temperature: 0.3,
+      }),
+      signal: controller.signal,
+    });
+
+    if (!res.ok) {
+      const body = await res.text().catch(() => `OpenAI error ${res.status}`);
+      throw new Error(body);
+    }
+
+    const json = await res.json() as {
+      choices?: Array<{ message?: { content?: string | null; tool_calls?: Array<{ id: string; function: { name: string; arguments: string } }> } }>;
+    };
+    const message = json.choices?.[0]?.message;
+    const toolCalls = message?.tool_calls?.length
+      ? message.tool_calls.map((tc) => ({ id: tc.id, name: tc.function.name, arguments: tc.function.arguments }))
+      : null;
+    return { content: message?.content?.trim() || null, toolCalls };
+  } catch (error) {
+    console.error("OpenAI tool-call request failed:", error);
     throw error;
   } finally {
     clearTimeout(timeoutId);
@@ -1774,18 +1905,57 @@ export async function finovaChat(
 
   const systemPrompt =
     FINOVA_SYSTEM_PROMPT
+    + (companyId ? FINOVA_TOOL_INSTRUCTIONS : "") // tools are only usable with a resolved companyId
     + (pricingContext ? `\n\n${pricingContext}` : "")
     + (planContext   ? `\n\n${planContext}`   : "")
     + (contextStr    ? `\n\nCURRENT FINANCIAL DATA:\n${contextStr}` : "");
 
-  const messages = [
-    ...history.map((h) => ({ role: h.role, content: h.content })),
-    { role: "user" as const, content: message },
+  const llmMessages: LLMMessage[] = [
+    ...history.map((h) => ({ role: h.role, content: h.content }) as LLMMessage),
+    { role: "user", content: message },
   ];
 
   return (async function* () {
     try {
-      const text = await openAITextResponse(systemPrompt, messages, 1500);
+      let finalText: string | null = null;
+
+      if (companyId) {
+        // Tool-calling loop — only possible once companyId is known, since every
+        // tool executor is scoped by it. Bounded by rounds and a wall-clock
+        // deadline so a chatty model can't run past the route's maxDuration.
+        const MAX_TOOL_ROUNDS = 4;
+        const deadline = Date.now() + 45_000;
+
+        for (let round = 0; round < MAX_TOOL_ROUNDS && Date.now() < deadline; round++) {
+          const result = await openAIChatWithTools(systemPrompt, llmMessages, FINOVA_TOOLS, 1200);
+
+          if (result.toolCalls && result.toolCalls.length > 0) {
+            const calls = result.toolCalls.slice(0, 5);
+            llmMessages.push({
+              role: "assistant",
+              content: result.content,
+              tool_calls: calls.map((c) => ({ id: c.id, type: "function", function: { name: c.name, arguments: c.arguments } })),
+            });
+            const outputs = await Promise.all(calls.map((c) => runFinovaTool(c.name, companyId, c.arguments)));
+            calls.forEach((c, i) => llmMessages.push({ role: "tool", tool_call_id: c.id, content: outputs[i] }));
+            continue;
+          }
+
+          if (result.content) finalText = result.content;
+          break;
+        }
+
+        if (!finalText) {
+          // Ran out of rounds/time, or the model stopped without content —
+          // force one more call with tools disabled so it must answer from
+          // whatever tool results are already in llmMessages.
+          finalText = await openAIChatWithTools(systemPrompt, llmMessages, [], 800).then((r) => r.content).catch(() => null);
+        }
+      } else {
+        finalText = await openAITextResponse(systemPrompt, llmMessages as ChatMessage[], 1500);
+      }
+
+      const text = finalText || localAIReply(message, ctx);
       const chunks = text.match(/.{1,140}/g) || [text];
       for (const chunk of chunks) {
         if (chunk) {
