@@ -202,7 +202,11 @@
       "Bash(timeout 90 flutter run -d chrome --web-port=8734)",
       "Bash(flutter build *)",
       "Bash(ls -la /Users/umersajjad/Finova/.git 2>&1 | head -5)",
-      "Bash(npx tsc *)"
+      "Bash(npx tsc *)",
+      "Bash(npx tsx *)",
+      "Bash(npx tsx -e ' *)",
+      "Bash(git -C /Users/umersajjad/Projects/smart-business-accounts status --short)",
+      "Bash(git check-ignore *)"
     ],
     "additionalDirectories": [
       "d:\\projects\\smart-business-accounts\\lib",
