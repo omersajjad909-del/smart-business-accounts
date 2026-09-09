@@ -835,22 +835,36 @@ function ReceiveTab({ challans, busy, setBusy, setMsg, refresh }: Setter & { cha
         {challan && (
           <div style={{ marginTop: 16 }}>
             <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: 0.6, color: dim, textTransform: "uppercase", marginBottom: 8 }}>
-              Balance held by the job worker — enter what came back, the rest is treated as consumed
+              Material held by the job worker
             </div>
             <div style={{ overflowX: "auto" }}>
-              <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 560 }}>
+              <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 780 }}>
                 <thead>
                   <tr>
                     <th style={th}>Material</th>
                     <th style={{ ...th, textAlign: "right" }}>Issued</th>
                     <th style={{ ...th, textAlign: "right" }}>Balance</th>
-                    <th style={{ ...th, textAlign: "right" }}>Std / pc</th>
-                    <th style={{ ...th, width: 130 }}>Returned</th>
+                    <th style={{ ...th, textAlign: "right" }}>Standard</th>
+                    <th style={{ ...th, width: 120 }}>Consumed</th>
+                    <th style={{ ...th, width: 120 }}>Returned</th>
+                    <th style={{ ...th, textAlign: "right" }}>Still with worker</th>
                   </tr>
                 </thead>
                 <tbody>
                   {challan.lines.map((l) => {
                     const balance = l.issuedQty - l.consumedQty - l.returnedQty;
+                    // The standard for the pieces being received now — what the
+                    // job *should* have taken, and what Consumed defaults to.
+                    const std = l.standardPerPc && Number(goodQty) > 0
+                      ? l.standardPerPc * Number(goodQty)
+                      : null;
+                    const ret = Number(returns[l.itemId]) || 0;
+                    const con = consumes[l.itemId] !== undefined && consumes[l.itemId] !== ""
+                      ? Number(consumes[l.itemId]) || 0
+                      : std !== null
+                        ? Math.min(std, Math.max(0, balance - ret))
+                        : Math.max(0, balance - ret);
+                    const left = balance - con - ret;
                     return (
                       <tr key={l.itemId}>
                         <td style={td}>{l.itemName}</td>
@@ -860,7 +874,18 @@ function ReceiveTab({ challans, busy, setBusy, setMsg, refresh }: Setter & { cha
                         <td style={{ ...tdNum, color: teal }}>
                           {qty(balance)} {l.unit}
                         </td>
-                        <td style={{ ...tdNum, color: dim }}>{l.standardPerPc ? qty(l.standardPerPc) : "—"}</td>
+                        <td style={{ ...tdNum, color: dim }}>{std !== null ? qty(std) : "—"}</td>
+                        <td style={td}>
+                          <input
+                            style={{ ...input, padding: "6px 9px" }}
+                            type="number"
+                            step="0.001"
+                            value={consumes[l.itemId] ?? ""}
+                            onChange={(e) => setConsumes({ ...consumes, [l.itemId]: e.target.value })}
+                            placeholder={std !== null ? qty(std) : qty(Math.max(0, balance - ret))}
+                            title="Actually burnt making these pieces. Leave blank to use the standard."
+                          />
+                        </td>
                         <td style={td}>
                           <input
                             style={{ ...input, padding: "6px 9px" }}
@@ -869,13 +894,24 @@ function ReceiveTab({ challans, busy, setBusy, setMsg, refresh }: Setter & { cha
                             value={returns[l.itemId] || ""}
                             onChange={(e) => setReturns({ ...returns, [l.itemId]: e.target.value })}
                             placeholder="0"
+                            title="Good material physically coming back to your godown now."
                           />
+                        </td>
+                        <td style={{ ...tdNum, color: left > 1e-6 ? amber : dim }}>
+                          {qty(left)} {l.unit}
                         </td>
                       </tr>
                     );
                   })}
                 </tbody>
               </table>
+            </div>
+            <div style={{ fontSize: 11.5, color: dim, marginTop: 8, lineHeight: 1.55, maxWidth: 760 }}>
+              A part-used roll is <b style={{ color: "#fff" }}>not wastage</b>. Send 13 rolls for a job needing 12.5 and
+              the half roll is still good material: leave it out of <b style={{ color: "#fff" }}>Consumed</b> and it
+              either comes back (put it in <b style={{ color: "#fff" }}>Returned</b>) or stays on the worker&apos;s floor
+              for the next order, where it keeps showing under <b style={{ color: "#fff" }}>Still with worker</b>.
+              Only what is genuinely burnt above the standard counts as wastage and gets charged back.
             </div>
           </div>
         )}
