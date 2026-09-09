@@ -150,7 +150,7 @@ export default function JobWorkPage() {
     (async () => {
       const s = await getJson<Status>("/api/job-work/status");
       if (!s || !("enabled" in s)) {
-        setStatus({ enabled: false, reason: "Status load nahi hua", summary: { workers: 0, openChallans: 0, closedChallans: 0, receipts: 0 } });
+        setStatus({ enabled: false, reason: "Could not load status", summary: { workers: 0, openChallans: 0, closedChallans: 0, receipts: 0 } });
         return;
       }
       setStatus(s);
@@ -175,7 +175,7 @@ export default function JobWorkPage() {
   if (!status.enabled) {
     return (
       <div style={{ padding: isMobile ? "17px 16px" : "28px 32px", fontFamily: ff, color: "#fff", minHeight: "100vh" }}>
-        <h1 style={{ fontSize: 24, fontWeight: 800, margin: "0 0 6px" }}>Job Work — Thekedar</h1>
+        <h1 style={{ fontSize: 24, fontWeight: 800, margin: "0 0 6px" }}>Job Work</h1>
         <div
           style={{
             marginTop: 20,
@@ -194,8 +194,8 @@ export default function JobWorkPage() {
             {status.reason}
           </p>
           <p style={{ margin: "12px 0 0", fontSize: 13, lineHeight: 1.6, color: dim }}>
-            Demo aur real companies is module ko nahi dekhtin — na koi entry banti hai, na koi account.
-            Test workspace mein OK ho jaye, phir yahan se aage kholenge.
+            Demo and live companies cannot see this module — no entries are written and no accounts are created.
+            Once it is signed off in a test workspace, it will be opened up from here.
           </p>
         </div>
       </div>
@@ -206,7 +206,7 @@ export default function JobWorkPage() {
     <div style={{ padding: isMobile ? "17px 16px" : "28px 32px", fontFamily: ff, color: "#fff", minHeight: "100vh" }}>
       <div style={{ marginBottom: 20 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
-          <h1 style={{ fontSize: 24, fontWeight: 800, margin: 0 }}>Job Work — Thekedar</h1>
+          <h1 style={{ fontSize: 24, fontWeight: 800, margin: 0 }}>Job Work</h1>
           <span
             style={{
               fontSize: 10,
@@ -222,7 +222,7 @@ export default function JobWorkPage() {
           </span>
         </div>
         <p style={{ fontSize: 13, color: dim, margin: "6px 0 0" }}>
-          Rolls thekedar ko bhejein, pcs wapas lein. Maal aap ka asset rehta hai — ye sale nahi hai.
+          Send material out to a job worker and take finished pieces back. The material stays your asset — this is not a sale.
         </p>
       </div>
 
@@ -230,8 +230,8 @@ export default function JobWorkPage() {
         {([
           ["issue", `Issue Challan`],
           ["receive", `Receive (${pendingChallans.length})`],
-          ["ledger", `Stock at Thekedar`],
-          ["workers", `Thekedars (${workers.length})`],
+          ["ledger", `Stock at Job Worker`],
+          ["workers", `Job Workers (${workers.length})`],
         ] as const).map(([key, label]) => (
           <button
             key={key}
@@ -393,7 +393,7 @@ function WorkersTab({ workers, setBusy, busy, setMsg, refresh }: Setter & { work
   const [form, setForm] = useState({ name: "", code: "", phone: "", defaultRatePerPc: "", allowedWastagePct: "" });
 
   const submit = async () => {
-    if (!form.name.trim()) return setMsg({ kind: "err", text: "Thekedar ka naam chahiye" });
+    if (!form.name.trim()) return setMsg({ kind: "err", text: "Job worker name is required" });
     setBusy(true);
     try {
       await post("/api/job-work/workers", {
@@ -404,7 +404,7 @@ function WorkersTab({ workers, setBusy, busy, setMsg, refresh }: Setter & { work
         allowedWastagePct: Number(form.allowedWastagePct) || 0,
       });
       setForm({ name: "", code: "", phone: "", defaultRatePerPc: "", allowedWastagePct: "" });
-      setMsg({ kind: "ok", text: "Thekedar add ho gaya — uska payable account bhi ban gaya." });
+      setMsg({ kind: "ok", text: "Job worker added — a payable account was created for them." });
       await refresh();
     } catch (e) {
       setMsg({ kind: "err", text: (e as Error).message });
@@ -416,13 +416,13 @@ function WorkersTab({ workers, setBusy, busy, setMsg, refresh }: Setter & { work
   return (
     <>
       <Section
-        title="Naya thekedar"
-        sub="Code stock location banata hai (JW:CODE) aur baad mein badla nahi ja sakta. Har thekedar ka apna payable account banta hai."
+        title="New job worker"
+        sub="The code becomes the stock location (JW:CODE) and cannot be changed later. Each job worker gets their own payable account."
       >
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(150px,1fr))", gap: 12 }}>
           <div>
-            <label style={label}>Naam</label>
-            <input style={input} value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="Thekedar A" />
+            <label style={label}>Name</label>
+            <input style={input} value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="Acme Stitching" />
           </div>
           <div>
             <label style={label}>Code</label>
@@ -443,7 +443,7 @@ function WorkersTab({ workers, setBusy, busy, setMsg, refresh }: Setter & { work
         </div>
         <div style={{ marginTop: 14 }}>
           <button style={btn()} disabled={busy} onClick={submit}>
-            {busy ? "Saving…" : "Add thekedar"}
+            {busy ? "Saving…" : "Add job worker"}
           </button>
         </div>
       </Section>
@@ -452,7 +452,7 @@ function WorkersTab({ workers, setBusy, busy, setMsg, refresh }: Setter & { work
         <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 640 }}>
           <thead>
             <tr>
-              <th style={th}>Naam</th>
+              <th style={th}>Name</th>
               <th style={th}>Code</th>
               <th style={th}>Stock location</th>
               <th style={th}>Phone</th>
@@ -464,7 +464,7 @@ function WorkersTab({ workers, setBusy, busy, setMsg, refresh }: Setter & { work
             {workers.length === 0 && (
               <tr>
                 <td style={{ ...td, color: dim }} colSpan={6}>
-                  Abhi koi thekedar nahi. Upar se add karein.
+                  No job workers yet. Add one above.
                 </td>
               </tr>
             )}
@@ -522,8 +522,8 @@ function IssueTab({
     const payload = lines
       .map((l) => ({ itemId: l.itemId, qty: Number(l.qty), standardPerPc: Number(l.standardPerPc) }))
       .filter((l) => l.itemId && l.qty > 0);
-    if (!workerId) return setMsg({ kind: "err", text: "Thekedar chunein" });
-    if (!payload.length) return setMsg({ kind: "err", text: "Kam se kam ek material line chahiye" });
+    if (!workerId) return setMsg({ kind: "err", text: "Select a job worker" });
+    if (!payload.length) return setMsg({ kind: "err", text: "At least one material line is required" });
 
     setBusy(true);
     try {
@@ -539,7 +539,7 @@ function IssueTab({
       });
       setMsg({
         kind: "ok",
-        text: `${r.challanNo} ban gaya — Rs ${money(r.totalValue)} ka maal ${r.jobLocation} par transfer hua. Voucher ${r.voucherNo || "—"}. Koi sale nahi bani.`,
+        text: `${r.challanNo} created — Rs ${money(r.totalValue)} of material moved to ${r.jobLocation}. Voucher ${r.voucherNo || "—"}. No sale was recorded.`,
       });
       setLines([{ itemId: "", qty: "", standardPerPc: "" }]);
       setExpectedQty("");
@@ -557,16 +557,16 @@ function IssueTab({
     return (
       <div style={{ ...card, borderLeft: `3px solid ${amber}` }}>
         <div style={{ fontSize: 11, fontWeight: 800, letterSpacing: 1, color: amber, marginBottom: 10 }}>
-          PEHLA QADAM
+          FIRST STEP
         </div>
-        <div style={{ fontSize: 15, fontWeight: 700, marginBottom: 6 }}>Abhi koi thekedar add nahi hua</div>
+        <div style={{ fontSize: 15, fontWeight: 700, marginBottom: 6 }}>No job worker has been added yet</div>
         <p style={{ fontSize: 13.5, color: dim, margin: "0 0 16px", maxWidth: 620, lineHeight: 1.6 }}>
-          Challan banane se pehle kam se kam ek thekedar chahiye. Uske code se hi uski stock location
-          (<span style={{ color: teal }}>JW:CODE</span>) aur uska payable account banta hai — dono khud ban jate hain,
-          aap ko alag se kuch nahi banana.
+          At least one job worker is needed before a challan can be raised. Their code becomes both their stock
+          location (<span style={{ color: teal }}>JW:CODE</span>) and their payable account — both are created for you,
+          so there is nothing to set up separately.
         </p>
         <button style={btn()} onClick={onGoToWorkers}>
-          Thekedar add karein →
+          Add a job worker →
         </button>
       </div>
     );
@@ -575,12 +575,12 @@ function IssueTab({
   return (
     <>
       <Section
-        title="Material thekedar ko bhejein"
-        sub="Ye challan sale nahi hai — na customer banta hai, na sales figure hilta hai. Sirf stock ki location badalti hai."
+        title="Send material to a job worker"
+        sub="This challan is not a sale — no customer is involved and the sales figure does not move. Only the stock location changes."
       >
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(160px,1fr))", gap: 12, marginBottom: 16 }}>
           <div>
-            <label style={label}>Thekedar</label>
+            <label style={label}>Job worker</label>
             <select style={input} value={workerId} onChange={(e) => setWorkerId(e.target.value)}>
               <option value="">— chunein —</option>
               {workers.map((w) => (
@@ -591,15 +591,15 @@ function IssueTab({
             </select>
           </div>
           <div>
-            <label style={label}>Kahan se (apna godown)</label>
+            <label style={label}>From (your godown)</label>
             <input style={input} value={sourceLocation} onChange={(e) => setSourceLocation(e.target.value)} />
             <div style={{ fontSize: 11, color: dim, marginTop: 4, lineHeight: 1.45 }}>
-              Aap ka apna store. Thekedar ki location alag se nahi banani —
-              {worker ? <span style={{ color: teal }}> {worker.jobLocation}</span> : " JW:CODE"} khud ban jati hai.
+              Your own store. The job worker's location is not something you create —
+              {worker ? <span style={{ color: teal }}> {worker.jobLocation}</span> : " JW:CODE"} is made for you.
             </div>
           </div>
           <div>
-            <label style={label}>Kya banega (finished item)</label>
+            <label style={label}>What will be made (finished item)</label>
             <select style={input} value={finishedItemId} onChange={(e) => setFinishedItemId(e.target.value)}>
               <option value="">— chunein —</option>
               {finished.map((i) => (
@@ -653,21 +653,21 @@ function IssueTab({
               type="number"
               step="0.0001"
               placeholder="std / pc"
-              title="Standard consumption per finished piece — wastage recovery ke liye. Khali chhor dein to wastage check nahi hoga."
+              title="Standard consumption per finished piece, used for wastage recovery. Leave blank and wastage is not checked."
               value={l.standardPerPc}
               onChange={(e) => setLines(lines.map((x, i) => (i === idx ? { ...x, standardPerPc: e.target.value } : x)))}
             />
             <button
               style={{ ...btn(false), padding: "8px 12px" }}
               onClick={() => setLines(lines.length > 1 ? lines.filter((_, i) => i !== idx) : lines)}
-              title="Line hatayein"
+              title="Remove line"
             >
               ✕
             </button>
           </div>
         ))}
         <div style={{ fontSize: 11.5, color: dim, marginTop: 4 }}>
-          <b>std / pc</b> khali chhor dein to wastage ka hisaab nahi hoga — ek hi material aur koi recovery na ho to yahi theek hai.
+          Leave <b>std / pc</b> blank and wastage is not calculated — which is the right answer for a single material with no recovery agreed.
         </div>
 
         <div style={{ display: "flex", gap: 10, marginTop: 14, flexWrap: "wrap" }}>
@@ -675,7 +675,7 @@ function IssueTab({
             + Line
           </button>
           <button style={btn()} disabled={busy} onClick={submit}>
-            {busy ? "Posting…" : "Issue challan banayein"}
+            {busy ? "Posting…" : "Create issue challan"}
           </button>
         </div>
 
@@ -686,14 +686,14 @@ function IssueTab({
       </Section>
 
       <div style={{ ...card, padding: 0, overflowX: "auto" }}>
-        <div style={{ padding: "14px 18px 0", fontSize: 15, fontWeight: 700 }}>Sab challans</div>
+        <div style={{ padding: "14px 18px 0", fontSize: 15, fontWeight: 700 }}>All challans</div>
         <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 780, marginTop: 10 }}>
           <thead>
             <tr>
               <th style={th}>Challan</th>
               <th style={th}>Date</th>
-              <th style={th}>Thekedar</th>
-              <th style={th}>Banega</th>
+              <th style={th}>Job worker</th>
+              <th style={th}>Will make</th>
               <th style={{ ...th, textAlign: "right" }}>Expected</th>
               <th style={{ ...th, textAlign: "right" }}>Received</th>
               <th style={{ ...th, textAlign: "right" }}>Balance value</th>
@@ -704,7 +704,7 @@ function IssueTab({
             {challans.length === 0 && (
               <tr>
                 <td style={{ ...td, color: dim }} colSpan={8}>
-                  Abhi koi challan nahi.
+                  No challans yet.
                 </td>
               </tr>
             )}
@@ -776,8 +776,8 @@ function ReceiveTab({ challans, busy, setBusy, setMsg, refresh }: Setter & { cha
   }, [challanId, goodQty, freight, jobCharges, returns]);
 
   const submit = async () => {
-    if (!challanId) return setMsg({ kind: "err", text: "Challan chunein" });
-    if (!(Number(goodQty) > 0)) return setMsg({ kind: "err", text: "Kitne pcs mile? qty daalein" });
+    if (!challanId) return setMsg({ kind: "err", text: "Select a challan" });
+    if (!(Number(goodQty) > 0)) return setMsg({ kind: "err", text: "Enter how many good pieces were received" });
     setBusy(true);
     try {
       const returned = Object.entries(returns)
@@ -792,7 +792,7 @@ function ReceiveTab({ challans, busy, setBusy, setMsg, refresh }: Setter & { cha
       });
       setMsg({
         kind: "ok",
-        text: `${r.receiptNo} post ho gaya — ${r.goodQty} pcs @ Rs ${money(r.unitCost)}/pc stock mein aaye. Thekedar ko dena: Rs ${money(r.netPayable)}. Challan ab "${r.challanStatus}".`,
+        text: `${r.receiptNo} posted — ${r.goodQty} pcs @ Rs ${money(r.unitCost)}/pc received into stock. Payable to job worker: Rs ${money(r.netPayable)}. Challan is now "${r.challanStatus}".`,
       });
       setChallanId("");
       await refresh();
@@ -805,7 +805,7 @@ function ReceiveTab({ challans, busy, setBusy, setMsg, refresh }: Setter & { cha
 
   return (
     <>
-      <Section title="Thekedar se maal wapas lein" sub="Material consume, finished goods stock mein, aur thekedar ka payable — teeno ek hi document se.">
+      <Section title="Take finished pieces back" sub="Material consumed, finished goods into stock, and the job worker's payable — all from one document.">
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(160px,1fr))", gap: 12 }}>
           <div>
             <label style={label}>Challan</label>
@@ -819,15 +819,15 @@ function ReceiveTab({ challans, busy, setBusy, setMsg, refresh }: Setter & { cha
             </select>
           </div>
           <div>
-            <label style={label}>Good pcs mile</label>
+            <label style={label}>Good pcs received</label>
             <input style={input} type="number" value={goodQty} onChange={(e) => setGoodQty(e.target.value)} placeholder="10000" />
           </div>
           <div>
-            <label style={label}>Job charges (khali = rate × pcs)</label>
+            <label style={label}>Job charges (blank = rate × pcs)</label>
             <input style={input} type="number" step="0.01" value={jobCharges} onChange={(e) => setJobCharges(e.target.value)} placeholder={challan ? money(challan.ratePerPc * (Number(goodQty) || 0)) : ""} />
           </div>
           <div>
-            <label style={label}>Freight (dono taraf)</label>
+            <label style={label}>Freight (both ways)</label>
             <input style={input} type="number" step="0.01" value={freight} onChange={(e) => setFreight(e.target.value)} placeholder="1800" />
           </div>
         </div>
@@ -835,7 +835,7 @@ function ReceiveTab({ challans, busy, setBusy, setMsg, refresh }: Setter & { cha
         {challan && (
           <div style={{ marginTop: 16 }}>
             <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: 0.6, color: dim, textTransform: "uppercase", marginBottom: 8 }}>
-              Thekedar ke paas balance — jo wapas aaya wo likhein, baqi consume maan liya jayega
+              Balance held by the job worker — enter what came back, the rest is treated as consumed
             </div>
             <div style={{ overflowX: "auto" }}>
               <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 560 }}>
@@ -845,7 +845,7 @@ function ReceiveTab({ challans, busy, setBusy, setMsg, refresh }: Setter & { cha
                     <th style={{ ...th, textAlign: "right" }}>Issued</th>
                     <th style={{ ...th, textAlign: "right" }}>Balance</th>
                     <th style={{ ...th, textAlign: "right" }}>Std / pc</th>
-                    <th style={{ ...th, width: 130 }}>Wapas aaya</th>
+                    <th style={{ ...th, width: 130 }}>Returned</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -882,23 +882,23 @@ function ReceiveTab({ challans, busy, setBusy, setMsg, refresh }: Setter & { cha
 
         <div style={{ marginTop: 16 }}>
           <button style={btn()} disabled={busy || !priced} onClick={submit}>
-            {busy ? "Posting…" : "Receipt post karein"}
+            {busy ? "Posting…" : "Post receipt"}
           </button>
         </div>
       </Section>
 
       {priced && (
-        <Section title="Is receipt ki lagat" sub="Post karne se pehle — yehi asli per-pc cost hai.">
+        <Section title="What this receipt costs" sub="Shown before posting — this is the real per-piece cost.">
           {priced.shortages.length > 0 && (
             <div style={{ color: red, fontSize: 13, marginBottom: 12 }}>
-              {priced.shortages.map((s) => `${s.itemName}: maang ${qty(s.asked)}${s.unit}, balance ${qty(s.balance)}${s.unit}`).join(" · ")}
+              {priced.shortages.map((s) => `${s.itemName}: asked for ${qty(s.asked)}${s.unit}, balance ${qty(s.balance)}${s.unit}`).join(" · ")}
             </div>
           )}
           <div style={{ overflowX: "auto" }}>
             <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 460 }}>
               <tbody>
                 {[
-                  ["Material consume", priced.materialCost],
+                  ["Material consumed", priced.materialCost],
                   ["Job charges", priced.jobCharges],
                   ["Wastage recovery", -priced.wastageRecovery],
                   ["Freight", priced.freight],
@@ -919,7 +919,7 @@ function ReceiveTab({ challans, busy, setBusy, setMsg, refresh }: Setter & { cha
                   <td style={{ ...tdNum, fontWeight: 700, color: teal }}>{money(priced.unitCost)}</td>
                 </tr>
                 <tr>
-                  <td style={{ ...td, fontWeight: 700 }}>Thekedar ko dena hai</td>
+                  <td style={{ ...td, fontWeight: 700 }}>Payable to job worker</td>
                   <td style={{ ...tdNum, fontWeight: 700, color: amber }}>{money(priced.netPayable)}</td>
                 </tr>
               </tbody>
@@ -980,12 +980,12 @@ function LedgerTab({ ledger }: { ledger: { workers: LedgerWorker[]; totalValue: 
           </div>
         </div>
         <div style={{ fontSize: 12.5, color: dim, maxWidth: 460, lineHeight: 1.55 }}>
-          Ye aap ka current asset hai, thekedar ka nahi. Balance sheet par account <b style={{ color: "#fff" }}>1204 Stock at Job Worker</b> se milna chahiye.
+          This is your current asset, not the job worker's. It should agree with account <b style={{ color: "#fff" }}>1204 Stock at Job Worker</b> on the balance sheet.
         </div>
       </div>
 
       {ledger.workers.length === 0 && (
-        <div style={{ ...card, color: dim, fontSize: 13 }}>Abhi kisi thekedar ke paas maal nahi.</div>
+        <div style={{ ...card, color: dim, fontSize: 13 }}>No material is lying with any job worker.</div>
       )}
 
       {ledger.workers.map((w) => (

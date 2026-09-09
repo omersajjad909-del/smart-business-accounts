@@ -20,8 +20,8 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({
         enabled: false,
         reason:
-          "Job Work abhi under test hai aur sirf internal test workspace mein chalta hai. " +
-          "Admin → Dev Test se test company banayein.",
+          "Job Work is still under test and runs only in an internal test workspace. " +
+          "Create one from Admin → Dev Test.",
         summary: { workers: 0, openChallans: 0, closedChallans: 0, receipts: 0 },
       });
     }

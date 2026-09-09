@@ -121,8 +121,8 @@ export async function isJobWorkEnabled(companyId: string): Promise<boolean> {
 export async function assertJobWorkEnabled(companyId: string): Promise<void> {
   if (!(await isJobWorkEnabled(companyId))) {
     throw new JobWorkError(
-      "Job Work abhi sirf internal test workspace mein available hai. " +
-        "Admin → Dev Test se test company banayein.",
+      "Job Work is only available in an internal test workspace. " +
+        "Create one from Admin → Dev Test.",
       403,
     );
   }
@@ -299,11 +299,11 @@ export async function issueToJobWorker(opts: {
       standardPerPc: Number(l.standardPerPc),
     }))
     .filter((l) => l.itemId && Number.isFinite(l.qty) && l.qty > 0);
-  if (!wanted.length) throw new JobWorkError("Kam se kam ek material line chahiye");
+  if (!wanted.length) throw new JobWorkError("At least one material line is required");
 
   const sourceLocation = String(opts.sourceLocation || "MAIN").trim() || "MAIN";
   if (isJobWorkerLocation(sourceLocation)) {
-    throw new JobWorkError("Material ek thekedar se doosre ko seedha nahi bheja ja sakta — pehle wapas mangwayein");
+    throw new JobWorkError("Material cannot go straight from one job worker to another — bring it back first");
   }
 
   return prisma.$transaction(
@@ -311,7 +311,7 @@ export async function issueToJobWorker(opts: {
       const worker = await tx.businessRecord.findFirst({
         where: { id: opts.workerId, companyId, category: JOB_WORK_CATEGORIES.WORKER },
       });
-      if (!worker) throw new JobWorkError("Thekedar nahi mila", 404);
+      if (!worker) throw new JobWorkError("Job worker not found", 404);
       const workerData = (worker.data ?? {}) as Record<string, unknown>;
       const code = jobWorkerCode(String(workerData.code || worker.title));
       const jobLocation = jobWorkerLocation(code);
@@ -322,7 +322,7 @@ export async function issueToJobWorker(opts: {
         select: { id: true, name: true, unit: true },
       });
       if (items.length !== itemIds.length) {
-        throw new JobWorkError("Ek ya zyada item maujood nahi", 404);
+        throw new JobWorkError("One or more items no longer exist", 404);
       }
       const itemById = new Map(items.map((i) => [i.id, i]));
 
@@ -354,9 +354,9 @@ export async function issueToJobWorker(opts: {
         const short = lines.filter((l) => (onHand.get(l.itemId) ?? 0) < l.issuedQty);
         if (short.length) {
           const detail = short
-            .map((l) => `${l.itemName} (chahiye ${l.issuedQty}${l.unit}, hai ${onHand.get(l.itemId) ?? 0}${l.unit})`)
+            .map((l) => `${l.itemName} (need ${l.issuedQty}${l.unit}, have ${onHand.get(l.itemId) ?? 0}${l.unit})`)
             .join("; ");
-          throw new JobWorkError(`${sourceLocation} mein itna material nahi: ${detail}`);
+          throw new JobWorkError(`Not enough material in ${sourceLocation}: ${detail}`);
         }
       }
 
@@ -520,7 +520,7 @@ export function priceJobWorkReceipt(opts: {
 }): PricedReceipt {
   const goodQty = Math.floor(Number(opts.goodQty));
   if (!Number.isFinite(goodQty) || goodQty <= 0) {
-    throw new JobWorkError("Receive ki gayi quantity sifar se zyada honi chahiye");
+    throw new JobWorkError("Quantity received must be greater than zero");
   }
 
   const askedConsume = new Map<string, number>();
@@ -665,19 +665,19 @@ export async function receiveFromJobWorker(opts: {
       const record = await tx.businessRecord.findFirst({
         where: { id: opts.challanId, companyId, category: JOB_WORK_CATEGORIES.CHALLAN },
       });
-      if (!record) throw new JobWorkError("Challan nahi mila", 404);
+      if (!record) throw new JobWorkError("Challan not found", 404);
       if (record.status === "closed") {
-        throw new JobWorkError("Yeh challan band ho chuka hai");
+        throw new JobWorkError("This challan is already closed");
       }
       const challan = readChallan(record);
       if (!challan.finishedItemId) {
-        throw new JobWorkError("Is challan par finished item set nahi — challan edit kar ke item chunein");
+        throw new JobWorkError("This challan has no finished item — edit it and pick one");
       }
       const finishedItem = await tx.itemNew.findFirst({
         where: { id: challan.finishedItemId, companyId, deletedAt: null },
         select: { id: true, name: true },
       });
-      if (!finishedItem) throw new JobWorkError("Finished item ab maujood nahi", 404);
+      if (!finishedItem) throw new JobWorkError("The finished item no longer exists", 404);
 
       const priced = priceJobWorkReceipt({
         challan,
@@ -690,9 +690,9 @@ export async function receiveFromJobWorker(opts: {
 
       if (priced.shortages.length) {
         const detail = priced.shortages
-          .map((s) => `${s.itemName} (maang ${s.asked}${s.unit}, thekedar ke paas ${s.balance}${s.unit})`)
+          .map((s) => `${s.itemName} (asked for ${s.asked}${s.unit}, job worker holds ${s.balance}${s.unit})`)
           .join("; ");
-        throw new JobWorkError(`Thekedar ke paas itna material hai hi nahi: ${detail}`);
+        throw new JobWorkError(`The job worker does not hold that much material: ${detail}`);
       }
 
       const worker = await tx.businessRecord.findFirst({

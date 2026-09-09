@@ -1734,7 +1734,7 @@ export default function DashboardLayout({
               open={openSection === "jobwork"}
               onToggle={() => toggle("jobwork")}
             >
-              <NavLink href="/dashboard/job-work" pathname={pathname}>Thekedar / Job Work</NavLink>
+              <NavLink href="/dashboard/job-work" pathname={pathname}>Job Work</NavLink>
             </NavGroup>
           )}
           {/* Its own group rather than a Manufacturing sub-item, but the two

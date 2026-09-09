@@ -79,7 +79,7 @@ export async function POST(req: NextRequest) {
     if (!body) return NextResponse.json({ error: "Invalid request body" }, { status: 400 });
 
     const name = String(body.name || "").trim();
-    if (!name) return NextResponse.json({ error: "Thekedar ka naam chahiye" }, { status: 400 });
+    if (!name) return NextResponse.json({ error: "Job worker name is required" }, { status: 400 });
 
     const code = jobWorkerCode(String(body.code || name));
     // Codes drive the stock location, so two workers sharing one would pool
@@ -93,7 +93,7 @@ export async function POST(req: NextRequest) {
     );
     if (taken) {
       return NextResponse.json(
-        { error: `Code "${code}" pehle se kisi thekedar ka hai — doosra code dein` },
+        { error: `Code "${code}" already belongs to another job worker — use a different one` },
         { status: 400 },
       );
     }
@@ -150,7 +150,7 @@ export async function PATCH(req: NextRequest) {
     const record = await prisma.businessRecord.findFirst({
       where: { id, companyId, category: JOB_WORK_CATEGORIES.WORKER },
     });
-    if (!record) return NextResponse.json({ error: "Thekedar nahi mila" }, { status: 404 });
+    if (!record) return NextResponse.json({ error: "Job worker not found" }, { status: 404 });
 
     const d = (record.data ?? {}) as Record<string, unknown>;
     // The code is deliberately not editable: it is baked into every
@@ -195,7 +195,7 @@ export async function DELETE(req: NextRequest) {
     });
     if (used > 0) {
       return NextResponse.json(
-        { error: "Is thekedar ke challans maujood hain — delete nahi ho sakta. Status inactive kar dein." },
+        { error: "This job worker has challans and cannot be deleted. Set their status to inactive instead." },
         { status: 400 },
       );
     }
