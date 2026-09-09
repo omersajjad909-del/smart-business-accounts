@@ -1673,7 +1673,9 @@ export default function DashboardLayout({
               {hasDashboardFeature("MANUFACTURING_BOM") && <NavLink href="/dashboard/manufacturing/bom" pathname={pathname}>Recipe BOM</NavLink>}
               {hasDashboardFeature("MANUFACTURING_PRODUCTION_ORDERS") && <NavLink href="/dashboard/manufacturing/production-orders" pathname={pathname}>Production Orders</NavLink>}
               {hasDashboardFeature("MANUFACTURING_RAW_MATERIALS") && <NavLink href="/dashboard/manufacturing/raw-materials" pathname={pathname}>Raw Materials</NavLink>}
+              {hasDashboardFeature("MANUFACTURING_TRADING_GOODS") && <NavLink href="/dashboard/manufacturing/trading-goods" pathname={pathname}>Trading Goods</NavLink>}
               {hasDashboardFeature("MANUFACTURING_FINISHED_GOODS") && <NavLink href="/dashboard/manufacturing/finished-goods" pathname={pathname}>Finished Goods</NavLink>}
+              {hasDashboardFeature("MANUFACTURING_WASTAGE") && <NavLink href="/dashboard/manufacturing/wastage" pathname={pathname}>Wastage</NavLink>}
               {hasDashboardFeature("FOOD_PROCESSING_ANALYTICS") && <NavLink href="/dashboard/food-processing/analytics" pathname={pathname}>Analytics</NavLink>}
             </NavGroup>
           )}
@@ -1690,7 +1692,9 @@ export default function DashboardLayout({
               {hasDashboardFeature("MANUFACTURING_PRODUCTION_ORDERS") && <NavLink href="/dashboard/manufacturing/labour" pathname={pathname}>Labour</NavLink>}
               {hasDashboardFeature("MANUFACTURING_WORK_ORDERS") && <NavLink href="/dashboard/manufacturing/work-orders" pathname={pathname}>Work Orders</NavLink>}
               {hasDashboardFeature("MANUFACTURING_RAW_MATERIALS") && <NavLink href="/dashboard/manufacturing/raw-materials" pathname={pathname}>Raw Materials</NavLink>}
+              {hasDashboardFeature("MANUFACTURING_TRADING_GOODS") && <NavLink href="/dashboard/manufacturing/trading-goods" pathname={pathname}>Trading Goods</NavLink>}
               {hasDashboardFeature("MANUFACTURING_FINISHED_GOODS") && <NavLink href="/dashboard/manufacturing/finished-goods" pathname={pathname}>Finished Goods</NavLink>}
+              {hasDashboardFeature("MANUFACTURING_WASTAGE") && <NavLink href="/dashboard/manufacturing/wastage" pathname={pathname}>Wastage</NavLink>}
               {hasDashboardFeature("MANUFACTURING_QUALITY") && <NavLink href="/dashboard/manufacturing/quality" pathname={pathname}>Quality Control</NavLink>}
             </NavGroup>
           )}

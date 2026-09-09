@@ -186,6 +186,10 @@ function CostingInner() {
   const [showWorking, setShowWorking] = useState(true);
   // Which sheet is being sent to the printer — the quote, or the cutting detail.
   const [printKind, setPrintKind] = useState<"cost" | "working" | null>(null);
+  // Profit is not part of the formula — it is what to charge on top of what the
+  // job costs, decided per quote rather than baked into the costing itself.
+  const [profitMode, setProfitMode] = useState<"amount" | "percent">("percent");
+  const [profitValue, setProfitValue] = useState<number>(0);
 
   const formulas = useMemo(
     () => formulaStore.records.map((r) => ({ id: r.id, formula: toFormula(r) })),
@@ -211,6 +215,7 @@ function CostingInner() {
     setValues(next);
     setSheetName(selected.formula.name);
     setSavedNote("");
+    setProfitValue(0);
   }, [selectedId]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const run = useMemo(
@@ -233,6 +238,16 @@ function CostingInner() {
   const fixedInputs = selected?.formula.inputs.filter((i) => i.askOnRun === false) ?? [];
   const outputs = selected?.formula.outputs.filter((o) => o.key) ?? [];
   const primary = outputs.find((o) => o.primary) ?? outputs[0];
+
+  // Profit is worked out on top of the primary result, whatever it is called —
+  // most formulas end on a cost per unit, but the box does not require it.
+  const baseRate = typeof run?.values[primary?.key ?? ""] === "number"
+    ? (run!.values[primary!.key] as number)
+    : null;
+  const profitAmount = baseRate == null ? 0
+    : profitMode === "percent" ? (baseRate * profitValue) / 100
+    : profitValue;
+  const saleRate = baseRate == null ? null : baseRate + profitAmount;
 
   async function saveSheet() {
     if (!selected || !run) return;
@@ -505,6 +520,42 @@ function CostingInner() {
                     </div>
                   )}
                 </div>
+
+                {/* Profit on top of the result — decided per quote, not part of
+                    the formula, so it lives here rather than as another step. */}
+                {baseRate != null && (
+                  <div style={{ padding: "16px 22px 20px", borderTop: "1px solid rgba(52,211,153,.18)" }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", gap: 16, flexWrap: "wrap" }}>
+                      <div style={{ flex: "1 1 170px" }}>
+                        <label style={labelStyle}>Profit</label>
+                        <div style={{ display: "flex", gap: 8 }}>
+                          <input
+                            type="number" step="any"
+                            value={profitValue || ""}
+                            onChange={(e) => setProfitValue(Number(e.target.value) || 0)}
+                            placeholder="0"
+                            style={{ ...inputStyle, flex: 1 }}
+                          />
+                          <select
+                            value={profitMode}
+                            onChange={(e) => setProfitMode(e.target.value as "amount" | "percent")}
+                            style={{ ...inputStyle, fontFamily: FONT, width: 68, flex: "0 0 auto", padding: "10px 6px" }}
+                          >
+                            <option value="percent">%</option>
+                            <option value="amount">Rs</option>
+                          </select>
+                        </div>
+                      </div>
+                      <div style={{ textAlign: "right" }}>
+                        <div style={{ fontSize: 11.5, color: "rgba(255,255,255,.4)", marginBottom: 3 }}>Sale rate</div>
+                        <div style={{ fontFamily: MONO, fontSize: 22, fontWeight: 800, color: "#34d399", fontVariantNumeric: "tabular-nums" }}>
+                          {fmt(saleRate)}
+                          <span style={{ fontSize: 12, color: "rgba(255,255,255,.32)", marginLeft: 6, fontWeight: 600 }}>{primary.unit}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
 
                 {/* Two prints, because two people use them. */}
                 <div className="cxActionRow" style={{
