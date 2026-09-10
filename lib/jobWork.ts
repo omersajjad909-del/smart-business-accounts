@@ -30,9 +30,10 @@
  * location, so every existing stock report keeps working.
  *
  * ── Availability ────────────────────────────────────────────────────────────
- * Gated to internal test workspaces (`Company.isInternalTest`). Nothing here
- * runs for a demo sandbox or a real customer until that gate is lifted. See
- * `assertJobWorkEnabled`.
+ * Still under test, so it ships switched off. It runs in an internal test
+ * workspace and in a demo sandbox, and for a real tenant only once an admin has
+ * ticked Job Work for their plan in Admin → Plans → Pages & Modules — which no
+ * plan ships with. See `isJobWorkEnabled` and `assertJobWorkEnabled`.
  */
 
 import { prisma } from "@/lib/prisma";
