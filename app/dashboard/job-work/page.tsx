@@ -3,9 +3,9 @@
 /**
  * Job Work (Thekedar) — issue material, take pieces back, see what is lying out.
  *
- * Internal test workspaces only. The page asks /api/job-work/status first and
- * renders a locked panel everywhere else, so a real company never sees a form
- * that would fail on submit.
+ * Ships switched off. The page asks /api/job-work/status first and renders a
+ * locked panel wherever the answer is no, so a company the module is not on for
+ * never sees a form that would fail on submit.
  */
 
 import { Suspense, useCallback, useEffect, useMemo, useState } from "react";

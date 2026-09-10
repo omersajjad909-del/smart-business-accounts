@@ -143,8 +143,8 @@ export async function isJobWorkEnabled(companyId: string): Promise<boolean> {
 export async function assertJobWorkEnabled(companyId: string): Promise<void> {
   if (!(await isJobWorkEnabled(companyId))) {
     throw new JobWorkError(
-      "Job Work is only available in an internal test workspace. " +
-        "Create one from Admin → Dev Test.",
+      "Job Work is switched off for this workspace. An admin can turn it on for " +
+        "the plan under Admin → Plans → Pages & Modules.",
       403,
     );
   }

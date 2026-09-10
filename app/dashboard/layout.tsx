@@ -292,12 +292,12 @@ export default function DashboardLayout({
   // for the link to go away. Defaults to false, so a failed lookup shows the
   // link rather than hiding a page nobody can then find.
   const [rateFormulaHidden, setRateFormulaHidden] = useState(false);
-  // Job Work is still under test and must not appear for a demo sandbox or a
-  // real customer. The answer comes from the server rather than from a plan
-  // flag or business type, because /api/job-work/status is the same authority
-  // every job-work endpoint enforces — a link that shows here can never point
-  // at a page whose API would refuse the company. Defaults to false: a failed
-  // lookup hides the link, which is the safe direction for an unreleased page.
+  // Job Work ships switched off. The answer comes from the server rather than
+  // from a plan flag or business type read here, because /api/job-work/status is
+  // the same authority every job-work endpoint enforces — a link that shows here
+  // can never point at a page whose API would refuse the company. Defaults to
+  // false: a failed lookup hides the link, the safe direction for a page that is
+  // off for almost everyone.
   const [jobWorkEnabled, setJobWorkEnabled] = useState(false);
   const [userAvatar, setUserAvatar] = useState<string | null>(null);
   const [avatarUploading, setAvatarUploading] = useState(false);
@@ -1726,7 +1726,8 @@ export default function DashboardLayout({
               the "bom" module, and a merchant manufacturer who owns no machines
               is usually set up as trading — which would have hidden the page from
               exactly the company it was built for. Gated purely on the server's
-              own answer, so it exists only inside an internal test workspace. */}
+              own answer, which covers all three ways in — internal test, demo
+              sandbox, or a plan an admin has ticked it for. */}
           {jobWorkEnabled && (
             <NavGroup
               title="Job Work"
