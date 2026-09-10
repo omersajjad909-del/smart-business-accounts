@@ -298,8 +298,9 @@ export async function GET(req: NextRequest) {
     // type, took the sidebar link away and had the page guard bounce anyone who
     // typed the URL. Applied before the global hides below, so a page retired
     // platform-wide stays retired here too.
-    if (company?.isDemo && dashboardFeatures && !dashboardFeatures.includes(DEMO_ALWAYS_ON_FEATURE)) {
-      dashboardFeatures = [...dashboardFeatures, DEMO_ALWAYS_ON_FEATURE];
+    if (company?.isDemo && dashboardFeatures) {
+      const missing = DEMO_ALWAYS_ON_FEATURES.filter((id) => !dashboardFeatures!.includes(id));
+      if (missing.length) dashboardFeatures = [...dashboardFeatures, ...missing];
     }
 
     // Global page-visibility hides apply on top of whichever list won — last,
