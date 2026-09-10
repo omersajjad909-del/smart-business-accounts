@@ -1162,7 +1162,7 @@ function SalesInvoiceContent() {
                                 <th key={"t"+h+hi} style={{ padding: "10px 6px", fontSize: 10.5, fontWeight: 800, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: 0.5, textAlign: hi <= 5 ? "right" : "left", whiteSpace: "nowrap" }}>{h}</th>
                               ))}
                               {rfActive && rtmmFormula.fields.length > 0 && <RateFormulaHeadCells settings={rtmmFormula} />}
-                              {["Unit Price","Total",""].map((h,hi) => (
+                              {["Unit Price","Disc%","Tax%","Total",""].map((h,hi) => (
                                 <th key={"tail"+h+hi} style={{ padding: "10px 6px", fontSize: 10.5, fontWeight: 800, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: 0.5, textAlign: hi <= 5 ? "right" : "left", whiteSpace: "nowrap" }}>{h}</th>
                               ))}
                             </tr>
@@ -1224,6 +1224,12 @@ function SalesInvoiceContent() {
                                   )}
                                   <td style={{ padding: "13px 6px", width: 82, borderTop: "1px solid var(--border)", borderBottom: "1px solid var(--border)" }}>
                                     <input type="number" step="any" style={{ ...inputStyle, padding: "5px 6px", border: "1.5px solid var(--border)", borderRadius: 7, textAlign: "right", fontSize: 12.5, ...(rfActive && !rf.rateEditable ? { opacity: 0.75, cursor: "not-allowed" } : {}) }} value={r.rate} onChange={e => updateRow(i, "rate", e.target.value)} readOnly={rfActive && !rf.rateEditable} title={rfActive && !rf.rateEditable ? "Worked out by your rate formula" : undefined} placeholder="0.00" />
+                                  </td>
+                                  <td style={{ padding: "13px 6px", width: 64, borderTop: "1px solid var(--border)", borderBottom: "1px solid var(--border)" }}>
+                                    <input type="number" step="any" style={{ ...inputStyle, padding: "5px 6px", border: "1.5px solid var(--border)", borderRadius: 7, textAlign: "right", fontSize: 12.5 }} value={r.discountPercent} onChange={e => updateRow(i, "discountPercent", e.target.value)} placeholder="0" />
+                                  </td>
+                                  <td style={{ padding: "13px 6px", width: 64, borderTop: "1px solid var(--border)", borderBottom: "1px solid var(--border)" }}>
+                                    <input type="number" step="any" style={{ ...inputStyle, padding: "5px 6px", border: "1.5px solid var(--border)", borderRadius: 7, textAlign: "right", fontSize: 12.5 }} value={r.taxPercent} onChange={e => updateRow(i, "taxPercent", e.target.value)} placeholder="0" />
                                   </td>
                                   <td style={{ padding: "13px 6px", textAlign: "right", fontWeight: 700, fontSize: 13, width: 82, whiteSpace: "nowrap", borderTop: "1px solid var(--border)", borderBottom: "1px solid var(--border)" }}>{fmt(lineTaxable + lineTax)}</td>
                                   <td style={{ padding: "13px 4px", width: 26, borderTop: "1px solid var(--border)", borderBottom: "1px solid var(--border)", borderRight: "1px solid var(--border)" }}>
