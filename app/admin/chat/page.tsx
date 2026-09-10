@@ -1,5 +1,6 @@
 "use client";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useVisiblePoll } from "@/hooks/useVisiblePoll";
 
 interface Conversation {
   id: string;
@@ -72,12 +73,7 @@ export default function AdminSupportInbox() {
 
   useEffect(() => { fetchConvos(); }, [fetchConvos]);
 
-  useEffect(() => {
-    if (!selected) return;
-    fetchMessages(selected.id);
-    const t = setInterval(() => fetchMessages(selected.id), 8000);
-    return () => clearInterval(t);
-  }, [selected, fetchMessages]);
+  useVisiblePoll(() => { if (selected) fetchMessages(selected.id); }, 8000, selected?.id);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });

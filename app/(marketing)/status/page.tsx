@@ -1,6 +1,7 @@
 "use client";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
+import { useVisiblePoll } from "@/hooks/useVisiblePoll";
 
 /* ─── Types ─── */
 type Status = "operational" | "degraded" | "outage" | "maintenance";
@@ -231,11 +232,9 @@ export default function StatusPage() {
     }
   }
 
-  useEffect(() => {
-    fetchHealth();
-    const interval = setInterval(fetchHealth, 60000);
-    return () => clearInterval(interval);
-  }, []);
+  // A status page is exactly the kind of tab people park and forget, so this
+  // stops polling the health check the moment it goes out of view.
+  useVisiblePoll(fetchHealth, 60000);
 
   const allOperational = services.length > 0 && services.every(s => s.status === "operational");
 
