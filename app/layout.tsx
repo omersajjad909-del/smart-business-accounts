@@ -34,6 +34,7 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { ALLOW_LIGHT_THEME, DEFAULT_THEME, FOLLOW_SYSTEM_THEME } from "@/lib/themeConfig";
 import VisitorTracker from "@/components/VisitorTracker";
 import ClientRegionSignal from "@/components/ClientRegionSignal";
+import NumberWheelGuard from "@/components/NumberWheelGuard";
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "https://www.finovaos.app";
 const GOOGLE_SITE_VERIFICATION =
@@ -365,6 +366,7 @@ export default async function RootLayout({
       <body className="app-root" suppressHydrationWarning>
         <VisitorTracker />
         <ClientRegionSignal />
+        <NumberWheelGuard />
         {/* ScrollRestorer removed. It hunted for any fixed/sticky element
             covering the viewport and set `pointer-events: none` on it — which
             caught the dashboard sidebar (position:fixed, top:0, bottom:0) and

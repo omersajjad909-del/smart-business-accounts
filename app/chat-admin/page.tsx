@@ -6,6 +6,15 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { getCurrentUser } from "@/lib/auth";
+import { useVisiblePoll } from "@/hooks/useVisiblePoll";
+
+/* ─── Poll intervals ───
+   These only run while the tab is visible (see useVisiblePoll), so the cost is
+   paid by agents actually working a queue rather than by forgotten tabs. The
+   list can lag a few seconds; the open conversation is what needs to feel live,
+   so it polls twice as often. */
+const CONVERSATIONS_POLL_MS = 10_000;
+const MESSAGES_POLL_MS = 5_000;
 
 /* ─── Types ─── */
 type Conversation = {
@@ -131,11 +140,7 @@ export default function AgentDashboard() {
     } catch { /* ignore */ }
   }, []);
 
-  useEffect(() => {
-    loadConversations();
-    const t = setInterval(loadConversations, 3000);
-    return () => clearInterval(t);
-  }, [loadConversations]);
+  useVisiblePoll(loadConversations, CONVERSATIONS_POLL_MS);
 
   /* ── Load messages for active conversation (polling) ── */
   const loadMessages = useCallback(async () => {
@@ -146,12 +151,7 @@ export default function AgentDashboard() {
     } catch { /* ignore */ }
   }, [activeId]);
 
-  useEffect(() => {
-    if (!activeId) return;
-    loadMessages();
-    const t = setInterval(loadMessages, 2500);
-    return () => clearInterval(t);
-  }, [activeId, loadMessages]);
+  useVisiblePoll(loadMessages, MESSAGES_POLL_MS, activeId);
 
   /* ── Notification blink reset ── */
   useEffect(() => {

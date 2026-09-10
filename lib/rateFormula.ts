@@ -202,7 +202,12 @@ export const RATE_FORMULA_PRESETS: Array<{
         // suffix survives; never part of the maths; and set on the item, so an
         // order can never quote a shade the item master does not carry.
         { key: "shade",  label: "Shade #", unit: "",       kind: "text",   defaultValue: "", width: 65, affectsRate: false, showOnPrint: true, required: false, focusOnPick: false, lockedToItem: true },
-        { key: "rtmm",   label: "RT/MM",   unit: "per mm", kind: "number", defaultValue: 0, width: 60, affectsRate: true,  showOnPrint: true, required: true,  focusOnPick: false, lockedToItem: false },
+        // Not required: some rolls are bought and sold at a flat price with no
+        // rate per mm behind it. Leaving this blank and typing the price is a
+        // legitimate line, so the template does not insist on it. The gauge,
+        // width and length above still are — they describe the goods, and stay
+        // on the bill whichever way the price was arrived at.
+        { key: "rtmm",   label: "RT/MM",   unit: "per mm", kind: "number", defaultValue: 0, width: 60, affectsRate: true,  showOnPrint: true, required: false, focusOnPick: false, lockedToItem: false },
       ],
     },
   },

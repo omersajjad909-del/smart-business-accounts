@@ -397,7 +397,7 @@ export default function GRNPage() {
     const filledItems = rows.filter(r => r.itemId && r.receivedQty);
     if (rfActive) {
       for (let i = 0; i < filledItems.length; i++) {
-        const missing = rateFormulaLineIncomplete(rf, filledItems[i].meta);
+        const missing = rateFormulaLineIncomplete(rf, filledItems[i].meta, filledItems[i].rate);
         if (missing) { toast.error(`Line ${i + 1}: ${missing.label} is required`); return; }
       }
     }

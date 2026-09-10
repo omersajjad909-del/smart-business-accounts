@@ -389,15 +389,31 @@ export function rateFormulaPrintValues(
   return out;
 }
 
-/** True when a required column on this line is still blank. */
+/**
+ * True when a required column on this line is still blank.
+ *
+ * `rate` is what the operator typed in the price box. Not every line is priced
+ * by the formula — a roll bought at a flat Rs 8,000 has no rate per mm to
+ * enter, and demanding one turned an ordinary purchase into a document that
+ * could not be saved at all. So a line that already carries a price is not
+ * unfinished: the columns that only exist to compute a price are not asked for.
+ *
+ * Columns that do not affect the rate — a shade code, a batch — are still
+ * required when marked so. Those record what was bought; they are not working.
+ */
 export function rateFormulaLineIncomplete(
   settings: RateFormulaSettings,
-  meta: RateFormulaMeta | undefined
+  meta: RateFormulaMeta | undefined,
+  rate?: number | string
 ): RateFormulaField | null {
+  const typed = Number(rate);
+  const pricedByHand = Number.isFinite(typed) && typed > 0;
   for (const f of settings.fields) {
     if (!f.required) continue;
     const v = meta?.[f.key];
-    if (v === "" || v === undefined || v === null) return f;
+    if (v !== "" && v !== undefined && v !== null) continue;
+    if (pricedByHand && f.affectsRate) continue;
+    return f;
   }
   return null;
 }

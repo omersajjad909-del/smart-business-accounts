@@ -6,7 +6,7 @@ import { confirmToast, alertToast } from "@/lib/toast-feedback";
 import { PrintActionBar } from "@/components/print/PrintActionBar";
 import { PrintDocA4, PrintPaperWrapper } from "@/components/print/PrintDocA4";
 
-import { Suspense, useEffect, useRef, useState } from "react";
+import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import toast from "react-hot-toast";
 import dynamic from "next/dynamic";
@@ -192,6 +192,23 @@ function PurchaseInvoiceContent() {
   // width × length ÷ 54 and the like — get extra columns and a computed rate.
   // Everyone else gets exactly the grid that was here before.
   const { settings: rf, active: rfActive } = useRateFormula("purchaseInvoice");
+  // Same column order as the sales invoice. The specifications arrive with the
+  // item and are typed first; RT/MM is worked out per line and is entered after
+  // Qty, so it is the one formula column that sits on the far side of it.
+  // Purchases used to put it with the rest, which meant the two grids read in
+  // different orders for the same trade and the same operator.
+  const rtmmFieldKey = useMemo(
+    () => rf.fields.find((field) => /rt\s*\/?\s*mm/i.test(`${field.key} ${field.label}`))?.key ?? null,
+    [rf],
+  );
+  const formulaBeforeQty = useMemo(
+    () => ({ ...rf, fields: rf.fields.filter((field) => field.key !== rtmmFieldKey) }),
+    [rf, rtmmFieldKey],
+  );
+  const rtmmFormula = useMemo(
+    () => ({ ...rf, fields: rtmmFieldKey ? rf.fields.filter((field) => field.key === rtmmFieldKey) : [] }),
+    [rf, rtmmFieldKey],
+  );
   /**
    * What the line got from the item that was just picked. The picker fires
    * Enter straight after its onChange, before React has committed the new row,
@@ -655,7 +672,7 @@ const [searchTerm, setSearchTerm] = useState("");
 
     if (rfActive) {
       for (let i = 0; i < clean.length; i++) {
-        const missing = rateFormulaLineIncomplete(rf, clean[i].meta);
+        const missing = rateFormulaLineIncomplete(rf, clean[i].meta, clean[i].rate);
         if (missing) {
           toast.error(`Line ${i + 1}: ${missing.label} is required`);
           return;
@@ -1303,9 +1320,13 @@ const [searchTerm, setSearchTerm] = useState("");
                               {["#","SKU / Code","Product Name"].map((h, hi) => (
                                 <th key={hi} style={{ padding: "9px 8px", textAlign: "left", color: MUTED, fontWeight: 700, fontSize: 10, textTransform: "uppercase" as const, letterSpacing: 0.5, whiteSpace: "nowrap", borderBottom: `1px solid ${BORDER}` }}>{h}</th>
                               ))}
-                              {rfActive && <RateFormulaHeadCells settings={rf} />}
-                              {["Unit","Qty","Unit Cost","Disc%","Tax%","Total",""].map((h, hi) => (
-                                <th key={`t${hi}`} style={{ padding: "9px 8px", textAlign: hi === 0 ? "left" : hi === 6 ? "center" : "right", color: MUTED, fontWeight: 700, fontSize: 10, textTransform: "uppercase" as const, letterSpacing: 0.5, whiteSpace: "nowrap", borderBottom: `1px solid ${BORDER}` }}>{h}</th>
+                              {rfActive && <RateFormulaHeadCells settings={formulaBeforeQty} />}
+                              {["Unit","Qty"].map((h, hi) => (
+                                <th key={`u${hi}`} style={{ padding: "9px 8px", textAlign: hi === 0 ? "left" : "right", color: MUTED, fontWeight: 700, fontSize: 10, textTransform: "uppercase" as const, letterSpacing: 0.5, whiteSpace: "nowrap", borderBottom: `1px solid ${BORDER}` }}>{h}</th>
+                              ))}
+                              {rfActive && rtmmFormula.fields.length > 0 && <RateFormulaHeadCells settings={rtmmFormula} />}
+                              {["Unit Cost","Disc%","Tax%","Total",""].map((h, hi) => (
+                                <th key={`t${hi}`} style={{ padding: "9px 8px", textAlign: hi === 4 ? "center" : "right", color: MUTED, fontWeight: 700, fontSize: 10, textTransform: "uppercase" as const, letterSpacing: 0.5, whiteSpace: "nowrap", borderBottom: `1px solid ${BORDER}` }}>{h}</th>
                               ))}
                             </tr>
                           </thead>
@@ -1362,7 +1383,7 @@ const [searchTerm, setSearchTerm] = useState("");
                                   </td>
                                   {rfActive && (
                                     <RateFormulaRowCells
-                                      settings={rf}
+                                      settings={formulaBeforeQty}
                                       meta={r.meta}
                                       rowIndex={i}
                                       onChange={(key, value) => updateRowMeta(i, key, value)}
@@ -1372,6 +1393,14 @@ const [searchTerm, setSearchTerm] = useState("");
                                     <input value={r.unit} onChange={e => updateRow(i, "unit", e.target.value)} placeholder="pcs" style={inp({ padding: "5px 6px", fontSize: 12, textAlign: "center" })} />
                                   </td>
                                   <td style={{ padding: "7px 8px", width: 76 }}><input type="number" step="any" value={r.qty} onChange={e => updateRow(i, "qty", e.target.value)} placeholder="0" style={inp({ padding: "5px 7px", textAlign: "right", fontSize: 12.5 })} /></td>
+                                  {rfActive && rtmmFormula.fields.length > 0 && (
+                                    <RateFormulaRowCells
+                                      settings={rtmmFormula}
+                                      meta={r.meta}
+                                      rowIndex={i}
+                                      onChange={(key, value) => updateRowMeta(i, key, value)}
+                                    />
+                                  )}
                                   <td style={{ padding: "7px 8px", width: 96 }}>
                                     <input
                                       type="number"

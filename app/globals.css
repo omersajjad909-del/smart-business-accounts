@@ -1188,3 +1188,29 @@ html:not(.dark) select option {
   color: #000000;
 }
 
+
+/* ── Number inputs: no spinners, and the wheel never edits them ──────────────
+ *
+ * Two separate nuisances, both belonging to the browser's default number input
+ * rather than to any one form.
+ *
+ * The stepper arrows sit on top of the value in a dense grid, and clicking a
+ * cell to type would land on them instead. They are removed everywhere: every
+ * quantity, rate and percentage in this app is typed, never nudged.
+ *
+ * The wheel is the worse one. A focused number input takes the scroll wheel as
+ * a stepper, so scrolling the page with the cursor resting over Disc% turned 10
+ * into 20 and then into -10 — silently, on a field the operator had already
+ * finished with. NumberWheelGuard in the root layout blurs the field instead;
+ * the page then scrolls the way it should and the value stays as typed.
+ */
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type="number"] {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}

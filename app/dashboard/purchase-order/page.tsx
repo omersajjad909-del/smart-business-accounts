@@ -192,7 +192,7 @@ export default function PurchaseOrderPage() {
     if (!supplierId || !clean.length) { toast.error("Supplier and items are required"); return; }
     if (rfActive) {
       for (let i = 0; i < clean.length; i++) {
-        const missing = rateFormulaLineIncomplete(rf, clean[i].meta);
+        const missing = rateFormulaLineIncomplete(rf, clean[i].meta, clean[i].rate);
         if (missing) { toast.error(`Line ${i + 1}: ${missing.label} is required`); return; }
       }
     }
