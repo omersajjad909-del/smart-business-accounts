@@ -83,6 +83,10 @@ export async function POST(req: NextRequest) {
       ratePerPc: Number(body.ratePerPc),
       allowedWastagePct: Number(body.allowedWastagePct),
       notes: String(body.notes || ""),
+      // Passed through as-is; readChallanFormula normalises it on the way back
+      // out, so a malformed stamp degrades to "no formula" rather than to bad
+      // numbers on a receipt.
+      formula: body.formula && typeof body.formula === "object" ? body.formula : null,
       allowNegativeStock: body.allowNegativeStock === true,
     });
 

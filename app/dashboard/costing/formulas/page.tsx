@@ -19,6 +19,9 @@ import {
   runFormula,
   checkExpression,
   validateKey,
+  applyProfit,
+  toProfit,
+  NO_PROFIT,
   FUNCTIONS,
   type CostingFormula,
   type FormulaInput,
@@ -73,13 +76,35 @@ const CSS = `
 .fxIn{display:grid;grid-template-columns:1.05fr 1.3fr .6fr .95fr 1.05fr auto auto;gap:8px;align-items:center}
 .fxOut{display:grid;grid-template-columns:1.05fr 1.3fr .6fr 1.1fr auto auto;gap:8px;align-items:center}
 .fxStep{display:grid;grid-template-columns:1.05fr 1.3fr .6fr auto;gap:8px;align-items:center}
+.fxProfit{display:grid;grid-template-columns:1fr 1.3fr;gap:8px;align-items:center;max-width:330px}
+/* Simple rows go two to a line, the way the run screen asks for the job —
+   twelve inputs stacked one per line is a page you scroll rather than read.
+   Both halves are the same 1fr of the same container and carry the same inner
+   template, so the header above them lines up without needing subgrid.
+   Detailed stays one per line: seven columns will not halve. */
+.fxRows{display:flex;flex-direction:column;gap:9px}
+.fxPairs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px 14px;align-items:start}
+.fxPairsHead{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 14px}
 .fxHead{font-size:9.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
   color:rgba(255,255,255,.32);padding:0 2px 3px}
 .fxFormulaTitle{flex:1 1 220px;min-width:220px;word-break:normal;overflow-wrap:anywhere}
 .fxFormulaActions{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+/* Two columns: the live result belongs in the sticky side rail. */
+.fxLiveMobile{display:none}
+/* Below this a half-row cannot hold a name, a unit and a number without
+   squeezing all three, so the pairs go back to one per line. */
+@media(max-width:900px){
+  .fxPairs{grid-template-columns:1fr}
+  .fxPairsHead{grid-template-columns:1fr}
+  .fxPairSecond{display:none}
+}
 @media(max-width:1080px){
   .fxCols{grid-template-columns:1fr}
   .fxSide{position:static}
+  /* One column: the side rail now sits below everything, so the result moves
+     up under Inputs and the rail's copy stands down. */
+  .fxLiveMobile{display:block}
+  .fxLiveDesk{display:none}
 }
 /* Under 768px the dashboard's own topbar is sticky against the window, so the
    action bar parks below it instead of covering it. */
@@ -111,6 +136,7 @@ function emptyDraft(category: string): Draft {
     inputs: [{ key: "materialCost", label: "Material cost", unit: "Rs", defaultValue: 100, askOnRun: true }],
     steps: [{ key: "costPerPc", label: "Cost per unit", expression: "materialCost", unit: "Rs" }],
     outputs: [{ key: "costPerPc", label: "Cost per unit", unit: "Rs", role: "cost_per_unit", primary: true }],
+    profit: { ...NO_PROFIT },
   };
 }
 
@@ -124,8 +150,30 @@ function toDraft(record: BusinessRecord): Draft {
     inputs: Array.isArray(d.inputs) ? (d.inputs as FormulaInput[]) : [],
     steps: Array.isArray(d.steps) ? (d.steps as FormulaStep[]) : [],
     outputs: Array.isArray(d.outputs) ? (d.outputs as FormulaOutput[]) : [],
+    profit: toProfit(d.profit),
   };
 }
+
+/* Simple-mode column labels. Written as functions rather than constants
+   because two-up draws them twice, once over each half, and React wants two
+   elements rather than the same one in two places. */
+const inputHeadCells = () => (
+  <>
+    <div className="fxHead">Name</div>
+    <div className="fxHead">Unit</div>
+    <div className="fxHead">Value</div>
+    <div />
+  </>
+);
+
+const outputHeadCells = () => (
+  <>
+    <div className="fxHead">Value</div>
+    <div className="fxHead">Shown as</div>
+    <div className="fxHead">Main</div>
+    <div />
+  </>
+);
 
 /**
  * Keys the editor invented for a brand-new row. While a key still looks like
@@ -186,7 +234,7 @@ export default function FormulasPage() {
 
   const templateCard = (t: (typeof FORMULA_TEMPLATES)[number]) => (
     <button key={t.templateId}
-      onClick={() => setEditing({ id: null, draft: { ...structuredClone(t), name: t.name } })}
+      onClick={() => setEditing({ id: null, draft: { ...structuredClone(t), name: t.name, profit: toProfit(t.profit) } })}
       style={{ ...btn(), display: "block", textAlign: "left", padding: "13px 15px", lineHeight: 1.5 }}>
       <div style={{ fontSize: 13, fontWeight: 700, color: "white", marginBottom: 3 }}>{t.name}</div>
       <div style={{ fontSize: 11.5, color: "rgba(255,255,255,.38)", fontWeight: 400 }}>{t.summary}</div>
@@ -251,6 +299,7 @@ export default function FormulasPage() {
           inputs: d.inputs,
           steps: d.steps,
           outputs: d.outputs,
+          profit: d.profit ?? NO_PROFIT,
         },
       };
       if (editing.id) await store.update(editing.id, payload);
@@ -308,6 +357,87 @@ export default function FormulasPage() {
         st.expression = st.expression.trim() ? `${st.expression.trimEnd()} ${k}` : k;
       });
     };
+
+    /* Profit lands on the starred output — the one number the formula is
+       really for. Same rule the run screen uses, so what an author previews is
+       what an operator gets. */
+    const primaryOut = d.outputs.find((o) => o.primary && o.key) ?? d.outputs.find((o) => o.key);
+    const baseRate = typeof preview?.values[primaryOut?.key ?? ""] === "number"
+      ? (preview!.values[primaryOut!.key] as number)
+      : null;
+    const { amount: profitAmount, total: saleRate } = applyProfit(baseRate, d.profit);
+
+    /* Written once, hung in two places. On a wide screen it rides in the
+       sticky right column; once the columns stack it would land at the very
+       bottom, a scroll away from the numbers that change it — so on narrow
+       screens it sits directly under Inputs instead. CSS picks which copy
+       shows. */
+    const liveResultCard = (
+      <div style={{ background: CARD, border: `1px solid ${BORDER}`, borderRadius: 14, padding: 18 }}>
+        <div style={{ ...label, marginBottom: 12 }}>Live result</div>
+        {preview?.ok === false && (
+          <div style={{
+            fontSize: 12, color: "#f87171", marginBottom: 12, lineHeight: 1.6,
+            padding: "9px 11px", borderRadius: 9,
+            background: "rgba(248,113,113,.09)", border: "1px solid rgba(248,113,113,.25)",
+          }}>
+            {preview.error}
+          </div>
+        )}
+        <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+          {d.outputs.filter((o) => o.key).map((o) => (
+            <div key={o.key} style={{
+              display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 10,
+              padding: o.primary ? "10px 12px" : "4px 0",
+              background: o.primary ? "rgba(52,211,153,.09)" : "transparent",
+              border: o.primary ? "1px solid rgba(52,211,153,.25)" : "none",
+              borderRadius: 10,
+            }}>
+              <span style={{ fontSize: 12.5, color: "rgba(255,255,255,.5)" }}>{o.label || o.key}</span>
+              <span style={{
+                fontFamily: MONO, fontVariantNumeric: "tabular-nums",
+                fontSize: o.primary ? 17 : 13, fontWeight: 700,
+                color: o.primary ? "#34d399" : "rgba(255,255,255,.85)",
+              }}>
+                {fmt(preview?.values[o.key])}<span style={{ fontSize: 10.5, color: "rgba(255,255,255,.3)", marginLeft: 4 }}>{o.unit}</span>
+              </span>
+            </div>
+          ))}
+          {!d.outputs.some((o) => o.key) && (
+            <div style={{ fontSize: 12.5, color: "rgba(255,255,255,.3)" }}>Add an output to see the result.</div>
+          )}
+        </div>
+
+        {/* Cost, then what goes on top of it, then what the customer pays.
+            Shown only once there is a profit to show — a cost-only formula
+            should not grow a second copy of its own total. */}
+        {saleRate != null && profitAmount !== 0 && (
+          <div style={{ marginTop: 12, paddingTop: 11, borderTop: `1px solid ${BORDER}`, display: "flex", flexDirection: "column", gap: 6 }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 10 }}>
+              <span style={{ fontSize: 12.5, color: "rgba(255,255,255,.5)" }}>
+                Profit
+                <span style={{ fontSize: 11, color: "rgba(255,255,255,.3)", marginLeft: 5 }}>
+                  {d.profit?.mode === "percent" ? `${fmt(d.profit?.value)}%` : `Rs ${fmt(d.profit?.value)} flat`}
+                </span>
+              </span>
+              <span style={{ fontFamily: MONO, fontVariantNumeric: "tabular-nums", fontSize: 13, fontWeight: 700, color: "rgba(255,255,255,.85)" }}>
+                + {fmt(profitAmount)}
+              </span>
+            </div>
+            <div style={{
+              display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 10,
+              padding: "10px 12px", borderRadius: 10,
+              background: "rgba(52,211,153,.09)", border: "1px solid rgba(52,211,153,.25)",
+            }}>
+              <span style={{ fontSize: 12.5, color: "rgba(255,255,255,.5)" }}>Sale rate</span>
+              <span style={{ fontFamily: MONO, fontVariantNumeric: "tabular-nums", fontSize: 17, fontWeight: 700, color: "#34d399" }}>
+                {fmt(saleRate)}<span style={{ fontSize: 10.5, color: "rgba(255,255,255,.3)", marginLeft: 4 }}>{primaryOut?.unit}</span>
+              </span>
+            </div>
+          </div>
+        )}
+      </div>
+    );
 
     return (
       <div className="fxWrap" style={{ fontFamily: FONT, color: "white" }}>
@@ -386,14 +516,13 @@ export default function FormulasPage() {
                   <div />
                 </div>
               ) : (
-                <div className="fxInS fxHeadRow">
-                  <div className="fxHead">Name</div>
-                  <div className="fxHead">Unit</div>
-                  <div className="fxHead">Value</div>
-                  <div />
+                <div className="fxPairsHead fxHeadRow">
+                  <div className="fxInS">{inputHeadCells()}</div>
+                  <div className="fxInS fxPairSecond">{inputHeadCells()}</div>
                 </div>
               )}
             >
+              <div className={detailed ? "fxRows" : "fxPairs"}>
               {d.inputs.map((inp, i) => {
                 const badList = !!inp.isList && !(inp.listValue ?? []).length;
 
@@ -465,19 +594,80 @@ export default function FormulasPage() {
                   </div>
                 );
               })}
+              </div>
               {!detailed && (
                 <div style={{ fontSize: 11.5, color: "rgba(255,255,255,.28)", lineHeight: 1.6, paddingTop: 4 }}>
                   Switch to <strong style={{ color: "rgba(255,255,255,.45)" }}>Detailed</strong> above to rename keys,
                   turn an input into a list of stock sizes, or stop the operator being asked for it.
                 </div>
               )}
+
+              {/* Profit. Not a step and not a row above — see FormulaProfit.
+                  It sits in Inputs because it is a number an author fills in,
+                  but it lands on the finished cost rather than inside it. */}
+              <div style={{
+                marginTop: 5, padding: "13px 14px", borderRadius: 11,
+                background: "rgba(52,211,153,.05)", border: "1px solid rgba(52,211,153,.22)",
+              }}>
+                <div style={{ fontSize: 13, fontWeight: 700, color: "#34d399" }}>Profit</div>
+                <div style={{ fontSize: 11.5, color: "rgba(255,255,255,.35)", marginTop: 2, lineHeight: 1.6, marginBottom: 10 }}>
+                  Added on top of the starred output to make the sale rate — Rs 2 a piece, or 15% of cost.
+                  This is the formula&rsquo;s usual profit; whoever runs it can still change it for one quote.
+                </div>
+                <div className="fxProfit">
+                  <input
+                    type="number" step="any"
+                    value={d.profit?.value || ""}
+                    onChange={(e) => patch((x) => {
+                      x.profit = { mode: x.profit?.mode ?? "percent", value: Number(e.target.value) || 0 };
+                    })}
+                    placeholder="0"
+                    style={monoInput}
+                  />
+                  <select
+                    value={d.profit?.mode ?? "percent"}
+                    onChange={(e) => patch((x) => {
+                      x.profit = { mode: e.target.value as "amount" | "percent", value: x.profit?.value ?? 0 };
+                    })}
+                    style={input}
+                  >
+                    <option value="amount">Rs — flat</option>
+                    <option value="percent">% — of cost</option>
+                  </select>
+                </div>
+                {/* The sum spelled out, because "15%" and "Rs 15" look the same
+                    in a box and land nowhere near each other on the rate. */}
+                <div style={{ fontSize: 12, fontFamily: MONO, marginTop: 9, color: "rgba(255,255,255,.45)" }}>
+                  {baseRate == null ? (
+                    <span style={{ fontFamily: FONT, color: "rgba(255,255,255,.3)" }}>
+                      Star an output under <strong style={{ color: "rgba(255,255,255,.45)" }}>Outputs</strong> to see the sale rate.
+                    </span>
+                  ) : profitAmount === 0 ? (
+                    <span style={{ fontFamily: FONT, color: "rgba(255,255,255,.3)" }}>
+                      No profit — the formula quotes {fmt(baseRate)} {primaryOut?.unit ?? ""} at cost.
+                    </span>
+                  ) : (
+                    <>
+                      {fmt(baseRate)} + {fmt(profitAmount)} ={" "}
+                      <strong style={{ color: "#34d399", fontSize: 13.5 }}>{fmt(saleRate)}</strong>
+                      {primaryOut?.unit && <span style={{ color: "rgba(255,255,255,.3)" }}> {primaryOut.unit}</span>}
+                    </>
+                  )}
+                </div>
+              </div>
             </Section>
+
+            {/* The stacked-layout home for the live result — see liveResultCard. */}
+            <div className="fxLiveMobile">{liveResultCard}</div>
 
             {/* Steps */}
             <Section
               n={3}
               title="Steps"
               hint="Each step can use the inputs and every step above it. Order matters."
+              collapsible
+              defaultOpen={false}
+              count={d.steps.length}
               onAdd={() => patch((x) => { x.steps.push({ key: `step${x.steps.length + 1}`, label: "", expression: "" }); })}
               head={detailed ? (
                 <div className="fxStep fxHeadRow">
@@ -551,6 +741,9 @@ export default function FormulasPage() {
               n={4}
               title="Outputs"
               hint="Which values the result screen shows — and what they mean to the rest of the system."
+              collapsible
+              defaultOpen={false}
+              count={d.outputs.length}
               onAdd={() => patch((x) => { x.outputs.push({ key: "", label: "", role: "none" }); })}
               head={detailed ? (
                 <div className="fxOut fxHeadRow">
@@ -562,14 +755,13 @@ export default function FormulasPage() {
                   <div />
                 </div>
               ) : (
-                <div className="fxOutS fxHeadRow">
-                  <div className="fxHead">Value</div>
-                  <div className="fxHead">Shown as</div>
-                  <div className="fxHead">Main</div>
-                  <div />
+                <div className="fxPairsHead fxHeadRow">
+                  <div className="fxOutS">{outputHeadCells()}</div>
+                  <div className="fxOutS fxPairSecond">{outputHeadCells()}</div>
                 </div>
               )}
             >
+              <div className={detailed ? "fxRows" : "fxPairs"}>
               {d.outputs.map((out, i) => {
                 const picker = (
                   <select value={out.key} onChange={(e) => patch((x) => {
@@ -625,46 +817,13 @@ export default function FormulasPage() {
                   </div>
                 );
               })}
+              </div>
             </Section>
           </div>
 
           {/* ── Right: live preview, the keys in scope, function reference ── */}
           <div className="fxSide">
-            <div style={{ background: CARD, border: `1px solid ${BORDER}`, borderRadius: 14, padding: 18 }}>
-              <div style={{ ...label, marginBottom: 12 }}>Live result</div>
-              {preview?.ok === false && (
-                <div style={{
-                  fontSize: 12, color: "#f87171", marginBottom: 12, lineHeight: 1.6,
-                  padding: "9px 11px", borderRadius: 9,
-                  background: "rgba(248,113,113,.09)", border: "1px solid rgba(248,113,113,.25)",
-                }}>
-                  {preview.error}
-                </div>
-              )}
-              <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-                {d.outputs.filter((o) => o.key).map((o) => (
-                  <div key={o.key} style={{
-                    display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 10,
-                    padding: o.primary ? "10px 12px" : "4px 0",
-                    background: o.primary ? "rgba(52,211,153,.09)" : "transparent",
-                    border: o.primary ? "1px solid rgba(52,211,153,.25)" : "none",
-                    borderRadius: 10,
-                  }}>
-                    <span style={{ fontSize: 12.5, color: "rgba(255,255,255,.5)" }}>{o.label || o.key}</span>
-                    <span style={{
-                      fontFamily: MONO, fontVariantNumeric: "tabular-nums",
-                      fontSize: o.primary ? 17 : 13, fontWeight: 700,
-                      color: o.primary ? "#34d399" : "rgba(255,255,255,.85)",
-                    }}>
-                      {fmt(preview?.values[o.key])}<span style={{ fontSize: 10.5, color: "rgba(255,255,255,.3)", marginLeft: 4 }}>{o.unit}</span>
-                    </span>
-                  </div>
-                ))}
-                {!d.outputs.some((o) => o.key) && (
-                  <div style={{ fontSize: 12.5, color: "rgba(255,255,255,.3)" }}>Add an output to see the result.</div>
-                )}
-              </div>
-            </div>
+            <div className="fxLiveDesk">{liveResultCard}</div>
 
             {/* Every name a step is allowed to mention, with what it holds right
                 now. Clicking one types it into the formula box last used. */}
@@ -849,13 +1008,41 @@ function CategoryBox({ label: text, count, active, onClick }: {
   );
 }
 
-function Section({ n, title, hint, onAdd, head, children }: {
+/* A numbered stage of the editor. The long ones — Steps and Outputs — fold
+   away behind their own header so the page opens on what an author starts
+   with rather than on a wall of formula boxes; the header is the toggle and
+   the arrow says which way it goes. */
+function Section({ n, title, hint, onAdd, head, children, collapsible = false, defaultOpen = true, count }: {
   n: number; title: string; hint: string;
   onAdd?: () => void; head?: React.ReactNode; children: React.ReactNode;
+  collapsible?: boolean; defaultOpen?: boolean;
+  /** Shown as a pill beside the title — how many rows are hidden while closed. */
+  count?: number;
 }) {
+  const [open, setOpen] = useState(defaultOpen);
+  const shown = !collapsible || open;
+  const toggle = () => setOpen((o) => !o);
+
   return (
     <div style={{ background: CARD, border: `1px solid ${BORDER}`, borderRadius: 14, padding: 18 }}>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 12, marginBottom: 14 }}>
+      <div
+        {...(collapsible ? {
+          role: "button" as const,
+          tabIndex: 0,
+          "aria-expanded": open,
+          onClick: toggle,
+          onKeyDown: (e: React.KeyboardEvent) => {
+            if (e.key === "Enter" || e.key === " ") { e.preventDefault(); toggle(); }
+          },
+        } : {})}
+        style={{
+          display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 12,
+          marginBottom: shown ? 14 : 0,
+          cursor: collapsible ? "pointer" : "default",
+          userSelect: collapsible ? "none" : "auto",
+          outline: "none",
+        }}
+      >
         <div style={{ display: "flex", gap: 11, alignItems: "flex-start" }}>
           <span style={{
             width: 24, height: 24, flexShrink: 0, borderRadius: 8, marginTop: 1,
@@ -863,14 +1050,44 @@ function Section({ n, title, hint, onAdd, head, children }: {
             fontSize: 12, fontWeight: 700, display: "grid", placeItems: "center",
           }}>{n}</span>
           <div>
-            <div style={{ fontSize: 14, fontWeight: 700 }}>{title}</div>
+            <div style={{ fontSize: 14, fontWeight: 700, display: "flex", alignItems: "center", gap: 8 }}>
+              {title}
+              {collapsible && typeof count === "number" && (
+                <span style={{
+                  fontSize: 10.5, fontWeight: 700, padding: "1px 7px", borderRadius: 20,
+                  background: "rgba(255,255,255,.06)", border: `1px solid ${BORDER}`,
+                  color: "rgba(255,255,255,.45)",
+                }}>{count}</span>
+              )}
+            </div>
             <div style={{ fontSize: 11.5, color: "rgba(255,255,255,.35)", marginTop: 2 }}>{hint}</div>
           </div>
         </div>
-        {onAdd && <button onClick={onAdd} style={{ ...btn(), padding: "7px 12px", fontSize: 12, whiteSpace: "nowrap" }}>+ Add</button>}
+        <div style={{ display: "flex", alignItems: "center", gap: 8, flexShrink: 0 }}>
+          {onAdd && (
+            /* Add on a closed section opens it too — a row added out of sight
+               reads as nothing having happened. */
+            <button
+              onClick={(e) => { e.stopPropagation(); setOpen(true); onAdd(); }}
+              style={{ ...btn(), padding: "7px 12px", fontSize: 12, whiteSpace: "nowrap" }}>+ Add</button>
+          )}
+          {collapsible && (
+            <span aria-hidden style={{
+              width: 26, height: 26, borderRadius: 8, display: "grid", placeItems: "center",
+              background: "rgba(255,255,255,.05)", border: `1px solid ${BORDER}`,
+              color: "rgba(255,255,255,.55)", fontSize: 11, lineHeight: 1,
+              transform: open ? "rotate(0deg)" : "rotate(-90deg)",
+              transition: "transform .16s ease",
+            }}>▼</span>
+          )}
+        </div>
       </div>
-      {head}
-      <div style={{ display: "flex", flexDirection: "column", gap: 9 }}>{children}</div>
+      {shown && (
+        <>
+          {head}
+          <div style={{ display: "flex", flexDirection: "column", gap: 9 }}>{children}</div>
+        </>
+      )}
     </div>
   );
 }

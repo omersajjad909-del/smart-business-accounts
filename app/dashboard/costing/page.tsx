@@ -31,12 +31,15 @@ import { useSearchParams } from "next/navigation";
 import { useBusinessRecords, type BusinessRecord } from "@/lib/useBusinessRecords";
 import {
   runFormula,
+  applyProfit,
+  toProfit,
   type CostingFormula,
   type FormulaInput,
   type FormulaStep,
   type FormulaOutput,
   type FormulaRun,
 } from "@/lib/formulaEngine";
+import { buildJobWorkSeed, jobWorkHrefFrom, planIssue } from "@/lib/jobWorkSeed";
 
 const CARD = "rgba(255,255,255,.03)";
 const BORDER = "rgba(255,255,255,.09)";
@@ -142,6 +145,7 @@ function toFormula(record: BusinessRecord): CostingFormula {
     inputs: Array.isArray(d.inputs) ? (d.inputs as FormulaInput[]) : [],
     steps: Array.isArray(d.steps) ? (d.steps as FormulaStep[]) : [],
     outputs: Array.isArray(d.outputs) ? (d.outputs as FormulaOutput[]) : [],
+    profit: toProfit(d.profit),
   };
 }
 
@@ -183,13 +187,34 @@ function CostingInner() {
   const [values, setValues] = useState<Record<string, number | number[]>>({});
   const [sheetName, setSheetName] = useState("");
   const [savedNote, setSavedNote] = useState("");
-  const [showWorking, setShowWorking] = useState(true);
+  // Folded away by default. The working is every step of the costing, which is
+  // what you open when a number looks wrong — not what you want between the
+  // result and the print buttons on every single quote.
+  const [showWorking, setShowWorking] = useState(false);
   // Which sheet is being sent to the printer — the quote, or the cutting detail.
   const [printKind, setPrintKind] = useState<"cost" | "working" | null>(null);
-  // Profit is not part of the formula — it is what to charge on top of what the
-  // job costs, decided per quote rather than baked into the costing itself.
+  // What to charge on top of what the job costs. The formula carries the usual
+  // one, set by whoever wrote it; these hold the figure for the quote on screen
+  // so it can be moved for a single customer without editing the costing.
   const [profitMode, setProfitMode] = useState<"amount" | "percent">("percent");
   const [profitValue, setProfitValue] = useState<number>(0);
+  // Job work is still gated to internal test workspaces, so the second button
+  // asks the same authority the module itself enforces rather than guessing
+  // from a plan flag or business type. False until told otherwise — an
+  // unreleased path staying hidden is the safe failure.
+  const [jobWorkEnabled, setJobWorkEnabled] = useState(false);
+  useEffect(() => {
+    let cancelled = false;
+    fetch("/api/job-work/status", { cache: "no-store" })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => {
+        if (!cancelled) setJobWorkEnabled(d?.enabled === true);
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const formulas = useMemo(
     () => formulaStore.records.map((r) => ({ id: r.id, formula: toFormula(r) })),
@@ -215,7 +240,11 @@ function CostingInner() {
     setValues(next);
     setSheetName(selected.formula.name);
     setSavedNote("");
-    setProfitValue(0);
+    // The formula's own profit, not zero — a formula written to quote at 15%
+    // should quote at 15% the moment it is opened.
+    const profit = toProfit(selected.formula.profit);
+    setProfitMode(profit.mode);
+    setProfitValue(profit.value);
   }, [selectedId]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const run = useMemo(
@@ -244,10 +273,8 @@ function CostingInner() {
   const baseRate = typeof run?.values[primary?.key ?? ""] === "number"
     ? (run!.values[primary!.key] as number)
     : null;
-  const profitAmount = baseRate == null ? 0
-    : profitMode === "percent" ? (baseRate * profitValue) / 100
-    : profitValue;
-  const saleRate = baseRate == null ? null : baseRate + profitAmount;
+  const { amount: profitAmount, total: saleRate } =
+    applyProfit(baseRate, { mode: profitMode, value: profitValue });
 
   async function saveSheet() {
     if (!selected || !run) return;
@@ -258,9 +285,12 @@ function CostingInner() {
       title: sheetName.trim() || selected.formula.name,
       status: "saved",
       refId: selected.id,
-      amount: typeof run.values[primary?.key ?? ""] === "number"
+      // What the sheet actually quoted, which is the rate with profit on it —
+      // the saved list shows this number, and cost alone would read as the
+      // price when it is not.
+      amount: saleRate ?? (typeof run.values[primary?.key ?? ""] === "number"
         ? (run.values[primary.key] as number)
-        : undefined,
+        : undefined),
       date: new Date().toISOString(),
       data: {
         formulaId: selected.id,
@@ -271,6 +301,12 @@ function CostingInner() {
         inputs: values,
         outputs: outputs.map((o) => ({ key: o.key, label: o.label, unit: o.unit, role: o.role })),
         results: resultSnapshot,
+        // The profit as it stood for this quote, and the cost under it — a
+        // sheet whose margin cannot be read back is not much of a record.
+        profit: { mode: profitMode, value: profitValue },
+        profitAmount,
+        costRate: baseRate,
+        saleRate,
       },
     });
     setSavedNote(`Saved "${sheetName.trim() || selected.formula.name}"`);
@@ -367,6 +403,24 @@ function CostingInner() {
     return `/dashboard/manufacturing/bom?${qs.toString()}`;
   }, [selected, bomSeed]);
 
+  /**
+   * The same run, read for the other road.
+   *
+   * A merchant manufacturer owns no machines, so "Create BOM" leads nowhere for
+   * them — but the costing is identical, and so is the arithmetic underneath.
+   * What differs is only where the material goes next.
+   */
+  const jobWorkSeed = useMemo(
+    () => (selected ? buildJobWorkSeed(selected.id, selected.formula, run) : null),
+    [selected, run],
+  );
+  const jobWorkHref = useMemo(() => jobWorkHrefFrom(jobWorkSeed), [jobWorkSeed]);
+  /** What this run means in whole rolls, shown so the split is visible up front. */
+  const jobWorkPlan = useMemo(
+    () => planIssue(jobWorkSeed?.stdPerPc ?? null, jobWorkSeed?.orderQty ?? 0),
+    [jobWorkSeed],
+  );
+
   /** One field, whether it holds a single number or a list of sizes. */
   const field = (inp: FormulaInput) => (
     <div key={inp.key}>
@@ -423,7 +477,16 @@ function CostingInner() {
         <div className="cxCols">
           {/* ── Left: the job, in the order it is filled ── */}
           <div className="cxForm">
-            <Card n={1} title="Formula" hint="Which costing this job uses.">
+            {/* The count is on the label on purpose: the box shows one name, and
+                without it there is no way to tell a single saved formula from
+                the first of ten. */}
+            <Card
+              n={1}
+              title="Formula"
+              hint={formulas.length === 1
+                ? "Which costing this job uses. 1 formula saved."
+                : `Which costing this job uses — pick from the ${formulas.length} you have saved.`}
+            >
               <select value={selectedId} onChange={(e) => setSelectedId(e.target.value)} style={{ ...inputStyle, fontFamily: FONT }}>
                 {formulas.map((f) => (
                   <option key={f.id} value={f.id}>{f.formula.category} — {f.formula.name}</option>
@@ -552,6 +615,14 @@ function CostingInner() {
                           {fmt(saleRate)}
                           <span style={{ fontSize: 12, color: "rgba(255,255,255,.32)", marginLeft: 6, fontWeight: 600 }}>{primary.unit}</span>
                         </div>
+                        {/* The sum behind the number. A percent typed into the
+                            box says nothing about how many rupees it is until
+                            it is spelled out against the cost. */}
+                        {profitAmount !== 0 && (
+                          <div style={{ fontFamily: MONO, fontSize: 11.5, color: "rgba(255,255,255,.38)", marginTop: 4, fontVariantNumeric: "tabular-nums" }}>
+                            {fmt(baseRate)} + {fmt(profitAmount)} profit
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -649,6 +720,55 @@ function CostingInner() {
                     Create BOM →
                   </Link>
                 </div>
+
+                {/* The second road. Same formula, same numbers — the work simply
+                    happens on somebody else's machines, so the material goes out
+                    on a challan instead of into a production order. Shown only
+                    where job work is switched on; a company that does everything
+                    in-house never sees a choice it does not have. */}
+                {/* The button appears wherever Create BOM does, not only where the
+                    standard could be derived. Hiding it when a formula declares no
+                    "Units per batch" output left the operator staring at one button
+                    where two were promised, with nothing saying why — so the
+                    missing role is now stated, and the road stays open either way. */}
+                {jobWorkEnabled && (
+                  <div style={{ marginTop: 16, paddingTop: 16, borderTop: `1px solid ${BORDER}` }}>
+                    <div className="cxSectionHead">
+                      <div>
+                        <div style={{ fontSize: 14, fontWeight: 700 }}>Get it made outside</div>
+                        <div style={{ fontSize: 12, color: "rgba(255,255,255,.35)", marginTop: 3, maxWidth: 480 }}>
+                          No machines of your own? Opens Job Work → Issue Challan with the standard
+                          this formula worked out already filled in — so consumption is never typed
+                          in by hand. Pick the job worker and the material there.
+                        </div>
+                        {jobWorkSeed?.stdPerPc != null ? (
+                          <div style={{ fontFamily: MONO, fontSize: 11.5, color: "rgba(255,255,255,.45)", marginTop: 9, lineHeight: 1.7 }}>
+                            {jobWorkSeed.unitsPerBatch != null && (
+                              <>1 batch = {Math.round(jobWorkSeed.unitsPerBatch * 100) / 100} pcs · std/pc = {jobWorkSeed.stdPerPc}<br /></>
+                            )}
+                            {jobWorkPlan && (
+                              <>
+                                needs {jobWorkPlan.needed} · issue {jobWorkPlan.toIssue} whole ·{" "}
+                                <span style={{ color: "#5eead4" }}>{jobWorkPlan.leftover} left over, not waste</span>
+                              </>
+                            )}
+                          </div>
+                        ) : (
+                          <div style={{ fontSize: 11.5, color: "#fbbf24", marginTop: 9, lineHeight: 1.6, maxWidth: 480 }}>
+                            This formula has no output marked{" "}
+                            <span style={{ fontFamily: MONO }}>Units per batch</span> — the one value
+                            that says how many pieces come off one roll. Set that role on the right
+                            output and the standard will carry across on its own; until then the
+                            challan opens blank and std / pc has to be typed.
+                          </div>
+                        )}
+                      </div>
+                      <Link href={jobWorkHref} style={{ ...btn(false), textDecoration: "none", display: "inline-flex", alignItems: "center" }}>
+                        Create with Job Worker →
+                      </Link>
+                    </div>
+                  </div>
+                )}
               </div>
             )}
           </div>

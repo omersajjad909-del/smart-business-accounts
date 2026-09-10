@@ -552,6 +552,51 @@ export type FormulaOutput = {
   primary?: boolean;
 };
 
+/**
+ * What to charge on top of what the job costs.
+ *
+ * Deliberately not another step. A step is part of what the thing costs to
+ * make; profit is a commercial decision laid on the finished cost, and it is
+ * the one number a quote gets argued over — so it stays separate, an author
+ * sets the usual one on the formula, and an operator can move it for a single
+ * quote without editing the costing.
+ *
+ * "amount" is flat currency — Rs 2 a piece. "percent" is a share of the base.
+ */
+export type FormulaProfit = {
+  mode: "amount" | "percent";
+  value: number;
+};
+
+export const NO_PROFIT: FormulaProfit = { mode: "percent", value: 0 };
+
+/** Reads a stored `profit` blob back without trusting its shape. */
+export function toProfit(raw: unknown): FormulaProfit {
+  const p = (raw ?? {}) as Record<string, unknown>;
+  const value = Number(p.value);
+  return {
+    mode: p.mode === "amount" ? "amount" : "percent",
+    value: Number.isFinite(value) ? value : 0,
+  };
+}
+
+/**
+ * The one place the profit maths lives, so the editor's preview and the run
+ * screen cannot drift apart. A zero or missing profit is not an error — it
+ * means a formula that quotes cost only, and the total is the base untouched.
+ */
+export function applyProfit(
+  base: number | null | undefined,
+  profit?: FormulaProfit | null,
+): { amount: number; total: number | null } {
+  if (typeof base !== "number" || !Number.isFinite(base)) return { amount: 0, total: null };
+  const value = Number(profit?.value);
+  if (!profit || !Number.isFinite(value) || value === 0) return { amount: 0, total: base };
+  const amount = profit.mode === "percent" ? (base * value) / 100 : value;
+  if (!Number.isFinite(amount)) return { amount: 0, total: base };
+  return { amount, total: base + amount };
+}
+
 export type CostingFormula = {
   name: string;
   category: string;
@@ -559,6 +604,8 @@ export type CostingFormula = {
   inputs: FormulaInput[];
   steps: FormulaStep[];
   outputs: FormulaOutput[];
+  /** The usual profit for this formula. Absent means cost only. */
+  profit?: FormulaProfit;
   version: number;
 };
 

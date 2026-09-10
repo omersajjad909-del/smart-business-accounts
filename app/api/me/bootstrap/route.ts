@@ -21,6 +21,21 @@ const DEFAULT_SHORTCUTS = [
 /** The one page a demo sandbox is never allowed to lose — see below. */
 const DEMO_ALWAYS_ON_FEATURE = "CORE_BUSINESS_FEATURES";
 
+/**
+ * Pages a workspace gets from what it *is* rather than from what it pays for.
+ *
+ * Job Work ships switched off for all three plans, so it reaches nobody through
+ * the plan grid — but it is on for an internal test workspace, where it was
+ * built, and for a demo sandbox, which is throwaway data on nobody's real books
+ * and exactly where an unreleased module is meant to be shown.
+ *
+ * This has to be listed here and not only in lib/jobWork.ts: the sidebar link
+ * asks /api/job-work/status, but the route guard in the dashboard layout bounces
+ * any registered page missing from this list. Without the entry the link would
+ * appear and the page it points at would throw the user back to /dashboard.
+ */
+const WORKSPACE_KIND_FEATURES = ["JOB_WORK"];
+
 function normalizePlanPermissions(saved: Record<string, string[]> = {}) {
   const get = (k: string): string[] => saved[k] || saved[k.toLowerCase()] || [];
   const hasAny = ["STARTER","PRO","ENTERPRISE","CUSTOM"].some(k => Array.isArray(get(k)) && get(k).length > 0);
@@ -99,7 +114,7 @@ export async function GET(req: NextRequest) {
           id: true, name: true, country: true, baseCurrency: true,
           plan: true, subscriptionStatus: true, activeModules: true,
           currentPeriodEnd: true, businessType: true, businessSetupDone: true,
-          logoUrl: true, createdAt: true, isDemo: true,
+          logoUrl: true, createdAt: true, isDemo: true, isInternalTest: true,
         },
       }),
       prisma.branch.findMany({
@@ -292,6 +307,15 @@ export async function GET(req: NextRequest) {
     // platform-wide stays retired here too.
     if (company?.isDemo && dashboardFeatures && !dashboardFeatures.includes(DEMO_ALWAYS_ON_FEATURE)) {
       dashboardFeatures = [...dashboardFeatures, DEMO_ALWAYS_ON_FEATURE];
+    }
+
+    // Pages that follow from the kind of workspace this is — see above. Same
+    // two conditions lib/jobWork.ts lets through, so the sidebar link, the route
+    // guard and the module's own API all answer alike.
+    if ((company?.isDemo || company?.isInternalTest) && dashboardFeatures) {
+      const list = dashboardFeatures;
+      const missing = WORKSPACE_KIND_FEATURES.filter((id) => !list.includes(id));
+      if (missing.length) dashboardFeatures = [...list, ...missing];
     }
 
     // Global page-visibility hides apply on top of whichever list won — last,

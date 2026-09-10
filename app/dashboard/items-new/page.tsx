@@ -56,6 +56,7 @@ export default function ItemsNewPage() {
   const user = getCurrentUser();
 
   const [items,       setItems]       = useState<Item[]>([]);
+  const [code,        setCode]        = useState("");
   const [name,        setName]        = useState("");
   const [category,    setCategory]    = useState("TRADING");
   const [unit,        setUnit]        = useState("");
@@ -108,7 +109,7 @@ export default function ItemsNewPage() {
   }, [rfActive, rf, editingItem]);
 
   function resetForm() {
-    setEditingId(null); setName(""); setCategory("TRADING"); setUnit("");
+    setEditingId(null); setCode(""); setName(""); setCategory("TRADING"); setUnit("");
     setRate(""); setPurchaseRate(""); setTaxRate(""); setMinStock("");
     setBarcode(""); setDescription(""); setImageUrl(null);
     setEditingItem(null);
@@ -117,12 +118,16 @@ export default function ItemsNewPage() {
 
   async function saveItem() {
     if (!name.trim() || !unit) { toast("Item name and unit are required."); return; }
+    // Editing an item whose code box has been emptied would clear a code every
+    // document and every search reads it by, so it is caught here rather than
+    // bounced off the server.
+    if (editingId && !code.trim()) { toast("Item code cannot be empty."); return; }
     setSaving(true);
     try {
       const res = await fetch("/api/items-new", {
         method: editingId ? "PUT" : "POST",
         headers: { "Content-Type":"application/json", ...headers },
-        body: JSON.stringify({ id:editingId, name:name.trim(), category, unit,
+        body: JSON.stringify({ id:editingId, code:code.trim(), name:name.trim(), category, unit,
           rate, purchaseRate, taxRate, minStock, barcode, description, imageUrl,
           meta: rfActive ? meta : null }),
       });
@@ -136,7 +141,7 @@ export default function ItemsNewPage() {
   }
 
   function handleEdit(item: Item) {
-    setEditingId(item.id); setName(item.name); setCategory(item.category || "TRADING");
+    setEditingId(item.id); setCode(item.code || ""); setName(item.name); setCategory(item.category || "TRADING");
     setUnit(item.unit); setRate(String(item.rate || "")); setPurchaseRate(String(item.purchaseRate || ""));
     setTaxRate(String(item.taxRate || "")); setMinStock(String(item.minStock || ""));
     setBarcode(item.barcode || ""); setDescription(item.description || "");
@@ -191,8 +196,23 @@ export default function ItemsNewPage() {
           {editingId ? "✏️ Edit Item" : "➕ Add New Item"}
         </div>
 
-        {/* Row 1: Name + Category + Unit */}
-        <div style={{ display:"grid", gridTemplateColumns:"2fr 1fr 1fr", gap:12, marginBottom:12 }}>
+        {/* Row 1: Code + Name + Category + Unit */}
+        <div style={{ display:"grid", gridTemplateColumns: isMobile ? "1fr 1fr" : "1fr 2fr 1fr 1fr", gap:12, marginBottom:12 }}>
+          <div>
+            <div style={{ fontSize:11, color:MUTED, marginBottom:5 }}>
+              Item Code {!editingId && <span style={{ fontSize:10, opacity:.6 }}>optional</span>}
+            </div>
+            {/* Typed exactly as entered — "I-1", "800689426", a supplier's part
+                number. Left blank on a new item the server falls back to the
+                generated I-<n>, so nobody who does not care about codes has to
+                invent one. */}
+            <input
+              style={{ ...INPUT, fontFamily:"ui-monospace,Consolas,monospace" }}
+              placeholder={editingId ? "" : "auto"}
+              value={code}
+              onChange={e=>setCode(e.target.value)}
+            />
+          </div>
           <div>
             <div style={{ fontSize:11, color:MUTED, marginBottom:5 }}>Item Name *</div>
             {/* Item names are upper-cased as they are typed, not just styled
@@ -246,6 +266,7 @@ export default function ItemsNewPage() {
               <optgroup label="Counting / Packing">
                 <option value="PCS">Pieces</option>
                 <option value="DOZ">Dozen (12 pcs)</option>
+                <option value="GURS">Gurs / Gross (12 dozen = 144 pcs)</option>
                 <option value="PAIR">Pair</option>
                 <option value="SET">Set</option>
                 <option value="BOX">Box</option>

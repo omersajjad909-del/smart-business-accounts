@@ -3,13 +3,32 @@
 /**
  * Job Work (Thekedar) — issue material, take pieces back, see what is lying out.
  *
- * Internal test workspaces only. The page asks /api/job-work/status first and
- * renders a locked panel everywhere else, so a real company never sees a form
- * that would fail on submit.
+ * Ships switched off. The page asks /api/job-work/status first and renders a
+ * locked panel wherever the answer is no, so a company the module is not on for
+ * never sees a form that would fail on submit.
  */
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { Suspense, useCallback, useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { useResponsive } from "@/hooks/useResponsive";
+import { planIssue } from "@/lib/jobWorkSeed";
+
+/**
+ * Numbers a costing run hands over, when the operator arrived from
+ * Costing → "Create with Job Worker". Absent on a challan raised by hand,
+ * and everything below still works without it.
+ */
+type FormulaSeed = {
+  formulaId: string;
+  formulaName: string;
+  formulaVersion: number;
+  stdPerPc: number | null;
+  unitsPerBatch: number | null;
+  expectedPcs: number | null;
+  ratePerPc: number | null;
+  costPerUnit: number | null;
+  wastePerBatch: number | null;
+};
 
 const ff = "'Outfit','Inter',sans-serif";
 const bg = "rgba(255,255,255,0.03)";
@@ -62,6 +81,15 @@ type Challan = {
   allowedWastagePct: number;
   lines: ChallanLine[];
   balanceValue: number;
+  /** What the costing formula said at issue time, when there was one. */
+  formula: {
+    formulaName: string;
+    formulaVersion: number;
+    stdPerPc: number | null;
+    costPerUnit: number | null;
+    expectedNeeded: number | null;
+    expectedLeftover: number | null;
+  } | null;
 };
 type Priced = {
   goodQty: number;
@@ -120,7 +148,39 @@ async function getJson<T>(url: string): Promise<T | { error: string }> {
 }
 
 export default function JobWorkPage() {
+  return (
+    <Suspense fallback={<div style={{ padding: 32, fontFamily: ff, color: dim }}>Loading…</div>}>
+      <JobWorkInner />
+    </Suspense>
+  );
+}
+
+function JobWorkInner() {
   const { isMobile } = useResponsive();
+  const params = useSearchParams();
+  // Arriving from a costing run means the standard is already known exactly, so
+  // the Issue tab opens on it rather than on whatever the operator last used.
+  const formulaSeed = useMemo<FormulaSeed | null>(() => {
+    const formulaId = params.get("formulaId") || "";
+    if (!formulaId) return null;
+    const num = (key: string) => {
+      const raw = params.get(key);
+      if (raw == null || raw === "") return null;
+      const n = Number(raw);
+      return Number.isFinite(n) ? n : null;
+    };
+    return {
+      formulaId,
+      formulaName: params.get("formulaName") || "",
+      formulaVersion: num("formulaVersion") ?? 1,
+      stdPerPc: num("stdPerPc"),
+      unitsPerBatch: num("unitsPerBatch"),
+      expectedPcs: num("expectedPcs"),
+      ratePerPc: num("ratePerPc"),
+      costPerUnit: num("costPerUnit"),
+      wastePerBatch: num("wastePerBatch"),
+    };
+  }, [params]);
   const [status, setStatus] = useState<Status | null>(null);
   const [tab, setTab] = useState<"issue" | "receive" | "ledger" | "workers">("issue");
   const [workers, setWorkers] = useState<Worker[]>([]);
@@ -275,6 +335,7 @@ export default function JobWorkPage() {
       {tab === "issue" && (
         <IssueTab
           onGoToWorkers={() => setTab("workers")}
+          seed={formulaSeed}
           workers={workers}
           items={items}
           challans={challans}
@@ -369,6 +430,29 @@ const td: React.CSSProperties = {
   verticalAlign: "top",
 };
 const tdNum: React.CSSProperties = { ...td, textAlign: "right", fontVariantNumeric: "tabular-nums", whiteSpace: "nowrap" };
+
+/** One figure from the formula, with the word that says what it means. */
+function Fig({ label, value, tone, note }: { label: string; value: string; tone?: string; note?: string }) {
+  return (
+    <div>
+      <div style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: 0.7, color: dim, textTransform: "uppercase" }}>
+        {label}
+      </div>
+      <div
+        style={{
+          fontSize: 20,
+          fontWeight: 700,
+          color: tone || "#fff",
+          fontVariantNumeric: "tabular-nums",
+          marginTop: 2,
+        }}
+      >
+        {value}
+      </div>
+      {note && <div style={{ fontSize: 10.5, color: dim, marginTop: 1 }}>{note}</div>}
+    </div>
+  );
+}
 
 function Section({ title, sub, children }: { title: string; sub?: string; children: React.ReactNode }) {
   return (
@@ -511,15 +595,26 @@ function IssueTab({
   setMsg,
   refresh,
   onGoToWorkers,
-}: Setter & { workers: Worker[]; items: Item[]; challans: Challan[]; onGoToWorkers: () => void }) {
+  seed,
+}: Setter & {
+  workers: Worker[];
+  items: Item[];
+  challans: Challan[];
+  onGoToWorkers: () => void;
+  seed: FormulaSeed | null;
+}) {
   const [workerId, setWorkerId] = useState("");
   const [finishedItemId, setFinishedItemId] = useState("");
   const [sourceLocation, setSourceLocation] = useState("MAIN");
-  const [expectedQty, setExpectedQty] = useState("");
-  const [ratePerPc, setRatePerPc] = useState("");
+  const [expectedQty, setExpectedQty] = useState(seed?.expectedPcs ? String(seed.expectedPcs) : "");
+  const [ratePerPc, setRatePerPc] = useState(seed?.ratePerPc ? String(seed.ratePerPc) : "");
   const [allowedWastagePct, setAllowedWastagePct] = useState("");
   const [notes, setNotes] = useState("");
-  const [lines, setLines] = useState<DraftLine[]>([{ itemId: "", qty: "", standardPerPc: "" }]);
+  // The first line carries the formula's standard. It is the material the
+  // formula was written about; which item that is, only the operator knows.
+  const [lines, setLines] = useState<DraftLine[]>([
+    { itemId: "", qty: "", standardPerPc: seed?.stdPerPc ? String(seed.stdPerPc) : "" },
+  ]);
 
   const worker = workers.find((w) => w.id === workerId);
   useEffect(() => {
@@ -527,6 +622,22 @@ function IssueTab({
     setRatePerPc((r) => r || (worker.defaultRatePerPc ? String(worker.defaultRatePerPc) : ""));
     setAllowedWastagePct((a) => a || (worker.allowedWastagePct ? String(worker.allowedWastagePct) : ""));
   }, [worker]);
+
+  // How many whole units this order actually needs, recomputed as the operator
+  // changes the piece count. Typing the quantity by hand is what used to turn
+  // 12.6 into "about 13" — this keeps the split in front of them instead.
+  const plan = useMemo(
+    () => planIssue(seed?.stdPerPc ?? null, Number(expectedQty) || 0),
+    [seed, expectedQty],
+  );
+  // Fill the first line's quantity from the plan while the operator has not
+  // overridden it, so the challan opens on whole rolls without hiding why.
+  useEffect(() => {
+    if (!plan) return;
+    setLines((prev) =>
+      prev.map((l, i) => (i === 0 && l.qty === "" ? { ...l, qty: String(plan.toIssue) } : l)),
+    );
+  }, [plan]);
 
   const raw = items.filter((i) => i.category === "RAW_MATERIAL" || i.category === "TRADING");
   const finished = items.filter((i) => i.category === "FINISHED" || i.category === "TRADING");
@@ -549,6 +660,24 @@ function IssueTab({
         allowedWastagePct: Number(allowedWastagePct) || 0,
         notes,
         lines: payload,
+        // Stamped, not referenced — the formula can be edited later without
+        // rewriting what this challan was raised against, and the receipt can
+        // still say what the job was supposed to consume.
+        ...(seed
+          ? {
+              formula: {
+                formulaId: seed.formulaId,
+                formulaName: seed.formulaName,
+                formulaVersion: seed.formulaVersion,
+                stdPerPc: seed.stdPerPc,
+                unitsPerBatch: seed.unitsPerBatch,
+                costPerUnit: seed.costPerUnit,
+                wastePerBatch: seed.wastePerBatch,
+                expectedNeeded: plan?.needed ?? null,
+                expectedLeftover: plan?.leftover ?? null,
+              },
+            }
+          : {}),
       });
       setMsg({
         kind: "ok",
@@ -587,6 +716,37 @@ function IssueTab({
 
   return (
     <>
+      {seed && (
+        <div style={{ ...card, borderLeft: `3px solid ${teal}` }}>
+          <div style={{ fontSize: 11, fontWeight: 800, letterSpacing: 1, color: teal, marginBottom: 8 }}>
+            FROM COSTING FORMULA
+          </div>
+          <div style={{ fontSize: 15, fontWeight: 700, marginBottom: 8 }}>
+            {seed.formulaName || "Costing formula"}{" "}
+            <span style={{ fontFamily: "inherit", fontWeight: 500, color: dim, fontSize: 13 }}>
+              v{seed.formulaVersion}
+            </span>
+          </div>
+          <p style={{ fontSize: 13.5, color: dim, margin: "0 0 12px", maxWidth: 620, lineHeight: 1.6 }}>
+            Consumption is not typed in here — the formula worked it out. Pick the job worker and
+            the material below; the standard and the quantity are already set.
+          </p>
+          {plan ? (
+            <div style={{ display: "flex", gap: 22, flexWrap: "wrap", fontFamily: "inherit" }}>
+              <Fig label="std / pc" value={String(seed.stdPerPc)} />
+              <Fig label="needs" value={qty(plan.needed)} />
+              <Fig label="issue whole" value={String(plan.toIssue)} tone={teal} />
+              <Fig label="left over" value={qty(plan.leftover)} tone={amber} note="not waste" />
+            </div>
+          ) : (
+            <div style={{ fontSize: 13, color: amber }}>
+              Enter the expected pieces below and the whole units to issue — and what is left
+              over — work themselves out.
+            </div>
+          )}
+        </div>
+      )}
+
       <Section
         title="Send material to a job worker"
         sub="This challan is not a sale — no customer is involved and the sales figure does not move. Only the stock location changes."
@@ -950,6 +1110,75 @@ function ReceiveTab({ challans, busy, setBusy, setMsg, refresh }: Setter & { cha
           </button>
         </div>
       </Section>
+
+      {priced && challan?.formula && (
+          <Section
+            title="What the formula said, and what happened"
+            sub={`${challan.formula.formulaName || "Costing formula"} v${challan.formula.formulaVersion} — the standard this job was raised against.`}
+          >
+            <div style={{ overflowX: "auto" }}>
+              <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 520 }}>
+                <thead>
+                  <tr>
+                    <th style={th}></th>
+                    <th style={{ ...th, textAlign: "right" }}>Formula</th>
+                    <th style={{ ...th, textAlign: "right" }}>Actual</th>
+                    <th style={{ ...th, textAlign: "right" }}>Difference</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {(() => {
+                    const consumedQty = priced.consumed.reduce((s, c) => s + c.qty, 0);
+                    const expected = challan.formula!.expectedNeeded;
+                    const diff = expected != null ? consumedQty - expected : null;
+                    const expCost = challan.formula!.costPerUnit;
+                    const costDiff = expCost != null ? priced.unitCost - expCost : null;
+                    return (
+                      <>
+                        <tr>
+                          <td style={td}>Material consumed</td>
+                          <td style={{ ...tdNum, color: dim }}>{expected != null ? qty(expected) : "—"}</td>
+                          <td style={tdNum}>{qty(consumedQty)}</td>
+                          <td style={{ ...tdNum, color: diff && diff > 1e-6 ? red : teal }}>
+                            {diff == null ? "—" : diff > 0 ? `+${qty(diff)}` : qty(diff)}
+                          </td>
+                        </tr>
+                        <tr>
+                          <td style={td}>Cost per piece</td>
+                          <td style={{ ...tdNum, color: dim }}>{expCost != null ? money(expCost) : "—"}</td>
+                          <td style={tdNum}>{money(priced.unitCost)}</td>
+                          <td style={{ ...tdNum, color: costDiff && costDiff > 0 ? red : teal }}>
+                            {costDiff == null ? "—" : costDiff > 0 ? `+${money(costDiff)}` : money(costDiff)}
+                          </td>
+                        </tr>
+                        <tr>
+                          <td style={td}>Left over</td>
+                          <td style={{ ...tdNum, color: dim }}>
+                            {challan.formula!.expectedLeftover != null ? qty(challan.formula!.expectedLeftover) : "—"}
+                          </td>
+                          <td style={tdNum}>
+                            {qty(
+                              challan.lines.reduce(
+                                (s, l) => s + (l.issuedQty - l.consumedQty - l.returnedQty),
+                                0,
+                              ) - consumedQty - priced.returned.reduce((s, r) => s + r.qty, 0),
+                            )}
+                          </td>
+                          <td style={{ ...tdNum, color: dim }}>stock, not waste</td>
+                        </tr>
+                      </>
+                    );
+                  })()}
+                </tbody>
+              </table>
+            </div>
+            <div style={{ fontSize: 11.5, color: dim, marginTop: 10, lineHeight: 1.55, maxWidth: 700 }}>
+              A positive difference on <b style={{ color: "#fff" }}>Material consumed</b> is the only
+              line that is genuine wastage — the job burnt more than the formula said it should. The
+              leftover row is neither side&apos;s loss: it is whole material that was never touched.
+            </div>
+          </Section>
+      )}
 
       {priced && (
         <Section title="What this receipt costs" sub="Shown before posting — this is the real per-piece cost.">

@@ -30,9 +30,10 @@
  * location, so every existing stock report keeps working.
  *
  * ── Availability ────────────────────────────────────────────────────────────
- * Gated to internal test workspaces (`Company.isInternalTest`). Nothing here
- * runs for a demo sandbox or a real customer until that gate is lifted. See
- * `assertJobWorkEnabled`.
+ * Still under test, so it ships switched off. It runs in an internal test
+ * workspace and in a demo sandbox, and for a real tenant only once an admin has
+ * ticked Job Work for their plan in Admin → Plans → Pages & Modules — which no
+ * plan ships with. See `isJobWorkEnabled` and `assertJobWorkEnabled`.
  */
 
 import { prisma } from "@/lib/prisma";
@@ -43,6 +44,7 @@ import {
 } from "@/lib/inventoryAccounts";
 import { MFG_ACCOUNTS, ensureAccount, getAverageCosts, getStockOnHand } from "@/lib/manufacturingPosting";
 import { round2, round6 } from "@/lib/manufacturingRemnants";
+import { companyOwnsDashboardFeature } from "@/lib/companyPlanFeatures";
 
 type Db = Omit<typeof prisma, "$connect" | "$disconnect" | "$on" | "$transaction" | "$use" | "$extends">;
 
@@ -103,12 +105,32 @@ export const JOB_WORK_ACCOUNTS = {
 
 /* ─────────────────────────── Availability gate ─────────────────────────── */
 
+/** The Pages & Modules id that carries Job Work. See dashboardFeatureRegistry. */
+export const JOB_WORK_FEATURE_ID = "JOB_WORK";
+
+/**
+ * Three ways in, and no fourth.
+ *
+ * An internal test workspace, where the module was built. A demo sandbox —
+ * throwaway data on a company nobody keeps books in, which is the point of
+ * showing it there while it is still off for everyone else. And a real tenant
+ * whose plan an admin has deliberately ticked Job Work for in
+ * Admin → Plans → Pages & Modules, which no plan ships with.
+ *
+ * The plan check goes through the same resolution the dashboard uses, so a
+ * company that can reach this module can also see its sidebar link, and one
+ * that cannot gets neither — the trap this gate exists to avoid is a link that
+ * opens a page whose API then refuses the company.
+ */
 export async function isJobWorkEnabled(companyId: string): Promise<boolean> {
   const company = await prisma.company.findUnique({
     where: { id: companyId },
-    select: { isInternalTest: true },
+    select: { isInternalTest: true, isDemo: true },
   });
-  return company?.isInternalTest === true;
+  if (!company) return false;
+  if (company.isInternalTest === true) return true;
+  if (company.isDemo === true) return true;
+  return companyOwnsDashboardFeature(companyId, JOB_WORK_FEATURE_ID);
 }
 
 /**
@@ -121,8 +143,8 @@ export async function isJobWorkEnabled(companyId: string): Promise<boolean> {
 export async function assertJobWorkEnabled(companyId: string): Promise<void> {
   if (!(await isJobWorkEnabled(companyId))) {
     throw new JobWorkError(
-      "Job Work is only available in an internal test workspace. " +
-        "Create one from Admin → Dev Test.",
+      "Job Work is switched off for this workspace. An admin can turn it on for " +
+        "the plan under Admin → Plans → Pages & Modules.",
       403,
     );
   }
@@ -172,6 +194,28 @@ export type JobWorkChallanLine = {
   returnedQty: number;
 };
 
+/**
+ * What the costing formula said, stamped on the challan at issue time.
+ *
+ * Stamped rather than referenced, exactly as a costing sheet stamps its own
+ * version: the formula can be corrected next week without rewriting what this
+ * job was raised against. It is what the receipt compares reality to — and
+ * without it, "how much should this have taken?" has no answer six months on.
+ */
+export type ChallanFormula = {
+  formulaId: string;
+  formulaName: string;
+  formulaVersion: number;
+  stdPerPc: number | null;
+  unitsPerBatch: number | null;
+  costPerUnit: number | null;
+  wastePerBatch: number | null;
+  /** Exact material the job needs — 12.6, fractional on purpose. */
+  expectedNeeded: number | null;
+  /** Part of the last whole unit the job never touches — 0.4. Stock, not scrap. */
+  expectedLeftover: number | null;
+};
+
 export type JobWorkChallan = {
   id: string;
   challanNo: string;
@@ -192,6 +236,8 @@ export type JobWorkChallan = {
   lines: JobWorkChallanLine[];
   /** Value of material still lying with the worker under this challan. */
   balanceValue: number;
+  /** What the costing formula said, when this challan came from one. */
+  formula: ChallanFormula | null;
 };
 
 /* ─────────────────────────── Reading ─────────────────────────── */
@@ -211,6 +257,27 @@ function lineOf(raw: unknown): JobWorkChallanLine | null {
     ...(Number.isFinite(standard) && standard > 0 ? { standardPerPc: standard } : {}),
     consumedQty: Number(l.consumedQty) || 0,
     returnedQty: Number(l.returnedQty) || 0,
+  };
+}
+
+function readChallanFormula(raw: unknown): ChallanFormula | null {
+  const f = (raw ?? {}) as Record<string, unknown>;
+  const formulaId = String(f.formulaId || "").trim();
+  if (!formulaId) return null;
+  const num = (v: unknown) => {
+    const n = Number(v);
+    return Number.isFinite(n) ? n : null;
+  };
+  return {
+    formulaId,
+    formulaName: String(f.formulaName || ""),
+    formulaVersion: num(f.formulaVersion) ?? 1,
+    stdPerPc: num(f.stdPerPc),
+    unitsPerBatch: num(f.unitsPerBatch),
+    costPerUnit: num(f.costPerUnit),
+    wastePerBatch: num(f.wastePerBatch),
+    expectedNeeded: num(f.expectedNeeded),
+    expectedLeftover: num(f.expectedLeftover),
   };
 }
 
@@ -250,6 +317,7 @@ export function readChallan(record: {
     notes: String(d.notes || ""),
     lines,
     balanceValue,
+    formula: readChallanFormula(d.formula),
   };
 }
 
@@ -283,6 +351,11 @@ export async function issueToJobWorker(opts: {
   ratePerPc?: number;
   allowedWastagePct?: number;
   notes?: string;
+  /**
+   * What the costing formula worked out, when the challan came from one.
+   * Stamped onto the record so the receipt can hold reality against it.
+   */
+  formula?: Partial<ChallanFormula> | null;
   /** Send anyway when the warehouse is short — the shortfall shows as negative stock. */
   allowNegativeStock?: boolean;
 }): Promise<IssueResult> {
@@ -457,6 +530,7 @@ export async function issueToJobWorker(opts: {
                 : Number(workerData.allowedWastagePct) || 0,
             notes: String(opts.notes || "").slice(0, 500),
             issueVoucherNo: voucherNo,
+            formula: opts.formula?.formulaId ? opts.formula : null,
             lines,
           },
         },

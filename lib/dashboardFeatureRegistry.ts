@@ -17,6 +17,14 @@ export type DashboardFeatureDefinition = {
   description?: string;
   category?: string;
   plans?: string[];
+  /**
+   * `false` keeps the page out of every plan's shipped defaults — it is listed
+   * in Admin → Plans → Pages & Modules so it can be switched on deliberately,
+   * and nothing switches it on by itself. Both heal paths
+   * (`healSavedPlanFeatureFlags`, `addUnseenRegistryFeatures`) only restore ids
+   * that are in the defaults, so a page marked this way never leaks into a
+   * tenant whose grid predates it. For a module still under test.
+   */
   defaultEnabled?: boolean;
   /**
    * Cross-business page — a salon, a pharmacy and a trading company all get it.
@@ -2652,6 +2660,20 @@ export const CORE_DASHBOARD_FEATURES: DashboardFeatureDefinition[] = [
   // customer either gets the migration documentation or does not, and an admin
   // switching it off per plan should not have to tick seven boxes to do it.
   { id: "CORE_IMPORT_GUIDES", label: "Import Guides", route: "/dashboard/import/guide", section: "Import Data", core: true, business: "service", businessLabel: "Core (all businesses)", description: "Per-system export instructions — the exact report and options for each of the nine files, plus the full column reference." },
+
+  // ── Job Work ──
+  //
+  // Listed here so it has a switch in Admin → Plans → Pages & Modules for all
+  // three plans, and shipped with that switch off: `defaultEnabled: false`
+  // keeps it out of every plan's defaults, and the heal paths only ever restore
+  // ids that are in the defaults, so no existing tenant picks it up on its own.
+  // Demo sandboxes get it regardless — see /api/me/bootstrap.
+  //
+  // Core rather than scoped to manufacturing on purpose: the Manufacturing
+  // group only renders for a business type carrying the "bom" module, and the
+  // merchant manufacturer this was built for — one who owns no machines and
+  // sends everything out to a thekedar — is usually set up as trading.
+  { id: "JOB_WORK", label: "Job Work", route: "/dashboard/job-work", section: "Operations", core: true, defaultEnabled: false, business: "service", businessLabel: "Core (all businesses)", description: "Issue material to an outside worker on a challan and take the finished pieces back, with the stock and the ledger following." },
 ];
 
 // Core pages join the same list the sidebar, the admin grid and the route
@@ -2712,6 +2734,8 @@ export function createDefaultDashboardFeatureFlags(): Record<DashboardFeaturePla
   const forPlan = (planCode: "STARTER" | "PRO" | "ENTERPRISE"): string[] => {
     const granted = new Set<string>(PLAN_DEFAULT_PERMISSIONS[planCode] || []);
     return DASHBOARD_FEATURE_DEFS
+      // A page shipped off stays off until an admin ticks it — see defaultEnabled.
+      .filter((f) => f.defaultEnabled !== false)
       .filter((f) => !f.core || !f.permKey || granted.has(f.permKey))
       .map((f) => f.id);
   };
@@ -2720,8 +2744,9 @@ export function createDefaultDashboardFeatureFlags(): Record<DashboardFeaturePla
     PRO: forPlan("PRO"),
     ENTERPRISE: forPlan("ENTERPRISE"),
     // Custom packages are built module by module at checkout, so the grid
-    // starts fully open and the purchased modules narrow it.
-    CUSTOM: [...DASHBOARD_FEATURE_IDS],
+    // starts fully open and the purchased modules narrow it — but "fully open"
+    // still cannot mean a module that is not released.
+    CUSTOM: DASHBOARD_FEATURE_DEFS.filter((f) => f.defaultEnabled !== false).map((f) => f.id),
   };
 }
 
