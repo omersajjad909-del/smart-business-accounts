@@ -1474,7 +1474,7 @@ const [searchTerm, setSearchTerm] = useState("");
                       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: 13 }}>
                         <span style={{ color: MUTED }}>Discount</span>
                         <div style={{ display: "flex", gap: 4 }}>
-                          <select value={discountType} onChange={e => setDiscountType(e.target.value)} style={{ ...inp({ width: 52, padding: "3px 5px", fontSize: 11 }) }}><option value="flat">Flat</option><option value="percent">%</option></select>
+                          <select data-compact-select value={discountType} onChange={e => setDiscountType(e.target.value)} style={{ ...inp({ width: 52, padding: "3px 5px", fontSize: 11 }) }}><option value="flat">Flat</option><option value="percent">%</option></select>
                           <input type="number" value={discount} onChange={e => setDiscount(e.target.value === "" ? "" : Number(e.target.value))} placeholder="0" style={{ ...inp({ width: 74, padding: "3px 6px", fontSize: 12, textAlign: "right" }) }} />
                         </div>
                       </div>

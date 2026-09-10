@@ -150,7 +150,7 @@ export default function StockLedgerPage() {
         <div style={{ display: "flex", flexDirection: "column", gap: 5, flex: "1 1 260px", minWidth: 220 }}>
           <label style={{ fontSize: 10, fontWeight: 700, color: "rgba(255,255,255,.38)", letterSpacing: ".07em", textTransform: "uppercase" }}>Select Item</label>
           <select className="sl-sel" value={itemId} onChange={e => setItemId(e.target.value)}
-            style={{ background: "rgba(255,255,255,.06)", border: "1.5px solid rgba(255,255,255,.1)", borderRadius: 9, padding: "9px 12px", color: itemId ? "#e2e8f0" : "rgba(255,255,255,.35)", fontSize: 13, fontFamily: ff, cursor: "pointer", appearance: "auto" }}>
+            style={{ background: "rgba(255,255,255,.06)", border: "1.5px solid rgba(255,255,255,.1)", borderRadius: 9, padding: "9px 12px", color: itemId ? "#e2e8f0" : "rgba(255,255,255,.35)", fontSize: 13, fontFamily: ff, cursor: "pointer" }}>
             <option value="">— Choose item —</option>
             {items.map(i => (
               <option key={i.id} value={i.id} style={{ background: "#1e293b" }}>

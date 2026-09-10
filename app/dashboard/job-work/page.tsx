@@ -387,6 +387,19 @@ const input: React.CSSProperties = {
   fontSize: 13,
   fontFamily: ff,
   outline: "none",
+  boxSizing: "border-box",
+};
+const selectInput: React.CSSProperties = {
+  ...input,
+  cursor: "pointer",
+  appearance: "none",
+  WebkitAppearance: "none",
+  MozAppearance: "none",
+  paddingRight: 30,
+  backgroundImage: `linear-gradient(45deg, transparent 50%, ${dim} 50%), linear-gradient(135deg, ${dim} 50%, transparent 50%)`,
+  backgroundPosition: "calc(100% - 18px) center, calc(100% - 13px) center",
+  backgroundSize: "5px 5px, 5px 5px",
+  backgroundRepeat: "no-repeat",
 };
 const btn = (primary = true): React.CSSProperties => ({
   padding: "10px 18px",
@@ -510,7 +523,7 @@ function WorkersTab({ workers, setBusy, busy, setMsg, refresh }: Setter & { work
           </div>
           <div>
             <label style={label}>Code</label>
-            <input style={input} value={form.code} onChange={(e) => setForm({ ...form, code: e.target.value })} placeholder="THEKA" />
+            <input style={input} value={form.code} onChange={(e) => setForm({ ...form, code: e.target.value })} placeholder="Contract" />
           </div>
           <div>
             <label style={label}>Phone</label>
@@ -741,7 +754,7 @@ function IssueTab({
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(160px,1fr))", gap: 12, marginBottom: 16 }}>
           <div>
             <label style={label}>Job worker</label>
-            <select style={input} value={workerId} onChange={(e) => setWorkerId(e.target.value)}>
+            <select style={selectInput} value={workerId} onChange={(e) => setWorkerId(e.target.value)}>
               <option value="">— select —</option>
               {workers.map((w) => (
                 <option key={w.id} value={w.id}>
@@ -760,7 +773,7 @@ function IssueTab({
           </div>
           <div>
             <label style={label}>What will be made (finished item)</label>
-            <select style={input} value={finishedItemId} onChange={(e) => setFinishedItemId(e.target.value)}>
+            <select style={selectInput} value={finishedItemId} onChange={(e) => setFinishedItemId(e.target.value)}>
               <option value="">— select —</option>
               {finished.map((i) => (
                 <option key={i.id} value={i.id}>
@@ -789,7 +802,7 @@ function IssueTab({
         {lines.map((l, idx) => (
           <div key={idx} style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr auto", gap: 10, marginBottom: 9 }}>
             <select
-              style={input}
+              style={selectInput}
               value={l.itemId}
               onChange={(e) => setLines(lines.map((x, i) => (i === idx ? { ...x, itemId: e.target.value } : x)))}
             >
@@ -984,7 +997,7 @@ function ReceiveTab({ challans, busy, setBusy, setMsg, refresh }: Setter & { cha
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(160px,1fr))", gap: 12 }}>
           <div>
             <label style={label}>Challan</label>
-            <select style={input} value={challanId} onChange={(e) => setChallanId(e.target.value)}>
+            <select style={selectInput} value={challanId} onChange={(e) => setChallanId(e.target.value)}>
               <option value="">— select —</option>
               {challans.map((c) => (
                 <option key={c.id} value={c.id}>

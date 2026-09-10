@@ -658,13 +658,52 @@ export function ItemPicker({
           }}
         >
           {/* ------------------------------------------------
+              PANEL SEARCH BOX
+
+              The cell input above drives `query` too, but once the
+              list is open the operator's eyes are down here — give
+              them a box to type into without hunting back up for
+              the cell.
+          ------------------------------------------------ */}
+
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              height: "100%",
+            }}
+          >
+            <input
+              value={query}
+              placeholder="Search items…"
+              spellCheck={false}
+              onChange={(e) => setQuery(e.target.value)}
+              onKeyDown={keyDown}
+              style={{
+                flex: "0 0 auto",
+                width: "100%",
+                boxSizing: "border-box",
+                margin: "0 0 4px",
+                padding: "8px 10px",
+                borderRadius: 8,
+                outline: "none",
+                fontSize: 13,
+                background: "var(--app-bg, #0b0d12)",
+                border:
+                  "1px solid var(--border, rgba(255,255,255,.14))",
+                color: "inherit",
+              }}
+            />
+
+          {/* ------------------------------------------------
               SCROLLABLE CONTENT
           ------------------------------------------------ */}
 
           <div
             ref={listRef}
             style={{
-              height: "100%",
+              flex: "1 1 auto",
+              minHeight: 0,
               overflowY: "auto",
               overflowX: "hidden",
               paddingBottom: 14,
@@ -1217,6 +1256,7 @@ export function ItemPicker({
                 ✎ Type manually…
               </div>
             )}
+          </div>
           </div>
 
           {/* ------------------------------------------------

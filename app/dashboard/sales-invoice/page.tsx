@@ -698,6 +698,15 @@ function SalesInvoiceContent() {
   // ── Styles ──
   const panelStyle: React.CSSProperties = { background: "var(--card-bg)", border: "1px solid var(--border)", borderRadius: 12, padding: 20, fontFamily: ff };
   const inputStyle: React.CSSProperties = { width: "100%", background: "var(--input-bg)", border: "1px solid var(--border)", borderRadius: 8, padding: "9px 12px", color: "var(--text-primary)", fontFamily: ff, fontSize: 14, outline: "none", boxSizing: "border-box" };
+  const selectStyle: React.CSSProperties = {
+    ...inputStyle,
+    appearance: "none", WebkitAppearance: "none", MozAppearance: "none",
+    cursor: "pointer", paddingRight: 30,
+    backgroundImage: "linear-gradient(45deg, transparent 50%, var(--text-muted) 50%), linear-gradient(135deg, var(--text-muted) 50%, transparent 50%)",
+    backgroundPosition: "calc(100% - 18px) center, calc(100% - 13px) center",
+    backgroundSize: "5px 5px, 5px 5px",
+    backgroundRepeat: "no-repeat",
+  };
   const labelStyle: React.CSSProperties = { fontSize: 11, color: "var(--text-muted)", fontWeight: 600, marginBottom: 5, display: "block", textTransform: "uppercase", letterSpacing: 0.5 };
   const btnPrimary: React.CSSProperties = { background: accent, color: "#fff", border: "none", borderRadius: 8, padding: "9px 20px", fontFamily: ff, fontSize: 14, fontWeight: 600, cursor: "pointer" };
   const btnGhost: React.CSSProperties = { background: "transparent", color: "var(--text-muted)", border: "1px solid var(--border)", borderRadius: 8, padding: "9px 16px", fontFamily: ff, fontSize: 14, cursor: "pointer" };
@@ -1031,7 +1040,7 @@ function SalesInvoiceContent() {
                   <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(3, minmax(0, 1fr))", gap: 14, alignItems: "stretch" }}>
                     <div style={panelStyle}>
                       <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 12 }}>Customer Details</div>
-                      <select style={inputStyle} value={customerId} onChange={e => { setCustomerId(e.target.value); setCustomerName(customers.find(c => c.id === e.target.value)?.name || ""); }}>
+                      <select style={selectStyle} value={customerId} onChange={e => { setCustomerId(e.target.value); setCustomerName(customers.find(c => c.id === e.target.value)?.name || ""); }}>
                         <option value="">— Select Customer —</option>
                         {customers.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
                       </select>
@@ -1133,9 +1142,9 @@ function SalesInvoiceContent() {
                                 {rfActive && (
                                   <RateFormulaMobileFields settings={rf} meta={r.meta} rowIndex={i} onChange={(key, value) => updateRowMeta(i, key, value)} />
                                 )}
-                                {(["qty","rate"] as const).map(k => (
+                                {(["qty","rate","discountPercent","taxPercent"] as const).map(k => (
                                   <div key={k}>
-                                    <div style={{ fontSize: 10, color: "var(--text-muted)", fontWeight: 700, marginBottom: 3, textTransform: "uppercase" }}>{k === "qty" ? "Qty" : "Unit Price"}</div>
+                                    <div style={{ fontSize: 10, color: "var(--text-muted)", fontWeight: 700, marginBottom: 3, textTransform: "uppercase" }}>{k === "qty" ? "Qty" : k === "rate" ? "Unit Price" : k === "discountPercent" ? "Disc%" : "Tax%"}</div>
                                     <input type="number" style={{ ...inputStyle, textAlign: "right", ...(rfActive && k === "rate" && !rf.rateEditable ? { opacity: 0.75 } : {}) }} value={r[k]} onChange={e => updateRow(i, k, e.target.value)} readOnly={rfActive && k === "rate" && !rf.rateEditable} placeholder="0" />
                                   </div>
                                 ))}
@@ -1162,7 +1171,7 @@ function SalesInvoiceContent() {
                                 <th key={"t"+h+hi} style={{ padding: "10px 6px", fontSize: 10.5, fontWeight: 800, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: 0.5, textAlign: hi <= 5 ? "right" : "left", whiteSpace: "nowrap" }}>{h}</th>
                               ))}
                               {rfActive && rtmmFormula.fields.length > 0 && <RateFormulaHeadCells settings={rtmmFormula} />}
-                              {["Unit Price","Total",""].map((h,hi) => (
+                              {["Unit Price","Disc%","Tax%","Total",""].map((h,hi) => (
                                 <th key={"tail"+h+hi} style={{ padding: "10px 6px", fontSize: 10.5, fontWeight: 800, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: 0.5, textAlign: hi <= 5 ? "right" : "left", whiteSpace: "nowrap" }}>{h}</th>
                               ))}
                             </tr>
@@ -1225,6 +1234,12 @@ function SalesInvoiceContent() {
                                   <td style={{ padding: "13px 6px", width: 82, borderTop: "1px solid var(--border)", borderBottom: "1px solid var(--border)" }}>
                                     <input type="number" step="any" style={{ ...inputStyle, padding: "5px 6px", border: "1.5px solid var(--border)", borderRadius: 7, textAlign: "right", fontSize: 12.5, ...(rfActive && !rf.rateEditable ? { opacity: 0.75, cursor: "not-allowed" } : {}) }} value={r.rate} onChange={e => updateRow(i, "rate", e.target.value)} readOnly={rfActive && !rf.rateEditable} title={rfActive && !rf.rateEditable ? "Worked out by your rate formula" : undefined} placeholder="0.00" />
                                   </td>
+                                  <td style={{ padding: "13px 6px", width: 64, borderTop: "1px solid var(--border)", borderBottom: "1px solid var(--border)" }}>
+                                    <input type="number" step="any" style={{ ...inputStyle, padding: "5px 6px", border: "1.5px solid var(--border)", borderRadius: 7, textAlign: "right", fontSize: 12.5 }} value={r.discountPercent} onChange={e => updateRow(i, "discountPercent", e.target.value)} placeholder="0" />
+                                  </td>
+                                  <td style={{ padding: "13px 6px", width: 64, borderTop: "1px solid var(--border)", borderBottom: "1px solid var(--border)" }}>
+                                    <input type="number" step="any" style={{ ...inputStyle, padding: "5px 6px", border: "1.5px solid var(--border)", borderRadius: 7, textAlign: "right", fontSize: 12.5 }} value={r.taxPercent} onChange={e => updateRow(i, "taxPercent", e.target.value)} placeholder="0" />
+                                  </td>
                                   <td style={{ padding: "13px 6px", textAlign: "right", fontWeight: 700, fontSize: 13, width: 82, whiteSpace: "nowrap", borderTop: "1px solid var(--border)", borderBottom: "1px solid var(--border)" }}>{fmt(lineTaxable + lineTax)}</td>
                                   <td style={{ padding: "13px 4px", width: 26, borderTop: "1px solid var(--border)", borderBottom: "1px solid var(--border)", borderRight: "1px solid var(--border)" }}>
                                     <button tabIndex={-1} style={{ background: "none", border: "none", color: "var(--danger)", cursor: "pointer", fontSize: 17, padding: 0 }} onClick={() => removeRow(i)} disabled={rows.length === 1}>×</button>
@@ -1244,7 +1259,7 @@ function SalesInvoiceContent() {
                       <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 12 }}>Payment Details</div>
                       <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
                         <div><label style={labelStyle}>Payment Method</label>
-                          <select style={inputStyle} value={paymentMethod} onChange={e => setPaymentMethod(e.target.value)}>
+                          <select style={selectStyle} value={paymentMethod} onChange={e => setPaymentMethod(e.target.value)}>
                             <option value="">Select Method</option>
                             <option value="CASH">Cash</option>
                             <option value="BANK">Bank Transfer</option>
@@ -1253,7 +1268,7 @@ function SalesInvoiceContent() {
                           </select>
                         </div>
                         <div><label style={labelStyle}>Payment Terms</label>
-                          <select style={inputStyle} value={paymentTerms} onChange={e => setPaymentTerms(e.target.value)}>
+                          <select style={selectStyle} value={paymentTerms} onChange={e => setPaymentTerms(e.target.value)}>
                             <option value="">Select Terms</option>
                             <option value="Immediate">Immediate</option>
                             <option value="Net 15">Net 15 Days</option>
@@ -1297,7 +1312,7 @@ function SalesInvoiceContent() {
                         <div><label style={labelStyle}>Due Date</label><DateInput value={dueDate} onChange={setDueDate} style={inputStyle} /></div>
                       </div>
                       <div><label style={labelStyle}>Currency</label>
-                        <select style={inputStyle} value={currencyId} onChange={e => { const cid = e.target.value; setCurrencyId(cid); const cur = currencies.find(c => c.id === cid); if (cur) setExchangeRate(cur.exchangeRate || 1); }}>
+                        <select style={selectStyle} value={currencyId} onChange={e => { const cid = e.target.value; setCurrencyId(cid); const cur = currencies.find(c => c.id === cid); if (cur) setExchangeRate(cur.exchangeRate || 1); }}>
                           <option value="">Base Currency</option>
                           {currencies.map(c => <option key={c.id} value={c.id}>{c.code} — {c.name}</option>)}
                         </select>
@@ -1305,7 +1320,7 @@ function SalesInvoiceContent() {
                       {currencyId && <div><label style={labelStyle}>Exchange Rate</label><input type="number" style={inputStyle} value={exchangeRate} onChange={e => setExchangeRate(Number(e.target.value))} /></div>}
                       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
                         <div><label style={labelStyle}>Sales Person</label>
-                          <select style={inputStyle} value={salesmanId} onChange={e => setSalesmanId(e.target.value)}>
+                          <select style={selectStyle} value={salesmanId} onChange={e => setSalesmanId(e.target.value)}>
                             <option value="">— None —</option>
                             {teamMembers.map(m => <option key={m.id} value={m.id}>{m.name}</option>)}
                           </select>
@@ -1313,7 +1328,7 @@ function SalesInvoiceContent() {
                         <div><label style={labelStyle}>Reference</label><input style={inputStyle} value={reference} onChange={e => setReference(e.target.value)} placeholder="PO-2024-…" /></div>
                       </div>
                       <div><label style={labelStyle}>Location</label>
-                        <select style={inputStyle} value={location} onChange={e => setLocation(e.target.value)}>
+                        <select style={selectStyle} value={location} onChange={e => setLocation(e.target.value)}>
                           <option value="MAIN">Main</option>
                           <option value="SHOP">Shop</option>
                         </select>
@@ -1331,7 +1346,7 @@ function SalesInvoiceContent() {
                       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: 13 }}>
                         <span style={{ color: "var(--text-muted)" }}>Discount</span>
                         <div style={{ display: "flex", gap: 5 }}>
-                          <select style={{ ...inputStyle, width: 58, padding: "3px 6px", fontSize: 12 }} value={discountType} onChange={e => setDiscountType(e.target.value as "flat" | "percent")}>
+                          <select data-compact-select style={{ ...selectStyle, width: 58, padding: "3px 6px", paddingRight: 20, backgroundPosition: "calc(100% - 10px) center, calc(100% - 6px) center", fontSize: 12 }} value={discountType} onChange={e => setDiscountType(e.target.value as "flat" | "percent")}>
                             <option value="flat">Flat</option><option value="percent">%</option>
                           </select>
                           <input type="number" style={{ ...inputStyle, width: 78, padding: "3px 7px", fontSize: 12, textAlign: "right" }} value={discount} onChange={e => setDiscount(e.target.value === "" ? "" : Number(e.target.value))} placeholder="0" />
@@ -1347,7 +1362,7 @@ function SalesInvoiceContent() {
                           onClick={() => { setApplyTax(!applyTax); if (!applyTax) setSelectedTaxId(""); }}>
                           {applyTax ? "✔ Global Tax Applied" : "+ Add Global Tax"}</button>
                         {applyTax && (
-                          <select style={{ ...inputStyle, marginTop: 8 }} value={selectedTaxId} onChange={e => setSelectedTaxId(e.target.value)}>
+                          <select style={{ ...selectStyle, marginTop: 8 }} value={selectedTaxId} onChange={e => setSelectedTaxId(e.target.value)}>
                             <option value="">— Select Tax —</option>
                             {taxes.map(t => <option key={t.id} value={t.id}>{t.taxType} ({t.taxCode}) — {t.taxRate}%</option>)}
                           </select>
