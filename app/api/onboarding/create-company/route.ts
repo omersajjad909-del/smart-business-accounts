@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import * as bcrypt from "bcryptjs";
 import { claimReferral, REF_COOKIE } from "@/lib/affiliateTracking";
+import { createDefaultBranchForCompany } from "@/lib/companyBranchBootstrap";
 
 export async function POST(req: NextRequest) {
   try {

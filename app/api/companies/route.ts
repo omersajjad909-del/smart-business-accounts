@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { createDefaultBranchForCompany } from "@/lib/companyBranchBootstrap";
 
 export async function GET(req: NextRequest) {
   const userId = req.headers.get("x-user-id");
@@ -48,6 +49,8 @@ export async function POST(req: NextRequest) {
     const company = await prisma.company.create({
       data: { name, code: code || null, isActive: true, baseCurrency: baseCurrency || "USD" },
     });
+
+    await createDefaultBranchForCompany(company.id, { name });
 
     await prisma.userCompany.create({
       data: { userId, companyId: company.id, isDefault: false },
