@@ -187,7 +187,10 @@ function CostingInner() {
   const [values, setValues] = useState<Record<string, number | number[]>>({});
   const [sheetName, setSheetName] = useState("");
   const [savedNote, setSavedNote] = useState("");
-  const [showWorking, setShowWorking] = useState(true);
+  // Folded away by default. The working is every step of the costing, which is
+  // what you open when a number looks wrong — not what you want between the
+  // result and the print buttons on every single quote.
+  const [showWorking, setShowWorking] = useState(false);
   // Which sheet is being sent to the printer — the quote, or the cutting detail.
   const [printKind, setPrintKind] = useState<"cost" | "working" | null>(null);
   // What to charge on top of what the job costs. The formula carries the usual
@@ -474,7 +477,16 @@ function CostingInner() {
         <div className="cxCols">
           {/* ── Left: the job, in the order it is filled ── */}
           <div className="cxForm">
-            <Card n={1} title="Formula" hint="Which costing this job uses.">
+            {/* The count is on the label on purpose: the box shows one name, and
+                without it there is no way to tell a single saved formula from
+                the first of ten. */}
+            <Card
+              n={1}
+              title="Formula"
+              hint={formulas.length === 1
+                ? "Which costing this job uses. 1 formula saved."
+                : `Which costing this job uses — pick from the ${formulas.length} you have saved.`}
+            >
               <select value={selectedId} onChange={(e) => setSelectedId(e.target.value)} style={{ ...inputStyle, fontFamily: FONT }}>
                 {formulas.map((f) => (
                   <option key={f.id} value={f.id}>{f.formula.category} — {f.formula.name}</option>

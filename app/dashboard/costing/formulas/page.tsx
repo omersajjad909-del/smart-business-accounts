@@ -77,12 +77,27 @@ const CSS = `
 .fxOut{display:grid;grid-template-columns:1.05fr 1.3fr .6fr 1.1fr auto auto;gap:8px;align-items:center}
 .fxStep{display:grid;grid-template-columns:1.05fr 1.3fr .6fr auto;gap:8px;align-items:center}
 .fxProfit{display:grid;grid-template-columns:1fr 1.3fr;gap:8px;align-items:center;max-width:330px}
+/* Simple rows go two to a line, the way the run screen asks for the job —
+   twelve inputs stacked one per line is a page you scroll rather than read.
+   Both halves are the same 1fr of the same container and carry the same inner
+   template, so the header above them lines up without needing subgrid.
+   Detailed stays one per line: seven columns will not halve. */
+.fxRows{display:flex;flex-direction:column;gap:9px}
+.fxPairs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px 14px;align-items:start}
+.fxPairsHead{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 14px}
 .fxHead{font-size:9.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
   color:rgba(255,255,255,.32);padding:0 2px 3px}
 .fxFormulaTitle{flex:1 1 220px;min-width:220px;word-break:normal;overflow-wrap:anywhere}
 .fxFormulaActions{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
 /* Two columns: the live result belongs in the sticky side rail. */
 .fxLiveMobile{display:none}
+/* Below this a half-row cannot hold a name, a unit and a number without
+   squeezing all three, so the pairs go back to one per line. */
+@media(max-width:900px){
+  .fxPairs{grid-template-columns:1fr}
+  .fxPairsHead{grid-template-columns:1fr}
+  .fxPairSecond{display:none}
+}
 @media(max-width:1080px){
   .fxCols{grid-template-columns:1fr}
   .fxSide{position:static}
@@ -138,6 +153,27 @@ function toDraft(record: BusinessRecord): Draft {
     profit: toProfit(d.profit),
   };
 }
+
+/* Simple-mode column labels. Written as functions rather than constants
+   because two-up draws them twice, once over each half, and React wants two
+   elements rather than the same one in two places. */
+const inputHeadCells = () => (
+  <>
+    <div className="fxHead">Name</div>
+    <div className="fxHead">Unit</div>
+    <div className="fxHead">Value</div>
+    <div />
+  </>
+);
+
+const outputHeadCells = () => (
+  <>
+    <div className="fxHead">Value</div>
+    <div className="fxHead">Shown as</div>
+    <div className="fxHead">Main</div>
+    <div />
+  </>
+);
 
 /**
  * Keys the editor invented for a brand-new row. While a key still looks like
@@ -472,14 +508,13 @@ export default function FormulasPage() {
                   <div />
                 </div>
               ) : (
-                <div className="fxInS fxHeadRow">
-                  <div className="fxHead">Name</div>
-                  <div className="fxHead">Unit</div>
-                  <div className="fxHead">Value</div>
-                  <div />
+                <div className="fxPairsHead fxHeadRow">
+                  <div className="fxInS">{inputHeadCells()}</div>
+                  <div className="fxInS fxPairSecond">{inputHeadCells()}</div>
                 </div>
               )}
             >
+              <div className={detailed ? "fxRows" : "fxPairs"}>
               {d.inputs.map((inp, i) => {
                 const badList = !!inp.isList && !(inp.listValue ?? []).length;
 
@@ -551,6 +586,7 @@ export default function FormulasPage() {
                   </div>
                 );
               })}
+              </div>
               {!detailed && (
                 <div style={{ fontSize: 11.5, color: "rgba(255,255,255,.28)", lineHeight: 1.6, paddingTop: 4 }}>
                   Switch to <strong style={{ color: "rgba(255,255,255,.45)" }}>Detailed</strong> above to rename keys,
@@ -711,14 +747,13 @@ export default function FormulasPage() {
                   <div />
                 </div>
               ) : (
-                <div className="fxOutS fxHeadRow">
-                  <div className="fxHead">Value</div>
-                  <div className="fxHead">Shown as</div>
-                  <div className="fxHead">Main</div>
-                  <div />
+                <div className="fxPairsHead fxHeadRow">
+                  <div className="fxOutS">{outputHeadCells()}</div>
+                  <div className="fxOutS fxPairSecond">{outputHeadCells()}</div>
                 </div>
               )}
             >
+              <div className={detailed ? "fxRows" : "fxPairs"}>
               {d.outputs.map((out, i) => {
                 const picker = (
                   <select value={out.key} onChange={(e) => patch((x) => {
@@ -774,6 +809,7 @@ export default function FormulasPage() {
                   </div>
                 );
               })}
+              </div>
             </Section>
           </div>
 
