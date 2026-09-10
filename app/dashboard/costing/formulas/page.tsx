@@ -77,9 +77,15 @@ const CSS = `
   color:rgba(255,255,255,.32);padding:0 2px 3px}
 .fxFormulaTitle{flex:1 1 220px;min-width:220px;word-break:normal;overflow-wrap:anywhere}
 .fxFormulaActions{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+/* Two columns: the live result belongs in the sticky side rail. */
+.fxLiveMobile{display:none}
 @media(max-width:1080px){
   .fxCols{grid-template-columns:1fr}
   .fxSide{position:static}
+  /* One column: the side rail now sits below everything, so the result moves
+     up under Inputs and the rail's copy stands down. */
+  .fxLiveMobile{display:block}
+  .fxLiveDesk{display:none}
 }
 /* Under 768px the dashboard's own topbar is sticky against the window, so the
    action bar parks below it instead of covering it. */
@@ -309,6 +315,49 @@ export default function FormulasPage() {
       });
     };
 
+    /* Written once, hung in two places. On a wide screen it rides in the
+       sticky right column; once the columns stack it would land at the very
+       bottom, a scroll away from the numbers that change it — so on narrow
+       screens it sits directly under Inputs instead. CSS picks which copy
+       shows. */
+    const liveResultCard = (
+      <div style={{ background: CARD, border: `1px solid ${BORDER}`, borderRadius: 14, padding: 18 }}>
+        <div style={{ ...label, marginBottom: 12 }}>Live result</div>
+        {preview?.ok === false && (
+          <div style={{
+            fontSize: 12, color: "#f87171", marginBottom: 12, lineHeight: 1.6,
+            padding: "9px 11px", borderRadius: 9,
+            background: "rgba(248,113,113,.09)", border: "1px solid rgba(248,113,113,.25)",
+          }}>
+            {preview.error}
+          </div>
+        )}
+        <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+          {d.outputs.filter((o) => o.key).map((o) => (
+            <div key={o.key} style={{
+              display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 10,
+              padding: o.primary ? "10px 12px" : "4px 0",
+              background: o.primary ? "rgba(52,211,153,.09)" : "transparent",
+              border: o.primary ? "1px solid rgba(52,211,153,.25)" : "none",
+              borderRadius: 10,
+            }}>
+              <span style={{ fontSize: 12.5, color: "rgba(255,255,255,.5)" }}>{o.label || o.key}</span>
+              <span style={{
+                fontFamily: MONO, fontVariantNumeric: "tabular-nums",
+                fontSize: o.primary ? 17 : 13, fontWeight: 700,
+                color: o.primary ? "#34d399" : "rgba(255,255,255,.85)",
+              }}>
+                {fmt(preview?.values[o.key])}<span style={{ fontSize: 10.5, color: "rgba(255,255,255,.3)", marginLeft: 4 }}>{o.unit}</span>
+              </span>
+            </div>
+          ))}
+          {!d.outputs.some((o) => o.key) && (
+            <div style={{ fontSize: 12.5, color: "rgba(255,255,255,.3)" }}>Add an output to see the result.</div>
+          )}
+        </div>
+      </div>
+    );
+
     return (
       <div className="fxWrap" style={{ fontFamily: FONT, color: "white" }}>
         <style>{CSS}</style>
@@ -465,11 +514,17 @@ export default function FormulasPage() {
               )}
             </Section>
 
+            {/* The stacked-layout home for the live result — see liveResultCard. */}
+            <div className="fxLiveMobile">{liveResultCard}</div>
+
             {/* Steps */}
             <Section
               n={3}
               title="Steps"
               hint="Each step can use the inputs and every step above it. Order matters."
+              collapsible
+              defaultOpen={false}
+              count={d.steps.length}
               onAdd={() => patch((x) => { x.steps.push({ key: `step${x.steps.length + 1}`, label: "", expression: "" }); })}
               head={detailed ? (
                 <div className="fxStep fxHeadRow">
@@ -543,6 +598,9 @@ export default function FormulasPage() {
               n={4}
               title="Outputs"
               hint="Which values the result screen shows — and what they mean to the rest of the system."
+              collapsible
+              defaultOpen={false}
+              count={d.outputs.length}
               onAdd={() => patch((x) => { x.outputs.push({ key: "", label: "", role: "none" }); })}
               head={detailed ? (
                 <div className="fxOut fxHeadRow">
@@ -622,41 +680,7 @@ export default function FormulasPage() {
 
           {/* ── Right: live preview, the keys in scope, function reference ── */}
           <div className="fxSide">
-            <div style={{ background: CARD, border: `1px solid ${BORDER}`, borderRadius: 14, padding: 18 }}>
-              <div style={{ ...label, marginBottom: 12 }}>Live result</div>
-              {preview?.ok === false && (
-                <div style={{
-                  fontSize: 12, color: "#f87171", marginBottom: 12, lineHeight: 1.6,
-                  padding: "9px 11px", borderRadius: 9,
-                  background: "rgba(248,113,113,.09)", border: "1px solid rgba(248,113,113,.25)",
-                }}>
-                  {preview.error}
-                </div>
-              )}
-              <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-                {d.outputs.filter((o) => o.key).map((o) => (
-                  <div key={o.key} style={{
-                    display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 10,
-                    padding: o.primary ? "10px 12px" : "4px 0",
-                    background: o.primary ? "rgba(52,211,153,.09)" : "transparent",
-                    border: o.primary ? "1px solid rgba(52,211,153,.25)" : "none",
-                    borderRadius: 10,
-                  }}>
-                    <span style={{ fontSize: 12.5, color: "rgba(255,255,255,.5)" }}>{o.label || o.key}</span>
-                    <span style={{
-                      fontFamily: MONO, fontVariantNumeric: "tabular-nums",
-                      fontSize: o.primary ? 17 : 13, fontWeight: 700,
-                      color: o.primary ? "#34d399" : "rgba(255,255,255,.85)",
-                    }}>
-                      {fmt(preview?.values[o.key])}<span style={{ fontSize: 10.5, color: "rgba(255,255,255,.3)", marginLeft: 4 }}>{o.unit}</span>
-                    </span>
-                  </div>
-                ))}
-                {!d.outputs.some((o) => o.key) && (
-                  <div style={{ fontSize: 12.5, color: "rgba(255,255,255,.3)" }}>Add an output to see the result.</div>
-                )}
-              </div>
-            </div>
+            <div className="fxLiveDesk">{liveResultCard}</div>
 
             {/* Every name a step is allowed to mention, with what it holds right
                 now. Clicking one types it into the formula box last used. */}
