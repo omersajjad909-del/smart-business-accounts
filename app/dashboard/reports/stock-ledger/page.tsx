@@ -50,6 +50,8 @@ export default function StockLedgerPage() {
   const [rows,   setRows]   = useState<Row[]>([]);
   const [loading, setLoading] = useState(false);
   const [hasLoaded, setHasLoaded] = useState(false);
+  /** Why the last load returned nothing, when it was not simply an empty ledger. */
+  const [error,  setError]  = useState("");
 
   useEffect(() => {
     fetch("/api/items-new")
@@ -60,15 +62,35 @@ export default function StockLedgerPage() {
   async function loadLedger() {
     if (!itemId) { toast.error("Please select an item first"); return; }
     setLoading(true);
+    setError("");
     const user = getCurrentUser();
     try {
       const res = await fetch(`/api/reports/stock-ledger?itemId=${itemId}&from=${from}&to=${to}`, {
         headers: { "x-user-role": user?.role || "ADMIN" },
       });
       const data = await res.json();
-      setRows(Array.isArray(data) ? data : []);
+      // A refused request used to land here as a non-array and be shown as an
+      // empty ledger — the same screen an item with no movements gets. Stock
+      // Ledger is gated on VIEW_STOCK_LEDGER, which a plan can grant the page
+      // without granting the permission, so "nothing at all" was the one
+      // symptom of a config nobody could then find. It says so now.
+      if (!res.ok || !Array.isArray(data)) {
+        const message = res.status === 403
+          ? "Your plan does not include the Stock Ledger permission (VIEW_STOCK_LEDGER). An admin can grant it under Admin → Plans → Permissions."
+          : (data && typeof data === "object" && "error" in data && String((data as { error?: string }).error))
+            || "The ledger could not be loaded.";
+        setRows([]);
+        setError(message);
+        setHasLoaded(true);
+        toast.error(res.status === 403 ? "Stock Ledger is not permitted on this plan" : message);
+        return;
+      }
+      setRows(data);
       setHasLoaded(true);
-    } catch { toast.error("Failed to load ledger"); }
+    } catch {
+      setError("The ledger could not be loaded.");
+      toast.error("Failed to load ledger");
+    }
     finally  { setLoading(false); }
   }
 
@@ -226,15 +248,23 @@ export default function StockLedgerPage() {
             ) : rows.length === 0 ? (
               <tr>
                 <td colSpan={rfActive ? 6 + rf.fields.length : 6} style={{ padding: "60px 0", textAlign: "center" }}>
-                  <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 10, color: "rgba(255,255,255,.22)" }}>
-                    <div style={{ fontSize: 40, opacity: 0.5 }}>📊</div>
-                    <div style={{ fontSize: 14, fontWeight: 700 }}>
-                      {hasLoaded ? "No transactions in this period" : "Select an item and click Show Ledger"}
+                  {error ? (
+                    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 10, color: "#f87171", maxWidth: 520, margin: "0 auto" }}>
+                      <div style={{ fontSize: 34, opacity: 0.7 }}>🔒</div>
+                      <div style={{ fontSize: 14, fontWeight: 700 }}>Ledger could not be shown</div>
+                      <div style={{ fontSize: 12, color: "rgba(255,255,255,.45)", lineHeight: 1.7, fontWeight: 400 }}>{error}</div>
                     </div>
-                    <div style={{ fontSize: 11, color: "rgba(255,255,255,.18)" }}>
-                      {hasLoaded ? "Try adjusting the date range" : ""}
+                  ) : (
+                    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 10, color: "rgba(255,255,255,.22)" }}>
+                      <div style={{ fontSize: 40, opacity: 0.5 }}>📊</div>
+                      <div style={{ fontSize: 14, fontWeight: 700 }}>
+                        {hasLoaded ? "No transactions in this period" : "Select an item and click Show Ledger"}
+                      </div>
+                      <div style={{ fontSize: 11, color: "rgba(255,255,255,.18)" }}>
+                        {hasLoaded ? "Try adjusting the date range" : ""}
+                      </div>
                     </div>
-                  </div>
+                  )}
                 </td>
               </tr>
             ) : rows.map((r, i) => {
