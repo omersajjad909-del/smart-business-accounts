@@ -837,7 +837,7 @@ function ReceiveTab({ challans, busy, setBusy, setMsg, refresh }: Setter & { cha
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(160px,1fr))", gap: 12 }}>
           <div>
             <label style={label}>Challan</label>
-            <select style={input} value={challanId} onChange={(e) => setChallanId(e.target.value)}>
+            <select style={selectInput} value={challanId} onChange={(e) => setChallanId(e.target.value)}>
               <option value="">— select —</option>
               {challans.map((c) => (
                 <option key={c.id} value={c.id}>
