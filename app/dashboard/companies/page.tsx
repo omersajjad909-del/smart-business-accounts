@@ -1,10 +1,7 @@
 "use client";
 
-import toast from "react-hot-toast";
-
 import { useEffect, useState } from "react";
 import { ResponsiveContainer, PageHeader, Card } from "@/components/ui/ResponsiveContainer";
-import { ResponsiveForm, FormField, FormActions, Input, Button } from "@/components/ui/ResponsiveForm";
 import { getCurrentUser, updateStoredUser } from "@/lib/auth";
 
 type Company = {
@@ -16,8 +13,6 @@ type Company = {
 
 export default function CompaniesPage() {
   const [companies, setCompanies] = useState<Company[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [form, setForm] = useState({ name: "", code: "" });
   const [user, setUser] = useState<any>(null);
 
   useEffect(() => {
@@ -57,39 +52,6 @@ export default function CompaniesPage() {
     }
   }
 
-  async function submit(e: React.FormEvent) {
-    e.preventDefault();
-    if (!user) return;
-
-    setLoading(true);
-    try {
-      const res = await fetch("/api/companies", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "x-user-id": user.id,
-          "x-user-role": user.role, // API requires ADMIN role usually, let's hope user is admin
-        },
-        body: JSON.stringify(form),
-      });
-
-      if (res.ok) {
-        setForm({ name: "", code: "" });
-        await loadCompanies();
-        // Force reload to update the company switcher in the header
-        window.location.reload(); 
-      } else {
-        const err = await res.json();
-        toast.error("Error: " + (err.error || "Failed to create company"));
-      }
-    } catch (error) {
-      console.error("Error creating company", error);
-      toast.error("Failed to create company");
-    } finally {
-      setLoading(false);
-    }
-  }
-
   if (!user || user.role !== "ADMIN") {
     return (
       <ResponsiveContainer>
@@ -105,40 +67,12 @@ export default function CompaniesPage() {
 
   return (
     <ResponsiveContainer>
-      <PageHeader title="Companies" description="Create and manage multiple business entities (Companies)." />
-      
+      <PageHeader title="Companies" description="Your business entity on FinovaOS." />
+
       <Card>
-        <div className="mb-4">
-          <h3 className="text-lg font-semibold mb-2">Create New Company</h3>
-          <p className="text-sm text-(--text-muted) mb-4">
-            Add a new company to manage its accounts, inventory, and employees separately.
-          </p>
-        </div>
-        
-        <ResponsiveForm onSubmit={submit}>
-          <div className="grid gap-4 sm:grid-cols-2">
-            <FormField label="Company Name">
-              <Input 
-                value={form.name} 
-                onChange={(e) => setForm({ ...form, name: e.target.value })} 
-                placeholder="e.g. FinovaOS SME Solutions"
-                required 
-              />
-            </FormField>
-            <FormField label="Company Code (Optional)">
-              <Input 
-                value={form.code} 
-                onChange={(e) => setForm({ ...form, code: e.target.value })} 
-                placeholder="e.g. LHR-01"
-              />
-            </FormField>
-          </div>
-          <FormActions>
-            <Button type="submit" disabled={loading}>
-              {loading ? "Creating..." : "Create Company"}
-            </Button>
-          </FormActions>
-        </ResponsiveForm>
+        <p className="text-sm text-(--text-muted)">
+          Every plan covers one company. To manage a separate business, contact support.
+        </p>
       </Card>
 
       <div className="mt-6 space-y-3">

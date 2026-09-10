@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { createDefaultBranchForCompany } from "@/lib/companyBranchBootstrap";
 
 export async function GET(req: NextRequest) {
   const userId = req.headers.get("x-user-id");
@@ -29,49 +28,19 @@ export async function GET(req: NextRequest) {
   }
 }
 
-export async function POST(req: NextRequest) {
-  const userId = req.headers.get("x-user-id");
-  const role = req.headers.get("x-user-role");
-  if (!userId || !role) {
-    return NextResponse.json({ error: "User headers required" }, { status: 400 });
-  }
-  if (role !== "ADMIN") {
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-  }
-
-  // Every plan — Starter, Pro, Enterprise — is sold and billed for one
-  // company. This endpoint was a free side door around that: an existing
-  // admin could self-serve a second, third, ... company, each starting on a
-  // brand-new free STARTER workspace with its own users/branch/invoice
-  // allowance. There is no plan tier that is meant to lift this, so it is a
-  // flat block rather than another limit table to configure.
+/**
+ * Every plan — Starter, Pro, Enterprise — is sold and billed for one company.
+ * This endpoint used to let any existing admin self-serve a second, third, …
+ * company, each starting on a brand-new free STARTER workspace with its own
+ * users/branch/invoice allowance — a free side door around the whole plan
+ * model. There is no tier meant to lift this, so it is a flat block rather
+ * than another limit table to configure.
+ */
+export async function POST(_req: NextRequest) {
   return NextResponse.json(
     { error: "Your plan includes one company. Contact support if you need to manage additional businesses." },
     { status: 403 },
   );
-
-  try {
-    const body = await req.json();
-    const { name, code, baseCurrency } = body;
-    if (!name) {
-      return NextResponse.json({ error: "Company name required" }, { status: 400 });
-    }
-
-    const company = await prisma.company.create({
-      data: { name, code: code || null, isActive: true, baseCurrency: baseCurrency || "USD" },
-    });
-
-    await createDefaultBranchForCompany(company.id, { name });
-
-    await prisma.userCompany.create({
-      data: { userId, companyId: company.id, isDefault: false },
-    });
-
-    return NextResponse.json(company, { status: 201 });
-  } catch (e: any) {
-    console.error("COMPANIES POST ERROR:", e);
-    return NextResponse.json({ error: "Failed to create company" }, { status: 500 });
-  }
 }
 
 export async function PUT(req: NextRequest) {
