@@ -568,6 +568,24 @@ html.dark .dashboard-root select optgroup {
   color: #e8ecf5 !important;
 }
 
+/* Native <select> chrome (esp. Safari/macOS) renders with its own baked-in
+   vertical padding that CSS padding cannot override, so a select next to a
+   plain text input never lines up with it even when their inline styles are
+   identical — this is the "select box is a different size" bug reported
+   across many pages. Stripping the native appearance and drawing our own
+   chevron puts sizing fully under our CSS, matching sibling inputs exactly. */
+.dashboard-root select {
+  -webkit-appearance: none !important;
+  -moz-appearance: none !important;
+  appearance: none !important;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E") !important;
+  background-repeat: no-repeat !important;
+  background-position: right 10px center !important;
+  background-size: 13px !important;
+  padding-right: 30px !important;
+  line-height: normal !important;
+}
+
 /* Tailwind bg-white / bg-gray-* inside dashboard → dark surfaces only in dark mode */
 html.dark .dashboard-root .bg-white    { background-color: #101828 !important; }
 html.dark .dashboard-root .bg-gray-50  { background-color: #0f1835 !important; }
