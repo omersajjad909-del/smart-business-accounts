@@ -18,8 +18,16 @@ const DEFAULT_SHORTCUTS = [
   { id: "inventory", keys: ["Alt","V"], label: "Inventory",          action: "navigate", route: "/dashboard/inventory",        enabled: true },
 ];
 
-/** The one page a demo sandbox is never allowed to lose — see below. */
-const DEMO_ALWAYS_ON_FEATURE = "CORE_BUSINESS_FEATURES";
+/**
+ * Pages a demo sandbox always gets, whatever the plan grid says — see below.
+ *
+ * CORE_BUSINESS_FEATURES because the demo is built around that screen.
+ * JOB_WORK because the module ships switched off for every plan and a sandbox
+ * is exactly where it is meant to be seen: throwaway data, nobody's real books.
+ * Its API agrees with this list — lib/jobWork.ts lets a demo company through on
+ * the same grounds — so the link and the page cannot disagree.
+ */
+const DEMO_ALWAYS_ON_FEATURES = ["CORE_BUSINESS_FEATURES", "JOB_WORK"];
 
 function normalizePlanPermissions(saved: Record<string, string[]> = {}) {
   const get = (k: string): string[] => saved[k] || saved[k.toLowerCase()] || [];
