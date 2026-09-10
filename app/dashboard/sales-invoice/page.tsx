@@ -1133,9 +1133,9 @@ function SalesInvoiceContent() {
                                 {rfActive && (
                                   <RateFormulaMobileFields settings={rf} meta={r.meta} rowIndex={i} onChange={(key, value) => updateRowMeta(i, key, value)} />
                                 )}
-                                {(["qty","rate"] as const).map(k => (
+                                {(["qty","rate","discountPercent","taxPercent"] as const).map(k => (
                                   <div key={k}>
-                                    <div style={{ fontSize: 10, color: "var(--text-muted)", fontWeight: 700, marginBottom: 3, textTransform: "uppercase" }}>{k === "qty" ? "Qty" : "Unit Price"}</div>
+                                    <div style={{ fontSize: 10, color: "var(--text-muted)", fontWeight: 700, marginBottom: 3, textTransform: "uppercase" }}>{k === "qty" ? "Qty" : k === "rate" ? "Unit Price" : k === "discountPercent" ? "Disc%" : "Tax%"}</div>
                                     <input type="number" style={{ ...inputStyle, textAlign: "right", ...(rfActive && k === "rate" && !rf.rateEditable ? { opacity: 0.75 } : {}) }} value={r[k]} onChange={e => updateRow(i, k, e.target.value)} readOnly={rfActive && k === "rate" && !rf.rateEditable} placeholder="0" />
                                   </div>
                                 ))}
