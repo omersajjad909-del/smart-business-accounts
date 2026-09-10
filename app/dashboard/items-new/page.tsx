@@ -139,7 +139,7 @@ export default function ItemsNewPage() {
   }
 
   function handleEdit(item: Item) {
-    setEditingId(item.id); setName(item.name); setCategory(item.category || "TRADING");
+    setEditingId(item.id); setCode(item.code || ""); setName(item.name); setCategory(item.category || "TRADING");
     setUnit(item.unit); setRate(String(item.rate || "")); setPurchaseRate(String(item.purchaseRate || ""));
     setTaxRate(String(item.taxRate || "")); setMinStock(String(item.minStock || ""));
     setBarcode(item.barcode || ""); setDescription(item.description || "");
