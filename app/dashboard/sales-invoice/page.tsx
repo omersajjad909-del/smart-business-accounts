@@ -1346,7 +1346,7 @@ function SalesInvoiceContent() {
                       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: 13 }}>
                         <span style={{ color: "var(--text-muted)" }}>Discount</span>
                         <div style={{ display: "flex", gap: 5 }}>
-                          <select style={{ ...selectStyle, width: 58, padding: "3px 6px", paddingRight: 20, backgroundPosition: "calc(100% - 10px) center, calc(100% - 6px) center", fontSize: 12 }} value={discountType} onChange={e => setDiscountType(e.target.value as "flat" | "percent")}>
+                          <select data-compact-select style={{ ...selectStyle, width: 58, padding: "3px 6px", paddingRight: 20, backgroundPosition: "calc(100% - 10px) center, calc(100% - 6px) center", fontSize: 12 }} value={discountType} onChange={e => setDiscountType(e.target.value as "flat" | "percent")}>
                             <option value="flat">Flat</option><option value="percent">%</option>
                           </select>
                           <input type="number" style={{ ...inputStyle, width: 78, padding: "3px 7px", fontSize: 12, textAlign: "right" }} value={discount} onChange={e => setDiscount(e.target.value === "" ? "" : Number(e.target.value))} placeholder="0" />

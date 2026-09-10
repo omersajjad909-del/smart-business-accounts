@@ -586,6 +586,14 @@ html.dark .dashboard-root select optgroup {
   line-height: normal !important;
 }
 
+/* A couple of 2-option toggles (Flat / %) are drawn ~52-58px wide with almost
+   no horizontal padding — the shared chevron above would eat their entire
+   content area. They opt out with this attribute instead of an arrow. */
+.dashboard-root select[data-compact-select] {
+  background-image: none !important;
+  padding-right: 6px !important;
+}
+
 /* Tailwind bg-white / bg-gray-* inside dashboard → dark surfaces only in dark mode */
 html.dark .dashboard-root .bg-white    { background-color: #101828 !important; }
 html.dark .dashboard-root .bg-gray-50  { background-color: #0f1835 !important; }
