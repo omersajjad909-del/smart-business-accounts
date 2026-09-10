@@ -841,13 +841,41 @@ function CategoryBox({ label: text, count, active, onClick }: {
   );
 }
 
-function Section({ n, title, hint, onAdd, head, children }: {
+/* A numbered stage of the editor. The long ones — Steps and Outputs — fold
+   away behind their own header so the page opens on what an author starts
+   with rather than on a wall of formula boxes; the header is the toggle and
+   the arrow says which way it goes. */
+function Section({ n, title, hint, onAdd, head, children, collapsible = false, defaultOpen = true, count }: {
   n: number; title: string; hint: string;
   onAdd?: () => void; head?: React.ReactNode; children: React.ReactNode;
+  collapsible?: boolean; defaultOpen?: boolean;
+  /** Shown as a pill beside the title — how many rows are hidden while closed. */
+  count?: number;
 }) {
+  const [open, setOpen] = useState(defaultOpen);
+  const shown = !collapsible || open;
+  const toggle = () => setOpen((o) => !o);
+
   return (
     <div style={{ background: CARD, border: `1px solid ${BORDER}`, borderRadius: 14, padding: 18 }}>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 12, marginBottom: 14 }}>
+      <div
+        {...(collapsible ? {
+          role: "button" as const,
+          tabIndex: 0,
+          "aria-expanded": open,
+          onClick: toggle,
+          onKeyDown: (e: React.KeyboardEvent) => {
+            if (e.key === "Enter" || e.key === " ") { e.preventDefault(); toggle(); }
+          },
+        } : {})}
+        style={{
+          display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 12,
+          marginBottom: shown ? 14 : 0,
+          cursor: collapsible ? "pointer" : "default",
+          userSelect: collapsible ? "none" : "auto",
+          outline: "none",
+        }}
+      >
         <div style={{ display: "flex", gap: 11, alignItems: "flex-start" }}>
           <span style={{
             width: 24, height: 24, flexShrink: 0, borderRadius: 8, marginTop: 1,
@@ -855,14 +883,44 @@ function Section({ n, title, hint, onAdd, head, children }: {
             fontSize: 12, fontWeight: 700, display: "grid", placeItems: "center",
           }}>{n}</span>
           <div>
-            <div style={{ fontSize: 14, fontWeight: 700 }}>{title}</div>
+            <div style={{ fontSize: 14, fontWeight: 700, display: "flex", alignItems: "center", gap: 8 }}>
+              {title}
+              {collapsible && typeof count === "number" && (
+                <span style={{
+                  fontSize: 10.5, fontWeight: 700, padding: "1px 7px", borderRadius: 20,
+                  background: "rgba(255,255,255,.06)", border: `1px solid ${BORDER}`,
+                  color: "rgba(255,255,255,.45)",
+                }}>{count}</span>
+              )}
+            </div>
             <div style={{ fontSize: 11.5, color: "rgba(255,255,255,.35)", marginTop: 2 }}>{hint}</div>
           </div>
         </div>
-        {onAdd && <button onClick={onAdd} style={{ ...btn(), padding: "7px 12px", fontSize: 12, whiteSpace: "nowrap" }}>+ Add</button>}
+        <div style={{ display: "flex", alignItems: "center", gap: 8, flexShrink: 0 }}>
+          {onAdd && (
+            /* Add on a closed section opens it too — a row added out of sight
+               reads as nothing having happened. */
+            <button
+              onClick={(e) => { e.stopPropagation(); setOpen(true); onAdd(); }}
+              style={{ ...btn(), padding: "7px 12px", fontSize: 12, whiteSpace: "nowrap" }}>+ Add</button>
+          )}
+          {collapsible && (
+            <span aria-hidden style={{
+              width: 26, height: 26, borderRadius: 8, display: "grid", placeItems: "center",
+              background: "rgba(255,255,255,.05)", border: `1px solid ${BORDER}`,
+              color: "rgba(255,255,255,.55)", fontSize: 11, lineHeight: 1,
+              transform: open ? "rotate(0deg)" : "rotate(-90deg)",
+              transition: "transform .16s ease",
+            }}>▼</span>
+          )}
+        </div>
       </div>
-      {head}
-      <div style={{ display: "flex", flexDirection: "column", gap: 9 }}>{children}</div>
+      {shown && (
+        <>
+          {head}
+          <div style={{ display: "flex", flexDirection: "column", gap: 9 }}>{children}</div>
+        </>
+      )}
     </div>
   );
 }

@@ -240,6 +240,7 @@ export default function ItemsNewPage() {
               <optgroup label="Counting / Packing">
                 <option value="PCS">Pieces</option>
                 <option value="DOZ">Dozen (12 pcs)</option>
+                <option value="GURS">Gurs / Gross (12 dozen = 144 pcs)</option>
                 <option value="PAIR">Pair</option>
                 <option value="SET">Set</option>
                 <option value="BOX">Box</option>
