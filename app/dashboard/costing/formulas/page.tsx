@@ -324,7 +324,15 @@ export default function FormulasPage() {
             style={{ ...input, fontSize: 15, fontWeight: 700, padding: "10px 13px" }}
           />
           <select value={d.category} onChange={(e) => patch((x) => { x.category = e.target.value; })}
-            style={{ ...input, width: "auto", minWidth: 150 }}>
+            style={{
+              ...input, width: "auto", minWidth: 150, cursor: "pointer",
+              appearance: "none", WebkitAppearance: "none", MozAppearance: "none",
+              paddingRight: 30,
+              backgroundImage: "linear-gradient(45deg, transparent 50%, rgba(255,255,255,.45) 50%), linear-gradient(135deg, rgba(255,255,255,.45) 50%, transparent 50%)",
+              backgroundPosition: "calc(100% - 18px) center, calc(100% - 13px) center",
+              backgroundSize: "5px 5px, 5px 5px",
+              backgroundRepeat: "no-repeat",
+            }}>
             {FORMULA_CATEGORIES.map((c) => <option key={c} value={c}>{c}</option>)}
           </select>
           <div style={{ display: "flex", gap: 3, padding: 3, borderRadius: 11, background: "rgba(255,255,255,.05)", border: `1px solid ${BORDER}` }}>
