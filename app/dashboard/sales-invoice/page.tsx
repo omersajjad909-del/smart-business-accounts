@@ -185,9 +185,23 @@ function SalesInvoiceContent() {
   // ── Init ──
   useEffect(() => {
     setOrigin(window.location.origin);
-    fetch("/api/me/company").then(r => r.ok ? r.json() : null).then(d => { if (d) setCompanyInfo(d); });
+    fetch("/api/me/company").then(r => r.ok ? r.json() : null).then(d => { if (d) setCompanyInfo((c: any) => ({ ...d, ...c })); });
     fetch("/api/company/admin-control").then(r => r.ok ? r.json() : null).then(d => {
       if (d?.printPreferences) setPrintPrefs(p => ({ ...p, ...d.printPreferences }));
+      // Company's own name/plan come from /api/me/company above; its address,
+      // phone/email and tax registration live in these admin-control sections
+      // instead — /api/me/company's Company row carries none of them.
+      if (d?.companyIdentity || d?.invoiceContact || d?.taxProfile) {
+        setCompanyInfo((c: any) => ({
+          ...(c || {}),
+          address: d.companyIdentity?.legalAddress || c?.address,
+          phone: d.invoiceContact?.phone || c?.phone,
+          email: d.invoiceContact?.email || c?.email,
+          ntn: d.taxProfile?.taxIdValue || c?.ntn,
+          ntnLabel: d.taxProfile?.taxIdLabel || c?.ntnLabel,
+          gst: d.taxProfile?.gstNumber || c?.gst,
+        }));
+      }
     }).finally(() => setLoading(false));
   }, []);
 

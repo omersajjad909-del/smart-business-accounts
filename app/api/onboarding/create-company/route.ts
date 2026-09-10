@@ -45,15 +45,7 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    await prisma.branch.create({
-      data: {
-        companyId: company.id,
-        code: "MAIN",
-        name: "Main Branch",
-        city: null,
-        isActive: true,
-      },
-    });
+    await createDefaultBranchForCompany(company.id, { name: companyName });
 
     // Create admin user
     const adminUser = await prisma.user.create({

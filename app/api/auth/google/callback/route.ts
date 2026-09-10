@@ -9,6 +9,7 @@ import {
   sendVerificationCode,
 } from "@/lib/verification";
 import { SIGNUPS_OPEN, WAITLIST_PATH } from "@/lib/signupGate";
+import { createDefaultBranchForCompany } from "@/lib/companyBranchBootstrap";
 
 export async function GET(req: NextRequest) {
   try {
@@ -86,6 +87,7 @@ export async function GET(req: NextRequest) {
         },
       } as any);
       companyId = company.id;
+      await createDefaultBranchForCompany(companyId, { name: company.name });
       user = await prisma.user.create({
         data: {
           name,
@@ -106,6 +108,7 @@ export async function GET(req: NextRequest) {
         },
       } as any);
       companyId = company.id;
+      await createDefaultBranchForCompany(companyId, { name: company.name });
       await prisma.user.update({
         where: { id: user.id },
         data: {

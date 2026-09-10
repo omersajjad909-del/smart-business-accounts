@@ -3,6 +3,7 @@ import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
 import { signJwt, verifyJwt } from "@/lib/auth";
 import { SIGNUPS_OPEN, WAITLIST_PATH } from "@/lib/signupGate";
+import { createDefaultBranchForCompany } from "@/lib/companyBranchBootstrap";
 
 export async function GET(req: NextRequest) {
   try {
@@ -31,6 +32,7 @@ export async function GET(req: NextRequest) {
         data: { name: "My Company", code: null, isActive: true },
       } as any);
       companyId = company.id;
+      await createDefaultBranchForCompany(companyId, { name: company.name });
       user = await prisma.user.create({
         data: {
           name: email.split("@")[0],
@@ -48,6 +50,7 @@ export async function GET(req: NextRequest) {
           data: { name: "My Company", code: null, isActive: true },
         } as any);
         companyId = company.id;
+        await createDefaultBranchForCompany(companyId, { name: company.name });
         await prisma.user.update({
           where: { id: user.id },
           data: { defaultCompanyId: companyId, companies: { create: { companyId, isDefault: true } } },

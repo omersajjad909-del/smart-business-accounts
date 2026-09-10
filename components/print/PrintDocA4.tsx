@@ -37,6 +37,9 @@ export interface PrintDocA4Props {
   companyAddress?: string;
   companyPhone?: string;
   companyEmail?: string;
+  /** The seller's own NTN/STRN/Tax ID — label and value, shown only when both are set. */
+  companyTaxLabel?: string;
+  companyTaxValue?: string;
   logoUrl?: string;
   showLogo?: boolean;
 
@@ -109,6 +112,8 @@ export function PrintDocA4({
   companyAddress,
   companyPhone,
   companyEmail,
+  companyTaxLabel,
+  companyTaxValue,
   logoUrl,
   showLogo,
   docTitle,
@@ -185,6 +190,11 @@ export function PrintDocA4({
                 {companyAddress}
                 {companyPhone ? `${companyAddress ? "  ·  " : ""}Tel: ${companyPhone}` : ""}
                 {companyEmail ? `  ·  ${companyEmail}` : ""}
+              </div>
+            )}
+            {companyTaxValue && (
+              <div className={banded ? undefined : "pdoc-label"} style={{ fontSize: 8.5, marginTop: 1, lineHeight: 1.45, opacity: banded ? 0.85 : 1, fontWeight: 700 }}>
+                {companyTaxLabel || "NTN"}: {companyTaxValue}
               </div>
             )}
           </div>
