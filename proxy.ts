@@ -534,7 +534,16 @@ export const config = {
     "/dashboard/:path*",
     "/onboarding/:path*",
     "/admin/:path*",
-    // Catch all non-static paths for forge hostname routing
-    "/((?!_next/static|_next/image|favicon.ico|icon.png|robots.txt|sitemap.xml).*)",
+    // Catch all non-static paths for forge hostname routing.
+    //
+    // The trailing extension list is what keeps /public off this function.
+    // Only `_next/static` was excluded before, so every logo, favicon, icon and
+    // manifest.json request ran the middleware — a billed invocation, plus its
+    // CPU, to add a CSP header to a file served straight off disk. A single
+    // landing-page view drags in a dozen of those.
+    //
+    // Matchers are OR'd, so the four prefixes above still cover everything that
+    // needs auth or hostname routing even if such a path ever ends in .json.
+    "/((?!_next/static|_next/image|.*\\.(?:png|jpg|jpeg|gif|svg|webp|avif|ico|bmp|css|js|json|xml|txt|html|map|woff|woff2|ttf|otf|eot|mp4|webm|pdf)$).*)",
   ],
 };

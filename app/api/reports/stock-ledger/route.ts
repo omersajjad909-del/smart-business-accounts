@@ -53,7 +53,15 @@ export async function GET(req: NextRequest) {
       where: { id: itemId, companyId },
       select: { id: true },
     });
-    if (!item) return NextResponse.json([]);
+    // An item that belongs to another company used to return an empty array —
+    // the same screen an item with no movements gets, and the same advice to
+    // widen the date range, which could never help. Say which it is.
+    if (!item) {
+      return NextResponse.json(
+        { error: "That item does not belong to this company — reopen the list and pick it again." },
+        { status: 404 },
+      );
+    }
 
     const fromDate = from ? new Date(from + "T00:00:00") : new Date("2025-01-01");
     const toDate = to ? new Date(to + "T23:59:59.999") : new Date();
@@ -134,7 +142,12 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json([...rows, ...updatedRows]);
   } catch (e) {
+    // A crash used to answer with an empty array, which the screen then drew as
+    // "No transactions in this period — try adjusting the date range". Widening
+    // the dates could never fix a thrown query, so the one real failure this
+    // report has was also the one nobody could see. Send the message instead.
+    const message = e instanceof Error ? e.message : "The ledger could not be built.";
     console.error("STOCK LEDGER ERROR:", e);
-    return NextResponse.json([], { status: 500 });
+    return NextResponse.json({ error: `Stock ledger failed: ${message}` }, { status: 500 });
   }
 }

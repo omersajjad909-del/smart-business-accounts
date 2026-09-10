@@ -33,7 +33,10 @@ export function useVisiblePoll(
   activeKey: unknown = true,
 ) {
   const fnRef = useRef(fn);
-  fnRef.current = fn;
+  // After commit, not during render — a ref written mid-render is a tearing
+  // hazard React lints against. Declared first so it lands before the poll
+  // effect below ever reads it.
+  useEffect(() => { fnRef.current = fn; });
 
   useEffect(() => {
     if (!activeKey) return;
