@@ -337,13 +337,23 @@ export default function ChartOfAccounts() {
           <SectionTitle icon="🏷️" label="Account Identity" />
           <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1.2fr 160px 2fr", gap: 14, marginBottom: 22 }}>
             <Field label="Category *">
-              <select
-                value={form.partyType}
-                onChange={e => handleCategoryChange(e.target.value)}
-                style={{ ...inp(), colorScheme: "dark", cursor: "pointer" }}
-              >
-                {CATEGORIES.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
-              </select>
+              <div style={{ position: "relative" }}>
+                <select
+                  value={form.partyType}
+                  onChange={e => handleCategoryChange(e.target.value)}
+                  style={{
+                    ...inp({ paddingRight: 34 }),
+                    colorScheme: "dark", cursor: "pointer",
+                    appearance: "none", WebkitAppearance: "none", MozAppearance: "none",
+                  }}
+                >
+                  {CATEGORIES.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
+                </select>
+                <span style={{
+                  position: "absolute", right: 14, top: "50%", transform: "translateY(-50%)",
+                  pointerEvents: "none", fontSize: 10, color: MUTED,
+                }}>▼</span>
+              </div>
             </Field>
             <Field label="A/C Code *">
               <input

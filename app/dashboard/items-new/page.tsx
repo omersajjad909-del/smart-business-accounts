@@ -17,6 +17,8 @@ const BORDER = "rgba(255,255,255,0.08)";
 const TEXT   = "#f1f5f9";
 const MUTED  = "rgba(255,255,255,0.45)";
 const INPUT  = { background:"rgba(255,255,255,0.05)", border:`1px solid ${BORDER}`, borderRadius:8, padding:"9px 12px", color:TEXT, fontFamily:FONT, fontSize:13, width:"100%", outline:"none" };
+const SELECT: React.CSSProperties = { ...INPUT, paddingRight:34, appearance:"none", WebkitAppearance:"none", MozAppearance:"none", colorScheme:"dark", cursor:"pointer" };
+const SELECT_ARROW: React.CSSProperties = { position:"absolute", right:12, top:"50%", transform:"translateY(-50%)", pointerEvents:"none", fontSize:10, color:MUTED };
 
 // ── Category options ──────────────────────────────────────────────────────────
 const CATEGORIES = [
@@ -207,13 +209,17 @@ export default function ItemsNewPage() {
           </div>
           <div>
             <div style={{ fontSize:11, color:MUTED, marginBottom:5 }}>Category *</div>
-            <select style={INPUT} value={category} onChange={e=>setCategory(e.target.value)}>
-              {CATEGORIES.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
-            </select>
+            <div style={{ position: "relative" }}>
+              <select style={SELECT} value={category} onChange={e=>setCategory(e.target.value)}>
+                {CATEGORIES.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
+              </select>
+              <span style={SELECT_ARROW}>▼</span>
+            </div>
           </div>
           <div>
             <div style={{ fontSize:11, color:MUTED, marginBottom:5 }}>Unit *</div>
-            <select style={INPUT} value={unit} onChange={e=>setUnit(e.target.value)}>
+            <div style={{ position: "relative" }}>
+            <select style={SELECT} value={unit} onChange={e=>setUnit(e.target.value)}>
               <option value="">Select Unit</option>
               <optgroup label="Weight">
                 <option value="KG">Kilogram (KG)</option>
@@ -253,6 +259,8 @@ export default function ItemsNewPage() {
                 <option value="UNIT">Unit</option>
               </optgroup>
             </select>
+            <span style={SELECT_ARROW}>▼</span>
+            </div>
           </div>
         </div>
 
