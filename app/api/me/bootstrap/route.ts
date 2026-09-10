@@ -18,16 +18,23 @@ const DEFAULT_SHORTCUTS = [
   { id: "inventory", keys: ["Alt","V"], label: "Inventory",          action: "navigate", route: "/dashboard/inventory",        enabled: true },
 ];
 
+/** The one page a demo sandbox is never allowed to lose — see below. */
+const DEMO_ALWAYS_ON_FEATURE = "CORE_BUSINESS_FEATURES";
+
 /**
- * Pages a demo sandbox always gets, whatever the plan grid says — see below.
+ * Pages a workspace gets from what it *is* rather than from what it pays for.
  *
- * CORE_BUSINESS_FEATURES because the demo is built around that screen.
- * JOB_WORK because the module ships switched off for every plan and a sandbox
- * is exactly where it is meant to be seen: throwaway data, nobody's real books.
- * Its API agrees with this list — lib/jobWork.ts lets a demo company through on
- * the same grounds — so the link and the page cannot disagree.
+ * Job Work ships switched off for all three plans, so it reaches nobody through
+ * the plan grid — but it is on for an internal test workspace, where it was
+ * built, and for a demo sandbox, which is throwaway data on nobody's real books
+ * and exactly where an unreleased module is meant to be shown.
+ *
+ * This has to be listed here and not only in lib/jobWork.ts: the sidebar link
+ * asks /api/job-work/status, but the route guard in the dashboard layout bounces
+ * any registered page missing from this list. Without the entry the link would
+ * appear and the page it points at would throw the user back to /dashboard.
  */
-const DEMO_ALWAYS_ON_FEATURES = ["CORE_BUSINESS_FEATURES", "JOB_WORK"];
+const WORKSPACE_KIND_FEATURES = ["JOB_WORK"];
 
 function normalizePlanPermissions(saved: Record<string, string[]> = {}) {
   const get = (k: string): string[] => saved[k] || saved[k.toLowerCase()] || [];
@@ -107,7 +114,7 @@ export async function GET(req: NextRequest) {
           id: true, name: true, country: true, baseCurrency: true,
           plan: true, subscriptionStatus: true, activeModules: true,
           currentPeriodEnd: true, businessType: true, businessSetupDone: true,
-          logoUrl: true, createdAt: true, isDemo: true,
+          logoUrl: true, createdAt: true, isDemo: true, isInternalTest: true,
         },
       }),
       prisma.branch.findMany({
@@ -298,9 +305,17 @@ export async function GET(req: NextRequest) {
     // type, took the sidebar link away and had the page guard bounce anyone who
     // typed the URL. Applied before the global hides below, so a page retired
     // platform-wide stays retired here too.
-    if (company?.isDemo && dashboardFeatures) {
-      const missing = DEMO_ALWAYS_ON_FEATURES.filter((id) => !dashboardFeatures!.includes(id));
-      if (missing.length) dashboardFeatures = [...dashboardFeatures, ...missing];
+    if (company?.isDemo && dashboardFeatures && !dashboardFeatures.includes(DEMO_ALWAYS_ON_FEATURE)) {
+      dashboardFeatures = [...dashboardFeatures, DEMO_ALWAYS_ON_FEATURE];
+    }
+
+    // Pages that follow from the kind of workspace this is — see above. Same
+    // two conditions lib/jobWork.ts lets through, so the sidebar link, the route
+    // guard and the module's own API all answer alike.
+    if ((company?.isDemo || company?.isInternalTest) && dashboardFeatures) {
+      const list = dashboardFeatures;
+      const missing = WORKSPACE_KIND_FEATURES.filter((id) => !list.includes(id));
+      if (missing.length) dashboardFeatures = [...list, ...missing];
     }
 
     // Global page-visibility hides apply on top of whichever list won — last,
