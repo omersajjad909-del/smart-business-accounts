@@ -27,6 +27,11 @@ model Account {
   address     String?
   ntn         String? // National Tax Number
   strn        String? // Sales Tax Reg. No.
+  // Province the buyer is registered in. A separate field from `city` because
+  // FBR matches this against its own list — the city was being sent in its
+  // place, and "Lahore" is not a province the gateway will accept. See
+  // lib/pkProvinces.ts.
+  province    String?
   bankIban    String? // IBAN / Bank Account No.
   description String? // Internal notes
   openDate    DateTime?

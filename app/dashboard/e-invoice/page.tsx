@@ -5,6 +5,7 @@ import { getCurrentUser } from "@/lib/auth";
 import { hasPermission } from "@/lib/hasPermission";
 import { PERMISSIONS } from "@/lib/permissions";
 import { useResponsive } from "@/hooks/useResponsive";
+import { PK_PROVINCES } from "@/lib/pkProvinces";
 
 // ─── Design tokens (matches sales-invoice / business-settings) ──────────────
 const ff = "'Outfit','Inter',sans-serif";
@@ -196,12 +197,20 @@ export default function EInvoicePage() {
               <input value={settings.sellerBusinessName} onChange={e => setSettings(p => ({ ...p, sellerBusinessName: e.target.value }))} style={inp()} />
             </Field>
             <Field label="Seller Province">
-              <input value={settings.sellerProvince} onChange={e => setSettings(p => ({ ...p, sellerProvince: e.target.value }))} style={inp()} placeholder="e.g. Punjab, Sindh" />
+              <select value={settings.sellerProvince} onChange={e => setSettings(p => ({ ...p, sellerProvince: e.target.value }))} style={inp()}>
+                <option value="">Use the company profile</option>
+                {PK_PROVINCES.map((p) => (<option key={p} value={p}>{p}</option>))}
+              </select>
             </Field>
             <Field label="Seller Address">
               <input value={settings.sellerAddress} onChange={e => setSettings(p => ({ ...p, sellerAddress: e.target.value }))} style={inp()} />
             </Field>
           </div>
+          <p style={{ fontSize: 12, color: "#fbbf24", margin: "4px 0 10px", lineHeight: 1.6 }}>
+            These four are <b>overrides</b>. Leave them blank and the filing uses your Company
+            Profile — the same NTN, name, address and province the invoice prints. Fill one in only
+            when FBR has you registered differently from what the invoice shows.
+          </p>
           <p style={{ fontSize: 12, color: "rgba(255,255,255,.4)", margin: "4px 0 14px" }}>
             Sandbox mode is for testing against FBR&apos;s test gateway — nothing filed there counts as a real return. Switch to Production only once your token and seller details are confirmed with FBR.
           </p>

@@ -1,4 +1,5 @@
-import type { FbrEInvoiceSettings } from "@/lib/companyAdminControl";
+import type { AdminControlSettings, FbrEInvoiceSettings } from "@/lib/companyAdminControl";
+import { normalizeProvince } from "@/lib/pkProvinces";
 
 // FBR's Digital Invoicing (PRAL) gateway. Same request shape for sandbox and
 // production — only the host and the bearer token differ. Confirm the exact
@@ -32,18 +33,62 @@ export type FbrInvoiceInput = {
   items: FbrInvoiceLine[];
 };
 
-export function buildFbrPayload(settings: FbrEInvoiceSettings, invoice: FbrInvoiceInput) {
+/** Who the seller is, as one resolved set rather than two half-filled ones. */
+export type FbrSeller = {
+  ntn: string;
+  businessName: string;
+  province: string;
+  address: string;
+};
+
+/**
+ * The seller's own details, from one place.
+ *
+ * These lived twice over: the printed invoice took the NTN, name, address and
+ * province from the company profile, while the filing took its own copies from
+ * the E-Invoice settings screen. Nothing kept the two in step, so a company
+ * could hand a buyer a bill carrying one NTN and file the same sale under
+ * another — and neither screen would look wrong.
+ *
+ * The E-Invoice fields now act as an override and nothing more: filled in, they
+ * win; left blank — which is what they are for almost everybody — the company
+ * profile answers. There is one place to keep correct.
+ */
+export function resolveFbrSeller(settings: AdminControlSettings): FbrSeller {
+  const fbr = settings.fbrSettings;
+  const identity = settings.companyIdentity;
+  const tax = settings.taxProfile;
+  const pick = (...values: (string | null | undefined)[]) =>
+    values.map((v) => String(v || "").trim()).find(Boolean) || "";
+
+  return {
+    ntn: pick(fbr.sellerNtn, tax.taxIdValue),
+    businessName: pick(fbr.sellerBusinessName, identity.legalName),
+    // Normalised on the way out: the province boxes have been free text for as
+    // long as they have existed, so what is stored is whatever somebody typed.
+    // An unrecognised value is passed through rather than dropped — the gateway
+    // rejecting it with a readable error beats us silently sending nothing.
+    province: normalizeProvince(pick(fbr.sellerProvince, identity.state))
+      || pick(fbr.sellerProvince, identity.state),
+    address: pick(fbr.sellerAddress, identity.legalAddress),
+  };
+}
+
+export function buildFbrPayload(seller: FbrSeller, settings: FbrEInvoiceSettings, invoice: FbrInvoiceInput) {
   const buyerRegistered = Boolean(invoice.buyerNtn && invoice.buyerNtn.trim());
   return {
     invoiceType: "Sale Invoice",
     invoiceDate: invoice.invoiceDate,
-    sellerNTNCNIC: settings.sellerNtn,
-    sellerBusinessName: settings.sellerBusinessName,
-    sellerProvince: settings.sellerProvince,
-    sellerAddress: settings.sellerAddress,
+    sellerNTNCNIC: seller.ntn,
+    sellerBusinessName: seller.businessName,
+    sellerProvince: seller.province,
+    sellerAddress: seller.address,
     buyerNTNCNIC: invoice.buyerNtn || "",
     buyerBusinessName: invoice.buyerBusinessName,
-    buyerProvince: invoice.buyerProvince || settings.sellerProvince,
+    // Falling back to the seller's own province is deliberate: a buyer with no
+    // province recorded is almost always local, and an empty province fails the
+    // filing outright. Normalised first, since what is stored is free text.
+    buyerProvince: normalizeProvince(invoice.buyerProvince) || invoice.buyerProvince || seller.province,
     buyerAddress: invoice.buyerAddress || "",
     buyerRegistrationType: buyerRegistered ? "Registered" : "Unregistered",
     invoiceRefNo: invoice.invoiceRefNo,
