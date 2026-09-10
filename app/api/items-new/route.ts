@@ -5,6 +5,62 @@ import { logActivity } from "@/lib/audit";
 import { prisma } from "@/lib/prisma";
 import { sanitizeLineMeta } from "@/lib/rateFormula";
 
+/* ─────────────────────────── Item codes ───────────────────────────
+ *
+ * The code is the user's to choose — "I-1", "800689426", a supplier's part
+ * number, whatever the trade already writes on its own paperwork. Left blank it
+ * falls back to the generated I-<n>, which is what the CSV import and older
+ * clients send.
+ *
+ * Two items sharing a code is the failure worth guarding: the code is what the
+ * search box matches, what the CSV export carries and what a document line is
+ * read back by. There is no @@unique on ItemNew.code — the old generator could
+ * produce duplicates (it read only the newest item's code and restarted at 1
+ * whenever that code had no "-" in it), so live data may already hold some and
+ * a database constraint would refuse to apply. Enforced here instead, which
+ * leaves a narrow race between two simultaneous creates; the alternative is a
+ * migration that fails on real data.
+ */
+
+/** Case-insensitive, because "i-1" and "I-1" are the same code to a person. */
+async function codeTaken(companyId: string, code: string, exceptId?: string): Promise<boolean> {
+  const clash = await prisma.itemNew.findFirst({
+    where: {
+      companyId,
+      deletedAt: null,
+      code: { equals: code, mode: "insensitive" },
+      ...(exceptId ? { id: { not: exceptId } } : {}),
+    },
+    select: { id: true },
+  });
+  return !!clash;
+}
+
+/**
+ * One past the highest I-<n> in the company.
+ *
+ * Reads every code rather than the newest one: the old version took the most
+ * recently created item and restarted the count at 1 whenever that item's code
+ * had no "-" in it — which is exactly what a manually typed "800689426" looks
+ * like. With codes now being typed by hand that path would collide constantly,
+ * and a collision is a save that fails for no reason the user can see.
+ */
+async function nextGeneratedCode(companyId: string): Promise<string> {
+  // Insensitive, and soft-deleted rows counted too: a hand-typed "i-9" must
+  // still push the next generated one to I-10, and a deleted item's code is
+  // never handed to a new item that old documents would then appear to name.
+  const rows = await prisma.itemNew.findMany({
+    where: { companyId, code: { startsWith: "I-", mode: "insensitive" } },
+    select: { code: true },
+  });
+  let highest = 0;
+  for (const { code } of rows) {
+    const n = parseInt(String(code).slice(2), 10);
+    if (Number.isFinite(n) && n > highest) highest = n;
+  }
+  return `I-${highest + 1}`;
+}
+
 export async function GET(req: NextRequest) {
   try {
     const companyId = await resolveCompanyId(req);
@@ -103,21 +159,21 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Name & Unit required" }, { status: 400 });
     }
 
-    const lastItem = await prisma.itemNew.findFirst({
-      where: { companyId },
-      orderBy: { createdAt: "desc" },
-    });
-
-    let nextNumber = 1;
-    if (lastItem?.code?.includes("-")) {
-      const n = parseInt(lastItem.code.split("-")[1]);
-      if (!isNaN(n)) nextNumber = n + 1;
+    const typedCode = String(body.code ?? "").trim();
+    if (typedCode.length > 40) {
+      return NextResponse.json({ error: "Item code cannot be longer than 40 characters" }, { status: 400 });
+    }
+    if (typedCode && (await codeTaken(companyId, typedCode))) {
+      return NextResponse.json({ error: `Item code "${typedCode}" is already used by another item` }, { status: 400 });
     }
 
     const item = await prisma.itemNew.create({
       data: {
         companyId,
-        code: `I-${nextNumber}`,
+        // What the user typed, exactly as typed. Blank falls back to the
+        // generated I-<n>, which is what the CSV import and every older client
+        // still send.
+        code: typedCode || (await nextGeneratedCode(companyId)),
         // Upper-cased here as well as in the form, so a name arriving from
         // the CSV import or the API lands the same way one typed by hand does.
         name: String(body.name).toUpperCase(),
@@ -168,15 +224,32 @@ export async function PUT(req: NextRequest) {
     }
     const userId = req.headers.get("x-user-id");
     const body = await req.json();
-    const { id, name, category, unit, rate, purchaseRate, taxRate, minStock, barcode, description, imageUrl, meta } = body;
+    const { id, code, name, category, unit, rate, purchaseRate, taxRate, minStock, barcode, description, imageUrl, meta } = body;
 
     if (!id || !name || !unit) {
       return NextResponse.json({ error: "ID, Name & Unit required" }, { status: 400 });
     }
 
+    // A code can be changed, but not cleared: an item with no code cannot be
+    // searched for, exported or read back off a document line. Omitting the
+    // field entirely leaves the code alone, which is what an older client does.
+    const typedCode = code === undefined ? undefined : String(code ?? "").trim();
+    if (typedCode !== undefined) {
+      if (!typedCode) {
+        return NextResponse.json({ error: "Item code cannot be empty" }, { status: 400 });
+      }
+      if (typedCode.length > 40) {
+        return NextResponse.json({ error: "Item code cannot be longer than 40 characters" }, { status: 400 });
+      }
+      if (await codeTaken(companyId, typedCode, id)) {
+        return NextResponse.json({ error: `Item code "${typedCode}" is already used by another item` }, { status: 400 });
+      }
+    }
+
     const updated = await prisma.itemNew.updateMany({
       where: { id, companyId },
       data: {
+        code: typedCode,
         name: String(name).toUpperCase(),
         category: category || "TRADING",
         unit,
