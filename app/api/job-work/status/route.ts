@@ -20,8 +20,9 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({
         enabled: false,
         reason:
-          "Job Work is still under test and runs only in an internal test workspace. " +
-          "Create one from Admin → Dev Test.",
+          "Job Work is still under test, so it ships switched off. It runs in a demo " +
+          "sandbox and in an internal test workspace, and an admin can turn it on for a " +
+          "plan under Admin → Plans → Pages & Modules.",
         summary: { workers: 0, openChallans: 0, closedChallans: 0, receipts: 0 },
       });
     }
