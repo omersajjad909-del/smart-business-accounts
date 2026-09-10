@@ -7,3 +7,8 @@
 -- lib/pkProvinces.ts and lib/fbrEInvoice.ts.
 ALTER TABLE "Account"
   ADD COLUMN IF NOT EXISTS "province" TEXT;
+
+-- "D No" on the printed delivery challan — a fifth buyer reference alongside
+-- S/#, Order No and PO No, distinct from the challan's own number.
+ALTER TABLE "DeliveryChallan"
+  ADD COLUMN IF NOT EXISTS "dNo" TEXT;

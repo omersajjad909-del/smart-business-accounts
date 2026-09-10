@@ -1669,6 +1669,10 @@ model DeliveryChallan {
   serialNo String?
   orderNo  String?
   poNo     String?
+  // "D No" on the printed challan — a fifth reference the buyer checks the
+  // delivery against, alongside S/#, Order No and PO No. Separate from the
+  // challan's own number, which the document carries in its own right.
+  dNo      String?
   // How the goods were packed for dispatch — a poly-bag/textile trade detail
   // (Bags / Carton / Packet) with the count in that unit. Null everywhere
   // else.

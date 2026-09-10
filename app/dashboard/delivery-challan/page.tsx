@@ -47,6 +47,7 @@ type DeliveryChallan = {
   serialNo?: string;
   orderNo?: string;
   poNo?: string;
+  dNo?: string;
   packagingType?: string;
   packagingQty?: number;
   items: Array<{ item: { name: string; description?: string; code?: string; unit?: string }; qty: number; rate?: number }>;
@@ -87,6 +88,7 @@ export default function DeliveryChallanPage() {
   const [serialNo, setSerialNo] = useState("");
   const [orderNo, setOrderNo] = useState("");
   const [poNo, setPoNo] = useState("");
+  const [dNo, setDNo] = useState("");
   const [packagingType, setPackagingType] = useState("");
   const [packagingQty, setPackagingQty] = useState<number | "">("");
 const [searchTerm, _setSearchTerm] = useState("");
@@ -294,6 +296,7 @@ const [searchTerm, _setSearchTerm] = useState("");
         serialNo: serialNo || null,
         orderNo: orderNo || null,
         poNo: poNo || null,
+        dNo: dNo || null,
         packagingType: packagingType || null,
         packagingQty: packagingQty === "" ? null : Number(packagingQty),
         items: clean.map(r => ({ itemId: r.itemId, qty: Number(r.qty), rate: Number(r.rate) || 0 })),
@@ -350,6 +353,7 @@ const [searchTerm, _setSearchTerm] = useState("");
     setSerialNo(c.serialNo || "");
     setOrderNo(c.orderNo || "");
     setPoNo(c.poNo || "");
+    setDNo(c.dNo || "");
     setPackagingType(c.packagingType || "");
     setPackagingQty(c.packagingQty ?? "");
     setRows(c.items.map((it: any) => ({
@@ -396,7 +400,7 @@ const [searchTerm, _setSearchTerm] = useState("");
     setDriverName("");
     setVehicleNo("");
     setRemarks("");
-    setSerialNo(""); setOrderNo(""); setPoNo(""); setPackagingType(""); setPackagingQty("");
+    setSerialNo(""); setOrderNo(""); setPoNo(""); setDNo(""); setPackagingType(""); setPackagingQty("");
     setRows([{ itemId: "", name: "", description: "", availableQty: 0, qty: "", rate: "" }]);
     setPreview(false);
   }
@@ -625,6 +629,10 @@ const [searchTerm, _setSearchTerm] = useState("");
                     <input className="border p-2 w-full" value={poNo} onChange={e => setPoNo(e.target.value)} placeholder="Optional" />
                  </div>
                  <div>
+                    <label className="text-xs font-bold">D No</label>
+                    <input className="border p-2 w-full" value={dNo} onChange={e => setDNo(e.target.value)} placeholder="Optional" />
+                 </div>
+                 <div>
                     <label className="text-xs font-bold">Packaging Source</label>
                     <select className="border p-2 w-full" value={packagingType} onChange={e => setPackagingType(e.target.value)}>
                       <option value="">— None —</option>
@@ -703,6 +711,7 @@ const [searchTerm, _setSearchTerm] = useState("");
                   ...(serialNo ? [{ label: "S/#", value: serialNo }] : []),
                   ...(orderNo ? [{ label: "Order No", value: orderNo }] : []),
                   ...((savedChallan?.poNo || poNo) ? [{ label: "PO No", value: savedChallan?.poNo || poNo }] : []),
+                  ...((savedChallan?.dNo || dNo) ? [{ label: "D No", value: savedChallan?.dNo || dNo }] : []),
                   ...(driverName ? [{ label: "Driver", value: driverName }] : []),
                   ...(vehicleNo ? [{ label: "Vehicle", value: vehicleNo }] : []),
                 ]}
