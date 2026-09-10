@@ -43,6 +43,7 @@ import {
 } from "@/lib/inventoryAccounts";
 import { MFG_ACCOUNTS, ensureAccount, getAverageCosts, getStockOnHand } from "@/lib/manufacturingPosting";
 import { round2, round6 } from "@/lib/manufacturingRemnants";
+import { companyOwnsDashboardFeature } from "@/lib/companyPlanFeatures";
 
 type Db = Omit<typeof prisma, "$connect" | "$disconnect" | "$on" | "$transaction" | "$use" | "$extends">;
 
