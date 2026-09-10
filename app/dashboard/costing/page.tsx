@@ -282,9 +282,12 @@ function CostingInner() {
       title: sheetName.trim() || selected.formula.name,
       status: "saved",
       refId: selected.id,
-      amount: typeof run.values[primary?.key ?? ""] === "number"
+      // What the sheet actually quoted, which is the rate with profit on it —
+      // the saved list shows this number, and cost alone would read as the
+      // price when it is not.
+      amount: saleRate ?? (typeof run.values[primary?.key ?? ""] === "number"
         ? (run.values[primary.key] as number)
-        : undefined,
+        : undefined),
       date: new Date().toISOString(),
       data: {
         formulaId: selected.id,
@@ -295,6 +298,12 @@ function CostingInner() {
         inputs: values,
         outputs: outputs.map((o) => ({ key: o.key, label: o.label, unit: o.unit, role: o.role })),
         results: resultSnapshot,
+        // The profit as it stood for this quote, and the cost under it — a
+        // sheet whose margin cannot be read back is not much of a record.
+        profit: { mode: profitMode, value: profitValue },
+        profitAmount,
+        costRate: baseRate,
+        saleRate,
       },
     });
     setSavedNote(`Saved "${sheetName.trim() || selected.formula.name}"`);
