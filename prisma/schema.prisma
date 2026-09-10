@@ -91,6 +91,19 @@ model ItemNew {
   imageUrl     String?
   createdAt    DateTime @default(now())
 
+  // FBR sales-tax-invoice line requires the tariff heading the item is sold
+  // under (e.g. "3923.1000"). Null for every item until the company files
+  // through the FBR gateway or bills in an industry that quotes it.
+  hsCode String?
+  // Some trades (poly bags, yarn, steel) sell by count but invoice by
+  // weight — a line needs both a primary quantity/rate (pieces) and a
+  // secondary one (kg) side by side. secondaryUnitRatio is how many
+  // secondary units one primary unit weighs, used only to pre-fill a new
+  // line; the actual figures billed live on the invoice line itself so a
+  // later change here never rewrites a past invoice.
+  secondaryUnit      String?
+  secondaryUnitRatio Float?
+
   stockRates   StockRate[]
   outwardItems OutwardItem[]
 
@@ -346,14 +359,27 @@ model SalesInvoice {
 }
 
 model SalesInvoiceItem {
-  id              String @id @default(uuid())
+  id              String  @id @default(uuid())
   invoiceId       String
   itemId          String
   qty             Float
   rate            Float
   amount          Float
-  discountPercent Float  @default(0)
-  taxPercent      Float  @default(0)
+  discountPercent Float   @default(0)
+  taxPercent      Float   @default(0)
+  // Snapshotted from the item at billing time — a later edit to the item's
+  // own HS Code must not silently rewrite an already-issued invoice.
+  hsCode          String?
+  // Buyer's own PO reference for this specific line — distinct from the
+  // invoice-level "reference" field, for the FBR-style Po# column.
+  poNo            String?
+  // The same line billed a second way (e.g. pieces + kg). Null on every
+  // ordinary line; see ItemNew.secondaryUnit for how a line pre-fills.
+  // secondaryUnit is snapshotted (not read live off the item) so a later
+  // change to the item's unit never rewrites how a past invoice reads.
+  secondaryUnit   String?
+  secondaryQty    Float?
+  secondaryRate   Float?
 
   invoice SalesInvoice @relation(fields: [invoiceId], references: [id])
   item    ItemNew      @relation(fields: [itemId], references: [id])
@@ -1631,6 +1657,18 @@ model DeliveryChallan {
   driverName String?
   vehicleNo  String?
   remarks    String?
+
+  // Particulars a printed challan carries beyond the challan number itself —
+  // the buyer's own serial/order/PO references it is checked against on
+  // receipt.
+  serialNo String?
+  orderNo  String?
+  poNo     String?
+  // How the goods were packed for dispatch — a poly-bag/textile trade detail
+  // (Bags / Carton / Packet) with the count in that unit. Null everywhere
+  // else.
+  packagingType String?
+  packagingQty  Float?
 
   items           DeliveryChallanItem[]
   status          String                @default("PENDING") // PENDING | DELIVERED | INVOICED

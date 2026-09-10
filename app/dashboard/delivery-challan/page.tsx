@@ -15,12 +15,14 @@ import { useRouter } from "next/navigation";
 import { useResponsive } from "@/hooks/useResponsive";
 
 
-type Account = { id: string; name: string };
+type Account = { id: string; name: string; address?: string; phone?: string; ntn?: string; strn?: string };
 type Item = {
   id: string;
   name: string;
   description?: string;
   availableQty: number;
+  code?: string;
+  unit?: string;
 };
 type Row = {
   itemId: string;
@@ -29,6 +31,8 @@ type Row = {
   availableQty: number;
   qty: number | "";
   rate: number | "";
+  sku?: string;
+  unit?: string;
 };
 
 type DeliveryChallan = {
@@ -40,7 +44,12 @@ type DeliveryChallan = {
   driverName?: string;
   vehicleNo?: string;
   remarks?: string;
-  items: Array<{ item: { name: string; description?: string }; qty: number; rate?: number }>;
+  serialNo?: string;
+  orderNo?: string;
+  poNo?: string;
+  packagingType?: string;
+  packagingQty?: number;
+  items: Array<{ item: { name: string; description?: string; code?: string; unit?: string }; qty: number; rate?: number }>;
   status: string;
 };
 
@@ -75,6 +84,11 @@ export default function DeliveryChallanPage() {
   const [driverName, setDriverName] = useState("");
   const [vehicleNo, setVehicleNo] = useState("");
   const [remarks, setRemarks] = useState("");
+  const [serialNo, setSerialNo] = useState("");
+  const [orderNo, setOrderNo] = useState("");
+  const [poNo, setPoNo] = useState("");
+  const [packagingType, setPackagingType] = useState("");
+  const [packagingQty, setPackagingQty] = useState<number | "">("");
 const [searchTerm, _setSearchTerm] = useState("");
 
 
@@ -85,6 +99,7 @@ const [searchTerm, _setSearchTerm] = useState("");
   const [preview, setPreview] = useState(false);
   const [savedChallan, setSavedChallan] = useState<any>(null);
   const [companyName, setCompanyName] = useState("FINOVA SME");
+  const [companyInfo, setCompanyInfo] = useState<{ address?: string; phone?: string; email?: string; logoUrl?: string; ntn?: string; ntnLabel?: string; strn?: string }>({});
   const [printPrefs, setPrintPrefs] = useState<PrintPreferences>({
     paperSize: "A4",
     showLogo: true,
@@ -150,6 +165,19 @@ const [searchTerm, _setSearchTerm] = useState("");
             logoUrl: d.printPreferences.logoUrl || prev.logoUrl,
             headerNote: d.printPreferences.headerNote || prev.headerNote,
             footerNote: d.printPreferences.footerNote || prev.footerNote,
+          }));
+        }
+        // The challan letterhead had no address/phone/NTN at all — every
+        // other print in the app already reads these from here.
+        if (d?.companyIdentity || d?.invoiceContact || d?.taxProfile) {
+          setCompanyInfo((c) => ({
+            ...c,
+            address: d.companyIdentity?.legalAddress || c.address,
+            phone: d.invoiceContact?.phone || c.phone,
+            email: d.invoiceContact?.email || c.email,
+            ntn: d.taxProfile?.taxIdValue || c.ntn,
+            ntnLabel: d.taxProfile?.taxIdLabel || c.ntnLabel,
+            strn: d.taxProfile?.gstNumber || c.strn,
           }));
         }
       });
@@ -218,7 +246,7 @@ const [searchTerm, _setSearchTerm] = useState("");
   function addRow() {
     setRows(r => [
       ...r,
-      { itemId: "", name: "", description: "", availableQty: 0, qty: "", rate: "" },
+      { itemId: "", name: "", description: "", availableQty: 0, qty: "", rate: "", sku: "", unit: "" },
     ]);
   }
 
@@ -233,6 +261,8 @@ const [searchTerm, _setSearchTerm] = useState("");
       description: item.description || "",
       availableQty: item.availableQty,
       qty: "",
+      sku: item.code || "",
+      unit: item.unit || "",
     };
     setRows(copy);
   }
@@ -261,6 +291,11 @@ const [searchTerm, _setSearchTerm] = useState("");
         driverName: driverName || null,
         vehicleNo: vehicleNo || null,
         remarks: remarks || null,
+        serialNo: serialNo || null,
+        orderNo: orderNo || null,
+        poNo: poNo || null,
+        packagingType: packagingType || null,
+        packagingQty: packagingQty === "" ? null : Number(packagingQty),
         items: clean.map(r => ({ itemId: r.itemId, qty: Number(r.qty), rate: Number(r.rate) || 0 })),
       };
       const body = editing ? { id: editing.id, ...baseBody } : baseBody;
@@ -312,6 +347,11 @@ const [searchTerm, _setSearchTerm] = useState("");
     setDriverName(c.driverName || "");
     setVehicleNo(c.vehicleNo || "");
     setRemarks(c.remarks || "");
+    setSerialNo(c.serialNo || "");
+    setOrderNo(c.orderNo || "");
+    setPoNo(c.poNo || "");
+    setPackagingType(c.packagingType || "");
+    setPackagingQty(c.packagingQty ?? "");
     setRows(c.items.map((it: any) => ({
       itemId: it.itemId || "",
       name: it.item?.name || "",
@@ -319,6 +359,8 @@ const [searchTerm, _setSearchTerm] = useState("");
       availableQty: 0, // Not needed for edit
       qty: it.qty.toString(),
       rate: it.rate ? it.rate.toString() : "",
+      sku: it.item?.code || "",
+      unit: it.item?.unit || "",
     })));
     setShowForm(true);
     setShowList(false);
@@ -354,6 +396,7 @@ const [searchTerm, _setSearchTerm] = useState("");
     setDriverName("");
     setVehicleNo("");
     setRemarks("");
+    setSerialNo(""); setOrderNo(""); setPoNo(""); setPackagingType(""); setPackagingQty("");
     setRows([{ itemId: "", name: "", description: "", availableQty: 0, qty: "", rate: "" }]);
     setPreview(false);
   }
@@ -566,10 +609,41 @@ const [searchTerm, _setSearchTerm] = useState("");
                  </div>
               </div>
 
+              {/* Buyer's own references the challan is checked against on
+                  receipt, and how the goods were packed for dispatch. */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+                 <div>
+                    <label className="text-xs font-bold">S/#</label>
+                    <input className="border p-2 w-full" value={serialNo} onChange={e => setSerialNo(e.target.value)} placeholder="Optional" />
+                 </div>
+                 <div>
+                    <label className="text-xs font-bold">Order No</label>
+                    <input className="border p-2 w-full" value={orderNo} onChange={e => setOrderNo(e.target.value)} placeholder="Optional" />
+                 </div>
+                 <div>
+                    <label className="text-xs font-bold">PO No</label>
+                    <input className="border p-2 w-full" value={poNo} onChange={e => setPoNo(e.target.value)} placeholder="Optional" />
+                 </div>
+                 <div>
+                    <label className="text-xs font-bold">Packaging Source</label>
+                    <select className="border p-2 w-full" value={packagingType} onChange={e => setPackagingType(e.target.value)}>
+                      <option value="">— None —</option>
+                      <option value="BAGS">Bags</option>
+                      <option value="CARTON">Carton</option>
+                      <option value="PACKET">Packet</option>
+                    </select>
+                 </div>
+                 <div>
+                    <label className="text-xs font-bold">Packaging Qty</label>
+                    <input type="number" className="border p-2 w-full" value={packagingQty} onChange={e => setPackagingQty(e.target.value === "" ? "" : Number(e.target.value))} placeholder="0" />
+                 </div>
+              </div>
+
               <div className="overflow-x-auto">
                 <table className="w-full border mt-4 text-sm min-w-[600px]">
                   <thead className="bg-gray-100">
                     <tr>
+                      <th className="border p-2 w-28 text-left">Item Code</th>
                       <th className="border p-2 text-left">Item</th>
                       <th className="border p-2 w-24">Qty</th>
                       <th className="border p-2 w-32">Rate (Opt)</th>
@@ -579,6 +653,7 @@ const [searchTerm, _setSearchTerm] = useState("");
                   <tbody>
                     {rows.map((r, i) => (
                       <tr key={i}>
+                        <td className="border p-2 text-xs text-gray-500 font-mono">{r.sku || "—"}</td>
                         <td className="border p-2">
                           <ItemPicker
                             items={items as any}
@@ -611,30 +686,51 @@ const [searchTerm, _setSearchTerm] = useState("");
             <PrintPaperWrapper>
               <PrintDocA4
                 companyName={companyName}
+                companyAddress={companyInfo.address}
+                companyPhone={companyInfo.phone}
+                companyEmail={companyInfo.email}
+                companyTaxLabel={companyInfo.ntnLabel}
+                companyTaxValue={companyInfo.ntn}
+                companyStrn={companyInfo.strn}
+                showLogo={printPrefs.showLogo}
+                logoUrl={printPrefs.logoUrl}
                 docTitle="DELIVERY CHALLAN"
                 docNo={savedChallan?.challanNo || challanNo}
                 date={fmtDate(date)}
                 partyLabel="Customer"
                 partyName={customerName}
                 metaFields={[
+                  ...(serialNo ? [{ label: "S/#", value: serialNo }] : []),
+                  ...(orderNo ? [{ label: "Order No", value: orderNo }] : []),
+                  ...((savedChallan?.poNo || poNo) ? [{ label: "PO No", value: savedChallan?.poNo || poNo }] : []),
                   ...(driverName ? [{ label: "Driver", value: driverName }] : []),
                   ...(vehicleNo ? [{ label: "Vehicle", value: vehicleNo }] : []),
                 ]}
                 columns={[
                   { key: "no", label: "#", align: "center", width: 30 },
+                  { key: "code", label: "Item Code", width: 70 },
                   { key: "name", label: "Description" },
                   { key: "qty", label: "Qty", align: "center", width: 70 },
                   { key: "unit", label: "Unit", align: "center", width: 70 },
                 ]}
                 rows={rows.filter(r => r.itemId && r.qty).map((row, index) => ({
                   no: index + 1,
+                  code: row.sku || "—",
                   name: row.name,
                   qty: row.qty,
-                  unit: "—",
+                  unit: row.unit || "—",
                 }))}
                 totalsLines={[
                   { label: "Total Items:", value: rows.filter(r => r.itemId && r.qty).length, bold: true },
                 ]}
+                summaryFields={
+                  (savedChallan?.packagingType || packagingType)
+                    ? [{
+                        label: "Packaging Source",
+                        value: `${(savedChallan?.packagingType || packagingType).charAt(0)}${(savedChallan?.packagingType || packagingType).slice(1).toLowerCase()} — Qty ${savedChallan?.packagingQty ?? packagingQty ?? 0}`,
+                      }]
+                    : []
+                }
                 notes={remarks || undefined}
                 footerNote={printPrefs.footerNote || undefined}
                 signatureLabels={["Received By", "Delivered By"]}

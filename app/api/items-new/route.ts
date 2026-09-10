@@ -186,6 +186,11 @@ export async function POST(req: NextRequest) {
         barcode: body.barcode ? String(body.barcode).trim() : null,
         description: body.description || "",
         imageUrl: body.imageUrl || null,
+        hsCode: body.hsCode ? String(body.hsCode).trim() : null,
+        secondaryUnit: body.secondaryUnit ? String(body.secondaryUnit).trim() : null,
+        secondaryUnitRatio: body.secondaryUnitRatio === undefined || body.secondaryUnitRatio === null || body.secondaryUnitRatio === ""
+          ? null
+          : Number(body.secondaryUnitRatio),
         // The item's usual rate-formula dimensions, if the company runs one.
         meta: sanitizeLineMeta(body.meta),
       },
@@ -224,7 +229,7 @@ export async function PUT(req: NextRequest) {
     }
     const userId = req.headers.get("x-user-id");
     const body = await req.json();
-    const { id, code, name, category, unit, rate, purchaseRate, taxRate, minStock, barcode, description, imageUrl, meta } = body;
+    const { id, code, name, category, unit, rate, purchaseRate, taxRate, minStock, barcode, description, imageUrl, meta, hsCode, secondaryUnit, secondaryUnitRatio } = body;
 
     if (!id || !name || !unit) {
       return NextResponse.json({ error: "ID, Name & Unit required" }, { status: 400 });
@@ -260,6 +265,11 @@ export async function PUT(req: NextRequest) {
         barcode: barcode ? String(barcode).trim() : null,
         description: description || "",
         imageUrl: imageUrl !== undefined ? (imageUrl || null) : undefined,
+        hsCode: hsCode !== undefined ? (hsCode ? String(hsCode).trim() : null) : undefined,
+        secondaryUnit: secondaryUnit !== undefined ? (secondaryUnit ? String(secondaryUnit).trim() : null) : undefined,
+        secondaryUnitRatio: secondaryUnitRatio === undefined
+          ? undefined
+          : (secondaryUnitRatio === null || secondaryUnitRatio === "" ? null : Number(secondaryUnitRatio)),
         // Undefined leaves the column as it was, which is what a company with
         // no rate formula sends and what an older client would send too.
         meta: meta === undefined ? undefined : (sanitizeLineMeta(meta) ?? Prisma.DbNull),

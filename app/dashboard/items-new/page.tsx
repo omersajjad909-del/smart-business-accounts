@@ -46,6 +46,9 @@ type Item = {
   unit: string; rate: number; purchaseRate: number; taxRate: number;
   minStock: number; barcode?: string | null; description?: string | null;
   imageUrl?: string | null;
+  hsCode?: string | null;
+  secondaryUnit?: string | null;
+  secondaryUnitRatio?: number | null;
   /** Saved rate-formula dimensions. See lib/rateFormula.ts. */
   meta?: unknown;
 };
@@ -66,6 +69,9 @@ export default function ItemsNewPage() {
   const [minStock,    setMinStock]    = useState("");
   const [barcode,     setBarcode]     = useState("");
   const [description, setDescription] = useState("");
+  const [hsCode,             setHsCode]             = useState("");
+  const [secondaryUnit,      setSecondaryUnit]      = useState("");
+  const [secondaryUnitRatio, setSecondaryUnitRatio] = useState("");
   const [imageUrl,    setImageUrl]    = useState<string | null>(null);
   const [saving,      setSaving]      = useState(false);
   // An item's usual dimensions, saved once here so every document that picks
@@ -112,6 +118,7 @@ export default function ItemsNewPage() {
     setEditingId(null); setCode(""); setName(""); setCategory("TRADING"); setUnit("");
     setRate(""); setPurchaseRate(""); setTaxRate(""); setMinStock("");
     setBarcode(""); setDescription(""); setImageUrl(null);
+    setHsCode(""); setSecondaryUnit(""); setSecondaryUnitRatio("");
     setEditingItem(null);
     setMeta(rfActive ? emptyRateFormulaMeta(rf) : {});
   }
@@ -129,6 +136,9 @@ export default function ItemsNewPage() {
         headers: { "Content-Type":"application/json", ...headers },
         body: JSON.stringify({ id:editingId, code:code.trim(), name:name.trim(), category, unit,
           rate, purchaseRate, taxRate, minStock, barcode, description, imageUrl,
+          hsCode: hsCode.trim() || null,
+          secondaryUnit: secondaryUnit.trim() || null,
+          secondaryUnitRatio: secondaryUnitRatio === "" ? null : Number(secondaryUnitRatio),
           meta: rfActive ? meta : null }),
       });
       if (!res.ok) { const e = await res.json(); throw new Error(e.error || "Save failed"); }
@@ -146,6 +156,8 @@ export default function ItemsNewPage() {
     setTaxRate(String(item.taxRate || "")); setMinStock(String(item.minStock || ""));
     setBarcode(item.barcode || ""); setDescription(item.description || "");
     setImageUrl(item.imageUrl || null);
+    setHsCode(item.hsCode || ""); setSecondaryUnit(item.secondaryUnit || "");
+    setSecondaryUnitRatio(item.secondaryUnitRatio != null ? String(item.secondaryUnitRatio) : "");
     setEditingItem(item);
     // An item imported from the old system keeps its dimensions in its name
     // and nowhere else. Reading them into the boxes means the first save of
@@ -335,6 +347,24 @@ export default function ItemsNewPage() {
           <div>
             <div style={{ fontSize:11, color:MUTED, marginBottom:5 }}>Description / Notes</div>
             <input style={INPUT} placeholder="Optional notes about this item" value={description} onChange={e=>setDescription(e.target.value)} />
+          </div>
+        </div>
+
+        {/* Row 4: HS Code + Secondary Unit — FBR tariff heading and the
+            second unit a trade like poly bags bills the same line in
+            (pieces + kg). Both optional; leave blank for an ordinary item. */}
+        <div style={{ display:"grid", gridTemplateColumns: isMobile ? "1fr 1fr" : "1fr 1fr 1fr", gap:12, marginBottom:12 }}>
+          <div>
+            <div style={{ fontSize:11, color:MUTED, marginBottom:5 }}>HS Code <span style={{fontSize:10,opacity:.6}}>for FBR sales tax invoices</span></div>
+            <input style={INPUT} placeholder="e.g. 3923.1000" value={hsCode} onChange={e=>setHsCode(e.target.value)} />
+          </div>
+          <div>
+            <div style={{ fontSize:11, color:MUTED, marginBottom:5 }}>Secondary Unit <span style={{fontSize:10,opacity:.6}}>e.g. KG</span></div>
+            <input style={INPUT} placeholder="Optional" value={secondaryUnit} onChange={e=>setSecondaryUnit(e.target.value)} />
+          </div>
+          <div>
+            <div style={{ fontSize:11, color:MUTED, marginBottom:5 }}>Secondary Unit Ratio <span style={{fontSize:10,opacity:.6}}>per 1 {unit || "unit"}</span></div>
+            <input style={INPUT} type="number" placeholder="e.g. 0.7471" value={secondaryUnitRatio} onChange={e=>setSecondaryUnitRatio(e.target.value)} />
           </div>
         </div>
 

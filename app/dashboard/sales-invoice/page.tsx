@@ -29,6 +29,7 @@ import {
 } from "@/components/RateFormulaCells";
 import { computeRateFromFormula, emptyRateFormulaMeta, itemMetaWithName, itemNameWithoutSpec, itemPickerLabel, itemSpecRole, metaFromItem, readRateFormulaMeta } from "@/lib/rateFormula";
 import type { RateFormulaValue } from "@/lib/rateFormula";
+import { amountToWordsInternational } from "@/lib/numberToWords";
 
 
 // ─── Design tokens ────────────────────────────────────────────────────────────
@@ -39,8 +40,12 @@ const accent = "#6366f1";
 type Account = { id: string; name: string; email?: string; phone?: string; address?: string; city?: string; ntn?: string; strn?: string };
 type Item = { id: string; name: string; code?: string; unit?: string; description?: string; availableQty: number; barcode?: string; salePrice?: number; taxRate?: number; meta?: unknown;
   /** Received, sold and balance from InventoryTxn — /api/items-new?withStock=1. */
-  stockIn?: number; stockOut?: number; stockBal?: number };
+  stockIn?: number; stockOut?: number; stockBal?: number;
+  /** FBR tariff heading, and a second unit this item is also billed in (e.g. pieces + kg). */
+  hsCode?: string | null; secondaryUnit?: string | null; secondaryUnitRatio?: number | null };
 type Row = { itemId: string; name: string; description: string; availableQty: number; qty: number | ""; rate: number | ""; discountPercent: number | ""; taxPercent: number | ""; unit: string; sku: string; isManual?: boolean;
+  /** FBR sales-tax-invoice extras — all optional, blank unless the item or line uses them. */
+  hsCode?: string; poNo?: string; secondaryUnit?: string; secondaryQty?: number | ""; secondaryRate?: number | "";
   /** Rate-formula dimensions, when this company uses one. See lib/rateFormula.ts. */
   meta?: RateFormulaMeta };
 type SalesInvoice = {
@@ -181,6 +186,10 @@ function SalesInvoiceContent() {
 
   // ── Logo / print prefs ──
   const [printPrefs, setPrintPrefs] = useState({ showLogo: true, logoUrl: "", headerNote: "", footerNote: "Thank you for your business.", invoiceTemplate: "classic" });
+  // Whether this company has connected FBR's digital invoicing gateway (see
+  // /dashboard/e-invoice) — the printed invoice only carries the FBR Invoice
+  // No. / Submitted At box when that is actually relevant to them.
+  const [fbrEnabled, setFbrEnabled] = useState(false);
 
   // ── Init ──
   useEffect(() => {
@@ -188,6 +197,7 @@ function SalesInvoiceContent() {
     fetch("/api/me/company").then(r => r.ok ? r.json() : null).then(d => { if (d) setCompanyInfo((c: any) => ({ ...d, ...c })); });
     fetch("/api/company/admin-control").then(r => r.ok ? r.json() : null).then(d => {
       if (d?.printPreferences) setPrintPrefs(p => ({ ...p, ...d.printPreferences }));
+      if (d?.fbrSettings?.enabled) setFbrEnabled(true);
       // Company's own name/plan come from /api/me/company above; its address,
       // phone/email and tax registration live in these admin-control sections
       // instead — /api/me/company's Company row carries none of them.
@@ -233,6 +243,8 @@ function SalesInvoiceContent() {
         stockIn: Number(i.stockIn ?? 0), stockOut: Number(i.stockOut ?? 0),
         stockBal: Number(i.stockBal ?? 0),
         availableQty: Number(i.stockBal ?? 0),
+        hsCode: i.hsCode || null, secondaryUnit: i.secondaryUnit || null,
+        secondaryUnitRatio: i.secondaryUnitRatio ?? null,
       })));
     });
     fetch("/api/tax-configuration").then(r => r.json()).then(d => setTaxes(Array.isArray(d) ? d : [])).catch(() => {});
@@ -327,7 +339,9 @@ function SalesInvoiceContent() {
         i.id === scanCode
       );
       if (found) {
-        const newRow: Row = { itemId: found.id, name: found.name, description: found.description || "", availableQty: found.availableQty, qty: 1, rate: rfActive ? "" : (found.salePrice || ""), discountPercent: "", taxPercent: found.taxRate || "", unit: found.unit || "", sku: found.code || "" };
+        const newRow: Row = { itemId: found.id, name: found.name, description: found.description || "", availableQty: found.availableQty, qty: 1, rate: rfActive ? "" : (found.salePrice || ""), discountPercent: "", taxPercent: found.taxRate || "", unit: found.unit || "", sku: found.code || "",
+          hsCode: found.hsCode || undefined, secondaryUnit: found.secondaryUnit || undefined,
+          secondaryQty: found.secondaryUnitRatio ? Math.round(found.secondaryUnitRatio * 10000) / 10000 : "" };
         // A scanned line is a picked line. Without this it arrived with no
         // dimensions and the item's stored sale price, so the one line nobody
         // typed was the one line the formula had not priced.
@@ -364,7 +378,8 @@ function SalesInvoiceContent() {
     if (!item) return;
     // With a formula running the rate belongs to the formula, so the item's
     // stored sale price must not overwrite a computed line rate.
-    copy[idx] = { ...copy[idx], itemId: item.id, name: item.name, description: item.description || "", availableQty: item.availableQty, qty: "", rate: rfActive ? copy[idx].rate : (item.salePrice || ""), discountPercent: "", taxPercent: item.taxRate || "", unit: item.unit || "", sku: item.code || "", isManual: false };
+    copy[idx] = { ...copy[idx], itemId: item.id, name: item.name, description: item.description || "", availableQty: item.availableQty, qty: "", rate: rfActive ? copy[idx].rate : (item.salePrice || ""), discountPercent: "", taxPercent: item.taxRate || "", unit: item.unit || "", sku: item.code || "", isManual: false,
+      hsCode: item.hsCode || undefined, secondaryUnit: item.secondaryUnit || undefined, secondaryQty: "", secondaryRate: "" };
     if (rfActive) {
       const meta = metaFromItem(rf, (item as any).meta, copy[idx].meta, `${item.name || ""} ${item.description || ""}`);
       copy[idx].meta = meta;
@@ -395,10 +410,25 @@ function SalesInvoiceContent() {
     focusRateFormulaCell(idx, rtmmFieldKey);
   }
 
-  function updateRow(idx: number, key: keyof Pick<Row, "qty" | "rate" | "discountPercent" | "taxPercent">, val: string) {
+  function updateRow(idx: number, key: keyof Pick<Row, "qty" | "rate" | "discountPercent" | "taxPercent" | "secondaryQty" | "secondaryRate">, val: string) {
     const copy = [...rows];
     (copy[idx] as any)[key] = val === "" ? "" : Number(val);
+    // A line billed a second way pre-fills its weight/secondary qty off the
+    // item's ratio whenever the primary qty changes — still a plain editable
+    // number afterward, the same way a rate-formula rate is.
+    if (key === "qty" && val !== "") {
+      const item = items.find(i => i.id === copy[idx].itemId);
+      if (item?.secondaryUnitRatio) {
+        copy[idx].secondaryQty = Math.round(Number(val) * item.secondaryUnitRatio * 10000) / 10000;
+      }
+    }
     if (idx === copy.length - 1 && val !== "") copy.push(emptyRow());
+    setRows(copy);
+  }
+
+  function updateRowPoNo(idx: number, val: string) {
+    const copy = [...rows];
+    copy[idx] = { ...copy[idx], poNo: val };
     setRows(copy);
   }
 
@@ -518,7 +548,15 @@ function SalesInvoiceContent() {
         freight: freight || 0, discount: discount || 0, discountType,
         notes: notes || null, termsConditions: termsConditions || null, reference: reference || null,
         paymentMethod: paymentMethod || null, paymentTerms: paymentTerms || null,
-        items: clean.map(r => ({ itemId: r.itemId, qty: Number(r.qty), rate: Number(r.rate), discountPercent: Number(r.discountPercent) || 0, taxPercent: Number(r.taxPercent) || 0, meta: rfActive ? (r.meta || null) : null })),
+        items: clean.map(r => ({
+          itemId: r.itemId, qty: Number(r.qty), rate: Number(r.rate),
+          discountPercent: Number(r.discountPercent) || 0, taxPercent: Number(r.taxPercent) || 0,
+          hsCode: r.hsCode || null, poNo: r.poNo || null,
+          secondaryUnit: r.secondaryUnit || null,
+          secondaryQty: r.secondaryQty === "" || r.secondaryQty == null ? null : Number(r.secondaryQty),
+          secondaryRate: r.secondaryRate === "" || r.secondaryRate == null ? null : Number(r.secondaryRate),
+          meta: rfActive ? (r.meta || null) : null,
+        })),
         applyTax, taxConfigId: applyTax ? selectedTaxId : null,
         currencyId: currencyId || null, exchangeRate,
         soId: (!editing && linkedSoId) ? linkedSoId : undefined,
@@ -546,7 +584,11 @@ function SalesInvoiceContent() {
     setDiscount(inv2.discount ?? ""); setDiscountType(inv2.discountType || "flat"); setFreight(inv2.freight ?? "");
     setNotes(inv2.notes || ""); setTermsConditions(inv2.termsConditions || ""); setReference(inv2.reference || "");
     setPaymentMethod(inv2.paymentMethod || ""); setPaymentTerms(inv2.paymentTerms || "");
-    setRows(inv.items.map((it: any) => ({ itemId: it.itemId || it.item?.id || "", name: it.item?.name || "", description: it.item?.description || "", availableQty: it.qty || 0, qty: it.qty.toString(), rate: it.rate.toString(), discountPercent: it.discountPercent ?? "", taxPercent: it.taxPercent ?? "", unit: it.item?.unit || "", sku: it.item?.code || "", ...(rfActive ? { meta: readRateFormulaMeta(rf, it.meta) } : {}) })));
+    setRows(inv.items.map((it: any) => ({ itemId: it.itemId || it.item?.id || "", name: it.item?.name || "", description: it.item?.description || "", availableQty: it.qty || 0, qty: it.qty.toString(), rate: it.rate.toString(), discountPercent: it.discountPercent ?? "", taxPercent: it.taxPercent ?? "", unit: it.item?.unit || "", sku: it.item?.code || "",
+      hsCode: it.hsCode || it.item?.hsCode || undefined, poNo: it.poNo || undefined,
+      secondaryUnit: it.secondaryUnit || undefined,
+      secondaryQty: it.secondaryQty ?? "", secondaryRate: it.secondaryRate ?? "",
+      ...(rfActive ? { meta: readRateFormulaMeta(rf, it.meta) } : {}) })));
     setShowForm(true); setShowList(false);
   }
 
@@ -727,6 +769,10 @@ function SalesInvoiceContent() {
   const menuPanel: React.CSSProperties = { position: "absolute", top: "calc(100% + 6px)", minWidth: 200, background: "var(--card-bg)", border: "1px solid var(--border)", borderRadius: 10, padding: "6px 0", zIndex: 50, boxShadow: "0 8px 32px rgba(0,0,0,.35)" };
   const menuItem: React.CSSProperties = { display: "flex", alignItems: "center", gap: 10, width: "100%", background: "none", border: "none", padding: "10px 16px", cursor: "pointer", color: "var(--text-primary)", fontSize: 13, fontFamily: ff, textAlign: "left" };
   const selectedCustomer = customers.find(c => c.id === customerId);
+  // Only a company that actually set up a secondary unit on an item (poly
+  // bags billed in pieces + kg, e.g.) sees the extra Po#/Secondary columns —
+  // every other invoice grid renders exactly as it did before this feature.
+  const hasDualUnitLines = rows.some(r => !!r.secondaryUnit);
 
   if (!canCreate) return <div style={{ padding: 40, textAlign: "center", color: "var(--text-muted)", fontFamily: ff }}>Access Denied</div>;
   if (loading) return <div style={{ padding: 40, textAlign: "center", color: "var(--text-muted)", fontFamily: ff }}>Loading…</div>;
@@ -747,6 +793,9 @@ function SalesInvoiceContent() {
   const invQty = invItems.reduce((sum: number, r: any) => sum + (Number(r.qty) || 0), 0);
   const invQtyUnits = Array.from(new Set(invItems.map((r: any) => String(r.item?.unit || r.unit || "").trim()).filter(Boolean)));
   const invQtyUnit = invQtyUnits.length === 1 ? invQtyUnits[0] : "";
+  // Same rule as the grid above, but against whichever set of lines this
+  // particular render is showing (draft rows, or a saved invoice's own).
+  const printHasDualUnit = invItems.some((r: any) => !!(r.secondaryUnit));
 
   /**
    * The document, built once and used twice: what the preview shows is the
@@ -764,6 +813,7 @@ function SalesInvoiceContent() {
     companyPhone: (printPrefs as any).showPhone === false ? undefined : companyInfo?.phone,
     companyTaxLabel: companyInfo?.ntnLabel,
     companyTaxValue: (printPrefs as any).showTaxNumber === false ? undefined : companyInfo?.ntn,
+    companyStrn: (printPrefs as any).showTaxNumber === false ? undefined : companyInfo?.gst,
     showLogo: printPrefs.showLogo,
     logoUrl: printPrefs.logoUrl,
     // The look the company chose in Admin -> Print & Branding.
@@ -776,6 +826,8 @@ function SalesInvoiceContent() {
     partyName: invCustomer,
     partyPhone: selectedCustomer?.phone,
     partyAddress: selectedCustomer?.address,
+    partyNtn: (savedInvoice?.customer as any)?.ntn || selectedCustomer?.ntn,
+    partyStrn: (savedInvoice?.customer as any)?.strn || selectedCustomer?.strn,
     metaFields: [
       ...(savedInvoice?.driverName || driverName ? [{ label: "Driver", value: savedInvoice?.driverName || driverName }] : []),
       ...(savedInvoice?.vehicleNo || vehicleNo ? [{ label: "Vehicle", value: savedInvoice?.vehicleNo || vehicleNo }] : []),
@@ -788,6 +840,24 @@ function SalesInvoiceContent() {
           { key: "name", label: "Description" },
           { key: "qty", label: "Qty", align: "center" as const, width: 46 },
           { key: "unit", label: "Unit", align: "center" as const, width: 46 },
+        ]
+      : printHasDualUnit
+      ? [
+          // Poly-bag/textile "Sales Tax Invoice" layout — billed by count and
+          // by weight on the same line, each with its own unit/qty/rate.
+          { key: "no", label: "#", align: "center" as const, width: 26 },
+          { key: "poNo", label: "Po#", width: 50 },
+          { key: "name", label: "Description" },
+          { key: "hsCode", label: "HS Code", width: 60 },
+          ...(rfActive ? rateFormulaPrintColumns(formulaBeforeQty) : []),
+          { key: "unit", label: "Unit", align: "center" as const, width: 46, group: "Primary" },
+          { key: "qty", label: "Qty", align: "center" as const, width: 46, group: "Primary" },
+          { key: "rate", label: "Rate", align: "right" as const, width: 60, group: "Primary" },
+          ...(rfActive ? rateFormulaPrintColumns(rtmmFormula) : []),
+          { key: "secondaryUnit", label: "Unit", align: "center" as const, width: 46, group: "Secondary" },
+          { key: "secondaryQty", label: "Qty", align: "right" as const, width: 60, group: "Secondary" },
+          { key: "secondaryRate", label: "Rate", align: "right" as const, width: 60, group: "Secondary" },
+          { key: "amount", label: "Amount", align: "right" as const, width: 80 },
         ]
       : [
           { key: "no", label: "#", align: "center" as const, width: 26 },
@@ -804,6 +874,8 @@ function SalesInvoiceContent() {
         ],
     rows: invItems.map((r: any, i: number) => ({
       no: i + 1,
+      poNo: r.poNo || "",
+      hsCode: r.hsCode || r.item?.hsCode || "",
       name: rfActive
         ? itemNameWithoutSpec(r.item?.name || r.name || "—")
         : (r.item?.name || r.name || "—"),
@@ -811,6 +883,9 @@ function SalesInvoiceContent() {
       qty: r.qty,
       unit: r.item?.unit || r.unit || "",
       rate: Number(r.rate).toLocaleString(),
+      secondaryUnit: r.secondaryUnit || "",
+      secondaryQty: r.secondaryQty != null && r.secondaryQty !== "" ? Number(r.secondaryQty).toLocaleString() : "",
+      secondaryRate: r.secondaryRate != null && r.secondaryRate !== "" ? Number(r.secondaryRate).toLocaleString() : "",
       amount: (Number(r.qty) * Number(r.rate)).toLocaleString("en-US", { minimumFractionDigits: 2 }),
     })),
     // What was counted. The gate checks the rolls against this line without
@@ -819,6 +894,15 @@ function SalesInvoiceContent() {
     summaryFields: [
       { label: "Total Qty", value: `${invQty.toLocaleString()}${invQtyUnit ? ` ${invQtyUnit}` : ""}` },
       { label: "Items", value: String(invItems.length) },
+      // Only for a company that actually connected FBR's gateway — everyone
+      // else's invoice keeps exactly the two lines above. Shown even before
+      // filing (blank), the way the client's own FBR-format sample does.
+      ...(previewMode !== "DELIVERY" && fbrEnabled
+        ? [
+            { label: "FBR Invoice Number", value: savedInvoice?.fbrInvoiceNo || "" },
+            { label: "Submitted at", value: savedInvoice?.fbrFiledAt ? fmtDate(new Date(savedInvoice.fbrFiledAt).toISOString().slice(0, 10)) : "" },
+          ]
+        : []),
     ],
     // A delivery note carries goods, not money: the columns above already
     // drop the rate, and the totals go with them.
@@ -826,13 +910,25 @@ function SalesInvoiceContent() {
     // Freight prints whether or not it was charged. A bill that simply omits
     // the line leaves the customer working out for themselves whether the
     // carriage was in the rate, and this trade has always shown the nil.
-    totalsLines: previewMode === "DELIVERY" ? [] : [
+    //
+    // A company running GST/sales tax gets the FBR-style three-line summary
+    // (Excluding GST Value / Sales Tax X% / Including GST Value) instead of
+    // the generic Total/Tax/Net Bill labels — same figures, the labels an
+    // FBR-format sales tax invoice is expected to carry.
+    totalsLines: previewMode === "DELIVERY" ? [] : (applyTax && selectedTax ? [
+      ...(invDiscount > 0 ? [{ label: "Discount:", value: -invDiscount }] : []),
+      { label: "Excluding GST Value:", value: invSubtotal - invDiscount },
+      { label: `Sales Tax ${selectedTax.taxRate}%:`, value: invTax },
+      ...(invFreight > 0 ? [{ label: "Freight:", value: invFreight }] : []),
+      { label: "Including GST Value:", value: invTotal, bold: true, borderTop: true },
+    ] : [
       { label: "Total:", value: invSubtotal },
       ...(invDiscount > 0 ? [{ label: "Discount:", value: -invDiscount }] : []),
       ...(invTax > 0 ? [{ label: "Tax:", value: invTax }] : []),
       { label: "Freight:", value: invFreight },
       { label: "Net Bill:", value: invTotal, bold: true, borderTop: true },
-    ],
+    ]),
+    amountInWords: previewMode === "DELIVERY" || invTotal <= 0 ? undefined : amountToWordsInternational(invTotal),
     notes: savedInvoice?.notes || notes,
     terms: savedInvoice?.termsConditions || undefined,
     footerNote: printPrefs.footerNote || undefined,
@@ -1154,6 +1250,7 @@ function SalesInvoiceContent() {
                                 </div>
                               )}
                               {r.sku && !r.isManual && <div style={{ fontSize: 11, color: "var(--text-muted)", marginBottom: 6 }}>SKU: {r.sku}{r.unit ? ` | Unit: ${r.unit}` : ""}</div>}
+                              {r.hsCode && <div style={{ fontSize: 11, color: "var(--text-muted)", marginBottom: 6 }}>HS Code: {r.hsCode}</div>}
                               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
                                 {rfActive && (
                                   <RateFormulaMobileFields settings={rf} meta={r.meta} rowIndex={i} onChange={(key, value) => updateRowMeta(i, key, value)} />
@@ -1164,6 +1261,22 @@ function SalesInvoiceContent() {
                                     <input type="number" style={{ ...inputStyle, textAlign: "right", ...(rfActive && k === "rate" && !rf.rateEditable ? { opacity: 0.75 } : {}) }} value={r[k]} onChange={e => updateRow(i, k, e.target.value)} readOnly={rfActive && k === "rate" && !rf.rateEditable} placeholder="0" />
                                   </div>
                                 ))}
+                                {hasDualUnitLines && (
+                                  <>
+                                    <div>
+                                      <div style={{ fontSize: 10, color: "var(--text-muted)", fontWeight: 700, marginBottom: 3, textTransform: "uppercase" }}>Po#</div>
+                                      <input style={inputStyle} value={r.poNo || ""} onChange={e => updateRowPoNo(i, e.target.value)} placeholder="—" />
+                                    </div>
+                                    <div>
+                                      <div style={{ fontSize: 10, color: "var(--text-muted)", fontWeight: 700, marginBottom: 3, textTransform: "uppercase" }}>Sec. Qty {r.secondaryUnit ? `(${r.secondaryUnit})` : ""}</div>
+                                      <input type="number" style={{ ...inputStyle, textAlign: "right" }} value={r.secondaryQty ?? ""} onChange={e => updateRow(i, "secondaryQty", e.target.value)} placeholder="0" />
+                                    </div>
+                                    <div>
+                                      <div style={{ fontSize: 10, color: "var(--text-muted)", fontWeight: 700, marginBottom: 3, textTransform: "uppercase" }}>Sec. Rate</div>
+                                      <input type="number" style={{ ...inputStyle, textAlign: "right" }} value={r.secondaryRate ?? ""} onChange={e => updateRow(i, "secondaryRate", e.target.value)} placeholder="0.00" />
+                                    </div>
+                                  </>
+                                )}
                               </div>
                               {lineBase > 0 && <div style={{ textAlign: "right", fontWeight: 700, fontSize: 13, marginTop: 8, color: "var(--accent)" }}>Total: {fmt(lineTaxable + lineTax)}</div>}
                             </div>
@@ -1182,13 +1295,22 @@ function SalesInvoiceContent() {
                               {["#","Item / Description"].map((h,hi) => (
                                 <th key={h+hi} style={{ padding: "10px 8px", fontSize: 10.5, fontWeight: 800, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: 0.5, textAlign: "left", whiteSpace: "nowrap" }}>{h}</th>
                               ))}
+                              {hasDualUnitLines && (
+                                <th style={{ padding: "10px 6px", fontSize: 10.5, fontWeight: 800, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: 0.5, textAlign: "left", whiteSpace: "nowrap" }}>Po#</th>
+                              )}
                               {rfActive && <RateFormulaHeadCells settings={formulaBeforeQty} />}
                               {["Unit","Qty"].map((h,hi) => (
                                 <th key={"t"+h+hi} style={{ padding: "10px 6px", fontSize: 10.5, fontWeight: 800, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: 0.5, textAlign: hi <= 5 ? "right" : "left", whiteSpace: "nowrap" }}>{h}</th>
                               ))}
                               {rfActive && rtmmFormula.fields.length > 0 && <RateFormulaHeadCells settings={rtmmFormula} />}
-                              {["Unit Price","Disc%","Tax%","Total",""].map((h,hi) => (
-                                <th key={"tail"+h+hi} style={{ padding: "10px 6px", fontSize: 10.5, fontWeight: 800, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: 0.5, textAlign: hi <= 5 ? "right" : "left", whiteSpace: "nowrap" }}>{h}</th>
+                              {["Unit Price"].map((h,hi) => (
+                                <th key={"tail"+h+hi} style={{ padding: "10px 6px", fontSize: 10.5, fontWeight: 800, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: 0.5, textAlign: "right", whiteSpace: "nowrap" }}>{h}</th>
+                              ))}
+                              {hasDualUnitLines && ["Sec. Qty","Sec. Rate"].map((h,hi) => (
+                                <th key={"sec"+h+hi} style={{ padding: "10px 6px", fontSize: 10.5, fontWeight: 800, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: 0.5, textAlign: "right", whiteSpace: "nowrap" }}>{h}</th>
+                              ))}
+                              {["Disc%","Tax%","Total",""].map((h,hi) => (
+                                <th key={"tail2"+h+hi} style={{ padding: "10px 6px", fontSize: 10.5, fontWeight: 800, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: 0.5, textAlign: hi <= 2 ? "right" : "left", whiteSpace: "nowrap" }}>{h}</th>
                               ))}
                             </tr>
                           </thead>
@@ -1232,7 +1354,13 @@ function SalesInvoiceContent() {
                                       />
                                     )}
                                     {r.description && !r.isManual && <div style={{ fontSize: 11, color: "var(--text-muted)", marginTop: 2, paddingLeft: 2 }}>{r.description}</div>}
+                                    {r.hsCode && <div style={{ fontSize: 10, color: "var(--text-muted)", opacity: 0.75, marginTop: 2, paddingLeft: 2 }}>HS: {r.hsCode}</div>}
                                   </td>
+                                  {hasDualUnitLines && (
+                                    <td style={{ padding: "13px 6px", width: 74, borderTop: "1px solid var(--border)", borderBottom: "1px solid var(--border)" }}>
+                                      <input style={{ ...inputStyle, padding: "5px 6px", border: "1.5px solid var(--border)", borderRadius: 7, fontSize: 12.5 }} value={r.poNo || ""} onChange={e => updateRowPoNo(i, e.target.value)} placeholder="—" />
+                                    </td>
+                                  )}
                                   {rfActive && (
                                     <RateFormulaRowCells settings={formulaBeforeQty} meta={r.meta} rowIndex={i} onChange={(key, value) => updateRowMeta(i, key, value)} />
                                   )}
@@ -1250,6 +1378,17 @@ function SalesInvoiceContent() {
                                   <td style={{ padding: "13px 6px", width: 82, borderTop: "1px solid var(--border)", borderBottom: "1px solid var(--border)" }}>
                                     <input type="number" step="any" style={{ ...inputStyle, padding: "5px 6px", border: "1.5px solid var(--border)", borderRadius: 7, textAlign: "right", fontSize: 12.5, ...(rfActive && !rf.rateEditable ? { opacity: 0.75, cursor: "not-allowed" } : {}) }} value={r.rate} onChange={e => updateRow(i, "rate", e.target.value)} readOnly={rfActive && !rf.rateEditable} title={rfActive && !rf.rateEditable ? "Worked out by your rate formula" : undefined} placeholder="0.00" />
                                   </td>
+                                  {hasDualUnitLines && (
+                                    <>
+                                      <td style={{ padding: "13px 6px", width: 86, borderTop: "1px solid var(--border)", borderBottom: "1px solid var(--border)" }}>
+                                        <input type="number" step="any" style={{ ...inputStyle, padding: "5px 6px", border: "1.5px solid var(--border)", borderRadius: 7, textAlign: "right", fontSize: 12.5 }} value={r.secondaryQty ?? ""} onChange={e => updateRow(i, "secondaryQty", e.target.value)} placeholder="0" title={r.secondaryUnit ? `In ${r.secondaryUnit}` : undefined} />
+                                        {r.secondaryUnit && <div style={{ fontSize: 9, color: "var(--text-muted)", textAlign: "right", marginTop: 1 }}>{r.secondaryUnit}</div>}
+                                      </td>
+                                      <td style={{ padding: "13px 6px", width: 82, borderTop: "1px solid var(--border)", borderBottom: "1px solid var(--border)" }}>
+                                        <input type="number" step="any" style={{ ...inputStyle, padding: "5px 6px", border: "1.5px solid var(--border)", borderRadius: 7, textAlign: "right", fontSize: 12.5 }} value={r.secondaryRate ?? ""} onChange={e => updateRow(i, "secondaryRate", e.target.value)} placeholder="0.00" />
+                                      </td>
+                                    </>
+                                  )}
                                   <td style={{ padding: "13px 6px", width: 64, borderTop: "1px solid var(--border)", borderBottom: "1px solid var(--border)" }}>
                                     <input type="number" step="any" style={{ ...inputStyle, padding: "5px 6px", border: "1.5px solid var(--border)", borderRadius: 7, textAlign: "right", fontSize: 12.5 }} value={r.discountPercent} onChange={e => updateRow(i, "discountPercent", e.target.value)} placeholder="0" />
                                   </td>
@@ -1393,6 +1532,11 @@ function SalesInvoiceContent() {
                         <span>Grand Total</span>
                         <span style={{ color: "var(--accent)" }}>{fmt(netTotal)}</span>
                       </div>
+                      {netTotal > 0 && (
+                        <div style={{ padding: "8px 10px", borderRadius: 8, background: "var(--panel-bg)", border: "1px solid var(--border)", fontSize: 11, color: "var(--text-muted)", fontStyle: "italic", lineHeight: 1.4 }}>
+                          {amountToWordsInternational(netTotal)}
+                        </div>
+                      )}
                     </div>
                   </div>
 

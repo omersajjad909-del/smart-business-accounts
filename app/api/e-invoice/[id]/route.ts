@@ -67,7 +67,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       const taxAmount = gross * (line.taxPercent / 100);
       return {
         productDescription: line.item?.name || "Item",
-        hsCode: "",
+        hsCode: (line as any).hsCode || line.item?.hsCode || "",
         rateLabel: `${line.taxPercent || 0}%`,
         uoM: line.item?.unit || "PCS",
         quantity: line.qty,

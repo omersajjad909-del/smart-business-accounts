@@ -11,6 +11,11 @@ const challanSchema = z.object({
   driverName: z.string().optional().nullable(),
   vehicleNo: z.string().optional().nullable(),
   remarks: z.string().optional().nullable(),
+  serialNo: z.string().optional().nullable(),
+  orderNo: z.string().optional().nullable(),
+  poNo: z.string().optional().nullable(),
+  packagingType: z.string().optional().nullable(),
+  packagingQty: z.number().optional().nullable(),
   items: z.array(
     z.object({
       itemId: z.string(),
@@ -86,6 +91,11 @@ export async function POST(req: NextRequest) {
         driverName: data.driverName || null,
         vehicleNo: data.vehicleNo || null,
         remarks: data.remarks || null,
+        serialNo: data.serialNo || null,
+        orderNo: data.orderNo || null,
+        poNo: data.poNo || null,
+        packagingType: data.packagingType || null,
+        packagingQty: data.packagingQty ?? null,
         status: data.status || "PENDING",
         items: {
           create: data.items.map((item) => ({
@@ -165,6 +175,11 @@ export async function PUT(req: NextRequest) {
           driverName: data.driverName || null,
           vehicleNo: data.vehicleNo || null,
           remarks: data.remarks || null,
+          serialNo: data.serialNo || null,
+          orderNo: data.orderNo || null,
+          poNo: data.poNo || null,
+          packagingType: data.packagingType || null,
+          packagingQty: data.packagingQty ?? null,
           status: data.status || "PENDING",
           items: {
             create: data.items.map((item) => ({

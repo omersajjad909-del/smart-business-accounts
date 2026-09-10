@@ -246,6 +246,11 @@ export async function POST(req: NextRequest) {
               discountPercent: i.discountPercent || 0,
               taxPercent: i.taxPercent || 0,
               amount: lineBase - lineDisc + lineTax,
+              hsCode: i.hsCode || null,
+              poNo: i.poNo || null,
+              secondaryUnit: i.secondaryUnit || null,
+              secondaryQty: i.secondaryQty ?? null,
+              secondaryRate: i.secondaryRate ?? null,
               meta: sanitizeLineMeta(i.meta),
             };
           }),
@@ -492,6 +497,11 @@ export async function PUT(req: NextRequest) {
                 discountPercent: i.discountPercent || 0,
                 taxPercent: i.taxPercent || 0,
                 amount: lineBase - lineDisc + lineTax,
+                hsCode: i.hsCode || null,
+                poNo: i.poNo || null,
+                secondaryUnit: i.secondaryUnit || null,
+                secondaryQty: i.secondaryQty ?? null,
+                secondaryRate: i.secondaryRate ?? null,
                 meta: sanitizeLineMeta(i.meta),
               };
             }),

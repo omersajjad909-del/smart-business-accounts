@@ -27,6 +27,13 @@ export type PrintColumn = {
   align?: "left" | "right" | "center";
   width?: string | number;
   render?: (val: any, row: any, idx: number) => React.ReactNode;
+  /**
+   * Groups this column under a spanning header cell (e.g. "Primary" over
+   * Unit/Qty/Rate, "Secondary" over its own Unit/Qty/Rate) — the dual-UOM
+   * layout a poly-bag/textile sales tax invoice bills in. Columns without a
+   * group render exactly as before, so this is opt-in per document.
+   */
+  group?: string;
 };
 
 export type PrintTotalsLine = { label: string; value: number; bold?: boolean; borderTop?: boolean };
@@ -40,6 +47,8 @@ export interface PrintDocA4Props {
   /** The seller's own NTN/STRN/Tax ID — label and value, shown only when both are set. */
   companyTaxLabel?: string;
   companyTaxValue?: string;
+  /** Seller's Sales Tax Registration Number — a separate line from the NTN above. */
+  companyStrn?: string;
   logoUrl?: string;
   showLogo?: boolean;
 
@@ -56,6 +65,7 @@ export interface PrintDocA4Props {
   partyAddress?: string;
   partyPhone?: string;
   partyNtn?: string;
+  partyStrn?: string;
 
   // Right-side meta fields (Invoice Date, PO Ref, etc.)
   metaFields?: { label: string; value: string }[];
@@ -74,6 +84,9 @@ export interface PrintDocA4Props {
    * for the gate.
    */
   summaryFields?: { label: string; value: string }[];
+
+  /** The net total spelled out — "One million five hundred ... Only." */
+  amountInWords?: string;
 
   // Footer
   notes?: string;
@@ -114,6 +127,7 @@ export function PrintDocA4({
   companyEmail,
   companyTaxLabel,
   companyTaxValue,
+  companyStrn,
   logoUrl,
   showLogo,
   docTitle,
@@ -126,11 +140,13 @@ export function PrintDocA4({
   partyAddress,
   partyPhone,
   partyNtn,
+  partyStrn,
   metaFields = [],
   columns,
   rows,
   totalsLines,
   summaryFields = [],
+  amountInWords,
   notes,
   terms,
   footerNote,
@@ -141,8 +157,28 @@ export function PrintDocA4({
   const RULE = `1px solid ${theme.rule}`;
   const banded = theme.band === "solid";
 
-  const partyLine = [partyAddress, partyPhone ? `Tel: ${partyPhone}` : "", partyNtn ? `NTN: ${partyNtn}` : ""]
-    .filter(Boolean).join("   ");
+  const partyLine = [
+    partyAddress,
+    partyPhone ? `Tel: ${partyPhone}` : "",
+    partyNtn ? `NTN: ${partyNtn}` : "",
+    partyStrn ? `STRN: ${partyStrn}` : "",
+  ].filter(Boolean).join("   ");
+
+  // Consecutive columns sharing a group become one spanning header cell
+  // ("Primary" over Unit/Qty/Rate); a column with no group gets its own
+  // cell spanning both header rows instead. No document passes `group`
+  // today except the dual-UOM sales tax invoice, so this is a no-op — a
+  // single header row exactly as before — everywhere else.
+  const hasColumnGroups = columns.some((c) => c.group);
+  const columnSegments = (() => {
+    const segs: { group: string | null; cols: PrintColumn[] }[] = [];
+    for (const c of columns) {
+      const last = segs[segs.length - 1];
+      if (c.group && last?.group === c.group) last.cols.push(c);
+      else segs.push({ group: c.group || null, cols: [c] });
+    }
+    return segs;
+  })();
 
   // Handed to the stylesheet below, so the rules that have to out-shout the
   // dashboard's own theme do not each need a copy of the palette.
@@ -192,9 +228,10 @@ export function PrintDocA4({
                 {companyEmail ? `  ·  ${companyEmail}` : ""}
               </div>
             )}
-            {companyTaxValue && (
+            {(companyTaxValue || companyStrn) && (
               <div className={banded ? undefined : "pdoc-label"} style={{ fontSize: 8.5, marginTop: 1, lineHeight: 1.45, opacity: banded ? 0.85 : 1, fontWeight: 700 }}>
-                {companyTaxLabel || "NTN"}: {companyTaxValue}
+                {companyTaxValue ? `${companyTaxLabel || "NTN"}: ${companyTaxValue}` : ""}
+                {companyStrn ? `${companyTaxValue ? "   " : ""}STRN: ${companyStrn}` : ""}
               </div>
             )}
           </div>
@@ -248,8 +285,40 @@ export function PrintDocA4({
         {/* ── The order itself ─────────────────────────────────────── */}
         <table className="pdoc-grid" style={{ width: "100%", borderCollapse: "collapse", fontSize: 9.5, marginBottom: 10 }}>
           <thead>
+            {hasColumnGroups && (
+              <tr>
+                {columnSegments.map((seg, i) =>
+                  seg.group ? (
+                    <th
+                      key={i}
+                      colSpan={seg.cols.length}
+                      style={{
+                        border: RULE, padding: theme.cellPad, textAlign: "center",
+                        fontSize: 8.5, fontWeight: 700, letterSpacing: 0.3,
+                        whiteSpace: "nowrap", background: theme.headBg, color: theme.headInk,
+                      }}
+                    >
+                      {seg.group}
+                    </th>
+                  ) : (
+                    <th
+                      key={seg.cols[0].key}
+                      rowSpan={2}
+                      style={{
+                        border: RULE, padding: theme.cellPad, width: seg.cols[0].width,
+                        textAlign: (seg.cols[0].align || "left") as any,
+                        fontSize: 8.5, fontWeight: 700, letterSpacing: 0.3,
+                        whiteSpace: "nowrap", background: theme.headBg, color: theme.headInk,
+                      }}
+                    >
+                      {seg.cols[0].label}
+                    </th>
+                  )
+                )}
+              </tr>
+            )}
             <tr>
-              {columns.map((c) => (
+              {(hasColumnGroups ? columns.filter((c) => c.group) : columns).map((c) => (
                 <th
                   key={c.key}
                   style={{
@@ -346,6 +415,12 @@ export function PrintDocA4({
               </tbody>
             </table>
           </div>
+
+          {amountInWords && (
+            <div style={{ fontSize: 8.5, lineHeight: 1.5, marginBottom: 12 }}>
+              <span className="pdoc-label" style={{ fontWeight: 700 }}>Amount: </span>{amountInWords}
+            </div>
+          )}
 
           {terms && (
             <div style={{ fontSize: 8.5, lineHeight: 1.5, whiteSpace: "pre-wrap", marginBottom: 12 }}>

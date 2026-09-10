@@ -1605,6 +1605,7 @@ const [searchTerm, setSearchTerm] = useState("");
                 companyPhone={printPrefs.showPhone === false ? undefined : companyInfo?.phone}
                 companyTaxLabel={companyInfo?.ntnLabel}
                 companyTaxValue={printPrefs.showTaxNumber === false ? undefined : companyInfo?.ntn}
+                companyStrn={printPrefs.showTaxNumber === false ? undefined : companyInfo?.gst}
                 logoUrl={companyInfo?.logoUrl}
                 showLogo={!!companyInfo?.logoUrl}
                 docTitle="PURCHASE INVOICE"

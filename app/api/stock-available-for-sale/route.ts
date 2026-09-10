@@ -36,6 +36,8 @@ export async function GET(req: NextRequest) {
         description: true,
         barcode: true,
         rate: true,
+        code: true,
+        unit: true,
       },
     });
 
@@ -50,6 +52,8 @@ export async function GET(req: NextRequest) {
         barcode: i.barcode,
         salePrice: i.rate ?? 0,
         availableQty: stockMap.get(i.id) ?? 0,
+        code: i.code,
+        unit: i.unit,
       }))
     );
 
