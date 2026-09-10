@@ -691,7 +691,12 @@ function CostingInner() {
                     on a challan instead of into a production order. Shown only
                     where job work is switched on; a company that does everything
                     in-house never sees a choice it does not have. */}
-                {jobWorkEnabled && jobWorkSeed && (
+                {/* The button appears wherever Create BOM does, not only where the
+                    standard could be derived. Hiding it when a formula declares no
+                    "Units per batch" output left the operator staring at one button
+                    where two were promised, with nothing saying why — so the
+                    missing role is now stated, and the road stays open either way. */}
+                {jobWorkEnabled && (
                   <div style={{ marginTop: 16, paddingTop: 16, borderTop: `1px solid ${BORDER}` }}>
                     <div className="cxSectionHead">
                       <div>
@@ -701,7 +706,7 @@ function CostingInner() {
                           this formula worked out already filled in — so consumption is never typed
                           in by hand. Pick the job worker and the material there.
                         </div>
-                        {jobWorkSeed.stdPerPc != null && (
+                        {jobWorkSeed?.stdPerPc != null ? (
                           <div style={{ fontFamily: MONO, fontSize: 11.5, color: "rgba(255,255,255,.45)", marginTop: 9, lineHeight: 1.7 }}>
                             {jobWorkSeed.unitsPerBatch != null && (
                               <>1 batch = {Math.round(jobWorkSeed.unitsPerBatch * 100) / 100} pcs · std/pc = {jobWorkSeed.stdPerPc}<br /></>
@@ -712,6 +717,14 @@ function CostingInner() {
                                 <span style={{ color: "#5eead4" }}>{jobWorkPlan.leftover} left over, not waste</span>
                               </>
                             )}
+                          </div>
+                        ) : (
+                          <div style={{ fontSize: 11.5, color: "#fbbf24", marginTop: 9, lineHeight: 1.6, maxWidth: 480 }}>
+                            This formula has no output marked{" "}
+                            <span style={{ fontFamily: MONO }}>Units per batch</span> — the one value
+                            that says how many pieces come off one roll. Set that role on the right
+                            output and the standard will carry across on its own; until then the
+                            challan opens blank and std / pc has to be typed.
                           </div>
                         )}
                       </div>
