@@ -103,12 +103,32 @@ export const JOB_WORK_ACCOUNTS = {
 
 /* ─────────────────────────── Availability gate ─────────────────────────── */
 
+/** The Pages & Modules id that carries Job Work. See dashboardFeatureRegistry. */
+export const JOB_WORK_FEATURE_ID = "JOB_WORK";
+
+/**
+ * Three ways in, and no fourth.
+ *
+ * An internal test workspace, where the module was built. A demo sandbox —
+ * throwaway data on a company nobody keeps books in, which is the point of
+ * showing it there while it is still off for everyone else. And a real tenant
+ * whose plan an admin has deliberately ticked Job Work for in
+ * Admin → Plans → Pages & Modules, which no plan ships with.
+ *
+ * The plan check goes through the same resolution the dashboard uses, so a
+ * company that can reach this module can also see its sidebar link, and one
+ * that cannot gets neither — the trap this gate exists to avoid is a link that
+ * opens a page whose API then refuses the company.
+ */
 export async function isJobWorkEnabled(companyId: string): Promise<boolean> {
   const company = await prisma.company.findUnique({
     where: { id: companyId },
-    select: { isInternalTest: true },
+    select: { isInternalTest: true, isDemo: true },
   });
-  return company?.isInternalTest === true;
+  if (!company) return false;
+  if (company.isInternalTest === true) return true;
+  if (company.isDemo === true) return true;
+  return companyOwnsDashboardFeature(companyId, JOB_WORK_FEATURE_ID);
 }
 
 /**
