@@ -760,8 +760,10 @@ function SalesInvoiceContent() {
    */
   const printDocProps = {
     companyName: companyInfo?.name || "",
-    companyAddress: companyInfo?.address,
-    companyPhone: companyInfo?.phone,
+    companyAddress: (printPrefs as any).showAddress === false ? undefined : companyInfo?.address,
+    companyPhone: (printPrefs as any).showPhone === false ? undefined : companyInfo?.phone,
+    companyTaxLabel: companyInfo?.ntnLabel,
+    companyTaxValue: (printPrefs as any).showTaxNumber === false ? undefined : companyInfo?.ntn,
     showLogo: printPrefs.showLogo,
     logoUrl: printPrefs.logoUrl,
     // The look the company chose in Admin -> Print & Branding.
@@ -1090,7 +1092,7 @@ function SalesInvoiceContent() {
                           </div>
                           {(companyInfo.ntn || companyInfo.gst) && (
                             <div style={{ fontSize: 11, color: "var(--text-muted)", marginTop: 3, display: "flex", gap: 12 }}>
-                              {companyInfo.ntn && <span>NTN: {companyInfo.ntn}</span>}
+                              {companyInfo.ntn && <span>{companyInfo.ntnLabel || "NTN"}: {companyInfo.ntn}</span>}
                               {companyInfo.gst && <span>GST: {companyInfo.gst}</span>}
                             </div>
                           )}

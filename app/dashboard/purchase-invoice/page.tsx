@@ -263,6 +263,7 @@ const [searchTerm, setSearchTerm] = useState("");
   const [currencyId, setCurrencyId] = useState("");
   const [exchangeRate, setExchangeRate] = useState(1);
   const [companyInfo, setCompanyInfo] = useState<any>(null);
+  const [printPrefs, setPrintPrefs] = useState({ showAddress: true, showPhone: true, showTaxNumber: true });
 
   // ── Query Mode (F7 / F8) ────────────────────────────────────────────────────
   const [piQueryMode,    setPiQueryMode]    = useState(false);
@@ -358,7 +359,23 @@ const [searchTerm, setSearchTerm] = useState("");
   }, [piQueryMode, piQueryIdx, piQueryResults]);
 
   useEffect(() => {
-    fetch("/api/me/company").then(r => r.ok ? r.json() : null).then(d => { if (d) setCompanyInfo(d); }).catch(() => {});
+    fetch("/api/me/company").then(r => r.ok ? r.json() : null).then(d => { if (d) setCompanyInfo((c: any) => ({ ...d, ...c })); }).catch(() => {});
+    // Company's own address, phone/email and tax registration live in
+    // admin-control, not on the Company row /api/me/company returns.
+    fetch("/api/company/admin-control").then(r => r.ok ? r.json() : null).then(d => {
+      if (d?.printPreferences) setPrintPrefs(p => ({ ...p, ...d.printPreferences }));
+      if (d?.companyIdentity || d?.invoiceContact || d?.taxProfile) {
+        setCompanyInfo((c: any) => ({
+          ...(c || {}),
+          address: d.companyIdentity?.legalAddress || c?.address,
+          phone: d.invoiceContact?.phone || c?.phone,
+          email: d.invoiceContact?.email || c?.email,
+          ntn: d.taxProfile?.taxIdValue || c?.ntn,
+          ntnLabel: d.taxProfile?.taxIdLabel || c?.ntnLabel,
+          gst: d.taxProfile?.gstNumber || c?.gst,
+        }));
+      }
+    }).catch(() => {});
   }, []);
 
   useEffect(() => {
@@ -1188,7 +1205,7 @@ const [searchTerm, setSearchTerm] = useState("");
                     <div style={{ padding: "8px 10px", background: "rgba(16,185,129,.04)", borderRadius: 8, border: "1px solid rgba(16,185,129,.12)", marginBottom: 9 }}>
                       <div style={{ fontWeight: 700, fontSize: 13, marginBottom: 2 }}>{companyInfo.name}</div>
                       {companyInfo.address && <div style={{ fontSize: 11, color: MUTED, marginBottom: 2 }}>{companyInfo.address}</div>}
-                      {(companyInfo.phone || companyInfo.ntn) && <div style={{ fontSize: 10, color: MUTED, display: "flex", gap: 10 }}>{companyInfo.phone && <span>{companyInfo.phone}</span>}{companyInfo.ntn && <span>NTN: {companyInfo.ntn}</span>}</div>}
+                      {(companyInfo.phone || companyInfo.ntn) && <div style={{ fontSize: 10, color: MUTED, display: "flex", gap: 10 }}>{companyInfo.phone && <span>{companyInfo.phone}</span>}{companyInfo.ntn && <span>{companyInfo.ntnLabel || "NTN"}: {companyInfo.ntn}</span>}</div>}
                     </div>
                   ) : <div style={{ fontSize: 11, color: MUTED, fontStyle: "italic", marginBottom: 9 }}>Loading…</div>}
                   <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 9 }}>
@@ -1584,8 +1601,10 @@ const [searchTerm, setSearchTerm] = useState("");
             <PrintPaperWrapper>
               <PrintDocA4
                 companyName={companyInfo?.name || "Your Company"}
-                companyAddress={companyInfo?.address}
-                companyPhone={companyInfo?.phone}
+                companyAddress={printPrefs.showAddress === false ? undefined : companyInfo?.address}
+                companyPhone={printPrefs.showPhone === false ? undefined : companyInfo?.phone}
+                companyTaxLabel={companyInfo?.ntnLabel}
+                companyTaxValue={printPrefs.showTaxNumber === false ? undefined : companyInfo?.ntn}
                 logoUrl={companyInfo?.logoUrl}
                 showLogo={!!companyInfo?.logoUrl}
                 docTitle="PURCHASE INVOICE"

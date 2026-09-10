@@ -39,6 +39,17 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
+  // Every plan — Starter, Pro, Enterprise — is sold and billed for one
+  // company. This endpoint was a free side door around that: an existing
+  // admin could self-serve a second, third, ... company, each starting on a
+  // brand-new free STARTER workspace with its own users/branch/invoice
+  // allowance. There is no plan tier that is meant to lift this, so it is a
+  // flat block rather than another limit table to configure.
+  return NextResponse.json(
+    { error: "Your plan includes one company. Contact support if you need to manage additional businesses." },
+    { status: 403 },
+  );
+
   try {
     const body = await req.json();
     const { name, code, baseCurrency } = body;
