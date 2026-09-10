@@ -19,6 +19,9 @@ import {
   runFormula,
   checkExpression,
   validateKey,
+  applyProfit,
+  toProfit,
+  NO_PROFIT,
   FUNCTIONS,
   type CostingFormula,
   type FormulaInput,
@@ -73,6 +76,7 @@ const CSS = `
 .fxIn{display:grid;grid-template-columns:1.05fr 1.3fr .6fr .95fr 1.05fr auto auto;gap:8px;align-items:center}
 .fxOut{display:grid;grid-template-columns:1.05fr 1.3fr .6fr 1.1fr auto auto;gap:8px;align-items:center}
 .fxStep{display:grid;grid-template-columns:1.05fr 1.3fr .6fr auto;gap:8px;align-items:center}
+.fxProfit{display:grid;grid-template-columns:1fr 1.3fr;gap:8px;align-items:center;max-width:330px}
 .fxHead{font-size:9.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
   color:rgba(255,255,255,.32);padding:0 2px 3px}
 .fxFormulaTitle{flex:1 1 220px;min-width:220px;word-break:normal;overflow-wrap:anywhere}
@@ -117,6 +121,7 @@ function emptyDraft(category: string): Draft {
     inputs: [{ key: "materialCost", label: "Material cost", unit: "Rs", defaultValue: 100, askOnRun: true }],
     steps: [{ key: "costPerPc", label: "Cost per unit", expression: "materialCost", unit: "Rs" }],
     outputs: [{ key: "costPerPc", label: "Cost per unit", unit: "Rs", role: "cost_per_unit", primary: true }],
+    profit: { ...NO_PROFIT },
   };
 }
 
@@ -130,6 +135,7 @@ function toDraft(record: BusinessRecord): Draft {
     inputs: Array.isArray(d.inputs) ? (d.inputs as FormulaInput[]) : [],
     steps: Array.isArray(d.steps) ? (d.steps as FormulaStep[]) : [],
     outputs: Array.isArray(d.outputs) ? (d.outputs as FormulaOutput[]) : [],
+    profit: toProfit(d.profit),
   };
 }
 
@@ -192,7 +198,7 @@ export default function FormulasPage() {
 
   const templateCard = (t: (typeof FORMULA_TEMPLATES)[number]) => (
     <button key={t.templateId}
-      onClick={() => setEditing({ id: null, draft: { ...structuredClone(t), name: t.name } })}
+      onClick={() => setEditing({ id: null, draft: { ...structuredClone(t), name: t.name, profit: toProfit(t.profit) } })}
       style={{ ...btn(), display: "block", textAlign: "left", padding: "13px 15px", lineHeight: 1.5 }}>
       <div style={{ fontSize: 13, fontWeight: 700, color: "white", marginBottom: 3 }}>{t.name}</div>
       <div style={{ fontSize: 11.5, color: "rgba(255,255,255,.38)", fontWeight: 400 }}>{t.summary}</div>
@@ -257,6 +263,7 @@ export default function FormulasPage() {
           inputs: d.inputs,
           steps: d.steps,
           outputs: d.outputs,
+          profit: d.profit ?? NO_PROFIT,
         },
       };
       if (editing.id) await store.update(editing.id, payload);
@@ -315,6 +322,15 @@ export default function FormulasPage() {
       });
     };
 
+    /* Profit lands on the starred output — the one number the formula is
+       really for. Same rule the run screen uses, so what an author previews is
+       what an operator gets. */
+    const primaryOut = d.outputs.find((o) => o.primary && o.key) ?? d.outputs.find((o) => o.key);
+    const baseRate = typeof preview?.values[primaryOut?.key ?? ""] === "number"
+      ? (preview!.values[primaryOut!.key] as number)
+      : null;
+    const { amount: profitAmount, total: saleRate } = applyProfit(baseRate, d.profit);
+
     /* Written once, hung in two places. On a wide screen it rides in the
        sticky right column; once the columns stack it would land at the very
        bottom, a scroll away from the numbers that change it — so on narrow
@@ -355,6 +371,35 @@ export default function FormulasPage() {
             <div style={{ fontSize: 12.5, color: "rgba(255,255,255,.3)" }}>Add an output to see the result.</div>
           )}
         </div>
+
+        {/* Cost, then what goes on top of it, then what the customer pays.
+            Shown only once there is a profit to show — a cost-only formula
+            should not grow a second copy of its own total. */}
+        {saleRate != null && profitAmount !== 0 && (
+          <div style={{ marginTop: 12, paddingTop: 11, borderTop: `1px solid ${BORDER}`, display: "flex", flexDirection: "column", gap: 6 }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 10 }}>
+              <span style={{ fontSize: 12.5, color: "rgba(255,255,255,.5)" }}>
+                Profit
+                <span style={{ fontSize: 11, color: "rgba(255,255,255,.3)", marginLeft: 5 }}>
+                  {d.profit?.mode === "percent" ? `${fmt(d.profit?.value)}%` : `Rs ${fmt(d.profit?.value)} flat`}
+                </span>
+              </span>
+              <span style={{ fontFamily: MONO, fontVariantNumeric: "tabular-nums", fontSize: 13, fontWeight: 700, color: "rgba(255,255,255,.85)" }}>
+                + {fmt(profitAmount)}
+              </span>
+            </div>
+            <div style={{
+              display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 10,
+              padding: "10px 12px", borderRadius: 10,
+              background: "rgba(52,211,153,.09)", border: "1px solid rgba(52,211,153,.25)",
+            }}>
+              <span style={{ fontSize: 12.5, color: "rgba(255,255,255,.5)" }}>Sale rate</span>
+              <span style={{ fontFamily: MONO, fontVariantNumeric: "tabular-nums", fontSize: 17, fontWeight: 700, color: "#34d399" }}>
+                {fmt(saleRate)}<span style={{ fontSize: 10.5, color: "rgba(255,255,255,.3)", marginLeft: 4 }}>{primaryOut?.unit}</span>
+              </span>
+            </div>
+          </div>
+        )}
       </div>
     );
 
@@ -512,6 +557,60 @@ export default function FormulasPage() {
                   turn an input into a list of stock sizes, or stop the operator being asked for it.
                 </div>
               )}
+
+              {/* Profit. Not a step and not a row above — see FormulaProfit.
+                  It sits in Inputs because it is a number an author fills in,
+                  but it lands on the finished cost rather than inside it. */}
+              <div style={{
+                marginTop: 5, padding: "13px 14px", borderRadius: 11,
+                background: "rgba(52,211,153,.05)", border: "1px solid rgba(52,211,153,.22)",
+              }}>
+                <div style={{ fontSize: 13, fontWeight: 700, color: "#34d399" }}>Profit</div>
+                <div style={{ fontSize: 11.5, color: "rgba(255,255,255,.35)", marginTop: 2, lineHeight: 1.6, marginBottom: 10 }}>
+                  Added on top of the starred output to make the sale rate — Rs 2 a piece, or 15% of cost.
+                  This is the formula&rsquo;s usual profit; whoever runs it can still change it for one quote.
+                </div>
+                <div className="fxProfit">
+                  <input
+                    type="number" step="any"
+                    value={d.profit?.value || ""}
+                    onChange={(e) => patch((x) => {
+                      x.profit = { mode: x.profit?.mode ?? "percent", value: Number(e.target.value) || 0 };
+                    })}
+                    placeholder="0"
+                    style={monoInput}
+                  />
+                  <select
+                    value={d.profit?.mode ?? "percent"}
+                    onChange={(e) => patch((x) => {
+                      x.profit = { mode: e.target.value as "amount" | "percent", value: x.profit?.value ?? 0 };
+                    })}
+                    style={input}
+                  >
+                    <option value="amount">Rs — flat</option>
+                    <option value="percent">% — of cost</option>
+                  </select>
+                </div>
+                {/* The sum spelled out, because "15%" and "Rs 15" look the same
+                    in a box and land nowhere near each other on the rate. */}
+                <div style={{ fontSize: 12, fontFamily: MONO, marginTop: 9, color: "rgba(255,255,255,.45)" }}>
+                  {baseRate == null ? (
+                    <span style={{ fontFamily: FONT, color: "rgba(255,255,255,.3)" }}>
+                      Star an output under <strong style={{ color: "rgba(255,255,255,.45)" }}>Outputs</strong> to see the sale rate.
+                    </span>
+                  ) : profitAmount === 0 ? (
+                    <span style={{ fontFamily: FONT, color: "rgba(255,255,255,.3)" }}>
+                      No profit — the formula quotes {fmt(baseRate)} {primaryOut?.unit ?? ""} at cost.
+                    </span>
+                  ) : (
+                    <>
+                      {fmt(baseRate)} + {fmt(profitAmount)} ={" "}
+                      <strong style={{ color: "#34d399", fontSize: 13.5 }}>{fmt(saleRate)}</strong>
+                      {primaryOut?.unit && <span style={{ color: "rgba(255,255,255,.3)" }}> {primaryOut.unit}</span>}
+                    </>
+                  )}
+                </div>
+              </div>
             </Section>
 
             {/* The stacked-layout home for the live result — see liveResultCard. */}

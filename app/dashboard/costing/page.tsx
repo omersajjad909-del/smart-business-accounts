@@ -31,6 +31,8 @@ import { useSearchParams } from "next/navigation";
 import { useBusinessRecords, type BusinessRecord } from "@/lib/useBusinessRecords";
 import {
   runFormula,
+  applyProfit,
+  toProfit,
   type CostingFormula,
   type FormulaInput,
   type FormulaStep,
@@ -143,6 +145,7 @@ function toFormula(record: BusinessRecord): CostingFormula {
     inputs: Array.isArray(d.inputs) ? (d.inputs as FormulaInput[]) : [],
     steps: Array.isArray(d.steps) ? (d.steps as FormulaStep[]) : [],
     outputs: Array.isArray(d.outputs) ? (d.outputs as FormulaOutput[]) : [],
+    profit: toProfit(d.profit),
   };
 }
 
@@ -187,8 +190,9 @@ function CostingInner() {
   const [showWorking, setShowWorking] = useState(true);
   // Which sheet is being sent to the printer — the quote, or the cutting detail.
   const [printKind, setPrintKind] = useState<"cost" | "working" | null>(null);
-  // Profit is not part of the formula — it is what to charge on top of what the
-  // job costs, decided per quote rather than baked into the costing itself.
+  // What to charge on top of what the job costs. The formula carries the usual
+  // one, set by whoever wrote it; these hold the figure for the quote on screen
+  // so it can be moved for a single customer without editing the costing.
   const [profitMode, setProfitMode] = useState<"amount" | "percent">("percent");
   const [profitValue, setProfitValue] = useState<number>(0);
   // Job work is still gated to internal test workspaces, so the second button
@@ -233,7 +237,11 @@ function CostingInner() {
     setValues(next);
     setSheetName(selected.formula.name);
     setSavedNote("");
-    setProfitValue(0);
+    // The formula's own profit, not zero — a formula written to quote at 15%
+    // should quote at 15% the moment it is opened.
+    const profit = toProfit(selected.formula.profit);
+    setProfitMode(profit.mode);
+    setProfitValue(profit.value);
   }, [selectedId]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const run = useMemo(
@@ -262,10 +270,8 @@ function CostingInner() {
   const baseRate = typeof run?.values[primary?.key ?? ""] === "number"
     ? (run!.values[primary!.key] as number)
     : null;
-  const profitAmount = baseRate == null ? 0
-    : profitMode === "percent" ? (baseRate * profitValue) / 100
-    : profitValue;
-  const saleRate = baseRate == null ? null : baseRate + profitAmount;
+  const { amount: profitAmount, total: saleRate } =
+    applyProfit(baseRate, { mode: profitMode, value: profitValue });
 
   async function saveSheet() {
     if (!selected || !run) return;
@@ -588,6 +594,14 @@ function CostingInner() {
                           {fmt(saleRate)}
                           <span style={{ fontSize: 12, color: "rgba(255,255,255,.32)", marginLeft: 6, fontWeight: 600 }}>{primary.unit}</span>
                         </div>
+                        {/* The sum behind the number. A percent typed into the
+                            box says nothing about how many rupees it is until
+                            it is spelled out against the cost. */}
+                        {profitAmount !== 0 && (
+                          <div style={{ fontFamily: MONO, fontSize: 11.5, color: "rgba(255,255,255,.38)", marginTop: 4, fontVariantNumeric: "tabular-nums" }}>
+                            {fmt(baseRate)} + {fmt(profitAmount)} profit
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>
