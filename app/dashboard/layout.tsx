@@ -17,6 +17,7 @@ import { hasPermission as baseHasPermission } from "@/lib/hasPermission";
 import { PERMISSIONS } from "@/lib/permissions";
 import { useGlobalEnterNavigation } from "@/hooks/useGlobalEnterNavigation";
 import { useAutoLogout } from "@/hooks/useAutoLogout";
+import { useVisiblePoll } from "@/hooks/useVisiblePoll";
 import { fetchRateFormula } from "@/hooks/useRateFormula";
 import { ModeToggle } from "@/components/mode-toggle";
 import AppearanceApplier from "@/components/AppearanceApplier";
@@ -700,45 +701,45 @@ export default function DashboardLayout({
   const shiftEndMsRef = useRef(0);
   const shiftWarningActiveRef = useRef(false);
 
+  // Every signed-in user on every dashboard screen runs this, so it is only
+  // worth a request while the tab is in front of someone. A shift that ends
+  // behind a hidden tab is caught by the refocus call the instant they come
+  // back — before they can do anything in the app.
+  useVisiblePoll(async () => {
+    try {
+      const res = await fetch("/api/user/shift-status");
+      if (!res.ok) return;
+      const d = await res.json() as {
+        enabled: boolean; isInShift: boolean;
+        minutesRemaining: number; warnMinutes: number;
+      };
+      if (!d.enabled) return;
+      if (!d.isInShift || d.minutesRemaining <= 0) {
+        logout();
+        return;
+      }
+      if (d.minutesRemaining <= d.warnMinutes) {
+        shiftEndMsRef.current = Date.now() + d.minutesRemaining * 60_000;
+        shiftWarningActiveRef.current = true;
+        setShiftSecsLeft(d.minutesRemaining * 60);
+        setShowShiftWarning(true);
+      } else {
+        shiftWarningActiveRef.current = false;
+        setShowShiftWarning(false);
+      }
+    } catch {}
+  }, 60_000);
+
+  // Local countdown for the warning banner — pure client state, no requests.
   useEffect(() => {
-    let pollHandle: ReturnType<typeof setInterval>;
-    let countHandle: ReturnType<typeof setInterval>;
-
-    async function pollShift() {
-      try {
-        const res = await fetch("/api/user/shift-status");
-        if (!res.ok) return;
-        const d = await res.json() as {
-          enabled: boolean; isInShift: boolean;
-          minutesRemaining: number; warnMinutes: number;
-        };
-        if (!d.enabled) return;
-        if (!d.isInShift || d.minutesRemaining <= 0) {
-          logout();
-          return;
-        }
-        if (d.minutesRemaining <= d.warnMinutes) {
-          shiftEndMsRef.current = Date.now() + d.minutesRemaining * 60_000;
-          shiftWarningActiveRef.current = true;
-          setShiftSecsLeft(d.minutesRemaining * 60);
-          setShowShiftWarning(true);
-        } else {
-          shiftWarningActiveRef.current = false;
-          setShowShiftWarning(false);
-        }
-      } catch {}
-    }
-
-    pollShift();
-    pollHandle = setInterval(pollShift, 60_000);
-    countHandle = setInterval(() => {
+    const countHandle = setInterval(() => {
       if (!shiftWarningActiveRef.current) return;
       const s = Math.max(0, Math.floor((shiftEndMsRef.current - Date.now()) / 1000));
       setShiftSecsLeft(s);
       if (s <= 0) logout();
     }, 1000);
 
-    return () => { clearInterval(pollHandle); clearInterval(countHandle); };
+    return () => clearInterval(countHandle);
   }, []);
 
   // Global keyboard shortcuts — driven by per-company config from API

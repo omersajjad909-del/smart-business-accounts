@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
+import { useVisiblePoll } from "@/hooks/useVisiblePoll";
 
 /* ─── Types ──────────────────────────────────────────────────────────────── */
 type Msg = {
@@ -268,36 +269,35 @@ export default function ChatWidget() {
 
   useEffect(() => { if (open) setUnread(0); }, [open]);
 
-  // Poll for agent replies when escalated (every 5 sec)
+  // Poll for agent replies when escalated (every 5 sec, visible tabs only).
+  // A visitor who escalated and then wandered off to another tab is not reading
+  // replies anyway — the catch-up call on refocus shows them everything they
+  // missed the moment they come back.
+  const agentPollKey = escalated && convId && !convId.startsWith("tmp-") ? convId : null;
+
   useEffect(() => {
-    if (!escalated || !convId || convId.startsWith("tmp-")) return;
-    escalatedAt.current = new Date();
+    if (agentPollKey) escalatedAt.current = new Date();
+  }, [agentPollKey]);
 
-    async function pollAgent() {
-      try {
-        const res = await fetch(`/api/chat/messages?conversationId=${convId}`, { cache: "no-store" });
-        if (!res.ok) return;
-        const { data } = await res.json();
-        if (!Array.isArray(data)) return;
-        for (const msg of data) {
-          if (shownAgentIds.current.has(msg.id)) continue;
-          if (msg.sender !== "agent") { shownAgentIds.current.add(msg.id); continue; }
-          if (escalatedAt.current && new Date(msg.created_at) < escalatedAt.current) {
-            shownAgentIds.current.add(msg.id); continue;
-          }
-          shownAgentIds.current.add(msg.id);
-          setAgentReplied(true);
-          setMessages(p => [...p, { id: mkId(), sender: "agent", text: msg.text, time: msg.created_at }]);
-          if (!open) setUnread(u => u + 1);
+  useVisiblePoll(async () => {
+    try {
+      const res = await fetch(`/api/chat/messages?conversationId=${agentPollKey}`, { cache: "no-store" });
+      if (!res.ok) return;
+      const { data } = await res.json();
+      if (!Array.isArray(data)) return;
+      for (const msg of data) {
+        if (shownAgentIds.current.has(msg.id)) continue;
+        if (msg.sender !== "agent") { shownAgentIds.current.add(msg.id); continue; }
+        if (escalatedAt.current && new Date(msg.created_at) < escalatedAt.current) {
+          shownAgentIds.current.add(msg.id); continue;
         }
-      } catch {}
-    }
-
-    const t = setInterval(pollAgent, 5000);
-    pollAgent();
-    return () => clearInterval(t);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [escalated, convId]);
+        shownAgentIds.current.add(msg.id);
+        setAgentReplied(true);
+        setMessages(p => [...p, { id: mkId(), sender: "agent", text: msg.text, time: msg.created_at }]);
+        if (!open) setUnread(u => u + 1);
+      }
+    } catch {}
+  }, 5000, agentPollKey);
 
   /* ── Start chat: show welcome immediately, no API call needed ── */
 
