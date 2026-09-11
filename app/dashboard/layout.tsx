@@ -2582,13 +2582,6 @@ export default function DashboardLayout({
                   entries now, and each is a row in Plans → Pages & Modules, so
                   the plan still decides who sees them. */}
               {currentUser?.role === "ADMIN" && <NavLink href="/dashboard/company-profile" pathname={pathname}>🏢 Company Profile</NavLink>}
-              {/* Linked to nothing until now — reachable only by typing the URL
-                  or finding it in search. It holds the address, phone, email and
-                  the NTN/STRN that every printed invoice and challan takes its
-                  header from, so being unfindable meant bills went out with a
-                  blank header and no way to see why. Sits next to Company
-                  Profile because the two are halves of the same thing. */}
-              {currentUser?.role === "ADMIN" && <NavLink href="/dashboard/business-settings" pathname={pathname}>🏷️ Business Settings</NavLink>}
               <NavLink href="/dashboard/admin-control" pathname={pathname}>Admin Control Center</NavLink>
               <NavLink href="/dashboard/business-features" pathname={pathname}>⚡ Business Features</NavLink>
               <NavLink href="/dashboard/notifications-config" pathname={pathname}>💬 Notification Settings</NavLink>
@@ -3181,7 +3174,6 @@ export default function DashboardLayout({
                     {/* Menu items */}
                     {[
                       ...(currentUser?.role === "ADMIN" ? [{ icon:"🏢", label:"Company Profile", href:"/dashboard/company-profile" }] : []),
-                      ...(currentUser?.role === "ADMIN" ? [{ icon:"🏷️", label:"Business Settings", href:"/dashboard/business-settings" }] : []),
                       { icon:"👤", label:"Account Settings", href:"/dashboard/account-settings" },
                       { icon:"💳", label:"My Billing",        href:"/dashboard/billing" },
                       { icon:"🎨", label:"Appearance",       href:"/dashboard/settings/appearance" },

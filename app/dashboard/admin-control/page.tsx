@@ -8,6 +8,7 @@ import { CURRENCY_LABEL, SUPPORTED_CURRENCIES, currencyByCountry } from "@/lib/c
 import Link from "next/link";
 import { useResponsive } from "@/hooks/useResponsive";
 import { PRINT_TEMPLATES, normalizePrintTemplate } from "@/components/print/printTemplates";
+import { PK_PROVINCES } from "@/lib/pkProvinces";
 
 /* ─── types ─── */
 type Branch = { id: string; code: string; name: string; city?: string | null; isActive: boolean; address?: string; latitude?: number | null; longitude?: number | null; geoSource?: "exact" | "manual" | "country" | "unset" };
@@ -20,7 +21,7 @@ type CompanyIdentityProfile = { legalName: string; legalAddress: string; city: s
 type InvoiceContactProfile = { contactName: string; email: string; phone: string; supportEmail: string; supportPhone: string };
 type BankDetailsProfile = { bankName: string; accountTitle: string; accountNumber: string; iban: string; swiftCode: string; branchName: string; branchCode: string };
 type BranchGeoProfile = { address: string; latitude: number | null; longitude: number | null; geoSource: "exact" | "manual" | "country" | "unset" };
-type AdminControlSettings = { branchAssignments: Record<string, string[]>; printPreferences: PrintPreferences; taxProfile: TaxProfile; companyIdentity: CompanyIdentityProfile; invoiceContact: InvoiceContactProfile; bankDetails: BankDetailsProfile; branchLocations: Record<string, BranchGeoProfile> };
+type AdminControlSettings = { branchAssignments: Record<string, string[]>; printPreferences: PrintPreferences; taxProfile: TaxProfile; companyIdentity: CompanyIdentityProfile; invoiceContact: InvoiceContactProfile; bankDetails: BankDetailsProfile; bankAccounts: BankDetailsProfile[]; branchLocations: Record<string, BranchGeoProfile> };
 type BackupRow = { id: string; fileName: string; status: string; createdAt: string };
 type TabId = "general" | "print" | "branches" | "team" | "permissions" | "finance";
 
@@ -134,7 +135,7 @@ export default function AdminControlPage() {
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
   const [userPermsMap, setUserPermsMap] = useState<Record<string, string[]>>({});
   const [savingUserPerms, setSavingUserPerms] = useState(false);
-  const [settings, setSettings] = useState<AdminControlSettings>({ branchAssignments: {}, printPreferences: DEFAULT_PRINT, taxProfile: DEFAULT_TAX, companyIdentity: DEFAULT_IDENTITY, invoiceContact: DEFAULT_CONTACT, bankDetails: DEFAULT_BANK, branchLocations: {} });
+  const [settings, setSettings] = useState<AdminControlSettings>({ branchAssignments: {}, printPreferences: DEFAULT_PRINT, taxProfile: DEFAULT_TAX, companyIdentity: DEFAULT_IDENTITY, invoiceContact: DEFAULT_CONTACT, bankDetails: DEFAULT_BANK, bankAccounts: [], branchLocations: {} });
   const [opsLoading, setOpsLoading] = useState<null | "backup" | "download">(null);
 
   const availablePermissions = useMemo(() => Object.values(PERMISSIONS), []);
@@ -165,7 +166,7 @@ export default function AdminControlPage() {
       const userList: UserRow[] = Array.isArray(userData) ? userData : [];
       setUsers(userList);
       setRoles(Array.isArray(roleData) ? roleData : []);
-      setSettings({ branchAssignments: settingsData?.branchAssignments || {}, printPreferences: { ...DEFAULT_PRINT, ...(settingsData?.printPreferences || {}) }, taxProfile: { ...DEFAULT_TAX, ...(settingsData?.taxProfile || {}) }, companyIdentity: { ...DEFAULT_IDENTITY, ...(settingsData?.companyIdentity || {}) }, invoiceContact: { ...DEFAULT_CONTACT, ...(settingsData?.invoiceContact || {}) }, bankDetails: { ...DEFAULT_BANK, ...(settingsData?.bankDetails || {}) }, branchLocations: settingsData?.branchLocations || {} });
+      setSettings({ branchAssignments: settingsData?.branchAssignments || {}, printPreferences: { ...DEFAULT_PRINT, ...(settingsData?.printPreferences || {}) }, taxProfile: { ...DEFAULT_TAX, ...(settingsData?.taxProfile || {}) }, companyIdentity: { ...DEFAULT_IDENTITY, ...(settingsData?.companyIdentity || {}) }, invoiceContact: { ...DEFAULT_CONTACT, ...(settingsData?.invoiceContact || {}) }, bankDetails: { ...DEFAULT_BANK, ...(settingsData?.bankDetails || {}) }, bankAccounts: Array.isArray(settingsData?.bankAccounts) ? settingsData.bankAccounts : [], branchLocations: settingsData?.branchLocations || {} });
       const firstRole = Array.isArray(roleData) && roleData.length > 0 ? roleData[0] : null;
       if (firstRole?.role) { setSelectedRole(firstRole.role); setRolePermissions(firstRole.permissions || []); }
       const permsMap: Record<string, string[]> = {};
@@ -221,7 +222,7 @@ export default function AdminControlPage() {
   async function saveFinance() {
     setSaving(true);
     try {
-      const res = await fetch("/api/company/admin-control", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ taxProfile: settings.taxProfile, bankDetails: settings.bankDetails }) });
+      const res = await fetch("/api/company/admin-control", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ taxProfile: settings.taxProfile, bankAccounts: settings.bankAccounts, bankDetails: settings.bankAccounts[0] || settings.bankDetails }) });
       if (!res.ok) throw new Error();
       flash("Finance settings saved.");
     } catch { flash("Failed to save.", false); } finally { setSaving(false); }
@@ -414,7 +415,24 @@ export default function AdminControlPage() {
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
                   <Field label="Legal Address" span2><input style={inp} value={settings.companyIdentity.legalAddress} onChange={e => setSettings(s => ({ ...s, companyIdentity: { ...s.companyIdentity, legalAddress: e.target.value } }))} placeholder="Street, building, full legal address" /></Field>
                   <Field label="City"><input style={inp} value={settings.companyIdentity.city} onChange={e => setSettings(s => ({ ...s, companyIdentity: { ...s.companyIdentity, city: e.target.value } }))} /></Field>
-                  <Field label="State / Region"><input style={inp} value={settings.companyIdentity.state} onChange={e => setSettings(s => ({ ...s, companyIdentity: { ...s.companyIdentity, state: e.target.value } }))} /></Field>
+                  {/* A dropdown for a Pakistani seller: this value goes out as
+                      the seller's province on every FBR filing and the gateway
+                      matches it against its own list, so free text let "punjab"
+                      and "Punjab" both be stored and neither looked wrong.
+                      Anywhere else it stays a plain box — no such list applies. */}
+                  <Field label="State / Province">
+                    {/^pakistan$/i.test((companyForm.country || "").trim()) ? (
+                      <select style={inp} value={settings.companyIdentity.state} onChange={e => setSettings(s => ({ ...s, companyIdentity: { ...s.companyIdentity, state: e.target.value } }))}>
+                        <option value="">— none —</option>
+                        {PK_PROVINCES.map(p => <option key={p} value={p}>{p}</option>)}
+                        {settings.companyIdentity.state && !PK_PROVINCES.includes(settings.companyIdentity.state as never) && (
+                          <option value={settings.companyIdentity.state}>{settings.companyIdentity.state} (not an FBR province)</option>
+                        )}
+                      </select>
+                    ) : (
+                      <input style={inp} value={settings.companyIdentity.state} onChange={e => setSettings(s => ({ ...s, companyIdentity: { ...s.companyIdentity, state: e.target.value } }))} />
+                    )}
+                  </Field>
                 </div>
               </div>
 
@@ -692,16 +710,39 @@ export default function AdminControlPage() {
 
               <div style={panel}>
                 <div style={sectionTitle}>Bank Details for Print Templates</div>
-                <div style={sectionSub}>Remittance and transfer details shown on invoices and quotations.</div>
-                <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(3,1fr)", gap: 14 }}>
-                  <Field label="Bank Name"><input style={inp} value={settings.bankDetails.bankName} onChange={e => setSettings(s => ({ ...s, bankDetails: { ...s.bankDetails, bankName: e.target.value } }))} /></Field>
-                  <Field label="Account Title"><input style={inp} value={settings.bankDetails.accountTitle} onChange={e => setSettings(s => ({ ...s, bankDetails: { ...s.bankDetails, accountTitle: e.target.value } }))} /></Field>
-                  <Field label="Account Number"><input style={inp} value={settings.bankDetails.accountNumber} onChange={e => setSettings(s => ({ ...s, bankDetails: { ...s.bankDetails, accountNumber: e.target.value } }))} /></Field>
-                  <Field label="IBAN"><input style={inp} value={settings.bankDetails.iban} onChange={e => setSettings(s => ({ ...s, bankDetails: { ...s.bankDetails, iban: e.target.value } }))} /></Field>
-                  <Field label="SWIFT Code"><input style={inp} value={settings.bankDetails.swiftCode} onChange={e => setSettings(s => ({ ...s, bankDetails: { ...s.bankDetails, swiftCode: e.target.value } }))} /></Field>
-                  <Field label="Branch Name"><input style={inp} value={settings.bankDetails.branchName} onChange={e => setSettings(s => ({ ...s, bankDetails: { ...s.bankDetails, branchName: e.target.value } }))} /></Field>
-                  <Field label="Branch Code"><input style={inp} value={settings.bankDetails.branchCode} onChange={e => setSettings(s => ({ ...s, bankDetails: { ...s.bankDetails, branchCode: e.target.value } }))} /></Field>
-                </div>
+                <div style={sectionSub}>Remittance and transfer details shown on invoices and quotations. Add every account you collect into — the first is the primary one.</div>
+                {settings.bankAccounts.length === 0 && (
+                  <div style={{ fontSize: 12.5, color: MUTED, marginBottom: 12 }}>No bank account added yet.</div>
+                )}
+                {settings.bankAccounts.map((b, i) => (
+                  <div key={i} style={{ border: `1px solid ${BDR}`, borderRadius: 10, padding: 14, marginBottom: 12 }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
+                      <div style={{ fontSize: 11.5, fontWeight: 800, letterSpacing: .5, color: MUTED }}>
+                        ACCOUNT {i + 1}{i === 0 ? " · PRIMARY" : ""}
+                      </div>
+                      <button onClick={() => setSettings(s => ({ ...s, bankAccounts: s.bankAccounts.filter((_, x) => x !== i) }))}
+                        style={{ background: "transparent", border: `1px solid ${BDR}`, color: "#f87171", borderRadius: 7, padding: "4px 10px", fontSize: 11.5, fontWeight: 700, cursor: "pointer" }}>
+                        Remove
+                      </button>
+                    </div>
+                    <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(3,1fr)", gap: 14 }}>
+                      {([
+                        ["bankName", "Bank Name"], ["accountTitle", "Account Title"], ["accountNumber", "Account Number"],
+                        ["iban", "IBAN"], ["swiftCode", "SWIFT Code"], ["branchName", "Branch Name"], ["branchCode", "Branch Code"],
+                      ] as [keyof BankDetailsProfile, string][]).map(([key, label]) => (
+                        <Field key={key} label={label}>
+                          <input style={inp} value={b[key] || ""} onChange={e => setSettings(s => ({
+                            ...s, bankAccounts: s.bankAccounts.map((row, x) => x === i ? { ...row, [key]: e.target.value } : row),
+                          }))} />
+                        </Field>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+                <button onClick={() => setSettings(s => ({ ...s, bankAccounts: [...s.bankAccounts, { ...DEFAULT_BANK }] }))}
+                  style={{ background: "transparent", border: `1px dashed ${BDR}`, color: "#fff", borderRadius: 9, padding: "9px 16px", fontSize: 12.5, fontWeight: 700, cursor: "pointer" }}>
+                  + Add bank account
+                </button>
               </div>
 
               <div style={panel}>
