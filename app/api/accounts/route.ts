@@ -193,6 +193,9 @@ export async function POST(req: NextRequest) {
         type: fixedType,
         partyType: body.partyType || "GENERAL",
         city: body.city || null,
+        // Not encrypted like the identifiers below it: a province is not
+        // personal data, and the FBR payload has to read it back in the clear.
+        province: body.province || null,
         phone: body.phone ? safeEncryptField(body.phone) : null,
         ntn: body.ntn ? safeEncryptField(body.ntn) : null,
         strn: body.strn ? safeEncryptField(body.strn) : null,

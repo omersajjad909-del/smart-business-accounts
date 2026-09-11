@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useResponsive } from "@/hooks/useResponsive";
 import { PRINT_TEMPLATES } from "@/components/print/printTemplates";
+import { PK_PROVINCES } from "@/lib/pkProvinces";
 
 const isMobile = false;
 
@@ -79,6 +80,8 @@ export default function BusinessSettingsPage() {
   const [co, setCo] = useState<CompanyInfo>({name:"",country:"",baseCurrency:"USD",businessType:"trading",plan:"STARTER",subscriptionStatus:"ACTIVE",totalUsers:0,totalAccounts:0,createdAt:"",currentPeriodEnd:null});
   const [name, setName]         = useState("");
   const [country, setCountry]   = useState("");
+  // The province list below is FBR's, so it only applies to a Pakistani seller.
+  const isPk = /^pakistan$/i.test(country.trim());
   const [currency, setCurrency] = useState("USD");
 
   // Admin control sections
@@ -277,7 +280,24 @@ export default function BusinessSettingsPage() {
               <Field label="Website"><input value={identity.website} onChange={e=>setIdentity(p=>({...p,website:e.target.value}))} style={inp()} placeholder="https://yourcompany.com"/></Field>
               <Field label="Registered Address"><input value={identity.legalAddress} onChange={e=>setIdentity(p=>({...p,legalAddress:e.target.value}))} style={inp()} placeholder="Street address"/></Field>
               <Field label="City"><input value={identity.city} onChange={e=>setIdentity(p=>({...p,city:e.target.value}))} style={inp()} placeholder="City"/></Field>
-              <Field label="State / Province"><input value={identity.state} onChange={e=>setIdentity(p=>({...p,state:e.target.value}))} style={inp()} placeholder="State / Province"/></Field>
+              {/* A dropdown for Pakistan, because this value is the seller's
+                  province on every FBR filing and the gateway matches it
+                  against its own list — free text let "punjab" and "Punjab"
+                  both be stored, and neither screen looked wrong. Anywhere
+                  else it stays a plain box, since no such list applies. */}
+              <Field label="State / Province">
+                {isPk ? (
+                  <select value={identity.state} onChange={e=>setIdentity(p=>({...p,state:e.target.value}))} style={inp()}>
+                    <option value="">— none —</option>
+                    {PK_PROVINCES.map((p)=>(<option key={p} value={p}>{p}</option>))}
+                    {identity.state && !PK_PROVINCES.includes(identity.state as never) && (
+                      <option value={identity.state}>{identity.state} (not an FBR province)</option>
+                    )}
+                  </select>
+                ) : (
+                  <input value={identity.state} onChange={e=>setIdentity(p=>({...p,state:e.target.value}))} style={inp()} placeholder="State / Province"/>
+                )}
+              </Field>
               <Field label="Postal / ZIP Code"><input value={identity.postalCode} onChange={e=>setIdentity(p=>({...p,postalCode:e.target.value}))} style={inp()} placeholder="12345"/></Field>
             </Grid>
 

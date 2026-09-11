@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { getCurrentUser } from "@/lib/auth";
 import { confirmToast } from "@/lib/toast-feedback";
 import { useResponsive } from "@/hooks/useResponsive";
+import { PK_PROVINCES } from "@/lib/pkProvinces";
 
 const FONT = "'Outfit','Inter',sans-serif";
 const ACCENT = "#6366f1";
@@ -60,6 +61,7 @@ type Account = {
   type?: string | null; partyType?: string | null;
   city?: string | null; phone?: string | null; email?: string | null;
   address?: string | null; ntn?: string | null; strn?: string | null;
+  province?: string | null;
   bankIban?: string | null; description?: string | null;
   parentId?: string | null;
   openDebit?: number; openCredit?: number;
@@ -68,7 +70,7 @@ type Account = {
 
 const EMPTY_FORM = {
   code: "", name: "", partyType: "CUSTOMER",
-  city: "", phone: "", email: "", address: "",
+  city: "", phone: "", email: "", address: "", province: "",
   ntn: "", strn: "", bankIban: "", description: "",
   parentId: "",
   openDate: new Date().toISOString().slice(0, 10),
@@ -201,6 +203,7 @@ export default function ChartOfAccounts() {
       partyType: a.partyType || "GENERAL",
       city: a.city || "", phone: a.phone || "", email: a.email || "",
       address: a.address || "", ntn: a.ntn || "", strn: a.strn || "",
+      province: a.province || "",
       bankIban: a.bankIban || "", description: a.description || "",
       parentId: a.parentId || "",
       openDate: a.openDate ? new Date(a.openDate).toISOString().slice(0, 10) : EMPTY_FORM.openDate,
@@ -386,6 +389,16 @@ export default function ChartOfAccounts() {
                 </Field>
                 <Field label="City">
                   <input value={form.city} onChange={e => f("city", e.target.value)} placeholder="Lahore" style={inp()} />
+                </Field>
+                <Field label="Province">
+                  {/* A dropdown, not a box: this rides on every FBR filing and
+                      the gateway matches it against its own list, so a typed
+                      "punjab" — or a city name, which is what used to go in
+                      this slot — fails the whole invoice. */}
+                  <select value={form.province} onChange={e => f("province", e.target.value)} style={inp()}>
+                    <option value="">— none —</option>
+                    {PK_PROVINCES.map((p) => (<option key={p} value={p}>{p}</option>))}
+                  </select>
                 </Field>
                 <Field label="Address">
                   <input value={form.address} onChange={e => f("address", e.target.value)} placeholder="Street, Area" style={inp()} />

@@ -27,6 +27,11 @@ model Account {
   address     String?
   ntn         String? // National Tax Number
   strn        String? // Sales Tax Reg. No.
+  // Province the buyer is registered in. A separate field from `city` because
+  // FBR matches this against its own list — the city was being sent in its
+  // place, and "Lahore" is not a province the gateway will accept. See
+  // lib/pkProvinces.ts.
+  province    String?
   bankIban    String? // IBAN / Bank Account No.
   description String? // Internal notes
   openDate    DateTime?
@@ -1664,6 +1669,10 @@ model DeliveryChallan {
   serialNo String?
   orderNo  String?
   poNo     String?
+  // "D No" on the printed challan — a fifth reference the buyer checks the
+  // delivery against, alongside S/#, Order No and PO No. Separate from the
+  // challan's own number, which the document carries in its own right.
+  dNo      String?
   // How the goods were packed for dispatch — a poly-bag/textile trade detail
   // (Bags / Carton / Packet) with the count in that unit. Null everywhere
   // else.

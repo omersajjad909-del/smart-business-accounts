@@ -4,7 +4,7 @@ import { apiHasPermission } from "@/lib/apiPermission";
 import { PERMISSIONS } from "@/lib/permissions";
 import { resolveCompanyId } from "@/lib/tenant";
 import { getCompanyAdminControlSettings } from "@/lib/companyAdminControl";
-import { buildFbrPayload, buildFbrQrPayload, submitToFbr, type FbrInvoiceLine } from "@/lib/fbrEInvoice";
+import { buildFbrPayload, buildFbrQrPayload, resolveFbrSeller, submitToFbr, type FbrInvoiceLine } from "@/lib/fbrEInvoice";
 import { logAuditFromReq } from "@/lib/auditLogger";
 
 export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
@@ -67,7 +67,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       const taxAmount = gross * (line.taxPercent / 100);
       return {
         productDescription: line.item?.name || "Item",
-        hsCode: (line as any).hsCode || line.item?.hsCode || "",
+        hsCode: line.hsCode || line.item?.hsCode || "",
         rateLabel: `${line.taxPercent || 0}%`,
         uoM: line.item?.unit || "PCS",
         quantity: line.qty,
@@ -77,12 +77,13 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       };
     });
 
-    const payload = buildFbrPayload(settings.fbrSettings, {
+    const seller = resolveFbrSeller(settings);
+    const payload = buildFbrPayload(seller, settings.fbrSettings, {
       invoiceDate: new Date(inv.date).toISOString().slice(0, 10),
       invoiceRefNo: inv.invoiceNo,
       buyerNtn: inv.customer?.ntn || undefined,
       buyerBusinessName: inv.customer?.name || "Walk-in Customer",
-      buyerProvince: inv.customer?.city || undefined,
+      buyerProvince: inv.customer?.province || undefined,
       buyerAddress: inv.customer?.address || undefined,
       scenarioId,
       items: lines,
@@ -100,7 +101,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     }
 
     const qrPayload = buildFbrQrPayload({
-      sellerNtn: settings.fbrSettings.sellerNtn,
+      sellerNtn: seller.ntn,
       invoiceNo: inv.invoiceNo,
       fbrInvoiceNo: result.fbrInvoiceNo,
       date: new Date(inv.date).toISOString().slice(0, 10),
