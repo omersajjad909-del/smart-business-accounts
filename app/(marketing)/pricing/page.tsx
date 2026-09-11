@@ -1139,6 +1139,28 @@ export default function PricingPage() {
             <div style={{ marginTop: 12, fontSize: 12, color: "rgba(255,255,255,.32)" }}>
               Need only the automation tools? <Link href="/onboarding/choose-plan?addon=automation" style={{ color: "#a78bfa", textDecoration: "none", fontWeight: 700 }}>Business Automation is sold separately →</Link>
             </div>
+
+            {/* Extra Users / Extra Branches — sits right under the presets so
+                it is visible without scrolling into the a-la-carte builder;
+                it used to live in its own box after the whole module list. */}
+            <div className="cp-addon-strip" style={{ marginTop: 20, padding: "16px 18px", borderRadius: 14, background: "rgba(255,255,255,.02)", border: "1px solid rgba(255,255,255,.07)", display: "flex", alignItems: "center", gap: 24, flexWrap: "wrap" }}>
+              {[
+                { key: "users",    label: "Extra Users",    icon: "👥", color: "#a5b4fc", val: extraUsers,    set: setExtraUsers },
+                { key: "branches", label: "Extra Branches", icon: "🏢", color: "#38bdf8", val: extraBranches, set: setExtraBranches },
+              ].map(addon => (
+                <div key={addon.key} style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                  <div>
+                    <div style={{ fontSize: 13, fontWeight: 700, color: "rgba(255,255,255,.65)" }}>{addon.icon} {addon.label}</div>
+                    <div style={{ fontSize: 11, color: "rgba(255,255,255,.3)" }}>+{formatPrice(seatRate)}/each/mo</div>
+                  </div>
+                  <div style={{ display: "flex", alignItems: "center", background: "rgba(255,255,255,.05)", borderRadius: 10, border: "1px solid rgba(255,255,255,.09)", overflow: "hidden" }}>
+                    <button onClick={() => addon.set((v: number) => Math.max(0, v - 1))} style={{ padding: "7px 13px", background: "none", border: "none", color: "rgba(255,255,255,.5)", fontSize: 18, cursor: "pointer", fontFamily: ff, lineHeight: 1 }}>−</button>
+                    <input type="number" min="0" value={addon.val} onChange={e => addon.set(Math.max(0, parseInt(e.target.value) || 0))} style={{ width: 40, background: "none", border: "none", color: addon.color, fontSize: 15, fontWeight: 800, textAlign: "center", outline: "none", fontFamily: ff }} />
+                    <button onClick={() => addon.set((v: number) => v + 1)} style={{ padding: "7px 13px", background: "none", border: "none", color: "rgba(255,255,255,.5)", fontSize: 18, cursor: "pointer", fontFamily: ff, lineHeight: 1 }}>+</button>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
 
           <div style={{ height: 1, background: "rgba(255,255,255,.06)", marginBottom: 32 }} />
@@ -1202,27 +1224,6 @@ export default function PricingPage() {
                   </div>
                 );
               })}
-
-              {/* Add-ons */}
-              <div style={{ padding: "20px 22px", borderRadius: 16, background: "rgba(255,255,255,.02)", border: "1px solid rgba(255,255,255,.07)", marginTop: 4 }}>
-                <div style={{ fontSize: 11, fontWeight: 800, color: "rgba(255,255,255,.3)", letterSpacing: ".08em", textTransform: "uppercase", marginBottom: 14 }}>Add-ons — Optional</div>
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
-                  {[
-                    { key: "users",    label: "Extra Users",    icon: "👥", color: "#a5b4fc", val: extraUsers,    set: setExtraUsers },
-                    { key: "branches", label: "Extra Branches", icon: "🏢", color: "#38bdf8", val: extraBranches, set: setExtraBranches },
-                  ].map(addon => (
-                    <div key={addon.key}>
-                      <div style={{ fontSize: 13, fontWeight: 700, color: "rgba(255,255,255,.65)", marginBottom: 4 }}>{addon.icon} {addon.label}</div>
-                      <div style={{ fontSize: 11, color: "rgba(255,255,255,.3)", marginBottom: 10 }}>+{formatPrice(seatRate)}/each/mo</div>
-                      <div style={{ display: "flex", alignItems: "center", background: "rgba(255,255,255,.05)", borderRadius: 10, border: "1px solid rgba(255,255,255,.09)", overflow: "hidden" }}>
-                        <button onClick={() => addon.set((v: number) => Math.max(0, v - 1))} style={{ padding: "9px 16px", background: "none", border: "none", color: "rgba(255,255,255,.5)", fontSize: 18, cursor: "pointer", fontFamily: ff, lineHeight: 1 }}>−</button>
-                        <input type="number" min="0" value={addon.val} onChange={e => addon.set(Math.max(0, parseInt(e.target.value) || 0))} style={{ flex: 1, background: "none", border: "none", color: addon.color, fontSize: 16, fontWeight: 800, textAlign: "center", outline: "none", fontFamily: ff, width: 0 }} />
-                        <button onClick={() => addon.set((v: number) => v + 1)} style={{ padding: "9px 16px", background: "none", border: "none", color: "rgba(255,255,255,.5)", fontSize: 18, cursor: "pointer", fontFamily: ff, lineHeight: 1 }}>+</button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
             </div>
 
             {/* Right — Price summary */}
