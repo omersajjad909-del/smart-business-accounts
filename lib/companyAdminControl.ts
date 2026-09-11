@@ -222,6 +222,7 @@ export const DEFAULT_ADMIN_CONTROL_SETTINGS: AdminControlSettings = {
     branchName: "",
     branchCode: "",
   },
+  bankAccounts: [],
   branchLocations: {},
   shiftSettings: {},
   features: { ...DEFAULT_FEATURE_FLAGS },
