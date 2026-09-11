@@ -23,6 +23,7 @@ import { ModeToggle } from "@/components/mode-toggle";
 import AppearanceApplier from "@/components/AppearanceApplier";
 import { hasModule as baseHasModule, type BusinessType } from "@/lib/businessModules";
 import { findDashboardFeatureByRoute } from "@/lib/dashboardFeatureRegistry";
+import { businessOwnsCoreFeature } from "@/lib/corePack";
 import { AFFILIATE_PROGRAM_LIVE } from "@/lib/affiliateProgram";
 import { FINOVA_COMPANY_PROFILE_UPDATED, FINOVA_USER_PROFILE_UPDATED } from "@/lib/dashboardProfileEvents";
 import { dataUrlToFile } from "@/lib/dataUrl";
@@ -926,6 +927,16 @@ export default function DashboardLayout({
   };
 
   const hasDashboardFeature = (featureId: string) => {
+    // Ownership before pricing. A core page outside this trade's core pack is
+    // not theirs on any plan, and asking here covers the whole sidebar in one
+    // place: every NavLink runs through canShowDashboardHref, and NavGroup drops
+    // a heading once all of its links are hidden. Before this the "no page grid
+    // saved" line below answered yes to everything, which is how a travel
+    // agency ended up with Purchase Order, GRN and Warehouse Transfers.
+    //
+    // Custom plans are assembled module by module at checkout, so what they
+    // bought decides what they see — not a trade profile they never picked.
+    if (!isCustomPlan && !businessOwnsCoreFeature(businessType, featureId)) return false;
     if (!allowedDashboardFeatures) return true;
     return getDashboardFeatureAccessIds(featureId).some((id) => allowedDashboardFeatures.has(id));
   };
@@ -949,7 +960,10 @@ export default function DashboardLayout({
    */
   const ownsDashboardRoute = (href: string) => {
     const feature = findDashboardFeatureByRoute(href);
-    if (!feature || feature.core) return true;
+    if (!feature) return true;
+    // A core page is owned by every trade whose paperwork uses it — the pack
+    // answers that, not the `core` flag on its own.
+    if (feature.core) return isCustomPlan || businessOwnsCoreFeature(businessType, feature.id);
     if (isCustomPlan) return false;
     const allowed = feature.businessTypes?.length ? feature.businessTypes : [feature.business];
     return allowed.includes(effectiveBusinessType);
@@ -980,7 +994,16 @@ export default function DashboardLayout({
   useEffect(() => {
     if (!ready) return;
     const feature = findDashboardFeatureByRoute(pathname);
-    if (!feature || feature.core) return;
+    if (!feature) return;
+    if (feature.core) {
+      // Core pages belong to every trade that runs that kind of paperwork, so
+      // the core pack is the test — hiding the link is not enough on its own,
+      // a travel agency typing /dashboard/grn has to land back on /dashboard.
+      if (!isCustomPlan && !businessOwnsCoreFeature(businessType, feature.id)) {
+        router.replace("/dashboard");
+      }
+      return;
+    }
     if (isCustomPlan) {
       router.replace("/dashboard");
       return;

@@ -1,11 +1,14 @@
 // ─────────────────────────────────────────────────────────────
 //  Business Module Configuration — Complete System
 //  61 business types, each with:
-//    - modules (sidebar features)
+//    - corePack     (how deep this trade's paperwork runs — lib/corePack.ts)
+//    - modules      (sidebar features: core pack + this trade's own)
 //    - defaultAccounts (Chart of Accounts to pre-create)
 //    - kpis (dashboard metrics)
 //    - quickActions (homepage shortcuts)
 // ─────────────────────────────────────────────────────────────
+
+import { coreModulesFor } from "./corePack";
 
 export type BusinessType =
   | "trading" | "manufacturing" | "distribution" | "retail"
@@ -151,28 +154,26 @@ export interface BusinessTypeMeta {
   quickActions: QuickAction[];
 }
 
-// ── Core modules every business type gets ───────────────────
-const CORE: ModuleKey[] = [
+// ── Core modules ────────────────────────────────────────────
+//
+// There used to be two hand-written core lists here — CORE and, after the
+// granular reports and HR keys landed, CORE_P1. Which of the two a business
+// type spread in was down to when it was written, so travel claimed a travel
+// agency had no payroll and no balance sheet while the sidebar showed it both.
+//
+// The core half of every module list now comes from the trade's core pack
+// (lib/corePack.ts), the same place the dashboard asks which core *pages* the
+// trade owns. One answer, two readers, no drift.
+//
+// CORE is kept only because the Phase-2 business types still commented out
+// below spread it. Each of them gets a core pack as it is brought live, and
+// this goes when the last one does.
+export const CORE: ModuleKey[] = [
   "dashboard", "ai_assistant",
   "chart_of_accounts", "cpv", "crv", "jv", "contra", "advance_payment",
   "petty_cash", "credit_note", "debit_note", "bank_reconciliation",
   "payment_receipts", "expense_vouchers", "tax_configuration",
   "loans", "recurring", "reports_financial", "admin_settings", "opening_balances",
-];
-
-// ── Phase 1 Core — granular reports + HR instead of broad keys ──
-const CORE_P1: ModuleKey[] = [
-  "dashboard", "ai_assistant",
-  // Available to every Phase 1 business type — they are not industry-specific.
-  "business_guide", "owner_dashboard", "ai_intelligence", "business_operator", "automation",
-  "chart_of_accounts", "cpv", "crv", "jv", "contra", "advance_payment",
-  "petty_cash", "credit_note", "debit_note", "bank_reconciliation",
-  "payment_receipts", "expense_vouchers", "tax_configuration",
-  "loans", "recurring", "admin_settings", "opening_balances",
-  // Granular financial reports
-  "ledger", "trial_balance", "profit_loss", "balance_sheet", "ageing_report", "cash_flow",
-  // Granular HR
-  "employees", "payroll", "attendance", "advance_salary",
 ];
 
 // ── Common accounts every business needs ───────────────────
@@ -202,7 +203,7 @@ export const BUSINESS_TYPES: BusinessTypeMeta[] = [
     description: "Buy & sell goods — general merchandise, hardware, electronics, wholesale",
     tagline: "Purchase → Sell → Profit",
     color: "#38bdf8", gradient: "linear-gradient(135deg,#0ea5e9,#38bdf8)", category: "Commerce",
-    modules: [...CORE_P1, "sales_invoice","purchase_invoice","purchase_order","sales_order","quotation","delivery_challan","delivery_order","sale_return","purchase_return","outward","inventory_items","stock_rates","barcode","stock_movements","stock_ledger","price_lists","reports_inventory","customer_statement","supplier_statement","payment_followup","bulk_payments","fixed_assets","audit_trail","budget","cost_centers","crm","order_desk","trading_analytics"],
+    modules: [...coreModulesFor("trading"), "delivery_order","order_desk","trading_analytics"],
     defaultAccounts: [
       ...COMMON_ACCOUNTS,
       { code: "1100", name: "Accounts Receivable", type: "Asset" },
@@ -234,7 +235,7 @@ export const BUSINESS_TYPES: BusinessTypeMeta[] = [
     description: "Produce goods from raw materials — factories, garments, food processing",
     tagline: "Raw Material → Production → Finished Goods",
     color: "#f59e0b", gradient: "linear-gradient(135deg,#d97706,#f59e0b)", category: "Production",
-    modules: [...CORE_P1, "sales_invoice","purchase_invoice","purchase_order","quotation","delivery_challan","sale_return","outward","inventory_items","stock_rates","barcode","stock_movements","stock_ledger","reports_inventory","customer_statement","supplier_statement","fixed_assets","audit_trail","budget","cost_centers","crm","bom","production_orders","work_orders","raw_materials"],
+    modules: [...coreModulesFor("manufacturing"), "bom","production_orders","work_orders","raw_materials"],
     defaultAccounts: [
       ...COMMON_ACCOUNTS,
       { code: "1100", name: "Accounts Receivable", type: "Asset" },
@@ -274,7 +275,7 @@ export const BUSINESS_TYPES: BusinessTypeMeta[] = [
     description: "Capital placed in someone else's business — track output, take a share",
     tagline: "Capital → Production → Share",
     color: "#14b8a6", gradient: "linear-gradient(135deg,#0d9488,#2dd4bf)", category: "Finance",
-    modules: [...CORE_P1, "investor_parties","investor_capital","investor_grades","investor_lots","investor_production","investor_settlements","investor_statement","investor_reports","audit_trail"],
+    modules: [...coreModulesFor("investor"), "investor_parties","investor_capital","investor_grades","investor_lots","investor_production","investor_settlements","investor_statement","investor_reports"],
     defaultAccounts: [
       ...COMMON_ACCOUNTS,
       { code: "1300", name: "Investment in Partnership", type: "Asset" },
@@ -305,7 +306,7 @@ export const BUSINESS_TYPES: BusinessTypeMeta[] = [
     description: "Distribute products to retailers — FMCG, pharma, electronics distribution",
     tagline: "Warehouse → Routes → Delivery",
     color: "#8b5cf6", gradient: "linear-gradient(135deg,#7c3aed,#8b5cf6)", category: "Commerce",
-    modules: [...CORE_P1, "sales_invoice","purchase_invoice","purchase_order","sales_order","quotation","delivery_challan","delivery_order","sale_return","purchase_return","outward","inventory_items","stock_rates","barcode","stock_movements","stock_ledger","warehouse_transfers","purchase_requisition","price_lists","reports_inventory","customer_statement","supplier_statement","payment_followup","bulk_payments","fixed_assets","audit_trail","budget","cost_centers","crm","routes","delivery_tracking","van_sales","stock_on_van","collections","trip_sheet","distribution_analytics"],
+    modules: [...coreModulesFor("distribution"), "delivery_order","routes","delivery_tracking","van_sales","stock_on_van","collections","trip_sheet","distribution_analytics"],
     defaultAccounts: [
       ...COMMON_ACCOUNTS,
       { code: "1100", name: "Accounts Receivable", type: "Asset" },
@@ -337,7 +338,7 @@ export const BUSINESS_TYPES: BusinessTypeMeta[] = [
     description: "Bulk buying and selling — dealers, distributors, warehouse-level operations",
     tagline: "Buy Bulk → Warehouse → Sell → Collect",
     color: "#f59e0b", gradient: "linear-gradient(135deg,#d97706,#f59e0b)", category: "Commerce",
-    modules: [...CORE_P1, "sales_invoice","purchase_invoice","purchase_order","sales_order","quotation","delivery_challan","delivery_order","sale_return","purchase_return","outward","inventory_items","stock_rates","barcode","stock_movements","stock_ledger","price_lists","credit_limits","warehouses","warehouse_transfers","reports_inventory","customer_statement","supplier_statement","payment_followup","bulk_payments","fixed_assets","audit_trail","budget","cost_centers","crm"],
+    modules: [...coreModulesFor("wholesale"), "delivery_order","credit_limits"],
     defaultAccounts: [
       ...COMMON_ACCOUNTS,
       { code: "1100", name: "Accounts Receivable", type: "Asset" },
@@ -367,7 +368,7 @@ export const BUSINESS_TYPES: BusinessTypeMeta[] = [
     description: "Sell directly to consumers — shops, supermarkets, boutiques, pharmacies",
     tagline: "Customer In → Sale → Repeat",
     color: "#ec4899", gradient: "linear-gradient(135deg,#db2777,#ec4899)", category: "Commerce",
-    modules: [...CORE_P1, "sales_invoice","purchase_invoice","purchase_order","sales_order","sale_return","purchase_return","outward","inventory_items","stock_rates","barcode","stock_movements","stock_ledger","reports_inventory","customer_statement","supplier_statement","payment_followup","bulk_payments","fixed_assets","audit_trail","crm","pos","loyalty_points","product_catalog","stock_transfer","branch_reports","online_store_sync","supplier_portal"],
+    modules: [...coreModulesFor("retail"), "pos","loyalty_points","product_catalog","stock_transfer","branch_reports","online_store_sync","supplier_portal"],
     defaultAccounts: [
       ...COMMON_ACCOUNTS,
       { code: "1100", name: "Accounts Receivable", type: "Asset" },
@@ -1505,7 +1506,7 @@ export const BUSINESS_TYPES: BusinessTypeMeta[] = [
     description: "Import & export business — sourcing, customs, LC/TT, shipping, foreign buyers & local sales",
     tagline: "Source → LC/TT → Ship → Clear → Invoice → Receive",
     color: "#0891b2", gradient: "linear-gradient(135deg,#0e7490,#0891b2)", category: "Commerce",
-    modules: [...CORE_P1, "sales_invoice","purchase_invoice","purchase_order","inventory_items","stock_rates","customer_statement","supplier_statement","payment_followup","bulk_payments","purchase_return","fixed_assets","audit_trail","landed_cost","crm","shipments","containers","freight","customs_clearance","lc_management","hs_codes","import_costing","export_rebate","commercial_invoice","packing_list","cert_of_origin","export_docs","trade_analytics","export_performance"],
+    modules: [...coreModulesFor("import_company"), "landed_cost","shipments","containers","freight","customs_clearance","lc_management","hs_codes","import_costing","export_rebate","commercial_invoice","packing_list","cert_of_origin","export_docs","trade_analytics","export_performance"],
     defaultAccounts: [
       ...COMMON_ACCOUNTS,
       { code: "1100", name: "Goods in Transit", type: "Asset" },
@@ -1543,7 +1544,7 @@ export const BUSINESS_TYPES: BusinessTypeMeta[] = [
     description: "Customs clearance — import/export clearing, freight forwarding, documentation",
     tagline: "Receive Docs → Clear Customs → Deliver → Invoice",
     color: "#78350f", gradient: "linear-gradient(135deg,#92400e,#78350f)", category: "Commerce",
-    modules: [...CORE_P1, "sales_invoice","purchase_invoice","quotation","customer_statement","supplier_statement","payment_followup","bulk_payments","audit_trail","crm","cnf_jobs","shipments","containers","freight","customs_clearance","lc_management","trade_analytics"],
+    modules: [...coreModulesFor("clearing_forwarding"), "cnf_jobs","shipments","containers","freight","customs_clearance","lc_management","trade_analytics"],
     defaultAccounts: [
       ...COMMON_ACCOUNTS,
       { code: "1100", name: "Client Receivables", type: "Asset" },
@@ -1716,7 +1717,7 @@ export const BUSINESS_TYPES: BusinessTypeMeta[] = [
     description: "Airline ticketing, visa processing, and travel-service billing for agencies and consultants",
     tagline: "Quote → Book → Issue → Support",
     color: "#38bdf8", gradient: "linear-gradient(135deg,#0ea5e9,#38bdf8)", category: "Services",
-    modules: [...CORE, "sales_invoice", "quotation", "expense_vouchers", "crm", "travel_bookings", "visa_processing", "travel_settlements"],
+    modules: [...coreModulesFor("travel"), "travel_bookings","visa_processing","travel_settlements"],
     defaultAccounts: [
       ...COMMON_ACCOUNTS,
       { code: "1100", name: "Customer Receivables", type: "Asset" },
@@ -1865,7 +1866,10 @@ export function getBusinessType(type: string): BusinessTypeMeta {
     category: cfg.category,
     phase: cfg.phase,
     status: cfg.status,
-    modules: [...CORE, "sales_invoice","purchase_invoice","reports_inventory"],
+    // A trade with no entry above has no pack either, so coreModulesFor hands
+    // back DEFAULT_CORE_PACK — the widest one. Forgetting to profile a business
+    // type costs a cluttered sidebar, never a customer locked out of a page.
+    modules: coreModulesFor(type),
     defaultAccounts: COMMON_ACCOUNTS,
     kpis: [],
     quickActions: [],
