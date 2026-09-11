@@ -13,6 +13,7 @@ import { hasPermission } from "@/lib/hasPermission";
 import { PERMISSIONS } from "@/lib/permissions";
 import { useRouter } from "next/navigation";
 import { useResponsive } from "@/hooks/useResponsive";
+import { useCompanyPrintHeader } from "@/hooks/useCompanyPrintHeader";
 
 
 type Account = { id: string; name: string; address?: string; phone?: string; ntn?: string; strn?: string };
@@ -64,6 +65,9 @@ type PrintPreferences = {
 
 export default function DeliveryChallanPage() {
   const { isMobile } = useResponsive();
+  // Address, phone, tax registration and the Print & Branding switches,
+  // read the one way every document reads them.
+  const printHeader = useCompanyPrintHeader();
   const _router = useRouter();
   const today = new Date().toISOString().slice(0, 10);
   const user = getCurrentUser();
@@ -690,22 +694,15 @@ const [searchTerm, _setSearchTerm] = useState("");
           )}
 
           {/* PREVIEW */}
+          {/* The Print & Branding switches apply here too. They were read on the
+              two invoices only, so turning "Show address" off left it printing
+              on every other document — a setting that looked applied and was
+              not. */}
           {preview && (
-            {/* The Print & Branding switches apply here too. They were read on
-                the two invoices only, so turning "Show address" off left it
-                printing on every other document — a setting that looked applied
-                and was not. */}
             <PrintPaperWrapper>
               <PrintDocA4
-                companyName={companyName}
-                companyAddress={printPrefs.showAddress === false ? undefined : companyInfo.address}
-                companyPhone={printPrefs.showPhone === false ? undefined : companyInfo.phone}
-                companyEmail={companyInfo.email}
-                companyTaxLabel={companyInfo.ntnLabel}
-                companyTaxValue={printPrefs.showTaxNumber === false ? undefined : companyInfo.ntn}
-                companyStrn={printPrefs.showTaxNumber === false ? undefined : companyInfo.strn}
-                showLogo={printPrefs.showLogo}
-                logoUrl={printPrefs.logoUrl}
+                {...printHeader}
+                companyName={printHeader.companyName || companyName}
                 docTitle="DELIVERY CHALLAN"
                 docNo={savedChallan?.challanNo || challanNo}
                 date={fmtDate(date)}
