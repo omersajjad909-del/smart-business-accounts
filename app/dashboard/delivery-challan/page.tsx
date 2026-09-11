@@ -691,15 +691,19 @@ const [searchTerm, _setSearchTerm] = useState("");
 
           {/* PREVIEW */}
           {preview && (
+            {/* The Print & Branding switches apply here too. They were read on
+                the two invoices only, so turning "Show address" off left it
+                printing on every other document — a setting that looked applied
+                and was not. */}
             <PrintPaperWrapper>
               <PrintDocA4
                 companyName={companyName}
-                companyAddress={companyInfo.address}
-                companyPhone={companyInfo.phone}
+                companyAddress={printPrefs.showAddress === false ? undefined : companyInfo.address}
+                companyPhone={printPrefs.showPhone === false ? undefined : companyInfo.phone}
                 companyEmail={companyInfo.email}
                 companyTaxLabel={companyInfo.ntnLabel}
-                companyTaxValue={companyInfo.ntn}
-                companyStrn={companyInfo.strn}
+                companyTaxValue={printPrefs.showTaxNumber === false ? undefined : companyInfo.ntn}
+                companyStrn={printPrefs.showTaxNumber === false ? undefined : companyInfo.strn}
                 showLogo={printPrefs.showLogo}
                 logoUrl={printPrefs.logoUrl}
                 docTitle="DELIVERY CHALLAN"
