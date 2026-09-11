@@ -788,7 +788,7 @@ export default function PricingPage() {
                 <div>
                   <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#34d399" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-                    <span style={{ fontSize: 13, fontWeight: 800, color: "#34d399" }}>Secure Checkout · Powered by Safepay</span>
+                    <span style={{ fontSize: 13, fontWeight: 800, color: "#34d399" }}>Secure Checkout</span>
                   </div>
                   <div style={{ fontSize: 12, color: "rgba(255,255,255,.35)" }}>256-bit SSL · PCI DSS compliant · No card data stored on our servers</div>
                 </div>
@@ -803,21 +803,10 @@ export default function PricingPage() {
                     <div style={{ width: 18, height: 18, borderRadius: "50%", background: "#F79E1B", opacity: .9, marginLeft: -8 }} />
                     <span style={{ fontSize: 11, fontWeight: 800, color: "rgba(255,255,255,.8)", marginLeft: 6 }}>Mastercard</span>
                   </div>
-                  {/* JazzCash */}
-                  <div style={{ display: "flex", alignItems: "center", gap: 6, background: "#CC0000", borderRadius: 8, padding: "6px 12px", height: 36 }}>
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="white"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/></svg>
-                    <span style={{ fontSize: 12, fontWeight: 800, color: "#fff" }}>JazzCash</span>
-                  </div>
-                  {/* Easypaisa */}
-                  <div style={{ display: "flex", alignItems: "center", gap: 6, background: "#44B549", borderRadius: 8, padding: "6px 12px", height: 36 }}>
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="white"><circle cx="12" cy="12" r="10"/><path d="M8 12l3 3 5-5" stroke="#44B549" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round"/></svg>
-                    <span style={{ fontSize: 12, fontWeight: 800, color: "#fff" }}>Easypaisa</span>
-                  </div>
-                  {/* Bank Transfer */}
-                  <div style={{ display: "flex", alignItems: "center", gap: 6, background: "rgba(255,255,255,.05)", border: "1px solid rgba(255,255,255,.1)", borderRadius: 8, padding: "6px 12px", height: 36 }}>
-                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.6)" strokeWidth="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-                    <span style={{ fontSize: 12, fontWeight: 700, color: "rgba(255,255,255,.6)" }}>Bank Transfer</span>
-                    <span style={{ fontSize: 10, color: "rgba(255,255,255,.35)", fontWeight: 600 }}>IBFT</span>
+                  {/* 1Link */}
+                  <div style={{ display: "flex", alignItems: "center", gap: 6, background: "rgba(255,255,255,.06)", border: "1px solid rgba(255,255,255,.1)", borderRadius: 8, padding: "6px 12px", height: 36 }}>
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.8)" strokeWidth="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                    <span style={{ fontSize: 12, fontWeight: 800, color: "rgba(255,255,255,.85)" }}>1Link</span>
                   </div>
                 </div>
               </div>
@@ -832,7 +821,7 @@ export default function PricingPage() {
                 <div>
                   <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#34d399" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-                    <span style={{ fontSize: 13, fontWeight: 800, color: "#34d399" }}>Secure Checkout · Powered by LemonSqueezy</span>
+                    <span style={{ fontSize: 13, fontWeight: 800, color: "#34d399" }}>Secure Checkout</span>
                   </div>
                   <div style={{ fontSize: 12, color: "rgba(255,255,255,.35)" }}>Merchant of Record · We handle tax, compliance & billing globally · 256-bit SSL</div>
                 </div>
@@ -851,21 +840,28 @@ export default function PricingPage() {
                   <div style={{ display: "flex", alignItems: "center", justifyContent: "center", background: "#2E77BC", borderRadius: 8, padding: "6px 12px", height: 36 }}>
                     <span style={{ fontSize: 12, fontWeight: 900, color: "#fff", letterSpacing: ".5px" }}>AMEX</span>
                   </div>
-                  {/* PayPal */}
-                  <div style={{ display: "flex", alignItems: "center", gap: 5, background: "#003087", borderRadius: 8, padding: "6px 12px", height: 36 }}>
-                    <span style={{ fontSize: 14, fontWeight: 900, color: "#009cde", fontStyle: "italic" }}>P</span>
-                    <span style={{ fontSize: 12, fontWeight: 800, color: "#fff" }}>PayPal</span>
+                  {/* Apple Pay */}
+                  <div style={{ display: "flex", alignItems: "center", gap: 5, background: "#000", borderRadius: 8, padding: "6px 12px", height: 36 }}>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="#fff"><path d="M16.5 6.5c-.9 1-2.2 1.7-3.5 1.6-.2-1.3.4-2.7 1.2-3.6.9-1 2.4-1.7 3.6-1.8.1 1.3-.4 2.7-1.3 3.8zM19.8 17c-.5 1.1-.7 1.6-1.4 2.6-.9 1.4-2.2 3.1-3.8 3.1-1.4 0-1.8-.9-3.7-.9s-2.4.9-3.7.9c-1.6 0-2.8-1.5-3.7-2.9C1.6 17.1.9 13.6 2.2 11c.7-1.4 2-2.3 3.4-2.3 1.3 0 2.1.9 3.2.9 1.1 0 1.7-.9 3.3-.9 1.1 0 2.4.6 3.2 1.7-2.8 1.6-2.3 5.6.5 6.6z"/></svg>
+                    <span style={{ fontSize: 12, fontWeight: 800, color: "#fff" }}>Pay</span>
+                  </div>
+                  {/* Google Pay */}
+                  <div style={{ display: "flex", alignItems: "center", gap: 5, background: "rgba(255,255,255,.06)", border: "1px solid rgba(255,255,255,.1)", borderRadius: 8, padding: "6px 12px", height: 36 }}>
+                    <span style={{ fontSize: 13, fontWeight: 900, color: "#4285F4" }}>G</span>
+                    <span style={{ fontSize: 12, fontWeight: 800, color: "rgba(255,255,255,.85)" }}>Pay</span>
                   </div>
                 </div>
               </div>
               <div style={{ marginTop: 16, paddingTop: 14, borderTop: "1px solid rgba(255,255,255,.05)", display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
-                <span style={{ fontSize: 11, color: "rgba(255,255,255,.28)", fontWeight: 600 }}>Regional wallets auto-detected at checkout · Sales tax handled automatically · Invoices issued by LemonSqueezy LLC</span>
+                <span style={{ fontSize: 11, color: "rgba(255,255,255,.28)", fontWeight: 600 }}>Regional wallets auto-detected at checkout · Sales tax handled automatically · Invoices issued automatically</span>
               </div>
             </div>
           )}
         </div>
 
-        {/* ── AUTOMATION ADD-ON ────────────────────────────────── */}
+        {/* ── AUTOMATION ADD-ON ── hidden for now, kept for a quick revert:
+            flip this back to `true` (or drop the guard) to bring it back. ── */}
+        {false && (
         <div style={{ marginBottom: 80 }}>
           <div style={{ textAlign: "center", marginBottom: 36 }}>
             <div style={{ display: "inline-flex", alignItems: "center", gap: 8, background: "rgba(124,58,237,.12)", border: "1px solid rgba(124,58,237,.28)", borderRadius: 100, padding: "5px 14px", fontSize: 12, color: "#a78bfa", fontWeight: 700, marginBottom: 16 }}>
@@ -963,6 +959,7 @@ export default function PricingPage() {
             </div>
           </div>
         </div>
+        )}
 
         {/* ── FEATURE COMPARISON TABLE ────────────────────────── */}
         <div style={{ marginBottom: 80 }}>
