@@ -57,6 +57,9 @@ type DeliveryChallan = {
 type PrintPreferences = {
   paperSize: "A4" | "THERMAL_80MM" | "THERMAL_58MM";
   showLogo: boolean;
+  showAddress?: boolean;
+  showPhone?: boolean;
+  showTaxNumber?: boolean;
   logoUrl: string;
   headerNote: string;
   footerNote: string;
@@ -164,6 +167,9 @@ const [searchTerm, _setSearchTerm] = useState("");
             ...prev,
             paperSize: d.printPreferences.paperSize || prev.paperSize,
             showLogo: d.printPreferences.showLogo ?? prev.showLogo,
+            showAddress: d.printPreferences.showAddress ?? prev.showAddress,
+            showPhone: d.printPreferences.showPhone ?? prev.showPhone,
+            showTaxNumber: d.printPreferences.showTaxNumber ?? prev.showTaxNumber,
             logoUrl: d.printPreferences.logoUrl || prev.logoUrl,
             headerNote: d.printPreferences.headerNote || prev.headerNote,
             footerNote: d.printPreferences.footerNote || prev.footerNote,
@@ -691,10 +697,10 @@ const [searchTerm, _setSearchTerm] = useState("");
 
           {/* PREVIEW */}
           {preview && (
-            {/* The Print & Branding switches apply here too. They were read on
-                the two invoices only, so turning "Show address" off left it
-                printing on every other document — a setting that looked applied
-                and was not. */}
+            // The Print & Branding switches apply here too. They were read on
+            // the two invoices only, so turning "Show address" off left it
+            // printing on every other document — a setting that looked applied
+            // and was not.
             <PrintPaperWrapper>
               <PrintDocA4
                 companyName={companyName}
