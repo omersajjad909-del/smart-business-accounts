@@ -19,6 +19,7 @@ interface AdminSettings {
   companyIdentity: { legalName:string; legalAddress:string; city:string; state:string; postalCode:string; website:string };
   invoiceContact:  { contactName:string; email:string; phone:string; supportEmail:string; supportPhone:string };
   bankDetails:     { bankName:string; accountTitle:string; accountNumber:string; iban:string; swiftCode:string; branchName:string };
+  bankAccounts?:   { bankName:string; accountTitle:string; accountNumber:string; iban:string; swiftCode:string; branchName:string; branchCode?:string }[];
   taxProfile:      { taxIdLabel:string; taxIdValue:string; vatNumber:string; gstNumber:string; registrationNote:string };
   printPreferences:{ paperSize:string; invoiceTemplate:string; footerNote:string; showLogo:boolean };
 }
@@ -88,6 +89,10 @@ export default function BusinessSettingsPage() {
   const [identity, setIdentity] = useState({legalName:"",legalAddress:"",city:"",state:"",postalCode:"",website:""});
   const [contact, setContact]   = useState({contactName:"",email:"",phone:"",supportEmail:"",supportPhone:""});
   const [bank, setBank]         = useState({bankName:"",accountTitle:"",accountNumber:"",iban:"",swiftCode:"",branchName:""});
+  type BankRow = {bankName:string;accountTitle:string;accountNumber:string;iban:string;swiftCode:string;branchName:string;branchCode?:string};
+  const [banks, setBanks]       = useState<BankRow[]>([]);
+  const updBank = (i:number, key:keyof BankRow, value:string) =>
+    setBanks(p=>p.map((row,x)=>x===i?{...row,[key]:value}:row));
   const [tax, setTax]           = useState({taxIdLabel:"",taxIdValue:"",vatNumber:"",gstNumber:"",registrationNote:""});
   const [print, setPrint]       = useState({paperSize:"A4",invoiceTemplate:"classic",footerNote:"Thank you for your business.",showLogo:true});
 
@@ -107,6 +112,9 @@ export default function BusinessSettingsPage() {
         if (a.companyIdentity) setIdentity(prev=>({...prev,...a.companyIdentity}));
         if (a.invoiceContact)  setContact(prev=>({...prev,...a.invoiceContact}));
         if (a.bankDetails)     setBank(prev=>({...prev,...a.bankDetails}));
+        // The server seeds this from the old single account when the list is
+        // empty, so a company that filled that in before never loses it.
+        if (Array.isArray(a.bankAccounts)) setBanks(a.bankAccounts as BankRow[]);
         if (a.taxProfile)      setTax(prev=>({...prev,...a.taxProfile}));
         if (a.printPreferences)setPrint(prev=>({...prev,...a.printPreferences}));
       }
@@ -319,17 +327,43 @@ export default function BusinessSettingsPage() {
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6366f1" strokeWidth="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
               Bank Details
             </div>
-            <Grid>
-              <Field label="Bank Name"><input value={bank.bankName} onChange={e=>setBank(p=>({...p,bankName:e.target.value}))} style={inp()} placeholder="Bank name"/></Field>
-              <Field label="Account Title"><input value={bank.accountTitle} onChange={e=>setBank(p=>({...p,accountTitle:e.target.value}))} style={inp()} placeholder="Account holder name"/></Field>
-              <Field label="Account Number"><input value={bank.accountNumber} onChange={e=>setBank(p=>({...p,accountNumber:e.target.value}))} style={inp()} placeholder="0000-0000-0000"/></Field>
-              <Field label="IBAN"><input value={bank.iban} onChange={e=>setBank(p=>({...p,iban:e.target.value}))} style={inp()} placeholder="IBAN number"/></Field>
-              <Field label="SWIFT / BIC Code"><input value={bank.swiftCode} onChange={e=>setBank(p=>({...p,swiftCode:e.target.value}))} style={inp()} placeholder="SWIFT code"/></Field>
-              <Field label="Branch Name"><input value={bank.branchName} onChange={e=>setBank(p=>({...p,branchName:e.target.value}))} style={inp()} placeholder="Branch name"/></Field>
-            </Grid>
+            {/* A list, not one set of boxes: most companies here collect into
+                two or three accounts and print whichever one a given buyer pays
+                into. The first entry is kept in the older single `bankDetails`
+                field as well, so the Admin Control screen keeps working. */}
+            {banks.length === 0 && (
+              <p style={{fontSize:12.5,color:"var(--text-muted)",margin:"0 0 12px"}}>
+                No bank account added yet.
+              </p>
+            )}
+            {banks.map((b,i)=>(
+              <div key={i} style={{border:"1px solid var(--border)",borderRadius:10,padding:14,marginBottom:12}}>
+                <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:10}}>
+                  <div style={{fontSize:12,fontWeight:800,letterSpacing:.5,color:"var(--text-muted)"}}>
+                    ACCOUNT {i+1}{i===0?" · PRIMARY":""}
+                  </div>
+                  <button onClick={()=>setBanks(p=>p.filter((_,x)=>x!==i))}
+                    style={{background:"transparent",border:"1px solid var(--border)",color:"#f87171",borderRadius:7,padding:"4px 10px",fontSize:11.5,fontWeight:700,cursor:"pointer",fontFamily:"inherit"}}>
+                    Remove
+                  </button>
+                </div>
+                <Grid>
+                  <Field label="Bank Name"><input value={b.bankName} onChange={e=>updBank(i,"bankName",e.target.value)} style={inp()} placeholder="Bank name"/></Field>
+                  <Field label="Account Title"><input value={b.accountTitle} onChange={e=>updBank(i,"accountTitle",e.target.value)} style={inp()} placeholder="Account holder name"/></Field>
+                  <Field label="Account Number"><input value={b.accountNumber} onChange={e=>updBank(i,"accountNumber",e.target.value)} style={inp()} placeholder="0000-0000-0000"/></Field>
+                  <Field label="IBAN"><input value={b.iban} onChange={e=>updBank(i,"iban",e.target.value)} style={inp()} placeholder="IBAN number"/></Field>
+                  <Field label="SWIFT / BIC Code"><input value={b.swiftCode} onChange={e=>updBank(i,"swiftCode",e.target.value)} style={inp()} placeholder="SWIFT code"/></Field>
+                  <Field label="Branch Name"><input value={b.branchName} onChange={e=>updBank(i,"branchName",e.target.value)} style={inp()} placeholder="Branch name"/></Field>
+                </Grid>
+              </div>
+            ))}
+            <button onClick={()=>setBanks(p=>[...p,{bankName:"",accountTitle:"",accountNumber:"",iban:"",swiftCode:"",branchName:"",branchCode:""}])}
+              style={{background:"transparent",border:"1px dashed var(--border)",color:"var(--text-primary)",borderRadius:9,padding:"9px 16px",fontSize:12.5,fontWeight:700,cursor:"pointer",fontFamily:"inherit"}}>
+              + Add bank account
+            </button>
 
             <div style={{display:"flex",justifyContent:"flex-end",marginTop:8}}>
-              <button onClick={()=>saveAdminSection({companyIdentity:identity,invoiceContact:contact,bankDetails:bank})} disabled={saving}
+              <button onClick={()=>saveAdminSection({companyIdentity:identity,invoiceContact:contact,bankAccounts:banks,bankDetails:banks[0]||bank})} disabled={saving}
                 style={{padding:"10px 28px",borderRadius:10,border:"none",cursor:saving?"wait":"pointer",background:"linear-gradient(135deg,#6366f1,#4f46e5)",color:"white",fontSize:13,fontWeight:700,fontFamily:"inherit",boxShadow:"0 4px 16px rgba(99,102,241,.35)",opacity:saving?.6:1}}>
                 {saving?"Saving…":"Save Identity & Bank"}
               </button>

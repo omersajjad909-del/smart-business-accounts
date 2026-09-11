@@ -290,6 +290,20 @@ function normalizeSettings(value: unknown): AdminControlSettings {
       ...DEFAULT_ADMIN_CONTROL_SETTINGS.bankDetails,
       ...bankDetails,
     },
+    // A company that filled in the old single account before the list existed
+    // still has it, as the first entry — dropping it would quietly blank the
+    // bank details on their invoices the day this shipped.
+    bankAccounts: (() => {
+      const raw = Array.isArray((parsed as { bankAccounts?: unknown }).bankAccounts)
+        ? ((parsed as { bankAccounts: unknown[] }).bankAccounts)
+        : [];
+      const list = raw
+        .filter((entry): entry is Partial<BankDetailsProfile> => Boolean(entry) && typeof entry === "object")
+        .map((entry) => ({ ...DEFAULT_ADMIN_CONTROL_SETTINGS.bankDetails, ...entry }));
+      if (list.length) return list;
+      const legacy = { ...DEFAULT_ADMIN_CONTROL_SETTINGS.bankDetails, ...bankDetails };
+      return Object.values(legacy).some((v) => String(v || "").trim()) ? [legacy] : [];
+    })(),
     branchLocations: Object.fromEntries(
       Object.entries(branchLocations).map(([branchId, value]) => [
         branchId,
@@ -402,6 +416,10 @@ export async function saveCompanyAdminControlSettings(
       ...current.bankDetails,
       ...(patch.bankDetails || {}),
     },
+    // Replaced outright rather than merged: a patch that sends the list is
+    // sending the whole list, and merging would make a removed account
+    // impossible to remove.
+    bankAccounts: Array.isArray(patch.bankAccounts) ? patch.bankAccounts : current.bankAccounts,
     branchLocations: {
       ...current.branchLocations,
       ...(patch.branchLocations || {}),

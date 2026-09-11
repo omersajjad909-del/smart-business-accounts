@@ -2664,6 +2664,12 @@ export default function DashboardLayout({
               {hasPermission(currentUser, PERMISSIONS.MANAGE_COST_CENTERS) && <NavLink href="/dashboard/cost-centers" pathname={pathname}>Cost Centers</NavLink>}
               {!isCustomPlan && hasPermission(currentUser, PERMISSIONS.FINANCIAL_YEAR) && <NavLink href="/dashboard/financial-year" pathname={pathname}>Financial Year</NavLink>}
               {!isCustomPlan && hasPermission(currentUser, PERMISSIONS.BUDGET_PLANNING) && <NavLink href="/dashboard/budget" pathname={pathname}>Budget Planning</NavLink>}
+              {/* Both were built and then linked to nothing — reachable only by
+                  typing the URL. Gated on their own Pages & Modules switch,
+                  which ships off, so wiring them in changes nobody's sidebar
+                  until an admin turns one on. */}
+              {hasDashboardFeature("CORE_DEPARTMENT_BUDGETS") && <NavLink href="/dashboard/department-budgets" pathname={pathname}>Department Budgets</NavLink>}
+              {hasDashboardFeature("CORE_REFERRALS") && <NavLink href="/dashboard/referrals" pathname={pathname}>Referrals</NavLink>}
               {!isCustomPlan && hasPermission(currentUser, PERMISSIONS.BACKUP_RESTORE) && <NavLink href="/dashboard/backup-restore" pathname={pathname}>Backup & Restore</NavLink>}
               {/* No !isCustomPlan guard: a Custom-plan tenant still sends invoices, so
                   they still need to send them from their own address. The permission

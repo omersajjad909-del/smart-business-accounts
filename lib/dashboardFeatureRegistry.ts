@@ -2674,6 +2674,16 @@ export const CORE_DASHBOARD_FEATURES: DashboardFeatureDefinition[] = [
   // merchant manufacturer this was built for — one who owns no machines and
   // sends everything out to a thekedar — is usually set up as trading.
   { id: "JOB_WORK", label: "Job Work", route: "/dashboard/job-work", section: "Operations", core: true, defaultEnabled: false, business: "service", businessLabel: "Core (all businesses)", description: "Issue material to an outside worker on a challan and take the finished pieces back, with the stock and the ledger following." },
+
+  // ── Built, but linked to nothing until now ──
+  //
+  // Both pages existed and worked; neither appeared in the sidebar, the nav
+  // order or this registry, so the only way to reach either was to type its
+  // URL. Registered here so each gets a switch in Admin → Plans → Pages &
+  // Modules, and shipped off the same way Job Work is — nobody sees a page
+  // turning up in their sidebar because it was finally wired in.
+  { id: "CORE_DEPARTMENT_BUDGETS", label: "Department Budgets", route: "/dashboard/department-budgets", section: "Settings", core: true, defaultEnabled: false, business: "service", businessLabel: "Core (all businesses)", description: "Budget per department, alongside Budget Planning and Cost Centers." },
+  { id: "CORE_REFERRALS", label: "Referrals", route: "/dashboard/referrals", section: "Settings", core: true, defaultEnabled: false, business: "service", businessLabel: "Core (all businesses)", description: "Refer other businesses and track what each referral turned into." },
 ];
 
 // Core pages join the same list the sidebar, the admin grid and the route
