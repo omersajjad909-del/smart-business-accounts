@@ -3175,6 +3175,7 @@ export default function DashboardLayout({
                     {/* Menu items */}
                     {[
                       ...(currentUser?.role === "ADMIN" ? [{ icon:"🏢", label:"Company Profile", href:"/dashboard/company-profile" }] : []),
+                      ...(currentUser?.role === "ADMIN" ? [{ icon:"🏷️", label:"Business Settings", href:"/dashboard/business-settings" }] : []),
                       { icon:"👤", label:"Account Settings", href:"/dashboard/account-settings" },
                       { icon:"💳", label:"My Billing",        href:"/dashboard/billing" },
                       { icon:"🎨", label:"Appearance",       href:"/dashboard/settings/appearance" },
