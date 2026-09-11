@@ -150,6 +150,15 @@ export type AdminControlSettings = {
   companyIdentity: CompanyIdentityProfile;
   invoiceContact: InvoiceContactProfile;
   bankDetails: BankDetailsProfile;
+  /**
+   * Every bank the company collects into, not just one.
+   *
+   * Most businesses here run two or three accounts and print whichever one
+   * a given buyer pays into, so a single set of boxes forced somebody to
+   * retype them per invoice.  above stays as the first entry
+   * so the older Admin Control screen keeps working untouched.
+   */
+  bankAccounts: BankDetailsProfile[];
   branchLocations: Record<string, BranchGeoProfile>;
   shiftSettings: ShiftSettingsMap;
   features: BusinessFeatureFlags;
