@@ -27,7 +27,8 @@
     "db:migrate": "npx prisma migrate dev",
     "db:studio": "npx prisma studio",
     "db:reset": "npx prisma migrate reset --force && npm run seed",
-    "gen:nav-order": "node scripts/gen-dashboard-nav-order.mjs"
+    "gen:nav-order": "node scripts/gen-dashboard-nav-order.mjs",
+    "check:core-packs": "node scripts/core-pack-diff.mjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.78.0",

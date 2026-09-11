@@ -89,63 +89,241 @@ export const DEFAULT_CORE_PACK: CorePack = {
 };
 
 // ─────────────────────────────────────────────────────────────
+//  Shapes
+//
+//  Most trades fall into one of a dozen paperwork shapes, so the shapes are
+//  named once and the table below points at them. A trade that is genuinely
+//  its own shape spells its pack out inline — that is the signal that it is
+//  unusual, not an oversight.
+// ─────────────────────────────────────────────────────────────
+
+/** Stock is the business: ordered, received, valued, moved, aged. */
+const GOODS_TRADER: CorePack = {
+  purchaseDepth: "po_grn", salesDepth: "order_challan", stockDepth: "full",
+  payroll: true, multiBranch: true, crm: true, costing: true,
+};
+
+/** The same, for a shop that sells rather than plans — no budgets or cost centres. */
+const GOODS_SHOP: CorePack = { ...GOODS_TRADER, costing: false };
+
+/** Buys goods, sells across a counter: spare parts, a repair shop's bench stock. */
+const PARTS_COUNTER: CorePack = {
+  purchaseDepth: "invoice", salesDepth: "bill", stockDepth: "full",
+  payroll: true, multiBranch: true, crm: true, costing: false,
+};
+
+/** A kitchen: provisions in on order, plates out at the table, recipes costed. */
+const KITCHEN: CorePack = {
+  purchaseDepth: "po_grn", salesDepth: "bill", stockDepth: "consumables",
+  payroll: true, multiBranch: true, crm: true, costing: true,
+};
+
+/** Quotes work, invoices on acceptance, holds nothing on a shelf. */
+const SERVICE_FIRM: CorePack = {
+  purchaseDepth: "invoice", salesDepth: "quote_invoice", stockDepth: "none",
+  payroll: true, multiBranch: true, crm: true, costing: false,
+};
+
+/** The same, where the work is a project with a budget to hold it to. */
+const PROJECT_FIRM: CorePack = { ...SERVICE_FIRM, costing: true };
+
+/** Service delivered over a counter, with consumables used up doing it. */
+const COUNTER_SERVICE: CorePack = {
+  purchaseDepth: "invoice", salesDepth: "bill", stockDepth: "consumables",
+  payroll: true, multiBranch: true, crm: true, costing: false,
+};
+
+/** Bills on a cycle rather than per job: subscriptions, memberships, meters. */
+const RECURRING_BILLER: CorePack = {
+  purchaseDepth: "invoice", salesDepth: "bill", stockDepth: "none",
+  payroll: true, multiBranch: true, crm: true, costing: false,
+};
+
+/** Meter-read utilities — recurring billing, but with plant and spares to fund. */
+const UTILITY: CorePack = {
+  purchaseDepth: "invoice", salesDepth: "bill", stockDepth: "consumables",
+  payroll: true, multiBranch: true, crm: true, costing: true,
+};
+
+/** Hires an asset out and back: the asset is not stock, the spares are. */
+const RENTAL: CorePack = {
+  purchaseDepth: "invoice", salesDepth: "quote_invoice", stockDepth: "consumables",
+  payroll: true, multiBranch: true, crm: true, costing: false,
+};
+
+/** Beds, wards and classrooms: ordered supplies, billed at a desk, budgeted. */
+const INSTITUTION: CorePack = {
+  purchaseDepth: "po_grn", salesDepth: "bill", stockDepth: "consumables",
+  payroll: true, multiBranch: true, crm: true, costing: true,
+};
+
+// ─────────────────────────────────────────────────────────────
 //  Per-business packs
 //
-//  Only the nine live business types are profiled. The rest sit behind
-//  BUSINESS_PHASE_CONFIG as coming_soon and fall back to DEFAULT_CORE_PACK —
-//  each one gets its pack as it is brought live, which is the point where
-//  somebody actually knows how that trade works.
+//  Two id vocabularies reach this table: BUSINESS_PHASE_CONFIG in
+//  businessModules.ts (what business-setup writes to company.businessType) and
+//  ALL_BUSINESS_TYPES in businessTypes.ts (what the admin panel lists), which
+//  spell several trades differently — "service" / "services", "car_workshop" /
+//  "automotive". Both spellings are entered so a company lands on its real pack
+//  whichever list it was created from, rather than silently on the wide default.
 // ─────────────────────────────────────────────────────────────
 export const CORE_PACKS: Record<string, CorePack> = {
-  // ── Commerce — stock is the business ──
-  trading: {
-    purchaseDepth: "po_grn", salesDepth: "order_challan", stockDepth: "full",
-    payroll: true, multiBranch: true, crm: true, costing: true,
-  },
-  wholesale: {
-    purchaseDepth: "po_grn", salesDepth: "order_challan", stockDepth: "full",
-    payroll: true, multiBranch: true, crm: true, costing: true,
-  },
-  distribution: {
-    purchaseDepth: "po_grn", salesDepth: "order_challan", stockDepth: "full",
-    payroll: true, multiBranch: true, crm: true, costing: true,
-  },
-  import_company: {
-    purchaseDepth: "po_grn", salesDepth: "order_challan", stockDepth: "full",
-    payroll: true, multiBranch: true, crm: true, costing: true,
-  },
-  manufacturing: {
-    purchaseDepth: "po_grn", salesDepth: "order_challan", stockDepth: "full",
-    payroll: true, multiBranch: true, crm: true, costing: true,
-  },
 
-  // Retail sells over a counter, so there is no quotation stage in its own
-  // flow — but its Sales group links Quotation and Delivery Challan for the
-  // shop that also supplies trade customers, so the depth stays order_challan.
-  // Budgets and cost centres are the one thing a single shop does not run.
-  retail: {
-    purchaseDepth: "po_grn", salesDepth: "order_challan", stockDepth: "full",
-    payroll: true, multiBranch: true, crm: true, costing: false,
-  },
+  // ── Commerce — stock is the business ──────────────────────
+  trading: GOODS_TRADER,
+  wholesale: GOODS_TRADER,
+  distribution: GOODS_TRADER,
+  import_company: GOODS_TRADER,
+  export_company: GOODS_TRADER,
+  manufacturing: GOODS_TRADER,
+  food_processing: GOODS_TRADER,
+  garments: GOODS_TRADER,
+  textile_mill: GOODS_TRADER,
+  steel_mill: GOODS_TRADER,
+  chemical: GOODS_TRADER,
+  mining: GOODS_TRADER,
+  oil_gas: GOODS_TRADER,
+  printing_press: GOODS_TRADER,
+  printing: GOODS_TRADER,
+  agriculture: GOODS_TRADER,
+  construction: GOODS_TRADER,
+  solar_company: GOODS_TRADER,
+  solar: GOODS_TRADER,
+  chain_store: GOODS_TRADER,
+  enterprise: GOODS_TRADER,
+  general: GOODS_TRADER,
 
-  // ── Services — a file moves, not a carton ──
+  // Retail sells over a counter, but its own Sales group links Quotation and
+  // Delivery Challan for the shop that also supplies trade customers — so the
+  // sales depth stays the full ladder. Budgets and cost centres are the one
+  // thing a shop floor does not run.
+  retail: GOODS_SHOP,
+  supermarket: GOODS_SHOP,
+  ecommerce: GOODS_SHOP,
+  subscription_box: GOODS_SHOP,
+  hardware: GOODS_SHOP,
+  spare_parts: GOODS_SHOP,
+  car_showroom: GOODS_SHOP,
+  bakery: GOODS_SHOP,
+  cold_storage: GOODS_SHOP,
+  water_plant: GOODS_SHOP,
+  shipping: GOODS_SHOP,
+
+  // Batch and expiry decide whether a pharmacy is compliant, so it keeps the
+  // full stock ladder even though it bills at a counter.
+  pharmacy: { ...GOODS_SHOP, salesDepth: "bill" },
+
+  // ── Workshops and parts counters ──────────────────────────
+  car_workshop: PARTS_COUNTER,
+  automotive: PARTS_COUNTER,
+  mobile_repair: PARTS_COUNTER,
+  computer_repair: PARTS_COUNTER,
+  electronics_repair: PARTS_COUNTER,
+  repair: PARTS_COUNTER,
+
+  // ── Food service ──────────────────────────────────────────
+  restaurant: KITCHEN,
+  franchise_restaurant: KITCHEN,
+
+  // ── Beds, wards, classrooms ───────────────────────────────
+  hotel: INSTITUTION,
+  hospital: INSTITUTION,
+  hospital_chain: INSTITUTION,
+  school: INSTITUTION,
+  university: INSTITUTION,
+
+  // A clinic is a consulting room, not a ward: supplies arrive on a bill.
+  clinic: COUNTER_SERVICE,
+
+  // ── Counter services — consumables used up serving the customer ──
   //
-  // A C&F agent's "goods" belong to the client, so they never enter its own
-  // stock. It buys services (port charges, transport) on a direct bill.
-  clearing_forwarding: {
-    purchaseDepth: "invoice", salesDepth: "quote_invoice", stockDepth: "none",
-    payroll: true, multiBranch: true, crm: true, costing: false,
+  // A salon buys colour, shampoo and consumables and needs to know when they
+  // are running out — so it gets a supplier bill and a light stock count. What
+  // it does not get is the goods pipeline: no purchase order to raise, no GRN
+  // to receive against, no delivery challan, no warehouse, no stock valuation.
+  // That distinction — "buys, but does not trade" — is the whole reason this
+  // file exists.
+  salon: COUNTER_SERVICE,
+  gym: COUNTER_SERVICE,
+  security: COUNTER_SERVICE,
+  courier: COUNTER_SERVICE,
+
+  // ── Professional and creative firms ───────────────────────
+  service: SERVICE_FIRM,
+  services: SERVICE_FIRM,
+  law_firm: SERVICE_FIRM,
+  accounting_firm: SERVICE_FIRM,
+  audit_firm: SERVICE_FIRM,
+  consultancy_firm: SERVICE_FIRM,
+  insurance: SERVICE_FIRM,
+  microfinance: SERVICE_FIRM,
+
+  architecture_firm: PROJECT_FIRM,
+  it_company: PROJECT_FIRM,
+  advertising_agency: PROJECT_FIRM,
+  advertising: PROJECT_FIRM,
+  digital_marketing: PROJECT_FIRM,
+  media_house: PROJECT_FIRM,
+  production_house: PROJECT_FIRM,
+  media: PROJECT_FIRM,
+  equipment_maintenance: PROJECT_FIRM,
+  aviation: PROJECT_FIRM,
+
+  // Per-trip costing is the whole game in transport, and the vehicles run on
+  // fuel, tyres and spares rather than saleable stock.
+  transport: { ...PROJECT_FIRM, stockDepth: "consumables" },
+
+  // A C&F agent's "goods" belong to the client and never enter its own stock.
+  // It buys services — port charges, transport — on a direct bill.
+  clearing_forwarding: SERVICE_FIRM,
+
+  // A travel agency holds no stock at all: a ticket is issued, not shipped. It
+  // buys — airline settlements, embassy fees — but on a direct bill, with no
+  // order to receive against. Branches stay on: agencies run city offices.
+  travel: SERVICE_FIRM,
+
+  // Events are quoted, budgeted and then consume decor, catering and hire.
+  event_planner: { ...PROJECT_FIRM, stockDepth: "consumables" },
+  wedding_planner: { ...PROJECT_FIRM, stockDepth: "consumables" },
+  events: { ...PROJECT_FIRM, stockDepth: "consumables" },
+  decorator: { ...PROJECT_FIRM, stockDepth: "consumables" },
+  sound_services: RENTAL,
+
+  // ── Rentals — the asset is not stock, the spares are ──────
+  equipment_rental: RENTAL,
+  generator_rental: RENTAL,
+  car_rental: RENTAL,
+  property_rental: { ...RENTAL, stockDepth: "none" },
+  real_estate: { ...RENTAL, stockDepth: "none" },
+
+  // ── Billed on a cycle, not per job ────────────────────────
+  saas_company: RECURRING_BILLER,
+  saas: RECURRING_BILLER,
+  membership_website: RECURRING_BILLER,
+  telecom: RECURRING_BILLER,
+  isp: { ...RECURRING_BILLER, stockDepth: "consumables" },
+  cable_network: { ...RECURRING_BILLER, stockDepth: "consumables" },
+
+  // Royalty and brand compliance, billed to outlets that hold their own stock.
+  franchise_brand: { ...PROJECT_FIRM },
+  franchise: { ...PROJECT_FIRM },
+
+  // ── Metered utilities ─────────────────────────────────────
+  electric_company: UTILITY,
+  gas_distribution: UTILITY,
+  water_supply: UTILITY,
+  power_plant: UTILITY,
+
+  // ── Donor-funded ──────────────────────────────────────────
+  //
+  // Money arrives as a donation, not a sale, and leaves against a grant line.
+  // The receipt side is the only "selling" an NGO does.
+  ngo: {
+    purchaseDepth: "invoice", salesDepth: "bill", stockDepth: "consumables",
+    payroll: true, multiBranch: true, crm: true, costing: true,
   },
 
-  // A travel agency holds no stock at all: a ticket is issued, not shipped.
-  // It buys — airline settlements, embassy fees — but on a direct bill, with
-  // no order to receive against. Branches stay on: agencies run city offices.
-  travel: {
-    purchaseDepth: "invoice", salesDepth: "quote_invoice", stockDepth: "none",
-    payroll: true, multiBranch: true, crm: true, costing: false,
-  },
-
-  // ── Finance ──
+  // ── Finance ───────────────────────────────────────────────
   //
   // An investor neither buys nor sells: capital goes in, a share of someone
   // else's output comes back. Every sales and purchase document is noise, and

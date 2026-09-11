@@ -31,8 +31,9 @@ try {
     stdin: {
       contents: `
         export { CORE_DASHBOARD_FEATURES, createDefaultDashboardFeatureFlags } from "./lib/dashboardFeatureRegistry";
-        export { CORE_PACKS, getCorePack, corePackAllows, describeCorePack } from "./lib/corePack";
-        export { BUSINESS_TYPES } from "./lib/businessModules";
+        export { CORE_PACKS, getCorePack, corePackAllows, describeCorePack, hasCorePack } from "./lib/corePack";
+        export { BUSINESS_TYPES, BUSINESS_PHASE_CONFIG, LIVE_TYPES } from "./lib/businessModules";
+        export { ALL_BUSINESS_TYPES } from "./lib/businessTypes";
       `,
       resolveDir: process.cwd(),
       loader: "ts",
@@ -45,17 +46,37 @@ try {
   });
 
   const mod = await import(pathToFileURL(bundle).href);
-  const { CORE_DASHBOARD_FEATURES, createDefaultDashboardFeatureFlags, CORE_PACKS, getCorePack, corePackAllows, describeCorePack } = mod;
+  const {
+    CORE_DASHBOARD_FEATURES, createDefaultDashboardFeatureFlags,
+    CORE_PACKS, getCorePack, corePackAllows, describeCorePack, hasCorePack,
+    BUSINESS_PHASE_CONFIG, LIVE_TYPES, ALL_BUSINESS_TYPES,
+  } = mod;
 
   const coreDefs = CORE_DASHBOARD_FEATURES.filter((f) => f.core);
   const label = new Map(coreDefs.map((f) => [f.id, `${f.section} › ${f.label}`]));
   const planDefaults = createDefaultDashboardFeatureFlags();
 
-  console.log(`\n${coreDefs.length} core pages · ${Object.keys(CORE_PACKS).length} profiled business types\n`);
+  // Coverage first: an unprofiled trade silently falls back to the widest pack,
+  // which is the old "every business looks the same" behaviour coming back for
+  // that one trade. Both id vocabularies are checked — business-setup writes
+  // BUSINESS_PHASE_CONFIG ids, the admin panel lists businessTypes.ts ids.
+  const everyId = [
+    ...Object.keys(BUSINESS_PHASE_CONFIG),
+    ...ALL_BUSINESS_TYPES.map((b) => b.id),
+  ];
+  const unprofiled = [...new Set(everyId)].filter((id) => !hasCorePack(id)).sort();
+  console.log(`\n${coreDefs.length} core pages · ${Object.keys(CORE_PACKS).length} packs`);
+  console.log(`business type ids across both lists: ${new Set(everyId).size} · unprofiled: ${unprofiled.length}`);
+  if (unprofiled.length) console.log(`  falling back to DEFAULT_CORE_PACK: ${unprofiled.join(", ")}`);
+
+  // Only live trades can have customers to regress, so those are listed first
+  // and in full; the rest are summarised.
+  const live = new Set(LIVE_TYPES);
+  const order = Object.keys(CORE_PACKS).sort((a, b) => (live.has(b) ? 1 : 0) - (live.has(a) ? 1 : 0));
 
   let totalRemoved = 0;
 
-  for (const businessType of Object.keys(CORE_PACKS)) {
+  for (const businessType of order.filter((b) => live.has(b))) {
     const pack = getCorePack(businessType);
     console.log(`${"─".repeat(72)}`);
     console.log(`${businessType}`);
@@ -83,29 +104,36 @@ try {
 
   console.log(`${"─".repeat(72)}`);
 
-  // A page no live pack can ever reach is either mis-ruled or belongs to a
-  // trade that is not live yet — worth seeing either way.
+  // Everything not yet live: one line each, since nobody is using these packs
+  // in anger yet and the page count is the only thing worth eyeballing.
+  console.log(`\nNot live yet — Enterprise core page count per pack:\n`);
+  const rows = order
+    .filter((b) => !live.has(b))
+    .map((b) => {
+      const pack = getCorePack(b);
+      const all = (planDefaults.ENTERPRISE || []).filter((id) => label.has(id));
+      return { b, n: all.filter((id) => corePackAllows(pack, id)).length, d: describeCorePack(pack) };
+    })
+    .sort((x, y) => y.n - x.n || x.b.localeCompare(y.b));
+  for (const r of rows) console.log(`  ${String(r.n).padStart(3)}  ${r.b.padEnd(22)} ${r.d}`);
+
+  // A page no pack can reach is either mis-ruled or spelled wrong in the rules
+  // table, where a typo is silent — the rule simply never fires.
   const reachable = new Set();
   for (const businessType of Object.keys(CORE_PACKS)) {
     const pack = getCorePack(businessType);
     for (const def of coreDefs) if (corePackAllows(pack, def.id)) reachable.add(def.id);
   }
   const orphans = coreDefs.filter((d) => !reachable.has(d.id));
-  console.log(`\nRemovals across all packs and plans: ${totalRemoved}`);
-  console.log(`Core pages no live pack reaches: ${orphans.length}`);
+  console.log(`\n${"─".repeat(72)}`);
+  console.log(`Removals across live packs and plans: ${totalRemoved}`);
+  console.log(`Core pages no pack reaches: ${orphans.length}`);
   for (const def of orphans) console.log(`  · ${label.get(def.id)}  (${def.id})`);
 
-  // Every id in the rules table has to name a page that exists, or the rule is
-  // silently doing nothing.
-  const known = new Set(coreDefs.map((d) => d.id));
-  const allRuled = new Set();
-  for (const def of coreDefs) {
-    const everyone = Object.keys(CORE_PACKS).every((b) => corePackAllows(getCorePack(b), def.id));
-    if (!everyone) allRuled.add(def.id);
-  }
-  const universal = coreDefs.filter((d) => !allRuled.has(d.id)).length;
-  console.log(`\nUniversal (every live pack): ${universal}   Gated by pack: ${allRuled.size}`);
-  if (!known.size) console.log("No core pages found — the registry import is wrong.");
+  const gated = coreDefs.filter((def) =>
+    !Object.keys(CORE_PACKS).every((b) => corePackAllows(getCorePack(b), def.id)),
+  );
+  console.log(`Universal (every pack): ${coreDefs.length - gated.length}   Gated by pack: ${gated.length}`);
   console.log("");
 } finally {
   rmSync(dir, { recursive: true, force: true });
