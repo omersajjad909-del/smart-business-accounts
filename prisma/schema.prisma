@@ -322,6 +322,9 @@ model SalesInvoice {
 
   items   SalesInvoiceItem[]
   returns SaleReturn[]       @relation("InvoiceReturns")
+  // The challans the goods actually went out on. An invoice can have more
+  // than one: a single bill is often loaded onto two vehicles.
+  deliveryChallans DeliveryChallan[] @relation("InvoiceChallans")
 
   salesmanId String?
   salesman   User?   @relation("SalesmanInvoices", fields: [salesmanId], references: [id])
@@ -1688,6 +1691,13 @@ model DeliveryChallan {
   // stays rather than being migrated away.
   packagingItemId String?
   packagingItem   ItemNew? @relation("ChallanPackagingItem", fields: [packagingItemId], references: [id])
+
+  // Set when the challan was raised off an already-written sales invoice.
+  // That invoice has taken the goods out of stock, so this challan must not
+  // take them out a second time — see writeDispatchStock in
+  // app/api/delivery-challan/route.ts. Null on a challan written on its own.
+  salesInvoiceId String?
+  salesInvoice   SalesInvoice? @relation("InvoiceChallans", fields: [salesInvoiceId], references: [id])
 
   items           DeliveryChallanItem[]
   status          String                @default("PENDING") // PENDING | DELIVERED | INVOICED
