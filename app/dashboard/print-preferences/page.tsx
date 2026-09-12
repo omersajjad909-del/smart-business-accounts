@@ -30,6 +30,9 @@ import {
   overriddenKeys,
   resolvePrintProfile,
   resetDoc,
+  setBaseDesign,
+  setBaseField,
+  setBaseFooterNote,
   setDocDesign,
   setDocField,
   setDocFooterNote,
@@ -87,7 +90,10 @@ export default function PrintPreferencesPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [dirty, setDirty] = useState(false);
-  const [doc, setDoc] = useState<DocKind>("sales_invoice");
+  // "base" is the row every document inherits from. It has to be editable here,
+  // or "Reset to base" resets to something nobody can reach and the only way to
+  // change a setting everywhere is to change it seven times.
+  const [sel, setSel] = useState<DocKind | "base">("base");
   const [profiles, setProfiles] = useState<PrintProfiles>(DEFAULT_PRINT_PROFILES);
   const [company, setCompany] = useState<CompanyBits>({ name: "Your Company" });
 
@@ -119,11 +125,23 @@ export default function PrintPreferencesPage() {
     return () => { cancelled = true; };
   }, []);
 
-  const resolved = useMemo(() => resolvePrintProfile(profiles, doc), [profiles, doc]);
-  const overrides = useMemo(() => overriddenKeys(profiles, doc), [profiles, doc]);
+  const isBase = sel === "base";
+  /** The document being edited. On the base row, the sales invoice stands in for the preview. */
+  const doc = (isBase ? "sales_invoice" : sel) as DocKind;
+
+  const resolved = useMemo(
+    () => (isBase ? profiles.base : resolvePrintProfile(profiles, doc)),
+    [isBase, profiles, doc],
+  );
+  const overrides = useMemo(
+    () => (isBase ? [] : overriddenKeys(profiles, doc)),
+    [isBase, profiles, doc],
+  );
   const overrideSet = useMemo(() => new Set(overrides), [overrides]);
 
-  const partyWord = docPartyWord(doc);
+  // The base applies to documents on both sides of a trade, so it cannot call
+  // the other party either one of them.
+  const partyWord = isBase ? "Customer / Supplier" : docPartyWord(doc);
 
   function update(next: PrintProfiles) {
     setProfiles(next);
@@ -160,8 +178,8 @@ export default function PrintPreferencesPage() {
         <div>
           <h1 style={{ fontSize: 22, fontWeight: 700, margin: "0 0 3px" }}>Print Preferences</h1>
           <p style={{ margin: 0, fontSize: 13, color: MUTED, maxWidth: "62ch" }}>
-            Har document apni setting rakhta hai. Jo aap yahan nahi chhedte, wo{" "}
-            <b>All documents</b> se chalta rahega.
+            Every document keeps its own settings. Anything you leave alone here
+            follows <b>All documents</b>.
           </p>
         </div>
         <button
@@ -209,7 +227,7 @@ export default function PrintPreferencesPage() {
                 <span style={{ fontSize: 13.5, fontWeight: active ? 700 : 500 }}>{d.label}</span>
                 {n > 0 && (
                   <span
-                    title={`${n} setting${n > 1 ? "s" : ""} is document ke liye alag hai`}
+                    title={`${n} setting${n > 1 ? "s" : ""} set just for this document`}
                     style={{ fontSize: 10.5, fontWeight: 700, color: "#b45309", background: "rgba(245,158,11,0.16)", padding: "1px 6px", borderRadius: 5 }}
                   >
                     {n}
@@ -219,7 +237,7 @@ export default function PrintPreferencesPage() {
             );
           })}
           <div style={{ padding: "11px 14px", fontSize: 11.5, color: MUTED, lineHeight: 1.5 }}>
-            Number batata hai ke us document ki kitni settings base se alag hain.
+            The number counts how many settings that document keeps of its own.
           </div>
         </div>
 
@@ -230,10 +248,10 @@ export default function PrintPreferencesPage() {
           <section style={{ background: PANEL, border: `1px solid ${BORDER}`, borderRadius: 12, padding: "16px 18px", display: "flex", flexDirection: "column", gap: 14 }}>
             <div>
               <h2 style={{ fontSize: 15.5, fontWeight: 700, margin: "0 0 3px" }}>
-                {docKindLabel(doc)} — kya kya chhape
+                {isBase ? "All documents" : docKindLabel(doc)} — what prints
               </h2>
               <p style={{ margin: 0, fontSize: 12.5, color: MUTED }}>
-                Dono taraf ki information alag alag: aap ki apni, aur {partyWord.toLowerCase()} ki.
+                Each side is set separately — your own details, and the {partyWord.toLowerCase()}&apos;s.
               </p>
             </div>
 
@@ -262,7 +280,7 @@ export default function PrintPreferencesPage() {
                         <span style={{ minWidth: 0 }}>
                           <span style={{ color: checked ? TEXT : MUTED }}>{item.label}</span>
                           {isOverride && (
-                            <span style={{ fontSize: 10, color: "#b45309", marginLeft: 6, whiteSpace: "nowrap" }}>alag</span>
+                            <span style={{ fontSize: 10, color: "#b45309", marginLeft: 6, whiteSpace: "nowrap" }}>custom</span>
                           )}
                           {item.hint && (
                             <span style={{ display: "block", fontSize: 11, color: MUTED, lineHeight: 1.4 }}>{item.hint}</span>
@@ -313,8 +331,8 @@ export default function PrintPreferencesPage() {
             <div>
               <h2 style={{ fontSize: 15.5, fontWeight: 700, margin: "0 0 3px" }}>Design</h2>
               <p style={{ margin: 0, fontSize: 12.5, color: MUTED }}>
-                Har design ka apna layout hai — letterhead, party block, grid aur totals sab badalte hain.
-                Column order aur width har design me aik jaisi rehti hai.
+                Every design has its own layout — letterhead, party block, grid and totals all change.
+                Column order and widths stay the same in all of them.
               </p>
             </div>
             <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(auto-fill, minmax(190px, 1fr))", gap: 10 }}>
@@ -354,7 +372,7 @@ export default function PrintPreferencesPage() {
             <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: 12, flexWrap: "wrap" }}>
               <h2 style={{ fontSize: 15.5, fontWeight: 700, margin: 0 }}>Preview</h2>
               <span style={{ fontSize: 11.5, color: MUTED }}>
-                Sample data · A4 210×297mm · bilkul wahi jo {docKindLabel(doc)} par chhapega
+                Sample data · A4 210×297mm · exactly what a {isBase ? "document" : docKindLabel(doc)} will print
               </span>
             </div>
             <div style={{ border: `1px solid ${BORDER}`, borderRadius: 12, overflow: "hidden" }}>

@@ -247,6 +247,46 @@ export function resetDoc(profiles: PrintProfiles, doc: DocKind): PrintProfiles {
   return { ...profiles, perDoc };
 }
 
+// ─────────────────────────────────────────────────────────────
+//  Editing the base
+//
+//  Changing the base has to sweep the overrides afterwards. A document that
+//  had "logo off" while the base said on is genuinely overriding it; the moment
+//  the base is switched off too, that same entry is saying nothing — and if it
+//  stayed, the document would be marked as customised forever and would stop
+//  following the base the next time it moved.
+// ─────────────────────────────────────────────────────────────
+
+function sweep(profiles: PrintProfiles): PrintProfiles {
+  const perDoc: Partial<Record<DocKind, PrintProfilePatch>> = {};
+  for (const [doc, patch] of Object.entries(profiles.perDoc) as [DocKind, PrintProfilePatch][]) {
+    if (!patch) continue;
+    const next: PrintProfilePatch = {};
+    if (patch.design !== undefined && patch.design !== profiles.base.design) next.design = patch.design;
+    if (patch.footerNote !== undefined && patch.footerNote !== profiles.base.footerNote) next.footerNote = patch.footerNote;
+    if (patch.signatureLabels !== undefined) next.signatureLabels = patch.signatureLabels;
+    const fields: Partial<PrintFields> = {};
+    for (const [k, v] of Object.entries(patch.fields || {})) {
+      if (v !== undefined && v !== profiles.base.fields[k as PrintFieldKey]) fields[k as PrintFieldKey] = v as boolean;
+    }
+    if (Object.keys(fields).length) next.fields = fields;
+    if (Object.keys(next).length) perDoc[doc] = next;
+  }
+  return { ...profiles, perDoc };
+}
+
+export function setBaseField(profiles: PrintProfiles, key: PrintFieldKey, value: boolean): PrintProfiles {
+  return sweep({ ...profiles, base: { ...profiles.base, fields: { ...profiles.base.fields, [key]: value } } });
+}
+
+export function setBaseDesign(profiles: PrintProfiles, design: PrintDesignId): PrintProfiles {
+  return sweep({ ...profiles, base: { ...profiles.base, design } });
+}
+
+export function setBaseFooterNote(profiles: PrintProfiles, note: string): PrintProfiles {
+  return sweep({ ...profiles, base: { ...profiles.base, footerNote: note } });
+}
+
 function prune(profiles: PrintProfiles, doc: DocKind, patch: PrintProfilePatch): PrintProfiles {
   const empty =
     patch.design === undefined &&
