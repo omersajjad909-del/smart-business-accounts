@@ -205,8 +205,29 @@ export default function PrintPreferencesPage() {
           <div style={{ padding: "11px 14px", borderBottom: `1px solid ${BORDER}`, fontSize: 11, letterSpacing: 0.7, textTransform: "uppercase", color: MUTED }}>
             Document
           </div>
+
+          {/* The row everything else inherits from. First in the list because
+              it is where a company sets its house style once, and each document
+              below only departs from it where it has to. */}
+          <div
+            id="pp-doc-base"
+            role="button"
+            tabIndex={0}
+            onClick={() => setSel("base")}
+            onKeyDown={e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setSel("base"); } }}
+            style={{
+              padding: "11px 14px", cursor: "pointer",
+              borderBottom: `1px solid ${BORDER}`,
+              borderLeft: `3px solid ${isBase ? ACCENT : "transparent"}`,
+              background: isBase ? "rgba(99,102,241,0.10)" : "transparent",
+            }}
+          >
+            <div style={{ fontSize: 13.5, fontWeight: isBase ? 700 : 500 }}>All documents</div>
+            <div style={{ fontSize: 11, color: MUTED, marginTop: 1 }}>The starting point for all seven</div>
+          </div>
+
           {DOC_KINDS.map(d => {
-            const active = d.id === doc;
+            const active = d.id === sel;
             const n = overriddenKeys(profiles, d.id).length;
             return (
               <div
@@ -214,8 +235,8 @@ export default function PrintPreferencesPage() {
                 id={`pp-doc-${d.id}`}
                 role="button"
                 tabIndex={0}
-                onClick={() => setDoc(d.id)}
-                onKeyDown={e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setDoc(d.id); } }}
+                onClick={() => setSel(d.id)}
+                onKeyDown={e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setSel(d.id); } }}
                 style={{
                   padding: "11px 14px", cursor: "pointer",
                   borderBottom: `1px solid ${BORDER}`,
@@ -267,14 +288,16 @@ export default function PrintPreferencesPage() {
                     return (
                       <label
                         key={item.key}
-                        htmlFor={`pp-${doc}-${item.key}`}
+                        htmlFor={`pp-${sel}-${item.key}`}
                         style={{ display: "flex", alignItems: "flex-start", gap: 8, cursor: "pointer", fontSize: 13 }}
                       >
                         <input
-                          id={`pp-${doc}-${item.key}`}
+                          id={`pp-${sel}-${item.key}`}
                           type="checkbox"
                           checked={checked}
-                          onChange={e => update(setDocField(profiles, doc, item.key as PrintFieldKey, e.target.checked))}
+                          onChange={e => update(isBase
+                            ? setBaseField(profiles, item.key as PrintFieldKey, e.target.checked)
+                            : setDocField(profiles, doc, item.key as PrintFieldKey, e.target.checked))}
                           style={{ marginTop: 2, accentColor: ACCENT, width: 15, height: 15, flex: "none" }}
                         />
                         <span style={{ minWidth: 0 }}>
@@ -295,13 +318,13 @@ export default function PrintPreferencesPage() {
 
             <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr auto", gap: 12, alignItems: "end" }}>
               <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
-                <label htmlFor={`pp-${doc}-footer`} style={{ fontSize: 11, letterSpacing: 0.6, textTransform: "uppercase", color: MUTED }}>
+                <label htmlFor={`pp-${sel}-footer`} style={{ fontSize: 11, letterSpacing: 0.6, textTransform: "uppercase", color: MUTED }}>
                   Footer note
                 </label>
                 <input
-                  id={`pp-${doc}-footer`}
+                  id={`pp-${sel}-footer`}
                   value={resolved.footerNote}
-                  onChange={e => update(setDocFooterNote(profiles, doc, e.target.value))}
+                  onChange={e => update(isBase ? setBaseFooterNote(profiles, e.target.value) : setDocFooterNote(profiles, doc, e.target.value))}
                   placeholder="Thank you for your business."
                   style={{
                     padding: "9px 12px", borderRadius: 8, border: `1.5px solid ${BORDER}`,
@@ -311,14 +334,16 @@ export default function PrintPreferencesPage() {
               </div>
               <button
                 onClick={() => update(resetDoc(profiles, doc))}
-                disabled={overrides.length === 0}
+                disabled={isBase || overrides.length === 0}
+                title={isBase ? "This is the base — the documents reset to it." : undefined}
                 style={{
                   padding: "9px 14px", borderRadius: 8, border: `1px solid ${BORDER}`,
                   background: "transparent",
-                  color: overrides.length === 0 ? MUTED : TEXT,
+                  color: isBase || overrides.length === 0 ? MUTED : TEXT,
                   fontFamily: FONT, fontSize: 12.5,
-                  cursor: overrides.length === 0 ? "default" : "pointer",
+                  cursor: isBase || overrides.length === 0 ? "default" : "pointer",
                   whiteSpace: "nowrap",
+                  visibility: isBase ? "hidden" : "visible",
                 }}
               >
                 Reset to base
@@ -344,8 +369,8 @@ export default function PrintPreferencesPage() {
                     id={`pp-design-${d.id}`}
                     role="button"
                     tabIndex={0}
-                    onClick={() => update(setDocDesign(profiles, doc, d.id as PrintDesignId))}
-                    onKeyDown={e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); update(setDocDesign(profiles, doc, d.id as PrintDesignId)); } }}
+                    onClick={() => update(isBase ? setBaseDesign(profiles, d.id as PrintDesignId) : setDocDesign(profiles, doc, d.id as PrintDesignId))}
+                    onKeyDown={e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); update(isBase ? setBaseDesign(profiles, d.id as PrintDesignId) : setDocDesign(profiles, doc, d.id as PrintDesignId)); } }}
                     style={{
                       border: `1.5px solid ${active ? ACCENT : BORDER}`,
                       background: active ? "rgba(99,102,241,0.08)" : "transparent",
