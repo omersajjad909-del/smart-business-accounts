@@ -67,7 +67,7 @@ export default function PurchaseOrderPage() {
   const { isMobile } = useResponsive();
   // Address, phone, tax registration and the Print & Branding switches,
   // read the one way every document reads them.
-  const printHeader = useCompanyPrintHeader();
+  const printHeader = useCompanyPrintHeader("purchase_order");
   const today = new Date().toISOString().slice(0, 10);
   const user = getCurrentUser();
 

@@ -90,7 +90,7 @@ export default function DeliveryChallanPage() {
   const { isMobile } = useResponsive();
   // Address, phone, tax registration and the Print & Branding switches,
   // read the one way every document reads them.
-  const printHeader = useCompanyPrintHeader();
+  const printHeader = useCompanyPrintHeader("delivery_challan");
   const router = useRouter();
   const today = new Date().toISOString().slice(0, 10);
   const user = getCurrentUser();
@@ -977,7 +977,6 @@ export default function DeliveryChallanPage() {
                   ...(packagingLabel ? [{ label: "Packaging Source", value: packagingLabel }] : []),
                 ]}
                 notes={remarks || undefined}
-                footerNote={printPrefs.footerNote || undefined}
                 signatureLabels={["Received By", "Delivered By"]}
               />
             </PrintPaperWrapper>

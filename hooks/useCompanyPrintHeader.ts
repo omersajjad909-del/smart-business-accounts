@@ -1,8 +1,8 @@
 "use client";
 
 /**
- * The company header every printed document shares — name, address, phone,
- * email and tax registration — with the Print & Branding switches applied.
+ * Everything a document needs to print itself: the company letterhead, the
+ * design it is set to, and what it is allowed to show.
  *
  * Each document used to assemble this for itself, and only the two invoices
  * ever got it right. Turning "Show address" off in Admin Control left the
@@ -10,18 +10,31 @@
  * and the sale return; the NTN and STRN never reached most of them at all. A
  * setting that looks applied and is not is worse than one that does not exist.
  *
- * So the reading lives in one place. A document spreads what comes back into
- * PrintDocA4 and cannot get it wrong — including documents added later, which
- * is the half that otherwise gets missed.
+ * So the reading lives in one place:
  *
- *   const header = useCompanyPrintHeader();
- *   <PrintDocA4 {...header} docTitle="QUOTATION" … />
+ *   const print = useCompanyPrintHeader("purchase_order");
+ *   <PrintDocA4 {...print} docTitle="PURCHASE ORDER" … />
  *
- * A document that already keeps its own print preferences for paper size or
- * footer notes is untouched by this — it only supplies the header.
+ * Two things changed when print settings became per-document. The hook now
+ * takes the document it is being read for, so the answer can differ between a
+ * PO and an invoice. And it no longer blanks hidden values on the way out —
+ * it hands `fields` to PrintDocA4 and lets the component decide, because
+ * blanking at the call site is exactly what let a page forget one field and
+ * print it anyway.
+ *
+ * Called without a document it returns the base profile, which is what the
+ * company's default is — so an unmigrated caller still gets a correct sheet.
  */
 
 import { useEffect, useState } from "react";
+import {
+  DEFAULT_PRINT_PROFILES,
+  resolvePrintProfile,
+  type DocKind,
+  type PrintFieldKey,
+  type PrintProfiles,
+} from "@/lib/printProfile";
+import type { PrintDesignId } from "@/components/print/printLayouts";
 
 export type CompanyPrintHeader = {
   companyName: string;
@@ -33,11 +46,25 @@ export type CompanyPrintHeader = {
   companyStrn?: string;
   showLogo?: boolean;
   logoUrl?: string;
+  /** The design this document prints in — pass straight to PrintDocA4. */
+  design?: PrintDesignId;
+  /** What this document may show. PrintDocA4 does the hiding. */
+  fields?: Partial<Record<PrintFieldKey, boolean>>;
+  /** The note under the signatures, per document. */
+  footerNote?: string;
 };
+/**
+ * `signatureLabels` is deliberately not returned. A challan is signed
+ * "Received By / Delivered By" and a purchase order "Prepared By / Authorized
+ * By" — each page already knows its own, and that is better domain knowledge
+ * than one list on the company. How *many* lines print, and whether they print
+ * at all, is what the profile decides: the design's `signatures` style and the
+ * `signatures` field switch.
+ */
 
 const EMPTY: CompanyPrintHeader = { companyName: "" };
 
-export function useCompanyPrintHeader(): CompanyPrintHeader {
+export function useCompanyPrintHeader(doc?: DocKind): CompanyPrintHeader {
   const [header, setHeader] = useState<CompanyPrintHeader>(EMPTY);
 
   useEffect(() => {
@@ -54,36 +81,40 @@ export function useCompanyPrintHeader(): CompanyPrintHeader {
       const identity = admin?.companyIdentity || {};
       const contact = admin?.invoiceContact || {};
       const tax = admin?.taxProfile || {};
+      const profiles = (admin?.printProfiles as PrintProfiles) || DEFAULT_PRINT_PROFILES;
+      // Without a document the per-document deltas do not apply — the base is
+      // the company's default, and the honest answer for a caller that has not
+      // said which document it is printing.
+      const resolved = doc ? resolvePrintProfile(profiles, doc) : profiles.base;
 
-      // `=== false` rather than a falsy check on purpose: these arrive missing
-      // on a company that has never opened the settings, and missing has to
-      // mean "show it", the way it always did.
-      const hidden = (flag: unknown) => flag === false;
-      const show = (flag: unknown, value: unknown) => {
-        const text = String(value || "").trim();
-        return hidden(flag) || !text ? undefined : text;
+      const text = (v: unknown) => {
+        const s = String(v || "").trim();
+        return s || undefined;
       };
 
       setHeader({
         companyName: String(company?.name || ""),
-        companyAddress: show(prefs.showAddress, identity.legalAddress),
-        companyPhone: show(prefs.showPhone, contact.phone),
-        companyEmail: String(contact.email || "").trim() || undefined,
-        companyTaxLabel: String(tax.taxIdLabel || "").trim() || undefined,
-        companyTaxValue: show(prefs.showTaxNumber, tax.taxIdValue),
+        companyAddress: text(identity.legalAddress),
+        companyPhone: text(contact.phone),
+        companyEmail: text(contact.email),
+        companyTaxLabel: text(tax.taxIdLabel),
+        companyTaxValue: text(tax.taxIdValue),
         // The Sales Tax Registration number is kept in the settings field named
         // `gstNumber` — one box serving GST, VAT and STRN depending on the
-        // country. Hidden by the same switch as the NTN beside it.
-        companyStrn: show(prefs.showTaxNumber, tax.gstNumber),
-        showLogo: prefs.showLogo !== false,
-        logoUrl: String(prefs.logoUrl || company?.logoUrl || "").trim() || undefined,
+        // country.
+        companyStrn: text(tax.gstNumber),
+        showLogo: true,
+        logoUrl: text(prefs.logoUrl) || text(company?.logoUrl),
+        design: resolved.design,
+        fields: resolved.fields,
+        footerNote: resolved.footerNote,
       });
     })();
 
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [doc]);
 
   return header;
 }

@@ -2625,6 +2625,9 @@ export const CORE_DASHBOARD_FEATURES: DashboardFeatureDefinition[] = [
   { id: "CORE_ACCOUNT_SETTINGS", label: "Account Settings", route: "/dashboard/account-settings", section: "Settings", core: true, permKey: "VIEW_SETTINGS", business: "service", businessLabel: "Core (all businesses)" },
   { id: "CORE_BILLING", label: "My Billing", route: "/dashboard/billing", section: "Settings", core: true, permKey: "VIEW_SETTINGS", business: "service", businessLabel: "Core (all businesses)" },
   { id: "CORE_SETTINGS_APPEARANCE", label: "Appearance", route: "/dashboard/settings/appearance", section: "Settings", core: true, permKey: "VIEW_SETTINGS", business: "service", businessLabel: "Core (all businesses)" },
+  // Not in any core-pack rule, so it reaches every trade: a salon prints a
+  // bill and a steel mill prints a challan, and both decide what goes on it.
+  { id: "CORE_PRINT_PREFERENCES", label: "Print Preferences", route: "/dashboard/print-preferences", section: "Settings", core: true, permKey: "VIEW_SETTINGS", business: "service", businessLabel: "Core (all businesses)", description: "Per-document print design and what each one shows — logo, addresses, both sides' tax numbers." },
   { id: "CORE_SETTINGS_HOLIDAYS", label: "Public Holidays", route: "/dashboard/settings/holidays", section: "Settings", core: true, permKey: "VIEW_SETTINGS", business: "service", businessLabel: "Core (all businesses)" },
   { id: "CORE_SECURITY_ACCESS", label: "Security & Access", route: "/dashboard/security-access", section: "Settings", core: true, permKey: "VIEW_SETTINGS", business: "service", businessLabel: "Core (all businesses)" },
   { id: "CORE_INTEGRATIONS", label: "Integrations", route: "/dashboard/integrations", section: "Settings", core: true, permKey: "API_ACCESS", business: "service", businessLabel: "Core (all businesses)" },

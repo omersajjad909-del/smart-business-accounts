@@ -17,6 +17,7 @@ import { useResponsive } from "@/hooks/useResponsive";
 import { ItemPicker } from "@/components/ItemPicker";
 import { usePageCloseGuard } from "@/components/PageCloseGuard";
 import { useRateFormula } from "@/hooks/useRateFormula";
+import { useCompanyPrintHeader } from "@/hooks/useCompanyPrintHeader";
 import {
   RateFormulaHeadCells,
   RateFormulaRowCells,
@@ -197,6 +198,10 @@ function SalesInvoiceContent() {
   const [siQueryIdx,     setSiQueryIdx]     = useState(-1);
 
   // ── Logo / print prefs ──
+  // The design, the field switches and the letterhead for *this* document.
+  const printHeader = useCompanyPrintHeader("sales_invoice");
+  // Still read for the thermal slip below, which has its own hand-written
+  // markup and is not on the shared component yet.
   const [printPrefs, setPrintPrefs] = useState({ showLogo: true, logoUrl: "", headerNote: "", footerNote: "Thank you for your business.", invoiceTemplate: "classic" });
   // Whether this company has connected FBR's digital invoicing gateway (see
   // /dashboard/e-invoice) — the printed invoice only carries the FBR Invoice
@@ -886,16 +891,18 @@ function SalesInvoiceContent() {
    * and printing it twice is what made the old bill unreadable.
    */
   const printDocProps = {
-    companyName: companyInfo?.name || "",
-    companyAddress: (printPrefs as any).showAddress === false ? undefined : companyInfo?.address,
-    companyPhone: (printPrefs as any).showPhone === false ? undefined : companyInfo?.phone,
-    companyTaxLabel: companyInfo?.ntnLabel,
-    companyTaxValue: (printPrefs as any).showTaxNumber === false ? undefined : companyInfo?.ntn,
-    companyStrn: (printPrefs as any).showTaxNumber === false ? undefined : companyInfo?.gst,
-    showLogo: printPrefs.showLogo,
-    logoUrl: printPrefs.logoUrl,
-    // The look the company chose in Admin -> Print & Branding.
-    template: printPrefs.invoiceTemplate,
+    // Letterhead, design and the field switches, all from this document's own
+    // print profile. This page used to read the settings by hand — which is how
+    // "Show Tax / NTN label" ended up gating the seller's numbers and not the
+    // buyer's, and the buyer's NTN kept printing after it was switched off.
+    // Hiding is PrintDocA4's job now; this passes values, not decisions.
+    ...printHeader,
+    companyName: printHeader.companyName || companyInfo?.name || "",
+    companyAddress: printHeader.companyAddress || companyInfo?.address,
+    companyPhone: printHeader.companyPhone || companyInfo?.phone,
+    companyTaxLabel: printHeader.companyTaxLabel || companyInfo?.ntnLabel,
+    companyTaxValue: printHeader.companyTaxValue || companyInfo?.ntn,
+    companyStrn: printHeader.companyStrn || companyInfo?.gst,
     docTitle: previewMode === "DELIVERY" ? "DELIVERY CHALLAN" : "SALES INVOICE",
     docNo: invNo,
     date: fmtDate(invDate),
@@ -904,17 +911,8 @@ function SalesInvoiceContent() {
     partyName: invCustomer,
     partyPhone: selectedCustomer?.phone,
     partyAddress: selectedCustomer?.address,
-    // "Show Tax / NTN label" gated the company's own numbers and not the
-    // buyer's, so switching it off still printed the customer's NTN and STRN.
-    // A business that does not put tax numbers on its invoices means both
-    // sides of the document, not just its own letterhead. The buyer's phone
-    // and address stay put: those are the Bill To block, not branding.
-    partyNtn: (printPrefs as any).showTaxNumber === false
-      ? undefined
-      : ((savedInvoice?.customer as any)?.ntn || selectedCustomer?.ntn),
-    partyStrn: (printPrefs as any).showTaxNumber === false
-      ? undefined
-      : ((savedInvoice?.customer as any)?.strn || selectedCustomer?.strn),
+    partyNtn: (savedInvoice?.customer as any)?.ntn || selectedCustomer?.ntn,
+    partyStrn: (savedInvoice?.customer as any)?.strn || selectedCustomer?.strn,
     metaFields: [
       ...(savedInvoice?.driverName || driverName ? [{ label: "Driver", value: savedInvoice?.driverName || driverName }] : []),
       ...(savedInvoice?.vehicleNo || vehicleNo ? [{ label: "Vehicle", value: savedInvoice?.vehicleNo || vehicleNo }] : []),
@@ -1018,7 +1016,9 @@ function SalesInvoiceContent() {
     amountInWords: previewMode === "DELIVERY" || invTotal <= 0 ? undefined : amountToWordsInternational(invTotal),
     notes: savedInvoice?.notes || notes,
     terms: savedInvoice?.termsConditions || undefined,
-    footerNote: printPrefs.footerNote || undefined,
+    // The spread at the top already carries this document's footer note from
+    // Print Preferences; only fall back when nothing is configured.
+    footerNote: printHeader.footerNote ?? printPrefs.footerNote ?? undefined,
     signatureLabels: previewMode === "DELIVERY"
       ? ["Received By", "Delivered By"]
       : ["Prepared By", "Checked By", "Approved By"],

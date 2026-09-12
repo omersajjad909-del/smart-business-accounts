@@ -531,14 +531,29 @@ export default function AdminControlPage() {
                     </select>
                   </Field>
                 </div>
-                <div style={{ display: "grid", gridTemplateColumns: "repeat(2,1fr)", gap: 10 }}>
-                  {([["showLogo","Show logo on print"],["showPhone","Show phone number"],["showAddress","Show address"],["showTaxNumber","Show Tax / NTN label"]] as [keyof PrintPreferences, string][]).map(([key, label]) => (
-                    <label key={key} style={{ display: "flex", alignItems: "center", gap: 10, padding: "11px 14px", borderRadius: 9, border: `1px solid ${BDR}`, background: "rgba(255,255,255,.02)", cursor: "pointer", fontSize: 13 }}>
-                      <input type="checkbox" checked={Boolean(settings.printPreferences[key])} onChange={e => setSettings(s => ({ ...s, printPreferences: { ...s.printPreferences, [key]: e.target.checked } }))} />
-                      {label}
-                    </label>
-                  ))}
-                </div>
+                {/* The four show/hide switches that used to sit here are now
+                    per document, and one company-wide copy of them would have
+                    to disagree with the seven that replaced it the moment
+                    anybody changed one. Print Preferences owns them. */}
+                <Link
+                  href="/dashboard/print-preferences"
+                  style={{
+                    display: "flex", alignItems: "center", justifyContent: "space-between", gap: 14,
+                    padding: "14px 16px", borderRadius: 10, border: `1px solid ${BDR}`,
+                    background: "rgba(99,102,241,.07)", textDecoration: "none", color: "inherit",
+                  }}
+                >
+                  <span>
+                    <span style={{ display: "block", fontSize: 13.5, fontWeight: 600 }}>
+                      What each document shows, and its design
+                    </span>
+                    <span style={{ display: "block", fontSize: 12, color: "rgba(255,255,255,.45)", marginTop: 2, lineHeight: 1.5 }}>
+                      Logo, addresses and both sides&apos; tax numbers — set per document now, with a
+                      live preview. Sales invoice, PO, challan, GRN and the rest each keep their own.
+                    </span>
+                  </span>
+                  <span style={{ fontSize: 13, fontWeight: 600, color: "#818cf8", whiteSpace: "nowrap" }}>Open →</span>
+                </Link>
               </div>
 
               <div style={{ display: "flex", justifyContent: "flex-end" }}>
