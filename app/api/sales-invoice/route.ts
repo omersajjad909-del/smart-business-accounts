@@ -3,6 +3,7 @@ import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { baseRate, toBase } from "@/lib/fx";
 import { writeDispatchStock } from "@/lib/challanStock";
+import { safeDecryptFields } from "@/lib/fieldEncrypt";
 import { sanitizeLineMeta } from "@/lib/rateFormula";
 
 import { apiHasPermission } from "@/lib/apiPermission";
@@ -75,6 +76,13 @@ export async function GET(req: NextRequest) {
       // shipping charge, so it holds none, so it saves none.
       return NextResponse.json({
         ...inv,
+        // The tax numbers are stored encrypted (see ACCOUNT_PII_FIELDS in
+        // app/api/accounts). Nested includes bypass the decrypting client
+        // extension, so an invoice printed straight off this response showed
+        // "enc:v1:…" where the buyer's NTN and STRN belong.
+        customer: inv.customer
+          ? safeDecryptFields(inv.customer, ACCOUNT_PII_FIELDS)
+          : inv.customer,
         customerName: inv.customer?.name || "Unknown",
       });
     }
