@@ -650,6 +650,19 @@ model Company {
   teamInvites           TeamInvite[]
   bulkPaymentBatches    BulkPaymentBatch[]
   paymentFollowUpLogs   PaymentFollowUpLog[]
+  fbrCredential         CompanyFbrCredential?
+}
+
+// The FBR digital-invoicing bearer token, held apart from AdminControlSettings
+// (which lives as a JSON blob inside ActivityLog — an audit trail, not a
+// secrets store). Only this table ever sees the token in ciphertext; the JSON
+// blob keeps enabled/environment/seller fields but the token itself is always
+// written here, AES-256-GCM'd via lib/fieldEncrypt.ts.
+model CompanyFbrCredential {
+  companyId String   @id
+  tokenEnc  String
+  updatedAt DateTime @updatedAt
+  company   Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
 }
 
 model CreditNote {

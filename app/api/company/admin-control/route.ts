@@ -3,8 +3,22 @@ import { resolveCompanyId } from "@/lib/tenant";
 import {
   getCompanyAdminControlSettings,
   saveCompanyAdminControlSettings,
+  type AdminControlSettings,
 } from "@/lib/companyAdminControl";
 import { getTokenFromRequest, verifyJwt } from "@/lib/auth";
+
+const MASKED_TOKEN = "********";
+
+/** Never hands the real FBR bearer token to the browser — same convention as maskCompanyCommsConfig. */
+function maskSettings(settings: AdminControlSettings): AdminControlSettings {
+  return {
+    ...settings,
+    fbrSettings: {
+      ...settings.fbrSettings,
+      bearerToken: settings.fbrSettings.bearerToken ? MASKED_TOKEN : "",
+    },
+  };
+}
 
 function isAdmin(req: NextRequest) {
   const headerRole = String(req.headers.get("x-user-role") || "").toUpperCase();
@@ -34,7 +48,7 @@ export async function GET(req: NextRequest) {
     }
 
     const settings = await getCompanyAdminControlSettings(companyId);
-    return NextResponse.json(settings);
+    return NextResponse.json(maskSettings(settings));
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : "Failed to load settings";
     return NextResponse.json({ error: message }, { status: 500 });
@@ -60,9 +74,20 @@ export async function POST(req: NextRequest) {
     const patch = isDemoSession(req)
       ? { features: (body || {}).features || {} }
       : body;
+    // The GET side hands the browser back "********" instead of the real
+    // token. If that same placeholder — or nothing — comes back on save, the
+    // token in the patch is dropped so saveCompanyAdminControlSettings keeps
+    // whatever is already vaulted rather than overwriting it with garbage.
+    if (patch?.fbrSettings && typeof patch.fbrSettings === "object") {
+      const tokenInPatch = (patch.fbrSettings as { bearerToken?: unknown }).bearerToken;
+      if (!tokenInPatch || tokenInPatch === MASKED_TOKEN) {
+        const { bearerToken: _drop, ...restFbrSettings } = patch.fbrSettings as Record<string, unknown>;
+        patch.fbrSettings = restFbrSettings;
+      }
+    }
     const userId = req.headers.get("x-user-id");
     const settings = await saveCompanyAdminControlSettings(companyId, userId, patch || {});
-    return NextResponse.json(settings);
+    return NextResponse.json(maskSettings(settings));
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : "Failed to save settings";
     return NextResponse.json({ error: message }, { status: 500 });
