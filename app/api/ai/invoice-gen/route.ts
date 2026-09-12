@@ -80,7 +80,7 @@ Extract invoice details from the user's natural language input and return ONLY v
       "description": "item or service description",
       "qty": number,
       "unitPrice": number,
-      "taxRate": number (0 if no tax, 17 if GST mentioned in Pakistan context),
+      "taxRate": number (0 if no tax, 18 if GST mentioned in Pakistan context),
       "amount": number (qty * unitPrice before tax)
     }
   ],
@@ -92,8 +92,8 @@ Extract invoice details from the user's natural language input and return ONLY v
 }
 
 Rules:
-- If user says "+ GST" or "with tax" in Pakistan context, taxRate = 17
-- If user says "exclusive of tax" or "ex-tax", apply 17% GST on top
+- If user says "+ GST" or "with tax" in Pakistan context, taxRate = 18
+- If user says "exclusive of tax" or "ex-tax", apply 18% GST on top
 - If user says "inclusive of tax" or "inc GST", back-calculate: subtotal = total / 1.17
 - qty defaults to 1 if not specified
 - Infer description from context ("consulting fee", "product sale", etc.)

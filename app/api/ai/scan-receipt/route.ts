@@ -63,7 +63,7 @@ Extract ALL of the following from this receipt or invoice image. Return ONLY val
   "invoiceNo": "invoice or receipt number or null",
   "subtotal": number or null,
   "taxAmount": number or null,
-  "taxRate": number or null (e.g. 17 for 17% GST),
+  "taxRate": number or null (e.g. 18 for 18% GST),
   "total": number (required — the grand total amount),
   "currency": "PKR or USD or AED etc",
   "items": [
