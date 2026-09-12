@@ -61,6 +61,14 @@ export function decryptField(value: string): string {
   return Buffer.concat([decipher.update(ciphertext), decipher.final()]).toString("utf8");
 }
 
+/**
+ * The Account columns held encrypted at rest. Anything that reads an Account
+ * — including one pulled in as a relation, which the decrypting client
+ * extension in lib/prisma.ts does not reach — has to decrypt these before
+ * showing them to anyone.
+ */
+export const ACCOUNT_PII_FIELDS = ["phone", "ntn", "strn", "bankIban"] as const;
+
 /** Returns true if the value is an encrypted field */
 export function isEncrypted(value: string | null | undefined): boolean {
   return typeof value === "string" && value.startsWith(PREFIX);

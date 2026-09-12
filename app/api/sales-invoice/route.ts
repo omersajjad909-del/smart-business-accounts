@@ -3,7 +3,7 @@ import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { baseRate, toBase } from "@/lib/fx";
 import { writeDispatchStock } from "@/lib/challanStock";
-import { safeDecryptFields } from "@/lib/fieldEncrypt";
+import { safeDecryptFields, ACCOUNT_PII_FIELDS } from "@/lib/fieldEncrypt";
 import { sanitizeLineMeta } from "@/lib/rateFormula";
 
 import { apiHasPermission } from "@/lib/apiPermission";
@@ -34,6 +34,20 @@ type SalesInvoiceFull = Prisma.SalesInvoiceGetPayload<{
 
 type TxClient = Prisma.TransactionClient;
 
+
+/**
+ * An invoice with its buyer's tax numbers readable.
+ *
+ * Account phone/NTN/STRN are stored encrypted (see app/api/accounts). The
+ * client extension in lib/prisma.ts decrypts only the top-level rows of the
+ * models it lists, so a customer arriving through include: { customer: true }
+ * comes back exactly as stored — which is how "enc:v1:…" ended up printed
+ * where the buyer's NTN and STRN belong on a sales invoice.
+ */
+function withReadableCustomer<T extends { customer?: unknown }>(inv: T): T {
+  if (!inv?.customer) return inv;
+  return { ...inv, customer: safeDecryptFields(inv.customer as Record<string, unknown>, ACCOUNT_PII_FIELDS) };
+}
 
 export async function GET(req: NextRequest) {
   try {
@@ -76,13 +90,7 @@ export async function GET(req: NextRequest) {
       // shipping charge, so it holds none, so it saves none.
       return NextResponse.json({
         ...inv,
-        // The tax numbers are stored encrypted (see ACCOUNT_PII_FIELDS in
-        // app/api/accounts). Nested includes bypass the decrypting client
-        // extension, so an invoice printed straight off this response showed
-        // "enc:v1:…" where the buyer's NTN and STRN belong.
-        customer: inv.customer
-          ? safeDecryptFields(inv.customer, ACCOUNT_PII_FIELDS)
-          : inv.customer,
+        ...withReadableCustomer(inv),
         customerName: inv.customer?.name || "Unknown",
       });
     }
@@ -415,7 +423,7 @@ export async function POST(req: NextRequest) {
       success: true,
       id: invoice.id,
       invoiceNo: invoice.invoiceNo,
-      invoice: savedInvoice
+      invoice: savedInvoice ? withReadableCustomer(savedInvoice) : savedInvoice
     });
   } catch (e: any) {
     return NextResponse.json({ error: e.message }, { status: 500 });

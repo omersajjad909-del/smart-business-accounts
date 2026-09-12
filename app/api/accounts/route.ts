@@ -6,9 +6,8 @@ import { logAuditFromReq } from "@/lib/auditLogger";
 import { PERMISSIONS } from "@/lib/permissions";
 import { apiHasPermission } from "@/lib/apiPermission";
 import { seedMinimalChart } from "@/lib/services/accountsSeed";
-import { safeEncryptField, safeDecryptFields } from "@/lib/fieldEncrypt";
+import { safeEncryptField, safeDecryptFields, ACCOUNT_PII_FIELDS } from "@/lib/fieldEncrypt";
 
-const ACCOUNT_PII_FIELDS = ["phone", "ntn", "strn", "bankIban"] as const;
 
 const CATEGORY_TYPE_MAP: Record<string, string> = {
   CUSTOMER: "ASSET",
