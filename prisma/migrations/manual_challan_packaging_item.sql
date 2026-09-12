@@ -31,3 +31,34 @@ BEGIN
       ON DELETE SET NULL ON UPDATE CASCADE;
   END IF;
 END $$;
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- A challan raised off an already-written sales invoice.
+--
+-- The invoice has already taken the goods out of stock (its SALE rows in
+-- InventoryTxn). A challan carrying this link therefore prints and tracks the
+-- delivery but writes no CHALLAN_OUT of its own — otherwise the same goods
+-- would leave the godown twice. It still writes PACKING_OUT, because the
+-- invoice never accounted for the bags or cartons.
+--
+-- Nullable: a challan written on its own, with no invoice behind it, keeps
+-- deducting stock exactly as before.
+
+ALTER TABLE "public"."DeliveryChallan"
+  ADD COLUMN IF NOT EXISTS "salesInvoiceId" TEXT;
+
+CREATE INDEX IF NOT EXISTS "DeliveryChallan_salesInvoiceId_idx"
+  ON "public"."DeliveryChallan" ("salesInvoiceId");
+
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_constraint
+    WHERE conname = 'DeliveryChallan_salesInvoiceId_fkey'
+  ) THEN
+    ALTER TABLE "public"."DeliveryChallan"
+      ADD CONSTRAINT "DeliveryChallan_salesInvoiceId_fkey"
+      FOREIGN KEY ("salesInvoiceId") REFERENCES "public"."SalesInvoice"("id")
+      ON DELETE SET NULL ON UPDATE CASCADE;
+  END IF;
+END $$;

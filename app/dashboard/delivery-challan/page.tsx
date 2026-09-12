@@ -67,6 +67,8 @@ type DeliveryChallan = {
   packagingType?: string;
   packagingQty?: number;
   packagingItemId?: string | null;
+  salesInvoiceId?: string | null;
+  salesInvoice?: { id: string; invoiceNo: string } | null;
   packagingItem?: { id: string; name: string; code?: string | null; unit?: string | null } | null;
   items: Array<{ item: { name: string; description?: string; code?: string; unit?: string }; qty: number; rate?: number }>;
   status: string;
@@ -119,6 +121,10 @@ export default function DeliveryChallanPage() {
   const [packagingType, setPackagingType] = useState("");
   const [packagingItemId, setPackagingItemId] = useState("");
   const [packagingQty, setPackagingQty] = useState<number | "">("");
+  // Set when the challan was opened off a sales invoice. The goods are already
+  // out of stock in that case, so this challan only carries them — it does not
+  // deduct them again (the API enforces that, see writeDispatchStock).
+  const [fromInvoice, setFromInvoice] = useState<{ id: string; invoiceNo: string } | null>(null);
 const [searchTerm, _setSearchTerm] = useState("");
 
 
@@ -143,6 +149,10 @@ const [searchTerm, _setSearchTerm] = useState("");
   // Packing material is picked from the catalogue rather than a hardcoded
   // word, so the dispatch can take it out of stock like anything else.
   const packagingItems = items.filter(i => i.category === PACKAGING_CATEGORY);
+
+  // The invoice this challan is delivering against, printed so the customer's
+  // gate can tie the two documents together.
+  const invoiceRef = savedChallan?.salesInvoice?.invoiceNo || fromInvoice?.invoiceNo || "";
 
   // What the printed challan says it was packed in: the item's own name, or —
   // on a challan written before packing was stocked — the old free-text label.
@@ -210,6 +220,9 @@ const [searchTerm, _setSearchTerm] = useState("");
         })));
       })
       .catch(() => setItems([]));
+
+    const fromInvoiceId = new URLSearchParams(window.location.search).get("fromInvoice");
+    if (fromInvoiceId) prefillFromInvoice(fromInvoiceId);
 
     fetch("/api/delivery-challan", {
         headers: {
@@ -301,6 +314,49 @@ const [searchTerm, _setSearchTerm] = useState("");
     return () => document.removeEventListener("keydown", handleKeyPress, true);
   }, [today, showForm, preview, customers]);
 
+  /**
+   * Open a challan for an invoice that is already written: same customer, same
+   * lines, and the driver and vehicle if the invoice happened to record them.
+   * Only the delivery details are left to fill in.
+   */
+  async function prefillFromInvoice(invoiceId: string) {
+    try {
+      const res = await fetch(`/api/sales-invoice?id=${invoiceId}`, {
+        headers: {
+          "x-user-role": user?.role || "",
+          "x-user-id": user?.id || "",
+        },
+      });
+      if (!res.ok) throw new Error("Invoice not found");
+      const inv = await res.json();
+
+      setFromInvoice({ id: inv.id, invoiceNo: inv.invoiceNo });
+      setCustomerId(inv.customerId || "");
+      setCustomerName(inv.customer?.name || inv.customerName || "");
+      setDate(inv.date ? String(inv.date).slice(0, 10) : today);
+      setDriverName(inv.driverName || "");
+      setVehicleNo(inv.vehicleNo || "");
+      setPoNo(inv.reference || "");
+      setRows(
+        (inv.items || []).map((it: any) => ({
+          itemId: it.itemId,
+          name: it.item?.name || "",
+          description: it.item?.description || "",
+          availableQty: 0,
+          qty: Number(it.qty) || "",
+          rate: Number(it.rate) || "",
+          sku: it.item?.code || "",
+          unit: it.item?.unit || "",
+        }))
+      );
+      setShowForm(true);
+      setShowList(false);
+      toast.success(`Challan opened for ${inv.invoiceNo}`);
+    } catch {
+      toast.error("Could not load that invoice.");
+    }
+  }
+
   async function loadChallans() {
     try {
       const res = await fetch("/api/delivery-challan", {
@@ -372,6 +428,7 @@ const [searchTerm, _setSearchTerm] = useState("");
         dNo: dNo || null,
         packagingType: packagingType || null,
         packagingItemId: packagingItemId || null,
+        salesInvoiceId: fromInvoice?.id || null,
         packagingQty: packagingQty === "" ? null : Number(packagingQty),
         items: clean.map(r => ({ itemId: r.itemId, qty: Number(r.qty), rate: Number(r.rate) || 0 })),
       };
@@ -430,6 +487,7 @@ const [searchTerm, _setSearchTerm] = useState("");
     setDNo(c.dNo || "");
     setPackagingType(c.packagingType || "");
     setPackagingItemId(c.packagingItemId || "");
+    setFromInvoice(c.salesInvoice ? { id: c.salesInvoice.id, invoiceNo: c.salesInvoice.invoiceNo } : null);
     setPackagingQty(c.packagingQty ?? "");
     setRows(c.items.map((it: any) => ({
       itemId: it.itemId || "",
@@ -475,7 +533,7 @@ const [searchTerm, _setSearchTerm] = useState("");
     setDriverName("");
     setVehicleNo("");
     setRemarks("");
-    setSerialNo(""); setOrderNo(""); setPoNo(""); setDNo(""); setPackagingType(""); setPackagingItemId(""); setPackagingQty("");
+    setSerialNo(""); setOrderNo(""); setPoNo(""); setDNo(""); setPackagingType(""); setPackagingItemId(""); setPackagingQty(""); setFromInvoice(null);
     setRows([{ itemId: "", name: "", description: "", availableQty: 0, qty: "", rate: "" }]);
     setPreview(false);
   }
@@ -651,6 +709,15 @@ const [searchTerm, _setSearchTerm] = useState("");
               <div className="mb-2 text-xs text-gray-500 italic">
                 Keyboard Shortcuts: <strong>F7</strong> = Clear Form | <strong>F8</strong> = Search Customer
               </div>
+
+              {fromInvoice && (
+                <div className="border border-blue-300 bg-blue-50 text-blue-900 rounded p-3 text-xs">
+                  <b>Against invoice {fromInvoice.invoiceNo}.</b> Customer and items came from
+                  it — fill in the driver, vehicle and packing. The goods already left stock on
+                  that invoice, so this challan will not deduct them again. Packing material is
+                  still deducted, since the invoice never counted it.
+                </div>
+              )}
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 <input value={challanNo} readOnly className="border p-2 bg-gray-100" placeholder="Challan No (Auto)" />
                 <div>
@@ -819,7 +886,10 @@ const [searchTerm, _setSearchTerm] = useState("");
                 totalsLines={[
                   { label: "Total Items:", value: rows.filter(r => r.itemId && r.qty).length, bold: true },
                 ]}
-                summaryFields={packagingLabel ? [{ label: "Packaging Source", value: packagingLabel }] : []}
+                summaryFields={[
+                  ...(invoiceRef ? [{ label: "Against Invoice", value: invoiceRef }] : []),
+                  ...(packagingLabel ? [{ label: "Packaging Source", value: packagingLabel }] : []),
+                ]}
                 notes={remarks || undefined}
                 footerNote={printPrefs.footerNote || undefined}
                 signatureLabels={["Received By", "Delivered By"]}

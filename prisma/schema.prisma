@@ -320,11 +320,11 @@ model SalesInvoice {
   taxConfigId String?
   taxConfig   TaxConfiguration? @relation("SalesTax", fields: [taxConfigId], references: [id])
 
-  items   SalesInvoiceItem[]
-  returns SaleReturn[]       @relation("InvoiceReturns")
+  items            SalesInvoiceItem[]
+  returns          SaleReturn[]       @relation("InvoiceReturns")
   // The challans the goods actually went out on. An invoice can have more
   // than one: a single bill is often loaded onto two vehicles.
-  deliveryChallans DeliveryChallan[] @relation("InvoiceChallans")
+  deliveryChallans DeliveryChallan[]  @relation("InvoiceChallans")
 
   salesmanId String?
   salesman   User?   @relation("SalesmanInvoices", fields: [salesmanId], references: [id])

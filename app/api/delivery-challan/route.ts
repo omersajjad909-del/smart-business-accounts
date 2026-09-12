@@ -18,6 +18,7 @@ const challanSchema = z.object({
   packagingType: z.string().optional().nullable(),
   packagingQty: z.number().optional().nullable(),
   packagingItemId: z.string().optional().nullable(),
+  salesInvoiceId: z.string().optional().nullable(),
   items: z.array(
     z.object({
       itemId: z.string(),
@@ -33,6 +34,11 @@ const challanSchema = z.object({
  * when the company stocks its packing material — the bags or cartons they went
  * out in. Both are written at the one moment the challan turns DELIVERED, so
  * the two can never drift apart.
+ *
+ * The goods are skipped when the challan was raised off a sales invoice: that
+ * invoice already wrote them out as SALE, and writing CHALLAN_OUT too would
+ * take the same goods off the shelf twice. The packing material is still
+ * written either way — an invoice has nothing to say about bags or cartons.
  */
 async function writeDispatchStock(
   companyId: string,
@@ -40,19 +46,21 @@ async function writeDispatchStock(
 ) {
   const date = new Date(data.date);
 
-  for (const item of data.items) {
-    await prisma.inventoryTxn.create({
-      data: {
-        companyId,
-        type: "CHALLAN_OUT",
-        date,
-        itemId: item.itemId,
-        qty: -item.qty,
-        rate: item.rate || 0,
-        amount: item.qty * (item.rate || 0),
-        location: "MAIN",
-      },
-    });
+  if (!data.salesInvoiceId) {
+    for (const item of data.items) {
+      await prisma.inventoryTxn.create({
+        data: {
+          companyId,
+          type: "CHALLAN_OUT",
+          date,
+          itemId: item.itemId,
+          qty: -item.qty,
+          rate: item.rate || 0,
+          amount: item.qty * (item.rate || 0),
+          location: "MAIN",
+        },
+      });
+    }
   }
 
   // The packing material, when the company holds it as stock. Valued at cost:
@@ -99,6 +107,7 @@ export async function GET(req: NextRequest) {
         include: {
           customer: true,
           packagingItem: true,
+          salesInvoice: { select: { id: true, invoiceNo: true } },
           items: {
             include: { item: true },
           },
@@ -113,6 +122,7 @@ export async function GET(req: NextRequest) {
       include: {
         customer: true,
         packagingItem: true,
+        salesInvoice: { select: { id: true, invoiceNo: true } },
         items: true,
       },
       orderBy: { createdAt: "desc" },
@@ -156,6 +166,7 @@ export async function POST(req: NextRequest) {
         packagingType: data.packagingType || null,
         packagingQty: data.packagingQty ?? null,
         packagingItemId: data.packagingItemId || null,
+        salesInvoiceId: data.salesInvoiceId || null,
         status: data.status || "PENDING",
         items: {
           create: data.items.map((item) => ({
@@ -168,6 +179,7 @@ export async function POST(req: NextRequest) {
       include: {
         customer: true,
         packagingItem: true,
+        salesInvoice: { select: { id: true, invoiceNo: true } },
         items: {
           include: { item: true },
         },
@@ -230,6 +242,7 @@ export async function PUT(req: NextRequest) {
           packagingType: data.packagingType || null,
           packagingQty: data.packagingQty ?? null,
           packagingItemId: data.packagingItemId || null,
+          salesInvoiceId: data.salesInvoiceId || null,
           status: data.status || "PENDING",
           items: {
             create: data.items.map((item) => ({
@@ -242,6 +255,7 @@ export async function PUT(req: NextRequest) {
         include: {
           customer: true,
           packagingItem: true,
+          salesInvoice: { select: { id: true, invoiceNo: true } },
           items: { include: { item: true } },
         },
       });
