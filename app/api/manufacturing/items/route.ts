@@ -1,5 +1,5 @@
 /**
- * GET /api/manufacturing/items?category=RAW_MATERIAL|FINISHED|TRADING|SERVICE
+ * GET /api/manufacturing/items?category=RAW_MATERIAL|PACKAGING|FINISHED|TRADING|SERVICE
  * Several may be asked for at once: ?category=RAW_MATERIAL,TRADING
  *
  * The real inventory a factory works with, with live stock and average cost.
@@ -19,7 +19,7 @@ import { resolveCompanyId } from "@/lib/tenant";
 import { getStockOnHand, getAverageCosts, readOpenRemnants } from "@/lib/manufacturingPosting";
 
 const WRITE_ROLES = new Set(["ADMIN", "ACCOUNTANT", "MANAGER"]);
-const CATEGORIES = new Set(["RAW_MATERIAL", "FINISHED", "TRADING", "SERVICE"]);
+const CATEGORIES = new Set(["RAW_MATERIAL", "PACKAGING", "FINISHED", "TRADING", "SERVICE"]);
 
 export async function GET(req: NextRequest) {
   try {

@@ -85,7 +85,7 @@ model ItemNew {
 
   code         String
   name         String
-  category     String   @default("TRADING") // TRADING | RAW_MATERIAL | FINISHED | SERVICE
+  category     String   @default("TRADING") // TRADING | RAW_MATERIAL | PACKAGING | FINISHED | SERVICE
   unit         String
   rate         Float    @default(0) // Sale Rate
   purchaseRate Float    @default(0) // Cost / Purchase Rate
@@ -99,7 +99,7 @@ model ItemNew {
   // FBR sales-tax-invoice line requires the tariff heading the item is sold
   // under (e.g. "3923.1000"). Null for every item until the company files
   // through the FBR gateway or bills in an industry that quotes it.
-  hsCode String?
+  hsCode             String?
   // Some trades (poly bags, yarn, steel) sell by count but invoice by
   // weight — a line needs both a primary quantity/rate (pieces) and a
   // secondary one (kg) side by side. secondaryUnitRatio is how many
@@ -124,6 +124,9 @@ model ItemNew {
   deletedAt            DateTime?
   deletedBy            String?
   deliveryChallanItems DeliveryChallanItem[]
+  // Challans that dispatched goods packed in this item — see
+  // DeliveryChallan.packagingItemId.
+  packagingChallans    DeliveryChallan[]     @relation("ChallanPackagingItem")
   // Default rate-formula dimensions for this item (gauge, width, length…),
   // pre-filled onto a document line when the item is picked. Null for every
   // ordinary item. See lib/rateFormula.ts.
@@ -178,7 +181,7 @@ model PurchaseOrderItem {
   itemId          String
   qty             Float
   rate            Float
-  invoicedQty     Float    @default(0)
+  invoicedQty     Float  @default(0)
   discountPercent Float  @default(0)
   taxPercent      Float  @default(0)
 
@@ -345,13 +348,13 @@ model SalesInvoice {
   // FBR digital e-invoicing (Pakistan). Left untouched (all null, status
   // NOT_FILED) for every company that never opens the E-Invoice page — see
   // lib/fbrEInvoice.ts and app/dashboard/e-invoice.
-  fbrStatus      String?   @default("NOT_FILED") // NOT_FILED | FILED | FAILED
-  fbrInvoiceNo   String? // Invoice number FBR's gateway assigned on success
-  fbrIrn         String? // Invoice Reference Number encoded into the printed QR
-  fbrQrPayload   String? // Raw string the QR code on the invoice encodes
-  fbrFiledAt     DateTime?
-  fbrResponse    Json? // Last raw gateway response (success or error), for support/audit
-  fbrScenarioId  String? // Sandbox-only scenario id used for the test submission
+  fbrStatus     String?   @default("NOT_FILED") // NOT_FILED | FILED | FAILED
+  fbrInvoiceNo  String? // Invoice number FBR's gateway assigned on success
+  fbrIrn        String? // Invoice Reference Number encoded into the printed QR
+  fbrQrPayload  String? // Raw string the QR code on the invoice encodes
+  fbrFiledAt    DateTime?
+  fbrResponse   Json? // Last raw gateway response (success or error), for support/audit
+  fbrScenarioId String? // Sandbox-only scenario id used for the test submission
 
   createdAt DateTime  @default(now())
   deletedAt DateTime?
@@ -1666,18 +1669,25 @@ model DeliveryChallan {
   // Particulars a printed challan carries beyond the challan number itself —
   // the buyer's own serial/order/PO references it is checked against on
   // receipt.
-  serialNo String?
-  orderNo  String?
-  poNo     String?
+  serialNo        String?
+  orderNo         String?
+  poNo            String?
   // "D No" on the printed challan — a fifth reference the buyer checks the
   // delivery against, alongside S/#, Order No and PO No. Separate from the
   // challan's own number, which the document carries in its own right.
-  dNo      String?
+  dNo             String?
   // How the goods were packed for dispatch — a poly-bag/textile trade detail
   // (Bags / Carton / Packet) with the count in that unit. Null everywhere
   // else.
-  packagingType String?
-  packagingQty  Float?
+  packagingType   String?
+  packagingQty    Float?
+  // The packing material itself, held as a stock item (category PACKAGING),
+  // so a dispatch can take it out of the godown the way it takes the goods
+  // out. Null on every challan written before packing was stocked — those
+  // still carry the free-text packagingType above, which is why that column
+  // stays rather than being migrated away.
+  packagingItemId String?
+  packagingItem   ItemNew? @relation("ChallanPackagingItem", fields: [packagingItemId], references: [id])
 
   items           DeliveryChallanItem[]
   status          String                @default("PENDING") // PENDING | DELIVERED | INVOICED
@@ -1887,17 +1897,17 @@ model GoodsReceiptNote {
   supplierId String
   supplier   Account        @relation("GRNSupplier", fields: [supplierId], references: [id])
 
-  remarks String?
-  partyBillNo String?
+  remarks      String?
+  partyBillNo  String?
   purchaseType String? // CASH | CREDIT
-  biltyNo String?
-  location String?
-  cargo String?
-  driver String?
-  vehicleNo String?
-  status  String  @default("DRAFT") // DRAFT | RECEIVED | PARTIAL | CANCELLED
+  biltyNo      String?
+  location     String?
+  cargo        String?
+  driver       String?
+  vehicleNo    String?
+  status       String  @default("DRAFT") // DRAFT | RECEIVED | PARTIAL | CANCELLED
 
-  items GoodsReceiptNoteItem[]
+  items            GoodsReceiptNoteItem[]
   purchaseInvoices PurchaseInvoice[]
 
   createdAt DateTime  @default(now())
@@ -2941,10 +2951,10 @@ model MarketSignal {
   /// this signal already exists instead of storing it twice.
   externalId String
 
-  url      String
-  title    String  @db.Text
-  snippet  String? @db.Text
-  author   String?
+  url     String
+  title   String  @db.Text
+  snippet String? @db.Text
+  author  String?
 
   /// Keyword arrays from the vocabulary in manual-lead-round.md.
   matchedIndustry Json?
@@ -2952,7 +2962,7 @@ model MarketSignal {
   matchedSoftware Json?
   /// A = software-pain + industry (highest), B = costing-pain + industry
   /// (strong), C = software-pain alone (maybe, verify industry by hand).
-  tier String
+  tier            String
 
   /// new | reviewed | replied | ignored — set by the admin reading the queue.
   status String @default("new")
