@@ -904,8 +904,17 @@ function SalesInvoiceContent() {
     partyName: invCustomer,
     partyPhone: selectedCustomer?.phone,
     partyAddress: selectedCustomer?.address,
-    partyNtn: (savedInvoice?.customer as any)?.ntn || selectedCustomer?.ntn,
-    partyStrn: (savedInvoice?.customer as any)?.strn || selectedCustomer?.strn,
+    // "Show Tax / NTN label" gated the company's own numbers and not the
+    // buyer's, so switching it off still printed the customer's NTN and STRN.
+    // A business that does not put tax numbers on its invoices means both
+    // sides of the document, not just its own letterhead. The buyer's phone
+    // and address stay put: those are the Bill To block, not branding.
+    partyNtn: (printPrefs as any).showTaxNumber === false
+      ? undefined
+      : ((savedInvoice?.customer as any)?.ntn || selectedCustomer?.ntn),
+    partyStrn: (printPrefs as any).showTaxNumber === false
+      ? undefined
+      : ((savedInvoice?.customer as any)?.strn || selectedCustomer?.strn),
     metaFields: [
       ...(savedInvoice?.driverName || driverName ? [{ label: "Driver", value: savedInvoice?.driverName || driverName }] : []),
       ...(savedInvoice?.vehicleNo || vehicleNo ? [{ label: "Vehicle", value: savedInvoice?.vehicleNo || vehicleNo }] : []),

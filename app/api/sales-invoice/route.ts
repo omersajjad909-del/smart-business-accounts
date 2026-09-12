@@ -124,8 +124,14 @@ export async function GET(req: NextRequest) {
 
     // Same reasoning as the single invoice above: the list is what the edit
     // form is opened from, so anything missing here is blanked on save.
+    //
+    // withReadableCustomer was on the single-invoice path and the create
+    // response but not on this one, and this is the path the browse arrows and
+    // the print view read. The buyer's NTN and STRN are stored encrypted, so a
+    // saved invoice printed its customer's tax numbers as raw "enc:v1:…"
+    // ciphertext — on the customer-facing document.
     const formattedInvoices = invoices.map((inv: SalesInvoiceFull) => ({
-      ...inv,
+      ...withReadableCustomer(inv),
       customerName: inv.customer?.name || "Unknown",
     }));
 
@@ -659,7 +665,18 @@ export async function PUT(req: NextRequest) {
       return invoice;
     }, { timeout: 30000 });
 
-    return NextResponse.json({ success: true, invoice: result });
+    // Decrypted on the way out for the same reason the create response is: the
+    // update includes { customer: true }, the form re-renders from this, and
+    // the print view reads it straight after a save without re-fetching.
+    //
+    // The cast is for the $transaction return, which TypeScript widens to
+    // any[] here — the same mis-inference this file already carries on its
+    // other tx calls. The value is the single invoice the callback returns.
+    const savedInvoice = result as unknown as { customer?: unknown } | null;
+    return NextResponse.json({
+      success: true,
+      invoice: savedInvoice ? withReadableCustomer(savedInvoice) : savedInvoice,
+    });
   } catch (e: any) {
     console.error("Sales Invoice PUT Error:", e);
     return NextResponse.json({ error: e.message }, { status: 500 });

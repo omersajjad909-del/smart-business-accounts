@@ -157,11 +157,23 @@ export function PrintDocA4({
   const RULE = `1px solid ${theme.rule}`;
   const banded = theme.band === "solid";
 
+  // Last line of defence against a value that reached here still encrypted.
+  //
+  // Phone, NTN, STRN and IBAN are stored ciphered and decrypted by whichever
+  // API hands the party over — and one of those paths missing the call is not
+  // hypothetical: the sales invoice list shipped without it, so saved invoices
+  // printed "enc:v1:…" where the buyer's tax numbers belong. On a document that
+  // goes to the customer, printing nothing is strictly better than printing
+  // ciphertext, and it makes the missing decrypt obvious on screen instead of
+  // looking like a corrupt record. Prefix per lib/fieldEncrypt.ts, which cannot
+  // be imported here — it pulls in node:crypto.
+  const plain = (v?: string) => (v && !String(v).startsWith("enc:v1:") ? v : "");
+
   const partyLine = [
-    partyAddress,
-    partyPhone ? `Tel: ${partyPhone}` : "",
-    partyNtn ? `NTN: ${partyNtn}` : "",
-    partyStrn ? `STRN: ${partyStrn}` : "",
+    plain(partyAddress),
+    plain(partyPhone) ? `Tel: ${plain(partyPhone)}` : "",
+    plain(partyNtn) ? `NTN: ${plain(partyNtn)}` : "",
+    plain(partyStrn) ? `STRN: ${plain(partyStrn)}` : "",
   ].filter(Boolean).join("   ");
 
   // Consecutive columns sharing a group become one spanning header cell
