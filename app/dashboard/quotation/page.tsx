@@ -13,6 +13,7 @@ import { hasPermission } from "@/lib/hasPermission";
 import { PERMISSIONS } from "@/lib/permissions";
 import { useRouter } from "next/navigation";
 import { useResponsive } from "@/hooks/useResponsive";
+import { useCompanyPrintHeader } from "@/hooks/useCompanyPrintHeader";
 
 type Account = { id: string; name: string };
 type Item = {
@@ -94,6 +95,9 @@ export default function QuotationPage() {
   const [_sendingEmail, _setSendingEmail] = useState(false);
   const [hideRates, setHideRates] = useState(false);
   const [companyName, setCompanyName] = useState("FINOVA SME");
+  // Address, phone, tax registration and the Print & Branding switches, read
+  // the one way every document reads them.
+  const printHeader = useCompanyPrintHeader();
   const [printPrefs, setPrintPrefs] = useState<PrintPreferences>({
     paperSize: "A4",
     showLogo: true,
@@ -817,7 +821,8 @@ export default function QuotationPage() {
           {preview && savedQuotation && printMode !== "55mm" && (
             <PrintPaperWrapper>
               <PrintDocA4
-                companyName={companyName}
+                {...printHeader}
+                companyName={printHeader.companyName || companyName}
                 docTitle="QUOTATION"
                 docNo={savedQuotation.quotationNo}
                 date={fmtDate(savedQuotation.date)}

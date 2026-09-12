@@ -8,6 +8,7 @@ import { getCurrentUser } from "@/lib/auth";
 import { PrintActionBar } from "@/components/print/PrintActionBar";
 import { PrintDocA4, PrintPaperWrapper } from "@/components/print/PrintDocA4";
 import { useResponsive } from "@/hooks/useResponsive";
+import { useCompanyPrintHeader } from "@/hooks/useCompanyPrintHeader";
 import { useRateFormula } from "@/hooks/useRateFormula";
 import {
   RateFormulaHeadCells,
@@ -60,6 +61,9 @@ type SavedData = {
 
 export default function SalesReturnPage() {
   const { isMobile } = useResponsive();
+  // Address, phone, tax registration and the Print & Branding switches,
+  // read the one way every document reads them.
+  const printHeader = useCompanyPrintHeader();
   const { settings: rf, active: rfActive } = useRateFormula("saleReturn");
   const today = new Date().toISOString().slice(0, 10);
   const user  = getCurrentUser();
@@ -491,9 +495,8 @@ export default function SalesReturnPage() {
             </div>
             <PrintPaperWrapper>
               <PrintDocA4
-                companyName={companyInfo?.name || "Company Name"}
-                companyAddress={companyInfo?.address}
-                companyPhone={companyInfo?.phone}
+                {...printHeader}
+                companyName={printHeader.companyName || companyInfo?.name || "Company Name"}
                 docTitle="SALES RETURN VOUCHER"
                 docNo={savedData.returnNo}
                 date={savedData.date}

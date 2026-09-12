@@ -9,6 +9,7 @@ import { getCurrentUser } from "@/lib/auth";
 import { PrintActionBar } from "@/components/print/PrintActionBar";
 import { PrintDocA4, PrintPaperWrapper } from "@/components/print/PrintDocA4";
 import { useResponsive } from "@/hooks/useResponsive";
+import { useCompanyPrintHeader } from "@/hooks/useCompanyPrintHeader";
 import { useRateFormula } from "@/hooks/useRateFormula";
 import {
   RateFormulaHeadCells,
@@ -66,6 +67,9 @@ function Label({ children }: { children: React.ReactNode }) {
 
 export default function GRNPage() {
   const { isMobile } = useResponsive();
+  // Address, phone, tax registration and the Print & Branding switches,
+  // read the one way every document reads them.
+  const printHeader = useCompanyPrintHeader();
   // Companies that price a line from a calculation get extra columns and a
   // computed rate. Everyone else gets exactly the grid that was here before.
   const { settings: rf, active: rfActive } = useRateFormula("grn");
@@ -842,9 +846,8 @@ export default function GRNPage() {
       {!showList && preview && printMode !== "58mm" && (
         <PrintPaperWrapper>
           <PrintDocA4
-            companyName={companyInfo?.name || "Company Name"}
-            companyAddress={companyInfo?.address}
-            companyPhone={companyInfo?.phone}
+            {...printHeader}
+            companyName={printHeader.companyName || companyInfo?.name || "Company Name"}
             docTitle="GOODS RECEIPT NOTE"
             docNo={grnNo}
             date={fmtDate(date)}

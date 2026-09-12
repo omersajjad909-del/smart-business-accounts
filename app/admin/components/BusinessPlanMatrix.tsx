@@ -3,6 +3,7 @@
 import { useEffect, useState, useMemo } from "react";
 import { BUSINESS_TYPES } from "@/lib/businessModules";
 import { dashboardFeaturesForBusinessType } from "@/lib/dashboardFeatureRegistry";
+import { describeCorePack, getCorePack } from "@/lib/corePack";
 import { navGroupTitle, navPositionForRoute } from "@/lib/dashboardNavOrder";
 import { getCurrentUser } from "@/lib/auth";
 
@@ -291,6 +292,16 @@ export default function BusinessPlanMatrix({ embedded = false, scope = "WORLD" }
     return counts;
   }, []);
 
+  // Why the counts differ. These numbers used to be identical for every trade
+  // because core pages were handed to all of them; now each one's core pack
+  // decides, so the count is worth explaining rather than leaving as a mystery
+  // an admin might read as a missing config.
+  const packLabels = useMemo(() => {
+    const labels: Record<string, string> = {};
+    for (const b of BUSINESS_TYPES) labels[b.id] = describeCorePack(getCorePack(b.id));
+    return labels;
+  }, []);
+
   // Only show business types that are currently enabled in Business Modules admin
   const filtered = useMemo(() => {
     const businesses = enabledIds
@@ -392,6 +403,7 @@ export default function BusinessPlanMatrix({ embedded = false, scope = "WORLD" }
                     <div
                       key={b.id}
                       onClick={() => setSelected(b)}
+                      title={`${b.label} — ${packLabels[b.id] ?? ""}`}
                       style={{
                         padding: "14px 12px", borderRadius: 12, cursor: "pointer",
                         background: "rgba(255,255,255,0.03)",
@@ -435,6 +447,9 @@ export default function BusinessPlanMatrix({ embedded = false, scope = "WORLD" }
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <div style={{ fontSize: 13, fontWeight: isActive ? 700 : 500, color: "white" }}>{b.label}</div>
                       <div style={{ fontSize: 10, color: "rgba(255,255,255,0.35)" }}>{pageCounts[b.id] ?? 0} pages</div>
+                      <div style={{ fontSize: 10, color: "rgba(255,255,255,0.25)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                        {packLabels[b.id] ?? ""}
+                      </div>
                     </div>
                     {hasCustom && (
                       <span style={{ fontSize: 9, fontWeight: 700, color: "#818cf8", textTransform: "uppercase", background: "rgba(99,102,241,0.15)", padding: "1px 5px", borderRadius: 4 }}>Custom</span>

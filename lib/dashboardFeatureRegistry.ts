@@ -1,6 +1,10 @@
 // Only for seeding per-plan defaults for the core pages below. planPermissions
 // imports permissions.ts and nothing else, so there is no cycle back here.
 import { PLAN_DEFAULT_PERMISSIONS } from "@/lib/planPermissions";
+// The ownership half of page access: which pages a trade's paperwork actually
+// uses. corePack imports nothing but a type from businessModules, so there is
+// no cycle back here.
+import { corePackAllows, getCorePack } from "@/lib/corePack";
 
 export type DashboardFeaturePlanCode = "STARTER" | "PRO" | "ENTERPRISE" | "CUSTOM";
 
@@ -2775,12 +2779,21 @@ export const CROSS_BUSINESS_FEATURE_LABELS = new Set(["AI Intelligence", "Core (
  * Mirrors the access check in `app/dashboard/layout.tsx` — a feature belongs to
  * a business type when its `businessTypes` includes it, falling back to the
  * broader `business` group when the def does not narrow it.
+ *
+ * Core pages used to return `true` unconditionally here, which is what made
+ * every trade's workspace look the same: the 131 core pages were handed to a
+ * travel agency and a steel mill alike, so business type could only ever add
+ * its industry pages and never drop the ones it has no use for. They now pass
+ * through the trade's core pack — see lib/corePack.ts. Universal pages (the
+ * ledger, the vouchers, the P&L, settings) are in no pack rule and still reach
+ * everyone; a GRN reaches only a trade that receives goods against an order.
  */
 export function dashboardFeaturesForBusinessType(businessType: string): DashboardFeatureDefinition[] {
   const target = String(businessType || "").trim();
   if (!target) return [];
+  const pack = getCorePack(target);
   return DASHBOARD_FEATURE_DEFS.filter((feature) => {
-    if (feature.core) return true;
+    if (feature.core) return corePackAllows(pack, feature.id);
     if (CROSS_BUSINESS_FEATURE_LABELS.has(feature.businessLabel)) return true;
     const allowed = feature.businessTypes?.length ? feature.businessTypes : [feature.business];
     return allowed.includes(target);
@@ -2953,15 +2966,23 @@ export function resolveDashboardFeaturesForCompany(opts: {
   const byBusiness =
     opts.businessFlags?.[opts.businessType] ?? opts.fallbackBusinessFlags?.[opts.businessType];
   const scoped = byBusiness?.[plan] ?? byBusiness?.[plan.toLowerCase()];
+
+  // Constrain to pages the business type actually owns, so a stale saved id
+  // cannot hand a pharmacy a trading-only page — and, since core pages now run
+  // through the trade's core pack, so a plan-wide grid cannot hand a travel
+  // agency a GRN either.
+  const owned = new Set(dashboardFeaturesForBusinessType(opts.businessType).map((f) => f.id));
+
   if (Array.isArray(scoped)) {
-    // Constrain to pages the business type actually owns, so a stale saved id
-    // cannot hand a pharmacy a trading-only page.
-    const owned = new Set(dashboardFeaturesForBusinessType(opts.businessType).map((f) => f.id));
     const healed = addUnseenRegistryFeatures(scoped, byBusiness, planKey);
     return healSavedFeatureList(healed, planKey).filter((id) => owned.has(id));
   }
+
+  // The plan-wide grid is written once for all trades, so it is the path that
+  // used to leak hardest: every core page in it reached every business type.
   const planList = opts.planFlags[plan] ?? opts.planFlags[plan.toLowerCase()] ?? null;
-  return planList ? healSavedFeatureList(planList, planKey) : null;
+  if (!planList) return null;
+  return healSavedFeatureList(planList, planKey).filter((id) => owned.has(id));
 }
 
 const CORE_FEATURE_IDS = CORE_DASHBOARD_FEATURES.filter((f) => f.core).map((f) => f.id);
