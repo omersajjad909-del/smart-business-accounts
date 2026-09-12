@@ -14,6 +14,7 @@ import { getCurrentUser } from "@/lib/auth";
 
 import { QRCodeSVG } from "qrcode.react";
 import { useResponsive } from "@/hooks/useResponsive";
+import { useCompanyPrintHeader } from "@/hooks/useCompanyPrintHeader";
 import { useRateFormula } from "@/hooks/useRateFormula";
 import {
   RateFormulaHeadCells,
@@ -280,6 +281,8 @@ const [searchTerm, setSearchTerm] = useState("");
   const [currencyId, setCurrencyId] = useState("");
   const [exchangeRate, setExchangeRate] = useState(1);
   const [companyInfo, setCompanyInfo] = useState<any>(null);
+  // Design, field switches and letterhead for the purchase invoice.
+  const printHeader = useCompanyPrintHeader("purchase_invoice");
   const [printPrefs, setPrintPrefs] = useState({ showAddress: true, showPhone: true, showTaxNumber: true });
 
   // ── Query Mode (F7 / F8) ────────────────────────────────────────────────────
@@ -1629,14 +1632,14 @@ const [searchTerm, setSearchTerm] = useState("");
           {showPreview && (printMode === "none" || printMode === "a4") && (
             <PrintPaperWrapper>
               <PrintDocA4
-                companyName={companyInfo?.name || "Your Company"}
-                companyAddress={printPrefs.showAddress === false ? undefined : companyInfo?.address}
-                companyPhone={printPrefs.showPhone === false ? undefined : companyInfo?.phone}
-                companyTaxLabel={companyInfo?.ntnLabel}
-                companyTaxValue={printPrefs.showTaxNumber === false ? undefined : companyInfo?.ntn}
-                companyStrn={printPrefs.showTaxNumber === false ? undefined : companyInfo?.gst}
-                logoUrl={companyInfo?.logoUrl}
-                showLogo={!!companyInfo?.logoUrl}
+                {...printHeader}
+                companyName={printHeader.companyName || companyInfo?.name || "Your Company"}
+                companyAddress={printHeader.companyAddress || companyInfo?.address}
+                companyPhone={printHeader.companyPhone || companyInfo?.phone}
+                companyTaxLabel={printHeader.companyTaxLabel || companyInfo?.ntnLabel}
+                companyTaxValue={printHeader.companyTaxValue || companyInfo?.ntn}
+                companyStrn={printHeader.companyStrn || companyInfo?.gst}
+                logoUrl={printHeader.logoUrl || companyInfo?.logoUrl}
                 docTitle="PURCHASE INVOICE"
                 docNo={invoiceId || "—"}
                 date={fmtDate(date)}

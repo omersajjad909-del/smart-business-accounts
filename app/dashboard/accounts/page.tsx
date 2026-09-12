@@ -1,11 +1,12 @@
 "use client";
 
 import toast from "react-hot-toast";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { getCurrentUser } from "@/lib/auth";
 import { confirmToast } from "@/lib/toast-feedback";
 import { useResponsive } from "@/hooks/useResponsive";
-import { PK_PROVINCES } from "@/lib/pkProvinces";
+import { COUNTRIES, sortCountries } from "@/lib/countries";
+import { subdivisionsFor, subdivisionLabelFor, skipsSubdivision } from "@/lib/subdivisions";
 
 const FONT = "'Outfit','Inter',sans-serif";
 const ACCENT = "#6366f1";
@@ -61,7 +62,7 @@ type Account = {
   type?: string | null; partyType?: string | null;
   city?: string | null; phone?: string | null; email?: string | null;
   address?: string | null; ntn?: string | null; strn?: string | null;
-  province?: string | null;
+  province?: string | null; country?: string | null;
   bankIban?: string | null; description?: string | null;
   parentId?: string | null;
   openDebit?: number; openCredit?: number;
@@ -70,7 +71,7 @@ type Account = {
 
 const EMPTY_FORM = {
   code: "", name: "", partyType: "CUSTOMER",
-  city: "", phone: "", email: "", address: "", province: "",
+  city: "", phone: "", email: "", address: "", province: "", country: "",
   ntn: "", strn: "", bankIban: "", description: "",
   parentId: "",
   openDate: new Date().toISOString().slice(0, 10),
@@ -123,6 +124,15 @@ export default function ChartOfAccounts() {
 
   const f = (k: string, v: string) => setForm(p => ({ ...p, [k]: v }));
 
+  // The company's own country, used only as the starting value for a *new*
+  // party — most customers are domestic, and pre-filling saves the picker on
+  // every single one. An existing party keeps whatever was saved, including
+  // nothing: guessing a country for a record somebody else created would turn
+  // "nobody has said" into something that looks confirmed.
+  const [companyCountry, setCompanyCountry] = useState("");
+  const countryOptions = useMemo(() => sortCountries(COUNTRIES).map(c => c.name), []);
+  const partyRegionOptions = useMemo(() => subdivisionsFor(form.country), [form.country]);
+
   async function loadAccounts() {
     const user = getCurrentUser();
     if (!user) { setLoading(false); return; }
@@ -137,6 +147,22 @@ export default function ChartOfAccounts() {
   }
 
   useEffect(() => { loadAccounts(); }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+    fetch("/api/me/company")
+      .then(r => (r.ok ? r.json() : null))
+      .then(d => {
+        const country = String(d?.country || "").trim();
+        if (cancelled || !country) return;
+        setCompanyCountry(country);
+        // Only fills a blank box on the empty form — never overwrites a party
+        // being edited, and never fights a choice already made.
+        setForm(p => (p.country ? p : { ...p, country }));
+      })
+      .catch(() => {});
+    return () => { cancelled = true; };
+  }, []);
 
   useEffect(() => {
     if (!loading && !editingId && !form.code) {
@@ -203,7 +229,7 @@ export default function ChartOfAccounts() {
       partyType: a.partyType || "GENERAL",
       city: a.city || "", phone: a.phone || "", email: a.email || "",
       address: a.address || "", ntn: a.ntn || "", strn: a.strn || "",
-      province: a.province || "",
+      province: a.province || "", country: a.country || "",
       bankIban: a.bankIban || "", description: a.description || "",
       parentId: a.parentId || "",
       openDate: a.openDate ? new Date(a.openDate).toISOString().slice(0, 10) : EMPTY_FORM.openDate,
@@ -213,7 +239,9 @@ export default function ChartOfAccounts() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
-  function resetForm() { setEditingId(null); setForm({ ...EMPTY_FORM }); }
+  // Back to a blank party, but still in the company's own country — entering
+  // ten local customers in a row should not mean picking Pakistan ten times.
+  function resetForm() { setEditingId(null); setForm({ ...EMPTY_FORM, country: companyCountry }); }
 
   const filtered = accounts.filter(a => {
     const matchTab = activeTab === "ALL" || a.partyType === activeTab;
@@ -390,16 +418,41 @@ export default function ChartOfAccounts() {
                 <Field label="City">
                   <input value={form.city} onChange={e => f("city", e.target.value)} placeholder="Lahore" style={inp()} />
                 </Field>
-                <Field label="Province">
-                  {/* A dropdown, not a box: this rides on every FBR filing and
-                      the gateway matches it against its own list, so a typed
-                      "punjab" — or a city name, which is what used to go in
-                      this slot — fails the whole invoice. */}
-                  <select value={form.province} onChange={e => f("province", e.target.value)} style={inp()}>
+                {/* The party's own country, not the company's. A Pakistani
+                    exporter's buyer in Sharjah needs an emirate recorded, and
+                    this field is what makes the one below know that. */}
+                <Field label="Country">
+                  <select value={form.country} onChange={e => f("country", e.target.value)} style={inp()}>
                     <option value="">— none —</option>
-                    {PK_PROVINCES.map((p) => (<option key={p} value={p}>{p}</option>))}
+                    {countryOptions.map((c) => (<option key={c} value={c}>{c}</option>))}
                   </select>
                 </Field>
+                {!skipsSubdivision(form.country) && (
+                  <Field label={subdivisionLabelFor(form.country)}>
+                    {/* A dropdown, not a box: for a Pakistani buyer this rides on
+                        every FBR filing and the gateway matches it against its own
+                        list, so a typed "punjab" — or a city name, which is what
+                        used to go in this slot — fails the whole invoice. The list
+                        and the heading both follow the country above; see
+                        lib/subdivisions.ts. */}
+                    {partyRegionOptions.length > 0 ? (
+                      <select value={form.province} onChange={e => f("province", e.target.value)} style={inp()}>
+                        <option value="">— none —</option>
+                        {partyRegionOptions.map((p) => (<option key={p} value={p}>{p}</option>))}
+                        {/* Whatever is already on the record stays selectable even
+                            when it is not on the list — an imported or legacy value
+                            must not vanish the moment the form opens. */}
+                        {form.province && !partyRegionOptions.includes(form.province) && (
+                          <option value={form.province}>
+                            {form.province} (not on the {subdivisionLabelFor(form.country).toLowerCase()} list)
+                          </option>
+                        )}
+                      </select>
+                    ) : (
+                      <input value={form.province} onChange={e => f("province", e.target.value)} style={inp()} />
+                    )}
+                  </Field>
+                )}
                 <Field label="Address">
                   <input value={form.address} onChange={e => f("address", e.target.value)} placeholder="Street, Area" style={inp()} />
                 </Field>

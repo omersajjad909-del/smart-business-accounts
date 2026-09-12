@@ -6,6 +6,7 @@ import {
   readCookieConsent,
   type CookieConsent,
 } from "@/lib/cookieConsent";
+import { loadMetaPixel } from "@/lib/metaPixel";
 
 const CLARITY_ID = process.env.NEXT_PUBLIC_CLARITY_PROJECT_ID;
 
@@ -52,6 +53,13 @@ function applyConsent(consent: CookieConsent | null) {
   // Load Clarity only when analytics consented
   if (analyticsGranted && CLARITY_ID) {
     loadClarity(CLARITY_ID);
+  }
+
+  // The Meta Pixel is advertising, so it follows the marketing flag rather
+  // than the analytics one. loadMetaPixel is idempotent, so re-applying
+  // consent never loads it twice.
+  if (marketingGranted) {
+    loadMetaPixel();
   }
 }
 

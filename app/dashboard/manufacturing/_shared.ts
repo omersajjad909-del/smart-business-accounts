@@ -276,7 +276,7 @@ export type ProductionRunQuote = {
   needsBomLines?: boolean;
 };
 
-export type ItemCategory = "RAW_MATERIAL" | "FINISHED" | "TRADING" | "SERVICE";
+export type ItemCategory = "RAW_MATERIAL" | "PACKAGING" | "FINISHED" | "TRADING" | "SERVICE";
 
 export async function loadManufacturingItems(
   category?: ItemCategory | ItemCategory[],

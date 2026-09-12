@@ -24,6 +24,7 @@ const SELECT_ARROW: React.CSSProperties = { position:"absolute", right:12, top:"
 const CATEGORIES = [
   { value:"TRADING",      label:"Trading Goods",    color:"#818cf8" },
   { value:"RAW_MATERIAL", label:"Raw Material",     color:"#34d399" },
+  { value:"PACKAGING",    label:"Packing Material", color:"#38bdf8" },
   { value:"FINISHED",     label:"Finished Goods",   color:"#f59e0b" },
   { value:"SERVICE",      label:"Service",          color:"#a78bfa" },
 ];
@@ -282,7 +283,7 @@ export default function ItemsNewPage() {
                 <option value="PAIR">Pair</option>
                 <option value="SET">Set</option>
                 <option value="BOX">Box</option>
-                <option value="PACK">Pack</option>
+                <option value="PACK">Packing</option>
                 <option value="CTN">Carton</option>
                 <option value="BAG">Bag</option>
                 <option value="ROLL">Roll</option>

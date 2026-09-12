@@ -2,7 +2,7 @@
 import { fmtDate } from "@/lib/dateUtils";
 import { DateInput } from "@/app/dashboard/reports/_components/DateInput";
 import { confirmToast } from "@/lib/toast-feedback";
-import { Suspense, useCallback, useEffect, useMemo, useState } from "react";
+import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import toast from "react-hot-toast";
 import dynamic from "next/dynamic";
@@ -17,6 +17,7 @@ import { useResponsive } from "@/hooks/useResponsive";
 import { ItemPicker } from "@/components/ItemPicker";
 import { usePageCloseGuard } from "@/components/PageCloseGuard";
 import { useRateFormula } from "@/hooks/useRateFormula";
+import { useCompanyPrintHeader } from "@/hooks/useCompanyPrintHeader";
 import {
   RateFormulaHeadCells,
   RateFormulaRowCells,
@@ -102,8 +103,15 @@ function SalesInvoiceContent() {
   const { isMobile } = useResponsive();
   const searchParams = useSearchParams();
   const queryId = searchParams.get("id");
+  const fromChallans = searchParams.get("fromChallans");
   const today = new Date().toISOString().slice(0, 10);
   const user = getCurrentUser();
+  // getCurrentUser() re-reads and re-parses sessionStorage on every render, so
+  // it hands back a fresh object each time. An effect that depends on it never
+  // settles: it runs, sets state, re-renders, sees a "new" user and runs
+  // again. These two primitives are what the effects below actually need.
+  const userId = user?.id || "";
+  const userRole = user?.role || "";
   const canCreate = hasPermission(user, PERMISSIONS.CREATE_SALES_INVOICE);
 
   // ── Data ──
@@ -162,6 +170,11 @@ function SalesInvoiceContent() {
   );
   const emptyRow = (): Row => ({ itemId: "", name: "", description: "", availableQty: 0, qty: "", rate: "", discountPercent: "", taxPercent: "", unit: "", sku: "", isManual: false, ...(rfActive ? { meta: emptyRateFormulaMeta(rf) } : {}) });
   const [rows, setRows]                 = useState<Row[]>([emptyRow()]);
+  // The delivery challans this invoice is settling. The usual case for a
+  // customer who takes goods all month and is billed once at the end of it:
+  // the goods are already out of stock, so the invoice must not take them out
+  // again — the API enforces that, this only carries the ids.
+  const [billedChallans, setBilledChallans] = useState<{ id: string; challanNo: string }[]>([]);
   const [freight, setFreight]           = useState<number | "">("");
   const [discount, setDiscount]         = useState<number | "">("");
   const [discountType, setDiscountType] = useState<"flat" | "percent">("flat");
@@ -185,6 +198,10 @@ function SalesInvoiceContent() {
   const [siQueryIdx,     setSiQueryIdx]     = useState(-1);
 
   // ── Logo / print prefs ──
+  // The design, the field switches and the letterhead for *this* document.
+  const printHeader = useCompanyPrintHeader("sales_invoice");
+  // Still read for the thermal slip below, which has its own hand-written
+  // markup and is not on the shared component yet.
   const [printPrefs, setPrintPrefs] = useState({ showLogo: true, logoUrl: "", headerNote: "", footerNote: "Thank you for your business.", invoiceTemplate: "classic" });
   // Whether this company has connected FBR's digital invoicing gateway (see
   // /dashboard/e-invoice) — the printed invoice only carries the FBR Invoice
@@ -277,13 +294,69 @@ function SalesInvoiceContent() {
     } catch {}
   }, []);
 
+  // ── Pre-fill from delivery challans ──
+  // Once per set of challans. The ref is belt and braces next to the stable
+  // deps: a challan list is pulled into a half-typed invoice exactly once, so
+  // a re-render can never overwrite edits already made to the lines.
+  const loadedChallansRef = useRef<string | null>(null);
   useEffect(() => {
-    if (!queryId || !user) return;
-    fetch(`/api/sales-invoice?id=${queryId}`, { headers: { "x-user-role": user.role || "", "x-user-id": user.id || "" } })
+    if (!fromChallans || !userId) return;
+    if (loadedChallansRef.current === fromChallans) return;
+    loadedChallansRef.current = fromChallans;
+    fetch(`/api/delivery-challan?ids=${fromChallans}`, {
+      headers: { "x-user-role": userRole, "x-user-id": userId },
+    })
+      .then(r => r.json())
+      .then((list: any[]) => {
+        if (!Array.isArray(list) || !list.length) { toast.error("Those challans could not be loaded."); return; }
+
+        setBilledChallans(list.map(c => ({ id: c.id, challanNo: c.challanNo })));
+        setCustomerId(list[0].customerId || "");
+        setCustomerName(list[0].customer?.name || "");
+        setDriverName(list[0].driverName || "");
+        setVehicleNo(list[0].vehicleNo || "");
+
+        // One line per challan line, never merged: the customer checks the
+        // bill against the challans they signed, and a merged line cannot be
+        // traced back to the delivery it came from. Each line carries its
+        // challan number in the Po# column, which is what that column prints.
+        const lines: Row[] = [];
+        for (const ch of list) {
+          for (const it of ch.items || []) {
+            lines.push({
+              itemId: it.itemId,
+              name: it.item?.name || "",
+              description: it.item?.description || "",
+              availableQty: 0,
+              qty: Number(it.qty) || "",
+              rate: Number(it.rate) || "",
+              discountPercent: "",
+              taxPercent: it.item?.taxRate || "",
+              unit: it.item?.unit || "",
+              sku: it.item?.code || "",
+              hsCode: it.item?.hsCode || undefined,
+              poNo: ch.challanNo,
+            });
+          }
+        }
+        if (lines.length) setRows(lines);
+
+        const nos = list.map(c => c.challanNo).join(", ");
+        setNotes(n => (n ? n + "\n" : "") + `Against Delivery Challan: ${nos}`);
+        setShowForm(true);
+        setShowList(false);
+        toast.success(`${list.length} challan${list.length > 1 ? "s" : ""} loaded`);
+      })
+      .catch(() => toast.error("Those challans could not be loaded."));
+  }, [fromChallans, userId, userRole]);
+
+  useEffect(() => {
+    if (!queryId || !userId) return;
+    fetch(`/api/sales-invoice?id=${queryId}`, { headers: { "x-user-role": userRole, "x-user-id": userId } })
       .then(r => r.json()).then(inv => {
         if (inv && !inv.error) { setSavedInvoice(inv); setInvoiceNo(inv.invoiceNo || invoiceNo); setCustomerName(inv.customer?.name || ""); setPreview(true); setShowForm(true); setShowList(false); }
       }).catch(() => {});
-  }, [queryId, user]);
+  }, [queryId, userId, userRole]);
 
   // ── Query Mode helpers ───────────────────────────────────────────────────────
   function siEnterQuery() { setSiQueryMode(true); setSiQueryInvNo(""); setSiQueryDate(""); setSiQueryParty(""); setSiQueryResults([]); setSiQueryIdx(-1); }
@@ -560,6 +633,7 @@ function SalesInvoiceContent() {
         applyTax, taxConfigId: applyTax ? selectedTaxId : null,
         currencyId: currencyId || null, exchangeRate,
         soId: (!editing && linkedSoId) ? linkedSoId : undefined,
+        deliveryChallanIds: (!editing && billedChallans.length) ? billedChallans.map(c => c.id) : undefined,
       };
       const body = editing ? { id: editing.id, ...baseBody } : baseBody;
       const res = await fetch("/api/sales-invoice", { method, credentials: "include", headers: { "Content-Type": "application/json", "x-user-role": user?.role || "", "x-user-id": user?.id || "" }, body: JSON.stringify(body) });
@@ -599,7 +673,7 @@ function SalesInvoiceContent() {
   }
 
   function resetForm() {
-    setEditing(null); setCustomerId(""); setCustomerName(""); setLinkedSoId(""); setLinkedSoNo("");
+    setEditing(null); setCustomerId(""); setCustomerName(""); setLinkedSoId(""); setLinkedSoNo(""); setBilledChallans([]);
     setDate(today); setDueDate(""); setLocation("MAIN"); setDriverName(""); setVehicleNo(""); setFreight("");
     setDiscount(""); setNotes(""); setTermsConditions(""); setReference(""); setPaymentMethod(""); setPaymentTerms("");
     setRows([emptyRow()]);
@@ -607,8 +681,16 @@ function SalesInvoiceContent() {
   }
 
   /** The print areas only exist in preview, so printing before it prints blank paper. */
-  function doPrint(mode: "a4" | "55mm") {
+  /**
+   * One saved invoice, two faces. The goods travel on the challan face — same
+   * items and quantities, no rates, no total, signed for on receipt — and the
+   * bill follows separately on the invoice face. Nothing is written either
+   * way: this only decides which face the preview and the printer show, so
+   * the stock and the ledger are untouched by printing.
+   */
+  function doPrint(mode: "a4" | "55mm", as: "INVOICE" | "DELIVERY" = previewMode) {
     if (!preview) { toast.error("Save the invoice first — printing works from the preview."); return; }
+    setPreviewMode(as);
     setPrintMode(mode);
     setTimeout(() => window.print(), 100);
   }
@@ -765,6 +847,7 @@ function SalesInvoiceContent() {
   };
   const labelStyle: React.CSSProperties = { fontSize: 11, color: "var(--text-muted)", fontWeight: 600, marginBottom: 5, display: "block", textTransform: "uppercase", letterSpacing: 0.5 };
   const btnPrimary: React.CSSProperties = { background: accent, color: "#fff", border: "none", borderRadius: 8, padding: "9px 20px", fontFamily: ff, fontSize: 14, fontWeight: 600, cursor: "pointer" };
+
   const btnGhost: React.CSSProperties = { background: "transparent", color: "var(--text-muted)", border: "1px solid var(--border)", borderRadius: 8, padding: "9px 16px", fontFamily: ff, fontSize: 14, cursor: "pointer" };
   const menuPanel: React.CSSProperties = { position: "absolute", top: "calc(100% + 6px)", minWidth: 200, background: "var(--card-bg)", border: "1px solid var(--border)", borderRadius: 10, padding: "6px 0", zIndex: 50, boxShadow: "0 8px 32px rgba(0,0,0,.35)" };
   const menuItem: React.CSSProperties = { display: "flex", alignItems: "center", gap: 10, width: "100%", background: "none", border: "none", padding: "10px 16px", cursor: "pointer", color: "var(--text-primary)", fontSize: 13, fontFamily: ff, textAlign: "left" };
@@ -808,17 +891,19 @@ function SalesInvoiceContent() {
    * and printing it twice is what made the old bill unreadable.
    */
   const printDocProps = {
-    companyName: companyInfo?.name || "",
-    companyAddress: (printPrefs as any).showAddress === false ? undefined : companyInfo?.address,
-    companyPhone: (printPrefs as any).showPhone === false ? undefined : companyInfo?.phone,
-    companyTaxLabel: companyInfo?.ntnLabel,
-    companyTaxValue: (printPrefs as any).showTaxNumber === false ? undefined : companyInfo?.ntn,
-    companyStrn: (printPrefs as any).showTaxNumber === false ? undefined : companyInfo?.gst,
-    showLogo: printPrefs.showLogo,
-    logoUrl: printPrefs.logoUrl,
-    // The look the company chose in Admin -> Print & Branding.
-    template: printPrefs.invoiceTemplate,
-    docTitle: previewMode === "DELIVERY" ? "DELIVERY NOTE" : "SALES INVOICE",
+    // Letterhead, design and the field switches, all from this document's own
+    // print profile. This page used to read the settings by hand — which is how
+    // "Show Tax / NTN label" ended up gating the seller's numbers and not the
+    // buyer's, and the buyer's NTN kept printing after it was switched off.
+    // Hiding is PrintDocA4's job now; this passes values, not decisions.
+    ...printHeader,
+    companyName: printHeader.companyName || companyInfo?.name || "",
+    companyAddress: printHeader.companyAddress || companyInfo?.address,
+    companyPhone: printHeader.companyPhone || companyInfo?.phone,
+    companyTaxLabel: printHeader.companyTaxLabel || companyInfo?.ntnLabel,
+    companyTaxValue: printHeader.companyTaxValue || companyInfo?.ntn,
+    companyStrn: printHeader.companyStrn || companyInfo?.gst,
+    docTitle: previewMode === "DELIVERY" ? "DELIVERY CHALLAN" : "SALES INVOICE",
     docNo: invNo,
     date: fmtDate(invDate),
     status: paymentTerms || paymentMethod || undefined,
@@ -931,8 +1016,12 @@ function SalesInvoiceContent() {
     amountInWords: previewMode === "DELIVERY" || invTotal <= 0 ? undefined : amountToWordsInternational(invTotal),
     notes: savedInvoice?.notes || notes,
     terms: savedInvoice?.termsConditions || undefined,
-    footerNote: printPrefs.footerNote || undefined,
-    signatureLabels: ["Prepared By", "Checked By", "Approved By"],
+    // The spread at the top already carries this document's footer note from
+    // Print Preferences; only fall back when nothing is configured.
+    footerNote: printHeader.footerNote ?? printPrefs.footerNote ?? undefined,
+    signatureLabels: previewMode === "DELIVERY"
+      ? ["Received By", "Delivered By"]
+      : ["Prepared By", "Checked By", "Approved By"],
   };
 
   return (
@@ -983,7 +1072,18 @@ function SalesInvoiceContent() {
                 <button onClick={siExitQuery} style={{ padding: "4px 10px", borderRadius: 6, background: "rgba(248,113,113,.08)", border: "1px solid rgba(248,113,113,.2)", color: "#f87171", fontSize: 11, cursor: "pointer", fontFamily: ff }}>✕</button>
               </div>
             )}
-            {/* ── Print ▾ — A4 or the 55mm short slip ── */}
+            {/* Which face the preview is showing. Only a view — the invoice
+                itself is the same record either way. */}
+            {preview && previewMode === "DELIVERY" && (
+              <div style={{ display: "flex", alignItems: "center", gap: 8, background: "rgba(59,130,246,.08)", border: "1px solid rgba(59,130,246,.3)", borderRadius: 8, padding: "6px 12px", fontSize: 12 }}>
+                <span style={{ color: "var(--text-muted)" }}>Showing delivery challan — no rates</span>
+                <button onClick={() => setPreviewMode("INVOICE")} style={{ background: "none", border: "none", color: "#3b82f6", fontFamily: ff, fontSize: 12, fontWeight: 700, cursor: "pointer", padding: 0 }}>
+                  Show invoice
+                </button>
+              </div>
+            )}
+
+            {/* ── Print ▾ — invoice or challan, A4 or the 55mm short slip ── */}
             <div style={{ position: "relative" }}>
               <button style={btnGhost} onClick={() => { setSendMenu(false); setPrintMenu(o => !o); }}>
                 🖨️ Print <span style={{ fontSize: 10, opacity: .7, marginLeft: 4 }}>▾</span>
@@ -992,11 +1092,18 @@ function SalesInvoiceContent() {
                 <>
                   <div onClick={() => setPrintMenu(false)} style={{ position: "fixed", inset: 0, zIndex: 49 }} />
                   <div style={{ ...menuPanel, left: 0 }}>
-                    <button style={menuItem} onClick={() => { setPrintMenu(false); doPrint("a4"); }}>
-                      <span style={{ fontSize: 15, minWidth: 20 }}>🖨️</span>A4
+                    <button style={menuItem} onClick={() => { setPrintMenu(false); doPrint("a4", "INVOICE"); }}>
+                      <span style={{ fontSize: 15, minWidth: 20 }}>🖨️</span>Invoice — A4
                     </button>
-                    <button style={menuItem} onClick={() => { setPrintMenu(false); doPrint("55mm"); }}>
+                    <button style={menuItem} onClick={() => { setPrintMenu(false); doPrint("55mm", "INVOICE"); }}>
                       <span style={{ fontSize: 15, minWidth: 20 }}>🧾</span>55mm (Short)
+                    </button>
+                    <div style={{ height: 1, background: "var(--border)", margin: "4px 0" }} />
+                    <button style={menuItem} onClick={() => { setPrintMenu(false); doPrint("a4", "DELIVERY"); }}>
+                      <span style={{ fontSize: 15, minWidth: 20 }}>📄</span>Delivery Challan — A4
+                    </button>
+                    <button style={menuItem} onClick={() => { setPrintMenu(false); doPrint("55mm", "DELIVERY"); }}>
+                      <span style={{ fontSize: 15, minWidth: 20 }}>📄</span>Delivery Challan — 55mm
                     </button>
                   </div>
                 </>
@@ -1148,6 +1255,17 @@ function SalesInvoiceContent() {
                     340px meta column does not. */}
                 <div style={{ display: "flex", flexDirection: "column", gap: 16, minWidth: 0 }}>
 
+                  {billedChallans.length > 0 && (
+                    <div style={{ background: "rgba(59,130,246,.08)", border: "1px solid rgba(59,130,246,.3)", borderRadius: 10, padding: "10px 14px", fontSize: 12, color: "var(--text-primary)" }}>
+                      <b>Billing {billedChallans.length} delivery challan{billedChallans.length > 1 ? "s" : ""}:</b>{" "}
+                      {billedChallans.map(c => c.challanNo).join(", ")}.{" "}
+                      <span style={{ color: "var(--text-muted)" }}>
+                        The goods already left stock on those challans, so this invoice will not
+                        deduct them again. Saving marks each challan as INVOICED.
+                      </span>
+                    </div>
+                  )}
+
                   {/* Customer + Business + Scan — three across */}
                   <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(3, minmax(0, 1fr))", gap: 14, alignItems: "stretch" }}>
                     <div style={panelStyle}>
@@ -1292,8 +1410,11 @@ function SalesInvoiceContent() {
                         <table style={{ width: "100%", minWidth: 0, tableLayout: "auto", borderCollapse: "separate", borderSpacing: "0 6px" }}>
                           <thead>
                             <tr style={{ borderBottom: "1px solid var(--border)" }}>
-                              {["#","Item / Description"].map((h,hi) => (
-                                <th key={h+hi} style={{ padding: "10px 8px", fontSize: 10.5, fontWeight: 800, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: 0.5, textAlign: "left", whiteSpace: "nowrap" }}>{h}</th>
+                              {[
+                                { label: "#", width: "1%" },
+                                { label: "Item / Description", width: "99%" },
+                              ].map(h => (
+                                <th key={h.label} style={{ padding: "10px 8px", width: h.width, fontSize: 10.5, fontWeight: 800, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: 0.5, textAlign: "left", whiteSpace: "nowrap" }}>{h.label}</th>
                               ))}
                               {hasDualUnitLines && (
                                 <th style={{ padding: "10px 6px", fontSize: 10.5, fontWeight: 800, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: 0.5, textAlign: "left", whiteSpace: "nowrap" }}>Po#</th>
@@ -1322,13 +1443,13 @@ function SalesInvoiceContent() {
                               const lineTax = lineTaxable * (Number(r.taxPercent) || 0) / 100;
                               return (
                                 <tr key={i} style={{ background: "var(--panel-bg)" }}>
-                                  <td style={{ padding: "13px 8px", fontSize: 12.5, color: "var(--text-muted)", verticalAlign: "top", borderTop: "1px solid var(--border)", borderBottom: "1px solid var(--border)" }}>
+                                  <td style={{ padding: "13px 8px", width: "1%", whiteSpace: "nowrap", fontSize: 12.5, color: "var(--text-muted)", verticalAlign: "top", borderTop: "1px solid var(--border)", borderBottom: "1px solid var(--border)" }}>
                                     <div style={{ lineHeight: 1.3, paddingTop: 7 }}>{i + 1}</div>
                                     {r.sku && !r.isManual && (
                                       <div title={`SKU ${r.sku}`} style={{ fontSize: 9.5, fontFamily: "ui-monospace, monospace", color: "var(--text-muted)", opacity: 0.75, marginTop: 1, maxWidth: 46, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{r.sku}</div>
                                     )}
                                   </td>
-                                  <td style={{ padding: "13px 8px", width: "27%", minWidth: 0, overflow: "visible", borderTop: "1px solid var(--border)", borderBottom: "1px solid var(--border)" }}>
+                                  <td style={{ padding: "13px 8px", width: "99%", minWidth: 0, overflow: "visible", borderTop: "1px solid var(--border)", borderBottom: "1px solid var(--border)" }}>
                                     {r.isManual ? (
                                       <div style={{ display: "flex", gap: 4, alignItems: "center" }}>
                                         <input
@@ -1573,7 +1694,7 @@ function SalesInvoiceContent() {
       {preview && printMode === "55mm" && (
         <div className="print-area" style={{ fontFamily: "'Courier New',monospace", fontSize: 11, color: "#000", background: "#fff", width: "55mm", margin: "0 auto", padding: "3mm" }}>
           <div style={{ textAlign: "center", borderBottom: "2px solid #000", paddingBottom: 8, marginBottom: 8 }}>
-            <div style={{ fontSize: 15, fontWeight: 900 }}>{previewMode === "DELIVERY" ? "DELIVERY NOTE" : "RECEIPT"}</div>
+            <div style={{ fontSize: 15, fontWeight: 900 }}>{previewMode === "DELIVERY" ? "DELIVERY CHALLAN" : "RECEIPT"}</div>
             <div style={{ fontSize: 11, fontWeight: 700 }}>{companyInfo?.name || ""}</div>
             {companyInfo?.phone && <div style={{ fontSize: 9 }}>{companyInfo.phone}</div>}
           </div>

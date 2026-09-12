@@ -63,7 +63,7 @@ export default function SalesReturnPage() {
   const { isMobile } = useResponsive();
   // Address, phone, tax registration and the Print & Branding switches,
   // read the one way every document reads them.
-  const printHeader = useCompanyPrintHeader();
+  const printHeader = useCompanyPrintHeader("sale_return");
   const { settings: rf, active: rfActive } = useRateFormula("saleReturn");
   const today = new Date().toISOString().slice(0, 10);
   const user  = getCurrentUser();

@@ -8,7 +8,7 @@ import { CURRENCY_LABEL, SUPPORTED_CURRENCIES, currencyByCountry } from "@/lib/c
 import Link from "next/link";
 import { useResponsive } from "@/hooks/useResponsive";
 import { PRINT_TEMPLATES, normalizePrintTemplate } from "@/components/print/printTemplates";
-import { PK_PROVINCES } from "@/lib/pkProvinces";
+import { subdivisionsFor, subdivisionLabelFor, skipsSubdivision } from "@/lib/subdivisions";
 
 /* ─── types ─── */
 type Branch = { id: string; code: string; name: string; city?: string | null; isActive: boolean; address?: string; latitude?: number | null; longitude?: number | null; geoSource?: "exact" | "manual" | "country" | "unset" };
@@ -140,6 +140,8 @@ export default function AdminControlPage() {
 
   const availablePermissions = useMemo(() => Object.values(PERMISSIONS), []);
   const countryOptions = useMemo(() => sortCountries(ALL_COUNTRIES).map(c => c.name), []);
+  // Re-read on every country change — that is the whole point of the field.
+  const stateOptions = useMemo(() => subdivisionsFor(companyForm.country), [companyForm.country]);
   const CURRENCIES = [...SUPPORTED_CURRENCIES];
 
   function flash(text: string, ok = true) {
@@ -415,24 +417,37 @@ export default function AdminControlPage() {
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
                   <Field label="Legal Address" span2><input style={inp} value={settings.companyIdentity.legalAddress} onChange={e => setSettings(s => ({ ...s, companyIdentity: { ...s.companyIdentity, legalAddress: e.target.value } }))} placeholder="Street, building, full legal address" /></Field>
                   <Field label="City"><input style={inp} value={settings.companyIdentity.city} onChange={e => setSettings(s => ({ ...s, companyIdentity: { ...s.companyIdentity, city: e.target.value } }))} /></Field>
-                  {/* A dropdown for a Pakistani seller: this value goes out as
-                      the seller's province on every FBR filing and the gateway
-                      matches it against its own list, so free text let "punjab"
-                      and "Punjab" both be stored and neither looked wrong.
-                      Anywhere else it stays a plain box — no such list applies. */}
-                  <Field label="State / Province">
-                    {/^pakistan$/i.test((companyForm.country || "").trim()) ? (
-                      <select style={inp} value={settings.companyIdentity.state} onChange={e => setSettings(s => ({ ...s, companyIdentity: { ...s.companyIdentity, state: e.target.value } }))}>
-                        <option value="">— none —</option>
-                        {PK_PROVINCES.map(p => <option key={p} value={p}>{p}</option>)}
-                        {settings.companyIdentity.state && !PK_PROVINCES.includes(settings.companyIdentity.state as never) && (
-                          <option value={settings.companyIdentity.state}>{settings.companyIdentity.state} (not an FBR province)</option>
-                        )}
-                      </select>
-                    ) : (
-                      <input style={inp} value={settings.companyIdentity.state} onChange={e => setSettings(s => ({ ...s, companyIdentity: { ...s.companyIdentity, state: e.target.value } }))} />
-                    )}
-                  </Field>
+                  {/* The list follows the country picked above, and so does the
+                      heading: the UAE has emirates, Japan prefectures, Egypt
+                      governorates. Pakistan's list is the FBR one — this value
+                      goes out as the seller's province on every filing and the
+                      gateway matches it against its own list, which is why free
+                      text let "punjab" and "Punjab" both be stored and neither
+                      look wrong. See lib/subdivisions.ts.
+
+                      A country the list does not cover keeps the plain box, and
+                      a city-state drops the field entirely rather than ask for
+                      something that does not exist. */}
+                  {!skipsSubdivision(companyForm.country) && (
+                    <Field label={subdivisionLabelFor(companyForm.country)}>
+                      {stateOptions.length > 0 ? (
+                        <select style={inp} value={settings.companyIdentity.state} onChange={e => setSettings(s => ({ ...s, companyIdentity: { ...s.companyIdentity, state: e.target.value } }))}>
+                          <option value="">— none —</option>
+                          {stateOptions.map(p => <option key={p} value={p}>{p}</option>)}
+                          {/* Whatever is already saved stays selectable even when
+                              it is not on the list — changing country must never
+                              silently blank a value the operator did not touch. */}
+                          {settings.companyIdentity.state && !stateOptions.includes(settings.companyIdentity.state) && (
+                            <option value={settings.companyIdentity.state}>
+                              {settings.companyIdentity.state} (not on the {subdivisionLabelFor(companyForm.country).toLowerCase()} list)
+                            </option>
+                          )}
+                        </select>
+                      ) : (
+                        <input style={inp} value={settings.companyIdentity.state} onChange={e => setSettings(s => ({ ...s, companyIdentity: { ...s.companyIdentity, state: e.target.value } }))} />
+                      )}
+                    </Field>
+                  )}
                 </div>
               </div>
 
@@ -516,14 +531,29 @@ export default function AdminControlPage() {
                     </select>
                   </Field>
                 </div>
-                <div style={{ display: "grid", gridTemplateColumns: "repeat(2,1fr)", gap: 10 }}>
-                  {([["showLogo","Show logo on print"],["showPhone","Show phone number"],["showAddress","Show address"],["showTaxNumber","Show Tax / NTN label"]] as [keyof PrintPreferences, string][]).map(([key, label]) => (
-                    <label key={key} style={{ display: "flex", alignItems: "center", gap: 10, padding: "11px 14px", borderRadius: 9, border: `1px solid ${BDR}`, background: "rgba(255,255,255,.02)", cursor: "pointer", fontSize: 13 }}>
-                      <input type="checkbox" checked={Boolean(settings.printPreferences[key])} onChange={e => setSettings(s => ({ ...s, printPreferences: { ...s.printPreferences, [key]: e.target.checked } }))} />
-                      {label}
-                    </label>
-                  ))}
-                </div>
+                {/* The four show/hide switches that used to sit here are now
+                    per document, and one company-wide copy of them would have
+                    to disagree with the seven that replaced it the moment
+                    anybody changed one. Print Preferences owns them. */}
+                <Link
+                  href="/dashboard/print-preferences"
+                  style={{
+                    display: "flex", alignItems: "center", justifyContent: "space-between", gap: 14,
+                    padding: "14px 16px", borderRadius: 10, border: `1px solid ${BDR}`,
+                    background: "rgba(99,102,241,.07)", textDecoration: "none", color: "inherit",
+                  }}
+                >
+                  <span>
+                    <span style={{ display: "block", fontSize: 13.5, fontWeight: 600 }}>
+                      What each document shows, and its design
+                    </span>
+                    <span style={{ display: "block", fontSize: 12, color: "rgba(255,255,255,.45)", marginTop: 2, lineHeight: 1.5 }}>
+                      Logo, addresses and both sides&apos; tax numbers — set per document now, with a
+                      live preview. Sales invoice, PO, challan, GRN and the rest each keep their own.
+                    </span>
+                  </span>
+                  <span style={{ fontSize: 13, fontWeight: 600, color: "#818cf8", whiteSpace: "nowrap" }}>Open →</span>
+                </Link>
               </div>
 
               <div style={{ display: "flex", justifyContent: "flex-end" }}>

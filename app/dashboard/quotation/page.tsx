@@ -97,7 +97,7 @@ export default function QuotationPage() {
   const [companyName, setCompanyName] = useState("FINOVA SME");
   // Address, phone, tax registration and the Print & Branding switches, read
   // the one way every document reads them.
-  const printHeader = useCompanyPrintHeader();
+  const printHeader = useCompanyPrintHeader("quotation");
   const [printPrefs, setPrintPrefs] = useState<PrintPreferences>({
     paperSize: "A4",
     showLogo: true,
@@ -856,7 +856,6 @@ export default function QuotationPage() {
                   { label: "TOTAL:", value: Number(savedQuotation.total) + Number(savedQuotation.freight || 0), bold: true, borderTop: true },
                 ]}
                 notes={savedQuotation.remarks || undefined}
-                footerNote={printPrefs.footerNote || "Thank you for your business!"}
                 signatureLabels={["Prepared By", "Checked By", "Authorized By"]}
               />
             </PrintPaperWrapper>

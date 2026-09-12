@@ -8,6 +8,7 @@ import { apiHasPermission } from "@/lib/apiPermission";
 import { requireActiveSubscription } from "@/lib/subscriptionGuard";
 import { logAuditFromReq } from "@/lib/auditLogger";
 import { sanitizeLineMeta } from "@/lib/rateFormula";
+import { withReadableParties } from "@/lib/partyDecrypt";
 
 /* ================= GET: Pending POs for Selection OR All Purchase Invoices ================= */
 export async function GET(req: NextRequest) {
@@ -42,7 +43,7 @@ export async function GET(req: NextRequest) {
         },
       });
       if (!invoice) return NextResponse.json({ error: "Not found" }, { status: 404 });
-      return NextResponse.json(invoice);
+      return NextResponse.json(withReadableParties(invoice));
     }
 
     // If type=invoices, return all purchase invoices
@@ -57,7 +58,7 @@ export async function GET(req: NextRequest) {
         },
         orderBy: { createdAt: "desc" },
       });
-      return NextResponse.json(invoices);
+      return NextResponse.json(withReadableParties(invoices));
     }
 
     // Default: return available POs for invoice matching.
@@ -78,7 +79,7 @@ export async function GET(req: NextRequest) {
       },
       orderBy: { createdAt: "desc" },
     });
-    return NextResponse.json(pos);
+    return NextResponse.json(withReadableParties(pos));
   } catch (e: any) {
     return NextResponse.json({ error: e.message }, { status: 500 });
   }
@@ -536,7 +537,7 @@ export async function PUT(req: NextRequest) {
 
     const result = invoice;
 
-    return NextResponse.json({ success: true, invoice: result });
+    return NextResponse.json(withReadableParties({ success: true, invoice: result }));
   } catch (e: any) {
     console.error("PI PUT ERROR:", e);
     return NextResponse.json({ error: e.message }, { status: 500 });

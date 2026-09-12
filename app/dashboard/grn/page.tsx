@@ -69,7 +69,7 @@ export default function GRNPage() {
   const { isMobile } = useResponsive();
   // Address, phone, tax registration and the Print & Branding switches,
   // read the one way every document reads them.
-  const printHeader = useCompanyPrintHeader();
+  const printHeader = useCompanyPrintHeader("grn");
   // Companies that price a line from a calculation get extra columns and a
   // computed rate. Everyone else gets exactly the grid that was here before.
   const { settings: rf, active: rfActive } = useRateFormula("grn");

@@ -24,7 +24,22 @@ type Item = {
   availableQty: number;
   code?: string;
   unit?: string;
+  stockIn?: number;
+  stockOut?: number;
+  stockBal?: number;
+  category?: string;
 };
+
+// Items a dispatch can be packed in. Stocked like anything else, so the same
+// picker and the same received / sold / balance figures apply.
+const PACKAGING_CATEGORY = "PACKAGING";
+
+// Module level so the picker's memo keeps a stable identity across renders.
+function itemStockValues(item: { id: string }) {
+  const row = item as Item;
+  if (row.stockBal === undefined) return null;
+  return { received: row.stockIn ?? 0, sold: row.stockOut ?? 0, balance: row.stockBal };
+}
 type Row = {
   itemId: string;
   name: string;
@@ -51,6 +66,11 @@ type DeliveryChallan = {
   dNo?: string;
   packagingType?: string;
   packagingQty?: number;
+  packagingItemId?: string | null;
+  salesInvoiceId?: string | null;
+  approvalStatus?: string;
+  salesInvoice?: { id: string; invoiceNo: string } | null;
+  packagingItem?: { id: string; name: string; code?: string | null; unit?: string | null } | null;
   items: Array<{ item: { name: string; description?: string; code?: string; unit?: string }; qty: number; rate?: number }>;
   status: string;
 };
@@ -70,8 +90,8 @@ export default function DeliveryChallanPage() {
   const { isMobile } = useResponsive();
   // Address, phone, tax registration and the Print & Branding switches,
   // read the one way every document reads them.
-  const printHeader = useCompanyPrintHeader();
-  const _router = useRouter();
+  const printHeader = useCompanyPrintHeader("delivery_challan");
+  const router = useRouter();
   const today = new Date().toISOString().slice(0, 10);
   const user = getCurrentUser();
 
@@ -96,9 +116,17 @@ export default function DeliveryChallanPage() {
   const [orderNo, setOrderNo] = useState("");
   const [poNo, setPoNo] = useState("");
   const [dNo, setDNo] = useState("");
+  // packagingType is the old free-text label (BAGS / CARTON / PACKET). Kept
+  // read-only for challans written before packing material was stocked; new
+  // ones name a real item instead, so the dispatch can take it out of stock.
   const [packagingType, setPackagingType] = useState("");
+  const [packagingItemId, setPackagingItemId] = useState("");
   const [packagingQty, setPackagingQty] = useState<number | "">("");
-const [searchTerm, _setSearchTerm] = useState("");
+
+  // Challans ticked in the list, to be billed together. A month of deliveries
+  // usually settles on one invoice, so this is the normal case, not an extra.
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const [searchTerm, setSearchTerm] = useState("");
 
 
   const [rows, setRows] = useState<Row[]>([{
@@ -118,6 +146,28 @@ const [searchTerm, _setSearchTerm] = useState("");
   });
   const isThermalPrint = printPrefs.paperSize !== "A4";
   const thermalWidth = printPrefs.paperSize === "THERMAL_58MM" ? "58mm" : "80mm";
+
+  // Packing material is picked from the catalogue rather than a hardcoded
+  // word, so the dispatch can take it out of stock like anything else.
+  const packagingItems = items.filter(i => i.category === PACKAGING_CATEGORY);
+
+  // The invoice this challan is delivering against, printed so the customer's
+  // gate can tie the two documents together.
+  const invoiceRef = savedChallan?.salesInvoice?.invoiceNo || "";
+
+  // What the printed challan says it was packed in: the item's own name, or —
+  // on a challan written before packing was stocked — the old free-text label.
+  const packagingLabel = (() => {
+    const pickedId = savedChallan?.packagingItemId || packagingItemId;
+    const name =
+      savedChallan?.packagingItem?.name ||
+      items.find(i => i.id === pickedId)?.name ||
+      savedChallan?.packagingType ||
+      packagingType;
+    if (!name) return "";
+    const qty = savedChallan?.packagingQty ?? (packagingQty === "" ? 0 : packagingQty);
+    return `${name} — Qty ${qty || 0}`;
+  })();
 
   useEffect(() => {
     if (!user) {
@@ -144,9 +194,33 @@ const [searchTerm, _setSearchTerm] = useState("");
         setCustomers(list.filter((a: any) => a.partyType === "CUSTOMER"));
       });
 
-    fetch("/api/stock-available-for-sale")
+    // The same catalogue Sales Invoice reads. The old
+    // /api/stock-available-for-sale dropped every item whose balance was not
+    // above zero, so an item at or below zero could not be dispatched at all.
+    fetch("/api/items-new?withStock=1", {
+      headers: {
+        "x-user-role": user.role || "",
+        "x-user-id": user.id || "",
+        ...(user.companyId ? { "x-company-id": user.companyId } : {}),
+      },
+    })
       .then(r => r.json())
-      .then(d => setItems(Array.isArray(d) ? d : []));
+      .then(d => {
+        const list = Array.isArray(d) ? d : [];
+        setItems(list.map((i: any) => ({
+          id: i.id,
+          name: i.name,
+          description: i.description || "",
+          code: i.code || "",
+          unit: i.unit || "",
+          category: i.category || "",
+          stockIn: Number(i.stockIn ?? 0),
+          stockOut: Number(i.stockOut ?? 0),
+          stockBal: Number(i.stockBal ?? 0),
+          availableQty: Number(i.stockBal ?? 0),
+        })));
+      })
+      .catch(() => setItems([]));
 
     fetch("/api/delivery-challan", {
         headers: {
@@ -218,25 +292,85 @@ const [searchTerm, _setSearchTerm] = useState("");
       }
       if (e.code === "F8" || e.key === "F8") {
         e.preventDefault();
+        const query = prompt("Search (Challan No, Customer Name, Date):");
+        if (!query) return;
+
         if (showForm && !preview) {
-          const query = prompt("Enter search query (Challan No, Customer Name, etc.):");
-          if (query) {
-            const foundCustomer = customers.find(c => 
-              c.name.toLowerCase().includes(query.toLowerCase())
-            );
-            if (foundCustomer) {
-              setCustomerId(foundCustomer.id);
-              setCustomerName(foundCustomer.name);
-            } else {
-              toast.error(`No customer found matching "${query}"`);
-            }
+          const foundCustomer = customers.find(c =>
+            c.name.toLowerCase().includes(query.toLowerCase())
+          );
+          if (foundCustomer) {
+            setCustomerId(foundCustomer.id);
+            setCustomerName(foundCustomer.name);
+            return;
           }
         }
+
+        setSearchTerm(query);
+        setShowList(true);
+        setShowForm(false);
       }
     }
     document.addEventListener("keydown", handleKeyPress, true);
     return () => document.removeEventListener("keydown", handleKeyPress, true);
   }, [today, showForm, preview, customers]);
+
+  // Only unbilled challans can be ticked, and they all have to be the same
+  // customer's — one invoice cannot bill two customers.
+  const billableCustomerId = (() => {
+    if (!selectedIds.length) return null;
+    const first = challans.find(c => c.id === selectedIds[0]);
+    return first?.customerId || null;
+  })();
+
+  function toggleSelected(c: DeliveryChallan) {
+    setSelectedIds(prev => {
+      if (prev.includes(c.id)) return prev.filter(id => id !== c.id);
+      const firstId = prev[0];
+      const first = firstId ? challans.find(x => x.id === firstId) : null;
+      if (first && first.customerId !== c.customerId) {
+        toast.error("One invoice, one customer — untick the others first.");
+        return prev;
+      }
+      return [...prev, c.id];
+    });
+  }
+
+  /** A month of deliveries settling on one bill. */
+  function invoiceSelected() {
+    if (!selectedIds.length) return;
+    router.push(`/dashboard/sales-invoice?fromChallans=${selectedIds.join(",")}`);
+  }
+
+  /** Bill this one challan by itself — the same road as a ticked batch. */
+  function invoiceOne(c: DeliveryChallan) {
+    router.push(`/dashboard/sales-invoice?fromChallans=${c.id}`);
+  }
+
+  /**
+   * Approve or reject the challan. The goods and the paperwork are separate
+   * questions: this settles whether the document stands, and moves no stock
+   * and no ledger of its own.
+   */
+  async function decide(c: DeliveryChallan, status: "APPROVED" | "REJECTED") {
+    try {
+      const res = await fetch("/api/approvals", {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          "x-user-role": user?.role || "",
+          "x-user-id": user?.id || "",
+        },
+        body: JSON.stringify({ type: "DELIVERY_CHALLAN", id: c.id, status }),
+      });
+      if (res.status === 403) throw new Error("Only an admin can approve or reject.");
+      if (!res.ok) throw new Error("Could not update approval.");
+      toast.success(`${c.challanNo} ${status.toLowerCase()}`);
+      await loadChallans();
+    } catch (e: any) {
+      toast.error(e.message || "Could not update approval.");
+    }
+  }
 
   async function loadChallans() {
     try {
@@ -308,6 +442,7 @@ const [searchTerm, _setSearchTerm] = useState("");
         poNo: poNo || null,
         dNo: dNo || null,
         packagingType: packagingType || null,
+        packagingItemId: packagingItemId || null,
         packagingQty: packagingQty === "" ? null : Number(packagingQty),
         items: clean.map(r => ({ itemId: r.itemId, qty: Number(r.qty), rate: Number(r.rate) || 0 })),
       };
@@ -336,13 +471,14 @@ const [searchTerm, _setSearchTerm] = useState("");
         setCustomerName(customers.find(c => c.id === customerId)?.name || customerName);
       }
       
+      // Straight to the print preview, whether this was a new challan or an
+      // update. An update used to hide the form and open the list instead, so
+      // the one thing the button promises — a challan to print — never
+      // appeared. The editing record is deliberately left set: the preview's
+      // Edit button then comes back to this same challan rather than starting
+      // a copy of it.
       setPreview(true);
       await loadChallans();
-      if (editing) {
-        setEditing(null);
-        setShowForm(false);
-        setShowList(true);
-      }
       toast.success("Delivery Challan saved successfully!");
     } catch (e: any) {
       toast.error("Saving failed: " + (e.message || "Unknown error"));
@@ -365,6 +501,7 @@ const [searchTerm, _setSearchTerm] = useState("");
     setPoNo(c.poNo || "");
     setDNo(c.dNo || "");
     setPackagingType(c.packagingType || "");
+    setPackagingItemId(c.packagingItemId || "");
     setPackagingQty(c.packagingQty ?? "");
     setRows(c.items.map((it: any) => ({
       itemId: it.itemId || "",
@@ -410,7 +547,7 @@ const [searchTerm, _setSearchTerm] = useState("");
     setDriverName("");
     setVehicleNo("");
     setRemarks("");
-    setSerialNo(""); setOrderNo(""); setPoNo(""); setDNo(""); setPackagingType(""); setPackagingQty("");
+    setSerialNo(""); setOrderNo(""); setPoNo(""); setDNo(""); setPackagingType(""); setPackagingItemId(""); setPackagingQty("");
     setRows([{ itemId: "", name: "", description: "", availableQty: 0, qty: "", rate: "" }]);
     setPreview(false);
   }
@@ -499,27 +636,77 @@ const [searchTerm, _setSearchTerm] = useState("");
       </div>
 
       {/* LIST VIEW */}
+      {showList && selectedIds.length > 0 && (
+        <div className="flex items-center justify-between gap-3 bg-blue-50 border border-blue-300 rounded p-3 mb-2 text-sm">
+          <span className="text-blue-900">
+            <b>{selectedIds.length}</b> challan{selectedIds.length > 1 ? "s" : ""} ticked
+            {" — "}
+            {challans.find(c => c.id === selectedIds[0])?.customer?.name}
+          </span>
+          <span className="flex gap-2">
+            <button onClick={() => setSelectedIds([])} className="px-3 py-1 border rounded text-gray-600">
+              Clear
+            </button>
+            <button onClick={invoiceSelected} className="bg-blue-600 text-white px-4 py-1 rounded">
+              🧾 Make Invoice
+            </button>
+          </span>
+        </div>
+      )}
+
+      {showList && (
+        <div className="flex items-center gap-2">
+          <input
+            value={searchTerm}
+            onChange={e => setSearchTerm(e.target.value)}
+            placeholder="Search challan no, customer or date…  (F8)"
+            className="border p-2 rounded w-full max-w-md text-sm"
+          />
+          {searchTerm && (
+            <button onClick={() => setSearchTerm("")} className="text-sm text-gray-600 px-3 py-2 border rounded">
+              Clear
+            </button>
+          )}
+          <span className="text-xs text-gray-500">{filteredChallans.length} of {challans.length}</span>
+        </div>
+      )}
+
       {showList && (
         <div className="bg-white border rounded overflow-hidden overflow-x-auto">
           <table className="w-full text-sm min-w-[600px]">
             <thead className="bg-gray-100">
               <tr>
+                <th className="p-3 w-10"></th>
                 <th className="p-3 text-left">Challan No</th>
                 <th className="p-3 text-left">Date</th>
                 <th className="p-3 text-left">Customer</th>
                 <th className="p-3 text-left">Vehicle/Driver</th>
                 <th className="p-3 text-left">Status</th>
+                <th className="p-3 text-left">Approval</th>
                 <th className="p-3 text-center">Actions</th>
               </tr>
             </thead>
             <tbody>
               {filteredChallans.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="p-4 text-center text-gray-400">No challans found</td>
+                  <td colSpan={9} className="p-4 text-center text-gray-400">No challans found</td>
                 </tr>
               ) : (
                 filteredChallans.map(c => (
                   <tr key={c.id} className="border-t hover:bg-gray-50">
+                    <td className="p-3 text-center">
+                      {c.status === "INVOICED" ? (
+                        <span className="text-xs text-gray-400" title="Already billed">✓</span>
+                      ) : (
+                        <input
+                          type="checkbox"
+                          checked={selectedIds.includes(c.id)}
+                          onChange={() => toggleSelected(c)}
+                          disabled={!!billableCustomerId && billableCustomerId !== c.customerId}
+                          title="Tick to bill this challan"
+                        />
+                      )}
+                    </td>
                     <td className="p-3 font-bold">{c.challanNo}</td>
                     <td className="p-3">{fmtDate(c.date)}</td>
                     <td className="p-3">{c.customer?.name || "N/A"}</td>
@@ -528,11 +715,42 @@ const [searchTerm, _setSearchTerm] = useState("");
                         {c.driverName && <span className="block text-xs">👤 {c.driverName}</span>}
                     </td>
                     <td className="p-3">
-                      <span className={`px-2 py-1 rounded text-xs ${c.status === 'DELIVERED' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}`}>
+                      <span className={`px-2 py-1 rounded text-xs ${c.status === 'INVOICED' ? 'bg-blue-100 text-blue-800' : c.status === 'DELIVERED' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}`}>
                         {c.status}
                       </span>
+                      {c.salesInvoice && (
+                        <span className="block text-[11px] text-gray-500 mt-1">{c.salesInvoice.invoiceNo}</span>
+                      )}
                     </td>
-                    <td className="p-3 text-center space-x-2">
+                    <td className="p-3">
+                      {(() => {
+                        const a = c.approvalStatus || "DRAFT";
+                        const tone = a === "APPROVED" ? "bg-green-100 text-green-800"
+                          : a === "REJECTED" ? "bg-red-100 text-red-800"
+                          : "bg-yellow-100 text-yellow-800";
+                        return <span className={`px-2 py-1 rounded text-xs ${tone}`}>{a}</span>;
+                      })()}
+                    </td>
+                    <td className="p-3 text-center space-x-2 whitespace-nowrap">
+                      {c.status !== "INVOICED" && (
+                        <button
+                          onClick={() => invoiceOne(c)}
+                          className="text-green-700 hover:text-green-900 font-medium text-sm"
+                          title="Bill this challan — the ledger is posted when the invoice is saved"
+                        >
+                          Sales Invoice
+                        </button>
+                      )}
+                      {(c.approvalStatus || "DRAFT") !== "APPROVED" && (
+                        <button onClick={() => decide(c, "APPROVED")} className="text-emerald-700 hover:text-emerald-900 font-medium text-sm">
+                          Approve
+                        </button>
+                      )}
+                      {(c.approvalStatus || "DRAFT") !== "REJECTED" && (
+                        <button onClick={() => decide(c, "REJECTED")} className="text-orange-600 hover:text-orange-800 font-medium text-sm">
+                          Reject
+                        </button>
+                      )}
                       <button
                         onClick={() => startEdit(c)}
                         className="text-blue-600 hover:text-blue-800 font-medium text-sm"
@@ -584,7 +802,7 @@ const [searchTerm, _setSearchTerm] = useState("");
           {!preview && (
             <div className="bg-white border p-6 rounded space-y-4">
               <div className="mb-2 text-xs text-gray-500 italic">
-                Keyboard Shortcuts: <strong>F7</strong> = Clear Form | <strong>F8</strong> = Search Customer
+                Keyboard Shortcuts: <strong>F7</strong> = Clear Form | <strong>F8</strong> = Search
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 <input value={challanNo} readOnly className="border p-2 bg-gray-100" placeholder="Challan No (Auto)" />
@@ -644,12 +862,26 @@ const [searchTerm, _setSearchTerm] = useState("");
                  </div>
                  <div>
                     <label className="text-xs font-bold">Packaging Source</label>
-                    <select className="border p-2 w-full" value={packagingType} onChange={e => setPackagingType(e.target.value)}>
-                      <option value="">— None —</option>
-                      <option value="BAGS">Bags</option>
-                      <option value="CARTON">Carton</option>
-                      <option value="PACKET">Packet</option>
-                    </select>
+                    {packagingItems.length === 0 ? (
+                      <div className="border p-2 w-full text-xs text-gray-500">
+                        No packing material in the catalogue yet — add an item under
+                        the <b>Packing Material</b> category in Items.
+                      </div>
+                    ) : (
+                      <ItemPicker
+                        items={packagingItems as any}
+                        value={packagingItemId}
+                        onChange={(picked: string) => setPackagingItemId(picked)}
+                        stockValues={itemStockValues}
+                        allowManual={false}
+                        placeholder="Bags / Carton / Packet…"
+                      />
+                    )}
+                    {packagingType && !packagingItemId && (
+                      <div className="text-[11px] text-gray-500 mt-1">
+                        Was recorded as “{packagingType}” before packing material was stocked.
+                      </div>
+                    )}
                  </div>
                  <div>
                     <label className="text-xs font-bold">Packaging Qty</label>
@@ -677,6 +909,7 @@ const [searchTerm, _setSearchTerm] = useState("");
                             items={items as any}
                             value={r.itemId}
                             onChange={(__picked: string) => selectItem(i, __picked)}
+                            stockValues={itemStockValues}
                             allowManual={false}
                             // placeholder="Type to search — e.g. e1060"
                           />
@@ -739,16 +972,11 @@ const [searchTerm, _setSearchTerm] = useState("");
                 totalsLines={[
                   { label: "Total Items:", value: rows.filter(r => r.itemId && r.qty).length, bold: true },
                 ]}
-                summaryFields={
-                  (savedChallan?.packagingType || packagingType)
-                    ? [{
-                        label: "Packaging Source",
-                        value: `${(savedChallan?.packagingType || packagingType).charAt(0)}${(savedChallan?.packagingType || packagingType).slice(1).toLowerCase()} — Qty ${savedChallan?.packagingQty ?? packagingQty ?? 0}`,
-                      }]
-                    : []
-                }
+                summaryFields={[
+                  ...(invoiceRef ? [{ label: "Against Invoice", value: invoiceRef }] : []),
+                  ...(packagingLabel ? [{ label: "Packaging Source", value: packagingLabel }] : []),
+                ]}
                 notes={remarks || undefined}
-                footerNote={printPrefs.footerNote || undefined}
                 signatureLabels={["Received By", "Delivered By"]}
               />
             </PrintPaperWrapper>

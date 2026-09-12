@@ -1,6 +1,8 @@
 "use client";
 import React from "react";
 import { printTheme, type PrintTemplateId, type PrintTheme } from "./printTemplates";
+import { printDesign, type PrintDesign, type PrintDesignId } from "./printLayouts";
+import type { PrintFieldKey } from "@/lib/printProfile";
 
 /**
  * The printed document, as this trade has always printed one.
@@ -98,6 +100,26 @@ export interface PrintDocA4Props {
 
   /** The company's chosen look. See ./printTemplates.ts. */
   template?: PrintTemplateId | string;
+
+  /**
+   * The design this document is set to print in — structure and ink together.
+   * See ./printLayouts.ts. When given it replaces `template` entirely; without
+   * it the older four-template behaviour is kept exactly as it was, so a page
+   * that has not been moved over yet prints the same sheet it always did.
+   */
+  design?: PrintDesignId | string;
+
+  /**
+   * What this document is allowed to print, from Print Preferences.
+   *
+   * Gating lives here rather than at each call site because the call sites got
+   * it wrong: every page passed `undefined` for a hidden field by hand, so a
+   * page that forgot one printed it anyway — which is how a company that had
+   * switched its tax numbers off still printed the buyer's NTN. A key left out
+   * of this object means "show it", so a document that passes nothing behaves
+   * the way it did before.
+   */
+  fields?: Partial<Record<PrintFieldKey, boolean>>;
 }
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
@@ -152,17 +174,84 @@ export function PrintDocA4({
   footerNote,
   signatureLabels,
   template,
+  design,
+  fields,
 }: PrintDocA4Props) {
-  const theme = printTheme(template);
+  // A design carries its own palette, so it decides the ink too. Without one we
+  // are on the old path: the template names the ink and the structure is the
+  // single classic layout, which is what every unmigrated page still expects.
+  const layout: PrintDesign | null = design ? printDesign(design) : null;
+  const theme = printTheme(layout ? layout.ink : template);
   const RULE = `1px solid ${theme.rule}`;
-  const banded = theme.band === "solid";
+
+  const headerStyle = layout?.header ?? (theme.band === "solid" ? "band" : "split");
+  const partyStyle = layout?.party ?? "inline";
+  const gridStyle = layout?.grid ?? (theme.zebra ? "zebra" : "ruled");
+  const totalsStyle = layout?.totals ?? (theme.netFill ? "bar" : "right");
+  const signatureStyle = layout?.signatures ?? "three";
+  const banded = headerStyle === "band";
+  const cellPad = layout?.density === "tight" ? "1.5px 4px" : theme.cellPad;
+
+  /** Missing means show it — see the `fields` prop. */
+  const on = (key: PrintFieldKey) => fields?.[key] !== false;
+
+  // Last line of defence against a value that reached here still encrypted.
+  //
+  // Phone, NTN, STRN and IBAN are stored ciphered and decrypted by whichever
+  // API hands the party over — and one of those paths missing the call is not
+  // hypothetical: the sales invoice list shipped without it, so saved invoices
+  // printed "enc:v1:…" where the buyer's tax numbers belong. On a document that
+  // goes to the customer, printing nothing is strictly better than printing
+  // ciphertext, and it makes the missing decrypt obvious on screen instead of
+  // looking like a corrupt record. Prefix per lib/fieldEncrypt.ts, which cannot
+  // be imported here — it pulls in node:crypto.
+  const plain = (v?: string) => (v && !String(v).startsWith("enc:v1:") ? v : "");
+
+  const pAddress = on("partyAddress") ? plain(partyAddress) : "";
+  const pPhone = on("partyPhone") ? plain(partyPhone) : "";
+  const pNtn = on("partyTaxNumber") ? plain(partyNtn) : "";
+  const pStrn = on("partyTaxNumber") ? plain(partyStrn) : "";
 
   const partyLine = [
-    partyAddress,
-    partyPhone ? `Tel: ${partyPhone}` : "",
-    partyNtn ? `NTN: ${partyNtn}` : "",
-    partyStrn ? `STRN: ${partyStrn}` : "",
+    pAddress,
+    pPhone ? `Tel: ${pPhone}` : "",
+    pNtn ? `NTN: ${pNtn}` : "",
+    pStrn ? `STRN: ${pStrn}` : "",
   ].filter(Boolean).join("   ");
+
+  const cAddress = on("companyAddress") ? companyAddress : undefined;
+  const cPhone = on("companyPhone") ? companyPhone : undefined;
+  const cEmail = on("companyEmail") ? companyEmail : undefined;
+  const cTax = on("companyTaxNumber") ? companyTaxValue : undefined;
+  const cStrn = on("companyTaxNumber") ? companyStrn : undefined;
+  const wantLogo = showLogo && on("logo") && Boolean(logoUrl);
+
+  /** The letterhead's text block — same content wherever the design puts it. */
+  const companyBlock = (opts: { align?: "left" | "center"; reversed?: boolean }) => {
+    const reversed = Boolean(opts.reversed);
+    return (
+      <div style={{ textAlign: opts.align || "left" }}>
+        <div style={{ fontSize: 17, fontWeight: 800, letterSpacing: 0.4, lineHeight: 1.1 }}>{companyName}</div>
+        {(cAddress || cPhone || cEmail) && (
+          <div className={reversed ? undefined : "pdoc-label"} style={{ fontSize: 8.5, marginTop: 2, lineHeight: 1.45, opacity: reversed ? 0.85 : 1 }}>
+            {cAddress}
+            {cPhone ? `${cAddress ? "  ·  " : ""}Tel: ${cPhone}` : ""}
+            {cEmail ? `  ·  ${cEmail}` : ""}
+          </div>
+        )}
+        {(cTax || cStrn) && (
+          <div className={reversed ? undefined : "pdoc-label"} style={{ fontSize: 8.5, marginTop: 1, lineHeight: 1.45, opacity: reversed ? 0.85 : 1, fontWeight: 700 }}>
+            {cTax ? `${companyTaxLabel || "NTN"}: ${cTax}` : ""}
+            {cStrn ? `${cTax ? "   " : ""}STRN: ${cStrn}` : ""}
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  const logoImg = wantLogo
+    ? <img src={logoUrl} alt="" style={{ maxHeight: 38, maxWidth: 120, objectFit: "contain", display: "block" }} />
+    : null;
 
   // Consecutive columns sharing a group become one spanning header cell
   // ("Primary" over Unit/Qty/Rate); a column with no group gets its own
@@ -203,49 +292,78 @@ export function PrintDocA4({
       }}
     >
 
-      {/* ── Letterhead: who is billing, and what this is ─────────── */}
-      <div
-        className={banded ? "pdoc-band" : undefined}
-        style={{
-          display: "flex", justifyContent: "space-between",
-          alignItems: banded ? "center" : "flex-start",
-          marginBottom: banded ? 0 : 10,
-          ...(banded
-            ? { background: theme.bandBg, color: theme.bandInk, padding: "7mm 10mm" }
-            : {}),
-        }}
-      >
-        <div style={{ minWidth: 0, display: "flex", alignItems: "center", gap: 10 }}>
-          {showLogo && logoUrl
-            ? <img src={logoUrl} alt="" style={{ maxHeight: 38, maxWidth: 120, objectFit: "contain", display: "block" }} />
-            : null}
-          <div>
-            <div style={{ fontSize: 17, fontWeight: 800, letterSpacing: 0.4, lineHeight: 1.1 }}>{companyName}</div>
-            {(companyAddress || companyPhone || companyEmail) && (
-              <div className={banded ? undefined : "pdoc-label"} style={{ fontSize: 8.5, marginTop: 2, lineHeight: 1.45, opacity: banded ? 0.85 : 1 }}>
-                {companyAddress}
-                {companyPhone ? `${companyAddress ? "  ·  " : ""}Tel: ${companyPhone}` : ""}
-                {companyEmail ? `  ·  ${companyEmail}` : ""}
-              </div>
-            )}
-            {(companyTaxValue || companyStrn) && (
-              <div className={banded ? undefined : "pdoc-label"} style={{ fontSize: 8.5, marginTop: 1, lineHeight: 1.45, opacity: banded ? 0.85 : 1, fontWeight: 700 }}>
-                {companyTaxValue ? `${companyTaxLabel || "NTN"}: ${companyTaxValue}` : ""}
-                {companyStrn ? `${companyTaxValue ? "   " : ""}STRN: ${companyStrn}` : ""}
-              </div>
-            )}
+      {/* ── Letterhead: who is billing, and what this is ───────────
+          Four arrangements of the same three things — mark, name, document
+          title. This is the half of a printed document a reader recognises
+          before they read a word of it, which is why the designs differ here
+          most and inside the grid least. */}
+
+      {headerStyle === "split" && (
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 10 }}>
+          <div style={{ minWidth: 0, display: "flex", alignItems: "center", gap: 10 }}>
+            {logoImg}
+            {companyBlock({})}
+          </div>
+          <div style={{ textAlign: "right" }}>
+            <div style={{ fontSize: 12, fontWeight: 800, letterSpacing: 1.6, textTransform: "uppercase" }}>{docTitle}</div>
+            <div className="pdoc-label" style={{ fontSize: 8.5, marginTop: 3 }}>{date}</div>
           </div>
         </div>
-        <div style={{ textAlign: "right" }}>
-          <div style={{ fontSize: banded ? 14 : 12, fontWeight: 800, letterSpacing: 1.6, textTransform: "uppercase" }}>{docTitle}</div>
-          <div className={banded ? undefined : "pdoc-label"} style={{ fontSize: 8.5, marginTop: 3, opacity: banded ? 0.85 : 1 }}>{date}</div>
+      )}
+
+      {headerStyle === "band" && (
+        <div
+          className="pdoc-band"
+          style={{
+            display: "flex", justifyContent: "space-between", alignItems: "center",
+            background: theme.bandBg, color: theme.bandInk, padding: "7mm 10mm",
+          }}
+        >
+          <div style={{ minWidth: 0, display: "flex", alignItems: "center", gap: 10 }}>
+            {logoImg}
+            {companyBlock({ reversed: true })}
+          </div>
+          <div style={{ textAlign: "right" }}>
+            <div style={{ fontSize: 14, fontWeight: 800, letterSpacing: 1.6, textTransform: "uppercase" }}>{docTitle}</div>
+            <div style={{ fontSize: 8.5, marginTop: 3, opacity: 0.85 }}>{date}</div>
+          </div>
         </div>
-      </div>
+      )}
+
+      {headerStyle === "centered" && (
+        <div style={{ marginBottom: 10 }}>
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 6, paddingBottom: 8 }}>
+            {logoImg}
+            {companyBlock({ align: "center" })}
+          </div>
+          <div style={{ textAlign: "center" }}>
+            <span style={{ fontSize: 11, fontWeight: 800, letterSpacing: 2.2, textTransform: "uppercase", borderTop: RULE, borderBottom: RULE, padding: "3px 18px", display: "inline-block" }}>
+              {docTitle}
+            </span>
+          </div>
+        </div>
+      )}
+
+      {headerStyle === "stacked" && (
+        <div style={{ marginBottom: 10 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8 }}>
+            {logoImg}
+            {companyBlock({})}
+          </div>
+          <div style={{ borderTop: `2px solid ${theme.ink}`, paddingTop: 6, display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 16 }}>
+            <div style={{ fontSize: 22, fontWeight: 800, letterSpacing: 1.2, textTransform: "uppercase", lineHeight: 1 }}>{docTitle}</div>
+            <div className="pdoc-label" style={{ fontSize: 9 }}>{date}</div>
+          </div>
+        </div>
+      )}
 
       {/* Everything below the band keeps the page's own margins. */}
       <div style={{ padding: banded ? "8mm 10mm 0" : 0, display: "flex", flexDirection: "column", flex: 1 }}>
 
-        {theme.titleAlign === "center" && !banded && (
+        {/* The old templates could centre the title without changing anything
+            else. A design that wants that uses the "centered" letterhead, so
+            this only still fires on the legacy template path. */}
+        {!layout && theme.titleAlign === "center" && !banded && (
           <div style={{ textAlign: "center", marginBottom: 8 }}>
             <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: 2.2, textTransform: "uppercase", borderTop: RULE, borderBottom: RULE, padding: "3px 14px", display: "inline-block" }}>
               {docTitle}
@@ -253,37 +371,108 @@ export function PrintDocA4({
           </div>
         )}
 
-        {/* ── Header box: the document's own particulars ───────────── */}
-        <div style={{ border: RULE, borderRadius: theme.radius, padding: "7px 9px", marginBottom: 9 }}>
-          <div style={{ display: "flex", gap: 22, marginBottom: 6 }}>
-            <HeadField theme={theme} label={docTitle.toUpperCase().includes("INVOICE") ? "Bill #" : "No"} value={docNo} flex={1} />
-            <HeadField theme={theme} label="Date" value={date} flex={1} />
-            {dueDate ? <HeadField theme={theme} label="Due" value={dueDate} flex={1} /> : null}
-            {status ? <HeadField theme={theme} label="Type" value={status.toUpperCase()} flex={1} /> : null}
-          </div>
-          <div style={{ marginBottom: 6 }}>
-            <HeadField
-              theme={theme}
-              label={partyLabel}
-              value={
-                <span>
-                  {partyName}
-                  {partyLine ? <span className="pdoc-label" style={{ fontWeight: 400, fontSize: 9 }}>{"   "}{partyLine}</span> : null}
-                </span>
-              }
-              flex={1}
-            />
-          </div>
-          {metaFields.length > 0 && (
-            <div style={{ display: "flex", gap: 22, flexWrap: "wrap", marginBottom: 6 }}>
-              {metaFields.map((f, i) => <HeadField theme={theme} key={i} label={f.label} value={f.value} flex={1} />)}
+        {/* ── Who it is for, and the document's own particulars ──────
+            "inline" keeps both in one box, which is the ledger bill. "cards"
+            splits them into two boxes side by side — the shape a formal tax
+            invoice is read in. "letter" drops the box around the party and
+            opens the page with it, the way correspondence does. */}
+
+        {partyStyle === "inline" && (
+          <div style={{ border: RULE, borderRadius: theme.radius, padding: "7px 9px", marginBottom: 9 }}>
+            <div style={{ display: "flex", gap: 22, marginBottom: 6 }}>
+              <HeadField theme={theme} label={docTitle.toUpperCase().includes("INVOICE") ? "Bill #" : "No"} value={docNo} flex={1} />
+              <HeadField theme={theme} label="Date" value={date} flex={1} />
+              {dueDate ? <HeadField theme={theme} label="Due" value={dueDate} flex={1} /> : null}
+              {status ? <HeadField theme={theme} label="Type" value={status.toUpperCase()} flex={1} /> : null}
             </div>
-          )}
-          <HeadField theme={theme} label="Remarks" value={notes || ""} flex={1} />
-        </div>
+            <div style={{ marginBottom: 6 }}>
+              <HeadField
+                theme={theme}
+                label={partyLabel}
+                value={
+                  <span>
+                    {partyName}
+                    {partyLine ? <span className="pdoc-label" style={{ fontWeight: 400, fontSize: 9 }}>{"   "}{partyLine}</span> : null}
+                  </span>
+                }
+                flex={1}
+              />
+            </div>
+            {metaFields.length > 0 && (
+              <div style={{ display: "flex", gap: 22, flexWrap: "wrap", marginBottom: 6 }}>
+                {metaFields.map((f, i) => <HeadField theme={theme} key={i} label={f.label} value={f.value} flex={1} />)}
+              </div>
+            )}
+            <HeadField theme={theme} label="Remarks" value={notes || ""} flex={1} />
+          </div>
+        )}
+
+        {partyStyle === "cards" && (
+          <div style={{ display: "flex", gap: 9, marginBottom: 9, alignItems: "stretch" }}>
+            <div style={{ flex: 1, minWidth: 0, border: RULE, borderRadius: theme.radius, padding: "7px 9px" }}>
+              <div className="pdoc-label" style={{ fontSize: 8.5, letterSpacing: 0.6, textTransform: "uppercase", marginBottom: 3 }}>{partyLabel}</div>
+              <div style={{ fontSize: 11.5, fontWeight: 700, lineHeight: 1.25 }}>{partyName}</div>
+              {pAddress && <div className="pdoc-label" style={{ fontSize: 9, marginTop: 2, lineHeight: 1.45 }}>{pAddress}</div>}
+              {pPhone && <div className="pdoc-label" style={{ fontSize: 9, lineHeight: 1.45 }}>Tel: {pPhone}</div>}
+              {(pNtn || pStrn) && (
+                <div style={{ fontSize: 9, marginTop: 2, lineHeight: 1.45, fontWeight: 700 }}>
+                  {pNtn ? `NTN: ${pNtn}` : ""}{pStrn ? `${pNtn ? "   " : ""}STRN: ${pStrn}` : ""}
+                </div>
+              )}
+            </div>
+            <div style={{ flex: 1, minWidth: 0, border: RULE, borderRadius: theme.radius, padding: "7px 9px" }}>
+              <div style={{ display: "flex", gap: 18, marginBottom: 5 }}>
+                <HeadField theme={theme} label={docTitle.toUpperCase().includes("INVOICE") ? "Bill #" : "No"} value={docNo} flex={1} />
+                <HeadField theme={theme} label="Date" value={date} flex={1} />
+              </div>
+              {(dueDate || status) && (
+                <div style={{ display: "flex", gap: 18, marginBottom: 5 }}>
+                  {dueDate ? <HeadField theme={theme} label="Due" value={dueDate} flex={1} /> : null}
+                  {status ? <HeadField theme={theme} label="Type" value={status.toUpperCase()} flex={1} /> : null}
+                </div>
+              )}
+              {metaFields.length > 0 && (
+                <div style={{ display: "flex", gap: 18, flexWrap: "wrap", marginBottom: 5 }}>
+                  {metaFields.map((f, i) => <HeadField theme={theme} key={i} label={f.label} value={f.value} flex={1} />)}
+                </div>
+              )}
+              {notes ? <HeadField theme={theme} label="Remarks" value={notes} flex={1} /> : null}
+            </div>
+          </div>
+        )}
+
+        {partyStyle === "letter" && (
+          <div style={{ marginBottom: 10 }}>
+            <div style={{ display: "flex", justifyContent: "space-between", gap: 24, alignItems: "flex-start" }}>
+              <div style={{ minWidth: 0 }}>
+                <div className="pdoc-label" style={{ fontSize: 8.5, letterSpacing: 0.6, textTransform: "uppercase", marginBottom: 2 }}>{partyLabel}</div>
+                <div style={{ fontSize: 12, fontWeight: 700, lineHeight: 1.25 }}>{partyName}</div>
+                {pAddress && <div className="pdoc-label" style={{ fontSize: 9, marginTop: 1, lineHeight: 1.5 }}>{pAddress}</div>}
+                {pPhone && <div className="pdoc-label" style={{ fontSize: 9, lineHeight: 1.5 }}>Tel: {pPhone}</div>}
+                {(pNtn || pStrn) && (
+                  <div className="pdoc-label" style={{ fontSize: 9, lineHeight: 1.5 }}>
+                    {pNtn ? `NTN: ${pNtn}` : ""}{pStrn ? `${pNtn ? "   " : ""}STRN: ${pStrn}` : ""}
+                  </div>
+                )}
+              </div>
+              <div style={{ textAlign: "right", fontSize: 9, lineHeight: 1.7, whiteSpace: "nowrap" }}>
+                <div><span className="pdoc-label">No </span><b>{docNo}</b></div>
+                <div><span className="pdoc-label">Date </span><b>{date}</b></div>
+                {dueDate ? <div><span className="pdoc-label">Due </span><b>{dueDate}</b></div> : null}
+                {status ? <div><span className="pdoc-label">Type </span><b>{status.toUpperCase()}</b></div> : null}
+                {metaFields.map((f, i) => <div key={i}><span className="pdoc-label">{f.label} </span><b>{f.value}</b></div>)}
+              </div>
+            </div>
+            {notes && (
+              <div style={{ fontSize: 9, marginTop: 7, lineHeight: 1.5 }}>
+                <span className="pdoc-label" style={{ fontWeight: 700 }}>Remarks: </span>{notes}
+              </div>
+            )}
+          </div>
+        )}
 
         {/* ── The order itself ─────────────────────────────────────── */}
-        <table className="pdoc-grid" style={{ width: "100%", borderCollapse: "collapse", fontSize: 9.5, marginBottom: 10 }}>
+        <table className={`pdoc-grid pdoc-g-${gridStyle}`} style={{ width: "100%", borderCollapse: "collapse", fontSize: 9.5, marginBottom: 10 }}>
           <thead>
             {hasColumnGroups && (
               <tr>
@@ -293,7 +482,7 @@ export function PrintDocA4({
                       key={i}
                       colSpan={seg.cols.length}
                       style={{
-                        border: RULE, padding: theme.cellPad, textAlign: "center",
+                        border: RULE, padding: cellPad, textAlign: "center",
                         fontSize: 8.5, fontWeight: 700, letterSpacing: 0.3,
                         whiteSpace: "nowrap", background: theme.headBg, color: theme.headInk,
                       }}
@@ -305,7 +494,7 @@ export function PrintDocA4({
                       key={seg.cols[0].key}
                       rowSpan={2}
                       style={{
-                        border: RULE, padding: theme.cellPad, width: seg.cols[0].width,
+                        border: RULE, padding: cellPad, width: seg.cols[0].width,
                         textAlign: (seg.cols[0].align || "left") as any,
                         fontSize: 8.5, fontWeight: 700, letterSpacing: 0.3,
                         whiteSpace: "nowrap", background: theme.headBg, color: theme.headInk,
@@ -322,7 +511,7 @@ export function PrintDocA4({
                 <th
                   key={c.key}
                   style={{
-                    border: RULE, padding: theme.cellPad, width: c.width,
+                    border: RULE, padding: cellPad, width: c.width,
                     textAlign: (c.align || "left") as any,
                     fontSize: 8.5, fontWeight: 700, letterSpacing: 0.3,
                     whiteSpace: "nowrap", background: theme.headBg, color: theme.headInk,
@@ -335,12 +524,12 @@ export function PrintDocA4({
           </thead>
           <tbody>
             {rows.map((row, i) => (
-              <tr key={i} className={theme.zebra && i % 2 === 1 ? "pdoc-zebra" : undefined}>
+              <tr key={i} className={gridStyle === "zebra" && i % 2 === 1 ? "pdoc-zebra" : undefined}>
                 {columns.map((c, ci) => (
                   <td
                     key={c.key}
                     style={{
-                      border: RULE, padding: theme.cellPad,
+                      border: RULE, padding: cellPad,
                       textAlign: (c.align || "left") as any,
                       verticalAlign: "top",
                       // Only the description may wrap. A figure that wraps turns
@@ -369,7 +558,7 @@ export function PrintDocA4({
           {/* What was counted, and what it comes to. Both boxed and level with
               each other, the way the old bill closed the page off. */}
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", gap: 24, marginBottom: 16 }}>
-            {summaryFields.length > 0 ? (
+            {summaryFields.length > 0 && on("summary") ? (
               <table className="pdoc-summary" style={{ borderCollapse: "collapse", border: RULE, borderRadius: theme.radius }}>
                 <tbody>
                   {summaryFields.map((f, i) => (
@@ -382,12 +571,24 @@ export function PrintDocA4({
               </table>
             ) : <div />}
 
-            <table className="pdoc-totals" style={{ borderCollapse: "collapse", minWidth: 210 }}>
+            {/* "boxed" rules the whole block off as one object; "right" and
+                "bar" leave it free-standing and differ only in how the net
+                figure is set, which the row below decides. */}
+            <table
+              className="pdoc-totals"
+              style={{
+                borderCollapse: "collapse",
+                minWidth: 210,
+                ...(totalsStyle === "boxed"
+                  ? { border: RULE, borderRadius: theme.radius, padding: 0 }
+                  : {}),
+              }}
+            >
               <tbody>
                 {totalsLines.map((line, i) => {
                   // The net figure is the one thing the customer looks for, so
-                  // a template may set it in a filled bar instead of ruling it.
-                  const filled = Boolean(line.bold && theme.netFill);
+                  // a design may set it in a filled bar instead of ruling it.
+                  const filled = Boolean(line.bold && totalsStyle === "bar" && theme.netFill);
                   const cell: React.CSSProperties = {
                     fontSize: line.bold ? 11 : 9.5,
                     fontWeight: line.bold ? 700 : 400,
@@ -416,30 +617,39 @@ export function PrintDocA4({
             </table>
           </div>
 
-          {amountInWords && (
+          {amountInWords && on("amountInWords") && (
             <div style={{ fontSize: 8.5, lineHeight: 1.5, marginBottom: 12 }}>
               <span className="pdoc-label" style={{ fontWeight: 700 }}>Amount: </span>{amountInWords}
             </div>
           )}
 
-          {terms && (
+          {terms && on("terms") && (
             <div style={{ fontSize: 8.5, lineHeight: 1.5, whiteSpace: "pre-wrap", marginBottom: 12 }}>
               <span className="pdoc-label" style={{ fontWeight: 700 }}>Terms: </span>{terms}
             </div>
           )}
 
-          {signatureLabels && signatureLabels.length > 0 && (
-            <div style={{ display: "flex", justifyContent: "space-between", gap: 30 }}>
-              {signatureLabels.map((lbl) => (
-                <div key={lbl} style={{ flex: 1, textAlign: "center" }}>
-                  <div className="pdoc-sig-line" style={{ borderTop: `1px solid ${theme.ink}`, margin: "0 auto 4px", maxWidth: 150 }} />
-                  <div className="pdoc-label" style={{ fontSize: 8.5 }}>{lbl}</div>
-                </div>
-              ))}
-            </div>
-          )}
+          {/* How many lines get signed, and where. Three across is the goods
+              document — issued, checked, received. A quotation nobody signs on
+              delivery only needs the one, and putting it right keeps the foot
+              of the sheet from looking like a form waiting to be filled in. */}
+          {signatureLabels && signatureLabels.length > 0 && on("signatures") && (() => {
+            const count = signatureStyle === "three" ? 3 : signatureStyle === "two_right" ? 2 : 1;
+            const shown = signatureLabels.slice(0, count);
+            const rightAligned = signatureStyle !== "three";
+            return (
+              <div style={{ display: "flex", justifyContent: rightAligned ? "flex-end" : "space-between", gap: 30 }}>
+                {shown.map((lbl) => (
+                  <div key={lbl} style={{ flex: rightAligned ? "0 0 170px" : 1, textAlign: "center" }}>
+                    <div className="pdoc-sig-line" style={{ borderTop: `1px solid ${theme.ink}`, margin: "0 auto 4px", maxWidth: 150 }} />
+                    <div className="pdoc-label" style={{ fontSize: 8.5 }}>{lbl}</div>
+                  </div>
+                ))}
+              </div>
+            );
+          })()}
 
-          {footerNote && (
+          {footerNote && on("footerNote") && (
             <div className="pdoc-label" style={{ textAlign: "center", fontSize: 8.5, marginTop: 14, fontStyle: "italic" }}>{footerNote}</div>
           )}
 
@@ -522,6 +732,65 @@ export function PrintPaperWrapper({ children }: { children: React.ReactNode }) {
         html.dark .dashboard-root .print-doc-a4 .pdoc-grid tr.pdoc-zebra td,
         html:not(.dark) .dashboard-root .print-doc-a4 .pdoc-grid tr.pdoc-zebra td,
         .print-doc-a4 .pdoc-grid tr.pdoc-zebra td { background-color: var(--pdoc-zebra, transparent) !important; }
+
+        /* ── How the order is ruled ────────────────────────────────
+           The block above boxes every cell, which is the ledger grid and the
+           default. A design that wants open rows has to out-specify it, hence
+           the same long selectors again: the dashboard's own table styling
+           sits between this sheet and the browser.
+
+           Only the rules change. Column order, widths and alignment stay put
+           across every design, so an operator who has learned where the rate
+           column sits never has to look for it again. */
+
+        /* rows — horizontal rules only, no verticals between columns. */
+        .print-doc-a4 .pdoc-g-rows th,
+        html.dark .dashboard-root .print-doc-a4 .pdoc-g-rows th,
+        html:not(.dark) .dashboard-root .print-doc-a4 .pdoc-g-rows th {
+          border: 0 !important;
+          border-bottom: 1px solid var(--pdoc-rule, #111) !important;
+        }
+        .print-doc-a4 .pdoc-g-rows td,
+        html.dark .dashboard-root .print-doc-a4 .pdoc-g-rows td,
+        html:not(.dark) .dashboard-root .print-doc-a4 .pdoc-g-rows td {
+          border: 0 !important;
+          border-bottom: 1px solid var(--pdoc-rule, #111) !important;
+        }
+
+        /* zebra — the fill separates the rows, so no rules inside the body. */
+        .print-doc-a4 .pdoc-g-zebra th,
+        html.dark .dashboard-root .print-doc-a4 .pdoc-g-zebra th,
+        html:not(.dark) .dashboard-root .print-doc-a4 .pdoc-g-zebra th {
+          border: 0 !important;
+          border-bottom: 1px solid var(--pdoc-rule, #111) !important;
+        }
+        .print-doc-a4 .pdoc-g-zebra td,
+        html.dark .dashboard-root .print-doc-a4 .pdoc-g-zebra td,
+        html:not(.dark) .dashboard-root .print-doc-a4 .pdoc-g-zebra td { border: 0 !important; }
+        .print-doc-a4 .pdoc-g-zebra tbody tr:last-child td,
+        html.dark .dashboard-root .print-doc-a4 .pdoc-g-zebra tbody tr:last-child td,
+        html:not(.dark) .dashboard-root .print-doc-a4 .pdoc-g-zebra tbody tr:last-child td {
+          border-bottom: 1px solid var(--pdoc-rule, #111) !important;
+        }
+
+        /* open — a rule under the headings, one under the last line, nothing
+           else. The whitespace does the work the rules used to. */
+        .print-doc-a4 .pdoc-g-open th,
+        html.dark .dashboard-root .print-doc-a4 .pdoc-g-open th,
+        html:not(.dark) .dashboard-root .print-doc-a4 .pdoc-g-open th {
+          border: 0 !important;
+          border-bottom: 1px solid var(--pdoc-rule, #111) !important;
+          background-color: transparent !important;
+          color: var(--pdoc-ink, #111) !important;
+        }
+        .print-doc-a4 .pdoc-g-open td,
+        html.dark .dashboard-root .print-doc-a4 .pdoc-g-open td,
+        html:not(.dark) .dashboard-root .print-doc-a4 .pdoc-g-open td { border: 0 !important; }
+        .print-doc-a4 .pdoc-g-open tbody tr:last-child td,
+        html.dark .dashboard-root .print-doc-a4 .pdoc-g-open tbody tr:last-child td,
+        html:not(.dark) .dashboard-root .print-doc-a4 .pdoc-g-open tbody tr:last-child td {
+          border-bottom: 1px solid var(--pdoc-rule, #111) !important;
+        }
 
         /* The totals stand free of the grid: one rule above the net figure,
            or the filled bar a template asks for. */

@@ -2,6 +2,8 @@
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 import { resolveCompanyId, resolveBranchId, resolveBranchIdOrDefault } from "@/lib/tenant";
+import { writeDispatchStock } from "@/lib/challanStock";
+import { withReadableParties } from "@/lib/partyDecrypt";
 
 // VALIDATION SCHEMA
 const challanSchema = z.object({
@@ -17,6 +19,8 @@ const challanSchema = z.object({
   dNo: z.string().optional().nullable(),
   packagingType: z.string().optional().nullable(),
   packagingQty: z.number().optional().nullable(),
+  packagingItemId: z.string().optional().nullable(),
+  salesInvoiceId: z.string().optional().nullable(),
   items: z.array(
     z.object({
       itemId: z.string(),
@@ -38,30 +42,52 @@ export async function GET(req: NextRequest) {
     const { searchParams } = new URL(req.url);
     const id = searchParams.get("id");
 
+    // A month's worth of challans billed on one invoice: the invoice screen
+    // asks for them all at once rather than one request per challan.
+    const ids = searchParams.get("ids");
+    if (ids) {
+      const idList = ids.split(",").map((v) => v.trim()).filter(Boolean);
+      if (!idList.length) return NextResponse.json([]);
+      const many = await prisma.deliveryChallan.findMany({
+        where: { id: { in: idList }, companyId, ...(branchId ? { branchId } : {}) },
+        include: {
+          customer: true,
+          packagingItem: true,
+          salesInvoice: { select: { id: true, invoiceNo: true } },
+          items: { include: { item: true } },
+        },
+        orderBy: { date: "asc" },
+      });
+      return NextResponse.json(withReadableParties(many));
+    }
     if (id) {
       const challan = await prisma.deliveryChallan.findFirst({
         where: { id, companyId, ...(branchId ? { branchId } : {}) },
         include: {
           customer: true,
+          packagingItem: true,
+          salesInvoice: { select: { id: true, invoiceNo: true } },
           items: {
             include: { item: true },
           },
         },
       });
       if (!challan) return NextResponse.json({ error: "Delivery Challan not found" }, { status: 404 });
-      return NextResponse.json(challan);
+      return NextResponse.json(withReadableParties(challan));
     }
 
     const challans = await prisma.deliveryChallan.findMany({
       where: { companyId, ...(branchId ? { branchId } : {}) },
       include: {
         customer: true,
+        packagingItem: true,
+        salesInvoice: { select: { id: true, invoiceNo: true } },
         items: true,
       },
       orderBy: { createdAt: "desc" },
     });
 
-    return NextResponse.json(challans);
+    return NextResponse.json(withReadableParties(challans));
   } catch (_error) {
     return NextResponse.json({ error: "Failed to fetch delivery challans" }, { status: 500 });
   }
@@ -98,6 +124,8 @@ export async function POST(req: NextRequest) {
         dNo: data.dNo || null,
         packagingType: data.packagingType || null,
         packagingQty: data.packagingQty ?? null,
+        packagingItemId: data.packagingItemId || null,
+        salesInvoiceId: data.salesInvoiceId || null,
         status: data.status || "PENDING",
         items: {
           create: data.items.map((item) => ({
@@ -109,6 +137,8 @@ export async function POST(req: NextRequest) {
       },
       include: {
         customer: true,
+        packagingItem: true,
+        salesInvoice: { select: { id: true, invoiceNo: true } },
         items: {
           include: { item: true },
         },
@@ -117,23 +147,10 @@ export async function POST(req: NextRequest) {
 
     // Deduct stock when challan is created as DELIVERED (immediate dispatch)
     if ((data.status || "PENDING") === "DELIVERED") {
-      for (const item of data.items) {
-        await prisma.inventoryTxn.create({
-          data: {
-            companyId,
-            type: "CHALLAN_OUT",
-            date: new Date(data.date),
-            itemId: item.itemId,
-            qty: -item.qty,
-            rate: item.rate || 0,
-            amount: item.qty * (item.rate || 0),
-            location: "MAIN",
-          },
-        });
-      }
+      await writeDispatchStock(prisma, companyId, data);
     }
 
-    return NextResponse.json(challan);
+    return NextResponse.json(withReadableParties(challan));
   } catch (error: any) {
     console.error("Create Delivery Challan Error:", error);
     return NextResponse.json({ error: error.message || "Failed to create delivery challan" }, { status: 400 });
@@ -183,6 +200,8 @@ export async function PUT(req: NextRequest) {
           dNo: data.dNo || null,
           packagingType: data.packagingType || null,
           packagingQty: data.packagingQty ?? null,
+          packagingItemId: data.packagingItemId || null,
+          salesInvoiceId: data.salesInvoiceId || null,
           status: data.status || "PENDING",
           items: {
             create: data.items.map((item) => ({
@@ -194,6 +213,8 @@ export async function PUT(req: NextRequest) {
         },
         include: {
           customer: true,
+          packagingItem: true,
+          salesInvoice: { select: { id: true, invoiceNo: true } },
           items: { include: { item: true } },
         },
       });
@@ -203,23 +224,10 @@ export async function PUT(req: NextRequest) {
     const wasNotDelivered = existingChallan?.status !== "DELIVERED";
     const nowDelivered = data.status === "DELIVERED";
     if (wasNotDelivered && nowDelivered) {
-      for (const item of data.items) {
-        await prisma.inventoryTxn.create({
-          data: {
-            companyId,
-            type: "CHALLAN_OUT",
-            date: new Date(data.date),
-            itemId: item.itemId,
-            qty: -item.qty,
-            rate: item.rate || 0,
-            amount: item.qty * (item.rate || 0),
-            location: "MAIN",
-          },
-        });
-      }
+      await writeDispatchStock(prisma, companyId, data);
     }
 
-    return NextResponse.json(updated);
+    return NextResponse.json(withReadableParties(updated));
   } catch (error: any) {
     console.error("Update Delivery Challan Error:", error);
     return NextResponse.json({ error: error.message || "Failed to update delivery challan" }, { status: 400 });

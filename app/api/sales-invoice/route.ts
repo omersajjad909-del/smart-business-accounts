@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { baseRate, toBase } from "@/lib/fx";
+import { writeDispatchStock } from "@/lib/challanStock";
+import { safeDecryptFields, ACCOUNT_PII_FIELDS } from "@/lib/fieldEncrypt";
 import { sanitizeLineMeta } from "@/lib/rateFormula";
 
 import { apiHasPermission } from "@/lib/apiPermission";
@@ -32,6 +34,20 @@ type SalesInvoiceFull = Prisma.SalesInvoiceGetPayload<{
 
 type TxClient = Prisma.TransactionClient;
 
+
+/**
+ * An invoice with its buyer's tax numbers readable.
+ *
+ * Account phone/NTN/STRN are stored encrypted (see app/api/accounts). The
+ * client extension in lib/prisma.ts decrypts only the top-level rows of the
+ * models it lists, so a customer arriving through include: { customer: true }
+ * comes back exactly as stored — which is how "enc:v1:…" ended up printed
+ * where the buyer's NTN and STRN belong on a sales invoice.
+ */
+function withReadableCustomer<T extends { customer?: unknown }>(inv: T): T {
+  if (!inv?.customer) return inv;
+  return { ...inv, customer: safeDecryptFields(inv.customer as Record<string, unknown>, ACCOUNT_PII_FIELDS) };
+}
 
 export async function GET(req: NextRequest) {
   try {
@@ -74,6 +90,7 @@ export async function GET(req: NextRequest) {
       // shipping charge, so it holds none, so it saves none.
       return NextResponse.json({
         ...inv,
+        ...withReadableCustomer(inv),
         customerName: inv.customer?.name || "Unknown",
       });
     }
@@ -107,8 +124,14 @@ export async function GET(req: NextRequest) {
 
     // Same reasoning as the single invoice above: the list is what the edit
     // form is opened from, so anything missing here is blanked on save.
+    //
+    // withReadableCustomer was on the single-invoice path and the create
+    // response but not on this one, and this is the path the browse arrows and
+    // the print view read. The buyer's NTN and STRN are stored encrypted, so a
+    // saved invoice printed its customer's tax numbers as raw "enc:v1:…"
+    // ciphertext — on the customer-facing document.
     const formattedInvoices = invoices.map((inv: SalesInvoiceFull) => ({
-      ...inv,
+      ...withReadableCustomer(inv),
       customerName: inv.customer?.name || "Unknown",
     }));
 
@@ -170,7 +193,14 @@ export async function POST(req: NextRequest) {
       reference = null,
       paymentMethod = null,
       paymentTerms = null,
+      // The challans this invoice is settling. The client's own habit: goods
+      // go out on challans all month, one bill follows at the end of it.
+      deliveryChallanIds = [],
     } = body;
+
+    const challanIds: string[] = Array.isArray(deliveryChallanIds)
+      ? deliveryChallanIds.filter((v: unknown) => typeof v === "string" && v)
+      : [];
 
     await ensureOpenPeriod(prisma, companyId, new Date(date));
 
@@ -189,7 +219,10 @@ export async function POST(req: NextRequest) {
     const total = subtotal - discountAmt + taxAmount + Number(freight);
 
     // ── Stock availability check ──────────────────────────────────────────────
-    for (const i of items) {
+    // Skipped when the invoice is settling challans: those goods left the
+    // godown when they were dispatched, so the shelf is already short of them
+    // and checking it would refuse every month-end bill.
+    for (const i of challanIds.length ? [] : items) {
       if (!i.itemId) continue;
       try {
         const agg = await prisma.inventoryTxn.aggregate({
@@ -308,20 +341,51 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    for (const i of items) {
-      await prisma.inventoryTxn.create({
-        data: {
-          companyId,
-          type: "SALE",
-          date: new Date(date),
-          itemId: i.itemId,
-          qty: -i.qty,
-          rate: i.rate,
-          amount: i.qty * i.rate,
-          location,
-          meta: sanitizeLineMeta(i.meta),
-        },
+    if (challanIds.length) {
+      // The goods left on the challans, not on this bill. Whichever document
+      // is written first takes the stock out; the other one links to it and
+      // takes nothing out — otherwise the same goods leave the godown twice.
+      //
+      // A challan still sitting at PENDING never wrote its stock out, and it
+      // is plainly gone or there would be nothing to bill, so its dispatch is
+      // written now, on its own date, before it is marked INVOICED.
+      const challans = await prisma.deliveryChallan.findMany({
+        where: { id: { in: challanIds }, companyId },
+        include: { items: true },
       });
+
+      for (const ch of challans) {
+        if (ch.status !== "DELIVERED") {
+          await writeDispatchStock(prisma, companyId, {
+            date: ch.date,
+            items: ch.items.map((it) => ({ itemId: it.itemId, qty: it.qty, rate: it.rate })),
+            packagingItemId: ch.packagingItemId,
+            packagingQty: ch.packagingQty,
+            salesInvoiceId: ch.salesInvoiceId,
+          });
+        }
+      }
+
+      await prisma.deliveryChallan.updateMany({
+        where: { id: { in: challans.map((c) => c.id) }, companyId },
+        data: { status: "INVOICED", salesInvoiceId: invoice.id },
+      });
+    } else {
+      for (const i of items) {
+        await prisma.inventoryTxn.create({
+          data: {
+            companyId,
+            type: "SALE",
+            date: new Date(date),
+            itemId: i.itemId,
+            qty: -i.qty,
+            rate: i.rate,
+            amount: i.qty * i.rate,
+            location,
+            meta: sanitizeLineMeta(i.meta),
+          },
+        });
+      }
     }
 
     // The cost leg. Without it the goods left the warehouse but their value
@@ -365,7 +429,7 @@ export async function POST(req: NextRequest) {
       success: true,
       id: invoice.id,
       invoiceNo: invoice.invoiceNo,
-      invoice: savedInvoice
+      invoice: savedInvoice ? withReadableCustomer(savedInvoice) : savedInvoice
     });
   } catch (e: any) {
     return NextResponse.json({ error: e.message }, { status: 500 });
@@ -601,7 +665,18 @@ export async function PUT(req: NextRequest) {
       return invoice;
     }, { timeout: 30000 });
 
-    return NextResponse.json({ success: true, invoice: result });
+    // Decrypted on the way out for the same reason the create response is: the
+    // update includes { customer: true }, the form re-renders from this, and
+    // the print view reads it straight after a save without re-fetching.
+    //
+    // The cast is for the $transaction return, which TypeScript widens to
+    // any[] here — the same mis-inference this file already carries on its
+    // other tx calls. The value is the single invoice the callback returns.
+    const savedInvoice = result as unknown as { customer?: unknown } | null;
+    return NextResponse.json({
+      success: true,
+      invoice: savedInvoice ? withReadableCustomer(savedInvoice) : savedInvoice,
+    });
   } catch (e: any) {
     console.error("Sales Invoice PUT Error:", e);
     return NextResponse.json({ error: e.message }, { status: 500 });

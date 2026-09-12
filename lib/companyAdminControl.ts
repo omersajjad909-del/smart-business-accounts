@@ -6,6 +6,11 @@ import {
   normalizeRateFormula,
   type RateFormulaSettings,
 } from "@/lib/rateFormula";
+import {
+  DEFAULT_PRINT_PROFILES,
+  normalizePrintProfiles,
+  type PrintProfiles,
+} from "@/lib/printProfile";
 
 export type BranchAssignmentMap = Record<string, string[]>;
 
@@ -146,7 +151,18 @@ export const DEFAULT_LOYALTY_SETTINGS: LoyaltySettings = {
 
 export type AdminControlSettings = {
   branchAssignments: BranchAssignmentMap;
+  /**
+   * Paper size, output and the logo — the settings that are genuinely one per
+   * company however many documents it prints. What each document *shows* and
+   * what it looks like moved to `printProfiles`; the four show/hide switches
+   * still here are what old configs are read from, and are no longer written.
+   */
   printPreferences: PrintPreferences;
+  /**
+   * Per-document print settings — a base profile and, for each document, only
+   * what differs from it. See lib/printProfile.ts.
+   */
+  printProfiles: PrintProfiles;
   taxProfile: TaxProfile;
   companyIdentity: CompanyIdentityProfile;
   invoiceContact: InvoiceContactProfile;
@@ -175,6 +191,7 @@ export type AdminControlSettings = {
 
 export const DEFAULT_ADMIN_CONTROL_SETTINGS: AdminControlSettings = {
   branchAssignments: {},
+  printProfiles: DEFAULT_PRINT_PROFILES,
   printPreferences: {
     paperSize: "A4",
     invoiceTemplate: "classic",
@@ -275,6 +292,10 @@ function normalizeSettings(value: unknown): AdminControlSettings {
       ...DEFAULT_ADMIN_CONTROL_SETTINGS.printPreferences,
       ...print,
     },
+    // Reads the stored per-document profiles, or builds a base one out of the
+    // old flat switches when a company has none yet — with `perDoc` empty, so
+    // the first print after this ships is identical to the last one before it.
+    printProfiles: normalizePrintProfiles(parsed.printProfiles, print),
     taxProfile: {
       ...DEFAULT_ADMIN_CONTROL_SETTINGS.taxProfile,
       ...taxProfile,
@@ -453,6 +474,10 @@ export async function saveCompanyAdminControlSettings(
       ...current.printPreferences,
       ...(patch.printPreferences || {}),
     },
+    // Replaced whole, not merged. `perDoc` is a delta map where *removing* an
+    // entry is how "reset to base" is expressed — a shallow merge would keep
+    // every override the screen had just cleared.
+    printProfiles: patch.printProfiles ?? current.printProfiles,
     taxProfile: {
       ...current.taxProfile,
       ...(patch.taxProfile || {}),

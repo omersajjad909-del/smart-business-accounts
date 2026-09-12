@@ -297,7 +297,11 @@ export async function generateFbrReport(
         inputTax += itemTax;
       }
     } else if (inv.taxConfig?.taxType === "GST") {
-      const gstRate = Number(inv.taxConfig.taxRate || 17) / 100;
+      // Pakistan's standard GST rate. Only reached when the invoice's own tax
+      // configuration carries no rate, which means the figure is already a
+      // guess — so it should at least be the current one: the standard rate
+      // moved from 17% to 18% in February 2023.
+      const gstRate = Number(inv.taxConfig.taxRate || 18) / 100;
       const base = invTotal / (1 + gstRate);
       inputTax += invTotal - base;
     }

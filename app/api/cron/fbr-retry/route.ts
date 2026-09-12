@@ -8,7 +8,15 @@ export const maxDuration = 60;
 /**
  * Cron: retries every SalesInvoice stuck at PENDING_SYNC — a filing that
  * failed because the FBR gateway itself was unreachable or erroring, not
- * because FBR rejected the payload. Runs every 15 minutes (see vercel.json).
+ * because FBR rejected the payload.
+ *
+ * Once a day (see vercel.json). Hourly is the frequency this wants, but a
+ * Hobby account may only run daily crons and Vercel rejects the whole
+ * deployment rather than quietly slowing a shorter schedule down — the same
+ * constraint app/api/cron/demo-cleanup already documents. An hourly schedule
+ * here blocked every deployment for three hours before this was found. Put it
+ * back on an hourly schedule if this account moves to Pro.
+ *
  * fileSalesInvoiceWithFbr gives up and marks an invoice FAILED once it has
  * been retried FBR_MAX_RETRIES times, so this never retries forever.
  */
