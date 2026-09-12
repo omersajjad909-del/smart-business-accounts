@@ -29,8 +29,9 @@ function fmt(n: number) {
 
 type InvoiceRow = {
   id: string; invoiceNo: string; date: string; total: number;
-  fbrStatus: "NOT_FILED" | "FILED" | "FAILED" | null;
+  fbrStatus: "NOT_FILED" | "PENDING_SYNC" | "FILED" | "FAILED" | null;
   fbrInvoiceNo: string | null; fbrIrn: string | null; fbrQrPayload?: string | null; fbrFiledAt: string | null;
+  fbrRetryCount?: number | null;
   customer?: { name: string; ntn?: string | null; strn?: string | null };
 };
 
@@ -39,8 +40,14 @@ type FbrSettings = {
   sellerNtn: string; sellerBusinessName: string; sellerProvince: string; sellerAddress: string;
 };
 
+// Kept in sync with FBR_SALE_TYPES in lib/fbrEInvoice.ts — "Goods at zero-rate"
+// is FBR's export/zero-rated scenario (SN007).
+const SALE_TYPE_STANDARD = "Goods at standard rate";
+const SALE_TYPE_ZERO_RATED = "Goods at zero-rate";
+
 const STATUS_STYLE: Record<string, { bg: string; fg: string; label: string }> = {
   NOT_FILED: { bg: "rgba(148,163,184,.12)", fg: "#94a3b8", label: "Not Filed" },
+  PENDING_SYNC: { bg: "rgba(251,191,36,.12)", fg: "#fbbf24", label: "Pending Sync" },
   FILED: { bg: "rgba(52,211,153,.12)", fg: "#34d399", label: "Filed with FBR" },
   FAILED: { bg: "rgba(248,113,113,.12)", fg: "#f87171", label: "Failed" },
 };
@@ -67,6 +74,10 @@ export default function EInvoicePage() {
   const [filingId, setFilingId] = useState<string | null>(null);
   const [qrFor, setQrFor] = useState<InvoiceRow | null>(null);
   const [toast, setToast] = useState<{ msg: string; type: "ok" | "err" } | null>(null);
+
+  const [fileDialogFor, setFileDialogFor] = useState<InvoiceRow | null>(null);
+  const [fileSaleType, setFileSaleType] = useState(SALE_TYPE_STANDARD);
+  const [fileSro, setFileSro] = useState("");
 
   const [showSettings, setShowSettings] = useState(false);
   const [settings, setSettings] = useState<FbrSettings>({
@@ -126,20 +137,29 @@ export default function EInvoicePage() {
     }
   }
 
-  async function fileInvoice(inv: InvoiceRow) {
+  async function fileInvoice(inv: InvoiceRow, saleType: string, sroScheduleNo: string) {
     if (!fbrConfigured) { setShowSettings(true); return; }
     setFilingId(inv.id);
     try {
-      const r = await fetch(`/api/e-invoice/${inv.id}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: "{}" });
+      const r = await fetch(`/api/e-invoice/${inv.id}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ saleType, sroScheduleNo }),
+      });
       const data = await r.json();
       if (!r.ok) throw new Error(data.error || "Filing failed");
       setInvoices(prev => prev.map(x => x.id === inv.id ? { ...x, ...data.invoice } : x));
-      showToast(`Filed — FBR invoice no. ${data.invoice.fbrInvoiceNo}`);
+      showToast(
+        data.invoice.fbrStatus === "PENDING_SYNC"
+          ? "FBR gateway unreachable right now — queued for automatic retry."
+          : `Filed — FBR invoice no. ${data.invoice.fbrInvoiceNo}`
+      );
     } catch (e: any) {
       showToast(e.message || "Filing failed", "err");
       load();
     } finally {
       setFilingId(null);
+      setFileDialogFor(null);
     }
   }
 
@@ -230,6 +250,7 @@ export default function EInvoicePage() {
         <select value={statusFilter} onChange={e => setStatusFilter(e.target.value)} style={{ ...inp(), maxWidth: 200 }}>
           <option value="">All statuses</option>
           <option value="NOT_FILED">Not Filed</option>
+          <option value="PENDING_SYNC">Pending Sync</option>
           <option value="FILED">Filed</option>
           <option value="FAILED">Failed</option>
         </select>
@@ -258,14 +279,27 @@ export default function EInvoicePage() {
                   <td style={{ padding: "12px 16px", color: "rgba(255,255,255,.6)" }}>{new Date(inv.date).toLocaleDateString()}</td>
                   <td style={{ padding: "12px 16px", color: "rgba(255,255,255,.7)" }}>{inv.customer?.name || "—"}</td>
                   <td style={{ padding: "12px 16px", color: "var(--text-primary)" }}>{fmt(inv.total)}</td>
-                  <td style={{ padding: "12px 16px" }}><StatusBadge status={inv.fbrStatus} /></td>
+                  <td style={{ padding: "12px 16px" }}>
+                    <StatusBadge status={inv.fbrStatus} />
+                    {inv.fbrStatus === "PENDING_SYNC" && !!inv.fbrRetryCount && (
+                      <div style={{ fontSize: 10.5, color: "rgba(255,255,255,.4)", marginTop: 4 }}>attempt {inv.fbrRetryCount}/8</div>
+                    )}
+                  </td>
                   <td style={{ padding: "12px 16px", color: "rgba(255,255,255,.6)", fontFamily: "monospace", fontSize: 12 }}>{inv.fbrInvoiceNo || "—"}</td>
                   <td style={{ padding: "12px 16px", textAlign: "right", whiteSpace: "nowrap" }}>
                     {inv.fbrStatus === "FILED" ? (
                       <button onClick={() => setQrFor(inv)} style={{ background: "rgba(52,211,153,.12)", color: "#34d399", border: "none", borderRadius: 7, padding: "6px 12px", fontSize: 12, fontWeight: 700, cursor: "pointer" }}>View QR</button>
                     ) : canManage ? (
-                      <button onClick={() => fileInvoice(inv)} disabled={filingId === inv.id} style={{ background: accent, color: "#fff", border: "none", borderRadius: 7, padding: "6px 12px", fontSize: 12, fontWeight: 700, cursor: "pointer", opacity: filingId === inv.id ? .6 : 1 }}>
-                        {filingId === inv.id ? "Filing…" : inv.fbrStatus === "FAILED" ? "Retry" : "File with FBR"}
+                      <button
+                        onClick={() => {
+                          setFileSaleType(SALE_TYPE_STANDARD);
+                          setFileSro("");
+                          setFileDialogFor(inv);
+                        }}
+                        disabled={filingId === inv.id}
+                        style={{ background: accent, color: "#fff", border: "none", borderRadius: 7, padding: "6px 12px", fontSize: 12, fontWeight: 700, cursor: "pointer", opacity: filingId === inv.id ? .6 : 1 }}
+                      >
+                        {filingId === inv.id ? "Filing…" : inv.fbrStatus === "FAILED" ? "Retry" : inv.fbrStatus === "PENDING_SYNC" ? "Retry now" : "File with FBR"}
                       </button>
                     ) : null}
                   </td>
@@ -275,6 +309,43 @@ export default function EInvoicePage() {
           </table>
         </div>
       </div>
+
+      {fileDialogFor && (
+        <div onClick={() => setFileDialogFor(null)} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.6)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 100 }}>
+          <div onClick={e => e.stopPropagation()} style={{ background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 16, padding: 26, maxWidth: 360, width: "90%" }}>
+            <h3 style={{ margin: "0 0 4px", fontSize: 15, fontWeight: 700, color: "var(--text-primary)" }}>File {fileDialogFor.invoiceNo} with FBR</h3>
+            <p style={{ margin: "0 0 16px", fontSize: 12, color: "rgba(255,255,255,.5)" }}>Pick how this sale should be reported.</p>
+            <Field label="Sale Type">
+              <select value={fileSaleType} onChange={e => setFileSaleType(e.target.value)} style={inp()}>
+                <option value={SALE_TYPE_STANDARD}>Standard Rate</option>
+                <option value={SALE_TYPE_ZERO_RATED}>Export / Zero-Rated</option>
+              </select>
+            </Field>
+            {fileSaleType === SALE_TYPE_ZERO_RATED && (
+              <>
+                <p style={{ margin: "-8px 0 12px", fontSize: 11.5, color: "#fbbf24", lineHeight: 1.6 }}>
+                  Sales tax is filed as 0% on every line, and buyer registration as Unregistered. Every line item needs an HS code set — filing fails otherwise.
+                </p>
+                <Field label="SRO / Schedule No. (optional)">
+                  <input value={fileSro} onChange={e => setFileSro(e.target.value)} style={inp()} placeholder="e.g. 327(I)/2008 — confirm with your tax advisor" />
+                </Field>
+              </>
+            )}
+            <div style={{ display: "flex", gap: 10, marginTop: 6 }}>
+              <button
+                onClick={() => fileInvoice(fileDialogFor, fileSaleType, fileSro)}
+                disabled={filingId === fileDialogFor.id}
+                style={{ background: accent, color: "#fff", border: "none", borderRadius: 9, padding: "10px 18px", fontSize: 13, fontWeight: 700, cursor: "pointer", opacity: filingId === fileDialogFor.id ? .6 : 1 }}
+              >
+                {filingId === fileDialogFor.id ? "Filing…" : "File with FBR"}
+              </button>
+              <button onClick={() => setFileDialogFor(null)} style={{ background: "transparent", border: "1px solid var(--border)", color: "var(--text-primary)", borderRadius: 9, padding: "10px 18px", fontSize: 13, cursor: "pointer" }}>
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {qrFor && (
         <div onClick={() => setQrFor(null)} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.6)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 100 }}>

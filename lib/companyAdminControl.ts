@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { revalidateTag, unstable_cache } from "next/cache";
+import { encryptField, decryptField } from "@/lib/fieldEncrypt";
 import {
   DEFAULT_RATE_FORMULA,
   normalizeRateFormula,
@@ -382,8 +383,60 @@ function cachedSettingsFor(companyId: string) {
   );
 }
 
+/**
+ * Self-provisioning, same as CompanyCommsVault in lib/companyCommsConfig.ts —
+ * a plain CREATE TABLE IF NOT EXISTS means this ships without a manual DB
+ * step blocking deploy. manual_company_fbr_credential_vault.sql documents the
+ * same statement for anyone provisioning by hand ahead of time.
+ */
+async function ensureCompanyFbrVaultTable() {
+  await prisma.$executeRawUnsafe(`
+    CREATE TABLE IF NOT EXISTS "CompanyFbrCredential" (
+      "companyId" TEXT PRIMARY KEY REFERENCES "Company"("id") ON DELETE CASCADE,
+      "tokenEnc" TEXT NOT NULL,
+      "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP
+    )
+  `);
+}
+
+/**
+ * Reads the FBR bearer token from its encrypted vault row, never from the
+ * ActivityLog JSON blob. Falls back to migrating a legacy plaintext token —
+ * one saved before this vault existed — out of `settingsFromJson` and into
+ * the vault, so it stops being re-read from an audit-log table on every load.
+ */
+async function resolveFbrToken(companyId: string, settingsFromJson: AdminControlSettings): Promise<string> {
+  const legacyToken = settingsFromJson.fbrSettings.bearerToken;
+
+  try {
+    await ensureCompanyFbrVaultTable();
+    const vaulted = await prisma.companyFbrCredential.findUnique({ where: { companyId } });
+    if (vaulted?.tokenEnc) {
+      try {
+        return decryptField(vaulted.tokenEnc);
+      } catch {
+        return "";
+      }
+    }
+
+    if (!legacyToken) return "";
+    await prisma.companyFbrCredential.upsert({
+      where: { companyId },
+      create: { companyId, tokenEnc: encryptField(legacyToken) },
+      update: { tokenEnc: encryptField(legacyToken) },
+    });
+    return legacyToken;
+  } catch {
+    // Vault unreachable (e.g. the DB role can't CREATE TABLE) — fall back to
+    // whatever the JSON blob has rather than breaking filing outright.
+    return legacyToken;
+  }
+}
+
 export async function getCompanyAdminControlSettings(companyId: string): Promise<AdminControlSettings> {
-  return cachedSettingsFor(companyId)();
+  const settings = await cachedSettingsFor(companyId)();
+  const bearerToken = await resolveFbrToken(companyId, settings);
+  return { ...settings, fbrSettings: { ...settings.fbrSettings, bearerToken } };
 }
 
 export async function saveCompanyAdminControlSettings(
@@ -451,12 +504,35 @@ export async function saveCompanyAdminControlSettings(
     },
   });
 
+  // The token never touches ActivityLog. It goes to its own encrypted vault
+  // row, and what gets persisted in the JSON blob below has it blanked out —
+  // see resolveFbrToken, which is the only place that reads it back. If the
+  // vault write fails outright, the token still lands in the JSON blob as a
+  // last resort — plaintext-but-working beats it silently vanishing.
+  const bearerToken = next.fbrSettings.bearerToken;
+  let vaulted = false;
+  try {
+    await ensureCompanyFbrVaultTable();
+    if (bearerToken) {
+      await prisma.companyFbrCredential.upsert({
+        where: { companyId },
+        create: { companyId, tokenEnc: encryptField(bearerToken) },
+        update: { tokenEnc: encryptField(bearerToken) },
+      });
+    } else {
+      await prisma.companyFbrCredential.deleteMany({ where: { companyId } });
+    }
+    vaulted = true;
+  } catch {
+    // Falls through to the ActivityLog write below with the token intact.
+  }
+
   await prisma.activityLog.create({
     data: {
       companyId,
       userId,
       action: "COMPANY_ADMIN_CONTROL",
-      details: JSON.stringify(next),
+      details: JSON.stringify({ ...next, fbrSettings: { ...next.fbrSettings, bearerToken: vaulted ? "" : bearerToken } }),
     },
   });
 
