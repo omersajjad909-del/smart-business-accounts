@@ -6,7 +6,7 @@ const BASE = process.env.NEXT_PUBLIC_BASE_URL || "https://www.finovaos.app";
 export const metadata: Metadata = {
   title: "About FinovaOS — Our Mission, Story & Values",
   description:
-    "Learn about FinovaOS's mission to simplify business finance for trading, wholesale, and distribution businesses. Purpose-built for how real businesses actually work.",
+    "Learn aboutFinovaOS's mission to simplify business finance for trading, wholesale, and distribution businesses. Purpose-built for how real businesses actually work.",
   keywords: [
     "about FinovaOS",
     "FinovaOS story",
