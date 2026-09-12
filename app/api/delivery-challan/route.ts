@@ -17,6 +17,7 @@ const challanSchema = z.object({
   dNo: z.string().optional().nullable(),
   packagingType: z.string().optional().nullable(),
   packagingQty: z.number().optional().nullable(),
+  packagingItemId: z.string().optional().nullable(),
   items: z.array(
     z.object({
       itemId: z.string(),
@@ -26,6 +27,60 @@ const challanSchema = z.object({
   ),
   status: z.enum(["PENDING", "DELIVERED", "INVOICED"]).optional(),
 });
+
+/**
+ * Everything a dispatch takes out of the godown: the goods themselves, and —
+ * when the company stocks its packing material — the bags or cartons they went
+ * out in. Both are written at the one moment the challan turns DELIVERED, so
+ * the two can never drift apart.
+ */
+async function writeDispatchStock(
+  companyId: string,
+  data: z.infer<typeof challanSchema>
+) {
+  const date = new Date(data.date);
+
+  for (const item of data.items) {
+    await prisma.inventoryTxn.create({
+      data: {
+        companyId,
+        type: "CHALLAN_OUT",
+        date,
+        itemId: item.itemId,
+        qty: -item.qty,
+        rate: item.rate || 0,
+        amount: item.qty * (item.rate || 0),
+        location: "MAIN",
+      },
+    });
+  }
+
+  // The packing material, when the company holds it as stock. Valued at cost:
+  // it is consumed on the way out, not sold, so the sale rate says nothing
+  // about it. A challan that names no packing item writes nothing here.
+  const packQty = Number(data.packagingQty ?? 0);
+  if (data.packagingItemId && packQty > 0) {
+    const packItem = await prisma.itemNew.findFirst({
+      where: { id: data.packagingItemId, companyId, deletedAt: null },
+      select: { purchaseRate: true },
+    });
+    if (packItem) {
+      const rate = packItem.purchaseRate || 0;
+      await prisma.inventoryTxn.create({
+        data: {
+          companyId,
+          type: "PACKING_OUT",
+          date,
+          itemId: data.packagingItemId,
+          qty: -packQty,
+          rate,
+          amount: packQty * rate,
+          location: "MAIN",
+        },
+      });
+    }
+  }
+}
 
 export async function GET(req: NextRequest) {
   try {
@@ -43,6 +98,7 @@ export async function GET(req: NextRequest) {
         where: { id, companyId, ...(branchId ? { branchId } : {}) },
         include: {
           customer: true,
+          packagingItem: true,
           items: {
             include: { item: true },
           },
@@ -56,6 +112,7 @@ export async function GET(req: NextRequest) {
       where: { companyId, ...(branchId ? { branchId } : {}) },
       include: {
         customer: true,
+        packagingItem: true,
         items: true,
       },
       orderBy: { createdAt: "desc" },
@@ -98,6 +155,7 @@ export async function POST(req: NextRequest) {
         dNo: data.dNo || null,
         packagingType: data.packagingType || null,
         packagingQty: data.packagingQty ?? null,
+        packagingItemId: data.packagingItemId || null,
         status: data.status || "PENDING",
         items: {
           create: data.items.map((item) => ({
@@ -109,6 +167,7 @@ export async function POST(req: NextRequest) {
       },
       include: {
         customer: true,
+        packagingItem: true,
         items: {
           include: { item: true },
         },
@@ -117,20 +176,7 @@ export async function POST(req: NextRequest) {
 
     // Deduct stock when challan is created as DELIVERED (immediate dispatch)
     if ((data.status || "PENDING") === "DELIVERED") {
-      for (const item of data.items) {
-        await prisma.inventoryTxn.create({
-          data: {
-            companyId,
-            type: "CHALLAN_OUT",
-            date: new Date(data.date),
-            itemId: item.itemId,
-            qty: -item.qty,
-            rate: item.rate || 0,
-            amount: item.qty * (item.rate || 0),
-            location: "MAIN",
-          },
-        });
-      }
+      await writeDispatchStock(companyId, data);
     }
 
     return NextResponse.json(challan);
@@ -183,6 +229,7 @@ export async function PUT(req: NextRequest) {
           dNo: data.dNo || null,
           packagingType: data.packagingType || null,
           packagingQty: data.packagingQty ?? null,
+          packagingItemId: data.packagingItemId || null,
           status: data.status || "PENDING",
           items: {
             create: data.items.map((item) => ({
@@ -194,6 +241,7 @@ export async function PUT(req: NextRequest) {
         },
         include: {
           customer: true,
+          packagingItem: true,
           items: { include: { item: true } },
         },
       });
@@ -203,20 +251,7 @@ export async function PUT(req: NextRequest) {
     const wasNotDelivered = existingChallan?.status !== "DELIVERED";
     const nowDelivered = data.status === "DELIVERED";
     if (wasNotDelivered && nowDelivered) {
-      for (const item of data.items) {
-        await prisma.inventoryTxn.create({
-          data: {
-            companyId,
-            type: "CHALLAN_OUT",
-            date: new Date(data.date),
-            itemId: item.itemId,
-            qty: -item.qty,
-            rate: item.rate || 0,
-            amount: item.qty * (item.rate || 0),
-            location: "MAIN",
-          },
-        });
-      }
+      await writeDispatchStock(companyId, data);
     }
 
     return NextResponse.json(updated);

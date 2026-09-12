@@ -27,7 +27,12 @@ type Item = {
   stockIn?: number;
   stockOut?: number;
   stockBal?: number;
+  category?: string;
 };
+
+// Items a dispatch can be packed in. Stocked like anything else, so the same
+// picker and the same received / sold / balance figures apply.
+const PACKAGING_CATEGORY = "PACKAGING";
 
 // Module level so the picker's memo keeps a stable identity across renders.
 function itemStockValues(item: { id: string }) {
@@ -61,6 +66,8 @@ type DeliveryChallan = {
   dNo?: string;
   packagingType?: string;
   packagingQty?: number;
+  packagingItemId?: string | null;
+  packagingItem?: { id: string; name: string; code?: string | null; unit?: string | null } | null;
   items: Array<{ item: { name: string; description?: string; code?: string; unit?: string }; qty: number; rate?: number }>;
   status: string;
 };
@@ -106,7 +113,11 @@ export default function DeliveryChallanPage() {
   const [orderNo, setOrderNo] = useState("");
   const [poNo, setPoNo] = useState("");
   const [dNo, setDNo] = useState("");
+  // packagingType is the old free-text label (BAGS / CARTON / PACKET). Kept
+  // read-only for challans written before packing material was stocked; new
+  // ones name a real item instead, so the dispatch can take it out of stock.
   const [packagingType, setPackagingType] = useState("");
+  const [packagingItemId, setPackagingItemId] = useState("");
   const [packagingQty, setPackagingQty] = useState<number | "">("");
 const [searchTerm, _setSearchTerm] = useState("");
 
@@ -128,6 +139,24 @@ const [searchTerm, _setSearchTerm] = useState("");
   });
   const isThermalPrint = printPrefs.paperSize !== "A4";
   const thermalWidth = printPrefs.paperSize === "THERMAL_58MM" ? "58mm" : "80mm";
+
+  // Packing material is picked from the catalogue rather than a hardcoded
+  // word, so the dispatch can take it out of stock like anything else.
+  const packagingItems = items.filter(i => i.category === PACKAGING_CATEGORY);
+
+  // What the printed challan says it was packed in: the item's own name, or —
+  // on a challan written before packing was stocked — the old free-text label.
+  const packagingLabel = (() => {
+    const pickedId = savedChallan?.packagingItemId || packagingItemId;
+    const name =
+      savedChallan?.packagingItem?.name ||
+      items.find(i => i.id === pickedId)?.name ||
+      savedChallan?.packagingType ||
+      packagingType;
+    if (!name) return "";
+    const qty = savedChallan?.packagingQty ?? (packagingQty === "" ? 0 : packagingQty);
+    return `${name} — Qty ${qty || 0}`;
+  })();
 
   useEffect(() => {
     if (!user) {
@@ -173,6 +202,7 @@ const [searchTerm, _setSearchTerm] = useState("");
           description: i.description || "",
           code: i.code || "",
           unit: i.unit || "",
+          category: i.category || "",
           stockIn: Number(i.stockIn ?? 0),
           stockOut: Number(i.stockOut ?? 0),
           stockBal: Number(i.stockBal ?? 0),
@@ -341,6 +371,7 @@ const [searchTerm, _setSearchTerm] = useState("");
         poNo: poNo || null,
         dNo: dNo || null,
         packagingType: packagingType || null,
+        packagingItemId: packagingItemId || null,
         packagingQty: packagingQty === "" ? null : Number(packagingQty),
         items: clean.map(r => ({ itemId: r.itemId, qty: Number(r.qty), rate: Number(r.rate) || 0 })),
       };
@@ -398,6 +429,7 @@ const [searchTerm, _setSearchTerm] = useState("");
     setPoNo(c.poNo || "");
     setDNo(c.dNo || "");
     setPackagingType(c.packagingType || "");
+    setPackagingItemId(c.packagingItemId || "");
     setPackagingQty(c.packagingQty ?? "");
     setRows(c.items.map((it: any) => ({
       itemId: it.itemId || "",
@@ -443,7 +475,7 @@ const [searchTerm, _setSearchTerm] = useState("");
     setDriverName("");
     setVehicleNo("");
     setRemarks("");
-    setSerialNo(""); setOrderNo(""); setPoNo(""); setDNo(""); setPackagingType(""); setPackagingQty("");
+    setSerialNo(""); setOrderNo(""); setPoNo(""); setDNo(""); setPackagingType(""); setPackagingItemId(""); setPackagingQty("");
     setRows([{ itemId: "", name: "", description: "", availableQty: 0, qty: "", rate: "" }]);
     setPreview(false);
   }
@@ -677,12 +709,26 @@ const [searchTerm, _setSearchTerm] = useState("");
                  </div>
                  <div>
                     <label className="text-xs font-bold">Packaging Source</label>
-                    <select className="border p-2 w-full" value={packagingType} onChange={e => setPackagingType(e.target.value)}>
-                      <option value="">— None —</option>
-                      <option value="BAGS">Bags</option>
-                      <option value="CARTON">Carton</option>
-                      <option value="PACKET">Packet</option>
-                    </select>
+                    {packagingItems.length === 0 ? (
+                      <div className="border p-2 w-full text-xs text-gray-500">
+                        No packing material in the catalogue yet — add an item under
+                        the <b>Packing Material</b> category in Items.
+                      </div>
+                    ) : (
+                      <ItemPicker
+                        items={packagingItems as any}
+                        value={packagingItemId}
+                        onChange={(picked: string) => setPackagingItemId(picked)}
+                        stockValues={itemStockValues}
+                        allowManual={false}
+                        placeholder="Bags / Carton / Packet…"
+                      />
+                    )}
+                    {packagingType && !packagingItemId && (
+                      <div className="text-[11px] text-gray-500 mt-1">
+                        Was recorded as “{packagingType}” before packing material was stocked.
+                      </div>
+                    )}
                  </div>
                  <div>
                     <label className="text-xs font-bold">Packaging Qty</label>
@@ -773,14 +819,7 @@ const [searchTerm, _setSearchTerm] = useState("");
                 totalsLines={[
                   { label: "Total Items:", value: rows.filter(r => r.itemId && r.qty).length, bold: true },
                 ]}
-                summaryFields={
-                  (savedChallan?.packagingType || packagingType)
-                    ? [{
-                        label: "Packaging Source",
-                        value: `${(savedChallan?.packagingType || packagingType).charAt(0)}${(savedChallan?.packagingType || packagingType).slice(1).toLowerCase()} — Qty ${savedChallan?.packagingQty ?? packagingQty ?? 0}`,
-                      }]
-                    : []
-                }
+                summaryFields={packagingLabel ? [{ label: "Packaging Source", value: packagingLabel }] : []}
                 notes={remarks || undefined}
                 footerNote={printPrefs.footerNote || undefined}
                 signatureLabels={["Received By", "Delivered By"]}
