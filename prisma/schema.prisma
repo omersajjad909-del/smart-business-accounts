@@ -345,13 +345,20 @@ model SalesInvoice {
   // FBR digital e-invoicing (Pakistan). Left untouched (all null, status
   // NOT_FILED) for every company that never opens the E-Invoice page — see
   // lib/fbrEInvoice.ts and app/dashboard/e-invoice.
-  fbrStatus      String?   @default("NOT_FILED") // NOT_FILED | FILED | FAILED
-  fbrInvoiceNo   String? // Invoice number FBR's gateway assigned on success
-  fbrIrn         String? // Invoice Reference Number encoded into the printed QR
-  fbrQrPayload   String? // Raw string the QR code on the invoice encodes
-  fbrFiledAt     DateTime?
-  fbrResponse    Json? // Last raw gateway response (success or error), for support/audit
-  fbrScenarioId  String? // Sandbox-only scenario id used for the test submission
+  fbrStatus        String?   @default("NOT_FILED") // NOT_FILED | PENDING_SYNC | FILED | FAILED
+  fbrInvoiceNo     String? // Invoice number FBR's gateway assigned on success
+  fbrIrn           String? // Invoice Reference Number encoded into the printed QR
+  fbrQrPayload     String? // Raw string the QR code on the invoice encodes
+  fbrFiledAt       DateTime?
+  fbrResponse      Json? // Last raw gateway response (success or error), for support/audit
+  fbrScenarioId    String? // Sandbox-only scenario id used for the test submission
+  fbrSaleType      String? // "Goods at standard rate" | "Goods at zero-rate" (export/zero-rated) — see lib/fbrEInvoice.ts FBR_SALE_TYPES
+  fbrSroScheduleNo String? // Fifth Schedule / SRO reference, only meaningful for zero-rated filings
+  // PENDING_SYNC retry bookkeeping. A capped counter, not unlimited — see
+  // app/api/cron/fbr-retry, which gives up and falls to FAILED past the cap
+  // rather than retrying a filing that will never go through forever.
+  fbrRetryCount  Int       @default(0)
+  fbrLastRetryAt DateTime?
 
   createdAt DateTime  @default(now())
   deletedAt DateTime?
