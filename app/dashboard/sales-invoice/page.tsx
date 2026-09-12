@@ -3,7 +3,7 @@ import { fmtDate } from "@/lib/dateUtils";
 import { DateInput } from "@/app/dashboard/reports/_components/DateInput";
 import { confirmToast } from "@/lib/toast-feedback";
 import { Suspense, useCallback, useEffect, useMemo, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import toast from "react-hot-toast";
 import dynamic from "next/dynamic";
 import { getCurrentUser } from "@/lib/auth";
@@ -100,7 +100,6 @@ function siRunQuery(invoices: SalesInvoice[], invNo: string, dateQ: string, part
 // ─── Component ───────────────────────────────────────────────────────────────
 function SalesInvoiceContent() {
   const { isMobile } = useResponsive();
-  const router = useRouter();
   const searchParams = useSearchParams();
   const queryId = searchParams.get("id");
   const fromChallans = searchParams.get("fromChallans");
@@ -831,15 +830,6 @@ function SalesInvoiceContent() {
   };
   const labelStyle: React.CSSProperties = { fontSize: 11, color: "var(--text-muted)", fontWeight: 600, marginBottom: 5, display: "block", textTransform: "uppercase", letterSpacing: 0.5 };
   const btnPrimary: React.CSSProperties = { background: accent, color: "#fff", border: "none", borderRadius: 8, padding: "9px 20px", fontFamily: ff, fontSize: 14, fontWeight: 600, cursor: "pointer" };
-  // The goods on this invoice still have to physically travel, with a driver,
-  // a vehicle and a signature on receipt — none of which an invoice records.
-  // So the button hands the invoice to the challan screen rather than printing
-  // a second face of the same paper. The challan knows not to take the stock
-  // out again.
-  function makeDeliveryChallan() {
-    if (!savedInvoice?.id) { toast.error("Save the invoice first."); return; }
-    router.push(`/dashboard/delivery-challan?fromInvoice=${savedInvoice.id}`);
-  }
 
   const btnGhost: React.CSSProperties = { background: "transparent", color: "var(--text-muted)", border: "1px solid var(--border)", borderRadius: 8, padding: "9px 16px", fontFamily: ff, fontSize: 14, cursor: "pointer" };
   const menuPanel: React.CSSProperties = { position: "absolute", top: "calc(100% + 6px)", minWidth: 200, background: "var(--card-bg)", border: "1px solid var(--border)", borderRadius: 10, padding: "6px 0", zIndex: 50, boxShadow: "0 8px 32px rgba(0,0,0,.35)" };
@@ -1098,13 +1088,6 @@ function SalesInvoiceContent() {
                 </>
               )}
             </div>
-
-            {/* ── Delivery Challan — the same goods, on their way out ── */}
-            {savedInvoice?.id && (
-              <button style={btnGhost} onClick={makeDeliveryChallan} title="Write a separate delivery challan record against this invoice — for goods tracked out on their own document. To simply print this invoice as a challan, use Print ▾ instead.">
-                🚚 Challan Record
-              </button>
-            )}
 
             {/* ── Send ▾ — WhatsApp or email ── */}
             <div style={{ position: "relative" }}>

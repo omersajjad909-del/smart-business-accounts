@@ -68,6 +68,7 @@ type DeliveryChallan = {
   packagingQty?: number;
   packagingItemId?: string | null;
   salesInvoiceId?: string | null;
+  approvalStatus?: string;
   salesInvoice?: { id: string; invoiceNo: string } | null;
   packagingItem?: { id: string; name: string; code?: string | null; unit?: string | null } | null;
   items: Array<{ item: { name: string; description?: string; code?: string; unit?: string }; qty: number; rate?: number }>;
@@ -121,15 +122,11 @@ export default function DeliveryChallanPage() {
   const [packagingType, setPackagingType] = useState("");
   const [packagingItemId, setPackagingItemId] = useState("");
   const [packagingQty, setPackagingQty] = useState<number | "">("");
-  // Set when the challan was opened off a sales invoice. The goods are already
-  // out of stock in that case, so this challan only carries them — it does not
-  // deduct them again (the API enforces that, see writeDispatchStock).
-  const [fromInvoice, setFromInvoice] = useState<{ id: string; invoiceNo: string } | null>(null);
 
   // Challans ticked in the list, to be billed together. A month of deliveries
   // usually settles on one invoice, so this is the normal case, not an extra.
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
-const [searchTerm, _setSearchTerm] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
 
 
   const [rows, setRows] = useState<Row[]>([{
@@ -156,7 +153,7 @@ const [searchTerm, _setSearchTerm] = useState("");
 
   // The invoice this challan is delivering against, printed so the customer's
   // gate can tie the two documents together.
-  const invoiceRef = savedChallan?.salesInvoice?.invoiceNo || fromInvoice?.invoiceNo || "";
+  const invoiceRef = savedChallan?.salesInvoice?.invoiceNo || "";
 
   // What the printed challan says it was packed in: the item's own name, or —
   // on a challan written before packing was stocked — the old free-text label.
@@ -224,9 +221,6 @@ const [searchTerm, _setSearchTerm] = useState("");
         })));
       })
       .catch(() => setItems([]));
-
-    const fromInvoiceId = new URLSearchParams(window.location.search).get("fromInvoice");
-    if (fromInvoiceId) prefillFromInvoice(fromInvoiceId);
 
     fetch("/api/delivery-challan", {
         headers: {
@@ -298,71 +292,31 @@ const [searchTerm, _setSearchTerm] = useState("");
       }
       if (e.code === "F8" || e.key === "F8") {
         e.preventDefault();
+        const query = prompt("Search (Challan No, Customer Name, Date):");
+        if (!query) return;
+
         if (showForm && !preview) {
-          const query = prompt("Enter search query (Challan No, Customer Name, etc.):");
-          if (query) {
-            const foundCustomer = customers.find(c => 
-              c.name.toLowerCase().includes(query.toLowerCase())
-            );
-            if (foundCustomer) {
-              setCustomerId(foundCustomer.id);
-              setCustomerName(foundCustomer.name);
-            } else {
-              toast.error(`No customer found matching "${query}"`);
-            }
+          const foundCustomer = customers.find(c =>
+            c.name.toLowerCase().includes(query.toLowerCase())
+          );
+          if (foundCustomer) {
+            setCustomerId(foundCustomer.id);
+            setCustomerName(foundCustomer.name);
+            return;
           }
         }
+
+        setSearchTerm(query);
+        setShowList(true);
+        setShowForm(false);
       }
     }
     document.addEventListener("keydown", handleKeyPress, true);
     return () => document.removeEventListener("keydown", handleKeyPress, true);
   }, [today, showForm, preview, customers]);
 
-  /**
-   * Open a challan for an invoice that is already written: same customer, same
-   * lines, and the driver and vehicle if the invoice happened to record them.
-   * Only the delivery details are left to fill in.
-   */
-  async function prefillFromInvoice(invoiceId: string) {
-    try {
-      const res = await fetch(`/api/sales-invoice?id=${invoiceId}`, {
-        headers: {
-          "x-user-role": user?.role || "",
-          "x-user-id": user?.id || "",
-        },
-      });
-      if (!res.ok) throw new Error("Invoice not found");
-      const inv = await res.json();
-
-      setFromInvoice({ id: inv.id, invoiceNo: inv.invoiceNo });
-      setCustomerId(inv.customerId || "");
-      setCustomerName(inv.customer?.name || inv.customerName || "");
-      setDate(inv.date ? String(inv.date).slice(0, 10) : today);
-      setDriverName(inv.driverName || "");
-      setVehicleNo(inv.vehicleNo || "");
-      setPoNo(inv.reference || "");
-      setRows(
-        (inv.items || []).map((it: any) => ({
-          itemId: it.itemId,
-          name: it.item?.name || "",
-          description: it.item?.description || "",
-          availableQty: 0,
-          qty: Number(it.qty) || "",
-          rate: Number(it.rate) || "",
-          sku: it.item?.code || "",
-          unit: it.item?.unit || "",
-        }))
-      );
-      setShowForm(true);
-      setShowList(false);
-      toast.success(`Challan opened for ${inv.invoiceNo}`);
-    } catch {
-      toast.error("Could not load that invoice.");
-    }
-  }
-
-  // Only challans that have not been billed yet can be ticked, and they all
-  // have to be the same customer's — one invoice cannot bill two customers.
+  // Only unbilled challans can be ticked, and they all have to be the same
+  // customer's — one invoice cannot bill two customers.
   const billableCustomerId = (() => {
     if (!selectedIds.length) return null;
     const first = challans.find(c => c.id === selectedIds[0]);
@@ -382,9 +336,40 @@ const [searchTerm, _setSearchTerm] = useState("");
     });
   }
 
+  /** A month of deliveries settling on one bill. */
   function invoiceSelected() {
     if (!selectedIds.length) return;
     router.push(`/dashboard/sales-invoice?fromChallans=${selectedIds.join(",")}`);
+  }
+
+  /** Bill this one challan by itself — the same road as a ticked batch. */
+  function invoiceOne(c: DeliveryChallan) {
+    router.push(`/dashboard/sales-invoice?fromChallans=${c.id}`);
+  }
+
+  /**
+   * Approve or reject the challan. The goods and the paperwork are separate
+   * questions: this settles whether the document stands, and moves no stock
+   * and no ledger of its own.
+   */
+  async function decide(c: DeliveryChallan, status: "APPROVED" | "REJECTED") {
+    try {
+      const res = await fetch("/api/approvals", {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          "x-user-role": user?.role || "",
+          "x-user-id": user?.id || "",
+        },
+        body: JSON.stringify({ type: "DELIVERY_CHALLAN", id: c.id, status }),
+      });
+      if (res.status === 403) throw new Error("Only an admin can approve or reject.");
+      if (!res.ok) throw new Error("Could not update approval.");
+      toast.success(`${c.challanNo} ${status.toLowerCase()}`);
+      await loadChallans();
+    } catch (e: any) {
+      toast.error(e.message || "Could not update approval.");
+    }
   }
 
   async function loadChallans() {
@@ -458,7 +443,6 @@ const [searchTerm, _setSearchTerm] = useState("");
         dNo: dNo || null,
         packagingType: packagingType || null,
         packagingItemId: packagingItemId || null,
-        salesInvoiceId: fromInvoice?.id || null,
         packagingQty: packagingQty === "" ? null : Number(packagingQty),
         items: clean.map(r => ({ itemId: r.itemId, qty: Number(r.qty), rate: Number(r.rate) || 0 })),
       };
@@ -517,7 +501,6 @@ const [searchTerm, _setSearchTerm] = useState("");
     setDNo(c.dNo || "");
     setPackagingType(c.packagingType || "");
     setPackagingItemId(c.packagingItemId || "");
-    setFromInvoice(c.salesInvoice ? { id: c.salesInvoice.id, invoiceNo: c.salesInvoice.invoiceNo } : null);
     setPackagingQty(c.packagingQty ?? "");
     setRows(c.items.map((it: any) => ({
       itemId: it.itemId || "",
@@ -563,7 +546,7 @@ const [searchTerm, _setSearchTerm] = useState("");
     setDriverName("");
     setVehicleNo("");
     setRemarks("");
-    setSerialNo(""); setOrderNo(""); setPoNo(""); setDNo(""); setPackagingType(""); setPackagingItemId(""); setPackagingQty(""); setFromInvoice(null);
+    setSerialNo(""); setOrderNo(""); setPoNo(""); setDNo(""); setPackagingType(""); setPackagingItemId(""); setPackagingQty("");
     setRows([{ itemId: "", name: "", description: "", availableQty: 0, qty: "", rate: "" }]);
     setPreview(false);
   }
@@ -671,6 +654,23 @@ const [searchTerm, _setSearchTerm] = useState("");
       )}
 
       {showList && (
+        <div className="flex items-center gap-2">
+          <input
+            value={searchTerm}
+            onChange={e => setSearchTerm(e.target.value)}
+            placeholder="Search challan no, customer or date…  (F8)"
+            className="border p-2 rounded w-full max-w-md text-sm"
+          />
+          {searchTerm && (
+            <button onClick={() => setSearchTerm("")} className="text-sm text-gray-600 px-3 py-2 border rounded">
+              Clear
+            </button>
+          )}
+          <span className="text-xs text-gray-500">{filteredChallans.length} of {challans.length}</span>
+        </div>
+      )}
+
+      {showList && (
         <div className="bg-white border rounded overflow-hidden overflow-x-auto">
           <table className="w-full text-sm min-w-[600px]">
             <thead className="bg-gray-100">
@@ -681,13 +681,14 @@ const [searchTerm, _setSearchTerm] = useState("");
                 <th className="p-3 text-left">Customer</th>
                 <th className="p-3 text-left">Vehicle/Driver</th>
                 <th className="p-3 text-left">Status</th>
+                <th className="p-3 text-left">Approval</th>
                 <th className="p-3 text-center">Actions</th>
               </tr>
             </thead>
             <tbody>
               {filteredChallans.length === 0 ? (
                 <tr>
-                  <td colSpan={8} className="p-4 text-center text-gray-400">No challans found</td>
+                  <td colSpan={9} className="p-4 text-center text-gray-400">No challans found</td>
                 </tr>
               ) : (
                 filteredChallans.map(c => (
@@ -720,7 +721,35 @@ const [searchTerm, _setSearchTerm] = useState("");
                         <span className="block text-[11px] text-gray-500 mt-1">{c.salesInvoice.invoiceNo}</span>
                       )}
                     </td>
-                    <td className="p-3 text-center space-x-2">
+                    <td className="p-3">
+                      {(() => {
+                        const a = c.approvalStatus || "DRAFT";
+                        const tone = a === "APPROVED" ? "bg-green-100 text-green-800"
+                          : a === "REJECTED" ? "bg-red-100 text-red-800"
+                          : "bg-yellow-100 text-yellow-800";
+                        return <span className={`px-2 py-1 rounded text-xs ${tone}`}>{a}</span>;
+                      })()}
+                    </td>
+                    <td className="p-3 text-center space-x-2 whitespace-nowrap">
+                      {c.status !== "INVOICED" && (
+                        <button
+                          onClick={() => invoiceOne(c)}
+                          className="text-green-700 hover:text-green-900 font-medium text-sm"
+                          title="Bill this challan — the ledger is posted when the invoice is saved"
+                        >
+                          Sales Invoice
+                        </button>
+                      )}
+                      {(c.approvalStatus || "DRAFT") !== "APPROVED" && (
+                        <button onClick={() => decide(c, "APPROVED")} className="text-emerald-700 hover:text-emerald-900 font-medium text-sm">
+                          Approve
+                        </button>
+                      )}
+                      {(c.approvalStatus || "DRAFT") !== "REJECTED" && (
+                        <button onClick={() => decide(c, "REJECTED")} className="text-orange-600 hover:text-orange-800 font-medium text-sm">
+                          Reject
+                        </button>
+                      )}
                       <button
                         onClick={() => startEdit(c)}
                         className="text-blue-600 hover:text-blue-800 font-medium text-sm"
@@ -772,17 +801,8 @@ const [searchTerm, _setSearchTerm] = useState("");
           {!preview && (
             <div className="bg-white border p-6 rounded space-y-4">
               <div className="mb-2 text-xs text-gray-500 italic">
-                Keyboard Shortcuts: <strong>F7</strong> = Clear Form | <strong>F8</strong> = Search Customer
+                Keyboard Shortcuts: <strong>F7</strong> = Clear Form | <strong>F8</strong> = Search
               </div>
-
-              {fromInvoice && (
-                <div className="border border-blue-300 bg-blue-50 text-blue-900 rounded p-3 text-xs">
-                  <b>Against invoice {fromInvoice.invoiceNo}.</b> Customer and items came from
-                  it — fill in the driver, vehicle and packing. The goods already left stock on
-                  that invoice, so this challan will not deduct them again. Packing material is
-                  still deducted, since the invoice never counted it.
-                </div>
-              )}
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 <input value={challanNo} readOnly className="border p-2 bg-gray-100" placeholder="Challan No (Auto)" />
                 <div>
