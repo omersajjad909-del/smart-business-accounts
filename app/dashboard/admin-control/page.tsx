@@ -8,7 +8,7 @@ import { CURRENCY_LABEL, SUPPORTED_CURRENCIES, currencyByCountry } from "@/lib/c
 import Link from "next/link";
 import { useResponsive } from "@/hooks/useResponsive";
 import { PRINT_TEMPLATES, normalizePrintTemplate } from "@/components/print/printTemplates";
-import { PK_PROVINCES } from "@/lib/pkProvinces";
+import { subdivisionsFor, subdivisionLabelFor, skipsSubdivision } from "@/lib/subdivisions";
 
 /* ─── types ─── */
 type Branch = { id: string; code: string; name: string; city?: string | null; isActive: boolean; address?: string; latitude?: number | null; longitude?: number | null; geoSource?: "exact" | "manual" | "country" | "unset" };
@@ -140,6 +140,8 @@ export default function AdminControlPage() {
 
   const availablePermissions = useMemo(() => Object.values(PERMISSIONS), []);
   const countryOptions = useMemo(() => sortCountries(ALL_COUNTRIES).map(c => c.name), []);
+  // Re-read on every country change — that is the whole point of the field.
+  const stateOptions = useMemo(() => subdivisionsFor(companyForm.country), [companyForm.country]);
   const CURRENCIES = [...SUPPORTED_CURRENCIES];
 
   function flash(text: string, ok = true) {
@@ -415,24 +417,37 @@ export default function AdminControlPage() {
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
                   <Field label="Legal Address" span2><input style={inp} value={settings.companyIdentity.legalAddress} onChange={e => setSettings(s => ({ ...s, companyIdentity: { ...s.companyIdentity, legalAddress: e.target.value } }))} placeholder="Street, building, full legal address" /></Field>
                   <Field label="City"><input style={inp} value={settings.companyIdentity.city} onChange={e => setSettings(s => ({ ...s, companyIdentity: { ...s.companyIdentity, city: e.target.value } }))} /></Field>
-                  {/* A dropdown for a Pakistani seller: this value goes out as
-                      the seller's province on every FBR filing and the gateway
-                      matches it against its own list, so free text let "punjab"
-                      and "Punjab" both be stored and neither looked wrong.
-                      Anywhere else it stays a plain box — no such list applies. */}
-                  <Field label="State / Province">
-                    {/^pakistan$/i.test((companyForm.country || "").trim()) ? (
-                      <select style={inp} value={settings.companyIdentity.state} onChange={e => setSettings(s => ({ ...s, companyIdentity: { ...s.companyIdentity, state: e.target.value } }))}>
-                        <option value="">— none —</option>
-                        {PK_PROVINCES.map(p => <option key={p} value={p}>{p}</option>)}
-                        {settings.companyIdentity.state && !PK_PROVINCES.includes(settings.companyIdentity.state as never) && (
-                          <option value={settings.companyIdentity.state}>{settings.companyIdentity.state} (not an FBR province)</option>
-                        )}
-                      </select>
-                    ) : (
-                      <input style={inp} value={settings.companyIdentity.state} onChange={e => setSettings(s => ({ ...s, companyIdentity: { ...s.companyIdentity, state: e.target.value } }))} />
-                    )}
-                  </Field>
+                  {/* The list follows the country picked above, and so does the
+                      heading: the UAE has emirates, Japan prefectures, Egypt
+                      governorates. Pakistan's list is the FBR one — this value
+                      goes out as the seller's province on every filing and the
+                      gateway matches it against its own list, which is why free
+                      text let "punjab" and "Punjab" both be stored and neither
+                      look wrong. See lib/subdivisions.ts.
+
+                      A country the list does not cover keeps the plain box, and
+                      a city-state drops the field entirely rather than ask for
+                      something that does not exist. */}
+                  {!skipsSubdivision(companyForm.country) && (
+                    <Field label={subdivisionLabelFor(companyForm.country)}>
+                      {stateOptions.length > 0 ? (
+                        <select style={inp} value={settings.companyIdentity.state} onChange={e => setSettings(s => ({ ...s, companyIdentity: { ...s.companyIdentity, state: e.target.value } }))}>
+                          <option value="">— none —</option>
+                          {stateOptions.map(p => <option key={p} value={p}>{p}</option>)}
+                          {/* Whatever is already saved stays selectable even when
+                              it is not on the list — changing country must never
+                              silently blank a value the operator did not touch. */}
+                          {settings.companyIdentity.state && !stateOptions.includes(settings.companyIdentity.state) && (
+                            <option value={settings.companyIdentity.state}>
+                              {settings.companyIdentity.state} (not on the {subdivisionLabelFor(companyForm.country).toLowerCase()} list)
+                            </option>
+                          )}
+                        </select>
+                      ) : (
+                        <input style={inp} value={settings.companyIdentity.state} onChange={e => setSettings(s => ({ ...s, companyIdentity: { ...s.companyIdentity, state: e.target.value } }))} />
+                      )}
+                    </Field>
+                  )}
                 </div>
               </div>
 
