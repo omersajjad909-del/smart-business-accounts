@@ -24,7 +24,17 @@ type Item = {
   availableQty: number;
   code?: string;
   unit?: string;
+  stockIn?: number;
+  stockOut?: number;
+  stockBal?: number;
 };
+
+// Module level so the picker's memo keeps a stable identity across renders.
+function itemStockValues(item: { id: string }) {
+  const row = item as Item;
+  if (row.stockBal === undefined) return null;
+  return { received: row.stockIn ?? 0, sold: row.stockOut ?? 0, balance: row.stockBal };
+}
 type Row = {
   itemId: string;
   name: string;
@@ -144,9 +154,32 @@ const [searchTerm, _setSearchTerm] = useState("");
         setCustomers(list.filter((a: any) => a.partyType === "CUSTOMER"));
       });
 
-    fetch("/api/stock-available-for-sale")
+    // The same catalogue Sales Invoice reads. The old
+    // /api/stock-available-for-sale dropped every item whose balance was not
+    // above zero, so an item at or below zero could not be dispatched at all.
+    fetch("/api/items-new?withStock=1", {
+      headers: {
+        "x-user-role": user.role || "",
+        "x-user-id": user.id || "",
+        ...(user.companyId ? { "x-company-id": user.companyId } : {}),
+      },
+    })
       .then(r => r.json())
-      .then(d => setItems(Array.isArray(d) ? d : []));
+      .then(d => {
+        const list = Array.isArray(d) ? d : [];
+        setItems(list.map((i: any) => ({
+          id: i.id,
+          name: i.name,
+          description: i.description || "",
+          code: i.code || "",
+          unit: i.unit || "",
+          stockIn: Number(i.stockIn ?? 0),
+          stockOut: Number(i.stockOut ?? 0),
+          stockBal: Number(i.stockBal ?? 0),
+          availableQty: Number(i.stockBal ?? 0),
+        })));
+      })
+      .catch(() => setItems([]));
 
     fetch("/api/delivery-challan", {
         headers: {
@@ -677,6 +710,7 @@ const [searchTerm, _setSearchTerm] = useState("");
                             items={items as any}
                             value={r.itemId}
                             onChange={(__picked: string) => selectItem(i, __picked)}
+                            stockValues={itemStockValues}
                             allowManual={false}
                             // placeholder="Type to search — e.g. e1060"
                           />
