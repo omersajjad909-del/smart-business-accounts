@@ -78,6 +78,7 @@ export default function EInvoicePage() {
   const [fileDialogFor, setFileDialogFor] = useState<InvoiceRow | null>(null);
   const [fileSaleType, setFileSaleType] = useState(SALE_TYPE_STANDARD);
   const [fileSro, setFileSro] = useState("");
+  const [fileScenarioId, setFileScenarioId] = useState("");
 
   const [showSettings, setShowSettings] = useState(false);
   const [settings, setSettings] = useState<FbrSettings>({
@@ -137,14 +138,14 @@ export default function EInvoicePage() {
     }
   }
 
-  async function fileInvoice(inv: InvoiceRow, saleType: string, sroScheduleNo: string) {
+  async function fileInvoice(inv: InvoiceRow, saleType: string, sroScheduleNo: string, scenarioId: string) {
     if (!fbrConfigured) { setShowSettings(true); return; }
     setFilingId(inv.id);
     try {
       const r = await fetch(`/api/e-invoice/${inv.id}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ saleType, sroScheduleNo }),
+        body: JSON.stringify({ saleType, sroScheduleNo, scenarioId: scenarioId || undefined }),
       });
       const data = await r.json();
       if (!r.ok) throw new Error(data.error || "Filing failed");
@@ -294,6 +295,7 @@ export default function EInvoicePage() {
                         onClick={() => {
                           setFileSaleType(SALE_TYPE_STANDARD);
                           setFileSro("");
+                          setFileScenarioId("");
                           setFileDialogFor(inv);
                         }}
                         disabled={filingId === inv.id}
@@ -331,9 +333,14 @@ export default function EInvoicePage() {
                 </Field>
               </>
             )}
+            {settings.environment === "sandbox" && (
+              <Field label="Scenario ID (sandbox only)">
+                <input value={fileScenarioId} onChange={e => setFileScenarioId(e.target.value)} style={inp()} placeholder="e.g. SN001 — from your IRIS sandbox test list" />
+              </Field>
+            )}
             <div style={{ display: "flex", gap: 10, marginTop: 6 }}>
               <button
-                onClick={() => fileInvoice(fileDialogFor, fileSaleType, fileSro)}
+                onClick={() => fileInvoice(fileDialogFor, fileSaleType, fileSro, fileScenarioId)}
                 disabled={filingId === fileDialogFor.id}
                 style={{ background: accent, color: "#fff", border: "none", borderRadius: 9, padding: "10px 18px", fontSize: 13, fontWeight: 700, cursor: "pointer", opacity: filingId === fileDialogFor.id ? .6 : 1 }}
               >
