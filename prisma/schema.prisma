@@ -32,6 +32,13 @@ model Account {
   // place, and "Lahore" is not a province the gateway will accept. See
   // lib/pkProvinces.ts.
   province    String?
+  // The party's own country, which decides what `province` above even means:
+  // an emirate for a buyer in Sharjah, a prefecture for one in Osaka. Without
+  // it the customer form could only ever offer the seven FBR provinces, so a
+  // Pakistani exporter had nowhere to record a foreign buyer's region. See
+  // lib/subdivisions.ts. Null means nobody has said — never assume the
+  // company's own country for an existing party.
+  country     String?
   bankIban    String? // IBAN / Bank Account No.
   description String? // Internal notes
   openDate    DateTime?

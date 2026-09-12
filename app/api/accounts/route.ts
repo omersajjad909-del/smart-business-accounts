@@ -105,6 +105,11 @@ export async function GET(req: NextRequest) {
       "partyType",
       "type",
       "city",
+      // Exported so a round-trip through CSV keeps the party's region. Without
+      // these two the import path below could never restore what the form had
+      // captured, and an edit-in-Excel workflow silently blanked them.
+      "province",
+      "country",
       "phone",
       "openDebit",
       "openCredit",
@@ -118,6 +123,8 @@ export async function GET(req: NextRequest) {
       JSON.stringify(a.partyType || ""),
       JSON.stringify(a.type || ""),
       JSON.stringify(a.city || ""),
+      JSON.stringify(a.province || ""),
+      JSON.stringify(a.country || ""),
       JSON.stringify(a.phone || ""),
       a.openDebit ?? "",
       a.openCredit ?? "",
@@ -192,9 +199,12 @@ export async function POST(req: NextRequest) {
         type: fixedType,
         partyType: body.partyType || "GENERAL",
         city: body.city || null,
-        // Not encrypted like the identifiers below it: a province is not
-        // personal data, and the FBR payload has to read it back in the clear.
+        // Neither is encrypted like the identifiers below them: a region is not
+        // personal data, and the FBR payload has to read the province back in
+        // the clear. Country decides which list `province` is drawn from —
+        // see lib/subdivisions.ts.
         province: body.province || null,
+        country: body.country || null,
         phone: body.phone ? safeEncryptField(body.phone) : null,
         ntn: body.ntn ? safeEncryptField(body.ntn) : null,
         strn: body.strn ? safeEncryptField(body.strn) : null,

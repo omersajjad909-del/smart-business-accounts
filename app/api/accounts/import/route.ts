@@ -7,6 +7,34 @@ import { safeEncryptField } from "@/lib/fieldEncrypt";
 // it one place left — the balance saved was not the balance in the file.
 // See lib/csvParse.ts.
 import { parseCsv, parseAmount, parseImportDate } from "@/lib/csvParse";
+import { COUNTRIES, normalizeCountryCode } from "@/lib/countries";
+import { normalizeSubdivision } from "@/lib/subdivisions";
+
+const COUNTRY_CODES = new Set(COUNTRIES.map((c) => c.code));
+const COUNTRY_NAME_BY_CODE = new Map(COUNTRIES.map((c) => [c.code, c.name]));
+
+/**
+ * Country and province off one imported row, spelled the way the app spells them.
+ *
+ * A spreadsheet is where "punjab", "PUNJAB" and "Punjab" all arrive in the same
+ * column, and the province is the field FBR matches against its own list — so a
+ * casing difference nobody can see is a rejected filing. Both values are put
+ * through the canonical lists, and anything the lists do not recognise is kept
+ * exactly as typed rather than dropped: an unrecognised region is still the only
+ * record of what the customer said, and the form shows it back for correction.
+ */
+function importedRegion(rawCountry?: string, rawProvince?: string) {
+  const country = String(rawCountry || "").trim();
+  const province = String(rawProvince || "").trim();
+  const code = normalizeCountryCode(country);
+  const canonicalCountry = COUNTRY_CODES.has(code)
+    ? COUNTRY_NAME_BY_CODE.get(code)!
+    : country || null;
+  return {
+    country: canonicalCountry,
+    province: (province ? normalizeSubdivision(canonicalCountry, province) : null) || province || null,
+  };
+}
 
 export async function POST(req: NextRequest) {
   const role = req.headers.get("x-user-role")?.toUpperCase();
@@ -58,6 +86,7 @@ export async function POST(req: NextRequest) {
           partyType: r.partyType || null,
           type,
           city: r.city || null,
+          ...importedRegion(r.country, r.province),
           phone: r.phone ? safeEncryptField(r.phone) : null,
           openDebit: parseAmount(r.openDebit),
           openCredit: parseAmount(r.openCredit),
