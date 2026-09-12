@@ -2,6 +2,7 @@
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 import { resolveCompanyId, resolveBranchId, resolveBranchIdOrDefault } from "@/lib/tenant";
+import { writeDispatchStock } from "@/lib/challanStock";
 
 // VALIDATION SCHEMA
 const challanSchema = z.object({
@@ -29,67 +30,6 @@ const challanSchema = z.object({
   status: z.enum(["PENDING", "DELIVERED", "INVOICED"]).optional(),
 });
 
-/**
- * Everything a dispatch takes out of the godown: the goods themselves, and —
- * when the company stocks its packing material — the bags or cartons they went
- * out in. Both are written at the one moment the challan turns DELIVERED, so
- * the two can never drift apart.
- *
- * The goods are skipped when the challan was raised off a sales invoice: that
- * invoice already wrote them out as SALE, and writing CHALLAN_OUT too would
- * take the same goods off the shelf twice. The packing material is still
- * written either way — an invoice has nothing to say about bags or cartons.
- */
-async function writeDispatchStock(
-  companyId: string,
-  data: z.infer<typeof challanSchema>
-) {
-  const date = new Date(data.date);
-
-  if (!data.salesInvoiceId) {
-    for (const item of data.items) {
-      await prisma.inventoryTxn.create({
-        data: {
-          companyId,
-          type: "CHALLAN_OUT",
-          date,
-          itemId: item.itemId,
-          qty: -item.qty,
-          rate: item.rate || 0,
-          amount: item.qty * (item.rate || 0),
-          location: "MAIN",
-        },
-      });
-    }
-  }
-
-  // The packing material, when the company holds it as stock. Valued at cost:
-  // it is consumed on the way out, not sold, so the sale rate says nothing
-  // about it. A challan that names no packing item writes nothing here.
-  const packQty = Number(data.packagingQty ?? 0);
-  if (data.packagingItemId && packQty > 0) {
-    const packItem = await prisma.itemNew.findFirst({
-      where: { id: data.packagingItemId, companyId, deletedAt: null },
-      select: { purchaseRate: true },
-    });
-    if (packItem) {
-      const rate = packItem.purchaseRate || 0;
-      await prisma.inventoryTxn.create({
-        data: {
-          companyId,
-          type: "PACKING_OUT",
-          date,
-          itemId: data.packagingItemId,
-          qty: -packQty,
-          rate,
-          amount: packQty * rate,
-          location: "MAIN",
-        },
-      });
-    }
-  }
-}
-
 export async function GET(req: NextRequest) {
   try {
     const companyId = await resolveCompanyId(req);
@@ -101,6 +41,24 @@ export async function GET(req: NextRequest) {
     const { searchParams } = new URL(req.url);
     const id = searchParams.get("id");
 
+    // A month's worth of challans billed on one invoice: the invoice screen
+    // asks for them all at once rather than one request per challan.
+    const ids = searchParams.get("ids");
+    if (ids) {
+      const idList = ids.split(",").map((v) => v.trim()).filter(Boolean);
+      if (!idList.length) return NextResponse.json([]);
+      const many = await prisma.deliveryChallan.findMany({
+        where: { id: { in: idList }, companyId, ...(branchId ? { branchId } : {}) },
+        include: {
+          customer: true,
+          packagingItem: true,
+          salesInvoice: { select: { id: true, invoiceNo: true } },
+          items: { include: { item: true } },
+        },
+        orderBy: { date: "asc" },
+      });
+      return NextResponse.json(many);
+    }
     if (id) {
       const challan = await prisma.deliveryChallan.findFirst({
         where: { id, companyId, ...(branchId ? { branchId } : {}) },
@@ -188,7 +146,7 @@ export async function POST(req: NextRequest) {
 
     // Deduct stock when challan is created as DELIVERED (immediate dispatch)
     if ((data.status || "PENDING") === "DELIVERED") {
-      await writeDispatchStock(companyId, data);
+      await writeDispatchStock(prisma, companyId, data);
     }
 
     return NextResponse.json(challan);
@@ -265,7 +223,7 @@ export async function PUT(req: NextRequest) {
     const wasNotDelivered = existingChallan?.status !== "DELIVERED";
     const nowDelivered = data.status === "DELIVERED";
     if (wasNotDelivered && nowDelivered) {
-      await writeDispatchStock(companyId, data);
+      await writeDispatchStock(prisma, companyId, data);
     }
 
     return NextResponse.json(updated);

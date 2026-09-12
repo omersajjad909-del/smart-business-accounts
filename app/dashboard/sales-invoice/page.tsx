@@ -103,6 +103,7 @@ function SalesInvoiceContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const queryId = searchParams.get("id");
+  const fromChallans = searchParams.get("fromChallans");
   const today = new Date().toISOString().slice(0, 10);
   const user = getCurrentUser();
   const canCreate = hasPermission(user, PERMISSIONS.CREATE_SALES_INVOICE);
@@ -163,6 +164,11 @@ function SalesInvoiceContent() {
   );
   const emptyRow = (): Row => ({ itemId: "", name: "", description: "", availableQty: 0, qty: "", rate: "", discountPercent: "", taxPercent: "", unit: "", sku: "", isManual: false, ...(rfActive ? { meta: emptyRateFormulaMeta(rf) } : {}) });
   const [rows, setRows]                 = useState<Row[]>([emptyRow()]);
+  // The delivery challans this invoice is settling. The usual case for a
+  // customer who takes goods all month and is billed once at the end of it:
+  // the goods are already out of stock, so the invoice must not take them out
+  // again — the API enforces that, this only carries the ids.
+  const [billedChallans, setBilledChallans] = useState<{ id: string; challanNo: string }[]>([]);
   const [freight, setFreight]           = useState<number | "">("");
   const [discount, setDiscount]         = useState<number | "">("");
   const [discountType, setDiscountType] = useState<"flat" | "percent">("flat");
@@ -277,6 +283,56 @@ function SalesInvoiceContent() {
       }
     } catch {}
   }, []);
+
+  // ── Pre-fill from delivery challans ──
+  useEffect(() => {
+    if (!fromChallans || !user) return;
+    fetch(`/api/delivery-challan?ids=${fromChallans}`, {
+      headers: { "x-user-role": user.role || "", "x-user-id": user.id || "" },
+    })
+      .then(r => r.json())
+      .then((list: any[]) => {
+        if (!Array.isArray(list) || !list.length) { toast.error("Those challans could not be loaded."); return; }
+
+        setBilledChallans(list.map(c => ({ id: c.id, challanNo: c.challanNo })));
+        setCustomerId(list[0].customerId || "");
+        setCustomerName(list[0].customer?.name || "");
+        setDriverName(list[0].driverName || "");
+        setVehicleNo(list[0].vehicleNo || "");
+
+        // One line per challan line, never merged: the customer checks the
+        // bill against the challans they signed, and a merged line cannot be
+        // traced back to the delivery it came from. Each line carries its
+        // challan number in the Po# column, which is what that column prints.
+        const lines: Row[] = [];
+        for (const ch of list) {
+          for (const it of ch.items || []) {
+            lines.push({
+              itemId: it.itemId,
+              name: it.item?.name || "",
+              description: it.item?.description || "",
+              availableQty: 0,
+              qty: Number(it.qty) || "",
+              rate: Number(it.rate) || "",
+              discountPercent: "",
+              taxPercent: it.item?.taxRate || "",
+              unit: it.item?.unit || "",
+              sku: it.item?.code || "",
+              hsCode: it.item?.hsCode || undefined,
+              poNo: ch.challanNo,
+            });
+          }
+        }
+        if (lines.length) setRows(lines);
+
+        const nos = list.map(c => c.challanNo).join(", ");
+        setNotes(n => (n ? n + "\n" : "") + `Against Delivery Challan: ${nos}`);
+        setShowForm(true);
+        setShowList(false);
+        toast.success(`${list.length} challan${list.length > 1 ? "s" : ""} loaded`);
+      })
+      .catch(() => toast.error("Those challans could not be loaded."));
+  }, [fromChallans, user]);
 
   useEffect(() => {
     if (!queryId || !user) return;
@@ -561,6 +617,7 @@ function SalesInvoiceContent() {
         applyTax, taxConfigId: applyTax ? selectedTaxId : null,
         currencyId: currencyId || null, exchangeRate,
         soId: (!editing && linkedSoId) ? linkedSoId : undefined,
+        deliveryChallanIds: (!editing && billedChallans.length) ? billedChallans.map(c => c.id) : undefined,
       };
       const body = editing ? { id: editing.id, ...baseBody } : baseBody;
       const res = await fetch("/api/sales-invoice", { method, credentials: "include", headers: { "Content-Type": "application/json", "x-user-role": user?.role || "", "x-user-id": user?.id || "" }, body: JSON.stringify(body) });
@@ -600,7 +657,7 @@ function SalesInvoiceContent() {
   }
 
   function resetForm() {
-    setEditing(null); setCustomerId(""); setCustomerName(""); setLinkedSoId(""); setLinkedSoNo("");
+    setEditing(null); setCustomerId(""); setCustomerName(""); setLinkedSoId(""); setLinkedSoNo(""); setBilledChallans([]);
     setDate(today); setDueDate(""); setLocation("MAIN"); setDriverName(""); setVehicleNo(""); setFreight("");
     setDiscount(""); setNotes(""); setTermsConditions(""); setReference(""); setPaymentMethod(""); setPaymentTerms("");
     setRows([emptyRow()]);
@@ -1165,6 +1222,17 @@ function SalesInvoiceContent() {
                     it and the payment panels below, and takes every pixel the
                     340px meta column does not. */}
                 <div style={{ display: "flex", flexDirection: "column", gap: 16, minWidth: 0 }}>
+
+                  {billedChallans.length > 0 && (
+                    <div style={{ background: "rgba(59,130,246,.08)", border: "1px solid rgba(59,130,246,.3)", borderRadius: 10, padding: "10px 14px", fontSize: 12, color: "var(--text-primary)" }}>
+                      <b>Billing {billedChallans.length} delivery challan{billedChallans.length > 1 ? "s" : ""}:</b>{" "}
+                      {billedChallans.map(c => c.challanNo).join(", ")}.{" "}
+                      <span style={{ color: "var(--text-muted)" }}>
+                        The goods already left stock on those challans, so this invoice will not
+                        deduct them again. Saving marks each challan as INVOICED.
+                      </span>
+                    </div>
+                  )}
 
                   {/* Customer + Business + Scan — three across */}
                   <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(3, minmax(0, 1fr))", gap: 14, alignItems: "stretch" }}>

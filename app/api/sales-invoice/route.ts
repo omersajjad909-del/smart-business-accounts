@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { baseRate, toBase } from "@/lib/fx";
+import { writeDispatchStock } from "@/lib/challanStock";
 import { sanitizeLineMeta } from "@/lib/rateFormula";
 
 import { apiHasPermission } from "@/lib/apiPermission";
@@ -169,7 +170,14 @@ export async function POST(req: NextRequest) {
       reference = null,
       paymentMethod = null,
       paymentTerms = null,
+      // The challans this invoice is settling. The client's own habit: goods
+      // go out on challans all month, one bill follows at the end of it.
+      deliveryChallanIds = [],
     } = body;
+
+    const challanIds: string[] = Array.isArray(deliveryChallanIds)
+      ? deliveryChallanIds.filter((v: unknown) => typeof v === "string" && v)
+      : [];
 
     await ensureOpenPeriod(prisma, companyId, new Date(date));
 
@@ -188,7 +196,10 @@ export async function POST(req: NextRequest) {
     const total = subtotal - discountAmt + taxAmount + Number(freight);
 
     // ── Stock availability check ──────────────────────────────────────────────
-    for (const i of items) {
+    // Skipped when the invoice is settling challans: those goods left the
+    // godown when they were dispatched, so the shelf is already short of them
+    // and checking it would refuse every month-end bill.
+    for (const i of challanIds.length ? [] : items) {
       if (!i.itemId) continue;
       try {
         const agg = await prisma.inventoryTxn.aggregate({
@@ -307,20 +318,51 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    for (const i of items) {
-      await prisma.inventoryTxn.create({
-        data: {
-          companyId,
-          type: "SALE",
-          date: new Date(date),
-          itemId: i.itemId,
-          qty: -i.qty,
-          rate: i.rate,
-          amount: i.qty * i.rate,
-          location,
-          meta: sanitizeLineMeta(i.meta),
-        },
+    if (challanIds.length) {
+      // The goods left on the challans, not on this bill. Whichever document
+      // is written first takes the stock out; the other one links to it and
+      // takes nothing out — otherwise the same goods leave the godown twice.
+      //
+      // A challan still sitting at PENDING never wrote its stock out, and it
+      // is plainly gone or there would be nothing to bill, so its dispatch is
+      // written now, on its own date, before it is marked INVOICED.
+      const challans = await prisma.deliveryChallan.findMany({
+        where: { id: { in: challanIds }, companyId },
+        include: { items: true },
       });
+
+      for (const ch of challans) {
+        if (ch.status !== "DELIVERED") {
+          await writeDispatchStock(prisma, companyId, {
+            date: ch.date,
+            items: ch.items.map((it) => ({ itemId: it.itemId, qty: it.qty, rate: it.rate })),
+            packagingItemId: ch.packagingItemId,
+            packagingQty: ch.packagingQty,
+            salesInvoiceId: ch.salesInvoiceId,
+          });
+        }
+      }
+
+      await prisma.deliveryChallan.updateMany({
+        where: { id: { in: challans.map((c) => c.id) }, companyId },
+        data: { status: "INVOICED", salesInvoiceId: invoice.id },
+      });
+    } else {
+      for (const i of items) {
+        await prisma.inventoryTxn.create({
+          data: {
+            companyId,
+            type: "SALE",
+            date: new Date(date),
+            itemId: i.itemId,
+            qty: -i.qty,
+            rate: i.rate,
+            amount: i.qty * i.rate,
+            location,
+            meta: sanitizeLineMeta(i.meta),
+          },
+        });
+      }
     }
 
     // The cost leg. Without it the goods left the warehouse but their value

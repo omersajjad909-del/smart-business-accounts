@@ -90,7 +90,7 @@ export default function DeliveryChallanPage() {
   // Address, phone, tax registration and the Print & Branding switches,
   // read the one way every document reads them.
   const printHeader = useCompanyPrintHeader();
-  const _router = useRouter();
+  const router = useRouter();
   const today = new Date().toISOString().slice(0, 10);
   const user = getCurrentUser();
 
@@ -125,6 +125,10 @@ export default function DeliveryChallanPage() {
   // out of stock in that case, so this challan only carries them — it does not
   // deduct them again (the API enforces that, see writeDispatchStock).
   const [fromInvoice, setFromInvoice] = useState<{ id: string; invoiceNo: string } | null>(null);
+
+  // Challans ticked in the list, to be billed together. A month of deliveries
+  // usually settles on one invoice, so this is the normal case, not an extra.
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
 const [searchTerm, _setSearchTerm] = useState("");
 
 
@@ -355,6 +359,32 @@ const [searchTerm, _setSearchTerm] = useState("");
     } catch {
       toast.error("Could not load that invoice.");
     }
+  }
+
+  // Only challans that have not been billed yet can be ticked, and they all
+  // have to be the same customer's — one invoice cannot bill two customers.
+  const billableCustomerId = (() => {
+    if (!selectedIds.length) return null;
+    const first = challans.find(c => c.id === selectedIds[0]);
+    return first?.customerId || null;
+  })();
+
+  function toggleSelected(c: DeliveryChallan) {
+    setSelectedIds(prev => {
+      if (prev.includes(c.id)) return prev.filter(id => id !== c.id);
+      const firstId = prev[0];
+      const first = firstId ? challans.find(x => x.id === firstId) : null;
+      if (first && first.customerId !== c.customerId) {
+        toast.error("One invoice, one customer — untick the others first.");
+        return prev;
+      }
+      return [...prev, c.id];
+    });
+  }
+
+  function invoiceSelected() {
+    if (!selectedIds.length) return;
+    router.push(`/dashboard/sales-invoice?fromChallans=${selectedIds.join(",")}`);
   }
 
   async function loadChallans() {
@@ -622,11 +652,30 @@ const [searchTerm, _setSearchTerm] = useState("");
       </div>
 
       {/* LIST VIEW */}
+      {showList && selectedIds.length > 0 && (
+        <div className="flex items-center justify-between gap-3 bg-blue-50 border border-blue-300 rounded p-3 mb-2 text-sm">
+          <span className="text-blue-900">
+            <b>{selectedIds.length}</b> challan{selectedIds.length > 1 ? "s" : ""} ticked
+            {" — "}
+            {challans.find(c => c.id === selectedIds[0])?.customer?.name}
+          </span>
+          <span className="flex gap-2">
+            <button onClick={() => setSelectedIds([])} className="px-3 py-1 border rounded text-gray-600">
+              Clear
+            </button>
+            <button onClick={invoiceSelected} className="bg-blue-600 text-white px-4 py-1 rounded">
+              🧾 Make Invoice
+            </button>
+          </span>
+        </div>
+      )}
+
       {showList && (
         <div className="bg-white border rounded overflow-hidden overflow-x-auto">
           <table className="w-full text-sm min-w-[600px]">
             <thead className="bg-gray-100">
               <tr>
+                <th className="p-3 w-10"></th>
                 <th className="p-3 text-left">Challan No</th>
                 <th className="p-3 text-left">Date</th>
                 <th className="p-3 text-left">Customer</th>
@@ -638,11 +687,24 @@ const [searchTerm, _setSearchTerm] = useState("");
             <tbody>
               {filteredChallans.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="p-4 text-center text-gray-400">No challans found</td>
+                  <td colSpan={8} className="p-4 text-center text-gray-400">No challans found</td>
                 </tr>
               ) : (
                 filteredChallans.map(c => (
                   <tr key={c.id} className="border-t hover:bg-gray-50">
+                    <td className="p-3 text-center">
+                      {c.status === "INVOICED" ? (
+                        <span className="text-xs text-gray-400" title="Already billed">✓</span>
+                      ) : (
+                        <input
+                          type="checkbox"
+                          checked={selectedIds.includes(c.id)}
+                          onChange={() => toggleSelected(c)}
+                          disabled={!!billableCustomerId && billableCustomerId !== c.customerId}
+                          title="Tick to bill this challan"
+                        />
+                      )}
+                    </td>
                     <td className="p-3 font-bold">{c.challanNo}</td>
                     <td className="p-3">{fmtDate(c.date)}</td>
                     <td className="p-3">{c.customer?.name || "N/A"}</td>
@@ -651,9 +713,12 @@ const [searchTerm, _setSearchTerm] = useState("");
                         {c.driverName && <span className="block text-xs">👤 {c.driverName}</span>}
                     </td>
                     <td className="p-3">
-                      <span className={`px-2 py-1 rounded text-xs ${c.status === 'DELIVERED' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}`}>
+                      <span className={`px-2 py-1 rounded text-xs ${c.status === 'INVOICED' ? 'bg-blue-100 text-blue-800' : c.status === 'DELIVERED' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}`}>
                         {c.status}
                       </span>
+                      {c.salesInvoice && (
+                        <span className="block text-[11px] text-gray-500 mt-1">{c.salesInvoice.invoiceNo}</span>
+                      )}
                     </td>
                     <td className="p-3 text-center space-x-2">
                       <button
