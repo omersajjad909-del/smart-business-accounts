@@ -5,6 +5,7 @@ import { setStoredDemoBusinessPreference } from "@/lib/auth";
 import BookingModal from "./BookingModal";
 import { DEMO_BUSINESSES, type DemoBusiness, type DemoBusinessId } from "@/lib/businessCatalog";
 import { DEMO_SESSION_LABEL, DEMO_SESSION_DURATION_TEXT } from "@/lib/demoSession";
+import { trackLead } from "@/lib/metaPixel";
 
 const FONT = "'Outfit','Inter',sans-serif";
 
@@ -196,6 +197,12 @@ export default function DemoPage() {
         setLaunching(null);
         return;
       }
+      // The conversion the ads are paying for. Fired only once the demo has
+      // actually started, so a failed launch is never counted as a lead. Does
+      // nothing unless the visitor allowed marketing cookies — see
+      // lib/metaPixel.ts.
+      trackLead({ content_name: biz.liveBusinessType, content_category: "demo" });
+
       window.location.href = "/dashboard";
     } catch {
       setLaunchError("Network error — please check your connection and try again.");

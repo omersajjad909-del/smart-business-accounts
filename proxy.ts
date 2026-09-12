@@ -119,6 +119,7 @@ function buildCsp(nonce: string): string {
     "https://www.googletagmanager.com",
     "https://static.cloudflareinsights.com",
     "https://www.clarity.ms",
+    "https://connect.facebook.net",
   ].join(" ");
 
   return [
@@ -127,7 +128,9 @@ function buildCsp(nonce: string): string {
     "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
     "font-src 'self' https://fonts.gstatic.com",
     "img-src 'self' data: blob: https:",
-    "connect-src 'self' https://ipapi.co https://www.googletagmanager.com https://static.cloudflareinsights.com https://cloudflareinsights.com https://www.google-analytics.com https://www.google.com https://*.sentry.io https://*.ingest.sentry.io https://*.ingest.us.sentry.io https://*.clarity.ms",
+    // www.facebook.com is where fbevents.js posts the event itself (/tr).
+    // Without it the script loads and every event is silently dropped.
+    "connect-src 'self' https://ipapi.co https://www.googletagmanager.com https://static.cloudflareinsights.com https://cloudflareinsights.com https://www.google-analytics.com https://www.google.com https://*.sentry.io https://*.ingest.sentry.io https://*.ingest.us.sentry.io https://*.clarity.ms https://connect.facebook.net https://www.facebook.com",
     "worker-src 'self' blob: https://www.clarity.ms",
     "child-src 'self' blob:",
     "frame-src 'self'",
