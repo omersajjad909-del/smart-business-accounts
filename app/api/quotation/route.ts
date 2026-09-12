@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 import { resolveCompanyId, resolveBranchId, resolveBranchIdOrDefault } from "@/lib/tenant";
+import { withReadableParties } from "@/lib/partyDecrypt";
 
 type _QuotationInput = {
   id?: string;
@@ -65,7 +66,7 @@ export async function GET(req: NextRequest) {
         },
       });
       if (!quotation) return NextResponse.json({ error: "Quotation not found" }, { status: 404 });
-      return NextResponse.json({ quotation });
+      return NextResponse.json(withReadableParties({ quotation }));
     }
 
     // Calculate next quotation number
@@ -96,10 +97,10 @@ export async function GET(req: NextRequest) {
       orderBy: { createdAt: "desc" },
     });
 
-    return NextResponse.json({
+    return NextResponse.json(withReadableParties({
       nextNo,
       quotations
-    });
+    }));
   } catch (_error) {
     return NextResponse.json({ error: "Failed to fetch quotations" }, { status: 500 });
   }
@@ -189,7 +190,7 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    return NextResponse.json({ quotation });
+    return NextResponse.json(withReadableParties({ quotation }));
   } catch (error: any) {
     console.error("Create Quotation Error:", error);
     return NextResponse.json({ error: error.message || "Failed to create quotation" }, { status: 400 });
@@ -251,7 +252,7 @@ export async function PUT(req: NextRequest) {
       });
     });
 
-    return NextResponse.json({ quotation: updated });
+    return NextResponse.json(withReadableParties({ quotation: updated }));
 
   } catch (error: any) {
     console.error("Update Quotation Error:", error);

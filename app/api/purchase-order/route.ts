@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { sanitizeLineMeta } from "@/lib/rateFormula";
 
 import { resolveCompanyId, resolveBranchId, resolveBranchIdOrDefault } from "@/lib/tenant";
+import { withReadableParties } from "@/lib/partyDecrypt";
 export async function POST(req: NextRequest) {
   const role = req.headers.get("x-user-role");
   if (role !== "ADMIN" && role !== "ACCOUNTANT") {
@@ -52,7 +53,7 @@ export async function POST(req: NextRequest) {
     },
   });
 
-  return NextResponse.json(po);
+  return NextResponse.json(withReadableParties(po));
 }
 
 export async function GET(req: NextRequest) {
@@ -113,7 +114,7 @@ export async function GET(req: NextRequest) {
     orderBy: { createdAt: "desc" },
   });
 
-  return NextResponse.json(pos);
+  return NextResponse.json(withReadableParties(pos));
 }
 
 // PUT - Update Purchase Order
@@ -182,7 +183,7 @@ export async function PUT(req: NextRequest) {
     return po;
   });
 
-  return NextResponse.json(result);
+  return NextResponse.json(withReadableParties(result));
 }
 
 // DELETE - Delete Purchase Order

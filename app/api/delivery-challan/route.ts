@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 import { resolveCompanyId, resolveBranchId, resolveBranchIdOrDefault } from "@/lib/tenant";
 import { writeDispatchStock } from "@/lib/challanStock";
+import { withReadableParties } from "@/lib/partyDecrypt";
 
 // VALIDATION SCHEMA
 const challanSchema = z.object({
@@ -57,7 +58,7 @@ export async function GET(req: NextRequest) {
         },
         orderBy: { date: "asc" },
       });
-      return NextResponse.json(many);
+      return NextResponse.json(withReadableParties(many));
     }
     if (id) {
       const challan = await prisma.deliveryChallan.findFirst({
@@ -72,7 +73,7 @@ export async function GET(req: NextRequest) {
         },
       });
       if (!challan) return NextResponse.json({ error: "Delivery Challan not found" }, { status: 404 });
-      return NextResponse.json(challan);
+      return NextResponse.json(withReadableParties(challan));
     }
 
     const challans = await prisma.deliveryChallan.findMany({
@@ -86,7 +87,7 @@ export async function GET(req: NextRequest) {
       orderBy: { createdAt: "desc" },
     });
 
-    return NextResponse.json(challans);
+    return NextResponse.json(withReadableParties(challans));
   } catch (_error) {
     return NextResponse.json({ error: "Failed to fetch delivery challans" }, { status: 500 });
   }
@@ -149,7 +150,7 @@ export async function POST(req: NextRequest) {
       await writeDispatchStock(prisma, companyId, data);
     }
 
-    return NextResponse.json(challan);
+    return NextResponse.json(withReadableParties(challan));
   } catch (error: any) {
     console.error("Create Delivery Challan Error:", error);
     return NextResponse.json({ error: error.message || "Failed to create delivery challan" }, { status: 400 });
@@ -226,7 +227,7 @@ export async function PUT(req: NextRequest) {
       await writeDispatchStock(prisma, companyId, data);
     }
 
-    return NextResponse.json(updated);
+    return NextResponse.json(withReadableParties(updated));
   } catch (error: any) {
     console.error("Update Delivery Challan Error:", error);
     return NextResponse.json({ error: error.message || "Failed to update delivery challan" }, { status: 400 });

@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { sanitizeLineMeta } from "@/lib/rateFormula";
 import { resolveCompanyId, resolveBranchId, resolveBranchIdOrDefault } from "@/lib/tenant";
 import { postCogsVoucher, type Db } from "@/lib/cogsPosting";
+import { withReadableParties } from "@/lib/partyDecrypt";
 type SaleReturn = Prisma.SaleReturnGetPayload<{
   select: {
     returnNo: true;
@@ -40,7 +41,7 @@ export async function GET(req: NextRequest) {
       orderBy: { date: "desc" },
     });
 
-    return NextResponse.json(returns);
+    return NextResponse.json(withReadableParties(returns));
   } catch (e: any) {
     console.error("Sale Return GET Error:", e);
     return NextResponse.json({ error: e.message }, { status: 500 });
@@ -266,7 +267,7 @@ export async function PUT(req: NextRequest) {
       return saleReturn;
     });
 
-    return NextResponse.json({ success: true, return: result });
+    return NextResponse.json(withReadableParties({ success: true, return: result }));
   } catch (e: any) {
     console.error("Sale Return PUT Error:", e);
     return NextResponse.json({ error: e.message }, { status: 500 });
