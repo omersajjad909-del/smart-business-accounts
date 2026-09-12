@@ -11,6 +11,7 @@ import { ensureOpenPeriod } from "@/lib/financialLock";
 import { requireActiveSubscription } from "@/lib/subscriptionGuard";
 import { logAuditFromReq } from "@/lib/auditLogger";
 import { postCogsVoucher, removeCogsVoucher, type Db } from "@/lib/cogsPosting";
+import { isFbrEditLocked, FBR_EDIT_LOCK_HOURS } from "@/lib/fbrEInvoice";
 
 // Quantities are weights now, not counts: a kilogram invoice can ask for
 // 0.1 + 0.2 of what a 0.3 receipt put into stock, and in binary floating point
@@ -432,6 +433,13 @@ export async function PUT(req: NextRequest) {
       return NextResponse.json({ error: "Invoice not found" }, { status: 404 });
     }
 
+    if (isFbrEditLocked(existing)) {
+      return NextResponse.json(
+        { error: `This invoice was filed with FBR more than ${FBR_EDIT_LOCK_HOURS} hours ago and can no longer be edited.` },
+        { status: 403 }
+      );
+    }
+
     const subtotal = items.reduce((s: number, i: any) => s + i.qty * i.rate, 0);
     const discountAmt = discountType === "percent" ? subtotal * Number(discount) / 100 : Number(discount);
     const itemsTax = items.reduce((s: number, i: any) => {
@@ -634,6 +642,13 @@ export async function DELETE(req: NextRequest) {
     });
     if (!existing) {
       return NextResponse.json({ error: "Invoice not found" }, { status: 404 });
+    }
+
+    if (isFbrEditLocked(existing)) {
+      return NextResponse.json(
+        { error: `This invoice was filed with FBR more than ${FBR_EDIT_LOCK_HOURS} hours ago and can no longer be cancelled.` },
+        { status: 403 }
+      );
     }
 
     await prisma.$transaction(async (tx: TxClient) => {

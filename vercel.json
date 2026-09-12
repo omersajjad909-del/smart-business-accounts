@@ -9,6 +9,10 @@
     {
       "path": "/api/cron/demo-cleanup",
       "schedule": "30 2 * * *"
+    },
+    {
+      "path": "/api/cron/fbr-retry",
+      "schedule": "0 * * * *"
     }
   ]
 }
