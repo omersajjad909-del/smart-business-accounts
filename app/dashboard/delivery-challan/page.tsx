@@ -471,13 +471,14 @@ export default function DeliveryChallanPage() {
         setCustomerName(customers.find(c => c.id === customerId)?.name || customerName);
       }
       
+      // Straight to the print preview, whether this was a new challan or an
+      // update. An update used to hide the form and open the list instead, so
+      // the one thing the button promises — a challan to print — never
+      // appeared. The editing record is deliberately left set: the preview's
+      // Edit button then comes back to this same challan rather than starting
+      // a copy of it.
       setPreview(true);
       await loadChallans();
-      if (editing) {
-        setEditing(null);
-        setShowForm(false);
-        setShowList(true);
-      }
       toast.success("Delivery Challan saved successfully!");
     } catch (e: any) {
       toast.error("Saving failed: " + (e.message || "Unknown error"));

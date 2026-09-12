@@ -2,7 +2,7 @@
 import { fmtDate } from "@/lib/dateUtils";
 import { DateInput } from "@/app/dashboard/reports/_components/DateInput";
 import { confirmToast } from "@/lib/toast-feedback";
-import { Suspense, useCallback, useEffect, useMemo, useState } from "react";
+import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import toast from "react-hot-toast";
 import dynamic from "next/dynamic";
@@ -103,6 +103,12 @@ function SalesInvoiceContent() {
   const searchParams = useSearchParams();
   const queryId = searchParams.get("id");
   const fromChallans = searchParams.get("fromChallans");
+  // getCurrentUser() re-reads and re-parses sessionStorage on every render, so
+  // it hands back a fresh object each time. An effect that depends on it never
+  // settles: it runs, sets state, re-renders, sees a "new" user and runs
+  // again. These two primitives are what the effects below actually need.
+  const userId = user?.id || "";
+  const userRole = user?.role || "";
   const today = new Date().toISOString().slice(0, 10);
   const user = getCurrentUser();
   const canCreate = hasPermission(user, PERMISSIONS.CREATE_SALES_INVOICE);
@@ -284,10 +290,16 @@ function SalesInvoiceContent() {
   }, []);
 
   // ── Pre-fill from delivery challans ──
+  // Once per set of challans. The ref is belt and braces next to the stable
+  // deps: a challan list is pulled into a half-typed invoice exactly once, so
+  // a re-render can never overwrite edits already made to the lines.
+  const loadedChallansRef = useRef<string | null>(null);
   useEffect(() => {
-    if (!fromChallans || !user) return;
+    if (!fromChallans || !userId) return;
+    if (loadedChallansRef.current === fromChallans) return;
+    loadedChallansRef.current = fromChallans;
     fetch(`/api/delivery-challan?ids=${fromChallans}`, {
-      headers: { "x-user-role": user.role || "", "x-user-id": user.id || "" },
+      headers: { "x-user-role": userRole, "x-user-id": userId },
     })
       .then(r => r.json())
       .then((list: any[]) => {
@@ -331,15 +343,15 @@ function SalesInvoiceContent() {
         toast.success(`${list.length} challan${list.length > 1 ? "s" : ""} loaded`);
       })
       .catch(() => toast.error("Those challans could not be loaded."));
-  }, [fromChallans, user]);
+  }, [fromChallans, userId, userRole]);
 
   useEffect(() => {
-    if (!queryId || !user) return;
-    fetch(`/api/sales-invoice?id=${queryId}`, { headers: { "x-user-role": user.role || "", "x-user-id": user.id || "" } })
+    if (!queryId || !userId) return;
+    fetch(`/api/sales-invoice?id=${queryId}`, { headers: { "x-user-role": userRole, "x-user-id": userId } })
       .then(r => r.json()).then(inv => {
         if (inv && !inv.error) { setSavedInvoice(inv); setInvoiceNo(inv.invoiceNo || invoiceNo); setCustomerName(inv.customer?.name || ""); setPreview(true); setShowForm(true); setShowList(false); }
       }).catch(() => {});
-  }, [queryId, user]);
+  }, [queryId, userId, userRole]);
 
   // ── Query Mode helpers ───────────────────────────────────────────────────────
   function siEnterQuery() { setSiQueryMode(true); setSiQueryInvNo(""); setSiQueryDate(""); setSiQueryParty(""); setSiQueryResults([]); setSiQueryIdx(-1); }
