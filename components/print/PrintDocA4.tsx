@@ -189,6 +189,7 @@ export function PrintDocA4({
   const gridStyle = layout?.grid ?? (theme.zebra ? "zebra" : "ruled");
   const totalsStyle = layout?.totals ?? (theme.netFill ? "bar" : "right");
   const signatureStyle = layout?.signatures ?? "three";
+  const footerStyle = layout?.footer ?? "centered";
   const banded = headerStyle === "band";
   const cellPad = layout?.density === "tight" ? "1.5px 4px" : theme.cellPad;
 
@@ -617,17 +618,39 @@ export function PrintDocA4({
             </table>
           </div>
 
-          {amountInWords && on("amountInWords") && (
-            <div style={{ fontSize: 8.5, lineHeight: 1.5, marginBottom: 12 }}>
-              <span className="pdoc-label" style={{ fontWeight: 700 }}>Amount: </span>{amountInWords}
-            </div>
-          )}
+          {/* ── How the sheet closes ───────────────────────────────
+              The amount spelled out and the terms are the bulk of the foot, so
+              grouping them is what makes one design's bottom third read
+              differently from another's. "boxed" rules them together the way a
+              formal invoice closes; "quiet" gives them no furniture at all. */}
+          {(() => {
+            const amountEl = amountInWords && on("amountInWords") ? (
+              <div style={{ fontSize: footerStyle === "quiet" ? 8 : 8.5, lineHeight: 1.5 }}>
+                <span className="pdoc-label" style={{ fontWeight: 700 }}>Amount: </span>{amountInWords}
+              </div>
+            ) : null;
+            const termsEl = terms && on("terms") ? (
+              <div style={{ fontSize: 8.5, lineHeight: 1.5, whiteSpace: "pre-wrap" }}>
+                <span className="pdoc-label" style={{ fontWeight: 700 }}>Terms: </span>{terms}
+              </div>
+            ) : null;
+            if (!amountEl && !termsEl) return null;
 
-          {terms && on("terms") && (
-            <div style={{ fontSize: 8.5, lineHeight: 1.5, whiteSpace: "pre-wrap", marginBottom: 12 }}>
-              <span className="pdoc-label" style={{ fontWeight: 700 }}>Terms: </span>{terms}
-            </div>
-          )}
+            if (footerStyle === "boxed") {
+              return (
+                <div style={{ border: RULE, borderRadius: theme.radius, padding: "6px 9px", marginBottom: 12, display: "flex", flexDirection: "column", gap: 4 }}>
+                  {amountEl}
+                  {termsEl}
+                </div>
+              );
+            }
+            return (
+              <div style={{ display: "flex", flexDirection: "column", gap: footerStyle === "quiet" ? 3 : 8, marginBottom: 12 }}>
+                {amountEl}
+                {termsEl}
+              </div>
+            );
+          })()}
 
           {/* How many lines get signed, and where. Three across is the goods
               document — issued, checked, received. A quotation nobody signs on
@@ -649,23 +672,68 @@ export function PrintDocA4({
             );
           })()}
 
-          {footerNote && on("footerNote") && (
-            <div className="pdoc-label" style={{ textAlign: "center", fontSize: 8.5, marginTop: 14, fontStyle: "italic" }}>{footerNote}</div>
-          )}
+          {/* The note and the mark. Every document this system prints says
+              where it came from; the app-wide print footer stands down when
+              this line is on the page (see app/globals.css) so it is never
+              printed twice — which is why the mark renders in all five
+              arrangements and only its setting changes. */}
+          {(() => {
+            const note = footerNote && on("footerNote") ? footerNote : "";
+            const mark = (
+              <span
+                className="pdoc-powered"
+                style={theme.poweredChip
+                  ? { display: "inline-block", background: theme.ink, color: "#fff", fontSize: 8, letterSpacing: 0.4, padding: "3px 12px", borderRadius: theme.radius }
+                  : { fontSize: 8.5, letterSpacing: 0.4 }}
+              >
+                Powered by <b>FinovaOS</b>
+              </span>
+            );
 
-          {/* Every document this system prints says where it came from. The
-              app-wide print footer stands down when this line is on the page
-              (see app/globals.css) so it is never printed twice. */}
-          <div style={{ textAlign: "center", marginTop: 6 }}>
-            <span
-              className="pdoc-powered"
-              style={theme.poweredChip
-                ? { display: "inline-block", background: theme.ink, color: "#fff", fontSize: 8, letterSpacing: 0.4, padding: "3px 12px", borderRadius: theme.radius }
-                : { fontSize: 8.5, letterSpacing: 0.4 }}
-            >
-              Powered by <b>FinovaOS</b>
-            </span>
-          </div>
+            if (footerStyle === "band") {
+              return (
+                <div
+                  className="pdoc-band"
+                  style={{
+                    marginTop: 14, background: theme.bandBg, color: theme.bandInk,
+                    padding: "5px 10px", borderRadius: theme.radius,
+                    display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12,
+                  }}
+                >
+                  <span style={{ fontSize: 8.5, fontStyle: "italic" }}>{note}</span>
+                  <span style={{ fontSize: 8, letterSpacing: 0.4, opacity: 0.9 }}>Powered by <b>FinovaOS</b></span>
+                </div>
+              );
+            }
+
+            if (footerStyle === "split") {
+              return (
+                <div style={{ marginTop: 12, borderTop: RULE, paddingTop: 5, display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12 }}>
+                  <span className="pdoc-label" style={{ fontSize: 8.5, fontStyle: "italic" }}>{note}</span>
+                  {mark}
+                </div>
+              );
+            }
+
+            if (footerStyle === "quiet") {
+              return (
+                <div style={{ marginTop: 12, display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 12 }}>
+                  <span className="pdoc-label" style={{ fontSize: 8 }}>{note}</span>
+                  {mark}
+                </div>
+              );
+            }
+
+            // "centered" and "boxed" both close the sheet down the middle.
+            return (
+              <>
+                {note && (
+                  <div className="pdoc-label" style={{ textAlign: "center", fontSize: 8.5, marginTop: 14, fontStyle: "italic" }}>{note}</div>
+                )}
+                <div style={{ textAlign: "center", marginTop: 6 }}>{mark}</div>
+              </>
+            );
+          })()}
         </div>
       </div>
     </div>

@@ -548,12 +548,45 @@ function DesignThumb({ design }: { design: string }) {
         )}
       </div>
 
+      {/* amount in words + terms */}
+      {d.footer === "boxed" ? (
+        <div style={{ border: `1px solid ${line}`, borderRadius: 2, padding: 2, display: "flex", flexDirection: "column", gap: 1.5 }}>
+          {bar("74%", 1.5)}{bar("58%", 1.5)}
+        </div>
+      ) : d.footer === "quiet" ? (
+        <div style={{ display: "flex", flexDirection: "column", gap: 1.5 }}>{bar("52%", 1.5)}</div>
+      ) : (
+        <div style={{ display: "flex", flexDirection: "column", gap: 1.5 }}>{bar("74%", 1.5)}{bar("58%", 1.5)}</div>
+      )}
+
       {/* signatures */}
       <div style={{ display: "flex", justifyContent: d.signatures === "three" ? "space-between" : "flex-end", gap: 5 }}>
         {Array.from({ length: d.signatures === "three" ? 3 : d.signatures === "two_right" ? 2 : 1 }).map((_, i) => (
           <div key={i} style={{ width: d.signatures === "three" ? "30%" : "26%", borderTop: `1px solid ${solid}`, height: 0 }} />
         ))}
       </div>
+
+      {/* how the sheet closes */}
+      {d.footer === "band" && (
+        <div style={{ margin: -7, marginTop: 2, padding: "3px 7px", background: "#334155", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          {bar("34%", 2, "#e2e8f0")}{bar("20%", 2, "#94a3b8")}
+        </div>
+      )}
+      {d.footer === "split" && (
+        <div style={{ borderTop: `1px solid ${line}`, paddingTop: 2, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          {bar("34%", 2)}{bar("20%", 2)}
+        </div>
+      )}
+      {d.footer === "quiet" && (
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          {bar("26%", 2)}{bar("20%", 2)}
+        </div>
+      )}
+      {(d.footer === "centered" || d.footer === "boxed") && (
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 1.5 }}>
+          {bar("40%", 2)}{bar("24%", 2)}
+        </div>
+      )}
     </div>
   );
 }
