@@ -283,7 +283,7 @@ export default function ItemsNewPage() {
                 <option value="PAIR">Pair</option>
                 <option value="SET">Set</option>
                 <option value="BOX">Box</option>
-                <option value="PACK">Pack</option>
+                <option value="PACK">Packing</option>
                 <option value="CTN">Carton</option>
                 <option value="BAG">Bag</option>
                 <option value="ROLL">Roll</option>
