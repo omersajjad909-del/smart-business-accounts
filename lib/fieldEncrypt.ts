@@ -80,7 +80,7 @@ export function isEncrypted(value: string | null | undefined): boolean {
  */
 export function encryptFields<T extends Record<string, any>>(
   obj: T,
-  fields: (keyof T)[],
+  fields: readonly (keyof T)[],
 ): T {
   const result = { ...obj };
   for (const field of fields) {
@@ -97,7 +97,7 @@ export function encryptFields<T extends Record<string, any>>(
  */
 export function decryptFields<T extends Record<string, any>>(
   obj: T,
-  fields: (keyof T)[],
+  fields: readonly (keyof T)[],
 ): T {
   const result = { ...obj };
   for (const field of fields) {
@@ -144,7 +144,7 @@ export function safeDecryptField(value: string | null | undefined): string {
 /** Safe bulk encrypt — same as encryptFields but never throws */
 export function safeEncryptFields<T extends Record<string, any>>(
   obj: T,
-  fields: (keyof T)[],
+  fields: readonly (keyof T)[],
 ): T {
   const result = { ...obj };
   for (const field of fields) {
@@ -158,7 +158,7 @@ export function safeEncryptFields<T extends Record<string, any>>(
 /** Safe bulk decrypt — same as decryptFields but never throws */
 export function safeDecryptFields<T extends Record<string, any>>(
   obj: T,
-  fields: (keyof T)[],
+  fields: readonly (keyof T)[],
 ): T {
   const result = { ...obj };
   for (const field of fields) {
