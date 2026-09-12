@@ -103,14 +103,14 @@ function SalesInvoiceContent() {
   const searchParams = useSearchParams();
   const queryId = searchParams.get("id");
   const fromChallans = searchParams.get("fromChallans");
+  const today = new Date().toISOString().slice(0, 10);
+  const user = getCurrentUser();
   // getCurrentUser() re-reads and re-parses sessionStorage on every render, so
   // it hands back a fresh object each time. An effect that depends on it never
   // settles: it runs, sets state, re-renders, sees a "new" user and runs
   // again. These two primitives are what the effects below actually need.
   const userId = user?.id || "";
   const userRole = user?.role || "";
-  const today = new Date().toISOString().slice(0, 10);
-  const user = getCurrentUser();
   const canCreate = hasPermission(user, PERMISSIONS.CREATE_SALES_INVOICE);
 
   // ── Data ──
