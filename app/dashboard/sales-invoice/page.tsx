@@ -665,8 +665,16 @@ function SalesInvoiceContent() {
   }
 
   /** The print areas only exist in preview, so printing before it prints blank paper. */
-  function doPrint(mode: "a4" | "55mm") {
+  /**
+   * One saved invoice, two faces. The goods travel on the challan face — same
+   * items and quantities, no rates, no total, signed for on receipt — and the
+   * bill follows separately on the invoice face. Nothing is written either
+   * way: this only decides which face the preview and the printer show, so
+   * the stock and the ledger are untouched by printing.
+   */
+  function doPrint(mode: "a4" | "55mm", as: "INVOICE" | "DELIVERY" = previewMode) {
     if (!preview) { toast.error("Save the invoice first — printing works from the preview."); return; }
+    setPreviewMode(as);
     setPrintMode(mode);
     setTimeout(() => window.print(), 100);
   }
@@ -886,7 +894,7 @@ function SalesInvoiceContent() {
     logoUrl: printPrefs.logoUrl,
     // The look the company chose in Admin -> Print & Branding.
     template: printPrefs.invoiceTemplate,
-    docTitle: previewMode === "DELIVERY" ? "DELIVERY NOTE" : "SALES INVOICE",
+    docTitle: previewMode === "DELIVERY" ? "DELIVERY CHALLAN" : "SALES INVOICE",
     docNo: invNo,
     date: fmtDate(invDate),
     status: paymentTerms || paymentMethod || undefined,
@@ -1000,7 +1008,9 @@ function SalesInvoiceContent() {
     notes: savedInvoice?.notes || notes,
     terms: savedInvoice?.termsConditions || undefined,
     footerNote: printPrefs.footerNote || undefined,
-    signatureLabels: ["Prepared By", "Checked By", "Approved By"],
+    signatureLabels: previewMode === "DELIVERY"
+      ? ["Received By", "Delivered By"]
+      : ["Prepared By", "Checked By", "Approved By"],
   };
 
   return (
@@ -1051,7 +1061,18 @@ function SalesInvoiceContent() {
                 <button onClick={siExitQuery} style={{ padding: "4px 10px", borderRadius: 6, background: "rgba(248,113,113,.08)", border: "1px solid rgba(248,113,113,.2)", color: "#f87171", fontSize: 11, cursor: "pointer", fontFamily: ff }}>✕</button>
               </div>
             )}
-            {/* ── Print ▾ — A4 or the 55mm short slip ── */}
+            {/* Which face the preview is showing. Only a view — the invoice
+                itself is the same record either way. */}
+            {preview && previewMode === "DELIVERY" && (
+              <div style={{ display: "flex", alignItems: "center", gap: 8, background: "rgba(59,130,246,.08)", border: "1px solid rgba(59,130,246,.3)", borderRadius: 8, padding: "6px 12px", fontSize: 12 }}>
+                <span style={{ color: "var(--text-muted)" }}>Showing delivery challan — no rates</span>
+                <button onClick={() => setPreviewMode("INVOICE")} style={{ background: "none", border: "none", color: "#3b82f6", fontFamily: ff, fontSize: 12, fontWeight: 700, cursor: "pointer", padding: 0 }}>
+                  Show invoice
+                </button>
+              </div>
+            )}
+
+            {/* ── Print ▾ — invoice or challan, A4 or the 55mm short slip ── */}
             <div style={{ position: "relative" }}>
               <button style={btnGhost} onClick={() => { setSendMenu(false); setPrintMenu(o => !o); }}>
                 🖨️ Print <span style={{ fontSize: 10, opacity: .7, marginLeft: 4 }}>▾</span>
@@ -1060,11 +1081,18 @@ function SalesInvoiceContent() {
                 <>
                   <div onClick={() => setPrintMenu(false)} style={{ position: "fixed", inset: 0, zIndex: 49 }} />
                   <div style={{ ...menuPanel, left: 0 }}>
-                    <button style={menuItem} onClick={() => { setPrintMenu(false); doPrint("a4"); }}>
-                      <span style={{ fontSize: 15, minWidth: 20 }}>🖨️</span>A4
+                    <button style={menuItem} onClick={() => { setPrintMenu(false); doPrint("a4", "INVOICE"); }}>
+                      <span style={{ fontSize: 15, minWidth: 20 }}>🖨️</span>Invoice — A4
                     </button>
-                    <button style={menuItem} onClick={() => { setPrintMenu(false); doPrint("55mm"); }}>
+                    <button style={menuItem} onClick={() => { setPrintMenu(false); doPrint("55mm", "INVOICE"); }}>
                       <span style={{ fontSize: 15, minWidth: 20 }}>🧾</span>55mm (Short)
+                    </button>
+                    <div style={{ height: 1, background: "var(--border)", margin: "4px 0" }} />
+                    <button style={menuItem} onClick={() => { setPrintMenu(false); doPrint("a4", "DELIVERY"); }}>
+                      <span style={{ fontSize: 15, minWidth: 20 }}>📄</span>Delivery Challan — A4
+                    </button>
+                    <button style={menuItem} onClick={() => { setPrintMenu(false); doPrint("55mm", "DELIVERY"); }}>
+                      <span style={{ fontSize: 15, minWidth: 20 }}>📄</span>Delivery Challan — 55mm
                     </button>
                   </div>
                 </>
@@ -1073,8 +1101,8 @@ function SalesInvoiceContent() {
 
             {/* ── Delivery Challan — the same goods, on their way out ── */}
             {savedInvoice?.id && (
-              <button style={btnGhost} onClick={makeDeliveryChallan} title="Create a delivery challan for this invoice">
-                🚚 Delivery Challan
+              <button style={btnGhost} onClick={makeDeliveryChallan} title="Write a separate delivery challan record against this invoice — for goods tracked out on their own document. To simply print this invoice as a challan, use Print ▾ instead.">
+                🚚 Challan Record
               </button>
             )}
 
@@ -1659,7 +1687,7 @@ function SalesInvoiceContent() {
       {preview && printMode === "55mm" && (
         <div className="print-area" style={{ fontFamily: "'Courier New',monospace", fontSize: 11, color: "#000", background: "#fff", width: "55mm", margin: "0 auto", padding: "3mm" }}>
           <div style={{ textAlign: "center", borderBottom: "2px solid #000", paddingBottom: 8, marginBottom: 8 }}>
-            <div style={{ fontSize: 15, fontWeight: 900 }}>{previewMode === "DELIVERY" ? "DELIVERY NOTE" : "RECEIPT"}</div>
+            <div style={{ fontSize: 15, fontWeight: 900 }}>{previewMode === "DELIVERY" ? "DELIVERY CHALLAN" : "RECEIPT"}</div>
             <div style={{ fontSize: 11, fontWeight: 700 }}>{companyInfo?.name || ""}</div>
             {companyInfo?.phone && <div style={{ fontSize: 9 }}>{companyInfo.phone}</div>}
           </div>
