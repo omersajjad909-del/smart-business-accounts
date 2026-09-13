@@ -849,12 +849,15 @@ export async function completeProductionRun(opts: {
     // before, so every BOM/order that predates this feature still posts
     // identically.
     let labourCreditLines: { companyId: string; accountId: string; amount: number }[];
+    // Hoisted: the per-worker earnings records written further down need the
+    // same names, and reading them twice would be two answers to one question.
+    let labourById = new Map<string, { id: string; title: string; data: unknown }>();
     if (namedAssignments.length) {
       const labourRecords = await tx.businessRecord.findMany({
         where: { id: { in: namedAssignments.map((a) => a.labourId) }, companyId, category: "labour" },
         select: { id: true, title: true, data: true },
       });
-      const labourById = new Map(labourRecords.map((r) => [r.id, r]));
+      labourById = new Map(labourRecords.map((r) => [r.id, r]));
       labourCreditLines = [];
       for (const a of namedAssignments) {
         const record = labourById.get(a.labourId);
@@ -950,6 +953,46 @@ export async function completeProductionRun(opts: {
           },
         },
       });
+    }
+
+    /* ── 3b. What each worker earned on this run ──
+       
+       One record per worker per run, so the labour report can be built from
+       facts rather than reconstructed. The ledger already carries the money —
+       but all four credits ride one voucher, and VoucherEntry has no narration
+       of its own, so the ledger cannot say which of them was for cutting and
+       which for packing. And `lastRunLabour` on the order keeps only the last
+       run, which answers nothing about the month.
+       
+       Written inside the same transaction as the posting: an entry that exists
+       without its voucher, or the other way round, is a report that disagrees
+       with the books. */
+    if (namedAssignments.length) {
+      for (const a of namedAssignments) {
+        const worker = labourById.get(a.labourId);
+        await tx.businessRecord.create({
+          data: {
+            companyId,
+            branchId,
+            category: "labour_entry",
+            title: worker?.title || "Labour",
+            status: "posted",
+            refId: order.id,
+            date,
+            amount: round2(a.qty * a.rate),
+            data: {
+              labourId: a.labourId,
+              labourName: worker?.title || "",
+              operation: String(a.operation || "").trim(),
+              qty: a.qty,
+              rate: a.rate,
+              productionOrderId: orderLabel,
+              product: finishedItem.name,
+              voucherNo: issueVoucherNo,
+            },
+          },
+        });
+      }
     }
 
     // ── 4. Finished goods batch ──
