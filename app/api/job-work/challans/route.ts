@@ -1,6 +1,8 @@
 /**
  * GET  /api/job-work/challans        — list issue challans (?status=open|partial|closed, ?workerId=)
  * POST /api/job-work/challans        — issue material to a thekedar
+ * PATCH  ?id=…                      — change what it issued
+ * DELETE ?id=…                      — cancel it, material comes home
  *
  * The issue is not a sale and posts nothing to the worker's account. See the
  * module header in lib/jobWork.ts for why.
@@ -9,6 +11,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { resolveCompanyId, resolveBranchIdOrDefault } from "@/lib/tenant";
+import { amendChallan, cancelChallan } from "@/lib/jobWorkAmend";
 import {
   assertJobWorkEnabled,
   issueToJobWorker,
@@ -93,5 +96,86 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ success: true, ...result });
   } catch (e) {
     return fail(e, "Failed to issue material");
+  }
+}
+
+/**
+ * PATCH /api/job-work/challans?id=…  — change what a challan issued
+ *
+ * Only the difference in each line moves: cut the rolls and the balance comes
+ * home, raise them and more goes out. See lib/jobWorkAmend.ts.
+ */
+export async function PATCH(req: NextRequest) {
+  try {
+    const companyId = await resolveCompanyId(req);
+    if (!companyId) return NextResponse.json({ error: "Company required" }, { status: 400 });
+    await assertJobWorkEnabled(companyId);
+
+    const role = String(req.headers.get("x-user-role") || "").trim().toUpperCase();
+    if (!WRITE_ROLES.has(role)) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+
+    const challanId = new URL(req.url).searchParams.get("id") || "";
+    if (!challanId) return NextResponse.json({ error: "Challan id required" }, { status: 400 });
+
+    const branchId = await resolveBranchIdOrDefault(req, companyId);
+    const body = await req.json().catch(() => null);
+    if (!body) return NextResponse.json({ error: "Invalid request body" }, { status: 400 });
+
+    const result = await amendChallan({
+      companyId,
+      branchId,
+      challanId,
+      lines: Array.isArray(body.lines)
+        ? body.lines.map((l: { itemId?: unknown; qty?: unknown; standardPerPc?: unknown }) => ({
+            itemId: String(l?.itemId || ""),
+            qty: Number(l?.qty),
+            standardPerPc: Number(l?.standardPerPc),
+          }))
+        : [],
+      expectedQty: Number(body.expectedQty),
+      ratePerPc: Number(body.ratePerPc),
+      allowedWastagePct: Number(body.allowedWastagePct),
+      notes: body.notes != null ? String(body.notes) : undefined,
+      date: body.date,
+      allowNegativeStock: body.allowNegativeStock === true,
+    });
+
+    return NextResponse.json({ success: true, ...result });
+  } catch (e) {
+    return fail(e, "Failed to edit the challan");
+  }
+}
+
+/**
+ * DELETE /api/job-work/challans?id=…  — cancel a challan
+ *
+ * A reversal, not a deletion: the material comes back, the value goes back to
+ * Inventory, and the document is kept marked `cancelled`. Erasing it would
+ * strand the stock at the worker and leave a voucher with nothing behind it.
+ */
+export async function DELETE(req: NextRequest) {
+  try {
+    const companyId = await resolveCompanyId(req);
+    if (!companyId) return NextResponse.json({ error: "Company required" }, { status: 400 });
+    await assertJobWorkEnabled(companyId);
+
+    const role = String(req.headers.get("x-user-role") || "").trim().toUpperCase();
+    if (!WRITE_ROLES.has(role)) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+
+    const { searchParams } = new URL(req.url);
+    const challanId = searchParams.get("id") || "";
+    if (!challanId) return NextResponse.json({ error: "Challan id required" }, { status: 400 });
+
+    const branchId = await resolveBranchIdOrDefault(req, companyId);
+    const result = await cancelChallan({
+      companyId,
+      branchId,
+      challanId,
+      reason: searchParams.get("reason") || "",
+    });
+
+    return NextResponse.json({ success: true, ...result });
+  } catch (e) {
+    return fail(e, "Failed to cancel the challan");
   }
 }

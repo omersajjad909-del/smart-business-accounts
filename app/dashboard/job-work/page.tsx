@@ -214,6 +214,13 @@ function JobWorkInner() {
       consumables: readConsumables(params.get("consumables")),
     };
   }, [params]);
+  /* A seed is spent once a challan is raised from it. The URL still carries
+     it — the operator may well press Back — but the form must not, or the same
+     material gets issued twice from figures that already went out. Bumping the
+     key remounts the tab, which is how every box in it returns to empty
+     without each one having to remember to. */
+  const [seedUsed, setSeedUsed] = useState(false);
+  const [seedKey, setSeedKey] = useState(0);
   const [status, setStatus] = useState<Status | null>(null);
   const [tab, setTab] = useState<"issue" | "receive" | "ledger" | "workers">("issue");
   const [workers, setWorkers] = useState<Worker[]>([]);
@@ -367,8 +374,12 @@ function JobWorkInner() {
       )}
       {tab === "issue" && (
         <IssueTab
+          // Remounts the tab, so every box inside it goes back to its initial
+          // state rather than each one having to remember to clear itself.
+          key={seedKey}
           onGoToWorkers={() => setTab("workers")}
-          seed={formulaSeed}
+          seed={seedUsed ? null : formulaSeed}
+          onSeedUsed={() => { setSeedUsed(true); setSeedKey((k) => k + 1); }}
           workers={workers}
           items={items}
           challans={challans}
@@ -517,6 +528,16 @@ async function post(url: string, body: unknown, method = "POST") {
   return j;
 }
 
+const patch = (url: string, body: unknown) => post(url, body, "PATCH");
+
+/** DELETE carries its arguments in the query string, so it sends no body. */
+async function del(url: string) {
+  const r = await fetch(url, { method: "DELETE" });
+  const j = await r.json().catch(() => ({}));
+  if (!r.ok) throw new Error(j?.error || `Request failed (${r.status})`);
+  return j;
+}
+
 /* ─────────────────────────── Thekedars ─────────────────────────── */
 
 function WorkersTab({ workers, setBusy, busy, setMsg, refresh }: Setter & { workers: Worker[] }) {
@@ -641,12 +662,15 @@ function IssueTab({
   refresh,
   onGoToWorkers,
   seed,
+  onSeedUsed,
 }: Setter & {
   workers: Worker[];
   items: Item[];
   challans: Challan[];
   onGoToWorkers: () => void;
   seed: FormulaSeed | null;
+  /** Clears the costing seed once a challan has been raised from it. */
+  onSeedUsed: () => void;
 }) {
   const [workerId, setWorkerId] = useState("");
   const [finishedItemId, setFinishedItemId] = useState("");
@@ -711,12 +735,98 @@ function IssueTab({
   const raw = items.filter((i) => i.category === "RAW_MATERIAL" || i.category === "TRADING");
   const finished = items.filter((i) => i.category === "FINISHED" || i.category === "TRADING");
 
+  /* Editing an existing challan rather than raising a new one.
+     The worker and the warehouse are not editable: the material is already
+     standing at that worker's location, and moving it somewhere else is a
+     different document, not an edit to this one. */
+  const [editing, setEditing] = useState<{ id: string; challanNo: string } | null>(null);
+
+  const startEdit = (c: Challan) => {
+    setEditing({ id: c.id, challanNo: c.challanNo });
+    setExpectedQty(c.expectedQty ? String(c.expectedQty) : "");
+    setRatePerPc(c.ratePerPc ? String(c.ratePerPc) : "");
+    setAllowedWastagePct(c.allowedWastagePct ? String(c.allowedWastagePct) : "");
+    setFinishedItemId(c.finishedItemId || "");
+    setSourceLocation(c.sourceLocation || "MAIN");
+    setLines(
+      c.lines.map((l) => ({
+        itemId: l.itemId,
+        qty: String(l.issuedQty),
+        standardPerPc: l.standardPerPc ? String(l.standardPerPc) : "",
+        // Typed by whoever raised it; the piece count must not rewrite it now.
+        autoQty: false,
+        note: `${l.itemName} — issued ${l.issuedQty}${l.unit}`,
+      })),
+    );
+    setMsg(null);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const leaveEdit = () => {
+    setEditing(null);
+    setLines([{ itemId: "", qty: "", standardPerPc: "", autoQty: false }]);
+    setExpectedQty(""); setRatePerPc(""); setAllowedWastagePct("");
+    setFinishedItemId(""); setNotes("");
+    setMsg(null);
+  };
+
+  const cancelChallan = async (c: Challan) => {
+    if (!confirm(
+      `Cancel ${c.challanNo}?\n\n` +
+      `Every material line comes back from ${c.workerName} into ${c.sourceLocation}, ` +
+      `and the ledger entry is reversed. The challan is kept, marked cancelled.`,
+    )) return;
+    const reason = window.prompt("Why is it being cancelled? (optional)", "") ?? "";
+    setBusy(true);
+    try {
+      const r = await del(`/api/job-work/challans?id=${encodeURIComponent(c.id)}&reason=${encodeURIComponent(reason)}`);
+      setMsg({
+        kind: "ok",
+        text: `${r.challanNo} cancelled — Rs ${money(r.returnedValue)} of material returned to ${c.sourceLocation}. Voucher ${r.voucherNo || "—"}.`,
+      });
+      if (editing?.id === c.id) leaveEdit();
+      await refresh();
+    } catch (e) {
+      setMsg({ kind: "err", text: (e as Error).message });
+    } finally {
+      setBusy(false);
+    }
+  };
+
   const submit = async () => {
     const payload = lines
       .map((l) => ({ itemId: l.itemId, qty: Number(l.qty), standardPerPc: Number(l.standardPerPc) }))
       .filter((l) => l.itemId && l.qty > 0);
-    if (!workerId) return setMsg({ kind: "err", text: "Select a job worker" });
+    if (!editing && !workerId) return setMsg({ kind: "err", text: "Select a job worker" });
     if (!payload.length) return setMsg({ kind: "err", text: "At least one material line is required" });
+
+    if (editing) {
+      setBusy(true);
+      try {
+        const r = await patch(`/api/job-work/challans?id=${encodeURIComponent(editing.id)}`, {
+          lines: payload,
+          expectedQty: Number(expectedQty) || 0,
+          ratePerPc: Number(ratePerPc) || 0,
+          allowedWastagePct: Number(allowedWastagePct) || 0,
+          notes,
+        });
+        setMsg({
+          kind: "ok",
+          text: r.netValue < 0
+            ? `${r.challanNo} updated — Rs ${money(-r.netValue)} of material came back to ${sourceLocation}. Voucher ${r.voucherNo || "—"}.`
+            : r.netValue > 0
+              ? `${r.challanNo} updated — Rs ${money(r.netValue)} more material sent out. Voucher ${r.voucherNo || "—"}.`
+              : `${r.challanNo} updated — no material moved.`,
+        });
+        leaveEdit();
+        await refresh();
+      } catch (e) {
+        setMsg({ kind: "err", text: (e as Error).message });
+      } finally {
+        setBusy(false);
+      }
+      return;
+    }
 
     setBusy(true);
     try {
@@ -752,8 +862,22 @@ function IssueTab({
         kind: "ok",
         text: `${r.challanNo} created — Rs ${money(r.totalValue)} of material moved to ${r.jobLocation}. Voucher ${r.voucherNo || "—"}. No sale was recorded.`,
       });
+      /* Back to an empty form. It used to clear only the lines and the piece
+         count, so the worker, the finished item, the rate and the wastage
+         stayed behind from a challan that had already gone out — and the next
+         one could be raised against them without anybody choosing them again.
+         The formula banner goes with them: those numbers belong to the challan
+         just created, and leaving them on screen invites a second challan for
+         material that has already left. Coming back from a costing run brings
+         a fresh set. */
       setLines([{ itemId: "", qty: "", standardPerPc: "", autoQty: false }]);
       setExpectedQty("");
+      setWorkerId("");
+      setFinishedItemId("");
+      setRatePerPc("");
+      setAllowedWastagePct("");
+      setNotes("");
+      onSeedUsed();
       await refresh();
     } catch (e) {
       setMsg({ kind: "err", text: (e as Error).message });
@@ -817,13 +941,15 @@ function IssueTab({
       )}
 
       <Section
-        title="Send material to a job worker"
-        sub="This challan is not a sale — no customer is involved and the sales figure does not move. Only the stock location changes."
+        title={editing ? `Editing ${editing.challanNo}` : "Send material to a job worker"}
+        sub={editing
+          ? "Change the quantities and only the difference moves — cut a line and the balance comes back into your own store, raise it and more goes out. The job worker and the godown stay as they were: material already standing at a worker cannot be moved elsewhere by an edit."
+          : "This challan is not a sale — no customer is involved and the sales figure does not move. Only the stock location changes."}
       >
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(160px,1fr))", gap: 12, marginBottom: 16 }}>
           <div>
             <label style={label}>Job worker</label>
-            <select style={selectInput} value={workerId} onChange={(e) => setWorkerId(e.target.value)}>
+            <select style={selectInput} value={workerId} disabled={!!editing} onChange={(e) => setWorkerId(e.target.value)}>
               <option value="">— select —</option>
               {workers.map((w) => (
                 <option key={w.id} value={w.id}>
@@ -926,8 +1052,13 @@ function IssueTab({
           <button style={btn(false)} onClick={() => setLines([...lines, { itemId: "", qty: "", standardPerPc: "", autoQty: false }])}>
             + Line
           </button>
+          {editing && (
+            <button style={btn(false)} disabled={busy} onClick={leaveEdit}>
+              Discard changes
+            </button>
+          )}
           <button style={btn()} disabled={busy} onClick={submit}>
-            {busy ? "Posting…" : "Create issue challan"}
+            {busy ? "Posting…" : editing ? `Save ${editing.challanNo}` : "Create issue challan"}
           </button>
         </div>
 
@@ -948,14 +1079,17 @@ function IssueTab({
               <th style={th}>Will make</th>
               <th style={{ ...th, textAlign: "right" }}>Expected</th>
               <th style={{ ...th, textAlign: "right" }}>Received</th>
-              <th style={{ ...th, textAlign: "right" }}>Balance value</th>
+              <th style={{ ...th, textAlign: "right" }} title="Material still lying at the job worker, at the cost it went out at">
+                Balance value
+              </th>
               <th style={th}>Status</th>
+              <th style={th} />
             </tr>
           </thead>
           <tbody>
             {challans.length === 0 && (
               <tr>
-                <td style={{ ...td, color: dim }} colSpan={8}>
+                <td style={{ ...td, color: dim }} colSpan={9}>
                   No challans yet.
                 </td>
               </tr>
@@ -969,8 +1103,38 @@ function IssueTab({
                 <td style={tdNum}>{c.expectedQty || "—"}</td>
                 <td style={tdNum}>{c.receivedQty || 0}</td>
                 <td style={tdNum}>{money(c.balanceValue)}</td>
-                <td style={{ ...td, color: c.status === "closed" ? dim : amber, fontSize: 12, fontWeight: 700 }}>
+                <td style={{
+                  ...td, fontSize: 12, fontWeight: 700,
+                  color: c.status === "closed" || c.status === "cancelled" ? dim : amber,
+                  textDecoration: c.status === "cancelled" ? "line-through" : undefined,
+                }}>
                   {c.status}
+                </td>
+                {/* Only while nothing has come back against it. Once a receipt
+                    posts, the issue is costed into finished stock and a payable
+                    — unpicking it here would leave the receipt standing on
+                    material this challan no longer says went out. */}
+                <td style={{ ...td, whiteSpace: "nowrap", textAlign: "right" }}>
+                  {c.status === "open" && (c.receivedQty || 0) === 0 ? (
+                    <>
+                      <button
+                        style={{ ...btn(false), padding: "5px 11px", fontSize: 12, marginRight: 6 }}
+                        onClick={() => startEdit(c)}
+                        disabled={busy}
+                      >
+                        Edit
+                      </button>
+                      <button
+                        style={{ ...btn(false), padding: "5px 11px", fontSize: 12, color: "#f87171" }}
+                        onClick={() => cancelChallan(c)}
+                        disabled={busy}
+                      >
+                        Cancel
+                      </button>
+                    </>
+                  ) : (
+                    <span style={{ color: dim, fontSize: 12 }}>—</span>
+                  )}
                 </td>
               </tr>
             ))}
