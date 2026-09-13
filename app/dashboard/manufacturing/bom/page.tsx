@@ -416,7 +416,7 @@ function BOMPageInner() {
             )}
             {charge && (
               <div style={{ marginBottom: 14, padding: "10px 12px", borderRadius: 8, background: "rgba(251,191,36,.09)", border: "1px solid rgba(251,191,36,.3)", color: "rgba(255,255,255,.72)", fontSize: 12, lineHeight: 1.6 }}>
-                <strong style={{ color: "#fbbf24" }}>{charge.label}</strong> — Rs {charge.perBatch.toLocaleString()} per batch — is material, not labour, and it is <strong>not</strong> in this batch's cost yet.
+                <strong style={{ color: "#fbbf24" }}>{charge.label}</strong> — Rs {charge.perBatch.toLocaleString()} per batch — is material, not labour, and it is <strong>not</strong> in this batch&rsquo;s cost yet.
                 {lines.some((l) => l.note)
                   ? " A line is waiting for it below with the quantity already worked out — pick which of your own items it is, and the cost then follows that item's live purchase rate and the stock moves when a batch is made."
                   : " Add it as its own line under Materials consumed per batch below — pick the item and set its quantity — so the cost follows the live purchase rate and the stock actually moves when a batch is made."}
