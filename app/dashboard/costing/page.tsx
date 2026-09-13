@@ -615,10 +615,21 @@ function CostingInner() {
                   <div style={{ fontSize: 11.5, fontWeight: 700, letterSpacing: ".08em", textTransform: "uppercase", color: "rgba(52,211,153,.8)", marginBottom: 8 }}>
                     {primary.label || primary.key}
                   </div>
+                  {/* The number that gets quoted, so it carries the profit —
+                      the same figure the formula editor previews. With no
+                      profit set it is the plain cost it always was. */}
                   <div className="cxPrimaryValue">
-                    {fmt(run?.values[primary.key])}
+                    {fmt(saleRate ?? run?.values[primary.key])}
                     <span style={{ fontSize: 15, color: "rgba(255,255,255,.32)", marginLeft: 8, fontWeight: 600 }}>{primary.unit}</span>
                   </div>
+                  {profitAmount !== 0 && (
+                    <div style={{
+                      fontFamily: MONO, fontSize: 12, marginTop: 5,
+                      color: "rgba(255,255,255,.4)", fontVariantNumeric: "tabular-nums",
+                    }}>
+                      {fmt(baseRate)} cost + {fmt(profitAmount)} profit
+                    </div>
+                  )}
 
                   {outputs.length > 1 && (
                     <div className="cxStats" style={{ marginTop: 20, paddingTop: 18, borderTop: "1px solid rgba(52,211,153,.18)" }}>
@@ -660,20 +671,17 @@ function CostingInner() {
                           </select>
                         </div>
                       </div>
+                      {/* What the profit comes to in rupees. The rate itself is
+                          the headline above — repeating it here left two big
+                          green numbers and no saying which one to quote. A
+                          percent typed into the box still says nothing about
+                          how much money it is until it is spelled out. */}
                       <div style={{ textAlign: "right" }}>
-                        <div style={{ fontSize: 11.5, color: "rgba(255,255,255,.4)", marginBottom: 3 }}>Sale rate</div>
-                        <div style={{ fontFamily: MONO, fontSize: 22, fontWeight: 800, color: "#34d399", fontVariantNumeric: "tabular-nums" }}>
-                          {fmt(saleRate)}
+                        <div style={{ fontSize: 11.5, color: "rgba(255,255,255,.4)", marginBottom: 3 }}>Profit on the rate</div>
+                        <div style={{ fontFamily: MONO, fontSize: 18, fontWeight: 800, color: "#34d399", fontVariantNumeric: "tabular-nums" }}>
+                          + {fmt(profitAmount)}
                           <span style={{ fontSize: 12, color: "rgba(255,255,255,.32)", marginLeft: 6, fontWeight: 600 }}>{primary.unit}</span>
                         </div>
-                        {/* The sum behind the number. A percent typed into the
-                            box says nothing about how many rupees it is until
-                            it is spelled out against the cost. */}
-                        {profitAmount !== 0 && (
-                          <div style={{ fontFamily: MONO, fontSize: 11.5, color: "rgba(255,255,255,.38)", marginTop: 4, fontVariantNumeric: "tabular-nums" }}>
-                            {fmt(baseRate)} + {fmt(profitAmount)} profit
-                          </div>
-                        )}
                       </div>
                     </div>
                   </div>
@@ -835,6 +843,8 @@ function CostingInner() {
           run={run}
           outputs={outputs}
           primaryKey={primary?.key}
+          saleRate={saleRate}
+          profitAmount={profitAmount}
         />
       )}
     </div>
@@ -857,13 +867,16 @@ const P_NUM: React.CSSProperties = { ...P_TD, textAlign: "right", fontFamily: MO
  * whoever cuts it are rarely the same person, and neither wants the other's
  * page.
  */
-function PrintSheet({ kind, formula, title, run, outputs, primaryKey }: {
+function PrintSheet({ kind, formula, title, run, outputs, primaryKey, saleRate, profitAmount }: {
   kind: "cost" | "working";
   formula: CostingFormula;
   title: string;
   run: FormulaRun;
   outputs: FormulaOutput[];
   primaryKey?: string;
+  /** The quoted rate — cost with this quote's profit on it. */
+  saleRate?: number | null;
+  profitAmount?: number;
 }) {
   /* The cost sheet is the result card off the screen and nothing more: the
      answer, the numbers standing behind it, and enough heading to know which
@@ -893,10 +906,18 @@ function PrintSheet({ kind, formula, title, run, outputs, primaryKey }: {
               <div style={{ fontSize: 9.5, fontWeight: 700, letterSpacing: ".09em", textTransform: "uppercase", color: "#555", marginBottom: 3 }}>
                 {main.label || main.key}
               </div>
+              {/* The quoted rate, profit included — the figure on the slip has
+                  to be the figure on the quotation, or the slip is worse than
+                  no slip. */}
               <div style={{ fontFamily: MONO, fontSize: 34, fontWeight: 800, lineHeight: 1.05, fontVariantNumeric: "tabular-nums" }}>
-                {fmt(run.values[main.key])}
+                {fmt(saleRate ?? run.values[main.key])}
                 <span style={{ fontSize: 13, color: "#666", marginLeft: 7, fontWeight: 600 }}>{main.unit ?? ""}</span>
               </div>
+              {!!profitAmount && (
+                <div style={{ fontFamily: MONO, fontSize: 10.5, color: "#666", marginTop: 3, fontVariantNumeric: "tabular-nums" }}>
+                  {fmt(run.values[main.key])} cost + {fmt(profitAmount)} profit
+                </div>
+              )}
             </div>
           )}
 

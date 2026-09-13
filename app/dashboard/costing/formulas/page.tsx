@@ -655,57 +655,53 @@ export default function FormulasPage() {
             tape cost: 0" under a buttoned bag is noise, and next to the real
             figure it reads as a second, contradictory answer. */}
         <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-          {d.outputs.filter((o) => o.key && isVisible(o, preview?.values ?? {})).map((o) => (
-            <div key={o.key} style={{
-              display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 10,
-              padding: o.primary ? "10px 12px" : "4px 0",
-              background: o.primary ? "rgba(52,211,153,.09)" : "transparent",
-              border: o.primary ? "1px solid rgba(52,211,153,.25)" : "none",
-              borderRadius: 10,
-            }}>
-              <span style={{ fontSize: 12.5, color: "rgba(255,255,255,.5)" }}>{o.label || o.key}</span>
-              <span style={{
-                fontFamily: MONO, fontVariantNumeric: "tabular-nums",
-                fontSize: o.primary ? 17 : 13, fontWeight: 700,
-                color: o.primary ? "#34d399" : "rgba(255,255,255,.85)",
+          {d.outputs.filter((o) => o.key && isVisible(o, preview?.values ?? {})).map((o) => {
+            /* The headline is the number that gets quoted, so it carries the
+               profit. It used to show cost here and the sale rate again lower
+               down, which left two green boxes and no saying which one goes on
+               the quotation. With no profit set the two are the same number
+               anyway, and this reads as the plain cost it always did. */
+            const isMain = !!o.primary && o.key === primaryOut?.key;
+            const shown = isMain && saleRate != null ? saleRate : preview?.values[o.key];
+            return (
+              <div key={o.key} style={{
+                padding: o.primary ? "10px 12px" : "4px 0",
+                background: o.primary ? "rgba(52,211,153,.09)" : "transparent",
+                border: o.primary ? "1px solid rgba(52,211,153,.25)" : "none",
+                borderRadius: 10,
               }}>
-                {fmt(preview?.values[o.key])}<span style={{ fontSize: 10.5, color: "rgba(255,255,255,.3)", marginLeft: 4 }}>{o.unit}</span>
-              </span>
-            </div>
-          ))}
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 10 }}>
+                  <span style={{ fontSize: 12.5, color: "rgba(255,255,255,.5)" }}>{o.label || o.key}</span>
+                  <span style={{
+                    fontFamily: MONO, fontVariantNumeric: "tabular-nums",
+                    fontSize: o.primary ? 17 : 13, fontWeight: 700,
+                    color: o.primary ? "#34d399" : "rgba(255,255,255,.85)",
+                  }}>
+                    {fmt(shown)}<span style={{ fontSize: 10.5, color: "rgba(255,255,255,.3)", marginLeft: 4 }}>{o.unit}</span>
+                  </span>
+                </div>
+                {/* The split, small, under the number it adds up to — a rate
+                    nobody can break into cost and margin is a rate nobody can
+                    argue down. */}
+                {isMain && profitAmount !== 0 && (
+                  <div style={{
+                    fontFamily: MONO, fontSize: 11, marginTop: 3,
+                    color: "rgba(255,255,255,.38)", fontVariantNumeric: "tabular-nums",
+                  }}>
+                    {fmt(baseRate)} cost + {fmt(profitAmount)} profit
+                    <span style={{ fontFamily: FONT, marginLeft: 5 }}>
+                      ({d.profit?.mode === "percent" ? `${fmt(d.profit?.value)}%` : `Rs ${fmt(d.profit?.value)} flat`})
+                    </span>
+                  </div>
+                )}
+              </div>
+            );
+          })}
           {!d.outputs.some((o) => o.key) && (
             <div style={{ fontSize: 12.5, color: "rgba(255,255,255,.3)" }}>Add an output to see the result.</div>
           )}
         </div>
 
-        {/* Cost, then what goes on top of it, then what the customer pays.
-            Shown only once there is a profit to show — a cost-only formula
-            should not grow a second copy of its own total. */}
-        {saleRate != null && profitAmount !== 0 && (
-          <div style={{ marginTop: 12, paddingTop: 11, borderTop: `1px solid ${BORDER}`, display: "flex", flexDirection: "column", gap: 6 }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 10 }}>
-              <span style={{ fontSize: 12.5, color: "rgba(255,255,255,.5)" }}>
-                Profit
-                <span style={{ fontSize: 11, color: "rgba(255,255,255,.3)", marginLeft: 5 }}>
-                  {d.profit?.mode === "percent" ? `${fmt(d.profit?.value)}%` : `Rs ${fmt(d.profit?.value)} flat`}
-                </span>
-              </span>
-              <span style={{ fontFamily: MONO, fontVariantNumeric: "tabular-nums", fontSize: 13, fontWeight: 700, color: "rgba(255,255,255,.85)" }}>
-                + {fmt(profitAmount)}
-              </span>
-            </div>
-            <div style={{
-              display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 10,
-              padding: "10px 12px", borderRadius: 10,
-              background: "rgba(52,211,153,.09)", border: "1px solid rgba(52,211,153,.25)",
-            }}>
-              <span style={{ fontSize: 12.5, color: "rgba(255,255,255,.5)" }}>Sale rate</span>
-              <span style={{ fontFamily: MONO, fontVariantNumeric: "tabular-nums", fontSize: 17, fontWeight: 700, color: "#34d399" }}>
-                {fmt(saleRate)}<span style={{ fontSize: 10.5, color: "rgba(255,255,255,.3)", marginLeft: 4 }}>{primaryOut?.unit}</span>
-              </span>
-            </div>
-          </div>
-        )}
       </div>
     );
 
