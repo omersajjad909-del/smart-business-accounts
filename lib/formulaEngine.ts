@@ -590,6 +590,16 @@ export type OutputRole =
   | "cost_per_batch"
   | "units_per_batch"
   | "material_qty"
+  /**
+   * A second material the order consumes, counted for the whole order —
+   * 20,000 buttons for 10,000 bags, 762m of tape.
+   *
+   * Distinct from material_qty, which formulas already use for both per-piece
+   * and whole-order figures and so cannot be read either way with confidence.
+   * This one has a single meaning: what leaves the store for this order. Job
+   * work seeds a material line from each of them.
+   */
+  | "consumable_qty"
   | "waste_qty";
 
 export type FormulaOutput = {

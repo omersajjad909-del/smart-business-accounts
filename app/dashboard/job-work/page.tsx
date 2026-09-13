@@ -10,6 +10,7 @@
 
 import { Suspense, useCallback, useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
+import type { JobWorkConsumable } from "@/lib/jobWorkSeed";
 import { useResponsive } from "@/hooks/useResponsive";
 import { planIssue } from "@/lib/jobWorkSeed";
 
@@ -28,7 +29,38 @@ type FormulaSeed = {
   ratePerPc: number | null;
   costPerUnit: number | null;
   wastePerBatch: number | null;
+  /** Buttons, tape — the materials beyond the one the standard is about. */
+  consumables: JobWorkConsumable[];
 };
+
+/**
+ * The consumables the costing screen put in the URL.
+ *
+ * A query string is the one input here nobody validates on the way in, so it
+ * is read defensively: anything malformed seeds no extra lines rather than a
+ * line with NaN in the quantity box.
+ */
+function readConsumables(raw: string | null): JobWorkConsumable[] {
+  if (!raw) return [];
+  try {
+    const parsed = JSON.parse(raw);
+    if (!Array.isArray(parsed)) return [];
+    return parsed.flatMap((c): JobWorkConsumable[] => {
+      const forOrder = Number(c?.forOrder);
+      if (!c?.key || !Number.isFinite(forOrder) || forOrder <= 0) return [];
+      const perPc = Number(c?.perPc);
+      return [{
+        key: String(c.key),
+        label: String(c.label || c.key),
+        unit: c.unit ? String(c.unit) : undefined,
+        forOrder,
+        perPc: Number.isFinite(perPc) && perPc > 0 ? perPc : null,
+      }];
+    });
+  } catch {
+    return [];
+  }
+}
 
 const ff = "'Outfit','Inter',sans-serif";
 const bg = "rgba(255,255,255,0.03)";
@@ -179,6 +211,7 @@ function JobWorkInner() {
       ratePerPc: num("ratePerPc"),
       costPerUnit: num("costPerUnit"),
       wastePerBatch: num("wastePerBatch"),
+      consumables: readConsumables(params.get("consumables")),
     };
   }, [params]);
   const [status, setStatus] = useState<Status | null>(null);
@@ -584,7 +617,19 @@ function WorkersTab({ workers, setBusy, busy, setMsg, refresh }: Setter & { work
 
 /* ─────────────────────────── Issue ─────────────────────────── */
 
-type DraftLine = { itemId: string; qty: string; standardPerPc: string };
+type DraftLine = {
+  itemId: string;
+  qty: string;
+  standardPerPc: string;
+  /**
+   * The quantity is still the formula's, so it follows a changed piece count.
+   * Cleared the moment the operator types in the box — from then on the number
+   * is theirs and nothing overwrites it.
+   */
+  autoQty?: boolean;
+  /** What the formula expects on this line, to pick the right item against. */
+  note?: string;
+};
 
 function IssueTab({
   workers,
@@ -610,10 +655,25 @@ function IssueTab({
   const [ratePerPc, setRatePerPc] = useState(seed?.ratePerPc ? String(seed.ratePerPc) : "");
   const [allowedWastagePct, setAllowedWastagePct] = useState("");
   const [notes, setNotes] = useState("");
-  // The first line carries the formula's standard. It is the material the
-  // formula was written about; which item that is, only the operator knows.
-  const [lines, setLines] = useState<DraftLine[]>([
-    { itemId: "", qty: "", standardPerPc: seed?.stdPerPc ? String(seed.stdPerPc) : "" },
+  /* The first line carries the formula's standard — the material the formula
+     was written about. Every consumable it names gets a line of its own behind
+     that, already counted for the order: a bag is a roll and twenty thousand
+     buttons, and the store should not have to work the second one out.
+
+     Which item each line is, only the operator knows; the note beside it says
+     what the formula was expecting there. */
+  const [lines, setLines] = useState<DraftLine[]>(() => [
+    {
+      itemId: "", qty: "", autoQty: true,
+      standardPerPc: seed?.stdPerPc ? String(seed.stdPerPc) : "",
+    },
+    ...(seed?.consumables ?? []).map((c): DraftLine => ({
+      itemId: "",
+      qty: "",
+      autoQty: true,
+      standardPerPc: c.perPc != null ? String(c.perPc) : "",
+      note: `${c.label} — ${c.forOrder.toLocaleString()}${c.unit ? ` ${c.unit}` : ""}`,
+    })),
   ]);
 
   const worker = workers.find((w) => w.id === workerId);
@@ -630,14 +690,23 @@ function IssueTab({
     () => planIssue(seed?.stdPerPc ?? null, Number(expectedQty) || 0),
     [seed, expectedQty],
   );
-  // Fill the first line's quantity from the plan while the operator has not
-  // overridden it, so the challan opens on whole rolls without hiding why.
+  /* Every line the formula seeded follows the piece count, rolls and buttons
+     alike, until somebody types in it. It used to fill the first line once and
+     only while it was still empty, so changing the expected pieces afterwards
+     left the challan issuing against the old figure — the plan on screen said
+     one thing and the line under it said another. */
+  const pcs = Number(expectedQty) || 0;
   useEffect(() => {
-    if (!plan) return;
-    setLines((prev) =>
-      prev.map((l, i) => (i === 0 && l.qty === "" ? { ...l, qty: String(plan.toIssue) } : l)),
-    );
-  }, [plan]);
+    if (pcs <= 0) return;
+    setLines((prev) => prev.map((l) => {
+      if (!l.autoQty) return l;
+      const std = Number(l.standardPerPc);
+      if (!Number.isFinite(std) || std <= 0) return l;
+      // Whole units leave the rack; the fraction is leftover, never a part-roll.
+      const qty = String(Math.ceil(Math.round(std * pcs * 1e4) / 1e4));
+      return l.qty === qty ? l : { ...l, qty };
+    }));
+  }, [pcs]);
 
   const raw = items.filter((i) => i.category === "RAW_MATERIAL" || i.category === "TRADING");
   const finished = items.filter((i) => i.category === "FINISHED" || i.category === "TRADING");
@@ -683,7 +752,7 @@ function IssueTab({
         kind: "ok",
         text: `${r.challanNo} created — Rs ${money(r.totalValue)} of material moved to ${r.jobLocation}. Voucher ${r.voucherNo || "—"}. No sale was recorded.`,
       });
-      setLines([{ itemId: "", qty: "", standardPerPc: "" }]);
+      setLines([{ itemId: "", qty: "", standardPerPc: "", autoQty: false }]);
       setExpectedQty("");
       await refresh();
     } catch (e) {
@@ -800,7 +869,14 @@ function IssueTab({
           Material lines
         </div>
         {lines.map((l, idx) => (
-          <div key={idx} style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr auto", gap: 10, marginBottom: 9 }}>
+          <div key={idx} style={{ marginBottom: 9 }}>
+          {/* What the formula put on this line. The quantity is filled in but
+              the item is not — only the operator knows which of their own
+              stock "Buttons required — 20,000 pcs" means. */}
+          {l.note && (
+            <div style={{ fontSize: 11, color: dim, marginBottom: 4 }}>{l.note}</div>
+          )}
+          <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr auto", gap: 10 }}>
             <select
               style={selectInput}
               value={l.itemId}
@@ -819,7 +895,9 @@ function IssueTab({
               step="0.001"
               placeholder="qty"
               value={l.qty}
-              onChange={(e) => setLines(lines.map((x, i) => (i === idx ? { ...x, qty: e.target.value } : x)))}
+              // Typing here hands the number to the operator for good — the
+              // formula stops writing over it from this point on.
+              onChange={(e) => setLines(lines.map((x, i) => (i === idx ? { ...x, qty: e.target.value, autoQty: false } : x)))}
             />
             <input
               style={input}
@@ -838,13 +916,14 @@ function IssueTab({
               ✕
             </button>
           </div>
+          </div>
         ))}
         <div style={{ fontSize: 11.5, color: dim, marginTop: 4 }}>
           Leave <b>std / pc</b> blank and wastage is not calculated — which is the right answer for a single material with no recovery agreed.
         </div>
 
         <div style={{ display: "flex", gap: 10, marginTop: 14, flexWrap: "wrap" }}>
-          <button style={btn(false)} onClick={() => setLines([...lines, { itemId: "", qty: "", standardPerPc: "" }])}>
+          <button style={btn(false)} onClick={() => setLines([...lines, { itemId: "", qty: "", standardPerPc: "", autoQty: false }])}>
             + Line
           </button>
           <button style={btn()} disabled={busy} onClick={submit}>

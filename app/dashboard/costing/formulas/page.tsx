@@ -154,6 +154,7 @@ const ROLE_LABELS: Record<OutputRole, string> = {
   cost_per_batch: "Cost per batch",
   units_per_batch: "Units per batch",
   material_qty: "Material quantity",
+  consumable_qty: "Consumable for the order",
   waste_qty: "Waste quantity",
 };
 

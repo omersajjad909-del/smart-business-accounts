@@ -192,9 +192,12 @@ export const FORMULA_TEMPLATES: FormulaTemplate[] = [
       { key: "rollsToBuy",       label: "Rolls to buy", group: "Rolls" },
       { key: "leftoverStockM",   label: "Leftover → waste stock", unit: "m", group: "Rolls" },
       { key: "wasteM",        label: "Waste per roll",  unit: "m",   role: "waste_qty", group: "Rolls" },
-      { key: "buttonsNeeded", label: "Buttons required", unit: "pcs", group: "Buttons & Tape", showWhen: { key: "fitting", is: 0 } },
+      // Marked as consumables, so a job work challan opens with a line for
+      // them already counted — 20,000 buttons against 10,000 bags — instead of
+      // the store being asked to multiply it out by hand.
+      { key: "buttonsNeeded", label: "Buttons required", unit: "pcs", role: "consumable_qty", group: "Buttons & Tape", showWhen: { key: "fitting", is: 0 } },
       { key: "buttonTotal",   label: "Total button cost", unit: "Rs", group: "Buttons & Tape", showWhen: { key: "fitting", is: 0 } },
-      { key: "tapeNeeded",    label: "Tape required",    unit: "m", group: "Buttons & Tape", showWhen: { key: "fitting", is: 1 } },
+      { key: "tapeNeeded",    label: "Tape required",    unit: "m", role: "consumable_qty", group: "Buttons & Tape", showWhen: { key: "fitting", is: 1 } },
       { key: "tapeTotal",     label: "Total tape cost",  unit: "Rs", group: "Buttons & Tape", showWhen: { key: "fitting", is: 1 } },
     ],
   },
