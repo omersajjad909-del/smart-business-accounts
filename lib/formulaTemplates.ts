@@ -57,6 +57,10 @@ export const FORMULA_TEMPLATES: FormulaTemplate[] = [
       { key: "densityDiv",   label: "Weight divisor",     unit: "",   defaultValue: 54, group: "Roll details", hidden: true },
       { key: "labour",       label: "Labour",             unit: "Rs", defaultValue: 3, askOnRun: true, group: "Order details" },
       { key: "buttonTape",   label: "Button / Tape",      unit: "Rs", defaultValue: 0, askOnRun: true, group: "Order details" },
+      // The odds and ends a quote picks up that have no box of their own — a
+      // rupee of printing, two of stitching. Per piece, like labour beside it,
+      // and zero by default so it changes nothing until somebody types in it.
+      { key: "others",       label: "Others",             unit: "Rs", defaultValue: 0, askOnRun: true, group: "Order details" },
       { key: "orderQty",     label: "Order quantity",     unit: "pcs", defaultValue: 10000, askOnRun: true, group: "Order details" },
     ],
     steps: [
@@ -79,7 +83,7 @@ export const FORMULA_TEMPLATES: FormulaTemplate[] = [
       // roll divided Rs. 2.40 of buttons down to three paisa a bag and the
       // charge may as well not have been entered — the two-panel template
       // below always costed it this way.
-      { key: "costPerPc",   label: "Cost per piece",  expression: "materialPerPc + labour + buttonTape", unit: "Rs" },
+      { key: "costPerPc",   label: "Cost per piece",  expression: "materialPerPc + labour + buttonTape + others", unit: "Rs" },
       { key: "rollsNeeded", label: "Rolls required",  expression: "orderQty / piecesPerRoll" },
       // You can only buy whole rolls, so the fractional part of rollsNeeded is
       // never actually used up — it comes back off the last roll as leftover
@@ -138,6 +142,8 @@ export const FORMULA_TEMPLATES: FormulaTemplate[] = [
       // Per piece, not per roll as in Roll → Pieces: there are two rolls here,
       // so loading it onto either one would charge the bag twice or not at all.
       { key: "buttonTape",   label: "Button / Tape",        unit: "Rs", defaultValue: 0,  askOnRun: true, group: "Order details" },
+      // Same catch-all as Roll → Pieces: per bag, zero until it is used.
+      { key: "others",       label: "Others",               unit: "Rs", defaultValue: 0,  askOnRun: true, group: "Order details" },
       { key: "orderQty",     label: "Order quantity",       unit: "pcs", defaultValue: 10000, askOnRun: true, group: "Order details" },
     ],
     steps: [
@@ -167,7 +173,7 @@ export const FORMULA_TEMPLATES: FormulaTemplate[] = [
 
       /* The bag */
       { key: "materialPerPc", label: "Material per bag",  expression: "backPerPc + frontPerPc", unit: "Rs" },
-      { key: "costPerPc",     label: "Cost per bag",      expression: "materialPerPc + labour + buttonTape", unit: "Rs" },
+      { key: "costPerPc",     label: "Cost per bag",      expression: "materialPerPc + labour + buttonTape + others", unit: "Rs" },
       { key: "backRolls",     label: "Back rolls required",  expression: "orderQty / backPerRoll" },
       { key: "frontRolls",    label: "Front rolls required", expression: "orderQty / frontPerRoll" },
       { key: "backWasteM",    label: "Back waste per roll",  expression: "(rollInches - backRepeats * (backCutLength + cutAllowance)) / 39.37", unit: "m" },
