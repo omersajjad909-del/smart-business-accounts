@@ -38,6 +38,7 @@ import {
   type FormulaStep,
   type FormulaOutput,
   type FormulaRun,
+  type StepResult,
 } from "@/lib/formulaEngine";
 import { buildJobWorkSeed, jobWorkHrefFrom, planIssue } from "@/lib/jobWorkSeed";
 
@@ -100,6 +101,12 @@ const CSS = `
   .cxPrimaryValue{font-size:30px}
 }
 .cxHalfGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px 18px}
+/* Sizes read across, four to a line, so the band a cutter checks first is one
+   glance rather than a column he has to run his finger down. */
+.cxSheetGrid{display:grid;grid-template-columns:repeat(4,1fr);gap:0 20px}
+/* Cutting, rolls and buttons sit two blocks to a line — that, plus dropping
+   the expression column, is what brings the sheet back onto one page. */
+.cxSheetBands{display:grid;grid-template-columns:repeat(2,1fr);gap:0 26px;align-items:start}
 .cxPrint{display:none}
 @media print{
   @page{size:A4;margin:12mm}
@@ -844,6 +851,8 @@ function PrintSheet({ kind, formula, title, run, outputs, primaryKey }: {
   outputs: FormulaOutput[];
   primaryKey?: string;
 }) {
+  /** Constants the formula keeps out of sight — they stay off the paper too. */
+  const hiddenKeys = new Set(formula.inputs.filter((i) => i.hidden).map((i) => i.key));
   /* The cost sheet is the result card off the screen and nothing more: the
      answer, the numbers standing behind it, and enough heading to know which
      job it belongs to. Boxed to half an A4 so it goes out with the quote as a
@@ -897,50 +906,80 @@ function PrintSheet({ kind, formula, title, run, outputs, primaryKey }: {
     );
   }
 
+  /* The cutting detail, for the machine. It used to be every step in the
+     formula with its expression printed beside it — `floor(rollInches /
+     (cutLength + cutAllowance))` and all — which ran to two pages and told the
+     man at the machine nothing he could act on. So the expressions come off
+     (they are still on screen under "How this was calculated", and in the
+     formula editor, which is where anyone checking the maths is standing) and
+     what is left prints in the blocks the formula was written in: the sizes he
+     is cutting to, then the cutting, then the rolls, then the buttons.
+
+     A formula with no groups on its steps falls back to one block, so nothing
+     that was never sectioned loses its working. */
+  const bands: { name: string; rows: StepResult[] }[] = [];
+  for (const s of run.steps) {
+    if (s.kind === "input") continue;          // sizes have their own band above
+    const name = (s.group ?? "").trim() || "Working";
+    const bucket = bands.find((b) => b.name === name);
+    if (bucket) bucket.rows.push(s);
+    else bands.push({ name, rows: [s] });
+  }
+
+  /* The sizes band: what was typed for this job, in the order it was typed,
+     minus the constants nobody at the machine sets. */
+  const typed = run.steps.filter((s) => s.kind === "input" && !hiddenKeys.has(s.key));
+
   return (
     <div className="cxPrint">
       <div style={{ fontFamily: FONT, color: "#000", background: "#fff", padding: "16px 20px" }}>
-        <div style={{ borderBottom: "2px solid #000", paddingBottom: 10, marginBottom: 16 }}>
+        <div style={{ borderBottom: "2px solid #000", paddingBottom: 10, marginBottom: 14 }}>
           <div style={{ fontSize: 20, fontWeight: 800 }}>{title}</div>
           <div style={{ fontSize: 11, color: "#555", marginTop: 4 }}>
             Working sheet — cutting detail · {formula.category} · {formula.name} · v{formula.version} · {today()}
           </div>
         </div>
 
-        <SheetTitle>Step by step</SheetTitle>
-        <table style={{ width: "100%", borderCollapse: "collapse", marginBottom: 20 }}>
-          <thead>
-            <tr>
-              <th style={P_TH}>Step</th>
-              <th style={P_TH}>How</th>
-              <th style={{ ...P_TH, textAlign: "right" }}>Value</th>
-              <th style={P_TH}>Unit</th>
-            </tr>
-          </thead>
-          <tbody>
-            {run.steps.map((s) => (
-              <tr key={s.key}>
-                <td style={P_TD}>{s.label}</td>
-                <td style={{ ...P_TD, fontFamily: MONO, fontSize: 10.5, color: "#555" }}>{s.expression}</td>
-                <td style={P_NUM}>{s.error ? "error" : fmt(s.value)}</td>
-                <td style={{ ...P_TD, width: 60, color: "#666" }}>{s.unit ?? ""}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+        {/* Sizes first, across the top, because it is the one band the man at
+            the machine checks before he starts and nothing else matters if it
+            is wrong. */}
+        {typed.length > 0 && (
+          <>
+            <SheetTitle>Sizes</SheetTitle>
+            <div className="cxSheetGrid" style={{ marginBottom: 18 }}>
+              {typed.map((s) => (
+                <div key={s.key} style={{ borderBottom: "1px solid #e2e2e2", padding: "5px 0" }}>
+                  <div style={{ fontSize: 9.5, color: "#666" }}>{s.label}</div>
+                  <div style={{ fontFamily: MONO, fontSize: 13, fontWeight: 700, fontVariantNumeric: "tabular-nums" }}>
+                    {fmt(s.value)}
+                    <span style={{ fontSize: 9.5, color: "#777", marginLeft: 3 }}>{s.unit ?? ""}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </>
+        )}
 
-        <SheetTitle>Key numbers</SheetTitle>
-        <table style={{ width: "100%", borderCollapse: "collapse" }}>
-          <tbody>
-            {outputs.map((o) => (
-              <tr key={o.key}>
-                <td style={P_TD}>{o.label || o.key}</td>
-                <td style={{ ...P_NUM, fontWeight: 700 }}>{fmt(run.values[o.key])}</td>
-                <td style={{ ...P_TD, width: 70, color: "#666" }}>{o.unit ?? ""}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+        {/* Then a block per section — cutting, rolls, buttons — each short
+            enough to read standing up. */}
+        <div className="cxSheetBands">
+          {bands.map((b) => (
+            <div key={b.name} style={{ breakInside: "avoid" }}>
+              <SheetTitle>{b.name}</SheetTitle>
+              <table style={{ width: "100%", borderCollapse: "collapse", marginBottom: 16 }}>
+                <tbody>
+                  {b.rows.map((s) => (
+                    <tr key={s.key}>
+                      <td style={P_TD}>{s.label}</td>
+                      <td style={{ ...P_NUM, fontWeight: 700 }}>{s.error ? "error" : fmt(s.value)}</td>
+                      <td style={{ ...P_TD, width: 46, color: "#666", fontSize: 10.5 }}>{s.unit ?? ""}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );
