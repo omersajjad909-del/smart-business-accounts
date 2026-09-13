@@ -241,7 +241,6 @@ export default function PayrollPage() {
       </div>
     </div>
     <div class="footer"><p>System Generated Payslip</p></div>
-    <div style="margin-top:32px;border-top:1px solid #eee;padding-top:8px;text-align:center;font-size:10px;color:#000">Powered by FinovaOS</div>
     </body></html>`;
     // innerHTML never executes embedded <script> tags, and about:blank inherits
     // this page's CSP anyway — so neither the auto-print nor the button's inline

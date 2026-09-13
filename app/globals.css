@@ -981,35 +981,14 @@ html.fnv-lock-scroll body {
   }
 }
 
-/* ── Print footer: Powered by FinovaOS ──────────────────────────────────── */
-@media print {
-  @page {
-    margin-bottom: 28mm;
-  }
-  body::after {
-    content: "Powered by FinovaOS";
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    text-align: center;
-    font-size: 10px;
-    color: #aaa;
-    padding: 6px 0 10px;
-    border-top: 1px solid #e5e7eb;
-    font-family: 'Outfit', 'Inter', Arial, sans-serif;
-    letter-spacing: 0.04em;
-  }
-
-  /* Only when the printed sheet IS a PrintDocA4 does the page footer stand
-     down — that document prints the line itself, at the foot of the paper.
-     The selector is deliberately narrow: most document pages merely hold a
-     PrintDocA4 on screen as a preview and print their own markup, and those
-     prints still need this footer. */
-  body:has(.print-area .print-doc-a4)::after {
-    content: none;
-  }
-}
+/* Every print used to close with a fixed "Powered by …" line, and @page held
+   28mm of the foot of the paper open for it. Both are gone: these documents go
+   out to a customer on the company's own letterhead, and the software that
+   produced them has no business signing them.
+   
+   The reserved margin goes with the line — it existed only to make room, and
+   leaving it behind would have cost every print an inch of blank paper and
+   pushed long documents onto a page they did not need. */
 
 /* The app stands down while an A4 document is printing.
  *

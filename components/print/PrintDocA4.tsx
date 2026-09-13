@@ -672,23 +672,17 @@ export function PrintDocA4({
             );
           })()}
 
-          {/* The note and the mark. Every document this system prints says
-              where it came from; the app-wide print footer stands down when
-              this line is on the page (see app/globals.css) so it is never
-              printed twice — which is why the mark renders in all five
-              arrangements and only its setting changes. */}
+          {/* The company's own footer note, and nothing else.
+              
+              Documents used to close with a "Powered by …" mark. It came off
+              every print: these go out to a customer on the company's own
+              letterhead, and the software that produced them has no business
+              signing them. The five arrangements stay — they lay out the
+              note — and theme.poweredChip is now unused rather than removed,
+              so a stored print preference does not have to be migrated. */}
           {(() => {
             const note = footerNote && on("footerNote") ? footerNote : "";
-            const mark = (
-              <span
-                className="pdoc-powered"
-                style={theme.poweredChip
-                  ? { display: "inline-block", background: theme.ink, color: "#fff", fontSize: 8, letterSpacing: 0.4, padding: "3px 12px", borderRadius: theme.radius }
-                  : { fontSize: 8.5, letterSpacing: 0.4 }}
-              >
-                Powered by <b>FinovaOS</b>
-              </span>
-            );
+            const mark = null;
 
             if (footerStyle === "band") {
               return (
@@ -701,7 +695,6 @@ export function PrintDocA4({
                   }}
                 >
                   <span style={{ fontSize: 8.5, fontStyle: "italic" }}>{note}</span>
-                  <span style={{ fontSize: 8, letterSpacing: 0.4, opacity: 0.9 }}>Powered by <b>FinovaOS</b></span>
                 </div>
               );
             }

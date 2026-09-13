@@ -275,7 +275,6 @@ export default function PriceListsPage() {
             </tr></thead>
             <tbody>${rows}</tbody>
            </table>`}
-      <div class="footer">Powered by FinovaOS</div>
     </body></html>`;
 
     const w = window.open("", "_blank", "width=900,height=700");
