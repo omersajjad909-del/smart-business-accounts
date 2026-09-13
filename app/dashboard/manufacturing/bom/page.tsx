@@ -461,7 +461,22 @@ function BOMPageInner() {
             </div>
 
             <div style={{ marginTop: 18 }}>
-              <label style={{ display: "block", fontSize: 12, color: "rgba(255,255,255,.45)", marginBottom: 8 }}>Materials consumed per batch</label>
+              {/* The batch size, said here rather than only in the box further
+                  up. A quantity is typed against a basis, and when the basis is
+                  three fields away the number gets typed against whatever the
+                  operator happens to be thinking in — which is per piece, and
+                  which is how a batch of 1,264 buttons gets entered as 2. */}
+              <label style={{ display: "block", fontSize: 12, color: "rgba(255,255,255,.45)", marginBottom: 8 }}>
+                Materials consumed per batch
+                {form.yieldUnits > 0 && (
+                  <span style={{ color: "rgba(255,255,255,.75)", fontWeight: 700 }}>
+                    {" "}of {form.yieldUnits.toLocaleString()}
+                    {finishedItems.find((f) => f.id === form.finishedItemId)?.name
+                      ? ` × ${finishedItems.find((f) => f.id === form.finishedItemId)!.name}`
+                      : " units"}
+                  </span>
+                )}
+              </label>
               <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                 {lines.map((line, index) => {
                   const item = itemsById.get(line.itemId);
@@ -480,8 +495,26 @@ function BOMPageInner() {
                         {rawMaterials.map((m) => <option key={m.id} value={m.id}>{m.name} ({m.currentStock}{m.unit})</option>)}
                       </select>
                       <input type="number" min={0} step="any" placeholder="Qty" value={line.qty} onChange={(e) => setLine(index, { qty: e.target.value })} style={inputStyle} />
-                      <div style={{ fontSize: 12, color: "rgba(255,255,255,.5)", textAlign: "right" }}>
-                        {item ? `Rs. ${Math.round(qty * item.unitCost).toLocaleString()}` : "—"}
+                      {/* The same quantity read the other way. A batch figure
+                          can only be checked against a batch nobody counts;
+                          the per-piece number beside it is the one an operator
+                          knows by heart, so a wrong entry shows itself here
+                          rather than in a costed run three days later. */}
+                      <div style={{ fontSize: 12, color: "rgba(255,255,255,.5)", textAlign: "right", lineHeight: 1.35 }}>
+                        <div>{item ? `Rs. ${Math.round(qty * item.unitCost).toLocaleString()}` : "—"}</div>
+                        {qty > 0 && form.yieldUnits > 0 && (
+                          <div style={{ fontSize: 10.5, color: "rgba(255,255,255,.32)" }}>
+                            {(() => {
+                              const perUnit = qty / form.yieldUnits;
+                              // Four decimals for a roll, none for a button —
+                              // "0.0016" and "2" are both the honest answer.
+                              const shown = perUnit >= 1
+                                ? Math.round(perUnit * 100) / 100
+                                : Math.round(perUnit * 1e4) / 1e4;
+                              return `${shown.toLocaleString()}${item?.unit ? ` ${item.unit}` : ""} per unit`;
+                            })()}
+                          </div>
+                        )}
                       </div>
                       <button
                         onClick={() => setLines((c) => (c.length === 1 ? [{ itemId: "", qty: "", divisible: false }] : c.filter((_, i) => i !== index)))}
