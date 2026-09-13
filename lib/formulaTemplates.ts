@@ -86,9 +86,20 @@ export const FORMULA_TEMPLATES: FormulaTemplate[] = [
       // reads baseCut, so they pick it up without being touched.
       { key: "baseCut",     label: "Base cut length", expression: "pieceLength * 2 + flap + guezzet", unit: "in", group: "Cutting" },
       { key: "lengthFactor",label: "Length multiple", expression: "scaleToRange(baseCut, cutMin, cutMax)", group: "Cutting" },
-      { key: "cutLength",   label: "Cut length",      expression: "baseCut * lengthFactor", unit: "in", group: "Cutting" },
+      // The allowance belongs here, not further down. It is blade and grip on
+      // every cut the machine makes, so the length actually cut is the panel
+      // plus the allowance — 24.5 x 2 + 0.75 = 49.75in, not 49. It used to be
+      // added inside the repeats division instead, which worked out to the
+      // same number of pieces but printed a cut length nobody could measure
+      // against the machine.
+      { key: "cutLength",   label: "Cut length",      expression: "baseCut * lengthFactor + cutAllowance", unit: "in", group: "Cutting" },
       { key: "rollInches",  label: "Roll length",     expression: "convert(rollLength, m, in)", unit: "in", group: "Cutting" },
-      { key: "repeats",     label: "Repeats per roll",expression: "floor(rollInches / (cutLength + cutAllowance))", group: "Cutting" },
+      // Layers is the raw division — how many cut lengths the roll holds. Only
+      // whole layers can be cut, so repeats floors it, but the exact figure is
+      // shown too: 79.135 and 79 are different answers to different questions,
+      // and rounding one into the other silently is how a roll comes up short.
+      { key: "layers",      label: "Layers — exact",  expression: "rollInches / cutLength", group: "Cutting" },
+      { key: "repeats",     label: "Layers per roll", expression: "floor(layers)", group: "Cutting" },
       { key: "piecesPerRoll", label: "Pieces per roll", expression: "repeats * acrossCount * lengthFactor", unit: "pcs", group: "Cutting" },
 
       { key: "rollsNeeded", label: "Rolls required",  expression: "orderQty / piecesPerRoll", group: "Rolls" },
@@ -97,7 +108,8 @@ export const FORMULA_TEMPLATES: FormulaTemplate[] = [
       // stock, not scrap.
       { key: "rollsToBuy",     label: "Rolls to buy",         expression: "ceil(rollsNeeded)", group: "Rolls" },
       { key: "leftoverStockM", label: "Leftover into stock",  expression: "(rollsToBuy - rollsNeeded) * rollLength", unit: "m", group: "Rolls" },
-      { key: "wasteM",      label: "Waste per roll",  expression: "(rollInches - repeats * (cutLength + cutAllowance)) / 39.37", unit: "m", group: "Rolls" },
+      // cutLength already carries the allowance, so it is not added again here.
+      { key: "wasteM",      label: "Waste per roll",  expression: "(rollInches - repeats * cutLength) / 39.37", unit: "m", group: "Rolls" },
 
       // Buttons costed like the roll: a count for the store to issue, a rate
       // against that count, and a total. buttonsNeeded is what actually goes
@@ -125,6 +137,10 @@ export const FORMULA_TEMPLATES: FormulaTemplate[] = [
       { key: "acrossCount",   label: "Pieces across",   unit: "pcs", group: "Cutting" },
       { key: "rollWidth",     label: "Roll width",      unit: "in", group: "Cutting" },
       { key: "cutLength",     label: "Cut length",      unit: "in", group: "Cutting" },
+      // The division and the whole number it becomes, both on the result card:
+      // 3,937.01 / 49.75 = 79.135 layers, of which 79 can actually be cut.
+      { key: "layers",        label: "Layers — exact",  group: "Cutting" },
+      { key: "repeats",       label: "Layers per roll", group: "Cutting" },
       { key: "rollsNeeded",   label: "Rolls required",  group: "Rolls" },
       { key: "rollsToBuy",       label: "Rolls to buy", group: "Rolls" },
       { key: "leftoverStockM",   label: "Leftover → waste stock", unit: "m", group: "Rolls" },
@@ -186,8 +202,9 @@ export const FORMULA_TEMPLATES: FormulaTemplate[] = [
       { key: "backRollWidth", label: "Back roll width used",  expression: "bestFitStock(bagWidth, backWidths)", unit: "in" },
       { key: "backBaseCut",   label: "Back base cut",         expression: "bagLength + flap + guezzet", unit: "in" },
       { key: "backFactor",    label: "Back length multiple",  expression: "scaleToRange(backBaseCut, cutMin, cutMax)" },
-      { key: "backCutLength", label: "Back cut length",       expression: "backBaseCut * backFactor", unit: "in" },
-      { key: "backRepeats",   label: "Back repeats per roll", expression: "floor(rollInches / (backCutLength + cutAllowance))" },
+      // Allowance inside the cut length, same as Roll → Pieces.
+      { key: "backCutLength", label: "Back cut length",       expression: "backBaseCut * backFactor + cutAllowance", unit: "in" },
+      { key: "backRepeats",   label: "Back layers per roll",  expression: "floor(rollInches / backCutLength)" },
       { key: "backPerRoll",   label: "Back panels per roll",  expression: "backRepeats * backAcross * backFactor", unit: "pcs" },
       { key: "backRollCost",  label: "Back roll cost",        expression: "backRate * backGauge * backRollWidth * rollLength / densityDiv", unit: "Rs" },
       { key: "backPerPc",     label: "Back cost per bag",     expression: "backRollCost / backPerRoll", unit: "Rs" },
@@ -197,8 +214,8 @@ export const FORMULA_TEMPLATES: FormulaTemplate[] = [
       { key: "frontRollWidth", label: "Front roll width used",  expression: "bestFitStock(bagWidth, frontWidths)", unit: "in" },
       { key: "frontBaseCut",   label: "Front base cut",         expression: "bagLength", unit: "in" },
       { key: "frontFactor",    label: "Front length multiple",  expression: "scaleToRange(frontBaseCut, cutMin, cutMax)" },
-      { key: "frontCutLength", label: "Front cut length",       expression: "frontBaseCut * frontFactor", unit: "in" },
-      { key: "frontRepeats",   label: "Front repeats per roll", expression: "floor(rollInches / (frontCutLength + cutAllowance))" },
+      { key: "frontCutLength", label: "Front cut length",       expression: "frontBaseCut * frontFactor + cutAllowance", unit: "in" },
+      { key: "frontRepeats",   label: "Front layers per roll",  expression: "floor(rollInches / frontCutLength)" },
       { key: "frontPerRoll",   label: "Front panels per roll",  expression: "frontRepeats * frontAcross * frontFactor", unit: "pcs" },
       { key: "frontRollCost",  label: "Front roll cost",        expression: "frontRate * frontGauge * frontRollWidth * rollLength / densityDiv", unit: "Rs" },
       { key: "frontPerPc",     label: "Front cost per bag",     expression: "frontRollCost / frontPerRoll", unit: "Rs" },
@@ -208,8 +225,8 @@ export const FORMULA_TEMPLATES: FormulaTemplate[] = [
       { key: "costPerPc",     label: "Cost per bag",      expression: "materialPerPc + labour + buttonTape + others", unit: "Rs" },
       { key: "backRolls",     label: "Back rolls required",  expression: "orderQty / backPerRoll" },
       { key: "frontRolls",    label: "Front rolls required", expression: "orderQty / frontPerRoll" },
-      { key: "backWasteM",    label: "Back waste per roll",  expression: "(rollInches - backRepeats * (backCutLength + cutAllowance)) / 39.37", unit: "m" },
-      { key: "frontWasteM",   label: "Front waste per roll", expression: "(rollInches - frontRepeats * (frontCutLength + cutAllowance)) / 39.37", unit: "m" },
+      { key: "backWasteM",    label: "Back waste per roll",  expression: "(rollInches - backRepeats * backCutLength) / 39.37", unit: "m" },
+      { key: "frontWasteM",   label: "Front waste per roll", expression: "(rollInches - frontRepeats * frontCutLength) / 39.37", unit: "m" },
       { key: "orderCost",     label: "Order total",       expression: "costPerPc * orderQty", unit: "Rs" },
     ],
     outputs: [
