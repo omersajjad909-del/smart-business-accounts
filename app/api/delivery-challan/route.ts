@@ -4,6 +4,7 @@ import { z } from "zod";
 import { resolveCompanyId, resolveBranchId, resolveBranchIdOrDefault } from "@/lib/tenant";
 import { writeDispatchStock } from "@/lib/challanStock";
 import { withReadableParties } from "@/lib/partyDecrypt";
+import { withDocNo, formatDocNo, highestSeq } from "@/lib/docNumber";
 
 // VALIDATION SCHEMA
 const challanSchema = z.object({
@@ -104,11 +105,18 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const data = challanSchema.parse(body);
 
-    // Auto-generate Challan No
-    const count = await prisma.deliveryChallan.count({ where: { companyId } });
-    const challanNo = `DC-${String(count + 1).padStart(4, "0")}`;
+    /* Off the highest challan this company has issued, not off how many rows
+       it has — a deleted challan used to hand the next one a number that was
+       already taken. See lib/docNumber.ts. */
+    const issued = await prisma.deliveryChallan.findMany({
+      where: { companyId },
+      select: { challanNo: true },
+    });
+    const top = highestSeq(issued, "challanNo");
 
-    const challan = await prisma.deliveryChallan.create({
+    const challan = await withDocNo(
+      async (offset) => formatDocNo("DC-", top + 1 + offset),
+      (challanNo) => prisma.deliveryChallan.create({
       data: {
         companyId,
         branchId,
@@ -143,7 +151,8 @@ export async function POST(req: NextRequest) {
           include: { item: true },
         },
       },
-    });
+      }),
+    );
 
     // Deduct stock when challan is created as DELIVERED (immediate dispatch)
     if ((data.status || "PENDING") === "DELIVERED") {

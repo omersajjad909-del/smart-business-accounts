@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { nextDocNo } from "@/lib/docNumber";
 
 // Process recurring transactions that are due
 export async function POST(_req: NextRequest) {
@@ -97,11 +98,12 @@ function calculateNextDate(currentDate: Date, frequency: string): Date {
 }
 
 async function createCPV(transaction: any) {
-  // Generate voucher number
-  const count = await prisma.voucher.count({
+  // One past the highest issued, not a row count — see lib/docNumber.ts.
+  const issued = await prisma.voucher.findMany({
     where: { type: "CPV", companyId: transaction.companyId },
+    select: { voucherNo: true },
   });
-  const voucherNo = `CPV-${count + 1}`;
+  const voucherNo = nextDocNo(issued, "voucherNo", "CPV-");
 
   const metadata = transaction.metadata ? JSON.parse(transaction.metadata) : {};
 
@@ -133,10 +135,11 @@ async function createCPV(transaction: any) {
 }
 
 async function createCRV(transaction: any) {
-  const count = await prisma.voucher.count({
+  const issued = await prisma.voucher.findMany({
     where: { type: "CRV", companyId: transaction.companyId },
+    select: { voucherNo: true },
   });
-  const voucherNo = `CRV-${count + 1}`;
+  const voucherNo = nextDocNo(issued, "voucherNo", "CRV-");
 
   const metadata = transaction.metadata ? JSON.parse(transaction.metadata) : {};
 
@@ -201,10 +204,11 @@ async function createSalesInvoice(transaction: any) {
     throw new Error("Sales invoice metadata missing customerId or items");
   }
 
-  const count = await prisma.salesInvoice.count({
+  const issued = await prisma.salesInvoice.findMany({
     where: { companyId: transaction.companyId },
+    select: { invoiceNo: true },
   });
-  const invoiceNo = metadata.invoiceNo || `SI-${count + 1}`;
+  const invoiceNo = metadata.invoiceNo || nextDocNo(issued, "invoiceNo", "SI-");
 
   const total = items.reduce(
     (sum: number, i: any) => sum + Number(i.qty || 0) * Number(i.rate || 0),
@@ -239,10 +243,11 @@ async function createPurchaseInvoice(transaction: any) {
     throw new Error("Purchase invoice metadata missing supplierId or items");
   }
 
-  const count = await prisma.purchaseInvoice.count({
+  const issued = await prisma.purchaseInvoice.findMany({
     where: { companyId: transaction.companyId },
+    select: { invoiceNo: true },
   });
-  const invoiceNo = metadata.invoiceNo || `PI-${count + 1}`;
+  const invoiceNo = metadata.invoiceNo || nextDocNo(issued, "invoiceNo", "PI-");
 
   const total = items.reduce(
     (sum: number, i: any) => sum + Number(i.qty || 0) * Number(i.rate || 0),

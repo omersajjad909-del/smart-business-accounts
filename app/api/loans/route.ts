@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { nextDocNo } from "@/lib/docNumber";
 
 export async function GET(req: NextRequest) {
   try {
@@ -41,8 +42,12 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const { loanType, accountId, principalAmount, interestRate, tenure, startDate } = body;
 
-    const count = await prisma.loan.count({ where: { companyId } });
-    const loanNumber = `LN-${String(count + 1).padStart(4, '0')}`;
+    // One past the highest issued, not a row count — see lib/docNumber.ts.
+    const issued = await prisma.loan.findMany({
+      where: { companyId },
+      select: { loanNumber: true },
+    });
+    const loanNumber = nextDocNo(issued, "loanNumber", "LN-");
 
     // Simple EMI calculation (if not provided, we can calc roughly or leave 0)
     // Formula: [P x R x (1+R)^N]/[(1+R)^N-1] where R is monthly rate

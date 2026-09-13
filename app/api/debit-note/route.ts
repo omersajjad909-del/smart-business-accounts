@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { nextDocNo } from "@/lib/docNumber";
 
 export async function GET(req: NextRequest) {
   try {
@@ -41,8 +42,12 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const { date, accountId, amount, reason, description, reference } = body;
 
-    const count = await prisma.debitNote.count({ where: { companyId } });
-    const debitNoteNumber = `DN-${String(count + 1).padStart(4, '0')}`;
+    // One past the highest issued, not a row count — see lib/docNumber.ts.
+    const issued = await prisma.debitNote.findMany({
+      where: { companyId },
+      select: { debitNoteNumber: true },
+    });
+    const debitNoteNumber = nextDocNo(issued, "debitNoteNumber", "DN-");
 
     const debitNote = await prisma.debitNote.create({
       data: {

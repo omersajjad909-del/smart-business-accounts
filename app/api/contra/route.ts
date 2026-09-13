@@ -4,6 +4,7 @@ import { resolveCompanyId } from "@/lib/tenant";
 import { logActivity } from "@/lib/audit";
 import { PERMISSIONS } from "@/lib/permissions";
 import { apiHasPermission } from "@/lib/apiPermission";
+import { nextDocNo } from "@/lib/docNumber";
 
 export async function GET(req: NextRequest) {
   try {
@@ -96,11 +97,12 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Generate voucher number
-    const count = await prisma.voucher.count({
+    // One past the highest issued, not a row count — see lib/docNumber.ts.
+    const issued = await prisma.voucher.findMany({
       where: { type: "CONTRA", companyId },
+      select: { voucherNo: true },
     });
-    const voucherNo = `CNT-${String(count + 1).padStart(4, "0")}`;
+    const voucherNo = nextDocNo(issued, "voucherNo", "CNT-");
 
     // Find linked bank accounts
     const fromBankAccount = await prisma.bankAccount.findFirst({

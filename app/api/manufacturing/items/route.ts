@@ -17,6 +17,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { resolveCompanyId } from "@/lib/tenant";
 import { getStockOnHand, getAverageCosts, readOpenRemnants } from "@/lib/manufacturingPosting";
+import { nextDocNo } from "@/lib/docNumber";
 
 const WRITE_ROLES = new Set(["ADMIN", "ACCOUNTANT", "MANAGER"]);
 const CATEGORIES = new Set(["RAW_MATERIAL", "PACKAGING", "FINISHED", "TRADING", "SERVICE"]);
@@ -102,8 +103,12 @@ export async function POST(req: NextRequest) {
       : category === "RAW_MATERIAL" ? "RM"
       : category === "PACKAGING" ? "PK"
       : "IT";
-    const count = await prisma.itemNew.count({ where: { companyId, category } });
-    const code = String(body?.code || "").trim() || `${prefix}-${count + 1}`;
+    // One past the highest issued, not a row count — see lib/docNumber.ts.
+    const issued = await prisma.itemNew.findMany({
+      where: { companyId, category },
+      select: { code: true },
+    });
+    const code = String(body?.code || "").trim() || nextDocNo(issued, "code", `${prefix}-`, 1);
 
     const item = await prisma.itemNew.create({
       data: {

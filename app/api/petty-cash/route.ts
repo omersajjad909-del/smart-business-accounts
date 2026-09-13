@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { resolveCompanyId } from "@/lib/tenant";
+import { nextDocNo } from "@/lib/docNumber";
 
 export async function GET(req: NextRequest) {
   try {
@@ -56,11 +57,12 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Generate a simple code if not provided logic exists
-    const count = await prisma.account.count({
+    // One past the highest issued, not a row count — see lib/docNumber.ts.
+    const issued = await prisma.account.findMany({
       where: { companyId, partyType: "CASH" },
+      select: { code: true },
     });
-    const code = `CASH-${String(count + 1).padStart(3, "0")}`;
+    const code = nextDocNo(issued, "code", "CASH-", 3);
 
     const account = await prisma.account.create({
       data: {
