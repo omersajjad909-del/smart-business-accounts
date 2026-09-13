@@ -19,6 +19,7 @@ import {
   runFormula,
   checkExpression,
   validateKey,
+  inputVisible,
   applyProfit,
   toProfit,
   NO_PROFIT,
@@ -395,6 +396,11 @@ export default function FormulasPage() {
     type InputRow = { inp: FormulaInput; i: number };
     const inputGroups: { name: string; rows: InputRow[] }[] = [];
     d.inputs.forEach((inp, i) => {
+      /* Simple is a preview of the run screen, so it shows the branch the
+         formula currently opens on and nothing else — six boxes for a bag that
+         can only take three is the thing this view exists to avoid. Detailed
+         keeps every branch on screen, because that is where they are written. */
+      if (!detailed && !inputVisible(inp, preview?.values ?? {})) return;
       const name = (inp.group ?? "").trim();
       const bucket = inputGroups.find((g) => g.name === name);
       if (bucket) bucket.rows.push({ inp, i });
@@ -497,13 +503,32 @@ export default function FormulasPage() {
       );
 
       if (!detailed) {
+        /* A choice shows as the choice, not as its option list — picking here
+           sets which option the formula opens on, and the boxes below follow
+           it straight away so an author sees what each branch really asks for.
+           The option names themselves are renamed in Detailed. */
+        const simpleValue = inp.options?.length ? (
+          <select
+            value={String(inp.defaultValue ?? 0)}
+            onChange={(e) => patch((x) => { x.inputs[i].defaultValue = Number(e.target.value); })}
+            style={{ ...input, cursor: "pointer", color: "#fbbf24" }}
+            title="Which option the formula opens on. The boxes underneath change with it."
+          >
+            {inp.options.map((o, oi) => <option key={oi} value={oi}>{o}</option>)}
+          </select>
+        ) : valueCell;
+
         return (
           <div className="fxInS" key={i}>
             <input value={inp.label} onChange={(e) => setInputLabel(i, e.target.value)}
               placeholder="Width" style={input}/>
-            <input value={inp.unit ?? ""} onChange={(e) => patch((x) => { x.inputs[i].unit = e.target.value; })}
-              placeholder="in" style={input}/>
-            {valueCell}
+            {/* A choice has no unit — leaving an editable box there only
+                invites one to be typed in. */}
+            {inp.options?.length ? <div /> : (
+              <input value={inp.unit ?? ""} onChange={(e) => patch((x) => { x.inputs[i].unit = e.target.value; })}
+                placeholder="in" style={input}/>
+            )}
+            {simpleValue}
             {removeBtn}
           </div>
         );

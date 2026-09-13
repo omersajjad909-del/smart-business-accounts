@@ -66,8 +66,12 @@ export const FORMULA_TEMPLATES: FormulaTemplate[] = [
       // Tape is not counted, it is measured — three inches a bag, bought by
       // the metre. So it gets a length and a rate rather than a count and a
       // rate, and the sheet converts between them instead of the operator.
+      // Three boxes either way, and the same three questions in the same
+      // order: how much per piece, what it costs, what it costs to fit. Only
+      // the unit moves — buttons are counted, tape is measured.
       { key: "tapePerPc",    label: "Tape per piece",     unit: "in", defaultValue: 3, askOnRun: true, group: "Button & Tape", showWhen: { key: "fitting", is: 1 } },
-      { key: "tapeRate",     label: "Tape rate",          unit: "per m", defaultValue: 8, askOnRun: true, group: "Button & Tape", showWhen: { key: "fitting", is: 1 } },
+      { key: "tapeRate",     label: "Rate per inch",      unit: "Rs", defaultValue: 0.25, askOnRun: true, group: "Button & Tape", showWhen: { key: "fitting", is: 1 } },
+      { key: "tapeLabour",   label: "Labour per inch",    unit: "Rs", defaultValue: 0.05, askOnRun: true, group: "Button & Tape", showWhen: { key: "fitting", is: 1 } },
       { key: "labour",       label: "Labour",             unit: "Rs", defaultValue: 3, askOnRun: true, group: "Order details" },
       // The odds and ends a quote picks up that have no box of their own — a
       // rupee of printing, two of stitching. Per piece, like labour beside it,
@@ -125,7 +129,7 @@ export const FORMULA_TEMPLATES: FormulaTemplate[] = [
       // Same shape as the buttons, in the unit tape is actually bought in: the
       // store issues metres, the bag is cut in inches.
       { key: "tapeNeeded",    label: "Tape required",       expression: "if(fitting == 1, convert(tapePerPc * orderQty, in, m), 0)", unit: "m", group: "Buttons & Tape" },
-      { key: "tapeCostPerPc", label: "Tape cost per piece", expression: "if(fitting == 1, convert(tapePerPc, in, m) * tapeRate, 0)", unit: "Rs", group: "Buttons & Tape" },
+      { key: "tapeCostPerPc", label: "Tape cost per piece", expression: "if(fitting == 1, tapePerPc * (tapeRate + tapeLabour), 0)", unit: "Rs", group: "Buttons & Tape" },
       { key: "tapeTotal",     label: "Total tape cost",     expression: "tapeCostPerPc * orderQty", unit: "Rs", group: "Buttons & Tape" },
 
       // Roll cost is the film and nothing else — what the roll weighs times
