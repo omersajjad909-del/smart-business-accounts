@@ -78,8 +78,6 @@ const CSS = `
 .cxForm{display:flex;flex-direction:column;gap:14px}
 .cxFields{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .cxStats{display:grid;grid-template-columns:repeat(auto-fill,minmax(145px,1fr));gap:14px}
-.cxRecentRow{display:flex;justify-content:space-between;gap:10px;font-size:12.5px}
-.cxRecentTitle{color:rgba(255,255,255,.55);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .cxActionRow{display:flex;gap:9px;flex-wrap:wrap}
 .cxWorkingRow{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;padding:8px 10px;border-radius:7px}
 .cxSectionHead{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
@@ -94,8 +92,6 @@ const CSS = `
   .cxHeaderAction,.cxHeaderAction > *{justify-content:center;width:100%}
   .cxFields{grid-template-columns:1fr}
   .cxStats{grid-template-columns:1fr}
-  .cxRecentRow{flex-direction:column;align-items:flex-start}
-  .cxRecentTitle{white-space:normal}
   .cxActionRow{flex-direction:column}
   .cxActionRow > *{width:100%}
   .cxWorkingRow{grid-template-columns:1fr;gap:6px}
@@ -195,12 +191,9 @@ function today(): string {
 function CostingInner() {
   const params = useSearchParams();
   const formulaStore = useBusinessRecords("costing_formula");
-  const sheetStore = useBusinessRecords("costing_sheet");
 
   const [selectedId, setSelectedId] = useState("");
   const [values, setValues] = useState<Record<string, number | number[]>>({});
-  const [sheetName, setSheetName] = useState("");
-  const [savedNote, setSavedNote] = useState("");
   // Folded away by default. The working is every step of the costing, which is
   // what you open when a number looks wrong — not what you want between the
   // result and the print buttons on every single quote.
@@ -252,8 +245,6 @@ function CostingInner() {
       next[inp.key] = inp.isList ? (inp.listValue ?? []) : (inp.defaultValue ?? 0);
     }
     setValues(next);
-    setSheetName(selected.formula.name);
-    setSavedNote("");
     // The formula's own profit, not zero — a formula written to quote at 15%
     // should quote at 15% the moment it is opened.
     const profit = toProfit(selected.formula.profit);
@@ -313,44 +304,6 @@ function CostingInner() {
   const { amount: profitAmount, total: saleRate } =
     applyProfit(baseRate, { mode: profitMode, value: profitValue });
 
-  async function saveSheet() {
-    if (!selected || !run) return;
-    const resultSnapshot: Record<string, unknown> = {};
-    for (const o of outputs) resultSnapshot[o.key] = run.values[o.key] ?? null;
-
-    await sheetStore.create({
-      title: sheetName.trim() || selected.formula.name,
-      status: "saved",
-      refId: selected.id,
-      // What the sheet actually quoted, which is the rate with profit on it —
-      // the saved list shows this number, and cost alone would read as the
-      // price when it is not.
-      amount: saleRate ?? (typeof run.values[primary?.key ?? ""] === "number"
-        ? (run.values[primary.key] as number)
-        : undefined),
-      date: new Date().toISOString(),
-      data: {
-        formulaId: selected.id,
-        formulaName: selected.formula.name,
-        // Stamped, not referenced: the formula can change later without
-        // rewriting what this sheet quoted.
-        formulaVersion: selected.formula.version,
-        inputs: values,
-        outputs: outputs.map((o) => ({ key: o.key, label: o.label, unit: o.unit, role: o.role })),
-        results: resultSnapshot,
-        // The profit as it stood for this quote, and the cost under it — a
-        // sheet whose margin cannot be read back is not much of a record.
-        profit: { mode: profitMode, value: profitValue },
-        profitAmount,
-        costRate: baseRate,
-        saleRate,
-      },
-    });
-    setSavedNote(`Saved "${sheetName.trim() || selected.formula.name}"`);
-    setTimeout(() => setSavedNote(""), 3500);
-  }
-
-  const recentSheets = sheetStore.records.slice(0, 6);
 
   /** The numbers the BOM needs, read off the outputs by their role. */
   const bomSeed = useMemo(() => {
@@ -580,24 +533,6 @@ function CostingInner() {
                 </details>
               </Card>
             )}
-
-            {recentSheets.length > 0 && (
-              <div style={{ background: CARD, border: `1px solid ${BORDER}`, borderRadius: 14, padding: 18 }}>
-                <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 12 }}>Recent sheets</div>
-                <div style={{ display: "flex", flexDirection: "column", gap: 7 }}>
-                  {recentSheets.map((s) => (
-                    <div key={s.id} className="cxRecentRow">
-                      <span className="cxRecentTitle">
-                        {s.title}
-                      </span>
-                      <span style={{ fontFamily: MONO, color: "#34d399", fontWeight: 700, flexShrink: 0, fontVariantNumeric: "tabular-nums" }}>
-                        {fmt(s.amount)}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
           </div>
 
           {/* ── Right: the answer, its working, and what to do with it ── */}
@@ -741,26 +676,6 @@ function CostingInner() {
               )}
             </div>
 
-            {/* Save */}
-            {selected && (
-              <div style={{ background: CARD, border: `1px solid ${BORDER}`, borderRadius: 14, padding: 18 }}>
-                <label style={labelStyle}>Save this as a sheet</label>
-                <div className="cxActionRow">
-                  <input value={sheetName} onChange={(e) => setSheetName(e.target.value)}
-                    placeholder="PVC bag 11.5 × 11 — Ali Traders"
-                    style={{ ...inputStyle, fontFamily: FONT, flex: 1, minWidth: 180 }}/>
-                  <button onClick={saveSheet} disabled={!run?.ok} style={{ ...btn(true), opacity: run?.ok ? 1 : .5 }}>
-                    Save sheet
-                  </button>
-                </div>
-                {savedNote && <div style={{ fontSize: 12.5, color: "#34d399", marginTop: 9 }}>{savedNote}</div>}
-                <p style={{ fontSize: 11.5, color: "rgba(255,255,255,.28)", margin: "10px 0 0", lineHeight: 1.6 }}>
-                  The sheet keeps the numbers you entered and the formula version used, so a
-                  quote stays as quoted even if the formula changes later.
-                </p>
-              </div>
-            )}
-
             {/* ── Turn the result into something the factory can produce against ──
                 This used to open a second, cut-down BOM form right here — its own
                 "Finished product"/"Raw material" pair, no room for more than one
@@ -844,7 +759,7 @@ function CostingInner() {
         <PrintSheet
           kind={printKind}
           formula={selected.formula}
-          title={sheetName.trim() || selected.formula.name}
+          title={selected.formula.name}
           run={run}
           outputs={outputs}
           primaryKey={primary?.key}
