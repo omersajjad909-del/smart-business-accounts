@@ -342,16 +342,23 @@ function CostingInner() {
        reached the BOM as labour — it rode across in the unassigned lump with
        the buttons themselves, and the batch was costed with neither.
        
-       Bounded by `seen`, so a formula whose steps refer to each other is
-       walked once rather than for ever. */
+       Exactly one level, though: see the note on the step branch below.
+       Bounded by `seen` as well, so a formula whose steps refer to each other
+       is walked once rather than for ever. */
     const seen = new Set<string>();
-    const walk = (expression: string | undefined) => {
+    const walk = (expression: string | undefined, depth: number) => {
       for (const token of expression?.match(/[A-Za-z_][A-Za-z0-9_]*/g) ?? []) {
         if (seen.has(token)) continue;
         seen.add(token);
 
         const step = stepByKey.get(token);
-        if (step) { walk(step.expression); continue; }
+        // One level, and no further. The step that works out the material is
+        // named here too, and inside it every rate and gauge is multiplied
+        // into a material cost rather than added as a charge — walking in
+        // there returns things like "Gauge / thickness" as a per-unit charge,
+        // which is not a charge at all. One level down is where a fitting
+        // cost lives; below that is the material's own arithmetic.
+        if (step) { if (depth > 0) walk(step.expression, depth - 1); continue; }
 
         const input = inputByKey.get(token);
         if (!input || input.isList || !isMoneyUnit(input.unit)) continue;
@@ -364,7 +371,7 @@ function CostingInner() {
         charges.push({ key: token, label: input.label || token, perUnit: value });
       }
     };
-    walk(stepByKey.get(unitKey ?? "")?.expression);
+    walk(stepByKey.get(unitKey ?? "")?.expression, 1);
     const isLabour = (c: { key: string; label: string }) =>
       LABOUR_CHARGE.test(c.key) || LABOUR_CHARGE.test(c.label);
     const labourPerUnit = charges.filter(isLabour).reduce((sum, c) => sum + c.perUnit, 0);
