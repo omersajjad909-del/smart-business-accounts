@@ -541,6 +541,12 @@ export type FormulaStep = {
   label: string;
   expression: string;
   unit?: string;
+  /**
+   * Heading this step is printed under on the working sheet — "Cutting",
+   * "Rolls", "Buttons". Display only, same as on an input: the engine runs the
+   * steps in the order they are written, never in group order.
+   */
+  group?: string;
 };
 
 /**
@@ -563,6 +569,8 @@ export type FormulaOutput = {
   unit?: string;
   role?: OutputRole;
   primary?: boolean;
+  /** Heading this figure prints under on the working sheet. Display only. */
+  group?: string;
 };
 
 /**
@@ -629,6 +637,10 @@ export type StepResult = {
   unit?: string;
   value: FormulaValue | null;
   error?: string;
+  /** Carried through from the input or step, for sheets that print in blocks. */
+  group?: string;
+  /** Which half of the run this row came from — what was typed, or what was worked out. */
+  kind: "input" | "step";
 };
 
 export type FormulaRun = {
@@ -693,6 +705,8 @@ export function runFormula(
       expression: "input",
       unit: input.unit,
       value,
+      group: input.group,
+      kind: "input",
     });
   }
 
@@ -708,6 +722,8 @@ export function runFormula(
         expression: step.expression,
         unit: step.unit,
         value,
+        group: step.group,
+        kind: "step",
       });
     } catch (e) {
       const message = e instanceof Error ? e.message : "Could not calculate";
@@ -719,6 +735,8 @@ export function runFormula(
         unit: step.unit,
         value: null,
         error: message,
+        group: step.group,
+        kind: "step",
       });
     }
   }

@@ -263,8 +263,25 @@ function CostingInner() {
     return () => window.clearTimeout(timer);
   }, [printKind]);
 
-  const askedInputs = selected?.formula.inputs.filter((i) => i.askOnRun !== false) ?? [];
-  const fixedInputs = selected?.formula.inputs.filter((i) => i.askOnRun === false) ?? [];
+  /* Hidden inputs never reach this screen at all. They are constants of the
+     trade — a weight divisor, a density — and an operator quoting a job has no
+     business being asked about them; they still feed every step through their
+     own default. Change one in the formula, not on a quote. */
+  const runInputs = selected?.formula.inputs.filter((i) => !i.hidden) ?? [];
+  const askedInputs = runInputs.filter((i) => i.askOnRun !== false);
+  const fixedInputs = runInputs.filter((i) => i.askOnRun === false);
+
+  /* The job is filled in blocks — sizes, then the roll, then the order — the
+     same sections the formula was written in. Twelve identical boxes in one
+     column is where an operator types a width into a length. */
+  const askedGroups: { name: string; rows: FormulaInput[] }[] = [];
+  for (const inp of askedInputs) {
+    const name = (inp.group ?? "").trim();
+    const bucket = askedGroups.find((g) => g.name === name);
+    if (bucket) bucket.rows.push(inp);
+    else askedGroups.push({ name, rows: [inp] });
+  }
+  const askedSectioned = askedGroups.some((g) => g.name);
   const outputs = selected?.formula.outputs.filter((o) => o.key) ?? [];
   const primary = outputs.find((o) => o.primary) ?? outputs[0];
 
@@ -501,8 +518,21 @@ function CostingInner() {
 
             {selected && (
               <Card n={2} title="Enter the job" hint="The result updates as you type — no calculate button to press.">
-                <div className="cxFields">
-                  {askedInputs.map(field)}
+                <div style={{ display: "flex", flexDirection: "column", gap: askedSectioned ? 16 : 0 }}>
+                  {askedGroups.map((g, gi) => (
+                    <div key={gi}>
+                      {askedSectioned && (
+                        <div style={{
+                          fontSize: 11, fontWeight: 700, letterSpacing: ".07em", textTransform: "uppercase",
+                          color: "rgba(255,255,255,.4)", marginBottom: 9,
+                          paddingBottom: 6, borderBottom: `1px solid ${BORDER}`,
+                        }}>
+                          {g.name || "Other details"}
+                        </div>
+                      )}
+                      <div className="cxFields">{g.rows.map(field)}</div>
+                    </div>
+                  ))}
                 </div>
                 {!askedInputs.length && (
                   <div style={{ fontSize: 12.5, color: "rgba(255,255,255,.3)" }}>

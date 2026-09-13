@@ -55,55 +55,76 @@ export const FORMULA_TEMPLATES: FormulaTemplate[] = [
       // rollCost still divides by it, so a trade running a different density
       // can still open Advanced and change the 54.
       { key: "densityDiv",   label: "Weight divisor",     unit: "",   defaultValue: 54, group: "Roll details", hidden: true },
+      // Buttons are counted, not guessed at. A flat "Button / Tape — Rs 3"
+      // could not answer the two questions a store actually gets asked: how
+      // many buttons to issue for the order, and what they came to. So the
+      // charge is built the way the roll is — a count per piece against a
+      // rate — and the total falls out of it.
+      { key: "buttonsPerPc", label: "Buttons per piece",  unit: "pcs", defaultValue: 2, askOnRun: true, group: "Button & Tape" },
+      { key: "buttonRate",   label: "Rate per button",    unit: "Rs", defaultValue: 1.2, askOnRun: true, group: "Button & Tape" },
+      { key: "buttonLabour", label: "Labour per button",  unit: "Rs", defaultValue: 0.3, askOnRun: true, group: "Button & Tape" },
+      { key: "tapePerPc",    label: "Tape per piece",     unit: "Rs", defaultValue: 0, askOnRun: true, group: "Button & Tape" },
       { key: "labour",       label: "Labour",             unit: "Rs", defaultValue: 3, askOnRun: true, group: "Order details" },
-      { key: "buttonTape",   label: "Button / Tape",      unit: "Rs", defaultValue: 0, askOnRun: true, group: "Order details" },
       // The odds and ends a quote picks up that have no box of their own — a
       // rupee of printing, two of stitching. Per piece, like labour beside it,
       // and zero by default so it changes nothing until somebody types in it.
       { key: "others",       label: "Others",             unit: "Rs", defaultValue: 0, askOnRun: true, group: "Order details" },
       { key: "orderQty",     label: "Order quantity",     unit: "pcs", defaultValue: 10000, askOnRun: true, group: "Order details" },
     ],
+    /* Grouped the way the cutting floor reads the job: what comes off the
+       width, what comes off the length, then rolls, then buttons, and the
+       money last. The groups only shape the working sheet — steps still run
+       top to bottom, so the order here is the order of calculation. */
     steps: [
-      { key: "acrossCount", label: "Pieces across",   expression: "bestFitCount(pieceWidth, stockWidths)" },
-      { key: "rollWidth",   label: "Roll width used", expression: "bestFitStock(pieceWidth, stockWidths)", unit: "in" },
+      { key: "acrossCount", label: "Pieces across",   expression: "bestFitCount(pieceWidth, stockWidths)", unit: "pcs", group: "Cutting" },
+      { key: "rollWidth",   label: "Roll width used", expression: "bestFitStock(pieceWidth, stockWidths)", unit: "in", group: "Cutting" },
       // Gusset joins the length + flap sum and nothing else — every step below
       // reads baseCut, so they pick it up without being touched.
-      { key: "baseCut",     label: "Base cut length", expression: "pieceLength * 2 + flap + guezzet", unit: "in" },
-      { key: "lengthFactor",label: "Length multiple", expression: "scaleToRange(baseCut, cutMin, cutMax)" },
-      { key: "cutLength",   label: "Cut length",      expression: "baseCut * lengthFactor", unit: "in" },
-      { key: "rollInches",  label: "Roll length",     expression: "convert(rollLength, m, in)", unit: "in" },
-      { key: "repeats",     label: "Repeats per roll",expression: "floor(rollInches / (cutLength + cutAllowance))" },
-      { key: "piecesPerRoll", label: "Pieces per roll", expression: "repeats * acrossCount * lengthFactor", unit: "pcs" },
-      // Roll cost is the film and nothing else — what the roll weighs times
-      // what the material sells for.
-      { key: "rollCost",    label: "Roll cost",       expression: "materialRate * gauge * rollWidth * rollLength / densityDiv", unit: "Rs" },
-      { key: "materialPerPc", label: "Material per piece", expression: "rollCost / piecesPerRoll", unit: "Rs" },
-      // Button/tape is fitted to each piece, so it is priced per piece next to
-      // labour. It used to be added once to the whole roll, where a 790-piece
-      // roll divided Rs. 2.40 of buttons down to three paisa a bag and the
-      // charge may as well not have been entered — the two-panel template
-      // below always costed it this way.
-      { key: "costPerPc",   label: "Cost per piece",  expression: "materialPerPc + labour + buttonTape + others", unit: "Rs" },
-      { key: "rollsNeeded", label: "Rolls required",  expression: "orderQty / piecesPerRoll" },
+      { key: "baseCut",     label: "Base cut length", expression: "pieceLength * 2 + flap + guezzet", unit: "in", group: "Cutting" },
+      { key: "lengthFactor",label: "Length multiple", expression: "scaleToRange(baseCut, cutMin, cutMax)", group: "Cutting" },
+      { key: "cutLength",   label: "Cut length",      expression: "baseCut * lengthFactor", unit: "in", group: "Cutting" },
+      { key: "rollInches",  label: "Roll length",     expression: "convert(rollLength, m, in)", unit: "in", group: "Cutting" },
+      { key: "repeats",     label: "Repeats per roll",expression: "floor(rollInches / (cutLength + cutAllowance))", group: "Cutting" },
+      { key: "piecesPerRoll", label: "Pieces per roll", expression: "repeats * acrossCount * lengthFactor", unit: "pcs", group: "Cutting" },
+
+      { key: "rollsNeeded", label: "Rolls required",  expression: "orderQty / piecesPerRoll", group: "Rolls" },
       // You can only buy whole rolls, so the fractional part of rollsNeeded is
       // never actually used up — it comes back off the last roll as leftover
       // stock, not scrap.
-      { key: "rollsToBuy",     label: "Rolls to buy",         expression: "ceil(rollsNeeded)" },
-      { key: "leftoverStockM", label: "Leftover into stock",  expression: "(rollsToBuy - rollsNeeded) * rollLength", unit: "m" },
-      { key: "wasteM",      label: "Waste per roll",  expression: "(rollInches - repeats * (cutLength + cutAllowance)) / 39.37", unit: "m" },
-      { key: "orderCost",   label: "Order total",     expression: "costPerPc * orderQty", unit: "Rs" },
+      { key: "rollsToBuy",     label: "Rolls to buy",         expression: "ceil(rollsNeeded)", group: "Rolls" },
+      { key: "leftoverStockM", label: "Leftover into stock",  expression: "(rollsToBuy - rollsNeeded) * rollLength", unit: "m", group: "Rolls" },
+      { key: "wasteM",      label: "Waste per roll",  expression: "(rollInches - repeats * (cutLength + cutAllowance)) / 39.37", unit: "m", group: "Rolls" },
+
+      // Buttons costed like the roll: a count for the store to issue, a rate
+      // against that count, and a total. buttonsNeeded is what actually goes
+      // out of the store for the order — the number a flat per-piece charge
+      // could never tell anybody.
+      { key: "buttonsNeeded", label: "Buttons required",    expression: "buttonsPerPc * orderQty", unit: "pcs", group: "Buttons" },
+      { key: "buttonPerPc",   label: "Button cost per piece", expression: "buttonsPerPc * (buttonRate + buttonLabour) + tapePerPc", unit: "Rs", group: "Buttons" },
+      { key: "buttonTotal",   label: "Total button cost",   expression: "buttonPerPc * orderQty", unit: "Rs", group: "Buttons" },
+
+      // Roll cost is the film and nothing else — what the roll weighs times
+      // what the material sells for.
+      { key: "rollCost",    label: "Roll cost",       expression: "materialRate * gauge * rollWidth * rollLength / densityDiv", unit: "Rs", group: "Cost" },
+      { key: "materialPerPc", label: "Material per piece", expression: "rollCost / piecesPerRoll", unit: "Rs", group: "Cost" },
+      { key: "costPerPc",   label: "Cost per piece",  expression: "materialPerPc + labour + buttonPerPc + others", unit: "Rs", group: "Cost" },
+      { key: "orderCost",   label: "Order total",     expression: "costPerPc * orderQty", unit: "Rs", group: "Cost" },
     ],
     outputs: [
       { key: "costPerPc",     label: "Cost per piece",  unit: "Rs",  role: "cost_per_unit", primary: true },
-      { key: "piecesPerRoll", label: "Pieces per roll", unit: "pcs", role: "units_per_batch" },
-      { key: "rollWidth",     label: "Roll width",      unit: "in" },
-      { key: "cutLength",     label: "Cut length",      unit: "in" },
-      { key: "rollCost",      label: "Roll cost",       unit: "Rs",  role: "cost_per_batch" },
-      { key: "rollsNeeded",   label: "Rolls required" },
-      { key: "rollsToBuy",       label: "Rolls to buy" },
-      { key: "leftoverStockM",   label: "Leftover → waste stock", unit: "m" },
-      { key: "wasteM",        label: "Waste per roll",  unit: "m",   role: "waste_qty" },
-      { key: "orderCost",     label: "Order total",     unit: "Rs" },
+      { key: "piecesPerRoll", label: "Pieces per roll", unit: "pcs", role: "units_per_batch", group: "Cutting" },
+      { key: "acrossCount",   label: "Pieces across",   unit: "pcs", group: "Cutting" },
+      { key: "rollWidth",     label: "Roll width",      unit: "in", group: "Cutting" },
+      { key: "cutLength",     label: "Cut length",      unit: "in", group: "Cutting" },
+      { key: "rollsNeeded",   label: "Rolls required",  group: "Rolls" },
+      { key: "rollsToBuy",       label: "Rolls to buy", group: "Rolls" },
+      { key: "leftoverStockM",   label: "Leftover → waste stock", unit: "m", group: "Rolls" },
+      { key: "wasteM",        label: "Waste per roll",  unit: "m",   role: "waste_qty", group: "Rolls" },
+      { key: "buttonsNeeded", label: "Buttons required", unit: "pcs", group: "Buttons" },
+      { key: "buttonPerPc",   label: "Button cost per piece", unit: "Rs", group: "Buttons" },
+      { key: "buttonTotal",   label: "Total button cost", unit: "Rs", group: "Buttons" },
+      { key: "rollCost",      label: "Roll cost",       unit: "Rs",  role: "cost_per_batch", group: "Cost" },
+      { key: "orderCost",     label: "Order total",     unit: "Rs", group: "Cost" },
     ],
   },
 
