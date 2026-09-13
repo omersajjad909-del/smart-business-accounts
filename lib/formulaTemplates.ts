@@ -62,7 +62,11 @@ export const FORMULA_TEMPLATES: FormulaTemplate[] = [
       { key: "fitting",      label: "Fastening",          options: ["Button", "Tape"], defaultValue: 0, askOnRun: true, group: "Button & Tape" },
       { key: "buttonsPerPc", label: "Buttons per piece",  unit: "pcs", defaultValue: 2, askOnRun: true, group: "Button & Tape", showWhen: { key: "fitting", is: 0 } },
       { key: "buttonRate",   label: "Rate per button",    unit: "Rs", defaultValue: 1.2, askOnRun: true, group: "Button & Tape", showWhen: { key: "fitting", is: 0 } },
-      { key: "buttonLabour", label: "Labour per button",  unit: "Rs", defaultValue: 0.3, askOnRun: true, group: "Button & Tape", showWhen: { key: "fitting", is: 0 } },
+      // Per piece, not per button — same as the tape branch below. Fitting a
+      // bag is one operation whether it takes two buttons or four, and 0.6 a
+      // bag is a figure a costing clerk can check against a wage; 0.3 a button
+      // is one they have to multiply first. Comes to the same money.
+      { key: "buttonLabour", label: "Labour per piece",   unit: "Rs", defaultValue: 0.6, askOnRun: true, group: "Button & Tape", showWhen: { key: "fitting", is: 0 } },
       // Tape is not counted, it is measured — three inches a bag, bought by
       // the metre. So it gets a length and a rate rather than a count and a
       // rate, and the sheet converts between them instead of the operator.
@@ -127,7 +131,7 @@ export const FORMULA_TEMPLATES: FormulaTemplate[] = [
       // last week's numbers, and a hidden field that keeps charging is the
       // worst kind of costing error: invisible and consistent.
       { key: "buttonsNeeded", label: "Buttons required",    expression: "if(fitting == 0, buttonsPerPc * orderQty, 0)", unit: "pcs", group: "Buttons & Tape" },
-      { key: "buttonPerPc",   label: "Button cost per piece", expression: "if(fitting == 0, buttonsPerPc * (buttonRate + buttonLabour), 0)", unit: "Rs", group: "Buttons & Tape" },
+      { key: "buttonPerPc",   label: "Button cost per piece", expression: "if(fitting == 0, buttonsPerPc * buttonRate + buttonLabour, 0)", unit: "Rs", group: "Buttons & Tape" },
       { key: "buttonTotal",   label: "Total button cost",   expression: "buttonPerPc * orderQty", unit: "Rs", group: "Buttons & Tape" },
       // Same shape as the buttons, in the unit tape is actually bought in: the
       // store issues metres, the bag is cut in inches.
