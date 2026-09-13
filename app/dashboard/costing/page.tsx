@@ -33,7 +33,7 @@ import {
   runFormula,
   applyProfit,
   toProfit,
-  inputVisible,
+  isVisible,
   type CostingFormula,
   type FormulaInput,
   type FormulaStep,
@@ -279,7 +279,7 @@ function CostingInner() {
      value still reaches the engine — the steps behind it zero it out with
      if() — but a tape rate has no business sitting under a bag that is being
      buttoned. */
-  const runInputs = selected?.formula.inputs.filter((i) => inputVisible(i, values)) ?? [];
+  const runInputs = selected?.formula.inputs.filter((i) => isVisible(i, values)) ?? [];
   const askedInputs = runInputs.filter((i) => i.askOnRun !== false);
   const fixedInputs = runInputs.filter((i) => i.askOnRun === false);
 
@@ -294,7 +294,9 @@ function CostingInner() {
     else askedGroups.push({ name, rows: [inp] });
   }
   const askedSectioned = askedGroups.some((g) => g.name);
-  const outputs = selected?.formula.outputs.filter((o) => o.key) ?? [];
+  /* Same rule as the inputs above: the branch nobody picked is all zeroes, and
+     a zero reported beside the real figure reads as a second answer. */
+  const outputs = selected?.formula.outputs.filter((o) => o.key && isVisible(o, run?.values ?? {})) ?? [];
   const primary = outputs.find((o) => o.primary) ?? outputs[0];
 
   // Profit is worked out on top of the primary result, whatever it is called —
@@ -933,6 +935,7 @@ function PrintSheet({ kind, formula, title, run, outputs, primaryKey }: {
   const bands: { name: string; rows: StepResult[] }[] = [];
   for (const s of run.steps) {
     if (s.kind === "input") continue;          // sizes have their own band above
+    if (!isVisible(s, run.values)) continue;   // the branch nobody picked is all zeroes
     const name = (s.group ?? "").trim() || "Working";
     const bucket = bands.find((b) => b.name === name);
     if (bucket) bucket.rows.push(s);
@@ -951,7 +954,7 @@ function PrintSheet({ kind, formula, title, run, outputs, primaryKey }: {
   const firstGroup = (formula.inputs[0]?.group ?? "").trim();
   const sizeKeys = new Set(
     formula.inputs
-      .filter((i) => inputVisible(i, run.values) && (i.group ?? "").trim() === firstGroup)
+      .filter((i) => isVisible(i, run.values) && (i.group ?? "").trim() === firstGroup)
       .map((i) => i.key),
   );
   const typed = run.steps.filter((s) => s.kind === "input" && sizeKeys.has(s.key));

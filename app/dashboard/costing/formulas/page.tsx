@@ -19,7 +19,7 @@ import {
   runFormula,
   checkExpression,
   validateKey,
-  inputVisible,
+  isVisible,
   applyProfit,
   toProfit,
   NO_PROFIT,
@@ -400,7 +400,7 @@ export default function FormulasPage() {
          formula currently opens on and nothing else — six boxes for a bag that
          can only take three is the thing this view exists to avoid. Detailed
          keeps every branch on screen, because that is where they are written. */
-      if (!detailed && !inputVisible(inp, preview?.values ?? {})) return;
+      if (!detailed && !isVisible(inp, preview?.values ?? {})) return;
       const name = (inp.group ?? "").trim();
       const bucket = inputGroups.find((g) => g.name === name);
       if (bucket) bucket.rows.push({ inp, i });
@@ -652,8 +652,11 @@ export default function FormulasPage() {
             {preview.error}
           </div>
         )}
+        {/* The branch that was not chosen is all zeroes — reporting "Total
+            tape cost: 0" under a buttoned bag is noise, and next to the real
+            figure it reads as a second, contradictory answer. */}
         <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-          {d.outputs.filter((o) => o.key).map((o) => (
+          {d.outputs.filter((o) => o.key && isVisible(o, preview?.values ?? {})).map((o) => (
             <div key={o.key} style={{
               display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 10,
               padding: o.primary ? "10px 12px" : "4px 0",

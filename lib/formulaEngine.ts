@@ -545,16 +545,20 @@ export type FormulaInput = {
 };
 
 /**
- * Whether an input is on screen for the numbers currently entered. One
- * implementation, because the run screen, the print sheet and the editor all
- * have to agree on it — a field that prints but cannot be typed into, or the
+ * Whether a row belongs on screen for the numbers currently entered.
+ *
+ * Inputs and outputs both carry `showWhen`, and both have to answer this the
+ * same way: asking an operator for a tape rate on a buttoned bag is the same
+ * mistake as reporting "Total tape cost: 0" back to them. One implementation,
+ * because the run screen, the result card, the print sheet and the editor all
+ * have to agree — a figure that prints but cannot be typed into, or the
  * reverse, is worse than no condition at all.
  */
-export function inputVisible(
-  input: FormulaInput,
+export function isVisible(
+  row: { showWhen?: { key: string; is: number } },
   values: Record<string, FormulaValue>,
 ): boolean {
-  const cond = input.showWhen;
+  const cond = row.showWhen;
   if (!cond) return true;
   const picked = values[cond.key];
   return typeof picked === "number" && Math.abs(picked - cond.is) < 1e-9;
@@ -565,6 +569,8 @@ export type FormulaStep = {
   label: string;
   expression: string;
   unit?: string;
+  /** Only printed while that choice is on this index — see FormulaOutput. */
+  showWhen?: { key: string; is: number };
   /**
    * Heading this step is printed under on the working sheet — "Cutting",
    * "Rolls", "Buttons". Display only, same as on an input: the engine runs the
@@ -595,6 +601,12 @@ export type FormulaOutput = {
   primary?: boolean;
   /** Heading this figure prints under on the working sheet. Display only. */
   group?: string;
+  /**
+   * Only reported while that choice is sitting on this index — the other
+   * branch's figures are all zero and reporting them is noise at best and a
+   * second, contradictory answer at worst.
+   */
+  showWhen?: { key: string; is: number };
 };
 
 /**
@@ -663,6 +675,8 @@ export type StepResult = {
   error?: string;
   /** Carried through from the input or step, for sheets that print in blocks. */
   group?: string;
+  /** Carried through too, so a sheet can drop the branch nobody picked. */
+  showWhen?: { key: string; is: number };
   /** Which half of the run this row came from — what was typed, or what was worked out. */
   kind: "input" | "step";
 };
@@ -769,6 +783,7 @@ export function runFormula(
         unit: step.unit,
         value,
         group: step.group,
+        showWhen: step.showWhen,
         kind: "step",
       });
     } catch (e) {
@@ -782,6 +797,7 @@ export function runFormula(
         value: null,
         error: message,
         group: step.group,
+        showWhen: step.showWhen,
         kind: "step",
       });
     }

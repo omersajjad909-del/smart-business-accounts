@@ -130,14 +130,17 @@ export const FORMULA_TEMPLATES: FormulaTemplate[] = [
       // zero — the boxes behind it are still on the formula and still hold
       // last week's numbers, and a hidden field that keeps charging is the
       // worst kind of costing error: invisible and consistent.
-      { key: "buttonsNeeded", label: "Buttons required",    expression: "if(fitting == 0, buttonsPerPc * orderQty, 0)", unit: "pcs", group: "Buttons & Tape" },
-      { key: "buttonPerPc",   label: "Button cost per piece", expression: "if(fitting == 0, buttonsPerPc * buttonRate + buttonLabour, 0)", unit: "Rs", group: "Buttons & Tape" },
-      { key: "buttonTotal",   label: "Total button cost",   expression: "buttonPerPc * orderQty", unit: "Rs", group: "Buttons & Tape" },
+      // The if() keeps the unpicked branch out of the money; showWhen keeps it
+      // off the paper and off the result card. Both are needed: the steps have
+      // to evaluate either way, because every step below reads them.
+      { key: "buttonsNeeded", label: "Buttons required",    expression: "if(fitting == 0, buttonsPerPc * orderQty, 0)", unit: "pcs", group: "Buttons & Tape", showWhen: { key: "fitting", is: 0 } },
+      { key: "buttonPerPc",   label: "Button cost per piece", expression: "if(fitting == 0, buttonsPerPc * buttonRate + buttonLabour, 0)", unit: "Rs", group: "Buttons & Tape", showWhen: { key: "fitting", is: 0 } },
+      { key: "buttonTotal",   label: "Total button cost",   expression: "buttonPerPc * orderQty", unit: "Rs", group: "Buttons & Tape", showWhen: { key: "fitting", is: 0 } },
       // Same shape as the buttons, in the unit tape is actually bought in: the
       // store issues metres, the bag is cut in inches.
-      { key: "tapeNeeded",    label: "Tape required",       expression: "if(fitting == 1, convert(tapePerPc * orderQty, in, m), 0)", unit: "m", group: "Buttons & Tape" },
-      { key: "tapeCostPerPc", label: "Tape cost per piece", expression: "if(fitting == 1, tapePerPc * tapeRate + tapeLabour, 0)", unit: "Rs", group: "Buttons & Tape" },
-      { key: "tapeTotal",     label: "Total tape cost",     expression: "tapeCostPerPc * orderQty", unit: "Rs", group: "Buttons & Tape" },
+      { key: "tapeNeeded",    label: "Tape required",       expression: "if(fitting == 1, convert(tapePerPc * orderQty, in, m), 0)", unit: "m", group: "Buttons & Tape", showWhen: { key: "fitting", is: 1 } },
+      { key: "tapeCostPerPc", label: "Tape cost per piece", expression: "if(fitting == 1, tapePerPc * tapeRate + tapeLabour, 0)", unit: "Rs", group: "Buttons & Tape", showWhen: { key: "fitting", is: 1 } },
+      { key: "tapeTotal",     label: "Total tape cost",     expression: "tapeCostPerPc * orderQty", unit: "Rs", group: "Buttons & Tape", showWhen: { key: "fitting", is: 1 } },
 
       // Roll cost is the film and nothing else — what the roll weighs times
       // what the material sells for.
@@ -160,11 +163,12 @@ export const FORMULA_TEMPLATES: FormulaTemplate[] = [
       { key: "rollsToBuy",       label: "Rolls to buy", group: "Rolls" },
       { key: "leftoverStockM",   label: "Leftover → waste stock", unit: "m", group: "Rolls" },
       { key: "wasteM",        label: "Waste per roll",  unit: "m",   role: "waste_qty", group: "Rolls" },
-      { key: "buttonsNeeded", label: "Buttons required", unit: "pcs", group: "Buttons & Tape" },
-      { key: "buttonPerPc",   label: "Button cost per piece", unit: "Rs", group: "Buttons & Tape" },
-      { key: "buttonTotal",   label: "Total button cost", unit: "Rs", group: "Buttons & Tape" },
-      { key: "tapeNeeded",    label: "Tape required",    unit: "m", group: "Buttons & Tape" },
-      { key: "tapeTotal",     label: "Total tape cost",  unit: "Rs", group: "Buttons & Tape" },
+      { key: "buttonsNeeded", label: "Buttons required", unit: "pcs", group: "Buttons & Tape", showWhen: { key: "fitting", is: 0 } },
+      { key: "buttonPerPc",   label: "Button cost per piece", unit: "Rs", group: "Buttons & Tape", showWhen: { key: "fitting", is: 0 } },
+      { key: "buttonTotal",   label: "Total button cost", unit: "Rs", group: "Buttons & Tape", showWhen: { key: "fitting", is: 0 } },
+      { key: "tapeNeeded",    label: "Tape required",    unit: "m", group: "Buttons & Tape", showWhen: { key: "fitting", is: 1 } },
+      { key: "tapeCostPerPc", label: "Tape cost per piece", unit: "Rs", group: "Buttons & Tape", showWhen: { key: "fitting", is: 1 } },
+      { key: "tapeTotal",     label: "Total tape cost",  unit: "Rs", group: "Buttons & Tape", showWhen: { key: "fitting", is: 1 } },
       { key: "rollCost",      label: "Roll cost",       unit: "Rs",  role: "cost_per_batch", group: "Cost" },
       { key: "orderCost",     label: "Order total",     unit: "Rs", group: "Cost" },
     ],
