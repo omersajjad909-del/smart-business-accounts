@@ -1011,6 +1011,62 @@ html.fnv-lock-scroll body {
   }
 }
 
+/* The app stands down while an A4 document is printing.
+ *
+ * Every page that prints one used to hide the shell itself, and most of them
+ * did it with `body * { visibility: hidden }`. That is per-page, so a page
+ * nobody remembered to write it on — delivery challan, print preferences —
+ * printed the sidebar, the topbar and its own "Show List / + New Challan"
+ * buttons onto the customer's paper. And visibility only makes things
+ * invisible: they keep their space, which is the other half of why those
+ * prints ran long.
+ *
+ * Keyed on .print-doc-a4 rather than on a class each page has to remember, so
+ * a new document page is right the day it is written. Same shape as the ledger
+ * block below, which is the one that has always worked.
+ */
+@media print {
+  .dashboard-root:has(.print-doc-a4) {
+    display: block !important;
+    min-height: auto !important;
+  }
+
+  /* Everything that is not the document, at any depth: the sidebar, the
+     topbar, the page heading, the Show List / New Challan buttons, the list
+     the document was opened from.
+     
+     Read it as three exclusions — keep an element if it CONTAINS the document
+     (its ancestors, which have to stay for the document to be in the page at
+     all), if it IS the document, or if it is INSIDE the document. Hide the
+     rest. Written this way rather than as a list of known wrappers because the
+     heading a challan prints by mistake is three levels inside the same div
+     that holds the paper, and no fixed list of levels catches that. */
+  .dashboard-root:has(.print-doc-a4)
+    *:not(:has(.print-doc-a4)):not(.print-doc-a4):not(.print-doc-a4 *) {
+    display: none !important;
+  }
+
+  /* What survives is the chain of wrappers between the root and the paper.
+     Each one is flattened to a plain block: no flex column stretching it to
+     the viewport, no scroller clipping it, no gutter indenting the sheet, and
+     no left margin held open for a sidebar that is no longer there. */
+  .dashboard-root:has(.print-doc-a4) :has(.print-doc-a4) {
+    display: block !important;
+    margin: 0 !important;
+    max-width: none !important;
+    min-height: auto !important;
+    overflow: visible !important;
+    padding: 0 !important;
+    width: 100% !important;
+  }
+
+  /* Screens are dark; paper is not. */
+  body:has(.print-doc-a4),
+  .dashboard-root:has(.print-doc-a4) {
+    background: #fff !important;
+  }
+}
+
 /* Ledger reports print as a standalone, monochrome accounting document.
 
    The landscape @page that used to live here has moved into the ledger page
