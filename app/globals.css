@@ -1013,44 +1013,48 @@ html.fnv-lock-scroll body {
 
 /* The app stands down while an A4 document is printing.
  *
- * Every page that prints one used to hide the shell itself, and most of them
- * did it with `body * { visibility: hidden }`. That is per-page, so a page
- * nobody remembered to write it on — delivery challan, print preferences —
- * printed the sidebar, the topbar and its own "Show List / + New Challan"
- * buttons onto the customer's paper. And visibility only makes things
- * invisible: they keep their space, which is the other half of why those
- * prints ran long.
+ * Every document page used to hide the shell itself, and a page nobody
+ * remembered to write that on printed the sidebar, the topbar and its own
+ * "Show List / + New Challan" buttons onto the customer's paper. Delivery
+ * challan was one; print preferences is the other.
  *
- * Keyed on .print-doc-a4 rather than on a class each page has to remember, so
- * a new document page is right the day it is written. Same shape as the ledger
- * block below, which is the one that has always worked.
+ * Keyed on .print-doc-a4, not on a class each page has to remember, so a new
+ * document page is right the day it is written.
+ *
+ * The guard is the legacy half. Six pages print markup of their own — a
+ * .pi-print, a .po-print, a .print-area — and only keep a PrintDocA4 on
+ * screen as a preview. On those, the paper is not the PrintDocA4, so this rule
+ * would hide the very thing they print. They already carry working print CSS,
+ * so the rule stands aside wherever one of those elements exists. Building a
+ * new document page? Use PrintDocA4 and this comes for free; do not add a
+ * seventh class here.
  */
 @media print {
-  .dashboard-root:has(.print-doc-a4) {
+  .dashboard-root:has(.print-doc-a4):not(:has(.print-area)):not(:has(.pi-print)):not(:has(.po-print)):not(:has(.qt-print)):not(:has(.grn-print)):not(:has(.cat-print-area)) {
     display: block !important;
     min-height: auto !important;
   }
 
   /* Everything that is not the document, at any depth: the sidebar, the
-     topbar, the page heading, the Show List / New Challan buttons, the list
-     the document was opened from.
-     
+     topbar, the page heading, the buttons beside it, the list the document was
+     opened from.
+
      Read it as three exclusions — keep an element if it CONTAINS the document
      (its ancestors, which have to stay for the document to be in the page at
      all), if it IS the document, or if it is INSIDE the document. Hide the
      rest. Written this way rather than as a list of known wrappers because the
-     heading a challan prints by mistake is three levels inside the same div
+     heading a challan printed by mistake sits three levels inside the same div
      that holds the paper, and no fixed list of levels catches that. */
-  .dashboard-root:has(.print-doc-a4)
+  .dashboard-root:has(.print-doc-a4):not(:has(.print-area)):not(:has(.pi-print)):not(:has(.po-print)):not(:has(.qt-print)):not(:has(.grn-print)):not(:has(.cat-print-area))
     *:not(:has(.print-doc-a4)):not(.print-doc-a4):not(.print-doc-a4 *) {
     display: none !important;
   }
 
   /* What survives is the chain of wrappers between the root and the paper.
-     Each one is flattened to a plain block: no flex column stretching it to
-     the viewport, no scroller clipping it, no gutter indenting the sheet, and
-     no left margin held open for a sidebar that is no longer there. */
-  .dashboard-root:has(.print-doc-a4) :has(.print-doc-a4) {
+     Each is flattened to a plain block: no flex column stretching it to the
+     viewport, no scroller clipping it, no gutter indenting the sheet, and no
+     left margin held open for a sidebar that is no longer there. */
+  .dashboard-root:has(.print-doc-a4):not(:has(.print-area)):not(:has(.pi-print)):not(:has(.po-print)):not(:has(.qt-print)):not(:has(.grn-print)):not(:has(.cat-print-area)) :has(.print-doc-a4) {
     display: block !important;
     margin: 0 !important;
     max-width: none !important;
@@ -1061,8 +1065,8 @@ html.fnv-lock-scroll body {
   }
 
   /* Screens are dark; paper is not. */
-  body:has(.print-doc-a4),
-  .dashboard-root:has(.print-doc-a4) {
+  body:has(.print-doc-a4):not(:has(.print-area)):not(:has(.pi-print)):not(:has(.po-print)):not(:has(.qt-print)):not(:has(.grn-print)):not(:has(.cat-print-area)),
+  .dashboard-root:has(.print-doc-a4):not(:has(.print-area)):not(:has(.pi-print)):not(:has(.po-print)):not(:has(.qt-print)):not(:has(.grn-print)):not(:has(.cat-print-area)) {
     background: #fff !important;
   }
 }
