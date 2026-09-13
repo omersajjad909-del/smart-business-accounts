@@ -291,7 +291,30 @@ export async function quoteProductionRun(
   qty?: number,
   location?: string,
 ): Promise<ProductionRunQuote | null> {
-  const params = new URLSearchParams({ productionOrderId });
+  return quoteRun({ productionOrderId }, qty, location);
+}
+
+/**
+ * Price a run straight off a BOM, with no production order in existence.
+ *
+ * What "Make this" needs: the operator sees the material and the cost before
+ * anything is raised, so backing out of the preview leaves no half-made order
+ * behind for somebody to find next week and wonder about.
+ */
+export async function quoteBomRun(
+  bomId: string,
+  qty?: number,
+  location?: string,
+): Promise<ProductionRunQuote | null> {
+  return quoteRun({ bomId }, qty, location);
+}
+
+async function quoteRun(
+  target: { productionOrderId: string } | { bomId: string },
+  qty?: number,
+  location?: string,
+): Promise<ProductionRunQuote | null> {
+  const params = new URLSearchParams(target);
   if (qty && qty > 0) params.set("qty", String(qty));
   if (location) params.set("location", location);
   try {

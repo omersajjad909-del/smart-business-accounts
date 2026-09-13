@@ -10,8 +10,11 @@ import {
   type ManufacturingBom,
   type ManufacturingItem,
   type BomLineInput,
+  type ProductionRunQuote,
+  quoteBomRun,
 } from "../_shared";
 import { useResponsive } from "@/hooks/useResponsive";
+import toast from "react-hot-toast";
 
 const ff = "'Outfit','Inter',sans-serif";
 const bg = "rgba(255,255,255,0.03)";
@@ -206,6 +209,113 @@ function BOMPageInner() {
     setShowModal(true);
   }
 
+  /* ── Make this ──────────────────────────────────────────────────────────
+     Raising an order, starting it and posting it are three screens and two
+     gates, and for most runs they carry no information: the job is simply
+     made. This does all three behind one confirm, against a quote taken
+     before anything is raised — so what is on screen is what will be
+     consumed, and backing out leaves nothing behind.
+
+     Production Orders is untouched and still the way to plan a job, assign
+     it, and come back to it in stages. */
+  const [makeBom, setMakeBom] = useState<ManufacturingBom | null>(null);
+  const [makeQty, setMakeQty] = useState("");
+  const [makeQuote, setMakeQuote] = useState<ProductionRunQuote | null>(null);
+  const [makeBusy, setMakeBusy] = useState(false);
+  const [makeError, setMakeError] = useState("");
+  const [makeShort, setMakeShort] = useState(false);
+
+  function openMake(bom: ManufacturingBom) {
+    setMakeBom(bom);
+    setMakeQty(String(bom.yieldUnits || 1));
+    setMakeQuote(null);
+    setMakeError("");
+    setMakeShort(false);
+  }
+
+  function closeMake() {
+    setMakeBom(null);
+    setMakeQuote(null);
+    setMakeError("");
+  }
+
+  // Re-priced as the quantity changes, so the figures never belong to a
+  // number the operator has already typed over.
+  useEffect(() => {
+    if (!makeBom) return;
+    const qty = Number(makeQty);
+    if (!Number.isFinite(qty) || qty <= 0) { setMakeQuote(null); return; }
+    let live = true;
+    const id = setTimeout(async () => {
+      const quote = await quoteBomRun(makeBom.id, Math.floor(qty));
+      if (!live) return;
+      if (!quote) { setMakeError("Could not reach the server."); setMakeQuote(null); return; }
+      setMakeError(quote.error || "");
+      setMakeQuote(quote.error ? null : quote);
+    }, 250);
+    return () => { live = false; clearTimeout(id); };
+  }, [makeBom, makeQty]);
+
+  async function confirmMake() {
+    if (!makeBom || !makeQuote) return;
+    const qty = Math.floor(Number(makeQty));
+    if (!Number.isFinite(qty) || qty <= 0) { setMakeError("How many are being made?"); return; }
+
+    setMakeBusy(true);
+    setMakeError("");
+    try {
+      // The order is raised first because the posting path is built around one
+      // — it is what the finished goods batch and the WIP entry are traced
+      // back to. It is simply not left for the operator to do by hand.
+      const order = await productionStore.create({
+        title: makeBom.product,
+        status: "in_progress",
+        date: new Date().toISOString().slice(0, 10),
+        data: {
+          orderId: `PO-${String(orders.length + 1).padStart(4, "0")}`,
+          quantity: qty,
+          completed: 0,
+          bomId: makeBom.id,
+          bomVersion: makeBom.version || "",
+          location: makeQuote.location || "MAIN",
+          notes: "Raised and posted from the BOM",
+        },
+      });
+
+      const res = await fetch("/api/manufacturing/production-orders/complete", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          productionOrderId: order.id,
+          producedQty: qty,
+          allowNegativeStock: makeShort,
+          location: makeQuote.location || "MAIN",
+          date: new Date().toISOString().slice(0, 10),
+        }),
+      });
+      const body = await res.json();
+      if (!res.ok) throw new Error(body?.error || "Could not post the run.");
+
+      const kept = (body.remnantsCreated ?? []) as { itemName: string; qty: number; unit: string }[];
+      toast.success(
+        `${body.producedQty} × ${makeBom.product} made · batch ${body.batchNo} · Rs. ${Math.round(body.totalCost).toLocaleString()} to Finished Goods`,
+      );
+      if (kept.length) {
+        toast(`Kept as open stock: ${kept.map((r) => `${Number(r.qty).toFixed(2)}${r.unit} ${r.itemName}`).join(", ")}`, { icon: "♻️" });
+      }
+      closeMake();
+      await Promise.all([productionStore.refetch?.(), bomStore.refetch?.()]);
+      loadManufacturingItems(["RAW_MATERIAL", "TRADING"]).then(setRawMaterials);
+    } catch (e) {
+      // The order is left standing on purpose: it was raised, and if the
+      // posting failed the operator needs to see it on Production Orders
+      // rather than wonder where it went.
+      setMakeError(e instanceof Error ? e.message : "Could not post the run.");
+    } finally {
+      setMakeBusy(false);
+    }
+  }
+
   async function removeBom(bom: { id: string; product: string }, linkedOrders: number) {
     // A BOM that production orders were costed against is not junk to be thrown
     // away — deleting it leaves those orders pointing at nothing.
@@ -333,6 +443,15 @@ function BOMPageInner() {
                     <div style={{ color: "#22c55e", fontSize: 15, fontWeight: 800 }}>Rs. {Math.round(bom.unitCost).toLocaleString()}</div>
                     <div style={{ fontSize: 11, color: "rgba(255,255,255,.35)" }}>per unit</div>
                     <div style={{ display: "flex", gap: 6, marginTop: 9, justifyContent: "flex-end" }}>
+                      {/* The whole run from here: raise the order, start it and
+                          post it in one confirm. The Production Orders screen
+                          is still there for a job somebody plans, assigns and
+                          comes back to — this is for the far commoner case
+                          where the order is simply made. */}
+                      <button onClick={() => openMake(bom)}
+                        style={{ padding: "4px 13px", borderRadius: 7, border: "1px solid rgba(34,197,94,.4)", background: "rgba(34,197,94,.12)", color: "#4ade80", fontFamily: "inherit", fontSize: 11.5, fontWeight: 800, cursor: "pointer" }}>
+                        Make
+                      </button>
                       <button onClick={() => startEdit(bom)}
                         style={{ padding: "4px 11px", borderRadius: 7, border: `1px solid ${border}`, background: "rgba(255,255,255,.04)", color: "rgba(255,255,255,.75)", fontFamily: "inherit", fontSize: 11.5, fontWeight: 700, cursor: "pointer" }}>
                         Edit
@@ -403,6 +522,91 @@ function BOMPageInner() {
           </div>
         </div>
       </div>
+
+      {/* ── Make this ── */}
+      {makeBom && (
+        <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.6)", display: "flex", alignItems: "center", justifyContent: "center", padding: 16, zIndex: 50 }}>
+          <div style={{ background: "#10131a", border: `1px solid ${border}`, borderRadius: 16, padding: isMobile ? 16 : 24, width: "100%", maxWidth: 520, maxHeight: "88vh", overflowY: "auto" }}>
+            <div style={{ fontSize: 18, fontWeight: 800, marginBottom: 4 }}>Make {makeBom.product}</div>
+            <div style={{ fontSize: 12, color: "rgba(255,255,255,.45)", marginBottom: 16 }}>
+              Raises the order, consumes the material and posts the finished goods — all on confirm.
+              Nothing is written until then.
+            </div>
+
+            <label style={{ display: "block", fontSize: 12, color: "rgba(255,255,255,.45)", marginBottom: 6 }}>
+              How many {makeBom.product}?
+            </label>
+            <input
+              type="number" min={1} step={1} value={makeQty} autoFocus
+              onChange={(e) => setMakeQty(e.target.value)}
+              style={{ width: "100%", padding: "10px 12px", borderRadius: 9, background: "rgba(255,255,255,.05)", border: `1px solid ${border}`, color: "#fff", fontSize: 15, fontFamily: "inherit", boxSizing: "border-box" }}
+            />
+
+            {makeError && (
+              <div style={{ marginTop: 12, padding: "10px 12px", borderRadius: 8, background: "rgba(239,68,68,.14)", border: "1px solid rgba(239,68,68,.28)", color: "#fca5a5", fontSize: 12 }}>
+                {makeError}
+              </div>
+            )}
+
+            {/* What it will actually take off the rack, priced before anything
+                is raised. A confirm against figures nobody was shown is how a
+                run consumes material the store did not expect to lose. */}
+            {makeQuote && (
+              <div style={{ marginTop: 16 }}>
+                <div style={{ fontSize: 11, fontWeight: 800, letterSpacing: .6, textTransform: "uppercase", color: "rgba(255,255,255,.4)", marginBottom: 8 }}>
+                  Material this takes — from {makeQuote.location || "MAIN"}
+                </div>
+                {makeQuote.lines.map((line) => {
+                  const short = makeQuote.shortages.some((s) => s.itemId === line.itemId);
+                  return (
+                    <div key={line.itemId} style={{ display: "flex", justifyContent: "space-between", gap: 10, padding: "4px 0", fontSize: 12.5, color: short ? "#fca5a5" : "rgba(255,255,255,.72)" }}>
+                      <span>{line.itemName}{short ? " — not enough in stock" : ""}</span>
+                      <span style={{ fontFamily: "ui-monospace, monospace", whiteSpace: "nowrap" }}>
+                        {Number(line.qty).toLocaleString()} {line.unit}
+                      </span>
+                    </div>
+                  );
+                })}
+                <div style={{ marginTop: 12, paddingTop: 12, borderTop: `1px solid ${border}`, display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
+                  <span style={{ fontSize: 12.5, color: "rgba(255,255,255,.5)" }}>Goes to Finished Goods</span>
+                  <span style={{ fontSize: 17, fontWeight: 800, color: "#22c55e", fontFamily: "ui-monospace, monospace" }}>
+                    Rs. {Math.round(makeQuote.totalCost).toLocaleString()}
+                    <span style={{ fontSize: 11, fontWeight: 600, color: "rgba(255,255,255,.35)", marginLeft: 6 }}>
+                      Rs. {Math.round(makeQuote.unitCost).toLocaleString()} / unit
+                    </span>
+                  </span>
+                </div>
+
+                {makeQuote.shortages.length > 0 && (
+                  <label style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 12, fontSize: 12, color: "#fbbf24", cursor: "pointer" }}>
+                    <input type="checkbox" checked={makeShort} onChange={(e) => setMakeShort(e.target.checked)} />
+                    Make it anyway — the short material will show as negative stock
+                  </label>
+                )}
+              </div>
+            )}
+
+            <div style={{ display: "flex", gap: 12, marginTop: 20 }}>
+              <button
+                onClick={confirmMake}
+                disabled={makeBusy || !makeQuote || (makeQuote.shortages.length > 0 && !makeShort)}
+                style={{
+                  flex: 1, padding: "11px 0", border: "none", borderRadius: 8, color: "#fff",
+                  fontSize: 14, fontWeight: 700, fontFamily: "inherit",
+                  background: makeBusy || !makeQuote || (makeQuote.shortages.length > 0 && !makeShort) ? "rgba(34,197,94,.4)" : "#22c55e",
+                  cursor: makeBusy || !makeQuote ? "not-allowed" : "pointer",
+                }}
+              >
+                {makeBusy ? "Making…" : makeQuote ? `Make ${Number(makeQty).toLocaleString()}` : "Pricing…"}
+              </button>
+              <button onClick={closeMake} disabled={makeBusy}
+                style={{ padding: "11px 20px", background: "rgba(255,255,255,.05)", border: `1px solid ${border}`, borderRadius: 8, color: "rgba(255,255,255,.65)", fontSize: 14, fontFamily: "inherit", cursor: "pointer" }}>
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {showModal && (
         <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.7)", zIndex: 50, display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }}>
