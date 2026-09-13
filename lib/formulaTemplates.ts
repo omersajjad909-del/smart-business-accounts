@@ -63,7 +63,11 @@ export const FORMULA_TEMPLATES: FormulaTemplate[] = [
       { key: "buttonsPerPc", label: "Buttons per piece",  unit: "pcs", defaultValue: 2, askOnRun: true, group: "Button & Tape" },
       { key: "buttonRate",   label: "Rate per button",    unit: "Rs", defaultValue: 1.2, askOnRun: true, group: "Button & Tape" },
       { key: "buttonLabour", label: "Labour per button",  unit: "Rs", defaultValue: 0.3, askOnRun: true, group: "Button & Tape" },
-      { key: "tapePerPc",    label: "Tape per piece",     unit: "Rs", defaultValue: 0, askOnRun: true, group: "Button & Tape" },
+      // Tape is not counted, it is measured — three inches a bag, bought by
+      // the metre. So it gets a length and a rate rather than a count and a
+      // rate, and the sheet converts between them instead of the operator.
+      { key: "tapePerPc",    label: "Tape per piece",     unit: "in", defaultValue: 3, askOnRun: true, group: "Button & Tape" },
+      { key: "tapeRate",     label: "Tape rate",          unit: "per m", defaultValue: 8, askOnRun: true, group: "Button & Tape" },
       { key: "labour",       label: "Labour",             unit: "Rs", defaultValue: 3, askOnRun: true, group: "Order details" },
       // The odds and ends a quote picks up that have no box of their own — a
       // rupee of printing, two of stitching. Per piece, like labour beside it,
@@ -99,15 +103,20 @@ export const FORMULA_TEMPLATES: FormulaTemplate[] = [
       // against that count, and a total. buttonsNeeded is what actually goes
       // out of the store for the order — the number a flat per-piece charge
       // could never tell anybody.
-      { key: "buttonsNeeded", label: "Buttons required",    expression: "buttonsPerPc * orderQty", unit: "pcs", group: "Buttons" },
-      { key: "buttonPerPc",   label: "Button cost per piece", expression: "buttonsPerPc * (buttonRate + buttonLabour) + tapePerPc", unit: "Rs", group: "Buttons" },
-      { key: "buttonTotal",   label: "Total button cost",   expression: "buttonPerPc * orderQty", unit: "Rs", group: "Buttons" },
+      { key: "buttonsNeeded", label: "Buttons required",    expression: "buttonsPerPc * orderQty", unit: "pcs", group: "Buttons & Tape" },
+      { key: "buttonPerPc",   label: "Button cost per piece", expression: "buttonsPerPc * (buttonRate + buttonLabour)", unit: "Rs", group: "Buttons & Tape" },
+      { key: "buttonTotal",   label: "Total button cost",   expression: "buttonPerPc * orderQty", unit: "Rs", group: "Buttons & Tape" },
+      // Same shape as the buttons, in the unit tape is actually bought in: the
+      // store issues metres, the bag is cut in inches.
+      { key: "tapeNeeded",    label: "Tape required",       expression: "convert(tapePerPc * orderQty, in, m)", unit: "m", group: "Buttons & Tape" },
+      { key: "tapeCostPerPc", label: "Tape cost per piece", expression: "convert(tapePerPc, in, m) * tapeRate", unit: "Rs", group: "Buttons & Tape" },
+      { key: "tapeTotal",     label: "Total tape cost",     expression: "tapeCostPerPc * orderQty", unit: "Rs", group: "Buttons & Tape" },
 
       // Roll cost is the film and nothing else — what the roll weighs times
       // what the material sells for.
       { key: "rollCost",    label: "Roll cost",       expression: "materialRate * gauge * rollWidth * rollLength / densityDiv", unit: "Rs", group: "Cost" },
       { key: "materialPerPc", label: "Material per piece", expression: "rollCost / piecesPerRoll", unit: "Rs", group: "Cost" },
-      { key: "costPerPc",   label: "Cost per piece",  expression: "materialPerPc + labour + buttonPerPc + others", unit: "Rs", group: "Cost" },
+      { key: "costPerPc",   label: "Cost per piece",  expression: "materialPerPc + labour + buttonPerPc + tapeCostPerPc + others", unit: "Rs", group: "Cost" },
       { key: "orderCost",   label: "Order total",     expression: "costPerPc * orderQty", unit: "Rs", group: "Cost" },
     ],
     outputs: [
@@ -120,9 +129,11 @@ export const FORMULA_TEMPLATES: FormulaTemplate[] = [
       { key: "rollsToBuy",       label: "Rolls to buy", group: "Rolls" },
       { key: "leftoverStockM",   label: "Leftover → waste stock", unit: "m", group: "Rolls" },
       { key: "wasteM",        label: "Waste per roll",  unit: "m",   role: "waste_qty", group: "Rolls" },
-      { key: "buttonsNeeded", label: "Buttons required", unit: "pcs", group: "Buttons" },
-      { key: "buttonPerPc",   label: "Button cost per piece", unit: "Rs", group: "Buttons" },
-      { key: "buttonTotal",   label: "Total button cost", unit: "Rs", group: "Buttons" },
+      { key: "buttonsNeeded", label: "Buttons required", unit: "pcs", group: "Buttons & Tape" },
+      { key: "buttonPerPc",   label: "Button cost per piece", unit: "Rs", group: "Buttons & Tape" },
+      { key: "buttonTotal",   label: "Total button cost", unit: "Rs", group: "Buttons & Tape" },
+      { key: "tapeNeeded",    label: "Tape required",    unit: "m", group: "Buttons & Tape" },
+      { key: "tapeTotal",     label: "Total tape cost",  unit: "Rs", group: "Buttons & Tape" },
       { key: "rollCost",      label: "Roll cost",       unit: "Rs",  role: "cost_per_batch", group: "Cost" },
       { key: "orderCost",     label: "Order total",     unit: "Rs", group: "Cost" },
     ],

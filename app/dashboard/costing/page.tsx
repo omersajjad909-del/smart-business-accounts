@@ -926,9 +926,20 @@ function PrintSheet({ kind, formula, title, run, outputs, primaryKey }: {
     else bands.push({ name, rows: [s] });
   }
 
-  /* The sizes band: what was typed for this job, in the order it was typed,
-     minus the constants nobody at the machine sets. */
-  const typed = run.steps.filter((s) => s.kind === "input" && !hiddenKeys.has(s.key));
+  /* The sizes band: the first block of inputs the formula was written in —
+     the bag's own dimensions. The later blocks are rates and order figures the
+     man at the machine is not cutting to, and every one of them he has to read
+     past is a line between him and the size that matters. What he does need
+     off them comes back as an answer in the bands below: not "stock widths
+     sold", but "roll width used = 58in".
+
+     A formula with no groups has one block, so it prints every input, which is
+     what this sheet always did. */
+  const firstGroup = (formula.inputs.find((i) => !i.hidden)?.group ?? "").trim();
+  const sizeKeys = new Set(
+    formula.inputs.filter((i) => !i.hidden && (i.group ?? "").trim() === firstGroup).map((i) => i.key),
+  );
+  const typed = run.steps.filter((s) => s.kind === "input" && sizeKeys.has(s.key));
 
   return (
     <div className="cxPrint">
@@ -945,7 +956,7 @@ function PrintSheet({ kind, formula, title, run, outputs, primaryKey }: {
             is wrong. */}
         {typed.length > 0 && (
           <>
-            <SheetTitle>Sizes</SheetTitle>
+            <SheetTitle>{firstGroup || "Sizes"}</SheetTitle>
             <div className="cxSheetGrid" style={{ marginBottom: 18 }}>
               {typed.map((s) => (
                 <div key={s.key} style={{ borderBottom: "1px solid #e2e2e2", padding: "5px 0" }}>
