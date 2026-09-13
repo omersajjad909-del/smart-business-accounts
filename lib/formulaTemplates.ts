@@ -104,15 +104,21 @@ export const FORMULA_TEMPLATES: FormulaTemplate[] = [
       // same number of pieces but printed a cut length nobody could measure
       // against the machine.
       { key: "cutLength",   label: "Cut length",      expression: "baseCut * lengthFactor + cutAllowance", unit: "in", group: "Cutting" },
-      { key: "rollInches",  label: "Roll length",     expression: "convert(rollLength, m, in)", unit: "in", group: "Cutting" },
+      // Ungrouped, so it stays off the working sheet: nobody at the machine
+      // measures a roll in inches. The metres they do measure it in print in
+      // the Rolls band below.
+      { key: "rollInches",  label: "Roll length (inches)", expression: "convert(rollLength, m, in)", unit: "in" },
       // Layers is the raw division — how many cut lengths the roll holds. Only
-      // whole layers can be cut, so repeats floors it, but the exact figure is
-      // shown too: 79.135 and 79 are different answers to different questions,
-      // and rounding one into the other silently is how a roll comes up short.
-      { key: "layers",      label: "Layers — exact",  expression: "rollInches / cutLength", group: "Cutting" },
+      // whole layers can be cut, so repeats floors it. The exact figure is
+      // working rather than an instruction, so it is ungrouped too and stays
+      // on screen instead of on the paper; the floor cuts whole layers.
+      { key: "layers",      label: "Layers — exact",  expression: "rollInches / cutLength" },
       { key: "repeats",     label: "Layers per roll", expression: "floor(layers)", group: "Cutting" },
       { key: "piecesPerRoll", label: "Pieces per roll", expression: "repeats * acrossCount * lengthFactor", unit: "pcs", group: "Cutting" },
 
+      // The roll as the store issues it and the floor loads it — metres, the
+      // number typed into the formula, not the inches the maths ran on.
+      { key: "rollLengthM", label: "Roll length",     expression: "rollLength", unit: "m", group: "Rolls" },
       { key: "rollsNeeded", label: "Rolls required",  expression: "orderQty / piecesPerRoll", group: "Rolls" },
       // You can only buy whole rolls, so the fractional part of rollsNeeded is
       // never actually used up — it comes back off the last roll as leftover
@@ -133,21 +139,30 @@ export const FORMULA_TEMPLATES: FormulaTemplate[] = [
       // The if() keeps the unpicked branch out of the money; showWhen keeps it
       // off the paper and off the result card. Both are needed: the steps have
       // to evaluate either way, because every step below reads them.
+      // What the store issues, which is the only part of this the floor acts
+      // on — grouped, so it prints, and branched, so a buttoned bag does not
+      // carry a tape line reading zero. The money beside it is ungrouped: the
+      // working sheet is a cutting instruction, and what the job costs is the
+      // quoter's business, on the cost sheet.
       { key: "buttonsNeeded", label: "Buttons required",    expression: "if(fitting == 0, buttonsPerPc * orderQty, 0)", unit: "pcs", group: "Buttons & Tape", showWhen: { key: "fitting", is: 0 } },
-      { key: "buttonPerPc",   label: "Button cost per piece", expression: "if(fitting == 0, buttonsPerPc * buttonRate + buttonLabour, 0)", unit: "Rs", group: "Buttons & Tape", showWhen: { key: "fitting", is: 0 } },
-      { key: "buttonTotal",   label: "Total button cost",   expression: "buttonPerPc * orderQty", unit: "Rs", group: "Buttons & Tape", showWhen: { key: "fitting", is: 0 } },
+      { key: "buttonPerPc",   label: "Button cost per piece", expression: "if(fitting == 0, buttonsPerPc * buttonRate + buttonLabour, 0)", unit: "Rs", showWhen: { key: "fitting", is: 0 } },
+      { key: "buttonTotal",   label: "Total button cost",   expression: "buttonPerPc * orderQty", unit: "Rs", showWhen: { key: "fitting", is: 0 } },
       // Same shape as the buttons, in the unit tape is actually bought in: the
       // store issues metres, the bag is cut in inches.
       { key: "tapeNeeded",    label: "Tape required",       expression: "if(fitting == 1, convert(tapePerPc * orderQty, in, m), 0)", unit: "m", group: "Buttons & Tape", showWhen: { key: "fitting", is: 1 } },
-      { key: "tapeCostPerPc", label: "Tape cost per piece", expression: "if(fitting == 1, tapePerPc * tapeRate + tapeLabour, 0)", unit: "Rs", group: "Buttons & Tape", showWhen: { key: "fitting", is: 1 } },
-      { key: "tapeTotal",     label: "Total tape cost",     expression: "tapeCostPerPc * orderQty", unit: "Rs", group: "Buttons & Tape", showWhen: { key: "fitting", is: 1 } },
+      { key: "tapeCostPerPc", label: "Tape cost per piece", expression: "if(fitting == 1, tapePerPc * tapeRate + tapeLabour, 0)", unit: "Rs", showWhen: { key: "fitting", is: 1 } },
+      { key: "tapeTotal",     label: "Total tape cost",     expression: "tapeCostPerPc * orderQty", unit: "Rs", showWhen: { key: "fitting", is: 1 } },
 
       // Roll cost is the film and nothing else — what the roll weighs times
       // what the material sells for.
-      { key: "rollCost",    label: "Roll cost",       expression: "materialRate * gauge * rollWidth * rollLength / densityDiv", unit: "Rs", group: "Cost" },
-      { key: "materialPerPc", label: "Material per piece", expression: "rollCost / piecesPerRoll", unit: "Rs", group: "Cost" },
-      { key: "costPerPc",   label: "Cost per piece",  expression: "materialPerPc + labour + buttonPerPc + tapeCostPerPc + others", unit: "Rs", group: "Cost" },
-      { key: "orderCost",   label: "Order total",     expression: "costPerPc * orderQty", unit: "Rs", group: "Cost" },
+      // All ungrouped: money never reaches the working sheet. That sheet goes
+      // to whoever cuts the job, and a cutting instruction carrying the order
+      // total is a rate sheet handed to the shop floor by accident. The cost
+      // sheet is the one that carries it, and it goes to whoever quotes.
+      { key: "rollCost",    label: "Roll cost",       expression: "materialRate * gauge * rollWidth * rollLength / densityDiv", unit: "Rs" },
+      { key: "materialPerPc", label: "Material per piece", expression: "rollCost / piecesPerRoll", unit: "Rs" },
+      { key: "costPerPc",   label: "Cost per piece",  expression: "materialPerPc + labour + buttonPerPc + tapeCostPerPc + others", unit: "Rs" },
+      { key: "orderCost",   label: "Order total",     expression: "costPerPc * orderQty", unit: "Rs" },
     ],
     outputs: [
       { key: "costPerPc",     label: "Cost per piece",  unit: "Rs",  role: "cost_per_unit", primary: true },

@@ -950,10 +950,21 @@ function PrintSheet({ kind, formula, title, run, outputs, primaryKey, saleRate, 
 
      A formula with no groups on its steps falls back to one block, so nothing
      that was never sectioned loses its working. */
+  /* A formula that bands its steps is saying which of them the floor needs to
+     read. The rest — a unit conversion, an exact figure that only exists to be
+     rounded, every line of the costing — are working, not instructions, and
+     they stay off the paper. They are all still on screen under "How this was
+     calculated", which is where anybody checking the arithmetic is standing.
+
+     A formula that bands nothing has not made that call, so it prints
+     everything under one heading, exactly as this sheet always did. */
+  const banded = run.steps.some((s) => s.kind === "step" && (s.group ?? "").trim());
+
   const bands: { name: string; rows: StepResult[] }[] = [];
   for (const s of run.steps) {
     if (s.kind === "input") continue;          // sizes have their own band above
     if (!isVisible(s, run.values)) continue;   // the branch nobody picked is all zeroes
+    if (banded && !(s.group ?? "").trim()) continue;
     const name = (s.group ?? "").trim() || "Working";
     const bucket = bands.find((b) => b.name === name);
     if (bucket) bucket.rows.push(s);
