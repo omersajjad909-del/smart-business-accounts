@@ -558,12 +558,27 @@ function BOMPageInner() {
                 </div>
                 {makeQuote.lines.map((line) => {
                   const short = makeQuote.shortages.some((s) => s.itemId === line.itemId);
+                  // requiredQty, not qty: `qty` is what the BOM says one batch
+                  // takes, and showing it against an order of ten thousand
+                  // reads as though the run consumes a single roll.
                   return (
-                    <div key={line.itemId} style={{ display: "flex", justifyContent: "space-between", gap: 10, padding: "4px 0", fontSize: 12.5, color: short ? "#fca5a5" : "rgba(255,255,255,.72)" }}>
-                      <span>{line.itemName}{short ? " — not enough in stock" : ""}</span>
-                      <span style={{ fontFamily: "ui-monospace, monospace", whiteSpace: "nowrap" }}>
-                        {Number(line.qty).toLocaleString()} {line.unit}
-                      </span>
+                    <div key={line.itemId} style={{ padding: "5px 0", fontSize: 12.5 }}>
+                      <div style={{ display: "flex", justifyContent: "space-between", gap: 10, color: short ? "#fca5a5" : "rgba(255,255,255,.75)" }}>
+                        <span>{line.itemName}{short ? ` — only ${line.availableQty.toLocaleString()}${line.unit} in stock` : ""}</span>
+                        <span style={{ fontFamily: "ui-monospace, monospace", whiteSpace: "nowrap", fontWeight: 700 }}>
+                          {line.requiredQty.toLocaleString()} {line.unit}
+                        </span>
+                      </div>
+                      {/* The exact figure under the whole one, so 15.82 rolls
+                          taken as 16 does not look like a rounding nobody
+                          agreed to — and the part that survives says so. */}
+                      {(line.exactQty !== line.requiredQty || line.leftoverQty > 0 || line.fromRemnantQty > 0) && (
+                        <div style={{ fontSize: 10.5, color: "rgba(255,255,255,.35)", marginTop: 1 }}>
+                          {line.exactQty !== line.requiredQty && `needs ${line.exactQty.toFixed(2)}${line.unit}`}
+                          {line.fromRemnantQty > 0 && ` · ${line.fromRemnantQty.toFixed(2)}${line.unit} from open stock`}
+                          {line.leftoverQty > 0 && ` · ${line.leftoverQty.toFixed(2)}${line.unit} stays as open stock`}
+                        </div>
+                      )}
                     </div>
                   );
                 })}
