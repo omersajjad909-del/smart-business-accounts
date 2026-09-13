@@ -113,6 +113,9 @@ export function ItemPicker({
   const boxRef = useRef<HTMLDivElement>(null);
   const listRef = useRef<HTMLDivElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
+  /** The cell, and the panel's own box — either may be the one holding focus. */
+  const inputRef = useRef<HTMLInputElement>(null);
+  const panelSearchRef = useRef<HTMLInputElement>(null);
 
   /*
    * The picker is rendered into <body> and positioned by hand: the line
@@ -333,6 +336,30 @@ export function ItemPicker({
         away
       );
     };
+  }, [open]);
+
+  /* ------------------------------------------------------------
+     Somewhere to type when the list opens.
+
+     Both inputs handle the arrow keys, but neither of them is necessarily
+     holding focus: the panel can be opened from a shortcut, or by a click that
+     lands on the panel itself, and then the keystrokes go to the body and the
+     highlight will not move. It looked like arrow keys were unsupported — the
+     operator was reaching for the mouse to do what the keyboard was already
+     wired for.
+
+     So on opening, if focus is not already on the cell or inside the panel, it
+     goes to the panel's search box. Focus that is already somewhere useful is
+     left exactly where it is, because moving it mid-keystroke is its own bug.
+     ------------------------------------------------------------ */
+  useEffect(() => {
+    if (!open) return;
+    const active = document.activeElement;
+    if (active === inputRef.current) return;
+    if (active && panelRef.current?.contains(active)) return;
+    // One frame, so the portal is mounted before it is asked to take focus.
+    const id = requestAnimationFrame(() => panelSearchRef.current?.focus());
+    return () => cancelAnimationFrame(id);
   }, [open]);
 
   // ------------------------------------------------------------
@@ -567,6 +594,7 @@ export function ItemPicker({
       ---------------------------------------------------- */}
 
       <input
+        ref={inputRef}
         id={inputId}
         value={shown}
         placeholder={
@@ -608,6 +636,10 @@ export function ItemPicker({
       {open && anchor && createPortal(
         <div
           ref={panelRef}
+          /* Also here, not only on the two inputs: focus can land on the
+             scroller or the resize grip, and from there the arrows would
+             otherwise do nothing at all. */
+          onKeyDown={keyDown}
           style={{
             position: "fixed",
             zIndex: 4000,
@@ -674,6 +706,7 @@ export function ItemPicker({
             }}
           >
             <input
+              ref={panelSearchRef}
               value={query}
               placeholder="Search items…"
               spellCheck={false}
