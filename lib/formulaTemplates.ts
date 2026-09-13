@@ -164,28 +164,38 @@ export const FORMULA_TEMPLATES: FormulaTemplate[] = [
       { key: "costPerPc",   label: "Cost per piece",  expression: "materialPerPc + labour + buttonPerPc + tapeCostPerPc + others", unit: "Rs" },
       { key: "orderCost",   label: "Order total",     expression: "costPerPc * orderQty", unit: "Rs" },
     ],
+    /* Money first. The cost sheet prints these in the order they are written
+       and it goes to whoever quotes, so the order total has no business
+       sitting below a roll width. "Layers — exact" is gone: 79.14 is working,
+       and the result card carries enough without it. */
     outputs: [
       { key: "costPerPc",     label: "Cost per piece",  unit: "Rs",  role: "cost_per_unit", primary: true },
+      { key: "orderQty",      label: "Order quantity",  unit: "pcs", group: "Order" },
+      // "at cost", said outright. The headline on the slip is the quoted rate
+      // with profit on it, and profit is decided per quote on the run screen
+      // rather than inside the formula — so this total is the cost total, and
+      // a slip that let someone multiply the quoted rate by the quantity and
+      // land on a different number would be worse than one that says so.
+      { key: "orderCost",     label: "Order total at cost", unit: "Rs", group: "Order" },
+      { key: "materialPerPc", label: "Material per piece", unit: "Rs", group: "Cost breakdown" },
+      { key: "buttonPerPc",   label: "Button per piece", unit: "Rs", group: "Cost breakdown", showWhen: { key: "fitting", is: 0 } },
+      { key: "tapeCostPerPc", label: "Tape per piece",  unit: "Rs", group: "Cost breakdown", showWhen: { key: "fitting", is: 1 } },
+      { key: "labour",        label: "Labour per piece", unit: "Rs", group: "Cost breakdown" },
+      { key: "others",        label: "Others per piece", unit: "Rs", group: "Cost breakdown" },
+      { key: "rollCost",      label: "Roll cost",       unit: "Rs",  role: "cost_per_batch", group: "Cost breakdown" },
       { key: "piecesPerRoll", label: "Pieces per roll", unit: "pcs", role: "units_per_batch", group: "Cutting" },
       { key: "acrossCount",   label: "Pieces across",   unit: "pcs", group: "Cutting" },
       { key: "rollWidth",     label: "Roll width",      unit: "in", group: "Cutting" },
       { key: "cutLength",     label: "Cut length",      unit: "in", group: "Cutting" },
-      // The division and the whole number it becomes, both on the result card:
-      // 3,937.01 / 49.75 = 79.135 layers, of which 79 can actually be cut.
-      { key: "layers",        label: "Layers — exact",  group: "Cutting" },
       { key: "repeats",       label: "Layers per roll", group: "Cutting" },
       { key: "rollsNeeded",   label: "Rolls required",  group: "Rolls" },
       { key: "rollsToBuy",       label: "Rolls to buy", group: "Rolls" },
       { key: "leftoverStockM",   label: "Leftover → waste stock", unit: "m", group: "Rolls" },
       { key: "wasteM",        label: "Waste per roll",  unit: "m",   role: "waste_qty", group: "Rolls" },
       { key: "buttonsNeeded", label: "Buttons required", unit: "pcs", group: "Buttons & Tape", showWhen: { key: "fitting", is: 0 } },
-      { key: "buttonPerPc",   label: "Button cost per piece", unit: "Rs", group: "Buttons & Tape", showWhen: { key: "fitting", is: 0 } },
       { key: "buttonTotal",   label: "Total button cost", unit: "Rs", group: "Buttons & Tape", showWhen: { key: "fitting", is: 0 } },
       { key: "tapeNeeded",    label: "Tape required",    unit: "m", group: "Buttons & Tape", showWhen: { key: "fitting", is: 1 } },
-      { key: "tapeCostPerPc", label: "Tape cost per piece", unit: "Rs", group: "Buttons & Tape", showWhen: { key: "fitting", is: 1 } },
       { key: "tapeTotal",     label: "Total tape cost",  unit: "Rs", group: "Buttons & Tape", showWhen: { key: "fitting", is: 1 } },
-      { key: "rollCost",      label: "Roll cost",       unit: "Rs",  role: "cost_per_batch", group: "Cost" },
-      { key: "orderCost",     label: "Order total",     unit: "Rs", group: "Cost" },
     ],
   },
 

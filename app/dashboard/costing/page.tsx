@@ -103,6 +103,11 @@ const CSS = `
   .cxPrimaryValue{font-size:30px}
 }
 .cxHalfGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px 18px}
+/* Bands side by side across the slip. auto-fit rather than a fixed count, so
+   a formula with two groups gets two wide columns and one with five gets five
+   narrow ones, instead of either being padded out or crushed. */
+.cxCostBands{display:grid;grid-template-columns:repeat(auto-fit,minmax(40mm,1fr));
+  gap:10px 16px;align-items:start}
 /* Sizes read across, four to a line, so the band a cutter checks first is one
    glance rather than a column he has to run his finger down. */
 .cxSheetGrid{display:grid;grid-template-columns:repeat(4,1fr);gap:0 20px}
@@ -885,6 +890,20 @@ function PrintSheet({ kind, formula, title, run, outputs, primaryKey, saleRate, 
   if (kind === "cost") {
     const main = outputs.find((o) => o.key === primaryKey) ?? outputs[0];
     const rest = outputs.filter((o) => o.key !== main?.key);
+
+    /* The slip used to end in one flat grid of every remaining figure —
+       seventeen numbers in three columns with a roll width sitting next to an
+       order total and nothing saying they were different kinds of thing. So
+       the figures come off the outputs' own groups, the same way the working
+       sheet bands its steps, and a formula that groups nothing still gets the
+       single block it always had. */
+    const costBands: { name: string; rows: FormulaOutput[] }[] = [];
+    for (const o of rest) {
+      const name = (o.group ?? "").trim();
+      const bucket = costBands.find((b) => b.name === name);
+      if (bucket) bucket.rows.push(o);
+      else costBands.push({ name, rows: [o] });
+    }
     return (
       <div className="cxPrint">
         <div className="cxHalf" style={{ fontFamily: FONT, color: "#000", background: "#fff" }}>
@@ -901,8 +920,11 @@ function PrintSheet({ kind, formula, title, run, outputs, primaryKey, saleRate, 
             <div style={{ fontSize: 10, color: "#555", whiteSpace: "nowrap", paddingTop: 4 }}>{today()}</div>
           </div>
 
+          {/* The rate, and the sum behind it spelled out. A slip that shows
+              only the finished number is a slip nobody can check, and one
+              nobody can check gets re-derived by hand on the spot. */}
           {main && (
-            <div style={{ marginBottom: 16 }}>
+            <div style={{ marginBottom: 14 }}>
               <div style={{ fontSize: 9.5, fontWeight: 700, letterSpacing: ".09em", textTransform: "uppercase", color: "#555", marginBottom: 3 }}>
                 {main.label || main.key}
               </div>
@@ -914,22 +936,51 @@ function PrintSheet({ kind, formula, title, run, outputs, primaryKey, saleRate, 
                 <span style={{ fontSize: 13, color: "#666", marginLeft: 7, fontWeight: 600 }}>{main.unit ?? ""}</span>
               </div>
               {!!profitAmount && (
-                <div style={{ fontFamily: MONO, fontSize: 10.5, color: "#666", marginTop: 3, fontVariantNumeric: "tabular-nums" }}>
-                  {fmt(run.values[main.key])} cost + {fmt(profitAmount)} profit
-                </div>
+                <table style={{ borderCollapse: "collapse", marginTop: 6, fontFamily: MONO, fontSize: 10 }}>
+                  <tbody>
+                    {([
+                      ["Cost", fmt(run.values[main.key])],
+                      ["Profit", `+ ${fmt(profitAmount)}`],
+                      ["Quoted rate", fmt(saleRate)],
+                    ] as const).map(([lbl, v], ri) => (
+                      <tr key={lbl} style={ri === 2 ? { borderTop: "1px solid #999" } : undefined}>
+                        <td style={{ fontFamily: FONT, fontSize: 9, color: "#555", padding: "1px 14px 1px 0" }}>{lbl}</td>
+                        <td style={{
+                          textAlign: "right", fontVariantNumeric: "tabular-nums",
+                          fontWeight: ri === 2 ? 800 : 600, padding: "1px 0",
+                        }}>
+                          {v}<span style={{ fontSize: 8, color: "#777", marginLeft: 3 }}>{main.unit ?? ""}</span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               )}
             </div>
           )}
 
           {rest.length > 0 && (
-            <div className="cxHalfGrid" style={{ borderTop: "1px solid #ddd", paddingTop: 14 }}>
-              {rest.map((o) => (
-                <div key={o.key}>
-                  <div style={{ fontSize: 9.5, color: "#666", marginBottom: 2 }}>{o.label || o.key}</div>
-                  <div style={{ fontFamily: MONO, fontSize: 13.5, fontWeight: 700, fontVariantNumeric: "tabular-nums" }}>
-                    {fmt(run.values[o.key])}
-                    <span style={{ fontSize: 9.5, color: "#777", marginLeft: 3 }}>{o.unit ?? ""}</span>
-                  </div>
+            <div className="cxCostBands" style={{ borderTop: "1px solid #ddd", paddingTop: 12 }}>
+              {costBands.map((b, bi) => (
+                <div key={bi} style={{ breakInside: "avoid" }}>
+                  {b.name && (
+                    <div style={{
+                      fontSize: 8.5, fontWeight: 800, letterSpacing: ".08em", textTransform: "uppercase",
+                      color: "#000", borderBottom: "1px solid #ccc", paddingBottom: 3, marginBottom: 5,
+                    }}>{b.name}</div>
+                  )}
+                  {b.rows.map((o) => (
+                    <div key={o.key} style={{
+                      display: "flex", justifyContent: "space-between", alignItems: "baseline",
+                      gap: 8, padding: "2px 0",
+                    }}>
+                      <span style={{ fontSize: 9, color: "#555" }}>{o.label || o.key}</span>
+                      <span style={{ fontFamily: MONO, fontSize: 10.5, fontWeight: 700, fontVariantNumeric: "tabular-nums", whiteSpace: "nowrap" }}>
+                        {fmt(run.values[o.key])}
+                        <span style={{ fontSize: 8, color: "#777", marginLeft: 2 }}>{o.unit ?? ""}</span>
+                      </span>
+                    </div>
+                  ))}
                 </div>
               ))}
             </div>
