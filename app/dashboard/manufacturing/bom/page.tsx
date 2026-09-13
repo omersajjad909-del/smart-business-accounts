@@ -25,6 +25,8 @@ const inputStyle: React.CSSProperties = {
   borderRadius: 8, padding: "9px 12px", color: "#fff", boxSizing: "border-box",
 };
 
+type LabourRow = { labourId: string; operation: string; qty: string; rate: string };
+
 type LineDraft = {
   itemId: string;
   qty: string;
@@ -225,12 +227,38 @@ function BOMPageInner() {
   const [makeError, setMakeError] = useState("");
   const [makeShort, setMakeShort] = useState(false);
 
+  /* Who did the work, and what they are owed for it.
+     
+     Without this the run still costs the labour — it falls back to the BOM's
+     per-batch figure — but the credit goes to one lump "Factory Labour"
+     expense head. Nobody is owed anything in the books and nobody can be paid
+     from it. Naming the workers here credits each one's own payable account
+     instead, the same way a job work receipt credits the thekedar. */
+  const [labourList, setLabourList] = useState<{ id: string; name: string; ratePerUnit: number }[]>([]);
+  const [labourRows, setLabourRows] = useState<LabourRow[]>([]);
+
+  useEffect(() => {
+    fetch("/api/manufacturing/labour", { cache: "no-store" })
+      .then((r) => r.json())
+      .then((list) => setLabourList(Array.isArray(list) ? list : []))
+      .catch(() => setLabourList([]));
+  }, []);
+
+  const setLabourRow = (index: number, patch: Partial<LabourRow>) =>
+    setLabourRows((rows) => rows.map((r, i) => (i === index ? { ...r, ...patch } : r)));
+
+  const labourTotal = labourRows.reduce(
+    (sum, r) => sum + (Number(r.qty) || 0) * (Number(r.rate) || 0),
+    0,
+  );
+
   function openMake(bom: ManufacturingBom) {
     setMakeBom(bom);
     setMakeQty(String(bom.yieldUnits || 1));
     setMakeQuote(null);
     setMakeError("");
     setMakeShort(false);
+    setLabourRows([]);
   }
 
   function closeMake() {
@@ -260,6 +288,15 @@ function BOMPageInner() {
     if (!makeBom || !makeQuote) return;
     const qty = Math.floor(Number(makeQty));
     if (!Number.isFinite(qty) || qty <= 0) { setMakeError("How many are being made?"); return; }
+
+    const assignments = labourRows
+      .filter((r) => r.labourId && Number(r.qty) > 0 && Number(r.rate) >= 0)
+      .map((r) => ({
+        labourId: r.labourId,
+        qty: Number(r.qty),
+        rate: Number(r.rate),
+        operation: r.operation.trim(),
+      }));
 
     setMakeBusy(true);
     setMakeError("");
@@ -291,6 +328,9 @@ function BOMPageInner() {
           allowNegativeStock: makeShort,
           location: makeQuote.location || "MAIN",
           date: new Date().toISOString().slice(0, 10),
+          // Named workers replace the BOM's labour estimate entirely — they
+          // are what was actually agreed to pay.
+          ...(assignments.length ? { labourAssignments: assignments } : {}),
         }),
       });
       const body = await res.json();
@@ -584,11 +624,15 @@ function BOMPageInner() {
                 })}
                 <div style={{ marginTop: 12, paddingTop: 12, borderTop: `1px solid ${border}`, display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
                   <span style={{ fontSize: 12.5, color: "rgba(255,255,255,.5)" }}>Goes to Finished Goods</span>
+                  {/* Named workers replace the BOM's labour figure, so the
+                      total has to follow them or the number on screen is not
+                      the number that posts. */}
                   <span style={{ fontSize: 17, fontWeight: 800, color: "#22c55e", fontFamily: "ui-monospace, monospace" }}>
-                    Rs. {Math.round(makeQuote.totalCost).toLocaleString()}
-                    <span style={{ fontSize: 11, fontWeight: 600, color: "rgba(255,255,255,.35)", marginLeft: 6 }}>
-                      Rs. {Math.round(makeQuote.unitCost).toLocaleString()} / unit
-                    </span>
+                    Rs. {Math.round(
+                      labourRows.length
+                        ? makeQuote.totalCost - makeQuote.labourCost + labourTotal
+                        : makeQuote.totalCost,
+                    ).toLocaleString()}
                   </span>
                 </div>
 
@@ -598,6 +642,65 @@ function BOMPageInner() {
                     Make it anyway — the short material will show as negative stock
                   </label>
                 )}
+
+                {/* Who did the work. Leave it empty and the labour is still
+                    costed, from the BOM — but it lands in one "Factory Labour"
+                    head and nobody is owed anything by name. Name them and
+                    each gets a payable of their own, to be paid off through
+                    CPV like any other creditor. */}
+                <div style={{ marginTop: 18 }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 10, marginBottom: 8 }}>
+                    <span style={{ fontSize: 11, fontWeight: 800, letterSpacing: .6, textTransform: "uppercase", color: "rgba(255,255,255,.4)" }}>
+                      Labour on this run
+                    </span>
+                    <span style={{ fontSize: 11, color: "rgba(255,255,255,.32)" }}>
+                      {labourRows.length
+                        ? `Rs. ${Math.round(labourTotal).toLocaleString()} — replaces the BOM estimate`
+                        : `BOM estimate Rs. ${Math.round(makeQuote.labourCost).toLocaleString()} — nobody owed by name`}
+                    </span>
+                  </div>
+
+                  {labourList.length === 0 ? (
+                    <div style={{ fontSize: 12, color: "rgba(255,255,255,.35)" }}>
+                      No workers added yet — add them on the{" "}
+                      <a href="/dashboard/manufacturing/labour" style={{ color: "#fb923c", fontWeight: 700 }}>Labour</a> page.
+                    </div>
+                  ) : (
+                    <>
+                      <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                        {labourRows.map((row, index) => (
+                          <div key={index} style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr 1fr" : "1.2fr 1fr 72px 80px 28px", gap: 6, alignItems: "center" }}>
+                            <select value={row.labourId}
+                              onChange={(e) => {
+                                const picked = labourList.find((l) => l.id === e.target.value);
+                                setLabourRow(index, { labourId: e.target.value, rate: picked ? String(picked.ratePerUnit) : row.rate });
+                              }}
+                              style={{ background: bg, border: `1px solid ${border}`, borderRadius: 8, padding: "8px 9px", color: "#fff", fontSize: 12.5, fontFamily: "inherit" }}>
+                              <option value="">— Worker —</option>
+                              {labourList.map((l) => <option key={l.id} value={l.id}>{l.name}</option>)}
+                            </select>
+                            <input placeholder="Job — e.g. Button" value={row.operation}
+                              onChange={(e) => setLabourRow(index, { operation: e.target.value })}
+                              style={{ background: bg, border: `1px solid ${border}`, borderRadius: 8, padding: "8px 9px", color: "#fff", fontSize: 12.5, fontFamily: "inherit" }} />
+                            <input type="number" min={0} step="any" placeholder="Pcs" value={row.qty}
+                              onChange={(e) => setLabourRow(index, { qty: e.target.value })}
+                              style={{ background: bg, border: `1px solid ${border}`, borderRadius: 8, padding: "8px 9px", color: "#fff", fontSize: 12.5, fontFamily: "inherit" }} />
+                            <input type="number" min={0} step="any" placeholder="Rate/pc" value={row.rate}
+                              onChange={(e) => setLabourRow(index, { rate: e.target.value })}
+                              style={{ background: bg, border: `1px solid ${border}`, borderRadius: 8, padding: "8px 9px", color: "#fff", fontSize: 12.5, fontFamily: "inherit" }} />
+                            <button onClick={() => setLabourRows((rows) => rows.filter((_, i) => i !== index))} title="Remove"
+                              style={{ background: "transparent", border: `1px solid ${border}`, borderRadius: 8, color: "rgba(255,255,255,.45)", cursor: "pointer", padding: "7px 0", gridColumn: isMobile ? "1 / -1" : "auto" }}>×</button>
+                          </div>
+                        ))}
+                      </div>
+                      <button
+                        onClick={() => setLabourRows((rows) => [...rows, { labourId: "", operation: "", qty: makeQty, rate: "" }])}
+                        style={{ marginTop: 8, padding: "6px 12px", borderRadius: 8, background: "rgba(255,255,255,.05)", border: `1px solid ${border}`, color: "rgba(255,255,255,.65)", fontSize: 12, fontWeight: 600, fontFamily: "inherit", cursor: "pointer" }}>
+                        + Worker
+                      </button>
+                    </>
+                  )}
+                </div>
               </div>
             )}
 
