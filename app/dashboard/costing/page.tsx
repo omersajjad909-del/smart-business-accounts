@@ -329,16 +329,42 @@ function CostingInner() {
     // this run. Anything nested inside another step stays out of it — those are
     // the material workings, not charges.
     const unitKey = selected.formula.outputs.find((o) => o.role === "cost_per_unit")?.key;
-    const unitStep = selected.formula.steps.find((s) => s.key === unitKey);
     const inputByKey = new Map(selected.formula.inputs.map((i) => [i.key, i]));
+    const stepByKey = new Map(selected.formula.steps.map((s) => [s.key, s]));
     const charges: { key: string; label: string; perUnit: number }[] = [];
-    for (const token of unitStep?.expression.match(/[A-Za-z_][A-Za-z0-9_]*/g) ?? []) {
-      const input = inputByKey.get(token);
-      if (!input || input.isList || !isMoneyUnit(input.unit) || charges.some((c) => c.key === token)) continue;
-      const value = run.values[token];
-      if (typeof value !== "number" || !Number.isFinite(value) || value <= 0) continue;
-      charges.push({ key: token, label: input.label || token, perUnit: value });
-    }
+
+    /* Walk down from the cost-per-unit expression, through the steps it names,
+       collecting the money-valued inputs on the way.
+       
+       It used to read the top expression only, which found `labour` and
+       stopped. A bag's fitting labour is one level further down, inside
+       `buttonPerPc = buttonsPerPc * buttonRate + buttonLabour`, so it never
+       reached the BOM as labour — it rode across in the unassigned lump with
+       the buttons themselves, and the batch was costed with neither.
+       
+       Bounded by `seen`, so a formula whose steps refer to each other is
+       walked once rather than for ever. */
+    const seen = new Set<string>();
+    const walk = (expression: string | undefined) => {
+      for (const token of expression?.match(/[A-Za-z_][A-Za-z0-9_]*/g) ?? []) {
+        if (seen.has(token)) continue;
+        seen.add(token);
+
+        const step = stepByKey.get(token);
+        if (step) { walk(step.expression); continue; }
+
+        const input = inputByKey.get(token);
+        if (!input || input.isList || !isMoneyUnit(input.unit)) continue;
+        // The branch this run did not take is still reachable through the
+        // expression tree — if() zeroes its value but the input is still
+        // sitting there. A buttoned bag must not be charged the tape labour.
+        if (!isVisible(input, run.values)) continue;
+        const value = run.values[token];
+        if (typeof value !== "number" || !Number.isFinite(value) || value <= 0) continue;
+        charges.push({ key: token, label: input.label || token, perUnit: value });
+      }
+    };
+    walk(stepByKey.get(unitKey ?? "")?.expression);
     const isLabour = (c: { key: string; label: string }) =>
       LABOUR_CHARGE.test(c.key) || LABOUR_CHARGE.test(c.label);
     const labourPerUnit = charges.filter(isLabour).reduce((sum, c) => sum + c.perUnit, 0);
@@ -357,10 +383,29 @@ function CostingInner() {
         ? Math.round((conversion - labourPerBatch) * 100) / 100
         : null;
 
+    /* The materials a batch eats besides the one the formula is about — the
+       same `consumable_qty` outputs a job work challan raises a line for. The
+       formula counts them for the whole order, so they are brought back to one
+       piece and then out again to one batch: 2 buttons a bag, 790 bags a roll,
+       1,580 buttons a batch. The item itself is still the operator's to pick;
+       only the quantity is known here. */
+    const consumables = buildJobWorkSeed(selected.id, selected.formula, run)?.consumables ?? [];
+    const bomConsumables = unitsPerBatch != null && unitsPerBatch > 0
+      ? consumables.flatMap((c) =>
+          c.perPc != null && c.perPc > 0
+            ? [{
+                label: c.label,
+                unit: c.unit ?? "",
+                perBatch: Math.round(c.perPc * unitsPerBatch * 1e4) / 1e4,
+              }]
+            : [])
+      : [];
+
     return {
       unitsPerBatch, costPerBatch, costPerUnit, conversion,
       labourPerBatch, otherPerBatch,
       otherLabel: otherCharges.map((c) => c.label).join(" + "),
+      consumables: bomConsumables,
     };
   }, [selected, run]);
 
@@ -390,6 +435,8 @@ function CostingInner() {
       qs.set("pendingChargeAmount", String(bomSeed.otherPerBatch));
       if (bomSeed.otherLabel) qs.set("chargeLabel", bomSeed.otherLabel);
     }
+    // Buttons, tape — a line each, already counted for one batch.
+    if (bomSeed?.consumables.length) qs.set("consumables", JSON.stringify(bomSeed.consumables));
     return `/dashboard/manufacturing/bom?${qs.toString()}`;
   }, [selected, bomSeed]);
 

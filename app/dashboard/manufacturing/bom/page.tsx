@@ -33,6 +33,13 @@ type LineDraft = {
    * of a screw is scrap, not stock.
    */
   divisible: boolean;
+  /**
+   * What the costing formula expected on this line — "Buttons required —
+   * 1,580 pcs". Only the quantity crosses over; which item of your own stock
+   * that is, the formula has no way of knowing, so the note stands beside the
+   * picker until somebody chooses.
+   */
+  note?: string;
 };
 
 function BOMPageInner() {
@@ -88,6 +95,29 @@ function BOMPageInner() {
     if (Number.isFinite(pendingChargeAmount) && pendingChargeAmount > 0) {
       setCharge({ label: chargeLabel || "Other per-unit charges", perBatch: pendingChargeAmount });
     }
+
+    /* A line per consumable the formula named, quantity already worked out for
+       one batch. Read defensively — a query string is the one input here
+       nobody validates on the way in, and a malformed one should seed no lines
+       rather than a line with NaN in the quantity box. */
+    try {
+      const raw = JSON.parse(params.get("consumables") || "[]");
+      const seeded: LineDraft[] = (Array.isArray(raw) ? raw : []).flatMap((c) => {
+        const perBatch = Number(c?.perBatch);
+        if (!Number.isFinite(perBatch) || perBatch <= 0) return [];
+        const label = String(c?.label || "Material");
+        const unit = c?.unit ? ` ${String(c.unit)}` : "";
+        return [{
+          itemId: "",
+          qty: String(perBatch),
+          // Buttons and the like are discrete; a roll is not, and neither is
+          // set here on the formula's word — see `divisible`.
+          divisible: false,
+          note: `${label} — ${perBatch.toLocaleString()}${unit} per batch`,
+        }];
+      });
+      if (seeded.length) setLines((prev) => [...prev, ...seeded]);
+    } catch { /* nothing seeded */ }
     setFormulaMeta({
       id: formulaId,
       name: params.get("formulaName") || "",
@@ -386,9 +416,11 @@ function BOMPageInner() {
             )}
             {charge && (
               <div style={{ marginBottom: 14, padding: "10px 12px", borderRadius: 8, background: "rgba(251,191,36,.09)", border: "1px solid rgba(251,191,36,.3)", color: "rgba(255,255,255,.72)", fontSize: 12, lineHeight: 1.6 }}>
-                <strong style={{ color: "#fbbf24" }}>{charge.label}</strong> — Rs {charge.perBatch.toLocaleString()} per batch — is not labour, and it has <strong>not</strong> been added to this batch's cost.
-                Add it as its own line under <strong>Materials consumed per batch</strong> below — pick the item and set its quantity —
-                so the cost follows the live purchase rate and the stock actually moves when a batch is made. It will never be added to Overhead automatically.
+                <strong style={{ color: "#fbbf24" }}>{charge.label}</strong> — Rs {charge.perBatch.toLocaleString()} per batch — is material, not labour, and it is <strong>not</strong> in this batch's cost yet.
+                {lines.some((l) => l.note)
+                  ? " A line is waiting for it below with the quantity already worked out — pick which of your own items it is, and the cost then follows that item's live purchase rate and the stock moves when a batch is made."
+                  : " Add it as its own line under Materials consumed per batch below — pick the item and set its quantity — so the cost follows the live purchase rate and the stock actually moves when a batch is made."}
+                {" "}It will never be added to Overhead automatically.
               </div>
             )}
             {formError && <div style={{ marginBottom: 14, padding: "10px 12px", borderRadius: 8, background: "rgba(239,68,68,.14)", border: "1px solid rgba(239,68,68,.28)", color: "#fca5a5", fontSize: 12 }}>{formError}</div>}
@@ -435,7 +467,14 @@ function BOMPageInner() {
                   const item = itemsById.get(line.itemId);
                   const qty = Number(line.qty) || 0;
                   return (
-                    <div key={index} style={{ display: "grid", gridTemplateColumns: "1fr 110px 96px 32px", gap: 8, alignItems: "center" }}>
+                    <div key={index}>
+                    {/* What the formula expected here. The quantity is filled
+                        in; the item is not, because only the operator knows
+                        which of their own stock it means. */}
+                    {line.note && (
+                      <div style={{ fontSize: 11, color: "rgba(255,255,255,.42)", marginBottom: 4 }}>{line.note}</div>
+                    )}
+                    <div style={{ display: "grid", gridTemplateColumns: "1fr 110px 96px 32px", gap: 8, alignItems: "center" }}>
                       <select value={line.itemId} onChange={(e) => setLine(index, { itemId: e.target.value })} style={inputStyle}>
                         <option value="">— Material —</option>
                         {rawMaterials.map((m) => <option key={m.id} value={m.id}>{m.name} ({m.currentStock}{m.unit})</option>)}
@@ -453,6 +492,7 @@ function BOMPageInner() {
                         <input type="checkbox" checked={line.divisible} onChange={(e) => setLine(index, { divisible: e.target.checked })} />
                         Roll / sheet material — keep the part-used {item?.unit || "unit"} as open stock for the next run
                       </label>
+                    </div>
                     </div>
                   );
                 })}
