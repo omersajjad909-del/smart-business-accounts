@@ -252,6 +252,14 @@ function BOMPageInner() {
     0,
   );
 
+  /* A worker named with no pieces or no rate. Left to go through it would
+     count as an assignment worth nothing, replace the BOM's estimate with it,
+     and post a run whose labour cost is zero and whose worker is owed nothing.
+     Stopped here and said out loud instead. */
+  const incompleteLabour = labourRows.some(
+    (r) => r.labourId && !(Number(r.qty) > 0 && Number(r.rate) > 0),
+  );
+
   function openMake(bom: ManufacturingBom) {
     setMakeBom(bom);
     setMakeQty(String(bom.yieldUnits || 1));
@@ -290,7 +298,12 @@ function BOMPageInner() {
     if (!Number.isFinite(qty) || qty <= 0) { setMakeError("How many are being made?"); return; }
 
     const assignments = labourRows
-      .filter((r) => r.labourId && Number(r.qty) > 0 && Number(r.rate) >= 0)
+      // rate > 0, not >= 0. A named worker at zero used to count as a real
+      // assignment and replace the BOM's estimate with nothing — the run then
+      // posted with no labour cost at all and the worker was owed nothing,
+      // which is not what naming somebody means. Incomplete rows are caught
+      // before this, so nothing is silently dropped either.
+      .filter((r) => r.labourId && Number(r.qty) > 0 && Number(r.rate) > 0)
       .map((r) => ({
         labourId: r.labourId,
         qty: Number(r.qty),
@@ -693,6 +706,12 @@ function BOMPageInner() {
                           </div>
                         ))}
                       </div>
+                      {incompleteLabour && (
+                        <div style={{ marginTop: 8, fontSize: 11.5, color: "#fbbf24" }}>
+                          A worker is named with no pieces or no rate. Fill both in, or take the row out —
+                          left as it is, the run would post with no labour cost and nobody owed.
+                        </div>
+                      )}
                       <button
                         onClick={() => setLabourRows((rows) => [...rows, { labourId: "", operation: "", qty: makeQty, rate: "" }])}
                         style={{ marginTop: 8, padding: "6px 12px", borderRadius: 8, background: "rgba(255,255,255,.05)", border: `1px solid ${border}`, color: "rgba(255,255,255,.65)", fontSize: 12, fontWeight: 600, fontFamily: "inherit", cursor: "pointer" }}>
@@ -707,11 +726,11 @@ function BOMPageInner() {
             <div style={{ display: "flex", gap: 12, marginTop: 20 }}>
               <button
                 onClick={confirmMake}
-                disabled={makeBusy || !makeQuote || (makeQuote.shortages.length > 0 && !makeShort)}
+                disabled={makeBusy || !makeQuote || incompleteLabour || (makeQuote.shortages.length > 0 && !makeShort)}
                 style={{
                   flex: 1, padding: "11px 0", border: "none", borderRadius: 8, color: "#fff",
                   fontSize: 14, fontWeight: 700, fontFamily: "inherit",
-                  background: makeBusy || !makeQuote || (makeQuote.shortages.length > 0 && !makeShort) ? "rgba(34,197,94,.4)" : "#22c55e",
+                  background: makeBusy || !makeQuote || incompleteLabour || (makeQuote.shortages.length > 0 && !makeShort) ? "rgba(34,197,94,.4)" : "#22c55e",
                   cursor: makeBusy || !makeQuote ? "not-allowed" : "pointer",
                 }}
               >
