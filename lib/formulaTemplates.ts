@@ -51,23 +51,23 @@ export const FORMULA_TEMPLATES: FormulaTemplate[] = [
       { key: "cutMin",       label: "Cutting range — min", unit: "in", defaultValue: 30, group: "Roll details" },
       { key: "cutMax",       label: "Cutting range — max", unit: "in", defaultValue: 50, group: "Roll details" },
       { key: "cutAllowance", label: "Allowance per cut",  unit: "in", defaultValue: 0.75, group: "Roll details" },
-      // Set once per material and then only in the way. Hidden, not removed:
-      // rollCost still divides by it, so a trade running a different density
-      // can still open Advanced and change the 54.
-      { key: "densityDiv",   label: "Weight divisor",     unit: "",   defaultValue: 54, group: "Roll details", hidden: true },
       // Buttons are counted, not guessed at. A flat "Button / Tape — Rs 3"
       // could not answer the two questions a store actually gets asked: how
       // many buttons to issue for the order, and what they came to. So the
       // charge is built the way the roll is — a count per piece against a
       // rate — and the total falls out of it.
-      { key: "buttonsPerPc", label: "Buttons per piece",  unit: "pcs", defaultValue: 2, askOnRun: true, group: "Button & Tape" },
-      { key: "buttonRate",   label: "Rate per button",    unit: "Rs", defaultValue: 1.2, askOnRun: true, group: "Button & Tape" },
-      { key: "buttonLabour", label: "Labour per button",  unit: "Rs", defaultValue: 0.3, askOnRun: true, group: "Button & Tape" },
+      // A bag is fastened one way or the other, never both, so the two are a
+      // choice rather than two charges that quietly add up. Button first,
+      // which makes it the default.
+      { key: "fitting",      label: "Fastening",          options: ["Button", "Tape"], defaultValue: 0, askOnRun: true, group: "Button & Tape" },
+      { key: "buttonsPerPc", label: "Buttons per piece",  unit: "pcs", defaultValue: 2, askOnRun: true, group: "Button & Tape", showWhen: { key: "fitting", is: 0 } },
+      { key: "buttonRate",   label: "Rate per button",    unit: "Rs", defaultValue: 1.2, askOnRun: true, group: "Button & Tape", showWhen: { key: "fitting", is: 0 } },
+      { key: "buttonLabour", label: "Labour per button",  unit: "Rs", defaultValue: 0.3, askOnRun: true, group: "Button & Tape", showWhen: { key: "fitting", is: 0 } },
       // Tape is not counted, it is measured — three inches a bag, bought by
       // the metre. So it gets a length and a rate rather than a count and a
       // rate, and the sheet converts between them instead of the operator.
-      { key: "tapePerPc",    label: "Tape per piece",     unit: "in", defaultValue: 3, askOnRun: true, group: "Button & Tape" },
-      { key: "tapeRate",     label: "Tape rate",          unit: "per m", defaultValue: 8, askOnRun: true, group: "Button & Tape" },
+      { key: "tapePerPc",    label: "Tape per piece",     unit: "in", defaultValue: 3, askOnRun: true, group: "Button & Tape", showWhen: { key: "fitting", is: 1 } },
+      { key: "tapeRate",     label: "Tape rate",          unit: "per m", defaultValue: 8, askOnRun: true, group: "Button & Tape", showWhen: { key: "fitting", is: 1 } },
       { key: "labour",       label: "Labour",             unit: "Rs", defaultValue: 3, askOnRun: true, group: "Order details" },
       // The odds and ends a quote picks up that have no box of their own — a
       // rupee of printing, two of stitching. Per piece, like labour beside it,
@@ -115,13 +115,17 @@ export const FORMULA_TEMPLATES: FormulaTemplate[] = [
       // against that count, and a total. buttonsNeeded is what actually goes
       // out of the store for the order — the number a flat per-piece charge
       // could never tell anybody.
-      { key: "buttonsNeeded", label: "Buttons required",    expression: "buttonsPerPc * orderQty", unit: "pcs", group: "Buttons & Tape" },
-      { key: "buttonPerPc",   label: "Button cost per piece", expression: "buttonsPerPc * (buttonRate + buttonLabour)", unit: "Rs", group: "Buttons & Tape" },
+      // Whichever way the bag is fastened, the other branch has to come out at
+      // zero — the boxes behind it are still on the formula and still hold
+      // last week's numbers, and a hidden field that keeps charging is the
+      // worst kind of costing error: invisible and consistent.
+      { key: "buttonsNeeded", label: "Buttons required",    expression: "if(fitting == 0, buttonsPerPc * orderQty, 0)", unit: "pcs", group: "Buttons & Tape" },
+      { key: "buttonPerPc",   label: "Button cost per piece", expression: "if(fitting == 0, buttonsPerPc * (buttonRate + buttonLabour), 0)", unit: "Rs", group: "Buttons & Tape" },
       { key: "buttonTotal",   label: "Total button cost",   expression: "buttonPerPc * orderQty", unit: "Rs", group: "Buttons & Tape" },
       // Same shape as the buttons, in the unit tape is actually bought in: the
       // store issues metres, the bag is cut in inches.
-      { key: "tapeNeeded",    label: "Tape required",       expression: "convert(tapePerPc * orderQty, in, m)", unit: "m", group: "Buttons & Tape" },
-      { key: "tapeCostPerPc", label: "Tape cost per piece", expression: "convert(tapePerPc, in, m) * tapeRate", unit: "Rs", group: "Buttons & Tape" },
+      { key: "tapeNeeded",    label: "Tape required",       expression: "if(fitting == 1, convert(tapePerPc * orderQty, in, m), 0)", unit: "m", group: "Buttons & Tape" },
+      { key: "tapeCostPerPc", label: "Tape cost per piece", expression: "if(fitting == 1, convert(tapePerPc, in, m) * tapeRate, 0)", unit: "Rs", group: "Buttons & Tape" },
       { key: "tapeTotal",     label: "Total tape cost",     expression: "tapeCostPerPc * orderQty", unit: "Rs", group: "Buttons & Tape" },
 
       // Roll cost is the film and nothing else — what the roll weighs times
@@ -184,8 +188,6 @@ export const FORMULA_TEMPLATES: FormulaTemplate[] = [
       { key: "cutMin",       label: "Cutting range — min",  unit: "in", defaultValue: 30, group: "Roll details" },
       { key: "cutMax",       label: "Cutting range — max",  unit: "in", defaultValue: 50, group: "Roll details" },
       { key: "cutAllowance", label: "Allowance per cut",    unit: "in", defaultValue: 0.75, group: "Roll details" },
-      // Both roll costs still divide by it — see the note in Roll → Pieces.
-      { key: "densityDiv",   label: "Weight divisor",       unit: "",   defaultValue: 54, group: "Roll details", hidden: true },
       { key: "labour",       label: "Labour",               unit: "Rs", defaultValue: 3,  askOnRun: true, group: "Order details" },
       // Per piece, not per roll as in Roll → Pieces: there are two rolls here,
       // so loading it onto either one would charge the bag twice or not at all.
@@ -364,8 +366,7 @@ export const FORMULA_TEMPLATES: FormulaTemplate[] = [
       { key: "sheetH",    label: "Sheet height",       unit: "mm", defaultValue: 2440, group: "Sheet details" },
       { key: "metalRate", label: "Metal rate",         unit: "per kg", defaultValue: 340, askOnRun: true, group: "Sheet details" },
       { key: "scrapRate", label: "Scrap recovery",     unit: "per kg", defaultValue: 90, group: "Sheet details" },
-      // Set once per alloy. Hidden, not gone — sheetKg and scrapKg both use it.
-      { key: "density",   label: "Density",            unit: "g/cm³", defaultValue: 7.85, group: "Sheet details", hidden: true },
+      { key: "density",   label: "Density",            unit: "g/cm³", defaultValue: 7.85, group: "Sheet details" },
       { key: "labour",    label: "Labour per blank",   unit: "Rs", defaultValue: 12, askOnRun: true, group: "Rates" },
     ],
     steps: [

@@ -33,6 +33,7 @@ import {
   runFormula,
   applyProfit,
   toProfit,
+  inputVisible,
   type CostingFormula,
   type FormulaInput,
   type FormulaStep,
@@ -274,7 +275,11 @@ function CostingInner() {
      trade — a weight divisor, a density — and an operator quoting a job has no
      business being asked about them; they still feed every step through their
      own default. Change one in the formula, not on a quote. */
-  const runInputs = selected?.formula.inputs.filter((i) => !i.hidden) ?? [];
+  /* A branch the operator did not pick comes off the screen entirely. Its
+     value still reaches the engine — the steps behind it zero it out with
+     if() — but a tape rate has no business sitting under a bag that is being
+     buttoned. */
+  const runInputs = selected?.formula.inputs.filter((i) => inputVisible(i, values)) ?? [];
   const askedInputs = runInputs.filter((i) => i.askOnRun !== false);
   const fixedInputs = runInputs.filter((i) => i.askOnRun === false);
 
@@ -452,7 +457,17 @@ function CostingInner() {
         {inp.label || inp.key}
         {inp.unit && <span style={{ color: "rgba(255,255,255,.28)" }}> · {inp.unit}</span>}
       </label>
-      {inp.isList ? (
+      {inp.options?.length ? (
+        /* The choice itself. Stored as the index, so the steps behind it can
+           compare a plain number and the label stays free to be renamed. */
+        <select
+          value={String(values[inp.key] ?? 0)}
+          onChange={(e) => setValues((v) => ({ ...v, [inp.key]: Number(e.target.value) }))}
+          style={{ ...inputStyle, fontFamily: FONT, cursor: "pointer" }}
+        >
+          {inp.options.map((o, oi) => <option key={oi} value={oi}>{o}</option>)}
+        </select>
+      ) : inp.isList ? (
         <input
           value={(values[inp.key] as number[] | undefined)?.join(", ") ?? ""}
           onChange={(e) => setValues((v) => ({
@@ -851,8 +866,6 @@ function PrintSheet({ kind, formula, title, run, outputs, primaryKey }: {
   outputs: FormulaOutput[];
   primaryKey?: string;
 }) {
-  /** Constants the formula keeps out of sight — they stay off the paper too. */
-  const hiddenKeys = new Set(formula.inputs.filter((i) => i.hidden).map((i) => i.key));
   /* The cost sheet is the result card off the screen and nothing more: the
      answer, the numbers standing behind it, and enough heading to know which
      job it belongs to. Boxed to half an A4 so it goes out with the quote as a
@@ -935,11 +948,18 @@ function PrintSheet({ kind, formula, title, run, outputs, primaryKey }: {
 
      A formula with no groups has one block, so it prints every input, which is
      what this sheet always did. */
-  const firstGroup = (formula.inputs.find((i) => !i.hidden)?.group ?? "").trim();
+  const firstGroup = (formula.inputs[0]?.group ?? "").trim();
   const sizeKeys = new Set(
-    formula.inputs.filter((i) => !i.hidden && (i.group ?? "").trim() === firstGroup).map((i) => i.key),
+    formula.inputs
+      .filter((i) => inputVisible(i, run.values) && (i.group ?? "").trim() === firstGroup)
+      .map((i) => i.key),
   );
   const typed = run.steps.filter((s) => s.kind === "input" && sizeKeys.has(s.key));
+  /* A choice prints as what was picked, not as the index behind it. */
+  const optionText = (key: string, v: unknown) => {
+    const opts = formula.inputs.find((i) => i.key === key)?.options;
+    return opts?.length && typeof v === "number" ? (opts[v] ?? fmt(v)) : fmt(v);
+  };
 
   return (
     <div className="cxPrint">
@@ -962,7 +982,7 @@ function PrintSheet({ kind, formula, title, run, outputs, primaryKey }: {
                 <div key={s.key} style={{ borderBottom: "1px solid #e2e2e2", padding: "5px 0" }}>
                   <div style={{ fontSize: 9.5, color: "#666" }}>{s.label}</div>
                   <div style={{ fontFamily: MONO, fontSize: 13, fontWeight: 700, fontVariantNumeric: "tabular-nums" }}>
-                    {fmt(s.value)}
+                    {optionText(s.key, s.value)}
                     <span style={{ fontSize: 9.5, color: "#777", marginLeft: 3 }}>{s.unit ?? ""}</span>
                   </div>
                 </div>

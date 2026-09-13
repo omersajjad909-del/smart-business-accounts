@@ -519,6 +519,21 @@ export type FormulaInput = {
   /** A list input, e.g. the stock widths a supplier actually sells. */
   isList?: boolean;
   listValue?: number[];
+  /**
+   * Turns the input into a choice — "Button" or "Tape", one or the other.
+   * Its value is the 0-based index of whatever is picked, so a step reads it
+   * as an ordinary number: `if(fitting == 0, buttonCost, tapeCost)`. The first
+   * option is the default, which is how an author sets the default: by putting
+   * it first.
+   */
+  options?: string[];
+  /**
+   * Only shown, and only asked for, while that choice is sitting on this
+   * index. The engine still evaluates the input — a hidden branch has to
+   * carry a value or every step reading it would fail — so the steps that use
+   * it are what must zero the branch out, usually with if().
+   */
+  showWhen?: { key: string; is: number };
   /** false = fixed in the formula, not asked on every run. */
   askOnRun?: boolean;
   /**
@@ -527,14 +542,23 @@ export type FormulaInput = {
    * grouping a formula cannot change what it works out.
    */
   group?: string;
-  /**
-   * Kept out of the main list, folded away under Advanced. Still an input in
-   * every other way — every step that names it reads the value it always did.
-   * For the constants of a trade that are set once and then only get in the
-   * way: a density divisor, a conversion factor.
-   */
-  hidden?: boolean;
 };
+
+/**
+ * Whether an input is on screen for the numbers currently entered. One
+ * implementation, because the run screen, the print sheet and the editor all
+ * have to agree on it — a field that prints but cannot be typed into, or the
+ * reverse, is worse than no condition at all.
+ */
+export function inputVisible(
+  input: FormulaInput,
+  values: Record<string, FormulaValue>,
+): boolean {
+  const cond = input.showWhen;
+  if (!cond) return true;
+  const picked = values[cond.key];
+  return typeof picked === "number" && Math.abs(picked - cond.is) < 1e-9;
+}
 
 export type FormulaStep = {
   key: string;
@@ -652,6 +676,23 @@ export type FormulaRun = {
   error?: string;
 };
 
+/**
+ * Constants the engine supplies to every formula, so a number a whole trade
+ * shares is written down once here instead of sitting in a box on every
+ * formula that needs it.
+ *
+ * densityDiv is the film weight divisor: rate x gauge x width x length / 54
+ * gives what a roll costs. It used to be an input, which meant it appeared in
+ * front of every operator who priced a bag and got typed over now and then —
+ * a constant nobody is meant to change should not be a field anybody can.
+ *
+ * An input of the same key still wins, so a trade running a different film can
+ * override it on its own formula without this file changing.
+ */
+export const CONSTANTS: Record<string, number> = {
+  densityDiv: 54,
+};
+
 const RESERVED = new Set([...FUNCTION_MAP.keys(), ...Object.keys(UNIT_TO_BASE)]);
 
 /** Keys must be usable as identifiers and must not shadow a function or unit. */
@@ -688,6 +729,11 @@ export function runFormula(
 ): FormulaRun {
   const scope = new Map<string, FormulaValue>();
   const steps: StepResult[] = [];
+
+  /* Seeded before the inputs, so an input of the same key overrides it — and
+     deliberately not pushed onto `steps`, which is what keeps constants off
+     the result card, the working sheet and the key chips. */
+  for (const [key, value] of Object.entries(CONSTANTS)) scope.set(key, value);
 
   for (const input of formula.inputs) {
     const given = provided[input.key];
