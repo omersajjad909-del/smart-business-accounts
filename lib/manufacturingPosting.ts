@@ -112,6 +112,32 @@ export const COST_BEARING_INBOUND_TYPES = [
   "JOB_RECEIPT",
 ] as const;
 
+/**
+ * Rows that take back a cost-bearing receipt.
+ *
+ * Editing or deleting a purchase invoice does not rewrite what it first
+ * posted — the original row stays and a reversal is written beside it, which
+ * is the right way round for an audit trail. But the reversal carries a
+ * negative qty with a *positive* amount, and the average-cost query above
+ * reads only `qty > 0` rows of the inbound types. So the reversal was
+ * invisible to it: the old rate stayed in the average for ever, and the qty it
+ * was divided by counted the same goods twice.
+ *
+ * Stock quantity was never wrong — getStockOnHand sums every row and the signs
+ * cancel. Only the valuation was, which is worse, because nothing looks
+ * broken: a bag simply costs more than the invoice says it does, everywhere
+ * that reads a cost.
+ *
+ * SALE_RETURN and OUTWARD_RETURN are deliberately not here. They are inbound
+ * too, but they are not reversals of a purchase — goods coming back from a
+ * customer return at what they were sold for, not at what they cost, and
+ * neither type is in the inbound list to begin with.
+ */
+export const COST_BEARING_REVERSAL_TYPES = [
+  "PURCHASE_RETURN",
+  "GRN_REVERSAL",
+] as const;
+
 export type BomLine = {
   itemId: string;
   qty: number;
@@ -244,6 +270,26 @@ export async function getAverageCosts(
     totals.set(row.itemId, acc);
   }
 
+  /* Take the reversals back out. They are stored with a negative qty and a
+     positive amount, so both are subtracted by magnitude rather than added —
+     see COST_BEARING_REVERSAL_TYPES. */
+  const reversed = await tx.inventoryTxn.findMany({
+    where: {
+      companyId,
+      itemId: { in: itemIds },
+      qty: { lt: 0 },
+      type: { in: [...COST_BEARING_REVERSAL_TYPES] },
+      ...(location ? { location } : {}),
+    },
+    select: { itemId: true, qty: true, amount: true },
+  });
+  for (const row of reversed) {
+    const acc = totals.get(row.itemId);
+    if (!acc) continue;
+    acc.qty -= Math.abs(row.qty);
+    acc.value -= Math.abs(row.amount);
+  }
+
   // Never received? Fall back to the item's own purchase rate so a brand-new
   // company can still run a costed production order on opening stock.
   const items = await tx.itemNew.findMany({
@@ -252,7 +298,10 @@ export async function getAverageCosts(
   });
   for (const item of items) {
     const t = totals.get(item.id);
-    const avg = t && t.qty > 0 ? t.value / t.qty : item.purchaseRate;
+    // Everything received has since been reversed, or the arithmetic has gone
+    // somewhere it should not — either way the item's own purchase rate is a
+    // better answer than a cost derived from nothing.
+    const avg = t && t.qty > 0 && t.value > 0 ? t.value / t.qty : item.purchaseRate;
     out.set(item.id, Number.isFinite(avg) && avg > 0 ? avg : 0);
   }
   return out;
