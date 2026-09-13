@@ -32,6 +32,7 @@ import {
   type StepResult,
 } from "@/lib/formulaEngine";
 import { FORMULA_CATEGORIES, FORMULA_TEMPLATES } from "@/lib/formulaTemplates";
+import { NumberListInput } from "@/components/costing/NumberListInput";
 
 const CARD = "rgba(255,255,255,.03)";
 const BORDER = "rgba(255,255,255,.09)";
@@ -485,11 +486,9 @@ export default function FormulasPage() {
           title="Comma-separated. The first one is the default."
           style={{ ...input, borderColor: badChoice ? "rgba(251,191,36,.55)" : BORDER }}/>
       ) : inp.isList ? (
-        <input value={(inp.listValue ?? []).join(", ")}
-          onChange={(e) => patch((x) => {
-            x.inputs[i].listValue = e.target.value.split(",").map((n) => Number(n.trim())).filter((n) => Number.isFinite(n));
-          })}
-          placeholder="48, 50, 52"
+        <NumberListInput
+          value={inp.listValue ?? []}
+          onChange={(next) => patch((x) => { x.inputs[i].listValue = next; })}
           style={{ ...monoInput, borderColor: badList ? "rgba(251,191,36,.55)" : BORDER }}/>
       ) : (
         <input type="number" step="any" value={inp.defaultValue ?? 0}

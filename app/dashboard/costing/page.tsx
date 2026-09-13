@@ -42,6 +42,7 @@ import {
   type StepResult,
 } from "@/lib/formulaEngine";
 import { buildJobWorkSeed, jobWorkHrefFrom, planIssue } from "@/lib/jobWorkSeed";
+import { NumberListInput } from "@/components/costing/NumberListInput";
 
 const CARD = "rgba(255,255,255,.03)";
 const BORDER = "rgba(255,255,255,.09)";
@@ -470,13 +471,9 @@ function CostingInner() {
           {inp.options.map((o, oi) => <option key={oi} value={oi}>{o}</option>)}
         </select>
       ) : inp.isList ? (
-        <input
-          value={(values[inp.key] as number[] | undefined)?.join(", ") ?? ""}
-          onChange={(e) => setValues((v) => ({
-            ...v,
-            [inp.key]: e.target.value.split(",").map((n) => Number(n.trim())).filter((n) => Number.isFinite(n)),
-          }))}
-          placeholder="48, 50, 52"
+        <NumberListInput
+          value={(values[inp.key] as number[] | undefined) ?? []}
+          onChange={(next) => setValues((v) => ({ ...v, [inp.key]: next }))}
           style={inputStyle}
         />
       ) : (
