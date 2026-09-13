@@ -521,6 +521,19 @@ export type FormulaInput = {
   listValue?: number[];
   /** false = fixed in the formula, not asked on every run. */
   askOnRun?: boolean;
+  /**
+   * Heading this input sits under in the editor and nowhere else — "Bag
+   * details", "Roll & cutting". Display only: the engine never reads it, so
+   * grouping a formula cannot change what it works out.
+   */
+  group?: string;
+  /**
+   * Kept out of the main list, folded away under Advanced. Still an input in
+   * every other way — every step that names it reads the value it always did.
+   * For the constants of a trade that are set once and then only get in the
+   * way: a density divisor, a conversion factor.
+   */
+  hidden?: boolean;
 };
 
 export type FormulaStep = {
