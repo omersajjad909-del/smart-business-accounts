@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { apiHasPermission } from "@/lib/apiPermission";
 import { PERMISSIONS } from "@/lib/permissions";
 import { resolveCompanyId } from "@/lib/tenant";
+import { nextDocNo } from "@/lib/docNumber";
 
 // Bulk payment processing
 export async function POST(req: NextRequest) {
@@ -50,9 +51,14 @@ export async function POST(req: NextRequest) {
           continue;
         }
 
-        // Generate voucher number
-        const count = await prisma.voucher.count({ where: { type: "CPV", companyId } });
-        const voucherNo = `CPV-${count + 1}`;
+        // One past the highest issued, not a row count — see lib/docNumber.ts.
+        // Inside the per-row loop on purpose: each voucher created in this
+        // batch has to be visible to the next row's numbering.
+        const issued = await prisma.voucher.findMany({
+          where: { type: "CPV", companyId },
+          select: { voucherNo: true },
+        });
+        const voucherNo = nextDocNo(issued, "voucherNo", "CPV-");
 
         const account = await prisma.account.findFirst({
           where: { id: accountId, companyId },

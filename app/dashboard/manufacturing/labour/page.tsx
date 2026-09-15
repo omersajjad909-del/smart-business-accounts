@@ -22,6 +22,36 @@ type LabourRow = {
   balance: number | null;
 };
 
+type LabourEntry = {
+  id: string;
+  date: string;
+  labourId: string;
+  labourName: string;
+  operation: string;
+  product: string;
+  qty: number;
+  rate: number;
+  amount: number;
+};
+
+/** Only the fields this page reads off a business record. */
+type BusinessRecordLike = {
+  id: string;
+  title?: string;
+  date?: string | null;
+  amount?: number | null;
+  data?: unknown;
+};
+
+const cell: React.CSSProperties = {
+  padding: "10px 14px", fontSize: 12.5, color: "rgba(255,255,255,.72)",
+  borderBottom: `1px solid ${border}`, whiteSpace: "nowrap",
+};
+const cellNum: React.CSSProperties = {
+  ...cell, textAlign: "right", fontFamily: "ui-monospace, monospace",
+  fontVariantNumeric: "tabular-nums",
+};
+
 export default function LabourPage() {
   const { isMobile } = useResponsive();
   const [rows, setRows] = useState<LabourRow[]>([]);
@@ -64,6 +94,61 @@ export default function LabourPage() {
   useEffect(() => { load(); }, []);
 
   const totalOwed = useMemo(() => rows.reduce((s, r) => s + (r.balance || 0), 0), [rows]);
+
+  /* ── Work done ──
+     One record per worker per run, written when the run posts. Loaded once —
+     the filtering below is over a list this size, not a round trip. */
+  const [entries, setEntries] = useState<LabourEntry[]>([]);
+  const [fromDate, setFromDate] = useState("");
+  const [toDate, setToDate] = useState("");
+  const [workerFilter, setWorkerFilter] = useState("");
+
+  useEffect(() => {
+    fetch("/api/business-records?category=labour_entry&limit=500", { cache: "no-store" })
+      .then((r) => r.json())
+      .then((list) => {
+        if (!Array.isArray(list)) return setEntries([]);
+        setEntries(list.map((r: BusinessRecordLike): LabourEntry => {
+          const d = (r.data ?? {}) as Record<string, unknown>;
+          return {
+            id: r.id,
+            date: String(r.date || "").slice(0, 10),
+            labourId: String(d.labourId || ""),
+            labourName: String(d.labourName || r.title || ""),
+            operation: String(d.operation || ""),
+            product: String(d.product || ""),
+            qty: Number(d.qty) || 0,
+            rate: Number(d.rate) || 0,
+            amount: Number(r.amount) || 0,
+          };
+        }));
+      })
+      .catch(() => setEntries([]));
+  }, []);
+
+  const visibleEntries = useMemo(
+    () => entries.filter((e) =>
+      (!workerFilter || e.labourId === workerFilter) &&
+      (!fromDate || e.date >= fromDate) &&
+      (!toDate || e.date <= toDate)),
+    [entries, workerFilter, fromDate, toDate],
+  );
+
+  /* What each worker comes to over the range — the question this page is
+     opened to answer, which a list of runs only answers after adding up. */
+  const entryTotals = useMemo(() => {
+    const by = new Map<string, { labourId: string; name: string; qty: number; amount: number; ops: Set<string> }>();
+    for (const e of visibleEntries) {
+      const acc = by.get(e.labourId) || { labourId: e.labourId, name: e.labourName, qty: 0, amount: 0, ops: new Set<string>() };
+      acc.qty += e.qty;
+      acc.amount += e.amount;
+      if (e.operation) acc.ops.add(e.operation);
+      by.set(e.labourId, acc);
+    }
+    return [...by.values()]
+      .map((t) => ({ ...t, jobs: t.ops.size ? [...t.ops].join(", ") : "—" }))
+      .sort((a, b) => b.amount - a.amount);
+  }, [visibleEntries]);
 
   function openAdd() {
     setEditingId(null);
@@ -196,6 +281,98 @@ export default function LabourPage() {
             No labour added yet.
           </div>
         )}
+      </div>
+
+      {/* ── Work done ───────────────────────────────────────────────────────
+          What the balances above are made of. The ledger has the money but
+          cannot say which of four credits on one voucher was for cutting and
+          which for packing — VoucherEntry carries no narration of its own — so
+          each assignment is recorded in its own right when a run posts. */}
+      <div style={{ marginTop: 26 }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 14, flexWrap: "wrap", marginBottom: 12 }}>
+          <div>
+            <h2 style={{ fontSize: 17, fontWeight: 800, margin: 0 }}>Work done</h2>
+            <p style={{ fontSize: 12.5, color: "rgba(255,255,255,.42)", margin: "3px 0 0" }}>
+              Every job a worker was credited for, run by run. This is what makes up the balances above.
+            </p>
+          </div>
+          <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
+            <input type="date" value={fromDate} onChange={(e) => setFromDate(e.target.value)}
+              style={{ ...inputStyle, width: "auto", padding: "7px 10px", fontSize: 12.5, fontFamily: "inherit" }} />
+            <span style={{ color: "rgba(255,255,255,.3)", fontSize: 12 }}>to</span>
+            <input type="date" value={toDate} onChange={(e) => setToDate(e.target.value)}
+              style={{ ...inputStyle, width: "auto", padding: "7px 10px", fontSize: 12.5, fontFamily: "inherit" }} />
+            <select value={workerFilter} onChange={(e) => setWorkerFilter(e.target.value)}
+              style={{ ...inputStyle, width: "auto", padding: "7px 10px", fontSize: 12.5, fontFamily: "inherit" }}>
+              <option value="">All workers</option>
+              {rows.map((r) => <option key={r.id} value={r.id}>{r.name}</option>)}
+            </select>
+          </div>
+        </div>
+
+        {/* Per worker first — the question is almost always "what does this one
+            come to", and a list of runs answers it only after adding up. */}
+        {entryTotals.length > 0 && (
+          <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(auto-fit,minmax(160px,1fr))", gap: 10, marginBottom: 14 }}>
+            {entryTotals.map((t) => (
+              <div key={t.labourId} style={{ background: bg, border: `1px solid ${border}`, borderRadius: 12, padding: "12px 14px" }}>
+                <div style={{ fontSize: 12.5, color: "rgba(255,255,255,.55)" }}>{t.name}</div>
+                <div style={{ fontSize: 17, fontWeight: 800, color: "#f59e0b", marginTop: 2 }}>
+                  Rs. {Math.round(t.amount).toLocaleString()}
+                </div>
+                <div style={{ fontSize: 11, color: "rgba(255,255,255,.33)", marginTop: 1 }}>
+                  {t.qty.toLocaleString()} pcs · {t.jobs}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        <div style={{ background: bg, border: `1px solid ${border}`, borderRadius: 14, overflowX: "auto" }}>
+          <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 680 }}>
+            <thead>
+              <tr>
+                {["Date", "Worker", "Job", "Product", "Pcs", "Rate", "Amount"].map((h, i) => (
+                  <th key={h} style={{
+                    textAlign: i >= 4 ? "right" : "left", padding: "10px 14px", fontSize: 11,
+                    fontWeight: 700, letterSpacing: .5, textTransform: "uppercase",
+                    color: "rgba(255,255,255,.38)", borderBottom: `1px solid ${border}`, whiteSpace: "nowrap",
+                  }}>{h}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {visibleEntries.map((e) => (
+                <tr key={e.id}>
+                  <td style={cell}>{e.date}</td>
+                  <td style={{ ...cell, fontWeight: 700 }}>{e.labourName}</td>
+                  <td style={{ ...cell, color: "rgba(255,255,255,.55)" }}>{e.operation || "—"}</td>
+                  <td style={{ ...cell, color: "rgba(255,255,255,.45)" }}>{e.product || "—"}</td>
+                  <td style={cellNum}>{e.qty.toLocaleString()}</td>
+                  <td style={cellNum}>{e.rate}</td>
+                  <td style={{ ...cellNum, fontWeight: 800, color: "#f59e0b" }}>Rs. {Math.round(e.amount).toLocaleString()}</td>
+                </tr>
+              ))}
+              {visibleEntries.length > 0 && (
+                <tr>
+                  <td colSpan={6} style={{ ...cell, textAlign: "right", fontWeight: 700, color: "rgba(255,255,255,.5)" }}>Total</td>
+                  <td style={{ ...cellNum, fontWeight: 800, color: "#f59e0b" }}>
+                    Rs. {Math.round(visibleEntries.reduce((s, e) => s + e.amount, 0)).toLocaleString()}
+                  </td>
+                </tr>
+              )}
+              {visibleEntries.length === 0 && (
+                <tr>
+                  <td colSpan={7} style={{ ...cell, textAlign: "center", color: "rgba(255,255,255,.28)", padding: 30 }}>
+                    {entries.length
+                      ? "Nothing in this range."
+                      : "No work recorded yet. It appears here as soon as a production run names its workers."}
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
 
       {showModal && (

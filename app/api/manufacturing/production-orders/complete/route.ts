@@ -29,23 +29,34 @@ export async function GET(req: NextRequest) {
 
     const { searchParams } = new URL(req.url);
     const productionOrderId = searchParams.get("productionOrderId") || "";
+    /* A BOM on its own is enough to price a run. "Make this" quotes before it
+       raises anything, so the operator sees the material and the cost first
+       and an abandoned preview leaves no half-made order behind. */
+    const directBomId = searchParams.get("bomId") || "";
     const qty = Number(searchParams.get("qty") || 0);
-    if (!productionOrderId) {
-      return NextResponse.json({ error: "productionOrderId required" }, { status: 400 });
+    if (!productionOrderId && !directBomId) {
+      return NextResponse.json({ error: "productionOrderId or bomId required" }, { status: 400 });
     }
 
-    const order = await prisma.businessRecord.findFirst({
-      where: { id: productionOrderId, companyId, category: "production_order" },
-    });
-    if (!order) return NextResponse.json({ error: "Production order not found" }, { status: 404 });
+    const order = productionOrderId
+      ? await prisma.businessRecord.findFirst({
+          where: { id: productionOrderId, companyId, category: "production_order" },
+        })
+      : null;
+    if (productionOrderId && !order) {
+      return NextResponse.json({ error: "Production order not found" }, { status: 404 });
+    }
 
-    const orderData = (order.data ?? {}) as Record<string, unknown>;
-    const bomId = String(orderData.bomId || "");
+    const orderData = (order?.data ?? {}) as Record<string, unknown>;
+    const bomId = directBomId || String(orderData.bomId || "");
     const bom = bomId
       ? await prisma.businessRecord.findFirst({ where: { id: bomId, companyId, category: "bom" } })
       : null;
     if (!bom) {
-      return NextResponse.json({ error: "This production order has no BOM attached" }, { status: 400 });
+      return NextResponse.json(
+        { error: order ? "This production order has no BOM attached" : "BOM not found" },
+        { status: order ? 400 : 404 },
+      );
     }
 
     const bomData = (bom.data ?? {}) as Record<string, unknown>;
@@ -59,7 +70,10 @@ export async function GET(req: NextRequest) {
 
     const ordered = Number(orderData.quantity ?? 0);
     const done = Number(orderData.completed ?? 0);
-    const producedQty = qty > 0 ? Math.floor(qty) : Math.max(ordered - done, 1);
+    // Quoting a bare BOM has no order to fall back on, so the batch it yields
+    // is the sensible default — one batch of whatever the BOM makes.
+    const fallbackQty = order ? Math.max(ordered - done, 1) : Math.max(Number(bomData.yield ?? 1), 1);
+    const producedQty = qty > 0 ? Math.floor(qty) : Math.floor(fallbackQty);
 
     // The quote must price the run exactly the way completing it will, so the
     // screen shows the real cost — conversion cost and warehouse included.

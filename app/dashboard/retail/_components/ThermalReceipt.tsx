@@ -201,7 +201,6 @@ export function ThermalReceipt({ receipt, company }: { receipt: ReceiptData; com
       <div style={{ textAlign: "center", fontSize: 10, color: "#444", lineHeight: 1.6 }}>
         <div>For return &amp; exchange policy details,</div>
         <div>visit: www.finovaos.app/return-policies</div>
-        <div style={{ marginTop: 4, color: "#999" }}>Powered by FinovaOS</div>
       </div>
     </div>
   );

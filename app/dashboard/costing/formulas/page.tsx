@@ -19,6 +19,7 @@ import {
   runFormula,
   checkExpression,
   validateKey,
+  isVisible,
   applyProfit,
   toProfit,
   NO_PROFIT,
@@ -31,6 +32,7 @@ import {
   type StepResult,
 } from "@/lib/formulaEngine";
 import { FORMULA_CATEGORIES, FORMULA_TEMPLATES } from "@/lib/formulaTemplates";
+import { NumberListInput } from "@/components/costing/NumberListInput";
 
 const CARD = "rgba(255,255,255,.03)";
 const BORDER = "rgba(255,255,255,.09)";
@@ -57,6 +59,27 @@ const btn = (kind: "primary" | "ghost" | "danger" = "ghost"): React.CSSPropertie
 });
 const iconBtn: React.CSSProperties = { ...btn(), padding: "8px 10px", fontSize: 12 };
 
+/* A block of inputs under one heading — a divider, not a second card inside
+   the first one, so fifteen boxes read as three short lists. */
+const groupBlock: React.CSSProperties = {
+  border: "1px solid rgba(255,255,255,.07)", borderRadius: 12,
+  padding: "11px 12px 12px", background: "rgba(255,255,255,.015)",
+};
+const groupHeadRow: React.CSSProperties = {
+  display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, marginBottom: 9,
+};
+const groupTitle: React.CSSProperties = {
+  fontSize: 12, fontWeight: 700, letterSpacing: ".04em",
+  color: "rgba(255,255,255,.62)", display: "flex", alignItems: "center",
+};
+const countPill: React.CSSProperties = {
+  fontSize: 10.5, fontWeight: 700, padding: "1px 7px", borderRadius: 20,
+  background: "rgba(255,255,255,.06)", border: `1px solid ${BORDER}`,
+  color: "rgba(255,255,255,.45)",
+};
+/** Sentinel option value — a section name nobody can type by accident. */
+const NEW_SECTION = "\u0000new";
+
 /* Grid shapes live in CSS, not inline styles, so the column headers and the
    rows below them stay locked together and the whole editor can stack on a
    narrow screen. */
@@ -73,7 +96,13 @@ const CSS = `
 .fxInS{display:grid;grid-template-columns:1.7fr .5fr 1fr auto;gap:8px;align-items:center}
 .fxStepS{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center}
 .fxOutS{display:grid;grid-template-columns:1.1fr 1.6fr auto auto;gap:8px;align-items:center}
-.fxIn{display:grid;grid-template-columns:1.05fr 1.3fr .6fr .95fr 1.05fr auto auto;gap:8px;align-items:center}
+/* Detailed adds a Section column in front, because a row that cannot be moved
+   out of its block is a block you can only fix by retyping the formula. */
+.fxIn{display:grid;grid-template-columns:.9fr .95fr 1.2fr .55fr .85fr .95fr auto auto;gap:8px;align-items:center}
+/* One column wider, used only once a formula actually has a choice on it —
+   most never do, and a permanently empty "Only when" column would cost every
+   other formula a column of nothing. */
+.fxInW{display:grid;grid-template-columns:.8fr .8fr 1fr .5fr .8fr .85fr .95fr auto auto;gap:7px;align-items:center}
 .fxOut{display:grid;grid-template-columns:1.05fr 1.3fr .6fr 1.1fr auto auto;gap:8px;align-items:center}
 .fxStep{display:grid;grid-template-columns:1.05fr 1.3fr .6fr auto;gap:8px;align-items:center}
 .fxProfit{display:grid;grid-template-columns:1fr 1.3fr;gap:8px;align-items:center;max-width:330px}
@@ -109,7 +138,7 @@ const CSS = `
 /* Under 768px the dashboard's own topbar is sticky against the window, so the
    action bar parks below it instead of covering it. */
 @media(max-width:767px){
-  .fxIn,.fxOut,.fxStep,.fxInS,.fxOutS{grid-template-columns:1fr 1fr}
+  .fxIn,.fxInW,.fxOut,.fxStep,.fxInS,.fxOutS{grid-template-columns:1fr 1fr}
   .fxHeadRow{display:none}
   .fxBar{top:52px;z-index:9}
   .fxFormulaCard{align-items:stretch!important}
@@ -125,6 +154,7 @@ const ROLE_LABELS: Record<OutputRole, string> = {
   cost_per_batch: "Cost per batch",
   units_per_batch: "Units per batch",
   material_qty: "Material quantity",
+  consumable_qty: "Consumable for the order",
   waste_qty: "Waste quantity",
 };
 
@@ -165,6 +195,30 @@ const inputHeadCells = () => (
     <div />
   </>
 );
+
+/* The header above a block of inputs. Drawn once per block rather than once
+   per section, because the blocks are what an author is actually reading. */
+const inputHead = (detailed: boolean, hasChoice: boolean) => detailed ? (
+  <div className={`${hasChoice ? "fxInW" : "fxIn"} fxHeadRow`}>
+    <div className="fxHead">Section</div>
+    <div className="fxHead">Key (used in steps)</div>
+    <div className="fxHead">Shown as</div>
+    <div className="fxHead">Unit</div>
+    <div className="fxHead">Type</div>
+    <div className="fxHead">Value</div>
+    {hasChoice && <div className="fxHead">Only when</div>}
+    <div className="fxHead">Ask</div>
+    <div />
+  </div>
+) : (
+  <div className="fxPairsHead fxHeadRow">
+    <div className="fxInS">{inputHeadCells()}</div>
+    <div className="fxInS fxPairSecond">{inputHeadCells()}</div>
+  </div>
+);
+const NO_SECTION = "Other details";
+/** Sentinel for the "Only when" picker's unconditional entry. */
+const ALWAYS = "\u0000always";
 
 const outputHeadCells = () => (
   <>
@@ -211,6 +265,12 @@ export default function FormulasPage() {
   // Simple hides the plumbing (keys, type, ask, roles) and shows a trade the
   // three things it cares about. Detailed is the full table.
   const [detailed, setDetailed] = useState(false);
+  // The two reference cards on the right open on demand — an author reads them
+  // once and then wants the live result at the top of the rail, not below a
+  // wall of chips. Values re-opens itself the moment a formula box is clicked,
+  // which is the only time its chips can do anything.
+  const [valuesOpen, setValuesOpen] = useState(false);
+  const [funcsOpen, setFuncsOpen] = useState(false);
 
   const formulas = useMemo(
     () => store.records.map((r) => ({ record: r, draft: toDraft(r) })),
@@ -281,6 +341,14 @@ export default function FormulasPage() {
       return;
     }
 
+    // A choice with one option is a box that cannot be chosen, and every step
+    // reading it is testing a condition that can only go one way.
+    const thinChoice = d.inputs.find((i) => i.options && i.options.filter((o) => o.trim()).length < 2);
+    if (thinChoice) {
+      setErr(`"${thinChoice.label || thinChoice.key}" is a Choice but has fewer than two options — type them like Button, Tape, or set it back to Number.`);
+      return;
+    }
+
     for (const step of d.steps) {
       const syntax = checkExpression(step.expression);
       if (syntax) { setErr(`${step.label || step.key}: ${syntax}`); return; }
@@ -320,6 +388,47 @@ export default function FormulasPage() {
     );
     const emptyLists = d.inputs.filter((i) => i.isList && !(i.listValue ?? []).length);
 
+    /* Inputs are read in blocks, not as one column of fifteen identical boxes:
+       what the bag is, what it is cut from, how many are wanted. The blocks are
+       each input's `group`, in the order the groups first appear — so an author
+       reorders the sections by reordering the rows, and a formula with no
+       groups at all draws one unlabelled block, which is the old layout
+       unchanged. Hidden inputs leave the blocks entirely and wait under
+       Advanced. */
+    type InputRow = { inp: FormulaInput; i: number };
+    const inputGroups: { name: string; rows: InputRow[] }[] = [];
+    d.inputs.forEach((inp, i) => {
+      /* Simple is a preview of the run screen, so it shows the branch the
+         formula currently opens on and nothing else — six boxes for a bag that
+         can only take three is the thing this view exists to avoid. Detailed
+         keeps every branch on screen, because that is where they are written. */
+      if (!detailed && !isVisible(inp, preview?.values ?? {})) return;
+      const name = (inp.group ?? "").trim();
+      const bucket = inputGroups.find((g) => g.name === name);
+      if (bucket) bucket.rows.push({ inp, i });
+      else inputGroups.push({ name, rows: [{ inp, i }] });
+    });
+    // One unnamed block is a formula that was never sectioned — leave its
+    // header off rather than inventing a heading it did not ask for.
+    const sectioned = inputGroups.some((g) => g.name);
+    const sectionNames = [...new Set(d.inputs.map((r) => (r.group ?? "").trim()).filter(Boolean))];
+    // Choices drive the "Only when" column, which is not drawn without one.
+    const choiceInputs = d.inputs.filter((r) => r.options?.length && r.key);
+    const hasChoice = choiceInputs.length > 0;
+
+    /* A new row lands at the bottom of the block its + Add belongs to — pushed
+       onto the array carrying that group, which is the same thing. */
+    const addInput = (group: string) => patch((x) => {
+      x.inputs.push({
+        key: `input${x.inputs.length + 1}`, label: "", defaultValue: 0, askOnRun: true,
+        ...(group ? { group } : {}),
+      });
+    });
+
+    const renameSection = (from: string, to: string) => patch((x) => {
+      x.inputs.forEach((r) => { if ((r.group ?? "").trim() === from) r.group = to; });
+    });
+
     /* Simple view never shows a key, so the label writes one — but only while
        the key is still the placeholder the editor invented, never over a key a
        step could already be using. */
@@ -358,6 +467,165 @@ export default function FormulasPage() {
       });
     };
 
+    /* One input row, drawn the same wherever it lands — inside a section block
+       or inside the Advanced fold. Lifted out of the map so both can use it. */
+    const inputRow = ({ inp, i }: InputRow) => {
+      const badList = !!inp.isList && !(inp.listValue ?? []).length;
+      const badChoice = !!inp.options && (inp.options.filter((o) => o.trim()).length < 2);
+
+      const valueCell = inp.options ? (
+        /* The options themselves, typed as a list. The first one is what the
+           formula opens on — an author sets the default by putting it first,
+           which is one fewer box than a separate "default" field and cannot
+           drift out of step with the options. */
+        <input value={inp.options.join(", ")}
+          onChange={(e) => patch((x) => {
+            x.inputs[i].options = e.target.value.split(",").map((o) => o.trim());
+            x.inputs[i].defaultValue = 0;
+          })}
+          placeholder="Button, Tape"
+          title="Comma-separated. The first one is the default."
+          style={{ ...input, borderColor: badChoice ? "rgba(251,191,36,.55)" : BORDER }}/>
+      ) : inp.isList ? (
+        <NumberListInput
+          value={inp.listValue ?? []}
+          onChange={(next) => patch((x) => { x.inputs[i].listValue = next; })}
+          style={{ ...monoInput, borderColor: badList ? "rgba(251,191,36,.55)" : BORDER }}/>
+      ) : (
+        <input type="number" step="any" value={inp.defaultValue ?? 0}
+          onChange={(e) => patch((x) => { x.inputs[i].defaultValue = Number(e.target.value); })}
+          style={monoInput}/>
+      );
+
+      const removeBtn = (
+        <button title="Remove" onClick={() => patch((x) => { x.inputs.splice(i, 1); })}
+          style={{ ...btn("danger"), padding: "8px 10px", fontSize: 12 }}>✕</button>
+      );
+
+      if (!detailed) {
+        /* A choice shows as the choice, not as its option list — picking here
+           sets which option the formula opens on, and the boxes below follow
+           it straight away so an author sees what each branch really asks for.
+           The option names themselves are renamed in Detailed. */
+        const simpleValue = inp.options?.length ? (
+          <select
+            value={String(inp.defaultValue ?? 0)}
+            onChange={(e) => patch((x) => { x.inputs[i].defaultValue = Number(e.target.value); })}
+            style={{ ...input, cursor: "pointer", color: "#fbbf24" }}
+            title="Which option the formula opens on. The boxes underneath change with it."
+          >
+            {inp.options.map((o, oi) => <option key={oi} value={oi}>{o}</option>)}
+          </select>
+        ) : valueCell;
+
+        return (
+          <div className="fxInS" key={i}>
+            <input value={inp.label} onChange={(e) => setInputLabel(i, e.target.value)}
+              placeholder="Width" style={input}/>
+            {/* A choice has no unit — leaving an editable box there only
+                invites one to be typed in. */}
+            {inp.options?.length ? <div /> : (
+              <input value={inp.unit ?? ""} onChange={(e) => patch((x) => { x.inputs[i].unit = e.target.value; })}
+                placeholder="in" style={input}/>
+            )}
+            {simpleValue}
+            {removeBtn}
+          </div>
+        );
+      }
+
+      return (
+        <div className={hasChoice ? "fxInW" : "fxIn"} key={i}>
+          {/* A picker, not a text box: a heading retyped row by row is how one
+              section quietly becomes two that read the same. */}
+          <select
+            value={(inp.group ?? "").trim()}
+            onChange={(e) => {
+              const picked = e.target.value;
+              if (picked === NEW_SECTION) {
+                const name = window.prompt("Name the new section", "")?.trim();
+                if (name) patch((x) => { x.inputs[i].group = name; });
+                return;
+              }
+              patch((x) => { x.inputs[i].group = picked; });
+            }}
+            style={input}
+            title="Which block this input is shown in. Display only — it never changes the maths."
+          >
+            <option value="">{NO_SECTION}</option>
+            {sectionNames.map((s) => <option key={s} value={s}>{s}</option>)}
+            <option value={NEW_SECTION}>+ New section…</option>
+          </select>
+          <input value={inp.key} onChange={(e) => patch((x) => { x.inputs[i].key = e.target.value; })}
+            placeholder="pieceWidth" style={monoInput}/>
+          <input value={inp.label} onChange={(e) => setInputLabel(i, e.target.value)}
+            placeholder="Width" style={input}/>
+          <input value={inp.unit ?? ""} onChange={(e) => patch((x) => { x.inputs[i].unit = e.target.value; })}
+            placeholder="in" style={input}/>
+          {/* Was a bare "[ ]" toggle. A named choice, because getting this
+              wrong hands a list to a step that wants a number. */}
+          <select
+            value={inp.options ? "choice" : inp.isList ? "list" : "number"}
+            onChange={(e) => patch((x) => {
+              const row = x.inputs[i];
+              const kind = e.target.value;
+              row.isList = kind === "list";
+              if (kind === "list" && !row.listValue) row.listValue = [];
+              if (kind === "choice") {
+                if (!row.options) row.options = ["Button", "Tape"];
+                row.defaultValue = 0;
+                row.unit = "";
+              } else {
+                delete row.options;
+                // Anything that was only shown for one branch of this choice
+                // has lost the thing it was reading.
+                x.inputs.forEach((r) => { if (r.showWhen?.key === row.key) delete r.showWhen; });
+              }
+            })}
+            style={{ ...input, color: inp.options ? "#fbbf24" : inp.isList ? "#a5b4fc" : "white" }}
+            title="Number = one value. List = several stock sizes to pick between. Choice = one option or the other, and other boxes can follow it."
+          >
+            <option value="number">Number</option>
+            <option value="list">List</option>
+            <option value="choice">Choice</option>
+          </select>
+          {valueCell}
+          {/* Only drawn once something on the formula is a choice — see fxInW. */}
+          {hasChoice && (
+            <select
+              value={inp.showWhen ? `${inp.showWhen.key}:${inp.showWhen.is}` : ALWAYS}
+              onChange={(e) => patch((x) => {
+                if (e.target.value === ALWAYS) { delete x.inputs[i].showWhen; return; }
+                const [key, at] = e.target.value.split(":");
+                x.inputs[i].showWhen = { key, is: Number(at) };
+              })}
+              style={{ ...input, color: inp.showWhen ? "#fbbf24" : "rgba(255,255,255,.5)" }}
+              title="Leave on Always unless this box belongs to one branch of a choice. The steps still have to zero the other branch out with if()."
+            >
+              <option value={ALWAYS}>Always</option>
+              {choiceInputs.flatMap((c) =>
+                (c.options ?? []).map((o, oi) => (
+                  <option key={`${c.key}:${oi}`} value={`${c.key}:${oi}`}>
+                    {(c.label || c.key)} = {o}
+                  </option>
+                )),
+              )}
+            </select>
+          )}
+          <button
+            title={inp.askOnRun === false
+              ? "Set here — sits under Settings when the formula runs. Click to have the operator asked."
+              : "The operator is asked for this on every run. Click to fix it here instead."}
+            onClick={() => patch((x) => { x.inputs[i].askOnRun = x.inputs[i].askOnRun === false; })}
+            style={{ ...iconBtn, padding: "8px 9px", fontSize: 11,
+              color: inp.askOnRun === false ? "rgba(255,255,255,.42)" : "#34d399" }}>
+            {inp.askOnRun === false ? "Fixed" : "Ask"}
+          </button>
+          {removeBtn}
+        </div>
+      );
+    };
+
     /* Profit lands on the starred output — the one number the formula is
        really for. Same rule the run screen uses, so what an author previews is
        what an operator gets. */
@@ -384,58 +652,57 @@ export default function FormulasPage() {
             {preview.error}
           </div>
         )}
+        {/* The branch that was not chosen is all zeroes — reporting "Total
+            tape cost: 0" under a buttoned bag is noise, and next to the real
+            figure it reads as a second, contradictory answer. */}
         <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-          {d.outputs.filter((o) => o.key).map((o) => (
-            <div key={o.key} style={{
-              display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 10,
-              padding: o.primary ? "10px 12px" : "4px 0",
-              background: o.primary ? "rgba(52,211,153,.09)" : "transparent",
-              border: o.primary ? "1px solid rgba(52,211,153,.25)" : "none",
-              borderRadius: 10,
-            }}>
-              <span style={{ fontSize: 12.5, color: "rgba(255,255,255,.5)" }}>{o.label || o.key}</span>
-              <span style={{
-                fontFamily: MONO, fontVariantNumeric: "tabular-nums",
-                fontSize: o.primary ? 17 : 13, fontWeight: 700,
-                color: o.primary ? "#34d399" : "rgba(255,255,255,.85)",
+          {d.outputs.filter((o) => o.key && isVisible(o, preview?.values ?? {})).map((o) => {
+            /* The headline is the number that gets quoted, so it carries the
+               profit. It used to show cost here and the sale rate again lower
+               down, which left two green boxes and no saying which one goes on
+               the quotation. With no profit set the two are the same number
+               anyway, and this reads as the plain cost it always did. */
+            const isMain = !!o.primary && o.key === primaryOut?.key;
+            const shown = isMain && saleRate != null ? saleRate : preview?.values[o.key];
+            return (
+              <div key={o.key} style={{
+                padding: o.primary ? "10px 12px" : "4px 0",
+                background: o.primary ? "rgba(52,211,153,.09)" : "transparent",
+                border: o.primary ? "1px solid rgba(52,211,153,.25)" : "none",
+                borderRadius: 10,
               }}>
-                {fmt(preview?.values[o.key])}<span style={{ fontSize: 10.5, color: "rgba(255,255,255,.3)", marginLeft: 4 }}>{o.unit}</span>
-              </span>
-            </div>
-          ))}
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 10 }}>
+                  <span style={{ fontSize: 12.5, color: "rgba(255,255,255,.5)" }}>{o.label || o.key}</span>
+                  <span style={{
+                    fontFamily: MONO, fontVariantNumeric: "tabular-nums",
+                    fontSize: o.primary ? 17 : 13, fontWeight: 700,
+                    color: o.primary ? "#34d399" : "rgba(255,255,255,.85)",
+                  }}>
+                    {fmt(shown)}<span style={{ fontSize: 10.5, color: "rgba(255,255,255,.3)", marginLeft: 4 }}>{o.unit}</span>
+                  </span>
+                </div>
+                {/* The split, small, under the number it adds up to — a rate
+                    nobody can break into cost and margin is a rate nobody can
+                    argue down. */}
+                {isMain && profitAmount !== 0 && (
+                  <div style={{
+                    fontFamily: MONO, fontSize: 11, marginTop: 3,
+                    color: "rgba(255,255,255,.38)", fontVariantNumeric: "tabular-nums",
+                  }}>
+                    {fmt(baseRate)} cost + {fmt(profitAmount)} profit
+                    <span style={{ fontFamily: FONT, marginLeft: 5 }}>
+                      ({d.profit?.mode === "percent" ? `${fmt(d.profit?.value)}%` : `Rs ${fmt(d.profit?.value)} flat`})
+                    </span>
+                  </div>
+                )}
+              </div>
+            );
+          })}
           {!d.outputs.some((o) => o.key) && (
             <div style={{ fontSize: 12.5, color: "rgba(255,255,255,.3)" }}>Add an output to see the result.</div>
           )}
         </div>
 
-        {/* Cost, then what goes on top of it, then what the customer pays.
-            Shown only once there is a profit to show — a cost-only formula
-            should not grow a second copy of its own total. */}
-        {saleRate != null && profitAmount !== 0 && (
-          <div style={{ marginTop: 12, paddingTop: 11, borderTop: `1px solid ${BORDER}`, display: "flex", flexDirection: "column", gap: 6 }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 10 }}>
-              <span style={{ fontSize: 12.5, color: "rgba(255,255,255,.5)" }}>
-                Profit
-                <span style={{ fontSize: 11, color: "rgba(255,255,255,.3)", marginLeft: 5 }}>
-                  {d.profit?.mode === "percent" ? `${fmt(d.profit?.value)}%` : `Rs ${fmt(d.profit?.value)} flat`}
-                </span>
-              </span>
-              <span style={{ fontFamily: MONO, fontVariantNumeric: "tabular-nums", fontSize: 13, fontWeight: 700, color: "rgba(255,255,255,.85)" }}>
-                + {fmt(profitAmount)}
-              </span>
-            </div>
-            <div style={{
-              display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 10,
-              padding: "10px 12px", borderRadius: 10,
-              background: "rgba(52,211,153,.09)", border: "1px solid rgba(52,211,153,.25)",
-            }}>
-              <span style={{ fontSize: 12.5, color: "rgba(255,255,255,.5)" }}>Sale rate</span>
-              <span style={{ fontFamily: MONO, fontVariantNumeric: "tabular-nums", fontSize: 17, fontWeight: 700, color: "#34d399" }}>
-                {fmt(saleRate)}<span style={{ fontSize: 10.5, color: "rgba(255,255,255,.3)", marginLeft: 4 }}>{primaryOut?.unit}</span>
-              </span>
-            </div>
-          </div>
-        )}
       </div>
     );
 
@@ -504,103 +771,61 @@ export default function FormulasPage() {
               n={2}
               title="Inputs"
               hint="What the operator types in, or a constant your trade always uses."
-              onAdd={() => patch((x) => { x.inputs.push({ key: `input${x.inputs.length + 1}`, label: "", defaultValue: 0, askOnRun: true }); })}
-              head={detailed ? (
-                <div className="fxIn fxHeadRow">
-                  <div className="fxHead">Key (used in steps)</div>
-                  <div className="fxHead">Shown as</div>
-                  <div className="fxHead">Unit</div>
-                  <div className="fxHead">Type</div>
-                  <div className="fxHead">Value</div>
-                  <div className="fxHead">Ask</div>
-                  <div />
-                </div>
-              ) : (
-                <div className="fxPairsHead fxHeadRow">
-                  <div className="fxInS">{inputHeadCells()}</div>
-                  <div className="fxInS fxPairSecond">{inputHeadCells()}</div>
-                </div>
-              )}
+              onAdd={() => addInput(inputGroups.length ? inputGroups[inputGroups.length - 1].name : "")}
             >
-              <div className={detailed ? "fxRows" : "fxPairs"}>
-              {d.inputs.map((inp, i) => {
-                const badList = !!inp.isList && !(inp.listValue ?? []).length;
-
-                const valueCell = inp.isList ? (
-                  <input value={(inp.listValue ?? []).join(", ")}
-                    onChange={(e) => patch((x) => {
-                      x.inputs[i].listValue = e.target.value.split(",").map((n) => Number(n.trim())).filter((n) => Number.isFinite(n));
-                    })}
-                    placeholder="48, 50, 52"
-                    style={{ ...monoInput, borderColor: badList ? "rgba(251,191,36,.55)" : BORDER }}/>
-                ) : (
-                  <input type="number" step="any" value={inp.defaultValue ?? 0}
-                    onChange={(e) => patch((x) => { x.inputs[i].defaultValue = Number(e.target.value); })}
-                    style={monoInput}/>
-                );
-
-                const removeBtn = (
-                  <button title="Remove" onClick={() => patch((x) => { x.inputs.splice(i, 1); })}
-                    style={{ ...btn("danger"), padding: "8px 10px", fontSize: 12 }}>✕</button>
-                );
-
-                if (!detailed) {
-                  return (
-                    <div className="fxInS" key={i}>
-                      <input value={inp.label} onChange={(e) => setInputLabel(i, e.target.value)}
-                        placeholder="Width" style={input}/>
-                      <input value={inp.unit ?? ""} onChange={(e) => patch((x) => { x.inputs[i].unit = e.target.value; })}
-                        placeholder="in" style={input}/>
-                      {valueCell}
-                      {removeBtn}
-                    </div>
-                  );
-                }
-
-                return (
-                  <div className="fxIn" key={i}>
-                    <input value={inp.key} onChange={(e) => patch((x) => { x.inputs[i].key = e.target.value; })}
-                      placeholder="pieceWidth" style={monoInput}/>
-                    <input value={inp.label} onChange={(e) => setInputLabel(i, e.target.value)}
-                      placeholder="Width" style={input}/>
-                    <input value={inp.unit ?? ""} onChange={(e) => patch((x) => { x.inputs[i].unit = e.target.value; })}
-                      placeholder="in" style={input}/>
-                    {/* Was a bare "[ ]" toggle. A named choice, because getting
-                        this wrong hands a list to a step that wants a number. */}
-                    <select
-                      value={inp.isList ? "list" : "number"}
-                      onChange={(e) => patch((x) => {
-                        const isList = e.target.value === "list";
-                        x.inputs[i].isList = isList;
-                        if (isList && !x.inputs[i].listValue) x.inputs[i].listValue = [];
-                      })}
-                      style={{ ...input, color: inp.isList ? "#a5b4fc" : "white" }}
-                      title="Number = one value. List = several stock sizes to choose between."
-                    >
-                      <option value="number">Number</option>
-                      <option value="list">List</option>
-                    </select>
-                    {valueCell}
-                    <button
-                      title={inp.askOnRun
-                        ? "The operator is asked for this on every run"
-                        : "Fixed — sits under Settings when the formula runs"}
-                      onClick={() => patch((x) => { x.inputs[i].askOnRun = !x.inputs[i].askOnRun; })}
-                      style={{ ...iconBtn, padding: "8px 9px", fontSize: 11,
-                        color: inp.askOnRun ? "#34d399" : "rgba(255,255,255,.35)" }}>
-                      {inp.askOnRun ? "Ask" : "Fixed"}
-                    </button>
-                    {removeBtn}
+              <div style={{ display: "flex", flexDirection: "column", gap: sectioned ? 12 : 9 }}>
+                {inputGroups.map((g, gi) => (
+                  <div key={gi} style={sectioned ? groupBlock : undefined}>
+                    {sectioned && (
+                      <div style={groupHeadRow}>
+                        {detailed ? (
+                          <input
+                            value={g.name}
+                            onChange={(e) => renameSection(g.name, e.target.value)}
+                            placeholder={NO_SECTION}
+                            title="Rename this section — every input in it moves with the name."
+                            style={{
+                              ...input, width: "auto", flex: "0 1 240px",
+                              fontSize: 12, fontWeight: 700, padding: "6px 9px",
+                            }}
+                          />
+                        ) : (
+                          <span style={groupTitle}>{g.name || NO_SECTION}</span>
+                        )}
+                        <button onClick={() => addInput(g.name)}
+                          style={{ ...btn(), padding: "5px 11px", fontSize: 11.5, whiteSpace: "nowrap" }}>
+                          + Add
+                        </button>
+                      </div>
+                    )}
+                    {inputHead(detailed, hasChoice)}
+                    <div className={detailed ? "fxRows" : "fxPairs"}>{g.rows.map(inputRow)}</div>
                   </div>
-                );
-              })}
+                ))}
               </div>
-              {!detailed && (
-                <div style={{ fontSize: 11.5, color: "rgba(255,255,255,.28)", lineHeight: 1.6, paddingTop: 4 }}>
-                  Switch to <strong style={{ color: "rgba(255,255,255,.45)" }}>Detailed</strong> above to rename keys,
-                  turn an input into a list of stock sizes, or stop the operator being asked for it.
-                </div>
-              )}
+
+              <div style={{ fontSize: 11.5, color: "rgba(255,255,255,.28)", lineHeight: 1.6, paddingTop: 4 }}>
+                {detailed ? (
+                  <>
+                    <strong style={{ color: "rgba(255,255,255,.45)" }}>Key</strong> is the name your steps
+                    type — rename it and every step that used it must be changed too.{" "}
+                    <strong style={{ color: "rgba(255,255,255,.45)" }}>Type</strong>: Number is one value,
+                    List is several stock sizes for the formula to choose between, Choice is one option or
+                    the other — set <strong style={{ color: "rgba(255,255,255,.45)" }}>Only when</strong> on
+                    the boxes that belong to each branch, and zero the other branch in the step with{" "}
+                    <code style={{ fontFamily: MONO }}>if()</code>.{" "}
+                    <strong style={{ color: "rgba(255,255,255,.45)" }}>Ask</strong>: the operator types it on
+                    every run — press it for Fixed, which sets it here and tucks it under Settings when the
+                    formula runs.
+                  </>
+                ) : (
+                  <>
+                    Switch to <strong style={{ color: "rgba(255,255,255,.45)" }}>Detailed</strong> above to rename keys,
+                    move a box into another section, turn an input into a list of stock sizes, or stop the
+                    operator being asked for it.
+                  </>
+                )}
+              </div>
 
               {/* Profit. Not a step and not a row above — see FormulaProfit.
                   It sits in Inputs because it is a number an author fills in,
@@ -715,7 +940,9 @@ export default function FormulasPage() {
                       }}>{i + 1}</span>
                       <span style={{ fontFamily: MONO, color: "rgba(255,255,255,.3)", fontSize: 14 }}>=</span>
                       <input value={st.expression}
-                        onFocus={() => setActiveStep(i)}
+                        // Opening Values here rather than leaving it to the
+                        // author: this is the one moment its chips do anything.
+                        onFocus={() => { setActiveStep(i); setValuesOpen(true); }}
                         onChange={(e) => patch((x) => { x.steps[i].expression = e.target.value; })}
                         placeholder="materialCost + labour"
                         style={{ ...monoInput, borderColor: stepErr ? "rgba(248,113,113,.5)" : BORDER }}/>
@@ -825,10 +1052,17 @@ export default function FormulasPage() {
           <div className="fxSide">
             <div className="fxLiveDesk">{liveResultCard}</div>
 
-            {/* Every name a step is allowed to mention, with what it holds right
-                now. Clicking one types it into the formula box last used. */}
-            <div style={{ background: CARD, border: `1px solid ${BORDER}`, borderRadius: 14, padding: 18 }}>
-              <div style={{ ...label, marginBottom: 4 }}>Values you can use</div>
+            {/* Every name a step is allowed to mention, with what it holds
+                right now. Folded by default — an author reads it once, and the
+                live result belongs at the top of the rail, not under a wall of
+                chips. Clicking a formula box opens it again, which is the only
+                moment its chips can do anything. */}
+            <Fold
+              title="Values you can use"
+              count={[...d.inputs, ...d.steps].filter((r) => r.key).length}
+              open={valuesOpen}
+              onToggle={() => setValuesOpen((o) => !o)}
+            >
               <div style={{ fontSize: 11.5, color: "rgba(255,255,255,.32)", marginBottom: 12, lineHeight: 1.6 }}>
                 {activeStep === null
                   ? "Click a step's formula box, then click a name to add it."
@@ -848,11 +1082,15 @@ export default function FormulasPage() {
                   </button>
                 ))}
               </div>
-            </div>
+            </Fold>
 
-            <details style={{ background: CARD, border: `1px solid ${BORDER}`, borderRadius: 14, padding: 18 }}>
-              <summary style={{ ...label, marginBottom: 0, cursor: "pointer" }}>Functions you can use</summary>
-              <div style={{ display: "flex", flexDirection: "column", gap: 11, marginTop: 14, maxHeight: 380, overflowY: "auto" }}>
+            <Fold
+              title="Functions you can use"
+              count={FUNCTIONS.length}
+              open={funcsOpen}
+              onToggle={() => setFuncsOpen((o) => !o)}
+            >
+              <div style={{ display: "flex", flexDirection: "column", gap: 11, maxHeight: 380, overflowY: "auto" }}>
                 {FUNCTIONS.map((f) => (
                   <div key={f.name}>
                     <div style={{ fontFamily: MONO, fontSize: 12, color: "#818cf8" }}>{f.signature}</div>
@@ -864,7 +1102,7 @@ export default function FormulasPage() {
                   <code style={{ fontFamily: MONO }}>&gt; &lt; &gt;= &lt;= == !=</code>
                 </div>
               </div>
-            </details>
+            </Fold>
           </div>
         </div>
       </div>
@@ -986,6 +1224,41 @@ function Banner({ tone, text }: { tone: "error" | "warn"; text: string }) {
       color: `rgb(${c})`, fontSize: 13, lineHeight: 1.6,
     }}>
       {text}
+    </div>
+  );
+}
+
+/* A reference card in the side rail that folds away behind its own header,
+   the same arrow Steps and Outputs use. Controlled, because Values wants to
+   open itself the moment a formula box is clicked. */
+function Fold({ title, count, open, onToggle, children }: {
+  title: string; count?: number; open: boolean; onToggle: () => void; children: React.ReactNode;
+}) {
+  return (
+    <div style={{ background: CARD, border: `1px solid ${BORDER}`, borderRadius: 14, padding: 18 }}>
+      <div
+        role="button" tabIndex={0} aria-expanded={open}
+        onClick={onToggle}
+        onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onToggle(); } }}
+        style={{
+          display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10,
+          cursor: "pointer", userSelect: "none", outline: "none",
+          marginBottom: open ? 14 : 0,
+        }}
+      >
+        <span style={{ ...label, marginBottom: 0, display: "flex", alignItems: "center", gap: 8 }}>
+          {title}
+          {typeof count === "number" && <span style={countPill}>{count}</span>}
+        </span>
+        <span aria-hidden style={{
+          width: 26, height: 26, flexShrink: 0, borderRadius: 8, display: "grid", placeItems: "center",
+          background: "rgba(255,255,255,.05)", border: `1px solid ${BORDER}`,
+          color: "rgba(255,255,255,.55)", fontSize: 11, lineHeight: 1,
+          transform: open ? "rotate(0deg)" : "rotate(-90deg)",
+          transition: "transform .16s ease",
+        }}>▼</span>
+      </div>
+      {open && children}
     </div>
   );
 }

@@ -45,7 +45,8 @@ export type PrintTheme = {
   titleAlign: "left" | "center";
   /** Row padding in the grid — tight bills fit more lines per sheet. */
   cellPad: string;
-  /** "Powered by FinovaOS" as plain text, or set in a filled chip. */
+  /** Unused since the "Powered by" mark came off printed documents. Kept so a
+   *  stored print preference does not need migrating. */
   poweredChip: boolean;
 };
 

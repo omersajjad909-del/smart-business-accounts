@@ -11,6 +11,7 @@ import { logActivity } from "@/lib/audit";
 import { logAuditFromReq } from "@/lib/auditLogger";
 import { rateLimit } from "@/lib/rateLimit";
 import { requireActiveSubscription } from "@/lib/subscriptionGuard";
+import { nextDocNo } from "@/lib/docNumber";
 
 const receiptSchema = z.object({
   receiptNo: z.string().optional(),
@@ -132,8 +133,14 @@ export async function POST(req: NextRequest) {
     // Auto-generate receipt number if not provided
     let receiptNo = providedReceiptNo;
     if (!receiptNo) {
-      const count = await prisma.paymentReceipt.count({ where: { companyId, ...(branchId ? { branchId } : {}) } });
-      receiptNo = `REC-${count + 1}`;
+      // Company-wide, not per branch: receiptNo is unique per company, so two
+      // branches counting separately both reach REC-7 and the second save
+      // fails. See lib/docNumber.ts.
+      const issued = await prisma.paymentReceipt.findMany({
+        where: { companyId },
+        select: { receiptNo: true },
+      });
+      receiptNo = nextDocNo(issued, "receiptNo", "REC-");
     }
 
     // Get payment account (bank or cash)

@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { resolveCompanyId } from "@/lib/tenant";
 
+/** Rows that take back a purchase rather than record a sale. */
+const REVERSAL_TYPES = new Set(["PURCHASE_RETURN", "GRN_REVERSAL"]);
+
 export async function GET(req: NextRequest) {
   try {
     const role = req.headers.get("x-user-role");
@@ -21,7 +24,7 @@ export async function GET(req: NextRequest) {
         id: true, name: true,
         inventoryTxns: {
           where: { companyId },
-          select: { qty: true, rate: true, date: true },
+          select: { qty: true, rate: true, date: true, type: true },
           orderBy: { date: "asc" },
         },
       },
@@ -60,7 +63,15 @@ export async function GET(req: NextRequest) {
           if (!firstPurchaseDate && d) firstPurchaseDate = d.toISOString().slice(0, 10);
         } else if (q < 0) {
           stockQty -= Math.abs(q);
-          if (d) {
+          /* A reversal is not a sale, and it has to come back out of what was
+             bought — an edited purchase invoice leaves its first row in place
+             and writes this beside it, so without the subtraction the old rate
+             stays in the average for ever. Same reason as
+             COST_BEARING_REVERSAL_TYPES in lib/manufacturingPosting.ts. */
+          if (REVERSAL_TYPES.has(String(t.type))) {
+            totalPurchasedQty -= Math.abs(q);
+            totalPurchasedAmt -= Math.abs(q) * Number(t.rate);
+          } else if (d) {
             const iso = d.toISOString().slice(0, 10);
             if (!lastSaleDate || iso > lastSaleDate) lastSaleDate = iso;
           }
@@ -85,7 +96,8 @@ export async function GET(req: NextRequest) {
 
       if (daysSinceLastSale < threshold) return null;
 
-      const avgCost = totalPurchasedQty > 0 ? totalPurchasedAmt / totalPurchasedQty : 0;
+      const avgCost =
+        totalPurchasedQty > 0 && totalPurchasedAmt > 0 ? totalPurchasedAmt / totalPurchasedQty : 0;
 
       return {
         itemName:          item.name,

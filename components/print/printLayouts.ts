@@ -13,7 +13,7 @@
  * words told nobody anything. So a design now names a structure, and the
  * structure is what the settings screen previews.
  *
- * Five axes, chosen because they are what actually changes the shape of a
+ * Six axes, chosen because they are what actually changes the shape of a
  * business document on A4 — and small enough that one component can render all
  * of them without becoming six components that drift:
  *
@@ -22,6 +22,7 @@
  *   grid        how the line items are ruled
  *   totals      how the closing figure is set
  *   signatures  how many lines, and where
+ *   footer      how the sheet closes — amount in words, terms, note
  *
  * The ink still comes from ./printTemplates.ts, so a design is a structure plus
  * a palette rather than a fresh stylesheet each time.
@@ -81,6 +82,28 @@ export type SignatureStyle =
   /** One line, right. */
   | "one_right";
 
+/**
+ * How the sheet closes — the amount in words, the terms, and the note.
+ *
+ * This was the one part of the page that looked identical in all six designs,
+ * which made two otherwise very different documents read the same from the
+ * bottom third down. It is also the busiest corner of a bill: the amount
+ * spelled out, the terms, the note and the mark all land within a few
+ * centimetres of each other, so how they are grouped changes the page as much
+ * as the letterhead does.
+ */
+export type FooterStyle =
+  /** Amount and terms as plain lines; note centred in italics. */
+  | "centered"
+  /** Amount and terms boxed together across the width; note centred under it. */
+  | "boxed"
+  /** Note reversed out of a filled strip at the very foot of the sheet. */
+  | "band"
+  /** Amount small and inline, note right-aligned; nothing else. */
+  | "quiet"
+  /** Note left, mark right, on one ruled line. */
+  | "split";
+
 export type PrintDesign = {
   id: PrintDesignId;
   label: string;
@@ -91,6 +114,7 @@ export type PrintDesign = {
   grid: GridStyle;
   totals: TotalsStyle;
   signatures: SignatureStyle;
+  footer: FooterStyle;
   /** Palette, from ./printTemplates.ts. */
   ink: PrintTemplateId;
   /** Row padding override — a dense design fits more lines on the sheet. */
@@ -107,43 +131,43 @@ export const PRINT_DESIGNS: PrintDesign[] = [
   {
     id: "classic_ledger",
     label: "Classic Ledger",
-    blurb: "Black on white, every cell ruled. What this trade already prints.",
-    header: "split", party: "inline", grid: "ruled", totals: "right", signatures: "three",
+    blurb: "Black on white, every cell ruled, note centred at the foot. What this trade already prints.",
+    header: "split", party: "inline", grid: "ruled", totals: "right", signatures: "three", footer: "centered",
     ink: "classic", density: "normal", linesPerPage: 24,
   },
   {
     id: "formal_gst",
     label: "Formal Tax Invoice",
-    blurb: "Centred letterhead, both parties boxed side by side, totals in a box.",
-    header: "centered", party: "cards", grid: "ruled", totals: "boxed", signatures: "three",
+    blurb: "Centred letterhead, both parties boxed side by side, totals and terms each in a box.",
+    header: "centered", party: "cards", grid: "ruled", totals: "boxed", signatures: "three", footer: "boxed",
     ink: "classic", density: "normal", linesPerPage: 20,
   },
   {
     id: "modern_band",
     label: "Modern Band",
-    blurb: "Colour band across the head, open rows, net figure in a filled bar.",
-    header: "band", party: "cards", grid: "rows", totals: "bar", signatures: "two_right",
+    blurb: "Colour band at the head and the foot, open rows, net figure in a filled bar.",
+    header: "band", party: "cards", grid: "rows", totals: "bar", signatures: "two_right", footer: "band",
     ink: "modern", density: "normal", linesPerPage: 22,
   },
   {
     id: "clean_minimal",
     label: "Clean Minimal",
-    blurb: "Hairlines only, party details as a letter opening, no signature block clutter.",
-    header: "split", party: "letter", grid: "open", totals: "right", signatures: "one_right",
+    blurb: "Hairlines only, party details as a letter opening, one signature and a quiet foot.",
+    header: "split", party: "letter", grid: "open", totals: "right", signatures: "one_right", footer: "quiet",
     ink: "minimal", density: "normal", linesPerPage: 26,
   },
   {
     id: "compact_dense",
     label: "Compact",
-    blurb: "Tight rows for long orders — the most lines that fit on one sheet.",
-    header: "split", party: "inline", grid: "rows", totals: "right", signatures: "two_right",
+    blurb: "Tight rows for long orders — the most lines per sheet, note and mark on one ruled line.",
+    header: "split", party: "inline", grid: "rows", totals: "right", signatures: "two_right", footer: "split",
     ink: "minimal", density: "tight", linesPerPage: 34,
   },
   {
     id: "bold_statement",
     label: "Bold Statement",
-    blurb: "Large document name across the head, striped rows, filled net bar.",
-    header: "stacked", party: "cards", grid: "zebra", totals: "bar", signatures: "three",
+    blurb: "Large document name across the head, striped rows, filled net bar and closing strip.",
+    header: "stacked", party: "cards", grid: "zebra", totals: "bar", signatures: "three", footer: "band",
     ink: "bold", density: "normal", linesPerPage: 21,
   },
 ];

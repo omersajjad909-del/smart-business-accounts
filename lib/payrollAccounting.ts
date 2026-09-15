@@ -1,12 +1,17 @@
 import { prisma } from "@/lib/prisma";
 import type { Prisma } from "@prisma/client";
+import { nextDocNo } from "@/lib/docNumber";
 
 // ─── Account ensure helpers ──────────────────────────────────────────────────
 // Each helper is idempotent — safe to call any number of times.
 
 async function nextVoucherNo(companyId: string, type: string) {
-  const count = await prisma.voucher.count({ where: { companyId, type } });
-  return `${type}-${String(count + 1).padStart(4, "0")}`;
+  // One past the highest issued, not a row count — see lib/docNumber.ts.
+  const issued = await prisma.voucher.findMany({
+    where: { companyId, type },
+    select: { voucherNo: true },
+  });
+  return nextDocNo(issued, "voucherNo", `${type}-`);
 }
 
 async function findOrCreateAccount(params: {

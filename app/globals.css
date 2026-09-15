@@ -981,33 +981,72 @@ html.fnv-lock-scroll body {
   }
 }
 
-/* ── Print footer: Powered by FinovaOS ──────────────────────────────────── */
+/* Every print used to close with a fixed "Powered by …" line, and @page held
+   28mm of the foot of the paper open for it. Both are gone: these documents go
+   out to a customer on the company's own letterhead, and the software that
+   produced them has no business signing them.
+   
+   The reserved margin goes with the line — it existed only to make room, and
+   leaving it behind would have cost every print an inch of blank paper and
+   pushed long documents onto a page they did not need. */
+
+/* The app stands down while an A4 document is printing.
+ *
+ * Every document page used to hide the shell itself, and a page nobody
+ * remembered to write that on printed the sidebar, the topbar and its own
+ * "Show List / + New Challan" buttons onto the customer's paper. Delivery
+ * challan was one; print preferences is the other.
+ *
+ * Keyed on .print-doc-a4, not on a class each page has to remember, so a new
+ * document page is right the day it is written.
+ *
+ * The guard is the legacy half. Six pages print markup of their own — a
+ * .pi-print, a .po-print, a .print-area — and only keep a PrintDocA4 on
+ * screen as a preview. On those, the paper is not the PrintDocA4, so this rule
+ * would hide the very thing they print. They already carry working print CSS,
+ * so the rule stands aside wherever one of those elements exists. Building a
+ * new document page? Use PrintDocA4 and this comes for free; do not add a
+ * seventh class here.
+ */
 @media print {
-  @page {
-    margin-bottom: 28mm;
-  }
-  body::after {
-    content: "Powered by FinovaOS";
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    text-align: center;
-    font-size: 10px;
-    color: #aaa;
-    padding: 6px 0 10px;
-    border-top: 1px solid #e5e7eb;
-    font-family: 'Outfit', 'Inter', Arial, sans-serif;
-    letter-spacing: 0.04em;
+  .dashboard-root:has(.print-doc-a4):not(:has(.print-area)):not(:has(.pi-print)):not(:has(.po-print)):not(:has(.qt-print)):not(:has(.grn-print)):not(:has(.cat-print-area)) {
+    display: block !important;
+    min-height: auto !important;
   }
 
-  /* Only when the printed sheet IS a PrintDocA4 does the page footer stand
-     down — that document prints the line itself, at the foot of the paper.
-     The selector is deliberately narrow: most document pages merely hold a
-     PrintDocA4 on screen as a preview and print their own markup, and those
-     prints still need this footer. */
-  body:has(.print-area .print-doc-a4)::after {
-    content: none;
+  /* Everything that is not the document, at any depth: the sidebar, the
+     topbar, the page heading, the buttons beside it, the list the document was
+     opened from.
+
+     Read it as three exclusions — keep an element if it CONTAINS the document
+     (its ancestors, which have to stay for the document to be in the page at
+     all), if it IS the document, or if it is INSIDE the document. Hide the
+     rest. Written this way rather than as a list of known wrappers because the
+     heading a challan printed by mistake sits three levels inside the same div
+     that holds the paper, and no fixed list of levels catches that. */
+  .dashboard-root:has(.print-doc-a4):not(:has(.print-area)):not(:has(.pi-print)):not(:has(.po-print)):not(:has(.qt-print)):not(:has(.grn-print)):not(:has(.cat-print-area))
+    *:not(:has(.print-doc-a4)):not(.print-doc-a4):not(.print-doc-a4 *) {
+    display: none !important;
+  }
+
+  /* What survives is the chain of wrappers between the root and the paper.
+     Each is flattened to a plain block: no flex column stretching it to the
+     viewport, no scroller clipping it, no gutter indenting the sheet, and no
+     left margin held open for a sidebar that is no longer there. */
+  .dashboard-root:has(.print-doc-a4):not(:has(.print-area)):not(:has(.pi-print)):not(:has(.po-print)):not(:has(.qt-print)):not(:has(.grn-print)):not(:has(.cat-print-area)) :has(.print-doc-a4) {
+    display: block !important;
+    margin: 0 !important;
+    max-width: none !important;
+    min-height: auto !important;
+    overflow: visible !important;
+    padding: 0 !important;
+    width: 100% !important;
+  }
+
+  /* Screens are dark; paper is not. */
+  body:has(.print-doc-a4):not(:has(.print-area)):not(:has(.pi-print)):not(:has(.po-print)):not(:has(.qt-print)):not(:has(.grn-print)):not(:has(.cat-print-area)),
+  .dashboard-root:has(.print-doc-a4):not(:has(.print-area)):not(:has(.pi-print)):not(:has(.po-print)):not(:has(.qt-print)):not(:has(.grn-print)):not(:has(.cat-print-area)) {
+    background: #fff !important;
   }
 }
 

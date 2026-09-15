@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { nextDocNo } from "@/lib/docNumber";
 
 export async function GET(req: NextRequest) {
   try {
@@ -42,9 +43,12 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const { date, accountId, amount, reason, description, reference } = body;
 
-    // Generate Credit Note Number (Simple logic for now, can be improved)
-    const count = await prisma.creditNote.count({ where: { companyId } });
-    const creditNoteNumber = `CN-${String(count + 1).padStart(4, '0')}`;
+    // One past the highest issued, not a row count — see lib/docNumber.ts.
+    const issued = await prisma.creditNote.findMany({
+      where: { companyId },
+      select: { creditNoteNumber: true },
+    });
+    const creditNoteNumber = nextDocNo(issued, "creditNoteNumber", "CN-");
 
     const creditNote = await prisma.creditNote.create({
       data: {

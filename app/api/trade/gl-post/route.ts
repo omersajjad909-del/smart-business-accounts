@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { resolveCompanyId } from "@/lib/tenant";
+import { nextDocNo } from "@/lib/docNumber";
 
 // category → [debit account hint, credit account hint]
 const ACCOUNT_HINTS: Record<string, [string, string]> = {
@@ -34,11 +35,15 @@ export async function POST(req: NextRequest) {
     ]);
     if (!debitAcc || !creditAcc) return NextResponse.json({ skipped: true, reason: "Accounts not configured" });
 
-    const count = await prisma.voucher.count({ where: { type: "JV", companyId } });
+    // One past the highest issued, not a row count — see lib/docNumber.ts.
+    const issued = await prisma.voucher.findMany({
+      where: { type: "JV", companyId },
+      select: { voucherNo: true },
+    });
     await prisma.voucher.create({
       data: {
         companyId,
-        voucherNo: `JV-${count + 1}`,
+        voucherNo: nextDocNo(issued, "voucherNo", "JV-"),
         type: "JV",
         date: date ? new Date(date) : new Date(),
         narration: narration || category,

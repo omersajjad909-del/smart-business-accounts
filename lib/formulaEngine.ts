@@ -519,15 +519,64 @@ export type FormulaInput = {
   /** A list input, e.g. the stock widths a supplier actually sells. */
   isList?: boolean;
   listValue?: number[];
+  /**
+   * Turns the input into a choice — "Button" or "Tape", one or the other.
+   * Its value is the 0-based index of whatever is picked, so a step reads it
+   * as an ordinary number: `if(fitting == 0, buttonCost, tapeCost)`. The first
+   * option is the default, which is how an author sets the default: by putting
+   * it first.
+   */
+  options?: string[];
+  /**
+   * Only shown, and only asked for, while that choice is sitting on this
+   * index. The engine still evaluates the input — a hidden branch has to
+   * carry a value or every step reading it would fail — so the steps that use
+   * it are what must zero the branch out, usually with if().
+   */
+  showWhen?: { key: string; is: number };
   /** false = fixed in the formula, not asked on every run. */
   askOnRun?: boolean;
+  /**
+   * Heading this input sits under in the editor and nowhere else — "Bag
+   * details", "Roll & cutting". Display only: the engine never reads it, so
+   * grouping a formula cannot change what it works out.
+   */
+  group?: string;
 };
+
+/**
+ * Whether a row belongs on screen for the numbers currently entered.
+ *
+ * Inputs and outputs both carry `showWhen`, and both have to answer this the
+ * same way: asking an operator for a tape rate on a buttoned bag is the same
+ * mistake as reporting "Total tape cost: 0" back to them. One implementation,
+ * because the run screen, the result card, the print sheet and the editor all
+ * have to agree — a figure that prints but cannot be typed into, or the
+ * reverse, is worse than no condition at all.
+ */
+export function isVisible(
+  row: { showWhen?: { key: string; is: number } },
+  values: Record<string, FormulaValue>,
+): boolean {
+  const cond = row.showWhen;
+  if (!cond) return true;
+  const picked = values[cond.key];
+  return typeof picked === "number" && Math.abs(picked - cond.is) < 1e-9;
+}
 
 export type FormulaStep = {
   key: string;
   label: string;
   expression: string;
   unit?: string;
+  /** Only printed while that choice is on this index — see FormulaOutput. */
+  showWhen?: { key: string; is: number };
+  /**
+   * Heading this step is printed under on the working sheet — "Cutting",
+   * "Rolls", "Buttons". Display only, same as on an input: the engine runs the
+   * steps in the order they are written, never in group order.
+   */
+  group?: string;
 };
 
 /**
@@ -541,6 +590,16 @@ export type OutputRole =
   | "cost_per_batch"
   | "units_per_batch"
   | "material_qty"
+  /**
+   * A second material the order consumes, counted for the whole order —
+   * 20,000 buttons for 10,000 bags, 762m of tape.
+   *
+   * Distinct from material_qty, which formulas already use for both per-piece
+   * and whole-order figures and so cannot be read either way with confidence.
+   * This one has a single meaning: what leaves the store for this order. Job
+   * work seeds a material line from each of them.
+   */
+  | "consumable_qty"
   | "waste_qty";
 
 export type FormulaOutput = {
@@ -550,6 +609,14 @@ export type FormulaOutput = {
   unit?: string;
   role?: OutputRole;
   primary?: boolean;
+  /** Heading this figure prints under on the working sheet. Display only. */
+  group?: string;
+  /**
+   * Only reported while that choice is sitting on this index — the other
+   * branch's figures are all zero and reporting them is noise at best and a
+   * second, contradictory answer at worst.
+   */
+  showWhen?: { key: string; is: number };
 };
 
 /**
@@ -616,6 +683,12 @@ export type StepResult = {
   unit?: string;
   value: FormulaValue | null;
   error?: string;
+  /** Carried through from the input or step, for sheets that print in blocks. */
+  group?: string;
+  /** Carried through too, so a sheet can drop the branch nobody picked. */
+  showWhen?: { key: string; is: number };
+  /** Which half of the run this row came from — what was typed, or what was worked out. */
+  kind: "input" | "step";
 };
 
 export type FormulaRun = {
@@ -625,6 +698,23 @@ export type FormulaRun = {
   /** Resolved values by key, for outputs and for callers to read roles from. */
   values: Record<string, FormulaValue>;
   error?: string;
+};
+
+/**
+ * Constants the engine supplies to every formula, so a number a whole trade
+ * shares is written down once here instead of sitting in a box on every
+ * formula that needs it.
+ *
+ * densityDiv is the film weight divisor: rate x gauge x width x length / 54
+ * gives what a roll costs. It used to be an input, which meant it appeared in
+ * front of every operator who priced a bag and got typed over now and then —
+ * a constant nobody is meant to change should not be a field anybody can.
+ *
+ * An input of the same key still wins, so a trade running a different film can
+ * override it on its own formula without this file changing.
+ */
+export const CONSTANTS: Record<string, number> = {
+  densityDiv: 54,
 };
 
 const RESERVED = new Set([...FUNCTION_MAP.keys(), ...Object.keys(UNIT_TO_BASE)]);
@@ -664,6 +754,11 @@ export function runFormula(
   const scope = new Map<string, FormulaValue>();
   const steps: StepResult[] = [];
 
+  /* Seeded before the inputs, so an input of the same key overrides it — and
+     deliberately not pushed onto `steps`, which is what keeps constants off
+     the result card, the working sheet and the key chips. */
+  for (const [key, value] of Object.entries(CONSTANTS)) scope.set(key, value);
+
   for (const input of formula.inputs) {
     const given = provided[input.key];
     let value: FormulaValue;
@@ -680,6 +775,8 @@ export function runFormula(
       expression: "input",
       unit: input.unit,
       value,
+      group: input.group,
+      kind: "input",
     });
   }
 
@@ -695,6 +792,9 @@ export function runFormula(
         expression: step.expression,
         unit: step.unit,
         value,
+        group: step.group,
+        showWhen: step.showWhen,
+        kind: "step",
       });
     } catch (e) {
       const message = e instanceof Error ? e.message : "Could not calculate";
@@ -706,6 +806,9 @@ export function runFormula(
         unit: step.unit,
         value: null,
         error: message,
+        group: step.group,
+        showWhen: step.showWhen,
+        kind: "step",
       });
     }
   }

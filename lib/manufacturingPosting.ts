@@ -112,6 +112,32 @@ export const COST_BEARING_INBOUND_TYPES = [
   "JOB_RECEIPT",
 ] as const;
 
+/**
+ * Rows that take back a cost-bearing receipt.
+ *
+ * Editing or deleting a purchase invoice does not rewrite what it first
+ * posted — the original row stays and a reversal is written beside it, which
+ * is the right way round for an audit trail. But the reversal carries a
+ * negative qty with a *positive* amount, and the average-cost query above
+ * reads only `qty > 0` rows of the inbound types. So the reversal was
+ * invisible to it: the old rate stayed in the average for ever, and the qty it
+ * was divided by counted the same goods twice.
+ *
+ * Stock quantity was never wrong — getStockOnHand sums every row and the signs
+ * cancel. Only the valuation was, which is worse, because nothing looks
+ * broken: a bag simply costs more than the invoice says it does, everywhere
+ * that reads a cost.
+ *
+ * SALE_RETURN and OUTWARD_RETURN are deliberately not here. They are inbound
+ * too, but they are not reversals of a purchase — goods coming back from a
+ * customer return at what they were sold for, not at what they cost, and
+ * neither type is in the inbound list to begin with.
+ */
+export const COST_BEARING_REVERSAL_TYPES = [
+  "PURCHASE_RETURN",
+  "GRN_REVERSAL",
+] as const;
+
 export type BomLine = {
   itemId: string;
   qty: number;
@@ -244,6 +270,26 @@ export async function getAverageCosts(
     totals.set(row.itemId, acc);
   }
 
+  /* Take the reversals back out. They are stored with a negative qty and a
+     positive amount, so both are subtracted by magnitude rather than added —
+     see COST_BEARING_REVERSAL_TYPES. */
+  const reversed = await tx.inventoryTxn.findMany({
+    where: {
+      companyId,
+      itemId: { in: itemIds },
+      qty: { lt: 0 },
+      type: { in: [...COST_BEARING_REVERSAL_TYPES] },
+      ...(location ? { location } : {}),
+    },
+    select: { itemId: true, qty: true, amount: true },
+  });
+  for (const row of reversed) {
+    const acc = totals.get(row.itemId);
+    if (!acc) continue;
+    acc.qty -= Math.abs(row.qty);
+    acc.value -= Math.abs(row.amount);
+  }
+
   // Never received? Fall back to the item's own purchase rate so a brand-new
   // company can still run a costed production order on opening stock.
   const items = await tx.itemNew.findMany({
@@ -252,7 +298,10 @@ export async function getAverageCosts(
   });
   for (const item of items) {
     const t = totals.get(item.id);
-    const avg = t && t.qty > 0 ? t.value / t.qty : item.purchaseRate;
+    // Everything received has since been reversed, or the arithmetic has gone
+    // somewhere it should not — either way the item's own purchase rate is a
+    // better answer than a cost derived from nothing.
+    const avg = t && t.qty > 0 && t.value > 0 ? t.value / t.qty : item.purchaseRate;
     out.set(item.id, Number.isFinite(avg) && avg > 0 ? avg : 0);
   }
   return out;
@@ -800,12 +849,15 @@ export async function completeProductionRun(opts: {
     // before, so every BOM/order that predates this feature still posts
     // identically.
     let labourCreditLines: { companyId: string; accountId: string; amount: number }[];
+    // Hoisted: the per-worker earnings records written further down need the
+    // same names, and reading them twice would be two answers to one question.
+    let labourById = new Map<string, { id: string; title: string; data: unknown }>();
     if (namedAssignments.length) {
       const labourRecords = await tx.businessRecord.findMany({
         where: { id: { in: namedAssignments.map((a) => a.labourId) }, companyId, category: "labour" },
         select: { id: true, title: true, data: true },
       });
-      const labourById = new Map(labourRecords.map((r) => [r.id, r]));
+      labourById = new Map(labourRecords.map((r) => [r.id, r]));
       labourCreditLines = [];
       for (const a of namedAssignments) {
         const record = labourById.get(a.labourId);
@@ -901,6 +953,46 @@ export async function completeProductionRun(opts: {
           },
         },
       });
+    }
+
+    /* ── 3b. What each worker earned on this run ──
+       
+       One record per worker per run, so the labour report can be built from
+       facts rather than reconstructed. The ledger already carries the money —
+       but all four credits ride one voucher, and VoucherEntry has no narration
+       of its own, so the ledger cannot say which of them was for cutting and
+       which for packing. And `lastRunLabour` on the order keeps only the last
+       run, which answers nothing about the month.
+       
+       Written inside the same transaction as the posting: an entry that exists
+       without its voucher, or the other way round, is a report that disagrees
+       with the books. */
+    if (namedAssignments.length) {
+      for (const a of namedAssignments) {
+        const worker = labourById.get(a.labourId);
+        await tx.businessRecord.create({
+          data: {
+            companyId,
+            branchId,
+            category: "labour_entry",
+            title: worker?.title || "Labour",
+            status: "posted",
+            refId: order.id,
+            date,
+            amount: round2(a.qty * a.rate),
+            data: {
+              labourId: a.labourId,
+              labourName: worker?.title || "",
+              operation: String(a.operation || "").trim(),
+              qty: a.qty,
+              rate: a.rate,
+              productionOrderId: orderLabel,
+              product: finishedItem.name,
+              voucherNo: issueVoucherNo,
+            },
+          },
+        });
+      }
     }
 
     // ── 4. Finished goods batch ──

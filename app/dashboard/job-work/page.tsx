@@ -10,6 +10,7 @@
 
 import { Suspense, useCallback, useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
+import type { JobWorkConsumable } from "@/lib/jobWorkSeed";
 import { useResponsive } from "@/hooks/useResponsive";
 import { planIssue } from "@/lib/jobWorkSeed";
 
@@ -28,7 +29,38 @@ type FormulaSeed = {
   ratePerPc: number | null;
   costPerUnit: number | null;
   wastePerBatch: number | null;
+  /** Buttons, tape — the materials beyond the one the standard is about. */
+  consumables: JobWorkConsumable[];
 };
+
+/**
+ * The consumables the costing screen put in the URL.
+ *
+ * A query string is the one input here nobody validates on the way in, so it
+ * is read defensively: anything malformed seeds no extra lines rather than a
+ * line with NaN in the quantity box.
+ */
+function readConsumables(raw: string | null): JobWorkConsumable[] {
+  if (!raw) return [];
+  try {
+    const parsed = JSON.parse(raw);
+    if (!Array.isArray(parsed)) return [];
+    return parsed.flatMap((c): JobWorkConsumable[] => {
+      const forOrder = Number(c?.forOrder);
+      if (!c?.key || !Number.isFinite(forOrder) || forOrder <= 0) return [];
+      const perPc = Number(c?.perPc);
+      return [{
+        key: String(c.key),
+        label: String(c.label || c.key),
+        unit: c.unit ? String(c.unit) : undefined,
+        forOrder,
+        perPc: Number.isFinite(perPc) && perPc > 0 ? perPc : null,
+      }];
+    });
+  } catch {
+    return [];
+  }
+}
 
 const ff = "'Outfit','Inter',sans-serif";
 const bg = "rgba(255,255,255,0.03)";
@@ -179,8 +211,16 @@ function JobWorkInner() {
       ratePerPc: num("ratePerPc"),
       costPerUnit: num("costPerUnit"),
       wastePerBatch: num("wastePerBatch"),
+      consumables: readConsumables(params.get("consumables")),
     };
   }, [params]);
+  /* A seed is spent once a challan is raised from it. The URL still carries
+     it — the operator may well press Back — but the form must not, or the same
+     material gets issued twice from figures that already went out. Bumping the
+     key remounts the tab, which is how every box in it returns to empty
+     without each one having to remember to. */
+  const [seedUsed, setSeedUsed] = useState(false);
+  const [seedKey, setSeedKey] = useState(0);
   const [status, setStatus] = useState<Status | null>(null);
   const [tab, setTab] = useState<"issue" | "receive" | "ledger" | "workers">("issue");
   const [workers, setWorkers] = useState<Worker[]>([]);
@@ -334,8 +374,12 @@ function JobWorkInner() {
       )}
       {tab === "issue" && (
         <IssueTab
+          // Remounts the tab, so every box inside it goes back to its initial
+          // state rather than each one having to remember to clear itself.
+          key={seedKey}
           onGoToWorkers={() => setTab("workers")}
-          seed={formulaSeed}
+          seed={seedUsed ? null : formulaSeed}
+          onSeedUsed={() => { setSeedUsed(true); setSeedKey((k) => k + 1); }}
           workers={workers}
           items={items}
           challans={challans}
@@ -484,6 +528,16 @@ async function post(url: string, body: unknown, method = "POST") {
   return j;
 }
 
+const patch = (url: string, body: unknown) => post(url, body, "PATCH");
+
+/** DELETE carries its arguments in the query string, so it sends no body. */
+async function del(url: string) {
+  const r = await fetch(url, { method: "DELETE" });
+  const j = await r.json().catch(() => ({}));
+  if (!r.ok) throw new Error(j?.error || `Request failed (${r.status})`);
+  return j;
+}
+
 /* ─────────────────────────── Thekedars ─────────────────────────── */
 
 function WorkersTab({ workers, setBusy, busy, setMsg, refresh }: Setter & { workers: Worker[] }) {
@@ -584,7 +638,19 @@ function WorkersTab({ workers, setBusy, busy, setMsg, refresh }: Setter & { work
 
 /* ─────────────────────────── Issue ─────────────────────────── */
 
-type DraftLine = { itemId: string; qty: string; standardPerPc: string };
+type DraftLine = {
+  itemId: string;
+  qty: string;
+  standardPerPc: string;
+  /**
+   * The quantity is still the formula's, so it follows a changed piece count.
+   * Cleared the moment the operator types in the box — from then on the number
+   * is theirs and nothing overwrites it.
+   */
+  autoQty?: boolean;
+  /** What the formula expects on this line, to pick the right item against. */
+  note?: string;
+};
 
 function IssueTab({
   workers,
@@ -596,12 +662,15 @@ function IssueTab({
   refresh,
   onGoToWorkers,
   seed,
+  onSeedUsed,
 }: Setter & {
   workers: Worker[];
   items: Item[];
   challans: Challan[];
   onGoToWorkers: () => void;
   seed: FormulaSeed | null;
+  /** Clears the costing seed once a challan has been raised from it. */
+  onSeedUsed: () => void;
 }) {
   const [workerId, setWorkerId] = useState("");
   const [finishedItemId, setFinishedItemId] = useState("");
@@ -610,10 +679,25 @@ function IssueTab({
   const [ratePerPc, setRatePerPc] = useState(seed?.ratePerPc ? String(seed.ratePerPc) : "");
   const [allowedWastagePct, setAllowedWastagePct] = useState("");
   const [notes, setNotes] = useState("");
-  // The first line carries the formula's standard. It is the material the
-  // formula was written about; which item that is, only the operator knows.
-  const [lines, setLines] = useState<DraftLine[]>([
-    { itemId: "", qty: "", standardPerPc: seed?.stdPerPc ? String(seed.stdPerPc) : "" },
+  /* The first line carries the formula's standard — the material the formula
+     was written about. Every consumable it names gets a line of its own behind
+     that, already counted for the order: a bag is a roll and twenty thousand
+     buttons, and the store should not have to work the second one out.
+
+     Which item each line is, only the operator knows; the note beside it says
+     what the formula was expecting there. */
+  const [lines, setLines] = useState<DraftLine[]>(() => [
+    {
+      itemId: "", qty: "", autoQty: true,
+      standardPerPc: seed?.stdPerPc ? String(seed.stdPerPc) : "",
+    },
+    ...(seed?.consumables ?? []).map((c): DraftLine => ({
+      itemId: "",
+      qty: "",
+      autoQty: true,
+      standardPerPc: c.perPc != null ? String(c.perPc) : "",
+      note: `${c.label} — ${c.forOrder.toLocaleString()}${c.unit ? ` ${c.unit}` : ""}`,
+    })),
   ]);
 
   const worker = workers.find((w) => w.id === workerId);
@@ -630,24 +714,119 @@ function IssueTab({
     () => planIssue(seed?.stdPerPc ?? null, Number(expectedQty) || 0),
     [seed, expectedQty],
   );
-  // Fill the first line's quantity from the plan while the operator has not
-  // overridden it, so the challan opens on whole rolls without hiding why.
+  /* Every line the formula seeded follows the piece count, rolls and buttons
+     alike, until somebody types in it. It used to fill the first line once and
+     only while it was still empty, so changing the expected pieces afterwards
+     left the challan issuing against the old figure — the plan on screen said
+     one thing and the line under it said another. */
+  const pcs = Number(expectedQty) || 0;
   useEffect(() => {
-    if (!plan) return;
-    setLines((prev) =>
-      prev.map((l, i) => (i === 0 && l.qty === "" ? { ...l, qty: String(plan.toIssue) } : l)),
-    );
-  }, [plan]);
+    if (pcs <= 0) return;
+    setLines((prev) => prev.map((l) => {
+      if (!l.autoQty) return l;
+      const std = Number(l.standardPerPc);
+      if (!Number.isFinite(std) || std <= 0) return l;
+      // Whole units leave the rack; the fraction is leftover, never a part-roll.
+      const qty = String(Math.ceil(Math.round(std * pcs * 1e4) / 1e4));
+      return l.qty === qty ? l : { ...l, qty };
+    }));
+  }, [pcs]);
 
   const raw = items.filter((i) => i.category === "RAW_MATERIAL" || i.category === "TRADING");
   const finished = items.filter((i) => i.category === "FINISHED" || i.category === "TRADING");
+
+  /* Editing an existing challan rather than raising a new one.
+     The worker and the warehouse are not editable: the material is already
+     standing at that worker's location, and moving it somewhere else is a
+     different document, not an edit to this one. */
+  const [editing, setEditing] = useState<{ id: string; challanNo: string } | null>(null);
+
+  const startEdit = (c: Challan) => {
+    setEditing({ id: c.id, challanNo: c.challanNo });
+    setExpectedQty(c.expectedQty ? String(c.expectedQty) : "");
+    setRatePerPc(c.ratePerPc ? String(c.ratePerPc) : "");
+    setAllowedWastagePct(c.allowedWastagePct ? String(c.allowedWastagePct) : "");
+    setFinishedItemId(c.finishedItemId || "");
+    setSourceLocation(c.sourceLocation || "MAIN");
+    setLines(
+      c.lines.map((l) => ({
+        itemId: l.itemId,
+        qty: String(l.issuedQty),
+        standardPerPc: l.standardPerPc ? String(l.standardPerPc) : "",
+        // Typed by whoever raised it; the piece count must not rewrite it now.
+        autoQty: false,
+        note: `${l.itemName} — issued ${l.issuedQty}${l.unit}`,
+      })),
+    );
+    setMsg(null);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const leaveEdit = () => {
+    setEditing(null);
+    setLines([{ itemId: "", qty: "", standardPerPc: "", autoQty: false }]);
+    setExpectedQty(""); setRatePerPc(""); setAllowedWastagePct("");
+    setFinishedItemId(""); setNotes("");
+    setMsg(null);
+  };
+
+  const cancelChallan = async (c: Challan) => {
+    if (!confirm(
+      `Cancel ${c.challanNo}?\n\n` +
+      `Every material line comes back from ${c.workerName} into ${c.sourceLocation}, ` +
+      `and the ledger entry is reversed. The challan is kept, marked cancelled.`,
+    )) return;
+    const reason = window.prompt("Why is it being cancelled? (optional)", "") ?? "";
+    setBusy(true);
+    try {
+      const r = await del(`/api/job-work/challans?id=${encodeURIComponent(c.id)}&reason=${encodeURIComponent(reason)}`);
+      setMsg({
+        kind: "ok",
+        text: `${r.challanNo} cancelled — Rs ${money(r.returnedValue)} of material returned to ${c.sourceLocation}. Voucher ${r.voucherNo || "—"}.`,
+      });
+      if (editing?.id === c.id) leaveEdit();
+      await refresh();
+    } catch (e) {
+      setMsg({ kind: "err", text: (e as Error).message });
+    } finally {
+      setBusy(false);
+    }
+  };
 
   const submit = async () => {
     const payload = lines
       .map((l) => ({ itemId: l.itemId, qty: Number(l.qty), standardPerPc: Number(l.standardPerPc) }))
       .filter((l) => l.itemId && l.qty > 0);
-    if (!workerId) return setMsg({ kind: "err", text: "Select a job worker" });
+    if (!editing && !workerId) return setMsg({ kind: "err", text: "Select a job worker" });
     if (!payload.length) return setMsg({ kind: "err", text: "At least one material line is required" });
+
+    if (editing) {
+      setBusy(true);
+      try {
+        const r = await patch(`/api/job-work/challans?id=${encodeURIComponent(editing.id)}`, {
+          lines: payload,
+          expectedQty: Number(expectedQty) || 0,
+          ratePerPc: Number(ratePerPc) || 0,
+          allowedWastagePct: Number(allowedWastagePct) || 0,
+          notes,
+        });
+        setMsg({
+          kind: "ok",
+          text: r.netValue < 0
+            ? `${r.challanNo} updated — Rs ${money(-r.netValue)} of material came back to ${sourceLocation}. Voucher ${r.voucherNo || "—"}.`
+            : r.netValue > 0
+              ? `${r.challanNo} updated — Rs ${money(r.netValue)} more material sent out. Voucher ${r.voucherNo || "—"}.`
+              : `${r.challanNo} updated — no material moved.`,
+        });
+        leaveEdit();
+        await refresh();
+      } catch (e) {
+        setMsg({ kind: "err", text: (e as Error).message });
+      } finally {
+        setBusy(false);
+      }
+      return;
+    }
 
     setBusy(true);
     try {
@@ -683,8 +862,22 @@ function IssueTab({
         kind: "ok",
         text: `${r.challanNo} created — Rs ${money(r.totalValue)} of material moved to ${r.jobLocation}. Voucher ${r.voucherNo || "—"}. No sale was recorded.`,
       });
-      setLines([{ itemId: "", qty: "", standardPerPc: "" }]);
+      /* Back to an empty form. It used to clear only the lines and the piece
+         count, so the worker, the finished item, the rate and the wastage
+         stayed behind from a challan that had already gone out — and the next
+         one could be raised against them without anybody choosing them again.
+         The formula banner goes with them: those numbers belong to the challan
+         just created, and leaving them on screen invites a second challan for
+         material that has already left. Coming back from a costing run brings
+         a fresh set. */
+      setLines([{ itemId: "", qty: "", standardPerPc: "", autoQty: false }]);
       setExpectedQty("");
+      setWorkerId("");
+      setFinishedItemId("");
+      setRatePerPc("");
+      setAllowedWastagePct("");
+      setNotes("");
+      onSeedUsed();
       await refresh();
     } catch (e) {
       setMsg({ kind: "err", text: (e as Error).message });
@@ -748,13 +941,15 @@ function IssueTab({
       )}
 
       <Section
-        title="Send material to a job worker"
-        sub="This challan is not a sale — no customer is involved and the sales figure does not move. Only the stock location changes."
+        title={editing ? `Editing ${editing.challanNo}` : "Send material to a job worker"}
+        sub={editing
+          ? "Change the quantities and only the difference moves — cut a line and the balance comes back into your own store, raise it and more goes out. The job worker and the godown stay as they were: material already standing at a worker cannot be moved elsewhere by an edit."
+          : "This challan is not a sale — no customer is involved and the sales figure does not move. Only the stock location changes."}
       >
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(160px,1fr))", gap: 12, marginBottom: 16 }}>
           <div>
             <label style={label}>Job worker</label>
-            <select style={selectInput} value={workerId} onChange={(e) => setWorkerId(e.target.value)}>
+            <select style={selectInput} value={workerId} disabled={!!editing} onChange={(e) => setWorkerId(e.target.value)}>
               <option value="">— select —</option>
               {workers.map((w) => (
                 <option key={w.id} value={w.id}>
@@ -800,7 +995,14 @@ function IssueTab({
           Material lines
         </div>
         {lines.map((l, idx) => (
-          <div key={idx} style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr auto", gap: 10, marginBottom: 9 }}>
+          <div key={idx} style={{ marginBottom: 9 }}>
+          {/* What the formula put on this line. The quantity is filled in but
+              the item is not — only the operator knows which of their own
+              stock "Buttons required — 20,000 pcs" means. */}
+          {l.note && (
+            <div style={{ fontSize: 11, color: dim, marginBottom: 4 }}>{l.note}</div>
+          )}
+          <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr auto", gap: 10 }}>
             <select
               style={selectInput}
               value={l.itemId}
@@ -819,7 +1021,9 @@ function IssueTab({
               step="0.001"
               placeholder="qty"
               value={l.qty}
-              onChange={(e) => setLines(lines.map((x, i) => (i === idx ? { ...x, qty: e.target.value } : x)))}
+              // Typing here hands the number to the operator for good — the
+              // formula stops writing over it from this point on.
+              onChange={(e) => setLines(lines.map((x, i) => (i === idx ? { ...x, qty: e.target.value, autoQty: false } : x)))}
             />
             <input
               style={input}
@@ -838,17 +1042,23 @@ function IssueTab({
               ✕
             </button>
           </div>
+          </div>
         ))}
         <div style={{ fontSize: 11.5, color: dim, marginTop: 4 }}>
           Leave <b>std / pc</b> blank and wastage is not calculated — which is the right answer for a single material with no recovery agreed.
         </div>
 
         <div style={{ display: "flex", gap: 10, marginTop: 14, flexWrap: "wrap" }}>
-          <button style={btn(false)} onClick={() => setLines([...lines, { itemId: "", qty: "", standardPerPc: "" }])}>
+          <button style={btn(false)} onClick={() => setLines([...lines, { itemId: "", qty: "", standardPerPc: "", autoQty: false }])}>
             + Line
           </button>
+          {editing && (
+            <button style={btn(false)} disabled={busy} onClick={leaveEdit}>
+              Discard changes
+            </button>
+          )}
           <button style={btn()} disabled={busy} onClick={submit}>
-            {busy ? "Posting…" : "Create issue challan"}
+            {busy ? "Posting…" : editing ? `Save ${editing.challanNo}` : "Create issue challan"}
           </button>
         </div>
 
@@ -869,14 +1079,17 @@ function IssueTab({
               <th style={th}>Will make</th>
               <th style={{ ...th, textAlign: "right" }}>Expected</th>
               <th style={{ ...th, textAlign: "right" }}>Received</th>
-              <th style={{ ...th, textAlign: "right" }}>Balance value</th>
+              <th style={{ ...th, textAlign: "right" }} title="Material still lying at the job worker, at the cost it went out at">
+                Balance value
+              </th>
               <th style={th}>Status</th>
+              <th style={th} />
             </tr>
           </thead>
           <tbody>
             {challans.length === 0 && (
               <tr>
-                <td style={{ ...td, color: dim }} colSpan={8}>
+                <td style={{ ...td, color: dim }} colSpan={9}>
                   No challans yet.
                 </td>
               </tr>
@@ -890,8 +1103,38 @@ function IssueTab({
                 <td style={tdNum}>{c.expectedQty || "—"}</td>
                 <td style={tdNum}>{c.receivedQty || 0}</td>
                 <td style={tdNum}>{money(c.balanceValue)}</td>
-                <td style={{ ...td, color: c.status === "closed" ? dim : amber, fontSize: 12, fontWeight: 700 }}>
+                <td style={{
+                  ...td, fontSize: 12, fontWeight: 700,
+                  color: c.status === "closed" || c.status === "cancelled" ? dim : amber,
+                  textDecoration: c.status === "cancelled" ? "line-through" : undefined,
+                }}>
                   {c.status}
+                </td>
+                {/* Only while nothing has come back against it. Once a receipt
+                    posts, the issue is costed into finished stock and a payable
+                    — unpicking it here would leave the receipt standing on
+                    material this challan no longer says went out. */}
+                <td style={{ ...td, whiteSpace: "nowrap", textAlign: "right" }}>
+                  {c.status === "open" && (c.receivedQty || 0) === 0 ? (
+                    <>
+                      <button
+                        style={{ ...btn(false), padding: "5px 11px", fontSize: 12, marginRight: 6 }}
+                        onClick={() => startEdit(c)}
+                        disabled={busy}
+                      >
+                        Edit
+                      </button>
+                      <button
+                        style={{ ...btn(false), padding: "5px 11px", fontSize: 12, color: "#f87171" }}
+                        onClick={() => cancelChallan(c)}
+                        disabled={busy}
+                      >
+                        Cancel
+                      </button>
+                    </>
+                  ) : (
+                    <span style={{ color: dim, fontSize: 12 }}>—</span>
+                  )}
                 </td>
               </tr>
             ))}

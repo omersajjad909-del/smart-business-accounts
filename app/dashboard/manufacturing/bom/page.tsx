@@ -10,8 +10,11 @@ import {
   type ManufacturingBom,
   type ManufacturingItem,
   type BomLineInput,
+  type ProductionRunQuote,
+  quoteBomRun,
 } from "../_shared";
 import { useResponsive } from "@/hooks/useResponsive";
+import toast from "react-hot-toast";
 
 const ff = "'Outfit','Inter',sans-serif";
 const bg = "rgba(255,255,255,0.03)";
@@ -21,6 +24,8 @@ const inputStyle: React.CSSProperties = {
   width: "100%", background: bg, border: `1px solid ${border}`,
   borderRadius: 8, padding: "9px 12px", color: "#fff", boxSizing: "border-box",
 };
+
+type LabourRow = { labourId: string; operation: string; qty: string; rate: string };
 
 type LineDraft = {
   itemId: string;
@@ -33,6 +38,13 @@ type LineDraft = {
    * of a screw is scrap, not stock.
    */
   divisible: boolean;
+  /**
+   * What the costing formula expected on this line — "Buttons required —
+   * 1,580 pcs". Only the quantity crosses over; which item of your own stock
+   * that is, the formula has no way of knowing, so the note stands beside the
+   * picker until somebody chooses.
+   */
+  note?: string;
 };
 
 function BOMPageInner() {
@@ -88,6 +100,29 @@ function BOMPageInner() {
     if (Number.isFinite(pendingChargeAmount) && pendingChargeAmount > 0) {
       setCharge({ label: chargeLabel || "Other per-unit charges", perBatch: pendingChargeAmount });
     }
+
+    /* A line per consumable the formula named, quantity already worked out for
+       one batch. Read defensively — a query string is the one input here
+       nobody validates on the way in, and a malformed one should seed no lines
+       rather than a line with NaN in the quantity box. */
+    try {
+      const raw = JSON.parse(params.get("consumables") || "[]");
+      const seeded: LineDraft[] = (Array.isArray(raw) ? raw : []).flatMap((c) => {
+        const perBatch = Number(c?.perBatch);
+        if (!Number.isFinite(perBatch) || perBatch <= 0) return [];
+        const label = String(c?.label || "Material");
+        const unit = c?.unit ? ` ${String(c.unit)}` : "";
+        return [{
+          itemId: "",
+          qty: String(perBatch),
+          // Buttons and the like are discrete; a roll is not, and neither is
+          // set here on the formula's word — see `divisible`.
+          divisible: false,
+          note: `${label} — ${perBatch.toLocaleString()}${unit} per batch`,
+        }];
+      });
+      if (seeded.length) setLines((prev) => [...prev, ...seeded]);
+    } catch { /* nothing seeded */ }
     setFormulaMeta({
       id: formulaId,
       name: params.get("formulaName") || "",
@@ -174,6 +209,164 @@ function BOMPageInner() {
     setFormulaMeta(bom.formulaId ? { id: bom.formulaId, name: bom.formulaName || "", version: bom.formulaVersion || 1 } : null);
     setFormError("");
     setShowModal(true);
+  }
+
+  /* ── Make this ──────────────────────────────────────────────────────────
+     Raising an order, starting it and posting it are three screens and two
+     gates, and for most runs they carry no information: the job is simply
+     made. This does all three behind one confirm, against a quote taken
+     before anything is raised — so what is on screen is what will be
+     consumed, and backing out leaves nothing behind.
+
+     Production Orders is untouched and still the way to plan a job, assign
+     it, and come back to it in stages. */
+  const [makeBom, setMakeBom] = useState<ManufacturingBom | null>(null);
+  const [makeQty, setMakeQty] = useState("");
+  const [makeQuote, setMakeQuote] = useState<ProductionRunQuote | null>(null);
+  const [makeBusy, setMakeBusy] = useState(false);
+  const [makeError, setMakeError] = useState("");
+  const [makeShort, setMakeShort] = useState(false);
+
+  /* Who did the work, and what they are owed for it.
+     
+     Without this the run still costs the labour — it falls back to the BOM's
+     per-batch figure — but the credit goes to one lump "Factory Labour"
+     expense head. Nobody is owed anything in the books and nobody can be paid
+     from it. Naming the workers here credits each one's own payable account
+     instead, the same way a job work receipt credits the thekedar. */
+  const [labourList, setLabourList] = useState<{ id: string; name: string; ratePerUnit: number }[]>([]);
+  const [labourRows, setLabourRows] = useState<LabourRow[]>([]);
+
+  useEffect(() => {
+    fetch("/api/manufacturing/labour", { cache: "no-store" })
+      .then((r) => r.json())
+      .then((list) => setLabourList(Array.isArray(list) ? list : []))
+      .catch(() => setLabourList([]));
+  }, []);
+
+  const setLabourRow = (index: number, patch: Partial<LabourRow>) =>
+    setLabourRows((rows) => rows.map((r, i) => (i === index ? { ...r, ...patch } : r)));
+
+  const labourTotal = labourRows.reduce(
+    (sum, r) => sum + (Number(r.qty) || 0) * (Number(r.rate) || 0),
+    0,
+  );
+
+  /* A worker named with no pieces or no rate. Left to go through it would
+     count as an assignment worth nothing, replace the BOM's estimate with it,
+     and post a run whose labour cost is zero and whose worker is owed nothing.
+     Stopped here and said out loud instead. */
+  const incompleteLabour = labourRows.some(
+    (r) => r.labourId && !(Number(r.qty) > 0 && Number(r.rate) > 0),
+  );
+
+  function openMake(bom: ManufacturingBom) {
+    setMakeBom(bom);
+    setMakeQty(String(bom.yieldUnits || 1));
+    setMakeQuote(null);
+    setMakeError("");
+    setMakeShort(false);
+    setLabourRows([]);
+  }
+
+  function closeMake() {
+    setMakeBom(null);
+    setMakeQuote(null);
+    setMakeError("");
+  }
+
+  // Re-priced as the quantity changes, so the figures never belong to a
+  // number the operator has already typed over.
+  useEffect(() => {
+    if (!makeBom) return;
+    const qty = Number(makeQty);
+    if (!Number.isFinite(qty) || qty <= 0) { setMakeQuote(null); return; }
+    let live = true;
+    const id = setTimeout(async () => {
+      const quote = await quoteBomRun(makeBom.id, Math.floor(qty));
+      if (!live) return;
+      if (!quote) { setMakeError("Could not reach the server."); setMakeQuote(null); return; }
+      setMakeError(quote.error || "");
+      setMakeQuote(quote.error ? null : quote);
+    }, 250);
+    return () => { live = false; clearTimeout(id); };
+  }, [makeBom, makeQty]);
+
+  async function confirmMake() {
+    if (!makeBom || !makeQuote) return;
+    const qty = Math.floor(Number(makeQty));
+    if (!Number.isFinite(qty) || qty <= 0) { setMakeError("How many are being made?"); return; }
+
+    const assignments = labourRows
+      // rate > 0, not >= 0. A named worker at zero used to count as a real
+      // assignment and replace the BOM's estimate with nothing — the run then
+      // posted with no labour cost at all and the worker was owed nothing,
+      // which is not what naming somebody means. Incomplete rows are caught
+      // before this, so nothing is silently dropped either.
+      .filter((r) => r.labourId && Number(r.qty) > 0 && Number(r.rate) > 0)
+      .map((r) => ({
+        labourId: r.labourId,
+        qty: Number(r.qty),
+        rate: Number(r.rate),
+        operation: r.operation.trim(),
+      }));
+
+    setMakeBusy(true);
+    setMakeError("");
+    try {
+      // The order is raised first because the posting path is built around one
+      // — it is what the finished goods batch and the WIP entry are traced
+      // back to. It is simply not left for the operator to do by hand.
+      const order = await productionStore.create({
+        title: makeBom.product,
+        status: "in_progress",
+        date: new Date().toISOString().slice(0, 10),
+        data: {
+          orderId: `PO-${String(orders.length + 1).padStart(4, "0")}`,
+          quantity: qty,
+          completed: 0,
+          bomId: makeBom.id,
+          bomVersion: makeBom.version || "",
+          location: makeQuote.location || "MAIN",
+          notes: "Raised and posted from the BOM",
+        },
+      });
+
+      const res = await fetch("/api/manufacturing/production-orders/complete", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          productionOrderId: order.id,
+          producedQty: qty,
+          allowNegativeStock: makeShort,
+          location: makeQuote.location || "MAIN",
+          date: new Date().toISOString().slice(0, 10),
+          // Named workers replace the BOM's labour estimate entirely — they
+          // are what was actually agreed to pay.
+          ...(assignments.length ? { labourAssignments: assignments } : {}),
+        }),
+      });
+      const body = await res.json();
+      if (!res.ok) throw new Error(body?.error || "Could not post the run.");
+
+      const kept = (body.remnantsCreated ?? []) as { itemName: string; qty: number; unit: string }[];
+      toast.success(
+        `${body.producedQty} × ${makeBom.product} made · batch ${body.batchNo} · Rs. ${Math.round(body.totalCost).toLocaleString()} to Finished Goods`,
+      );
+      if (kept.length) {
+        toast(`Kept as open stock: ${kept.map((r) => `${Number(r.qty).toFixed(2)}${r.unit} ${r.itemName}`).join(", ")}`, { icon: "♻️" });
+      }
+      closeMake();
+      await Promise.all([productionStore.refetch?.(), bomStore.refetch?.()]);
+      loadManufacturingItems(["RAW_MATERIAL", "TRADING"]).then(setRawMaterials);
+    } catch (e) {
+      // The order is left standing on purpose: it was raised, and if the
+      // posting failed the operator needs to see it on Production Orders
+      // rather than wonder where it went.
+      setMakeError(e instanceof Error ? e.message : "Could not post the run.");
+    } finally {
+      setMakeBusy(false);
+    }
   }
 
   async function removeBom(bom: { id: string; product: string }, linkedOrders: number) {
@@ -303,6 +496,15 @@ function BOMPageInner() {
                     <div style={{ color: "#22c55e", fontSize: 15, fontWeight: 800 }}>Rs. {Math.round(bom.unitCost).toLocaleString()}</div>
                     <div style={{ fontSize: 11, color: "rgba(255,255,255,.35)" }}>per unit</div>
                     <div style={{ display: "flex", gap: 6, marginTop: 9, justifyContent: "flex-end" }}>
+                      {/* The whole run from here: raise the order, start it and
+                          post it in one confirm. The Production Orders screen
+                          is still there for a job somebody plans, assigns and
+                          comes back to — this is for the far commoner case
+                          where the order is simply made. */}
+                      <button onClick={() => openMake(bom)}
+                        style={{ padding: "4px 13px", borderRadius: 7, border: "1px solid rgba(34,197,94,.4)", background: "rgba(34,197,94,.12)", color: "#4ade80", fontFamily: "inherit", fontSize: 11.5, fontWeight: 800, cursor: "pointer" }}>
+                        Make
+                      </button>
                       <button onClick={() => startEdit(bom)}
                         style={{ padding: "4px 11px", borderRadius: 7, border: `1px solid ${border}`, background: "rgba(255,255,255,.04)", color: "rgba(255,255,255,.75)", fontFamily: "inherit", fontSize: 11.5, fontWeight: 700, cursor: "pointer" }}>
                         Edit
@@ -374,6 +576,175 @@ function BOMPageInner() {
         </div>
       </div>
 
+      {/* ── Make this ── */}
+      {makeBom && (
+        <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.6)", display: "flex", alignItems: "center", justifyContent: "center", padding: 16, zIndex: 50 }}>
+          <div style={{ background: "#10131a", border: `1px solid ${border}`, borderRadius: 16, padding: isMobile ? 16 : 24, width: "100%", maxWidth: 520, maxHeight: "88vh", overflowY: "auto" }}>
+            <div style={{ fontSize: 18, fontWeight: 800, marginBottom: 4 }}>Make {makeBom.product}</div>
+            <div style={{ fontSize: 12, color: "rgba(255,255,255,.45)", marginBottom: 16 }}>
+              Raises the order, consumes the material and posts the finished goods — all on confirm.
+              Nothing is written until then.
+            </div>
+
+            <label style={{ display: "block", fontSize: 12, color: "rgba(255,255,255,.45)", marginBottom: 6 }}>
+              How many {makeBom.product}?
+            </label>
+            <input
+              type="number" min={1} step={1} value={makeQty} autoFocus
+              onChange={(e) => setMakeQty(e.target.value)}
+              style={{ width: "100%", padding: "10px 12px", borderRadius: 9, background: "rgba(255,255,255,.05)", border: `1px solid ${border}`, color: "#fff", fontSize: 15, fontFamily: "inherit", boxSizing: "border-box" }}
+            />
+
+            {makeError && (
+              <div style={{ marginTop: 12, padding: "10px 12px", borderRadius: 8, background: "rgba(239,68,68,.14)", border: "1px solid rgba(239,68,68,.28)", color: "#fca5a5", fontSize: 12 }}>
+                {makeError}
+              </div>
+            )}
+
+            {/* What it will actually take off the rack, priced before anything
+                is raised. A confirm against figures nobody was shown is how a
+                run consumes material the store did not expect to lose. */}
+            {makeQuote && (
+              <div style={{ marginTop: 16 }}>
+                <div style={{ fontSize: 11, fontWeight: 800, letterSpacing: .6, textTransform: "uppercase", color: "rgba(255,255,255,.4)", marginBottom: 8 }}>
+                  Material this takes — from {makeQuote.location || "MAIN"}
+                </div>
+                {makeQuote.lines.map((line) => {
+                  const short = makeQuote.shortages.some((s) => s.itemId === line.itemId);
+                  // requiredQty, not qty: `qty` is what the BOM says one batch
+                  // takes, and showing it against an order of ten thousand
+                  // reads as though the run consumes a single roll.
+                  return (
+                    <div key={line.itemId} style={{ padding: "5px 0", fontSize: 12.5 }}>
+                      <div style={{ display: "flex", justifyContent: "space-between", gap: 10, color: short ? "#fca5a5" : "rgba(255,255,255,.75)" }}>
+                        <span>{line.itemName}{short ? ` — only ${line.availableQty.toLocaleString()}${line.unit} in stock` : ""}</span>
+                        <span style={{ fontFamily: "ui-monospace, monospace", whiteSpace: "nowrap", fontWeight: 700 }}>
+                          {line.requiredQty.toLocaleString()} {line.unit}
+                        </span>
+                      </div>
+                      {/* The exact figure under the whole one, so 15.82 rolls
+                          taken as 16 does not look like a rounding nobody
+                          agreed to — and the part that survives says so. */}
+                      {(line.exactQty !== line.requiredQty || line.leftoverQty > 0 || line.fromRemnantQty > 0) && (
+                        <div style={{ fontSize: 10.5, color: "rgba(255,255,255,.35)", marginTop: 1 }}>
+                          {line.exactQty !== line.requiredQty && `needs ${line.exactQty.toFixed(2)}${line.unit}`}
+                          {line.fromRemnantQty > 0 && ` · ${line.fromRemnantQty.toFixed(2)}${line.unit} from open stock`}
+                          {line.leftoverQty > 0 && ` · ${line.leftoverQty.toFixed(2)}${line.unit} stays as open stock`}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+                <div style={{ marginTop: 12, paddingTop: 12, borderTop: `1px solid ${border}`, display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
+                  <span style={{ fontSize: 12.5, color: "rgba(255,255,255,.5)" }}>Goes to Finished Goods</span>
+                  {/* Named workers replace the BOM's labour figure, so the
+                      total has to follow them or the number on screen is not
+                      the number that posts. */}
+                  <span style={{ fontSize: 17, fontWeight: 800, color: "#22c55e", fontFamily: "ui-monospace, monospace" }}>
+                    Rs. {Math.round(
+                      labourRows.length
+                        ? makeQuote.totalCost - makeQuote.labourCost + labourTotal
+                        : makeQuote.totalCost,
+                    ).toLocaleString()}
+                  </span>
+                </div>
+
+                {makeQuote.shortages.length > 0 && (
+                  <label style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 12, fontSize: 12, color: "#fbbf24", cursor: "pointer" }}>
+                    <input type="checkbox" checked={makeShort} onChange={(e) => setMakeShort(e.target.checked)} />
+                    Make it anyway — the short material will show as negative stock
+                  </label>
+                )}
+
+                {/* Who did the work. Leave it empty and the labour is still
+                    costed, from the BOM — but it lands in one "Factory Labour"
+                    head and nobody is owed anything by name. Name them and
+                    each gets a payable of their own, to be paid off through
+                    CPV like any other creditor. */}
+                <div style={{ marginTop: 18 }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 10, marginBottom: 8 }}>
+                    <span style={{ fontSize: 11, fontWeight: 800, letterSpacing: .6, textTransform: "uppercase", color: "rgba(255,255,255,.4)" }}>
+                      Labour on this run
+                    </span>
+                    <span style={{ fontSize: 11, color: "rgba(255,255,255,.32)" }}>
+                      {labourRows.length
+                        ? `Rs. ${Math.round(labourTotal).toLocaleString()} — replaces the BOM estimate`
+                        : `BOM estimate Rs. ${Math.round(makeQuote.labourCost).toLocaleString()} — nobody owed by name`}
+                    </span>
+                  </div>
+
+                  {labourList.length === 0 ? (
+                    <div style={{ fontSize: 12, color: "rgba(255,255,255,.35)" }}>
+                      No workers added yet — add them on the{" "}
+                      <a href="/dashboard/manufacturing/labour" style={{ color: "#fb923c", fontWeight: 700 }}>Labour</a> page.
+                    </div>
+                  ) : (
+                    <>
+                      <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                        {labourRows.map((row, index) => (
+                          <div key={index} style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr 1fr" : "1.2fr 1fr 72px 80px 28px", gap: 6, alignItems: "center" }}>
+                            <select value={row.labourId}
+                              onChange={(e) => {
+                                const picked = labourList.find((l) => l.id === e.target.value);
+                                setLabourRow(index, { labourId: e.target.value, rate: picked ? String(picked.ratePerUnit) : row.rate });
+                              }}
+                              style={{ background: bg, border: `1px solid ${border}`, borderRadius: 8, padding: "8px 9px", color: "#fff", fontSize: 12.5, fontFamily: "inherit" }}>
+                              <option value="">— Worker —</option>
+                              {labourList.map((l) => <option key={l.id} value={l.id}>{l.name}</option>)}
+                            </select>
+                            <input placeholder="Job — e.g. Button" value={row.operation}
+                              onChange={(e) => setLabourRow(index, { operation: e.target.value })}
+                              style={{ background: bg, border: `1px solid ${border}`, borderRadius: 8, padding: "8px 9px", color: "#fff", fontSize: 12.5, fontFamily: "inherit" }} />
+                            <input type="number" min={0} step="any" placeholder="Pcs" value={row.qty}
+                              onChange={(e) => setLabourRow(index, { qty: e.target.value })}
+                              style={{ background: bg, border: `1px solid ${border}`, borderRadius: 8, padding: "8px 9px", color: "#fff", fontSize: 12.5, fontFamily: "inherit" }} />
+                            <input type="number" min={0} step="any" placeholder="Rate/pc" value={row.rate}
+                              onChange={(e) => setLabourRow(index, { rate: e.target.value })}
+                              style={{ background: bg, border: `1px solid ${border}`, borderRadius: 8, padding: "8px 9px", color: "#fff", fontSize: 12.5, fontFamily: "inherit" }} />
+                            <button onClick={() => setLabourRows((rows) => rows.filter((_, i) => i !== index))} title="Remove"
+                              style={{ background: "transparent", border: `1px solid ${border}`, borderRadius: 8, color: "rgba(255,255,255,.45)", cursor: "pointer", padding: "7px 0", gridColumn: isMobile ? "1 / -1" : "auto" }}>×</button>
+                          </div>
+                        ))}
+                      </div>
+                      {incompleteLabour && (
+                        <div style={{ marginTop: 8, fontSize: 11.5, color: "#fbbf24" }}>
+                          A worker is named with no pieces or no rate. Fill both in, or take the row out —
+                          left as it is, the run would post with no labour cost and nobody owed.
+                        </div>
+                      )}
+                      <button
+                        onClick={() => setLabourRows((rows) => [...rows, { labourId: "", operation: "", qty: makeQty, rate: "" }])}
+                        style={{ marginTop: 8, padding: "6px 12px", borderRadius: 8, background: "rgba(255,255,255,.05)", border: `1px solid ${border}`, color: "rgba(255,255,255,.65)", fontSize: 12, fontWeight: 600, fontFamily: "inherit", cursor: "pointer" }}>
+                        + Worker
+                      </button>
+                    </>
+                  )}
+                </div>
+              </div>
+            )}
+
+            <div style={{ display: "flex", gap: 12, marginTop: 20 }}>
+              <button
+                onClick={confirmMake}
+                disabled={makeBusy || !makeQuote || incompleteLabour || (makeQuote.shortages.length > 0 && !makeShort)}
+                style={{
+                  flex: 1, padding: "11px 0", border: "none", borderRadius: 8, color: "#fff",
+                  fontSize: 14, fontWeight: 700, fontFamily: "inherit",
+                  background: makeBusy || !makeQuote || incompleteLabour || (makeQuote.shortages.length > 0 && !makeShort) ? "rgba(34,197,94,.4)" : "#22c55e",
+                  cursor: makeBusy || !makeQuote ? "not-allowed" : "pointer",
+                }}
+              >
+                {makeBusy ? "Making…" : makeQuote ? `Make ${Number(makeQty).toLocaleString()}` : "Pricing…"}
+              </button>
+              <button onClick={closeMake} disabled={makeBusy}
+                style={{ padding: "11px 20px", background: "rgba(255,255,255,.05)", border: `1px solid ${border}`, borderRadius: 8, color: "rgba(255,255,255,.65)", fontSize: 14, fontFamily: "inherit", cursor: "pointer" }}>
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {showModal && (
         <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.7)", zIndex: 50, display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }}>
           <div style={{ background: "#161b27", border: `1px solid ${border}`, borderRadius: 16, padding: 30, width: 580, maxHeight: "90vh", overflowY: "auto", fontFamily: ff }}>
@@ -386,9 +757,11 @@ function BOMPageInner() {
             )}
             {charge && (
               <div style={{ marginBottom: 14, padding: "10px 12px", borderRadius: 8, background: "rgba(251,191,36,.09)", border: "1px solid rgba(251,191,36,.3)", color: "rgba(255,255,255,.72)", fontSize: 12, lineHeight: 1.6 }}>
-                <strong style={{ color: "#fbbf24" }}>{charge.label}</strong> — Rs {charge.perBatch.toLocaleString()} per batch — is not labour, and it has <strong>not</strong> been added to this batch's cost.
-                Add it as its own line under <strong>Materials consumed per batch</strong> below — pick the item and set its quantity —
-                so the cost follows the live purchase rate and the stock actually moves when a batch is made. It will never be added to Overhead automatically.
+                <strong style={{ color: "#fbbf24" }}>{charge.label}</strong> — Rs {charge.perBatch.toLocaleString()} per batch — is material, not labour, and it is <strong>not</strong> in this batch&rsquo;s cost yet.
+                {lines.some((l) => l.note)
+                  ? " A line is waiting for it below with the quantity already worked out — pick which of your own items it is, and the cost then follows that item's live purchase rate and the stock moves when a batch is made."
+                  : " Add it as its own line under Materials consumed per batch below — pick the item and set its quantity — so the cost follows the live purchase rate and the stock actually moves when a batch is made."}
+                {" "}It will never be added to Overhead automatically.
               </div>
             )}
             {formError && <div style={{ marginBottom: 14, padding: "10px 12px", borderRadius: 8, background: "rgba(239,68,68,.14)", border: "1px solid rgba(239,68,68,.28)", color: "#fca5a5", fontSize: 12 }}>{formError}</div>}
@@ -429,20 +802,60 @@ function BOMPageInner() {
             </div>
 
             <div style={{ marginTop: 18 }}>
-              <label style={{ display: "block", fontSize: 12, color: "rgba(255,255,255,.45)", marginBottom: 8 }}>Materials consumed per batch</label>
+              {/* The batch size, said here rather than only in the box further
+                  up. A quantity is typed against a basis, and when the basis is
+                  three fields away the number gets typed against whatever the
+                  operator happens to be thinking in — which is per piece, and
+                  which is how a batch of 1,264 buttons gets entered as 2. */}
+              <label style={{ display: "block", fontSize: 12, color: "rgba(255,255,255,.45)", marginBottom: 8 }}>
+                Materials consumed per batch
+                {form.yieldUnits > 0 && (
+                  <span style={{ color: "rgba(255,255,255,.75)", fontWeight: 700 }}>
+                    {" "}of {form.yieldUnits.toLocaleString()}
+                    {finishedItems.find((f) => f.id === form.finishedItemId)?.name
+                      ? ` × ${finishedItems.find((f) => f.id === form.finishedItemId)!.name}`
+                      : " units"}
+                  </span>
+                )}
+              </label>
               <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                 {lines.map((line, index) => {
                   const item = itemsById.get(line.itemId);
                   const qty = Number(line.qty) || 0;
                   return (
-                    <div key={index} style={{ display: "grid", gridTemplateColumns: "1fr 110px 96px 32px", gap: 8, alignItems: "center" }}>
+                    <div key={index}>
+                    {/* What the formula expected here. The quantity is filled
+                        in; the item is not, because only the operator knows
+                        which of their own stock it means. */}
+                    {line.note && (
+                      <div style={{ fontSize: 11, color: "rgba(255,255,255,.42)", marginBottom: 4 }}>{line.note}</div>
+                    )}
+                    <div style={{ display: "grid", gridTemplateColumns: "1fr 110px 96px 32px", gap: 8, alignItems: "center" }}>
                       <select value={line.itemId} onChange={(e) => setLine(index, { itemId: e.target.value })} style={inputStyle}>
                         <option value="">— Material —</option>
                         {rawMaterials.map((m) => <option key={m.id} value={m.id}>{m.name} ({m.currentStock}{m.unit})</option>)}
                       </select>
                       <input type="number" min={0} step="any" placeholder="Qty" value={line.qty} onChange={(e) => setLine(index, { qty: e.target.value })} style={inputStyle} />
-                      <div style={{ fontSize: 12, color: "rgba(255,255,255,.5)", textAlign: "right" }}>
-                        {item ? `Rs. ${Math.round(qty * item.unitCost).toLocaleString()}` : "—"}
+                      {/* The same quantity read the other way. A batch figure
+                          can only be checked against a batch nobody counts;
+                          the per-piece number beside it is the one an operator
+                          knows by heart, so a wrong entry shows itself here
+                          rather than in a costed run three days later. */}
+                      <div style={{ fontSize: 12, color: "rgba(255,255,255,.5)", textAlign: "right", lineHeight: 1.35 }}>
+                        <div>{item ? `Rs. ${Math.round(qty * item.unitCost).toLocaleString()}` : "—"}</div>
+                        {qty > 0 && form.yieldUnits > 0 && (
+                          <div style={{ fontSize: 10.5, color: "rgba(255,255,255,.32)" }}>
+                            {(() => {
+                              const perUnit = qty / form.yieldUnits;
+                              // Four decimals for a roll, none for a button —
+                              // "0.0016" and "2" are both the honest answer.
+                              const shown = perUnit >= 1
+                                ? Math.round(perUnit * 100) / 100
+                                : Math.round(perUnit * 1e4) / 1e4;
+                              return `${shown.toLocaleString()}${item?.unit ? ` ${item.unit}` : ""} per unit`;
+                            })()}
+                          </div>
+                        )}
                       </div>
                       <button
                         onClick={() => setLines((c) => (c.length === 1 ? [{ itemId: "", qty: "", divisible: false }] : c.filter((_, i) => i !== index)))}
@@ -453,6 +866,7 @@ function BOMPageInner() {
                         <input type="checkbox" checked={line.divisible} onChange={(e) => setLine(index, { divisible: e.target.checked })} />
                         Roll / sheet material — keep the part-used {item?.unit || "unit"} as open stock for the next run
                       </label>
+                    </div>
                     </div>
                   );
                 })}

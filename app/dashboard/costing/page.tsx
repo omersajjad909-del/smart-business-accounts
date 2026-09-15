@@ -33,13 +33,16 @@ import {
   runFormula,
   applyProfit,
   toProfit,
+  isVisible,
   type CostingFormula,
   type FormulaInput,
   type FormulaStep,
   type FormulaOutput,
   type FormulaRun,
+  type StepResult,
 } from "@/lib/formulaEngine";
 import { buildJobWorkSeed, jobWorkHrefFrom, planIssue } from "@/lib/jobWorkSeed";
+import { NumberListInput } from "@/components/costing/NumberListInput";
 
 const CARD = "rgba(255,255,255,.03)";
 const BORDER = "rgba(255,255,255,.09)";
@@ -75,8 +78,6 @@ const CSS = `
 .cxForm{display:flex;flex-direction:column;gap:14px}
 .cxFields{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .cxStats{display:grid;grid-template-columns:repeat(auto-fill,minmax(145px,1fr));gap:14px}
-.cxRecentRow{display:flex;justify-content:space-between;gap:10px;font-size:12.5px}
-.cxRecentTitle{color:rgba(255,255,255,.55);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .cxActionRow{display:flex;gap:9px;flex-wrap:wrap}
 .cxWorkingRow{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;padding:8px 10px;border-radius:7px}
 .cxSectionHead{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
@@ -91,8 +92,6 @@ const CSS = `
   .cxHeaderAction,.cxHeaderAction > *{justify-content:center;width:100%}
   .cxFields{grid-template-columns:1fr}
   .cxStats{grid-template-columns:1fr}
-  .cxRecentRow{flex-direction:column;align-items:flex-start}
-  .cxRecentTitle{white-space:normal}
   .cxActionRow{flex-direction:column}
   .cxActionRow > *{width:100%}
   .cxWorkingRow{grid-template-columns:1fr;gap:6px}
@@ -100,6 +99,17 @@ const CSS = `
   .cxPrimaryValue{font-size:30px}
 }
 .cxHalfGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px 18px}
+/* Bands side by side across the slip. auto-fit rather than a fixed count, so
+   a formula with two groups gets two wide columns and one with five gets five
+   narrow ones, instead of either being padded out or crushed. */
+.cxCostBands{display:grid;grid-template-columns:repeat(auto-fit,minmax(40mm,1fr));
+  gap:10px 16px;align-items:start}
+/* Sizes read across, four to a line, so the band a cutter checks first is one
+   glance rather than a column he has to run his finger down. */
+.cxSheetGrid{display:grid;grid-template-columns:repeat(4,1fr);gap:0 20px}
+/* Cutting, rolls and buttons sit two blocks to a line — that, plus dropping
+   the expression column, is what brings the sheet back onto one page. */
+.cxSheetBands{display:grid;grid-template-columns:repeat(2,1fr);gap:0 26px;align-items:start}
 .cxPrint{display:none}
 @media print{
   @page{size:A4;margin:12mm}
@@ -181,12 +191,9 @@ function today(): string {
 function CostingInner() {
   const params = useSearchParams();
   const formulaStore = useBusinessRecords("costing_formula");
-  const sheetStore = useBusinessRecords("costing_sheet");
 
   const [selectedId, setSelectedId] = useState("");
   const [values, setValues] = useState<Record<string, number | number[]>>({});
-  const [sheetName, setSheetName] = useState("");
-  const [savedNote, setSavedNote] = useState("");
   // Folded away by default. The working is every step of the costing, which is
   // what you open when a number looks wrong — not what you want between the
   // result and the print buttons on every single quote.
@@ -238,8 +245,6 @@ function CostingInner() {
       next[inp.key] = inp.isList ? (inp.listValue ?? []) : (inp.defaultValue ?? 0);
     }
     setValues(next);
-    setSheetName(selected.formula.name);
-    setSavedNote("");
     // The formula's own profit, not zero — a formula written to quote at 15%
     // should quote at 15% the moment it is opened.
     const profit = toProfit(selected.formula.profit);
@@ -263,9 +268,32 @@ function CostingInner() {
     return () => window.clearTimeout(timer);
   }, [printKind]);
 
-  const askedInputs = selected?.formula.inputs.filter((i) => i.askOnRun !== false) ?? [];
-  const fixedInputs = selected?.formula.inputs.filter((i) => i.askOnRun === false) ?? [];
-  const outputs = selected?.formula.outputs.filter((o) => o.key) ?? [];
+  /* Hidden inputs never reach this screen at all. They are constants of the
+     trade — a weight divisor, a density — and an operator quoting a job has no
+     business being asked about them; they still feed every step through their
+     own default. Change one in the formula, not on a quote. */
+  /* A branch the operator did not pick comes off the screen entirely. Its
+     value still reaches the engine — the steps behind it zero it out with
+     if() — but a tape rate has no business sitting under a bag that is being
+     buttoned. */
+  const runInputs = selected?.formula.inputs.filter((i) => isVisible(i, values)) ?? [];
+  const askedInputs = runInputs.filter((i) => i.askOnRun !== false);
+  const fixedInputs = runInputs.filter((i) => i.askOnRun === false);
+
+  /* The job is filled in blocks — sizes, then the roll, then the order — the
+     same sections the formula was written in. Twelve identical boxes in one
+     column is where an operator types a width into a length. */
+  const askedGroups: { name: string; rows: FormulaInput[] }[] = [];
+  for (const inp of askedInputs) {
+    const name = (inp.group ?? "").trim();
+    const bucket = askedGroups.find((g) => g.name === name);
+    if (bucket) bucket.rows.push(inp);
+    else askedGroups.push({ name, rows: [inp] });
+  }
+  const askedSectioned = askedGroups.some((g) => g.name);
+  /* Same rule as the inputs above: the branch nobody picked is all zeroes, and
+     a zero reported beside the real figure reads as a second answer. */
+  const outputs = selected?.formula.outputs.filter((o) => o.key && isVisible(o, run?.values ?? {})) ?? [];
   const primary = outputs.find((o) => o.primary) ?? outputs[0];
 
   // Profit is worked out on top of the primary result, whatever it is called —
@@ -276,44 +304,6 @@ function CostingInner() {
   const { amount: profitAmount, total: saleRate } =
     applyProfit(baseRate, { mode: profitMode, value: profitValue });
 
-  async function saveSheet() {
-    if (!selected || !run) return;
-    const resultSnapshot: Record<string, unknown> = {};
-    for (const o of outputs) resultSnapshot[o.key] = run.values[o.key] ?? null;
-
-    await sheetStore.create({
-      title: sheetName.trim() || selected.formula.name,
-      status: "saved",
-      refId: selected.id,
-      // What the sheet actually quoted, which is the rate with profit on it —
-      // the saved list shows this number, and cost alone would read as the
-      // price when it is not.
-      amount: saleRate ?? (typeof run.values[primary?.key ?? ""] === "number"
-        ? (run.values[primary.key] as number)
-        : undefined),
-      date: new Date().toISOString(),
-      data: {
-        formulaId: selected.id,
-        formulaName: selected.formula.name,
-        // Stamped, not referenced: the formula can change later without
-        // rewriting what this sheet quoted.
-        formulaVersion: selected.formula.version,
-        inputs: values,
-        outputs: outputs.map((o) => ({ key: o.key, label: o.label, unit: o.unit, role: o.role })),
-        results: resultSnapshot,
-        // The profit as it stood for this quote, and the cost under it — a
-        // sheet whose margin cannot be read back is not much of a record.
-        profit: { mode: profitMode, value: profitValue },
-        profitAmount,
-        costRate: baseRate,
-        saleRate,
-      },
-    });
-    setSavedNote(`Saved "${sheetName.trim() || selected.formula.name}"`);
-    setTimeout(() => setSavedNote(""), 3500);
-  }
-
-  const recentSheets = sheetStore.records.slice(0, 6);
 
   /** The numbers the BOM needs, read off the outputs by their role. */
   const bomSeed = useMemo(() => {
@@ -339,16 +329,49 @@ function CostingInner() {
     // this run. Anything nested inside another step stays out of it — those are
     // the material workings, not charges.
     const unitKey = selected.formula.outputs.find((o) => o.role === "cost_per_unit")?.key;
-    const unitStep = selected.formula.steps.find((s) => s.key === unitKey);
     const inputByKey = new Map(selected.formula.inputs.map((i) => [i.key, i]));
+    const stepByKey = new Map(selected.formula.steps.map((s) => [s.key, s]));
     const charges: { key: string; label: string; perUnit: number }[] = [];
-    for (const token of unitStep?.expression.match(/[A-Za-z_][A-Za-z0-9_]*/g) ?? []) {
-      const input = inputByKey.get(token);
-      if (!input || input.isList || !isMoneyUnit(input.unit) || charges.some((c) => c.key === token)) continue;
-      const value = run.values[token];
-      if (typeof value !== "number" || !Number.isFinite(value) || value <= 0) continue;
-      charges.push({ key: token, label: input.label || token, perUnit: value });
-    }
+
+    /* Walk down from the cost-per-unit expression, through the steps it names,
+       collecting the money-valued inputs on the way.
+       
+       It used to read the top expression only, which found `labour` and
+       stopped. A bag's fitting labour is one level further down, inside
+       `buttonPerPc = buttonsPerPc * buttonRate + buttonLabour`, so it never
+       reached the BOM as labour — it rode across in the unassigned lump with
+       the buttons themselves, and the batch was costed with neither.
+       
+       Exactly one level, though: see the note on the step branch below.
+       Bounded by `seen` as well, so a formula whose steps refer to each other
+       is walked once rather than for ever. */
+    const seen = new Set<string>();
+    const walk = (expression: string | undefined, depth: number) => {
+      for (const token of expression?.match(/[A-Za-z_][A-Za-z0-9_]*/g) ?? []) {
+        if (seen.has(token)) continue;
+        seen.add(token);
+
+        const step = stepByKey.get(token);
+        // One level, and no further. The step that works out the material is
+        // named here too, and inside it every rate and gauge is multiplied
+        // into a material cost rather than added as a charge — walking in
+        // there returns things like "Gauge / thickness" as a per-unit charge,
+        // which is not a charge at all. One level down is where a fitting
+        // cost lives; below that is the material's own arithmetic.
+        if (step) { if (depth > 0) walk(step.expression, depth - 1); continue; }
+
+        const input = inputByKey.get(token);
+        if (!input || input.isList || !isMoneyUnit(input.unit)) continue;
+        // The branch this run did not take is still reachable through the
+        // expression tree — if() zeroes its value but the input is still
+        // sitting there. A buttoned bag must not be charged the tape labour.
+        if (!isVisible(input, run.values)) continue;
+        const value = run.values[token];
+        if (typeof value !== "number" || !Number.isFinite(value) || value <= 0) continue;
+        charges.push({ key: token, label: input.label || token, perUnit: value });
+      }
+    };
+    walk(stepByKey.get(unitKey ?? "")?.expression, 1);
     const isLabour = (c: { key: string; label: string }) =>
       LABOUR_CHARGE.test(c.key) || LABOUR_CHARGE.test(c.label);
     const labourPerUnit = charges.filter(isLabour).reduce((sum, c) => sum + c.perUnit, 0);
@@ -367,10 +390,29 @@ function CostingInner() {
         ? Math.round((conversion - labourPerBatch) * 100) / 100
         : null;
 
+    /* The materials a batch eats besides the one the formula is about — the
+       same `consumable_qty` outputs a job work challan raises a line for. The
+       formula counts them for the whole order, so they are brought back to one
+       piece and then out again to one batch: 2 buttons a bag, 790 bags a roll,
+       1,580 buttons a batch. The item itself is still the operator's to pick;
+       only the quantity is known here. */
+    const consumables = buildJobWorkSeed(selected.id, selected.formula, run)?.consumables ?? [];
+    const bomConsumables = unitsPerBatch != null && unitsPerBatch > 0
+      ? consumables.flatMap((c) =>
+          c.perPc != null && c.perPc > 0
+            ? [{
+                label: c.label,
+                unit: c.unit ?? "",
+                perBatch: Math.round(c.perPc * unitsPerBatch * 1e4) / 1e4,
+              }]
+            : [])
+      : [];
+
     return {
       unitsPerBatch, costPerBatch, costPerUnit, conversion,
       labourPerBatch, otherPerBatch,
       otherLabel: otherCharges.map((c) => c.label).join(" + "),
+      consumables: bomConsumables,
     };
   }, [selected, run]);
 
@@ -400,6 +442,8 @@ function CostingInner() {
       qs.set("pendingChargeAmount", String(bomSeed.otherPerBatch));
       if (bomSeed.otherLabel) qs.set("chargeLabel", bomSeed.otherLabel);
     }
+    // Buttons, tape — a line each, already counted for one batch.
+    if (bomSeed?.consumables.length) qs.set("consumables", JSON.stringify(bomSeed.consumables));
     return `/dashboard/manufacturing/bom?${qs.toString()}`;
   }, [selected, bomSeed]);
 
@@ -428,14 +472,20 @@ function CostingInner() {
         {inp.label || inp.key}
         {inp.unit && <span style={{ color: "rgba(255,255,255,.28)" }}> · {inp.unit}</span>}
       </label>
-      {inp.isList ? (
-        <input
-          value={(values[inp.key] as number[] | undefined)?.join(", ") ?? ""}
-          onChange={(e) => setValues((v) => ({
-            ...v,
-            [inp.key]: e.target.value.split(",").map((n) => Number(n.trim())).filter((n) => Number.isFinite(n)),
-          }))}
-          placeholder="48, 50, 52"
+      {inp.options?.length ? (
+        /* The choice itself. Stored as the index, so the steps behind it can
+           compare a plain number and the label stays free to be renamed. */
+        <select
+          value={String(values[inp.key] ?? 0)}
+          onChange={(e) => setValues((v) => ({ ...v, [inp.key]: Number(e.target.value) }))}
+          style={{ ...inputStyle, fontFamily: FONT, cursor: "pointer" }}
+        >
+          {inp.options.map((o, oi) => <option key={oi} value={oi}>{o}</option>)}
+        </select>
+      ) : inp.isList ? (
+        <NumberListInput
+          value={(values[inp.key] as number[] | undefined) ?? []}
+          onChange={(next) => setValues((v) => ({ ...v, [inp.key]: next }))}
           style={inputStyle}
         />
       ) : (
@@ -501,8 +551,21 @@ function CostingInner() {
 
             {selected && (
               <Card n={2} title="Enter the job" hint="The result updates as you type — no calculate button to press.">
-                <div className="cxFields">
-                  {askedInputs.map(field)}
+                <div style={{ display: "flex", flexDirection: "column", gap: askedSectioned ? 16 : 0 }}>
+                  {askedGroups.map((g, gi) => (
+                    <div key={gi}>
+                      {askedSectioned && (
+                        <div style={{
+                          fontSize: 11, fontWeight: 700, letterSpacing: ".07em", textTransform: "uppercase",
+                          color: "rgba(255,255,255,.4)", marginBottom: 9,
+                          paddingBottom: 6, borderBottom: `1px solid ${BORDER}`,
+                        }}>
+                          {g.name || "Other details"}
+                        </div>
+                      )}
+                      <div className="cxFields">{g.rows.map(field)}</div>
+                    </div>
+                  ))}
                 </div>
                 {!askedInputs.length && (
                   <div style={{ fontSize: 12.5, color: "rgba(255,255,255,.3)" }}>
@@ -523,24 +586,6 @@ function CostingInner() {
                   </div>
                 </details>
               </Card>
-            )}
-
-            {recentSheets.length > 0 && (
-              <div style={{ background: CARD, border: `1px solid ${BORDER}`, borderRadius: 14, padding: 18 }}>
-                <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 12 }}>Recent sheets</div>
-                <div style={{ display: "flex", flexDirection: "column", gap: 7 }}>
-                  {recentSheets.map((s) => (
-                    <div key={s.id} className="cxRecentRow">
-                      <span className="cxRecentTitle">
-                        {s.title}
-                      </span>
-                      <span style={{ fontFamily: MONO, color: "#34d399", fontWeight: 700, flexShrink: 0, fontVariantNumeric: "tabular-nums" }}>
-                        {fmt(s.amount)}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              </div>
             )}
           </div>
 
@@ -564,10 +609,21 @@ function CostingInner() {
                   <div style={{ fontSize: 11.5, fontWeight: 700, letterSpacing: ".08em", textTransform: "uppercase", color: "rgba(52,211,153,.8)", marginBottom: 8 }}>
                     {primary.label || primary.key}
                   </div>
+                  {/* The number that gets quoted, so it carries the profit —
+                      the same figure the formula editor previews. With no
+                      profit set it is the plain cost it always was. */}
                   <div className="cxPrimaryValue">
-                    {fmt(run?.values[primary.key])}
+                    {fmt(saleRate ?? run?.values[primary.key])}
                     <span style={{ fontSize: 15, color: "rgba(255,255,255,.32)", marginLeft: 8, fontWeight: 600 }}>{primary.unit}</span>
                   </div>
+                  {profitAmount !== 0 && (
+                    <div style={{
+                      fontFamily: MONO, fontSize: 12, marginTop: 5,
+                      color: "rgba(255,255,255,.4)", fontVariantNumeric: "tabular-nums",
+                    }}>
+                      {fmt(baseRate)} cost + {fmt(profitAmount)} profit
+                    </div>
+                  )}
 
                   {outputs.length > 1 && (
                     <div className="cxStats" style={{ marginTop: 20, paddingTop: 18, borderTop: "1px solid rgba(52,211,153,.18)" }}>
@@ -609,20 +665,17 @@ function CostingInner() {
                           </select>
                         </div>
                       </div>
+                      {/* What the profit comes to in rupees. The rate itself is
+                          the headline above — repeating it here left two big
+                          green numbers and no saying which one to quote. A
+                          percent typed into the box still says nothing about
+                          how much money it is until it is spelled out. */}
                       <div style={{ textAlign: "right" }}>
-                        <div style={{ fontSize: 11.5, color: "rgba(255,255,255,.4)", marginBottom: 3 }}>Sale rate</div>
-                        <div style={{ fontFamily: MONO, fontSize: 22, fontWeight: 800, color: "#34d399", fontVariantNumeric: "tabular-nums" }}>
-                          {fmt(saleRate)}
+                        <div style={{ fontSize: 11.5, color: "rgba(255,255,255,.4)", marginBottom: 3 }}>Profit on the rate</div>
+                        <div style={{ fontFamily: MONO, fontSize: 18, fontWeight: 800, color: "#34d399", fontVariantNumeric: "tabular-nums" }}>
+                          + {fmt(profitAmount)}
                           <span style={{ fontSize: 12, color: "rgba(255,255,255,.32)", marginLeft: 6, fontWeight: 600 }}>{primary.unit}</span>
                         </div>
-                        {/* The sum behind the number. A percent typed into the
-                            box says nothing about how many rupees it is until
-                            it is spelled out against the cost. */}
-                        {profitAmount !== 0 && (
-                          <div style={{ fontFamily: MONO, fontSize: 11.5, color: "rgba(255,255,255,.38)", marginTop: 4, fontVariantNumeric: "tabular-nums" }}>
-                            {fmt(baseRate)} + {fmt(profitAmount)} profit
-                          </div>
-                        )}
                       </div>
                     </div>
                   </div>
@@ -676,26 +729,6 @@ function CostingInner() {
                 </div>
               )}
             </div>
-
-            {/* Save */}
-            {selected && (
-              <div style={{ background: CARD, border: `1px solid ${BORDER}`, borderRadius: 14, padding: 18 }}>
-                <label style={labelStyle}>Save this as a sheet</label>
-                <div className="cxActionRow">
-                  <input value={sheetName} onChange={(e) => setSheetName(e.target.value)}
-                    placeholder="PVC bag 11.5 × 11 — Ali Traders"
-                    style={{ ...inputStyle, fontFamily: FONT, flex: 1, minWidth: 180 }}/>
-                  <button onClick={saveSheet} disabled={!run?.ok} style={{ ...btn(true), opacity: run?.ok ? 1 : .5 }}>
-                    Save sheet
-                  </button>
-                </div>
-                {savedNote && <div style={{ fontSize: 12.5, color: "#34d399", marginTop: 9 }}>{savedNote}</div>}
-                <p style={{ fontSize: 11.5, color: "rgba(255,255,255,.28)", margin: "10px 0 0", lineHeight: 1.6 }}>
-                  The sheet keeps the numbers you entered and the formula version used, so a
-                  quote stays as quoted even if the formula changes later.
-                </p>
-              </div>
-            )}
 
             {/* ── Turn the result into something the factory can produce against ──
                 This used to open a second, cut-down BOM form right here — its own
@@ -780,10 +813,12 @@ function CostingInner() {
         <PrintSheet
           kind={printKind}
           formula={selected.formula}
-          title={sheetName.trim() || selected.formula.name}
+          title={selected.formula.name}
           run={run}
           outputs={outputs}
           primaryKey={primary?.key}
+          saleRate={saleRate}
+          profitAmount={profitAmount}
         />
       )}
     </div>
@@ -806,13 +841,16 @@ const P_NUM: React.CSSProperties = { ...P_TD, textAlign: "right", fontFamily: MO
  * whoever cuts it are rarely the same person, and neither wants the other's
  * page.
  */
-function PrintSheet({ kind, formula, title, run, outputs, primaryKey }: {
+function PrintSheet({ kind, formula, title, run, outputs, primaryKey, saleRate, profitAmount }: {
   kind: "cost" | "working";
   formula: CostingFormula;
   title: string;
   run: FormulaRun;
   outputs: FormulaOutput[];
   primaryKey?: string;
+  /** The quoted rate — cost with this quote's profit on it. */
+  saleRate?: number | null;
+  profitAmount?: number;
 }) {
   /* The cost sheet is the result card off the screen and nothing more: the
      answer, the numbers standing behind it, and enough heading to know which
@@ -821,6 +859,20 @@ function PrintSheet({ kind, formula, title, run, outputs, primaryKey }: {
   if (kind === "cost") {
     const main = outputs.find((o) => o.key === primaryKey) ?? outputs[0];
     const rest = outputs.filter((o) => o.key !== main?.key);
+
+    /* The slip used to end in one flat grid of every remaining figure —
+       seventeen numbers in three columns with a roll width sitting next to an
+       order total and nothing saying they were different kinds of thing. So
+       the figures come off the outputs' own groups, the same way the working
+       sheet bands its steps, and a formula that groups nothing still gets the
+       single block it always had. */
+    const costBands: { name: string; rows: FormulaOutput[] }[] = [];
+    for (const o of rest) {
+      const name = (o.group ?? "").trim();
+      const bucket = costBands.find((b) => b.name === name);
+      if (bucket) bucket.rows.push(o);
+      else costBands.push({ name, rows: [o] });
+    }
     return (
       <div className="cxPrint">
         <div className="cxHalf" style={{ fontFamily: FONT, color: "#000", background: "#fff" }}>
@@ -837,27 +889,67 @@ function PrintSheet({ kind, formula, title, run, outputs, primaryKey }: {
             <div style={{ fontSize: 10, color: "#555", whiteSpace: "nowrap", paddingTop: 4 }}>{today()}</div>
           </div>
 
+          {/* The rate, and the sum behind it spelled out. A slip that shows
+              only the finished number is a slip nobody can check, and one
+              nobody can check gets re-derived by hand on the spot. */}
           {main && (
-            <div style={{ marginBottom: 16 }}>
+            <div style={{ marginBottom: 14 }}>
               <div style={{ fontSize: 9.5, fontWeight: 700, letterSpacing: ".09em", textTransform: "uppercase", color: "#555", marginBottom: 3 }}>
                 {main.label || main.key}
               </div>
+              {/* The quoted rate, profit included — the figure on the slip has
+                  to be the figure on the quotation, or the slip is worse than
+                  no slip. */}
               <div style={{ fontFamily: MONO, fontSize: 34, fontWeight: 800, lineHeight: 1.05, fontVariantNumeric: "tabular-nums" }}>
-                {fmt(run.values[main.key])}
+                {fmt(saleRate ?? run.values[main.key])}
                 <span style={{ fontSize: 13, color: "#666", marginLeft: 7, fontWeight: 600 }}>{main.unit ?? ""}</span>
               </div>
+              {!!profitAmount && (
+                <table style={{ borderCollapse: "collapse", marginTop: 6, fontFamily: MONO, fontSize: 10 }}>
+                  <tbody>
+                    {([
+                      ["Cost", fmt(run.values[main.key])],
+                      ["Profit", `+ ${fmt(profitAmount)}`],
+                      ["Quoted rate", fmt(saleRate)],
+                    ] as const).map(([lbl, v], ri) => (
+                      <tr key={lbl} style={ri === 2 ? { borderTop: "1px solid #999" } : undefined}>
+                        <td style={{ fontFamily: FONT, fontSize: 9, color: "#555", padding: "1px 14px 1px 0" }}>{lbl}</td>
+                        <td style={{
+                          textAlign: "right", fontVariantNumeric: "tabular-nums",
+                          fontWeight: ri === 2 ? 800 : 600, padding: "1px 0",
+                        }}>
+                          {v}<span style={{ fontSize: 8, color: "#777", marginLeft: 3 }}>{main.unit ?? ""}</span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
             </div>
           )}
 
           {rest.length > 0 && (
-            <div className="cxHalfGrid" style={{ borderTop: "1px solid #ddd", paddingTop: 14 }}>
-              {rest.map((o) => (
-                <div key={o.key}>
-                  <div style={{ fontSize: 9.5, color: "#666", marginBottom: 2 }}>{o.label || o.key}</div>
-                  <div style={{ fontFamily: MONO, fontSize: 13.5, fontWeight: 700, fontVariantNumeric: "tabular-nums" }}>
-                    {fmt(run.values[o.key])}
-                    <span style={{ fontSize: 9.5, color: "#777", marginLeft: 3 }}>{o.unit ?? ""}</span>
-                  </div>
+            <div className="cxCostBands" style={{ borderTop: "1px solid #ddd", paddingTop: 12 }}>
+              {costBands.map((b, bi) => (
+                <div key={bi} style={{ breakInside: "avoid" }}>
+                  {b.name && (
+                    <div style={{
+                      fontSize: 8.5, fontWeight: 800, letterSpacing: ".08em", textTransform: "uppercase",
+                      color: "#000", borderBottom: "1px solid #ccc", paddingBottom: 3, marginBottom: 5,
+                    }}>{b.name}</div>
+                  )}
+                  {b.rows.map((o) => (
+                    <div key={o.key} style={{
+                      display: "flex", justifyContent: "space-between", alignItems: "baseline",
+                      gap: 8, padding: "2px 0",
+                    }}>
+                      <span style={{ fontSize: 9, color: "#555" }}>{o.label || o.key}</span>
+                      <span style={{ fontFamily: MONO, fontSize: 10.5, fontWeight: 700, fontVariantNumeric: "tabular-nums", whiteSpace: "nowrap" }}>
+                        {fmt(run.values[o.key])}
+                        <span style={{ fontSize: 8, color: "#777", marginLeft: 2 }}>{o.unit ?? ""}</span>
+                      </span>
+                    </div>
+                  ))}
                 </div>
               ))}
             </div>
@@ -867,50 +959,110 @@ function PrintSheet({ kind, formula, title, run, outputs, primaryKey }: {
     );
   }
 
+  /* The cutting detail, for the machine. It used to be every step in the
+     formula with its expression printed beside it — `floor(rollInches /
+     (cutLength + cutAllowance))` and all — which ran to two pages and told the
+     man at the machine nothing he could act on. So the expressions come off
+     (they are still on screen under "How this was calculated", and in the
+     formula editor, which is where anyone checking the maths is standing) and
+     what is left prints in the blocks the formula was written in: the sizes he
+     is cutting to, then the cutting, then the rolls, then the buttons.
+
+     A formula with no groups on its steps falls back to one block, so nothing
+     that was never sectioned loses its working. */
+  /* A formula that bands its steps is saying which of them the floor needs to
+     read. The rest — a unit conversion, an exact figure that only exists to be
+     rounded, every line of the costing — are working, not instructions, and
+     they stay off the paper. They are all still on screen under "How this was
+     calculated", which is where anybody checking the arithmetic is standing.
+
+     A formula that bands nothing has not made that call, so it prints
+     everything under one heading, exactly as this sheet always did. */
+  const banded = run.steps.some((s) => s.kind === "step" && (s.group ?? "").trim());
+
+  const bands: { name: string; rows: StepResult[] }[] = [];
+  for (const s of run.steps) {
+    if (s.kind === "input") continue;          // sizes have their own band above
+    if (!isVisible(s, run.values)) continue;   // the branch nobody picked is all zeroes
+    if (banded && !(s.group ?? "").trim()) continue;
+    const name = (s.group ?? "").trim() || "Working";
+    const bucket = bands.find((b) => b.name === name);
+    if (bucket) bucket.rows.push(s);
+    else bands.push({ name, rows: [s] });
+  }
+
+  /* The sizes band: the first block of inputs the formula was written in —
+     the bag's own dimensions. The later blocks are rates and order figures the
+     man at the machine is not cutting to, and every one of them he has to read
+     past is a line between him and the size that matters. What he does need
+     off them comes back as an answer in the bands below: not "stock widths
+     sold", but "roll width used = 58in".
+
+     A formula with no groups has one block, so it prints every input, which is
+     what this sheet always did. */
+  const firstGroup = (formula.inputs[0]?.group ?? "").trim();
+  const sizeKeys = new Set(
+    formula.inputs
+      .filter((i) => isVisible(i, run.values) && (i.group ?? "").trim() === firstGroup)
+      .map((i) => i.key),
+  );
+  const typed = run.steps.filter((s) => s.kind === "input" && sizeKeys.has(s.key));
+  /* A choice prints as what was picked, not as the index behind it. */
+  const optionText = (key: string, v: unknown) => {
+    const opts = formula.inputs.find((i) => i.key === key)?.options;
+    return opts?.length && typeof v === "number" ? (opts[v] ?? fmt(v)) : fmt(v);
+  };
+
   return (
     <div className="cxPrint">
       <div style={{ fontFamily: FONT, color: "#000", background: "#fff", padding: "16px 20px" }}>
-        <div style={{ borderBottom: "2px solid #000", paddingBottom: 10, marginBottom: 16 }}>
+        <div style={{ borderBottom: "2px solid #000", paddingBottom: 10, marginBottom: 14 }}>
           <div style={{ fontSize: 20, fontWeight: 800 }}>{title}</div>
           <div style={{ fontSize: 11, color: "#555", marginTop: 4 }}>
             Working sheet — cutting detail · {formula.category} · {formula.name} · v{formula.version} · {today()}
           </div>
         </div>
 
-        <SheetTitle>Step by step</SheetTitle>
-        <table style={{ width: "100%", borderCollapse: "collapse", marginBottom: 20 }}>
-          <thead>
-            <tr>
-              <th style={P_TH}>Step</th>
-              <th style={P_TH}>How</th>
-              <th style={{ ...P_TH, textAlign: "right" }}>Value</th>
-              <th style={P_TH}>Unit</th>
-            </tr>
-          </thead>
-          <tbody>
-            {run.steps.map((s) => (
-              <tr key={s.key}>
-                <td style={P_TD}>{s.label}</td>
-                <td style={{ ...P_TD, fontFamily: MONO, fontSize: 10.5, color: "#555" }}>{s.expression}</td>
-                <td style={P_NUM}>{s.error ? "error" : fmt(s.value)}</td>
-                <td style={{ ...P_TD, width: 60, color: "#666" }}>{s.unit ?? ""}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+        {/* Sizes first, across the top, because it is the one band the man at
+            the machine checks before he starts and nothing else matters if it
+            is wrong. */}
+        {typed.length > 0 && (
+          <>
+            <SheetTitle>{firstGroup || "Sizes"}</SheetTitle>
+            <div className="cxSheetGrid" style={{ marginBottom: 18 }}>
+              {typed.map((s) => (
+                <div key={s.key} style={{ borderBottom: "1px solid #e2e2e2", padding: "5px 0" }}>
+                  <div style={{ fontSize: 9.5, color: "#666" }}>{s.label}</div>
+                  <div style={{ fontFamily: MONO, fontSize: 13, fontWeight: 700, fontVariantNumeric: "tabular-nums" }}>
+                    {optionText(s.key, s.value)}
+                    <span style={{ fontSize: 9.5, color: "#777", marginLeft: 3 }}>{s.unit ?? ""}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </>
+        )}
 
-        <SheetTitle>Key numbers</SheetTitle>
-        <table style={{ width: "100%", borderCollapse: "collapse" }}>
-          <tbody>
-            {outputs.map((o) => (
-              <tr key={o.key}>
-                <td style={P_TD}>{o.label || o.key}</td>
-                <td style={{ ...P_NUM, fontWeight: 700 }}>{fmt(run.values[o.key])}</td>
-                <td style={{ ...P_TD, width: 70, color: "#666" }}>{o.unit ?? ""}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+        {/* Then a block per section — cutting, rolls, buttons — each short
+            enough to read standing up. */}
+        <div className="cxSheetBands">
+          {bands.map((b) => (
+            <div key={b.name} style={{ breakInside: "avoid" }}>
+              <SheetTitle>{b.name}</SheetTitle>
+              <table style={{ width: "100%", borderCollapse: "collapse", marginBottom: 16 }}>
+                <tbody>
+                  {b.rows.map((s) => (
+                    <tr key={s.key}>
+                      <td style={P_TD}>{s.label}</td>
+                      <td style={{ ...P_NUM, fontWeight: 700 }}>{s.error ? "error" : fmt(s.value)}</td>
+                      <td style={{ ...P_TD, width: 46, color: "#666", fontSize: 10.5 }}>{s.unit ?? ""}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );

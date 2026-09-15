@@ -370,8 +370,8 @@ model SalesInvoice {
   // PENDING_SYNC retry bookkeeping. A capped counter, not unlimited — see
   // app/api/cron/fbr-retry, which gives up and falls to FAILED past the cap
   // rather than retrying a filing that will never go through forever.
-  fbrRetryCount  Int       @default(0)
-  fbrLastRetryAt DateTime?
+  fbrRetryCount    Int       @default(0)
+  fbrLastRetryAt   DateTime?
 
   createdAt DateTime  @default(now())
   deletedAt DateTime?
@@ -898,7 +898,7 @@ model BankAccount {
   companyId String
   company   Company @relation(fields: [companyId], references: [id])
 
-  accountNo       String               @unique
+  accountNo       String
   bankName        String
   accountName     String
   balance         Float                @default(0)
@@ -919,6 +919,7 @@ model BankAccount {
   deletedAt DateTime?
   deletedBy String?
 
+  @@unique([companyId, accountNo])
   @@index([companyId])
 }
 
@@ -961,7 +962,7 @@ model PaymentReceipt {
   costCenterId String?
   costCenter   CostCenter? @relation(fields: [costCenterId], references: [id])
 
-  receiptNo       String    @unique
+  receiptNo       String
   date            DateTime
   amount          Float
   paymentMode     String // CASH | CHECK | BANK_TRANSFER
@@ -979,6 +980,8 @@ model PaymentReceipt {
   createdAt       DateTime  @default(now())
   deletedAt       DateTime?
   deletedBy       String?
+
+  @@unique([companyId, receiptNo])
 }
 
 model ExpenseVoucher {
@@ -990,7 +993,7 @@ model ExpenseVoucher {
   costCenterId String?
   costCenter   CostCenter? @relation(fields: [costCenterId], references: [id])
 
-  voucherNo        String              @unique
+  voucherNo        String
   date             DateTime
   description      String
   totalAmount      Float
@@ -1008,6 +1011,7 @@ model ExpenseVoucher {
   deletedAt        DateTime?
   deletedBy        String?
 
+  @@unique([companyId, voucherNo])
   @@index([companyId, deletedAt, date])
   @@index([companyId, costCenterId, deletedAt, date])
 }
@@ -1050,7 +1054,7 @@ model TaxConfiguration {
   company   Company @relation(fields: [companyId], references: [id])
 
   taxType          String // GST | VAT | INCOME_TAX | SALES_TAX
-  taxCode          String            @unique
+  taxCode          String
   taxRate          Float
   description      String?
   isActive         Boolean           @default(true)
@@ -1059,6 +1063,8 @@ model TaxConfiguration {
   salesInvoices    SalesInvoice[]    @relation("SalesTax")
   purchaseInvoices PurchaseInvoice[] @relation("PurchaseTax")
   createdAt        DateTime          @default(now())
+
+  @@unique([companyId, taxCode])
 }
 
 model TaxAccount {
@@ -1263,7 +1269,7 @@ model Currency {
   companyId String
   company   Company @relation(fields: [companyId], references: [id])
 
-  code         String   @unique // USD, EUR, GBP, PKR, etc.
+  code         String // USD, EUR, GBP, PKR, etc.
   name         String
   symbol       String
   isActive     Boolean  @default(true)
@@ -1273,6 +1279,7 @@ model Currency {
 
   transactions CurrencyTransaction[]
 
+  @@unique([companyId, code])
   @@index([code, isActive])
 }
 
@@ -1686,7 +1693,7 @@ model DeliveryChallan {
   costCenterId String?
   costCenter   CostCenter? @relation(fields: [costCenterId], references: [id])
 
-  challanNo String   @unique
+  challanNo String
   date      DateTime
 
   customerId String
@@ -1734,6 +1741,8 @@ model DeliveryChallan {
   approvalRemarks String?
 
   createdAt DateTime @default(now())
+
+  @@unique([companyId, challanNo])
 }
 
 model DeliveryChallanItem {
@@ -1758,7 +1767,7 @@ model AdvancePayment {
   companyId String
   company   Company @relation(fields: [companyId], references: [id])
 
-  advanceNo      String   @unique
+  advanceNo      String
   date           DateTime
   amount         Float
   adjustedAmount Float    @default(0)
@@ -1774,6 +1783,8 @@ model AdvancePayment {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@unique([companyId, advanceNo])
 }
 
 model AdvanceAdjustment {

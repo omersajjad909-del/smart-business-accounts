@@ -1043,8 +1043,8 @@ function SalesInvoiceContent() {
 
           /* Portrait, stated outright: a bill is a portrait document, and
              this page shares its @page with whatever else the app declares.
-             The document prints "Powered by FinovaOS" at its own foot, so no
-             bottom margin is reserved for the page footer. */
+             Nothing is printed at the foot of the sheet any more, so the
+             bottom margin is the printer's, not a reservation. */
           @page { size: A4 portrait; margin: 8mm 10mm; }
         }
         @media screen { .print-area { display: none; } }
@@ -1740,7 +1740,6 @@ function SalesInvoiceContent() {
           <div style={{ textAlign: "center", fontSize: 9, borderTop: "1px dashed #000", paddingTop: 6, marginBottom: 4 }}>
             {printPrefs.footerNote || "Thank you for your business!"}
           </div>
-          <div style={{ textAlign: "center", fontSize: 8, color: "#999" }}>Powered by <b>FinovaOS</b></div>
         </div>
       )}
     </>

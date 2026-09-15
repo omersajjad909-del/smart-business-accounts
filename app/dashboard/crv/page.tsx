@@ -100,7 +100,6 @@ function printReceipt(entry: EntryRow, voucherNo: string, date: string, mode: st
   <div class="row bold" style="font-size:14px"><span>Amount</span><span>${cur} ${fmt(Number(entry.amount))}</span></div>
   <div class="line"></div>
   ${entry.narration ? `<div style="font-size:11px;margin-top:6px">Narration: ${entry.narration}</div>` : ""}
-  <div style="margin-top:20px;text-align:center;font-size:9px">Powered by FinovaOS</div>
   </body></html>`);
   w.document.close();
   // about:blank inherits this page's CSP, so an inline onclick/<script> here is

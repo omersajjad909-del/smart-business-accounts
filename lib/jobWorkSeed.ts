@@ -25,6 +25,7 @@
  * for the receipt to compare against later.
  */
 
+import { isVisible } from "@/lib/formulaEngine";
 import type { CostingFormula, FormulaRun } from "@/lib/formulaEngine";
 
 /** Charges named in money units read as conversion cost, not material. */
@@ -64,6 +65,25 @@ export type JobWorkSeed = {
   wastePerBatch: number | null;
   /** Order size, when the formula was run against one. */
   orderQty: number | null;
+  /**
+   * The other materials the order eats — buttons, tape, thread.
+   *
+   * The challan used to open with one line, because the module was built
+   * around the one standard a formula turns on. A bag is not one material: it
+   * is a roll and twenty thousand buttons, and the store was left to multiply
+   * the second one out by hand against a piece count it had to remember.
+   */
+  consumables: JobWorkConsumable[];
+};
+
+export type JobWorkConsumable = {
+  key: string;
+  label: string;
+  unit?: string;
+  /** What the whole order consumes — 20,000 buttons. */
+  forOrder: number;
+  /** Per finished piece, so the line follows a changed piece count. */
+  perPc: number | null;
 };
 
 /** What one order needs, in whole units of material and the part left over. */
@@ -158,11 +178,30 @@ export function buildJobWorkSeed(
     }
   }
 
+  /* Only the branch the run actually took. A bag fastened with buttons must
+     not seed a tape line reading zero — the whole point of the challan opening
+     pre-filled is that what it opens on can be trusted. */
+  const consumables: JobWorkConsumable[] = [];
+  for (const output of formula.outputs) {
+    if (output.role !== "consumable_qty" || !output.key) continue;
+    if (!isVisible(output, run.values)) continue;
+    const value = numberFor(output.key);
+    if (value == null || value <= 0) continue;
+    consumables.push({
+      key: output.key,
+      label: output.label || output.key,
+      unit: output.unit,
+      forOrder: r4(value),
+      perPc: orderQty && orderQty > 0 ? r4(value / orderQty) : null,
+    });
+  }
+
   return {
     formulaId,
     formulaName: formula.name,
     formulaVersion: formula.version,
     unitsPerBatch,
+    consumables,
     stdPerPc: r4(1 / unitsPerBatch),
     costPerUnit: byRole("cost_per_unit"),
     costPerBatch: byRole("cost_per_batch"),
@@ -186,5 +225,8 @@ export function jobWorkHrefFrom(seed: JobWorkSeed | null): string {
   if (seed.costPerUnit != null) qs.set("costPerUnit", String(seed.costPerUnit));
   if (seed.costPerBatch != null) qs.set("costPerBatch", String(seed.costPerBatch));
   if (seed.wastePerBatch != null) qs.set("wastePerBatch", String(seed.wastePerBatch));
+  // One parameter rather than a numbered set: the list is short, and a shape
+  // the other side parses in one go cannot half-arrive.
+  if (seed.consumables.length) qs.set("consumables", JSON.stringify(seed.consumables));
   return `/dashboard/job-work?${qs.toString()}`;
 }

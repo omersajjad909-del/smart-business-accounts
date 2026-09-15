@@ -30,6 +30,9 @@ import {
   overriddenKeys,
   resolvePrintProfile,
   resetDoc,
+  setBaseDesign,
+  setBaseField,
+  setBaseFooterNote,
   setDocDesign,
   setDocField,
   setDocFooterNote,
@@ -87,7 +90,10 @@ export default function PrintPreferencesPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [dirty, setDirty] = useState(false);
-  const [doc, setDoc] = useState<DocKind>("sales_invoice");
+  // "base" is the row every document inherits from. It has to be editable here,
+  // or "Reset to base" resets to something nobody can reach and the only way to
+  // change a setting everywhere is to change it seven times.
+  const [sel, setSel] = useState<DocKind | "base">("base");
   const [profiles, setProfiles] = useState<PrintProfiles>(DEFAULT_PRINT_PROFILES);
   const [company, setCompany] = useState<CompanyBits>({ name: "Your Company" });
 
@@ -119,11 +125,23 @@ export default function PrintPreferencesPage() {
     return () => { cancelled = true; };
   }, []);
 
-  const resolved = useMemo(() => resolvePrintProfile(profiles, doc), [profiles, doc]);
-  const overrides = useMemo(() => overriddenKeys(profiles, doc), [profiles, doc]);
+  const isBase = sel === "base";
+  /** The document being edited. On the base row, the sales invoice stands in for the preview. */
+  const doc = (isBase ? "sales_invoice" : sel) as DocKind;
+
+  const resolved = useMemo(
+    () => (isBase ? profiles.base : resolvePrintProfile(profiles, doc)),
+    [isBase, profiles, doc],
+  );
+  const overrides = useMemo(
+    () => (isBase ? [] : overriddenKeys(profiles, doc)),
+    [isBase, profiles, doc],
+  );
   const overrideSet = useMemo(() => new Set(overrides), [overrides]);
 
-  const partyWord = docPartyWord(doc);
+  // The base applies to documents on both sides of a trade, so it cannot call
+  // the other party either one of them.
+  const partyWord = isBase ? "Customer / Supplier" : docPartyWord(doc);
 
   function update(next: PrintProfiles) {
     setProfiles(next);
@@ -160,8 +178,8 @@ export default function PrintPreferencesPage() {
         <div>
           <h1 style={{ fontSize: 22, fontWeight: 700, margin: "0 0 3px" }}>Print Preferences</h1>
           <p style={{ margin: 0, fontSize: 13, color: MUTED, maxWidth: "62ch" }}>
-            Har document apni setting rakhta hai. Jo aap yahan nahi chhedte, wo{" "}
-            <b>All documents</b> se chalta rahega.
+            Every document keeps its own settings. Anything you leave alone here
+            follows <b>All documents</b>.
           </p>
         </div>
         <button
@@ -187,8 +205,29 @@ export default function PrintPreferencesPage() {
           <div style={{ padding: "11px 14px", borderBottom: `1px solid ${BORDER}`, fontSize: 11, letterSpacing: 0.7, textTransform: "uppercase", color: MUTED }}>
             Document
           </div>
+
+          {/* The row everything else inherits from. First in the list because
+              it is where a company sets its house style once, and each document
+              below only departs from it where it has to. */}
+          <div
+            id="pp-doc-base"
+            role="button"
+            tabIndex={0}
+            onClick={() => setSel("base")}
+            onKeyDown={e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setSel("base"); } }}
+            style={{
+              padding: "11px 14px", cursor: "pointer",
+              borderBottom: `1px solid ${BORDER}`,
+              borderLeft: `3px solid ${isBase ? ACCENT : "transparent"}`,
+              background: isBase ? "rgba(99,102,241,0.10)" : "transparent",
+            }}
+          >
+            <div style={{ fontSize: 13.5, fontWeight: isBase ? 700 : 500 }}>All documents</div>
+            <div style={{ fontSize: 11, color: MUTED, marginTop: 1 }}>The starting point for all seven</div>
+          </div>
+
           {DOC_KINDS.map(d => {
-            const active = d.id === doc;
+            const active = d.id === sel;
             const n = overriddenKeys(profiles, d.id).length;
             return (
               <div
@@ -196,8 +235,8 @@ export default function PrintPreferencesPage() {
                 id={`pp-doc-${d.id}`}
                 role="button"
                 tabIndex={0}
-                onClick={() => setDoc(d.id)}
-                onKeyDown={e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setDoc(d.id); } }}
+                onClick={() => setSel(d.id)}
+                onKeyDown={e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setSel(d.id); } }}
                 style={{
                   padding: "11px 14px", cursor: "pointer",
                   borderBottom: `1px solid ${BORDER}`,
@@ -209,7 +248,7 @@ export default function PrintPreferencesPage() {
                 <span style={{ fontSize: 13.5, fontWeight: active ? 700 : 500 }}>{d.label}</span>
                 {n > 0 && (
                   <span
-                    title={`${n} setting${n > 1 ? "s" : ""} is document ke liye alag hai`}
+                    title={`${n} setting${n > 1 ? "s" : ""} set just for this document`}
                     style={{ fontSize: 10.5, fontWeight: 700, color: "#b45309", background: "rgba(245,158,11,0.16)", padding: "1px 6px", borderRadius: 5 }}
                   >
                     {n}
@@ -219,7 +258,7 @@ export default function PrintPreferencesPage() {
             );
           })}
           <div style={{ padding: "11px 14px", fontSize: 11.5, color: MUTED, lineHeight: 1.5 }}>
-            Number batata hai ke us document ki kitni settings base se alag hain.
+            The number counts how many settings that document keeps of its own.
           </div>
         </div>
 
@@ -230,10 +269,10 @@ export default function PrintPreferencesPage() {
           <section style={{ background: PANEL, border: `1px solid ${BORDER}`, borderRadius: 12, padding: "16px 18px", display: "flex", flexDirection: "column", gap: 14 }}>
             <div>
               <h2 style={{ fontSize: 15.5, fontWeight: 700, margin: "0 0 3px" }}>
-                {docKindLabel(doc)} — kya kya chhape
+                {isBase ? "All documents" : docKindLabel(doc)} — what prints
               </h2>
               <p style={{ margin: 0, fontSize: 12.5, color: MUTED }}>
-                Dono taraf ki information alag alag: aap ki apni, aur {partyWord.toLowerCase()} ki.
+                Each side is set separately — your own details, and the {partyWord.toLowerCase()}&apos;s.
               </p>
             </div>
 
@@ -249,20 +288,22 @@ export default function PrintPreferencesPage() {
                     return (
                       <label
                         key={item.key}
-                        htmlFor={`pp-${doc}-${item.key}`}
+                        htmlFor={`pp-${sel}-${item.key}`}
                         style={{ display: "flex", alignItems: "flex-start", gap: 8, cursor: "pointer", fontSize: 13 }}
                       >
                         <input
-                          id={`pp-${doc}-${item.key}`}
+                          id={`pp-${sel}-${item.key}`}
                           type="checkbox"
                           checked={checked}
-                          onChange={e => update(setDocField(profiles, doc, item.key as PrintFieldKey, e.target.checked))}
+                          onChange={e => update(isBase
+                            ? setBaseField(profiles, item.key as PrintFieldKey, e.target.checked)
+                            : setDocField(profiles, doc, item.key as PrintFieldKey, e.target.checked))}
                           style={{ marginTop: 2, accentColor: ACCENT, width: 15, height: 15, flex: "none" }}
                         />
                         <span style={{ minWidth: 0 }}>
                           <span style={{ color: checked ? TEXT : MUTED }}>{item.label}</span>
                           {isOverride && (
-                            <span style={{ fontSize: 10, color: "#b45309", marginLeft: 6, whiteSpace: "nowrap" }}>alag</span>
+                            <span style={{ fontSize: 10, color: "#b45309", marginLeft: 6, whiteSpace: "nowrap" }}>custom</span>
                           )}
                           {item.hint && (
                             <span style={{ display: "block", fontSize: 11, color: MUTED, lineHeight: 1.4 }}>{item.hint}</span>
@@ -277,13 +318,13 @@ export default function PrintPreferencesPage() {
 
             <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr auto", gap: 12, alignItems: "end" }}>
               <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
-                <label htmlFor={`pp-${doc}-footer`} style={{ fontSize: 11, letterSpacing: 0.6, textTransform: "uppercase", color: MUTED }}>
+                <label htmlFor={`pp-${sel}-footer`} style={{ fontSize: 11, letterSpacing: 0.6, textTransform: "uppercase", color: MUTED }}>
                   Footer note
                 </label>
                 <input
-                  id={`pp-${doc}-footer`}
+                  id={`pp-${sel}-footer`}
                   value={resolved.footerNote}
-                  onChange={e => update(setDocFooterNote(profiles, doc, e.target.value))}
+                  onChange={e => update(isBase ? setBaseFooterNote(profiles, e.target.value) : setDocFooterNote(profiles, doc, e.target.value))}
                   placeholder="Thank you for your business."
                   style={{
                     padding: "9px 12px", borderRadius: 8, border: `1.5px solid ${BORDER}`,
@@ -293,14 +334,16 @@ export default function PrintPreferencesPage() {
               </div>
               <button
                 onClick={() => update(resetDoc(profiles, doc))}
-                disabled={overrides.length === 0}
+                disabled={isBase || overrides.length === 0}
+                title={isBase ? "This is the base — the documents reset to it." : undefined}
                 style={{
                   padding: "9px 14px", borderRadius: 8, border: `1px solid ${BORDER}`,
                   background: "transparent",
-                  color: overrides.length === 0 ? MUTED : TEXT,
+                  color: isBase || overrides.length === 0 ? MUTED : TEXT,
                   fontFamily: FONT, fontSize: 12.5,
-                  cursor: overrides.length === 0 ? "default" : "pointer",
+                  cursor: isBase || overrides.length === 0 ? "default" : "pointer",
                   whiteSpace: "nowrap",
+                  visibility: isBase ? "hidden" : "visible",
                 }}
               >
                 Reset to base
@@ -313,8 +356,8 @@ export default function PrintPreferencesPage() {
             <div>
               <h2 style={{ fontSize: 15.5, fontWeight: 700, margin: "0 0 3px" }}>Design</h2>
               <p style={{ margin: 0, fontSize: 12.5, color: MUTED }}>
-                Har design ka apna layout hai — letterhead, party block, grid aur totals sab badalte hain.
-                Column order aur width har design me aik jaisi rehti hai.
+                Every design has its own layout — letterhead, party block, grid and totals all change.
+                Column order and widths stay the same in all of them.
               </p>
             </div>
             <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(auto-fill, minmax(190px, 1fr))", gap: 10 }}>
@@ -326,8 +369,8 @@ export default function PrintPreferencesPage() {
                     id={`pp-design-${d.id}`}
                     role="button"
                     tabIndex={0}
-                    onClick={() => update(setDocDesign(profiles, doc, d.id as PrintDesignId))}
-                    onKeyDown={e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); update(setDocDesign(profiles, doc, d.id as PrintDesignId)); } }}
+                    onClick={() => update(isBase ? setBaseDesign(profiles, d.id as PrintDesignId) : setDocDesign(profiles, doc, d.id as PrintDesignId))}
+                    onKeyDown={e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); update(isBase ? setBaseDesign(profiles, d.id as PrintDesignId) : setDocDesign(profiles, doc, d.id as PrintDesignId)); } }}
                     style={{
                       border: `1.5px solid ${active ? ACCENT : BORDER}`,
                       background: active ? "rgba(99,102,241,0.08)" : "transparent",
@@ -354,7 +397,7 @@ export default function PrintPreferencesPage() {
             <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: 12, flexWrap: "wrap" }}>
               <h2 style={{ fontSize: 15.5, fontWeight: 700, margin: 0 }}>Preview</h2>
               <span style={{ fontSize: 11.5, color: MUTED }}>
-                Sample data · A4 210×297mm · bilkul wahi jo {docKindLabel(doc)} par chhapega
+                Sample data · A4 210×297mm · exactly what a {isBase ? "document" : docKindLabel(doc)} will print
               </span>
             </div>
             <div style={{ border: `1px solid ${BORDER}`, borderRadius: 12, overflow: "hidden" }}>
@@ -505,12 +548,45 @@ function DesignThumb({ design }: { design: string }) {
         )}
       </div>
 
+      {/* amount in words + terms */}
+      {d.footer === "boxed" ? (
+        <div style={{ border: `1px solid ${line}`, borderRadius: 2, padding: 2, display: "flex", flexDirection: "column", gap: 1.5 }}>
+          {bar("74%", 1.5)}{bar("58%", 1.5)}
+        </div>
+      ) : d.footer === "quiet" ? (
+        <div style={{ display: "flex", flexDirection: "column", gap: 1.5 }}>{bar("52%", 1.5)}</div>
+      ) : (
+        <div style={{ display: "flex", flexDirection: "column", gap: 1.5 }}>{bar("74%", 1.5)}{bar("58%", 1.5)}</div>
+      )}
+
       {/* signatures */}
       <div style={{ display: "flex", justifyContent: d.signatures === "three" ? "space-between" : "flex-end", gap: 5 }}>
         {Array.from({ length: d.signatures === "three" ? 3 : d.signatures === "two_right" ? 2 : 1 }).map((_, i) => (
           <div key={i} style={{ width: d.signatures === "three" ? "30%" : "26%", borderTop: `1px solid ${solid}`, height: 0 }} />
         ))}
       </div>
+
+      {/* how the sheet closes */}
+      {d.footer === "band" && (
+        <div style={{ margin: -7, marginTop: 2, padding: "3px 7px", background: "#334155", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          {bar("34%", 2, "#e2e8f0")}{bar("20%", 2, "#94a3b8")}
+        </div>
+      )}
+      {d.footer === "split" && (
+        <div style={{ borderTop: `1px solid ${line}`, paddingTop: 2, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          {bar("34%", 2)}{bar("20%", 2)}
+        </div>
+      )}
+      {d.footer === "quiet" && (
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          {bar("26%", 2)}{bar("20%", 2)}
+        </div>
+      )}
+      {(d.footer === "centered" || d.footer === "boxed") && (
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 1.5 }}>
+          {bar("40%", 2)}{bar("24%", 2)}
+        </div>
+      )}
     </div>
   );
 }

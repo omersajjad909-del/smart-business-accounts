@@ -15,6 +15,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { resolveCompanyId } from "@/lib/tenant";
 import { ensureAccount, LABOUR_ACCOUNTS } from "@/lib/manufacturingPosting";
+import { nextDocNo } from "@/lib/docNumber";
 
 export async function GET(req: NextRequest) {
   try {
@@ -60,8 +61,18 @@ export async function POST(req: NextRequest) {
     const ratePerUnit = Number.isFinite(ratePer1000) && ratePer1000 > 0 ? ratePer1000 / 1000 : 0;
     const phone = String(body?.phone || "").trim();
 
-    const count = await prisma.businessRecord.count({ where: { companyId, category: "labour" } });
-    const code = `L-${String(count + 1).padStart(4, "0")}`;
+    // One past the highest issued, not a row count — see lib/docNumber.ts.
+    // A labour code lives inside the record's JSON, not in a column of its
+    // own, so the codes are read out of there before the highest is taken.
+    const issued = await prisma.businessRecord.findMany({
+      where: { companyId, category: "labour" },
+      select: { data: true },
+    });
+    const code = nextDocNo(
+      issued.map((r) => ({ code: (r.data as { code?: string } | null)?.code })),
+      "code",
+      "L-",
+    );
 
     const parent = await ensureAccount(prisma, companyId, LABOUR_ACCOUNTS.PAYABLE_PARENT);
     const accountId = await ensureAccount(prisma, companyId, {

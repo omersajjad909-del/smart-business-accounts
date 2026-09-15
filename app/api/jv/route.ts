@@ -3,6 +3,7 @@ import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 
 import { resolveCompanyId, resolveBranchId, resolveBranchIdOrDefault } from "@/lib/tenant";
+import { nextDocNo } from "@/lib/docNumber";
 // GET - List all JVs
 export async function GET(req: NextRequest) {
   try {
@@ -148,9 +149,14 @@ export async function POST(req: Request) {
       );
     }
 
-    // Generate voucher number
-    const count = await prisma.voucher.count({ where: { type: "JV", companyId, ...(branchId ? { branchId } : {}) } });
-    const voucherNo = `JV-${count + 1}`;
+    // One past the highest issued, not a row count — see lib/docNumber.ts.
+    // Numbering stays company-wide even when a branch is set: two branches
+    // issuing JV-7 apiece is the duplicate this is here to stop.
+    const issued = await prisma.voucher.findMany({
+      where: { type: "JV", companyId },
+      select: { voucherNo: true },
+    });
+    const voucherNo = nextDocNo(issued, "voucherNo", "JV-");
 
     // Create voucher with entries in transaction
     const result = await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
