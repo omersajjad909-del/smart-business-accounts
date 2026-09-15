@@ -112,6 +112,7 @@ const API_PATH_TO_PAGE: Array<[string, string]> = [
   ["/api/admin/leads", "leads"],
   ["/api/admin/broadcasts", "broadcasts"],
   ["/api/admin/newsletter", "newsletter"],
+  ["/api/admin/waitlist", "waitlist"],
   ["/api/admin/social", "social"],
   ["/api/admin/feedback", "feedback"],
   ["/api/admin/testimonials", "testimonials"],

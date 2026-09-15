@@ -1,8 +1,48 @@
 "use client";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
+import ComingSoonSubscribe from "@/components/ComingSoonSubscribe";
 
 /* ══════════════════════════════════════════════════════════
+   ACTIVE PAGE — coming soon
+   (Full careers page content is kept below, in LegacyCareersPage,
+   unused for now. Restore by making it the default export again.)
+══════════════════════════════════════════════════════════ */
+export default function CareersPage() {
+  return (
+    <main style={{
+      minHeight:"100vh",
+      background:"linear-gradient(160deg,#080c1e 0%,#0c0f2e 50%,#080c1e 100%)",
+      color:"white",
+      fontFamily:"'DM Sans','Outfit',system-ui,sans-serif",
+      display:"flex", alignItems:"center", justifyContent:"center",
+      padding:"24px", textAlign:"center",
+    }}>
+      <div style={{ maxWidth:560 }}>
+        <div style={{ display:"inline-flex", alignItems:"center", gap:8, padding:"6px 16px", borderRadius:24, background:"rgba(99,102,241,.1)", border:"1px solid rgba(99,102,241,.25)", marginBottom:24 }}>
+          <span style={{ fontSize:12, fontWeight:800, color:"#818cf8", letterSpacing:".06em" }}>CAREERS</span>
+        </div>
+        <h1 style={{ fontSize:"clamp(32px,6vw,52px)", fontWeight:900, letterSpacing:"-.03em", lineHeight:1.15, fontFamily:"Lora,Georgia,serif", margin:"0 0 20px" }}>
+          Coming soon
+        </h1>
+        <p style={{ fontSize:15, color:"rgba(255,255,255,.5)", lineHeight:1.75, margin:"0 auto 24px" }}>
+          We're not actively hiring right now. Leave your email and we'll let you know the moment roles open up.
+        </p>
+        <ComingSoonSubscribe list="careers" />
+        <div style={{ marginTop:24 }}>
+          <a href="https://mail.google.com/mail/?view=cm&fs=1&to=partnerships@finovaos.app" style={{ fontSize:13, color:"rgba(255,255,255,.4)", textDecoration:"underline" }}>
+            Or send a speculative application to partnerships@finovaos.app
+          </a>
+        </div>
+      </div>
+    </main>
+  );
+}
+
+/* ══════════════════════════════════════════════════════════
+   HIDDEN — full careers page, kept for when hiring resumes.
+   Not exported, not rendered.
+══════════════════════════════════════════════════════════
    DATA
 ══════════════════════════════════════════════════════════ */
 const STATS = [
@@ -33,7 +73,6 @@ const DEPARTMENTS = [
   { id:"support",     label:"Customer Success" },
 ];
 
-/* Hidden — not currently hiring. Kept for when we resume posting roles.
 const JOBS = [
   {
     id:"1", title:"Senior Backend Engineer",     dept:"engineering",  location:"Remote · Worldwide",   type:"Full-time",   level:"Senior",
@@ -144,11 +183,6 @@ const JOBS = [
     posted:"1 week ago", color:"#f9a8d4",
   },
 ];
-*/
-const JOBS: {
-  id:string; title:string; dept:string; location:string; type:string; level:string;
-  desc:string; tags:string[]; posted:string; color:string;
-}[] = [];
 
 const PROCESS = [
   { step:"01", title:"Apply Online",       desc:"Submit your CV and a short note on why FinovaOS. No cover letter essays — just be genuine.",   icon:"📋", color:"#818cf8" },
@@ -202,7 +236,7 @@ function SectionLabel({ text }: { text: string }) {
 /* ══════════════════════════════════════════════════════════
    MAIN PAGE
 ══════════════════════════════════════════════════════════ */
-export default function CareersPage() {
+function LegacyCareersPage() {
   const [heroVis,    setHeroVis]    = useState(false);
   const [activeDept, setActiveDept] = useState("all");
   const [search,     setSearch]     = useState("");
