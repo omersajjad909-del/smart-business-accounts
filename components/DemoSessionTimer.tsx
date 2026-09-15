@@ -26,6 +26,29 @@ export default function DemoSessionTimer() {
   const [now, setNow] = useState(() => Date.now());
   const [ending, setEnding] = useState(false);
   const [confirmEnd, setConfirmEnd] = useState(false);
+  const [confirmClear, setConfirmClear] = useState(false);
+  const [clearing, setClearing] = useState(false);
+  const [clearError, setClearError] = useState("");
+
+  /* Empties the workspace and stays in it. The session, its cookie and its
+     remaining time are untouched — only what is inside the company goes. */
+  async function clearDemo() {
+    if (clearing) return;
+    setClearing(true);
+    setClearError("");
+    try {
+      const res = await fetch("/api/demo/clear", { method: "POST" });
+      const body = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(body?.error || "Could not clear the workspace.");
+      // A full reload rather than a refetch: every screen in the app is now
+      // holding rows that no longer exist, and there is no cheaper way to be
+      // sure none of them is still showing one.
+      window.location.reload();
+    } catch (e) {
+      setClearError(e instanceof Error ? e.message : "Could not clear the workspace.");
+      setClearing(false);
+    }
+  }
 
   useEffect(() => {
     setSession(readDemoCookie());
@@ -91,19 +114,92 @@ export default function DemoSessionTimer() {
             {pad(mins)}:{pad(secs)}
           </div>
         </div>
+        {/* Two different things, so two buttons. Clear empties the workspace
+            and leaves the visitor in it — the common case, somebody who has
+            filled it with trial entries and wants a clean sheet without
+            starting the tour again. End destroys the sandbox and signs out. */}
+        <button
+          onClick={() => setConfirmClear(true)}
+          disabled={ending || clearing}
+          title="Delete everything in this demo workspace and start fresh, without ending the session"
+          style={{
+            padding: "7px 10px", borderRadius: 10,
+            background: "rgba(255,255,255,.08)", border: "1px solid rgba(255,255,255,.12)",
+            color: "white", cursor: ending || clearing ? "not-allowed" : "pointer",
+            fontSize: 11, fontWeight: 700, fontFamily: FONT, whiteSpace: "nowrap",
+          }}
+        >
+          {clearing ? "Clearing…" : "Clear"}
+        </button>
         <button
           onClick={() => setConfirmEnd(true)}
-          disabled={ending}
+          disabled={ending || clearing}
           style={{
             padding: "7px 12px", borderRadius: 10,
             background: "rgba(255,255,255,.08)", border: "1px solid rgba(255,255,255,.12)",
-            color: "white", cursor: ending ? "not-allowed" : "pointer",
+            color: "white", cursor: ending || clearing ? "not-allowed" : "pointer",
             fontSize: 11, fontWeight: 700, fontFamily: FONT,
           }}
         >
           End
         </button>
       </div>
+
+      {confirmClear && (
+        <div
+          onClick={() => !clearing && setConfirmClear(false)}
+          style={{
+            position: "fixed", inset: 0, zIndex: 9999, background: "rgba(4,6,20,.75)",
+            backdropFilter: "blur(6px)", display: "flex", alignItems: "center",
+            justifyContent: "center", padding: 20, fontFamily: FONT,
+          }}
+        >
+          <div
+            onClick={e => e.stopPropagation()}
+            style={{
+              maxWidth: 400, width: "100%", background: "linear-gradient(160deg,#0b0e28,#0a0d24)",
+              border: "1px solid rgba(251,191,36,.3)", borderRadius: 20, padding: 24, color: "white",
+            }}
+          >
+            <div style={{ fontSize: 34, marginBottom: 12 }}>🧹</div>
+            <div style={{ fontSize: 18, fontWeight: 900, marginBottom: 8 }}>Clear this workspace?</div>
+            <div style={{ fontSize: 13, color: "rgba(255,255,255,.6)", lineHeight: 1.7, marginBottom: 20 }}>
+              Everything in this demo goes — the sample data and anything you have entered.
+              You stay signed in on an empty workspace, with the time you have left unchanged.
+              This cannot be undone.
+            </div>
+            {clearError && (
+              <div style={{ fontSize: 12.5, color: "#fca5a5", marginBottom: 14 }}>{clearError}</div>
+            )}
+            <div style={{ display: "flex", gap: 10 }}>
+              <button
+                onClick={clearDemo}
+                disabled={clearing}
+                style={{
+                  flex: 1, padding: "11px 0", borderRadius: 12, border: "none",
+                  background: clearing ? "rgba(251,191,36,.4)" : "#fbbf24",
+                  color: "#1a1205", fontSize: 13.5, fontWeight: 800, fontFamily: FONT,
+                  cursor: clearing ? "not-allowed" : "pointer",
+                }}
+              >
+                {clearing ? "Clearing…" : "Clear everything"}
+              </button>
+              <button
+                onClick={() => setConfirmClear(false)}
+                disabled={clearing}
+                style={{
+                  padding: "11px 18px", borderRadius: 12,
+                  background: "rgba(255,255,255,.06)", border: "1px solid rgba(255,255,255,.14)",
+                  color: "white", fontSize: 13.5, fontWeight: 700, fontFamily: FONT,
+                  cursor: clearing ? "not-allowed" : "pointer",
+                }}
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {confirmEnd && (
         <div
