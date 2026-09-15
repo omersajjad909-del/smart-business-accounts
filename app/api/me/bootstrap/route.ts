@@ -4,6 +4,7 @@ import { getTokenFromRequest, verifyJwt } from "@/lib/auth";
 import { resolvePlanPermissions, PLAN_DEFAULT_PERMISSIONS } from "@/lib/planPermissions";
 import { DASHBOARD_FEATURE_IDS, createDefaultDashboardFeatureFlags, readSavedDashboardFeatureFlags, resolveDashboardFeaturesForCompany, healSavedFeatureList, healSavedPlanFeatureFlags, resolvePlanWideFeatureFlags } from "@/lib/dashboardFeatureRegistry";
 import { COMPANY_PAGE_OVERRIDES_ACTION, applyCompanyPageOverrides, parseCompanyPageOverrides } from "@/lib/companyPageOverrides";
+import { COMPANY_PAGE_PREFS_ACTION, applyCompanyPagePrefs, parseCompanyPagePrefs } from "@/lib/companyPagePrefs";
 import { BUSINESS_PHASE_CONFIG } from "@/lib/businessModules";
 import { currencyByCountry } from "@/lib/currency";
 import { getCompanyAdminControlSettings } from "@/lib/companyAdminControl";
@@ -93,6 +94,7 @@ export async function GET(req: NextRequest) {
       businessPlanModulesLog,
       pkrBusinessPlanModulesLog,
       companyPageOverrideLog,
+      companyPagePrefsLog,
     ] = await Promise.all([
       prisma.user.findUnique({
         where: { id: userId },
@@ -160,6 +162,11 @@ export async function GET(req: NextRequest) {
       }).catch(() => null),
       prisma.activityLog.findFirst({
         where: { companyId, action: COMPANY_PAGE_OVERRIDES_ACTION },
+        orderBy: { createdAt: "desc" },
+        select: { details: true },
+      }).catch(() => null),
+      prisma.activityLog.findFirst({
+        where: { companyId, action: COMPANY_PAGE_PREFS_ACTION },
         orderBy: { createdAt: "desc" },
         select: { details: true },
       }).catch(() => null),
@@ -326,6 +333,16 @@ export async function GET(req: NextRequest) {
         if (hidden.size > 0) dashboardFeatures = dashboardFeatures.filter(id => !hidden.has(id));
       } catch {}
     }
+
+    /* Finally, what the customer themselves has switched off in
+       Settings → Pages. It only ever subtracts, so it is safe here at the end,
+       and it shapes the sidebar and the route guard alone — see the note in
+       lib/companyPagePrefs.ts on why it is deliberately kept away from
+       companyOwnsDashboardFeature, which is what a module's API asks. */
+    dashboardFeatures = applyCompanyPagePrefs(
+      dashboardFeatures,
+      parseCompanyPagePrefs(companyPagePrefsLog?.details),
+    );
 
     // Business module status
     let moduleOverrides: Record<string, string> = {};
