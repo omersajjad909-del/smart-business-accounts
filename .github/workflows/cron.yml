@@ -34,7 +34,6 @@ on:
     - cron: "0 9 * * *"      # dunning
     - cron: "0 10 * * *"     # sms-reminder
     - cron: "0 15 * * *"     # platform-dunning
-    - cron: "0 9 * * 1"      # tax-fbr (Mondays)
   workflow_dispatch:
     inputs:
       job:
@@ -56,7 +55,6 @@ on:
           - retention-reminders
           - sms-reminder
           - subscriptions-lifecycle
-          - tax-fbr
           - uptime-probe
 
 # A long-running backup must never overlap with the next tick of the same job.
@@ -86,11 +84,10 @@ jobs:
             "0 9 * * *")    jobs="dunning" ;;
             "0 10 * * *")   jobs="sms-reminder" ;;
             "0 15 * * *")   jobs="platform-dunning" ;;
-            "0 9 * * 1")    jobs="tax-fbr" ;;
             *)
               # Manual run (workflow_dispatch): no github.event.schedule is set.
               if [ "${{ inputs.job }}" = "all" ]; then
-                jobs="automation-lifecycle automation-lifecycle-trigger backup breach-notify demo-cleanup demo-reminders dunning inventory-reorder platform-dunning retention-reminders sms-reminder subscriptions-lifecycle tax-fbr uptime-probe"
+                jobs="automation-lifecycle automation-lifecycle-trigger backup breach-notify demo-cleanup demo-reminders dunning inventory-reorder platform-dunning retention-reminders sms-reminder subscriptions-lifecycle uptime-probe"
               else
                 jobs="${{ inputs.job }}"
               fi
