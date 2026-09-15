@@ -116,6 +116,7 @@ const ENGINEERING_LADDER = [
   },
 ];
 
+/* Hidden — not currently hiring. Kept for when we resume posting roles.
 const ALL_ROLES = [
   // Engineering
   { title:"Senior Backend Engineer",      dept:"engineering", location:"Remote",          type:"Full-time", level:"Senior",     color:"#818cf8" },
@@ -143,6 +144,10 @@ const ALL_ROLES = [
   { title:"People Operations Manager",    dept:"operations",  location:"Remote",           type:"Full-time", level:"Mid",        color:"#c4b5fd" },
   { title:"Legal & Compliance Counsel",   dept:"operations",  location:"Remote",           type:"Contract",  level:"Senior",     color:"#c4b5fd" },
 ];
+*/
+const ALL_ROLES: {
+  title:string; dept:string; location:string; type:string; level:string; color:string;
+}[] = [];
 
 /* ══════════════════════════════════════════════════════════
    HELPERS
@@ -418,6 +423,11 @@ export default function RolesPage() {
             <div style={{ display:"grid", gridTemplateColumns:"2fr 1fr 1.2fr 1fr 100px", gap:0, padding:"10px 20px", borderBottom:"1px solid rgba(255,255,255,.07)", fontSize:10, fontWeight:800, color:"rgba(255,255,255,.3)", letterSpacing:".06em", textTransform:"uppercase" }}>
               <span>Role</span><span>Department</span><span>Location</span><span>Level</span><span style={{textAlign:"right"}}>Apply</span>
             </div>
+            {filteredRoles.length===0 && (
+              <div style={{ padding:"32px 20px", textAlign:"center", color:"rgba(255,255,255,.3)", fontSize:13 }}>
+                We're not actively hiring for any roles right now — check back soon.
+              </div>
+            )}
             {filteredRoles.map((r,i)=>(
               <div key={r.title+i} style={{ display:"grid", gridTemplateColumns:"2fr 1fr 1.2fr 1fr 100px", gap:0, padding:"14px 20px", borderBottom:i<filteredRoles.length-1?"1px solid rgba(255,255,255,.04)":"none", alignItems:"center", transition:"background .15s" }}
                 onMouseEnter={e=>e.currentTarget.style.background="rgba(99,102,241,.05)"}

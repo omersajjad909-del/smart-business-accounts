@@ -25,14 +25,15 @@ const PERKS = [
 ];
 
 const DEPARTMENTS = [
-  { id:"all",         label:"All Roles",       count:24 },
-  { id:"engineering", label:"Engineering",     count:10 },
-  { id:"product",     label:"Product & Design",count:4  },
-  { id:"sales",       label:"Sales & GTM",     count:4  },
-  { id:"operations",  label:"Operations",      count:3  },
-  { id:"support",     label:"Customer Success",count:3  },
+  { id:"all",         label:"All Roles" },
+  { id:"engineering", label:"Engineering" },
+  { id:"product",     label:"Product & Design" },
+  { id:"sales",       label:"Sales & GTM" },
+  { id:"operations",  label:"Operations" },
+  { id:"support",     label:"Customer Success" },
 ];
 
+/* Hidden — not currently hiring. Kept for when we resume posting roles.
 const JOBS = [
   {
     id:"1", title:"Senior Backend Engineer",     dept:"engineering",  location:"Remote · Worldwide",   type:"Full-time",   level:"Senior",
@@ -143,6 +144,11 @@ const JOBS = [
     posted:"1 week ago", color:"#f9a8d4",
   },
 ];
+*/
+const JOBS: {
+  id:string; title:string; dept:string; location:string; type:string; level:string;
+  desc:string; tags:string[]; posted:string; color:string;
+}[] = [];
 
 const PROCESS = [
   { step:"01", title:"Apply Online",       desc:"Submit your CV and a short note on why FinovaOS. No cover letter essays — just be genuine.",   icon:"📋", color:"#818cf8" },
@@ -242,7 +248,9 @@ export default function CareersPage() {
             transition:"opacity .5s ease, transform .5s ease",
           }}>
             <div style={{ width:7, height:7, borderRadius:"50%", background:"#34d399", animation:"blink 1.5s ease infinite" }}/>
-            <span style={{ fontSize:12, fontWeight:800, color:"#34d399", letterSpacing:".06em" }}>24 OPEN POSITIONS</span>
+            <span style={{ fontSize:12, fontWeight:800, color:"#34d399", letterSpacing:".06em" }}>
+              {JOBS.length > 0 ? `${JOBS.length} OPEN POSITION${JOBS.length===1?"":"S"}` : "NOT CURRENTLY HIRING"}
+            </span>
           </div>
 
           <h1 style={{
@@ -415,7 +423,9 @@ export default function CareersPage() {
                   background:activeDept===d.id?"linear-gradient(135deg,#4f46e5,#7c3aed)":"rgba(255,255,255,.05)",
                   color:activeDept===d.id?"white":"rgba(255,255,255,.4)" }}>
                 {d.label}
-                <span style={{ marginLeft:6, padding:"1px 7px", borderRadius:20, background:activeDept===d.id?"rgba(255,255,255,.2)":"rgba(255,255,255,.08)", fontSize:10, fontWeight:800 }}>{d.count}</span>
+                <span style={{ marginLeft:6, padding:"1px 7px", borderRadius:20, background:activeDept===d.id?"rgba(255,255,255,.2)":"rgba(255,255,255,.08)", fontSize:10, fontWeight:800 }}>
+                  {JOBS.filter(j=>d.id==="all"||j.dept===d.id).length}
+                </span>
               </button>
             ))}
           </div>
@@ -423,7 +433,9 @@ export default function CareersPage() {
           {/* Jobs grid */}
           {filtered.length===0 ? (
             <div style={{ padding:48, textAlign:"center", color:"rgba(255,255,255,.2)", fontSize:14 }}>
-              No roles found — try a different search or department.
+              {JOBS.length===0
+                ? "We're not actively hiring for any positions right now — check back soon, or send us a speculative application below."
+                : "No roles found — try a different search or department."}
             </div>
           ) : (
             <div style={{ display:"flex", flexDirection:"column", gap:12 }}>
