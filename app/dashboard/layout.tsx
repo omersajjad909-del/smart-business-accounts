@@ -2695,6 +2695,12 @@ export default function DashboardLayout({
               <NavLink href="/dashboard/account-settings" pathname={pathname}>Account Settings</NavLink>
               <NavLink href="/dashboard/billing"   pathname={pathname}>💳 My Billing</NavLink>
               <NavLink href="/dashboard/settings/appearance" pathname={pathname}>🎨 Appearance</NavLink>
+              {/* Not gated by the feature list on purpose — this is the screen
+                  that switches pages back on, so it has to stay reachable
+                  whatever has been switched off. */}
+              {currentUser?.role === "ADMIN" && (
+                <NavLink href="/dashboard/settings/pages" pathname={pathname}>🧩 Pages</NavLink>
+              )}
               <NavLink href="/dashboard/print-preferences" pathname={pathname}>🖨️ Print Preferences</NavLink>
               <NavLink href="/dashboard/feedback" pathname={pathname}>⭐ Feedback & Reviews</NavLink>
               <NavLink href="/dashboard/settings/holidays"   pathname={pathname}>🎉 Public Holidays</NavLink>
