@@ -229,6 +229,14 @@ export type ManufacturingItem = {
   /** Part-used pieces (open rolls) waiting to be finished off. */
   openRemnant: number;
   openRemnantValue: number;
+  /**
+   * The unit the floor measures in, and how many of it one stock unit is —
+   * "M" and 50 for a roll that is fifty metres long. Both null until somebody
+   * fills them in on the item, which is most items: stock is counted in whole
+   * units and that is usually enough.
+   */
+  secondaryUnit?: string | null;
+  secondaryUnitRatio?: number | null;
   stockValue: number;
   isLow: boolean;
 };
@@ -290,6 +298,33 @@ export type ItemCategory = "RAW_MATERIAL" | "PACKAGING" | "FINISHED" | "TRADING"
  * Below a hundred rupees the paisa is a meaningful share of the figure, so it
  * is shown. Above that it is noise and the whole rupee reads better.
  */
+/**
+ * A stock quantity in the unit the floor actually measures in.
+ *
+ * "0.34ROLL" is exact and useless to a store keeper: it is a third of a roll,
+ * not 34 of anything, and there is no way to take that number to the rack. If
+ * the item says one roll is 50 M, this turns it into "17 M" — the figure
+ * someone can walk out and measure.
+ *
+ * Returns null when the item has no secondary unit set, which is most items:
+ * stock counted in whole units needs no translation, and a made-up conversion
+ * would be worse than none.
+ */
+export function secondaryQty(
+  item: { secondaryUnit?: string | null; secondaryUnitRatio?: number | null },
+  qty: number,
+): string | null {
+  const ratio = Number(item.secondaryUnitRatio);
+  const unit = String(item.secondaryUnit || "").trim();
+  if (!unit || !Number.isFinite(ratio) || ratio <= 0 || !Number.isFinite(qty)) return null;
+  const converted = qty * ratio;
+  // Two decimals only where they carry meaning — 17 M reads better than 17.00 M.
+  const shown = Number.isInteger(converted)
+    ? converted.toLocaleString()
+    : (Math.round(converted * 100) / 100).toLocaleString();
+  return `${shown} ${unit}`;
+}
+
 export function formatRate(value: number): string {
   if (!Number.isFinite(value)) return "0";
   return Math.abs(value) < 100

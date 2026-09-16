@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useBusinessRecords } from "@/lib/useBusinessRecords";
-import { formatRate, mapBomRecord, loadManufacturingItems, type ManufacturingItem } from "../_shared";
+import { formatRate, mapBomRecord, loadManufacturingItems, secondaryQty, type ManufacturingItem } from "../_shared";
 import { useResponsive } from "@/hooks/useResponsive";
 
 const ff = "'Outfit','Inter',sans-serif";
@@ -146,9 +146,24 @@ export default function RawMaterialsPage() {
                     {item.currentStock}
                     {item.isLow && <span style={{ marginLeft: 6, fontSize: 10, padding: "2px 6px", borderRadius: 5, background: "rgba(239,68,68,.15)", color: "#fca5a5" }}>LOW</span>}
                   </td>
-                  {/* Part-used rolls a small order can run on without opening a new one. */}
+                  {/* Part-used rolls a small order can run on without opening
+                      a new one — with what that is on the floor underneath it.
+                      "0.34ROLL" is exact and unusable: it is a third of a roll,
+                      and there is no way to take that to the rack. "17 M" is
+                      the number somebody can go and measure. Shown only when
+                      the item says how long one roll is; a guessed conversion
+                      would be worse than none. */}
                   <td style={{ padding: "12px 16px", fontSize: 13, textAlign: "right", color: item.openRemnant > 0 ? "#34d399" : "rgba(255,255,255,.25)" }}>
-                    {item.openRemnant > 0 ? `${item.openRemnant.toFixed(2)}${item.unit}` : "—"}
+                    {item.openRemnant > 0 ? (
+                      <>
+                        <div>{item.openRemnant.toFixed(2)}{item.unit}</div>
+                        {secondaryQty(item, item.openRemnant) && (
+                          <div style={{ fontSize: 10.5, color: "rgba(255,255,255,.4)", marginTop: 1 }}>
+                            {secondaryQty(item, item.openRemnant)}
+                          </div>
+                        )}
+                      </>
+                    ) : "—"}
                   </td>
                   <td style={{ padding: "12px 16px", fontSize: 13, textAlign: "right", color: "rgba(255,255,255,.62)" }}>Rs. {formatRate(item.unitCost)}</td>
                   <td style={{ padding: "12px 16px", fontSize: 13, textAlign: "right", fontWeight: 700, color: "#22c55e" }}>Rs. {Math.round(item.stockValue).toLocaleString()}</td>
