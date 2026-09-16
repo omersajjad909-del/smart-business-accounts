@@ -157,7 +157,22 @@ export default function WastagePage() {
 
       <div style={{ marginTop: 16, padding: "13px 18px", borderRadius: 12, background: "rgba(248,113,113,.07)", border: "1px solid rgba(248,113,113,.2)", fontSize: 12.5, color: "rgba(255,255,255,.55)", lineHeight: 1.6 }}>
         Logging wastage takes it straight off the raw material&apos;s stock — the same number Raw Materials and the stock reports show, so
-        there is nothing to reconcile afterwards.
+        there is nothing to reconcile afterwards. Nothing writes here on its own: a run only records waste when someone says there was
+        some.
+      </div>
+
+      {/* Said because this page being empty after a run reads as something
+          lost. The part-roll a run leaves behind is not waste and deliberately
+          never arrives here — it is still the company's material, still an
+          asset, and the next run reaches for it before opening a new roll. The
+          two are one keystroke apart in an operator's mind and a world apart in
+          the ledger. */}
+      <div style={{ marginTop: 12, padding: "13px 18px", borderRadius: 12, background: "rgba(56,189,248,.06)", border: "1px solid rgba(56,189,248,.2)", fontSize: 12.5, color: "rgba(255,255,255,.55)", lineHeight: 1.7 }}>
+        <strong style={{ color: "#7dd3fc" }}>Left over is not wasted.</strong> When a run needs 12.66 rolls and 13 come off the rack,
+        the 0.34 that is left stays yours: it is held as <strong style={{ color: "rgba(255,255,255,.75)" }}>open stock</strong> under
+        Material Remnants and the next run uses it before opening a new roll. You will find it in the Open Stock column on{" "}
+        <a href="/dashboard/manufacturing/raw-materials" style={{ color: "#fb923c", fontWeight: 700 }}>Raw Materials</a>, not here.
+        Log it here only if it is too small to ever use again.
       </div>
 
       {showModal && (
