@@ -60,6 +60,7 @@ export const ADMIN_NAV_ITEMS: AdminNavItem[] = [
   { id: "leads",            label: "Leads",             href: "/admin/leads",               group: "Marketing", short: "LD", icon: "target" },
   { id: "broadcasts",       label: "Broadcasts",        href: "/admin/broadcasts",          group: "Marketing", short: "BR", icon: "megaphone" },
   { id: "newsletter",       label: "Newsletter",        href: "/admin/newsletter",          group: "Marketing", short: "NL", icon: "mail" },
+  { id: "waitlist",         label: "Waitlist",          href: "/admin/waitlist",            group: "Marketing", short: "WL", icon: "list" },
   { id: "social",           label: "Social",            href: "/admin/social",              group: "Marketing", short: "SO", icon: "share" },
   { id: "feedback",         label: "All Feedback",      href: "/admin/feedback",            group: "Marketing", short: "FB", icon: "message" },
   // One route, scoped by ?type=. See SCOPES in app/admin/feedback/page.tsx.

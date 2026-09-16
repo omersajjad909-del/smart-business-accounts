@@ -2,6 +2,7 @@
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { AFFILIATE_PROGRAM_LIVE } from "@/lib/affiliateProgram";
+import ComingSoonSubscribe from "@/components/ComingSoonSubscribe";
 
 const TIERS = [
   { name:"Starter",    referrals:"1–5",   commission:"20%", monthly:"$200", color:"#818cf8", glow:"rgba(129,140,248,.15)", icon:"🌱" },
@@ -66,9 +67,12 @@ function ComingSoon() {
           monthly payouts — so that everyone who sends us a customer is paid
           accurately, from the first referral.
         </p>
-        <p style={{ fontSize: "clamp(15px,2.2vw,18px)", lineHeight: 1.75, color: "var(--text-secondary)", margin: "0 0 40px" }}>
+        <p style={{ fontSize: "clamp(15px,2.2vw,18px)", lineHeight: 1.75, color: "var(--text-secondary)", margin: "0 0 32px" }}>
           We&apos;d rather open late than take your traffic and get your payout wrong.
         </p>
+        <div style={{ marginBottom: 28 }}>
+          <ComingSoonSubscribe list="affiliate" accent="#f59e0b" dark={false} />
+        </div>
         <div style={{ display: "flex", gap: 14, justifyContent: "center", flexWrap: "wrap" }}>
           <Link href="/pricing" style={{ padding: "14px 30px", borderRadius: 12, textDecoration: "none", background: "linear-gradient(135deg,#6366f1,#4f46e5)", color: "white", fontWeight: 800, fontSize: 15 }}>
             View Pricing {"→"}
