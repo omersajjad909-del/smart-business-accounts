@@ -4,6 +4,7 @@ import { Suspense, useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { useBusinessRecords } from "@/lib/useBusinessRecords";
 import {
+  formatRate,
   mapBomRecord,
   mapProductionOrderRecord,
   loadManufacturingItems,
@@ -607,7 +608,7 @@ function BOMPageInner() {
                 <div key={item.id} style={{ display: "flex", justifyContent: "space-between", fontSize: 12.5 }}>
                   <span style={{ color: "rgba(255,255,255,.62)" }}>{item.name}</span>
                   <span style={{ color: item.isLow ? "#fca5a5" : "#38bdf8", fontWeight: 700 }}>
-                    {item.currentStock}{item.unit} · Rs. {Math.round(item.unitCost).toLocaleString()}
+                    {item.currentStock}{item.unit} · Rs. {formatRate(item.unitCost)}
                   </span>
                 </div>
               )) : <div style={{ color: "rgba(255,255,255,.3)", fontSize: 13 }}>No raw materials yet.</div>}

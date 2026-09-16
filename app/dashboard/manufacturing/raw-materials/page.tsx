@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useBusinessRecords } from "@/lib/useBusinessRecords";
-import { mapBomRecord, loadManufacturingItems, type ManufacturingItem } from "../_shared";
+import { formatRate, mapBomRecord, loadManufacturingItems, type ManufacturingItem } from "../_shared";
 import { useResponsive } from "@/hooks/useResponsive";
 
 const ff = "'Outfit','Inter',sans-serif";
@@ -150,7 +150,7 @@ export default function RawMaterialsPage() {
                   <td style={{ padding: "12px 16px", fontSize: 13, textAlign: "right", color: item.openRemnant > 0 ? "#34d399" : "rgba(255,255,255,.25)" }}>
                     {item.openRemnant > 0 ? `${item.openRemnant.toFixed(2)}${item.unit}` : "—"}
                   </td>
-                  <td style={{ padding: "12px 16px", fontSize: 13, textAlign: "right", color: "rgba(255,255,255,.62)" }}>Rs. {Math.round(item.unitCost).toLocaleString()}</td>
+                  <td style={{ padding: "12px 16px", fontSize: 13, textAlign: "right", color: "rgba(255,255,255,.62)" }}>Rs. {formatRate(item.unitCost)}</td>
                   <td style={{ padding: "12px 16px", fontSize: 13, textAlign: "right", fontWeight: 700, color: "#22c55e" }}>Rs. {Math.round(item.stockValue).toLocaleString()}</td>
                   <td style={{ padding: "12px 16px", fontSize: 13, textAlign: "right", color: "rgba(255,255,255,.5)" }}>
                     {isRaw ? (usedByBom.get(item.id) || 0) : `Rs. ${Math.round(item.rate).toLocaleString()}`}

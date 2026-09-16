@@ -278,6 +278,25 @@ export type ProductionRunQuote = {
 
 export type ItemCategory = "RAW_MATERIAL" | "PACKAGING" | "FINISHED" | "TRADING" | "SERVICE";
 
+/**
+ * A material rate, shown to as many decimals as it needs.
+ *
+ * Rounding every rate to whole rupees is right for a roll at Rs 12,889 and
+ * quietly wrong for a button at Rs 1.40, which printed as "Rs. 1" — a 40%
+ * error on the face of it. Someone checking a production run by hand
+ * multiplied by the number on screen and could not make the total come out,
+ * because the number on screen was not the number the run had used.
+ *
+ * Below a hundred rupees the paisa is a meaningful share of the figure, so it
+ * is shown. Above that it is noise and the whole rupee reads better.
+ */
+export function formatRate(value: number): string {
+  if (!Number.isFinite(value)) return "0";
+  return Math.abs(value) < 100
+    ? value.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+    : Math.round(value).toLocaleString();
+}
+
 export async function loadManufacturingItems(
   category?: ItemCategory | ItemCategory[],
 ): Promise<ManufacturingItem[]> {
