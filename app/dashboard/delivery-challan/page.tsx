@@ -836,7 +836,13 @@ export default function DeliveryChallanPage() {
                  </div>
                  <div>
                     <label className="text-xs font-bold">Vehicle No</label>
-                    <input className="border p-2 w-full" value={vehicleNo} onChange={e => setVehicleNo(e.target.value)} placeholder="Vehicle No" />
+                    {/* Upper-cased as it is typed, not just drawn that way: a
+                        registration is written in capitals on the plate, on the
+                        gate pass and on the printed challan, and the value that
+                        gets saved should match. CSS alone would have shown
+                        FDA-1234 and stored fda-1234, which then fails to match
+                        when somebody searches for the vehicle later. */}
+                    <input className="border p-2 w-full" value={vehicleNo} onChange={e => setVehicleNo(e.target.value.toUpperCase())} placeholder="Vehicle No" />
                  </div>
                  <div>
                     <label className="text-xs font-bold">Remarks</label>
