@@ -856,6 +856,14 @@ const [searchTerm, setSearchTerm] = useState("");
     setDueDate(inv2.dueDate ? new Date(inv2.dueDate).toISOString().slice(0, 10) : "");
     setDiscount(inv2.discount ?? "");
     setDiscountType(inv2.discountType || "flat");
+    /* Both of these are stored on the invoice and were not being read back.
+       Worse than looking empty: the form re-saves whatever it is holding, so
+       reopening an invoice and pressing Update wiped the freight to 0 and
+       dropped the tax — a figure the operator had typed, silently gone
+       because they opened the document to change something else. */
+    setFreight(inv2.freight ?? "");
+    setApplyTax(Boolean(inv2.taxConfigId));
+    setSelectedTaxId(inv2.taxConfigId || "");
     setNotes(inv2.notes || "");
     setReference(inv2.reference || "");
     setPaymentMethod(inv2.paymentMethod || "");
