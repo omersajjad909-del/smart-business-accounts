@@ -412,8 +412,14 @@ export default function ProductionOrdersPage() {
                 )}
                 {(order.status === "in_progress" || order.status === "running") && (
                   <button onClick={() => openCompleteDialog(order)} style={{ padding: "7px 14px", background: "rgba(34,197,94,.15)", border: "1px solid rgba(34,197,94,.3)", color: "#22c55e", borderRadius: 8, fontSize: 12, fontWeight: 700, cursor: "pointer" }}>
+                    {/* Not "Run remaining 41,000" any more. On an order that
+                        takes a week that reads as an instruction to make the
+                        whole balance in one go, which is the opposite of what
+                        the dialog behind it is for. The balance is already on
+                        the line above; this button only has to open the day's
+                        entry. */}
                     {order.completed > 0 && remaining > 0
-                      ? `Run remaining ${remaining.toLocaleString()} →`
+                      ? "Record today's production →"
                       : "Record production →"}
                   </button>
                 )}
@@ -505,22 +511,34 @@ export default function ProductionOrdersPage() {
 
             <div style={{ display: "flex", gap: 14, flexWrap: "wrap", marginBottom: 16 }}>
               <div>
-                <label style={{ display: "block", fontSize: 12, color: "rgba(255,255,255,.45)", marginBottom: 6 }}>Units finished in this run</label>
+                {/* Named the same thing the Make dialog names it. It is the
+                    same question — how many came off the floor today — and
+                    calling it "Units finished in this run" on one screen and
+                    "Finished today" on the other read as two different
+                    mechanisms, which is why an order spread over a week looked
+                    like something the system could not do. */}
+                <label style={{ display: "block", fontSize: 12, color: "rgba(255,255,255,.45)", marginBottom: 6 }}>Finished today</label>
                 <input
                   type="number" min={1} value={runQty}
                   onChange={(e) => setRunQty(Math.max(1, Number(e.target.value) || 1))}
                   onBlur={(e) => requote(Math.max(1, Number(e.target.value) || 1))}
+                  // The box opens on the whole balance, which is right on the
+                  // last day and wrong on every other one. Selecting it means
+                  // the real figure is typed over the top in one go, instead of
+                  // backspacing five digits every morning for a week.
+                  onFocus={(e) => e.currentTarget.select()}
                   style={{ width: 180, height: 38, background: bg, border: `1px solid ${border}`, borderRadius: 8, padding: "9px 12px", fontSize: 14, color: "#fff", boxSizing: "border-box" }}
                 />
-                {/* The box opens on the whole balance, which is right for a run
-                    that finishes the order and wrong for a day that finishes
-                    part of it. Say what happens to the rest so a short day is
-                    not typed in as a full one. */}
+                {/* Say what happens to the rest, so a short day is not typed in
+                    as a full one — and say it in a way that covers an order
+                    running for a week, not just one that slips a day. */}
                 <div style={{ fontSize: 11, color: "rgba(255,255,255,.35)", marginTop: 6, width: 180, lineHeight: 1.6 }}>
                   {runOrder.completed > 0
                     ? `${runOrder.completed.toLocaleString()} done, ${Math.max(runOrder.quantity - runOrder.completed, 0).toLocaleString()} left of ${runOrder.quantity.toLocaleString()}.`
                     : `Order is for ${runOrder.quantity.toLocaleString()}.`}{" "}
-                  Enter only what was finished — the rest stays open for the next run.
+                  Enter only what was finished today. The rest stays on this
+                  order and you come back to it tomorrow — as many days as it
+                  takes.
                 </div>
               </div>
               <div>
