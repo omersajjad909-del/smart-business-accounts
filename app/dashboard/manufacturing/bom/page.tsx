@@ -809,10 +809,22 @@ function BOMPageInner() {
                             <input type="number" min={0} step="any" placeholder="Pcs" value={row.qty}
                               onChange={(e) => setLabourRow(index, { qty: e.target.value })}
                               style={{ background: bg, border: `1px solid ${border}`, borderRadius: 8, padding: "8px 9px", color: "#fff", fontSize: 12.5, fontFamily: "inherit" }} />
+                            {/* Enter on the last box of a row means "next
+                                worker", not "delete this row" — which is what
+                                it meant while the × button was the next thing
+                                in the tab order. */}
                             <input type="number" min={0} step="any" placeholder="Rate/pc" value={row.rate}
                               onChange={(e) => setLabourRow(index, { rate: e.target.value })}
+                              onKeyDown={(e) => {
+                                if (e.key !== "Enter" || e.shiftKey) return;
+                                e.preventDefault();
+                                document.getElementById("bom-add-worker")?.focus();
+                              }}
                               style={{ background: bg, border: `1px solid ${border}`, borderRadius: 8, padding: "8px 9px", color: "#fff", fontSize: 12.5, fontFamily: "inherit" }} />
-                            <button onClick={() => setLabourRows((rows) => rows.filter((_, i) => i !== index))} title="Remove"
+                            {/* Out of the tab order: removing a row is a
+                                deliberate click, not something the keyboard
+                                should pass through. */}
+                            <button onClick={() => setLabourRows((rows) => rows.filter((_, i) => i !== index))} tabIndex={-1} title="Remove"
                               style={{ background: "transparent", border: `1px solid ${border}`, borderRadius: 8, color: "rgba(255,255,255,.45)", cursor: "pointer", padding: "7px 0", gridColumn: isMobile ? "1 / -1" : "auto" }}>×</button>
                           </div>
                         ))}
@@ -860,6 +872,7 @@ function BOMPageInner() {
                         </div>
                       )}
                       <button
+                        id="bom-add-worker"
                         onClick={() => setLabourRows((rows) => [...rows, { labourId: "", operation: "", qty: makeQty, rate: "" }])}
                         style={{ marginTop: 8, padding: "6px 12px", borderRadius: 8, background: "rgba(255,255,255,.05)", border: `1px solid ${border}`, color: "rgba(255,255,255,.65)", fontSize: 12, fontWeight: 600, fontFamily: "inherit", cursor: "pointer" }}>
                         + Worker

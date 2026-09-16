@@ -710,15 +710,34 @@ export default function ProductionOrdersPage() {
                           }}
                         />
                         <input type="number" min={0} step="any" placeholder="Pcs" value={row.qty} onChange={(e) => setLabourRow(index, { qty: e.target.value })} style={{ background: bg, border: `1px solid ${border}`, borderRadius: 8, padding: "8px 10px", color: "#fff", fontSize: 12.5 }} />
-                        <input type="number" min={0} step="any" placeholder="Rate/pc" value={row.rate} onChange={(e) => setLabourRow(index, { rate: e.target.value })} style={{ background: bg, border: `1px solid ${border}`, borderRadius: 8, padding: "8px 10px", color: "#fff", fontSize: 12.5 }} />
-                        <button onClick={() => removeLabourRow(index)} title="Remove" style={{ background: "transparent", border: `1px solid ${border}`, borderRadius: 8, color: "rgba(255,255,255,.45)", cursor: "pointer", padding: "7px 0", gridColumn: isMobile ? "1 / -1" : "auto" }}>×</button>
+                        {/* Rate is the last thing typed on a row, so Enter here
+                            means "done, next worker". It used to mean "delete
+                            this row": the next thing in the tab order was the
+                            × button, and Enter on a focused button presses it.
+                            A keystroke that finishes a row should not be one
+                            keystroke away from destroying it. */}
+                        <input
+                          type="number" min={0} step="any" placeholder="Rate/pc" value={row.rate}
+                          onChange={(e) => setLabourRow(index, { rate: e.target.value })}
+                          onKeyDown={(e) => {
+                            if (e.key !== "Enter" || e.shiftKey) return;
+                            e.preventDefault();
+                            document.getElementById("po-add-worker")?.focus();
+                          }}
+                          style={{ background: bg, border: `1px solid ${border}`, borderRadius: 8, padding: "8px 10px", color: "#fff", fontSize: 12.5 }}
+                        />
+                        {/* Out of the tab order entirely. Deleting a row is a
+                            decision, taken with a deliberate click; it has no
+                            business being somewhere the keyboard lands on the
+                            way past. */}
+                        <button onClick={() => removeLabourRow(index)} tabIndex={-1} title="Remove" style={{ background: "transparent", border: `1px solid ${border}`, borderRadius: 8, color: "rgba(255,255,255,.45)", cursor: "pointer", padding: "7px 0", gridColumn: isMobile ? "1 / -1" : "auto" }}>×</button>
                       </div>
                     ))}
                   </div>
                   <datalist id="production-operations">
                     {operationSuggestions.map((operation) => <option key={operation} value={operation} />)}
                   </datalist>
-                  <button onClick={addLabourRow} style={{ marginTop: 8, padding: "6px 12px", borderRadius: 8, background: "rgba(255,255,255,.05)", border: `1px solid ${border}`, color: "rgba(255,255,255,.65)", fontSize: 11.5, fontWeight: 600, cursor: "pointer" }}>
+                  <button id="po-add-worker" onClick={addLabourRow} style={{ marginTop: 8, padding: "6px 12px", borderRadius: 8, background: "rgba(255,255,255,.05)", border: `1px solid ${border}`, color: "rgba(255,255,255,.65)", fontSize: 11.5, fontWeight: 600, cursor: "pointer" }}>
                     + Add worker
                   </button>
                   <div style={{ fontSize: 11, color: "rgba(255,255,255,.32)", marginTop: 8, lineHeight: 1.7 }}>
