@@ -346,10 +346,33 @@ export default function CRVPage() {
     finally { setSaving(false); }
   }
 
-  async function deleteVoucher(id: string) {
-    if (!confirm("Delete this voucher? This action cannot be undone.")) return;
-    const r = await fetch(`/api/crv?id=${id}`, { method: "DELETE", headers: h() });
-    if (r.ok) { toast.success("Deleted"); setVouchers(prev => prev.filter(v => v.id !== id)); }
+  /**
+   * Delete the voucher currently on screen.
+   *
+   * This existed and was never wired to anything, so a voucher entered by
+   * mistake could be found through Query Mode and then only looked at. The
+   * obvious move — clearing the rows with ✕ and pressing Save — does not
+   * delete it either: the rows are the form's, not the voucher's, and emptying
+   * them just takes the total to zero, which is what was disabling the Save
+   * button. It is the voucher that has to go, not its lines.
+   */
+  async function deleteVoucher() {
+    const target = queryResults[queryIdx];
+    if (!target) return;
+    if (!window.confirm(`Delete ${target.voucherNo} permanently?\n\nIts ledger entries will be removed from every report.`)) return;
+    setSaving(true);
+    try {
+      const r = await fetch(`/api/crv?id=${target.id}`, { method: "DELETE", headers: h() });
+      const d = await r.json().catch(() => ({}));
+      if (!r.ok) throw new Error(d.error || "Could not delete the voucher");
+      toast.success(`${target.voucherNo} deleted`);
+      // Back to a blank voucher rather than sitting on a record that is gone.
+      exitQueryMode();
+      setEntries(initRows()); setNarration(""); setMode("CASH"); setBankId("");
+      const fresh = await fetch("/api/crv", { headers: h() }).then(r => r.json());
+      if (Array.isArray(fresh)) setVouchers(fresh);
+    } catch (e: any) { toast.error(e.message); }
+    finally { setSaving(false); }
   }
 
   const inp: React.CSSProperties = { background:"rgba(255,255,255,.06)", border:"1px solid rgba(255,255,255,.12)", borderRadius:8, color:"rgba(255,255,255,.85)", padding:"8px 12px", fontSize:13, fontFamily:ff, outline:"none", width:"100%", boxSizing:"border-box" };
@@ -466,6 +489,11 @@ export default function CRVPage() {
               </span>
               <button onClick={() => navTo(queryIdx + 1)} disabled={queryIdx === queryResults.length - 1}
                 style={{ padding:"4px 10px", borderRadius:6, background:"rgba(255,255,255,.06)", border:"1px solid rgba(255,255,255,.1)", color:queryIdx===queryResults.length-1?"rgba(255,255,255,.2)":"rgba(255,255,255,.7)", fontSize:13, cursor:queryIdx===queryResults.length-1?"default":"pointer", fontFamily:ff }}>▶</button>
+              {/* Next to the record it acts on, the way CPV has it. "Clear"
+                  beside it only puts the voucher down; this is the one that
+                  takes it out of the ledger. */}
+              <button onClick={deleteVoucher} disabled={saving || !queryResults[queryIdx]} title="Delete this voucher and its ledger entries"
+                style={{ padding:"4px 10px", borderRadius:6, background:"rgba(248,113,113,.14)", border:"1px solid rgba(248,113,113,.35)", color:"#f87171", fontSize:11, fontWeight:700, cursor:(saving||!queryResults[queryIdx])?"default":"pointer", fontFamily:ff, opacity:(saving||!queryResults[queryIdx])?0.5:1 }}>🗑 Delete</button>
               <button onClick={exitQueryMode}
                 style={{ padding:"4px 10px", borderRadius:6, background:"rgba(248,113,113,.08)", border:"1px solid rgba(248,113,113,.2)", color:"#f87171", fontSize:11, cursor:"pointer", fontFamily:ff }}>✕ Clear</button>
             </div>
