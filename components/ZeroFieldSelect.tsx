@@ -39,31 +39,64 @@ function isNumericField(el: Element | null): el is HTMLInputElement {
   return mode === "decimal" || mode === "numeric";
 }
 
+/** Selects the whole field, where the browser allows it on that input type. */
+function selectAll(el: HTMLInputElement): void {
+  try {
+    el.select();
+  } catch {
+    // Some browsers refuse select() on a number input. Nothing is lost — the
+    // field simply behaves as it did before.
+  }
+}
+
 export default function ZeroFieldSelect() {
   useEffect(() => {
+    /* The one that actually has to work.
+    
+       Selecting on focus depends on winning a race with the browser's own
+       caret placement, and it does not always win — which is why the zero was
+       still there to type in front of. This fires at the moment a character is
+       about to be inserted, long after any caret has settled, so there is no
+       timing to lose: the zero is selected and the keystroke replaces it.
+       
+       Only for typing. A paste, a delete, an arrow key are all left alone. */
+    function onBeforeInput(event: Event) {
+      const el = event.target as Element | null;
+      if (!isNumericField(el)) return;
+      const inputType = (event as InputEvent).inputType;
+      if (inputType !== "insertText") return;
+      if (!ZERO.test(el.value.trim())) return;
+      // Already selected — the keystroke will replace it on its own. Reading
+      // the selection off a number input throws in Firefox, so a failure here
+      // just means "assume not selected" rather than skipping the fix.
+      try {
+        if (el.selectionStart === 0 && el.selectionEnd === el.value.length) return;
+      } catch { /* selection unreadable on this input type */ }
+      selectAll(el);
+    }
+
+    /* Belt and braces, and the reason the selection is visible: this one
+       highlights the zero as soon as the box is clicked, so it is obvious the
+       digit will replace rather than follow it. Where it loses the race the
+       handler above still catches the keystroke. */
     function onFocusIn(event: FocusEvent) {
       const el = event.target as Element | null;
       if (!isNumericField(el)) return;
       if (!ZERO.test(el.value.trim())) return;
-
-      /* One frame late on purpose. A click focuses the field and *then* places
-         the caret, so selecting during the focus event is undone a moment
-         later by the browser's own caret placement. */
       requestAnimationFrame(() => {
         if (document.activeElement !== el) return;
         if (!ZERO.test(el.value.trim())) return;
-        try {
-          el.select();
-        } catch {
-          // Safari refuses select() on some number inputs. Nothing is lost —
-          // the field simply behaves as it did before.
-        }
+        selectAll(el);
       });
     }
 
-    // focusin rather than focus: it bubbles, so one listener covers the page.
+    // focusin and beforeinput both bubble, so one listener each covers the page.
     document.addEventListener("focusin", onFocusIn);
-    return () => document.removeEventListener("focusin", onFocusIn);
+    document.addEventListener("beforeinput", onBeforeInput, true);
+    return () => {
+      document.removeEventListener("focusin", onFocusIn);
+      document.removeEventListener("beforeinput", onBeforeInput, true);
+    };
   }, []);
 
   return null;
