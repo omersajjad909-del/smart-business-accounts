@@ -221,6 +221,15 @@ function BOMPageInner() {
      Production Orders is untouched and still the way to plan a job, assign
      it, and come back to it in stages. */
   const [makeBom, setMakeBom] = useState<ManufacturingBom | null>(null);
+  /* Two quantities, because they are two different facts.
+     
+     The order is what the customer asked for; today is what actually came off
+     the floor. They part company the moment a job runs over more than one day,
+     which is the normal case when the operations move at different speeds —
+     buttons go on fast, sealing is slow, and an evening ends with neither
+     finished. Posting the order size as though it were done puts finished
+     goods into stock that nobody has made yet. */
+  const [makeOrderQty, setMakeOrderQty] = useState("");
   const [makeQty, setMakeQty] = useState("");
   const [makeQuote, setMakeQuote] = useState<ProductionRunQuote | null>(null);
   const [makeBusy, setMakeBusy] = useState(false);
@@ -260,8 +269,14 @@ function BOMPageInner() {
     (r) => r.labourId && !(Number(r.qty) > 0 && Number(r.rate) > 0),
   );
 
+  const orderQtyNum = Math.floor(Number(makeOrderQty)) || 0;
+  const todayQtyNum = Math.floor(Number(makeQty)) || 0;
+  const partial = orderQtyNum > 0 && todayQtyNum > 0 && todayQtyNum < orderQtyNum;
+  const pendingQty = Math.max(orderQtyNum - todayQtyNum, 0);
+
   function openMake(bom: ManufacturingBom) {
     setMakeBom(bom);
+    setMakeOrderQty(String(bom.yieldUnits || 1));
     setMakeQty(String(bom.yieldUnits || 1));
     setMakeQuote(null);
     setMakeError("");
@@ -586,14 +601,38 @@ function BOMPageInner() {
               Nothing is written until then.
             </div>
 
-            <label style={{ display: "block", fontSize: 12, color: "rgba(255,255,255,.45)", marginBottom: 6 }}>
-              How many {makeBom.product}?
-            </label>
-            <input
-              type="number" min={1} step={1} value={makeQty} autoFocus
-              onChange={(e) => setMakeQty(e.target.value)}
-              style={{ width: "100%", padding: "10px 12px", borderRadius: 9, background: "rgba(255,255,255,.05)", border: `1px solid ${border}`, color: "#fff", fontSize: 15, fontFamily: "inherit", boxSizing: "border-box" }}
-            />
+            <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: 12 }}>
+              <div>
+                <label style={qtyLabel}>The order — how many {makeBom.product}?</label>
+                <input
+                  type="number" min={1} step={1} value={makeOrderQty} autoFocus
+                  onChange={(e) => {
+                    const next = e.target.value;
+                    setMakeOrderQty(next);
+                    // Most jobs finish in one go, so today follows the order
+                    // until somebody says otherwise.
+                    if (!partial) setMakeQty(next);
+                  }}
+                  style={qtyInput}
+                />
+              </div>
+              <div>
+                <label style={qtyLabel}>Finished today</label>
+                <input
+                  type="number" min={1} step={1} value={makeQty}
+                  onChange={(e) => setMakeQty(e.target.value)}
+                  style={{ ...qtyInput, borderColor: partial ? "rgba(251,191,36,.45)" : border }}
+                />
+              </div>
+            </div>
+
+            {/* Said plainly, because posting an order size as though it were
+                made is how finished goods nobody has produced get into stock. */}
+            <div style={{ fontSize: 11.5, color: partial ? "#fbbf24" : "rgba(255,255,255,.32)", marginTop: 6, lineHeight: 1.6 }}>
+              {partial
+                ? `${pendingQty.toLocaleString()} left over — the order stays open on Production Orders, and tomorrow's run carries on from there with its own labour.`
+                : "The whole order is finished in this run. Making only part of it today? Put that in “Finished today”."}
+            </div>
 
             {makeError && (
               <div style={{ marginTop: 12, padding: "10px 12px", borderRadius: 8, background: "rgba(239,68,68,.14)", border: "1px solid rgba(239,68,68,.28)", color: "#fca5a5", fontSize: 12 }}>
