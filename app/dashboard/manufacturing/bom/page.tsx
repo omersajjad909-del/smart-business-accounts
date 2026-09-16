@@ -140,6 +140,14 @@ function BOMPageInner() {
     [rawMaterials, finishedItems],
   );
 
+  /* Materials at or below their reorder level. The same flag the stock panel
+     and the material chips already colour red with — counted once at the top
+     so the answer is visible before anybody scrolls looking for red. */
+  const lowMaterials = useMemo(
+    () => rawMaterials.filter((m) => m.isLow).length,
+    [rawMaterials],
+  );
+
   useEffect(() => {
     // Trading goods too: a button, a zip, a bought-in fitting is consumed by a
     // batch exactly like raw material, and stocking it as a trading good is the
@@ -492,14 +500,18 @@ function BOMPageInner() {
         </div>
       )}
 
-      {/* Three, not four. The fourth was Average Unit Cost — an average across
-          BOMs for different products, which is a number with no meaning: the
-          mean of a bag and a box is neither. */}
-      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(3,1fr)", gap: 12, marginBottom: 20 }}>
+      {/* The fourth card used to be Average Unit Cost — the mean of a bag and
+          a box, which is neither, and money on a screen that is not about
+          money. In its place, the one number that decides whether any of these
+          BOMs can actually be run today: how many of the materials they
+          consume have fallen to their reorder level. Amber only when there is
+          something to act on; a zero here is good news and reads as such. */}
+      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 12, marginBottom: 20 }}>
         {[
           { label: "Total BOMs", value: boms.length, color: "#f97316" },
           { label: "Products In Production", value: new Set(orders.map((o) => o.product)).size, color: "#38bdf8" },
           { label: "Raw Materials", value: rawMaterials.length, color: "#22c55e" },
+          { label: "Materials Low On Stock", value: lowMaterials, color: lowMaterials ? "#f59e0b" : "#22c55e" },
         ].map((card) => (
           <div key={card.label} style={{ background: bg, border: `1px solid ${border}`, borderRadius: 14, padding: isMobile ? "12px 10px" : "18px 20px" }}>
             <div style={{ fontSize: 12, color: "rgba(255,255,255,.48)", marginBottom: 6 }}>{card.label}</div>
