@@ -283,6 +283,42 @@ function BOMPageInner() {
   const partial = orderQtyNum > 0 && todayQtyNum > 0 && todayQtyNum < orderQtyNum;
   const pendingQty = Math.max(orderQtyNum - todayQtyNum, 0);
 
+  /**
+   * Pieces done today, per job.
+   *
+   * One run is not one operation. A bag is sealed and then buttoned, by
+   * different people working at different speeds, and on any given day those
+   * two numbers are simply not the same — 8,000 sealed and 7,000 buttoned is
+   * an ordinary day, not an error.
+   *
+   * The finished count is the slowest of the jobs, because a bag that has been
+   * sealed but not buttoned is not a bag anyone can ship. The difference is
+   * part-made stock, and it finishes first thing tomorrow.
+   *
+   * The labour rows already carry the honest per-job figure — each worker is
+   * paid for what they actually did — so nothing new has to be typed. This
+   * only reads them back and says what they imply, which is the one thing the
+   * screen was leaving the operator to work out in their head.
+   */
+  const jobsToday = useMemo(() => {
+    const by = new Map<string, number>();
+    for (const row of labourRows) {
+      const qty = Number(row.qty) || 0;
+      if (!row.labourId || qty <= 0) continue;
+      const job = row.operation.trim() || "Unnamed job";
+      // Two people on the same job add up — three cutters doing 3,000 each
+      // have cut 9,000 pieces between them, not done the job three times.
+      by.set(job, (by.get(job) || 0) + qty);
+    }
+    return [...by.entries()].sort((a, b) => a[1] - b[1]);
+  }, [labourRows]);
+
+  const slowestJob = jobsToday.length ? jobsToday[0][1] : 0;
+  const fastestJob = jobsToday.length ? jobsToday[jobsToday.length - 1][1] : 0;
+  /* Only worth saying when the jobs actually disagree. One job, or every job
+     on the same number, and the finished count is not in question. */
+  const jobsDisagree = jobsToday.length > 1 && slowestJob < fastestJob;
+
   function openMake(bom: ManufacturingBom) {
     setMakeBom(bom);
     setMakeOrderQty(String(bom.yieldUnits || 1));
@@ -785,6 +821,42 @@ function BOMPageInner() {
                         <div style={{ marginTop: 8, fontSize: 11.5, color: "#fbbf24" }}>
                           A worker is named with no pieces or no rate. Fill both in, or take the row out —
                           left as it is, the run would post with no labour cost and nobody owed.
+                        </div>
+                      )}
+
+                      {/* The jobs finished different amounts today, which is
+                          normal and which the single "Finished today" box
+                          cannot say on its own. Rather than leaving the
+                          operator to work out which number goes in it, the
+                          rows they have already filled in are read back and
+                          the answer is offered. */}
+                      {jobsDisagree && (
+                        <div style={{ marginTop: 12, padding: "11px 13px", borderRadius: 10, background: "rgba(56,189,248,.07)", border: "1px solid rgba(56,189,248,.24)" }}>
+                          <div style={{ display: "flex", flexWrap: "wrap", gap: "4px 14px", marginBottom: 8 }}>
+                            {jobsToday.map(([job, qty]) => (
+                              <span key={job} style={{ fontSize: 12, color: "rgba(255,255,255,.72)" }}>
+                                {job}{" "}
+                                <span style={{ fontFamily: "ui-monospace, monospace", fontWeight: 700, color: qty === slowestJob ? "#38bdf8" : "rgba(255,255,255,.55)" }}>
+                                  {qty.toLocaleString()}
+                                </span>
+                              </span>
+                            ))}
+                          </div>
+                          <div style={{ fontSize: 11.5, lineHeight: 1.65, color: "rgba(255,255,255,.55)" }}>
+                            A piece is finished only once every job is done on it, so{" "}
+                            <strong style={{ color: "#38bdf8" }}>{slowestJob.toLocaleString()}</strong> are
+                            finished today. The other {(fastestJob - slowestJob).toLocaleString()} are
+                            part-made — they keep the work already done on them and finish first thing in
+                            the next run. Everyone above is paid for what they did either way.
+                          </div>
+                          {todayQtyNum !== slowestJob && (
+                            <button
+                              onClick={() => setMakeQty(String(slowestJob))}
+                              style={{ marginTop: 9, padding: "6px 12px", borderRadius: 8, background: "rgba(56,189,248,.14)", border: "1px solid rgba(56,189,248,.35)", color: "#7dd3fc", fontSize: 11.5, fontWeight: 700, fontFamily: "inherit", cursor: "pointer" }}
+                            >
+                              Set “Finished today” to {slowestJob.toLocaleString()}
+                            </button>
+                          )}
                         </div>
                       )}
                       <button

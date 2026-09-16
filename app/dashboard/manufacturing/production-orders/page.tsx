@@ -26,6 +26,10 @@ export default function ProductionOrdersPage() {
   const bomStore = useBusinessRecords("bom");
   const goodsStore = useBusinessRecords("finished_good_batch");
   const workStore = useBusinessRecords("work_order");
+  /* Every piece-rate row ever posted against a run. Each one names the job it
+     was for and how many pieces it covered, which between them is the only
+     record of how far each operation has got on an order. */
+  const labourStore = useBusinessRecords("labour_entry");
   const [showModal, setShowModal] = useState(false);
   const [formError, setFormError] = useState("");
   // Completion dialog — priced before anything is written.
@@ -61,6 +65,38 @@ export default function ProductionOrdersPage() {
   const boms = useMemo(() => bomStore.records.map(mapBomRecord), [bomStore.records]);
   const finishedGoods = useMemo(() => goodsStore.records.map(mapFinishedGoodsRecord), [goodsStore.records]);
   const workOrders = useMemo(() => workStore.records.map(mapWorkOrderRecord), [workStore.records]);
+
+  /**
+   * How far each job has got, per order.
+   *
+   * An order is not one operation. The same 10,000 bags are sealed by one
+   * person and buttoned by another, and those two jobs do not keep pace — a
+   * day that seals 8,000 and buttons 7,000 is an ordinary day. The order's own
+   * `completed` count is the finished figure, which is the slower of them; it
+   * cannot say that 1,000 bags are already sealed and only need buttons.
+   *
+   * Tomorrow's operator has to know that, or those 1,000 get sealed twice and
+   * somebody gets paid twice for doing it once. The labour rows already record
+   * it honestly — each worker was paid for the pieces they actually did — so
+   * this reads them back per job rather than asking anyone to log it again.
+   */
+  const jobsByOrder = useMemo(() => {
+    const byOrder = new Map<string, Map<string, number>>();
+    for (const record of labourStore.records) {
+      const orderKey = record.refId || "";
+      if (!orderKey) continue;
+      const data = record.data as { operation?: unknown; qty?: unknown };
+      const qty = Number(data?.qty) || 0;
+      if (qty <= 0) continue;
+      const job = String(data?.operation || "").trim() || "Unnamed job";
+      const jobs = byOrder.get(orderKey) ?? new Map<string, number>();
+      // Several people on one job add up: three cutters doing 3,000 each have
+      // cut 9,000 pieces between them.
+      jobs.set(job, (jobs.get(job) || 0) + qty);
+      byOrder.set(orderKey, jobs);
+    }
+    return byOrder;
+  }, [labourStore.records]);
 
   useEffect(() => {
     fetch("/api/manufacturing/labour", { cache: "no-store" })
@@ -311,6 +347,8 @@ export default function ProductionOrdersPage() {
           const fgCreated = finishedGoods.some((item) => item.productionOrderId === order.orderId);
           const linkedWorkOrders = workOrders.filter((item) => item.linkedProductionOrderId === order.orderId);
           const incompleteWorkOrders = linkedWorkOrders.filter((item) => item.status !== "completed").length;
+          // Slowest job first: the one holding the order up is the one to read.
+          const jobs = [...(jobsByOrder.get(order.id) ?? new Map<string, number>())].sort((a, b) => a[1] - b[1]);
           return (
             <div key={order.id} style={{ background: bg, border: `1px solid ${border}`, borderRadius: 14, padding: isMobile ? "12px 10px" : "18px 22px" }}>
               <div style={{ display: "flex", justifyContent: "space-between", gap: 14, alignItems: "flex-start", marginBottom: 12 }}>
@@ -328,6 +366,41 @@ export default function ProductionOrdersPage() {
               <div style={{ fontSize: 12, color: "rgba(255,255,255,.5)", marginBottom: 10 }}>
                 Due {order.plannedDate || "Not set"} • Assigned {order.assignedTo || "Unassigned"} • {fgCreated ? "Finished goods batch created" : "FG pending"} • Work orders open {incompleteWorkOrders}
               </div>
+
+              {/* Where each job has got to, which the finished count cannot
+                  say. A job standing ahead of the finished figure is pieces
+                  already part-made: they do not need that job doing again, and
+                  nobody should be paid for it twice. */}
+              {jobs.length > 0 && (
+                <div style={{ display: "flex", flexWrap: "wrap", gap: "6px 8px", marginBottom: 12 }}>
+                  {jobs.map(([job, qty]) => {
+                    const ahead = qty - order.completed;
+                    return (
+                      <span
+                        key={job}
+                        title={ahead > 0
+                          ? `${ahead.toLocaleString()} pieces have had ${job} done but are not finished yet — they do not need it again`
+                          : `${job} has kept up with the finished count`}
+                        style={{
+                          display: "inline-flex", alignItems: "baseline", gap: 6,
+                          padding: "4px 10px", borderRadius: 999, fontSize: 11.5,
+                          background: ahead > 0 ? "rgba(56,189,248,.1)" : "rgba(255,255,255,.04)",
+                          border: `1px solid ${ahead > 0 ? "rgba(56,189,248,.28)" : border}`,
+                          color: "rgba(255,255,255,.65)",
+                        }}
+                      >
+                        {job}
+                        <span style={{ fontFamily: "ui-monospace, monospace", fontWeight: 700, color: "#fff" }}>
+                          {qty.toLocaleString()}/{order.quantity.toLocaleString()}
+                        </span>
+                        {ahead > 0 && (
+                          <span style={{ color: "#7dd3fc", fontWeight: 700 }}>+{ahead.toLocaleString()} part-made</span>
+                        )}
+                      </span>
+                    );
+                  })}
+                </div>
+              )}
               <div style={{ background: "rgba(255,255,255,.08)", height: 6, borderRadius: 999, overflow: "hidden", marginBottom: 14 }}>
                 <div style={{ width: `${progress}%`, height: "100%", background: statusColor[order.status] || "#94a3b8" }} />
               </div>
