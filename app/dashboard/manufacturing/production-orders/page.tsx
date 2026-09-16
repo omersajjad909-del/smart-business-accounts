@@ -168,8 +168,28 @@ export default function ProductionOrdersPage() {
      that was never made. One word in the box settles it. */
   const jobNamesMissing = (labourPieces?.unnamed ?? 0) > 1;
 
-  const labourBlocked =
-    jobNamesMissing || (labourPieces?.over.length ?? 0) > 0 || (labourPieces?.under.length ?? 0) > 0;
+  /**
+   * A job's pieces no longer have to equal the run.
+   *
+   * That rule was written for an order made start to finish in one go, and it
+   * is wrong for every other kind. Jobs run at different speeds and carry over
+   * between days, which is the whole point of part-made stock:
+   *
+   *   under the run — sealing 2,000 on a run that finishes 3,000 is right when
+   *     1,000 of today's pieces were sealed in an earlier run and only needed
+   *     buttons today. They keep the work already done on them.
+   *
+   *   over the run — sealing 8,000 on a run that finishes 3,000 is right too.
+   *     The extra 5,000 are sealed and waiting for the next job.
+   *
+   * Both were blocked, so the one pattern this screen exists to handle could
+   * not be entered at all. They are now said out loud and left to the operator,
+   * who can see the floor and knows which of the two it is. The danger the
+   * block was there for — the day's output typed against a worker while the
+   * run is left at the order's whole balance — is still called out, in the
+   * warning below, naming the consequence.
+   */
+  const labourBlocked = jobNamesMissing;
 
   /**
    * The jobs this company has actually paid for before, offered as you type.
@@ -704,8 +724,9 @@ export default function ProductionOrdersPage() {
                   <div style={{ fontSize: 11, color: "rgba(255,255,255,.32)", marginTop: 8, lineHeight: 1.7 }}>
                     Assigning workers here charges what&apos;s actually owed to each of them instead of the BOM&apos;s flat labour estimate below.
                     Name the job each row is for — cutting, button, packing. With more than one worker it is required, because
-                    rows with no job named are counted as one job. The same pieces can go through every job on this one run, and
-                    each job&apos;s pieces have to add up to the run on their own.
+                    rows with no job named are counted as one job. Jobs need not match each other or the run: one can run ahead
+                    and leave pieces part-made for the next run, and one can run behind because its pieces were done in an
+                    earlier one. Each worker is paid for the pieces on their own row.
                   </div>
                 </div>
 
@@ -729,18 +750,24 @@ export default function ProductionOrdersPage() {
                 )}
 
                 {/* A job's pieces disagree with the run — say so before the order closes. */}
+                {/* A job behind the run. Normal when those pieces had that job
+                    done in an earlier run — and the one real danger on this
+                    screen when they did not, so the consequence is named
+                    rather than the entry refused. */}
                 {!jobNamesMissing && labourPieces && labourPieces.under.length > 0 && (
                   <div style={{ padding: "12px 14px", borderRadius: 12, background: "rgba(251,191,36,.1)", border: "1px solid rgba(251,191,36,.3)", marginBottom: 14 }}>
                     <div style={{ fontSize: 12.5, color: "#fbbf24", fontWeight: 700, marginBottom: 5 }}>
                       This run finishes {runQty.toLocaleString()} pieces, but {labourPieces.under.map((g) => `${g.operation} is paid for ${g.total.toLocaleString()}`).join("; ")}
                     </div>
                     <div style={{ fontSize: 11.5, color: "rgba(255,255,255,.5)", lineHeight: 1.7 }}>
-                      Confirm is blocked until every job adds up to {runQty.toLocaleString()} — that is what would be received into
-                      finished goods and charged to this order
+                      That is right if the rest of today&apos;s pieces already had that job done in an earlier run —
+                      they keep the work done on them and only needed finishing.
+                      {" "}If they did not, {runQty.toLocaleString()} is more than was really made: it goes into finished
+                      goods and is charged to this order
                       {runOrder.quantity > 0 && runQty >= runOrder.quantity - runOrder.completed
                         ? ", which closes it — the balance could never be produced against it again"
                         : ""}.
-                      {" "}Add the workers who did the rest of that job, or lower the run to what was really finished.
+                      {" "}Add the workers who did the rest of that job, or lower the run.
                     </div>
                     {labourPieces.soleTotal != null && (
                       <button
@@ -752,11 +779,15 @@ export default function ProductionOrdersPage() {
                     )}
                   </div>
                 )}
+
+                {/* A job ahead of the run — pieces worked on today that finish
+                    later. Not a problem at all: this is part-made stock, and
+                    saying so is the whole reason the operator can trust the
+                    difference is not lost. */}
                 {!jobNamesMissing && labourPieces && labourPieces.over.length > 0 && (
-                  <div style={{ padding: "12px 14px", borderRadius: 12, background: "rgba(239,68,68,.12)", border: "1px solid rgba(239,68,68,.3)", marginBottom: 14, fontSize: 12.5, color: "#fca5a5", lineHeight: 1.7 }}>
-                    {labourPieces.over.map((g) => `${g.operation} is paid for ${g.total.toLocaleString()} pieces`).join("; ")} but this run only
-                    finishes {runQty.toLocaleString()}. Raise the run, or lower that job&apos;s pieces so it adds up to {runQty.toLocaleString()}.
-                    {" "}Two different jobs on the same pieces are fine — give each row its own job name.
+                  <div style={{ padding: "12px 14px", borderRadius: 12, background: "rgba(56,189,248,.08)", border: "1px solid rgba(56,189,248,.25)", marginBottom: 14, fontSize: 12, color: "rgba(255,255,255,.6)", lineHeight: 1.7 }}>
+                    {labourPieces.over.map((g) => `${g.operation} is paid for ${g.total.toLocaleString()} but only ${runQty.toLocaleString()} finish today, so ${(g.total - runQty).toLocaleString()} stay part-made`).join("; ")}.
+                    {" "}They keep the work done on them and finish in a later run — nothing is lost and nobody is paid twice.
                   </div>
                 )}
 
