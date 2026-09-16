@@ -144,10 +144,32 @@ export default function ProductionOrdersPage() {
       under: groups.filter((g) => g.total < runQty),
       /** Only one job on this run — the "set the run to what was made" shortcut still makes sense. */
       soleTotal: groups.length === 1 ? groups[0].total : null,
+      /**
+       * Rows with a worker and pieces but no job typed.
+       *
+       * Two of them fall into the same group and are added together, which
+       * reads as one job paid twice over. That is how a sealer on 2,000 and a
+       * button hand on 3,000 came out as "5,000 pieces" against a run of
+       * 3,000: the screen could not tell they were different jobs, because
+       * nobody had said so.
+       *
+       * It looks like it has been said — the workers are called "Ahmad sealer"
+       * and "Ali Button" — but a worker's name is who they are, not what this
+       * row is for. The same person does a different job tomorrow.
+       */
+      unnamed: rows.filter((r) => !r.operation.trim()).length,
     };
   }, [labourRows, runQty]);
 
-  const labourBlocked = (labourPieces?.over.length ?? 0) > 0 || (labourPieces?.under.length ?? 0) > 0;
+  /* Ambiguous rather than wrong, and blocked for that reason: two blank job
+     names could be one job split between two people, or two jobs on the same
+     pieces, and those need completely different totals. The screen cannot
+     guess, and guessing wrong either double-pays a job or closes an order
+     that was never made. One word in the box settles it. */
+  const jobNamesMissing = (labourPieces?.unnamed ?? 0) > 1;
+
+  const labourBlocked =
+    jobNamesMissing || (labourPieces?.over.length ?? 0) > 0 || (labourPieces?.under.length ?? 0) > 0;
 
   /**
    * The jobs this company has actually paid for before, offered as you type.
@@ -654,12 +676,18 @@ export default function ProductionOrdersPage() {
                           <option value="">— Worker —</option>
                           {labourList.map((l) => <option key={l.id} value={l.id}>{l.name}</option>)}
                         </select>
+                        {/* Marked red when it is the empty box that is holding
+                            the run up. The message below says what is wrong;
+                            this says which box to type in. */}
                         <input
                           list="production-operations"
                           placeholder="Job — e.g. Button"
                           value={row.operation}
                           onChange={(e) => setLabourRow(index, { operation: e.target.value })}
-                          style={{ background: bg, border: `1px solid ${border}`, borderRadius: 8, padding: "8px 10px", color: "#fff", fontSize: 12.5 }}
+                          style={{
+                            background: bg, borderRadius: 8, padding: "8px 10px", color: "#fff", fontSize: 12.5,
+                            border: `1px solid ${jobNamesMissing && row.labourId && !row.operation.trim() ? "rgba(239,68,68,.55)" : border}`,
+                          }}
                         />
                         <input type="number" min={0} step="any" placeholder="Pcs" value={row.qty} onChange={(e) => setLabourRow(index, { qty: e.target.value })} style={{ background: bg, border: `1px solid ${border}`, borderRadius: 8, padding: "8px 10px", color: "#fff", fontSize: 12.5 }} />
                         <input type="number" min={0} step="any" placeholder="Rate/pc" value={row.rate} onChange={(e) => setLabourRow(index, { rate: e.target.value })} style={{ background: bg, border: `1px solid ${border}`, borderRadius: 8, padding: "8px 10px", color: "#fff", fontSize: 12.5 }} />
@@ -675,13 +703,33 @@ export default function ProductionOrdersPage() {
                   </button>
                   <div style={{ fontSize: 11, color: "rgba(255,255,255,.32)", marginTop: 8, lineHeight: 1.7 }}>
                     Assigning workers here charges what&apos;s actually owed to each of them instead of the BOM&apos;s flat labour estimate below.
-                    Name the job each row is for — cutting, button, packing — and the same pieces can go through every job on this one run.
-                    Each job&apos;s pieces have to add up to the run on their own.
+                    Name the job each row is for — cutting, button, packing. With more than one worker it is required, because
+                    rows with no job named are counted as one job. The same pieces can go through every job on this one run, and
+                    each job&apos;s pieces have to add up to the run on their own.
                   </div>
                 </div>
 
+                {/* Said before the arithmetic message, because when the job
+                    names are missing the arithmetic message is misleading: it
+                    reports a 5,000 that nobody entered and asks for it to be
+                    lowered, when the rows were right all along and only the
+                    job names were missing. */}
+                {jobNamesMissing && (
+                  <div style={{ padding: "12px 14px", borderRadius: 12, background: "rgba(239,68,68,.12)", border: "1px solid rgba(239,68,68,.3)", marginBottom: 14 }}>
+                    <div style={{ fontSize: 12.5, color: "#fca5a5", fontWeight: 700, marginBottom: 5 }}>
+                      Name the job on each row — the boxes marked in red
+                    </div>
+                    <div style={{ fontSize: 11.5, color: "rgba(255,255,255,.5)", lineHeight: 1.7 }}>
+                      Rows with no job named are counted as one job and added together, so their pieces come
+                      out as {(labourPieces?.groups.find((g) => g.operation === "Labour")?.total ?? 0).toLocaleString()} instead
+                      of standing on their own. The worker&apos;s name does not settle it — the same person does a
+                      different job tomorrow. Type what this row is for: sealing, button, packing.
+                    </div>
+                  </div>
+                )}
+
                 {/* A job's pieces disagree with the run — say so before the order closes. */}
-                {labourPieces && labourPieces.under.length > 0 && (
+                {!jobNamesMissing && labourPieces && labourPieces.under.length > 0 && (
                   <div style={{ padding: "12px 14px", borderRadius: 12, background: "rgba(251,191,36,.1)", border: "1px solid rgba(251,191,36,.3)", marginBottom: 14 }}>
                     <div style={{ fontSize: 12.5, color: "#fbbf24", fontWeight: 700, marginBottom: 5 }}>
                       This run finishes {runQty.toLocaleString()} pieces, but {labourPieces.under.map((g) => `${g.operation} is paid for ${g.total.toLocaleString()}`).join("; ")}
@@ -704,7 +752,7 @@ export default function ProductionOrdersPage() {
                     )}
                   </div>
                 )}
-                {labourPieces && labourPieces.over.length > 0 && (
+                {!jobNamesMissing && labourPieces && labourPieces.over.length > 0 && (
                   <div style={{ padding: "12px 14px", borderRadius: 12, background: "rgba(239,68,68,.12)", border: "1px solid rgba(239,68,68,.3)", marginBottom: 14, fontSize: 12.5, color: "#fca5a5", lineHeight: 1.7 }}>
                     {labourPieces.over.map((g) => `${g.operation} is paid for ${g.total.toLocaleString()} pieces`).join("; ")} but this run only
                     finishes {runQty.toLocaleString()}. Raise the run, or lower that job&apos;s pieces so it adds up to {runQty.toLocaleString()}.
