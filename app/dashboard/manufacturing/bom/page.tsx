@@ -879,7 +879,13 @@ function BOMPageInner() {
                     <div style={{ display: "grid", gridTemplateColumns: "1fr 110px 96px 32px", gap: 8, alignItems: "center" }}>
                       <select value={line.itemId} onChange={(e) => setLine(index, { itemId: e.target.value })} style={inputStyle}>
                         <option value="">— Material —</option>
-                        {rawMaterials.map((m) => <option key={m.id} value={m.id}>{m.name} ({m.currentStock}{m.unit})</option>)}
+                        {/* The unit, not the stock on hand. The number in the
+                            name was a running balance read at the moment the
+                            list rendered — stale by the time a batch is made,
+                            and never what this dialog is deciding. The unit
+                            stays because the box beside it is a quantity and
+                            the operator has to know 1 means one roll. */}
+                        {rawMaterials.map((m) => <option key={m.id} value={m.id}>{m.name}{m.unit ? ` (${m.unit})` : ""}</option>)}
                       </select>
                       <input type="number" min={0} step="any" placeholder="Qty" value={line.qty} onChange={(e) => setLine(index, { qty: e.target.value })} style={inputStyle} />
                       {/* The same quantity read the other way, and deliberately
