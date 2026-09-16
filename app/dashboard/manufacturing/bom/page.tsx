@@ -900,15 +900,18 @@ function BOMPageInner() {
                         {rawMaterials.map((m) => <option key={m.id} value={m.id}>{m.name} ({m.currentStock}{m.unit})</option>)}
                       </select>
                       <input type="number" min={0} step="any" placeholder="Qty" value={line.qty} onChange={(e) => setLine(index, { qty: e.target.value })} style={inputStyle} />
-                      {/* The same quantity read the other way. A batch figure
-                          can only be checked against a batch nobody counts;
-                          the per-piece number beside it is the one an operator
-                          knows by heart, so a wrong entry shows itself here
-                          rather than in a costed run three days later. */}
+                      {/* The same quantity read the other way, and deliberately
+                          no money. A batch figure can only be checked against a
+                          batch nobody counts; the per-piece number beside it is
+                          the one an operator knows by heart, so a wrong entry
+                          shows itself here rather than in a run three days
+                          later. A rupee figure next to it checks nothing — the
+                          operator did not choose the rate and cannot correct
+                          it, so it only invites them to doubt a number that is
+                          not theirs to doubt. */}
                       <div style={{ fontSize: 12, color: "rgba(255,255,255,.5)", textAlign: "right", lineHeight: 1.35 }}>
-                        <div>{item ? `Rs. ${Math.round(qty * item.unitCost).toLocaleString()}` : "—"}</div>
-                        {qty > 0 && form.yieldUnits > 0 && (
-                          <div style={{ fontSize: 10.5, color: "rgba(255,255,255,.32)" }}>
+                        {qty > 0 && form.yieldUnits > 0 ? (
+                          <div>
                             {(() => {
                               const perUnit = qty / form.yieldUnits;
                               // Four decimals for a roll, none for a button —
@@ -919,6 +922,8 @@ function BOMPageInner() {
                               return `${shown.toLocaleString()}${item?.unit ? ` ${item.unit}` : ""} per unit`;
                             })()}
                           </div>
+                        ) : (
+                          <div style={{ color: "rgba(255,255,255,.25)" }}>—</div>
                         )}
                       </div>
                       <button
@@ -940,18 +945,20 @@ function BOMPageInner() {
               </button>
             </div>
 
-            <div style={{ marginTop: 18, padding: "14px 16px", borderRadius: 12, background: "rgba(34,197,94,.08)", border: "1px solid rgba(34,197,94,.22)", display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
-              <div style={{ fontSize: 12, color: "rgba(255,255,255,.5)" }}>Calculated from live material rates</div>
-              <div style={{ textAlign: "right" }}>
-                <div style={{ fontSize: 17, fontWeight: 800, color: "#22c55e" }}>Rs. {Math.round(draftCost.unitCost).toLocaleString()} <span style={{ fontSize: 12, fontWeight: 500, color: "rgba(255,255,255,.4)" }}>/ unit</span></div>
-                <div style={{ fontSize: 11, color: "rgba(255,255,255,.38)" }}>Rs. {Math.round(draftCost.batchCost).toLocaleString()} per batch of {form.yieldUnits || 1}</div>
-                {draftCost.conversion > 0 && (
-                  <div style={{ fontSize: 11, color: "rgba(255,255,255,.3)", marginTop: 2 }}>
-                    Material Rs. {Math.round(draftCost.materialCost).toLocaleString()} + conversion Rs. {Math.round(draftCost.conversion).toLocaleString()}
-                  </div>
-                )}
-              </div>
-            </div>
+            {/* No cost panel here, on purpose.
+
+                This screen is a recipe: which materials, how much of each, per
+                batch of how many. The cost of that recipe is arithmetic we do
+                from rates the operator did not set and cannot change from this
+                dialog, so a figure here answers a question nobody is asking at
+                this moment and quietly invites a different one — "is Rs. 24
+                right?" — that the person filling in a recipe has no way to
+                settle. It was also the loudest thing on the dialog, which made
+                the costing look like the point of the screen.
+
+                The cost is still calculated and still saved with the BOM
+                (`amount` on the payload below); it is read where it belongs, on
+                the BOM list and in the costed run. */}
 
             <div style={{ display: "flex", gap: 12, marginTop: 18 }}>
               <button onClick={save} disabled={saving} style={{ flex: 1, padding: "11px 0", background: saving ? "rgba(249,115,22,.5)" : "#f97316", border: "none", borderRadius: 8, color: "#fff", fontSize: 14, fontWeight: 700, cursor: saving ? "not-allowed" : "pointer" }}>
