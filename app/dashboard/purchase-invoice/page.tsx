@@ -308,6 +308,31 @@ const [searchTerm, setSearchTerm] = useState("");
     ...(rfActive ? { meta: emptyRateFormulaMeta(rf) } : {}),
   });
 
+  /* Where Enter goes after an item is picked.
+  
+     With a rate formula on, it goes to whichever column the company nominated
+     — that is what rateFormulaEnterHandler decides. Without one it used to go
+     nowhere at all: the picker swallows the Enter that chose the item, and
+     nothing else was listening, so the operator picked an item and then had to
+     reach for the mouse to type a quantity. Qty is what they were reaching
+     for, so Enter goes there. */
+  const onPickerEnter = (i: number) => (e: React.KeyboardEvent<HTMLInputElement> | { key: string; shiftKey: boolean; preventDefault(): void; stopPropagation(): void }) => {
+    if (rfActive) {
+      rateFormulaEnterHandler(rf, rfActive, i, () => lastPickedMeta.current)(e);
+      return;
+    }
+    if (e.key !== "Enter" || e.shiftKey) return;
+    e.preventDefault();
+    e.stopPropagation();
+    // A frame late: the pick has to land on the row before the box it filled
+    // can be focused, and select() so a quantity is typed over, not after.
+    requestAnimationFrame(() => {
+      const el = document.getElementById(`pi-qty-${i}`) as HTMLInputElement | null;
+      el?.focus();
+      el?.select?.();
+    });
+  };
+
   function handlePIScan(e: React.KeyboardEvent<HTMLInputElement>) {
     if (e.key !== "Enter") return;
     e.preventDefault();
@@ -1307,7 +1332,7 @@ const [searchTerm, setSearchTerm] = useState("");
                                   onChange={(key, value) => updateRowMeta(i, key, value)}
                                 />
                               )}
-                              <div><div style={labelStyle()}>Qty</div><input type="number" step="any" value={r.qty} onChange={e => updateRow(i, "qty", e.target.value)} style={inp({ padding: "7px 9px", textAlign: "right" })} /></div>
+                              <div><div style={labelStyle()}>Qty</div><input id={`pi-qty-${i}`} type="number" step="any" value={r.qty} onChange={e => updateRow(i, "qty", e.target.value)} style={inp({ padding: "7px 9px", textAlign: "right" })} /></div>
                               <div><div style={labelStyle()}>Unit Cost</div><input type="number" value={r.rate} onChange={e => updateRow(i, "rate", e.target.value)} readOnly={rfActive && !rf.rateEditable} style={inp({ padding: "7px 9px", textAlign: "right", ...(rfActive && !rf.rateEditable ? { opacity: 0.75 } : {}) })} /></div>
                               <div><div style={labelStyle()}>Disc%</div><input type="number" value={r.discountPercent} onChange={e => updateRow(i, "discountPercent", e.target.value)} style={inp({ padding: "7px 9px", textAlign: "right" })} /></div>
                               <div><div style={labelStyle()}>Tax%</div><input type="number" value={r.taxPercent} onChange={e => updateRow(i, "taxPercent", e.target.value)} style={inp({ padding: "7px 9px", textAlign: "right" })} /></div>
@@ -1375,7 +1400,7 @@ const [searchTerm, setSearchTerm] = useState("");
                                         setRows(copy);
                                       }
                                     }}
-                                      onKeyDown={rateFormulaEnterHandler(rf, rfActive, i, () => lastPickedMeta.current)}
+                                      onKeyDown={onPickerEnter(i)}
                                       label={rfActive ? itemPickerLabel : undefined}
                                       note={grnRemainingNote}
                                       style={{ ...inp({ padding: "5px 7px", fontSize: 12.5 }), fontWeight: r.itemId ? 600 : 400 }}
@@ -1395,7 +1420,7 @@ const [searchTerm, setSearchTerm] = useState("");
                                   <td style={{ padding: "7px 8px", width: 64 }}>
                                     <input value={r.unit} onChange={e => updateRow(i, "unit", e.target.value)} placeholder="pcs" style={inp({ padding: "5px 6px", fontSize: 12, textAlign: "center" })} />
                                   </td>
-                                  <td style={{ padding: "7px 8px", width: 76 }}><input type="number" step="any" value={r.qty} onChange={e => updateRow(i, "qty", e.target.value)} placeholder="0" style={inp({ padding: "5px 7px", textAlign: "right", fontSize: 12.5 })} /></td>
+                                  <td style={{ padding: "7px 8px", width: 76 }}><input id={`pi-qty-${i}`} type="number" step="any" value={r.qty} onChange={e => updateRow(i, "qty", e.target.value)} placeholder="0" style={inp({ padding: "5px 7px", textAlign: "right", fontSize: 12.5 })} /></td>
                                   {rfActive && rtmmFormula.fields.length > 0 && (
                                     <RateFormulaRowCells
                                       settings={rtmmFormula}
