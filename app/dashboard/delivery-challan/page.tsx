@@ -32,7 +32,8 @@ type Item = {
 
 // Items a dispatch can be packed in. Stocked like anything else, so the same
 // picker and the same received / sold / balance figures apply.
-const PACKAGING_CATEGORY = "PACKAGING";
+/** How the goods were packed — a label on the challan, not a stock item. */
+const PACKAGING_TYPES = ["Bags", "Carton", "Packet", "Drum", "Roll", "Loose"];
 
 // Module level so the picker's memo keeps a stable identity across renders.
 function itemStockValues(item: { id: string }) {
@@ -120,6 +121,8 @@ export default function DeliveryChallanPage() {
   // read-only for challans written before packing material was stocked; new
   // ones name a real item instead, so the dispatch can take it out of stock.
   const [packagingType, setPackagingType] = useState("");
+  /* Kept only so an old challan opened for editing still shows what it was
+     packed from, and so its print keeps naming it. Nothing sets it any more. */
   const [packagingItemId, setPackagingItemId] = useState("");
   const [packagingQty, setPackagingQty] = useState<number | "">("");
 
@@ -146,10 +149,6 @@ export default function DeliveryChallanPage() {
   });
   const isThermalPrint = printPrefs.paperSize !== "A4";
   const thermalWidth = printPrefs.paperSize === "THERMAL_58MM" ? "58mm" : "80mm";
-
-  // Packing material is picked from the catalogue rather than a hardcoded
-  // word, so the dispatch can take it out of stock like anything else.
-  const packagingItems = items.filter(i => i.category === PACKAGING_CATEGORY);
 
   // The invoice this challan is delivering against, printed so the customer's
   // gate can tie the two documents together.
@@ -442,7 +441,11 @@ export default function DeliveryChallanPage() {
         poNo: poNo || null,
         dNo: dNo || null,
         packagingType: packagingType || null,
-        packagingItemId: packagingItemId || null,
+        // Always null now. The column and the challans that carry one are left
+        // alone — an old challan still names the item it was packed from, and
+        // lib/challanStock.ts still honours it — but nothing writes a new one,
+        // so no fresh dispatch takes packing material out of stock.
+        packagingItemId: null,
         packagingQty: packagingQty === "" ? null : Number(packagingQty),
         items: clean.map(r => ({ itemId: r.itemId, qty: Number(r.qty), rate: Number(r.rate) || 0 })),
       };
@@ -861,27 +864,26 @@ export default function DeliveryChallanPage() {
                     <input className="border p-2 w-full" value={dNo} onChange={e => setDNo(e.target.value)} placeholder="Optional" />
                  </div>
                  <div>
+                    {/* A plain label again. Naming a stocked item here meant a
+                        challan could not be written until somebody had set up a
+                        Packing Material catalogue, and it took the packing out
+                        of stock on dispatch — more bookkeeping than most
+                        deliveries want. How the goods were packed is a note on
+                        the paperwork, so it is typed like one. */}
                     <label className="text-xs font-bold">Packaging Source</label>
-                    {packagingItems.length === 0 ? (
-                      <div className="border p-2 w-full text-xs text-gray-500">
-                        No packing material in the catalogue yet — add an item under
-                        the <b>Packing Material</b> category in Items.
-                      </div>
-                    ) : (
-                      <ItemPicker
-                        items={packagingItems as any}
-                        value={packagingItemId}
-                        onChange={(picked: string) => setPackagingItemId(picked)}
-                        stockValues={itemStockValues}
-                        allowManual={false}
-                        placeholder="Bags / Carton / Packet…"
-                      />
-                    )}
-                    {packagingType && !packagingItemId && (
-                      <div className="text-[11px] text-gray-500 mt-1">
-                        Was recorded as “{packagingType}” before packing material was stocked.
-                      </div>
-                    )}
+                    <select
+                      className="border p-2 w-full"
+                      value={packagingType}
+                      onChange={e => setPackagingType(e.target.value)}
+                    >
+                      <option value="">— Select —</option>
+                      {PACKAGING_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
+                      {/* A challan written before this list existed keeps
+                          whatever it said, rather than silently losing it. */}
+                      {packagingType && !PACKAGING_TYPES.includes(packagingType) && (
+                        <option value={packagingType}>{packagingType}</option>
+                      )}
+                    </select>
                  </div>
                  <div>
                     <label className="text-xs font-bold">Packaging Qty</label>
