@@ -25,6 +25,15 @@ const inputStyle: React.CSSProperties = {
   borderRadius: 8, padding: "9px 12px", color: "#fff", boxSizing: "border-box",
 };
 
+const qtyLabel: React.CSSProperties = {
+  display: "block", fontSize: 12, color: "rgba(255,255,255,.45)", marginBottom: 6,
+};
+const qtyInput: React.CSSProperties = {
+  width: "100%", padding: "10px 12px", borderRadius: 9,
+  background: "rgba(255,255,255,.05)", border: `1px solid ${border}`,
+  color: "#fff", fontSize: 15, fontFamily: "inherit", boxSizing: "border-box",
+};
+
 type LabourRow = { labourId: string; operation: string; qty: string; rate: string };
 
 type LineDraft = {
@@ -309,8 +318,9 @@ function BOMPageInner() {
 
   async function confirmMake() {
     if (!makeBom || !makeQuote) return;
-    const qty = Math.floor(Number(makeQty));
-    if (!Number.isFinite(qty) || qty <= 0) { setMakeError("How many are being made?"); return; }
+    const qty = todayQtyNum;
+    const orderQty = Math.max(orderQtyNum, qty);
+    if (qty <= 0) { setMakeError("How many were finished today?"); return; }
 
     const assignments = labourRows
       // rate > 0, not >= 0. A named worker at zero used to count as a real
@@ -332,18 +342,22 @@ function BOMPageInner() {
       // The order is raised first because the posting path is built around one
       // — it is what the finished goods batch and the WIP entry are traced
       // back to. It is simply not left for the operator to do by hand.
+      /* The order is what was asked for, not what came off the floor today.
+         Posting them as the same number is what put finished goods into stock
+         that nobody had made yet; keeping them apart is what lets the posting
+         leave the order `running` with a balance to carry into tomorrow. */
       const order = await productionStore.create({
         title: makeBom.product,
         status: "in_progress",
         date: new Date().toISOString().slice(0, 10),
         data: {
           orderId: `PO-${String(orders.length + 1).padStart(4, "0")}`,
-          quantity: qty,
+          quantity: orderQty,
           completed: 0,
           bomId: makeBom.id,
           bomVersion: makeBom.version || "",
           location: makeQuote.location || "MAIN",
-          notes: "Raised and posted from the BOM",
+          notes: "Raised from the BOM",
         },
       });
 
@@ -368,6 +382,13 @@ function BOMPageInner() {
       toast.success(
         `${body.producedQty} × ${makeBom.product} made · batch ${body.batchNo} · Rs. ${Math.round(body.totalCost).toLocaleString()} to Finished Goods`,
       );
+      // Where the rest of the job now lives, said at the moment it becomes true.
+      if (orderQty > qty) {
+        toast(
+          `${(orderQty - qty).toLocaleString()} still to make — the order is open on Production Orders`,
+          { icon: "📋", duration: 6000 },
+        );
+      }
       if (kept.length) {
         toast(`Kept as open stock: ${kept.map((r) => `${Number(r.qty).toFixed(2)}${r.unit} ${r.itemName}`).join(", ")}`, { icon: "♻️" });
       }
@@ -773,7 +794,11 @@ function BOMPageInner() {
                   cursor: makeBusy || !makeQuote ? "not-allowed" : "pointer",
                 }}
               >
-                {makeBusy ? "Making…" : makeQuote ? `Make ${Number(makeQty).toLocaleString()}` : "Pricing…"}
+                {makeBusy
+                  ? "Making…"
+                  : makeQuote
+                    ? `Make ${todayQtyNum.toLocaleString()}${partial ? ` of ${orderQtyNum.toLocaleString()}` : ""}`
+                    : "Pricing…"}
               </button>
               <button onClick={closeMake} disabled={makeBusy}
                 style={{ padding: "11px 20px", background: "rgba(255,255,255,.05)", border: `1px solid ${border}`, borderRadius: 8, color: "rgba(255,255,255,.65)", fontSize: 14, fontFamily: "inherit", cursor: "pointer" }}>
