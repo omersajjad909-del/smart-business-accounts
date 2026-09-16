@@ -476,7 +476,7 @@ function BOMPageInner() {
         <div>
           <h1 style={{ fontSize: 22, fontWeight: 800, margin: "0 0 4px" }}>Bill of Materials</h1>
           <p style={{ fontSize: 13, color: "rgba(255,255,255,.42)", margin: 0 }}>
-            What each finished product consumes. Cost is calculated from live material rates.
+            What each finished product consumes, and how many one batch makes.
           </p>
         </div>
         <button onClick={startNew} style={{ padding: "10px 20px", borderRadius: 10, border: "none", background: "#f97316", color: "#fff", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>
@@ -492,12 +492,14 @@ function BOMPageInner() {
         </div>
       )}
 
-      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 12, marginBottom: 20 }}>
+      {/* Three, not four. The fourth was Average Unit Cost — an average across
+          BOMs for different products, which is a number with no meaning: the
+          mean of a bag and a box is neither. */}
+      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(3,1fr)", gap: 12, marginBottom: 20 }}>
         {[
           { label: "Total BOMs", value: boms.length, color: "#f97316" },
           { label: "Products In Production", value: new Set(orders.map((o) => o.product)).size, color: "#38bdf8" },
           { label: "Raw Materials", value: rawMaterials.length, color: "#22c55e" },
-          { label: "Average Unit Cost", value: `Rs. ${boms.length ? Math.round(boms.reduce((s, b) => s + b.unitCost, 0) / boms.length).toLocaleString() : 0}`, color: "#f59e0b" },
         ].map((card) => (
           <div key={card.label} style={{ background: bg, border: `1px solid ${border}`, borderRadius: 14, padding: isMobile ? "12px 10px" : "18px 20px" }}>
             <div style={{ fontSize: 12, color: "rgba(255,255,255,.48)", marginBottom: 6 }}>{card.label}</div>
@@ -510,18 +512,27 @@ function BOMPageInner() {
         <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
           {boms.map((bom) => {
             const linkedOrders = orders.filter((o) => o.product === bom.product).length;
+            // What the finished goods are counted in — PCS, KG, whatever the
+            // item was set up as. "units" only when the item has gone.
+            const yieldUnit = itemsById.get(bom.finishedItemId)?.unit || "units";
             return (
               <div key={bom.id} style={{ background: bg, border: `1px solid ${border}`, borderRadius: 14, padding: isMobile ? "12px 10px" : "20px 22px" }}>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 16, marginBottom: 12 }}>
                   <div>
                     <div style={{ fontSize: 16, fontWeight: 800 }}>{bom.product}</div>
                     <div style={{ fontSize: 12, color: "rgba(255,255,255,.42)", marginTop: 4 }}>
-                      Version {bom.version} • Yield {bom.yieldUnits} units • Linked orders {linkedOrders}
+                      Version {bom.version} • Linked orders {linkedOrders}
                     </div>
                   </div>
                   <div style={{ textAlign: "right" }}>
-                    <div style={{ color: "#22c55e", fontSize: 15, fontWeight: 800 }}>Rs. {Math.round(bom.unitCost).toLocaleString()}</div>
-                    <div style={{ fontSize: 11, color: "rgba(255,255,255,.35)" }}>per unit</div>
+                    {/* The batch size, where the unit cost used to be. What a
+                        BOM is asked at a glance is "how many does one run of
+                        this make" — the cost is a figure for the costing
+                        screen, and up here it only competed with the name of
+                        the product for attention. Yield also stops repeating
+                        itself: it was in the line above as well. */}
+                    <div style={{ color: "#38bdf8", fontSize: 15, fontWeight: 800 }}>{bom.yieldUnits.toLocaleString()}</div>
+                    <div style={{ fontSize: 11, color: "rgba(255,255,255,.35)" }}>{yieldUnit} per batch</div>
                     <div style={{ display: "flex", gap: 6, marginTop: 9, justifyContent: "flex-end" }}>
                       {/* The whole run from here: raise the order, start it and
                           post it in one confirm. The Production Orders screen
