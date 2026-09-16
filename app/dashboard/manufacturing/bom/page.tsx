@@ -78,14 +78,11 @@ function BOMPageInner() {
    * by resetForm()/startEdit() so it never leaks onto an unrelated BOM.
    */
   const [formulaMeta, setFormulaMeta] = useState<{ id: string; name: string; version: number } | null>(null);
-  /**
-   * The non-labour charge the formula sent across — buttons, tape, a bought-in
-   * part. Never written into Overhead: Overhead per batch stays a manual field
-   * the operator types themselves. This is only named here so the operator is
-   * prompted to add it as its own line under Materials consumed per batch,
-   * with a real quantity and item, until then it is simply not costed in.
-   */
-  const [charge, setCharge] = useState<{ label: string; perBatch: number } | null>(null);
+  /* The formula's non-labour charge — buttons, tape, a bought-in part — is
+     deliberately not held in state any more. It was only ever here to be
+     announced in a banner, and it arrives as a seeded material line below
+     regardless. It is still never written into Overhead: Overhead per batch
+     stays a manual field the operator types themselves. */
 
   // Deep-linked from Costing → "Create BOM →". The formula already knows the
   // units per batch and the conversion cost; only the finished product and
@@ -96,8 +93,6 @@ function BOMPageInner() {
     if (!formulaId) return;
     const yieldUnits = Number(params.get("yieldUnits"));
     const labourPerBatch = Number(params.get("labourPerBatch"));
-    const pendingChargeAmount = Number(params.get("pendingChargeAmount"));
-    const chargeLabel = params.get("chargeLabel") || "";
     setForm((c) => ({
       ...c,
       version: params.get("version") || c.version,
@@ -106,9 +101,6 @@ function BOMPageInner() {
       // Overhead per batch is left untouched here — it stays whatever the
       // operator types, never auto-filled from the formula.
     }));
-    if (Number.isFinite(pendingChargeAmount) && pendingChargeAmount > 0) {
-      setCharge({ label: chargeLabel || "Other per-unit charges", perBatch: pendingChargeAmount });
-    }
 
     /* A line per consumable the formula named, quantity already worked out for
        one batch. Read defensively — a query string is the one input here
@@ -184,7 +176,6 @@ function BOMPageInner() {
     setLines([{ itemId: "", qty: "", divisible: false }]);
     setEditingId("");
     setFormulaMeta(null);
-    setCharge(null);
     setFormError("");
   }
 
@@ -813,21 +804,12 @@ function BOMPageInner() {
         <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.7)", zIndex: 50, display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }}>
           <div style={{ background: "#161b27", border: `1px solid ${border}`, borderRadius: 16, padding: 30, width: 580, maxHeight: "90vh", overflowY: "auto", fontFamily: ff }}>
             <h2 style={{ margin: "0 0 12px", fontSize: 18, fontWeight: 700 }}>{editingId ? "Edit Bill of Materials" : "New Bill of Materials"}</h2>
-            {formulaMeta && (
-              <div style={{ marginBottom: 14, padding: "10px 12px", borderRadius: 8, background: "rgba(129,140,248,.1)", border: "1px solid rgba(129,140,248,.28)", color: "rgba(255,255,255,.7)", fontSize: 12, lineHeight: 1.6 }}>
-                Filled in from <strong>{formulaMeta.name || "the formula"}</strong>: Units per batch and Labour per batch below.
-                Still yours to pick — the <strong>Finished Product</strong> this makes, and the <strong>Materials consumed per batch</strong> list at the bottom.
-              </div>
-            )}
-            {charge && (
-              <div style={{ marginBottom: 14, padding: "10px 12px", borderRadius: 8, background: "rgba(251,191,36,.09)", border: "1px solid rgba(251,191,36,.3)", color: "rgba(255,255,255,.72)", fontSize: 12, lineHeight: 1.6 }}>
-                <strong style={{ color: "#fbbf24" }}>{charge.label}</strong> — Rs {charge.perBatch.toLocaleString()} per batch — is material, not labour, and it is <strong>not</strong> in this batch&rsquo;s cost yet.
-                {lines.some((l) => l.note)
-                  ? " A line is waiting for it below with the quantity already worked out — pick which of your own items it is, and the cost then follows that item's live purchase rate and the stock moves when a batch is made."
-                  : " Add it as its own line under Materials consumed per batch below — pick the item and set its quantity — so the cost follows the live purchase rate and the stock actually moves when a batch is made."}
-                {" "}It will never be added to Overhead automatically.
-              </div>
-            )}
+            {/* No explanatory banners here. The dialog arrives filled in, and
+                the fields say what they are; two paragraphs above them only
+                delayed the person who could already see that. The charge the
+                formula names still arrives as its own material line below,
+                with the quantity worked out and a note saying what it is —
+                which is the instruction, in the place where it is carried out. */}
             {formError && <div style={{ marginBottom: 14, padding: "10px 12px", borderRadius: 8, background: "rgba(239,68,68,.14)", border: "1px solid rgba(239,68,68,.28)", color: "#fca5a5", fontSize: 12 }}>{formError}</div>}
 
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
