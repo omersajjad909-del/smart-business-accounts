@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { verifyJwt } from "@/lib/auth";
+import { cookieMaxAgeFor, verifyJwt } from "@/lib/auth";
 
 /**
  * GET /api/auth/impersonate-handoff?token=<jwt>
@@ -44,12 +44,23 @@ export async function GET(req: NextRequest) {
 
   // Land on the dashboard without the token left in the URL/history.
   const response = NextResponse.redirect(new URL("/dashboard", req.nextUrl.origin));
+
+  /* The cookie lives exactly as long as the token inside it.
+  
+     This used to be a hardcoded hour, which is correct for impersonation — the
+     route that mints those sets `exp` to issuedAt + 3600 deliberately — and
+     quietly wrong for the other caller. A dev test session carries a full-length
+     token, so an admin working in a test workspace was signed out after sixty
+     minutes holding a token that had days left on it, and had to go back to the
+     console to be let in again. The token is the authority on how long it is
+     good for; the cookie now asks it rather than guessing. */
+  const maxAge = cookieMaxAgeFor(decoded);
   response.cookies.set("sb_auth", token, {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: "lax",
     path: "/",
-    maxAge: 60 * 60, // match the token's own 1h lifetime
+    maxAge,
   });
   return response;
 }

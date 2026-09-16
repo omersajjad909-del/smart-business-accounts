@@ -30,7 +30,7 @@ export async function GET(req: NextRequest) {
   const token = getTokenFromRequest(req);
   const payload = token ? verifyJwt(token) : null;
 
-  // Either nothing was ever launched, or the 8h session has aged out. Send the
+  // Either nothing was ever launched, or the session has aged out. Send the
   // admin back to the launcher rather than to a login form they cannot use.
   if (!token || payload?.isTestMode !== true) {
     const back = new URL("/admin/dev-test", req.nextUrl.origin);

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getTokenFromRequest, signJwt } from "@/lib/auth";
+import { DEFAULT_SESSION_TTL_MS, getTokenFromRequest, signJwt } from "@/lib/auth";
 import { requireSuperAdmin } from "@/lib/adminAuth";
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
@@ -200,12 +200,19 @@ export async function POST(req: NextRequest) {
       });
     }
 
+    /* As long as the token itself, which is a normal session's length.
+    
+       It was eight hours, against a token good for a week — so on this host the
+       session ended in the middle of a working day for no reason the admin
+       could see. A test session ends when the admin ends it, from "Exit test
+       mode"; until then the only thing that should close it is the same
+       inactivity that closes anybody else's login. */
     res.cookies.set("sb_auth", testToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
       path: "/",
-      maxAge: 8 * 60 * 60,
+      maxAge: Math.floor(DEFAULT_SESSION_TTL_MS / 1000),
     });
 
     return res;
