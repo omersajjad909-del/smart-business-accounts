@@ -308,6 +308,31 @@ const [searchTerm, setSearchTerm] = useState("");
     ...(rfActive ? { meta: emptyRateFormulaMeta(rf) } : {}),
   });
 
+  /* Where Enter goes after an item is picked.
+  
+     With a rate formula on, it goes to whichever column the company nominated
+     — that is what rateFormulaEnterHandler decides. Without one it used to go
+     nowhere at all: the picker swallows the Enter that chose the item, and
+     nothing else was listening, so the operator picked an item and then had to
+     reach for the mouse to type a quantity. Qty is what they were reaching
+     for, so Enter goes there. */
+  const onPickerEnter = (i: number) => (e: React.KeyboardEvent<HTMLInputElement> | { key: string; shiftKey: boolean; preventDefault(): void; stopPropagation(): void }) => {
+    if (rfActive) {
+      rateFormulaEnterHandler(rf, rfActive, i, () => lastPickedMeta.current)(e);
+      return;
+    }
+    if (e.key !== "Enter" || e.shiftKey) return;
+    e.preventDefault();
+    e.stopPropagation();
+    // A frame late: the pick has to land on the row before the box it filled
+    // can be focused, and select() so a quantity is typed over, not after.
+    requestAnimationFrame(() => {
+      const el = document.getElementById(`pi-qty-${i}`) as HTMLInputElement | null;
+      el?.focus();
+      el?.select?.();
+    });
+  };
+
   function handlePIScan(e: React.KeyboardEvent<HTMLInputElement>) {
     if (e.key !== "Enter") return;
     e.preventDefault();
@@ -831,6 +856,14 @@ const [searchTerm, setSearchTerm] = useState("");
     setDueDate(inv2.dueDate ? new Date(inv2.dueDate).toISOString().slice(0, 10) : "");
     setDiscount(inv2.discount ?? "");
     setDiscountType(inv2.discountType || "flat");
+    /* Both of these are stored on the invoice and were not being read back.
+       Worse than looking empty: the form re-saves whatever it is holding, so
+       reopening an invoice and pressing Update wiped the freight to 0 and
+       dropped the tax — a figure the operator had typed, silently gone
+       because they opened the document to change something else. */
+    setFreight(inv2.freight ?? "");
+    setApplyTax(Boolean(inv2.taxConfigId));
+    setSelectedTaxId(inv2.taxConfigId || "");
     setNotes(inv2.notes || "");
     setReference(inv2.reference || "");
     setPaymentMethod(inv2.paymentMethod || "");
@@ -847,6 +880,11 @@ const [searchTerm, setSearchTerm] = useState("");
       sku: it.item?.code || "",
       ...(rfActive ? { meta: readRateFormulaMeta(rf, it.meta) } : {}),
     })));
+    // A blank row at the foot, the way a new invoice opens. Without it an
+    // invoice reopened for editing had nowhere to type a second item — the
+    // form only grows a row when the last one is filled in, and on an edit the
+    // last one was already a saved line. There was no way to add anything.
+    setRows(prev => [...prev, emptyRow()]);
     setShowForm(true);
     setShowList(false);
   }
@@ -1307,7 +1345,7 @@ const [searchTerm, setSearchTerm] = useState("");
                                   onChange={(key, value) => updateRowMeta(i, key, value)}
                                 />
                               )}
-                              <div><div style={labelStyle()}>Qty</div><input type="number" step="any" value={r.qty} onChange={e => updateRow(i, "qty", e.target.value)} style={inp({ padding: "7px 9px", textAlign: "right" })} /></div>
+                              <div><div style={labelStyle()}>Qty</div><input id={`pi-qty-${i}`} type="number" step="any" value={r.qty} onChange={e => updateRow(i, "qty", e.target.value)} style={inp({ padding: "7px 9px", textAlign: "right" })} /></div>
                               <div><div style={labelStyle()}>Unit Cost</div><input type="number" value={r.rate} onChange={e => updateRow(i, "rate", e.target.value)} readOnly={rfActive && !rf.rateEditable} style={inp({ padding: "7px 9px", textAlign: "right", ...(rfActive && !rf.rateEditable ? { opacity: 0.75 } : {}) })} /></div>
                               <div><div style={labelStyle()}>Disc%</div><input type="number" value={r.discountPercent} onChange={e => updateRow(i, "discountPercent", e.target.value)} style={inp({ padding: "7px 9px", textAlign: "right" })} /></div>
                               <div><div style={labelStyle()}>Tax%</div><input type="number" value={r.taxPercent} onChange={e => updateRow(i, "taxPercent", e.target.value)} style={inp({ padding: "7px 9px", textAlign: "right" })} /></div>
@@ -1375,7 +1413,7 @@ const [searchTerm, setSearchTerm] = useState("");
                                         setRows(copy);
                                       }
                                     }}
-                                      onKeyDown={rateFormulaEnterHandler(rf, rfActive, i, () => lastPickedMeta.current)}
+                                      onKeyDown={onPickerEnter(i)}
                                       label={rfActive ? itemPickerLabel : undefined}
                                       note={grnRemainingNote}
                                       style={{ ...inp({ padding: "5px 7px", fontSize: 12.5 }), fontWeight: r.itemId ? 600 : 400 }}
@@ -1395,7 +1433,7 @@ const [searchTerm, setSearchTerm] = useState("");
                                   <td style={{ padding: "7px 8px", width: 64 }}>
                                     <input value={r.unit} onChange={e => updateRow(i, "unit", e.target.value)} placeholder="pcs" style={inp({ padding: "5px 6px", fontSize: 12, textAlign: "center" })} />
                                   </td>
-                                  <td style={{ padding: "7px 8px", width: 76 }}><input type="number" step="any" value={r.qty} onChange={e => updateRow(i, "qty", e.target.value)} placeholder="0" style={inp({ padding: "5px 7px", textAlign: "right", fontSize: 12.5 })} /></td>
+                                  <td style={{ padding: "7px 8px", width: 76 }}><input id={`pi-qty-${i}`} type="number" step="any" value={r.qty} onChange={e => updateRow(i, "qty", e.target.value)} placeholder="0" style={inp({ padding: "5px 7px", textAlign: "right", fontSize: 12.5 })} /></td>
                                   {rfActive && rtmmFormula.fields.length > 0 && (
                                     <RateFormulaRowCells
                                       settings={rtmmFormula}
@@ -1422,7 +1460,15 @@ const [searchTerm, setSearchTerm] = useState("");
                                   <td style={{ padding: "7px 8px", width: 64 }}><input type="number" value={r.taxPercent} onChange={e => updateRow(i, "taxPercent", e.target.value)} placeholder="0" style={inp({ padding: "5px 7px", textAlign: "right", fontSize: 12.5 })} /></td>
                                   <td style={{ padding: "7px 8px", textAlign: "right", fontWeight: 700, fontSize: 13, width: 96, color: lineTotal > 0 ? TEXT : MUTED, whiteSpace: "nowrap" }}>{lineTotal > 0 ? lineTotal.toLocaleString() : "—"}</td>
                                   <td style={{ padding: "7px 8px", width: 28, textAlign: "center" }}>
-                                    <button tabIndex={-1} onClick={() => { if (rows.length > 1) setRows(rows.filter((_, idx) => idx !== i)); }} style={{ background: "none", border: "none", color: "#f87171", cursor: "pointer", fontSize: 16, padding: 2, opacity: rows.length === 1 ? 0.2 : 0.6, lineHeight: 1 }} disabled={rows.length === 1}>×</button>
+                                    {/* Clearing the only line empties it rather
+                                        than being refused. The button used to
+                                        disable itself on the last row, which on
+                                        a one-item invoice opened for editing
+                                        meant the line could never be taken off
+                                        at all — the form always keeps one row,
+                                        but that is the form's business, not
+                                        something to refuse the operator with. */}
+                                    <button tabIndex={-1} onClick={() => setRows(rows.length > 1 ? rows.filter((_, idx) => idx !== i) : [emptyRow()])} title="Remove line" style={{ background: "none", border: "none", color: "#f87171", cursor: "pointer", fontSize: 16, padding: 2, opacity: 0.6, lineHeight: 1 }}>×</button>
                                   </td>
                                 </tr>
                               );
@@ -1431,6 +1477,21 @@ const [searchTerm, setSearchTerm] = useState("");
                         </table>
                       </div>
                     )}
+
+                    {/* An explicit way to add a line. The form does grow one on
+                        its own once the last row is filled, but that is a side
+                        effect nobody can see coming, and on a reopened invoice
+                        it never fired. A button that says what it does costs
+                        one line and removes the guesswork. */}
+                    <div style={{ padding: "9px 12px", borderTop: `1px solid ${BORDER}` }}>
+                      <button
+                        type="button"
+                        onClick={() => setRows(r => [...r, emptyRow()])}
+                        style={{ padding: "6px 13px", borderRadius: 7, background: "rgba(255,255,255,.05)", border: `1px solid ${BORDER}`, color: MUTED, fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}
+                      >
+                        + Add Row
+                      </button>
+                    </div>
                   </div>
 
                   {/* Notes + Payment + Batch row */}
@@ -1614,16 +1675,76 @@ const [searchTerm, setSearchTerm] = useState("");
             </div>
           )}
 
-          {/* ── PRINT STYLES ── */}
-          {showPreview && (
+          {/* A4 deliberately has no print CSS of its own. It is a PrintDocA4
+              like every other document in the app, and globals.css already
+              knows how to put one of those on paper.
+
+              What used to be here hid the whole body and un-hid
+              ".pi-print.pi-a4" — a class no element has carried since the A4
+              preview became a PrintDocA4. So A4 printed a blank sheet:
+              everything hidden, nothing shown. And because the thermal block
+              sat in the DOM even in A4 mode, the global rule's
+              ":not(:has(.pi-print))" guard saw it and stood down, so nothing
+              printed the document either. Two rules each waiting for the
+              other. The thermal block now renders only in 55mm mode. */}
+          {showPreview && printMode === "55mm" && (
             <style>{`
+              /* A receipt roll, not a sheet: no page margins and a height that
+                 follows the content, so a short receipt is not padded out to a
+                 full page. */
+              @page { size: 55mm auto; margin: 0; }
+
               @media print {
-                body * { visibility: hidden !important; }
-                .pi-print, .pi-print * { visibility: visible !important; }
-                .pi-print { position: fixed !important; inset: 0 !important; }
-                .pi-print.pi-a4 { width: 210mm !important; padding: 18mm 18mm 14mm !important; font-size: 11pt !important; }
-                .pi-print.pi-55mm { width: 55mm !important; padding: 4mm 3mm !important; font-size: 7pt !important; }
-                .no-print, .print\\:hidden { display: none !important; }
+                /* Everything that is not the receipt, at any depth — the same
+                   three exclusions the global document rule uses: keep an
+                   element if it CONTAINS the receipt, if it IS the receipt, or
+                   if it is INSIDE it.
+
+                   Display, not visibility. A hidden element still occupies its
+                   space, so the app's own layout went on pushing a 55mm
+                   receipt off the printable area while the preview on screen
+                   looked perfect. */
+                body:has(.pi-print) *:not(:has(.pi-print)):not(.pi-print):not(.pi-print *) {
+                  display: none !important;
+                }
+
+                /* The chain of wrappers between body and the receipt, each
+                   flattened to a plain block: no flex column, no scroller
+                   clipping it, no gutter, no margin held open for a sidebar
+                   that is not being printed. */
+                body:has(.pi-print) :has(.pi-print) {
+                  display: block !important;
+                  margin: 0 !important;
+                  max-width: none !important;
+                  min-height: auto !important;
+                  overflow: visible !important;
+                  padding: 0 !important;
+                  width: auto !important;
+                }
+
+                /* Screens are dark; paper is not. */
+                body:has(.pi-print),
+                body:has(.pi-print) :has(.pi-print) { background: #fff !important; }
+
+                .pi-print {
+                  display: block !important;
+                  width: 55mm !important;
+                  margin: 0 !important;
+                  padding: 4mm 3mm !important;
+                  font-size: 7pt !important;
+                  box-shadow: none !important;
+                  border-radius: 0 !important;
+                }
+
+                /* The QR is an <img>. Without this it prints as a pale ghost,
+                   or not at all once the browser decides background graphics
+                   are off — and a receipt whose QR will not scan has failed at
+                   the one thing it was printed for. */
+                .pi-print img { display: inline-block !important; max-width: 100% !important; }
+                .pi-print, .pi-print * {
+                  -webkit-print-color-adjust: exact !important;
+                  print-color-adjust: exact !important;
+                }
               }
             `}</style>
           )}
@@ -1689,7 +1810,10 @@ const [searchTerm, setSearchTerm] = useState("");
           )}
 
           {/* ── 55mm THERMAL PREVIEW ── */}
-          {showPreview && (
+          {/* Rendered only in 55mm mode. Left in the DOM the rest of the
+              time, its .pi-print class made globals.css stand down and the A4
+              document printed a blank sheet. */}
+          {showPreview && printMode === "55mm" && (
             <div className="pi-print pi-55mm" style={{
               background: "white", color: "#000",
               fontFamily: "'Courier New',Courier,monospace",
@@ -1697,7 +1821,7 @@ const [searchTerm, setSearchTerm] = useState("");
               padding: "10px 12px",
               boxShadow: "0 4px 24px rgba(0,0,0,0.15)",
               borderRadius: 4,
-              display: printMode === "55mm" ? "block" : "none",
+              display: "block",
             }}>
               {/* Header */}
               <div style={{ textAlign: "center", borderBottom: "1px dashed #555", paddingBottom: 6, marginBottom: 6 }}>

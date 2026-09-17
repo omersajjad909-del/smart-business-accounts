@@ -4,6 +4,7 @@ import { Suspense, useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { useBusinessRecords } from "@/lib/useBusinessRecords";
 import {
+  formatRate,
   mapBomRecord,
   mapProductionOrderRecord,
   loadManufacturingItems,
@@ -23,6 +24,15 @@ const border = "rgba(255,255,255,0.07)";
 const inputStyle: React.CSSProperties = {
   width: "100%", background: bg, border: `1px solid ${border}`,
   borderRadius: 8, padding: "9px 12px", color: "#fff", boxSizing: "border-box",
+};
+
+const qtyLabel: React.CSSProperties = {
+  display: "block", fontSize: 12, color: "rgba(255,255,255,.45)", marginBottom: 6,
+};
+const qtyInput: React.CSSProperties = {
+  width: "100%", padding: "10px 12px", borderRadius: 9,
+  background: "rgba(255,255,255,.05)", border: `1px solid ${border}`,
+  color: "#fff", fontSize: 15, fontFamily: "inherit", boxSizing: "border-box",
 };
 
 type LabourRow = { labourId: string; operation: string; qty: string; rate: string };
@@ -69,14 +79,11 @@ function BOMPageInner() {
    * by resetForm()/startEdit() so it never leaks onto an unrelated BOM.
    */
   const [formulaMeta, setFormulaMeta] = useState<{ id: string; name: string; version: number } | null>(null);
-  /**
-   * The non-labour charge the formula sent across — buttons, tape, a bought-in
-   * part. Never written into Overhead: Overhead per batch stays a manual field
-   * the operator types themselves. This is only named here so the operator is
-   * prompted to add it as its own line under Materials consumed per batch,
-   * with a real quantity and item, until then it is simply not costed in.
-   */
-  const [charge, setCharge] = useState<{ label: string; perBatch: number } | null>(null);
+  /* The formula's non-labour charge — buttons, tape, a bought-in part — is
+     deliberately not held in state any more. It was only ever here to be
+     announced in a banner, and it arrives as a seeded material line below
+     regardless. It is still never written into Overhead: Overhead per batch
+     stays a manual field the operator types themselves. */
 
   // Deep-linked from Costing → "Create BOM →". The formula already knows the
   // units per batch and the conversion cost; only the finished product and
@@ -87,8 +94,6 @@ function BOMPageInner() {
     if (!formulaId) return;
     const yieldUnits = Number(params.get("yieldUnits"));
     const labourPerBatch = Number(params.get("labourPerBatch"));
-    const pendingChargeAmount = Number(params.get("pendingChargeAmount"));
-    const chargeLabel = params.get("chargeLabel") || "";
     setForm((c) => ({
       ...c,
       version: params.get("version") || c.version,
@@ -97,9 +102,6 @@ function BOMPageInner() {
       // Overhead per batch is left untouched here — it stays whatever the
       // operator types, never auto-filled from the formula.
     }));
-    if (Number.isFinite(pendingChargeAmount) && pendingChargeAmount > 0) {
-      setCharge({ label: chargeLabel || "Other per-unit charges", perBatch: pendingChargeAmount });
-    }
 
     /* A line per consumable the formula named, quantity already worked out for
        one batch. Read defensively — a query string is the one input here
@@ -139,6 +141,14 @@ function BOMPageInner() {
     [rawMaterials, finishedItems],
   );
 
+  /* Materials at or below their reorder level. The same flag the stock panel
+     and the material chips already colour red with — counted once at the top
+     so the answer is visible before anybody scrolls looking for red. */
+  const lowMaterials = useMemo(
+    () => rawMaterials.filter((m) => m.isLow).length,
+    [rawMaterials],
+  );
+
   useEffect(() => {
     // Trading goods too: a button, a zip, a bought-in fitting is consumed by a
     // batch exactly like raw material, and stocking it as a trading good is the
@@ -175,7 +185,6 @@ function BOMPageInner() {
     setLines([{ itemId: "", qty: "", divisible: false }]);
     setEditingId("");
     setFormulaMeta(null);
-    setCharge(null);
     setFormError("");
   }
 
@@ -221,6 +230,15 @@ function BOMPageInner() {
      Production Orders is untouched and still the way to plan a job, assign
      it, and come back to it in stages. */
   const [makeBom, setMakeBom] = useState<ManufacturingBom | null>(null);
+  /* Two quantities, because they are two different facts.
+     
+     The order is what the customer asked for; today is what actually came off
+     the floor. They part company the moment a job runs over more than one day,
+     which is the normal case when the operations move at different speeds —
+     buttons go on fast, sealing is slow, and an evening ends with neither
+     finished. Posting the order size as though it were done puts finished
+     goods into stock that nobody has made yet. */
+  const [makeOrderQty, setMakeOrderQty] = useState("");
   const [makeQty, setMakeQty] = useState("");
   const [makeQuote, setMakeQuote] = useState<ProductionRunQuote | null>(null);
   const [makeBusy, setMakeBusy] = useState(false);
@@ -260,8 +278,50 @@ function BOMPageInner() {
     (r) => r.labourId && !(Number(r.qty) > 0 && Number(r.rate) > 0),
   );
 
+  const orderQtyNum = Math.floor(Number(makeOrderQty)) || 0;
+  const todayQtyNum = Math.floor(Number(makeQty)) || 0;
+  const partial = orderQtyNum > 0 && todayQtyNum > 0 && todayQtyNum < orderQtyNum;
+  const pendingQty = Math.max(orderQtyNum - todayQtyNum, 0);
+
+  /**
+   * Pieces done today, per job.
+   *
+   * One run is not one operation. A bag is sealed and then buttoned, by
+   * different people working at different speeds, and on any given day those
+   * two numbers are simply not the same — 8,000 sealed and 7,000 buttoned is
+   * an ordinary day, not an error.
+   *
+   * The finished count is the slowest of the jobs, because a bag that has been
+   * sealed but not buttoned is not a bag anyone can ship. The difference is
+   * part-made stock, and it finishes first thing tomorrow.
+   *
+   * The labour rows already carry the honest per-job figure — each worker is
+   * paid for what they actually did — so nothing new has to be typed. This
+   * only reads them back and says what they imply, which is the one thing the
+   * screen was leaving the operator to work out in their head.
+   */
+  const jobsToday = useMemo(() => {
+    const by = new Map<string, number>();
+    for (const row of labourRows) {
+      const qty = Number(row.qty) || 0;
+      if (!row.labourId || qty <= 0) continue;
+      const job = row.operation.trim() || "Unnamed job";
+      // Two people on the same job add up — three cutters doing 3,000 each
+      // have cut 9,000 pieces between them, not done the job three times.
+      by.set(job, (by.get(job) || 0) + qty);
+    }
+    return [...by.entries()].sort((a, b) => a[1] - b[1]);
+  }, [labourRows]);
+
+  const slowestJob = jobsToday.length ? jobsToday[0][1] : 0;
+  const fastestJob = jobsToday.length ? jobsToday[jobsToday.length - 1][1] : 0;
+  /* Only worth saying when the jobs actually disagree. One job, or every job
+     on the same number, and the finished count is not in question. */
+  const jobsDisagree = jobsToday.length > 1 && slowestJob < fastestJob;
+
   function openMake(bom: ManufacturingBom) {
     setMakeBom(bom);
+    setMakeOrderQty(String(bom.yieldUnits || 1));
     setMakeQty(String(bom.yieldUnits || 1));
     setMakeQuote(null);
     setMakeError("");
@@ -294,8 +354,9 @@ function BOMPageInner() {
 
   async function confirmMake() {
     if (!makeBom || !makeQuote) return;
-    const qty = Math.floor(Number(makeQty));
-    if (!Number.isFinite(qty) || qty <= 0) { setMakeError("How many are being made?"); return; }
+    const qty = todayQtyNum;
+    const orderQty = Math.max(orderQtyNum, qty);
+    if (qty <= 0) { setMakeError("How many were finished today?"); return; }
 
     const assignments = labourRows
       // rate > 0, not >= 0. A named worker at zero used to count as a real
@@ -317,18 +378,22 @@ function BOMPageInner() {
       // The order is raised first because the posting path is built around one
       // — it is what the finished goods batch and the WIP entry are traced
       // back to. It is simply not left for the operator to do by hand.
+      /* The order is what was asked for, not what came off the floor today.
+         Posting them as the same number is what put finished goods into stock
+         that nobody had made yet; keeping them apart is what lets the posting
+         leave the order `running` with a balance to carry into tomorrow. */
       const order = await productionStore.create({
         title: makeBom.product,
         status: "in_progress",
         date: new Date().toISOString().slice(0, 10),
         data: {
           orderId: `PO-${String(orders.length + 1).padStart(4, "0")}`,
-          quantity: qty,
+          quantity: orderQty,
           completed: 0,
           bomId: makeBom.id,
           bomVersion: makeBom.version || "",
           location: makeQuote.location || "MAIN",
-          notes: "Raised and posted from the BOM",
+          notes: "Raised from the BOM",
         },
       });
 
@@ -353,6 +418,13 @@ function BOMPageInner() {
       toast.success(
         `${body.producedQty} × ${makeBom.product} made · batch ${body.batchNo} · Rs. ${Math.round(body.totalCost).toLocaleString()} to Finished Goods`,
       );
+      // Where the rest of the job now lives, said at the moment it becomes true.
+      if (orderQty > qty) {
+        toast(
+          `${(orderQty - qty).toLocaleString()} still to make — the order is open on Production Orders`,
+          { icon: "📋", duration: 6000 },
+        );
+      }
       if (kept.length) {
         toast(`Kept as open stock: ${kept.map((r) => `${Number(r.qty).toFixed(2)}${r.unit} ${r.itemName}`).join(", ")}`, { icon: "♻️" });
       }
@@ -449,7 +521,7 @@ function BOMPageInner() {
         <div>
           <h1 style={{ fontSize: 22, fontWeight: 800, margin: "0 0 4px" }}>Bill of Materials</h1>
           <p style={{ fontSize: 13, color: "rgba(255,255,255,.42)", margin: 0 }}>
-            What each finished product consumes. Cost is calculated from live material rates.
+            What each finished product consumes, and how many one batch makes.
           </p>
         </div>
         <button onClick={startNew} style={{ padding: "10px 20px", borderRadius: 10, border: "none", background: "#f97316", color: "#fff", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>
@@ -465,12 +537,18 @@ function BOMPageInner() {
         </div>
       )}
 
+      {/* The fourth card used to be Average Unit Cost — the mean of a bag and
+          a box, which is neither, and money on a screen that is not about
+          money. In its place, the one number that decides whether any of these
+          BOMs can actually be run today: how many of the materials they
+          consume have fallen to their reorder level. Amber only when there is
+          something to act on; a zero here is good news and reads as such. */}
       <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 12, marginBottom: 20 }}>
         {[
           { label: "Total BOMs", value: boms.length, color: "#f97316" },
           { label: "Products In Production", value: new Set(orders.map((o) => o.product)).size, color: "#38bdf8" },
           { label: "Raw Materials", value: rawMaterials.length, color: "#22c55e" },
-          { label: "Average Unit Cost", value: `Rs. ${boms.length ? Math.round(boms.reduce((s, b) => s + b.unitCost, 0) / boms.length).toLocaleString() : 0}`, color: "#f59e0b" },
+          { label: "Materials Low On Stock", value: lowMaterials, color: lowMaterials ? "#f59e0b" : "#22c55e" },
         ].map((card) => (
           <div key={card.label} style={{ background: bg, border: `1px solid ${border}`, borderRadius: 14, padding: isMobile ? "12px 10px" : "18px 20px" }}>
             <div style={{ fontSize: 12, color: "rgba(255,255,255,.48)", marginBottom: 6 }}>{card.label}</div>
@@ -483,18 +561,27 @@ function BOMPageInner() {
         <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
           {boms.map((bom) => {
             const linkedOrders = orders.filter((o) => o.product === bom.product).length;
+            // What the finished goods are counted in — PCS, KG, whatever the
+            // item was set up as. "units" only when the item has gone.
+            const yieldUnit = itemsById.get(bom.finishedItemId)?.unit || "units";
             return (
               <div key={bom.id} style={{ background: bg, border: `1px solid ${border}`, borderRadius: 14, padding: isMobile ? "12px 10px" : "20px 22px" }}>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 16, marginBottom: 12 }}>
                   <div>
                     <div style={{ fontSize: 16, fontWeight: 800 }}>{bom.product}</div>
                     <div style={{ fontSize: 12, color: "rgba(255,255,255,.42)", marginTop: 4 }}>
-                      Version {bom.version} • Yield {bom.yieldUnits} units • Linked orders {linkedOrders}
+                      Version {bom.version} • Linked orders {linkedOrders}
                     </div>
                   </div>
                   <div style={{ textAlign: "right" }}>
-                    <div style={{ color: "#22c55e", fontSize: 15, fontWeight: 800 }}>Rs. {Math.round(bom.unitCost).toLocaleString()}</div>
-                    <div style={{ fontSize: 11, color: "rgba(255,255,255,.35)" }}>per unit</div>
+                    {/* The batch size, where the unit cost used to be. What a
+                        BOM is asked at a glance is "how many does one run of
+                        this make" — the cost is a figure for the costing
+                        screen, and up here it only competed with the name of
+                        the product for attention. Yield also stops repeating
+                        itself: it was in the line above as well. */}
+                    <div style={{ color: "#38bdf8", fontSize: 15, fontWeight: 800 }}>{bom.yieldUnits.toLocaleString()}</div>
+                    <div style={{ fontSize: 11, color: "rgba(255,255,255,.35)" }}>{yieldUnit} per batch</div>
                     <div style={{ display: "flex", gap: 6, marginTop: 9, justifyContent: "flex-end" }}>
                       {/* The whole run from here: raise the order, start it and
                           post it in one confirm. The Production Orders screen
@@ -557,7 +644,7 @@ function BOMPageInner() {
                 <div key={item.id} style={{ display: "flex", justifyContent: "space-between", fontSize: 12.5 }}>
                   <span style={{ color: "rgba(255,255,255,.62)" }}>{item.name}</span>
                   <span style={{ color: item.isLow ? "#fca5a5" : "#38bdf8", fontWeight: 700 }}>
-                    {item.currentStock}{item.unit} · Rs. {Math.round(item.unitCost).toLocaleString()}
+                    {item.currentStock}{item.unit} · Rs. {formatRate(item.unitCost)}
                   </span>
                 </div>
               )) : <div style={{ color: "rgba(255,255,255,.3)", fontSize: 13 }}>No raw materials yet.</div>}
@@ -586,14 +673,38 @@ function BOMPageInner() {
               Nothing is written until then.
             </div>
 
-            <label style={{ display: "block", fontSize: 12, color: "rgba(255,255,255,.45)", marginBottom: 6 }}>
-              How many {makeBom.product}?
-            </label>
-            <input
-              type="number" min={1} step={1} value={makeQty} autoFocus
-              onChange={(e) => setMakeQty(e.target.value)}
-              style={{ width: "100%", padding: "10px 12px", borderRadius: 9, background: "rgba(255,255,255,.05)", border: `1px solid ${border}`, color: "#fff", fontSize: 15, fontFamily: "inherit", boxSizing: "border-box" }}
-            />
+            <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: 12 }}>
+              <div>
+                <label style={qtyLabel}>The order — how many {makeBom.product}?</label>
+                <input
+                  type="number" min={1} step={1} value={makeOrderQty} autoFocus
+                  onChange={(e) => {
+                    const next = e.target.value;
+                    setMakeOrderQty(next);
+                    // Most jobs finish in one go, so today follows the order
+                    // until somebody says otherwise.
+                    if (!partial) setMakeQty(next);
+                  }}
+                  style={qtyInput}
+                />
+              </div>
+              <div>
+                <label style={qtyLabel}>Finished today</label>
+                <input
+                  type="number" min={1} step={1} value={makeQty}
+                  onChange={(e) => setMakeQty(e.target.value)}
+                  style={{ ...qtyInput, borderColor: partial ? "rgba(251,191,36,.45)" : border }}
+                />
+              </div>
+            </div>
+
+            {/* Said plainly, because posting an order size as though it were
+                made is how finished goods nobody has produced get into stock. */}
+            <div style={{ fontSize: 11.5, color: partial ? "#fbbf24" : "rgba(255,255,255,.32)", marginTop: 6, lineHeight: 1.6 }}>
+              {partial
+                ? `${pendingQty.toLocaleString()} left over — the order stays open on Production Orders, and tomorrow's run carries on from there with its own labour.`
+                : "The whole order is finished in this run. Making only part of it today? Put that in “Finished today”."}
+            </div>
 
             {makeError && (
               <div style={{ marginTop: 12, padding: "10px 12px", borderRadius: 8, background: "rgba(239,68,68,.14)", border: "1px solid rgba(239,68,68,.28)", color: "#fca5a5", fontSize: 12 }}>
@@ -698,10 +809,22 @@ function BOMPageInner() {
                             <input type="number" min={0} step="any" placeholder="Pcs" value={row.qty}
                               onChange={(e) => setLabourRow(index, { qty: e.target.value })}
                               style={{ background: bg, border: `1px solid ${border}`, borderRadius: 8, padding: "8px 9px", color: "#fff", fontSize: 12.5, fontFamily: "inherit" }} />
+                            {/* Enter on the last box of a row means "next
+                                worker", not "delete this row" — which is what
+                                it meant while the × button was the next thing
+                                in the tab order. */}
                             <input type="number" min={0} step="any" placeholder="Rate/pc" value={row.rate}
                               onChange={(e) => setLabourRow(index, { rate: e.target.value })}
+                              onKeyDown={(e) => {
+                                if (e.key !== "Enter" || e.shiftKey) return;
+                                e.preventDefault();
+                                document.getElementById("bom-add-worker")?.focus();
+                              }}
                               style={{ background: bg, border: `1px solid ${border}`, borderRadius: 8, padding: "8px 9px", color: "#fff", fontSize: 12.5, fontFamily: "inherit" }} />
-                            <button onClick={() => setLabourRows((rows) => rows.filter((_, i) => i !== index))} title="Remove"
+                            {/* Out of the tab order: removing a row is a
+                                deliberate click, not something the keyboard
+                                should pass through. */}
+                            <button onClick={() => setLabourRows((rows) => rows.filter((_, i) => i !== index))} tabIndex={-1} title="Remove"
                               style={{ background: "transparent", border: `1px solid ${border}`, borderRadius: 8, color: "rgba(255,255,255,.45)", cursor: "pointer", padding: "7px 0", gridColumn: isMobile ? "1 / -1" : "auto" }}>×</button>
                           </div>
                         ))}
@@ -712,7 +835,44 @@ function BOMPageInner() {
                           left as it is, the run would post with no labour cost and nobody owed.
                         </div>
                       )}
+
+                      {/* The jobs finished different amounts today, which is
+                          normal and which the single "Finished today" box
+                          cannot say on its own. Rather than leaving the
+                          operator to work out which number goes in it, the
+                          rows they have already filled in are read back and
+                          the answer is offered. */}
+                      {jobsDisagree && (
+                        <div style={{ marginTop: 12, padding: "11px 13px", borderRadius: 10, background: "rgba(56,189,248,.07)", border: "1px solid rgba(56,189,248,.24)" }}>
+                          <div style={{ display: "flex", flexWrap: "wrap", gap: "4px 14px", marginBottom: 8 }}>
+                            {jobsToday.map(([job, qty]) => (
+                              <span key={job} style={{ fontSize: 12, color: "rgba(255,255,255,.72)" }}>
+                                {job}{" "}
+                                <span style={{ fontFamily: "ui-monospace, monospace", fontWeight: 700, color: qty === slowestJob ? "#38bdf8" : "rgba(255,255,255,.55)" }}>
+                                  {qty.toLocaleString()}
+                                </span>
+                              </span>
+                            ))}
+                          </div>
+                          <div style={{ fontSize: 11.5, lineHeight: 1.65, color: "rgba(255,255,255,.55)" }}>
+                            A piece is finished only once every job is done on it, so{" "}
+                            <strong style={{ color: "#38bdf8" }}>{slowestJob.toLocaleString()}</strong> are
+                            finished today. The other {(fastestJob - slowestJob).toLocaleString()} are
+                            part-made — they keep the work already done on them and finish first thing in
+                            the next run. Everyone above is paid for what they did either way.
+                          </div>
+                          {todayQtyNum !== slowestJob && (
+                            <button
+                              onClick={() => setMakeQty(String(slowestJob))}
+                              style={{ marginTop: 9, padding: "6px 12px", borderRadius: 8, background: "rgba(56,189,248,.14)", border: "1px solid rgba(56,189,248,.35)", color: "#7dd3fc", fontSize: 11.5, fontWeight: 700, fontFamily: "inherit", cursor: "pointer" }}
+                            >
+                              Set “Finished today” to {slowestJob.toLocaleString()}
+                            </button>
+                          )}
+                        </div>
+                      )}
                       <button
+                        id="bom-add-worker"
                         onClick={() => setLabourRows((rows) => [...rows, { labourId: "", operation: "", qty: makeQty, rate: "" }])}
                         style={{ marginTop: 8, padding: "6px 12px", borderRadius: 8, background: "rgba(255,255,255,.05)", border: `1px solid ${border}`, color: "rgba(255,255,255,.65)", fontSize: 12, fontWeight: 600, fontFamily: "inherit", cursor: "pointer" }}>
                         + Worker
@@ -734,7 +894,11 @@ function BOMPageInner() {
                   cursor: makeBusy || !makeQuote ? "not-allowed" : "pointer",
                 }}
               >
-                {makeBusy ? "Making…" : makeQuote ? `Make ${Number(makeQty).toLocaleString()}` : "Pricing…"}
+                {makeBusy
+                  ? "Making…"
+                  : makeQuote
+                    ? `Make ${todayQtyNum.toLocaleString()}${partial ? ` of ${orderQtyNum.toLocaleString()}` : ""}`
+                    : "Pricing…"}
               </button>
               <button onClick={closeMake} disabled={makeBusy}
                 style={{ padding: "11px 20px", background: "rgba(255,255,255,.05)", border: `1px solid ${border}`, borderRadius: 8, color: "rgba(255,255,255,.65)", fontSize: 14, fontFamily: "inherit", cursor: "pointer" }}>
@@ -749,21 +913,12 @@ function BOMPageInner() {
         <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.7)", zIndex: 50, display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }}>
           <div style={{ background: "#161b27", border: `1px solid ${border}`, borderRadius: 16, padding: 30, width: 580, maxHeight: "90vh", overflowY: "auto", fontFamily: ff }}>
             <h2 style={{ margin: "0 0 12px", fontSize: 18, fontWeight: 700 }}>{editingId ? "Edit Bill of Materials" : "New Bill of Materials"}</h2>
-            {formulaMeta && (
-              <div style={{ marginBottom: 14, padding: "10px 12px", borderRadius: 8, background: "rgba(129,140,248,.1)", border: "1px solid rgba(129,140,248,.28)", color: "rgba(255,255,255,.7)", fontSize: 12, lineHeight: 1.6 }}>
-                Filled in from <strong>{formulaMeta.name || "the formula"}</strong>: Units per batch and Labour per batch below.
-                Still yours to pick — the <strong>Finished Product</strong> this makes, and the <strong>Materials consumed per batch</strong> list at the bottom.
-              </div>
-            )}
-            {charge && (
-              <div style={{ marginBottom: 14, padding: "10px 12px", borderRadius: 8, background: "rgba(251,191,36,.09)", border: "1px solid rgba(251,191,36,.3)", color: "rgba(255,255,255,.72)", fontSize: 12, lineHeight: 1.6 }}>
-                <strong style={{ color: "#fbbf24" }}>{charge.label}</strong> — Rs {charge.perBatch.toLocaleString()} per batch — is material, not labour, and it is <strong>not</strong> in this batch&rsquo;s cost yet.
-                {lines.some((l) => l.note)
-                  ? " A line is waiting for it below with the quantity already worked out — pick which of your own items it is, and the cost then follows that item's live purchase rate and the stock moves when a batch is made."
-                  : " Add it as its own line under Materials consumed per batch below — pick the item and set its quantity — so the cost follows the live purchase rate and the stock actually moves when a batch is made."}
-                {" "}It will never be added to Overhead automatically.
-              </div>
-            )}
+            {/* No explanatory banners here. The dialog arrives filled in, and
+                the fields say what they are; two paragraphs above them only
+                delayed the person who could already see that. The charge the
+                formula names still arrives as its own material line below,
+                with the quantity worked out and a note saying what it is —
+                which is the instruction, in the place where it is carried out. */}
             {formError && <div style={{ marginBottom: 14, padding: "10px 12px", borderRadius: 8, background: "rgba(239,68,68,.14)", border: "1px solid rgba(239,68,68,.28)", color: "#fca5a5", fontSize: 12 }}>{formError}</div>}
 
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
@@ -833,18 +988,27 @@ function BOMPageInner() {
                     <div style={{ display: "grid", gridTemplateColumns: "1fr 110px 96px 32px", gap: 8, alignItems: "center" }}>
                       <select value={line.itemId} onChange={(e) => setLine(index, { itemId: e.target.value })} style={inputStyle}>
                         <option value="">— Material —</option>
-                        {rawMaterials.map((m) => <option key={m.id} value={m.id}>{m.name} ({m.currentStock}{m.unit})</option>)}
+                        {/* The unit, not the stock on hand. The number in the
+                            name was a running balance read at the moment the
+                            list rendered — stale by the time a batch is made,
+                            and never what this dialog is deciding. The unit
+                            stays because the box beside it is a quantity and
+                            the operator has to know 1 means one roll. */}
+                        {rawMaterials.map((m) => <option key={m.id} value={m.id}>{m.name}{m.unit ? ` (${m.unit})` : ""}</option>)}
                       </select>
                       <input type="number" min={0} step="any" placeholder="Qty" value={line.qty} onChange={(e) => setLine(index, { qty: e.target.value })} style={inputStyle} />
-                      {/* The same quantity read the other way. A batch figure
-                          can only be checked against a batch nobody counts;
-                          the per-piece number beside it is the one an operator
-                          knows by heart, so a wrong entry shows itself here
-                          rather than in a costed run three days later. */}
+                      {/* The same quantity read the other way, and deliberately
+                          no money. A batch figure can only be checked against a
+                          batch nobody counts; the per-piece number beside it is
+                          the one an operator knows by heart, so a wrong entry
+                          shows itself here rather than in a run three days
+                          later. A rupee figure next to it checks nothing — the
+                          operator did not choose the rate and cannot correct
+                          it, so it only invites them to doubt a number that is
+                          not theirs to doubt. */}
                       <div style={{ fontSize: 12, color: "rgba(255,255,255,.5)", textAlign: "right", lineHeight: 1.35 }}>
-                        <div>{item ? `Rs. ${Math.round(qty * item.unitCost).toLocaleString()}` : "—"}</div>
-                        {qty > 0 && form.yieldUnits > 0 && (
-                          <div style={{ fontSize: 10.5, color: "rgba(255,255,255,.32)" }}>
+                        {qty > 0 && form.yieldUnits > 0 ? (
+                          <div>
                             {(() => {
                               const perUnit = qty / form.yieldUnits;
                               // Four decimals for a roll, none for a button —
@@ -855,6 +1019,8 @@ function BOMPageInner() {
                               return `${shown.toLocaleString()}${item?.unit ? ` ${item.unit}` : ""} per unit`;
                             })()}
                           </div>
+                        ) : (
+                          <div style={{ color: "rgba(255,255,255,.25)" }}>—</div>
                         )}
                       </div>
                       <button
@@ -876,18 +1042,20 @@ function BOMPageInner() {
               </button>
             </div>
 
-            <div style={{ marginTop: 18, padding: "14px 16px", borderRadius: 12, background: "rgba(34,197,94,.08)", border: "1px solid rgba(34,197,94,.22)", display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
-              <div style={{ fontSize: 12, color: "rgba(255,255,255,.5)" }}>Calculated from live material rates</div>
-              <div style={{ textAlign: "right" }}>
-                <div style={{ fontSize: 17, fontWeight: 800, color: "#22c55e" }}>Rs. {Math.round(draftCost.unitCost).toLocaleString()} <span style={{ fontSize: 12, fontWeight: 500, color: "rgba(255,255,255,.4)" }}>/ unit</span></div>
-                <div style={{ fontSize: 11, color: "rgba(255,255,255,.38)" }}>Rs. {Math.round(draftCost.batchCost).toLocaleString()} per batch of {form.yieldUnits || 1}</div>
-                {draftCost.conversion > 0 && (
-                  <div style={{ fontSize: 11, color: "rgba(255,255,255,.3)", marginTop: 2 }}>
-                    Material Rs. {Math.round(draftCost.materialCost).toLocaleString()} + conversion Rs. {Math.round(draftCost.conversion).toLocaleString()}
-                  </div>
-                )}
-              </div>
-            </div>
+            {/* No cost panel here, on purpose.
+
+                This screen is a recipe: which materials, how much of each, per
+                batch of how many. The cost of that recipe is arithmetic we do
+                from rates the operator did not set and cannot change from this
+                dialog, so a figure here answers a question nobody is asking at
+                this moment and quietly invites a different one — "is Rs. 24
+                right?" — that the person filling in a recipe has no way to
+                settle. It was also the loudest thing on the dialog, which made
+                the costing look like the point of the screen.
+
+                The cost is still calculated and still saved with the BOM
+                (`amount` on the payload below); it is read where it belongs, on
+                the BOM list and in the costed run. */}
 
             <div style={{ display: "flex", gap: 12, marginTop: 18 }}>
               <button onClick={save} disabled={saving} style={{ flex: 1, padding: "11px 0", background: saving ? "rgba(249,115,22,.5)" : "#f97316", border: "none", borderRadius: 8, color: "#fff", fontSize: 14, fontWeight: 700, cursor: saving ? "not-allowed" : "pointer" }}>

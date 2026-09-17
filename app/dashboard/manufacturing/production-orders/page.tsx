@@ -26,6 +26,10 @@ export default function ProductionOrdersPage() {
   const bomStore = useBusinessRecords("bom");
   const goodsStore = useBusinessRecords("finished_good_batch");
   const workStore = useBusinessRecords("work_order");
+  /* Every piece-rate row ever posted against a run. Each one names the job it
+     was for and how many pieces it covered, which between them is the only
+     record of how far each operation has got on an order. */
+  const labourStore = useBusinessRecords("labour_entry");
   const [showModal, setShowModal] = useState(false);
   const [formError, setFormError] = useState("");
   // Completion dialog — priced before anything is written.
@@ -61,6 +65,38 @@ export default function ProductionOrdersPage() {
   const boms = useMemo(() => bomStore.records.map(mapBomRecord), [bomStore.records]);
   const finishedGoods = useMemo(() => goodsStore.records.map(mapFinishedGoodsRecord), [goodsStore.records]);
   const workOrders = useMemo(() => workStore.records.map(mapWorkOrderRecord), [workStore.records]);
+
+  /**
+   * How far each job has got, per order.
+   *
+   * An order is not one operation. The same 10,000 bags are sealed by one
+   * person and buttoned by another, and those two jobs do not keep pace — a
+   * day that seals 8,000 and buttons 7,000 is an ordinary day. The order's own
+   * `completed` count is the finished figure, which is the slower of them; it
+   * cannot say that 1,000 bags are already sealed and only need buttons.
+   *
+   * Tomorrow's operator has to know that, or those 1,000 get sealed twice and
+   * somebody gets paid twice for doing it once. The labour rows already record
+   * it honestly — each worker was paid for the pieces they actually did — so
+   * this reads them back per job rather than asking anyone to log it again.
+   */
+  const jobsByOrder = useMemo(() => {
+    const byOrder = new Map<string, Map<string, number>>();
+    for (const record of labourStore.records) {
+      const orderKey = record.refId || "";
+      if (!orderKey) continue;
+      const data = record.data as { operation?: unknown; qty?: unknown };
+      const qty = Number(data?.qty) || 0;
+      if (qty <= 0) continue;
+      const job = String(data?.operation || "").trim() || "Unnamed job";
+      const jobs = byOrder.get(orderKey) ?? new Map<string, number>();
+      // Several people on one job add up: three cutters doing 3,000 each have
+      // cut 9,000 pieces between them.
+      jobs.set(job, (jobs.get(job) || 0) + qty);
+      byOrder.set(orderKey, jobs);
+    }
+    return byOrder;
+  }, [labourStore.records]);
 
   useEffect(() => {
     fetch("/api/manufacturing/labour", { cache: "no-store" })
@@ -108,10 +144,52 @@ export default function ProductionOrdersPage() {
       under: groups.filter((g) => g.total < runQty),
       /** Only one job on this run — the "set the run to what was made" shortcut still makes sense. */
       soleTotal: groups.length === 1 ? groups[0].total : null,
+      /**
+       * Rows with a worker and pieces but no job typed.
+       *
+       * Two of them fall into the same group and are added together, which
+       * reads as one job paid twice over. That is how a sealer on 2,000 and a
+       * button hand on 3,000 came out as "5,000 pieces" against a run of
+       * 3,000: the screen could not tell they were different jobs, because
+       * nobody had said so.
+       *
+       * It looks like it has been said — the workers are called "Ahmad sealer"
+       * and "Ali Button" — but a worker's name is who they are, not what this
+       * row is for. The same person does a different job tomorrow.
+       */
+      unnamed: rows.filter((r) => !r.operation.trim()).length,
     };
   }, [labourRows, runQty]);
 
-  const labourBlocked = (labourPieces?.over.length ?? 0) > 0 || (labourPieces?.under.length ?? 0) > 0;
+  /* Ambiguous rather than wrong, and blocked for that reason: two blank job
+     names could be one job split between two people, or two jobs on the same
+     pieces, and those need completely different totals. The screen cannot
+     guess, and guessing wrong either double-pays a job or closes an order
+     that was never made. One word in the box settles it. */
+  const jobNamesMissing = (labourPieces?.unnamed ?? 0) > 1;
+
+  /**
+   * A job's pieces no longer have to equal the run.
+   *
+   * That rule was written for an order made start to finish in one go, and it
+   * is wrong for every other kind. Jobs run at different speeds and carry over
+   * between days, which is the whole point of part-made stock:
+   *
+   *   under the run — sealing 2,000 on a run that finishes 3,000 is right when
+   *     1,000 of today's pieces were sealed in an earlier run and only needed
+   *     buttons today. They keep the work already done on them.
+   *
+   *   over the run — sealing 8,000 on a run that finishes 3,000 is right too.
+   *     The extra 5,000 are sealed and waiting for the next job.
+   *
+   * Both were blocked, so the one pattern this screen exists to handle could
+   * not be entered at all. They are now said out loud and left to the operator,
+   * who can see the floor and knows which of the two it is. The danger the
+   * block was there for — the day's output typed against a worker while the
+   * run is left at the order's whole balance — is still called out, in the
+   * warning below, naming the consequence.
+   */
+  const labourBlocked = jobNamesMissing;
 
   /**
    * The jobs this company has actually paid for before, offered as you type.
@@ -311,6 +389,12 @@ export default function ProductionOrdersPage() {
           const fgCreated = finishedGoods.some((item) => item.productionOrderId === order.orderId);
           const linkedWorkOrders = workOrders.filter((item) => item.linkedProductionOrderId === order.orderId);
           const incompleteWorkOrders = linkedWorkOrders.filter((item) => item.status !== "completed").length;
+          // Slowest job first: the one holding the order up is the one to read.
+          const jobs = [...(jobsByOrder.get(order.id) ?? new Map<string, number>())].sort((a, b) => a[1] - b[1]);
+          // Jobs the order still owes pieces on. While any of these exist the
+          // run posting deliberately leaves the order open, whatever the
+          // finished count says.
+          const jobsBehind = jobs.filter(([, qty]) => qty < order.quantity);
           return (
             <div key={order.id} style={{ background: bg, border: `1px solid ${border}`, borderRadius: 14, padding: isMobile ? "12px 10px" : "18px 22px" }}>
               <div style={{ display: "flex", justifyContent: "space-between", gap: 14, alignItems: "flex-start", marginBottom: 12 }}>
@@ -321,6 +405,15 @@ export default function ProductionOrdersPage() {
                     {remaining > 0 && order.status !== "cancelled" && (
                       <span style={{ color: "#fbbf24", fontWeight: 700 }}> • {remaining.toLocaleString()} left to make</span>
                     )}
+                    {/* The count is met and the order is still open, which
+                        looks stuck until it says why: a job has not been done
+                        on every piece yet, so the order is held to carry it. */}
+                    {remaining === 0 && jobsBehind.length > 0 && order.status !== "cancelled" && (
+                      <span style={{ color: "#fbbf24", fontWeight: 700 }}>
+                        {" "}• all {order.quantity.toLocaleString()} made, but{" "}
+                        {jobsBehind.map((j) => `${j[0]} is short ${(order.quantity - j[1]).toLocaleString()}`).join(", ")}
+                      </span>
+                    )}
                   </div>
                 </div>
                 <div style={{ fontSize: 11, fontWeight: 800, color: statusColor[order.status] || "#94a3b8" }}>{order.status.replace("_", " ").toUpperCase()}</div>
@@ -328,6 +421,49 @@ export default function ProductionOrdersPage() {
               <div style={{ fontSize: 12, color: "rgba(255,255,255,.5)", marginBottom: 10 }}>
                 Due {order.plannedDate || "Not set"} • Assigned {order.assignedTo || "Unassigned"} • {fgCreated ? "Finished goods batch created" : "FG pending"} • Work orders open {incompleteWorkOrders}
               </div>
+
+              {/* Where each job has got to, which the finished count cannot
+                  say. A job standing ahead of the finished figure is pieces
+                  already part-made: they do not need that job doing again, and
+                  nobody should be paid for it twice. */}
+              {jobs.length > 0 && (
+                <div style={{ display: "flex", flexWrap: "wrap", gap: "6px 8px", marginBottom: 12 }}>
+                  {jobs.map(([job, qty]) => {
+                    const ahead = qty - order.completed;
+                    return (
+                      <span
+                        key={job}
+                        title={ahead > 0
+                          ? `${ahead.toLocaleString()} pieces have had ${job} done but are not finished yet — they do not need it again`
+                          : `${job} has kept up with the finished count`}
+                        style={{
+                          display: "inline-flex", alignItems: "baseline", gap: 6,
+                          padding: "4px 10px", borderRadius: 999, fontSize: 11.5,
+                          background: ahead > 0 ? "rgba(56,189,248,.1)" : "rgba(255,255,255,.04)",
+                          border: `1px solid ${ahead > 0 ? "rgba(56,189,248,.28)" : border}`,
+                          color: "rgba(255,255,255,.65)",
+                        }}
+                      >
+                        {job}
+                        <span style={{ fontFamily: "ui-monospace, monospace", fontWeight: 700, color: "#fff" }}>
+                          {qty.toLocaleString()}/{order.quantity.toLocaleString()}
+                        </span>
+                        {ahead > 0 && (
+                          <span style={{ color: "#7dd3fc", fontWeight: 700 }}>+{ahead.toLocaleString()} part-made</span>
+                        )}
+                        {/* Behind the order, not merely behind the finished
+                            count: these are pieces the order still owes this
+                            job, and the reason it has not closed. */}
+                        {qty < order.quantity && (
+                          <span style={{ color: "#fbbf24", fontWeight: 700 }}>
+                            {(order.quantity - qty).toLocaleString()} still to do
+                          </span>
+                        )}
+                      </span>
+                    );
+                  })}
+                </div>
+              )}
               <div style={{ background: "rgba(255,255,255,.08)", height: 6, borderRadius: 999, overflow: "hidden", marginBottom: 14 }}>
                 <div style={{ width: `${progress}%`, height: "100%", background: statusColor[order.status] || "#94a3b8" }} />
               </div>
@@ -339,8 +475,14 @@ export default function ProductionOrdersPage() {
                 )}
                 {(order.status === "in_progress" || order.status === "running") && (
                   <button onClick={() => openCompleteDialog(order)} style={{ padding: "7px 14px", background: "rgba(34,197,94,.15)", border: "1px solid rgba(34,197,94,.3)", color: "#22c55e", borderRadius: 8, fontSize: 12, fontWeight: 700, cursor: "pointer" }}>
+                    {/* Not "Run remaining 41,000" any more. On an order that
+                        takes a week that reads as an instruction to make the
+                        whole balance in one go, which is the opposite of what
+                        the dialog behind it is for. The balance is already on
+                        the line above; this button only has to open the day's
+                        entry. */}
                     {order.completed > 0 && remaining > 0
-                      ? `Run remaining ${remaining.toLocaleString()} →`
+                      ? "Record today's production →"
                       : "Record production →"}
                   </button>
                 )}
@@ -432,22 +574,34 @@ export default function ProductionOrdersPage() {
 
             <div style={{ display: "flex", gap: 14, flexWrap: "wrap", marginBottom: 16 }}>
               <div>
-                <label style={{ display: "block", fontSize: 12, color: "rgba(255,255,255,.45)", marginBottom: 6 }}>Units finished in this run</label>
+                {/* Named the same thing the Make dialog names it. It is the
+                    same question — how many came off the floor today — and
+                    calling it "Units finished in this run" on one screen and
+                    "Finished today" on the other read as two different
+                    mechanisms, which is why an order spread over a week looked
+                    like something the system could not do. */}
+                <label style={{ display: "block", fontSize: 12, color: "rgba(255,255,255,.45)", marginBottom: 6 }}>Finished today</label>
                 <input
                   type="number" min={1} value={runQty}
                   onChange={(e) => setRunQty(Math.max(1, Number(e.target.value) || 1))}
                   onBlur={(e) => requote(Math.max(1, Number(e.target.value) || 1))}
+                  // The box opens on the whole balance, which is right on the
+                  // last day and wrong on every other one. Selecting it means
+                  // the real figure is typed over the top in one go, instead of
+                  // backspacing five digits every morning for a week.
+                  onFocus={(e) => e.currentTarget.select()}
                   style={{ width: 180, height: 38, background: bg, border: `1px solid ${border}`, borderRadius: 8, padding: "9px 12px", fontSize: 14, color: "#fff", boxSizing: "border-box" }}
                 />
-                {/* The box opens on the whole balance, which is right for a run
-                    that finishes the order and wrong for a day that finishes
-                    part of it. Say what happens to the rest so a short day is
-                    not typed in as a full one. */}
+                {/* Say what happens to the rest, so a short day is not typed in
+                    as a full one — and say it in a way that covers an order
+                    running for a week, not just one that slips a day. */}
                 <div style={{ fontSize: 11, color: "rgba(255,255,255,.35)", marginTop: 6, width: 180, lineHeight: 1.6 }}>
                   {runOrder.completed > 0
                     ? `${runOrder.completed.toLocaleString()} done, ${Math.max(runOrder.quantity - runOrder.completed, 0).toLocaleString()} left of ${runOrder.quantity.toLocaleString()}.`
                     : `Order is for ${runOrder.quantity.toLocaleString()}.`}{" "}
-                  Enter only what was finished — the rest stays open for the next run.
+                  Enter only what was finished today. The rest stays on this
+                  order and you come back to it tomorrow — as many days as it
+                  takes.
                 </div>
               </div>
               <div>
@@ -563,45 +717,97 @@ export default function ProductionOrdersPage() {
                           <option value="">— Worker —</option>
                           {labourList.map((l) => <option key={l.id} value={l.id}>{l.name}</option>)}
                         </select>
+                        {/* Marked red when it is the empty box that is holding
+                            the run up. The message below says what is wrong;
+                            this says which box to type in. */}
                         <input
                           list="production-operations"
                           placeholder="Job — e.g. Button"
                           value={row.operation}
                           onChange={(e) => setLabourRow(index, { operation: e.target.value })}
-                          style={{ background: bg, border: `1px solid ${border}`, borderRadius: 8, padding: "8px 10px", color: "#fff", fontSize: 12.5 }}
+                          style={{
+                            background: bg, borderRadius: 8, padding: "8px 10px", color: "#fff", fontSize: 12.5,
+                            border: `1px solid ${jobNamesMissing && row.labourId && !row.operation.trim() ? "rgba(239,68,68,.55)" : border}`,
+                          }}
                         />
                         <input type="number" min={0} step="any" placeholder="Pcs" value={row.qty} onChange={(e) => setLabourRow(index, { qty: e.target.value })} style={{ background: bg, border: `1px solid ${border}`, borderRadius: 8, padding: "8px 10px", color: "#fff", fontSize: 12.5 }} />
-                        <input type="number" min={0} step="any" placeholder="Rate/pc" value={row.rate} onChange={(e) => setLabourRow(index, { rate: e.target.value })} style={{ background: bg, border: `1px solid ${border}`, borderRadius: 8, padding: "8px 10px", color: "#fff", fontSize: 12.5 }} />
-                        <button onClick={() => removeLabourRow(index)} title="Remove" style={{ background: "transparent", border: `1px solid ${border}`, borderRadius: 8, color: "rgba(255,255,255,.45)", cursor: "pointer", padding: "7px 0", gridColumn: isMobile ? "1 / -1" : "auto" }}>×</button>
+                        {/* Rate is the last thing typed on a row, so Enter here
+                            means "done, next worker". It used to mean "delete
+                            this row": the next thing in the tab order was the
+                            × button, and Enter on a focused button presses it.
+                            A keystroke that finishes a row should not be one
+                            keystroke away from destroying it. */}
+                        <input
+                          type="number" min={0} step="any" placeholder="Rate/pc" value={row.rate}
+                          onChange={(e) => setLabourRow(index, { rate: e.target.value })}
+                          onKeyDown={(e) => {
+                            if (e.key !== "Enter" || e.shiftKey) return;
+                            e.preventDefault();
+                            document.getElementById("po-add-worker")?.focus();
+                          }}
+                          style={{ background: bg, border: `1px solid ${border}`, borderRadius: 8, padding: "8px 10px", color: "#fff", fontSize: 12.5 }}
+                        />
+                        {/* Out of the tab order entirely. Deleting a row is a
+                            decision, taken with a deliberate click; it has no
+                            business being somewhere the keyboard lands on the
+                            way past. */}
+                        <button onClick={() => removeLabourRow(index)} tabIndex={-1} title="Remove" style={{ background: "transparent", border: `1px solid ${border}`, borderRadius: 8, color: "rgba(255,255,255,.45)", cursor: "pointer", padding: "7px 0", gridColumn: isMobile ? "1 / -1" : "auto" }}>×</button>
                       </div>
                     ))}
                   </div>
                   <datalist id="production-operations">
                     {operationSuggestions.map((operation) => <option key={operation} value={operation} />)}
                   </datalist>
-                  <button onClick={addLabourRow} style={{ marginTop: 8, padding: "6px 12px", borderRadius: 8, background: "rgba(255,255,255,.05)", border: `1px solid ${border}`, color: "rgba(255,255,255,.65)", fontSize: 11.5, fontWeight: 600, cursor: "pointer" }}>
+                  <button id="po-add-worker" onClick={addLabourRow} style={{ marginTop: 8, padding: "6px 12px", borderRadius: 8, background: "rgba(255,255,255,.05)", border: `1px solid ${border}`, color: "rgba(255,255,255,.65)", fontSize: 11.5, fontWeight: 600, cursor: "pointer" }}>
                     + Add worker
                   </button>
                   <div style={{ fontSize: 11, color: "rgba(255,255,255,.32)", marginTop: 8, lineHeight: 1.7 }}>
                     Assigning workers here charges what&apos;s actually owed to each of them instead of the BOM&apos;s flat labour estimate below.
-                    Name the job each row is for — cutting, button, packing — and the same pieces can go through every job on this one run.
-                    Each job&apos;s pieces have to add up to the run on their own.
+                    Name the job each row is for — cutting, button, packing. With more than one worker it is required, because
+                    rows with no job named are counted as one job. Jobs need not match each other or the run: one can run ahead
+                    and leave pieces part-made for the next run, and one can run behind because its pieces were done in an
+                    earlier one. Each worker is paid for the pieces on their own row.
                   </div>
                 </div>
 
+                {/* Said before the arithmetic message, because when the job
+                    names are missing the arithmetic message is misleading: it
+                    reports a 5,000 that nobody entered and asks for it to be
+                    lowered, when the rows were right all along and only the
+                    job names were missing. */}
+                {jobNamesMissing && (
+                  <div style={{ padding: "12px 14px", borderRadius: 12, background: "rgba(239,68,68,.12)", border: "1px solid rgba(239,68,68,.3)", marginBottom: 14 }}>
+                    <div style={{ fontSize: 12.5, color: "#fca5a5", fontWeight: 700, marginBottom: 5 }}>
+                      Name the job on each row — the boxes marked in red
+                    </div>
+                    <div style={{ fontSize: 11.5, color: "rgba(255,255,255,.5)", lineHeight: 1.7 }}>
+                      Rows with no job named are counted as one job and added together, so their pieces come
+                      out as {(labourPieces?.groups.find((g) => g.operation === "Labour")?.total ?? 0).toLocaleString()} instead
+                      of standing on their own. The worker&apos;s name does not settle it — the same person does a
+                      different job tomorrow. Type what this row is for: sealing, button, packing.
+                    </div>
+                  </div>
+                )}
+
                 {/* A job's pieces disagree with the run — say so before the order closes. */}
-                {labourPieces && labourPieces.under.length > 0 && (
+                {/* A job behind the run. Normal when those pieces had that job
+                    done in an earlier run — and the one real danger on this
+                    screen when they did not, so the consequence is named
+                    rather than the entry refused. */}
+                {!jobNamesMissing && labourPieces && labourPieces.under.length > 0 && (
                   <div style={{ padding: "12px 14px", borderRadius: 12, background: "rgba(251,191,36,.1)", border: "1px solid rgba(251,191,36,.3)", marginBottom: 14 }}>
                     <div style={{ fontSize: 12.5, color: "#fbbf24", fontWeight: 700, marginBottom: 5 }}>
                       This run finishes {runQty.toLocaleString()} pieces, but {labourPieces.under.map((g) => `${g.operation} is paid for ${g.total.toLocaleString()}`).join("; ")}
                     </div>
                     <div style={{ fontSize: 11.5, color: "rgba(255,255,255,.5)", lineHeight: 1.7 }}>
-                      Confirm is blocked until every job adds up to {runQty.toLocaleString()} — that is what would be received into
-                      finished goods and charged to this order
+                      That is right if the rest of today&apos;s pieces already had that job done in an earlier run —
+                      they keep the work done on them and only needed finishing.
+                      {" "}If they did not, {runQty.toLocaleString()} is more than was really made: it goes into finished
+                      goods and is charged to this order
                       {runOrder.quantity > 0 && runQty >= runOrder.quantity - runOrder.completed
                         ? ", which closes it — the balance could never be produced against it again"
                         : ""}.
-                      {" "}Add the workers who did the rest of that job, or lower the run to what was really finished.
+                      {" "}Add the workers who did the rest of that job, or lower the run.
                     </div>
                     {labourPieces.soleTotal != null && (
                       <button
@@ -613,11 +819,15 @@ export default function ProductionOrdersPage() {
                     )}
                   </div>
                 )}
-                {labourPieces && labourPieces.over.length > 0 && (
-                  <div style={{ padding: "12px 14px", borderRadius: 12, background: "rgba(239,68,68,.12)", border: "1px solid rgba(239,68,68,.3)", marginBottom: 14, fontSize: 12.5, color: "#fca5a5", lineHeight: 1.7 }}>
-                    {labourPieces.over.map((g) => `${g.operation} is paid for ${g.total.toLocaleString()} pieces`).join("; ")} but this run only
-                    finishes {runQty.toLocaleString()}. Raise the run, or lower that job&apos;s pieces so it adds up to {runQty.toLocaleString()}.
-                    {" "}Two different jobs on the same pieces are fine — give each row its own job name.
+
+                {/* A job ahead of the run — pieces worked on today that finish
+                    later. Not a problem at all: this is part-made stock, and
+                    saying so is the whole reason the operator can trust the
+                    difference is not lost. */}
+                {!jobNamesMissing && labourPieces && labourPieces.over.length > 0 && (
+                  <div style={{ padding: "12px 14px", borderRadius: 12, background: "rgba(56,189,248,.08)", border: "1px solid rgba(56,189,248,.25)", marginBottom: 14, fontSize: 12, color: "rgba(255,255,255,.6)", lineHeight: 1.7 }}>
+                    {labourPieces.over.map((g) => `${g.operation} is paid for ${g.total.toLocaleString()} but only ${runQty.toLocaleString()} finish today, so ${(g.total - runQty).toLocaleString()} stay part-made`).join("; ")}.
+                    {" "}They keep the work done on them and finish in a later run — nothing is lost and nobody is paid twice.
                   </div>
                 )}
 

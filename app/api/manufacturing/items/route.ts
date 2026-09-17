@@ -43,6 +43,11 @@ export async function GET(req: NextRequest) {
       select: {
         id: true, code: true, name: true, unit: true, category: true,
         purchaseRate: true, rate: true, minStock: true,
+        /* What one of these is in the unit the floor measures in — one ROLL
+           is 50 M. Stock is counted in rolls, which is right; a part-roll
+           then reads as "0.34ROLL", which nobody can take to the rack and
+           measure. With this the screen can say what that is in metres. */
+        secondaryUnit: true, secondaryUnitRatio: true,
       },
       orderBy: { name: "asc" },
     });

@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useBusinessRecords } from "@/lib/useBusinessRecords";
-import { mapBomRecord, loadManufacturingItems, type ManufacturingItem } from "../_shared";
+import { formatRate, mapBomRecord, loadManufacturingItems, type ManufacturingItem } from "../_shared";
 import { useResponsive } from "@/hooks/useResponsive";
 
 const ff = "'Outfit','Inter',sans-serif";
@@ -127,7 +127,7 @@ export default function TradingGoodsPage() {
                     {item.isLow && <span style={{ marginLeft: 6, fontSize: 10, padding: "2px 6px", borderRadius: 5, background: "rgba(239,68,68,.15)", color: "#fca5a5" }}>LOW</span>}
                   </td>
                   <td style={{ padding: "12px 16px", fontSize: 13, textAlign: "right", color: "rgba(255,255,255,.5)" }}>{usedByBom.get(item.id) || 0}</td>
-                  <td style={{ padding: "12px 16px", fontSize: 13, textAlign: "right", color: "rgba(255,255,255,.62)" }}>Rs. {Math.round(item.unitCost).toLocaleString()}</td>
+                  <td style={{ padding: "12px 16px", fontSize: 13, textAlign: "right", color: "rgba(255,255,255,.62)" }}>Rs. {formatRate(item.unitCost)}</td>
                   <td style={{ padding: "12px 16px", fontSize: 13, textAlign: "right", fontWeight: 700, color: "#22c55e" }}>Rs. {Math.round(item.stockValue).toLocaleString()}</td>
                   <td style={{ padding: "12px 16px", fontSize: 13, textAlign: "right", color: "rgba(255,255,255,.5)" }}>Rs. {Math.round(item.rate).toLocaleString()}</td>
                 </tr>

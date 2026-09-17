@@ -83,7 +83,24 @@ export async function GET(req: NextRequest) {
         customer: true,
         packagingItem: true,
         salesInvoice: { select: { id: true, invoiceNo: true } },
-        items: true,
+        /* The item behind each line, not just the line.
+        
+           This was `items: true`, which returns itemId, qty and rate and
+           nothing that can be read by a human. The screen opens a challan for
+           editing straight out of this list, so a challan reopened that way
+           came back with no item code, no description and no unit — the item
+           picker still looked right, because it resolves the name from the id
+           itself, and the printed challan then went out with an empty
+           description column.
+        
+           Named fields rather than the whole row: this query returns every
+           challan the company has, so it is the one place where dragging the
+           full item record along actually costs something. */
+        items: {
+          include: {
+            item: { select: { id: true, code: true, name: true, unit: true, description: true } },
+          },
+        },
       },
       orderBy: { createdAt: "desc" },
     });

@@ -34,6 +34,17 @@ export async function GET(req: NextRequest) {
     const limit = Math.min(500, Math.max(1, Number(searchParams.get("limit")) || 200));
 
     const where: any = {};
+    /* Test-mode charges are out unless asked for.
+    
+       They are real rows — the webhook was real — for money nobody paid, and
+       sitting in the ledger they read as customers. Two of them, with no
+       company attached, were being counted in "9 invoices · 7 companies" and
+       in every currency total on the page.
+    
+       Excluded here rather than deleted: a test charge is still worth being
+       able to trace, and a paid-invoice row is not a thing to throw away on a
+       hunch about what it was for. `includeTest=1` brings them back. */
+    if (searchParams.get("includeTest") !== "1") where.testMode = { not: true };
     if (companyId) where.companyId = companyId;
     if (provider) where.provider = provider.toUpperCase();
     if (status) where.status = status.toUpperCase();

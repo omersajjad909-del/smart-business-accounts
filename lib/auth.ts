@@ -134,6 +134,32 @@ function expToMs(exp: unknown): number {
   return n < 1e12 ? n * 1000 : n;
 }
 
+/**
+ * How many seconds a cookie should live so that it dies exactly when the token
+ * inside it does.
+ *
+ * Written because the two were set independently and drifted apart. The
+ * cross-domain handoff hardcoded one hour, which is right for an impersonation
+ * token (minted with exactly that life) and wrong for anything else — a dev
+ * test session carrying a week-long token was signed out after sixty minutes,
+ * on a cookie that expired while its contents were still perfectly valid.
+ *
+ * Deriving it from the token removes the chance of ever disagreeing again: one
+ * of them is the truth and the other now follows it.
+ *
+ * Returns 0 for a token with no usable `exp` — the caller should not be setting
+ * a cookie for it at all. The one-minute floor keeps a token that is seconds
+ * from expiry from being written as a session cookie by accident (maxAge 0
+ * means "delete this", which is emphatically not what a rounding error should
+ * mean).
+ */
+export function cookieMaxAgeFor(payload: { exp?: unknown } | null | undefined): number {
+  const expMs = expToMs(payload?.exp);
+  if (!expMs) return 0;
+  const seconds = Math.floor((expMs - Date.now()) / 1000);
+  return seconds <= 0 ? 0 : Math.max(60, seconds);
+}
+
 /** Length-safe, branch-free string compare so signature checks don't leak timing. */
 function constantTimeEqual(a: string, b: string): boolean {
   if (a.length !== b.length) return false;

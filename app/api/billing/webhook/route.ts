@@ -816,6 +816,9 @@ async function handleLemonWebhook(req: NextRequest, raw: string) {
         customerCountry: displayCountry || invoiceCompany?.country || null,
         // No company-level tax registration is captured at signup yet, so this
         // stays null until an admin fills it in on the ledger.
+        // Lemon Squeezy says so on every order; a store left in test mode
+        // sends real webhooks for money nobody paid.
+        testMode: attrs?.test_mode === true,
         cardBrand: attrs?.card_brand || null,
         cardLast4: attrs?.card_last_four || null,
         periodEnd: safeDate(attrs?.renews_at),

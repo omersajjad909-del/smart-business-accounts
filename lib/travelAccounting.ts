@@ -202,6 +202,47 @@ export async function ensureRevenueAccount(companyId: string, name: string) {
   });
 }
 
+/**
+ * The cost head a travel document's supplier bill lands in.
+ *
+ * Mirrors `revenueAccount` on the other side of the same file, and uses the
+ * codes the travel business type already seeds in lib/businessModules.ts, so a
+ * fresh agency does not end up with two accounts meaning the same thing.
+ */
+export const TRAVEL_COST_ACCOUNTS: Record<TravelSourceCategory, string> = {
+  travel_ticket: "Airline Settlement Cost",
+  visa_case: "Embassy / Visa Fee",
+  travel_hotel: "Hotel Supplier Cost",
+  travel_tour: "Tour Supplier Cost",
+};
+
+export async function ensureExpenseAccount(companyId: string, name: string) {
+  const existing = await prisma.account.findFirst({
+    where: { companyId, name: { equals: name, mode: "insensitive" }, deletedAt: null },
+  });
+  if (existing) return existing;
+
+  // 5100 and 5101 are seeded with the travel business type; the other two
+  // follow them rather than landing in a general expense bucket, so a P&L can
+  // be read by line of business without anyone building a report for it.
+  const codeMap: Record<string, string> = {
+    "Airline Settlement Cost": "5100",
+    "Embassy / Visa Fee": "5101",
+    "Hotel Supplier Cost": "5103",
+    "Tour Supplier Cost": "5104",
+    "Supplier Cancellation Charges": "5105",
+  };
+
+  return prisma.account.create({
+    data: {
+      companyId,
+      code: codeMap[name] || "5109",
+      name,
+      type: "EXPENSE",
+    },
+  });
+}
+
 export async function ensureServiceItem(companyId: string, name: string, rate: number) {
   const existing = await prisma.itemNew.findFirst({
     where: {

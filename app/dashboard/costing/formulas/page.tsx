@@ -117,7 +117,13 @@ const CSS = `
 .fxHead{font-size:9.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
   color:rgba(255,255,255,.32);padding:0 2px 3px}
 .fxFormulaTitle{flex:1 1 220px;min-width:220px;word-break:normal;overflow-wrap:anywhere}
-.fxFormulaActions{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+/* margin-left:auto keeps the four buttons against the right edge however wide
+   the card gets — flex-grow on the title alone left them stranded mid-row with
+   a stretch of empty card after them. The gap is what stops Duplicate and
+   Delete reading as one control: they sit side by side and one of them cannot
+   be undone. */
+.fxFormulaActions{display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+  margin-left:auto;justify-content:flex-end}
 /* Two columns: the live result belongs in the sticky side rail. */
 .fxLiveMobile{display:none}
 /* Below this a half-row cannot hold a name, a unit and a number without
@@ -143,7 +149,8 @@ const CSS = `
   .fxBar{top:52px;z-index:9}
   .fxFormulaCard{align-items:stretch!important}
   .fxFormulaTitle{flex-basis:100%!important;min-width:0!important;width:100%!important;word-break:normal!important}
-  .fxFormulaActions{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr));width:100%}
+  .fxFormulaActions{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:8px!important;width:100%;margin-left:0!important}
   .fxFormulaActions>*{width:100%;text-align:center}
 }
 `;
@@ -1142,7 +1149,8 @@ export default function FormulasPage() {
               {visible.map(({ record, draft }) => (
                 <div key={record.id} className="fxFormulaCard" style={{
                   background: CARD, border: `1px solid ${BORDER}`, borderRadius: 12,
-                  padding: "14px 16px", display: "flex", alignItems: "center", gap: 14, flexWrap: "wrap",
+                  padding: "14px 18px", display: "flex", alignItems: "center",
+                  gap: 16, flexWrap: "wrap", justifyContent: "space-between",
                 }}>
                   <div className="fxFormulaTitle">
                     <div style={{ fontSize: 14.5, fontWeight: 700 }}>{draft.name}</div>

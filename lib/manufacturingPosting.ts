@@ -599,6 +599,12 @@ export async function priceProductionRun(opts: {
 
 export type CompletedRun = {
   producedQty: number;
+  /**
+   * Named jobs that have not yet covered the whole order, with what they have
+   * covered so far. Non-empty means the order was deliberately left open even
+   * though the finished count has reached the ordered quantity.
+   */
+  jobsBehind: { operation: string; done: number }[];
   materialCost: number;
   /** Value of open pieces this run consumed instead of taking from stock. */
   remnantUsedCost: number;
@@ -1023,13 +1029,56 @@ export async function completeProductionRun(opts: {
 
     // ── 5. Move the order along ──
     const completed = alreadyDone + producedQty;
+
+    /**
+     * An order is finished when every job has been done on every piece — not
+     * when the finished count reaches the ordered quantity.
+     *
+     * Those are not the same thing, and the difference closed an order with
+     * 1,000 bags still waiting for their buttons. The finished figure is typed
+     * by whoever records the run; the job figures are what each worker was
+     * actually paid for. When a job is behind, one of the two is wrong, and
+     * closing is the half that cannot be taken back: a completed order can
+     * never be produced against again, so the shortfall becomes a thousand
+     * bags that exist in finished goods and nowhere on the floor.
+     *
+     * So a short job holds the order open. Nothing is refused and nothing is
+     * lost — the run posts, the workers are paid, the stock moves. The order
+     * simply stays available to carry the rest, which is what it is for.
+     *
+     * Only jobs that were named. A row with no job on it cannot be attributed
+     * to anything, so it cannot be held against the order either; and an order
+     * whose labour was never named at all falls back to the finished count,
+     * because there is nothing else to go on.
+     */
+    const labourSoFar = await tx.businessRecord.findMany({
+      where: { companyId, category: "labour_entry", refId: order.id },
+      select: { data: true },
+    });
+    const piecesByJob = new Map<string, number>();
+    for (const entry of labourSoFar) {
+      const row = entry.data as { operation?: unknown; qty?: unknown };
+      const job = String(row?.operation || "").trim();
+      if (!job) continue;
+      piecesByJob.set(job, round2((piecesByJob.get(job) || 0) + (Number(row?.qty) || 0)));
+    }
+    const jobsBehind = [...piecesByJob]
+      .filter(([, done]) => done + REMNANT_EPSILON < orderedQty)
+      .map(([operation, done]) => ({ operation, done }));
+
+    const orderFinished =
+      orderedQty > 0 && completed >= orderedQty && jobsBehind.length === 0;
+
     await tx.businessRecord.update({
       where: { id: order.id },
       data: {
-        status: orderedQty > 0 && completed >= orderedQty ? "completed" : "running",
+        status: orderFinished ? "completed" : "running",
         data: {
           ...orderData,
           completed,
+          /* Why the order is still open although the count says it is done, so
+             the screen can say it rather than leaving it looking stuck. */
+          jobsBehind,
           lastRunAt: date.toISOString(),
           lastRunCost: priced.totalCost,
           ...(namedAssignments.length
@@ -1051,6 +1100,7 @@ export async function completeProductionRun(opts: {
 
     return {
       producedQty,
+      jobsBehind,
       materialCost: priced.materialCost,
       remnantUsedCost: priced.remnantUsedCost,
       remnantCreatedCost: priced.remnantCreatedCost,

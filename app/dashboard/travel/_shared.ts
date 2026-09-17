@@ -42,7 +42,13 @@ export function mapTravelTicket(record: BusinessRecord) {
   return {
     id: record.id,
     booking: record.title,
+    /* The lead passenger, kept so every screen that shows one name still shows
+       a sensible one. The party itself is `passengers` — a file is one PNR and
+       may carry a whole family. */
     passenger: String(record.data?.passenger || ""),
+    passengers: Array.isArray(record.data?.passengers) ? record.data.passengers : [],
+    paxCount: Number(record.data?.paxCount || 0),
+    paxSeats: Number(record.data?.paxSeats || 0),
     airline: String(record.data?.airline || ""),
     supplier: String(record.data?.supplier || record.data?.airline || ""),
     route: String(record.data?.route || ""),

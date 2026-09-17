@@ -21,6 +21,7 @@ import { useVisiblePoll } from "@/hooks/useVisiblePoll";
 import { fetchRateFormula } from "@/hooks/useRateFormula";
 import { ModeToggle } from "@/components/mode-toggle";
 import AppearanceApplier from "@/components/AppearanceApplier";
+import ZeroFieldSelect from "@/components/ZeroFieldSelect";
 import { hasModule as baseHasModule, type BusinessType } from "@/lib/businessModules";
 import { findDashboardFeatureByRoute } from "@/lib/dashboardFeatureRegistry";
 import { businessOwnsCoreFeature } from "@/lib/corePack";
@@ -1218,6 +1219,7 @@ export default function DashboardLayout({
     // hides. Desktop is unaffected: there the two are identical.
     <div className="dashboard-root" style={{display:"flex",minHeight:"100dvh",background:"var(--app-bg)",fontSize:13,color:"var(--text-primary)",position:"relative"}}>
       <AppearanceApplier />
+      <ZeroFieldSelect />
       <DemoSessionTimer />
 
       {/* ── Idle auto-logout warning modal ── */}

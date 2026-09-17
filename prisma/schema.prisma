@@ -2764,6 +2764,13 @@ model PlatformInvoice {
   refundedAmount Float     @default(0)
   refundedAt     DateTime?
 
+  /// A charge the provider made in its own test mode — a card that was never
+  /// charged, for money that was never taken. It is a real row because the
+  /// webhook was real, and it must never be counted as revenue or read as a
+  /// customer. Kept rather than discarded so a test can still be traced, but
+  /// left out of the admin ledger unless it is explicitly asked for.
+  testMode  Boolean  @default(false)
+
   periodStart DateTime?
   periodEnd   DateTime?
 
@@ -2775,6 +2782,7 @@ model PlatformInvoice {
   @@index([status, issuedAt])
   @@index([provider, issuedAt])
   @@index([issuedAt])
+  @@index([testMode, issuedAt])
 }
 
 // ─── AI Prospecting (outbound client acquisition for FinovaOS itself) ─────────

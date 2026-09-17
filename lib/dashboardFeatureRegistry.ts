@@ -20,6 +20,21 @@ export type DashboardFeatureDefinition = {
   businessTypes?: string[];
   description?: string;
   category?: string;
+  /**
+   * Which plans ship this page on, for an industry page that is meant to be a
+   * ladder rather than all-or-nothing.
+   *
+   * Omit it and the page goes to all three, which is what every industry page
+   * did and still does — this only narrows. Values are the lowercase plan
+   * names the admin grid uses: "starter", "professional", "enterprise".
+   *
+   * It existed on this type for a long while, was set on two IT pages, and was
+   * read by nothing: every industry page reached every plan whatever it said.
+   * `createDefaultDashboardFeatureFlags` honours it now.
+   *
+   * Only the shipped default. Once an admin saves Pages & Modules their grid
+   * wins, exactly as it does for `permKey`.
+   */
   plans?: string[];
   /**
    * `false` keeps the page out of every plan's shipped defaults — it is listed
@@ -891,6 +906,19 @@ export const DASHBOARD_FEATURE_DEFS: DashboardFeatureDefinition[] = [
     section: "Control Center",
     businessTypes: ["event_planner", "wedding_planner", "decorator", "sound_services"],
   },
+  /* The travel ladder.
+  
+     Starter is the working desk of a small agency: take a booking, run the
+     visa, issue the ticket, know what is owed to the airline. Passports belong
+     there and not higher up — a visa cannot be filed without passport data, so
+     charging for it would be charging for the ability to do the job at all.
+  
+     Professional adds the group business: Hajj and Umrah departures, the
+     bookings against them, and the hotel and tour files a package is built
+     from. That is the step from "I sell tickets" to "I run groups", and it is
+     the one worth paying for.
+  
+     Enterprise adds the reporting on top of it. */
   {
     id: "TRAVEL_OVERVIEW",
     label: "Travel Overview",
@@ -899,6 +927,7 @@ export const DASHBOARD_FEATURE_DEFS: DashboardFeatureDefinition[] = [
     businessLabel: "Travel Agency",
     section: "Control Center",
     businessTypes: ["travel"],
+    plans: ["starter", "professional", "enterprise"],
   },
   {
     id: "TRAVEL_TICKETS",
@@ -908,6 +937,7 @@ export const DASHBOARD_FEATURE_DEFS: DashboardFeatureDefinition[] = [
     businessLabel: "Travel Agency",
     section: "Ticketing Desk",
     businessTypes: ["travel"],
+    plans: ["starter", "professional", "enterprise"],
   },
   {
     id: "TRAVEL_VISAS",
@@ -917,6 +947,7 @@ export const DASHBOARD_FEATURE_DEFS: DashboardFeatureDefinition[] = [
     businessLabel: "Travel Agency",
     section: "Visa Desk",
     businessTypes: ["travel"],
+    plans: ["starter", "professional", "enterprise"],
   },
   {
     id: "TRAVEL_SETTLEMENTS",
@@ -926,24 +957,33 @@ export const DASHBOARD_FEATURE_DEFS: DashboardFeatureDefinition[] = [
     businessLabel: "Travel Agency",
     section: "Finance Desk",
     businessTypes: ["travel"],
+    plans: ["starter", "professional", "enterprise"],
   },
   {
-    id: "TRAVEL_HOTELS",
-    label: "Hotel Packages",
-    route: "/dashboard/travel/hotel-packages",
+    /* The group business: a dated trip with a quota, priced per sharing
+       option. This is the step from selling tickets to running groups, so it
+       is where Professional starts earning its price. */
+    id: "TRAVEL_DEPARTURES",
+    label: "Hajj & Umrah Departures",
+    route: "/dashboard/travel/departures",
     business: "travel",
     businessLabel: "Travel Agency",
     section: "Bookings",
     businessTypes: ["travel"],
+    plans: ["professional", "enterprise"],
   },
   {
-    id: "TRAVEL_TOURS",
-    label: "Group Tours",
-    route: "/dashboard/travel/tours",
+    /* The document the pilgrim actually carries. Starter, because an Umrah
+       operator who cannot print a voucher cannot trade at all — this is not the
+       upsell, it is the job. */
+    id: "TRAVEL_VOUCHERS",
+    label: "Umrah & Hajj Vouchers",
+    route: "/dashboard/travel/vouchers",
     business: "travel",
     businessLabel: "Travel Agency",
-    section: "Bookings",
+    section: "Ticketing Desk",
     businessTypes: ["travel"],
+    plans: ["starter", "professional", "enterprise"],
   },
   {
     id: "TRAVEL_PASSPORTS",
@@ -953,6 +993,27 @@ export const DASHBOARD_FEATURE_DEFS: DashboardFeatureDefinition[] = [
     businessLabel: "Travel Agency",
     section: "Operations",
     businessTypes: ["travel"],
+    plans: ["starter", "professional", "enterprise"],
+  },
+  {
+    id: "TRAVEL_HOTELS",
+    label: "Hotel Packages",
+    route: "/dashboard/travel/hotel-packages",
+    business: "travel",
+    businessLabel: "Travel Agency",
+    section: "Bookings",
+    businessTypes: ["travel"],
+    plans: ["professional", "enterprise"],
+  },
+  {
+    id: "TRAVEL_TOURS",
+    label: "Group Tours",
+    route: "/dashboard/travel/tours",
+    business: "travel",
+    businessLabel: "Travel Agency",
+    section: "Bookings",
+    businessTypes: ["travel"],
+    plans: ["professional", "enterprise"],
   },
   {
     id: "TRAVEL_ANALYTICS",
@@ -962,6 +1023,7 @@ export const DASHBOARD_FEATURE_DEFS: DashboardFeatureDefinition[] = [
     businessLabel: "Travel Agency",
     section: "Control Center",
     businessTypes: ["travel"],
+    plans: ["enterprise"],
   },
   {
     id: "RENTALS_OVERVIEW",
@@ -2750,10 +2812,17 @@ export const AI_TOOL_META: Record<AiToolId, { icon: string; label: string; desc:
 export function createDefaultDashboardFeatureFlags(): Record<DashboardFeaturePlanCode, string[]> {
   const forPlan = (planCode: "STARTER" | "PRO" | "ENTERPRISE"): string[] => {
     const granted = new Set<string>(PLAN_DEFAULT_PERMISSIONS[planCode] || []);
+    // "PRO" is the plan code; the grid and the defs spell the middle plan
+    // "professional". One name for one thing at the boundary.
+    const planName = planCode === "PRO" ? "professional" : planCode.toLowerCase();
     return DASHBOARD_FEATURE_DEFS
       // A page shipped off stays off until an admin ticks it — see defaultEnabled.
       .filter((f) => f.defaultEnabled !== false)
       .filter((f) => !f.core || !f.permKey || granted.has(f.permKey))
+      // An industry page that names its plans is a ladder; one that does not
+      // goes to all three, which is what every industry page did before this
+      // was read at all. So this can only ever narrow, never widen.
+      .filter((f) => !f.plans?.length || f.plans.includes(planName))
       .map((f) => f.id);
   };
   return {
