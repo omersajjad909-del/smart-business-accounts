@@ -31,7 +31,13 @@
 // not a gap where a sale used to be.
 
 import { prisma } from "@/lib/prisma";
-import { ensurePartyAccount, ensureRevenueAccount } from "@/lib/travelAccounting";
+import {
+  TRAVEL_COST_ACCOUNTS,
+  ensureExpenseAccount,
+  ensurePartyAccount,
+  ensureRevenueAccount,
+  type TravelSourceCategory,
+} from "@/lib/travelAccounting";
 
 export class TravelAmendError extends Error {}
 
@@ -187,6 +193,44 @@ export async function refundTravelDocument(input: RefundInput): Promise<RefundRe
        The payable was a travel_settlement record, not a ledger posting, so this
        reverses it the same way: the settlement is reduced to whatever the
        airline actually keeps, and closed when it keeps nothing. */
+    const supplierName = String(data.supplierName || data.supplier || data.airline || "");
+    if (supplierName && supplierRefund > 0) {
+      /* The supplier bill comes back by what the airline actually returns.
+      
+         Raising the settlement posted a purchase bill: the cost to its own head
+         and the money owed to the supplier. Reducing only the settlement record
+         would leave that bill standing in the ledger for a seat nobody flew, so
+         it is reversed here for the refunded part — the supplier owes us less,
+         and the cost of sale falls with it. What the airline keeps stays
+         posted, because it is a real cost of the cancellation. */
+      const supplier = await ensurePartyAccount({
+        companyId,
+        name: supplierName,
+        partyType: "SUPPLIER",
+        openDate: date,
+      });
+      const costAccount = await ensureExpenseAccount(
+        companyId,
+        TRAVEL_COST_ACCOUNTS[record.category as TravelSourceCategory] || "Airline Settlement Cost",
+      );
+      await tx.voucher.create({
+        data: {
+          companyId,
+          branchId: input.branchId || null,
+          voucherNo: `${creditNoteNo}-S`,
+          type: "PR",
+          date,
+          narration: `${label} — supplier refund from ${supplier.name}`,
+          entries: {
+            create: [
+              { companyId, accountId: supplier.id, amount: supplierRefund },
+              { companyId, accountId: costAccount.id, amount: -supplierRefund },
+            ],
+          },
+        },
+      });
+    }
+
     const settlementId = String(data.settlementId || "");
     if (settlementId) {
       const settlement = await tx.businessRecord.findFirst({

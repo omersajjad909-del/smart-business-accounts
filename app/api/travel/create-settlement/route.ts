@@ -2,7 +2,13 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { logAuditFromReq } from "@/lib/auditLogger";
 import { resolveCompanyId } from "@/lib/tenant";
-import { buildTravelSource, ensurePartyAccount } from "@/lib/travelAccounting";
+import { resolveBranchIdOrDefault } from "@/lib/tenant";
+import {
+  TRAVEL_COST_ACCOUNTS,
+  buildTravelSource,
+  ensureExpenseAccount,
+  ensurePartyAccount,
+} from "@/lib/travelAccounting";
 
 export async function POST(req: NextRequest) {
   try {
@@ -38,6 +44,47 @@ export async function POST(req: NextRequest) {
     });
 
     const settlementRef = `SET-${record.title}`;
+
+    /* The supplier bill, in the ledger.
+    
+       This is the half that was missing, and it was the most expensive gap in
+       the module. Raising a ticket posted the sale — debit the passenger,
+       credit revenue — and the cost of that ticket was never posted at all. It
+       lived in this settlement record and nowhere else, so the P&L showed the
+       whole fare as profit: a ticket sold for 185,000 that cost 172,000 read as
+       185,000 earned instead of 13,000, and the airline's payable never
+       appeared in the trial balance or on its own supplier ledger.
+    
+       There is no Purchase Invoice here on purpose. That document is built for
+       goods — items, quantities, rates, stock movement — and a seat on an
+       aircraft is none of those. The settlement IS the agency's purchase
+       document, so it posts like one: the cost to its own head, the money owed
+       to the supplier's account, where a CPV can pay it off like any other
+       creditor. */
+    const branchId = await resolveBranchIdOrDefault(req, companyId);
+    const costAccount = await ensureExpenseAccount(
+      companyId,
+      TRAVEL_COST_ACCOUNTS[source.category] || "Airline Settlement Cost",
+    );
+
+    await prisma.voucher.create({
+      data: {
+        companyId,
+        branchId,
+        voucherNo: settlementRef,
+        // A purchase bill, not a payment. Nothing has left the bank yet.
+        type: "PI",
+        date: source.issueDate,
+        narration: `${settlementRef} — ${supplier.name} (${source.title})`,
+        entries: {
+          create: [
+            { companyId, accountId: costAccount.id, amount: source.costAmount },
+            { companyId, accountId: supplier.id, amount: -source.costAmount },
+          ],
+        },
+      },
+    });
+
     const settlement = await prisma.businessRecord.create({
       data: {
         companyId,
