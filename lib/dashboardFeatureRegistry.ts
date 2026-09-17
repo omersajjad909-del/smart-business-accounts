@@ -960,6 +960,19 @@ export const DASHBOARD_FEATURE_DEFS: DashboardFeatureDefinition[] = [
     plans: ["starter", "professional", "enterprise"],
   },
   {
+    /* The document the pilgrim actually carries. Starter, because an Umrah
+       operator who cannot print a voucher cannot trade at all — this is not the
+       upsell, it is the job. */
+    id: "TRAVEL_VOUCHERS",
+    label: "Umrah & Hajj Vouchers",
+    route: "/dashboard/travel/vouchers",
+    business: "travel",
+    businessLabel: "Travel Agency",
+    section: "Ticketing Desk",
+    businessTypes: ["travel"],
+    plans: ["starter", "professional", "enterprise"],
+  },
+  {
     id: "TRAVEL_PASSPORTS",
     label: "Passport Database",
     route: "/dashboard/travel/passports",
