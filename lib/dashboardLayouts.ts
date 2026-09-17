@@ -139,6 +139,43 @@ export const DASHBOARD_LAYOUTS: Partial<Record<BusinessType, DashboardLayout>> =
     chart: { title: "Sales vs Purchases", revenueLabel: "Revenue", expensesLabel: "Expenses" },
   },
 
+  // ── TRAVEL ─────────────────────────────────────────────────
+  //
+  //  A Hajj and Umrah operator had the generic financial dashboard, which
+  //  put "Low Stock Items" in front of a business that holds no stock at
+  //  all and told them nothing they could act on.
+  //
+  //  What they open the software for is three things: what is left to
+  //  sell, who owes money, and whether anyone is about to fly on a file
+  //  that is not straight. The last is the one that costs — the operator
+  //  has already paid the airline and the hotel, and immigration refuses
+  //  a pilgrim whose passport number was never entered.
+  travel: {
+    opsTitle: "Departures & money",
+    verticalEndpoint: "/api/travel/control-center",
+    kpis: [
+      { key: "seats_left",    label: "Seats Left To Sell", icon: "💺", color: "#38bdf8", source: "vertical", metric: "seatsLeft",        format: "number",   caption: "Across open departures", href: "/dashboard/travel/departures" },
+      { key: "owed_pilgrims", label: "Owed By Pilgrims",   icon: "🧾", color: "#fbbf24", source: "vertical", metric: "owedByPilgrims",   format: "currency", caption: "Balances on bookings",   href: "/dashboard/travel/bookings" },
+      { key: "flying_soon",   label: "Flying In 30 Days",  icon: "✈️", color: "#a78bfa", source: "vertical", metric: "flyingSoonPax",    format: "number",   caption: "Pilgrims due to travel", href: "/dashboard/travel" },
+      { key: "profit",        label: "Profit This Month",  icon: "🚀", color: "#10b981", source: "core",     metric: "profit",           format: "currency", deltaMetric: "profitGrowth", deltaTone: "up-good" },
+    ],
+    opsStrip: [
+      // First, because it is the only one with a deadline attached.
+      { label: "Flying Soon, Not Ready", icon: "⚠️", color: "#f87171", source: "vertical", metric: "notReady",             format: "number",   href: "/dashboard/travel" },
+      { label: "Overdue Instalments",    icon: "⏰", color: "#fbbf24", source: "vertical", metric: "overdueFromPilgrims",  format: "currency", href: "/dashboard/travel/reports" },
+      { label: "Group Bookings",         icon: "👥", color: "#38bdf8", source: "vertical", metric: "groupBookings",        format: "number",   href: "/dashboard/travel/bookings" },
+      { label: "Owed To Suppliers",      icon: "💳", color: "#a78bfa", source: "vertical", metric: "supplierExposure",     format: "currency", href: "/dashboard/travel/settlements" },
+      { label: "Active Visa Cases",      icon: "🛂", color: "#34d399", source: "vertical", metric: "activeVisaCases",      format: "number",   href: "/dashboard/travel/visas" },
+    ],
+    actions: [
+      { label: "New Booking",   href: "/dashboard/travel/bookings",   icon: "👥", bg: GR.sky    },
+      { label: "New Departure", href: "/dashboard/travel/departures", icon: "🕋", bg: GR.green  },
+      { label: "Print Voucher", href: "/dashboard/travel/vouchers",   icon: "🎫", bg: GR.violet },
+      { label: "Receive Payment", href: "/dashboard/crv",             icon: "💰", bg: GR.amber  },
+    ],
+    chart: { title: "Sales vs Supplier Cost", revenueLabel: "Sales", expensesLabel: "Cost" },
+  },
+
   // ── MANUFACTURING ──────────────────────────────────────────
   manufacturing: {
     opsTitle: "Factory floor",

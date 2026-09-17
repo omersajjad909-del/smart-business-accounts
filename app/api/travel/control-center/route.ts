@@ -1,18 +1,27 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { resolveCompanyId } from "@/lib/tenant";
+import { bookingMoney, readBooking } from "@/lib/umrahBooking";
+import { readDeparture, seatPosition } from "@/lib/umrahPackage";
+
+/** How far ahead "about to fly" reaches. A visa is filed inside this window. */
+const SOON_DAYS = 30;
 
 export async function GET(req: NextRequest) {
   const companyId = await resolveCompanyId(req);
   if (!companyId) return NextResponse.json({ error: "Company required" }, { status: 400 });
 
-  const [ticketRec, visaRec, hotelRec, tourRec, settlementRec, passportRec] = await Promise.all([
+  const [ticketRec, visaRec, hotelRec, tourRec, settlementRec, passportRec, departureRec, bookingRec] = await Promise.all([
     prisma.businessRecord.findMany({ where: { companyId, category: "travel_ticket" }, orderBy: { createdAt: "desc" }, take: 20 }),
     prisma.businessRecord.findMany({ where: { companyId, category: "visa_case" }, orderBy: { createdAt: "desc" }, take: 20 }),
     prisma.businessRecord.findMany({ where: { companyId, category: "travel_hotel" }, orderBy: { createdAt: "desc" }, take: 20 }),
     prisma.businessRecord.findMany({ where: { companyId, category: "travel_tour" }, orderBy: { createdAt: "desc" }, take: 20 }),
     prisma.businessRecord.findMany({ where: { companyId, category: "travel_settlement" }, orderBy: { createdAt: "desc" }, take: 20 }),
     prisma.businessRecord.count({ where: { companyId, category: "travel_passport" } }),
+    // The group business. Not capped: seats left and money owed are totals, and
+    // a total of the twenty most recent rows is not a total of anything.
+    prisma.businessRecord.findMany({ where: { companyId, category: "umrah_departure" } }),
+    prisma.businessRecord.findMany({ where: { companyId, category: "umrah_booking" } }),
   ]);
 
   function d(record: typeof ticketRec[0]) { return (record.data || {}) as Record<string, unknown>; }
@@ -29,8 +38,64 @@ export async function GET(req: NextRequest) {
     hotels.reduce((s, x) => s + x.amount, 0) +
     tours.reduce((s, x) => s + x.amount, 0);
 
+  /* ── The group business ──
+     The four numbers a Hajj or Umrah operator opens the dashboard for. Worked
+     out here as well as on the Travel page, from the same two helpers, so the
+     dashboard and the module can never show the owner different figures. */
+  const today = new Date().toISOString().slice(0, 10);
+  const liveBookings = bookingRec
+    .map((r) => {
+      const booking = readBooking(r.data);
+      return { refId: r.refId || booking.departureId, booking, money: bookingMoney(booking, today) };
+    })
+    .filter((x) => x.booking.status !== "cancelled");
+
+  const paxByDeparture = new Map<string, number>();
+  for (const b of liveBookings) {
+    if (!b.refId) continue;
+    paxByDeparture.set(b.refId, (paxByDeparture.get(b.refId) || 0) + b.money.pax);
+  }
+
+  let seatsLeft = 0;
+  const departureDates = new Map<string, string>();
+  for (const r of departureRec) {
+    const dep = readDeparture(r.data);
+    departureDates.set(r.id, dep.departureDate);
+    // Only trips still ahead. Seats on a departure that has flown are not
+    // stock — nobody can sell them.
+    if (dep.departureDate && dep.departureDate < today) continue;
+    seatsLeft += seatPosition(dep.seats, paxByDeparture.get(r.id) || 0).left;
+  }
+
+  const owedByPilgrims = liveBookings.reduce((s, b) => s + b.money.balance, 0);
+  const overdueFromPilgrims = liveBookings.reduce((s, b) => s + b.money.overdue, 0);
+  const flyingSoonPax = liveBookings.reduce((s, b) => {
+    const date = departureDates.get(b.refId || "") || "";
+    if (!date) return s;
+    const days = Math.round((new Date(date).getTime() - new Date(today).getTime()) / 86_400_000);
+    return days >= 0 && days <= SOON_DAYS ? s + b.money.pax : s;
+  }, 0);
+
+  /* Files flying inside the window that are not straight — an unpaid balance,
+     or a pilgrim with no passport number. Neither appears in any ledger and
+     both stop the trip, so this is the counter worth putting on a dashboard. */
+  const notReady = liveBookings.filter((b) => {
+    const date = departureDates.get(b.refId || "") || "";
+    if (!date) return false;
+    const days = Math.round((new Date(date).getTime() - new Date(today).getTime()) / 86_400_000);
+    if (days < 0 || days > SOON_DAYS) return false;
+    return b.money.balance > 0.01 || b.booking.pilgrims.some((p) => !p.passportNo.trim());
+  }).length;
+
   return NextResponse.json({
     summary: {
+      seatsLeft,
+      owedByPilgrims: Math.round(owedByPilgrims),
+      overdueFromPilgrims: Math.round(overdueFromPilgrims),
+      flyingSoonPax,
+      notReady,
+      openDepartures: departureRec.length,
+      groupBookings: liveBookings.length,
       tickets: tickets.length,
       issuedTickets: tickets.filter(x => x.status === "issued").length,
       pendingTickets: tickets.filter(x => x.status === "quoted" || x.status === "booked").length,
