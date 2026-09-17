@@ -75,16 +75,51 @@ export async function POST(req: NextRequest) {
     });
     const originCompanyId = originUser?.defaultCompanyId || null;
 
-    // Find existing test company for this admin
+    /* The existing test workspace for this admin AND THIS BUSINESS TYPE.
+    
+       There used to be one test company per admin, full stop, and launching a
+       different business type simply rewrote `businessType` on it. So a
+       manufacturer's purchase invoices, items and BOMs were still sitting
+       there when the same admin launched a travel agency — one workspace
+       wearing whatever trade was asked for last, with every trade's data piled
+       up inside it. A test workspace exists to be a clean room; one that keeps
+       the last tenant's furniture is worse than none, because the data looks
+       plausible.
+    
+       Keyed on the business type now. Switching trades gets its own company
+       and its own books, and switching back returns to the one you left. */
+    const wantedType = String(businessType);
     let testCompanyId: string | null = null;
     try {
-      const log = await prisma.activityLog.findFirst({
+      const logs = await prisma.activityLog.findMany({
         where: { action: TEST_ACTION, userId: sessionUserId },
         orderBy: { createdAt: "desc" },
       });
-      if (log?.details) {
-        const d = JSON.parse(log.details);
-        testCompanyId = d.testCompanyId || null;
+      for (const log of logs) {
+        if (!log.details) continue;
+        let marked: { testCompanyId?: string; businessType?: string };
+        try {
+          marked = JSON.parse(log.details);
+        } catch {
+          continue;
+        }
+        if (!marked.testCompanyId) continue;
+
+        /* Markers written before this fix carry no business type. Fall back to
+           what the company itself currently says, so an admin's existing test
+           workspace is still found rather than a duplicate being made beside
+           it — and so the manufacturing data stays with manufacturing instead
+           of being inherited by the next trade. */
+        const markedType = marked.businessType
+          || (await prisma.company.findUnique({
+              where: { id: marked.testCompanyId },
+              select: { businessType: true },
+            }).catch(() => null))?.businessType;
+
+        if (markedType === wantedType) {
+          testCompanyId = marked.testCompanyId;
+          break;
+        }
       }
     } catch {}
 
@@ -125,7 +160,10 @@ export async function POST(req: NextRequest) {
         const testCompany = await tx.company.create({
           data: {
             ...(testCompanyNo ? { companyNo: testCompanyNo } : {}),
-            name: `${user?.name || "Admin"}'s (Test)`,
+            // Named with its trade, because an admin now has one of these per
+            // business type and "Admin's (Test)" three times over is not a list
+            // anybody can use.
+            name: `${user?.name || "Admin"}'s ${wantedType} (Test)`,
             isActive: true,
             country: "PK",
             baseCurrency: "PKR",
@@ -149,17 +187,23 @@ export async function POST(req: NextRequest) {
             action: TEST_ACTION,
             userId: sessionUserId,
             companyId: testCompany.id,
-            details: JSON.stringify({ testCompanyId: testCompany.id }),
+            // The business type is what the next launch looks this company up
+            // by. Without it the lookup falls back to reading the company row,
+            // which is how every trade ended up sharing one workspace.
+            details: JSON.stringify({ testCompanyId: testCompany.id, businessType: wantedType }),
           },
         });
 
         return testCompany.id;
       });
     } else {
+      /* Only the plan moves. `businessType` is what this workspace was found
+         by, so writing it again is a no-op — and writing a DIFFERENT one is
+         exactly the bug this replaced. A plan change is safe: it opens and
+         closes pages, it does not mix one trade's books into another's. */
       await prisma.company.update({
         where: { id: testCompanyId },
         data: {
-          businessType: String(businessType),
           plan: String(plan).toUpperCase(),
           businessSetupDone: true,
           subscriptionStatus: "ACTIVE",
