@@ -391,6 +391,10 @@ export default function ProductionOrdersPage() {
           const incompleteWorkOrders = linkedWorkOrders.filter((item) => item.status !== "completed").length;
           // Slowest job first: the one holding the order up is the one to read.
           const jobs = [...(jobsByOrder.get(order.id) ?? new Map<string, number>())].sort((a, b) => a[1] - b[1]);
+          // Jobs the order still owes pieces on. While any of these exist the
+          // run posting deliberately leaves the order open, whatever the
+          // finished count says.
+          const jobsBehind = jobs.filter(([, qty]) => qty < order.quantity);
           return (
             <div key={order.id} style={{ background: bg, border: `1px solid ${border}`, borderRadius: 14, padding: isMobile ? "12px 10px" : "18px 22px" }}>
               <div style={{ display: "flex", justifyContent: "space-between", gap: 14, alignItems: "flex-start", marginBottom: 12 }}>
@@ -400,6 +404,15 @@ export default function ProductionOrdersPage() {
                     {order.orderId} • BOM {linkedBom?.version || order.bomVersion || "Not linked"} • Qty {order.completed.toLocaleString()}/{order.quantity.toLocaleString()}
                     {remaining > 0 && order.status !== "cancelled" && (
                       <span style={{ color: "#fbbf24", fontWeight: 700 }}> • {remaining.toLocaleString()} left to make</span>
+                    )}
+                    {/* The count is met and the order is still open, which
+                        looks stuck until it says why: a job has not been done
+                        on every piece yet, so the order is held to carry it. */}
+                    {remaining === 0 && jobsBehind.length > 0 && order.status !== "cancelled" && (
+                      <span style={{ color: "#fbbf24", fontWeight: 700 }}>
+                        {" "}• all {order.quantity.toLocaleString()} made, but{" "}
+                        {jobsBehind.map((j) => `${j[0]} is short ${(order.quantity - j[1]).toLocaleString()}`).join(", ")}
+                      </span>
                     )}
                   </div>
                 </div>
@@ -437,6 +450,14 @@ export default function ProductionOrdersPage() {
                         </span>
                         {ahead > 0 && (
                           <span style={{ color: "#7dd3fc", fontWeight: 700 }}>+{ahead.toLocaleString()} part-made</span>
+                        )}
+                        {/* Behind the order, not merely behind the finished
+                            count: these are pieces the order still owes this
+                            job, and the reason it has not closed. */}
+                        {qty < order.quantity && (
+                          <span style={{ color: "#fbbf24", fontWeight: 700 }}>
+                            {(order.quantity - qty).toLocaleString()} still to do
+                          </span>
                         )}
                       </span>
                     );
