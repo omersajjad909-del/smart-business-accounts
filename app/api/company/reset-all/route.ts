@@ -23,6 +23,7 @@ import { rateLimitAsync } from "@/lib/rateLimit";
 import { requireActiveSession, isCredentialChangeAllowed } from "@/lib/sessionGuard";
 import { clearCompanyData } from "@/lib/clearCompanyData";
 import { sendEmail } from "@/lib/email";
+import { logAdminAction } from "@/lib/adminAuth";
 
 export async function GET(req: NextRequest) {
   const session = await requireActiveSession(req);
@@ -123,10 +124,29 @@ export async function POST(req: NextRequest) {
       },
     }).catch(() => {});
 
+    // Also mirrored into the platform's own AdminActionLog — the one table
+    // clearCompanyData never touches, so it survives even a second reset of
+    // the same company and shows up in /admin/audit-trail regardless of
+    // which tenant it happened in.
+    //
+    // Awaited, not fire-and-forget: a serverless function can be frozen the
+    // moment its response is sent, which would silently drop an unawaited
+    // promise before it ever reached the network.
+    await logAdminAction({
+      adminId: user.id,
+      adminEmail: user.email,
+      action: "SYSTEM_RESET",
+      targetType: "Company",
+      targetId: company.id,
+      targetLabel: company.name,
+      companyId: company.id,
+      details: { ip, at: when.toISOString(), confirmedBy: "password+company-name" },
+    }).catch(() => {});
+
     // Sent to the acting admin's own inbox, outside the database this reset
     // just emptied — the one record of who did this and when that a later
     // "I didn't do this" dispute cannot make disappear along with the data.
-    sendEmail({
+    await sendEmail({
       to: user.email,
       subject: "Your FinovaOS system data was reset",
       html: `
