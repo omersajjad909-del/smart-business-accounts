@@ -23,6 +23,7 @@ import { rateLimitAsync } from "@/lib/rateLimit";
 import { requireActiveSession, isCredentialChangeAllowed } from "@/lib/sessionGuard";
 import { clearCompanyData } from "@/lib/clearCompanyData";
 import { sendEmail } from "@/lib/email";
+import { logAdminAction } from "@/lib/adminAuth";
 
 export async function GET(req: NextRequest) {
   const session = await requireActiveSession(req);
@@ -121,6 +122,21 @@ export async function POST(req: NextRequest) {
         action: "SYSTEM_RESET",
         details: `Full system reset performed by ${user.name} (${user.email}) from IP ${ip} at ${when.toISOString()}`,
       },
+    }).catch(() => {});
+
+    // Also mirrored into the platform's own AdminActionLog — the one table
+    // clearCompanyData never touches, so it survives even a second reset of
+    // the same company and shows up in /admin/audit-trail regardless of
+    // which tenant it happened in.
+    logAdminAction({
+      adminId: user.id,
+      adminEmail: user.email,
+      action: "SYSTEM_RESET",
+      targetType: "Company",
+      targetId: company.id,
+      targetLabel: company.name,
+      companyId: company.id,
+      details: { ip, at: when.toISOString(), confirmedBy: "password+company-name" },
     }).catch(() => {});
 
     // Sent to the acting admin's own inbox, outside the database this reset
