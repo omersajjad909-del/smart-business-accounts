@@ -20,6 +20,21 @@ export type DashboardFeatureDefinition = {
   businessTypes?: string[];
   description?: string;
   category?: string;
+  /**
+   * Which plans ship this page on, for an industry page that is meant to be a
+   * ladder rather than all-or-nothing.
+   *
+   * Omit it and the page goes to all three, which is what every industry page
+   * did and still does — this only narrows. Values are the lowercase plan
+   * names the admin grid uses: "starter", "professional", "enterprise".
+   *
+   * It existed on this type for a long while, was set on two IT pages, and was
+   * read by nothing: every industry page reached every plan whatever it said.
+   * `createDefaultDashboardFeatureFlags` honours it now.
+   *
+   * Only the shipped default. Once an admin saves Pages & Modules their grid
+   * wins, exactly as it does for `permKey`.
+   */
   plans?: string[];
   /**
    * `false` keeps the page out of every plan's shipped defaults — it is listed
@@ -2750,10 +2765,17 @@ export const AI_TOOL_META: Record<AiToolId, { icon: string; label: string; desc:
 export function createDefaultDashboardFeatureFlags(): Record<DashboardFeaturePlanCode, string[]> {
   const forPlan = (planCode: "STARTER" | "PRO" | "ENTERPRISE"): string[] => {
     const granted = new Set<string>(PLAN_DEFAULT_PERMISSIONS[planCode] || []);
+    // "PRO" is the plan code; the grid and the defs spell the middle plan
+    // "professional". One name for one thing at the boundary.
+    const planName = planCode === "PRO" ? "professional" : planCode.toLowerCase();
     return DASHBOARD_FEATURE_DEFS
       // A page shipped off stays off until an admin ticks it — see defaultEnabled.
       .filter((f) => f.defaultEnabled !== false)
       .filter((f) => !f.core || !f.permKey || granted.has(f.permKey))
+      // An industry page that names its plans is a ladder; one that does not
+      // goes to all three, which is what every industry page did before this
+      // was read at all. So this can only ever narrow, never widen.
+      .filter((f) => !f.plans?.length || f.plans.includes(planName))
       .map((f) => f.id);
   };
   return {
