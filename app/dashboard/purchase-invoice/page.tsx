@@ -880,6 +880,11 @@ const [searchTerm, setSearchTerm] = useState("");
       sku: it.item?.code || "",
       ...(rfActive ? { meta: readRateFormulaMeta(rf, it.meta) } : {}),
     })));
+    // A blank row at the foot, the way a new invoice opens. Without it an
+    // invoice reopened for editing had nowhere to type a second item — the
+    // form only grows a row when the last one is filled in, and on an edit the
+    // last one was already a saved line. There was no way to add anything.
+    setRows(prev => [...prev, emptyRow()]);
     setShowForm(true);
     setShowList(false);
   }
@@ -1455,7 +1460,15 @@ const [searchTerm, setSearchTerm] = useState("");
                                   <td style={{ padding: "7px 8px", width: 64 }}><input type="number" value={r.taxPercent} onChange={e => updateRow(i, "taxPercent", e.target.value)} placeholder="0" style={inp({ padding: "5px 7px", textAlign: "right", fontSize: 12.5 })} /></td>
                                   <td style={{ padding: "7px 8px", textAlign: "right", fontWeight: 700, fontSize: 13, width: 96, color: lineTotal > 0 ? TEXT : MUTED, whiteSpace: "nowrap" }}>{lineTotal > 0 ? lineTotal.toLocaleString() : "—"}</td>
                                   <td style={{ padding: "7px 8px", width: 28, textAlign: "center" }}>
-                                    <button tabIndex={-1} onClick={() => { if (rows.length > 1) setRows(rows.filter((_, idx) => idx !== i)); }} style={{ background: "none", border: "none", color: "#f87171", cursor: "pointer", fontSize: 16, padding: 2, opacity: rows.length === 1 ? 0.2 : 0.6, lineHeight: 1 }} disabled={rows.length === 1}>×</button>
+                                    {/* Clearing the only line empties it rather
+                                        than being refused. The button used to
+                                        disable itself on the last row, which on
+                                        a one-item invoice opened for editing
+                                        meant the line could never be taken off
+                                        at all — the form always keeps one row,
+                                        but that is the form's business, not
+                                        something to refuse the operator with. */}
+                                    <button tabIndex={-1} onClick={() => setRows(rows.length > 1 ? rows.filter((_, idx) => idx !== i) : [emptyRow()])} title="Remove line" style={{ background: "none", border: "none", color: "#f87171", cursor: "pointer", fontSize: 16, padding: 2, opacity: 0.6, lineHeight: 1 }}>×</button>
                                   </td>
                                 </tr>
                               );
@@ -1464,6 +1477,21 @@ const [searchTerm, setSearchTerm] = useState("");
                         </table>
                       </div>
                     )}
+
+                    {/* An explicit way to add a line. The form does grow one on
+                        its own once the last row is filled, but that is a side
+                        effect nobody can see coming, and on a reopened invoice
+                        it never fired. A button that says what it does costs
+                        one line and removes the guesswork. */}
+                    <div style={{ padding: "9px 12px", borderTop: `1px solid ${BORDER}` }}>
+                      <button
+                        type="button"
+                        onClick={() => setRows(r => [...r, emptyRow()])}
+                        style={{ padding: "6px 13px", borderRadius: 7, background: "rgba(255,255,255,.05)", border: `1px solid ${BORDER}`, color: MUTED, fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}
+                      >
+                        + Add Row
+                      </button>
+                    </div>
                   </div>
 
                   {/* Notes + Payment + Batch row */}
