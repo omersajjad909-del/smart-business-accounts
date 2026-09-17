@@ -128,7 +128,11 @@ export async function POST(req: NextRequest) {
     // clearCompanyData never touches, so it survives even a second reset of
     // the same company and shows up in /admin/audit-trail regardless of
     // which tenant it happened in.
-    logAdminAction({
+    //
+    // Awaited, not fire-and-forget: a serverless function can be frozen the
+    // moment its response is sent, which would silently drop an unawaited
+    // promise before it ever reached the network.
+    await logAdminAction({
       adminId: user.id,
       adminEmail: user.email,
       action: "SYSTEM_RESET",
@@ -142,7 +146,7 @@ export async function POST(req: NextRequest) {
     // Sent to the acting admin's own inbox, outside the database this reset
     // just emptied — the one record of who did this and when that a later
     // "I didn't do this" dispute cannot make disappear along with the data.
-    sendEmail({
+    await sendEmail({
       to: user.email,
       subject: "Your FinovaOS system data was reset",
       html: `
