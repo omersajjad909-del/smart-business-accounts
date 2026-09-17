@@ -2708,6 +2708,10 @@ export default function DashboardLayout({
               <NavLink href="/dashboard/settings/holidays"   pathname={pathname}>🎉 Public Holidays</NavLink>
               {!isCustomPlan && <NavLink href="/dashboard/security-access" pathname={pathname}>Security & Access</NavLink>}
               {hasPermission(currentUser, PERMISSIONS.API_ACCESS) && <NavLink href="/dashboard/integrations" pathname={pathname}>Integrations</NavLink>}
+              {/* Irreversible, so it stays admin-only — same gate as Pages above. */}
+              {currentUser?.role === "ADMIN" && (
+                <NavLink href="/dashboard/settings/danger-zone" pathname={pathname}>⚠️ Danger Zone</NavLink>
+              )}
               {/* Hidden until the program actually launches. lib/affiliateProgram.ts
                   is the single switch — the public /affiliate page already reads it
                   and shows Coming Soon — but this link never did, so a tenant was
