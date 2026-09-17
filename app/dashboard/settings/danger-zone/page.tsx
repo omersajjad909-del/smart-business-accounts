@@ -6,9 +6,13 @@
  * One irreversible action lives here: wipe every record this company has
  * ever entered (invoices, vouchers, ledger, contacts, employees — everything
  * clearCompanyData touches) while keeping the company, its plan and its
- * logins intact. Because there is no undo, the confirm step asks for two
- * things a stolen or hijacked session would not have handy: the admin's
- * current password, and the company's exact name typed by hand.
+ * logins intact.
+ *
+ * Because there is no undo, confirming it takes two steps rather than one.
+ * The first asks for the admin's current password and the company's exact
+ * name and deletes nothing; it only mails a code. The second asks for that
+ * code. Whoever presses the button therefore has to hold the inbox too, and
+ * the warning mail reaches its reader while the books are still there.
  */
 
 import { useEffect, useState } from "react";
@@ -18,6 +22,16 @@ const ff = "'Outfit','Inter',sans-serif";
 const bg = "rgba(255,255,255,0.03)";
 const border = "rgba(239,68,68,0.35)";
 
+const field: React.CSSProperties = {
+  width: "100%", padding: "10px 12px", borderRadius: 9, background: "rgba(255,255,255,.04)",
+  border: "1px solid rgba(255,255,255,.1)", color: "#fff", fontSize: 13, fontFamily: ff,
+  boxSizing: "border-box", outline: "none",
+};
+
+const label: React.CSSProperties = {
+  display: "block", fontSize: 11.5, color: "rgba(255,255,255,.5)", marginBottom: 5,
+};
+
 export default function DangerZonePage() {
   const { isMobile } = useResponsive();
   const [companyName, setCompanyName] = useState("");
@@ -26,8 +40,11 @@ export default function DangerZonePage() {
   const [error, setError] = useState("");
 
   const [showConfirm, setShowConfirm] = useState(false);
+  const [step, setStep] = useState<"credentials" | "code">("credentials");
   const [password, setPassword] = useState("");
   const [confirmName, setConfirmName] = useState("");
+  const [code, setCode] = useState("");
+  const [sentTo, setSentTo] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [modalError, setModalError] = useState("");
   const [done, setDone] = useState(false);
@@ -46,8 +63,11 @@ export default function DangerZonePage() {
 
   function openConfirm() {
     setModalError("");
+    setStep("credentials");
     setPassword("");
     setConfirmName("");
+    setCode("");
+    setSentTo("");
     setShowConfirm(true);
   }
 
@@ -56,7 +76,18 @@ export default function DangerZonePage() {
     setShowConfirm(false);
   }
 
-  async function doReset() {
+  async function post(body: Record<string, string>) {
+    const res = await fetch("/api/company/reset-all", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    });
+    const json = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(json?.error || "Something went wrong.");
+    return json;
+  }
+
+  async function requestCode() {
     setModalError("");
     if (!password) {
       setModalError("Enter your current password.");
@@ -68,13 +99,25 @@ export default function DangerZonePage() {
     }
     setSubmitting(true);
     try {
-      const res = await fetch("/api/company/reset-all", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ password, confirmName }),
-      });
-      const body = await res.json().catch(() => ({}));
-      if (!res.ok) throw new Error(body?.error || "Could not reset the system.");
+      const body = await post({ password, confirmName });
+      setSentTo(body.sentTo || "your email");
+      setStep("code");
+    } catch (e) {
+      setModalError(e instanceof Error ? e.message : "Could not send the code.");
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
+  async function doReset() {
+    setModalError("");
+    if (code.trim().length < 6) {
+      setModalError("Enter the 6-digit code from your email.");
+      return;
+    }
+    setSubmitting(true);
+    try {
+      await post({ password, confirmName, code: code.trim() });
       setShowConfirm(false);
       setDone(true);
     } catch (e) {
@@ -84,7 +127,8 @@ export default function DangerZonePage() {
     }
   }
 
-  const canSubmit = password.length > 0 && confirmName.trim() === companyName && !submitting;
+  const canRequest = password.length > 0 && confirmName.trim() === companyName && !submitting;
+  const canReset = code.trim().length === 6 && !submitting;
 
   return (
     <div style={{ fontFamily: ff, color: "#fff", padding: isMobile ? "16px 12px 80px" : "24px 28px 80px", maxWidth: 760, margin: "0 auto" }}>
@@ -116,6 +160,10 @@ export default function DangerZonePage() {
                 Permanently deletes every invoice, voucher, ledger entry, contact, employee, bank
                 account and record this company has ever entered. Your login, the company itself
                 and its subscription are kept — this only empties what is inside.
+              </p>
+              <p style={{ fontSize: 12, color: "rgba(255,255,255,.35)", margin: "8px 0 0", lineHeight: 1.7 }}>
+                Needs your password, the company name, and a code sent to your email before
+                anything is deleted.
               </p>
             </div>
             {!isAdmin ? (
@@ -154,41 +202,49 @@ export default function DangerZonePage() {
               boxShadow: "0 20px 60px rgba(0,0,0,.5)",
             }}
           >
-            <div style={{ fontSize: 16, fontWeight: 800, color: "#fca5a5" }}>Reset all system data?</div>
-            <p style={{ fontSize: 12.5, color: "rgba(255,255,255,.5)", margin: "8px 0 16px", lineHeight: 1.7 }}>
-              This deletes everything this company has recorded. It cannot be undone. To continue,
-              confirm your password and type the company name below.
-            </p>
+            <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: ".08em", color: "rgba(255,255,255,.3)", textTransform: "uppercase", marginBottom: 6 }}>
+              Step {step === "credentials" ? "1" : "2"} of 2
+            </div>
 
-            <label style={{ display: "block", fontSize: 11.5, color: "rgba(255,255,255,.5)", marginBottom: 5 }}>
-              Current password
-            </label>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              autoFocus
-              style={{
-                width: "100%", padding: "10px 12px", borderRadius: 9, background: "rgba(255,255,255,.04)",
-                border: "1px solid rgba(255,255,255,.1)", color: "#fff", fontSize: 13, fontFamily: ff,
-                boxSizing: "border-box", outline: "none",
-              }}
-            />
+            {step === "credentials" ? (
+              <>
+                <div style={{ fontSize: 16, fontWeight: 800, color: "#fca5a5" }}>Reset all system data?</div>
+                <p style={{ fontSize: 12.5, color: "rgba(255,255,255,.5)", margin: "8px 0 16px", lineHeight: 1.7 }}>
+                  This deletes everything this company has recorded, and it cannot be undone.
+                  Nothing is deleted yet — confirm your password and the company name, and we will
+                  email you a code to finish.
+                </p>
 
-            <label style={{ display: "block", fontSize: 11.5, color: "rgba(255,255,255,.5)", margin: "14px 0 5px" }}>
-              Type <strong style={{ color: "#fff" }}>{companyName}</strong> to confirm
-            </label>
-            <input
-              type="text"
-              value={confirmName}
-              onChange={(e) => setConfirmName(e.target.value)}
-              placeholder={companyName}
-              style={{
-                width: "100%", padding: "10px 12px", borderRadius: 9, background: "rgba(255,255,255,.04)",
-                border: "1px solid rgba(255,255,255,.1)", color: "#fff", fontSize: 13, fontFamily: ff,
-                boxSizing: "border-box", outline: "none",
-              }}
-            />
+                <label style={label}>Current password</label>
+                <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} autoFocus style={field} />
+
+                <label style={{ ...label, marginTop: 14 }}>
+                  Type <strong style={{ color: "#fff" }}>{companyName}</strong> to confirm
+                </label>
+                <input type="text" value={confirmName} onChange={(e) => setConfirmName(e.target.value)} placeholder={companyName} style={field} />
+              </>
+            ) : (
+              <>
+                <div style={{ fontSize: 16, fontWeight: 800, color: "#fca5a5" }}>Enter the code we emailed you</div>
+                <p style={{ fontSize: 12.5, color: "rgba(255,255,255,.5)", margin: "8px 0 16px", lineHeight: 1.7 }}>
+                  A 6-digit code was sent to <strong style={{ color: "#fff" }}>{sentTo}</strong>. It expires
+                  in 15 minutes. <strong style={{ color: "#fca5a5" }}>Nothing has been deleted yet</strong> —
+                  entering this code is what deletes it.
+                </p>
+
+                <label style={label}>6-digit code</label>
+                <input
+                  type="text"
+                  inputMode="numeric"
+                  maxLength={6}
+                  value={code}
+                  onChange={(e) => setCode(e.target.value.replace(/\D/g, ""))}
+                  autoFocus
+                  placeholder="000000"
+                  style={{ ...field, letterSpacing: 8, fontSize: 18, fontWeight: 700, textAlign: "center", fontFamily: "monospace" }}
+                />
+              </>
+            )}
 
             {modalError && (
               <div style={{ marginTop: 12, padding: "8px 12px", borderRadius: 8, background: "rgba(239,68,68,.12)", border: "1px solid rgba(239,68,68,.3)", color: "#fca5a5", fontSize: 12 }}>
@@ -208,18 +264,33 @@ export default function DangerZonePage() {
               >
                 Cancel
               </button>
-              <button
-                onClick={doReset}
-                disabled={!canSubmit}
-                style={{
-                  padding: "9px 18px", borderRadius: 9, border: "none",
-                  background: canSubmit ? "#ef4444" : "rgba(239,68,68,.35)",
-                  color: "#fff", fontSize: 12.5, fontWeight: 800, fontFamily: ff,
-                  cursor: canSubmit ? "pointer" : "not-allowed",
-                }}
-              >
-                {submitting ? "Resetting…" : "Reset everything"}
-              </button>
+              {step === "credentials" ? (
+                <button
+                  onClick={requestCode}
+                  disabled={!canRequest}
+                  style={{
+                    padding: "9px 18px", borderRadius: 9, border: "none",
+                    background: canRequest ? "#ef4444" : "rgba(239,68,68,.35)",
+                    color: "#fff", fontSize: 12.5, fontWeight: 800, fontFamily: ff,
+                    cursor: canRequest ? "pointer" : "not-allowed",
+                  }}
+                >
+                  {submitting ? "Sending…" : "Email me the code"}
+                </button>
+              ) : (
+                <button
+                  onClick={doReset}
+                  disabled={!canReset}
+                  style={{
+                    padding: "9px 18px", borderRadius: 9, border: "none",
+                    background: canReset ? "#ef4444" : "rgba(239,68,68,.35)",
+                    color: "#fff", fontSize: 12.5, fontWeight: 800, fontFamily: ff,
+                    cursor: canReset ? "pointer" : "not-allowed",
+                  }}
+                >
+                  {submitting ? "Resetting…" : "Reset everything"}
+                </button>
+              )}
             </div>
           </div>
         </div>
