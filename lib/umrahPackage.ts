@@ -1,0 +1,294 @@
+// FILE: lib/umrahPackage.ts
+//
+// A Hajj or Umrah departure, and what it costs per pilgrim.
+//
+// This is the object the whole group business turns on. An operator does not
+// sell "an Umrah" — they sell a seat on a dated departure with a quota, and the
+// price a pilgrim pays depends on how many people they are willing to share a
+// room with. Same flight, same hotel, same dates, four different prices.
+//
+// The reason is one line of arithmetic, and it is the whole of the trade:
+//
+//     a room costs what it costs per night
+//     the pilgrims in it split that
+//
+// So Makkah for 70 nights at SAR 400 is SAR 14,000 a head shared two ways and
+// SAR 5,600 shared five ways. Everything else on the trip — the seat, the visa,
+// the transport, the ziyarat — costs the same whoever you room with, which is
+// why those are held apart from the hotel legs rather than mixed into one
+// "package cost" that cannot then be split by sharing.
+//
+// Two ways of pricing, because operators use both and often on the same
+// departure: a per-sharing rate card for the quote, and a flat figure for the
+// deal that actually gets struck. Neither is the real one; the sale is.
+//
+// Money: hotels are contracted in Saudi riyals and everything else is in the
+// operator's own currency. Held in the currency each is really in, converted
+// once, at a rate stored on the departure — so a departure costed in March does
+// not silently re-cost itself in June when the rate moves.
+
+export type PackageKind = "umrah" | "hajj";
+
+/** One hotel leg of the trip: a city, a hotel, nights, and the ROOM rate. */
+export type PackageLeg = {
+  id: string;
+  city: string;
+  hotelName: string;
+  nights: number;
+  /**
+   * Per ROOM per night, not per pilgrim. The division by occupancy happens in
+   * the costing and nowhere else — a rate already divided is a rate that cannot
+   * be re-divided when the sharing changes.
+   */
+  roomRatePerNight: number;
+};
+
+/** What a pilgrim costs regardless of who they share with. */
+export type PackageFixedCosts = {
+  /** The air seat, at whatever the consolidator charges. */
+  air: number;
+  visa: number;
+  transport: number;
+  ziyarat: number;
+  meals: number;
+  insurance: number;
+  misc: number;
+};
+
+export type PackageTier = {
+  /** How many share the room. */
+  occupancy: number;
+  /** What a pilgrim in that room is charged. Blank until the operator prices it. */
+  sellPrice: number;
+};
+
+export type UmrahDeparture = {
+  kind: PackageKind;
+  title: string;
+  tripNumber: string;
+  departureDate: string;
+  returnDate: string;
+  /** The quota. Seats the operator has actually bought. */
+  seats: number;
+  legs: PackageLeg[];
+  fixed: PackageFixedCosts;
+  /** Hotel legs are contracted in this; everything else is in base currency. */
+  hotelCurrency: string;
+  /** One unit of hotelCurrency in base currency. Stored, so costings are stable. */
+  hotelRate: number;
+  pricingMode: "sharing" | "flat";
+  tiers: PackageTier[];
+  /** Used when pricingMode is "flat" — one price whatever the room. */
+  flatPrice: number;
+  notes?: string;
+};
+
+export type TierCosting = {
+  occupancy: number;
+  tierName: string;
+  /** Hotel cost per pilgrim, in base currency. */
+  roomCost: number;
+  /** Everything that does not depend on sharing. */
+  fixedCost: number;
+  costPerPilgrim: number;
+  sellPerPilgrim: number;
+  marginPerPilgrim: number;
+  /** As a share of the sale — the number an owner actually reads. */
+  marginPercent: number;
+};
+
+function round2(n: number): number {
+  return Math.round((Number(n) || 0) * 100) / 100;
+}
+
+function newId(prefix: string): string {
+  return `${prefix}-${Date.now().toString(36)}-${Math.floor(Math.random() * 1e6).toString(36)}`;
+}
+
+export const OCCUPANCY_NAMES: Record<number, string> = {
+  1: "Single",
+  2: "Double",
+  3: "Triple",
+  4: "Quad",
+  5: "Quint",
+};
+
+export function occupancyName(n: number): string {
+  const k = Math.max(1, Math.floor(Number(n) || 1));
+  return OCCUPANCY_NAMES[k] || `${k}-sharing`;
+}
+
+export function emptyLeg(city = "Makkah"): PackageLeg {
+  return { id: newId("leg"), city, hotelName: "", nights: 0, roomRatePerNight: 0 };
+}
+
+export function emptyDeparture(kind: PackageKind = "umrah"): UmrahDeparture {
+  return {
+    kind,
+    title: "",
+    tripNumber: "",
+    departureDate: "",
+    returnDate: "",
+    seats: 0,
+    // Madinah, Makkah, Madinah — the ordinary shape of a trip, so a new
+    // departure opens on it rather than on nothing.
+    legs: [emptyLeg("Madinah"), emptyLeg("Makkah"), emptyLeg("Madinah")],
+    fixed: { air: 0, visa: 0, transport: 0, ziyarat: 0, meals: 0, insurance: 0, misc: 0 },
+    hotelCurrency: "SAR",
+    hotelRate: 0,
+    pricingMode: "sharing",
+    // The four an operator actually sells. Single is left out of the default
+    // card because almost nobody buys it, and it is one click to add.
+    tiers: [2, 3, 4, 5].map((occupancy) => ({ occupancy, sellPrice: 0 })),
+    flatPrice: 0,
+    notes: "",
+  };
+}
+
+/** Everything that does not move with the sharing, added up. */
+export function totalFixed(fixed: PackageFixedCosts): number {
+  return round2(
+    (Number(fixed.air) || 0) +
+    (Number(fixed.visa) || 0) +
+    (Number(fixed.transport) || 0) +
+    (Number(fixed.ziyarat) || 0) +
+    (Number(fixed.meals) || 0) +
+    (Number(fixed.insurance) || 0) +
+    (Number(fixed.misc) || 0),
+  );
+}
+
+/** Room cost for the whole trip, per room, in the hotel's own currency. */
+export function roomCostPerRoom(legs: PackageLeg[]): number {
+  return round2(
+    legs.reduce((sum, l) => sum + (Number(l.nights) || 0) * (Number(l.roomRatePerNight) || 0), 0),
+  );
+}
+
+export function totalNights(legs: PackageLeg[]): number {
+  return legs.reduce((sum, l) => sum + (Number(l.nights) || 0), 0);
+}
+
+/**
+ * The rate card: what each sharing option costs and earns, per pilgrim.
+ *
+ * The one place the division by occupancy happens. Everything upstream keeps
+ * room rates per room, so changing the sharing re-prices the trip correctly
+ * instead of dividing an already-divided number.
+ */
+export function costDeparture(d: UmrahDeparture): TierCosting[] {
+  const fixedCost = totalFixed(d.fixed);
+  const perRoom = roomCostPerRoom(d.legs);
+  const rate = Number(d.hotelRate) || 0;
+
+  const tiers = d.pricingMode === "flat"
+    // A flat price still has to be costed against a real room, otherwise the
+    // margin is a guess. Quad is the honest default: it is what most flat deals
+    // are actually built on.
+    ? (d.tiers.length ? d.tiers : [{ occupancy: 4, sellPrice: 0 }])
+    : d.tiers;
+
+  return tiers.map((tier) => {
+    const occupancy = Math.max(1, Math.floor(Number(tier.occupancy) || 1));
+    const roomCost = round2((perRoom / occupancy) * rate);
+    const costPerPilgrim = round2(fixedCost + roomCost);
+    const sellPerPilgrim = round2(
+      d.pricingMode === "flat" ? Number(d.flatPrice) || 0 : Number(tier.sellPrice) || 0,
+    );
+    const marginPerPilgrim = round2(sellPerPilgrim - costPerPilgrim);
+    return {
+      occupancy,
+      tierName: occupancyName(occupancy),
+      roomCost,
+      fixedCost,
+      costPerPilgrim,
+      sellPerPilgrim,
+      marginPerPilgrim,
+      // Margin on the sale, not on the cost. An owner reads "we keep 12% of what
+      // the pilgrim pays"; a mark-up on cost answers a different question and
+      // is the larger, flattering number.
+      marginPercent: sellPerPilgrim > 0 ? Math.round((marginPerPilgrim / sellPerPilgrim) * 1000) / 10 : 0,
+    };
+  });
+}
+
+/** Seats sold against the quota, and what is left to sell. */
+export function seatPosition(seats: number, sold: number) {
+  const quota = Math.max(0, Math.floor(Number(seats) || 0));
+  const taken = Math.max(0, Math.floor(Number(sold) || 0));
+  return {
+    quota,
+    sold: taken,
+    left: Math.max(quota - taken, 0),
+    /* Over the quota is not impossible — an operator oversells and buys more
+       seats, or the consolidator releases extra. Reported rather than clamped,
+       because a silent clamp is how a departure carries more pilgrims than it
+       has seats and nobody finds out until the airport. */
+    over: Math.max(taken - quota, 0),
+    percent: quota > 0 ? Math.min(100, Math.round((taken / quota) * 100)) : 0,
+  };
+}
+
+/** What would make a departure impossible to sell or cost honestly. */
+export function validateDeparture(d: UmrahDeparture): string[] {
+  const errors: string[] = [];
+  if (!d.title.trim()) errors.push("The departure needs a name.");
+  if (!d.departureDate) errors.push("The departure needs a date.");
+  if (d.returnDate && d.departureDate && d.returnDate <= d.departureDate) {
+    errors.push("The return is on or before the departure.");
+  }
+  if (!(Number(d.seats) > 0)) errors.push("The departure needs a seat quota.");
+
+  const withNights = d.legs.filter((l) => Number(l.nights) > 0);
+  if (!withNights.length) errors.push("No hotel nights — the room cost would be zero.");
+  withNights.forEach((l) => {
+    if (!l.hotelName.trim()) errors.push(`The ${l.city || "hotel"} leg has no hotel named.`);
+    if (!(Number(l.roomRatePerNight) > 0)) {
+      errors.push(`${l.hotelName.trim() || l.city || "A leg"} has no room rate.`);
+    }
+  });
+
+  // Hotel rates are contracted in riyals. Without a conversion rate the room
+  // cost silently comes out as zero and every tier looks wildly profitable.
+  if (roomCostPerRoom(d.legs) > 0 && !(Number(d.hotelRate) > 0)) {
+    errors.push(`No rate for ${d.hotelCurrency || "the hotel currency"} — the room cost would come out as zero.`);
+  }
+
+  if (d.pricingMode === "flat") {
+    if (!(Number(d.flatPrice) > 0)) errors.push("Flat pricing needs a price.");
+  } else if (!d.tiers.some((t) => Number(t.sellPrice) > 0)) {
+    errors.push("No sharing option has been priced.");
+  }
+
+  return errors;
+}
+
+/** Read a stored departure back, defensively. */
+export function readDeparture(data: unknown): UmrahDeparture {
+  const d = (data ?? {}) as Record<string, any>;
+  const base = emptyDeparture();
+  return {
+    ...base,
+    ...d,
+    kind: d.kind === "hajj" ? "hajj" : "umrah",
+    seats: Number(d.seats) || 0,
+    hotelRate: Number(d.hotelRate) || 0,
+    flatPrice: Number(d.flatPrice) || 0,
+    pricingMode: d.pricingMode === "flat" ? "flat" : "sharing",
+    legs: Array.isArray(d.legs) && d.legs.length
+      ? d.legs.map((l: any) => ({
+          ...emptyLeg(),
+          ...l,
+          nights: Number(l?.nights) || 0,
+          roomRatePerNight: Number(l?.roomRatePerNight) || 0,
+        }))
+      : base.legs,
+    fixed: { ...base.fixed, ...(d.fixed || {}) },
+    tiers: Array.isArray(d.tiers) && d.tiers.length
+      ? d.tiers.map((t: any) => ({
+          occupancy: Number(t?.occupancy) || 4,
+          sellPrice: Number(t?.sellPrice) || 0,
+        }))
+      : base.tiers,
+  };
+}

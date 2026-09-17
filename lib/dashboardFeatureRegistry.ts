@@ -960,6 +960,19 @@ export const DASHBOARD_FEATURE_DEFS: DashboardFeatureDefinition[] = [
     plans: ["starter", "professional", "enterprise"],
   },
   {
+    /* The group business: a dated trip with a quota, priced per sharing
+       option. This is the step from selling tickets to running groups, so it
+       is where Professional starts earning its price. */
+    id: "TRAVEL_DEPARTURES",
+    label: "Hajj & Umrah Departures",
+    route: "/dashboard/travel/departures",
+    business: "travel",
+    businessLabel: "Travel Agency",
+    section: "Bookings",
+    businessTypes: ["travel"],
+    plans: ["professional", "enterprise"],
+  },
+  {
     /* The document the pilgrim actually carries. Starter, because an Umrah
        operator who cannot print a voucher cannot trade at all — this is not the
        upsell, it is the job. */
