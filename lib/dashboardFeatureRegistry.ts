@@ -973,6 +973,18 @@ export const DASHBOARD_FEATURE_DEFS: DashboardFeatureDefinition[] = [
     plans: ["professional", "enterprise"],
   },
   {
+    /* Who is on which departure and what they still owe. Sits with departures
+       on Professional — a booking without a departure to sit on is nothing. */
+    id: "TRAVEL_BOOKINGS",
+    label: "Bookings",
+    route: "/dashboard/travel/bookings",
+    business: "travel",
+    businessLabel: "Travel Agency",
+    section: "Bookings",
+    businessTypes: ["travel"],
+    plans: ["professional", "enterprise"],
+  },
+  {
     /* The document the pilgrim actually carries. Starter, because an Umrah
        operator who cannot print a voucher cannot trade at all — this is not the
        upsell, it is the job. */
@@ -1012,6 +1024,18 @@ export const DASHBOARD_FEATURE_DEFS: DashboardFeatureDefinition[] = [
     business: "travel",
     businessLabel: "Travel Agency",
     section: "Bookings",
+    businessTypes: ["travel"],
+    plans: ["professional", "enterprise"],
+  },
+  {
+    /* The three questions an operator asks their books. Professional, with
+       departures and bookings — they are what these report on. */
+    id: "TRAVEL_REPORTS",
+    label: "Travel Reports",
+    route: "/dashboard/travel/reports",
+    business: "travel",
+    businessLabel: "Travel Agency",
+    section: "Control Center",
     businessTypes: ["travel"],
     plans: ["professional", "enterprise"],
   },
