@@ -1647,16 +1647,76 @@ const [searchTerm, setSearchTerm] = useState("");
             </div>
           )}
 
-          {/* ── PRINT STYLES ── */}
-          {showPreview && (
+          {/* A4 deliberately has no print CSS of its own. It is a PrintDocA4
+              like every other document in the app, and globals.css already
+              knows how to put one of those on paper.
+
+              What used to be here hid the whole body and un-hid
+              ".pi-print.pi-a4" — a class no element has carried since the A4
+              preview became a PrintDocA4. So A4 printed a blank sheet:
+              everything hidden, nothing shown. And because the thermal block
+              sat in the DOM even in A4 mode, the global rule's
+              ":not(:has(.pi-print))" guard saw it and stood down, so nothing
+              printed the document either. Two rules each waiting for the
+              other. The thermal block now renders only in 55mm mode. */}
+          {showPreview && printMode === "55mm" && (
             <style>{`
+              /* A receipt roll, not a sheet: no page margins and a height that
+                 follows the content, so a short receipt is not padded out to a
+                 full page. */
+              @page { size: 55mm auto; margin: 0; }
+
               @media print {
-                body * { visibility: hidden !important; }
-                .pi-print, .pi-print * { visibility: visible !important; }
-                .pi-print { position: fixed !important; inset: 0 !important; }
-                .pi-print.pi-a4 { width: 210mm !important; padding: 18mm 18mm 14mm !important; font-size: 11pt !important; }
-                .pi-print.pi-55mm { width: 55mm !important; padding: 4mm 3mm !important; font-size: 7pt !important; }
-                .no-print, .print\\:hidden { display: none !important; }
+                /* Everything that is not the receipt, at any depth — the same
+                   three exclusions the global document rule uses: keep an
+                   element if it CONTAINS the receipt, if it IS the receipt, or
+                   if it is INSIDE it.
+
+                   Display, not visibility. A hidden element still occupies its
+                   space, so the app's own layout went on pushing a 55mm
+                   receipt off the printable area while the preview on screen
+                   looked perfect. */
+                body:has(.pi-print) *:not(:has(.pi-print)):not(.pi-print):not(.pi-print *) {
+                  display: none !important;
+                }
+
+                /* The chain of wrappers between body and the receipt, each
+                   flattened to a plain block: no flex column, no scroller
+                   clipping it, no gutter, no margin held open for a sidebar
+                   that is not being printed. */
+                body:has(.pi-print) :has(.pi-print) {
+                  display: block !important;
+                  margin: 0 !important;
+                  max-width: none !important;
+                  min-height: auto !important;
+                  overflow: visible !important;
+                  padding: 0 !important;
+                  width: auto !important;
+                }
+
+                /* Screens are dark; paper is not. */
+                body:has(.pi-print),
+                body:has(.pi-print) :has(.pi-print) { background: #fff !important; }
+
+                .pi-print {
+                  display: block !important;
+                  width: 55mm !important;
+                  margin: 0 !important;
+                  padding: 4mm 3mm !important;
+                  font-size: 7pt !important;
+                  box-shadow: none !important;
+                  border-radius: 0 !important;
+                }
+
+                /* The QR is an <img>. Without this it prints as a pale ghost,
+                   or not at all once the browser decides background graphics
+                   are off — and a receipt whose QR will not scan has failed at
+                   the one thing it was printed for. */
+                .pi-print img { display: inline-block !important; max-width: 100% !important; }
+                .pi-print, .pi-print * {
+                  -webkit-print-color-adjust: exact !important;
+                  print-color-adjust: exact !important;
+                }
               }
             `}</style>
           )}
@@ -1722,7 +1782,10 @@ const [searchTerm, setSearchTerm] = useState("");
           )}
 
           {/* ── 55mm THERMAL PREVIEW ── */}
-          {showPreview && (
+          {/* Rendered only in 55mm mode. Left in the DOM the rest of the
+              time, its .pi-print class made globals.css stand down and the A4
+              document printed a blank sheet. */}
+          {showPreview && printMode === "55mm" && (
             <div className="pi-print pi-55mm" style={{
               background: "white", color: "#000",
               fontFamily: "'Courier New',Courier,monospace",
@@ -1730,7 +1793,7 @@ const [searchTerm, setSearchTerm] = useState("");
               padding: "10px 12px",
               boxShadow: "0 4px 24px rgba(0,0,0,0.15)",
               borderRadius: 4,
-              display: printMode === "55mm" ? "block" : "none",
+              display: "block",
             }}>
               {/* Header */}
               <div style={{ textAlign: "center", borderBottom: "1px dashed #555", paddingBottom: 6, marginBottom: 6 }}>
