@@ -906,6 +906,19 @@ export const DASHBOARD_FEATURE_DEFS: DashboardFeatureDefinition[] = [
     section: "Control Center",
     businessTypes: ["event_planner", "wedding_planner", "decorator", "sound_services"],
   },
+  /* The travel ladder.
+  
+     Starter is the working desk of a small agency: take a booking, run the
+     visa, issue the ticket, know what is owed to the airline. Passports belong
+     there and not higher up — a visa cannot be filed without passport data, so
+     charging for it would be charging for the ability to do the job at all.
+  
+     Professional adds the group business: Hajj and Umrah departures, the
+     bookings against them, and the hotel and tour files a package is built
+     from. That is the step from "I sell tickets" to "I run groups", and it is
+     the one worth paying for.
+  
+     Enterprise adds the reporting on top of it. */
   {
     id: "TRAVEL_OVERVIEW",
     label: "Travel Overview",
@@ -914,6 +927,7 @@ export const DASHBOARD_FEATURE_DEFS: DashboardFeatureDefinition[] = [
     businessLabel: "Travel Agency",
     section: "Control Center",
     businessTypes: ["travel"],
+    plans: ["starter", "professional", "enterprise"],
   },
   {
     id: "TRAVEL_TICKETS",
@@ -923,6 +937,7 @@ export const DASHBOARD_FEATURE_DEFS: DashboardFeatureDefinition[] = [
     businessLabel: "Travel Agency",
     section: "Ticketing Desk",
     businessTypes: ["travel"],
+    plans: ["starter", "professional", "enterprise"],
   },
   {
     id: "TRAVEL_VISAS",
@@ -932,6 +947,7 @@ export const DASHBOARD_FEATURE_DEFS: DashboardFeatureDefinition[] = [
     businessLabel: "Travel Agency",
     section: "Visa Desk",
     businessTypes: ["travel"],
+    plans: ["starter", "professional", "enterprise"],
   },
   {
     id: "TRAVEL_SETTLEMENTS",
@@ -941,24 +957,7 @@ export const DASHBOARD_FEATURE_DEFS: DashboardFeatureDefinition[] = [
     businessLabel: "Travel Agency",
     section: "Finance Desk",
     businessTypes: ["travel"],
-  },
-  {
-    id: "TRAVEL_HOTELS",
-    label: "Hotel Packages",
-    route: "/dashboard/travel/hotel-packages",
-    business: "travel",
-    businessLabel: "Travel Agency",
-    section: "Bookings",
-    businessTypes: ["travel"],
-  },
-  {
-    id: "TRAVEL_TOURS",
-    label: "Group Tours",
-    route: "/dashboard/travel/tours",
-    business: "travel",
-    businessLabel: "Travel Agency",
-    section: "Bookings",
-    businessTypes: ["travel"],
+    plans: ["starter", "professional", "enterprise"],
   },
   {
     id: "TRAVEL_PASSPORTS",
@@ -968,6 +967,27 @@ export const DASHBOARD_FEATURE_DEFS: DashboardFeatureDefinition[] = [
     businessLabel: "Travel Agency",
     section: "Operations",
     businessTypes: ["travel"],
+    plans: ["starter", "professional", "enterprise"],
+  },
+  {
+    id: "TRAVEL_HOTELS",
+    label: "Hotel Packages",
+    route: "/dashboard/travel/hotel-packages",
+    business: "travel",
+    businessLabel: "Travel Agency",
+    section: "Bookings",
+    businessTypes: ["travel"],
+    plans: ["professional", "enterprise"],
+  },
+  {
+    id: "TRAVEL_TOURS",
+    label: "Group Tours",
+    route: "/dashboard/travel/tours",
+    business: "travel",
+    businessLabel: "Travel Agency",
+    section: "Bookings",
+    businessTypes: ["travel"],
+    plans: ["professional", "enterprise"],
   },
   {
     id: "TRAVEL_ANALYTICS",
@@ -977,6 +997,7 @@ export const DASHBOARD_FEATURE_DEFS: DashboardFeatureDefinition[] = [
     businessLabel: "Travel Agency",
     section: "Control Center",
     businessTypes: ["travel"],
+    plans: ["enterprise"],
   },
   {
     id: "RENTALS_OVERVIEW",
