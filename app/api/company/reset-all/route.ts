@@ -22,6 +22,7 @@ import { prisma } from "@/lib/prisma";
 import { rateLimitAsync } from "@/lib/rateLimit";
 import { requireActiveSession, isCredentialChangeAllowed } from "@/lib/sessionGuard";
 import { clearCompanyData } from "@/lib/clearCompanyData";
+import { sendEmail } from "@/lib/email";
 
 export async function GET(req: NextRequest) {
   const session = await requireActiveSession(req);
@@ -103,19 +104,43 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Company name does not match" }, { status: 400 });
     }
 
+    const ip = (req.headers.get("x-forwarded-for") || "unknown").split(",")[0].trim();
+    const when = new Date();
+
     await clearCompanyData(company.id);
 
     // Written after the wipe, not inside it — clearCompanyData deletes this
     // company's ActivityLog rows as part of the transaction, so a row
-    // written before would be erased along with everything else.
+    // written before would be erased along with everything else. A later
+    // reset will in turn wipe this row too, so it is not durable proof on
+    // its own — the email below is what survives that.
     await prisma.activityLog.create({
       data: {
         companyId: company.id,
         userId: user.id,
         action: "SYSTEM_RESET",
-        details: `Full system reset performed by ${user.name} (${user.email})`,
+        details: `Full system reset performed by ${user.name} (${user.email}) from IP ${ip} at ${when.toISOString()}`,
       },
     }).catch(() => {});
+
+    // Sent to the acting admin's own inbox, outside the database this reset
+    // just emptied — the one record of who did this and when that a later
+    // "I didn't do this" dispute cannot make disappear along with the data.
+    sendEmail({
+      to: user.email,
+      subject: "Your FinovaOS system data was reset",
+      html: `
+        <div style="font-family:sans-serif;max-width:480px;margin:0 auto;padding:32px;background:#0d1035;color:#fff;border-radius:16px">
+          <h2 style="margin:0 0 12px;font-size:22px">System reset performed</h2>
+          <p style="color:#94a3b8;margin:0 0 16px">
+            All records for <strong style="color:#fff">${company.name}</strong> were deleted from a
+            signed-in session at IP <strong style="color:#fff">${ip}</strong> on ${when.toUTCString()},
+            confirmed with your account password and by typing the company name.
+          </p>
+          <p style="color:#f87171;margin:0">If this wasn't you, contact support immediately — this action cannot be undone.</p>
+        </div>
+      `,
+    }).catch((err) => console.error("Reset-all notice failed:", err));
 
     return NextResponse.json({ success: true });
   } catch (error: unknown) {
