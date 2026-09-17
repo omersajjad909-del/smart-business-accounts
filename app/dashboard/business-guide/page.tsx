@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { getBusinessType, type BusinessType } from "@/lib/businessModules";
+import { getBusinessType, type BusinessType, type BusinessTypeMeta } from "@/lib/businessModules";
 import { useResponsive } from "@/hooks/useResponsive";
 import { AI_TOOL_META, type AiToolId } from "@/lib/dashboardFeatureRegistry";
 
@@ -65,6 +65,14 @@ const FLOW_MAP: Record<string, { step: string; icon: string; desc: string; link:
     { step: "Finished Goods Entry", icon: "✅", desc: "Record completed goods into finished goods inventory with quality check.", link: "/dashboard/manufacturing/finished-goods" },
     { step: "Costing & Analysis", icon: "📊", desc: "See production cost vs selling price. Track efficiency and wastage.", link: "/dashboard/ai" },
   ],
+  travel: [
+    { step: "Build the Departure", icon: "🕋", desc: "A dated trip with a seat quota, its hotel legs, and a price for each sharing option.", link: "/dashboard/travel/departures" },
+    { step: "Take the Booking", icon: "👥", desc: "The party, the room they are sharing, and the instalments they will clear it in.", link: "/dashboard/travel/bookings" },
+    { step: "Collect the Instalments", icon: "💰", desc: "Advance first, the rest before the visa cut-off. Nothing is issued on an unpaid file.", link: "/dashboard/crv" },
+    { step: "File Visas & Issue Tickets", icon: "🛂", desc: "Passport details go to the embassy; the airline seat is issued against the PNR.", link: "/dashboard/travel/visas" },
+    { step: "Print the Voucher", icon: "🎫", desc: "What the pilgrim carries — flights, every hotel stay in order, and the party.", link: "/dashboard/travel/vouchers" },
+    { step: "Settle & Review", icon: "📊", desc: "Pay the airline and the Saudi hotel, then read the departure's real margin.", link: "/dashboard/travel/reports" },
+  ],
   hospital: [
     { step: "Patient Registration", icon: "👤", desc: "Register new patient — name, age, contact, and medical history.", link: "/dashboard/hospital/patients" },
     { step: "Book Appointment", icon: "📅", desc: "Schedule consultation with doctor, assign to clinic or department.", link: "/dashboard/hospital/appointments" },
@@ -115,7 +123,54 @@ const FLOW_MAP: Record<string, { step: string; icon: string; desc: string; link:
   ],
 };
 
-const DEFAULT_FLOW = [
+/**
+ * The flow for a trade with no hand-written entry above.
+ *
+ * There are forty-five business types and twelve of them were written out by
+ * hand, so the other thirty-three — a travel agency, a law firm, a gym — all
+ * read the same six generic steps about invoices and trial balances. That is
+ * the complaint: every business guide looked identical.
+ *
+ * Writing thirty-three more by hand is the mistake this codebase already warns
+ * against elsewhere: a hundred and thirty decisions nobody can keep true. So
+ * this derives them instead, from two things every trade already declares in
+ * lib/businessModules.ts:
+ *
+ *   tagline      — already written as a flow. "Quote → Book → Issue → Support"
+ *                  for travel, "Sow → Grow → Harvest → Sell" for agriculture.
+ *                  All forty-five are in that form.
+ *   quickActions — where each of those steps is actually done.
+ *
+ * A trade that later earns a hand-written entry simply gets one; nothing here
+ * has to be removed for that to work.
+ */
+function deriveFlow(meta: BusinessTypeMeta) {
+  const stages = String(meta.tagline || "")
+    .split(/→|->/)
+    .map((s) => s.trim())
+    .filter(Boolean);
+
+  if (stages.length < 2) return GENERIC_FLOW;
+
+  const actions = meta.quickActions || [];
+  return stages.map((step, i) => {
+    // Pair each stage with the quick action at the same position. They are
+    // written in the same order by the same hand, so the pairing is usually
+    // right; where it runs out, the step still stands on its own.
+    const action = actions[i];
+    return {
+      step,
+      icon: action?.icon || meta.emoji || "•",
+      desc: action
+        ? `${action.label} — this is where "${step}" happens in ${meta.label}.`
+        : `"${step}" in the ${meta.label} flow.`,
+      link: action?.href || "/dashboard",
+    };
+  });
+}
+
+/** The last resort: a trade whose tagline is not a flow at all. */
+const GENERIC_FLOW = [
   { step: "Initial Setup", icon: "⚙️", desc: "Configure your company profile, chart of accounts, and opening balances.", link: "/dashboard/business-settings" },
   { step: "Add Master Data", icon: "📋", desc: "Set up customers, suppliers, items, and bank accounts.", link: "/dashboard/crm" },
   { step: "Record Transactions", icon: "🧾", desc: "Create sales invoices, purchase invoices, and expense vouchers daily.", link: "/dashboard/sales-invoice" },
@@ -209,6 +264,20 @@ const MODULES_MAP: Record<string, { icon: string; label: string; desc: string; l
     { icon: "🏦", label: "Bank Reconciliation", desc: "Match books with bank statements", link: "/dashboard/bank-reconciliation" },
     { icon: "🤖", label: "AI Insights", desc: "Efficiency tracking and margin forecasting", link: "/dashboard/ai" },
     { icon: "👥", label: "HR & Payroll", desc: "Factory staff and payroll management", link: "/dashboard/employees" },
+  ],
+  travel: [
+    { icon: "🕋", label: "Departures", desc: "Dated trips, seat quota, price per sharing", link: "/dashboard/travel/departures" },
+    { icon: "👥", label: "Bookings", desc: "Parties, instalments, and what is still owed", link: "/dashboard/travel/bookings" },
+    { icon: "🎫", label: "Vouchers", desc: "The arrival–departure sheet the pilgrim carries", link: "/dashboard/travel/vouchers" },
+    { icon: "✈️", label: "Airline Tickets", desc: "PNRs, passengers, refunds and voids", link: "/dashboard/travel/tickets" },
+    { icon: "🛂", label: "Visa Cases", desc: "Embassy files and their status", link: "/dashboard/travel/visas" },
+    { icon: "🛄", label: "Passport Database", desc: "Passport details, ready to file", link: "/dashboard/travel/passports" },
+    { icon: "🧾", label: "Supplier Settlements", desc: "What is owed to airlines and Saudi hotels", link: "/dashboard/travel/settlements" },
+    { icon: "📊", label: "Travel Reports", desc: "Departure P&L, who owes what, manifest", link: "/dashboard/travel/reports" },
+    { icon: "💰", label: "Receive Payment", desc: "Instalments in, against the booking", link: "/dashboard/crv" },
+    { icon: "💳", label: "Pay Supplier", desc: "Clear the consolidator and the hotel", link: "/dashboard/cpv" },
+    { icon: "📄", label: "Quotation", desc: "Price a package before it is sold", link: "/dashboard/quotation" },
+    { icon: "🤖", label: "AI Intelligence", desc: "Smart insights", link: "/dashboard/ai" },
   ],
   hospital: [
     { icon: "👤", label: "Patient Registration", desc: "Demographics, history, and ID management", link: "/dashboard/hospital/patients" },
@@ -310,17 +379,48 @@ const MODULES_MAP: Record<string, { icon: string; label: string; desc: string; l
   ],
 };
 
-// ─── Getting Started Checklist ─────────────────────────────────────────────────
-const CHECKLIST = [
-  { id: 1, task: "Complete your company profile", icon: "🏢", link: "/dashboard/business-settings", urgent: true },
-  { id: 2, task: "Set up chart of accounts", icon: "📒", link: "/dashboard/accounts", urgent: true },
-  { id: 3, task: "Enter opening balances", icon: "⚖️", link: "/dashboard/opening-balances", urgent: true },
-  { id: 4, task: "Add your customers & suppliers", icon: "👥", link: "/dashboard/crm", urgent: false },
-  { id: 5, task: "Create your first invoice", icon: "🧾", link: "/dashboard/sales-invoice", urgent: false },
-  { id: 6, task: "Set up your team users", icon: "👤", link: "/dashboard/team", urgent: false },
-  { id: 7, task: "Configure email & WhatsApp", icon: "📧", link: "/dashboard/notifications", urgent: false },
-  { id: 8, task: "Explore AI Intelligence", icon: "🤖", link: "/dashboard/ai", urgent: false },
-];
+/**
+ * The modules panel for a trade with no hand-written entry.
+ *
+ * Its own quick actions first — those are the pages that trade opens daily and
+ * the ones it was set up to declare — then the accounting every business needs
+ * whatever it sells.
+ */
+function deriveModules(meta: BusinessTypeMeta) {
+  const own = (meta.quickActions || []).map((a) => ({
+    icon: a.icon || meta.emoji || "•",
+    label: a.label,
+    desc: `${meta.label} — daily`,
+    link: a.href,
+  }));
+  return [...own, ...MODULES_MAP.default].slice(0, 12);
+}
+
+/**
+ * Getting started, in this trade's own terms.
+ *
+ * The middle of the list used to say "Create your first invoice" to everyone,
+ * including a travel agency whose first document is a booking and a school
+ * whose first is an enrolment. The setup steps are genuinely the same for every
+ * trade — a company profile and a chart of accounts are a company profile and a
+ * chart of accounts — so those stay put, and the one step that is about the
+ * work itself points at whatever this trade actually does first.
+ */
+function buildChecklist(meta: BusinessTypeMeta) {
+  const first = (meta.quickActions || [])[0];
+  return [
+    { id: 1, task: "Complete your company profile", icon: "🏢", link: "/dashboard/business-settings", urgent: true },
+    { id: 2, task: "Set up chart of accounts", icon: "📒", link: "/dashboard/accounts", urgent: true },
+    { id: 3, task: "Enter opening balances", icon: "⚖️", link: "/dashboard/opening-balances", urgent: true },
+    { id: 4, task: "Add your customers & suppliers", icon: "👥", link: "/dashboard/crm", urgent: false },
+    first
+      ? { id: 5, task: `${first.label} — your first one`, icon: first.icon || "🧾", link: first.href, urgent: false }
+      : { id: 5, task: "Create your first invoice", icon: "🧾", link: "/dashboard/sales-invoice", urgent: false },
+    { id: 6, task: "Set up your team users", icon: "👤", link: "/dashboard/team", urgent: false },
+    { id: 7, task: "Configure email & WhatsApp", icon: "📧", link: "/dashboard/notifications", urgent: false },
+    { id: 8, task: "Explore AI Intelligence", icon: "🤖", link: "/dashboard/ai", urgent: false },
+  ];
+}
 
 
 export default function BusinessGuidePage() {
@@ -360,8 +460,12 @@ export default function BusinessGuidePage() {
 
   const businessType = companyInfo?.businessType || "trading";
   const businessMeta = getBusinessType(businessType);
-  const flow = FLOW_MAP[businessType] || DEFAULT_FLOW;
-  const modules = MODULES_MAP[businessType] || MODULES_MAP.default;
+  // A hand-written flow where one exists; otherwise built from this trade's own
+  // tagline and quick actions, so all forty-five read as their own trade rather
+  // than thirty-three of them sharing one generic guide.
+  const flow = FLOW_MAP[businessType] || deriveFlow(businessMeta);
+  const modules = MODULES_MAP[businessType] || deriveModules(businessMeta);
+  const checklist = buildChecklist(businessMeta);
 
   const planColor = companyInfo?.plan === "ENTERPRISE" ? "#fbbf24" : companyInfo?.plan === "PRO" ? "#a78bfa" : "#34d399";
 
@@ -733,16 +837,16 @@ export default function BusinessGuidePage() {
             {/* Progress bar */}
             <div style={{ marginBottom: 28 }}>
               <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8 }}>
-                <span style={{ fontSize: 12, fontWeight: 700, color: "#a5b4fc" }}>{completedTasks.length} of {CHECKLIST.length} completed</span>
-                <span style={{ fontSize: 12, color: "rgba(255,255,255,.35)" }}>{Math.round((completedTasks.length / CHECKLIST.length) * 100)}%</span>
+                <span style={{ fontSize: 12, fontWeight: 700, color: "#a5b4fc" }}>{completedTasks.length} of {checklist.length} completed</span>
+                <span style={{ fontSize: 12, color: "rgba(255,255,255,.35)" }}>{Math.round((completedTasks.length / checklist.length) * 100)}%</span>
               </div>
               <div style={{ height: 6, borderRadius: 3, background: "rgba(255,255,255,.08)", overflow: "hidden" }}>
-                <div style={{ height: "100%", borderRadius: 3, background: "linear-gradient(90deg,#6366f1,#a78bfa)", width: `${(completedTasks.length / CHECKLIST.length) * 100}%`, transition: "width .5s ease" }} />
+                <div style={{ height: "100%", borderRadius: 3, background: "linear-gradient(90deg,#6366f1,#a78bfa)", width: `${(completedTasks.length / checklist.length) * 100}%`, transition: "width .5s ease" }} />
               </div>
             </div>
 
             <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-              {CHECKLIST.map((item) => {
+              {checklist.map((item) => {
                 const done = completedTasks.includes(item.id);
                 return (
                   <div key={item.id} className="check-item" style={{
@@ -783,7 +887,7 @@ export default function BusinessGuidePage() {
               })}
             </div>
 
-            {completedTasks.length === CHECKLIST.length && (
+            {completedTasks.length === checklist.length && (
               <div style={{ marginTop: 20, padding: isMobile ? "12px 11px" : "20px 24px", borderRadius: 14, background: "rgba(16,185,129,.08)", border: "1px solid rgba(16,185,129,.2)", textAlign: "center" }}>
                 <div style={{ fontSize: 28, marginBottom: 8 }}>🎉</div>
                 <div style={{ fontSize: 16, fontWeight: 800, color: "#6ee7b7" }}>Setup Complete!</div>
