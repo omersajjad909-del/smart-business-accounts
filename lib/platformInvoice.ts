@@ -50,6 +50,14 @@ export type PlatformInvoiceInput = {
   cardBrand?: string | null;
   cardLast4?: string | null;
 
+  /**
+   * The provider processed this in test mode — nobody's card was charged.
+   * Passed straight through from the webhook rather than worked out here: it
+   * is the provider's fact about the charge, and the moment it is inferred,
+   * somebody's genuine small invoice gets thrown away as a test.
+   */
+  testMode?: boolean | null;
+
   status?: string | null;
   periodStart?: Date | null;
   periodEnd?: Date | null;
@@ -133,6 +141,10 @@ export async function recordPlatformInvoice(
       cardBrand: input.cardBrand || null,
       cardLast4: input.cardLast4 || null,
       status: String(input.status || "PAID").toUpperCase(),
+      // Recorded, never inferred. Whether a charge was real is the provider's
+      // fact about it, and guessing later from the amount or the plan would
+      // eventually throw away somebody's genuine invoice.
+      testMode: input.testMode === true,
       periodStart: input.periodStart || null,
       periodEnd: input.periodEnd || null,
       issuedAt,
