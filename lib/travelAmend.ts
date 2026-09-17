@@ -289,55 +289,14 @@ export async function refundTravelDocument(input: RefundInput): Promise<RefundRe
   }, { timeout: 20_000, maxWait: 10_000 });
 }
 
-/**
- * What a refund would do, without doing it.
+/*
+ * quoteRefund lives in lib/travelRefundMath.ts and is re-exported here.
  *
- * The screen shows this before the operator confirms, for the same reason the
- * production run is priced before it posts: a cancellation is the one moment in
- * a travel file where money moves in two directions at once, and nobody should
- * have to work out in their head which way each part went.
+ * It was defined in this file, and the refund dialog imported it from here —
+ * which dragged the Prisma import at the top of this module into the browser
+ * bundle and killed the page before it rendered. The maths is now in a module
+ * with no database import; this keeps the name working for anything already
+ * reaching for it.
  */
-export function quoteRefund(opts: {
-  saleAmount: number;
-  costAmount: number;
-  customerRefund: number;
-  supplierRefund: number;
-}): {
-  customerRefund: number;
-  supplierRefund: number;
-  retainedIncome: number;
-  supplierCharge: number;
-  /** What the agency is left with once both sides have settled. */
-  netToAgency: number;
-  errors: string[];
-} {
-  const saleAmount = round2(opts.saleAmount);
-  const costAmount = round2(opts.costAmount);
-  const customerRefund = round2(opts.customerRefund);
-  const supplierRefund = round2(opts.supplierRefund);
+export { quoteRefund, type RefundQuote } from "@/lib/travelRefundMath";
 
-  const errors: string[] = [];
-  if (customerRefund < 0 || supplierRefund < 0) errors.push("A refund cannot be negative.");
-  if (customerRefund > saleAmount) {
-    errors.push(`The passenger paid ${saleAmount.toLocaleString()} — the refund cannot exceed it.`);
-  }
-  if (supplierRefund > costAmount) {
-    errors.push(`The supplier was owed ${costAmount.toLocaleString()} — it cannot refund more.`);
-  }
-
-  const retainedIncome = round2(saleAmount - customerRefund);
-  const supplierCharge = round2(costAmount - supplierRefund);
-
-  return {
-    customerRefund,
-    supplierRefund,
-    retainedIncome,
-    supplierCharge,
-    // What the agency keeps less what the airline keeps. Negative is a real and
-    // common answer — an airline penalty larger than the agency's own charge
-    // means the cancellation cost the agency money, and that is worth seeing
-    // before confirming rather than at month end.
-    netToAgency: round2(retainedIncome - supplierCharge),
-    errors,
-  };
-}

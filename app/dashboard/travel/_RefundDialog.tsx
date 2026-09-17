@@ -18,7 +18,10 @@
 
 import { useMemo, useState } from "react";
 
-import { quoteRefund } from "@/lib/travelAmend";
+// From the maths module, not from travelAmend — that one imports Prisma, and a
+// client component reaching into it drags the database client into the browser
+// bundle, where it cannot run.
+import { quoteRefund } from "@/lib/travelRefundMath";
 
 const ff = "'Outfit','Inter',sans-serif";
 const border = "rgba(255,255,255,0.09)";
