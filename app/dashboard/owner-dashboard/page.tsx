@@ -3,6 +3,7 @@ import { useState, useEffect, useCallback } from "react";
 import { getCurrentUser } from "@/lib/auth";
 import Link from "next/link";
 import { useResponsive } from "@/hooks/useResponsive";
+import { getDashboardLayout } from "@/lib/dashboardLayouts";
 
 const F = "'Outfit','Inter',sans-serif";
 
@@ -120,16 +121,43 @@ function Skeleton({ w = "100%", h = 16, r = 6 }: { w?: string | number; h?: numb
 const SHIMMER = `@keyframes shimmer{0%,100%{opacity:.5}50%{opacity:1}}`;
 const SPIN_CSS = `@keyframes spin{to{transform:rotate(360deg)}}`;
 
-const QUICK = [
-  { label: "New Invoice",          href: "/dashboard/sales-invoice",       color: T.indigo,  icon: <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/> },
-  { label: "Sales Order",          href: "/dashboard/sales-order",          color: T.emerald, icon: <><path d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4z"/></> },
-  { label: "New Purchase",         href: "/dashboard/purchase-invoice",     color: T.violet,  icon: <><path d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/></> },
-  { label: "Customer Statement",   href: "/dashboard/customer-statement",   color: T.amber,   icon: <><path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0"/></> },
+/**
+ * The four that are the same work whatever the trade.
+ *
+ * A profit and loss is a profit and loss for a travel agency and a steel mill
+ * alike, so these stay put. What sits above them is the trade's own — see
+ * `tradeActions`.
+ */
+const UNIVERSAL_QUICK = [
   { label: "Payment Follow-up",    href: "/dashboard/payment-followup",     color: T.rose,    icon: <><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></> },
   { label: "Profit & Loss",        href: "/dashboard/reports/profit-loss",  color: T.cyan,    icon: <><path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></> },
   { label: "Balance Sheet",        href: "/dashboard/reports/balance-sheet",color: "#a78bfa", icon: <><path d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3"/></> },
   { label: "Trial Balance",        href: "/dashboard/reports/trial-balance",color: T.emerald, icon: <><path d="M3 10h18M3 14h18m-9-4v8m-7 0h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></> },
 ];
+
+/**
+ * The trade's own four, above the universal ones.
+ *
+ * "New Invoice / Sales Order / New Purchase / Customer Statement" was the whole
+ * list, which is a trading company's day and nobody else's. A Hajj operator has
+ * no sales order; what they open in the morning is a booking.
+ *
+ * Read from the same per-business layout the main dashboard uses, so an owner
+ * looking at two dashboards is offered the same four shortcuts on both, and a
+ * trade added there needs nothing doing here.
+ */
+const TRADE_COLORS = [T.indigo, T.emerald, T.violet, T.amber];
+
+function tradeActions(businessType: string) {
+  const layout = getDashboardLayout(businessType);
+  return (layout?.actions || []).slice(0, 4).map((a, i) => ({
+    label: a.label,
+    href: a.href,
+    color: TRADE_COLORS[i % TRADE_COLORS.length],
+    // The layouts carry an emoji rather than an SVG path; rendered as one.
+    emoji: a.icon,
+  }));
+}
 
 const ACT_COLORS: Record<string, string> = {
   invoice: T.indigo, purchase: T.violet, payment: T.emerald, order: T.amber, expense: T.red,
@@ -145,6 +173,9 @@ export default function OwnerDashboardPage() {
   const [cur, setCur] = useState("Rs.");
   const [ownerName, setOwnerName] = useState("");
 
+  // Falls back to trading, which is what this page assumed before it asked.
+  const [businessType, setBusinessType] = useState("trading");
+
   const load = useCallback(async (isRefresh = false) => {
     const user = getCurrentUser();
     if (!user) return;
@@ -159,6 +190,7 @@ export default function OwnerDashboardPage() {
       if (sum) setData(sum);
       if (co?.name) setCompanyName(co.name);
       if (co?.currency) setCur(co.currency);
+      if (co?.businessType) setBusinessType(String(co.businessType));
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -355,7 +387,7 @@ export default function OwnerDashboardPage() {
             <div style={{ background: T.panel, border: `1px solid ${T.border}`, borderRadius: 16, padding: isMobile ? "12px 10px" : "20px 22px" }}>
               <div style={{ fontSize: 14, fontWeight: 800, marginBottom: 16 }}>Quick Actions</div>
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
-                {QUICK.map(q => (
+                {[...tradeActions(businessType), ...UNIVERSAL_QUICK].map(q => (
                   <Link key={q.href} prefetch={false} href={q.href} style={{
                     display: "flex", alignItems: "center", gap: 10, padding: "11px 14px",
                     background: `${q.color}0d`, border: `1px solid ${q.color}22`,
@@ -366,7 +398,9 @@ export default function OwnerDashboardPage() {
                     onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = `${q.color}22`; (e.currentTarget as HTMLElement).style.background = `${q.color}0d`; }}
                   >
                     <div style={{ width: 30, height: 30, borderRadius: 8, background: `${q.color}18`, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                      <svg width="15" height="15" fill="none" stroke={q.color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">{q.icon}</svg>
+                      {"emoji" in q && q.emoji
+                        ? <span style={{ fontSize: 15, lineHeight: 1 }}>{q.emoji}</span>
+                        : <svg width="15" height="15" fill="none" stroke={q.color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">{"icon" in q ? q.icon : null}</svg>}
                     </div>
                     {q.label}
                   </Link>
