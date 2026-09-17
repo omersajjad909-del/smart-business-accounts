@@ -1028,6 +1028,18 @@ export const DASHBOARD_FEATURE_DEFS: DashboardFeatureDefinition[] = [
     plans: ["professional", "enterprise"],
   },
   {
+    /* The three questions an operator asks their books. Professional, with
+       departures and bookings — they are what these report on. */
+    id: "TRAVEL_REPORTS",
+    label: "Travel Reports",
+    route: "/dashboard/travel/reports",
+    business: "travel",
+    businessLabel: "Travel Agency",
+    section: "Control Center",
+    businessTypes: ["travel"],
+    plans: ["professional", "enterprise"],
+  },
+  {
     id: "TRAVEL_ANALYTICS",
     label: "Travel Analytics",
     route: "/dashboard/travel/analytics",
