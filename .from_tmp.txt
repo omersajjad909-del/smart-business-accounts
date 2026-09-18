@@ -1,0 +1,10 @@
+    defaultAccounts: [
+      ...COMMON_ACCOUNTS,
+      { code: "1100", name: "Customer Receivables", type: "Asset" },
+      { code: "4001", name: "Air Ticket Revenue", type: "Revenue" },
+      { code: "4002", name: "Visa Processing Revenue", type: "Revenue" },
+      { code: "4003", name: "Travel Service Charges", type: "Revenue" },
+      { code: "5100", name: "Airline Settlement Cost", type: "Expense" },
+      { code: "5101", name: "Embassy / Visa Fee", type: "Expense" },
+      { code: "5102", name: "Travel & Courier Expense", type: "Expense" },
+    ],
