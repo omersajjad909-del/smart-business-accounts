@@ -1,0 +1,4 @@
+// From the maths module, not from travelAmend — that one imports Prisma, and a
+// client component reaching into it drags the database client into the browser
+// bundle, where it cannot run.
+import { quoteRefund } from "@/lib/travelRefundMath";
