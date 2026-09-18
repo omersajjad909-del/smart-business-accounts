@@ -81,12 +81,20 @@ export default function TravelTicketsPage() {
       fields={[
         { key: "booking", label: "Booking Ref", placeholder: "TRV-24018", required: true },
         { key: "passenger", label: "Passenger", placeholder: "Ali Raza", required: true },
-        { key: "airline", label: "Airline", placeholder: "Qatar Airways", required: true },
+
         { key: "route", label: "Route", placeholder: "KHI -> DOH -> LHR", required: true },
         { key: "pnr", label: "PNR", placeholder: "A1B2C3", required: true },
-        // Offered from the chart of accounts. Typing a new one still works —
-        // the settlement posting creates the supplier account.
-        { key: "supplier", label: "Airline / Supplier", placeholder: "Qatar Airways BSP", required: true, suggestions: supplierNames },
+        /* One box, not two.
+        
+           There used to be "Airline" and "Airline / Supplier" side by side, and
+           an operator filling both was writing the same carrier twice — once
+           for the eye and once for the ledger, with nothing keeping them
+           honest. The one that matters is the account the payable lands in, so
+           that is the one that is asked for; the display name is written from
+           it. Where an agency really does buy through a consolidator, the
+           consolidator IS the supplier, and that is what should show on the
+           ticket. */
+        { key: "supplier", label: "Airline / Supplier", type: "party", options: supplierNames, placeholder: "New airline or consolidator", required: true },
         { key: "travelDate", label: "Travel Date", type: "date", required: true },
         { key: "amount", label: "Ticket Value", type: "number", placeholder: "185000", required: true },
         { key: "cost", label: "Supplier Cost", type: "number", placeholder: "172000", required: true },
@@ -97,10 +105,11 @@ export default function TravelTicketsPage() {
       columns={[
         { key: "booking", label: "Booking" },
         { key: "passenger", label: "Passenger" },
-        { key: "airline", label: "Airline" },
         { key: "route", label: "Route" },
         { key: "pnr", label: "PNR" },
-        { key: "supplier", label: "Supplier" },
+        // One column now, for the same reason there is one box: the airline and
+        // the supplier were the same fact printed twice.
+        { key: "supplier", label: "Airline / Supplier" },
         { key: "travelDate", label: "Travel Date" },
         { key: "amount", label: "Value" },
         { key: "invoiceNo", label: "Invoice" },
@@ -197,7 +206,10 @@ export default function TravelTicketsPage() {
         date: form.travelDate,
         data: {
           passenger: form.passenger,
-          airline: form.airline,
+          // Kept in step with the supplier rather than entered beside it, so
+          // every screen that reads `airline` keeps working and the two can
+          // never disagree.
+          airline: form.supplier,
           route: form.route,
           pnr: form.pnr,
           supplier: form.supplier,

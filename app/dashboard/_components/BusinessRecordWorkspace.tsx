@@ -8,7 +8,12 @@ import { useResponsive } from "@/hooks/useResponsive";
 type FormField = {
   key: string;
   label: string;
-  type?: "text" | "number" | "date" | "select";
+  /**
+   * "party" is a select of accounts that already exist, with "+ New…" at the
+   * foot for one that does not — see the renderer. Everything else is a plain
+   * input of that type.
+   */
+  type?: "text" | "number" | "date" | "select" | "party";
   placeholder?: string;
   options?: string[];
   /**
@@ -234,7 +239,69 @@ export function BusinessRecordWorkspace({
             {fields.map((field) => (
               <label key={field.key} style={{ display: "grid", gap: 6 }}>
                 <span style={{ fontSize: 11, color: "rgba(255,255,255,.45)", textTransform: "uppercase", letterSpacing: ".06em" }}>{field.label}</span>
-                {field.type === "select" ? (
+                {field.type === "party" ? (
+                  /* A party picked from the accounts that already exist, with a
+                     way out for one that does not.
+
+                     A plain dropdown is what an operator asks for and it breaks
+                     the first booking with a supplier nobody has set up — they
+                     would have to abandon a half-typed ticket, go to Accounts,
+                     add a row and come back. A plain text box is what was there
+                     before and it is how "Qatar Airways BSP" and "Qatar Airways
+                     Bsp" become two suppliers with half the payable each.
+
+                     So: the list, and "+ New" at the foot of it. Choosing the
+                     existing one is one click and always spelled the same way;
+                     a new one is still possible without leaving the form. */
+                  <>
+                    <select
+                      value={(field.options ?? []).includes(form[field.key] ?? "") || !form[field.key] ? (form[field.key] ?? "") : "__NEW__"}
+                      onChange={(event) => {
+                        const picked = event.target.value;
+                        setForm((current) => ({
+                          ...current,
+                          // "+ New" clears the box rather than storing the
+                          // sentinel, so the text input opens empty.
+                          [field.key]: picked === "__NEW__" ? "" : picked,
+                          [`__new_${field.key}`]: picked === "__NEW__" ? "1" : "",
+                        }));
+                      }}
+                      style={{
+                        width: "100%",
+                        background: inputBg,
+                        border: `1px solid ${panelBorder}`,
+                        borderRadius: 10,
+                        padding: "10px 12px",
+                        color: "#fff",
+                        fontSize: 13,
+                      }}
+                    >
+                      <option value="">Select {field.label}</option>
+                      {(field.options ?? []).map((option) => (
+                        <option key={option} value={option}>{option}</option>
+                      ))}
+                      <option value="__NEW__">+ New…</option>
+                    </select>
+                    {(form[`__new_${field.key}`] === "1" || (form[field.key] && !(field.options ?? []).includes(form[field.key]))) && (
+                      <input
+                        autoFocus
+                        value={form[field.key] ?? ""}
+                        placeholder={field.placeholder}
+                        onChange={(event) => setForm((current) => ({ ...current, [field.key]: event.target.value }))}
+                        style={{
+                          width: "100%",
+                          marginTop: 6,
+                          background: inputBg,
+                          border: `1px solid ${panelBorder}`,
+                          borderRadius: 10,
+                          padding: "10px 12px",
+                          color: "#fff",
+                          fontSize: 13,
+                        }}
+                      />
+                    )}
+                  </>
+                ) : field.type === "select" ? (
                   <select
                     value={form[field.key] ?? ""}
                     onChange={(event) => setForm((current) => ({ ...current, [field.key]: event.target.value }))}
@@ -320,8 +387,16 @@ export function BusinessRecordWorkspace({
           {loading ? (
             <div style={{ fontSize: 13, color: "rgba(255,255,255,.45)" }}>Loading records...</div>
           ) : filteredRows.length ? (
-            <div style={{ overflowX: "auto" }}>
-              <table style={{ width: "100%", borderCollapse: "collapse" }}>
+            /* The table scrolls rather than crushes.
+
+               It had no column padding and no minimum width, so eleven columns
+               in a narrow panel ran their headings together — "BOOKINGPASSENGER
+               AIRLINE" as one word — and wrapped "Qatar Airways" onto two lines
+               as "Qatar Air / Ways". A table that cannot fit should be scrolled
+               sideways, which everyone understands, not squeezed until the words
+               break. */
+            <div style={{ overflowX: "auto", margin: "0 -4px" }}>
+              <table style={{ width: "100%", minWidth: 760, borderCollapse: "collapse" }}>
                 <thead>
                   <tr>
                     {columns.map((column) => (
@@ -329,11 +404,15 @@ export function BusinessRecordWorkspace({
                         key={column.key}
                         style={{
                           textAlign: "left",
-                          fontSize: 11,
-                          color: "rgba(255,255,255,.45)",
+                          fontSize: 10.5,
+                          fontWeight: 700,
+                          color: "rgba(255,255,255,.4)",
                           textTransform: "uppercase",
-                          letterSpacing: ".06em",
-                          padding: "0 0 10px",
+                          letterSpacing: ".05em",
+                          padding: "0 14px 10px 0",
+                          // Headings never wrap. A two-line heading is what made
+                          // the row above unreadable.
+                          whiteSpace: "nowrap",
                           borderBottom: `1px solid ${panelBorder}`,
                         }}
                       >
@@ -342,12 +421,14 @@ export function BusinessRecordWorkspace({
                     ))}
                     <th
                       style={{
-                        textAlign: "left",
-                        fontSize: 11,
-                        color: "rgba(255,255,255,.45)",
+                        textAlign: "right",
+                        fontSize: 10.5,
+                        fontWeight: 700,
+                        color: "rgba(255,255,255,.4)",
                         textTransform: "uppercase",
-                        letterSpacing: ".06em",
-                        padding: "0 0 10px",
+                        letterSpacing: ".05em",
+                        padding: "0 0 10px 14px",
+                        whiteSpace: "nowrap",
                         borderBottom: `1px solid ${panelBorder}`,
                       }}
                     >
@@ -362,12 +443,25 @@ export function BusinessRecordWorkspace({
                     return (
                       <tr key={rowId}>
                         {columns.map((column) => (
-                          <td key={column.key} style={{ padding: "14px 8px 14px 0", borderBottom: `1px solid rgba(255,255,255,.04)`, fontSize: 13, color: "rgba(255,255,255,.78)" }}>
+                          <td
+                            key={column.key}
+                            style={{
+                              padding: "12px 14px 12px 0",
+                              borderBottom: `1px solid rgba(255,255,255,.05)`,
+                              fontSize: 13,
+                              color: "rgba(255,255,255,.78)",
+                              // A name is one thing, so it stays on one line.
+                              whiteSpace: "nowrap",
+                            }}
+                          >
                             {column.render ? column.render(row) : formatCellValue(row[column.key])}
                           </td>
                         ))}
-                        <td style={{ padding: "14px 0", borderBottom: `1px solid rgba(255,255,255,.04)` }}>
-                          <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+                        {/* Actions kept on one line and pushed right, so the
+                            row reads as data with its controls at the end
+                            rather than as two piles of pills. */}
+                        <td style={{ padding: "12px 0 12px 14px", borderBottom: `1px solid rgba(255,255,255,.05)`, whiteSpace: "nowrap" }}>
+                          <div style={{ display: "flex", gap: 6, justifyContent: "flex-end", alignItems: "center" }}>
                             {statusOptions
                               .filter((option) => option !== rowStatus)
                               .slice(0, 3)
