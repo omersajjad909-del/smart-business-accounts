@@ -212,9 +212,17 @@ export default function AdminSystemPage() {
               ? "Checking…"
               : !h.configuredGateways.length
               ? "None configured"
-              : h.liveGateway
-              ? `${GATEWAY_LABELS[h.liveGateway] || h.liveGateway} — last processed`
-              : `${h.configuredGateways.join(", ")} configured`
+              : // Both facts, because they answer different questions and the
+                // "last processed" one alone is actively misleading: it reports
+                // whichever gateway most recently touched a subscription, so it
+                // reads identically whether a second gateway is fully configured
+                // or missing its keys entirely. Diagnosing why Pakistani
+                // customers were still being routed to Lemon Squeezy meant
+                // reading the source to find out this row could not say.
+                `${h.configuredGateways.join(", ")} configured` +
+                (h.liveGateway
+                  ? ` · ${GATEWAY_LABELS[h.liveGateway] || h.liveGateway} last processed`
+                  : "")
           }
         />
         <div style={{ paddingTop: 10, fontSize: 12, color: "rgba(255,255,255,.25)", textAlign: "right" }}>
