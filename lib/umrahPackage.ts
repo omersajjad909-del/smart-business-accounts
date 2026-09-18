@@ -81,6 +81,28 @@ export type UmrahDeparture = {
   /** Used when pricingMode is "flat" — one price whatever the room. */
   flatPrice: number;
   notes?: string;
+  /**
+   * The group's flights, held on the departure rather than on each booking.
+   *
+   * Everyone on a departure is on the same aircraft — that is what a group
+   * departure is. Asking for the flight number again on every booking would be
+   * asking forty families for the same answer, and getting thirty-nine of them
+   * right.
+   */
+  arrivalFlight?: DepartureFlight;
+  returnFlight?: DepartureFlight;
+  /** Printed on every voucher for this departure. */
+  makkahStaff?: string;
+  madinahStaff?: string;
+  transportNote?: string;
+};
+
+/** One leg of the group's own travel — the same for everybody on the trip. */
+export type DepartureFlight = {
+  flightNo: string;
+  sector: string;
+  terminal: string;
+  time: string;
 };
 
 export type TierCosting = {
@@ -137,6 +159,11 @@ export function emptyDeparture(kind: PackageKind = "umrah"): UmrahDeparture {
     hotelCurrency: "SAR",
     hotelRate: 0,
     pricingMode: "sharing",
+    arrivalFlight: { flightNo: "", sector: "", terminal: "", time: "" },
+    returnFlight: { flightNo: "", sector: "", terminal: "", time: "" },
+    makkahStaff: "",
+    madinahStaff: "",
+    transportNote: "",
     // The four an operator actually sells. Single is left out of the default
     // card because almost nobody buys it, and it is one click to add.
     tiers: [2, 3, 4, 5].map((occupancy) => ({ occupancy, sellPrice: 0 })),
@@ -284,6 +311,8 @@ export function readDeparture(data: unknown): UmrahDeparture {
         }))
       : base.legs,
     fixed: { ...base.fixed, ...(d.fixed || {}) },
+    arrivalFlight: { ...base.arrivalFlight!, ...(d.arrivalFlight || {}) },
+    returnFlight: { ...base.returnFlight!, ...(d.returnFlight || {}) },
     tiers: Array.isArray(d.tiers) && d.tiers.length
       ? d.tiers.map((t: any) => ({
           occupancy: Number(t?.occupancy) || 4,

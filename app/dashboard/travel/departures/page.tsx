@@ -15,6 +15,7 @@
 
 import { useMemo, useState } from "react";
 
+import { alertToast } from "@/lib/toast-feedback";
 import { useBusinessRecords } from "@/lib/useBusinessRecords";
 import { useResponsive } from "@/hooks/useResponsive";
 import {
@@ -65,9 +66,41 @@ export default function DeparturesPage() {
   const { isMobile } = useResponsive();
   const store = useBusinessRecords("umrah_departure");
   const bookings = useBusinessRecords("umrah_booking");
+  const settlements = useBusinessRecords("travel_settlement");
   const [editing, setEditing] = useState<{ id: string | null; d: UmrahDeparture } | null>(null);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [bill, setBill] = useState({ supplierName: "", component: "air", qty: "", amount: "" });
+
+  /** Raise a supplier bill against the departure being edited. */
+  async function raiseBill() {
+    if (!editing?.id) return;
+    setBusy(true);
+    setError("");
+    try {
+      const res = await fetch("/api/travel/departure-settlement", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          departureId: editing.id,
+          supplierName: bill.supplierName,
+          component: bill.component,
+          qty: Number(bill.qty) || 0,
+          amount: Number(bill.amount) || 0,
+        }),
+      });
+      const b = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(b?.error || "Could not raise the bill");
+      await settlements.refetch();
+      setBill({ supplierName: "", component: "air", qty: "", amount: "" });
+      alertToast(`${b.settlementRef} — ${b.component} ${Number(b.amount).toLocaleString()} owed to ${b.supplierName}.`, "success", "Bill Raised");
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Could not raise the bill");
+    } finally {
+      setBusy(false);
+    }
+  }
 
   /* Seats sold, counted off the bookings rather than kept as a number on the
      departure. A stored count is a number that drifts the first time a booking
@@ -88,6 +121,24 @@ export default function DeparturesPage() {
     () => store.records.map((r) => ({ id: r.id, status: r.status, d: readDeparture(r.data) })),
     [store.records],
   );
+
+  /** Bills already raised against the departure being edited. */
+  const billed = useMemo(() => {
+    if (!editing?.id) return [];
+    return settlements.records
+      .filter((r) => r.refId === editing.id)
+      .map((r) => {
+        const d = r.data as { componentLabel?: unknown; supplierName?: unknown };
+        return {
+          id: r.id,
+          title: r.title,
+          status: r.status,
+          amount: Number(r.amount) || 0,
+          componentLabel: String(d?.componentLabel || "—"),
+          supplierName: String(d?.supplierName || "—"),
+        };
+      });
+  }, [settlements.records, editing]);
 
   const problems = useMemo(() => (editing ? validateDeparture(editing.d) : []), [editing]);
   const card = useMemo(() => (editing ? costDeparture(editing.d) : []), [editing]);
@@ -176,6 +227,64 @@ export default function DeparturesPage() {
           {/* Stored on the departure, not read live. A trip costed in March must
               not re-cost itself in June because the riyal moved. */}
           {money(`1 ${d.hotelCurrency || "SAR"} =`, d.hotelRate, (n) => patch({ hotelRate: n }))}
+        </div>
+
+        {/* Held here and not on each booking: everyone on a departure is on the
+            same aircraft — that is what a group departure is. Asking forty
+            families for the same flight number gets thirty-nine right. */}
+        <div style={sectionHead}>The group&rsquo;s flights</div>
+        <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: 18 }}>
+          {([["arrivalFlight", "Going out"], ["returnFlight", "Coming back"]] as const).map(([key, heading]) => {
+            const f = d[key] || { flightNo: "", sector: "", terminal: "", time: "" };
+            const set = (changes: Partial<typeof f>) => patch({ [key]: { ...f, ...changes } } as Partial<UmrahDeparture>);
+            return (
+              <div key={key} style={{ background: bg, border: `1px solid ${border}`, borderRadius: 12, padding: 14 }}>
+                <div style={{ fontSize: 12.5, fontWeight: 700, marginBottom: 10 }}>{heading}</div>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+                  <div>
+                    <label style={label}>Flight No</label>
+                    <input value={f.flightNo} placeholder="PK-747"
+                      onChange={(e) => set({ flightNo: e.target.value.toUpperCase() })} style={input} />
+                  </div>
+                  <div>
+                    <label style={label}>Time</label>
+                    <input value={f.time} placeholder="19:30"
+                      onChange={(e) => set({ time: e.target.value })} style={input} />
+                  </div>
+                  <div>
+                    <label style={label}>Sector</label>
+                    <input value={f.sector} placeholder="LHE - Madina"
+                      onChange={(e) => set({ sector: e.target.value })} style={input} />
+                  </div>
+                  <div>
+                    <label style={label}>Terminal</label>
+                    <input value={f.terminal} placeholder="Madina Airport"
+                      onChange={(e) => set({ terminal: e.target.value })} style={input} />
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Printed on every voucher for this departure, so they are entered once
+            for the group rather than forty times. */}
+        <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(3,1fr)", gap: 12, marginTop: 12 }}>
+          <div>
+            <label style={label}>Makkah staff</label>
+            <input value={d.makkahStaff || ""} placeholder="+966 58 315 6418 Qudratullah"
+              onChange={(e) => patch({ makkahStaff: e.target.value })} style={input} />
+          </div>
+          <div>
+            <label style={label}>Madinah staff</label>
+            <input value={d.madinahStaff || ""} placeholder="SAEED +966 58 013 0848"
+              onChange={(e) => patch({ madinahStaff: e.target.value })} style={input} />
+          </div>
+          <div>
+            <label style={label}>Transport note</label>
+            <input value={d.transportNote || ""} placeholder="TRANSPORT BY VOUCHER # 106830"
+              onChange={(e) => patch({ transportNote: e.target.value })} style={input} />
+          </div>
         </div>
 
         <div style={sectionHead}>Hotel legs — rate is per room, per night</div>
@@ -315,9 +424,86 @@ export default function DeparturesPage() {
           </button>
           <button onClick={() => setEditing(null)}
             style={{ padding: "11px 20px", background: "transparent", border: `1px solid ${border}`, borderRadius: 9, color: "rgba(255,255,255,.6)", fontSize: 14, fontFamily: "inherit", cursor: "pointer" }}>
-            Cancel
+            Close
           </button>
         </div>
+
+        {/* ── What the departure is bought with ──
+            A group trip is bought in blocks — forty seats from a consolidator,
+            a room allocation from a hotel, forty visas from an agent. None of
+            those belongs to any one pilgrim, which is why the per-ticket
+            settlement could not hold them and the payable for a whole
+            departure appeared nowhere. */}
+        {editing.id && (
+          <div style={{ marginTop: 22, paddingTop: 18, borderTop: `1px solid ${border}` }}>
+            <div style={{ ...sectionHead, margin: "0 0 4px" }}>Supplier bills for this departure</div>
+            <div style={{ fontSize: 11.5, color: "rgba(255,255,255,.38)", marginBottom: 12, lineHeight: 1.6 }}>
+              Posts the cost to its own head and the money owed to the supplier, where a CPV clears it.
+            </div>
+
+            {billed.length > 0 && (
+              <div style={{ display: "flex", flexDirection: "column", gap: 7, marginBottom: 14 }}>
+                {billed.map((s) => (
+                  <div key={s.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 12, fontSize: 12.5, flexWrap: "wrap" }}>
+                    <span style={{ color: "rgba(255,255,255,.62)" }}>
+                      <strong style={{ color: "#fff" }}>{s.title}</strong> · {s.componentLabel} · {s.supplierName}
+                    </span>
+                    <span style={{ fontFamily: "ui-monospace, monospace", fontWeight: 700, color: s.status === "settled" ? "#34d399" : "#fbbf24" }}>
+                      {s.amount.toLocaleString()} {s.status === "settled" ? "paid" : "owing"}
+                    </span>
+                  </div>
+                ))}
+                <div style={{ borderTop: `1px solid ${border}`, paddingTop: 7, display: "flex", justifyContent: "space-between", fontSize: 13, fontWeight: 800 }}>
+                  <span>Bought so far</span>
+                  <span style={{ fontFamily: "ui-monospace, monospace" }}>
+                    {billed.reduce((s, x) => s + x.amount, 0).toLocaleString()}
+                  </span>
+                </div>
+              </div>
+            )}
+
+            <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr 1fr" : "1.4fr 1fr 110px 1fr 130px", gap: 9, alignItems: "end" }}>
+              <div>
+                <label style={label}>Supplier</label>
+                <input value={bill.supplierName} placeholder="Diamond Hijazi / Qatar BSP"
+                  onChange={(e) => setBill({ ...bill, supplierName: e.target.value })} style={input} />
+              </div>
+              <div>
+                <label style={label}>For</label>
+                <select value={bill.component} onChange={(e) => setBill({ ...bill, component: e.target.value })}
+                  style={{ ...input, background: "#161b27" }}>
+                  <option value="air">Air seats</option>
+                  <option value="visa">Visas</option>
+                  <option value="hotel">Hotel rooms</option>
+                  <option value="transport">Transport</option>
+                  <option value="other">Other</option>
+                </select>
+              </div>
+              <div>
+                <label style={label}>Qty</label>
+                <input type="number" min={0} value={bill.qty}
+                  onChange={(e) => setBill({ ...bill, qty: e.target.value })}
+                  onFocus={(e) => e.currentTarget.select()} style={{ ...input, textAlign: "right" }} />
+              </div>
+              <div>
+                <label style={label}>Amount</label>
+                <input type="number" min={0} step="any" value={bill.amount}
+                  onChange={(e) => setBill({ ...bill, amount: e.target.value })}
+                  onFocus={(e) => e.currentTarget.select()} style={{ ...input, textAlign: "right" }} />
+              </div>
+              <button onClick={raiseBill}
+                disabled={busy || !bill.supplierName.trim() || !(Number(bill.amount) > 0)}
+                style={{
+                  padding: "9px 0", borderRadius: 9, border: "none", fontSize: 12.5, fontWeight: 800, fontFamily: "inherit",
+                  background: bill.supplierName.trim() && Number(bill.amount) > 0 ? "#a78bfa" : "rgba(167,139,250,.35)",
+                  color: "#1b1033",
+                  cursor: bill.supplierName.trim() && Number(bill.amount) > 0 ? "pointer" : "not-allowed",
+                }}>
+                {busy ? "Posting…" : "Raise bill"}
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     );
   }

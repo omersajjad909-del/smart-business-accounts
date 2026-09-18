@@ -9,7 +9,7 @@
  * owes what, and whether anyone is about to fly with money outstanding.
  */
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import { alertToast } from "@/lib/toast-feedback";
 import { useBusinessRecords } from "@/lib/useBusinessRecords";
@@ -27,6 +27,7 @@ import {
   type UmrahBooking,
 } from "@/lib/umrahBooking";
 import { costDeparture, occupancyName, readDeparture } from "@/lib/umrahPackage";
+import { voucherFromBooking } from "@/lib/umrahVoucherBuild";
 
 const ff = "'Outfit','Inter',sans-serif";
 const bg = "rgba(255,255,255,0.03)";
@@ -54,6 +55,9 @@ export default function BookingsPage() {
   const { isMobile } = useResponsive();
   const store = useBusinessRecords("umrah_booking");
   const departuresStore = useBusinessRecords("umrah_departure");
+  const vouchersStore = useBusinessRecords("umrah_voucher", { autoFetch: false });
+  const passportsStore = useBusinessRecords("travel_passport");
+  const [companyName, setCompanyName] = useState("");
   const [editing, setEditing] = useState<{ id: string | null; b: UmrahBooking } | null>(null);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
@@ -96,6 +100,59 @@ export default function BookingsPage() {
     [departuresStore.records],
   );
 
+  /**
+   * Passport numbers already on file, by name.
+   *
+   * The passport database and the booking were keeping the same fact and only
+   * one of them was ever filled in — which is how a voucher reaches immigration
+   * with a blank passport column. Looked up by name because that is the only
+   * thing the two screens share; a number typed on the booking still wins,
+   * since it is the more recent thing somebody read off the document.
+   */
+  const passportByName = useMemo(() => {
+    const by = new Map<string, string>();
+    for (const r of passportsStore.records) {
+      const d = r.data as { passengerName?: unknown; passportNo?: unknown };
+      const name = String(d?.passengerName || "").trim().toUpperCase();
+      const no = String(d?.passportNo || "").trim();
+      if (name && no) by.set(name, no);
+    }
+    return by;
+  }, [passportsStore.records]);
+
+  /** Build a voucher draft from this booking and its departure, and open it. */
+  async function makeVoucher() {
+    if (!editing || !chosenDeparture) return;
+    setBusyAction("voucher");
+    setError("");
+    try {
+      const draft = voucherFromBooking({
+        booking: editing.b,
+        departure: chosenDeparture.d,
+        companyName,
+        passportByName,
+      });
+      await vouchersStore.create({
+        title: draft.tripNumber || draft.guestName || "Voucher",
+        status: "issued",
+        // Traceable back to the booking it came from, so a reissue can find it.
+        refId: editing.id || undefined,
+        date: draft.arrival.date || draft.entryDate,
+        data: draft as unknown as Record<string, unknown>,
+      });
+      alertToast(
+        `Voucher drafted for ${draft.guestName} — ${draft.stays.length} stay(s), ${draft.pilgrims.length} pilgrim(s). Check the room numbers before printing.`,
+        "success",
+        "Voucher Created",
+      );
+      window.location.href = "/dashboard/travel/vouchers";
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Could not build the voucher");
+    } finally {
+      setBusyAction("");
+    }
+  }
+
   const rows = useMemo(
     () => store.records.map((r) => {
       const b = readBooking(r.data);
@@ -103,6 +160,15 @@ export default function BookingsPage() {
     }),
     [store.records, today],
   );
+
+  // The letterhead on the printed voucher. Read once; it does not change while
+  // somebody is editing a booking.
+  useEffect(() => {
+    fetch("/api/me/company", { cache: "no-store" })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((c) => { if (c?.name) setCompanyName(String(c.name)); })
+      .catch(() => {});
+  }, []);
 
   const chosenDeparture = editing ? departures.find((x) => x.id === editing.b.departureId) : undefined;
   const money = useMemo(
@@ -432,6 +498,18 @@ export default function BookingsPage() {
                   {busyAction === "booking-invoice" ? "Raising…" : "Raise invoice"}
                 </button>
               )}
+
+              {/* The voucher is the booking and the departure said again. Built
+                  from both rather than typed a third time — typed twice means
+                  wrong once, and the thing that is usually wrong is a hotel
+                  date, discovered at a check-in desk in Makkah. */}
+              <button
+                onClick={makeVoucher}
+                disabled={busyAction !== "" || !chosenDeparture}
+                title={chosenDeparture ? "Builds a voucher draft from this booking and its departure" : "Pick a departure first"}
+                style={{ padding: "9px 16px", borderRadius: 9, background: "rgba(167,139,250,.12)", border: "1px solid rgba(167,139,250,.35)", color: "#c4b5fd", fontSize: 12.5, fontWeight: 700, fontFamily: "inherit", cursor: chosenDeparture ? "pointer" : "not-allowed" }}>
+                {busyAction === "voucher" ? "Building…" : "Make voucher"}
+              </button>
 
               <button
                 onClick={() => setCancelling({ charge: "", refund: String(money.paid), reason: "" })}
