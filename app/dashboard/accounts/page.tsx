@@ -7,6 +7,7 @@ import { confirmToast } from "@/lib/toast-feedback";
 import { useResponsive } from "@/hooks/useResponsive";
 import { COUNTRIES, sortCountries } from "@/lib/countries";
 import { subdivisionsFor, subdivisionLabelFor, skipsSubdivision } from "@/lib/subdivisions";
+import { hasPartyVocabulary, partyOptions, partySideFor, type PartyOption } from "@/lib/partyVocabulary";
 
 const FONT = "'Outfit','Inter',sans-serif";
 const ACCENT = "#6366f1";
@@ -130,6 +131,11 @@ export default function ChartOfAccounts() {
   // nothing: guessing a country for a record somebody else created would turn
   // "nobody has said" into something that looks confirmed.
   const [companyCountry, setCompanyCountry] = useState("");
+  const [businessType, setBusinessType] = useState("");
+  /** The trade's own party words, empty for a trade that uses the plain two. */
+  const [tradeParties, setTradeParties] = useState<PartyOption[]>([]);
+  /** Which of them is selected, so the box reads back the way it was picked. */
+  const [partyLabel, setPartyLabel] = useState("");
   const countryOptions = useMemo(() => sortCountries(COUNTRIES).map(c => c.name), []);
   const partyRegionOptions = useMemo(() => subdivisionsFor(form.country), [form.country]);
 
@@ -153,8 +159,13 @@ export default function ChartOfAccounts() {
     fetch("/api/me/company")
       .then(r => (r.ok ? r.json() : null))
       .then(d => {
+        if (cancelled) return;
+        // The trade decides what its parties are called — see lib/partyVocabulary.
+        const bt = String(d?.businessType || "").trim();
+        setBusinessType(bt);
+        if (bt && hasPartyVocabulary(bt)) setTradeParties(partyOptions(bt));
         const country = String(d?.country || "").trim();
-        if (cancelled || !country) return;
+        if (!country) return;
         setCompanyCountry(country);
         // Only fills a blank box on the empty form — never overwrites a party
         // being edited, and never fights a choice already made.
@@ -171,7 +182,17 @@ export default function ChartOfAccounts() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [loading]);
 
-  async function handleCategoryChange(cat: string) {
+  async function handleCategoryChange(raw: string) {
+    /* A trade word resolves to one of the two sides the ledger knows about.
+       "Visa Agent / Embassy" is filed as a SUPPLIER; the label was only ever
+       for the person choosing it, and nothing downstream has to learn a third
+       party type. The chosen wording is kept on the form so the box still
+       reads back the way it was picked. */
+    const isTradeWord = raw.startsWith("PARTY:");
+    const chosenLabel = isTradeWord ? raw.slice(6) : "";
+    const cat = isTradeWord ? partySideFor(businessType, chosenLabel) : raw;
+    setPartyLabel(chosenLabel);
+
     if (editingId) { f("partyType", cat); return; }
     const prefix = PREFIX_MAP[cat] || "ACC";
     const user = getCurrentUser();
@@ -370,7 +391,7 @@ export default function ChartOfAccounts() {
             <Field label="Category *">
               <div style={{ position: "relative" }}>
                 <select
-                  value={form.partyType}
+                  value={partyLabel ? `PARTY:${partyLabel}` : form.partyType}
                   onChange={e => handleCategoryChange(e.target.value)}
                   style={{
                     ...inp({ paddingRight: 34 }),
@@ -378,7 +399,25 @@ export default function ChartOfAccounts() {
                     appearance: "none", WebkitAppearance: "none", MozAppearance: "none",
                   }}
                 >
-                  {CATEGORIES.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
+                  {/* This trade's own words for the two sides of the ledger,
+                      above the general heads. A travel agency files airlines,
+                      embassies and Saudi hotels, not "suppliers" — and being
+                      asked to call an embassy a supplier is the moment the
+                      software stops sounding like it was built for the job.
+
+                      Only the wording changes. Every one of these still stores
+                      CUSTOMER or SUPPLIER, which is what the ledger, the ageing
+                      report and every statement already run on. */}
+                  {tradeParties.length > 0 && (
+                    <optgroup label="This business">
+                      {tradeParties.map(p => (
+                        <option key={p.label} value={`PARTY:${p.label}`}>{p.label}</option>
+                      ))}
+                    </optgroup>
+                  )}
+                  <optgroup label={tradeParties.length > 0 ? "General" : ""}>
+                    {CATEGORIES.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
+                  </optgroup>
                 </select>
                 <span style={{
                   position: "absolute", right: 14, top: "50%", transform: "translateY(-50%)",
