@@ -192,6 +192,20 @@ export async function POST(req: NextRequest) {
     // While the merchant account is under review this is false, and Pakistan
     // falls through to the Lemon Squeezy branch below, which selects the _PK
     // variants carrying the same PKR-equivalent prices.
+    // A Pakistani buyer who does not reach Safepay falls through to Lemon Squeezy
+    // in silence, which is correct behaviour but indistinguishable from a
+    // misconfiguration — one missing env var on the host sends every PKR customer
+    // to the wrong gateway with nothing logged anywhere. Say which piece is absent.
+    if (isPkrCustomer && !isSafepayCheckoutEnabled()) {
+      console.warn("[safepay] PKR customer routed to Lemon Squeezy — Safepay unavailable:", {
+        SAFEPAY_API_KEY:          process.env.SAFEPAY_API_KEY ? "set" : "MISSING",
+        SAFEPAY_SECRET_KEY:       process.env.SAFEPAY_SECRET_KEY ? "set" : "MISSING",
+        SAFEPAY_WEBHOOK_SECRET:   process.env.SAFEPAY_WEBHOOK_SECRET ? "set" : "MISSING",
+        SAFEPAY_CHECKOUT_ENABLED: process.env.SAFEPAY_CHECKOUT_ENABLED?.trim() || "(unset)",
+        note: "all four are required; CHECKOUT_ENABLED must be the literal 'true'",
+      });
+    }
+
     if (isPkrCustomer && isSafepayCheckoutEnabled()) {
       const base      = getRuntimeAppUrl(req.nextUrl.origin);
       const amountPkr = usdToPkr(finalCustomPrice > 0 ? finalCustomPrice : planBasePerMonth);
