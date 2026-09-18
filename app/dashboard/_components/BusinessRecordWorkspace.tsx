@@ -462,28 +462,46 @@ export function BusinessRecordWorkspace({
                             rather than as two piles of pills. */}
                         <td style={{ padding: "12px 0 12px 14px", borderBottom: `1px solid rgba(255,255,255,.05)`, whiteSpace: "nowrap" }}>
                           <div style={{ display: "flex", gap: 6, justifyContent: "flex-end", alignItems: "center" }}>
-                            {statusOptions
-                              .filter((option) => option !== rowStatus)
-                              .slice(0, 3)
-                              .map((option) => (
-                                <button
-                                  key={option}
-                                  type="button"
-                                  onClick={() => handleStatusChange(rowId, option)}
-                                  style={{
-                                    borderRadius: 999,
-                                    border: `1px solid ${accent}55`,
-                                    background: `${accent}18`,
-                                    color: accent,
-                                    fontSize: 11,
-                                    fontWeight: 700,
-                                    padding: "5px 10px",
-                                    cursor: "pointer",
-                                  }}
-                                >
-                                  {option}
-                                </button>
-                              ))}
+                            {/* One box instead of three pills.
+
+                                Every row carried a button per status it was not
+                                currently in — "booked", "issued", "refunded" —
+                                so a five-status record grew five controls
+                                before the real actions even started, and the
+                                row became two lines of coloured pills with no
+                                order to them. A status is one value out of a
+                                known list, which is a dropdown; and this way
+                                the row also shows what the status IS, which
+                                the pills never did. */}
+                            {statusOptions.length > 0 && (
+                              <select
+                                value={rowStatus}
+                                onChange={(event) => handleStatusChange(rowId, event.target.value)}
+                                style={{
+                                  borderRadius: 999,
+                                  border: `1px solid ${accent}44`,
+                                  background: `${accent}14`,
+                                  color: accent,
+                                  fontSize: 11,
+                                  fontWeight: 700,
+                                  padding: "5px 8px",
+                                  cursor: "pointer",
+                                  fontFamily: "inherit",
+                                }}
+                              >
+                                {/* The current one first, even where it is not
+                                    a listed option — a record set to something
+                                    retired should still read back honestly
+                                    rather than showing the first option as
+                                    though it were true. */}
+                                {!statusOptions.includes(rowStatus) && rowStatus && (
+                                  <option value={rowStatus}>{rowStatus}</option>
+                                )}
+                                {statusOptions.map((option) => (
+                                  <option key={option} value={option}>{option}</option>
+                                ))}
+                              </select>
+                            )}
                             {actions
                               .filter((action) => !action.hidden?.(row))
                               .map((action) => {
