@@ -161,9 +161,23 @@ export async function createSafepayCheckout(input: SafepayCheckoutInput): Promis
   if (!env("SAFEPAY_SECRET_KEY")) throw new Error("SAFEPAY_SECRET_KEY is not set.");
 
   // ── 1. Payment session ──
-  // Unlike v1's /order/v1/init, v3 stores `metadata` and hands it back on the
-  // webhook. That is the whole reason the webhook no longer has to reverse a
-  // companyId out of the order-ID string.
+  //
+  // `metadata` is NOT a free-form bag, whatever the docs imply. Sandbox rejects
+  // any key outside a fixed allow-list with HTTP 500 "unsupported meta key
+  // <name>", and the whole request fails — so one stray key loses the sale.
+  // Probed against sandbox on 2026-09-18; only these two are accepted:
+  //
+  //     order_id   source
+  //
+  // company_id, plan_code, billing_cycle, user_id, customer_email,
+  // customer_name, udf1-5, reference, invoice_id, description, note, cart_id,
+  // external_id and a dozen similar guesses were all refused. Do not add one
+  // back without re-probing.
+  //
+  // That is why `fnv-<companyId>-<ts>` is still load-bearing: order_id is the
+  // only channel we have, so the company has to be encoded *into* it, and the
+  // plan and cycle have to be recovered from our own BILLING_CHECKOUT_CREATED
+  // log by tracker. See handleSafepayWebhook.
   const sessionBody = {
     merchant_api_key: apiKey,
     intent:           "CYBERSOURCE",   // card payments (Visa / Mastercard)
@@ -172,13 +186,8 @@ export async function createSafepayCheckout(input: SafepayCheckoutInput): Promis
     currency:         "PKR",
     amount:           pkrToPaisa(input.amountPkr),
     metadata: {
-      order_id:      input.orderId,
-      company_id:    input.companyId,
-      plan_code:     input.planCode,
-      billing_cycle: input.billingCycle,
-      ...(input.userId ? { user_id: input.userId } : {}),
-      ...(input.customerEmail ? { customer_email: input.customerEmail } : {}),
-      ...(input.customerName ? { customer_name: input.customerName } : {}),
+      order_id: input.orderId,
+      source:   "finovaos",
     },
   };
 
@@ -229,10 +238,39 @@ export async function createSafepayCheckout(input: SafepayCheckoutInput): Promis
 
 // ─── Payment status ───────────────────────────────────────────────────────────
 
+/**
+ * Flatten Safepay's metadata back into plain `{ key: value }`.
+ *
+ * It does not hand back what you sent. `metadata: { order_id: "fnv-x-1" }` comes
+ * out of the reporter (and, by the same shape, the webhook) as:
+ *
+ *   metadata: { order_id: { token, tracker, key: "order_id", value: "fnv-x-1", … } }
+ *
+ * Read naively, `String(meta.order_id)` is the string "[object Object]", which
+ * then fails the `fnv-` prefix test and loses the company the payment belongs
+ * to. Both shapes are accepted here so this keeps working if Safepay ever
+ * flattens it themselves.
+ */
+export function normalizeSafepayMetadata(meta: any): Record<string, string> {
+  const out: Record<string, string> = {};
+  if (!meta || typeof meta !== "object") return out;
+
+  for (const [key, entry] of Object.entries<any>(meta)) {
+    if (entry == null) continue;
+    if (typeof entry === "object") {
+      if (entry.value != null) out[String(entry.key || key)] = String(entry.value);
+    } else {
+      out[key] = String(entry);
+    }
+  }
+  return out;
+}
+
 export type SafepayPaymentStatus = {
   state: string;            // e.g. TRACKER_STARTED, TRACKER_ENDED
   paid: boolean;
   amountPkr: number | null;
+  metadata: Record<string, string>;
   raw: any;
 };
 
@@ -258,12 +296,21 @@ export async function fetchSafepayPaymentStatus(tracker: string): Promise<Safepa
 
     const t = json?.data?.tracker || json?.data || {};
     const state = String(t?.state || "");
-    const rawAmount = typeof t?.amount === "number" ? t.amount : null;
+
+    // The charge lives under purchase_totals, not on the tracker itself — there
+    // is no top-level `amount` on this response at all, so reading one returned
+    // null for every payment.
+    const rawAmount =
+      typeof t?.purchase_totals?.quote_amount?.amount === "number" ? t.purchase_totals.quote_amount.amount
+      : typeof t?.purchase_totals?.base_amount?.amount === "number" ? t.purchase_totals.base_amount.amount
+      : typeof t?.amount === "number"                               ? t.amount
+      : null;
 
     return {
       state,
       paid: state.toUpperCase() === "TRACKER_ENDED",
       amountPkr: rawAmount == null ? null : paisaToPkr(rawAmount),
+      metadata: normalizeSafepayMetadata(t?.metadata),
       raw: json,
     };
   } catch {

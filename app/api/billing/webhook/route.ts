@@ -6,7 +6,7 @@ import { createHmac, timingSafeEqual } from "crypto";
 import { sendEmail } from "@/lib/email";
 import { emailTemplates } from "@/lib/emailTemplates";
 import { cancelLemonSubscription, mapLemonSubscriptionStatus, verifyLemonSignature } from "@/lib/lemonsqueezy";
-import { mapSafepayEventToStatus, paisaToPkr, verifySafepaySignature } from "@/lib/safepay";
+import { mapSafepayEventToStatus, normalizeSafepayMetadata, paisaToPkr, verifySafepaySignature } from "@/lib/safepay";
 import {
   PAYMENT_EVENT_DEDUPE_WINDOW_MS,
   createBillingInvoiceAccessToken,
@@ -1014,16 +1014,20 @@ async function handleSafepayWebhook(req: NextRequest, raw: string) {
   const event    = String(payload?.type || payload?.event || "");
   const data     = payload?.data || payload?.payload || {};
   const tracker  = String(data?.tracker?.token || data?.tracker || payload?.tracker || "");
-  const meta     = data?.tracker?.metadata || data?.metadata || data?.order?.metadata || payload?.metadata || {};
+  // Safepay returns metadata as { order_id: { key, value, … } }, not { order_id: "…" }.
+  // Flattened before use, or every read here becomes the string "[object Object]".
+  const meta     = normalizeSafepayMetadata(
+    data?.tracker?.metadata || data?.metadata || data?.order?.metadata || payload?.metadata || {},
+  );
   const orderId  = String(
     meta?.order_id || data?.order?.ref || data?.order_id || payload?.order_id || "",
   );
 
-  // companyId rides in the v3 `metadata` object, which is what createSafepayCheckout
-  // now sends. The order-ref parse below is the v1-era fallback: that API dropped
-  // metadata entirely (it answered `metadata: null`), so `fnv-<companyId>-<ts>` was
-  // the only place the company survived the round trip. Kept because a checkout
-  // started before this change can still settle after it.
+  // The order-ref parse is the primary path, not a fallback. Safepay's metadata
+  // accepts only `order_id` and `source` — every other key is refused outright
+  // (see the allow-list note in createSafepayCheckout) — so `fnv-<companyId>-<ts>`
+  // remains the only place the company survives the round trip.
+  // meta.company_id is read first purely in case Safepay ever widens that list.
   let companyId = String(meta?.company_id || "").trim();
   if (!companyId && orderId.startsWith("fnv-")) {
     const parts = orderId.split("-");
@@ -1031,12 +1035,10 @@ async function handleSafepayWebhook(req: NextRequest, raw: string) {
   }
   if (!companyId) return apiError("Missing company_id in Safepay webhook", 400);
 
-  // Same story for plan and cycle. Under v1 they could not survive the round trip
-  // at all, and defaulting meant every Safepay buyer landed on STARTER/MONTHLY no
-  // matter what they picked and paid for; createSafepayCheckout logged the real
-  // values against the tracker so they could be read back. v3 carries them in
-  // metadata, so this lookback should now be dead weight — but it stays until a
-  // live payment has proven that, because guessing the plan is guessing the price.
+  // Plan and cycle cannot travel to Safepay at all — metadata refuses those keys
+  // — so they are recovered from our own BILLING_CHECKOUT_CREATED log, matched on
+  // the tracker. This lookback is not optional: without it every Safepay buyer
+  // lands on STARTER/MONTHLY no matter what they picked and paid for.
   let planCode = String(meta?.plan_code || "").toUpperCase();
   let cycleRaw = String(meta?.billing_cycle || "").toUpperCase();
 
