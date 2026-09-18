@@ -1,5 +1,7 @@
 "use client";
 
+import { useEffect, useState } from "react";
+
 import { alertToast } from "@/lib/toast-feedback";
 import { BusinessRecordWorkspace } from "../../_components/BusinessRecordWorkspace";
 import { mapVisaCase, travelAccent } from "../_shared";
@@ -7,6 +9,19 @@ import { mapVisaCase, travelAccent } from "../_shared";
 const statusOptions = ["document_check", "submitted", "approved", "rejected"];
 
 export default function TravelVisasPage() {
+  /* Embassies and visa agents already on the chart of accounts, offered as you
+     type. Re-keying them is how one embassy becomes three suppliers. */
+  const [supplierNames, setSupplierNames] = useState<string[]>([]);
+  useEffect(() => {
+    fetch("/api/accounts?partyType=SUPPLIER", { cache: "no-store" })
+      .then((r) => (r.ok ? r.json() : []))
+      .then((rows) => {
+        if (!Array.isArray(rows)) return;
+        setSupplierNames(rows.map((a: { name?: unknown }) => String(a?.name || "")).filter(Boolean));
+      })
+      .catch(() => {});
+  }, []);
+
   return (
     <BusinessRecordWorkspace
       title="Visa Cases"
@@ -19,7 +34,7 @@ export default function TravelVisasPage() {
         { key: "applicant", label: "Applicant", placeholder: "Sara Khan", required: true },
         { key: "country", label: "Destination Country", placeholder: "United Kingdom", required: true },
         { key: "passportNo", label: "Passport No", placeholder: "AB1234567", required: true },
-        { key: "supplier", label: "Embassy / Supplier", placeholder: "UK Visa Center", required: true },
+        { key: "supplier", label: "Embassy / Supplier", placeholder: "UK Visa Center", required: true, suggestions: supplierNames },
         { key: "submissionDate", label: "Submission Date", type: "date", required: true },
         { key: "amount", label: "Service Fee", type: "number", placeholder: "25000", required: true },
         { key: "cost", label: "Supplier Cost", type: "number", placeholder: "18000", required: true },

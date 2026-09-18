@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { alertToast } from "@/lib/toast-feedback";
 import { BusinessRecordWorkspace } from "../../_components/BusinessRecordWorkspace";
@@ -23,6 +23,20 @@ export default function TravelTicketsPage() {
   const [refundTarget, setRefundTarget] = useState<RefundTarget | null>(null);
   const [afterRefund, setAfterRefund] = useState<{ refetch: () => Promise<void> } | null>(null);
   const [paxTarget, setPaxTarget] = useState<{ id: string; label: string; rows: Passenger[] } | null>(null);
+
+  /* Airlines, consolidators and embassies the company already deals with.
+     Re-typing them by hand is how "Qatar Airways BSP" and "Qatar Airways Bsp"
+     become two suppliers with half the payable each. */
+  const [supplierNames, setSupplierNames] = useState<string[]>([]);
+  useEffect(() => {
+    fetch("/api/accounts?partyType=SUPPLIER", { cache: "no-store" })
+      .then((r) => (r.ok ? r.json() : []))
+      .then((rows) => {
+        if (!Array.isArray(rows)) return;
+        setSupplierNames(rows.map((a: { name?: unknown }) => String(a?.name || "")).filter(Boolean));
+      })
+      .catch(() => {});
+  }, []);
 
   return (
     <>
@@ -70,7 +84,9 @@ export default function TravelTicketsPage() {
         { key: "airline", label: "Airline", placeholder: "Qatar Airways", required: true },
         { key: "route", label: "Route", placeholder: "KHI -> DOH -> LHR", required: true },
         { key: "pnr", label: "PNR", placeholder: "A1B2C3", required: true },
-        { key: "supplier", label: "Airline / Supplier", placeholder: "Qatar Airways BSP", required: true },
+        // Offered from the chart of accounts. Typing a new one still works —
+        // the settlement posting creates the supplier account.
+        { key: "supplier", label: "Airline / Supplier", placeholder: "Qatar Airways BSP", required: true, suggestions: supplierNames },
         { key: "travelDate", label: "Travel Date", type: "date", required: true },
         { key: "amount", label: "Ticket Value", type: "number", placeholder: "185000", required: true },
         { key: "cost", label: "Supplier Cost", type: "number", placeholder: "172000", required: true },

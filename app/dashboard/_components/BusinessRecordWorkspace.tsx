@@ -11,6 +11,16 @@ type FormField = {
   type?: "text" | "number" | "date" | "select";
   placeholder?: string;
   options?: string[];
+  /**
+   * Names offered as you type, without forcing the choice.
+   *
+   * For a field whose value is a party — an airline, an embassy, a hotel — the
+   * chart of accounts already knows the ones this company deals with, and
+   * re-typing them by hand is how "Qatar Airways BSP" and "Qatar Airways Bsp"
+   * end up as two suppliers. A dropdown would fix the spelling and break the
+   * first booking with a supplier nobody has set up yet.
+   */
+  suggestions?: string[];
   required?: boolean;
 };
 
@@ -246,22 +256,37 @@ export function BusinessRecordWorkspace({
                     ))}
                   </select>
                 ) : (
-                  <input
-                    type={field.type ?? "text"}
-                    required={field.required}
-                    value={form[field.key] ?? ""}
-                    placeholder={field.placeholder}
-                    onChange={(event) => setForm((current) => ({ ...current, [field.key]: event.target.value }))}
-                    style={{
-                      width: "100%",
-                      background: inputBg,
-                      border: `1px solid ${panelBorder}`,
-                      borderRadius: 10,
-                      padding: "10px 12px",
-                      color: "#fff",
-                      fontSize: 13,
-                    }}
-                  />
+                  <>
+                    <input
+                      type={field.type ?? "text"}
+                      required={field.required}
+                      value={form[field.key] ?? ""}
+                      placeholder={field.placeholder}
+                      /* Suggestions rather than a dropdown. The names come from
+                         the chart of accounts, so the ones already set up are
+                         one keystroke away and spelled the same way every time
+                         — but a supplier being used for the first time can
+                         still simply be typed, and the posting creates the
+                         account. A hard dropdown would send the operator off
+                         to Accounts mid-booking to add a row. */
+                      list={field.suggestions?.length ? `${field.key}-suggestions` : undefined}
+                      onChange={(event) => setForm((current) => ({ ...current, [field.key]: event.target.value }))}
+                      style={{
+                        width: "100%",
+                        background: inputBg,
+                        border: `1px solid ${panelBorder}`,
+                        borderRadius: 10,
+                        padding: "10px 12px",
+                        color: "#fff",
+                        fontSize: 13,
+                      }}
+                    />
+                    {field.suggestions?.length ? (
+                      <datalist id={`${field.key}-suggestions`}>
+                        {field.suggestions.map((s) => <option key={s} value={s} />)}
+                      </datalist>
+                    ) : null}
+                  </>
                 )}
               </label>
             ))}
