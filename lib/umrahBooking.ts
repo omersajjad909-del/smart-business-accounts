@@ -52,6 +52,12 @@ export type UmrahBooking = {
   instalments: Instalment[];
   status: BookingStatus;
   notes?: string;
+  /** Set once the sale is on the ledger. Until then the party owes nothing anywhere. */
+  invoiceId?: string;
+  invoiceNo?: string;
+  /** Stamped by a cancellation, so the charge and refund can be read back. */
+  cancellationCharge?: number;
+  cancellationRefund?: number;
 };
 
 export type BookingMoney = {
@@ -282,5 +288,7 @@ export function readBooking(data: unknown): UmrahBooking {
     instalments: Array.isArray(d.instalments)
       ? d.instalments.map((i: any) => ({ ...emptyInstalment(), ...i, amount: Number(i?.amount) || 0 }))
       : [],
+    invoiceId: String(d.invoiceId || ""),
+    invoiceNo: String(d.invoiceNo || ""),
   };
 }

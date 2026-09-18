@@ -11,6 +11,7 @@
 
 import { useMemo, useState } from "react";
 
+import { alertToast } from "@/lib/toast-feedback";
 import { useBusinessRecords } from "@/lib/useBusinessRecords";
 import { useResponsive } from "@/hooks/useResponsive";
 import {
@@ -56,7 +57,39 @@ export default function BookingsPage() {
   const [editing, setEditing] = useState<{ id: string | null; b: UmrahBooking } | null>(null);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
+  const [busyAction, setBusyAction] = useState("");
+  const [cancelling, setCancelling] = useState<{ charge: string; refund: string; reason: string } | null>(null);
   const today = new Date().toISOString().slice(0, 10);
+
+  /**
+   * The postings, as opposed to the form.
+   *
+   * Everything above edits a record; these move money, so each is its own
+   * endpoint and each refetches afterwards rather than trusting what the screen
+   * already had. A booking whose invoice was raised in another tab must not be
+   * invoiced again because this one still thinks it was not.
+   */
+  async function post(path: string, payload: Record<string, unknown>, ok: (b: any) => string) {
+    setBusyAction(path);
+    setError("");
+    try {
+      const res = await fetch(`/api/travel/${path}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      const b = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(b?.error || "That did not go through");
+      await store.refetch();
+      setEditing(null);
+      setCancelling(null);
+      alertToast(ok(b), "success", "Done");
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "That did not go through");
+    } finally {
+      setBusyAction("");
+    }
+  }
 
   const departures = useMemo(
     () => departuresStore.records.map((r) => ({ id: r.id, d: readDeparture(r.data) })),
@@ -371,11 +404,127 @@ export default function BookingsPage() {
             }}>
             {saving ? "Saving…" : "Save booking"}
           </button>
-          <button onClick={() => setEditing(null)}
+          <button onClick={() => { setEditing(null); setCancelling(null); }}
             style={{ padding: "11px 20px", background: "transparent", border: `1px solid ${border}`, borderRadius: 9, color: "rgba(255,255,255,.6)", fontSize: 14, fontFamily: "inherit", cursor: "pointer" }}>
-            Cancel
+            Close
           </button>
         </div>
+
+        {/* ── The postings ──
+            Separated from Save by a rule, because they are a different kind of
+            act: above this line nothing has left the form, below it money moves
+            and a voucher number exists for ever. */}
+        {editing.id && b.status !== "cancelled" && (
+          <div style={{ marginTop: 22, paddingTop: 18, borderTop: `1px solid ${border}` }}>
+            <div style={{ ...sectionHead, margin: "0 0 10px" }}>Post to the ledger</div>
+            <div style={{ display: "flex", gap: 10, flexWrap: "wrap", alignItems: "center" }}>
+              {b.invoiceNo ? (
+                <a href={`/dashboard/sales-invoice?id=${encodeURIComponent(b.invoiceId || "")}`}
+                  style={{ padding: "9px 16px", borderRadius: 9, background: "rgba(34,197,94,.12)", border: "1px solid rgba(34,197,94,.35)", color: "#34d399", fontSize: 12.5, fontWeight: 700, textDecoration: "none" }}>
+                  Invoice {b.invoiceNo} →
+                </a>
+              ) : (
+                <button
+                  onClick={() => post("booking-invoice", { recordId: editing.id }, (r) => `Invoice ${r.invoiceNo} raised — ${Number(r.total).toLocaleString()} is now on the customer ledger.`)}
+                  disabled={busyAction !== "" || money.total <= 0}
+                  title="Puts the party on the customer ledger, so the balance ages and appears on a statement"
+                  style={{ padding: "9px 18px", borderRadius: 9, border: "none", background: money.total > 0 ? "#22c55e" : "rgba(34,197,94,.35)", color: "#04140a", fontSize: 12.5, fontWeight: 800, fontFamily: "inherit", cursor: money.total > 0 ? "pointer" : "not-allowed" }}>
+                  {busyAction === "booking-invoice" ? "Raising…" : "Raise invoice"}
+                </button>
+              )}
+
+              <button
+                onClick={() => setCancelling({ charge: "", refund: String(money.paid), reason: "" })}
+                disabled={busyAction !== ""}
+                style={{ padding: "9px 16px", borderRadius: 9, background: "rgba(239,68,68,.1)", border: "1px solid rgba(239,68,68,.3)", color: "#fca5a5", fontSize: 12.5, fontWeight: 700, fontFamily: "inherit", cursor: "pointer" }}>
+                Cancel booking
+              </button>
+
+              {!b.invoiceNo && (
+                <span style={{ fontSize: 11.5, color: "rgba(255,255,255,.35)" }}>
+                  Until the invoice is raised this balance is on no ledger, no statement and no ageing report.
+                </span>
+              )}
+            </div>
+
+            {/* Receiving an instalment is a posting too, so it lives here rather
+                than as a date typed into the row above. */}
+            {b.invoiceNo && b.instalments.some((i) => !i.paidDate) && (
+              <div style={{ marginTop: 14 }}>
+                <div style={{ fontSize: 11.5, color: "rgba(255,255,255,.4)", marginBottom: 8 }}>Receive an instalment</div>
+                <div style={{ display: "flex", flexDirection: "column", gap: 7 }}>
+                  {b.instalments.filter((i) => !i.paidDate).map((inst) => (
+                    <div key={inst.id} style={{ display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
+                      <span style={{ fontSize: 12.5, color: "rgba(255,255,255,.6)", minWidth: 190 }}>
+                        due {inst.dueDate || "—"} ·{" "}
+                        <strong style={{ color: "#fff", fontFamily: "ui-monospace, monospace" }}>
+                          {inst.amount.toLocaleString()}
+                        </strong>
+                      </span>
+                      <button
+                        onClick={() => post("booking-receipt", { recordId: editing.id, instalmentId: inst.id }, (r) => `${Number(r.amount).toLocaleString()} received into ${r.into} — ${r.voucherNo}. Balance ${Number(r.balance).toLocaleString()}.`)}
+                        disabled={busyAction !== ""}
+                        style={{ padding: "6px 14px", borderRadius: 8, background: "rgba(56,189,248,.12)", border: "1px solid rgba(56,189,248,.35)", color: accent, fontSize: 12, fontWeight: 700, fontFamily: "inherit", cursor: "pointer" }}>
+                        {busyAction === "booking-receipt" ? "Posting…" : "Receive"}
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* A cancellation is three figures and only one of them is arithmetic,
+            so it asks rather than assumes. */}
+        {cancelling && editing.id && (
+          <div onClick={() => setCancelling(null)}
+            style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.72)", zIndex: 60, display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }}>
+            <div onClick={(e) => e.stopPropagation()}
+              style={{ background: "#161b27", border: `1px solid ${border}`, borderRadius: 16, padding: 26, width: 460, fontFamily: ff }}>
+              <h2 style={{ margin: "0 0 4px", fontSize: 18, fontWeight: 800 }}>Cancel {b.partyName || "booking"}</h2>
+              <div style={{ fontSize: 12.5, color: "rgba(255,255,255,.42)", marginBottom: 18, lineHeight: 1.6 }}>
+                {money.paid.toLocaleString()} has been received. Keep the agency&rsquo;s charge out of it and refund
+                the rest — the two together cannot come to more than what was paid.
+              </div>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 14 }}>
+                <div>
+                  <label style={label}>Agency keeps</label>
+                  <input type="number" min={0} step="any" value={cancelling.charge} autoFocus
+                    onChange={(e) => setCancelling({ ...cancelling, charge: e.target.value, refund: String(Math.max(0, money.paid - (Number(e.target.value) || 0))) })}
+                    onFocus={(e) => e.currentTarget.select()} style={{ ...input, textAlign: "right" }} />
+                </div>
+                <div>
+                  <label style={label}>Refund to the party</label>
+                  <input type="number" min={0} step="any" value={cancelling.refund}
+                    onChange={(e) => setCancelling({ ...cancelling, refund: e.target.value })}
+                    onFocus={(e) => e.currentTarget.select()} style={{ ...input, textAlign: "right" }} />
+                </div>
+              </div>
+              <div style={{ marginBottom: 16 }}>
+                <label style={label}>Reason</label>
+                <input value={cancelling.reason} placeholder="Visa refused, family withdrew…"
+                  onChange={(e) => setCancelling({ ...cancelling, reason: e.target.value })} style={input} />
+              </div>
+              <div style={{ fontSize: 11.5, color: "rgba(255,255,255,.4)", marginBottom: 16, lineHeight: 1.7 }}>
+                {money.pax} seat{money.pax === 1 ? "" : "s"} go back on the departure.
+                {b.invoiceNo ? ` A credit note reverses ${b.invoiceNo}.` : " Nothing was invoiced, so there is nothing to reverse."}
+              </div>
+              <div style={{ display: "flex", gap: 12 }}>
+                <button
+                  onClick={() => post("booking-cancel", { recordId: editing.id, charge: Number(cancelling.charge) || 0, refund: Number(cancelling.refund) || 0, reason: cancelling.reason }, (r) => `Cancelled — kept ${Number(r.charge).toLocaleString()}, refunded ${Number(r.refund).toLocaleString()}, ${r.seatsReleased} seat(s) released.`)}
+                  disabled={busyAction !== ""}
+                  style={{ flex: 1, padding: "11px 0", border: "none", borderRadius: 9, background: "#ef4444", color: "#fff", fontSize: 14, fontWeight: 800, fontFamily: "inherit", cursor: "pointer" }}>
+                  {busyAction === "booking-cancel" ? "Cancelling…" : "Cancel the booking"}
+                </button>
+                <button onClick={() => setCancelling(null)}
+                  style={{ padding: "11px 20px", background: "transparent", border: `1px solid ${border}`, borderRadius: 9, color: "rgba(255,255,255,.65)", fontSize: 14, fontFamily: "inherit", cursor: "pointer" }}>
+                  Back
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     );
   }
