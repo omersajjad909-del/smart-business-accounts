@@ -1718,15 +1718,62 @@ export const BUSINESS_TYPES: BusinessTypeMeta[] = [
     tagline: "Quote → Book → Issue → Support",
     color: "#38bdf8", gradient: "linear-gradient(135deg,#0ea5e9,#38bdf8)", category: "Services",
     modules: [...coreModulesFor("travel"), "travel_bookings","visa_processing","travel_settlements"],
+    /*
+     * The chart a travel agency actually posts to.
+     *
+     * It used to seed seven heads while the module posted to twelve, so the
+     * rest were created on the fly the first time a settlement or a refund
+     * needed one. That works, but it means a new agency opens its chart of
+     * accounts and cannot see where its money is going to land — and the heads
+     * arrive one at a time, in the order things happened to go wrong.
+     *
+     * Grouped the way the trade thinks rather than the way a textbook does:
+     * what is sold (4xxx), what it was bought for (5xxx), and the two ends of
+     * the money — pilgrims who owe, airlines and hotels who are owed.
+     */
     defaultAccounts: [
       ...COMMON_ACCOUNTS,
+
+      // ── Who owes the agency ──
       { code: "1100", name: "Customer Receivables", type: "Asset" },
+      { code: "1101", name: "Pilgrims & Passengers", type: "Asset" },
+      { code: "1102", name: "Sub-Agents", type: "Asset" },
+      // Visa fees and hotel deposits paid out long before the trip. Real money
+      // gone with nothing yet earned against it, so it is an asset and not a
+      // cost until the pilgrim travels.
+      { code: "1150", name: "Advances to Suppliers", type: "Asset" },
+
+      // ── Who the agency owes ──
+      { code: "2100", name: "Airlines & Consolidators", type: "Liability" },
+      { code: "2101", name: "Saudi Hotels", type: "Liability" },
+      { code: "2102", name: "Visa Agents & Embassies", type: "Liability" },
+      { code: "2103", name: "Ground Transport", type: "Liability" },
+      // Instalments taken before the package is invoiced. The agency holds the
+      // money and has delivered nothing — it is owed, not earned.
+      { code: "2150", name: "Advance from Pilgrims", type: "Liability" },
+
+      // ── What is sold ──
       { code: "4001", name: "Air Ticket Revenue", type: "Revenue" },
       { code: "4002", name: "Visa Processing Revenue", type: "Revenue" },
       { code: "4003", name: "Travel Service Charges", type: "Revenue" },
+      { code: "4004", name: "Hotel Booking Revenue", type: "Revenue" },
+      { code: "4005", name: "Hajj & Umrah Package Revenue", type: "Revenue" },
+      // Kept out of a cancellation. Its own head, so a month of cancellations
+      // reads as cancellations and not as a thinner month of sales.
+      { code: "4009", name: "Cancellation & Service Charges", type: "Revenue" },
+
+      // ── What it cost ──
       { code: "5100", name: "Airline Settlement Cost", type: "Expense" },
       { code: "5101", name: "Embassy / Visa Fee", type: "Expense" },
       { code: "5102", name: "Travel & Courier Expense", type: "Expense" },
+      { code: "5103", name: "Hotel Supplier Cost", type: "Expense" },
+      { code: "5104", name: "Tour Supplier Cost", type: "Expense" },
+      // What the airline keeps when a ticket is refunded. A real cost of the
+      // cancellation, and the number that says whether cancelling is expensive.
+      { code: "5105", name: "Supplier Cancellation Charges", type: "Expense" },
+      { code: "5106", name: "Ziyarat & Local Transport", type: "Expense" },
+      { code: "5107", name: "Meals & Catering", type: "Expense" },
+      { code: "5108", name: "Travel Insurance", type: "Expense" },
     ],
     kpis: [
       { key: "tickets_issued", label: "Tickets Issued", icon: "🎫", color: "#38bdf8" },
