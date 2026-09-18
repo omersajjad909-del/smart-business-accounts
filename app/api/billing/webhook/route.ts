@@ -6,7 +6,7 @@ import { createHmac, timingSafeEqual } from "crypto";
 import { sendEmail } from "@/lib/email";
 import { emailTemplates } from "@/lib/emailTemplates";
 import { cancelLemonSubscription, mapLemonSubscriptionStatus, verifyLemonSignature } from "@/lib/lemonsqueezy";
-import { mapSafepayEventToStatus, verifySafepaySignature } from "@/lib/safepay";
+import { mapSafepayEventToStatus, paisaToPkr, verifySafepaySignature } from "@/lib/safepay";
 import {
   PAYMENT_EVENT_DEDUPE_WINDOW_MS,
   createBillingInvoiceAccessToken,
@@ -1014,10 +1014,16 @@ async function handleSafepayWebhook(req: NextRequest, raw: string) {
   const event    = String(payload?.type || payload?.event || "");
   const data     = payload?.data || payload?.payload || {};
   const tracker  = String(data?.tracker?.token || data?.tracker || payload?.tracker || "");
-  const orderId  = String(data?.order?.ref || data?.order_id || payload?.order_id || "");
-  const meta     = data?.metadata || data?.order?.metadata || payload?.metadata || {};
+  const meta     = data?.tracker?.metadata || data?.metadata || data?.order?.metadata || payload?.metadata || {};
+  const orderId  = String(
+    meta?.order_id || data?.order?.ref || data?.order_id || payload?.order_id || "",
+  );
 
-  // Extract companyId from metadata or order ref pattern (fnv-<companyId>-<ts>)
+  // companyId rides in the v3 `metadata` object, which is what createSafepayCheckout
+  // now sends. The order-ref parse below is the v1-era fallback: that API dropped
+  // metadata entirely (it answered `metadata: null`), so `fnv-<companyId>-<ts>` was
+  // the only place the company survived the round trip. Kept because a checkout
+  // started before this change can still settle after it.
   let companyId = String(meta?.company_id || "").trim();
   if (!companyId && orderId.startsWith("fnv-")) {
     const parts = orderId.split("-");
@@ -1025,12 +1031,12 @@ async function handleSafepayWebhook(req: NextRequest, raw: string) {
   }
   if (!companyId) return apiError("Missing company_id in Safepay webhook", 400);
 
-  // Safepay's /order/v1/init accepts no metadata — it answers `metadata: null`
-  // and forgets it — so plan and cycle cannot survive the round trip the way
-  // they do with Lemon Squeezy. Defaulting instead meant every Safepay buyer
-  // landed on STARTER/MONTHLY no matter what they picked and paid for.
-  // createSafepayCheckout already logged the real values against this tracker,
-  // so read them back before falling back.
+  // Same story for plan and cycle. Under v1 they could not survive the round trip
+  // at all, and defaulting meant every Safepay buyer landed on STARTER/MONTHLY no
+  // matter what they picked and paid for; createSafepayCheckout logged the real
+  // values against the tracker so they could be read back. v3 carries them in
+  // metadata, so this lookback should now be dead weight — but it stays until a
+  // live payment has proven that, because guessing the plan is guessing the price.
   let planCode = String(meta?.plan_code || "").toUpperCase();
   let cycleRaw = String(meta?.billing_cycle || "").toUpperCase();
 
@@ -1065,7 +1071,15 @@ async function handleSafepayWebhook(req: NextRequest, raw: string) {
 
   const status = mapSafepayEventToStatus(event);
 
-  const amountPkr = typeof data?.order?.amount === "number" ? data.order.amount : null;
+  // Safepay quotes money in paisa, not rupees. Taken at face value this wrote a
+  // Rs 13,720 charge into the ledger, the receipt email and lifetime `totalPaid`
+  // as Rs 1,372,000 — a 100x overstatement on every Pakistani invoice.
+  const rawAmount =
+    typeof data?.tracker?.amount === "number" ? data.tracker.amount
+    : typeof data?.amount === "number"        ? data.amount
+    : typeof data?.order?.amount === "number" ? data.order.amount
+    : null;
+  const amountPkr = rawAmount == null ? null : paisaToPkr(rawAmount);
 
   if (status === "ACTIVE") {
     // Calculate 30-day (monthly) or 365-day (yearly) period end
@@ -1131,9 +1145,44 @@ async function handleSafepayWebhook(req: NextRequest, raw: string) {
     const nextBilling = currentPeriodEnd.toLocaleDateString("en-GB", { day: "2-digit", month: "long", year: "numeric" });
     await sendPaymentConfirmationEmail(companyId, planCode, amountPkr || 0, "PKR", nextBilling);
 
-    if (event.includes("subscription:activated") || event.includes("payment:created")) {
+    // First purchase only — never a renewal. Matched exactly rather than with
+    // `includes`, because "subscription.payment.succeeded" (a renewal) contains
+    // "payment.succeeded" (a first charge) as a substring, so a loose test would
+    // welcome the same customer aboard every billing cycle.
+    const FIRST_CHARGE_EVENTS = new Set([
+      "payment.succeeded",
+      "subscription.created",
+      // v1 spellings, retained alongside the v1 aliases in mapSafepayEventToStatus
+      "subscription:activated",
+      "payment:created",
+    ]);
+    if (FIRST_CHARGE_EVENTS.has(event.toLowerCase())) {
       await sendWelcomeSubscriptionEmail(companyId, planCode, "PK");
     }
+  }
+
+  if (status === "REFUNDED") {
+    // Money going back out. `markPlatformInvoiceRefunded` keys off the same
+    // providerEventId the successful charge was written under, so the refund
+    // lands on the original ledger row rather than creating a second one.
+    await markPlatformInvoiceRefunded({
+      providerEventId: `safepay:${tracker || orderId}`,
+      providerOrderId: orderId || null,
+      companyId,
+      amount: amountPkr || 0,
+    }).catch(() => {});
+
+    await reverseRefundFromSubscriptionTotals(companyId, amountPkr || 0);
+
+    await prisma.activityLog.create({
+      data: {
+        companyId, userId: null,
+        action: "SAFEPAY_PAYMENT_REFUNDED",
+        details: JSON.stringify({ event, planCode, tracker, orderId, amountPkr }),
+      },
+    }).catch(() => {});
+
+    await sendRefundConfirmationEmail(companyId, planCode, amountPkr || 0, "PKR");
   }
 
   if (status === "PAST_DUE") {

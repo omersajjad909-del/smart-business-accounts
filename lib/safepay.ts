@@ -1,50 +1,77 @@
 import { createHmac, timingSafeEqual } from "crypto";
 
-// ─── Safepay API base URLs ─────────────────────────────────────────────────────
-// Adjust these if Safepay updates their endpoints.
-const SANDBOX_BASE  = "https://sandbox.api.getsafepay.com";
-const PROD_BASE     = "https://api.getsafepay.com";
-// Hosted checkout lives on Safepay's own API host. Two earlier values were
-// both dead ends, so don't "restore" either from an old doc or gist:
+// ─── Safepay API hosts ────────────────────────────────────────────────────────
+// Verified against @sfpy/node-core 0.3.5 (the library Safepay's own docs tell
+// you to install). Everything below that looks arbitrary was read out of that
+// package rather than guessed — see the note on the checkout host.
+const SANDBOX_BASE = "https://sandbox.api.getsafepay.com";
+const PROD_BASE    = "https://api.getsafepay.com";
+
+// Hosted checkout is NOT served from the API host in production, and the path
+// is /embedded/, not /checkout/pay. Three earlier values were all dead ends;
+// don't "restore" any of them from an old gist or doc page:
 //   safepay.pk/checkout  — that domain never served this flow.
-//   .../components       — Safepay retired it; it now answers 301 to
-//                          getsafepay.pk, dropping the buyer on the marketing
-//                          site mid-purchase. Still what the public gists and
-//                          the netlify docs tell you to use.
-// /checkout/pay is what actually serves the checkout app today (verified
-// against sandbox: a bogus path returns a different, smaller shell).
-const SANDBOX_CHECKOUT = "https://sandbox.api.getsafepay.com/checkout/pay";
-const PROD_CHECKOUT    = "https://api.getsafepay.com/checkout/pay";
+//   .../components       — retired; 301s to getsafepay.pk, dropping the buyer
+//                          on the marketing site mid-purchase.
+//   .../checkout/pay     — answered with a checkout-looking shell, but it is
+//                          not the v3 entry point and never carries the tbt.
+// hostUrls in @sfpy/node-core/esm/Checkout.js is the authority here.
+const SANDBOX_CHECKOUT = "https://sandbox.api.getsafepay.com/embedded/";
+const PROD_CHECKOUT    = "https://getsafepay.com/embedded/";
 
 function env(name: string) {
   return process.env[name]?.trim() || "";
 }
 
+function isProduction() {
+  return env("SAFEPAY_ENVIRONMENT") === "production";
+}
 function getBase() {
-  return env("SAFEPAY_ENVIRONMENT") === "production" ? PROD_BASE : SANDBOX_BASE;
+  return isProduction() ? PROD_BASE : SANDBOX_BASE;
 }
 function getCheckoutBase() {
-  return env("SAFEPAY_ENVIRONMENT") === "production" ? PROD_CHECKOUT : SANDBOX_CHECKOUT;
+  return isProduction() ? PROD_CHECKOUT : SANDBOX_CHECKOUT;
 }
 
-/** The literal Safepay expects in the init body and the `env` query param. */
-function getEnvName() {
-  return env("SAFEPAY_ENVIRONMENT") === "production" ? "production" : "sandbox";
+/** The literal Safepay expects in the `environment` query param and v3 body. */
+function getEnvName(): "production" | "sandbox" {
+  return isProduction() ? "production" : "sandbox";
+}
+
+/**
+ * Server-to-server auth. Safepay issues two credentials and they are not
+ * interchangeable:
+ *   SAFEPAY_API_KEY    — the public merchant key. Travels in the v3 request
+ *                        *body* as `merchant_api_key`.
+ *   SAFEPAY_SECRET_KEY — the secret. Travels in the `x-sfpy-merchant-secret`
+ *                        *header*. Never in a body, never in a URL.
+ * Sending the key as `Authorization: Bearer` (what the old v1 code did before
+ * it gave up and moved the key into the body) makes Safepay answer 417 with
+ * "Expected required but got for field: Client / Environment" — the credential
+ * is never read at all.
+ */
+function authHeaders(): Record<string, string> {
+  return {
+    "Content-Type": "application/json",
+    Accept: "application/json",
+    "x-sfpy-merchant-secret": env("SAFEPAY_SECRET_KEY"),
+  };
 }
 
 export function hasSafepayConfig() {
-  return Boolean(env("SAFEPAY_API_KEY") && env("SAFEPAY_WEBHOOK_SECRET"));
+  return Boolean(
+    env("SAFEPAY_API_KEY") && env("SAFEPAY_SECRET_KEY") && env("SAFEPAY_WEBHOOK_SECRET"),
+  );
 }
 
 /**
  * Whether Safepay may take a live customer's payment.
  *
- * Credentials alone are not permission. The merchant account is still in
- * Safepay's due-diligence review, so the keys on this deployment are sandbox
- * ones — and having them present routed every Pakistani customer to a checkout
- * that either fails outright ("Failed to create Safepay checkout session") or,
- * worse, succeeds against sandbox.safepay.pk and takes no real money while
- * looking like it did. Until approval lands, Pakistan checks out through Lemon
+ * Credentials alone are not permission. The merchant account goes through
+ * Safepay's KYC review before live keys are issued, and having sandbox keys
+ * present once routed every Pakistani customer to a checkout that either failed
+ * outright or succeeded against sandbox and took no real money while looking
+ * like it had. Until approval lands, Pakistan checks out through Lemon
  * Squeezy's _PK variants, which carry the same PKR-equivalent prices.
  *
  * Deliberately opt-in rather than opt-out: an unapproved gateway must not
@@ -58,11 +85,25 @@ export function isSafepayCheckoutEnabled() {
   return hasSafepayConfig() && env("SAFEPAY_CHECKOUT_ENABLED").toLowerCase() === "true";
 }
 
+// ─── Money ────────────────────────────────────────────────────────────────────
+// Safepay represents every amount in the currency's minor unit: PKR in paisa,
+// USD in cents. Sending rupees where paisa were expected undercharges by 100x
+// (a Rs 13,720 plan collects Rs 137.20); reading a paisa figure back as rupees
+// overstates revenue by the same factor. Both directions go through here.
+
+export function pkrToPaisa(rupees: number): number {
+  return Math.round(rupees * 100);
+}
+
+export function paisaToPkr(paisa: number): number {
+  return Math.round(paisa) / 100;
+}
+
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 export type SafepayCheckoutInput = {
   orderId: string;          // Our unique reference (e.g. company_id + timestamp)
-  amountPkr: number;        // Amount in PKR (rupees, not paisa)
+  amountPkr: number;        // Amount in PKR (rupees — converted to paisa here)
   companyId: string;
   userId?: string | null;
   planCode: string;
@@ -79,118 +120,240 @@ export type SafepayCheckoutResult = {
   orderId: string;
 };
 
+// ─── Error reporting ──────────────────────────────────────────────────────────
+
+/**
+ * Safepay reports failures under `status`, not at the top level. Reading only
+ * the top level turned every error into the same useless "Failed to create
+ * Safepay checkout session." with the real reason discarded.
+ */
+function safepayError(step: string, response: Response, json: any): Error {
+  const detail =
+    (Array.isArray(json?.status?.errors) && json.status.errors.length
+      ? json.status.errors.join("; ")
+      : null) ||
+    json?.status?.message ||
+    json?.message ||
+    json?.error ||
+    json?.errors?.[0]?.message ||
+    "no detail returned";
+  return new Error(`Safepay ${step} failed (HTTP ${response.status}): ${detail}`);
+}
+
 // ─── Create checkout session ──────────────────────────────────────────────────
 
+/**
+ * Express Checkout, as documented at
+ * https://safepay-docs.netlify.app/build-your-integration/express-checkout
+ *
+ * Three calls, in order, and all three are load-bearing:
+ *   1. POST /order/payments/v3/       → tracker token
+ *   2. POST /client/passport/v1/token → time-based token (tbt)
+ *   3. build the /embedded/ URL carrying both
+ *
+ * The tbt is what the old v1 integration was missing. Without it the checkout
+ * page loads and then cannot authenticate its own client-side calls, which is
+ * why hand-built URLs kept half-working.
+ */
 export async function createSafepayCheckout(input: SafepayCheckoutInput): Promise<SafepayCheckoutResult> {
   const apiKey = env("SAFEPAY_API_KEY");
   if (!apiKey) throw new Error("Safepay is not configured.");
+  if (!env("SAFEPAY_SECRET_KEY")) throw new Error("SAFEPAY_SECRET_KEY is not set.");
 
-  // /order/v1/init authenticates on the body, not on a header. Sending the key
-  // as `Authorization: Bearer` made Safepay answer 417 with "Expected required
-  // but got for field: Client / Environment" — the key was never read at all.
-  //
-  // It also accepts only these four fields. order_id, metadata, success_url,
-  // cancel_url and customer were all being posted here and all silently
-  // dropped (init echoes back `metadata: null`); the ones that matter travel on
-  // the checkout URL below instead.
-  const body = {
-    client:      apiKey,
-    environment: getEnvName(),
-    currency:    "PKR",
-    amount:      Math.round(input.amountPkr),   // Safepay expects whole rupees
+  // ── 1. Payment session ──
+  // Unlike v1's /order/v1/init, v3 stores `metadata` and hands it back on the
+  // webhook. That is the whole reason the webhook no longer has to reverse a
+  // companyId out of the order-ID string.
+  const sessionBody = {
+    merchant_api_key: apiKey,
+    intent:           "CYBERSOURCE",   // card payments (Visa / Mastercard)
+    mode:             "payment",
+    entry_mode:       "raw",
+    currency:         "PKR",
+    amount:           pkrToPaisa(input.amountPkr),
+    metadata: {
+      order_id:      input.orderId,
+      company_id:    input.companyId,
+      plan_code:     input.planCode,
+      billing_cycle: input.billingCycle,
+      ...(input.userId ? { user_id: input.userId } : {}),
+      ...(input.customerEmail ? { customer_email: input.customerEmail } : {}),
+      ...(input.customerName ? { customer_name: input.customerName } : {}),
+    },
   };
 
-  const response = await fetch(`${getBase()}/order/v1/init`, {
+  const sessionRes = await fetch(`${getBase()}/order/payments/v3/`, {
     method:  "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(body),
+    headers: authHeaders(),
+    body:    JSON.stringify(sessionBody),
   });
+  const sessionJson = await sessionRes.json().catch(() => ({}));
+  if (!sessionRes.ok) throw safepayError("payment session setup", sessionRes, sessionJson);
 
-  const json = await response.json().catch(() => ({}));
-  if (!response.ok) {
-    // Safepay reports failures under `status`, not at the top level. Reading
-    // only the top level turned every error into the same useless
-    // "Failed to create Safepay checkout session." with the real reason
-    // discarded, so keep the status code and whatever Safepay actually said.
-    const detail =
-      (Array.isArray(json?.status?.errors) && json.status.errors.length
-        ? json.status.errors.join("; ")
-        : null) ||
-      json?.status?.message ||
-      json?.message ||
-      json?.error ||
-      json?.errors?.[0]?.message ||
-      "Failed to create Safepay checkout session.";
-    throw new Error(`Safepay init failed (HTTP ${response.status}): ${detail}`);
-  }
-
-  // Init returns the tracker token at data.token.
-  const tracker =
-    json?.data?.token || json?.data?.tracker?.token || json?.tracker?.token || json?.token;
+  const tracker = sessionJson?.data?.tracker?.token || sessionJson?.data?.token;
   if (!tracker) {
-    throw new Error("Safepay checkout tracker token was missing in response.");
+    throw new Error("Safepay payment session returned no tracker token.");
   }
 
-  // Everything init refused to store rides on the redirect instead. order_id
-  // is load-bearing: it is the only place the webhook can recover which
-  // company paid, via the `fnv-<companyId>-<ts>` pattern.
+  // ── 2. Passport (time-based) token ──
+  const passportRes = await fetch(`${getBase()}/client/passport/v1/token`, {
+    method:  "POST",
+    headers: authHeaders(),
+    body:    JSON.stringify({}),
+  });
+  const passportJson = await passportRes.json().catch(() => ({}));
+  if (!passportRes.ok) throw safepayError("passport token", passportRes, passportJson);
+
+  const tbt = typeof passportJson?.data === "string" ? passportJson.data : passportJson?.data?.token;
+  if (!tbt) {
+    throw new Error("Safepay passport token was missing in response.");
+  }
+
+  // ── 3. Hosted checkout URL ──
+  // `source` is a closed set — "hosted" | "mobile" | "popup" | "woocommerce" |
+  // "shopify". The old code sent "finovaos", which is not one of them.
   const params = new URLSearchParams({
-    env:          getEnvName(),
-    beacon:       String(tracker),
-    source:       "finovaos",
+    environment:  getEnvName(),
+    tracker:      String(tracker),
+    tbt:          String(tbt),
+    source:       "hosted",
     order_id:     input.orderId,
     redirect_url: input.successUrl,
     cancel_url:   input.cancelUrl,
+    ...(input.userId ? { user_id: input.userId } : {}),
   });
   const checkoutUrl = `${getCheckoutBase()}?${params.toString()}`;
 
   return { checkoutUrl, tracker: String(tracker), orderId: input.orderId };
 }
 
-// ─── Webhook signature verification ──────────────────────────────────────────
-// Safepay signs webhooks with HMAC-SHA256 of the raw body using the webhook secret.
-// The signature is sent in the `x-sfpy-signature` header.
+// ─── Payment status ───────────────────────────────────────────────────────────
 
-export function verifySafepaySignature(rawBody: string, signatureHeader: string | null): boolean {
-  const secret = env("SAFEPAY_WEBHOOK_SECRET");
-  if (!secret || !signatureHeader || !rawBody) return false;
+export type SafepayPaymentStatus = {
+  state: string;            // e.g. TRACKER_STARTED, TRACKER_ENDED
+  paid: boolean;
+  amountPkr: number | null;
+  raw: any;
+};
+
+/**
+ * Ask Safepay directly what happened to a tracker.
+ *
+ * The webhook is still the system of record, but it is delivered best-effort —
+ * a retry window that outlasts the buyer's patience leaves a paying customer
+ * sitting on an unactivated plan. The success redirect can call this to settle
+ * immediately and let the webhook arrive later as a no-op (the alreadyProcessed
+ * guard in the webhook route makes the second one idempotent).
+ */
+export async function fetchSafepayPaymentStatus(tracker: string): Promise<SafepayPaymentStatus | null> {
+  if (!tracker || !env("SAFEPAY_SECRET_KEY")) return null;
 
   try {
-    const provided = Buffer.from(signatureHeader.replace(/^sha256=/, ""), "hex");
-    const expected = Buffer.from(
-      createHmac("sha256", secret).update(rawBody).digest("hex"),
-      "hex",
+    const res = await fetch(
+      `${getBase()}/reporter/api/v1/payments/${encodeURIComponent(tracker)}`,
+      { method: "GET", headers: authHeaders() },
     );
-    if (provided.length === 0 || provided.length !== expected.length) return false;
-    return timingSafeEqual(expected, provided);
+    const json = await res.json().catch(() => ({}));
+    if (!res.ok) return null;
+
+    const t = json?.data?.tracker || json?.data || {};
+    const state = String(t?.state || "");
+    const rawAmount = typeof t?.amount === "number" ? t.amount : null;
+
+    return {
+      state,
+      paid: state.toUpperCase() === "TRACKER_ENDED",
+      amountPkr: rawAmount == null ? null : paisaToPkr(rawAmount),
+      raw: json,
+    };
   } catch {
-    return false;
+    return null;
   }
 }
 
-// ─── Status mapping ───────────────────────────────────────────────────────────
-// Maps Safepay event/payment state to our internal subscription status.
+// ─── Webhook signature verification ──────────────────────────────────────────
+// Safepay signs the raw request body with HMAC-SHA512 and sends the hex digest
+// in the `X-SFPY-SIGNATURE` header. This was SHA-256 until it was checked
+// against the docs, which meant the digest lengths never even matched and every
+// genuine webhook was rejected with "Invalid Safepay signature" — no Safepay
+// payment could ever activate a plan.
 
-export function mapSafepayEventToStatus(event: string): "ACTIVE" | "PAST_DUE" | "CANCELLED" | "INACTIVE" {
+/**
+ * Safepay's docs warn that a rotated HMAC key takes time to propagate and that
+ * you must keep accepting the previous one meanwhile. Set
+ * SAFEPAY_WEBHOOK_SECRET_PREVIOUS for the duration of a rotation, then remove it.
+ */
+function webhookSecrets(): string[] {
+  return [env("SAFEPAY_WEBHOOK_SECRET"), env("SAFEPAY_WEBHOOK_SECRET_PREVIOUS")].filter(Boolean);
+}
+
+export function verifySafepaySignature(rawBody: string, signatureHeader: string | null): boolean {
+  const secrets = webhookSecrets();
+  if (!secrets.length || !signatureHeader || !rawBody) return false;
+
+  // Tolerate a `sha512=` prefix; Safepay sends a bare hex digest today, but
+  // prefixed digests are common enough that stripping one costs nothing.
+  const provided = Buffer.from(signatureHeader.trim().replace(/^sha512=/i, ""), "hex");
+  if (provided.length === 0) return false;
+
+  for (const secret of secrets) {
+    try {
+      const expected = createHmac("sha512", secret).update(rawBody, "utf8").digest();
+      if (provided.length !== expected.length) continue;
+      if (timingSafeEqual(expected, provided)) return true;
+    } catch {
+      // try the next secret
+    }
+  }
+  return false;
+}
+
+// ─── Status mapping ───────────────────────────────────────────────────────────
+// Event names come from
+// https://safepay-docs.netlify.app/developers/webhooks/webhook-types and are
+// dot-separated. The v1 colon-separated spellings (payment:created,
+// subscription:cancelled) are kept as aliases only because nothing has yet
+// confirmed which set a live account emits; drop them once sandbox has.
+
+export function mapSafepayEventToStatus(event: string): "ACTIVE" | "PAST_DUE" | "CANCELLED" | "REFUNDED" | "INACTIVE" {
   switch (String(event || "").toLowerCase()) {
+    // A completed charge — initial purchase or a renewal.
+    case "payment.succeeded":
+    case "subscription.created":
+    case "subscription.resumed":
+    case "subscription.payment.succeeded":
+    // v1 aliases
     case "payment:created":
     case "payment:success":
     case "payment.success":
-    // Safepay's Payments 2.0 event set spells this one 'succeeded'. The v1
-    // integration (/order/v1/init) fires payment:created instead, but the
-    // sandbox dashboard offers both, so accept either rather than letting a
-    // paid order fall through to INACTIVE and silently do nothing.
-    case "payment.succeeded":
     case "payment:succeeded":
     case "subscription:activated":
       return "ACTIVE";
-    case "payment:failed":
+
+    // A charge that did not go through. Renewal failures land here too, which
+    // is what keeps a lapsing customer out of ACTIVE — the old mapper had no
+    // case for subscription.payment.failed at all, so renewals silently did
+    // nothing and a failing card never showed as past due.
     case "payment.failed":
+    case "subscription.payment.failed":
+    case "subscription.paused":
+    case "payment:failed":
     case "subscription:past_due":
       return "PAST_DUE";
+
+    case "subscription.canceled":
+    case "subscription.cancelled":
+    case "subscription.ended":
     case "subscription:cancelled":
     case "subscription:canceled":
       return "CANCELLED";
+
+    case "payment.refunded":
+      return "REFUNDED";
+
+    // authorization.* and void.* describe an auth hold, not settled money, and
+    // deliberately fall through — acting on them would activate a plan against
+    // a charge that has not captured.
     default:
       return "INACTIVE";
   }
