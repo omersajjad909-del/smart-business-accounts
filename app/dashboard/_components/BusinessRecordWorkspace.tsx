@@ -1,5 +1,5 @@
 "use client";
-import { confirmToast, alertToast } from "@/lib/toast-feedback";
+import { confirmToast } from "@/lib/toast-feedback";
 
 import { useMemo, useState } from "react";
 import { useBusinessRecords, type BusinessRecord } from "@/lib/useBusinessRecords";
@@ -74,9 +74,33 @@ type BusinessRecordWorkspaceProps = {
 };
 
 const shellFont = "'Outfit','Inter',sans-serif";
-const panelBg = "rgba(255,255,255,.03)";
-const panelBorder = "rgba(255,255,255,.07)";
-const inputBg = "rgba(15,23,42,.72)";
+
+/* Theme variables rather than hard-coded dark values.
+   The shell around this workspace switches between light and dark; the panel
+   inside it used to be painted in fixed whites-on-transparent, so in light mode
+   the records read as white text on a white card. */
+const panelBg = "var(--card-bg)";
+const panelBorder = "var(--border)";
+const inputBg = "var(--input-bg)";
+const textPrimary = "var(--text-primary)";
+const textMuted = "var(--text-muted)";
+
+/* Hover, sticky cells and the scrollbar need real CSS — a :hover or a
+   ::-webkit-scrollbar cannot be written as an inline style. */
+const workspaceCss = `
+.sba-scroll{overflow:auto;overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch}
+.sba-scroll::-webkit-scrollbar{height:9px;width:9px}
+.sba-scroll::-webkit-scrollbar-track{background:transparent}
+.sba-scroll::-webkit-scrollbar-thumb{background:var(--border);border-radius:999px}
+.sba-scroll::-webkit-scrollbar-thumb:hover{background:var(--text-muted)}
+.sba-table{width:100%;min-width:max-content;border-collapse:separate;border-spacing:0}
+.sba-table thead th{position:sticky;top:0;z-index:2;background:var(--card-bg)}
+.sba-table th.sba-sticky{right:0;z-index:3}
+.sba-table td.sba-sticky{position:sticky;right:0;z-index:1;background:var(--card-bg)}
+.sba-table td.sba-sticky::before,.sba-table th.sba-sticky::before{content:"";position:absolute;left:0;top:0;bottom:0;width:18px;transform:translateX(-100%);pointer-events:none;background:linear-gradient(to right,rgba(0,0,0,0),rgba(0,0,0,.18))}
+.sba-table tbody tr:hover td{background:var(--panel-bg-2)}
+.sba-table tbody tr:last-child td{border-bottom:none}
+`;
 
 function formatCellValue(value: unknown) {
   if (value === null || value === undefined || value === "") return "-";
@@ -108,7 +132,7 @@ export function BusinessRecordWorkspace({
     [defaultValues, fields],
   );
 
-  const { isMobile } = useResponsive();
+  const { isMobile, isTablet } = useResponsive();
   const { records, loading, create, remove, setStatus, refetch } = useBusinessRecords(category);
   const [form, setForm] = useState<Record<string, string>>(initialForm);
   const [search, setSearch] = useState("");
@@ -176,14 +200,119 @@ export function BusinessRecordWorkspace({
     }
   }
 
+  /* The controls of one row — the status box, the page's own actions, Delete.
+     Shared, because the wide screen shows them in the last table cell and the
+     narrow one shows them at the foot of a card, and they must not drift
+     apart. */
+  function renderRowControls(row: Record<string, unknown>, justify: "flex-end" | "flex-start") {
+    const rowId = String(row.id);
+    const rowStatus = String(row.status ?? "");
+    return (
+      <div style={{ display: "flex", gap: 6, justifyContent: justify, alignItems: "center", flexWrap: isMobile ? "wrap" : "nowrap" }}>
+        {/* One box instead of three pills.
+
+            Every row carried a button per status it was not currently in —
+            "booked", "issued", "refunded" — so a five-status record grew five
+            controls before the real actions even started. A status is one
+            value out of a known list, which is a dropdown; and this way the
+            row also shows what the status IS, which the pills never did. */}
+        {statusOptions.length > 0 && (
+          <select
+            value={rowStatus}
+            onChange={(event) => handleStatusChange(rowId, event.target.value)}
+            style={{
+              borderRadius: 999,
+              border: `1px solid ${accent}44`,
+              background: `${accent}14`,
+              color: accent,
+              fontSize: 11,
+              fontWeight: 700,
+              padding: "5px 8px",
+              cursor: "pointer",
+              fontFamily: "inherit",
+            }}
+          >
+            {/* The current one first, even where it is not a listed option — a
+                record set to something retired should still read back honestly
+                rather than showing the first option as though it were true. */}
+            {!statusOptions.includes(rowStatus) && rowStatus && (
+              <option value={rowStatus}>{rowStatus}</option>
+            )}
+            {statusOptions.map((option) => (
+              <option key={option} value={option}>{option}</option>
+            ))}
+          </select>
+        )}
+        {actions
+          .filter((action) => !action.hidden?.(row))
+          .map((action) => {
+            const label = typeof action.label === "function" ? action.label(row) : action.label;
+            const busy = actionKey === `${rowId}:${label}`;
+            const tone =
+              action.tone === "success"
+                ? { border: "1px solid rgba(52,211,153,.35)", background: "rgba(52,211,153,.12)", color: "#34d399" }
+                : action.tone === "neutral"
+                  ? { border: `1px solid ${panelBorder}`, background: "var(--panel-bg)", color: textPrimary }
+                  : { border: `1px solid ${accent}55`, background: `${accent}18`, color: accent };
+
+            return (
+              <button
+                key={label}
+                type="button"
+                disabled={busy}
+                onClick={() => handleAction(action, row)}
+                style={{
+                  borderRadius: 999,
+                  fontSize: 11,
+                  fontWeight: 700,
+                  padding: "5px 10px",
+                  cursor: busy ? "wait" : "pointer",
+                  opacity: busy ? 0.7 : 1,
+                  whiteSpace: "nowrap",
+                  fontFamily: "inherit",
+                  ...tone,
+                }}
+              >
+                {busy ? "Working..." : label}
+              </button>
+            );
+          })}
+        <button
+          type="button"
+          onClick={() => handleDelete(rowId)}
+          style={{
+            borderRadius: 999,
+            border: "1px solid rgba(248,113,113,.35)",
+            background: "rgba(248,113,113,.12)",
+            color: "#f87171",
+            fontSize: 11,
+            fontWeight: 700,
+            padding: "5px 10px",
+            cursor: "pointer",
+            whiteSpace: "nowrap",
+            fontFamily: "inherit",
+          }}
+        >
+          Delete
+        </button>
+      </div>
+    );
+  }
+
   return (
-    <div style={{ padding: isMobile ? "16px" : "28px 32px", fontFamily: shellFont, color: "#e2e8f0" }}>
+    /* maxWidth + overflow hidden on the page root, and minmax(0,…) on every
+       track below, because a grid or flex track is min-content wide by default
+       — a table of eleven nowrap columns therefore pushed this whole page
+       wider than the window and the right-hand buttons ended up off-screen. */
+    <div style={{ padding: isMobile ? "16px" : "28px 32px", fontFamily: shellFont, color: textPrimary, maxWidth: "100%", overflow: "hidden" }}>
+      <style dangerouslySetInnerHTML={{ __html: workspaceCss }} />
+
       <div style={{ display: "flex", justifyContent: "space-between", gap: 20, flexWrap: "wrap", marginBottom: 24 }}>
-        <div>
-          <h1 style={{ margin: "0 0 6px", fontSize: 24, fontWeight: 800, color: "white" }}>{title}</h1>
-          <p style={{ margin: 0, fontSize: 14, color: "rgba(255,255,255,.45)" }}>{subtitle}</p>
+        <div style={{ minWidth: 0 }}>
+          <h1 style={{ margin: "0 0 6px", fontSize: isMobile ? 20 : 24, fontWeight: 800, color: textPrimary }}>{title}</h1>
+          <p style={{ margin: 0, fontSize: 14, color: textMuted }}>{subtitle}</p>
         </div>
-        <div style={{ minWidth: 260, display: "grid", gap: 10 }}>
+        <div style={{ flex: "0 1 320px", minWidth: 220, display: "grid", gap: 10 }}>
           <input
             value={search}
             onChange={(event) => setSearch(event.target.value)}
@@ -194,8 +323,9 @@ export function BusinessRecordWorkspace({
               border: `1px solid ${panelBorder}`,
               borderRadius: 10,
               padding: "10px 12px",
-              color: "#fff",
+              color: textPrimary,
               fontSize: 13,
+              fontFamily: "inherit",
             }}
           />
           {statusOptions.length ? (
@@ -208,8 +338,9 @@ export function BusinessRecordWorkspace({
                 border: `1px solid ${panelBorder}`,
                 borderRadius: 10,
                 padding: "10px 12px",
-                color: "#fff",
+                color: textPrimary,
                 fontSize: 13,
+                fontFamily: "inherit",
               }}
             >
               <option value="all">All statuses</option>
@@ -223,22 +354,25 @@ export function BusinessRecordWorkspace({
         </div>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(180px,1fr))", gap: 14, marginBottom: 24 }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(150px,1fr))", gap: 14, marginBottom: 24 }}>
         {summaries.map((card) => (
-          <div key={card.label} style={{ background: panelBg, border: `1px solid ${panelBorder}`, borderRadius: 14, padding: "18px 20px" }}>
-            <div style={{ fontSize: 11, color: "rgba(255,255,255,.4)", marginBottom: 6, textTransform: "uppercase", letterSpacing: ".06em" }}>{card.label}</div>
+          <div key={card.label} style={{ background: panelBg, border: `1px solid ${panelBorder}`, borderRadius: 14, padding: "16px 18px", minWidth: 0 }}>
+            <div style={{ fontSize: 11, color: textMuted, marginBottom: 6, textTransform: "uppercase", letterSpacing: ".06em", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{card.label}</div>
             <div style={{ fontSize: 24, fontWeight: 800, color: card.color }}>{card.value}</div>
           </div>
         ))}
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "340px 1fr", gap: 16, alignItems: "start" }}>
-        <form onSubmit={handleCreate} style={{ background: panelBg, border: `1px solid ${panelBorder}`, borderRadius: 16, padding: 20 }}>
-          <div style={{ fontSize: 15, fontWeight: 700, color: "white", marginBottom: 14 }}>Create Record</div>
-          <div style={{ display: "grid", gap: 12 }}>
+      {/* Below a laptop width the form sits above the records instead of beside
+          them: 340px of form plus a wide table in what is left is what pushed
+          the table off the screen on a tablet. */}
+      <div style={{ display: "grid", gridTemplateColumns: isTablet ? "minmax(0,1fr)" : "minmax(280px,340px) minmax(0,1fr)", gap: 16, alignItems: "start" }}>
+        <form onSubmit={handleCreate} style={{ background: panelBg, border: `1px solid ${panelBorder}`, borderRadius: 16, padding: 20, minWidth: 0 }}>
+          <div style={{ fontSize: 15, fontWeight: 700, color: textPrimary, marginBottom: 14 }}>Create Record</div>
+          <div style={{ display: "grid", gridTemplateColumns: isTablet && !isMobile ? "repeat(auto-fit,minmax(220px,1fr))" : "minmax(0,1fr)", gap: 12 }}>
             {fields.map((field) => (
-              <label key={field.key} style={{ display: "grid", gap: 6 }}>
-                <span style={{ fontSize: 11, color: "rgba(255,255,255,.45)", textTransform: "uppercase", letterSpacing: ".06em" }}>{field.label}</span>
+              <label key={field.key} style={{ display: "grid", gap: 6, minWidth: 0 }}>
+                <span style={{ fontSize: 11, color: textMuted, textTransform: "uppercase", letterSpacing: ".06em" }}>{field.label}</span>
                 {field.type === "party" ? (
                   /* A party picked from the accounts that already exist, with a
                      way out for one that does not.
@@ -272,8 +406,9 @@ export function BusinessRecordWorkspace({
                         border: `1px solid ${panelBorder}`,
                         borderRadius: 10,
                         padding: "10px 12px",
-                        color: "#fff",
+                        color: textPrimary,
                         fontSize: 13,
+                        fontFamily: "inherit",
                       }}
                     >
                       <option value="">Select {field.label}</option>
@@ -295,8 +430,9 @@ export function BusinessRecordWorkspace({
                           border: `1px solid ${panelBorder}`,
                           borderRadius: 10,
                           padding: "10px 12px",
-                          color: "#fff",
+                          color: textPrimary,
                           fontSize: 13,
+                          fontFamily: "inherit",
                         }}
                       />
                     )}
@@ -311,8 +447,9 @@ export function BusinessRecordWorkspace({
                       border: `1px solid ${panelBorder}`,
                       borderRadius: 10,
                       padding: "10px 12px",
-                      color: "#fff",
+                      color: textPrimary,
                       fontSize: 13,
+                      fontFamily: "inherit",
                     }}
                   >
                     <option value="">Select {field.label}</option>
@@ -344,8 +481,9 @@ export function BusinessRecordWorkspace({
                         border: `1px solid ${panelBorder}`,
                         borderRadius: 10,
                         padding: "10px 12px",
-                        color: "#fff",
+                        color: textPrimary,
                         fontSize: 13,
+                        fontFamily: "inherit",
                       }}
                     />
                     {field.suggestions?.length ? (
@@ -372,31 +510,71 @@ export function BusinessRecordWorkspace({
               color: "#0f172a",
               fontWeight: 800,
               cursor: "pointer",
+              fontFamily: "inherit",
             }}
           >
             {saving ? "Saving..." : "Save Record"}
           </button>
         </form>
 
-        <div style={{ background: panelBg, border: `1px solid ${panelBorder}`, borderRadius: 16, padding: 20 }}>
+        <div style={{ background: panelBg, border: `1px solid ${panelBorder}`, borderRadius: 16, padding: isMobile ? 14 : 18, minWidth: 0, overflow: "hidden" }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12, marginBottom: 14 }}>
-            <div style={{ fontSize: 15, fontWeight: 700, color: "white" }}>Live Records</div>
-            <div style={{ fontSize: 12, color: "rgba(255,255,255,.45)" }}>{filteredRows.length} shown</div>
+            <div style={{ fontSize: 15, fontWeight: 700, color: textPrimary }}>Live Records</div>
+            <div style={{ fontSize: 12, color: textMuted, whiteSpace: "nowrap" }}>{filteredRows.length} shown</div>
           </div>
 
           {loading ? (
-            <div style={{ fontSize: 13, color: "rgba(255,255,255,.45)" }}>Loading records...</div>
-          ) : filteredRows.length ? (
-            /* The table scrolls rather than crushes.
+            <div style={{ fontSize: 13, color: textMuted }}>Loading records...</div>
+          ) : !filteredRows.length ? (
+            <div style={{ fontSize: 13, color: textMuted }}>{emptyState}</div>
+          ) : isMobile ? (
+            /* A card per record on a phone.
 
-               It had no column padding and no minimum width, so eleven columns
-               in a narrow panel ran their headings together — "BOOKINGPASSENGER
-               AIRLINE" as one word — and wrapped "Qatar Airways" onto two lines
-               as "Qatar Air / Ways". A table that cannot fit should be scrolled
-               sideways, which everyone understands, not squeezed until the words
-               break. */
-            <div style={{ overflowX: "auto", margin: "0 -4px" }}>
-              <table style={{ width: "100%", minWidth: 760, borderCollapse: "collapse" }}>
+               A ten-column table on a 390px screen is a table nobody can read:
+               either it is crushed or it is a sideways scroll where the column
+               you are reading has scrolled its heading away. A card names each
+               value beside it and needs no horizontal scroll at all. */
+            <div style={{ display: "grid", gap: 10 }}>
+              {filteredRows.map((row) => (
+                <div
+                  key={String(row.id)}
+                  style={{
+                    border: `1px solid ${panelBorder}`,
+                    borderRadius: 12,
+                    padding: 12,
+                    background: "var(--panel-bg)",
+                    display: "grid",
+                    gap: 8,
+                  }}
+                >
+                  <div style={{ display: "grid", gap: 6 }}>
+                    {columns.map((column) => (
+                      <div key={column.key} style={{ display: "flex", gap: 10, alignItems: "baseline", justifyContent: "space-between" }}>
+                        <span style={{ fontSize: 10.5, color: textMuted, textTransform: "uppercase", letterSpacing: ".05em", flexShrink: 0 }}>
+                          {column.label}
+                        </span>
+                        <span style={{ fontSize: 13, color: textPrimary, textAlign: "right", overflowWrap: "anywhere" }}>
+                          {column.render ? column.render(row) : formatCellValue(row[column.key])}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                  <div style={{ borderTop: `1px solid ${panelBorder}`, paddingTop: 8 }}>
+                    {renderRowControls(row, "flex-start")}
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            /* The table scrolls inside its own panel rather than crushing the
+               words or dragging the page sideways.
+
+               Headings stay put at the top and the controls column stays put at
+               the right, so a wide record can be scrolled through without
+               losing either the name of the column being read or the buttons
+               that act on the row. */
+            <div className="sba-scroll" style={{ maxHeight: "min(68vh, 640px)", borderRadius: 12, border: `1px solid ${panelBorder}` }}>
+              <table className="sba-table">
                 <thead>
                   <tr>
                     {columns.map((column) => (
@@ -406,10 +584,10 @@ export function BusinessRecordWorkspace({
                           textAlign: "left",
                           fontSize: 10.5,
                           fontWeight: 700,
-                          color: "rgba(255,255,255,.4)",
+                          color: textMuted,
                           textTransform: "uppercase",
                           letterSpacing: ".05em",
-                          padding: "0 14px 10px 0",
+                          padding: "11px 14px",
                           // Headings never wrap. A two-line heading is what made
                           // the row above unreadable.
                           whiteSpace: "nowrap",
@@ -420,14 +598,15 @@ export function BusinessRecordWorkspace({
                       </th>
                     ))}
                     <th
+                      className="sba-sticky"
                       style={{
                         textAlign: "right",
                         fontSize: 10.5,
                         fontWeight: 700,
-                        color: "rgba(255,255,255,.4)",
+                        color: textMuted,
                         textTransform: "uppercase",
                         letterSpacing: ".05em",
-                        padding: "0 0 10px 14px",
+                        padding: "11px 14px",
                         whiteSpace: "nowrap",
                         borderBottom: `1px solid ${panelBorder}`,
                       }}
@@ -437,129 +616,34 @@ export function BusinessRecordWorkspace({
                   </tr>
                 </thead>
                 <tbody>
-                  {filteredRows.map((row) => {
-                    const rowId = String(row.id);
-                    const rowStatus = String(row.status ?? "");
-                    return (
-                      <tr key={rowId}>
-                        {columns.map((column) => (
-                          <td
-                            key={column.key}
-                            style={{
-                              padding: "12px 14px 12px 0",
-                              borderBottom: `1px solid rgba(255,255,255,.05)`,
-                              fontSize: 13,
-                              color: "rgba(255,255,255,.78)",
-                              // A name is one thing, so it stays on one line.
-                              whiteSpace: "nowrap",
-                            }}
-                          >
-                            {column.render ? column.render(row) : formatCellValue(row[column.key])}
-                          </td>
-                        ))}
-                        {/* Actions kept on one line and pushed right, so the
-                            row reads as data with its controls at the end
-                            rather than as two piles of pills. */}
-                        <td style={{ padding: "12px 0 12px 14px", borderBottom: `1px solid rgba(255,255,255,.05)`, whiteSpace: "nowrap" }}>
-                          <div style={{ display: "flex", gap: 6, justifyContent: "flex-end", alignItems: "center" }}>
-                            {/* One box instead of three pills.
-
-                                Every row carried a button per status it was not
-                                currently in — "booked", "issued", "refunded" —
-                                so a five-status record grew five controls
-                                before the real actions even started, and the
-                                row became two lines of coloured pills with no
-                                order to them. A status is one value out of a
-                                known list, which is a dropdown; and this way
-                                the row also shows what the status IS, which
-                                the pills never did. */}
-                            {statusOptions.length > 0 && (
-                              <select
-                                value={rowStatus}
-                                onChange={(event) => handleStatusChange(rowId, event.target.value)}
-                                style={{
-                                  borderRadius: 999,
-                                  border: `1px solid ${accent}44`,
-                                  background: `${accent}14`,
-                                  color: accent,
-                                  fontSize: 11,
-                                  fontWeight: 700,
-                                  padding: "5px 8px",
-                                  cursor: "pointer",
-                                  fontFamily: "inherit",
-                                }}
-                              >
-                                {/* The current one first, even where it is not
-                                    a listed option — a record set to something
-                                    retired should still read back honestly
-                                    rather than showing the first option as
-                                    though it were true. */}
-                                {!statusOptions.includes(rowStatus) && rowStatus && (
-                                  <option value={rowStatus}>{rowStatus}</option>
-                                )}
-                                {statusOptions.map((option) => (
-                                  <option key={option} value={option}>{option}</option>
-                                ))}
-                              </select>
-                            )}
-                            {actions
-                              .filter((action) => !action.hidden?.(row))
-                              .map((action) => {
-                                const label = typeof action.label === "function" ? action.label(row) : action.label;
-                                const busy = actionKey === `${rowId}:${label}`;
-                                const tone =
-                                  action.tone === "success"
-                                    ? { border: "1px solid rgba(52,211,153,.35)", background: "rgba(52,211,153,.12)", color: "#34d399" }
-                                    : action.tone === "neutral"
-                                      ? { border: "1px solid rgba(255,255,255,.16)", background: "rgba(255,255,255,.05)", color: "#e2e8f0" }
-                                      : { border: `1px solid ${accent}55`, background: `${accent}18`, color: accent };
-
-                                return (
-                                  <button
-                                    key={label}
-                                    type="button"
-                                    disabled={busy}
-                                    onClick={() => handleAction(action, row)}
-                                    style={{
-                                      borderRadius: 999,
-                                      fontSize: 11,
-                                      fontWeight: 700,
-                                      padding: "5px 10px",
-                                      cursor: busy ? "wait" : "pointer",
-                                      opacity: busy ? 0.7 : 1,
-                                      ...tone,
-                                    }}
-                                  >
-                                    {busy ? "Working..." : label}
-                                  </button>
-                                );
-                              })}
-                            <button
-                              type="button"
-                              onClick={() => handleDelete(rowId)}
-                              style={{
-                                borderRadius: 999,
-                                border: "1px solid rgba(248,113,113,.35)",
-                                background: "rgba(248,113,113,.12)",
-                                color: "#f87171",
-                                fontSize: 11,
-                                fontWeight: 700,
-                                padding: "5px 10px",
-                                cursor: "pointer",
-                              }}
-                            >
-                              Delete
-                            </button>
-                          </div>
+                  {filteredRows.map((row) => (
+                    <tr key={String(row.id)}>
+                      {columns.map((column) => (
+                        <td
+                          key={column.key}
+                          style={{
+                            padding: "12px 14px",
+                            borderBottom: `1px solid ${panelBorder}`,
+                            fontSize: 13,
+                            color: textPrimary,
+                            // A name is one thing, so it stays on one line.
+                            whiteSpace: "nowrap",
+                          }}
+                        >
+                          {column.render ? column.render(row) : formatCellValue(row[column.key])}
                         </td>
-                      </tr>
-                    );
-                  })}
+                      ))}
+                      <td
+                        className="sba-sticky"
+                        style={{ padding: "12px 14px", borderBottom: `1px solid ${panelBorder}`, whiteSpace: "nowrap" }}
+                      >
+                        {renderRowControls(row, "flex-end")}
+                      </td>
+                    </tr>
+                  ))}
                 </tbody>
               </table>
             </div>
-          ) : (
-            <div style={{ fontSize: 13, color: "rgba(255,255,255,.45)" }}>{emptyState}</div>
           )}
         </div>
       </div>

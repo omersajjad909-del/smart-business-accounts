@@ -547,7 +547,7 @@ function LeadsTab() {
   const STATUS_COLOR: Record<string, string> = { new: "#38bdf8", contacted: "#a78bfa", qualified: "#22c55e", lost: "#f87171", won: "#fbbf24" };
 
   return (
-    <div style={{ display: "grid", gridTemplateColumns: "300px 1fr", gap: 20 }}>
+    <div style={{ display: "grid", gridTemplateColumns: "300px minmax(0,1fr)", gap: 20 }}>
       {toast && <Toast {...toast} />}
 
       <Card>

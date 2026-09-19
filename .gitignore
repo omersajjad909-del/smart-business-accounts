@@ -57,3 +57,6 @@ scripts/biometric-bridge/config.json
 scripts/biometric-bridge/.bridge-state.json
 scripts/biometric-bridge/node_modules/
 scripts/biometric-bridge/bridge.log
+
+# MCP server config — holds the Supabase personal access token
+.mcp.json
