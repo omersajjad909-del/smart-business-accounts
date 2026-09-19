@@ -360,8 +360,23 @@ function indicativeFare(km: number, cabin: CabinClass, code: string, rand: () =>
   // A per-kilometre rate that eases off over distance, the way published fares
   // do — a four-hour sector is not twice the price of a two-hour one.
   const perKm = 48 * Math.pow(km || 1, -0.18);
-  const raw = km * perKm * CABIN_MULTIPLIER[cabin] * (POSITIONING[code] ?? 1) * (0.94 + rand() * 0.14);
-  const baseFare = Math.max(9000, Math.round(raw / 500) * 500);
+
+  /* The floor applies to the distance, not to the finished fare.
+
+     It used to clamp the last step, and on a short sector that swallowed
+     everything before it: Islamabad to Lahore is 270km, every carrier's
+     calculation landed under the floor, and the page offered PIA, AirSial,
+     SereneAir and Airblue at identical prices to the rupee. Four airlines
+     agreeing exactly is the one thing that never happens, and it made an
+     estimate look like a bug.
+
+     Applied here it does what it is for — no airline sells a seat for what
+     270 kilometres alone suggest — while the carrier's own positioning still
+     separates them afterwards. */
+  const distanceFare = Math.max(11000, km * perKm) * CABIN_MULTIPLIER[cabin];
+  const raw = distanceFare * (POSITIONING[code] ?? 1) * (0.94 + rand() * 0.14);
+
+  const baseFare = Math.round(raw / 500) * 500;
   const taxes = Math.max(2500, Math.round((3200 + km * 4.1) / 100) * 100);
   return { baseFare, taxes };
 }
