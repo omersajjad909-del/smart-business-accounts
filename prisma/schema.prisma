@@ -668,6 +668,7 @@ model Company {
   sessions              Session[]
   businessRecords       BusinessRecord[]
   travelers             Traveler[]
+  bookings              Booking[]
   teamInvites           TeamInvite[]
   bulkPaymentBatches    BulkPaymentBatch[]
   paymentFollowUpLogs   PaymentFollowUpLog[]
@@ -2336,6 +2337,128 @@ model Traveler {
   @@index([companyId, passportNo])
   @@index([companyId, passportExpiry])
   @@index([companyId, phone])
+}
+
+// ── Bookings ─────────────────────────────────────────────────────────────────
+//
+// One trip, however many services it is made of.
+//
+// "Me family ke saath Dubai jana hai" is a flight, a hotel, a visa, an airport
+// transfer and insurance. Until now that was five unrelated records in five
+// different categories: five quotations to assemble by hand, five invoices, and
+// no number anywhere that said what the trip made. Cancel it and you cancelled
+// five things and hoped you found them all.
+//
+// So a booking holds the services, and the services hold the money. The
+// customer is who pays; the travellers are who go; neither is a copy of the
+// other. The existing vertical records are not replaced — a BookingItem points
+// at the travel_ticket or travel_visa it came from, so every desk goes on
+// working exactly as it did.
+
+model Booking {
+  id        String  @id @default(uuid())
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  branchId  String?
+
+  /// What the desk says out loud. Unique within the company.
+  bookingNo String
+
+  /// Who pays. An account, because that is what an invoice is raised against —
+  /// a father, a company, a walk-in. Distinct from who travels.
+  customerAccountId String?
+  customerName      String
+
+  /// draft | quoted | confirmed | ticketed | travelling | completed | cancelled
+  status String @default("draft")
+
+  /// Where the enquiry came from, for the CRM that reads this later.
+  source String?
+
+  travelDate DateTime?
+  returnDate DateTime?
+
+  /// Summed from the items on every write, never posted by a client — the same
+  /// rule the passenger rows follow. A total typed separately from the lines it
+  /// is meant to be the sum of stops being their sum.
+  saleTotal   Float @default(0)
+  costTotal   Float @default(0)
+  /// saleTotal − costTotal. Stored so a month of bookings can be ranked by it
+  /// without recomputing every line.
+  marginTotal Float @default(0)
+  paidTotal   Float @default(0)
+
+  /// Once raised, the booking is fixed — see the travel passenger route for the
+  /// same reasoning.
+  invoiceId String?
+  invoiceNo String?
+
+  notes String? @db.Text
+
+  items     BookingItem[]
+  travelers BookingTraveler[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([companyId, bookingNo])
+  @@index([companyId, status])
+  @@index([companyId, travelDate])
+  @@index([companyId, customerAccountId])
+}
+
+/// One service on a booking: the flight, the hotel, the visa, the transfer.
+model BookingItem {
+  id        String  @id @default(uuid())
+  bookingId String
+  booking   Booking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+
+  /// FLIGHT | HOTEL | VISA | PASSPORT | TRANSPORT | INSURANCE | TOUR | HAJJ | UMRAH | FEE
+  productType String
+  title       String
+
+  /// The account the payable lands in. The airline, the hotel, the consolidator.
+  supplierName      String?
+  supplierAccountId String?
+
+  /// What the customer pays for this service, and what it costs to buy.
+  sale Float @default(0)
+  cost Float @default(0)
+  qty  Float @default(1)
+
+  /// The vertical record this came from — a travel_ticket, a travel_visa — so
+  /// the existing desks keep working and nothing is duplicated.
+  sourceCategory String?
+  sourceRecordId String?
+
+  /// Anything the service itself needs: PNR, room type, visa country.
+  data Json?
+
+  status String @default("pending")
+
+  serviceDate DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([bookingId])
+  @@index([sourceRecordId])
+}
+
+/// Who is actually going. A join, because one traveller has many bookings and
+/// one booking has many travellers — a family of five on one Umrah file.
+model BookingTraveler {
+  id         String  @id @default(uuid())
+  bookingId  String
+  booking    Booking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  travelerId String
+
+  /// lead | adult | child | infant — the lead is who the file is named after.
+  role String @default("adult")
+
+  createdAt DateTime @default(now())
+
+  @@unique([bookingId, travelerId])
+  @@index([travelerId])
 }
 
 // ── Support & Tickets ────────────────────────────────────────────────────────

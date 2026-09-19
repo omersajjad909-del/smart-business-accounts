@@ -561,6 +561,7 @@ export const DASHBOARD_NAV_GROUPS: DashboardNavGroup[] = [
     title: "Travel",
     routes: [
       "/dashboard/travel",
+      "/dashboard/travel/trips",
       "/dashboard/travel/travelers",
       "/dashboard/travel/flight-search",
       "/dashboard/travel/book",

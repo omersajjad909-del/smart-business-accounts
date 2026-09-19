@@ -2285,6 +2285,7 @@ export default function DashboardLayout({
                 onToggle={() => toggle("travel")}
               >
                 {hasDashboardFeature("TRAVEL_OVERVIEW") && <NavLink href="/dashboard/travel" pathname={pathname}>Overview</NavLink>}
+                {hasDashboardFeature("TRAVEL_TRIPS") && <NavLink href="/dashboard/travel/trips" pathname={pathname}>🧳 Trips</NavLink>}
                 {hasDashboardFeature("TRAVEL_TRAVELERS") && <NavLink href="/dashboard/travel/travelers" pathname={pathname}>👤 Travellers</NavLink>}
                 {hasDashboardFeature("TRAVEL_FLIGHT_SEARCH") && <NavLink href="/dashboard/travel/flight-search" pathname={pathname}>🔍 Flight Search</NavLink>}
                 {hasDashboardFeature("TRAVEL_BOOK_FLIGHT") && <NavLink href="/dashboard/travel/book" pathname={pathname}>🎫 Book Flight Ticket</NavLink>}
