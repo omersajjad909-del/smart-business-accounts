@@ -52,17 +52,64 @@ export type FlightLeg = {
   to: string;
   /** ISO date of departure, "2026-10-15". */
   date: string;
-  /** Local clock times, "10:30" — an airline's timetable is written in them. */
+  /**
+   * Local clock times, "10:30" — an airline's timetable is written in them.
+   *
+   * Empty where no timetable has been recorded for this sector. They used to be
+   * generated, which produced a departure time and a flight number that looked
+   * exactly like a real one and were not: an agent reading "PA 163 departs
+   * 00:45" off this screen would have been reading a random number. Nothing
+   * fills these now except a schedule someone entered or a provider returned.
+   */
   departAt: string;
   arriveAt: string;
   durationMinutes: number;
+  /** True where the duration is worked out from the distance rather than from
+      a real timetable, so the card can say "about" and mean it. */
+  durationIsEstimate: boolean;
   /** Where it touches down on the way, by IATA code. Empty for a direct. */
   via: string[];
+  /** Empty where unknown. Never invented. */
   flightNo: string;
   /** A red-eye arriving the next morning is not the same flight as one that
       lands the same evening, and a passenger who misses that misses the day. */
   arrivesNextDay: boolean;
 };
+
+/**
+ * A timetable row the agency recorded, or a provider returned.
+ *
+ * This is the only thing that may put a clock time on a card.
+ */
+export type FlightSchedule = {
+  id: string;
+  airline: string;
+  airlineCode: string;
+  flightNo: string;
+  from: string;
+  to: string;
+  departAt: string;
+  arriveAt: string;
+  /** Where it touches down on the way. Empty for a direct. */
+  via: string[];
+  /** ISO weekday numbers it operates on, Monday = 1. Empty means every day. */
+  days: number[];
+  validFrom: string;
+  validTo: string;
+};
+
+/** Minutes between two clock times, rolling past midnight. */
+export function minutesBetween(departAt: string, arriveAt: string): number {
+  const parse = (value: string) => {
+    const [h, m] = String(value || "").split(":").map((part) => Number(part));
+    return Number.isFinite(h) && Number.isFinite(m) ? h * 60 + m : NaN;
+  };
+  const out = parse(departAt);
+  const back = parse(arriveAt);
+  if (!Number.isFinite(out) || !Number.isFinite(back)) return 0;
+  // An arrival earlier on the clock than the departure landed the next day.
+  return back >= out ? back - out : back + 1440 - out;
+}
 
 /**
  * Where a price came from, in descending order of how much it can be trusted.
@@ -381,4 +428,51 @@ export function distanceKm(a: Airport, b: Airport): number {
  */
 export function flightMinutes(km: number): number {
   return Math.round(35 + (km / 820) * 60);
+}
+
+/** ISO weekday of a date, Monday = 1 through Sunday = 7. */
+export function isoWeekday(date: string): number {
+  const parsed = new Date(`${date}T00:00:00Z`);
+  if (Number.isNaN(parsed.getTime())) return 0;
+  const day = parsed.getUTCDay();
+  return day === 0 ? 7 : day;
+}
+
+/** The recorded flights a carrier operates on this sector, on this date. */
+export function schedulesFor(
+  schedules: FlightSchedule[],
+  code: string,
+  from: string,
+  to: string,
+  date: string,
+): FlightSchedule[] {
+  const weekday = isoWeekday(date);
+  return schedules
+    .filter((row) => {
+      if (row.airlineCode !== code) return false;
+      if (row.from !== from || row.to !== to) return false;
+      if (row.validFrom && date && date < row.validFrom) return false;
+      if (row.validTo && date && date > row.validTo) return false;
+      // A flight that does not operate on the day asked for is not an option.
+      if (row.days.length && weekday && !row.days.includes(weekday)) return false;
+      return true;
+    })
+    .sort((a, b) => a.departAt.localeCompare(b.departAt));
+}
+
+/** A leg built from a timetable someone actually recorded. */
+export function scheduledLeg(schedule: FlightSchedule, date: string): FlightLeg {
+  const duration = minutesBetween(schedule.departAt, schedule.arriveAt);
+  return {
+    from: schedule.from,
+    to: schedule.to,
+    date,
+    departAt: schedule.departAt,
+    arriveAt: schedule.arriveAt,
+    durationMinutes: duration,
+    durationIsEstimate: false,
+    via: schedule.via,
+    flightNo: schedule.flightNo,
+    arrivesNextDay: schedule.arriveAt < schedule.departAt,
+  };
 }

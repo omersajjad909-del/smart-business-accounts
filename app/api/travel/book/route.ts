@@ -45,6 +45,7 @@ function readLegs(value: unknown): FlightLeg[] {
       departAt: String(leg.departAt || ""),
       arriveAt: String(leg.arriveAt || ""),
       durationMinutes: Number(leg.durationMinutes) || 0,
+      durationIsEstimate: Boolean(leg.durationIsEstimate),
       via: Array.isArray(leg.via) ? leg.via.map((v) => String(v).toUpperCase()).filter(Boolean) : [],
       flightNo: String(leg.flightNo || ""),
       arrivesNextDay: Boolean(leg.arrivesNextDay),

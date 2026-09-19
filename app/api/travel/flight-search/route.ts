@@ -32,10 +32,13 @@ import {
   distanceKm,
   findAirport,
   flightMinutes,
+  scheduledLeg,
+  schedulesFor,
   type Airport,
   type CabinClass,
   type FlightLeg,
   type FlightOffer,
+  type FlightSchedule,
   type SearchLeg,
   type SearchQuery,
   type TripType,
@@ -88,16 +91,92 @@ function seeded(seed: string) {
   };
 }
 
-function minutesToClock(total: number): { clock: string; dayOffset: number } {
-  const wrapped = ((total % 1440) + 1440) % 1440;
-  const h = Math.floor(wrapped / 60);
-  const m = wrapped % 60;
+function readSchedules(
+  rows: Array<{ id: string; title: string; status: string; date: Date | null; data: unknown }>,
+): FlightSchedule[] {
+  const out: FlightSchedule[] = [];
+  for (const row of rows) {
+    if (String(row.status || "").toLowerCase() !== "active") continue;
+    const data = (row.data ?? {}) as Record<string, unknown>;
+    const from = String(data.from || "").toUpperCase();
+    const to = String(data.to || "").toUpperCase();
+    const departAt = String(data.departAt || "");
+    const arriveAt = String(data.arriveAt || "");
+    if (!from || !to || !departAt || !arriveAt) continue;
+
+    const airline = String(data.airline || "");
+    const match = AIRLINES.find((a) => a.name.toLowerCase() === airline.toLowerCase());
+
+    out.push({
+      id: row.id,
+      airline,
+      airlineCode: match?.code || String(data.airlineCode || "").toUpperCase(),
+      flightNo: String(data.flightNo || ""),
+      from,
+      to,
+      departAt,
+      arriveAt,
+      via: String(data.via || "")
+        .split(/[^A-Za-z]+/)
+        .map((code) => code.toUpperCase())
+        .filter((code) => code.length === 3),
+      // Empty means every day, which is what most of these are.
+      days: String(data.days || "")
+        .split(/[^0-9]+/)
+        .map((n) => Number(n))
+        .filter((n) => n >= 1 && n <= 7),
+      validFrom: row.date ? row.date.toISOString().slice(0, 10) : "",
+      validTo: String(data.validTo || "").slice(0, 10),
+    });
+  }
+  return out;
+}
+
+/**
+ * A leg with no timetable behind it.
+ *
+ * No times and no flight number, because nothing here knows them. What it does
+ * know is the distance, so it can say roughly how long the sector takes and
+ * whether this carrier would likely bank it through its hub — both marked as
+ * the estimates they are.
+ */
+function estimatedLeg(code: string, leg: SearchLeg, from: Airport, to: Airport): FlightLeg | null {
+  const home = HOME_COUNTRY[code];
+  const atHome = home === from.country || home === to.country;
+  const hub = HUBS[code];
+  const hubAirport = !atHome && hub && hub !== from.code && hub !== to.code ? findAirport(hub) : undefined;
+
+  const direct = distanceKm(from, to);
+  let via: string[] = [];
+  let minutes = flightMinutes(direct);
+
+  if (hubAirport) {
+    const viaHub = distanceKm(from, hubAirport) + distanceKm(hubAirport, to);
+    // Nobody flies Karachi to Lahore via Dubai.
+    if (viaHub < direct * 1.85 && direct > 900) {
+      via = [hubAirport.code];
+      minutes = flightMinutes(distanceKm(from, hubAirport)) + flightMinutes(distanceKm(hubAirport, to)) + 90;
+    } else if (direct > 4200) {
+      // Too far for this carrier to fly nonstop off its own network.
+      return null;
+    }
+  }
+
   return {
-    clock: `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`,
-    dayOffset: Math.floor(total / 1440),
+    from: from.code,
+    to: to.code,
+    date: leg.date,
+    departAt: "",
+    arriveAt: "",
+    durationMinutes: minutes,
+    durationIsEstimate: true,
+    via,
+    flightNo: "",
+    arrivesNextDay: false,
   };
 }
 
+/** A fare the agency negotiated, off the Contract Fares sheet. */
 /** Which carriers plausibly fly this sector at all. */
 function carriersFor(from: Airport, to: Airport): string[] {
   const domestic = from.country === "Pakistan" && to.country === "Pakistan";
@@ -125,58 +204,6 @@ function carriersFor(from: Airport, to: Airport): string[] {
   return codes;
 }
 
-function buildLeg(
-  code: string,
-  leg: SearchLeg,
-  from: Airport,
-  to: Airport,
-  rand: () => number,
-): FlightLeg | null {
-  const home = HOME_COUNTRY[code];
-  const atHome = home === from.country || home === to.country;
-  const hub = HUBS[code];
-  /* No hub stop where the carrier is already at home on this sector: PIA flies
-     Lahore to Jeddah, it does not tour Karachi on the way. */
-  const hubAirport = !atHome && hub && hub !== from.code && hub !== to.code ? findAirport(hub) : undefined;
-
-  const direct = distanceKm(from, to);
-  let via: string[] = [];
-  let airborne = flightMinutes(direct);
-  let ground = 0;
-
-  if (hubAirport) {
-    const viaHub = distanceKm(from, hubAirport) + distanceKm(hubAirport, to);
-    // Only route through the hub where the detour is not absurd — nobody flies
-    // Karachi to Lahore via Dubai.
-    if (viaHub < direct * 1.85 && direct > 900) {
-      via = [hubAirport.code];
-      airborne = flightMinutes(distanceKm(from, hubAirport)) + flightMinutes(distanceKm(hubAirport, to));
-      ground = 70 + Math.floor(rand() * 180);
-    } else if (direct > 4200) {
-      // Too far for this carrier to fly nonstop off its own network.
-      return null;
-    }
-  }
-
-  const departMinutes = Math.floor(rand() * 20) * 60 + Math.floor(rand() * 4) * 15;
-  const total = airborne + ground;
-  const arrival = minutesToClock(departMinutes + total);
-  const departure = minutesToClock(departMinutes);
-
-  return {
-    from: from.code,
-    to: to.code,
-    date: leg.date,
-    departAt: departure.clock,
-    arriveAt: arrival.clock,
-    durationMinutes: total,
-    via,
-    flightNo: `${code} ${100 + Math.floor(rand() * 899)}`,
-    arrivesNextDay: arrival.dayOffset > 0,
-  };
-}
-
-/** A fare the agency negotiated, off the Contract Fares sheet. */
 type ContractFare = {
   from: string;
   to: string;
@@ -321,6 +348,7 @@ function buildOffers(
   query: SearchQuery,
   history: Array<{ title: string; amount: unknown; date: Date | null; data: unknown }>,
   contracts: ContractFare[],
+  schedules: FlightSchedule[],
 ): FlightOffer[] {
   /* The outbound sector is the market, not the first and last points of the
      itinerary. A return trip ends where it started, so reading the last leg's
@@ -333,82 +361,115 @@ function buildOffers(
 
   const offers: FlightOffer[] = [];
 
-  /* A carrier the agency holds a contract with is always offered, even where
-     the route rules would not have suggested it — a negotiated fare is a seat
-     the desk can actually sell, and leaving it out of the list is the one way
-     this search can cost the agency money. */
+  /* A carrier the agency holds a contract with, or has recorded a flight for,
+     is always offered — even where the routing rules would not have suggested
+     it. A negotiated fare is a seat the desk can actually sell, and leaving it
+     out of the list is the one way this search can cost the agency money. */
   const candidates = new Set(carriersFor(origin, destination));
   for (const fare of contracts) {
     if (fare.from !== origin.code || fare.to !== destination.code) continue;
     const match = AIRLINES.find((a) => a.name.toLowerCase() === fare.airline.toLowerCase());
     if (match) candidates.add(match.code);
   }
+  for (const row of schedules) {
+    if (row.from === origin.code && row.to === destination.code && row.airlineCode) {
+      candidates.add(row.airlineCode);
+    }
+  }
 
   for (const code of candidates) {
     const rand = seeded(`${code}|${query.legs.map((l) => `${l.from}${l.to}${l.date}`).join("|")}|${query.cabin}`);
 
-    const legs: FlightLeg[] = [];
-    let usable = true;
-    for (const leg of query.legs) {
-      const legFrom = findAirport(leg.from);
-      const legTo = findAirport(leg.to);
-      if (!legFrom || !legTo) { usable = false; break; }
-      const built = buildLeg(code, leg, legFrom, legTo, rand);
-      if (!built) { usable = false; break; }
-      legs.push(built);
-    }
-    if (!usable || !legs.length) continue;
-
-    // Priced per adult across the whole itinerary, which is how a return fare
-    // is quoted — not as two one-ways added together.
-    const km = legs.reduce((sum, leg) => {
-      const a = findAirport(leg.from);
-      const b = findAirport(leg.to);
-      return sum + (a && b ? distanceKm(a, b) : 0);
-    }, 0);
-
     const carrier = airlineName(code);
     const contract = contractFor(contracts, origin.code, destination.code, carrier, query.cabin, query.tripType, first.date);
     const past = contract ? null : historyFor(history, origin.code, destination.code, carrier);
-    const indicative = indicativeFare(km, query.cabin, code, rand);
 
-    const baseFare = contract ? contract.sellFare : past ? past.baseFare : indicative.baseFare;
-    const taxes = contract ? contract.taxes : past ? past.taxes : indicative.taxes;
-    // Where a contract or history knows the real cost, use it. Otherwise assume
-    // the agency buys at the published fare and earns on the markup alone,
-    // which is the conservative assumption — it never flatters the margin.
-    const supplierCost = contract
-      ? contract.netCost
-      : past && past.cost > 0
-        ? past.cost
-        : baseFare + taxes;
+    /* One offer per recorded outbound flight, because a departure at 07:00 and
+       one at 19:00 are two different things to sell. The later legs of an
+       itinerary take the first flight recorded for them — choosing among the
+       return options is the passenger's conversation, not this list's. */
+    const outbound = schedulesFor(schedules, code, first.from, first.to, first.date);
+    const departures: Array<FlightSchedule | null> = outbound.length ? outbound.slice(0, 6) : [null];
 
-    offers.push({
-      id: `${code}-${legs.map((l) => l.flightNo.replace(/\s+/g, "")).join("-")}`,
-      airline: carrier,
-      airlineCode: code,
-      cabin: query.cabin,
-      legs,
-      /* Only from a contract the agency actually holds, and only what it
-         actually says. Anything else is left unknown rather than guessed — see
-         the note on FlightOffer. */
-      baggageKg: contract && contract.baggageKg > 0 ? contract.baggageKg : null,
-      cabinBaggageKg: null,
-      mealsIncluded: null,
-      refundable: null,
-      baseFare,
-      taxes,
-      supplierCost,
-      // The account the payable lands in, which on a contract fare is whoever
-      // the agency actually buys through rather than the carrier on the tail.
-      supplier: contract ? contract.supplier || carrier : carrier,
-      source: contract ? "contract" : past ? "history" : "sample",
-      sourceNote: contract
-        ? `Your contract fare — ${contract.title}${contract.validTo ? `, valid to ${contract.validTo}` : ""}`
-        : past
-          ? `${past.label} — your own booking, not a live quote`
-          : "Indicative fare — confirm with the airline before quoting",
-    });
+    for (const chosen of departures) {
+      const legs: FlightLeg[] = [];
+      let usable = true;
+
+      query.legs.forEach((leg, index) => {
+        if (!usable) return;
+        const legFrom = findAirport(leg.from);
+        const legTo = findAirport(leg.to);
+        if (!legFrom || !legTo) { usable = false; return; }
+
+        const recorded = index === 0
+          ? chosen
+          : schedulesFor(schedules, code, leg.from, leg.to, leg.date)[0] || null;
+
+        if (recorded) {
+          legs.push(scheduledLeg(recorded, leg.date));
+          return;
+        }
+        const estimated = estimatedLeg(code, leg, legFrom, legTo);
+        if (!estimated) { usable = false; return; }
+        legs.push(estimated);
+      });
+
+      if (!usable || !legs.length) continue;
+
+      // Priced per adult across the whole itinerary, which is how a return fare
+      // is quoted — not as two one-ways added together.
+      const km = legs.reduce((sum, leg) => {
+        const a = findAirport(leg.from);
+        const b = findAirport(leg.to);
+        return sum + (a && b ? distanceKm(a, b) : 0);
+      }, 0);
+
+      const indicative = indicativeFare(km, query.cabin, code, rand);
+      const baseFare = contract ? contract.sellFare : past ? past.baseFare : indicative.baseFare;
+      const taxes = contract ? contract.taxes : past ? past.taxes : indicative.taxes;
+      // Where a contract or history knows the real cost, use it. Otherwise
+      // assume the agency buys at the published fare and earns on the markup
+      // alone, which is conservative — it never flatters the margin.
+      const supplierCost = contract
+        ? contract.netCost
+        : past && past.cost > 0
+          ? past.cost
+          : baseFare + taxes;
+
+      const scheduled = legs.every((leg) => Boolean(leg.departAt));
+
+      offers.push({
+        id: `${code}-${legs.map((l) => l.flightNo.replace(/\s+/g, "") || `${l.from}${l.to}`).join("-")}-${chosen?.id || "est"}`,
+        airline: carrier,
+        airlineCode: code,
+        cabin: query.cabin,
+        legs,
+        /* Only from a contract the agency actually holds, and only what it
+           actually says. Anything else is left unknown rather than guessed —
+           see the note on FlightOffer. */
+        baggageKg: contract && contract.baggageKg > 0 ? contract.baggageKg : null,
+        cabinBaggageKg: null,
+        mealsIncluded: null,
+        refundable: null,
+        baseFare,
+        taxes,
+        supplierCost,
+        // The account the payable lands in, which on a contract fare is whoever
+        // the agency actually buys through rather than the carrier on the tail.
+        supplier: contract ? contract.supplier || carrier : carrier,
+        source: contract ? "contract" : past ? "history" : "sample",
+        /* Two separate claims, kept separate: where the price came from, and
+           whether the times are a timetable or an absence of one. */
+        sourceNote: [
+          contract
+            ? `Your contract fare — ${contract.title}${contract.validTo ? `, valid to ${contract.validTo}` : ""}`
+            : past
+              ? `${past.label} — your own booking, not a live quote`
+              : "Indicative fare — confirm with the airline before quoting",
+          scheduled ? "Times from your recorded schedule" : "No schedule recorded for this sector",
+        ].join(" · "),
+      });
+    }
   }
 
   return offers;
@@ -473,7 +534,17 @@ export async function POST(req: NextRequest) {
     });
     const contracts = readContracts(contractRows as never);
 
-    const offers = buildOffers(query, history as never, contracts);
+    /* The timetable the agency recorded. The only thing in this system that
+       may put a clock time on a card. */
+    const scheduleRows = await prisma.businessRecord.findMany({
+      where: { companyId, category: "travel_schedule", status: "active" },
+      orderBy: { createdAt: "desc" },
+      take: 1000,
+      select: { id: true, title: true, status: true, date: true, data: true },
+    });
+    const schedules = readSchedules(scheduleRows as never);
+
+    const offers = buildOffers(query, history as never, contracts, schedules);
 
     return NextResponse.json({
       offers,
@@ -482,10 +553,12 @@ export async function POST(req: NextRequest) {
          UI cannot mistake this for a fare feed either. */
       liveProvider: false,
       notice:
-        "No airline or GDS connection is configured. Schedules below are built from the route. " +
-        "Fares marked as your contract fare or your past fare are your own real numbers; " +
-        "anything marked indicative is this system's estimate — confirm it before you quote it.",
+        "No airline or GDS connection is configured. Flight times and numbers come only from the " +
+        "schedules you have recorded — where none exists this shows no times at all rather than " +
+        "inventing them. Fares marked as your contract fare or your past fare are your own real " +
+        "numbers; anything marked indicative is this system's estimate.",
       fromContract: offers.filter((offer) => offer.source === "contract").length,
+      scheduled: offers.filter((offer) => offer.legs.every((leg) => Boolean(leg.departAt))).length,
       fromHistory: offers.filter((offer) => offer.source === "history").length,
     });
   } catch (error) {

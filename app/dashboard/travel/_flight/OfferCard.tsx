@@ -22,15 +22,24 @@ import {
 import { Money, T } from "./ui";
 
 function LegRow({ leg, compact }: { leg: FlightOffer["legs"][number]; compact?: boolean }) {
+  /* No recorded timetable means no clock on the card. The sector, the distance
+     and roughly how long it takes are still real and still worth showing; the
+     departure time is not ours to invent. */
+  const timed = Boolean(leg.departAt);
+
   return (
     <div style={{ display: "flex", alignItems: "center", gap: compact ? 12 : 18, flexWrap: "wrap" }}>
       <div style={{ minWidth: 64 }}>
-        <div style={{ fontSize: compact ? 15 : 17, fontWeight: 800, color: T.text, lineHeight: 1.2 }}>{leg.departAt}</div>
+        <div style={{ fontSize: compact ? 15 : 17, fontWeight: 800, color: timed ? T.text : T.muted, lineHeight: 1.2 }}>
+          {timed ? leg.departAt : "--:--"}
+        </div>
         <div style={{ fontSize: 11, color: T.muted, fontWeight: 600 }}>{leg.from}</div>
       </div>
 
       <div style={{ flex: "1 1 120px", minWidth: 110, textAlign: "center" }}>
-        <div style={{ fontSize: 10.5, color: T.muted, marginBottom: 3 }}>{formatDuration(leg.durationMinutes)}</div>
+        <div style={{ fontSize: 10.5, color: T.muted, marginBottom: 3 }}>
+          {leg.durationIsEstimate ? "about " : ""}{formatDuration(leg.durationMinutes)}
+        </div>
         <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
           <span style={{ width: 6, height: 6, borderRadius: "50%", border: `1.5px solid ${T.muted}`, flexShrink: 0 }} />
           <span style={{ flex: 1, height: 1, background: T.border }} />
@@ -40,14 +49,14 @@ function LegRow({ leg, compact }: { leg: FlightOffer["legs"][number]; compact?: 
           {leg.via.length ? <span style={{ flex: 1, height: 1, background: T.border }} /> : null}
           <span style={{ width: 6, height: 6, borderRadius: "50%", background: T.muted, flexShrink: 0 }} />
         </div>
-        <div style={{ fontSize: 10.5, color: leg.via.length ? T.muted : "#34d399", marginTop: 3, fontWeight: 600 }}>
-          {describeStops(leg)}
+        <div style={{ fontSize: 10.5, color: leg.via.length || !timed ? T.muted : "#34d399", marginTop: 3, fontWeight: 600 }}>
+          {timed ? describeStops(leg) : `Likely ${describeStops(leg).toLowerCase()}`}
         </div>
       </div>
 
       <div style={{ minWidth: 64 }}>
-        <div style={{ fontSize: compact ? 15 : 17, fontWeight: 800, color: T.text, lineHeight: 1.2 }}>
-          {leg.arriveAt}
+        <div style={{ fontSize: compact ? 15 : 17, fontWeight: 800, color: timed ? T.text : T.muted, lineHeight: 1.2 }}>
+          {timed ? leg.arriveAt : "--:--"}
           {/* A red-eye that lands the next morning is not the same flight as
               one that lands the same evening. */}
           {leg.arrivesNextDay ? <span style={{ fontSize: 10, color: "#f4c25b", marginLeft: 3 }}>+1</span> : null}
@@ -119,6 +128,9 @@ export function OfferCard({
         {best ? <Badge tone="#34d399">Best option</Badge> : null}
         {cheapest && !best ? <Badge tone="#34d399">Cheapest</Badge> : null}
         {direct ? <Badge tone="#60a5fa">Direct</Badge> : null}
+        {/* Separate from the fare badge on purpose: a real contract fare on a
+            sector with no recorded timetable is both at once. */}
+        {offer.legs.every((leg) => leg.departAt) ? null : <Badge tone="#94a3b8">No schedule</Badge>}
         {/* Said on every card, because a price whose provenance is not on it is
             the one that gets quoted by accident. */}
         <Badge tone={offer.source === "contract" ? "#34d399" : offer.source === "history" ? "#a78bfa" : "#f4c25b"}>
@@ -145,7 +157,9 @@ export function OfferCard({
                 {offer.airline}
               </div>
               <div style={{ fontSize: 11, color: T.muted }}>
-                {offer.legs.map((leg) => leg.flightNo).join(" · ")}
+                {offer.legs.some((leg) => leg.flightNo)
+                  ? offer.legs.map((leg) => leg.flightNo).filter(Boolean).join(" · ")
+                  : "Flight number not recorded"}
               </div>
             </div>
           </div>
@@ -218,8 +232,19 @@ export function OfferCard({
                 {offer.legs.length > 1 ? (index === 0 ? "Outbound" : index === 1 ? "Return" : `Leg ${index + 1}`) : "Flight"} · {leg.date}
               </div>
               <div style={{ fontSize: 12.5, color: T.text }}>
-                {leg.flightNo} — {leg.from} {leg.departAt} → {leg.to} {leg.arriveAt}
-                {leg.arrivesNextDay ? " (next day)" : ""} · {formatDuration(leg.durationMinutes)} · {describeStops(leg)}
+                {leg.departAt ? (
+                  <>
+                    {leg.flightNo ? `${leg.flightNo} — ` : ""}{leg.from} {leg.departAt} → {leg.to} {leg.arriveAt}
+                    {leg.arrivesNextDay ? " (next day)" : ""} · {formatDuration(leg.durationMinutes)} · {describeStops(leg)}
+                  </>
+                ) : (
+                  <>
+                    {leg.from} → {leg.to} · about {formatDuration(leg.durationMinutes)} · likely {describeStops(leg).toLowerCase()}
+                    <span style={{ color: T.muted }}>
+                      {" "}— no timetable recorded for this sector, so no flight number or times.
+                    </span>
+                  </>
+                )}
               </div>
             </div>
           ))}

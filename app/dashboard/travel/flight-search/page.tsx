@@ -71,7 +71,7 @@ export default function FlightSearchPage() {
     ? `${describeRoute(
         pricedFor.legs.map((leg) => ({
           from: leg.from, to: leg.to, date: leg.date, departAt: "", arriveAt: "",
-          durationMinutes: 0, via: [], flightNo: "", arrivesNextDay: false,
+          durationMinutes: 0, durationIsEstimate: true, via: [], flightNo: "", arrivesNextDay: false,
         })),
       )} · ${pricedFor.legs.map((leg) => leg.date).join(" — ")}`
     : "";

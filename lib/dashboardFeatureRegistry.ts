@@ -970,6 +970,16 @@ export const DASHBOARD_FEATURE_DEFS: DashboardFeatureDefinition[] = [
     plans: ["starter", "professional", "enterprise"],
   },
   {
+    id: "TRAVEL_SCHEDULES",
+    label: "Flight Schedules",
+    route: "/dashboard/travel/schedules",
+    business: "travel",
+    businessLabel: "Travel Agency",
+    section: "Ticketing Desk",
+    businessTypes: ["travel"],
+    plans: ["starter", "professional", "enterprise"],
+  },
+  {
     id: "TRAVEL_VISAS",
     label: "Visa Cases",
     route: "/dashboard/travel/visas",

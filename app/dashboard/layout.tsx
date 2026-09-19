@@ -2289,6 +2289,7 @@ export default function DashboardLayout({
                 {hasDashboardFeature("TRAVEL_BOOK_FLIGHT") && <NavLink href="/dashboard/travel/book" pathname={pathname}>🎫 Book Flight Ticket</NavLink>}
                 {hasDashboardFeature("TRAVEL_TICKETS") && <NavLink href="/dashboard/travel/tickets" pathname={pathname}>✈️ Airline Tickets</NavLink>}
                 {hasDashboardFeature("TRAVEL_FARE_SHEET") && <NavLink href="/dashboard/travel/fare-sheet" pathname={pathname}>💱 Contract Fares</NavLink>}
+                {hasDashboardFeature("TRAVEL_SCHEDULES") && <NavLink href="/dashboard/travel/schedules" pathname={pathname}>🕑 Flight Schedules</NavLink>}
                 {hasDashboardFeature("TRAVEL_VISAS") && <NavLink href="/dashboard/travel/visas" pathname={pathname}>🛂 Visa Cases</NavLink>}
                 {hasDashboardFeature("TRAVEL_HOTELS") && <NavLink href="/dashboard/travel/hotel-packages" pathname={pathname}>🏨 Hotel Packages</NavLink>}
                 {hasDashboardFeature("TRAVEL_TOURS") && <NavLink href="/dashboard/travel/tours" pathname={pathname}>🚌 Group Tours</NavLink>}

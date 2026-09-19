@@ -118,7 +118,9 @@ export function SummaryRail({
                     <span style={{ fontSize: 11.5, color: T.muted }}>{leg.date}</span>
                   </div>
                   <div style={{ fontSize: 11.5, color: T.muted }}>
-                    {leg.departAt} – {leg.arriveAt}{leg.arrivesNextDay ? " (+1)" : ""} · {leg.flightNo}
+                    {leg.departAt
+                      ? `${leg.departAt} – ${leg.arriveAt}${leg.arrivesNextDay ? " (+1)" : ""}${leg.flightNo ? ` · ${leg.flightNo}` : ""}`
+                      : "Times to be confirmed with the airline"}
                   </div>
                 </div>
               ))}
