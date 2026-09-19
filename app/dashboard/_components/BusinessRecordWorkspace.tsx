@@ -85,22 +85,30 @@ const inputBg = "var(--input-bg)";
 const textPrimary = "var(--text-primary)";
 const textMuted = "var(--text-muted)";
 
-/* Hover, sticky cells and the scrollbar need real CSS — a :hover or a
-   ::-webkit-scrollbar cannot be written as an inline style. */
+/* Hover and the status pill's native arrow need real CSS — a :hover or an
+   appearance reset cannot be written as an inline style. */
 const workspaceCss = `
-.sba-scroll{overflow:auto;overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch}
-.sba-scroll::-webkit-scrollbar{height:9px;width:9px}
-.sba-scroll::-webkit-scrollbar-track{background:transparent}
-.sba-scroll::-webkit-scrollbar-thumb{background:var(--border);border-radius:999px}
-.sba-scroll::-webkit-scrollbar-thumb:hover{background:var(--text-muted)}
-.sba-table{width:100%;min-width:max-content;border-collapse:separate;border-spacing:0}
-.sba-table thead th{position:sticky;top:0;z-index:2;background:var(--card-bg)}
-.sba-table th.sba-sticky{right:0;z-index:3}
-.sba-table td.sba-sticky{position:sticky;right:0;z-index:1;background:var(--card-bg)}
-.sba-table td.sba-sticky::before,.sba-table th.sba-sticky::before{content:"";position:absolute;left:0;top:0;bottom:0;width:18px;transform:translateX(-100%);pointer-events:none;background:linear-gradient(to right,rgba(0,0,0,0),rgba(0,0,0,.18))}
-.sba-table tbody tr:hover td{background:var(--panel-bg-2)}
-.sba-table tbody tr:last-child td{border-bottom:none}
+.sba-card{transition:border-color .15s,box-shadow .15s,transform .15s}
+.sba-card:hover{border-color:var(--text-muted);box-shadow:var(--shadow)}
+.sba-status{appearance:none;-webkit-appearance:none;background-image:none}
+.sba-act{transition:filter .15s}
+.sba-act:hover:not(:disabled){filter:brightness(1.18)}
 `;
+
+/* What a status means, in colour.
+
+   The word itself is written by whichever vertical owns the record — a ticket
+   is "issued", a job is "completed", an invoice is "overdue" — so the tone is
+   read from the word rather than configured per page. Anything unrecognised
+   falls back to the page's own accent, which is never wrong, only neutral. */
+function statusTone(status: string, accent: string) {
+  const value = status.toLowerCase();
+  if (/(issued|paid|settled|complete|completed|approved|active|delivered|closed|done|received)/.test(value)) return "#34d399";
+  if (/(quoted|pending|draft|hold|on hold|await|awaiting|open|new)/.test(value)) return "#fbbf24";
+  if (/(refund|refunded|void|cancel|cancelled|reject|rejected|failed|overdue|expired)/.test(value)) return "#f87171";
+  if (/(booked|confirmed|progress|in progress|partial|sent|shipped|scheduled)/.test(value)) return "#60a5fa";
+  return accent;
+}
 
 function formatCellValue(value: unknown) {
   if (value === null || value === undefined || value === "") return "-";
@@ -200,94 +208,127 @@ export function BusinessRecordWorkspace({
     }
   }
 
-  /* The controls of one row — the status box, the page's own actions, Delete.
-     Shared, because the wide screen shows them in the last table cell and the
-     narrow one shows them at the foot of a card, and they must not drift
-     apart. */
-  function renderRowControls(row: Record<string, unknown>, justify: "flex-end" | "flex-start") {
+
+  /* The status of a record, as a pill you can change.
+
+     A status is one value out of a known list, so it is a dropdown; and
+     showing it where the eye lands first — beside the record's own name —
+     means the row reads as "TRV-011, quoted" rather than making you hunt for a
+     control at the far right of a scrolling table. */
+  function renderStatusPill(row: Record<string, unknown>) {
     const rowId = String(row.id);
     const rowStatus = String(row.status ?? "");
+    if (!statusOptions.length) {
+      return rowStatus ? (
+        <span style={{ fontSize: 11.5, fontWeight: 700, color: textMuted, textTransform: "uppercase", letterSpacing: ".04em" }}>{rowStatus}</span>
+      ) : null;
+    }
+    const tone = statusTone(rowStatus, accent);
     return (
-      <div style={{ display: "flex", gap: 6, justifyContent: justify, alignItems: "center", flexWrap: isMobile ? "wrap" : "nowrap" }}>
-        {/* One box instead of three pills.
+      <span style={{ position: "relative", display: "inline-flex", alignItems: "center", flexShrink: 0 }}>
+        <select
+          className="sba-status"
+          value={rowStatus}
+          onChange={(event) => handleStatusChange(rowId, event.target.value)}
+          style={{
+            borderRadius: 999,
+            border: `1px solid ${tone}55`,
+            background: `${tone}1f`,
+            color: tone,
+            fontSize: 11.5,
+            fontWeight: 700,
+            letterSpacing: ".04em",
+            textTransform: "uppercase",
+            padding: "6px 26px 6px 12px",
+            cursor: "pointer",
+            fontFamily: "inherit",
+          }}
+        >
+          {/* The current one first, even where it is not a listed option — a
+              record set to something retired should still read back honestly
+              rather than showing the first option as though it were true. */}
+          {!statusOptions.includes(rowStatus) && rowStatus && (
+            <option value={rowStatus}>{rowStatus}</option>
+          )}
+          {statusOptions.map((option) => (
+            <option key={option} value={option}>{option}</option>
+          ))}
+        </select>
+        <span aria-hidden style={{ position: "absolute", right: 11, fontSize: 8, color: tone, pointerEvents: "none" }}>▼</span>
+      </span>
+    );
+  }
 
-            Every row carried a button per status it was not currently in —
-            "booked", "issued", "refunded" — so a five-status record grew five
-            controls before the real actions even started. A status is one
-            value out of a known list, which is a dropdown; and this way the
-            row also shows what the status IS, which the pills never did. */}
-        {statusOptions.length > 0 && (
-          <select
-            value={rowStatus}
-            onChange={(event) => handleStatusChange(rowId, event.target.value)}
-            style={{
-              borderRadius: 999,
-              border: `1px solid ${accent}44`,
-              background: `${accent}14`,
-              color: accent,
-              fontSize: 11,
-              fontWeight: 700,
-              padding: "5px 8px",
-              cursor: "pointer",
-              fontFamily: "inherit",
-            }}
-          >
-            {/* The current one first, even where it is not a listed option — a
-                record set to something retired should still read back honestly
-                rather than showing the first option as though it were true. */}
-            {!statusOptions.includes(rowStatus) && rowStatus && (
-              <option value={rowStatus}>{rowStatus}</option>
-            )}
-            {statusOptions.map((option) => (
-              <option key={option} value={option}>{option}</option>
-            ))}
-          </select>
-        )}
-        {actions
-          .filter((action) => !action.hidden?.(row))
-          .map((action) => {
-            const label = typeof action.label === "function" ? action.label(row) : action.label;
-            const busy = actionKey === `${rowId}:${label}`;
-            const tone =
-              action.tone === "success"
-                ? { border: "1px solid rgba(52,211,153,.35)", background: "rgba(52,211,153,.12)", color: "#34d399" }
-                : action.tone === "neutral"
-                  ? { border: `1px solid ${panelBorder}`, background: "var(--panel-bg)", color: textPrimary }
-                  : { border: `1px solid ${accent}55`, background: `${accent}18`, color: accent };
+  /* The page's own actions, on their own line at the foot of the card.
 
-            return (
-              <button
-                key={label}
-                type="button"
-                disabled={busy}
-                onClick={() => handleAction(action, row)}
-                style={{
-                  borderRadius: 999,
-                  fontSize: 11,
-                  fontWeight: 700,
-                  padding: "5px 10px",
-                  cursor: busy ? "wait" : "pointer",
-                  opacity: busy ? 0.7 : 1,
-                  whiteSpace: "nowrap",
-                  fontFamily: "inherit",
-                  ...tone,
-                }}
-              >
-                {busy ? "Working..." : label}
-              </button>
-            );
-          })}
+     They used to ride in the last cell of the table, which on a wide record
+     meant a block of buttons pinned over the columns it was supposed to sit
+     beside. A record and the things you can do to it are two different kinds
+     of thing, so they get two different rows. */
+  function renderActions(row: Record<string, unknown>) {
+    const rowId = String(row.id);
+    const visible = actions.filter((action) => !action.hidden?.(row));
+    return (
+      <div
+        style={{
+          display: "flex",
+          gap: 8,
+          flexWrap: "wrap",
+          alignItems: "center",
+          justifyContent: isMobile ? "flex-start" : "flex-end",
+          borderTop: `1px solid ${panelBorder}`,
+          paddingTop: 12,
+          marginTop: 2,
+        }}
+      >
+        {visible.map((action) => {
+          const label = typeof action.label === "function" ? action.label(row) : action.label;
+          const busy = actionKey === `${rowId}:${label}`;
+          const tone =
+            action.tone === "success"
+              ? { border: "1px solid rgba(52,211,153,.45)", background: "rgba(52,211,153,.14)", color: "#34d399" }
+              : action.tone === "neutral"
+                ? { border: `1px solid ${panelBorder}`, background: "var(--panel-bg)", color: textPrimary }
+                : { border: `1px solid ${accent}66`, background: `${accent}1f`, color: accent };
+
+          return (
+            <button
+              key={label}
+              className="sba-act"
+              type="button"
+              disabled={busy}
+              onClick={() => handleAction(action, row)}
+              style={{
+                borderRadius: 10,
+                fontSize: 12,
+                fontWeight: 700,
+                padding: "8px 14px",
+                cursor: busy ? "wait" : "pointer",
+                opacity: busy ? 0.7 : 1,
+                whiteSpace: "nowrap",
+                fontFamily: "inherit",
+                ...tone,
+              }}
+            >
+              {busy ? "Working..." : label}
+            </button>
+          );
+        })}
+        {/* Destructive, so it sits apart from the things you do on purpose
+            every day and is never the button next to the one you wanted. */}
         <button
+          className="sba-act"
           type="button"
           onClick={() => handleDelete(rowId)}
           style={{
-            borderRadius: 999,
-            border: "1px solid rgba(248,113,113,.35)",
-            background: "rgba(248,113,113,.12)",
+            marginLeft: visible.length && !isMobile ? 4 : 0,
+            borderRadius: 10,
+            border: "1px solid transparent",
+            background: "transparent",
             color: "#f87171",
-            fontSize: 11,
+            fontSize: 12,
             fontWeight: 700,
-            padding: "5px 10px",
+            padding: "8px 12px",
             cursor: "pointer",
             whiteSpace: "nowrap",
             fontFamily: "inherit",
@@ -296,6 +337,90 @@ export function BusinessRecordWorkspace({
           Delete
         </button>
       </div>
+    );
+  }
+
+  /* One record, one card.
+
+     Ten columns of a travel booking never fitted a table on any screen anyone
+     actually uses: either the words were crushed together, or the table was
+     scrolled sideways and the heading of the column being read had scrolled
+     away with it. A card gives the record a name you can see, its values each
+     labelled beside them, and its buttons at the foot — and it needs no
+     horizontal scroll at any width. */
+  function renderCard(row: Record<string, unknown>) {
+    const [titleColumn, subtitleColumn] = columns;
+    const detailColumns = columns.filter((column, index) => {
+      if (index === 0) return false;
+      if (index === 1 && subtitleColumn) return false;
+      // The status is already the pill in the header.
+      if (column.key === "status" && statusOptions.length) return false;
+      return true;
+    });
+
+    const titleValue = titleColumn
+      ? (titleColumn.render ? titleColumn.render(row) : formatCellValue(row[titleColumn.key]))
+      : null;
+    const subtitleValue = subtitleColumn
+      ? (subtitleColumn.render ? subtitleColumn.render(row) : formatCellValue(row[subtitleColumn.key]))
+      : null;
+
+    return (
+      <article
+        key={String(row.id)}
+        className="sba-card"
+        style={{
+          border: `1px solid ${panelBorder}`,
+          borderRadius: 14,
+          background: "var(--panel-bg)",
+          padding: isMobile ? 14 : 16,
+          display: "grid",
+          gap: 14,
+          minWidth: 0,
+        }}
+      >
+        <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 12, flexWrap: "wrap" }}>
+          <div style={{ minWidth: 0 }}>
+            <div style={{ fontSize: 16, fontWeight: 800, color: textPrimary, lineHeight: 1.25, overflowWrap: "anywhere" }}>
+              {titleValue}
+            </div>
+            {subtitleColumn ? (
+              <div style={{ fontSize: 13, color: textMuted, marginTop: 3, overflowWrap: "anywhere" }}>
+                <span style={{ textTransform: "uppercase", letterSpacing: ".05em", fontSize: 10.5, marginRight: 6 }}>
+                  {subtitleColumn.label}
+                </span>
+                {subtitleValue}
+              </div>
+            ) : null}
+          </div>
+          {renderStatusPill(row)}
+        </div>
+
+        {detailColumns.length ? (
+          <div
+            style={{
+              display: "grid",
+              // Auto-fit rather than a fixed count: the same card is tidy in a
+              // narrow panel beside the form and in a wide one without it.
+              gridTemplateColumns: `repeat(auto-fit,minmax(${isMobile ? 130 : 150}px,1fr))`,
+              gap: "12px 16px",
+            }}
+          >
+            {detailColumns.map((column) => (
+              <div key={column.key} style={{ minWidth: 0 }}>
+                <div style={{ fontSize: 10, color: textMuted, textTransform: "uppercase", letterSpacing: ".06em", marginBottom: 4 }}>
+                  {column.label}
+                </div>
+                <div style={{ fontSize: 13.5, color: textPrimary, fontWeight: 600, overflowWrap: "anywhere" }}>
+                  {column.render ? column.render(row) : formatCellValue(row[column.key])}
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : null}
+
+        {renderActions(row)}
+      </article>
     );
   }
 
@@ -364,8 +489,8 @@ export function BusinessRecordWorkspace({
       </div>
 
       {/* Below a laptop width the form sits above the records instead of beside
-          them: 340px of form plus a wide table in what is left is what pushed
-          the table off the screen on a tablet. */}
+          them: 340px of form plus the records in what is left is what pushed
+          the records off the screen on a tablet. */}
       <div style={{ display: "grid", gridTemplateColumns: isTablet ? "minmax(0,1fr)" : "minmax(280px,340px) minmax(0,1fr)", gap: 16, alignItems: "start" }}>
         <form onSubmit={handleCreate} style={{ background: panelBg, border: `1px solid ${panelBorder}`, borderRadius: 16, padding: 20, minWidth: 0 }}>
           <div style={{ fontSize: 15, fontWeight: 700, color: textPrimary, marginBottom: 14 }}>Create Record</div>
@@ -517,7 +642,7 @@ export function BusinessRecordWorkspace({
           </button>
         </form>
 
-        <div style={{ background: panelBg, border: `1px solid ${panelBorder}`, borderRadius: 16, padding: isMobile ? 14 : 18, minWidth: 0, overflow: "hidden" }}>
+        <div style={{ background: panelBg, border: `1px solid ${panelBorder}`, borderRadius: 16, padding: isMobile ? 14 : 18, minWidth: 0 }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12, marginBottom: 14 }}>
             <div style={{ fontSize: 15, fontWeight: 700, color: textPrimary }}>Live Records</div>
             <div style={{ fontSize: 12, color: textMuted, whiteSpace: "nowrap" }}>{filteredRows.length} shown</div>
@@ -527,122 +652,9 @@ export function BusinessRecordWorkspace({
             <div style={{ fontSize: 13, color: textMuted }}>Loading records...</div>
           ) : !filteredRows.length ? (
             <div style={{ fontSize: 13, color: textMuted }}>{emptyState}</div>
-          ) : isMobile ? (
-            /* A card per record on a phone.
-
-               A ten-column table on a 390px screen is a table nobody can read:
-               either it is crushed or it is a sideways scroll where the column
-               you are reading has scrolled its heading away. A card names each
-               value beside it and needs no horizontal scroll at all. */
-            <div style={{ display: "grid", gap: 10 }}>
-              {filteredRows.map((row) => (
-                <div
-                  key={String(row.id)}
-                  style={{
-                    border: `1px solid ${panelBorder}`,
-                    borderRadius: 12,
-                    padding: 12,
-                    background: "var(--panel-bg)",
-                    display: "grid",
-                    gap: 8,
-                  }}
-                >
-                  <div style={{ display: "grid", gap: 6 }}>
-                    {columns.map((column) => (
-                      <div key={column.key} style={{ display: "flex", gap: 10, alignItems: "baseline", justifyContent: "space-between" }}>
-                        <span style={{ fontSize: 10.5, color: textMuted, textTransform: "uppercase", letterSpacing: ".05em", flexShrink: 0 }}>
-                          {column.label}
-                        </span>
-                        <span style={{ fontSize: 13, color: textPrimary, textAlign: "right", overflowWrap: "anywhere" }}>
-                          {column.render ? column.render(row) : formatCellValue(row[column.key])}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                  <div style={{ borderTop: `1px solid ${panelBorder}`, paddingTop: 8 }}>
-                    {renderRowControls(row, "flex-start")}
-                  </div>
-                </div>
-              ))}
-            </div>
           ) : (
-            /* The table scrolls inside its own panel rather than crushing the
-               words or dragging the page sideways.
-
-               Headings stay put at the top and the controls column stays put at
-               the right, so a wide record can be scrolled through without
-               losing either the name of the column being read or the buttons
-               that act on the row. */
-            <div className="sba-scroll" style={{ maxHeight: "min(68vh, 640px)", borderRadius: 12, border: `1px solid ${panelBorder}` }}>
-              <table className="sba-table">
-                <thead>
-                  <tr>
-                    {columns.map((column) => (
-                      <th
-                        key={column.key}
-                        style={{
-                          textAlign: "left",
-                          fontSize: 10.5,
-                          fontWeight: 700,
-                          color: textMuted,
-                          textTransform: "uppercase",
-                          letterSpacing: ".05em",
-                          padding: "11px 14px",
-                          // Headings never wrap. A two-line heading is what made
-                          // the row above unreadable.
-                          whiteSpace: "nowrap",
-                          borderBottom: `1px solid ${panelBorder}`,
-                        }}
-                      >
-                        {column.label}
-                      </th>
-                    ))}
-                    <th
-                      className="sba-sticky"
-                      style={{
-                        textAlign: "right",
-                        fontSize: 10.5,
-                        fontWeight: 700,
-                        color: textMuted,
-                        textTransform: "uppercase",
-                        letterSpacing: ".05em",
-                        padding: "11px 14px",
-                        whiteSpace: "nowrap",
-                        borderBottom: `1px solid ${panelBorder}`,
-                      }}
-                    >
-                      Actions
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {filteredRows.map((row) => (
-                    <tr key={String(row.id)}>
-                      {columns.map((column) => (
-                        <td
-                          key={column.key}
-                          style={{
-                            padding: "12px 14px",
-                            borderBottom: `1px solid ${panelBorder}`,
-                            fontSize: 13,
-                            color: textPrimary,
-                            // A name is one thing, so it stays on one line.
-                            whiteSpace: "nowrap",
-                          }}
-                        >
-                          {column.render ? column.render(row) : formatCellValue(row[column.key])}
-                        </td>
-                      ))}
-                      <td
-                        className="sba-sticky"
-                        style={{ padding: "12px 14px", borderBottom: `1px solid ${panelBorder}`, whiteSpace: "nowrap" }}
-                      >
-                        {renderRowControls(row, "flex-end")}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+            <div style={{ display: "grid", gap: 12 }}>
+              {filteredRows.map((row) => renderCard(row))}
             </div>
           )}
         </div>
