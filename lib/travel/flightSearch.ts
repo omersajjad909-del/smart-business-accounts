@@ -304,85 +304,34 @@ export function describeRoute(legs: FlightLeg[]): string {
   return points.filter((code, index) => index === 0 || code !== points[index - 1]).join(" -> ");
 }
 
-export type Airport = { code: string; city: string; country: string; name: string; lat: number; lon: number };
+/* The airport table moved to lib/travel/airports.ts, which carries all 4,008
+   airports a scheduled flight actually goes to.
+
+   It is not re-exported here on purpose: that file is 310KB and this one is
+   imported by client components, so pulling it through would put the whole
+   world's airports into the browser bundle to answer a box showing seven rows
+   at a time. Server code imports it directly; the picker asks
+   /api/travel/airports. Only the type comes through, and a type costs nothing
+   at runtime. */
+export type { Airport } from "./airports";
+// Needed in scope here too, for distanceKm below. Type-only, so nothing of
+// that 310KB file reaches a bundle.
+import type { Airport } from "./airports";
 
 /**
- * The airports a Pakistani agency actually sells, plus where its customers go.
+ * A handful of codes, for the plain text boxes that offer a datalist hint.
  *
- * Not a world database — a list the desk can find its airport in without
- * scrolling, which is what a From box needs. Anything missing can still be
- * typed as a bare IATA code.
+ * Not a limit on anything — every one of those boxes takes any IATA code that
+ * is typed into it, and the search resolves it against the full table. These
+ * are the ones a Pakistani desk reaches for most, so they are one keystroke
+ * away instead of being buried four thousand rows deep.
  */
-export const AIRPORTS: Airport[] = [
-  { code: "KHI", city: "Karachi", country: "Pakistan", name: "Jinnah International" , lat: 24.9065, lon: 67.1608 },
-  { code: "LHE", city: "Lahore", country: "Pakistan", name: "Allama Iqbal International" , lat: 31.5216, lon: 74.4036 },
-  { code: "ISB", city: "Islamabad", country: "Pakistan", name: "Islamabad International" , lat: 33.5607, lon: 72.8516 },
-  { code: "PEW", city: "Peshawar", country: "Pakistan", name: "Bacha Khan International" , lat: 33.9939, lon: 71.5146 },
-  { code: "UET", city: "Quetta", country: "Pakistan", name: "Quetta International" , lat: 30.2514, lon: 66.9378 },
-  { code: "MUX", city: "Multan", country: "Pakistan", name: "Multan International" , lat: 30.2032, lon: 71.4191 },
-  { code: "SKT", city: "Sialkot", country: "Pakistan", name: "Sialkot International" , lat: 32.5356, lon: 74.3639 },
-  { code: "FSD", city: "Faisalabad", country: "Pakistan", name: "Faisalabad International" , lat: 31.365, lon: 72.9948 },
-  { code: "JED", city: "Jeddah", country: "Saudi Arabia", name: "King Abdulaziz International" , lat: 21.6796, lon: 39.1565 },
-  { code: "MED", city: "Madinah", country: "Saudi Arabia", name: "Prince Mohammad bin Abdulaziz" , lat: 24.5534, lon: 39.7051 },
-  { code: "RUH", city: "Riyadh", country: "Saudi Arabia", name: "King Khalid International" , lat: 24.9576, lon: 46.6988 },
-  { code: "DMM", city: "Dammam", country: "Saudi Arabia", name: "King Fahd International" , lat: 26.4712, lon: 49.7979 },
-  { code: "DXB", city: "Dubai", country: "UAE", name: "Dubai International" , lat: 25.2532, lon: 55.3657 },
-  { code: "SHJ", city: "Sharjah", country: "UAE", name: "Sharjah International" , lat: 25.3286, lon: 55.5172 },
-  { code: "AUH", city: "Abu Dhabi", country: "UAE", name: "Zayed International" , lat: 24.433, lon: 54.6511 },
-  { code: "DOH", city: "Doha", country: "Qatar", name: "Hamad International" , lat: 25.2731, lon: 51.6081 },
-  { code: "MCT", city: "Muscat", country: "Oman", name: "Muscat International" , lat: 23.5933, lon: 58.2844 },
-  { code: "BAH", city: "Manama", country: "Bahrain", name: "Bahrain International" , lat: 26.2708, lon: 50.6336 },
-  { code: "KWI", city: "Kuwait City", country: "Kuwait", name: "Kuwait International" , lat: 29.2266, lon: 47.9689 },
-  { code: "IST", city: "Istanbul", country: "Turkey", name: "Istanbul Airport" , lat: 41.2753, lon: 28.7519 },
-  { code: "LHR", city: "London", country: "United Kingdom", name: "Heathrow" , lat: 51.47, lon: -0.4543 },
-  { code: "MAN", city: "Manchester", country: "United Kingdom", name: "Manchester" , lat: 53.3537, lon: -2.275 },
-  { code: "BHX", city: "Birmingham", country: "United Kingdom", name: "Birmingham" , lat: 52.4539, lon: -1.748 },
-  { code: "CDG", city: "Paris", country: "France", name: "Charles de Gaulle" , lat: 49.0097, lon: 2.5479 },
-  { code: "FRA", city: "Frankfurt", country: "Germany", name: "Frankfurt am Main" , lat: 50.0379, lon: 8.5622 },
-  { code: "JFK", city: "New York", country: "United States", name: "John F. Kennedy" , lat: 40.6413, lon: -73.7781 },
-  { code: "YYZ", city: "Toronto", country: "Canada", name: "Pearson International" , lat: 43.6777, lon: -79.6248 },
-  { code: "KUL", city: "Kuala Lumpur", country: "Malaysia", name: "Kuala Lumpur International" , lat: 2.7456, lon: 101.7099 },
-  { code: "BKK", city: "Bangkok", country: "Thailand", name: "Suvarnabhumi" , lat: 13.69, lon: 100.7501 },
-  { code: "SIN", city: "Singapore", country: "Singapore", name: "Changi" , lat: 1.3644, lon: 103.9915 },
-  { code: "CAN", city: "Guangzhou", country: "China", name: "Baiyun International" , lat: 23.3924, lon: 113.2988 },
-  { code: "PEK", city: "Beijing", country: "China", name: "Capital International" , lat: 40.0799, lon: 116.6031 },
-  { code: "DEL", city: "New Delhi", country: "India", name: "Indira Gandhi International" , lat: 28.5562, lon: 77.1 },
-  { code: "CMB", city: "Colombo", country: "Sri Lanka", name: "Bandaranaike International" , lat: 7.1808, lon: 79.8841 },
-  { code: "DAC", city: "Dhaka", country: "Bangladesh", name: "Hazrat Shahjalal International" , lat: 23.8433, lon: 90.3978 },
-  { code: "KBL", city: "Kabul", country: "Afghanistan", name: "Hamid Karzai International" , lat: 34.5658, lon: 69.2123 },
-  { code: "THR", city: "Tehran", country: "Iran", name: "Mehrabad" , lat: 35.6892, lon: 51.3134 },
-  { code: "BGW", city: "Baghdad", country: "Iraq", name: "Baghdad International" , lat: 33.2625, lon: 44.2346 },
-  { code: "NJF", city: "Najaf", country: "Iraq", name: "Al Najaf International" , lat: 31.9896, lon: 44.4044 },
-  { code: "AMM", city: "Amman", country: "Jordan", name: "Queen Alia International" , lat: 31.7226, lon: 35.9932 },
+export const COMMON_AIRPORT_CODES = [
+  "KHI", "LHE", "ISB", "PEW", "UET", "MUX", "SKT", "LYP", "GWD", "SDT",
+  "JED", "MED", "RUH", "DMM", "DXB", "SHJ", "AUH", "DOH", "MCT", "BAH",
+  "KWI", "IST", "LHR", "MAN", "BHX", "CDG", "FRA", "JFK", "YYZ", "KUL",
+  "BKK", "SIN", "CAN", "PEK", "DEL", "CMB", "DAC", "KBL", "BGW", "NJF",
 ];
-
-const AIRPORT_BY_CODE = new Map(AIRPORTS.map((a) => [a.code, a]));
-
-export function findAirport(code: string): Airport | undefined {
-  return AIRPORT_BY_CODE.get(String(code || "").trim().toUpperCase());
-}
-
-/** Airports whose code, city or name the typed text matches. */
-export function searchAirports(text: string, limit = 8): Airport[] {
-  const needle = String(text || "").trim().toLowerCase();
-  if (!needle) return AIRPORTS.slice(0, limit);
-  const scored = AIRPORTS.map((airport) => {
-    const code = airport.code.toLowerCase();
-    const city = airport.city.toLowerCase();
-    // An exact code is what the desk types when it knows what it wants, so it
-    // has to come first — "DEL" must not be beaten by "New Delhi".
-    if (code === needle) return { airport, score: 0 };
-    if (city.startsWith(needle)) return { airport, score: 1 };
-    if (code.startsWith(needle)) return { airport, score: 2 };
-    if (city.includes(needle) || airport.name.toLowerCase().includes(needle) || airport.country.toLowerCase().includes(needle)) {
-      return { airport, score: 3 };
-    }
-    return { airport, score: 99 };
-  })
-    .filter((row) => row.score < 99)
-    .sort((a, b) => a.score - b.score);
-  return scored.slice(0, limit).map((row) => row.airport);
-}
 
 export const AIRLINES: Array<{ code: string; name: string }> = [
   { code: "PK", name: "Pakistan International Airlines" },

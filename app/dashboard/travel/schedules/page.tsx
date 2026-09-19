@@ -17,10 +17,10 @@
 import { BusinessRecordWorkspace } from "../../_components/BusinessRecordWorkspace";
 import { ScheduleImport } from "../_flight/ScheduleImport";
 import { travelAccent } from "../_shared";
-import { AIRLINES, AIRPORTS, minutesBetween, formatDuration } from "@/lib/travel/flightSearch";
+import { AIRLINES, COMMON_AIRPORT_CODES, minutesBetween, formatDuration } from "@/lib/travel/flightSearch";
 import type { BusinessRecord } from "@/lib/useBusinessRecords";
 
-const airportCodes = AIRPORTS.map((airport) => airport.code);
+const airportCodes = COMMON_AIRPORT_CODES;
 const airlineNames = AIRLINES.map((airline) => airline.name);
 
 /* A flight that stops operating is suspended, not deleted — last winter's

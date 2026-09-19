@@ -12,7 +12,7 @@
 
 import { useState } from "react";
 
-import { AIRPORTS } from "@/lib/travel/flightSearch";
+import { COMMON_AIRPORT_CODES } from "@/lib/travel/flightSearch";
 import { Field, GhostButton, PrimaryButton, T, flightCss, inputStyle } from "./ui";
 
 type Flight = {
@@ -27,7 +27,7 @@ type Flight = {
   aircraft: string;
 };
 
-const airportCodes = AIRPORTS.map((a) => a.code);
+const airportCodes = COMMON_AIRPORT_CODES;
 
 export function ScheduleImport() {
   const today = new Date().toISOString().slice(0, 10);

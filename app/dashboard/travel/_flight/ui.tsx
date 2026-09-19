@@ -14,8 +14,7 @@ import { useCurrency } from "@/lib/useCurrency";
 import {
   CABIN_LABELS,
   describePax,
-  findAirport,
-  searchAirports,
+  type Airport,
   type CabinClass,
   type PaxCounts,
 } from "@/lib/travel/flightSearch";
@@ -172,12 +171,24 @@ const popover: React.CSSProperties = {
   minWidth: 260,
 };
 
+/* What the picker has already been told about an airport.
+
+   Shared across every box on the page, so swapping From and To, or coming back
+   to a form, does not have to ask the server again for a city name it already
+   printed once. */
+const airportCache = new Map<string, Airport>();
+
 /**
  * An airport box that takes a code but accepts a city.
  *
  * The desk types "LHE" when it knows and "Lahore" when it does not, and both
  * have to land on the same airport — a free-text box is how a booking ends up
  * routed to the wrong Hyderabad.
+ *
+ * It asks the server rather than searching a list it carries. The table is all
+ * 4,008 airports a scheduled flight goes to and weighs 310KB; shipping that to
+ * a browser to fill seven rows would be the whole world's airports downloaded
+ * so somebody can type three letters.
  */
 export function AirportInput({
   value,
@@ -190,9 +201,56 @@ export function AirportInput({
 }) {
   const [open, setOpen] = useState(false);
   const [text, setText] = useState("");
+  const [matches, setMatches] = useState<Airport[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [selected, setSelected] = useState<Airport | undefined>(() => airportCache.get(value));
   const ref = useDismiss(open, () => setOpen(false));
-  const selected = findAirport(value);
-  const matches = useMemo(() => searchAirports(text, 7), [text]);
+
+  /* Whatever comes back is remembered, so the next box asking about the same
+     airport costs nothing. */
+  const remember = (rows: Airport[]) => {
+    rows.forEach((row) => airportCache.set(row.code, row));
+  };
+
+  // The code may arrive from outside — a swap, a restored form — with nothing
+  // yet known about it.
+  useEffect(() => {
+    if (!value) { setSelected(undefined); return; }
+    const cached = airportCache.get(value);
+    if (cached) { setSelected(cached); return; }
+    let cancelled = false;
+    fetch(`/api/travel/airports?q=${encodeURIComponent(value)}&limit=1`)
+      .then((r) => (r.ok ? r.json() : null))
+      .then((body) => {
+        const row = body?.airports?.[0] as Airport | undefined;
+        if (cancelled || !row || row.code !== value) return;
+        remember([row]);
+        setSelected(row);
+      })
+      .catch(() => {});
+    return () => { cancelled = true; };
+  }, [value]);
+
+  // Typing. Debounced, because a keystroke is not a question worth asking the
+  // server on its own.
+  useEffect(() => {
+    if (!open) return;
+    let cancelled = false;
+    setLoading(true);
+    const timer = setTimeout(() => {
+      fetch(`/api/travel/airports?q=${encodeURIComponent(text)}&limit=8`)
+        .then((r) => (r.ok ? r.json() : null))
+        .then((body) => {
+          if (cancelled) return;
+          const rows = (body?.airports ?? []) as Airport[];
+          remember(rows);
+          setMatches(rows);
+        })
+        .catch(() => { if (!cancelled) setMatches([]); })
+        .finally(() => { if (!cancelled) setLoading(false); });
+    }, 180);
+    return () => { cancelled = true; clearTimeout(timer); };
+  }, [text, open]);
 
   return (
     <div ref={ref} style={{ position: "relative" }}>
@@ -217,11 +275,11 @@ export function AirportInput({
             placeholder={placeholder}
             style={{ flex: 1, minWidth: 0, background: "transparent", border: "none", outline: "none", color: T.text, fontSize: 14, fontFamily: "inherit" }}
           />
-        ) : selected ? (
+        ) : value ? (
           <span style={{ minWidth: 0 }}>
-            <span style={{ fontSize: 15, fontWeight: 800, color: T.text }}>{selected.code}</span>
+            <span style={{ fontSize: 15, fontWeight: 800, color: T.text }}>{value}</span>
             <span style={{ display: "block", fontSize: 11, color: T.muted, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-              {selected.city}, {selected.country}
+              {selected ? `${selected.city}, ${selected.country}` : "\u00a0"}
             </span>
           </span>
         ) : (
@@ -230,14 +288,14 @@ export function AirportInput({
       </div>
 
       {open ? (
-        <div style={{ ...popover, minWidth: 300, maxHeight: 300, overflowY: "auto" }} className="fl-scroll">
+        <div style={{ ...popover, minWidth: 320, maxHeight: 320, overflowY: "auto" }} className="fl-scroll">
           {matches.length ? (
             matches.map((airport) => (
               <button
                 key={airport.code}
                 type="button"
                 className="fl-opt"
-                onClick={() => { onChange(airport.code); setOpen(false); }}
+                onClick={() => { remember([airport]); setSelected(airport); onChange(airport.code); setOpen(false); }}
                 style={{
                   display: "flex", width: "100%", gap: 10, alignItems: "center", textAlign: "left",
                   background: "transparent", border: "none", borderRadius: 8, padding: "9px 10px",
@@ -247,13 +305,15 @@ export function AirportInput({
                 <span style={{ fontSize: 13, fontWeight: 800, width: 34, color: T.accent }}>{airport.code}</span>
                 <span style={{ minWidth: 0 }}>
                   <span style={{ display: "block", fontSize: 13, fontWeight: 600 }}>{airport.city}</span>
-                  <span style={{ display: "block", fontSize: 11, color: T.muted }}>{airport.name} · {airport.country}</span>
+                  <span style={{ display: "block", fontSize: 11, color: T.muted, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                    {airport.name} · {airport.country}
+                  </span>
                 </span>
               </button>
             ))
           ) : (
             <div style={{ padding: "10px 12px", fontSize: 12.5, color: T.muted }}>
-              No airport matches “{text}”. Type the three-letter code if you know it.
+              {loading ? "Searching…" : text ? `No airport matches “${text}”.` : "Start typing a city or code."}
             </div>
           )}
         </div>

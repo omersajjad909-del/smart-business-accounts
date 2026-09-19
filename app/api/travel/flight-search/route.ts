@@ -30,7 +30,6 @@ import {
   CABIN_MULTIPLIER,
   airlineName,
   distanceKm,
-  findAirport,
   flightMinutes,
   scheduledLeg,
   schedulesFor,
@@ -43,6 +42,8 @@ import {
   type SearchQuery,
   type TripType,
 } from "@/lib/travel/flightSearch";
+// The full table — server-side only, see the header of that file.
+import { findAirport } from "@/lib/travel/airports";
 
 /** Where each carrier banks its connections. */
 const HUBS: Record<string, string> = {
@@ -75,6 +76,22 @@ const POSITIONING: Record<string, number> = {
 };
 
 const PK_CARRIERS = new Set(["PK", "PF", "ER", "PA"]);
+
+/**
+ * Carriers that fly narrow-body aircraft and nothing else.
+ *
+ * It matters because without it the estimator offered AirSial, Airblue and
+ * SereneAir flying Lahore to Barcelona nonstop — six and a half thousand
+ * kilometres on an A320. The range check only ran for carriers being routed
+ * through a hub, so anyone at home at one end of the sector was offered it at
+ * any distance at all.
+ */
+const NARROW_BODY = new Set(["PF", "ER", "PA", "9P", "G9", "FZ", "J9", "XY", "F3", "OV"]);
+
+/** How far a carrier plausibly flies a sector without stopping. */
+function rangeLimitKm(code: string): number {
+  return NARROW_BODY.has(code) ? 4200 : 13000;
+}
 
 /** A number generator that gives the same route the same timetable twice. */
 function seeded(seed: string) {
@@ -156,11 +173,15 @@ function estimatedLeg(code: string, leg: SearchLeg, from: Airport, to: Airport):
     if (viaHub < direct * 1.85 && direct > 900) {
       via = [hubAirport.code];
       minutes = flightMinutes(distanceKm(from, hubAirport)) + flightMinutes(distanceKm(hubAirport, to)) + 90;
-    } else if (direct > 4200) {
-      // Too far for this carrier to fly nonstop off its own network.
-      return null;
     }
   }
+
+  /* A sector the aircraft cannot reach is not an offer, however it was routed.
+     This check used to sit inside the hub branch, so a carrier at home at one
+     end — which is every Pakistani carrier on every sector out of Pakistan —
+     skipped it entirely. */
+  const longest = via.length ? Math.max(distanceKm(from, findAirport(via[0])!), distanceKm(findAirport(via[0])!, to)) : direct;
+  if (longest > rangeLimitKm(code)) return null;
 
   return {
     from: from.code,

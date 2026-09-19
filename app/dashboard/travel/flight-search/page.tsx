@@ -13,7 +13,7 @@ import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 
 import { useResponsive } from "@/hooks/useResponsive";
-import { describeRoute, findAirport, type FlightOffer } from "@/lib/travel/flightSearch";
+import { describeRoute, type FlightOffer } from "@/lib/travel/flightSearch";
 import { OfferCard } from "../_flight/OfferCard";
 import { SearchPanel } from "../_flight/SearchPanel";
 import { SummaryRail } from "../_flight/SummaryRail";
@@ -175,7 +175,7 @@ export default function FlightSearchPage() {
                   <div style={{ border: `1px solid ${T.border}`, borderRadius: 14, padding: 24, textAlign: "center", color: T.muted, fontSize: 13, background: T.card }}>
                     {offers.length
                       ? "No flight matches those filters. Widen the stops or the airline."
-                      : findAirport(query.legs[0]?.from || "") && findAirport(query.legs[0]?.to || "")
+                      : (query.legs[0]?.from || "").length === 3 && (query.legs[0]?.to || "").length === 3
                         ? "No carrier in the list flies this sector. Enter the booking by hand on the Airline Tickets desk."
                         : "Pick both airports from the list so the route can be read."}
                   </div>
