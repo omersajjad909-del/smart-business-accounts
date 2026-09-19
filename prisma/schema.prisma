@@ -2388,6 +2388,12 @@ model Booking {
   marginTotal Float @default(0)
   paidTotal   Float @default(0)
 
+  /// What was sent to the customer before they agreed to anything. A trip is
+  /// quoted first and invoiced only once it is accepted, which is the order
+  /// the conversation actually happens in.
+  quotationId String?
+  quotationNo String?
+
   /// Once raised, the booking is fixed — see the travel passenger route for the
   /// same reasoning.
   invoiceId String?

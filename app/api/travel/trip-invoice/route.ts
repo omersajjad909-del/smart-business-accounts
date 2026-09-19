@@ -147,6 +147,16 @@ export async function POST(req: NextRequest) {
       data: { invoiceId: invoice.id, invoiceNo: invoice.invoiceNo, status: booking.status === "draft" ? "confirmed" : booking.status },
     });
 
+    /* Invoicing a quoted trip is the customer having said yes, so the quotation
+       is marked accepted rather than sitting in the pipeline for ever
+       inflating what the agency thinks it is about to win. */
+    if (booking.quotationId) {
+      await prisma.quotation.updateMany({
+        where: { id: booking.quotationId, companyId, status: { not: "ACCEPTED" } },
+        data: { status: "ACCEPTED" },
+      }).catch(() => {});
+    }
+
     await logAuditFromReq(req, {
       companyId,
       entity: "Booking",

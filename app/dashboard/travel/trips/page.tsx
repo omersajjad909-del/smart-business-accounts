@@ -40,6 +40,7 @@ type Trip = {
   saleTotal: number;
   costTotal: number;
   marginTotal: number;
+  quotationNo: string | null;
   invoiceNo: string | null;
   items: Item[];
   travelers: { travelerId: string; role: string }[];
@@ -165,6 +166,29 @@ export default function TripsPage() {
       return;
     }
     await load();
+  }
+
+  /* The price the customer sees, before they have agreed to anything. Sent
+     first, invoiced only once they say yes. */
+  async function sendQuote(trip: Trip) {
+    setError("");
+    try {
+      const response = await fetch("/api/travel/trip-quote", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ bookingId: trip.id, validDays: 7 }),
+      });
+      const body = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(body?.error || "Could not create the quotation");
+      alertToast(
+        `Quotation ${body.quotationNo} for ${money(body.total ?? trip.saleTotal)}${body.validUntil ? `, valid to ${String(body.validUntil).slice(0, 10)}` : ""}.`,
+        "success",
+        body.reused ? "Already Quoted" : "Quotation Created",
+      );
+      await load();
+    } catch (quoteError) {
+      setError(quoteError instanceof Error ? quoteError.message : "Could not create the quotation");
+    }
   }
 
   /* One invoice for the whole trip: a line per service, the customer owing the
@@ -397,6 +421,7 @@ export default function TripsPage() {
                     {trip.customerName}
                     {trip.travelDate ? ` · ${String(trip.travelDate).slice(0, 10)}` : ""}
                     {trip.travelers.length ? ` · ${trip.travelers.length} traveller${trip.travelers.length === 1 ? "" : "s"}` : ""}
+                    {trip.quotationNo ? ` · quote ${trip.quotationNo}` : ""}
                     {trip.invoiceNo ? ` · invoice ${trip.invoiceNo}` : ""}
                   </div>
                 </div>
@@ -441,6 +466,35 @@ export default function TripsPage() {
                   </span>
                 </div>
                 <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
+                  {/* Quote first, invoice once they agree — the order the
+                      conversation actually happens in. */}
+                  {trip.quotationNo ? (
+                    <a
+                      href="/dashboard/quotation"
+                      style={{
+                        border: `1px solid ${T.border}`, background: T.panel, color: T.text,
+                        borderRadius: 10, padding: "7px 13px", fontSize: 12, fontWeight: 700,
+                        textDecoration: "none", whiteSpace: "nowrap",
+                      }}
+                    >
+                      Quote {trip.quotationNo}
+                    </a>
+                  ) : (
+                    <button
+                      type="button"
+                      className="fl-press"
+                      onClick={() => sendQuote(trip)}
+                      disabled={trip.status === "cancelled" || !trip.items.length}
+                      style={{
+                        border: `1px solid ${T.accent}55`, background: "var(--accent-soft)", color: T.accent,
+                        borderRadius: 10, padding: "7px 13px", fontSize: 12, fontWeight: 700,
+                        cursor: trip.status === "cancelled" ? "not-allowed" : "pointer",
+                        fontFamily: "inherit", whiteSpace: "nowrap", opacity: trip.status === "cancelled" ? 0.5 : 1,
+                      }}
+                    >
+                      Send quote
+                    </button>
+                  )}
                   {trip.invoiceNo ? (
                     <a
                       href={`/dashboard/sales-invoice?id=${encodeURIComponent(trip.id)}`}
