@@ -15,6 +15,7 @@
  */
 
 import { BusinessRecordWorkspace } from "../../_components/BusinessRecordWorkspace";
+import { ScheduleImport } from "../_flight/ScheduleImport";
 import { travelAccent } from "../_shared";
 import { AIRLINES, AIRPORTS, minutesBetween, formatDuration } from "@/lib/travel/flightSearch";
 import type { BusinessRecord } from "@/lib/useBusinessRecords";
@@ -63,6 +64,12 @@ function mapSchedule(record: BusinessRecord) {
 
 export default function TravelSchedulesPage() {
   return (
+    <>
+    {/* Above the list, because importing a sector is what you do before the
+        list has anything in it. */}
+    <div style={{ padding: "20px 28px 0" }}>
+      <ScheduleImport />
+    </div>
     <BusinessRecordWorkspace
       title="Flight Schedules"
       subtitle="The timetable you sell. Flight Search shows a departure time only where it finds one here — it never invents one."
@@ -141,5 +148,6 @@ export default function TravelSchedulesPage() {
         ];
       }}
     />
+    </>
   );
 }
