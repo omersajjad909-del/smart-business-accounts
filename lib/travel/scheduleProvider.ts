@@ -26,6 +26,8 @@
 // that rather than against a guess. Until then, treat anything here as
 // provisional.
 
+import { AIRLINES } from "@/lib/travel/flightSearch";
+
 export type ProviderFlight = {
   airline: string;
   airlineIata: string;
@@ -91,6 +93,23 @@ function readDepartureRow(raw: unknown, from: string): ProviderFlight | null {
   const airlineNode = (row.airline ?? {}) as Record<string, unknown>;
   const aircraftNode = (row.aircraft ?? {}) as Record<string, unknown>;
 
+  /* The provider's own name for a carrier is whatever is on its operating
+     certificate — the first real import returned "M/S Fly Jinnah Services Pvt
+     Ltd" and "Pakistan International". Nobody sells a seat under those. Where
+     the IATA code is one we know, ours is the name that goes on the card. */
+  const flightNo = String(row.number || row.flightNumber || "").trim().toUpperCase();
+  if (!flightNo) return null;
+
+  /* And the code itself is not always given. Fly Jinnah came back as
+     `{"name":"M/S Fly Jinnah Services Pvt Ltd"}` with no iata at all — which
+     matters far more than the name, because a schedule saved without a carrier
+     code matches nothing when the search looks for it later. The flight number
+     carries the code as its prefix, so that is where it is read from. */
+  const iata =
+    String(airlineNode.iata || "").toUpperCase() ||
+    (flightNo.match(/^([A-Z0-9]{2})\s*\d/)?.[1] ?? "");
+  const known = AIRLINES.find((a) => a.code === iata);
+
   const departAt =
     clockFrom((departure.scheduledTime as Record<string, unknown>)?.local) ||
     clockFrom(row.scheduledDepartureLocal) ||
@@ -101,12 +120,9 @@ function readDepartureRow(raw: unknown, from: string): ProviderFlight | null {
     clockFrom((movement.scheduledTime as Record<string, unknown>)?.local) ||
     clockFrom(row.scheduledArrivalLocal);
 
-  const flightNo = String(row.number || row.flightNumber || "").trim().toUpperCase();
-  if (!flightNo) return null;
-
   return {
-    airline: String(airlineNode.name || ""),
-    airlineIata: String(airlineNode.iata || "").toUpperCase(),
+    airline: known?.name || String(airlineNode.name || ""),
+    airlineIata: iata,
     flightNo,
     from,
     to,
@@ -190,6 +206,17 @@ async function fetchAeroDataBox(options: FetchOptions): Promise<ProviderResult &
 
   if (!unique.length) {
     warnings.push(`Nothing came back for ${options.from} to ${options.to} on ${options.date}. The sector may not operate that day, or the provider may not cover it.`);
+  } else {
+    /* A departures board is one day, not a week.
+
+       Everything here flew on the date asked for and nothing in the response
+       says which other days it flies. Saved as-is these rows read as daily,
+       so a thrice-weekly service would be offered to a customer on a Tuesday
+       it does not operate. Said plainly rather than guessed at. */
+    warnings.push(
+      `These are the flights that operated on ${options.date} — the provider does not say which other days they run. ` +
+      "Set the operating days below if any of them is not a daily service.",
+    );
   }
   unique.forEach((flight) => {
     if (!flight.arriveAt) {

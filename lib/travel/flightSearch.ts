@@ -401,6 +401,22 @@ export const AIRLINES: Array<{ code: string; name: string }> = [
   { code: "KU", name: "Kuwait Airways" },
   { code: "MS", name: "EgyptAir" },
   { code: "J9", name: "Jazeera Airways" },
+  /* Turned up by the first real schedule import off Karachi and missing from
+     the list written from memory — which is what a list written from memory
+     is for. Without them a Fly Jinnah flight reads as "9P" on the card. */
+  { code: "9P", name: "Fly Jinnah" },
+  { code: "F3", name: "flyadeal" },
+  { code: "XY", name: "flynas" },
+  { code: "OV", name: "SalamAir" },
+  { code: "UL", name: "SriLankan Airlines" },
+  { code: "6E", name: "IndiGo" },
+  { code: "AI", name: "Air India" },
+  { code: "TG", name: "Thai Airways" },
+  { code: "MH", name: "Malaysia Airlines" },
+  { code: "SQ", name: "Singapore Airlines" },
+  { code: "CZ", name: "China Southern" },
+  { code: "BA", name: "British Airways" },
+  { code: "VS", name: "Virgin Atlantic" },
 ];
 
 export function airlineName(code: string): string {

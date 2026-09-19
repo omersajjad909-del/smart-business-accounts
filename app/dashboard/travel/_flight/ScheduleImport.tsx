@@ -32,6 +32,10 @@ const airportCodes = AIRPORTS.map((a) => a.code);
 export function ScheduleImport() {
   const today = new Date().toISOString().slice(0, 10);
   const [form, setForm] = useState({ from: "", to: "", date: today });
+  /* Empty means daily, which is what most of these are. The provider cannot
+     tell us, so this is the operator's call and it is asked for rather than
+     assumed. */
+  const [days, setDays] = useState("");
   const [flights, setFlights] = useState<Flight[] | null>(null);
   const [keep, setKeep] = useState<Record<string, boolean>>({});
   const [warnings, setWarnings] = useState<string[]>([]);
@@ -88,7 +92,13 @@ export function ScheduleImport() {
           to: form.to.toUpperCase(),
           date: form.date,
           save: true,
-          flights: chosen,
+          flights: chosen.map((row) => ({
+            ...row,
+            days: days
+              .split(/[^0-9]+/)
+              .map((n) => Number(n))
+              .filter((n) => n >= 1 && n <= 7),
+          })),
         }),
       });
       const body = await response.json().catch(() => ({}));
@@ -230,7 +240,21 @@ export function ScheduleImport() {
                 );
               })}
 
-              <div style={{ display: "flex", justifyContent: "flex-end", gap: 10 }}>
+              <div
+                style={{
+                  display: "flex", gap: 12, alignItems: "flex-end", flexWrap: "wrap",
+                  borderTop: `1px solid ${T.border}`, paddingTop: 12,
+                }}
+              >
+                <div style={{ flex: "0 1 240px" }}>
+                  <Field label="Operating days" hint="Empty = daily. Otherwise 1=Mon … 7=Sun, e.g. 1,3,5">
+                    <input
+                      value={days} onChange={(e) => setDays(e.target.value)}
+                      placeholder="Daily" style={cell} className="fl-in"
+                    />
+                  </Field>
+                </div>
+                <div style={{ flex: 1 }} />
                 <GhostButton onClick={() => setFlights(null)}>Discard</GhostButton>
                 <PrimaryButton onClick={save} disabled={busy}>
                   {busy ? "Saving…" : "Save ticked flights"}
