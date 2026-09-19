@@ -42,7 +42,11 @@ export function ScheduleImport() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [saved, setSaved] = useState("");
-  const [open, setOpen] = useState(false);
+  /* Open. It was collapsed behind a small "Open" button and people could not
+     find it at all — which on a page whose whole job is getting a timetable in
+     is the wrong default. Importing a sector is the first thing you do here,
+     not a tool tucked away for later. */
+  const [open, setOpen] = useState(true);
 
   const cell = { ...inputStyle, padding: "9px 11px", fontSize: 13 };
 
@@ -134,12 +138,13 @@ export function ScheduleImport() {
 
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
         <div style={{ minWidth: 0 }}>
-          <div style={{ fontSize: 14, fontWeight: 800, color: T.text }}>📡 Import a sector from a provider</div>
+          <div style={{ fontSize: 15, fontWeight: 800, color: T.text }}>📡 Import a sector&rsquo;s timetable</div>
           <div style={{ fontSize: 11.5, color: T.muted, marginTop: 2 }}>
-            One call per sector, saved here for good — searches afterwards cost nothing.
+            Ask a flight-data provider what flies a route, check it, and keep it. One call per
+            sector — every search after that reads it from here and costs nothing.
           </div>
         </div>
-        <GhostButton onClick={() => setOpen((o) => !o)}>{open ? "Close" : "Open"}</GhostButton>
+        <GhostButton onClick={() => setOpen((o) => !o)}>{open ? "Hide" : "Import flights"}</GhostButton>
       </div>
 
       {open ? (
