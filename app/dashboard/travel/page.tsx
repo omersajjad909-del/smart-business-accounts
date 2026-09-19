@@ -20,6 +20,7 @@ import Link from "next/link";
 import { useMemo } from "react";
 
 import { useBusinessRecords } from "@/lib/useBusinessRecords";
+import { AttentionPanel } from "./_flight/AttentionPanel";
 import { useResponsive } from "@/hooks/useResponsive";
 import { bookingMoney, readBooking } from "@/lib/umrahBooking";
 import { occupancyName, readDeparture, seatPosition } from "@/lib/umrahPackage";
@@ -149,6 +150,10 @@ export default function TravelOverviewPage() {
 
   return (
     <div style={{ padding: isMobile ? "15px 13px" : "24px 28px", color: "#e2e8f0", fontFamily: ff }}>
+      {/* Across every desk at once: what is not a problem today and is an
+          expensive problem the week it lands. */}
+      <AttentionPanel />
+
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 18, flexWrap: "wrap", marginBottom: 20 }}>
         <div>
           <h1 style={{ margin: "0 0 5px", fontSize: 23, fontWeight: 800, color: "#fff" }}>Travel</h1>
