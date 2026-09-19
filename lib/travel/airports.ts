@@ -131,18 +131,32 @@ const PROMINENT_ORDER = [
 const PROMINENCE = new Map(PROMINENT_ORDER.map((code, index) => [code, index]));
 const prominence = (code: string) => PROMINENCE.get(code) ?? Number.MAX_SAFE_INTEGER;
 
+/**
+ * What an empty box offers first.
+ *
+ * Home airports and the places they actually fly to, interleaved, so the first
+ * six rows are not all one country. See the note in searchAirports.
+ */
+const OPENING_SUGGESTIONS = [
+  "KHI", "DXB", "LHE", "JED", "ISB", "LHR", "DOH", "RUH",
+  "PEW", "IST", "MED", "JFK", "UET", "KUL", "MUX", "YYZ",
+];
+
 export function searchAirports(text: string, limit = 8): Airport[] {
   const needle = String(text || "").trim().toLowerCase();
 
   if (!needle) {
-    /* An empty box shows the airports a desk reaches for, in that order.
+    /* An empty box shows a starting point, not a catalogue.
 
-       It used to show the first seven rows of the table, which were seven
-       Pakistani cities and left the impression the product only sold domestic
-       flights. Sorting the whole world alphabetically instead was no better —
-       it opened on El Arish and Aalborg. */
+       The order matters more than it looks. Listing the ten Pakistani airports
+       first — which is what prominence order does — filled the visible rows
+       with Karachi, Lahore, Islamabad, Peshawar, Quetta and Multan, and a
+       desk opening the box saw exactly what it saw when the whole table was
+       forty entries: a domestic-only product. So the opening suggestions
+       deliberately alternate home and abroad. Typing still searches all of
+       them; this is only the first impression. */
     const out: Airport[] = [];
-    for (const code of PROMINENT_ORDER) {
+    for (const code of OPENING_SUGGESTIONS) {
       const airport = BY_CODE.get(code);
       if (airport) out.push(airport);
       if (out.length >= limit) break;

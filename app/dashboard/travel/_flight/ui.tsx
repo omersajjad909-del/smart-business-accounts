@@ -203,6 +203,7 @@ export function AirportInput({
   const [open, setOpen] = useState(false);
   const [text, setText] = useState("");
   const [matches, setMatches] = useState<Airport[]>([]);
+  const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(false);
   const [selected, setSelected] = useState<Airport | undefined>(() => airportCache.get(value));
   const ref = useDismiss(open, () => setOpen(false));
@@ -246,6 +247,7 @@ export function AirportInput({
           const rows = (body?.airports ?? []) as Airport[];
           remember(rows);
           setMatches(rows);
+          setTotal(Number(body?.total) || 0);
         })
         .catch(() => { if (!cancelled) setMatches([]); })
         .finally(() => { if (!cancelled) setLoading(false); });
@@ -317,6 +319,21 @@ export function AirportInput({
               {loading ? "Searching…" : text ? `No airport matches “${text}”.` : "Start typing a city or code."}
             </div>
           )}
+
+          {/* Eight rows with nothing typed reads as eight airports. It is
+              eight suggestions out of four thousand, and the box says so. */}
+          {total ? (
+            <div
+              style={{
+                borderTop: `1px solid ${T.border}`, marginTop: 4, padding: "8px 12px 4px",
+                fontSize: 10.5, color: T.muted, position: "sticky", bottom: 0, background: T.card,
+              }}
+            >
+              {text
+                ? `Showing ${matches.length} of ${total.toLocaleString()} airports`
+                : `Suggestions — type a city, country or code to search all ${total.toLocaleString()} airports`}
+            </div>
+          ) : null}
         </div>
       ) : null}
     </div>
