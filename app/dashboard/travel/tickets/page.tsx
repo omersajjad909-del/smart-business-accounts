@@ -75,6 +75,11 @@ export default function TravelTicketsPage() {
     <BusinessRecordWorkspace
       title="Airline Tickets"
       subtitle="Track passenger bookings, PNR status, travel dates, and issued-ticket value."
+      /* The wizard is the way in for a booking being taken now — a flight, a
+         party and a fare, in that order. The form below stays for the file
+         that is being entered after the fact, where every value is already
+         known and nine boxes is genuinely quicker. */
+      headerAction={{ label: "✈️ Book a Flight", href: "/dashboard/travel/book" }}
       accent={travelAccent}
       category="travel_ticket"
       emptyState="No airline tickets yet. Create the first travel booking."

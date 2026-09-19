@@ -61,6 +61,24 @@ export type Passenger = {
   tax: number;
   /** What the airline or consolidator charges us for this passenger. */
   cost: number;
+
+  /* What the airline needs to issue the ticket, and what the desk would
+     otherwise keep on a photocopy of the passport.
+
+     All optional, because the quick path — a name and a fare typed into the
+     passenger dialog — must stay as quick as it was. The booking wizard asks
+     for them properly, since a ticket issued against a name that does not
+     match the passport is a ticket the passenger cannot fly on. */
+  title?: string;
+  firstName?: string;
+  lastName?: string;
+  /** ISO date. An airline prices a child off this, not off what we typed. */
+  dob?: string;
+  gender?: string;
+  nationality?: string;
+  /** ISO date. Most carriers refuse a passport expiring within six months. */
+  passportExpiry?: string;
+  frequentFlyer?: string;
 };
 
 export type PassengerTotals = {
@@ -104,7 +122,7 @@ export function readPassengers(value: unknown): Passenger[] {
     if (!raw || typeof raw !== "object") continue;
     const row = raw as Record<string, unknown>;
     const type = String(row.type || "ADT").toUpperCase();
-    out.push({
+    const passenger: Passenger = {
       id: String(row.id || emptyPassenger().id),
       name: String(row.name || ""),
       type: (type === "CHD" || type === "INF" ? type : "ADT") as PaxType,
@@ -113,7 +131,19 @@ export function readPassengers(value: unknown): Passenger[] {
       fare: Number(row.fare) || 0,
       tax: Number(row.tax) || 0,
       cost: Number(row.cost) || 0,
-    });
+    };
+
+    /* The travel-document fields are copied only where they are actually set.
+       Writing "" into every one of them would turn a booking taken at the
+       counter with nothing but a name into a record that looks as though
+       someone had filled the passport details in and left them blank. */
+    const optional = ["title", "firstName", "lastName", "dob", "gender", "nationality", "passportExpiry", "frequentFlyer"] as const;
+    for (const key of optional) {
+      const value = String(row[key] || "").trim();
+      if (value) passenger[key] = value;
+    }
+
+    out.push(passenger);
   }
   return out;
 }

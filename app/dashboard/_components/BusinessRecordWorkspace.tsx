@@ -71,6 +71,15 @@ type BusinessRecordWorkspaceProps = {
   };
   summarize: (rows: Record<string, unknown>[]) => SummaryCard[];
   actions?: WorkspaceAction[];
+  /**
+   * A way in that is better than the form beside the list.
+   *
+   * Some desks have a proper flow for creating a record — a travel booking is
+   * a flight, a party of passengers and a fare, not nine boxes typed in one
+   * go. Where that exists, it is offered at the top of the page and the quick
+   * form stays for the operator who already has every value in front of them.
+   */
+  headerAction?: { label: string; href: string };
 };
 
 const shellFont = "'Outfit','Inter',sans-serif";
@@ -130,6 +139,7 @@ export function BusinessRecordWorkspace({
   buildCreatePayload,
   summarize,
   actions = [],
+  headerAction,
 }: BusinessRecordWorkspaceProps) {
   const initialForm = useMemo(
     () =>
@@ -438,6 +448,19 @@ export function BusinessRecordWorkspace({
           <p style={{ margin: 0, fontSize: 14, color: textMuted }}>{subtitle}</p>
         </div>
         <div style={{ flex: "0 1 320px", minWidth: 220, display: "grid", gap: 10 }}>
+          {headerAction ? (
+            <a
+              href={headerAction.href}
+              style={{
+                display: "flex", alignItems: "center", justifyContent: "center", gap: 7,
+                background: "linear-gradient(135deg,var(--accent),var(--accent-strong))",
+                color: "#06121f", borderRadius: 10, padding: "11px 14px",
+                fontSize: 13, fontWeight: 800, textDecoration: "none",
+              }}
+            >
+              {headerAction.label}
+            </a>
+          ) : null}
           <input
             value={search}
             onChange={(event) => setSearch(event.target.value)}
