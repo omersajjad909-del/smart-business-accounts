@@ -46,6 +46,7 @@ function mapFare(record: BusinessRecord) {
     sellFare: sell,
     taxes,
     netCost: net,
+    baggageKg: Number(data.baggageKg || 0),
     // What the agency keeps per adult. The reason the sheet exists.
     margin: Math.round(sell + taxes - net),
     validFrom: String(record.date || "").slice(0, 10),
@@ -90,6 +91,10 @@ export default function TravelFareSheetPage() {
         { key: "sellFare", label: "Selling Fare / Adult", type: "number", placeholder: "185000", required: true },
         { key: "taxes", label: "Taxes / Adult", type: "number", placeholder: "21250", required: true },
         { key: "netCost", label: "Net Cost / Adult", type: "number", placeholder: "172000", required: true },
+        /* Optional, and the only place a baggage figure can come from. Left
+           empty, Flight Search says "confirm with the airline" rather than
+           inventing one. */
+        { key: "baggageKg", label: "Checked Baggage (kg)", type: "number", placeholder: "30" },
         { key: "validFrom", label: "Valid From", type: "date", required: true },
         { key: "validTo", label: "Valid To", type: "date" },
         { key: "status", label: "Status", type: "select", options: statusOptions, required: true },
@@ -104,6 +109,11 @@ export default function TravelFareSheetPage() {
         { key: "sellFare", label: "Sell / Adult" },
         { key: "taxes", label: "Taxes" },
         { key: "netCost", label: "Net Cost" },
+        {
+          key: "baggageKg",
+          label: "Baggage",
+          render: (row) => (Number(row.baggageKg) > 0 ? `${row.baggageKg} kg` : "Not recorded"),
+        },
         {
           key: "margin",
           label: "Margin / Adult",
@@ -141,6 +151,7 @@ export default function TravelFareSheetPage() {
           sellFare: Number(form.sellFare || 0),
           taxes: Number(form.taxes || 0),
           netCost: Number(form.netCost || 0),
+          baggageKg: Number(form.baggageKg || 0),
           validTo: form.validTo || null,
         },
       })}

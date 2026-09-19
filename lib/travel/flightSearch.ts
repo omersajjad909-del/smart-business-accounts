@@ -79,10 +79,19 @@ export type FlightOffer = {
   airlineCode: string;
   cabin: CabinClass;
   legs: FlightLeg[];
-  baggageKg: number;
-  cabinBaggageKg: number;
-  mealsIncluded: boolean;
-  refundable: boolean;
+  /* Null means nobody knows, and null is the honest default.
+
+     These are fare rules. They are set by the fare the agency bought, they
+     differ between two seats on the same aircraft, and nothing in this system
+     can derive them. They used to be filled in anyway — baggage hard-coded at
+     30 kg, meals by a list of carriers, and refundability by a coin flip
+     (rand() > 0.45) — and then printed on the card as fact. An agent who
+     quotes "refundable with fee" off a coin flip has told the customer
+     something the agency may have to honour. */
+  baggageKg: number | null;
+  cabinBaggageKg: number | null;
+  mealsIncluded: boolean | null;
+  refundable: boolean | null;
   /** Per adult, before anything the agency adds. */
   baseFare: number;
   /** Per adult. Levied per passenger, so it does not scale with the fare. */

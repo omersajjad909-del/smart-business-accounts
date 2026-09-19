@@ -156,11 +156,20 @@ export function OfferCard({
             ))}
           </div>
 
+          {/* A fare rule is shown only where something actually told us what it
+              is — today, only a contract fare the agency entered itself. The
+              rest says so, because an empty row invites the agent to assume
+              the usual and a guessed one invites them to quote it. */}
           <div style={{ display: "flex", gap: 14, flexWrap: "wrap" }}>
-            <Chip icon="🧳">{offer.baggageKg} kg checked</Chip>
-            <Chip icon="🎒">{offer.cabinBaggageKg} kg cabin</Chip>
-            {offer.mealsIncluded ? <Chip icon="🍽">Meals included</Chip> : null}
-            <Chip icon={offer.refundable ? "↩️" : "🚫"}>{offer.refundable ? "Refundable (with fee)" : "Non-refundable"}</Chip>
+            {offer.baggageKg != null ? <Chip icon="🧳">{offer.baggageKg} kg checked</Chip> : null}
+            {offer.cabinBaggageKg != null ? <Chip icon="🎒">{offer.cabinBaggageKg} kg cabin</Chip> : null}
+            {offer.mealsIncluded != null ? <Chip icon="🍽">{offer.mealsIncluded ? "Meals included" : "No meals"}</Chip> : null}
+            {offer.refundable != null ? (
+              <Chip icon={offer.refundable ? "↩️" : "🚫"}>{offer.refundable ? "Refundable (with fee)" : "Non-refundable"}</Chip>
+            ) : null}
+            {offer.baggageKg == null && offer.refundable == null ? (
+              <Chip icon="❔">Baggage and fare rules — confirm with the airline</Chip>
+            ) : null}
           </div>
         </div>
 

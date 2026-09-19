@@ -187,6 +187,7 @@ type ContractFare = {
   sellFare: number;
   taxes: number;
   netCost: number;
+  baggageKg: number;
   validFrom: string;
   validTo: string;
   title: string;
@@ -213,6 +214,7 @@ function readContracts(
       sellFare,
       taxes: Number(data.taxes) || 0,
       netCost: Number(data.netCost) || 0,
+      baggageKg: Number(data.baggageKg) || 0,
       validFrom: row.date ? row.date.toISOString().slice(0, 10) : "",
       validTo: String(data.validTo || "").slice(0, 10),
       title: row.title,
@@ -387,10 +389,13 @@ function buildOffers(
       airlineCode: code,
       cabin: query.cabin,
       legs,
-      baggageKg: query.cabin === "economy" ? (PK_CARRIERS.has(code) ? 30 : 30) : 40,
-      cabinBaggageKg: 7,
-      mealsIncluded: !["G9", "FZ", "J9"].includes(code),
-      refundable: query.cabin !== "economy" || rand() > 0.45,
+      /* Only from a contract the agency actually holds, and only what it
+         actually says. Anything else is left unknown rather than guessed — see
+         the note on FlightOffer. */
+      baggageKg: contract && contract.baggageKg > 0 ? contract.baggageKg : null,
+      cabinBaggageKg: null,
+      mealsIncluded: null,
+      refundable: null,
       baseFare,
       taxes,
       supplierCost,
