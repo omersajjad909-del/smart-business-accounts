@@ -2,24 +2,20 @@
 
 import { useCallback, useState } from "react";
 
-import { getCurrentUser } from "@/lib/auth";
 import type { FlightOffer, SearchQuery } from "@/lib/travel/flightSearch";
 import { emptyQuery, queryForSearch } from "./SearchPanel";
 
 /**
- * Who the browser says it is.
+ * Headers for a call to our own API.
  *
- * The API decides for itself from the signed token; these only save it the
- * lookup. Sending them is not what grants the permission.
+ * Deliberately only the content type. Identity is not the browser's to assert:
+ * proxy.ts deletes whatever x-user-id, x-user-role and x-company-id arrive on
+ * a request and sets them from the signed session cookie. Sending them from
+ * here would be stripped on the way in, and reading code that sent them would
+ * suggest the server trusted them.
  */
 export function authHeaders(): Record<string, string> {
-  const user = getCurrentUser() as { id?: string; role?: string; companyId?: string } | null;
-  return {
-    "Content-Type": "application/json",
-    ...(user?.id ? { "x-user-id": user.id } : {}),
-    ...(user?.role ? { "x-user-role": user.role } : {}),
-    ...(user?.companyId ? { "x-company-id": user.companyId } : {}),
-  };
+  return { "Content-Type": "application/json" };
 }
 
 /** Where a selection is left for the booking wizard to pick up. */
@@ -106,11 +102,13 @@ export function sortOffers(offers: FlightOffer[], sort: SortKey): FlightOffer[] 
     default:
       /* "Recommended" is price and time together, leaning on price — the fare
          matters most, but nobody thanks you for saving two thousand rupees by
-         putting a family through a fourteen-hour connection. A fare you have
-         actually paid before edges ahead of one this system guessed at. */
+         putting a family through a fourteen-hour connection. A fare the agency
+         actually negotiated comes first, one it has really charged before comes
+         next, and this system's own estimate comes last. */
       return copy.sort((a, b) => {
-        const score = (offer: FlightOffer) =>
-          total(offer) + minutes(offer) * 45 + (offer.source === "history" ? -4000 : 0);
+        const provenance = (offer: FlightOffer) =>
+          offer.source === "contract" ? -9000 : offer.source === "history" ? -4000 : 0;
+        const score = (offer: FlightOffer) => total(offer) + minutes(offer) * 45 + provenance(offer);
         return score(a) - score(b);
       });
   }

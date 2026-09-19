@@ -64,7 +64,14 @@ export type FlightLeg = {
   arrivesNextDay: boolean;
 };
 
-export type OfferSource = "history" | "sample";
+/**
+ * Where a price came from, in descending order of how much it can be trusted.
+ *
+ * "contract" is a fare the agency actually negotiated and typed in; "history"
+ * is one it really charged on this sector before; "sample" is this system's own
+ * estimate and is never a quote.
+ */
+export type OfferSource = "contract" | "history" | "sample";
 
 export type FlightOffer = {
   id: string;

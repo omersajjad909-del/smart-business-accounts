@@ -18,7 +18,6 @@
 import { NextRequest, NextResponse } from "next/server";
 
 import { logAuditFromReq } from "@/lib/auditLogger";
-import { getTokenFromRequest, verifyJwt } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { resolveBranchIdOrDefault, resolveCompanyId } from "@/lib/tenant";
 import { readPassengers, totalPassengers, validatePassengers } from "@/lib/travelPassengers";
@@ -29,30 +28,6 @@ const WRITE_ROLES = new Set(["ADMIN", "ACCOUNTANT", "MANAGER"]);
 /** What the wizard may set a new file to. Everything else is reached by doing
     the thing that causes it — you refund a booking, you do not type "refunded". */
 const ALLOWED_STATUS = new Set(["quoted", "booked", "issued"]);
-
-/**
- * Who is asking, whether or not the page remembered to say so.
- *
- * Most of this app sends the role in a header it sets itself from the browser
- * session. A header a client sets is a header a client can set to anything, and
- * a page that simply forgets to send it gets a 403 it cannot explain — so the
- * signed token is consulted too, and it is the one that decides.
- */
-async function resolveRole(req: NextRequest): Promise<string> {
-  const token = getTokenFromRequest(req);
-  const payload = token ? verifyJwt(token) : null;
-
-  const claimed = typeof payload?.role === "string" ? payload.role : "";
-  if (claimed) return claimed.toUpperCase();
-
-  const userId = typeof payload?.userId === "string" ? payload.userId : req.headers.get("x-user-id");
-  if (userId) {
-    const user = await prisma.user.findUnique({ where: { id: userId }, select: { role: true } });
-    if (user?.role) return String(user.role).toUpperCase();
-  }
-
-  return String(req.headers.get("x-user-role") || "").toUpperCase();
-}
 
 function readLegs(value: unknown): FlightLeg[] {
   if (!Array.isArray(value)) return [];
@@ -83,7 +58,9 @@ export async function POST(req: NextRequest) {
     const companyId = await resolveCompanyId(req);
     if (!companyId) return NextResponse.json({ error: "Company required" }, { status: 400 });
 
-    const role = await resolveRole(req);
+    /* Set by proxy.ts from the signed session, not by the page — a client that
+       could assert its own role would be no check at all. */
+    const role = String(req.headers.get("x-user-role") || "").toUpperCase();
     if (!WRITE_ROLES.has(role)) {
       return NextResponse.json(
         { error: "Your role cannot create bookings. Ask an administrator." },

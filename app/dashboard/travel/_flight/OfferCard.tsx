@@ -119,8 +119,10 @@ export function OfferCard({
         {best ? <Badge tone="#34d399">Best option</Badge> : null}
         {cheapest && !best ? <Badge tone="#34d399">Cheapest</Badge> : null}
         {direct ? <Badge tone="#60a5fa">Direct</Badge> : null}
-        <Badge tone={offer.source === "history" ? "#a78bfa" : "#f4c25b"}>
-          {offer.source === "history" ? "Your past fare" : "Indicative fare"}
+        {/* Said on every card, because a price whose provenance is not on it is
+            the one that gets quoted by accident. */}
+        <Badge tone={offer.source === "contract" ? "#34d399" : offer.source === "history" ? "#a78bfa" : "#f4c25b"}>
+          {offer.source === "contract" ? "Your contract fare" : offer.source === "history" ? "Your past fare" : "Indicative fare"}
         </Badge>
         <span style={{ fontSize: 11, color: T.muted, marginLeft: "auto" }}>{CABIN_LABELS[offer.cabin]}</span>
       </div>

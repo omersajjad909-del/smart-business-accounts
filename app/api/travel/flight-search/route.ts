@@ -5,8 +5,10 @@
  * connected to this system. What comes back is a plausible timetable built from
  * the real geography of the route, priced from two things:
  *
- *   - what this company itself last charged and paid on the same route, where
- *     it has flown it before, which is a real number and is labelled as one;
+ *   - a contract fare the agency negotiated and entered on the Contract Fares
+ *     sheet, which is the agency's own real buying and selling price;
+ *   - failing that, what this company itself last charged and paid on the same
+ *     route, where it has flown it before, which is also a real number;
  *   - failing that, an indicative fare derived from distance and cabin, which
  *     is labelled as indicative and is not a quote.
  *
@@ -36,6 +38,7 @@ import {
   type FlightOffer,
   type SearchLeg,
   type SearchQuery,
+  type TripType,
 } from "@/lib/travel/flightSearch";
 
 /** Where each carrier banks its connections. */
@@ -173,6 +176,84 @@ function buildLeg(
   };
 }
 
+/** A fare the agency negotiated, off the Contract Fares sheet. */
+type ContractFare = {
+  from: string;
+  to: string;
+  airline: string;
+  supplier: string;
+  cabin: string;
+  tripType: string;
+  sellFare: number;
+  taxes: number;
+  netCost: number;
+  validFrom: string;
+  validTo: string;
+  title: string;
+};
+
+function readContracts(
+  rows: Array<{ title: string; status: string; date: Date | null; data: unknown }>,
+): ContractFare[] {
+  const out: ContractFare[] = [];
+  for (const row of rows) {
+    if (String(row.status || "").toLowerCase() !== "active") continue;
+    const data = (row.data ?? {}) as Record<string, unknown>;
+    const from = String(data.from || "").toUpperCase();
+    const to = String(data.to || "").toUpperCase();
+    const sellFare = Number(data.sellFare) || 0;
+    if (!from || !to || sellFare <= 0) continue;
+    out.push({
+      from,
+      to,
+      airline: String(data.airline || ""),
+      supplier: String(data.supplier || data.airline || ""),
+      cabin: String(data.cabin || "economy"),
+      tripType: String(data.tripType || "oneway"),
+      sellFare,
+      taxes: Number(data.taxes) || 0,
+      netCost: Number(data.netCost) || 0,
+      validFrom: row.date ? row.date.toISOString().slice(0, 10) : "",
+      validTo: String(data.validTo || "").slice(0, 10),
+      title: row.title,
+    });
+  }
+  return out;
+}
+
+/**
+ * The contract fare for this sector, carrier and cabin, if there is one.
+ *
+ * The trip type has to match exactly. A one-way contract applied to a return
+ * would price a journey home at nothing, and the booking would be invoiced for
+ * roughly half of what the supplier is about to bill — which is the specific
+ * mistake this whole sheet exists to prevent.
+ */
+function contractFor(
+  contracts: ContractFare[],
+  from: string,
+  to: string,
+  airline: string,
+  cabin: string,
+  tripType: TripType,
+  travelDate: string,
+): ContractFare | null {
+  const wanted = tripType === "round" ? "round" : "oneway";
+  const on = travelDate || new Date().toISOString().slice(0, 10);
+
+  for (const fare of contracts) {
+    if (fare.from !== from || fare.to !== to) continue;
+    if (fare.cabin !== cabin) continue;
+    if (fare.tripType !== wanted) continue;
+    if (fare.airline.toLowerCase() !== airline.toLowerCase()) continue;
+    // A fare that has lapsed by the travel date cannot be sold for it.
+    if (fare.validFrom && on < fare.validFrom) continue;
+    if (fare.validTo && on > fare.validTo) continue;
+    return fare;
+  }
+  return null;
+}
+
 /** What this company itself last charged and paid on the same sector. */
 type HistoryFare = { baseFare: number; taxes: number; cost: number; label: string };
 
@@ -237,6 +318,7 @@ function indicativeFare(km: number, cabin: CabinClass, code: string, rand: () =>
 function buildOffers(
   query: SearchQuery,
   history: Array<{ title: string; amount: unknown; date: Date | null; data: unknown }>,
+  contracts: ContractFare[],
 ): FlightOffer[] {
   /* The outbound sector is the market, not the first and last points of the
      itinerary. A return trip ends where it started, so reading the last leg's
@@ -249,7 +331,18 @@ function buildOffers(
 
   const offers: FlightOffer[] = [];
 
-  for (const code of carriersFor(origin, destination)) {
+  /* A carrier the agency holds a contract with is always offered, even where
+     the route rules would not have suggested it — a negotiated fare is a seat
+     the desk can actually sell, and leaving it out of the list is the one way
+     this search can cost the agency money. */
+  const candidates = new Set(carriersFor(origin, destination));
+  for (const fare of contracts) {
+    if (fare.from !== origin.code || fare.to !== destination.code) continue;
+    const match = AIRLINES.find((a) => a.name.toLowerCase() === fare.airline.toLowerCase());
+    if (match) candidates.add(match.code);
+  }
+
+  for (const code of candidates) {
     const rand = seeded(`${code}|${query.legs.map((l) => `${l.from}${l.to}${l.date}`).join("|")}|${query.cabin}`);
 
     const legs: FlightLeg[] = [];
@@ -273,15 +366,20 @@ function buildOffers(
     }, 0);
 
     const carrier = airlineName(code);
-    const past = historyFor(history, origin.code, destination.code, carrier);
+    const contract = contractFor(contracts, origin.code, destination.code, carrier, query.cabin, query.tripType, first.date);
+    const past = contract ? null : historyFor(history, origin.code, destination.code, carrier);
     const indicative = indicativeFare(km, query.cabin, code, rand);
 
-    const baseFare = past ? past.baseFare : indicative.baseFare;
-    const taxes = past ? past.taxes : indicative.taxes;
-    // Where history knows the real cost, use it. Otherwise assume the agency
-    // buys at the published fare and earns on the markup alone, which is the
-    // conservative assumption — it never flatters the margin.
-    const supplierCost = past && past.cost > 0 ? past.cost : baseFare + taxes;
+    const baseFare = contract ? contract.sellFare : past ? past.baseFare : indicative.baseFare;
+    const taxes = contract ? contract.taxes : past ? past.taxes : indicative.taxes;
+    // Where a contract or history knows the real cost, use it. Otherwise assume
+    // the agency buys at the published fare and earns on the markup alone,
+    // which is the conservative assumption — it never flatters the margin.
+    const supplierCost = contract
+      ? contract.netCost
+      : past && past.cost > 0
+        ? past.cost
+        : baseFare + taxes;
 
     offers.push({
       id: `${code}-${legs.map((l) => l.flightNo.replace(/\s+/g, "")).join("-")}`,
@@ -296,11 +394,15 @@ function buildOffers(
       baseFare,
       taxes,
       supplierCost,
-      supplier: carrier,
-      source: past ? "history" : "sample",
-      sourceNote: past
-        ? `${past.label} — your own booking, not a live quote`
-        : "Indicative fare — confirm with the airline before quoting",
+      // The account the payable lands in, which on a contract fare is whoever
+      // the agency actually buys through rather than the carrier on the tail.
+      supplier: contract ? contract.supplier || carrier : carrier,
+      source: contract ? "contract" : past ? "history" : "sample",
+      sourceNote: contract
+        ? `Your contract fare — ${contract.title}${contract.validTo ? `, valid to ${contract.validTo}` : ""}`
+        : past
+          ? `${past.label} — your own booking, not a live quote`
+          : "Indicative fare — confirm with the airline before quoting",
     });
   }
 
@@ -355,7 +457,18 @@ export async function POST(req: NextRequest) {
       select: { title: true, amount: true, date: true, data: true },
     });
 
-    const offers = buildOffers(query, history as never);
+    /* The agency's own negotiated fares. Read first because they are the only
+       numbers here that are neither an estimate nor a guess at what is still
+       on offer. */
+    const contractRows = await prisma.businessRecord.findMany({
+      where: { companyId, category: "travel_fare", status: "active" },
+      orderBy: { createdAt: "desc" },
+      take: 500,
+      select: { title: true, status: true, date: true, data: true },
+    });
+    const contracts = readContracts(contractRows as never);
+
+    const offers = buildOffers(query, history as never, contracts);
 
     return NextResponse.json({
       offers,
@@ -364,9 +477,10 @@ export async function POST(req: NextRequest) {
          UI cannot mistake this for a fare feed either. */
       liveProvider: false,
       notice:
-        "No airline or GDS connection is configured. Schedules below are built from the route, " +
-        "and fares are either your own past fares on this route or indicative figures. " +
-        "Confirm every fare with the airline before you quote it.",
+        "No airline or GDS connection is configured. Schedules below are built from the route. " +
+        "Fares marked as your contract fare or your past fare are your own real numbers; " +
+        "anything marked indicative is this system's estimate — confirm it before you quote it.",
+      fromContract: offers.filter((offer) => offer.source === "contract").length,
       fromHistory: offers.filter((offer) => offer.source === "history").length,
     });
   } catch (error) {
