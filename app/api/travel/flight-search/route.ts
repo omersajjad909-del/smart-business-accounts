@@ -509,16 +509,26 @@ async function autoImportSchedules(
   branchId: string | null,
   query: SearchQuery,
   existing: FlightSchedule[],
-): Promise<{ added: FlightSchedule[]; sectors: string[] }> {
+): Promise<{ added: FlightSchedule[]; sectors: string[]; problem: string | null }> {
   const added: FlightSchedule[] = [];
   const sectors: string[] = [];
-  if (!configuredProvider()) return { added, sectors };
+  let problem: string | null = null;
+
+  /* Said out loud rather than swallowed. Without a key the page showed "no
+     schedule" on every sector for ever and looked exactly like a provider
+     that does not work — which is how somebody concludes the API is useless
+     when in fact nobody had told the deployment about it. */
+  if (!configuredProvider()) {
+    return { added, sectors, problem: "no-provider" };
+  }
 
   const wanted = query.legs.slice(0, 2).filter((leg) => {
     const already = existing.some((row) => row.from === leg.from && row.to === leg.to);
     return !already;
   });
-  if (!wanted.length) return { added, sectors };
+  // Every sector already has a timetable, so there is nothing to ask for and
+  // nothing to report.
+  if (!wanted.length) return { added, sectors, problem };
 
   /* Sectors already asked about and found empty. Without this a route the
      provider does not cover would be asked again on every single search. */
@@ -597,14 +607,17 @@ async function autoImportSchedules(
           validTo: "",
         });
       }
-    } catch {
-      /* A provider that is down must not take the search with it. The sector
-         simply stays unscheduled, exactly as it was a moment ago, and the next
-         search will try again. */
+    } catch (providerError) {
+      /* A provider that is down must not take the search with it — the sector
+         stays unscheduled, exactly as it was a moment ago. But it must not be
+         silent either: an exhausted quota, a rejected key and a route nobody
+         covers all look identical from the outside, and the desk needs to know
+         which one it is looking at. */
+      problem = providerError instanceof Error ? providerError.message : "The flight-data provider could not be reached.";
     }
   }
 
-  return { added, sectors };
+  return { added, sectors, problem };
 }
 
 function readQuery(body: unknown): SearchQuery | null {
@@ -697,6 +710,11 @@ export async function POST(req: NextRequest) {
          checking — a codeshare, a seasonal service, an operating-days column
          the provider does not fill in. */
       autoImported: auto.sectors,
+      /* Why a sector came back with no times: no key configured, a quota that
+         is used up, a provider that refused. Null when it simply had nothing
+         for that route, which is a different thing and says so on its own. */
+      providerProblem: auto.problem,
+      providerConfigured: auto.problem !== "no-provider",
       scheduled: offers.filter((offer) => offer.legs.every((leg) => Boolean(leg.departAt))).length,
       fromHistory: offers.filter((offer) => offer.source === "history").length,
     });

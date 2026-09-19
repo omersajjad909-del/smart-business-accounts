@@ -25,7 +25,7 @@ type StopFilter = "any" | "direct" | "one";
 export default function FlightSearchPage() {
   const router = useRouter();
   const { isMobile, isTablet } = useResponsive();
-  const { query, setQuery, offers, notice, busy, error, searched, pricedFor, autoImported, search } = useFlightSearch();
+  const { query, setQuery, offers, notice, busy, error, searched, pricedFor, autoImported, providerProblem, search } = useFlightSearch();
 
   const [selectedId, setSelectedId] = useState("");
   const [markup, setMarkup] = useState(0);
@@ -108,6 +108,36 @@ export default function FlightSearchPage() {
         <FareNotice note={notice || undefined} />
 
         <SearchPanel query={query} onChange={setQuery} onSearch={() => { setSelectedId(""); search(); }} busy={busy} />
+
+        {/* The reason there are no times, when the reason is fixable. Without
+            this the page said "no schedule" on every sector for ever and
+            looked exactly like a provider that does not work. */}
+        {providerProblem ? (
+          <div
+            style={{
+              border: "1px solid rgba(248,113,113,.45)", background: "rgba(248,113,113,.1)",
+              borderRadius: 12, padding: "12px 15px", fontSize: 12.5, color: T.text, lineHeight: 1.6,
+            }}
+          >
+            <strong style={{ color: "#f87171" }}>Times are missing because the flight-data provider did not answer.</strong>
+            <div style={{ marginTop: 5 }}>
+              {providerProblem === "no-provider" ? (
+                <>
+                  No provider key is configured on this deployment. Add <code>AERODATABOX_RAPIDAPI_KEY</code> to
+                  the environment and redeploy — environment variables only take effect on the next deploy.
+                  Until then, record the timetable by hand on{" "}
+                  <a href="/dashboard/travel/schedules" style={{ color: T.accent, textDecoration: "none" }}>Flight Schedules</a>.
+                </>
+              ) : (
+                <>
+                  {providerProblem}{" "}
+                  You can still record this sector by hand on{" "}
+                  <a href="/dashboard/travel/schedules" style={{ color: T.accent, textDecoration: "none" }}>Flight Schedules</a>.
+                </>
+              )}
+            </div>
+          </div>
+        ) : null}
 
         {autoImported.length ? (
           <div

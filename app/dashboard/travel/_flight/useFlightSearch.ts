@@ -54,6 +54,8 @@ export function useFlightSearch() {
   const [notice, setNotice] = useState("");
   /** Sectors whose timetable the provider filled in during this search. */
   const [autoImported, setAutoImported] = useState<string[]>([]);
+  /** Why times are missing, when the reason is the provider rather than the route. */
+  const [providerProblem, setProviderProblem] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [searched, setSearched] = useState(false);
@@ -76,6 +78,7 @@ export function useFlightSearch() {
       setOffers(Array.isArray(body.offers) ? body.offers : []);
       setNotice(String(body.notice || ""));
       setAutoImported(Array.isArray(body.autoImported) ? body.autoImported : []);
+      setProviderProblem(typeof body.providerProblem === "string" ? body.providerProblem : null);
       setPricedFor(asked);
       setSearched(true);
     } catch (searchError) {
@@ -87,7 +90,7 @@ export function useFlightSearch() {
     }
   }, [query]);
 
-  return { query, setQuery, offers, notice, busy, error, searched, pricedFor, autoImported, search };
+  return { query, setQuery, offers, notice, busy, error, searched, pricedFor, autoImported, providerProblem, search };
 }
 
 /** Rank the list the way the chosen sort says, without mutating it. */

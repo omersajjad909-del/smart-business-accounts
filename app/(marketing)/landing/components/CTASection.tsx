@@ -36,17 +36,17 @@ function CountUp({ to, prefix = "", suffix = "", duration = 1800, start }: { to:
     const offscreen = el.getBoundingClientRect().top > window.innerHeight;
     if (reduced || !offscreen) return;
     animatable.current = true;
-    setVal(0);
+    // Note: do NOT setVal(0) here. Flipping to 0 the moment this mounts —
+    // before we know the entrance animation will actually run soon — is what
+    // let crawlers, fast DOM snapshots and anyone who never scrolls capture
+    // "0 Modules / 0+ Features / 0 Industries Live / < 0 min Setup Time".
+    // The real number stays on screen until `start` flips true below, at
+    // which point we drop to 0 and animate back up in the same tick.
   }, []);
 
   useEffect(() => {
-    if (!animatable.current) return;
-    if (!start) {
-      // Safety net: if the observer never fires, land on the real number
-      // rather than sitting at zero forever.
-      const t = setTimeout(() => setVal(to), 4000);
-      return () => clearTimeout(t);
-    }
+    if (!animatable.current || !start) return;
+    setVal(0);
     let raf: number;
     const t0 = performance.now();
     const tick = (now: number) => {
