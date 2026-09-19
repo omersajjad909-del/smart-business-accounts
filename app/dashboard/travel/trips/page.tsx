@@ -27,6 +27,22 @@ type Item = {
   sale: number;
   cost: number;
   qty: number;
+  /** Set where the line came from a desk record rather than being typed here. */
+  sourceCategory?: string | null;
+  sourceRecordId?: string | null;
+};
+
+/** A desk record — a ticket, a visa, a transfer — not yet on any trip. */
+type Loose = {
+  id: string;
+  category: string;
+  categoryLabel: string;
+  productType: string;
+  title: string;
+  sale: number;
+  cost: number;
+  margin: number;
+  date: string | null;
 };
 
 type Traveler = { id: string; fullName: string; passportNo: string | null };
@@ -91,6 +107,12 @@ export default function TripsPage() {
   const [items, setItems] = useState<Item[]>([emptyItem()]);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
+
+  /* Desk records with a price on them that nobody has put on a trip yet. */
+  const [attachTo, setAttachTo] = useState<Trip | null>(null);
+  const [loose, setLoose] = useState<Loose[]>([]);
+  const [picked, setPicked] = useState<string[]>([]);
+  const [looseBusy, setLooseBusy] = useState(false);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -163,6 +185,59 @@ export default function TripsPage() {
     if (!response.ok) {
       const body = await response.json().catch(() => ({}));
       setError(body?.error || "Could not remove the trip");
+      return;
+    }
+    await load();
+  }
+
+  async function openAttach(trip: Trip) {
+    setAttachTo(trip);
+    setPicked([]);
+    setLooseBusy(true);
+    try {
+      const body = await fetch("/api/travel/trip-attach").then((r) => (r.ok ? r.json() : null));
+      setLoose(body?.records ?? []);
+    } catch {
+      setLoose([]);
+    } finally {
+      setLooseBusy(false);
+    }
+  }
+
+  /* The money comes off the desk record, not off this screen — entering a
+     price twice is entering two prices. */
+  async function attach() {
+    if (!attachTo || !picked.length) return;
+    setLooseBusy(true);
+    setError("");
+    try {
+      const response = await fetch("/api/travel/trip-attach", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ bookingId: attachTo.id, recordIds: picked }),
+      });
+      const body = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(body?.error || "Could not attach");
+      alertToast(
+        `${body.attached} service${body.attached === 1 ? "" : "s"} added to ${attachTo.bookingNo} — now ${money(body.booking.saleTotal)}.`,
+        "success",
+        "Services Attached",
+      );
+      setAttachTo(null);
+      await load();
+    } catch (attachError) {
+      setError(attachError instanceof Error ? attachError.message : "Could not attach the services");
+    } finally {
+      setLooseBusy(false);
+    }
+  }
+
+  async function detach(item: Item) {
+    if (!item.id) return;
+    const response = await fetch(`/api/travel/trip-attach?itemId=${encodeURIComponent(item.id)}`, { method: "DELETE" });
+    if (!response.ok) {
+      const body = await response.json().catch(() => ({}));
+      setError(body?.error || "Could not remove the service");
       return;
     }
     await load();
@@ -267,6 +342,76 @@ export default function TripsPage() {
           </div>
         ))}
       </div>
+
+      {attachTo ? (
+        <section style={{ background: T.card, border: `1px solid var(--accent)`, borderRadius: 16, padding: 18, marginBottom: 18, display: "grid", gap: 14 }}>
+          <div style={{ display: "flex", justifyContent: "space-between", gap: 12, flexWrap: "wrap", alignItems: "flex-start" }}>
+            <div style={{ minWidth: 0 }}>
+              <div style={{ fontSize: 15, fontWeight: 800, color: T.text }}>
+                Attach a service to {attachTo.bookingNo}
+              </div>
+              <div style={{ fontSize: 12, color: T.muted, marginTop: 3, lineHeight: 1.5 }}>
+                Tickets, visas, hotels and transfers already raised on their own desks that are not on a trip yet.
+                Their price comes off the record — it is not retyped here.
+              </div>
+            </div>
+            <GhostButton onClick={() => setAttachTo(null)}>Close</GhostButton>
+          </div>
+
+          {looseBusy ? (
+            <div style={{ fontSize: 13, color: T.muted }}>Loading…</div>
+          ) : !loose.length ? (
+            <div style={{ fontSize: 12.5, color: T.muted, lineHeight: 1.6 }}>
+              Nothing to attach. Every priced record on the travel desks is either already on a trip,
+              or has no value on it yet.
+            </div>
+          ) : (
+            <>
+              <div style={{ display: "grid", gap: 8, maxHeight: 340, overflowY: "auto" }} className="fl-scroll">
+                {loose.map((record) => {
+                  const on = picked.includes(record.id);
+                  return (
+                    <label
+                      key={record.id}
+                      style={{
+                        display: "flex", gap: 11, alignItems: "center", cursor: "pointer",
+                        border: `1px solid ${on ? "var(--accent)" : T.border}`,
+                        background: on ? "var(--accent-soft)" : "var(--panel-bg)",
+                        borderRadius: 11, padding: 11,
+                      }}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={on}
+                        onChange={() => setPicked((prev) => (on ? prev.filter((id) => id !== record.id) : [...prev, record.id]))}
+                        style={{ width: 16, height: 16, cursor: "pointer" }}
+                      />
+                      <span style={{ minWidth: 0, flex: 1 }}>
+                        <span style={{ display: "block", fontSize: 13, fontWeight: 700, color: T.text }}>{record.title}</span>
+                        <span style={{ display: "block", fontSize: 11, color: T.muted }}>
+                          {record.categoryLabel}
+                          {record.date ? ` · ${String(record.date).slice(0, 10)}` : ""}
+                        </span>
+                      </span>
+                      <span style={{ textAlign: "right", whiteSpace: "nowrap", fontSize: 12.5 }}>
+                        <span style={{ color: T.text, fontWeight: 700 }}>{money(record.sale)}</span>
+                        <span style={{ display: "block", fontSize: 11, color: record.margin >= 0 ? "#34d399" : "#f87171" }}>
+                          margin {money(record.margin)}
+                        </span>
+                      </span>
+                    </label>
+                  );
+                })}
+              </div>
+              <div style={{ display: "flex", justifyContent: "flex-end", gap: 10 }}>
+                <PrimaryButton onClick={attach} disabled={!picked.length || looseBusy}>
+                  {looseBusy ? "Attaching…" : `Attach ${picked.length || ""} service${picked.length === 1 ? "" : "s"}`}
+                </PrimaryButton>
+              </div>
+            </>
+          )}
+        </section>
+      ) : null}
 
       {building ? (
         <section style={{ background: T.card, border: `1px solid ${T.border}`, borderRadius: 16, padding: 18, marginBottom: 18, display: "grid", gap: 16 }}>
@@ -447,11 +592,28 @@ export default function TripsPage() {
                       {item.supplierName ? <span style={{ color: T.muted }}> · {item.supplierName}</span> : null}
                       {item.qty !== 1 ? <span style={{ color: T.muted }}> × {item.qty}</span> : null}
                     </span>
-                    <span style={{ color: T.muted, whiteSpace: "nowrap" }}>
+                    <span style={{ color: T.muted, whiteSpace: "nowrap", display: "inline-flex", gap: 8, alignItems: "center" }}>
+                      {/* Said on the line, because a service that came off a
+                          desk record is edited there, not here. */}
+                      {item.sourceRecordId ? (
+                        <span style={{ fontSize: 10, color: "#a78bfa", border: "1px solid rgba(167,139,250,.4)", borderRadius: 999, padding: "2px 7px" }}>
+                          linked
+                        </span>
+                      ) : null}
                       {money(item.sale * item.qty)}
                       <span style={{ color: (item.sale - item.cost) >= 0 ? "#34d399" : "#f87171" }}>
-                        {"  "}({money((item.sale - item.cost) * item.qty)})
+                        ({money((item.sale - item.cost) * item.qty)})
                       </span>
+                      {!trip.invoiceNo && item.id ? (
+                        <button
+                          type="button"
+                          onClick={() => detach(item)}
+                          title="Take this service off the trip — the record itself is untouched"
+                          style={{ border: "none", background: "transparent", color: T.muted, cursor: "pointer", fontSize: 13, fontFamily: "inherit", padding: 0 }}
+                        >
+                          ×
+                        </button>
+                      ) : null}
                     </span>
                   </div>
                 ))}
@@ -523,6 +685,19 @@ export default function TripsPage() {
                       Raise invoice
                     </button>
                   )}
+                  {!trip.invoiceNo ? (
+                    <button
+                      type="button"
+                      onClick={() => openAttach(trip)}
+                      style={{
+                        border: `1px solid ${T.border}`, background: T.panel, color: T.text,
+                        borderRadius: 10, padding: "7px 13px", fontSize: 12, fontWeight: 700,
+                        cursor: "pointer", fontFamily: "inherit", whiteSpace: "nowrap",
+                      }}
+                    >
+                      + Attach service
+                    </button>
+                  ) : null}
                   <button
                     type="button"
                     onClick={() => remove(trip)}
