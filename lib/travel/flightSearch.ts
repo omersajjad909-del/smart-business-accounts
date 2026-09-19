@@ -115,10 +115,16 @@ export function minutesBetween(departAt: string, arriveAt: string): number {
  * Where a price came from, in descending order of how much it can be trusted.
  *
  * "contract" is a fare the agency actually negotiated and typed in; "history"
- * is one it really charged on this sector before; "sample" is this system's own
- * estimate and is never a quote.
+ * is one it really charged on this sector before; "none" means nobody has told
+ * this system what the sector sells for, and it says so rather than guessing.
+ *
+ * There used to be a fourth, "sample", which was a fare worked out from the
+ * distance. It read Rs 51,100 for Faisalabad to Jeddah against a real fare
+ * north of Rs 150,000 — a third of the truth, printed to the rupee beside a
+ * Select button. An estimate that wrong is not a starting point, it is a
+ * booking taken at a loss, so it is gone.
  */
-export type OfferSource = "contract" | "history" | "sample";
+export type OfferSource = "contract" | "history" | "none";
 
 export type FlightOffer = {
   id: string;
@@ -139,12 +145,14 @@ export type FlightOffer = {
   cabinBaggageKg: number | null;
   mealsIncluded: boolean | null;
   refundable: boolean | null;
+  /* Null where nothing real says what this sector sells for. The card shows
+     no price at all then, and the booking wizard asks for one. */
   /** Per adult, before anything the agency adds. */
-  baseFare: number;
+  baseFare: number | null;
   /** Per adult. Levied per passenger, so it does not scale with the fare. */
-  taxes: number;
+  taxes: number | null;
   /** Per adult, what the airline or consolidator charges the agency. */
-  supplierCost: number;
+  supplierCost: number | null;
   /** The account the payable lands in — usually the airline, sometimes a
       consolidator the agency actually buys through. */
   supplier: string;
@@ -208,7 +216,10 @@ export type OfferPricing = {
  * the system already uses, so a fare quoted here and a fare typed into the
  * passenger dialog land on the same number.
  */
-export function priceOffer(offer: FlightOffer, pax: PaxCounts, markup = 0): OfferPricing {
+export function priceOffer(offer: FlightOffer, pax: PaxCounts, markup = 0): OfferPricing | null {
+  // Nothing real to price from. The caller shows the sector and says so.
+  if (offer.baseFare == null) return null;
+
   const rows: Array<{ type: PaxType; n: number }> = [
     { type: "ADT", n: Number(pax.adults) || 0 },
     { type: "CHD", n: Number(pax.children) || 0 },
@@ -224,11 +235,11 @@ export function priceOffer(offer: FlightOffer, pax: PaxCounts, markup = 0): Offe
   for (const row of rows) {
     if (row.n <= 0) continue;
     const share = PAX_FARE_SHARE[row.type];
-    baseFare += offer.baseFare * share * row.n;
+    baseFare += (offer.baseFare ?? 0) * share * row.n;
     // Tax is levied per passenger rather than as a share of the fare, except
     // for an infant, who is largely exempt.
-    taxes += (row.type === "INF" ? 0 : offer.taxes) * row.n;
-    supplierCost += offer.supplierCost * share * row.n;
+    taxes += (row.type === "INF" ? 0 : (offer.taxes ?? 0)) * row.n;
+    supplierCost += (offer.supplierCost ?? 0) * share * row.n;
     if (PAX_TAKES_SEAT[row.type]) seats += row.n;
     count += row.n;
   }
@@ -268,9 +279,11 @@ export function buildPassengers(offer: FlightOffer, pax: PaxCounts, markup = 0):
       const share = PAX_FARE_SHARE[type];
       out.push({
         ...emptyPassenger(type),
-        fare: round2(offer.baseFare * share),
-        tax: type === "INF" ? 0 : round2(offer.taxes),
-        cost: round2(offer.supplierCost * share),
+        // Zero where the sector has no recorded fare, which the wizard's
+        // passenger step then requires the operator to fill in.
+        fare: round2((offer.baseFare ?? 0) * share),
+        tax: type === "INF" ? 0 : round2(offer.taxes ?? 0),
+        cost: round2((offer.supplierCost ?? 0) * share),
       });
     }
   }
@@ -336,10 +349,10 @@ import type { Airport } from "./airports";
  * operator what they may quote is not a sentence to keep two copies of.
  */
 export const FARE_NOTICE =
-  "No airline or GDS connection is configured. Flight times and numbers come only from the " +
-  "schedules you have recorded — where none exists this shows no times at all rather than " +
-  "inventing them. Fares marked as your contract fare or your past fare are your own real " +
-  "numbers; anything marked indicative is this system's estimate.";
+  "No airline or GDS connection is configured. This page shows only what you have told it: " +
+  "times come from your Flight Schedules and prices from your Contract Fares or from what you " +
+  "charged on the sector before. Where a sector has neither, it shows the carriers and no " +
+  "numbers — it does not estimate a fare.";
 
 export const COMMON_AIRPORT_CODES = [
   "KHI", "LHE", "ISB", "PEW", "UET", "MUX", "SKT", "LYP", "GWD", "SDT",

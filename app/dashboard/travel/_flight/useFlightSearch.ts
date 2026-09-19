@@ -89,7 +89,9 @@ export function useFlightSearch() {
 
 /** Rank the list the way the chosen sort says, without mutating it. */
 export function sortOffers(offers: FlightOffer[], sort: SortKey): FlightOffer[] {
-  const total = (offer: FlightOffer) => offer.baseFare + offer.taxes;
+  /* An offer with no fare sorts last on price rather than sorting as free. */
+  const total = (offer: FlightOffer) =>
+    offer.baseFare == null ? Number.MAX_SAFE_INTEGER : offer.baseFare + (offer.taxes ?? 0);
   const minutes = (offer: FlightOffer) => offer.legs.reduce((sum, leg) => sum + leg.durationMinutes, 0);
   const copy = [...offers];
   switch (sort) {
@@ -108,7 +110,8 @@ export function sortOffers(offers: FlightOffer[], sort: SortKey): FlightOffer[] 
       return copy.sort((a, b) => {
         const provenance = (offer: FlightOffer) =>
           offer.source === "contract" ? -9000 : offer.source === "history" ? -4000 : 0;
-        const score = (offer: FlightOffer) => total(offer) + minutes(offer) * 45 + provenance(offer);
+        const score = (offer: FlightOffer) =>
+          (offer.baseFare == null ? 5_000_000 : total(offer)) + minutes(offer) * 45 + provenance(offer);
         return score(a) - score(b);
       });
   }

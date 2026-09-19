@@ -9,8 +9,11 @@
  *     sheet, which is the agency's own real buying and selling price;
  *   - failing that, what this company itself last charged and paid on the same
  *     route, where it has flown it before, which is also a real number;
- *   - failing that, an indicative fare derived from distance and cabin, which
- *     is labelled as indicative and is not a quote.
+ *   - and where neither exists, no fare at all. It used to fall back to a
+ *     figure worked out from the distance, which read Rs 51,100 for
+ *     Faisalabad to Jeddah against a real fare north of Rs 150,000. A third
+ *     of the truth, printed to the rupee next to a Select button, is not a
+ *     starting point — it is a booking taken at a loss.
  *
  * Every offer says which of the two it is, the page repeats it, and every fare
  * is editable before the booking is saved. That is deliberate: an invented
@@ -356,31 +359,6 @@ function historyFor(
   return null;
 }
 
-function indicativeFare(km: number, cabin: CabinClass, code: string, rand: () => number) {
-  // A per-kilometre rate that eases off over distance, the way published fares
-  // do — a four-hour sector is not twice the price of a two-hour one.
-  const perKm = 48 * Math.pow(km || 1, -0.18);
-
-  /* The floor applies to the distance, not to the finished fare.
-
-     It used to clamp the last step, and on a short sector that swallowed
-     everything before it: Islamabad to Lahore is 270km, every carrier's
-     calculation landed under the floor, and the page offered PIA, AirSial,
-     SereneAir and Airblue at identical prices to the rupee. Four airlines
-     agreeing exactly is the one thing that never happens, and it made an
-     estimate look like a bug.
-
-     Applied here it does what it is for — no airline sells a seat for what
-     270 kilometres alone suggest — while the carrier's own positioning still
-     separates them afterwards. */
-  const distanceFare = Math.max(11000, km * perKm) * CABIN_MULTIPLIER[cabin];
-  const raw = distanceFare * (POSITIONING[code] ?? 1) * (0.94 + rand() * 0.14);
-
-  const baseFare = Math.round(raw / 500) * 500;
-  const taxes = Math.max(2500, Math.round((3200 + km * 4.1) / 100) * 100);
-  return { baseFare, taxes };
-}
-
 function buildOffers(
   query: SearchQuery,
   history: Array<{ title: string; amount: unknown; date: Date | null; data: unknown }>,
@@ -415,8 +393,6 @@ function buildOffers(
   }
 
   for (const code of candidates) {
-    const rand = seeded(`${code}|${query.legs.map((l) => `${l.from}${l.to}${l.date}`).join("|")}|${query.cabin}`);
-
     const carrier = airlineName(code);
     const contract = contractFor(contracts, origin.code, destination.code, carrier, query.cabin, query.tripType, first.date);
     const past = contract ? null : historyFor(history, origin.code, destination.code, carrier);
@@ -453,25 +429,21 @@ function buildOffers(
 
       if (!usable || !legs.length) continue;
 
-      // Priced per adult across the whole itinerary, which is how a return fare
-      // is quoted — not as two one-ways added together.
-      const km = legs.reduce((sum, leg) => {
-        const a = findAirport(leg.from);
-        const b = findAirport(leg.to);
-        return sum + (a && b ? distanceKm(a, b) : 0);
-      }, 0);
-
-      const indicative = indicativeFare(km, query.cabin, code, rand);
-      const baseFare = contract ? contract.sellFare : past ? past.baseFare : indicative.baseFare;
-      const taxes = contract ? contract.taxes : past ? past.taxes : indicative.taxes;
-      // Where a contract or history knows the real cost, use it. Otherwise
-      // assume the agency buys at the published fare and earns on the markup
-      // alone, which is conservative — it never flatters the margin.
+      /* A price only where something real says so. No contract fare and no
+         history on the sector means this system does not know what it sells
+         for, and the card says exactly that. */
+      const baseFare = contract ? contract.sellFare : past ? past.baseFare : null;
+      const taxes = contract ? contract.taxes : past ? past.taxes : null;
       const supplierCost = contract
         ? contract.netCost
         : past && past.cost > 0
           ? past.cost
-          : baseFare + taxes;
+          // History that knew the sale but not the cost: assume the agency
+          // bought at what it charged, which is conservative — it never
+          // flatters the margin.
+          : past
+            ? (past.baseFare + past.taxes)
+            : null;
 
       const scheduled = legs.every((leg) => Boolean(leg.departAt));
 
@@ -494,7 +466,7 @@ function buildOffers(
         // The account the payable lands in, which on a contract fare is whoever
         // the agency actually buys through rather than the carrier on the tail.
         supplier: contract ? contract.supplier || carrier : carrier,
-        source: contract ? "contract" : past ? "history" : "sample",
+        source: contract ? "contract" : past ? "history" : "none",
         /* Two separate claims, kept separate: where the price came from, and
            whether the times are a timetable or an absence of one. */
         sourceNote: [
@@ -502,7 +474,7 @@ function buildOffers(
             ? `Your contract fare — ${contract.title}${contract.validTo ? `, valid to ${contract.validTo}` : ""}`
             : past
               ? `${past.label} — your own booking, not a live quote`
-              : "Indicative fare — confirm with the airline before quoting",
+              : "No fare recorded for this sector",
           scheduled ? "Times from your recorded schedule" : "No schedule recorded for this sector",
         ].join(" · "),
       });
@@ -591,6 +563,7 @@ export async function POST(req: NextRequest) {
       liveProvider: false,
       notice: FARE_NOTICE,
       fromContract: offers.filter((offer) => offer.source === "contract").length,
+      unpriced: offers.filter((offer) => offer.baseFare == null).length,
       scheduled: offers.filter((offer) => offer.legs.every((leg) => Boolean(leg.departAt))).length,
       fromHistory: offers.filter((offer) => offer.source === "history").length,
     });

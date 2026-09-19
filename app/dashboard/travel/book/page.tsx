@@ -211,7 +211,9 @@ export default function BookFlightPage() {
   function addPassenger(type: PaxType) {
     const adult = passengers.find((p) => p.type === "ADT" && p.fare > 0);
     const suggested = suggestFare(type, adult?.fare ?? 0, adult?.tax ?? 0);
-    const cost = offer ? Math.round(offer.supplierCost * (type === "ADT" ? 1 : type === "CHD" ? 0.75 : 0.1)) : 0;
+    const cost = offer?.supplierCost != null
+      ? Math.round(offer.supplierCost * (type === "ADT" ? 1 : type === "CHD" ? 0.75 : 0.1))
+      : 0;
     setPassengers((prev) => [...prev, { ...emptyPassenger(type), ...suggested, cost }]);
     setActivePax(passengers.length);
   }

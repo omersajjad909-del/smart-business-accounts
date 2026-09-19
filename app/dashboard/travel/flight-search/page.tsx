@@ -52,9 +52,14 @@ export default function FlightSearchPage() {
   }, [offers, airline, stops, sort]);
 
   const cheapestId = useMemo(() => {
+    // Only among offers that have a fare at all — an unpriced sector is not
+    // the cheapest one, it is the one nobody has priced.
     let best: FlightOffer | null = null;
+    let bestTotal = Infinity;
     for (const offer of visible) {
-      if (!best || offer.baseFare + offer.taxes < best.baseFare + best.taxes) best = offer;
+      if (offer.baseFare == null) continue;
+      const total = offer.baseFare + (offer.taxes ?? 0);
+      if (total < bestTotal) { best = offer; bestTotal = total; }
     }
     return best?.id || "";
   }, [visible]);

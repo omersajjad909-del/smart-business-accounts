@@ -193,6 +193,24 @@ export function SummaryRail({
               </div>
             ) : null}
 
+            {/* A selected flight with no price is not an error — it is a sector
+                nobody has told this system the fare for. Saying so here stops
+                the rail reading as though the summary failed to load. */}
+            {!pricing ? (
+              <div
+                style={{
+                  borderTop: `1px solid ${T.border}`, paddingTop: 12,
+                  fontSize: 12, color: T.muted, lineHeight: 1.55,
+                }}
+              >
+                No fare on file for this sector. Add what you buy and sell it for on{" "}
+                <a href="/dashboard/travel/fare-sheet" style={{ color: T.accent, textDecoration: "none" }}>
+                  Contract Fares
+                </a>
+                , or carry on and type the fare for each passenger as you book.
+              </div>
+            ) : null}
+
             {cta ? (
               <PrimaryButton wide onClick={cta.onClick} disabled={cta.disabled}>
                 {cta.label}

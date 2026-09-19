@@ -107,7 +107,9 @@ export function OfferCard({
 }) {
   const [open, setOpen] = useState(false);
   const pricing = priceOffer(offer, pax, 0);
-  const perAdult = offer.baseFare + offer.taxes;
+  /* Null where nothing real says what this sector sells for. The card shows
+     the flight and asks for a fare instead of printing one it made up. */
+  const perAdult = offer.baseFare == null ? null : offer.baseFare + (offer.taxes ?? 0);
   const direct = offer.legs.every((leg) => !leg.via.length);
 
   return (
@@ -133,8 +135,8 @@ export function OfferCard({
         {offer.legs.every((leg) => leg.departAt) ? null : <Badge tone="#94a3b8">No schedule</Badge>}
         {/* Said on every card, because a price whose provenance is not on it is
             the one that gets quoted by accident. */}
-        <Badge tone={offer.source === "contract" ? "#34d399" : offer.source === "history" ? "#a78bfa" : "#f4c25b"}>
-          {offer.source === "contract" ? "Your contract fare" : offer.source === "history" ? "Your past fare" : "Indicative fare"}
+        <Badge tone={offer.source === "contract" ? "#34d399" : offer.source === "history" ? "#a78bfa" : "#94a3b8"}>
+          {offer.source === "contract" ? "Your contract fare" : offer.source === "history" ? "Your past fare" : "No fare on file"}
         </Badge>
         <span style={{ fontSize: 11, color: T.muted, marginLeft: "auto" }}>{CABIN_LABELS[offer.cabin]}</span>
       </div>
@@ -188,15 +190,29 @@ export function OfferCard({
         </div>
 
         <div style={{ textAlign: "right", display: "grid", gap: 8, justifyItems: "end" }}>
-          <div>
-            <Money value={perAdult} size={19} weight={800} />
-            <div style={{ fontSize: 10.5, color: T.muted, marginTop: 2 }}>per adult</div>
-          </div>
-          {pricing.count > 1 ? (
-            <div style={{ fontSize: 11, color: T.muted }}>
-              <Money value={pricing.total} size={12} weight={700} tone={T.muted} /> for {pricing.count}
+          {perAdult != null ? (
+            <>
+              <div>
+                <Money value={perAdult} size={19} weight={800} />
+                <div style={{ fontSize: 10.5, color: T.muted, marginTop: 2 }}>per adult</div>
+              </div>
+              {pricing && pricing.count > 1 ? (
+                <div style={{ fontSize: 11, color: T.muted }}>
+                  <Money value={pricing.total} size={12} weight={700} tone={T.muted} /> for {pricing.count}
+                </div>
+              ) : null}
+            </>
+          ) : (
+            <div style={{ textAlign: "right", maxWidth: 190 }}>
+              <div style={{ fontSize: 13.5, fontWeight: 700, color: T.muted }}>No fare on file</div>
+              <a
+                href="/dashboard/travel/fare-sheet"
+                style={{ fontSize: 11, color: T.accent, textDecoration: "none", display: "block", marginTop: 3, lineHeight: 1.45 }}
+              >
+                Add your fare for this sector →
+              </a>
             </div>
-          ) : null}
+          )}
           <button
             type="button"
             className="fl-press"
@@ -249,9 +265,18 @@ export function OfferCard({
             </div>
           ))}
           <div style={{ fontSize: 11.5, color: T.muted, borderTop: `1px solid ${T.border}`, paddingTop: 8 }}>
-            Fare per adult: base <Money value={offer.baseFare} size={11.5} weight={700} tone={T.muted} />
-            {" + taxes "}<Money value={offer.taxes} size={11.5} weight={700} tone={T.muted} />
-            {" · supplier cost "}<Money value={offer.supplierCost} size={11.5} weight={700} tone={T.muted} />
+            {offer.baseFare != null ? (
+              <>
+                Fare per adult: base <Money value={offer.baseFare} size={11.5} weight={700} tone={T.muted} />
+                {" + taxes "}<Money value={offer.taxes ?? 0} size={11.5} weight={700} tone={T.muted} />
+                {" · supplier cost "}<Money value={offer.supplierCost ?? 0} size={11.5} weight={700} tone={T.muted} />
+              </>
+            ) : (
+              <>
+                No fare recorded for this sector, so none is shown. Add what you buy and sell it
+                for on Contract Fares, or type the fares into the booking as you go.
+              </>
+            )}
           </div>
         </div>
       ) : null}
