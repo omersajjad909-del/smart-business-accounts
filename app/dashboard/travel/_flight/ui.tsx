@@ -13,6 +13,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useCurrency } from "@/lib/useCurrency";
 import {
   CABIN_LABELS,
+  FARE_NOTICE,
   describePax,
   type Airport,
   type CabinClass,
@@ -523,9 +524,11 @@ export function FareNotice({ note }: { note?: string }) {
     >
       <span style={{ fontSize: 14, lineHeight: 1.3 }}>⚠️</span>
       <div style={{ fontSize: 12.5, color: T.text, lineHeight: 1.5 }}>
-        <strong style={{ color: "#f4c25b" }}>Not a live airline feed.</strong>{" "}
-        {note ||
-          "No airline or GDS connection is configured yet. Schedules are built from the route and fares are either your own past fares or indicative figures — confirm every fare with the airline before you quote it."}
+        {/* Leads with what the operator has to act on. "Not a live airline
+            feed" read as a fault that wanted fixing; the thing that actually
+            matters is that a fare here is not yet a fare you can quote. */}
+        <strong style={{ color: "#f4c25b" }}>Confirm fares before quoting.</strong>{" "}
+        {note || FARE_NOTICE}
       </div>
     </div>
   );

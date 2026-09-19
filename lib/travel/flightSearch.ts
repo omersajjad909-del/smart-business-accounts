@@ -326,6 +326,21 @@ import type { Airport } from "./airports";
  * are the ones a Pakistani desk reaches for most, so they are one keystroke
  * away instead of being buried four thousand rows deep.
  */
+/**
+ * What this search is and is not, in one place.
+ *
+ * It used to be written twice — once in the API response and once as the
+ * banner's fallback — and the two drifted the moment invented timetables were
+ * removed: the server stopped claiming schedules were "built from the route"
+ * and the banner went on saying it for another week. A sentence that tells an
+ * operator what they may quote is not a sentence to keep two copies of.
+ */
+export const FARE_NOTICE =
+  "No airline or GDS connection is configured. Flight times and numbers come only from the " +
+  "schedules you have recorded — where none exists this shows no times at all rather than " +
+  "inventing them. Fares marked as your contract fare or your past fare are your own real " +
+  "numbers; anything marked indicative is this system's estimate.";
+
 export const COMMON_AIRPORT_CODES = [
   "KHI", "LHE", "ISB", "PEW", "UET", "MUX", "SKT", "LYP", "GWD", "SDT",
   "JED", "MED", "RUH", "DMM", "DXB", "SHJ", "AUH", "DOH", "MCT", "BAH",

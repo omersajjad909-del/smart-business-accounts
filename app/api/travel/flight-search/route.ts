@@ -28,6 +28,7 @@ import { resolveCompanyId } from "@/lib/tenant";
 import {
   AIRLINES,
   CABIN_MULTIPLIER,
+  FARE_NOTICE,
   airlineName,
   distanceKm,
   flightMinutes,
@@ -573,11 +574,7 @@ export async function POST(req: NextRequest) {
       /* Said by the server as well as the page, so a caller that is not our own
          UI cannot mistake this for a fare feed either. */
       liveProvider: false,
-      notice:
-        "No airline or GDS connection is configured. Flight times and numbers come only from the " +
-        "schedules you have recorded — where none exists this shows no times at all rather than " +
-        "inventing them. Fares marked as your contract fare or your past fare are your own real " +
-        "numbers; anything marked indicative is this system's estimate.",
+      notice: FARE_NOTICE,
       fromContract: offers.filter((offer) => offer.source === "contract").length,
       scheduled: offers.filter((offer) => offer.legs.every((leg) => Boolean(leg.departAt))).length,
       fromHistory: offers.filter((offer) => offer.source === "history").length,
