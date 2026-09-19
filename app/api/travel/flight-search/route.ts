@@ -377,20 +377,35 @@ function buildOffers(
 
   const offers: FlightOffer[] = [];
 
-  /* A carrier the agency holds a contract with, or has recorded a flight for,
-     is always offered — even where the routing rules would not have suggested
-     it. A negotiated fare is a seat the desk can actually sell, and leaving it
-     out of the list is the one way this search can cost the agency money. */
-  const candidates = new Set(carriersFor(origin, destination));
+  /* Who actually flies this sector.
+
+     There are two answers and one is much better than the other. A recorded
+     timetable is a fact: these carriers operate it, and by implication the
+     others do not. carriersFor() is a rule of thumb — Pakistani carrier,
+     route touches Pakistan, therefore plausible — which is fine when nothing
+     better exists and wrong the moment something does. Left in, it offered
+     SereneAir on Lahore–Jeddah with no times against it, because the rule said
+     it was plausible and the timetable had never heard of it.
+
+     So: a sector with a timetable is answered by the timetable. A sector
+     without one falls back to the rule, and every card then says "No
+     schedule", which is honest. */
+  const scheduledHere = schedules.filter((row) => row.from === origin.code && row.to === destination.code && row.airlineCode);
+
+  const candidates = new Set(
+    scheduledHere.length
+      ? scheduledHere.map((row) => row.airlineCode)
+      : carriersFor(origin, destination),
+  );
+
+  /* A carrier the agency holds a contract with is always offered, whichever
+     answer was used. A negotiated fare is a seat the desk can actually sell —
+     a consolidator block on a flight the public timetable does not show is
+     exactly the thing an agency has and a search engine does not. */
   for (const fare of contracts) {
     if (fare.from !== origin.code || fare.to !== destination.code) continue;
     const match = AIRLINES.find((a) => a.name.toLowerCase() === fare.airline.toLowerCase());
     if (match) candidates.add(match.code);
-  }
-  for (const row of schedules) {
-    if (row.from === origin.code && row.to === destination.code && row.airlineCode) {
-      candidates.add(row.airlineCode);
-    }
   }
 
   for (const code of candidates) {
@@ -714,6 +729,10 @@ export async function POST(req: NextRequest) {
          is used up, a provider that refused. Null when it simply had nothing
          for that route, which is a different thing and says so on its own. */
       providerProblem: auto.problem,
+      /* True when the carrier list came from a real timetable rather than the
+         geography rule. A short list is then a fact about the route, not a
+         gap. */
+      fromTimetable: offers.every((offer) => offer.legs.every((leg) => Boolean(leg.departAt))),
       providerConfigured: auto.problem !== "no-provider",
       scheduled: offers.filter((offer) => offer.legs.every((leg) => Boolean(leg.departAt))).length,
       fromHistory: offers.filter((offer) => offer.source === "history").length,
