@@ -667,6 +667,7 @@ model Company {
   fixedAssets           FixedAsset[]
   sessions              Session[]
   businessRecords       BusinessRecord[]
+  travelers             Traveler[]
   teamInvites           TeamInvite[]
   bulkPaymentBatches    BulkPaymentBatch[]
   paymentFollowUpLogs   PaymentFollowUpLog[]
@@ -2268,6 +2269,75 @@ model BusinessRecord {
   @@index([refId])
 }
 
+// ── Travellers ───────────────────────────────────────────────────────────────
+//
+// The person who flies, as distinct from the customer who pays.
+//
+// A family books under the father's account and four people travel; a company
+// books under its own and two hundred do. Conflating the two is why a passenger
+// used to exist only as a name inside one booking's JSON — so the same person
+// flying twice was two unrelated blobs, their passport expiry was invisible
+// until an airline refused them at the desk, and every repeat booking meant
+// typing the passport number out again from a photocopy.
+//
+// A real table because this is the one thing in travel that is queried rather
+// than read: by passport number when a document arrives, by expiry when the
+// six-month rule bites, by name when somebody rings up and says "you booked me
+// last year". None of that is possible against a JSON column.
+
+model Traveler {
+  id        String  @id @default(uuid())
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  branchId  String?
+
+  /// The name exactly as the passport prints it. A ticket issued against
+  /// anything else is a ticket the passenger cannot fly on.
+  title     String?
+  firstName String
+  lastName  String
+  /// Both names joined, kept so a search can hit one indexed column rather
+  /// than concatenating four thousand rows at query time.
+  fullName  String
+
+  dob         DateTime?
+  gender      String?
+  nationality String?
+  cnic        String?
+
+  passportNo      String?
+  /// Most carriers refuse a passport with under six months left, and nobody
+  /// finds out until check-in. Indexed so the desk can be told first.
+  passportExpiry  DateTime?
+  passportIssue   DateTime?
+  passportCountry String?
+
+  email    String?
+  phone    String?
+  altPhone String?
+
+  /// Who to ring if something happens while they are abroad.
+  emergencyName  String?
+  emergencyPhone String?
+
+  /// Frequent flyer numbers, keyed by airline IATA code.
+  frequentFlyer Json?
+
+  /// The account that pays for this traveller's bookings — the father's, the
+  /// company's, or their own. Null where nobody has said yet.
+  billToAccountId String?
+
+  notes String? @db.Text
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([companyId, fullName])
+  @@index([companyId, passportNo])
+  @@index([companyId, passportExpiry])
+  @@index([companyId, phone])
+}
+
 // ── Support & Tickets ────────────────────────────────────────────────────────
 
 model SupportTicket {
@@ -2769,7 +2839,7 @@ model PlatformInvoice {
   /// webhook was real, and it must never be counted as revenue or read as a
   /// customer. Kept rather than discarded so a test can still be traced, but
   /// left out of the admin ledger unless it is explicitly asked for.
-  testMode  Boolean  @default(false)
+  testMode Boolean @default(false)
 
   periodStart DateTime?
   periodEnd   DateTime?
