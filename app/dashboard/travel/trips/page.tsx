@@ -167,6 +167,29 @@ export default function TripsPage() {
     await load();
   }
 
+  /* One invoice for the whole trip: a line per service, the customer owing the
+     total, each service's revenue account credited with its own share. */
+  async function raiseInvoice(trip: Trip) {
+    setError("");
+    try {
+      const response = await fetch("/api/travel/trip-invoice", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ bookingId: trip.id }),
+      });
+      const body = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(body?.error || "Could not raise the invoice");
+      alertToast(
+        `Invoice ${body.invoiceNo} raised for ${trip.bookingNo} — ${money(body.total ?? trip.saleTotal)} across ${body.lines ?? trip.items.length} lines.`,
+        "success",
+        body.reused ? "Already Invoiced" : "Invoice Raised",
+      );
+      await load();
+    } catch (invoiceError) {
+      setError(invoiceError instanceof Error ? invoiceError.message : "Could not raise the invoice");
+    }
+  }
+
   async function setStatus(trip: Trip, status: string) {
     await fetch("/api/travel/bookings", {
       method: "PUT",
@@ -417,13 +440,43 @@ export default function TripsPage() {
                     Margin {money(trip.marginTotal)}
                   </span>
                 </div>
-                <button
-                  type="button"
-                  onClick={() => remove(trip)}
-                  style={{ border: "none", background: "transparent", color: "#f87171", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}
-                >
-                  Remove
-                </button>
+                <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
+                  {trip.invoiceNo ? (
+                    <a
+                      href={`/dashboard/sales-invoice?id=${encodeURIComponent(trip.id)}`}
+                      style={{
+                        border: "1px solid rgba(52,211,153,.45)", background: "rgba(52,211,153,.14)",
+                        color: "#34d399", borderRadius: 10, padding: "7px 13px", fontSize: 12,
+                        fontWeight: 700, textDecoration: "none", whiteSpace: "nowrap",
+                      }}
+                    >
+                      Invoice {trip.invoiceNo}
+                    </a>
+                  ) : (
+                    <button
+                      type="button"
+                      className="fl-press"
+                      onClick={() => raiseInvoice(trip)}
+                      disabled={trip.status === "cancelled" || !trip.items.length}
+                      style={{
+                        border: "none", borderRadius: 10, padding: "8px 14px", fontSize: 12, fontWeight: 800,
+                        background: trip.status === "cancelled" ? T.panel2 : "linear-gradient(135deg,var(--accent),var(--accent-strong))",
+                        color: trip.status === "cancelled" ? T.muted : "#06121f",
+                        cursor: trip.status === "cancelled" ? "not-allowed" : "pointer",
+                        fontFamily: "inherit", whiteSpace: "nowrap",
+                      }}
+                    >
+                      Raise invoice
+                    </button>
+                  )}
+                  <button
+                    type="button"
+                    onClick={() => remove(trip)}
+                    style={{ border: "none", background: "transparent", color: "#f87171", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}
+                  >
+                    Remove
+                  </button>
+                </div>
               </div>
             </article>
           ))}

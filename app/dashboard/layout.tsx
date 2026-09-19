@@ -2297,6 +2297,8 @@ export default function DashboardLayout({
                 {hasDashboardFeature("TRAVEL_TOURS") && <NavLink href="/dashboard/travel/tours" pathname={pathname}>🚌 Group Tours</NavLink>}
                 {hasDashboardFeature("TRAVEL_SETTLEMENTS") && <NavLink href="/dashboard/travel/settlements" pathname={pathname}>🧾 Supplier Settlements</NavLink>}
                 {hasDashboardFeature("TRAVEL_PASSPORTS") && <NavLink href="/dashboard/travel/passports" pathname={pathname}>🛂 Passport Database</NavLink>}
+                {hasDashboardFeature("TRAVEL_TRANSPORT") && <NavLink href="/dashboard/travel/transport" pathname={pathname}>🚐 Transport</NavLink>}
+                {hasDashboardFeature("TRAVEL_INSURANCE") && <NavLink href="/dashboard/travel/insurance" pathname={pathname}>🛡 Travel Insurance</NavLink>}
                 {hasDashboardFeature("TRAVEL_ANALYTICS") && <NavLink href="/dashboard/travel/analytics" pathname={pathname}>📊 Analytics</NavLink>}
                 <NavLink href="/dashboard/quotation" pathname={pathname}>Quotations</NavLink>
                 <NavLink href="/dashboard/sales-invoice" pathname={pathname}>Sales Invoices</NavLink>
