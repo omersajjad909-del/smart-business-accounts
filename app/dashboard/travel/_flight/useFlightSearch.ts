@@ -52,6 +52,8 @@ export function useFlightSearch() {
   const [query, setQuery] = useState<SearchQuery>(emptyQuery);
   const [offers, setOffers] = useState<FlightOffer[]>([]);
   const [notice, setNotice] = useState("");
+  /** Sectors whose timetable the provider filled in during this search. */
+  const [autoImported, setAutoImported] = useState<string[]>([]);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [searched, setSearched] = useState(false);
@@ -73,6 +75,7 @@ export function useFlightSearch() {
       if (!response.ok) throw new Error(body?.error || "Flight search failed");
       setOffers(Array.isArray(body.offers) ? body.offers : []);
       setNotice(String(body.notice || ""));
+      setAutoImported(Array.isArray(body.autoImported) ? body.autoImported : []);
       setPricedFor(asked);
       setSearched(true);
     } catch (searchError) {
@@ -84,7 +87,7 @@ export function useFlightSearch() {
     }
   }, [query]);
 
-  return { query, setQuery, offers, notice, busy, error, searched, pricedFor, search };
+  return { query, setQuery, offers, notice, busy, error, searched, pricedFor, autoImported, search };
 }
 
 /** Rank the list the way the chosen sort says, without mutating it. */

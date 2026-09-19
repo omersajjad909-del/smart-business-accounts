@@ -27,7 +27,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
 import { prisma } from "@/lib/prisma";
-import { resolveCompanyId } from "@/lib/tenant";
+import { resolveBranchIdOrDefault, resolveCompanyId } from "@/lib/tenant";
 import {
   AIRLINES,
   CABIN_MULTIPLIER,
@@ -48,6 +48,7 @@ import {
 } from "@/lib/travel/flightSearch";
 // The full table — server-side only, see the header of that file.
 import { findAirport } from "@/lib/travel/airports";
+import { configuredProvider, fetchSchedules } from "@/lib/travel/scheduleProvider";
 
 /** Where each carrier banks its connections. */
 const HUBS: Record<string, string> = {
@@ -484,6 +485,128 @@ function buildOffers(
   return offers;
 }
 
+/**
+ * Fill in a sector's timetable from the provider, the first time it is searched.
+ *
+ * The import panel on Flight Schedules exists for the operator who wants to
+ * look before saving. This is for everybody else: search a sector nobody has
+ * recorded, and the real timetable is fetched, kept, and shown — rather than
+ * the page saying "no schedule" and leaving the agent to go and do it by hand.
+ *
+ * WHAT KEEPS THIS FROM EATING THE QUOTA
+ *
+ * A provider that sells to a Pakistani company without an accreditation is
+ * metered in the hundreds of calls a month, so this runs once per sector, ever.
+ * A sector with rows already recorded is skipped, and a sector that came back
+ * empty leaves a marker so the next search does not ask again. Two sectors per
+ * search at most — an outbound and a return.
+ *
+ * It never fails a search. A provider that is down, out of quota or misbehaving
+ * leaves the page exactly as it would have been without it.
+ */
+async function autoImportSchedules(
+  companyId: string,
+  branchId: string | null,
+  query: SearchQuery,
+  existing: FlightSchedule[],
+): Promise<{ added: FlightSchedule[]; sectors: string[] }> {
+  const added: FlightSchedule[] = [];
+  const sectors: string[] = [];
+  if (!configuredProvider()) return { added, sectors };
+
+  const wanted = query.legs.slice(0, 2).filter((leg) => {
+    const already = existing.some((row) => row.from === leg.from && row.to === leg.to);
+    return !already;
+  });
+  if (!wanted.length) return { added, sectors };
+
+  /* Sectors already asked about and found empty. Without this a route the
+     provider does not cover would be asked again on every single search. */
+  const probes = await prisma.businessRecord.findMany({
+    where: { companyId, category: "travel_schedule_probe" },
+    select: { title: true },
+  });
+  const probed = new Set(probes.map((row) => row.title));
+
+  for (const leg of wanted) {
+    const key = `${leg.from}-${leg.to}`;
+    if (probed.has(key)) continue;
+
+    try {
+      const result = await fetchSchedules({ from: leg.from, to: leg.to, date: leg.date });
+
+      // Asked and answered, whatever the answer. The marker goes down either
+      // way so an empty sector is not re-asked on the next search.
+      await prisma.businessRecord.create({
+        data: {
+          companyId,
+          branchId: branchId || null,
+          category: "travel_schedule_probe",
+          title: key,
+          status: result.flights.length ? "found" : "empty",
+          date: new Date(),
+          data: { from: leg.from, to: leg.to, found: result.flights.length, checkedOn: new Date().toISOString().slice(0, 10) },
+        },
+      });
+
+      if (!result.flights.length) continue;
+      sectors.push(key);
+
+      for (const flight of result.flights) {
+        const record = await prisma.businessRecord.create({
+          data: {
+            companyId,
+            branchId: branchId || null,
+            category: "travel_schedule",
+            title: `${flight.flightNo} · ${flight.from} → ${flight.to}`,
+            status: "active",
+            date: new Date(leg.date),
+            data: {
+              airline: flight.airline,
+              airlineIata: flight.airlineIata,
+              flightNo: flight.flightNo,
+              from: flight.from,
+              to: flight.to,
+              departAt: flight.departAt,
+              arriveAt: flight.arriveAt,
+              via: "",
+              // The provider gives one day's board and says nothing about the
+              // others, so this is recorded as daily and flagged for review.
+              days: "",
+              validTo: null,
+              aircraft: flight.aircraft,
+              importedFrom: configuredProvider() || "provider",
+              importedOn: new Date().toISOString().slice(0, 10),
+              importedAutomatically: true,
+            },
+          },
+        });
+
+        added.push({
+          id: record.id,
+          airline: flight.airline,
+          airlineCode: flight.airlineIata,
+          flightNo: flight.flightNo,
+          from: flight.from,
+          to: flight.to,
+          departAt: flight.departAt,
+          arriveAt: flight.arriveAt,
+          via: [],
+          days: [],
+          validFrom: leg.date,
+          validTo: "",
+        });
+      }
+    } catch {
+      /* A provider that is down must not take the search with it. The sector
+         simply stays unscheduled, exactly as it was a moment ago, and the next
+         search will try again. */
+    }
+  }
+
+  return { added, sectors };
+}
+
 function readQuery(body: unknown): SearchQuery | null {
   const raw = (body ?? {}) as Record<string, unknown>;
   const tripType = String(raw.tripType || "oneway");
@@ -553,7 +676,12 @@ export async function POST(req: NextRequest) {
     });
     const schedules = readSchedules(scheduleRows as never);
 
-    const offers = buildOffers(query, history as never, contracts, schedules);
+    /* A sector nobody has recorded gets its timetable fetched now rather than
+       showing "no schedule" and waiting for somebody to go and import it. */
+    const branchId = await resolveBranchIdOrDefault(req, companyId);
+    const auto = await autoImportSchedules(companyId, branchId, query, schedules);
+
+    const offers = buildOffers(query, history as never, contracts, [...schedules, ...auto.added]);
 
     return NextResponse.json({
       offers,
@@ -564,6 +692,11 @@ export async function POST(req: NextRequest) {
       notice: FARE_NOTICE,
       fromContract: offers.filter((offer) => offer.source === "contract").length,
       unpriced: offers.filter((offer) => offer.baseFare == null).length,
+      /* Sectors whose timetable was fetched on this search. The page tells the
+         operator, because rows that appeared without anyone asking still need
+         checking — a codeshare, a seasonal service, an operating-days column
+         the provider does not fill in. */
+      autoImported: auto.sectors,
       scheduled: offers.filter((offer) => offer.legs.every((leg) => Boolean(leg.departAt))).length,
       fromHistory: offers.filter((offer) => offer.source === "history").length,
     });

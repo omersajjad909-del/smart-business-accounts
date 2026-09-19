@@ -25,7 +25,7 @@ type StopFilter = "any" | "direct" | "one";
 export default function FlightSearchPage() {
   const router = useRouter();
   const { isMobile, isTablet } = useResponsive();
-  const { query, setQuery, offers, notice, busy, error, searched, pricedFor, search } = useFlightSearch();
+  const { query, setQuery, offers, notice, busy, error, searched, pricedFor, autoImported, search } = useFlightSearch();
 
   const [selectedId, setSelectedId] = useState("");
   const [markup, setMarkup] = useState(0);
@@ -108,6 +108,23 @@ export default function FlightSearchPage() {
         <FareNotice note={notice || undefined} />
 
         <SearchPanel query={query} onChange={setQuery} onSearch={() => { setSelectedId(""); search(); }} busy={busy} />
+
+        {autoImported.length ? (
+          <div
+            style={{
+              border: "1px solid rgba(167,139,250,.4)", background: "rgba(167,139,250,.1)",
+              borderRadius: 12, padding: "11px 14px", fontSize: 12.5, color: T.text, lineHeight: 1.55,
+            }}
+          >
+            <strong style={{ color: "#a78bfa" }}>Timetable fetched for {autoImported.join(", ")}.</strong>{" "}
+            The provider gives one day&rsquo;s departures and does not say which other days they run, so
+            these are saved as daily. Check them on{" "}
+            <a href="/dashboard/travel/schedules" style={{ color: T.accent, textDecoration: "none" }}>
+              Flight Schedules
+            </a>{" "}
+            and set the operating days for anything that is not a daily service.
+          </div>
+        ) : null}
 
         {error ? (
           <div style={{ border: "1px solid rgba(248,113,113,.4)", background: "rgba(248,113,113,.1)", color: "#f87171", borderRadius: 12, padding: "11px 14px", fontSize: 12.5 }}>
