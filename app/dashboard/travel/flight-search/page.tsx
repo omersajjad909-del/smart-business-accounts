@@ -191,6 +191,11 @@ export default function FlightSearchPage() {
                       best={index === 0 && sort === "recommended"}
                       cheapest={offer.id === cheapestId}
                       onSelect={() => setSelectedId(offer.id)}
+                      tripType={pricedFor?.tripType ?? query.tripType}
+                      /* Re-run so the fare just saved comes back attached to
+                         the offer, rather than the card claiming a price the
+                         rest of the page does not know about. */
+                      onFareSaved={() => search(pricedFor ?? undefined)}
                     />
                   ))
                 ) : (

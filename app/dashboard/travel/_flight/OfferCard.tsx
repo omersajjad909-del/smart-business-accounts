@@ -18,8 +18,9 @@ import {
   priceOffer,
   type FlightOffer,
   type PaxCounts,
+  type TripType,
 } from "@/lib/travel/flightSearch";
-import { Money, T } from "./ui";
+import { Money, T, inputStyle } from "./ui";
 
 function LegRow({ leg, compact }: { leg: FlightOffer["legs"][number]; compact?: boolean }) {
   /* No recorded timetable means no clock on the card. The sector, the distance
@@ -90,6 +91,153 @@ function Badge({ tone, children }: { tone: string; children: React.ReactNode }) 
   );
 }
 
+/**
+ * Put the fare in from here, rather than going to another page to do it.
+ *
+ * The sector, the airline, the cabin and the trip type are all on the card
+ * already — asking the operator to retype them on Contract Fares is asking
+ * them not to bother, and a fare nobody records is a fare the next search
+ * cannot show either. Three numbers and it is saved for good.
+ */
+function QuickFare({
+  offer,
+  tripType,
+  onSaved,
+}: {
+  offer: FlightOffer;
+  tripType: TripType;
+  onSaved?: () => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const [form, setForm] = useState({ sellFare: "", taxes: "", netCost: "" });
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
+
+  const from = offer.legs[0]?.from || "";
+  const to = offer.legs[0]?.to || "";
+  const sell = Number(form.sellFare) || 0;
+  const taxes = Number(form.taxes) || 0;
+  const net = Number(form.netCost) || 0;
+  const margin = sell + taxes - net;
+  const ready = sell > 0 && net > 0;
+
+  async function save() {
+    setBusy(true);
+    setError("");
+    try {
+      const today = new Date().toISOString().slice(0, 10);
+      const response = await fetch("/api/business-records", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          category: "travel_fare",
+          title: `${from} → ${to} · ${offer.airline}`,
+          status: "active",
+          amount: sell,
+          date: today,
+          data: {
+            from, to,
+            airline: offer.airline,
+            // Who bills you. The carrier by default; change it on Contract
+            // Fares if you actually buy through a consolidator.
+            supplier: offer.supplier || offer.airline,
+            cabin: offer.cabin,
+            tripType: tripType === "round" ? "round" : "oneway",
+            sellFare: sell,
+            taxes,
+            netCost: net,
+            baggageKg: 0,
+            validTo: null,
+          },
+        }),
+      });
+      if (!response.ok) throw new Error(await response.text().catch(() => "Could not save"));
+      onSaved?.();
+    } catch (saveError) {
+      setError(saveError instanceof Error ? saveError.message : "Could not save the fare");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  const cell: React.CSSProperties = { ...inputStyle, padding: "7px 9px", fontSize: 12.5, textAlign: "right" };
+
+  if (!open) {
+    return (
+      <div style={{ textAlign: "right", maxWidth: 200 }}>
+        <div style={{ fontSize: 13.5, fontWeight: 700, color: T.muted }}>No fare on file</div>
+        <button
+          type="button"
+          onClick={() => setOpen(true)}
+          style={{
+            marginTop: 5, border: `1px solid ${T.accent}55`, background: "var(--accent-soft)",
+            color: T.accent, borderRadius: 9, padding: "6px 12px", fontSize: 12, fontWeight: 700,
+            cursor: "pointer", fontFamily: "inherit", whiteSpace: "nowrap",
+          }}
+        >
+          + Add your fare
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <div style={{ width: 210, display: "grid", gap: 7, textAlign: "left" }}>
+      <div style={{ fontSize: 11, color: T.muted }}>
+        Per adult, {tripType === "round" ? "return" : "one way"} — {from} → {to}
+      </div>
+      {([
+        ["sellFare", "You sell for"],
+        ["taxes", "Taxes"],
+        ["netCost", "You pay supplier"],
+      ] as const).map(([key, label]) => (
+        <label key={key} style={{ display: "flex", alignItems: "center", gap: 8, justifyContent: "space-between" }}>
+          <span style={{ fontSize: 11.5, color: T.muted, whiteSpace: "nowrap" }}>{label}</span>
+          <input
+            className="fl-in"
+            type="number"
+            min={0}
+            value={form[key]}
+            onChange={(event) => setForm({ ...form, [key]: event.target.value })}
+            style={{ ...cell, width: 96 }}
+          />
+        </label>
+      ))}
+
+      {ready ? (
+        <div style={{ fontSize: 11.5, color: margin >= 0 ? "#34d399" : "#f87171", textAlign: "right", fontWeight: 700 }}>
+          Margin {margin.toLocaleString()}
+        </div>
+      ) : null}
+      {error ? <div style={{ fontSize: 11, color: "#f87171" }}>{error}</div> : null}
+
+      <div style={{ display: "flex", gap: 6, justifyContent: "flex-end" }}>
+        <button
+          type="button"
+          onClick={() => setOpen(false)}
+          style={{ border: "none", background: "transparent", color: T.muted, fontSize: 12, cursor: "pointer", fontFamily: "inherit" }}
+        >
+          Cancel
+        </button>
+        <button
+          type="button"
+          disabled={!ready || busy}
+          onClick={save}
+          className="fl-press"
+          style={{
+            border: "none", borderRadius: 9, padding: "7px 14px", fontSize: 12, fontWeight: 800,
+            background: ready ? "linear-gradient(135deg,var(--accent),var(--accent-strong))" : T.panel2,
+            color: ready ? "#06121f" : T.muted, cursor: ready && !busy ? "pointer" : "not-allowed",
+            fontFamily: "inherit",
+          }}
+        >
+          {busy ? "Saving…" : "Save fare"}
+        </button>
+      </div>
+    </div>
+  );
+}
+
 export function OfferCard({
   offer,
   pax,
@@ -97,6 +245,8 @@ export function OfferCard({
   best,
   cheapest,
   onSelect,
+  tripType = "oneway",
+  onFareSaved,
 }: {
   offer: FlightOffer;
   pax: PaxCounts;
@@ -104,6 +254,8 @@ export function OfferCard({
   best?: boolean;
   cheapest?: boolean;
   onSelect: () => void;
+  tripType?: TripType;
+  onFareSaved?: () => void;
 }) {
   const [open, setOpen] = useState(false);
   const pricing = priceOffer(offer, pax, 0);
@@ -203,15 +355,7 @@ export function OfferCard({
               ) : null}
             </>
           ) : (
-            <div style={{ textAlign: "right", maxWidth: 190 }}>
-              <div style={{ fontSize: 13.5, fontWeight: 700, color: T.muted }}>No fare on file</div>
-              <a
-                href="/dashboard/travel/fare-sheet"
-                style={{ fontSize: 11, color: T.accent, textDecoration: "none", display: "block", marginTop: 3, lineHeight: 1.45 }}
-              >
-                Add your fare for this sector →
-              </a>
-            </div>
+            <QuickFare offer={offer} tripType={tripType} onSaved={onFareSaved} />
           )}
           <button
             type="button"

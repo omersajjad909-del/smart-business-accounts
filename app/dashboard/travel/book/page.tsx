@@ -406,6 +406,8 @@ export default function BookFlightPage() {
                       selected={row.id === offer?.id}
                       best={index === 0}
                       onSelect={() => chooseOffer(row, pricedFor?.pax ?? query.pax, markup)}
+                      tripType={pricedFor?.tripType ?? query.tripType}
+                      onFareSaved={() => search(pricedFor ?? undefined)}
                     />
                   ))}
                   {!visibleOffers.length ? (
