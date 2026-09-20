@@ -219,7 +219,9 @@ export default function TripsPage() {
       const body = await response.json().catch(() => ({}));
       if (!response.ok) throw new Error(body?.error || "Could not attach");
       alertToast(
-        `${body.attached} service${body.attached === 1 ? "" : "s"} added to ${attachTo.bookingNo} — now ${money(body.booking.saleTotal)}.`,
+        `${body.attached} service${body.attached === 1 ? "" : "s"} added to ${attachTo.bookingNo}` +
+          (body.replaced ? `, replacing ${body.replaced} quoted line${body.replaced === 1 ? "" : "s"}` : "") +
+          ` — now ${money(body.booking.saleTotal)}.`,
         "success",
         "Services Attached",
       );
@@ -352,7 +354,8 @@ export default function TripsPage() {
               </div>
               <div style={{ fontSize: 12, color: T.muted, marginTop: 3, lineHeight: 1.5 }}>
                 Tickets, visas, hotels and transfers already raised on their own desks that are not on a trip yet.
-                Their price comes off the record — it is not retyped here.
+                Their price comes off the record, not from this screen — and attaching one replaces the line
+                you typed when you quoted, so the trip is never worth double.
               </div>
             </div>
             <GhostButton onClick={() => setAttachTo(null)}>Close</GhostButton>

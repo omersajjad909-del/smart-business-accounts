@@ -170,6 +170,33 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Those services are already on a trip" }, { status: 409 });
     }
 
+    /* A typed line becomes the real record rather than sitting beside it.
+
+       The desk quotes before the PNR exists — a customer standing at the
+       counter wants a number, and there is nothing to attach yet. So a FLIGHT
+       line gets typed from the contract fare, and later the ticket is raised
+       with its PNR. Left alone that is two flight lines and a trip worth
+       double; removing one by hand is a step somebody forgets on a Friday.
+
+       So attaching a service replaces the first typed line of the same kind —
+       typed meaning it carries no sourceRecordId, which is exactly what "not
+       yet real" looks like here. One line replaced per record attached, and
+       the count comes back so the page can say so. */
+    const typed = await prisma.bookingItem.findMany({
+      where: { bookingId, sourceRecordId: null },
+      orderBy: { createdAt: "asc" },
+    });
+
+    const replacedIds: string[] = [];
+    for (const record of fresh) {
+      const productType = CATEGORY_TO_PRODUCT[record.category];
+      const match = typed.find((item) => item.productType === productType && !replacedIds.includes(item.id));
+      if (match) replacedIds.push(match.id);
+    }
+    if (replacedIds.length) {
+      await prisma.bookingItem.deleteMany({ where: { id: { in: replacedIds } } });
+    }
+
     await prisma.bookingItem.createMany({
       data: fresh.map((record) => {
         const price = priceOf(record);
@@ -207,10 +234,12 @@ export async function POST(req: NextRequest) {
       entityId: bookingId,
       action: "UPDATE",
       afterValues: updated,
-      description: `Attached ${fresh.length} service${fresh.length === 1 ? "" : "s"} to trip ${booking.bookingNo}`,
+      description:
+        `Attached ${fresh.length} service${fresh.length === 1 ? "" : "s"} to trip ${booking.bookingNo}` +
+        (replacedIds.length ? `, replacing ${replacedIds.length} quoted line${replacedIds.length === 1 ? "" : "s"}` : ""),
     });
 
-    return NextResponse.json({ success: true, attached: fresh.length, booking: updated });
+    return NextResponse.json({ success: true, attached: fresh.length, replaced: replacedIds.length, booking: updated });
   } catch (error) {
     return NextResponse.json(
       { error: error instanceof Error ? error.message : "Could not attach the services" },
