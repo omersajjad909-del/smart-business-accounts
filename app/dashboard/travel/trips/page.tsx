@@ -96,6 +96,13 @@ export default function TripsPage() {
 
   const [trips, setTrips] = useState<Trip[]>([]);
   const [travelers, setTravelers] = useState<Traveler[]>([]);
+  /* The airlines, hotels and consolidators already on the chart of accounts.
+     Offered rather than imposed: the supplier being used for the first time
+     must still be typeable, or the first booking with a new consolidator means
+     abandoning the trip to go and add them. But re-typing an existing one is
+     how "Qatar Airways BSP" and "Qatar Airways Bsp" become two suppliers with
+     half the payable each. */
+  const [suppliers, setSuppliers] = useState<string[]>([]);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [loading, setLoading] = useState(true);
@@ -117,12 +124,14 @@ export default function TripsPage() {
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      const [tripRes, travRes] = await Promise.all([
+      const [tripRes, travRes, supRes] = await Promise.all([
         fetch(`/api/travel/bookings?q=${encodeURIComponent(search)}&status=${statusFilter}&limit=100`).then((r) => (r.ok ? r.json() : null)),
         fetch("/api/travel/travelers?limit=100").then((r) => (r.ok ? r.json() : null)),
+        fetch("/api/accounts?partyType=SUPPLIER", { cache: "no-store" }).then((r) => (r.ok ? r.json() : [])),
       ]);
       setTrips(tripRes?.bookings ?? []);
       setTravelers(travRes?.travelers ?? []);
+      setSuppliers(Array.isArray(supRes) ? supRes.map((a: { name?: unknown }) => String(a?.name || "")).filter(Boolean).sort() : []);
     } catch {
       setTrips([]);
     } finally {
@@ -487,7 +496,14 @@ export default function TripsPage() {
                   <input value={item.title} onChange={(e) => patchItem(index, { title: e.target.value })} placeholder="KHI → DXB, PK 213" style={cell} className="fl-in" />
                 </Field>
                 <Field label="Supplier">
-                  <input value={item.supplierName} onChange={(e) => patchItem(index, { supplierName: e.target.value })} placeholder="Who bills you" style={cell} className="fl-in" />
+                  <input
+                    list="trip-suppliers"
+                    value={item.supplierName}
+                    onChange={(e) => patchItem(index, { supplierName: e.target.value })}
+                    placeholder={suppliers.length ? "Pick or type" : "Who bills you"}
+                    style={cell}
+                    className="fl-in"
+                  />
                 </Field>
                 <Field label="Sell">
                   <input type="number" min={0} value={item.sale || ""} onChange={(e) => patchItem(index, { sale: Number(e.target.value) || 0 })} style={{ ...cell, textAlign: "right" }} className="fl-in" />
@@ -512,6 +528,12 @@ export default function TripsPage() {
                 </button>
               </div>
             ))}
+
+            {/* The accounts a payable can land on. Shared by every service row
+                rather than repeated per row. */}
+            <datalist id="trip-suppliers">
+              {suppliers.map((name) => <option key={name} value={name} />)}
+            </datalist>
 
             <button
               type="button"

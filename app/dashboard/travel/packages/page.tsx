@@ -74,6 +74,18 @@ export default function PackagesPage() {
   const [components, setComponents] = useState<Component[]>([emptyComponent()]);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
+  /* Same list, same reason as the trip builder. */
+  const [suppliers, setSuppliers] = useState<string[]>([]);
+
+  useEffect(() => {
+    fetch("/api/accounts?partyType=SUPPLIER", { cache: "no-store" })
+      .then((r) => (r.ok ? r.json() : []))
+      .then((rows) => {
+        if (!Array.isArray(rows)) return;
+        setSuppliers(rows.map((a: { name?: unknown }) => String(a?.name || "")).filter(Boolean).sort());
+      })
+      .catch(() => {});
+  }, []);
 
   /* Turning a package into a trip: who it is for and how many are going. */
   const [selling, setSelling] = useState<BusinessRecord | null>(null);
@@ -227,7 +239,14 @@ export default function PackagesPage() {
                   <input value={row.title} onChange={(e) => patch(index, { title: e.target.value })} placeholder="Return flight, economy" style={cell} className="fl-in" />
                 </Field>
                 <Field label="Supplier">
-                  <input value={row.supplierName} onChange={(e) => patch(index, { supplierName: e.target.value })} style={cell} className="fl-in" />
+                  <input
+                    list="package-suppliers"
+                    value={row.supplierName}
+                    onChange={(e) => patch(index, { supplierName: e.target.value })}
+                    placeholder={suppliers.length ? "Pick or type" : "Who bills you"}
+                    style={cell}
+                    className="fl-in"
+                  />
                 </Field>
                 <Field label="Sell">
                   <input type="number" min={0} value={row.sale || ""} onChange={(e) => patch(index, { sale: Number(e.target.value) || 0 })} style={{ ...cell, textAlign: "right" }} className="fl-in" />
@@ -251,6 +270,10 @@ export default function PackagesPage() {
                 </button>
               </div>
             ))}
+            <datalist id="package-suppliers">
+              {suppliers.map((name) => <option key={name} value={name} />)}
+            </datalist>
+
             <button
               type="button"
               onClick={() => setComponents((prev) => [...prev, emptyComponent()])}
