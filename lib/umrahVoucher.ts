@@ -83,6 +83,15 @@ export type UmrahVoucher = {
   remarks?: string;
   /** "Transport will be provided by NAQA" and the like — printed in red. */
   notice?: string;
+  /**
+   * The agency's terms, printed at the foot of the voucher.
+   *
+   * Written once in Voucher Settings and copied onto each new voucher rather
+   * than read live, because a voucher already in a pilgrim's hand must go on
+   * saying what it said when it was issued — changing the wording next season
+   * cannot retrospectively change what somebody agreed to.
+   */
+  terms?: string;
   makkahStaff?: string;
   madinahStaff?: string;
   /** Scanned by the Saudi office to pull the trip up. */
@@ -293,6 +302,7 @@ export function readVoucher(data: unknown): UmrahVoucher {
         }))
       : [],
     remarks: String(d.remarks || ""),
+    terms: String(d.terms || ""),
     notice: String(d.notice || ""),
     makkahStaff: String(d.makkahStaff || ""),
     madinahStaff: String(d.madinahStaff || ""),

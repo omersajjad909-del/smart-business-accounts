@@ -10,8 +10,9 @@
  * and not another BusinessRecordWorkspace.
  */
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 
+import { alertToast } from "@/lib/toast-feedback";
 import { useBusinessRecords } from "@/lib/useBusinessRecords";
 import { useResponsive } from "@/hooks/useResponsive";
 import {
@@ -57,14 +58,35 @@ function blankVoucher(): UmrahVoucher {
     // opens on it rather than on one empty row that has to be added to twice.
     stays: [emptyStay("Madinah"), emptyStay("Makkah"), emptyStay("Madinah")],
     pilgrims: [emptyPilgrim()],
-    remarks: "", notice: "", makkahStaff: "", madinahStaff: "", qrUrl: "",
+    remarks: "", notice: "", terms: "", makkahStaff: "", madinahStaff: "", qrUrl: "",
   };
 }
 
 export default function UmrahVouchersPage() {
+  /* The saved default, pulled once and used to seed a voucher that has no
+     terms of its own yet — a new one, or one created before this existed. */
+  const [defaultTerms, setDefaultTerms] = useState("");
+  useEffect(() => {
+    fetch("/api/travel/voucher-terms")
+      .then((r) => (r.ok ? r.json() : null))
+      .then((b) => { if (b?.terms) setDefaultTerms(String(b.terms)); })
+      .catch(() => {});
+  }, []);
+
   const { isMobile } = useResponsive();
   const store = useBusinessRecords("umrah_voucher");
   const [editing, setEditing] = useState<{ id: string | null; v: UmrahVoucher } | null>(null);
+
+  /* A voucher opened with no terms of its own takes the agency's default —
+     a new one, or an old one created before terms existed. One that already
+     carries terms is left exactly as it was issued. */
+  useEffect(() => {
+    if (!defaultTerms || !editing) return;
+    if (editing.v.terms) return;
+    setEditing((current) =>
+      current && !current.v.terms ? { ...current, v: { ...current.v, terms: defaultTerms } } : current,
+    );
+  }, [defaultTerms, editing]);
   const [previewing, setPreviewing] = useState<UmrahVoucher | null>(null);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
@@ -263,6 +285,48 @@ export default function UmrahVouchersPage() {
         <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: 12 }}>
           {field("Remarks", v.remarks || "", (s) => patch({ remarks: s }), "text", "TRANSPORT BY VOUCHER # 106830")}
           {field("Red notice", v.notice || "", (s) => patch({ notice: s }), "text", "Transport will be provided by NAQA")}
+
+          {/* Written once, reused for ever. A desk that has to retype its terms
+              on every voucher is a desk whose vouchers disagree with each
+              other by the end of the season. */}
+          <label style={{ display: "grid", gap: 4, gridColumn: "1 / -1" }}>
+            <span style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: ".05em", textTransform: "uppercase", color: "rgba(255,255,255,.4)" }}>
+              Terms &amp; Conditions
+            </span>
+            <textarea
+              value={v.terms || ""}
+              onChange={(e) => patch({ terms: e.target.value })}
+              rows={5}
+              placeholder="Your agency's terms — printed at the foot of the voucher. Written once and saved as the default below."
+              style={{
+                width: "100%", background: "rgba(255,255,255,.05)", border: "1px solid rgba(255,255,255,.09)",
+                borderRadius: 8, padding: "8px 10px", color: "#fff", fontSize: 12.5,
+                fontFamily: "inherit", boxSizing: "border-box", resize: "vertical", lineHeight: 1.6,
+              }}
+            />
+            <span style={{ display: "flex", gap: 10, flexWrap: "wrap", alignItems: "center" }}>
+              <button
+                type="button"
+                onClick={async () => {
+                  await fetch("/api/travel/voucher-terms", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ terms: v.terms || "" }),
+                  });
+                  alertToast("Saved. New vouchers will start with these terms.", "success", "Default Terms Saved");
+                }}
+                style={{
+                  border: "1px solid rgba(255,255,255,.16)", background: "rgba(255,255,255,.05)", color: "#fff",
+                  borderRadius: 8, padding: "5px 11px", fontSize: 11.5, fontWeight: 700, cursor: "pointer", fontFamily: "inherit",
+                }}
+              >
+                Save as default
+              </button>
+              <span style={{ fontSize: 10.5, color: "rgba(255,255,255,.38)" }}>
+                A voucher keeps the terms it was issued with, even after the default changes.
+              </span>
+            </span>
+          </label>
           {field("Makkah staff", v.makkahStaff || "", (s) => patch({ makkahStaff: s }), "text", "+966 58 315 6418 Qudratullah")}
           {field("Madinah staff", v.madinahStaff || "", (s) => patch({ madinahStaff: s }), "text", "SAEED +966 58 013 0848")}
           {field("QR link", v.qrUrl || "", (s) => patch({ qrUrl: s }), "text", "https://…")}

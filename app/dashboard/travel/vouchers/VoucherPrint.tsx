@@ -276,6 +276,26 @@ export function VoucherPrint({ voucher, companyName }: { voucher: UmrahVoucher; 
           </div>
         ) : null}
 
+        {/* The agency's own terms, at the foot where a voucher's terms belong.
+
+            Printed from what the voucher itself stores rather than from the
+            current settings: a voucher already in a pilgrim's hand must go on
+            saying what it said the day it was issued. */}
+        {voucher.terms ? (
+          <div
+            style={{
+              border: "1px solid #999", borderRadius: 2, padding: "5px 7px",
+              marginBottom: 6, fontSize: 7.5, color: "#333", lineHeight: 1.55,
+              whiteSpace: "pre-wrap",
+            }}
+          >
+            <div style={{ fontWeight: 700, fontSize: 8, marginBottom: 2, textTransform: "uppercase", letterSpacing: ".04em" }}>
+              Terms &amp; Conditions
+            </div>
+            {voucher.terms}
+          </div>
+        ) : null}
+
         <div style={{ display: "flex", gap: 14, alignItems: "flex-start", fontSize: 8, color: "#333", lineHeight: 1.5 }}>
           <div style={{ flex: 1 }}>
             {voucher.makkahStaff ? <div>Makkah staff &nbsp; {voucher.makkahStaff}</div> : null}
