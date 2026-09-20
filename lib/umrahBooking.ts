@@ -36,7 +36,76 @@ export type BookingPilgrim = {
   passportNo: string;
   gender: "Male" | "Female";
   age: number | "";
+
+  /* What the desk chases between the booking and the aeroplane.
+
+     All optional, because a booking is taken on a phone call with a name and a
+     number, months before any of this exists. They are added as they arrive,
+     and the group screen exists to show which of them have not. */
+
+  /** ISO date. Saudi Arabia wants six months on the passport, and the pilgrim
+      finds out at the airport. */
+  passportExpiry?: string;
+  cnic?: string;
+  dob?: string;
+  /** Who this pilgrim travels under, where the rules require one. */
+  mahram?: string;
+
+  /** pending | applied | approved | rejected */
+  visaStatus?: string;
+  visaNo?: string;
+
+  /** Room label in each city. A party of four in a quad is one room; a party of
+      six is two, and which two matters to the family. */
+  roomMakkah?: string;
+  roomMadinah?: string;
+
+  /** Documents received, keyed by PILGRIM_DOCUMENTS. */
+  documents?: Record<string, boolean>;
+
+  /** The Traveler this pilgrim is, once they are one — so next season does not
+      start by typing the passport out of a photocopy again. */
+  travelerId?: string;
 };
+
+/** The five things every pilgrim has to hand over. 100 pilgrims is 500 of them. */
+export const PILGRIM_DOCUMENTS = [
+  { key: "passport", label: "Passport" },
+  { key: "photo", label: "Photo" },
+  { key: "cnic", label: "CNIC" },
+  { key: "vaccination", label: "Vaccination" },
+  { key: "medical", label: "Medical" },
+] as const;
+
+export const VISA_STATUSES = ["pending", "applied", "approved", "rejected"] as const;
+
+/** How many of the five are in. */
+export function documentsIn(p: BookingPilgrim): number {
+  const docs = p.documents ?? {};
+  return PILGRIM_DOCUMENTS.filter((d) => docs[d.key]).length;
+}
+
+export type PassportState = "missing" | "no-expiry" | "expired" | "short" | "ok";
+
+/**
+ * Whether this passport will get the pilgrim onto the aircraft.
+ *
+ * Saudi Arabia wants six months remaining on the day of travel, not today — a
+ * passport that is fine in January is not fine for a June departure, and the
+ * whole point of looking now is to catch that while it can still be renewed.
+ */
+export function passportState(p: BookingPilgrim, departureDate?: string): PassportState {
+  if (!p.passportNo?.trim()) return "missing";
+  if (!p.passportExpiry) return "no-expiry";
+  const against = departureDate && /^\d{4}-\d{2}-\d{2}$/.test(departureDate)
+    ? new Date(`${departureDate}T00:00:00Z`).getTime()
+    : Date.now();
+  const expiry = new Date(`${p.passportExpiry}T00:00:00Z`).getTime();
+  if (Number.isNaN(expiry)) return "no-expiry";
+  if (expiry < against) return "expired";
+  if (expiry - against < 183 * 864e5) return "short";
+  return "ok";
+}
 
 export type UmrahBooking = {
   bookingNo: string;

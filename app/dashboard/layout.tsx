@@ -2285,6 +2285,7 @@ export default function DashboardLayout({
                 onToggle={() => toggle("travel")}
               >
                 {hasDashboardFeature("TRAVEL_OVERVIEW") && <NavLink href="/dashboard/travel" pathname={pathname}>Overview</NavLink>}
+                {hasDashboardFeature("TRAVEL_NEW_BOOKING") && <NavLink href="/dashboard/travel/new" pathname={pathname}>➕ New Booking</NavLink>}
                 {hasDashboardFeature("TRAVEL_TRIPS") && <NavLink href="/dashboard/travel/trips" pathname={pathname}>🧳 Trips</NavLink>}
                 {hasDashboardFeature("TRAVEL_PACKAGES") && <NavLink href="/dashboard/travel/packages" pathname={pathname}>📦 Packages</NavLink>}
                 {hasDashboardFeature("TRAVEL_CUSTOMERS") && <NavLink href="/dashboard/travel/customers" pathname={pathname}>🗂 Customers</NavLink>}
@@ -2297,6 +2298,7 @@ export default function DashboardLayout({
                 {hasDashboardFeature("TRAVEL_VISAS") && <NavLink href="/dashboard/travel/visas" pathname={pathname}>🛂 Visa Cases</NavLink>}
                 {hasDashboardFeature("TRAVEL_HOTELS") && <NavLink href="/dashboard/travel/hotel-packages" pathname={pathname}>🏨 Hotel Packages</NavLink>}
                 {hasDashboardFeature("TRAVEL_TOURS") && <NavLink href="/dashboard/travel/tours" pathname={pathname}>🚌 Group Tours</NavLink>}
+                {hasDashboardFeature("TRAVEL_GROUP_OPS") && <NavLink href="/dashboard/travel/group-ops" pathname={pathname}>🕋 Group Operations</NavLink>}
                 {hasDashboardFeature("TRAVEL_SETTLEMENTS") && <NavLink href="/dashboard/travel/settlements" pathname={pathname}>🧾 Supplier Settlements</NavLink>}
                 {hasDashboardFeature("TRAVEL_PASSPORTS") && <NavLink href="/dashboard/travel/passports" pathname={pathname}>🛂 Passport Database</NavLink>}
                 {hasDashboardFeature("TRAVEL_TRANSPORT") && <NavLink href="/dashboard/travel/transport" pathname={pathname}>🚐 Transport</NavLink>}
