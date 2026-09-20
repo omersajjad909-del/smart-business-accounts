@@ -185,7 +185,7 @@ export default function PackagesPage() {
 
       {building ? (
         <section style={{ background: T.card, border: `1px solid ${T.border}`, borderRadius: 16, padding: 18, marginBottom: 18, display: "grid", gap: 16 }}>
-          <div style={{ display: "grid", gridTemplateColumns: `repeat(auto-fit,minmax(${isMobile ? 150 : 190}px,1fr))`, gap: 12 }}>
+          <div style={{ display: "grid", gridTemplateColumns: `repeat(auto-fit,minmax(${isMobile ? 150 : 190}px,1fr))`, gap: 12, alignItems: "start" }}>
             <Field label="Package Name" required>
               <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Dubai 7 Nights — Family" style={cell} className="fl-in" />
             </Field>
@@ -280,7 +280,7 @@ export default function PackagesPage() {
       {selling ? (
         <section style={{ background: T.card, border: "1px solid var(--accent)", borderRadius: 16, padding: 18, marginBottom: 18, display: "grid", gap: 14 }}>
           <div style={{ fontSize: 15, fontWeight: 800, color: T.text }}>Sell “{selling.title}”</div>
-          <div style={{ display: "grid", gridTemplateColumns: `repeat(auto-fit,minmax(${isMobile ? 150 : 180}px,1fr))`, gap: 12 }}>
+          <div style={{ display: "grid", gridTemplateColumns: `repeat(auto-fit,minmax(${isMobile ? 150 : 180}px,1fr))`, gap: 12, alignItems: "start" }}>
             <Field label="Customer" required hint="Who the invoice goes to">
               <input value={customerName} onChange={(e) => setCustomerName(e.target.value)} placeholder="Muhammad Ali" style={cell} className="fl-in" />
             </Field>

@@ -464,7 +464,7 @@ export default function BookFlightPage() {
 
                 {passengers[activePax] ? (
                   <div style={{ display: "grid", gap: 14 }}>
-                    <div style={{ display: "grid", gridTemplateColumns: `repeat(auto-fit,minmax(${isMobile ? 140 : 170}px,1fr))`, gap: 12 }}>
+                    <div style={{ display: "grid", gridTemplateColumns: `repeat(auto-fit,minmax(${isMobile ? 140 : 170}px,1fr))`, gap: 12, alignItems: "start" }}>
                       <Field label="Title" required>
                         <select value={passengers[activePax].title || "Mr"} onChange={(e) => patchPassenger(activePax, { title: e.target.value })} style={cell}>
                           {TITLES.map((t) => <option key={t} value={t}>{t}</option>)}
@@ -514,7 +514,7 @@ export default function BookFlightPage() {
                         out of five has to be worked out later. */}
                     <div style={{ borderTop: `1px solid ${T.border}`, paddingTop: 13, display: "grid", gap: 12 }}>
                       <div style={{ fontSize: 12, fontWeight: 800, color: T.text }}>Fare for this passenger</div>
-                      <div style={{ display: "grid", gridTemplateColumns: `repeat(auto-fit,minmax(${isMobile ? 130 : 150}px,1fr))`, gap: 12 }}>
+                      <div style={{ display: "grid", gridTemplateColumns: `repeat(auto-fit,minmax(${isMobile ? 130 : 150}px,1fr))`, gap: 12, alignItems: "start" }}>
                         <Field label="Fare" required>
                           <input type="number" min={0} value={passengers[activePax].fare || ""} onChange={(e) => patchPassenger(activePax, { fare: Number(e.target.value) || 0 })} style={cell} className="fl-in" />
                         </Field>
@@ -556,7 +556,7 @@ export default function BookFlightPage() {
               </Card>
 
               <Card title="Contact Information" icon="📞" hint="Where booking updates and the e-ticket go">
-                <div style={{ display: "grid", gridTemplateColumns: `repeat(auto-fit,minmax(${isMobile ? 160 : 200}px,1fr))`, gap: 12 }}>
+                <div style={{ display: "grid", gridTemplateColumns: `repeat(auto-fit,minmax(${isMobile ? 160 : 200}px,1fr))`, gap: 12, alignItems: "start" }}>
                   <Field label="Email">
                     <input type="email" value={contact.email} onChange={(e) => setContact({ ...contact, email: e.target.value })} placeholder="aliraza@example.com" style={cell} className="fl-in" />
                   </Field>
@@ -583,7 +583,7 @@ export default function BookFlightPage() {
           {step === 3 ? (
             <>
               <Card title="Booking & Supplier" icon="🧾" hint="What the ledger will carry this booking as">
-                <div style={{ display: "grid", gridTemplateColumns: `repeat(auto-fit,minmax(${isMobile ? 150 : 190}px,1fr))`, gap: 12 }}>
+                <div style={{ display: "grid", gridTemplateColumns: `repeat(auto-fit,minmax(${isMobile ? 150 : 190}px,1fr))`, gap: 12, alignItems: "start" }}>
                   <Field label="Booking Reference" required>
                     <input value={booking.bookingRef} onChange={(e) => setBooking({ ...booking, bookingRef: e.target.value })} style={cell} className="fl-in" />
                   </Field>

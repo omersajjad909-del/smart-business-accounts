@@ -234,7 +234,7 @@ export default function TravelersPage() {
             {form.id ? "Edit traveller" : "Add a traveller"}
           </div>
 
-          <div style={{ display: "grid", gridTemplateColumns: `repeat(auto-fit,minmax(${isMobile ? 130 : 145}px,1fr))`, gap: 12 }}>
+          <div style={{ display: "grid", gridTemplateColumns: `repeat(auto-fit,minmax(${isMobile ? 130 : 145}px,1fr))`, gap: 12, alignItems: "start" }}>
             <Field label="Title">
               <select value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} style={cell}>
                 {TITLES.map((t) => <option key={t} value={t}>{t}</option>)}

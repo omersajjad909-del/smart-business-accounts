@@ -42,6 +42,12 @@ export const flightCss = `
 .fl-card:hover{border-color:var(--accent);box-shadow:var(--shadow)}
 .fl-opt:hover{background:var(--panel-bg-2)}
 .fl-in:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent-rgb,56,189,248),.16)}
+/* Safari gives a date input more height than a text input of the same padding,
+   so a row mixing the two sits crooked. One height for every single-line
+   control; a textarea is exempt because it is meant to grow. */
+input.fl-in,select.fl-in{box-sizing:border-box;height:38px}
+textarea.fl-in{box-sizing:border-box;height:auto}
+input.fl-in[type="date"]{padding-top:0;padding-bottom:0}
 .fl-scroll::-webkit-scrollbar{width:8px}
 .fl-scroll::-webkit-scrollbar-thumb{background:var(--border);border-radius:999px}
 `;
@@ -86,7 +92,11 @@ export function Field({
   hint?: string;
 }) {
   return (
-    <label style={{ display: "grid", gap: 6, minWidth: 0 }}>
+    /* alignContent start, because a grid row stretches its items to match the
+       tallest — so a field carrying a hint under it stretched the field beside
+       it, and the two inputs sat at different heights on the same line. Each
+       field takes its own height now and the inputs line up. */
+    <label style={{ display: "grid", gap: 6, minWidth: 0, alignContent: "start" }}>
       <span style={{ fontSize: 11, fontWeight: 600, color: T.muted, letterSpacing: ".02em" }}>
         {label}
         {required ? <span style={{ color: "#f87171", marginLeft: 3 }}>*</span> : null}

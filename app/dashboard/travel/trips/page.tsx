@@ -420,7 +420,7 @@ export default function TripsPage() {
         <section style={{ background: T.card, border: `1px solid ${T.border}`, borderRadius: 16, padding: 18, marginBottom: 18, display: "grid", gap: 16 }}>
           <div style={{ fontSize: 15, fontWeight: 800, color: T.text }}>Build a trip</div>
 
-          <div style={{ display: "grid", gridTemplateColumns: `repeat(auto-fit,minmax(${isMobile ? 160 : 200}px,1fr))`, gap: 12 }}>
+          <div style={{ display: "grid", gridTemplateColumns: isMobile ? "minmax(0,1fr)" : "minmax(0,2fr) minmax(0,1fr)", gap: 12, alignItems: "start" }}>
             <Field label="Customer (who pays)" required hint="The invoice goes to this name">
               <input value={customerName} onChange={(e) => setCustomerName(e.target.value)} placeholder="Muhammad Ali" style={cell} className="fl-in" />
             </Field>
