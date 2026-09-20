@@ -228,13 +228,13 @@ export default function TravelersPage() {
         </div>
       ) : null}
 
-      <div style={{ display: "grid", gridTemplateColumns: isTablet ? "minmax(0,1fr)" : "minmax(300px,380px) minmax(0,1fr)", gap: 16, alignItems: "start" }}>
-        <section style={{ background: T.card, border: `1px solid ${T.border}`, borderRadius: 16, padding: 18, display: "grid", gap: 14, minWidth: 0 }}>
+      <div style={{ display: "grid", gridTemplateColumns: isTablet ? "minmax(0,1fr)" : "minmax(340px,460px) minmax(0,1fr)", gap: 16, alignItems: "start" }}>
+        <section className="fl-form" style={{ background: T.card, border: `1px solid ${T.border}`, borderRadius: 16, padding: 18, display: "grid", gap: 14, minWidth: 0 }}>
           <div style={{ fontSize: 15, fontWeight: 800, color: T.text }}>
             {form.id ? "Edit traveller" : "Add a traveller"}
           </div>
 
-          <div style={{ display: "grid", gridTemplateColumns: `repeat(auto-fit,minmax(${isMobile ? 130 : 145}px,1fr))`, gap: 12, alignItems: "start" }}>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(0,1fr))", gap: 12, alignItems: "start" }}>
             <Field label="Title">
               <select value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} style={cell}>
                 {TITLES.map((t) => <option key={t} value={t}>{t}</option>)}

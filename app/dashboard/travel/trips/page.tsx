@@ -320,7 +320,7 @@ export default function TripsPage() {
   }, [trips, symbol]);
 
   return (
-    <div style={{ padding: isMobile ? 16 : "24px 28px", fontFamily: ff, color: T.text, maxWidth: "100%", overflow: "hidden" }}>
+    <div className="fl-form" style={{ padding: isMobile ? 16 : "24px 28px", fontFamily: ff, color: T.text, maxWidth: "100%", overflow: "hidden" }}>
       <style dangerouslySetInnerHTML={{ __html: flightCss }} />
 
       <header style={{ display: "flex", gap: 14, alignItems: "flex-start", marginBottom: 18, flexWrap: "wrap" }}>
@@ -417,7 +417,7 @@ export default function TripsPage() {
       ) : null}
 
       {building ? (
-        <section style={{ background: T.card, border: `1px solid ${T.border}`, borderRadius: 16, padding: 18, marginBottom: 18, display: "grid", gap: 16 }}>
+        <section className="fl-form" style={{ background: T.card, border: `1px solid ${T.border}`, borderRadius: 16, padding: 18, marginBottom: 18, display: "grid", gap: 16 }}>
           <div style={{ fontSize: 15, fontWeight: 800, color: T.text }}>Build a trip</div>
 
           <div style={{ display: "grid", gridTemplateColumns: isMobile ? "minmax(0,1fr)" : "minmax(0,2fr) minmax(0,1fr)", gap: 12, alignItems: "start" }}>

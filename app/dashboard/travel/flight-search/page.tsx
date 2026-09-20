@@ -84,7 +84,7 @@ export default function FlightSearchPage() {
   const filterSelect: React.CSSProperties = { ...inputStyle, width: "auto", minWidth: 132, padding: "8px 11px", fontSize: 12.5, fontWeight: 600, cursor: "pointer" };
 
   return (
-    <div style={{ padding: isMobile ? 16 : "24px 28px", fontFamily: ff, color: T.text, maxWidth: "100%", overflow: "hidden" }}>
+    <div className="fl-form" style={{ padding: isMobile ? 16 : "24px 28px", fontFamily: ff, color: T.text, maxWidth: "100%", overflow: "hidden" }}>
       <style dangerouslySetInnerHTML={{ __html: flightCss }} />
 
       <header style={{ display: "flex", gap: 14, alignItems: "flex-start", marginBottom: 18, flexWrap: "wrap" }}>

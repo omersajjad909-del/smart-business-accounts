@@ -170,7 +170,7 @@ export default function GroupOpsPage() {
   const seats = departure?.d.seats ?? 0;
 
   return (
-    <div style={{ padding: isMobile ? 16 : "24px 28px", fontFamily: ff, color: T.text, maxWidth: "100%", overflow: "hidden" }}>
+    <div className="fl-form" style={{ padding: isMobile ? 16 : "24px 28px", fontFamily: ff, color: T.text, maxWidth: "100%", overflow: "hidden" }}>
       <style dangerouslySetInnerHTML={{ __html: flightCss }} />
 
       <header style={{ display: "flex", gap: 14, alignItems: "flex-start", marginBottom: 16, flexWrap: "wrap" }}>

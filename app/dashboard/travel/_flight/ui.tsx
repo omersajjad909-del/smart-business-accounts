@@ -45,9 +45,10 @@ export const flightCss = `
 /* Safari gives a date input more height than a text input of the same padding,
    so a row mixing the two sits crooked. One height for every single-line
    control; a textarea is exempt because it is meant to grow. */
-input.fl-in,select.fl-in{box-sizing:border-box;height:38px}
-textarea.fl-in{box-sizing:border-box;height:auto}
-input.fl-in[type="date"]{padding-top:0;padding-bottom:0}
+.fl-form input,.fl-form select,input.fl-in,select.fl-in{box-sizing:border-box;height:38px}
+.fl-form textarea,textarea.fl-in{box-sizing:border-box;height:auto;min-height:38px}
+.fl-form input[type="date"],input.fl-in[type="date"]{padding-top:0;padding-bottom:0}
+.fl-form input[type="checkbox"]{height:auto}
 .fl-scroll::-webkit-scrollbar{width:8px}
 .fl-scroll::-webkit-scrollbar-thumb{background:var(--border);border-radius:999px}
 `;
@@ -97,12 +98,25 @@ export function Field({
        it, and the two inputs sat at different heights on the same line. Each
        field takes its own height now and the inputs line up. */
     <label style={{ display: "grid", gap: 6, minWidth: 0, alignContent: "start" }}>
-      <span style={{ fontSize: 11, fontWeight: 600, color: T.muted, letterSpacing: ".02em" }}>
+      {/* One line, always. A label that wrapped to two pushed its own input
+          down while the field beside it stayed put, and the row went crooked
+          again for a different reason. The full text stays available on hover
+          rather than being lost. */}
+      <span
+        title={label}
+        style={{
+          fontSize: 11, fontWeight: 600, color: T.muted, letterSpacing: ".02em",
+          lineHeight: "16px", height: 16,
+          whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis",
+        }}
+      >
         {label}
         {required ? <span style={{ color: "#f87171", marginLeft: 3 }}>*</span> : null}
       </span>
       {children}
-      {hint ? <span style={{ fontSize: 10.5, color: T.muted }}>{hint}</span> : null}
+      {/* Reserves no space when absent, and cannot stretch the field beside it
+          because the row aligns to the top. */}
+      {hint ? <span style={{ fontSize: 10.5, color: T.muted, lineHeight: 1.45 }}>{hint}</span> : null}
     </label>
   );
 }
