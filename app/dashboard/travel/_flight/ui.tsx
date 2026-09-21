@@ -219,10 +219,13 @@ export function AirportInput({
   value,
   onChange,
   placeholder = "City or airport",
+  compact,
 }: {
   value: string;
   onChange: (code: string) => void;
   placeholder?: string;
+  /** For a service row, where a 46px control beside 38px ones sits proud. */
+  compact?: boolean;
 }) {
   const [open, setOpen] = useState(false);
   const [text, setText] = useState("");
@@ -289,11 +292,14 @@ export function AirportInput({
           cursor: "pointer",
           display: "flex",
           alignItems: "center",
-          gap: 10,
-          minHeight: 46,
+          gap: compact ? 7 : 10,
+          height: compact ? 38 : undefined,
+          minHeight: compact ? 38 : 46,
+          padding: compact ? "0 10px" : inputStyle.padding,
+          fontSize: compact ? 12.5 : inputStyle.fontSize,
         }}
       >
-        <span style={{ fontSize: 15 }}>✈</span>
+        <span style={{ fontSize: compact ? 12 : 15 }}>✈</span>
         {open ? (
           <input
             autoFocus
@@ -303,14 +309,23 @@ export function AirportInput({
             style={{ flex: 1, minWidth: 0, background: "transparent", border: "none", outline: "none", color: T.text, fontSize: 14, fontFamily: "inherit" }}
           />
         ) : value ? (
-          <span style={{ minWidth: 0 }}>
-            <span style={{ fontSize: 15, fontWeight: 800, color: T.text }}>{value}</span>
-            <span style={{ display: "block", fontSize: 11, color: T.muted, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-              {selected ? `${selected.city}, ${selected.country}` : "\u00a0"}
+          /* Compact has one line — the code and the city beside it — because a
+             two-line control cannot be 38px. */
+          compact ? (
+            <span style={{ minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+              <span style={{ fontSize: 12.5, fontWeight: 800, color: T.text }}>{value}</span>
+              {selected ? <span style={{ fontSize: 11, color: T.muted }}> · {selected.city}</span> : null}
             </span>
-          </span>
+          ) : (
+            <span style={{ minWidth: 0 }}>
+              <span style={{ fontSize: 15, fontWeight: 800, color: T.text }}>{value}</span>
+              <span style={{ display: "block", fontSize: 11, color: T.muted, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                {selected ? `${selected.city}, ${selected.country}` : "\u00a0"}
+              </span>
+            </span>
+          )
         ) : (
-          <span style={{ fontSize: 13.5, color: T.muted }}>{placeholder}</span>
+          <span style={{ fontSize: compact ? 12.5 : 13.5, color: T.muted, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{placeholder}</span>
         )}
       </div>
 

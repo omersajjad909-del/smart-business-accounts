@@ -17,12 +17,18 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useResponsive } from "@/hooks/useResponsive";
 import { useCurrency } from "@/lib/useCurrency";
 import { confirmToast, alertToast } from "@/lib/toast-feedback";
-import { Field, GhostButton, PrimaryButton, T, ff, flightCss, inputStyle } from "../_flight/ui";
+import { AirportInput, Field, GhostButton, PrimaryButton, T, ff, flightCss, inputStyle } from "../_flight/ui";
 
 type Item = {
   id?: string;
   productType: string;
   title: string;
+  /* A flight is a sector, not a sentence. Typing "KHI to JED" into a
+     description box gives you a string nobody can search, price or check
+     against a timetable — so a flight row asks where from and where to, and
+     the description writes itself. */
+  from?: string;
+  to?: string;
   supplierName: string;
   sale: number;
   cost: number;
@@ -87,7 +93,13 @@ function statusTone(status: string) {
   return "#60a5fa";
 }
 
-const emptyItem = (): Item => ({ productType: "FLIGHT", title: "", supplierName: "", sale: 0, cost: 0, qty: 1 });
+const emptyItem = (): Item => ({ productType: "FLIGHT", title: "", from: "", to: "", supplierName: "", sale: 0, cost: 0, qty: 1 });
+
+/** "FSD → JED" going out, "FSD → JED → FSD" coming back as well. */
+function sectorTitle(from?: string, to?: string, hasReturn?: boolean): string {
+  if (!from || !to) return "";
+  return hasReturn ? `${from} → ${to} → ${from}` : `${from} → ${to}`;
+}
 
 export default function TripsPage() {
   const { isMobile, isTablet } = useResponsive();
@@ -110,6 +122,10 @@ export default function TripsPage() {
   const [building, setBuilding] = useState(false);
   const [customerName, setCustomerName] = useState("");
   const [travelDate, setTravelDate] = useState("");
+  /* Most of what an agency sells comes back. Asking for one date and leaving
+     the other to a description is how a return booking loses the day it
+     returns on. */
+  const [returnDate, setReturnDate] = useState("");
   const [chosen, setChosen] = useState<string[]>([]);
   const [items, setItems] = useState<Item[]>([emptyItem()]);
   const [saving, setSaving] = useState(false);
@@ -144,6 +160,29 @@ export default function TripsPage() {
     return () => clearTimeout(timer);
   }, [load, search]);
 
+  /* Picking the travellers usually answers who pays, so the box fills itself
+     from the first one rather than asking the same question twice. It is still
+     a box, because the two genuinely differ — a company sending staff, a father
+     paying for a family — and only an empty one is filled, so a name typed by
+     hand is never overwritten. */
+  useEffect(() => {
+    if (!chosen.length || customerName.trim()) return;
+    const lead = travelers.find((t) => t.id === chosen[0]);
+    if (lead) setCustomerName(lead.fullName);
+  }, [chosen, travelers, customerName]);
+
+  /* A flight row's description is the sector, so adding or clearing the return
+     date rewrites it — "FSD → JED" becomes "FSD → JED → FSD" and back. */
+  useEffect(() => {
+    setItems((prev) =>
+      prev.map((item) =>
+        item.productType === "FLIGHT" && item.from && item.to
+          ? { ...item, title: sectorTitle(item.from, item.to, Boolean(returnDate)) }
+          : item,
+      ),
+    );
+  }, [returnDate]);
+
   /* Worked out as you type, from the same lines the server will sum. The two
      agreeing is not a coincidence — the server recomputes and its answer wins. */
   const draftTotals = useMemo(() => {
@@ -162,10 +201,17 @@ export default function TripsPage() {
         body: JSON.stringify({
           customerName,
           travelDate,
+          returnDate,
           status: "draft",
           travelerIds: chosen,
           leadTravelerId: chosen[0],
-          items: items.filter((item) => item.title.trim()),
+          items: items
+            .filter((item) => item.title.trim())
+            // Kept beside the line so a flight can be read back as a sector
+            // rather than parsed out of its own description.
+            .map((item) => (item.productType === "FLIGHT" && item.from && item.to
+              ? { ...item, data: { from: item.from, to: item.to } }
+              : item)),
         }),
       });
       const body = await response.json().catch(() => ({}));
@@ -178,6 +224,7 @@ export default function TripsPage() {
       setBuilding(false);
       setCustomerName("");
       setTravelDate("");
+      setReturnDate("");
       setChosen([]);
       setItems([emptyItem()]);
       await load();
@@ -429,12 +476,23 @@ export default function TripsPage() {
         <section className="fl-form" style={{ background: T.card, border: `1px solid ${T.border}`, borderRadius: 16, padding: 18, marginBottom: 18, display: "grid", gap: 16 }}>
           <div style={{ fontSize: 15, fontWeight: 800, color: T.text }}>Build a trip</div>
 
-          <div style={{ display: "grid", gridTemplateColumns: isMobile ? "minmax(0,1fr)" : "minmax(0,2fr) minmax(0,1fr)", gap: 12, alignItems: "start" }}>
-            <Field label="Customer (who pays)" required hint="The invoice goes to this name">
+          <div style={{ display: "grid", gridTemplateColumns: isMobile ? "minmax(0,1fr)" : "minmax(0,2fr) minmax(0,1fr) minmax(0,1fr)", gap: 12, alignItems: "start" }}>
+            <Field
+              label="Customer (who pays)"
+              required
+              hint={
+                chosen.length
+                  ? "Filled from the lead traveller — change it if a company or somebody else is paying"
+                  : "The invoice goes to this name"
+              }
+            >
               <input value={customerName} onChange={(e) => setCustomerName(e.target.value)} placeholder="Muhammad Ali" style={cell} className="fl-in" />
             </Field>
-            <Field label="Travel Date">
+            <Field label="Going Out">
               <input type="date" value={travelDate} onChange={(e) => setTravelDate(e.target.value)} style={cell} className="fl-in" />
+            </Field>
+            <Field label="Coming Back" hint="Leave empty for a one way">
+              <input type="date" value={returnDate} min={travelDate || undefined} onChange={(e) => setReturnDate(e.target.value)} style={cell} className="fl-in" />
             </Field>
           </div>
 
@@ -488,13 +546,50 @@ export default function TripsPage() {
                 }}
               >
                 <Field label="Service">
-                  <select value={item.productType} onChange={(e) => patchItem(index, { productType: e.target.value })} style={cell}>
+                  <select
+                    value={item.productType}
+                    onChange={(e) => {
+                      const next = e.target.value;
+                      // The two kinds of row describe themselves differently, so
+                      // the description does not survive the change.
+                      patchItem(index, next === "FLIGHT"
+                        ? { productType: next, title: sectorTitle(item.from, item.to, Boolean(returnDate)) }
+                        : { productType: next, from: "", to: "", title: "" });
+                    }}
+                    style={cell}
+                  >
                     {PRODUCTS.map((p) => <option key={p.value} value={p.value}>{p.label}</option>)}
                   </select>
                 </Field>
-                <Field label="Description" required>
-                  <input value={item.title} onChange={(e) => patchItem(index, { title: e.target.value })} placeholder="KHI → DXB, PK 213" style={cell} className="fl-in" />
-                </Field>
+                {/* A flight is a sector; everything else is a sentence. */}
+                {item.productType === "FLIGHT" ? (
+                  <div style={{ display: "grid", gridTemplateColumns: "minmax(0,1fr) minmax(0,1fr)", gap: 8, minWidth: 0 }}>
+                    <Field label="From" required>
+                      <AirportInput
+                        compact
+                        value={item.from || ""}
+                        placeholder="Faisalabad"
+                        onChange={(code) =>
+                          patchItem(index, { from: code, title: sectorTitle(code, item.to, Boolean(returnDate)) })
+                        }
+                      />
+                    </Field>
+                    <Field label="To" required>
+                      <AirportInput
+                        compact
+                        value={item.to || ""}
+                        placeholder="Jeddah"
+                        onChange={(code) =>
+                          patchItem(index, { to: code, title: sectorTitle(item.from, code, Boolean(returnDate)) })
+                        }
+                      />
+                    </Field>
+                  </div>
+                ) : (
+                  <Field label="Description" required>
+                    <input value={item.title} onChange={(e) => patchItem(index, { title: e.target.value })} placeholder="Rove Downtown, 4 nights" style={cell} className="fl-in" />
+                  </Field>
+                )}
                 <Field label="Supplier">
                   <input
                     list="trip-suppliers"
