@@ -1745,7 +1745,7 @@ export const BUSINESS_TYPES: BusinessTypeMeta[] = [
 
       // ── Who the agency owes ──
       { code: "2100", name: "Airlines & Consolidators", type: "Liability" },
-      { code: "2101", name: "Saudi Hotels", type: "Liability" },
+      { code: "2101", name: "Hotels", type: "Liability" },
       { code: "2102", name: "Visa Agents & Embassies", type: "Liability" },
       { code: "2103", name: "Ground Transport", type: "Liability" },
       // Instalments taken before the package is invoiced. The agency holds the

@@ -401,7 +401,7 @@ export default function ChartOfAccounts() {
                 >
                   {/* This trade's own words for the two sides of the ledger,
                       above the general heads. A travel agency files airlines,
-                      embassies and Saudi hotels, not "suppliers" — and being
+                      embassies and hotels, not "suppliers" — and being
                       asked to call an embassy a supplier is the moment the
                       software stops sounding like it was built for the job.
 

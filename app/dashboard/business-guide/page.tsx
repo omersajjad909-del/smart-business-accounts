@@ -71,7 +71,7 @@ const FLOW_MAP: Record<string, { step: string; icon: string; desc: string; link:
     { step: "Collect the Instalments", icon: "💰", desc: "Advance first, the rest before the visa cut-off. Nothing is issued on an unpaid file.", link: "/dashboard/crv" },
     { step: "File Visas & Issue Tickets", icon: "🛂", desc: "Passport details go to the embassy; the airline seat is issued against the PNR.", link: "/dashboard/travel/visas" },
     { step: "Print the Voucher", icon: "🎫", desc: "What the pilgrim carries — flights, every hotel stay in order, and the party.", link: "/dashboard/travel/vouchers" },
-    { step: "Settle & Review", icon: "📊", desc: "Pay the airline and the Saudi hotel, then read the departure's real margin.", link: "/dashboard/travel/reports" },
+    { step: "Settle & Review", icon: "📊", desc: "Pay the airline and the hotel, then read the departure's real margin.", link: "/dashboard/travel/reports" },
   ],
   hospital: [
     { step: "Patient Registration", icon: "👤", desc: "Register new patient — name, age, contact, and medical history.", link: "/dashboard/hospital/patients" },
@@ -272,7 +272,7 @@ const MODULES_MAP: Record<string, { icon: string; label: string; desc: string; l
     { icon: "✈️", label: "Airline Tickets", desc: "PNRs, passengers, refunds and voids", link: "/dashboard/travel/tickets" },
     { icon: "🛂", label: "Visa Cases", desc: "Embassy files and their status", link: "/dashboard/travel/visas" },
     { icon: "🛄", label: "Passport Database", desc: "Passport details, ready to file", link: "/dashboard/travel/passports" },
-    { icon: "🧾", label: "Supplier Settlements", desc: "What is owed to airlines and Saudi hotels", link: "/dashboard/travel/settlements" },
+    { icon: "🧾", label: "Supplier Settlements", desc: "What is owed to airlines and hotels", link: "/dashboard/travel/settlements" },
     { icon: "📊", label: "Travel Reports", desc: "Departure P&L, who owes what, manifest", link: "/dashboard/travel/reports" },
     { icon: "💰", label: "Receive Payment", desc: "Instalments in, against the booking", link: "/dashboard/crv" },
     { icon: "💳", label: "Pay Supplier", desc: "Clear the consolidator and the hotel", link: "/dashboard/cpv" },

@@ -39,7 +39,11 @@ const BY_BUSINESS: Record<string, PartyOption[]> = {
     { label: "Sub-Agent", side: "CUSTOMER", hint: "Sub-Agents" },
     { label: "Corporate Client", side: "CUSTOMER", hint: "Customer Receivables" },
     { label: "Airline / Consolidator", side: "SUPPLIER", hint: "Airlines & Consolidators" },
-    { label: "Saudi Hotel", side: "SUPPLIER", hint: "Saudi Hotels" },
+    /* "Hotel", not "Saudi Hotel". The same agency that runs Hajj also books
+       Dubai in December and Istanbul in summer, and a payable to a hotel is a
+       payable to a hotel — naming the head after one country meant every hotel
+       outside it landed somewhere it did not belong. */
+    { label: "Hotel", side: "SUPPLIER", hint: "Hotels" },
     { label: "Visa Agent / Embassy", side: "SUPPLIER", hint: "Visa Agents & Embassies" },
     { label: "Ground Transport", side: "SUPPLIER", hint: "Ground Transport" },
   ],
