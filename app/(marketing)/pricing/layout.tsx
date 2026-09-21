@@ -44,7 +44,7 @@ export default function PricingLayout({ children }: { children: React.ReactNode 
         name: "How much does FinovaOS cost?",
         acceptedAnswer: {
           "@type": "Answer",
-          text: "FinovaOS offers three plans: Starter at $49/month (up to 5 users), Professional at $99/month (up to 20 users), and Enterprise at $249/month (unlimited users). All plans include accounting, invoicing, and inventory management.",
+          text: "FinovaOS offers three plans: Starter at $49/month (up to 3 users), Professional at $99/month (up to 10 users), and Enterprise at $249/month (up to 25 users). All plans include accounting, invoicing, and inventory management.",
         },
       },
       {

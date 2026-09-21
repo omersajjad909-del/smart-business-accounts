@@ -8,7 +8,8 @@
  * booking screen that only works in one of them is half a booking screen.
  */
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 
 import { useCurrency } from "@/lib/useCurrency";
 import {
@@ -162,16 +163,76 @@ export function Segmented<T extends string>({
   );
 }
 
-/** Close me when the click lands somewhere else. */
-function useDismiss(open: boolean, close: () => void) {
-  const ref = useRef<HTMLDivElement>(null);
+/**
+ * A panel that hangs off a control and is not clipped by anything.
+ *
+ * It used to be an absolutely positioned div inside the field. That works
+ * until an ancestor has overflow hidden — which the travel pages do, to stop a
+ * wide row pushing the whole page sideways — and then the panel is silently
+ * cut off. The airport pickers near the top of a form looked fine because
+ * their panels fitted inside the page box; the supplier picker on the last
+ * service row opened into the clipped region and simply never appeared.
+ *
+ * So it renders into the body and positions itself against the control's
+ * rectangle. Nothing above it can clip it, now or when somebody adds another
+ * scrolling container next year.
+ */
+function Popover({
+  anchor,
+  open,
+  onClose,
+  children,
+  minWidth = 260,
+}: {
+  anchor: React.RefObject<HTMLElement | null>;
+  open: boolean;
+  onClose: () => void;
+  children: React.ReactNode;
+  minWidth?: number;
+}) {
+  const panel = useRef<HTMLDivElement>(null);
+  const [box, setBox] = useState<{ top: number; left: number; width: number; above: boolean } | null>(null);
+
+  // Measured before paint, so it never appears in the wrong place first.
+  useLayoutEffect(() => {
+    if (!open) { setBox(null); return; }
+
+    const place = () => {
+      const el = anchor.current;
+      if (!el) return;
+      const r = el.getBoundingClientRect();
+      const wanted = panel.current?.offsetHeight ?? 260;
+      // Opens downward unless the room is not there, which is the whole
+      // reason the last row in a form was the one that failed.
+      const above = r.bottom + 6 + wanted > window.innerHeight && r.top > wanted + 12;
+      setBox({
+        top: above ? r.top - 6 - wanted : r.bottom + 6,
+        left: Math.max(8, Math.min(r.left, window.innerWidth - Math.max(minWidth, r.width) - 8)),
+        width: Math.max(minWidth, r.width),
+        above,
+      });
+    };
+
+    place();
+    // Fixed positioning does not follow a scrolling page on its own.
+    window.addEventListener("scroll", place, true);
+    window.addEventListener("resize", place);
+    return () => {
+      window.removeEventListener("scroll", place, true);
+      window.removeEventListener("resize", place);
+    };
+  }, [open, anchor, minWidth]);
+
   useEffect(() => {
     if (!open) return;
     function onDown(event: MouseEvent) {
-      if (ref.current && !ref.current.contains(event.target as Node)) close();
+      const target = event.target as Node;
+      // The panel lives outside the field now, so both count as "inside".
+      if (anchor.current?.contains(target) || panel.current?.contains(target)) return;
+      onClose();
     }
     function onKey(event: KeyboardEvent) {
-      if (event.key === "Escape") close();
+      if (event.key === "Escape") onClose();
     }
     document.addEventListener("mousedown", onDown);
     document.addEventListener("keydown", onKey);
@@ -179,22 +240,37 @@ function useDismiss(open: boolean, close: () => void) {
       document.removeEventListener("mousedown", onDown);
       document.removeEventListener("keydown", onKey);
     };
-  }, [open, close]);
-  return ref;
-}
+  }, [open, onClose, anchor]);
 
-const popover: React.CSSProperties = {
-  position: "absolute",
-  top: "calc(100% + 6px)",
-  left: 0,
-  zIndex: 40,
-  background: T.card,
-  border: `1px solid ${T.border}`,
-  borderRadius: 12,
-  boxShadow: "0 18px 40px rgba(0,0,0,.35)",
-  padding: 6,
-  minWidth: 260,
-};
+  if (!open || typeof document === "undefined") return null;
+
+  return createPortal(
+    <div
+      ref={panel}
+      className="fl-scroll"
+      style={{
+        position: "fixed",
+        top: box?.top ?? -9999,
+        left: box?.left ?? -9999,
+        width: box?.width,
+        maxHeight: 300,
+        overflowY: "auto",
+        zIndex: 2147483000,
+        background: T.card,
+        border: `1px solid ${T.border}`,
+        borderRadius: 12,
+        boxShadow: "0 18px 40px rgba(0,0,0,.45)",
+        padding: 6,
+        // Hidden until it has been measured, rather than flashing top-left.
+        visibility: box ? "visible" : "hidden",
+        fontFamily: ff,
+      }}
+    >
+      {children}
+    </div>,
+    document.body,
+  );
+}
 
 /* What the picker has already been told about an airport.
 

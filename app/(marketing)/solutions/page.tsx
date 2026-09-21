@@ -1686,7 +1686,7 @@ export default function SolutionsPage() {
                 </Link>
               </div>
               <p style={{ fontSize:12, color:"rgba(255,255,255,.2)", marginTop:16 }}>
-                Already supporting 43+ industries · Free setup on all plans
+                60+ industries configured · Free setup on all plans
               </p>
             </div>
           </div>

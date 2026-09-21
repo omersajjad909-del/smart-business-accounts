@@ -218,14 +218,27 @@ export default function FaqPage() {
                         {isOpen ? "−" : "+"}
                       </span>
                     </button>
-                    {isOpen && (
+                    {/* Always mounted (not conditionally rendered) so every
+                        answer is present in the crawled HTML — only the
+                        visual height collapses. A closed-accordion answer
+                        that never enters the DOM is invisible to crawlers,
+                        which is why only 1 of 21 answers used to be indexable. */}
+                    <div
+                      aria-hidden={!isOpen}
+                      style={{
+                        display: "grid",
+                        gridTemplateRows: isOpen ? "1fr" : "0fr",
+                        transition: "grid-template-rows .25s ease",
+                      }}
+                    >
                       <p style={{
-                        margin: 0, padding: "0 18px 18px",
+                        margin: 0, padding: isOpen ? "0 18px 18px" : "0 18px",
                         fontSize: 14, color: "rgba(255,255,255,.5)", lineHeight: 1.8,
+                        overflow: "hidden", minHeight: 0,
                       }}>
                         {item.a}
                       </p>
-                    )}
+                    </div>
                   </div>
                 );
               })}

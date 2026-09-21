@@ -10,8 +10,36 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
+  const article = ARTICLES[slug];
+  const url = `${BASE}/help/${slug}`;
+
+  if (!article) return { alternates: { canonical: url } };
+
+  const title = `${article.title} — FinovaOS Help Center`;
+  const intro = article.content.find(b => b.type === "intro")?.text ?? "";
+  const description = (intro || `A step-by-step FinovaOS Help Center guide: ${article.title.toLowerCase()}.`)
+    .replace(/\*\*/g, "")
+    .slice(0, 160);
+
   return {
-    alternates: { canonical: `${BASE}/help/${slug}` },
+    title,
+    description,
+    keywords: [article.title, article.category, "FinovaOS help", "FinovaOS guide"],
+    openGraph: {
+      title,
+      description,
+      url,
+      siteName: "FinovaOS",
+      images: [{ url: `${BASE}/icon.png`, width: 1200, height: 630, alt: article.title }],
+      type: "article",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: [`${BASE}/icon.png`],
+    },
+    alternates: { canonical: url },
   };
 }
 
@@ -1619,7 +1647,6 @@ export default async function HelpArticlePage({
   return (
     <div style={{ minHeight:"100vh", background:"linear-gradient(180deg,#080c1e 0%,#0c0f2e 30%,#080c1e 100%)", color:"white", fontFamily:"'Outfit','DM Sans',sans-serif" }}>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Lora:ital,wght@0,700;1,700&display=swap');
         *,*::before,*::after{box-sizing:border-box;}
         @keyframes orbDrift{0%,100%{transform:translate(0,0)}50%{transform:translate(16px,-14px)}}
         @keyframes fadeUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}

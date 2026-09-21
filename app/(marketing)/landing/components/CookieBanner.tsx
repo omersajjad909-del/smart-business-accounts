@@ -175,8 +175,11 @@ export default function CookieBanner() {
         <div
           style={{
             position: "fixed",
-            inset: "auto 24px 24px 24px",
+            left: 24,
+            bottom: 24,
+            right: "auto",
             zIndex: 99998,
+            width: "min(560px, calc(100vw - 48px))",
             maxWidth: 560,
             background: panel,
             border: "1px solid rgba(94,162,255,.22)",

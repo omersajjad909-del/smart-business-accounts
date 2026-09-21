@@ -129,7 +129,7 @@ export default function TestimonialsPage() {
               🏷️ 50% OFF — FIRST 3 MONTHS
             </div>
             <h3 style={{fontFamily:"'Lora',serif",fontSize:"clamp(18px,2.5vw,26px)",fontWeight:700,color:"white",letterSpacing:"-.4px",marginBottom:6}}>
-              Join thousands of businesses on FinovaOS
+              {all.length > 0 ? "Join the businesses already on FinovaOS" : "Be one of the first businesses on FinovaOS"}
             </h3>
             <p style={{fontSize:14,color:"rgba(255,255,255,.4)",margin:0}}>Any industry. Any size. Anywhere in the world.</p>
           </div>
