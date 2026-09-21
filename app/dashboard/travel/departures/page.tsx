@@ -62,6 +62,24 @@ const FIXED_FIELDS: { key: keyof PackageFixedCosts; label: string }[] = [
   { key: "misc", label: "Other" },
 ];
 
+/** The ground-staff field is named after the city it belongs to. */
+function staffLabel(d: UmrahDeparture, index: number): string {
+  const city = d.legs.filter((l) => l.city.trim())[index]?.city.trim();
+  if (city) return `${city} staff`;
+  // Before any leg is entered there is nothing to name it after, and for a
+  // pilgrimage the two cities are known in advance anyway.
+  if (d.kind === "tour") return index === 0 ? "Ground staff 1" : "Ground staff 2";
+  return index === 0 ? "Makkah staff" : "Madinah staff";
+}
+
+/** What a new hotel leg starts as, given where this group is going. */
+function nextLegCity(d: UmrahDeparture): string {
+  if (d.kind === "tour") return "";
+  // A pilgrimage is Makkah then Madinah, in that order, and almost never
+  // anything else — so the second leg offers the second city.
+  return d.legs.some((l) => l.city.trim().toLowerCase() === "makkah") ? "Madinah" : "Makkah";
+}
+
 export default function DeparturesPage() {
   const { isMobile } = useResponsive();
   const store = useBusinessRecords("umrah_departure");
@@ -201,10 +219,11 @@ export default function DeparturesPage() {
           </div>
           <div>
             <label style={label}>Kind</label>
-            <select value={d.kind} onChange={(e) => patch({ kind: e.target.value as "umrah" | "hajj" })}
+            <select value={d.kind} onChange={(e) => patch({ kind: e.target.value as "umrah" | "hajj" | "tour" })}
               style={{ ...input, background: "#161b27" }}>
               <option value="umrah">Umrah</option>
               <option value="hajj">Hajj</option>
+              <option value="tour">Group Tour</option>
             </select>
           </div>
           <div>
@@ -270,13 +289,17 @@ export default function DeparturesPage() {
         {/* Printed on every voucher for this departure, so they are entered once
             for the group rather than forty times. */}
         <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(3,1fr)", gap: 12, marginTop: 12 }}>
+          {/* Named after the cities on the itinerary rather than after Makkah
+              and Madinah. The same two fields serve a Dubai group, whose
+              ground staff are in Dubai and Abu Dhabi — only the labels ever
+              needed to know where the group was going. */}
           <div>
-            <label style={label}>Makkah staff</label>
+            <label style={label}>{staffLabel(d, 0)}</label>
             <input value={d.makkahStaff || ""} placeholder="+966 58 315 6418 Qudratullah"
               onChange={(e) => patch({ makkahStaff: e.target.value })} style={input} />
           </div>
           <div>
-            <label style={label}>Madinah staff</label>
+            <label style={label}>{staffLabel(d, 1)}</label>
             <input value={d.madinahStaff || ""} placeholder="SAEED +966 58 013 0848"
               onChange={(e) => patch({ madinahStaff: e.target.value })} style={input} />
           </div>
@@ -323,7 +346,7 @@ export default function DeparturesPage() {
             </div>
           ))}
         </div>
-        <button onClick={() => patch({ legs: [...d.legs, emptyLeg("Makkah")] })}
+        <button onClick={() => patch({ legs: [...d.legs, emptyLeg(nextLegCity(d))] })}
           style={{ marginTop: 10, padding: "7px 14px", borderRadius: 8, background: "rgba(255,255,255,.05)", border: `1px solid ${border}`, color: "rgba(255,255,255,.65)", fontSize: 12, fontWeight: 700, fontFamily: "inherit", cursor: "pointer" }}>
           + Add leg
         </button>

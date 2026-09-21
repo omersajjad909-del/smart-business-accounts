@@ -27,7 +27,15 @@
 // once, at a rate stored on the departure — so a departure costed in March does
 // not silently re-cost itself in June when the rate moves.
 
-export type PackageKind = "umrah" | "hajj";
+/**
+ * What kind of group this is.
+ *
+ * "tour" is here because an agency that runs Hajj and Umrah also runs Dubai in
+ * December and Turkey in summer, and a group departure is a group departure:
+ * a quota of seats, hotel legs, a rate card by sharing, one aircraft. Nothing
+ * in the costing cares which country it is — only the labels did.
+ */
+export type PackageKind = "umrah" | "hajj" | "tour";
 
 /** One hotel leg of the trip: a city, a hotel, nights, and the ROOM rate. */
 export type PackageLeg = {

@@ -98,6 +98,13 @@ function StayTable({ stay }: { stay: VoucherHotelStay }) {
   );
 }
 
+/** The ground-staff line is named after the city it belongs to. */
+function staffLabel(voucher: UmrahVoucher, index: number): string {
+  const city = voucher.stays.filter((s) => s.city.trim())[index]?.city.trim();
+  if (city) return `${city} staff`;
+  return index === 0 ? "Makkah staff" : "Madina staff";
+}
+
 export function VoucherPrint({ voucher, companyName }: { voucher: UmrahVoucher; companyName?: string }) {
   const similar = voucher.stays.filter((s) => s.orSimilar && s.hotelName.trim());
 
@@ -298,8 +305,10 @@ export function VoucherPrint({ voucher, companyName }: { voucher: UmrahVoucher; 
 
         <div style={{ display: "flex", gap: 14, alignItems: "flex-start", fontSize: 8, color: "#333", lineHeight: 1.5 }}>
           <div style={{ flex: 1 }}>
-            {voucher.makkahStaff ? <div>Makkah staff &nbsp; {voucher.makkahStaff}</div> : null}
-            {voucher.madinahStaff ? <div style={{ marginTop: 6 }}>Madina staff &nbsp; {voucher.madinahStaff}</div> : null}
+            {/* Named after the cities this voucher actually visits, so a Dubai
+                group's voucher does not offer its travellers a Makkah contact. */}
+            {voucher.makkahStaff ? <div>{staffLabel(voucher, 0)} &nbsp; {voucher.makkahStaff}</div> : null}
+            {voucher.madinahStaff ? <div style={{ marginTop: 6 }}>{staffLabel(voucher, 1)} &nbsp; {voucher.madinahStaff}</div> : null}
           </div>
           {voucher.qrUrl ? (
             <img
