@@ -39,7 +39,7 @@ import {
 import { OfferCard } from "../_flight/OfferCard";
 import { SearchPanel } from "../_flight/SearchPanel";
 import { SummaryRail } from "../_flight/SummaryRail";
-import { FareNotice, Field, GhostButton, Money, PrimaryButton, T, ff, flightCss, inputStyle } from "../_flight/ui";
+import { FareNotice, Field, GhostButton, Money, PartyInput, PrimaryButton, T, ff, flightCss, inputStyle } from "../_flight/ui";
 import { authHeaders, sortOffers, takeSelection, useFlightSearch } from "../_flight/useFlightSearch";
 
 const STEPS = ["Flight Details", "Passengers", "Review & Payment", "Confirmation"] as const;
@@ -591,10 +591,13 @@ export default function BookFlightPage() {
                     <input value={booking.pnr} onChange={(e) => setBooking({ ...booking, pnr: e.target.value.toUpperCase() })} placeholder="A1B2C3" style={cell} className="fl-in" />
                   </Field>
                   <Field label="Airline / Supplier" required hint="The account the payable lands in">
-                    <input list="wizard-suppliers" value={booking.supplier} onChange={(e) => setBooking({ ...booking, supplier: e.target.value })} style={cell} className="fl-in" />
-                    <datalist id="wizard-suppliers">
-                      {suppliers.map((name) => <option key={name} value={name} />)}
-                    </datalist>
+                    <PartyInput
+                      compact
+                      value={booking.supplier}
+                      options={suppliers}
+                      placeholder="Pick or type"
+                      onChange={(name) => setBooking({ ...booking, supplier: name })}
+                    />
                   </Field>
                   <Field label="Status">
                     <select value={booking.status} onChange={(e) => setBooking({ ...booking, status: e.target.value })} style={cell}>

@@ -17,7 +17,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useResponsive } from "@/hooks/useResponsive";
 import { useCurrency } from "@/lib/useCurrency";
 import { confirmToast, alertToast } from "@/lib/toast-feedback";
-import { AirportInput, Field, GhostButton, PrimaryButton, T, ff, flightCss, inputStyle } from "../_flight/ui";
+import { AirportInput, Field, GhostButton, PartyInput, PrimaryButton, T, ff, flightCss, inputStyle } from "../_flight/ui";
 
 type Item = {
   id?: string;
@@ -591,13 +591,12 @@ export default function TripsPage() {
                   </Field>
                 )}
                 <Field label="Supplier">
-                  <input
-                    list="trip-suppliers"
+                  <PartyInput
+                    compact
                     value={item.supplierName}
-                    onChange={(e) => patchItem(index, { supplierName: e.target.value })}
+                    options={suppliers}
                     placeholder={suppliers.length ? "Pick or type" : "Who bills you"}
-                    style={cell}
-                    className="fl-in"
+                    onChange={(name) => patchItem(index, { supplierName: name })}
                   />
                 </Field>
                 <Field label="Sell">
@@ -623,12 +622,6 @@ export default function TripsPage() {
                 </button>
               </div>
             ))}
-
-            {/* The accounts a payable can land on. Shared by every service row
-                rather than repeated per row. */}
-            <datalist id="trip-suppliers">
-              {suppliers.map((name) => <option key={name} value={name} />)}
-            </datalist>
 
             <button
               type="button"

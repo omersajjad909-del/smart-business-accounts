@@ -379,6 +379,100 @@ export function AirportInput({
   );
 }
 
+/**
+ * A party picked from the ones already on file, or typed if it is new.
+ *
+ * Not a <datalist>. Safari renders those inconsistently — the list does not
+ * open on click and often not on typing either — so a supplier box looked
+ * exactly like a plain text field and the accounts sitting behind it might as
+ * well not have existed.
+ *
+ * Not a <select> either, for the reason the rest of this module already
+ * follows: the supplier being used for the first time must still be typeable,
+ * or the first booking with a new consolidator means abandoning a half-built
+ * trip to go and create an account.
+ */
+export function PartyInput({
+  value,
+  onChange,
+  options,
+  placeholder = "Pick or type",
+  compact,
+}: {
+  value: string;
+  onChange: (name: string) => void;
+  options: string[];
+  placeholder?: string;
+  compact?: boolean;
+}) {
+  const [open, setOpen] = useState(false);
+  const [text, setText] = useState("");
+  const ref = useDismiss(open, () => setOpen(false));
+
+  const needle = text.trim().toLowerCase();
+  const matches = needle
+    ? options.filter((name) => name.toLowerCase().includes(needle)).slice(0, 12)
+    : options.slice(0, 12);
+
+  /* What is typed is the value, whether or not it matches anything. Closing
+     without picking keeps it — the new consolidator is the point. */
+  function commit(next: string) {
+    onChange(next);
+    setOpen(false);
+  }
+
+  return (
+    <div ref={ref} style={{ position: "relative", minWidth: 0 }}>
+      <input
+        className="fl-in"
+        value={open ? text : value}
+        placeholder={placeholder}
+        onFocus={() => { setText(value); setOpen(true); }}
+        onChange={(event) => { setText(event.target.value); onChange(event.target.value); }}
+        onKeyDown={(event) => {
+          if (event.key === "Enter") { event.preventDefault(); commit(text); }
+          if (event.key === "Escape") setOpen(false);
+        }}
+        style={{
+          ...inputStyle,
+          height: compact ? 38 : undefined,
+          padding: compact ? "0 10px" : inputStyle.padding,
+          fontSize: compact ? 12.5 : inputStyle.fontSize,
+        }}
+      />
+
+      {open ? (
+        <div style={{ ...popover, minWidth: "100%", maxHeight: 240, overflowY: "auto" }} className="fl-scroll">
+          {matches.length ? (
+            matches.map((name) => (
+              <button
+                key={name}
+                type="button"
+                className="fl-opt"
+                onMouseDown={(event) => { event.preventDefault(); commit(name); }}
+                style={{
+                  display: "block", width: "100%", textAlign: "left", background: "transparent",
+                  border: "none", borderRadius: 8, padding: "8px 10px", cursor: "pointer",
+                  color: T.text, fontFamily: "inherit", fontSize: 12.5,
+                  overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
+                }}
+              >
+                {name}
+              </button>
+            ))
+          ) : (
+            <div style={{ padding: "9px 11px", fontSize: 11.5, color: T.muted, lineHeight: 1.5 }}>
+              {options.length
+                ? `Nothing on file matches “${text}”. Keep typing to use it as a new one.`
+                : "No accounts on file yet — type the name and it will be created when the booking posts."}
+            </div>
+          )}
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
 function Stepper({
   label,
   hint,

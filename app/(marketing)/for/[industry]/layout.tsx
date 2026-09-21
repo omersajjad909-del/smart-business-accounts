@@ -23,7 +23,11 @@ export async function generateMetadata({
   if (!config) return { title: "Industry not found", robots: { index: false, follow: false } };
 
   const url = `${BASE}/for/${industry}`;
-  const title = `${config.label} Accounting & ERP Software — FinovaOS`;
+  // Bare title — the root layout's "%s | FinovaOS" template appends the brand
+  // for the <title> tag. OG/Twitter titles aren't templated, so they get the
+  // brand suffix spelled out explicitly.
+  const title = `${config.label} Accounting & ERP Software`;
+  const socialTitle = `${title} — FinovaOS`;
   const description =
     `${config.description} FinovaOS gives ${config.label.toLowerCase()} businesses accounting, ` +
     `invoicing, inventory and reporting in one cloud platform built for the way the industry actually works.`;
@@ -40,7 +44,7 @@ export async function generateMetadata({
       "cloud accounting",
     ],
     openGraph: {
-      title,
+      title: socialTitle,
       description,
       url,
       siteName: "FinovaOS",
@@ -49,7 +53,7 @@ export async function generateMetadata({
     },
     twitter: {
       card: "summary_large_image",
-      title,
+      title: socialTitle,
       description,
       images: [`${BASE}/icon.png`],
     },

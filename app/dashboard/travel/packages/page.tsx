@@ -20,7 +20,7 @@ import { useResponsive } from "@/hooks/useResponsive";
 import { useCurrency } from "@/lib/useCurrency";
 import { confirmToast, alertToast } from "@/lib/toast-feedback";
 import { useBusinessRecords, type BusinessRecord } from "@/lib/useBusinessRecords";
-import { Field, GhostButton, PrimaryButton, T, ff, flightCss, inputStyle } from "../_flight/ui";
+import { Field, GhostButton, PartyInput, PrimaryButton, T, ff, flightCss, inputStyle } from "../_flight/ui";
 
 type Component = {
   productType: string;
@@ -239,13 +239,12 @@ export default function PackagesPage() {
                   <input value={row.title} onChange={(e) => patch(index, { title: e.target.value })} placeholder="Return flight, economy" style={cell} className="fl-in" />
                 </Field>
                 <Field label="Supplier">
-                  <input
-                    list="package-suppliers"
+                  <PartyInput
+                    compact
                     value={row.supplierName}
-                    onChange={(e) => patch(index, { supplierName: e.target.value })}
+                    options={suppliers}
                     placeholder={suppliers.length ? "Pick or type" : "Who bills you"}
-                    style={cell}
-                    className="fl-in"
+                    onChange={(name) => patch(index, { supplierName: name })}
                   />
                 </Field>
                 <Field label="Sell">
@@ -270,10 +269,6 @@ export default function PackagesPage() {
                 </button>
               </div>
             ))}
-            <datalist id="package-suppliers">
-              {suppliers.map((name) => <option key={name} value={name} />)}
-            </datalist>
-
             <button
               type="button"
               onClick={() => setComponents((prev) => [...prev, emptyComponent()])}
