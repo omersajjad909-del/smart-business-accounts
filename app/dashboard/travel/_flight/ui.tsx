@@ -556,6 +556,202 @@ export function PartyInput({
   );
 }
 
+const linkish: React.CSSProperties = {
+  border: "none", background: "transparent", color: "var(--accent)", cursor: "pointer",
+  fontSize: 11.5, fontWeight: 700, fontFamily: "inherit", padding: "4px 2px",
+};
+
+/** Enough of a traveller to show them in a list and put them on a trip. */
+export type PickedTraveler = {
+  id: string;
+  fullName: string;
+  passportNo?: string | null;
+  phone?: string | null;
+};
+
+/* Chips for a hundred-person Hajj group would bury the form as thoroughly as
+   listing every traveller on file did, so the wall is folded after this many
+   and opened on request. */
+const CHIP_LIMIT = 12;
+
+/**
+ * The people on a trip, chosen by searching rather than by reading everyone.
+ *
+ * This used to render one chip per traveller on file. At the twenty this
+ * started with that was a convenience; at the thousand a working agency
+ * carries it is a wall of names, and the fetch was capped at a hundred anyway,
+ * so the nine hundred behind the cap could not be put on a trip at all.
+ *
+ * Searching is also how you tell two travellers apart. An agency will have
+ * several people called Muhammad Ali, and a chip showing only a name cannot
+ * say which passport is flying — so each row carries the passport or the
+ * phone underneath.
+ */
+export function TravelerPicker({
+  selected,
+  onChange,
+}: {
+  selected: PickedTraveler[];
+  onChange: (next: PickedTraveler[]) => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const [text, setText] = useState("");
+  const [rows, setRows] = useState<PickedTraveler[]>([]);
+  const [total, setTotal] = useState(0);
+  const [loading, setLoading] = useState(false);
+  const [showAllChips, setShowAllChips] = useState(false);
+  const anchor = useRef<HTMLDivElement>(null);
+
+  // Nothing typed lists the most recently touched, which is who the desk is
+  // usually still working on.
+  useEffect(() => {
+    if (!open) return;
+    let cancelled = false;
+    setLoading(true);
+    const timer = setTimeout(() => {
+      fetch(`/api/travel/travelers?q=${encodeURIComponent(text.trim())}&limit=12`)
+        .then((r) => (r.ok ? r.json() : null))
+        .then((body) => {
+          if (cancelled) return;
+          setRows(Array.isArray(body?.travelers) ? body.travelers : []);
+          setTotal(Number(body?.total) || 0);
+        })
+        .catch(() => { if (!cancelled) setRows([]); })
+        .finally(() => { if (!cancelled) setLoading(false); });
+    }, text.trim() ? 250 : 0);
+    return () => { cancelled = true; clearTimeout(timer); };
+  }, [open, text]);
+
+  const chosenIds = useMemo(() => new Set(selected.map((p) => p.id)), [selected]);
+
+  function toggle(person: PickedTraveler) {
+    onChange(
+      chosenIds.has(person.id)
+        ? selected.filter((p) => p.id !== person.id)
+        : [...selected, person],
+    );
+  }
+
+  const shownChips = showAllChips ? selected : selected.slice(0, CHIP_LIMIT);
+  const hiddenChips = selected.length - shownChips.length;
+
+  return (
+    <div style={{ display: "grid", gap: 8 }}>
+      {selected.length ? (
+        <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
+          {shownChips.map((person) => (
+            <span
+              key={person.id}
+              style={{
+                display: "inline-flex", alignItems: "center", gap: 7,
+                border: `1px solid var(--accent)`, background: "var(--accent-soft)",
+                color: T.accent, borderRadius: 999, padding: "5px 6px 5px 13px",
+                fontSize: 12, fontWeight: 700, maxWidth: "100%",
+              }}
+            >
+              <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                {person.fullName}
+              </span>
+              <button
+                type="button"
+                aria-label={`Remove ${person.fullName}`}
+                onClick={() => toggle(person)}
+                style={{
+                  border: "none", background: "transparent", color: "inherit", cursor: "pointer",
+                  fontSize: 14, lineHeight: 1, padding: "0 4px", fontFamily: "inherit", opacity: 0.75,
+                }}
+              >
+                ×
+              </button>
+            </span>
+          ))}
+
+          {hiddenChips > 0 ? (
+            <button type="button" onClick={() => setShowAllChips(true)} style={linkish}>
+              +{hiddenChips} more
+            </button>
+          ) : null}
+          {showAllChips && selected.length > CHIP_LIMIT ? (
+            <button type="button" onClick={() => setShowAllChips(false)} style={linkish}>
+              Show fewer
+            </button>
+          ) : null}
+          {selected.length > 1 ? (
+            <button type="button" onClick={() => { onChange([]); setShowAllChips(false); }} style={{ ...linkish, color: T.muted }}>
+              Clear all
+            </button>
+          ) : null}
+        </div>
+      ) : null}
+
+      <div ref={anchor} style={{ position: "relative", minWidth: 0 }}>
+        <input
+          className="fl-in"
+          value={text}
+          placeholder={selected.length ? "Add another traveller — name, passport or phone" : "Search a traveller by name, passport or phone"}
+          onFocus={() => setOpen(true)}
+          onClick={() => setOpen(true)}
+          onChange={(event) => { setText(event.target.value); setOpen(true); }}
+          onKeyDown={(event) => { if (event.key === "Escape") setOpen(false); }}
+          style={{ ...inputStyle, height: 38, padding: "0 12px", fontSize: 12.5 }}
+        />
+
+        {/* Picking does not close the panel: a group is several people, and
+            reopening the list for each of them is the slow way to book. */}
+        <Popover anchor={anchor} open={open} onClose={() => setOpen(false)} minWidth={0}>
+          {rows.length ? (
+            rows.map((person) => {
+              const on = chosenIds.has(person.id);
+              return (
+                <button
+                  key={person.id}
+                  type="button"
+                  className="fl-opt"
+                  onMouseDown={(event) => { event.preventDefault(); toggle(person); }}
+                  style={{
+                    display: "flex", width: "100%", gap: 10, alignItems: "center", textAlign: "left",
+                    background: "transparent", border: "none", borderRadius: 8, padding: "8px 10px",
+                    cursor: "pointer", color: T.text, fontFamily: "inherit",
+                  }}
+                >
+                  <span style={{ width: 14, fontSize: 12, color: on ? T.accent : "transparent" }}>✓</span>
+                  <span style={{ minWidth: 0 }}>
+                    <span style={{ display: "block", fontSize: 12.5, fontWeight: 700, color: on ? T.accent : T.text }}>
+                      {person.fullName}
+                    </span>
+                    <span style={{ display: "block", fontSize: 10.5, color: T.muted, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                      {person.passportNo || person.phone || "No passport on file"}
+                    </span>
+                  </span>
+                </button>
+              );
+            })
+          ) : (
+            <div style={{ padding: "10px 12px", fontSize: 12, color: T.muted, lineHeight: 1.5 }}>
+              {loading
+                ? "Searching…"
+                : text.trim()
+                  ? `Nobody on file matches “${text.trim()}”.`
+                  : "No travellers on file yet."}
+            </div>
+          )}
+
+          {total > rows.length ? (
+            <div
+              style={{
+                borderTop: `1px solid ${T.border}`, marginTop: 4, padding: "8px 12px 4px",
+                fontSize: 10.5, color: T.muted, position: "sticky", bottom: 0, background: T.card,
+              }}
+            >
+              Showing {rows.length} of {total.toLocaleString()} — narrow it with a name, passport or phone
+            </div>
+          ) : null}
+        </Popover>
+      </div>
+    </div>
+  );
+}
+
 function Stepper({
   label,
   hint,

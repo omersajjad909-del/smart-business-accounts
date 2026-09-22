@@ -90,13 +90,18 @@ export async function GET(req: NextRequest) {
       };
     }
 
-    const travelers = await prisma.traveler.findMany({
-      where: where as never,
-      orderBy: expiringDays > 0 ? { passportExpiry: "asc" } : { updatedAt: "desc" },
-      take,
-    });
+    /* The count comes back with the page so a picker can say "20 of 1,340"
+       rather than implying the agency has twenty travellers on file. */
+    const [travelers, total] = await Promise.all([
+      prisma.traveler.findMany({
+        where: where as never,
+        orderBy: expiringDays > 0 ? { passportExpiry: "asc" } : { updatedAt: "desc" },
+        take,
+      }),
+      prisma.traveler.count({ where: where as never }),
+    ]);
 
-    return NextResponse.json({ travelers });
+    return NextResponse.json({ travelers, total });
   } catch (error) {
     return NextResponse.json(
       { error: error instanceof Error ? error.message : "Could not load travellers" },

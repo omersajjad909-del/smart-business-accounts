@@ -17,7 +17,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useResponsive } from "@/hooks/useResponsive";
 import { useCurrency } from "@/lib/useCurrency";
 import { confirmToast, alertToast } from "@/lib/toast-feedback";
-import { AirportInput, Field, GhostButton, PartyInput, PrimaryButton, T, ff, flightCss, inputStyle } from "../_flight/ui";
+import { AirportInput, Field, GhostButton, PartyInput, PrimaryButton, T, TravelerPicker, ff, flightCss, inputStyle, type PickedTraveler } from "../_flight/ui";
 
 type Item = {
   id?: string;
@@ -51,7 +51,6 @@ type Loose = {
   date: string | null;
 };
 
-type Traveler = { id: string; fullName: string; passportNo: string | null };
 
 type Trip = {
   id: string;
@@ -107,7 +106,6 @@ export default function TripsPage() {
   const money = (n: number) => `${symbol}${Math.round(Number(n) || 0).toLocaleString()}`;
 
   const [trips, setTrips] = useState<Trip[]>([]);
-  const [travelers, setTravelers] = useState<Traveler[]>([]);
   /* The airlines, hotels and consolidators already on the chart of accounts.
      Offered rather than imposed: the supplier being used for the first time
      must still be typeable, or the first booking with a new consolidator means
@@ -126,7 +124,10 @@ export default function TripsPage() {
      the other to a description is how a return booking loses the day it
      returns on. */
   const [returnDate, setReturnDate] = useState("");
-  const [chosen, setChosen] = useState<string[]>([]);
+  /* The chosen people are kept whole rather than as ids into a fetched list.
+     They are found by searching now, and a search for somebody else clears the
+     rows the earlier ones came from. */
+  const [chosen, setChosen] = useState<PickedTraveler[]>([]);
   const [items, setItems] = useState<Item[]>([emptyItem()]);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
@@ -140,13 +141,11 @@ export default function TripsPage() {
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      const [tripRes, travRes, supRes] = await Promise.all([
+      const [tripRes, supRes] = await Promise.all([
         fetch(`/api/travel/bookings?q=${encodeURIComponent(search)}&status=${statusFilter}&limit=100`).then((r) => (r.ok ? r.json() : null)),
-        fetch("/api/travel/travelers?limit=100").then((r) => (r.ok ? r.json() : null)),
         fetch("/api/accounts?partyType=SUPPLIER", { cache: "no-store" }).then((r) => (r.ok ? r.json() : [])),
       ]);
       setTrips(tripRes?.bookings ?? []);
-      setTravelers(travRes?.travelers ?? []);
       setSuppliers(Array.isArray(supRes) ? supRes.map((a: { name?: unknown }) => String(a?.name || "")).filter(Boolean).sort() : []);
     } catch {
       setTrips([]);
@@ -167,9 +166,8 @@ export default function TripsPage() {
      hand is never overwritten. */
   useEffect(() => {
     if (!chosen.length || customerName.trim()) return;
-    const lead = travelers.find((t) => t.id === chosen[0]);
-    if (lead) setCustomerName(lead.fullName);
-  }, [chosen, travelers, customerName]);
+    setCustomerName(chosen[0].fullName);
+  }, [chosen, customerName]);
 
   /* A flight row's description is the sector, so adding or clearing the return
      date rewrites it — "FSD → JED" becomes "FSD → JED → FSD" and back. */
@@ -203,8 +201,8 @@ export default function TripsPage() {
           travelDate,
           returnDate,
           status: "draft",
-          travelerIds: chosen,
-          leadTravelerId: chosen[0],
+          travelerIds: chosen.map((person) => person.id),
+          leadTravelerId: chosen[0]?.id,
           items: items
             .filter((item) => item.title.trim())
             // Kept beside the line so a flight can be read back as a sector
@@ -501,35 +499,12 @@ export default function TripsPage() {
             <div style={{ fontSize: 12, fontWeight: 700, color: T.text }}>
               Travellers {chosen.length ? `(${chosen.length} selected)` : ""}
             </div>
-            {travelers.length ? (
-              <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-                {travelers.map((person) => {
-                  const on = chosen.includes(person.id);
-                  return (
-                    <button
-                      key={person.id}
-                      type="button"
-                      onClick={() => setChosen((prev) => (on ? prev.filter((id) => id !== person.id) : [...prev, person.id]))}
-                      style={{
-                        border: `1px solid ${on ? "var(--accent)" : T.border}`,
-                        background: on ? "var(--accent-soft)" : T.panel,
-                        color: on ? T.accent : T.muted,
-                        borderRadius: 999, padding: "6px 13px", fontSize: 12, fontWeight: 700,
-                        cursor: "pointer", fontFamily: "inherit",
-                      }}
-                    >
-                      {person.fullName}
-                    </button>
-                  );
-                })}
-              </div>
-            ) : (
-              <div style={{ fontSize: 12, color: T.muted }}>
-                Nobody on file yet — add them on{" "}
-                <a href="/dashboard/travel/travelers" style={{ color: T.accent, textDecoration: "none" }}>Travellers</a>{" "}
-                and they can be put on trips from then on.
-              </div>
-            )}
+            <TravelerPicker selected={chosen} onChange={setChosen} />
+            <div style={{ fontSize: 11, color: T.muted }}>
+              Somebody travelling for the first time is added on{" "}
+              <a href="/dashboard/travel/travelers" style={{ color: T.accent, textDecoration: "none" }}>Travellers</a>{" "}
+              and can be searched for here from then on.
+            </div>
           </div>
 
           <div style={{ display: "grid", gap: 10, borderTop: `1px solid ${T.border}`, paddingTop: 14 }}>
