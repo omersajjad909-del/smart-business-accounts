@@ -48,6 +48,7 @@ const SIGNAL_ICONS: Record<string, string> = {
   ODD_HOURS:    "🌙",
   RAPID_LOGINS: "🔁",
   MANUAL_FLAG:  "🚩",
+  DUPLICATE_CHARGE: "💳",
 };
 
 function RiskBadge({ risk }: { risk: string }) {

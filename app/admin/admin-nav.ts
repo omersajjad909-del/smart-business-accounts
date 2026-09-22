@@ -84,6 +84,7 @@ export const ADMIN_NAV_ITEMS: AdminNavItem[] = [
   { id: "api-keys",         label: "API Keys",          href: "/admin/api-keys",            group: "System",    short: "AK", icon: "lock" },
   { id: "business-types",   label: "Business Types",    href: "/admin/business-types",      group: "System",    short: "BT", icon: "box" },
   { id: "email-logs",       label: "Email Logs",        href: "/admin/email-logs",          group: "System",    short: "EM", icon: "mail" },
+  { id: "gdpr",             label: "GDPR / Data Requests", href: "/admin/gdpr",             group: "System",    short: "GD", icon: "lock" },
   { id: "tickets",          label: "Support Tickets",   href: "/admin/tickets",             group: "System",    short: "TK", icon: "message" },
   { id: "support-inbox",    label: "Support Inbox",     href: "/admin/chat",                group: "System",    short: "SI", icon: "message", badge: "LIVE" },
   { id: "logs",             label: "Activity Logs",     href: "/admin/logs",                group: "System",    short: "LG", icon: "activity" },

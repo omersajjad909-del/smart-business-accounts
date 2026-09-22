@@ -30,12 +30,18 @@ const PLAN_COLORS: Record<string, string> = {
   STARTER: "#38bdf8", PRO: "#818cf8", ENTERPRISE: "#c4b5fd", CUSTOM: "#fbbf24",
 };
 const STATUS_COLORS: Record<string, { bg: string; text: string }> = {
-  ACTIVE:   { bg: "rgba(34,197,94,.12)",  text: "#22c55e" },
-  TRIALING: { bg: "rgba(6,182,212,.12)",  text: "#06b6d4" },
-  PAST_DUE: { bg: "rgba(249,115,22,.12)", text: "#f97316" },
-  INACTIVE: { bg: "rgba(100,116,139,.12)",text: "#94a3b8" },
-  CANCELED: { bg: "rgba(239,68,68,.12)",  text: "#f87171" },
-  PURGED:   { bg: "rgba(71,85,105,.12)",  text: "#475569" },
+  ACTIVE:    { bg: "rgba(34,197,94,.12)",  text: "#22c55e" },
+  TRIALING:  { bg: "rgba(6,182,212,.12)",  text: "#06b6d4" },
+  PAST_DUE:  { bg: "rgba(249,115,22,.12)", text: "#f97316" },
+  INACTIVE:  { bg: "rgba(100,116,139,.12)",text: "#94a3b8" },
+  CANCELED:  { bg: "rgba(239,68,68,.12)",  text: "#f87171" },
+  PURGED:    { bg: "rgba(71,85,105,.12)",  text: "#475569" },
+  // Written by the platform-dunning cron (app/api/cron/platform-dunning) —
+  // before this, both rendered as the generic gray INACTIVE badge, so a
+  // company auto-suspended for non-payment looked identical to one that had
+  // simply gone inactive on its own.
+  READ_ONLY: { bg: "rgba(251,191,36,.14)", text: "#fbbf24" },
+  SUSPENDED: { bg: "rgba(220,38,38,.16)",  text: "#dc2626" },
 };
 
 function PlanBadge({ plan }: { plan?: string | null }) {
@@ -553,9 +559,11 @@ export default function AdminSubscriptionsPage() {
     return matchQ && matchS;
   });
 
-  // Attention-needed: past_due + trialing + inactive
+  // Attention-needed: past_due + inactive + canceled, plus the two states the
+  // platform-dunning cron puts an account into automatically for non-payment
+  // — these are the most urgent of the group, not less.
   const needsAttention = companies.filter(c =>
-    ["PAST_DUE", "INACTIVE", "CANCELED"].includes((c.subscriptionStatus || "").toUpperCase())
+    ["PAST_DUE", "READ_ONLY", "SUSPENDED", "INACTIVE", "CANCELED"].includes((c.subscriptionStatus || "").toUpperCase())
   );
   const expiringSoon = companies.filter(c => {
     if (!c.currentPeriodEnd) return false;
@@ -637,6 +645,8 @@ export default function AdminSubscriptionsPage() {
           { label: "Trialing",  value: companies.filter(c => c.subscriptionStatus?.toUpperCase() === "TRIALING").length,  color: "#06b6d4" },
           { label: "Past Due",  value: companies.filter(c => c.subscriptionStatus?.toUpperCase() === "PAST_DUE").length,  color: "#f97316" },
           { label: "Canceled",  value: companies.filter(c => c.subscriptionStatus?.toUpperCase() === "CANCELED").length,  color: "#f87171" },
+          { label: "Read-Only", value: companies.filter(c => c.subscriptionStatus?.toUpperCase() === "READ_ONLY").length, color: "#fbbf24" },
+          { label: "Suspended", value: companies.filter(c => c.subscriptionStatus?.toUpperCase() === "SUSPENDED").length, color: "#dc2626" },
           { label: "Expiring",  value: expiringSoon.length,                                                                              color: "#fbbf24" },
         ].map(s => (
           <div key={s.label} style={{ padding: "14px 16px", borderRadius: 14, background: "rgba(255,255,255,.03)", border: `1px solid ${s.color}20` }}>
@@ -653,7 +663,7 @@ export default function AdminSubscriptionsPage() {
         <select value={filterStatus} onChange={e => setFilterStatus(e.target.value)}
           style={{ padding: "9px 14px", borderRadius: 10, background: "rgba(255,255,255,.05)", border: "1px solid rgba(255,255,255,.1)", color: "#94a3b8", fontSize: 13, outline: "none", cursor: "pointer" }}>
           <option value="ALL">All Statuses</option>
-          {["ACTIVE","TRIALING","PAST_DUE","INACTIVE","CANCELED"].map(s => (
+          {["ACTIVE","TRIALING","PAST_DUE","READ_ONLY","SUSPENDED","INACTIVE","CANCELED"].map(s => (
             <option key={s} value={s}>{s.replace("_"," ")}</option>
           ))}
         </select>

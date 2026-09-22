@@ -99,6 +99,28 @@ export async function GET(req: NextRequest) {
       }
     }
 
+    /* ── 4b. Duplicate-charge flags (written by the billing webhook
+       when a second successful charge lands within 60 minutes of the
+       first — no admin page surfaced these before; they only ever
+       reached an inbox email). Last 30 days, most recent per company. */
+    const dupeChargeLogs = await prisma.activityLog.findMany({
+      where: { action: "DUPLICATE_CHARGE_FLAGGED", createdAt: { gte: d30 } },
+      orderBy: { createdAt: "desc" },
+      select: { companyId: true, details: true, createdAt: true },
+    });
+    const dupeChargesByCompany = new Map<string, { count: number; latest: any; latestAt: Date }>();
+    for (const dl of dupeChargeLogs) {
+      if (!dl.companyId) continue;
+      const existing = dupeChargesByCompany.get(dl.companyId);
+      let details: any = {};
+      try { details = JSON.parse(dl.details || "{}"); } catch {}
+      if (existing) {
+        existing.count += 1;
+      } else {
+        dupeChargesByCompany.set(dl.companyId, { count: 1, latest: details, latestAt: dl.createdAt });
+      }
+    }
+
     /* ── 5. Compute signals per company ──────────────────── */
     const results = companies.map(c => {
       const signals: { code: string; label: string; severity: "high" | "medium" | "low"; detail: string }[] = [];
@@ -194,6 +216,21 @@ export async function GET(req: NextRequest) {
           label: "Manually Flagged by Admin",
           severity: "high",
           detail: flagDetails?.note || "No reason provided",
+        });
+      }
+
+      // Signal 7: DUPLICATE_CHARGE — billing webhook caught a second
+      // successful charge within 60 minutes of the first
+      const dupeCharge = dupeChargesByCompany.get(c.id);
+      if (dupeCharge) {
+        const d = dupeCharge.latest;
+        signals.push({
+          code: "DUPLICATE_CHARGE",
+          label: "Duplicate Charge Detected",
+          severity: "high",
+          detail: dupeCharge.count > 1
+            ? `${dupeCharge.count} duplicate-charge events in the last 30 days — most recent: ${d?.amount ?? "?"} ${d?.currency ?? ""} on ${dupeCharge.latestAt.toISOString().slice(0, 10)}`
+            : `${d?.amount ?? "?"} ${d?.currency ?? ""} charged twice within 60 minutes on ${dupeCharge.latestAt.toISOString().slice(0, 10)} — no auto-refund issued`,
         });
       }
 
