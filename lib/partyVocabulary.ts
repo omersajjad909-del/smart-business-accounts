@@ -75,3 +75,41 @@ export function partySideFor(businessType: string, label: string): PartySide {
   const found = partyOptions(businessType).find((p) => p.label === label);
   return found?.side ?? "CUSTOMER";
 }
+
+/**
+ * Which sort of supplier bills a given travel service.
+ *
+ * A hotel line is billed by a hotel and a ticket by an airline, and until the
+ * chart could say which was which, every booking screen had to offer every
+ * payable on file — so picking the supplier for a room meant reading past the
+ * airlines. The keys are the product types the travel pages already use.
+ *
+ * A service with no entry — a package, a tour, a service fee — is deliberately
+ * unrestricted: those really can be billed by anybody.
+ */
+export const TRAVEL_SUPPLIER_KIND: Record<string, string> = {
+  FLIGHT: "Airline / Consolidator",
+  HOTEL: "Hotel",
+  VISA: "Visa Agent / Embassy",
+  PASSPORT: "Visa Agent / Embassy",
+  TRANSPORT: "Ground Transport",
+};
+
+/**
+ * Control accounts are not parties.
+ *
+ * `Accounts Payable` is seeded with partyType SUPPLIER so that a posting with
+ * no named supplier still lands somewhere. That makes it a fallback, not a
+ * company anybody books a room with, and it has no business in a picker.
+ */
+const CONTROL_CODES = new Set(["AP-SUP", "AR-CUST"]);
+
+export function isControlAccount(code: string): boolean {
+  return CONTROL_CODES.has(String(code || "").trim().toUpperCase());
+}
+
+/** The plural the chart already uses for a kind — "Hotels", not "Hotel". */
+export function partyKindHeading(kind: string): string {
+  const found = partyOptions("travel").find((party) => party.label === kind);
+  return found?.hint || kind;
+}

@@ -198,6 +198,9 @@ export async function POST(req: NextRequest) {
         name: body.name,
         type: fixedType,
         partyType: body.partyType || "GENERAL",
+        /* The trade's own word for them, kept beside the ledger's. A booking
+           screen asking for a hotel can then offer hotels. */
+        partyKind: body.partyKind || null,
         city: body.city || null,
         // Neither is encrypted like the identifiers below them: a region is not
         // personal data, and the FBR payload has to read the province back in

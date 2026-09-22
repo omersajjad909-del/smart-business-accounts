@@ -39,7 +39,8 @@ import {
 import { OfferCard } from "../_flight/OfferCard";
 import { SearchPanel } from "../_flight/SearchPanel";
 import { SummaryRail } from "../_flight/SummaryRail";
-import { FareNotice, Field, GhostButton, Money, PartyInput, PrimaryButton, T, ff, flightCss, inputStyle } from "../_flight/ui";
+import { FareNotice, Field, GhostButton, Money, PartyInput, PrimaryButton, T, ff, flightCss, inputStyle, readParties, type PartyChoice } from "../_flight/ui";
+import { TRAVEL_SUPPLIER_KIND, partyKindHeading } from "@/lib/partyVocabulary";
 import { authHeaders, sortOffers, takeSelection, useFlightSearch } from "../_flight/useFlightSearch";
 
 const STEPS = ["Flight Details", "Passengers", "Review & Payment", "Confirmation"] as const;
@@ -146,7 +147,7 @@ export default function BookFlightPage() {
     customerName: "",
     notes: "",
   });
-  const [suppliers, setSuppliers] = useState<string[]>([]);
+  const [suppliers, setSuppliers] = useState<PartyChoice[]>([]);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const [done, setDone] = useState<{ id: string; ref: string; sale: number; cost: number; margin: number } | null>(null);
@@ -168,7 +169,7 @@ export default function BookFlightPage() {
       .then((r) => (r.ok ? r.json() : []))
       .then((rows) => {
         if (!Array.isArray(rows)) return;
-        setSuppliers(rows.map((a: { name?: unknown }) => String(a?.name || "")).filter(Boolean));
+        setSuppliers(readParties(rows));
       })
       .catch(() => {});
   }, []);
@@ -595,6 +596,8 @@ export default function BookFlightPage() {
                       compact
                       value={booking.supplier}
                       options={suppliers}
+                      kind={TRAVEL_SUPPLIER_KIND.FLIGHT}
+                      kindLabel={partyKindHeading(TRAVEL_SUPPLIER_KIND.FLIGHT)}
                       placeholder="Pick or type"
                       onChange={(name) => setBooking({ ...booking, supplier: name })}
                     />

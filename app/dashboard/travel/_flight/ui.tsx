@@ -11,6 +11,7 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 
+import { isControlAccount } from "@/lib/partyVocabulary";
 import { useCurrency } from "@/lib/useCurrency";
 import {
   CABIN_LABELS,
@@ -460,6 +461,58 @@ export function AirportInput({
   );
 }
 
+/** A party the picker can offer, and the trade's word for what they are. */
+export type PartyChoice = { name: string; kind?: string | null };
+
+/**
+ * Accounts as the pickers want them.
+ *
+ * Drops the control accounts: `Accounts Payable` carries partyType SUPPLIER so
+ * an unnamed posting still lands somewhere, which makes it a fallback and not
+ * a company anybody books a room with.
+ */
+export function readParties(rows: unknown): PartyChoice[] {
+  if (!Array.isArray(rows)) return [];
+  return rows
+    .map((row) => row as { name?: unknown; code?: unknown; partyKind?: unknown })
+    .filter((row) => !isControlAccount(String(row.code ?? "")))
+    .map((row) => ({
+      name: String(row.name ?? "").trim(),
+      kind: row.partyKind ? String(row.partyKind) : null,
+    }))
+    .filter((party) => party.name)
+    .sort((a, b) => a.name.localeCompare(b.name));
+}
+
+function Heading({ children }: { children: React.ReactNode }) {
+  return (
+    <div style={{
+      padding: "7px 11px 4px", fontSize: 10, fontWeight: 800, color: T.muted,
+      letterSpacing: ".08em", textTransform: "uppercase",
+    }}>
+      {children}
+    </div>
+  );
+}
+
+function Choice({ name, onPick }: { name: string; onPick: (name: string) => void }) {
+  return (
+    <button
+      type="button"
+      className="fl-opt"
+      onMouseDown={(event) => { event.preventDefault(); onPick(name); }}
+      style={{
+        display: "block", width: "100%", textAlign: "left", background: "transparent",
+        border: "none", borderRadius: 8, padding: "8px 10px", cursor: "pointer",
+        color: T.text, fontFamily: "inherit", fontSize: 12.5,
+        overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
+      }}
+    >
+      {name}
+    </button>
+  );
+}
+
 /**
  * A party picked from the ones already on file, or typed if it is new.
  *
@@ -479,21 +532,42 @@ export function PartyInput({
   options,
   placeholder = "Pick or type",
   compact,
+  kind,
+  kindLabel,
 }: {
   value: string;
   onChange: (name: string) => void;
-  options: string[];
+  options: PartyChoice[];
   placeholder?: string;
   compact?: boolean;
+  /** The sort of party this field wants — "Hotel" for a room, say. */
+  kind?: string;
+  /** What to call them in the list. Defaults to the kind itself. */
+  kindLabel?: string;
 }) {
   const [open, setOpen] = useState(false);
   const [text, setText] = useState("");
   const anchor = useRef<HTMLDivElement>(null);
 
   const needle = text.trim().toLowerCase();
-  const matches = needle
-    ? options.filter((name) => name.toLowerCase().includes(needle)).slice(0, 12)
-    : options.slice(0, 12);
+
+  /* Split rather than filter. A strict filter is what the field is asking for,
+     and on a chart where nobody has been categorised yet it would answer with
+     an empty list — so the ones that fit come first under their own heading
+     and the rest stay reachable underneath. The second group empties itself as
+     accounts get categorised. */
+  const { fits, rest } = useMemo(() => {
+    const pool = needle
+      ? options.filter((o) => o.name.toLowerCase().includes(needle))
+      : options;
+    if (!kind) return { fits: pool.slice(0, 12), rest: [] as PartyChoice[] };
+    const fits: PartyChoice[] = [];
+    const rest: PartyChoice[] = [];
+    pool.forEach((o) => (o.kind === kind ? fits : rest).push(o));
+    return { fits: fits.slice(0, 12), rest: rest.slice(0, 12) };
+  }, [options, needle, kind]);
+
+  const matches = [...fits, ...rest];
 
   /* What is typed is the value, whether or not it matches anything. Closing
      without picking keeps it — the new consolidator is the point. */
@@ -528,22 +602,25 @@ export function PartyInput({
 
       <Popover anchor={anchor} open={open} onClose={() => setOpen(false)} minWidth={0}>
           {matches.length ? (
-            matches.map((name) => (
-              <button
-                key={name}
-                type="button"
-                className="fl-opt"
-                onMouseDown={(event) => { event.preventDefault(); commit(name); }}
-                style={{
-                  display: "block", width: "100%", textAlign: "left", background: "transparent",
-                  border: "none", borderRadius: 8, padding: "8px 10px", cursor: "pointer",
-                  color: T.text, fontFamily: "inherit", fontSize: 12.5,
-                  overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
-                }}
-              >
-                {name}
-              </button>
-            ))
+            <>
+              {kind ? <Heading>{kindLabel || kind}</Heading> : null}
+              {fits.length
+                ? fits.map((choice) => <Choice key={choice.name} name={choice.name} onPick={commit} />)
+                : kind
+                  ? (
+                    <div style={{ padding: "7px 11px", fontSize: 11, color: T.muted, lineHeight: 1.5 }}>
+                      None tagged yet — set the type on Accounts and they will be listed here.
+                    </div>
+                  )
+                  : null}
+
+              {rest.length ? (
+                <>
+                  <Heading>Other accounts</Heading>
+                  {rest.map((choice) => <Choice key={choice.name} name={choice.name} onPick={commit} />)}
+                </>
+              ) : null}
+            </>
           ) : (
             <div style={{ padding: "9px 11px", fontSize: 11.5, color: T.muted, lineHeight: 1.5 }}>
               {options.length

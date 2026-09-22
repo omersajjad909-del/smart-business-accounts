@@ -17,7 +17,9 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useResponsive } from "@/hooks/useResponsive";
 import { useCurrency } from "@/lib/useCurrency";
 import { confirmToast, alertToast } from "@/lib/toast-feedback";
-import { AirportInput, Field, GhostButton, PartyInput, PrimaryButton, T, TravelerPicker, ff, flightCss, inputStyle, type PickedTraveler } from "../_flight/ui";
+import { AirportInput, Field, GhostButton, PartyInput, PrimaryButton, T, TravelerPicker, ff, flightCss, inputStyle, readParties, type PartyChoice, type PickedTraveler } from "../_flight/ui";
+import { TRAVEL_SUPPLIER_KIND, partyKindHeading } from "@/lib/partyVocabulary";
+import { ROOM_TYPES, STAY_UNITS, isRoundTrip, sectorTitle, stayTitle } from "@/lib/travel/tripLines";
 
 type Item = {
   id?: string;
@@ -29,6 +31,15 @@ type Item = {
      the description writes itself. */
   from?: string;
   to?: string;
+  /* Which way this one goes, where the return is booked as its own line.
+     Absent means the row is the whole journey: a one way, or a return sold on
+     a single ticket. */
+  leg?: "OUT" | "RETURN";
+  /* A room is sold by the night and by how many share it, and both belong on
+     the line rather than inside a sentence somebody typed. */
+  nights?: number;
+  stayUnit?: string;
+  roomType?: string;
   supplierName: string;
   sale: number;
   cost: number;
@@ -94,11 +105,7 @@ function statusTone(status: string) {
 
 const emptyItem = (): Item => ({ productType: "FLIGHT", title: "", from: "", to: "", supplierName: "", sale: 0, cost: 0, qty: 1 });
 
-/** "FSD → JED" going out, "FSD → JED → FSD" coming back as well. */
-function sectorTitle(from?: string, to?: string, hasReturn?: boolean): string {
-  if (!from || !to) return "";
-  return hasReturn ? `${from} → ${to} → ${from}` : `${from} → ${to}`;
-}
+
 
 export default function TripsPage() {
   const { isMobile, isTablet } = useResponsive();
@@ -112,7 +119,7 @@ export default function TripsPage() {
      abandoning the trip to go and add them. But re-typing an existing one is
      how "Qatar Airways BSP" and "Qatar Airways Bsp" become two suppliers with
      half the payable each. */
-  const [suppliers, setSuppliers] = useState<string[]>([]);
+  const [suppliers, setSuppliers] = useState<PartyChoice[]>([]);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [loading, setLoading] = useState(true);
@@ -146,7 +153,7 @@ export default function TripsPage() {
         fetch("/api/accounts?partyType=SUPPLIER", { cache: "no-store" }).then((r) => (r.ok ? r.json() : [])),
       ]);
       setTrips(tripRes?.bookings ?? []);
-      setSuppliers(Array.isArray(supRes) ? supRes.map((a: { name?: unknown }) => String(a?.name || "")).filter(Boolean).sort() : []);
+      setSuppliers(readParties(supRes));
     } catch {
       setTrips([]);
     } finally {
@@ -169,13 +176,40 @@ export default function TripsPage() {
     setCustomerName(chosen[0].fullName);
   }, [chosen, customerName]);
 
+  /* The way home as its own line, for when it is not on the same ticket — a
+     different airline, a different fare, or simply bought later. The outbound
+     stops calling itself a round trip at the same moment, or the trip reads as
+     though the return were being sold twice. */
+  function addReturnLeg(index: number) {
+    setItems((prev) => {
+      const out = prev[index];
+      if (!out?.from || !out?.to) return prev;
+      const next = [...prev];
+      next[index] = { ...out, leg: "OUT", title: sectorTitle(out.from, out.to, false) };
+      next.splice(index + 1, 0, {
+        productType: "FLIGHT",
+        leg: "RETURN",
+        from: out.to,
+        to: out.from,
+        title: sectorTitle(out.to, out.from, false),
+        // Usually the same carrier, so it is offered — and the money is left
+        // blank, because a separate line exists to be priced separately.
+        supplierName: out.supplierName,
+        sale: 0,
+        cost: 0,
+        qty: out.qty,
+      });
+      return next;
+    });
+  }
+
   /* A flight row's description is the sector, so adding or clearing the return
      date rewrites it — "FSD → JED" becomes "FSD → JED → FSD" and back. */
   useEffect(() => {
     setItems((prev) =>
       prev.map((item) =>
         item.productType === "FLIGHT" && item.from && item.to
-          ? { ...item, title: sectorTitle(item.from, item.to, Boolean(returnDate)) }
+          ? { ...item, title: sectorTitle(item.from, item.to, isRoundTrip(item.leg, returnDate)) }
           : item,
       ),
     );
@@ -207,9 +241,31 @@ export default function TripsPage() {
             .filter((item) => item.title.trim())
             // Kept beside the line so a flight can be read back as a sector
             // rather than parsed out of its own description.
-            .map((item) => (item.productType === "FLIGHT" && item.from && item.to
-              ? { ...item, data: { from: item.from, to: item.to } }
-              : item)),
+            .map((item) => {
+              if (item.productType === "FLIGHT" && item.from && item.to) {
+                return {
+                  ...item,
+                  data: {
+                    from: item.from,
+                    to: item.to,
+                    // "ROUND" where one ticket covers both ways, so a manifest
+                    // does not go looking for a return that was never a line.
+                    leg: item.leg ?? (returnDate ? "ROUND" : "OUT"),
+                  },
+                };
+              }
+              if (item.productType === "HOTEL") {
+                return {
+                  ...item,
+                  data: {
+                    nights: item.nights ?? null,
+                    stayUnit: item.stayUnit ?? STAY_UNITS[0],
+                    roomType: item.roomType ?? null,
+                  },
+                };
+              }
+              return item;
+            }),
         }),
       });
       const body = await response.json().catch(() => ({}));
@@ -514,10 +570,15 @@ export default function TripsPage() {
               <div
                 key={index}
                 style={{
+                  display: "grid", gap: 8,
+                  border: `1px solid ${T.border}`, borderRadius: 11, padding: 10, background: "var(--panel-bg)",
+                }}
+              >
+              <div
+                style={{
                   display: "grid",
                   gridTemplateColumns: isTablet ? "minmax(0,1fr)" : "150px minmax(0,1fr) 150px 110px 110px 70px auto",
                   gap: 8, alignItems: "end",
-                  border: `1px solid ${T.border}`, borderRadius: 11, padding: 10, background: "var(--panel-bg)",
                 }}
               >
                 <Field label="Service">
@@ -527,9 +588,15 @@ export default function TripsPage() {
                       const next = e.target.value;
                       // The two kinds of row describe themselves differently, so
                       // the description does not survive the change.
-                      patchItem(index, next === "FLIGHT"
-                        ? { productType: next, title: sectorTitle(item.from, item.to, Boolean(returnDate)) }
-                        : { productType: next, from: "", to: "", title: "" });
+                      /* Each shape of row describes itself differently, so
+                         nothing carries over from the last one. */
+                      if (next === "FLIGHT") {
+                        patchItem(index, { productType: next, nights: undefined, roomType: undefined, title: sectorTitle(item.from, item.to, isRoundTrip(item.leg, returnDate)) });
+                      } else if (next === "HOTEL") {
+                        patchItem(index, { productType: next, from: "", to: "", leg: undefined, title: "" });
+                      } else {
+                        patchItem(index, { productType: next, from: "", to: "", leg: undefined, nights: undefined, roomType: undefined, title: "" });
+                      }
                     }}
                     style={cell}
                   >
@@ -545,7 +612,7 @@ export default function TripsPage() {
                         value={item.from || ""}
                         placeholder="Faisalabad"
                         onChange={(code) =>
-                          patchItem(index, { from: code, title: sectorTitle(code, item.to, Boolean(returnDate)) })
+                          patchItem(index, { from: code, title: sectorTitle(code, item.to, isRoundTrip(item.leg, returnDate)) })
                         }
                       />
                     </Field>
@@ -555,14 +622,54 @@ export default function TripsPage() {
                         value={item.to || ""}
                         placeholder="Jeddah"
                         onChange={(code) =>
-                          patchItem(index, { to: code, title: sectorTitle(item.from, code, Boolean(returnDate)) })
+                          patchItem(index, { to: code, title: sectorTitle(item.from, code, isRoundTrip(item.leg, returnDate)) })
                         }
                       />
                     </Field>
                   </div>
+                ) : item.productType === "HOTEL" ? (
+                  /* A room is a length of stay and a number of beds. Typed into
+                     a description box that is a string nobody can price, count
+                     into a rooming list, or compare against what the hotel
+                     invoiced. */
+                  <div style={{ display: "grid", gridTemplateColumns: "minmax(0,1fr) minmax(0,1fr)", gap: 8, minWidth: 0 }}>
+                    <Field label="Stay" required>
+                      <div style={{ display: "grid", gridTemplateColumns: "minmax(0,62px) minmax(0,1fr)", gap: 6, minWidth: 0 }}>
+                        <input
+                          type="number"
+                          min={1}
+                          value={item.nights || ""}
+                          placeholder="4"
+                          onChange={(e) => {
+                            const nights = Number(e.target.value) || 0;
+                            patchItem(index, { nights, title: stayTitle(nights, item.stayUnit, item.roomType) });
+                          }}
+                          style={{ ...cell, textAlign: "right" }}
+                          className="fl-in"
+                        />
+                        <select
+                          value={item.stayUnit || STAY_UNITS[0]}
+                          onChange={(e) => patchItem(index, { stayUnit: e.target.value, title: stayTitle(item.nights, e.target.value, item.roomType) })}
+                          style={cell}
+                        >
+                          {STAY_UNITS.map((unit) => <option key={unit} value={unit}>{unit}</option>)}
+                        </select>
+                      </div>
+                    </Field>
+                    <Field label="Room">
+                      <select
+                        value={item.roomType || ""}
+                        onChange={(e) => patchItem(index, { roomType: e.target.value, title: stayTitle(item.nights, item.stayUnit, e.target.value) })}
+                        style={cell}
+                      >
+                        <option value="">Room type…</option>
+                        {ROOM_TYPES.map((room) => <option key={room} value={room}>{room}</option>)}
+                      </select>
+                    </Field>
+                  </div>
                 ) : (
                   <Field label="Description" required>
-                    <input value={item.title} onChange={(e) => patchItem(index, { title: e.target.value })} placeholder="Rove Downtown, 4 nights" style={cell} className="fl-in" />
+                    <input value={item.title} onChange={(e) => patchItem(index, { title: e.target.value })} placeholder="Airport transfer, Jeddah" style={cell} className="fl-in" />
                   </Field>
                 )}
                 <Field label="Supplier">
@@ -570,6 +677,8 @@ export default function TripsPage() {
                     compact
                     value={item.supplierName}
                     options={suppliers}
+                    kind={TRAVEL_SUPPLIER_KIND[item.productType]}
+                    kindLabel={TRAVEL_SUPPLIER_KIND[item.productType] ? partyKindHeading(TRAVEL_SUPPLIER_KIND[item.productType]) : undefined}
                     placeholder={suppliers.length ? "Pick or type" : "Who bills you"}
                     onChange={(name) => patchItem(index, { supplierName: name })}
                   />
@@ -595,6 +704,29 @@ export default function TripsPage() {
                 >
                   Remove
                 </button>
+              </div>
+
+              {/* Offered only where there is a way home to book and this row is
+                  still carrying it. Splitting sets the row to the outbound leg,
+                  so the offer disappears once it has been taken. */}
+              {item.productType === "FLIGHT" && returnDate && !item.leg && item.from && item.to ? (
+                <button
+                  type="button"
+                  onClick={() => addReturnLeg(index)}
+                  style={{
+                    justifySelf: "start", border: "none", background: "transparent", color: T.accent,
+                    fontSize: 11.5, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", padding: "2px 0",
+                  }}
+                >
+                  + Book the return {item.to} → {item.from} separately
+                </button>
+              ) : null}
+
+              {item.leg ? (
+                <div style={{ fontSize: 10.5, color: T.muted, letterSpacing: ".04em", textTransform: "uppercase", fontWeight: 700 }}>
+                  {item.leg === "OUT" ? `Going out · ${travelDate || "date on the trip"}` : `Coming back · ${returnDate || "date on the trip"}`}
+                </div>
+              ) : null}
               </div>
             ))}
 

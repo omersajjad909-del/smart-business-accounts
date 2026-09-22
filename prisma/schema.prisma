@@ -19,6 +19,11 @@ model Account {
   type          String
   parentId      String?
   partyType     String?
+  /* Which sort of party, in the trade's own words — "Hotel", "Airline /
+     Consolidator". partyType says which side of the ledger they sit on, which
+     is all the accounting needs; it cannot tell a hotel from an airline, so a
+     booking screen asking for a hotel had to offer every payable on file. */
+  partyKind     String?
   inventoryTxns InventoryTxn[]
 
   city        String?

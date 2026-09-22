@@ -20,7 +20,8 @@ import { useResponsive } from "@/hooks/useResponsive";
 import { useCurrency } from "@/lib/useCurrency";
 import { confirmToast, alertToast } from "@/lib/toast-feedback";
 import { useBusinessRecords, type BusinessRecord } from "@/lib/useBusinessRecords";
-import { Field, GhostButton, PartyInput, PrimaryButton, T, ff, flightCss, inputStyle } from "../_flight/ui";
+import { Field, GhostButton, PartyInput, PrimaryButton, T, ff, flightCss, inputStyle, readParties, type PartyChoice } from "../_flight/ui";
+import { TRAVEL_SUPPLIER_KIND, partyKindHeading } from "@/lib/partyVocabulary";
 
 type Component = {
   productType: string;
@@ -75,14 +76,14 @@ export default function PackagesPage() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   /* Same list, same reason as the trip builder. */
-  const [suppliers, setSuppliers] = useState<string[]>([]);
+  const [suppliers, setSuppliers] = useState<PartyChoice[]>([]);
 
   useEffect(() => {
     fetch("/api/accounts?partyType=SUPPLIER", { cache: "no-store" })
       .then((r) => (r.ok ? r.json() : []))
       .then((rows) => {
         if (!Array.isArray(rows)) return;
-        setSuppliers(rows.map((a: { name?: unknown }) => String(a?.name || "")).filter(Boolean).sort());
+        setSuppliers(readParties(rows));
       })
       .catch(() => {});
   }, []);
@@ -243,6 +244,8 @@ export default function PackagesPage() {
                     compact
                     value={row.supplierName}
                     options={suppliers}
+                    kind={TRAVEL_SUPPLIER_KIND[row.productType]}
+                    kindLabel={TRAVEL_SUPPLIER_KIND[row.productType] ? partyKindHeading(TRAVEL_SUPPLIER_KIND[row.productType]) : undefined}
                     placeholder={suppliers.length ? "Pick or type" : "Who bills you"}
                     onChange={(name) => patch(index, { supplierName: name })}
                   />

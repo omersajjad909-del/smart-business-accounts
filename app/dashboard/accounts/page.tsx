@@ -66,12 +66,13 @@ type Account = {
   province?: string | null; country?: string | null;
   bankIban?: string | null; description?: string | null;
   parentId?: string | null;
+  partyKind?: string | null;
   openDebit?: number; openCredit?: number;
   openDate?: string; creditDays?: number; creditLimit?: number;
 };
 
 const EMPTY_FORM = {
-  code: "", name: "", partyType: "CUSTOMER",
+  code: "", name: "", partyType: "CUSTOMER", partyKind: "",
   city: "", phone: "", email: "", address: "", province: "", country: "",
   ntn: "", strn: "", bankIban: "", description: "",
   parentId: "",
@@ -193,7 +194,7 @@ export default function ChartOfAccounts() {
     const cat = isTradeWord ? partySideFor(businessType, chosenLabel) : raw;
     setPartyLabel(chosenLabel);
 
-    if (editingId) { f("partyType", cat); return; }
+    if (editingId) { setForm(p => ({ ...p, partyType: cat, partyKind: chosenLabel })); return; }
     const prefix = PREFIX_MAP[cat] || "ACC";
     const user = getCurrentUser();
     try {
@@ -201,9 +202,9 @@ export default function ChartOfAccounts() {
         headers: { "x-user-role": user?.role || "", "x-company-id": user?.companyId || "" },
       });
       const data = await res.json();
-      setForm(p => ({ ...p, partyType: cat, code: data.nextCode || p.code }));
+      setForm(p => ({ ...p, partyType: cat, partyKind: chosenLabel, code: data.nextCode || p.code }));
     } catch {
-      f("partyType", cat);
+      setForm(p => ({ ...p, partyType: cat, partyKind: chosenLabel }));
     }
   }
 
@@ -245,9 +246,11 @@ export default function ChartOfAccounts() {
 
   function handleEdit(a: Account) {
     setEditingId(a.id);
+    setPartyLabel(a.partyKind || "");
     setForm({
       code: a.code, name: a.name,
       partyType: a.partyType || "GENERAL",
+      partyKind: a.partyKind || "",
       city: a.city || "", phone: a.phone || "", email: a.email || "",
       address: a.address || "", ntn: a.ntn || "", strn: a.strn || "",
       province: a.province || "", country: a.country || "",
@@ -262,7 +265,7 @@ export default function ChartOfAccounts() {
 
   // Back to a blank party, but still in the company's own country — entering
   // ten local customers in a row should not mean picking Pakistan ten times.
-  function resetForm() { setEditingId(null); setForm({ ...EMPTY_FORM, country: companyCountry }); }
+  function resetForm() { setEditingId(null); setPartyLabel(""); setForm({ ...EMPTY_FORM, country: companyCountry }); }
 
   const filtered = accounts.filter(a => {
     const matchTab = activeTab === "ALL" || a.partyType === activeTab;
