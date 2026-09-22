@@ -110,6 +110,36 @@ export async function POST(req: NextRequest) {
       }
     } catch {}
 
+    // Admin-set PKR-native prices — the same PKR_PLAN_CONFIG row /api/public/pricing
+    // serves, and therefore the same figure /pricing and the payment page put on
+    // screen for a Pakistani visitor.
+    //
+    // Safepay used to charge usdToPkr(planBasePerMonth) instead, which is the
+    // international list price run through FX. Those are not the same number and
+    // never were: Starter shows as Rs 4,999 and was charged at Rs 13,720,
+    // Enterprise shows as Rs 24,999 and was charged at Rs 69,720. The payment page
+    // had already been fixed to stop displaying the FX figure; the charge had not,
+    // so the mismatch simply moved out of sight.
+    let pkrPlanPricing: Record<string, { monthly: number; yearly: number }> | null = null;
+    try {
+      const pkrLatest = await prisma.activityLog.findFirst({
+        where: { action: "PKR_PLAN_CONFIG" },
+        orderBy: { createdAt: "desc" },
+        select: { details: true },
+      });
+      const pkr = pkrLatest?.details ? JSON.parse(pkrLatest.details)?.pricing : null;
+      if (pkr) {
+        // `yearly` is stored per-month and displayed as an annual total — the ×12
+        // happens in /api/public/pricing, so it has to happen here too or a yearly
+        // plan is charged one month's worth.
+        pkrPlanPricing = {
+          starter:    { monthly: Number(pkr.starter?.monthly    ?? 4999),  yearly: Number(pkr.starter?.yearly    ?? 3999)  * 12 },
+          pro:        { monthly: Number(pkr.pro?.monthly        ?? 9999),  yearly: Number(pkr.pro?.yearly        ?? 7999)  * 12 },
+          enterprise: { monthly: Number(pkr.enterprise?.monthly ?? 24999), yearly: Number(pkr.enterprise?.yearly ?? 19999) * 12 },
+        };
+      }
+    } catch {}
+
     // Rupee totals are converted to USD once, at the end, because Lemon Squeezy
     // settles in USD. Same table the pricing pages display from, so the figure
     // charged tracks the figure quoted.
@@ -210,9 +240,68 @@ export async function POST(req: NextRequest) {
     // populated while production runs against sandbox credentials — see
     // isSafepayAllowedForCompany.
     if (isPkrCustomer && isSafepayCheckoutEnabled() && isSafepayAllowedForCompany(companyId)) {
-      const base      = getRuntimeAppUrl(req.nextUrl.origin);
-      const amountPkr = usdToPkr(finalCustomPrice > 0 ? finalCustomPrice : planBasePerMonth);
-      const orderId   = `fnv-${companyId}-${Date.now()}`;
+      const base = getRuntimeAppUrl(req.nextUrl.origin);
+
+      // ── What this customer actually owes, in rupees ──
+      //
+      // Priority is the PKR-native table, because that is the number on screen.
+      // The FX path survives only as a fallback for plans the table does not
+      // cover (CUSTOM, add-ons), where the displayed figure is FX-derived too and
+      // the two therefore still agree.
+      const pkrKey =
+        planCode === "PRO" || planCode === "PROFESSIONAL" ? "pro"
+        : planCode === "ENTERPRISE"                       ? "enterprise"
+        : planCode === "STARTER"                          ? "starter"
+        : null;
+      const pkrRow      = pkrKey ? pkrPlanPricing?.[pkrKey] : null;
+      const pkrBasePrice = pkrRow
+        ? (billingCycle === "YEARLY" ? pkrRow.yearly : pkrRow.monthly)
+        : null;
+
+      // Extra seats have no PKR-native rate, so they stay on FX. They are added
+      // after the discount because the coupon applies to the plan, which is how
+      // the payment page reads it too.
+      const seatsPkr = seatAddonCycleAmount > 0 ? usdToPkr(seatAddonCycleAmount) : 0;
+
+      // The coupon has to be applied here. Lemon Squeezy redeems the code on its
+      // own side, so the branch below just forwards it — Safepay has no such
+      // notion, and this branch returns long before the redemption block at the
+      // bottom of this route ever runs. A Pakistani buyer entering LAUNCH50 was
+      // shown the discounted total and then charged the full one.
+      let discountPkr = 0;
+      let appliedCoupon: { id: string; type: string; value: number } | null = null;
+      if (couponCode && pkrBasePrice !== null) {
+        try {
+          const coupon = await prisma.coupon.findUnique({ where: { code: couponCode } });
+          const planSlug = pkrKey;
+          const usable =
+            coupon &&
+            coupon.active &&
+            (!coupon.expiresAt || coupon.expiresAt >= new Date()) &&
+            (!coupon.maxUses || coupon.usedCount < coupon.maxUses) &&
+            (!coupon.applicableTo || coupon.applicableTo === planSlug);
+          if (usable && coupon) {
+            // Same arithmetic the payment page displays with — including that a
+            // `fixed` value is subtracted from the rupee figure as-is, not run
+            // through FX first. Diverging here would put the old mismatch back.
+            discountPkr =
+              coupon.type === "percent"
+                ? (pkrBasePrice * Number(coupon.value)) / 100
+                : Number(coupon.value);
+            discountPkr = Math.min(Math.max(0, discountPkr), pkrBasePrice);
+            appliedCoupon = { id: coupon.id, type: coupon.type, value: Number(coupon.value) };
+          }
+        } catch { /* a coupon lookup must never cost the sale */ }
+      }
+
+      // Not rounded to whole rupees: a 50% coupon on Rs 3,999 is Rs 1,999.5, and
+      // the payment page prints exactly that. pkrToPaisa rounds at the paisa, which
+      // is the only place rounding belongs.
+      const amountPkr = pkrBasePrice !== null
+        ? Math.max(0, pkrBasePrice - discountPkr) + seatsPkr
+        : usdToPkr(finalCustomPrice > 0 ? finalCustomPrice : planBasePerMonth);
+
+      const orderId = `fnv-${companyId}-${Date.now()}`;
 
       const checkout = await createSafepayCheckout({
         orderId,
@@ -239,6 +328,12 @@ export async function POST(req: NextRequest) {
             orderId,
             tracker: checkout.tracker,
             amountPkr,
+            // Kept so a disputed charge can be reconstructed without guessing
+            // which price table or coupon was in force at the time.
+            pkrBasePrice,
+            discountPkr,
+            couponCode: appliedCoupon ? couponCode : null,
+            seatsPkr,
             displayCurrency: "PKR",
             displayCountry:  "PK",
             baseCycleAmount,
@@ -246,6 +341,21 @@ export async function POST(req: NextRequest) {
           }),
         },
       }).catch(() => {});
+
+      // Redeemed here rather than at the bottom of the route, which this branch
+      // never reaches. Recorded at checkout creation, matching what the Lemon
+      // Squeezy path does.
+      if (appliedCoupon) {
+        await prisma.$transaction([
+          prisma.couponRedemption.create({
+            data: { couponId: appliedCoupon.id, userId: userId || null, companyId },
+          }),
+          prisma.coupon.update({
+            where: { id: appliedCoupon.id },
+            data: { usedCount: { increment: 1 } },
+          }),
+        ]).catch(() => {});
+      }
 
       return apiOk({
         url:      checkout.checkoutUrl,
