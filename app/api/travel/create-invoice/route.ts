@@ -30,6 +30,22 @@ export async function POST(req: NextRequest) {
         reused: true,
       });
     }
+    /* A record that belongs to a trip is invoiced by the trip, never here.
+
+       The trip already carries this service as one of its lines and bills the
+       whole journey on one invoice. Raising a second invoice from the desk
+       would charge the customer for the same flight twice — and the desk has
+       no way of knowing the trip exists unless it is told, so it is told. */
+    if (existingData.bookingNo) {
+      return NextResponse.json(
+        {
+          error: `This is on trip ${String(existingData.bookingNo)}. Raise the invoice from the trip so the whole journey is billed once.`,
+          bookingId: existingData.bookingId ? String(existingData.bookingId) : null,
+          bookingNo: String(existingData.bookingNo),
+        },
+        { status: 409 },
+      );
+    }
     if (!source.customerName) {
       return NextResponse.json({ error: "Passenger or applicant name is required before invoicing" }, { status: 400 });
     }

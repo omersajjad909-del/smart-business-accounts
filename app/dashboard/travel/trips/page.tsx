@@ -75,6 +75,7 @@ type Trip = {
   marginTotal: number;
   quotationNo: string | null;
   invoiceNo: string | null;
+  invoiceId: string | null;
   items: Item[];
   travelers: { travelerId: string; role: string }[];
 };
@@ -140,6 +141,12 @@ export default function TripsPage() {
   const [items, setItems] = useState<Item[]>([emptyItem()]);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
+
+  /* The flight line waiting for its PNR, and what has been typed for it. */
+  const [issuing, setIssuing] = useState<{ trip: Trip; item: Item } | null>(null);
+  const [pnr, setPnr] = useState("");
+  const [ticketNumbers, setTicketNumbers] = useState("");
+  const [issueBusy, setIssueBusy] = useState(false);
 
   /* Desk records with a price on them that nobody has put on a trip yet. */
   const [attachTo, setAttachTo] = useState<Trip | null>(null);
@@ -406,6 +413,43 @@ export default function TripsPage() {
     }
   }
 
+  /* The flight on the trip becomes a ticket on the tickets desk, and the two
+     are linked so the journey is still billed once. The passengers come from
+     the travellers already on the trip; only the PNR has to be typed, because
+     only the airline knows it. */
+  async function issueTicket() {
+    if (!issuing || !pnr.trim()) return;
+    setIssueBusy(true);
+    setError("");
+    try {
+      const response = await fetch("/api/travel/trip-ticket", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          bookingId: issuing.trip.id,
+          itemId: issuing.item.id,
+          pnr: pnr.trim(),
+          ticketNumbers: ticketNumbers.trim(),
+        }),
+      });
+      const body = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(body?.error || "Could not issue the ticket");
+      alertToast(
+        `${body.bookingRef} — PNR ${body.pnr}${body.passengers ? ` for ${body.passengers} passenger${body.passengers === 1 ? "" : "s"}` : ""}. It is on the Airline Tickets desk and stays on this trip.`,
+        "success",
+        body.reused ? "Already Ticketed" : "Ticket Issued",
+      );
+      setIssuing(null);
+      setPnr("");
+      setTicketNumbers("");
+      await load();
+    } catch (issueError) {
+      setError(issueError instanceof Error ? issueError.message : "Could not issue the ticket");
+    } finally {
+      setIssueBusy(false);
+    }
+  }
+
   async function setStatus(trip: Trip, status: string) {
     await fetch("/api/travel/bookings", {
       method: "PUT",
@@ -459,6 +503,50 @@ export default function TripsPage() {
           </div>
         ))}
       </div>
+
+      {issuing ? (
+        <section style={{ background: T.card, border: `1px solid var(--accent)`, borderRadius: 16, padding: 18, marginBottom: 18, display: "grid", gap: 14 }}>
+          <div style={{ display: "flex", justifyContent: "space-between", gap: 12, flexWrap: "wrap", alignItems: "flex-start" }}>
+            <div style={{ minWidth: 0 }}>
+              <div style={{ fontSize: 15, fontWeight: 800, color: T.text }}>
+                Issue the ticket for {issuing.item.title || "this flight"}
+              </div>
+              <div style={{ fontSize: 12, color: T.muted, marginTop: 3, lineHeight: 1.5 }}>
+                This puts the flight on the Airline Tickets desk with the travellers already on{" "}
+                {issuing.trip.bookingNo}, and keeps the two linked — the journey is still invoiced once, from the trip.
+                Only the PNR has to be typed, because only the airline knows it.
+              </div>
+            </div>
+            <GhostButton onClick={() => setIssuing(null)}>Close</GhostButton>
+          </div>
+
+          <div style={{ display: "grid", gridTemplateColumns: isMobile ? "minmax(0,1fr)" : "minmax(0,160px) minmax(0,1fr) auto", gap: 12, alignItems: "end" }}>
+            <Field label="PNR" required hint="What the airline issued">
+              <input
+                autoFocus
+                value={pnr}
+                onChange={(e) => setPnr(e.target.value.toUpperCase())}
+                onKeyDown={(e) => { if (e.key === "Enter" && pnr.trim()) issueTicket(); }}
+                placeholder="A1B2C3"
+                style={cell}
+                className="fl-in"
+              />
+            </Field>
+            <Field label="Ticket numbers" hint="Optional — one per passenger, comma separated">
+              <input
+                value={ticketNumbers}
+                onChange={(e) => setTicketNumbers(e.target.value)}
+                placeholder="214-1234567890, 214-1234567891"
+                style={cell}
+                className="fl-in"
+              />
+            </Field>
+            <PrimaryButton onClick={issueTicket} disabled={issueBusy || !pnr.trim()}>
+              {issueBusy ? "Issuing…" : "Issue ticket"}
+            </PrimaryButton>
+          </div>
+        </section>
+      ) : null}
 
       {attachTo ? (
         <section style={{ background: T.card, border: `1px solid var(--accent)`, borderRadius: 16, padding: 18, marginBottom: 18, display: "grid", gap: 14 }}>
@@ -825,6 +913,22 @@ export default function TripsPage() {
                           linked
                         </span>
                       ) : null}
+                      {/* A flight nobody has ticketed yet. The trip says what
+                          was sold; this is what the airline issued against it. */}
+                      {item.productType === "FLIGHT" && item.id && !item.sourceRecordId ? (
+                        <button
+                          type="button"
+                          onClick={() => { setIssuing({ trip, item }); setPnr(""); setTicketNumbers(""); }}
+                          title="Record the PNR and put this flight on the Airline Tickets desk"
+                          style={{
+                            border: `1px solid ${T.accent}55`, background: "var(--accent-soft)", color: T.accent,
+                            borderRadius: 999, padding: "2px 9px", fontSize: 10.5, fontWeight: 700,
+                            cursor: "pointer", fontFamily: "inherit",
+                          }}
+                        >
+                          Issue ticket
+                        </button>
+                      ) : null}
                       {money(item.sale * item.qty)}
                       <span style={{ color: (item.sale - item.cost) >= 0 ? "#34d399" : "#f87171" }}>
                         ({money((item.sale - item.cost) * item.qty)})
@@ -884,7 +988,7 @@ export default function TripsPage() {
                   )}
                   {trip.invoiceNo ? (
                     <a
-                      href={`/dashboard/sales-invoice?id=${encodeURIComponent(trip.id)}`}
+                      href={trip.invoiceId ? `/dashboard/sales-invoice?id=${encodeURIComponent(trip.invoiceId)}` : "/dashboard/sales-invoice"}
                       style={{
                         border: "1px solid rgba(52,211,153,.45)", background: "rgba(52,211,153,.14)",
                         color: "#34d399", borderRadius: 10, padding: "7px 13px", fontSize: 12,
