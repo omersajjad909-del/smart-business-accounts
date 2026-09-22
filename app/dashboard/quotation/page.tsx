@@ -40,6 +40,11 @@ type Quotation = {
   total: number;
   items: Array<{ item: { name: string; description?: string }; qty: number; rate: number }>;
   status: string;
+  /* Read back when the quotation is reopened. Left off the type, they were
+     left out of startEdit too, and saving then wrote the blanks back. */
+  validUntil?: string | null;
+  freight?: number | null;
+  remarks?: string | null;
 };
 
 type TaxConfig = {
@@ -332,8 +337,12 @@ export default function QuotationPage() {
     setCustomerId(q.customerId);
     setCustomerName(q.customer?.name || "");
     setDate(new Date(q.date).toISOString().slice(0, 10));
-    setFreight((q as any).freight || "");
-    setRemarks((q as any).remarks || "");
+    /* Valid Until was never read back, so opening a quotation and saving it
+       silently cleared the date it expires on — the one field a customer
+       chasing a price actually argues about. */
+    setValidUntil(q.validUntil ? new Date(q.validUntil).toISOString().slice(0, 10) : "");
+    setFreight(q.freight || "");
+    setRemarks(q.remarks || "");
     setRows(q.items.map((it: any) => ({
       itemId: it.itemId || "",
       name: it.item?.name || "",
@@ -408,6 +417,12 @@ export default function QuotationPage() {
           date: new Date(q.date).toISOString().slice(0, 10),
           customerId: q.customerId,
           status: "ACCEPTED",
+          /* Carried through deliberately. The update writes what it is handed
+             and clears what it is not, so marking a quotation ACCEPTED used to
+             take its freight, its remarks and its expiry date with it. */
+          validUntil: q.validUntil ? new Date(q.validUntil).toISOString().slice(0, 10) : null,
+          freight: q.freight || 0,
+          remarks: q.remarks || null,
           items: q.items.map((it: any) => ({
             itemId: it.itemId,
             qty: it.qty,
@@ -419,7 +434,12 @@ export default function QuotationPage() {
 
       await loadQuotations();
       toast.success(`Invoice ${invoiceData.invoiceNo} created successfully!`);
-      router.push(`/dashboard/sales-invoice`);
+      /* With the id, so the invoice that was just raised is the one that
+         opens. Without it the page came up on an empty form and the invoice
+         looked as though it had not been created. */
+      router.push(invoiceData.id
+        ? `/dashboard/sales-invoice?id=${encodeURIComponent(invoiceData.id)}`
+        : "/dashboard/sales-invoice");
     } catch (e: any) {
       toast.error("Conversion failed: " + (e.message || "Unknown error"));
     } finally {
@@ -538,8 +558,17 @@ export default function QuotationPage() {
                 </tr>
               ) : (
                 filteredQuotations.map(q => (
-                  <tr key={q.id} className="border-t hover:bg-gray-50">
-                    <td className="p-3 font-bold">{q.quotationNo}</td>
+                  /* The number is what people click, and it was plain text —
+                     so clicking a quotation did nothing at all and the next
+                     button pressed opened an empty form instead. The whole row
+                     opens it now; the buttons beside it keep their own jobs. */
+                  <tr
+                    key={q.id}
+                    onClick={() => startEdit(q)}
+                    className="border-t hover:bg-gray-50 cursor-pointer"
+                    title={`Open ${q.quotationNo}`}
+                  >
+                    <td className="p-3 font-bold text-blue-600 underline">{q.quotationNo}</td>
                     <td className="p-3">{fmtDate(q.date)}</td>
                     <td className="p-3">{q.customer?.name || "N/A"}</td>
                     <td className="p-3 text-right">{q.total.toLocaleString()}</td>
@@ -548,7 +577,7 @@ export default function QuotationPage() {
                         {q.status}
                       </span>
                     </td>
-                    <td className="p-3 text-center space-x-2">
+                    <td className="p-3 text-center space-x-2" onClick={(e) => e.stopPropagation()}>
                       <button
                         onClick={() => startEdit(q)}
                         className="text-blue-600 hover:text-blue-800 font-medium text-sm"

@@ -13,6 +13,7 @@
  */
 
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
 
 import { useResponsive } from "@/hooks/useResponsive";
 import { useCurrency } from "@/lib/useCurrency";
@@ -108,6 +109,7 @@ const emptyItem = (): Item => ({ productType: "FLIGHT", title: "", from: "", to:
 
 
 export default function TripsPage() {
+  const router = useRouter();
   const { isMobile, isTablet } = useResponsive();
   const symbol = useCurrency();
   const money = (n: number) => `${symbol}${Math.round(Number(n) || 0).toLocaleString()}`;
@@ -396,6 +398,9 @@ export default function TripsPage() {
         body.reused ? "Already Invoiced" : "Invoice Raised",
       );
       await load();
+      /* Open the invoice that was just raised. A toast naming it and a screen
+         that does not show it leaves the desk wondering whether it exists. */
+      if (body.invoiceId) router.push(`/dashboard/sales-invoice?id=${encodeURIComponent(body.invoiceId)}`);
     } catch (invoiceError) {
       setError(invoiceError instanceof Error ? invoiceError.message : "Could not raise the invoice");
     }
