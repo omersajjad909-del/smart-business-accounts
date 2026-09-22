@@ -309,7 +309,7 @@ export function AirportInput({
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(false);
   const [selected, setSelected] = useState<Airport | undefined>(() => airportCache.get(value));
-  const ref = useDismiss(open, () => setOpen(false));
+  const anchor = useRef<HTMLDivElement>(null);
 
   /* Whatever comes back is remembered, so the next box asking about the same
      airport costs nothing. */
@@ -359,7 +359,7 @@ export function AirportInput({
   }, [text, open]);
 
   return (
-    <div ref={ref} style={{ position: "relative" }}>
+    <div ref={anchor} style={{ position: "relative" }}>
       <div
         className="fl-in"
         onClick={() => { setOpen(true); setText(""); }}
@@ -405,8 +405,7 @@ export function AirportInput({
         )}
       </div>
 
-      {open ? (
-        <div style={{ ...popover, minWidth: 320, maxHeight: 320, overflowY: "auto" }} className="fl-scroll">
+      <Popover anchor={anchor} open={open} onClose={() => setOpen(false)} minWidth={320}>
           {matches.length ? (
             matches.map((airport) => (
               <button
@@ -449,8 +448,7 @@ export function AirportInput({
                 : `Suggestions — type a city, country or code to search all ${total.toLocaleString()} airports`}
             </div>
           ) : null}
-        </div>
-      ) : null}
+      </Popover>
     </div>
   );
 }
@@ -483,7 +481,7 @@ export function PartyInput({
 }) {
   const [open, setOpen] = useState(false);
   const [text, setText] = useState("");
-  const ref = useDismiss(open, () => setOpen(false));
+  const anchor = useRef<HTMLDivElement>(null);
 
   const needle = text.trim().toLowerCase();
   const matches = needle
@@ -498,7 +496,7 @@ export function PartyInput({
   }
 
   return (
-    <div ref={ref} style={{ position: "relative", minWidth: 0 }}>
+    <div ref={anchor} style={{ position: "relative", minWidth: 0 }}>
       <input
         className="fl-in"
         value={open ? text : value}
@@ -517,8 +515,7 @@ export function PartyInput({
         }}
       />
 
-      {open ? (
-        <div style={{ ...popover, minWidth: "100%", maxHeight: 240, overflowY: "auto" }} className="fl-scroll">
+      <Popover anchor={anchor} open={open} onClose={() => setOpen(false)} minWidth={0}>
           {matches.length ? (
             matches.map((name) => (
               <button
@@ -543,8 +540,7 @@ export function PartyInput({
                 : "No accounts on file yet — type the name and it will be created when the booking posts."}
             </div>
           )}
-        </div>
-      ) : null}
+      </Popover>
     </div>
   );
 }
@@ -586,10 +582,10 @@ function Stepper({
 
 export function PaxPicker({ value, onChange }: { value: PaxCounts; onChange: (next: PaxCounts) => void }) {
   const [open, setOpen] = useState(false);
-  const ref = useDismiss(open, () => setOpen(false));
+  const anchor = useRef<HTMLDivElement>(null);
 
   return (
-    <div ref={ref} style={{ position: "relative" }}>
+    <div ref={anchor} style={{ position: "relative" }}>
       <button
         type="button"
         onClick={() => setOpen((o) => !o)}
@@ -607,8 +603,7 @@ export function PaxPicker({ value, onChange }: { value: PaxCounts; onChange: (ne
         </span>
       </button>
 
-      {open ? (
-        <div style={{ ...popover, padding: 10, minWidth: 280 }}>
+      <Popover anchor={anchor} open={open} onClose={() => setOpen(false)} minWidth={280}>
           <Stepper label="Adults" hint="12 years and over" value={value.adults} min={1} max={9}
             onChange={(n) => onChange({ ...value, adults: n, infants: Math.min(value.infants, n) })} />
           <Stepper label="Children" hint="2 to 11 years" value={value.children} min={0} max={8}
@@ -630,8 +625,7 @@ export function PaxPicker({ value, onChange }: { value: PaxCounts; onChange: (ne
           >
             Done
           </button>
-        </div>
-      ) : null}
+      </Popover>
     </div>
   );
 }

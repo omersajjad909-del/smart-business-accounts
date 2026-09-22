@@ -140,13 +140,70 @@ function safepayError(step: string, response: Response, json: any): Error {
   return new Error(`Safepay ${step} failed (HTTP ${response.status}): ${detail}`);
 }
 
+// ─── Customer (Express Checkout, step 2) ─────────────────────────────────────
+
+/**
+ * Register the buyer with Safepay and hand back their customer token.
+ *
+ * Step 2 of
+ * https://safepay-docs.netlify.app/build-your-integration/express-checkout —
+ * optional in the sense that a checkout works without it, but it is what makes
+ * the hosted page arrive with the name and email already filled in, and it is
+ * the only legitimate source of the `user_id` the checkout URL takes. Before
+ * this existed we sent our own database user id there, which is not a Safepay
+ * token and means nothing to their side.
+ *
+ * `is_guest` is true because these buyers are not signing up for a Safepay
+ * account — they are paying once, through us.
+ *
+ * Deliberately non-fatal: a failure here costs a pre-filled form, not the sale,
+ * so it returns null and the checkout carries on without a customer token.
+ */
+export async function createSafepayCustomer(input: {
+  email?: string | null;
+  name?: string | null;
+  country?: string;
+}): Promise<string | null> {
+  if (!input.email) return null;
+
+  const parts = String(input.name || "").trim().split(/\s+/).filter(Boolean);
+  const firstName = parts[0] || String(input.email).split("@")[0];
+  const lastName  = parts.length > 1 ? parts.slice(1).join(" ") : "-";
+
+  try {
+    const res = await fetch(`${getBase()}/user/customers`, {
+      method:  "POST",
+      headers: authHeaders(),
+      body: JSON.stringify({
+        first_name: firstName,
+        last_name:  lastName,
+        email:      input.email,
+        country:    input.country || "PK",
+        is_guest:   true,
+      }),
+    });
+    const json = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      console.warn("[safepay] customer create failed — continuing without prefill:",
+        json?.status?.message || json?.message || res.status);
+      return null;
+    }
+    const token = json?.data?.token || json?.data?.customer?.token;
+    return token ? String(token) : null;
+  } catch (err) {
+    console.warn("[safepay] customer create errored — continuing without prefill:", err);
+    return null;
+  }
+}
+
 // ─── Create checkout session ──────────────────────────────────────────────────
 
 /**
  * Express Checkout, as documented at
  * https://safepay-docs.netlify.app/build-your-integration/express-checkout
  *
- * Three calls, in order, and all three are load-bearing:
+ * Four calls, in order:
+ *   0. POST /user/customers           → customer token (optional; prefill only)
  *   1. POST /order/payments/v3/       → tracker token
  *   2. POST /client/passport/v1/token → time-based token (tbt)
  *   3. build the /embedded/ URL carrying both
@@ -159,6 +216,13 @@ export async function createSafepayCheckout(input: SafepayCheckoutInput): Promis
   const apiKey = env("SAFEPAY_API_KEY");
   if (!apiKey) throw new Error("Safepay is not configured.");
   if (!env("SAFEPAY_SECRET_KEY")) throw new Error("SAFEPAY_SECRET_KEY is not set.");
+
+  // ── 0. Customer ──
+  // Best-effort. Null here just means the buyer types their own details.
+  const customerToken = await createSafepayCustomer({
+    email: input.customerEmail,
+    name:  input.customerName,
+  });
 
   // ── 1. Payment session ──
   //
@@ -185,6 +249,10 @@ export async function createSafepayCheckout(input: SafepayCheckoutInput): Promis
     entry_mode:       "raw",
     currency:         "PKR",
     amount:           pkrToPaisa(input.amountPkr),
+    // Ties the session to the customer record so the hosted page knows who is
+    // paying. Omitted entirely when there is no token — sending `user: null`
+    // is not the same as not sending it.
+    ...(customerToken ? { user: customerToken } : {}),
     metadata: {
       order_id: input.orderId,
       source:   "finovaos",
@@ -229,7 +297,9 @@ export async function createSafepayCheckout(input: SafepayCheckoutInput): Promis
     order_id:     input.orderId,
     redirect_url: input.successUrl,
     cancel_url:   input.cancelUrl,
-    ...(input.userId ? { user_id: input.userId } : {}),
+    // Safepay's customer token from step 0 — NOT input.userId, which is our own
+    // database id and is meaningless to Safepay.
+    ...(customerToken ? { user_id: customerToken } : {}),
   });
   const checkoutUrl = `${getCheckoutBase()}?${params.toString()}`;
 
