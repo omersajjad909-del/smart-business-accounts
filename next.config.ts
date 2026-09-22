@@ -35,6 +35,20 @@ const nextConfig: NextConfig = {
     // into per-module imports at build time, so pages only ship the specific
     // icons/chart pieces they actually use instead of the whole package graph.
     optimizePackageImports: ["lucide-react", "recharts"],
+
+    /* The Vercel build container is 8 GB, and the build was being killed by the
+       kernel rather than failing on its own — the signature of a process that
+       grew past what the box had. Two settings keep it inside:
+
+       webpackMemoryOptimizations trades a little compile time for a smaller
+       peak heap, which is the trade worth making on a box this size.
+
+       memoryBasedWorkersCount decides how many compile workers to spawn from
+       the memory actually available instead of from the core count. Two cores
+       meant two workers, each free to grow to whatever the heap cap allowed,
+       and two of those did not fit in 8 GB at once. */
+    webpackMemoryOptimizations: true,
+    memoryBasedWorkersCount: true,
   },
   async redirects() {
     return [
