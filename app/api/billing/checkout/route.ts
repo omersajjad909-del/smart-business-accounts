@@ -5,7 +5,7 @@ import { apiError, apiOk } from "@/lib/apiError";
 import { getRuntimeAppUrl } from "@/lib/domains";
 import { resolvePricingRegion } from "@/lib/geoCountry";
 import { createLemonCheckout, hasLemonSqueezyConfig } from "@/lib/lemonsqueezy";
-import { createSafepayCheckout, isSafepayCheckoutEnabled, usdToPkr } from "@/lib/safepay";
+import { createSafepayCheckout, isSafepayAllowedForCompany, isSafepayCheckoutEnabled, usdToPkr } from "@/lib/safepay";
 import { getCompanyExtraSeats } from "@/lib/companySeatLimit";
 import { getCustomPlanCycleAmountUsd, getModuleRate, parseCustomModules } from "@/lib/customPlanPricing";
 import { FX_USD } from "@/lib/currency";
@@ -206,7 +206,10 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    if (isPkrCustomer && isSafepayCheckoutEnabled()) {
+    // The allow-list is normally empty and lets everyone through. It is only
+    // populated while production runs against sandbox credentials — see
+    // isSafepayAllowedForCompany.
+    if (isPkrCustomer && isSafepayCheckoutEnabled() && isSafepayAllowedForCompany(companyId)) {
       const base      = getRuntimeAppUrl(req.nextUrl.origin);
       const amountPkr = usdToPkr(finalCustomPrice > 0 ? finalCustomPrice : planBasePerMonth);
       const orderId   = `fnv-${companyId}-${Date.now()}`;

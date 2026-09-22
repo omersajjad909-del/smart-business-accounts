@@ -85,6 +85,34 @@ export function isSafepayCheckoutEnabled() {
   return hasSafepayConfig() && env("SAFEPAY_CHECKOUT_ENABLED").toLowerCase() === "true";
 }
 
+/**
+ * Which companies Safepay is allowed to take to checkout.
+ *
+ * Empty (the default) means everyone in Pakistan, which is the shape this is
+ * meant to end up in. It exists for the window where SAFEPAY_CHECKOUT_ENABLED
+ * is true on production while SAFEPAY_ENVIRONMENT is still "sandbox" — testing
+ * the live deployment against test money.
+ *
+ * That window is not harmless. The webhook handler has no environment guard: a
+ * sandbox `payment.succeeded` is signed with the same secret the deployment
+ * holds, so it verifies and activates a plan on the production database. A real
+ * customer who upgrades during that window gets their plan switched on for
+ * free, and nothing about it looks like an error afterwards.
+ *
+ * Setting SAFEPAY_TEST_COMPANY_IDS to a comma-separated list closes the window
+ * to everyone but the tester. Everybody else keeps checking out through Lemon
+ * Squeezy exactly as before. Clear the variable once the account is live and
+ * SAFEPAY_ENVIRONMENT says production.
+ */
+export function isSafepayAllowedForCompany(companyId: string): boolean {
+  const allowList = env("SAFEPAY_TEST_COMPANY_IDS")
+    .split(",")
+    .map(s => s.trim())
+    .filter(Boolean);
+  if (!allowList.length) return true;
+  return allowList.includes(String(companyId || "").trim());
+}
+
 // ─── Money ────────────────────────────────────────────────────────────────────
 // Safepay represents every amount in the currency's minor unit: PKR in paisa,
 // USD in cents. Sending rupees where paisa were expected undercharges by 100x
