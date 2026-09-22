@@ -112,6 +112,9 @@ export type SafepayCheckoutInput = {
   cancelUrl: string;
   customerEmail?: string | null;
   customerName?: string | null;
+  // Safepay refuses a customer record without one, so prefill stays off until
+  // there is a real number to send.
+  customerPhone?: string | null;
 };
 
 export type SafepayCheckoutResult = {
@@ -156,29 +159,48 @@ function safepayError(step: string, response: Response, json: any): Error {
  * `is_guest` is true because these buyers are not signing up for a Safepay
  * account — they are paying once, through us.
  *
+ * The path is /user/customers/v1/, not the /user/customers the docs print.
+ * That one answers 404 — read out of @sfpy/node-core's Customers/Object.js and
+ * confirmed against sandbox on 2026-09-22.
+ *
+ * `phone_number` is mandatory: omitting it is rejected with "the phone number
+ * supplied is not a number", not treated as absent. Neither Company nor User
+ * carries a phone today, so in practice this step is skipped and the buyer
+ * types their own details on Safepay's page — which is the documented fallback,
+ * since the whole customer step is optional. Start passing `phone` here the day
+ * we collect one and prefill starts working on its own.
+ *
  * Deliberately non-fatal: a failure here costs a pre-filled form, not the sale,
  * so it returns null and the checkout carries on without a customer token.
  */
 export async function createSafepayCustomer(input: {
   email?: string | null;
   name?: string | null;
+  phone?: string | null;
   country?: string;
 }): Promise<string | null> {
   if (!input.email) return null;
+
+  // Safepay wants digits, not a formatted string. Anything that does not survive
+  // that test would only earn a 400, so skip the call rather than log noise on
+  // every checkout.
+  const phone = String(input.phone || "").replace(/[^\d+]/g, "");
+  if (!phone || phone.replace(/\D/g, "").length < 10) return null;
 
   const parts = String(input.name || "").trim().split(/\s+/).filter(Boolean);
   const firstName = parts[0] || String(input.email).split("@")[0];
   const lastName  = parts.length > 1 ? parts.slice(1).join(" ") : "-";
 
   try {
-    const res = await fetch(`${getBase()}/user/customers`, {
+    const res = await fetch(`${getBase()}/user/customers/v1/`, {
       method:  "POST",
       headers: authHeaders(),
       body: JSON.stringify({
         first_name: firstName,
         last_name:  lastName,
-        email:      input.email,
-        country:    input.country || "PK",
+        email:        input.email,
+        phone_number: phone,
+        country:      input.country || "PK",
         is_guest:   true,
       }),
     });
@@ -222,6 +244,7 @@ export async function createSafepayCheckout(input: SafepayCheckoutInput): Promis
   const customerToken = await createSafepayCustomer({
     email: input.customerEmail,
     name:  input.customerName,
+    phone: input.customerPhone,
   });
 
   // ── 1. Payment session ──
