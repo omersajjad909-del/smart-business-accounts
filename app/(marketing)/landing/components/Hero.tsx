@@ -261,9 +261,11 @@ export default function Hero() {
                     </svg>
                   </Link>
                 )}
-                {/* Went straight to signup, skipping the pricing page entirely —
-                    so the "Launching Soon" buttons there never saw this visitor. */}
-                <Link href={signupHrefFor(signupsOpen, "/onboarding/signup/starter")} className={signupsOpen ? "cta-primary" : "cta-ghost"}>
+                {/* Sends to /pricing rather than straight into the Starter
+                    signup — a visitor clicking "Get Started" from the hero
+                    hasn't chosen a plan yet, and dropping them into Starter
+                    specifically skipped Pro/Enterprise entirely. */}
+                <Link href={signupHrefFor(signupsOpen, "/pricing")} className={signupsOpen ? "cta-primary" : "cta-ghost"}>
                   Get Started
                   {signupsOpen && (
                     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
