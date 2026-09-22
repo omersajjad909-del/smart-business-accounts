@@ -163,6 +163,10 @@ export function Segmented<T extends string>({
   );
 }
 
+/* React warns about useLayoutEffect on the server, and these controls are
+   server-rendered closed before they ever hydrate. */
+const useIsoLayoutEffect = typeof window === "undefined" ? useEffect : useLayoutEffect;
+
 /**
  * A panel that hangs off a control and is not clipped by anything.
  *
@@ -194,7 +198,7 @@ function Popover({
   const [box, setBox] = useState<{ top: number; left: number; width: number; above: boolean } | null>(null);
 
   // Measured before paint, so it never appears in the wrong place first.
-  useLayoutEffect(() => {
+  useIsoLayoutEffect(() => {
     if (!open) { setBox(null); return; }
 
     const place = () => {
@@ -250,6 +254,9 @@ function Popover({
       className="fl-scroll"
       style={{
         position: "fixed",
+        // Padding and border are inside the measured width, so the panel lines
+        // up with the control rather than sitting a few pixels wider than it.
+        boxSizing: "border-box",
         top: box?.top ?? -9999,
         left: box?.left ?? -9999,
         width: box?.width,
@@ -502,7 +509,11 @@ export function PartyInput({
         value={open ? text : value}
         placeholder={placeholder}
         onFocus={() => { setText(value); setOpen(true); }}
-        onChange={(event) => { setText(event.target.value); onChange(event.target.value); }}
+        /* Focus alone is not enough. Escape closes the list but leaves the
+           cursor in the box, and a second click on an already-focused field
+           fires no focus event — so the list would stay shut for good. */
+        onClick={() => { if (!open) { setText(value); setOpen(true); } }}
+        onChange={(event) => { setText(event.target.value); onChange(event.target.value); setOpen(true); }}
         onKeyDown={(event) => {
           if (event.key === "Enter") { event.preventDefault(); commit(text); }
           if (event.key === "Escape") setOpen(false);
