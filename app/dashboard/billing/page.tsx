@@ -586,6 +586,10 @@ function BillingPage() {
       body:JSON.stringify({
         planCode,
         successUrl:`${window.location.origin}/dashboard/billing?upgrade=success`,
+        // Sent explicitly, because the server's fallback is NEXT_PUBLIC_APP_URL —
+        // so a buyer who cancels on a local or preview build was thrown onto
+        // production mid-checkout.
+        cancelUrl:`${window.location.origin}/dashboard/billing?cancel=1`,
         billingCycle:cycle,
         customPrice: checkoutAmount,
       }),

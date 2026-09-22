@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { headers } from "next/headers";
 import { Toaster } from "react-hot-toast";
+import { prisma } from "@/lib/prisma";
 import "./globals.css";
 
 /**
@@ -199,7 +200,13 @@ export const viewport: Viewport = {
   ],
 };
 
-const softwareApplicationJsonLd = {
+// Built per-request (see buildSoftwareApplicationJsonLd below) rather than as
+// a static const, because aggregateRating can only be included honestly once
+// there is a real published review to back it — and that count changes as
+// customers submit them. See the same "claim only what the count backs up"
+// pattern in Testimonials.tsx.
+function buildSoftwareApplicationJsonLd(aggregateRating: { ratingValue: number; reviewCount: number } | null) {
+  return {
   "@context": "https://schema.org",
   "@type": "SoftwareApplication",
   "@id": `${BASE_URL}/#software`,
@@ -228,6 +235,17 @@ const softwareApplicationJsonLd = {
     priceCurrency: "USD",
     offerCount: "3",
   },
+  ...(aggregateRating && aggregateRating.reviewCount > 0
+    ? {
+        aggregateRating: {
+          "@type": "AggregateRating",
+          ratingValue: aggregateRating.ratingValue,
+          reviewCount: aggregateRating.reviewCount,
+          bestRating: 5,
+          worstRating: 1,
+        },
+      }
+    : {}),
   featureList: [
     "AI Business Health Score",
     "Ask AI — Natural Language Finance Queries",
@@ -255,7 +273,8 @@ const softwareApplicationJsonLd = {
     "Real Estate Accounting",
     "Clearing & Forwarding Management",
   ],
-};
+  };
+}
 
 const founderJsonLd = {
   "@context": "https://schema.org",
@@ -346,6 +365,16 @@ export default async function RootLayout({
   children: React.ReactNode;
 }) {
   const nonce = (await headers()).get("x-nonce") || undefined;
+
+  const reviewAgg = await prisma.testimonial
+    .aggregate({ where: { status: "PUBLISHED" }, _avg: { rating: true }, _count: true })
+    .catch(() => null);
+  const aggregateRating =
+    reviewAgg && reviewAgg._count > 0 && reviewAgg._avg.rating !== null
+      ? { ratingValue: Math.round(reviewAgg._avg.rating * 10) / 10, reviewCount: reviewAgg._count }
+      : null;
+  const softwareApplicationJsonLd = buildSoftwareApplicationJsonLd(aggregateRating);
+
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
