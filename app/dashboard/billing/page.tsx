@@ -363,6 +363,9 @@ function BillingPage() {
   const { isMobile } = useResponsive();
   const searchParams = useSearchParams();
   const upgraded = searchParams?.get("upgrade") === "success";
+  // Safepay appends ?tracker=<token> to redirect_url when it sends the buyer
+  // back. It is the only handle we have on the payment they just made.
+  const safepayTracker = String(searchParams?.get("tracker") || "").trim();
   const isRequired = searchParams?.get("required") === "1";
   const seatsAdded = searchParams?.get("seats") === "added";
   const seatsQtyParam = Number(searchParams?.get("qty") || "0");
@@ -399,12 +402,74 @@ function BillingPage() {
   // be quoted rather than the international USD figure.
   const [pkrPricing,        setPkrPricing]         = useState<PlanPricingMap | null>(null);
   const [isPkCompany,       setIsPkCompany]        = useState(false);
+  const [safepayCheck,      setSafepayCheck]       = useState<{ state:string; settled:boolean; planActive:boolean; amountPkr:number|null } | null>(null);
+  const [safepayGaveUp,     setSafepayGaveUp]      = useState(false);
 
   useEffect(() => {
     if (seatsAdded && seatsQtyParam > 0) {
       toast.success(`${seatsQtyParam} seat${seatsQtyParam > 1 ? "s" : ""} added successfully! Your team capacity has been expanded.`);
     }
   }, [seatsAdded, seatsQtyParam]);
+
+  /* ── Confirm the Safepay payment the buyer just made ──────────────────
+     Step 6 of Safepay's Express Checkout: ask them what happened rather than
+     assuming it from the fact that the browser came back. /api/billing/safepay/status
+     answers with their `settled` and our `planActive`, which is what tells
+     "paid, webhook is seconds behind" apart from "never paid at all".
+
+     Polled because the webhook is the only writer for money and it lands
+     asynchronously — usually within a few seconds of the redirect. Stops the
+     moment both sides agree, and gives up after ~60s rather than spinning
+     forever on an abandoned checkout. */
+  useEffect(() => {
+    if (!upgraded || !safepayTracker) return;
+    let cancelled = false;
+    let attempts = 0;
+
+    const u = getCurrentUser();
+    const h: Record<string,string> = {};
+    if (u?.role)      h["x-user-role"]  = u.role;
+    if (u?.id)        h["x-user-id"]    = u.id;
+    if (u?.companyId) h["x-company-id"] = u.companyId;
+
+    const poll = async () => {
+      if (cancelled) return;
+      attempts += 1;
+      try {
+        const r = await fetch(`/api/billing/safepay/status?tracker=${encodeURIComponent(safepayTracker)}`, {
+          cache:"no-store", headers:h, credentials:"include",
+        });
+        const j = await r.json().catch(() => ({}));
+        const d = j?.data || j;
+        if (!cancelled && r.ok && d?.state) {
+          setSafepayCheck({
+            state:     String(d.state),
+            settled:   Boolean(d.settled),
+            planActive: Boolean(d.planActive),
+            amountPkr: d.amountPkr ?? null,
+          });
+          if (d.settled && d.planActive) {
+            // The webhook has already written the row — reflect it here rather
+            // than making the customer refresh, and pull the invoice in so the
+            // receipt can print.
+            setSubscription(prev => prev ? { ...prev, status:"active" } : prev);
+            fetch("/api/billing/invoices", { cache:"no-store", headers:h, credentials:"include" })
+              .then(res => res.ok ? res.json() : null)
+              .then(data => { if (!cancelled && data?.invoices) setInvoices(data.invoices); })
+              .catch(() => {});
+            return;
+          }
+        }
+      } catch { /* network blip — the next tick retries */ }
+      if (!cancelled) {
+        if (attempts >= 20) setSafepayGaveUp(true);
+        else setTimeout(poll, 3000);
+      }
+    };
+
+    poll();
+    return () => { cancelled = true; };
+  }, [upgraded, safepayTracker]);
 
   useEffect(() => {
     (async () => {
@@ -742,21 +807,35 @@ function BillingPage() {
           on the real status instead. */}
       {showUpgradeBanner && (() => {
         const isReallyActive = ["active", "trialing"].includes(String(subscription?.status || "").toLowerCase());
-        const c       = isReallyActive ? "#34d399"                : "#fcd34d";
-        const bg      = isReallyActive ? "rgba(52,211,153,.08)"   : "rgba(251,191,36,.08)";
-        const border  = isReallyActive ? "rgba(52,211,153,.22)"   : "rgba(251,191,36,.24)";
-        const iconBg  = isReallyActive ? "rgba(52,211,153,.15)"   : "rgba(251,191,36,.14)";
+        // Safepay's own answer about this tracker, when there is one. It is the
+        // difference between a slow webhook and a payment that never happened —
+        // the amber "activating…" copy is a lie in the second case.
+        const paymentFailed = Boolean(safepayCheck && !safepayCheck.settled && safepayGaveUp);
+        const c       = isReallyActive ? "#34d399"                : paymentFailed ? "#fca5a5"             : "#fcd34d";
+        const bg      = isReallyActive ? "rgba(52,211,153,.08)"   : paymentFailed ? "rgba(239,68,68,.08)" : "rgba(251,191,36,.08)";
+        const border  = isReallyActive ? "rgba(52,211,153,.22)"   : paymentFailed ? "rgba(239,68,68,.28)" : "rgba(251,191,36,.24)";
+        const iconBg  = isReallyActive ? "rgba(52,211,153,.15)"   : paymentFailed ? "rgba(239,68,68,.15)" : "rgba(251,191,36,.14)";
         return (
           <div style={{ marginBottom:20, padding: isMobile ? "12px 10px" : "16px 20px", borderRadius:16, background:bg, border:`1.5px solid ${border}`, display:"flex", alignItems:"center", gap:14, animation:"fadeUp .4s ease" }}>
-            <div style={{ width:42, height:42, borderRadius:12, background:iconBg, display:"flex", alignItems:"center", justifyContent:"center", fontSize:22, flexShrink:0 }}>{isReallyActive ? "✅" : "⏳"}</div>
+            <div style={{ width:42, height:42, borderRadius:12, background:iconBg, display:"flex", alignItems:"center", justifyContent:"center", fontSize:22, flexShrink:0 }}>{isReallyActive ? "✅" : paymentFailed ? "⚠️" : "⏳"}</div>
             <div style={{ flex:1 }}>
               <div style={{ fontSize:15, fontWeight:800, color:c }}>
-                {isReallyActive ? "Plan activated successfully!" : "Payment received — activating your plan…"}
+                {isReallyActive
+                  ? "Plan activated successfully!"
+                  : paymentFailed
+                    ? "We could not confirm a payment"
+                    : safepayCheck?.settled
+                      ? "Payment confirmed by Safepay — activating your plan…"
+                      : "Payment received — activating your plan…"}
               </div>
               <div style={{ fontSize:12, color:c, opacity:.7, marginTop:2 }}>
                 {isReallyActive
                   ? "Your subscription is now active. Add a payment method below for uninterrupted service."
-                  : "We're confirming your payment with the billing provider. This usually takes under a minute — refresh this page shortly. If it stays inactive, contact support."}
+                  : paymentFailed
+                    ? `Safepay reports this checkout as ${safepayCheck?.state || "incomplete"} — no money has moved. Nothing has been charged. Please try again, or contact support if you believe this is wrong.`
+                    : safepayCheck?.settled
+                      ? "Safepay has settled the charge. Your plan switches on as soon as their confirmation reaches us — usually a few seconds."
+                      : "We're confirming your payment with the billing provider. This usually takes under a minute — refresh this page shortly. If it stays inactive, contact support."}
               </div>
             </div>
             <button onClick={() => setShowUpgradeBanner(false)} style={{ width:28, height:28, borderRadius:8, border:`1px solid ${border}`, background:"transparent", cursor:"pointer", fontSize:14, color:c }}>✕</button>
