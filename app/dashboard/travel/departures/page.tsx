@@ -13,7 +13,7 @@
  * screen is the difference between this and a spreadsheet.
  */
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import { alertToast } from "@/lib/toast-feedback";
 import { useBusinessRecords } from "@/lib/useBusinessRecords";
@@ -24,6 +24,7 @@ import {
   emptyLeg,
   emptyLeg2,
   layoverLabel,
+  PILGRIMAGE_CITIES,
   layoverMinutes,
   occupancyName,
   readDeparture,
@@ -39,7 +40,8 @@ import {
   type PackageLeg,
   type UmrahDeparture,
 } from "@/lib/umrahPackage";
-import { AirportInput } from "../_flight/ui";
+import { AirportInput, PartyInput, readParties, type PartyChoice } from "../_flight/ui";
+import { TRAVEL_SUPPLIER_KIND, partyKindHeading } from "@/lib/partyVocabulary";
 
 const ff = "'Outfit','Inter',sans-serif";
 const bg = "rgba(255,255,255,0.03)";
@@ -106,9 +108,26 @@ function staffLabel(d: UmrahDeparture, index: number): string {
 /** What a new hotel leg starts as, given where this group is going. */
 function nextLegCity(d: UmrahDeparture): string {
   if (d.kind === "tour") return "";
-  // A pilgrimage is Makkah then Madinah, in that order, and almost never
-  // anything else — so the second leg offers the second city.
-  return d.legs.some((l) => l.city.trim().toLowerCase() === "makkah") ? "Madinah" : "Makkah";
+  /* The next city the trip has not booked yet, in the order a pilgrimage
+     happens: Makkah, then Madinah, then Aziziah for the days of the Hajj
+     itself. Once all three are on the trip a fourth leg is a second stay
+     somewhere, so it opens on Makkah for the operator to change. */
+  const taken = new Set(d.legs.map((l) => l.city.trim().toLowerCase()).filter(Boolean));
+  const offered = d.kind === "hajj" ? PILGRIMAGE_CITIES : PILGRIMAGE_CITIES.slice(0, 2);
+  return offered.find((city) => !taken.has(city.toLowerCase())) || PILGRIMAGE_CITIES[0];
+}
+
+/**
+ * The cities this leg's dropdown offers.
+ *
+ * Whatever is already saved comes first even when it is not one of the three —
+ * a departure that stayed in Jeddah must not lose the word "Jeddah" because a
+ * list was tightened around it.
+ */
+function cityOptions(d: UmrahDeparture, current: string): string[] {
+  const base = d.kind === "hajj" ? PILGRIMAGE_CITIES : PILGRIMAGE_CITIES.slice(0, 2);
+  const here = current.trim();
+  return here && !base.some((c) => c.toLowerCase() === here.toLowerCase()) ? [here, ...base] : base;
 }
 
 export default function DeparturesPage() {
@@ -116,6 +135,15 @@ export default function DeparturesPage() {
   const store = useBusinessRecords("umrah_departure");
   const bookings = useBusinessRecords("umrah_booking");
   const settlements = useBusinessRecords("travel_settlement");
+  /* Suppliers filed as Hotels on the chart of accounts. Offered rather than
+     imposed — a hotel being used for the first time must still be typeable. */
+  const [hotels, setHotels] = useState<PartyChoice[]>([]);
+  useEffect(() => {
+    fetch("/api/accounts?partyType=SUPPLIER", { cache: "no-store" })
+      .then((r) => (r.ok ? r.json() : []))
+      .then((rows) => setHotels(readParties(rows)))
+      .catch(() => setHotels([]));
+  }, []);
   const [editing, setEditing] = useState<{ id: string | null; d: UmrahDeparture } | null>(null);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
@@ -405,11 +433,31 @@ export default function DeparturesPage() {
             <div key={leg.id} style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr 1fr" : "130px 1.8fr 90px 130px 150px 30px", gap: 9, alignItems: "end" }}>
               <div>
                 <label style={label}>City</label>
-                <input value={leg.city} onChange={(e) => patchLeg(leg.id, { city: e.target.value })} style={input} />
+                {d.kind === "tour" ? (
+                  // A tour names its own cities; there is no list to offer.
+                  <input value={leg.city} onChange={(e) => patchLeg(leg.id, { city: e.target.value })} style={input} />
+                ) : (
+                  <select value={leg.city} onChange={(e) => patchLeg(leg.id, { city: e.target.value })} style={input}>
+                    <option value="">City…</option>
+                    {cityOptions(d, leg.city).map((city) => <option key={city} value={city}>{city}</option>)}
+                  </select>
+                )}
               </div>
               <div>
                 <label style={label}>Hotel</label>
-                <input value={leg.hotelName} onChange={(e) => patchLeg(leg.id, { hotelName: e.target.value.toUpperCase() })} style={input} />
+                {/* The hotels already on the chart, under the Hotel type the
+                    Accounts screen records. Typed once, then picked — which is
+                    also what stops "Makkah Towers" and "MAKKAH TOWER" becoming
+                    two suppliers with half the payable each. */}
+                <PartyInput
+                  compact
+                  value={leg.hotelName}
+                  options={hotels}
+                  kind={TRAVEL_SUPPLIER_KIND.HOTEL}
+                  kindLabel={partyKindHeading(TRAVEL_SUPPLIER_KIND.HOTEL)}
+                  placeholder={hotels.length ? "Pick or type" : "Hotel name"}
+                  onChange={(name) => patchLeg(leg.id, { hotelName: name })}
+                />
               </div>
               <div>
                 <label style={label}>Nights</label>

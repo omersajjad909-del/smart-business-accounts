@@ -248,6 +248,17 @@ export function occupancyName(n: number): string {
   return OCCUPANCY_NAMES[k] || `${k}-sharing`;
 }
 
+/**
+ * Where a pilgrimage sleeps, in the order it sleeps there.
+ *
+ * Makkah first, then Madinah. Aziziah is the Hajj days themselves — the
+ * district a group is housed in around the Mashair — so it comes last and only
+ * a Hajj is offered it by default.
+ *
+ * A tour goes wherever it goes and types its own.
+ */
+export const PILGRIMAGE_CITIES = ["Makkah", "Madinah", "Aziziah"];
+
 export function emptyLeg(city = "Makkah"): PackageLeg {
   return { id: newId("leg"), city, hotelName: "", nights: 0, roomRatePerNight: 0 };
 }
@@ -262,7 +273,16 @@ export function emptyDeparture(kind: PackageKind = "umrah"): UmrahDeparture {
     seats: 0,
     // Madinah, Makkah, Madinah — the ordinary shape of a trip, so a new
     // departure opens on it rather than on nothing.
-    legs: [emptyLeg("Madinah"), emptyLeg("Makkah"), emptyLeg("Madinah")],
+    /* The shape each kind of trip actually takes, so a new departure opens on
+       something worth editing rather than on three blank rows. A Hajj sleeps
+       in Aziziah for the days of the pilgrimage; an Umrah does not go there
+       at all, and a tour has no cities until somebody names them. */
+    legs:
+      kind === "hajj"
+        ? [emptyLeg("Makkah"), emptyLeg("Madinah"), emptyLeg("Aziziah")]
+        : kind === "umrah"
+          ? [emptyLeg("Makkah"), emptyLeg("Madinah")]
+          : [emptyLeg("")],
     fixed: { air: 0, visa: 0, transport: 0, ziyarat: 0, meals: 0, insurance: 0, minaTent: 0, arafatTent: 0, muzdalifah: 0, maktab: 0, misc: 0 },
     hotelCurrency: "SAR",
     hotelRate: 0,
