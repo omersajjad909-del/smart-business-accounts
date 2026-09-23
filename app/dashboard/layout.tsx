@@ -2298,11 +2298,21 @@ export default function DashboardLayout({
                 {hasDashboardFeature("TRAVEL_VISAS") && <NavLink href="/dashboard/travel/visas" pathname={pathname}>🛂 Visa Cases</NavLink>}
                 {hasDashboardFeature("TRAVEL_HOTELS") && <NavLink href="/dashboard/travel/hotel-packages" pathname={pathname}>🏨 Hotel Packages</NavLink>}
                 {hasDashboardFeature("TRAVEL_TOURS") && <NavLink href="/dashboard/travel/tours" pathname={pathname}>🚌 Group Tours</NavLink>}
-                {hasDashboardFeature("TRAVEL_GROUP_OPS") && <NavLink href="/dashboard/travel/group-ops" pathname={pathname}>🕋 Group Operations</NavLink>}
+                {/* The Hajj flow, in the order it is worked: build the
+                    departure, put people on it, get them through the checks,
+                    hand them the voucher. Departures, Pilgrim Bookings and
+                    Vouchers had registry entries and pages but no link here,
+                    so the group business — the whole reason an Umrah operator
+                    buys this — was reachable only by typing the URL. */}
+                {hasDashboardFeature("TRAVEL_DEPARTURES") && <NavLink href="/dashboard/travel/departures" pathname={pathname}>🕋 Hajj & Umrah Departures</NavLink>}
+                {hasDashboardFeature("TRAVEL_BOOKINGS") && <NavLink href="/dashboard/travel/bookings" pathname={pathname}>📋 Pilgrim Bookings</NavLink>}
+                {hasDashboardFeature("TRAVEL_GROUP_OPS") && <NavLink href="/dashboard/travel/group-ops" pathname={pathname}>🧭 Group Operations</NavLink>}
+                {hasDashboardFeature("TRAVEL_VOUCHERS") && <NavLink href="/dashboard/travel/vouchers" pathname={pathname}>🎟 Umrah & Hajj Vouchers</NavLink>}
                 {hasDashboardFeature("TRAVEL_SETTLEMENTS") && <NavLink href="/dashboard/travel/settlements" pathname={pathname}>🧾 Supplier Settlements</NavLink>}
                 {hasDashboardFeature("TRAVEL_PASSPORTS") && <NavLink href="/dashboard/travel/passports" pathname={pathname}>🛂 Passport Database</NavLink>}
                 {hasDashboardFeature("TRAVEL_TRANSPORT") && <NavLink href="/dashboard/travel/transport" pathname={pathname}>🚐 Transport</NavLink>}
                 {hasDashboardFeature("TRAVEL_INSURANCE") && <NavLink href="/dashboard/travel/insurance" pathname={pathname}>🛡 Travel Insurance</NavLink>}
+                {hasDashboardFeature("TRAVEL_REPORTS") && <NavLink href="/dashboard/travel/reports" pathname={pathname}>📑 Travel Reports</NavLink>}
                 {hasDashboardFeature("TRAVEL_ANALYTICS") && <NavLink href="/dashboard/travel/analytics" pathname={pathname}>📊 Analytics</NavLink>}
                 <NavLink href="/dashboard/quotation" pathname={pathname}>Quotations</NavLink>
                 <NavLink href="/dashboard/sales-invoice" pathname={pathname}>Sales Invoices</NavLink>
