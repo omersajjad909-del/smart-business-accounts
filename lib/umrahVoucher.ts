@@ -94,6 +94,10 @@ export type UmrahVoucher = {
   terms?: string;
   makkahStaff?: string;
   madinahStaff?: string;
+  makkahStaffName?: string;
+  makkahStaffPhone?: string;
+  madinahStaffName?: string;
+  madinahStaffPhone?: string;
   /** Scanned by the Saudi office to pull the trip up. */
   qrUrl?: string;
 };
@@ -306,6 +310,10 @@ export function readVoucher(data: unknown): UmrahVoucher {
     notice: String(d.notice || ""),
     makkahStaff: String(d.makkahStaff || ""),
     madinahStaff: String(d.madinahStaff || ""),
+    makkahStaffName: String(d.makkahStaffName || ""),
+    makkahStaffPhone: String(d.makkahStaffPhone || ""),
+    madinahStaffName: String(d.madinahStaffName || ""),
+    madinahStaffPhone: String(d.madinahStaffPhone || ""),
     qrUrl: String(d.qrUrl || ""),
   };
 }

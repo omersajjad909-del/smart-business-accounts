@@ -431,16 +431,21 @@ export default function DeparturesPage() {
               and Madinah. The same two fields serve a Dubai group, whose
               ground staff are in Dubai and Abu Dhabi — only the labels ever
               needed to know where the group was going. */}
-          <div>
-            <label style={label}>{staffLabel(d, 0)}</label>
-            <input value={d.makkahStaff || ""} placeholder="+966 58 315 6418 Qudratullah"
-              onChange={(e) => patch({ makkahStaff: e.target.value })} style={input} />
-          </div>
-          <div>
-            <label style={label}>{staffLabel(d, 1)}</label>
-            <input value={d.madinahStaff || ""} placeholder="SAEED +966 58 013 0848"
-              onChange={(e) => patch({ madinahStaff: e.target.value })} style={input} />
-          </div>
+          {[0, 1].map((index) => {
+            const city = staffLabel(d, index);
+            const nameKey = index === 0 ? "makkahStaffName" : "madinahStaffName";
+            const phoneKey = index === 0 ? "makkahStaffPhone" : "madinahStaffPhone";
+            const legacyKey = index === 0 ? "makkahStaff" : "madinahStaff";
+            const value = d as UmrahDeparture & Record<string, string | undefined>;
+            return <div key={city}>
+              <label style={label}>{city} name</label>
+              <input value={value[nameKey] || ""} placeholder="Staff name"
+                onChange={(e) => patch({ [nameKey]: e.target.value, [legacyKey]: "" } as Partial<UmrahDeparture>)} style={input} />
+              <label style={{ ...label, marginTop: 7 }}>Phone number</label>
+              <input type="tel" value={value[phoneKey] || ""} placeholder="+966 58 315 6418"
+                onChange={(e) => patch({ [phoneKey]: e.target.value, [legacyKey]: "" } as Partial<UmrahDeparture>)} style={input} />
+            </div>;
+          })}
           <div>
             <label style={label}>Transport note</label>
             <input value={d.transportNote || ""} placeholder="TRANSPORT BY VOUCHER # 106830"
@@ -555,9 +560,11 @@ export default function DeparturesPage() {
           </div>
           {card.map((t, i) => (
             <div key={t.occupancy} style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1.2fr 1fr 80px 34px", gap: 8, padding: "9px 14px", alignItems: "center", borderTop: `1px solid ${border}`, fontSize: 13 }}>
-              <span style={{ fontWeight: 700 }}>
-                {t.tierName} <span style={{ color: "rgba(255,255,255,.35)", fontWeight: 500 }}>({t.occupancy})</span>
-              </span>
+              <select aria-label="People sharing this room" value={t.occupancy}
+                onChange={(e) => patch({ tiers: d.tiers.map((x, xi) => xi === i ? { ...x, occupancy: Number(e.target.value) } : x) })}
+                style={{ ...input, padding: "6px 8px", fontWeight: 700 }}>
+                {Array.from({ length: 10 }, (_, n) => n + 1).map((n) => <option key={n} value={n} style={{ color: "#111" }}>{occupancyName(n)} ({n})</option>)}
+              </select>
               <span style={{ textAlign: "right", color: "rgba(255,255,255,.55)", fontFamily: "ui-monospace, monospace" }}>{t.roomCost.toLocaleString()}</span>
               <span style={{ textAlign: "right", fontFamily: "ui-monospace, monospace" }}>{t.costPerPilgrim.toLocaleString()}</span>
               <span style={{ textAlign: "right" }}>

@@ -307,8 +307,8 @@ export function VoucherPrint({ voucher, companyName }: { voucher: UmrahVoucher; 
           <div style={{ flex: 1 }}>
             {/* Named after the cities this voucher actually visits, so a Dubai
                 group's voucher does not offer its travellers a Makkah contact. */}
-            {voucher.makkahStaff ? <div>{staffLabel(voucher, 0)} &nbsp; {voucher.makkahStaff}</div> : null}
-            {voucher.madinahStaff ? <div style={{ marginTop: 6 }}>{staffLabel(voucher, 1)} &nbsp; {voucher.madinahStaff}</div> : null}
+            {(voucher.makkahStaffName || voucher.makkahStaffPhone || voucher.makkahStaff) ? <div>{staffLabel(voucher, 0)} &nbsp; {[voucher.makkahStaffName, voucher.makkahStaffPhone].filter(Boolean).join(" · ") || voucher.makkahStaff}</div> : null}
+            {(voucher.madinahStaffName || voucher.madinahStaffPhone || voucher.madinahStaff) ? <div style={{ marginTop: 6 }}>{staffLabel(voucher, 1)} &nbsp; {[voucher.madinahStaffName, voucher.madinahStaffPhone].filter(Boolean).join(" · ") || voucher.madinahStaff}</div> : null}
           </div>
           {voucher.qrUrl ? (
             <img

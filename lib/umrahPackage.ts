@@ -118,6 +118,10 @@ export type UmrahDeparture = {
   /** Printed on every voucher for this departure. */
   makkahStaff?: string;
   madinahStaff?: string;
+  makkahStaffName?: string;
+  makkahStaffPhone?: string;
+  madinahStaffName?: string;
+  madinahStaffPhone?: string;
   transportNote?: string;
 };
 
@@ -291,6 +295,10 @@ export function emptyDeparture(kind: PackageKind = "umrah"): UmrahDeparture {
     returnFlight: { flightNo: "", sector: "", terminal: "", time: "", legs: [emptyLeg2()] },
     makkahStaff: "",
     madinahStaff: "",
+    makkahStaffName: "",
+    makkahStaffPhone: "",
+    madinahStaffName: "",
+    madinahStaffPhone: "",
     transportNote: "",
     // The four an operator actually sells. Single is left out of the default
     // card because almost nobody buys it, and it is one click to add.
@@ -494,6 +502,10 @@ export function readDeparture(data: unknown): UmrahDeparture {
     fixed: { ...base.fixed, ...(d.fixed || {}) },
     arrivalFlight: readFlight(d.arrivalFlight, base.arrivalFlight!),
     returnFlight: readFlight(d.returnFlight, base.returnFlight!),
+    makkahStaffName: String(d.makkahStaffName || ""),
+    makkahStaffPhone: String(d.makkahStaffPhone || ""),
+    madinahStaffName: String(d.madinahStaffName || ""),
+    madinahStaffPhone: String(d.madinahStaffPhone || ""),
     tiers: Array.isArray(d.tiers) && d.tiers.length
       ? d.tiers.map((t: any) => ({
           occupancy: Number(t?.occupancy) || 4,

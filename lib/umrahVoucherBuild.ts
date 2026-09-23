@@ -130,6 +130,10 @@ export function voucherFromBooking(opts: {
     notice: "",
     makkahStaff: departure.makkahStaff || "",
     madinahStaff: departure.madinahStaff || "",
+    makkahStaffName: departure.makkahStaffName || "",
+    makkahStaffPhone: departure.makkahStaffPhone || "",
+    madinahStaffName: departure.madinahStaffName || "",
+    madinahStaffPhone: departure.madinahStaffPhone || "",
     qrUrl: "",
   };
 }
