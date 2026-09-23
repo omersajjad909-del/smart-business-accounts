@@ -2284,38 +2284,59 @@ export default function DashboardLayout({
                 open={openSection === "travel"}
                 onToggle={() => toggle("travel")}
               >
+                {/* Twenty-five links in one column asked the operator to
+                    remember where everything was. They are the same links,
+                    under the desk each one belongs to. */}
                 {hasDashboardFeature("TRAVEL_OVERVIEW") && <NavLink href="/dashboard/travel" pathname={pathname}>Overview</NavLink>}
                 {hasDashboardFeature("TRAVEL_NEW_BOOKING") && <NavLink href="/dashboard/travel/new" pathname={pathname}>➕ New Booking</NavLink>}
-                {hasDashboardFeature("TRAVEL_TRIPS") && <NavLink href="/dashboard/travel/trips" pathname={pathname}>🧳 Trips</NavLink>}
-                {hasDashboardFeature("TRAVEL_PACKAGES") && <NavLink href="/dashboard/travel/packages" pathname={pathname}>📦 Packages</NavLink>}
-                {hasDashboardFeature("TRAVEL_CUSTOMERS") && <NavLink href="/dashboard/travel/customers" pathname={pathname}>🗂 Customers</NavLink>}
-                {hasDashboardFeature("TRAVEL_TRAVELERS") && <NavLink href="/dashboard/travel/travelers" pathname={pathname}>👤 Travellers</NavLink>}
-                {hasDashboardFeature("TRAVEL_FLIGHT_SEARCH") && <NavLink href="/dashboard/travel/flight-search" pathname={pathname}>🔍 Flight Search</NavLink>}
-                {hasDashboardFeature("TRAVEL_BOOK_FLIGHT") && <NavLink href="/dashboard/travel/book" pathname={pathname}>🎫 Book Flight Ticket</NavLink>}
-                {hasDashboardFeature("TRAVEL_TICKETS") && <NavLink href="/dashboard/travel/tickets" pathname={pathname}>✈️ Airline Tickets</NavLink>}
-                {hasDashboardFeature("TRAVEL_FARE_SHEET") && <NavLink href="/dashboard/travel/fare-sheet" pathname={pathname}>💱 Contract Fares</NavLink>}
-                {hasDashboardFeature("TRAVEL_SCHEDULES") && <NavLink href="/dashboard/travel/schedules" pathname={pathname}>🕑 Flight Schedules</NavLink>}
-                {hasDashboardFeature("TRAVEL_VISAS") && <NavLink href="/dashboard/travel/visas" pathname={pathname}>🛂 Visa Cases</NavLink>}
-                {hasDashboardFeature("TRAVEL_HOTELS") && <NavLink href="/dashboard/travel/hotel-packages" pathname={pathname}>🏨 Hotel Packages</NavLink>}
-                {hasDashboardFeature("TRAVEL_TOURS") && <NavLink href="/dashboard/travel/tours" pathname={pathname}>🚌 Group Tours</NavLink>}
-                {/* The Hajj flow, in the order it is worked: build the
-                    departure, put people on it, get them through the checks,
-                    hand them the voucher. Departures, Pilgrim Bookings and
-                    Vouchers had registry entries and pages but no link here,
-                    so the group business — the whole reason an Umrah operator
-                    buys this — was reachable only by typing the URL. */}
-                {hasDashboardFeature("TRAVEL_DEPARTURES") && <NavLink href="/dashboard/travel/departures" pathname={pathname}>🕋 Hajj & Umrah Departures</NavLink>}
-                {hasDashboardFeature("TRAVEL_BOOKINGS") && <NavLink href="/dashboard/travel/bookings" pathname={pathname}>📋 Pilgrim Bookings</NavLink>}
-                {hasDashboardFeature("TRAVEL_GROUP_OPS") && <NavLink href="/dashboard/travel/group-ops" pathname={pathname}>🧭 Group Operations</NavLink>}
-                {hasDashboardFeature("TRAVEL_VOUCHERS") && <NavLink href="/dashboard/travel/vouchers" pathname={pathname}>🎟 Umrah & Hajj Vouchers</NavLink>}
-                {hasDashboardFeature("TRAVEL_SETTLEMENTS") && <NavLink href="/dashboard/travel/settlements" pathname={pathname}>🧾 Supplier Settlements</NavLink>}
-                {hasDashboardFeature("TRAVEL_PASSPORTS") && <NavLink href="/dashboard/travel/passports" pathname={pathname}>🛂 Passport Database</NavLink>}
-                {hasDashboardFeature("TRAVEL_TRANSPORT") && <NavLink href="/dashboard/travel/transport" pathname={pathname}>🚐 Transport</NavLink>}
-                {hasDashboardFeature("TRAVEL_INSURANCE") && <NavLink href="/dashboard/travel/insurance" pathname={pathname}>🛡 Travel Insurance</NavLink>}
-                {hasDashboardFeature("TRAVEL_REPORTS") && <NavLink href="/dashboard/travel/reports" pathname={pathname}>📑 Travel Reports</NavLink>}
-                {hasDashboardFeature("TRAVEL_ANALYTICS") && <NavLink href="/dashboard/travel/analytics" pathname={pathname}>📊 Analytics</NavLink>}
-                <NavLink href="/dashboard/quotation" pathname={pathname}>Quotations</NavLink>
-                <NavLink href="/dashboard/sales-invoice" pathname={pathname}>Sales Invoices</NavLink>
+
+                {/* One customer buying one thing. */}
+                <NavSection label="Tickets">
+                  {hasDashboardFeature("TRAVEL_BOOK_FLIGHT") && <NavLink href="/dashboard/travel/book" pathname={pathname}>🎫 Book Flight Ticket</NavLink>}
+                  {hasDashboardFeature("TRAVEL_TICKETS") && <NavLink href="/dashboard/travel/tickets" pathname={pathname}>✈️ Airline Tickets</NavLink>}
+                  {hasDashboardFeature("TRAVEL_FLIGHT_SEARCH") && <NavLink href="/dashboard/travel/flight-search" pathname={pathname}>🔍 Flight Search</NavLink>}
+                  {hasDashboardFeature("TRAVEL_FARE_SHEET") && <NavLink href="/dashboard/travel/fare-sheet" pathname={pathname}>💱 Contract Fares</NavLink>}
+                  {hasDashboardFeature("TRAVEL_SCHEDULES") && <NavLink href="/dashboard/travel/schedules" pathname={pathname}>🕑 Flight Schedules</NavLink>}
+                </NavSection>
+
+                {/* One customer buying several things at once. */}
+                <NavSection label="Trips & Packages">
+                  {hasDashboardFeature("TRAVEL_TRIPS") && <NavLink href="/dashboard/travel/trips" pathname={pathname}>🧳 Trips</NavLink>}
+                  {hasDashboardFeature("TRAVEL_PACKAGES") && <NavLink href="/dashboard/travel/packages" pathname={pathname}>📦 Packages</NavLink>}
+                  {hasDashboardFeature("TRAVEL_HOTELS") && <NavLink href="/dashboard/travel/hotel-packages" pathname={pathname}>🏨 Hotel Packages</NavLink>}
+                  {hasDashboardFeature("TRAVEL_TRANSPORT") && <NavLink href="/dashboard/travel/transport" pathname={pathname}>🚐 Transport</NavLink>}
+                  {hasDashboardFeature("TRAVEL_INSURANCE") && <NavLink href="/dashboard/travel/insurance" pathname={pathname}>🛡 Travel Insurance</NavLink>}
+                </NavSection>
+
+                {/* A hundred people on one aircraft, in the order the work
+                    happens: build the departure, put people on it, run the
+                    checks, hand out the voucher. */}
+                <NavSection label="Hajj & Umrah">
+                  {hasDashboardFeature("TRAVEL_DEPARTURES") && <NavLink href="/dashboard/travel/departures" pathname={pathname}>🕋 Departures</NavLink>}
+                  {hasDashboardFeature("TRAVEL_BOOKINGS") && <NavLink href="/dashboard/travel/bookings" pathname={pathname}>📋 Pilgrim Bookings</NavLink>}
+                  {hasDashboardFeature("TRAVEL_GROUP_OPS") && <NavLink href="/dashboard/travel/group-ops" pathname={pathname}>🧭 Group Operations</NavLink>}
+                  {hasDashboardFeature("TRAVEL_TOURS") && <NavLink href="/dashboard/travel/tours" pathname={pathname}>🚌 Group Tours</NavLink>}
+                  {hasDashboardFeature("TRAVEL_VOUCHERS") && <NavLink href="/dashboard/travel/vouchers" pathname={pathname}>🎟 Vouchers</NavLink>}
+                </NavSection>
+
+                {/* Who they are and what they need to travel. */}
+                <NavSection label="People & Documents">
+                  {hasDashboardFeature("TRAVEL_CUSTOMERS") && <NavLink href="/dashboard/travel/customers" pathname={pathname}>🗂 Customers</NavLink>}
+                  {hasDashboardFeature("TRAVEL_TRAVELERS") && <NavLink href="/dashboard/travel/travelers" pathname={pathname}>👤 Travellers</NavLink>}
+                  {hasDashboardFeature("TRAVEL_VISAS") && <NavLink href="/dashboard/travel/visas" pathname={pathname}>🛂 Visa Cases</NavLink>}
+                  {hasDashboardFeature("TRAVEL_PASSPORTS") && <NavLink href="/dashboard/travel/passports" pathname={pathname}>📕 Passport Database</NavLink>}
+                </NavSection>
+
+                <NavSection label="Money">
+                  <NavLink href="/dashboard/quotation" pathname={pathname}>📝 Quotations</NavLink>
+                  <NavLink href="/dashboard/sales-invoice" pathname={pathname}>🧾 Sales Invoices</NavLink>
+                  {hasDashboardFeature("TRAVEL_SETTLEMENTS") && <NavLink href="/dashboard/travel/settlements" pathname={pathname}>💳 Supplier Settlements</NavLink>}
+                </NavSection>
+
+                <NavSection label="Reports">
+                  {hasDashboardFeature("TRAVEL_REPORTS") && <NavLink href="/dashboard/travel/reports" pathname={pathname}>📑 Travel Reports</NavLink>}
+                  {hasDashboardFeature("TRAVEL_ANALYTICS") && <NavLink href="/dashboard/travel/analytics" pathname={pathname}>📊 Analytics</NavLink>}
+                </NavSection>
               </NavGroup>
             )}
 
@@ -3615,6 +3636,42 @@ function collectNavHrefs(node: ReactNode, out: string[] = []): string[] {
     if (props.children) collectNavHrefs(props.children, out);
   });
   return out;
+}
+
+/**
+ * A heading inside an open NavGroup.
+ *
+ * Travel grew to twenty-five links in one list — every page an agency owns,
+ * from a fare sheet to a pilgrim's passport, in a single column with nothing
+ * telling one kind of work from another. The registry already knew which desk
+ * each page belonged to; the sidebar did not.
+ *
+ * It hides itself when none of its links can show, for the same reason
+ * NavGroup does: a Starter sidebar full of headings over nothing is worse than
+ * no headings at all. And it disappears entirely when the sidebar is
+ * collapsed, where there is no room for words.
+ */
+function NavSection({ label, children }: { label: string; children: React.ReactNode }) {
+  const { collapsed, canShowHref } = useContext(SidebarCtx);
+
+  const hrefs = collectNavHrefs(children);
+  if (hrefs.length > 0 && !hrefs.some(canShowHref)) return null;
+  if (collapsed) return <>{children}</>;
+
+  return (
+    <>
+      <div
+        style={{
+          fontSize: 9.5, fontWeight: 800, letterSpacing: ".09em", textTransform: "uppercase",
+          color: "var(--sidebar-link-muted)", opacity: 0.72,
+          padding: "0 12px", margin: "12px 0 4px",
+        }}
+      >
+        {label}
+      </div>
+      {children}
+    </>
+  );
 }
 
 function NavGroup({ title, icon, open, onToggle, children }: {
