@@ -90,11 +90,16 @@ function fixedFieldsFor(kind: string): FixedField[] {
 
 /** The ground-staff field is named after the city it belongs to. */
 function staffLabel(d: UmrahDeparture, index: number): string {
-  const city = d.legs.filter((l) => l.city.trim())[index]?.city.trim();
-  if (city) return `${city} staff`;
-  // Before any leg is entered there is nothing to name it after, and for a
-  // pilgrimage the two cities are known in advance anyway.
-  if (d.kind === "tour") return index === 0 ? "Ground staff 1" : "Ground staff 2";
+  if (d.kind === "tour") {
+    /* A tour goes wherever it goes, so the contacts are named after its own
+       cities — each one once, however many nights are booked in it. */
+    const cities = [...new Set(d.legs.map((l) => l.city.trim()).filter(Boolean))];
+    return cities[index] ? `${cities[index]} staff` : `Ground staff ${index + 1}`;
+  }
+  /* These two fields ARE Makkah and Madinah — makkahStaff and madinahStaff.
+     Naming them after whichever hotel leg happened to be first put the Makkah
+     contact under a "Madinah staff" label on a trip that starts in Madinah,
+     and left both fields wearing the same label. */
   return index === 0 ? "Makkah staff" : "Madinah staff";
 }
 
