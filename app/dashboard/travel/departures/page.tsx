@@ -118,16 +118,29 @@ function nextLegCity(d: UmrahDeparture): string {
 }
 
 /**
- * The cities this leg's dropdown offers.
+ * The cities this leg offers, in the order a pilgrimage happens.
  *
- * Whatever is already saved comes first even when it is not one of the three —
- * a departure that stayed in Jeddah must not lose the word "Jeddah" because a
- * list was tightened around it.
+ * The three canonical ones first, then every city this agency has actually
+ * used on any departure — so a city typed once is on the list from then on,
+ * without anybody maintaining a list. An Umrah is not offered Aziziah unless
+ * one of theirs has stayed there, in which case it is their own history and
+ * worth offering back.
+ *
+ * The box is pick-or-type either way. A fixed dropdown looked tidier and took
+ * away the ability to name a city nobody had thought of, which is the one
+ * thing a free-text box was good at.
  */
-function cityOptions(d: UmrahDeparture, current: string): string[] {
-  const base = d.kind === "hajj" ? PILGRIMAGE_CITIES : PILGRIMAGE_CITIES.slice(0, 2);
-  const here = current.trim();
-  return here && !base.some((c) => c.toLowerCase() === here.toLowerCase()) ? [here, ...base] : base;
+function cityOptions(kind: string, used: string[]): string[] {
+  const base = kind === "hajj" ? PILGRIMAGE_CITIES : PILGRIMAGE_CITIES.slice(0, 2);
+  const seen = new Set(base.map((c) => c.toLowerCase()));
+  const extra: string[] = [];
+  for (const city of used) {
+    const key = city.trim().toLowerCase();
+    if (!key || seen.has(key)) continue;
+    seen.add(key);
+    extra.push(city.trim());
+  }
+  return [...base, ...extra.sort((a, b) => a.localeCompare(b))];
 }
 
 export default function DeparturesPage() {
@@ -216,6 +229,14 @@ export default function DeparturesPage() {
         };
       });
   }, [settlements.records, editing]);
+
+  /* Every city this agency has ever put a group in. Read off their own saved
+     departures rather than kept in a settings screen nobody would remember to
+     fill in. */
+  const citiesUsed = useMemo(
+    () => rows.flatMap((row) => row.d.legs.map((leg) => leg.city)).filter(Boolean),
+    [rows],
+  );
 
   const problems = useMemo(() => (editing ? validateDeparture(editing.d) : []), [editing]);
   const card = useMemo(() => (editing ? costDeparture(editing.d) : []), [editing]);
@@ -433,15 +454,17 @@ export default function DeparturesPage() {
             <div key={leg.id} style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr 1fr" : "130px 1.8fr 90px 130px 150px 30px", gap: 9, alignItems: "end" }}>
               <div>
                 <label style={label}>City</label>
-                {d.kind === "tour" ? (
-                  // A tour names its own cities; there is no list to offer.
-                  <input value={leg.city} onChange={(e) => patchLeg(leg.id, { city: e.target.value })} style={input} />
-                ) : (
-                  <select value={leg.city} onChange={(e) => patchLeg(leg.id, { city: e.target.value })} style={input}>
-                    <option value="">City…</option>
-                    {cityOptions(d, leg.city).map((city) => <option key={city} value={city}>{city}</option>)}
-                  </select>
-                )}
+                {/* Pick one, or type a new one — Aziziah was a new one once.
+                    A city typed here shows up in this list on the next
+                    departure, because the list is read off what they have
+                    actually used. */}
+                <PartyInput
+                  compact
+                  value={leg.city}
+                  options={cityOptions(d.kind, citiesUsed).map((city) => ({ name: city }))}
+                  placeholder="Pick or type a city"
+                  onChange={(city) => patchLeg(leg.id, { city })}
+                />
               </div>
               <div>
                 <label style={label}>Hotel</label>
