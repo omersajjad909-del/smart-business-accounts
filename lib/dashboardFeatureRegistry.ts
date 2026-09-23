@@ -940,6 +940,39 @@ export const DASHBOARD_FEATURE_DEFS: DashboardFeatureDefinition[] = [
     plans: ["starter", "professional", "enterprise"],
   },
   {
+    /* The group business: a dated trip with a quota, priced per sharing
+       option. This is the step from selling tickets to running groups, so it
+       is where Professional starts earning its price.
+
+       It sits at the top of the Hajj desk, ahead of Group Operations, because
+       it is the thing that has to exist first — there is nothing to operate
+       until a departure has been built. It used to be twentieth of
+       twenty-four under a heading called "Bookings", which for an operator
+       whose whole trade is Hajj is the most important page on the system
+       filed where nobody would look for it. */
+    id: "TRAVEL_DEPARTURES",
+    label: "Hajj & Umrah Departures",
+    route: "/dashboard/travel/departures",
+    business: "travel",
+    businessLabel: "Travel Agency",
+    section: "Hajj & Umrah Desk",
+    businessTypes: ["travel"],
+    plans: ["professional", "enterprise"],
+  },
+  {
+    /* Who is on which departure and what they still owe. Named for what it
+       holds rather than the bare word "Bookings", which on a travel system
+       could mean any of five things. */
+    id: "TRAVEL_BOOKINGS",
+    label: "Pilgrim Bookings",
+    route: "/dashboard/travel/bookings",
+    business: "travel",
+    businessLabel: "Travel Agency",
+    section: "Hajj & Umrah Desk",
+    businessTypes: ["travel"],
+    plans: ["professional", "enterprise"],
+  },
+  {
     id: "TRAVEL_GROUP_OPS",
     label: "Group Operations",
     route: "/dashboard/travel/group-ops",
@@ -1078,31 +1111,6 @@ export const DASHBOARD_FEATURE_DEFS: DashboardFeatureDefinition[] = [
     section: "Finance Desk",
     businessTypes: ["travel"],
     plans: ["starter", "professional", "enterprise"],
-  },
-  {
-    /* The group business: a dated trip with a quota, priced per sharing
-       option. This is the step from selling tickets to running groups, so it
-       is where Professional starts earning its price. */
-    id: "TRAVEL_DEPARTURES",
-    label: "Hajj & Umrah Departures",
-    route: "/dashboard/travel/departures",
-    business: "travel",
-    businessLabel: "Travel Agency",
-    section: "Bookings",
-    businessTypes: ["travel"],
-    plans: ["professional", "enterprise"],
-  },
-  {
-    /* Who is on which departure and what they still owe. Sits with departures
-       on Professional — a booking without a departure to sit on is nothing. */
-    id: "TRAVEL_BOOKINGS",
-    label: "Bookings",
-    route: "/dashboard/travel/bookings",
-    business: "travel",
-    businessLabel: "Travel Agency",
-    section: "Bookings",
-    businessTypes: ["travel"],
-    plans: ["professional", "enterprise"],
   },
   {
     /* The document the pilgrim actually carries. Starter, because an Umrah

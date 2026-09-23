@@ -152,6 +152,13 @@ export function BusinessRecordWorkspace({
 
   const { isMobile, isTablet } = useResponsive();
   const { records, loading, create, remove, setStatus, refetch } = useBusinessRecords(category);
+  /* The nine-box form used to sit open beside the records on every one of
+     these desks. On a page whose main action is a wizard — "Book a Flight" —
+     that is two ways in shouting at each other, and the operator has to work
+     out which one is the real one before doing anything. So it opens when it
+     is asked for, and where there is no wizard it stays open, because then it
+     IS the way in. */
+  const [formOpen, setFormOpen] = useState(!headerAction);
   const [form, setForm] = useState<Record<string, string>>(initialForm);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
@@ -514,9 +521,21 @@ export function BusinessRecordWorkspace({
       {/* Below a laptop width the form sits above the records instead of beside
           them: 340px of form plus the records in what is left is what pushed
           the records off the screen on a tablet. */}
-      <div style={{ display: "grid", gridTemplateColumns: isTablet ? "minmax(0,1fr)" : "minmax(280px,340px) minmax(0,1fr)", gap: 16, alignItems: "start" }}>
+      <div style={{ display: "grid", gridTemplateColumns: isTablet || !formOpen ? "minmax(0,1fr)" : "minmax(280px,340px) minmax(0,1fr)", gap: 16, alignItems: "start" }}>
+        {formOpen ? (
         <form onSubmit={handleCreate} style={{ background: panelBg, border: `1px solid ${panelBorder}`, borderRadius: 16, padding: 20, minWidth: 0 }}>
-          <div style={{ fontSize: 15, fontWeight: 700, color: textPrimary, marginBottom: 14 }}>Create Record</div>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 10, marginBottom: 14 }}>
+            <div style={{ fontSize: 15, fontWeight: 700, color: textPrimary }}>Create Record</div>
+            {headerAction ? (
+              <button
+                type="button"
+                onClick={() => setFormOpen(false)}
+                style={{ border: "none", background: "transparent", color: textMuted, cursor: "pointer", fontSize: 12, fontWeight: 700, fontFamily: "inherit", padding: 0 }}
+              >
+                Close
+              </button>
+            ) : null}
+          </div>
           <div style={{ display: "grid", gridTemplateColumns: isTablet && !isMobile ? "repeat(auto-fit,minmax(220px,1fr))" : "minmax(0,1fr)", gap: 12 }}>
             {fields.map((field) => (
               <label key={field.key} style={{ display: "grid", gap: 6, minWidth: 0 }}>
@@ -664,11 +683,29 @@ export function BusinessRecordWorkspace({
             {saving ? "Saving..." : "Save Record"}
           </button>
         </form>
+        ) : null}
 
         <div style={{ background: panelBg, border: `1px solid ${panelBorder}`, borderRadius: 16, padding: isMobile ? 14 : 18, minWidth: 0 }}>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12, marginBottom: 14 }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12, marginBottom: 14, flexWrap: "wrap" }}>
             <div style={{ fontSize: 15, fontWeight: 700, color: textPrimary }}>Live Records</div>
-            <div style={{ fontSize: 12, color: textMuted, whiteSpace: "nowrap" }}>{filteredRows.length} shown</div>
+            <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
+              {/* The second way in, said once and quietly, rather than a whole
+                  form competing with the wizard above. */}
+              {!formOpen ? (
+                <button
+                  type="button"
+                  onClick={() => setFormOpen(true)}
+                  style={{
+                    border: `1px dashed ${panelBorder}`, background: "transparent", color: accent,
+                    borderRadius: 9, padding: "5px 11px", fontSize: 11.5, fontWeight: 700,
+                    cursor: "pointer", fontFamily: "inherit", whiteSpace: "nowrap",
+                  }}
+                >
+                  + Enter one by hand
+                </button>
+              ) : null}
+              <div style={{ fontSize: 12, color: textMuted, whiteSpace: "nowrap" }}>{filteredRows.length} shown</div>
+            </div>
           </div>
 
           {loading ? (

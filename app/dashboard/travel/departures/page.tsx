@@ -52,7 +52,9 @@ const sectionHead: React.CSSProperties = {
   color: "rgba(255,255,255,.4)", margin: "22px 0 10px",
 };
 
-const FIXED_FIELDS: { key: keyof PackageFixedCosts; label: string }[] = [
+type FixedField = { key: keyof PackageFixedCosts; label: string };
+
+const FIXED_FIELDS: FixedField[] = [
   { key: "air", label: "Air seat" },
   { key: "visa", label: "Visa" },
   { key: "transport", label: "Transport" },
@@ -61,6 +63,23 @@ const FIXED_FIELDS: { key: keyof PackageFixedCosts; label: string }[] = [
   { key: "insurance", label: "Insurance" },
   { key: "misc", label: "Other" },
 ];
+
+/* The days of Hajj itself, which happen outside the hotels and used to have
+   nowhere to go but "Other" — hiding the biggest cost after the rooms. An
+   Umrah never goes to Mina, so an Umrah departure is never asked. */
+const MASHAIR_FIELDS: FixedField[] = [
+  { key: "minaTent", label: "Mina tent" },
+  { key: "arafatTent", label: "Arafat tent" },
+  { key: "muzdalifah", label: "Muzdalifah" },
+  { key: "maktab", label: "Maktab" },
+];
+
+function fixedFieldsFor(kind: string): FixedField[] {
+  if (kind !== "hajj") return FIXED_FIELDS;
+  // "Other" stays last, after the Mashair, so the list reads in the order the
+  // costing is actually argued.
+  return [...FIXED_FIELDS.slice(0, -1), ...MASHAIR_FIELDS, FIXED_FIELDS[FIXED_FIELDS.length - 1]];
+}
 
 /** The ground-staff field is named after the city it belongs to. */
 function staffLabel(d: UmrahDeparture, index: number): string {
@@ -351,10 +370,13 @@ export default function DeparturesPage() {
           + Add leg
         </button>
 
-        <div style={sectionHead}>Per pilgrim, whoever they share with</div>
-        <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr 1fr" : "repeat(7,1fr)", gap: 10 }}>
-          {FIXED_FIELDS.map((f) =>
-            money(f.label, d.fixed[f.key], (n) => patch({ fixed: { ...d.fixed, [f.key]: n } })),
+        <div style={sectionHead}>
+          Per pilgrim, whoever they share with
+          {d.kind === "hajj" ? <span style={{ color: "rgba(255,255,255,.3)", fontWeight: 600, textTransform: "none", letterSpacing: 0 }}> — including the Mashair</span> : null}
+        </div>
+        <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr 1fr" : "repeat(auto-fit,minmax(110px,1fr))", gap: 10 }}>
+          {fixedFieldsFor(d.kind).map((f) =>
+            money(f.label, d.fixed[f.key] ?? 0, (n) => patch({ fixed: { ...d.fixed, [f.key]: n } })),
           )}
         </div>
         <div style={{ marginTop: 8, fontSize: 12, color: "rgba(255,255,255,.42)" }}>

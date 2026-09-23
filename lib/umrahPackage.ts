@@ -60,6 +60,22 @@ export type PackageFixedCosts = {
   ziyarat: number;
   meals: number;
   insurance: number;
+
+  /* The Mashair — the days of Hajj itself, spent outside the hotels.
+
+     These were landing in `misc` for want of anywhere else, which for a Hajj
+     package hides the second largest cost after the hotels. An operator
+     cannot argue a Maktab category or show a pilgrim what the tent costs if
+     the whole of Mina, Arafat and Muzdalifah is one line called "Other".
+
+     They are nothing to do with an Umrah, so an Umrah departure never shows
+     them and they stay at zero. */
+  minaTent?: number;
+  arafatTent?: number;
+  muzdalifah?: number;
+  /** The Maktab / Mu'assasah category the group is booked under. */
+  maktab?: number;
+
   misc: number;
 };
 
@@ -163,7 +179,7 @@ export function emptyDeparture(kind: PackageKind = "umrah"): UmrahDeparture {
     // Madinah, Makkah, Madinah — the ordinary shape of a trip, so a new
     // departure opens on it rather than on nothing.
     legs: [emptyLeg("Madinah"), emptyLeg("Makkah"), emptyLeg("Madinah")],
-    fixed: { air: 0, visa: 0, transport: 0, ziyarat: 0, meals: 0, insurance: 0, misc: 0 },
+    fixed: { air: 0, visa: 0, transport: 0, ziyarat: 0, meals: 0, insurance: 0, minaTent: 0, arafatTent: 0, muzdalifah: 0, maktab: 0, misc: 0 },
     hotelCurrency: "SAR",
     hotelRate: 0,
     pricingMode: "sharing",
@@ -189,9 +205,17 @@ export function totalFixed(fixed: PackageFixedCosts): number {
     (Number(fixed.ziyarat) || 0) +
     (Number(fixed.meals) || 0) +
     (Number(fixed.insurance) || 0) +
+    // Zero on an Umrah, where they are never asked for.
+    (Number(fixed.minaTent) || 0) +
+    (Number(fixed.arafatTent) || 0) +
+    (Number(fixed.muzdalifah) || 0) +
+    (Number(fixed.maktab) || 0) +
     (Number(fixed.misc) || 0),
   );
 }
+
+/** The Mashair lines, which only a Hajj departure asks for. */
+export const MASHAIR_KEYS = ["minaTent", "arafatTent", "muzdalifah", "maktab"] as const;
 
 /** Room cost for the whole trip, per room, in the hotel's own currency. */
 export function roomCostPerRoom(legs: PackageLeg[]): number {
