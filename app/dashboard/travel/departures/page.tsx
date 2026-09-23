@@ -22,17 +22,24 @@ import {
   costDeparture,
   emptyDeparture,
   emptyLeg,
+  emptyLeg2,
+  layoverLabel,
+  layoverMinutes,
   occupancyName,
   readDeparture,
   roomCostPerRoom,
+  sectorText,
   seatPosition,
+  syncFlight,
   totalFixed,
   totalNights,
   validateDeparture,
+  type FlightLeg,
   type PackageFixedCosts,
   type PackageLeg,
   type UmrahDeparture,
 } from "@/lib/umrahPackage";
+import { AirportInput } from "../_flight/ui";
 
 const ff = "'Outfit','Inter',sans-serif";
 const bg = "rgba(255,255,255,0.03)";
@@ -273,33 +280,91 @@ export default function DeparturesPage() {
         <div style={sectionHead}>The group&rsquo;s flights</div>
         <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: 18 }}>
           {([["arrivalFlight", "Going out"], ["returnFlight", "Coming back"]] as const).map(([key, heading]) => {
-            const f = d[key] || { flightNo: "", sector: "", terminal: "", time: "" };
-            const set = (changes: Partial<typeof f>) => patch({ [key]: { ...f, ...changes } } as Partial<UmrahDeparture>);
+            const f = d[key] || { flightNo: "", sector: "", terminal: "", time: "", legs: [] };
+            const legs = f.legs?.length ? f.legs : [emptyLeg2()];
+            /* The sector, the headline flight number and the check-in time are
+               written from the legs every time one changes, so the voucher and
+               the invoice — which read those — can never disagree with what is
+               on screen. */
+            const setLegs = (next: FlightLeg[]) =>
+              patch({ [key]: syncFlight({ ...f, legs: next }) } as Partial<UmrahDeparture>);
+            const patchLegAt = (id: string, changes: Partial<FlightLeg>) =>
+              setLegs(legs.map((leg) => (leg.id === id ? { ...leg, ...changes } : leg)));
+
             return (
               <div key={key} style={{ background: bg, border: `1px solid ${border}`, borderRadius: 12, padding: 14 }}>
-                <div style={{ fontSize: 12.5, fontWeight: 700, marginBottom: 10 }}>{heading}</div>
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
-                  <div>
-                    <label style={label}>Flight No</label>
-                    <input value={f.flightNo} placeholder="PK-747"
-                      onChange={(e) => set({ flightNo: e.target.value.toUpperCase() })} style={input} />
-                  </div>
-                  <div>
-                    <label style={label}>Time</label>
-                    <input value={f.time} placeholder="19:30"
-                      onChange={(e) => set({ time: e.target.value })} style={input} />
-                  </div>
-                  <div>
-                    <label style={label}>Sector</label>
-                    <input value={f.sector} placeholder="LHE - Madina"
-                      onChange={(e) => set({ sector: e.target.value })} style={input} />
-                  </div>
-                  <div>
-                    <label style={label}>Terminal</label>
-                    <input value={f.terminal} placeholder="Madina Airport"
-                      onChange={(e) => set({ terminal: e.target.value })} style={input} />
-                  </div>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 8, marginBottom: 10 }}>
+                  <div style={{ fontSize: 12.5, fontWeight: 700 }}>{heading}</div>
+                  {sectorText(legs) ? (
+                    <div style={{ fontSize: 11, color: "rgba(255,255,255,.45)" }}>{sectorText(legs)}</div>
+                  ) : null}
                 </div>
+
+                {legs.map((leg, index) => {
+                  const wait = index > 0 ? layoverMinutes(legs[index - 1].arrTime, leg.depTime) : null;
+                  return (
+                    <div key={leg.id}>
+                      {index > 0 ? (
+                        /* The hours a group spends in a transit hall between
+                           two aircraft. Worked out rather than asked for —
+                           both times are already on the page. */
+                        <div style={{ fontSize: 10.5, color: "rgba(255,255,255,.4)", margin: "10px 0 6px", display: "flex", alignItems: "center", gap: 6 }}>
+                          <span>↓</span>
+                          <span>
+                            Change of aircraft at {legs[index - 1].to || "—"}
+                            {wait !== null ? ` · ${layoverLabel(wait)} on the ground` : ""}
+                          </span>
+                        </div>
+                      ) : null}
+
+                      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+                        <div>
+                          <label style={label}>From</label>
+                          <AirportInput compact value={leg.from} placeholder="Lahore"
+                            onChange={(code) => patchLegAt(leg.id, { from: code })} />
+                        </div>
+                        <div>
+                          <label style={label}>To</label>
+                          <AirportInput compact value={leg.to} placeholder="Jeddah"
+                            onChange={(code) => patchLegAt(leg.id, { to: code })} />
+                        </div>
+                        <div>
+                          <label style={label}>Flight No</label>
+                          <input value={leg.flightNo} placeholder="PK-747"
+                            onChange={(e) => patchLegAt(leg.id, { flightNo: e.target.value.toUpperCase() })} style={input} />
+                        </div>
+                        <div>
+                          <label style={label}>Terminal</label>
+                          <input value={leg.terminal} placeholder="T1"
+                            onChange={(e) => patchLegAt(leg.id, { terminal: e.target.value })} style={input} />
+                        </div>
+                        <div>
+                          <label style={label}>Departs</label>
+                          <input value={leg.depTime} placeholder="10:40"
+                            onChange={(e) => patchLegAt(leg.id, { depTime: e.target.value })} style={input} />
+                        </div>
+                        <div>
+                          <label style={label}>Arrives</label>
+                          <input value={leg.arrTime} placeholder="13:10"
+                            onChange={(e) => patchLegAt(leg.id, { arrTime: e.target.value })} style={input} />
+                        </div>
+                      </div>
+
+                      {legs.length > 1 ? (
+                        <button type="button" onClick={() => setLegs(legs.filter((row) => row.id !== leg.id))}
+                          style={{ marginTop: 6, background: "none", border: "none", color: "#f87171", fontSize: 11, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", padding: 0 }}>
+                          Remove this flight
+                        </button>
+                      ) : null}
+                    </div>
+                  );
+                })}
+
+                <button type="button"
+                  onClick={() => setLegs([...legs, emptyLeg2(legs[legs.length - 1]?.to || "")])}
+                  style={{ marginTop: 10, padding: "6px 12px", borderRadius: 8, background: "rgba(255,255,255,.05)", border: `1px solid ${border}`, color: "rgba(255,255,255,.65)", fontSize: 11.5, fontWeight: 700, fontFamily: "inherit", cursor: "pointer" }}>
+                  + Change of aircraft
+                </button>
               </div>
             );
           })}

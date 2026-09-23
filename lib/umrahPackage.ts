@@ -121,13 +121,97 @@ export type UmrahDeparture = {
   transportNote?: string;
 };
 
-/** One leg of the group's own travel — the same for everybody on the trip. */
+/**
+ * One aircraft, from one airport to another.
+ *
+ * A group rarely flies straight there. Lahore to Madinah is often Lahore to
+ * Jeddah on one aircraft and Jeddah to Madinah on another, with two hours in
+ * between — and a pilgrim standing in Jeddah needs the second flight number,
+ * not a note saying "LHE - Madina".
+ */
+export type FlightLeg = {
+  id: string;
+  flightNo: string;
+  /** IATA codes, so a sector can be read back rather than parsed. */
+  from: string;
+  to: string;
+  depTime: string;
+  arrTime: string;
+  terminal: string;
+};
+
+/** The group's travel in one direction — one leg, or several with a change. */
 export type DepartureFlight = {
+  /* Kept in step with the legs rather than typed beside them. Everything that
+     already reads a departure — the voucher, the invoice, the manifest — reads
+     these, and none of it has to learn about connections to keep working. */
   flightNo: string;
   sector: string;
   terminal: string;
   time: string;
+  legs?: FlightLeg[];
 };
+
+export function emptyLeg2(from = "", to = ""): FlightLeg {
+  return { id: newId("fl"), flightNo: "", from, to, depTime: "", arrTime: "", terminal: "" };
+}
+
+/** "LHE → JED → MED", built from the legs so it can never disagree with them. */
+export function sectorText(legs: FlightLeg[] | undefined): string {
+  const chain = (legs ?? []).filter((leg) => leg.from.trim() || leg.to.trim());
+  if (!chain.length) return "";
+  const stops = [chain[0].from.trim().toUpperCase()];
+  for (const leg of chain) stops.push(leg.to.trim().toUpperCase());
+  return stops.filter(Boolean).join(" → ");
+}
+
+/**
+ * The derived fields, recomputed from the legs.
+ *
+ * The first leg is the one the group checks in for, so its number and time are
+ * the ones every existing screen wants; the terminal that matters on arrival
+ * is the last leg's.
+ */
+export function syncFlight(flight: DepartureFlight): DepartureFlight {
+  const legs = flight.legs ?? [];
+  const first = legs[0];
+  const last = legs[legs.length - 1];
+  return {
+    ...flight,
+    legs,
+    flightNo: legs.map((leg) => leg.flightNo.trim()).filter(Boolean).join(" / ") || flight.flightNo,
+    sector: sectorText(legs) || flight.sector,
+    time: first?.depTime || flight.time,
+    terminal: last?.terminal || flight.terminal,
+  };
+}
+
+/**
+ * How long the group waits between two aircraft.
+ *
+ * Returned in minutes, or null where either time is missing — a connection
+ * nobody has timed yet is not a zero-minute connection. Times are HH:MM on the
+ * day; a wait that crosses midnight is read as the next day rather than as a
+ * negative number.
+ */
+export function layoverMinutes(arrive: string, depart: string): number | null {
+  const parse = (t: string) => {
+    const m = /^(\d{1,2}):(\d{2})$/.exec(String(t || "").trim());
+    return m ? Number(m[1]) * 60 + Number(m[2]) : null;
+  };
+  const a = parse(arrive);
+  const d = parse(depart);
+  if (a === null || d === null) return null;
+  return d >= a ? d - a : d + 1440 - a;
+}
+
+/** "2h 15m", or "45m". */
+export function layoverLabel(minutes: number | null): string {
+  if (minutes === null) return "";
+  const h = Math.floor(minutes / 60);
+  const m = minutes % 60;
+  return h ? `${h}h${m ? ` ${m}m` : ""}` : `${m}m`;
+}
 
 export type TierCosting = {
   occupancy: number;
@@ -183,8 +267,8 @@ export function emptyDeparture(kind: PackageKind = "umrah"): UmrahDeparture {
     hotelCurrency: "SAR",
     hotelRate: 0,
     pricingMode: "sharing",
-    arrivalFlight: { flightNo: "", sector: "", terminal: "", time: "" },
-    returnFlight: { flightNo: "", sector: "", terminal: "", time: "" },
+    arrivalFlight: { flightNo: "", sector: "", terminal: "", time: "", legs: [emptyLeg2()] },
+    returnFlight: { flightNo: "", sector: "", terminal: "", time: "", legs: [emptyLeg2()] },
     makkahStaff: "",
     madinahStaff: "",
     transportNote: "",
@@ -323,6 +407,51 @@ export function validateDeparture(d: UmrahDeparture): string[] {
 }
 
 /** Read a stored departure back, defensively. */
+/**
+ * A saved flight, brought up to the legged shape.
+ *
+ * Departures saved before connections existed carry a free-text sector like
+ * "LHE - Madina" and no legs. Splitting that on its dash recovers the two
+ * airports where it was written that way and leaves the text alone where it
+ * was not — the old sector is still shown either way, so nothing a desk typed
+ * is lost to a format change.
+ */
+function readFlight(raw: unknown, fallback: DepartureFlight): DepartureFlight {
+  const d = (raw && typeof raw === "object" ? raw : {}) as Record<string, any>;
+  const flight: DepartureFlight = { ...fallback, ...d };
+
+  if (Array.isArray(d.legs) && d.legs.length) {
+    flight.legs = d.legs.map((leg: any) => ({
+      id: String(leg?.id || newId("fl")),
+      flightNo: String(leg?.flightNo || ""),
+      from: String(leg?.from || "").toUpperCase(),
+      to: String(leg?.to || "").toUpperCase(),
+      depTime: String(leg?.depTime || ""),
+      arrTime: String(leg?.arrTime || ""),
+      terminal: String(leg?.terminal || ""),
+    }));
+    return flight;
+  }
+
+  const parts = String(flight.sector || "")
+    .split(/[-–—>→]+/)
+    .map((part) => part.trim())
+    .filter(Boolean);
+
+  flight.legs = [{
+    id: newId("fl"),
+    flightNo: String(flight.flightNo || ""),
+    // Only a three-letter code is a code. "Madina" is a city somebody typed,
+    // and guessing an airport from it would be inventing data.
+    from: parts.length >= 2 && /^[A-Za-z]{3}$/.test(parts[0]) ? parts[0].toUpperCase() : "",
+    to: parts.length >= 2 && /^[A-Za-z]{3}$/.test(parts[1]) ? parts[1].toUpperCase() : "",
+    depTime: String(flight.time || ""),
+    arrTime: "",
+    terminal: String(flight.terminal || ""),
+  }];
+  return flight;
+}
+
 export function readDeparture(data: unknown): UmrahDeparture {
   const d = (data ?? {}) as Record<string, any>;
   const base = emptyDeparture();
@@ -343,8 +472,8 @@ export function readDeparture(data: unknown): UmrahDeparture {
         }))
       : base.legs,
     fixed: { ...base.fixed, ...(d.fixed || {}) },
-    arrivalFlight: { ...base.arrivalFlight!, ...(d.arrivalFlight || {}) },
-    returnFlight: { ...base.returnFlight!, ...(d.returnFlight || {}) },
+    arrivalFlight: readFlight(d.arrivalFlight, base.arrivalFlight!),
+    returnFlight: readFlight(d.returnFlight, base.returnFlight!),
     tiers: Array.isArray(d.tiers) && d.tiers.length
       ? d.tiers.map((t: any) => ({
           occupancy: Number(t?.occupancy) || 4,
