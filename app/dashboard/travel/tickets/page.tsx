@@ -169,8 +169,12 @@ export default function TravelTicketsPage() {
           label: (row) => (String(row.invoiceNo || "") ? `Invoice ${String(row.invoiceNo)}` : "Create Invoice"),
           tone: "success",
           onClick: async (row, helpers) => {
+            /* The customer's copy, in travel's words rather than the trade
+               shape a SalesInvoice prints by default — passenger, sector, PNR
+               and ticket number, not "Air Ticket Revenue ×1". The ledger entry
+               is untouched; only the paper changes. */
             if (row.invoiceId) {
-              window.location.href = `/dashboard/sales-invoice?id=${encodeURIComponent(String(row.invoiceId))}`;
+              window.location.href = `/dashboard/travel/print?kind=ticket&id=${encodeURIComponent(String(row.id))}`;
               return;
             }
             const response = await fetch("/api/travel/create-invoice", {
@@ -182,6 +186,7 @@ export default function TravelTicketsPage() {
             if (!response.ok) throw new Error(result.error || "Failed to create invoice");
             await helpers.refetch();
             alertToast(`Sales invoice ${result.invoiceNo} created for ${String(row.passenger || "this ticket")}.`, "success", "Invoice Created");
+            window.location.href = `/dashboard/travel/print?kind=ticket&id=${encodeURIComponent(String(row.id))}`;
           },
         },
         {

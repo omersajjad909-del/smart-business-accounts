@@ -988,7 +988,10 @@ export default function TripsPage() {
                   )}
                   {trip.invoiceNo ? (
                     <a
-                      href={trip.invoiceId ? `/dashboard/sales-invoice?id=${encodeURIComponent(trip.invoiceId)}` : "/dashboard/sales-invoice"}
+                      /* The trip's own invoice: a line per service with its
+                         supplier and its PNR, rather than the trade shape a
+                         SalesInvoice prints by default. */
+                      href={`/dashboard/travel/print?kind=trip&id=${encodeURIComponent(trip.id)}`}
                       style={{
                         border: "1px solid rgba(52,211,153,.45)", background: "rgba(52,211,153,.14)",
                         color: "#34d399", borderRadius: 10, padding: "7px 13px", fontSize: 12,

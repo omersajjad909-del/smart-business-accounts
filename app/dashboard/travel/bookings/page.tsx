@@ -485,7 +485,10 @@ export default function BookingsPage() {
             <div style={{ ...sectionHead, margin: "0 0 10px" }}>Post to the ledger</div>
             <div style={{ display: "flex", gap: 10, flexWrap: "wrap", alignItems: "center" }}>
               {b.invoiceNo ? (
-                <a href={`/dashboard/sales-invoice?id=${encodeURIComponent(b.invoiceId || "")}`}
+                /* The pilgrim's copy: a line per person with their passport
+                   and their room sharing, the hotels said once, and what has
+                   actually been received against it. */
+                <a href={`/dashboard/travel/print?kind=package&id=${encodeURIComponent(editing.id)}`}
                   style={{ padding: "9px 16px", borderRadius: 9, background: "rgba(34,197,94,.12)", border: "1px solid rgba(34,197,94,.35)", color: "#34d399", fontSize: 12.5, fontWeight: 700, textDecoration: "none" }}>
                   Invoice {b.invoiceNo} →
                 </a>
