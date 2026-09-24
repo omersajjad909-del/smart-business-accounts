@@ -37,18 +37,16 @@
  */
 export type PackageKind = "umrah" | "hajj" | "tour";
 
-/** One hotel leg of the trip: a city, a hotel, nights, and the ROOM rate. */
+/** One hotel leg with its per-room/night rate for each sharing occupancy. */
 export type PackageLeg = {
   id: string;
   city: string;
   hotelName: string;
   nights: number;
-  /**
-   * Per ROOM per night, not per pilgrim. The division by occupancy happens in
-   * the costing and nowhere else — a rate already divided is a rate that cannot
-   * be re-divided when the sharing changes.
-   */
+  /** Legacy room rate, used when a saved departure has no occupancy rates. */
   roomRatePerNight: number;
+  /** Optional rate per room/night for each room-sharing occupancy. */
+  roomRatesPerNight?: Record<string, number>;
 };
 
 /** What a pilgrim costs regardless of who they share with. */
@@ -264,7 +262,7 @@ export function occupancyName(n: number): string {
 export const PILGRIMAGE_CITIES = ["Makkah", "Madinah", "Aziziah"];
 
 export function emptyLeg(city = "Makkah"): PackageLeg {
-  return { id: newId("leg"), city, hotelName: "", nights: 0, roomRatePerNight: 0 };
+  return { id: newId("leg"), city, hotelName: "", nights: 0, roomRatePerNight: 0, roomRatesPerNight: {} };
 }
 
 export function emptyDeparture(kind: PackageKind = "umrah"): UmrahDeparture {
@@ -330,9 +328,15 @@ export function totalFixed(fixed: PackageFixedCosts): number {
 export const MASHAIR_KEYS = ["minaTent", "arafatTent", "muzdalifah", "maktab"] as const;
 
 /** Room cost for the whole trip, per room, in the hotel's own currency. */
-export function roomCostPerRoom(legs: PackageLeg[]): number {
+export function roomRatePerNight(leg: PackageLeg, occupancy: number): number {
+  const specific = leg.roomRatesPerNight?.[String(occupancy)];
+  return Number(specific ?? leg.roomRatePerNight) || 0;
+}
+
+/** Whole trip hotel cost for one room at a particular occupancy, in hotel currency. */
+export function roomCostPerRoom(legs: PackageLeg[], occupancy = 4): number {
   return round2(
-    legs.reduce((sum, l) => sum + (Number(l.nights) || 0) * (Number(l.roomRatePerNight) || 0), 0),
+    legs.reduce((sum, l) => sum + (Number(l.nights) || 0) * roomRatePerNight(l, occupancy), 0),
   );
 }
 
@@ -349,7 +353,6 @@ export function totalNights(legs: PackageLeg[]): number {
  */
 export function costDeparture(d: UmrahDeparture): TierCosting[] {
   const fixedCost = totalFixed(d.fixed);
-  const perRoom = roomCostPerRoom(d.legs);
   const rate = Number(d.hotelRate) || 0;
 
   const tiers = d.pricingMode === "flat"
@@ -361,7 +364,7 @@ export function costDeparture(d: UmrahDeparture): TierCosting[] {
 
   return tiers.map((tier) => {
     const occupancy = Math.max(1, Math.floor(Number(tier.occupancy) || 1));
-    const roomCost = round2((perRoom / occupancy) * rate);
+    const roomCost = round2((roomCostPerRoom(d.legs, occupancy) / occupancy) * rate);
     const costPerPilgrim = round2(fixedCost + roomCost);
     const sellPerPilgrim = round2(
       d.pricingMode === "flat" ? Number(d.flatPrice) || 0 : Number(tier.sellPrice) || 0,
@@ -414,9 +417,11 @@ export function validateDeparture(d: UmrahDeparture): string[] {
   if (!withNights.length) errors.push("No hotel nights — the room cost would be zero.");
   withNights.forEach((l) => {
     if (!l.hotelName.trim()) errors.push(`The ${l.city || "hotel"} leg has no hotel named.`);
-    if (!(Number(l.roomRatePerNight) > 0)) {
-      errors.push(`${l.hotelName.trim() || l.city || "A leg"} has no room rate.`);
-    }
+    d.tiers.forEach((tier) => {
+      if (!(roomRatePerNight(l, tier.occupancy) > 0)) {
+        errors.push(`${l.hotelName.trim() || l.city || "A leg"} has no ${occupancyName(tier.occupancy)} room rate.`);
+      }
+    });
   });
 
   // Hotel rates are contracted in riyals. Without a conversion rate the room
@@ -497,6 +502,9 @@ export function readDeparture(data: unknown): UmrahDeparture {
           ...l,
           nights: Number(l?.nights) || 0,
           roomRatePerNight: Number(l?.roomRatePerNight) || 0,
+          roomRatesPerNight: l?.roomRatesPerNight && typeof l.roomRatesPerNight === "object"
+            ? Object.fromEntries(Object.entries(l.roomRatesPerNight).map(([occupancy, amount]) => [occupancy, Number(amount) || 0]))
+            : {},
         }))
       : base.legs,
     fixed: { ...base.fixed, ...(d.fixed || {}) },

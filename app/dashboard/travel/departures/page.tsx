@@ -28,6 +28,7 @@ import {
   layoverMinutes,
   occupancyName,
   readDeparture,
+  roomRatePerNight,
   roomCostPerRoom,
   sectorText,
   seatPosition,
@@ -293,7 +294,7 @@ export default function DeparturesPage() {
           {editing.id ? d.title || "Departure" : "New departure"}
         </h1>
         <p style={{ fontSize: 13, color: "rgba(255,255,255,.42)", margin: 0 }}>
-          {totalNights(d.legs)} nights · {d.seats || 0} seats · room {d.hotelCurrency} {roomCostPerRoom(d.legs).toLocaleString()} for the trip
+          {totalNights(d.legs)} nights · {d.seats || 0} seats · room cost per pilgrim: {d.tiers.map((t) => `${occupancyName(t.occupancy)} ${d.hotelCurrency} ${((roomCostPerRoom(d.legs, t.occupancy) / Math.max(1, t.occupancy))).toLocaleString()}`).join(" · ")}
         </p>
 
         <div style={sectionHead}>The trip</div>
@@ -459,61 +460,49 @@ export default function DeparturesPage() {
           </div>
         </div>
 
-        <div style={sectionHead}>Hotel legs — rate is per room, per night</div>
+        <div style={sectionHead}>Hotel legs — enter the room rate per night for each sharing option</div>
         <div style={{ display: "flex", flexDirection: "column", gap: 9 }}>
           {d.legs.map((leg) => (
-            <div key={leg.id} style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr 1fr" : "130px 1.8fr 90px 130px 150px 30px", gap: 9, alignItems: "end" }}>
-              <div>
-                <label style={label}>City</label>
-                {/* Pick one, or type a new one — Aziziah was a new one once.
-                    A city typed here shows up in this list on the next
-                    departure, because the list is read off what they have
-                    actually used. */}
-                <PartyInput
-                  compact
-                  value={leg.city}
-                  options={cityOptions(d.kind, citiesUsed).map((city) => ({ name: city }))}
-                  placeholder="Pick or type a city"
-                  onChange={(city) => patchLeg(leg.id, { city })}
-                />
-              </div>
-              <div>
-                <label style={label}>Hotel</label>
-                {/* The hotels already on the chart, under the Hotel type the
-                    Accounts screen records. Typed once, then picked — which is
-                    also what stops "Makkah Towers" and "MAKKAH TOWER" becoming
-                    two suppliers with half the payable each. */}
-                <PartyInput
-                  compact
-                  value={leg.hotelName}
-                  options={hotels}
-                  kind={TRAVEL_SUPPLIER_KIND.HOTEL}
-                  kindLabel={partyKindHeading(TRAVEL_SUPPLIER_KIND.HOTEL)}
-                  placeholder={hotels.length ? "Pick or type" : "Hotel name"}
-                  onChange={(name) => patchLeg(leg.id, { hotelName: name })}
-                />
-              </div>
-              <div>
-                <label style={label}>Nights</label>
-                <input type="number" min={0} value={leg.nights}
-                  onChange={(e) => patchLeg(leg.id, { nights: Number(e.target.value) || 0 })}
-                  onFocus={(e) => e.currentTarget.select()} style={{ ...input, textAlign: "right" }} />
-              </div>
-              <div>
-                <label style={label}>{d.hotelCurrency}/room/night</label>
-                <input type="number" min={0} step="any" value={leg.roomRatePerNight}
-                  onChange={(e) => patchLeg(leg.id, { roomRatePerNight: Number(e.target.value) || 0 })}
-                  onFocus={(e) => e.currentTarget.select()} style={{ ...input, textAlign: "right" }} />
-              </div>
-              <div>
-                <label style={label}>Leg total</label>
-                <div style={{ ...input, background: "rgba(56,189,248,.07)", borderColor: "rgba(56,189,248,.25)", textAlign: "right", color: accent, fontWeight: 700 }}>
-                  {(leg.nights * leg.roomRatePerNight).toLocaleString()}
+            <div key={leg.id} style={{ padding: 10, border: `1px solid ${border}`, borderRadius: 10 }}>
+              <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr 1fr 70px 30px" : "130px 1.8fr 90px 30px", gap: 9, alignItems: "end" }}>
+                <div>
+                  <label style={label}>City</label>
+                  <PartyInput compact value={leg.city}
+                    options={cityOptions(d.kind, citiesUsed).map((city) => ({ name: city }))}
+                    placeholder="Pick or type a city" onChange={(city) => patchLeg(leg.id, { city })} />
                 </div>
+                <div>
+                  <label style={label}>Hotel</label>
+                  <PartyInput compact value={leg.hotelName} options={hotels}
+                    kind={TRAVEL_SUPPLIER_KIND.HOTEL} kindLabel={partyKindHeading(TRAVEL_SUPPLIER_KIND.HOTEL)}
+                    placeholder={hotels.length ? "Pick or type" : "Hotel name"}
+                    onChange={(name) => patchLeg(leg.id, { hotelName: name })} />
+                </div>
+                <div>
+                  <label style={label}>Nights</label>
+                  <input type="number" min={0} value={leg.nights}
+                    onChange={(e) => patchLeg(leg.id, { nights: Number(e.target.value) || 0 })}
+                    onFocus={(e) => e.currentTarget.select()} style={{ ...input, textAlign: "right" }} />
+                </div>
+                <button tabIndex={-1} title="Remove leg"
+                  onClick={() => patch({ legs: d.legs.filter((l) => l.id !== leg.id) })}
+                  style={{ background: "transparent", border: `1px solid ${border}`, borderRadius: 8, color: "rgba(255,255,255,.45)", cursor: "pointer", padding: "8px 0" }}>×</button>
               </div>
-              <button tabIndex={-1} title="Remove leg"
-                onClick={() => patch({ legs: d.legs.filter((l) => l.id !== leg.id) })}
-                style={{ background: "transparent", border: `1px solid ${border}`, borderRadius: 8, color: "rgba(255,255,255,.45)", cursor: "pointer", padding: "8px 0" }}>×</button>
+              <div style={{ display: "grid", gridTemplateColumns: `repeat(${Math.max(1, d.tiers.length)}, minmax(105px, 1fr))`, gap: 9, marginTop: 9, overflowX: "auto" }}>
+                {[...d.tiers].sort((a, b) => a.occupancy - b.occupancy).map((tier) => {
+                  const occupancy = tier.occupancy;
+                  const rate = roomRatePerNight(leg, occupancy);
+                  return <div key={occupancy}>
+                    <label style={label}>{occupancyName(occupancy)} room · {d.hotelCurrency}/night</label>
+                    <input type="number" min={0} step="any" value={rate}
+                      onChange={(e) => patchLeg(leg.id, { roomRatesPerNight: { ...(leg.roomRatesPerNight || {}), [String(occupancy)]: Number(e.target.value) || 0 } })}
+                      onFocus={(e) => e.currentTarget.select()} style={{ ...input, textAlign: "right" }} />
+                    <div style={{ marginTop: 4, textAlign: "right", fontSize: 10, color: "rgba(255,255,255,.42)" }}>
+                      Stay: {(leg.nights * rate).toLocaleString()} {d.hotelCurrency}
+                    </div>
+                  </div>;
+                })}
+              </div>
             </div>
           ))}
         </div>
@@ -561,7 +550,7 @@ export default function DeparturesPage() {
             calculator and this is the answer to it. */}
         <div style={{ background: bg, border: `1px solid ${border}`, borderRadius: 14, overflow: "hidden" }}>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1.2fr 1fr 80px 34px", gap: 8, padding: "9px 14px", background: "rgba(255,255,255,.03)", fontSize: 10.5, fontWeight: 800, letterSpacing: ".05em", textTransform: "uppercase", color: "rgba(255,255,255,.38)" }}>
-            <span>Sharing</span><span style={{ textAlign: "right" }}>Room</span><span style={{ textAlign: "right" }}>Cost</span>
+            <span>Sharing</span><span style={{ textAlign: "right" }}>Room / pilgrim</span><span style={{ textAlign: "right" }}>Total cost / pilgrim</span>
             <span style={{ textAlign: "right" }}>Sells for</span><span style={{ textAlign: "right" }}>Margin</span><span style={{ textAlign: "right" }}>%</span><span />
           </div>
           {card.map((t, i) => (
@@ -569,7 +558,7 @@ export default function DeparturesPage() {
               <select aria-label="People sharing this room" value={t.occupancy}
                 onChange={(e) => patch({ tiers: d.tiers.map((x, xi) => xi === i ? { ...x, occupancy: Number(e.target.value) } : x) })}
                 style={{ ...input, padding: "6px 8px", fontWeight: 700 }}>
-                {Array.from({ length: 10 }, (_, n) => n + 1).map((n) => <option key={n} value={n} style={{ color: "#111" }}>{occupancyName(n)} ({n})</option>)}
+                {Array.from({ length: 10 }, (_, n) => n + 1).map((n) => <option key={n} value={n} disabled={d.tiers.some((other, oi) => oi !== i && other.occupancy === n)} style={{ color: "#111" }}>{occupancyName(n)} ({n})</option>)}
               </select>
               <span style={{ textAlign: "right", color: "rgba(255,255,255,.55)", fontFamily: "ui-monospace, monospace" }}>{t.roomCost.toLocaleString()}</span>
               <span style={{ textAlign: "right", fontFamily: "ui-monospace, monospace" }}>{t.costPerPilgrim.toLocaleString()}</span>
