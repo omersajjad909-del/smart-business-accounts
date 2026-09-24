@@ -32,6 +32,7 @@ import {
   type PassportState,
 } from "@/lib/umrahBooking";
 import { readDeparture } from "@/lib/umrahPackage";
+import { syncUmrahPilgrimPassports } from "@/lib/umrahPassportSync";
 import { T, ff, flightCss, inputStyle } from "../_flight/ui";
 
 type Row = {
@@ -82,6 +83,7 @@ export default function GroupOpsPage() {
 
   const departures = useBusinessRecords("umrah_departure");
   const bookings = useBusinessRecords("umrah_booking");
+  const passports = useBusinessRecords("travel_passport");
 
   const [departureId, setDepartureId] = useState("");
   const [filter, setFilter] = useState<"all" | "passport" | "visa" | "docs" | "room" | "money">("all");
@@ -187,6 +189,11 @@ export default function GroupOpsPage() {
         const b = readBooking(record.data);
         b.pilgrims = b.pilgrims.map((p, i) => (i === row.index ? { ...p, ...changes } : p));
         await bookings.update(row.bookingId, { data: { ...record.data, pilgrims: b.pilgrims } });
+        try {
+          await syncUmrahPilgrimPassports(b.pilgrims, passports.records, passports.create, passports.update);
+        } catch {
+          alertToast("Pilgrim saved, but passport details could not sync to the Passport Database.", "error", "Passport sync");
+        }
       } catch {
         alertToast("Could not save that change.", "error", "Not Saved");
       } finally {

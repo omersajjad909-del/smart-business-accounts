@@ -28,6 +28,7 @@ import {
 } from "@/lib/umrahBooking";
 import { costDeparture, occupancyName, readDeparture } from "@/lib/umrahPackage";
 import { voucherFromBooking } from "@/lib/umrahVoucherBuild";
+import { syncUmrahPilgrimPassports } from "@/lib/umrahPassportSync";
 
 const ff = "'Outfit','Inter',sans-serif";
 const bg = "rgba(255,255,255,0.03)";
@@ -220,6 +221,11 @@ export default function BookingsPage() {
       };
       if (editing.id) await store.update(editing.id, payload);
       else await store.create(payload);
+      try {
+        await syncUmrahPilgrimPassports(editing.b.pilgrims, passportsStore.records, passportsStore.create, passportsStore.update);
+      } catch {
+        alertToast("Booking saved, but a passport could not sync to the Passport Database. Please retry from the booking.", "error", "Passport sync");
+      }
       setEditing(null);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Could not save the booking");
