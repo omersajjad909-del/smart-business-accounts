@@ -29,6 +29,7 @@ import { AFFILIATE_PROGRAM_LIVE } from "@/lib/affiliateProgram";
 import { FINOVA_COMPANY_PROFILE_UPDATED, FINOVA_USER_PROFILE_UPDATED } from "@/lib/dashboardProfileEvents";
 import { dataUrlToFile } from "@/lib/dataUrl";
 import { PageCloseGuardCtx, type PageCloseGuard } from "@/components/PageCloseGuard";
+import ClientPageTracker from "@/components/ClientPageTracker";
 
 // Deferred out of the main dashboard bundle — each is only relevant in a rare
 // path (avatar cropping, demo-account sessions), not needed for first paint
@@ -1221,6 +1222,7 @@ export default function DashboardLayout({
       <AppearanceApplier />
       <ZeroFieldSelect />
       <DemoSessionTimer />
+      <ClientPageTracker userId={currentUser.id} companyId={currentUser.companyId || ""} />
 
       {/* ── Idle auto-logout warning modal ── */}
       {showIdleWarning && (

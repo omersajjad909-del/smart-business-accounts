@@ -28,6 +28,7 @@ export const ADMIN_NAV_ITEMS: AdminNavItem[] = [
   { id: "signup-analytics", label: "Signup Analytics",  href: "/admin/signup-analytics",    group: "Analytics", short: "SA", icon: "chart" },
   { id: "funnel",           label: "Funnel Analysis",   href: "/admin/funnel",              group: "Analytics", short: "FN", icon: "chart", badge: "NEW" },
   { id: "usage",            label: "Usage Insights",    href: "/admin/usage",               group: "Analytics", short: "UG", icon: "pulse" },
+  { id: "client-page-usage", label: "Client Page Usage", href: "/admin/client-page-usage",    group: "Analytics", short: "PU", icon: "monitor", badge: "NEW" },
   { id: "audit-trail",      label: "Audit Trail",       href: "/admin/audit-trail",         group: "Analytics", short: "AT", icon: "list" },
   { id: "web",              label: "Web Metrics",       href: "/admin/web",                 group: "Analytics", short: "WB", icon: "monitor" },
 

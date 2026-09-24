@@ -105,6 +105,7 @@ const API_PATH_TO_PAGE: Array<[string, string]> = [
   ["/api/admin/module-prices", "business-modules"],
   ["/api/admin/signup-analytics", "signup-analytics"],
   ["/api/admin/funnel", "funnel"],
+  ["/api/admin/client-page-usage", "client-page-usage"],
   ["/api/admin/usage", "usage"],
   ["/api/admin/audit-trail", "audit-trail"],
   ["/api/admin/visitors", "web"],
