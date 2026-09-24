@@ -101,7 +101,11 @@ export async function POST(req: NextRequest) {
         data: {
           action: "WHATSAPP_BROADCAST",
           details: JSON.stringify({ body, audience, plan, sentTo: 0, channel: "whatsapp", note }),
-          userId: req.headers.get("x-user-id") || null,
+          // ActivityLog.userId refers to a tenant `User`. Admin accounts live
+          // in AdminUser (or the platform admin store), so writing the admin
+          // session id here violates ActivityLog_userId_fkey and makes an
+          // otherwise successful broadcast look like a failed one.
+          userId: null,
         },
       });
 
@@ -158,7 +162,9 @@ export async function POST(req: NextRequest) {
       data: {
         action: "EMAIL_BROADCAST",
         details: JSON.stringify({ subject, body, audience, plan, sentTo: successCount, openRate: 0, channel: "email" }),
-        userId: req.headers.get("x-user-id") || null,
+        // See the equivalent WhatsApp log above: this relation cannot store
+        // an AdminUser id.
+        userId: null,
       },
     });
 
