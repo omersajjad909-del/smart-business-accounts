@@ -117,6 +117,12 @@ function nextLegCity(d: UmrahDeparture): string {
   return offered.find((city) => !taken.has(city.toLowerCase())) || PILGRIMAGE_CITIES[0];
 }
 
+/** Native time inputs use 24-hour values; seconds are included for precise entry. */
+function timeWithSeconds(value: string): string {
+  if (!value) return "";
+  return /^\d{2}:\d{2}$/.test(value) ? `${value}:00` : value;
+}
+
 /**
  * The cities this leg offers, in the order a pilgrimage happens.
  *
@@ -394,12 +400,12 @@ export default function DeparturesPage() {
                         </div>
                         <div>
                           <label style={label}>Departs</label>
-                          <input value={leg.depTime} placeholder="10:40"
+                          <input type="time" lang="en-GB" step={1} value={timeWithSeconds(leg.depTime)}
                             onChange={(e) => patchLegAt(leg.id, { depTime: e.target.value })} style={input} />
                         </div>
                         <div>
                           <label style={label}>Arrives</label>
-                          <input value={leg.arrTime} placeholder="13:10"
+                          <input type="time" lang="en-GB" step={1} value={timeWithSeconds(leg.arrTime)}
                             onChange={(e) => patchLegAt(leg.id, { arrTime: e.target.value })} style={input} />
                         </div>
                       </div>
