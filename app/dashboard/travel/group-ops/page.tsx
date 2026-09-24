@@ -59,6 +59,14 @@ const VISA_TONE: Record<string, string> = {
   pending: "#94a3b8", applied: "#60a5fa", approved: "#34d399", rejected: "#f87171",
 };
 
+/** Pakistani CNIC format: five digits, seven digits, then one digit. */
+function formatCnic(value: string): string {
+  const digits = value.replace(/\D/g, "").slice(0, 13);
+  if (digits.length <= 5) return digits;
+  if (digits.length <= 12) return `${digits.slice(0, 5)}-${digits.slice(5)}`;
+  return `${digits.slice(0, 5)}-${digits.slice(5, 12)}-${digits.slice(12)}`;
+}
+
 export default function GroupOpsPage() {
   const { isMobile } = useResponsive();
   const symbol = useCurrency();
@@ -306,7 +314,10 @@ export default function GroupOpsPage() {
                       </label>
                       <label style={{ display: "grid", gap: 3 }}>
                         <span style={{ fontSize: 10, color: T.muted, textTransform: "uppercase", letterSpacing: ".05em" }}>CNIC</span>
-                        <input defaultValue={row.pilgrim.cnic || ""} onBlur={(e) => { if (e.target.value !== (row.pilgrim.cnic || "")) patchPilgrim(row, { cnic: e.target.value.trim() }); }} style={cell} className="fl-in" />
+                        <input defaultValue={formatCnic(row.pilgrim.cnic || "")} inputMode="numeric" maxLength={15} placeholder="33100-1234567-1"
+                          onChange={(e) => { e.currentTarget.value = formatCnic(e.currentTarget.value); }}
+                          onBlur={(e) => { const value = formatCnic(e.target.value); if (value !== (row.pilgrim.cnic || "")) patchPilgrim(row, { cnic: value }); }}
+                          style={cell} className="fl-in" />
                       </label>
                       <label style={{ display: "grid", gap: 3 }}>
                         <span style={{ fontSize: 10, color: VISA_TONE[visa], textTransform: "uppercase", letterSpacing: ".05em" }}>Visa</span>
