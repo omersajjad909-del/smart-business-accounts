@@ -6,6 +6,7 @@ type PassportPayload = {
   data: Record<string, unknown>;
   status?: string;
   date?: string;
+  refId?: string;
 };
 type PassportUpdatePayload = Pick<PassportPayload, "title" | "data" | "date">;
 
@@ -30,7 +31,7 @@ export async function syncUmrahPilgrimPassports(
       const data = record.data as Record<string, unknown>;
       const savedNo = String(data.passportNo || "").trim().toUpperCase();
       const savedName = String(data.passengerName || record.title || "").trim().toUpperCase();
-      return savedNo === passportNo || (!savedNo && savedName === name.toUpperCase());
+      return record.refId === pilgrim.id || savedNo === passportNo || (!savedNo && savedName === name.toUpperCase());
     });
     const existingData = (match?.data || {}) as Record<string, unknown>;
     const expiryDate = String(pilgrim.passportExpiry || existingData.expiryDate || match?.date || "").slice(0, 10);
@@ -55,7 +56,7 @@ export async function syncUmrahPilgrimPassports(
       const saved = await update(match.id, { title, data, ...(date ? { date } : {}) });
       working[working.findIndex((record) => record.id === match.id)] = saved;
     } else {
-      working.unshift(await create(payload));
+      working.unshift(await create({ ...payload, refId: pilgrim.id }));
     }
   }
 }

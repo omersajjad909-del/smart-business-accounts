@@ -1,8 +1,10 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 import { useBusinessRecords } from "@/lib/useBusinessRecords";
 import { useResponsive } from "@/hooks/useResponsive";
+import { readBooking } from "@/lib/umrahBooking";
+import { syncUmrahPilgrimPassports } from "@/lib/umrahPassportSync";
 
 const ff = "'Outfit','Inter',sans-serif";
 const panelBg = "rgba(255,255,255,.03)";
@@ -28,6 +30,8 @@ function getPassportStatus(expiryDate: string): { label: string; color: string }
 export default function PassportDatabasePage() {
   const { isMobile } = useResponsive();
   const { records, loading, create, update, remove } = useBusinessRecords("travel_passport");
+  const bookings = useBusinessRecords("umrah_booking");
+  const didSyncBookings = useRef(false);
 
   const [showModal, setShowModal] = useState(false);
   const [editId, setEditId] = useState<string | null>(null);
@@ -37,6 +41,17 @@ export default function PassportDatabasePage() {
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [deleteId, setDeleteId] = useState<string | null>(null);
+
+  // Bring existing booking pilgrims into this list once, then keep new/edited
+  // passport details mirrored from the booking and Group Operations forms.
+  useEffect(() => {
+    if (didSyncBookings.current || loading || bookings.loading) return;
+    didSyncBookings.current = true;
+    const pilgrims = bookings.records.flatMap((record) => readBooking(record.data).pilgrims);
+    void syncUmrahPilgrimPassports(pilgrims, records, create, update).catch(() => {
+      didSyncBookings.current = false;
+    });
+  }, [loading, bookings.loading, bookings.records, records, create, update]);
 
   const passports = useMemo(() => records.map(r => {
     const expiryDate = String(r.data?.expiryDate || r.date || "").slice(0, 10);
