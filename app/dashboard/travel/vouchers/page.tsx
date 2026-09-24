@@ -205,7 +205,7 @@ export default function UmrahVouchersPage() {
             const nights = nightsBetween(stay.inDate, stay.outDate);
             return (
               <div key={stay.id} style={{ background: bg, border: `1px solid ${border}`, borderRadius: 12, padding: 12 }}>
-                <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr 1fr" : "120px 1.6fr 96px 1fr 1fr 80px 90px 30px", gap: 9, alignItems: "end" }}>
+                <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr 1fr" : "120px 1.5fr 96px 1fr 1fr 110px 80px 90px 30px", gap: 9, alignItems: "end" }}>
                   {field("City", stay.city, (s) => patchStay(stay.id, { city: s }))}
                   {field("Hotel", stay.hotelName, (s) => patchStay(stay.id, { hotelName: s.toUpperCase() }))}
                   <div>
@@ -217,6 +217,7 @@ export default function UmrahVouchersPage() {
                   </div>
                   {field("In Date", stay.inDate, (s) => patchStay(stay.id, { inDate: s }), "date")}
                   {field("Out Date", stay.outDate, (s) => patchStay(stay.id, { outDate: s }), "date")}
+                  {field("Room No", stay.roomNo || "", (s) => patchStay(stay.id, { roomNo: s }), "text", "Enter room number")}
                   <div>
                     <label style={label}>Rooms</label>
                     <input type="number" min={1} value={stay.rooms}
