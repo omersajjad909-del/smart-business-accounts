@@ -480,9 +480,14 @@ export default function DeparturesPage() {
                 <div>
                   <label style={label}>{mina ? "Hajj Company (supplier)" : "Hotel"}</label>
                   {mina ? (
-                    <PartyInput compact value={leg.hajjCompanyName || ""} options={hotels}
-                      placeholder={hotels.length ? "Choose supplier account" : "Add Hajj Company in Accounts first"}
-                      onChange={(name) => patchLeg(leg.id, { hajjCompanyName: name })} />
+                    <select value={leg.hajjCompanyName || ""}
+                      onChange={(e) => patchLeg(leg.id, { hajjCompanyName: e.target.value })}
+                      style={{ ...input, background: "#161b27" }}>
+                      <option value="">{hotels.length ? "Choose supplier account" : "Add Hajj Company in Accounts first"}</option>
+                      {leg.hajjCompanyName && !hotels.some((supplier) => supplier.name === leg.hajjCompanyName)
+                        ? <option value={leg.hajjCompanyName}>{leg.hajjCompanyName}</option> : null}
+                      {hotels.map((supplier) => <option key={supplier.name} value={supplier.name}>{supplier.name}</option>)}
+                    </select>
                   ) : (
                     <PartyInput compact value={leg.hotelName} options={hotels}
                       kind={TRAVEL_SUPPLIER_KIND.HOTEL} kindLabel={partyKindHeading(TRAVEL_SUPPLIER_KIND.HOTEL)}

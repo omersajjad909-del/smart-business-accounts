@@ -47,6 +47,14 @@ type Row = {
   paidPercent: number;
 };
 
+function pilgrimRoom(pilgrim: BookingPilgrim, city: string): string {
+  const key = city.trim().toLowerCase();
+  if (pilgrim.roomAssignments?.[key] != null) return pilgrim.roomAssignments[key];
+  if (key === "makkah") return pilgrim.roomMakkah || "";
+  if (key === "madinah") return pilgrim.roomMadinah || "";
+  return "";
+}
+
 const PASSPORT_TONE: Record<PassportState, { tone: string; label: string }> = {
   missing: { tone: "#f87171", label: "No passport" },
   "no-expiry": { tone: "#f4c25b", label: "No expiry" },
@@ -93,23 +101,20 @@ export default function GroupOpsPage() {
   }, [departureList, departureId]);
 
   const departure = departureList.find((d) => d.id === departureId);
-  const accommodationLegs = departure?.d.legs.filter((leg) =>
+  const departureKind = departure?.d.kind;
+  const accommodationLegs = useMemo(() => (departure?.d.legs || []).filter((leg) =>
     leg.nights > 0 || Boolean(leg.hotelName.trim()) || Boolean(
-      departure.d.kind === "hajj" && leg.city.trim().toLowerCase() === "mina" &&
+      departureKind === "hajj" && leg.city.trim().toLowerCase() === "mina" &&
       (leg.hajjCompanyName?.trim() || leg.maktabName?.trim()),
     ),
-  ) ?? [];
-  const roomCities = [...new Set(accommodationLegs
-    .filter((leg) => !(departure?.d.kind === "hajj" && leg.city.trim().toLowerCase() === "mina"))
-    .map((leg) => leg.city.trim()).filter(Boolean))];
-  if (!roomCities.length && accommodationLegs.length === 0) roomCities.push("Makkah", "Madinah");
-  const roomValue = (pilgrim: BookingPilgrim, city: string) => {
-    const key = city.trim().toLowerCase();
-    if (pilgrim.roomAssignments?.[key] != null) return pilgrim.roomAssignments[key];
-    if (key === "makkah") return pilgrim.roomMakkah || "";
-    if (key === "madinah") return pilgrim.roomMadinah || "";
-    return "";
-  };
+  ), [departure, departureKind]);
+  const roomCities = useMemo(() => {
+    const cities = [...new Set(accommodationLegs
+      .filter((leg) => !(departureKind === "hajj" && leg.city.trim().toLowerCase() === "mina"))
+      .map((leg) => leg.city.trim()).filter(Boolean))];
+    if (!cities.length && accommodationLegs.length === 0) cities.push("Makkah", "Madinah");
+    return cities;
+  }, [accommodationLegs, departureKind]);
 
   const rows = useMemo(() => {
     const out: Row[] = [];
@@ -149,7 +154,7 @@ export default function GroupOpsPage() {
         case "passport": return state !== "ok";
         case "visa": return (row.pilgrim.visaStatus ?? "pending") !== "approved";
         case "docs": return documentsIn(row.pilgrim) < PILGRIM_DOCUMENTS.length;
-        case "room": return roomCities.some((city) => !roomValue(row.pilgrim, city).trim());
+        case "room": return roomCities.some((city) => !pilgrimRoom(row.pilgrim, city).trim());
         case "money": return row.overdue > 0 || row.balance > 0;
         default: return true;
       }
@@ -167,7 +172,7 @@ export default function GroupOpsPage() {
     const visaPending = rows.filter((r) => (r.pilgrim.visaStatus ?? "pending") !== "approved").length;
     const docsIn = rows.reduce((sum, r) => sum + documentsIn(r.pilgrim), 0);
     const docsTotal = rows.length * PILGRIM_DOCUMENTS.length;
-    const noRoom = rows.filter((r) => roomCities.some((city) => !roomValue(r.pilgrim, city).trim())).length;
+    const noRoom = rows.filter((r) => roomCities.some((city) => !pilgrimRoom(r.pilgrim, city).trim())).length;
     return { parties: parties.size, owed, overdueParties, passportIssues, visaPending, docsIn, docsTotal, noRoom };
   }, [rows, departureDate, roomCities]);
 
@@ -243,7 +248,7 @@ export default function GroupOpsPage() {
 
           {accommodationLegs.length > 0 ? <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 14 }}>
             {accommodationLegs.map((leg) => {
-              const mina = departure?.d.kind === "hajj" && leg.city.trim().toLowerCase() === "mina";
+              const mina = departureKind === "hajj" && leg.city.trim().toLowerCase() === "mina";
               const detail = mina
                 ? `${leg.hajjCompanyName || "Hajj Company not set"} · Maktab ${leg.maktabName || "—"} · Category ${leg.maktabCategory || "—"}`
                 : leg.hotelName || "Hotel not set";
@@ -356,7 +361,7 @@ export default function GroupOpsPage() {
                       </label>
                       {roomCities.map((city) => {
                         const key = city.trim().toLowerCase();
-                        const current = roomValue(row.pilgrim, city);
+                        const current = pilgrimRoom(row.pilgrim, city);
                         return <label key={key} style={{ display: "grid", gap: 3 }}>
                           <span style={{ fontSize: 10, color: T.muted, textTransform: "uppercase", letterSpacing: ".05em" }}>Room — {city}</span>
                           <input defaultValue={current} placeholder="Room number"
