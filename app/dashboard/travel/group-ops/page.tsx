@@ -93,6 +93,23 @@ export default function GroupOpsPage() {
   }, [departureList, departureId]);
 
   const departure = departureList.find((d) => d.id === departureId);
+  const accommodationLegs = departure?.d.legs.filter((leg) =>
+    leg.nights > 0 || Boolean(leg.hotelName.trim()) || Boolean(
+      departure.d.kind === "hajj" && leg.city.trim().toLowerCase() === "mina" &&
+      (leg.hajjCompanyName?.trim() || leg.maktabName?.trim()),
+    ),
+  ) ?? [];
+  const roomCities = [...new Set(accommodationLegs
+    .filter((leg) => !(departure?.d.kind === "hajj" && leg.city.trim().toLowerCase() === "mina"))
+    .map((leg) => leg.city.trim()).filter(Boolean))];
+  if (!roomCities.length && accommodationLegs.length === 0) roomCities.push("Makkah", "Madinah");
+  const roomValue = (pilgrim: BookingPilgrim, city: string) => {
+    const key = city.trim().toLowerCase();
+    if (pilgrim.roomAssignments?.[key] != null) return pilgrim.roomAssignments[key];
+    if (key === "makkah") return pilgrim.roomMakkah || "";
+    if (key === "madinah") return pilgrim.roomMadinah || "";
+    return "";
+  };
 
   const rows = useMemo(() => {
     const out: Row[] = [];
@@ -132,12 +149,12 @@ export default function GroupOpsPage() {
         case "passport": return state !== "ok";
         case "visa": return (row.pilgrim.visaStatus ?? "pending") !== "approved";
         case "docs": return documentsIn(row.pilgrim) < PILGRIM_DOCUMENTS.length;
-        case "room": return !row.pilgrim.roomMakkah?.trim() || !row.pilgrim.roomMadinah?.trim();
+        case "room": return roomCities.some((city) => !roomValue(row.pilgrim, city).trim());
         case "money": return row.overdue > 0 || row.balance > 0;
         default: return true;
       }
     });
-  }, [rows, filter, search, departureDate]);
+  }, [rows, filter, search, departureDate, roomCities]);
 
   const stats = useMemo(() => {
     const parties = new Set(rows.map((r) => r.bookingId));
@@ -150,9 +167,9 @@ export default function GroupOpsPage() {
     const visaPending = rows.filter((r) => (r.pilgrim.visaStatus ?? "pending") !== "approved").length;
     const docsIn = rows.reduce((sum, r) => sum + documentsIn(r.pilgrim), 0);
     const docsTotal = rows.length * PILGRIM_DOCUMENTS.length;
-    const noRoom = rows.filter((r) => !r.pilgrim.roomMakkah?.trim() || !r.pilgrim.roomMadinah?.trim()).length;
+    const noRoom = rows.filter((r) => roomCities.some((city) => !roomValue(r.pilgrim, city).trim())).length;
     return { parties: parties.size, owed, overdueParties, passportIssues, visaPending, docsIn, docsTotal, noRoom };
-  }, [rows, departureDate]);
+  }, [rows, departureDate, roomCities]);
 
   /* Saving one pilgrim writes the party's whole booking back, because that is
      the record — the pilgrim is a row inside it. */
@@ -223,6 +240,18 @@ export default function GroupOpsPage() {
               </div>
             ))}
           </div>
+
+          {accommodationLegs.length > 0 ? <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 14 }}>
+            {accommodationLegs.map((leg) => {
+              const mina = departure?.d.kind === "hajj" && leg.city.trim().toLowerCase() === "mina";
+              const detail = mina
+                ? `${leg.hajjCompanyName || "Hajj Company not set"} · Maktab ${leg.maktabName || "—"} · Category ${leg.maktabCategory || "—"}`
+                : leg.hotelName || "Hotel not set";
+              return <div key={leg.id} style={{ background: T.card, border: `1px solid ${T.border}`, borderRadius: 10, padding: "8px 11px", fontSize: 11.5, color: T.muted }}>
+                <strong style={{ color: T.text }}>{leg.city}</strong> · {detail} · {leg.nights} nights
+              </div>;
+            })}
+          </div> : null}
 
           <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 14, alignItems: "center" }}>
             {([
@@ -325,14 +354,22 @@ export default function GroupOpsPage() {
                           {VISA_STATUSES.map((s) => <option key={s} value={s}>{s}</option>)}
                         </select>
                       </label>
-                      <label style={{ display: "grid", gap: 3 }}>
-                        <span style={{ fontSize: 10, color: T.muted, textTransform: "uppercase", letterSpacing: ".05em" }}>Room — Makkah</span>
-                        <input defaultValue={row.pilgrim.roomMakkah || ""} placeholder="e.g. 412" onBlur={(e) => { if (e.target.value !== (row.pilgrim.roomMakkah || "")) patchPilgrim(row, { roomMakkah: e.target.value.trim() }); }} style={cell} className="fl-in" />
-                      </label>
-                      <label style={{ display: "grid", gap: 3 }}>
-                        <span style={{ fontSize: 10, color: T.muted, textTransform: "uppercase", letterSpacing: ".05em" }}>Room — Madinah</span>
-                        <input defaultValue={row.pilgrim.roomMadinah || ""} placeholder="e.g. 207" onBlur={(e) => { if (e.target.value !== (row.pilgrim.roomMadinah || "")) patchPilgrim(row, { roomMadinah: e.target.value.trim() }); }} style={cell} className="fl-in" />
-                      </label>
+                      {roomCities.map((city) => {
+                        const key = city.trim().toLowerCase();
+                        const current = roomValue(row.pilgrim, city);
+                        return <label key={key} style={{ display: "grid", gap: 3 }}>
+                          <span style={{ fontSize: 10, color: T.muted, textTransform: "uppercase", letterSpacing: ".05em" }}>Room — {city}</span>
+                          <input defaultValue={current} placeholder="Room number"
+                            onBlur={(e) => {
+                              const value = e.target.value.trim();
+                              if (value === current) return;
+                              const changes: Partial<BookingPilgrim> = { roomAssignments: { ...(row.pilgrim.roomAssignments || {}), [key]: value } };
+                              if (key === "makkah") changes.roomMakkah = value;
+                              if (key === "madinah") changes.roomMadinah = value;
+                              patchPilgrim(row, changes);
+                            }} style={cell} className="fl-in" />
+                        </label>;
+                      })}
                     </div>
 
                     {/* Five ticks. At a hundred pilgrims this is the five hundred

@@ -28,6 +28,7 @@ import {
   layoverMinutes,
   occupancyName,
   readDeparture,
+  isMinaLeg,
   roomRatePerNight,
   roomCostPerRoom,
   sectorText,
@@ -110,8 +111,8 @@ function staffLabel(d: UmrahDeparture, index: number): string {
 function nextLegCity(d: UmrahDeparture): string {
   if (d.kind === "tour") return "";
   /* The next city the trip has not booked yet, in the order a pilgrimage
-     happens: Makkah, then Madinah, then Aziziah for the days of the Hajj
-     itself. Once all three are on the trip a fourth leg is a second stay
+     happens: Makkah, then Madinah, then Aziziah and Mina for the Hajj
+     itself. Once all four are on the trip a fifth leg is a second stay
      somewhere, so it opens on Makkah for the operator to change. */
   const taken = new Set(d.legs.map((l) => l.city.trim().toLowerCase()).filter(Boolean));
   const offered = d.kind === "hajj" ? PILGRIMAGE_CITIES : PILGRIMAGE_CITIES.slice(0, 2);
@@ -127,9 +128,9 @@ function timeWithSeconds(value: string): string {
 /**
  * The cities this leg offers, in the order a pilgrimage happens.
  *
- * The three canonical ones first, then every city this agency has actually
+ * The pilgrimage cities first, then every city this agency has actually
  * used on any departure — so a city typed once is on the list from then on,
- * without anybody maintaining a list. An Umrah is not offered Aziziah unless
+ * without anybody maintaining a list. An Umrah is not offered Aziziah or Mina unless
  * one of theirs has stayed there, in which case it is their own history and
  * worth offering back.
  *
@@ -143,6 +144,7 @@ function cityOptions(kind: string, used: string[]): string[] {
   const extra: string[] = [];
   for (const city of used) {
     const key = city.trim().toLowerCase();
+    if (kind !== "hajj" && key === "mina") continue;
     if (!key || seen.has(key)) continue;
     seen.add(key);
     extra.push(city.trim());
@@ -460,23 +462,33 @@ export default function DeparturesPage() {
           </div>
         </div>
 
-        <div style={sectionHead}>Hotel legs — enter the room rate per night for each sharing option</div>
+        <div style={sectionHead}>Hotel legs and Mina camp</div>
         <div style={{ display: "flex", flexDirection: "column", gap: 9 }}>
-          {d.legs.map((leg) => (
+          {d.legs.map((leg) => {
+            const mina = d.kind === "hajj" && isMinaLeg(leg);
+            return (
             <div key={leg.id} style={{ padding: 10, border: `1px solid ${border}`, borderRadius: 10 }}>
               <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr 1fr 70px 30px" : "130px 1.8fr 90px 30px", gap: 9, alignItems: "end" }}>
                 <div>
                   <label style={label}>City</label>
                   <PartyInput compact value={leg.city}
                     options={cityOptions(d.kind, citiesUsed).map((city) => ({ name: city }))}
-                    placeholder="Pick or type a city" onChange={(city) => patchLeg(leg.id, { city })} />
+                    placeholder="Pick or type a city" onChange={(city) => patchLeg(leg.id, isMinaLeg({ city })
+                      ? { city, hotelName: "", roomRatePerNight: 0, roomRatesPerNight: {} }
+                      : { city })} />
                 </div>
                 <div>
-                  <label style={label}>Hotel</label>
-                  <PartyInput compact value={leg.hotelName} options={hotels}
-                    kind={TRAVEL_SUPPLIER_KIND.HOTEL} kindLabel={partyKindHeading(TRAVEL_SUPPLIER_KIND.HOTEL)}
-                    placeholder={hotels.length ? "Pick or type" : "Hotel name"}
-                    onChange={(name) => patchLeg(leg.id, { hotelName: name })} />
+                  <label style={label}>{mina ? "Hajj Company (supplier)" : "Hotel"}</label>
+                  {mina ? (
+                    <PartyInput compact value={leg.hajjCompanyName || ""} options={hotels}
+                      placeholder={hotels.length ? "Choose supplier account" : "Add Hajj Company in Accounts first"}
+                      onChange={(name) => patchLeg(leg.id, { hajjCompanyName: name })} />
+                  ) : (
+                    <PartyInput compact value={leg.hotelName} options={hotels}
+                      kind={TRAVEL_SUPPLIER_KIND.HOTEL} kindLabel={partyKindHeading(TRAVEL_SUPPLIER_KIND.HOTEL)}
+                      placeholder={hotels.length ? "Pick or type" : "Hotel name"}
+                      onChange={(name) => patchLeg(leg.id, { hotelName: name })} />
+                  )}
                 </div>
                 <div>
                   <label style={label}>Nights</label>
@@ -488,6 +500,24 @@ export default function DeparturesPage() {
                   onClick={() => patch({ legs: d.legs.filter((l) => l.id !== leg.id) })}
                   style={{ background: "transparent", border: `1px solid ${border}`, borderRadius: 8, color: "rgba(255,255,255,.45)", cursor: "pointer", padding: "8px 0" }}>×</button>
               </div>
+              {mina ? (
+                <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr 1fr" : "2fr 1fr", gap: 9, marginTop: 9 }}>
+                  <div>
+                    <label style={label}>Maktab name</label>
+                    <input value={leg.maktabName || ""} placeholder="Maktab name"
+                      onChange={(e) => patchLeg(leg.id, { maktabName: e.target.value })} style={input} />
+                  </div>
+                  <div>
+                    <label style={label}>Maktab category</label>
+                    <select value={leg.maktabCategory || ""}
+                      onChange={(e) => patchLeg(leg.id, { maktabCategory: e.target.value as "A" | "B" | "C" | "D" | "" })}
+                      style={{ ...input, background: "#161b27" }}>
+                      <option value="">Choose category</option>
+                      {["A", "B", "C", "D"].map((category) => <option key={category} value={category}>{category}</option>)}
+                    </select>
+                  </div>
+                </div>
+              ) : (
               <div style={{ display: "grid", gridTemplateColumns: `repeat(${Math.max(1, d.tiers.length)}, minmax(105px, 1fr))`, gap: 9, marginTop: 9, overflowX: "auto" }}>
                 {[...d.tiers].sort((a, b) => a.occupancy - b.occupancy).map((tier) => {
                   const occupancy = tier.occupancy;
@@ -503,8 +533,10 @@ export default function DeparturesPage() {
                   </div>;
                 })}
               </div>
+              )}
             </div>
-          ))}
+            );
+          })}
         </div>
         <button onClick={() => patch({ legs: [...d.legs, emptyLeg(nextLegCity(d))] })}
           style={{ marginTop: 10, padding: "7px 14px", borderRadius: 8, background: "rgba(255,255,255,.05)", border: `1px solid ${border}`, color: "rgba(255,255,255,.65)", fontSize: 12, fontWeight: 700, fontFamily: "inherit", cursor: "pointer" }}>

@@ -67,6 +67,7 @@ function FlightTable({ flight, heading, bandColour }: { flight: VoucherFlight; h
 
 function StayTable({ stay }: { stay: VoucherHotelStay }) {
   const nights = nightsBetween(stay.inDate, stay.outDate);
+  const mina = stay.city.trim().toLowerCase() === "mina";
   const row = (label: string, value: React.ReactNode) => (
     <tr>
       <td style={{ ...cellLabel, width: "46%" }}>{label}</td>
@@ -76,22 +77,32 @@ function StayTable({ stay }: { stay: VoucherHotelStay }) {
   return (
     <div style={{ flex: 1, minWidth: 0 }}>
       <div style={{ background: BAND_HOTEL, color: "#fff", fontSize: 9.5, fontWeight: 700, padding: "3px 7px" }}>
-        Hotel In {stay.city}
+        {mina ? "Mina Camp" : `Hotel In ${stay.city}`}
       </div>
       <table style={{ width: "100%", borderCollapse: "collapse" }}>
         <tbody>
-          {row("Hotel Name", stay.hotelName || "—")}
-          {row("Room Type", roomTypeLabel(stay.occupancy))}
+          {mina ? (
+            <>
+              {row("Hajj Company", stay.hajjCompanyName || "—")}
+              {row("Maktab Name", stay.maktabName || "—")}
+              {row("Maktab Category", stay.maktabCategory || "—")}
+            </>
+          ) : (
+            <>
+              {row("Hotel Name", stay.hotelName || "—")}
+              {row("Room Type", roomTypeLabel(stay.occupancy))}
+            </>
+          )}
           {row("In Date", fmtVoucherDate(stay.inDate) || "—")}
           {/* The number the hotel desk checks. Worked out from the dates above
               it, so the two can never be handed over disagreeing. */}
           {row("Nights", nights || "—")}
           {row("Out Date", fmtVoucherDate(stay.outDate) || "—")}
-          {row("No Of Room", stay.rooms || 1)}
-          {row(
+          {!mina ? row("No Of Room", stay.rooms || 1) : null}
+          {!mina ? row(
             "Room No",
             <span style={{ color: LINE, fontWeight: 700 }}>{stay.roomNo?.trim() || "SELF HOTEL--"}</span>,
-          )}
+          ) : null}
         </tbody>
       </table>
     </div>

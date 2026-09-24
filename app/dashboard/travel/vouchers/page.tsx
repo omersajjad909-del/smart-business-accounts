@@ -199,31 +199,39 @@ export default function UmrahVouchersPage() {
           ))}
         </div>
 
-        <div style={sectionHead}>Hotel stays — in trip order</div>
+        <div style={sectionHead}>Hotel stays and Mina camp — in trip order</div>
         <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
           {v.stays.map((stay) => {
             const nights = nightsBetween(stay.inDate, stay.outDate);
+            const mina = stay.city.trim().toLowerCase() === "mina";
             return (
               <div key={stay.id} style={{ background: bg, border: `1px solid ${border}`, borderRadius: 12, padding: 12 }}>
-                <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr 1fr" : "120px 1.5fr 96px 1fr 1fr 110px 80px 90px 30px", gap: 9, alignItems: "end" }}>
+                <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr 1fr" : mina ? "120px 1.5fr 1.2fr 100px 1fr 1fr 80px 30px" : "120px 1.5fr 96px 1fr 1fr 110px 80px 90px 30px", gap: 9, alignItems: "end" }}>
                   {field("City", stay.city, (s) => patchStay(stay.id, { city: s }))}
-                  {field("Hotel", stay.hotelName, (s) => patchStay(stay.id, { hotelName: s.toUpperCase() }))}
-                  <div>
-                    <label style={label}>Sharing</label>
-                    <select value={stay.occupancy} onChange={(e) => patchStay(stay.id, { occupancy: Number(e.target.value) })}
-                      style={{ ...input, background: "#161b27" }}>
-                      {[1, 2, 3, 4, 5, 6].map((n) => <option key={n} value={n}>{n} Pax</option>)}
+                  {mina ? field("Hajj Company", stay.hajjCompanyName || "", (s) => patchStay(stay.id, { hajjCompanyName: s })) : field("Hotel", stay.hotelName, (s) => patchStay(stay.id, { hotelName: s.toUpperCase() }))}
+                  {mina ? field("Maktab name", stay.maktabName || "", (s) => patchStay(stay.id, { maktabName: s })) : (
+                    <div>
+                      <label style={label}>Sharing</label>
+                      <select value={stay.occupancy} onChange={(e) => patchStay(stay.id, { occupancy: Number(e.target.value) })} style={{ ...input, background: "#161b27" }}>
+                        {[1, 2, 3, 4, 5, 6].map((n) => <option key={n} value={n}>{n} Pax</option>)}
+                      </select>
+                    </div>
+                  )}
+                  {mina ? <div>
+                    <label style={label}>Maktab category</label>
+                    <select value={stay.maktabCategory || ""} onChange={(e) => patchStay(stay.id, { maktabCategory: e.target.value as "A" | "B" | "C" | "D" | "" })} style={{ ...input, background: "#161b27" }}>
+                      <option value="">Choose</option>{["A", "B", "C", "D"].map((category) => <option key={category} value={category}>{category}</option>)}
                     </select>
-                  </div>
+                  </div> : null}
                   {field("In Date", stay.inDate, (s) => patchStay(stay.id, { inDate: s }), "date")}
                   {field("Out Date", stay.outDate, (s) => patchStay(stay.id, { outDate: s }), "date")}
-                  {field("Room No", stay.roomNo || "", (s) => patchStay(stay.id, { roomNo: s }), "text", "Enter room number")}
-                  <div>
+                  {!mina ? field("Room No", stay.roomNo || "", (s) => patchStay(stay.id, { roomNo: s }), "text", "Enter room number") : null}
+                  {!mina ? <div>
                     <label style={label}>Rooms</label>
                     <input type="number" min={1} value={stay.rooms}
                       onChange={(e) => patchStay(stay.id, { rooms: Number(e.target.value) || 1 })}
                       onFocus={(e) => e.currentTarget.select()} style={input} />
-                  </div>
+                  </div> : null}
                   {/* Worked out, not typed. The hotel reads the nights and the
                       dates off the same voucher. */}
                   <div>
@@ -236,11 +244,11 @@ export default function UmrahVouchersPage() {
                     onClick={() => patch({ stays: v.stays.filter((s) => s.id !== stay.id) })}
                     style={{ background: "transparent", border: `1px solid ${border}`, borderRadius: 8, color: "rgba(255,255,255,.45)", cursor: "pointer", padding: "8px 0" }}>×</button>
                 </div>
-                <label style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 11.5, color: "rgba(255,255,255,.45)", marginTop: 8, cursor: "pointer" }}>
+                {!mina ? <label style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 11.5, color: "rgba(255,255,255,.45)", marginTop: 8, cursor: "pointer" }}>
                   <input type="checkbox" checked={stay.orSimilar !== false}
                     onChange={(e) => patchStay(stay.id, { orSimilar: e.target.checked })} />
                   Or similar hotel — printed on the voucher, because that is how the room was sold
-                </label>
+                </label> : null}
               </div>
             );
           })}

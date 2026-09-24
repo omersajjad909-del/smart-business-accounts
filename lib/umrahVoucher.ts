@@ -41,6 +41,9 @@ export type VoucherHotelStay = {
   /** "Makkah" / "Madinah" — printed as the block heading. */
   city: string;
   hotelName: string;
+  hajjCompanyName?: string;
+  maktabName?: string;
+  maktabCategory?: "A" | "B" | "C" | "D" | "";
   /**
    * How many the room is shared between. The price per pilgrim falls as this
    * rises, which is the whole of Umrah pricing.
@@ -229,8 +232,13 @@ export function validateVoucher(v: UmrahVoucher): string[] {
   if (!v.stays.length) errors.push("A trip needs at least one hotel stay.");
 
   v.stays.forEach((s, i) => {
-    const where = s.hotelName.trim() || `stay ${i + 1}`;
-    if (!s.hotelName.trim()) errors.push(`Stay ${i + 1} has no hotel.`);
+    const mina = s.city.trim().toLowerCase() === "mina";
+    const where = mina ? "Mina" : s.hotelName.trim() || `stay ${i + 1}`;
+    if (mina) {
+      if (!s.hajjCompanyName?.trim()) errors.push("Mina has no Hajj Company.");
+      if (!s.maktabName?.trim()) errors.push("Mina has no Maktab name.");
+      if (!["A", "B", "C", "D"].includes(s.maktabCategory || "")) errors.push("Mina has no Maktab category.");
+    } else if (!s.hotelName.trim()) errors.push(`Stay ${i + 1} has no hotel.`);
     if (!s.inDate || !s.outDate) errors.push(`${where} has no dates.`);
     else if (nightsBetween(s.inDate, s.outDate) <= 0) {
       errors.push(`${where} checks out on or before it checks in.`);

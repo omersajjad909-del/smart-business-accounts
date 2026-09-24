@@ -47,6 +47,10 @@ export type PackageLeg = {
   roomRatePerNight: number;
   /** Optional rate per room/night for each room-sharing occupancy. */
   roomRatesPerNight?: Record<string, number>;
+  /** Hajj-specific Mina camp allocation; Mina is not costed as a hotel room. */
+  hajjCompanyName?: string;
+  maktabName?: string;
+  maktabCategory?: "A" | "B" | "C" | "D" | "";
 };
 
 /** What a pilgrim costs regardless of who they share with. */
@@ -253,13 +257,16 @@ export function occupancyName(n: number): string {
 /**
  * Where a pilgrimage sleeps, in the order it sleeps there.
  *
- * Makkah first, then Madinah. Aziziah is the Hajj days themselves — the
- * district a group is housed in around the Mashair — so it comes last and only
- * a Hajj is offered it by default.
+ * Makkah, Madinah and Aziziah hotel stays, then Mina camp for Hajj. Mina is
+ * represented as a special leg rather than a hotel room.
  *
  * A tour goes wherever it goes and types its own.
  */
-export const PILGRIMAGE_CITIES = ["Makkah", "Madinah", "Aziziah"];
+export const PILGRIMAGE_CITIES = ["Makkah", "Madinah", "Aziziah", "Mina"];
+
+export function isMinaLeg(leg: Pick<PackageLeg, "city">): boolean {
+  return leg.city.trim().toLowerCase() === "mina";
+}
 
 export function emptyLeg(city = "Makkah"): PackageLeg {
   return { id: newId("leg"), city, hotelName: "", nights: 0, roomRatePerNight: 0, roomRatesPerNight: {} };
@@ -277,11 +284,11 @@ export function emptyDeparture(kind: PackageKind = "umrah"): UmrahDeparture {
     // departure opens on it rather than on nothing.
     /* The shape each kind of trip actually takes, so a new departure opens on
        something worth editing rather than on three blank rows. A Hajj sleeps
-       in Aziziah for the days of the pilgrimage; an Umrah does not go there
+       in Aziziah and Mina for the days of the pilgrimage; an Umrah does not go there
        at all, and a tour has no cities until somebody names them. */
     legs:
       kind === "hajj"
-        ? [emptyLeg("Makkah"), emptyLeg("Madinah"), emptyLeg("Aziziah")]
+        ? [emptyLeg("Makkah"), emptyLeg("Madinah"), emptyLeg("Aziziah"), emptyLeg("Mina")]
         : kind === "umrah"
           ? [emptyLeg("Makkah"), emptyLeg("Madinah")]
           : [emptyLeg("")],
@@ -336,7 +343,7 @@ export function roomRatePerNight(leg: PackageLeg, occupancy: number): number {
 /** Whole trip hotel cost for one room at a particular occupancy, in hotel currency. */
 export function roomCostPerRoom(legs: PackageLeg[], occupancy = 4): number {
   return round2(
-    legs.reduce((sum, l) => sum + (Number(l.nights) || 0) * roomRatePerNight(l, occupancy), 0),
+    legs.reduce((sum, l) => sum + (isMinaLeg(l) ? 0 : (Number(l.nights) || 0) * roomRatePerNight(l, occupancy)), 0),
   );
 }
 
@@ -414,8 +421,10 @@ export function validateDeparture(d: UmrahDeparture): string[] {
   if (!(Number(d.seats) > 0)) errors.push("The departure needs a seat quota.");
 
   const withNights = d.legs.filter((l) => Number(l.nights) > 0);
-  if (!withNights.length) errors.push("No hotel nights — the room cost would be zero.");
-  withNights.forEach((l) => {
+  const minaLegs = d.kind === "hajj" ? withNights.filter(isMinaLeg) : [];
+  const hotelLegs = withNights.filter((l) => !minaLegs.includes(l));
+  if (!hotelLegs.length) errors.push("Add at least one hotel stay with nights.");
+  hotelLegs.forEach((l) => {
     if (!l.hotelName.trim()) errors.push(`The ${l.city || "hotel"} leg has no hotel named.`);
     d.tiers.forEach((tier) => {
       if (!(roomRatePerNight(l, tier.occupancy) > 0)) {
@@ -423,10 +432,15 @@ export function validateDeparture(d: UmrahDeparture): string[] {
       }
     });
   });
+  minaLegs.forEach((l) => {
+    if (!l.hajjCompanyName?.trim()) errors.push("Mina needs a Hajj Company supplier.");
+    if (!l.maktabName?.trim()) errors.push("Mina needs a Maktab name.");
+    if (!["A", "B", "C", "D"].includes(l.maktabCategory || "")) errors.push("Choose a Maktab category for Mina.");
+  });
 
   // Hotel rates are contracted in riyals. Without a conversion rate the room
   // cost silently comes out as zero and every tier looks wildly profitable.
-  if (roomCostPerRoom(d.legs) > 0 && !(Number(d.hotelRate) > 0)) {
+  if (d.tiers.some((tier) => roomCostPerRoom(d.legs, tier.occupancy) > 0) && !(Number(d.hotelRate) > 0)) {
     errors.push(`No rate for ${d.hotelCurrency || "the hotel currency"} — the room cost would come out as zero.`);
   }
 

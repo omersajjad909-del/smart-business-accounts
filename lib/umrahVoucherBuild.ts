@@ -50,13 +50,19 @@ export function datedStays(departure: UmrahDeparture, occupancy: number): Vouche
 
   for (const leg of departure.legs) {
     const nights = Number(leg.nights) || 0;
-    if (nights <= 0 || !leg.hotelName.trim()) continue;
+    const mina = leg.city.trim().toLowerCase() === "mina";
+    if (nights <= 0 || (!mina && !leg.hotelName.trim())) continue;
     const inDate = cursor;
     const outDate = addDays(cursor, nights);
     out.push({
       ...emptyStay(leg.city || "Makkah"),
       city: leg.city || "Makkah",
       hotelName: leg.hotelName,
+      ...(mina ? {
+        hajjCompanyName: leg.hajjCompanyName || "",
+        maktabName: leg.maktabName || "",
+        maktabCategory: leg.maktabCategory || "",
+      } : {}),
       // The sharing the party bought, not the departure's default. It is what
       // the hotel is being asked to room them as.
       occupancy,

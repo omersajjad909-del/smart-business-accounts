@@ -59,6 +59,8 @@ export type BookingPilgrim = {
       six is two, and which two matters to the family. */
   roomMakkah?: string;
   roomMadinah?: string;
+  /** Room allocations for any additional hotel city on this departure. */
+  roomAssignments?: Record<string, string>;
 
   /** Documents received, keyed by PILGRIM_DOCUMENTS. */
   documents?: Record<string, boolean>;
