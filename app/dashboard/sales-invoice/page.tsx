@@ -576,11 +576,32 @@ function SalesInvoiceContent() {
    * back the very object it was given, so this reads the row rather than
    * looking it up — a find() here would be a scan of the catalogue per row.
    */
+  /**
+   * What the invoice being edited already took out of stock, per item. Those
+   * rolls are counted as sold, but saving the edit puts them back first — so
+   * to this invoice they are still available. Without adding them back, a line
+   * that used the last of an item and was deleted by mistake could not be
+   * picked again: its balance read 0 and "In stock only" hid it.
+   */
+  const editingQtyByItem = useMemo(() => {
+    const map = new Map<string, number>();
+    for (const it of (editing?.items ?? []) as any[]) {
+      const id = it.itemId || it.item?.id;
+      if (id) map.set(id, (map.get(id) ?? 0) + Number(it.qty || 0));
+    }
+    return map;
+  }, [editing]);
+
   const itemStockValues = useCallback((item: { id: string }) => {
     const row = item as Item;
     if (row.stockBal === undefined) return null;
-    return { received: row.stockIn ?? 0, sold: row.stockOut ?? 0, balance: row.stockBal };
-  }, []);
+    const own = editingQtyByItem.get(row.id) ?? 0;
+    return {
+      received: row.stockIn ?? 0,
+      sold: Math.max(0, (row.stockOut ?? 0) - own),
+      balance: row.stockBal + own,
+    };
+  }, [editingQtyByItem]);
 
   const itemPreviewValues = useCallback(
     (item: { id: string; name: string; description?: string | null; meta?: unknown }) =>
