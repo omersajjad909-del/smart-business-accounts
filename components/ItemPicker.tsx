@@ -348,17 +348,23 @@ export function ItemPicker({
      operator was reaching for the mouse to do what the keyboard was already
      wired for.
 
-     So on opening, if focus is not already on the cell or inside the panel, it
-     goes to the panel's search box. Focus that is already somewhere useful is
-     left exactly where it is, because moving it mid-keystroke is its own bug.
+     So on opening, focus goes to the panel's search box — also when the cell
+     had it. Leaving it on the cell meant the operator typed into the cell
+     while looking at the panel. Whatever was already typed into the cell is
+     in `query`, which the panel box shows, so the caret goes to its end.
      ------------------------------------------------------------ */
   useEffect(() => {
     if (!open) return;
     const active = document.activeElement;
-    if (active === inputRef.current) return;
     if (active && panelRef.current?.contains(active)) return;
     // One frame, so the portal is mounted before it is asked to take focus.
-    const id = requestAnimationFrame(() => panelSearchRef.current?.focus());
+    const id = requestAnimationFrame(() => {
+      const box = panelSearchRef.current;
+      if (!box) return;
+      box.focus();
+      const end = box.value.length;
+      box.setSelectionRange(end, end);
+    });
     return () => cancelAnimationFrame(id);
   }, [open]);
 
@@ -369,10 +375,12 @@ export function ItemPicker({
   useEffect(() => {
     if (!open || !listRef.current) return;
 
+    // By row index, not child index: the stock filter and the column header
+    // sit in the same scroller ahead of the rows.
     const row =
-      listRef.current.children[
-        cursor
-      ] as HTMLElement | undefined;
+      listRef.current.querySelector<HTMLElement>(
+        `[data-row="${cursor}"]`
+      );
 
     row?.scrollIntoView({
       block: "nearest",
@@ -451,8 +459,25 @@ export function ItemPicker({
   // Select item
   // ------------------------------------------------------------
 
+  /** Focus back on the cell first — the panel box is about to unmount. */
+  function refocusCell() {
+    if (
+      document.activeElement &&
+      panelRef.current?.contains(document.activeElement)
+    ) {
+      inputRef.current?.focus();
+    }
+  }
+
   function take(id: string) {
+    refocusCell();
     onChange(id);
+    setQuery("");
+    setOpen(false);
+  }
+
+  function close() {
+    refocusCell();
     setQuery("");
     setOpen(false);
   }
@@ -497,7 +522,7 @@ export function ItemPicker({
     }
 
     if (e.key === "Escape") {
-      setOpen(false);
+      close();
       return;
     }
 
@@ -639,7 +664,12 @@ export function ItemPicker({
           /* Also here, not only on the two inputs: focus can land on the
              scroller or the resize grip, and from there the arrows would
              otherwise do nothing at all. */
-          onKeyDown={keyDown}
+          onKeyDown={(e) => {
+            // The search box has its own handler and its keys bubble up to
+            // here; handling them twice moved the highlight two rows a press.
+            if (e.target === panelSearchRef.current) return;
+            keyDown(e as React.KeyboardEvent<HTMLInputElement>);
+          }}
           style={{
             position: "fixed",
             zIndex: 4000,
@@ -937,6 +967,7 @@ export function ItemPicker({
               (item, index) => (
                 <div
                   key={item.id}
+                  data-row={index}
                   onMouseDown={(e) => {
                     e.preventDefault();
                     take(item.id);
@@ -1251,6 +1282,7 @@ export function ItemPicker({
 
             {allowManual && (
               <div
+                data-row={matches.length}
                 onMouseDown={(e) => {
                   e.preventDefault();
                   take(MANUAL);
@@ -1290,6 +1322,57 @@ export function ItemPicker({
               </div>
             )}
           </div>
+
+            {/* ------------------------------------------------
+                FOOTER — a way out that is not Escape or a click
+                somewhere else on the page.
+            ------------------------------------------------ */}
+
+            <div
+              style={{
+                flex: "0 0 auto",
+                position: "relative",
+                zIndex: 11,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                gap: 8,
+                padding: "6px 8px",
+                marginBottom: 8,
+                borderTop:
+                  "1px solid var(--border, rgba(255,255,255,.12))",
+                background: "var(--panel-bg, #14161c)",
+              }}
+            >
+              <span
+                style={{
+                  fontSize: 11,
+                  color:
+                    "var(--text-muted, rgba(255,255,255,.5))",
+                }}
+              >
+                ↑↓ move · Enter select · Esc close
+              </span>
+
+              <button
+                type="button"
+                onMouseDown={(e) => e.preventDefault()}
+                onClick={close}
+                style={{
+                  padding: "6px 16px",
+                  borderRadius: 7,
+                  fontSize: 12.5,
+                  fontWeight: 700,
+                  cursor: "pointer",
+                  background: "transparent",
+                  color: "var(--danger, #f87171)",
+                  border:
+                    "1px solid var(--danger, #f87171)",
+                }}
+              >
+                Cancel
+              </button>
+            </div>
           </div>
 
           {/* ------------------------------------------------
