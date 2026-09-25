@@ -353,8 +353,13 @@ export function ItemPicker({
      while looking at the panel. Whatever was already typed into the cell is
      in `query`, which the panel box shows, so the caret goes to its end.
      ------------------------------------------------------------ */
+  // Keyed on the panel being on screen, not just `open`: on a fresh line the
+  // anchor is not measured yet when `open` flips, so the panel mounts a render
+  // later — and focusing then found no search box, leaving the cursor behind.
+  const panelShown = open && anchor !== null;
+
   useEffect(() => {
-    if (!open) return;
+    if (!panelShown) return;
     const active = document.activeElement;
     if (active && panelRef.current?.contains(active)) return;
     // One frame, so the portal is mounted before it is asked to take focus.
@@ -366,7 +371,7 @@ export function ItemPicker({
       box.setSelectionRange(end, end);
     });
     return () => cancelAnimationFrame(id);
-  }, [open]);
+  }, [panelShown]);
 
   // ------------------------------------------------------------
   // Keep highlighted row visible
@@ -532,6 +537,11 @@ export function ItemPicker({
       // the list they just asked for, and the next Enter picks from it.
       if (!open) {
         e.preventDefault();
+        // The dashboard's global Enter-to-next-field handler listens on the
+        // document and does not look at defaultPrevented. Left to bubble, it
+        // moved focus to the next cell (gauge) as the list opened, and what the
+        // operator typed for the search went into that cell instead.
+        e.stopPropagation();
         setOpen(true);
         return;
       }
