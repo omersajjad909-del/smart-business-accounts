@@ -151,12 +151,13 @@ const SECTIONS = [
     glow: "rgba(99,102,241,.12)",
     border: "rgba(99,102,241,.25)",
     title: "API & Integrations",
-    desc: "Connect external systems using company-scoped API keys and webhooks.",
+    // "and webhooks" removed — there is no external-facing webhook feature to
+    // document (only internal billing/automation webhooks exist).
+    desc: "Connect external systems using company-scoped API keys.",
     links: [
       { label: "API authentication",               href: "/developers/api",           badge: "Dev" },
       { label: "Available endpoints",              href: "/developers/api#endpoints", badge: "Dev" },
-      { label: "cURL & SDK examples",              href: "/developers/api#examples",  badge: "Dev" },
-      { label: "Webhook events",                   href: "/developers/api#webhooks",  badge: "Dev" },
+      { label: "cURL examples",                    href: "/developers/api#examples",  badge: "Dev" },
       { label: "Generate an API key",              href: "/dashboard/integrations"   },
     ],
   },
@@ -168,7 +169,6 @@ const QUICK_LINKS = [
   { icon: "⚙️", label: "API Reference",   sub: "Endpoints & authentication",   href: "/developers/api",       color: "#6366f1" },
   { icon: "🔄", label: "Changelog",       sub: "Latest updates & releases",    href: "/changelog",            color: "#fbbf24" },
   { icon: "💬", label: "Support",         sub: "Live chat & tickets",          href: "/support",              color: "#a78bfa" },
-  { icon: "🎬", label: "Video Tutorials", sub: "Watch step-by-step walkthroughs",href: "/help#videos",        color: "#f87171" },
 ];
 
 const SEARCH_INDEX = SECTIONS.flatMap(s =>

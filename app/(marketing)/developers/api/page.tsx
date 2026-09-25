@@ -386,12 +386,12 @@ export default function ApiDocsPage() {
         </div>
 
         {/* Endpoints */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 56 }}>
+        <div id="endpoints" style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 56, scrollMarginTop: 90 }}>
           {filtered.map((ep, i) => <EndpointCard key={i} ep={ep} />)}
         </div>
 
         {/* cURL example */}
-        <div style={{ borderRadius: 18, padding: 24, background: "rgba(255,255,255,.025)", border: "1px solid rgba(255,255,255,.07)", marginBottom: 24 }}>
+        <div id="examples" style={{ borderRadius: 18, padding: 24, background: "rgba(255,255,255,.025)", border: "1px solid rgba(255,255,255,.07)", marginBottom: 24, scrollMarginTop: 90 }}>
           <div style={{ fontSize: 13, fontWeight: 700, color: "rgba(255,255,255,.6)", marginBottom: 14 }}>Quick test — cURL</div>
           <pre style={{ margin: 0, padding: "14px 16px", borderRadius: 12, background: "#050816", border: "1px solid rgba(255,255,255,.07)", color: "#e5e7eb", fontSize: 12, overflowX: "auto", lineHeight: 1.8, fontFamily: "ui-monospace,monospace" }}>
 {`# Financial summary for current month
