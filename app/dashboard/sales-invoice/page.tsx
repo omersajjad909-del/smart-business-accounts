@@ -289,7 +289,7 @@ function SalesInvoiceContent() {
         const mapped = so.items.filter((i: any) => i.name || i.itemId).map((i: any) => ({
           itemId: i.itemId || "", name: i.name || "", description: "", availableQty: 0, qty: i.qty || 1, rate: i.unitPrice || 0,
         }));
-        if (mapped.length > 0) setRows(mapped);
+        if (mapped.length > 0) setRows([...mapped, emptyRow()]);
       }
     } catch {}
   }, []);
@@ -339,7 +339,7 @@ function SalesInvoiceContent() {
             });
           }
         }
-        if (lines.length) setRows(lines);
+        if (lines.length) setRows([...lines, emptyRow()]);
 
         const nos = list.map(c => c.challanNo).join(", ");
         setNotes(n => (n ? n + "\n" : "") + `Against Delivery Challan: ${nos}`);
@@ -528,7 +528,15 @@ function SalesInvoiceContent() {
     setRows(prev => prev.some(r => r.meta) ? prev : prev.map(r => ({ ...r, meta: emptyRateFormulaMeta(rf) })));
   }, [rfActive, rf]);
 
-  function removeRow(idx: number) { if (rows.length > 1) setRows(rows.filter((_, i) => i !== idx)); }
+  // There is no "Add row" button — new lines are typed into the blank row at the
+  // bottom — so removing a line must never leave the grid without one.
+  function removeRow(idx: number) {
+    if (rows.length <= 1) return;
+    const next = rows.filter((_, i) => i !== idx);
+    const last = next[next.length - 1];
+    if (last.itemId || last.isManual) next.push(emptyRow());
+    setRows(next);
+  }
 
   const subtotal = rows.reduce((s, r) => s + (Number(r.qty) * Number(r.rate) || 0), 0);
   const perItemDiscountAmt = rows.reduce((s, r) => s + ((Number(r.qty) * Number(r.rate) || 0) * (Number(r.discountPercent) || 0) / 100), 0);
@@ -662,7 +670,7 @@ function SalesInvoiceContent() {
       hsCode: it.hsCode || it.item?.hsCode || undefined, poNo: it.poNo || undefined,
       secondaryUnit: it.secondaryUnit || undefined,
       secondaryQty: it.secondaryQty ?? "", secondaryRate: it.secondaryRate ?? "",
-      ...(rfActive ? { meta: readRateFormulaMeta(rf, it.meta) } : {}) })));
+      ...(rfActive ? { meta: readRateFormulaMeta(rf, it.meta) } : {}) })).concat(emptyRow()));
     setShowForm(true); setShowList(false);
   }
 
