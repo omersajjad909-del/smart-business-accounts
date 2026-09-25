@@ -6,7 +6,7 @@ import { confirmToast, alertToast } from "@/lib/toast-feedback";
 import { PrintActionBar } from "@/components/print/PrintActionBar";
 import { PrintDocA4, PrintPaperWrapper } from "@/components/print/PrintDocA4";
 
-import { Suspense, useEffect, useMemo, useRef, useState } from "react";
+import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import toast from "react-hot-toast";
 import dynamic from "next/dynamic";
@@ -27,7 +27,7 @@ import {
   rateFormulaEnterHandler,
   type RateFormulaMeta,
 } from "@/components/RateFormulaCells";
-import { computeRateFromFormula, emptyRateFormulaMeta, itemPickerLabel, metaFromItem, readRateFormulaMeta } from "@/lib/rateFormula";
+import { computeRateFromFormula, emptyRateFormulaMeta, itemMetaWithName, itemPickerLabel, itemSpecRole, metaFromItem, readRateFormulaMeta } from "@/lib/rateFormula";
 import type { RateFormulaValue } from "@/lib/rateFormula";
 
 type Supplier = { id: string; name: string; partyType: string };
@@ -101,7 +101,7 @@ type TaxConfig = {
   description?: string;
 };
 
-type InventoryItem = { id: string; name: string; barcode?: string; purchaseRate?: number; unit?: string; code?: string; description?: string; meta?: unknown };
+type InventoryItem = { id: string; name: string; barcode?: string; purchaseRate?: number; unit?: string; code?: string; description?: string; meta?: unknown; stockIn?: number; stockOut?: number; stockBal?: number };
 
 type Currency = {
   id: string;
@@ -317,11 +317,21 @@ const [searchTerm, setSearchTerm] = useState("");
      reach for the mouse to type a quantity. Qty is what they were reaching
      for, so Enter goes there. */
   const onPickerEnter = (i: number) => (e: React.KeyboardEvent<HTMLInputElement> | { key: string; shiftKey: boolean; preventDefault(): void; stopPropagation(): void }) => {
-    if (rfActive) {
-      rateFormulaEnterHandler(rf, rfActive, i, () => lastPickedMeta.current)(e);
-      return;
-    }
     if (e.key !== "Enter" || e.shiftKey) return;
+    if (rfActive) {
+      // The formula handler only takes the cursor when a nominated column is
+      // still blank. When it passes, it used to be left there: focus stayed on
+      // the item cell and the next Enter opened the list again. Qty instead,
+      // as on the sales invoice.
+      let claimed = false;
+      rateFormulaEnterHandler(rf, rfActive, i, () => lastPickedMeta.current)({
+        key: e.key,
+        shiftKey: e.shiftKey,
+        preventDefault: () => e.preventDefault(),
+        stopPropagation: () => { claimed = true; e.stopPropagation(); },
+      });
+      if (claimed) return;
+    }
     e.preventDefault();
     e.stopPropagation();
     // A frame late: the pick has to land on the row before the box it filled
@@ -455,10 +465,11 @@ const [searchTerm, setSearchTerm] = useState("");
       })
       .catch(() => {});
 
-    fetch("/api/items-new", { headers: requestHeaders })
+    // withStock=1: the picker shows received / sold / balance, as on sales.
+    fetch("/api/items-new?withStock=1", { headers: requestHeaders })
       .then(r => r.json())
       .then(data => {
-        if (Array.isArray(data)) setAllInventoryItems(data.map((i: any) => ({ id: i.id, name: i.name, barcode: i.barcode || "", purchaseRate: i.purchaseRate ?? 0, unit: i.unit || "", code: i.code || "", description: i.description || "", meta: i.meta ?? null })));
+        if (Array.isArray(data)) setAllInventoryItems(data.map((i: any) => ({ id: i.id, name: i.name, barcode: i.barcode || "", purchaseRate: i.purchaseRate ?? 0, unit: i.unit || "", code: i.code || "", description: i.description || "", meta: i.meta ?? null, stockIn: Number(i.stockIn ?? 0), stockOut: Number(i.stockOut ?? 0), stockBal: Number(i.stockBal ?? 0) })));
       })
       .catch(() => {});
   }, []);
@@ -612,6 +623,26 @@ const [searchTerm, setSearchTerm] = useState("");
   const pickerItems = selectedGrnForItems
     ? allInventoryItems.filter((item) => selectedGrnForItems.items.some((line) => line.itemId === item.id))
     : allInventoryItems;
+
+  /* The picker's table columns — the same spec columns and stock figures the
+     sales invoice shows, so the two grids read alike. RT/MM is left out: it is
+     worked out per line and has nothing to show in a catalogue. */
+  const pickerPreviewFields = useMemo(
+    () => rf.fields.filter((field) => itemSpecRole(field)).map((field) => ({ key: field.key, label: field.label })),
+    [rf],
+  );
+
+  const itemPreviewValues = useCallback(
+    (item: { id: string; name: string; description?: string | null; meta?: unknown }) =>
+      itemMetaWithName(rf, item.meta, `${item.name || ""} ${item.description || ""}`) as Record<string, unknown>,
+    [rf],
+  );
+
+  const itemStockValues = useCallback((item: { id: string }) => {
+    const row = item as InventoryItem;
+    if (row.stockBal === undefined) return null;
+    return { received: row.stockIn ?? 0, sold: row.stockOut ?? 0, balance: row.stockBal };
+  }, []);
 
   useEffect(() => {
     if (!supplierId) {
@@ -1415,6 +1446,10 @@ const [searchTerm, setSearchTerm] = useState("");
                                     }}
                                       onKeyDown={onPickerEnter(i)}
                                       label={rfActive ? itemPickerLabel : undefined}
+                                      previewFields={rfActive ? pickerPreviewFields : []}
+                                      previewValues={rfActive ? itemPreviewValues : undefined}
+                                      stockValues={itemStockValues}
+                                      defaultInStockOnly={false}
                                       note={grnRemainingNote}
                                       style={{ ...inp({ padding: "5px 7px", fontSize: 12.5 }), fontWeight: r.itemId ? 600 : 400 }}
                                       allowManual={false}

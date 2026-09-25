@@ -68,6 +68,13 @@ type Props = {
     sold: number;
     balance: number;
   } | null;
+
+  /**
+   * Whether "In stock only" starts ticked. A sale can only take what is on
+   * hand; a purchase is usually for exactly what is not, so there it starts
+   * off and the whole catalogue shows.
+   */
+  defaultInStockOnly?: boolean;
 };
 
 export function ItemPicker({
@@ -85,6 +92,7 @@ export function ItemPicker({
   previewFields = [],
   previewValues,
   stockValues,
+  defaultInStockOnly = true,
 }: Props) {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
@@ -220,7 +228,7 @@ export function ItemPicker({
   }, [stockMap]);
 
   const [inStockOnly, setInStockOnly] =
-    useState(true);
+    useState(defaultInStockOnly);
 
   const stockFilterOn =
     Boolean(stockMap) &&
@@ -1048,6 +1056,31 @@ export function ItemPicker({
                         : item.name
                       : item.code ||
                         "—"}
+
+                    {/* In the table layout the note rides in the item
+                        cell: as a cell of its own it pushed every column
+                        after it one place to the right. */}
+                    {previewFields.length > 0 &&
+                      (() => {
+                        const text = note?.(item);
+                        if (!text) return null;
+                        return (
+                          <span
+                            style={{
+                              fontFamily: "inherit",
+                              fontSize: 10.5,
+                              fontWeight: 700,
+                              marginLeft: 8,
+                              padding: "1px 6px",
+                              borderRadius: 5,
+                              background: "rgba(52,211,153,.12)",
+                              color: "#34d399",
+                            }}
+                          >
+                            {text}
+                          </span>
+                        );
+                      })()}
                   </span>
 
                   {/* NAME */}
@@ -1143,7 +1176,7 @@ export function ItemPicker({
 
                   {/* NOTE */}
 
-                  {(() => {
+                  {!previewFields.length && (() => {
                     const text =
                       note?.(item);
                     if (!text) return null;
