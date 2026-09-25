@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { resolveCompanyId } from "@/lib/tenant";
 import { apiError, apiOk } from "@/lib/apiError";
 import { cancelLemonSubscription } from "@/lib/lemonsqueezy";
+import { cancelSafepaySubscription } from "@/lib/safepay";
 
 // Data Retention Policy:
 //   Day  0      — subscription cancelled, account becomes read-only
@@ -43,8 +44,11 @@ export async function POST(req: NextRequest) {
       })
       .catch(() => null);
 
-    if (subscription?.stripeSubscriptionId && String(subscription.provider).toUpperCase() === "LEMONSQUEEZY") {
-      const cancelled = await cancelLemonSubscription(subscription.stripeSubscriptionId);
+    const gateway = String(subscription?.provider || "").toUpperCase();
+    if (subscription?.stripeSubscriptionId && (gateway === "LEMONSQUEEZY" || gateway === "SAFEPAY")) {
+      const cancelled = gateway === "SAFEPAY"
+        ? await cancelSafepaySubscription(subscription.stripeSubscriptionId)
+        : await cancelLemonSubscription(subscription.stripeSubscriptionId);
       if (!cancelled.ok) {
         await prisma.activityLog.create({
           data: {
@@ -52,7 +56,7 @@ export async function POST(req: NextRequest) {
             userId: req.headers.get("x-user-id") || null,
             action: "SUBSCRIPTION_CANCEL_PROVIDER_FAILED",
             details: JSON.stringify({
-              provider: "LEMONSQUEEZY",
+              provider: gateway,
               subscriptionId: subscription.stripeSubscriptionId,
               error: cancelled.error,
               at: new Date().toISOString(),

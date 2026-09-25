@@ -296,6 +296,7 @@ export const SEO_ARTICLES: Record<string, SeoArticle> = {
       "quickbooks alternatives for growing business",
       "quickbooks competitors",
       "outgrown quickbooks",
+      "quickbooks replacement",
     ],
     content: [
       { type: "answer", text: "The best QuickBooks alternative depends on how you outgrew it. If you outgrew it on inventory — multiple warehouses, batch or serial tracking, assembly — move to an all-in-one platform such as Zoho One, Odoo, ERPNext or FinovaOS, where stock and the ledger share one database. If you outgrew it on users and cost, look for a vendor that does not charge per seat. If you outgrew it on local compliance because you file outside the US or UK, choose software built for your jurisdiction rather than adapted to it. If you outgrew it on scale — multiple legal entities needing consolidation — the answer is a real ERP such as NetSuite or Dynamics 365 Business Central. If you simply want a better ledger and nothing more, Xero is the closest direct replacement and the easiest migration." },
@@ -480,6 +481,8 @@ export const SEO_ARTICLES: Record<string, SeoArticle> = {
       "accounting and inventory software for small business",
       "CRM with inventory and accounting",
       "integrated accounting CRM inventory",
+      "CRM and inventory software",
+      "CRM inventory system",
     ],
     content: [
       { type: "answer", text: "Small businesses that hold stock should run accounting, CRM and inventory on one system rather than three, because the three share the same objects: a customer in the CRM is a receivable in the ledger, and a product in a quote is a stock item in the warehouse. When they are separate, someone re-keys those objects and reconciles them forever. Platforms that cover all three natively include Zoho One, Odoo, ERPNext and FinovaOS. The exception is a business where one function is genuinely strategic — a sales-led company running complex multi-touch campaigns will outgrow any all-in-one CRM, and is better served by a specialist CRM integrated to a combined accounting-plus-inventory system. Service businesses with no stock only need two of the three, and should not buy a platform for a module they will never use." },
@@ -1019,6 +1022,63 @@ export const SEO_ARTICLES: Record<string, SeoArticle> = {
         { q: "What accounting software supports PKR billing?", a: "This depends on the vendor's regional pricing, not a general rule — check directly rather than assuming. Products built specifically around the Pakistani market, such as FinovaOS, bill natively in PKR. Global products may or may not offer local pricing depending on their current regional rollout, so confirm the actual currency you'll be charged before signing up." },
         { q: "Do I need inventory management as part of my accounting software in Pakistan?", a: "If you buy and sell physical goods — trading, wholesale, distribution, manufacturing, retail — yes, and it should share a database with the ledger rather than sync from a separate app, because that sync gap is where reconciliation time and stock discrepancies come from. If you run a pure service business, a lighter ledger without deep inventory is sufficient." },
         { q: "Is open-source software like Odoo or ERPNext a good fit for a Pakistani SME?", a: "It can be, if you have or can afford a technical owner or a local implementation partner to configure the Pakistan-specific tax and compliance localisation, which exists through community or partner modules rather than out of the box. For a business that wants to sign up and start posting invoices the same day without that configuration step, a pre-configured product will be faster to get running." },
+      ]},
+    ],
+  },
+
+  // ---------------------------------------------------------------------
+  "should-you-combine-inventory-and-accounting": {
+    id: "should-you-combine-inventory-and-accounting",
+    title: "Should a Small Business Combine Inventory and Accounting Into One System?",
+    excerpt:
+      "For most goods-based businesses, yes — but not automatically. Here's the actual test, the cases where staying separate is the better call, and what changes once you combine them.",
+    category: "business",
+    categoryLabel: "Buyer's Guide",
+    color: "#818cf8",
+    icon: "🧩",
+    ...TEAM,
+    date: "September 20, 2026",
+    readTime: "8 min read",
+    keywords: [
+      "should a small business combine inventory and accounting into one system",
+      "combine inventory and accounting software",
+      "separate inventory and accounting systems",
+      "integrated inventory accounting software",
+    ],
+    content: [
+      { type: "answer", text: "For a small business that buys and sells physical goods, combining inventory and accounting into one system is usually the right call, because a sale needs to update stock and the ledger together — running them as two separate tools means someone is manually re-entering the same transaction twice, and the two records drift apart the moment that step gets skipped. The exception is a pure service business with no stock to track, where a plain accounting ledger is simpler and there is nothing for an inventory module to do. The real test isn't \"do I have inventory\" — it's \"does a single transaction need to touch both stock and the books at the same time.\" If yes, combine them. If your inventory changes only occasionally and isn't tied to daily sales (a services firm with a handful of fixed assets, for instance), a separate spreadsheet is genuinely fine." },
+
+      { type: "intro", text: "This question usually comes up after the pain has already started — a stock count that doesn't match the books, a month-end close that takes days because someone is reconciling two systems by hand. The honest answer is \"it depends,\" but the test for which side of that line you're on is more specific than most advice makes it sound." },
+
+      { type: "h2", text: "The test: does one transaction touch both systems?" },
+      { type: "p", text: "Every time you make a sale, three things happen: stock goes down, a receivable or cash goes up, and revenue plus cost of goods sold get recorded. If those three things happen in two different tools — a warehouse spreadsheet and an accounting ledger — someone has to enter the same sale twice, once in each place. That's the actual cost of staying separate, and it's not a one-time cost: it recurs on every single transaction, every day, for as long as the two systems stay apart." },
+      { type: "p", text: "If your business sells physical goods regularly enough that this double-entry becomes a daily task, combining the two systems removes it entirely — a sale posts to stock and the ledger in the same action, because it's the same system." },
+
+      { type: "h2", text: "Signs you should combine them" },
+      { type: "list", items: [
+        "Your month-end close involves manually reconciling a stock report against the accounting system's numbers, and they rarely match on the first try.",
+        "Someone re-types the same sale or purchase into two different tools.",
+        "You've had a stock discrepancy that took more than an hour to trace back to its source.",
+        "You sell from more than one location or warehouse, and knowing your real-time stock position across all of them matters.",
+        "Your gross margin reporting is an estimate rather than a number you trust, because cost of goods sold isn't tied cleanly to what actually left the warehouse.",
+      ]},
+
+      { type: "h2", text: "When staying separate is genuinely fine" },
+      { type: "p", text: "A service business — consulting, agencies, professional firms — with no physical stock has nothing for an inventory module to track. Adding one would be complexity with no payoff. The same is often true for a business with a small, slow-moving set of fixed assets rather than sellable inventory: a spreadsheet reviewed occasionally is proportionate to how often that data actually changes." },
+      { type: "p", text: "It's also reasonable to stay separate temporarily while evaluating a combined system, as long as that's a deliberate, time-boxed decision rather than the default you've drifted into." },
+
+      { type: "h2", text: "What actually changes once you combine them" },
+      { type: "p", text: "The mechanics: a sales order or invoice becomes the single entry point, and it automatically reduces stock at its costed value (weighted-average or FIFO, depending on the system) while posting the receivable, the revenue and the cost of goods sold in one balanced transaction. A purchase order followed by a goods-received note does the same in reverse — stock goes up, a payable is created, and the landed cost is captured against that batch." },
+      { type: "p", text: "The result that matters most in practice: your stock quantity and your stock valuation on the balance sheet always agree, because they're the same number viewed two ways, not two separately-maintained figures that happen to usually be close." },
+      { type: "p", text: "For the full sequence of how to actually migrate — data model, transaction chain and cutover order — see our guide on managing sales, inventory and accounting in one system." },
+
+      { type: "note", text: "The businesses that regret combining these systems are almost always the ones that did it without a real physical stock count first, carrying over an opening balance that was already wrong. The system doesn't cause that problem — it just stops hiding it." },
+
+      { type: "faq", items: [
+        { q: "What's the risk of keeping inventory and accounting separate?", a: "The main risk is drift: the two records are only as accurate as the last time someone manually reconciled them, and that reconciliation itself takes real time every period. The business doesn't usually notice until a stock discrepancy or a wrong margin number forces the question." },
+        { q: "Does a service business need inventory management?", a: "Generally no. If you don't hold physical stock for resale, an inventory module adds complexity without a corresponding benefit — a standard accounting ledger is the right tool." },
+        { q: "Can I combine inventory and accounting without switching my whole software stack?", a: "Sometimes, via integrations between a dedicated inventory tool and your accounting software — but the sync between them is itself a point of failure, and it's rarely instant. An all-in-one platform where both live in the same database avoids that gap entirely, at the cost of being a bigger switch to make upfront." },
+        { q: "How do I know if my current setup is costing me money?", a: "Time yourself for one month-end close: if reconciling stock against the books takes more than an hour, or if you've ever shipped an order against stock that wasn't actually there, that's the cost of the separation showing up directly." },
       ]},
     ],
   },

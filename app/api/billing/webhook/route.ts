@@ -6,7 +6,14 @@ import { createHmac, timingSafeEqual } from "crypto";
 import { sendEmail } from "@/lib/email";
 import { emailTemplates } from "@/lib/emailTemplates";
 import { cancelLemonSubscription, mapLemonSubscriptionStatus, verifyLemonSignature } from "@/lib/lemonsqueezy";
-import { mapSafepayEventToStatus, normalizeSafepayMetadata, paisaToPkr, verifySafepaySignature } from "@/lib/safepay";
+import {
+  cancelSafepaySubscription,
+  mapSafepayEventToStatus,
+  normalizeSafepayMetadata,
+  paisaToPkr,
+  resolveSafepayPlanId,
+  verifySafepaySignature,
+} from "@/lib/safepay";
 import {
   PAYMENT_EVENT_DEDUPE_WINDOW_MS,
   createBillingInvoiceAccessToken,
@@ -213,6 +220,38 @@ async function applySuccessfulPlanUpdate(params: {
         console.error(
           `[webhook] Provider switch: could not cancel Lemon subscription ${previous.stripeSubscriptionId} ` +
             `for company ${params.companyId} — cancel it manually to avoid double billing. ${cancelled.error}`,
+        );
+      }
+    }
+  }
+
+  // Changing plan within Safepay. Safepay cannot move a subscription between
+  // plans, so the customer subscribed afresh — stop the old one the same way,
+  // new-paid-first, or both would bill every month.
+  if (incomingProvider === "SAFEPAY" && params.providerSubscriptionId) {
+    const previous = await prisma.subscription
+      .findUnique({ where: { companyId: params.companyId }, select: { provider: true, stripeSubscriptionId: true } })
+      .catch(() => null);
+    const oldId = previous?.stripeSubscriptionId;
+    if (oldId && oldId !== params.providerSubscriptionId && String(previous?.provider).toUpperCase() === "SAFEPAY") {
+      const cancelled = await cancelSafepaySubscription(oldId);
+      await prisma.activityLog.create({
+        data: {
+          companyId: params.companyId,
+          userId: null,
+          action: cancelled.ok ? "SAFEPAY_PLAN_CHANGE_OLD_CANCELLED" : "SAFEPAY_PLAN_CHANGE_CANCEL_FAILED",
+          details: JSON.stringify({
+            oldSubscriptionId: oldId,
+            newSubscriptionId: params.providerSubscriptionId,
+            ...(cancelled.ok ? {} : { error: cancelled.error }),
+            at: new Date().toISOString(),
+          }),
+        },
+      }).catch(() => {});
+      if (!cancelled.ok) {
+        console.error(
+          `[webhook] Safepay plan change: could not cancel old subscription ${oldId} for company ` +
+            `${params.companyId} — cancel it in the Safepay dashboard to avoid double billing. ${cancelled.error}`,
         );
       }
     }
@@ -1019,19 +1058,40 @@ async function handleSafepayWebhook(req: NextRequest, raw: string) {
   const meta     = normalizeSafepayMetadata(
     data?.tracker?.metadata || data?.metadata || data?.order?.metadata || payload?.metadata || {},
   );
+  // Subscription events (monthly plans — see createSafepaySubscriptionCheckout)
+  // carry the subscription itself rather than a tracker. Its shape is read
+  // defensively: the SDK types name plan_id / reference / price_amount, but the
+  // webhook body has not yet been seen from a live account.
+  const sub = data?.subscription || data;
+  const subscriptionId = [sub?.token, sub?.subscription_id, sub?.id, data?.subscription_id, payload?.subscription_id]
+    .map(v => String(v || ""))
+    .find(v => v.startsWith("sub_")) || "";
+  const safepayPlan = resolveSafepayPlanId(String(sub?.plan_id || sub?.plan?.token || data?.plan_id || ""));
+  const isSubscriptionEvent = event.toLowerCase().startsWith("subscription") || Boolean(subscriptionId);
+
   const orderId  = String(
-    meta?.order_id || data?.order?.ref || data?.order_id || payload?.order_id || "",
+    meta?.order_id || data?.order?.ref || data?.order_id || payload?.order_id ||
+    sub?.reference || data?.reference || payload?.reference || "",
   );
 
   // The order-ref parse is the primary path, not a fallback. Safepay's metadata
   // accepts only `order_id` and `source` — every other key is refused outright
   // (see the allow-list note in createSafepayCheckout) — so `fnv-<companyId>-<ts>`
-  // remains the only place the company survives the round trip.
+  // remains the only place the company survives the round trip. Subscriptions
+  // carry the same ref as `reference`.
   // meta.company_id is read first purely in case Safepay ever widens that list.
   let companyId = String(meta?.company_id || "").trim();
   if (!companyId && orderId.startsWith("fnv-")) {
     const parts = orderId.split("-");
     if (parts.length >= 2) companyId = parts.slice(1, -1).join("-");
+  }
+  // A renewal may arrive without the reference; the subscription id is stored
+  // on our Subscription row from the first charge.
+  if (!companyId && subscriptionId) {
+    const owner = await prisma.subscription
+      .findFirst({ where: { provider: "SAFEPAY", stripeSubscriptionId: subscriptionId }, select: { companyId: true } })
+      .catch(() => null);
+    companyId = owner?.companyId || "";
   }
   if (!companyId) return apiError("Missing company_id in Safepay webhook", 400);
 
@@ -1039,8 +1099,9 @@ async function handleSafepayWebhook(req: NextRequest, raw: string) {
   // — so they are recovered from our own BILLING_CHECKOUT_CREATED log, matched on
   // the tracker. This lookback is not optional: without it every Safepay buyer
   // lands on STARTER/MONTHLY no matter what they picked and paid for.
-  let planCode = String(meta?.plan_code || "").toUpperCase();
-  let cycleRaw = String(meta?.billing_cycle || "").toUpperCase();
+  // A subscription's plan id says both, and every Safepay plan is monthly.
+  let planCode = String(safepayPlan?.planCode || meta?.plan_code || "").toUpperCase();
+  let cycleRaw = safepayPlan ? "MONTHLY" : String(meta?.billing_cycle || "").toUpperCase();
 
   if (!planCode || !cycleRaw) {
     const needle = tracker || orderId;
@@ -1065,13 +1126,35 @@ async function handleSafepayWebhook(req: NextRequest, raw: string) {
   if (!planCode) planCode = "STARTER";
   const billingCycle = cycleRaw === "YEARLY" ? "YEARLY" : "MONTHLY";
 
-  // Idempotency — use tracker or orderId as the unique event key
-  const eventKey = `${event}:${tracker || orderId}`;
+  const status = mapSafepayEventToStatus(event);
+
+  // Idempotency. A one-off payment is unique by tracker. A subscription reuses
+  // its reference every month, so keying on that would drop every renewal as a
+  // duplicate — its charges are keyed by subscription and day instead. That
+  // also collapses `subscription.created` and the first payment event, should
+  // Safepay send both for one charge, into a single invoice.
+  const chargeRef = isSubscriptionEvent && subscriptionId
+    ? `${subscriptionId}:${new Date().toISOString().slice(0, 10)}`
+    : (tracker || orderId);
+  const eventKey = isSubscriptionEvent && subscriptionId
+    ? `${status}:${chargeRef}`
+    : `${event}:${tracker || orderId}`;
   if (eventKey !== ":" && await alreadyProcessed("safepay", eventKey)) {
     return apiOk({ received: true, provider: "safepay", duplicate: true });
   }
 
-  const status = mapSafepayEventToStatus(event);
+  // An event for a subscription the company has already moved off — the old one
+  // cancelled during a plan change, or the intro plan after they continued on
+  // the full one — must not touch the account.
+  if (subscriptionId) {
+    const current = await prisma.subscription
+      .findUnique({ where: { companyId }, select: { provider: true, stripeSubscriptionId: true } })
+      .catch(() => null);
+    const currentId = String(current?.provider).toUpperCase() === "SAFEPAY" ? current?.stripeSubscriptionId : null;
+    if (currentId && currentId !== subscriptionId && status !== "ACTIVE") {
+      return apiOk({ received: true, provider: "safepay", ignored: "superseded subscription" });
+    }
+  }
 
   // Safepay quotes money in paisa, not rupees. Taken at face value this wrote a
   // Rs 13,720 charge into the ledger, the receipt email and lifetime `totalPaid`
@@ -1080,6 +1163,7 @@ async function handleSafepayWebhook(req: NextRequest, raw: string) {
     typeof data?.tracker?.amount === "number" ? data.tracker.amount
     : typeof data?.amount === "number"        ? data.amount
     : typeof data?.order?.amount === "number" ? data.order.amount
+    : typeof sub?.price_amount === "number"   ? sub.price_amount
     : null;
   const amountPkr = rawAmount == null ? null : paisaToPkr(rawAmount);
 
@@ -1095,6 +1179,7 @@ async function handleSafepayWebhook(req: NextRequest, raw: string) {
       provider: "SAFEPAY",
       safepayTracker: tracker || null,
       safepayOrderId: orderId || null,
+      providerSubscriptionId: subscriptionId || null,
       currentPeriodEnd,
       billingCycle,
       displayCurrency: "PKR",
@@ -1113,8 +1198,9 @@ async function handleSafepayWebhook(req: NextRequest, raw: string) {
       companyId,
       companyName: safepayCompany?.name,
       provider: "SAFEPAY",
-      providerEventId: `safepay:${tracker || orderId}`,
+      providerEventId: `safepay:${chargeRef}`,
       providerOrderId: orderId || null,
+      providerSubscriptionId: subscriptionId || null,
       plan: planCode,
       billingCycle,
       currency: "PKR",
@@ -1134,7 +1220,12 @@ async function handleSafepayWebhook(req: NextRequest, raw: string) {
       data: {
         companyId, userId: null,
         action: "SAFEPAY_PAYMENT_SUCCESS",
-        details: JSON.stringify({ event, planCode, billingCycle, tracker, orderId, amountPkr }),
+        // `intro` is what checkout reads to offer the launch plan only once.
+        details: JSON.stringify({
+          event, planCode, billingCycle, tracker, orderId, amountPkr,
+          subscriptionId: subscriptionId || null,
+          intro: Boolean(safepayPlan?.intro),
+        }),
       },
     }).catch(() => {});
 
@@ -1158,7 +1249,14 @@ async function handleSafepayWebhook(req: NextRequest, raw: string) {
       "subscription:activated",
       "payment:created",
     ]);
-    if (FIRST_CHARGE_EVENTS.has(event.toLowerCase())) {
+    // Continuing on the full plan after the intro is a new Safepay subscription
+    // but not a new customer — no second welcome.
+    const continuingAfterIntro = Boolean(safepayPlan && !safepayPlan.intro) &&
+      Boolean(await prisma.activityLog.findFirst({
+        where: { companyId, action: "SAFEPAY_INTRO_ENDED" },
+        select: { id: true },
+      }).catch(() => null));
+    if (FIRST_CHARGE_EVENTS.has(event.toLowerCase()) && !continuingAfterIntro) {
       await sendWelcomeSubscriptionEmail(companyId, planCode, "PK");
     }
   }
@@ -1215,6 +1313,45 @@ async function handleSafepayWebhook(req: NextRequest, raw: string) {
     }).catch(() => {});
 
     await sendPaymentFailedEmail(companyId, planCode, amountPkr || 0, "PKR", "soon");
+  }
+
+  // The half-price intro plan ran its 3 billing cycles and Safepay ended it.
+  // That is the offer finishing, not the customer leaving: the last cycle is
+  // paid, so the account stays live to currentPeriodEnd (the lifecycle cron
+  // handles it from there if nothing follows). Clearing the subscription id
+  // is what makes the billing page offer "Continue on full plan", whose
+  // checkout picks the full-price plan because an intro has now been paid.
+  if (status === "CANCELLED" && safepayPlan?.intro && event.toLowerCase() === "subscription.ended") {
+    await prisma.subscription.update({
+      where: { companyId },
+      data: { stripeSubscriptionId: null },
+    }).catch(() => {});
+
+    await prisma.activityLog.create({
+      data: {
+        companyId, userId: null,
+        action: "SAFEPAY_INTRO_ENDED",
+        details: JSON.stringify({ event, planCode, subscriptionId }),
+      },
+    }).catch(() => {});
+
+    try {
+      const uc = await getCompanyOwner(companyId);
+      if (uc?.user?.email) {
+        const link = `${APP_URL}/dashboard/billing`;
+        await sendEmail({
+          to: uc.user.email,
+          subject: "Your FinovaOS launch offer has ended — continue your plan",
+          html: `<p>Hi ${String(uc.user.name || "there").replace(/[<>&"]/g, "")},</p>
+<p>Your 3 discounted months on the ${planCode} plan are complete. Your account stays active until the end of the current billing period.</p>
+<p>To keep using FinovaOS without interruption, continue on the regular monthly plan — the card saved in your Safepay wallet can be reused.</p>
+<p><a href="${link}">Continue my plan</a></p>`,
+          companyId,
+        });
+      }
+    } catch {}
+
+    return apiOk({ received: true, provider: "safepay", introEnded: true });
   }
 
   if (status === "CANCELLED") {

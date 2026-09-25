@@ -6,7 +6,14 @@ import { getRuntimeAppUrl } from "@/lib/domains";
 import { resolvePricingRegion } from "@/lib/geoCountry";
 import { createLemonCheckout, hasLemonSqueezyConfig } from "@/lib/lemonsqueezy";
 import { getLaunchDiscount } from "@/lib/launchDiscount";
-import { createSafepayCheckout, isSafepayAllowedForCompany, isSafepayCheckoutEnabled, usdToPkr } from "@/lib/safepay";
+import {
+  createSafepayCheckout,
+  createSafepaySubscriptionCheckout,
+  getSafepayPlanId,
+  isSafepayAllowedForCompany,
+  isSafepayCheckoutEnabled,
+  usdToPkr,
+} from "@/lib/safepay";
 import { getCompanyExtraSeats } from "@/lib/companySeatLimit";
 import { getCustomPlanCycleAmountUsd, getModuleRate, parseCustomModules } from "@/lib/customPlanPricing";
 import { FX_USD } from "@/lib/currency";
@@ -338,6 +345,74 @@ export async function POST(req: NextRequest) {
         : usdToPkr(finalCustomPrice > 0 ? finalCustomPrice : planBasePerMonth);
 
       const orderId = `fnv-${companyId}-${Date.now()}`;
+
+      // ── Monthly plans: a recurring Safepay subscription ──
+      //
+      // Safepay charges the card every month itself. The launch offer is a
+      // separate half-price intro plan limited to 3 billing cycles (see the
+      // Subscriptions note in lib/safepay.ts), offered only to a company that has
+      // never paid a monthly invoice or started an intro before.
+      //
+      // Anything a fixed-price plan cannot express — a typed coupon, extra seats,
+      // custom plans, yearly — and any tier whose plan id is not configured falls
+      // through to the one-off payment below, which prices it exactly.
+      if (!appliedCoupon && billingCycle === "MONTHLY" && seatsPkr === 0 && pkrKey) {
+        let introEligible = false;
+        try {
+          const [paidMonths, priorIntro] = await Promise.all([
+            prisma.platformInvoice.count({
+              where: {
+                companyId,
+                billingCycle: "MONTHLY",
+                testMode: false,
+                status: { in: ["PAID", "PARTIALLY_REFUNDED"] },
+                total: { gt: 0 },
+              },
+            }),
+            prisma.activityLog.findFirst({
+              where: { companyId, action: "SAFEPAY_PAYMENT_SUCCESS", details: { contains: '"intro":true' } },
+              select: { id: true },
+            }),
+          ]);
+          introEligible = paidMonths === 0 && !priorIntro;
+        } catch { /* unknown history — charge the full plan rather than guess */ }
+
+        const introPlanId = introEligible ? getSafepayPlanId(planCode, true) : "";
+        const planId = introPlanId || getSafepayPlanId(planCode, false);
+
+        if (planId) {
+          const intro = Boolean(introPlanId);
+          const sub = await createSafepaySubscriptionCheckout({
+            planId,
+            reference: orderId,
+            successUrl: successUrl || `${base}/dashboard/billing?upgrade=success`,
+            cancelUrl:  cancelUrl  || `${base}/dashboard/billing?cancel=1`,
+          });
+
+          await prisma.activityLog.create({
+            data: {
+              companyId,
+              userId: userId || null,
+              action: "BILLING_CHECKOUT_CREATED",
+              details: JSON.stringify({
+                provider: "SAFEPAY",
+                mode: "subscription",
+                planCode,
+                billingCycle,
+                orderId,
+                safepayPlanId: planId,
+                intro,
+                pkrBasePrice,
+                displayCurrency: "PKR",
+                displayCountry:  "PK",
+                createdAt: new Date().toISOString(),
+              }),
+            },
+          }).catch(() => {});
+
+          return apiOk({ url: sub.checkoutUrl, provider: "safepay", orderId });
+        }
+      }
 
       const checkout = await createSafepayCheckout({
         orderId,

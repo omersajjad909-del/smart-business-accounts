@@ -86,6 +86,15 @@ export async function GET(req: NextRequest) {
    * — offered nothing, and the only way through was to buy a *different* plan.
    */
   function reCheckout(): { canReCheckout: boolean; reCheckoutLabel: string | null; reCheckoutReason: string | null } {
+    // The Safepay intro plan ended (the webhook clears its id) — the customer
+    // continues on the full monthly plan with the card in their Safepay wallet.
+    if (!subscription?.stripeSubscriptionId && String(subscription?.provider).toUpperCase() === "SAFEPAY") {
+      return {
+        canReCheckout: true,
+        reCheckoutLabel: "Continue on full plan",
+        reCheckoutReason: "Your 3 discounted launch months are complete. Continue on the regular monthly price to keep your workspace running without interruption.",
+      };
+    }
     if (!subscription?.stripeSubscriptionId) {
       return {
         canReCheckout: true,

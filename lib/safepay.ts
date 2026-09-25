@@ -357,6 +357,105 @@ export async function createSafepayCheckout(input: SafepayCheckoutInput): Promis
   return { checkoutUrl, tracker: String(tracker), orderId: input.orderId };
 }
 
+// ─── Subscriptions ────────────────────────────────────────────────────────────
+//
+// Monthly plans are billed as Safepay subscriptions so the card is charged
+// every month without the customer coming back. Safepay has no intro-price or
+// discount-for-N-cycles feature and no API to move a subscription between
+// plans (the only calls are cancel / pause / resume), so the launch offer is
+// two plans per tier in the Safepay dashboard:
+//
+//   SAFEPAY_PLAN_<TIER>_INTRO — half price, "Number of Billing Cycles" = 3.
+//                               Safepay ends it on its own after the third charge.
+//   SAFEPAY_PLAN_<TIER>       — full price, cycles = 0 (runs until cancelled).
+//
+// A new customer subscribes to the intro plan; when it ends the webhook keeps
+// the account running to the end of the paid period and asks them to continue
+// on the full plan, which reuses the card already in their Safepay wallet.
+//
+// Checkout URL and cancel endpoint are from Safepay's own safepay-node SDK
+// (src/utils/constants.ts, builder.ts, resources/subscription.ts).
+
+const SANDBOX_SUBSCRIBE = "https://sandbox.api.getsafepay.com/checkout/subscribe";
+const PROD_SUBSCRIBE    = "https://getsafepay.com/checkout/subscribe";
+
+type SafepayTier = "STARTER" | "PRO" | "ENTERPRISE";
+
+function tierOf(planCode: string): SafepayTier | null {
+  const p = String(planCode || "").toUpperCase();
+  if (p === "STARTER") return "STARTER";
+  if (p === "PRO" || p === "PROFESSIONAL") return "PRO";
+  if (p === "ENTERPRISE") return "ENTERPRISE";
+  return null;
+}
+
+/** The Safepay plan id for a tier, or "" when that plan is not configured. */
+export function getSafepayPlanId(planCode: string, intro: boolean): string {
+  const tier = tierOf(planCode);
+  if (!tier) return "";
+  return env(`SAFEPAY_PLAN_${tier}${intro ? "_INTRO" : ""}`);
+}
+
+/** Reverse of getSafepayPlanId — which tier a webhook's plan id belongs to. */
+export function resolveSafepayPlanId(planId: string): { planCode: SafepayTier; intro: boolean } | null {
+  const id = String(planId || "").trim();
+  if (!id) return null;
+  for (const tier of ["STARTER", "PRO", "ENTERPRISE"] as const) {
+    if (env(`SAFEPAY_PLAN_${tier}`) === id) return { planCode: tier, intro: false };
+    if (env(`SAFEPAY_PLAN_${tier}_INTRO`) === id) return { planCode: tier, intro: true };
+  }
+  return null;
+}
+
+/**
+ * Hosted subscription checkout. `reference` is our `fnv-<companyId>-<ts>` order
+ * ref, so the webhook can find the company the same way it does for payments.
+ */
+export async function createSafepaySubscriptionCheckout(input: {
+  planId: string;
+  reference: string;
+  successUrl: string;
+  cancelUrl: string;
+}): Promise<{ checkoutUrl: string }> {
+  if (!env("SAFEPAY_SECRET_KEY")) throw new Error("SAFEPAY_SECRET_KEY is not set.");
+
+  const passportRes = await fetch(`${getBase()}/client/passport/v1/token`, {
+    method:  "POST",
+    headers: authHeaders(),
+    body:    JSON.stringify({}),
+  });
+  const passportJson = await passportRes.json().catch(() => ({}));
+  if (!passportRes.ok) throw safepayError("passport token", passportRes, passportJson);
+
+  const authToken = typeof passportJson?.data === "string" ? passportJson.data : passportJson?.data?.token;
+  if (!authToken) throw new Error("Safepay passport token was missing in response.");
+
+  const params = new URLSearchParams({
+    plan_id:      input.planId,
+    auth_token:   String(authToken),
+    env:          getEnvName(),
+    cancel_url:   input.cancelUrl,
+    redirect_url: input.successUrl,
+    reference:    input.reference,
+  });
+  const base = isProduction() ? PROD_SUBSCRIBE : SANDBOX_SUBSCRIBE;
+  return { checkoutUrl: `${base}?${params.toString()}` };
+}
+
+export async function cancelSafepaySubscription(subscriptionId: string): Promise<{ ok: boolean; error?: string }> {
+  try {
+    const res = await fetch(
+      `${getBase()}/client/subscriptions/v1/${encodeURIComponent(subscriptionId)}/cancel`,
+      { method: "POST", headers: authHeaders(), body: JSON.stringify({}) },
+    );
+    if (res.ok) return { ok: true };
+    const json = await res.json().catch(() => ({}));
+    return { ok: false, error: safepayError("subscription cancel", res, json).message };
+  } catch (err: any) {
+    return { ok: false, error: String(err?.message || err) };
+  }
+}
+
 // ─── Payment status ───────────────────────────────────────────────────────────
 
 /**
