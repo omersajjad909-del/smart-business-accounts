@@ -365,9 +365,9 @@ export async function createSafepayCheckout(input: SafepayCheckoutInput): Promis
 // plans (the only calls are cancel / pause / resume), so the launch offer is
 // two plans per tier in the Safepay dashboard:
 //
-//   SAFEPAY_PLAN_<TIER>_INTRO — half price, "Number of Billing Cycles" = 3.
-//                               Safepay ends it on its own after the third charge.
-//   SAFEPAY_PLAN_<TIER>       — full price, cycles = 0 (runs until cancelled).
+//   SAFEPAY_<STAGE>_PLAN_<TIER>_INTRO   — half price, "Number of Billing Cycles" = 3.
+//                                         Safepay ends it itself after the third charge.
+//   SAFEPAY_<STAGE>_PLAN_<TIER>_MONTHLY — full price, cycles = 0 (runs until cancelled).
 //
 // A new customer subscribes to the intro plan; when it ends the webhook keeps
 // the account running to the end of the paid period and asks them to continue
@@ -389,11 +389,19 @@ function tierOf(planCode: string): SafepayTier | null {
   return null;
 }
 
+/**
+ * Plan ids live in SAFEPAY_<PRODUCTION|SANDBOX>_PLAN_<TIER>_<MONTHLY|INTRO>,
+ * kept per environment because a sandbox plan id means nothing to production.
+ */
+function planEnv(tier: SafepayTier, intro: boolean): string {
+  const stage = isProduction() ? "PRODUCTION" : "SANDBOX";
+  return env(`SAFEPAY_${stage}_PLAN_${tier}_${intro ? "INTRO" : "MONTHLY"}`);
+}
+
 /** The Safepay plan id for a tier, or "" when that plan is not configured. */
 export function getSafepayPlanId(planCode: string, intro: boolean): string {
   const tier = tierOf(planCode);
-  if (!tier) return "";
-  return env(`SAFEPAY_PLAN_${tier}${intro ? "_INTRO" : ""}`);
+  return tier ? planEnv(tier, intro) : "";
 }
 
 /** Reverse of getSafepayPlanId — which tier a webhook's plan id belongs to. */
@@ -401,8 +409,8 @@ export function resolveSafepayPlanId(planId: string): { planCode: SafepayTier; i
   const id = String(planId || "").trim();
   if (!id) return null;
   for (const tier of ["STARTER", "PRO", "ENTERPRISE"] as const) {
-    if (env(`SAFEPAY_PLAN_${tier}`) === id) return { planCode: tier, intro: false };
-    if (env(`SAFEPAY_PLAN_${tier}_INTRO`) === id) return { planCode: tier, intro: true };
+    if (planEnv(tier, false) === id) return { planCode: tier, intro: false };
+    if (planEnv(tier, true) === id) return { planCode: tier, intro: true };
   }
   return null;
 }

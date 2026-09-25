@@ -129,7 +129,7 @@ function CategoryCard({ cat, index }: { cat: typeof CATEGORIES[0]; index: number
   const shown = expanded ? cat.articles : cat.articles.slice(0, 4);
 
   return (
-    <div ref={ref} style={{
+    <div ref={ref} id={cat.id} style={{
       opacity: visible ? 1 : 0,
       transform: visible ? "translateY(0)" : "translateY(24px)",
       transition: `all .6s cubic-bezier(.22,1,.36,1) ${index * 70}ms`,
@@ -138,6 +138,7 @@ function CategoryCard({ cat, index }: { cat: typeof CATEGORIES[0]; index: number
       border: "1.5px solid rgba(255,255,255,.07)",
       backdropFilter: "blur(16px)",
       position: "relative",
+      scrollMarginTop: 90,
     }}>
       {/* Color accent top line */}
       <div style={{ height: 2, background: `linear-gradient(90deg, ${cat.color}, transparent)` }}/>

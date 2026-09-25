@@ -349,7 +349,19 @@ export default function ApiDocsPage() {
         <div style={{ borderRadius: 14, padding: "14px 20px", marginBottom: 36, background: "rgba(255,255,255,.02)", border: "1px solid rgba(255,255,255,.06)", display: "flex", alignItems: "center", gap: 12 }}>
           <span style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,.28)", letterSpacing: ".08em", flexShrink: 0 }}>BASE URL</span>
           <code style={{ fontSize: 13, color: "#a5b4fc" }}>https://finovaos.app</code>
-          <span style={{ fontSize: 12, color: "rgba(255,255,255,.25)", marginLeft: "auto" }}>All responses are JSON · Rate limit: 1,000 req/hr</span>
+          <span style={{ fontSize: 12, color: "rgba(255,255,255,.25)", marginLeft: "auto" }}>All responses are JSON</span>
+        </div>
+
+        {/* Plan access — was undocumented before, which meant a Starter
+            customer's first API call would just fail with no explanation
+            anywhere on this page. */}
+        <div style={{ borderRadius: 14, padding: "16px 20px", marginBottom: 36, background: "rgba(129,140,248,.05)", border: "1px solid rgba(129,140,248,.18)" }}>
+          <div style={{ fontSize: 11, fontWeight: 700, color: "#a5b4fc", letterSpacing: ".08em", marginBottom: 10 }}>API ACCESS BY PLAN</div>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(180px,1fr))", gap: 10, fontSize: 13, color: "rgba(255,255,255,.6)" }}>
+            <div><b style={{ color: "white" }}>Starter</b> — no API access</div>
+            <div><b style={{ color: "white" }}>Professional</b> — read-only (GET)</div>
+            <div><b style={{ color: "white" }}>Enterprise</b> — full access (GET/POST/PUT/DELETE)</div>
+          </div>
         </div>
 
         {/* Tag filter */}

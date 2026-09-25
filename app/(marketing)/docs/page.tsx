@@ -18,6 +18,12 @@ function useInView(threshold = 0.1) {
 
 /* ─── Data ──────────────────────────────────────────────────────────── */
 
+// /help's own CATEGORIES only render ids for these six — the other section
+// ids below (accounting, hr-payroll, multi-branch, api) have no matching
+// anchor there, so their "All X docs" link falls back to a plain page below
+// instead of a #fragment that would silently land on the wrong spot.
+const HELP_CATEGORY_IDS = new Set(["getting-started", "invoicing", "reports", "banking", "inventory", "account"]);
+
 const SECTIONS = [
   {
     id: "getting-started",
@@ -239,7 +245,7 @@ function SectionCard({ s, i }: { s: typeof SECTIONS[0]; i: number }) {
         </div>
       </div>
 
-      <Link href={`/help#${s.id}`} style={{
+      <Link href={HELP_CATEGORY_IDS.has(s.id) ? `/help#${s.id}` : s.id === "api" ? "/developers/api" : "/help"} style={{
         display: "flex", alignItems: "center", justifyContent: "center", gap: 5,
         padding: "11px", width: "100%",
         borderTop: "1px solid rgba(255,255,255,.05)",
