@@ -3,9 +3,14 @@ import type { Metadata } from "next";
 const BASE = process.env.NEXT_PUBLIC_BASE_URL || "https://www.finovaos.app";
 
 export const metadata: Metadata = {
-  title: "Industry Solutions — Trading, Wholesale, Manufacturing, Distribution, Restaurant, Retail, Import/Export & More | FinovaOS",
+  // Bare title — the root layout's "%s | FinovaOS" template appends the
+  // brand for the <title> tag. This one used to carry its own "| FinovaOS"
+  // suffix on top of that template, which is how it ended up rendering as
+  // "...| FinovaOS | FinovaOS" and flagged as an overlong title by a live
+  // OpenRush audit (2026-09-25).
+  title: "Industry Solutions for Every Business Type",
   description:
-    "FinovaOS is purpose-built for every industry — trading, wholesale, manufacturing, distribution, restaurant, retail, import/export, construction, hospital, school, pharmacy, transport, real estate, hotel, NGO, IT, law firm, salon, gym, e-commerce, and agriculture. Industry-specific accounting, inventory, and ERP workflows.",
+    "FinovaOS is built for your industry — trading, manufacturing, retail, restaurant, distribution, import/export and more — with accounting and inventory workflows tailored to each one.",
   keywords: [
     // Trading & Wholesale
     "trading business accounting software", "wholesale accounting software",

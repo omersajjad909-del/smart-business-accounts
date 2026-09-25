@@ -3,8 +3,14 @@ import type { Metadata } from "next";
 const BASE = process.env.NEXT_PUBLIC_BASE_URL || "https://www.finovaos.app";
 
 export const metadata: Metadata = {
-  title: "Industry Solutions — Trading, Manufacturing, Restaurant, Retail, Import/Export & More | FinovaOS",
-  description: "FinovaOS is purpose-built for every industry — trading, wholesale, manufacturing, distribution, restaurant, retail, import/export, construction, hospital, school, pharmacy, transport, real estate, clearing & forwarding, hotel, NGO, IT, law firm, salon, gym, e-commerce, and agriculture.",
+  // Bare title — see the identical fix + comment in solutions/layout.tsx.
+  // Given a distinct title from /solutions on purpose: this page is the full
+  // roadmap of every business type (live and coming-soon, phased rollout),
+  // while /solutions showcases the industries already live — same fix, but
+  // reusing one title across both would have traded one duplicate-title bug
+  // for another.
+  title: "All Business Types — Live & Coming Soon",
+  description: "Every business type FinovaOS supports, phase by phase — from trading and retail to manufacturing, healthcare, education and more.",
   keywords: [
     // Trading & Wholesale
     "trading business software", "trading company ERP", "wholesale accounting software",
