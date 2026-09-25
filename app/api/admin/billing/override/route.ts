@@ -15,7 +15,7 @@ import { sendManualInvoiceEmail } from "@/lib/manualInvoiceEmail";
     - ADD_NOTE          — add an internal audit note
 */
 
-const ALLOWED_ACTIONS = ["EXTEND_TRIAL", "GRANT_FREE_ACCESS", "RESET_INTRO_OFFER", "SET_STATUS", "SET_EXTRA_SEATS", "ADD_NOTE"];
+const ALLOWED_ACTIONS = ["EXTEND_TRIAL", "GRANT_FREE_ACCESS", "RESET_INTRO_OFFER", "SET_STATUS", "SET_EXTRA_SEATS", "SET_COUNTRY", "ADD_NOTE"];
 
 // Five years. Long enough for any prepaid deal worth signing, short enough that
 // a typo cannot hand out access for a decade.
@@ -228,6 +228,26 @@ export async function POST(req: NextRequest) {
           // the admin who just reactivated it would have no idea why.
           ...(nextStatus === "ACTIVE" ? { accessGrantedUntil: null } : {}),
         },
+      });
+    }
+
+    /* ── SET_COUNTRY ──
+       lib/geoCountry.ts falls back to this field only when IP, accept-language
+       and the client's own timezone cookie all fail to say Pakistan — the last
+       resort that decides whether an existing Lemon Squeezy customer ever sees
+       "Switch to local payment". It has to be a bare ISO-3166 alpha-2 code:
+       Company.country defaults to the full name "United States" and nothing in
+       the signup flow writes an ISO code onto it, so resolvePricingRegion's
+       normalizeCountry (which requires exactly /^[A-Z]{2}$/) silently drops it.
+       This is the one place that stores it in the shape the resolver can read. */
+    if (action === "SET_COUNTRY") {
+      const country = String(payload?.country || "").trim().toUpperCase();
+      if (!/^[A-Z]{2}$/.test(country)) {
+        return NextResponse.json({ error: "country must be a 2-letter ISO code, e.g. PK" }, { status: 400 });
+      }
+      result = await prisma.company.update({
+        where: { id: companyId },
+        data: { country },
       });
     }
 
