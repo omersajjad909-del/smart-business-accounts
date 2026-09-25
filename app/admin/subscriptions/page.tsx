@@ -60,7 +60,7 @@ function StatusBadge({ status }: { status?: string | null }) {
 }
 
 /* ── Override Modal ─────────────────────────────────── */
-type ActionType = "EXTEND_TRIAL" | "GRANT_FREE_ACCESS" | "RESET_INTRO_OFFER" | "SET_STATUS" | "ADD_NOTE";
+type ActionType = "EXTEND_TRIAL" | "GRANT_FREE_ACCESS" | "RESET_INTRO_OFFER" | "SET_STATUS" | "SET_COUNTRY" | "ADD_NOTE";
 
 /** Today plus N whole years, as YYYY-MM-DD. Leap years take care of themselves. */
 function addYearsISO(years: number): string {
@@ -110,6 +110,13 @@ function OverrideModal({ company, onClose, onDone }: {
   const [until, setUntil]   = useState(() => addYearsISO(1));
   const [plan, setPlan]     = useState(company.plan?.toUpperCase() || "PRO");
   const [status, setStatus] = useState("ACTIVE");
+  // Company.country is stored free-text ("United States" by default) and
+  // resolvePricingRegion only reads a bare ISO-3166 alpha-2 code, so a company
+  // whose country was never corrected onto that shape can never trip the
+  // Pakistan fallback that offers Safepay. This lets an admin fix it directly.
+  const [countryCode, setCountryCode] = useState(
+    /^[A-Za-z]{2}$/.test(company.country || "") ? String(company.country).toUpperCase() : "PK",
+  );
   const [note, setNote]     = useState("");
   // The invoice half of an offline deal. Off by default: a genuinely free
   // grant — a partner account, an apology — has no money behind it and must
@@ -164,6 +171,7 @@ function OverrideModal({ company, onClose, onDone }: {
         }
       }
       if (action === "SET_STATUS")      payload = { status };
+      if (action === "SET_COUNTRY")     payload = { country: countryCode };
 
       const r = await fetch("/api/admin/billing/override", {
         method: "POST", headers: h, credentials: "include" as any,
@@ -222,6 +230,7 @@ function OverrideModal({ company, onClose, onDone }: {
     { key: "GRANT_FREE_ACCESS", icon: "🎁", label: "Grant Free Access",   desc: "Set ACTIVE + choose plan for N days, no charge",     color: "#22c55e" },
     { key: "RESET_INTRO_OFFER", icon: "🔄", label: "Reset 50% Offer",     desc: "Let them use the intro offer again",                  color: "#fbbf24" },
     { key: "SET_STATUS",        icon: "🔧", label: "Override Status",      desc: "Manually force any subscription status",             color: "#818cf8" },
+    { key: "SET_COUNTRY",       icon: "🌍", label: "Fix Country Code",     desc: "Correct the ISO code used for Pakistan/Safepay routing", color: "#f472b6" },
     { key: "ADD_NOTE",          icon: "📝", label: "Add Internal Note",    desc: "Log a note to audit trail (no DB change)",           color: "#64748b" },
   ];
 
@@ -432,6 +441,20 @@ function OverrideModal({ company, onClose, onDone }: {
             </div>
           )}
 
+          {action === "SET_COUNTRY" && (
+            <div style={{ padding: "18px", borderRadius: 14, background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)" }}>
+              <label style={{ fontSize: 11, fontWeight: 700, color: "#475569", letterSpacing: ".06em", display: "block", marginBottom: 6 }}>
+                ISO COUNTRY CODE (currently stored as "{company.country || "—"}")
+              </label>
+              <input value={countryCode} onChange={e => setCountryCode(e.target.value.toUpperCase().slice(0, 2))}
+                placeholder="PK" maxLength={2} style={{ ...inputStyle, textTransform: "uppercase", letterSpacing: 2 }} />
+              <div style={{ marginTop: 8, fontSize: 11, color: "#64748b", lineHeight: 1.6 }}>
+                Two letters only (PK, US, AE…). This is what unlocks "Switch to local payment" for a
+                Lemon Squeezy customer once their IP/timezone signals don't say Pakistan on their own.
+              </div>
+            </div>
+          )}
+
           {action === "RESET_INTRO_OFFER" && (
             <div style={{ padding: "14px 16px", borderRadius: 12, background: "rgba(251,191,36,.06)", border: "1px solid rgba(251,191,36,.2)", fontSize: 13, color: "#fbbf24" }}>
               ⚠️ This will delete the BILLING_OFFER_CLAIM log for this company. They will be able to use the 50% intro offer again on their next checkout.
@@ -449,7 +472,7 @@ function OverrideModal({ company, onClose, onDone }: {
           {/* Apply button */}
           <div style={{ display: "flex", gap: 10 }}>
             <button onClick={onClose} style={{ flex: 1, padding: "12px", borderRadius: 12, background: "rgba(255,255,255,.05)", border: "1px solid rgba(255,255,255,.1)", color: "#64748b", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>Cancel</button>
-            <button onClick={apply} disabled={saving || (action === "ADD_NOTE" && !note.trim()) || invoiceIncomplete}
+            <button onClick={apply} disabled={saving || (action === "ADD_NOTE" && !note.trim()) || (action === "SET_COUNTRY" && !/^[A-Z]{2}$/.test(countryCode)) || invoiceIncomplete}
               style={{ flex: 2, padding: "12px", borderRadius: 12, background: saving ? "#4338ca" : `linear-gradient(135deg,${selected.color},${selected.color}bb)`, border: "none", color: "white", fontSize: 13, fontWeight: 700, cursor: saving ? "wait" : invoiceIncomplete ? "not-allowed" : "pointer", opacity: saving || invoiceIncomplete ? .55 : 1 }}>
               {saving ? "Applying…" : invoiceIncomplete ? "Enter the invoice amount" : `Apply — ${selected.label}`}
             </button>

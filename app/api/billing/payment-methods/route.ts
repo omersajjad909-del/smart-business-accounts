@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { resolveCompanyId } from "@/lib/tenant";
 import { hasLemonSqueezyConfig } from "@/lib/lemonsqueezy";
-import { isSafepayCheckoutEnabled } from "@/lib/safepay";
+import { hasSafepayConfig, isSafepayAllowedForCompany, isSafepayCheckoutEnabled } from "@/lib/safepay";
 import { resolvePricingRegion } from "@/lib/geoCountry";
 
 export const runtime = "nodejs";
@@ -75,6 +75,33 @@ export async function GET(req: NextRequest) {
     .findUnique({ where: { id: companyId }, select: { accessGrantedUntil: true, country: true } })
     .catch(() => null);
 
+  // Region is resolved server-side from the request, the same way checkout
+  // does it — a client-supplied country must not decide who gets Safepay.
+  const region = resolvePricingRegion(req, company?.country || null);
+
+  /**
+   * Temporary diagnostic for the "Switch to local payment" button not showing
+   * up for a Pakistani Lemon Squeezy customer. Opt-in via ?debug=1 and
+   * restricted to ADMIN/OWNER so it never leaks region signals to an ordinary
+   * customer session. Safe to delete once that investigation is closed —
+   * nothing else reads `debug`.
+   */
+  const wantsDebug = req.nextUrl.searchParams.get("debug") === "1";
+  const isAdminCaller = ["ADMIN", "OWNER"].includes(String(req.headers.get("x-user-role") || "").toUpperCase());
+  const showDebug = wantsDebug && isAdminCaller;
+  const debugInfo = showDebug
+    ? {
+        companyId,
+        subscriptionProvider: subscription?.provider || null,
+        hasProviderSubscriptionId: Boolean(subscription?.stripeSubscriptionId),
+        companyCountryField: company?.country || null,
+        region,
+        safepayConfigured: hasSafepayConfig(),
+        safepayCheckoutEnabled: isSafepayCheckoutEnabled(),
+        safepayAllowedForThisCompany: isSafepayAllowedForCompany(companyId),
+      }
+    : null;
+
   /**
    * Whether the customer should be offered a fresh checkout on the plan they
    * already have — normally a no-op, and so normally hidden.
@@ -102,9 +129,6 @@ export async function GET(req: NextRequest) {
         reCheckoutReason: "Move this workspace onto card billing. Your data and settings stay exactly as they are.",
       };
     }
-    // Region is resolved server-side from the request, the same way checkout
-    // does it — a client-supplied country must not decide who gets Safepay.
-    const region = resolvePricingRegion(req, company?.country || null);
     const wouldUseSafepay = region.isPakistan && isSafepayCheckoutEnabled();
     if (wouldUseSafepay && String(subscription.provider).toUpperCase() === "LEMONSQUEEZY") {
       return {
@@ -132,6 +156,7 @@ export async function GET(req: NextRequest) {
       updateUrl: null,
       ...reCheckout(),
       note: "This workspace is billed directly by arrangement — we issue your invoice each period and no card is stored here.",
+      ...(debugInfo ? { debug: debugInfo } : {}),
     });
   }
 
@@ -148,6 +173,7 @@ export async function GET(req: NextRequest) {
         provider === "LEMONSQUEEZY"
           ? "No active subscription yet — a card is collected at checkout."
           : "Payment methods are not configured yet for this workspace.",
+      ...(debugInfo ? { debug: debugInfo } : {}),
     });
   }
 
@@ -190,6 +216,7 @@ export async function GET(req: NextRequest) {
     note: updateUrl
       ? null
       : "Could not reach Lemon Squeezy for the current card. Try again shortly.",
+    ...(debugInfo ? { debug: debugInfo } : {}),
   });
 }
 
