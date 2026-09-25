@@ -8,7 +8,6 @@ const BENEFITS = [
   "Priority early access when new launches go live",
   "Direct product updates from the FinovaOS team",
   "Launch pricing and onboarding announcements",
-  "A cleaner way to tell Google and visitors that the brand is real",
 ];
 
 const TRUST_POINTS = [

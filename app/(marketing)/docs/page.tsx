@@ -152,7 +152,6 @@ const SECTIONS = [
       { label: "cURL & SDK examples",              href: "/developers/api#examples",  badge: "Dev" },
       { label: "Webhook events",                   href: "/developers/api#webhooks",  badge: "Dev" },
       { label: "Generate an API key",              href: "/dashboard/integrations"   },
-      { label: "Zapier integration",               href: "/integrations/zapier"      },
     ],
   },
 ];
@@ -554,7 +553,7 @@ export default function DocsPage() {
             <div style={{ width: 44, height: 44, borderRadius: 12, background: "rgba(52,211,153,.1)", border: "1.5px solid rgba(52,211,153,.25)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0 }}>💬</div>
             <div>
               <div style={{ fontSize: 15, fontWeight: 700, color: "rgba(255,255,255,.85)", marginBottom: 3 }}>Can't find what you're looking for?</div>
-              <div style={{ fontSize: 13, color: "rgba(255,255,255,.35)" }}>Our support team typically responds within 2 hours.</div>
+              <div style={{ fontSize: 13, color: "rgba(255,255,255,.35)" }}>Our support team typically responds within 24 hours.</div>
             </div>
           </div>
           <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>

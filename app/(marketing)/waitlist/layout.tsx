@@ -7,6 +7,10 @@ export const metadata: Metadata = {
   description:
     "Join the FinovaOS early access waitlist to get launch updates, product news, and priority onboarding for your business.",
   alternates: { canonical: `${BASE}/waitlist` },
+  // No `images` field below — see the matching comment in pricing/layout.tsx.
+  // This route's own opengraph-image.tsx is auto-detected by Next at a
+  // hashed URL; a hardcoded unhashed one here 404'd on the Twitter card
+  // (confirmed in Search Console's "Not found (404)" report).
   openGraph: {
     title: "Join the Waitlist | FinovaOS",
     description:
@@ -14,14 +18,12 @@ export const metadata: Metadata = {
     url: `${BASE}/waitlist`,
     siteName: "FinovaOS",
     type: "website",
-    images: [{ url: `${BASE}/waitlist/opengraph-image`, width: 1200, height: 630, alt: "FinovaOS — Join the Waitlist" }],
   },
   twitter: {
     card: "summary_large_image",
     title: "Join the Waitlist | FinovaOS",
     description:
       "Join the FinovaOS early access waitlist for launch updates and priority onboarding.",
-    images: [`${BASE}/waitlist/opengraph-image`],
   },
 };
 

@@ -5,6 +5,7 @@ import { apiError, apiOk } from "@/lib/apiError";
 import { getRuntimeAppUrl } from "@/lib/domains";
 import { resolvePricingRegion } from "@/lib/geoCountry";
 import { createLemonCheckout, hasLemonSqueezyConfig } from "@/lib/lemonsqueezy";
+import { getLaunchDiscount } from "@/lib/launchDiscount";
 import { createSafepayCheckout, isSafepayAllowedForCompany, isSafepayCheckoutEnabled, usdToPkr } from "@/lib/safepay";
 import { getCompanyExtraSeats } from "@/lib/companySeatLimit";
 import { getCustomPlanCycleAmountUsd, getModuleRate, parseCustomModules } from "@/lib/customPlanPricing";
@@ -294,6 +295,41 @@ export async function POST(req: NextRequest) {
         } catch { /* a coupon lookup must never cost the sale */ }
       }
 
+      // The store-wide launch offer (50% off the first 3 months). Lemon Squeezy
+      // applies it to its checkouts and repeats it on renewals itself; Safepay
+      // charges each month as a fresh one-off payment, so it has to be applied
+      // here for as long as the offer runs. The payment page already shows it,
+      // so without this a Pakistani buyer saw half price and paid full.
+      // Monthly only — the offer does not stack with the yearly 20%. Counting
+      // paid monthly invoices from any provider keeps someone who started on
+      // Lemon Squeezy from getting a second three months after switching.
+      let launchDiscount: { code: string; months: number; paidMonths: number } | null = null;
+      if (!appliedCoupon && billingCycle === "MONTHLY" && pkrBasePrice !== null) {
+        try {
+          const launch = await getLaunchDiscount();
+          if (launch) {
+            const months = launch.durationMonths ?? 3;
+            const paidMonths = await prisma.platformInvoice.count({
+              where: {
+                companyId,
+                billingCycle: "MONTHLY",
+                testMode: false,
+                status: { in: ["PAID", "PARTIALLY_REFUNDED"] },
+                total: { gt: 0 },
+              },
+            });
+            if (paidMonths < months) {
+              discountPkr =
+                launch.type === "percent"
+                  ? (pkrBasePrice * launch.value) / 100
+                  : launch.value;
+              discountPkr = Math.min(Math.max(0, discountPkr), pkrBasePrice);
+              launchDiscount = { code: launch.code, months, paidMonths };
+            }
+          }
+        } catch { /* the launch offer must never cost the sale */ }
+      }
+
       // Not rounded to whole rupees: a 50% coupon on Rs 3,999 is Rs 1,999.5, and
       // the payment page prints exactly that. pkrToPaisa rounds at the paisa, which
       // is the only place rounding belongs.
@@ -333,6 +369,7 @@ export async function POST(req: NextRequest) {
             pkrBasePrice,
             discountPkr,
             couponCode: appliedCoupon ? couponCode : null,
+            launchDiscount,
             seatsPkr,
             displayCurrency: "PKR",
             displayCountry:  "PK",

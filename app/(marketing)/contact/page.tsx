@@ -283,7 +283,7 @@ export default function ContactPage() {
             <div style={{ background:"rgba(255,255,255,.03)", borderRadius:22, border:"1px solid rgba(255,255,255,.07)", padding:"36px 32px" }}>
               <div style={{ marginBottom:28 }}>
                 <div style={{ fontSize:20, fontWeight:800, color:"white", marginBottom:6 }}>Send us a message</div>
-                <div style={{ fontSize:13, color:"rgba(255,255,255,.35)" }}>We will get back to you within one business day.</div>
+                <div style={{ fontSize:13, color:"rgba(255,255,255,.35)" }}>We will get back to you within 24 hours.</div>
               </div>
 
               {sent ? (

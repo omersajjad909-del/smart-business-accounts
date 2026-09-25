@@ -26,10 +26,16 @@ export async function generateMetadata({
   // Bare title — the root layout's "%s | FinovaOS" template appends the brand
   // for the <title> tag. OG/Twitter titles aren't templated, so they get the
   // brand suffix spelled out explicitly.
-  const title = `${config.label} Accounting & ERP Software`;
+  //
+  // "Pakistan" is in the title on purpose: every real competitor ranking for
+  // "<industry> ERP Pakistan" — the actual search term buyers use — carries
+  // the country in its own title. Leaving it out here meant this page never
+  // looked like a match for that query in the first place. Kept short (with
+  // the root template's " | FinovaOS" added on top) to stay under ~60 chars.
+  const title = `${config.label} ERP & Accounting Software — Pakistan`;
   const socialTitle = `${title} — FinovaOS`;
   const description =
-    `${config.description} FinovaOS gives ${config.label.toLowerCase()} businesses accounting, ` +
+    `${config.description} FinovaOS gives ${config.label.toLowerCase()} businesses in Pakistan and the Gulf FBR-ready accounting, ` +
     `invoicing, inventory and reporting in one cloud platform built for the way the industry actually works.`;
 
   return {

@@ -8,8 +8,10 @@ const SECURITY_HEADERS = [
   { key: "X-Frame-Options", value: "SAMEORIGIN" },
   // Prevent MIME sniffing
   { key: "X-Content-Type-Options", value: "nosniff" },
-  // XSS protection (legacy browsers)
-  { key: "X-XSS-Protection", value: "1; mode=block" },
+  // X-XSS-Protection deliberately omitted: modern browsers removed their XSS
+  // auditors (the header does nothing in current Chrome/Firefox/Safari), and
+  // the strict per-request CSP set in proxy.ts is what actually mitigates XSS
+  // here. Keeping a dead header around just adds noise to security scans.
   // HSTS — force HTTPS for 1 year, include subdomains
   { key: "Strict-Transport-Security", value: "max-age=31536000; includeSubDomains; preload" },
   // Referrer policy — only send origin on same-origin

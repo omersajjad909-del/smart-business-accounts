@@ -19,7 +19,7 @@ export interface FeatureRow {
 export const ROWS: FeatureRow[] = [
   // Pricing
   { feature: "💰 PRICING", category: true, finova: "", xero: "", zoho: "", wave: "", quickbooks: "" },
-  { feature: "Starting price",      finova: "$49/mo",  xero: "$13/mo",  zoho: "$15/mo",  wave: "Free*",   quickbooks: "$30/mo", note: "FinovaOS includes far more at base tier" },
+  { feature: "Starting price",      finova: "$49/mo",  xero: "$13/mo",  zoho: "$15/mo",  wave: "Free*",   quickbooks: "$30/mo", note: "FinovaOS includes far more at base tier. Competitor prices change often — verify on each vendor's own pricing page before deciding." },
   { feature: "Free plan available", finova: false,     xero: false,     zoho: true,      wave: true,      quickbooks: false },
   { feature: "Regional pricing",    finova: true,      xero: false,     zoho: false,     wave: false,     quickbooks: false, note: "Localized pricing for PKR, AED, SAR & more" },
   { feature: "Multi-currency",      finova: true,      xero: true,      zoho: true,      wave: false,     quickbooks: true },
@@ -60,7 +60,7 @@ export const ROWS: FeatureRow[] = [
 
   // Inventory
   { feature: "📦 INVENTORY", category: true, finova: "", xero: "", zoho: "", wave: "", quickbooks: "" },
-  { feature: "Stock Management",        finova: true,  xero: false, zoho: true,  wave: false, quickbooks: true },
+  { feature: "Stock Management",        finova: true,  xero: "Basic (higher plans)", zoho: true,  wave: false, quickbooks: true },
   { feature: "Low Stock Alerts",        finova: true,  xero: false, zoho: true,  wave: false, quickbooks: true },
   { feature: "Multi-warehouse",         finova: true,  xero: false, zoho: true,  wave: false, quickbooks: false },
   { feature: "Barcode / SKU",           finova: true,  xero: false, zoho: true,  wave: false, quickbooks: true },

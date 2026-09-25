@@ -10,7 +10,7 @@ const CHANNELS = [
     label: "Email Support",
     href: `https://mail.google.com/mail/?view=cm&to=${SUPPORT_EMAIL}&su=Support+Request`,
     display: SUPPORT_EMAIL,
-    note: "Reply within 4 business hours",
+    note: "Reply within 24 hours (faster on Pro & Enterprise)",
     color: "#818cf8",
     glow: "rgba(129,140,248,.22)",
     dim: "rgba(129,140,248,.08)",
@@ -200,10 +200,6 @@ const SLA_ROWS = [
   { label: "Phone / Video Support", key: "phone" },
 ] as const;
 
-const UPTIME_BARS = Array.from({ length: 30 }, (_, i) =>
-  i === 7 || i === 22 ? "partial" : "up"
-);
-
 function useVisible(threshold = 0.08) {
   const ref = useRef<HTMLDivElement>(null);
   const [v, setV] = useState(false);
@@ -360,14 +356,18 @@ export default function SupportPage() {
                 <span style={{ fontSize: 12, color: "rgba(255,255,255,.45)", fontWeight: 500 }}>Support Center</span>
               </div>
 
-              {/* Status badge */}
-              <div style={{ display: "inline-flex", alignItems: "center", gap: 10, padding: "8px 18px 8px 14px",
-                borderRadius: 28, background: "rgba(16,185,129,.07)", border: "1.5px solid rgba(16,185,129,.2)", marginBottom: 26 }}>
+              {/* Status link — used to be a static "99.98% uptime" badge that
+                  never changed regardless of real status. /status already
+                  polls live health data every 60s; linking to it is honest,
+                  duplicating a hardcoded number here was not. */}
+              <Link href="/status" style={{ display: "inline-flex", alignItems: "center", gap: 10, padding: "8px 18px 8px 14px",
+                borderRadius: 28, background: "rgba(16,185,129,.07)", border: "1.5px solid rgba(16,185,129,.2)", marginBottom: 26,
+                textDecoration: "none", transition: "background .2s" }}
+                onMouseEnter={e => (e.currentTarget.style.background = "rgba(16,185,129,.12)")}
+                onMouseLeave={e => (e.currentTarget.style.background = "rgba(16,185,129,.07)")}>
                 <div className="live-dot" />
-                <span style={{ fontSize: 12, fontWeight: 700, color: "#10b981", letterSpacing: ".06em" }}>ALL SYSTEMS OPERATIONAL</span>
-                <div style={{ width: 1, height: 14, background: "rgba(255,255,255,.12)" }} />
-                <span style={{ fontSize: 11.5, color: "rgba(255,255,255,.35)", fontWeight: 500 }}>99.98% uptime last 30 days</span>
-              </div>
+                <span style={{ fontSize: 12, fontWeight: 700, color: "#10b981", letterSpacing: ".06em" }}>CHECK LIVE STATUS</span>
+              </Link>
 
               <h1 style={{ fontFamily: "'Lora',serif", fontSize: "clamp(36px,5vw,62px)",
                 fontWeight: 700, color: "white", lineHeight: 1.08, letterSpacing: "-1.8px", marginBottom: 18 }}>
@@ -604,36 +604,26 @@ export default function SupportPage() {
                   </Link>
                 </div>
 
-                {/* Uptime status */}
-                <div style={{ borderRadius: 20, padding: "22px",
-                  background: "rgba(16,185,129,.05)", border: "1.5px solid rgba(16,185,129,.18)" }}>
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
+                {/* Uptime status — this used to be a random 30-day bar chart
+                    plus a hardcoded "99.98% uptime" and "status.finovaos.app
+                    — coming soon" note, none of which was real: none of the
+                    bars were backed by data, and /status has been live on
+                    this same domain the whole time. Link to the real thing
+                    instead of simulating one next to it. */}
+                <Link href="/status" style={{ display: "block", borderRadius: 20, padding: "22px", textDecoration: "none",
+                  background: "rgba(16,185,129,.05)", border: "1.5px solid rgba(16,185,129,.18)", transition: "background .2s" }}
+                  onMouseEnter={e => (e.currentTarget.style.background = "rgba(16,185,129,.1)")}
+                  onMouseLeave={e => (e.currentTarget.style.background = "rgba(16,185,129,.05)")}>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                     <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,.28)", letterSpacing: ".09em", textTransform: "uppercase" }}>
                       Platform Status
                     </div>
                     <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 11.5, fontWeight: 700, color: "#10b981" }}>
                       <div className="live-dot" style={{ width: 6, height: 6 }} />
-                      Operational
+                      View live status →
                     </div>
                   </div>
-                  <div style={{ display: "flex", gap: 2, marginBottom: 10 }}>
-                    {UPTIME_BARS.map((s, i) => (
-                      <div key={i} style={{ flex: 1, height: 26, borderRadius: 3,
-                        background: s === "up" ? "#10b981" : "#f59e0b",
-                        opacity: s === "up" ? 0.65 : 0.9 }} />
-                    ))}
-                  </div>
-                  <div style={{ display: "flex", justifyContent: "space-between", fontSize: 11, color: "rgba(255,255,255,.24)", fontWeight: 500 }}>
-                    <span>30 days ago</span>
-                    <span style={{ color: "#10b981", fontWeight: 700 }}>99.98% uptime</span>
-                    <span>Today</span>
-                  </div>
-                  <div style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 14,
-                    paddingTop: 12, borderTop: "1px solid rgba(16,185,129,.12)",
-                    fontSize: 12, fontWeight: 500, color: "rgba(255,255,255,.28)" }}>
-                    status.finovaos.app — coming soon
-                  </div>
-                </div>
+                </Link>
 
                 {/* Quick links */}
                 <div style={{ borderRadius: 20, padding: "22px", ...CARD_BASE, gap: 0 }}>

@@ -3,9 +3,18 @@
 
 import { MetadataRoute } from "next";
 import { SEO_ARTICLES } from "./(marketing)/blog/seo-articles";
+import { ALL_POSTS } from "./(marketing)/blog/posts";
 import { LIVE_TYPES } from "@/lib/businessModules";
 
 const BASE = process.env.NEXT_PUBLIC_BASE_URL || "https://www.finovaos.app";
+
+// A sitemap where every URL carries the exact same lastModified (the build
+// timestamp) tells a crawler nothing — it reads as "everything changed at
+// once," which is how a real 24-month-old page and a page edited five
+// minutes ago end up indistinguishable. Content types that carry their own
+// real date (blog posts, SEO articles, legal pages) use it below; only pages
+// with no tracked per-page date fall back to the build time.
+const LEGAL_LAST_UPDATED = new Date("2026-05-10");
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const now = new Date();
@@ -31,15 +40,15 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${BASE}/security`,          lastModified: now, changeFrequency: "monthly" as const, priority: 0.6 },
     { url: `${BASE}/testimonials`,      lastModified: now, changeFrequency: "weekly" as const,  priority: 0.7 },
     { url: `${BASE}/industries`,        lastModified: now, changeFrequency: "monthly" as const, priority: 0.8 },
-    // Legal
-    { url: `${BASE}/legal/privacy`,     lastModified: now, changeFrequency: "yearly" as const,  priority: 0.4 },
-    { url: `${BASE}/legal/cookies`,     lastModified: now, changeFrequency: "yearly" as const,  priority: 0.38 },
-    { url: `${BASE}/legal/terms`,       lastModified: now, changeFrequency: "yearly" as const,  priority: 0.4 },
-    { url: `${BASE}/legal/sla`,         lastModified: now, changeFrequency: "yearly" as const,  priority: 0.35 },
-    { url: `${BASE}/legal/dpa`,         lastModified: now, changeFrequency: "yearly" as const,  priority: 0.35 },
-    { url: `${BASE}/legal/aup`,         lastModified: now, changeFrequency: "yearly" as const,  priority: 0.35 },
-    { url: `${BASE}/legal/refund`,      lastModified: now, changeFrequency: "yearly" as const,  priority: 0.35 },
-    { url: `${BASE}/legal/delivery`,    lastModified: now, changeFrequency: "yearly" as const,  priority: 0.35 },
+    // Legal — real last-updated date (matches LAST_UPDATED shown on each page)
+    { url: `${BASE}/legal/privacy`,     lastModified: LEGAL_LAST_UPDATED, changeFrequency: "yearly" as const,  priority: 0.4 },
+    { url: `${BASE}/legal/cookies`,     lastModified: LEGAL_LAST_UPDATED, changeFrequency: "yearly" as const,  priority: 0.38 },
+    { url: `${BASE}/legal/terms`,       lastModified: LEGAL_LAST_UPDATED, changeFrequency: "yearly" as const,  priority: 0.4 },
+    { url: `${BASE}/legal/sla`,         lastModified: LEGAL_LAST_UPDATED, changeFrequency: "yearly" as const,  priority: 0.35 },
+    { url: `${BASE}/legal/dpa`,         lastModified: LEGAL_LAST_UPDATED, changeFrequency: "yearly" as const,  priority: 0.35 },
+    { url: `${BASE}/legal/aup`,         lastModified: LEGAL_LAST_UPDATED, changeFrequency: "yearly" as const,  priority: 0.35 },
+    { url: `${BASE}/legal/refund`,      lastModified: LEGAL_LAST_UPDATED, changeFrequency: "yearly" as const,  priority: 0.35 },
+    { url: `${BASE}/legal/delivery`,    lastModified: LEGAL_LAST_UPDATED, changeFrequency: "yearly" as const,  priority: 0.35 },
     // Tools & converters
     { url: `${BASE}/roi-calculator`,    lastModified: now, changeFrequency: "monthly" as const, priority: 0.8 },
     { url: `${BASE}/compare`,           lastModified: now, changeFrequency: "monthly" as const, priority: 0.8 },
@@ -83,7 +92,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   ];
   const blogPages = blogSlugs.map(slug => ({
     url: `${BASE}/blog/${slug}`,
-    lastModified: now,
+    lastModified: ALL_POSTS[slug]?.date ? new Date(ALL_POSTS[slug].date) : now,
     changeFrequency: "monthly" as const,
     priority: 0.65,
   }));
@@ -92,9 +101,9 @@ export default function sitemap(): MetadataRoute.Sitemap {
   // drift out of sync with what actually renders. Higher priority than the
   // rest of the blog: these are the pages built to be found on search and
   // cited by AI answer engines.
-  const seoArticlePages = Object.keys(SEO_ARTICLES).map(slug => ({
+  const seoArticlePages = Object.entries(SEO_ARTICLES).map(([slug, article]) => ({
     url: `${BASE}/blog/${slug}`,
-    lastModified: now,
+    lastModified: article.date ? new Date(article.date) : now,
     changeFrequency: "monthly" as const,
     priority: 0.75,
   }));

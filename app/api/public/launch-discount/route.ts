@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { getLaunchDiscount } from "@/lib/launchDiscount";
 
 export const runtime = "nodejs";
 export const revalidate = 300;
@@ -17,47 +18,9 @@ export const revalidate = 300;
  * a bad code — see createLemonCheckout).
  */
 export async function GET() {
-  const code = (process.env.LEMONSQUEEZY_LAUNCH_DISCOUNT || "").trim();
-  const apiKey = process.env.LEMONSQUEEZY_API_KEY;
-  const storeId = process.env.LEMONSQUEEZY_STORE_ID;
-
-  if (!code || !apiKey || !storeId) {
-    return NextResponse.json({ discount: null });
-  }
-
-  try {
-    const res = await fetch(
-      `https://api.lemonsqueezy.com/v1/discounts?filter[store_id]=${encodeURIComponent(storeId)}`,
-      {
-        headers: {
-          Accept: "application/vnd.api+json",
-          Authorization: `Bearer ${apiKey}`,
-        },
-        next: { revalidate: 300 },
-      },
-    );
-    if (!res.ok) return NextResponse.json({ discount: null });
-
-    const json = await res.json();
-    const match = (json?.data || []).find(
-      (d: any) =>
-        String(d?.attributes?.code || "").toUpperCase() === code.toUpperCase() &&
-        String(d?.attributes?.status || "").toLowerCase() === "published",
-    );
-    if (!match) return NextResponse.json({ discount: null });
-
-    // Lemon Squeezy reports percent as a whole number and fixed amounts in cents.
-    const isPercent = String(match.attributes.amount_type).toLowerCase() === "percent";
-    const rawAmount = Number(match.attributes.amount) || 0;
-
-    return NextResponse.json({
-      discount: {
-        code: String(match.attributes.code).toUpperCase(),
-        type: isPercent ? "percent" : "fixed",
-        value: isPercent ? rawAmount : rawAmount / 100,
-      },
-    });
-  } catch {
-    return NextResponse.json({ discount: null });
-  }
+  const d = await getLaunchDiscount();
+  if (!d) return NextResponse.json({ discount: null });
+  return NextResponse.json({
+    discount: { code: d.code, type: d.type, value: d.value },
+  });
 }

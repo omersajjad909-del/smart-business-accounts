@@ -16,20 +16,26 @@ export const metadata: Metadata = {
     "business software plans",
     "starter plan accounting",
   ],
+  // No `images` field in openGraph/twitter below — this route has its own
+  // opengraph-image.tsx, which Next.js auto-detects and serves at a hashed
+  // URL (e.g. /pricing/opengraph-image-15m7k7?...). A hardcoded, unhashed
+  // "/pricing/opengraph-image" here used to override that for the Twitter
+  // card specifically (Next merges the auto-detected image into openGraph
+  // automatically, but not into a manually-set twitter.images), so the
+  // Twitter preview 404'd — and Google's crawler logged that 404 too, since
+  // it fetches referenced share images. Let Next fill both in.
   openGraph: {
     title: "Pricing Plans — Start at $49/month | FinovaOS",
     description:
       "Starter ($49/mo), Professional ($99/mo), Enterprise ($249/mo). No hidden fees. Cancel anytime.",
     url: `${BASE}/pricing`,
     siteName: "FinovaOS",
-    images: [{ url: `${BASE}/pricing/opengraph-image`, width: 1200, height: 630, alt: "FinovaOS Pricing Plans" }],
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
     title: "FinovaOS Pricing — Plans from $49/month",
     description: "Starter · Professional · Enterprise. Transparent pricing, no hidden fees.",
-    images: [`${BASE}/pricing/opengraph-image`],
   },
   alternates: { canonical: `${BASE}/pricing` },
 };

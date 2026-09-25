@@ -47,6 +47,9 @@ export default function Offer() {
         background: "#fbbf24", color: "#0f172a",
         fontSize: 12, fontWeight: 800, textDecoration: "none",
         transition: "all .2s", flexShrink: 0,
+        // Room for the absolutely-positioned close button so its touch
+        // target doesn't sit flush against this one on narrow screens.
+        marginRight: 20,
       }}
         onMouseEnter={e => (e.currentTarget.style.background = "#f59e0b")}
         onMouseLeave={e => (e.currentTarget.style.background = "#fbbf24")}
@@ -58,10 +61,13 @@ export default function Offer() {
       </Link>
 
       <button onClick={() => setClosed(true)} style={{
-        position: "absolute", right: 12, top: "50%", transform: "translateY(-50%)",
+        position: "absolute", right: 0, top: "50%", transform: "translateY(-50%)",
         background: "none", border: "none", cursor: "pointer",
         color: "rgba(255,255,255,.5)", fontSize: 16, lineHeight: 1,
-        padding: 4, transition: "color .2s",
+        // 44x44 touch target (was ~24x24) — the glyph itself stays the same
+        // visual size, only the tappable area around it grows.
+        width: 44, height: 44, display: "flex", alignItems: "center", justifyContent: "center",
+        transition: "color .2s",
       }}
         onMouseEnter={e => (e.currentTarget.style.color = "white")}
         onMouseLeave={e => (e.currentTarget.style.color = "rgba(255,255,255,.5)")}

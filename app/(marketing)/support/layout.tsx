@@ -4,7 +4,7 @@ const BASE = process.env.NEXT_PUBLIC_BASE_URL || "https://www.finovaos.app";
 
 export const metadata: Metadata = {
   title: "Support Center — FinovaOS",
-  description: "Get help with FinovaOS. Browse FAQs, contact our support team, or submit a ticket. We typically respond within a few hours.",
+  description: "Get help with FinovaOS. Browse FAQs, contact our support team, or submit a ticket. We typically respond within 24 hours.",
   // No canonical here on purpose. A hardcoded canonical in a nested layout
   // applies to the whole subtree, so this one made /support/ticket declare itself
   // a duplicate of /support. The (marketing) layout already derives a per-pathname

@@ -26,7 +26,7 @@ const PILLARS = [
     points:[
       { icon:"🔑", title:"TLS 1.3 in Transit", desc:"All communication between your browser and our servers is encrypted with TLS 1.3. This is enforced on every request, no exceptions." },
       { icon:"💾", title:"AES-256-GCM Field Encryption", desc:"PII fields — phone numbers, tax IDs, contact details — are encrypted with AES-256-GCM at the application layer before being written to the database." },
-      { icon:"🗝️", title:"Key Management (In Progress)", desc:"Encryption keys are currently managed via environment secrets. A dedicated key vault with automatic rotation is on our roadmap for Q3 2025." },
+      { icon:"🗝️", title:"Key Management (In Progress)", desc:"Encryption keys are currently managed via environment secrets. A dedicated key vault with automatic rotation is on our roadmap." },
     ],
   },
   {

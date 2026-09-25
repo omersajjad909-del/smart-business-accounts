@@ -5,7 +5,7 @@ const BASE = process.env.NEXT_PUBLIC_BASE_URL || "https://www.finovaos.app";
 export const metadata: Metadata = {
   title: "Product Changelog — What's New at FinovaOS",
   description:
-    "Stay up to date with the latest FinovaOS releases, new features, improvements, and bug fixes. We ship updates every week based on customer feedback.",
+    "Stay up to date with the latest FinovaOS releases, new features, improvements, and bug fixes.",
   keywords: [
     "FinovaOS changelog",
     "accounting software updates",
@@ -16,7 +16,7 @@ export const metadata: Metadata = {
   ],
   openGraph: {
     title: "FinovaOS Changelog — Latest Updates & Features",
-    description: "New features, improvements, and bug fixes. Updated weekly.",
+    description: "New features, improvements, and bug fixes.",
     url: `${BASE}/changelog`,
     siteName: "FinovaOS",
     images: [{ url: `${BASE}/icon.png`, width: 1200, height: 630, alt: "FinovaOS Changelog" }],
@@ -25,7 +25,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "FinovaOS Changelog",
-    description: "Latest updates, new features, and improvements. Updated weekly.",
+    description: "Latest updates, new features, and improvements.",
     images: [`${BASE}/icon.png`],
   },
   alternates: { canonical: `${BASE}/changelog` },

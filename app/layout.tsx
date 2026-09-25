@@ -176,7 +176,7 @@ export const metadata: Metadata = {
     icon: [
       { url: "/icon.png", sizes: "any", type: "image/png" },
     ],
-    apple: [{ url: "/icon.png", sizes: "180x180", type: "image/png" }],
+    apple: [{ url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" }],
     shortcut: "/icon.png",
   },
   manifest: "/manifest.json",
@@ -217,7 +217,8 @@ function buildSoftwareApplicationJsonLd(aggregateRating: { ratingValue: number; 
   description: "FinovaOS — cloud ERP & accounting software purpose-built for trading, wholesale, manufacturing, distribution, restaurant, retail, import/export, construction, hospital, school, pharmacy, transport, real estate, and service businesses.",
   url: BASE_URL,
   screenshot: `${BASE_URL}${BRAND_ICON_PATH}`,
-  sameAs: ["https://www.wikidata.org/wiki/Q140702000"],
+  // No Wikidata entry — see the comment on founderJsonLd's sameAs below;
+  // Q140702000 does not resolve to a real item either.
   brand: {
     "@type": "Brand",
     name: "FinovaOS",
@@ -284,13 +285,15 @@ const founderJsonLd = {
   jobTitle: "Founder & CEO",
   worksFor: { "@id": `${BASE_URL}/#organization` },
   url: `${BASE_URL}/forge/about`,
+  // No Wikidata entry here — the ID this used to carry (Q140701676) doesn't
+  // resolve to a real Wikidata item. A fabricated, checkable claim is worse
+  // than no claim at all; add it back only once a real entity exists there.
   sameAs: [
     "https://www.linkedin.com/in/umer-sajjad-657936417",
-    "https://www.wikidata.org/wiki/Q140701676",
     `${BASE_URL}/forge/about`,
     `${BASE_URL}/about`,
   ],
-  description: "Umer Sajjad is the Founder and CEO of Finova Forge — a PSEB Registered IT Exporter based in Lahore, Pakistan — and the creator of FinovaOS, an AI-powered cloud ERP and accounting platform serving 6 focused industries with 60+ features.",
+  description: "Umer Sajjad is the Founder and CEO of Finova Forge — a PSEB Registered IT Exporter based in Faisalabad, Pakistan — and the creator of FinovaOS, an AI-powered cloud ERP and accounting platform serving 6 focused industries with 60+ features.",
   address: {
     "@type": "PostalAddress",
     addressLocality: "Faisalabad",
@@ -334,12 +337,13 @@ const organizationJsonLd = {
     url: `${BASE_URL}/contact`,
     availableLanguage: ["English", "Urdu"],
   },
+  // No Wikidata entry here either — same reasoning as founderJsonLd above;
+  // Q140701786 does not resolve to a real item.
   sameAs: [
     "https://finovaforge.com",
     "https://www.finovaos.app",
     "https://x.com/finovaos",
     "https://www.linkedin.com/in/umer-sajjad-657936417",
-    "https://www.wikidata.org/wiki/Q140701786",
   ],
 };
 
@@ -352,11 +356,10 @@ const websiteJsonLd = {
   url: BASE_URL,
   description: "FinovaOS — also written Finova OS — is cloud accounting and ERP software for modern SMEs.",
   publisher: { "@id": `${BASE_URL}/#organization` },
-  potentialAction: {
-    "@type": "SearchAction",
-    target: { "@type": "EntryPoint", urlTemplate: `${BASE_URL}/search?q={search_term_string}` },
-    "query-input": "required name=search_term_string",
-  },
+  // No SearchAction here — it used to promise a /search?q= sitelinks
+  // searchbox, but no /search page exists (app/api/search/route.ts is an
+  // internal accounts API, not a public page), so the promised URL 404s.
+  // Add this back once a real on-site search page ships.
 };
 
 export default async function RootLayout({

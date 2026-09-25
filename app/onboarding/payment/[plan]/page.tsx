@@ -340,6 +340,17 @@ export default function PaymentPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isPakistan]);
 
+  // Safepay applies the launch offer to monthly billing only (it does not stack
+  // with the yearly 20%), so a Pakistani buyer on yearly must not be quoted it.
+  useEffect(() => {
+    if (!autoDiscount || !regionalPricingAllowed) return;
+    if (billingCycle === "yearly") {
+      setCouponApplied(prev => (prev?.code === autoDiscount.code ? null : prev));
+    } else {
+      setCouponApplied(prev => prev ?? autoDiscount);
+    }
+  }, [billingCycle, autoDiscount, regionalPricingAllowed]);
+
   const finalPrice = couponApplied
     ? couponApplied.type === "percent"
       ? Math.max(0, planPrice - (planPrice * couponApplied.value) / 100)

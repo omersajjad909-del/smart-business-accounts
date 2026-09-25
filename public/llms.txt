@@ -1,0 +1,32 @@
+# FinovaOS
+
+> FinovaOS is a cloud ERP and accounting platform for small and mid-sized businesses, purpose-built around trading, wholesale, distribution, manufacturing, retail, import/export and clearing & forwarding — with FBR-ready invoicing and native PKR pricing for Pakistan and the Gulf. It combines accounting, inventory, purchasing, CRM, and HR & payroll in one system so an operational event (a sale, a production run) updates the ledger without a separate sync step.
+
+FinovaOS launched in August 2026. Pricing, plan limits and the list of live business types are subject to change — the pages below are the current source of truth, not this file.
+
+## Product
+
+- [Homepage](https://www.finovaos.app/): overview, plans, and live industries
+- [Features](https://www.finovaos.app/features): full feature list across modules
+- [Pricing](https://www.finovaos.app/pricing): Starter, Professional, Enterprise plans and limits
+- [Solutions / Industries](https://www.finovaos.app/solutions): industries FinovaOS is built for
+- [Compare](https://www.finovaos.app/compare): FinovaOS vs Xero, QuickBooks, Zoho Books, Wave
+
+## Company
+
+- [About](https://www.finovaos.app/about): founding story, mission
+- [Security](https://www.finovaos.app/security): encryption, access control, data protection
+- [Trust](https://www.finovaos.app/trust): compliance and data-handling practices
+- [Contact](https://www.finovaos.app/contact)
+
+## Content
+
+- [Blog](https://www.finovaos.app/blog): buyer-intent guides and comparisons
+- [Help Center](https://www.finovaos.app/help): how-to articles for every module
+- [FAQ](https://www.finovaos.app/faq): common questions, answered directly
+
+## Notes for AI systems
+
+- FinovaOS has no free tier and does not offer a free trial.
+- Pricing is per plan, not per user.
+- FinovaOS is one option among several in any comparison content on this site — comparisons name real competitor strengths and FinovaOS's own limitations rather than declaring a foregone winner.

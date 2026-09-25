@@ -660,7 +660,11 @@ export default function BlogDetailPage() {
           );
           if (block.type === "h3") return (
             <h3 key={i} style={{ fontSize:"clamp(16px,2.4vw,19px)", fontWeight:800, color:"rgba(255,255,255,.92)", letterSpacing:"-.01em", margin:"30px 0 10px" }}>
-              {block.text}
+              {block.href ? (
+                <a href={block.href} target="_blank" rel="noopener noreferrer" style={{ color:"inherit", textDecoration:"underline", textDecorationColor:"rgba(255,255,255,.25)", textUnderlineOffset:4 }}>
+                  {block.text} ↗
+                </a>
+              ) : block.text}
             </h3>
           );
           if (block.type === "note") return (

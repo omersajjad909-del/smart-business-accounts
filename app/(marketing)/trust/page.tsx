@@ -3,12 +3,12 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 
 const CERTIFICATIONS = [
-  { name:"Security Program", icon:"🛡️", color:"#818cf8", glow:"rgba(129,140,248,.15)", desc:"Security, access control, and data protection practices are reviewed regularly as the platform grows.", badge:"Active", year:"Ongoing" },
-  { name:"Policy Controls",  icon:"🔐", color:"#34d399", glow:"rgba(52,211,153,.12)",  desc:"Internal controls, operating procedures, and secure handling standards help protect customer data.", badge:"Managed", year:"Ongoing" },
-  { name:"GDPR Compliant", icon:"🇪🇺", color:"#38bdf8", glow:"rgba(56,189,248,.12)",  desc:"Full compliance with EU General Data Protection Regulation. DPA available on request.", badge:"Compliant", year:"Ongoing" },
-  { name:"Payment Security",icon:"💳", color:"#fbbf24", glow:"rgba(251,191,36,.12)",  desc:"Payments are handled through secure providers, with encrypted transport and careful operational controls.", badge:"Protected", year:"Ongoing" },
-  { name:"CCPA Ready",     icon:"🏛️", color:"#c4b5fd", glow:"rgba(196,181,253,.12)", desc:"California Consumer Privacy Act compliance for all US-based users and data processing.", badge:"Compliant", year:"Ongoing" },
-  { name:"Service Standards", icon:"✅", color:"#f9a8d4", glow:"rgba(249,168,212,.12)",  desc:"Operational standards and documented processes help us deliver support and product updates consistently.", badge:"Documented", year:"Ongoing" },
+  { name:"Security Program", icon:"🛡️", color:"#818cf8", glow:"rgba(129,140,248,.15)", desc:"Security, access control, and data protection practices are reviewed regularly as the platform grows.", badge:"Active" },
+  { name:"Policy Controls",  icon:"🔐", color:"#34d399", glow:"rgba(52,211,153,.12)",  desc:"Internal controls, operating procedures, and secure handling standards help protect customer data.", badge:"Managed" },
+  { name:"GDPR Compliant", icon:"🇪🇺", color:"#38bdf8", glow:"rgba(56,189,248,.12)",  desc:"Full compliance with EU General Data Protection Regulation. DPA available on request.", badge:"Compliant" },
+  { name:"Payment Security",icon:"💳", color:"#fbbf24", glow:"rgba(251,191,36,.12)",  desc:"Payments are handled through secure providers, with encrypted transport and careful operational controls.", badge:"Protected" },
+  { name:"CCPA Ready",     icon:"🏛️", color:"#c4b5fd", glow:"rgba(196,181,253,.12)", desc:"California Consumer Privacy Act compliance for all US-based users and data processing.", badge:"Compliant" },
+  { name:"Service Standards", icon:"✅", color:"#f9a8d4", glow:"rgba(249,168,212,.12)",  desc:"Operational standards and documented processes help us deliver support and product updates consistently.", badge:"Documented" },
 ];
 
 const SECURITY_FEATURES = [
@@ -115,7 +115,7 @@ export default function TrustPage() {
           <div style={{ textAlign:"center", marginBottom:48 }}>
             <SectionLabel text="Certifications"/>
             <h2 style={{ fontSize:"clamp(24px,3.5vw,38px)", fontWeight:800, letterSpacing:"-.02em", fontFamily:"Lora,serif", margin:0 }}>
-              Independently verified, annually
+              How we handle your data
             </h2>
           </div>
           <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(290px,1fr))", gap:16 }}>
@@ -127,8 +127,7 @@ export default function TrustPage() {
                     <span style={{ fontSize:14, fontWeight:800, color:"white" }}>{c.name}</span>
                     <span style={{ padding:"2px 8px", borderRadius:20, background:`${c.color}20`, color:c.color, fontSize:9, fontWeight:800 }}>{c.badge}</span>
                   </div>
-                  <div style={{ fontSize:12, color:"rgba(255,255,255,.45)", lineHeight:1.6, marginBottom:8 }}>{c.desc}</div>
-                  <div style={{ fontSize:10, color:c.color, fontWeight:700 }}>Last verified: {c.year}</div>
+                  <div style={{ fontSize:12, color:"rgba(255,255,255,.45)", lineHeight:1.6 }}>{c.desc}</div>
                 </div>
               </div>
             ))}

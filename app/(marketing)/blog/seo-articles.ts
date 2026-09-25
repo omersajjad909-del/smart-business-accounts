@@ -29,7 +29,7 @@ export type ArticleBlock =
   | { type: "answer"; text: string }
   | { type: "intro"; text: string }
   | { type: "h2"; text: string }
-  | { type: "h3"; text: string }
+  | { type: "h3"; text: string; href?: string }
   | { type: "p"; text: string }
   | { type: "list"; items: string[] }
   | { type: "numbered"; items: string[] }
@@ -127,23 +127,23 @@ export const SEO_ARTICLES: Record<string, SeoArticle> = {
 
       { type: "h2", text: "Vendor by vendor" },
 
-      { type: "h3", text: "Xero" },
+      { type: "h3", text: "Xero", href: "https://www.xero.com" },
       { type: "p", text: "A well-designed ledger with a strong accountant network outside the US and a large app marketplace. Bank reconciliation is fast and the interface is the least intimidating in the category for a non-finance owner." },
       { type: "p", text: "Best for service businesses, professional firms, and any company whose accountant already works in Xero. Avoid it if you run multi-warehouse stock or manufacturing — you will end up paying for a third-party inventory app and maintaining the sync between them, and that is where the hidden cost lives." },
 
-      { type: "h3", text: "QuickBooks Online" },
+      { type: "h3", text: "QuickBooks Online", href: "https://quickbooks.intuit.com" },
       { type: "p", text: "The most widely recognised small-business accounting product, which matters more than it sounds: in the US and UK you can hire a bookkeeper who already knows it on any given Tuesday. Reporting is solid and support is extensive." },
       { type: "p", text: "Best for US and UK small businesses and anyone who values a deep pool of trained bookkeepers. Avoid it if you are outside its core markets and need local statutory payroll, or if you need serious inventory depth." },
 
-      { type: "h3", text: "Zoho One" },
+      { type: "h3", text: "Zoho One", href: "https://www.zoho.com/one/" },
       { type: "p", text: "The widest coverage for the money in this category — accounting, CRM, inventory, HR, projects and helpdesk, licensed per employee. If you want one vendor for everything and will trade some depth for that, it is hard to argue with." },
       { type: "p", text: "Best for businesses that want broad functional coverage without assembling a stack. Avoid it if you need depth in one specific area, because a dedicated CRM or a dedicated warehouse system will beat the equivalent Zoho app. Note too that per-employee licensing normally means all employees, not only the ones using the software." },
 
-      { type: "h3", text: "Odoo" },
+      { type: "h3", text: "Odoo", href: "https://www.odoo.com" },
       { type: "p", text: "Extremely capable and genuinely modular, with an open-source Community edition and a paid Enterprise edition. Manufacturing, purchasing and inventory are strong, and if your process is unusual, Odoo can almost certainly be made to fit it." },
       { type: "p", text: "Best for businesses with a technical owner or the budget for an implementation partner, and a process that genuinely needs configuring. Avoid it if nobody will own it. The subscription is rarely the real cost — partner implementation, customisation and version upgrades are, and the businesses abandoning Odoo eighteen months in are usually the ones that skipped that budget line." },
 
-      { type: "h3", text: "ERPNext" },
+      { type: "h3", text: "ERPNext", href: "https://frappe.io/erpnext" },
       { type: "p", text: "Open source, full-featured, and free if you self-host. The functional scope is remarkable for the price and the community is active." },
       { type: "p", text: "Best for technically capable teams that want control of their data and hosting. Avoid it if \"free\" is the reason you are considering it — someone has to run the server, apply upgrades and answer the phone at month-end close, and that person costs more than a subscription." },
 

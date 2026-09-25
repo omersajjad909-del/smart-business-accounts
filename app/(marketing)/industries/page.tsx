@@ -145,7 +145,7 @@ export default function IndustriesPage() {
           </h1>
 
           <p style={{ fontSize: 16, color: "rgba(255,255,255,.45)", lineHeight: 1.8, marginBottom: 36, maxWidth: 560, margin: "0 auto 36px" }}>
-            FinovaOS is expanding to cover 61 industry types. Phase 1 is live — more coming soon. Click any live business to get started.
+            FinovaOS is expanding to cover 60+ industry types. Phase 1 is live — more coming soon. Click any live business to get started.
           </p>
 
           {/* Stats row */}
