@@ -168,10 +168,10 @@ export default function TransportExpensesPage() {
   }
 
   const card = { background: transportBg, border: `1px solid ${transportBorder}`, borderRadius: 12, padding: 20 };
-  const input = { width: "100%", background: "rgba(255,255,255,.05)", border: `1px solid ${transportBorder}`, borderRadius: 8, padding: "10px 12px", color: "#fff", fontFamily: transportFont, boxSizing: "border-box" as const, fontSize: 14 };
+  const input = { width: "100%", background: "rgba(var(--ink),.05)", border: `1px solid ${transportBorder}`, borderRadius: 8, padding: "10px 12px", color: "var(--ink-solid, #fff)", fontFamily: transportFont, boxSizing: "border-box" as const, fontSize: 14 };
 
   return (
-    <div style={{ fontFamily: transportFont, color: "#fff", padding: isMobile ? "12px" : "24px", minHeight: "100vh" }}>
+    <div style={{ fontFamily: transportFont, color: "var(--ink-solid, #fff)", padding: isMobile ? "12px" : "24px", minHeight: "100vh" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24, gap: 12 }}>
         <div>
           <h1 style={{ margin: 0, fontSize: 24, fontWeight: 800 }}>Trip Expenses</h1>
@@ -196,7 +196,7 @@ export default function TransportExpensesPage() {
       </div>
 
       <div style={{ display: "grid", gap: 12 }}>
-        {!expenseStore.loading && expenses.length === 0 && <div style={{ ...card, textAlign: "center", color: "rgba(255,255,255,.28)" }}>No transport expenses logged yet.</div>}
+        {!expenseStore.loading && expenses.length === 0 && <div style={{ ...card, textAlign: "center", color: "rgba(var(--ink),.28)" }}>No transport expenses logged yet.</div>}
         {expenses.map((row) => (
           <div key={row.id} style={card}>
             <div style={{ display: "flex", justifyContent: "space-between", gap: 16 }}>
@@ -207,7 +207,7 @@ export default function TransportExpensesPage() {
                     {row.status}
                   </span>
                 </div>
-                <div style={{ display: "grid", gridTemplateColumns: "repeat(5,1fr)", gap: 8, fontSize: 13, color: "rgba(255,255,255,.62)" }}>
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(5,1fr)", gap: 8, fontSize: 13, color: "rgba(var(--ink),.62)" }}>
                   <div>Vehicle: {row.vehicle || "-"}</div>
                   <div>Driver: {row.driver || "-"}</div>
                   <div>Trip: {row.tripNo || "-"}</div>
@@ -221,7 +221,7 @@ export default function TransportExpensesPage() {
                 <button onClick={() => editRow(row.id)} style={{ background: "rgba(99,102,241,.16)", border: "1px solid rgba(99,102,241,.3)", color: "#c7d2fe", borderRadius: 8, padding: "8px 10px", fontSize: 12, cursor: "pointer" }}>Edit</button>
                 {row.status === "logged" && <button onClick={() => void moveStatus(row.id, "approved")} style={{ background: "rgba(245,158,11,.16)", border: "1px solid rgba(245,158,11,.25)", color: "#fcd34d", borderRadius: 8, padding: "8px 10px", fontSize: 12, cursor: "pointer" }}>Approve</button>}
                 {row.status === "approved" && <button onClick={() => void moveStatus(row.id, "posted")} style={{ background: "rgba(34,197,94,.16)", border: "1px solid rgba(34,197,94,.25)", color: "#86efac", borderRadius: 8, padding: "8px 10px", fontSize: 12, cursor: "pointer" }}>Post</button>}
-                <button onClick={() => void removeRow(row.id)} style={{ background: "transparent", border: `1px solid ${transportBorder}`, color: "rgba(255,255,255,.68)", borderRadius: 8, padding: "8px 10px", fontSize: 12, cursor: "pointer" }}>Delete</button>
+                <button onClick={() => void removeRow(row.id)} style={{ background: "transparent", border: `1px solid ${transportBorder}`, color: "rgba(var(--ink),.68)", borderRadius: 8, padding: "8px 10px", fontSize: 12, cursor: "pointer" }}>Delete</button>
               </div>
             </div>
           </div>
@@ -230,7 +230,7 @@ export default function TransportExpensesPage() {
 
       {showModal && (
         <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.72)", zIndex: 50, display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
-          <div style={{ background: "#161b27", border: `1px solid ${transportBorder}`, borderRadius: 16, padding: 28, width: 620, maxHeight: "90vh", overflowY: "auto" }}>
+          <div style={{ background: "var(--dk-161b27, #161b27)", border: `1px solid ${transportBorder}`, borderRadius: 16, padding: 28, width: 620, maxHeight: "90vh", overflowY: "auto" }}>
             <h2 style={{ margin: "0 0 20px", fontSize: 18, fontWeight: 800 }}>{editingId ? "Edit Expense" : "Add Expense"}</h2>
             {error && <div style={{ marginBottom: 14, padding: "10px 12px", borderRadius: 8, background: "rgba(239,68,68,.14)", border: "1px solid rgba(239,68,68,.25)", color: "#fca5a5", fontSize: 12 }}>{error}</div>}
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
@@ -284,7 +284,7 @@ export default function TransportExpensesPage() {
             </div>
             <div style={{ display: "flex", gap: 12, marginTop: 18 }}>
               <button onClick={() => void saveExpense()} style={{ flex: 1, background: "#dc2626", border: "none", borderRadius: 8, padding: "11px 0", color: "#fff", fontWeight: 700, cursor: "pointer" }}>Save Expense</button>
-              <button onClick={closeModal} style={{ padding: "11px 20px", borderRadius: 8, border: `1px solid ${transportBorder}`, background: "transparent", color: "rgba(255,255,255,.7)", cursor: "pointer" }}>Cancel</button>
+              <button onClick={closeModal} style={{ padding: "11px 20px", borderRadius: 8, border: `1px solid ${transportBorder}`, background: "transparent", color: "rgba(var(--ink),.7)", cursor: "pointer" }}>Cancel</button>
             </div>
           </div>
         </div>

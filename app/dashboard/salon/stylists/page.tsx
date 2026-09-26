@@ -98,7 +98,7 @@ export default function StylistsPage() {
   }
 
   return (
-    <div style={{ padding: "32px", fontFamily: salonFont, color: "#fff", minHeight: "100vh" }}>
+    <div style={{ padding: "32px", fontFamily: salonFont, color: "var(--ink-solid, #fff)", minHeight: "100vh" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 28 }}>
         <div>
           <h1 style={{ fontSize: 26, fontWeight: 800, margin: 0 }}>Salon Stylists</h1>
@@ -130,14 +130,14 @@ export default function StylistsPage() {
             <div style={{ marginBottom: 14 }}>
               <span style={{ display: "inline-block", background: `${salonStatusColor(stylist.status)}20`, color: salonStatusColor(stylist.status), borderRadius: 999, padding: "4px 10px", fontSize: 12, fontWeight: 700 }}>{stylist.status}</span>
             </div>
-            <div style={{ display: "grid", gap: 8, fontSize: 13, color: "rgba(255,255,255,.7)" }}>
+            <div style={{ display: "grid", gap: 8, fontSize: 13, color: "rgba(var(--ink),.7)" }}>
               <div style={{ display: "flex", justifyContent: "space-between" }}><span>Phone</span><span>{stylist.phone}</span></div>
-              <div style={{ display: "flex", justifyContent: "space-between" }}><span>Appointments Today</span><span style={{ color: "#fff", fontWeight: 700 }}>{stylist.appointmentsToday}</span></div>
+              <div style={{ display: "flex", justifyContent: "space-between" }}><span>Appointments Today</span><span style={{ color: "var(--ink-solid, #fff)", fontWeight: 700 }}>{stylist.appointmentsToday}</span></div>
               <div style={{ display: "flex", justifyContent: "space-between" }}><span>Revenue</span><span style={{ color: "#34d399", fontWeight: 700 }}>Rs. {stylist.monthlyEarnings.toLocaleString()}</span></div>
             </div>
             <div style={{ display: "flex", gap: 8, marginTop: 16 }}>
-              <button style={{ flex: 1, background: "rgba(255,255,255,.06)", border: "1px solid rgba(255,255,255,.1)", color: "#fff", borderRadius: 8, padding: "8px", fontSize: 13, cursor: "pointer" }}>View Schedule</button>
-              <button style={{ flex: 1, background: stylist.status === "Active" ? "rgba(255,255,255,.06)" : "rgba(52,211,153,.16)", border: "1px solid rgba(255,255,255,.1)", color: "#fff", borderRadius: 8, padding: "8px", fontSize: 13, cursor: "pointer" }} onClick={() => toggleStatus(stylist.id, stylist.status)}>
+              <button style={{ flex: 1, background: "rgba(var(--ink),.06)", border: "1px solid rgba(var(--ink),.1)", color: "var(--ink-solid, #fff)", borderRadius: 8, padding: "8px", fontSize: 13, cursor: "pointer" }}>View Schedule</button>
+              <button style={{ flex: 1, background: stylist.status === "Active" ? "rgba(var(--ink),.06)" : "rgba(52,211,153,.16)", border: "1px solid rgba(var(--ink),.1)", color: "#fff", borderRadius: 8, padding: "8px", fontSize: 13, cursor: "pointer" }} onClick={() => toggleStatus(stylist.id, stylist.status)}>
                 {stylist.status === "Active" ? "Set Leave" : "Activate"}
               </button>
             </div>
@@ -147,7 +147,7 @@ export default function StylistsPage() {
 
       {showModal && (
         <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.6)", zIndex: 1000, display: "flex", alignItems: "center", justifyContent: "center" }} onClick={(event) => { if (event.target === event.currentTarget) setShowModal(false); }}>
-          <div style={{ background: "#1a1a2e", border: `1px solid ${salonBorder}`, borderRadius: 16, padding: 32, width: "100%", maxWidth: 480 }}>
+          <div style={{ background: "var(--dk-1a1a2e, #1a1a2e)", border: `1px solid ${salonBorder}`, borderRadius: 16, padding: 32, width: "100%", maxWidth: 480 }}>
             <div style={{ fontSize: 18, fontWeight: 800, marginBottom: 24 }}>Add New Stylist</div>
             <div style={{ marginBottom: 16 }}>
               <label style={{ display: "block", fontSize: 13, color: salonMuted, marginBottom: 6 }}>Full Name</label>
@@ -172,7 +172,7 @@ export default function StylistsPage() {
             </div>
             <div style={{ display: "flex", gap: 12, marginTop: 24 }}>
               <button style={{ flex: 1, background: "#ec4899", color: "#fff", border: "none", borderRadius: 8, padding: "10px", fontSize: 14, fontWeight: 700, cursor: "pointer" }} onClick={handleAdd}>Add Stylist</button>
-              <button style={{ flex: 1, background: "rgba(255,255,255,.06)", border: "1px solid rgba(255,255,255,.1)", color: "#fff", borderRadius: 8, padding: "10px", fontSize: 14, cursor: "pointer" }} onClick={() => setShowModal(false)}>Cancel</button>
+              <button style={{ flex: 1, background: "rgba(var(--ink),.06)", border: "1px solid rgba(var(--ink),.1)", color: "var(--ink-solid, #fff)", borderRadius: 8, padding: "10px", fontSize: 14, cursor: "pointer" }} onClick={() => setShowModal(false)}>Cancel</button>
             </div>
           </div>
         </div>

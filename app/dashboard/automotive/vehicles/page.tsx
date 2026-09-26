@@ -109,7 +109,7 @@ export default function VehiclesPage() {
   /* ── shared style snippets ── */
   const input: React.CSSProperties  = { width: "100%", background: "var(--app-bg)", border: "1px solid var(--border)", borderRadius: 9, padding: "9px 13px", color: "var(--text-primary)", fontSize: 14, fontFamily: FONT, outline: "none", boxSizing: "border-box" };
   const label: React.CSSProperties  = { fontSize: 11, color: "var(--text-muted)", fontWeight: 700, textTransform: "uppercase", letterSpacing: 0.6, display: "block", marginBottom: 5 };
-  const th: React.CSSProperties     = { padding: "12px 16px", textAlign: "left", fontSize: 11, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: 0.7, borderBottom: "1px solid var(--border)", background: "rgba(255,255,255,0.02)", fontWeight: 600 };
+  const th: React.CSSProperties     = { padding: "12px 16px", textAlign: "left", fontSize: 11, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: 0.7, borderBottom: "1px solid var(--border)", background: "rgba(var(--ink),0.02)", fontWeight: 600 };
   const td: React.CSSProperties     = { padding: "13px 16px", fontSize: 14, borderBottom: "1px solid var(--border)", color: "var(--text-primary)" };
 
   return (
@@ -173,7 +173,7 @@ export default function VehiclesPage() {
             </thead>
             <tbody>
               {filtered.map((v, i) => (
-                <tr key={v.id} style={{ background: i % 2 === 1 ? "rgba(255,255,255,0.013)" : "transparent" }}>
+                <tr key={v.id} style={{ background: i % 2 === 1 ? "rgba(var(--ink),0.013)" : "transparent" }}>
                   <td style={td}>
                     <div style={{ fontWeight: 600 }}>{v.make}</div>
                     <div style={{ fontSize: 12, color: "var(--text-muted)", marginTop: 2 }}>{v.model}</div>

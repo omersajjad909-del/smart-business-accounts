@@ -35,7 +35,7 @@ export default function IspOverviewPage() {
   const { summary, bills, tickets, connections } = data;
 
   return (
-    <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", minHeight: "100vh", color: "#fff", fontFamily: ispFont }}>
+    <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", minHeight: "100vh", color: "var(--ink-solid, #fff)", fontFamily: ispFont }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 18, flexWrap: "wrap", marginBottom: 24 }}>
         <div>
           <div style={{ fontSize: 12, color: "#60a5fa", fontWeight: 800, letterSpacing: ".08em", textTransform: "uppercase", marginBottom: 8 }}>ISP / Cable Network</div>
@@ -84,10 +84,10 @@ export default function IspOverviewPage() {
               { title: "Recurring Billing", body: "Cycle-wise bills, collections, and overdue recovery monitor karein." },
               { title: "Support Response", body: "Complaints, outages, and assigned tickets ko SLA-style handle karein." },
             ].map((step, index) => (
-              <div key={step.title} style={{ background: "rgba(8,12,30,.36)", border: "1px solid rgba(255,255,255,.08)", borderRadius: 16, padding: 16 }}>
+              <div key={step.title} style={{ background: "rgba(8,12,30,.36)", border: "1px solid rgba(var(--ink),.08)", borderRadius: 16, padding: 16 }}>
                 <div style={{ width: 28, height: 28, borderRadius: 999, background: "rgba(147,197,253,.16)", color: "#dbeafe", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 800, fontSize: 12, marginBottom: 12 }}>{index + 1}</div>
                 <div style={{ fontSize: 15, fontWeight: 800, marginBottom: 8 }}>{step.title}</div>
-                <div style={{ fontSize: 13, lineHeight: 1.55, color: "rgba(255,255,255,.62)" }}>{step.body}</div>
+                <div style={{ fontSize: 13, lineHeight: 1.55, color: "rgba(var(--ink),.62)" }}>{step.body}</div>
               </div>
             ))}
           </div>
@@ -100,7 +100,7 @@ export default function IspOverviewPage() {
               {bills.length === 0 ? (
                 <div style={{ color: ispMuted, fontSize: 13 }}>The collection watchlist will appear after monthly billing records are added.</div>
               ) : bills.slice(0, 4).map((bill) => (
-                <div key={bill.id} style={{ background: "rgba(255,255,255,.025)", border: "1px solid rgba(255,255,255,.06)", borderRadius: 14, padding: "12px 14px" }}>
+                <div key={bill.id} style={{ background: "rgba(var(--ink),.025)", border: "1px solid rgba(var(--ink),.06)", borderRadius: 14, padding: "12px 14px" }}>
                   <div style={{ fontSize: 14, fontWeight: 700 }}>{bill.customer}</div>
                   <div style={{ fontSize: 12, color: ispMuted }}>{bill.invoiceNo} | {bill.cycle || "Current cycle"}</div>
                   <div style={{ fontSize: 12, color: bill.status === "overdue" ? "#fca5a5" : "#93c5fd", marginTop: 6 }}>
@@ -120,7 +120,7 @@ export default function IspOverviewPage() {
                 { label: "Assigned tickets", value: `${tickets.filter((item) => item.status === "assigned").length} active`, tone: "#c084fc" },
                 { label: "Pending installs", value: `${connections.filter((item) => item.status === "pending").length} waiting`, tone: "#34d399" },
               ].map((row) => (
-                <div key={row.label} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "rgba(255,255,255,.025)", border: "1px solid rgba(255,255,255,.06)", borderRadius: 14, padding: isMobile ? "12px 10px" : "14px 16px" }}>
+                <div key={row.label} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "rgba(var(--ink),.025)", border: "1px solid rgba(var(--ink),.06)", borderRadius: 14, padding: isMobile ? "12px 10px" : "14px 16px" }}>
                   <span style={{ fontSize: 13, color: ispMuted }}>{row.label}</span>
                   <span style={{ fontSize: 14, fontWeight: 800, color: row.tone }}>{row.value}</span>
                 </div>

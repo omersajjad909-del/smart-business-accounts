@@ -51,7 +51,7 @@ export default function AutomotiveAnalyticsPage() {
   );
 
   return (
-    <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", minHeight: "100vh", color: "#fff", fontFamily: autoFont }}>
+    <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", minHeight: "100vh", color: "var(--ink-solid, #fff)", fontFamily: autoFont }}>
       <div style={{ marginBottom: 24 }}>
         <h1 style={{ margin: "0 0 6px", fontSize: 28, fontWeight: 900 }}>Showroom Analytics</h1>
         <p style={{ margin: 0, fontSize: 14, color: autoMuted }}>Inventory composition, drive completion, and deal pipeline performance from the live automotive feed.</p>
@@ -76,7 +76,7 @@ export default function AutomotiveAnalyticsPage() {
           <div style={{ fontSize: 15, fontWeight: 800, marginBottom: 14 }}>Available Stock Mix</div>
           <div style={{ display: "grid", gap: 10 }}>
             {availableByType.map((row) => (
-              <div key={row.type} style={{ display: "flex", justifyContent: "space-between", borderRadius: 12, border: "1px solid rgba(255,255,255,.06)", background: "rgba(255,255,255,.03)", padding: "10px 12px" }}>
+              <div key={row.type} style={{ display: "flex", justifyContent: "space-between", borderRadius: 12, border: "1px solid rgba(var(--ink),.06)", background: "rgba(var(--ink),.03)", padding: "10px 12px" }}>
                 <span style={{ fontSize: 13, color: autoMuted }}>{row.type}</span>
                 <span style={{ fontSize: 14, fontWeight: 800, color: "#93c5fd" }}>{row.count}</span>
               </div>
@@ -89,7 +89,7 @@ export default function AutomotiveAnalyticsPage() {
           <div style={{ fontSize: 15, fontWeight: 800, marginBottom: 14 }}>Deal Pipeline</div>
           <div style={{ display: "grid", gap: 10 }}>
             {dealsByStatus.map((row) => (
-              <div key={row.status} style={{ display: "flex", justifyContent: "space-between", borderRadius: 12, border: "1px solid rgba(255,255,255,.06)", background: "rgba(255,255,255,.03)", padding: "10px 12px" }}>
+              <div key={row.status} style={{ display: "flex", justifyContent: "space-between", borderRadius: 12, border: "1px solid rgba(var(--ink),.06)", background: "rgba(var(--ink),.03)", padding: "10px 12px" }}>
                 <span style={{ fontSize: 13, color: autoMuted }}>{row.status}</span>
                 <span style={{ fontSize: 14, fontWeight: 800, color: "#c084fc" }}>{row.count}</span>
               </div>

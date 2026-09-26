@@ -61,7 +61,7 @@ export default function TablesPage() {
   }
 
   return (
-    <div style={{ padding: "28px", color: "white", fontFamily: restaurantFont }}>
+    <div style={{ padding: "28px", color: "var(--ink-solid, white)", fontFamily: restaurantFont }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 28 }}>
         <div>
           <h1 style={{ fontSize: 22, fontWeight: 800, margin: "0 0 4px" }}>Table Management</h1>
@@ -76,7 +76,7 @@ export default function TablesPage() {
       <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 12, marginBottom: 28 }}>
         {(Object.entries(counts) as [TableStatus, number][]).map(([status, count]) => {
           const meta = STATUS_META[status];
-          return <div key={status} style={{ padding: isMobile ? "12px 10px" : "16px 18px", borderRadius: 13, background: meta.bg, border: `1px solid ${meta.color}30` }}><div style={{ fontSize: 22, fontWeight: 800, color: meta.color }}>{count}</div><div style={{ fontSize: 12, color: "rgba(255,255,255,.6)", marginTop: 3 }}>{meta.emoji} {meta.label}</div></div>;
+          return <div key={status} style={{ padding: isMobile ? "12px 10px" : "16px 18px", borderRadius: 13, background: meta.bg, border: `1px solid ${meta.color}30` }}><div style={{ fontSize: 22, fontWeight: 800, color: meta.color }}>{count}</div><div style={{ fontSize: 12, color: "rgba(var(--ink),.6)", marginTop: 3 }}>{meta.emoji} {meta.label}</div></div>;
         })}
       </div>
 
@@ -89,20 +89,20 @@ export default function TablesPage() {
             const isSelected = selected === table.id;
             return <div key={table.id} onClick={() => setSelected(isSelected ? null : table.id)} style={{ padding: isMobile ? "12px 10px" : "18px 14px", borderRadius: 14, background: isSelected ? meta.bg : restaurantBg, border: `2px solid ${isSelected ? meta.color : `${meta.color}30`}`, cursor: "pointer", textAlign: "center" }}><div style={{ fontSize: 26, marginBottom: 6 }}>{meta.emoji}</div><div style={{ fontSize: 18, fontWeight: 800 }}>Table {table.number}</div><div style={{ fontSize: 11, color: restaurantMuted, marginTop: 2 }}>Cap: {table.capacity}</div><div style={{ fontSize: 11, fontWeight: 700, color: meta.color, marginTop: 6, padding: "2px 8px", borderRadius: 20, background: `${meta.color}15`, display: "inline-block" }}>{meta.label}</div>{table.order && <div style={{ fontSize: 12, fontWeight: 700, color: "#f59e0b", marginTop: 6 }}>Rs.{table.order.total.toLocaleString()}</div>}</div>;
           })}
-          {!loading && tables.length === 0 && <div style={{ background: restaurantBg, border: `1px solid ${restaurantBorder}`, borderRadius: 12, padding: 40, textAlign: "center", color: "rgba(255,255,255,.25)", gridColumn: "1/-1" }}>No tables added yet.</div>}
+          {!loading && tables.length === 0 && <div style={{ background: restaurantBg, border: `1px solid ${restaurantBorder}`, borderRadius: 12, padding: 40, textAlign: "center", color: "rgba(var(--ink),.25)", gridColumn: "1/-1" }}>No tables added yet.</div>}
         </div>
 
         {selectedTable && (
           <div style={{ padding: isMobile ? "12px 10px" : "20px 22px", borderRadius: 16, background: restaurantBg, border: `1px solid ${restaurantBorder}`, height: "fit-content" }}>
             <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 18 }}>
               <div style={{ fontSize: 16, fontWeight: 800 }}>Table {selectedTable.number}</div>
-              <button onClick={() => setSelected(null)} style={{ background: "none", border: "none", color: "rgba(255,255,255,.4)", fontSize: 18, cursor: "pointer" }}>×</button>
+              <button onClick={() => setSelected(null)} style={{ background: "none", border: "none", color: "rgba(var(--ink),.4)", fontSize: 18, cursor: "pointer" }}>×</button>
             </div>
             <div style={{ fontSize: 12, fontWeight: 700, color: restaurantMuted, marginBottom: 10, textTransform: "uppercase" }}>Change Status</div>
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
               {(["available", "occupied", "reserved", "cleaning"] as TableStatus[]).map((status) => {
                 const meta = STATUS_META[status];
-                return <button key={status} onClick={() => void changeStatus(selectedTable.id, status)} style={{ padding: "9px", borderRadius: 9, border: `1px solid ${selectedTable.status === status ? meta.color : "rgba(255,255,255,.08)"}`, background: selectedTable.status === status ? meta.bg : "transparent", color: selectedTable.status === status ? meta.color : "rgba(255,255,255,.4)", fontSize: 12, fontWeight: 700, cursor: "pointer" }}>{meta.emoji} {meta.label}</button>;
+                return <button key={status} onClick={() => void changeStatus(selectedTable.id, status)} style={{ padding: "9px", borderRadius: 9, border: `1px solid ${selectedTable.status === status ? meta.color : "rgba(var(--ink),.08)"}`, background: selectedTable.status === status ? meta.bg : "transparent", color: selectedTable.status === status ? meta.color : "rgba(var(--ink),.4)", fontSize: 12, fontWeight: 700, cursor: "pointer" }}>{meta.emoji} {meta.label}</button>;
               })}
             </div>
           </div>
@@ -111,7 +111,7 @@ export default function TablesPage() {
 
       {showModal && (
         <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.7)", zIndex: 50, display: "flex", alignItems: "center", justifyContent: "center" }}>
-          <div style={{ background: "#161b27", border: `1px solid ${restaurantBorder}`, borderRadius: 16, padding: 32, width: 400, fontFamily: restaurantFont }}>
+          <div style={{ background: "var(--dk-161b27, #161b27)", border: `1px solid ${restaurantBorder}`, borderRadius: 16, padding: 32, width: 400, fontFamily: restaurantFont }}>
             <h2 style={{ margin: "0 0 24px", fontSize: 18, fontWeight: 700 }}>Add Table</h2>
             {formError && <div style={{ marginBottom: 14, padding: "10px 12px", borderRadius: 8, background: "rgba(239,68,68,.14)", border: "1px solid rgba(239,68,68,.28)", color: "#fca5a5", fontSize: 12 }}>{formError}</div>}
             <div style={{ marginBottom: 16 }}>
@@ -124,7 +124,7 @@ export default function TablesPage() {
             </div>
             <div style={{ display: "flex", gap: 12 }}>
               <button onClick={addTable} style={{ flex: 1, padding: "11px 0", background: "#f87171", border: "none", borderRadius: 8, color: "#fff", fontSize: 14, fontWeight: 600, cursor: "pointer" }}>Add Table</button>
-              <button onClick={() => setShowModal(false)} style={{ padding: "11px 24px", background: "transparent", border: `1px solid ${restaurantBorder}`, borderRadius: 8, color: "rgba(255,255,255,.6)", fontSize: 14, cursor: "pointer" }}>Cancel</button>
+              <button onClick={() => setShowModal(false)} style={{ padding: "11px 24px", background: "transparent", border: `1px solid ${restaurantBorder}`, borderRadius: 8, color: "rgba(var(--ink),.6)", fontSize: 14, cursor: "pointer" }}>Cancel</button>
             </div>
           </div>
         </div>

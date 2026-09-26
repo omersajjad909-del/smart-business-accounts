@@ -49,7 +49,7 @@ export default function MenuPage() {
   }
 
   return (
-    <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", fontFamily: restaurantFont, color: "#fff", minHeight: "100vh" }}>
+    <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", fontFamily: restaurantFont, color: "var(--ink-solid, #fff)", minHeight: "100vh" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 28 }}>
         <div>
           <h1 style={{ fontSize: 22, fontWeight: 800, margin: "0 0 4px" }}>Menu</h1>
@@ -66,7 +66,7 @@ export default function MenuPage() {
           { label: "Categories", val: CATEGORIES.length - 1, color: "#818cf8" },
         ].map((card) => (
           <div key={card.label} style={{ background: restaurantBg, border: `1px solid ${restaurantBorder}`, borderRadius: 12, padding: isMobile ? "12px 11px" : "20px 24px" }}>
-            <div style={{ fontSize: 13, color: "rgba(255,255,255,.5)", marginBottom: 6 }}>{card.label}</div>
+            <div style={{ fontSize: 13, color: "rgba(var(--ink),.5)", marginBottom: 6 }}>{card.label}</div>
             <div style={{ fontSize: 22, fontWeight: 700, color: card.color }}>{card.val}</div>
           </div>
         ))}
@@ -74,7 +74,7 @@ export default function MenuPage() {
 
       <div style={{ display: "flex", gap: 8, marginBottom: 24, flexWrap: "wrap" }}>
         {CATEGORIES.map((category) => (
-          <button key={category} onClick={() => setTab(category)} style={{ background: tab === category ? "#ef4444" : "rgba(255,255,255,.06)", color: tab === category ? "#fff" : "rgba(255,255,255,.6)", border: "none", borderRadius: 8, padding: "8px 16px", cursor: "pointer", fontWeight: 600, fontSize: 13 }}>
+          <button key={category} onClick={() => setTab(category)} style={{ background: tab === category ? "#ef4444" : "rgba(var(--ink),.06)", color: tab === category ? "#fff" : "rgba(var(--ink),.6)", border: "none", borderRadius: 8, padding: "8px 16px", cursor: "pointer", fontWeight: 600, fontSize: 13 }}>
             {category}
           </button>
         ))}
@@ -102,12 +102,12 @@ export default function MenuPage() {
             </div>
           </div>
         ))}
-        {!loading && filtered.length === 0 && <div style={{ background: restaurantBg, border: `1px solid ${restaurantBorder}`, borderRadius: 12, padding: 40, textAlign: "center", color: "rgba(255,255,255,.25)", gridColumn: "1/-1" }}>No items found.</div>}
+        {!loading && filtered.length === 0 && <div style={{ background: restaurantBg, border: `1px solid ${restaurantBorder}`, borderRadius: 12, padding: 40, textAlign: "center", color: "rgba(var(--ink),.25)", gridColumn: "1/-1" }}>No items found.</div>}
       </div>
 
       {showModal && (
         <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.7)", zIndex: 50, display: "flex", alignItems: "center", justifyContent: "center" }}>
-          <div style={{ background: "#161b27", border: `1px solid ${restaurantBorder}`, borderRadius: 16, padding: 32, width: 480, fontFamily: restaurantFont }}>
+          <div style={{ background: "var(--dk-161b27, #161b27)", border: `1px solid ${restaurantBorder}`, borderRadius: 16, padding: 32, width: 480, fontFamily: restaurantFont }}>
             <h2 style={{ margin: "0 0 24px", fontSize: 20, fontWeight: 700 }}>Add Menu Item</h2>
             {formError && <div style={{ marginBottom: 14, padding: "10px 12px", borderRadius: 8, background: "rgba(239,68,68,.14)", border: "1px solid rgba(239,68,68,.28)", color: "#fca5a5", fontSize: 12 }}>{formError}</div>}
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
@@ -117,7 +117,7 @@ export default function MenuPage() {
               </div>
               <div>
                 <label style={{ display: "block", fontSize: 12, color: restaurantMuted, marginBottom: 6 }}>Category</label>
-                <select value={form.category} onChange={(event) => setForm((prev) => ({ ...prev, category: event.target.value }))} style={{ width: "100%", background: "#161b27", border: `1px solid ${restaurantBorder}`, borderRadius: 8, padding: "9px 12px", color: "#fff", fontSize: 14 }}>
+                <select value={form.category} onChange={(event) => setForm((prev) => ({ ...prev, category: event.target.value }))} style={{ width: "100%", background: "var(--dk-161b27, #161b27)", border: `1px solid ${restaurantBorder}`, borderRadius: 8, padding: "9px 12px", color: "var(--ink-solid, #fff)", fontSize: 14 }}>
                   {CATEGORIES.filter((item) => item !== "All").map((category) => <option key={category}>{category}</option>)}
                 </select>
               </div>
@@ -140,7 +140,7 @@ export default function MenuPage() {
             </div>
             <div style={{ display: "flex", gap: 12, marginTop: 24 }}>
               <button onClick={save} style={{ flex: 1, padding: "11px 0", background: "#ef4444", border: "none", borderRadius: 8, color: "#fff", fontSize: 14, fontWeight: 600, cursor: "pointer" }}>Add Item</button>
-              <button onClick={() => setShowModal(false)} style={{ padding: "11px 24px", background: "transparent", border: `1px solid ${restaurantBorder}`, borderRadius: 8, color: "rgba(255,255,255,.6)", fontSize: 14, cursor: "pointer" }}>Cancel</button>
+              <button onClick={() => setShowModal(false)} style={{ padding: "11px 24px", background: "transparent", border: `1px solid ${restaurantBorder}`, borderRadius: 8, color: "rgba(var(--ink),.6)", fontSize: 14, cursor: "pointer" }}>Cancel</button>
             </div>
           </div>
         </div>

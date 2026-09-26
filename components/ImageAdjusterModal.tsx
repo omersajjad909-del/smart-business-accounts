@@ -258,10 +258,10 @@ export default function ImageAdjusterModal({
         style={{
           width: "min(96vw, 360px)",
           borderRadius: 20,
-          border: "1px solid rgba(255,255,255,0.10)",
-          background: "linear-gradient(180deg,#111936,#0b1225)",
+          border: "1px solid rgba(var(--ink),0.10)",
+          background: "linear-gradient(180deg,var(--dk-111936, #111936),var(--dk-0b1225, #0b1225))",
           boxShadow: "0 24px 80px rgba(0,0,0,0.6)",
-          color: "white",
+          color: "var(--ink-solid, white)",
           userSelect: "none",
           overflow: "hidden",
         }}
@@ -274,9 +274,9 @@ export default function ImageAdjusterModal({
             onClick={onCancel}
             style={{
               width: 30, height: 30, borderRadius: 9, flexShrink: 0,
-              border: "1px solid rgba(255,255,255,0.12)",
-              background: "rgba(255,255,255,0.06)",
-              color: "rgba(255,255,255,0.7)",
+              border: "1px solid rgba(var(--ink),0.12)",
+              background: "rgba(var(--ink),0.06)",
+              color: "rgba(var(--ink),0.7)",
               cursor: "pointer", fontSize: 14,
               display: "flex", alignItems: "center", justifyContent: "center",
             }}
@@ -303,7 +303,7 @@ export default function ImageAdjusterModal({
               borderRadius: shape === "circle" ? "50%" : 20,
               overflow: "hidden",
               position: "relative",
-              background: "#060c1e",
+              background: "var(--dk-060c1e, #060c1e)",
               cursor: isDragging ? "grabbing" : "grab",
               touchAction: "none",
               border: "2.5px solid rgba(99,102,241,0.65)",
@@ -334,7 +334,7 @@ export default function ImageAdjusterModal({
                 transform: "translateX(-50%)",
                 background: "rgba(0,0,0,0.6)", backdropFilter: "blur(6px)",
                 borderRadius: 20, padding: "4px 12px",
-                fontSize: 10, color: "rgba(255,255,255,0.7)",
+                fontSize: 10, color: "rgba(var(--ink),0.7)",
                 whiteSpace: "nowrap", pointerEvents: "none",
               }}>
                 drag · pinch to zoom
@@ -346,10 +346,10 @@ export default function ImageAdjusterModal({
         {/* Zoom slider */}
         <div style={{ padding: "0 14px 14px" }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
-            <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: ".08em", textTransform: "uppercase", color: "rgba(255,255,255,0.4)" }}>
+            <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: ".08em", textTransform: "uppercase", color: "rgba(var(--ink),0.4)" }}>
               Zoom
             </span>
-            <span style={{ fontSize: 11, color: "rgba(255,255,255,0.55)", fontWeight: 600 }}>
+            <span style={{ fontSize: 11, color: "rgba(var(--ink),0.55)", fontWeight: 600 }}>
               {(zoom / minZoom).toFixed(1)}×
             </span>
           </div>
@@ -371,9 +371,9 @@ export default function ImageAdjusterModal({
             onClick={onCancel}
             style={{
               flex: 1, padding: "12px", borderRadius: 11,
-              border: "1px solid rgba(255,255,255,0.1)",
-              background: "rgba(255,255,255,0.04)",
-              color: "rgba(255,255,255,0.65)",
+              border: "1px solid rgba(var(--ink),0.1)",
+              background: "rgba(var(--ink),0.04)",
+              color: "rgba(var(--ink),0.65)",
               fontWeight: 600, fontSize: 14, cursor: "pointer",
             }}
           >

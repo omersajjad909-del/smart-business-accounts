@@ -146,10 +146,10 @@ export default function TradingConversionCenterPage() {
             <tbody>
               {pendingPos.slice(0, 6).map((entry) => (
                 <tr key={entry.id}>
-                  <td style={{ padding: "12px 16px", borderBottom: "1px solid rgba(255,255,255,.04)", fontWeight: 700 }}>{entry.poNo}</td>
-                  <td style={{ padding: "12px 16px", borderBottom: "1px solid rgba(255,255,255,.04)" }}>{entry.supplier?.name || "-"}</td>
-                  <td style={{ padding: "12px 16px", borderBottom: "1px solid rgba(255,255,255,.04)" }}>{formatDate(entry.date)}</td>
-                  <td style={{ padding: "12px 16px", borderBottom: "1px solid rgba(255,255,255,.04)", color: "#f59e0b", fontWeight: 700 }}>{formatMoney(sumLineAmount(entry.items))}</td>
+                  <td style={{ padding: "12px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", fontWeight: 700 }}>{entry.poNo}</td>
+                  <td style={{ padding: "12px 16px", borderBottom: "1px solid rgba(var(--ink),.04)" }}>{entry.supplier?.name || "-"}</td>
+                  <td style={{ padding: "12px 16px", borderBottom: "1px solid rgba(var(--ink),.04)" }}>{formatDate(entry.date)}</td>
+                  <td style={{ padding: "12px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", color: "#f59e0b", fontWeight: 700 }}>{formatMoney(sumLineAmount(entry.items))}</td>
                 </tr>
               ))}
               {pendingPos.length === 0 && (

@@ -348,7 +348,7 @@ export default function CurrenciesPage() {
               </thead>
               <tbody>
                 {currencies.map((currency, i) => (
-                  <tr key={currency.id} style={{ borderBottom: "1px solid var(--border)", background: i % 2 === 0 ? "transparent" : "rgba(255,255,255,0.02)" }}>
+                  <tr key={currency.id} style={{ borderBottom: "1px solid var(--border)", background: i % 2 === 0 ? "transparent" : "rgba(var(--ink),0.02)" }}>
                     <td style={{ padding: "11px 16px", fontWeight: 700, fontFamily: "monospace", color: ACCENT }}>
                       {currency.code}
                     </td>

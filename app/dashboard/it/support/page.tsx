@@ -8,33 +8,33 @@ import { useResponsive } from "@/hooks/useResponsive";
 const isMobile = false;
 
 const S = {
-  page: { padding: '32px', fontFamily: 'Inter, sans-serif', color: '#fff', minHeight: '100vh' },
+  page: { padding: '32px', fontFamily: 'Inter, sans-serif', color: 'var(--ink-solid, #fff)', minHeight: '100vh' },
   header: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 28 },
   title: { fontSize: 24, fontWeight: 700, margin: 0 },
-  sub: { fontSize: 14, color: 'rgba(255,255,255,.5)', marginTop: 4 },
+  sub: { fontSize: 14, color: 'rgba(var(--ink),.5)', marginTop: 4 },
   btn: { background: '#7c3aed', color: '#fff', border: 'none', borderRadius: 8, padding: '10px 20px', fontWeight: 600, cursor: 'pointer', fontSize: 14 },
   stats: { display: 'grid', gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 16, marginBottom: 28 },
-  stat: { background: 'rgba(255,255,255,.03)', border: '1px solid rgba(255,255,255,.07)', borderRadius: 12, padding: isMobile ? "12px 11px" : "20px 24px" },
-  statLabel: { fontSize: 13, color: 'rgba(255,255,255,.5)', marginBottom: 6 },
+  stat: { background: 'rgba(var(--ink),.03)', border: '1px solid rgba(var(--ink),.07)', borderRadius: 12, padding: isMobile ? "12px 11px" : "20px 24px" },
+  statLabel: { fontSize: 13, color: 'rgba(var(--ink),.5)', marginBottom: 6 },
   statVal: { fontSize: 28, fontWeight: 700 },
   filters: { display: 'flex', gap: 12, marginBottom: 24, flexWrap: 'wrap' as const },
-  tab: (a: boolean) => ({ background: a ? '#7c3aed' : 'rgba(255,255,255,.06)', color: a ? '#fff' : 'rgba(255,255,255,.6)', border: 'none', borderRadius: 8, padding: '8px 16px', cursor: 'pointer', fontWeight: 600, fontSize: 13 }),
-  filterSelect: { background: 'rgba(255,255,255,.06)', border: '1px solid rgba(255,255,255,.1)', color: '#fff', borderRadius: 8, padding: '8px 14px', fontSize: 13, cursor: 'pointer' },
-  card: { background: 'rgba(255,255,255,.03)', border: '1px solid rgba(255,255,255,.07)', borderRadius: 12, overflow: 'hidden' },
+  tab: (a: boolean) => ({ background: a ? '#7c3aed' : 'rgba(var(--ink),.06)', color: a ? '#fff' : 'rgba(var(--ink),.6)', border: 'none', borderRadius: 8, padding: '8px 16px', cursor: 'pointer', fontWeight: 600, fontSize: 13 }),
+  filterSelect: { background: 'rgba(var(--ink),.06)', border: '1px solid rgba(var(--ink),.1)', color: 'var(--ink-solid, #fff)', borderRadius: 8, padding: '8px 14px', fontSize: 13, cursor: 'pointer' },
+  card: { background: 'rgba(var(--ink),.03)', border: '1px solid rgba(var(--ink),.07)', borderRadius: 12, overflow: 'hidden' },
   table: { width: '100%', borderCollapse: 'collapse' as const },
-  th: { textAlign: 'left' as const, padding: '12px 16px', fontSize: 12, color: 'rgba(255,255,255,.5)', borderBottom: '1px solid rgba(255,255,255,.07)', fontWeight: 600 },
-  td: { padding: isMobile ? "12px 10px" : "14px 16px", fontSize: 14, borderBottom: '1px solid rgba(255,255,255,.04)' },
+  th: { textAlign: 'left' as const, padding: '12px 16px', fontSize: 12, color: 'rgba(var(--ink),.5)', borderBottom: '1px solid rgba(var(--ink),.07)', fontWeight: 600 },
+  td: { padding: isMobile ? "12px 10px" : "14px 16px", fontSize: 14, borderBottom: '1px solid rgba(var(--ink),.04)' },
   badge: (c: string) => ({ display: 'inline-block', background: `${c}20`, color: c, borderRadius: 6, padding: '2px 10px', fontSize: 12, fontWeight: 600 }),
   priorityDot: (c: string) => ({ display: 'inline-block', width: 8, height: 8, borderRadius: '50%', background: c, marginRight: 6 }),
   overlay: { position: 'fixed' as const, inset: 0, background: 'rgba(0,0,0,.6)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center' },
-  modal: { background: '#1a1a2e', border: '1px solid rgba(255,255,255,.1)', borderRadius: 16, padding: 32, width: '100%', maxWidth: 500 },
+  modal: { background: 'var(--dk-1a1a2e, #1a1a2e)', border: '1px solid rgba(var(--ink),.1)', borderRadius: 16, padding: 32, width: '100%', maxWidth: 500 },
   modalTitle: { fontSize: 18, fontWeight: 700, marginBottom: 24 },
   field: { marginBottom: 16 },
-  label: { display: 'block', fontSize: 13, color: 'rgba(255,255,255,.6)', marginBottom: 6 },
-  input: { width: '100%', background: 'rgba(255,255,255,.06)', border: '1px solid rgba(255,255,255,.1)', borderRadius: 8, padding: '10px 12px', color: '#fff', fontSize: 14, boxSizing: 'border-box' as const },
+  label: { display: 'block', fontSize: 13, color: 'rgba(var(--ink),.6)', marginBottom: 6 },
+  input: { width: '100%', background: 'rgba(var(--ink),.06)', border: '1px solid rgba(var(--ink),.1)', borderRadius: 8, padding: '10px 12px', color: 'var(--ink-solid, #fff)', fontSize: 14, boxSizing: 'border-box' as const },
   row2: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 },
   modalBtns: { display: 'flex', gap: 12, marginTop: 24 },
-  actBtn: { background: 'rgba(255,255,255,.06)', border: '1px solid rgba(255,255,255,.1)', color: '#fff', borderRadius: 8, padding: '6px 12px', fontSize: 12, cursor: 'pointer' },
+  actBtn: { background: 'rgba(var(--ink),.06)', border: '1px solid rgba(var(--ink),.1)', color: 'var(--ink-solid, #fff)', borderRadius: 8, padding: '6px 12px', fontSize: 12, cursor: 'pointer' },
 };
 
 const PRIORITIES = ['Critical', 'High', 'Medium', 'Low'];
@@ -131,7 +131,7 @@ export default function SupportPage() {
         </select>
       </div>
 
-      {loading && <div style={{ textAlign: 'center', padding: 40, color: 'rgba(255,255,255,.4)' }}>Loading...</div>}
+      {loading && <div style={{ textAlign: 'center', padding: 40, color: 'rgba(var(--ink),.4)' }}>Loading...</div>}
 
       <div style={S.card}>
         <table style={S.table}>
@@ -142,12 +142,12 @@ export default function SupportPage() {
           </tr></thead>
           <tbody>
             {!loading && filtered.length === 0 && (
-              <tr><td colSpan={9} style={{ padding: 32, textAlign: 'center', color: 'rgba(255,255,255,.25)', fontSize: 14 }}>No tickets found.</td></tr>
+              <tr><td colSpan={9} style={{ padding: 32, textAlign: 'center', color: 'rgba(var(--ink),.25)', fontSize: 14 }}>No tickets found.</td></tr>
             )}
             {filtered.map(t => (
               <tr key={t.id}>
-                <td style={S.td}><div style={{ fontWeight: 600, fontFamily: 'monospace' }}>{t.ticketId}</div><div style={{ fontSize: 11, color: 'rgba(255,255,255,.4)' }}>{t.created}</div></td>
-                <td style={{ ...S.td, maxWidth: 200 }}><div style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{t.title}</div><div style={{ fontSize: 11, color: 'rgba(255,255,255,.4)' }}>{t.project}</div></td>
+                <td style={S.td}><div style={{ fontWeight: 600, fontFamily: 'monospace' }}>{t.ticketId}</div><div style={{ fontSize: 11, color: 'rgba(var(--ink),.4)' }}>{t.created}</div></td>
+                <td style={{ ...S.td, maxWidth: 200 }}><div style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{t.title}</div><div style={{ fontSize: 11, color: 'rgba(var(--ink),.4)' }}>{t.project}</div></td>
                 <td style={S.td}>{t.client}</td>
                 <td style={S.td}><span><span style={S.priorityDot(PRIORITY_COLOR[t.priority])} />{t.priority}</span></td>
                 <td style={S.td}>{t.category}</td>

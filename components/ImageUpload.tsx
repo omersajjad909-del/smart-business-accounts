@@ -63,7 +63,7 @@ export default function ImageUpload({ value, onChange, label = "Product Image" }
 
   return (
     <div style={{ display: "grid", gap: 6 }}>
-      <label style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,.45)", textTransform: "uppercase", letterSpacing: ".05em" }}>
+      <label style={{ fontSize: 11, fontWeight: 700, color: "rgba(var(--ink),.45)", textTransform: "uppercase", letterSpacing: ".05em" }}>
         {label}
       </label>
 
@@ -73,7 +73,7 @@ export default function ImageUpload({ value, onChange, label = "Product Image" }
           <img
             src={value}
             alt="product"
-            style={{ width: 120, height: 120, objectFit: "cover", borderRadius: 10, border: "1px solid rgba(255,255,255,.1)" }}
+            style={{ width: 120, height: 120, objectFit: "cover", borderRadius: 10, border: "1px solid rgba(var(--ink),.1)" }}
           />
           <button
             type="button"
@@ -82,7 +82,7 @@ export default function ImageUpload({ value, onChange, label = "Product Image" }
             style={{
               position: "absolute", top: -8, right: -8,
               width: 22, height: 22, borderRadius: "50%",
-              background: "#ef4444", border: "2px solid #0f172a",
+              background: "#ef4444", border: "2px solid var(--dkb-0f172a, #0f172a)",
               color: "#fff", fontSize: 11, fontWeight: 700,
               cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center",
               lineHeight: 1,
@@ -122,15 +122,15 @@ export default function ImageUpload({ value, onChange, label = "Product Image" }
           {uploading ? (
             <>
               <div style={{ fontSize: 22 }}>⏳</div>
-              <div style={{ fontSize: 10, color: "rgba(255,255,255,.4)" }}>Uploading…</div>
+              <div style={{ fontSize: 10, color: "rgba(var(--ink),.4)" }}>Uploading…</div>
             </>
           ) : (
             <>
               <div style={{ fontSize: 24, opacity: .5 }}>🖼</div>
-              <div style={{ fontSize: 10, color: "rgba(255,255,255,.35)", textAlign: "center", lineHeight: 1.4 }}>
+              <div style={{ fontSize: 10, color: "rgba(var(--ink),.35)", textAlign: "center", lineHeight: 1.4 }}>
                 Click or drag<br />to upload
               </div>
-              <div style={{ fontSize: 9, color: "rgba(255,255,255,.2)" }}>Max 2 MB</div>
+              <div style={{ fontSize: 9, color: "rgba(var(--ink),.2)" }}>Max 2 MB</div>
             </>
           )}
         </div>

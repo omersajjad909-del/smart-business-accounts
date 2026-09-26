@@ -35,7 +35,7 @@ export default function SchoolTeachersPage() {
   }
 
   return (
-    <div style={{ minHeight: "100vh", padding: isMobile ? "17px 16px" : "28px 32px", color: "#fff", fontFamily: schoolFont }}>
+    <div style={{ minHeight: "100vh", padding: isMobile ? "17px 16px" : "28px 32px", color: "var(--ink-solid, #fff)", fontFamily: schoolFont }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24, gap: 16, flexWrap: "wrap" }}>
         <div>
           <h1 style={{ margin: "0 0 6px", fontSize: 24, fontWeight: 800 }}>Teachers & Rooms</h1>
@@ -54,43 +54,43 @@ export default function SchoolTeachersPage() {
           <tbody>
             {teachers.map((row) => (
               <tr key={row.id}>
-                <td style={{ padding: isMobile ? "8px 8px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)", fontWeight: 700 }}>{row.name}</td>
-                <td style={{ padding: isMobile ? "8px 8px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)" }}>{row.subject}</td>
-                <td style={{ padding: isMobile ? "8px 8px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)" }}>{row.classes}</td>
-                <td style={{ padding: isMobile ? "8px 8px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)" }}>{row.phone || "—"}</td>
-                <td style={{ padding: isMobile ? "8px 8px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)" }}>{row.room || "—"}</td>
-                <td style={{ padding: isMobile ? "8px 8px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)" }}>{row.status}</td>
+                <td style={{ padding: isMobile ? "8px 8px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", fontWeight: 700 }}>{row.name}</td>
+                <td style={{ padding: isMobile ? "8px 8px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)" }}>{row.subject}</td>
+                <td style={{ padding: isMobile ? "8px 8px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)" }}>{row.classes}</td>
+                <td style={{ padding: isMobile ? "8px 8px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)" }}>{row.phone || "—"}</td>
+                <td style={{ padding: isMobile ? "8px 8px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)" }}>{row.room || "—"}</td>
+                <td style={{ padding: isMobile ? "8px 8px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)" }}>{row.status}</td>
               </tr>
             ))}
-            {!loading && teachers.length === 0 && <tr><td colSpan={6} style={{ padding: 40, textAlign: "center", color: "rgba(255,255,255,.25)" }}>No teachers yet.</td></tr>}
+            {!loading && teachers.length === 0 && <tr><td colSpan={6} style={{ padding: 40, textAlign: "center", color: "rgba(var(--ink),.25)" }}>No teachers yet.</td></tr>}
           </tbody>
         </table>
       </div>
 
       {showModal && (
         <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.72)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-          <div style={{ width: 560, background: "#161b27", border: `1px solid ${schoolBorder}`, borderRadius: 16, padding: 28 }}>
+          <div style={{ width: 560, background: "var(--dk-161b27, #161b27)", border: `1px solid ${schoolBorder}`, borderRadius: 16, padding: 28 }}>
             <h2 style={{ margin: "0 0 18px", fontSize: 18, fontWeight: 800 }}>Add Teacher</h2>
             <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: 12 }}>
               <div style={{ gridColumn: "span 2" }}>
                 <label style={{ display: "block", marginBottom: 6, fontSize: 12, color: schoolMuted }}>Teacher Name</label>
-                <input value={form.name} onChange={(e) => setForm((prev) => ({ ...prev, name: e.target.value }))} style={{ width: "100%", padding: isMobile ? "8px 8px" : "10px 12px", background: "#111827", border: `1px solid ${schoolBorder}`, borderRadius: 8, color: "#fff" }} />
+                <input value={form.name} onChange={(e) => setForm((prev) => ({ ...prev, name: e.target.value }))} style={{ width: "100%", padding: isMobile ? "8px 8px" : "10px 12px", background: "var(--dk-111827, #111827)", border: `1px solid ${schoolBorder}`, borderRadius: 8, color: "var(--ink-solid, #fff)" }} />
               </div>
               <div>
                 <label style={{ display: "block", marginBottom: 6, fontSize: 12, color: schoolMuted }}>Subject</label>
-                <input value={form.subject} onChange={(e) => setForm((prev) => ({ ...prev, subject: e.target.value }))} style={{ width: "100%", padding: isMobile ? "8px 8px" : "10px 12px", background: "#111827", border: `1px solid ${schoolBorder}`, borderRadius: 8, color: "#fff" }} />
+                <input value={form.subject} onChange={(e) => setForm((prev) => ({ ...prev, subject: e.target.value }))} style={{ width: "100%", padding: isMobile ? "8px 8px" : "10px 12px", background: "var(--dk-111827, #111827)", border: `1px solid ${schoolBorder}`, borderRadius: 8, color: "var(--ink-solid, #fff)" }} />
               </div>
               <div>
                 <label style={{ display: "block", marginBottom: 6, fontSize: 12, color: schoolMuted }}>Classes</label>
-                <input value={form.classes} onChange={(e) => setForm((prev) => ({ ...prev, classes: e.target.value }))} style={{ width: "100%", padding: isMobile ? "8px 8px" : "10px 12px", background: "#111827", border: `1px solid ${schoolBorder}`, borderRadius: 8, color: "#fff" }} />
+                <input value={form.classes} onChange={(e) => setForm((prev) => ({ ...prev, classes: e.target.value }))} style={{ width: "100%", padding: isMobile ? "8px 8px" : "10px 12px", background: "var(--dk-111827, #111827)", border: `1px solid ${schoolBorder}`, borderRadius: 8, color: "var(--ink-solid, #fff)" }} />
               </div>
               <div>
                 <label style={{ display: "block", marginBottom: 6, fontSize: 12, color: schoolMuted }}>Phone</label>
-                <input value={form.phone} onChange={(e) => setForm((prev) => ({ ...prev, phone: e.target.value }))} style={{ width: "100%", padding: isMobile ? "8px 8px" : "10px 12px", background: "#111827", border: `1px solid ${schoolBorder}`, borderRadius: 8, color: "#fff" }} />
+                <input value={form.phone} onChange={(e) => setForm((prev) => ({ ...prev, phone: e.target.value }))} style={{ width: "100%", padding: isMobile ? "8px 8px" : "10px 12px", background: "var(--dk-111827, #111827)", border: `1px solid ${schoolBorder}`, borderRadius: 8, color: "var(--ink-solid, #fff)" }} />
               </div>
               <div>
                 <label style={{ display: "block", marginBottom: 6, fontSize: 12, color: schoolMuted }}>Room</label>
-                <input value={form.room} onChange={(e) => setForm((prev) => ({ ...prev, room: e.target.value }))} style={{ width: "100%", padding: isMobile ? "8px 8px" : "10px 12px", background: "#111827", border: `1px solid ${schoolBorder}`, borderRadius: 8, color: "#fff" }} />
+                <input value={form.room} onChange={(e) => setForm((prev) => ({ ...prev, room: e.target.value }))} style={{ width: "100%", padding: isMobile ? "8px 8px" : "10px 12px", background: "var(--dk-111827, #111827)", border: `1px solid ${schoolBorder}`, borderRadius: 8, color: "var(--ink-solid, #fff)" }} />
               </div>
             </div>
             {error && <div style={{ marginTop: 12, color: "#fda4af", fontSize: 12 }}>{error}</div>}

@@ -37,7 +37,7 @@ export default function RealEstateOverviewPage() {
   const expiringLeases = leases.filter((row) => row.status === "active").slice(0, 5);
 
   return (
-    <div style={{ minHeight: "100vh", padding: isMobile ? "15px 14px" : "28px 32px", color: "#fff", fontFamily: realEstateFont }}>
+    <div style={{ minHeight: "100vh", padding: isMobile ? "15px 14px" : "28px 32px", color: "var(--ink-solid, #fff)", fontFamily: realEstateFont }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 26, gap: 20, flexWrap: "wrap" }}>
         <div>
           <h1 style={{ margin: "0 0 6px", fontSize: 26, fontWeight: 800 }}>Real Estate Command Center</h1>
@@ -82,7 +82,7 @@ export default function RealEstateOverviewPage() {
               { label: "Maintenance units", value: summary.maintenanceProperties, color: "#f59e0b" },
               { label: "Active tenants", value: summary.activeTenants, color: "#c084fc" },
             ].map((row) => (
-              <div key={row.label} style={{ display: "flex", justifyContent: "space-between", padding: "10px 12px", borderRadius: 10, background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.05)" }}>
+              <div key={row.label} style={{ display: "flex", justifyContent: "space-between", padding: "10px 12px", borderRadius: 10, background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.05)" }}>
                 <span style={{ fontSize: 13, color: realEstateMuted }}>{row.label}</span>
                 <span style={{ fontSize: 16, fontWeight: 800, color: row.color }}>{row.value}</span>
               </div>
@@ -93,9 +93,9 @@ export default function RealEstateOverviewPage() {
         <div style={{ background: realEstateBg, border: `1px solid ${realEstateBorder}`, borderRadius: 16, overflow: "hidden" }}>
           <div style={{ padding: isMobile ? "12px 10px" : "16px 18px", borderBottom: `1px solid ${realEstateBorder}`, fontSize: 15, fontWeight: 800 }}>Lease Watchlist</div>
           <div style={{ padding: 18, display: "grid", gap: 10 }}>
-            {expiringLeases.length === 0 && <div style={{ color: "rgba(255,255,255,.28)" }}>No active leases yet.</div>}
+            {expiringLeases.length === 0 && <div style={{ color: "rgba(var(--ink),.28)" }}>No active leases yet.</div>}
             {expiringLeases.map((lease) => (
-              <div key={lease.id} style={{ padding: "12px 14px", borderRadius: 10, background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.05)" }}>
+              <div key={lease.id} style={{ padding: "12px 14px", borderRadius: 10, background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.05)" }}>
                 <div style={{ fontSize: 14, fontWeight: 700 }}>{lease.tenant}</div>
                 <div style={{ fontSize: 12, color: realEstateMuted, marginTop: 4 }}>{lease.property} | {lease.startDate} to {lease.endDate}</div>
                 <div style={{ fontSize: 12, color: "#93c5fd", marginTop: 6 }}>Rs. {lease.rentAmount.toLocaleString()} / month</div>

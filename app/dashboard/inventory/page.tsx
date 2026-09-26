@@ -303,7 +303,7 @@ export default function InventoryPage() {
                 const statusStyle = STATUS_STYLE[s.status];
                 const pct = s.minStock > 0 ? Math.min((s.qty / (s.minStock * 2)) * 100, 100) : 100;
                 return (
-                  <tr key={s.itemId} style={{ background: i % 2 === 1 ? "rgba(255,255,255,0.013)" : "transparent" }}>
+                  <tr key={s.itemId} style={{ background: i % 2 === 1 ? "rgba(var(--ink),0.013)" : "transparent" }}>
                     <td style={td}>
                       <div style={{ fontWeight: 600 }}>{s.name}</div>
                     </td>
@@ -326,7 +326,7 @@ export default function InventoryPage() {
                     <td style={{ ...td, textAlign: "right", fontWeight: 700 }}>
                       <div>{s.qty.toLocaleString()}</div>
                       {/* Stock bar */}
-                      <div style={{ height: 3, borderRadius: 2, background: "rgba(255,255,255,0.06)", marginTop: 4, overflow: "hidden", minWidth: 60 }}>
+                      <div style={{ height: 3, borderRadius: 2, background: "rgba(var(--ink),0.06)", marginTop: 4, overflow: "hidden", minWidth: 60 }}>
                         <div style={{ height: "100%", width: `${pct}%`, background: s.status === "OK" ? "#4ade80" : s.status === "LOW" ? "#fbbf24" : "#f87171", borderRadius: 2 }} />
                       </div>
                     </td>

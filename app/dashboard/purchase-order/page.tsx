@@ -800,7 +800,7 @@ export default function PurchaseOrderPage() {
           </div>
           {/* Items */}
           <div style={{ fontSize: 9, marginBottom: 5 }}>
-            <div style={{ display: "flex", justifyContent: "space-between", fontWeight: 700, borderBottom: "1px solid #000", paddingBottom: 2, marginBottom: 3 }}>
+            <div style={{ display: "flex", justifyContent: "space-between", fontWeight: 700, borderBottom: "1px solid var(--dkb-000000, #000)", paddingBottom: 2, marginBottom: 3 }}>
               <span style={{ flex: 2 }}>Item</span>
               <span style={{ width: 28, textAlign: "right" }}>Qty</span>
               <span style={{ width: 40, textAlign: "right" }}>Rate</span>
@@ -819,7 +819,7 @@ export default function PurchaseOrderPage() {
           <div style={{ fontSize: 9, borderTop: "1px dashed #555", paddingTop: 4, marginBottom: 4 }}>
             <div style={{ display: "flex", justifyContent: "space-between" }}><span>Sub Total:</span><span>{cur} {subTotal.toLocaleString()}</span></div>
             {freightAmt > 0 && <div style={{ display: "flex", justifyContent: "space-between" }}><span>Freight:</span><span>{cur} {freightAmt.toLocaleString()}</span></div>}
-            <div style={{ display: "flex", justifyContent: "space-between", fontWeight: 900, fontSize: 11, borderTop: "1px solid #000", marginTop: 3, paddingTop: 3 }}>
+            <div style={{ display: "flex", justifyContent: "space-between", fontWeight: 900, fontSize: 11, borderTop: "1px solid var(--dkb-000000, #000)", marginTop: 3, paddingTop: 3 }}>
               <span>TOTAL:</span><span>{cur} {grandTotal.toLocaleString()}</span>
             </div>
           </div>

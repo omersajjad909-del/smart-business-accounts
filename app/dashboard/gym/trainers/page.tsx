@@ -8,32 +8,32 @@ import { useResponsive } from "@/hooks/useResponsive";
 const isMobile = false;
 
 const S = {
-  page: { padding: '32px', fontFamily: 'Inter, sans-serif', color: '#fff', minHeight: '100vh' },
+  page: { padding: '32px', fontFamily: 'Inter, sans-serif', color: 'var(--ink-solid, #fff)', minHeight: '100vh' },
   header: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 28 },
   title: { fontSize: 24, fontWeight: 700, margin: 0 },
-  sub: { fontSize: 14, color: 'rgba(255,255,255,.5)', marginTop: 4 },
+  sub: { fontSize: 14, color: 'rgba(var(--ink),.5)', marginTop: 4 },
   btn: { background: '#16a34a', color: '#fff', border: 'none', borderRadius: 8, padding: '10px 20px', fontWeight: 600, cursor: 'pointer', fontSize: 14 },
   stats: { display: 'grid', gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 16, marginBottom: 28 },
-  stat: { background: 'rgba(255,255,255,.03)', border: '1px solid rgba(255,255,255,.07)', borderRadius: 12, padding: isMobile ? "12px 11px" : "20px 24px" },
-  statLabel: { fontSize: 13, color: 'rgba(255,255,255,.5)', marginBottom: 6 },
+  stat: { background: 'rgba(var(--ink),.03)', border: '1px solid rgba(var(--ink),.07)', borderRadius: 12, padding: isMobile ? "12px 11px" : "20px 24px" },
+  statLabel: { fontSize: 13, color: 'rgba(var(--ink),.5)', marginBottom: 6 },
   statVal: { fontSize: 28, fontWeight: 700 },
   grid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(280px,1fr))', gap: 20 },
-  card: { background: 'rgba(255,255,255,.03)', border: '1px solid rgba(255,255,255,.07)', borderRadius: 12, padding: 24 },
+  card: { background: 'rgba(var(--ink),.03)', border: '1px solid rgba(var(--ink),.07)', borderRadius: 12, padding: 24 },
   avatar: (c: string) => ({ width: 60, height: 60, borderRadius: '50%', background: c, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: 22, marginBottom: 16 }),
   name: { fontWeight: 700, fontSize: 17, marginBottom: 4 },
   spec: { display: 'inline-block', background: 'rgba(22,163,74,.15)', color: '#16a34a', borderRadius: 6, padding: '3px 10px', fontSize: 12, fontWeight: 600, marginBottom: 12 },
   badge: (c: string) => ({ display: 'inline-block', background: `${c}20`, color: c, borderRadius: 6, padding: '2px 10px', fontSize: 12, fontWeight: 600 }),
-  infoRow: { display: 'flex', justifyContent: 'space-between', fontSize: 13, color: 'rgba(255,255,255,.6)', marginBottom: 8 },
+  infoRow: { display: 'flex', justifyContent: 'space-between', fontSize: 13, color: 'rgba(var(--ink),.6)', marginBottom: 8 },
   stars: (r: number) => Array.from({ length: 5 }, (_, i) => i < r ? '⭐' : '☆').join(''),
   certBadge: { background: 'rgba(56,189,248,.12)', color: '#38bdf8', borderRadius: 6, padding: '2px 8px', fontSize: 11, marginRight: 4, marginBottom: 4, display: 'inline-block' },
   actRow: { display: 'flex', gap: 8, marginTop: 16 },
-  actBtn: { flex: 1, background: 'rgba(255,255,255,.06)', border: '1px solid rgba(255,255,255,.1)', color: '#fff', borderRadius: 8, padding: '8px', fontSize: 13, cursor: 'pointer' },
+  actBtn: { flex: 1, background: 'rgba(var(--ink),.06)', border: '1px solid rgba(var(--ink),.1)', color: 'var(--ink-solid, #fff)', borderRadius: 8, padding: '8px', fontSize: 13, cursor: 'pointer' },
   overlay: { position: 'fixed' as const, inset: 0, background: 'rgba(0,0,0,.6)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center' },
-  modal: { background: '#1a1a2e', border: '1px solid rgba(255,255,255,.1)', borderRadius: 16, padding: 32, width: '100%', maxWidth: 480 },
+  modal: { background: 'var(--dk-1a1a2e, #1a1a2e)', border: '1px solid rgba(var(--ink),.1)', borderRadius: 16, padding: 32, width: '100%', maxWidth: 480 },
   modalTitle: { fontSize: 18, fontWeight: 700, marginBottom: 24 },
   field: { marginBottom: 16 },
-  label: { display: 'block', fontSize: 13, color: 'rgba(255,255,255,.6)', marginBottom: 6 },
-  input: { width: '100%', background: 'rgba(255,255,255,.06)', border: '1px solid rgba(255,255,255,.1)', borderRadius: 8, padding: '10px 12px', color: '#fff', fontSize: 14, boxSizing: 'border-box' as const },
+  label: { display: 'block', fontSize: 13, color: 'rgba(var(--ink),.6)', marginBottom: 6 },
+  input: { width: '100%', background: 'rgba(var(--ink),.06)', border: '1px solid rgba(var(--ink),.1)', borderRadius: 8, padding: '10px 12px', color: 'var(--ink-solid, #fff)', fontSize: 14, boxSizing: 'border-box' as const },
   row2: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 },
   modalBtns: { display: 'flex', gap: 12, marginTop: 24 },
 };
@@ -103,11 +103,11 @@ export default function TrainersPage() {
         <div style={S.stat}><div style={S.statLabel}>Avg Rating</div><div style={{ ...S.statVal, color: '#fbbf24' }}>⭐ {avgRating}</div></div>
       </div>
 
-      {loading && <div style={{ textAlign: 'center', padding: 40, color: 'rgba(255,255,255,.4)' }}>Loading...</div>}
+      {loading && <div style={{ textAlign: 'center', padding: 40, color: 'rgba(var(--ink),.4)' }}>Loading...</div>}
 
       <div style={S.grid}>
         {!loading && trainers.length === 0 && (
-          <div style={{ ...S.card, textAlign: 'center', padding: 40, color: 'rgba(255,255,255,.25)' }}>No trainers found.</div>
+          <div style={{ ...S.card, textAlign: 'center', padding: 40, color: 'rgba(var(--ink),.25)' }}>No trainers found.</div>
         )}
         {trainers.map(t => (
           <div key={t.id} style={S.card}>
@@ -121,7 +121,7 @@ export default function TrainersPage() {
               {t.certifications.map(c => <span key={c} style={S.certBadge}>{c}</span>)}
             </div>
             <div style={{ fontSize: 18, marginBottom: 12, letterSpacing: 2 }}>{S.stars(t.rating)}</div>
-            <div style={S.infoRow}><span>👥 Active Clients</span><span style={{ color: '#fff', fontWeight: 600 }}>{t.activeClients}</span></div>
+            <div style={S.infoRow}><span>👥 Active Clients</span><span style={{ color: 'var(--ink-solid, #fff)', fontWeight: 600 }}>{t.activeClients}</span></div>
             <div style={S.infoRow}><span>💰 Monthly Salary</span><span style={{ color: '#34d399', fontWeight: 600 }}>Rs. {t.salary.toLocaleString()}</span></div>
             <div style={S.infoRow}><span>🪪 {t.trainerId}</span></div>
             <div style={S.actRow}>
@@ -144,7 +144,7 @@ export default function TrainersPage() {
             </div>
             <div style={S.modalBtns}>
               <button style={{ ...S.btn, flex: 1 }} onClick={handleAdd}>Add Trainer</button>
-              <button style={{ flex: 1, background: 'rgba(255,255,255,.06)', border: '1px solid rgba(255,255,255,.1)', color: '#fff', borderRadius: 8, padding: '10px', fontSize: 14, cursor: 'pointer' }} onClick={() => setShowModal(false)}>Cancel</button>
+              <button style={{ flex: 1, background: 'rgba(var(--ink),.06)', border: '1px solid rgba(var(--ink),.1)', color: 'var(--ink-solid, #fff)', borderRadius: 8, padding: '10px', fontSize: 14, cursor: 'pointer' }} onClick={() => setShowModal(false)}>Cancel</button>
             </div>
           </div>
         </div>

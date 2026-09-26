@@ -658,7 +658,7 @@ export default function GRNPage() {
                   {supplierId && suppliers.find((s: any) => s.id === supplierId) && (() => {
                     const s = suppliers.find((x: any) => x.id === supplierId);
                     return (
-                      <div style={{ padding: "10px 12px", background: "var(--panel-bg-2,rgba(255,255,255,0.03))", borderRadius: 8, border: `1px solid ${BORDER}` }}>
+                      <div style={{ padding: "10px 12px", background: "var(--panel-bg-2,rgba(var(--ink),0.03))", borderRadius: 8, border: `1px solid ${BORDER}` }}>
                         <div style={{ fontWeight: 700, fontSize: 14, marginBottom: 4 }}>{s.name}</div>
                         {(s.email || s.phone) && <div style={{ fontSize: 12, color: MUTED, marginBottom: 3, display: "flex", gap: 12, flexWrap: "wrap" }}>{s.email && <span>{s.email}</span>}{s.phone && <span>{s.phone}</span>}</div>}
                         {s.address && <div style={{ fontSize: 12, color: MUTED }}>{s.address}</div>}
@@ -669,7 +669,7 @@ export default function GRNPage() {
                 <div style={{ background: PANEL, border: `1px solid ${BORDER}`, borderRadius: 12, padding: 18 }}>
                   <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 12, color: TEXT }}>Your Business</div>
                   {companyInfo ? (
-                    <div style={{ padding: "10px 12px", background: "var(--panel-bg-2,rgba(255,255,255,0.03))", borderRadius: 8, border: `1px solid ${BORDER}` }}>
+                    <div style={{ padding: "10px 12px", background: "var(--panel-bg-2,rgba(var(--ink),0.03))", borderRadius: 8, border: `1px solid ${BORDER}` }}>
                       <div style={{ fontWeight: 700, fontSize: 14, marginBottom: 4 }}>{companyInfo.name}</div>
                       {companyInfo.address && <div style={{ fontSize: 12, color: MUTED, marginBottom: 3 }}>{companyInfo.address}</div>}
                       {companyInfo.phone && <div style={{ fontSize: 12, color: MUTED }}>{companyInfo.phone}</div>}
@@ -907,7 +907,7 @@ export default function GRNPage() {
             <div style={{ fontWeight: 700 }}>Supplier: {supplierName}</div>
           </div>
           <div style={{ fontSize: 9, marginBottom: 5 }}>
-            <div style={{ display: "flex", justifyContent: "space-between", fontWeight: 700, borderBottom: "1px solid #000", paddingBottom: 2, marginBottom: 3 }}>
+            <div style={{ display: "flex", justifyContent: "space-between", fontWeight: 700, borderBottom: "1px solid var(--dkb-000000, #000)", paddingBottom: 2, marginBottom: 3 }}>
               <span style={{ flex: 2 }}>Item</span>
               <span style={{ width: 24, textAlign: "right" }}>Rcv</span>
             </div>

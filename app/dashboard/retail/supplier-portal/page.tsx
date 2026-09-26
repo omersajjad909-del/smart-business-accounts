@@ -188,7 +188,7 @@ export default function SupplierPortalPage() {
         <div style={{ background: BG, border: `1px solid ${BD}`, borderRadius: 16, overflow: "hidden" }}>
           <table style={{ width: "100%", borderCollapse: "collapse" }}>
             <thead>
-              <tr style={{ background: "rgba(255,255,255,.02)" }}>
+              <tr style={{ background: "rgba(var(--ink),.02)" }}>
                 {["Supplier","Category","Email","Phone","Credit Days","Orders","Status","Actions"].map(h => (
                   <th key={h} style={{ padding: "11px 14px", fontSize: 11, fontWeight: 700, color: "var(--text-muted)", textAlign: "left", textTransform: "uppercase", letterSpacing: .5, borderBottom: `1px solid ${BD}` }}>{h}</th>
                 ))}
@@ -234,7 +234,7 @@ export default function SupplierPortalPage() {
         <div style={{ background: BG, border: `1px solid ${BD}`, borderRadius: 16, overflow: "hidden" }}>
           <table style={{ width: "100%", borderCollapse: "collapse" }}>
             <thead>
-              <tr style={{ background: "rgba(255,255,255,.02)" }}>
+              <tr style={{ background: "rgba(var(--ink),.02)" }}>
                 {["PO Ref","Supplier","Items","Amount","Expected","Date","Status","Actions"].map(h => (
                   <th key={h} style={{ padding: "11px 14px", fontSize: 11, fontWeight: 700, color: "var(--text-muted)", textAlign: "left", textTransform: "uppercase", letterSpacing: .5, borderBottom: `1px solid ${BD}` }}>{h}</th>
                 ))}
@@ -282,7 +282,7 @@ export default function SupplierPortalPage() {
       {/* Supplier modal */}
       {showSupModal && (
         <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.65)", zIndex: 50, display: "flex", alignItems: "center", justifyContent: "center" }}>
-          <div style={{ background: "var(--panel-bg,#1a1d2e)", border: `1px solid ${BD}`, borderRadius: 18, padding: 28, width: 480 }}>
+          <div style={{ background: "var(--panel-bg,var(--dk-1a1d2e, #1a1d2e))", border: `1px solid ${BD}`, borderRadius: 18, padding: 28, width: 480 }}>
             <h2 style={{ margin: "0 0 20px", fontSize: 17, fontWeight: 800 }}>{editSupId ? "Edit Supplier" : "Add Supplier"}</h2>
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
               {[
@@ -315,7 +315,7 @@ export default function SupplierPortalPage() {
       {/* Order modal */}
       {showOrdModal && (
         <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.65)", zIndex: 50, display: "flex", alignItems: "center", justifyContent: "center" }}>
-          <div style={{ background: "var(--panel-bg,#1a1d2e)", border: `1px solid ${BD}`, borderRadius: 18, padding: 28, width: 480 }}>
+          <div style={{ background: "var(--panel-bg,var(--dk-1a1d2e, #1a1d2e))", border: `1px solid ${BD}`, borderRadius: 18, padding: 28, width: 480 }}>
             <h2 style={{ margin: "0 0 20px", fontSize: 17, fontWeight: 800 }}>New Purchase Order</h2>
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
               <div style={{ gridColumn: "1 / -1" }}>

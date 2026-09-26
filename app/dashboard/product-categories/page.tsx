@@ -34,7 +34,7 @@ const ACCENT = "#14b8a6";
 const s = {
   page:  { fontFamily: FONT, color: "var(--text-primary)", padding: isMobile ? "15px 11px" : "28px 24px", minHeight: "100vh", background: "var(--app-bg)" },
   panel: { background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 14 },
-  inp:   { background: "rgba(255,255,255,.05)", border: "1px solid var(--border)", borderRadius: 8, padding: "9px 13px", color: "var(--text-primary)", fontFamily: FONT, fontSize: 13, width: "100%", boxSizing: "border-box" as const, outline: "none" },
+  inp:   { background: "rgba(var(--ink),.05)", border: "1px solid var(--border)", borderRadius: 8, padding: "9px 13px", color: "var(--text-primary)", fontFamily: FONT, fontSize: 13, width: "100%", boxSizing: "border-box" as const, outline: "none" },
   label: { fontSize: 12, color: "var(--text-muted)", display: "block", marginBottom: 5, fontWeight: 500 } as React.CSSProperties,
   btn:   (bg: string, sm?: boolean) => ({ background: bg, border: "none", borderRadius: 8, padding: sm ? "7px 14px" : "10px 22px", color: "#fff", fontFamily: FONT, cursor: "pointer", fontSize: sm ? 12 : 13, fontWeight: 600, lineHeight: 1 } as React.CSSProperties),
   badge: (m: { color: string; bg: string; border: string }) => ({ background: m.bg, color: m.color, border: `1px solid ${m.border}`, borderRadius: 20, padding: "3px 10px", fontSize: 11, fontWeight: 700, whiteSpace: "nowrap" as const, display: "inline-block" }),
@@ -168,7 +168,7 @@ export default function ProductCategoriesPage() {
       {/* Filter + Search */}
       <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap", marginBottom: 16 }}>
         {(["ALL", ...Object.keys(TYPE_META)] as const).map(t => (
-          <button key={t} onClick={() => setFilterType(t as CategoryType | "ALL")} style={{ background: filterType === t ? ACCENT : "rgba(255,255,255,.06)", border: `1px solid ${filterType === t ? ACCENT : "var(--border)"}`, borderRadius: 8, padding: "6px 14px", color: filterType === t ? "#fff" : "var(--text-muted)", fontFamily: FONT, cursor: "pointer", fontSize: 12, fontWeight: 600 }}>
+          <button key={t} onClick={() => setFilterType(t as CategoryType | "ALL")} style={{ background: filterType === t ? ACCENT : "rgba(var(--ink),.06)", border: `1px solid ${filterType === t ? ACCENT : "var(--border)"}`, borderRadius: 8, padding: "6px 14px", color: filterType === t ? "#fff" : "var(--text-muted)", fontFamily: FONT, cursor: "pointer", fontSize: 12, fontWeight: 600 }}>
             {t === "ALL" ? "All Types" : TYPE_META[t as CategoryType].label}
           </button>
         ))}
@@ -184,7 +184,7 @@ export default function ProductCategoriesPage() {
         ) : (
           <table style={{ width: "100%", borderCollapse: "collapse" }}>
             <thead>
-              <tr style={{ background: "rgba(255,255,255,.03)" }}>
+              <tr style={{ background: "rgba(var(--ink),.03)" }}>
                 <th style={s.th}>Code</th>
                 <th style={s.th}>Name</th>
                 <th style={s.th}>Type</th>

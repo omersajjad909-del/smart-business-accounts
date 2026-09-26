@@ -110,7 +110,7 @@ export default function SubscriptionsOverviewPage() {
       ];
 
   return (
-    <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", minHeight: "100vh", color: "#fff", fontFamily: saasFont }}>
+    <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", minHeight: "100vh", color: "var(--ink-solid, #fff)", fontFamily: saasFont }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 18, flexWrap: "wrap", marginBottom: 24 }}>
         <div>
           <div style={{ fontSize: 12, color: "#60a5fa", fontWeight: 800, letterSpacing: ".08em", textTransform: "uppercase", marginBottom: 8 }}>
@@ -152,10 +152,10 @@ export default function SubscriptionsOverviewPage() {
           </div>
           <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,minmax(0,1fr))", gap: 12 }}>
             {flow.map((step, index) => (
-              <div key={step.title} style={{ background: "rgba(8,12,30,.36)", border: "1px solid rgba(255,255,255,.08)", borderRadius: 16, padding: 16 }}>
+              <div key={step.title} style={{ background: "rgba(8,12,30,.36)", border: "1px solid rgba(var(--ink),.08)", borderRadius: 16, padding: 16 }}>
                 <div style={{ width: 28, height: 28, borderRadius: 999, background: "rgba(147,197,253,.16)", color: "#dbeafe", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 800, fontSize: 12, marginBottom: 12 }}>{index + 1}</div>
                 <div style={{ fontSize: 15, fontWeight: 800, marginBottom: 8 }}>{step.title}</div>
-                <div style={{ fontSize: 13, lineHeight: 1.55, color: "rgba(255,255,255,.62)" }}>{step.body}</div>
+                <div style={{ fontSize: 13, lineHeight: 1.55, color: "rgba(var(--ink),.62)" }}>{step.body}</div>
               </div>
             ))}
           </div>
@@ -171,7 +171,7 @@ export default function SubscriptionsOverviewPage() {
                 { label: "Cancelled subscribers", value: summary.cancelledSubscribers, color: "#f87171" },
                 { label: "Draft or retired plans", value: plans.filter((item) => item.status !== "active").length, color: "#fbbf24" },
               ].map((row) => (
-                <div key={row.label} style={{ display: "flex", justifyContent: "space-between", border: "1px solid rgba(255,255,255,.06)", background: "rgba(255,255,255,.03)", borderRadius: 12, padding: "10px 12px" }}>
+                <div key={row.label} style={{ display: "flex", justifyContent: "space-between", border: "1px solid rgba(var(--ink),.06)", background: "rgba(var(--ink),.03)", borderRadius: 12, padding: "10px 12px" }}>
                   <span style={{ fontSize: 13, color: saasMuted }}>{row.label}</span>
                   <span style={{ fontSize: 15, fontWeight: 800, color: row.color }}>{row.value}</span>
                 </div>
@@ -183,12 +183,12 @@ export default function SubscriptionsOverviewPage() {
             <div style={{ fontSize: 14, fontWeight: 800, marginBottom: 12 }}>Renewal Watchlist</div>
             <div style={{ display: "grid", gap: 10 }}>
               {subscribers.slice(0, 5).map((item) => (
-                <div key={item.id} style={{ border: "1px solid rgba(255,255,255,.06)", background: "rgba(255,255,255,.03)", borderRadius: 12, padding: "12px 14px" }}>
+                <div key={item.id} style={{ border: "1px solid rgba(var(--ink),.06)", background: "rgba(var(--ink),.03)", borderRadius: 12, padding: "12px 14px" }}>
                   <div style={{ fontSize: 14, fontWeight: 700 }}>{item.company}</div>
                   <div style={{ fontSize: 12, color: saasMuted, marginTop: 4 }}>{item.planName} | Renewal {item.renewalDate || "-"}</div>
                 </div>
               ))}
-              {subscribers.length === 0 && <div style={{ color: "rgba(255,255,255,.28)" }}>No subscriber records yet.</div>}
+              {subscribers.length === 0 && <div style={{ color: "rgba(var(--ink),.28)" }}>No subscriber records yet.</div>}
             </div>
           </div>
         </div>

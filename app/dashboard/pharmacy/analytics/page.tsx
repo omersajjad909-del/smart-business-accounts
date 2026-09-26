@@ -58,7 +58,7 @@ export default function PharmacyAnalyticsPage() {
   }, [sales]);
 
   return (
-    <div style={{ minHeight: "100vh", padding: isMobile ? "15px 14px" : "28px 32px", color: "#fff", fontFamily: pharmacyFont }}>
+    <div style={{ minHeight: "100vh", padding: isMobile ? "15px 14px" : "28px 32px", color: "var(--ink-solid, #fff)", fontFamily: pharmacyFont }}>
       <div style={{ marginBottom: 24 }}>
         <h1 style={{ margin: "0 0 6px", fontSize: 26, fontWeight: 800 }}>Pharmacy Analytics</h1>
         <p style={{ margin: 0, fontSize: 13, color: pharmacyMuted }}>Inventory composition, prescription demand, and sales mix.</p>
@@ -83,7 +83,7 @@ export default function PharmacyAnalyticsPage() {
           <div style={{ padding: isMobile ? "12px 10px" : "16px 18px", borderBottom: `1px solid ${pharmacyBorder}`, fontSize: 15, fontWeight: 800 }}>Category Mix</div>
           <div style={{ padding: 18, display: "grid", gap: 10 }}>
             {categoryRows.slice(0, 6).map((row) => (
-              <div key={row.category} style={{ display: "grid", gap: 4, padding: "10px 12px", borderRadius: 10, background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.05)" }}>
+              <div key={row.category} style={{ display: "grid", gap: 4, padding: "10px 12px", borderRadius: 10, background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.05)" }}>
                 <div style={{ fontSize: 14, fontWeight: 700 }}>{row.category}</div>
                 <div style={{ fontSize: 12, color: pharmacyMuted }}>Stock {row.stock} | Value Rs. {row.value.toLocaleString()}</div>
               </div>
@@ -95,12 +95,12 @@ export default function PharmacyAnalyticsPage() {
           <div style={{ padding: isMobile ? "12px 10px" : "16px 18px", borderBottom: `1px solid ${pharmacyBorder}`, fontSize: 15, fontWeight: 800 }}>Prescription Demand</div>
           <div style={{ padding: 18, display: "grid", gap: 10 }}>
             {demandRows.map((row) => (
-              <div key={row.name} style={{ display: "flex", justifyContent: "space-between", padding: "10px 12px", borderRadius: 10, background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.05)" }}>
+              <div key={row.name} style={{ display: "flex", justifyContent: "space-between", padding: "10px 12px", borderRadius: 10, background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.05)" }}>
                 <span style={{ fontSize: 13 }}>{row.name}</span>
                 <span style={{ fontSize: 14, fontWeight: 800, color: "#f59e0b" }}>{row.count}</span>
               </div>
             ))}
-            {demandRows.length === 0 && <div style={{ color: "rgba(255,255,255,.28)" }}>No prescription data available.</div>}
+            {demandRows.length === 0 && <div style={{ color: "rgba(var(--ink),.28)" }}>No prescription data available.</div>}
           </div>
         </section>
 
@@ -108,12 +108,12 @@ export default function PharmacyAnalyticsPage() {
           <div style={{ padding: isMobile ? "12px 10px" : "16px 18px", borderBottom: `1px solid ${pharmacyBorder}`, fontSize: 15, fontWeight: 800 }}>Payment Mix</div>
           <div style={{ padding: 18, display: "grid", gap: 10 }}>
             {paymentRows.map((row) => (
-              <div key={row.method} style={{ display: "flex", justifyContent: "space-between", padding: "10px 12px", borderRadius: 10, background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.05)" }}>
+              <div key={row.method} style={{ display: "flex", justifyContent: "space-between", padding: "10px 12px", borderRadius: 10, background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.05)" }}>
                 <span style={{ fontSize: 13, textTransform: "capitalize" }}>{row.method}</span>
                 <span style={{ fontSize: 14, fontWeight: 800, color: "#34d399" }}>Rs. {row.amount.toLocaleString()}</span>
               </div>
             ))}
-            {paymentRows.length === 0 && <div style={{ color: "rgba(255,255,255,.28)" }}>No counter sales recorded yet.</div>}
+            {paymentRows.length === 0 && <div style={{ color: "rgba(var(--ink),.28)" }}>No counter sales recorded yet.</div>}
           </div>
         </section>
       </div>

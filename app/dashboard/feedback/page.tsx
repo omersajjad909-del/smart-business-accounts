@@ -316,7 +316,7 @@ export default function FeedbackPage() {
               <button
                 onClick={cancelEditing}
                 style={{
-                  background: "transparent", border: "1px solid rgba(255,255,255,.18)",
+                  background: "transparent", border: "1px solid rgba(var(--ink),.18)",
                   color: "var(--text-muted)", borderRadius: "7px", padding: "5px 12px",
                   fontSize: "12px", cursor: "pointer", fontFamily: "inherit", whiteSpace: "nowrap",
                 }}

@@ -158,7 +158,7 @@ export default function ImportCenterPage() {
                 width: 34, height: 34, borderRadius: 10, flexShrink: 0,
                 display: "flex", alignItems: "center", justifyContent: "center",
                 fontSize: 14, fontWeight: 800,
-                background: done ? "rgba(34,197,94,.14)" : "rgba(255,255,255,.05)",
+                background: done ? "rgba(34,197,94,.14)" : "rgba(var(--ink),.05)",
                 border: `1px solid ${done ? "rgba(34,197,94,.3)" : "var(--border)"}`,
                 color: done ? "#22c55e" : "var(--text-muted)",
               }}>

@@ -7,8 +7,8 @@ import { useResponsive } from "@/hooks/useResponsive";
 
 function card(label: string, value: string | number, color: string, isMobile: boolean) {
   return (
-    <div style={{ background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)", borderRadius: 16, padding: isMobile ? "12px 10px" : "18px 20px" }}>
-      <div style={{ fontSize: 11, color: "rgba(255,255,255,.45)", textTransform: "uppercase", letterSpacing: ".06em", marginBottom: 6 }}>{label}</div>
+    <div style={{ background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.07)", borderRadius: 16, padding: isMobile ? "12px 10px" : "18px 20px" }}>
+      <div style={{ fontSize: 11, color: "rgba(var(--ink),.45)", textTransform: "uppercase", letterSpacing: ".06em", marginBottom: 6 }}>{label}</div>
       <div style={{ fontSize: 28, fontWeight: 800, color }}>{value}</div>
     </div>
   );
@@ -39,8 +39,8 @@ export default function UtilityAnalyticsPage() {
   return (
     <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", color: "#e2e8f0", fontFamily: "'Outfit','Inter',sans-serif" }}>
       <div style={{ marginBottom: 24 }}>
-        <h1 style={{ margin: "0 0 6px", fontSize: 24, fontWeight: 800, color: "white" }}>Utility Analytics</h1>
-        <p style={{ margin: 0, fontSize: 14, color: "rgba(255,255,255,.45)" }}>
+        <h1 style={{ margin: "0 0 6px", fontSize: 24, fontWeight: 800, color: "var(--ink-solid, white)" }}>Utility Analytics</h1>
+        <p style={{ margin: 0, fontSize: 14, color: "rgba(var(--ink),.45)" }}>
           Account base, billing pressure, and meter coverage from live operations records.
         </p>
       </div>
@@ -54,67 +54,67 @@ export default function UtilityAnalyticsPage() {
       </div>
 
       <div style={{ display: "grid", gridTemplateColumns: "1.1fr .9fr", gap: 16 }}>
-        <div style={{ background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)", borderRadius: 16, padding: 20 }}>
-          <div style={{ fontSize: 15, fontWeight: 700, color: "white", marginBottom: 14 }}>Billing Snapshot</div>
+        <div style={{ background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.07)", borderRadius: 16, padding: 20 }}>
+          <div style={{ fontSize: 15, fontWeight: 700, color: "var(--ink-solid, white)", marginBottom: 14 }}>Billing Snapshot</div>
           {billingStore.loading ? (
-            <div style={{ fontSize: 13, color: "rgba(255,255,255,.45)" }}>Loading billing...</div>
+            <div style={{ fontSize: 13, color: "rgba(var(--ink),.45)" }}>Loading billing...</div>
           ) : bills.length ? (
             <table style={{ width: "100%", borderCollapse: "collapse" }}>
               <thead>
                 <tr>
                   {["Invoice", "Account", "Month", "Amount", "Status"].map((head) => (
-                    <th key={head} style={{ textAlign: "left", padding: "0 0 10px", borderBottom: "1px solid rgba(255,255,255,.07)", fontSize: 11, color: "rgba(255,255,255,.45)", textTransform: "uppercase", letterSpacing: ".06em" }}>{head}</th>
+                    <th key={head} style={{ textAlign: "left", padding: "0 0 10px", borderBottom: "1px solid rgba(var(--ink),.07)", fontSize: 11, color: "rgba(var(--ink),.45)", textTransform: "uppercase", letterSpacing: ".06em" }}>{head}</th>
                   ))}
                 </tr>
               </thead>
               <tbody>
                 {bills.slice(0, 8).map((item) => (
                   <tr key={item.id}>
-                    <td style={{ padding: "14px 12px 14px 0", borderBottom: "1px solid rgba(255,255,255,.04)", fontSize: 13 }}>{item.invoice}</td>
-                    <td style={{ padding: "14px 12px 14px 0", borderBottom: "1px solid rgba(255,255,255,.04)", fontSize: 13 }}>{item.account || "-"}</td>
-                    <td style={{ padding: "14px 12px 14px 0", borderBottom: "1px solid rgba(255,255,255,.04)", fontSize: 13 }}>{item.billingMonth || "-"}</td>
-                    <td style={{ padding: "14px 12px 14px 0", borderBottom: "1px solid rgba(255,255,255,.04)", fontSize: 13 }}>{Number(item.amount || 0).toLocaleString()}</td>
-                    <td style={{ padding: "14px 0", borderBottom: "1px solid rgba(255,255,255,.04)", fontSize: 13 }}>{String(item.status || "-")}</td>
+                    <td style={{ padding: "14px 12px 14px 0", borderBottom: "1px solid rgba(var(--ink),.04)", fontSize: 13 }}>{item.invoice}</td>
+                    <td style={{ padding: "14px 12px 14px 0", borderBottom: "1px solid rgba(var(--ink),.04)", fontSize: 13 }}>{item.account || "-"}</td>
+                    <td style={{ padding: "14px 12px 14px 0", borderBottom: "1px solid rgba(var(--ink),.04)", fontSize: 13 }}>{item.billingMonth || "-"}</td>
+                    <td style={{ padding: "14px 12px 14px 0", borderBottom: "1px solid rgba(var(--ink),.04)", fontSize: 13 }}>{Number(item.amount || 0).toLocaleString()}</td>
+                    <td style={{ padding: "14px 0", borderBottom: "1px solid rgba(var(--ink),.04)", fontSize: 13 }}>{String(item.status || "-")}</td>
                   </tr>
                 ))}
               </tbody>
             </table>
           ) : (
-            <div style={{ fontSize: 13, color: "rgba(255,255,255,.45)" }}>No bills available yet.</div>
+            <div style={{ fontSize: 13, color: "rgba(var(--ink),.45)" }}>No bills available yet.</div>
           )}
         </div>
 
         <div style={{ display: "grid", gap: 16 }}>
-          <div style={{ background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)", borderRadius: 16, padding: 20 }}>
-            <div style={{ fontSize: 15, fontWeight: 700, color: "white", marginBottom: 12 }}>Connection Mix</div>
+          <div style={{ background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.07)", borderRadius: 16, padding: 20 }}>
+            <div style={{ fontSize: 15, fontWeight: 700, color: "var(--ink-solid, white)", marginBottom: 12 }}>Connection Mix</div>
             {connections.length ? connections.slice(0, 6).map((item) => (
-              <div key={item.id} style={{ display: "flex", justifyContent: "space-between", gap: 12, padding: "10px 0", borderBottom: "1px solid rgba(255,255,255,.05)" }}>
+              <div key={item.id} style={{ display: "flex", justifyContent: "space-between", gap: 12, padding: "10px 0", borderBottom: "1px solid rgba(var(--ink),.05)" }}>
                 <div>
                   <div style={{ fontSize: 13, fontWeight: 600 }}>{item.account}</div>
-                  <div style={{ fontSize: 12, color: "rgba(255,255,255,.45)" }}>{item.customer || "-"}</div>
+                  <div style={{ fontSize: 12, color: "rgba(var(--ink),.45)" }}>{item.customer || "-"}</div>
                 </div>
                 <div style={{ textAlign: "right" }}>
                   <div style={{ fontSize: 13 }}>{item.tariff || "-"}</div>
-                  <div style={{ fontSize: 12, color: "rgba(255,255,255,.45)" }}>{String(item.status || "-")}</div>
+                  <div style={{ fontSize: 12, color: "rgba(var(--ink),.45)" }}>{String(item.status || "-")}</div>
                 </div>
               </div>
-            )) : <div style={{ fontSize: 13, color: "rgba(255,255,255,.45)" }}>No connections available yet.</div>}
+            )) : <div style={{ fontSize: 13, color: "rgba(var(--ink),.45)" }}>No connections available yet.</div>}
           </div>
 
-          <div style={{ background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)", borderRadius: 16, padding: 20 }}>
-            <div style={{ fontSize: 15, fontWeight: 700, color: "white", marginBottom: 12 }}>Meter Coverage</div>
+          <div style={{ background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.07)", borderRadius: 16, padding: 20 }}>
+            <div style={{ fontSize: 15, fontWeight: 700, color: "var(--ink-solid, white)", marginBottom: 12 }}>Meter Coverage</div>
             {meters.length ? meters.slice(0, 6).map((item) => (
-              <div key={item.id} style={{ display: "flex", justifyContent: "space-between", gap: 12, padding: "10px 0", borderBottom: "1px solid rgba(255,255,255,.05)" }}>
+              <div key={item.id} style={{ display: "flex", justifyContent: "space-between", gap: 12, padding: "10px 0", borderBottom: "1px solid rgba(var(--ink),.05)" }}>
                 <div>
                   <div style={{ fontSize: 13, fontWeight: 600 }}>{item.meter}</div>
-                  <div style={{ fontSize: 12, color: "rgba(255,255,255,.45)" }}>{item.account || "-"}</div>
+                  <div style={{ fontSize: 12, color: "rgba(var(--ink),.45)" }}>{item.account || "-"}</div>
                 </div>
                 <div style={{ textAlign: "right" }}>
                   <div style={{ fontSize: 13 }}>{Number(item.units || 0).toLocaleString()}</div>
-                  <div style={{ fontSize: 12, color: "rgba(255,255,255,.45)" }}>{String(item.status || "-")}</div>
+                  <div style={{ fontSize: 12, color: "rgba(var(--ink),.45)" }}>{String(item.status || "-")}</div>
                 </div>
               </div>
-            )) : <div style={{ fontSize: 13, color: "rgba(255,255,255,.45)" }}>No meter readings available yet.</div>}
+            )) : <div style={{ fontSize: 13, color: "rgba(var(--ink),.45)" }}>No meter readings available yet.</div>}
           </div>
         </div>
       </div>

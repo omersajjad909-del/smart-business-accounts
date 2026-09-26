@@ -67,8 +67,8 @@ export default function TravelAnalyticsPage() {
       {/* Header */}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 20, flexWrap: "wrap", marginBottom: 28 }}>
         <div>
-          <h1 style={{ margin: "0 0 6px", fontSize: 26, fontWeight: 800, color: "#fff" }}>📊 Travel Analytics</h1>
-          <p style={{ margin: 0, fontSize: 13, color: "rgba(255,255,255,.45)" }}>Complete business performance — revenue, margin, pipeline, and supplier exposure.</p>
+          <h1 style={{ margin: "0 0 6px", fontSize: 26, fontWeight: 800, color: "var(--ink-solid, #fff)" }}>📊 Travel Analytics</h1>
+          <p style={{ margin: 0, fontSize: 13, color: "rgba(var(--ink),.45)" }}>Complete business performance — revenue, margin, pipeline, and supplier exposure.</p>
         </div>
         <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
           {moduleLinks.map(l => (
@@ -79,7 +79,7 @@ export default function TravelAnalyticsPage() {
         </div>
       </div>
 
-      {loading && <div style={{ textAlign: "center", padding: 60, color: "rgba(255,255,255,.4)" }}>Loading analytics...</div>}
+      {loading && <div style={{ textAlign: "center", padding: 60, color: "rgba(var(--ink),.4)" }}>Loading analytics...</div>}
 
       {!loading && (
         <>
@@ -95,7 +95,7 @@ export default function TravelAnalyticsPage() {
               { label: "Pending Settlements", value: summary.pendingSettlements, color: "#f87171" },
             ].map(k => (
               <div key={k.label} style={{ background: panelBg, border: `1px solid ${panelBorder}`, borderRadius: 14, padding: isMobile ? "12px 10px" : "16px 20px" }}>
-                <div style={{ fontSize: 11, color: "rgba(255,255,255,.4)", textTransform: "uppercase", letterSpacing: ".06em", marginBottom: 8 }}>{k.label}</div>
+                <div style={{ fontSize: 11, color: "rgba(var(--ink),.4)", textTransform: "uppercase", letterSpacing: ".06em", marginBottom: 8 }}>{k.label}</div>
                 <div style={{ fontSize: 22, fontWeight: 800, color: k.color }}>{k.value}</div>
               </div>
             ))}
@@ -105,21 +105,21 @@ export default function TravelAnalyticsPage() {
 
             {/* Revenue by Module */}
             <div style={{ background: panelBg, border: `1px solid ${panelBorder}`, borderRadius: 16, padding: 22 }}>
-              <div style={{ fontSize: 15, fontWeight: 700, color: "#fff", marginBottom: 18 }}>Revenue by Module</div>
+              <div style={{ fontSize: 15, fontWeight: 700, color: "var(--ink-solid, #fff)", marginBottom: 18 }}>Revenue by Module</div>
               {byModule.length === 0 ? (
-                <div style={{ fontSize: 13, color: "rgba(255,255,255,.35)", padding: "20px 0" }}>No data yet.</div>
+                <div style={{ fontSize: 13, color: "rgba(var(--ink),.35)", padding: "20px 0" }}>No data yet.</div>
               ) : byModule.map(m => {
                 const pct = summary.totalRevenue > 0 ? Math.round((m.revenue / summary.totalRevenue) * 100) : 0;
                 return (
                   <div key={m.module} style={{ marginBottom: 16 }}>
                     <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}>
                       <span style={{ fontSize: 13, color: m.color, fontWeight: 600 }}>{m.module}</span>
-                      <span style={{ fontSize: 13, color: "rgba(255,255,255,.6)" }}>Rs. {m.revenue.toLocaleString()} ({pct}%)</span>
+                      <span style={{ fontSize: 13, color: "rgba(var(--ink),.6)" }}>Rs. {m.revenue.toLocaleString()} ({pct}%)</span>
                     </div>
-                    <div style={{ height: 6, background: "rgba(255,255,255,.06)", borderRadius: 4, overflow: "hidden" }}>
+                    <div style={{ height: 6, background: "rgba(var(--ink),.06)", borderRadius: 4, overflow: "hidden" }}>
                       <div style={{ height: "100%", width: `${pct}%`, background: m.color, borderRadius: 4, transition: "width .5s" }} />
                     </div>
-                    <div style={{ fontSize: 11, color: "rgba(255,255,255,.35)", marginTop: 4 }}>{m.count} records | Margin: Rs. {(m.revenue - m.cost).toLocaleString()}</div>
+                    <div style={{ fontSize: 11, color: "rgba(var(--ink),.35)", marginTop: 4 }}>{m.count} records | Margin: Rs. {(m.revenue - m.cost).toLocaleString()}</div>
                   </div>
                 );
               })}
@@ -127,14 +127,14 @@ export default function TravelAnalyticsPage() {
 
             {/* Top Suppliers */}
             <div style={{ background: panelBg, border: `1px solid ${panelBorder}`, borderRadius: 16, padding: 22 }}>
-              <div style={{ fontSize: 15, fontWeight: 700, color: "#fff", marginBottom: 18 }}>Supplier Exposure</div>
+              <div style={{ fontSize: 15, fontWeight: 700, color: "var(--ink-solid, #fff)", marginBottom: 18 }}>Supplier Exposure</div>
               {topSuppliers.length === 0 ? (
-                <div style={{ fontSize: 13, color: "rgba(255,255,255,.35)", padding: "20px 0" }}>No settlements yet.</div>
+                <div style={{ fontSize: 13, color: "rgba(var(--ink),.35)", padding: "20px 0" }}>No settlements yet.</div>
               ) : topSuppliers.map((s, i) => (
                 <div key={s.name} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "12px 0", borderBottom: i < topSuppliers.length - 1 ? `1px solid ${panelBorder}` : "none" }}>
                   <div>
-                    <div style={{ fontSize: 14, fontWeight: 600, color: "#fff" }}>{s.name}</div>
-                    <div style={{ fontSize: 11, color: "rgba(255,255,255,.4)", marginTop: 2 }}>{s.count} settlement{s.count !== 1 ? "s" : ""}</div>
+                    <div style={{ fontSize: 14, fontWeight: 600, color: "var(--ink-solid, #fff)" }}>{s.name}</div>
+                    <div style={{ fontSize: 11, color: "rgba(var(--ink),.4)", marginTop: 2 }}>{s.count} settlement{s.count !== 1 ? "s" : ""}</div>
                   </div>
                   <div style={{ fontSize: 15, fontWeight: 700, color: "#f87171" }}>Rs. {s.exposure.toLocaleString()}</div>
                 </div>
@@ -146,10 +146,10 @@ export default function TravelAnalyticsPage() {
 
             {/* Status Breakdown */}
             <div style={{ background: panelBg, border: `1px solid ${panelBorder}`, borderRadius: 16, padding: 22 }}>
-              <div style={{ fontSize: 15, fontWeight: 700, color: "#fff", marginBottom: 18 }}>Pipeline Status</div>
+              <div style={{ fontSize: 15, fontWeight: 700, color: "var(--ink-solid, #fff)", marginBottom: 18 }}>Pipeline Status</div>
               {statusBreakdown.map(mod => (
                 <div key={mod.module} style={{ marginBottom: 18 }}>
-                  <div style={{ fontSize: 12, color: "rgba(255,255,255,.5)", fontWeight: 700, textTransform: "uppercase", letterSpacing: ".06em", marginBottom: 8 }}>{mod.module}</div>
+                  <div style={{ fontSize: 12, color: "rgba(var(--ink),.5)", fontWeight: 700, textTransform: "uppercase", letterSpacing: ".06em", marginBottom: 8 }}>{mod.module}</div>
                   <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
                     {mod.statuses.map(s => (
                       <div key={s.status} style={{ background: `${s.color}18`, border: `1px solid ${s.color}44`, borderRadius: 20, padding: "4px 12px", fontSize: 12, color: s.color, fontWeight: 700 }}>
@@ -159,19 +159,19 @@ export default function TravelAnalyticsPage() {
                   </div>
                 </div>
               ))}
-              {statusBreakdown.length === 0 && <div style={{ fontSize: 13, color: "rgba(255,255,255,.35)" }}>No records yet.</div>}
+              {statusBreakdown.length === 0 && <div style={{ fontSize: 13, color: "rgba(var(--ink),.35)" }}>No records yet.</div>}
             </div>
 
             {/* Recent Activity */}
             <div style={{ background: panelBg, border: `1px solid ${panelBorder}`, borderRadius: 16, padding: 22 }}>
-              <div style={{ fontSize: 15, fontWeight: 700, color: "#fff", marginBottom: 18 }}>Recent Activity</div>
+              <div style={{ fontSize: 15, fontWeight: 700, color: "var(--ink-solid, #fff)", marginBottom: 18 }}>Recent Activity</div>
               {recentActivity.length === 0 ? (
-                <div style={{ fontSize: 13, color: "rgba(255,255,255,.35)" }}>No recent activity.</div>
+                <div style={{ fontSize: 13, color: "rgba(var(--ink),.35)" }}>No recent activity.</div>
               ) : recentActivity.map(a => (
                 <div key={a.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "10px 0", borderBottom: `1px solid ${panelBorder}` }}>
                   <div>
-                    <div style={{ fontSize: 13, fontWeight: 600, color: "#fff" }}>{a.ref}</div>
-                    <div style={{ fontSize: 11, color: "rgba(255,255,255,.4)", marginTop: 2 }}>{a.type} | {a.customer}</div>
+                    <div style={{ fontSize: 13, fontWeight: 600, color: "var(--ink-solid, #fff)" }}>{a.ref}</div>
+                    <div style={{ fontSize: 11, color: "rgba(var(--ink),.4)", marginTop: 2 }}>{a.type} | {a.customer}</div>
                   </div>
                   <div style={{ textAlign: "right" }}>
                     <div style={{ fontSize: 13, fontWeight: 700, color: "#34d399" }}>Rs. {a.amount.toLocaleString()}</div>

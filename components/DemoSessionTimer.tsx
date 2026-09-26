@@ -124,8 +124,8 @@ export default function DemoSessionTimer() {
           title="Delete everything in this demo workspace and start fresh, without ending the session"
           style={{
             padding: "7px 10px", borderRadius: 10,
-            background: "rgba(255,255,255,.08)", border: "1px solid rgba(255,255,255,.12)",
-            color: "white", cursor: ending || clearing ? "not-allowed" : "pointer",
+            background: "rgba(var(--ink),.08)", border: "1px solid rgba(var(--ink),.12)",
+            color: "var(--ink-solid, white)", cursor: ending || clearing ? "not-allowed" : "pointer",
             fontSize: 11, fontWeight: 700, fontFamily: FONT, whiteSpace: "nowrap",
           }}
         >
@@ -136,8 +136,8 @@ export default function DemoSessionTimer() {
           disabled={ending || clearing}
           style={{
             padding: "7px 12px", borderRadius: 10,
-            background: "rgba(255,255,255,.08)", border: "1px solid rgba(255,255,255,.12)",
-            color: "white", cursor: ending || clearing ? "not-allowed" : "pointer",
+            background: "rgba(var(--ink),.08)", border: "1px solid rgba(var(--ink),.12)",
+            color: "var(--ink-solid, white)", cursor: ending || clearing ? "not-allowed" : "pointer",
             fontSize: 11, fontWeight: 700, fontFamily: FONT,
           }}
         >
@@ -157,13 +157,13 @@ export default function DemoSessionTimer() {
           <div
             onClick={e => e.stopPropagation()}
             style={{
-              maxWidth: 400, width: "100%", background: "linear-gradient(160deg,#0b0e28,#0a0d24)",
-              border: "1px solid rgba(251,191,36,.3)", borderRadius: 20, padding: 24, color: "white",
+              maxWidth: 400, width: "100%", background: "linear-gradient(160deg,var(--dk-0b0e28, #0b0e28),var(--dk-0a0d24, #0a0d24))",
+              border: "1px solid rgba(251,191,36,.3)", borderRadius: 20, padding: 24, color: "var(--ink-solid, white)",
             }}
           >
             <div style={{ fontSize: 34, marginBottom: 12 }}>🧹</div>
             <div style={{ fontSize: 18, fontWeight: 900, marginBottom: 8 }}>Clear this workspace?</div>
-            <div style={{ fontSize: 13, color: "rgba(255,255,255,.6)", lineHeight: 1.7, marginBottom: 20 }}>
+            <div style={{ fontSize: 13, color: "rgba(var(--ink),.6)", lineHeight: 1.7, marginBottom: 20 }}>
               Everything in this demo goes — the sample data and anything you have entered.
               You stay signed in on an empty workspace, with the time you have left unchanged.
               This cannot be undone.
@@ -189,8 +189,8 @@ export default function DemoSessionTimer() {
                 disabled={clearing}
                 style={{
                   padding: "11px 18px", borderRadius: 12,
-                  background: "rgba(255,255,255,.06)", border: "1px solid rgba(255,255,255,.14)",
-                  color: "white", fontSize: 13.5, fontWeight: 700, fontFamily: FONT,
+                  background: "rgba(var(--ink),.06)", border: "1px solid rgba(var(--ink),.14)",
+                  color: "var(--ink-solid, white)", fontSize: 13.5, fontWeight: 700, fontFamily: FONT,
                   cursor: clearing ? "not-allowed" : "pointer",
                 }}
               >
@@ -213,13 +213,13 @@ export default function DemoSessionTimer() {
           <div
             onClick={e => e.stopPropagation()}
             style={{
-              maxWidth: 400, width: "100%", background: "linear-gradient(160deg,#0b0e28,#0a0d24)",
-              border: "1px solid rgba(239,68,68,.3)", borderRadius: 20, padding: 24, color: "white",
+              maxWidth: 400, width: "100%", background: "linear-gradient(160deg,var(--dk-0b0e28, #0b0e28),var(--dk-0a0d24, #0a0d24))",
+              border: "1px solid rgba(239,68,68,.3)", borderRadius: 20, padding: 24, color: "var(--ink-solid, white)",
             }}
           >
             <div style={{ fontSize: 34, marginBottom: 12 }}>⚠️</div>
             <div style={{ fontSize: 18, fontWeight: 900, marginBottom: 8 }}>End demo session?</div>
-            <div style={{ fontSize: 13, color: "rgba(255,255,255,.6)", lineHeight: 1.7, marginBottom: 20 }}>
+            <div style={{ fontSize: 13, color: "rgba(var(--ink),.6)", lineHeight: 1.7, marginBottom: 20 }}>
               This will log you out and delete all data you created in this demo. This cannot be undone.
             </div>
             <div style={{ display: "flex", gap: 10 }}>
@@ -228,8 +228,8 @@ export default function DemoSessionTimer() {
                 disabled={ending}
                 style={{
                   flex: 1, padding: "12px 16px", borderRadius: 12,
-                  background: "rgba(255,255,255,.06)", border: "1px solid rgba(255,255,255,.1)",
-                  color: "white", cursor: "pointer", fontSize: 13, fontWeight: 700, fontFamily: FONT,
+                  background: "rgba(var(--ink),.06)", border: "1px solid rgba(var(--ink),.1)",
+                  color: "var(--ink-solid, white)", cursor: "pointer", fontSize: 13, fontWeight: 700, fontFamily: FONT,
                 }}
               >
                 Keep going

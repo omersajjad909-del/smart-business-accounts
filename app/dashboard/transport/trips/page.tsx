@@ -48,11 +48,11 @@ export default function TripsPage() {
   };
 
   const card = { background: transportBg, border: `1px solid ${transportBorder}`, borderRadius: 12, padding: 20 };
-  const inp = { background: "rgba(255,255,255,.05)", border: `1px solid ${transportBorder}`, borderRadius: 8, padding: "10px 14px", color: "#fff", fontFamily: transportFont, width: "100%", boxSizing: "border-box" as const, fontSize: 14 };
+  const inp = { background: "rgba(var(--ink),.05)", border: `1px solid ${transportBorder}`, borderRadius: 8, padding: "10px 14px", color: "var(--ink-solid, #fff)", fontFamily: transportFont, width: "100%", boxSizing: "border-box" as const, fontSize: 14 };
   const btn = (c: string) => ({ background: c, border: "none", borderRadius: 8, padding: "10px 20px", color: "#fff", fontFamily: transportFont, cursor: "pointer", fontSize: 14, fontWeight: 600 });
 
   return (
-    <div style={{ fontFamily: transportFont, color: "#fff", padding: isMobile ? "12px" : "24px", minHeight: "100vh" }}>
+    <div style={{ fontFamily: transportFont, color: "var(--ink-solid, #fff)", padding: isMobile ? "12px" : "24px", minHeight: "100vh" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24 }}>
         <div>
           <h1 style={{ margin: 0, fontSize: 24, fontWeight: 700 }}>Trip Management</h1>
@@ -84,7 +84,7 @@ export default function TripsPage() {
       {loading && <div style={{ textAlign: "center", padding: 40, color: transportMuted }}>Loading...</div>}
 
       <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-        {!loading && filtered.length === 0 && <div style={{ ...card, textAlign: "center", padding: 40, color: "rgba(255,255,255,.25)" }}>No trips found.</div>}
+        {!loading && filtered.length === 0 && <div style={{ ...card, textAlign: "center", padding: 40, color: "rgba(var(--ink),.25)" }}>No trips found.</div>}
         {filtered.map((t) => {
           const profit = t.fare - t.expenses;
           return (
@@ -95,14 +95,14 @@ export default function TripsPage() {
                     <span style={{ fontWeight: 700, fontSize: 16 }}>{t.tripNo}</span>
                     <span style={{ background: `${statusColor[t.status]}22`, color: statusColor[t.status], border: `1px solid ${statusColor[t.status]}44`, borderRadius: 20, padding: "3px 10px", fontSize: 12, fontWeight: 600 }}>{statusLabel[t.status]}</span>
                   </div>
-                  <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10, background: "rgba(255,255,255,.04)", borderRadius: 8, padding: "10px 14px" }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10, background: "rgba(var(--ink),.04)", borderRadius: 8, padding: "10px 14px" }}>
                     <div style={{ fontWeight: 700, fontSize: 15 }}>{t.from}</div>
-                    <div style={{ flex: 1, borderTop: "2px dashed rgba(255,255,255,.2)", position: "relative" }}>
-                      <span style={{ position: "absolute", top: -10, left: "50%", transform: "translateX(-50%)", fontSize: 11, color: "rgba(255,255,255,.4)", whiteSpace: "nowrap" }}>{t.distance} km</span>
+                    <div style={{ flex: 1, borderTop: "2px dashed rgba(var(--ink),.2)", position: "relative" }}>
+                      <span style={{ position: "absolute", top: -10, left: "50%", transform: "translateX(-50%)", fontSize: 11, color: "rgba(var(--ink),.4)", whiteSpace: "nowrap" }}>{t.distance} km</span>
                     </div>
                     <div style={{ fontWeight: 700, fontSize: 15 }}>{t.to}</div>
                   </div>
-                  <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 8, fontSize: 13, color: "rgba(255,255,255,.6)" }}>
+                  <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 8, fontSize: 13, color: "rgba(var(--ink),.6)" }}>
                     <div>Vehicle: {t.vehicle}</div>
                     <div>Driver: {t.driver}</div>
                     <div>Cargo: {t.cargo} ({t.weight} kg)</div>
@@ -124,7 +124,7 @@ export default function TripsPage() {
 
       {showModal && (
         <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.7)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000 }}>
-          <div style={{ background: "#1a1a2e", border: `1px solid ${transportBorder}`, borderRadius: 16, padding: 28, width: 560, maxHeight: "90vh", overflowY: "auto" }}>
+          <div style={{ background: "var(--dk-1a1a2e, #1a1a2e)", border: `1px solid ${transportBorder}`, borderRadius: 16, padding: 28, width: 560, maxHeight: "90vh", overflowY: "auto" }}>
             <h2 style={{ margin: "0 0 20px", fontSize: 18 }}>Create Trip</h2>
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
               {[["Trip No", "tripNo"], ["Vehicle", "vehicle"], ["Driver", "driver"], ["From", "from"], ["To", "to"], ["Cargo", "cargo"], ["Weight (kg)", "weight"], ["Client", "client"], ["Date", "date"], ["Start Time", "startTime"], ["Distance (km)", "distance"], ["Fare (Rs.)", "fare"], ["Expenses (Rs.)", "expenses"]].map(([lbl, key]) => (

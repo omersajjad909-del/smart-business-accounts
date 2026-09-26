@@ -71,8 +71,8 @@ const ALL_ROLES = Object.keys(ROLE_META);
 function roleMeta(r: string) { return ROLE_META[r] || { color: "#94a3b8", bg: "rgba(148,163,184,.1)", border: "rgba(148,163,184,.2)", desc: "" }; }
 
 const inp: React.CSSProperties = {
-  background: "rgba(255,255,255,.04)", border: "1.5px solid rgba(255,255,255,.1)", borderRadius: 9,
-  padding: "9px 13px", color: "white", fontFamily: ff, fontSize: 13,
+  background: "rgba(var(--ink),.04)", border: "1.5px solid rgba(var(--ink),.1)", borderRadius: 9,
+  padding: "9px 13px", color: "var(--ink-solid, white)", fontFamily: ff, fontSize: 13,
   outline: "none", width: "100%", boxSizing: "border-box",
 };
 const lbl: React.CSSProperties = { fontSize: 11, fontWeight: 700, color: "#475569", textTransform: "uppercase", letterSpacing: ".06em", display: "block", marginBottom: 6 };
@@ -370,11 +370,11 @@ export default function TeamAndPermissionsPage() {
 
   /* ════════════════ RENDER ════════════════ */
   return (
-    <div style={{ padding: "24px 28px 60px", maxWidth: 1120, fontFamily: ff, color: "white" }}>
+    <div style={{ padding: "24px 28px 60px", maxWidth: 1120, fontFamily: ff, color: "var(--ink-solid, white)" }}>
       <style>{`
-        select option { background: #0f172a; color: white; }
+        select option { background: var(--dk-0f172a, #0f172a); color: white; }
         * { box-sizing: border-box; }
-        ::-webkit-scrollbar { width: 5px; } ::-webkit-scrollbar-track { background: transparent; } ::-webkit-scrollbar-thumb { background: rgba(255,255,255,.1); border-radius: 8px; }
+        ::-webkit-scrollbar { width: 5px; } ::-webkit-scrollbar-track { background: transparent; } ::-webkit-scrollbar-thumb { background: rgba(var(--ink),.1); border-radius: 8px; }
       `}</style>
 
       {/* ── Header ── */}
@@ -402,7 +402,7 @@ export default function TeamAndPermissionsPage() {
           { label: "Admins",        value: adminCount,   color: "#f87171" },
           { label: "Shifts Active", value: shiftOnCount, color: "#f59e0b" },
         ].map(s => (
-          <div key={s.label} style={{ padding: isMobile ? "12px 10px" : "14px 18px", borderRadius: 14, background: "rgba(255,255,255,.03)", border: `1px solid ${s.color}20` }}>
+          <div key={s.label} style={{ padding: isMobile ? "12px 10px" : "14px 18px", borderRadius: 14, background: "rgba(var(--ink),.03)", border: `1px solid ${s.color}20` }}>
             <div style={{ fontSize: 26, fontWeight: 900, color: s.color, lineHeight: 1 }}>{s.value}</div>
             <div style={{ fontSize: 11, color: "#475569", fontWeight: 700, marginTop: 4 }}>{s.label}</div>
           </div>
@@ -410,7 +410,7 @@ export default function TeamAndPermissionsPage() {
       </div>
 
       {/* ── Tabs ── */}
-      <div style={{ display: "flex", gap: 0, marginBottom: 24, background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)", borderRadius: 12, padding: 4, width: "fit-content", flexWrap: "wrap" }}>
+      <div style={{ display: "flex", gap: 0, marginBottom: 24, background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.07)", borderRadius: 12, padding: 4, width: "fit-content", flexWrap: "wrap" }}>
         {([
           { key: "team",        label: "👥 Team Members" },
           { key: "invite",      label: "✉️ Invite" },
@@ -430,17 +430,17 @@ export default function TeamAndPermissionsPage() {
 
       {/* ══════════════ TAB: TEAM ══════════════ */}
       {tab === "team" && (
-        <div style={{ background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)", borderRadius: 16, overflow: "hidden" }}>
+        <div style={{ background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.07)", borderRadius: 16, overflow: "hidden" }}>
           {users.length === 0 ? (
             <div style={{ padding: "56px 0", textAlign: "center", color: "#334155" }}>
               <div style={{ fontSize: 40, marginBottom: 12 }}>👥</div>
-              <div style={{ fontSize: 15, fontWeight: 700, color: "white", marginBottom: 6 }}>No team members yet</div>
+              <div style={{ fontSize: 15, fontWeight: 700, color: "var(--ink-solid, white)", marginBottom: 6 }}>No team members yet</div>
               <div style={{ fontSize: 13 }}>Add your first user or send an invitation</div>
             </div>
           ) : (
             <table style={{ width: "100%", borderCollapse: "collapse" }}>
               <thead>
-                <tr style={{ borderBottom: "1px solid rgba(255,255,255,.06)" }}>
+                <tr style={{ borderBottom: "1px solid rgba(var(--ink),.06)" }}>
                   {["Member","Email","Role","Branch Access","Status","Actions"].map(h => (
                     <th key={h} style={{ padding: "11px 16px", fontSize: 10, fontWeight: 800, color: "#334155", textTransform: "uppercase", letterSpacing: ".08em", textAlign: "left" }}>{h}</th>
                   ))}
@@ -451,7 +451,7 @@ export default function TeamAndPermissionsPage() {
                   const rm = roleMeta(u.role);
                   const assignedBranches = (branchMap[u.id] || []).map(bid => branches.find(b => b.id === bid)?.name).filter(Boolean);
                   return (
-                    <tr key={u.id} style={{ borderBottom: i < users.length - 1 ? "1px solid rgba(255,255,255,.04)" : "none", transition: "background .12s" }}
+                    <tr key={u.id} style={{ borderBottom: i < users.length - 1 ? "1px solid rgba(var(--ink),.04)" : "none", transition: "background .12s" }}
                       onMouseEnter={e => (e.currentTarget.style.background = "rgba(255,255,255,.02)")}
                       onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
                       <td style={{ padding: "13px 16px" }}>
@@ -494,7 +494,7 @@ export default function TeamAndPermissionsPage() {
       {/* ══════════════ TAB: INVITE ══════════════ */}
       {tab === "invite" && (
         <div style={{ maxWidth: 680 }}>
-          <div style={{ background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)", borderRadius: 18, padding: "28px" }}>
+          <div style={{ background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.07)", borderRadius: 18, padding: "28px" }}>
             <div style={{ fontSize: 15, fontWeight: 800, marginBottom: 20 }}>Send Email Invitation</div>
             <form onSubmit={sendInvite}>
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14, marginBottom: 16 }}>
@@ -513,7 +513,7 @@ export default function TeamAndPermissionsPage() {
                   {ALL_ROLES.map(r => {
                     const rm = roleMeta(r); const active = invRole === r;
                     return (
-                      <label key={r} onClick={() => setInvRole(r)} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", borderRadius: 9, border: `1.5px solid ${active ? rm.border : "rgba(255,255,255,.07)"}`, background: active ? rm.bg : "rgba(255,255,255,.02)", cursor: "pointer", transition: "all .12s" }}>
+                      <label key={r} onClick={() => setInvRole(r)} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", borderRadius: 9, border: `1.5px solid ${active ? rm.border : "rgba(var(--ink),.07)"}`, background: active ? rm.bg : "rgba(var(--ink),.02)", cursor: "pointer", transition: "all .12s" }}>
                         <div style={{ width: 8, height: 8, borderRadius: "50%", background: rm.color, flexShrink: 0 }} />
                         <span style={{ fontSize: 12, fontWeight: active ? 700 : 400, color: active ? rm.color : "#475569" }}>{r.replace(/_/g, " ")}</span>
                       </label>
@@ -538,8 +538,8 @@ export default function TeamAndPermissionsPage() {
                       const checked = invBranches.includes(b.id);
                       return (
                         <label key={b.id} onClick={() => setInvBranches(p => p.includes(b.id) ? p.filter(x => x !== b.id) : [...p, b.id])}
-                          style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", borderRadius: 9, border: `1px solid ${checked ? "rgba(99,102,241,.35)" : "rgba(255,255,255,.07)"}`, background: checked ? "rgba(99,102,241,.07)" : "rgba(255,255,255,.02)", cursor: "pointer", transition: "all .12s" }}>
-                          <div style={{ width: 16, height: 16, borderRadius: 4, border: `2px solid ${checked ? "#6366f1" : "rgba(255,255,255,.15)"}`, background: checked ? "#6366f1" : "transparent", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                          style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", borderRadius: 9, border: `1px solid ${checked ? "rgba(99,102,241,.35)" : "rgba(var(--ink),.07)"}`, background: checked ? "rgba(99,102,241,.07)" : "rgba(var(--ink),.02)", cursor: "pointer", transition: "all .12s" }}>
+                          <div style={{ width: 16, height: 16, borderRadius: 4, border: `2px solid ${checked ? "#6366f1" : "rgba(var(--ink),.15)"}`, background: checked ? "#6366f1" : "transparent", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                             {checked && <svg width="9" height="9" viewBox="0 0 12 10" fill="none"><path d="M1 5.5L4.5 9 11 1" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>}
                           </div>
                           <div>
@@ -554,7 +554,7 @@ export default function TeamAndPermissionsPage() {
                 </div>
               )}
               {/* ── Also add as Employee (opt-in) ── */}
-              <div style={{ marginBottom: 16, padding: isMobile ? "12px 10px" : "14px 16px", borderRadius: 10, background: invAddEmployee ? "rgba(34,197,94,.06)" : "rgba(255,255,255,.02)", border: `1px solid ${invAddEmployee ? "rgba(34,197,94,.28)" : "rgba(255,255,255,.07)"}`, transition: "all .15s" }}>
+              <div style={{ marginBottom: 16, padding: isMobile ? "12px 10px" : "14px 16px", borderRadius: 10, background: invAddEmployee ? "rgba(34,197,94,.06)" : "rgba(var(--ink),.02)", border: `1px solid ${invAddEmployee ? "rgba(34,197,94,.28)" : "rgba(var(--ink),.07)"}`, transition: "all .15s" }}>
                 <label style={{ display: "flex", alignItems: "flex-start", gap: 10, cursor: "pointer" }}>
                   <input
                     type="checkbox"
@@ -563,7 +563,7 @@ export default function TeamAndPermissionsPage() {
                     style={{ marginTop: 3, width: 16, height: 16, accentColor: "#22c55e", cursor: "pointer" }}
                   />
                   <div style={{ flex: 1 }}>
-                    <div style={{ fontSize: 13, fontWeight: 700, color: "white", marginBottom: 2 }}>
+                    <div style={{ fontSize: 13, fontWeight: 700, color: "var(--ink-solid, white)", marginBottom: 2 }}>
                       🧑‍💼 Also add to Employees list
                     </div>
                     <div style={{ fontSize: 11.5, color: "#475569", lineHeight: 1.5 }}>
@@ -573,7 +573,7 @@ export default function TeamAndPermissionsPage() {
                 </label>
 
                 {invAddEmployee && (
-                  <div style={{ marginTop: 14, paddingTop: 14, borderTop: "1px dashed rgba(255,255,255,.08)", display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+                  <div style={{ marginTop: 14, paddingTop: 14, borderTop: "1px dashed rgba(var(--ink),.08)", display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
                     <div>
                       <label style={lbl}>Department <span style={{ color: "#f87171" }}>*</span></label>
                       <input
@@ -633,7 +633,7 @@ export default function TeamAndPermissionsPage() {
               </button>
             </form>
           </div>
-          <div style={{ marginTop: 12, padding: isMobile ? "12px 10px" : "14px 18px", borderRadius: 12, background: "rgba(255,255,255,.02)", border: "1px solid rgba(255,255,255,.06)", display: "flex", gap: 12, alignItems: "flex-start" }}>
+          <div style={{ marginTop: 12, padding: isMobile ? "12px 10px" : "14px 18px", borderRadius: 12, background: "rgba(var(--ink),.02)", border: "1px solid rgba(var(--ink),.06)", display: "flex", gap: 12, alignItems: "flex-start" }}>
             <span style={{ fontSize: 16, flexShrink: 0 }}>ℹ️</span>
             <div style={{ fontSize: 12, color: "#475569", lineHeight: 1.7 }}>
               Invited member will receive an email with a link to set their password and join your workspace. You can change their role anytime from the <strong style={{ color: "#818cf8" }}>Team Members</strong> tab.
@@ -646,7 +646,7 @@ export default function TeamAndPermissionsPage() {
       {tab === "permissions" && (
         <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "220px 1fr", gap: 16, alignItems: "start" }}>
           {/* Role sidebar */}
-          <div style={{ background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)", borderRadius: 14, padding: "14px 10px", position: "sticky", top: 16 }}>
+          <div style={{ background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.07)", borderRadius: 14, padding: "14px 10px", position: "sticky", top: 16 }}>
             <div style={{ fontSize: 10, fontWeight: 800, color: "#334155", letterSpacing: ".1em", textTransform: "uppercase", marginBottom: 10, paddingLeft: 8 }}>Roles</div>
             {ALL_ROLES.map(r => {
               const rm = roleMeta(r); const found = roles.find(x => x.role === r); const count = found?.permissions?.length || 0; const active = selRole === r;
@@ -663,7 +663,7 @@ export default function TeamAndPermissionsPage() {
           </div>
 
           {/* Permissions panel */}
-          <div style={{ background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)", borderRadius: 14, padding: isMobile ? "12px 10px" : "20px 22px" }}>
+          <div style={{ background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.07)", borderRadius: 14, padding: isMobile ? "12px 10px" : "20px 22px" }}>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 18, flexWrap: "wrap", gap: 10 }}>
               <div>
                 <div style={{ fontSize: 16, fontWeight: 800, color: roleMeta(selRole).color }}>{selRole.replace(/_/g, " ")}</div>
@@ -688,8 +688,8 @@ export default function TeamAndPermissionsPage() {
                   {perms.map(perm => {
                     const on = rolePerms.includes(perm);
                     return (
-                      <label key={perm} onClick={() => setRolePerms(p => p.includes(perm) ? p.filter(x => x !== perm) : [...p, perm])} style={{ display: "flex", alignItems: "center", gap: 10, padding: "8px 12px", borderRadius: 8, border: `1px solid ${on ? "rgba(99,102,241,.3)" : "rgba(255,255,255,.06)"}`, background: on ? "rgba(99,102,241,.07)" : "rgba(255,255,255,.01)", cursor: "pointer", transition: "all .1s" }}>
-                        <div style={{ width: 16, height: 16, borderRadius: 4, border: `2px solid ${on ? "#6366f1" : "rgba(255,255,255,.15)"}`, background: on ? "#6366f1" : "transparent", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                      <label key={perm} onClick={() => setRolePerms(p => p.includes(perm) ? p.filter(x => x !== perm) : [...p, perm])} style={{ display: "flex", alignItems: "center", gap: 10, padding: "8px 12px", borderRadius: 8, border: `1px solid ${on ? "rgba(99,102,241,.3)" : "rgba(var(--ink),.06)"}`, background: on ? "rgba(99,102,241,.07)" : "rgba(var(--ink),.01)", cursor: "pointer", transition: "all .1s" }}>
+                        <div style={{ width: 16, height: 16, borderRadius: 4, border: `2px solid ${on ? "#6366f1" : "rgba(var(--ink),.15)"}`, background: on ? "#6366f1" : "transparent", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                           {on && <svg width="9" height="9" viewBox="0 0 12 10" fill="none"><path d="M1 5.5L4.5 9 11 1" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>}
                         </div>
                         <span style={{ fontSize: 11, fontWeight: 600, color: on ? "white" : "#475569" }}>{perm}</span>
@@ -731,7 +731,7 @@ export default function TeamAndPermissionsPage() {
                 const rm = roleMeta(u.role);
 
                 return (
-                  <div key={u.id} style={{ background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)", borderRadius: 14, overflow: "hidden" }}>
+                  <div key={u.id} style={{ background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.07)", borderRadius: 14, overflow: "hidden" }}>
                     {/* Card header */}
                     <div onClick={() => setShiftExpanded(isOpen ? null : u.id)} style={{ display: "flex", alignItems: "center", gap: 14, padding: isMobile ? "12px 10px" : "14px 18px", cursor: "pointer", background: isOpen ? "rgba(99,102,241,.05)" : "transparent", transition: "background .12s" }}>
                       <div style={{ width: 38, height: 38, borderRadius: "50%", background: rm.bg, border: `1px solid ${rm.border}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, fontWeight: 800, color: rm.color, flexShrink: 0, overflow: "hidden" }}>
@@ -746,7 +746,7 @@ export default function TeamAndPermissionsPage() {
                       <div style={{ display: "flex", gap: 8, alignItems: "center", flexShrink: 0 }}>
                         {hasShift
                           ? <span style={{ background: "rgba(16,185,129,.14)", color: "#10b981", border: "1px solid rgba(16,185,129,.28)", padding: "3px 10px", borderRadius: 20, fontSize: 11, fontWeight: 700 }}>SHIFT ON</span>
-                          : <span style={{ background: "rgba(148,163,184,.1)", color: "#475569", border: "1px solid rgba(255,255,255,.08)", padding: "3px 10px", borderRadius: 20, fontSize: 11, fontWeight: 700 }}>NO SHIFT</span>
+                          : <span style={{ background: "rgba(148,163,184,.1)", color: "#475569", border: "1px solid rgba(var(--ink),.08)", padding: "3px 10px", borderRadius: 20, fontSize: 11, fontWeight: 700 }}>NO SHIFT</span>
                         }
                         {ot > 0 && <span style={{ background: "rgba(245,158,11,.14)", color: "#f59e0b", border: "1px solid rgba(245,158,11,.28)", padding: "3px 10px", borderRadius: 20, fontSize: 11, fontWeight: 700 }}>+{ot}m OT</span>}
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#475569" strokeWidth="2" style={{ transform: isOpen ? "rotate(180deg)" : "none", transition: "transform .2s" }}><polyline points="6 9 12 15 18 9"/></svg>
@@ -755,10 +755,10 @@ export default function TeamAndPermissionsPage() {
 
                     {/* Expanded body */}
                     {isOpen && (
-                      <div style={{ padding: "0 18px 18px", borderTop: "1px solid rgba(255,255,255,.06)" }}>
+                      <div style={{ padding: "0 18px 18px", borderTop: "1px solid rgba(var(--ink),.06)" }}>
 
                         {/* Enable toggle */}
-                        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "14px 0", borderBottom: "1px solid rgba(255,255,255,.05)" }}>
+                        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "14px 0", borderBottom: "1px solid rgba(var(--ink),.05)" }}>
                           <div>
                             <div style={{ fontWeight: 700, fontSize: 13 }}>Enable Shift Control</div>
                             <div style={{ fontSize: 11, color: "#475569", marginTop: 2 }}>Block login outside scheduled hours</div>
@@ -777,7 +777,7 @@ export default function TeamAndPermissionsPage() {
                                 {ALL_DAYS.map(day => {
                                   const active = draft.days.includes(day);
                                   return (
-                                    <button key={day} onClick={() => toggleShiftDay(u.id, day)} style={{ padding: "5px 13px", borderRadius: 7, border: `1.5px solid ${active ? "#6366f1" : "rgba(255,255,255,.1)"}`, background: active ? "rgba(99,102,241,.15)" : "transparent", color: active ? "#818cf8" : "#475569", fontWeight: 700, fontSize: 12, cursor: "pointer", transition: "all .12s" }}>
+                                    <button key={day} onClick={() => toggleShiftDay(u.id, day)} style={{ padding: "5px 13px", borderRadius: 7, border: `1.5px solid ${active ? "#6366f1" : "rgba(var(--ink),.1)"}`, background: active ? "rgba(99,102,241,.15)" : "transparent", color: active ? "#818cf8" : "#475569", fontWeight: 700, fontSize: 12, cursor: "pointer", transition: "all .12s" }}>
                                       {day}
                                     </button>
                                   );
@@ -875,13 +875,13 @@ export default function TeamAndPermissionsPage() {
       {modal && (
         <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.6)", backdropFilter: "blur(5px)", zIndex: 1000, display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}
           onClick={e => { if (e.target === e.currentTarget) setModal(false); }}>
-          <div style={{ background: "#0f172a", border: "1px solid rgba(255,255,255,.1)", borderRadius: 20, width: "100%", maxWidth: 560, maxHeight: "90vh", overflowY: "auto", boxShadow: "0 40px 100px rgba(0,0,0,.5)" }}>
-            <div style={{ padding: isMobile ? "12px 11px" : "20px 24px", borderBottom: "1px solid rgba(255,255,255,.07)", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+          <div style={{ background: "var(--dk-0f172a, #0f172a)", border: "1px solid rgba(var(--ink),.1)", borderRadius: 20, width: "100%", maxWidth: 560, maxHeight: "90vh", overflowY: "auto", boxShadow: "0 40px 100px rgba(0,0,0,.5)" }}>
+            <div style={{ padding: isMobile ? "12px 11px" : "20px 24px", borderBottom: "1px solid rgba(var(--ink),.07)", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
               <div>
                 <div style={{ fontSize: 17, fontWeight: 900 }}>{editing ? "✏️ Edit User" : "➕ Add New User"}</div>
                 <div style={{ fontSize: 12, color: "#475569", marginTop: 2 }}>{editing ? "Update user details and branch access" : "Create a new team member account"}</div>
               </div>
-              <button onClick={() => setModal(false)} style={{ width: 30, height: 30, borderRadius: "50%", border: "1px solid rgba(255,255,255,.1)", background: "rgba(255,255,255,.05)", color: "#475569", cursor: "pointer", fontSize: 16, display: "flex", alignItems: "center", justifyContent: "center", fontFamily: ff }}>×</button>
+              <button onClick={() => setModal(false)} style={{ width: 30, height: 30, borderRadius: "50%", border: "1px solid rgba(var(--ink),.1)", background: "rgba(var(--ink),.05)", color: "#475569", cursor: "pointer", fontSize: 16, display: "flex", alignItems: "center", justifyContent: "center", fontFamily: ff }}>×</button>
             </div>
 
             <form onSubmit={saveUser} style={{ padding: isMobile ? "12px 11px" : "22px 24px", display: "flex", flexDirection: "column", gap: 16 }}>
@@ -951,8 +951,8 @@ export default function TeamAndPermissionsPage() {
                     {branches.map(b => {
                       const checked = selBr.includes(b.id);
                       return (
-                        <label key={b.id} onClick={() => setSelBr(p => p.includes(b.id) ? p.filter(x => x !== b.id) : [...p, b.id])} style={{ display: "flex", alignItems: "center", gap: 10, padding: "9px 13px", borderRadius: 9, border: `1px solid ${checked ? "rgba(99,102,241,.35)" : "rgba(255,255,255,.07)"}`, background: checked ? "rgba(99,102,241,.07)" : "rgba(255,255,255,.02)", cursor: "pointer" }}>
-                          <div style={{ width: 16, height: 16, borderRadius: 4, border: `2px solid ${checked ? "#6366f1" : "rgba(255,255,255,.15)"}`, background: checked ? "#6366f1" : "transparent", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                        <label key={b.id} onClick={() => setSelBr(p => p.includes(b.id) ? p.filter(x => x !== b.id) : [...p, b.id])} style={{ display: "flex", alignItems: "center", gap: 10, padding: "9px 13px", borderRadius: 9, border: `1px solid ${checked ? "rgba(99,102,241,.35)" : "rgba(var(--ink),.07)"}`, background: checked ? "rgba(99,102,241,.07)" : "rgba(var(--ink),.02)", cursor: "pointer" }}>
+                          <div style={{ width: 16, height: 16, borderRadius: 4, border: `2px solid ${checked ? "#6366f1" : "rgba(var(--ink),.15)"}`, background: checked ? "#6366f1" : "transparent", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                             {checked && <svg width="9" height="9" viewBox="0 0 12 10" fill="none"><path d="M1 5.5L4.5 9 11 1" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>}
                           </div>
                           <span style={{ fontSize: 13, fontWeight: 600 }}>{b.code} — {b.name}</span>
@@ -965,7 +965,7 @@ export default function TeamAndPermissionsPage() {
               )}
 
               <label style={{ display: "flex", alignItems: "center", gap: 10, cursor: "pointer" }}>
-                <div onClick={() => setForm(f => ({ ...f, active: !f.active }))} style={{ width: 40, height: 22, borderRadius: 11, background: form.active ? "#6366f1" : "rgba(255,255,255,.1)", position: "relative", transition: "background .2s", flexShrink: 0, cursor: "pointer" }}>
+                <div onClick={() => setForm(f => ({ ...f, active: !f.active }))} style={{ width: 40, height: 22, borderRadius: 11, background: form.active ? "#6366f1" : "rgba(var(--ink),.1)", position: "relative", transition: "background .2s", flexShrink: 0, cursor: "pointer" }}>
                   <div style={{ position: "absolute", top: 3, left: form.active ? 20 : 3, width: 16, height: 16, borderRadius: "50%", background: "white", transition: "left .2s", boxShadow: "0 1px 4px rgba(0,0,0,.3)" }} />
                 </div>
                 <span style={{ fontSize: 13, fontWeight: 600 }}>Active account</span>
@@ -975,7 +975,7 @@ export default function TeamAndPermissionsPage() {
                 <button type="submit" disabled={saving} style={{ flex: 1, padding: 12, borderRadius: 10, background: saving ? "rgba(99,102,241,.5)" : "linear-gradient(135deg,#6366f1,#4f46e5)", border: "none", color: "white", fontFamily: ff, fontSize: 14, fontWeight: 700, cursor: saving ? "default" : "pointer" }}>
                   {saving ? "Saving…" : editing ? "Update User" : "Create User"}
                 </button>
-                <button type="button" onClick={() => setModal(false)} style={{ padding: "12px 22px", borderRadius: 10, border: "1px solid rgba(255,255,255,.1)", background: "rgba(255,255,255,.03)", color: "#475569", fontFamily: ff, fontSize: 14, fontWeight: 600, cursor: "pointer" }}>Cancel</button>
+                <button type="button" onClick={() => setModal(false)} style={{ padding: "12px 22px", borderRadius: 10, border: "1px solid rgba(var(--ink),.1)", background: "rgba(var(--ink),.03)", color: "#475569", fontFamily: ff, fontSize: 14, fontWeight: 600, cursor: "pointer" }}>Cancel</button>
               </div>
             </form>
           </div>
@@ -1005,7 +1005,7 @@ function BlockedLoginLog() {
     <div style={{ marginTop: 32 }}>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }}>
         <div style={{ fontSize: 15, fontWeight: 800 }}>📋 Blocked Login Attempts</div>
-        <button onClick={fetchLogs} disabled={loadingLogs} style={{ padding: "7px 16px", borderRadius: 8, border: "1px solid rgba(255,255,255,.1)", background: "rgba(255,255,255,.04)", color: "#475569", fontSize: 12, fontWeight: 600, cursor: "pointer", fontFamily: "'Outfit','Inter',sans-serif" }}>
+        <button onClick={fetchLogs} disabled={loadingLogs} style={{ padding: "7px 16px", borderRadius: 8, border: "1px solid rgba(var(--ink),.1)", background: "rgba(var(--ink),.04)", color: "#475569", fontSize: 12, fontWeight: 600, cursor: "pointer", fontFamily: "'Outfit','Inter',sans-serif" }}>
           {loadingLogs ? "Loading…" : "Load Logs"}
         </button>
       </div>

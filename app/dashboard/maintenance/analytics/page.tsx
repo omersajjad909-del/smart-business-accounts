@@ -38,7 +38,7 @@ export default function MaintenanceAnalyticsPage() {
   const scheduleAdherence = schedules.length ? Math.round((summary.completedVisits / schedules.length) * 100) : 0;
 
   return (
-    <div style={{ minHeight: "100vh", padding: isMobile ? "15px 14px" : "28px 32px", color: "#fff", fontFamily: maintenanceFont }}>
+    <div style={{ minHeight: "100vh", padding: isMobile ? "15px 14px" : "28px 32px", color: "var(--ink-solid, #fff)", fontFamily: maintenanceFont }}>
       <div style={{ marginBottom: 26 }}>
         <div style={{ fontSize: 12, color: "#86efac", fontWeight: 800, letterSpacing: ".08em", textTransform: "uppercase", marginBottom: 8 }}>Maintenance Analytics</div>
         <h1 style={{ fontSize: 28, fontWeight: 900, margin: "0 0 8px" }}>Contract health, schedule discipline, and field performance</h1>
@@ -71,7 +71,7 @@ export default function MaintenanceAnalyticsPage() {
               { label: "Paused contracts", value: `${contracts.filter((row) => row.status === "paused").length} paused`, tone: "#94a3b8" },
               { label: "Average contract size", value: `Rs. ${Math.round(summary.contractValue / Math.max(contracts.length, 1)).toLocaleString()}`, tone: "#60a5fa" },
             ].map((row) => (
-              <div key={row.label} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "rgba(255,255,255,.025)", border: "1px solid rgba(255,255,255,.06)", borderRadius: 14, padding: isMobile ? "12px 10px" : "14px 16px" }}>
+              <div key={row.label} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "rgba(var(--ink),.025)", border: "1px solid rgba(var(--ink),.06)", borderRadius: 14, padding: isMobile ? "12px 10px" : "14px 16px" }}>
                 <span style={{ fontSize: 13, color: maintenanceMuted }}>{row.label}</span>
                 <span style={{ fontSize: 14, fontWeight: 800, color: row.tone }}>{row.value}</span>
               </div>
@@ -88,7 +88,7 @@ export default function MaintenanceAnalyticsPage() {
               { label: "Completed visits", value: `${summary.completedVisits} done`, tone: "#22c55e" },
               { label: "Reserved stock", value: `${parts.filter((row) => row.status === "reserved").length} reserved`, tone: "#a78bfa" },
             ].map((row) => (
-              <div key={row.label} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "rgba(255,255,255,.025)", border: "1px solid rgba(255,255,255,.06)", borderRadius: 14, padding: isMobile ? "12px 10px" : "14px 16px" }}>
+              <div key={row.label} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "rgba(var(--ink),.025)", border: "1px solid rgba(var(--ink),.06)", borderRadius: 14, padding: isMobile ? "12px 10px" : "14px 16px" }}>
                 <span style={{ fontSize: 13, color: maintenanceMuted }}>{row.label}</span>
                 <span style={{ fontSize: 14, fontWeight: 800, color: row.tone }}>{row.value}</span>
               </div>

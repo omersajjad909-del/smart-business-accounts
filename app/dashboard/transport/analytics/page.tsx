@@ -48,7 +48,7 @@ export default function TransportAnalyticsPage() {
   }, [fuelLogs]);
 
   return (
-    <div style={{ minHeight: "100vh", padding: isMobile ? "15px 14px" : "28px 32px", color: "#fff", fontFamily: transportFont }}>
+    <div style={{ minHeight: "100vh", padding: isMobile ? "15px 14px" : "28px 32px", color: "var(--ink-solid, #fff)", fontFamily: transportFont }}>
       <div style={{ marginBottom: 24 }}>
         <h1 style={{ margin: "0 0 6px", fontSize: 26, fontWeight: 800 }}>Transport Analytics</h1>
         <p style={{ margin: 0, fontSize: 13, color: transportMuted }}>Fleet composition, route yield, and fuel distribution.</p>
@@ -73,7 +73,7 @@ export default function TransportAnalyticsPage() {
           <div style={{ padding: isMobile ? "12px 10px" : "16px 18px", borderBottom: `1px solid ${transportBorder}`, fontSize: 15, fontWeight: 800 }}>Fleet Type Mix</div>
           <div style={{ padding: 18, display: "grid", gap: 10 }}>
             {typeMix.map((row) => (
-              <div key={row.type} style={{ display: "flex", justifyContent: "space-between", padding: "10px 12px", borderRadius: 10, background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.05)" }}>
+              <div key={row.type} style={{ display: "flex", justifyContent: "space-between", padding: "10px 12px", borderRadius: 10, background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.05)" }}>
                 <span style={{ fontSize: 13, textTransform: "capitalize" }}>{row.type}</span>
                 <span style={{ fontSize: 14, fontWeight: 800, color: "#93c5fd" }}>{row.count}</span>
               </div>
@@ -85,12 +85,12 @@ export default function TransportAnalyticsPage() {
           <div style={{ padding: isMobile ? "12px 10px" : "16px 18px", borderBottom: `1px solid ${transportBorder}`, fontSize: 15, fontWeight: 800 }}>Top Routes</div>
           <div style={{ padding: 18, display: "grid", gap: 10 }}>
             {routeMix.map((row) => (
-              <div key={row.route} style={{ display: "grid", gap: 4, padding: "10px 12px", borderRadius: 10, background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.05)" }}>
+              <div key={row.route} style={{ display: "grid", gap: 4, padding: "10px 12px", borderRadius: 10, background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.05)" }}>
                 <div style={{ fontSize: 14, fontWeight: 700 }}>{row.route}</div>
                 <div style={{ fontSize: 12, color: transportMuted }}>{row.trips} trips | Net Rs. {row.revenue.toLocaleString()}</div>
               </div>
             ))}
-            {routeMix.length === 0 && <div style={{ color: "rgba(255,255,255,.28)" }}>No trip data available.</div>}
+            {routeMix.length === 0 && <div style={{ color: "rgba(var(--ink),.28)" }}>No trip data available.</div>}
           </div>
         </section>
 
@@ -98,12 +98,12 @@ export default function TransportAnalyticsPage() {
           <div style={{ padding: isMobile ? "12px 10px" : "16px 18px", borderBottom: `1px solid ${transportBorder}`, fontSize: 15, fontWeight: 800 }}>Fuel by Vehicle</div>
           <div style={{ padding: 18, display: "grid", gap: 10 }}>
             {fuelByVehicle.map((row) => (
-              <div key={row.vehicle} style={{ display: "flex", justifyContent: "space-between", padding: "10px 12px", borderRadius: 10, background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.05)" }}>
+              <div key={row.vehicle} style={{ display: "flex", justifyContent: "space-between", padding: "10px 12px", borderRadius: 10, background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.05)" }}>
                 <span style={{ fontSize: 13 }}>{row.vehicle}</span>
                 <span style={{ fontSize: 14, fontWeight: 800, color: "#f87171" }}>Rs. {row.amount.toLocaleString()}</span>
               </div>
             ))}
-            {fuelByVehicle.length === 0 && <div style={{ color: "rgba(255,255,255,.28)" }}>No fuel data available.</div>}
+            {fuelByVehicle.length === 0 && <div style={{ color: "rgba(var(--ink),.28)" }}>No fuel data available.</div>}
           </div>
         </section>
       </div>

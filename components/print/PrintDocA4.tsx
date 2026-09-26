@@ -781,13 +781,13 @@ export function PrintPaperWrapper({ children }: { children: React.ReactNode }) {
         .print-doc-a4 .pdoc-grid th {
           background-color: var(--pdoc-head-bg, #f2f2f2) !important;
           color: var(--pdoc-head-ink, #111) !important;
-          border: 1px solid var(--pdoc-rule, #111) !important;
+          border: 1px solid var(--pdoc-rule, var(--dkb-111111, #111)) !important;
         }
         html.dark .dashboard-root .print-doc-a4 .pdoc-grid td,
         html:not(.dark) .dashboard-root .print-doc-a4 .pdoc-grid td,
         .print-doc-a4 .pdoc-grid td {
           color: var(--pdoc-ink, #111) !important;
-          border: 1px solid var(--pdoc-rule, #111) !important;
+          border: 1px solid var(--pdoc-rule, var(--dkb-111111, #111)) !important;
           background-color: transparent !important;
         }
         html.dark .dashboard-root .print-doc-a4 .pdoc-grid tr.pdoc-zebra td,
@@ -809,13 +809,13 @@ export function PrintPaperWrapper({ children }: { children: React.ReactNode }) {
         html.dark .dashboard-root .print-doc-a4 .pdoc-g-rows th,
         html:not(.dark) .dashboard-root .print-doc-a4 .pdoc-g-rows th {
           border: 0 !important;
-          border-bottom: 1px solid var(--pdoc-rule, #111) !important;
+          border-bottom: 1px solid var(--pdoc-rule, var(--dkb-111111, #111)) !important;
         }
         .print-doc-a4 .pdoc-g-rows td,
         html.dark .dashboard-root .print-doc-a4 .pdoc-g-rows td,
         html:not(.dark) .dashboard-root .print-doc-a4 .pdoc-g-rows td {
           border: 0 !important;
-          border-bottom: 1px solid var(--pdoc-rule, #111) !important;
+          border-bottom: 1px solid var(--pdoc-rule, var(--dkb-111111, #111)) !important;
         }
 
         /* zebra — the fill separates the rows, so no rules inside the body. */
@@ -823,7 +823,7 @@ export function PrintPaperWrapper({ children }: { children: React.ReactNode }) {
         html.dark .dashboard-root .print-doc-a4 .pdoc-g-zebra th,
         html:not(.dark) .dashboard-root .print-doc-a4 .pdoc-g-zebra th {
           border: 0 !important;
-          border-bottom: 1px solid var(--pdoc-rule, #111) !important;
+          border-bottom: 1px solid var(--pdoc-rule, var(--dkb-111111, #111)) !important;
         }
         .print-doc-a4 .pdoc-g-zebra td,
         html.dark .dashboard-root .print-doc-a4 .pdoc-g-zebra td,
@@ -831,7 +831,7 @@ export function PrintPaperWrapper({ children }: { children: React.ReactNode }) {
         .print-doc-a4 .pdoc-g-zebra tbody tr:last-child td,
         html.dark .dashboard-root .print-doc-a4 .pdoc-g-zebra tbody tr:last-child td,
         html:not(.dark) .dashboard-root .print-doc-a4 .pdoc-g-zebra tbody tr:last-child td {
-          border-bottom: 1px solid var(--pdoc-rule, #111) !important;
+          border-bottom: 1px solid var(--pdoc-rule, var(--dkb-111111, #111)) !important;
         }
 
         /* open — a rule under the headings, one under the last line, nothing
@@ -840,7 +840,7 @@ export function PrintPaperWrapper({ children }: { children: React.ReactNode }) {
         html.dark .dashboard-root .print-doc-a4 .pdoc-g-open th,
         html:not(.dark) .dashboard-root .print-doc-a4 .pdoc-g-open th {
           border: 0 !important;
-          border-bottom: 1px solid var(--pdoc-rule, #111) !important;
+          border-bottom: 1px solid var(--pdoc-rule, var(--dkb-111111, #111)) !important;
           background-color: transparent !important;
           color: var(--pdoc-ink, #111) !important;
         }
@@ -850,7 +850,7 @@ export function PrintPaperWrapper({ children }: { children: React.ReactNode }) {
         .print-doc-a4 .pdoc-g-open tbody tr:last-child td,
         html.dark .dashboard-root .print-doc-a4 .pdoc-g-open tbody tr:last-child td,
         html:not(.dark) .dashboard-root .print-doc-a4 .pdoc-g-open tbody tr:last-child td {
-          border-bottom: 1px solid var(--pdoc-rule, #111) !important;
+          border-bottom: 1px solid var(--pdoc-rule, var(--dkb-111111, #111)) !important;
         }
 
         /* The totals stand free of the grid: one rule above the net figure,
@@ -864,12 +864,12 @@ export function PrintPaperWrapper({ children }: { children: React.ReactNode }) {
         }
         html.dark .dashboard-root .print-doc-a4 .pdoc-totals td.pdoc-ruled,
         html:not(.dark) .dashboard-root .print-doc-a4 .pdoc-totals td.pdoc-ruled,
-        .print-doc-a4 .pdoc-totals td.pdoc-ruled { border-top: 1px solid var(--pdoc-rule, #111) !important; }
+        .print-doc-a4 .pdoc-totals td.pdoc-ruled { border-top: 1px solid var(--pdoc-rule, var(--dkb-111111, #111)) !important; }
 
         /* The counted summary is boxed as a whole, not cell by cell. */
         html.dark .dashboard-root .print-doc-a4 .pdoc-summary,
         html:not(.dark) .dashboard-root .print-doc-a4 .pdoc-summary,
-        .print-doc-a4 .pdoc-summary { width: auto !important; border: 1px solid var(--pdoc-rule, #111) !important; }
+        .print-doc-a4 .pdoc-summary { width: auto !important; border: 1px solid var(--pdoc-rule, var(--dkb-111111, #111)) !important; }
         html.dark .dashboard-root .print-doc-a4 .pdoc-summary td,
         html:not(.dark) .dashboard-root .print-doc-a4 .pdoc-summary td,
         .print-doc-a4 .pdoc-summary td {

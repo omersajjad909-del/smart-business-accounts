@@ -227,7 +227,7 @@ export default function JVPage() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [queryMode, queryIdx, queryResults]);
 
-  const inp:   React.CSSProperties = { width: "100%", background: "rgba(255,255,255,0.05)", border: "1px solid var(--border)", borderRadius: 8, padding: "8px 10px", color: "var(--text-primary)", fontFamily: ff, fontSize: 13, outline: "none", boxSizing: "border-box" };
+  const inp:   React.CSSProperties = { width: "100%", background: "rgba(var(--ink),0.05)", border: "1px solid var(--border)", borderRadius: 8, padding: "8px 10px", color: "var(--text-primary)", fontFamily: ff, fontSize: 13, outline: "none", boxSizing: "border-box" };
   const lbl:   React.CSSProperties = { fontSize: 11, color: "var(--text-muted)", fontWeight: 700, marginBottom: 5, display: "block", textTransform: "uppercase", letterSpacing: 0.5 };
   const panel: React.CSSProperties = { background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 12, padding: 20, fontFamily: ff };
 
@@ -255,12 +255,12 @@ export default function JVPage() {
             {queryIdx >= 0 && !queryMode && (
               <div style={{ display: "flex", alignItems: "center", gap: 6, background: "rgba(167,139,250,.08)", border: "1px solid rgba(167,139,250,.2)", borderRadius: 10, padding: "6px 12px" }}>
                 <button onClick={() => navTo(queryIdx - 1)} disabled={queryIdx === 0}
-                  style={{ padding: "4px 10px", borderRadius: 6, background: "rgba(255,255,255,.06)", border: "1px solid rgba(255,255,255,.1)", color: queryIdx === 0 ? "rgba(255,255,255,.2)" : "rgba(255,255,255,.7)", fontSize: 13, cursor: queryIdx === 0 ? "default" : "pointer", fontFamily: ff }}>◀</button>
+                  style={{ padding: "4px 10px", borderRadius: 6, background: "rgba(var(--ink),.06)", border: "1px solid rgba(var(--ink),.1)", color: queryIdx === 0 ? "rgba(var(--ink),.2)" : "rgba(var(--ink),.7)", fontSize: 13, cursor: queryIdx === 0 ? "default" : "pointer", fontFamily: ff }}>◀</button>
                 <span style={{ fontSize: 12, color: PURPLE, fontWeight: 700, minWidth: 80, textAlign: "center" }}>
                   {queryResults[queryIdx]?.voucherNo} · {queryIdx + 1} / {queryResults.length}
                 </span>
                 <button onClick={() => navTo(queryIdx + 1)} disabled={queryIdx === queryResults.length - 1}
-                  style={{ padding: "4px 10px", borderRadius: 6, background: "rgba(255,255,255,.06)", border: "1px solid rgba(255,255,255,.1)", color: queryIdx === queryResults.length - 1 ? "rgba(255,255,255,.2)" : "rgba(255,255,255,.7)", fontSize: 13, cursor: queryIdx === queryResults.length - 1 ? "default" : "pointer", fontFamily: ff }}>▶</button>
+                  style={{ padding: "4px 10px", borderRadius: 6, background: "rgba(var(--ink),.06)", border: "1px solid rgba(var(--ink),.1)", color: queryIdx === queryResults.length - 1 ? "rgba(var(--ink),.2)" : "rgba(var(--ink),.7)", fontSize: 13, cursor: queryIdx === queryResults.length - 1 ? "default" : "pointer", fontFamily: ff }}>▶</button>
                 <button onClick={exitQueryMode}
                   style={{ padding: "4px 10px", borderRadius: 6, background: "rgba(248,113,113,.08)", border: "1px solid rgba(248,113,113,.2)", color: "#f87171", fontSize: 11, cursor: "pointer", fontFamily: ff }}>✕ Clear</button>
               </div>
@@ -271,7 +271,7 @@ export default function JVPage() {
                   <div style={{ fontSize: 10, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: ".06em" }}>Next JV #</div>
                   <div style={{ fontSize: 16, fontWeight: 800, color: PURPLE }}>JV-{vouchers.length + 1}</div>
                 </div>
-                <div style={{ background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.08)", borderRadius: 10, padding: "8px 16px", textAlign: "right" }}>
+                <div style={{ background: "rgba(var(--ink),.04)", border: "1px solid rgba(var(--ink),.08)", borderRadius: 10, padding: "8px 16px", textAlign: "right" }}>
                   <div style={{ fontSize: 10, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: ".06em" }}>Saved Vouchers</div>
                   <div style={{ fontSize: 16, fontWeight: 800, color: "var(--text-primary)" }}>{vouchers.length}</div>
                 </div>
@@ -325,7 +325,7 @@ export default function JVPage() {
                 <span style={{ background: "rgba(0,0,0,.2)", borderRadius: 4, padding: "1px 7px", fontSize: 11 }}>F8</span>
                 Execute Query
               </button>
-              <button onClick={exitQueryMode} style={{ padding: "10px 20px", borderRadius: 9, background: "rgba(255,255,255,.05)", border: "1px solid rgba(255,255,255,.1)", color: "rgba(255,255,255,.5)", fontSize: 13, cursor: "pointer", fontFamily: ff }}>Cancel (Esc)</button>
+              <button onClick={exitQueryMode} style={{ padding: "10px 20px", borderRadius: 9, background: "rgba(var(--ink),.05)", border: "1px solid rgba(var(--ink),.1)", color: "rgba(var(--ink),.5)", fontSize: 13, cursor: "pointer", fontFamily: ff }}>Cancel (Esc)</button>
               <span style={{ fontSize: 11, color: "rgba(250,204,21,.4)", marginLeft: 8 }}>
                 Operators: <b style={{ color: "rgba(250,204,21,.7)" }}>&gt;010425</b> (after) &nbsp; <b style={{ color: "rgba(250,204,21,.7)" }}>&lt;010425</b> (before) &nbsp; <b style={{ color: "rgba(250,204,21,.7)" }}>010425</b> (exact)
               </span>
@@ -408,7 +408,7 @@ export default function JVPage() {
             </div>
 
             <div style={{ display: "flex", gap: 10 }}>
-              <button onClick={saveJV} disabled={saving || !balanced} style={{ background: balanced ? PURPLE : "rgba(255,255,255,0.1)", color: balanced ? "#fff" : "var(--text-muted)", border: "none", borderRadius: 8, padding: "10px 24px", fontFamily: ff, fontSize: 14, fontWeight: 700, cursor: saving || !balanced ? "not-allowed" : "pointer", opacity: saving ? 0.7 : 1 }}>
+              <button onClick={saveJV} disabled={saving || !balanced} style={{ background: balanced ? PURPLE : "rgba(var(--ink),0.1)", color: balanced ? "#fff" : "var(--text-muted)", border: "none", borderRadius: 8, padding: "10px 24px", fontFamily: ff, fontSize: 14, fontWeight: 700, cursor: saving || !balanced ? "not-allowed" : "pointer", opacity: saving ? 0.7 : 1 }}>
                 {saving ? "Saving…" : editing ? "Update JV" : "Save JV"}
               </button>
               {editing && (
@@ -429,14 +429,14 @@ export default function JVPage() {
               <button onClick={() => { setSaved(null); resetForm(); }} style={{ background: "transparent", border: "1px solid var(--border)", borderRadius: 8, padding: "9px 20px", fontFamily: ff, fontSize: 14, color: "var(--text-muted)", cursor: "pointer" }}>New JV</button>
             </div>
             <div style={{ ...panel, background: "#fff", color: "#111", padding: 36 }}>
-              <div style={{ textAlign: "center", borderBottom: "3px solid #111", paddingBottom: 14, marginBottom: 24 }}>
+              <div style={{ textAlign: "center", borderBottom: "3px solid var(--dkb-111111, #111)", paddingBottom: 14, marginBottom: 24 }}>
                 <div style={{ fontSize: 22, fontWeight: 900, letterSpacing: 1 }}>JOURNAL VOUCHER</div>
                 <div style={{ fontSize: 13, color: "#555", marginTop: 4 }}>No: {saved.voucherNo} &nbsp;|&nbsp; Date: {fmtDate(date)}</div>
               </div>
               {narration && <div style={{ marginBottom: 18, fontSize: 13 }}><strong>Narration:</strong> {narration}</div>}
               <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13, marginBottom: 20 }}>
                 <thead>
-                  <tr style={{ borderTop: "2px solid #111", borderBottom: "2px solid #111", background: "#f5f5f5" }}>
+                  <tr style={{ borderTop: "2px solid var(--dkb-111111, #111)", borderBottom: "2px solid var(--dkb-111111, #111)", background: "#f5f5f5" }}>
                     <th style={{ padding: "9px 12px", textAlign: "left" }}>Account</th>
                     <th style={{ padding: "9px 12px", textAlign: "right", width: 120 }}>Debit</th>
                     <th style={{ padding: "9px 12px", textAlign: "right", width: 120 }}>Credit</th>
@@ -452,7 +452,7 @@ export default function JVPage() {
                   ))}
                 </tbody>
                 <tfoot>
-                  <tr style={{ borderTop: "2px solid #111", fontWeight: 900 }}>
+                  <tr style={{ borderTop: "2px solid var(--dkb-111111, #111)", fontWeight: 900 }}>
                     <td style={{ padding: "9px 12px", textAlign: "right" }}>Total:</td>
                     <td style={{ padding: "9px 12px", textAlign: "right" }}>{fmt(totalDebit)}</td>
                     <td style={{ padding: "9px 12px", textAlign: "right" }}>{fmt(totalCredit)}</td>
@@ -477,9 +477,9 @@ export default function JVPage() {
               { key: "F7", label: "Query Mode", color: PURPLE },
               { key: "Enter", label: "Next Field", color: undefined },
             ]).map(s => (
-              <div key={s.key} style={{ display: "flex", alignItems: "center", gap: 4, background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)", borderRadius: 6, padding: "4px 10px" }}>
-                <span style={{ background: s.color ? `${s.color}22` : "rgba(255,255,255,.06)", color: s.color || "rgba(255,255,255,.5)", borderRadius: 4, padding: "1px 7px", fontSize: 10, fontWeight: 800, fontFamily: "monospace", border: `1px solid ${s.color ? `${s.color}44` : "rgba(255,255,255,.1)"}` }}>{s.key}</span>
-                <span style={{ fontSize: 11, color: "rgba(255,255,255,.3)" }}>{s.label}</span>
+              <div key={s.key} style={{ display: "flex", alignItems: "center", gap: 4, background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.07)", borderRadius: 6, padding: "4px 10px" }}>
+                <span style={{ background: s.color ? `${s.color}22` : "rgba(var(--ink),.06)", color: s.color || "rgba(var(--ink),.5)", borderRadius: 4, padding: "1px 7px", fontSize: 10, fontWeight: 800, fontFamily: "monospace", border: `1px solid ${s.color ? `${s.color}44` : "rgba(var(--ink),.1)"}` }}>{s.key}</span>
+                <span style={{ fontSize: 11, color: "rgba(var(--ink),.3)" }}>{s.label}</span>
               </div>
             ))}
           </div>
@@ -488,14 +488,14 @@ export default function JVPage() {
 
       {saved && (
         <div className="print-area" style={{ fontFamily: "'Outfit','Arial',sans-serif", color: "#000", background: "#fff", padding: "8mm 10mm", fontSize: 12 }}>
-          <div style={{ textAlign: "center", borderBottom: "3px solid #000", paddingBottom: 12, marginBottom: 20 }}>
+          <div style={{ textAlign: "center", borderBottom: "3px solid var(--dkb-000000, #000)", paddingBottom: 12, marginBottom: 20 }}>
             <div style={{ fontSize: 20, fontWeight: 900, letterSpacing: 1 }}>JOURNAL VOUCHER</div>
             <div style={{ fontSize: 11, color: "#333", marginTop: 3 }}>No: {saved.voucherNo} &nbsp;|&nbsp; Date: {fmtDate(date)}</div>
           </div>
           {narration && <div style={{ marginBottom: 14, fontSize: 11 }}><strong>Narration:</strong> {narration}</div>}
           <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 11, marginBottom: 18 }}>
             <thead>
-              <tr style={{ borderTop: "2px solid #000", borderBottom: "2px solid #000", background: "#f0f0f0" }}>
+              <tr style={{ borderTop: "2px solid var(--dkb-000000, #000)", borderBottom: "2px solid var(--dkb-000000, #000)", background: "#f0f0f0" }}>
                 <th style={{ padding: "7px 10px", textAlign: "left" }}>Account</th>
                 <th style={{ padding: "7px 10px", textAlign: "right", width: 100 }}>Debit</th>
                 <th style={{ padding: "7px 10px", textAlign: "right", width: 100 }}>Credit</th>
@@ -511,7 +511,7 @@ export default function JVPage() {
               ))}
             </tbody>
             <tfoot>
-              <tr style={{ borderTop: "2px solid #000", fontWeight: 900 }}>
+              <tr style={{ borderTop: "2px solid var(--dkb-000000, #000)", fontWeight: 900 }}>
                 <td style={{ padding: "7px 10px", textAlign: "right" }}>Total:</td>
                 <td style={{ padding: "7px 10px", textAlign: "right" }}>{fmt(totalDebit)}</td>
                 <td style={{ padding: "7px 10px", textAlign: "right" }}>{fmt(totalCredit)}</td>

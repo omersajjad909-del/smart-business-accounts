@@ -27,7 +27,7 @@ export default function TransportOverviewPage() {
   const { summary, trips } = data;
 
   return (
-    <div style={{ minHeight: "100vh", padding: isMobile ? "17px 16px" : "28px 32px", color: "#fff", fontFamily: transportFont }}>
+    <div style={{ minHeight: "100vh", padding: isMobile ? "17px 16px" : "28px 32px", color: "var(--ink-solid, #fff)", fontFamily: transportFont }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 20, flexWrap: "wrap", marginBottom: 24 }}>
         <div>
           <h1 style={{ margin: "0 0 6px", fontSize: 26, fontWeight: 800 }}>Transport Command Center</h1>
@@ -71,13 +71,13 @@ export default function TransportOverviewPage() {
           <div style={{ padding: isMobile ? "10px 9px" : "16px 18px", borderBottom: `1px solid ${transportBorder}`, fontSize: 15, fontWeight: 800 }}>Trip Watchlist</div>
           <div style={{ padding: 18, display: "grid", gap: 10 }}>
             {trips.filter((row) => row.status !== "completed" && row.status !== "cancelled").slice(0, 6).map((row) => (
-              <div key={row.id} style={{ padding: isMobile ? "8px 8px" : "12px 14px", borderRadius: 10, background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.05)" }}>
+              <div key={row.id} style={{ padding: isMobile ? "8px 8px" : "12px 14px", borderRadius: 10, background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.05)" }}>
                 <div style={{ fontSize: 14, fontWeight: 700 }}>{row.tripNo}</div>
                 <div style={{ fontSize: 12, color: transportMuted, marginTop: 4 }}>{row.vehicle || "-"} | {row.driver || "-"}</div>
                 <div style={{ fontSize: 12, color: "#93c5fd", marginTop: 6 }}>{row.from} to {row.to}</div>
               </div>
             ))}
-            {trips.filter((row) => row.status !== "completed" && row.status !== "cancelled").length === 0 && <div style={{ color: "rgba(255,255,255,.28)" }}>No active transport movement right now.</div>}
+            {trips.filter((row) => row.status !== "completed" && row.status !== "cancelled").length === 0 && <div style={{ color: "rgba(var(--ink),.28)" }}>No active transport movement right now.</div>}
           </div>
         </div>
 
@@ -92,7 +92,7 @@ export default function TransportOverviewPage() {
               { label: "Maintenance cost", value: `Rs. ${summary.maintenanceCost.toLocaleString()}`, color: "#fb7185" },
               { label: "Trip expenses booked", value: `Rs. ${summary.expenseBooked.toLocaleString()}`, color: "#f97316" },
             ].map((row) => (
-              <div key={row.label} style={{ display: "flex", justifyContent: "space-between", padding: isMobile ? "8px 8px" : "10px 12px", borderRadius: 10, background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.05)" }}>
+              <div key={row.label} style={{ display: "flex", justifyContent: "space-between", padding: isMobile ? "8px 8px" : "10px 12px", borderRadius: 10, background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.05)" }}>
                 <span style={{ fontSize: 13, color: transportMuted }}>{row.label}</span>
                 <span style={{ fontSize: 15, fontWeight: 800, color: row.color }}>{row.value}</span>
               </div>

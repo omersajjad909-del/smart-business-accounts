@@ -79,10 +79,10 @@ const BDR  = "rgba(255,255,255,.08)";
 const MUTED = "rgba(255,255,255,.45)";
 const ACCENT = "#6366f1";
 
-const inp: React.CSSProperties = { width: "100%", boxSizing: "border-box", background: "rgba(255,255,255,.05)", border: `1px solid ${BDR}`, borderRadius: 8, padding: "9px 12px", fontSize: 13, color: "#fff", fontFamily: ff, outline: "none" };
+const inp: React.CSSProperties = { width: "100%", boxSizing: "border-box", background: "rgba(var(--ink),.05)", border: `1px solid ${BDR}`, borderRadius: 8, padding: "9px 12px", fontSize: 13, color: "var(--ink-solid, #fff)", fontFamily: ff, outline: "none" };
 const lbl: React.CSSProperties = { fontSize: 11, fontWeight: 700, color: MUTED, textTransform: "uppercase" as const, letterSpacing: ".06em", display: "block", marginBottom: 5 };
 const panel: React.CSSProperties = { background: BG, border: `1px solid ${BDR}`, borderRadius: 14, padding: 22 };
-const sectionTitle: React.CSSProperties = { fontSize: 15, fontWeight: 800, color: "#fff", marginBottom: 4 };
+const sectionTitle: React.CSSProperties = { fontSize: 15, fontWeight: 800, color: "var(--ink-solid, #fff)", marginBottom: 4 };
 const sectionSub: React.CSSProperties = { fontSize: 12, color: MUTED, marginBottom: 20 };
 
 function Field({ label, children, span2 }: { label: string; children: React.ReactNode; span2?: boolean }) {
@@ -343,7 +343,7 @@ export default function AdminControlPage() {
   );
 
   return (
-    <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", fontFamily: ff, color: "#fff", minHeight: "100vh" }}>
+    <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", fontFamily: ff, color: "var(--ink-solid, #fff)", minHeight: "100vh" }}>
 
       {/* ── Header ── */}
       <div style={{ marginBottom: 28 }}>
@@ -382,7 +382,7 @@ export default function AdminControlPage() {
           {/* ── Tab bar ── */}
           <div style={{ display: "flex", gap: 6, marginBottom: 24, flexWrap: "wrap" }}>
             {TABS.map(t => (
-              <button key={t.id} onClick={() => setTab(t.id)} style={{ padding: "9px 18px", borderRadius: 10, border: "none", fontSize: 13, fontWeight: 700, cursor: "pointer", background: tab === t.id ? ACCENT : "rgba(255,255,255,.06)", color: tab === t.id ? "#fff" : MUTED, transition: "background .15s" }}>
+              <button key={t.id} onClick={() => setTab(t.id)} style={{ padding: "9px 18px", borderRadius: 10, border: "none", fontSize: 13, fontWeight: 700, cursor: "pointer", background: tab === t.id ? ACCENT : "rgba(var(--ink),.06)", color: tab === t.id ? "#fff" : MUTED, transition: "background .15s" }}>
                 {t.icon} {t.label}
               </button>
             ))}
@@ -477,7 +477,7 @@ export default function AdminControlPage() {
                 <div style={sectionTitle}>Logo & Branding</div>
                 <div style={sectionSub}>Your logo and notes shown on all printed documents.</div>
                 <div style={{ display: "flex", gap: 20, alignItems: "flex-start", marginBottom: 18 }}>
-                  <div style={{ width: 90, height: 90, borderRadius: 14, border: `1px solid ${BDR}`, background: "rgba(255,255,255,.04)", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden", flexShrink: 0 }}>
+                  <div style={{ width: 90, height: 90, borderRadius: 14, border: `1px solid ${BDR}`, background: "rgba(var(--ink),.04)", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden", flexShrink: 0 }}>
                     {settings.printPreferences.logoUrl ? <img src={settings.printPreferences.logoUrl} alt="logo" style={{ width: "100%", height: "100%", objectFit: "contain" }} /> : <span style={{ fontSize: 11, color: MUTED }}>No logo</span>}
                   </div>
                   <div style={{ flex: 1 }}>
@@ -547,7 +547,7 @@ export default function AdminControlPage() {
                     <span style={{ display: "block", fontSize: 13.5, fontWeight: 600 }}>
                       What each document shows, and its design
                     </span>
-                    <span style={{ display: "block", fontSize: 12, color: "rgba(255,255,255,.45)", marginTop: 2, lineHeight: 1.5 }}>
+                    <span style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),.45)", marginTop: 2, lineHeight: 1.5 }}>
                       Logo, addresses and both sides&apos; tax numbers — set per document now, with a
                       live preview. Sales invoice, PO, challan, GRN and the rest each keep their own.
                     </span>
@@ -595,7 +595,7 @@ export default function AdminControlPage() {
                 <div style={sectionSub}>{branches.length} branch{branches.length !== 1 ? "es" : ""} configured.</div>
                 <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
                   {branches.length === 0 ? <div style={{ textAlign: "center", padding: 32, color: MUTED }}>No branches yet.</div> : branches.map(b => (
-                    <div key={b.id} style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderRadius: 10, border: `1px solid ${BDR}`, background: "rgba(255,255,255,.02)", display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12 }}>
+                    <div key={b.id} style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderRadius: 10, border: `1px solid ${BDR}`, background: "rgba(var(--ink),.02)", display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12 }}>
                       <div>
                         <div style={{ fontWeight: 700, fontSize: 14 }}>{b.code} · {b.name}</div>
                         <div style={{ fontSize: 12, color: MUTED, marginTop: 2 }}>{b.city || "No city"} · <span style={{ color: b.isActive ? "#34d399" : "#f87171" }}>{b.isActive ? "Active" : "Inactive"}</span></div>
@@ -672,7 +672,7 @@ export default function AdminControlPage() {
                       const isSel = selectedUserId === u.id;
                       return (
                         <button key={u.id} onClick={() => setSelectedUserId(u.id)} style={{ width: "100%", textAlign: "left", padding: "12px 14px", borderRadius: 10, border: `1px solid ${isSel ? ACCENT : BDR}`, background: isSel ? "rgba(99,102,241,.1)" : BG, cursor: "pointer", transition: "all .15s", outline: "none" }}>
-                          <div style={{ fontSize: 13, fontWeight: 700, color: "#fff", marginBottom: 3, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{u.name}</div>
+                          <div style={{ fontSize: 13, fontWeight: 700, color: "var(--ink-solid, #fff)", marginBottom: 3, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{u.name}</div>
                           <div style={{ fontSize: 11, fontWeight: 700, color: isSel ? ACCENT : MUTED, letterSpacing: ".04em" }}>{u.role}</div>
                         </button>
                       );
@@ -693,7 +693,7 @@ export default function AdminControlPage() {
                           {/* User header + action buttons */}
                           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14, flexWrap: "wrap", gap: 10, padding: isMobile ? "12px 10px" : "14px 16px", borderRadius: 12, background: "rgba(99,102,241,.06)", border: `1px solid rgba(99,102,241,.2)` }}>
                             <div>
-                              <div style={{ fontSize: 15, fontWeight: 800, color: "#fff" }}>{selUser?.name}</div>
+                              <div style={{ fontSize: 15, fontWeight: 800, color: "var(--ink-solid, #fff)" }}>{selUser?.name}</div>
                               <div style={{ fontSize: 12, color: MUTED, marginTop: 2 }}>{selUser?.role} · {selUser?.email}</div>
                             </div>
                             <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
@@ -706,7 +706,7 @@ export default function AdminControlPage() {
                           {/* Permission checkboxes */}
                           <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(3,1fr)", gap: 7 }}>
                             {availablePermissions.map(p => (
-                              <label key={p} style={{ display: "flex", alignItems: "center", gap: 9, padding: "9px 13px", borderRadius: 8, border: `1px solid ${perms.includes(p) ? "rgba(99,102,241,.35)" : BDR}`, background: perms.includes(p) ? "rgba(99,102,241,.07)" : "rgba(255,255,255,.02)", fontSize: 12, fontWeight: 600, cursor: "pointer" }}>
+                              <label key={p} style={{ display: "flex", alignItems: "center", gap: 9, padding: "9px 13px", borderRadius: 8, border: `1px solid ${perms.includes(p) ? "rgba(99,102,241,.35)" : BDR}`, background: perms.includes(p) ? "rgba(99,102,241,.07)" : "rgba(var(--ink),.02)", fontSize: 12, fontWeight: 600, cursor: "pointer" }}>
                                 <input type="checkbox" checked={perms.includes(p)} onChange={() => setUserPermsMap(m => ({ ...m, [selectedUserId]: perms.includes(p) ? perms.filter(x => x !== p) : [...perms, p] }))} style={{ accentColor: ACCENT }} />
                                 {p}
                               </label>
@@ -770,7 +770,7 @@ export default function AdminControlPage() {
                   </div>
                 ))}
                 <button onClick={() => setSettings(s => ({ ...s, bankAccounts: [...s.bankAccounts, { ...DEFAULT_BANK }] }))}
-                  style={{ background: "transparent", border: `1px dashed ${BDR}`, color: "#fff", borderRadius: 9, padding: "9px 16px", fontSize: 12.5, fontWeight: 700, cursor: "pointer" }}>
+                  style={{ background: "transparent", border: `1px dashed ${BDR}`, color: "var(--ink-solid, #fff)", borderRadius: 9, padding: "9px 16px", fontSize: 12.5, fontWeight: 700, cursor: "pointer" }}>
                   + Add bank account
                 </button>
               </div>

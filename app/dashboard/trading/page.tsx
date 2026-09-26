@@ -144,10 +144,10 @@ export default function TradingOverviewPage() {
               { label: "Purchase Invoices", value: data.purchaseInvoices.length, sub: "Received cost", color: "#a78bfa" },
               { label: "Delivery Challans", value: data.challans.length, sub: "Dispatch docs", color: "#f97316" },
             ].map((entry) => (
-              <div key={entry.label} style={{ background: "rgba(255,255,255,.02)", border: `1px solid ${tradingBorder}`, borderRadius: 12, padding: isMobile ? "12px 10px" : "16px 14px" }}>
+              <div key={entry.label} style={{ background: "rgba(var(--ink),.02)", border: `1px solid ${tradingBorder}`, borderRadius: 12, padding: isMobile ? "12px 10px" : "16px 14px" }}>
                 <div style={{ fontSize: 11, color: tradingMuted, marginBottom: 6 }}>{entry.label}</div>
                 <div style={{ fontSize: 22, fontWeight: 800, color: entry.color }}>{entry.value}</div>
-                <div style={{ fontSize: 11, color: "rgba(255,255,255,.3)", marginTop: 6 }}>{entry.sub}</div>
+                <div style={{ fontSize: 11, color: "rgba(var(--ink),.3)", marginTop: 6 }}>{entry.sub}</div>
               </div>
             ))}
           </div>
@@ -189,15 +189,15 @@ export default function TradingOverviewPage() {
             <tbody>
               {recentSales.map((row) => (
                 <tr key={row.id}>
-                  <td style={{ padding: "12px 16px", borderBottom: "1px solid rgba(255,255,255,.04)", fontWeight: 700 }}>{row.invoiceNo}</td>
-                  <td style={{ padding: "12px 16px", borderBottom: "1px solid rgba(255,255,255,.04)" }}>{row.customerName || "-"}</td>
-                  <td style={{ padding: "12px 16px", borderBottom: "1px solid rgba(255,255,255,.04)" }}>{formatDate(row.date)}</td>
-                  <td style={{ padding: "12px 16px", borderBottom: "1px solid rgba(255,255,255,.04)", color: "#34d399", fontWeight: 700 }}>{formatMoney(row.total)}</td>
+                  <td style={{ padding: "12px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", fontWeight: 700 }}>{row.invoiceNo}</td>
+                  <td style={{ padding: "12px 16px", borderBottom: "1px solid rgba(var(--ink),.04)" }}>{row.customerName || "-"}</td>
+                  <td style={{ padding: "12px 16px", borderBottom: "1px solid rgba(var(--ink),.04)" }}>{formatDate(row.date)}</td>
+                  <td style={{ padding: "12px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", color: "#34d399", fontWeight: 700 }}>{formatMoney(row.total)}</td>
                 </tr>
               ))}
               {recentSales.length === 0 && (
                 <tr>
-                  <td colSpan={4} style={{ padding: 28, textAlign: "center", color: "rgba(255,255,255,.28)" }}>No sales invoices yet.</td>
+                  <td colSpan={4} style={{ padding: 28, textAlign: "center", color: "rgba(var(--ink),.28)" }}>No sales invoices yet.</td>
                 </tr>
               )}
             </tbody>
@@ -219,15 +219,15 @@ export default function TradingOverviewPage() {
             <tbody>
               {recentProcurement.map((row) => (
                 <tr key={row.id}>
-                  <td style={{ padding: "12px 16px", borderBottom: "1px solid rgba(255,255,255,.04)", fontWeight: 700 }}>{row.invoiceNo}</td>
-                  <td style={{ padding: "12px 16px", borderBottom: "1px solid rgba(255,255,255,.04)" }}>{row.supplier?.name || "-"}</td>
-                  <td style={{ padding: "12px 16px", borderBottom: "1px solid rgba(255,255,255,.04)" }}>{formatDate(row.date)}</td>
-                  <td style={{ padding: "12px 16px", borderBottom: "1px solid rgba(255,255,255,.04)", color: "#a78bfa", fontWeight: 700 }}>{formatMoney(row.total)}</td>
+                  <td style={{ padding: "12px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", fontWeight: 700 }}>{row.invoiceNo}</td>
+                  <td style={{ padding: "12px 16px", borderBottom: "1px solid rgba(var(--ink),.04)" }}>{row.supplier?.name || "-"}</td>
+                  <td style={{ padding: "12px 16px", borderBottom: "1px solid rgba(var(--ink),.04)" }}>{formatDate(row.date)}</td>
+                  <td style={{ padding: "12px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", color: "#a78bfa", fontWeight: 700 }}>{formatMoney(row.total)}</td>
                 </tr>
               ))}
               {recentProcurement.length === 0 && (
                 <tr>
-                  <td colSpan={4} style={{ padding: 28, textAlign: "center", color: "rgba(255,255,255,.28)" }}>No purchase invoices yet.</td>
+                  <td colSpan={4} style={{ padding: 28, textAlign: "center", color: "rgba(var(--ink),.28)" }}>No purchase invoices yet.</td>
                 </tr>
               )}
             </tbody>

@@ -69,7 +69,7 @@ export default function EcommerceProductsPage() {
   }
 
   return (
-    <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", fontFamily: ecommerceFont, color: "#fff", minHeight: "100vh" }}>
+    <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", fontFamily: ecommerceFont, color: "var(--ink-solid, #fff)", minHeight: "100vh" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 28 }}>
         <div>
           <h1 style={{ fontSize: 24, fontWeight: 900, margin: "0 0 6px" }}>Product Listings</h1>
@@ -117,14 +117,14 @@ export default function EcommerceProductsPage() {
             <tbody>
               {products.map((product) => (
                 <tr key={product.id}>
-                  <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)", fontWeight: 700 }}>{product.name}</td>
-                  <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)", fontSize: 13 }}>{product.category}</td>
-                  <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)", fontSize: 12, color: ecommerceMuted }}>{product.sku}</td>
-                  <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)", fontSize: 13 }}>{product.platform}</td>
-                  <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)", color: "#34d399", fontWeight: 700 }}>Rs. {product.price.toLocaleString()}</td>
-                  <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)", color: product.stock === 0 ? "#f87171" : "#fff", fontWeight: product.stock <= 5 ? 700 : 500 }}>{product.stock}</td>
-                  <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)" }}>{product.sales}</td>
-                  <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)" }}>
+                  <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", fontWeight: 700 }}>{product.name}</td>
+                  <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", fontSize: 13 }}>{product.category}</td>
+                  <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", fontSize: 12, color: ecommerceMuted }}>{product.sku}</td>
+                  <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", fontSize: 13 }}>{product.platform}</td>
+                  <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", color: "#34d399", fontWeight: 700 }}>Rs. {product.price.toLocaleString()}</td>
+                  <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", color: product.stock === 0 ? "#f87171" : "#fff", fontWeight: product.stock <= 5 ? 700 : 500 }}>{product.stock}</td>
+                  <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)" }}>{product.sales}</td>
+                  <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)" }}>
                     <button
                       onClick={() => update(product.id, { status: product.status === "active" ? "inactive" : "active" })}
                       style={{
@@ -146,7 +146,7 @@ export default function EcommerceProductsPage() {
               ))}
               {!products.length && (
                 <tr>
-                  <td colSpan={8} style={{ padding: 42, textAlign: "center", color: "rgba(255,255,255,.28)" }}>
+                  <td colSpan={8} style={{ padding: 42, textAlign: "center", color: "rgba(var(--ink),.28)" }}>
                     The catalog is currently empty. Add your first product.
                   </td>
                 </tr>
@@ -158,7 +158,7 @@ export default function EcommerceProductsPage() {
 
       {showModal && (
         <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.72)", zIndex: 50, display: "flex", alignItems: "center", justifyContent: "center" }}>
-          <div style={{ background: "#161b27", border: `1px solid ${ecommerceBorder}`, borderRadius: 18, padding: 32, width: 520, fontFamily: ecommerceFont }}>
+          <div style={{ background: "var(--dk-161b27, #161b27)", border: `1px solid ${ecommerceBorder}`, borderRadius: 18, padding: 32, width: 520, fontFamily: ecommerceFont }}>
             <h2 style={{ margin: "0 0 24px", fontSize: 20, fontWeight: 800 }}>Add Product Listing</h2>
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
               <div style={{ gridColumn: "span 2" }}>
@@ -192,7 +192,7 @@ export default function EcommerceProductsPage() {
               <button onClick={save} disabled={saving} style={{ flex: 1, padding: "11px 0", background: "#6366f1", border: "none", borderRadius: 10, color: "#fff", fontSize: 14, fontWeight: 700, cursor: "pointer", opacity: saving ? 0.7 : 1 }}>
                 {saving ? "Saving..." : "Add Product"}
               </button>
-              <button onClick={() => { setShowModal(false); setError(""); }} style={{ padding: "11px 24px", background: "transparent", border: `1px solid ${ecommerceBorder}`, borderRadius: 10, color: "rgba(255,255,255,.65)", fontSize: 14, cursor: "pointer" }}>
+              <button onClick={() => { setShowModal(false); setError(""); }} style={{ padding: "11px 24px", background: "transparent", border: `1px solid ${ecommerceBorder}`, borderRadius: 10, color: "rgba(var(--ink),.65)", fontSize: 14, cursor: "pointer" }}>
                 Cancel
               </button>
             </div>
@@ -205,11 +205,11 @@ export default function EcommerceProductsPage() {
 
 const inputStyle: CSSProperties = {
   width: "100%",
-  background: "rgba(255,255,255,.04)",
-  border: "1px solid rgba(255,255,255,.08)",
+  background: "rgba(var(--ink),.04)",
+  border: "1px solid rgba(var(--ink),.08)",
   borderRadius: 10,
   padding: "10px 12px",
-  color: "#fff",
+  color: "var(--ink-solid, #fff)",
   fontSize: 14,
   boxSizing: "border-box",
 };

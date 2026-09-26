@@ -6,37 +6,37 @@ import { useResponsive } from "@/hooks/useResponsive";
 const isMobile = false;
 
 const s = {
-  page: { minHeight: "100vh", background: "#0f0f13", fontFamily: "'Outfit','Inter',sans-serif", color: "#fff", padding: isMobile ? "16px" : "32px" } as React.CSSProperties,
+  page: { minHeight: "100vh", background: "var(--dk-0f0f13, #0f0f13)", fontFamily: "'Outfit','Inter',sans-serif", color: "var(--ink-solid, #fff)", padding: isMobile ? "16px" : "32px" } as React.CSSProperties,
   heading: { fontSize: 26, fontWeight: 700, marginBottom: 4 } as React.CSSProperties,
-  sub: { color: "rgba(255,255,255,.45)", fontSize: 13, marginBottom: 28 } as React.CSSProperties,
+  sub: { color: "rgba(var(--ink),.45)", fontSize: 13, marginBottom: 28 } as React.CSSProperties,
   statsRow: { display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 16, marginBottom: 28 } as React.CSSProperties,
-  card: { background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)", borderRadius: 14, padding: isMobile ? "12px 11px" : "20px 24px" } as React.CSSProperties,
-  cardLabel: { fontSize: 12, color: "rgba(255,255,255,.45)", marginBottom: 8, textTransform: "uppercase" as const, letterSpacing: 1 },
+  card: { background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.07)", borderRadius: 14, padding: isMobile ? "12px 11px" : "20px 24px" } as React.CSSProperties,
+  cardLabel: { fontSize: 12, color: "rgba(var(--ink),.45)", marginBottom: 8, textTransform: "uppercase" as const, letterSpacing: 1 },
   cardValue: { fontSize: 28, fontWeight: 700 },
   mainLayout: { display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 360px", gap: 24 } as React.CSSProperties,
   topRow: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 } as React.CSSProperties,
   sectionTitle: { fontSize: 16, fontWeight: 700 } as React.CSSProperties,
   btn: { background: "#6366f1", color: "#fff", border: "none", borderRadius: 10, padding: "10px 22px", fontSize: 14, fontWeight: 600, cursor: "pointer" } as React.CSSProperties,
-  tCard: (sel: boolean) => ({ background: sel ? "rgba(99,102,241,.08)" : "rgba(255,255,255,.03)", border: `1px solid ${sel ? "rgba(99,102,241,.4)" : "rgba(255,255,255,.07)"}`, borderRadius: 14, padding: isMobile ? "12px 10px" : "18px 20px", marginBottom: 12, cursor: "pointer", transition: "all .2s" }) as React.CSSProperties,
+  tCard: (sel: boolean) => ({ background: sel ? "rgba(99,102,241,.08)" : "rgba(var(--ink),.03)", border: `1px solid ${sel ? "rgba(99,102,241,.4)" : "rgba(var(--ink),.07)"}`, borderRadius: 14, padding: isMobile ? "12px 10px" : "18px 20px", marginBottom: 12, cursor: "pointer", transition: "all .2s" }) as React.CSSProperties,
   tTop: { display: "flex", justifyContent: "space-between", alignItems: "flex-start" } as React.CSSProperties,
   tName: { fontSize: 15, fontWeight: 700, marginBottom: 4 } as React.CSSProperties,
-  tSub: { fontSize: 12, color: "rgba(255,255,255,.4)" } as React.CSSProperties,
+  tSub: { fontSize: 12, color: "rgba(var(--ink),.4)" } as React.CSSProperties,
   badge: (color: string) => ({ background: `${color}18`, color, border: `1px solid ${color}40`, borderRadius: 6, padding: "3px 10px", fontSize: 11, fontWeight: 700 }) as React.CSSProperties,
   tInfo: { display: "flex", gap: 20, marginTop: 12 } as React.CSSProperties,
-  infoItem: { fontSize: 12, color: "rgba(255,255,255,.5)" } as React.CSSProperties,
-  detailPanel: { background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)", borderRadius: 16, padding: 24, position: "sticky" as const, top: 0 } as React.CSSProperties,
+  infoItem: { fontSize: 12, color: "rgba(var(--ink),.5)" } as React.CSSProperties,
+  detailPanel: { background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.07)", borderRadius: 16, padding: 24, position: "sticky" as const, top: 0 } as React.CSSProperties,
   dpTitle: { fontSize: 16, fontWeight: 700, marginBottom: 20 } as React.CSSProperties,
-  dpRow: { display: "flex", justifyContent: "space-between", alignItems: "flex-start", padding: "12px 0", borderBottom: "1px solid rgba(255,255,255,.06)" } as React.CSSProperties,
-  dpLabel: { fontSize: 12, color: "rgba(255,255,255,.4)" } as React.CSSProperties,
+  dpRow: { display: "flex", justifyContent: "space-between", alignItems: "flex-start", padding: "12px 0", borderBottom: "1px solid rgba(var(--ink),.06)" } as React.CSSProperties,
+  dpLabel: { fontSize: 12, color: "rgba(var(--ink),.4)" } as React.CSSProperties,
   dpValue: { fontSize: 13, fontWeight: 600, textAlign: "right" as const, maxWidth: 180 } as React.CSSProperties,
   overlay: { position: "fixed" as const, inset: 0, background: "rgba(0,0,0,.75)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 999 },
-  modal: { background: "#1a1a24", border: "1px solid rgba(255,255,255,.1)", borderRadius: 18, padding: 32, width: 560, maxHeight: "90vh", overflowY: "auto" as const },
+  modal: { background: "var(--dk-1a1a24, #1a1a24)", border: "1px solid rgba(var(--ink),.1)", borderRadius: 18, padding: 32, width: 560, maxHeight: "90vh", overflowY: "auto" as const },
   mTitle: { fontSize: 20, fontWeight: 700, marginBottom: 24 } as React.CSSProperties,
   formGrid: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 } as React.CSSProperties,
-  lbl: { fontSize: 12, color: "rgba(255,255,255,.5)", marginBottom: 6, display: "block" } as React.CSSProperties,
-  inp: { width: "100%", background: "rgba(255,255,255,.05)", border: "1px solid rgba(255,255,255,.1)", borderRadius: 8, padding: "10px 12px", color: "#fff", fontSize: 14, boxSizing: "border-box" as const, fontFamily: "'Outfit','Inter',sans-serif" } as React.CSSProperties,
+  lbl: { fontSize: 12, color: "rgba(var(--ink),.5)", marginBottom: 6, display: "block" } as React.CSSProperties,
+  inp: { width: "100%", background: "rgba(var(--ink),.05)", border: "1px solid rgba(var(--ink),.1)", borderRadius: 8, padding: "10px 12px", color: "var(--ink-solid, #fff)", fontSize: 14, boxSizing: "border-box" as const, fontFamily: "'Outfit','Inter',sans-serif" } as React.CSSProperties,
   mBtns: { display: "flex", gap: 12, marginTop: 24, justifyContent: "flex-end" } as React.CSSProperties,
-  cancelBtn: { background: "transparent", color: "rgba(255,255,255,.6)", border: "1px solid rgba(255,255,255,.1)", borderRadius: 10, padding: "10px 22px", fontSize: 14, cursor: "pointer" } as React.CSSProperties,
+  cancelBtn: { background: "transparent", color: "rgba(var(--ink),.6)", border: "1px solid rgba(var(--ink),.1)", borderRadius: 10, padding: "10px 22px", fontSize: 14, cursor: "pointer" } as React.CSSProperties,
 };
 
 const statusConfig: Record<string, { label: string; color: string }> = {
@@ -113,7 +113,7 @@ export default function TenantsPage() {
         ))}
       </div>
 
-      {loading && <div style={{ textAlign: "center", padding: 40, color: "rgba(255,255,255,.4)" }}>Loading...</div>}
+      {loading && <div style={{ textAlign: "center", padding: 40, color: "rgba(var(--ink),.4)" }}>Loading...</div>}
 
       <div style={s.mainLayout}>
         <div>
@@ -123,7 +123,7 @@ export default function TenantsPage() {
           </div>
 
           {!loading && tenants.length === 0 && (
-            <div style={{ ...s.card, textAlign: "center", padding: 40, color: "rgba(255,255,255,.25)" }}>No tenants found.</div>
+            <div style={{ ...s.card, textAlign: "center", padding: 40, color: "rgba(var(--ink),.25)" }}>No tenants found.</div>
           )}
 
           {tenants.map(t => {

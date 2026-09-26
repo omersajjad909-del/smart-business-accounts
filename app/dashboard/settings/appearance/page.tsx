@@ -15,8 +15,8 @@ type UserPrefs = { themeMode: ThemeMode; density: Density; sidebarDefault: Sideb
 type CompanyBranding = { name: string; logoUrl: string | null; brandColor: BrandKey };
 
 const CARD: React.CSSProperties = {
-  background: "var(--card-bg, rgba(255,255,255,.03))",
-  border: "1px solid var(--card-border, rgba(255,255,255,.08))",
+  background: "var(--card-bg, rgba(var(--ink),.03))",
+  border: "1px solid var(--card-border, rgba(var(--ink),.08))",
   borderRadius: 16,
   padding: 24,
   color: "var(--text-primary, #fff)",
@@ -24,7 +24,7 @@ const CARD: React.CSSProperties = {
 
 const LABEL: React.CSSProperties = {
   fontSize: 11, fontWeight: 800, letterSpacing: ".08em", textTransform: "uppercase",
-  color: "var(--text-muted, rgba(255,255,255,.5))", marginBottom: 10,
+  color: "var(--text-muted, rgba(var(--ink),.5))", marginBottom: 10,
 };
 
 export default function AppearancePage() {
@@ -149,14 +149,14 @@ export default function AppearancePage() {
   }
 
   if (loading) {
-    return <div style={{ padding: 40, color: "var(--text-muted, rgba(255,255,255,.5))" }}>Loading appearance…</div>;
+    return <div style={{ padding: 40, color: "var(--text-muted, rgba(var(--ink),.5))" }}>Loading appearance…</div>;
   }
 
   return (
     <div style={{ maxWidth: 900, margin: "0 auto", padding: "24px 20px 80px", display: "flex", flexDirection: "column", gap: 22, fontFamily: "'Outfit','Inter',sans-serif" }}>
       <header>
         <h1 style={{ fontSize: 26, fontWeight: 800, margin: 0, letterSpacing: -0.5 }}>Appearance</h1>
-        <p style={{ fontSize: 14, color: "var(--text-muted, rgba(255,255,255,.5))", margin: "6px 0 0", lineHeight: 1.6 }}>
+        <p style={{ fontSize: 14, color: "var(--text-muted, rgba(var(--ink),.5))", margin: "6px 0 0", lineHeight: 1.6 }}>
           Personal settings apply to your account. Branding is shared across everyone in your company{isAdmin ? "" : " and can only be changed by an admin"}.
         </p>
       </header>
@@ -166,7 +166,7 @@ export default function AppearancePage() {
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, marginBottom: 18 }}>
           <div>
             <div style={{ fontSize: 17, fontWeight: 800, marginBottom: 2 }}>Company branding</div>
-            <div style={{ fontSize: 12.5, color: "var(--text-muted, rgba(255,255,255,.45))" }}>
+            <div style={{ fontSize: 12.5, color: "var(--text-muted, rgba(var(--ink),.45))" }}>
               Logo and brand color appear on the dashboard, invoices, and shared documents.
             </div>
           </div>
@@ -179,7 +179,7 @@ export default function AppearancePage() {
 
         {/* Logo */}
         <div style={{ display: "flex", gap: 20, alignItems: "center", marginBottom: 24 }}>
-          <div style={{ width: 84, height: 84, borderRadius: 16, background: "var(--sidebar-bg, rgba(255,255,255,.05))", border: "1px solid var(--card-border, rgba(255,255,255,.1))", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden", flexShrink: 0 }}>
+          <div style={{ width: 84, height: 84, borderRadius: 16, background: "var(--sidebar-bg, rgba(var(--ink),.05))", border: "1px solid var(--card-border, rgba(var(--ink),.1))", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden", flexShrink: 0 }}>
             {brand.logoUrl
               ? <img src={brand.logoUrl} alt="Logo" style={{ maxWidth: "100%", maxHeight: "100%", objectFit: "contain" }} />
               : <span style={{ fontSize: 30, opacity: 0.4 }}>🏢</span>
@@ -200,7 +200,7 @@ export default function AppearancePage() {
                 onClick={() => fileRef.current?.click()}
                 disabled={!isAdmin || logoUploading}
                 style={{
-                  padding: "9px 16px", borderRadius: 10, border: "1px solid var(--card-border, rgba(255,255,255,.12))",
+                  padding: "9px 16px", borderRadius: 10, border: "1px solid var(--card-border, rgba(var(--ink),.12))",
                   background: "var(--accent-soft, rgba(13,148,136,.1))", color: "var(--accent, #0d9488)",
                   fontSize: 13, fontWeight: 700, cursor: (!isAdmin || logoUploading) ? "not-allowed" : "pointer",
                 }}
@@ -219,7 +219,7 @@ export default function AppearancePage() {
                 </button>
               )}
             </div>
-            <div style={{ fontSize: 11, color: "var(--text-muted, rgba(255,255,255,.35))", marginTop: 8 }}>
+            <div style={{ fontSize: 11, color: "var(--text-muted, rgba(var(--ink),.35))", marginTop: 8 }}>
               PNG, JPEG, WebP or SVG — max 1 MB
             </div>
           </div>
@@ -239,8 +239,8 @@ export default function AppearancePage() {
                   disabled={!isAdmin || saving}
                   style={{
                     padding: "12px 8px 10px", borderRadius: 12,
-                    border: `1.5px solid ${active ? p.accent : "var(--card-border, rgba(255,255,255,.08))"}`,
-                    background: active ? p.accentSoft : "var(--sidebar-bg, rgba(255,255,255,.03))",
+                    border: `1.5px solid ${active ? p.accent : "var(--card-border, rgba(var(--ink),.08))"}`,
+                    background: active ? p.accentSoft : "var(--sidebar-bg, rgba(var(--ink),.03))",
                     cursor: (!isAdmin || saving) ? "not-allowed" : "pointer",
                     display: "flex", flexDirection: "column", alignItems: "center", gap: 6,
                     transition: "all .15s ease",
@@ -267,8 +267,8 @@ export default function AppearancePage() {
             placeholder="Your company name"
             style={{
               width: "100%", padding: "10px 14px", borderRadius: 10,
-              background: "var(--sidebar-bg, rgba(255,255,255,.03))",
-              border: "1px solid var(--card-border, rgba(255,255,255,.1))",
+              background: "var(--sidebar-bg, rgba(var(--ink),.03))",
+              border: "1px solid var(--card-border, rgba(var(--ink),.1))",
               color: "var(--text-primary, #fff)", fontSize: 14, fontFamily: "inherit", outline: "none",
             }}
           />
@@ -279,7 +279,7 @@ export default function AppearancePage() {
       <section style={CARD}>
         <div style={{ marginBottom: 18 }}>
           <div style={{ fontSize: 17, fontWeight: 800, marginBottom: 2 }}>Personal preferences</div>
-          <div style={{ fontSize: 12.5, color: "var(--text-muted, rgba(255,255,255,.45))" }}>
+          <div style={{ fontSize: 12.5, color: "var(--text-muted, rgba(var(--ink),.45))" }}>
             Only affects your view. Every teammate has their own settings.
           </div>
         </div>
@@ -300,7 +300,7 @@ export default function AppearancePage() {
               <div style={{ padding: "8px 16px", borderRadius: 10, background: "rgba(99,102,241,.12)", border: "1px solid rgba(99,102,241,.3)", fontSize: 13, fontWeight: 700, color: "#a5b4fc" }}>
                 🌙 Dark
               </div>
-              <div style={{ fontSize: 12, color: "rgba(255,255,255,.38)" }}>
+              <div style={{ fontSize: 12, color: "rgba(var(--ink),.38)" }}>
                 Light mode is coming back once its colours are finished.
               </div>
             </div>
@@ -341,8 +341,8 @@ function SegmentedControl({
   return (
     <div style={{
       display: "inline-flex", padding: 4, borderRadius: 12,
-      background: "var(--sidebar-bg, rgba(255,255,255,.03))",
-      border: "1px solid var(--card-border, rgba(255,255,255,.08))",
+      background: "var(--sidebar-bg, rgba(var(--ink),.03))",
+      border: "1px solid var(--card-border, rgba(var(--ink),.08))",
       gap: 2,
     }}>
       {options.map(o => {

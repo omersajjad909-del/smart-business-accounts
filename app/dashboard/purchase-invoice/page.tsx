@@ -1063,9 +1063,9 @@ const [searchTerm, setSearchTerm] = useState("");
         <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
           {piQueryIdx >= 0 && !piQueryMode && (
             <div style={{ display: "flex", alignItems: "center", gap: 6, background: "rgba(99,102,241,.08)", border: "1px solid rgba(99,102,241,.2)", borderRadius: 10, padding: "6px 12px" }}>
-              <button onClick={() => piNavTo(piQueryIdx - 1)} disabled={piQueryIdx === 0} style={{ padding: "4px 10px", borderRadius: 6, background: "rgba(255,255,255,.06)", border: "1px solid rgba(255,255,255,.1)", color: piQueryIdx===0?"rgba(255,255,255,.2)":"rgba(255,255,255,.7)", fontSize: 13, cursor: piQueryIdx===0?"default":"pointer", fontFamily: FONT }}>◀</button>
+              <button onClick={() => piNavTo(piQueryIdx - 1)} disabled={piQueryIdx === 0} style={{ padding: "4px 10px", borderRadius: 6, background: "rgba(var(--ink),.06)", border: "1px solid rgba(var(--ink),.1)", color: piQueryIdx===0?"rgba(var(--ink),.2)":"rgba(var(--ink),.7)", fontSize: 13, cursor: piQueryIdx===0?"default":"pointer", fontFamily: FONT }}>◀</button>
               <span style={{ fontSize: 12, color: ACCENT, fontWeight: 700, minWidth: 110, textAlign: "center" }}>{piQueryResults[piQueryIdx]?.invoiceNo} · {piQueryIdx+1}/{piQueryResults.length}</span>
-              <button onClick={() => piNavTo(piQueryIdx + 1)} disabled={piQueryIdx === piQueryResults.length-1} style={{ padding: "4px 10px", borderRadius: 6, background: "rgba(255,255,255,.06)", border: "1px solid rgba(255,255,255,.1)", color: piQueryIdx===piQueryResults.length-1?"rgba(255,255,255,.2)":"rgba(255,255,255,.7)", fontSize: 13, cursor: piQueryIdx===piQueryResults.length-1?"default":"pointer", fontFamily: FONT }}>▶</button>
+              <button onClick={() => piNavTo(piQueryIdx + 1)} disabled={piQueryIdx === piQueryResults.length-1} style={{ padding: "4px 10px", borderRadius: 6, background: "rgba(var(--ink),.06)", border: "1px solid rgba(var(--ink),.1)", color: piQueryIdx===piQueryResults.length-1?"rgba(var(--ink),.2)":"rgba(var(--ink),.7)", fontSize: 13, cursor: piQueryIdx===piQueryResults.length-1?"default":"pointer", fontFamily: FONT }}>▶</button>
               <button onClick={piExitQuery} style={{ padding: "4px 10px", borderRadius: 6, background: "rgba(248,113,113,.08)", border: "1px solid rgba(248,113,113,.2)", color: "#f87171", fontSize: 11, cursor: "pointer", fontFamily: FONT }}>✕ Exit</button>
             </div>
           )}
@@ -1341,7 +1341,7 @@ const [searchTerm, setSearchTerm] = useState("");
                     style={{ width: "100%", padding: "6px 10px", borderRadius: 7, background: "transparent", border: `1px solid ${BORDER}`, color: TEXT, fontSize: 13, fontFamily: "monospace", outline: "none" }} />
                 </div>
                 <div style={{ fontSize: 10, color: MUTED, display: "flex", alignItems: "center", gap: 4, flexShrink: 0 }}>
-                  <span style={{ background: "rgba(255,255,255,.06)", border: `1px solid ${BORDER}`, borderRadius: 4, padding: "2px 7px", fontFamily: "monospace", fontWeight: 700, fontSize: 10 }}>F4</span>
+                  <span style={{ background: "rgba(var(--ink),.06)", border: `1px solid ${BORDER}`, borderRadius: 4, padding: "2px 7px", fontFamily: "monospace", fontWeight: 700, fontSize: 10 }}>F4</span>
                   <span>Item Search</span>
                 </div>
               </div>
@@ -1522,7 +1522,7 @@ const [searchTerm, setSearchTerm] = useState("");
                       <button
                         type="button"
                         onClick={() => setRows(r => [...r, emptyRow()])}
-                        style={{ padding: "6px 13px", borderRadius: 7, background: "rgba(255,255,255,.05)", border: `1px solid ${BORDER}`, color: MUTED, fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}
+                        style={{ padding: "6px 13px", borderRadius: 7, background: "rgba(var(--ink),.05)", border: `1px solid ${BORDER}`, color: MUTED, fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}
                       >
                         + Add Row
                       </button>
@@ -1638,7 +1638,7 @@ const [searchTerm, setSearchTerm] = useState("");
                       </div>
 
                       {/* In Words */}
-                      <div style={{ padding: "8px 10px", borderRadius: 8, background: "rgba(255,255,255,.03)", border: `1px solid ${BORDER}`, fontSize: 11, color: MUTED, fontStyle: "italic", lineHeight: 1.4 }}>
+                      <div style={{ padding: "8px 10px", borderRadius: 8, background: "rgba(var(--ink),.03)", border: `1px solid ${BORDER}`, fontSize: 11, color: MUTED, fontStyle: "italic", lineHeight: 1.4 }}>
                         {netTotal > 0 ? amountInWords(netTotal) : "—"}
                       </div>
 
@@ -1668,7 +1668,7 @@ const [searchTerm, setSearchTerm] = useState("");
                       <button onClick={saveInvoice} disabled={saving}
                         style={{ padding: "12px", borderRadius: 9, border: "none", background: saving ? "#374151" : "linear-gradient(135deg,#2563eb,#3b82f6)", color: "#fff", fontFamily: FONT, fontSize: 14, fontWeight: 800, cursor: saving ? "not-allowed" : "pointer", boxShadow: saving ? "none" : "0 4px 16px rgba(37,99,235,.4)", display: "flex", alignItems: "center", justifyContent: "center", gap: 7 }}>
                         {saving ? (
-                          <><span style={{ display: "inline-block", width: 14, height: 14, border: "2px solid rgba(255,255,255,.3)", borderTopColor: "#fff", borderRadius: "50%", animation: "spin 0.7s linear infinite" }} />Saving…</>
+                          <><span style={{ display: "inline-block", width: 14, height: 14, border: "2px solid rgba(var(--ink),.3)", borderTopColor: "#fff", borderRadius: "50%", animation: "spin 0.7s linear infinite" }} />Saving…</>
                         ) : (
                           <><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>{editing ? "Update Invoice" : "Save & Preview"}</>
                         )}
@@ -1683,7 +1683,7 @@ const [searchTerm, setSearchTerm] = useState("");
               </div>
 
               {/* ── SHORTCUTS BAR ── */}
-              <div style={{ marginTop: 16, padding: "10px 14px", borderRadius: 10, background: "rgba(255,255,255,.02)", border: `1px solid ${BORDER}`, display: "flex", gap: 6, flexWrap: "wrap", alignItems: "center" }}>
+              <div style={{ marginTop: 16, padding: "10px 14px", borderRadius: 10, background: "rgba(var(--ink),.02)", border: `1px solid ${BORDER}`, display: "flex", gap: 6, flexWrap: "wrap", alignItems: "center" }}>
                 <span style={{ fontSize: 10, color: MUTED, fontWeight: 700, textTransform: "uppercase" as const, letterSpacing: 0.5, marginRight: 4 }}>Shortcuts:</span>
                 {(piQueryMode ? [
                   { key: "F8", label: "Execute Query", c: "#facc15" },
@@ -1702,7 +1702,7 @@ const [searchTerm, setSearchTerm] = useState("");
                   { key: "Esc", label: "Clear", c: undefined },
                 ]).map(s => (
                   <div key={s.key} style={{ display: "flex", alignItems: "center", gap: 4, padding: "3px 9px 3px 5px", borderRadius: 6, border: `1px solid ${s.c ? `${s.c}33` : BORDER}`, background: s.c ? `${s.c}0d` : "transparent" }}>
-                    <span style={{ background: s.c ? `${s.c}22` : "rgba(255,255,255,.06)", color: s.c || MUTED, borderRadius: 4, padding: "1px 6px", fontSize: 10, fontWeight: 800, fontFamily: "monospace", border: `1px solid ${s.c ? `${s.c}44` : BORDER}` }}>{s.key}</span>
+                    <span style={{ background: s.c ? `${s.c}22` : "rgba(var(--ink),.06)", color: s.c || MUTED, borderRadius: 4, padding: "1px 6px", fontSize: 10, fontWeight: 800, fontFamily: "monospace", border: `1px solid ${s.c ? `${s.c}44` : BORDER}` }}>{s.key}</span>
                     <span style={{ fontSize: 10.5, color: s.c || MUTED, fontWeight: s.c ? 700 : 500 }}>{s.label}</span>
                   </div>
                 ))}
@@ -1885,7 +1885,7 @@ const [searchTerm, setSearchTerm] = useState("");
                 <div style={{ display: "flex", justifyContent: "space-between" }}><span>Sub Total:</span><span>{subtotal.toLocaleString()}</span></div>
                 {Number(freight) > 0 && <div style={{ display: "flex", justifyContent: "space-between" }}><span>Freight:</span><span>{Number(freight).toLocaleString()}</span></div>}
                 {selectedTax && <div style={{ display: "flex", justifyContent: "space-between" }}><span>{selectedTax.taxType}:</span><span>{globalTaxAmt.toLocaleString()}</span></div>}
-                <div style={{ display: "flex", justifyContent: "space-between", fontWeight: 900, fontSize: 11, borderTop: "1px solid #000", paddingTop: 3, marginTop: 3 }}>
+                <div style={{ display: "flex", justifyContent: "space-between", fontWeight: 900, fontSize: 11, borderTop: "1px solid var(--dkb-000000, #000)", paddingTop: 3, marginTop: 3 }}>
                   <span>NET:</span><span>{netTotal.toLocaleString()}</span>
                 </div>
               </div>

@@ -37,7 +37,7 @@ export default function PharmacyPrescriptionsPage() {
   }
 
   return (
-    <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", fontFamily: pharmacyFont, color: "#fff", minHeight: "100vh" }}>
+    <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", fontFamily: pharmacyFont, color: "var(--ink-solid, #fff)", minHeight: "100vh" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 28 }}>
         <div>
           <h1 style={{ fontSize: 22, fontWeight: 800, margin: "0 0 4px" }}>Prescriptions</h1>
@@ -65,8 +65,8 @@ export default function PharmacyPrescriptionsPage() {
                 <span style={{ fontWeight: 700 }}>{p.patient}</span>
                 <span style={{ fontSize: 12, color: pharmacyMuted }}>Dr. {p.doctor} | {p.date}</span>
               </div>
-              <div style={{ fontSize: 12, color: "rgba(255,255,255,.65)" }}>{p.drugs}</div>
-              {p.notes && <div style={{ fontSize: 11, color: "rgba(255,255,255,.35)", marginTop: 2 }}>{p.notes}</div>}
+              <div style={{ fontSize: 12, color: "rgba(var(--ink),.65)" }}>{p.drugs}</div>
+              {p.notes && <div style={{ fontSize: 11, color: "rgba(var(--ink),.35)", marginTop: 2 }}>{p.notes}</div>}
             </div>
             <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
               <span style={{ display: "inline-block", background: `${STATUS_COLOR[p.status]}20`, color: STATUS_COLOR[p.status], borderRadius: 6, padding: "2px 8px", fontSize: 11, fontWeight: 600 }}>{p.status}</span>
@@ -74,12 +74,12 @@ export default function PharmacyPrescriptionsPage() {
             </div>
           </div>
         ))}
-        {!loading && prescriptions.length === 0 && <div style={{ background: pharmacyBg, border: `1px solid ${pharmacyBorder}`, borderRadius: 12, padding: 40, textAlign: "center", color: "rgba(255,255,255,.25)" }}>No prescriptions yet.</div>}
+        {!loading && prescriptions.length === 0 && <div style={{ background: pharmacyBg, border: `1px solid ${pharmacyBorder}`, borderRadius: 12, padding: 40, textAlign: "center", color: "rgba(var(--ink),.25)" }}>No prescriptions yet.</div>}
       </div>
 
       {showModal && (
         <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.7)", zIndex: 50, display: "flex", alignItems: "center", justifyContent: "center" }}>
-          <div style={{ background: "#161b27", border: `1px solid ${pharmacyBorder}`, borderRadius: 16, padding: 32, width: 480, fontFamily: pharmacyFont }}>
+          <div style={{ background: "var(--dk-161b27, #161b27)", border: `1px solid ${pharmacyBorder}`, borderRadius: 16, padding: 32, width: 480, fontFamily: pharmacyFont }}>
             <h2 style={{ margin: "0 0 24px", fontSize: 18, fontWeight: 700 }}>New Prescription</h2>
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
               {[["Patient Name", "patient", "text", "span 2"], ["Doctor", "doctor", "text", ""], ["Date", "date", "date", ""], ["Drugs (comma separated)", "drugs", "text", "span 2"], ["Notes", "notes", "text", "span 2"]].map(([label, key, type, col]) => (
@@ -92,7 +92,7 @@ export default function PharmacyPrescriptionsPage() {
             {error && <div style={{ marginTop: 14, fontSize: 12, color: "#fca5a5" }}>{error}</div>}
             <div style={{ display: "flex", gap: 12, marginTop: 16 }}>
               <button onClick={save} style={{ flex: 1, padding: "11px 0", background: "#fb7185", border: "none", borderRadius: 8, color: "#fff", fontSize: 14, fontWeight: 600, cursor: "pointer" }}>Add</button>
-              <button onClick={() => { setShowModal(false); setError(""); }} style={{ padding: "11px 24px", background: "transparent", border: `1px solid ${pharmacyBorder}`, borderRadius: 8, color: "rgba(255,255,255,.6)", fontSize: 14, cursor: "pointer" }}>Cancel</button>
+              <button onClick={() => { setShowModal(false); setError(""); }} style={{ padding: "11px 24px", background: "transparent", border: `1px solid ${pharmacyBorder}`, borderRadius: 8, color: "rgba(var(--ink),.6)", fontSize: 14, cursor: "pointer" }}>Cancel</button>
             </div>
           </div>
         </div>

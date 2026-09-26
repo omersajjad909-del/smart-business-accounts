@@ -275,7 +275,7 @@ function FlowList({ steps, color }: { steps: readonly string[]; color: string })
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
       {steps.map((s, i) => (
-        <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: 8, fontSize: 12, color: i === 0 ? "rgba(255,255,255,.75)" : "#475569", lineHeight: 1.5 }}>
+        <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: 8, fontSize: 12, color: i === 0 ? "rgba(var(--ink),.75)" : "#475569", lineHeight: 1.5 }}>
           {i > 0 && <span style={{ color, flexShrink: 0, marginTop: 1 }}>▸</span>}
           <span style={i === 0 ? { fontWeight: 600 } : {}}>{s}</span>
         </div>
@@ -354,7 +354,7 @@ export default function BusinessFeaturesPage() {
   );
 
   return (
-    <div style={{ padding: "28px 32px 80px", maxWidth: 900, fontFamily: ff, color: "white" }}>
+    <div style={{ padding: "28px 32px 80px", maxWidth: 900, fontFamily: ff, color: "var(--ink-solid, white)" }}>
       <style>{`* { box-sizing: border-box; }`}</style>
 
       {/* ── Header ── */}
@@ -379,10 +379,10 @@ export default function BusinessFeaturesPage() {
           <div>
             <div style={{ fontSize: 13, fontWeight: 700, color: "#818cf8", marginBottom: 4 }}>One system. Adaptive workflow.</div>
             <div style={{ fontSize: 12, color: "#475569", lineHeight: 1.7 }}>
-              Every feature uses the <strong style={{ color: "rgba(255,255,255,.6)" }}>same database and backend</strong> — only the screen and workflow adapts.
+              Every feature uses the <strong style={{ color: "rgba(var(--ink),.6)" }}>same database and backend</strong> — only the screen and workflow adapts.
               Simple 2-click flow for small shops. Full approval + audit trail for enterprise.
               <br />
-              <strong style={{ color: "rgba(255,255,255,.5)" }}>Default: all OFF</strong> — enable only what your business actually needs.
+              <strong style={{ color: "rgba(var(--ink),.5)" }}>Default: all OFF</strong> — enable only what your business actually needs.
             </div>
           </div>
         </div>
@@ -413,8 +413,8 @@ export default function BusinessFeaturesPage() {
           const isOn = features[fc.key];
           return (
             <div key={fc.key} style={{
-              borderRadius: 16, border: `1px solid ${isOn ? fc.border : "rgba(255,255,255,.07)"}`,
-              background: isOn ? fc.bg : "rgba(255,255,255,.02)",
+              borderRadius: 16, border: `1px solid ${isOn ? fc.border : "rgba(var(--ink),.07)"}`,
+              background: isOn ? fc.bg : "rgba(var(--ink),.02)",
               overflow: "hidden", transition: "border-color .2s, background .2s",
             }}>
               {/* Card header */}
@@ -429,15 +429,15 @@ export default function BusinessFeaturesPage() {
                     {isOn && <span style={{ fontSize: 11, fontWeight: 700, padding: "2px 8px", borderRadius: 20, background: "rgba(16,185,129,.12)", color: "#10b981", border: "1px solid rgba(16,185,129,.25)" }}>✓ ENABLED</span>}
                   </div>
                   <div style={{ fontSize: 12, color: "#475569", marginTop: 3 }}>{fc.subtitle}</div>
-                  <div style={{ fontSize: 12, color: "rgba(255,255,255,.5)", marginTop: 6, lineHeight: 1.6 }}>{fc.description}</div>
+                  <div style={{ fontSize: 12, color: "rgba(var(--ink),.5)", marginTop: 6, lineHeight: 1.6 }}>{fc.description}</div>
                 </div>
                 <Toggle on={isOn} onChange={() => toggle(fc.key)} />
               </div>
 
               {/* Flow comparison */}
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", borderTop: `1px solid ${isOn ? fc.border : "rgba(255,255,255,.05)"}` }}>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", borderTop: `1px solid ${isOn ? fc.border : "rgba(var(--ink),.05)"}` }}>
                 {/* Simple side */}
-                <div style={{ padding: isMobile ? "12px 10px" : "14px 18px", borderRight: "1px solid rgba(255,255,255,.05)", background: !isOn ? "rgba(52,211,153,.04)" : "transparent" }}>
+                <div style={{ padding: isMobile ? "12px 10px" : "14px 18px", borderRight: "1px solid rgba(var(--ink),.05)", background: !isOn ? "rgba(52,211,153,.04)" : "transparent" }}>
                   <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 10 }}>
                     <div style={{ width: 7, height: 7, borderRadius: "50%", background: !isOn ? "#34d399" : "#334155" }} />
                     <div style={{ fontSize: 10, fontWeight: 800, color: !isOn ? "#34d399" : "#334155", textTransform: "uppercase", letterSpacing: ".06em" }}>
@@ -479,9 +479,9 @@ export default function BusinessFeaturesPage() {
 
       {/* ── Save bar ── */}
       {hasChanges && (
-        <div style={{ position: "fixed", bottom: 24, left: "50%", transform: "translateX(-50%)", zIndex: 999, display: "flex", alignItems: "center", gap: 14, padding: "12px 24px", borderRadius: 14, background: "#0f172a", border: "1px solid rgba(99,102,241,.35)", boxShadow: "0 8px 40px rgba(0,0,0,.5)" }}>
+        <div style={{ position: "fixed", bottom: 24, left: "50%", transform: "translateX(-50%)", zIndex: 999, display: "flex", alignItems: "center", gap: 14, padding: "12px 24px", borderRadius: 14, background: "var(--dk-0f172a, #0f172a)", border: "1px solid rgba(99,102,241,.35)", boxShadow: "0 8px 40px rgba(0,0,0,.5)" }}>
           <span style={{ fontSize: 13, color: "#818cf8", fontWeight: 600 }}>Unsaved changes</span>
-          <button onClick={() => setFeatures({ ...saved })} style={{ padding: "7px 16px", borderRadius: 8, border: "1px solid rgba(255,255,255,.1)", background: "transparent", color: "#475569", fontFamily: ff, fontSize: 12, fontWeight: 600, cursor: "pointer" }}>Discard</button>
+          <button onClick={() => setFeatures({ ...saved })} style={{ padding: "7px 16px", borderRadius: 8, border: "1px solid rgba(var(--ink),.1)", background: "transparent", color: "#475569", fontFamily: ff, fontSize: 12, fontWeight: 600, cursor: "pointer" }}>Discard</button>
           <button onClick={save} disabled={saving} style={{ padding: "7px 20px", borderRadius: 8, background: saving ? "rgba(99,102,241,.4)" : "linear-gradient(135deg,#6366f1,#4f46e5)", border: "none", color: "white", fontFamily: ff, fontSize: 13, fontWeight: 700, cursor: saving ? "default" : "pointer" }}>
             {saving ? "Saving…" : "💾 Save"}
           </button>

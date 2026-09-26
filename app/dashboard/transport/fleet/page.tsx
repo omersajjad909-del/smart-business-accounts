@@ -54,11 +54,11 @@ export default function FleetPage() {
   };
 
   const card = { background: transportBg, border: `1px solid ${transportBorder}`, borderRadius: 12, padding: 20 };
-  const inp = { background: "rgba(255,255,255,.05)", border: `1px solid ${transportBorder}`, borderRadius: 8, padding: "10px 14px", color: "#fff", fontFamily: transportFont, width: "100%", boxSizing: "border-box" as const, fontSize: 14 };
+  const inp = { background: "rgba(var(--ink),.05)", border: `1px solid ${transportBorder}`, borderRadius: 8, padding: "10px 14px", color: "var(--ink-solid, #fff)", fontFamily: transportFont, width: "100%", boxSizing: "border-box" as const, fontSize: 14 };
   const btn = (c: string) => ({ background: c, border: "none", borderRadius: 8, padding: "10px 20px", color: "#fff", fontFamily: transportFont, cursor: "pointer", fontSize: 14, fontWeight: 600 });
 
   return (
-    <div style={{ fontFamily: transportFont, color: "#fff", padding: isMobile ? "12px" : "24px", minHeight: "100vh" }}>
+    <div style={{ fontFamily: transportFont, color: "var(--ink-solid, #fff)", padding: isMobile ? "12px" : "24px", minHeight: "100vh" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24 }}>
         <div>
           <h1 style={{ margin: 0, fontSize: 24, fontWeight: 700 }}>Fleet Management</h1>
@@ -90,7 +90,7 @@ export default function FleetPage() {
       {loading && <div style={{ textAlign: "center", padding: 40, color: transportMuted }}>Loading...</div>}
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(320px,1fr))", gap: 16 }}>
-        {!loading && filtered.length === 0 && <div style={{ ...card, textAlign: "center", padding: 40, color: "rgba(255,255,255,.25)" }}>No vehicles found.</div>}
+        {!loading && filtered.length === 0 && <div style={{ ...card, textAlign: "center", padding: 40, color: "rgba(var(--ink),.25)" }}>No vehicles found.</div>}
         {filtered.map((v) => {
           const overdue = isOverdue(v.nextService);
           const dueSoon = isDueSoon(v.nextService);
@@ -111,7 +111,7 @@ export default function FleetPage() {
                   {statusLabel[v.status] || v.status}
                 </span>
               </div>
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, fontSize: 13, color: "rgba(255,255,255,.6)" }}>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, fontSize: 13, color: "rgba(var(--ink),.6)" }}>
                 <div>Driver: {v.driver || "-"}</div>
                 <div>Capacity: {v.capacity || "-"}</div>
                 <div>Fuel: {v.fuelType}</div>
@@ -126,7 +126,7 @@ export default function FleetPage() {
 
       {showModal && (
         <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.7)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000 }}>
-          <div style={{ background: "#1a1a2e", border: `1px solid ${transportBorder}`, borderRadius: 16, padding: 28, width: 500, maxHeight: "90vh", overflowY: "auto" }}>
+          <div style={{ background: "var(--dk-1a1a2e, #1a1a2e)", border: `1px solid ${transportBorder}`, borderRadius: 16, padding: 28, width: 500, maxHeight: "90vh", overflowY: "auto" }}>
             <h2 style={{ margin: "0 0 20px", fontSize: 18 }}>Add Vehicle</h2>
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
               {[["Registration No", "regNo"], ["Make", "make"], ["Model", "model"], ["Year", "year"], ["Capacity", "capacity"], ["Driver", "driver"], ["Fuel Type", "fuelType"], ["Next Service", "nextService"]].map(([lbl, key]) => (

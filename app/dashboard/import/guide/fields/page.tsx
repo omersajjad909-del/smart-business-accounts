@@ -58,7 +58,7 @@ function Pill({ children, tone }: { children: React.ReactNode; tone?: "required"
   return (
     <span style={{
       padding: "3px 9px", borderRadius: 7, fontSize: 11, fontFamily: MONO,
-      background: "rgba(255,255,255,.05)", border: "1px solid var(--border)",
+      background: "rgba(var(--ink),.05)", border: "1px solid var(--border)",
       color: tone === "required" ? "#f59e0b" : "var(--text-muted)",
       display: "inline-block",
     }}>{children}</span>
@@ -114,7 +114,7 @@ function TypeBlock({ def, isMobile }: { def: ImportDataTypeDef; isMobile: boolea
         }}>
           <span style={{
             width: 24, height: 24, borderRadius: 7, fontSize: 10.5, fontWeight: 800,
-            background: "rgba(255,255,255,.05)", border: "1px solid var(--border)",
+            background: "rgba(var(--ink),.05)", border: "1px solid var(--border)",
             color: "var(--text-muted)",
             display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
           }}>{def.order}</span>

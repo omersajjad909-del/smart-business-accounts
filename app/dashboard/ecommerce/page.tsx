@@ -51,7 +51,7 @@ export default function EcommerceOverviewPage() {
   const topProducts = useMemo(() => [...data.products].sort((a, b) => b.sales - a.sales).slice(0, 4), [data.products]);
 
   return (
-    <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", minHeight: "100vh", color: "#fff", fontFamily: ecommerceFont }}>
+    <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", minHeight: "100vh", color: "var(--ink-solid, #fff)", fontFamily: ecommerceFont }}>
       <div style={{ marginBottom: 26 }}>
         <div style={{ fontSize: 12, color: "#818cf8", fontWeight: 700, letterSpacing: ".08em", textTransform: "uppercase", marginBottom: 10 }}>E-Commerce / Online Store</div>
         <h1 style={{ fontSize: 30, fontWeight: 900, margin: "0 0 10px" }}>Command Center</h1>
@@ -78,10 +78,10 @@ export default function EcommerceOverviewPage() {
               { title: "Returns Desk", body: `${data.summary.openReturns} return cases need action.` },
               { title: "Shipping Ops", body: `${data.summary.inTransitShipments} shipments are currently moving.` },
             ].map((step, index) => (
-              <div key={step.title} style={{ background: "rgba(8,12,30,.36)", border: "1px solid rgba(255,255,255,.08)", borderRadius: 16, padding: 16 }}>
+              <div key={step.title} style={{ background: "rgba(8,12,30,.36)", border: "1px solid rgba(var(--ink),.08)", borderRadius: 16, padding: 16 }}>
                 <div style={{ width: 28, height: 28, borderRadius: 999, background: "rgba(99,102,241,.2)", color: "#c7d2fe", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 800, marginBottom: 12 }}>{index + 1}</div>
                 <div style={{ fontSize: 15, fontWeight: 800, marginBottom: 8 }}>{step.title}</div>
-                <div style={{ fontSize: 13, color: "rgba(255,255,255,.6)", lineHeight: 1.55 }}>{step.body}</div>
+                <div style={{ fontSize: 13, color: "rgba(var(--ink),.6)", lineHeight: 1.55 }}>{step.body}</div>
               </div>
             ))}
           </div>
@@ -97,7 +97,7 @@ export default function EcommerceOverviewPage() {
               { href: "/dashboard/ecommerce/shipping", label: "Track Shipments", hint: "Courier and ETA follow-up" },
               { href: "/dashboard/ecommerce/analytics", label: "See Ecommerce Analytics", hint: "Revenue, returns, platform mix" },
             ].map((item) => (
-              <Link prefetch={false} key={item.href} href={item.href} style={{ textDecoration: "none", color: "#fff", background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)", borderRadius: 14, padding: isMobile ? "12px 10px" : "14px 16px" }}>
+              <Link prefetch={false} key={item.href} href={item.href} style={{ textDecoration: "none", color: "var(--ink-solid, #fff)", background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.07)", borderRadius: 14, padding: isMobile ? "12px 10px" : "14px 16px" }}>
                 <div style={{ fontSize: 14, fontWeight: 800, marginBottom: 4 }}>{item.label}</div>
                 <div style={{ fontSize: 12, color: ecommerceMuted }}>{item.hint}</div>
               </Link>
@@ -113,7 +113,7 @@ export default function EcommerceOverviewPage() {
             {topProducts.length === 0 ? (
               <div style={{ color: ecommerceMuted, fontSize: 13 }}>No products have been added yet.</div>
             ) : topProducts.map((product) => (
-              <div key={product.id} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, background: "rgba(255,255,255,.025)", border: "1px solid rgba(255,255,255,.06)", borderRadius: 14, padding: "12px 14px" }}>
+              <div key={product.id} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, background: "rgba(var(--ink),.025)", border: "1px solid rgba(var(--ink),.06)", borderRadius: 14, padding: "12px 14px" }}>
                 <div>
                   <div style={{ fontSize: 14, fontWeight: 700 }}>{product.name}</div>
                   <div style={{ fontSize: 12, color: ecommerceMuted }}>{product.sku || "No SKU"} | {product.platform}</div>
@@ -136,7 +136,7 @@ export default function EcommerceOverviewPage() {
               { label: "Customer Service", value: `${data.summary.openReturns} active return cases`, tone: "#f59e0b" },
               { label: "Fulfillment Readiness", value: `${data.summary.inTransitShipments} shipments in motion`, tone: "#60a5fa" },
             ].map((row) => (
-              <div key={row.label} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "rgba(255,255,255,.025)", border: "1px solid rgba(255,255,255,.06)", borderRadius: 14, padding: isMobile ? "12px 10px" : "14px 16px" }}>
+              <div key={row.label} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "rgba(var(--ink),.025)", border: "1px solid rgba(var(--ink),.06)", borderRadius: 14, padding: isMobile ? "12px 10px" : "14px 16px" }}>
                 <div style={{ fontSize: 13, color: ecommerceMuted }}>{row.label}</div>
                 <div style={{ fontSize: 14, fontWeight: 800, color: row.tone }}>{row.value}</div>
               </div>

@@ -86,7 +86,7 @@ function FinovaLoader() {
   return (
     <div style={{
       position: "fixed", inset: 0, zIndex: 9999,
-      background: "linear-gradient(135deg,#080c1e 0%,#0d1035 50%,#080c1e 100%)",
+      background: "linear-gradient(135deg,var(--dk-080c1e, #080c1e) 0%,var(--dk-0d1035, #0d1035) 50%,var(--dk-080c1e, #080c1e) 100%)",
       display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
       fontFamily: "'Outfit','Inter',sans-serif",
     }}>
@@ -136,17 +136,17 @@ function FinovaLoader() {
 
       {/* Brand name */}
       <div style={{ animation: "finova-fadeup .5s ease .1s both", textAlign: "center", marginBottom: 8 }}>
-        <div style={{ fontSize: 28, fontWeight: 800, color: "white", letterSpacing: "-0.5px" }}>
+        <div style={{ fontSize: 28, fontWeight: 800, color: "var(--ink-solid, white)", letterSpacing: "-0.5px" }}>
           FinovaOS
         </div>
-        <div style={{ fontSize: 12, color: "rgba(255,255,255,.35)", letterSpacing: ".12em", textTransform: "uppercase", marginTop: 4 }}>
+        <div style={{ fontSize: 12, color: "rgba(var(--ink),.35)", letterSpacing: ".12em", textTransform: "uppercase", marginTop: 4 }}>
           Global Accounting & Business Suite
         </div>
       </div>
 
       {/* Progress bar */}
       <div style={{ animation: "finova-fadeup .5s ease .25s both", width: 200, marginTop: 28 }}>
-        <div style={{ height: 3, borderRadius: 8, background: "rgba(255,255,255,.08)", overflow: "hidden" }}>
+        <div style={{ height: 3, borderRadius: 8, background: "rgba(var(--ink),.08)", overflow: "hidden" }}>
           <div style={{
             height: "100%", borderRadius: 8,
             background: "linear-gradient(90deg,var(--accent),var(--accent),var(--accent))",
@@ -1203,7 +1203,7 @@ export default function DashboardLayout({
 
   if (!currentUser) {
     return (
-      <div style={{minHeight:"100vh",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",background:"#080c1e"}}>
+      <div style={{minHeight:"100vh",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",background:"var(--dk-080c1e, #080c1e)"}}>
         <div style={{color:"#f87171",fontWeight:700,fontSize:18}}>Session expired.</div>
         <button onClick={logout} style={{marginTop:16,color:"var(--accent)",background:"none",border:"none",cursor:"pointer",textDecoration:"underline",fontSize:14}}>
           Back to Login
@@ -1233,15 +1233,15 @@ export default function DashboardLayout({
           fontFamily:"'Outfit','Inter',sans-serif",
         }}>
           <div style={{
-            background:"#0d1035", border:"1px solid rgba(var(--accent-rgb),0.4)",
+            background:"var(--dk-0d1035, #0d1035)", border:"1px solid rgba(var(--accent-rgb),0.4)",
             borderRadius:20, padding:"36px 40px", maxWidth:420, width:"90%",
             boxShadow:"0 0 60px rgba(var(--accent-rgb),0.25)", textAlign:"center",
           }}>
             <div style={{fontSize:44, marginBottom:12}}>⏱️</div>
-            <div style={{fontSize:22, fontWeight:800, color:"#fff", marginBottom:8}}>
+            <div style={{fontSize:22, fontWeight:800, color:"var(--ink-solid, #fff)", marginBottom:8}}>
               Still there?
             </div>
-            <div style={{fontSize:14, color:"rgba(255,255,255,0.6)", lineHeight:1.6, marginBottom:24}}>
+            <div style={{fontSize:14, color:"rgba(var(--ink),0.6)", lineHeight:1.6, marginBottom:24}}>
               You've been inactive for 25 minutes.<br/>
               For your security, you'll be logged out in{" "}
               <span style={{color:"#f87171", fontWeight:700}}>
@@ -1263,8 +1263,8 @@ export default function DashboardLayout({
                 onClick={logout}
                 style={{
                   padding:"10px 28px", borderRadius:10, cursor:"pointer",
-                  background:"transparent", border:"1px solid rgba(255,255,255,0.15)",
-                  color:"rgba(255,255,255,0.6)", fontWeight:600, fontSize:14,
+                  background:"transparent", border:"1px solid rgba(var(--ink),0.15)",
+                  color:"rgba(var(--ink),0.6)", fontWeight:600, fontSize:14,
                 }}
               >
                 Logout Now
@@ -1283,22 +1283,22 @@ export default function DashboardLayout({
           fontFamily:"'Outfit','Inter',sans-serif",
         }}>
           <div style={{
-            background:"#0d1035", border:"1px solid rgba(239,68,68,0.4)",
+            background:"var(--dk-0d1035, #0d1035)", border:"1px solid rgba(239,68,68,0.4)",
             borderRadius:20, padding:"36px 40px", maxWidth:420, width:"90%",
             boxShadow:"0 0 60px rgba(239,68,68,0.25)", textAlign:"center",
           }}>
             <div style={{fontSize:44, marginBottom:12}}>🕐</div>
-            <div style={{fontSize:22, fontWeight:800, color:"#fff", marginBottom:8}}>
+            <div style={{fontSize:22, fontWeight:800, color:"var(--ink-solid, #fff)", marginBottom:8}}>
               Shift Ending Soon
             </div>
-            <div style={{fontSize:14, color:"rgba(255,255,255,0.6)", lineHeight:1.6, marginBottom:24}}>
+            <div style={{fontSize:14, color:"rgba(var(--ink),0.6)", lineHeight:1.6, marginBottom:24}}>
               Your shift is about to end.<br/>
               You will be automatically logged out in{" "}
               <span style={{color:"#f87171", fontWeight:700}}>
                 {Math.floor(shiftSecsLeft / 60)}:{String(shiftSecsLeft % 60).padStart(2,"0")}
               </span>
               <br/>
-              <span style={{fontSize:12, color:"rgba(255,255,255,0.4)"}}>
+              <span style={{fontSize:12, color:"rgba(var(--ink),0.4)"}}>
                 Please save your work. Contact admin to extend shift.
               </span>
             </div>
@@ -1306,8 +1306,8 @@ export default function DashboardLayout({
               onClick={logout}
               style={{
                 padding:"10px 28px", borderRadius:10, cursor:"pointer",
-                background:"transparent", border:"1px solid rgba(255,255,255,0.15)",
-                color:"rgba(255,255,255,0.6)", fontWeight:600, fontSize:14,
+                background:"transparent", border:"1px solid rgba(var(--ink),0.15)",
+                color:"rgba(var(--ink),0.6)", fontWeight:600, fontSize:14,
               }}
             >
               Logout Now
@@ -2773,13 +2773,13 @@ export default function DashboardLayout({
         {!sidebarCollapsed && !isCustomPlan && ["STARTER", "PRO"].includes(normalizedPlanCode) && (
           <div style={{margin:"0 10px 10px",borderRadius:14,background:"linear-gradient(135deg,rgba(var(--accent-rgb),.18),rgba(139,92,246,.1))",border:"1px solid rgba(var(--accent-rgb),.28)",padding:"14px 14px 12px",position:"relative",overflow:"hidden"}}>
             {/* X close */}
-            <div style={{position:"absolute",top:8,right:8,width:18,height:18,display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",color:"rgba(255,255,255,.35)"}}
+            <div style={{position:"absolute",top:8,right:8,width:18,height:18,display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",color:"rgba(var(--ink),.35)"}}
               onClick={e=>{e.currentTarget.parentElement!.style.display="none";}}>
               <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
             </div>
             <div style={{width:30,height:30,borderRadius:9,background:"linear-gradient(135deg,var(--accent),#7c3aed)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:15,marginBottom:9}}>⭐</div>
-            <div style={{fontSize:12,fontWeight:800,color:"rgba(255,255,255,.9)",marginBottom:4}}>Upgrade Plan</div>
-            <div style={{fontSize:10,color:"rgba(255,255,255,.45)",lineHeight:1.5,marginBottom:10}}>Unlock more features and grow your business.</div>
+            <div style={{fontSize:12,fontWeight:800,color:"rgba(var(--ink),.9)",marginBottom:4}}>Upgrade Plan</div>
+            <div style={{fontSize:10,color:"rgba(var(--ink),.45)",lineHeight:1.5,marginBottom:10}}>Unlock more features and grow your business.</div>
             <a href="/pricing" style={{display:"flex",alignItems:"center",gap:5,padding:"7px 13px",borderRadius:9,background:"linear-gradient(135deg,var(--accent),var(--accent-strong))",color:"white",fontSize:11,fontWeight:700,textDecoration:"none",boxShadow:"0 3px 12px rgba(var(--accent-rgb),.4)"}}>
               Upgrade Now
               <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
@@ -2854,7 +2854,7 @@ export default function DashboardLayout({
             top:0,
             zIndex:10,
             flexWrap: isMobileViewport ? "nowrap" : "wrap",
-            boxShadow:isMobileViewport ? "0 1px 0 rgba(255,255,255,0.05)" : "none",
+            boxShadow:isMobileViewport ? "0 1px 0 rgba(var(--ink),0.05)" : "none",
           }}
           className="print:hidden sm:px-4"
           data-nav-shell
@@ -2906,7 +2906,7 @@ export default function DashboardLayout({
           ) : isMobileViewport ? (
             <>
               {/* Hamburger */}
-              <button onClick={()=>setIsMobileMenuOpen(true)} style={{width:36,height:36,borderRadius:10,background:"rgba(255,255,255,0.05)",border:"1px solid rgba(255,255,255,0.07)",display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",color:"rgba(255,255,255,0.6)",flexShrink:0,marginRight:10}}>
+              <button onClick={()=>setIsMobileMenuOpen(true)} style={{width:36,height:36,borderRadius:10,background:"rgba(var(--ink),0.05)",border:"1px solid rgba(var(--ink),0.07)",display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",color:"rgba(var(--ink),0.6)",flexShrink:0,marginRight:10}}>
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
               </button>
               {/* Company logo + name */}
@@ -2917,7 +2917,7 @@ export default function DashboardLayout({
                     : <img src="/icon1.png" alt="FinovaOS" width={18} height={18} style={{objectFit:"contain"}}/>}
                 </div>
                 <div style={{minWidth:0}}>
-                  <span style={{fontSize:14,fontWeight:800,color:"white",letterSpacing:"-.2px",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap",display:"block"}}>{companyName}</span>
+                  <span style={{fontSize:14,fontWeight:800,color:"var(--ink-solid, white)",letterSpacing:"-.2px",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap",display:"block"}}>{companyName}</span>
                   {companyDetail?.companyNo && (
                     <span style={{fontSize:10,fontWeight:700,color:"rgba(56,189,248,0.8)",fontFamily:"monospace",letterSpacing:".04em"}}>ID: {companyDetail.companyNo}</span>
                   )}
@@ -2929,7 +2929,7 @@ export default function DashboardLayout({
               <div style={{position:"relative",flexShrink:0}} data-panel-anchor="notif">
                 <button
                   onClick={()=>{ const next=!showNotifPanel; setShowNotifPanel(next); setShowHelpPanel(false); setShowUserMenu(false); if(next&&!notifsFetched)fetchNotifs(); }}
-                  style={{width:38,height:38,borderRadius:11,background:showNotifPanel?"rgba(var(--accent-rgb),0.15)":"rgba(255,255,255,0.06)",border:showNotifPanel?"1px solid rgba(var(--accent-rgb),0.4)":"1px solid rgba(255,255,255,0.08)",display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",color:showNotifPanel?"var(--accent)":"rgba(255,255,255,0.65)"}}>
+                  style={{width:38,height:38,borderRadius:11,background:showNotifPanel?"rgba(var(--accent-rgb),0.15)":"rgba(var(--ink),0.06)",border:showNotifPanel?"1px solid rgba(var(--accent-rgb),0.4)":"1px solid rgba(var(--ink),0.08)",display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",color:showNotifPanel?"var(--accent)":"rgba(var(--ink),0.65)"}}>
                   <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
                   {unreadCount > 0 && (
                     <span style={{position:"absolute",top:7,right:7,minWidth:8,height:8,borderRadius:"50%",background:"#f87171",border:"1.5px solid rgba(10,15,35,0.97)"}}/>
@@ -2986,7 +2986,7 @@ export default function DashboardLayout({
             <>
           {/* Global Search — DESKTOP only */}
           <div style={{flex:"1 1 auto",minWidth:240,order:0}}>
-            <Suspense fallback={<div style={{width:"100%",maxWidth:340,height:36,background:"rgba(255,255,255,0.04)",borderRadius:8,animation:"pulse 1.5s infinite"}} />}>
+            <Suspense fallback={<div style={{width:"100%",maxWidth:340,height:36,background:"rgba(var(--ink),0.04)",borderRadius:8,animation:"pulse 1.5s infinite"}} />}>
               <GlobalSearch />
             </Suspense>
           </div>
@@ -2994,18 +2994,18 @@ export default function DashboardLayout({
           {/* Branch switcher */}
           {branches.length > 0 && (
             <div
-              style={{display:"flex",alignItems:"center",gap:6,padding:"5px 10px",borderRadius:9,background:"rgba(255,255,255,0.04)",border:"1px solid rgba(255,255,255,0.08)"}}
+              style={{display:"flex",alignItems:"center",gap:6,padding:"5px 10px",borderRadius:9,background:"rgba(var(--ink),0.04)",border:"1px solid rgba(var(--ink),0.08)"}}
               className="hidden md:flex"
             >
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.4)" strokeWidth="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
               <select
                 value={activeBranchId}
                 onChange={e => setActiveBranchId(e.target.value)}
-                style={{background:"transparent",border:"none",color:"rgba(255,255,255,0.75)",fontSize:12,fontWeight:600,outline:"none",cursor:"pointer",fontFamily:"inherit",maxWidth:140}}
+                style={{background:"transparent",border:"none",color:"rgba(var(--ink),0.75)",fontSize:12,fontWeight:600,outline:"none",cursor:"pointer",fontFamily:"inherit",maxWidth:140}}
               >
-                <option value="all" style={{background:"#0f172a"}}>All Branches</option>
+                <option value="all" style={{background:"var(--dk-0f172a, #0f172a)"}}>All Branches</option>
                 {branches.map(b => (
-                  <option key={b.id} value={b.id} style={{background:"#0f172a"}}>{b.name}</option>
+                  <option key={b.id} value={b.id} style={{background:"var(--dk-0f172a, #0f172a)"}}>{b.name}</option>
                 ))}
               </select>
             </div>
@@ -3036,7 +3036,7 @@ export default function DashboardLayout({
                   setShowUserMenu(false);
                   if (next && !notifsFetched) fetchNotifs();
                 }}
-                style={{position:"relative",width:36,height:36,borderRadius:10,background:showNotifPanel?"rgba(var(--accent-rgb),0.15)":"rgba(255,255,255,0.05)",border:showNotifPanel?"1px solid rgba(var(--accent-rgb),0.4)":"1px solid rgba(255,255,255,0.08)",display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",transition:"all .15s",color:showNotifPanel?"var(--accent)":"var(--text-muted)"}}
+                style={{position:"relative",width:36,height:36,borderRadius:10,background:showNotifPanel?"rgba(var(--accent-rgb),0.15)":"rgba(var(--ink),0.05)",border:showNotifPanel?"1px solid rgba(var(--accent-rgb),0.4)":"1px solid rgba(var(--ink),0.08)",display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",transition:"all .15s",color:showNotifPanel?"var(--accent)":"var(--text-muted)"}}
                 onMouseEnter={e=>{if(!showNotifPanel)e.currentTarget.style.background="rgba(255,255,255,0.1)";}}
                 onMouseLeave={e=>{if(!showNotifPanel)e.currentTarget.style.background="rgba(255,255,255,0.05)";}}>
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -3116,7 +3116,7 @@ export default function DashboardLayout({
             <div style={{position:"relative"}} data-panel-anchor="help">
               <button
                 onClick={()=>{ setShowHelpPanel(v=>!v); setShowNotifPanel(false); setShowUserMenu(false); }}
-                style={{width:36,height:36,borderRadius:10,background:showHelpPanel?"rgba(var(--accent-rgb),0.15)":"rgba(255,255,255,0.05)",border:showHelpPanel?"1px solid rgba(var(--accent-rgb),0.4)":"1px solid rgba(255,255,255,0.08)",display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",transition:"all .15s",color:showHelpPanel?"var(--accent)":"var(--text-muted)"}}
+                style={{width:36,height:36,borderRadius:10,background:showHelpPanel?"rgba(var(--accent-rgb),0.15)":"rgba(var(--ink),0.05)",border:showHelpPanel?"1px solid rgba(var(--accent-rgb),0.4)":"1px solid rgba(var(--ink),0.08)",display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",transition:"all .15s",color:showHelpPanel?"var(--accent)":"var(--text-muted)"}}
                 onMouseEnter={e=>{if(!showHelpPanel)e.currentTarget.style.background="rgba(255,255,255,0.1)";}}
                 onMouseLeave={e=>{if(!showHelpPanel)e.currentTarget.style.background="rgba(255,255,255,0.05)";}}>
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -3157,7 +3157,7 @@ export default function DashboardLayout({
                     ))}
                     <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"7px 16px",opacity:.5}}>
                       <span style={{fontSize:12,color:"var(--text-muted)"}}>Close popup / Go back</span>
-                      <kbd style={{padding:"2px 6px",borderRadius:5,background:"rgba(255,255,255,0.06)",border:"1px solid var(--border)",fontSize:10,fontWeight:700,color:"var(--text-primary)",fontFamily:"inherit"}}>Escape</kbd>
+                      <kbd style={{padding:"2px 6px",borderRadius:5,background:"rgba(var(--ink),0.06)",border:"1px solid var(--border)",fontSize:10,fontWeight:700,color:"var(--text-primary)",fontFamily:"inherit"}}>Escape</kbd>
                     </div>
                   </div>
                   <div style={{padding:"10px 16px",borderTop:"1px solid var(--border)",display:"flex",flexDirection:"column",gap:6}}>
@@ -3221,12 +3221,12 @@ export default function DashboardLayout({
                   <div style={{position:"fixed",inset:0,zIndex:40}} onClick={()=>setShowUserMenu(false)}/>
                   <div style={{
                     position:"absolute",top:"calc(100% + 10px)",right:0,width:240,
-                    background:"#0e1120",border:"1px solid rgba(255,255,255,0.12)",
+                    background:"var(--dk-0e1120, #0e1120)",border:"1px solid rgba(var(--ink),0.12)",
                     borderRadius:14,padding:"6px",zIndex:9999,
                     boxShadow:"0 20px 60px rgba(0,0,0,0.6)",
                   }}>
                     {/* User header */}
-                    <div style={{padding:"10px 12px 10px",borderBottom:"1px solid rgba(255,255,255,0.07)",marginBottom:4,display:"flex",alignItems:"center",gap:10}}>
+                    <div style={{padding:"10px 12px 10px",borderBottom:"1px solid rgba(var(--ink),0.07)",marginBottom:4,display:"flex",alignItems:"center",gap:10}}>
                       <label htmlFor="navbar-avatar-input" style={{cursor:"pointer",flexShrink:0,position:"relative"}}>
                         <div style={{width:40,height:40,borderRadius:11,background:"linear-gradient(135deg,var(--accent-strong),var(--accent))",display:"flex",alignItems:"center",justifyContent:"center",fontSize:15,fontWeight:700,color:"white",overflow:"hidden",border:"2px solid rgba(var(--accent-rgb),0.35)"}}>
                           {(userAvatar || companyDetail?.logoUrl)
@@ -3234,14 +3234,14 @@ export default function DashboardLayout({
                             : (currentUser.name || "U")[0].toUpperCase()
                           }
                         </div>
-                        <div style={{position:"absolute",bottom:-3,right:-3,width:16,height:16,borderRadius:"50%",background:"var(--accent-strong)",border:"1.5px solid #0e1120",display:"flex",alignItems:"center",justifyContent:"center"}}>
+                        <div style={{position:"absolute",bottom:-3,right:-3,width:16,height:16,borderRadius:"50%",background:"var(--accent-strong)",border:"1.5px solid var(--dkb-0e1120, #0e1120)",display:"flex",alignItems:"center",justifyContent:"center"}}>
                           <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>
                         </div>
                       </label>
                       <div style={{minWidth:0}}>
-                        <div style={{fontSize:13,fontWeight:700,color:"white",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{currentUser.name || "User"}</div>
-                        <div style={{fontSize:10,color:"rgba(255,255,255,0.55)",marginTop:1,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{currentUser.email}</div>
-                        <div style={{fontSize:10,color:"rgba(255,255,255,0.4)",marginTop:1,textTransform:"capitalize"}}>
+                        <div style={{fontSize:13,fontWeight:700,color:"var(--ink-solid, white)",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{currentUser.name || "User"}</div>
+                        <div style={{fontSize:10,color:"rgba(var(--ink),0.55)",marginTop:1,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{currentUser.email}</div>
+                        <div style={{fontSize:10,color:"rgba(var(--ink),0.4)",marginTop:1,textTransform:"capitalize"}}>
                           {(currentUser.role||"User").toLowerCase()} · {avatarUploading ? "Uploading..." : "Tap photo to change"}
                         </div>
                         {companyDetail?.companyNo && (
@@ -3263,7 +3263,7 @@ export default function DashboardLayout({
                       { icon:"⭐", label:"Feedback & Reviews",href:"/dashboard/feedback" },
                     ].map(item => (
                       <a key={item.href} href={item.href} onClick={()=>setShowUserMenu(false)}
-                        style={{display:"flex",alignItems:"center",gap:10,padding:"9px 12px",borderRadius:9,color:"rgba(255,255,255,0.65)",fontSize:12,fontWeight:500,textDecoration:"none",transition:"all .15s"}}
+                        style={{display:"flex",alignItems:"center",gap:10,padding:"9px 12px",borderRadius:9,color:"rgba(var(--ink),0.65)",fontSize:12,fontWeight:500,textDecoration:"none",transition:"all .15s"}}
                         onMouseEnter={e=>{e.currentTarget.style.background="rgba(255,255,255,0.06)";e.currentTarget.style.color="white";}}
                         onMouseLeave={e=>{e.currentTarget.style.background="transparent";e.currentTarget.style.color="rgba(255,255,255,0.65)";}}>
                         <span style={{fontSize:14,width:18,textAlign:"center"}}>{item.icon}</span>
@@ -3271,7 +3271,7 @@ export default function DashboardLayout({
                       </a>
                     ))}
 
-                    <div style={{borderTop:"1px solid rgba(255,255,255,0.07)",marginTop:4,paddingTop:4}}>
+                    <div style={{borderTop:"1px solid rgba(var(--ink),0.07)",marginTop:4,paddingTop:4}}>
                       <button onClick={logout}
                         style={{width:"100%",display:"flex",alignItems:"center",gap:10,padding:"9px 12px",borderRadius:9,background:"transparent",border:"none",color:"#f87171",fontSize:12,fontWeight:600,cursor:"pointer",transition:"all .15s",textAlign:"left"}}
                         onMouseEnter={e=>{e.currentTarget.style.background="rgba(239,68,68,0.1)";}}
@@ -3292,8 +3292,8 @@ export default function DashboardLayout({
               aria-label="Hide navigation bar"
               title="Hide navigation bar"
               style={{
-                width:34,height:34,borderRadius:9,border:"1px solid rgba(255,255,255,.08)",
-                background:"rgba(255,255,255,.05)",color:"var(--text-muted)",cursor:"pointer",
+                width:34,height:34,borderRadius:9,border:"1px solid rgba(var(--ink),.08)",
+                background:"rgba(var(--ink),.05)",color:"var(--text-muted)",cursor:"pointer",
                 display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,transition:"all .15s",
               }}
               onMouseEnter={e=>{e.currentTarget.style.background="rgba(var(--accent-rgb),.14)";e.currentTarget.style.borderColor="rgba(var(--accent-rgb),.35)";e.currentTarget.style.color="var(--accent)";}}
@@ -3349,7 +3349,7 @@ export default function DashboardLayout({
                   <span style={{fontSize:18}}>🎮</span>
                   <div>
                     <span style={{fontSize:13,fontWeight:700,color:"#fbbf24"}}>Demo Mode</span>
-                    <span style={{fontSize:12,color:"rgba(255,255,255,.45)",marginLeft:10}}>
+                    <span style={{fontSize:12,color:"rgba(var(--ink),.45)",marginLeft:10}}>
                       You&apos;re viewing a demo account with sample data. Nothing here is real.
                     </span>
                   </div>
@@ -3375,7 +3375,7 @@ export default function DashboardLayout({
                   <span style={{fontSize:18}}>🧪</span>
                   <div>
                     <span style={{fontSize:13,fontWeight:700,color:"var(--accent)"}}>Dev Test Mode</span>
-                    <span style={{fontSize:12,color:"rgba(255,255,255,.45)",marginLeft:10}}>
+                    <span style={{fontSize:12,color:"rgba(var(--ink),.45)",marginLeft:10}}>
                       {testMode.testBusinessType} · {testMode.testPlan} — This is an isolated test workspace
                     </span>
                   </div>
@@ -3429,7 +3429,7 @@ export default function DashboardLayout({
         <nav style={{
           position:"fixed", bottom:0, left:0, right:0, zIndex:25,
           background:"rgba(8,12,30,0.97)", backdropFilter:"blur(24px)",
-          borderTop:"1px solid rgba(255,255,255,0.08)",
+          borderTop:"1px solid rgba(var(--ink),0.08)",
           display:"flex", alignItems:"stretch",
           paddingBottom:"env(safe-area-inset-bottom)",
           height:"calc(62px + env(safe-area-inset-bottom))",
@@ -3438,7 +3438,7 @@ export default function DashboardLayout({
           <Link prefetch={false} href="/dashboard" style={{
             flex:1, display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center",
             gap:3, paddingTop:6, textDecoration:"none",
-            color: pathname==="/dashboard" ? "var(--accent)" : "rgba(255,255,255,0.4)",
+            color: pathname==="/dashboard" ? "var(--accent)" : "rgba(var(--ink),0.4)",
             background: pathname==="/dashboard" ? "rgba(var(--accent-rgb),0.08)" : "transparent",
             borderTop: pathname==="/dashboard" ? "2px solid var(--accent)" : "2px solid transparent",
             transition:"color .15s",
@@ -3454,7 +3454,7 @@ export default function DashboardLayout({
               <Link prefetch={false} href="/dashboard/invoices" style={{
                 flex:1, display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center",
                 gap:3, paddingTop:6, textDecoration:"none",
-                color: isSalesActive ? "var(--accent)" : "rgba(255,255,255,0.4)",
+                color: isSalesActive ? "var(--accent)" : "rgba(var(--ink),0.4)",
                 background: isSalesActive ? "rgba(var(--accent-rgb),0.08)" : "transparent",
                 borderTop: isSalesActive ? "2px solid var(--accent)" : "2px solid transparent",
                 transition:"color .15s",
@@ -3492,7 +3492,7 @@ export default function DashboardLayout({
               <Link prefetch={false} href="/dashboard/inventory" style={{
                 flex:1, display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center",
                 gap:3, paddingTop:6, textDecoration:"none",
-                color: isInvActive ? "var(--accent)" : "rgba(255,255,255,0.4)",
+                color: isInvActive ? "var(--accent)" : "rgba(var(--ink),0.4)",
                 background: isInvActive ? "rgba(var(--accent-rgb),0.08)" : "transparent",
                 borderTop: isInvActive ? "2px solid var(--accent)" : "2px solid transparent",
                 transition:"color .15s",
@@ -3507,7 +3507,7 @@ export default function DashboardLayout({
           <button onClick={() => setIsMobileMenuOpen(true)} style={{
             flex:1, display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center",
             gap:3, paddingTop:6, background:"transparent", border:"none", cursor:"pointer",
-            color: isMobileMenuOpen ? "var(--accent)" : "rgba(255,255,255,0.4)",
+            color: isMobileMenuOpen ? "var(--accent)" : "rgba(var(--ink),0.4)",
             borderTop: isMobileMenuOpen ? "2px solid var(--accent)" : "2px solid transparent",
             transition:"color .15s",
           }}>
@@ -3523,15 +3523,15 @@ export default function DashboardLayout({
           onClick={e => { if (e.target === e.currentTarget) setShowCompanyModal(false); }}
           style={{ position:"fixed",inset:0,zIndex:9999,background:"rgba(0,0,0,.75)",backdropFilter:"blur(12px)",display:"flex",alignItems:"center",justifyContent:"center",padding:20,fontFamily:"'Outfit','Inter',sans-serif" }}
         >
-          <div style={{ width:"100%",maxWidth:560,background:"#0e1120",border:"1px solid rgba(255,255,255,.1)",borderRadius:20,padding:"28px 32px",boxShadow:"0 40px 100px rgba(0,0,0,.7)",maxHeight:"88vh",overflowY:"auto",position:"relative" }}>
-            <button onClick={()=>setShowCompanyModal(false)} style={{ position:"absolute",top:16,right:20,background:"none",border:"none",color:"rgba(255,255,255,.4)",cursor:"pointer",fontSize:22,lineHeight:1 }}>✕</button>
+          <div style={{ width:"100%",maxWidth:560,background:"var(--dk-0e1120, #0e1120)",border:"1px solid rgba(var(--ink),.1)",borderRadius:20,padding:"28px 32px",boxShadow:"0 40px 100px rgba(0,0,0,.7)",maxHeight:"88vh",overflowY:"auto",position:"relative" }}>
+            <button onClick={()=>setShowCompanyModal(false)} style={{ position:"absolute",top:16,right:20,background:"none",border:"none",color:"rgba(var(--ink),.4)",cursor:"pointer",fontSize:22,lineHeight:1 }}>✕</button>
 
             {/* Header */}
             <div style={{ display:"flex",alignItems:"center",gap:14,marginBottom:24 }}>
               <div style={{ width:50,height:50,borderRadius:13,background:"linear-gradient(135deg,var(--accent-strong),#7c3aed)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:22,flexShrink:0 }}>🏢</div>
               <div>
-                <div style={{ fontSize:18,fontWeight:800,color:"white" }}>{companyDetail?.name || companyName}</div>
-                <div style={{ fontSize:12,color:"rgba(255,255,255,.35)",marginTop:3 }}>
+                <div style={{ fontSize:18,fontWeight:800,color:"var(--ink-solid, white)" }}>{companyDetail?.name || companyName}</div>
+                <div style={{ fontSize:12,color:"rgba(var(--ink),.35)",marginTop:3 }}>
                   {companyDetail?.businessType ? `${companyDetail.businessType.replace(/_/g," ")} Business` : "Business Account"}
                 </div>
               </div>
@@ -3557,9 +3557,9 @@ export default function DashboardLayout({
                 { icon:"📅", label:"Joined",        value: companyDetail?.createdAt ? fmtDate(companyDetail.createdAt) : "—" },
                 { icon:"🔄", label:"Renews",        value: companyDetail?.currentPeriodEnd ? fmtDate(companyDetail.currentPeriodEnd) : "—" },
               ].map(row => (
-                <div key={row.label} style={{ padding:"12px 14px",borderRadius:10,background:"rgba(255,255,255,.04)",border:"1px solid rgba(255,255,255,.06)" }}>
-                  <div style={{ fontSize:10,color:"rgba(255,255,255,.3)",fontWeight:700,textTransform:"uppercase",letterSpacing:".05em",marginBottom:5 }}>{row.icon} {row.label}</div>
-                  <div style={{ fontSize:14,fontWeight:700,color:"white" }}>{String(row.value)}</div>
+                <div key={row.label} style={{ padding:"12px 14px",borderRadius:10,background:"rgba(var(--ink),.04)",border:"1px solid rgba(var(--ink),.06)" }}>
+                  <div style={{ fontSize:10,color:"rgba(var(--ink),.3)",fontWeight:700,textTransform:"uppercase",letterSpacing:".05em",marginBottom:5 }}>{row.icon} {row.label}</div>
+                  <div style={{ fontSize:14,fontWeight:700,color:"var(--ink-solid, white)" }}>{String(row.value)}</div>
                 </div>
               ))}
             </div>

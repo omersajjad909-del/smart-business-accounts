@@ -55,7 +55,7 @@ const labelStyle: React.CSSProperties = {
 
 const inputStyle: React.CSSProperties = {
   width: "100%", boxSizing: "border-box",
-  background: "rgba(255,255,255,.05)",
+  background: "rgba(var(--ink),.05)",
   border: "1px solid var(--border)",
   borderRadius: 8, padding: "9px 12px",
   fontSize: 13, color: "var(--text-primary)",
@@ -190,7 +190,7 @@ export default function CreditLimitsPage() {
     return (
       <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
         <div style={{
-          width: 80, height: 6, background: "rgba(255,255,255,.08)",
+          width: 80, height: 6, background: "rgba(var(--ink),.08)",
           borderRadius: 4, overflow: "hidden",
         }}>
           <div style={{ width: `${clamped}%`, height: "100%", background: color, borderRadius: 4 }} />

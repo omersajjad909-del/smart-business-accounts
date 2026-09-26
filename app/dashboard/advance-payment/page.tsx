@@ -269,7 +269,7 @@ export default function AdvancePaymentPage() {
               <span style={{ background: "rgba(0,0,0,.2)", borderRadius: 4, padding: "1px 7px", fontSize: 11 }}>F8</span>
               Execute Query
             </button>
-            <button onClick={exitQueryMode} style={{ padding: "10px 20px", borderRadius: 9, background: "rgba(255,255,255,.05)", border: "1px solid rgba(255,255,255,.1)", color: "var(--text-muted)", fontSize: 13, cursor: "pointer", fontFamily: ff }}>Cancel (Esc)</button>
+            <button onClick={exitQueryMode} style={{ padding: "10px 20px", borderRadius: 9, background: "rgba(var(--ink),.05)", border: "1px solid rgba(var(--ink),.1)", color: "var(--text-muted)", fontSize: 13, cursor: "pointer", fontFamily: ff }}>Cancel (Esc)</button>
             <span style={{ fontSize: 11, color: "rgba(250,204,21,.4)", marginLeft: 8 }}>
               Operators: <b style={{ color: "rgba(250,204,21,.7)" }}>&gt;010425</b> (after) &nbsp; <b style={{ color: "rgba(250,204,21,.7)" }}>&lt;010425</b> (before) &nbsp; <b style={{ color: "rgba(250,204,21,.7)" }}>010425</b> (exact)
             </span>
@@ -415,8 +415,8 @@ export default function AdvancePaymentPage() {
           { key: "F7", label: "Query Mode", color: accent },
           { key: "Esc", label: "Close Query", color: undefined },
         ]).map(s => (
-          <div key={s.key} style={{ display: "flex", alignItems: "center", gap: 4, background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)", borderRadius: 6, padding: "4px 10px" }}>
-            <span style={{ background: s.color ? `${s.color}22` : "rgba(255,255,255,.06)", color: s.color || "var(--text-muted)", borderRadius: 4, padding: "1px 7px", fontSize: 10, fontWeight: 800, fontFamily: "monospace", border: `1px solid ${s.color ? `${s.color}44` : "rgba(255,255,255,.1)"}` }}>{s.key}</span>
+          <div key={s.key} style={{ display: "flex", alignItems: "center", gap: 4, background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.07)", borderRadius: 6, padding: "4px 10px" }}>
+            <span style={{ background: s.color ? `${s.color}22` : "rgba(var(--ink),.06)", color: s.color || "var(--text-muted)", borderRadius: 4, padding: "1px 7px", fontSize: 10, fontWeight: 800, fontFamily: "monospace", border: `1px solid ${s.color ? `${s.color}44` : "rgba(var(--ink),.1)"}` }}>{s.key}</span>
             <span style={{ fontSize: 11, color: "var(--text-muted)" }}>{s.label}</span>
           </div>
         ))}

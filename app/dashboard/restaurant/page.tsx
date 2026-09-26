@@ -24,7 +24,7 @@ export default function RestaurantOverviewPage() {
   }, []);
 
   return (
-    <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", color: "#fff", fontFamily: restaurantFont, minHeight: "100vh" }}>
+    <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", color: "var(--ink-solid, #fff)", fontFamily: restaurantFont, minHeight: "100vh" }}>
       <div style={{ marginBottom: 26 }}>
         <h1 style={{ fontSize: 24, fontWeight: 800, margin: "0 0 6px" }}>Restaurant Command Center</h1>
         <p style={{ fontSize: 13, color: restaurantMuted, margin: 0 }}>
@@ -70,7 +70,7 @@ export default function RestaurantOverviewPage() {
               { label: "Reservations", value: data.summary.reservations, color: "#a78bfa" },
               { label: "Sales value", value: `Rs. ${data.summary.salesValue.toLocaleString()}`, color: "#f59e0b" },
             ].map((row) => (
-              <div key={row.label} style={{ display: "flex", justifyContent: "space-between", padding: "10px 12px", borderRadius: 10, background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.05)" }}>
+              <div key={row.label} style={{ display: "flex", justifyContent: "space-between", padding: "10px 12px", borderRadius: 10, background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.05)" }}>
                 <span style={{ color: restaurantMuted }}>{row.label}</span>
                 <span style={{ color: row.color, fontWeight: 800 }}>{row.value}</span>
               </div>
@@ -82,7 +82,7 @@ export default function RestaurantOverviewPage() {
           <div style={{ fontSize: 15, fontWeight: 800, marginBottom: 14 }}>Reservation Watchlist</div>
           <div style={{ display: "grid", gap: 10 }}>
             {data.reservations.slice(0, 5).map((reservation) => (
-              <div key={reservation.id} style={{ padding: "12px 14px", borderRadius: 10, background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.05)" }}>
+              <div key={reservation.id} style={{ padding: "12px 14px", borderRadius: 10, background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.05)" }}>
                 <div style={{ fontSize: 14, fontWeight: 700 }}>{reservation.guestName}</div>
                 <div style={{ fontSize: 12, color: restaurantMuted }}>{reservation.tableRef || "Walk-in"} | {reservation.guests} guests</div>
               </div>

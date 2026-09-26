@@ -142,7 +142,7 @@ export default function BranchReportsPage() {
               { label: "Low Traffic Branches", value: String(lowTrafficBranches), color: lowTrafficBranches ? "#f97316" : "#22c55e" },
               { label: "Active Branches", value: String(selectedRows.filter((row) => row.isActive).length), color: "#818cf8" },
             ].map((item) => (
-              <div key={item.label} style={{ border: "1px solid var(--border)", borderRadius: 12, padding: isMobile ? "12px 10px" : "14px 16px", background: "rgba(255,255,255,.02)" }}>
+              <div key={item.label} style={{ border: "1px solid var(--border)", borderRadius: 12, padding: isMobile ? "12px 10px" : "14px 16px", background: "rgba(var(--ink),.02)" }}>
                 <div style={{ fontSize: 11, color: "var(--text-muted)", marginBottom: 6, textTransform: "uppercase", letterSpacing: ".06em" }}>{item.label}</div>
                 <div style={{ fontSize: 16, fontWeight: 700, color: item.color }}>{loading ? "..." : item.value}</div>
               </div>

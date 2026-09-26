@@ -330,7 +330,7 @@ export default function ChartOfAccounts() {
       {showImport && (
         <div style={{ background: PANEL, border: `1px solid ${BORDER}`, borderRadius: 12, padding: 20, marginBottom: 20 }}>
           <p style={{ margin: "0 0 10px", fontSize: 12, color: MUTED }}>
-            CSV headers: <code style={{ background: "rgba(255,255,255,0.06)", padding: "2px 6px", borderRadius: 4 }}>code, name, partyType, city, phone, openDebit, openCredit, openDate, creditDays, creditLimit</code>
+            CSV headers: <code style={{ background: "rgba(var(--ink),0.06)", padding: "2px 6px", borderRadius: 4 }}>code, name, partyType, city, phone, openDebit, openCredit, openDate, creditDays, creditLimit</code>
           </p>
           <textarea value={importCsv} onChange={e => setImportCsv(e.target.value)}
             style={{ ...inp(), height: 110, resize: "vertical", display: "block", marginBottom: 10 }} />
@@ -363,7 +363,7 @@ export default function ChartOfAccounts() {
         <div style={{
           padding: isMobile ? "12px 10px" : "16px 22px",
           borderBottom: `1px solid ${BORDER}`,
-          background: editingId ? "rgba(99,102,241,0.06)" : "rgba(255,255,255,0.02)",
+          background: editingId ? "rgba(99,102,241,0.06)" : "rgba(var(--ink),0.02)",
           display: "flex", alignItems: "center", justifyContent: "space-between",
         }}>
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>

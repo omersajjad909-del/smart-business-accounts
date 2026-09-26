@@ -715,10 +715,10 @@ export function ItemPicker({
             height: `${panelHeight}px`,
 
             background:
-              "var(--panel-bg, #14161c)",
+              "var(--panel-bg, var(--dk-14161c, #14161c))",
 
             border:
-              "1px solid var(--border, rgba(255,255,255,.14))",
+              "1px solid var(--border, rgba(var(--ink),.14))",
 
             borderRadius: 10,
 
@@ -769,9 +769,9 @@ export function ItemPicker({
                 borderRadius: 8,
                 outline: "none",
                 fontSize: 13,
-                background: "var(--app-bg, #0b0d12)",
+                background: "var(--app-bg, var(--dk-0b0d12, #0b0d12))",
                 border:
-                  "1px solid var(--border, rgba(255,255,255,.14))",
+                  "1px solid var(--border, rgba(var(--ink),.14))",
                 color: "inherit",
               }}
             />
@@ -805,14 +805,14 @@ export function ItemPicker({
                   padding:
                     "6px 10px 7px",
                   borderBottom:
-                    "1px solid var(--border, rgba(255,255,255,.12))",
+                    "1px solid var(--border, rgba(var(--ink),.12))",
                 }}
               >
                 <span
                   style={{
                     fontSize: 11,
                     color:
-                      "var(--text-muted, rgba(255,255,255,.5))",
+                      "var(--text-muted, rgba(var(--ink),.5))",
                   }}
                 >
                   {matches.length} shown
@@ -835,7 +835,7 @@ export function ItemPicker({
                     cursor:
                       "pointer",
                     color:
-                      "var(--text-muted, rgba(255,255,255,.6))",
+                      "var(--text-muted, rgba(var(--ink),.6))",
                   }}
                 >
                   <input
@@ -876,9 +876,9 @@ export function ItemPicker({
                   padding:
                     "7px 10px",
                   borderBottom:
-                    "1px solid var(--border, rgba(255,255,255,.12))",
+                    "1px solid var(--border, rgba(var(--ink),.12))",
                   color:
-                    "var(--text-muted, rgba(255,255,255,.5))",
+                    "var(--text-muted, rgba(var(--ink),.5))",
                   fontSize: 10,
                   fontWeight: 800,
                   textTransform:
@@ -890,7 +890,7 @@ export function ItemPicker({
                   top: 0,
                   zIndex: 2,
                   background:
-                    "var(--panel-bg, #14161c)",
+                    "var(--panel-bg, var(--dk-14161c, #14161c))",
                 }}
               >
                 <span>
@@ -1039,7 +1039,7 @@ export function ItemPicker({
                       color:
                         previewFields.length
                           ? "var(--text-primary, #fff)"
-                          : "var(--text-muted, rgba(255,255,255,.4))",
+                          : "var(--text-muted, rgba(var(--ink),.4))",
 
                       minWidth: 62,
 
@@ -1099,7 +1099,7 @@ export function ItemPicker({
                         <span
                           style={{
                             color:
-                              "var(--text-muted, rgba(255,255,255,.4))",
+                              "var(--text-muted, rgba(var(--ink),.4))",
 
                             fontSize:
                               11.5,
@@ -1164,7 +1164,7 @@ export function ItemPicker({
                             color:
                               text ===
                               "—"
-                                ? "var(--text-muted, rgba(255,255,255,.35))"
+                                ? "var(--text-muted, rgba(var(--ink),.35))"
                                 : "var(--text-primary, #fff)",
                           }}
                         >
@@ -1212,7 +1212,7 @@ export function ItemPicker({
                         fontSize: 11,
 
                         color:
-                          "var(--text-muted, rgba(255,255,255,.35))",
+                          "var(--text-muted, rgba(var(--ink),.35))",
 
                         marginLeft:
                           previewFields.length
@@ -1262,7 +1262,7 @@ export function ItemPicker({
 
                             color:
                               tone ??
-                              "var(--text-muted, rgba(255,255,255,.55))",
+                              "var(--text-muted, rgba(var(--ink),.55))",
                           }}
                         >
                           {n ===
@@ -1340,7 +1340,7 @@ export function ItemPicker({
                     "7px 10px",
 
                   borderTop:
-                    "1px solid var(--border, rgba(255,255,255,.08))",
+                    "1px solid var(--border, rgba(var(--ink),.08))",
 
                   marginTop: 4,
 
@@ -1352,7 +1352,7 @@ export function ItemPicker({
                   fontSize: 12.5,
 
                   color:
-                    "var(--text-muted, rgba(255,255,255,.5))",
+                    "var(--text-muted, rgba(var(--ink),.5))",
 
                   background:
                     cursor ===
@@ -1383,15 +1383,15 @@ export function ItemPicker({
                 padding: "6px 8px",
                 marginBottom: 8,
                 borderTop:
-                  "1px solid var(--border, rgba(255,255,255,.12))",
-                background: "var(--panel-bg, #14161c)",
+                  "1px solid var(--border, rgba(var(--ink),.12))",
+                background: "var(--panel-bg, var(--dk-14161c, #14161c))",
               }}
             >
               <span
                 style={{
                   fontSize: 11,
                   color:
-                    "var(--text-muted, rgba(255,255,255,.5))",
+                    "var(--text-muted, rgba(var(--ink),.5))",
                 }}
               >
                 ↑↓ move · Enter select · Esc close
@@ -1475,7 +1475,7 @@ export function ItemPicker({
                 borderRadius: 999,
 
                 background:
-                  "var(--border, rgba(255,255,255,.28))",
+                  "var(--border, rgba(var(--ink),.28))",
 
                 opacity: 0.8,
               }}

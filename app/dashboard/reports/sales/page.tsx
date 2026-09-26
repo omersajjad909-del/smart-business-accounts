@@ -15,17 +15,17 @@ type Item = { id: string; code: string; name: string; unit: string };
 type Row = { date: string; invoiceNo: string; customer: string; item: string; unit: string; qty: number; rate: number; amount: number; status: string };
 
 const inputStyle: React.CSSProperties = {
-  background: "rgba(255,255,255,.06)", border: "1px solid rgba(255,255,255,.12)",
-  borderRadius: 8, color: "rgba(255,255,255,.85)", padding: "10px 14px",
+  background: "rgba(var(--ink),.06)", border: "1px solid rgba(var(--ink),.12)",
+  borderRadius: 8, color: "rgba(var(--ink),.85)", padding: "10px 14px",
   fontSize: 13, fontFamily: ff, outline: "none", width: "100%", boxSizing: "border-box",
 };
 const labelStyle: React.CSSProperties = {
-  fontSize: 10, fontWeight: 700, color: "rgba(255,255,255,.35)",
+  fontSize: 10, fontWeight: 700, color: "rgba(var(--ink),.35)",
   letterSpacing: ".08em", textTransform: "uppercase", marginBottom: 6, display: "block",
 };
 const selectStyle: React.CSSProperties = {
   ...inputStyle, cursor: "pointer", appearance: "none",
-  backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='rgba(255,255,255,.4)' stroke-width='2.5'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E")`,
+  backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='rgba(var(--ink),.4)' stroke-width='2.5'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E")`,
   backgroundRepeat: "no-repeat", backgroundPosition: "right 12px center", paddingRight: 32,
 };
 
@@ -106,7 +106,7 @@ export default function SalesReportPage() {
   const uniqueCustomers = new Set(rows.map(r => r.customer)).size;
 
   return (
-    <div style={{ fontFamily: ff, color: "rgba(255,255,255,.85)", minHeight: "100vh" }}>
+    <div style={{ fontFamily: ff, color: "rgba(var(--ink),.85)", minHeight: "100vh" }}>
 
       {/* ── PARAMETER MODAL ── */}
       {showModal && (
@@ -116,14 +116,14 @@ export default function SalesReportPage() {
           display: "flex", alignItems: "center", justifyContent: "center", padding: 24,
         }}>
           <div style={{
-            background: "linear-gradient(145deg,#0f1a35,#0b1225)",
+            background: "linear-gradient(145deg,var(--dk-0f1a35, #0f1a35),var(--dk-0b1225, #0b1225))",
             border: "1px solid rgba(52,211,153,.2)",
             borderRadius: 18, padding: isMobile ? "20px 18px" : "36px 40px", width: "100%", maxWidth: 500,
             boxShadow: "0 32px 80px rgba(0,0,0,.6)", position: "relative",
           }}>
             <button
               onClick={() => router.back()}
-              style={{ position:"absolute", top:14, right:16, background:"none", border:"none", color:"rgba(255,255,255,.35)", fontSize:20, cursor:"pointer", padding:4, borderRadius:6, fontFamily:ff }}
+              style={{ position:"absolute", top:14, right:16, background:"none", border:"none", color:"rgba(var(--ink),.35)", fontSize:20, cursor:"pointer", padding:4, borderRadius:6, fontFamily:ff }}
             >✕</button>
 
             {/* Header */}
@@ -132,7 +132,7 @@ export default function SalesReportPage() {
                 <div style={{ width:4, height:24, borderRadius:2, background:"linear-gradient(180deg,#34d399,#10b981)" }}/>
                 <h2 style={{ margin:0, fontSize:20, fontWeight:800, letterSpacing:"-.3px" }}>Sale Reports</h2>
               </div>
-              <p style={{ margin:0, fontSize:12, color:"rgba(255,255,255,.3)", paddingLeft:14 }}>
+              <p style={{ margin:0, fontSize:12, color:"rgba(var(--ink),.3)", paddingLeft:14 }}>
                 Enter parameters to generate sales report
               </p>
             </div>
@@ -186,28 +186,28 @@ export default function SalesReportPage() {
                 {itemId && (
                   <button onClick={() => { setItemId(""); setItemSearch(""); setItemDropOpen(false); }} style={{
                     position: "absolute", right: 10, top: "50%", transform: "translateY(-50%)",
-                    background: "none", border: "none", color: "rgba(255,255,255,.4)", cursor: "pointer", fontSize: 16,
+                    background: "none", border: "none", color: "rgba(var(--ink),.4)", cursor: "pointer", fontSize: 16,
                   }}>×</button>
                 )}
                 {itemDropOpen && !itemId && (
                   <div style={{
                     position: "absolute", top: "100%", left: 0, right: 0, zIndex: 100,
-                    background: "#0f1a35", border: "1px solid rgba(52,211,153,.3)",
+                    background: "var(--dk-0f1a35, #0f1a35)", border: "1px solid rgba(52,211,153,.3)",
                     borderRadius: 8, marginTop: 4, maxHeight: 180, overflowY: "auto",
                     boxShadow: "0 16px 40px rgba(0,0,0,.5)",
                   }}>
                     {items.filter(i => i.code.toLowerCase().includes(itemSearch.toLowerCase()) || i.name.toLowerCase().includes(itemSearch.toLowerCase())).length === 0 ? (
-                      <div style={{ padding: 14, textAlign: "center", color: "rgba(255,255,255,.25)", fontSize: 12 }}>No items found</div>
+                      <div style={{ padding: 14, textAlign: "center", color: "rgba(var(--ink),.25)", fontSize: 12 }}>No items found</div>
                     ) : items.filter(i => i.code.toLowerCase().includes(itemSearch.toLowerCase()) || i.name.toLowerCase().includes(itemSearch.toLowerCase())).map(item => (
                       <div key={item.id} onMouseDown={() => { setItemId(item.id); setItemSearch(""); setItemDropOpen(false); }} style={{
                         padding: "10px 14px", cursor: "pointer", fontSize: 13,
-                        color: "rgba(255,255,255,.75)", borderBottom: "1px solid rgba(255,255,255,.04)",
+                        color: "rgba(var(--ink),.75)", borderBottom: "1px solid rgba(var(--ink),.04)",
                       }}
                         onMouseEnter={e => e.currentTarget.style.background = "rgba(52,211,153,.15)"}
                         onMouseLeave={e => e.currentTarget.style.background = "transparent"}
                       >
                         <div style={{ fontWeight: 600 }}>{item.code}</div>
-                        <div style={{ fontSize: 11, color: "rgba(255,255,255,.3)" }}>{item.name}</div>
+                        <div style={{ fontSize: 11, color: "rgba(var(--ink),.3)" }}>{item.name}</div>
                       </div>
                     ))}
                   </div>
@@ -253,8 +253,8 @@ export default function SalesReportPage() {
             <div style={{ display:"flex", alignItems:"center", gap:12 }}>
               <div style={{ width:40, height:40, borderRadius:12, background:"rgba(52,211,153,.12)", border:"1px solid rgba(52,211,153,.25)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:20 }}>📊</div>
               <div>
-                <div style={{ fontSize:18, fontWeight:800, color:"white" }}>Sales Report</div>
-                <div style={{ fontSize:11, color:"rgba(255,255,255,.35)", marginTop:2 }}>
+                <div style={{ fontSize:18, fontWeight:800, color:"var(--ink-solid, white)" }}>Sales Report</div>
+                <div style={{ fontSize:11, color:"rgba(var(--ink),.35)", marginTop:2 }}>
                   {from} → {to}
                   {customerId && customers.find(c=>c.id===customerId) ? ` · ${customers.find(c=>c.id===customerId)!.name}` : ""}
                   {unitParam ? ` · Unit: ${unitParam}` : ""}
@@ -276,7 +276,7 @@ export default function SalesReportPage() {
                 </button>
               )}
               <button onClick={() => window.print()}
-                style={{ padding:"8px 14px", borderRadius:9, background:"transparent", border:"1px solid rgba(255,255,255,.1)", color:"rgba(255,255,255,.5)", fontSize:12, fontWeight:700, cursor:"pointer", fontFamily:ff }}>
+                style={{ padding:"8px 14px", borderRadius:9, background:"transparent", border:"1px solid rgba(var(--ink),.1)", color:"rgba(var(--ink),.5)", fontSize:12, fontWeight:700, cursor:"pointer", fontFamily:ff }}>
                 🖨 Print
               </button>
               <button onClick={() => router.back()}
@@ -294,10 +294,10 @@ export default function SalesReportPage() {
               { label:"Total Qty",       val: fmt(totalQty),             color:"#fbbf24", icon:"📦" },
               { label:"Total Amount",    val: `Rs ${fmt(totalAmount)}`,  color:"#34d399", icon:"💰" },
             ].map(k => (
-              <div key={k.label} style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderRadius:12, background:"rgba(255,255,255,.03)", border:"1px solid rgba(255,255,255,.07)", display:"flex", alignItems:"center", gap:12 }}>
+              <div key={k.label} style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderRadius:12, background:"rgba(var(--ink),.03)", border:"1px solid rgba(var(--ink),.07)", display:"flex", alignItems:"center", gap:12 }}>
                 <span style={{ fontSize:20 }}>{k.icon}</span>
                 <div>
-                  <div style={{ fontSize:10, color:"rgba(255,255,255,.4)", fontWeight:700, textTransform:"uppercase", letterSpacing:".06em" }}>{k.label}</div>
+                  <div style={{ fontSize:10, color:"rgba(var(--ink),.4)", fontWeight:700, textTransform:"uppercase", letterSpacing:".06em" }}>{k.label}</div>
                   <div style={{ fontSize:18, fontWeight:900, color:k.color, lineHeight:1.3 }}>{k.val}</div>
                 </div>
               </div>
@@ -305,38 +305,38 @@ export default function SalesReportPage() {
           </div>
 
           {/* Table */}
-          <div style={{ borderRadius:12, border:"1px solid rgba(255,255,255,.08)", overflow:"hidden" }}>
+          <div style={{ borderRadius:12, border:"1px solid rgba(var(--ink),.08)", overflow:"hidden" }}>
             <table style={{ width:"100%", borderCollapse:"collapse" }}>
               <thead>
-                <tr style={{ borderBottom:"1px solid rgba(255,255,255,.08)", background:"rgba(255,255,255,.02)" }}>
+                <tr style={{ borderBottom:"1px solid rgba(var(--ink),.08)", background:"rgba(var(--ink),.02)" }}>
                   {["#","Date","Invoice","Customer","Item","Unit","Qty","Rate","Amount","Status"].map((h, i) => (
-                    <th key={h} style={{ padding:"11px 12px", fontSize:11, fontWeight:700, color:"rgba(255,255,255,.35)", textTransform:"uppercase", letterSpacing:".06em", textAlign: i>5 ? "right" : "left" }}>{h}</th>
+                    <th key={h} style={{ padding:"11px 12px", fontSize:11, fontWeight:700, color:"rgba(var(--ink),.35)", textTransform:"uppercase", letterSpacing:".06em", textAlign: i>5 ? "right" : "left" }}>{h}</th>
                   ))}
                 </tr>
               </thead>
               <tbody>
                 {loading ? (
-                  <tr><td colSpan={10} style={{ padding:56, textAlign:"center", color:"rgba(255,255,255,.3)", fontSize:13 }}>Fetching data…</td></tr>
+                  <tr><td colSpan={10} style={{ padding:56, textAlign:"center", color:"rgba(var(--ink),.3)", fontSize:13 }}>Fetching data…</td></tr>
                 ) : rows.length === 0 ? (
                   <tr><td colSpan={10} style={{ padding:56, textAlign:"center" }}>
                     <div style={{ fontSize:36, marginBottom:8 }}>📊</div>
-                    <div style={{ fontSize:13, color:"rgba(255,255,255,.3)", fontWeight:600 }}>No sales data found</div>
-                    <div style={{ fontSize:11, color:"rgba(255,255,255,.2)", marginTop:4 }}>Try changing the parameters</div>
+                    <div style={{ fontSize:13, color:"rgba(var(--ink),.3)", fontWeight:600 }}>No sales data found</div>
+                    <div style={{ fontSize:11, color:"rgba(var(--ink),.2)", marginTop:4 }}>Try changing the parameters</div>
                   </td></tr>
                 ) : rows.map((r, i) => (
                   <tr key={i}
-                    style={{ borderBottom:"1px solid rgba(255,255,255,.05)", background:i%2===0?"transparent":"rgba(255,255,255,.01)", transition:"background .15s" }}
+                    style={{ borderBottom:"1px solid rgba(var(--ink),.05)", background:i%2===0?"transparent":"rgba(var(--ink),.01)", transition:"background .15s" }}
                     onMouseEnter={e => (e.currentTarget.style.background="rgba(99,102,241,.05)")}
                     onMouseLeave={e => (e.currentTarget.style.background=i%2===0?"transparent":"rgba(255,255,255,.01)")}
                   >
-                    <td style={{ padding:"10px 12px", fontSize:11, color:"rgba(255,255,255,.25)", fontWeight:600 }}>{i+1}</td>
-                    <td style={{ padding:"10px 12px", fontSize:12, color:"rgba(255,255,255,.5)" }}>{r.date}</td>
+                    <td style={{ padding:"10px 12px", fontSize:11, color:"rgba(var(--ink),.25)", fontWeight:600 }}>{i+1}</td>
+                    <td style={{ padding:"10px 12px", fontSize:12, color:"rgba(var(--ink),.5)" }}>{r.date}</td>
                     <td style={{ padding:"10px 12px", fontSize:12, fontWeight:700, color:"#818cf8" }}>#{r.invoiceNo}</td>
-                    <td style={{ padding:"10px 12px", fontSize:12, fontWeight:600, color:"rgba(255,255,255,.8)" }}>{r.customer}</td>
-                    <td style={{ padding:"10px 12px", fontSize:12, color:"rgba(255,255,255,.6)" }}>{r.item}</td>
-                    <td style={{ padding:"10px 12px", fontSize:11, color:"rgba(255,255,255,.35)", fontWeight:600 }}>{r.unit}</td>
-                    <td style={{ padding:"10px 12px", textAlign:"right", fontSize:12, fontWeight:700, color:"rgba(255,255,255,.7)" }}>{fmt(r.qty)}</td>
-                    <td style={{ padding:"10px 12px", textAlign:"right", fontSize:12, color:"rgba(255,255,255,.45)" }}>{fmt(r.rate)}</td>
+                    <td style={{ padding:"10px 12px", fontSize:12, fontWeight:600, color:"rgba(var(--ink),.8)" }}>{r.customer}</td>
+                    <td style={{ padding:"10px 12px", fontSize:12, color:"rgba(var(--ink),.6)" }}>{r.item}</td>
+                    <td style={{ padding:"10px 12px", fontSize:11, color:"rgba(var(--ink),.35)", fontWeight:600 }}>{r.unit}</td>
+                    <td style={{ padding:"10px 12px", textAlign:"right", fontSize:12, fontWeight:700, color:"rgba(var(--ink),.7)" }}>{fmt(r.qty)}</td>
+                    <td style={{ padding:"10px 12px", textAlign:"right", fontSize:12, color:"rgba(var(--ink),.45)" }}>{fmt(r.rate)}</td>
                     <td style={{ padding:"10px 12px", textAlign:"right", fontSize:13, fontWeight:800, color:"#34d399" }}>{fmt(r.amount)}</td>
                     <td style={{ padding:"10px 12px", textAlign:"right" }}>
                       <span style={{
@@ -350,8 +350,8 @@ export default function SalesReportPage() {
               </tbody>
               {!loading && rows.length > 0 && (
                 <tfoot>
-                  <tr style={{ borderTop:"1px solid rgba(255,255,255,.1)", background:"rgba(52,211,153,.04)" }}>
-                    <td colSpan={6} style={{ padding:"13px 12px", fontSize:11, fontWeight:800, color:"rgba(255,255,255,.4)", textTransform:"uppercase", letterSpacing:".06em" }}>
+                  <tr style={{ borderTop:"1px solid rgba(var(--ink),.1)", background:"rgba(52,211,153,.04)" }}>
+                    <td colSpan={6} style={{ padding:"13px 12px", fontSize:11, fontWeight:800, color:"rgba(var(--ink),.4)", textTransform:"uppercase", letterSpacing:".06em" }}>
                       Grand Total — {rows.length} line item{rows.length!==1?"s":""}
                     </td>
                     <td style={{ padding:"13px 12px", textAlign:"right", fontSize:15, fontWeight:900, color:"#818cf8" }}>{fmt(totalQty)}</td>

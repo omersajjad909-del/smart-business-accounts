@@ -103,7 +103,7 @@ function CardBrandMark({ brand, compact = false }: { brand: string; compact?: bo
     height: compact ? 24 : 32,
     borderRadius: 7,
     background: "#fff",
-    border: "1px solid rgba(255,255,255,.12)",
+    border: "1px solid rgba(var(--ink),.12)",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
@@ -132,7 +132,7 @@ function CardBrandMark({ brand, compact = false }: { brand: string; compact?: bo
   if (key === "amex") {
     return (
       <div style={{ ...boxStyle, background: "#2e77bc" }} aria-label="American Express">
-        <span style={{ color: "#fff", fontSize: compact ? 8 : 10, fontWeight: 900, letterSpacing: 0 }}>AMEX</span>
+        <span style={{ color: "var(--ink-solid, #fff)", fontSize: compact ? 8 : 10, fontWeight: 900, letterSpacing: 0 }}>AMEX</span>
       </div>
     );
   }
@@ -146,8 +146,8 @@ function CardBrandMark({ brand, compact = false }: { brand: string; compact?: bo
   }
 
   return (
-    <div style={{ ...boxStyle, background: "#111827" }} aria-label="Card">
-      <span style={{ color: "#fff", fontSize: compact ? 8 : 10, fontWeight: 900, letterSpacing: 0 }}>CARD</span>
+    <div style={{ ...boxStyle, background: "var(--dk-111827, #111827)" }} aria-label="Card">
+      <span style={{ color: "var(--ink-solid, #fff)", fontSize: compact ? 8 : 10, fontWeight: 900, letterSpacing: 0 }}>CARD</span>
     </div>
   );
 }
@@ -181,12 +181,12 @@ function StatusBadge({ status }: { status: string }) {
   const map: Record<string, { bg: string; color: string; label: string }> = {
     paid:     { bg:"rgba(52,211,153,.12)",  color:"#34d399", label:"Paid" },
     open:     { bg:"rgba(251,191,36,.12)",  color:"#fbbf24", label:"Open" },
-    void:     { bg:"rgba(255,255,255,.06)", color:"rgba(255,255,255,.4)", label:"Void" },
+    void:     { bg:"rgba(255,255,255,.06)", color:"rgba(var(--ink),.4)", label:"Void" },
     active:   { bg:"rgba(52,211,153,.12)",  color:"#34d399", label:"Active" },
     trialing: { bg:"rgba(129,140,248,.12)", color:"#a5b4fc", label:"Trial" },
     past_due: { bg:"rgba(239,68,68,.12)",   color:"#f87171", label:"Past Due" },
-    canceled: { bg:"rgba(255,255,255,.06)", color:"rgba(255,255,255,.4)", label:"Canceled" },
-    inactive: { bg:"rgba(255,255,255,.06)", color:"rgba(255,255,255,.4)", label:"Inactive" },
+    canceled: { bg:"rgba(255,255,255,.06)", color:"rgba(var(--ink),.4)", label:"Canceled" },
+    inactive: { bg:"rgba(255,255,255,.06)", color:"rgba(var(--ink),.4)", label:"Inactive" },
   };
   const s = map[status.toLowerCase()] ?? map.inactive;
   return (
@@ -213,20 +213,20 @@ function CancelModal({ onClose, onConfirm, planName }: { onClose:()=>void; onCon
   return (
     <div style={{ position:"fixed", inset:0, zIndex:1000, display:"flex", alignItems:"center", justifyContent:"center", padding:20 }}>
       <div onClick={onClose} style={{ position:"absolute", inset:0, background:"rgba(0,0,0,.72)", backdropFilter:"blur(6px)" }}/>
-      <div style={{ position:"relative", width:"100%", maxWidth:480, background:"#0f1630", borderRadius:24, border:"1px solid rgba(239,68,68,.22)", boxShadow:"0 32px 80px rgba(0,0,0,.5)", overflow:"hidden" }}>
+      <div style={{ position:"relative", width:"100%", maxWidth:480, background:"var(--dk-0f1630, #0f1630)", borderRadius:24, border:"1px solid rgba(239,68,68,.22)", boxShadow:"0 32px 80px rgba(0,0,0,.5)", overflow:"hidden" }}>
         <div style={{ height:3, background:"linear-gradient(90deg,#ef4444,#dc2626)" }}/>
         <div style={{ padding:"28px 32px 32px" }}>
           <div style={{ width:52, height:52, borderRadius:16, background:"rgba(239,68,68,.1)", border:"1px solid rgba(239,68,68,.25)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:24, marginBottom:18 }}>⚠️</div>
-          <h2 style={{ margin:"0 0 8px", fontSize:20, fontWeight:800, color:"white" }}>Cancel {planName} Plan?</h2>
-          <p style={{ margin:"0 0 24px", fontSize:13, color:"rgba(255,255,255,.5)", lineHeight:1.65 }}>
+          <h2 style={{ margin:"0 0 8px", fontSize:20, fontWeight:800, color:"var(--ink-solid, white)" }}>Cancel {planName} Plan?</h2>
+          <p style={{ margin:"0 0 24px", fontSize:13, color:"rgba(var(--ink),.5)", lineHeight:1.65 }}>
             Your plan stays active until the end of the billing period. You can reactivate at any time.
           </p>
           <div style={{ marginBottom:20 }}>
-            <div style={{ fontSize:10, fontWeight:700, color:"rgba(255,255,255,.3)", letterSpacing:".08em", textTransform:"uppercase", marginBottom:10 }}>Why are you leaving?</div>
+            <div style={{ fontSize:10, fontWeight:700, color:"rgba(var(--ink),.3)", letterSpacing:".08em", textTransform:"uppercase", marginBottom:10 }}>Why are you leaving?</div>
             <div style={{ display:"flex", flexDirection:"column", gap:7 }}>
               {reasons.map(r => (
-                <button key={r} onClick={() => setReason(r)} style={{ display:"flex", alignItems:"center", gap:12, padding:"11px 14px", borderRadius:11, border:`1.5px solid ${reason===r?"rgba(239,68,68,.5)":"rgba(255,255,255,.08)"}`, background:reason===r?"rgba(239,68,68,.08)":"rgba(255,255,255,.03)", cursor:"pointer", fontSize:13, color:reason===r?"#fca5a5":"rgba(255,255,255,.6)", textAlign:"left", fontFamily:"inherit", transition:"all .15s" }}>
-                  <div style={{ width:16, height:16, borderRadius:"50%", border:`2px solid ${reason===r?"#ef4444":"rgba(255,255,255,.2)"}`, display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
+                <button key={r} onClick={() => setReason(r)} style={{ display:"flex", alignItems:"center", gap:12, padding:"11px 14px", borderRadius:11, border:`1.5px solid ${reason===r?"rgba(239,68,68,.5)":"rgba(var(--ink),.08)"}`, background:reason===r?"rgba(239,68,68,.08)":"rgba(var(--ink),.03)", cursor:"pointer", fontSize:13, color:reason===r?"#fca5a5":"rgba(var(--ink),.6)", textAlign:"left", fontFamily:"inherit", transition:"all .15s" }}>
+                  <div style={{ width:16, height:16, borderRadius:"50%", border:`2px solid ${reason===r?"#ef4444":"rgba(var(--ink),.2)"}`, display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
                     {reason===r && <div style={{ width:8, height:8, borderRadius:"50%", background:"#ef4444" }}/>}
                   </div>
                   {r}
@@ -235,10 +235,10 @@ function CancelModal({ onClose, onConfirm, planName }: { onClose:()=>void; onCon
             </div>
           </div>
           <div style={{ display:"flex", gap:10 }}>
-            <button onClick={onClose} style={{ flex:1, padding:"12px", borderRadius:12, background:"rgba(255,255,255,.06)", border:"1px solid rgba(255,255,255,.1)", color:"rgba(255,255,255,.7)", fontSize:13, fontWeight:700, cursor:"pointer", fontFamily:"inherit" }}>
+            <button onClick={onClose} style={{ flex:1, padding:"12px", borderRadius:12, background:"rgba(var(--ink),.06)", border:"1px solid rgba(var(--ink),.1)", color:"rgba(var(--ink),.7)", fontSize:13, fontWeight:700, cursor:"pointer", fontFamily:"inherit" }}>
               Keep my plan
             </button>
-            <button onClick={confirmCancellation} disabled={!reason||loading} style={{ flex:1, padding:"12px", borderRadius:12, background:(!reason||loading)?"rgba(255,255,255,.05)":"linear-gradient(135deg,#ef4444,#dc2626)", border:"none", color:(!reason||loading)?"rgba(255,255,255,.3)":"white", fontSize:13, fontWeight:700, cursor:(!reason||loading)?"not-allowed":"pointer", fontFamily:"inherit", transition:"all .2s" }}>
+            <button onClick={confirmCancellation} disabled={!reason||loading} style={{ flex:1, padding:"12px", borderRadius:12, background:(!reason||loading)?"rgba(var(--ink),.05)":"linear-gradient(135deg,#ef4444,#dc2626)", border:"none", color:(!reason||loading)?"rgba(var(--ink),.3)":"white", fontSize:13, fontWeight:700, cursor:(!reason||loading)?"not-allowed":"pointer", fontFamily:"inherit", transition:"all .2s" }}>
               {loading ? "Canceling..." : "Yes, Cancel"}
             </button>
           </div>
@@ -264,8 +264,8 @@ function AddCardModal({ onClose, onSuccess }: { onClose:()=>void; onSuccess?:(ca
   const brand    = detectBrand(cardNumber);
   const brandCfg = CARD_BRANDS[brand] ?? CARD_BRANDS.unknown;
 
-  const inp: React.CSSProperties = { width:"100%", padding:"12px 14px", borderRadius:11, border:"1.5px solid rgba(255,255,255,.1)", background:"rgba(255,255,255,.05)", color:"white", fontSize:13, outline:"none", fontFamily:"inherit", transition:"border-color .2s" };
-  const lbl: React.CSSProperties = { fontSize:10, fontWeight:700, color:"rgba(255,255,255,.35)", letterSpacing:".08em", textTransform:"uppercase" as const, display:"block", marginBottom:6 };
+  const inp: React.CSSProperties = { width:"100%", padding:"12px 14px", borderRadius:11, border:"1.5px solid rgba(var(--ink),.1)", background:"rgba(var(--ink),.05)", color:"var(--ink-solid, white)", fontSize:13, outline:"none", fontFamily:"inherit", transition:"border-color .2s" };
+  const lbl: React.CSSProperties = { fontSize:10, fontWeight:700, color:"rgba(var(--ink),.35)", letterSpacing:".08em", textTransform:"uppercase" as const, display:"block", marginBottom:6 };
 
   async function handleSave() {
     if (!cardNumber.replace(/\s/g,"") || !expiry || !name) { toast.error("Fill in card number, expiry, and name."); return; }
@@ -282,19 +282,19 @@ function AddCardModal({ onClose, onSuccess }: { onClose:()=>void; onSuccess?:(ca
   return (
     <div style={{ position:"fixed", inset:0, zIndex:1000, display:"flex", alignItems:"center", justifyContent:"center", padding:20 }}>
       <div onClick={onClose} style={{ position:"absolute", inset:0, background:"rgba(0,0,0,.72)", backdropFilter:"blur(6px)" }}/>
-      <div style={{ position:"relative", width:"100%", maxWidth:500, background:"#0f1630", borderRadius:24, border:"1px solid rgba(255,255,255,.1)", boxShadow:"0 32px 80px rgba(0,0,0,.5)", overflow:"hidden" }}>
+      <div style={{ position:"relative", width:"100%", maxWidth:500, background:"var(--dk-0f1630, #0f1630)", borderRadius:24, border:"1px solid rgba(var(--ink),.1)", boxShadow:"0 32px 80px rgba(0,0,0,.5)", overflow:"hidden" }}>
         <div style={{ height:3, background:"linear-gradient(90deg,#6366f1,#8b5cf6,#d946ef)" }}/>
-        <div style={{ padding: isMobile ? "12px 13px" : "22px 28px", borderBottom:"1px solid rgba(255,255,255,.07)", display:"flex", alignItems:"center", justifyContent:"space-between" }}>
+        <div style={{ padding: isMobile ? "12px 13px" : "22px 28px", borderBottom:"1px solid rgba(var(--ink),.07)", display:"flex", alignItems:"center", justifyContent:"space-between" }}>
           <div>
-            <h2 style={{ margin:0, fontSize:17, fontWeight:800, color:"white" }}>Add Payment Method</h2>
-            <p style={{ margin:"3px 0 0", fontSize:12, color:"rgba(255,255,255,.4)" }}>Encrypted &amp; secure — we never store full card numbers</p>
+            <h2 style={{ margin:0, fontSize:17, fontWeight:800, color:"var(--ink-solid, white)" }}>Add Payment Method</h2>
+            <p style={{ margin:"3px 0 0", fontSize:12, color:"rgba(var(--ink),.4)" }}>Encrypted &amp; secure — we never store full card numbers</p>
           </div>
-          <button onClick={onClose} style={{ width:32, height:32, borderRadius:8, border:"1px solid rgba(255,255,255,.1)", background:"rgba(255,255,255,.04)", cursor:"pointer", fontSize:16, color:"rgba(255,255,255,.5)", display:"flex", alignItems:"center", justifyContent:"center" }}>✕</button>
+          <button onClick={onClose} style={{ width:32, height:32, borderRadius:8, border:"1px solid rgba(var(--ink),.1)", background:"rgba(var(--ink),.04)", cursor:"pointer", fontSize:16, color:"rgba(var(--ink),.5)", display:"flex", alignItems:"center", justifyContent:"center" }}>✕</button>
         </div>
         <div style={{ padding:"22px 28px 28px" }}>
-          <div style={{ display:"flex", gap:5, marginBottom:22, padding:4, background:"rgba(255,255,255,.05)", borderRadius:12 }}>
+          <div style={{ display:"flex", gap:5, marginBottom:22, padding:4, background:"rgba(var(--ink),.05)", borderRadius:12 }}>
             {(["card","billing"] as const).map(s => (
-              <button key={s} onClick={() => setStep(s)} style={{ flex:1, padding:"8px", borderRadius:9, border:"none", cursor:"pointer", fontSize:12, fontWeight:700, fontFamily:"inherit", transition:"all .15s", background:step===s?"rgba(255,255,255,.1)":"transparent", color:step===s?"white":"rgba(255,255,255,.35)" }}>
+              <button key={s} onClick={() => setStep(s)} style={{ flex:1, padding:"8px", borderRadius:9, border:"none", cursor:"pointer", fontSize:12, fontWeight:700, fontFamily:"inherit", transition:"all .15s", background:step===s?"rgba(var(--ink),.1)":"transparent", color:step===s?"white":"rgba(var(--ink),.35)" }}>
                 {s==="card" ? "💳 Card Details" : "📍 Billing Address"}
               </button>
             ))}
@@ -303,14 +303,14 @@ function AddCardModal({ onClose, onSuccess }: { onClose:()=>void; onSuccess?:(ca
           {step === "card" && (
             <div style={{ display:"flex", flexDirection:"column", gap:16 }}>
               <div style={{ height:100, borderRadius:14, background:brandCfg.grad, padding: isMobile ? "12px 10px" : "16px 20px", position:"relative", overflow:"hidden", boxShadow:"0 8px 28px rgba(0,0,0,.3)" }}>
-                <div style={{ position:"absolute", top:-20, right:-20, width:110, height:110, borderRadius:"50%", background:"rgba(255,255,255,.06)" }}/>
+                <div style={{ position:"absolute", top:-20, right:-20, width:110, height:110, borderRadius:"50%", background:"rgba(var(--ink),.06)" }}/>
                 <div style={{ width:28, height:20, borderRadius:4, background:"linear-gradient(135deg,#fbbf24,#d97706)", marginBottom:10 }}/>
                 <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-end" }}>
                   <div>
-                    <div style={{ fontSize:13, color:"rgba(255,255,255,.9)", fontFamily:"monospace", letterSpacing:2 }}>{cardNumber || "**** **** **** ****"}</div>
-                    <div style={{ fontSize:11, color:"rgba(255,255,255,.5)", marginTop:4 }}>{name || "CARDHOLDER NAME"} &nbsp; {expiry || "MM/YY"}</div>
+                    <div style={{ fontSize:13, color:"rgba(var(--ink),.9)", fontFamily:"monospace", letterSpacing:2 }}>{cardNumber || "**** **** **** ****"}</div>
+                    <div style={{ fontSize:11, color:"rgba(var(--ink),.5)", marginTop:4 }}>{name || "CARDHOLDER NAME"} &nbsp; {expiry || "MM/YY"}</div>
                   </div>
-                  <div style={{ fontSize:9, fontWeight:900, color:"rgba(255,255,255,.45)", letterSpacing:1 }}>{brandCfg.label}</div>
+                  <div style={{ fontSize:9, fontWeight:900, color:"rgba(var(--ink),.45)", letterSpacing:1 }}>{brandCfg.label}</div>
                 </div>
               </div>
               <div><label style={lbl}>Card Number</label><input value={cardNumber} onChange={e=>setCardNumber(formatCardNumber(e.target.value))} placeholder="1234 5678 9012 3456" maxLength={19} style={{...inp,fontFamily:"monospace",letterSpacing:2}}/></div>
@@ -343,8 +343,8 @@ function AddCardModal({ onClose, onSuccess }: { onClose:()=>void; onSuccess?:(ca
                 🔒 256-bit SSL — we never store your full card number
               </div>
               <div style={{ display:"flex", gap:10 }}>
-                <button onClick={() => setStep("card")} style={{ flex:1, padding:"12px", borderRadius:12, background:"rgba(255,255,255,.06)", border:"1px solid rgba(255,255,255,.1)", color:"rgba(255,255,255,.7)", fontSize:13, fontWeight:700, cursor:"pointer", fontFamily:"inherit" }}>← Back</button>
-                <button onClick={handleSave} disabled={saving} style={{ flex:2, padding:"12px", borderRadius:12, background:saving?"rgba(255,255,255,.06)":"linear-gradient(135deg,#6366f1,#7c3aed)", border:"none", color:saving?"rgba(255,255,255,.3)":"white", fontSize:13, fontWeight:700, cursor:saving?"wait":"pointer", fontFamily:"inherit" }}>
+                <button onClick={() => setStep("card")} style={{ flex:1, padding:"12px", borderRadius:12, background:"rgba(var(--ink),.06)", border:"1px solid rgba(var(--ink),.1)", color:"rgba(var(--ink),.7)", fontSize:13, fontWeight:700, cursor:"pointer", fontFamily:"inherit" }}>← Back</button>
+                <button onClick={handleSave} disabled={saving} style={{ flex:2, padding:"12px", borderRadius:12, background:saving?"rgba(var(--ink),.06)":"linear-gradient(135deg,#6366f1,#7c3aed)", border:"none", color:saving?"rgba(var(--ink),.3)":"white", fontSize:13, fontWeight:700, cursor:saving?"wait":"pointer", fontFamily:"inherit" }}>
                   {saving ? "Saving..." : "Save Payment Method"}
                 </button>
               </div>
@@ -746,18 +746,18 @@ function BillingPage() {
 
   if (loading) return (
     <div style={{ padding: isMobile ? "18px 13px" : "32px 28px", fontFamily:"'Outfit',sans-serif" }}>
-      {[1,2,3].map(i => <div key={i} style={{ height:80, borderRadius:16, background:"rgba(255,255,255,.05)", marginBottom:16, animation:"pulse 1.5s infinite" }}/>)}
+      {[1,2,3].map(i => <div key={i} style={{ height:80, borderRadius:16, background:"rgba(var(--ink),.05)", marginBottom:16, animation:"pulse 1.5s infinite" }}/>)}
     </div>
   );
 
   const tabBtn = (active: boolean): React.CSSProperties => ({
     padding:"9px 18px", borderRadius:10, border:"none", cursor:"pointer", fontSize:13, fontWeight:700, fontFamily:"inherit", transition:"all .15s",
     background: active ? "rgba(99,102,241,.18)" : "transparent",
-    color: active ? "#a5b4fc" : "rgba(255,255,255,.4)",
+    color: active ? "#a5b4fc" : "rgba(var(--ink),.4)",
   });
 
   const card: React.CSSProperties = {
-    borderRadius:20, border:"1px solid rgba(255,255,255,.08)", background:"rgba(255,255,255,.03)",
+    borderRadius:20, border:"1px solid rgba(var(--ink),.08)", background:"rgba(var(--ink),.03)",
     overflow:"hidden", boxShadow:"0 2px 12px rgba(0,0,0,.12)",
   };
 
@@ -765,17 +765,17 @@ function BillingPage() {
   const seatTotalCost  = seatQty * seatCyclePrice;
 
   return (
-    <div style={{ padding:"28px 28px 80px", maxWidth:1050, margin:"0 auto", fontFamily:"'Outfit','DM Sans',sans-serif", color:"white" }}>
+    <div style={{ padding:"28px 28px 80px", maxWidth:1050, margin:"0 auto", fontFamily:"'Outfit','DM Sans',sans-serif", color:"var(--ink-solid, white)" }}>
       <style>{`
         
         @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
         @keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
         input:focus,select:focus{border-color:rgba(99,102,241,.6)!important;box-shadow:0 0 0 3px rgba(99,102,241,.12)!important;outline:none!important}
-        input::placeholder,select::placeholder{color:rgba(255,255,255,.2)!important}
-        select option{background:#1e293b;color:white}
-        .plan-card{border-radius:20px;border:1.5px solid rgba(255,255,255,.08);padding:26px 22px;transition:transform .2s,box-shadow .2s;background:rgba(255,255,255,.03);position:relative}
+        input::placeholder,select::placeholder{color:rgba(var(--ink),.2)!important}
+        select option{background:var(--dk-1e293b, #1e293b);color:white}
+        .plan-card{border-radius:20px;border:1.5px solid rgba(var(--ink),.08);padding:26px 22px;transition:transform .2s,box-shadow .2s;background:rgba(var(--ink),.03);position:relative}
         .plan-card:hover{transform:translateY(-3px);box-shadow:0 12px 40px rgba(0,0,0,.2)}
-        .row-hover:hover{background:rgba(255,255,255,.03)!important}
+        .row-hover:hover{background:rgba(var(--ink),.03)!important}
         @media(max-width:860px){.bill-stats{grid-template-columns:repeat(2,1fr)!important}.bill-plans{grid-template-columns:1fr!important}.bill-sub-inner{flex-direction:column!important}}
         @media(max-width:540px){.bill-stats{grid-template-columns:1fr!important}}
       `}</style>
@@ -795,7 +795,7 @@ function BillingPage() {
           <div style={{ width:52, height:52, borderRadius:14, background:"rgba(239,68,68,.15)", border:"1px solid rgba(239,68,68,.3)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:24, flexShrink:0 }}>🔒</div>
           <div>
             <div style={{ fontSize:17, fontWeight:800, color:"#fca5a5", marginBottom:4 }}>Active subscription required</div>
-            <div style={{ fontSize:13, color:"rgba(255,255,255,.55)", lineHeight:1.6 }}>
+            <div style={{ fontSize:13, color:"rgba(var(--ink),.55)", lineHeight:1.6 }}>
               Dashboard access is locked until your subscription is active. Please select a plan and add a payment method below to continue.
             </div>
           </div>
@@ -866,7 +866,7 @@ function BillingPage() {
               <div style={{ fontSize:14, fontWeight:800, color:tone.accent, marginBottom:4 }}>
                 {tone.title}
               </div>
-              <div style={{ fontSize:12, color:"rgba(255,255,255,.62)", lineHeight:1.6 }}>
+              <div style={{ fontSize:12, color:"rgba(var(--ink),.62)", lineHeight:1.6 }}>
                 {paymentManagedExternally && !paymentManualBilling
                   ? `${paymentNote} The card is added on the provider checkout page, not inside this form.`
                   : paymentNote}
@@ -878,7 +878,7 @@ function BillingPage() {
       <div style={{ display:"flex", alignItems:"flex-start", justifyContent:"space-between", marginBottom:24, flexWrap:"wrap", gap:12 }}>
         <div>
           <h1 style={{ margin:0, fontSize:24, fontWeight:800, letterSpacing:"-0.6px" }}>Billing &amp; Payments</h1>
-          <p style={{ margin:"4px 0 0", fontSize:13, color:"rgba(255,255,255,.4)" }}>Manage your subscription, payment methods, and invoices</p>
+          <p style={{ margin:"4px 0 0", fontSize:13, color:"rgba(var(--ink),.4)" }}>Manage your subscription, payment methods, and invoices</p>
         </div>
         <button onClick={openPaymentMethodFlow} style={{ padding:"9px 18px", borderRadius:11, background:"linear-gradient(135deg,#6366f1,#7c3aed)", border:"none", color:"white", fontSize:13, fontWeight:700, cursor:"pointer", fontFamily:"inherit" }}>
           {paymentUpdateUrl ? "Update Card" : paymentManagedExternally ? "Open Checkout" : "+ Add Card"}
@@ -895,10 +895,10 @@ function BillingPage() {
             value: subscription ? `${formatInvoiceAmount(subscription.amount, subscription.currency)}/${subscription.billingCycle === "yearly" ? "yr" : "mo"}` : "—",
             icon: "💰", color: "#38bdf8" },
         ].map(s => (
-          <div key={s.label} style={{ padding: isMobile ? "12px 10px" : "17px 18px", borderRadius:16, background:"rgba(255,255,255,.03)", border:"1px solid rgba(255,255,255,.07)", display:"flex", alignItems:"center", gap:14 }}>
+          <div key={s.label} style={{ padding: isMobile ? "12px 10px" : "17px 18px", borderRadius:16, background:"rgba(var(--ink),.03)", border:"1px solid rgba(var(--ink),.07)", display:"flex", alignItems:"center", gap:14 }}>
             <div style={{ width:40, height:40, borderRadius:12, background:`${s.color}18`, display:"flex", alignItems:"center", justifyContent:"center", fontSize:18, flexShrink:0 }}>{s.icon}</div>
             <div>
-              <div style={{ fontSize:10, fontWeight:700, color:"rgba(255,255,255,.3)", letterSpacing:".06em", textTransform:"uppercase" }}>{s.label}</div>
+              <div style={{ fontSize:10, fontWeight:700, color:"rgba(var(--ink),.3)", letterSpacing:".06em", textTransform:"uppercase" }}>{s.label}</div>
               <div style={{ fontSize:14, fontWeight:800, marginTop:3 }}>
                 {(s as {isStatus?:boolean}).isStatus ? <StatusBadge status={s.value.toLowerCase()} /> : s.value}
               </div>
@@ -908,7 +908,7 @@ function BillingPage() {
       </div>
 
       {/* ── Tabs ── */}
-      <div style={{ display:"flex", gap:4, marginBottom:24, padding:5, borderRadius:14, background:"rgba(255,255,255,.04)", border:"1px solid rgba(255,255,255,.07)", width:"fit-content", overflowX:"auto" }}>
+      <div style={{ display:"flex", gap:4, marginBottom:24, padding:5, borderRadius:14, background:"rgba(var(--ink),.04)", border:"1px solid rgba(var(--ink),.07)", width:"fit-content", overflowX:"auto" }}>
         {([
           { id:"overview", label:"📊 Overview" },
           { id:"plans",    label:"📋 Plans" },
@@ -932,7 +932,7 @@ function BillingPage() {
                 <div style={{ padding: isMobile ? "12px 11px" : "20px 24px", borderRadius:16, background:`linear-gradient(135deg,${currentPlan.gradFrom}18,${currentPlan.gradTo}10)`, border:`1px solid ${currentPlan.color}22`, textAlign:"center", minWidth:150 }}>
                   <div style={{ fontSize:30, marginBottom:6 }}>{currentPlan.icon}</div>
                   <div style={{ fontSize:19, fontWeight:900, color:currentPlan.color }}>{currentPlan.name}</div>
-                  <div style={{ fontSize:12, color:"rgba(255,255,255,.35)", marginTop:4 }}>
+                  <div style={{ fontSize:12, color:"rgba(var(--ink),.35)", marginTop:4 }}>
                     {subscription ? formatInvoiceAmount(subscription.amount, subscription.currency) : `$${currentPlan.monthlyPrice}`}
                     <span style={{ fontSize:11 }}>/{subscription?.billingCycle === "yearly" ? "yr" : "mo"}</span>
                   </div>
@@ -947,7 +947,7 @@ function BillingPage() {
                     { label:"Currency",      node: <span style={{ fontSize:14, fontWeight:800 }}>{subscription?.currency || "USD"}</span> },
                   ].map(r => (
                     <div key={r.label}>
-                      <div style={{ fontSize:10, fontWeight:700, color:"rgba(255,255,255,.3)", letterSpacing:".06em", textTransform:"uppercase", marginBottom:7 }}>{r.label}</div>
+                      <div style={{ fontSize:10, fontWeight:700, color:"rgba(var(--ink),.3)", letterSpacing:".06em", textTransform:"uppercase", marginBottom:7 }}>{r.label}</div>
                       {r.node}
                     </div>
                   ))}
@@ -963,7 +963,7 @@ function BillingPage() {
                       >
                         {checkingOut ? "Processing..." : `Renew ${currentPlan.name}`}
                       </button>
-                      <button onClick={() => setActiveTab("plans")} style={{ padding:"10px 20px", borderRadius:12, background:"rgba(255,255,255,.05)", border:"1px solid rgba(255,255,255,.09)", color:"rgba(255,255,255,.6)", fontSize:12, fontWeight:600, cursor:"pointer", fontFamily:"inherit" }}>
+                      <button onClick={() => setActiveTab("plans")} style={{ padding:"10px 20px", borderRadius:12, background:"rgba(var(--ink),.05)", border:"1px solid rgba(var(--ink),.09)", color:"rgba(var(--ink),.6)", fontSize:12, fontWeight:600, cursor:"pointer", fontFamily:"inherit" }}>
                         View all plans
                       </button>
                       <button onClick={() => setShowCancel(true)} style={{ padding:"10px 20px", borderRadius:12, background:"rgba(239,68,68,.07)", border:"1px solid rgba(239,68,68,.18)", color:"#f87171", fontSize:12, fontWeight:600, cursor:"pointer", fontFamily:"inherit" }}>
@@ -992,17 +992,17 @@ function BillingPage() {
                       <div style={{ width:38, height:38, borderRadius:11, background:"rgba(99,102,241,.15)", border:"1px solid rgba(99,102,241,.28)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:18 }}>👥</div>
                       <div>
                         <div style={{ fontSize:15, fontWeight:800 }}>Users &amp; Seats</div>
-                        <div style={{ fontSize:11, color:"rgba(255,255,255,.4)", marginTop:1 }}>Team capacity for {currentPlan.name} plan</div>
+                        <div style={{ fontSize:11, color:"rgba(var(--ink),.4)", marginTop:1 }}>Team capacity for {currentPlan.name} plan</div>
                       </div>
                     </div>
                     {/* Usage bar */}
                     {effectiveUserLimit !== null ? (
                       <>
                         <div style={{ display:"flex", justifyContent:"space-between", marginBottom:6 }}>
-                          <span style={{ fontSize:13, color:"rgba(255,255,255,.6)" }}>{totalUsers} of {effectiveUserLimit} seats used</span>
+                          <span style={{ fontSize:13, color:"rgba(var(--ink),.6)" }}>{totalUsers} of {effectiveUserLimit} seats used</span>
                           {extraSeats > 0 && <span style={{ fontSize:11, color:"#a78bfa", fontWeight:600 }}>+{extraSeats} extra</span>}
                         </div>
-                        <div style={{ height:7, borderRadius:4, background:"rgba(255,255,255,.07)", overflow:"hidden" }}>
+                        <div style={{ height:7, borderRadius:4, background:"rgba(var(--ink),.07)", overflow:"hidden" }}>
                           <div style={{ height:"100%", borderRadius:4, width:`${Math.min(100, (totalUsers / effectiveUserLimit) * 100)}%`, background: totalUsers >= effectiveUserLimit ? "linear-gradient(90deg,#f87171,#ef4444)" : "linear-gradient(90deg,#6366f1,#7c3aed)", transition:"width .5s" }}/>
                         </div>
                         {totalUsers >= effectiveUserLimit && (
@@ -1010,14 +1010,14 @@ function BillingPage() {
                         )}
                       </>
                     ) : (
-                      <div style={{ fontSize:13, color:"rgba(255,255,255,.5)" }}>{totalUsers} users · <span style={{ color:"#34d399", fontWeight:700 }}>Unlimited seats</span></div>
+                      <div style={{ fontSize:13, color:"rgba(var(--ink),.5)" }}>{totalUsers} users · <span style={{ color:"#34d399", fontWeight:700 }}>Unlimited seats</span></div>
                     )}
                   </div>
                   {/* Right: pricing + button */}
                   <div style={{ display:"flex", flexDirection:"column", gap:8, alignItems:"flex-end" }}>
                     <div style={{ textAlign:"right" }}>
-                      <div style={{ fontSize:20, fontWeight:900, color:"white" }}>+${seatCyclePrice}<span style={{ fontSize:12, fontWeight:500, color:"rgba(255,255,255,.4)" }}>/seat/mo</span></div>
-                      {extraSeats > 0 && <div style={{ fontSize:11, color:"rgba(255,255,255,.35)", marginTop:2 }}>Current: +${extraSeats * seatCyclePrice}/mo for {extraSeats} extra seat{extraSeats > 1 ? "s" : ""}</div>}
+                      <div style={{ fontSize:20, fontWeight:900, color:"var(--ink-solid, white)" }}>+${seatCyclePrice}<span style={{ fontSize:12, fontWeight:500, color:"rgba(var(--ink),.4)" }}>/seat/mo</span></div>
+                      {extraSeats > 0 && <div style={{ fontSize:11, color:"rgba(var(--ink),.35)", marginTop:2 }}>Current: +${extraSeats * seatCyclePrice}/mo for {extraSeats} extra seat{extraSeats > 1 ? "s" : ""}</div>}
                     </div>
                     <button onClick={() => { setSeatQty(1); setShowSeatModal(true); }} style={{ padding:"10px 20px", borderRadius:11, background:"linear-gradient(135deg,#6366f1,#7c3aed)", border:"none", color:"white", fontSize:13, fontWeight:700, cursor:"pointer", fontFamily:"inherit", whiteSpace:"nowrap" }}>
                       + Add Seats
@@ -1030,32 +1030,32 @@ function BillingPage() {
 
           {/* Recent invoices */}
           <div style={{ ...card }}>
-            <div style={{ padding: isMobile ? "12px 11px" : "18px 24px", borderBottom:"1px solid rgba(255,255,255,.06)", display:"flex", alignItems:"center", justifyContent:"space-between" }}>
+            <div style={{ padding: isMobile ? "12px 11px" : "18px 24px", borderBottom:"1px solid rgba(var(--ink),.06)", display:"flex", alignItems:"center", justifyContent:"space-between" }}>
               <div style={{ fontSize:15, fontWeight:800 }}>Recent Invoices</div>
               <button onClick={() => setActiveTab("invoices")} style={{ fontSize:12, fontWeight:600, color:"#a5b4fc", background:"none", border:"none", cursor:"pointer", fontFamily:"inherit" }}>View all →</button>
             </div>
             {invoices.length === 0 ? (
-              <div style={{ padding: isMobile ? "18px 11px" : "32px 24px", textAlign:"center", color:"rgba(255,255,255,.3)" }}>                <div style={{ fontSize:28, marginBottom:8 }}>💳</div>
+              <div style={{ padding: isMobile ? "18px 11px" : "32px 24px", textAlign:"center", color:"rgba(var(--ink),.3)" }}>                <div style={{ fontSize:28, marginBottom:8 }}>💳</div>
                 <div style={{ fontSize:13, fontWeight:600 }}>No invoices yet</div>
               </div>
             ) : (
               <div style={{ overflowX:"auto" }}>
                 <table style={{ width:"100%", borderCollapse:"collapse" }}>
                   <thead>
-                    <tr>{["Invoice #","Date","Plan","Amount","Status",""].map(h=><th key={h} style={{ padding:"10px 20px", textAlign:"left", fontSize:10, fontWeight:700, color:"rgba(255,255,255,.3)", letterSpacing:".06em", textTransform:"uppercase", borderBottom:"1px solid rgba(255,255,255,.05)" }}>{h}</th>)}</tr>
+                    <tr>{["Invoice #","Date","Plan","Amount","Status",""].map(h=><th key={h} style={{ padding:"10px 20px", textAlign:"left", fontSize:10, fontWeight:700, color:"rgba(var(--ink),.3)", letterSpacing:".06em", textTransform:"uppercase", borderBottom:"1px solid rgba(var(--ink),.05)" }}>{h}</th>)}</tr>
                   </thead>
                   <tbody>
                     {invoices.slice(0,3).map((inv,i) => (
-                      <tr key={inv.id} className="row-hover" style={{ borderBottom:i<Math.min(invoices.length,3)-1?"1px solid rgba(255,255,255,.04)":"none" }}>
-                        <td style={{ padding:"13px 20px", fontSize:12, fontWeight:700, color:"rgba(255,255,255,.8)", fontFamily:"monospace" }}>{inv.number}</td>
-                        <td style={{ padding:"13px 20px", fontSize:12, color:"rgba(255,255,255,.4)" }}>{inv.date}</td>
-                        <td style={{ padding:"13px 20px", fontSize:12, color:"rgba(255,255,255,.65)" }}>{inv.plan}</td>
+                      <tr key={inv.id} className="row-hover" style={{ borderBottom:i<Math.min(invoices.length,3)-1?"1px solid rgba(var(--ink),.04)":"none" }}>
+                        <td style={{ padding:"13px 20px", fontSize:12, fontWeight:700, color:"rgba(var(--ink),.8)", fontFamily:"monospace" }}>{inv.number}</td>
+                        <td style={{ padding:"13px 20px", fontSize:12, color:"rgba(var(--ink),.4)" }}>{inv.date}</td>
+                        <td style={{ padding:"13px 20px", fontSize:12, color:"rgba(var(--ink),.65)" }}>{inv.plan}</td>
                         <td style={{ padding:"13px 20px", fontSize:12, fontWeight:700 }}>{formatInvoiceAmount(inv.amount, inv.currency)}</td>
                         <td style={{ padding:"13px 20px" }}><StatusBadge status={inv.status}/></td>
                         <td style={{ padding:"13px 20px" }}>
                           <button
                             onClick={() => window.open(`/api/billing/invoices/pdf?invoiceId=${encodeURIComponent(inv.id)}`, "_blank")}
-                            style={{ padding:"4px 12px", borderRadius:8, border:"1px solid rgba(255,255,255,.08)", background:"rgba(255,255,255,.04)", fontSize:11, fontWeight:600, color:"rgba(255,255,255,.45)", cursor:"pointer", fontFamily:"inherit" }}
+                            style={{ padding:"4px 12px", borderRadius:8, border:"1px solid rgba(var(--ink),.08)", background:"rgba(var(--ink),.04)", fontSize:11, fontWeight:600, color:"rgba(var(--ink),.45)", cursor:"pointer", fontFamily:"inherit" }}
                           >⬇ PDF</button>
                         </td>
                       </tr>
@@ -1068,16 +1068,16 @@ function BillingPage() {
 
           {/* Payment methods preview */}
           <div style={{ ...card }}>
-            <div style={{ padding: isMobile ? "12px 11px" : "18px 24px", borderBottom:"1px solid rgba(255,255,255,.06)", display:"flex", alignItems:"center", justifyContent:"space-between" }}>
+            <div style={{ padding: isMobile ? "12px 11px" : "18px 24px", borderBottom:"1px solid rgba(var(--ink),.06)", display:"flex", alignItems:"center", justifyContent:"space-between" }}>
               <div style={{ fontSize:15, fontWeight:800 }}>Payment Methods</div>
               <button onClick={() => setActiveTab("methods")} style={{ fontSize:12, fontWeight:600, color:"#a5b4fc", background:"none", border:"none", cursor:"pointer", fontFamily:"inherit" }}>Manage →</button>
             </div>
             {paymentMethods.length === 0 ? (
               <div style={{ padding: isMobile ? "15px 11px" : "28px 24px", textAlign:"center" }}>                <div style={{ fontSize:26, marginBottom:8 }}>🧾</div>
-                <div style={{ fontSize:13, fontWeight:600, color:"rgba(255,255,255,.4)", marginBottom:12 }}>
+                <div style={{ fontSize:13, fontWeight:600, color:"rgba(var(--ink),.4)", marginBottom:12 }}>
                   {paymentManagedExternally ? "No card details are stored in FinovaOS." : "No payment methods saved"}
                 </div>
-                <div style={{ fontSize:12, color:"rgba(255,255,255,.36)", marginBottom:14, maxWidth:420, marginInline:"auto", lineHeight:1.55 }}>
+                <div style={{ fontSize:12, color:"rgba(var(--ink),.36)", marginBottom:14, maxWidth:420, marginInline:"auto", lineHeight:1.55 }}>
                   {paymentManagedExternally
                     ? "Your billing provider collects and stores payment methods during hosted checkout, so this page will not show raw card setup controls."
                     : paymentNote || "Add a card for uninterrupted service."}
@@ -1089,21 +1089,21 @@ function BillingPage() {
             ) : paymentMethods.slice(0,2).map(pm => {
               const brandLabel = cardBrandLabel(pm.brand);
               return (
-                <div key={pm.id} className="row-hover" style={{ padding: isMobile ? "12px 11px" : "14px 24px", display:"flex", alignItems:"center", gap:16, borderBottom:"1px solid rgba(255,255,255,.04)" }}>
+                <div key={pm.id} className="row-hover" style={{ padding: isMobile ? "12px 11px" : "14px 24px", display:"flex", alignItems:"center", gap:16, borderBottom:"1px solid rgba(var(--ink),.04)" }}>
                   <CardBrandMark brand={pm.brand} />
                   <div style={{ flex:1 }}>
                     <div style={{ fontSize:13, fontWeight:700 }}>{brandLabel} ending in {pm.last4}</div>
                     {/* Lemon Squeezy does not report the expiry, so a card that
                         came from there has expMonth/expYear of 0 — show the
                         provider line instead of a fake "Expires 00/0". */}
-                    <div style={{ fontSize:11, color:"rgba(255,255,255,.3)", marginTop:2 }}>
+                    <div style={{ fontSize:11, color:"rgba(var(--ink),.3)", marginTop:2 }}>
                       {pm.expYear
                         ? `Expires ${String(pm.expMonth).padStart(2,"0")}/${pm.expYear}`
                         : "Held securely by our payment provider"}
                     </div>
                   </div>
                   {paymentUpdateUrl && (
-                    <button onClick={openPaymentMethodFlow} style={{ padding:"6px 14px", borderRadius:9, background:"rgba(255,255,255,.06)", border:"1px solid rgba(255,255,255,.14)", color:"rgba(255,255,255,.8)", fontSize:12, fontWeight:700, cursor:"pointer", fontFamily:"inherit" }}>
+                    <button onClick={openPaymentMethodFlow} style={{ padding:"6px 14px", borderRadius:9, background:"rgba(var(--ink),.06)", border:"1px solid rgba(var(--ink),.14)", color:"rgba(var(--ink),.8)", fontSize:12, fontWeight:700, cursor:"pointer", fontFamily:"inherit" }}>
                       Update
                     </button>
                   )}
@@ -1120,11 +1120,11 @@ function BillingPage() {
           <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:22, flexWrap:"wrap", gap:12 }}>
             <div>
               <h2 style={{ margin:0, fontSize:18, fontWeight:800 }}>Available Plans</h2>
-              <p style={{ margin:"4px 0 0", fontSize:13, color:"rgba(255,255,255,.4)" }}>Upgrade, downgrade, or switch billing cycle anytime</p>
+              <p style={{ margin:"4px 0 0", fontSize:13, color:"rgba(var(--ink),.4)" }}>Upgrade, downgrade, or switch billing cycle anytime</p>
             </div>
-            <div style={{ display:"flex", gap:5, padding:4, borderRadius:12, background:"rgba(255,255,255,.05)", border:"1px solid rgba(255,255,255,.07)" }}>
+            <div style={{ display:"flex", gap:5, padding:4, borderRadius:12, background:"rgba(var(--ink),.05)", border:"1px solid rgba(var(--ink),.07)" }}>
               {(["monthly","annual"] as const).map(t => (
-                <button key={t} onClick={() => setBillingToggle(t)} style={{ padding:"8px 16px", borderRadius:9, border:"none", cursor:"pointer", fontSize:12, fontWeight:700, fontFamily:"inherit", transition:"all .15s", background:billing===t?"rgba(255,255,255,.12)":"transparent", color:billing===t?"white":"rgba(255,255,255,.35)" }}>
+                <button key={t} onClick={() => setBillingToggle(t)} style={{ padding:"8px 16px", borderRadius:9, border:"none", cursor:"pointer", fontSize:12, fontWeight:700, fontFamily:"inherit", transition:"all .15s", background:billing===t?"rgba(var(--ink),.12)":"transparent", color:billing===t?"white":"rgba(var(--ink),.35)" }}>
                   {t==="monthly" ? "Monthly" : "Annual (Save 20%)"}
                 </button>
               ))}
@@ -1160,7 +1160,7 @@ function BillingPage() {
                   <h3 style={{ margin:"0 0 4px", fontSize:18, fontWeight:800 }}>{plan.name}</h3>
                   <div style={{ display:"flex", alignItems:"baseline", gap:4, marginBottom:4 }}>
                     <span style={{ fontSize:30, fontWeight:900, color:plan.color }}>{currencySym}{price.toLocaleString("en-US")}</span>
-                    <span style={{ fontSize:12, color:"rgba(255,255,255,.35)" }}>/ mo{billing==="annual"?" · billed annually":""}</span>
+                    <span style={{ fontSize:12, color:"rgba(var(--ink),.35)" }}>/ mo{billing==="annual"?" · billed annually":""}</span>
                   </div>
                   {seatAddon > 0 && (
                     <div style={{ fontSize:11, color:"rgba(110,231,183,.95)", marginBottom:8, fontWeight:700 }}>
@@ -1173,8 +1173,8 @@ function BillingPage() {
                     return <div style={{ fontSize:11, color:"rgba(52,211,153,.7)", marginBottom:14, fontWeight:600 }}>Save {currencySym}{yearlySaving.toLocaleString("en-US")}/year</div>;
                   })()}
                   <div style={{ display:"flex", flexDirection:"column", gap:7, marginBottom:22, marginTop:billing==="annual"?0:14 }}>
-                    {plan.features.map(f => <div key={f} style={{ display:"flex", alignItems:"center", gap:8, fontSize:12, color:"rgba(255,255,255,.7)" }}><span style={{ color:"#34d399", flexShrink:0 }}>✓</span>{f}</div>)}
-                    {plan.notIncluded.map(f => <div key={f} style={{ display:"flex", alignItems:"center", gap:8, fontSize:12, color:"rgba(255,255,255,.22)" }}><span style={{ flexShrink:0, opacity:.4 }}>✕</span>{f}</div>)}
+                    {plan.features.map(f => <div key={f} style={{ display:"flex", alignItems:"center", gap:8, fontSize:12, color:"rgba(var(--ink),.7)" }}><span style={{ color:"#34d399", flexShrink:0 }}>✓</span>{f}</div>)}
+                    {plan.notIncluded.map(f => <div key={f} style={{ display:"flex", alignItems:"center", gap:8, fontSize:12, color:"rgba(var(--ink),.22)" }}><span style={{ flexShrink:0, opacity:.4 }}>✕</span>{f}</div>)}
                   </div>
                   {/* The current plan is normally a dead end — there is nothing
                       to buy. It stops being one when the customer needs to
@@ -1187,7 +1187,7 @@ function BillingPage() {
                     const locked = (isCurrent && !offerReCheckout) || !!checkingOut;
                     return (
                       <button onClick={() => { if (!isCurrent || offerReCheckout) handleCheckout(plan.code, billing==="annual"?"yearly":"monthly"); }} disabled={locked}
-                        style={{ width:"100%", padding:"12px", borderRadius:12, border:"none", fontSize:13, fontWeight:700, cursor:locked?"default":"pointer", fontFamily:"inherit", transition:"all .2s", background:locked?"rgba(255,255,255,.06)":`linear-gradient(135deg,${plan.gradFrom},${plan.gradTo})`, color:locked?"rgba(255,255,255,.3)":"white", boxShadow:locked?"none":`0 4px 20px ${plan.color}28`, opacity: checkingOut && checkingOut !== plan.code ? 0.5 : 1 }}>
+                        style={{ width:"100%", padding:"12px", borderRadius:12, border:"none", fontSize:13, fontWeight:700, cursor:locked?"default":"pointer", fontFamily:"inherit", transition:"all .2s", background:locked?"rgba(var(--ink),.06)":`linear-gradient(135deg,${plan.gradFrom},${plan.gradTo})`, color:locked?"rgba(var(--ink),.3)":"white", boxShadow:locked?"none":`0 4px 20px ${plan.color}28`, opacity: checkingOut && checkingOut !== plan.code ? 0.5 : 1 }}>
                         {checkingOut===plan.code ? "Processing..."
                           : offerReCheckout ? reCheckoutLabel
                           : isCurrent ? "Current Plan"
@@ -1198,7 +1198,7 @@ function BillingPage() {
                     );
                   })()}
                   {isCurrent && canReCheckout && reCheckoutReason && (
-                    <div style={{ marginTop:9, fontSize:11, color:"rgba(255,255,255,.42)", lineHeight:1.55 }}>
+                    <div style={{ marginTop:9, fontSize:11, color:"rgba(var(--ink),.42)", lineHeight:1.55 }}>
                       {reCheckoutReason}
                     </div>
                   )}
@@ -1211,11 +1211,11 @@ function BillingPage() {
               buttons above hand off straight to the payment provider, so the
               terms have to be readable here rather than only in the site footer.
               New tab, so opening one never discards the billing page. */}
-          <div style={{ marginTop:20, padding: isMobile ? "14px 12px" : "18px 22px", borderRadius:14, background:"rgba(255,255,255,.02)", border:"1px solid rgba(255,255,255,.06)" }}>
-            <div style={{ fontSize:10, fontWeight:700, color:"rgba(255,255,255,.28)", letterSpacing:".08em", textTransform:"uppercase", marginBottom:10 }}>
+          <div style={{ marginTop:20, padding: isMobile ? "14px 12px" : "18px 22px", borderRadius:14, background:"rgba(var(--ink),.02)", border:"1px solid rgba(var(--ink),.06)" }}>
+            <div style={{ fontSize:10, fontWeight:700, color:"rgba(var(--ink),.28)", letterSpacing:".08em", textTransform:"uppercase", marginBottom:10 }}>
               Before You Subscribe
             </div>
-            <p style={{ fontSize:12, color:"rgba(255,255,255,.42)", lineHeight:1.7, margin:"0 0 12px" }}>
+            <p style={{ fontSize:12, color:"rgba(var(--ink),.42)", lineHeight:1.7, margin:"0 0 12px" }}>
               Selecting a plan takes you to our secure payment provider. By subscribing you agree to
               our Terms of Service and confirm you have read our Privacy Policy, Refund Policy and
               Service Delivery Policy. Subscriptions renew automatically until cancelled — you can
@@ -1230,7 +1230,7 @@ function BillingPage() {
                 { label: "🛟 Contact Support",  href: "/contact" },
               ].map(l => (
                 <a key={l.href} href={l.href} target="_blank" rel="noopener noreferrer"
-                  style={{ padding:"5px 12px", borderRadius:8, background:"rgba(255,255,255,.04)", border:"1px solid rgba(255,255,255,.08)", fontSize:11, fontWeight:600, color:"rgba(255,255,255,.5)", textDecoration:"none", transition:"all .15s" }}
+                  style={{ padding:"5px 12px", borderRadius:8, background:"rgba(var(--ink),.04)", border:"1px solid rgba(var(--ink),.08)", fontSize:11, fontWeight:600, color:"rgba(var(--ink),.5)", textDecoration:"none", transition:"all .15s" }}
                   onMouseEnter={e => { e.currentTarget.style.color = "rgba(255,255,255,.85)"; e.currentTarget.style.borderColor = "rgba(255,255,255,.2)"; }}
                   onMouseLeave={e => { e.currentTarget.style.color = "rgba(255,255,255,.5)"; e.currentTarget.style.borderColor = "rgba(255,255,255,.08)"; }}
                 >
@@ -1248,7 +1248,7 @@ function BillingPage() {
           <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:22 }}>
             <div>
               <h2 style={{ margin:0, fontSize:18, fontWeight:800 }}>Payment Methods</h2>
-              <p style={{ margin:"4px 0 0", fontSize:13, color:"rgba(255,255,255,.4)" }}>
+              <p style={{ margin:"4px 0 0", fontSize:13, color:"rgba(var(--ink),.4)" }}>
                 {paymentManagedExternally ? "Billing provider handles saved cards during hosted checkout" : "Cards saved for automatic renewal"}
               </p>
             </div>
@@ -1263,7 +1263,7 @@ function BillingPage() {
                 <div style={{ fontSize:15, fontWeight:700, marginBottom:6 }}>
                   {paymentManagedExternally ? "No payment methods shown here" : "No payment methods"}
                 </div>
-                <div style={{ fontSize:13, color:"rgba(255,255,255,.35)", marginBottom:20, maxWidth:460, marginInline:"auto", lineHeight:1.55 }}>
+                <div style={{ fontSize:13, color:"rgba(var(--ink),.35)", marginBottom:20, maxWidth:460, marginInline:"auto", lineHeight:1.55 }}>
                   {paymentManagedExternally
                     ? "Your active billing setup uses a hosted provider. The real card entry happens on the checkout page, and available payment options depend on country, currency, and provider support."
                     : paymentNote || "Add a card for uninterrupted service"}
@@ -1275,20 +1275,20 @@ function BillingPage() {
             ) : paymentMethods.map((pm, i) => {
               const brandLabel = cardBrandLabel(pm.brand);
               return (
-                <div key={pm.id} className="row-hover" style={{ padding: isMobile ? "12px 11px" : "18px 24px", display:"flex", alignItems:"center", gap:18, borderBottom:i<paymentMethods.length-1?"1px solid rgba(255,255,255,.05)":"none" }}>
+                <div key={pm.id} className="row-hover" style={{ padding: isMobile ? "12px 11px" : "18px 24px", display:"flex", alignItems:"center", gap:18, borderBottom:i<paymentMethods.length-1?"1px solid rgba(var(--ink),.05)":"none" }}>
                   <CardBrandMark brand={pm.brand} />
                   <div style={{ flex:1 }}>
                     <div style={{ display:"flex", alignItems:"center", gap:8 }}>
                       <span style={{ fontWeight:700, fontSize:14 }}>{brandLabel} ending in {pm.last4}</span>
                     </div>
-                    <div style={{ fontSize:12, color:"rgba(255,255,255,.35)", marginTop:3 }}>
+                    <div style={{ fontSize:12, color:"rgba(var(--ink),.35)", marginTop:3 }}>
                       {pm.expYear
                         ? `${pm.holderName ? `${pm.holderName} - ` : ""}Expires ${String(pm.expMonth).padStart(2,"0")}/${pm.expYear}`
                         : "Held securely by our payment provider"}
                     </div>
                   </div>
                   <div style={{ display:"flex", gap:8 }}>
-                    {!pm.isDefault && <button onClick={() => setDefaultCard(pm.id)} style={{ fontSize:11, fontWeight:600, padding:"6px 14px", borderRadius:9, border:"1px solid rgba(255,255,255,.09)", background:"rgba(255,255,255,.04)", color:"rgba(255,255,255,.55)", cursor:"pointer", fontFamily:"inherit" }}>Set Default</button>}
+                    {!pm.isDefault && <button onClick={() => setDefaultCard(pm.id)} style={{ fontSize:11, fontWeight:600, padding:"6px 14px", borderRadius:9, border:"1px solid rgba(var(--ink),.09)", background:"rgba(var(--ink),.04)", color:"rgba(var(--ink),.55)", cursor:"pointer", fontFamily:"inherit" }}>Set Default</button>}
                     <button onClick={() => removeCard(pm.id)} style={{ fontSize:11, fontWeight:600, padding:"6px 14px", borderRadius:9, border:"1px solid rgba(239,68,68,.22)", background:"rgba(239,68,68,.06)", color:"#f87171", cursor:"pointer", fontFamily:"inherit" }}>Remove</button>
                   </div>
                 </div>
@@ -1296,16 +1296,16 @@ function BillingPage() {
             })}
           </div>
           {/* Processor badges */}
-          <div style={{ marginTop:18, padding: isMobile ? "12px 10px" : "16px 20px", borderRadius:14, background:"rgba(255,255,255,.02)", border:"1px solid rgba(255,255,255,.06)" }}>
-            <div style={{ fontSize:10, fontWeight:700, color:"rgba(255,255,255,.28)", letterSpacing:".08em", textTransform:"uppercase", marginBottom:10 }}>Accepted Payment Methods</div>
-            <div style={{ fontSize:12, color:"rgba(255,255,255,.42)", marginBottom:10, lineHeight:1.55 }}>
+          <div style={{ marginTop:18, padding: isMobile ? "12px 10px" : "16px 20px", borderRadius:14, background:"rgba(var(--ink),.02)", border:"1px solid rgba(var(--ink),.06)" }}>
+            <div style={{ fontSize:10, fontWeight:700, color:"rgba(var(--ink),.28)", letterSpacing:".08em", textTransform:"uppercase", marginBottom:10 }}>Accepted Payment Methods</div>
+            <div style={{ fontSize:12, color:"rgba(var(--ink),.42)", marginBottom:10, lineHeight:1.55 }}>
               {paymentManagedExternally
                 ? "These are the card networks we explicitly support through hosted checkout. Final availability can vary by billing country and provider checkout options."
                 : paymentNote || "Only methods with configured backend processing should be treated as live."}
             </div>
             <div style={{ display:"flex", flexWrap:"wrap", gap:8 }}>
               {acceptedMethods.map(p => (
-                <div key={p} style={{ padding:"4px 11px", borderRadius:7, background:"rgba(255,255,255,.04)", border:"1px solid rgba(255,255,255,.07)", fontSize:11, fontWeight:600, color:"rgba(255,255,255,.45)" }}>{p}</div>
+                <div key={p} style={{ padding:"4px 11px", borderRadius:7, background:"rgba(var(--ink),.04)", border:"1px solid rgba(var(--ink),.07)", fontSize:11, fontWeight:600, color:"rgba(var(--ink),.45)" }}>{p}</div>
               ))}
             </div>
           </div>
@@ -1318,35 +1318,35 @@ function BillingPage() {
           <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:22 }}>
             <div>
               <h2 style={{ margin:0, fontSize:18, fontWeight:800 }}>Invoice History</h2>
-              <p style={{ margin:"4px 0 0", fontSize:13, color:"rgba(255,255,255,.4)" }}>All past and upcoming billing records</p>
+              <p style={{ margin:"4px 0 0", fontSize:13, color:"rgba(var(--ink),.4)" }}>All past and upcoming billing records</p>
             </div>
-            <button onClick={() => toast("CSV export coming soon.")} style={{ padding:"9px 16px", borderRadius:11, border:"1px solid rgba(255,255,255,.09)", background:"rgba(255,255,255,.04)", color:"rgba(255,255,255,.55)", fontSize:12, fontWeight:600, cursor:"pointer", fontFamily:"inherit" }}>⬇ Export CSV</button>
+            <button onClick={() => toast("CSV export coming soon.")} style={{ padding:"9px 16px", borderRadius:11, border:"1px solid rgba(var(--ink),.09)", background:"rgba(var(--ink),.04)", color:"rgba(var(--ink),.55)", fontSize:12, fontWeight:600, cursor:"pointer", fontFamily:"inherit" }}>⬇ Export CSV</button>
           </div>
           <div style={{ ...card }}>
             {invoices.length === 0 ? (
               <div style={{ padding:"52px 24px", textAlign:"center" }}>
                 <div style={{ fontSize:40, marginBottom:12 }}>💳</div>
                 <div style={{ fontSize:15, fontWeight:700, marginBottom:6 }}>No invoices yet</div>
-                <div style={{ fontSize:13, color:"rgba(255,255,255,.35)" }}>Billing history will appear here once you have an active subscription</div>
+                <div style={{ fontSize:13, color:"rgba(var(--ink),.35)" }}>Billing history will appear here once you have an active subscription</div>
               </div>
             ) : (
               <div style={{ overflowX:"auto" }}>
                 <table style={{ width:"100%", borderCollapse:"collapse" }}>
                   <thead>
-                    <tr>{["Invoice #","Date","Plan","Amount","Status","Action"].map(h=><th key={h} style={{ padding:"12px 20px", textAlign:"left", fontSize:10, fontWeight:700, color:"rgba(255,255,255,.3)", letterSpacing:".06em", textTransform:"uppercase", borderBottom:"1px solid rgba(255,255,255,.06)", whiteSpace:"nowrap" }}>{h}</th>)}</tr>
+                    <tr>{["Invoice #","Date","Plan","Amount","Status","Action"].map(h=><th key={h} style={{ padding:"12px 20px", textAlign:"left", fontSize:10, fontWeight:700, color:"rgba(var(--ink),.3)", letterSpacing:".06em", textTransform:"uppercase", borderBottom:"1px solid rgba(var(--ink),.06)", whiteSpace:"nowrap" }}>{h}</th>)}</tr>
                   </thead>
                   <tbody>
                     {invoices.map((inv,i) => (
-                      <tr key={inv.id} className="row-hover" style={{ borderBottom:i<invoices.length-1?"1px solid rgba(255,255,255,.04)":"none" }}>
-                        <td style={{ padding: isMobile ? "12px 10px" : "14px 20px", fontSize:13, fontWeight:700, color:"rgba(255,255,255,.85)", fontFamily:"monospace" }}>{inv.number}</td>
-                        <td style={{ padding: isMobile ? "12px 10px" : "14px 20px", fontSize:13, color:"rgba(255,255,255,.4)" }}>{inv.date}</td>
-                        <td style={{ padding: isMobile ? "12px 10px" : "14px 20px", fontSize:13, color:"rgba(255,255,255,.65)" }}>{inv.plan}</td>
+                      <tr key={inv.id} className="row-hover" style={{ borderBottom:i<invoices.length-1?"1px solid rgba(var(--ink),.04)":"none" }}>
+                        <td style={{ padding: isMobile ? "12px 10px" : "14px 20px", fontSize:13, fontWeight:700, color:"rgba(var(--ink),.85)", fontFamily:"monospace" }}>{inv.number}</td>
+                        <td style={{ padding: isMobile ? "12px 10px" : "14px 20px", fontSize:13, color:"rgba(var(--ink),.4)" }}>{inv.date}</td>
+                        <td style={{ padding: isMobile ? "12px 10px" : "14px 20px", fontSize:13, color:"rgba(var(--ink),.65)" }}>{inv.plan}</td>
                         <td style={{ padding: isMobile ? "12px 10px" : "14px 20px", fontSize:13, fontWeight:700 }}>{formatInvoiceAmount(inv.amount, inv.currency)}</td>
                         <td style={{ padding: isMobile ? "12px 10px" : "14px 20px" }}><StatusBadge status={inv.status}/></td>
                         <td style={{ padding: isMobile ? "12px 10px" : "14px 20px" }}>
                           <button
                             onClick={() => window.open(`/api/billing/invoices/pdf?invoiceId=${encodeURIComponent(inv.id)}`, "_blank")}
-                            style={{ display:"flex", alignItems:"center", gap:5, padding:"5px 12px", borderRadius:8, border:"1px solid rgba(255,255,255,.08)", background:"rgba(255,255,255,.04)", fontSize:11, fontWeight:600, color:"rgba(255,255,255,.45)", cursor:"pointer", fontFamily:"inherit" }}
+                            style={{ display:"flex", alignItems:"center", gap:5, padding:"5px 12px", borderRadius:8, border:"1px solid rgba(var(--ink),.08)", background:"rgba(var(--ink),.04)", fontSize:11, fontWeight:600, color:"rgba(var(--ink),.45)", cursor:"pointer", fontFamily:"inherit" }}
                           >⬇ PDF</button>
                         </td>
                       </tr>
@@ -1367,7 +1367,7 @@ function BillingPage() {
       {showSeatModal && (
         <div style={{ position:"fixed", inset:0, zIndex:1000, display:"flex", alignItems:"center", justifyContent:"center", padding:20 }}>
           <div onClick={() => setShowSeatModal(false)} style={{ position:"absolute", inset:0, background:"rgba(0,0,0,.75)", backdropFilter:"blur(6px)" }}/>
-          <div style={{ position:"relative", width:"100%", maxWidth:480, background:"#0f1630", borderRadius:24, border:"1px solid rgba(99,102,241,.25)", boxShadow:"0 32px 80px rgba(0,0,0,.5)", overflow:"hidden" }}>
+          <div style={{ position:"relative", width:"100%", maxWidth:480, background:"var(--dk-0f1630, #0f1630)", borderRadius:24, border:"1px solid rgba(99,102,241,.25)", boxShadow:"0 32px 80px rgba(0,0,0,.5)", overflow:"hidden" }}>
             <div style={{ height:3, background:"linear-gradient(90deg,#6366f1,#7c3aed,#a78bfa)" }}/>
             <div style={{ padding:"26px 28px 28px" }}>
               {/* Header */}
@@ -1376,22 +1376,22 @@ function BillingPage() {
                   <div style={{ display:"flex", alignItems:"center", gap:10 }}>
                     <div style={{ width:40, height:40, borderRadius:12, background:"rgba(99,102,241,.15)", border:"1px solid rgba(99,102,241,.3)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:20 }}>👥</div>
                     <div>
-                      <div style={{ fontSize:17, fontWeight:800, color:"white" }}>Add More Users</div>
-                      <div style={{ fontSize:11, color:"rgba(255,255,255,.4)", marginTop:1 }}>Expand your team capacity</div>
+                      <div style={{ fontSize:17, fontWeight:800, color:"var(--ink-solid, white)" }}>Add More Users</div>
+                      <div style={{ fontSize:11, color:"rgba(var(--ink),.4)", marginTop:1 }}>Expand your team capacity</div>
                     </div>
                   </div>
                 </div>
-                <button onClick={() => setShowSeatModal(false)} style={{ width:32, height:32, borderRadius:8, border:"1px solid rgba(255,255,255,.1)", background:"rgba(255,255,255,.04)", cursor:"pointer", fontSize:16, color:"rgba(255,255,255,.5)", display:"flex", alignItems:"center", justifyContent:"center" }}>✕</button>
+                <button onClick={() => setShowSeatModal(false)} style={{ width:32, height:32, borderRadius:8, border:"1px solid rgba(var(--ink),.1)", background:"rgba(var(--ink),.04)", cursor:"pointer", fontSize:16, color:"rgba(var(--ink),.5)", display:"flex", alignItems:"center", justifyContent:"center" }}>✕</button>
               </div>
 
               {/* Current usage */}
-              <div style={{ padding:"12px 16px", borderRadius:12, background:"rgba(255,255,255,.04)", border:"1px solid rgba(255,255,255,.07)", marginBottom:20 }}>
+              <div style={{ padding:"12px 16px", borderRadius:12, background:"rgba(var(--ink),.04)", border:"1px solid rgba(var(--ink),.07)", marginBottom:20 }}>
                 <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:8 }}>
-                  <span style={{ fontSize:12, color:"rgba(255,255,255,.5)" }}>Current users</span>
-                  <span style={{ fontSize:13, fontWeight:700, color:"white" }}>{totalUsers} / {effectiveUserLimit ?? "∞"}</span>
+                  <span style={{ fontSize:12, color:"rgba(var(--ink),.5)" }}>Current users</span>
+                  <span style={{ fontSize:13, fontWeight:700, color:"var(--ink-solid, white)" }}>{totalUsers} / {effectiveUserLimit ?? "∞"}</span>
                 </div>
                 {effectiveUserLimit !== null && (
-                  <div style={{ height:6, borderRadius:3, background:"rgba(255,255,255,.08)", overflow:"hidden" }}>
+                  <div style={{ height:6, borderRadius:3, background:"rgba(var(--ink),.08)", overflow:"hidden" }}>
                     <div style={{ height:"100%", borderRadius:3, width:`${Math.min(100, (totalUsers / effectiveUserLimit) * 100)}%`, background: totalUsers >= effectiveUserLimit ? "linear-gradient(90deg,#f87171,#ef4444)" : "linear-gradient(90deg,#6366f1,#7c3aed)", transition:"width .3s" }}/>
                   </div>
                 )}
@@ -1400,16 +1400,16 @@ function BillingPage() {
 
               {/* Quantity selector */}
               <div style={{ marginBottom:20 }}>
-                <div style={{ fontSize:11, fontWeight:700, color:"rgba(255,255,255,.35)", letterSpacing:".07em", textTransform:"uppercase", marginBottom:12 }}>How many seats to add?</div>
+                <div style={{ fontSize:11, fontWeight:700, color:"rgba(var(--ink),.35)", letterSpacing:".07em", textTransform:"uppercase", marginBottom:12 }}>How many seats to add?</div>
                 <div style={{ display:"flex", alignItems:"center", gap:12 }}>
-                  <button onClick={() => setSeatQty(q => Math.max(1, q - 1))} style={{ width:40, height:40, borderRadius:10, border:"1.5px solid rgba(255,255,255,.12)", background:"rgba(255,255,255,.06)", cursor:"pointer", fontSize:20, color:"white", display:"flex", alignItems:"center", justifyContent:"center", fontFamily:"inherit" }}>−</button>
-                  <div style={{ flex:1, textAlign:"center", fontSize:32, fontWeight:900, color:"white", lineHeight:1 }}>{seatQty}</div>
-                  <button onClick={() => setSeatQty(q => Math.min(50, q + 1))} style={{ width:40, height:40, borderRadius:10, border:"1.5px solid rgba(255,255,255,.12)", background:"rgba(255,255,255,.06)", cursor:"pointer", fontSize:20, color:"white", display:"flex", alignItems:"center", justifyContent:"center", fontFamily:"inherit" }}>+</button>
+                  <button onClick={() => setSeatQty(q => Math.max(1, q - 1))} style={{ width:40, height:40, borderRadius:10, border:"1.5px solid rgba(var(--ink),.12)", background:"rgba(var(--ink),.06)", cursor:"pointer", fontSize:20, color:"var(--ink-solid, white)", display:"flex", alignItems:"center", justifyContent:"center", fontFamily:"inherit" }}>−</button>
+                  <div style={{ flex:1, textAlign:"center", fontSize:32, fontWeight:900, color:"var(--ink-solid, white)", lineHeight:1 }}>{seatQty}</div>
+                  <button onClick={() => setSeatQty(q => Math.min(50, q + 1))} style={{ width:40, height:40, borderRadius:10, border:"1.5px solid rgba(var(--ink),.12)", background:"rgba(var(--ink),.06)", cursor:"pointer", fontSize:20, color:"var(--ink-solid, white)", display:"flex", alignItems:"center", justifyContent:"center", fontFamily:"inherit" }}>+</button>
                 </div>
                 {/* Quick picks */}
                 <div style={{ display:"flex", gap:6, marginTop:12, justifyContent:"center" }}>
                   {[1, 2, 5, 10].map(n => (
-                    <button key={n} onClick={() => setSeatQty(n)} style={{ padding:"5px 14px", borderRadius:8, border:`1.5px solid ${seatQty===n?"rgba(99,102,241,.6)":"rgba(255,255,255,.1)"}`, background:seatQty===n?"rgba(99,102,241,.15)":"rgba(255,255,255,.04)", cursor:"pointer", fontSize:12, fontWeight:700, color:seatQty===n?"#a5b4fc":"rgba(255,255,255,.5)", fontFamily:"inherit", transition:"all .15s" }}>+{n}</button>
+                    <button key={n} onClick={() => setSeatQty(n)} style={{ padding:"5px 14px", borderRadius:8, border:`1.5px solid ${seatQty===n?"rgba(99,102,241,.6)":"rgba(var(--ink),.1)"}`, background:seatQty===n?"rgba(99,102,241,.15)":"rgba(var(--ink),.04)", cursor:"pointer", fontSize:12, fontWeight:700, color:seatQty===n?"#a5b4fc":"rgba(var(--ink),.5)", fontFamily:"inherit", transition:"all .15s" }}>+{n}</button>
                   ))}
                 </div>
               </div>
@@ -1417,17 +1417,17 @@ function BillingPage() {
               {/* Price breakdown */}
               <div style={{ padding: isMobile ? "12px 10px" : "14px 18px", borderRadius:14, background:"linear-gradient(135deg,rgba(99,102,241,.1),rgba(124,58,237,.08))", border:"1px solid rgba(99,102,241,.2)", marginBottom:20 }}>
                 <div style={{ display:"flex", justifyContent:"space-between", marginBottom:8 }}>
-                  <span style={{ fontSize:12, color:"rgba(255,255,255,.5)" }}>{seatQty} seat{seatQty > 1 ? "s" : ""} × ${seatCyclePrice}/seat/mo</span>
-                  <span style={{ fontSize:13, fontWeight:700, color:"white" }}>${seatTotalCost}/mo</span>
+                  <span style={{ fontSize:12, color:"rgba(var(--ink),.5)" }}>{seatQty} seat{seatQty > 1 ? "s" : ""} × ${seatCyclePrice}/seat/mo</span>
+                  <span style={{ fontSize:13, fontWeight:700, color:"var(--ink-solid, white)" }}>${seatTotalCost}/mo</span>
                 </div>
                 {subscription?.billingCycle === "yearly" && (
                   <div style={{ display:"flex", justifyContent:"space-between" }}>
-                    <span style={{ fontSize:12, color:"rgba(255,255,255,.4)" }}>Billed yearly</span>
+                    <span style={{ fontSize:12, color:"rgba(var(--ink),.4)" }}>Billed yearly</span>
                     <span style={{ fontSize:12, fontWeight:700, color:"#34d399" }}>${seatTotalCost * 12}/year</span>
                   </div>
                 )}
-                <div style={{ borderTop:"1px solid rgba(255,255,255,.07)", marginTop:10, paddingTop:10, display:"flex", justifyContent:"space-between", alignItems:"center" }}>
-                  <span style={{ fontSize:11, color:"rgba(255,255,255,.4)" }}>New user limit</span>
+                <div style={{ borderTop:"1px solid rgba(var(--ink),.07)", marginTop:10, paddingTop:10, display:"flex", justifyContent:"space-between", alignItems:"center" }}>
+                  <span style={{ fontSize:11, color:"rgba(var(--ink),.4)" }}>New user limit</span>
                   <span style={{ fontSize:14, fontWeight:800, color:"#a5b4fc" }}>{effectiveUserLimit !== null ? effectiveUserLimit + seatQty : "∞"} users</span>
                 </div>
               </div>
@@ -1436,11 +1436,11 @@ function BillingPage() {
               <button
                 onClick={handleBuySeats}
                 disabled={buyingSeats}
-                style={{ width:"100%", padding:"14px", borderRadius:14, background:buyingSeats?"rgba(255,255,255,.07)":"linear-gradient(135deg,#6366f1,#7c3aed)", border:"none", color:buyingSeats?"rgba(255,255,255,.3)":"white", fontSize:15, fontWeight:800, cursor:buyingSeats?"not-allowed":"pointer", fontFamily:"inherit", transition:"all .2s" }}
+                style={{ width:"100%", padding:"14px", borderRadius:14, background:buyingSeats?"rgba(var(--ink),.07)":"linear-gradient(135deg,#6366f1,#7c3aed)", border:"none", color:buyingSeats?"rgba(var(--ink),.3)":"white", fontSize:15, fontWeight:800, cursor:buyingSeats?"not-allowed":"pointer", fontFamily:"inherit", transition:"all .2s" }}
               >
                 {buyingSeats ? "Processing…" : `Confirm — Add ${seatQty} seat${seatQty > 1 ? "s" : ""} for $${seatTotalCost}/mo`}
               </button>
-              <div style={{ marginTop:10, fontSize:11, color:"rgba(255,255,255,.3)", textAlign:"center" }}>Seats are added immediately · Cancel anytime</div>
+              <div style={{ marginTop:10, fontSize:11, color:"rgba(var(--ink),.3)", textAlign:"center" }}>Seats are added immediately · Cancel anytime</div>
             </div>
           </div>
         </div>
@@ -1451,7 +1451,7 @@ function BillingPage() {
 
 export default function BillingPageWrapper() {
   return (
-    <Suspense fallback={<div style={{ padding:32, fontFamily:"Outfit,sans-serif", color:"white" }}>Loading...</div>}>
+    <Suspense fallback={<div style={{ padding:32, fontFamily:"Outfit,sans-serif", color:"var(--ink-solid, white)" }}>Loading...</div>}>
       <BillingPage />
     </Suspense>
   );

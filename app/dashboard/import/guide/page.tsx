@@ -148,7 +148,7 @@ export default function ImportGuideHubPage() {
             }}>
               <span style={{
                 width: 26, height: 26, borderRadius: 8, flexShrink: 0, fontSize: 11, fontWeight: 800,
-                background: "rgba(255,255,255,.05)", border: "1px solid var(--border)",
+                background: "rgba(var(--ink),.05)", border: "1px solid var(--border)",
                 color: "var(--text-muted)",
                 display: "flex", alignItems: "center", justifyContent: "center",
               }}>{type.order}</span>

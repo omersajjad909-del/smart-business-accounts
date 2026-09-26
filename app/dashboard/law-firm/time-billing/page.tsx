@@ -8,31 +8,31 @@ import { useResponsive } from "@/hooks/useResponsive";
 const isMobile = false;
 
 const S = {
-  page: { padding: '32px', fontFamily: 'Inter, sans-serif', color: '#fff', minHeight: '100vh' },
+  page: { padding: '32px', fontFamily: 'Inter, sans-serif', color: 'var(--ink-solid, #fff)', minHeight: '100vh' },
   header: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 28 },
   title: { fontSize: 24, fontWeight: 700, margin: 0 },
-  sub: { fontSize: 14, color: 'rgba(255,255,255,.5)', marginTop: 4 },
+  sub: { fontSize: 14, color: 'rgba(var(--ink),.5)', marginTop: 4 },
   btn: { background: '#92400e', color: '#fff', border: 'none', borderRadius: 8, padding: '10px 20px', fontWeight: 600, cursor: 'pointer', fontSize: 14 },
   stats: { display: 'grid', gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 16, marginBottom: 28 },
-  stat: { background: 'rgba(255,255,255,.03)', border: '1px solid rgba(255,255,255,.07)', borderRadius: 12, padding: isMobile ? "12px 11px" : "20px 24px" },
-  statLabel: { fontSize: 13, color: 'rgba(255,255,255,.5)', marginBottom: 6 },
+  stat: { background: 'rgba(var(--ink),.03)', border: '1px solid rgba(var(--ink),.07)', borderRadius: 12, padding: isMobile ? "12px 11px" : "20px 24px" },
+  statLabel: { fontSize: 13, color: 'rgba(var(--ink),.5)', marginBottom: 6 },
   statVal: { fontSize: 28, fontWeight: 700 },
   filters: { display: 'flex', gap: 12, marginBottom: 24 },
-  filterSelect: { background: 'rgba(255,255,255,.06)', border: '1px solid rgba(255,255,255,.1)', color: '#fff', borderRadius: 8, padding: '8px 14px', fontSize: 13, cursor: 'pointer' },
-  card: { background: 'rgba(255,255,255,.03)', border: '1px solid rgba(255,255,255,.07)', borderRadius: 12, overflow: 'hidden' },
+  filterSelect: { background: 'rgba(var(--ink),.06)', border: '1px solid rgba(var(--ink),.1)', color: 'var(--ink-solid, #fff)', borderRadius: 8, padding: '8px 14px', fontSize: 13, cursor: 'pointer' },
+  card: { background: 'rgba(var(--ink),.03)', border: '1px solid rgba(var(--ink),.07)', borderRadius: 12, overflow: 'hidden' },
   table: { width: '100%', borderCollapse: 'collapse' as const },
-  th: { textAlign: 'left' as const, padding: '12px 16px', fontSize: 12, color: 'rgba(255,255,255,.5)', borderBottom: '1px solid rgba(255,255,255,.07)', fontWeight: 600 },
-  td: { padding: isMobile ? "12px 10px" : "14px 16px", fontSize: 14, borderBottom: '1px solid rgba(255,255,255,.04)' },
+  th: { textAlign: 'left' as const, padding: '12px 16px', fontSize: 12, color: 'rgba(var(--ink),.5)', borderBottom: '1px solid rgba(var(--ink),.07)', fontWeight: 600 },
+  td: { padding: isMobile ? "12px 10px" : "14px 16px", fontSize: 14, borderBottom: '1px solid rgba(var(--ink),.04)' },
   badge: (c: string) => ({ display: 'inline-block', background: `${c}20`, color: c, borderRadius: 6, padding: '2px 10px', fontSize: 12, fontWeight: 600 }),
   overlay: { position: 'fixed' as const, inset: 0, background: 'rgba(0,0,0,.6)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center' },
-  modal: { background: '#1a1a2e', border: '1px solid rgba(255,255,255,.1)', borderRadius: 16, padding: 32, width: '100%', maxWidth: 480 },
+  modal: { background: 'var(--dk-1a1a2e, #1a1a2e)', border: '1px solid rgba(var(--ink),.1)', borderRadius: 16, padding: 32, width: '100%', maxWidth: 480 },
   modalTitle: { fontSize: 18, fontWeight: 700, marginBottom: 24 },
   field: { marginBottom: 16 },
-  label: { display: 'block', fontSize: 13, color: 'rgba(255,255,255,.6)', marginBottom: 6 },
-  input: { width: '100%', background: 'rgba(255,255,255,.06)', border: '1px solid rgba(255,255,255,.1)', borderRadius: 8, padding: '10px 12px', color: '#fff', fontSize: 14, boxSizing: 'border-box' as const },
+  label: { display: 'block', fontSize: 13, color: 'rgba(var(--ink),.6)', marginBottom: 6 },
+  input: { width: '100%', background: 'rgba(var(--ink),.06)', border: '1px solid rgba(var(--ink),.1)', borderRadius: 8, padding: '10px 12px', color: 'var(--ink-solid, #fff)', fontSize: 14, boxSizing: 'border-box' as const },
   row2: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 },
   modalBtns: { display: 'flex', gap: 12, marginTop: 24 },
-  actBtn: { background: 'rgba(255,255,255,.06)', border: '1px solid rgba(255,255,255,.1)', color: '#fff', borderRadius: 8, padding: '6px 12px', fontSize: 12, cursor: 'pointer' },
+  actBtn: { background: 'rgba(var(--ink),.06)', border: '1px solid rgba(var(--ink),.1)', color: 'var(--ink-solid, #fff)', borderRadius: 8, padding: '6px 12px', fontSize: 12, cursor: 'pointer' },
 };
 
 const LAWYERS = ['All', 'Adv. Rehman', 'Adv. Siddiqui', 'Adv. Farooq'];
@@ -125,7 +125,7 @@ export default function TimeBillingPage() {
         </select>
       </div>
 
-      {loading && <div style={{ textAlign: 'center', padding: 40, color: 'rgba(255,255,255,.4)' }}>Loading...</div>}
+      {loading && <div style={{ textAlign: 'center', padding: 40, color: 'rgba(var(--ink),.4)' }}>Loading...</div>}
 
       <div style={S.card}>
         <table style={S.table}>
@@ -136,13 +136,13 @@ export default function TimeBillingPage() {
           </tr></thead>
           <tbody>
             {!loading && filtered.length === 0 && (
-              <tr><td colSpan={9} style={{ padding: 32, textAlign: 'center', color: 'rgba(255,255,255,.25)', fontSize: 14 }}>No time entries found.</td></tr>
+              <tr><td colSpan={9} style={{ padding: 32, textAlign: 'center', color: 'rgba(var(--ink),.25)', fontSize: 14 }}>No time entries found.</td></tr>
             )}
             {filtered.map(e => (
               <tr key={e.id}>
                 <td style={S.td}>{e.date}</td>
                 <td style={S.td}>{e.lawyer}</td>
-                <td style={S.td}><div style={{ fontWeight: 600 }}>{e.caseTitle}</div><div style={{ fontSize: 11, color: 'rgba(255,255,255,.4)' }}>{e.caseId}</div></td>
+                <td style={S.td}><div style={{ fontWeight: 600 }}>{e.caseTitle}</div><div style={{ fontSize: 11, color: 'rgba(var(--ink),.4)' }}>{e.caseId}</div></td>
                 <td style={{ ...S.td, maxWidth: 180 }}><div style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{e.task}</div></td>
                 <td style={S.td}><strong>{e.hours}h</strong></td>
                 <td style={S.td}>{e.billable ? `Rs. ${e.amount.toLocaleString()}` : '—'}</td>

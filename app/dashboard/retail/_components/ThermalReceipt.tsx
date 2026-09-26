@@ -44,7 +44,7 @@ export function generateFBRInvoice(receiptNo: string, date: Date): string {
 }
 
 function Divider({ dashed = true }: { dashed?: boolean }) {
-  return <div style={{ borderTop: dashed ? "1px dashed #999" : "2px solid #000", margin: "8px 0" }} />;
+  return <div style={{ borderTop: dashed ? "1px dashed #999" : "2px solid var(--dkb-000000, #000)", margin: "8px 0" }} />;
 }
 
 function Row({ label, value, bold, large }: { label: string; value: string | number; bold?: boolean; large?: boolean }) {
@@ -142,7 +142,7 @@ export function ThermalReceipt({ receipt, company }: { receipt: ReceiptData; com
       <Row label="Total Items/Qty:" value={`${receipt.items.length}/${receipt.totalQty}`} />
       {receipt.discount > 0 && <Row label="Discount:" value={`Rs${receipt.discount.toLocaleString()}`} />}
       <Row label="Rounding:" value={`Rs${receipt.rounding.toFixed(2)}`} />
-      <div style={{ borderTop: "2px solid #000", marginTop: 4, paddingTop: 4 }}>
+      <div style={{ borderTop: "2px solid var(--dkb-000000, #000)", marginTop: 4, paddingTop: 4 }}>
         <Row label="Invoice Value:" value={`Rs${Math.round(receipt.total).toLocaleString()}`} bold large />
       </div>
 

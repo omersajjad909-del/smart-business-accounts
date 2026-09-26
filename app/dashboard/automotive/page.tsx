@@ -44,7 +44,7 @@ export default function AutomotiveOverviewPage() {
   );
 
   return (
-    <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", minHeight: "100vh", color: "#fff", fontFamily: autoFont }}>
+    <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", minHeight: "100vh", color: "var(--ink-solid, #fff)", fontFamily: autoFont }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 18, flexWrap: "wrap", marginBottom: 24 }}>
         <div>
           <div style={{ fontSize: 12, color: "#60a5fa", fontWeight: 800, letterSpacing: ".08em", textTransform: "uppercase", marginBottom: 8 }}>Car Showroom</div>
@@ -90,10 +90,10 @@ export default function AutomotiveOverviewPage() {
             { title: "Deals & Finance", body: `${data.summary.openDeals} deals are active across lead, negotiation, and financed stages.` },
             { title: "Analytics", body: `${data.summary.conversionRate}% close rate from the current deal pipeline.` },
           ].map((step, index) => (
-            <div key={step.title} style={{ background: "rgba(8,12,30,.36)", border: "1px solid rgba(255,255,255,.08)", borderRadius: 16, padding: 16 }}>
+            <div key={step.title} style={{ background: "rgba(8,12,30,.36)", border: "1px solid rgba(var(--ink),.08)", borderRadius: 16, padding: 16 }}>
               <div style={{ width: 28, height: 28, borderRadius: 999, background: "rgba(147,197,253,.16)", color: "#dbeafe", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 800, fontSize: 12, marginBottom: 12 }}>{index + 1}</div>
               <div style={{ fontSize: 15, fontWeight: 800, marginBottom: 8 }}>{step.title}</div>
-              <div style={{ fontSize: 13, lineHeight: 1.55, color: "rgba(255,255,255,.62)" }}>{step.body}</div>
+              <div style={{ fontSize: 13, lineHeight: 1.55, color: "rgba(var(--ink),.62)" }}>{step.body}</div>
             </div>
           ))}
         </div>
@@ -104,7 +104,7 @@ export default function AutomotiveOverviewPage() {
           <div style={{ fontSize: 15, fontWeight: 800, marginBottom: 14 }}>Pipeline Mix</div>
           <div style={{ display: "grid", gap: 10 }}>
             {pipelineMix.map((row) => (
-              <div key={row.label} style={{ display: "flex", justifyContent: "space-between", borderRadius: 12, border: "1px solid rgba(255,255,255,.06)", background: "rgba(255,255,255,.03)", padding: "10px 12px" }}>
+              <div key={row.label} style={{ display: "flex", justifyContent: "space-between", borderRadius: 12, border: "1px solid rgba(var(--ink),.06)", background: "rgba(var(--ink),.03)", padding: "10px 12px" }}>
                 <span style={{ fontSize: 13, color: autoMuted }}>{row.label}</span>
                 <span style={{ fontSize: 14, fontWeight: 800, color: row.tone }}>{row.value}</span>
               </div>
@@ -116,7 +116,7 @@ export default function AutomotiveOverviewPage() {
           <div style={{ fontSize: 15, fontWeight: 800, marginBottom: 14 }}>Recent Wins</div>
           <div style={{ display: "grid", gap: 10 }}>
             {data.deals.filter((row) => row.status === "won").slice(0, 5).map((row) => (
-              <div key={row.id} style={{ display: "flex", justifyContent: "space-between", borderRadius: 12, border: "1px solid rgba(255,255,255,.06)", background: "rgba(255,255,255,.03)", padding: "10px 12px" }}>
+              <div key={row.id} style={{ display: "flex", justifyContent: "space-between", borderRadius: 12, border: "1px solid rgba(var(--ink),.06)", background: "rgba(var(--ink),.03)", padding: "10px 12px" }}>
                 <div>
                   <div style={{ fontSize: 13, fontWeight: 700 }}>{row.customer}</div>
                   <div style={{ fontSize: 12, color: autoMuted }}>{row.vehicleLabel || "Vehicle not linked"}</div>

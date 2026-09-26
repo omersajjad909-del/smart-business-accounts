@@ -60,9 +60,9 @@ function ProgressStep({ step, label, active, done }: { step: number; label: stri
         width:32, height:32, borderRadius:"50%",
         display:"flex", alignItems:"center", justifyContent:"center",
         fontSize:12, fontWeight:700, transition:"all .4s",
-        background: done ? "#34d399" : active ? "#6366f1" : "rgba(255,255,255,.06)",
-        color: done||active ? "white" : "rgba(255,255,255,.25)",
-        border: active ? "2px solid rgba(129,140,248,.6)" : done ? "2px solid #34d399" : "2px solid rgba(255,255,255,.08)",
+        background: done ? "#34d399" : active ? "#6366f1" : "rgba(var(--ink),.06)",
+        color: done||active ? "white" : "rgba(var(--ink),.25)",
+        border: active ? "2px solid rgba(129,140,248,.6)" : done ? "2px solid #34d399" : "2px solid rgba(var(--ink),.08)",
         boxShadow: active ? "0 0 16px rgba(99,102,241,.5)" : done ? "0 0 12px rgba(52,211,153,.4)" : "none",
         transform: active ? "scale(1.1)" : "scale(1)",
       }}>
@@ -70,7 +70,7 @@ function ProgressStep({ step, label, active, done }: { step: number; label: stri
       </div>
       <span style={{
         fontSize:9, fontWeight:700, letterSpacing:".1em", textTransform:"uppercase",
-        color: active ? "#a5b4fc" : done ? "#6ee7b7" : "rgba(255,255,255,.22)",
+        color: active ? "#a5b4fc" : done ? "#6ee7b7" : "rgba(var(--ink),.22)",
       }}>
         {label}
       </span>
@@ -141,14 +141,14 @@ function PermissionsCard({ perms, meta }: { perms: string[]; meta: typeof PLAN_M
   const categories = CATEGORY_ORDER.filter(c => grouped[c]).concat(Object.keys(grouped).filter(c => !CATEGORY_ORDER.includes(c)));
 
   return (
-    <div style={{ borderRadius:18, background:"rgba(255,255,255,.03)", border:"1px solid rgba(255,255,255,.07)", overflow:"hidden" }}>
+    <div style={{ borderRadius:18, background:"rgba(var(--ink),.03)", border:"1px solid rgba(var(--ink),.07)", overflow:"hidden" }}>
       {/* Header */}
-      <div style={{ padding:"16px 22px", borderBottom:"1px solid rgba(255,255,255,.06)", display:"flex", alignItems:"center", justifyContent:"space-between" }}>
+      <div style={{ padding:"16px 22px", borderBottom:"1px solid rgba(var(--ink),.06)", display:"flex", alignItems:"center", justifyContent:"space-between" }}>
         <div>
-          <div style={{ fontSize:12, fontWeight:800, color:"rgba(255,255,255,.7)", letterSpacing:".06em", textTransform:"uppercase" }}>
+          <div style={{ fontSize:12, fontWeight:800, color:"rgba(var(--ink),.7)", letterSpacing:".06em", textTransform:"uppercase" }}>
             Included Permissions
           </div>
-          <div style={{ fontSize:11, color:"rgba(255,255,255,.3)", marginTop:2 }}>
+          <div style={{ fontSize:11, color:"rgba(var(--ink),.3)", marginTop:2 }}>
             {perms.length} permissions across {categories.length} modules
           </div>
         </div>
@@ -172,7 +172,7 @@ function PermissionsCard({ perms, meta }: { perms: string[]; meta: typeof PLAN_M
                 {items.map(({ key, label, icon }) => (
                   <div key={key} style={{ display:"flex", alignItems:"center", gap:7, padding:"6px 10px", borderRadius:8, background:"rgba(0,0,0,.15)" }}>
                     <span style={{ fontSize:13, lineHeight:1 }}>{icon}</span>
-                    <span style={{ fontSize:11, fontWeight:600, color:"rgba(255,255,255,.75)", lineHeight:1.3 }}>{label}</span>
+                    <span style={{ fontSize:11, fontWeight:600, color:"rgba(var(--ink),.75)", lineHeight:1.3 }}>{label}</span>
                   </div>
                 ))}
               </div>
@@ -262,8 +262,8 @@ export default function OnboardingPlanFeatures() {
   return (
     <div style={{
       minHeight: "100vh",
-      background: "linear-gradient(180deg,#080c1e 0%,#0c0f2e 40%,#080c1e 100%)",
-      color: "white",
+      background: "linear-gradient(180deg,var(--dk-080c1e, #080c1e) 0%,var(--dk-0c0f2e, #0c0f2e) 40%,var(--dk-080c1e, #080c1e) 100%)",
+      color: "var(--ink-solid, white)",
       fontFamily: "'Outfit','DM Sans',sans-serif",
     }}>
       <style>{`
@@ -300,7 +300,7 @@ export default function OnboardingPlanFeatures() {
 
       {/* Header */}
       <header className="fu" style={{
-        borderBottom:"1px solid rgba(255,255,255,.06)",
+        borderBottom:"1px solid rgba(var(--ink),.06)",
         background:"rgba(8,12,30,.85)", backdropFilter:"blur(20px)",
         position:"sticky", top:0, zIndex:50,
       }}>
@@ -314,7 +314,7 @@ export default function OnboardingPlanFeatures() {
                 <path d="M2 12l10 5 10-5"/>
               </svg>
             </div>
-            <span style={{ fontFamily:"'Lora',serif", fontSize:18, fontWeight:700, color:"white", letterSpacing:"-.3px" }}>
+            <span style={{ fontFamily:"'Lora',serif", fontSize:18, fontWeight:700, color:"var(--ink-solid, white)", letterSpacing:"-.3px" }}>
               FinovaOS
             </span>
           </div>
@@ -329,9 +329,9 @@ export default function OnboardingPlanFeatures() {
           </div>
 
           <button onClick={() => router.back()} style={{
-            fontSize:13, fontWeight:600, color:"rgba(255,255,255,.55)",
+            fontSize:13, fontWeight:600, color:"rgba(var(--ink),.55)",
             display:"flex", alignItems:"center", gap:4, padding:"7px 14px", borderRadius:9,
-            border:"1.5px solid rgba(255,255,255,.1)", background:"rgba(255,255,255,.04)",
+            border:"1.5px solid rgba(var(--ink),.1)", background:"rgba(var(--ink),.04)",
             cursor:"pointer", transition:"all .2s", fontFamily:"inherit",
           }}
             onMouseEnter={e=>{ e.currentTarget.style.color="white"; e.currentTarget.style.borderColor="rgba(255,255,255,.25)"; }}
@@ -351,10 +351,10 @@ export default function OnboardingPlanFeatures() {
             <span style={{ width:5, height:5, borderRadius:"50%", background:"#6366f1", animation:"blink 2s ease infinite" }}/>
             Step 3 of 3 — Plan Confirmation
           </div>
-          <h1 style={{ fontFamily:"'Lora',serif", fontSize:"clamp(26px,4vw,40px)", fontWeight:700, color:"white", letterSpacing:"-1px", lineHeight:1.1, margin:"0 0 8px" }}>
+          <h1 style={{ fontFamily:"'Lora',serif", fontSize:"clamp(26px,4vw,40px)", fontWeight:700, color:"var(--ink-solid, white)", letterSpacing:"-1px", lineHeight:1.1, margin:"0 0 8px" }}>
             Your <span style={{ color:meta.color }}>{meta.name}</span> plan is ready
           </h1>
-          <p style={{ fontSize:14, color:"rgba(255,255,255,.4)" }}>
+          <p style={{ fontSize:14, color:"rgba(var(--ink),.4)" }}>
             Review your plan features and proceed to activate your workspace.
           </p>
         </div>
@@ -367,7 +367,7 @@ export default function OnboardingPlanFeatures() {
             {/* Plan header card */}
             <div style={{
               borderRadius:20, overflow:"hidden",
-              background:"rgba(255,255,255,.04)",
+              background:"rgba(var(--ink),.04)",
               border:`1.5px solid ${meta.border}`,
               backdropFilter:"blur(20px)",
               boxShadow:`0 16px 48px rgba(0,0,0,.4), 0 0 0 1px ${meta.color}15`,
@@ -380,8 +380,8 @@ export default function OnboardingPlanFeatures() {
                     {meta.icon}
                   </div>
                   <div>
-                    <div style={{ fontFamily:"'Lora',serif", fontSize:22, fontWeight:700, color:"white" }}>{meta.name}</div>
-                    <div style={{ fontSize:12, color:"rgba(255,255,255,.4)", marginTop:2 }}>{meta.tagline}</div>
+                    <div style={{ fontFamily:"'Lora',serif", fontSize:22, fontWeight:700, color:"var(--ink-solid, white)" }}>{meta.name}</div>
+                    <div style={{ fontSize:12, color:"rgba(var(--ink),.4)", marginTop:2 }}>{meta.tagline}</div>
                   </div>
                   <div style={{ marginLeft:"auto", padding:"4px 12px", borderRadius:20, background:meta.dim, border:`1px solid ${meta.border}`, fontSize:10, fontWeight:800, color:meta.color, letterSpacing:".08em", textTransform:"uppercase" }}>
                     Selected
@@ -390,22 +390,22 @@ export default function OnboardingPlanFeatures() {
 
                 {/* Feature list */}
                 <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
-                  <div style={{ fontSize:10, fontWeight:700, color:"rgba(255,255,255,.3)", letterSpacing:".08em", textTransform:"uppercase", marginBottom:4 }}>Included Features</div>
+                  <div style={{ fontSize:10, fontWeight:700, color:"rgba(var(--ink),.3)", letterSpacing:".08em", textTransform:"uppercase", marginBottom:4 }}>Included Features</div>
                   {displayRows.map(r => (
                     <div key={r.label} style={{
                       display:"flex", alignItems:"center", gap:12, padding:"10px 14px",
                       borderRadius:10, transition:"all .2s",
-                      background: r.enabled ? "rgba(255,255,255,.04)" : "rgba(255,255,255,.01)",
-                      border: r.enabled ? `1px solid ${meta.color}25` : "1px solid rgba(255,255,255,.04)",
+                      background: r.enabled ? "rgba(var(--ink),.04)" : "rgba(var(--ink),.01)",
+                      border: r.enabled ? `1px solid ${meta.color}25` : "1px solid rgba(var(--ink),.04)",
                     }}>
                       <span style={{ fontSize:16, opacity: r.enabled ? 1 : .3 }}>{FEATURE_ICONS[r.label] || "•"}</span>
-                      <span style={{ flex:1, fontSize:13, fontWeight:500, color: r.enabled ? "rgba(255,255,255,.85)" : "rgba(255,255,255,.25)", textDecoration: r.enabled ? "none" : "line-through" }}>
+                      <span style={{ flex:1, fontSize:13, fontWeight:500, color: r.enabled ? "rgba(var(--ink),.85)" : "rgba(var(--ink),.25)", textDecoration: r.enabled ? "none" : "line-through" }}>
                         {r.label}
                       </span>
                       <div style={{
                         width:20, height:20, borderRadius:"50%",
-                        background: r.enabled ? meta.dim : "rgba(255,255,255,.04)",
-                        border: `1.5px solid ${r.enabled ? meta.color : "rgba(255,255,255,.08)"}`,
+                        background: r.enabled ? meta.dim : "rgba(var(--ink),.04)",
+                        border: `1.5px solid ${r.enabled ? meta.color : "rgba(var(--ink),.08)"}`,
                         display:"flex", alignItems:"center", justifyContent:"center",
                       }}>
                         {r.enabled ? (
@@ -413,7 +413,7 @@ export default function OnboardingPlanFeatures() {
                             <path d="M1 5L4.5 8.5 11 1" stroke={meta.color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
                           </svg>
                         ) : (
-                          <div style={{ width:6, height:1.5, background:"rgba(255,255,255,.15)", borderRadius:2 }}/>
+                          <div style={{ width:6, height:1.5, background:"rgba(var(--ink),.15)", borderRadius:2 }}/>
                         )}
                       </div>
                     </div>
@@ -434,16 +434,16 @@ export default function OnboardingPlanFeatures() {
             {/* Summary card */}
             <div style={{
               borderRadius:20, padding:"28px 26px",
-              background:"rgba(255,255,255,.04)",
-              border:"1.5px solid rgba(255,255,255,.08)",
+              background:"rgba(var(--ink),.04)",
+              border:"1.5px solid rgba(var(--ink),.08)",
               backdropFilter:"blur(20px)",
-              boxShadow:"0 24px 64px rgba(0,0,0,.4), inset 0 1px 0 rgba(255,255,255,.06)",
+              boxShadow:"0 24px 64px rgba(0,0,0,.4), inset 0 1px 0 rgba(var(--ink),.06)",
               position:"relative", overflow:"hidden",
             }}>
               <div style={{ position:"absolute", top:0, left:"20%", right:"20%", height:1, background:`linear-gradient(90deg,transparent,${meta.color}60,transparent)` }}/>
 
               <div style={{ marginBottom:24 }}>
-                <div style={{ fontSize:13, fontWeight:700, color:"rgba(255,255,255,.4)", textTransform:"uppercase", letterSpacing:".08em", marginBottom:8 }}>What happens next</div>
+                <div style={{ fontSize:13, fontWeight:700, color:"rgba(var(--ink),.4)", textTransform:"uppercase", letterSpacing:".08em", marginBottom:8 }}>What happens next</div>
                 <div style={{ display:"flex", flexDirection:"column", gap:12 }}>
                   {[
                     { icon:"✅", title:"Instant activation",  desc:"Click the button and your plan activates immediately" },
@@ -453,8 +453,8 @@ export default function OnboardingPlanFeatures() {
                     <div key={i} style={{ display:"flex", gap:12, alignItems:"flex-start" }}>
                       <div style={{ width:36, height:36, borderRadius:10, background:meta.dim, border:`1px solid ${meta.border}`, display:"flex", alignItems:"center", justifyContent:"center", fontSize:16, flexShrink:0 }}>{s.icon}</div>
                       <div>
-                        <div style={{ fontSize:13, fontWeight:700, color:"white" }}>{s.title}</div>
-                        <div style={{ fontSize:12, color:"rgba(255,255,255,.35)", marginTop:2 }}>{s.desc}</div>
+                        <div style={{ fontSize:13, fontWeight:700, color:"var(--ink-solid, white)" }}>{s.title}</div>
+                        <div style={{ fontSize:12, color:"rgba(var(--ink),.35)", marginTop:2 }}>{s.desc}</div>
                       </div>
                     </div>
                   ))}
@@ -478,8 +478,8 @@ export default function OnboardingPlanFeatures() {
 
               <button onClick={() => router.replace("/dashboard")} style={{
                 width:"100%", padding:"13px 24px", borderRadius:13,
-                background:"rgba(255,255,255,.04)", border:"1.5px solid rgba(255,255,255,.1)",
-                color:"rgba(255,255,255,.55)", fontSize:14, fontWeight:600,
+                background:"rgba(var(--ink),.04)", border:"1.5px solid rgba(var(--ink),.1)",
+                color:"rgba(var(--ink),.55)", fontSize:14, fontWeight:600,
                 cursor:"pointer", fontFamily:"inherit", transition:"all .2s",
               }}
                 onMouseEnter={e=>{ e.currentTarget.style.color="white"; e.currentTarget.style.borderColor="rgba(255,255,255,.25)"; }}
@@ -488,13 +488,13 @@ export default function OnboardingPlanFeatures() {
                 Skip for now — View Dashboard
               </button>
 
-              <p style={{ marginTop:14, fontSize:11, color:"rgba(255,255,255,.22)", textAlign:"center", lineHeight:1.6 }}>
+              <p style={{ marginTop:14, fontSize:11, color:"rgba(var(--ink),.22)", textAlign:"center", lineHeight:1.6 }}>
                 Your plan activates immediately. Billing setup can be done later from dashboard.
               </p>
             </div>
 
             {/* Trust badges */}
-            <div style={{ padding:"18px 20px", borderRadius:16, background:"rgba(255,255,255,.03)", border:"1px solid rgba(255,255,255,.07)" }}>
+            <div style={{ padding:"18px 20px", borderRadius:16, background:"rgba(var(--ink),.03)", border:"1px solid rgba(var(--ink),.07)" }}>
               <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:10 }}>
                 {[
                   { icon:"🔒", text:"256-bit SSL" },
@@ -502,7 +502,7 @@ export default function OnboardingPlanFeatures() {
                   { icon:"🔄", text:"Cancel anytime" },
                   { icon:"📞", text:"Enhanced support" },
                 ].map(b => (
-                  <div key={b.text} style={{ display:"flex", alignItems:"center", gap:8, fontSize:12, color:"rgba(255,255,255,.4)", fontWeight:500 }}>
+                  <div key={b.text} style={{ display:"flex", alignItems:"center", gap:8, fontSize:12, color:"rgba(var(--ink),.4)", fontWeight:500 }}>
                     <span>{b.icon}</span><span>{b.text}</span>
                   </div>
                 ))}

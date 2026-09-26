@@ -35,16 +35,16 @@ const border = "rgba(255,255,255,0.08)";
 const accent = "#38bdf8";
 
 const input: React.CSSProperties = {
-  width: "100%", background: "rgba(255,255,255,.05)", border: `1px solid ${border}`,
-  borderRadius: 8, padding: "8px 10px", color: "#fff", fontSize: 13,
+  width: "100%", background: "rgba(var(--ink),.05)", border: `1px solid ${border}`,
+  borderRadius: 8, padding: "8px 10px", color: "var(--ink-solid, #fff)", fontSize: 13,
   fontFamily: "inherit", boxSizing: "border-box",
 };
 const label: React.CSSProperties = {
-  display: "block", fontSize: 11.5, color: "rgba(255,255,255,.45)", marginBottom: 5,
+  display: "block", fontSize: 11.5, color: "rgba(var(--ink),.45)", marginBottom: 5,
 };
 const sectionHead: React.CSSProperties = {
   fontSize: 11, fontWeight: 800, letterSpacing: ".06em", textTransform: "uppercase",
-  color: "rgba(255,255,255,.4)", margin: "22px 0 10px",
+  color: "rgba(var(--ink),.4)", margin: "22px 0 10px",
 };
 
 function blankVoucher(): UmrahVoucher {
@@ -138,7 +138,7 @@ export default function UmrahVouchersPage() {
             Print voucher
           </button>
           <button onClick={() => setPreviewing(null)}
-            style={{ padding: "9px 18px", borderRadius: 9, background: "transparent", border: `1px solid ${border}`, color: "rgba(255,255,255,.65)", fontSize: 13, fontFamily: "inherit", cursor: "pointer" }}>
+            style={{ padding: "9px 18px", borderRadius: 9, background: "transparent", border: `1px solid ${border}`, color: "rgba(var(--ink),.65)", fontSize: 13, fontFamily: "inherit", cursor: "pointer" }}>
             Back
           </button>
         </div>
@@ -159,12 +159,12 @@ export default function UmrahVouchersPage() {
     );
 
     return (
-      <div style={{ padding: isMobile ? "14px 12px" : "24px 28px", fontFamily: ff, color: "#fff", maxWidth: 1080 }}>
+      <div style={{ padding: isMobile ? "14px 12px" : "24px 28px", fontFamily: ff, color: "var(--ink-solid, #fff)", maxWidth: 1080 }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 14, flexWrap: "wrap" }}>
           <h1 style={{ fontSize: 21, fontWeight: 800, margin: 0 }}>
             {editing.id ? `Voucher ${v.tripNumber || ""}` : "New voucher"}
           </h1>
-          <div style={{ fontSize: 12.5, color: "rgba(255,255,255,.42)" }}>
+          <div style={{ fontSize: 12.5, color: "rgba(var(--ink),.42)" }}>
             {v.pilgrims.length} pilgrim{v.pilgrims.length === 1 ? "" : "s"} · {totalNights(v.stays)} nights
           </div>
         </div>
@@ -212,14 +212,14 @@ export default function UmrahVouchersPage() {
                   {mina ? field("Maktab name", stay.maktabName || "", (s) => patchStay(stay.id, { maktabName: s })) : (
                     <div>
                       <label style={label}>Sharing</label>
-                      <select value={stay.occupancy} onChange={(e) => patchStay(stay.id, { occupancy: Number(e.target.value) })} style={{ ...input, background: "#161b27" }}>
+                      <select value={stay.occupancy} onChange={(e) => patchStay(stay.id, { occupancy: Number(e.target.value) })} style={{ ...input, background: "var(--dk-161b27, #161b27)" }}>
                         {[1, 2, 3, 4, 5, 6].map((n) => <option key={n} value={n}>{n} Pax</option>)}
                       </select>
                     </div>
                   )}
                   {mina ? <div>
                     <label style={label}>Maktab category</label>
-                    <select value={stay.maktabCategory || ""} onChange={(e) => patchStay(stay.id, { maktabCategory: e.target.value as "A" | "B" | "C" | "D" | "" })} style={{ ...input, background: "#161b27" }}>
+                    <select value={stay.maktabCategory || ""} onChange={(e) => patchStay(stay.id, { maktabCategory: e.target.value as "A" | "B" | "C" | "D" | "" })} style={{ ...input, background: "var(--dk-161b27, #161b27)" }}>
                       <option value="">Choose</option>{["A", "B", "C", "D"].map((category) => <option key={category} value={category}>{category}</option>)}
                     </select>
                   </div> : null}
@@ -236,15 +236,15 @@ export default function UmrahVouchersPage() {
                       dates off the same voucher. */}
                   <div>
                     <label style={label}>Nights</label>
-                    <div style={{ ...input, background: "rgba(56,189,248,.08)", borderColor: "rgba(56,189,248,.3)", color: nights ? accent : "rgba(255,255,255,.3)", fontWeight: 700, textAlign: "center" }}>
+                    <div style={{ ...input, background: "rgba(56,189,248,.08)", borderColor: "rgba(56,189,248,.3)", color: nights ? accent : "rgba(var(--ink),.3)", fontWeight: 700, textAlign: "center" }}>
                       {nights || "—"}
                     </div>
                   </div>
                   <button tabIndex={-1} title="Remove stay"
                     onClick={() => patch({ stays: v.stays.filter((s) => s.id !== stay.id) })}
-                    style={{ background: "transparent", border: `1px solid ${border}`, borderRadius: 8, color: "rgba(255,255,255,.45)", cursor: "pointer", padding: "8px 0" }}>×</button>
+                    style={{ background: "transparent", border: `1px solid ${border}`, borderRadius: 8, color: "rgba(var(--ink),.45)", cursor: "pointer", padding: "8px 0" }}>×</button>
                 </div>
-                {!mina ? <label style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 11.5, color: "rgba(255,255,255,.45)", marginTop: 8, cursor: "pointer" }}>
+                {!mina ? <label style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 11.5, color: "rgba(var(--ink),.45)", marginTop: 8, cursor: "pointer" }}>
                   <input type="checkbox" checked={stay.orSimilar !== false}
                     onChange={(e) => patchStay(stay.id, { orSimilar: e.target.checked })} />
                   Or similar hotel — printed on the voucher, because that is how the room was sold
@@ -254,7 +254,7 @@ export default function UmrahVouchersPage() {
           })}
         </div>
         <button onClick={() => patch({ stays: [...v.stays, emptyStay("Makkah")] })}
-          style={{ marginTop: 10, padding: "7px 14px", borderRadius: 8, background: "rgba(255,255,255,.05)", border: `1px solid ${border}`, color: "rgba(255,255,255,.65)", fontSize: 12, fontWeight: 700, fontFamily: "inherit", cursor: "pointer" }}>
+          style={{ marginTop: 10, padding: "7px 14px", borderRadius: 8, background: "rgba(var(--ink),.05)", border: `1px solid ${border}`, color: "rgba(var(--ink),.65)", fontSize: 12, fontWeight: 700, fontFamily: "inherit", cursor: "pointer" }}>
           + Add stay
         </button>
 
@@ -268,7 +268,7 @@ export default function UmrahVouchersPage() {
               <div>
                 <label style={label}>Gender</label>
                 <select value={p.gender} onChange={(e) => patchPilgrim(p.id, { gender: e.target.value as "Male" | "Female" })}
-                  style={{ ...input, background: "#161b27" }}>
+                  style={{ ...input, background: "var(--dk-161b27, #161b27)" }}>
                   <option>Male</option><option>Female</option>
                 </select>
               </div>
@@ -280,13 +280,13 @@ export default function UmrahVouchersPage() {
               </div>
               <button tabIndex={-1} title="Remove pilgrim"
                 onClick={() => patch({ pilgrims: v.pilgrims.length === 1 ? [emptyPilgrim()] : v.pilgrims.filter((x) => x.id !== p.id) })}
-                style={{ background: "transparent", border: `1px solid ${border}`, borderRadius: 8, color: "rgba(255,255,255,.45)", cursor: "pointer", padding: "8px 0" }}>×</button>
+                style={{ background: "transparent", border: `1px solid ${border}`, borderRadius: 8, color: "rgba(var(--ink),.45)", cursor: "pointer", padding: "8px 0" }}>×</button>
             </div>
           ))}
         </div>
         <button
           onClick={() => patch({ pilgrims: [...v.pilgrims, emptyPilgrim(v.pilgrims[0]?.groupName || "")] })}
-          style={{ marginTop: 10, padding: "7px 14px", borderRadius: 8, background: "rgba(255,255,255,.05)", border: `1px solid ${border}`, color: "rgba(255,255,255,.65)", fontSize: 12, fontWeight: 700, fontFamily: "inherit", cursor: "pointer" }}>
+          style={{ marginTop: 10, padding: "7px 14px", borderRadius: 8, background: "rgba(var(--ink),.05)", border: `1px solid ${border}`, color: "rgba(var(--ink),.65)", fontSize: 12, fontWeight: 700, fontFamily: "inherit", cursor: "pointer" }}>
           + Add pilgrim
         </button>
 
@@ -299,7 +299,7 @@ export default function UmrahVouchersPage() {
               on every voucher is a desk whose vouchers disagree with each
               other by the end of the season. */}
           <label style={{ display: "grid", gap: 4, gridColumn: "1 / -1" }}>
-            <span style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: ".05em", textTransform: "uppercase", color: "rgba(255,255,255,.4)" }}>
+            <span style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: ".05em", textTransform: "uppercase", color: "rgba(var(--ink),.4)" }}>
               Terms &amp; Conditions
             </span>
             <textarea
@@ -308,8 +308,8 @@ export default function UmrahVouchersPage() {
               rows={5}
               placeholder="Your agency's terms — printed at the foot of the voucher. Written once and saved as the default below."
               style={{
-                width: "100%", background: "rgba(255,255,255,.05)", border: "1px solid rgba(255,255,255,.09)",
-                borderRadius: 8, padding: "8px 10px", color: "#fff", fontSize: 12.5,
+                width: "100%", background: "rgba(var(--ink),.05)", border: "1px solid rgba(var(--ink),.09)",
+                borderRadius: 8, padding: "8px 10px", color: "var(--ink-solid, #fff)", fontSize: 12.5,
                 fontFamily: "inherit", boxSizing: "border-box", resize: "vertical", lineHeight: 1.6,
               }}
             />
@@ -325,13 +325,13 @@ export default function UmrahVouchersPage() {
                   alertToast("Saved. New vouchers will start with these terms.", "success", "Default Terms Saved");
                 }}
                 style={{
-                  border: "1px solid rgba(255,255,255,.16)", background: "rgba(255,255,255,.05)", color: "#fff",
+                  border: "1px solid rgba(var(--ink),.16)", background: "rgba(var(--ink),.05)", color: "var(--ink-solid, #fff)",
                   borderRadius: 8, padding: "5px 11px", fontSize: 11.5, fontWeight: 700, cursor: "pointer", fontFamily: "inherit",
                 }}
               >
                 Save as default
               </button>
-              <span style={{ fontSize: 10.5, color: "rgba(255,255,255,.38)" }}>
+              <span style={{ fontSize: 10.5, color: "rgba(var(--ink),.38)" }}>
                 A voucher keeps the terms it was issued with, even after the default changes.
               </span>
             </span>
@@ -363,11 +363,11 @@ export default function UmrahVouchersPage() {
             {saving ? "Saving…" : "Save voucher"}
           </button>
           <button onClick={() => setPreviewing(v)}
-            style={{ padding: "11px 20px", background: "rgba(255,255,255,.05)", border: `1px solid ${border}`, borderRadius: 9, color: "rgba(255,255,255,.75)", fontSize: 14, fontFamily: "inherit", cursor: "pointer" }}>
+            style={{ padding: "11px 20px", background: "rgba(var(--ink),.05)", border: `1px solid ${border}`, borderRadius: 9, color: "rgba(var(--ink),.75)", fontSize: 14, fontFamily: "inherit", cursor: "pointer" }}>
             Preview
           </button>
           <button onClick={() => setEditing(null)}
-            style={{ padding: "11px 20px", background: "transparent", border: `1px solid ${border}`, borderRadius: 9, color: "rgba(255,255,255,.6)", fontSize: 14, fontFamily: "inherit", cursor: "pointer" }}>
+            style={{ padding: "11px 20px", background: "transparent", border: `1px solid ${border}`, borderRadius: 9, color: "rgba(var(--ink),.6)", fontSize: 14, fontFamily: "inherit", cursor: "pointer" }}>
             Cancel
           </button>
         </div>
@@ -377,11 +377,11 @@ export default function UmrahVouchersPage() {
 
   // ── List ─────────────────────────────────────────────────────────────────
   return (
-    <div style={{ padding: isMobile ? "14px 12px" : "24px 28px", fontFamily: ff, color: "#fff" }}>
+    <div style={{ padding: isMobile ? "14px 12px" : "24px 28px", fontFamily: ff, color: "var(--ink-solid, #fff)" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 14, flexWrap: "wrap", marginBottom: 20 }}>
         <div>
           <h1 style={{ fontSize: 22, fontWeight: 800, margin: "0 0 4px" }}>Umrah &amp; Hajj Vouchers</h1>
-          <p style={{ fontSize: 13, color: "rgba(255,255,255,.42)", margin: 0 }}>
+          <p style={{ fontSize: 13, color: "rgba(var(--ink),.42)", margin: 0 }}>
             The arrival–departure voucher the pilgrim carries — flights, every hotel stay in order, and the party.
           </p>
         </div>
@@ -399,7 +399,7 @@ export default function UmrahVouchersPage() {
                 {row.v.guestName || "—"}
                 <span style={{ color: accent, marginLeft: 10, fontFamily: "ui-monospace, monospace" }}>{row.v.tripNumber}</span>
               </div>
-              <div style={{ fontSize: 12, color: "rgba(255,255,255,.42)", marginTop: 4 }}>
+              <div style={{ fontSize: 12, color: "rgba(var(--ink),.42)", marginTop: 4 }}>
                 {row.v.pilgrims.length} pax · {totalNights(row.v.stays)} nights ·{" "}
                 {row.v.stays.map((s) => `${s.city} ${nightsBetween(s.inDate, s.outDate)}`).join(" → ") || "no stays"}
                 {row.v.arrival.date ? ` · arrives ${fmtVoucherDate(row.v.arrival.date)}` : ""}
@@ -411,14 +411,14 @@ export default function UmrahVouchersPage() {
                 Voucher
               </button>
               <button onClick={() => setEditing({ id: row.id, v: row.v })}
-                style={{ padding: "6px 14px", borderRadius: 8, background: "rgba(255,255,255,.05)", border: `1px solid ${border}`, color: "rgba(255,255,255,.7)", fontSize: 12, fontWeight: 700, fontFamily: "inherit", cursor: "pointer" }}>
+                style={{ padding: "6px 14px", borderRadius: 8, background: "rgba(var(--ink),.05)", border: `1px solid ${border}`, color: "rgba(var(--ink),.7)", fontSize: 12, fontWeight: 700, fontFamily: "inherit", cursor: "pointer" }}>
                 Edit
               </button>
             </div>
           </div>
         ))}
         {!store.loading && rows.length === 0 && (
-          <div style={{ background: bg, border: `1px solid ${border}`, borderRadius: 14, padding: 40, textAlign: "center", color: "rgba(255,255,255,.3)", fontSize: 13.5 }}>
+          <div style={{ background: bg, border: `1px solid ${border}`, borderRadius: 14, padding: 40, textAlign: "center", color: "rgba(var(--ink),.3)", fontSize: 13.5 }}>
             No vouchers yet.
           </div>
         )}

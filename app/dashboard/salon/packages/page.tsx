@@ -90,7 +90,7 @@ export default function SalonPackagesPage() {
   }
 
   return (
-    <div style={{ padding: "32px", fontFamily: salonFont, color: "#fff", minHeight: "100vh" }}>
+    <div style={{ padding: "32px", fontFamily: salonFont, color: "var(--ink-solid, #fff)", minHeight: "100vh" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 28 }}>
         <div>
           <h1 style={{ fontSize: 26, fontWeight: 800, margin: 0 }}>Beauty Packages</h1>
@@ -112,7 +112,7 @@ export default function SalonPackagesPage() {
             <thead>
               <tr>
                 {["Package", "Included Services", "Sessions", "Price", "Status", "Action"].map((heading) => (
-                  <th key={heading} style={{ textAlign: "left", padding: "12px 16px", fontSize: 12, color: salonMuted, borderBottom: "1px solid rgba(255,255,255,.07)", fontWeight: 700 }}>{heading}</th>
+                  <th key={heading} style={{ textAlign: "left", padding: "12px 16px", fontSize: 12, color: salonMuted, borderBottom: "1px solid rgba(var(--ink),.07)", fontWeight: 700 }}>{heading}</th>
                 ))}
               </tr>
             </thead>
@@ -121,15 +121,15 @@ export default function SalonPackagesPage() {
                 <tr><td colSpan={6} style={{ padding: 32, textAlign: "center", color: salonMuted, fontSize: 14 }}>No beauty packages yet.</td></tr>
               ) : packages.map((pkg) => (
                 <tr key={pkg.id}>
-                  <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)" }}><div style={{ fontWeight: 700 }}>{pkg.name}</div></td>
-                  <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)", fontSize: 13, color: "rgba(255,255,255,.72)" }}>{pkg.services.join(", ")}</td>
-                  <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)" }}>{pkg.sessions}</td>
-                  <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)", color: "#34d399", fontWeight: 700 }}>Rs. {pkg.price.toLocaleString()}</td>
-                  <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)" }}>
+                  <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)" }}><div style={{ fontWeight: 700 }}>{pkg.name}</div></td>
+                  <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", fontSize: 13, color: "rgba(var(--ink),.72)" }}>{pkg.services.join(", ")}</td>
+                  <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)" }}>{pkg.sessions}</td>
+                  <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", color: "#34d399", fontWeight: 700 }}>Rs. {pkg.price.toLocaleString()}</td>
+                  <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)" }}>
                     <span style={{ display: "inline-block", borderRadius: 999, padding: "3px 10px", fontSize: 12, fontWeight: 700, background: pkg.status === "Active" ? "rgba(52,211,153,.16)" : "rgba(148,163,184,.16)", color: pkg.status === "Active" ? "#34d399" : "#94a3b8" }}>{pkg.status}</span>
                   </td>
-                  <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)" }}>
-                    <button onClick={() => toggleStatus(pkg.id, pkg.status)} style={{ padding: "6px 12px", fontSize: 12, borderRadius: 8, border: "1px solid rgba(255,255,255,.1)", background: "rgba(255,255,255,.06)", color: "#fff", cursor: "pointer" }}>
+                  <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)" }}>
+                    <button onClick={() => toggleStatus(pkg.id, pkg.status)} style={{ padding: "6px 12px", fontSize: 12, borderRadius: 8, border: "1px solid rgba(var(--ink),.1)", background: "rgba(var(--ink),.06)", color: "var(--ink-solid, #fff)", cursor: "pointer" }}>
                       {pkg.status === "Active" ? "Pause" : "Activate"}
                     </button>
                   </td>
@@ -142,15 +142,15 @@ export default function SalonPackagesPage() {
         <div style={{ background: "linear-gradient(135deg, rgba(236,72,153,.12), rgba(168,85,247,.10))", border: `1px solid ${salonBorder}`, borderRadius: 18, padding: 22 }}>
           <div style={{ fontSize: 13, color: "#fbcfe8", fontWeight: 800, marginBottom: 12, textTransform: "uppercase", letterSpacing: ".07em" }}>Package Strategy</div>
           <div style={{ display: "grid", gap: 12 }}>
-            <div style={{ background: "rgba(255,255,255,.04)", borderRadius: 14, padding: isMobile ? "12px 10px" : "14px 16px", border: "1px solid rgba(255,255,255,.06)" }}>
+            <div style={{ background: "rgba(var(--ink),.04)", borderRadius: 14, padding: isMobile ? "12px 10px" : "14px 16px", border: "1px solid rgba(var(--ink),.06)" }}>
               <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 4 }}>Service Coverage</div>
               <div style={{ fontSize: 13, color: salonMuted }}>{packageServiceCoverage} unique services bundle-ready hain.</div>
             </div>
-            <div style={{ background: "rgba(255,255,255,.04)", borderRadius: 14, padding: isMobile ? "12px 10px" : "14px 16px", border: "1px solid rgba(255,255,255,.06)" }}>
+            <div style={{ background: "rgba(var(--ink),.04)", borderRadius: 14, padding: isMobile ? "12px 10px" : "14px 16px", border: "1px solid rgba(var(--ink),.06)" }}>
               <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 4 }}>Upsell Tip</div>
               <div style={{ fontSize: 13, color: salonMuted }}>Hair, nails, and skincare combo packages can be a strong offer for repeat clients.</div>
             </div>
-            <div style={{ background: "rgba(255,255,255,.04)", borderRadius: 14, padding: isMobile ? "12px 10px" : "14px 16px", border: "1px solid rgba(255,255,255,.06)" }}>
+            <div style={{ background: "rgba(var(--ink),.04)", borderRadius: 14, padding: isMobile ? "12px 10px" : "14px 16px", border: "1px solid rgba(var(--ink),.06)" }}>
               <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 4 }}>Pricing Control</div>
               <div style={{ fontSize: 13, color: salonMuted }}>Package rate ko single-service total se slightly better rakhein taa ke bundle conversion improve ho.</div>
             </div>
@@ -160,7 +160,7 @@ export default function SalonPackagesPage() {
 
       {showModal && (
         <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.68)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 50 }} onClick={(event) => { if (event.target === event.currentTarget) setShowModal(false); }}>
-          <div style={{ width: 560, background: "#161b27", border: `1px solid ${salonBorder}`, borderRadius: 18, padding: 28 }}>
+          <div style={{ width: 560, background: "var(--dk-161b27, #161b27)", border: `1px solid ${salonBorder}`, borderRadius: 18, padding: 28 }}>
             <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 18 }}>
               <div>
                 <h2 style={{ margin: 0, fontSize: 20, fontWeight: 800 }}>Create Beauty Package</h2>

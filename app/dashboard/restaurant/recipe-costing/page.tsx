@@ -41,7 +41,7 @@ export default function RecipeCostingPage() {
   }
 
   return (
-    <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", fontFamily: restaurantFont, color: "#fff", minHeight: "100vh" }}>
+    <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", fontFamily: restaurantFont, color: "var(--ink-solid, #fff)", minHeight: "100vh" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 28 }}>
         <div>
           <h1 style={{ fontSize: 22, fontWeight: 800, margin: "0 0 4px" }}>Recipe Costing</h1>
@@ -57,7 +57,7 @@ export default function RecipeCostingPage() {
           { label: "High Margin (>60%)", val: recipes.filter((recipe) => recipe.margin > 60).length, color: "#fbbf24" },
           { label: "Low Margin (<30%)", val: recipes.filter((recipe) => recipe.margin < 30).length, color: "#f87171" },
         ].map((cardItem) => (
-          <div key={cardItem.label} style={card}><div style={{ fontSize: 13, color: "rgba(255,255,255,.5)", marginBottom: 6 }}>{cardItem.label}</div><div style={{ fontSize: 22, fontWeight: 700, color: cardItem.color }}>{cardItem.val}</div></div>
+          <div key={cardItem.label} style={card}><div style={{ fontSize: 13, color: "rgba(var(--ink),.5)", marginBottom: 6 }}>{cardItem.label}</div><div style={{ fontSize: 22, fontWeight: 700, color: cardItem.color }}>{cardItem.val}</div></div>
         ))}
       </div>
 
@@ -65,27 +65,27 @@ export default function RecipeCostingPage() {
 
       <div style={card}>
         <table style={{ width: "100%", borderCollapse: "collapse" }}>
-          <thead><tr>{["Recipe", "Category", "Servings", "Ingredients", "Cost", "Selling Price", "Margin"].map((header) => <th key={header} style={{ textAlign: "left", padding: "12px 16px", fontSize: 12, color: "rgba(255,255,255,.5)", borderBottom: `1px solid ${restaurantBorder}`, fontWeight: 600 }}>{header}</th>)}</tr></thead>
+          <thead><tr>{["Recipe", "Category", "Servings", "Ingredients", "Cost", "Selling Price", "Margin"].map((header) => <th key={header} style={{ textAlign: "left", padding: "12px 16px", fontSize: 12, color: "rgba(var(--ink),.5)", borderBottom: `1px solid ${restaurantBorder}`, fontWeight: 600 }}>{header}</th>)}</tr></thead>
           <tbody>
             {recipes.map((recipe) => (
               <tr key={recipe.id}>
-                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)", fontWeight: 600 }}>{recipe.name}</td>
-                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)", fontSize: 13 }}>{recipe.category}</td>
-                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)", fontSize: 13 }}>{recipe.servings}</td>
-                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)", fontSize: 12, color: restaurantMuted }}>{recipe.ingredients.slice(0, 3).join(", ")}{recipe.ingredients.length > 3 ? "..." : ""}</td>
-                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)", fontSize: 13 }}>Rs. {recipe.totalCost.toLocaleString()}</td>
-                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)", color: "#34d399", fontWeight: 600 }}>Rs. {recipe.sellingPrice.toLocaleString()}</td>
-                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)" }}><span style={{ color: recipe.margin > 60 ? "#34d399" : recipe.margin > 30 ? "#f59e0b" : "#ef4444", fontWeight: 700 }}>{recipe.margin}%</span></td>
+                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", fontWeight: 600 }}>{recipe.name}</td>
+                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", fontSize: 13 }}>{recipe.category}</td>
+                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", fontSize: 13 }}>{recipe.servings}</td>
+                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", fontSize: 12, color: restaurantMuted }}>{recipe.ingredients.slice(0, 3).join(", ")}{recipe.ingredients.length > 3 ? "..." : ""}</td>
+                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", fontSize: 13 }}>Rs. {recipe.totalCost.toLocaleString()}</td>
+                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", color: "#34d399", fontWeight: 600 }}>Rs. {recipe.sellingPrice.toLocaleString()}</td>
+                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)" }}><span style={{ color: recipe.margin > 60 ? "#34d399" : recipe.margin > 30 ? "#f59e0b" : "#ef4444", fontWeight: 700 }}>{recipe.margin}%</span></td>
               </tr>
             ))}
-            {!loading && recipes.length === 0 && <tr><td colSpan={7} style={{ padding: 40, textAlign: "center", color: "rgba(255,255,255,.25)" }}>No recipes yet.</td></tr>}
+            {!loading && recipes.length === 0 && <tr><td colSpan={7} style={{ padding: 40, textAlign: "center", color: "rgba(var(--ink),.25)" }}>No recipes yet.</td></tr>}
           </tbody>
         </table>
       </div>
 
       {showModal && (
         <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.7)", zIndex: 50, display: "flex", alignItems: "center", justifyContent: "center" }}>
-          <div style={{ background: "#161b27", border: `1px solid ${restaurantBorder}`, borderRadius: 16, padding: 32, width: 480, fontFamily: restaurantFont }}>
+          <div style={{ background: "var(--dk-161b27, #161b27)", border: `1px solid ${restaurantBorder}`, borderRadius: 16, padding: 32, width: 480, fontFamily: restaurantFont }}>
             <h2 style={{ margin: "0 0 24px", fontSize: 18, fontWeight: 700 }}>Add Recipe</h2>
             {formError && <div style={{ marginBottom: 14, padding: "10px 12px", borderRadius: 8, background: "rgba(239,68,68,.14)", border: "1px solid rgba(239,68,68,.28)", color: "#fca5a5", fontSize: 12 }}>{formError}</div>}
             {[
@@ -100,7 +100,7 @@ export default function RecipeCostingPage() {
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 16 }}>
               <div>
                 <label style={{ display: "block", fontSize: 12, color: restaurantMuted, marginBottom: 6 }}>Category</label>
-                <select value={form.category} onChange={(event) => setForm((prev) => ({ ...prev, category: event.target.value }))} style={{ width: "100%", background: "#161b27", border: `1px solid ${restaurantBorder}`, borderRadius: 8, padding: "9px 12px", color: "#fff", fontSize: 14 }}>
+                <select value={form.category} onChange={(event) => setForm((prev) => ({ ...prev, category: event.target.value }))} style={{ width: "100%", background: "var(--dk-161b27, #161b27)", border: `1px solid ${restaurantBorder}`, borderRadius: 8, padding: "9px 12px", color: "var(--ink-solid, #fff)", fontSize: 14 }}>
                   {["Starters", "Mains", "Desserts", "Drinks"].map((category) => <option key={category}>{category}</option>)}
                 </select>
               </div>
@@ -117,7 +117,7 @@ export default function RecipeCostingPage() {
             </div>
             <div style={{ display: "flex", gap: 12 }}>
               <button onClick={save} style={{ flex: 1, padding: "11px 0", background: "#ef4444", border: "none", borderRadius: 8, color: "#fff", fontSize: 14, fontWeight: 600, cursor: "pointer" }}>Add Recipe</button>
-              <button onClick={() => setShowModal(false)} style={{ padding: "11px 24px", background: "transparent", border: `1px solid ${restaurantBorder}`, borderRadius: 8, color: "rgba(255,255,255,.6)", fontSize: 14, cursor: "pointer" }}>Cancel</button>
+              <button onClick={() => setShowModal(false)} style={{ padding: "11px 24px", background: "transparent", border: `1px solid ${restaurantBorder}`, borderRadius: 8, color: "rgba(var(--ink),.6)", fontSize: 14, cursor: "pointer" }}>Cancel</button>
             </div>
           </div>
         </div>

@@ -159,19 +159,19 @@ export default function POSSessionsPage() {
   }
 
   const inp: React.CSSProperties = {
-    background: "rgba(255,255,255,.05)", border: `1px solid ${border}`, borderRadius: 8,
-    padding: "9px 12px", color: "#fff", fontSize: 13, fontFamily: ff, outline: "none",
+    background: "rgba(var(--ink),.05)", border: `1px solid ${border}`, borderRadius: 8,
+    padding: "9px 12px", color: "var(--ink-solid, #fff)", fontSize: 13, fontFamily: ff, outline: "none",
     width: "100%", boxSizing: "border-box",
   };
 
   return (
-    <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", fontFamily: ff, color: "#fff", minHeight: "100vh", background: "#0a0f1a" }}>
+    <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", fontFamily: ff, color: "var(--ink-solid, #fff)", minHeight: "100vh", background: "var(--dk-0a0f1a, #0a0f1a)" }}>
 
       {/* Header */}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 28 }}>
         <div>
           <h1 style={{ fontSize: 24, fontWeight: 800, margin: "0 0 6px" }}>📋 POS Sessions</h1>
-          <p style={{ fontSize: 13, color: "rgba(255,255,255,.35)", margin: 0 }}>Shift management — opening cash, sales tracking, closing reconciliation</p>
+          <p style={{ fontSize: 13, color: "rgba(var(--ink),.35)", margin: 0 }}>Shift management — opening cash, sales tracking, closing reconciliation</p>
         </div>
         <button
           onClick={() => setShowOpen(true)}
@@ -187,20 +187,20 @@ export default function POSSessionsPage() {
           { label: "Open Sessions", value: openSessions.length, color: "#10b981", sub: openSessions.map(s => s.cashier).join(", ") || "None" },
           { label: "Today's Revenue", value: `Rs. ${todayRevenue.toLocaleString()}`, color: "#34d399", sub: `${todaySessions.length} sessions today` },
           { label: "Today's Transactions", value: todayTxns, color: "#818cf8", sub: "All shifts combined" },
-          { label: "Total Sessions", value: sessions.length, color: "rgba(255,255,255,.6)", sub: `${sessions.filter(s => s.status === "CLOSED").length} closed` },
+          { label: "Total Sessions", value: sessions.length, color: "rgba(var(--ink),.6)", sub: `${sessions.filter(s => s.status === "CLOSED").length} closed` },
         ].map(s => (
           <div key={s.label} style={{ background: bg, border: `1px solid ${border}`, borderRadius: 14, padding: isMobile ? "12px 10px" : "18px 22px" }}>
-            <div style={{ fontSize: 12, color: "rgba(255,255,255,.4)", marginBottom: 8 }}>{s.label}</div>
+            <div style={{ fontSize: 12, color: "rgba(var(--ink),.4)", marginBottom: 8 }}>{s.label}</div>
             <div style={{ fontSize: 22, fontWeight: 800, color: s.color, marginBottom: 4 }}>{loading ? "…" : s.value}</div>
-            <div style={{ fontSize: 11, color: "rgba(255,255,255,.25)" }}>{s.sub}</div>
+            <div style={{ fontSize: 11, color: "rgba(var(--ink),.25)" }}>{s.sub}</div>
           </div>
         ))}
       </div>
 
       {/* Sessions list */}
-      {loading && <div style={{ textAlign: "center", padding: 60, color: "rgba(255,255,255,.3)" }}>Loading...</div>}
+      {loading && <div style={{ textAlign: "center", padding: 60, color: "rgba(var(--ink),.3)" }}>Loading...</div>}
       {!loading && sessions.length === 0 && (
-        <div style={{ textAlign: "center", padding: 60, color: "rgba(255,255,255,.2)" }}>
+        <div style={{ textAlign: "center", padding: 60, color: "rgba(var(--ink),.2)" }}>
           <div style={{ fontSize: 40, marginBottom: 12 }}>📋</div>
           <div style={{ fontSize: 16, marginBottom: 6 }}>No session</div>
           <div style={{ fontSize: 13 }}>Start your first cashier shift</div>
@@ -225,7 +225,7 @@ export default function POSSessionsPage() {
                 {/* Session ref */}
                 <div>
                   <div style={{ fontWeight: 800, fontSize: 13, color: "#818cf8" }}>{session.sessionRef}</div>
-                  <div style={{ fontSize: 11, color: "rgba(255,255,255,.3)", marginTop: 2 }}>{fmtDate(session.date)}</div>
+                  <div style={{ fontSize: 11, color: "rgba(var(--ink),.3)", marginTop: 2 }}>{fmtDate(session.date)}</div>
                 </div>
 
                 {/* Status */}
@@ -238,20 +238,20 @@ export default function POSSessionsPage() {
                 {/* Cashier + Branch */}
                 <div>
                   <div style={{ fontSize: 13, fontWeight: 600 }}>{session.cashier}</div>
-                  <div style={{ fontSize: 11, color: "rgba(255,255,255,.35)", marginTop: 2 }}>{session.branch}</div>
+                  <div style={{ fontSize: 11, color: "rgba(var(--ink),.35)", marginTop: 2 }}>{session.branch}</div>
                 </div>
 
                 {/* Opening cash */}
                 <div>
-                  <div style={{ fontSize: 11, color: "rgba(255,255,255,.35)", marginBottom: 3 }}>Opening Cash</div>
+                  <div style={{ fontSize: 11, color: "rgba(var(--ink),.35)", marginBottom: 3 }}>Opening Cash</div>
                   <div style={{ fontWeight: 700 }}>Rs. {session.openingCash.toLocaleString()}</div>
                 </div>
 
                 {/* Sales */}
                 <div>
-                  <div style={{ fontSize: 11, color: "rgba(255,255,255,.35)", marginBottom: 3 }}>Sales · {session.transactions} txns</div>
+                  <div style={{ fontSize: 11, color: "rgba(var(--ink),.35)", marginBottom: 3 }}>Sales · {session.transactions} txns</div>
                   <div style={{ fontWeight: 700, color: "#34d399" }}>Rs. {session.totalSales.toLocaleString()}</div>
-                  <div style={{ fontSize: 11, color: "rgba(255,255,255,.3)", marginTop: 2 }}>
+                  <div style={{ fontSize: 11, color: "rgba(var(--ink),.3)", marginTop: 2 }}>
                     Cash Rs. {session.cashSales.toLocaleString()} · Card Rs. {session.cardSales.toLocaleString()}
                   </div>
                 </div>
@@ -260,7 +260,7 @@ export default function POSSessionsPage() {
                 <div>
                   {!isOpen ? (
                     <>
-                      <div style={{ fontSize: 11, color: "rgba(255,255,255,.35)", marginBottom: 3 }}>Reconciliation</div>
+                      <div style={{ fontSize: 11, color: "rgba(var(--ink),.35)", marginBottom: 3 }}>Reconciliation</div>
                       <div style={{ fontSize: 12 }}>Expected: <strong>Rs. {session.expectedCash.toLocaleString()}</strong></div>
                       <div style={{ fontSize: 12 }}>Actual: <strong>Rs. {session.closingCash.toLocaleString()}</strong></div>
                       <div style={{ fontSize: 12, fontWeight: 800, marginTop: 3, color: session.discrepancy === 0 && session.closingCash > 0 ? "#34d399" : session.discrepancy > 0 ? "#818cf8" : "#f87171" }}>
@@ -268,7 +268,7 @@ export default function POSSessionsPage() {
                       </div>
                     </>
                   ) : (
-                    <div style={{ fontSize: 12, color: "rgba(255,255,255,.25)" }}>Session open</div>
+                    <div style={{ fontSize: 12, color: "rgba(var(--ink),.25)" }}>Session open</div>
                   )}
                 </div>
 
@@ -282,7 +282,7 @@ export default function POSSessionsPage() {
                       Close
                     </button>
                   )}
-                  <div style={{ width: 24, display: "flex", alignItems: "center", justifyContent: "center", color: "rgba(255,255,255,.2)", fontSize: 11 }}>
+                  <div style={{ width: 24, display: "flex", alignItems: "center", justifyContent: "center", color: "rgba(var(--ink),.2)", fontSize: 11 }}>
                     {isExpanded ? "▲" : "▼"}
                   </div>
                 </div>
@@ -293,22 +293,22 @@ export default function POSSessionsPage() {
                 <div style={{ borderTop: `1px solid rgba(239,68,68,.2)`, background: "rgba(239,68,68,.05)", padding: isMobile ? "12px 11px" : "20px 24px" }}>
                   <div style={{ fontSize: 14, fontWeight: 700, color: "#f87171", marginBottom: 16 }}>🔒 Close Session — {session.sessionRef}</div>
                   <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr 1fr", gap: 16, marginBottom: 16 }}>
-                    <div style={{ background: "rgba(255,255,255,.04)", borderRadius: 10, padding: isMobile ? "12px 10px" : "14px 16px" }}>
-                      <div style={{ fontSize: 11, color: "rgba(255,255,255,.4)", marginBottom: 6 }}>Opening Cash</div>
+                    <div style={{ background: "rgba(var(--ink),.04)", borderRadius: 10, padding: isMobile ? "12px 10px" : "14px 16px" }}>
+                      <div style={{ fontSize: 11, color: "rgba(var(--ink),.4)", marginBottom: 6 }}>Opening Cash</div>
                       <div style={{ fontWeight: 800, fontSize: 18 }}>Rs. {session.openingCash.toLocaleString()}</div>
                     </div>
                     <div style={{ background: "rgba(16,185,129,.06)", border: "1px solid rgba(16,185,129,.15)", borderRadius: 10, padding: isMobile ? "12px 10px" : "14px 16px" }}>
-                      <div style={{ fontSize: 11, color: "rgba(255,255,255,.4)", marginBottom: 6 }}>Cash Sales</div>
+                      <div style={{ fontSize: 11, color: "rgba(var(--ink),.4)", marginBottom: 6 }}>Cash Sales</div>
                       <div style={{ fontWeight: 800, fontSize: 18, color: "#34d399" }}>Rs. {session.cashSales.toLocaleString()}</div>
                     </div>
                     <div style={{ background: "rgba(99,102,241,.06)", border: "1px solid rgba(99,102,241,.15)", borderRadius: 10, padding: isMobile ? "12px 10px" : "14px 16px" }}>
-                      <div style={{ fontSize: 11, color: "rgba(255,255,255,.4)", marginBottom: 6 }}>Expected in Drawer</div>
+                      <div style={{ fontSize: 11, color: "rgba(var(--ink),.4)", marginBottom: 6 }}>Expected in Drawer</div>
                       <div style={{ fontWeight: 800, fontSize: 18, color: "#818cf8" }}>Rs. {session.expectedCash.toLocaleString()}</div>
                     </div>
                   </div>
                   <div style={{ display: "flex", gap: 14, alignItems: "flex-end" }}>
                     <div style={{ flex: 1 }}>
-                      <label style={{ display: "block", fontSize: 12, color: "rgba(255,255,255,.45)", marginBottom: 6 }}>Actual Cash in Drawer (Count it) *</label>
+                      <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),.45)", marginBottom: 6 }}>Actual Cash in Drawer (Count it) *</label>
                       <input
                         type="number" min="0" autoFocus
                         value={closingCash}
@@ -327,13 +327,13 @@ export default function POSSessionsPage() {
                       )}
                     </div>
                     <div style={{ display: "flex", gap: 8 }}>
-                      <button onClick={() => setClosingId(null)} style={{ padding: "10px 18px", background: "transparent", border: `1px solid ${border}`, color: "rgba(255,255,255,.6)", borderRadius: 8, fontSize: 13, cursor: "pointer" }}>
+                      <button onClick={() => setClosingId(null)} style={{ padding: "10px 18px", background: "transparent", border: `1px solid ${border}`, color: "rgba(var(--ink),.6)", borderRadius: 8, fontSize: 13, cursor: "pointer" }}>
                         Cancel
                       </button>
                       <button
                         onClick={() => closeSession(session)}
                         disabled={!closingCash}
-                        style={{ padding: "10px 22px", background: !closingCash ? "rgba(255,255,255,.08)" : "rgba(239,68,68,.8)", color: !closingCash ? "rgba(255,255,255,.3)" : "#fff", border: "none", borderRadius: 8, fontSize: 13, fontWeight: 700, cursor: closingCash ? "pointer" : "not-allowed" }}
+                        style={{ padding: "10px 22px", background: !closingCash ? "rgba(var(--ink),.08)" : "rgba(239,68,68,.8)", color: !closingCash ? "rgba(var(--ink),.3)" : "#fff", border: "none", borderRadius: 8, fontSize: 13, fontWeight: 700, cursor: closingCash ? "pointer" : "not-allowed" }}
                       >
                         Confirm Close
                       </button>
@@ -345,20 +345,20 @@ export default function POSSessionsPage() {
               {/* Expanded — Sales in session */}
               {isExpanded && !isClosing && (
                 <div style={{ borderTop: `1px solid ${border}`, padding: isMobile ? "12px 11px" : "20px 24px" }}>
-                  <div style={{ fontSize: 12, fontWeight: 700, color: "rgba(255,255,255,.35)", letterSpacing: ".06em", textTransform: "uppercase", marginBottom: 14 }}>
+                  <div style={{ fontSize: 12, fontWeight: 700, color: "rgba(var(--ink),.35)", letterSpacing: ".06em", textTransform: "uppercase", marginBottom: 14 }}>
                     Sales in this session ({thisSales.length})
                   </div>
                   {thisSales.length === 0 ? (
-                    <div style={{ fontSize: 13, color: "rgba(255,255,255,.25)", padding: "12px 0" }}>No sales recorded in this session.</div>
+                    <div style={{ fontSize: 13, color: "rgba(var(--ink),.25)", padding: "12px 0" }}>No sales recorded in this session.</div>
                   ) : (
                     <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
                       {thisSales.map(sale => {
                         const sd = sale.data || {};
                         return (
-                          <div key={sale.id} style={{ display: "flex", alignItems: "center", gap: 16, padding: "10px 14px", background: "rgba(255,255,255,.025)", borderRadius: 8 }}>
+                          <div key={sale.id} style={{ display: "flex", alignItems: "center", gap: 16, padding: "10px 14px", background: "rgba(var(--ink),.025)", borderRadius: 8 }}>
                             <div style={{ fontWeight: 700, color: "#818cf8", minWidth: 100, fontSize: 13 }}>{sale.title}</div>
-                            <div style={{ fontSize: 12, color: "rgba(255,255,255,.4)", flex: 1 }}>{String(sd.items || "")}</div>
-                            <div style={{ fontSize: 12, color: "rgba(255,255,255,.4)", textTransform: "capitalize" }}>{String(sd.payMethod || "cash")}</div>
+                            <div style={{ fontSize: 12, color: "rgba(var(--ink),.4)", flex: 1 }}>{String(sd.items || "")}</div>
+                            <div style={{ fontSize: 12, color: "rgba(var(--ink),.4)", textTransform: "capitalize" }}>{String(sd.payMethod || "cash")}</div>
                             <div style={{ fontWeight: 700, color: "#34d399", minWidth: 100, textAlign: "right" }}>Rs. {(sale.amount || 0).toLocaleString()}</div>
                           </div>
                         );
@@ -375,18 +375,18 @@ export default function POSSessionsPage() {
       {/* Open Session Modal */}
       {showOpen && (
         <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.8)", backdropFilter: "blur(8px)", zIndex: 99, display: "flex", alignItems: "center", justifyContent: "center" }}>
-          <div style={{ background: "#111827", border: `1px solid ${border}`, borderRadius: 18, padding: 32, width: 440, fontFamily: ff }}>
+          <div style={{ background: "var(--dk-111827, #111827)", border: `1px solid ${border}`, borderRadius: 18, padding: 32, width: 440, fontFamily: ff }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24 }}>
               <div>
                 <h2 style={{ margin: "0 0 4px", fontSize: 18, fontWeight: 800 }}>🟢 Open New Session</h2>
-                <p style={{ margin: 0, fontSize: 13, color: "rgba(255,255,255,.4)" }}>Start cashier shift</p>
+                <p style={{ margin: 0, fontSize: 13, color: "rgba(var(--ink),.4)" }}>Start cashier shift</p>
               </div>
-              <button onClick={() => setShowOpen(false)} style={{ background: "none", border: "none", color: "rgba(255,255,255,.5)", fontSize: 22, cursor: "pointer" }}>✕</button>
+              <button onClick={() => setShowOpen(false)} style={{ background: "none", border: "none", color: "rgba(var(--ink),.5)", fontSize: 22, cursor: "pointer" }}>✕</button>
             </div>
 
             <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
               <div>
-                <label style={{ display: "block", fontSize: 12, color: "rgba(255,255,255,.45)", marginBottom: 6 }}>Cashier Name *</label>
+                <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),.45)", marginBottom: 6 }}>Cashier Name *</label>
                 <select
                   value={openForm.cashier} onChange={e => setOpenForm(f => ({ ...f, cashier: e.target.value }))}
                   style={inp} autoFocus
@@ -406,7 +406,7 @@ export default function POSSessionsPage() {
                 </select>
               </div>
               <div>
-                <label style={{ display: "block", fontSize: 12, color: "rgba(255,255,255,.45)", marginBottom: 6 }}>Branch / Counter</label>
+                <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),.45)", marginBottom: 6 }}>Branch / Counter</label>
                 <select
                   value={openForm.branch} onChange={e => setOpenForm(f => ({ ...f, branch: e.target.value }))}
                   style={inp}
@@ -421,7 +421,7 @@ export default function POSSessionsPage() {
                 </select>
               </div>
               <div>
-                <label style={{ display: "block", fontSize: 12, color: "rgba(255,255,255,.45)", marginBottom: 6 }}>Opening Cash</label>
+                <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),.45)", marginBottom: 6 }}>Opening Cash</label>
                 <input
                   type="number" min="0"
                   value={openForm.openingCash} onChange={e => setOpenForm(f => ({ ...f, openingCash: e.target.value }))}
@@ -431,13 +431,13 @@ export default function POSSessionsPage() {
             </div>
 
             <div style={{ display: "flex", gap: 10, justifyContent: "flex-end", marginTop: 24 }}>
-              <button onClick={() => setShowOpen(false)} style={{ padding: "10px 20px", background: "transparent", border: `1px solid ${border}`, color: "rgba(255,255,255,.6)", borderRadius: 10, fontSize: 13, cursor: "pointer" }}>
+              <button onClick={() => setShowOpen(false)} style={{ padding: "10px 20px", background: "transparent", border: `1px solid ${border}`, color: "rgba(var(--ink),.6)", borderRadius: 10, fontSize: 13, cursor: "pointer" }}>
                 Cancel
               </button>
               <button
                 onClick={openSession}
                 disabled={saving || !openForm.cashier.trim()}
-                style={{ padding: "10px 24px", background: !openForm.cashier.trim() ? "rgba(255,255,255,.08)" : "linear-gradient(135deg,#10b981,#059669)", color: !openForm.cashier.trim() ? "rgba(255,255,255,.3)" : "#fff", border: "none", borderRadius: 10, fontSize: 13, fontWeight: 700, cursor: openForm.cashier.trim() ? "pointer" : "not-allowed" }}
+                style={{ padding: "10px 24px", background: !openForm.cashier.trim() ? "rgba(var(--ink),.08)" : "linear-gradient(135deg,#10b981,#059669)", color: !openForm.cashier.trim() ? "rgba(var(--ink),.3)" : "#fff", border: "none", borderRadius: 10, fontSize: 13, fontWeight: 700, cursor: openForm.cashier.trim() ? "pointer" : "not-allowed" }}
               >
                 {saving ? "Opening..." : "🟢 Open Session"}
               </button>

@@ -86,11 +86,11 @@ export default function RawMaterialsPage() {
   const isRaw = tab === "RAW_MATERIAL";
 
   return (
-    <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", fontFamily: ff, color: "#fff", minHeight: "100vh" }}>
+    <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", fontFamily: ff, color: "var(--ink-solid, #fff)", minHeight: "100vh" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 22, gap: 14, flexWrap: "wrap" }}>
         <div>
           <h1 style={{ fontSize: 22, fontWeight: 800, margin: "0 0 4px" }}>Materials & Products</h1>
-          <p style={{ fontSize: 13, color: "rgba(255,255,255,.42)", margin: 0 }}>
+          <p style={{ fontSize: 13, color: "rgba(var(--ink),.42)", margin: 0 }}>
             Real inventory — stock and cost come from purchases and production, not typed in.
           </p>
         </div>
@@ -105,7 +105,7 @@ export default function RawMaterialsPage() {
             padding: "8px 18px", borderRadius: 10, fontSize: 13, fontWeight: 700, cursor: "pointer",
             border: `1px solid ${tab === key ? "rgba(249,115,22,.45)" : border}`,
             background: tab === key ? "rgba(249,115,22,.14)" : "transparent",
-            color: tab === key ? "#fb923c" : "rgba(255,255,255,.5)",
+            color: tab === key ? "#fb923c" : "rgba(var(--ink),.5)",
           }}>{label}</button>
         ))}
       </div>
@@ -118,7 +118,7 @@ export default function RawMaterialsPage() {
           { label: "Linked BOMs", value: boms.length, color: "#38bdf8" },
         ].map((card) => (
           <div key={card.label} style={{ background: bg, border: `1px solid ${border}`, borderRadius: 14, padding: isMobile ? "12px 10px" : "18px 20px" }}>
-            <div style={{ fontSize: 12, color: "rgba(255,255,255,.48)", marginBottom: 6 }}>{card.label}</div>
+            <div style={{ fontSize: 12, color: "rgba(var(--ink),.48)", marginBottom: 6 }}>{card.label}</div>
             <div style={{ fontSize: 21, fontWeight: 800, color: card.color }}>{card.value}</div>
           </div>
         ))}
@@ -128,9 +128,9 @@ export default function RawMaterialsPage() {
         <div style={{ overflowX: "auto" }}>
           <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 640 }}>
             <thead>
-              <tr style={{ background: "rgba(255,255,255,.03)" }}>
+              <tr style={{ background: "rgba(var(--ink),.03)" }}>
                 {["Item", "Unit", "In Stock", "Open Stock", "Avg Cost", "Stock Value", isRaw ? "Used in BOMs" : "Sale Rate"].map((h, i) => (
-                  <th key={h} style={{ padding: "12px 16px", fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,.4)", textTransform: "uppercase", letterSpacing: ".05em", textAlign: i >= 2 ? "right" : "left" }}>{h}</th>
+                  <th key={h} style={{ padding: "12px 16px", fontSize: 11, fontWeight: 700, color: "rgba(var(--ink),.4)", textTransform: "uppercase", letterSpacing: ".05em", textAlign: i >= 2 ? "right" : "left" }}>{h}</th>
                 ))}
               </tr>
             </thead>
@@ -139,9 +139,9 @@ export default function RawMaterialsPage() {
                 <tr key={item.id} style={{ borderTop: `1px solid ${border}` }}>
                   <td style={{ padding: "12px 16px", fontSize: 13 }}>
                     <div style={{ fontWeight: 700 }}>{item.name}</div>
-                    <div style={{ fontSize: 11, color: "rgba(255,255,255,.32)" }}>{item.code}</div>
+                    <div style={{ fontSize: 11, color: "rgba(var(--ink),.32)" }}>{item.code}</div>
                   </td>
-                  <td style={{ padding: "12px 16px", fontSize: 13, color: "rgba(255,255,255,.5)" }}>{item.unit}</td>
+                  <td style={{ padding: "12px 16px", fontSize: 13, color: "rgba(var(--ink),.5)" }}>{item.unit}</td>
                   <td style={{ padding: "12px 16px", fontSize: 13, textAlign: "right", fontWeight: 700, color: item.isLow ? "#fca5a5" : "#e2e8f0" }}>
                     {item.currentStock}
                     {item.isLow && <span style={{ marginLeft: 6, fontSize: 10, padding: "2px 6px", borderRadius: 5, background: "rgba(239,68,68,.15)", color: "#fca5a5" }}>LOW</span>}
@@ -153,80 +153,80 @@ export default function RawMaterialsPage() {
                       the number somebody can go and measure. Shown only when
                       the item says how long one roll is; a guessed conversion
                       would be worse than none. */}
-                  <td style={{ padding: "12px 16px", fontSize: 13, textAlign: "right", color: item.openRemnant > 0 ? "#34d399" : "rgba(255,255,255,.25)" }}>
+                  <td style={{ padding: "12px 16px", fontSize: 13, textAlign: "right", color: item.openRemnant > 0 ? "#34d399" : "rgba(var(--ink),.25)" }}>
                     {item.openRemnant > 0 ? (
                       <>
                         <div>{item.openRemnant.toFixed(2)}{item.unit}</div>
                         {secondaryQty(item, item.openRemnant) && (
-                          <div style={{ fontSize: 10.5, color: "rgba(255,255,255,.4)", marginTop: 1 }}>
+                          <div style={{ fontSize: 10.5, color: "rgba(var(--ink),.4)", marginTop: 1 }}>
                             {secondaryQty(item, item.openRemnant)}
                           </div>
                         )}
                       </>
                     ) : "—"}
                   </td>
-                  <td style={{ padding: "12px 16px", fontSize: 13, textAlign: "right", color: "rgba(255,255,255,.62)" }}>Rs. {formatRate(item.unitCost)}</td>
+                  <td style={{ padding: "12px 16px", fontSize: 13, textAlign: "right", color: "rgba(var(--ink),.62)" }}>Rs. {formatRate(item.unitCost)}</td>
                   <td style={{ padding: "12px 16px", fontSize: 13, textAlign: "right", fontWeight: 700, color: "#22c55e" }}>Rs. {Math.round(item.stockValue).toLocaleString()}</td>
-                  <td style={{ padding: "12px 16px", fontSize: 13, textAlign: "right", color: "rgba(255,255,255,.5)" }}>
+                  <td style={{ padding: "12px 16px", fontSize: 13, textAlign: "right", color: "rgba(var(--ink),.5)" }}>
                     {isRaw ? (usedByBom.get(item.id) || 0) : `Rs. ${Math.round(item.rate).toLocaleString()}`}
                   </td>
                 </tr>
               ))}
               {!loading && items.length === 0 && (
-                <tr><td colSpan={7} style={{ padding: 36, textAlign: "center", color: "rgba(255,255,255,.28)", fontSize: 13 }}>
+                <tr><td colSpan={7} style={{ padding: 36, textAlign: "center", color: "rgba(var(--ink),.28)", fontSize: 13 }}>
                   No {isRaw ? "raw materials" : "finished products"} yet.
                 </td></tr>
               )}
               {loading && (
-                <tr><td colSpan={7} style={{ padding: 36, textAlign: "center", color: "rgba(255,255,255,.28)", fontSize: 13 }}>Loading…</td></tr>
+                <tr><td colSpan={7} style={{ padding: 36, textAlign: "center", color: "rgba(var(--ink),.28)", fontSize: 13 }}>Loading…</td></tr>
               )}
             </tbody>
           </table>
         </div>
       </div>
 
-      <div style={{ marginTop: 16, padding: "13px 18px", borderRadius: 12, background: "rgba(56,189,248,.07)", border: "1px solid rgba(56,189,248,.2)", fontSize: 12.5, color: "rgba(255,255,255,.55)", lineHeight: 1.6 }}>
+      <div style={{ marginTop: 16, padding: "13px 18px", borderRadius: 12, background: "rgba(56,189,248,.07)", border: "1px solid rgba(56,189,248,.2)", fontSize: 12.5, color: "rgba(var(--ink),.55)", lineHeight: 1.6 }}>
         Stock rises on a purchase invoice or GRN and falls when production consumes it — there is no manual stock field, so
         the number here always matches the stock reports and the Raw Material Stock account.
       </div>
 
       {showModal && (
         <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.7)", zIndex: 50, display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }}>
-          <div style={{ background: "#161b27", border: `1px solid ${border}`, borderRadius: 16, padding: 30, width: 500, fontFamily: ff }}>
+          <div style={{ background: "var(--dk-161b27, #161b27)", border: `1px solid ${border}`, borderRadius: 16, padding: 30, width: 500, fontFamily: ff }}>
             <h2 style={{ margin: "0 0 20px", fontSize: 18, fontWeight: 700 }}>New {isRaw ? "Raw Material" : "Finished Product"}</h2>
             {error && <div style={{ marginBottom: 14, padding: "10px 12px", borderRadius: 8, background: "rgba(239,68,68,.14)", border: "1px solid rgba(239,68,68,.28)", color: "#fca5a5", fontSize: 12 }}>{error}</div>}
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
               <div style={{ gridColumn: "span 2" }}>
-                <label style={{ display: "block", fontSize: 12, color: "rgba(255,255,255,.45)", marginBottom: 6 }}>Name</label>
+                <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),.45)", marginBottom: 6 }}>Name</label>
                 <input value={form.name} onChange={(e) => setForm((c) => ({ ...c, name: e.target.value }))} style={inputStyle} />
               </div>
               <div>
-                <label style={{ display: "block", fontSize: 12, color: "rgba(255,255,255,.45)", marginBottom: 6 }}>Unit</label>
+                <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),.45)", marginBottom: 6 }}>Unit</label>
                 <input value={form.unit} onChange={(e) => setForm((c) => ({ ...c, unit: e.target.value }))} style={inputStyle} />
               </div>
               <div>
-                <label style={{ display: "block", fontSize: 12, color: "rgba(255,255,255,.45)", marginBottom: 6 }}>Reorder level</label>
+                <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),.45)", marginBottom: 6 }}>Reorder level</label>
                 <input type="number" min={0} value={form.minStock} onChange={(e) => setForm((c) => ({ ...c, minStock: Number(e.target.value) }))} style={inputStyle} />
               </div>
               <div>
-                <label style={{ display: "block", fontSize: 12, color: "rgba(255,255,255,.45)", marginBottom: 6 }}>Purchase rate (Rs.)</label>
+                <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),.45)", marginBottom: 6 }}>Purchase rate (Rs.)</label>
                 <input type="number" min={0} value={form.purchaseRate} onChange={(e) => setForm((c) => ({ ...c, purchaseRate: Number(e.target.value) }))} style={inputStyle} />
               </div>
               {!isRaw && (
                 <div>
-                  <label style={{ display: "block", fontSize: 12, color: "rgba(255,255,255,.45)", marginBottom: 6 }}>Sale rate (Rs.)</label>
+                  <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),.45)", marginBottom: 6 }}>Sale rate (Rs.)</label>
                   <input type="number" min={0} value={form.rate} onChange={(e) => setForm((c) => ({ ...c, rate: Number(e.target.value) }))} style={inputStyle} />
                 </div>
               )}
             </div>
-            <div style={{ marginTop: 12, fontSize: 11.5, color: "rgba(255,255,255,.35)", lineHeight: 1.6 }}>
+            <div style={{ marginTop: 12, fontSize: 11.5, color: "rgba(var(--ink),.35)", lineHeight: 1.6 }}>
               Opening stock is not set here. Receive it with a purchase invoice or GRN so the cost lands in the ledger too.
             </div>
             <div style={{ display: "flex", gap: 12, marginTop: 18 }}>
               <button onClick={save} disabled={saving} style={{ flex: 1, padding: "11px 0", background: saving ? "rgba(249,115,22,.5)" : "#f97316", border: "none", borderRadius: 8, color: "#fff", fontSize: 14, fontWeight: 700, cursor: saving ? "not-allowed" : "pointer" }}>
                 {saving ? "Saving…" : "Create"}
               </button>
-              <button onClick={() => { setShowModal(false); setError(""); }} style={{ padding: "11px 24px", background: "transparent", border: `1px solid ${border}`, borderRadius: 8, color: "rgba(255,255,255,.65)", cursor: "pointer" }}>Cancel</button>
+              <button onClick={() => { setShowModal(false); setError(""); }} style={{ padding: "11px 24px", background: "transparent", border: `1px solid ${border}`, borderRadius: 8, color: "rgba(var(--ink),.65)", cursor: "pointer" }}>Cancel</button>
             </div>
           </div>
         </div>

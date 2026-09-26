@@ -47,10 +47,10 @@ function DiffViewer({ before, after }: { before: string | null; after: string | 
         const bv = b[k], av = a[k];
         const changed = JSON.stringify(bv) !== JSON.stringify(av);
         return (
-          <div key={k} style={{ marginBottom: 4, color: changed ? "#fbbf24" : "rgba(255,255,255,0.4)" }}>
+          <div key={k} style={{ marginBottom: 4, color: changed ? "#fbbf24" : "rgba(var(--ink),0.4)" }}>
             <span style={{ color: "#a5b4fc" }}>{k}</span>:{" "}
             {changed && bv !== undefined && <><span style={{ color: "#f87171", textDecoration: "line-through" }}>{JSON.stringify(bv)}</span>{" → "}</>}
-            <span style={{ color: changed ? "#4ade80" : "rgba(255,255,255,0.5)" }}>{JSON.stringify(av ?? bv)}</span>
+            <span style={{ color: changed ? "#4ade80" : "rgba(var(--ink),0.5)" }}>{JSON.stringify(av ?? bv)}</span>
           </div>
         );
       })}
@@ -172,7 +172,7 @@ export default function AuditTrailPage() {
             <tbody>
               {logs.map((log, i) => (
                 <>
-                  <tr key={log.id} style={{ background: i % 2 === 1 ? "rgba(255,255,255,0.013)" : "transparent" }}>
+                  <tr key={log.id} style={{ background: i % 2 === 1 ? "rgba(var(--ink),0.013)" : "transparent" }}>
                     <td style={{ ...td, fontSize: 11, color: "var(--text-muted)", whiteSpace: "nowrap" }}>
                       {new Date(log.createdAt).toLocaleString()}
                     </td>

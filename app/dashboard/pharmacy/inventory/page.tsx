@@ -48,7 +48,7 @@ export default function PharmacyInventoryPage() {
   }
 
   return (
-    <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", fontFamily: pharmacyFont, color: "#fff", minHeight: "100vh" }}>
+    <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", fontFamily: pharmacyFont, color: "var(--ink-solid, #fff)", minHeight: "100vh" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 28 }}>
         <div>
           <h1 style={{ fontSize: 22, fontWeight: 800, margin: "0 0 4px" }}>Drug Inventory</h1>
@@ -76,29 +76,29 @@ export default function PharmacyInventoryPage() {
           <tbody>
             {drugs.map((d) => (
               <tr key={d.id} style={{ opacity: d.isExpired ? 0.6 : 1 }}>
-                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)", fontWeight: 600 }}>{d.name}</td>
-                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)", fontSize: 13 }}>{d.category}</td>
-                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)", fontSize: 13, color: pharmacyMuted }}>{d.manufacturer || "-"}</td>
-                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)", fontSize: 12, color: pharmacyMuted }}>{d.batchNo}</td>
-                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)", color: d.isLow ? "#ef4444" : "#fff", fontWeight: d.isLow ? 700 : 400 }}>{d.stock}</td>
-                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)", fontSize: 13, color: pharmacyMuted }}>{d.minStock}</td>
-                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)" }}>Rs. {d.unitPrice.toLocaleString()}</td>
-                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)", fontSize: 12, color: d.isExpired ? "#ef4444" : pharmacyMuted }}>{d.expiryDate}</td>
-                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)" }}>
+                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", fontWeight: 600 }}>{d.name}</td>
+                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", fontSize: 13 }}>{d.category}</td>
+                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", fontSize: 13, color: pharmacyMuted }}>{d.manufacturer || "-"}</td>
+                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", fontSize: 12, color: pharmacyMuted }}>{d.batchNo}</td>
+                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", color: d.isLow ? "#ef4444" : "#fff", fontWeight: d.isLow ? 700 : 400 }}>{d.stock}</td>
+                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", fontSize: 13, color: pharmacyMuted }}>{d.minStock}</td>
+                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)" }}>Rs. {d.unitPrice.toLocaleString()}</td>
+                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", fontSize: 12, color: d.isExpired ? "#ef4444" : pharmacyMuted }}>{d.expiryDate}</td>
+                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)" }}>
                   {d.isExpired ? <span style={{ display: "inline-block", background: "rgba(245,158,11,.15)", color: "#f59e0b", borderRadius: 6, padding: "2px 8px", fontSize: 10, fontWeight: 600 }}>Expired</span> :
                    d.isLow ? <span style={{ display: "inline-block", background: "rgba(239,68,68,.15)", color: "#ef4444", borderRadius: 6, padding: "2px 8px", fontSize: 10, fontWeight: 600 }}>Low Stock</span> :
                    <span style={{ display: "inline-block", background: "rgba(52,211,153,.15)", color: "#34d399", borderRadius: 6, padding: "2px 8px", fontSize: 10, fontWeight: 600 }}>OK</span>}
                 </td>
               </tr>
             ))}
-            {!loading && drugs.length === 0 && <tr><td colSpan={9} style={{ padding: 40, textAlign: "center", color: "rgba(255,255,255,.25)" }}>No drugs in inventory.</td></tr>}
+            {!loading && drugs.length === 0 && <tr><td colSpan={9} style={{ padding: 40, textAlign: "center", color: "rgba(var(--ink),.25)" }}>No drugs in inventory.</td></tr>}
           </tbody>
         </table>
       </div>
 
       {showModal && (
         <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.7)", zIndex: 50, display: "flex", alignItems: "center", justifyContent: "center" }}>
-          <div style={{ background: "#161b27", border: `1px solid ${pharmacyBorder}`, borderRadius: 16, padding: 32, width: 520, fontFamily: pharmacyFont }}>
+          <div style={{ background: "var(--dk-161b27, #161b27)", border: `1px solid ${pharmacyBorder}`, borderRadius: 16, padding: 32, width: 520, fontFamily: pharmacyFont }}>
             <h2 style={{ margin: "0 0 24px", fontSize: 18, fontWeight: 700 }}>Add Drug</h2>
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
               {[["Drug Name", "name", "text", "span 2"], ["Manufacturer", "manufacturer", "text", ""], ["Batch No.", "batchNo", "text", ""], ["Expiry Date", "expiryDate", "date", "span 2"]].map(([label, key, type, col]) => (
@@ -109,7 +109,7 @@ export default function PharmacyInventoryPage() {
               ))}
               <div style={{ gridColumn: "span 2" }}>
                 <label style={{ display: "block", fontSize: 12, color: pharmacyMuted, marginBottom: 6 }}>Category</label>
-                <select value={form.category} onChange={(e) => setForm((f) => ({ ...f, category: e.target.value }))} style={{ width: "100%", background: "#161b27", border: `1px solid ${pharmacyBorder}`, borderRadius: 8, padding: "9px 12px", color: "#fff", fontSize: 14 }}>
+                <select value={form.category} onChange={(e) => setForm((f) => ({ ...f, category: e.target.value }))} style={{ width: "100%", background: "var(--dk-161b27, #161b27)", border: `1px solid ${pharmacyBorder}`, borderRadius: 8, padding: "9px 12px", color: "var(--ink-solid, #fff)", fontSize: 14 }}>
                   {["Tablet", "Capsule", "Syrup", "Injection", "Cream", "Drops", "Inhaler", "Other"].map((c) => <option key={c}>{c}</option>)}
                 </select>
               </div>
@@ -129,7 +129,7 @@ export default function PharmacyInventoryPage() {
             {error && <div style={{ marginTop: 14, fontSize: 12, color: "#fca5a5" }}>{error}</div>}
             <div style={{ display: "flex", gap: 12, marginTop: 16 }}>
               <button onClick={save} style={{ flex: 1, padding: "11px 0", background: "#fb7185", border: "none", borderRadius: 8, color: "#fff", fontSize: 14, fontWeight: 600, cursor: "pointer" }}>Add Drug</button>
-              <button onClick={() => { setShowModal(false); setError(""); }} style={{ padding: "11px 24px", background: "transparent", border: `1px solid ${pharmacyBorder}`, borderRadius: 8, color: "rgba(255,255,255,.6)", fontSize: 14, cursor: "pointer" }}>Cancel</button>
+              <button onClick={() => { setShowModal(false); setError(""); }} style={{ padding: "11px 24px", background: "transparent", border: `1px solid ${pharmacyBorder}`, borderRadius: 8, color: "rgba(var(--ink),.6)", fontSize: 14, cursor: "pointer" }}>Cancel</button>
             </div>
           </div>
         </div>

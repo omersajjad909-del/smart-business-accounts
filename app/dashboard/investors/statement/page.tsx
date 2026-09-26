@@ -131,14 +131,14 @@ export default function InvestorStatementPage() {
             padding: 0;
             color: #000 !important;
             background: #fff !important;
-            border: 1px solid #000 !important;
+            border: 1px solid var(--dkb-000000, #000) !important;
             border-radius: 0 !important;
             box-shadow: none !important;
           }
           #investor-statement * {
             color: #000 !important;
             background: transparent !important;
-            border-color: #000 !important;
+            border-color: var(--dkb-000000, #000) !important;
             box-shadow: none !important;
             text-shadow: none !important;
           }

@@ -248,7 +248,7 @@ export default function OpeningBalancesPage() {
               ))}
             </tbody>
             <tfoot>
-              <tr style={{ background: "rgba(255,255,255,0.02)" }}>
+              <tr style={{ background: "rgba(var(--ink),0.02)" }}>
                 <td style={{ padding: "12px 12px", fontSize: 13, fontWeight: 700 }}>
                   <button onClick={addRow} style={{ background: "rgba(99,102,241,0.1)", border: "1px solid rgba(99,102,241,0.2)", borderRadius: 8, padding: "6px 16px", fontSize: 12, fontWeight: 600, cursor: "pointer", color: "#a5b4fc", fontFamily: FONT }}>
                     + Add Row

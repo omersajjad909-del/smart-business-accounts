@@ -564,7 +564,7 @@ export default function BarcodePage() {
                   { label: "With Barcode",    val: items.filter(i => i.barcode).length,  color: "#34d399" },
                   { label: "Without Barcode", val: items.filter(i => !i.barcode).length, color: "#f87171" },
                 ].map(({ label, val, color }) => (
-                  <div key={label} style={{ flex: 1, borderRadius: 12, background: "rgba(255,255,255,.03)", border: "1px solid var(--border)", padding: isMobile ? "12px 10px" : "16px 20px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                  <div key={label} style={{ flex: 1, borderRadius: 12, background: "rgba(var(--ink),.03)", border: "1px solid var(--border)", padding: isMobile ? "12px 10px" : "16px 20px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                     <span style={{ fontSize: 13, color: "var(--text-muted)" }}>{label}</span>
                     <span style={{ fontSize: 24, fontWeight: 800, color }}>{val}</span>
                   </div>
@@ -573,7 +573,7 @@ export default function BarcodePage() {
             </div>
 
             {/* Items Table */}
-            <div style={{ borderRadius: 14, background: "rgba(255,255,255,.03)", border: "1px solid var(--border)", overflow: "hidden" }}>
+            <div style={{ borderRadius: 14, background: "rgba(var(--ink),.03)", border: "1px solid var(--border)", overflow: "hidden" }}>
               <div style={{ padding: isMobile ? "12px 10px" : "14px 20px", borderBottom: "1px solid var(--border)", display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
                 <span style={{ fontSize: 13, fontWeight: 700, color: "var(--text-primary)", marginRight: "auto" }}>All Items</span>
 
@@ -584,7 +584,7 @@ export default function BarcodePage() {
                     <button onClick={() => setShowBatchModal(true)} style={{ padding: "5px 12px", borderRadius: 7, background: "linear-gradient(135deg,#6366f1,#4f46e5)", border: "none", color: "#fff", fontSize: 12, fontWeight: 700, cursor: "pointer" }}>
                       🖨 Print Selected
                     </button>
-                    <button onClick={() => setSelectedIds(new Set())} style={{ padding: "5px 8px", borderRadius: 7, background: "transparent", border: "1px solid rgba(255,255,255,.15)", color: "var(--text-muted)", fontSize: 11, cursor: "pointer" }}>✕</button>
+                    <button onClick={() => setSelectedIds(new Set())} style={{ padding: "5px 8px", borderRadius: 7, background: "transparent", border: "1px solid rgba(var(--ink),.15)", color: "var(--text-muted)", fontSize: 11, cursor: "pointer" }}>✕</button>
                   </div>
                 )}
 
@@ -608,7 +608,7 @@ export default function BarcodePage() {
                   </thead>
                   <tbody>
                     {filtered.slice(0, 100).map(item => (
-                      <tr key={item.id} style={{ borderBottom: "1px solid rgba(255,255,255,.04)", background: selectedIds.has(item.id) ? "rgba(99,102,241,.05)" : "transparent" }}>
+                      <tr key={item.id} style={{ borderBottom: "1px solid rgba(var(--ink),.04)", background: selectedIds.has(item.id) ? "rgba(99,102,241,.05)" : "transparent" }}>
                         <td style={{ padding: "11px 10px 11px 16px" }}>
                           {item.barcode && (
                             <input type="checkbox" checked={selectedIds.has(item.id)} onChange={() => toggleSelect(item.id)}
@@ -627,7 +627,7 @@ export default function BarcodePage() {
                         <td style={{ padding: "8px 16px" }}>
                           {item.barcode
                             ? <div style={{ display: "inline-block", background: "white", padding: "3px 5px", borderRadius: 4 }}><Barcode128 value={item.barcode} moduleWidth={1} height={28} showText={false} bg="white" fg="black" /></div>
-                            : <span style={{ color: "rgba(255,255,255,.2)", fontSize: 11 }}>Not set</span>}
+                            : <span style={{ color: "rgba(var(--ink),.2)", fontSize: 11 }}>Not set</span>}
                         </td>
                         <td style={{ padding: "11px 16px", color: "var(--text-muted)" }}>{item.unit || "—"}</td>
                         <td style={{ padding: "11px 16px", color: "var(--text-muted)" }}>{item.rate != null ? `${currency}${item.rate}` : "—"}</td>
@@ -776,7 +776,7 @@ export default function BarcodePage() {
             </div>
 
             {/* Right — session log */}
-            <div style={{ borderRadius: 14, background: "rgba(255,255,255,.02)", border: "1px solid var(--border)", overflow: "hidden" }}>
+            <div style={{ borderRadius: 14, background: "rgba(var(--ink),.02)", border: "1px solid var(--border)", overflow: "hidden" }}>
               <div style={{ padding: isMobile ? "12px 10px" : "14px 20px", borderBottom: "1px solid var(--border)", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                 <span style={{ fontSize: 13, fontWeight: 700, color: "var(--text-primary)" }}>Session Log</span>
                 <span style={{ fontSize: 11, color: "var(--text-muted)" }}>{puLog.length} updated today</span>
@@ -798,7 +798,7 @@ export default function BarcodePage() {
                     {puLog.map((l, i) => {
                       const diff = l.newPrice - l.oldPrice;
                       return (
-                        <tr key={i} style={{ borderBottom: "1px solid rgba(255,255,255,.04)" }}>
+                        <tr key={i} style={{ borderBottom: "1px solid rgba(var(--ink),.04)" }}>
                           <td style={{ padding: "10px 14px", color: "var(--text-muted)", fontSize: 11, whiteSpace: "nowrap" }}>{l.ts}</td>
                           <td style={{ padding: "10px 14px", fontWeight: 600 }}>{l.name}</td>
                           <td style={{ padding: "10px 14px", color: "#f87171" }}>{currency}{l.oldPrice}</td>
@@ -880,7 +880,7 @@ export default function BarcodePage() {
             </div>
 
             {bulkPreview.length > 0 && (
-              <div style={{ borderRadius: 14, background: "rgba(255,255,255,.02)", border: "1px solid var(--border)", overflow: "hidden" }}>
+              <div style={{ borderRadius: 14, background: "rgba(var(--ink),.02)", border: "1px solid var(--border)", overflow: "hidden" }}>
                 <div style={{ padding: isMobile ? "12px 10px" : "14px 20px", borderBottom: "1px solid var(--border)" }}>
                   <span style={{ fontSize: 13, fontWeight: 700, color: "var(--text-primary)" }}>Preview — {bulkPreview.length} items</span>
                   <span style={{ fontSize: 12, color: "var(--text-muted)", marginLeft: 10 }}>
@@ -899,7 +899,7 @@ export default function BarcodePage() {
                     {bulkPreview.slice(0, 200).map(p => {
                       const diff = p.newRate - p.old;
                       return (
-                        <tr key={p.id} style={{ borderBottom: "1px solid rgba(255,255,255,.04)" }}>
+                        <tr key={p.id} style={{ borderBottom: "1px solid rgba(var(--ink),.04)" }}>
                           <td style={{ padding: "9px 16px", fontWeight: 600 }}>{p.name}</td>
                           <td style={{ padding: "9px 16px", color: "var(--text-muted)" }}>{items.find(i => i.id === p.id)?.category || "—"}</td>
                           <td style={{ padding: "9px 16px", color: "#f87171" }}>{currency}{p.old}</td>
@@ -940,7 +940,7 @@ export default function BarcodePage() {
               <strong>✅ Android scanning:</strong><br/>
               Google Lens or the default camera app — scans Code128 natively.
             </div>
-            <button onClick={() => setTestScanItem(null)} style={{ padding: "10px 28px", borderRadius: 10, background: "#111", border: "none", color: "white", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>Close</button>
+            <button onClick={() => setTestScanItem(null)} style={{ padding: "10px 28px", borderRadius: 10, background: "var(--dk-111111, #111)", border: "none", color: "var(--ink-solid, white)", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>Close</button>
           </div>
         </div>
       )}
@@ -948,7 +948,7 @@ export default function BarcodePage() {
       {/* Print Qty Modal */}
       {showPrintModal && printItem && (
         <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.75)", backdropFilter: "blur(8px)", zIndex: 99, display: "flex", alignItems: "center", justifyContent: "center" }}>
-          <div style={{ background: "var(--panel-bg, #1a1d2e)", border: "1px solid var(--border)", borderRadius: 18, padding: 28, width: 460, fontFamily: "'Outfit',sans-serif" }}>
+          <div style={{ background: "var(--panel-bg, var(--dk-1a1d2e, #1a1d2e))", border: "1px solid var(--border)", borderRadius: 18, padding: 28, width: 460, fontFamily: "'Outfit',sans-serif" }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
               <h2 style={{ fontSize: 17, fontWeight: 800, margin: 0, color: "var(--text-primary)" }}>🖨 Print Labels</h2>
               <button onClick={() => setShowPrintModal(false)} style={{ background: "none", border: "none", color: "var(--text-muted)", fontSize: 22, cursor: "pointer" }}>✕</button>
@@ -987,7 +987,7 @@ export default function BarcodePage() {
       {/* Batch Print Modal */}
       {showBatchModal && (
         <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.75)", backdropFilter: "blur(8px)", zIndex: 99, display: "flex", alignItems: "center", justifyContent: "center" }}>
-          <div style={{ background: "var(--panel-bg, #1a1d2e)", border: "1px solid var(--border)", borderRadius: 18, padding: 28, width: 500, fontFamily: "'Outfit',sans-serif" }}>
+          <div style={{ background: "var(--panel-bg, var(--dk-1a1d2e, #1a1d2e))", border: "1px solid var(--border)", borderRadius: 18, padding: 28, width: 500, fontFamily: "'Outfit',sans-serif" }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
               <h2 style={{ fontSize: 17, fontWeight: 800, margin: 0, color: "var(--text-primary)" }}>🖨 Batch Print Barcodes</h2>
               <button onClick={() => setShowBatchModal(false)} style={{ background: "none", border: "none", color: "var(--text-muted)", fontSize: 22, cursor: "pointer" }}>✕</button>
@@ -1002,7 +1002,7 @@ export default function BarcodePage() {
                 {batchSelectedItems.map(item => (
                   <div key={item.id} style={{ display: "inline-flex", alignItems: "center", gap: 5, padding: "4px 10px", borderRadius: 20, background: "rgba(99,102,241,.15)", border: "1px solid rgba(99,102,241,.25)", fontSize: 11.5, color: "var(--text-primary)", fontWeight: 600 }}>
                     {item.name}
-                    <button onClick={() => toggleSelect(item.id)} style={{ background: "none", border: "none", color: "rgba(255,255,255,.4)", fontSize: 12, cursor: "pointer", padding: 0, lineHeight: 1 }}>✕</button>
+                    <button onClick={() => toggleSelect(item.id)} style={{ background: "none", border: "none", color: "rgba(var(--ink),.4)", fontSize: 12, cursor: "pointer", padding: 0, lineHeight: 1 }}>✕</button>
                   </div>
                 ))}
               </div>
@@ -1045,18 +1045,18 @@ export default function BarcodePage() {
         <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.92)", zIndex: 120, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
           <div style={{ position: "absolute", top: 0, left: 0, right: 0, display: "flex", alignItems: "center", justifyContent: "space-between", padding: isMobile ? "12px 10px" : "16px 20px" }}>
             <div>
-              <div style={{ fontSize: 16, fontWeight: 800, color: "#fff" }}>Price Scanner Camera</div>
-              <div style={{ fontSize: 12, color: "rgba(255,255,255,.45)", marginTop: 2 }}>Barcode ko frame ke andar seedha rakho</div>
+              <div style={{ fontSize: 16, fontWeight: 800, color: "var(--ink-solid, #fff)" }}>Price Scanner Camera</div>
+              <div style={{ fontSize: 12, color: "rgba(var(--ink),.45)", marginTop: 2 }}>Barcode ko frame ke andar seedha rakho</div>
             </div>
             <button onClick={stopPuCamera}
-              style={{ width: 40, height: 40, borderRadius: "50%", background: "rgba(255,255,255,.08)", border: "1px solid rgba(255,255,255,.15)", color: "#fff", fontSize: 20, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>
+              style={{ width: 40, height: 40, borderRadius: "50%", background: "rgba(var(--ink),.08)", border: "1px solid rgba(var(--ink),.15)", color: "var(--ink-solid, #fff)", fontSize: 20, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>
               ×
             </button>
           </div>
 
           <div style={{ position: "relative", width: "min(94vw,520px)", borderRadius: 16, overflow: "hidden", border: "2px solid rgba(245,158,11,.45)", boxShadow: "0 0 40px rgba(245,158,11,.18)" }}>
             <video ref={puVideoRef} autoPlay playsInline muted
-              style={{ width: "100%", display: "block", background: "#000", aspectRatio: "4/3", objectFit: "cover" }} />
+              style={{ width: "100%", display: "block", background: "var(--dk-000000, #000)", aspectRatio: "4/3", objectFit: "cover" }} />
             <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", pointerEvents: "none" }}>
               <div style={{ width: 240, height: 105, border: "2px solid rgba(245,158,11,.9)", borderRadius: 8, boxShadow: "0 0 0 9999px rgba(0,0,0,.35)" }} />
             </div>
@@ -1068,7 +1068,7 @@ export default function BarcodePage() {
                 {puCameraErr}
               </div>
             ) : (
-              <div style={{ fontSize: 13, color: puCameraStatus === "scanning" ? "#34d399" : "rgba(255,255,255,.55)" }}>
+              <div style={{ fontSize: 13, color: puCameraStatus === "scanning" ? "#34d399" : "rgba(var(--ink),.55)" }}>
                 {puCameraStatus === "starting" && "Starting camera…"}
                 {puCameraStatus === "scanning" && "🟢 Scanning — hold barcode steady"}
               </div>
@@ -1080,7 +1080,7 @@ export default function BarcodePage() {
               </button>
             </div>
             {puCameraMsg && (
-              <div style={{ marginTop: 8, fontSize: 12, color: "rgba(255,255,255,.45)" }}>{puCameraMsg}</div>
+              <div style={{ marginTop: 8, fontSize: 12, color: "rgba(var(--ink),.45)" }}>{puCameraMsg}</div>
             )}
           </div>
         </div>

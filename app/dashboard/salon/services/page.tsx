@@ -80,7 +80,7 @@ export default function ServicesPage() {
   };
 
   return (
-    <div style={{ padding: "32px", fontFamily: salonFont, color: "#fff", minHeight: "100vh" }}>
+    <div style={{ padding: "32px", fontFamily: salonFont, color: "var(--ink-solid, #fff)", minHeight: "100vh" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 28 }}>
         <div>
           <h1 style={{ fontSize: 26, fontWeight: 800, margin: 0 }}>Service Menu</h1>
@@ -100,7 +100,7 @@ export default function ServicesPage() {
 
       <div style={{ display: "flex", gap: 8, marginBottom: 24, flexWrap: "wrap" }}>
         {CATEGORY_TABS.map((category) => (
-          <button key={category} style={{ background: tab === category ? "#ec4899" : "rgba(255,255,255,.06)", color: tab === category ? "#fff" : salonMuted, border: "none", borderRadius: 999, padding: "8px 16px", cursor: "pointer", fontWeight: 700, fontSize: 13 }} onClick={() => setTab(category)}>
+          <button key={category} style={{ background: tab === category ? "#ec4899" : "rgba(var(--ink),.06)", color: tab === category ? "#fff" : salonMuted, border: "none", borderRadius: 999, padding: "8px 16px", cursor: "pointer", fontWeight: 700, fontSize: 13 }} onClick={() => setTab(category)}>
             {category}
           </button>
         ))}
@@ -111,7 +111,7 @@ export default function ServicesPage() {
           <thead>
             <tr>
               {["Service Name", "Category", "Duration", "Price", "Status", "Actions"].map((heading) => (
-                <th key={heading} style={{ textAlign: "left", padding: "12px 16px", fontSize: 12, color: salonMuted, borderBottom: "1px solid rgba(255,255,255,.07)", fontWeight: 700 }}>{heading}</th>
+                <th key={heading} style={{ textAlign: "left", padding: "12px 16px", fontSize: 12, color: salonMuted, borderBottom: "1px solid rgba(var(--ink),.07)", fontWeight: 700 }}>{heading}</th>
               ))}
             </tr>
           </thead>
@@ -120,18 +120,18 @@ export default function ServicesPage() {
               <tr><td colSpan={6} style={{ padding: 32, textAlign: "center", color: salonMuted, fontSize: 14 }}>No services found.</td></tr>
             ) : filtered.map((service) => (
               <tr key={service.id}>
-                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", fontSize: 14, borderBottom: "1px solid rgba(255,255,255,.04)" }}>
+                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", fontSize: 14, borderBottom: "1px solid rgba(var(--ink),.04)" }}>
                   <div style={{ fontWeight: 700 }}>{service.name}</div>
                   {service.name === popular && <span style={{ fontSize: 11, color: "#fbbf24" }}>Most booked</span>}
                 </td>
-                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", fontSize: 14, borderBottom: "1px solid rgba(255,255,255,.04)" }}>{service.category}</td>
-                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", fontSize: 14, borderBottom: "1px solid rgba(255,255,255,.04)" }}>{service.duration} min</td>
-                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", fontSize: 14, borderBottom: "1px solid rgba(255,255,255,.04)" }}>Rs. {service.price.toLocaleString()}</td>
-                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", fontSize: 14, borderBottom: "1px solid rgba(255,255,255,.04)" }}>
+                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", fontSize: 14, borderBottom: "1px solid rgba(var(--ink),.04)" }}>{service.category}</td>
+                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", fontSize: 14, borderBottom: "1px solid rgba(var(--ink),.04)" }}>{service.duration} min</td>
+                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", fontSize: 14, borderBottom: "1px solid rgba(var(--ink),.04)" }}>Rs. {service.price.toLocaleString()}</td>
+                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", fontSize: 14, borderBottom: "1px solid rgba(var(--ink),.04)" }}>
                   <span style={{ display: "inline-block", background: `${salonStatusColor(service.status)}20`, color: salonStatusColor(service.status), borderRadius: 999, padding: "3px 10px", fontSize: 12, fontWeight: 700 }}>{service.status}</span>
                 </td>
-                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", fontSize: 14, borderBottom: "1px solid rgba(255,255,255,.04)" }}>
-                  <button style={{ padding: "6px 12px", fontSize: 12, borderRadius: 8, border: "1px solid rgba(255,255,255,.1)", background: service.status === "Active" ? "rgba(255,255,255,.06)" : "rgba(52,211,153,.16)", color: "#fff", cursor: "pointer" }} onClick={() => toggleStatus(service.id, service.status)}>
+                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", fontSize: 14, borderBottom: "1px solid rgba(var(--ink),.04)" }}>
+                  <button style={{ padding: "6px 12px", fontSize: 12, borderRadius: 8, border: "1px solid rgba(var(--ink),.1)", background: service.status === "Active" ? "rgba(var(--ink),.06)" : "rgba(52,211,153,.16)", color: "#fff", cursor: "pointer" }} onClick={() => toggleStatus(service.id, service.status)}>
                     {service.status === "Active" ? "Deactivate" : "Activate"}
                   </button>
                 </td>
@@ -143,7 +143,7 @@ export default function ServicesPage() {
 
       {showModal && (
         <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.6)", zIndex: 1000, display: "flex", alignItems: "center", justifyContent: "center" }} onClick={(event) => { if (event.target === event.currentTarget) setShowModal(false); }}>
-          <div style={{ background: "#1a1a2e", border: `1px solid ${salonBorder}`, borderRadius: 16, padding: 32, width: "100%", maxWidth: 480 }}>
+          <div style={{ background: "var(--dk-1a1a2e, #1a1a2e)", border: `1px solid ${salonBorder}`, borderRadius: 16, padding: 32, width: "100%", maxWidth: 480 }}>
             <div style={{ fontSize: 18, fontWeight: 800, marginBottom: 24 }}>Add New Service</div>
             <div style={{ marginBottom: 16 }}><label style={{ display: "block", fontSize: 13, color: salonMuted, marginBottom: 6 }}>Service Name</label><input style={{ width: "100%", background: salonBg, border: `1px solid ${salonBorder}`, borderRadius: 8, padding: "10px 12px", color: "#fff", fontSize: 14, boxSizing: "border-box" }} value={form.name} onChange={(event) => setForm((current) => ({ ...current, name: event.target.value }))} placeholder="e.g. Hair Cut & Blow Dry" /></div>
             <div style={{ marginBottom: 16 }}><label style={{ display: "block", fontSize: 13, color: salonMuted, marginBottom: 6 }}>Category</label><select style={{ width: "100%", background: salonBg, border: `1px solid ${salonBorder}`, borderRadius: 8, padding: "10px 12px", color: "#fff", fontSize: 14 }} value={form.category} onChange={(event) => setForm((current) => ({ ...current, category: event.target.value }))}>{salonServiceCategories.map((category) => <option key={category}>{category}</option>)}</select></div>
@@ -152,7 +152,7 @@ export default function ServicesPage() {
             <div style={{ marginBottom: 16 }}><label style={{ display: "block", fontSize: 13, color: salonMuted, marginBottom: 6 }}>Status</label><select style={{ width: "100%", background: salonBg, border: `1px solid ${salonBorder}`, borderRadius: 8, padding: "10px 12px", color: "#fff", fontSize: 14 }} value={form.status} onChange={(event) => setForm((current) => ({ ...current, status: event.target.value }))}><option>Active</option><option>Inactive</option></select></div>
             <div style={{ display: "flex", gap: 12, marginTop: 24 }}>
               <button style={{ flex: 1, background: "#ec4899", color: "#fff", border: "none", borderRadius: 8, padding: "10px", fontSize: 14, fontWeight: 700, cursor: "pointer" }} onClick={handleAdd}>Save Service</button>
-              <button style={{ flex: 1, background: "rgba(255,255,255,.06)", border: "1px solid rgba(255,255,255,.1)", color: "#fff", borderRadius: 8, padding: "10px", fontSize: 14, cursor: "pointer" }} onClick={() => setShowModal(false)}>Cancel</button>
+              <button style={{ flex: 1, background: "rgba(var(--ink),.06)", border: "1px solid rgba(var(--ink),.1)", color: "var(--ink-solid, #fff)", borderRadius: 8, padding: "10px", fontSize: 14, cursor: "pointer" }} onClick={() => setShowModal(false)}>Cancel</button>
             </div>
           </div>
         </div>

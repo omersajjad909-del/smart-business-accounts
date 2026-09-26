@@ -60,15 +60,15 @@ export default function DonorsPage() {
   };
 
   const card = { background:bg, border:`1px solid ${border}`, borderRadius:12, padding:20 };
-  const inp = { background:"rgba(255,255,255,.05)", border:`1px solid ${border}`, borderRadius:8, padding:"10px 14px", color:"#fff", fontFamily:ff, width:"100%", boxSizing:"border-box" as const, fontSize:14 };
+  const inp = { background:"rgba(var(--ink),.05)", border:`1px solid ${border}`, borderRadius:8, padding:"10px 14px", color:"var(--ink-solid, #fff)", fontFamily:ff, width:"100%", boxSizing:"border-box" as const, fontSize:14 };
   const btn = (c:string) => ({ background:c, border:"none", borderRadius:8, padding:"10px 20px", color:"#fff", fontFamily:ff, cursor:"pointer", fontSize:14, fontWeight:600 });
 
   return (
-    <div style={{ fontFamily:ff, color:"#fff", padding: isMobile ? "12px" : "24px", minHeight:"100vh", background:"#0f0f0f" }}>
+    <div style={{ fontFamily:ff, color:"var(--ink-solid, #fff)", padding: isMobile ? "12px" : "24px", minHeight:"100vh", background:"var(--dk-0f0f0f, #0f0f0f)" }}>
       <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:24 }}>
         <div>
           <h1 style={{ margin:0, fontSize:24, fontWeight:700 }}>Donor Management</h1>
-          <p style={{ margin:"4px 0 0", color:"rgba(255,255,255,.5)", fontSize:14 }}>Manage donor relationships & contributions</p>
+          <p style={{ margin:"4px 0 0", color:"rgba(var(--ink),.5)", fontSize:14 }}>Manage donor relationships & contributions</p>
         </div>
         <button onClick={()=>setShowModal(true)} style={btn("#6366f1")}>+ Add Donor</button>
       </div>
@@ -82,7 +82,7 @@ export default function DonorsPage() {
         ].map(s=>(
           <div key={s.label} style={{ ...card, textAlign:"center" }}>
             <div style={{ fontSize:24, fontWeight:700, color:s.color }}>{s.value}</div>
-            <div style={{ color:"rgba(255,255,255,.5)", fontSize:13, marginTop:4 }}>{s.label}</div>
+            <div style={{ color:"rgba(var(--ink),.5)", fontSize:13, marginTop:4 }}>{s.label}</div>
           </div>
         ))}
       </div>
@@ -93,10 +93,10 @@ export default function DonorsPage() {
         ))}
       </div>
 
-      {loading && <div style={{ textAlign:"center", padding:40, color:"rgba(255,255,255,.4)" }}>Loading...</div>}
+      {loading && <div style={{ textAlign:"center", padding:40, color:"rgba(var(--ink),.4)" }}>Loading...</div>}
 
       <div style={{ display:"flex", flexDirection:"column", gap:10 }}>
-        {!loading && filtered.length === 0 && <div style={{ ...card, textAlign:"center", padding:40, color:"rgba(255,255,255,.25)" }}>No donors found.</div>}
+        {!loading && filtered.length === 0 && <div style={{ ...card, textAlign:"center", padding:40, color:"rgba(var(--ink),.25)" }}>No donors found.</div>}
         {filtered.map(d=>{
           const tier = getTier(d.totalDonated);
           return (
@@ -108,15 +108,15 @@ export default function DonorsPage() {
                 <div style={{ display:"flex", alignItems:"center", gap:10, marginBottom:4 }}>
                   <span style={{ fontWeight:700 }}>{d.name}</span>
                   <span style={{ background:(typeColor[d.type]||"#6366f1")+"22", color:typeColor[d.type]||"#6366f1", border:`1px solid ${typeColor[d.type]||"#6366f1"}44`, borderRadius:20, padding:"2px 8px", fontSize:11, fontWeight:600, textTransform:"capitalize" }}>{d.type}</span>
-                  <span style={{ background:"rgba(255,255,255,.07)", borderRadius:20, padding:"2px 8px", fontSize:11, fontWeight:700, color:tier.color }}>🏆 {tier.label}</span>
+                  <span style={{ background:"rgba(var(--ink),.07)", borderRadius:20, padding:"2px 8px", fontSize:11, fontWeight:700, color:tier.color }}>🏆 {tier.label}</span>
                   {d.status==="inactive" && <span style={{ background:"rgba(107,114,128,.2)", color:"#6b7280", borderRadius:20, padding:"2px 8px", fontSize:11 }}>Inactive</span>}
                 </div>
-                <div style={{ fontSize:13, color:"rgba(255,255,255,.5)" }}>{d.donorId} · {d.phone} · {d.email}</div>
-                <div style={{ fontSize:12, color:"rgba(255,255,255,.4)", marginTop:2 }}>📂 {d.category} · {freqLabel[d.frequency] || d.frequency}</div>
+                <div style={{ fontSize:13, color:"rgba(var(--ink),.5)" }}>{d.donorId} · {d.phone} · {d.email}</div>
+                <div style={{ fontSize:12, color:"rgba(var(--ink),.4)", marginTop:2 }}>📂 {d.category} · {freqLabel[d.frequency] || d.frequency}</div>
               </div>
               <div style={{ textAlign:"right" }}>
                 <div style={{ fontSize:16, fontWeight:700, color:"#22c55e" }}>Rs. {d.totalDonated.toLocaleString()}</div>
-                <div style={{ fontSize:12, color:"rgba(255,255,255,.4)" }}>Total donated</div>
+                <div style={{ fontSize:12, color:"rgba(var(--ink),.4)" }}>Total donated</div>
                 <div style={{ fontSize:13, color:"#60a5fa", marginTop:2 }}>Last: Rs. {d.lastDonation.toLocaleString()}</div>
               </div>
               <div style={{ display:"flex", gap:6, flexShrink:0 }}>
@@ -130,23 +130,23 @@ export default function DonorsPage() {
 
       {showModal && (
         <div style={{ position:"fixed", inset:0, background:"rgba(0,0,0,.7)", display:"flex", alignItems:"center", justifyContent:"center", zIndex:1000 }}>
-          <div style={{ background:"#1a1a2e", border:`1px solid ${border}`, borderRadius:16, padding:28, width:500 }}>
+          <div style={{ background:"var(--dk-1a1a2e, #1a1a2e)", border:`1px solid ${border}`, borderRadius:16, padding:28, width:500 }}>
             <h2 style={{ margin:"0 0 20px", fontSize:18 }}>Add Donor</h2>
             <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:12 }}>
               {[["Donor ID","donorId"],["Full Name","name"],["Phone","phone"],["Email","email"],["Category","category"]].map(([lbl,key])=>(
                 <div key={key}>
-                  <label style={{ fontSize:12, color:"rgba(255,255,255,.5)", display:"block", marginBottom:4 }}>{lbl}</label>
+                  <label style={{ fontSize:12, color:"rgba(var(--ink),.5)", display:"block", marginBottom:4 }}>{lbl}</label>
                   <input value={(form as Record<string,string>)[key]} onChange={e=>setForm(p=>({...p,[key]:e.target.value}))} style={inp} />
                 </div>
               ))}
               <div>
-                <label style={{ fontSize:12, color:"rgba(255,255,255,.5)", display:"block", marginBottom:4 }}>Type</label>
+                <label style={{ fontSize:12, color:"rgba(var(--ink),.5)", display:"block", marginBottom:4 }}>Type</label>
                 <select value={form.type} onChange={e=>setForm(p=>({...p,type:e.target.value}))} style={inp}>
                   {["individual","corporate","government","foreign"].map(t=><option key={t} value={t}>{t}</option>)}
                 </select>
               </div>
               <div>
-                <label style={{ fontSize:12, color:"rgba(255,255,255,.5)", display:"block", marginBottom:4 }}>Frequency</label>
+                <label style={{ fontSize:12, color:"rgba(var(--ink),.5)", display:"block", marginBottom:4 }}>Frequency</label>
                 <select value={form.frequency} onChange={e=>setForm(p=>({...p,frequency:e.target.value}))} style={inp}>
                   {["one_time","monthly","annual"].map(f=><option key={f} value={f}>{freqLabel[f]}</option>)}
                 </select>
@@ -154,7 +154,7 @@ export default function DonorsPage() {
             </div>
             <div style={{ display:"flex", gap:12, marginTop:20 }}>
               <button onClick={addDonor} style={{ background:"#6366f1", border:"none", borderRadius:8, padding:"10px 20px", color:"#fff", fontFamily:ff, cursor:"pointer", fontSize:14, fontWeight:600, flex:1 }}>Add Donor</button>
-              <button onClick={()=>setShowModal(false)} style={{ background:"rgba(255,255,255,.07)", border:"none", borderRadius:8, padding:"10px 20px", color:"#fff", fontFamily:ff, cursor:"pointer", fontSize:14, fontWeight:600, flex:1 }}>Cancel</button>
+              <button onClick={()=>setShowModal(false)} style={{ background:"rgba(var(--ink),.07)", border:"none", borderRadius:8, padding:"10px 20px", color:"var(--ink-solid, #fff)", fontFamily:ff, cursor:"pointer", fontSize:14, fontWeight:600, flex:1 }}>Cancel</button>
             </div>
           </div>
         </div>

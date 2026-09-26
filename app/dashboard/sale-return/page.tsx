@@ -323,7 +323,7 @@ export default function SalesReturnPage() {
                   <div style={{ background: PANEL, border: `1px solid ${BORDER}`, borderRadius: 12, padding: 18 }}>
                     <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 12, color: TEXT }}>Your Business</div>
                     {companyInfo ? (
-                      <div style={{ padding: isMobile ? "8px 8px" : "10px 12px", background: "var(--panel-bg-2,rgba(255,255,255,0.03))", borderRadius: 8, border: `1px solid ${BORDER}` }}>
+                      <div style={{ padding: isMobile ? "8px 8px" : "10px 12px", background: "var(--panel-bg-2,rgba(var(--ink),0.03))", borderRadius: 8, border: `1px solid ${BORDER}` }}>
                         <div style={{ fontWeight: 700, fontSize: 14, marginBottom: 4 }}>{companyInfo.name}</div>
                         {companyInfo.address && <div style={{ fontSize: 12, color: MUTED, marginBottom: 3 }}>{companyInfo.address}</div>}
                         {companyInfo.phone && <div style={{ fontSize: 12, color: MUTED }}>{companyInfo.phone}</div>}
@@ -539,7 +539,7 @@ export default function SalesReturnPage() {
       {/* Print Area */}
       {preview && savedData && (
         <div className="print-area" style={{ fontFamily: "'Outfit','Arial',sans-serif", fontSize: 13, color: "#000", background: "#fff", padding: "8mm 10mm" }}>
-          <div style={{ textAlign: "center", borderBottom: "3px solid #000", paddingBottom: 14, marginBottom: 20 }}>
+          <div style={{ textAlign: "center", borderBottom: "3px solid var(--dkb-000000, #000)", paddingBottom: 14, marginBottom: 20 }}>
             <div style={{ fontSize: 24, fontWeight: 900, letterSpacing: 1 }}>SALES RETURN VOUCHER</div>
             <div style={{ fontSize: 12, color: "#333", marginTop: 4 }}>Date: {savedData.date} &nbsp;|&nbsp; Voucher No: {savedData.returnNo}</div>
           </div>
@@ -552,7 +552,7 @@ export default function SalesReturnPage() {
           </div>
           <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 12, marginBottom: 18 }}>
             <thead>
-              <tr style={{ borderTop: "2px solid #000", borderBottom: "2px solid #000", background: "#f0f0f0" }}>
+              <tr style={{ borderTop: "2px solid var(--dkb-000000, #000)", borderBottom: "2px solid var(--dkb-000000, #000)", background: "#f0f0f0" }}>
                 <th style={{ padding: isMobile ? "8px 8px" : "8px 10px", textAlign: "left" }}>Description</th>
                 <th style={{ padding: isMobile ? "8px 8px" : "8px 10px", textAlign: "center", width: 60 }}>Qty</th>
                 <th style={{ padding: isMobile ? "8px 8px" : "8px 10px", textAlign: "right", width: 90 }}>Rate</th>
@@ -574,12 +574,12 @@ export default function SalesReturnPage() {
             <div style={{ width: 240, fontSize: 12 }}>
               <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 5 }}><span>Subtotal:</span><span>{fmt(savedData.total)}</span></div>
               {savedData.freight > 0 && <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 5 }}><span>Freight:</span><span>{fmt(savedData.freight)}</span></div>}
-              <div style={{ display: "flex", justifyContent: "space-between", borderTop: "3px solid #000", paddingTop: 8, fontWeight: 900, fontSize: 16 }}><span>Net Total:</span><span>{fmt(savedData.netTotal)}</span></div>
+              <div style={{ display: "flex", justifyContent: "space-between", borderTop: "3px solid var(--dkb-000000, #000)", paddingTop: 8, fontWeight: 900, fontSize: 16 }}><span>Net Total:</span><span>{fmt(savedData.netTotal)}</span></div>
             </div>
           </div>
           <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: 40 }}>
             {["Prepared By", "Received By"].map(l => (
-              <div key={l}><div style={{ borderTop: "1px solid #000", paddingTop: 6, fontSize: 11, color: "#444" }}>{l}</div></div>
+              <div key={l}><div style={{ borderTop: "1px solid var(--dkb-000000, #000)", paddingTop: 6, fontSize: 11, color: "#444" }}>{l}</div></div>
             ))}
           </div>
         </div>

@@ -94,7 +94,7 @@ const MARKETING_ASSETS = [
 
 function StatCard({ label, value, sub, color, icon }: { label: string; value: string; sub?: string; color: string; icon: string }) {
   return (
-    <div style={{ background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.08)", borderRadius: 14, padding: isMobile ? "12px 11px" : "20px 24px", display: "flex", flexDirection: "column", gap: 8 }}>
+    <div style={{ background: "rgba(var(--ink),.04)", border: "1px solid rgba(var(--ink),.08)", borderRadius: 14, padding: isMobile ? "12px 11px" : "20px 24px", display: "flex", flexDirection: "column", gap: 8 }}>
       <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
         <span style={{ fontSize: 22 }}>{icon}</span>
         <span style={{ fontSize: 13, color: "#94a3b8", fontWeight: 500 }}>{label}</span>
@@ -173,7 +173,7 @@ export default function AffiliateDashboardPage() {
 
   const s: React.CSSProperties = {
     minHeight: "100vh",
-    background: "linear-gradient(135deg,#080c1e 0%,#0d1035 60%,#080c1e 100%)",
+    background: "linear-gradient(135deg,var(--dk-080c1e, #080c1e) 0%,var(--dk-0d1035, #0d1035) 60%,var(--dk-080c1e, #080c1e) 100%)",
     fontFamily: "'Outfit','Inter',sans-serif",
     color: "#e2e8f0",
     padding: isMobile ? "16px" : "32px",
@@ -271,7 +271,7 @@ export default function AffiliateDashboardPage() {
       )}
 
       {/* Tabs */}
-      <div style={{ display: "flex", gap: 4, borderBottom: "1px solid rgba(255,255,255,.08)", marginBottom: 28, overflowX: "auto" }}>
+      <div style={{ display: "flex", gap: 4, borderBottom: "1px solid rgba(var(--ink),.08)", marginBottom: 28, overflowX: "auto" }}>
         {TABS.map(t => (
           <button key={t.key} onClick={() => setTab(t.key)}
             style={{ padding: "10px 18px", background: "none", border: "none", color: tab === t.key ? "#818cf8" : "#64748b", borderBottom: tab === t.key ? "2px solid #818cf8" : "2px solid transparent", cursor: "pointer", fontSize: 14, fontWeight: 600, whiteSpace: "nowrap", transition: "color .2s" }}>
@@ -293,7 +293,7 @@ export default function AffiliateDashboardPage() {
           </div>
 
           {/* Commission Tier Progress */}
-          <div style={{ background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.08)", borderRadius: 14, padding: 24, marginBottom: 24 }}>
+          <div style={{ background: "rgba(var(--ink),.04)", border: "1px solid rgba(var(--ink),.08)", borderRadius: 14, padding: 24, marginBottom: 24 }}>
             <h3 style={{ margin: "0 0 20px", fontSize: 16, fontWeight: 700 }}>Commission Tier</h3>
             <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 12 }}>
               {[
@@ -304,7 +304,7 @@ export default function AffiliateDashboardPage() {
               ].map(t => {
                 const active = affiliate.tier === t.tier;
                 return (
-                  <div key={t.tier} style={{ background: active ? `rgba(${t.color === "#818cf8" ? "129,140,248" : t.color === "#34d399" ? "52,211,153" : t.color === "#fbbf24" ? "251,191,36" : "196,181,253"},.12)` : "rgba(255,255,255,.02)", border: `1px solid ${active ? t.color + "44" : "rgba(255,255,255,.06)"}`, borderRadius: 10, padding: "14px 12px", textAlign: "center" }}>
+                  <div key={t.tier} style={{ background: active ? `rgba(${t.color === "#818cf8" ? "129,140,248" : t.color === "#34d399" ? "52,211,153" : t.color === "#fbbf24" ? "251,191,36" : "196,181,253"},.12)` : "rgba(var(--ink),.02)", border: `1px solid ${active ? t.color + "44" : "rgba(var(--ink),.06)"}`, borderRadius: 10, padding: "14px 12px", textAlign: "center" }}>
                     <div style={{ fontSize: 20, marginBottom: 4 }}>{t.icon}</div>
                     <div style={{ fontSize: 13, fontWeight: 700, color: active ? t.color : "#94a3b8" }}>{t.tier}</div>
                     <div style={{ fontSize: 20, fontWeight: 800, color: active ? t.color : "#64748b", marginTop: 4 }}>{t.rate}</div>
@@ -318,7 +318,7 @@ export default function AffiliateDashboardPage() {
 
           {/* Recent Conversions preview */}
           {affiliate.conversions.length > 0 && (
-            <div style={{ background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.08)", borderRadius: 14, padding: 24 }}>
+            <div style={{ background: "rgba(var(--ink),.04)", border: "1px solid rgba(var(--ink),.08)", borderRadius: 14, padding: 24 }}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
                 <h3 style={{ margin: 0, fontSize: 16, fontWeight: 700 }}>Recent Conversions</h3>
                 <button onClick={() => setTab("conversions")} style={{ background: "none", border: "none", color: "#818cf8", cursor: "pointer", fontSize: 13 }}>View all →</button>
@@ -337,7 +337,7 @@ export default function AffiliateDashboardPage() {
                   {affiliate.conversions.slice(0, 5).map(c => {
                     const st = CONVERSION_STATUS[c.status] || { label: c.status, color: "#94a3b8" };
                     return (
-                      <tr key={c.id} style={{ borderTop: "1px solid rgba(255,255,255,.05)" }}>
+                      <tr key={c.id} style={{ borderTop: "1px solid rgba(var(--ink),.05)" }}>
                         <td style={{ padding: "10px 12px", fontSize: 14 }}>{c.customerName || c.customerEmail}</td>
                         <td style={{ padding: "10px 12px", fontSize: 13, color: "#94a3b8" }}>{c.plan || "—"}</td>
                         <td style={{ padding: "10px 12px", fontSize: 14, color: "#34d399", fontWeight: 600 }}>${c.commissionAmt.toFixed(2)}</td>
@@ -354,7 +354,7 @@ export default function AffiliateDashboardPage() {
           )}
 
           {affiliate.conversions.length === 0 && affiliate.status === "APPROVED" && (
-            <div style={{ background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.08)", borderRadius: 14, padding: 40, textAlign: "center" }}>
+            <div style={{ background: "rgba(var(--ink),.04)", border: "1px solid rgba(var(--ink),.08)", borderRadius: 14, padding: 40, textAlign: "center" }}>
               <div style={{ fontSize: 48, marginBottom: 12 }}>🔗</div>
               <div style={{ fontSize: 16, fontWeight: 600, marginBottom: 8 }}>Share your referral link to start earning</div>
               <div style={{ color: "#64748b", fontSize: 14, marginBottom: 20 }}>Copy your link above and share with business owners, accountants, and consultants.</div>
@@ -368,7 +368,7 @@ export default function AffiliateDashboardPage() {
 
       {/* ── CONVERSIONS ── */}
       {tab === "conversions" && (
-        <div style={{ background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.08)", borderRadius: 14, padding: 24 }}>
+        <div style={{ background: "rgba(var(--ink),.04)", border: "1px solid rgba(var(--ink),.08)", borderRadius: 14, padding: 24 }}>
           <h3 style={{ margin: "0 0 20px", fontSize: 16, fontWeight: 700 }}>All Conversions ({affiliate.conversions.length})</h3>
           {affiliate.conversions.length === 0 ? (
             <div style={{ textAlign: "center", padding: 40, color: "#64748b" }}>No conversions yet. Share your link to get started!</div>
@@ -389,7 +389,7 @@ export default function AffiliateDashboardPage() {
                 {affiliate.conversions.map(c => {
                   const st = CONVERSION_STATUS[c.status] || { label: c.status, color: "#94a3b8" };
                   return (
-                    <tr key={c.id} style={{ borderTop: "1px solid rgba(255,255,255,.05)" }}>
+                    <tr key={c.id} style={{ borderTop: "1px solid rgba(var(--ink),.05)" }}>
                       <td style={{ padding: "10px 12px", fontSize: 14, fontWeight: 500 }}>{c.customerName || "—"}</td>
                       <td style={{ padding: "10px 12px", fontSize: 13, color: "#94a3b8" }}>{c.customerEmail}</td>
                       <td style={{ padding: "10px 12px", fontSize: 13, color: "#94a3b8" }}>{c.plan || "—"}</td>
@@ -417,7 +417,7 @@ export default function AffiliateDashboardPage() {
             <StatCard label="Total Earned"     value={`$${affiliate.totalEarned.toFixed(2)}`}     sub="Lifetime"            color="#818cf8" icon="💰" />
           </div>
 
-          <div style={{ background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.08)", borderRadius: 14, padding: 24 }}>
+          <div style={{ background: "rgba(var(--ink),.04)", border: "1px solid rgba(var(--ink),.08)", borderRadius: 14, padding: 24 }}>
             <h3 style={{ margin: "0 0 20px", fontSize: 16, fontWeight: 700 }}>Payout History</h3>
             {affiliate.payouts.length === 0 ? (
               <div style={{ textAlign: "center", padding: 40, color: "#64748b" }}>
@@ -438,7 +438,7 @@ export default function AffiliateDashboardPage() {
                 </thead>
                 <tbody>
                   {affiliate.payouts.map(p => (
-                    <tr key={p.id} style={{ borderTop: "1px solid rgba(255,255,255,.05)" }}>
+                    <tr key={p.id} style={{ borderTop: "1px solid rgba(var(--ink),.05)" }}>
                       <td style={{ padding: "10px 12px", fontSize: 14 }}>{p.month}</td>
                       <td style={{ padding: "10px 12px", fontSize: 14, color: "#34d399", fontWeight: 700 }}>${p.amount.toFixed(2)}</td>
                       <td style={{ padding: "10px 12px", fontSize: 13, color: "#94a3b8", textTransform: "capitalize" }}>{p.method}</td>
@@ -464,7 +464,7 @@ export default function AffiliateDashboardPage() {
           </div>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(280px,1fr))", gap: 16 }}>
             {MARKETING_ASSETS.map((a, i) => (
-              <div key={i} style={{ background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.08)", borderRadius: 14, padding: "20px 20px 16px", display: "flex", flexDirection: "column", gap: 10 }}>
+              <div key={i} style={{ background: "rgba(var(--ink),.04)", border: "1px solid rgba(var(--ink),.08)", borderRadius: 14, padding: "20px 20px 16px", display: "flex", flexDirection: "column", gap: 10 }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
                   <span style={{ fontSize: 24 }}>{a.icon}</span>
                   <span style={{ fontSize: 11, background: "rgba(99,102,241,.15)", color: "#818cf8", padding: "2px 8px", borderRadius: 20, fontWeight: 600 }}>{a.type}</span>
@@ -486,7 +486,7 @@ export default function AffiliateDashboardPage() {
       {/* ── SETTINGS ── */}
       {tab === "settings" && (
         <div style={{ maxWidth: 560 }}>
-          <div style={{ background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.08)", borderRadius: 14, padding: 24, marginBottom: 20 }}>
+          <div style={{ background: "rgba(var(--ink),.04)", border: "1px solid rgba(var(--ink),.08)", borderRadius: 14, padding: 24, marginBottom: 20 }}>
             <h3 style={{ margin: "0 0 20px", fontSize: 16, fontWeight: 700 }}>Account Info</h3>
             <div style={{ display: "grid", gap: 14 }}>
               {[
@@ -496,7 +496,7 @@ export default function AffiliateDashboardPage() {
                 { label: "Commission Rate",value: `${(affiliate.commissionRate * 100).toFixed(0)}%` },
                 { label: "Member Since",   value: new Date(affiliate.approvedAt || "").toLocaleDateString("en-GB") },
               ].map(f => (
-                <div key={f.label} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px solid rgba(255,255,255,.05)", paddingBottom: 12 }}>
+                <div key={f.label} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px solid rgba(var(--ink),.05)", paddingBottom: 12 }}>
                   <span style={{ fontSize: 13, color: "#64748b" }}>{f.label}</span>
                   <span style={{ fontSize: 14, fontWeight: 500 }}>{f.value}</span>
                 </div>
@@ -504,14 +504,14 @@ export default function AffiliateDashboardPage() {
             </div>
           </div>
 
-          <div style={{ background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.08)", borderRadius: 14, padding: 24 }}>
+          <div style={{ background: "rgba(var(--ink),.04)", border: "1px solid rgba(var(--ink),.08)", borderRadius: 14, padding: 24 }}>
             <h3 style={{ margin: "0 0 20px", fontSize: 16, fontWeight: 700 }}>Payout Settings</h3>
             <div style={{ marginBottom: 16 }}>
               <label style={{ fontSize: 13, color: "#94a3b8", display: "block", marginBottom: 8 }}>Preferred Payout Method</label>
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(140px,1fr))", gap: 8 }}>
                 {PAYOUT_METHODS.map(m => (
                   <button key={m.value} onClick={() => setPayoutMethod(m.value)}
-                    style={{ padding: "10px 12px", background: payoutMethod === m.value ? "rgba(99,102,241,.2)" : "rgba(255,255,255,.04)", border: `1px solid ${payoutMethod === m.value ? "rgba(99,102,241,.5)" : "rgba(255,255,255,.08)"}`, borderRadius: 10, color: payoutMethod === m.value ? "#818cf8" : "#94a3b8", cursor: "pointer", fontSize: 13, fontWeight: 600, textAlign: "center" }}>
+                    style={{ padding: "10px 12px", background: payoutMethod === m.value ? "rgba(99,102,241,.2)" : "rgba(var(--ink),.04)", border: `1px solid ${payoutMethod === m.value ? "rgba(99,102,241,.5)" : "rgba(var(--ink),.08)"}`, borderRadius: 10, color: payoutMethod === m.value ? "#818cf8" : "#94a3b8", cursor: "pointer", fontSize: 13, fontWeight: 600, textAlign: "center" }}>
                     <div style={{ fontSize: 18, marginBottom: 2 }}>{m.icon}</div>
                     {m.label}
                   </button>
@@ -525,7 +525,7 @@ export default function AffiliateDashboardPage() {
                 onChange={e => setPayoutDetails(e.target.value)}
                 placeholder={payoutMethod === "bank" ? "Bank name, account #, IBAN…" : payoutMethod === "jazzcash" || payoutMethod === "easypaisa" ? "Mobile number…" : payoutMethod === "paypal" ? "PayPal email…" : payoutMethod === "crypto" ? "USDT TRC20 / ERC20 wallet address…" : "Payout details…"}
                 rows={3}
-                style={{ width: "100%", background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.1)", borderRadius: 10, color: "#e2e8f0", padding: "10px 14px", fontSize: 13, resize: "vertical", fontFamily: "inherit", boxSizing: "border-box" }}
+                style={{ width: "100%", background: "rgba(var(--ink),.04)", border: "1px solid rgba(var(--ink),.1)", borderRadius: 10, color: "#e2e8f0", padding: "10px 14px", fontSize: 13, resize: "vertical", fontFamily: "inherit", boxSizing: "border-box" }}
               />
             </div>
             <div style={{ display: "flex", alignItems: "center", gap: 12 }}>

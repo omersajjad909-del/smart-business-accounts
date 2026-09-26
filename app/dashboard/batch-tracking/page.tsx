@@ -12,9 +12,9 @@ const MUTED = "rgba(255,255,255,.45)";
 
 const inp: React.CSSProperties = {
   width: "100%", boxSizing: "border-box",
-  background: "rgba(255,255,255,.05)", border: `1px solid ${BORDER}`,
+  background: "rgba(var(--ink),.05)", border: `1px solid ${BORDER}`,
   borderRadius: 8, padding: "9px 12px", fontSize: 13,
-  color: "#fff", fontFamily: ff, outline: "none",
+  color: "var(--ink-solid, #fff)", fontFamily: ff, outline: "none",
 };
 const lbl: React.CSSProperties = { fontSize: 11, fontWeight: 700, color: MUTED, textTransform: "uppercase" as const, letterSpacing: ".06em", display: "block", marginBottom: 5 };
 
@@ -101,7 +101,7 @@ export default function BatchTrackingPage() {
   const td: React.CSSProperties = { padding: "12px 14px", fontSize: 13, borderBottom: `1px solid ${BORDER}` };
 
   return (
-    <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", fontFamily: ff, color: "#fff", minHeight: "100vh" }}>
+    <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", fontFamily: ff, color: "var(--ink-solid, #fff)", minHeight: "100vh" }}>
 
       {/* Header */}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 28 }}>
@@ -132,7 +132,7 @@ export default function BatchTrackingPage() {
       {/* Tabs */}
       <div style={{ display: "flex", gap: 8, marginBottom: 20 }}>
         {(["batches", "serials"] as Tab[]).map(t => (
-          <button key={t} onClick={() => setTab(t)} style={{ padding: "8px 20px", borderRadius: 8, border: "none", fontSize: 13, fontWeight: 700, cursor: "pointer", background: tab === t ? ACCENT : "rgba(255,255,255,.06)", color: tab === t ? "#fff" : MUTED }}>
+          <button key={t} onClick={() => setTab(t)} style={{ padding: "8px 20px", borderRadius: 8, border: "none", fontSize: 13, fontWeight: 700, cursor: "pointer", background: tab === t ? ACCENT : "rgba(var(--ink),.06)", color: tab === t ? "#fff" : MUTED }}>
             {t === "batches" ? "Batch Records" : "Serial Numbers"}
           </button>
         ))}
@@ -209,7 +209,7 @@ export default function BatchTrackingPage() {
       {/* Modal */}
       {showModal && (
         <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.6)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 50 }}>
-          <div style={{ background: "#0f172a", border: `1px solid ${BORDER}`, borderRadius: 16, padding: 28, width: 440, fontFamily: ff }}>
+          <div style={{ background: "var(--dk-0f172a, #0f172a)", border: `1px solid ${BORDER}`, borderRadius: 16, padding: 28, width: 440, fontFamily: ff }}>
             <h2 style={{ fontSize: 17, fontWeight: 800, margin: "0 0 20px" }}>
               {tab === "batches" ? "Add Batch Record" : "Add Serial Number"}
             </h2>

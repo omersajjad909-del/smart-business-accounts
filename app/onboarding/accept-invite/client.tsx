@@ -60,7 +60,7 @@ export default function ClientAcceptInvite() {
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    background: "linear-gradient(135deg, #04061a 0%, #07091f 50%, #0d0f2b 100%)",
+    background: "linear-gradient(135deg, var(--dk-04061a, #04061a) 0%, var(--dk-07091f, #07091f) 50%, var(--dk-0d0f2b, #0d0f2b) 100%)",
     fontFamily: "'Outfit', 'Inter', sans-serif",
     padding: "24px",
   };
@@ -69,8 +69,8 @@ export default function ClientAcceptInvite() {
     width: "100%",
     maxWidth: 420,
     borderRadius: 20,
-    background: "rgba(255,255,255,0.04)",
-    border: "1px solid rgba(255,255,255,0.1)",
+    background: "rgba(var(--ink),0.04)",
+    border: "1px solid rgba(var(--ink),0.1)",
     backdropFilter: "blur(20px)",
     padding: "36px 32px",
     boxShadow: "0 24px 80px rgba(0,0,0,0.5)",
@@ -78,14 +78,14 @@ export default function ClientAcceptInvite() {
 
   const label: React.CSSProperties = {
     display: "block", fontSize: 11, fontWeight: 700,
-    color: "rgba(255,255,255,0.45)", letterSpacing: ".08em",
+    color: "rgba(var(--ink),0.45)", letterSpacing: ".08em",
     textTransform: "uppercase", marginBottom: 6,
   };
 
   const input: React.CSSProperties = {
     width: "100%", padding: "11px 14px", borderRadius: 10,
-    background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)",
-    color: "white", fontSize: 14, outline: "none", boxSizing: "border-box",
+    background: "rgba(var(--ink),0.06)", border: "1px solid rgba(var(--ink),0.1)",
+    color: "var(--ink-solid, white)", fontSize: 14, outline: "none", boxSizing: "border-box",
     fontFamily: "inherit",
   };
 
@@ -93,7 +93,7 @@ export default function ClientAcceptInvite() {
     ...input,
     background: "rgba(99,102,241,0.08)",
     border: "1px solid rgba(99,102,241,0.25)",
-    color: "rgba(255,255,255,0.7)",
+    color: "rgba(var(--ink),0.7)",
     cursor: "default",
   };
 
@@ -102,7 +102,7 @@ export default function ClientAcceptInvite() {
       <div style={{ textAlign: "center" }}>
         <div style={{ width: 36, height: 36, border: "3px solid rgba(99,102,241,0.2)", borderTopColor: "#6366f1", borderRadius: "50%", animation: "spin .7s linear infinite", margin: "0 auto 16px" }} />
         <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
-        <div style={{ color: "rgba(255,255,255,0.4)", fontSize: 13 }}>Loading invite…</div>
+        <div style={{ color: "rgba(var(--ink),0.4)", fontSize: 13 }}>Loading invite…</div>
       </div>
     </div>
   );
@@ -113,7 +113,7 @@ export default function ClientAcceptInvite() {
         <div style={{ textAlign: "center" }}>
           <div style={{ fontSize: 40, marginBottom: 12 }}>❌</div>
           <div style={{ fontSize: 18, fontWeight: 800, color: "#f87171", marginBottom: 8 }}>Invalid Invite</div>
-          <div style={{ fontSize: 13, color: "rgba(255,255,255,0.45)" }}>{inviteError}</div>
+          <div style={{ fontSize: 13, color: "rgba(var(--ink),0.45)" }}>{inviteError}</div>
         </div>
       </div>
     </div>
@@ -131,19 +131,19 @@ export default function ClientAcceptInvite() {
               <rect x="6" y="11.5" width="6" height="2.5" rx="1.25" fill="white" opacity=".45"/>
             </svg>
           </div>
-          <span style={{ fontSize: 18, fontWeight: 800, color: "white", letterSpacing: "-.3px" }}>FinovaOS</span>
+          <span style={{ fontSize: 18, fontWeight: 800, color: "var(--ink-solid, white)", letterSpacing: "-.3px" }}>FinovaOS</span>
         </div>
 
         <div style={{ marginBottom: 24 }}>
-          <h1 style={{ fontSize: 22, fontWeight: 900, color: "white", margin: "0 0 6px", letterSpacing: "-.4px" }}>Accept Invite</h1>
-          <p style={{ fontSize: 13, color: "rgba(255,255,255,0.4)", margin: 0 }}>Set up your account to join the team.</p>
+          <h1 style={{ fontSize: 22, fontWeight: 900, color: "var(--ink-solid, white)", margin: "0 0 6px", letterSpacing: "-.4px" }}>Accept Invite</h1>
+          <p style={{ fontSize: 13, color: "rgba(var(--ink),0.4)", margin: 0 }}>Set up your account to join the team.</p>
         </div>
 
         {done ? (
           <div style={{ textAlign: "center", padding: "20px 0" }}>
             <div style={{ fontSize: 40, marginBottom: 12 }}>✅</div>
             <div style={{ fontSize: 16, fontWeight: 700, color: "#34d399", marginBottom: 6 }}>Account created!</div>
-            <div style={{ fontSize: 13, color: "rgba(255,255,255,0.4)" }}>Redirecting to login…</div>
+            <div style={{ fontSize: 13, color: "rgba(var(--ink),0.4)" }}>Redirecting to login…</div>
           </div>
         ) : (
           <form onSubmit={submit} style={{ display: "flex", flexDirection: "column", gap: 16 }}>

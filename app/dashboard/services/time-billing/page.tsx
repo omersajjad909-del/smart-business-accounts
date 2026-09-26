@@ -81,11 +81,11 @@ export default function ServiceTimeBillingPage() {
   }
 
   return (
-    <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", fontFamily: ff, color: "#fff", minHeight: "100vh" }}>
+    <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", fontFamily: ff, color: "var(--ink-solid, #fff)", minHeight: "100vh" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24 }}>
         <div>
           <h1 style={{ fontSize: 22, fontWeight: 800, margin: "0 0 4px" }}>Time Billing</h1>
-          <p style={{ fontSize: 13, color: "rgba(255,255,255,.42)", margin: 0 }}>
+          <p style={{ fontSize: 13, color: "rgba(var(--ink),.42)", margin: 0 }}>
             Capture consultant hours, billable rates, and ready-to-invoice effort.
           </p>
         </div>
@@ -105,7 +105,7 @@ export default function ServiceTimeBillingPage() {
           { label: "Draft Entries", value: draftCount, color: "#f97316" },
         ].map((card) => (
           <div key={card.label} style={{ background: bg, border: `1px solid ${border}`, borderRadius: 14, padding: isMobile ? "12px 10px" : "18px 20px" }}>
-            <div style={{ fontSize: 11, color: "rgba(255,255,255,.4)", marginBottom: 6, textTransform: "uppercase", letterSpacing: ".06em" }}>
+            <div style={{ fontSize: 11, color: "rgba(var(--ink),.4)", marginBottom: 6, textTransform: "uppercase", letterSpacing: ".06em" }}>
               {card.label}
             </div>
             <div style={{ fontSize: 24, fontWeight: 800, color: card.color }}>{card.value}</div>
@@ -121,7 +121,7 @@ export default function ServiceTimeBillingPage() {
           >
             <div>
               <div style={{ fontSize: 15, fontWeight: 800 }}>{entry.consultant || "Unknown consultant"}</div>
-              <div style={{ fontSize: 12, color: "rgba(255,255,255,.42)", marginTop: 4 }}>
+              <div style={{ fontSize: 12, color: "rgba(var(--ink),.42)", marginTop: 4 }}>
                 {entry.entryNo} - {entry.projectCode || "No project"} - {entry.billableHours} hrs
               </div>
             </div>
@@ -129,27 +129,27 @@ export default function ServiceTimeBillingPage() {
               <div style={{ fontSize: 12, fontWeight: 700, color: entry.status === "approved" ? "#22c55e" : "#f59e0b" }}>
                 {entry.status.toUpperCase()}
               </div>
-              <div style={{ fontSize: 11, color: "rgba(255,255,255,.4)", marginTop: 4 }}>
+              <div style={{ fontSize: 11, color: "rgba(var(--ink),.4)", marginTop: 4 }}>
                 {entry.workDate} - Rs. {(entry.billableHours * entry.billingRate).toLocaleString()}
               </div>
             </div>
           </div>
         ))}
-        {!timesheetStore.loading && entries.length === 0 && <div style={{ color: "rgba(255,255,255,.3)" }}>No time entries recorded yet.</div>}
+        {!timesheetStore.loading && entries.length === 0 && <div style={{ color: "rgba(var(--ink),.3)" }}>No time entries recorded yet.</div>}
       </div>
 
       {showModal && (
         <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.72)", zIndex: 50, display: "flex", alignItems: "center", justifyContent: "center" }}>
-          <div style={{ width: 520, background: "#161b27", border: `1px solid ${border}`, borderRadius: 16, padding: 28 }}>
+          <div style={{ width: 520, background: "var(--dk-161b27, #161b27)", border: `1px solid ${border}`, borderRadius: 16, padding: 28 }}>
             <h2 style={{ margin: "0 0 18px", fontSize: 18, fontWeight: 700 }}>New Time Entry</h2>
             {formError && <div style={{ marginBottom: 14, padding: "10px 12px", borderRadius: 8, background: "rgba(239,68,68,.14)", border: "1px solid rgba(239,68,68,.28)", color: "#fca5a5", fontSize: 12 }}>{formError}</div>}
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
               <div>
-                <label style={{ display: "block", marginBottom: 6, fontSize: 12, color: "rgba(255,255,255,.45)" }}>Project</label>
+                <label style={{ display: "block", marginBottom: 6, fontSize: 12, color: "rgba(var(--ink),.45)" }}>Project</label>
                 <select
                   value={form.projectCode}
                   onChange={(e) => setForm((current) => ({ ...current, projectCode: e.target.value }))}
-                  style={{ width: "100%", background: "#161b27", border: `1px solid ${border}`, borderRadius: 8, padding: "9px 12px", color: "#fff" }}
+                  style={{ width: "100%", background: "var(--dk-161b27, #161b27)", border: `1px solid ${border}`, borderRadius: 8, padding: "9px 12px", color: "var(--ink-solid, #fff)" }}
                 >
                   <option value="">Select Project</option>
                   {projects.map((item) => (
@@ -160,7 +160,7 @@ export default function ServiceTimeBillingPage() {
                 </select>
               </div>
               <div>
-                <label style={{ display: "block", marginBottom: 6, fontSize: 12, color: "rgba(255,255,255,.45)" }}>Consultant</label>
+                <label style={{ display: "block", marginBottom: 6, fontSize: 12, color: "rgba(var(--ink),.45)" }}>Consultant</label>
                 <input
                   value={form.consultant}
                   onChange={(e) => setForm((current) => ({ ...current, consultant: e.target.value }))}
@@ -168,7 +168,7 @@ export default function ServiceTimeBillingPage() {
                 />
               </div>
               <div>
-                <label style={{ display: "block", marginBottom: 6, fontSize: 12, color: "rgba(255,255,255,.45)" }}>Billable Hours</label>
+                <label style={{ display: "block", marginBottom: 6, fontSize: 12, color: "rgba(var(--ink),.45)" }}>Billable Hours</label>
                 <input
                   type="number"
                   min="0.5"
@@ -179,7 +179,7 @@ export default function ServiceTimeBillingPage() {
                 />
               </div>
               <div>
-                <label style={{ display: "block", marginBottom: 6, fontSize: 12, color: "rgba(255,255,255,.45)" }}>Billing Rate</label>
+                <label style={{ display: "block", marginBottom: 6, fontSize: 12, color: "rgba(var(--ink),.45)" }}>Billing Rate</label>
                 <input
                   type="number"
                   value={form.billingRate}
@@ -188,7 +188,7 @@ export default function ServiceTimeBillingPage() {
                 />
               </div>
               <div style={{ gridColumn: "span 2" }}>
-                <label style={{ display: "block", marginBottom: 6, fontSize: 12, color: "rgba(255,255,255,.45)" }}>Work Date</label>
+                <label style={{ display: "block", marginBottom: 6, fontSize: 12, color: "rgba(var(--ink),.45)" }}>Work Date</label>
                 <input
                   type="date"
                   value={form.workDate}
@@ -206,7 +206,7 @@ export default function ServiceTimeBillingPage() {
               </button>
               <button
                 onClick={() => { setShowModal(false); setFormError(""); }}
-                style={{ padding: "11px 24px", borderRadius: 8, border: `1px solid ${border}`, background: "transparent", color: "rgba(255,255,255,.65)", cursor: "pointer" }}
+                style={{ padding: "11px 24px", borderRadius: 8, border: `1px solid ${border}`, background: "transparent", color: "rgba(var(--ink),.65)", cursor: "pointer" }}
               >
                 Cancel
               </button>

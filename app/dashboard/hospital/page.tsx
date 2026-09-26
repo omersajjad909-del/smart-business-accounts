@@ -61,7 +61,7 @@ export default function HospitalOverviewPage() {
       ];
 
   return (
-    <div style={{ minHeight: "100vh", padding: isMobile ? "15px 14px" : "28px 32px", color: "#fff", fontFamily: hospitalFont }}>
+    <div style={{ minHeight: "100vh", padding: isMobile ? "15px 14px" : "28px 32px", color: "var(--ink-solid, #fff)", fontFamily: hospitalFont }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 26, gap: 20, flexWrap: "wrap" }}>
         <div>
           <h1 style={{ margin: "0 0 6px", fontSize: 26, fontWeight: 800 }}>{heroTitle}</h1>
@@ -99,9 +99,9 @@ export default function HospitalOverviewPage() {
             </Link>
           </div>
           <div style={{ padding: 18, display: "flex", flexDirection: "column", gap: 10 }}>
-            {upcomingAppointments.length === 0 && <div style={{ color: "rgba(255,255,255,.28)", textAlign: "center", padding: 24 }}>No active appointments for today.</div>}
+            {upcomingAppointments.length === 0 && <div style={{ color: "rgba(var(--ink),.28)", textAlign: "center", padding: 24 }}>No active appointments for today.</div>}
             {upcomingAppointments.map((row) => (
-              <div key={row.id} style={{ display: "grid", gridTemplateColumns: "80px 1fr auto", gap: 12, alignItems: "center", padding: "12px 14px", borderRadius: 10, background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.05)" }}>
+              <div key={row.id} style={{ display: "grid", gridTemplateColumns: "80px 1fr auto", gap: 12, alignItems: "center", padding: "12px 14px", borderRadius: 10, background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.05)" }}>
                 <div style={{ fontSize: 18, fontWeight: 800, color: "#c4b5fd" }}>{row.time || "--:--"}</div>
                 <div>
                   <div style={{ fontSize: 14, fontWeight: 700 }}>{row.patient}</div>
@@ -117,9 +117,9 @@ export default function HospitalOverviewPage() {
           <div style={{ background: hospitalBg, border: `1px solid ${hospitalBorder}`, borderRadius: 16, padding: 18 }}>
             <div style={{ fontSize: 15, fontWeight: 800, marginBottom: 12 }}>{isClinic ? "Urgent Care Watchlist" : "Clinical Risk Watchlist"}</div>
             <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-              {highRiskQueue.length === 0 && <div style={{ color: "rgba(255,255,255,.28)", padding: "8px 0" }}>No urgent cases in queue.</div>}
+              {highRiskQueue.length === 0 && <div style={{ color: "rgba(var(--ink),.28)", padding: "8px 0" }}>No urgent cases in queue.</div>}
               {highRiskQueue.map((row, index) => (
-                <div key={`${row.label}-${index}`} style={{ padding: "12px 14px", borderRadius: 10, background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.05)" }}>
+                <div key={`${row.label}-${index}`} style={{ padding: "12px 14px", borderRadius: 10, background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.05)" }}>
                   <div style={{ fontSize: 14, fontWeight: 700, color: row.tone }}>{row.label}</div>
                   <div style={{ fontSize: 12, color: hospitalMuted, marginTop: 4 }}>{row.meta}</div>
                 </div>
@@ -135,7 +135,7 @@ export default function HospitalOverviewPage() {
                 { label: "Lab processing", value: labs.filter((row) => row.status === "processing").length, color: "#3b82f6" },
                 { label: "Prescriptions dispensed", value: summary.completedPrescriptions, color: "#a78bfa" },
               ].map((row) => (
-                <div key={row.label} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "10px 12px", borderRadius: 10, background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.05)" }}>
+                <div key={row.label} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "10px 12px", borderRadius: 10, background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.05)" }}>
                   <span style={{ fontSize: 13, color: hospitalMuted }}>{row.label}</span>
                   <span style={{ fontSize: 18, fontWeight: 800, color: row.color }}>{row.value}</span>
                 </div>

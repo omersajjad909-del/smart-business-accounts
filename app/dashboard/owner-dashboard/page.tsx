@@ -11,7 +11,7 @@ const T = {
   indigo:  "#6366f1", violet: "#818cf8", cyan:    "#22d3ee",
   emerald: "#10b981", amber:  "#f59e0b", red:     "#ef4444",
   rose:    "#fb7185", panel:  "rgba(255,255,255,.03)",
-  border:  "rgba(255,255,255,.07)", muted: "rgba(255,255,255,.38)",
+  border:  "rgba(var(--ink),.07)", muted: "rgba(255,255,255,.38)",
 };
 
 interface SummaryData {
@@ -114,7 +114,7 @@ function BarChart({ rev, exp }: { rev: number[]; exp: number[] }) {
 
 function Skeleton({ w = "100%", h = 16, r = 6 }: { w?: string | number; h?: number; r?: number }) {
   return (
-    <div style={{ width: w, height: h, borderRadius: r, background: "rgba(255,255,255,.06)", animation: "shimmer 1.4s ease-in-out infinite" }} />
+    <div style={{ width: w, height: h, borderRadius: r, background: "rgba(var(--ink),.06)", animation: "shimmer 1.4s ease-in-out infinite" }} />
   );
 }
 
@@ -432,7 +432,7 @@ export default function OwnerDashboardPage() {
                           </div>
                           <span style={{ fontSize: 12, color: barColor, fontWeight: 700 }}>{fmt(c.revenue, cur)}</span>
                         </div>
-                        <div style={{ height: 5, borderRadius: 3, background: "rgba(255,255,255,.05)", overflow: "hidden" }}>
+                        <div style={{ height: 5, borderRadius: 3, background: "rgba(var(--ink),.05)", overflow: "hidden" }}>
                           <div style={{ height: "100%", width: `${pct}%`, background: `linear-gradient(90deg,${barColor},${barColor}99)`, borderRadius: 3, transition: "width .6s ease" }} />
                         </div>
                       </div>

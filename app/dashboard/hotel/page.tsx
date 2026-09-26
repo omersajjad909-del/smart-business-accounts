@@ -41,7 +41,7 @@ export default function HotelOverviewPage() {
     .reduce((s, o) => s + o.amount, 0);
 
   return (
-    <div style={{ minHeight: "100vh", padding: isMobile ? "15px 14px" : "28px 32px", color: "#fff", fontFamily: hotelFont }}>
+    <div style={{ minHeight: "100vh", padding: isMobile ? "15px 14px" : "28px 32px", color: "var(--ink-solid, #fff)", fontFamily: hotelFont }}>
 
       {/* Header */}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 24, flexWrap: "wrap", gap: 12 }}>
@@ -62,7 +62,7 @@ export default function HotelOverviewPage() {
             { label: "Analytics", href: "/dashboard/hotel/analytics" },
           ].map(item => (
             <Link key={item.href} prefetch={false} href={item.href}
-              style={{ padding: "8px 14px", borderRadius: 8, border: "1px solid rgba(255,255,255,.1)", background: "rgba(255,255,255,.04)", color: "#fdba74", textDecoration: "none", fontSize: 12, fontWeight: 600 }}>
+              style={{ padding: "8px 14px", borderRadius: 8, border: "1px solid rgba(var(--ink),.1)", background: "rgba(var(--ink),.04)", color: "#fdba74", textDecoration: "none", fontSize: 12, fontWeight: 600 }}>
               {item.label}
             </Link>
           ))}
@@ -77,7 +77,7 @@ export default function HotelOverviewPage() {
           { label: "Expected Arrivals",   value: summary.expectedArrivals,   icon: "🧳", color: "#f59e0b" },
           { label: "Open Complaints",     value: summary.openComplaints,     icon: "⚠️", color: "#f87171" },
         ].map(c => (
-          <div key={c.label} style={{ background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)", borderRadius: 14, padding: isMobile ? "12px 10px" : "18px 20px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          <div key={c.label} style={{ background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.07)", borderRadius: 14, padding: isMobile ? "12px 10px" : "18px 20px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
             <div>
               <div style={{ fontSize: 12, color: hotelMuted, marginBottom: 6 }}>{c.label}</div>
               <div style={{ fontSize: 28, fontWeight: 800, color: c.color, lineHeight: 1 }}>{loading ? "—" : c.value}</div>
@@ -95,7 +95,7 @@ export default function HotelOverviewPage() {
           { label: "Checked-In Guests",    value: summary.checkedInGuests,    icon: "🛏️", color: "#60a5fa" },
           { label: "Pending Reservations", value: summary.pendingReservations, icon: "📋", color: "#f59e0b" },
         ].map(c => (
-          <div key={c.label} style={{ background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)", borderRadius: 14, padding: isMobile ? "12px 10px" : "18px 20px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          <div key={c.label} style={{ background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.07)", borderRadius: 14, padding: isMobile ? "12px 10px" : "18px 20px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
             <div>
               <div style={{ fontSize: 12, color: hotelMuted, marginBottom: 6 }}>{c.label}</div>
               <div style={{ fontSize: 22, fontWeight: 800, color: c.color, lineHeight: 1.2, whiteSpace: "pre-line" }}>{loading ? "—" : c.value}</div>
@@ -112,7 +112,7 @@ export default function HotelOverviewPage() {
           { label: "In Progress",         value: summary.laundryInProgress, sub: "Washing / Ironing",          icon: "🫧", color: "#60a5fa" },
           { label: "Ready to Deliver",    value: summary.laundryReady,      sub: "Cleaned & folded",           icon: "✅", color: "#34d399" },
         ].map(c => (
-          <div key={c.label} style={{ background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)", borderRadius: 14, padding: isMobile ? "12px 10px" : "18px 20px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          <div key={c.label} style={{ background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.07)", borderRadius: 14, padding: isMobile ? "12px 10px" : "18px 20px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
             <div>
               <div style={{ fontSize: 12, color: hotelMuted, marginBottom: 4 }}>{c.label}</div>
               <div style={{ fontSize: 32, fontWeight: 800, color: c.color, lineHeight: 1, marginBottom: 4 }}>{loading ? "—" : c.value}</div>
@@ -124,7 +124,7 @@ export default function HotelOverviewPage() {
       </div>
 
       {/* Room Status Board */}
-      <div style={{ background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)", borderRadius: 16, padding: isMobile ? "12px 11px" : "20px 24px", marginBottom: 20 }}>
+      <div style={{ background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.07)", borderRadius: 16, padding: isMobile ? "12px 11px" : "20px 24px", marginBottom: 20 }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16, flexWrap: "wrap", gap: 10 }}>
           <div style={{ fontSize: 15, fontWeight: 800 }}>🏠 Room Status Board <span style={{ fontSize: 12, color: hotelMuted, fontWeight: 400, marginLeft: 6 }}>{rooms.length} rooms</span></div>
           <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
@@ -158,11 +158,11 @@ export default function HotelOverviewPage() {
 
       {/* Bottom: Stay Watchlist + Operations */}
       <div style={{ display: "grid", gridTemplateColumns: "1.1fr .9fr", gap: 18 }}>
-        <div style={{ background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)", borderRadius: 16, overflow: "hidden" }}>
-          <div style={{ padding: isMobile ? "12px 10px" : "14px 18px", borderBottom: "1px solid rgba(255,255,255,.07)", fontSize: 14, fontWeight: 800 }}>Stay Watchlist</div>
+        <div style={{ background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.07)", borderRadius: 16, overflow: "hidden" }}>
+          <div style={{ padding: isMobile ? "12px 10px" : "14px 18px", borderBottom: "1px solid rgba(var(--ink),.07)", fontSize: 14, fontWeight: 800 }}>Stay Watchlist</div>
           <div style={{ padding: 16, display: "grid", gap: 8 }}>
             {reservations.filter(r => r.status !== "checked_out").slice(0, 6).map(r => (
-              <div key={r.id} style={{ padding: "10px 12px", borderRadius: 10, background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.05)" }}>
+              <div key={r.id} style={{ padding: "10px 12px", borderRadius: 10, background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.05)" }}>
                 <div style={{ fontSize: 13, fontWeight: 700 }}>{r.guest}</div>
                 <div style={{ fontSize: 11, color: hotelMuted, marginTop: 2 }}>Room {r.room} · {r.checkIn} → {r.checkOut}</div>
                 <div style={{ fontSize: 11, color: "#93c5fd", marginTop: 4 }}>{r.status.replace(/_/g, " ")}</div>
@@ -174,8 +174,8 @@ export default function HotelOverviewPage() {
           </div>
         </div>
 
-        <div style={{ background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)", borderRadius: 16, overflow: "hidden" }}>
-          <div style={{ padding: isMobile ? "12px 10px" : "14px 18px", borderBottom: "1px solid rgba(255,255,255,.07)", fontSize: 14, fontWeight: 800 }}>Operations Snapshot</div>
+        <div style={{ background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.07)", borderRadius: 16, overflow: "hidden" }}>
+          <div style={{ padding: isMobile ? "12px 10px" : "14px 18px", borderBottom: "1px solid rgba(var(--ink),.07)", fontSize: 14, fontWeight: 800 }}>Operations Snapshot</div>
           <div style={{ padding: 16, display: "grid", gap: 8 }}>
             {[
               { label: "Available rooms",        value: rooms.filter(r => r.status === "available").length,  color: "#34d399" },
@@ -184,7 +184,7 @@ export default function HotelOverviewPage() {
               { label: "Maintenance rooms",      value: summary.maintenanceRooms,                            color: "#f87171" },
               { label: "Laundry in queue",       value: summary.laundryPending + summary.laundryInProgress,  color: "#a78bfa" },
             ].map(row => (
-              <div key={row.label} style={{ display: "flex", justifyContent: "space-between", padding: "9px 12px", borderRadius: 10, background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.05)" }}>
+              <div key={row.label} style={{ display: "flex", justifyContent: "space-between", padding: "9px 12px", borderRadius: 10, background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.05)" }}>
                 <span style={{ fontSize: 12, color: hotelMuted }}>{row.label}</span>
                 <span style={{ fontSize: 15, fontWeight: 800, color: row.color }}>{loading ? "—" : row.value}</span>
               </div>

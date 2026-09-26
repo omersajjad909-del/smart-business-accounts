@@ -9,10 +9,10 @@ import { useResponsive } from "@/hooks/useResponsive";
 
 const inputStyle: React.CSSProperties = {
   width: "100%",
-  background: "rgba(255,255,255,.06)",
-  border: "1px solid rgba(255,255,255,.1)",
+  background: "rgba(var(--ink),.06)",
+  border: "1px solid rgba(var(--ink),.1)",
   borderRadius: 10,
-  color: "#fff",
+  color: "var(--ink-solid, #fff)",
   padding: "12px 14px",
   fontSize: 14,
 };
@@ -68,7 +68,7 @@ export default function TestDrivesPage() {
   };
 
   return (
-    <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", minHeight: "100vh", color: "#fff", fontFamily: autoFont }}>
+    <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", minHeight: "100vh", color: "var(--ink-solid, #fff)", fontFamily: autoFont }}>
       <div style={{ marginBottom: 24 }}>
         <h1 style={{ margin: "0 0 6px", fontSize: 28, fontWeight: 900 }}>Test Drives</h1>
         <p style={{ margin: 0, fontSize: 14, color: autoMuted }}>Schedule test drives and manage follow-ups for interested buyers.</p>
@@ -92,9 +92,9 @@ export default function TestDrivesPage() {
         <div style={{ background: autoBg, border: `1px solid ${autoBorder}`, borderRadius: 18, overflow: "hidden" }}>
           <div style={{ padding: isMobile ? "12px 10px" : "16px 18px", borderBottom: `1px solid ${autoBorder}`, fontSize: 16, fontWeight: 800 }}>Drive Desk</div>
           <div style={{ display: "grid", gap: 12, padding: 18 }}>
-            {!loading && drives.length === 0 && <div style={{ color: "rgba(255,255,255,.28)" }}>No test drives yet.</div>}
+            {!loading && drives.length === 0 && <div style={{ color: "rgba(var(--ink),.28)" }}>No test drives yet.</div>}
             {drives.map((row) => (
-              <div key={row.id} style={{ border: "1px solid rgba(255,255,255,.07)", background: "rgba(255,255,255,.03)", borderRadius: 14, padding: 16 }}>
+              <div key={row.id} style={{ border: "1px solid rgba(var(--ink),.07)", background: "rgba(var(--ink),.03)", borderRadius: 14, padding: 16 }}>
                 <div style={{ display: "flex", justifyContent: "space-between", gap: 12 }}>
                   <div>
                     <div style={{ fontSize: 16, fontWeight: 800 }}>{row.customer}</div>

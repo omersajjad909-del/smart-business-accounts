@@ -80,7 +80,7 @@ export default function ConstructionExpensesPage() {
   }
 
   return (
-    <div style={{ minHeight: "100vh", padding: isMobile ? "17px 16px" : "28px 32px", color: "#fff", fontFamily: constructionFont }}>
+    <div style={{ minHeight: "100vh", padding: isMobile ? "17px 16px" : "28px 32px", color: "var(--ink-solid, #fff)", fontFamily: constructionFont }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24, gap: 16, flexWrap: "wrap" }}>
         <div>
           <h1 style={{ margin: "0 0 6px", fontSize: 24, fontWeight: 800 }}>Site Expenses</h1>
@@ -99,15 +99,15 @@ export default function ConstructionExpensesPage() {
           <tbody>
             {expenses.map((row) => (
               <tr key={row.id}>
-                <td style={{ padding: isMobile ? "8px 8px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)", fontWeight: 700 }}>{row.title}</td>
-                <td style={{ padding: isMobile ? "8px 8px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)" }}>{row.project}</td>
-                <td style={{ padding: isMobile ? "8px 8px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)" }}>{row.site}</td>
-                <td style={{ padding: isMobile ? "8px 8px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)" }}>{row.category}</td>
-                <td style={{ padding: isMobile ? "8px 8px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)" }}>{row.vendor || "—"}</td>
-                <td style={{ padding: isMobile ? "8px 8px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)", color: "#f87171" }}>Rs. {row.amount.toLocaleString()}</td>
-                <td style={{ padding: isMobile ? "8px 8px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)" }}>{row.date}</td>
-                <td style={{ padding: isMobile ? "8px 8px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)" }}>{row.status}</td>
-                <td style={{ padding: isMobile ? "8px 8px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)" }}>
+                <td style={{ padding: isMobile ? "8px 8px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", fontWeight: 700 }}>{row.title}</td>
+                <td style={{ padding: isMobile ? "8px 8px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)" }}>{row.project}</td>
+                <td style={{ padding: isMobile ? "8px 8px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)" }}>{row.site}</td>
+                <td style={{ padding: isMobile ? "8px 8px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)" }}>{row.category}</td>
+                <td style={{ padding: isMobile ? "8px 8px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)" }}>{row.vendor || "—"}</td>
+                <td style={{ padding: isMobile ? "8px 8px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", color: "#f87171" }}>Rs. {row.amount.toLocaleString()}</td>
+                <td style={{ padding: isMobile ? "8px 8px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)" }}>{row.date}</td>
+                <td style={{ padding: isMobile ? "8px 8px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)" }}>{row.status}</td>
+                <td style={{ padding: isMobile ? "8px 8px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)" }}>
                   <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
                     {row.status === "open" && <button onClick={() => step(row.id, "approved")} style={{ padding: isMobile ? "8px 8px" : "5px 10px", borderRadius: 6, background: "rgba(129,140,248,.15)", border: "1px solid rgba(129,140,248,.3)", color: "#a5b4fc", cursor: "pointer" }}>Approve</button>}
                     {row.status === "approved" && <button onClick={() => step(row.id, "posted")} style={{ padding: isMobile ? "8px 8px" : "5px 10px", borderRadius: 6, background: "rgba(52,211,153,.15)", border: "1px solid rgba(52,211,153,.3)", color: "#34d399", cursor: "pointer" }}>Post</button>}
@@ -115,14 +115,14 @@ export default function ConstructionExpensesPage() {
                 </td>
               </tr>
             ))}
-            {!loading && expenses.length === 0 && <tr><td colSpan={9} style={{ padding: 40, textAlign: "center", color: "rgba(255,255,255,.25)" }}>No expenses yet.</td></tr>}
+            {!loading && expenses.length === 0 && <tr><td colSpan={9} style={{ padding: 40, textAlign: "center", color: "rgba(var(--ink),.25)" }}>No expenses yet.</td></tr>}
           </tbody>
         </table>
       </div>
 
       {showModal && (
         <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.72)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-          <div style={{ width: 560, background: "#161b27", border: `1px solid ${constructionBorder}`, borderRadius: 16, padding: 28 }}>
+          <div style={{ width: 560, background: "var(--dk-161b27, #161b27)", border: `1px solid ${constructionBorder}`, borderRadius: 16, padding: 28 }}>
             <h2 style={{ margin: "0 0 18px", fontSize: 18, fontWeight: 800 }}>Add Site Expense</h2>
             <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: 12 }}>
               {[
@@ -137,12 +137,12 @@ export default function ConstructionExpensesPage() {
                 <div key={key} style={{ gridColumn: col || undefined }}>
                   <label style={{ display: "block", marginBottom: 6, fontSize: 12, color: constructionMuted }}>{label}</label>
                   {type === "select" ? (
-                    <select value={String((form as Record<string, unknown>)[key] ?? "")} onChange={(e) => setForm((prev) => ({ ...prev, [key]: e.target.value }))} style={{ width: "100%", padding: isMobile ? "8px 8px" : "10px 12px", background: "#111827", border: `1px solid ${constructionBorder}`, borderRadius: 8, color: "#fff" }}>
+                    <select value={String((form as Record<string, unknown>)[key] ?? "")} onChange={(e) => setForm((prev) => ({ ...prev, [key]: e.target.value }))} style={{ width: "100%", padding: isMobile ? "8px 8px" : "10px 12px", background: "var(--dk-111827, #111827)", border: `1px solid ${constructionBorder}`, borderRadius: 8, color: "var(--ink-solid, #fff)" }}>
                       <option value="">Select {label.toLowerCase()}</option>
                       {(key === "project" ? projects : sites).map((row) => <option key={row.id} value={row.name}>{row.name}</option>)}
                     </select>
                   ) : (
-                    <input type={type} value={String((form as Record<string, unknown>)[key] ?? "")} onChange={(e) => setForm((prev) => ({ ...prev, [key]: type === "number" ? Number(e.target.value) : e.target.value }))} style={{ width: "100%", padding: isMobile ? "8px 8px" : "10px 12px", background: "#111827", border: `1px solid ${constructionBorder}`, borderRadius: 8, color: "#fff" }} />
+                    <input type={type} value={String((form as Record<string, unknown>)[key] ?? "")} onChange={(e) => setForm((prev) => ({ ...prev, [key]: type === "number" ? Number(e.target.value) : e.target.value }))} style={{ width: "100%", padding: isMobile ? "8px 8px" : "10px 12px", background: "var(--dk-111827, #111827)", border: `1px solid ${constructionBorder}`, borderRadius: 8, color: "var(--ink-solid, #fff)" }} />
                   )}
                 </div>
               ))}

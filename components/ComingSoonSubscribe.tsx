@@ -56,7 +56,7 @@ export default function ComingSoonSubscribe({ list, accent = "#818cf8", dark = t
       <button
         type="submit"
         disabled={status === "loading"}
-        style={{ padding: "12px 22px", borderRadius: 10, fontWeight: 800, fontSize: 13, background: status === "loading" ? (dark ? "rgba(255,255,255,.1)" : "var(--surface, #e2e8f0)") : `linear-gradient(135deg,${accent},#7c3aed)`, color: "white", border: "none", cursor: status === "loading" ? "default" : "pointer", whiteSpace: "nowrap" }}
+        style={{ padding: "12px 22px", borderRadius: 10, fontWeight: 800, fontSize: 13, background: status === "loading" ? (dark ? "rgba(var(--ink),.1)" : "var(--surface, #e2e8f0)") : `linear-gradient(135deg,${accent},#7c3aed)`, color: "white", border: "none", cursor: status === "loading" ? "default" : "pointer", whiteSpace: "nowrap" }}
       >
         {status === "loading" ? "…" : "Notify me"}
       </button>

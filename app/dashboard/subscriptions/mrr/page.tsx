@@ -39,7 +39,7 @@ export default function MrrArrPage() {
   const overdue = subscribers.filter((item) => item.status === "past_due").reduce((sum, item) => sum + item.amount, 0);
 
   return (
-    <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", color: "#fff", minHeight: "100vh", fontFamily: saasFont }}>
+    <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", color: "var(--ink-solid, #fff)", minHeight: "100vh", fontFamily: saasFont }}>
       <div style={{ marginBottom: 24 }}>
         <h1 style={{ margin: "0 0 6px", fontSize: 28, fontWeight: 900 }}>MRR / ARR</h1>
         <p style={{ margin: 0, color: saasMuted, fontSize: 14 }}>Recurring revenue, churn pressure, aur collection quality ka clean SaaS snapshot.</p>
@@ -67,13 +67,13 @@ export default function MrrArrPage() {
               const list = subscribers.filter((item) => item.planName === planName && item.status !== "cancelled");
               const value = list.reduce((sum, item) => sum + item.amount, 0);
               return (
-                <div key={planName} style={{ display: "flex", justifyContent: "space-between", borderRadius: 12, border: "1px solid rgba(255,255,255,.06)", background: "rgba(255,255,255,.03)", padding: "10px 12px" }}>
+                <div key={planName} style={{ display: "flex", justifyContent: "space-between", borderRadius: 12, border: "1px solid rgba(var(--ink),.06)", background: "rgba(var(--ink),.03)", padding: "10px 12px" }}>
                   <span style={{ fontSize: 13, color: saasMuted }}>{planName}</span>
                   <span style={{ fontSize: 14, fontWeight: 800, color: "#bfdbfe" }}>{list.length} accounts | {formatMoney(value)}</span>
                 </div>
               );
             })}
-            {subscribers.length === 0 && <div style={{ color: "rgba(255,255,255,.28)" }}>No subscriber data yet.</div>}
+            {subscribers.length === 0 && <div style={{ color: "rgba(var(--ink),.28)" }}>No subscriber data yet.</div>}
           </div>
         </div>
 
@@ -86,7 +86,7 @@ export default function MrrArrPage() {
               { label: "Cancelled accounts", value: subscribers.filter((item) => item.status === "cancelled").length, color: "#f87171" },
               { label: "Active accounts", value: subscribers.filter((item) => item.status === "active").length, color: "#34d399" },
             ].map((row) => (
-              <div key={row.label} style={{ display: "flex", justifyContent: "space-between", borderRadius: 12, border: "1px solid rgba(255,255,255,.06)", background: "rgba(255,255,255,.03)", padding: "10px 12px" }}>
+              <div key={row.label} style={{ display: "flex", justifyContent: "space-between", borderRadius: 12, border: "1px solid rgba(var(--ink),.06)", background: "rgba(var(--ink),.03)", padding: "10px 12px" }}>
                 <span style={{ fontSize: 13, color: saasMuted }}>{row.label}</span>
                 <span style={{ fontSize: 14, fontWeight: 800, color: row.color }}>{row.value}</span>
               </div>

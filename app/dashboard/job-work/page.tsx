@@ -274,7 +274,7 @@ function JobWorkInner() {
 
   if (!status.enabled) {
     return (
-      <div style={{ padding: isMobile ? "17px 16px" : "28px 32px", fontFamily: ff, color: "#fff", minHeight: "100vh" }}>
+      <div style={{ padding: isMobile ? "17px 16px" : "28px 32px", fontFamily: ff, color: "var(--ink-solid, #fff)", minHeight: "100vh" }}>
         <h1 style={{ fontSize: 24, fontWeight: 800, margin: "0 0 6px" }}>Job Work</h1>
         <div
           style={{
@@ -290,7 +290,7 @@ function JobWorkInner() {
           <div style={{ fontSize: 12, fontWeight: 800, color: amber, letterSpacing: 1, marginBottom: 10 }}>
             UNDER TEST
           </div>
-          <p style={{ margin: 0, fontSize: 14, lineHeight: 1.6, color: "rgba(255,255,255,.75)" }}>
+          <p style={{ margin: 0, fontSize: 14, lineHeight: 1.6, color: "rgba(var(--ink),.75)" }}>
             {status.reason}
           </p>
           <p style={{ margin: "12px 0 0", fontSize: 13, lineHeight: 1.6, color: dim }}>
@@ -303,7 +303,7 @@ function JobWorkInner() {
   }
 
   return (
-    <div style={{ padding: isMobile ? "17px 16px" : "28px 32px", fontFamily: ff, color: "#fff", minHeight: "100vh" }}>
+    <div style={{ padding: isMobile ? "17px 16px" : "28px 32px", fontFamily: ff, color: "var(--ink-solid, #fff)", minHeight: "100vh" }}>
       <div style={{ marginBottom: 20 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
           <h1 style={{ fontSize: 24, fontWeight: 800, margin: 0 }}>Job Work</h1>
@@ -427,7 +427,7 @@ const input: React.CSSProperties = {
   borderRadius: 8,
   border: `1px solid ${border}`,
   background: "rgba(0,0,0,.25)",
-  color: "#fff",
+  color: "var(--ink-solid, #fff)",
   fontSize: 13,
   fontFamily: ff,
   outline: "none",
@@ -1338,10 +1338,10 @@ function ReceiveTab({ challans, busy, setBusy, setMsg, refresh }: Setter & { cha
               </table>
             </div>
             <div style={{ fontSize: 11.5, color: dim, marginTop: 8, lineHeight: 1.55, maxWidth: 760 }}>
-              A part-used roll is <b style={{ color: "#fff" }}>not wastage</b>. Send 13 rolls for a job needing 12.5 and
-              the half roll is still good material: leave it out of <b style={{ color: "#fff" }}>Consumed</b> and it
-              either comes back (put it in <b style={{ color: "#fff" }}>Returned</b>) or stays on the worker&apos;s floor
-              for the next order, where it keeps showing under <b style={{ color: "#fff" }}>Still with worker</b>.
+              A part-used roll is <b style={{ color: "var(--ink-solid, #fff)" }}>not wastage</b>. Send 13 rolls for a job needing 12.5 and
+              the half roll is still good material: leave it out of <b style={{ color: "var(--ink-solid, #fff)" }}>Consumed</b> and it
+              either comes back (put it in <b style={{ color: "var(--ink-solid, #fff)" }}>Returned</b>) or stays on the worker&apos;s floor
+              for the next order, where it keeps showing under <b style={{ color: "var(--ink-solid, #fff)" }}>Still with worker</b>.
               Only what is genuinely burnt above the standard counts as wastage and gets charged back.
             </div>
           </div>
@@ -1416,7 +1416,7 @@ function ReceiveTab({ challans, busy, setBusy, setMsg, refresh }: Setter & { cha
               </table>
             </div>
             <div style={{ fontSize: 11.5, color: dim, marginTop: 10, lineHeight: 1.55, maxWidth: 700 }}>
-              A positive difference on <b style={{ color: "#fff" }}>Material consumed</b> is the only
+              A positive difference on <b style={{ color: "var(--ink-solid, #fff)" }}>Material consumed</b> is the only
               line that is genuine wastage — the job burnt more than the formula said it should. The
               leftover row is neither side&apos;s loss: it is whole material that was never touched.
             </div>
@@ -1516,7 +1516,7 @@ function LedgerTab({ ledger }: { ledger: { workers: LedgerWorker[]; totalValue: 
           </div>
         </div>
         <div style={{ fontSize: 12.5, color: dim, maxWidth: 460, lineHeight: 1.55 }}>
-          This is your current asset, not the job worker&apos;s. It should agree with account <b style={{ color: "#fff" }}>1204 Stock at Job Worker</b> on the balance sheet.
+          This is your current asset, not the job worker&apos;s. It should agree with account <b style={{ color: "var(--ink-solid, #fff)" }}>1204 Stock at Job Worker</b> on the balance sheet.
         </div>
       </div>
 

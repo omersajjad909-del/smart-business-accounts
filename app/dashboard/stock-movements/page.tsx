@@ -39,13 +39,13 @@ const ACCENT = "#14b8a6";
 const s = {
   page:  { fontFamily: FONT, color: "var(--text-primary)", padding: isMobile ? "15px 11px" : "28px 24px", minHeight: "100vh", background: "var(--app-bg)" },
   panel: { background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 14 },
-  inp:   { background: "rgba(255,255,255,.05)", border: "1px solid var(--border)", borderRadius: 8, padding: "9px 13px", color: "var(--text-primary)", fontFamily: FONT, fontSize: 13, width: "100%", boxSizing: "border-box" as const, outline: "none" },
+  inp:   { background: "rgba(var(--ink),.05)", border: "1px solid var(--border)", borderRadius: 8, padding: "9px 13px", color: "var(--text-primary)", fontFamily: FONT, fontSize: 13, width: "100%", boxSizing: "border-box" as const, outline: "none" },
   label: { fontSize: 12, color: "var(--text-muted)", display: "block", marginBottom: 5, fontWeight: 500 } as React.CSSProperties,
   btn:   (bg: string, sm?: boolean) => ({ background: bg, border: "none", borderRadius: 8, padding: sm ? "7px 14px" : "10px 22px", color: "#fff", fontFamily: FONT, cursor: "pointer", fontSize: sm ? 12 : 13, fontWeight: 600, lineHeight: 1 } as React.CSSProperties),
   badge: (m: { color: string; bg: string; border: string }) => ({ background: m.bg, color: m.color, border: `1px solid ${m.border}`, borderRadius: 20, padding: "3px 10px", fontSize: 11, fontWeight: 700, whiteSpace: "nowrap" as const, display: "inline-block" }),
   th:    { padding: "11px 13px", textAlign: "left" as const, fontSize: 11, color: "var(--text-muted)", fontWeight: 600, textTransform: "uppercase" as const, letterSpacing: "0.06em", borderBottom: "1px solid var(--border)" },
   td:    { padding: "12px 13px", fontSize: 13, borderBottom: "1px solid var(--border)", verticalAlign: "middle" as const },
-  tabBtn:(active: boolean) => ({ background: active ? ACCENT : "rgba(255,255,255,.06)", border: `1px solid ${active ? ACCENT : "var(--border)"}`, borderRadius: 8, padding: "7px 16px", color: active ? "#fff" : "var(--text-muted)", fontFamily: FONT, cursor: "pointer", fontSize: 12, fontWeight: 600 }),
+  tabBtn:(active: boolean) => ({ background: active ? ACCENT : "rgba(var(--ink),.06)", border: `1px solid ${active ? ACCENT : "var(--border)"}`, borderRadius: 8, padding: "7px 16px", color: active ? "#fff" : "var(--text-muted)", fontFamily: FONT, cursor: "pointer", fontSize: 12, fontWeight: 600 }),
 };
 
 const todayIso = () => new Date().toISOString().split("T")[0];
@@ -220,7 +220,7 @@ export default function StockMovementsPage() {
         ) : (
           <table style={{ width: "100%", borderCollapse: "collapse" }}>
             <thead>
-              <tr style={{ background: "rgba(255,255,255,.03)" }}>
+              <tr style={{ background: "rgba(var(--ink),.03)" }}>
                 <th style={s.th}>No</th>
                 <th style={s.th}>Type</th>
                 <th style={s.th}>Date</th>

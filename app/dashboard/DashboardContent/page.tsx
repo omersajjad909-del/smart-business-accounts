@@ -365,7 +365,7 @@ function AIInsightPanel({
             style={{
               fontSize: 14,
               fontWeight: 800,
-              color: "#fff",
+              color: "var(--ink-solid, #fff)",
               letterSpacing: ".3px",
             }}
           >
@@ -421,7 +421,7 @@ function AIInsightPanel({
                 style={{
                   margin: "0 0 12px",
                   fontSize: 14.5,
-                  color: "rgba(255,255,255,.88)",
+                  color: "rgba(var(--ink),.88)",
                   lineHeight: 1.6,
                 }}
               >
@@ -927,12 +927,12 @@ export default function DashboardContent() {
 
   const TT = {
     contentStyle: {
-      background: "#0f1629",
-      border: "1px solid rgba(255,255,255,.1)",
+      background: "var(--dk-0f1629, #0f1629)",
+      border: "1px solid rgba(var(--ink),.1)",
       borderRadius: 10,
       fontSize: 12,
     },
-    labelStyle: { color: "rgba(255,255,255,.4)", fontWeight: 600 },
+    labelStyle: { color: "rgba(var(--ink),.4)", fontWeight: 600 },
   };
 
   return (
@@ -954,7 +954,7 @@ export default function DashboardContent() {
         .db-ops-title{font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--text-muted);margin-bottom:8px;}
         .db-ops-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(158px,1fr));gap:10px;}
         .db-ops-cell{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:12px;background:var(--panel-bg);border:1px solid var(--border);text-decoration:none;transition:transform .15s,border-color .15s;}
-        a.db-ops-cell:hover{transform:translateY(-2px);border-color:rgba(255,255,255,.18);}
+        a.db-ops-cell:hover{transform:translateY(-2px);border-color:rgba(var(--ink),.18);}
 
         .db-mid{display:grid;grid-template-columns:2fr 1fr;gap:16px;margin-bottom:20px;min-height:340px;}
         @media(max-width:960px){.db-mid{grid-template-columns:1fr;}}
@@ -981,7 +981,7 @@ export default function DashboardContent() {
 
         .db-card{transition:transform .15s,box-shadow .15s;}
         .db-card:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(0,0,0,.2);}
-        .db-row:hover{background:rgba(255,255,255,.03)!important;}
+        .db-row:hover{background:rgba(var(--ink),.03)!important;}
         .db-qa:hover{transform:translateY(-2px);}
         .db-qa{transition:transform .15s;}
       `}</style>
@@ -1473,8 +1473,8 @@ export default function DashboardContent() {
             width: 40,
             height: 40,
             borderRadius: 13,
-            background: "rgba(255,255,255,0.05)",
-            border: "1px solid rgba(255,255,255,0.1)",
+            background: "rgba(var(--ink),0.05)",
+            border: "1px solid rgba(var(--ink),0.1)",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
@@ -1545,7 +1545,7 @@ export default function DashboardContent() {
             width: 160,
             height: 160,
             borderRadius: "50%",
-            background: "rgba(255,255,255,.04)",
+            background: "rgba(var(--ink),.04)",
             pointerEvents: "none",
           }}
         />
@@ -1557,7 +1557,7 @@ export default function DashboardContent() {
             width: 120,
             height: 120,
             borderRadius: "50%",
-            background: "rgba(255,255,255,.03)",
+            background: "rgba(var(--ink),.03)",
             pointerEvents: "none",
           }}
         />
@@ -1575,7 +1575,7 @@ export default function DashboardContent() {
             <div
               style={{
                 fontSize: 11,
-                color: "rgba(255,255,255,.55)",
+                color: "rgba(var(--ink),.55)",
                 fontWeight: 600,
                 textTransform: "uppercase",
                 letterSpacing: ".1em",
@@ -1588,7 +1588,7 @@ export default function DashboardContent() {
               style={{
                 fontSize: 34,
                 fontWeight: 900,
-                color: "white",
+                color: "var(--ink-solid, white)",
                 letterSpacing: "-1.5px",
                 lineHeight: 1,
               }}
@@ -1626,7 +1626,7 @@ export default function DashboardContent() {
                 {Math.abs(heroDelta).toFixed(1)}% vs last month
               </div>
             ) : heroKpi.caption ? (
-              <div style={{ fontSize: 12, fontWeight: 600, color: "rgba(255,255,255,.5)", marginTop: 6 }}>
+              <div style={{ fontSize: 12, fontWeight: 600, color: "rgba(var(--ink),.5)", marginTop: 6 }}>
                 {heroKpi.caption}
               </div>
             ) : null}
@@ -1636,12 +1636,12 @@ export default function DashboardContent() {
               width: 48,
               height: 48,
               borderRadius: 15,
-              background: "rgba(255,255,255,.15)",
+              background: "rgba(var(--ink),.15)",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
               backdropFilter: "blur(8px)",
-              border: "1px solid rgba(255,255,255,.2)",
+              border: "1px solid rgba(var(--ink),.2)",
               fontSize: 22,
             }}
           >
@@ -1658,7 +1658,7 @@ export default function DashboardContent() {
             gridTemplateColumns: "1fr 1fr 1fr",
             gap: isMobile ? 6 : 8,
             paddingTop: isMobile ? 12 : 16,
-            borderTop: "1px solid rgba(255,255,255,.12)",
+            borderTop: "1px solid rgba(var(--ink),.12)",
             position: "relative",
           }}
         >
@@ -1667,7 +1667,7 @@ export default function DashboardContent() {
               <div
                 style={{
                   fontSize: 9,
-                  color: "rgba(255,255,255,.45)",
+                  color: "rgba(var(--ink),.45)",
                   fontWeight: 600,
                   textTransform: "uppercase",
                   letterSpacing: ".07em",
@@ -2368,7 +2368,7 @@ export default function DashboardContent() {
                 gap: 5,
                 padding: "5px 12px",
                 borderRadius: 9,
-                background: "rgba(255,255,255,.04)",
+                background: "rgba(var(--ink),.04)",
                 border: "1px solid var(--border)",
                 fontSize: 12,
                 color: "var(--text-muted)",
@@ -2559,7 +2559,7 @@ export default function DashboardContent() {
               gap: 6,
               padding: "7px 20px",
               borderBottom: "1px solid var(--border)",
-              background: "rgba(255,255,255,.02)",
+              background: "rgba(var(--ink),.02)",
               minWidth: 480,
             }}
           >
@@ -2611,7 +2611,7 @@ export default function DashboardContent() {
                     minWidth: 480,
                     borderBottom:
                       i < Math.min(stats.recentActivity.length, 6) - 1
-                        ? "1px solid rgba(255,255,255,.04)"
+                        ? "1px solid rgba(var(--ink),.04)"
                         : "none",
                     transition: "background .12s",
                     alignItems: "center",
@@ -2903,8 +2903,8 @@ export default function DashboardContent() {
                     borderRadius: 13,
                     textDecoration: "none",
                     gap: 7,
-                    background: "rgba(255,255,255,.03)",
-                    border: "1px solid rgba(255,255,255,.07)",
+                    background: "rgba(var(--ink),.03)",
+                    border: "1px solid rgba(var(--ink),.07)",
                     textAlign: "center",
                   }}
                 >
@@ -2984,7 +2984,7 @@ export default function DashboardContent() {
                     style={{
                       height: 44,
                       borderRadius: 10,
-                      background: "rgba(255,255,255,.04)",
+                      background: "rgba(var(--ink),.04)",
                       animation: "db-up .6s ease both",
                     }}
                   />
@@ -3414,7 +3414,7 @@ export default function DashboardContent() {
               style={{ display: "flex", alignItems: "center", gap: 12 }}
             >
               {index > 0 && (
-                <span style={{ fontSize: 11, color: "rgba(255,255,255,.2)" }}>
+                <span style={{ fontSize: 11, color: "rgba(var(--ink),.2)" }}>
                   •
                 </span>
               )}

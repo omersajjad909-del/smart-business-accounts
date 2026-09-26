@@ -46,11 +46,11 @@ export default function DistributionTripSheetPage() {
   })), [selectedDate, selectedRouteId, stockRecords.records]);
 
   return (
-    <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", fontFamily: distributionFont, color: "#fff", minHeight: "100vh" }}>
+    <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", fontFamily: distributionFont, color: "var(--ink-solid, #fff)", minHeight: "100vh" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 28 }}>
         <div>
           <h1 style={{ fontSize: 22, fontWeight: 800, margin: "0 0 4px" }}>Trip Sheet</h1>
-          <p style={{ fontSize: 13, color: "rgba(255,255,255,.4)", margin: 0 }}>
+          <p style={{ fontSize: 13, color: "rgba(var(--ink),.4)", margin: 0 }}>
             Generate a printable route sheet with dispatch list and stock summary.
           </p>
         </div>
@@ -61,14 +61,14 @@ export default function DistributionTripSheetPage() {
 
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14, marginBottom: 24 }}>
         <div>
-          <label style={{ display: "block", fontSize: 12, color: "rgba(255,255,255,.45)", marginBottom: 6 }}>Route</label>
+          <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),.45)", marginBottom: 6 }}>Route</label>
           <select value={selectedRouteId} onChange={(event) => setSelectedRouteId(event.target.value)} style={{ width: "100%", background: distributionBg, border: `1px solid ${distributionBorder}`, borderRadius: 8, padding: "10px 12px", color: "#fff", fontSize: 14 }}>
             <option value="">All routes</option>
             {routes.map((route) => <option key={route.id} value={route.id}>{route.name} - {route.area}</option>)}
           </select>
         </div>
         <div>
-          <label style={{ display: "block", fontSize: 12, color: "rgba(255,255,255,.45)", marginBottom: 6 }}>Date</label>
+          <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),.45)", marginBottom: 6 }}>Date</label>
           <input type="date" value={selectedDate} onChange={(event) => setSelectedDate(event.target.value)} style={{ width: "100%", background: distributionBg, border: `1px solid ${distributionBorder}`, borderRadius: 8, padding: "10px 12px", color: "#fff", fontSize: 14 }} />
         </div>
       </div>
@@ -77,12 +77,12 @@ export default function DistributionTripSheetPage() {
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 20 }}>
           <div>
             <div style={{ fontSize: 24, fontWeight: 800, marginBottom: 6 }}>{selectedRoute?.name || "All Distribution Routes"}</div>
-            <div style={{ fontSize: 13, color: "rgba(255,255,255,.45)" }}>
+            <div style={{ fontSize: 13, color: "rgba(var(--ink),.45)" }}>
               {selectedRoute ? `${selectedRoute.area} · Driver: ${selectedRoute.driver || "-"} · Vehicle: ${selectedRoute.vehicle || "-"}` : "Combined dispatch summary"}
             </div>
           </div>
           <div style={{ textAlign: "right" }}>
-            <div style={{ fontSize: 12, color: "rgba(255,255,255,.45)" }}>Trip Date</div>
+            <div style={{ fontSize: 12, color: "rgba(var(--ink),.45)" }}>Trip Date</div>
             <div style={{ fontSize: 16, fontWeight: 700 }}>{selectedDate}</div>
           </div>
         </div>
@@ -94,22 +94,22 @@ export default function DistributionTripSheetPage() {
               <thead>
                 <tr>
                   {["Customer", "Invoice", "Items", "Status"].map((header) => (
-                    <th key={header} style={{ textAlign: "left", padding: "10px 12px", fontSize: 12, color: "rgba(255,255,255,.5)", borderBottom: `1px solid ${distributionBorder}` }}>{header}</th>
+                    <th key={header} style={{ textAlign: "left", padding: "10px 12px", fontSize: 12, color: "rgba(var(--ink),.5)", borderBottom: `1px solid ${distributionBorder}` }}>{header}</th>
                   ))}
                 </tr>
               </thead>
               <tbody>
                 {deliveries.map((delivery, index) => (
                   <tr key={`${delivery.customer}-${index}`}>
-                    <td style={{ padding: "10px 12px", borderBottom: "1px solid rgba(255,255,255,.04)", fontWeight: 700 }}>{delivery.customer}</td>
-                    <td style={{ padding: "10px 12px", borderBottom: "1px solid rgba(255,255,255,.04)", fontSize: 12 }}>{delivery.invoiceRef || "-"}</td>
-                    <td style={{ padding: "10px 12px", borderBottom: "1px solid rgba(255,255,255,.04)", fontSize: 12 }}>{delivery.items || "-"}</td>
-                    <td style={{ padding: "10px 12px", borderBottom: "1px solid rgba(255,255,255,.04)", fontSize: 12 }}>{delivery.status}</td>
+                    <td style={{ padding: "10px 12px", borderBottom: "1px solid rgba(var(--ink),.04)", fontWeight: 700 }}>{delivery.customer}</td>
+                    <td style={{ padding: "10px 12px", borderBottom: "1px solid rgba(var(--ink),.04)", fontSize: 12 }}>{delivery.invoiceRef || "-"}</td>
+                    <td style={{ padding: "10px 12px", borderBottom: "1px solid rgba(var(--ink),.04)", fontSize: 12 }}>{delivery.items || "-"}</td>
+                    <td style={{ padding: "10px 12px", borderBottom: "1px solid rgba(var(--ink),.04)", fontSize: 12 }}>{delivery.status}</td>
                   </tr>
                 ))}
                 {deliveries.length === 0 && (
                   <tr>
-                    <td colSpan={4} style={{ padding: 20, textAlign: "center", color: "rgba(255,255,255,.25)" }}>No deliveries for this selection.</td>
+                    <td colSpan={4} style={{ padding: 20, textAlign: "center", color: "rgba(var(--ink),.25)" }}>No deliveries for this selection.</td>
                   </tr>
                 )}
               </tbody>
@@ -122,22 +122,22 @@ export default function DistributionTripSheetPage() {
               <thead>
                 <tr>
                   {["Item", "Loaded", "Sold", "Returned"].map((header) => (
-                    <th key={header} style={{ textAlign: "left", padding: "10px 12px", fontSize: 12, color: "rgba(255,255,255,.5)", borderBottom: `1px solid ${distributionBorder}` }}>{header}</th>
+                    <th key={header} style={{ textAlign: "left", padding: "10px 12px", fontSize: 12, color: "rgba(var(--ink),.5)", borderBottom: `1px solid ${distributionBorder}` }}>{header}</th>
                   ))}
                 </tr>
               </thead>
               <tbody>
                 {stockLoads.map((load, index) => (
                   <tr key={`${load.itemName}-${index}`}>
-                    <td style={{ padding: "10px 12px", borderBottom: "1px solid rgba(255,255,255,.04)", fontWeight: 700 }}>{load.itemName}</td>
-                    <td style={{ padding: "10px 12px", borderBottom: "1px solid rgba(255,255,255,.04)", fontSize: 12 }}>{load.loadQty}</td>
-                    <td style={{ padding: "10px 12px", borderBottom: "1px solid rgba(255,255,255,.04)", fontSize: 12 }}>{load.soldQty}</td>
-                    <td style={{ padding: "10px 12px", borderBottom: "1px solid rgba(255,255,255,.04)", fontSize: 12 }}>{load.returnedQty}</td>
+                    <td style={{ padding: "10px 12px", borderBottom: "1px solid rgba(var(--ink),.04)", fontWeight: 700 }}>{load.itemName}</td>
+                    <td style={{ padding: "10px 12px", borderBottom: "1px solid rgba(var(--ink),.04)", fontSize: 12 }}>{load.loadQty}</td>
+                    <td style={{ padding: "10px 12px", borderBottom: "1px solid rgba(var(--ink),.04)", fontSize: 12 }}>{load.soldQty}</td>
+                    <td style={{ padding: "10px 12px", borderBottom: "1px solid rgba(var(--ink),.04)", fontSize: 12 }}>{load.returnedQty}</td>
                   </tr>
                 ))}
                 {stockLoads.length === 0 && (
                   <tr>
-                    <td colSpan={4} style={{ padding: 20, textAlign: "center", color: "rgba(255,255,255,.25)" }}>No load sheet data for this selection.</td>
+                    <td colSpan={4} style={{ padding: 20, textAlign: "center", color: "rgba(var(--ink),.25)" }}>No load sheet data for this selection.</td>
                   </tr>
                 )}
               </tbody>

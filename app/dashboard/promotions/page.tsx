@@ -10,7 +10,7 @@ const BG = "rgba(255,255,255,.03)";
 const BORDER = "rgba(255,255,255,.08)";
 const MUTED = "rgba(255,255,255,.45)";
 
-const inp: React.CSSProperties = { width: "100%", boxSizing: "border-box", background: "rgba(255,255,255,.05)", border: `1px solid ${BORDER}`, borderRadius: 8, padding: "9px 12px", fontSize: 13, color: "#fff", fontFamily: ff, outline: "none" };
+const inp: React.CSSProperties = { width: "100%", boxSizing: "border-box", background: "rgba(var(--ink),.05)", border: `1px solid ${BORDER}`, borderRadius: 8, padding: "9px 12px", fontSize: 13, color: "var(--ink-solid, #fff)", fontFamily: ff, outline: "none" };
 const lbl: React.CSSProperties = { fontSize: 11, fontWeight: 700, color: MUTED, textTransform: "uppercase" as const, letterSpacing: ".06em", display: "block", marginBottom: 5 };
 
 const PROMO_TYPES = [
@@ -106,7 +106,7 @@ export default function PromotionsPage() {
   const td: React.CSSProperties = { padding: "13px 14px", fontSize: 13, borderBottom: `1px solid ${BORDER}` };
 
   return (
-    <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", fontFamily: ff, color: "#fff", minHeight: "100vh" }}>
+    <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", fontFamily: ff, color: "var(--ink-solid, #fff)", minHeight: "100vh" }}>
 
       {/* Header */}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 28 }}>
@@ -137,7 +137,7 @@ export default function PromotionsPage() {
       {/* Tabs */}
       <div style={{ display: "flex", gap: 8, marginBottom: 20 }}>
         {[{ v: "all", l: "All" }, { v: "active", l: "Active" }, { v: "scheduled", l: "Scheduled" }, { v: "paused", l: "Paused" }, { v: "expired", l: "Expired" }].map(t => (
-          <button key={t.v} onClick={() => setTab(t.v)} style={{ padding: "7px 16px", borderRadius: 8, border: "none", fontSize: 12, fontWeight: 700, cursor: "pointer", background: tab === t.v ? ACCENT : "rgba(255,255,255,.06)", color: tab === t.v ? "#fff" : MUTED }}>
+          <button key={t.v} onClick={() => setTab(t.v)} style={{ padding: "7px 16px", borderRadius: 8, border: "none", fontSize: 12, fontWeight: 700, cursor: "pointer", background: tab === t.v ? ACCENT : "rgba(var(--ink),.06)", color: tab === t.v ? "#fff" : MUTED }}>
             {t.l}
           </button>
         ))}
@@ -190,7 +190,7 @@ export default function PromotionsPage() {
       {/* Modal */}
       {showModal && (
         <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.6)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 50 }}>
-          <div style={{ background: "#0f172a", border: `1px solid ${BORDER}`, borderRadius: 16, padding: 28, width: 500, fontFamily: ff, maxHeight: "90vh", overflowY: "auto" }}>
+          <div style={{ background: "var(--dk-0f172a, #0f172a)", border: `1px solid ${BORDER}`, borderRadius: 16, padding: 28, width: 500, fontFamily: ff, maxHeight: "90vh", overflowY: "auto" }}>
             <h2 style={{ fontSize: 17, fontWeight: 800, margin: "0 0 20px" }}>New Promotion</h2>
 
             <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>

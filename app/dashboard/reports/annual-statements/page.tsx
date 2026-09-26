@@ -234,7 +234,7 @@ export default function AnnualStatementsPage() {
                         key={i}
                         style={{
                           borderBottom: "1px solid var(--border)",
-                          background: i % 2 === 0 ? "transparent" : "rgba(255,255,255,0.02)",
+                          background: i % 2 === 0 ? "transparent" : "rgba(var(--ink),0.02)",
                         }}
                       >
                         <td style={{ padding: "11px 16px", color: "var(--text-muted)", fontFamily: "monospace" }}>{acc.code}</td>

@@ -17,7 +17,7 @@ type LedgerRow = {
 const fmt = (n: number, cur = "") =>
   `${cur ? cur + " " : ""}${Math.abs(n).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
-const closeX: React.CSSProperties = { position:"absolute", top:14, right:16, background:"none", border:"none", color:"rgba(255,255,255,.35)", fontSize:20, cursor:"pointer", lineHeight:1, padding:4, borderRadius:6, fontFamily:"inherit" };
+const closeX: React.CSSProperties = { position:"absolute", top:14, right:16, background:"none", border:"none", color:"rgba(var(--ink),.35)", fontSize:20, cursor:"pointer", lineHeight:1, padding:4, borderRadius:6, fontFamily:"inherit" };
 
 export default function LedgerReportPage() {
   const { isMobile } = useResponsive();
@@ -102,18 +102,18 @@ export default function LedgerReportPage() {
     .sort((a, b) => a.name.localeCompare(b.name));
 
   const inputStyle: React.CSSProperties = {
-    background: "rgba(255,255,255,.06)", border: "1px solid rgba(255,255,255,.12)",
-    borderRadius: 8, color: "rgba(255,255,255,.85)", padding: "10px 14px",
+    background: "rgba(var(--ink),.06)", border: "1px solid rgba(var(--ink),.12)",
+    borderRadius: 8, color: "rgba(var(--ink),.85)", padding: "10px 14px",
     fontSize: 13, fontFamily: "inherit", outline: "none", width: "100%",
     boxSizing: "border-box",
   };
   const labelStyle: React.CSSProperties = {
-    fontSize: 10, fontWeight: 700, color: "rgba(255,255,255,.35)",
+    fontSize: 10, fontWeight: 700, color: "rgba(var(--ink),.35)",
     letterSpacing: ".08em", textTransform: "uppercase", marginBottom: 6, display: "block",
   };
 
   return (
-    <div className="ledger-print-root" style={{ fontFamily: "'Outfit','Inter',sans-serif", color: "rgba(255,255,255,.85)" }}>
+    <div className="ledger-print-root" style={{ fontFamily: "'Outfit','Inter',sans-serif", color: "rgba(var(--ink),.85)" }}>
 
       {/*
         A ledger is a wide document and prints sideways. @page cannot be aimed
@@ -132,7 +132,7 @@ export default function LedgerReportPage() {
           padding: 24,
         }}>
           <div style={{
-            background: "linear-gradient(145deg,#0f1a35,#0b1225)",
+            background: "linear-gradient(145deg,var(--dk-0f1a35, #0f1a35),var(--dk-0b1225, #0b1225))",
             border: "1px solid rgba(99,102,241,.25)",
             borderRadius: 18, padding: isMobile ? "20px 18px" : "36px 40px", width: "100%", maxWidth: 480,
             boxShadow: "0 32px 80px rgba(0,0,0,.6)", position: "relative",
@@ -146,7 +146,7 @@ export default function LedgerReportPage() {
                   Account Ledger
                 </h2>
               </div>
-              <p style={{ margin: 0, fontSize: 12, color: "rgba(255,255,255,.3)", paddingLeft: 14 }}>
+              <p style={{ margin: 0, fontSize: 12, color: "rgba(var(--ink),.3)", paddingLeft: 14 }}>
                 Select date range and account to generate ledger
               </p>
             </div>
@@ -210,7 +210,7 @@ export default function LedgerReportPage() {
                 {accountId && (
                   <button onClick={() => { setAccountId(""); setSearch(""); setDropOpen(false); }} style={{
                     position: "absolute", right: 10, top: "50%", transform: "translateY(-50%)",
-                    background: "none", border: "none", color: "rgba(255,255,255,.4)",
+                    background: "none", border: "none", color: "rgba(var(--ink),.4)",
                     cursor: "pointer", fontSize: 16, lineHeight: 1, padding: 2,
                   }}>×</button>
                 )}
@@ -219,18 +219,18 @@ export default function LedgerReportPage() {
               {dropOpen && !accountId && (
                 <div style={{
                   position: "absolute", top: "100%", left: 0, right: 0, zIndex: 100,
-                  background: "#0f1a35", border: "1px solid rgba(99,102,241,.3)",
+                  background: "var(--dk-0f1a35, #0f1a35)", border: "1px solid rgba(99,102,241,.3)",
                   borderRadius: 8, marginTop: 4, maxHeight: 220, overflowY: "auto",
                   boxShadow: "0 16px 40px rgba(0,0,0,.5)",
                 }}>
                   {filteredAccounts.length === 0 ? (
-                    <div style={{ padding: "14px", textAlign: "center", color: "rgba(255,255,255,.25)", fontSize: 12 }}>
+                    <div style={{ padding: "14px", textAlign: "center", color: "rgba(var(--ink),.25)", fontSize: 12 }}>
                       No accounts found
                     </div>
                   ) : filteredAccounts.map(a => (
                     <div key={a.id} onMouseDown={() => { setAccountId(a.id); setSearch(""); setDropOpen(false); }} style={{
                       padding: "10px 14px", cursor: "pointer", fontSize: 13,
-                      color: "rgba(255,255,255,.75)", borderBottom: "1px solid rgba(255,255,255,.04)",
+                      color: "rgba(var(--ink),.75)", borderBottom: "1px solid rgba(var(--ink),.04)",
                       transition: "background .1s",
                     }}
                       onMouseEnter={e => e.currentTarget.style.background = "rgba(99,102,241,.15)"}
@@ -248,7 +248,7 @@ export default function LedgerReportPage() {
                     ✓ {acctCode && <span style={{ fontFamily:"monospace", marginRight:5 }}>{acctCode}</span>}{acctName}
                   </div>
                   {previewLoading ? (
-                    <div style={{ fontSize: 11, color: "rgba(255,255,255,.3)" }}>…</div>
+                    <div style={{ fontSize: 11, color: "rgba(var(--ink),.3)" }}>…</div>
                   ) : previewBal !== null && (
                     <div style={{
                       display: "flex", alignItems: "center", gap: 6,
@@ -256,7 +256,7 @@ export default function LedgerReportPage() {
                       border: `1px solid ${previewBal >= 0 ? "rgba(52,211,153,.25)" : "rgba(248,113,113,.25)"}`,
                       borderRadius: 7, padding: "4px 10px",
                     }}>
-                      <span style={{ fontSize: 10, color: "rgba(255,255,255,.35)", fontWeight: 700, textTransform: "uppercase", letterSpacing: ".06em" }}>
+                      <span style={{ fontSize: 10, color: "rgba(var(--ink),.35)", fontWeight: 700, textTransform: "uppercase", letterSpacing: ".06em" }}>
                         Current Balance
                       </span>
                       <span style={{ fontSize: 13, fontWeight: 800, color: previewBal >= 0 ? "#34d399" : "#f87171", fontFamily: "monospace" }}>
@@ -275,8 +275,8 @@ export default function LedgerReportPage() {
                 disabled={!accountId}
                 style={{
                   flex: 1, padding: "12px", borderRadius: 10, border: "none", cursor: accountId ? "pointer" : "not-allowed",
-                  background: accountId ? "linear-gradient(135deg,#6366f1,#4f46e5)" : "rgba(255,255,255,.08)",
-                  color: accountId ? "white" : "rgba(255,255,255,.3)",
+                  background: accountId ? "linear-gradient(135deg,#6366f1,#4f46e5)" : "rgba(var(--ink),.08)",
+                  color: accountId ? "white" : "rgba(var(--ink),.3)",
                   fontSize: 14, fontWeight: 700, fontFamily: "inherit", transition: "all .15s",
                 }}
               >
@@ -299,8 +299,8 @@ export default function LedgerReportPage() {
             </div>
             <div style={{ display: "flex", gap: 10 }} className="print:hidden">
               <button onClick={() => { setShowModal(true); setRows([]); }} style={{
-                padding: "8px 18px", borderRadius: 8, border: "1px solid rgba(255,255,255,.12)",
-                cursor: "pointer", background: "rgba(255,255,255,.04)", color: "rgba(255,255,255,.6)",
+                padding: "8px 18px", borderRadius: 8, border: "1px solid rgba(var(--ink),.12)",
+                cursor: "pointer", background: "rgba(var(--ink),.04)", color: "rgba(var(--ink),.6)",
                 fontSize: 12, fontWeight: 600, fontFamily: "inherit",
               }}>⟵ Change Account</button>
               {rows.length > 0 && (
@@ -323,27 +323,27 @@ export default function LedgerReportPage() {
 
           {/* Report document */}
           <div className="ledger-print-document" style={{
-            background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.08)",
+            background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.08)",
             borderRadius: 16, overflow: "hidden",
           }}>
             {/* Compact header */}
             <div style={{
               padding: isMobile ? "12px 10px" : "14px 20px",
               background: "rgba(99,102,241,.08)",
-              borderBottom: "1px solid rgba(255,255,255,.07)",
+              borderBottom: "1px solid rgba(var(--ink),.07)",
               display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 8,
             }}>
               {/* Left: company + account */}
               <div style={{ display: "flex", alignItems: "center", gap: 16, flexWrap: "wrap" }}>
-                <div style={{ fontSize: 15, fontWeight: 800, color: "white", letterSpacing: "-.2px" }}>
+                <div style={{ fontSize: 15, fontWeight: 800, color: "var(--ink-solid, white)", letterSpacing: "-.2px" }}>
                   {companyInfo?.name || "—"}
                 </div>
-                <div style={{ width: 1, height: 16, background: "rgba(255,255,255,.1)" }}/>
+                <div style={{ width: 1, height: 16, background: "rgba(var(--ink),.1)" }}/>
                 <div style={{ fontSize: 13, fontWeight: 700, color: "#818cf8" }}>{acctName}</div>
                 {openingBal !== null && rows.length > 0 && (
                   <>
-                    <div style={{ width: 1, height: 16, background: "rgba(255,255,255,.1)" }}/>
-                    <div style={{ fontSize: 11, color: "rgba(255,255,255,.35)" }}>
+                    <div style={{ width: 1, height: 16, background: "rgba(var(--ink),.1)" }}/>
+                    <div style={{ fontSize: 11, color: "rgba(var(--ink),.35)" }}>
                       Opening: <span style={{ fontWeight: 700, color: openingBal >= 0 ? "#34d399" : "#f87171" }}>
                         {fmt(openingBal, cur)} {openingBal >= 0 ? "Dr" : "Cr"}
                       </span>
@@ -353,13 +353,13 @@ export default function LedgerReportPage() {
               </div>
               {/* Right: period + date */}
               <div style={{ display: "flex", alignItems: "center", gap: 16, fontSize: 11 }}>
-                <div style={{ color: "rgba(255,255,255,.45)" }}>
-                  <span style={{ color: "rgba(255,255,255,.25)", marginRight: 4 }}>Period:</span>
-                  <span style={{ fontWeight: 700, color: "rgba(255,255,255,.7)" }}>{fromDate}</span>
-                  <span style={{ color: "rgba(255,255,255,.2)", margin: "0 4px" }}>—</span>
-                  <span style={{ fontWeight: 700, color: "rgba(255,255,255,.7)" }}>{toDate}</span>
+                <div style={{ color: "rgba(var(--ink),.45)" }}>
+                  <span style={{ color: "rgba(var(--ink),.25)", marginRight: 4 }}>Period:</span>
+                  <span style={{ fontWeight: 700, color: "rgba(var(--ink),.7)" }}>{fromDate}</span>
+                  <span style={{ color: "rgba(var(--ink),.2)", margin: "0 4px" }}>—</span>
+                  <span style={{ fontWeight: 700, color: "rgba(var(--ink),.7)" }}>{toDate}</span>
                 </div>
-                <div style={{ color: "rgba(255,255,255,.2)" }}>Generated: {fmtDate(new Date())}</div>
+                <div style={{ color: "rgba(var(--ink),.2)" }}>Generated: {fmtDate(new Date())}</div>
               </div>
             </div>
 
@@ -367,13 +367,13 @@ export default function LedgerReportPage() {
             <div style={{ overflowX: "auto" }}>
               <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
                 <thead>
-                  <tr style={{ background: "rgba(255,255,255,.05)", borderBottom: "1px solid rgba(255,255,255,.08)" }}>
+                  <tr style={{ background: "rgba(var(--ink),.05)", borderBottom: "1px solid rgba(var(--ink),.08)" }}>
                     {["Date","Voucher #","Narration / Particulars","Debit","Credit","Running Balance"].map((h, i) => (
                       <th key={h} style={{
                         padding: "11px 16px", fontSize: 10, fontWeight: 700,
-                        color: "rgba(255,255,255,.35)", letterSpacing: ".08em", textTransform: "uppercase",
+                        color: "rgba(var(--ink),.35)", letterSpacing: ".08em", textTransform: "uppercase",
                         textAlign: i >= 3 ? "right" : "left", whiteSpace: "nowrap",
-                        borderRight: i < 5 ? "1px solid rgba(255,255,255,.05)" : "none",
+                        borderRight: i < 5 ? "1px solid rgba(var(--ink),.05)" : "none",
                       }}>{h}</th>
                     ))}
                   </tr>
@@ -381,41 +381,41 @@ export default function LedgerReportPage() {
                 <tbody>
                   {!loading && openingRow && (
                     <tr style={{
-                      borderBottom: "1px solid rgba(255,255,255,.08)",
+                      borderBottom: "1px solid rgba(var(--ink),.08)",
                       background: "rgba(99,102,241,.07)",
                     }}>
-                      <td style={{ padding: "11px 16px", color: "rgba(255,255,255,.55)", fontSize: 12, borderRight: "1px solid rgba(255,255,255,.04)", whiteSpace: "nowrap" }}>{openingRow.date}</td>
-                      <td style={{ padding: "11px 16px", color: "rgba(255,255,255,.3)", fontWeight: 600, fontSize: 12, borderRight: "1px solid rgba(255,255,255,.04)", whiteSpace: "nowrap" }}>OP</td>
-                      <td style={{ padding: "11px 16px", color: "rgba(255,255,255,.8)", fontWeight: 700, borderRight: "1px solid rgba(255,255,255,.04)", maxWidth: 360 }}>Opening Balance</td>
-                      <td style={{ padding: "11px 16px", textAlign: "right", fontWeight: 700, color: openingRow.debit ? "#34d399" : "rgba(255,255,255,.18)", borderRight: "1px solid rgba(255,255,255,.04)", whiteSpace: "nowrap" }}>{openingRow.debit ? fmt(openingRow.debit) : "—"}</td>
-                      <td style={{ padding: "11px 16px", textAlign: "right", fontWeight: 700, color: openingRow.credit ? "#f87171" : "rgba(255,255,255,.18)", borderRight: "1px solid rgba(255,255,255,.04)", whiteSpace: "nowrap" }}>{openingRow.credit ? fmt(openingRow.credit) : "—"}</td>
+                      <td style={{ padding: "11px 16px", color: "rgba(var(--ink),.55)", fontSize: 12, borderRight: "1px solid rgba(var(--ink),.04)", whiteSpace: "nowrap" }}>{openingRow.date}</td>
+                      <td style={{ padding: "11px 16px", color: "rgba(var(--ink),.3)", fontWeight: 600, fontSize: 12, borderRight: "1px solid rgba(var(--ink),.04)", whiteSpace: "nowrap" }}>OP</td>
+                      <td style={{ padding: "11px 16px", color: "rgba(var(--ink),.8)", fontWeight: 700, borderRight: "1px solid rgba(var(--ink),.04)", maxWidth: 360 }}>Opening Balance</td>
+                      <td style={{ padding: "11px 16px", textAlign: "right", fontWeight: 700, color: openingRow.debit ? "#34d399" : "rgba(var(--ink),.18)", borderRight: "1px solid rgba(var(--ink),.04)", whiteSpace: "nowrap" }}>{openingRow.debit ? fmt(openingRow.debit) : "—"}</td>
+                      <td style={{ padding: "11px 16px", textAlign: "right", fontWeight: 700, color: openingRow.credit ? "#f87171" : "rgba(var(--ink),.18)", borderRight: "1px solid rgba(var(--ink),.04)", whiteSpace: "nowrap" }}>{openingRow.credit ? fmt(openingRow.credit) : "—"}</td>
                       <td style={{ padding: "11px 16px", textAlign: "right", fontWeight: 800, whiteSpace: "nowrap", color: openingRow.balance >= 0 ? "#34d399" : "#f87171" }}>
                         {fmt(openingRow.balance, cur)} <span style={{ fontSize: 10, opacity: .7 }}>{openingRow.balance >= 0 ? "Dr" : "Cr"}</span>
                       </td>
                     </tr>
                   )}
                   {loading ? (
-                    <tr><td colSpan={6} style={{ padding: "60px 0", textAlign: "center", color: "rgba(255,255,255,.25)", fontSize: 13 }}>
+                    <tr><td colSpan={6} style={{ padding: "60px 0", textAlign: "center", color: "rgba(var(--ink),.25)", fontSize: 13 }}>
                       Loading transactions…
                     </td></tr>
                   ) : dataRows.length === 0 ? (
-                    <tr><td colSpan={6} style={{ padding: "40px 0", textAlign: "center", color: "rgba(255,255,255,.2)", fontSize: 13 }}>
+                    <tr><td colSpan={6} style={{ padding: "40px 0", textAlign: "center", color: "rgba(var(--ink),.2)", fontSize: 13 }}>
                       No transactions in this period
                     </td></tr>
                   ) : dataRows.map((r, i) => (
                     <tr key={i} style={{
-                      borderBottom: "1px solid rgba(255,255,255,.04)",
-                      background: i % 2 === 0 ? "transparent" : "rgba(255,255,255,.015)",
+                      borderBottom: "1px solid rgba(var(--ink),.04)",
+                      background: i % 2 === 0 ? "transparent" : "rgba(var(--ink),.015)",
                       transition: "background .15s",
                     }}
                       onMouseEnter={e => (e.currentTarget.style.background = "rgba(99,102,241,.06)")}
                       onMouseLeave={e => (e.currentTarget.style.background = i % 2 === 0 ? "transparent" : "rgba(255,255,255,.015)")}
                     >
-                      <td style={{ padding: "11px 16px", color: "rgba(255,255,255,.45)", fontSize: 12, borderRight: "1px solid rgba(255,255,255,.04)", whiteSpace: "nowrap" }}>{r.date}</td>
-                      <td style={{ padding: "11px 16px", color: "#818cf8", fontWeight: 600, fontSize: 12, borderRight: "1px solid rgba(255,255,255,.04)", whiteSpace: "nowrap" }}>{r.voucherNo}</td>
-                      <td style={{ padding: "11px 16px", color: "rgba(255,255,255,.65)", borderRight: "1px solid rgba(255,255,255,.04)", maxWidth: 360 }}>{r.narration}</td>
-                      <td style={{ padding: "11px 16px", textAlign: "right", fontWeight: 700, color: r.debit ? "#34d399" : "rgba(255,255,255,.18)", borderRight: "1px solid rgba(255,255,255,.04)", whiteSpace: "nowrap" }}>{r.debit ? fmt(r.debit) : "—"}</td>
-                      <td style={{ padding: "11px 16px", textAlign: "right", fontWeight: 700, color: r.credit ? "#f87171" : "rgba(255,255,255,.18)", borderRight: "1px solid rgba(255,255,255,.04)", whiteSpace: "nowrap" }}>{r.credit ? fmt(r.credit) : "—"}</td>
+                      <td style={{ padding: "11px 16px", color: "rgba(var(--ink),.45)", fontSize: 12, borderRight: "1px solid rgba(var(--ink),.04)", whiteSpace: "nowrap" }}>{r.date}</td>
+                      <td style={{ padding: "11px 16px", color: "#818cf8", fontWeight: 600, fontSize: 12, borderRight: "1px solid rgba(var(--ink),.04)", whiteSpace: "nowrap" }}>{r.voucherNo}</td>
+                      <td style={{ padding: "11px 16px", color: "rgba(var(--ink),.65)", borderRight: "1px solid rgba(var(--ink),.04)", maxWidth: 360 }}>{r.narration}</td>
+                      <td style={{ padding: "11px 16px", textAlign: "right", fontWeight: 700, color: r.debit ? "#34d399" : "rgba(var(--ink),.18)", borderRight: "1px solid rgba(var(--ink),.04)", whiteSpace: "nowrap" }}>{r.debit ? fmt(r.debit) : "—"}</td>
+                      <td style={{ padding: "11px 16px", textAlign: "right", fontWeight: 700, color: r.credit ? "#f87171" : "rgba(var(--ink),.18)", borderRight: "1px solid rgba(var(--ink),.04)", whiteSpace: "nowrap" }}>{r.credit ? fmt(r.credit) : "—"}</td>
                       <td style={{ padding: "11px 16px", textAlign: "right", fontWeight: 800, whiteSpace: "nowrap", color: r.balance >= 0 ? "#34d399" : "#f87171" }}>
                         {fmt(r.balance, cur)} <span style={{ fontSize: 10, opacity: .7 }}>{r.balance >= 0 ? "Dr" : "Cr"}</span>
                       </td>
@@ -424,8 +424,8 @@ export default function LedgerReportPage() {
                 </tbody>
                 {rows.length > 0 && (
                   <tfoot>
-                    <tr style={{ borderTop: "1px solid rgba(255,255,255,.12)", background: "rgba(99,102,241,.06)" }}>
-                      <td colSpan={3} style={{ padding: "12px 16px", fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,.35)", letterSpacing: ".06em", textTransform: "uppercase" }}>Period Totals</td>
+                    <tr style={{ borderTop: "1px solid rgba(var(--ink),.12)", background: "rgba(99,102,241,.06)" }}>
+                      <td colSpan={3} style={{ padding: "12px 16px", fontSize: 11, fontWeight: 700, color: "rgba(var(--ink),.35)", letterSpacing: ".06em", textTransform: "uppercase" }}>Period Totals</td>
                       <td style={{ padding: "12px 16px", textAlign: "right", fontWeight: 800, color: "#34d399", fontSize: 14, whiteSpace: "nowrap" }}>{fmt(totalDebit, cur)}</td>
                       <td style={{ padding: "12px 16px", textAlign: "right", fontWeight: 800, color: "#f87171", fontSize: 14, whiteSpace: "nowrap" }}>{fmt(totalCredit, cur)}</td>
                       <td style={{ padding: "12px 16px", textAlign: "right", fontWeight: 900, fontSize: 15, color: finalBal >= 0 ? "#34d399" : "#f87171", whiteSpace: "nowrap" }}>
@@ -437,7 +437,7 @@ export default function LedgerReportPage() {
               </table>
             </div>
             {cur && (
-              <div style={{ padding: "12px 24px", borderTop: "1px solid rgba(255,255,255,.05)", fontSize: 11, color: "rgba(255,255,255,.2)" }}>
+              <div style={{ padding: "12px 24px", borderTop: "1px solid rgba(var(--ink),.05)", fontSize: 11, color: "rgba(var(--ink),.2)" }}>
                 All amounts in {cur}
               </div>
             )}

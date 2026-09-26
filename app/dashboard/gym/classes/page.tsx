@@ -6,34 +6,34 @@ import { useResponsive } from "@/hooks/useResponsive";
 const isMobile = false;
 
 const S = {
-  page: { padding: '32px', fontFamily: 'Inter, sans-serif', color: '#fff', minHeight: '100vh' },
+  page: { padding: '32px', fontFamily: 'Inter, sans-serif', color: 'var(--ink-solid, #fff)', minHeight: '100vh' },
   header: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 28 },
   title: { fontSize: 24, fontWeight: 700, margin: 0 },
-  sub: { fontSize: 14, color: 'rgba(255,255,255,.5)', marginTop: 4 },
+  sub: { fontSize: 14, color: 'rgba(var(--ink),.5)', marginTop: 4 },
   btn: { background: '#16a34a', color: '#fff', border: 'none', borderRadius: 8, padding: '10px 20px', fontWeight: 600, cursor: 'pointer', fontSize: 14 },
   stats: { display: 'grid', gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 16, marginBottom: 28 },
-  stat: { background: 'rgba(255,255,255,.03)', border: '1px solid rgba(255,255,255,.07)', borderRadius: 12, padding: isMobile ? "12px 11px" : "20px 24px" },
-  statLabel: { fontSize: 13, color: 'rgba(255,255,255,.5)', marginBottom: 6 },
+  stat: { background: 'rgba(var(--ink),.03)', border: '1px solid rgba(var(--ink),.07)', borderRadius: 12, padding: isMobile ? "12px 11px" : "20px 24px" },
+  statLabel: { fontSize: 13, color: 'rgba(var(--ink),.5)', marginBottom: 6 },
   statVal: { fontSize: 28, fontWeight: 700 },
   grid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(320px,1fr))', gap: 20 },
-  card: { background: 'rgba(255,255,255,.03)', border: '1px solid rgba(255,255,255,.07)', borderRadius: 12, padding: 24 },
+  card: { background: 'rgba(var(--ink),.03)', border: '1px solid rgba(var(--ink),.07)', borderRadius: 12, padding: 24 },
   classTitle: { fontSize: 18, fontWeight: 700, marginBottom: 4 },
-  instructor: { fontSize: 13, color: 'rgba(255,255,255,.5)', marginBottom: 16 },
+  instructor: { fontSize: 13, color: 'rgba(var(--ink),.5)', marginBottom: 16 },
   badge: (c: string) => ({ display: 'inline-block', background: `${c}20`, color: c, borderRadius: 6, padding: '3px 10px', fontSize: 12, fontWeight: 600 }),
   infoGrid: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, margin: '16px 0' },
-  infoItem: { background: 'rgba(255,255,255,.04)', borderRadius: 8, padding: '10px 12px' },
-  infoLabel: { fontSize: 11, color: 'rgba(255,255,255,.4)', marginBottom: 4 },
+  infoItem: { background: 'rgba(var(--ink),.04)', borderRadius: 8, padding: '10px 12px' },
+  infoLabel: { fontSize: 11, color: 'rgba(var(--ink),.4)', marginBottom: 4 },
   infoVal: { fontSize: 15, fontWeight: 600 },
-  progressBar: { background: 'rgba(255,255,255,.08)', borderRadius: 4, height: 6, marginTop: 4 },
+  progressBar: { background: 'rgba(var(--ink),.08)', borderRadius: 4, height: 6, marginTop: 4 },
   progressFill: (pct: number, c: string) => ({ width: `${pct}%`, height: '100%', borderRadius: 4, background: c }),
   actRow: { display: 'flex', gap: 8, marginTop: 16 },
-  actBtn: { flex: 1, background: 'rgba(255,255,255,.06)', border: '1px solid rgba(255,255,255,.1)', color: '#fff', borderRadius: 8, padding: '8px', fontSize: 13, cursor: 'pointer' },
+  actBtn: { flex: 1, background: 'rgba(var(--ink),.06)', border: '1px solid rgba(var(--ink),.1)', color: 'var(--ink-solid, #fff)', borderRadius: 8, padding: '8px', fontSize: 13, cursor: 'pointer' },
   overlay: { position: 'fixed' as const, inset: 0, background: 'rgba(0,0,0,.6)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center' },
-  modal: { background: '#1a1a2e', border: '1px solid rgba(255,255,255,.1)', borderRadius: 16, padding: 32, width: '100%', maxWidth: 480 },
+  modal: { background: 'var(--dk-1a1a2e, #1a1a2e)', border: '1px solid rgba(var(--ink),.1)', borderRadius: 16, padding: 32, width: '100%', maxWidth: 480 },
   modalTitle: { fontSize: 18, fontWeight: 700, marginBottom: 24 },
   field: { marginBottom: 16 },
-  label: { display: 'block', fontSize: 13, color: 'rgba(255,255,255,.6)', marginBottom: 6 },
-  input: { width: '100%', background: 'rgba(255,255,255,.06)', border: '1px solid rgba(255,255,255,.1)', borderRadius: 8, padding: '10px 12px', color: '#fff', fontSize: 14, boxSizing: 'border-box' as const },
+  label: { display: 'block', fontSize: 13, color: 'rgba(var(--ink),.6)', marginBottom: 6 },
+  input: { width: '100%', background: 'rgba(var(--ink),.06)', border: '1px solid rgba(var(--ink),.1)', borderRadius: 8, padding: '10px 12px', color: 'var(--ink-solid, #fff)', fontSize: 14, boxSizing: 'border-box' as const },
   row2: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 },
   modalBtns: { display: 'flex', gap: 12, marginTop: 24 },
 };
@@ -95,11 +95,11 @@ export default function ClassesPage() {
         <div style={S.stat}><div style={S.statLabel}>Avg Occupancy</div><div style={{ ...S.statVal, color: '#fbbf24' }}>{avgOccupancy}%</div></div>
       </div>
 
-      {loading && <div style={{ textAlign: 'center', padding: 40, color: 'rgba(255,255,255,.4)' }}>Loading...</div>}
+      {loading && <div style={{ textAlign: 'center', padding: 40, color: 'rgba(var(--ink),.4)' }}>Loading...</div>}
 
       <div style={S.grid}>
         {!loading && classes.length === 0 && (
-          <div style={{ ...S.card, textAlign: 'center', padding: 40, color: 'rgba(255,255,255,.25)' }}>No classes found.</div>
+          <div style={{ ...S.card, textAlign: 'center', padding: 40, color: 'rgba(var(--ink),.25)' }}>No classes found.</div>
         )}
         {classes.map(c => {
           const pct = c.capacity > 0 ? Math.round((c.enrolled / c.capacity) * 100) : 0;
@@ -120,7 +120,7 @@ export default function ClassesPage() {
                 <div style={S.infoItem}><div style={S.infoLabel}>Capacity</div><div style={S.infoVal}>{c.enrolled}/{c.capacity}</div></div>
               </div>
               <div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, color: 'rgba(255,255,255,.5)', marginBottom: 6 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, color: 'rgba(var(--ink),.5)', marginBottom: 6 }}>
                   <span>Occupancy</span><span style={{ color: barColor, fontWeight: 600 }}>{pct}%</span>
                 </div>
                 <div style={S.progressBar}><div style={S.progressFill(pct, barColor)} /></div>
@@ -148,7 +148,7 @@ export default function ClassesPage() {
             <div style={S.field}><label style={S.label}>Capacity</label><input type="number" style={S.input} value={form.capacity} onChange={e => setForm(p => ({ ...p, capacity: e.target.value }))} placeholder="20" /></div>
             <div style={S.modalBtns}>
               <button style={{ ...S.btn, flex: 1 }} onClick={handleAdd}>Add Class</button>
-              <button style={{ flex: 1, background: 'rgba(255,255,255,.06)', border: '1px solid rgba(255,255,255,.1)', color: '#fff', borderRadius: 8, padding: '10px', fontSize: 14, cursor: 'pointer' }} onClick={() => setShowModal(false)}>Cancel</button>
+              <button style={{ flex: 1, background: 'rgba(var(--ink),.06)', border: '1px solid rgba(var(--ink),.1)', color: 'var(--ink-solid, #fff)', borderRadius: 8, padding: '10px', fontSize: 14, cursor: 'pointer' }} onClick={() => setShowModal(false)}>Cancel</button>
             </div>
           </div>
         </div>

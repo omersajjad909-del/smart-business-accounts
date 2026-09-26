@@ -229,7 +229,7 @@ export default function RetailBranchesPage() {
                 </div>
               </div>
               <div style={{ display: "flex", gap: 10 }}>
-                <button type="button" onClick={() => setShowModal(false)} style={{ flex: 1, padding: "10px 0", borderRadius: 10, background: "rgba(255,255,255,.05)", border: "1px solid var(--border)", color: "var(--text-muted)", fontSize: 13, fontWeight: 600, cursor: "pointer" }}>
+                <button type="button" onClick={() => setShowModal(false)} style={{ flex: 1, padding: "10px 0", borderRadius: 10, background: "rgba(var(--ink),.05)", border: "1px solid var(--border)", color: "var(--text-muted)", fontSize: 13, fontWeight: 600, cursor: "pointer" }}>
                   Cancel
                 </button>
                 <button type="submit" disabled={saving} style={{ flex: 2, padding: "10px 0", borderRadius: 10, background: saving ? "#4338ca" : "linear-gradient(135deg,#6366f1,#4f46e5)", border: "none", color: "white", fontSize: 13, fontWeight: 700, cursor: saving ? "wait" : "pointer", opacity: saving ? .7 : 1 }}>

@@ -82,7 +82,7 @@ export default function ConstructionBillingPage() {
   }
 
   return (
-    <div style={{ minHeight: "100vh", padding: isMobile ? "15px 14px" : "28px 32px", color: "#fff", fontFamily: constructionFont }}>
+    <div style={{ minHeight: "100vh", padding: isMobile ? "15px 14px" : "28px 32px", color: "var(--ink-solid, #fff)", fontFamily: constructionFont }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24, gap: 16, flexWrap: "wrap" }}>
         <div>
           <h1 style={{ margin: "0 0 6px", fontSize: 24, fontWeight: 800 }}>Progress Billing</h1>
@@ -115,15 +115,15 @@ export default function ConstructionBillingPage() {
           <tbody>
             {billings.map((row) => (
               <tr key={row.id}>
-                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)", fontWeight: 700 }}>{row.project}</td>
-                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)" }}>{row.invoiceNo}</td>
-                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)" }}>{row.client}</td>
-                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)" }}>{row.site}</td>
-                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)", color: "#60a5fa" }}>{row.progress}%</td>
-                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)", color: "#34d399" }}>Rs. {row.certifiedValue.toLocaleString()}</td>
-                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)" }}>{row.date}</td>
-                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)" }}>{row.status}</td>
-                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)" }}>
+                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", fontWeight: 700 }}>{row.project}</td>
+                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)" }}>{row.invoiceNo}</td>
+                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)" }}>{row.client}</td>
+                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)" }}>{row.site}</td>
+                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", color: "#60a5fa" }}>{row.progress}%</td>
+                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", color: "#34d399" }}>Rs. {row.certifiedValue.toLocaleString()}</td>
+                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)" }}>{row.date}</td>
+                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)" }}>{row.status}</td>
+                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)" }}>
                   <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
                     {row.status === "draft" && <button onClick={() => advance(row.id, "submitted")} style={{ padding: "5px 10px", borderRadius: 6, background: "rgba(245,158,11,.15)", border: "1px solid rgba(245,158,11,.3)", color: "#f59e0b", cursor: "pointer" }}>Submit</button>}
                     {row.status === "submitted" && <button onClick={() => advance(row.id, "approved")} style={{ padding: "5px 10px", borderRadius: 6, background: "rgba(129,140,248,.15)", border: "1px solid rgba(129,140,248,.3)", color: "#a5b4fc", cursor: "pointer" }}>Approve</button>}
@@ -132,38 +132,38 @@ export default function ConstructionBillingPage() {
                 </td>
               </tr>
             ))}
-            {!loading && billings.length === 0 && <tr><td colSpan={9} style={{ padding: 40, textAlign: "center", color: "rgba(255,255,255,.25)" }}>No billing records yet.</td></tr>}
+            {!loading && billings.length === 0 && <tr><td colSpan={9} style={{ padding: 40, textAlign: "center", color: "rgba(var(--ink),.25)" }}>No billing records yet.</td></tr>}
           </tbody>
         </table>
       </div>
 
       {showModal && (
         <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.72)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-          <div style={{ width: 560, background: "#161b27", border: `1px solid ${constructionBorder}`, borderRadius: 16, padding: 28 }}>
+          <div style={{ width: 560, background: "var(--dk-161b27, #161b27)", border: `1px solid ${constructionBorder}`, borderRadius: 16, padding: 28 }}>
             <h2 style={{ margin: "0 0 18px", fontSize: 18, fontWeight: 800 }}>New Progress Bill</h2>
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
               <div>
                 <label style={{ display: "block", marginBottom: 6, fontSize: 12, color: constructionMuted }}>Project</label>
-                <select value={form.project} onChange={(e) => setForm((prev) => ({ ...prev, project: e.target.value }))} style={{ width: "100%", padding: "10px 12px", background: "#111827", border: `1px solid ${constructionBorder}`, borderRadius: 8, color: "#fff" }}>
+                <select value={form.project} onChange={(e) => setForm((prev) => ({ ...prev, project: e.target.value }))} style={{ width: "100%", padding: "10px 12px", background: "var(--dk-111827, #111827)", border: `1px solid ${constructionBorder}`, borderRadius: 8, color: "var(--ink-solid, #fff)" }}>
                   <option value="">Select project</option>
                   {projects.map((project) => <option key={project.id} value={project.name}>{project.name}</option>)}
                 </select>
               </div>
               <div>
                 <label style={{ display: "block", marginBottom: 6, fontSize: 12, color: constructionMuted }}>Invoice No</label>
-                <input value={form.invoiceNo} onChange={(e) => setForm((prev) => ({ ...prev, invoiceNo: e.target.value }))} style={{ width: "100%", padding: "10px 12px", background: "#111827", border: `1px solid ${constructionBorder}`, borderRadius: 8, color: "#fff" }} />
+                <input value={form.invoiceNo} onChange={(e) => setForm((prev) => ({ ...prev, invoiceNo: e.target.value }))} style={{ width: "100%", padding: "10px 12px", background: "var(--dk-111827, #111827)", border: `1px solid ${constructionBorder}`, borderRadius: 8, color: "var(--ink-solid, #fff)" }} />
               </div>
               <div>
                 <label style={{ display: "block", marginBottom: 6, fontSize: 12, color: constructionMuted }}>Progress %</label>
-                <input type="number" value={form.progress} onChange={(e) => setForm((prev) => ({ ...prev, progress: Number(e.target.value) }))} style={{ width: "100%", padding: "10px 12px", background: "#111827", border: `1px solid ${constructionBorder}`, borderRadius: 8, color: "#fff" }} />
+                <input type="number" value={form.progress} onChange={(e) => setForm((prev) => ({ ...prev, progress: Number(e.target.value) }))} style={{ width: "100%", padding: "10px 12px", background: "var(--dk-111827, #111827)", border: `1px solid ${constructionBorder}`, borderRadius: 8, color: "var(--ink-solid, #fff)" }} />
               </div>
               <div>
                 <label style={{ display: "block", marginBottom: 6, fontSize: 12, color: constructionMuted }}>Certified Value</label>
-                <input type="number" value={form.certifiedValue} onChange={(e) => setForm((prev) => ({ ...prev, certifiedValue: Number(e.target.value) }))} style={{ width: "100%", padding: "10px 12px", background: "#111827", border: `1px solid ${constructionBorder}`, borderRadius: 8, color: "#fff" }} />
+                <input type="number" value={form.certifiedValue} onChange={(e) => setForm((prev) => ({ ...prev, certifiedValue: Number(e.target.value) }))} style={{ width: "100%", padding: "10px 12px", background: "var(--dk-111827, #111827)", border: `1px solid ${constructionBorder}`, borderRadius: 8, color: "var(--ink-solid, #fff)" }} />
               </div>
               <div style={{ gridColumn: "span 2" }}>
                 <label style={{ display: "block", marginBottom: 6, fontSize: 12, color: constructionMuted }}>Billing Date</label>
-                <input type="date" value={form.date} onChange={(e) => setForm((prev) => ({ ...prev, date: e.target.value }))} style={{ width: "100%", padding: "10px 12px", background: "#111827", border: `1px solid ${constructionBorder}`, borderRadius: 8, color: "#fff" }} />
+                <input type="date" value={form.date} onChange={(e) => setForm((prev) => ({ ...prev, date: e.target.value }))} style={{ width: "100%", padding: "10px 12px", background: "var(--dk-111827, #111827)", border: `1px solid ${constructionBorder}`, borderRadius: 8, color: "var(--ink-solid, #fff)" }} />
               </div>
             </div>
             {error && <div style={{ marginTop: 12, color: "#fda4af", fontSize: 12 }}>{error}</div>}

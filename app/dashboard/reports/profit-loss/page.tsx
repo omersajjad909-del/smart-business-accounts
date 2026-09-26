@@ -61,10 +61,10 @@ function PLRow({ label, amount, variant = "normal", indent = false, dimZero = fa
   if (dimZero && isZero) return null;
 
   const styles: Record<RowVariant, React.CSSProperties> = {
-    normal:   { fontSize: 13, color: "rgba(255,255,255,.65)", fontWeight: 400 },
+    normal:   { fontSize: 13, color: "rgba(var(--ink),.65)", fontWeight: 400 },
     deduct:   { fontSize: 13, color: "#f87171",               fontWeight: 500 },
-    subtotal: { fontSize: 13, color: "#e2e8f0",               fontWeight: 700, borderTop: "1px solid rgba(255,255,255,.08)", paddingTop: 8, marginTop: 4 },
-    total:    { fontSize: 15, color: "#fff",                   fontWeight: 900 },
+    subtotal: { fontSize: 13, color: "#e2e8f0",               fontWeight: 700, borderTop: "1px solid rgba(var(--ink),.08)", paddingTop: 8, marginTop: 4 },
+    total:    { fontSize: 15, color: "var(--ink-solid, #fff)",                   fontWeight: 900 },
   };
   const s = styles[variant];
   const amtColor = variant === "total" || variant === "subtotal"
@@ -74,7 +74,7 @@ function PLRow({ label, amount, variant = "normal", indent = false, dimZero = fa
       : "rgba(255,255,255,.7)";
 
   return (
-    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "5px 0", ...(variant === "subtotal" || variant === "total" ? { borderTop: "1px solid rgba(255,255,255,.08)", marginTop: 6, paddingTop: 8 } : {}) }}>
+    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "5px 0", ...(variant === "subtotal" || variant === "total" ? { borderTop: "1px solid rgba(var(--ink),.08)", marginTop: 6, paddingTop: 8 } : {}) }}>
       <span style={{ ...s, paddingLeft: indent ? 16 : 0 }}>{label}</span>
       <span style={{ ...s, color: amtColor, fontFamily: "'Courier New',monospace", minWidth: 140, textAlign: "right" }}>
         {variant === "deduct" && amount > 0 ? `(${fmt(amount)})` : fmt(amount)}
@@ -85,8 +85,8 @@ function PLRow({ label, amount, variant = "normal", indent = false, dimZero = fa
 
 function Section({ title, color, icon, children }: { title: string; color: string; icon: string; children: React.ReactNode }) {
   return (
-    <div style={{ background: "#111827", border: "1px solid rgba(255,255,255,.07)", borderRadius: 14, overflow: "hidden", marginBottom: 12 }}>
-      <div style={{ padding: "10px 18px", borderBottom: "1px solid rgba(255,255,255,.06)", background: `${color}0c`, display: "flex", alignItems: "center", gap: 8 }}>
+    <div style={{ background: "var(--dk-111827, #111827)", border: "1px solid rgba(var(--ink),.07)", borderRadius: 14, overflow: "hidden", marginBottom: 12 }}>
+      <div style={{ padding: "10px 18px", borderBottom: "1px solid rgba(var(--ink),.06)", background: `${color}0c`, display: "flex", alignItems: "center", gap: 8 }}>
         <span style={{ fontSize: 14 }}>{icon}</span>
         <span style={{ fontSize: 11, fontWeight: 800, letterSpacing: ".08em", textTransform: "uppercase", color }}>{title}</span>
       </div>
@@ -154,33 +154,33 @@ export default function ProfitLossPage() {
 
   const inputStyle: React.CSSProperties = {
     width: "100%", padding: "11px 14px", borderRadius: 10, fontSize: 14,
-    background: "rgba(255,255,255,.06)", border: "1px solid rgba(255,255,255,.12)",
-    color: "white", outline: "none", fontFamily: ff, boxSizing: "border-box",
+    background: "rgba(var(--ink),.06)", border: "1px solid rgba(var(--ink),.12)",
+    color: "var(--ink-solid, white)", outline: "none", fontFamily: ff, boxSizing: "border-box",
   };
 
   return (
-    <div style={{ fontFamily: ff, color: "rgba(255,255,255,.85)", minHeight: "100vh" }}>
+    <div style={{ fontFamily: ff, color: "rgba(var(--ink),.85)", minHeight: "100vh" }}>
       <style>{`@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}} @media print{.no-print{display:none!important}}`}</style>
 
       {/* ── DATE PICKER MODAL ── */}
       {showModal && (
         <div style={{ position: "fixed", inset: 0, zIndex: 9000, background: "rgba(0,0,0,.82)", backdropFilter: "blur(14px)", display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }}>
-          <div style={{ width: "100%", maxWidth: 460, background: "rgba(10,13,32,.97)", border: "1px solid rgba(255,255,255,.12)", borderRadius: 22, padding: "40px 40px 36px", boxShadow: "0 40px 100px rgba(0,0,0,.8)", position: "relative" }}>
-            <button onClick={() => report ? setShowModal(false) : router.back()} style={{ position: "absolute", top: 14, right: 16, background: "none", border: "none", color: "rgba(255,255,255,.35)", fontSize: 20, cursor: "pointer", padding: 4, borderRadius: 6 }}>✕</button>
+          <div style={{ width: "100%", maxWidth: 460, background: "rgba(10,13,32,.97)", border: "1px solid rgba(var(--ink),.12)", borderRadius: 22, padding: "40px 40px 36px", boxShadow: "0 40px 100px rgba(0,0,0,.8)", position: "relative" }}>
+            <button onClick={() => report ? setShowModal(false) : router.back()} style={{ position: "absolute", top: 14, right: 16, background: "none", border: "none", color: "rgba(var(--ink),.35)", fontSize: 20, cursor: "pointer", padding: 4, borderRadius: 6 }}>✕</button>
             <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 28 }}>
               <div style={{ width: 46, height: 46, borderRadius: 14, background: "linear-gradient(135deg,#10b981,#059669)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22 }}>📊</div>
               <div>
-                <div style={{ fontSize: 20, fontWeight: 800, color: "white", letterSpacing: "-.3px" }}>Profit & Loss</div>
-                <div style={{ fontSize: 12, color: "rgba(255,255,255,.35)", marginTop: 2 }}>Select reporting period</div>
+                <div style={{ fontSize: 20, fontWeight: 800, color: "var(--ink-solid, white)", letterSpacing: "-.3px" }}>Profit & Loss</div>
+                <div style={{ fontSize: 12, color: "rgba(var(--ink),.35)", marginTop: 2 }}>Select reporting period</div>
               </div>
             </div>
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14, marginBottom: 22 }}>
               <div>
-                <label style={{ fontSize: 10, fontWeight: 700, color: "rgba(255,255,255,.35)", letterSpacing: ".08em", textTransform: "uppercase", display: "block", marginBottom: 7 }}>From</label>
+                <label style={{ fontSize: 10, fontWeight: 700, color: "rgba(var(--ink),.35)", letterSpacing: ".08em", textTransform: "uppercase", display: "block", marginBottom: 7 }}>From</label>
                 <DateInput ref={fromRef} value={from} onChange={setFrom} style={inputStyle} autoFocus onKeyDown={e => { if (e.key === "Enter") { e.preventDefault(); toRef.current?.focus(); } }} />
               </div>
               <div>
-                <label style={{ fontSize: 10, fontWeight: 700, color: "rgba(255,255,255,.35)", letterSpacing: ".08em", textTransform: "uppercase", display: "block", marginBottom: 7 }}>To</label>
+                <label style={{ fontSize: 10, fontWeight: 700, color: "rgba(var(--ink),.35)", letterSpacing: ".08em", textTransform: "uppercase", display: "block", marginBottom: 7 }}>To</label>
                 <DateInput ref={toRef} value={to} onChange={setTo} style={inputStyle} onKeyDown={e => { if (e.key === "Enter") { e.preventDefault(); handleGenerate(); } }} />
               </div>
             </div>
@@ -197,17 +197,17 @@ export default function ProfitLossPage() {
           {/* Top bar */}
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 24, flexWrap: "wrap", gap: 10 }}>
             <div>
-              <div style={{ fontSize: 11, color: "rgba(255,255,255,.3)", marginBottom: 4 }}>Reports › <span style={{ color: "#a5b4fc" }}>Profit & Loss</span></div>
-              <h1 style={{ fontSize: 24, fontWeight: 900, color: "#fff", margin: 0, letterSpacing: "-.02em" }}>Profit & Loss Statement</h1>
-              <div style={{ fontSize: 12, color: "rgba(255,255,255,.35)", marginTop: 4 }}>
+              <div style={{ fontSize: 11, color: "rgba(var(--ink),.3)", marginBottom: 4 }}>Reports › <span style={{ color: "#a5b4fc" }}>Profit & Loss</span></div>
+              <h1 style={{ fontSize: 24, fontWeight: 900, color: "var(--ink-solid, #fff)", margin: 0, letterSpacing: "-.02em" }}>Profit & Loss Statement</h1>
+              <div style={{ fontSize: 12, color: "rgba(var(--ink),.35)", marginTop: 4 }}>
                 Period: <strong style={{ color: "#e2e8f0" }}>{from}</strong> → <strong style={{ color: "#e2e8f0" }}>{to}</strong>
               </div>
             </div>
             <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-              <button onClick={() => setShowModal(true)} style={{ padding: "8px 14px", borderRadius: 9, border: "1px solid rgba(255,255,255,.1)", background: "rgba(255,255,255,.04)", color: "rgba(255,255,255,.55)", fontSize: 12, fontWeight: 600, cursor: "pointer", fontFamily: ff }}>
+              <button onClick={() => setShowModal(true)} style={{ padding: "8px 14px", borderRadius: 9, border: "1px solid rgba(var(--ink),.1)", background: "rgba(var(--ink),.04)", color: "rgba(var(--ink),.55)", fontSize: 12, fontWeight: 600, cursor: "pointer", fontFamily: ff }}>
                 ⟵ Change Dates
               </button>
-              <button onClick={() => window.print()} style={{ padding: "8px 14px", borderRadius: 9, border: "1px solid rgba(255,255,255,.1)", background: "rgba(255,255,255,.04)", color: "rgba(255,255,255,.5)", fontSize: 12, fontWeight: 600, cursor: "pointer", fontFamily: ff }}>
+              <button onClick={() => window.print()} style={{ padding: "8px 14px", borderRadius: 9, border: "1px solid rgba(var(--ink),.1)", background: "rgba(var(--ink),.04)", color: "rgba(var(--ink),.5)", fontSize: 12, fontWeight: 600, cursor: "pointer", fontFamily: ff }}>
                 🖨 Print
               </button>
               <button onClick={sendEmail} disabled={sendingEmail || !report} style={{ padding: "8px 14px", borderRadius: 9, border: "1px solid rgba(52,211,153,.3)", background: "rgba(52,211,153,.06)", color: "#34d399", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: ff, opacity: (sendingEmail || !report) ? 0.5 : 1 }}>
@@ -221,7 +221,7 @@ export default function ProfitLossPage() {
           )}
 
           {loading && (
-            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "80px 0", gap: 16, color: "rgba(255,255,255,.3)" }}>
+            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "80px 0", gap: 16, color: "rgba(var(--ink),.3)" }}>
               <div style={{ width: 32, height: 32, borderRadius: "50%", border: "3px solid rgba(16,185,129,.2)", borderTopColor: "#10b981", animation: "spin 0.8s linear infinite" }} />
               <span style={{ fontSize: 14 }}>Building your P&L report…</span>
             </div>
@@ -245,7 +245,7 @@ export default function ProfitLossPage() {
                     { label: isProfit ? "Net Profit" : "Net Loss", val: r.netProfit, color: isProfit ? "#34d399" : "#f87171", icon: isProfit ? "✅" : "⚠️", pct: r.netMarginPct },
                   ].map(k => (
                     <div key={k.label} style={{ background: `${k.color}0e`, border: `1px solid ${k.color}28`, borderRadius: 13, padding: isMobile ? "12px 10px" : "14px 16px" }}>
-                      <div style={{ fontSize: 9, fontWeight: 700, color: "rgba(255,255,255,.32)", letterSpacing: ".08em", textTransform: "uppercase", marginBottom: 8, display: "flex", alignItems: "center", gap: 5 }}>
+                      <div style={{ fontSize: 9, fontWeight: 700, color: "rgba(var(--ink),.32)", letterSpacing: ".08em", textTransform: "uppercase", marginBottom: 8, display: "flex", alignItems: "center", gap: 5 }}>
                         <span>{k.icon}</span>{k.label}
                       </div>
                       <div style={{ fontSize: 20, fontWeight: 900, color: k.color, letterSpacing: "-.02em" }}>
@@ -277,7 +277,7 @@ export default function ProfitLossPage() {
                 {/* 2. COGS */}
                 <Section title="Cost of Goods Sold — COGS" color="#fb923c" icon="📦">
                   {r.cogsLines.length === 0
-                    ? <div style={{ textAlign: "center", padding: "16px 0", color: "rgba(255,255,255,.25)", fontSize: 13 }}>No cost of sales recorded in this period</div>
+                    ? <div style={{ textAlign: "center", padding: "16px 0", color: "rgba(var(--ink),.25)", fontSize: 13 }}>No cost of sales recorded in this period</div>
                     : r.cogsLines.map((e, i) => <PLRow key={i} label={e.name} amount={e.amount} indent />)}
                   <PLRow label="COST OF GOODS SOLD" amount={r.cogs} variant="total" />
                 </Section>
@@ -288,7 +288,7 @@ export default function ProfitLossPage() {
                 {/* 3. OPERATING EXPENSES */}
                 <Section title="Operating Expenses" color="#f87171" icon="⚙️">
                   {r.operatingExpenses.length === 0 ? (
-                    <div style={{ textAlign: "center", padding: "16px 0", color: "rgba(255,255,255,.25)", fontSize: 13 }}>No operating expenses recorded in this period</div>
+                    <div style={{ textAlign: "center", padding: "16px 0", color: "rgba(var(--ink),.25)", fontSize: 13 }}>No operating expenses recorded in this period</div>
                   ) : r.operatingExpenses.map((e, i) => (
                     <PLRow key={i} label={e.name} amount={e.amount} indent />
                   ))}
@@ -322,7 +322,7 @@ export default function ProfitLossPage() {
                 )}
 
                 {/* 5. EBT */}
-                <div style={{ background: "#111827", border: "1px solid rgba(255,255,255,.07)", borderRadius: 14, padding: "12px 18px", marginBottom: 12 }}>
+                <div style={{ background: "var(--dk-111827, #111827)", border: "1px solid rgba(var(--ink),.07)", borderRadius: 14, padding: "12px 18px", marginBottom: 12 }}>
                   <PLRow label="NET PROFIT BEFORE TAX (EBT)" amount={r.ebt} variant="total" />
                 </div>
 
@@ -345,10 +345,10 @@ export default function ProfitLossPage() {
                 }}>
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                     <div>
-                      <div style={{ fontSize: 10, fontWeight: 700, color: "rgba(255,255,255,.35)", letterSpacing: ".1em", textTransform: "uppercase", marginBottom: 5 }}>
+                      <div style={{ fontSize: 10, fontWeight: 700, color: "rgba(var(--ink),.35)", letterSpacing: ".1em", textTransform: "uppercase", marginBottom: 5 }}>
                         {isProfit ? "✅ NET PROFIT AFTER TAX" : "⚠️ NET LOSS AFTER TAX"}
                       </div>
-                      <div style={{ fontSize: 11, color: "rgba(255,255,255,.3)" }}>
+                      <div style={{ fontSize: 11, color: "rgba(var(--ink),.3)" }}>
                         Period: {from} → {to}
                         <MarginBadge pct={r.netMarginPct} />
                       </div>

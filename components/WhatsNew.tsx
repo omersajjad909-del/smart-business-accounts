@@ -68,9 +68,9 @@ export default function WhatsNew() {
           padding: "8px",
           borderRadius: 10,
           cursor: "pointer",
-          background: "rgba(255,255,255,.05)",
-          border: "1px solid rgba(255,255,255,.08)",
-          color: "rgba(255,255,255,.6)",
+          background: "rgba(var(--ink),.05)",
+          border: "1px solid rgba(var(--ink),.08)",
+          color: "rgba(var(--ink),.6)",
           fontSize: 16,
           lineHeight: 1,
           display: "inline-flex",
@@ -89,7 +89,7 @@ export default function WhatsNew() {
               height: 16,
               borderRadius: "50%",
               background: "linear-gradient(135deg,#f87171,#ef4444)",
-              border: "2px solid #080c1e",
+              border: "2px solid var(--dkb-080c1e, #080c1e)",
               fontSize: 9,
               fontWeight: 800,
               color: "white",
@@ -126,7 +126,7 @@ export default function WhatsNew() {
               width: "100%",
               maxWidth: 720,
               maxHeight: "85vh",
-              background: "linear-gradient(160deg,#0d1035,#080c1e)",
+              background: "linear-gradient(160deg,var(--dk-0d1035, #0d1035),var(--dk-080c1e, #080c1e))",
               borderRadius: 22,
               border: "1.5px solid rgba(99,102,241,.3)",
               boxShadow: "0 30px 80px rgba(0,0,0,.6), 0 0 0 1px rgba(99,102,241,.1)",
@@ -138,7 +138,7 @@ export default function WhatsNew() {
             <div
               style={{
                 padding: "22px 28px",
-                borderBottom: "1px solid rgba(255,255,255,.07)",
+                borderBottom: "1px solid rgba(var(--ink),.07)",
                 background: "linear-gradient(135deg,rgba(79,70,229,.2),rgba(124,58,237,.1))",
                 display: "flex",
                 alignItems: "center",
@@ -149,10 +149,10 @@ export default function WhatsNew() {
                 <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
                   <span style={{ fontSize: 24 }}>🚀</span>
                   <div>
-                    <div style={{ fontSize: 20, fontWeight: 800, color: "white", letterSpacing: "-.02em" }}>
+                    <div style={{ fontSize: 20, fontWeight: 800, color: "var(--ink-solid, white)", letterSpacing: "-.02em" }}>
                       What’s New in FinovaOS
                     </div>
-                    <div style={{ fontSize: 12, color: "rgba(255,255,255,.4)", marginTop: 2 }}>
+                    <div style={{ fontSize: 12, color: "rgba(var(--ink),.4)", marginTop: 2 }}>
                       {updates.length} update{updates.length !== 1 ? "s" : ""} · Latest first
                     </div>
                   </div>
@@ -164,9 +164,9 @@ export default function WhatsNew() {
                   width: 32,
                   height: 32,
                   borderRadius: 8,
-                  background: "rgba(255,255,255,.06)",
-                  border: "1px solid rgba(255,255,255,.1)",
-                  color: "rgba(255,255,255,.5)",
+                  background: "rgba(var(--ink),.06)",
+                  border: "1px solid rgba(var(--ink),.1)",
+                  color: "rgba(var(--ink),.5)",
                   fontSize: 16,
                   cursor: "pointer",
                   display: "flex",
@@ -179,7 +179,7 @@ export default function WhatsNew() {
             </div>
 
             <div style={{ display: "flex", flex: 1, overflow: "hidden" }}>
-              <div style={{ width: 280, borderRight: "1px solid rgba(255,255,255,.07)", overflowY: "auto", flexShrink: 0 }}>
+              <div style={{ width: 280, borderRight: "1px solid rgba(var(--ink),.07)", overflowY: "auto", flexShrink: 0 }}>
                 {updates.map((u, i) => {
                   const tc = TYPE_CONFIG[u.type] || TYPE_CONFIG.feature;
                   const isSelected = selected?.id === u.id || (!selected && i === 0);
@@ -190,7 +190,7 @@ export default function WhatsNew() {
                       style={{
                         padding: "14px 18px",
                         cursor: "pointer",
-                        borderBottom: "1px solid rgba(255,255,255,.04)",
+                        borderBottom: "1px solid rgba(var(--ink),.04)",
                         background: isSelected ? "rgba(99,102,241,.12)" : "transparent",
                         borderLeft: `3px solid ${isSelected ? tc.color : "transparent"}`,
                         transition: "all .15s",
@@ -212,8 +212,8 @@ export default function WhatsNew() {
                           </span>
                         )}
                       </div>
-                      <div style={{ fontSize: 12, fontWeight: 600, color: "white", lineHeight: 1.4 }}>{u.title}</div>
-                      <div style={{ fontSize: 10, color: "rgba(255,255,255,.25)", marginTop: 4 }}>
+                      <div style={{ fontSize: 12, fontWeight: 600, color: "var(--ink-solid, white)", lineHeight: 1.4 }}>{u.title}</div>
+                      <div style={{ fontSize: 10, color: "rgba(var(--ink),.25)", marginTop: 4 }}>
                         {new Date(u.createdAt).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}
                         {u.version && ` · ${u.version}`}
                       </div>
@@ -234,18 +234,18 @@ export default function WhatsNew() {
                           {tc.icon} {tc.label}
                         </span>
                         {u.version && (
-                          <span style={{ padding: "4px 12px", borderRadius: 20, background: "rgba(255,255,255,.06)", color: "rgba(255,255,255,.5)", fontSize: 11, fontWeight: 700, fontFamily: "monospace" }}>
+                          <span style={{ padding: "4px 12px", borderRadius: 20, background: "rgba(var(--ink),.06)", color: "rgba(var(--ink),.5)", fontSize: 11, fontWeight: 700, fontFamily: "monospace" }}>
                             {u.version}
                           </span>
                         )}
                       </div>
-                      <h2 style={{ fontSize: 22, fontWeight: 800, color: "white", letterSpacing: "-.02em", lineHeight: 1.3, margin: "0 0 12px" }}>
+                      <h2 style={{ fontSize: 22, fontWeight: 800, color: "var(--ink-solid, white)", letterSpacing: "-.02em", lineHeight: 1.3, margin: "0 0 12px" }}>
                         {u.title}
                       </h2>
-                      <div style={{ fontSize: 11, color: "rgba(255,255,255,.3)", marginBottom: 20 }}>
+                      <div style={{ fontSize: 11, color: "rgba(var(--ink),.3)", marginBottom: 20 }}>
                         {new Date(u.createdAt).toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long", year: "numeric" })}
                       </div>
-                      <div style={{ color: "rgba(255,255,255,.75)", fontSize: 13, lineHeight: 1.7, whiteSpace: "pre-wrap" }}>{u.body}</div>
+                      <div style={{ color: "rgba(var(--ink),.75)", fontSize: 13, lineHeight: 1.7, whiteSpace: "pre-wrap" }}>{u.body}</div>
                     </div>
                   );
                 })()}

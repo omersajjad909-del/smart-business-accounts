@@ -49,8 +49,8 @@ export function PrintActionBar({
         <button
           onClick={() => setOpen(o => !o)}
           style={{
-            background: "#18181b",
-            color: "#fff",
+            background: "var(--dk-18181b, #18181b)",
+            color: "var(--ink-solid, #fff)",
             border: "none",
             borderRadius: 8,
             padding: "9px 16px",
@@ -74,8 +74,8 @@ export function PrintActionBar({
               position: "absolute",
               top: "calc(100% + 6px)",
               left: 0,
-              background: "var(--card-bg, #1c1c1e)",
-              border: "1px solid var(--border, #333)",
+              background: "var(--card-bg, var(--dk-1c1c1e, #1c1c1e))",
+              border: "1px solid var(--border, var(--dkb-333333, #333))",
               borderRadius: 10,
               padding: "6px 0",
               zIndex: 50,
@@ -117,7 +117,7 @@ export function PrintActionBar({
 const ghostBtn: React.CSSProperties = {
   background: "transparent",
   color: "var(--text-muted, #888)",
-  border: "1px solid var(--border, #333)",
+  border: "1px solid var(--border, var(--dkb-333333, #333))",
   borderRadius: 8,
   padding: "9px 16px",
   fontSize: 14,
@@ -158,5 +158,5 @@ function DropItem({
 }
 
 function Divider() {
-  return <div style={{ height: 1, background: "var(--border, #2a2a2a)", margin: "4px 0" }} />;
+  return <div style={{ height: 1, background: "var(--border, var(--dk-2a2a2a, #2a2a2a))", margin: "4px 0" }} />;
 }

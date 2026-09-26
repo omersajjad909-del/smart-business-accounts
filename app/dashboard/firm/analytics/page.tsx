@@ -45,7 +45,7 @@ export default function FirmAnalyticsPage() {
   const industryMix = [...industryMap.entries()].sort((a, b) => b[1] - a[1]);
 
   return (
-    <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", minHeight: "100vh", color: "#fff", fontFamily: firmFont }}>
+    <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", minHeight: "100vh", color: "var(--ink-solid, #fff)", fontFamily: firmFont }}>
       <div style={{ marginBottom: 24 }}>
         <div style={{ fontSize: 12, color: "#818cf8", fontWeight: 700, letterSpacing: ".08em", textTransform: "uppercase", marginBottom: 10 }}>Firm Analytics</div>
         <h1 style={{ fontSize: 30, fontWeight: 900, margin: "0 0 10px" }}>Portfolio mix, fee realization, aur utilization</h1>
@@ -74,7 +74,7 @@ export default function FirmAnalyticsPage() {
                   <span style={{ fontSize: 13, fontWeight: 700 }}>{industry}</span>
                   <span style={{ fontSize: 12, color: firmMuted }}>{count} clients</span>
                 </div>
-                <div style={{ height: 10, borderRadius: 999, background: "rgba(255,255,255,.05)", overflow: "hidden" }}>
+                <div style={{ height: 10, borderRadius: 999, background: "rgba(var(--ink),.05)", overflow: "hidden" }}>
                   <div style={{ width: `${pct}%`, height: "100%", borderRadius: 999, background: "linear-gradient(90deg,#818cf8,#60a5fa)" }} />
                 </div>
               </div>

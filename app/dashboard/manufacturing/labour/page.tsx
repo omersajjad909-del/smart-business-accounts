@@ -44,7 +44,7 @@ type BusinessRecordLike = {
 };
 
 const cell: React.CSSProperties = {
-  padding: "10px 14px", fontSize: 12.5, color: "rgba(255,255,255,.72)",
+  padding: "10px 14px", fontSize: 12.5, color: "rgba(var(--ink),.72)",
   borderBottom: `1px solid ${border}`, whiteSpace: "nowrap",
 };
 const cellNum: React.CSSProperties = {
@@ -211,11 +211,11 @@ export default function LabourPage() {
   }
 
   return (
-    <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", fontFamily: ff, color: "#fff", minHeight: "100vh" }}>
+    <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", fontFamily: ff, color: "var(--ink-solid, #fff)", minHeight: "100vh" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 26, gap: 14, flexWrap: "wrap" }}>
         <div>
           <h1 style={{ fontSize: 22, fontWeight: 800, margin: "0 0 4px" }}>Labour</h1>
-          <p style={{ fontSize: 13, color: "rgba(255,255,255,.42)", margin: 0 }}>
+          <p style={{ fontSize: 13, color: "rgba(var(--ink),.42)", margin: 0 }}>
             Piece-rate workers. Assign them to a production run and what they&apos;re owed posts to their own ledger.
           </p>
         </div>
@@ -237,7 +237,7 @@ export default function LabourPage() {
           { label: "Fully paid", value: rows.filter((r) => (r.balance || 0) <= 0).length, color: "#22c55e" },
         ].map((card) => (
           <div key={card.label} style={{ background: bg, border: `1px solid ${border}`, borderRadius: 14, padding: isMobile ? "12px 10px" : "18px 20px" }}>
-            <div style={{ fontSize: 12, color: "rgba(255,255,255,.48)", marginBottom: 6 }}>{card.label}</div>
+            <div style={{ fontSize: 12, color: "rgba(var(--ink),.48)", marginBottom: 6 }}>{card.label}</div>
             <div style={{ fontSize: 21, fontWeight: 800, color: card.color }}>{card.value}</div>
           </div>
         ))}
@@ -248,7 +248,7 @@ export default function LabourPage() {
           <div key={r.id} style={{ background: bg, border: `1px solid ${border}`, borderRadius: 14, padding: isMobile ? "12px 10px" : "16px 20px", display: "flex", justifyContent: "space-between", alignItems: "center", gap: 14, flexWrap: "wrap" }}>
             <div>
               <div style={{ fontSize: 15, fontWeight: 800 }}>{r.name}</div>
-              <div style={{ fontSize: 12, color: "rgba(255,255,255,.42)", marginTop: 4 }}>
+              <div style={{ fontSize: 12, color: "rgba(var(--ink),.42)", marginTop: 4 }}>
                 {r.code} • {r.phone || "No phone"} • Rs. {(r.ratePerUnit * 1000).toLocaleString()} / 1,000 pcs
               </div>
             </div>
@@ -257,7 +257,7 @@ export default function LabourPage() {
                 <div style={{ fontSize: 15, fontWeight: 800, color: (r.balance || 0) > 0 ? "#f59e0b" : "#22c55e" }}>
                   Rs. {Math.round(r.balance || 0).toLocaleString()}
                 </div>
-                <div style={{ fontSize: 11, color: "rgba(255,255,255,.35)" }}>owed</div>
+                <div style={{ fontSize: 11, color: "rgba(var(--ink),.35)" }}>owed</div>
               </div>
               <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
                 <a href={`/dashboard/reports/ledger?accountId=${r.accountId}`} style={{ padding: "7px 14px", background: "rgba(56,189,248,.12)", border: "1px solid rgba(56,189,248,.3)", color: "#38bdf8", borderRadius: 8, fontSize: 12, fontWeight: 700, textDecoration: "none" }}>
@@ -277,7 +277,7 @@ export default function LabourPage() {
           </div>
         ))}
         {!loading && rows.length === 0 && (
-          <div style={{ background: bg, border: `1px solid ${border}`, borderRadius: 14, padding: 36, textAlign: "center", color: "rgba(255,255,255,.28)" }}>
+          <div style={{ background: bg, border: `1px solid ${border}`, borderRadius: 14, padding: 36, textAlign: "center", color: "rgba(var(--ink),.28)" }}>
             No labour added yet.
           </div>
         )}
@@ -292,14 +292,14 @@ export default function LabourPage() {
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 14, flexWrap: "wrap", marginBottom: 12 }}>
           <div>
             <h2 style={{ fontSize: 17, fontWeight: 800, margin: 0 }}>Work done</h2>
-            <p style={{ fontSize: 12.5, color: "rgba(255,255,255,.42)", margin: "3px 0 0" }}>
+            <p style={{ fontSize: 12.5, color: "rgba(var(--ink),.42)", margin: "3px 0 0" }}>
               Every job a worker was credited for, run by run. This is what makes up the balances above.
             </p>
           </div>
           <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
             <input type="date" value={fromDate} onChange={(e) => setFromDate(e.target.value)}
               style={{ ...inputStyle, width: "auto", padding: "7px 10px", fontSize: 12.5, fontFamily: "inherit" }} />
-            <span style={{ color: "rgba(255,255,255,.3)", fontSize: 12 }}>to</span>
+            <span style={{ color: "rgba(var(--ink),.3)", fontSize: 12 }}>to</span>
             <input type="date" value={toDate} onChange={(e) => setToDate(e.target.value)}
               style={{ ...inputStyle, width: "auto", padding: "7px 10px", fontSize: 12.5, fontFamily: "inherit" }} />
             <select value={workerFilter} onChange={(e) => setWorkerFilter(e.target.value)}
@@ -316,11 +316,11 @@ export default function LabourPage() {
           <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(auto-fit,minmax(160px,1fr))", gap: 10, marginBottom: 14 }}>
             {entryTotals.map((t) => (
               <div key={t.labourId} style={{ background: bg, border: `1px solid ${border}`, borderRadius: 12, padding: "12px 14px" }}>
-                <div style={{ fontSize: 12.5, color: "rgba(255,255,255,.55)" }}>{t.name}</div>
+                <div style={{ fontSize: 12.5, color: "rgba(var(--ink),.55)" }}>{t.name}</div>
                 <div style={{ fontSize: 17, fontWeight: 800, color: "#f59e0b", marginTop: 2 }}>
                   Rs. {Math.round(t.amount).toLocaleString()}
                 </div>
-                <div style={{ fontSize: 11, color: "rgba(255,255,255,.33)", marginTop: 1 }}>
+                <div style={{ fontSize: 11, color: "rgba(var(--ink),.33)", marginTop: 1 }}>
                   {t.qty.toLocaleString()} pcs · {t.jobs}
                 </div>
               </div>
@@ -336,7 +336,7 @@ export default function LabourPage() {
                   <th key={h} style={{
                     textAlign: i >= 4 ? "right" : "left", padding: "10px 14px", fontSize: 11,
                     fontWeight: 700, letterSpacing: .5, textTransform: "uppercase",
-                    color: "rgba(255,255,255,.38)", borderBottom: `1px solid ${border}`, whiteSpace: "nowrap",
+                    color: "rgba(var(--ink),.38)", borderBottom: `1px solid ${border}`, whiteSpace: "nowrap",
                   }}>{h}</th>
                 ))}
               </tr>
@@ -346,8 +346,8 @@ export default function LabourPage() {
                 <tr key={e.id}>
                   <td style={cell}>{e.date}</td>
                   <td style={{ ...cell, fontWeight: 700 }}>{e.labourName}</td>
-                  <td style={{ ...cell, color: "rgba(255,255,255,.55)" }}>{e.operation || "—"}</td>
-                  <td style={{ ...cell, color: "rgba(255,255,255,.45)" }}>{e.product || "—"}</td>
+                  <td style={{ ...cell, color: "rgba(var(--ink),.55)" }}>{e.operation || "—"}</td>
+                  <td style={{ ...cell, color: "rgba(var(--ink),.45)" }}>{e.product || "—"}</td>
                   <td style={cellNum}>{e.qty.toLocaleString()}</td>
                   <td style={cellNum}>{e.rate}</td>
                   <td style={{ ...cellNum, fontWeight: 800, color: "#f59e0b" }}>Rs. {Math.round(e.amount).toLocaleString()}</td>
@@ -355,7 +355,7 @@ export default function LabourPage() {
               ))}
               {visibleEntries.length > 0 && (
                 <tr>
-                  <td colSpan={6} style={{ ...cell, textAlign: "right", fontWeight: 700, color: "rgba(255,255,255,.5)" }}>Total</td>
+                  <td colSpan={6} style={{ ...cell, textAlign: "right", fontWeight: 700, color: "rgba(var(--ink),.5)" }}>Total</td>
                   <td style={{ ...cellNum, fontWeight: 800, color: "#f59e0b" }}>
                     Rs. {Math.round(visibleEntries.reduce((s, e) => s + e.amount, 0)).toLocaleString()}
                   </td>
@@ -363,7 +363,7 @@ export default function LabourPage() {
               )}
               {visibleEntries.length === 0 && (
                 <tr>
-                  <td colSpan={7} style={{ ...cell, textAlign: "center", color: "rgba(255,255,255,.28)", padding: 30 }}>
+                  <td colSpan={7} style={{ ...cell, textAlign: "center", color: "rgba(var(--ink),.28)", padding: 30 }}>
                     {entries.length
                       ? "Nothing in this range."
                       : "No work recorded yet. It appears here as soon as a production run names its workers."}
@@ -377,25 +377,25 @@ export default function LabourPage() {
 
       {showModal && (
         <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.7)", zIndex: 50, display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }}>
-          <div style={{ background: "#161b27", border: `1px solid ${border}`, borderRadius: 16, padding: 30, width: 460, fontFamily: ff }}>
+          <div style={{ background: "var(--dk-161b27, #161b27)", border: `1px solid ${border}`, borderRadius: 16, padding: 30, width: 460, fontFamily: ff }}>
             <h2 style={{ margin: "0 0 20px", fontSize: 18, fontWeight: 700 }}>{editingId ? "Edit Labour" : "Add Labour"}</h2>
             {formError && <div style={{ marginBottom: 14, padding: "10px 12px", borderRadius: 8, background: "rgba(239,68,68,.14)", border: "1px solid rgba(239,68,68,.28)", color: "#fca5a5", fontSize: 12 }}>{formError}</div>}
             <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
               <div>
-                <label style={{ display: "block", fontSize: 12, color: "rgba(255,255,255,.45)", marginBottom: 6 }}>Name</label>
+                <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),.45)", marginBottom: 6 }}>Name</label>
                 <input value={form.name} onChange={(e) => setForm((c) => ({ ...c, name: e.target.value }))} style={inputStyle} />
               </div>
               <div>
-                <label style={{ display: "block", fontSize: 12, color: "rgba(255,255,255,.45)", marginBottom: 6 }}>Phone</label>
+                <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),.45)", marginBottom: 6 }}>Phone</label>
                 <input value={form.phone} onChange={(e) => setForm((c) => ({ ...c, phone: e.target.value }))} style={inputStyle} />
               </div>
               <div>
-                <label style={{ display: "block", fontSize: 12, color: "rgba(255,255,255,.45)", marginBottom: 6 }}>Rate per 1,000 pcs (Rs)</label>
+                <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),.45)", marginBottom: 6 }}>Rate per 1,000 pcs (Rs)</label>
                 <input type="number" min={0} step="any" value={form.ratePer1000} onChange={(e) => setForm((c) => ({ ...c, ratePer1000: e.target.value }))} style={inputStyle} />
               </div>
             </div>
             {editingId && (
-              <p style={{ margin: "14px 0 0", fontSize: 11.5, color: "rgba(255,255,255,.35)" }}>
+              <p style={{ margin: "14px 0 0", fontSize: 11.5, color: "rgba(var(--ink),.35)" }}>
                 A new rate applies to future production runs — runs already completed keep the rate they were costed at.
               </p>
             )}
@@ -403,7 +403,7 @@ export default function LabourPage() {
               <button onClick={save} disabled={saving} style={{ flex: 1, padding: "11px 0", background: saving ? "rgba(249,115,22,.5)" : "#f97316", border: "none", borderRadius: 8, color: "#fff", fontSize: 14, fontWeight: 700, cursor: saving ? "not-allowed" : "pointer" }}>
                 {saving ? "Saving…" : editingId ? "Save Changes" : "Add Labour"}
               </button>
-              <button onClick={() => { setShowModal(false); setEditingId(null); }} style={{ padding: "11px 24px", background: "transparent", border: `1px solid ${border}`, borderRadius: 8, color: "rgba(255,255,255,.65)", cursor: "pointer" }}>Cancel</button>
+              <button onClick={() => { setShowModal(false); setEditingId(null); }} style={{ padding: "11px 24px", background: "transparent", border: `1px solid ${border}`, borderRadius: 8, color: "rgba(var(--ink),.65)", cursor: "pointer" }}>Cancel</button>
             </div>
           </div>
         </div>

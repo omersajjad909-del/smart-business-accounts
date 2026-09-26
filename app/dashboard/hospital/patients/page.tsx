@@ -88,11 +88,11 @@ export default function PatientsPage() {
   }
 
   return (
-    <div style={{ minHeight: "100vh", background: "#0f1117", color: "#fff", fontFamily: ff, padding: isMobile ? "15px 14px" : "28px 32px" }}>
+    <div style={{ minHeight: "100vh", background: "var(--dk-0f1117, #0f1117)", color: "var(--ink-solid, #fff)", fontFamily: ff, padding: isMobile ? "15px 14px" : "28px 32px" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24 }}>
         <div>
           <h1 style={{ margin: 0, fontSize: 26, fontWeight: 700 }}>Patient Records</h1>
-          <p style={{ margin: "4px 0 0", color: "rgba(255,255,255,0.45)", fontSize: 14 }}>Manage hospital patient information</p>
+          <p style={{ margin: "4px 0 0", color: "rgba(var(--ink),0.45)", fontSize: 14 }}>Manage hospital patient information</p>
         </div>
         <button onClick={() => { setFormError(""); setForm({ ...EMPTY_FORM, mrNo: `MR-${1000 + patients.length + 1}`, admitDate: new Date().toISOString().split("T")[0] }); setShowModal(true); }}
           style={{ background: "#3b82f6", color: "#fff", border: "none", borderRadius: 8, padding: "10px 20px", fontSize: 14, fontWeight: 600, cursor: "pointer", fontFamily: ff }}>
@@ -111,7 +111,7 @@ export default function PatientsPage() {
         ].map(s => (
           <div key={s.label} style={{ ...card, textAlign: "center" }}>
             <div style={{ fontSize: 28, fontWeight: 700, color: s.color }}>{s.value}</div>
-            <div style={{ fontSize: 12, color: "rgba(255,255,255,0.5)", marginTop: 4 }}>{s.label}</div>
+            <div style={{ fontSize: 12, color: "rgba(var(--ink),0.5)", marginTop: 4 }}>{s.label}</div>
           </div>
         ))}
       </div>
@@ -122,13 +122,13 @@ export default function PatientsPage() {
           style={{ flex: 1, background: bg, border: `1px solid ${border}`, borderRadius: 8, padding: "10px 14px", color: "#fff", fontFamily: ff, fontSize: 14 }} />
         {["all", "admitted", "icu", "opd", "discharged"].map(s => (
           <button key={s} onClick={() => setFilterStatus(s)}
-            style={{ padding: "8px 16px", borderRadius: 8, border: `1px solid ${filterStatus === s ? "#3b82f6" : border}`, background: filterStatus === s ? "rgba(59,130,246,0.15)" : bg, color: filterStatus === s ? "#3b82f6" : "rgba(255,255,255,0.6)", cursor: "pointer", fontFamily: ff, fontSize: 13, textTransform: "capitalize" }}>
+            style={{ padding: "8px 16px", borderRadius: 8, border: `1px solid ${filterStatus === s ? "#3b82f6" : border}`, background: filterStatus === s ? "rgba(59,130,246,0.15)" : bg, color: filterStatus === s ? "#3b82f6" : "rgba(var(--ink),0.6)", cursor: "pointer", fontFamily: ff, fontSize: 13, textTransform: "capitalize" }}>
             {s === "all" ? "All" : statusLabel[s]}
           </button>
         ))}
       </div>
 
-      {loading && <div style={{ textAlign: "center", padding: 40, color: "rgba(255,255,255,0.4)" }}>Loading...</div>}
+      {loading && <div style={{ textAlign: "center", padding: 40, color: "rgba(var(--ink),0.4)" }}>Loading...</div>}
 
       <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : selectedPatient ? "1fr 380px" : "1fr", gap: 20 }}>
         {/* List */}
@@ -137,29 +137,29 @@ export default function PatientsPage() {
             <thead>
               <tr style={{ borderBottom: `1px solid ${border}` }}>
                 {["MR No", "Patient", "Age/Gender", "Blood", "Doctor", "Admit Date", "Status", "Ins."].map(h => (
-                  <th key={h} style={{ padding: isMobile ? "12px 10px" : "14px 16px", textAlign: "left", color: "rgba(255,255,255,0.45)", fontWeight: 500, fontSize: 12 }}>{h}</th>
+                  <th key={h} style={{ padding: isMobile ? "12px 10px" : "14px 16px", textAlign: "left", color: "rgba(var(--ink),0.45)", fontWeight: 500, fontSize: 12 }}>{h}</th>
                 ))}
               </tr>
             </thead>
             <tbody>
               {filtered.length === 0 && !loading && (
-                <tr><td colSpan={8} style={{ padding: 40, textAlign: "center", color: "rgba(255,255,255,0.25)", fontSize: 14 }}>No patients found.</td></tr>
+                <tr><td colSpan={8} style={{ padding: 40, textAlign: "center", color: "rgba(var(--ink),0.25)", fontSize: 14 }}>No patients found.</td></tr>
               )}
               {filtered.map(p => (
                 <tr key={p.id} onClick={() => setSelected(p.id === selected ? null : p.id)} style={{ borderBottom: `1px solid ${border}`, cursor: "pointer", background: selected === p.id ? "rgba(59,130,246,0.08)" : "transparent", transition: "background 0.15s" }}>
                   <td style={{ padding: "13px 16px", color: "#a78bfa", fontWeight: 600 }}>{p.mrNo}</td>
                   <td style={{ padding: "13px 16px", fontWeight: 500 }}>{p.name}</td>
-                  <td style={{ padding: "13px 16px", color: "rgba(255,255,255,0.6)" }}>{p.age}y / {p.gender}</td>
+                  <td style={{ padding: "13px 16px", color: "rgba(var(--ink),0.6)" }}>{p.age}y / {p.gender}</td>
                   <td style={{ padding: "13px 16px" }}>
                     <span style={{ background: "rgba(239,68,68,0.15)", color: "#ef4444", padding: "2px 8px", borderRadius: 4, fontSize: 12, fontWeight: 600 }}>{p.bloodGroup}</span>
                   </td>
-                  <td style={{ padding: "13px 16px", color: "rgba(255,255,255,0.7)" }}>{p.doctor}</td>
-                  <td style={{ padding: "13px 16px", color: "rgba(255,255,255,0.5)" }}>{p.admitDate}</td>
+                  <td style={{ padding: "13px 16px", color: "rgba(var(--ink),0.7)" }}>{p.doctor}</td>
+                  <td style={{ padding: "13px 16px", color: "rgba(var(--ink),0.5)" }}>{p.admitDate}</td>
                   <td style={{ padding: "13px 16px" }}>
                     <span style={{ background: `${statusColor[p.status]}22`, color: statusColor[p.status], padding: "3px 10px", borderRadius: 20, fontSize: 12, fontWeight: 600 }}>{statusLabel[p.status] || p.status}</span>
                   </td>
                   <td style={{ padding: "13px 16px" }}>
-                    <span style={{ color: p.insurance ? "#22c55e" : "rgba(255,255,255,0.3)", fontSize: 16 }}>{p.insurance ? "✓" : "✗"}</span>
+                    <span style={{ color: p.insurance ? "#22c55e" : "rgba(var(--ink),0.3)", fontSize: 16 }}>{p.insurance ? "✓" : "✗"}</span>
                   </td>
                 </tr>
               ))}
@@ -170,7 +170,7 @@ export default function PatientsPage() {
         {/* Detail Panel */}
         {selectedPatient && (
           <div style={{ ...card, position: "relative" }}>
-            <button onClick={() => setSelected(null)} style={{ position: "absolute", top: 16, right: 16, background: "transparent", border: "none", color: "rgba(255,255,255,0.5)", fontSize: 18, cursor: "pointer" }}>✕</button>
+            <button onClick={() => setSelected(null)} style={{ position: "absolute", top: 16, right: 16, background: "transparent", border: "none", color: "rgba(var(--ink),0.5)", fontSize: 18, cursor: "pointer" }}>✕</button>
             <div style={{ marginBottom: 16 }}>
               <span style={{ background: `${statusColor[selectedPatient.status]}22`, color: statusColor[selectedPatient.status], padding: "4px 12px", borderRadius: 20, fontSize: 12, fontWeight: 600 }}>{statusLabel[selectedPatient.status]}</span>
               {selectedPatient.insurance && <span style={{ marginLeft: 8, background: "rgba(34,197,94,0.15)", color: "#22c55e", padding: "4px 10px", borderRadius: 20, fontSize: 12 }}>Insured</span>}
@@ -187,7 +187,7 @@ export default function PatientsPage() {
               ["Admit Date", selectedPatient.admitDate],
             ].map(([k, v]) => (
               <div key={k} style={{ display: "flex", justifyContent: "space-between", padding: "10px 0", borderBottom: `1px solid ${border}` }}>
-                <span style={{ color: "rgba(255,255,255,0.45)", fontSize: 13 }}>{k}</span>
+                <span style={{ color: "rgba(var(--ink),0.45)", fontSize: 13 }}>{k}</span>
                 <span style={{ fontSize: 13, fontWeight: 500, textAlign: "right", maxWidth: 200 }}>{v}</span>
               </div>
             ))}
@@ -204,70 +204,70 @@ export default function PatientsPage() {
       {/* Modal */}
       {showModal && (
         <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.7)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 50 }}>
-          <div style={{ background: "#161b27", border: `1px solid ${border}`, borderRadius: 16, padding: 32, width: 540, maxHeight: "85vh", overflowY: "auto", fontFamily: ff }}>
+          <div style={{ background: "var(--dk-161b27, #161b27)", border: `1px solid ${border}`, borderRadius: 16, padding: 32, width: 540, maxHeight: "85vh", overflowY: "auto", fontFamily: ff }}>
             <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 24 }}>
               <h2 style={{ margin: 0, fontSize: 20, fontWeight: 700 }}>{form.id ? "Edit Patient" : "Add Patient"}</h2>
-              <button onClick={() => setShowModal(false)} style={{ background: "none", border: "none", color: "rgba(255,255,255,0.5)", fontSize: 20, cursor: "pointer" }}>✕</button>
+              <button onClick={() => setShowModal(false)} style={{ background: "none", border: "none", color: "rgba(var(--ink),0.5)", fontSize: 20, cursor: "pointer" }}>✕</button>
             </div>
             {formError && <div style={{ marginBottom: 14, padding: "10px 12px", background: "rgba(239,68,68,0.12)", border: "1px solid rgba(239,68,68,0.26)", borderRadius: 8, color: "#fca5a5", fontSize: 12 }}>{formError}</div>}
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
               {([["MR No", "mrNo"], ["Full Name", "name"], ["Phone", "phone"]] as [string, string][]).map(([label, key]) => (
                 <div key={key}>
-                  <label style={{ display: "block", fontSize: 12, color: "rgba(255,255,255,0.45)", marginBottom: 6 }}>{label}</label>
+                  <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),0.45)", marginBottom: 6 }}>{label}</label>
                   <input value={String((form as Record<string,unknown>)[key] ?? "")} onChange={e => setForm(f => ({ ...f, [key]: e.target.value }))}
                     style={{ width: "100%", background: bg, border: `1px solid ${border}`, borderRadius: 8, padding: "9px 12px", color: "#fff", fontFamily: ff, fontSize: 14, boxSizing: "border-box" }} />
                 </div>
               ))}
               <div>
-                <label style={{ display: "block", fontSize: 12, color: "rgba(255,255,255,0.45)", marginBottom: 6 }}>Age</label>
+                <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),0.45)", marginBottom: 6 }}>Age</label>
                 <input type="number" value={form.age} onChange={e => setForm(f => ({ ...f, age: Number(e.target.value) }))}
                   style={{ width: "100%", background: bg, border: `1px solid ${border}`, borderRadius: 8, padding: "9px 12px", color: "#fff", fontFamily: ff, fontSize: 14, boxSizing: "border-box" }} />
               </div>
               <div>
-                <label style={{ display: "block", fontSize: 12, color: "rgba(255,255,255,0.45)", marginBottom: 6 }}>Gender</label>
+                <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),0.45)", marginBottom: 6 }}>Gender</label>
                 <select value={form.gender} onChange={e => setForm(f => ({ ...f, gender: e.target.value }))}
-                  style={{ width: "100%", background: "#161b27", border: `1px solid ${border}`, borderRadius: 8, padding: "9px 12px", color: "#fff", fontFamily: ff, fontSize: 14 }}>
+                  style={{ width: "100%", background: "var(--dk-161b27, #161b27)", border: `1px solid ${border}`, borderRadius: 8, padding: "9px 12px", color: "var(--ink-solid, #fff)", fontFamily: ff, fontSize: 14 }}>
                   {["Male", "Female", "Other"].map(g => <option key={g}>{g}</option>)}
                 </select>
               </div>
               <div>
-                <label style={{ display: "block", fontSize: 12, color: "rgba(255,255,255,0.45)", marginBottom: 6 }}>Blood Group</label>
+                <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),0.45)", marginBottom: 6 }}>Blood Group</label>
                 <select value={form.bloodGroup} onChange={e => setForm(f => ({ ...f, bloodGroup: e.target.value }))}
-                  style={{ width: "100%", background: "#161b27", border: `1px solid ${border}`, borderRadius: 8, padding: "9px 12px", color: "#fff", fontFamily: ff, fontSize: 14 }}>
+                  style={{ width: "100%", background: "var(--dk-161b27, #161b27)", border: `1px solid ${border}`, borderRadius: 8, padding: "9px 12px", color: "var(--ink-solid, #fff)", fontFamily: ff, fontSize: 14 }}>
                   {["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"].map(b => <option key={b}>{b}</option>)}
                 </select>
               </div>
               <div>
-                <label style={{ display: "block", fontSize: 12, color: "rgba(255,255,255,0.45)", marginBottom: 6 }}>Status</label>
+                <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),0.45)", marginBottom: 6 }}>Status</label>
                 <select value={form.status} onChange={e => setForm(f => ({ ...f, status: e.target.value }))}
-                  style={{ width: "100%", background: "#161b27", border: `1px solid ${border}`, borderRadius: 8, padding: "9px 12px", color: "#fff", fontFamily: ff, fontSize: 14 }}>
+                  style={{ width: "100%", background: "var(--dk-161b27, #161b27)", border: `1px solid ${border}`, borderRadius: 8, padding: "9px 12px", color: "var(--ink-solid, #fff)", fontFamily: ff, fontSize: 14 }}>
                   {["admitted", "discharged", "icu", "opd"].map(s => <option key={s}>{s}</option>)}
                 </select>
               </div>
               <div style={{ gridColumn: "span 2" }}>
-                <label style={{ display: "block", fontSize: 12, color: "rgba(255,255,255,0.45)", marginBottom: 6 }}>Address</label>
+                <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),0.45)", marginBottom: 6 }}>Address</label>
                 <input value={form.address} onChange={e => setForm(f => ({ ...f, address: e.target.value }))}
                   style={{ width: "100%", background: bg, border: `1px solid ${border}`, borderRadius: 8, padding: "9px 12px", color: "#fff", fontFamily: ff, fontSize: 14, boxSizing: "border-box" }} />
               </div>
               <div style={{ gridColumn: "span 2" }}>
-                <label style={{ display: "block", fontSize: 12, color: "rgba(255,255,255,0.45)", marginBottom: 6 }}>Diagnosis</label>
+                <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),0.45)", marginBottom: 6 }}>Diagnosis</label>
                 <input value={form.diagnosis} onChange={e => setForm(f => ({ ...f, diagnosis: e.target.value }))}
                   style={{ width: "100%", background: bg, border: `1px solid ${border}`, borderRadius: 8, padding: "9px 12px", color: "#fff", fontFamily: ff, fontSize: 14, boxSizing: "border-box" }} />
               </div>
               <div style={{ gridColumn: "span 2" }}>
-                <label style={{ display: "block", fontSize: 12, color: "rgba(255,255,255,0.45)", marginBottom: 6 }}>Doctor</label>
+                <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),0.45)", marginBottom: 6 }}>Doctor</label>
                 <input value={form.doctor} onChange={e => setForm(f => ({ ...f, doctor: e.target.value }))}
                   style={{ width: "100%", background: bg, border: `1px solid ${border}`, borderRadius: 8, padding: "9px 12px", color: "#fff", fontFamily: ff, fontSize: 14, boxSizing: "border-box" }} />
               </div>
               <div>
-                <label style={{ display: "block", fontSize: 12, color: "rgba(255,255,255,0.45)", marginBottom: 6 }}>Admit Date</label>
+                <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),0.45)", marginBottom: 6 }}>Admit Date</label>
                 <input type="date" value={form.admitDate} onChange={e => setForm(f => ({ ...f, admitDate: e.target.value }))}
                   style={{ width: "100%", background: bg, border: `1px solid ${border}`, borderRadius: 8, padding: "9px 12px", color: "#fff", fontFamily: ff, fontSize: 14, boxSizing: "border-box" }} />
               </div>
               <div>
-                <label style={{ display: "block", fontSize: 12, color: "rgba(255,255,255,0.45)", marginBottom: 6 }}>Insurance</label>
+                <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),0.45)", marginBottom: 6 }}>Insurance</label>
                 <select value={form.insurance ? "yes" : "no"} onChange={e => setForm(f => ({ ...f, insurance: e.target.value === "yes" }))}
-                  style={{ width: "100%", background: "#161b27", border: `1px solid ${border}`, borderRadius: 8, padding: "9px 12px", color: "#fff", fontFamily: ff, fontSize: 14 }}>
+                  style={{ width: "100%", background: "var(--dk-161b27, #161b27)", border: `1px solid ${border}`, borderRadius: 8, padding: "9px 12px", color: "var(--ink-solid, #fff)", fontFamily: ff, fontSize: 14 }}>
                   <option value="yes">Yes</option>
                   <option value="no">No</option>
                 </select>
@@ -277,7 +277,7 @@ export default function PatientsPage() {
               <button onClick={save} style={{ flex: 1, padding: "11px 0", background: "#3b82f6", border: "none", borderRadius: 8, color: "#fff", fontFamily: ff, fontSize: 14, fontWeight: 600, cursor: "pointer" }}>
                 {form.id ? "Save Changes" : "Add Patient"}
               </button>
-              <button onClick={() => setShowModal(false)} style={{ padding: "11px 24px", background: "transparent", border: `1px solid ${border}`, borderRadius: 8, color: "rgba(255,255,255,0.6)", fontFamily: ff, fontSize: 14, cursor: "pointer" }}>Cancel</button>
+              <button onClick={() => setShowModal(false)} style={{ padding: "11px 24px", background: "transparent", border: `1px solid ${border}`, borderRadius: 8, color: "rgba(var(--ink),0.6)", fontFamily: ff, fontSize: 14, cursor: "pointer" }}>Cancel</button>
             </div>
           </div>
         </div>

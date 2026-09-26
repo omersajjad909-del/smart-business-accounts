@@ -49,11 +49,11 @@ export default function FinishedGoodsPage() {
   }
 
   return (
-    <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", fontFamily: ff, color: "#fff", minHeight: "100vh" }}>
+    <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", fontFamily: ff, color: "var(--ink-solid, #fff)", minHeight: "100vh" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 28 }}>
         <div>
           <h1 style={{ fontSize: 22, fontWeight: 800, margin: "0 0 4px" }}>Finished Goods</h1>
-          <p style={{ fontSize: 13, color: "rgba(255,255,255,.4)", margin: 0 }}>Track produced batches ready for dispatch or sale.</p>
+          <p style={{ fontSize: 13, color: "rgba(var(--ink),.4)", margin: 0 }}>Track produced batches ready for dispatch or sale.</p>
         </div>
         <button onClick={() => setShowModal(true)} style={{ padding: "10px 20px", borderRadius: 10, border: "none", background: "#22c55e", color: "white", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>
           + Record Batch
@@ -68,7 +68,7 @@ export default function FinishedGoodsPage() {
           { label: "Linked Orders", value: goods.filter((item) => item.productionOrderId).length, color: "#a78bfa" },
         ].map((card) => (
           <div key={card.label} style={{ background: bg, border: `1px solid ${border}`, borderRadius: 14, padding: isMobile ? "12px 10px" : "18px 20px" }}>
-            <div style={{ fontSize: 12, color: "rgba(255,255,255,.5)", marginBottom: 6 }}>{card.label}</div>
+            <div style={{ fontSize: 12, color: "rgba(var(--ink),.5)", marginBottom: 6 }}>{card.label}</div>
             <div style={{ fontSize: 22, fontWeight: 800, color: card.color }}>{card.value}</div>
           </div>
         ))}
@@ -79,7 +79,7 @@ export default function FinishedGoodsPage() {
           <thead>
             <tr>
               {["Batch", "Product", "Qty", "Warehouse", "Prod. Order", "Date", "Status"].map((head) => (
-                <th key={head} style={{ textAlign: "left", padding: "12px 16px", fontSize: 12, color: "rgba(255,255,255,.5)", borderBottom: `1px solid ${border}`, fontWeight: 600 }}>
+                <th key={head} style={{ textAlign: "left", padding: "12px 16px", fontSize: 12, color: "rgba(var(--ink),.5)", borderBottom: `1px solid ${border}`, fontWeight: 600 }}>
                   {head}
                 </th>
               ))}
@@ -88,13 +88,13 @@ export default function FinishedGoodsPage() {
           <tbody>
             {goods.map((item) => (
               <tr key={item.id}>
-                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.05)", color: "rgba(255,255,255,.55)" }}>{item.batchNo}</td>
-                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.05)", fontWeight: 700 }}>{item.product}</td>
-                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.05)" }}>{item.quantity}</td>
-                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.05)" }}>{item.warehouse}</td>
-                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.05)", color: "rgba(255,255,255,.55)" }}>{item.productionOrderId || "Manual"}</td>
-                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.05)" }}>{item.productionDate}</td>
-                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.05)" }}>
+                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.05)", color: "rgba(var(--ink),.55)" }}>{item.batchNo}</td>
+                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.05)", fontWeight: 700 }}>{item.product}</td>
+                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.05)" }}>{item.quantity}</td>
+                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.05)" }}>{item.warehouse}</td>
+                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.05)", color: "rgba(var(--ink),.55)" }}>{item.productionOrderId || "Manual"}</td>
+                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.05)" }}>{item.productionDate}</td>
+                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.05)" }}>
                   <span style={{ display: "inline-block", background: "rgba(34,197,94,.15)", color: "#22c55e", borderRadius: 999, padding: "4px 10px", fontSize: 11, fontWeight: 700 }}>
                     {item.status.toUpperCase()}
                   </span>
@@ -103,7 +103,7 @@ export default function FinishedGoodsPage() {
             ))}
             {!goodsStore.loading && goods.length === 0 && (
               <tr>
-                <td colSpan={7} style={{ padding: 36, textAlign: "center", color: "rgba(255,255,255,.28)" }}>
+                <td colSpan={7} style={{ padding: 36, textAlign: "center", color: "rgba(var(--ink),.28)" }}>
                   No finished goods batches recorded yet.
                 </td>
               </tr>
@@ -114,28 +114,28 @@ export default function FinishedGoodsPage() {
 
       {showModal && (
         <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.7)", zIndex: 50, display: "flex", alignItems: "center", justifyContent: "center" }}>
-          <div style={{ background: "#161b27", border: `1px solid ${border}`, borderRadius: 16, padding: 30, width: 520, fontFamily: ff }}>
+          <div style={{ background: "var(--dk-161b27, #161b27)", border: `1px solid ${border}`, borderRadius: 16, padding: 30, width: 520, fontFamily: ff }}>
             <h2 style={{ margin: "0 0 20px", fontSize: 18, fontWeight: 700 }}>Record Finished Goods Batch</h2>
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
               <div style={{ gridColumn: "span 2" }}>
-                <label style={{ display: "block", fontSize: 12, color: "rgba(255,255,255,.45)", marginBottom: 6 }}>Product</label>
+                <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),.45)", marginBottom: 6 }}>Product</label>
                 <input value={form.product} onChange={(e) => setForm((current) => ({ ...current, product: e.target.value }))} style={{ width: "100%", background: bg, border: `1px solid ${border}`, borderRadius: 8, padding: "9px 12px", color: "#fff", boxSizing: "border-box" }} />
               </div>
               <div>
-                <label style={{ display: "block", fontSize: 12, color: "rgba(255,255,255,.45)", marginBottom: 6 }}>Quantity</label>
+                <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),.45)", marginBottom: 6 }}>Quantity</label>
                 <input type="number" value={form.quantity} onChange={(e) => setForm((current) => ({ ...current, quantity: Number(e.target.value) }))} style={{ width: "100%", background: bg, border: `1px solid ${border}`, borderRadius: 8, padding: "9px 12px", color: "#fff", boxSizing: "border-box" }} />
               </div>
               <div>
-                <label style={{ display: "block", fontSize: 12, color: "rgba(255,255,255,.45)", marginBottom: 6 }}>Production Date</label>
+                <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),.45)", marginBottom: 6 }}>Production Date</label>
                 <input type="date" value={form.productionDate} onChange={(e) => setForm((current) => ({ ...current, productionDate: e.target.value }))} style={{ width: "100%", background: bg, border: `1px solid ${border}`, borderRadius: 8, padding: "9px 12px", color: "#fff", boxSizing: "border-box" }} />
               </div>
               <div>
-                <label style={{ display: "block", fontSize: 12, color: "rgba(255,255,255,.45)", marginBottom: 6 }}>Warehouse</label>
+                <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),.45)", marginBottom: 6 }}>Warehouse</label>
                 <input value={form.warehouse} onChange={(e) => setForm((current) => ({ ...current, warehouse: e.target.value }))} style={{ width: "100%", background: bg, border: `1px solid ${border}`, borderRadius: 8, padding: "9px 12px", color: "#fff", boxSizing: "border-box" }} />
               </div>
               <div>
-                <label style={{ display: "block", fontSize: 12, color: "rgba(255,255,255,.45)", marginBottom: 6 }}>Production Order</label>
-                <select value={form.productionOrderId} onChange={(e) => setForm((current) => ({ ...current, productionOrderId: e.target.value }))} style={{ width: "100%", background: "#161b27", border: `1px solid ${border}`, borderRadius: 8, padding: "9px 12px", color: "#fff" }}>
+                <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),.45)", marginBottom: 6 }}>Production Order</label>
+                <select value={form.productionOrderId} onChange={(e) => setForm((current) => ({ ...current, productionOrderId: e.target.value }))} style={{ width: "100%", background: "var(--dk-161b27, #161b27)", border: `1px solid ${border}`, borderRadius: 8, padding: "9px 12px", color: "var(--ink-solid, #fff)" }}>
                   <option value="">Manual / Not Linked</option>
                   {productionOrders.map((order) => (
                     <option key={order.id} value={order.orderId}>{order.orderId} - {order.product}</option>
@@ -145,7 +145,7 @@ export default function FinishedGoodsPage() {
             </div>
             <div style={{ display: "flex", gap: 12, marginTop: 18 }}>
               <button onClick={save} style={{ flex: 1, padding: "11px 0", background: "#22c55e", border: "none", borderRadius: 8, color: "#fff", fontSize: 14, fontWeight: 700, cursor: "pointer" }}>Save Batch</button>
-              <button onClick={() => setShowModal(false)} style={{ padding: "11px 24px", background: "transparent", border: `1px solid ${border}`, borderRadius: 8, color: "rgba(255,255,255,.65)", cursor: "pointer" }}>Cancel</button>
+              <button onClick={() => setShowModal(false)} style={{ padding: "11px 24px", background: "transparent", border: `1px solid ${border}`, borderRadius: 8, color: "rgba(var(--ink),.65)", cursor: "pointer" }}>Cancel</button>
             </div>
           </div>
         </div>

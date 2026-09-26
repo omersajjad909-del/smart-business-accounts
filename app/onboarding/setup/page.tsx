@@ -84,9 +84,9 @@ function SetupPageInner() {
   return (
     <div style={{
       minHeight: "100vh",
-      background: "linear-gradient(160deg,#060818 0%,#0b0e28 50%,#080c1e 100%)",
+      background: "linear-gradient(160deg,var(--dk-060818, #060818) 0%,var(--dk-0b0e28, #0b0e28) 50%,var(--dk-080c1e, #080c1e) 100%)",
       display: "flex", alignItems: "center", justifyContent: "center",
-      fontFamily: "'Outfit','DM Sans',sans-serif", color: "white",
+      fontFamily: "'Outfit','DM Sans',sans-serif", color: "var(--ink-solid, white)",
       position: "relative", overflow: "hidden",
     }}>
       <style>{`
@@ -114,8 +114,8 @@ function SetupPageInner() {
         width:"100%", maxWidth:520,
         padding:"48px 44px",
         borderRadius:28,
-        background:"rgba(255,255,255,.04)",
-        border:"1px solid rgba(255,255,255,.09)",
+        background:"rgba(var(--ink),.04)",
+        border:"1px solid rgba(var(--ink),.09)",
         backdropFilter:"blur(24px)",
         boxShadow:"0 32px 80px rgba(0,0,0,.5), 0 0 0 1px rgba(99,102,241,.1)",
         textAlign:"center",
@@ -128,7 +128,7 @@ function SetupPageInner() {
               <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
             </svg>
           </div>
-          <span style={{fontFamily:"'Lora',serif",fontSize:18,fontWeight:700,color:"white"}}>FinovaOS</span>
+          <span style={{fontFamily:"'Lora',serif",fontSize:18,fontWeight:700,color:"var(--ink-solid, white)"}}>FinovaOS</span>
         </div>
 
         {/* Big animated icon */}
@@ -148,19 +148,19 @@ function SetupPageInner() {
         <div key={step} className="step-in">
           <h2 style={{
             fontFamily:"'Lora',serif",
-            fontSize:22,fontWeight:700,color:"white",
+            fontSize:22,fontWeight:700,color:"var(--ink-solid, white)",
             letterSpacing:"-.3px",margin:"0 0 6px",
           }}>
             {current.label}
           </h2>
-          <p style={{fontSize:13,color:"rgba(255,255,255,.4)",margin:"0 0 32px",lineHeight:1.6}}>
+          <p style={{fontSize:13,color:"rgba(var(--ink),.4)",margin:"0 0 32px",lineHeight:1.6}}>
             {current.sub}
           </p>
         </div>
 
         {/* Progress bar */}
         <div style={{marginBottom:32}}>
-          <div style={{height:6,borderRadius:6,background:"rgba(255,255,255,.07)",overflow:"hidden",marginBottom:10}}>
+          <div style={{height:6,borderRadius:6,background:"rgba(var(--ink),.07)",overflow:"hidden",marginBottom:10}}>
             <div style={{
               height:"100%",borderRadius:6,
               background:"linear-gradient(90deg,#6366f1,#818cf8,#a78bfa)",
@@ -169,7 +169,7 @@ function SetupPageInner() {
               boxShadow:"0 0 12px rgba(99,102,241,.6)",
             }}/>
           </div>
-          <div style={{fontSize:12,fontWeight:700,color:"rgba(255,255,255,.3)",textAlign:"right"}}>
+          <div style={{fontSize:12,fontWeight:700,color:"rgba(var(--ink),.3)",textAlign:"right"}}>
             {Math.round(progress)}%
           </div>
         </div>
@@ -187,8 +187,8 @@ function SetupPageInner() {
                   width:34,height:34,borderRadius:"50%",
                   display:"flex",alignItems:"center",justifyContent:"center",
                   fontSize:14,transition:"all .3s",
-                  background: isDone ? "rgba(52,211,153,.15)" : isActive ? "rgba(99,102,241,.2)" : "rgba(255,255,255,.04)",
-                  border:`1.5px solid ${isDone?"rgba(52,211,153,.5)":isActive?"rgba(99,102,241,.6)":"rgba(255,255,255,.07)"}`,
+                  background: isDone ? "rgba(52,211,153,.15)" : isActive ? "rgba(99,102,241,.2)" : "rgba(var(--ink),.04)",
+                  border:`1.5px solid ${isDone?"rgba(52,211,153,.5)":isActive?"rgba(99,102,241,.6)":"rgba(var(--ink),.07)"}`,
                   boxShadow: isActive ? "0 0 16px rgba(99,102,241,.4)" : "none",
                   transform: isActive ? "scale(1.1)" : "scale(1)",
                 }}>
@@ -220,8 +220,8 @@ function SetupPageInner() {
         </div>
 
         {businessType && (
-          <div style={{marginTop:16,fontSize:11,color:"rgba(255,255,255,.2)"}}>
-            Configured for: <span style={{color:"rgba(255,255,255,.45)",fontWeight:600}}>
+          <div style={{marginTop:16,fontSize:11,color:"rgba(var(--ink),.2)"}}>
+            Configured for: <span style={{color:"rgba(var(--ink),.45)",fontWeight:600}}>
               {businessType.replace(/_/g," ").replace(/\b\w/g,l=>l.toUpperCase())}
             </span>
           </div>
@@ -233,7 +233,7 @@ function SetupPageInner() {
 
 export default function SetupPage() {
   return (
-    <Suspense fallback={<div style={{ minHeight: "100vh", background: "#0a0a0f" }} />}>
+    <Suspense fallback={<div style={{ minHeight: "100vh", background: "var(--dk-0a0a0f, #0a0a0f)" }} />}>
       <SetupPageInner />
     </Suspense>
   );

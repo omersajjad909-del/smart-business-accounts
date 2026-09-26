@@ -11,10 +11,10 @@ import { useResponsive } from "@/hooks/useResponsive";
 
 const inputStyle: React.CSSProperties = {
   width: "100%",
-  background: "rgba(255,255,255,.06)",
-  border: "1px solid rgba(255,255,255,.1)",
+  background: "rgba(var(--ink),.06)",
+  border: "1px solid rgba(var(--ink),.1)",
   borderRadius: 10,
-  color: "#fff",
+  color: "var(--ink-solid, #fff)",
   padding: isMobile ? "8px 8px" : "12px 14px",
   fontSize: 14,
 };
@@ -72,7 +72,7 @@ export default function IspConnectionsPage() {
   };
 
   return (
-    <div style={{ padding: isMobile ? "17px 16px" : "28px 32px", color: "#fff", minHeight: "100vh", fontFamily: ispFont }}>
+    <div style={{ padding: isMobile ? "17px 16px" : "28px 32px", color: "var(--ink-solid, #fff)", minHeight: "100vh", fontFamily: ispFont }}>
       <div style={{ marginBottom: 24 }}>
         <h1 style={{ margin: "0 0 6px", fontSize: 28, fontWeight: 900 }}>Connections</h1>
         <p style={{ margin: 0, color: ispMuted, fontSize: 14 }}>Customer installs, active lines, package mapping, aur suspended accounts yahan manage karein.</p>
@@ -97,9 +97,9 @@ export default function IspConnectionsPage() {
         <div style={{ background: ispBg, border: `1px solid ${ispBorder}`, borderRadius: 18, overflow: "hidden" }}>
           <div style={{ padding: isMobile ? "10px 9px" : "16px 18px", borderBottom: `1px solid ${ispBorder}`, fontSize: 16, fontWeight: 800 }}>Connection Desk</div>
           <div style={{ display: "grid", gap: 12, padding: 18 }}>
-            {!loading && connections.length === 0 && <div style={{ color: "rgba(255,255,255,.28)" }}>No connections yet.</div>}
+            {!loading && connections.length === 0 && <div style={{ color: "rgba(var(--ink),.28)" }}>No connections yet.</div>}
             {connections.map((row) => (
-              <div key={row.id} style={{ border: "1px solid rgba(255,255,255,.07)", background: "rgba(255,255,255,.03)", borderRadius: 14, padding: 16 }}>
+              <div key={row.id} style={{ border: "1px solid rgba(var(--ink),.07)", background: "rgba(var(--ink),.03)", borderRadius: 14, padding: 16 }}>
                 <div style={{ display: "flex", justifyContent: "space-between", gap: 12 }}>
                   <div>
                     <div style={{ fontSize: 16, fontWeight: 800 }}>{row.customer}</div>

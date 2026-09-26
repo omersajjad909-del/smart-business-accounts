@@ -27,7 +27,7 @@ export default function SchoolOverviewPage() {
   const { summary, students } = data;
 
   return (
-    <div style={{ minHeight: "100vh", padding: isMobile ? "17px 16px" : "28px 32px", color: "#fff", fontFamily: schoolFont }}>
+    <div style={{ minHeight: "100vh", padding: isMobile ? "17px 16px" : "28px 32px", color: "var(--ink-solid, #fff)", fontFamily: schoolFont }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 20, flexWrap: "wrap", marginBottom: 24 }}>
         <div>
           <h1 style={{ margin: "0 0 6px", fontSize: 26, fontWeight: 800 }}>School Command Center</h1>
@@ -74,7 +74,7 @@ export default function SchoolOverviewPage() {
               { label: "Teachers", value: summary.teachers, color: "#34d399" },
               { label: "Attendance today", value: `${summary.attendancePresent}/${summary.attendanceTotal}`, color: "#60a5fa" },
             ].map((row) => (
-              <div key={row.label} style={{ display: "flex", justifyContent: "space-between", padding: isMobile ? "8px 8px" : "10px 12px", borderRadius: 10, background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.05)" }}>
+              <div key={row.label} style={{ display: "flex", justifyContent: "space-between", padding: isMobile ? "8px 8px" : "10px 12px", borderRadius: 10, background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.05)" }}>
                 <span style={{ fontSize: 13, color: schoolMuted }}>{row.label}</span>
                 <span style={{ fontSize: 16, fontWeight: 800, color: row.color }}>{row.value}</span>
               </div>
@@ -86,13 +86,13 @@ export default function SchoolOverviewPage() {
           <div style={{ padding: isMobile ? "10px 9px" : "16px 18px", borderBottom: `1px solid ${schoolBorder}`, fontSize: 15, fontWeight: 800 }}>Watchlist</div>
           <div style={{ padding: 18, display: "grid", gap: 10 }}>
             {students.filter((row) => row.feeStatus === "overdue").slice(0, 5).map((student) => (
-              <div key={student.id} style={{ padding: isMobile ? "8px 8px" : "12px 14px", borderRadius: 10, background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.05)" }}>
+              <div key={student.id} style={{ padding: isMobile ? "8px 8px" : "12px 14px", borderRadius: 10, background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.05)" }}>
                 <div style={{ fontSize: 14, fontWeight: 700 }}>{student.name}</div>
                 <div style={{ fontSize: 12, color: schoolMuted, marginTop: 4 }}>Roll {student.rollNo} | Class {student.className}{student.section ? `-${student.section}` : ""}</div>
                 <div style={{ fontSize: 12, color: "#fca5a5", marginTop: 6 }}>Fee status: {student.feeStatus}</div>
               </div>
             ))}
-            {students.filter((row) => row.feeStatus === "overdue").length === 0 && <div style={{ color: "rgba(255,255,255,.28)" }}>No overdue student accounts right now.</div>}
+            {students.filter((row) => row.feeStatus === "overdue").length === 0 && <div style={{ color: "rgba(var(--ink),.28)" }}>No overdue student accounts right now.</div>}
           </div>
         </div>
       </div>

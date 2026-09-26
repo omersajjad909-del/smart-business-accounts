@@ -99,11 +99,11 @@ export default function TradingDispatchBoardPage() {
             <tbody>
               {challans.slice(0, 10).map((row) => (
                 <tr key={row.id}>
-                  <td style={{ padding: "12px 16px", borderBottom: "1px solid rgba(255,255,255,.04)", fontWeight: 700 }}>{row.challanNo}</td>
-                  <td style={{ padding: "12px 16px", borderBottom: "1px solid rgba(255,255,255,.04)" }}>{row.customer?.name || "-"}</td>
-                  <td style={{ padding: "12px 16px", borderBottom: "1px solid rgba(255,255,255,.04)", color: String(row.status || "").toUpperCase() === "DELIVERED" ? "#34d399" : "#f59e0b", fontWeight: 700 }}>{row.status || "-"}</td>
-                  <td style={{ padding: "12px 16px", borderBottom: "1px solid rgba(255,255,255,.04)" }}>{row.driverName || row.vehicleNo || "-"}</td>
-                  <td style={{ padding: "12px 16px", borderBottom: "1px solid rgba(255,255,255,.04)" }}>{formatDate(row.date)}</td>
+                  <td style={{ padding: "12px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", fontWeight: 700 }}>{row.challanNo}</td>
+                  <td style={{ padding: "12px 16px", borderBottom: "1px solid rgba(var(--ink),.04)" }}>{row.customer?.name || "-"}</td>
+                  <td style={{ padding: "12px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", color: String(row.status || "").toUpperCase() === "DELIVERED" ? "#34d399" : "#f59e0b", fontWeight: 700 }}>{row.status || "-"}</td>
+                  <td style={{ padding: "12px 16px", borderBottom: "1px solid rgba(var(--ink),.04)" }}>{row.driverName || row.vehicleNo || "-"}</td>
+                  <td style={{ padding: "12px 16px", borderBottom: "1px solid rgba(var(--ink),.04)" }}>{formatDate(row.date)}</td>
                 </tr>
               ))}
               {challans.length === 0 && (
@@ -128,10 +128,10 @@ export default function TradingDispatchBoardPage() {
             <tbody>
               {outward.slice(0, 10).map((row) => (
                 <tr key={row.id}>
-                  <td style={{ padding: "12px 16px", borderBottom: "1px solid rgba(255,255,255,.04)", fontWeight: 700 }}>OUT-{row.outwardNo}</td>
-                  <td style={{ padding: "12px 16px", borderBottom: "1px solid rgba(255,255,255,.04)" }}>{row.customer?.name || "-"}</td>
-                  <td style={{ padding: "12px 16px", borderBottom: "1px solid rgba(255,255,255,.04)" }}>{row.vehicleNo || row.driverName || "-"}</td>
-                  <td style={{ padding: "12px 16px", borderBottom: "1px solid rgba(255,255,255,.04)" }}>{formatDate(row.date)}</td>
+                  <td style={{ padding: "12px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", fontWeight: 700 }}>OUT-{row.outwardNo}</td>
+                  <td style={{ padding: "12px 16px", borderBottom: "1px solid rgba(var(--ink),.04)" }}>{row.customer?.name || "-"}</td>
+                  <td style={{ padding: "12px 16px", borderBottom: "1px solid rgba(var(--ink),.04)" }}>{row.vehicleNo || row.driverName || "-"}</td>
+                  <td style={{ padding: "12px 16px", borderBottom: "1px solid rgba(var(--ink),.04)" }}>{formatDate(row.date)}</td>
                 </tr>
               ))}
               {outward.length === 0 && (

@@ -244,7 +244,7 @@ export default function SalesOrderPage() {
 
   const inputStyle: React.CSSProperties = {
     width: "100%",
-    background: "rgba(255,255,255,0.05)",
+    background: "rgba(var(--ink),0.05)",
     border: "1px solid var(--border)",
     borderRadius: 8,
     padding: "8px 12px",
@@ -612,7 +612,7 @@ export default function SalesOrderPage() {
               {isMobile ? (
                 <div>
                   {form.items.map((item, idx) => (
-                    <div key={idx} style={{ border: "1px solid var(--border)", borderRadius: 10, padding: "12px 14px", marginBottom: 10, background: "rgba(255,255,255,0.02)" }}>
+                    <div key={idx} style={{ border: "1px solid var(--border)", borderRadius: 10, padding: "12px 14px", marginBottom: 10, background: "rgba(var(--ink),0.02)" }}>
                       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
                         <span style={{ fontSize: 11, fontWeight: 700, color: "var(--text-muted)", textTransform: "uppercase" }}>Item {idx + 1}</span>
                         <button onClick={() => removeItem(idx)} disabled={form.items.length === 1} style={{ background: "transparent", border: "none", cursor: form.items.length === 1 ? "not-allowed" : "pointer", color: form.items.length === 1 ? "var(--text-muted)" : "#f87171", fontSize: 18, lineHeight: 1, padding: 0 }}>×</button>

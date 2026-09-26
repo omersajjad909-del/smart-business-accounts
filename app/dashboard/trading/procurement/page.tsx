@@ -105,11 +105,11 @@ export default function TradingProcurementPage() {
             <tbody>
               {purchaseOrders.slice(0, 8).map((row) => (
                 <tr key={row.id}>
-                  <td style={{ padding: "12px 16px", borderBottom: "1px solid rgba(255,255,255,.04)", fontWeight: 700 }}>{row.poNo}</td>
-                  <td style={{ padding: "12px 16px", borderBottom: "1px solid rgba(255,255,255,.04)" }}>{row.supplier?.name || "-"}</td>
-                  <td style={{ padding: "12px 16px", borderBottom: "1px solid rgba(255,255,255,.04)" }}>{formatDate(row.date)}</td>
-                  <td style={{ padding: "12px 16px", borderBottom: "1px solid rgba(255,255,255,.04)", color: String(row.status || "").toUpperCase() === "PENDING" ? "#f59e0b" : "#34d399", fontWeight: 700 }}>{row.status || row.approvalStatus || "-"}</td>
-                  <td style={{ padding: "12px 16px", borderBottom: "1px solid rgba(255,255,255,.04)", color: "#34d399", fontWeight: 700 }}>{formatMoney(sumLineAmount(row.items))}</td>
+                  <td style={{ padding: "12px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", fontWeight: 700 }}>{row.poNo}</td>
+                  <td style={{ padding: "12px 16px", borderBottom: "1px solid rgba(var(--ink),.04)" }}>{row.supplier?.name || "-"}</td>
+                  <td style={{ padding: "12px 16px", borderBottom: "1px solid rgba(var(--ink),.04)" }}>{formatDate(row.date)}</td>
+                  <td style={{ padding: "12px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", color: String(row.status || "").toUpperCase() === "PENDING" ? "#f59e0b" : "#34d399", fontWeight: 700 }}>{row.status || row.approvalStatus || "-"}</td>
+                  <td style={{ padding: "12px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", color: "#34d399", fontWeight: 700 }}>{formatMoney(sumLineAmount(row.items))}</td>
                 </tr>
               ))}
               {purchaseOrders.length === 0 && (

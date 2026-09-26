@@ -69,7 +69,7 @@ export default function HotelFoliosPage() {
   }
 
   return (
-    <div style={{ minHeight: "100vh", padding: isMobile ? "17px 16px" : "28px 32px", color: "#fff", fontFamily: hotelFont }}>
+    <div style={{ minHeight: "100vh", padding: isMobile ? "17px 16px" : "28px 32px", color: "var(--ink-solid, #fff)", fontFamily: hotelFont }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24, gap: 16, flexWrap: "wrap" }}>
         <div>
           <h1 style={{ margin: "0 0 6px", fontSize: 24, fontWeight: 800 }}>Billing Folios</h1>
@@ -86,27 +86,27 @@ export default function HotelFoliosPage() {
           <tbody>
             {folios.map((row) => (
               <tr key={row.id}>
-                <td style={{ padding: isMobile ? "8px 8px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)", fontWeight: 700 }}>{row.guest}</td>
-                <td style={{ padding: isMobile ? "8px 8px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)" }}>{row.room}</td>
-                <td style={{ padding: isMobile ? "8px 8px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)" }}>Rs. {row.charges.toLocaleString()}</td>
-                <td style={{ padding: isMobile ? "8px 8px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)" }}>Rs. {row.serviceCharges.toLocaleString()}</td>
-                <td style={{ padding: isMobile ? "8px 8px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)" }}>Rs. {row.taxes.toLocaleString()}</td>
-                <td style={{ padding: isMobile ? "8px 8px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)", color: "#34d399" }}>Rs. {row.paid.toLocaleString()}</td>
-                <td style={{ padding: isMobile ? "8px 8px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)" }}>{row.checkOut}</td>
-                <td style={{ padding: isMobile ? "8px 8px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)" }}>{row.status}</td>
-                <td style={{ padding: isMobile ? "8px 8px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)" }}>
+                <td style={{ padding: isMobile ? "8px 8px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", fontWeight: 700 }}>{row.guest}</td>
+                <td style={{ padding: isMobile ? "8px 8px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)" }}>{row.room}</td>
+                <td style={{ padding: isMobile ? "8px 8px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)" }}>Rs. {row.charges.toLocaleString()}</td>
+                <td style={{ padding: isMobile ? "8px 8px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)" }}>Rs. {row.serviceCharges.toLocaleString()}</td>
+                <td style={{ padding: isMobile ? "8px 8px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)" }}>Rs. {row.taxes.toLocaleString()}</td>
+                <td style={{ padding: isMobile ? "8px 8px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", color: "#34d399" }}>Rs. {row.paid.toLocaleString()}</td>
+                <td style={{ padding: isMobile ? "8px 8px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)" }}>{row.checkOut}</td>
+                <td style={{ padding: isMobile ? "8px 8px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)" }}>{row.status}</td>
+                <td style={{ padding: isMobile ? "8px 8px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)" }}>
                   {row.status === "open" && <button onClick={() => closeFolio(row.id)} style={{ padding: isMobile ? "8px 8px" : "5px 10px", borderRadius: 6, background: "rgba(52,211,153,.15)", border: "1px solid rgba(52,211,153,.3)", color: "#34d399", cursor: "pointer" }}>Close</button>}
                 </td>
               </tr>
             ))}
-            {!loading && folios.length === 0 && <tr><td colSpan={9} style={{ padding: 40, textAlign: "center", color: "rgba(255,255,255,.25)" }}>No folios yet.</td></tr>}
+            {!loading && folios.length === 0 && <tr><td colSpan={9} style={{ padding: 40, textAlign: "center", color: "rgba(var(--ink),.25)" }}>No folios yet.</td></tr>}
           </tbody>
         </table>
       </div>
 
       {showModal && (
         <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.72)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-          <div style={{ width: 560, background: "#161b27", border: `1px solid ${hotelBorder}`, borderRadius: 16, padding: 28 }}>
+          <div style={{ width: 560, background: "var(--dk-161b27, #161b27)", border: `1px solid ${hotelBorder}`, borderRadius: 16, padding: 28 }}>
             <h2 style={{ margin: "0 0 18px", fontSize: 18, fontWeight: 800 }}>New Folio</h2>
             <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: 12 }}>
               {[
@@ -119,7 +119,7 @@ export default function HotelFoliosPage() {
               ].map(([label, key, type]) => (
                 <div key={key}>
                   <label style={{ display: "block", marginBottom: 6, fontSize: 12, color: hotelMuted }}>{label}</label>
-                  <input type={type} value={String((form as Record<string, unknown>)[key] ?? "")} onChange={(e) => setForm((prev) => ({ ...prev, [key]: type === "number" ? Number(e.target.value) : e.target.value }))} style={{ width: "100%", padding: isMobile ? "8px 8px" : "10px 12px", background: "#111827", border: `1px solid ${hotelBorder}`, borderRadius: 8, color: "#fff" }} />
+                  <input type={type} value={String((form as Record<string, unknown>)[key] ?? "")} onChange={(e) => setForm((prev) => ({ ...prev, [key]: type === "number" ? Number(e.target.value) : e.target.value }))} style={{ width: "100%", padding: isMobile ? "8px 8px" : "10px 12px", background: "var(--dk-111827, #111827)", border: `1px solid ${hotelBorder}`, borderRadius: 8, color: "var(--ink-solid, #fff)" }} />
                 </div>
               ))}
             </div>

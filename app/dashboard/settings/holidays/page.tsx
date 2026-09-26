@@ -12,19 +12,19 @@ const WEEK_DAYS = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Frid
 type Holiday = { id: string; date: string; name: string; isRecurring: boolean };
 
 const CARD: React.CSSProperties = {
-  background: "var(--card-bg, rgba(255,255,255,.03))",
-  border:     "1px solid var(--card-border, rgba(255,255,255,.08))",
+  background: "var(--card-bg, rgba(var(--ink),.03))",
+  border:     "1px solid var(--card-border, rgba(var(--ink),.08))",
   borderRadius: 16, padding: 24, color: "var(--text-primary, #fff)",
 };
 const inp: React.CSSProperties = {
   width: "100%", boxSizing: "border-box",
   padding: "10px 12px", borderRadius: 10,
-  background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.1)",
+  background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.1)",
   color: "var(--text-primary,#fff)", fontSize: 13, outline: "none", fontFamily: ff,
 };
 const lbl: React.CSSProperties = {
   fontSize: 11, fontWeight: 800, letterSpacing: ".07em",
-  textTransform: "uppercase", color: "var(--text-muted, rgba(255,255,255,.5))",
+  textTransform: "uppercase", color: "var(--text-muted, rgba(var(--ink),.5))",
   marginBottom: 6, display: "block",
 };
 
@@ -123,7 +123,7 @@ export default function HolidaysPage() {
     <div style={{ maxWidth: 900, margin: "0 auto", padding: "24px 20px 80px", fontFamily: ff, display: "flex", flexDirection: "column", gap: 22 }}>
       <header>
         <h1 style={{ fontSize: 26, fontWeight: 800, margin: 0, letterSpacing: -0.5 }}>Public Holidays</h1>
-        <p style={{ fontSize: 14, color: "var(--text-muted, rgba(255,255,255,.5))", margin: "6px 0 0", lineHeight: 1.6 }}>
+        <p style={{ fontSize: 14, color: "var(--text-muted, rgba(var(--ink),.5))", margin: "6px 0 0", lineHeight: 1.6 }}>
           Company-wide holiday calendar. Marked dates auto-appear as HOLIDAY on the attendance calendar for every employee — no per-day marking needed. Sundays are always treated as holiday by default.
         </p>
       </header>
@@ -132,7 +132,7 @@ export default function HolidaysPage() {
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 16, marginBottom: 14, flexDirection: isMobile ? "column" : "row" }}>
           <div>
             <div style={{ fontSize: 15, fontWeight: 800, marginBottom: 6 }}>Weekly Off Defaults</div>
-            <div style={{ fontSize: 13, color: "var(--text-muted, rgba(255,255,255,.5))", lineHeight: 1.6 }}>
+            <div style={{ fontSize: 13, color: "var(--text-muted, rgba(var(--ink),.5))", lineHeight: 1.6 }}>
               Choose the weekly holiday pattern for the attendance calendar, such as Friday only, Sunday only, or Saturday and Sunday.
             </div>
           </div>
@@ -171,8 +171,8 @@ export default function HolidaysPage() {
                 style={{
                   padding: "12px 10px",
                   borderRadius: 12,
-                  border: `1px solid ${active ? `${ACCENT}66` : "rgba(255,255,255,.1)"}`,
-                  background: active ? `${ACCENT}18` : "rgba(255,255,255,.02)",
+                  border: `1px solid ${active ? `${ACCENT}66` : "rgba(var(--ink),.1)"}`,
+                  background: active ? `${ACCENT}18` : "rgba(var(--ink),.02)",
                   color: active ? ACCENT : "var(--text-primary, #fff)",
                   fontFamily: ff,
                   fontSize: 12,
@@ -182,7 +182,7 @@ export default function HolidaysPage() {
                 }}
               >
                 <div>{day}</div>
-                <div style={{ marginTop: 4, fontSize: 10, color: active ? ACCENT : "var(--text-muted, rgba(255,255,255,.5))", textTransform: "uppercase", letterSpacing: ".05em" }}>
+                <div style={{ marginTop: 4, fontSize: 10, color: active ? ACCENT : "var(--text-muted, rgba(var(--ink),.5))", textTransform: "uppercase", letterSpacing: ".05em" }}>
                   {active ? "Holiday" : "Working Day"}
                 </div>
               </button>
@@ -206,7 +206,7 @@ export default function HolidaysPage() {
             </div>
             <div>
               <label style={lbl}>Recurring</label>
-              <label style={{ display: "flex", alignItems: "center", gap: 6, padding: "10px 12px", borderRadius: 10, background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.1)", cursor: "pointer", fontSize: 12 }}>
+              <label style={{ display: "flex", alignItems: "center", gap: 6, padding: "10px 12px", borderRadius: 10, background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.1)", cursor: "pointer", fontSize: 12 }}>
                 <input type="checkbox" checked={form.isRecurring} onChange={e => setForm({ ...form, isRecurring: e.target.checked })} style={{ accentColor: ACCENT }} />
                 Every year
               </label>
@@ -235,9 +235,9 @@ export default function HolidaysPage() {
         </div>
 
         {loading ? (
-          <div style={{ padding: 24, color: "var(--text-muted, rgba(255,255,255,.5))", fontSize: 13 }}>Loading…</div>
+          <div style={{ padding: 24, color: "var(--text-muted, rgba(var(--ink),.5))", fontSize: 13 }}>Loading…</div>
         ) : holidays.length === 0 ? (
-          <div style={{ padding: 32, textAlign: "center", color: "var(--text-muted, rgba(255,255,255,.5))", fontSize: 13 }}>
+          <div style={{ padding: 32, textAlign: "center", color: "var(--text-muted, rgba(var(--ink),.5))", fontSize: 13 }}>
             No holidays configured for {year}. {isAdmin ? "Add one above." : "Ask your admin to add them."}
           </div>
         ) : (
@@ -247,13 +247,13 @@ export default function HolidaysPage() {
               const weekday = d.toLocaleDateString(undefined, { weekday: "short" });
               const long = d.toLocaleDateString(undefined, { day: "numeric", month: "long", year: "numeric" });
               return (
-                <div key={h.id} style={{ display: "grid", gridTemplateColumns: "auto 1fr auto auto", gap: 12, alignItems: "center", padding: "10px 14px", borderRadius: 10, background: "rgba(255,255,255,.02)", border: "1px solid rgba(255,255,255,.06)" }}>
+                <div key={h.id} style={{ display: "grid", gridTemplateColumns: "auto 1fr auto auto", gap: 12, alignItems: "center", padding: "10px 14px", borderRadius: 10, background: "rgba(var(--ink),.02)", border: "1px solid rgba(var(--ink),.06)" }}>
                   <div style={{ fontSize: 11, fontWeight: 800, color: ACCENT, background: `${ACCENT}18`, padding: "3px 10px", borderRadius: 999, letterSpacing: ".04em" }}>
                     {weekday.toUpperCase()}
                   </div>
                   <div>
                     <div style={{ fontSize: 13, fontWeight: 700 }}>{h.name}</div>
-                    <div style={{ fontSize: 11, color: "var(--text-muted, rgba(255,255,255,.5))" }}>{long}</div>
+                    <div style={{ fontSize: 11, color: "var(--text-muted, rgba(var(--ink),.5))" }}>{long}</div>
                   </div>
                   {h.isRecurring && (
                     <span style={{ padding: "3px 10px", borderRadius: 999, background: "rgba(56,189,248,.14)", color: "#38bdf8", fontSize: 10, fontWeight: 700, letterSpacing: ".04em" }}>

@@ -683,7 +683,7 @@ export default function QuotationPage() {
               {isMobile ? (
                 <div>
                   {rows.map((r, i) => (
-                    <div key={i} style={{ border: "1px solid var(--border)", borderRadius: 10, padding: isMobile ? "8px 8px" : "12px 14px", marginBottom: 10, background: "rgba(255,255,255,0.02)" }}>
+                    <div key={i} style={{ border: "1px solid var(--border)", borderRadius: 10, padding: isMobile ? "8px 8px" : "12px 14px", marginBottom: 10, background: "rgba(var(--ink),0.02)" }}>
                       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
                         <span style={{ fontSize: 11, fontWeight: 700, color: "var(--text-muted)", textTransform: "uppercase" }}>Item {i + 1}</span>
                         <button onClick={() => removeRow(i)} disabled={rows.length === 1} style={{ background: "transparent", border: "none", cursor: rows.length === 1 ? "not-allowed" : "pointer", color: rows.length === 1 ? "var(--text-muted)" : "#f87171", fontSize: 18, lineHeight: 1, padding: 0 }}>×</button>
@@ -952,7 +952,7 @@ export default function QuotationPage() {
                       <span>Freight:</span><span>{Number(savedQuotation.freight).toLocaleString()}</span>
                     </div>
                   )}
-                  <div style={{ display: "flex", justifyContent: "space-between", fontWeight: 900, fontSize: 11, borderTop: "1px solid #000", paddingTop: 4, marginTop: 3 }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", fontWeight: 900, fontSize: 11, borderTop: "1px solid var(--dkb-000000, #000)", paddingTop: 4, marginTop: 3 }}>
                     <span>NET TOTAL:</span>
                     <span>{(Number(savedQuotation.total) + Number(savedQuotation.freight || 0)).toLocaleString()}</span>
                   </div>

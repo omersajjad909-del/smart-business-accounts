@@ -56,7 +56,7 @@ export default function PharmacyCounterSalesPage() {
   }
 
   return (
-    <div style={{ minHeight: "100vh", padding: isMobile ? "15px 14px" : "28px 32px", color: "#fff", fontFamily: pharmacyFont }}>
+    <div style={{ minHeight: "100vh", padding: isMobile ? "15px 14px" : "28px 32px", color: "var(--ink-solid, #fff)", fontFamily: pharmacyFont }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24 }}>
         <div>
           <h1 style={{ margin: "0 0 6px", fontSize: 22, fontWeight: 800 }}>Counter Sales</h1>
@@ -88,23 +88,23 @@ export default function PharmacyCounterSalesPage() {
           <tbody>
             {sales.map((row) => (
               <tr key={row.id}>
-                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)", fontWeight: 700 }}>{row.medicine}</td>
-                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)" }}>{row.customer}</td>
-                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)" }}>{row.quantity}</td>
-                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)" }}>Rs. {row.amount.toLocaleString()}</td>
-                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)", textTransform: "capitalize" }}>{row.paymentMethod}</td>
-                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)" }}>{row.saleDate}</td>
-                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)" }}>{row.status}</td>
+                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", fontWeight: 700 }}>{row.medicine}</td>
+                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)" }}>{row.customer}</td>
+                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)" }}>{row.quantity}</td>
+                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)" }}>Rs. {row.amount.toLocaleString()}</td>
+                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", textTransform: "capitalize" }}>{row.paymentMethod}</td>
+                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)" }}>{row.saleDate}</td>
+                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)" }}>{row.status}</td>
               </tr>
             ))}
-            {!saleStore.loading && sales.length === 0 && <tr><td colSpan={7} style={{ padding: 32, textAlign: "center", color: "rgba(255,255,255,.28)" }}>No counter sales recorded yet.</td></tr>}
+            {!saleStore.loading && sales.length === 0 && <tr><td colSpan={7} style={{ padding: 32, textAlign: "center", color: "rgba(var(--ink),.28)" }}>No counter sales recorded yet.</td></tr>}
           </tbody>
         </table>
       </div>
 
       {showModal && (
         <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.7)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 60 }}>
-          <div style={{ width: 520, background: "#161b27", border: `1px solid ${pharmacyBorder}`, borderRadius: 16, padding: 28 }}>
+          <div style={{ width: 520, background: "var(--dk-161b27, #161b27)", border: `1px solid ${pharmacyBorder}`, borderRadius: 16, padding: 28 }}>
             <h2 style={{ margin: "0 0 18px", fontSize: 18, fontWeight: 800 }}>Record Counter Sale</h2>
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
               {[
@@ -121,7 +121,7 @@ export default function PharmacyCounterSalesPage() {
               ))}
               <div style={{ gridColumn: "span 2" }}>
                 <label style={{ display: "block", fontSize: 12, color: pharmacyMuted, marginBottom: 6 }}>Payment Method</label>
-                <select value={form.paymentMethod} onChange={(e) => setForm((prev) => ({ ...prev, paymentMethod: e.target.value }))} style={{ width: "100%", background: "#161b27", border: `1px solid ${pharmacyBorder}`, borderRadius: 8, padding: "10px 12px", color: "#fff" }}>
+                <select value={form.paymentMethod} onChange={(e) => setForm((prev) => ({ ...prev, paymentMethod: e.target.value }))} style={{ width: "100%", background: "var(--dk-161b27, #161b27)", border: `1px solid ${pharmacyBorder}`, borderRadius: 8, padding: "10px 12px", color: "var(--ink-solid, #fff)" }}>
                   {["cash", "card", "bank_transfer"].map((method) => <option key={method} value={method}>{method.replace("_", " ")}</option>)}
                 </select>
               </div>
@@ -129,7 +129,7 @@ export default function PharmacyCounterSalesPage() {
             {error && <div style={{ marginTop: 12, color: "#fca5a5", fontSize: 12 }}>{error}</div>}
             <div style={{ display: "flex", gap: 12, marginTop: 18 }}>
               <button onClick={save} style={{ flex: 1, padding: "11px 0", borderRadius: 8, border: "none", background: "#60a5fa", color: "#fff", fontWeight: 700, cursor: "pointer" }}>Save Sale</button>
-              <button onClick={() => { setShowModal(false); setError(""); }} style={{ padding: "11px 18px", borderRadius: 8, border: `1px solid ${pharmacyBorder}`, background: "transparent", color: "#fff", cursor: "pointer" }}>Cancel</button>
+              <button onClick={() => { setShowModal(false); setError(""); }} style={{ padding: "11px 18px", borderRadius: 8, border: `1px solid ${pharmacyBorder}`, background: "transparent", color: "var(--ink-solid, #fff)", cursor: "pointer" }}>Cancel</button>
             </div>
           </div>
         </div>

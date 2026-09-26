@@ -136,7 +136,7 @@ export default function ShippingPage() {
   }
 
   return (
-    <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", minHeight: "100vh", color: "#fff", fontFamily: ecommerceFont }}>
+    <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", minHeight: "100vh", color: "var(--ink-solid, #fff)", fontFamily: ecommerceFont }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 28 }}>
         <div>
           <h1 style={{ fontSize: 24, fontWeight: 900, margin: "0 0 6px" }}>Shipping Desk</h1>
@@ -167,9 +167,9 @@ export default function ShippingPage() {
             style={{
               padding: "8px 14px",
               borderRadius: 999,
-              border: filter === status ? "1px solid rgba(99,102,241,.4)" : "1px solid rgba(255,255,255,.08)",
-              background: filter === status ? "rgba(99,102,241,.16)" : "rgba(255,255,255,.03)",
-              color: filter === status ? "#c7d2fe" : "rgba(255,255,255,.65)",
+              border: filter === status ? "1px solid rgba(99,102,241,.4)" : "1px solid rgba(var(--ink),.08)",
+              background: filter === status ? "rgba(99,102,241,.16)" : "rgba(var(--ink),.03)",
+              color: filter === status ? "#c7d2fe" : "rgba(var(--ink),.65)",
               fontSize: 12,
               fontWeight: 700,
               textTransform: "capitalize",
@@ -238,7 +238,7 @@ export default function ShippingPage() {
               ))}
               {!filtered.length && (
                 <tr>
-                  <td colSpan={9} style={{ padding: 42, textAlign: "center", color: "rgba(255,255,255,.28)" }}>
+                  <td colSpan={9} style={{ padding: 42, textAlign: "center", color: "rgba(var(--ink),.28)" }}>
                     No shipments matched this filter.
                   </td>
                 </tr>
@@ -337,15 +337,15 @@ const thStyle: CSSProperties = {
 
 const tdStyle: CSSProperties = {
   padding: isMobile ? "12px 10px" : "14px 16px",
-  borderBottom: "1px solid rgba(255,255,255,.04)",
+  borderBottom: "1px solid rgba(var(--ink),.04)",
   fontSize: 13,
   verticalAlign: "top",
 };
 
 const actionButton: CSSProperties = {
   padding: "5px 9px",
-  background: "rgba(255,255,255,.04)",
-  border: "1px solid rgba(255,255,255,.08)",
+  background: "rgba(var(--ink),.04)",
+  border: "1px solid rgba(var(--ink),.08)",
   borderRadius: 8,
   fontSize: 11,
   fontWeight: 700,
@@ -358,18 +358,18 @@ const secondaryButton: CSSProperties = {
   background: "transparent",
   border: `1px solid ${ecommerceBorder}`,
   borderRadius: 10,
-  color: "rgba(255,255,255,.65)",
+  color: "rgba(var(--ink),.65)",
   fontSize: 14,
   cursor: "pointer",
 };
 
 const inputStyle: CSSProperties = {
   width: "100%",
-  background: "rgba(255,255,255,.04)",
+  background: "rgba(var(--ink),.04)",
   border: `1px solid ${ecommerceBorder}`,
   borderRadius: 10,
   padding: "10px 12px",
-  color: "#fff",
+  color: "var(--ink-solid, #fff)",
   fontSize: 14,
   boxSizing: "border-box",
 };
@@ -392,7 +392,7 @@ const overlayStyle: CSSProperties = {
 };
 
 const modalStyle: CSSProperties = {
-  background: "#161b27",
+  background: "var(--dk-161b27, #161b27)",
   border: `1px solid ${ecommerceBorder}`,
   borderRadius: 18,
   padding: 32,

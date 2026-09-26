@@ -15,7 +15,7 @@ const T = {
   bg:      "#070a1c",
   panel:   "rgba(10,13,36,.96)",
   glass:   "rgba(255,255,255,.028)",
-  border:  "rgba(255,255,255,.075)",
+  border:  "rgba(var(--ink),.075)",
   borderM: "rgba(255,255,255,.13)",
   text:    "rgba(255,255,255,.96)",
   muted:   "rgba(200,210,240,.72)",
@@ -227,7 +227,7 @@ function DecisionCard({ decision, queueingId, onQueue }: {
           <button onClick={() => onQueue(decision)} disabled={busy} style={{
             display: "flex", alignItems: "center", justifyContent: "center",
             padding: "10px 14px", borderRadius: 12, fontSize: 13,
-            background: "rgba(255,255,255,.04)", color: "rgba(255,255,255,.62)",
+            background: "rgba(var(--ink),.04)", color: "rgba(var(--ink),.62)",
             border: `1px solid ${T.borderM}`, cursor: busy ? "wait" : "pointer",
             fontWeight: 600, fontFamily: "inherit",
             opacity: busy ? 0.6 : 1,
@@ -255,7 +255,7 @@ function ProblemCard({ problem }: { problem: AnomalyAlert }) {
         <span style={{ color: tone.dot, flexShrink: 0 }}>{icon}</span>
         <div style={{ fontSize: 13, fontWeight: 800, color: tone.text, lineHeight: 1.3 }}>{problem.title}</div>
       </div>
-      <div style={{ marginTop: 6, fontSize: 12.5, color: "rgba(255,255,255,.76)", lineHeight: 1.65 }}>{problem.description}</div>
+      <div style={{ marginTop: 6, fontSize: 12.5, color: "rgba(var(--ink),.76)", lineHeight: 1.65 }}>{problem.description}</div>
       {problem.action && <div style={{ marginTop: 6, fontSize: 12, color: T.dim, fontStyle: "italic" }}>→ {problem.action}</div>}
       {problem.link && (
         <Link prefetch={false} href={problem.link} style={{ display: "inline-block", marginTop: 6, fontSize: 11.5, color: T.violet, textDecoration: "none", fontWeight: 700 }}>
@@ -313,7 +313,7 @@ function ActionCard({ action, queueingId, buttonLabel, onQueue }: {
     }}>
       <div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" }}>
         <span style={{ padding: "2px 9px", borderRadius: 99, background: tone.bg, border: `1px solid ${tone.border}`, color: tone.text, fontSize: 10, fontWeight: 800, textTransform: "uppercase", letterSpacing: ".1em" }}>{action.priority}</span>
-        <span style={{ fontSize: 10.5, color: T.dim, background: "rgba(255,255,255,.045)", border: `1px solid ${T.border}`, padding: "2px 9px", borderRadius: 99 }}>{action.automationLevel}</span>
+        <span style={{ fontSize: 10.5, color: T.dim, background: "rgba(var(--ink),.045)", border: `1px solid ${T.border}`, padding: "2px 9px", borderRadius: 99 }}>{action.automationLevel}</span>
       </div>
       <div style={{ marginTop: 9, fontSize: 15, fontWeight: 800, color: T.text }}>{action.title}</div>
       <div style={{ marginTop: 5, fontSize: 12.5, color: T.muted, lineHeight: 1.65 }}>{action.description}</div>
@@ -329,7 +329,7 @@ function ActionCard({ action, queueingId, buttonLabel, onQueue }: {
         )}
         <button onClick={() => onQueue(action)} disabled={busy || watchOnly} style={{
           padding: "8px 14px", borderRadius: 10, fontSize: 12.5,
-          background: "rgba(255,255,255,.04)", color: "rgba(255,255,255,.58)",
+          background: "rgba(var(--ink),.04)", color: "rgba(var(--ink),.58)",
           border: `1px solid ${T.borderM}`, fontFamily: "inherit",
           cursor: watchOnly || busy ? "not-allowed" : "pointer", fontWeight: 600,
           opacity: watchOnly ? 0.38 : busy ? 0.6 : 1,
@@ -345,8 +345,8 @@ function ActionCard({ action, queueingId, buttonLabel, onQueue }: {
 function Skeleton() {
   const { isMobile } = useResponsive();
   return (
-    <div style={{ padding: 24, minHeight: "100vh", color: "white", fontFamily: "'Outfit','Inter',sans-serif" }}>
-      <style>{`@keyframes sk{0%,100%{opacity:.35}50%{opacity:.7}} .sk{background:rgba(255,255,255,.07);border-radius:12px;animation:sk 1.7s ease infinite}`}</style>
+    <div style={{ padding: 24, minHeight: "100vh", color: "var(--ink-solid, white)", fontFamily: "'Outfit','Inter',sans-serif" }}>
+      <style>{`@keyframes sk{0%,100%{opacity:.35}50%{opacity:.7}} .sk{background:rgba(var(--ink),.07);border-radius:12px;animation:sk 1.7s ease infinite}`}</style>
       <div className="sk" style={{ height: 190, borderRadius: 24, marginBottom: 18 }} />
       <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 14, marginBottom: 18 }}>
         {[0,1,2,3].map(i => <div key={i} className="sk" style={{ height: 120, borderRadius: 20 }} />)}
@@ -429,7 +429,7 @@ export default function BusinessOperatorPage() {
 
   if (!data) {
     return (
-      <div style={{ padding: 24, minHeight: "100vh", color: "white", fontFamily: "'Outfit','Inter',sans-serif", display: "flex", alignItems: "center", justifyContent: "center" }}>
+      <div style={{ padding: 24, minHeight: "100vh", color: "var(--ink-solid, white)", fontFamily: "'Outfit','Inter',sans-serif", display: "flex", alignItems: "center", justifyContent: "center" }}>
         <div style={{ textAlign: "center", maxWidth: 400 }}>
           <div style={{ fontSize: 48, marginBottom: 16 }}>⚠️</div>
           <div style={{ fontSize: 22, fontWeight: 800, color: T.text }}>Operator Unavailable</div>
@@ -445,7 +445,7 @@ export default function BusinessOperatorPage() {
   const healthColor = data.overview.healthScore >= 70 ? T.emerald : data.overview.healthScore >= 45 ? T.amber : T.red;
 
   return (
-    <div style={{ minHeight: "100vh", padding: isMobile ? "12px" : "24px", color: "white", fontFamily: "'Outfit','Inter',sans-serif" }}>
+    <div style={{ minHeight: "100vh", padding: isMobile ? "12px" : "24px", color: "var(--ink-solid, white)", fontFamily: "'Outfit','Inter',sans-serif" }}>
       <style>{`
         
         @keyframes live-pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.5;transform:scale(1.4)} }
@@ -455,8 +455,8 @@ export default function BusinessOperatorPage() {
         .op-main     { display:grid; grid-template-columns:minmax(0,1.42fr) minmax(300px,.95fr); gap:18px; align-items:start }
         .op-bottom   { display:grid; grid-template-columns:1fr 1fr; gap:18px }
         .op-shell    {
-          background: linear-gradient(180deg,rgba(255,255,255,.032),rgba(255,255,255,.012)), rgba(10,13,36,.96);
-          border: 1px solid rgba(255,255,255,.075);
+          background: linear-gradient(180deg,rgba(var(--ink),.032),rgba(var(--ink),.012)), rgba(10,13,36,.96);
+          border: 1px solid rgba(var(--ink),.075);
           border-radius: 24px;
           box-shadow: 0 20px 55px rgba(0,0,0,.28);
         }
@@ -516,11 +516,11 @@ export default function BusinessOperatorPage() {
                 { label: "Business", value: data.company.businessLabel },
                 { label: "Plan",     value: data.company.plan },
               ].map(m => (
-                <div key={m.label} style={{ padding: "8px 14px", borderRadius: 12, background: "rgba(255,255,255,.04)", border: `1px solid ${T.border}`, fontSize: 13, color: T.muted }}>
+                <div key={m.label} style={{ padding: "8px 14px", borderRadius: 12, background: "rgba(var(--ink),.04)", border: `1px solid ${T.border}`, fontSize: 13, color: T.muted }}>
                   {m.label}: <strong style={{ color: T.text }}>{m.value}</strong>
                 </div>
               ))}
-              <div style={{ padding: "8px 14px", borderRadius: 12, background: "rgba(255,255,255,.04)", border: `1px solid ${T.border}`, fontSize: 13, color: T.muted }}>
+              <div style={{ padding: "8px 14px", borderRadius: 12, background: "rgba(var(--ink),.04)", border: `1px solid ${T.border}`, fontSize: 13, color: T.muted }}>
                 Updated: <strong style={{ color: T.text }}>{new Date(data.generatedAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</strong>
               </div>
               <button onClick={() => loadData(true)} disabled={refreshing} style={{
@@ -538,7 +538,7 @@ export default function BusinessOperatorPage() {
           {/* Right: Health card */}
           <div style={{
             width: 310, maxWidth: "100%", borderRadius: 20,
-            background: "rgba(255,255,255,.04)", border: `1px solid ${T.border}`,
+            background: "rgba(var(--ink),.04)", border: `1px solid ${T.border}`,
             padding: isMobile ? "12px 11px" : "22px 24px",
             display: "flex", flexDirection: "column", gap: 0,
           }}>

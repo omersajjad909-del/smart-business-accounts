@@ -227,9 +227,9 @@ export default function ExpenseVouchersPage() {
         <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
           {queryIdx >= 0 && !queryMode && (
             <div style={{ display: "flex", alignItems: "center", gap: 6, background: "rgba(249,115,22,.08)", border: "1px solid rgba(249,115,22,.2)", borderRadius: 10, padding: "6px 12px" }}>
-              <button onClick={() => evNavTo(queryIdx-1)} disabled={queryIdx===0} style={{ padding: "4px 10px", borderRadius: 6, background: "rgba(255,255,255,.06)", border: "1px solid rgba(255,255,255,.1)", color: queryIdx===0?"rgba(255,255,255,.2)":"rgba(255,255,255,.7)", fontSize: 13, cursor: queryIdx===0?"default":"pointer", fontFamily: ff }}>◀</button>
+              <button onClick={() => evNavTo(queryIdx-1)} disabled={queryIdx===0} style={{ padding: "4px 10px", borderRadius: 6, background: "rgba(var(--ink),.06)", border: "1px solid rgba(var(--ink),.1)", color: queryIdx===0?"rgba(var(--ink),.2)":"rgba(var(--ink),.7)", fontSize: 13, cursor: queryIdx===0?"default":"pointer", fontFamily: ff }}>◀</button>
               <span style={{ fontSize: 12, color: accent, fontWeight: 700, minWidth: 80, textAlign: "center" }}>{queryResults[queryIdx]?.voucherNo} · {queryIdx+1}/{queryResults.length}</span>
-              <button onClick={() => evNavTo(queryIdx+1)} disabled={queryIdx===queryResults.length-1} style={{ padding: "4px 10px", borderRadius: 6, background: "rgba(255,255,255,.06)", border: "1px solid rgba(255,255,255,.1)", color: queryIdx===queryResults.length-1?"rgba(255,255,255,.2)":"rgba(255,255,255,.7)", fontSize: 13, cursor: queryIdx===queryResults.length-1?"default":"pointer", fontFamily: ff }}>▶</button>
+              <button onClick={() => evNavTo(queryIdx+1)} disabled={queryIdx===queryResults.length-1} style={{ padding: "4px 10px", borderRadius: 6, background: "rgba(var(--ink),.06)", border: "1px solid rgba(var(--ink),.1)", color: queryIdx===queryResults.length-1?"rgba(var(--ink),.2)":"rgba(var(--ink),.7)", fontSize: 13, cursor: queryIdx===queryResults.length-1?"default":"pointer", fontFamily: ff }}>▶</button>
               <button onClick={evExitQuery} style={{ padding: "4px 10px", borderRadius: 6, background: "rgba(248,113,113,.08)", border: "1px solid rgba(248,113,113,.2)", color: "#f87171", fontSize: 11, cursor: "pointer", fontFamily: ff }}>✕ Clear</button>
             </div>
           )}
@@ -275,7 +275,7 @@ export default function ExpenseVouchersPage() {
               style={{ padding: "10px 32px", borderRadius: 9, background: "linear-gradient(135deg,#facc15,#ca8a04)", border: "none", color: "#000", fontSize: 14, fontWeight: 800, cursor: "pointer", fontFamily: ff, display: "flex", alignItems: "center", gap: 8 }}>
               <span style={{ background: "rgba(0,0,0,.2)", borderRadius: 4, padding: "1px 7px", fontSize: 11 }}>F8</span>Execute Query
             </button>
-            <button onClick={evExitQuery} style={{ padding: "10px 20px", borderRadius: 9, background: "rgba(255,255,255,.05)", border: "1px solid rgba(255,255,255,.1)", color: "var(--text-muted)", fontSize: 13, cursor: "pointer", fontFamily: ff }}>Cancel (Esc)</button>
+            <button onClick={evExitQuery} style={{ padding: "10px 20px", borderRadius: 9, background: "rgba(var(--ink),.05)", border: "1px solid rgba(var(--ink),.1)", color: "var(--text-muted)", fontSize: 13, cursor: "pointer", fontFamily: ff }}>Cancel (Esc)</button>
           </div>
         </div>
       )}
@@ -398,8 +398,8 @@ export default function ExpenseVouchersPage() {
         ] : [
           { key: "F7", label: "Query Mode", color: accent },
         ]).map(s => (
-          <div key={s.key} style={{ display: "flex", alignItems: "center", gap: 4, background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)", borderRadius: 6, padding: "4px 10px" }}>
-            <span style={{ background: s.color ? `${s.color}22` : "rgba(255,255,255,.06)", color: s.color || "var(--text-muted)", borderRadius: 4, padding: "1px 7px", fontSize: 10, fontWeight: 800, fontFamily: "monospace", border: `1px solid ${s.color ? `${s.color}44` : "rgba(255,255,255,.1)"}` }}>{s.key}</span>
+          <div key={s.key} style={{ display: "flex", alignItems: "center", gap: 4, background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.07)", borderRadius: 6, padding: "4px 10px" }}>
+            <span style={{ background: s.color ? `${s.color}22` : "rgba(var(--ink),.06)", color: s.color || "var(--text-muted)", borderRadius: 4, padding: "1px 7px", fontSize: 10, fontWeight: 800, fontFamily: "monospace", border: `1px solid ${s.color ? `${s.color}44` : "rgba(var(--ink),.1)"}` }}>{s.key}</span>
             <span style={{ fontSize: 11, color: "var(--text-muted)" }}>{s.label}</span>
           </div>
         ))}

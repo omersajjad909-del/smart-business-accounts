@@ -153,14 +153,14 @@ const FONT = "'Outfit','Inter',sans-serif";
 const s = {
   page:   { fontFamily: FONT, color: "var(--text-primary)", padding: isMobile ? "15px 11px" : "28px 24px", minHeight: "100vh", background: "var(--app-bg)" },
   panel:  { background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 14 },
-  inp:    { background: "rgba(255,255,255,.05)", border: "1px solid var(--border)", borderRadius: 8, padding: "9px 13px", color: "var(--text-primary)", fontFamily: FONT, fontSize: 13, width: "100%", boxSizing: "border-box" as const, outline: "none" },
+  inp:    { background: "rgba(var(--ink),.05)", border: "1px solid var(--border)", borderRadius: 8, padding: "9px 13px", color: "var(--text-primary)", fontFamily: FONT, fontSize: 13, width: "100%", boxSizing: "border-box" as const, outline: "none" },
   label:  { fontSize: 12, color: "var(--text-muted)", display: "block", marginBottom: 5, fontWeight: 500 } as React.CSSProperties,
   btn:    (bg: string, small?: boolean) => ({ background: bg, border: "none", borderRadius: 8, padding: small ? "7px 14px" : "10px 22px", color: "var(--text-primary)", fontFamily: FONT, cursor: "pointer", fontSize: small ? 12 : 13, fontWeight: 600, lineHeight: 1 } as React.CSSProperties),
   badge:  (color: string, bg: string, border: string) => ({ background: bg, color, border: `1px solid ${border}`, borderRadius: 20, padding: "3px 10px", fontSize: 11, fontWeight: 700, whiteSpace: "nowrap" as const, display: "inline-block" }),
   th:     { padding: "11px 13px", textAlign: "left" as const, fontSize: 11, color: "var(--text-muted)", fontWeight: 600, textTransform: "uppercase" as const, letterSpacing: "0.06em", whiteSpace: "nowrap" as const, borderBottom: "1px solid var(--border)" },
   td:     { padding: "12px 13px", fontSize: 12, color: "var(--text-primary)", borderBottom: "1px solid var(--border)", verticalAlign: "middle" as const, whiteSpace: "nowrap" as const },
   kpi:    { ...{} as object, background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 12, padding: isMobile ? "12px 10px" : "18px 20px", minWidth: 0 },
-  tabBtn: (active: boolean) => ({ background: active ? "#3b82f6" : "rgba(255,255,255,.06)", border: `1px solid ${active ? "#3b82f6" : "var(--border)"}`, borderRadius: 8, padding: "7px 14px", color: active ? "#fff" : "var(--text-muted)", fontFamily: FONT, cursor: "pointer", fontSize: 12, fontWeight: 600, whiteSpace: "nowrap" as const }),
+  tabBtn: (active: boolean) => ({ background: active ? "#3b82f6" : "rgba(var(--ink),.06)", border: `1px solid ${active ? "#3b82f6" : "var(--border)"}`, borderRadius: 8, padding: "7px 14px", color: active ? "#fff" : "var(--text-muted)", fontFamily: FONT, cursor: "pointer", fontSize: 12, fontWeight: 600, whiteSpace: "nowrap" as const }),
 };
 
 // ─── Initial Form State ───────────────────────────────────────────────────────
@@ -619,7 +619,7 @@ export default function CustomsClearancePage() {
               <div style={{ border: "1px solid var(--border)", borderRadius: 10, overflow: "hidden" }}>
                 <table style={{ width: "100%", borderCollapse: "collapse" }}>
                   <thead>
-                    <tr style={{ background: "rgba(255,255,255,.04)" }}>
+                    <tr style={{ background: "rgba(var(--ink),.04)" }}>
                       {["HS Code","Description","Qty","Unit","Unit Value ($)","Total Value ($)",""].map(h => (
                         <th key={h} style={{ ...s.th, fontSize: 10 }}>{h}</th>
                       ))}

@@ -10,7 +10,7 @@ const BG = "rgba(255,255,255,.03)";
 const BORDER = "rgba(255,255,255,.08)";
 const MUTED = "rgba(255,255,255,.45)";
 
-const inp: React.CSSProperties = { width: "100%", boxSizing: "border-box", background: "rgba(255,255,255,.05)", border: `1px solid ${BORDER}`, borderRadius: 8, padding: "9px 12px", fontSize: 13, color: "#fff", fontFamily: ff, outline: "none" };
+const inp: React.CSSProperties = { width: "100%", boxSizing: "border-box", background: "rgba(var(--ink),.05)", border: `1px solid ${BORDER}`, borderRadius: 8, padding: "9px 12px", fontSize: 13, color: "var(--ink-solid, #fff)", fontFamily: ff, outline: "none" };
 const lbl: React.CSSProperties = { fontSize: 11, fontWeight: 700, color: MUTED, textTransform: "uppercase" as const, letterSpacing: ".06em", display: "block", marginBottom: 5 };
 
 const PRESET_ATTRS: Record<string, string[]> = {
@@ -73,7 +73,7 @@ export default function ProductVariantsPage() {
   const td: React.CSSProperties = { padding: "13px 14px", fontSize: 13, borderBottom: `1px solid ${BORDER}` };
 
   return (
-    <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", fontFamily: ff, color: "#fff", minHeight: "100vh" }}>
+    <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", fontFamily: ff, color: "var(--ink-solid, #fff)", minHeight: "100vh" }}>
 
       {/* Header */}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 28 }}>
@@ -132,7 +132,7 @@ export default function ProductVariantsPage() {
                 <td style={td}>
                   <div style={{ display: "flex", flexWrap: "wrap", gap: 4 }}>
                     {g.values.map(v => (
-                      <span key={v} style={{ padding: "2px 8px", borderRadius: 6, background: "rgba(255,255,255,.07)", color: "#e2e8f0", fontSize: 12, fontWeight: 600 }}>{v}</span>
+                      <span key={v} style={{ padding: "2px 8px", borderRadius: 6, background: "rgba(var(--ink),.07)", color: "#e2e8f0", fontSize: 12, fontWeight: 600 }}>{v}</span>
                     ))}
                   </div>
                 </td>
@@ -157,7 +157,7 @@ export default function ProductVariantsPage() {
       {/* Modal */}
       {showModal && (
         <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.6)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 50 }}>
-          <div style={{ background: "#0f172a", border: `1px solid ${BORDER}`, borderRadius: 16, padding: 28, width: 460, fontFamily: ff }}>
+          <div style={{ background: "var(--dk-0f172a, #0f172a)", border: `1px solid ${BORDER}`, borderRadius: 16, padding: 28, width: 460, fontFamily: ff }}>
             <h2 style={{ fontSize: 17, fontWeight: 800, margin: "0 0 20px" }}>Add Variant Group</h2>
 
             <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>

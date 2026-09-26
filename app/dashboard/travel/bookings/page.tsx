@@ -36,16 +36,16 @@ const border = "rgba(255,255,255,0.08)";
 const accent = "#38bdf8";
 
 const input: React.CSSProperties = {
-  width: "100%", background: "rgba(255,255,255,.05)", border: `1px solid ${border}`,
-  borderRadius: 8, padding: "8px 10px", color: "#fff", fontSize: 13,
+  width: "100%", background: "rgba(var(--ink),.05)", border: `1px solid ${border}`,
+  borderRadius: 8, padding: "8px 10px", color: "var(--ink-solid, #fff)", fontSize: 13,
   fontFamily: "inherit", boxSizing: "border-box",
 };
 const label: React.CSSProperties = {
-  display: "block", fontSize: 11.5, color: "rgba(255,255,255,.45)", marginBottom: 5,
+  display: "block", fontSize: 11.5, color: "rgba(var(--ink),.45)", marginBottom: 5,
 };
 const sectionHead: React.CSSProperties = {
   fontSize: 11, fontWeight: 800, letterSpacing: ".06em", textTransform: "uppercase",
-  color: "rgba(255,255,255,.4)", margin: "22px 0 10px",
+  color: "rgba(var(--ink),.4)", margin: "22px 0 10px",
 };
 
 const STATUS_COLOUR: Record<BookingStatus, string> = {
@@ -240,11 +240,11 @@ export default function BookingsPage() {
     const tiers = chosenDeparture ? costDeparture(chosenDeparture.d) : [];
 
     return (
-      <div style={{ padding: isMobile ? "14px 12px" : "24px 28px", fontFamily: ff, color: "#fff", maxWidth: 1040 }}>
+      <div style={{ padding: isMobile ? "14px 12px" : "24px 28px", fontFamily: ff, color: "var(--ink-solid, #fff)", maxWidth: 1040 }}>
         <h1 style={{ fontSize: 21, fontWeight: 800, margin: "0 0 4px" }}>
           {editing.id ? b.partyName || "Booking" : "New booking"}
         </h1>
-        <p style={{ fontSize: 13, color: "rgba(255,255,255,.42)", margin: 0 }}>
+        <p style={{ fontSize: 13, color: "rgba(var(--ink),.42)", margin: 0 }}>
           {money.pax} pilgrim{money.pax === 1 ? "" : "s"} · {money.total.toLocaleString()} total ·{" "}
           <strong style={{ color: money.balance > 0 ? "#fbbf24" : "#34d399" }}>
             {money.balance > 0 ? `${money.balance.toLocaleString()} owing` : "paid in full"}
@@ -268,7 +268,7 @@ export default function BookingsPage() {
           <div>
             <label style={label}>Status</label>
             <select value={b.status} onChange={(e) => patch({ status: e.target.value as BookingStatus })}
-              style={{ ...input, background: "#161b27" }}>
+              style={{ ...input, background: "var(--dk-161b27, #161b27)" }}>
               {(["enquiry", "confirmed", "travelled", "cancelled"] as BookingStatus[]).map((s) => (
                 <option key={s} value={s}>{s}</option>
               ))}
@@ -281,7 +281,7 @@ export default function BookingsPage() {
           <div>
             <label style={label}>Departure</label>
             <select value={b.departureId} onChange={(e) => applyRateCard(e.target.value, b.occupancy)}
-              style={{ ...input, background: "#161b27" }}>
+              style={{ ...input, background: "var(--dk-161b27, #161b27)" }}>
               <option value="">— Pick a departure —</option>
               {departures.map((x) => (
                 <option key={x.id} value={x.id}>
@@ -293,7 +293,7 @@ export default function BookingsPage() {
           <div>
             <label style={label}>Sharing</label>
             <select value={b.occupancy} onChange={(e) => applyRateCard(b.departureId, Number(e.target.value))}
-              style={{ ...input, background: "#161b27" }}>
+              style={{ ...input, background: "var(--dk-161b27, #161b27)" }}>
               {(tiers.length ? tiers.map((t) => t.occupancy) : [1, 2, 3, 4, 5]).map((n) => (
                 <option key={n} value={n}>{occupancyName(n)} ({n})</option>
               ))}
@@ -308,7 +308,7 @@ export default function BookingsPage() {
           </div>
         </div>
         {tiers.length > 0 && (
-          <div style={{ marginTop: 8, fontSize: 11.5, color: "rgba(255,255,255,.38)" }}>
+          <div style={{ marginTop: 8, fontSize: 11.5, color: "rgba(var(--ink),.38)" }}>
             Rate card: {tiers.filter((t) => t.sellPerPilgrim > 0).map((t) => `${t.tierName} ${t.sellPerPilgrim.toLocaleString()}`).join(" · ") || "not priced"}
           </div>
         )}
@@ -333,7 +333,7 @@ export default function BookingsPage() {
                 <label style={label}>Gender</label>
                 <select value={p.gender}
                   onChange={(e) => patch({ pilgrims: b.pilgrims.map((x) => (x.id === p.id ? { ...x, gender: e.target.value as "Male" | "Female" } : x)) })}
-                  style={{ ...input, background: "#161b27" }}>
+                  style={{ ...input, background: "var(--dk-161b27, #161b27)" }}>
                   <option>Male</option><option>Female</option>
                 </select>
               </div>
@@ -345,19 +345,19 @@ export default function BookingsPage() {
               </div>
               <button tabIndex={-1} title="Remove pilgrim"
                 onClick={() => patch({ pilgrims: b.pilgrims.length === 1 ? [emptyPilgrim()] : b.pilgrims.filter((x) => x.id !== p.id) })}
-                style={{ background: "transparent", border: `1px solid ${border}`, borderRadius: 8, color: "rgba(255,255,255,.45)", cursor: "pointer", padding: "8px 0" }}>×</button>
+                style={{ background: "transparent", border: `1px solid ${border}`, borderRadius: 8, color: "rgba(var(--ink),.45)", cursor: "pointer", padding: "8px 0" }}>×</button>
             </div>
           ))}
         </div>
         <button onClick={() => patch({ pilgrims: [...b.pilgrims, emptyPilgrim()] })}
-          style={{ marginTop: 10, padding: "7px 14px", borderRadius: 8, background: "rgba(255,255,255,.05)", border: `1px solid ${border}`, color: "rgba(255,255,255,.65)", fontSize: 12, fontWeight: 700, fontFamily: "inherit", cursor: "pointer" }}>
+          style={{ marginTop: 10, padding: "7px 14px", borderRadius: 8, background: "rgba(var(--ink),.05)", border: `1px solid ${border}`, color: "rgba(var(--ink),.65)", fontSize: 12, fontWeight: 700, fontFamily: "inherit", cursor: "pointer" }}>
           + Add pilgrim
         </button>
 
         <div style={sectionHead}>Instalments</div>
         {b.instalments.length === 0 ? (
           <div style={{ background: bg, border: `1px solid ${border}`, borderRadius: 12, padding: 18 }}>
-            <div style={{ fontSize: 12.5, color: "rgba(255,255,255,.5)", marginBottom: 12, lineHeight: 1.7 }}>
+            <div style={{ fontSize: 12.5, color: "rgba(var(--ink),.5)", marginBottom: 12, lineHeight: 1.7 }}>
               Nothing scheduled. {money.total > 0 ? `${money.total.toLocaleString()} is owed` : "Set a price first"} —
               a balance with no dates on it is a balance nobody will chase.
             </div>
@@ -377,7 +377,7 @@ export default function BookingsPage() {
                 </button>
               ))}
               <button onClick={() => patch({ instalments: [emptyInstalment(today, money.total)] })}
-                style={{ padding: "7px 14px", borderRadius: 8, background: "rgba(255,255,255,.05)", border: `1px solid ${border}`, color: "rgba(255,255,255,.65)", fontSize: 12, fontWeight: 700, fontFamily: "inherit", cursor: "pointer" }}>
+                style={{ padding: "7px 14px", borderRadius: 8, background: "rgba(var(--ink),.05)", border: `1px solid ${border}`, color: "rgba(var(--ink),.65)", fontSize: 12, fontWeight: 700, fontFamily: "inherit", cursor: "pointer" }}>
                 One payment
               </button>
             </div>
@@ -414,18 +414,18 @@ export default function BookingsPage() {
                         onChange={(e) => patchInstalment(inst.id, { receiptNo: e.target.value })}
                         style={input} />
                     </div>
-                    <div style={{ fontSize: 11.5, fontWeight: 700, paddingBottom: 10, textAlign: "right", color: inst.paidDate ? "#34d399" : late ? "#fbbf24" : "rgba(255,255,255,.35)" }}>
+                    <div style={{ fontSize: 11.5, fontWeight: 700, paddingBottom: 10, textAlign: "right", color: inst.paidDate ? "#34d399" : late ? "#fbbf24" : "rgba(var(--ink),.35)" }}>
                       {inst.paidDate ? "paid" : late ? "overdue" : "due"}
                     </div>
                     <button tabIndex={-1} title="Remove instalment"
                       onClick={() => patch({ instalments: b.instalments.filter((x) => x.id !== inst.id) })}
-                      style={{ background: "transparent", border: `1px solid ${border}`, borderRadius: 8, color: "rgba(255,255,255,.45)", cursor: "pointer", padding: "8px 0" }}>×</button>
+                      style={{ background: "transparent", border: `1px solid ${border}`, borderRadius: 8, color: "rgba(var(--ink),.45)", cursor: "pointer", padding: "8px 0" }}>×</button>
                   </div>
                 );
               })}
             </div>
             <button onClick={() => patch({ instalments: [...b.instalments, emptyInstalment(today, Math.max(money.unscheduled, 0))] })}
-              style={{ marginTop: 10, padding: "7px 14px", borderRadius: 8, background: "rgba(255,255,255,.05)", border: `1px solid ${border}`, color: "rgba(255,255,255,.65)", fontSize: 12, fontWeight: 700, fontFamily: "inherit", cursor: "pointer" }}>
+              style={{ marginTop: 10, padding: "7px 14px", borderRadius: 8, background: "rgba(var(--ink),.05)", border: `1px solid ${border}`, color: "rgba(var(--ink),.65)", fontSize: 12, fontWeight: 700, fontFamily: "inherit", cursor: "pointer" }}>
               + Add instalment
             </button>
           </>
@@ -433,10 +433,10 @@ export default function BookingsPage() {
 
         <div style={{ marginTop: 16, padding: "14px 16px", borderRadius: 12, background: "rgba(56,189,248,.06)", border: "1px solid rgba(56,189,248,.22)" }}>
           <div style={{ display: "flex", justifyContent: "space-between", fontSize: 13, marginBottom: 5 }}>
-            <span style={{ color: "rgba(255,255,255,.6)" }}>{money.pax} × {b.pricePerPilgrim.toLocaleString()}</span>
+            <span style={{ color: "rgba(var(--ink),.6)" }}>{money.pax} × {b.pricePerPilgrim.toLocaleString()}</span>
             <span style={{ fontFamily: "ui-monospace, monospace", fontWeight: 700 }}>{money.total.toLocaleString()}</span>
           </div>
-          <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12.5, color: "rgba(255,255,255,.45)" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12.5, color: "rgba(var(--ink),.45)" }}>
             <span>Paid ({money.percentPaid}%)</span>
             <span style={{ fontFamily: "ui-monospace, monospace", color: "#34d399" }}>{money.paid.toLocaleString()}</span>
           </div>
@@ -477,7 +477,7 @@ export default function BookingsPage() {
             {saving ? "Saving…" : "Save booking"}
           </button>
           <button onClick={() => { setEditing(null); setCancelling(null); }}
-            style={{ padding: "11px 20px", background: "transparent", border: `1px solid ${border}`, borderRadius: 9, color: "rgba(255,255,255,.6)", fontSize: 14, fontFamily: "inherit", cursor: "pointer" }}>
+            style={{ padding: "11px 20px", background: "transparent", border: `1px solid ${border}`, borderRadius: 9, color: "rgba(var(--ink),.6)", fontSize: 14, fontFamily: "inherit", cursor: "pointer" }}>
             Close
           </button>
         </div>
@@ -528,7 +528,7 @@ export default function BookingsPage() {
               </button>
 
               {!b.invoiceNo && (
-                <span style={{ fontSize: 11.5, color: "rgba(255,255,255,.35)" }}>
+                <span style={{ fontSize: 11.5, color: "rgba(var(--ink),.35)" }}>
                   Until the invoice is raised this balance is on no ledger, no statement and no ageing report.
                 </span>
               )}
@@ -538,13 +538,13 @@ export default function BookingsPage() {
                 than as a date typed into the row above. */}
             {b.invoiceNo && b.instalments.some((i) => !i.paidDate) && (
               <div style={{ marginTop: 14 }}>
-                <div style={{ fontSize: 11.5, color: "rgba(255,255,255,.4)", marginBottom: 8 }}>Receive an instalment</div>
+                <div style={{ fontSize: 11.5, color: "rgba(var(--ink),.4)", marginBottom: 8 }}>Receive an instalment</div>
                 <div style={{ display: "flex", flexDirection: "column", gap: 7 }}>
                   {b.instalments.filter((i) => !i.paidDate).map((inst) => (
                     <div key={inst.id} style={{ display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
-                      <span style={{ fontSize: 12.5, color: "rgba(255,255,255,.6)", minWidth: 190 }}>
+                      <span style={{ fontSize: 12.5, color: "rgba(var(--ink),.6)", minWidth: 190 }}>
                         due {inst.dueDate || "—"} ·{" "}
-                        <strong style={{ color: "#fff", fontFamily: "ui-monospace, monospace" }}>
+                        <strong style={{ color: "var(--ink-solid, #fff)", fontFamily: "ui-monospace, monospace" }}>
                           {inst.amount.toLocaleString()}
                         </strong>
                       </span>
@@ -568,9 +568,9 @@ export default function BookingsPage() {
           <div onClick={() => setCancelling(null)}
             style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.72)", zIndex: 60, display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }}>
             <div onClick={(e) => e.stopPropagation()}
-              style={{ background: "#161b27", border: `1px solid ${border}`, borderRadius: 16, padding: 26, width: 460, fontFamily: ff }}>
+              style={{ background: "var(--dk-161b27, #161b27)", border: `1px solid ${border}`, borderRadius: 16, padding: 26, width: 460, fontFamily: ff }}>
               <h2 style={{ margin: "0 0 4px", fontSize: 18, fontWeight: 800 }}>Cancel {b.partyName || "booking"}</h2>
-              <div style={{ fontSize: 12.5, color: "rgba(255,255,255,.42)", marginBottom: 18, lineHeight: 1.6 }}>
+              <div style={{ fontSize: 12.5, color: "rgba(var(--ink),.42)", marginBottom: 18, lineHeight: 1.6 }}>
                 {money.paid.toLocaleString()} has been received. Keep the agency&rsquo;s charge out of it and refund
                 the rest — the two together cannot come to more than what was paid.
               </div>
@@ -593,7 +593,7 @@ export default function BookingsPage() {
                 <input value={cancelling.reason} placeholder="Visa refused, family withdrew…"
                   onChange={(e) => setCancelling({ ...cancelling, reason: e.target.value })} style={input} />
               </div>
-              <div style={{ fontSize: 11.5, color: "rgba(255,255,255,.4)", marginBottom: 16, lineHeight: 1.7 }}>
+              <div style={{ fontSize: 11.5, color: "rgba(var(--ink),.4)", marginBottom: 16, lineHeight: 1.7 }}>
                 {money.pax} seat{money.pax === 1 ? "" : "s"} go back on the departure.
                 {b.invoiceNo ? ` A credit note reverses ${b.invoiceNo}.` : " Nothing was invoiced, so there is nothing to reverse."}
               </div>
@@ -605,7 +605,7 @@ export default function BookingsPage() {
                   {busyAction === "booking-cancel" ? "Cancelling…" : "Cancel the booking"}
                 </button>
                 <button onClick={() => setCancelling(null)}
-                  style={{ padding: "11px 20px", background: "transparent", border: `1px solid ${border}`, borderRadius: 9, color: "rgba(255,255,255,.65)", fontSize: 14, fontFamily: "inherit", cursor: "pointer" }}>
+                  style={{ padding: "11px 20px", background: "transparent", border: `1px solid ${border}`, borderRadius: 9, color: "rgba(var(--ink),.65)", fontSize: 14, fontFamily: "inherit", cursor: "pointer" }}>
                   Back
                 </button>
               </div>
@@ -621,11 +621,11 @@ export default function BookingsPage() {
   const late = rows.filter((r) => r.b.status !== "cancelled" && r.money.overdue > 0);
 
   return (
-    <div style={{ padding: isMobile ? "14px 12px" : "24px 28px", fontFamily: ff, color: "#fff" }}>
+    <div style={{ padding: isMobile ? "14px 12px" : "24px 28px", fontFamily: ff, color: "var(--ink-solid, #fff)" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 14, flexWrap: "wrap", marginBottom: 18 }}>
         <div>
           <h1 style={{ fontSize: 22, fontWeight: 800, margin: "0 0 4px" }}>Bookings</h1>
-          <p style={{ fontSize: 13, color: "rgba(255,255,255,.42)", margin: 0 }}>
+          <p style={{ fontSize: 13, color: "rgba(var(--ink),.42)", margin: 0 }}>
             Who is on which departure, and what they still owe.
           </p>
         </div>
@@ -643,7 +643,7 @@ export default function BookingsPage() {
           { label: "Overdue instalments", value: late.reduce((s, r) => s + r.money.overdueCount, 0), colour: late.length ? "#ef4444" : "#22c55e" },
         ].map((c) => (
           <div key={c.label} style={{ background: bg, border: `1px solid ${border}`, borderRadius: 14, padding: "15px 18px" }}>
-            <div style={{ fontSize: 12, color: "rgba(255,255,255,.45)", marginBottom: 5 }}>{c.label}</div>
+            <div style={{ fontSize: 12, color: "rgba(var(--ink),.45)", marginBottom: 5 }}>{c.label}</div>
             <div style={{ fontSize: 21, fontWeight: 800, color: c.colour }}>{c.value}</div>
           </div>
         ))}
@@ -660,7 +660,7 @@ export default function BookingsPage() {
                     {row.b.status}
                   </span>
                 </div>
-                <div style={{ fontSize: 12, color: "rgba(255,255,255,.42)", marginTop: 4 }}>
+                <div style={{ fontSize: 12, color: "rgba(var(--ink),.42)", marginTop: 4 }}>
                   {row.b.bookingNo ? `${row.b.bookingNo} · ` : ""}
                   {row.b.departureTitle || "no departure"} · {row.money.pax} pax · {occupancyName(row.b.occupancy)}
                   {row.money.nextDue ? ` · next ${row.money.nextDue.dueDate}` : ""}
@@ -670,14 +670,14 @@ export default function BookingsPage() {
                 <div style={{ fontSize: 16, fontWeight: 800, color: row.money.balance > 0 ? "#fbbf24" : "#34d399" }}>
                   {row.money.balance > 0 ? row.money.balance.toLocaleString() : "clear"}
                 </div>
-                <div style={{ fontSize: 11, color: "rgba(255,255,255,.35)" }}>
+                <div style={{ fontSize: 11, color: "rgba(var(--ink),.35)" }}>
                   {row.money.paid.toLocaleString()} of {row.money.total.toLocaleString()}
                 </div>
               </div>
             </div>
 
             <div style={{ marginTop: 11, display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
-              <div style={{ flex: "1 1 200px", minWidth: 160, background: "rgba(255,255,255,.07)", height: 6, borderRadius: 999, overflow: "hidden" }}>
+              <div style={{ flex: "1 1 200px", minWidth: 160, background: "rgba(var(--ink),.07)", height: 6, borderRadius: 999, overflow: "hidden" }}>
                 <div style={{ width: `${row.money.percentPaid}%`, height: "100%", background: row.money.overdue > 0 ? "#ef4444" : row.money.balance > 0 ? "#fbbf24" : "#22c55e" }} />
               </div>
               {row.money.overdue > 0 && (
@@ -686,14 +686,14 @@ export default function BookingsPage() {
                 </span>
               )}
               <button onClick={() => setEditing({ id: row.id, b: row.b })}
-                style={{ padding: "6px 14px", borderRadius: 8, background: "rgba(255,255,255,.05)", border: `1px solid ${border}`, color: "rgba(255,255,255,.7)", fontSize: 12, fontWeight: 700, fontFamily: "inherit", cursor: "pointer" }}>
+                style={{ padding: "6px 14px", borderRadius: 8, background: "rgba(var(--ink),.05)", border: `1px solid ${border}`, color: "rgba(var(--ink),.7)", fontSize: 12, fontWeight: 700, fontFamily: "inherit", cursor: "pointer" }}>
                 Open
               </button>
             </div>
           </div>
         ))}
         {!store.loading && rows.length === 0 && (
-          <div style={{ background: bg, border: `1px solid ${border}`, borderRadius: 14, padding: 40, textAlign: "center", color: "rgba(255,255,255,.3)", fontSize: 13.5 }}>
+          <div style={{ background: bg, border: `1px solid ${border}`, borderRadius: 14, padding: 40, textAlign: "center", color: "rgba(var(--ink),.3)", fontSize: 13.5 }}>
             No bookings yet.
           </div>
         )}

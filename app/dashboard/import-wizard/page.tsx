@@ -554,7 +554,7 @@ function ImportWizardInner() {
               }}>
                 <span style={{
                   width: 26, height: 26, borderRadius: 8, flexShrink: 0, fontSize: 11, fontWeight: 800,
-                  background: "rgba(255,255,255,.05)", border: "1px solid var(--border)",
+                  background: "rgba(var(--ink),.05)", border: "1px solid var(--border)",
                   color: "var(--text-muted)",
                   display: "flex", alignItems: "center", justifyContent: "center",
                 }}>{index + 1}</span>
@@ -738,7 +738,7 @@ function ImportWizardInner() {
                 {typeDef.template.map((c) => (
                   <span key={c} style={{
                     padding: "4px 9px", borderRadius: 7, fontSize: 11, fontFamily: MONO,
-                    background: "rgba(255,255,255,.05)", border: "1px solid var(--border)",
+                    background: "rgba(var(--ink),.05)", border: "1px solid var(--border)",
                     color: typeDef.required.includes(c) ? "#f59e0b" : "var(--text-muted)",
                   }}>{c}{typeDef.required.includes(c) ? " *" : ""}</span>
                 ))}

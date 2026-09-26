@@ -78,7 +78,7 @@ function ReceiptBarcode({ value }: { value: string }) {
 }
 
 function Line({ dashed = true }: { dashed?: boolean }) {
-  return <div style={{ borderTop: dashed ? "1px dashed #b9b9b9" : "2px solid #111", margin: "9px 0" }} />;
+  return <div style={{ borderTop: dashed ? "1px dashed #b9b9b9" : "2px solid var(--dkb-111111, #111)", margin: "9px 0" }} />;
 }
 
 function Row({ label, value, bold, large }: { label: string; value: string; bold?: boolean; large?: boolean }) {
@@ -113,7 +113,7 @@ export function SubscriptionReceiptPaper({ data }: { data: SubscriptionReceiptDa
     >
       {/* Header */}
       <div style={{ textAlign: "center", marginBottom: 10 }}>
-        <div style={{ width: 34, height: 34, margin: "0 auto 8px", borderRadius: 9, background: "#111", color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 17, fontWeight: 900, fontFamily: "system-ui,sans-serif" }}>F</div>
+        <div style={{ width: 34, height: 34, margin: "0 auto 8px", borderRadius: 9, background: "var(--dk-111111, #111)", color: "var(--ink-solid, #fff)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 17, fontWeight: 900, fontFamily: "system-ui,sans-serif" }}>F</div>
         <div style={{ fontSize: 15, fontWeight: 900, letterSpacing: "1px" }}>FINOVAOS</div>
         <div style={{ fontSize: 10, opacity: .65, marginTop: 2 }}>PAYMENT RECEIPT</div>
       </div>
@@ -247,31 +247,31 @@ export function SubscriptionReceiptPrinter({
       <div style={{ width: "100%", maxWidth: 420, animation: "fnvRcptRise .45s cubic-bezier(.22,.61,.36,1)" }}>
 
         {/* ── Order summary card (the "till display" above the printer) ── */}
-        <div className="fnv-receipt-chrome" style={{ borderRadius: 18, background: "rgba(255,255,255,.055)", border: "1px solid rgba(255,255,255,.1)", padding: "16px 18px", marginBottom: 18, backdropFilter: "blur(6px)" }}>
+        <div className="fnv-receipt-chrome" style={{ borderRadius: 18, background: "rgba(var(--ink),.055)", border: "1px solid rgba(var(--ink),.1)", padding: "16px 18px", marginBottom: 18, backdropFilter: "blur(6px)" }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 14 }}>
             <div>
-              <div style={{ fontSize: 15, fontWeight: 800, color: "#fff" }}>{data.planLabel}</div>
-              <div style={{ fontSize: 12, color: "rgba(255,255,255,.42)", marginTop: 2 }}>{cycleLabel(data.billingCycle)}</div>
+              <div style={{ fontSize: 15, fontWeight: 800, color: "var(--ink-solid, #fff)" }}>{data.planLabel}</div>
+              <div style={{ fontSize: 12, color: "rgba(var(--ink),.42)", marginTop: 2 }}>{cycleLabel(data.billingCycle)}</div>
             </div>
             <div style={{ textAlign: "right" }}>
-              <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: ".08em", textTransform: "uppercase", color: "rgba(255,255,255,.32)" }}>Total</div>
-              <div style={{ fontSize: 17, fontWeight: 800, color: "#fff", marginTop: 2 }}>{money(data.total, data.currency)}</div>
+              <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: ".08em", textTransform: "uppercase", color: "rgba(var(--ink),.32)" }}>Total</div>
+              <div style={{ fontSize: 17, fontWeight: 800, color: "var(--ink-solid, #fff)", marginTop: 2 }}>{money(data.total, data.currency)}</div>
             </div>
           </div>
 
-          <div style={{ display: "flex", alignItems: "center", gap: 9, marginTop: 14, paddingTop: 13, borderTop: "1px solid rgba(255,255,255,.08)" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 9, marginTop: 14, paddingTop: 13, borderTop: "1px solid rgba(var(--ink),.08)" }}>
             {stage === "done" ? (
               <span style={{ width: 16, height: 16, borderRadius: "50%", background: "#34d399", color: "#04241a", fontSize: 10, fontWeight: 900, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>✓</span>
             ) : (
-              <span style={{ width: 15, height: 15, borderRadius: "50%", border: "2px solid rgba(255,255,255,.16)", borderTopColor: "#818cf8", animation: "fnvRcptSpin .7s linear infinite", flexShrink: 0 }} />
+              <span style={{ width: 15, height: 15, borderRadius: "50%", border: "2px solid rgba(var(--ink),.16)", borderTopColor: "#818cf8", animation: "fnvRcptSpin .7s linear infinite", flexShrink: 0 }} />
             )}
-            <span style={{ fontSize: 12.5, fontWeight: 600, color: stage === "done" ? "#34d399" : "rgba(255,255,255,.6)" }}>
+            <span style={{ fontSize: 12.5, fontWeight: 600, color: stage === "done" ? "#34d399" : "rgba(var(--ink),.6)" }}>
               {statusText}
             </span>
             {stage !== "done" && (
               <button
                 onClick={skip}
-                style={{ marginLeft: "auto", background: "none", border: "none", color: "rgba(255,255,255,.35)", fontSize: 11.5, fontWeight: 600, cursor: "pointer", fontFamily: "inherit" }}
+                style={{ marginLeft: "auto", background: "none", border: "none", color: "rgba(var(--ink),.35)", fontSize: 11.5, fontWeight: 600, cursor: "pointer", fontFamily: "inherit" }}
               >
                 Skip →
               </button>
@@ -280,15 +280,15 @@ export function SubscriptionReceiptPrinter({
         </div>
 
         {/* ── Printer body ── */}
-        <div className="fnv-receipt-chrome" style={{ width: PAPER_W + 40, maxWidth: "100%", margin: "0 auto", borderRadius: "16px 16px 6px 6px", background: "linear-gradient(180deg,#2a2e3a,#171a23)", border: "1px solid rgba(255,255,255,.09)", padding: "14px 20px 12px", boxShadow: "0 22px 50px rgba(0,0,0,.5)" }}>
+        <div className="fnv-receipt-chrome" style={{ width: PAPER_W + 40, maxWidth: "100%", margin: "0 auto", borderRadius: "16px 16px 6px 6px", background: "linear-gradient(180deg,var(--dk-2a2e3a, #2a2e3a),var(--dk-171a23, #171a23))", border: "1px solid rgba(var(--ink),.09)", padding: "14px 20px 12px", boxShadow: "0 22px 50px rgba(0,0,0,.5)" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 11 }}>
             <span style={{ width: 7, height: 7, borderRadius: "50%", background: stage === "done" ? "#34d399" : "#fbbf24", animation: stage === "done" ? "none" : "fnvRcptLed .8s ease-in-out infinite" }} />
-            <span style={{ fontSize: 9.5, fontWeight: 700, letterSpacing: ".14em", color: "rgba(255,255,255,.28)", textTransform: "uppercase" }}>
+            <span style={{ fontSize: 9.5, fontWeight: 700, letterSpacing: ".14em", color: "rgba(var(--ink),.28)", textTransform: "uppercase" }}>
               {stage === "done" ? "Ready" : "Printing"}
             </span>
           </div>
           {/* Slot */}
-          <div style={{ height: 9, borderRadius: 5, background: "#0a0c12", boxShadow: "inset 0 3px 7px rgba(0,0,0,.9), 0 1px 0 rgba(255,255,255,.06)" }} />
+          <div style={{ height: 9, borderRadius: 5, background: "var(--dk-0a0c12, #0a0c12)", boxShadow: "inset 0 3px 7px rgba(0,0,0,.9), 0 1px 0 rgba(var(--ink),.06)" }} />
         </div>
 
         {/* ── Paper, clipped by a mask that grows downward out of the slot ── */}
@@ -328,7 +328,7 @@ export function SubscriptionReceiptPrinter({
           <div className="fnv-receipt-actions" style={{ display: "flex", gap: 10, justifyContent: "center", marginTop: 22, animation: "fnvRcptRise .4s ease" }}>
             <button
               onClick={() => window.print()}
-              style={{ padding: "10px 18px", borderRadius: 11, border: "1px solid rgba(255,255,255,.14)", background: "rgba(255,255,255,.06)", color: "rgba(255,255,255,.8)", fontSize: 12.5, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}
+              style={{ padding: "10px 18px", borderRadius: 11, border: "1px solid rgba(var(--ink),.14)", background: "rgba(var(--ink),.06)", color: "rgba(var(--ink),.8)", fontSize: 12.5, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}
             >
               🖨 Print receipt
             </button>

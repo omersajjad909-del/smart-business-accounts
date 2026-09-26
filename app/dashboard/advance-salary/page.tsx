@@ -74,7 +74,7 @@ export default function AdvanceSalaryPage() {
   const totalCleared = advances.filter(a => a.status === "CLEARED").length;
 
   const selectedEmployee = employees.find(e => e.id === form.employeeId);
-  const optionStyle: React.CSSProperties = { background: "#0f172a", color: "#f8fafc" };
+  const optionStyle: React.CSSProperties = { background: "var(--dk-0f172a, #0f172a)", color: "#f8fafc" };
 
   async function handleSave() {
     if (!form.employeeId || !form.amount) { setMsg("Please select an employee and enter amount"); return; }
@@ -184,7 +184,7 @@ export default function AdvanceSalaryPage() {
     mbox:   { background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 16, padding: 28, width: 420, maxWidth: "90vw" },
     label:  { fontSize: 12, color: "var(--text-muted)", fontWeight: 600, display: "block", marginBottom: 6 },
     input:  { width: "100%", padding: "9px 12px", borderRadius: 8, border: "1px solid var(--border)", background: "var(--app-bg)", color: "var(--text-primary)", fontSize: 13, outline: "none", boxSizing: "border-box" as const },
-    select: { width: "100%", padding: "9px 12px", borderRadius: 8, border: "1px solid var(--border)", background: "#0f172a", color: "#f8fafc", fontSize: 13, outline: "none", boxSizing: "border-box" as const, colorScheme: "dark" as const, cursor: "pointer" },
+    select: { width: "100%", padding: "9px 12px", borderRadius: 8, border: "1px solid var(--border)", background: "var(--dk-0f172a, #0f172a)", color: "#f8fafc", fontSize: 13, outline: "none", boxSizing: "border-box" as const, colorScheme: "dark" as const, cursor: "pointer" },
   };
 
   return (

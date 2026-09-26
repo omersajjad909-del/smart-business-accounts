@@ -102,7 +102,7 @@ function KeyRecorder({ value, onChange }: { value: string[]; onChange: (keys: st
         ) : (
           current.map((k, i) => (
             <span key={i}>
-              <kbd style={{ padding: "2px 7px", borderRadius: 5, background: "rgba(255,255,255,0.08)", border: "1px solid var(--border)", fontSize: 11, fontWeight: 700, color: "var(--text-primary)", fontFamily: "inherit" }}>
+              <kbd style={{ padding: "2px 7px", borderRadius: 5, background: "rgba(var(--ink),0.08)", border: "1px solid var(--border)", fontSize: 11, fontWeight: 700, color: "var(--text-primary)", fontFamily: "inherit" }}>
                 {DISPLAY_KEY(k)}
               </kbd>
               {i < current.length - 1 && <span style={{ fontSize: 10, color: "var(--text-muted)", margin: "0 2px" }}>+</span>}
@@ -132,11 +132,11 @@ function ShortcutRow({
   return (
     <div style={{ borderRadius: 10, border: `1px solid ${conflict ? "rgba(248,113,113,0.4)" : "var(--border)"}`, marginBottom: 8, overflow: "hidden" }}>
       {/* Row summary */}
-      <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 16px", background: sc.enabled ? "transparent" : "rgba(255,255,255,0.02)" }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 16px", background: sc.enabled ? "transparent" : "rgba(var(--ink),0.02)" }}>
         {/* Toggle */}
         <div
           onClick={() => onToggle(sc.id)}
-          style={{ width: 36, height: 20, borderRadius: 10, background: sc.enabled ? "#6366f1" : "rgba(255,255,255,0.1)", cursor: "pointer", position: "relative", transition: "background .2s", flexShrink: 0 }}
+          style={{ width: 36, height: 20, borderRadius: 10, background: sc.enabled ? "#6366f1" : "rgba(var(--ink),0.1)", cursor: "pointer", position: "relative", transition: "background .2s", flexShrink: 0 }}
         >
           <div style={{ position: "absolute", top: 2, left: sc.enabled ? 18 : 2, width: 16, height: 16, borderRadius: "50%", background: "#fff", transition: "left .2s", boxShadow: "0 1px 4px rgba(0,0,0,0.3)" }} />
         </div>
@@ -145,7 +145,7 @@ function ShortcutRow({
         <div style={{ display: "flex", gap: 3, alignItems: "center", minWidth: 140 }}>
           {sc.keys.map((k, i) => (
             <span key={i}>
-              <kbd style={{ padding: "2px 7px", borderRadius: 5, background: sc.enabled ? "rgba(99,102,241,0.12)" : "rgba(255,255,255,0.05)", border: "1px solid var(--border)", fontSize: 11, fontWeight: 700, color: sc.enabled ? "#818cf8" : "var(--text-muted)", fontFamily: "inherit", opacity: sc.enabled ? 1 : 0.5 }}>
+              <kbd style={{ padding: "2px 7px", borderRadius: 5, background: sc.enabled ? "rgba(99,102,241,0.12)" : "rgba(var(--ink),0.05)", border: "1px solid var(--border)", fontSize: 11, fontWeight: 700, color: sc.enabled ? "#818cf8" : "var(--text-muted)", fontFamily: "inherit", opacity: sc.enabled ? 1 : 0.5 }}>
                 {k}
               </kbd>
               {i < sc.keys.length - 1 && <span style={{ fontSize: 10, color: "var(--text-muted)", margin: "0 1px" }}>+</span>}
@@ -186,7 +186,7 @@ function ShortcutRow({
 
       {/* Edit panel */}
       {expanded && (
-        <div style={{ padding: "16px", borderTop: "1px solid var(--border)", background: "rgba(255,255,255,0.02)" }}>
+        <div style={{ padding: "16px", borderTop: "1px solid var(--border)", background: "rgba(var(--ink),0.02)" }}>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14, marginBottom: 14 }}>
             <div>
               <label style={lbl}>Label / Name</label>

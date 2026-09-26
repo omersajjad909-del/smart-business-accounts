@@ -52,11 +52,11 @@ export default function DriversPage() {
   const stars = (r: number) => "★".repeat(Math.floor(r)) + "☆".repeat(Math.max(0, 5 - Math.floor(r)));
 
   const card = { background: transportBg, border: `1px solid ${transportBorder}`, borderRadius: 12, padding: 20 };
-  const inp = { background: "rgba(255,255,255,.05)", border: `1px solid ${transportBorder}`, borderRadius: 8, padding: "10px 14px", color: "#fff", fontFamily: transportFont, width: "100%", boxSizing: "border-box" as const, fontSize: 14 };
+  const inp = { background: "rgba(var(--ink),.05)", border: `1px solid ${transportBorder}`, borderRadius: 8, padding: "10px 14px", color: "var(--ink-solid, #fff)", fontFamily: transportFont, width: "100%", boxSizing: "border-box" as const, fontSize: 14 };
   const btn = (c: string) => ({ background: c, border: "none", borderRadius: 8, padding: "10px 20px", color: "#fff", fontFamily: transportFont, cursor: "pointer", fontSize: 14, fontWeight: 600 });
 
   return (
-    <div style={{ fontFamily: transportFont, color: "#fff", padding: isMobile ? "12px" : "24px", minHeight: "100vh" }}>
+    <div style={{ fontFamily: transportFont, color: "var(--ink-solid, #fff)", padding: isMobile ? "12px" : "24px", minHeight: "100vh" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24 }}>
         <div>
           <h1 style={{ margin: 0, fontSize: 24, fontWeight: 700 }}>Driver Management</h1>
@@ -82,7 +82,7 @@ export default function DriversPage() {
       {loading && <div style={{ textAlign: "center", padding: 40, color: transportMuted }}>Loading...</div>}
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(340px,1fr))", gap: 16 }}>
-        {!loading && drivers.length === 0 && <div style={{ ...card, textAlign: "center", padding: 40, color: "rgba(255,255,255,.25)" }}>No drivers found.</div>}
+        {!loading && drivers.length === 0 && <div style={{ ...card, textAlign: "center", padding: 40, color: "rgba(var(--ink),.25)" }}>No drivers found.</div>}
         {drivers.map((d) => {
           const days = daysTo(d.licenseExpiry);
           const expired = days < 0;
@@ -113,7 +113,7 @@ export default function DriversPage() {
                 <div style={{ fontSize: 12 }}>{d.cnic || "-"}</div>
               </div>
 
-              <div style={{ background: expired ? "rgba(239,68,68,.1)" : expiringSoon ? "rgba(245,158,11,.1)" : "rgba(255,255,255,.04)", border: `1px solid ${expired ? "#ef444440" : expiringSoon ? "#f59e0b40" : transportBorder}`, borderRadius: 8, padding: "8px 12px", fontSize: 13 }}>
+              <div style={{ background: expired ? "rgba(239,68,68,.1)" : expiringSoon ? "rgba(245,158,11,.1)" : "rgba(var(--ink),.04)", border: `1px solid ${expired ? "#ef444440" : expiringSoon ? "#f59e0b40" : transportBorder}`, borderRadius: 8, padding: "8px 12px", fontSize: 13 }}>
                 <span style={{ color: expired ? "#ef4444" : expiringSoon ? "#f59e0b" : transportMuted }}>
                   License: {d.licenseNo}
                 </span>
@@ -128,7 +128,7 @@ export default function DriversPage() {
 
       {showModal && (
         <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.7)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000 }}>
-          <div style={{ background: "#1a1a2e", border: `1px solid ${transportBorder}`, borderRadius: 16, padding: 28, width: 520, maxHeight: "90vh", overflowY: "auto" }}>
+          <div style={{ background: "var(--dk-1a1a2e, #1a1a2e)", border: `1px solid ${transportBorder}`, borderRadius: 16, padding: 28, width: 520, maxHeight: "90vh", overflowY: "auto" }}>
             <h2 style={{ margin: "0 0 20px", fontSize: 18 }}>Add Driver</h2>
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
               {[["Employee ID", "empId"], ["Full Name", "name"], ["Phone", "phone"], ["CNIC", "cnic"], ["License No", "licenseNo"], ["License Expiry", "licenseExpiry"], ["Experience (yrs)", "experience"], ["Salary (Rs.)", "salary"]].map(([lbl, key]) => (

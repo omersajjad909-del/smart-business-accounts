@@ -73,7 +73,7 @@ export default function EcommerceAnalyticsPage() {
     .slice(0, 5);
 
   return (
-    <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", minHeight: "100vh", color: "#fff", fontFamily: ecommerceFont }}>
+    <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", minHeight: "100vh", color: "var(--ink-solid, #fff)", fontFamily: ecommerceFont }}>
       <div style={{ marginBottom: 24 }}>
         <div style={{ fontSize: 12, color: "#818cf8", fontWeight: 700, letterSpacing: ".08em", textTransform: "uppercase", marginBottom: 10 }}>Ecommerce Analytics</div>
         <h1 style={{ fontSize: 30, fontWeight: 900, margin: "0 0 10px" }}>Revenue, returns, and fulfillment performance</h1>
@@ -103,7 +103,7 @@ export default function EcommerceAnalyticsPage() {
                     <span style={{ fontSize: 13, fontWeight: 700 }}>{platform}</span>
                     <span style={{ fontSize: 12, color: ecommerceMuted }}>Rs. {total.toLocaleString()}</span>
                   </div>
-                  <div style={{ height: 10, borderRadius: 999, background: "rgba(255,255,255,.05)", overflow: "hidden" }}>
+                  <div style={{ height: 10, borderRadius: 999, background: "rgba(var(--ink),.05)", overflow: "hidden" }}>
                     <div style={{ width: `${width}%`, height: "100%", borderRadius: 999, background: "linear-gradient(90deg,#6366f1,#8b5cf6)" }} />
                   </div>
                 </div>
@@ -115,16 +115,16 @@ export default function EcommerceAnalyticsPage() {
         <div style={{ background: ecommerceBg, border: `1px solid ${ecommerceBorder}`, borderRadius: 20, padding: 22 }}>
           <div style={{ fontSize: 13, color: "#f87171", fontWeight: 800, marginBottom: 16, textTransform: "uppercase", letterSpacing: ".07em" }}>Return Pressure</div>
           <div style={{ display: "grid", gap: 12 }}>
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "rgba(255,255,255,.025)", border: "1px solid rgba(255,255,255,.06)", borderRadius: 14, padding: isMobile ? "12px 10px" : "14px 16px" }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "rgba(var(--ink),.025)", border: "1px solid rgba(var(--ink),.06)", borderRadius: 14, padding: isMobile ? "12px 10px" : "14px 16px" }}>
               <span style={{ fontSize: 13, color: ecommerceMuted }}>Total return value</span>
               <span style={{ fontSize: 15, fontWeight: 800, color: "#f87171" }}>Rs. {totalReturns.toLocaleString()}</span>
             </div>
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "rgba(255,255,255,.025)", border: "1px solid rgba(255,255,255,.06)", borderRadius: 14, padding: isMobile ? "12px 10px" : "14px 16px" }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "rgba(var(--ink),.025)", border: "1px solid rgba(var(--ink),.06)", borderRadius: 14, padding: isMobile ? "12px 10px" : "14px 16px" }}>
               <span style={{ fontSize: 13, color: ecommerceMuted }}>Cancelled orders</span>
               <span style={{ fontSize: 15, fontWeight: 800, color: "#f59e0b" }}>{cancelled}</span>
             </div>
             {returnReasonData.slice(0, 4).map(([reason, count]) => (
-              <div key={reason} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "rgba(255,255,255,.025)", border: "1px solid rgba(255,255,255,.06)", borderRadius: 14, padding: isMobile ? "12px 10px" : "14px 16px" }}>
+              <div key={reason} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "rgba(var(--ink),.025)", border: "1px solid rgba(var(--ink),.06)", borderRadius: 14, padding: isMobile ? "12px 10px" : "14px 16px" }}>
                 <span style={{ fontSize: 13 }}>{reason}</span>
                 <span style={{ fontSize: 14, fontWeight: 800, color: "#c7d2fe" }}>{count} cases</span>
               </div>
@@ -140,7 +140,7 @@ export default function EcommerceAnalyticsPage() {
             {topProducts.length === 0 ? (
               <div style={{ color: ecommerceMuted, fontSize: 13 }}>Add product and sales activity to see top revenue products.</div>
             ) : topProducts.map((product) => (
-              <div key={product.id} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, background: "rgba(255,255,255,.025)", border: "1px solid rgba(255,255,255,.06)", borderRadius: 14, padding: "12px 14px" }}>
+              <div key={product.id} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, background: "rgba(var(--ink),.025)", border: "1px solid rgba(var(--ink),.06)", borderRadius: 14, padding: "12px 14px" }}>
                 <div>
                   <div style={{ fontSize: 14, fontWeight: 700 }}>{product.name}</div>
                   <div style={{ fontSize: 12, color: ecommerceMuted }}>{product.platform} | {product.sales} units</div>
@@ -160,7 +160,7 @@ export default function EcommerceAnalyticsPage() {
               { label: "Catalog depth", value: `${data.products.filter((product) => product.stock > 0).length} in-stock products`, tone: "#34d399" },
               { label: "Order mix", value: `${data.summary.activeOrders} active orders`, tone: "#f59e0b" },
             ].map((row) => (
-              <div key={row.label} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "rgba(255,255,255,.025)", border: "1px solid rgba(255,255,255,.06)", borderRadius: 14, padding: isMobile ? "12px 10px" : "14px 16px" }}>
+              <div key={row.label} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "rgba(var(--ink),.025)", border: "1px solid rgba(var(--ink),.06)", borderRadius: 14, padding: isMobile ? "12px 10px" : "14px 16px" }}>
                 <span style={{ fontSize: 13, color: ecommerceMuted }}>{row.label}</span>
                 <span style={{ fontSize: 14, fontWeight: 800, color: row.tone }}>{row.value}</span>
               </div>

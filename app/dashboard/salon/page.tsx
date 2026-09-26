@@ -54,7 +54,7 @@ export default function SalonOverviewPage() {
   const topServices = [...services].sort((a, b) => Number(b.popular) - Number(a.popular) || b.price - a.price).slice(0, 4);
 
   return (
-    <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", minHeight: "100vh", color: "#fff", fontFamily: salonFont }}>
+    <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", minHeight: "100vh", color: "var(--ink-solid, #fff)", fontFamily: salonFont }}>
       <div style={{ marginBottom: 26 }}>
         <div style={{ fontSize: 12, color: "#f472b6", fontWeight: 700, letterSpacing: ".08em", textTransform: "uppercase", marginBottom: 10 }}>Salon / Beauty</div>
         <h1 style={{ fontSize: 30, fontWeight: 900, margin: "0 0 10px" }}>Owner Beauty Desk</h1>
@@ -81,10 +81,10 @@ export default function SalonOverviewPage() {
               { title: "Deliver Service", body: "In-progress se complete tak treatment status track karein." },
               { title: "Review Earnings", body: "Revenue, service mix, aur stylist performance compare karein." },
             ].map((step, index) => (
-              <div key={step.title} style={{ background: "rgba(8,12,30,.36)", border: "1px solid rgba(255,255,255,.08)", borderRadius: 16, padding: 16 }}>
+              <div key={step.title} style={{ background: "rgba(8,12,30,.36)", border: "1px solid rgba(var(--ink),.08)", borderRadius: 16, padding: 16 }}>
                 <div style={{ width: 28, height: 28, borderRadius: 999, background: "rgba(244,114,182,.2)", color: "#fbcfe8", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 800, marginBottom: 12 }}>{index + 1}</div>
                 <div style={{ fontSize: 15, fontWeight: 800, marginBottom: 8 }}>{step.title}</div>
-                <div style={{ fontSize: 13, color: "rgba(255,255,255,.62)", lineHeight: 1.55 }}>{step.body}</div>
+                <div style={{ fontSize: 13, color: "rgba(var(--ink),.62)", lineHeight: 1.55 }}>{step.body}</div>
               </div>
             ))}
           </div>
@@ -100,7 +100,7 @@ export default function SalonOverviewPage() {
               { href: "/dashboard/sales-invoice", label: "Billing Counter", hint: "Issue invoice for products and services" },
               { href: "/dashboard/salon/analytics", label: "See Salon Analytics", hint: "Revenue, utilization, and service mix" },
             ].map((item) => (
-              <Link prefetch={false} key={item.href} href={item.href} style={{ textDecoration: "none", color: "#fff", background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)", borderRadius: 14, padding: isMobile ? "12px 10px" : "14px 16px" }}>
+              <Link prefetch={false} key={item.href} href={item.href} style={{ textDecoration: "none", color: "var(--ink-solid, #fff)", background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.07)", borderRadius: 14, padding: isMobile ? "12px 10px" : "14px 16px" }}>
                 <div style={{ fontSize: 14, fontWeight: 800, marginBottom: 4 }}>{item.label}</div>
                 <div style={{ fontSize: 12, color: salonMuted }}>{item.hint}</div>
               </Link>
@@ -116,7 +116,7 @@ export default function SalonOverviewPage() {
             {topServices.length === 0 ? (
               <div style={{ color: salonMuted, fontSize: 13 }}>Abhi service menu build nahi hua. Pehle services add karein phir yahan top cards aayenge.</div>
             ) : topServices.map((service) => (
-              <div key={service.id} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, background: "rgba(255,255,255,.025)", border: "1px solid rgba(255,255,255,.06)", borderRadius: 14, padding: "12px 14px" }}>
+              <div key={service.id} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, background: "rgba(var(--ink),.025)", border: "1px solid rgba(var(--ink),.06)", borderRadius: 14, padding: "12px 14px" }}>
                 <div>
                   <div style={{ fontSize: 14, fontWeight: 700 }}>{service.name}</div>
                   <div style={{ fontSize: 12, color: salonMuted }}>{service.category} · {service.duration} min</div>
@@ -139,7 +139,7 @@ export default function SalonOverviewPage() {
               { label: "Leave pressure", value: `${summary.leaveStylists} team members away`, tone: "#f59e0b" },
               { label: "Inactive services", value: `${services.filter((service) => service.status !== "Active").length} cards paused`, tone: "#94a3b8" },
             ].map((row) => (
-              <div key={row.label} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "rgba(255,255,255,.025)", border: "1px solid rgba(255,255,255,.06)", borderRadius: 14, padding: isMobile ? "12px 10px" : "14px 16px" }}>
+              <div key={row.label} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "rgba(var(--ink),.025)", border: "1px solid rgba(var(--ink),.06)", borderRadius: 14, padding: isMobile ? "12px 10px" : "14px 16px" }}>
                 <span style={{ fontSize: 13, color: salonMuted }}>{row.label}</span>
                 <span style={{ fontSize: 14, fontWeight: 800, color: row.tone }}>{row.value}</span>
               </div>

@@ -124,7 +124,7 @@ export default function SalonAppointmentsPage() {
   }
 
   return (
-    <div style={{ minHeight: "100vh", color: "#fff", fontFamily: salonFont, padding: isMobile ? "15px 14px" : "28px 32px" }}>
+    <div style={{ minHeight: "100vh", color: "var(--ink-solid, #fff)", fontFamily: salonFont, padding: isMobile ? "15px 14px" : "28px 32px" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24 }}>
         <div>
           <h1 style={{ margin: 0, fontSize: 28, fontWeight: 800 }}>Salon Appointments</h1>
@@ -218,7 +218,7 @@ export default function SalonAppointmentsPage() {
                         {salonStatusLabel(appointment.status)}
                       </span>
                     </div>
-                    <div style={{ fontSize: 13, color: "rgba(255,255,255,.7)" }}>{appointment.service} • {appointment.date}</div>
+                    <div style={{ fontSize: 13, color: "rgba(var(--ink),.7)" }}>{appointment.service} • {appointment.date}</div>
                   </div>
                   <div style={{ minWidth: 92, textAlign: "right" }}>
                     <div style={{ fontSize: 15, fontWeight: 800, color: "#34d399" }}>Rs. {appointment.price.toLocaleString()}</div>
@@ -247,7 +247,7 @@ export default function SalonAppointmentsPage() {
 
       {showModal && (
         <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.72)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 50 }} onClick={(event) => { if (event.target === event.currentTarget) setShowModal(false); }}>
-          <div style={{ background: "#161b27", border: `1px solid ${salonBorder}`, borderRadius: 18, padding: 28, width: 520, fontFamily: salonFont }}>
+          <div style={{ background: "var(--dk-161b27, #161b27)", border: `1px solid ${salonBorder}`, borderRadius: 18, padding: 28, width: 520, fontFamily: salonFont }}>
             <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 20 }}>
               <div>
                 <h2 style={{ margin: 0, fontSize: 20, fontWeight: 800 }}>Book Appointment</h2>
@@ -275,14 +275,14 @@ export default function SalonAppointmentsPage() {
               ))}
               <div>
                 <label style={{ display: "block", fontSize: 12, color: salonMuted, marginBottom: 6 }}>Stylist</label>
-                <select value={form.stylist} onChange={(event) => setForm((current) => ({ ...current, stylist: event.target.value }))} style={{ width: "100%", background: "#161b27", border: `1px solid ${salonBorder}`, borderRadius: 10, padding: "10px 12px", color: "#fff", fontFamily: salonFont, fontSize: 14 }}>
+                <select value={form.stylist} onChange={(event) => setForm((current) => ({ ...current, stylist: event.target.value }))} style={{ width: "100%", background: "var(--dk-161b27, #161b27)", border: `1px solid ${salonBorder}`, borderRadius: 10, padding: "10px 12px", color: "var(--ink-solid, #fff)", fontFamily: salonFont, fontSize: 14 }}>
                   <option value="">Select stylist</option>
                   {activeStylists.map((stylist) => <option key={stylist.id} value={stylist.name}>{stylist.name}</option>)}
                 </select>
               </div>
               <div>
                 <label style={{ display: "block", fontSize: 12, color: salonMuted, marginBottom: 6 }}>Service</label>
-                <select value={form.service} onChange={(event) => syncFromService(event.target.value)} style={{ width: "100%", background: "#161b27", border: `1px solid ${salonBorder}`, borderRadius: 10, padding: "10px 12px", color: "#fff", fontFamily: salonFont, fontSize: 14 }}>
+                <select value={form.service} onChange={(event) => syncFromService(event.target.value)} style={{ width: "100%", background: "var(--dk-161b27, #161b27)", border: `1px solid ${salonBorder}`, borderRadius: 10, padding: "10px 12px", color: "var(--ink-solid, #fff)", fontFamily: salonFont, fontSize: 14 }}>
                   <option value="">Select service</option>
                   {activeServices.map((service) => <option key={service.id} value={service.name}>{service.name}</option>)}
                 </select>

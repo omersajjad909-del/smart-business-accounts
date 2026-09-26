@@ -161,7 +161,7 @@ function StatCard({ label, value, tone, sub }: { label: string; value: string | 
     <div style={{ background: wholesaleBg, border: `1px solid ${wholesaleBorder}`, borderRadius: 18, padding: isMobile ? "12px 10px" : "20px 22px" }}>
       <div style={{ fontSize: 12, color: wholesaleMuted, marginBottom: 8, textTransform: "uppercase", letterSpacing: ".06em" }}>{label}</div>
       <div style={{ fontSize: 28, fontWeight: 800, color: tone }}>{value}</div>
-      {sub ? <div style={{ fontSize: 12, color: "rgba(255,255,255,.42)", marginTop: 8 }}>{sub}</div> : null}
+      {sub ? <div style={{ fontSize: 12, color: "rgba(var(--ink),.42)", marginTop: 8 }}>{sub}</div> : null}
     </div>
   );
 }
@@ -194,7 +194,7 @@ export default function WholesaleDashboard() {
   );
 
   return (
-    <div style={{ minHeight: "100vh", padding: isMobile ? "15px 14px" : "28px 32px", color: "#fff", fontFamily: wholesaleFont }}>
+    <div style={{ minHeight: "100vh", padding: isMobile ? "15px 14px" : "28px 32px", color: "var(--ink-solid, #fff)", fontFamily: wholesaleFont }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 20, flexWrap: "wrap", marginBottom: 24 }}>
         <div>
           <div style={{ fontSize: 12, color: "#fbbf24", fontWeight: 800, letterSpacing: ".08em", textTransform: "uppercase", marginBottom: 10 }}>
@@ -255,12 +255,12 @@ export default function WholesaleDashboard() {
               { title: "Store & Move", body: `${data.summary.totalSkuCoverage.toLocaleString()} SKU coverage with ${data.summary.activeTransfers} live transfer jobs.` },
               { title: "Price & Recover", body: `${data.summary.activePriceLists} active price lists and ${data.summary.customersOverLimit} customer(s) already over limit.` },
             ].map((step, index) => (
-              <div key={step.title} style={{ background: "rgba(8,12,30,.34)", border: "1px solid rgba(255,255,255,.08)", borderRadius: 16, padding: 16 }}>
+              <div key={step.title} style={{ background: "rgba(8,12,30,.34)", border: "1px solid rgba(var(--ink),.08)", borderRadius: 16, padding: 16 }}>
                 <div style={{ width: 28, height: 28, borderRadius: 999, background: "rgba(251,191,36,.18)", color: "#fde68a", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 800, marginBottom: 12 }}>
                   {index + 1}
                 </div>
                 <div style={{ fontSize: 15, fontWeight: 800, marginBottom: 8 }}>{step.title}</div>
-                <div style={{ fontSize: 13, color: "rgba(255,255,255,.62)", lineHeight: 1.55 }}>{step.body}</div>
+                <div style={{ fontSize: 13, color: "rgba(var(--ink),.62)", lineHeight: 1.55 }}>{step.body}</div>
               </div>
             ))}
           </div>
@@ -279,7 +279,7 @@ export default function WholesaleDashboard() {
               { label: "Price lists active", value: data.summary.activePriceLists, tone: "#a78bfa" },
               { label: "Customers over limit", value: data.summary.customersOverLimit, tone: "#f87171" },
             ].map((row) => (
-              <div key={row.label} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "rgba(255,255,255,.025)", border: "1px solid rgba(255,255,255,.06)", borderRadius: 14, padding: isMobile ? "12px 10px" : "14px 16px" }}>
+              <div key={row.label} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "rgba(var(--ink),.025)", border: "1px solid rgba(var(--ink),.06)", borderRadius: 14, padding: isMobile ? "12px 10px" : "14px 16px" }}>
                 <div style={{ fontSize: 13, color: wholesaleMuted }}>{row.label}</div>
                 <div style={{ fontSize: 14, fontWeight: 800, color: row.tone }}>{row.value}</div>
               </div>
@@ -300,7 +300,7 @@ export default function WholesaleDashboard() {
               warehouseWatchlist.map((warehouse) => {
                 const utilization = warehouse.capacity > 0 ? Math.round((warehouse.capacityUsed / warehouse.capacity) * 100) : 0;
                 return (
-                  <div key={warehouse.id} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, background: "rgba(255,255,255,.025)", border: "1px solid rgba(255,255,255,.06)", borderRadius: 14, padding: "12px 14px" }}>
+                  <div key={warehouse.id} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, background: "rgba(var(--ink),.025)", border: "1px solid rgba(var(--ink),.06)", borderRadius: 14, padding: "12px 14px" }}>
                     <div>
                       <div style={{ fontSize: 14, fontWeight: 700 }}>{warehouse.name}</div>
                       <div style={{ fontSize: 12, color: wholesaleMuted }}>{warehouse.location || "Unassigned"} | {warehouse.itemsCount} SKUs</div>
@@ -325,7 +325,7 @@ export default function WholesaleDashboard() {
               <div style={{ color: wholesaleMuted, fontSize: 13 }}>No customer credit limits configured yet.</div>
             ) : (
               creditWatchlist.map((row) => (
-                <div key={row.id} style={{ background: "rgba(255,255,255,.025)", border: "1px solid rgba(255,255,255,.06)", borderRadius: 14, padding: "12px 14px" }}>
+                <div key={row.id} style={{ background: "rgba(var(--ink),.025)", border: "1px solid rgba(var(--ink),.06)", borderRadius: 14, padding: "12px 14px" }}>
                   <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
                     <div>
                       <div style={{ fontSize: 14, fontWeight: 700 }}>{row.customerName}</div>
@@ -355,7 +355,7 @@ export default function WholesaleDashboard() {
               <div style={{ color: wholesaleMuted, fontSize: 13 }}>No sales orders posted yet.</div>
             ) : (
               data.salesOrders.slice(0, 6).map((row) => (
-                <div key={row.id} style={{ background: "rgba(255,255,255,.025)", border: "1px solid rgba(255,255,255,.06)", borderRadius: 14, padding: "12px 14px" }}>
+                <div key={row.id} style={{ background: "rgba(var(--ink),.025)", border: "1px solid rgba(var(--ink),.06)", borderRadius: 14, padding: "12px 14px" }}>
                   <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
                     <div>
                       <div style={{ fontSize: 14, fontWeight: 700 }}>{row.orderNo}</div>
@@ -381,7 +381,7 @@ export default function WholesaleDashboard() {
               <div style={{ color: wholesaleMuted, fontSize: 13 }}>No stock transfers yet.</div>
             ) : (
               transferWatchlist.map((transfer) => (
-                <div key={transfer.id} style={{ background: "rgba(255,255,255,.025)", border: "1px solid rgba(255,255,255,.06)", borderRadius: 14, padding: "12px 14px" }}>
+                <div key={transfer.id} style={{ background: "rgba(var(--ink),.025)", border: "1px solid rgba(var(--ink),.06)", borderRadius: 14, padding: "12px 14px" }}>
                   <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
                     <div>
                       <div style={{ fontSize: 14, fontWeight: 700 }}>{transfer.item}</div>
@@ -409,7 +409,7 @@ export default function WholesaleDashboard() {
               <div style={{ color: wholesaleMuted, fontSize: 13 }}>No price lists configured yet.</div>
             ) : (
               pricingWatchlist.map((row) => (
-                <div key={row.id} style={{ background: "rgba(255,255,255,.025)", border: "1px solid rgba(255,255,255,.06)", borderRadius: 14, padding: "12px 14px" }}>
+                <div key={row.id} style={{ background: "rgba(var(--ink),.025)", border: "1px solid rgba(var(--ink),.06)", borderRadius: 14, padding: "12px 14px" }}>
                   <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
                     <div>
                       <div style={{ fontSize: 14, fontWeight: 700 }}>{row.name}</div>
@@ -432,7 +432,7 @@ export default function WholesaleDashboard() {
           </div>
           <div style={{ display: "grid", gap: 10 }}>
             {data.topCustomers.slice(0, 3).map((row) => (
-              <div key={row.id} style={{ background: "rgba(255,255,255,.025)", border: "1px solid rgba(255,255,255,.06)", borderRadius: 14, padding: "12px 14px" }}>
+              <div key={row.id} style={{ background: "rgba(var(--ink),.025)", border: "1px solid rgba(var(--ink),.06)", borderRadius: 14, padding: "12px 14px" }}>
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
                   <div>
                     <div style={{ fontSize: 14, fontWeight: 700 }}>{row.name}</div>
@@ -446,7 +446,7 @@ export default function WholesaleDashboard() {
               </div>
             ))}
             {data.topSuppliers.slice(0, 3).map((row) => (
-              <div key={row.id} style={{ background: "rgba(255,255,255,.025)", border: "1px solid rgba(255,255,255,.06)", borderRadius: 14, padding: "12px 14px" }}>
+              <div key={row.id} style={{ background: "rgba(var(--ink),.025)", border: "1px solid rgba(var(--ink),.06)", borderRadius: 14, padding: "12px 14px" }}>
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
                   <div>
                     <div style={{ fontSize: 14, fontWeight: 700 }}>{row.name}</div>

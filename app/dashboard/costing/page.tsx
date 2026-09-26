@@ -51,20 +51,20 @@ const MONO = "ui-monospace,'Cascadia Code','SF Mono',Consolas,monospace";
 
 const inputStyle: React.CSSProperties = {
   width: "100%", padding: "10px 12px", borderRadius: 10,
-  background: "rgba(255,255,255,.05)", border: `1px solid ${BORDER}`,
-  color: "white", fontSize: 13.5, outline: "none", fontFamily: MONO,
+  background: "rgba(var(--ink),.05)", border: `1px solid ${BORDER}`,
+  color: "var(--ink-solid, white)", fontSize: 13.5, outline: "none", fontFamily: MONO,
   boxSizing: "border-box",
 };
 const labelStyle: React.CSSProperties = {
   display: "block", fontSize: 11, fontWeight: 600,
-  color: "rgba(255,255,255,.45)", marginBottom: 5, fontFamily: FONT,
+  color: "rgba(var(--ink),.45)", marginBottom: 5, fontFamily: FONT,
 };
 const btn = (primary = false): React.CSSProperties => ({
   padding: "10px 18px", borderRadius: 10, fontSize: 13.5, fontWeight: 600,
   cursor: "pointer", fontFamily: FONT,
-  background: primary ? "linear-gradient(135deg,#4f46e5,#6366f1)" : "rgba(255,255,255,.05)",
+  background: primary ? "linear-gradient(135deg,#4f46e5,#6366f1)" : "rgba(var(--ink),.05)",
   border: primary ? "none" : `1px solid ${BORDER}`,
-  color: primary ? "white" : "rgba(255,255,255,.7)",
+  color: primary ? "white" : "rgba(var(--ink),.7)",
 });
 
 /* Layout lives in CSS so the page can stack on a small screen, and so the
@@ -470,7 +470,7 @@ function CostingInner() {
     <div key={inp.key}>
       <label style={labelStyle}>
         {inp.label || inp.key}
-        {inp.unit && <span style={{ color: "rgba(255,255,255,.28)" }}> · {inp.unit}</span>}
+        {inp.unit && <span style={{ color: "rgba(var(--ink),.28)" }}> · {inp.unit}</span>}
       </label>
       {inp.options?.length ? (
         /* The choice itself. Stored as the index, so the steps behind it can
@@ -499,13 +499,13 @@ function CostingInner() {
   );
 
   return (
-    <div className="cxWrap" style={{ fontFamily: FONT, color: "white" }}>
+    <div className="cxWrap" style={{ fontFamily: FONT, color: "var(--ink-solid, white)" }}>
       <style>{CSS}</style>
 
       <div className="cxHeader">
         <div>
           <h1 style={{ fontSize: 23, fontWeight: 800, margin: "0 0 4px" }}>Costing</h1>
-          <p style={{ fontSize: 13.5, color: "rgba(255,255,255,.42)", margin: 0 }}>
+          <p style={{ fontSize: 13.5, color: "rgba(var(--ink),.42)", margin: 0 }}>
             Work out what a job costs using your own{" "}
             <Link href="/dashboard/costing/formulas" style={{ color: "#818cf8" }}>formulas</Link>.
           </p>
@@ -514,11 +514,11 @@ function CostingInner() {
       </div>
 
       {formulaStore.loading ? (
-        <div style={{ color: "rgba(255,255,255,.3)", fontSize: 13 }}>Loading…</div>
+        <div style={{ color: "rgba(var(--ink),.3)", fontSize: 13 }}>Loading…</div>
       ) : !formulas.length ? (
         <div style={{ background: CARD, border: `1px dashed ${BORDER}`, borderRadius: 14, padding: "38px 24px", textAlign: "center" }}>
-          <p style={{ fontSize: 14.5, color: "rgba(255,255,255,.5)", margin: "0 0 8px" }}>No formulas yet.</p>
-          <p style={{ fontSize: 13, color: "rgba(255,255,255,.32)", margin: "0 0 22px" }}>
+          <p style={{ fontSize: 14.5, color: "rgba(var(--ink),.5)", margin: "0 0 8px" }}>No formulas yet.</p>
+          <p style={{ fontSize: 13, color: "rgba(var(--ink),.32)", margin: "0 0 22px" }}>
             Create one first — there are worked examples for packaging, textile, printing, wood, metal, food and moulding.
           </p>
           <Link href="/dashboard/costing/formulas" style={{ ...btn(true), textDecoration: "none" }}>Create a formula →</Link>
@@ -543,7 +543,7 @@ function CostingInner() {
                 ))}
               </select>
               {selected?.formula.description && (
-                <p style={{ fontSize: 12.5, color: "rgba(255,255,255,.35)", margin: "10px 0 0", lineHeight: 1.65 }}>
+                <p style={{ fontSize: 12.5, color: "rgba(var(--ink),.35)", margin: "10px 0 0", lineHeight: 1.65 }}>
                   {selected.formula.description}
                 </p>
               )}
@@ -557,7 +557,7 @@ function CostingInner() {
                       {askedSectioned && (
                         <div style={{
                           fontSize: 11, fontWeight: 700, letterSpacing: ".07em", textTransform: "uppercase",
-                          color: "rgba(255,255,255,.4)", marginBottom: 9,
+                          color: "rgba(var(--ink),.4)", marginBottom: 9,
                           paddingBottom: 6, borderBottom: `1px solid ${BORDER}`,
                         }}>
                           {g.name || "Other details"}
@@ -568,7 +568,7 @@ function CostingInner() {
                   ))}
                 </div>
                 {!askedInputs.length && (
-                  <div style={{ fontSize: 12.5, color: "rgba(255,255,255,.3)" }}>
+                  <div style={{ fontSize: 12.5, color: "rgba(var(--ink),.3)" }}>
                     This formula asks for nothing — every input is fixed below.
                   </div>
                 )}
@@ -614,12 +614,12 @@ function CostingInner() {
                       profit set it is the plain cost it always was. */}
                   <div className="cxPrimaryValue">
                     {fmt(saleRate ?? run?.values[primary.key])}
-                    <span style={{ fontSize: 15, color: "rgba(255,255,255,.32)", marginLeft: 8, fontWeight: 600 }}>{primary.unit}</span>
+                    <span style={{ fontSize: 15, color: "rgba(var(--ink),.32)", marginLeft: 8, fontWeight: 600 }}>{primary.unit}</span>
                   </div>
                   {profitAmount !== 0 && (
                     <div style={{
                       fontFamily: MONO, fontSize: 12, marginTop: 5,
-                      color: "rgba(255,255,255,.4)", fontVariantNumeric: "tabular-nums",
+                      color: "rgba(var(--ink),.4)", fontVariantNumeric: "tabular-nums",
                     }}>
                       {fmt(baseRate)} cost + {fmt(profitAmount)} profit
                     </div>
@@ -629,10 +629,10 @@ function CostingInner() {
                     <div className="cxStats" style={{ marginTop: 20, paddingTop: 18, borderTop: "1px solid rgba(52,211,153,.18)" }}>
                       {outputs.filter((o) => o.key !== primary?.key).map((o) => (
                         <div key={o.key}>
-                          <div style={{ fontSize: 11.5, color: "rgba(255,255,255,.4)", marginBottom: 3 }}>{o.label || o.key}</div>
+                          <div style={{ fontSize: 11.5, color: "rgba(var(--ink),.4)", marginBottom: 3 }}>{o.label || o.key}</div>
                           <div style={{ fontFamily: MONO, fontSize: 16, fontWeight: 700, fontVariantNumeric: "tabular-nums" }}>
                             {fmt(run?.values[o.key])}
-                            <span style={{ fontSize: 10.5, color: "rgba(255,255,255,.28)", marginLeft: 4 }}>{o.unit}</span>
+                            <span style={{ fontSize: 10.5, color: "rgba(var(--ink),.28)", marginLeft: 4 }}>{o.unit}</span>
                           </div>
                         </div>
                       ))}
@@ -671,10 +671,10 @@ function CostingInner() {
                           percent typed into the box still says nothing about
                           how much money it is until it is spelled out. */}
                       <div style={{ textAlign: "right" }}>
-                        <div style={{ fontSize: 11.5, color: "rgba(255,255,255,.4)", marginBottom: 3 }}>Profit on the rate</div>
+                        <div style={{ fontSize: 11.5, color: "rgba(var(--ink),.4)", marginBottom: 3 }}>Profit on the rate</div>
                         <div style={{ fontFamily: MONO, fontSize: 18, fontWeight: 800, color: "#34d399", fontVariantNumeric: "tabular-nums" }}>
                           + {fmt(profitAmount)}
-                          <span style={{ fontSize: 12, color: "rgba(255,255,255,.32)", marginLeft: 6, fontWeight: 600 }}>{primary.unit}</span>
+                          <span style={{ fontSize: 12, color: "rgba(var(--ink),.32)", marginLeft: 6, fontWeight: 600 }}>{primary.unit}</span>
                         </div>
                       </div>
                     </div>
@@ -700,7 +700,7 @@ function CostingInner() {
             <div style={{ background: CARD, border: `1px solid ${BORDER}`, borderRadius: 14, padding: 18 }}>
               <button onClick={() => setShowWorking((v) => !v)} style={{
                 background: "none", border: "none", padding: 0, cursor: "pointer",
-                fontFamily: FONT, fontSize: 14, fontWeight: 700, color: "white", marginBottom: showWorking ? 14 : 0,
+                fontFamily: FONT, fontSize: 14, fontWeight: 700, color: "var(--ink-solid, white)", marginBottom: showWorking ? 14 : 0,
               }}>
                 {showWorking ? "▾" : "▸"} How this was calculated
               </button>
@@ -711,18 +711,18 @@ function CostingInner() {
                       background: s.error ? "rgba(248,113,113,.08)" : "transparent",
                     }}>
                       <div style={{ minWidth: 0 }}>
-                        <div style={{ fontSize: 12.5, color: "rgba(255,255,255,.6)" }}>{s.label}</div>
-                        <div style={{ fontFamily: MONO, fontSize: 11, color: "rgba(255,255,255,.28)", overflowWrap: "break-word" }}>
+                        <div style={{ fontSize: 12.5, color: "rgba(var(--ink),.6)" }}>{s.label}</div>
+                        <div style={{ fontFamily: MONO, fontSize: 11, color: "rgba(var(--ink),.28)", overflowWrap: "break-word" }}>
                           {s.expression}
                         </div>
                       </div>
                       <div style={{
                         fontFamily: MONO, fontSize: 13, fontWeight: 700, textAlign: "right", whiteSpace: "nowrap",
                         fontVariantNumeric: "tabular-nums",
-                        color: s.error ? "#f87171" : "rgba(255,255,255,.85)",
+                        color: s.error ? "#f87171" : "rgba(var(--ink),.85)",
                       }}>
                         {s.error ? "error" : fmt(s.value)}
-                        <span style={{ fontSize: 10, color: "rgba(255,255,255,.25)", marginLeft: 4 }}>{s.unit}</span>
+                        <span style={{ fontSize: 10, color: "rgba(var(--ink),.25)", marginLeft: 4 }}>{s.unit}</span>
                       </div>
                     </div>
                   ))}
@@ -743,7 +743,7 @@ function CostingInner() {
                 <div className="cxSectionHead">
                   <div>
                     <div style={{ fontSize: 14, fontWeight: 700 }}>Produce this</div>
-                    <div style={{ fontSize: 12, color: "rgba(255,255,255,.35)", marginTop: 3, maxWidth: 480 }}>
+                    <div style={{ fontSize: 12, color: "rgba(var(--ink),.35)", marginTop: 3, maxWidth: 480 }}>
                       Opens Manufacturing → Bill of Materials with the units per batch and labour cost
                       this run worked out already filled in. Pick the finished product and add the
                       material(s) it consumes there — same screen every BOM is built on.
@@ -769,13 +769,13 @@ function CostingInner() {
                     <div className="cxSectionHead">
                       <div>
                         <div style={{ fontSize: 14, fontWeight: 700 }}>Get it made outside</div>
-                        <div style={{ fontSize: 12, color: "rgba(255,255,255,.35)", marginTop: 3, maxWidth: 480 }}>
+                        <div style={{ fontSize: 12, color: "rgba(var(--ink),.35)", marginTop: 3, maxWidth: 480 }}>
                           No machines of your own? Opens Job Work → Issue Challan with the standard
                           this formula worked out already filled in — so consumption is never typed
                           in by hand. Pick the job worker and the material there.
                         </div>
                         {jobWorkSeed?.stdPerPc != null ? (
-                          <div style={{ fontFamily: MONO, fontSize: 11.5, color: "rgba(255,255,255,.45)", marginTop: 9, lineHeight: 1.7 }}>
+                          <div style={{ fontFamily: MONO, fontSize: 11.5, color: "rgba(var(--ink),.45)", marginTop: 9, lineHeight: 1.7 }}>
                             {jobWorkSeed.unitsPerBatch != null && (
                               <>1 batch = {Math.round(jobWorkSeed.unitsPerBatch * 100) / 100} pcs · std/pc = {jobWorkSeed.stdPerPc}<br /></>
                             )}
@@ -878,7 +878,7 @@ function PrintSheet({ kind, formula, title, run, outputs, primaryKey, saleRate, 
         <div className="cxHalf" style={{ fontFamily: FONT, color: "#000", background: "#fff" }}>
           <div style={{
             display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 14,
-            borderBottom: "2px solid #000", paddingBottom: 8, marginBottom: 14,
+            borderBottom: "2px solid var(--dkb-000000, #000)", paddingBottom: 8, marginBottom: 14,
           }}>
             <div>
               <div style={{ fontSize: 17, fontWeight: 800 }}>{title}</div>
@@ -1016,7 +1016,7 @@ function PrintSheet({ kind, formula, title, run, outputs, primaryKey, saleRate, 
   return (
     <div className="cxPrint">
       <div style={{ fontFamily: FONT, color: "#000", background: "#fff", padding: "16px 20px" }}>
-        <div style={{ borderBottom: "2px solid #000", paddingBottom: 10, marginBottom: 14 }}>
+        <div style={{ borderBottom: "2px solid var(--dkb-000000, #000)", paddingBottom: 10, marginBottom: 14 }}>
           <div style={{ fontSize: 20, fontWeight: 800 }}>{title}</div>
           <div style={{ fontSize: 11, color: "#555", marginTop: 4 }}>
             Working sheet — cutting detail · {formula.category} · {formula.name} · v{formula.version} · {today()}
@@ -1090,7 +1090,7 @@ function Card({ n, title, hint, children }: {
         }}>{n}</span>
         <div>
           <div style={{ fontSize: 14, fontWeight: 700 }}>{title}</div>
-          <div style={{ fontSize: 11.5, color: "rgba(255,255,255,.35)", marginTop: 2 }}>{hint}</div>
+          <div style={{ fontSize: 11.5, color: "rgba(var(--ink),.35)", marginTop: 2 }}>{hint}</div>
         </div>
       </div>
       {children}
@@ -1100,7 +1100,7 @@ function Card({ n, title, hint, children }: {
 
 export default function CostingPage() {
   return (
-    <Suspense fallback={<div style={{ padding: 40, color: "rgba(255,255,255,.35)", fontFamily: FONT }}>Loading…</div>}>
+    <Suspense fallback={<div style={{ padding: 40, color: "rgba(var(--ink),.35)", fontFamily: FONT }}>Loading…</div>}>
       <CostingInner/>
     </Suspense>
   );

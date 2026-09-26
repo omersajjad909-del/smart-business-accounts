@@ -32,7 +32,7 @@ export default function PharmacyOverviewPage() {
   const { summary, prescriptions } = data;
 
   return (
-    <div style={{ minHeight: "100vh", padding: isMobile ? "17px 16px" : "28px 32px", color: "#fff", fontFamily: pharmacyFont }}>
+    <div style={{ minHeight: "100vh", padding: isMobile ? "17px 16px" : "28px 32px", color: "var(--ink-solid, #fff)", fontFamily: pharmacyFont }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 20, flexWrap: "wrap", marginBottom: 24 }}>
         <div>
           <h1 style={{ margin: "0 0 6px", fontSize: 26, fontWeight: 800 }}>Pharmacy Command Center</h1>
@@ -73,13 +73,13 @@ export default function PharmacyOverviewPage() {
           <div style={{ padding: isMobile ? "10px 9px" : "16px 18px", borderBottom: `1px solid ${pharmacyBorder}`, fontSize: 15, fontWeight: 800 }}>Prescription Watchlist</div>
           <div style={{ padding: 18, display: "grid", gap: 10 }}>
             {prescriptions.filter((row) => row.status !== "dispensed").slice(0, 6).map((row) => (
-              <div key={row.id} style={{ padding: isMobile ? "8px 8px" : "12px 14px", borderRadius: 10, background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.05)" }}>
+              <div key={row.id} style={{ padding: isMobile ? "8px 8px" : "12px 14px", borderRadius: 10, background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.05)" }}>
                 <div style={{ fontSize: 14, fontWeight: 700 }}>{row.patient}</div>
                 <div style={{ fontSize: 12, color: pharmacyMuted, marginTop: 4 }}>Dr. {row.doctor} | {row.date || "No date"}</div>
                 <div style={{ fontSize: 12, color: "#fda4af", marginTop: 6 }}>{row.drugs}</div>
               </div>
             ))}
-            {prescriptions.filter((row) => row.status !== "dispensed").length === 0 && <div style={{ color: "rgba(255,255,255,.28)" }}>No pending prescriptions right now.</div>}
+            {prescriptions.filter((row) => row.status !== "dispensed").length === 0 && <div style={{ color: "rgba(var(--ink),.28)" }}>No pending prescriptions right now.</div>}
           </div>
         </div>
 
@@ -93,7 +93,7 @@ export default function PharmacyOverviewPage() {
               { label: "Counter sales", value: summary.counterSales, color: "#fb7185" },
               { label: "Active batches", value: summary.activeBatches, color: "#c084fc" },
             ].map((row) => (
-              <div key={row.label} style={{ display: "flex", justifyContent: "space-between", padding: isMobile ? "8px 8px" : "10px 12px", borderRadius: 10, background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.05)" }}>
+              <div key={row.label} style={{ display: "flex", justifyContent: "space-between", padding: isMobile ? "8px 8px" : "10px 12px", borderRadius: 10, background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.05)" }}>
                 <span style={{ fontSize: 13, color: pharmacyMuted }}>{row.label}</span>
                 <span style={{ fontSize: 15, fontWeight: 800, color: row.color }}>{row.value}</span>
               </div>

@@ -41,12 +41,12 @@ function KitchenKanbanCol({
       </div>
       <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
         {rows.map((order) => (
-          <div key={order.id} style={{ background: "rgba(255,255,255,.04)", border: `1px solid ${PRIORITY_COLOR[order.priority]}30`, borderLeft: `3px solid ${PRIORITY_COLOR[order.priority]}`, borderRadius: 10, padding: isMobile ? "12px 10px" : "14px 16px" }}>
+          <div key={order.id} style={{ background: "rgba(var(--ink),.04)", border: `1px solid ${PRIORITY_COLOR[order.priority]}30`, borderLeft: `3px solid ${PRIORITY_COLOR[order.priority]}`, borderRadius: 10, padding: isMobile ? "12px 10px" : "14px 16px" }}>
             <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8 }}>
               <div style={{ fontWeight: 700, fontSize: 14 }}>Table {order.table}</div>
               <div style={{ fontSize: 11, color: order.elapsed > 15 ? "#ef4444" : restaurantMuted }}>⏱ {order.elapsed}m</div>
             </div>
-            <div style={{ fontSize: 12, color: "rgba(255,255,255,.6)", marginBottom: 10 }}>{order.items.join(", ")}</div>
+            <div style={{ fontSize: 12, color: "rgba(var(--ink),.6)", marginBottom: 10 }}>{order.items.join(", ")}</div>
             {order.notes && <div style={{ fontSize: 11, color: restaurantMuted, marginBottom: 10 }}>Note: {order.notes}</div>}
             <div style={{ display: "flex", gap: 6 }}>
               {order.status === "pending" && <button onClick={() => onMove(order.id, "preparing", order.table)} style={{ flex: 1, padding: "6px", background: "rgba(59,130,246,.15)", border: "1px solid rgba(59,130,246,.3)", color: "#3b82f6", borderRadius: 6, fontSize: 11, fontWeight: 600, cursor: "pointer" }}>Start</button>}
@@ -55,7 +55,7 @@ function KitchenKanbanCol({
             </div>
           </div>
         ))}
-        {rows.length === 0 && <div style={{ textAlign: "center", padding: 24, color: "rgba(255,255,255,.2)", fontSize: 13 }}>No orders</div>}
+        {rows.length === 0 && <div style={{ textAlign: "center", padding: 24, color: "rgba(var(--ink),.2)", fontSize: 13 }}>No orders</div>}
       </div>
     </div>
   );
@@ -124,7 +124,7 @@ export default function KitchenPage() {
   }
 
   return (
-    <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", fontFamily: restaurantFont, color: "#fff", minHeight: "100vh" }}>
+    <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", fontFamily: restaurantFont, color: "var(--ink-solid, #fff)", minHeight: "100vh" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 28 }}>
         <div>
           <h1 style={{ fontSize: 22, fontWeight: 800, margin: "0 0 4px" }}>Kitchen Display</h1>
@@ -143,7 +143,7 @@ export default function KitchenPage() {
 
       {showModal && (
         <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.7)", zIndex: 50, display: "flex", alignItems: "center", justifyContent: "center" }}>
-          <div style={{ background: "#161b27", border: `1px solid ${restaurantBorder}`, borderRadius: 16, padding: 32, width: 480, fontFamily: restaurantFont }}>
+          <div style={{ background: "var(--dk-161b27, #161b27)", border: `1px solid ${restaurantBorder}`, borderRadius: 16, padding: 32, width: 480, fontFamily: restaurantFont }}>
             <h2 style={{ margin: "0 0 24px", fontSize: 18, fontWeight: 700 }}>New Kitchen Order</h2>
             {formError && <div style={{ marginBottom: 14, padding: "10px 12px", borderRadius: 8, background: "rgba(239,68,68,.14)", border: "1px solid rgba(239,68,68,.28)", color: "#fca5a5", fontSize: 12 }}>{formError}</div>}
             {[
@@ -158,7 +158,7 @@ export default function KitchenPage() {
             ))}
             <div style={{ marginBottom: 16 }}>
               <label style={{ display: "block", fontSize: 12, color: restaurantMuted, marginBottom: 6 }}>Priority</label>
-              <select value={form.priority} onChange={(event) => setForm((prev) => ({ ...prev, priority: event.target.value }))} style={{ width: "100%", background: "#161b27", border: `1px solid ${restaurantBorder}`, borderRadius: 8, padding: "9px 12px", color: "#fff", fontSize: 14 }}>
+              <select value={form.priority} onChange={(event) => setForm((prev) => ({ ...prev, priority: event.target.value }))} style={{ width: "100%", background: "var(--dk-161b27, #161b27)", border: `1px solid ${restaurantBorder}`, borderRadius: 8, padding: "9px 12px", color: "var(--ink-solid, #fff)", fontSize: 14 }}>
                 <option value="high">High</option>
                 <option value="medium">Medium</option>
                 <option value="low">Low</option>
@@ -166,7 +166,7 @@ export default function KitchenPage() {
             </div>
             <div style={{ display: "flex", gap: 12 }}>
               <button onClick={save} style={{ flex: 1, padding: "11px 0", background: "#ef4444", border: "none", borderRadius: 8, color: "#fff", fontSize: 14, fontWeight: 600, cursor: "pointer" }}>Add Order</button>
-              <button onClick={() => setShowModal(false)} style={{ padding: "11px 24px", background: "transparent", border: `1px solid ${restaurantBorder}`, borderRadius: 8, color: "rgba(255,255,255,.6)", fontSize: 14, cursor: "pointer" }}>Cancel</button>
+              <button onClick={() => setShowModal(false)} style={{ padding: "11px 24px", background: "transparent", border: `1px solid ${restaurantBorder}`, borderRadius: 8, color: "rgba(var(--ink),.6)", fontSize: 14, cursor: "pointer" }}>Cancel</button>
             </div>
           </div>
         </div>

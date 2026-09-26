@@ -17,10 +17,10 @@ type AccessRecord = {
 
 const inputStyle: React.CSSProperties = {
   width: "100%",
-  background: "rgba(255,255,255,.06)",
-  border: "1px solid rgba(255,255,255,.1)",
+  background: "rgba(var(--ink),.06)",
+  border: "1px solid rgba(var(--ink),.1)",
   borderRadius: 10,
-  color: "#fff",
+  color: "var(--ink-solid, #fff)",
   padding: "12px 14px",
   fontSize: 14,
 };
@@ -79,7 +79,7 @@ export default function MemberAccessPage() {
   };
 
   return (
-    <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", color: "#fff", minHeight: "100vh", fontFamily: saasFont }}>
+    <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", color: "var(--ink-solid, #fff)", minHeight: "100vh", fontFamily: saasFont }}>
       <div style={{ marginBottom: 24 }}>
         <h1 style={{ margin: "0 0 6px", fontSize: 28, fontWeight: 900 }}>Member Access</h1>
         <p style={{ margin: 0, color: saasMuted, fontSize: 14 }}>Subscribers ko tier-based access assign karein aur revoke / renew lifecycle manage karein.</p>
@@ -105,9 +105,9 @@ export default function MemberAccessPage() {
         <div style={{ background: saasBg, border: `1px solid ${saasBorder}`, borderRadius: 18, overflow: "hidden" }}>
           <div style={{ padding: isMobile ? "12px 10px" : "16px 18px", borderBottom: `1px solid ${saasBorder}`, fontSize: 16, fontWeight: 800 }}>Access Matrix</div>
           <div style={{ display: "grid", gap: 12, padding: 18 }}>
-            {!loading && accessRows.length === 0 && <div style={{ color: "rgba(255,255,255,.28)" }}>No access records yet.</div>}
+            {!loading && accessRows.length === 0 && <div style={{ color: "rgba(var(--ink),.28)" }}>No access records yet.</div>}
             {accessRows.map((row) => (
-              <div key={row.id} style={{ border: "1px solid rgba(255,255,255,.07)", background: "rgba(255,255,255,.03)", borderRadius: 14, padding: 16 }}>
+              <div key={row.id} style={{ border: "1px solid rgba(var(--ink),.07)", background: "rgba(var(--ink),.03)", borderRadius: 14, padding: 16 }}>
                 <div style={{ display: "flex", justifyContent: "space-between", gap: 12 }}>
                   <div>
                     <div style={{ fontSize: 16, fontWeight: 800 }}>{row.title}</div>

@@ -47,7 +47,7 @@ export default function SalonClientHistoryPage() {
   }, [appointments, search]);
 
   return (
-    <div style={{ padding: "32px", fontFamily: salonFont, color: "#fff", minHeight: "100vh" }}>
+    <div style={{ padding: "32px", fontFamily: salonFont, color: "var(--ink-solid, #fff)", minHeight: "100vh" }}>
       <div style={{ marginBottom: 24 }}>
         <h1 style={{ fontSize: 26, fontWeight: 800, margin: 0 }}>Client History</h1>
         <p style={{ fontSize: 14, color: salonMuted, marginTop: 6 }}>Repeat clients, favorite services, aur spend history ko yahan se samjhein.</p>
@@ -86,15 +86,15 @@ export default function SalonClientHistoryPage() {
             </div>
 
             <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(3,minmax(0,1fr))", gap: 12, marginBottom: 14 }}>
-              <div style={{ background: "rgba(255,255,255,.025)", borderRadius: 12, border: "1px solid rgba(255,255,255,.06)", padding: "12px 14px" }}>
+              <div style={{ background: "rgba(var(--ink),.025)", borderRadius: 12, border: "1px solid rgba(var(--ink),.06)", padding: "12px 14px" }}>
                 <div style={{ fontSize: 12, color: salonMuted }}>Last Visit</div>
                 <div style={{ marginTop: 4, fontWeight: 700 }}>{client.lastVisit?.date || "-"} {client.lastVisit?.time || ""}</div>
               </div>
-              <div style={{ background: "rgba(255,255,255,.025)", borderRadius: 12, border: "1px solid rgba(255,255,255,.06)", padding: "12px 14px" }}>
+              <div style={{ background: "rgba(var(--ink),.025)", borderRadius: 12, border: "1px solid rgba(var(--ink),.06)", padding: "12px 14px" }}>
                 <div style={{ fontSize: 12, color: salonMuted }}>Last Service</div>
                 <div style={{ marginTop: 4, fontWeight: 700 }}>{client.lastVisit?.service || "-"}</div>
               </div>
-              <div style={{ background: "rgba(255,255,255,.025)", borderRadius: 12, border: "1px solid rgba(255,255,255,.06)", padding: "12px 14px" }}>
+              <div style={{ background: "rgba(var(--ink),.025)", borderRadius: 12, border: "1px solid rgba(var(--ink),.06)", padding: "12px 14px" }}>
                 <div style={{ fontSize: 12, color: salonMuted }}>Last Status</div>
                 <div style={{ marginTop: 4, fontWeight: 700, color: salonStatusColor(client.lastVisit?.status || "") }}>{salonStatusLabel(client.lastVisit?.status || "-")}</div>
               </div>
@@ -102,7 +102,7 @@ export default function SalonClientHistoryPage() {
 
             <div style={{ display: "grid", gap: 10 }}>
               {client.visits.slice(0, 5).map((visit) => (
-                <div key={visit.id} style={{ display: "flex", justifyContent: "space-between", gap: 12, padding: "10px 12px", borderRadius: 12, background: "rgba(255,255,255,.025)", border: "1px solid rgba(255,255,255,.05)" }}>
+                <div key={visit.id} style={{ display: "flex", justifyContent: "space-between", gap: 12, padding: "10px 12px", borderRadius: 12, background: "rgba(var(--ink),.025)", border: "1px solid rgba(var(--ink),.05)" }}>
                   <div>
                     <div style={{ fontSize: 14, fontWeight: 700 }}>{visit.service}</div>
                     <div style={{ fontSize: 12, color: salonMuted }}>{visit.date} • {visit.time} • {visit.stylist}</div>

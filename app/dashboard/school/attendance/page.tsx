@@ -42,7 +42,7 @@ export default function SchoolAttendancePage() {
   }
 
   return (
-    <div style={{ minHeight: "100vh", padding: isMobile ? "17px 16px" : "28px 32px", color: "#fff", fontFamily: schoolFont }}>
+    <div style={{ minHeight: "100vh", padding: isMobile ? "17px 16px" : "28px 32px", color: "var(--ink-solid, #fff)", fontFamily: schoolFont }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24, gap: 16, flexWrap: "wrap" }}>
         <div>
           <h1 style={{ margin: "0 0 6px", fontSize: 24, fontWeight: 800 }}>Attendance Register</h1>
@@ -61,41 +61,41 @@ export default function SchoolAttendancePage() {
           <tbody>
             {attendance.map((row) => (
               <tr key={row.id}>
-                <td style={{ padding: isMobile ? "8px 8px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)", fontWeight: 700 }}>{row.student}</td>
-                <td style={{ padding: isMobile ? "8px 8px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)" }}>Class {row.className}</td>
-                <td style={{ padding: isMobile ? "8px 8px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)" }}>{row.date}</td>
-                <td style={{ padding: isMobile ? "8px 8px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)" }}>{row.status}</td>
-                <td style={{ padding: isMobile ? "8px 8px" : "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)" }}>{row.remarks || "—"}</td>
+                <td style={{ padding: isMobile ? "8px 8px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", fontWeight: 700 }}>{row.student}</td>
+                <td style={{ padding: isMobile ? "8px 8px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)" }}>Class {row.className}</td>
+                <td style={{ padding: isMobile ? "8px 8px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)" }}>{row.date}</td>
+                <td style={{ padding: isMobile ? "8px 8px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)" }}>{row.status}</td>
+                <td style={{ padding: isMobile ? "8px 8px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)" }}>{row.remarks || "—"}</td>
               </tr>
             ))}
-            {!loading && attendance.length === 0 && <tr><td colSpan={5} style={{ padding: 40, textAlign: "center", color: "rgba(255,255,255,.25)" }}>No attendance records yet.</td></tr>}
+            {!loading && attendance.length === 0 && <tr><td colSpan={5} style={{ padding: 40, textAlign: "center", color: "rgba(var(--ink),.25)" }}>No attendance records yet.</td></tr>}
           </tbody>
         </table>
       </div>
 
       {showModal && (
         <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.72)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-          <div style={{ width: 560, background: "#161b27", border: `1px solid ${schoolBorder}`, borderRadius: 16, padding: 28 }}>
+          <div style={{ width: 560, background: "var(--dk-161b27, #161b27)", border: `1px solid ${schoolBorder}`, borderRadius: 16, padding: 28 }}>
             <h2 style={{ margin: "0 0 18px", fontSize: 18, fontWeight: 800 }}>Mark Attendance</h2>
             <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: 12 }}>
               <div>
                 <label style={{ display: "block", marginBottom: 6, fontSize: 12, color: schoolMuted }}>Student</label>
-                <select value={form.student} onChange={(e) => setForm((prev) => ({ ...prev, student: e.target.value }))} style={{ width: "100%", padding: isMobile ? "8px 8px" : "10px 12px", background: "#111827", border: `1px solid ${schoolBorder}`, borderRadius: 8, color: "#fff" }}>
+                <select value={form.student} onChange={(e) => setForm((prev) => ({ ...prev, student: e.target.value }))} style={{ width: "100%", padding: isMobile ? "8px 8px" : "10px 12px", background: "var(--dk-111827, #111827)", border: `1px solid ${schoolBorder}`, borderRadius: 8, color: "var(--ink-solid, #fff)" }}>
                   <option value="">Select student</option>
                   {students.map((row) => <option key={row.id} value={row.name}>{row.name}</option>)}
                 </select>
               </div>
               <div>
                 <label style={{ display: "block", marginBottom: 6, fontSize: 12, color: schoolMuted }}>Class</label>
-                <input value={form.className} onChange={(e) => setForm((prev) => ({ ...prev, className: e.target.value }))} style={{ width: "100%", padding: isMobile ? "8px 8px" : "10px 12px", background: "#111827", border: `1px solid ${schoolBorder}`, borderRadius: 8, color: "#fff" }} />
+                <input value={form.className} onChange={(e) => setForm((prev) => ({ ...prev, className: e.target.value }))} style={{ width: "100%", padding: isMobile ? "8px 8px" : "10px 12px", background: "var(--dk-111827, #111827)", border: `1px solid ${schoolBorder}`, borderRadius: 8, color: "var(--ink-solid, #fff)" }} />
               </div>
               <div>
                 <label style={{ display: "block", marginBottom: 6, fontSize: 12, color: schoolMuted }}>Date</label>
-                <input type="date" value={form.date} onChange={(e) => setForm((prev) => ({ ...prev, date: e.target.value }))} style={{ width: "100%", padding: isMobile ? "8px 8px" : "10px 12px", background: "#111827", border: `1px solid ${schoolBorder}`, borderRadius: 8, color: "#fff" }} />
+                <input type="date" value={form.date} onChange={(e) => setForm((prev) => ({ ...prev, date: e.target.value }))} style={{ width: "100%", padding: isMobile ? "8px 8px" : "10px 12px", background: "var(--dk-111827, #111827)", border: `1px solid ${schoolBorder}`, borderRadius: 8, color: "var(--ink-solid, #fff)" }} />
               </div>
               <div>
                 <label style={{ display: "block", marginBottom: 6, fontSize: 12, color: schoolMuted }}>Status</label>
-                <select value={form.status} onChange={(e) => setForm((prev) => ({ ...prev, status: e.target.value }))} style={{ width: "100%", padding: isMobile ? "8px 8px" : "10px 12px", background: "#111827", border: `1px solid ${schoolBorder}`, borderRadius: 8, color: "#fff" }}>
+                <select value={form.status} onChange={(e) => setForm((prev) => ({ ...prev, status: e.target.value }))} style={{ width: "100%", padding: isMobile ? "8px 8px" : "10px 12px", background: "var(--dk-111827, #111827)", border: `1px solid ${schoolBorder}`, borderRadius: 8, color: "var(--ink-solid, #fff)" }}>
                   <option value="present">Present</option>
                   <option value="absent">Absent</option>
                   <option value="leave">Leave</option>
@@ -103,7 +103,7 @@ export default function SchoolAttendancePage() {
               </div>
               <div style={{ gridColumn: "span 2" }}>
                 <label style={{ display: "block", marginBottom: 6, fontSize: 12, color: schoolMuted }}>Remarks</label>
-                <input value={form.remarks} onChange={(e) => setForm((prev) => ({ ...prev, remarks: e.target.value }))} style={{ width: "100%", padding: isMobile ? "8px 8px" : "10px 12px", background: "#111827", border: `1px solid ${schoolBorder}`, borderRadius: 8, color: "#fff" }} />
+                <input value={form.remarks} onChange={(e) => setForm((prev) => ({ ...prev, remarks: e.target.value }))} style={{ width: "100%", padding: isMobile ? "8px 8px" : "10px 12px", background: "var(--dk-111827, #111827)", border: `1px solid ${schoolBorder}`, borderRadius: 8, color: "var(--ink-solid, #fff)" }} />
               </div>
             </div>
             {error && <div style={{ marginTop: 12, color: "#fda4af", fontSize: 12 }}>{error}</div>}

@@ -9,8 +9,8 @@ import { useResponsive } from "@/hooks/useResponsive";
 const bg = "rgba(255,255,255,.03)";
 const border = "rgba(255,255,255,.07)";
 const inp: React.CSSProperties = {
-  width: "100%", background: "rgba(255,255,255,.05)", border: "1px solid rgba(255,255,255,.1)",
-  borderRadius: 8, padding: "9px 12px", color: "#fff", fontSize: 14, boxSizing: "border-box",
+  width: "100%", background: "rgba(var(--ink),.05)", border: "1px solid rgba(var(--ink),.1)",
+  borderRadius: 8, padding: "9px 12px", color: "var(--ink-solid, #fff)", fontSize: 14, boxSizing: "border-box",
 };
 
 const PRIORITIES = { low: { label: "Low", color: "#34d399" }, medium: { label: "Medium", color: "#f59e0b" }, high: { label: "High", color: "#f87171" } };
@@ -74,7 +74,7 @@ export default function ComplaintsPage() {
   }
 
   return (
-    <div style={{ minHeight: "100vh", padding: isMobile ? "15px 14px" : "28px 32px", color: "#fff", fontFamily: hotelFont }}>
+    <div style={{ minHeight: "100vh", padding: isMobile ? "15px 14px" : "28px 32px", color: "var(--ink-solid, #fff)", fontFamily: hotelFont }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24 }}>
         <div>
           <h1 style={{ margin: "0 0 4px", fontSize: 22, fontWeight: 800 }}>⚠️ Guest Complaints</h1>
@@ -126,7 +126,7 @@ export default function ComplaintsPage() {
               const pc = PRIORITIES[c.priority] || PRIORITIES.medium;
               const sc = STATUSES[c.status] || STATUSES.open;
               return (
-                <tr key={c.id} style={{ borderBottom: "1px solid rgba(255,255,255,.04)" }}>
+                <tr key={c.id} style={{ borderBottom: "1px solid rgba(var(--ink),.04)" }}>
                   <td style={{ padding: "12px 16px", fontWeight: 600, maxWidth: 180 }}>{c.title}</td>
                   <td style={{ padding: "12px 16px", fontSize: 13 }}>{c.guestName || "—"}</td>
                   <td style={{ padding: "12px 16px" }}>
@@ -177,7 +177,7 @@ export default function ComplaintsPage() {
       {/* Modal */}
       {showModal && (
         <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.75)", backdropFilter: "blur(6px)", zIndex: 50, display: "flex", alignItems: "center", justifyContent: "center" }}>
-          <div style={{ background: "#161b27", border: `1px solid ${border}`, borderRadius: 16, padding: 32, width: 500, fontFamily: hotelFont }}>
+          <div style={{ background: "var(--dk-161b27, #161b27)", border: `1px solid ${border}`, borderRadius: 16, padding: 32, width: 500, fontFamily: hotelFont }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
               <h2 style={{ margin: 0, fontSize: 17, fontWeight: 700 }}>{editId ? "✏️ Edit Complaint" : "⚠️ Log Complaint"}</h2>
               <button onClick={() => setShowModal(false)} style={{ background: "none", border: "none", color: hotelMuted, fontSize: 22, cursor: "pointer" }}>✕</button>
@@ -198,14 +198,14 @@ export default function ComplaintsPage() {
               <div>
                 <label style={{ display: "block", fontSize: 12, color: hotelMuted, marginBottom: 6 }}>Category</label>
                 <select value={form.category} onChange={e => setForm(f => ({ ...f, category: e.target.value }))}
-                  style={{ ...inp, background: "#1e2535", cursor: "pointer" }}>
+                  style={{ ...inp, background: "var(--dk-1e2535, #1e2535)", cursor: "pointer" }}>
                   {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
                 </select>
               </div>
               <div>
                 <label style={{ display: "block", fontSize: 12, color: hotelMuted, marginBottom: 6 }}>Priority</label>
                 <select value={form.priority} onChange={e => setForm(f => ({ ...f, priority: e.target.value }))}
-                  style={{ ...inp, background: "#1e2535", cursor: "pointer" }}>
+                  style={{ ...inp, background: "var(--dk-1e2535, #1e2535)", cursor: "pointer" }}>
                   <option value="low">Low</option>
                   <option value="medium">Medium</option>
                   <option value="high">High</option>

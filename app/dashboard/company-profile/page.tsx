@@ -365,7 +365,7 @@ export default function CompanyProfilePage() {
               }}
             >
               {logoUploading ? (
-                <div style={{ width: 22, height: 22, border: "3px solid rgba(255,255,255,0.3)", borderTopColor: "#fff", borderRadius: "50%", animation: "spin .7s linear infinite" }} />
+                <div style={{ width: 22, height: 22, border: "3px solid rgba(var(--ink),0.3)", borderTopColor: "#fff", borderRadius: "50%", animation: "spin .7s linear infinite" }} />
               ) : company.logoUrl ? (
                 <img src={company.logoUrl} alt="logo" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
               ) : (

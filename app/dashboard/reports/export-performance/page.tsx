@@ -56,11 +56,11 @@ const FONT = "'Outfit','Inter',sans-serif";
 const s = {
   page:   { fontFamily: FONT, color: "var(--text-primary)", padding: isMobile ? "17px 12px" : "28px 24px", minHeight: "100vh", background: "var(--app-bg)" },
   panel:  { background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 14, padding: 20 },
-  inp:    { background: "rgba(255,255,255,.05)", border: "1px solid var(--border)", borderRadius: 8, padding: isMobile ? "8px 8px" : "8px 12px", color: "var(--text-primary)", fontFamily: FONT, fontSize: 13, boxSizing: "border-box" as const, outline: "none" },
+  inp:    { background: "rgba(var(--ink),.05)", border: "1px solid var(--border)", borderRadius: 8, padding: isMobile ? "8px 8px" : "8px 12px", color: "var(--text-primary)", fontFamily: FONT, fontSize: 13, boxSizing: "border-box" as const, outline: "none" },
   th:     { padding: isMobile ? "8px 8px" : "10px 13px", textAlign: "left" as const, fontSize: 11, color: "var(--text-muted)", fontWeight: 600, textTransform: "uppercase" as const, letterSpacing: "0.06em", whiteSpace: "nowrap" as const, borderBottom: "1px solid var(--border)" },
   td:     { padding: isMobile ? "8px 8px" : "11px 13px", fontSize: 12, color: "var(--text-primary)", borderBottom: "1px solid var(--border)", verticalAlign: "middle" as const },
   kpi:    { background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 12, padding: isMobile ? "11px 10px" : "18px 20px" },
-  tabBtn: (active: boolean, color = "#10b981") => ({ background: active ? color : "rgba(255,255,255,.06)", border: `1px solid ${active ? color : "var(--border)"}`, borderRadius: 8, padding: isMobile ? "8px 8px" : "7px 16px", color: active ? "#fff" : "var(--text-muted)", fontFamily: FONT, cursor: "pointer", fontSize: 12, fontWeight: 600 }),
+  tabBtn: (active: boolean, color = "#10b981") => ({ background: active ? color : "rgba(var(--ink),.06)", border: `1px solid ${active ? color : "var(--border)"}`, borderRadius: 8, padding: isMobile ? "8px 8px" : "7px 16px", color: active ? "#fff" : "var(--text-muted)", fontFamily: FONT, cursor: "pointer", fontSize: 12, fontWeight: 600 }),
 };
 
 const fmt = (n: number) => `$${n.toLocaleString("en-US", { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
@@ -70,7 +70,7 @@ function buildBar(value: number, max: number, color: string) {
   const pct = max > 0 ? Math.min((value / max) * 100, 100) : 0;
   return (
     <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-      <div style={{ flex: 1, height: 6, background: "rgba(255,255,255,.07)", borderRadius: 3, overflow: "hidden" }}>
+      <div style={{ flex: 1, height: 6, background: "rgba(var(--ink),.07)", borderRadius: 3, overflow: "hidden" }}>
         <div style={{ width: `${pct}%`, height: "100%", background: color, borderRadius: 3, transition: "width .4s ease" }} />
       </div>
       <span style={{ fontSize: 11, fontWeight: 700, color, minWidth: 60, textAlign: "right" }}>{fmt(value)}</span>

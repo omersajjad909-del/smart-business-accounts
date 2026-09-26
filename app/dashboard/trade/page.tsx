@@ -105,7 +105,7 @@ export default function TradeOverviewPage() {
           <div style={{ padding: isMobile ? "12px 10px" : "16px 18px", borderBottom: `1px solid ${tradeBorder}`, fontSize: 15, fontWeight: 800 }}>Movement Watchlist</div>
           <div style={{ padding: 18, display: "grid", gap: 10 }}>
             {shipments.filter((row) => row.status !== "CLEARED").slice(0, 6).map((row) => (
-              <div key={row.id} style={{ padding: "12px 14px", borderRadius: 10, background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.05)" }}>
+              <div key={row.id} style={{ padding: "12px 14px", borderRadius: 10, background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.05)" }}>
                 <div style={{ fontSize: 14, fontWeight: 700 }}>{row.ref}</div>
                 <div style={{ fontSize: 12, color: tradeMuted, marginTop: 4 }}>{row.type} | {row.originPort} to {row.destinationPort}</div>
                 <div style={{ fontSize: 12, color: "#7dd3fc", marginTop: 6 }}>{row.blAwbNo || "No BL/AWB"} | {row.incoterm}</div>
@@ -123,7 +123,7 @@ export default function TradeOverviewPage() {
               { label: "Export rebate claimed", value: `USD ${data.summary.rebateValue.toLocaleString()}`, color: "#34d399" },
               { label: "Shipment freight", value: `USD ${data.summary.shipmentFreight.toLocaleString()}`, color: "#f87171" },
             ].map((row) => (
-              <div key={row.label} style={{ display: "flex", justifyContent: "space-between", padding: "10px 12px", borderRadius: 10, background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.05)" }}>
+              <div key={row.label} style={{ display: "flex", justifyContent: "space-between", padding: "10px 12px", borderRadius: 10, background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.05)" }}>
                 <span style={{ fontSize: 13, color: tradeMuted }}>{row.label}</span>
                 <span style={{ fontSize: 14, fontWeight: 800, color: row.color }}>{row.value}</span>
               </div>

@@ -50,31 +50,31 @@ export default function TaxSummaryPage() {
   const totalAmt = data.reduce((s, d) => s + d.totalAmount, 0);
   const cur = companyInfo?.baseCurrency || "";
 
-  const inputStyle: React.CSSProperties = { width:"100%", padding:"11px 14px", borderRadius:10, fontSize:14, background:"rgba(255,255,255,.06)", border:"1px solid rgba(255,255,255,.12)", color:"white", outline:"none", fontFamily:"inherit", boxSizing:"border-box" };
-  const th: React.CSSProperties = { padding:"10px 14px", fontSize:10, fontWeight:700, color:"rgba(255,255,255,.35)", textTransform:"uppercase", letterSpacing:".08em", borderBottom:"1px solid rgba(255,255,255,.07)", background:"rgba(255,255,255,.03)", whiteSpace:"nowrap" };
+  const inputStyle: React.CSSProperties = { width:"100%", padding:"11px 14px", borderRadius:10, fontSize:14, background:"rgba(var(--ink),.06)", border:"1px solid rgba(var(--ink),.12)", color:"var(--ink-solid, white)", outline:"none", fontFamily:"inherit", boxSizing:"border-box" };
+  const th: React.CSSProperties = { padding:"10px 14px", fontSize:10, fontWeight:700, color:"rgba(var(--ink),.35)", textTransform:"uppercase", letterSpacing:".08em", borderBottom:"1px solid rgba(var(--ink),.07)", background:"rgba(var(--ink),.03)", whiteSpace:"nowrap" };
 
   return (
-    <div style={{ fontFamily:"'Outfit','Inter',sans-serif", color:"rgba(255,255,255,.85)" }}>
+    <div style={{ fontFamily:"'Outfit','Inter',sans-serif", color:"rgba(var(--ink),.85)" }}>
 
       {/* ── MODAL ── */}
       {showModal && (
         <div style={{ position:"fixed", inset:0, zIndex:9000, background:"rgba(0,0,0,.78)", backdropFilter:"blur(14px)", display:"flex", alignItems:"center", justifyContent:"center", padding:24 }}>
-          <div style={{ width:"100%", maxWidth:460, background:"rgba(10,13,32,.97)", border:"1px solid rgba(255,255,255,.12)", borderRadius:22, padding:"40px 40px 36px", boxShadow:"0 40px 100px rgba(0,0,0,.8)", position:"relative" }}>
-            <button onClick={() => data.length > 0 ? setShowModal(false) : router.back()} style={{ position:"absolute", top:14, right:16, background:"none", border:"none", color:"rgba(255,255,255,.35)", fontSize:20, cursor:"pointer", lineHeight:1, padding:4, borderRadius:6 }}>✕</button>
+          <div style={{ width:"100%", maxWidth:460, background:"rgba(10,13,32,.97)", border:"1px solid rgba(var(--ink),.12)", borderRadius:22, padding:"40px 40px 36px", boxShadow:"0 40px 100px rgba(0,0,0,.8)", position:"relative" }}>
+            <button onClick={() => data.length > 0 ? setShowModal(false) : router.back()} style={{ position:"absolute", top:14, right:16, background:"none", border:"none", color:"rgba(var(--ink),.35)", fontSize:20, cursor:"pointer", lineHeight:1, padding:4, borderRadius:6 }}>✕</button>
             <div style={{ display:"flex", alignItems:"center", gap:14, marginBottom:28 }}>
               <div style={{ width:46, height:46, borderRadius:14, background:"linear-gradient(135deg,#f59e0b,#d97706)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:22 }}>🧾</div>
               <div>
-                <div style={{ fontSize:20, fontWeight:800, color:"white", letterSpacing:"-.3px" }}>Tax Summary</div>
-                <div style={{ fontSize:12, color:"rgba(255,255,255,.35)", marginTop:2 }}>Select reporting period</div>
+                <div style={{ fontSize:20, fontWeight:800, color:"var(--ink-solid, white)", letterSpacing:"-.3px" }}>Tax Summary</div>
+                <div style={{ fontSize:12, color:"rgba(var(--ink),.35)", marginTop:2 }}>Select reporting period</div>
               </div>
             </div>
             <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:14, marginBottom:22 }}>
               <div>
-                <label style={{ fontSize:10, fontWeight:700, color:"rgba(255,255,255,.35)", letterSpacing:".08em", textTransform:"uppercase", display:"block", marginBottom:7 }}>From</label>
+                <label style={{ fontSize:10, fontWeight:700, color:"rgba(var(--ink),.35)", letterSpacing:".08em", textTransform:"uppercase", display:"block", marginBottom:7 }}>From</label>
                 <DateInput ref={fromRef} value={from} onChange={setFrom} style={inputStyle} autoFocus onKeyDown={e => { if (e.key==="Enter") { e.preventDefault(); toRef.current?.focus(); } }}/>
               </div>
               <div>
-                <label style={{ fontSize:10, fontWeight:700, color:"rgba(255,255,255,.35)", letterSpacing:".08em", textTransform:"uppercase", display:"block", marginBottom:7 }}>To</label>
+                <label style={{ fontSize:10, fontWeight:700, color:"rgba(var(--ink),.35)", letterSpacing:".08em", textTransform:"uppercase", display:"block", marginBottom:7 }}>To</label>
                 <DateInput ref={toRef} value={to} onChange={setTo} style={inputStyle} onKeyDown={e => { if (e.key==="Enter") { e.preventDefault(); handleGenerate(); } }}/>
               </div>
             </div>
@@ -89,7 +89,7 @@ export default function TaxSummaryPage() {
       {!showModal && (
         <>
           <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:24, flexWrap:"wrap", gap:10 }}>
-            <button onClick={() => setShowModal(true)} style={{ display:"flex", alignItems:"center", gap:8, padding:"8px 16px", borderRadius:10, border:"1px solid rgba(255,255,255,.1)", background:"rgba(255,255,255,.04)", color:"rgba(255,255,255,.6)", fontSize:13, fontWeight:600, cursor:"pointer", fontFamily:"inherit" }}>
+            <button onClick={() => setShowModal(true)} style={{ display:"flex", alignItems:"center", gap:8, padding:"8px 16px", borderRadius:10, border:"1px solid rgba(var(--ink),.1)", background:"rgba(var(--ink),.04)", color:"rgba(var(--ink),.6)", fontSize:13, fontWeight:600, cursor:"pointer", fontFamily:"inherit" }}>
               ⟵ Change Dates
             </button>
             {data.length > 0 && (
@@ -100,7 +100,7 @@ export default function TaxSummaryPage() {
           </div>
 
           {loading ? (
-            <div style={{ textAlign:"center", padding:"80px 0", color:"rgba(255,255,255,.25)", fontSize:14 }}>Loading report…</div>
+            <div style={{ textAlign:"center", padding:"80px 0", color:"rgba(var(--ink),.25)", fontSize:14 }}>Loading report…</div>
           ) : (
             <>
               {/* KPI cards */}
@@ -112,7 +112,7 @@ export default function TaxSummaryPage() {
                     { label:"Tax Types", val:data.length, color:"#34d399", bg:"rgba(52,211,153,.08)", border:"rgba(52,211,153,.2)", isCount:true },
                   ].map(k => (
                     <div key={k.label} style={{ background:k.bg, border:`1px solid ${k.border}`, borderRadius:14, padding: isMobile ? "12px 10px" : "18px 20px" }}>
-                      <div style={{ fontSize:10, fontWeight:700, color:"rgba(255,255,255,.35)", textTransform:"uppercase", letterSpacing:".08em", marginBottom:8 }}>{k.label}</div>
+                      <div style={{ fontSize:10, fontWeight:700, color:"rgba(var(--ink),.35)", textTransform:"uppercase", letterSpacing:".08em", marginBottom:8 }}>{k.label}</div>
                       <div style={{ fontSize:26, fontWeight:900, color:k.color }}>{(k as any).isCount ? k.val : `${cur ? cur+" " : ""}${fmtN(k.val as number)}`}</div>
                     </div>
                   ))}
@@ -120,11 +120,11 @@ export default function TaxSummaryPage() {
               )}
 
               {/* Report header */}
-              <div style={{ background:"rgba(255,255,255,.03)", border:"1px solid rgba(255,255,255,.08)", borderRadius:16, overflow:"hidden" }}>
-                <div style={{ padding: isMobile ? "12px 11px" : "20px 24px", background:"linear-gradient(135deg,rgba(245,158,11,.1),rgba(217,119,6,.05))", borderBottom:"1px solid rgba(255,255,255,.07)", display:"flex", justifyContent:"space-between", alignItems:"center" }}>
+              <div style={{ background:"rgba(var(--ink),.03)", border:"1px solid rgba(var(--ink),.08)", borderRadius:16, overflow:"hidden" }}>
+                <div style={{ padding: isMobile ? "12px 11px" : "20px 24px", background:"linear-gradient(135deg,rgba(245,158,11,.1),rgba(217,119,6,.05))", borderBottom:"1px solid rgba(var(--ink),.07)", display:"flex", justifyContent:"space-between", alignItems:"center" }}>
                   <div>
-                    <div style={{ fontSize:16, fontWeight:800, color:"white" }}>{companyInfo?.name || "Tax Summary Report"}</div>
-                    <div style={{ fontSize:11, color:"rgba(255,255,255,.35)", marginTop:3 }}>Period: {from} — {to}</div>
+                    <div style={{ fontSize:16, fontWeight:800, color:"var(--ink-solid, white)" }}>{companyInfo?.name || "Tax Summary Report"}</div>
+                    <div style={{ fontSize:11, color:"rgba(var(--ink),.35)", marginTop:3 }}>Period: {from} — {to}</div>
                   </div>
                   <div style={{ fontSize:13, color:"#fbbf24", fontWeight:700 }}>🧾 Tax Summary</div>
                 </div>
@@ -144,28 +144,28 @@ export default function TaxSummaryPage() {
                     </thead>
                     <tbody>
                       {data.length === 0 ? (
-                        <tr><td colSpan={7} style={{ padding: isMobile ? "22px 10px" : "40px 16px", textAlign:"center", color:"rgba(255,255,255,.2)", fontSize:13 }}>No tax data found for this period</td></tr>
+                        <tr><td colSpan={7} style={{ padding: isMobile ? "22px 10px" : "40px 16px", textAlign:"center", color:"rgba(var(--ink),.2)", fontSize:13 }}>No tax data found for this period</td></tr>
                       ) : data.map((d, i) => (
-                        <tr key={i} style={{ background:i%2===0?"transparent":"rgba(255,255,255,.012)", borderBottom:"1px solid rgba(255,255,255,.04)" }}
+                        <tr key={i} style={{ background:i%2===0?"transparent":"rgba(var(--ink),.012)", borderBottom:"1px solid rgba(var(--ink),.04)" }}
                           onMouseEnter={e => (e.currentTarget.style.background="rgba(245,158,11,.05)")}
                           onMouseLeave={e => (e.currentTarget.style.background=i%2===0?"transparent":"rgba(255,255,255,.012)")}>
                           <td style={{ padding:"10px 14px", fontSize:13, fontWeight:700, color:"#fbbf24" }}>{d.taxType}</td>
-                          <td style={{ padding:"10px 14px", fontSize:12, color:"rgba(255,255,255,.5)", fontFamily:"monospace" }}>{d.taxCode}</td>
-                          <td style={{ padding:"10px 14px", textAlign:"right", fontSize:13, color:"rgba(255,255,255,.7)" }}>{d.taxRate}%</td>
-                          <td style={{ padding:"10px 14px", textAlign:"right", fontSize:13, color:"rgba(255,255,255,.6)" }}>{d.invoiceCount}</td>
-                          <td style={{ padding:"10px 14px", textAlign:"right", fontSize:13, color:"rgba(255,255,255,.6)", fontFamily:"monospace" }}>{fmtN(d.totalSubtotal)}</td>
+                          <td style={{ padding:"10px 14px", fontSize:12, color:"rgba(var(--ink),.5)", fontFamily:"monospace" }}>{d.taxCode}</td>
+                          <td style={{ padding:"10px 14px", textAlign:"right", fontSize:13, color:"rgba(var(--ink),.7)" }}>{d.taxRate}%</td>
+                          <td style={{ padding:"10px 14px", textAlign:"right", fontSize:13, color:"rgba(var(--ink),.6)" }}>{d.invoiceCount}</td>
+                          <td style={{ padding:"10px 14px", textAlign:"right", fontSize:13, color:"rgba(var(--ink),.6)", fontFamily:"monospace" }}>{fmtN(d.totalSubtotal)}</td>
                           <td style={{ padding:"10px 14px", textAlign:"right", fontSize:13, fontWeight:700, color:"#fbbf24", fontFamily:"monospace" }}>{fmtN(d.totalTaxAmount)}</td>
-                          <td style={{ padding:"10px 14px", textAlign:"right", fontSize:13, color:"rgba(255,255,255,.7)", fontFamily:"monospace" }}>{fmtN(d.totalAmount)}</td>
+                          <td style={{ padding:"10px 14px", textAlign:"right", fontSize:13, color:"rgba(var(--ink),.7)", fontFamily:"monospace" }}>{fmtN(d.totalAmount)}</td>
                         </tr>
                       ))}
                     </tbody>
                     {data.length > 0 && (
                       <tfoot>
                         <tr style={{ background:"rgba(245,158,11,.08)", borderTop:"2px solid rgba(245,158,11,.25)" }}>
-                          <td colSpan={4} style={{ padding:"12px 14px", fontWeight:700, fontSize:12, textTransform:"uppercase", letterSpacing:".06em", color:"rgba(255,255,255,.5)" }}>Grand Total</td>
-                          <td style={{ padding:"12px 14px", textAlign:"right", fontWeight:800, fontSize:14, color:"rgba(255,255,255,.7)", fontFamily:"monospace" }}>{fmtN(data.reduce((s,d)=>s+d.totalSubtotal,0))}</td>
+                          <td colSpan={4} style={{ padding:"12px 14px", fontWeight:700, fontSize:12, textTransform:"uppercase", letterSpacing:".06em", color:"rgba(var(--ink),.5)" }}>Grand Total</td>
+                          <td style={{ padding:"12px 14px", textAlign:"right", fontWeight:800, fontSize:14, color:"rgba(var(--ink),.7)", fontFamily:"monospace" }}>{fmtN(data.reduce((s,d)=>s+d.totalSubtotal,0))}</td>
                           <td style={{ padding:"12px 14px", textAlign:"right", fontWeight:900, fontSize:14, color:"#fbbf24", fontFamily:"monospace" }}>{fmtN(totalTax)}</td>
-                          <td style={{ padding:"12px 14px", textAlign:"right", fontWeight:800, fontSize:14, color:"rgba(255,255,255,.7)", fontFamily:"monospace" }}>{fmtN(totalAmt)}</td>
+                          <td style={{ padding:"12px 14px", textAlign:"right", fontWeight:800, fontSize:14, color:"rgba(var(--ink),.7)", fontFamily:"monospace" }}>{fmtN(totalAmt)}</td>
                         </tr>
                       </tfoot>
                     )}

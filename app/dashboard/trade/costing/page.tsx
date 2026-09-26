@@ -21,7 +21,7 @@ const inputStyle: React.CSSProperties = {
   padding: "10px 12px",
   borderRadius: 10,
   border: `1px solid ${tradeBorder}`,
-  background: "rgba(255,255,255,.04)",
+  background: "rgba(var(--ink),.04)",
   color: "var(--text-primary)",
   fontSize: 13,
   fontFamily: tradeFont,
@@ -281,7 +281,7 @@ export default function ImportCostingPage() {
       {showModal && (
         <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.72)", zIndex: 1200, display: "flex", alignItems: "flex-start", justifyContent: "center", padding: 20, overflowY: "auto" }}
           onClick={(e) => { if (e.target === e.currentTarget) setShowModal(false); }}>
-          <div style={{ width: "100%", maxWidth: 980, margin: "24px 0", background: "#101522", border: `1px solid ${tradeBorder}`, borderRadius: 18, padding: 28 }}>
+          <div style={{ width: "100%", maxWidth: 980, margin: "24px 0", background: "var(--dk-101522, #101522)", border: `1px solid ${tradeBorder}`, borderRadius: 18, padding: 28 }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
               <div>
                 <h2 style={{ margin: "0 0 4px", fontSize: 20, fontWeight: 800 }}>{editingId ? "Edit Import Costing" : "New Import Costing"}</h2>
@@ -319,7 +319,7 @@ export default function ImportCostingPage() {
             {error ? <div style={{ marginTop: 14, color: "#f87171", fontSize: 13 }}>{error}</div> : null}
 
             <div style={{ display: "flex", justifyContent: "flex-end", gap: 10, marginTop: 22 }}>
-              <button onClick={() => setShowModal(false)} style={{ background: "rgba(255,255,255,.08)", border: "none", color: "var(--text-primary)", borderRadius: 10, padding: "10px 14px", cursor: "pointer" }}>Cancel</button>
+              <button onClick={() => setShowModal(false)} style={{ background: "rgba(var(--ink),.08)", border: "none", color: "var(--text-primary)", borderRadius: 10, padding: "10px 14px", cursor: "pointer" }}>Cancel</button>
               <button onClick={save} disabled={saving} style={{ background: "#2563eb", border: "none", color: "var(--text-primary)", borderRadius: 10, padding: "10px 16px", cursor: "pointer", fontWeight: 700 }}>
                 {saving ? "Saving..." : editingId ? "Update Costing" : "Create Costing"}
               </button>

@@ -86,7 +86,7 @@ export default function DemoBusinessShowcase({
       >
         <div>
           <div style={{ fontSize: 13, fontWeight: 800, color: "#fbbf24" }}>Live Demo Experience</div>
-          <div style={{ fontSize: 12, color: "rgba(255,255,255,0.55)", marginTop: 4 }}>
+          <div style={{ fontSize: 12, color: "rgba(var(--ink),0.55)", marginTop: 4 }}>
             This preview is tailored for {businessMeta.label}. Explore the business flow here, then open the owner dashboard for a live operational view.
           </div>
         </div>
@@ -114,7 +114,7 @@ export default function DemoBusinessShowcase({
           padding: "28px",
           borderRadius: 22,
           background: "radial-gradient(circle at top left, rgba(99,102,241,0.18), rgba(8,10,24,0.94) 55%)",
-          border: "1px solid rgba(255,255,255,0.08)",
+          border: "1px solid rgba(var(--ink),0.08)",
           display: "grid",
           gridTemplateColumns: "minmax(0, 1.4fr) minmax(280px, 0.9fr)",
           gap: 20,
@@ -141,10 +141,10 @@ export default function DemoBusinessShowcase({
             <span>{businessMeta.icon}</span>
             <span>{businessMeta.label} Demo</span>
           </div>
-          <h1 style={{ margin: 0, color: "white", fontSize: 34, lineHeight: 1.1, letterSpacing: "-0.03em" }}>
+          <h1 style={{ margin: 0, color: "var(--ink-solid, white)", fontSize: 34, lineHeight: 1.1, letterSpacing: "-0.03em" }}>
             {businessMeta.label} operations, explained beautifully.
           </h1>
-          <p style={{ margin: "12px 0 0", color: "rgba(255,255,255,0.62)", fontSize: 15, maxWidth: 760, lineHeight: 1.7 }}>
+          <p style={{ margin: "12px 0 0", color: "rgba(var(--ink),0.62)", fontSize: 15, maxWidth: 760, lineHeight: 1.7 }}>
             {businessMeta.description} This demo shows how FinovaOS fits the flow, reporting style, and decisions that matter for this business.
           </p>
           <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginTop: 18 }}>
@@ -154,9 +154,9 @@ export default function DemoBusinessShowcase({
                 style={{
                   padding: "10px 14px",
                   borderRadius: 12,
-                  background: "rgba(255,255,255,0.04)",
-                  border: "1px solid rgba(255,255,255,0.07)",
-                  color: "rgba(255,255,255,0.78)",
+                  background: "rgba(var(--ink),0.04)",
+                  border: "1px solid rgba(var(--ink),0.07)",
+                  color: "rgba(var(--ink),0.78)",
                   fontSize: 12,
                   fontWeight: 700,
                 }}
@@ -170,30 +170,30 @@ export default function DemoBusinessShowcase({
         <div
           style={{
             borderRadius: 18,
-            background: "rgba(255,255,255,0.03)",
-            border: "1px solid rgba(255,255,255,0.08)",
+            background: "rgba(var(--ink),0.03)",
+            border: "1px solid rgba(var(--ink),0.08)",
             padding: 20,
           }}
         >
-          <div style={{ color: "rgba(255,255,255,0.45)", fontSize: 11, fontWeight: 800, textTransform: "uppercase", letterSpacing: ".08em" }}>
+          <div style={{ color: "rgba(var(--ink),0.45)", fontSize: 11, fontWeight: 800, textTransform: "uppercase", letterSpacing: ".08em" }}>
             Demo Summary
           </div>
           <div style={{ marginTop: 14, display: "grid", gap: 12 }}>
             <div style={{ display: "flex", justifyContent: "space-between", gap: 12 }}>
-              <span style={{ color: "rgba(255,255,255,0.5)", fontSize: 12 }}>Selected business</span>
-              <span style={{ color: "white", fontSize: 12, fontWeight: 800 }}>{businessMeta.label}</span>
+              <span style={{ color: "rgba(var(--ink),0.5)", fontSize: 12 }}>Selected business</span>
+              <span style={{ color: "var(--ink-solid, white)", fontSize: 12, fontWeight: 800 }}>{businessMeta.label}</span>
             </div>
             <div style={{ display: "flex", justifyContent: "space-between", gap: 12 }}>
-              <span style={{ color: "rgba(255,255,255,0.5)", fontSize: 12 }}>Demo plan</span>
+              <span style={{ color: "rgba(var(--ink),0.5)", fontSize: 12 }}>Demo plan</span>
               <span style={{ color: "#a5b4fc", fontSize: 12, fontWeight: 800 }}>{companyInfo?.plan || "Professional"}</span>
             </div>
             <div style={{ display: "flex", justifyContent: "space-between", gap: 12 }}>
-              <span style={{ color: "rgba(255,255,255,0.5)", fontSize: 12 }}>Status</span>
+              <span style={{ color: "rgba(var(--ink),0.5)", fontSize: 12 }}>Status</span>
               <span style={{ color: "#34d399", fontSize: 12, fontWeight: 800 }}>{companyInfo?.subscriptionStatus || "ACTIVE"}</span>
             </div>
             <div style={{ display: "flex", justifyContent: "space-between", gap: 12 }}>
-              <span style={{ color: "rgba(255,255,255,0.5)", fontSize: 12 }}>Modules previewed</span>
-              <span style={{ color: "white", fontSize: 12, fontWeight: 800 }}>{visibleModules.length}</span>
+              <span style={{ color: "rgba(var(--ink),0.5)", fontSize: 12 }}>Modules previewed</span>
+              <span style={{ color: "var(--ink-solid, white)", fontSize: 12, fontWeight: 800 }}>{visibleModules.length}</span>
             </div>
           </div>
         </div>
@@ -203,12 +203,12 @@ export default function DemoBusinessShowcase({
         <div
           style={{
             borderRadius: 18,
-            background: "rgba(255,255,255,0.03)",
-            border: "1px solid rgba(255,255,255,0.07)",
+            background: "rgba(var(--ink),0.03)",
+            border: "1px solid rgba(var(--ink),0.07)",
             padding: 22,
           }}
         >
-          <div style={{ fontSize: 12, fontWeight: 800, color: "rgba(255,255,255,0.45)", textTransform: "uppercase", letterSpacing: ".08em", marginBottom: 14 }}>
+          <div style={{ fontSize: 12, fontWeight: 800, color: "rgba(var(--ink),0.45)", textTransform: "uppercase", letterSpacing: ".08em", marginBottom: 14 }}>
             Core Modules
           </div>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(170px, 1fr))", gap: 10 }}>
@@ -218,12 +218,12 @@ export default function DemoBusinessShowcase({
                 style={{
                   borderRadius: 14,
                   padding: "14px 14px",
-                  background: "rgba(255,255,255,0.03)",
-                  border: "1px solid rgba(255,255,255,0.06)",
+                  background: "rgba(var(--ink),0.03)",
+                  border: "1px solid rgba(var(--ink),0.06)",
                 }}
               >
                 <div style={{ color: businessMeta.color, fontSize: 11, fontWeight: 800, marginBottom: 6 }}>Module {index + 1}</div>
-                <div style={{ color: "white", fontSize: 13, fontWeight: 700 }}>{prettifyModuleLabel(moduleName)}</div>
+                <div style={{ color: "var(--ink-solid, white)", fontSize: 13, fontWeight: 700 }}>{prettifyModuleLabel(moduleName)}</div>
               </div>
             ))}
           </div>
@@ -232,12 +232,12 @@ export default function DemoBusinessShowcase({
         <div
           style={{
             borderRadius: 18,
-            background: "rgba(255,255,255,0.03)",
-            border: "1px solid rgba(255,255,255,0.07)",
+            background: "rgba(var(--ink),0.03)",
+            border: "1px solid rgba(var(--ink),0.07)",
             padding: 22,
           }}
         >
-          <div style={{ fontSize: 12, fontWeight: 800, color: "rgba(255,255,255,0.45)", textTransform: "uppercase", letterSpacing: ".08em", marginBottom: 14 }}>
+          <div style={{ fontSize: 12, fontWeight: 800, color: "rgba(var(--ink),0.45)", textTransform: "uppercase", letterSpacing: ".08em", marginBottom: 14 }}>
             Why It Fits
           </div>
           <div style={{ display: "grid", gap: 10 }}>
@@ -260,12 +260,12 @@ export default function DemoBusinessShowcase({
                 style={{
                   borderRadius: 14,
                   padding: "14px 16px",
-                  background: "rgba(255,255,255,0.025)",
-                  border: "1px solid rgba(255,255,255,0.06)",
+                  background: "rgba(var(--ink),0.025)",
+                  border: "1px solid rgba(var(--ink),0.06)",
                 }}
               >
-                <div style={{ color: "white", fontSize: 14, fontWeight: 800 }}>{item.title}</div>
-                <div style={{ color: "rgba(255,255,255,0.58)", fontSize: 12, lineHeight: 1.7, marginTop: 6 }}>{item.body}</div>
+                <div style={{ color: "var(--ink-solid, white)", fontSize: 14, fontWeight: 800 }}>{item.title}</div>
+                <div style={{ color: "rgba(var(--ink),0.58)", fontSize: 12, lineHeight: 1.7, marginTop: 6 }}>{item.body}</div>
               </div>
             ))}
           </div>
@@ -275,17 +275,17 @@ export default function DemoBusinessShowcase({
       <div
         style={{
           borderRadius: 18,
-          background: "rgba(255,255,255,0.03)",
-          border: "1px solid rgba(255,255,255,0.07)",
+          background: "rgba(var(--ink),0.03)",
+          border: "1px solid rgba(var(--ink),0.07)",
           padding: 22,
         }}
       >
         <div style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "flex-end", flexWrap: "wrap", marginBottom: 16 }}>
           <div>
-            <div style={{ fontSize: 12, fontWeight: 800, color: "rgba(255,255,255,0.45)", textTransform: "uppercase", letterSpacing: ".08em" }}>
+            <div style={{ fontSize: 12, fontWeight: 800, color: "rgba(var(--ink),0.45)", textTransform: "uppercase", letterSpacing: ".08em" }}>
               3-Plan Comparison
             </div>
-            <div style={{ color: "white", fontSize: 24, fontWeight: 800, marginTop: 6 }}>Choose the growth path that matches this business</div>
+            <div style={{ color: "var(--ink-solid, white)", fontSize: 24, fontWeight: 800, marginTop: 6 }}>Choose the growth path that matches this business</div>
           </div>
           <Link prefetch={false}
             href="/pricing"
@@ -310,16 +310,16 @@ export default function DemoBusinessShowcase({
               style={{
                 borderRadius: 16,
                 padding: 18,
-                background: "rgba(255,255,255,0.025)",
+                background: "rgba(var(--ink),0.025)",
                 border: `1px solid ${plan.accent}30`,
                 boxShadow: `inset 0 1px 0 ${plan.accent}15`,
               }}
             >
               <div style={{ color: plan.accent, fontSize: 13, fontWeight: 800 }}>{plan.name}</div>
-              <div style={{ color: "rgba(255,255,255,0.58)", fontSize: 12, lineHeight: 1.7, marginTop: 8 }}>{plan.note}</div>
+              <div style={{ color: "rgba(var(--ink),0.58)", fontSize: 12, lineHeight: 1.7, marginTop: 8 }}>{plan.note}</div>
               <div style={{ display: "grid", gap: 8, marginTop: 14 }}>
                 {plan.points.map((point) => (
-                  <div key={point} style={{ color: "white", fontSize: 12, fontWeight: 700 }}>
+                  <div key={point} style={{ color: "var(--ink-solid, white)", fontSize: 12, fontWeight: 700 }}>
                     • {point}
                   </div>
                 ))}

@@ -40,12 +40,12 @@ function UpsellGate() {
           <div style={{ width: 50, height: 50, borderRadius: 14, background: "linear-gradient(135deg,#7c3aed,#2563eb)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22, flexShrink: 0 }}>⚡</div>
           <div style={{ flex: 1, minWidth: 220 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap", marginBottom: 4 }}>
-              <h2 style={{ margin: 0, fontSize: 18, fontWeight: 800, color: "white" }}>Business Automation Add-on</h2>
+              <h2 style={{ margin: 0, fontSize: 18, fontWeight: 800, color: "var(--ink-solid, white)" }}>Business Automation Add-on</h2>
               <span style={{ padding: "3px 10px", borderRadius: 20, background: "rgba(251,191,36,.15)", color: "#fbbf24", fontSize: 11, fontWeight: 700, border: "1px solid rgba(251,191,36,.3)" }}>
                 {AUTOMATION_ADDON_ENABLED ? "$79/month" : "Coming soon"}
               </span>
             </div>
-            <p style={{ margin: 0, fontSize: 13, color: "rgba(255,255,255,.55)", lineHeight: 1.6 }}>
+            <p style={{ margin: 0, fontSize: 13, color: "rgba(var(--ink),.55)", lineHeight: 1.6 }}>
               Operational automation for invoice follow-up, stock alerts, reporting, and business-app integrations.
             </p>
           </div>
@@ -60,23 +60,23 @@ function UpsellGate() {
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))", gap: 14 }}>
         {FEATURES.map(f => (
-          <div key={f.title} style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 14, padding: "18px 20px" }}>
+          <div key={f.title} style={{ background: "rgba(var(--ink),0.03)", border: "1px solid rgba(var(--ink),0.08)", borderRadius: 14, padding: "18px 20px" }}>
             <div style={{ fontSize: 26, marginBottom: 10 }}>{f.icon}</div>
             <div style={{ fontSize: 14, fontWeight: 700, color: f.color, marginBottom: 6 }}>{f.title}</div>
-            <div style={{ fontSize: 12.5, color: "rgba(255,255,255,0.5)", lineHeight: 1.5 }}>{f.desc}</div>
+            <div style={{ fontSize: 12.5, color: "rgba(var(--ink),0.5)", lineHeight: 1.5 }}>{f.desc}</div>
           </div>
         ))}
       </div>
 
       {AUTOMATION_ADDON_ENABLED ? (
-        <div style={{ marginTop: 14, padding: "12px 18px", borderRadius: 12, background: "rgba(0,0,0,.25)", border: "1px solid rgba(255,255,255,.06)", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 14, flexWrap: "wrap" }}>
+        <div style={{ marginTop: 14, padding: "12px 18px", borderRadius: 12, background: "rgba(0,0,0,.25)", border: "1px solid rgba(var(--ink),.06)", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 14, flexWrap: "wrap" }}>
           <div style={{ fontSize: 13, fontWeight: 900, color: "#22c55e" }}>$79/mo</div>
           <a href="/onboarding/payment/addon-automation?cycle=monthly" style={{ padding: "9px 18px", borderRadius: 10, background: "linear-gradient(135deg,#7c3aed,#2563eb)", color: "white", fontSize: 12, fontWeight: 700, textDecoration: "none", whiteSpace: "nowrap" }}>
             Get Started →
           </a>
         </div>
       ) : (
-        <div style={{ marginTop: 14, padding: "12px 18px", borderRadius: 12, background: "rgba(0,0,0,.25)", border: "1px solid rgba(255,255,255,.06)", fontSize: 12.5, color: "rgba(255,255,255,.45)", textAlign: "center" }}>
+        <div style={{ marginTop: 14, padding: "12px 18px", borderRadius: 12, background: "rgba(0,0,0,.25)", border: "1px solid rgba(var(--ink),.06)", fontSize: 12.5, color: "rgba(var(--ink),.45)", textAlign: "center" }}>
           Launching soon — we&apos;ll let you know the moment it&apos;s ready.
         </div>
       )}
@@ -165,7 +165,7 @@ export default function AutomationPage() {
         <h1 style={{ fontSize: 26, fontWeight: 700, margin: 0, background: "linear-gradient(135deg,#a78bfa,#38bdf8)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
           Business Automation
         </h1>
-        <p style={{ margin: "6px 0 0", color: "rgba(255,255,255,0.45)", fontSize: 14 }}>
+        <p style={{ margin: "6px 0 0", color: "rgba(var(--ink),0.45)", fontSize: 14 }}>
           Invoice follow-up, stock alerts, reporting, and business-app integrations
         </p>
       </div>
@@ -176,7 +176,7 @@ export default function AutomationPage() {
           <span style={{ fontSize: 22 }}>🎉</span>
           <div>
             <div style={{ fontWeight: 700, color: "#22c55e", fontSize: 15 }}>Business Automation Activated!</div>
-            <div style={{ fontSize: 13, color: "rgba(255,255,255,0.6)", marginTop: 2 }}>All automation tools are now unlocked for your account.</div>
+            <div style={{ fontSize: 13, color: "rgba(var(--ink),0.6)", marginTop: 2 }}>All automation tools are now unlocked for your account.</div>
           </div>
         </div>
       )}
@@ -186,7 +186,7 @@ export default function AutomationPage() {
           <span style={{ fontSize: 22 }}>⏳</span>
           <div>
             <div style={{ fontWeight: 700, color: "#fbbf24", fontSize: 15 }}>Payment received — activating your add-on…</div>
-            <div style={{ fontSize: 13, color: "rgba(255,255,255,0.6)", marginTop: 2 }}>We&apos;re confirming your payment with the billing provider. This usually takes under a minute.</div>
+            <div style={{ fontSize: 13, color: "rgba(var(--ink),0.6)", marginTop: 2 }}>We&apos;re confirming your payment with the billing provider. This usually takes under a minute.</div>
           </div>
         </div>
       )}
@@ -199,8 +199,8 @@ export default function AutomationPage() {
             {tabs.map(t => (
               <button key={t.id} onClick={() => setTab(t.id)} style={{
                 padding: "7px 14px", borderRadius: 8, border: "none", cursor: "pointer", fontSize: 13, fontFamily: FONT,
-                background: tab === t.id ? "linear-gradient(135deg,#7c3aed,#2563eb)" : "rgba(255,255,255,0.06)",
-                color: tab === t.id ? "#fff" : "rgba(255,255,255,0.6)",
+                background: tab === t.id ? "linear-gradient(135deg,#7c3aed,#2563eb)" : "rgba(var(--ink),0.06)",
+                color: tab === t.id ? "#fff" : "rgba(var(--ink),0.6)",
                 fontWeight: tab === t.id ? 600 : 400,
                 transition: "all 0.18s",
               }}>
@@ -226,7 +226,7 @@ function Card({ children, style = {}, onClick }: { children: React.ReactNode; st
   const { isMobile } = useResponsive();
   return (
     <div onClick={onClick} style={{
-      background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)",
+      background: "rgba(var(--ink),0.04)", border: "1px solid rgba(var(--ink),0.08)",
       borderRadius: 14, padding: isMobile ? "12px 10px" : "20px 22px", ...style,
     }}>{children}</div>
   );
@@ -235,10 +235,10 @@ function Card({ children, style = {}, onClick }: { children: React.ReactNode; st
 function Input({ label, ...props }: { label: string } & React.InputHTMLAttributes<HTMLInputElement>) {
   return (
     <div style={{ marginBottom: 14 }}>
-      <label style={{ display: "block", fontSize: 12, color: "rgba(255,255,255,0.5)", marginBottom: 5 }}>{label}</label>
+      <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),0.5)", marginBottom: 5 }}>{label}</label>
       <input {...props} style={{
-        width: "100%", padding: "9px 12px", borderRadius: 8, border: "1px solid rgba(255,255,255,0.12)",
-        background: "rgba(255,255,255,0.06)", color: "#e2e8f0", fontSize: 13, fontFamily: FONT,
+        width: "100%", padding: "9px 12px", borderRadius: 8, border: "1px solid rgba(var(--ink),0.12)",
+        background: "rgba(var(--ink),0.06)", color: "#e2e8f0", fontSize: 13, fontFamily: FONT,
         outline: "none", boxSizing: "border-box", ...props.style,
       }} />
     </div>
@@ -248,10 +248,10 @@ function Input({ label, ...props }: { label: string } & React.InputHTMLAttribute
 function Textarea({ label, ...props }: { label: string } & React.TextareaHTMLAttributes<HTMLTextAreaElement>) {
   return (
     <div style={{ marginBottom: 14 }}>
-      <label style={{ display: "block", fontSize: 12, color: "rgba(255,255,255,0.5)", marginBottom: 5 }}>{label}</label>
+      <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),0.5)", marginBottom: 5 }}>{label}</label>
       <textarea {...props} style={{
-        width: "100%", padding: "9px 12px", borderRadius: 8, border: "1px solid rgba(255,255,255,0.12)",
-        background: "rgba(255,255,255,0.06)", color: "#e2e8f0", fontSize: 13, fontFamily: FONT,
+        width: "100%", padding: "9px 12px", borderRadius: 8, border: "1px solid rgba(var(--ink),0.12)",
+        background: "rgba(var(--ink),0.06)", color: "#e2e8f0", fontSize: 13, fontFamily: FONT,
         outline: "none", resize: "vertical", boxSizing: "border-box", ...props.style,
       }} />
     </div>
@@ -305,7 +305,7 @@ function OverviewTab({ onNavigate }: { onNavigate: (t: Tab) => void }) {
           onClick={() => onNavigate(f.id)}>
           <div style={{ fontSize: 28, marginBottom: 10 }}>{f.icon}</div>
           <div style={{ fontSize: 15, fontWeight: 700, color: f.color, marginBottom: 6 }}>{f.title}</div>
-          <div style={{ fontSize: 13, color: "rgba(255,255,255,0.5)", lineHeight: 1.5 }}>{f.desc}</div>
+          <div style={{ fontSize: 13, color: "rgba(var(--ink),0.5)", lineHeight: 1.5 }}>{f.desc}</div>
           <div style={{ marginTop: 14, fontSize: 12, color: f.color, fontWeight: 600 }}>Open →</div>
         </Card>
       ))}
@@ -352,19 +352,19 @@ function RemindersTab() {
     <Card>
       {toast && <Toast {...toast} />}
       <h3 style={{ margin: "0 0 4px", fontSize: 16, fontWeight: 700 }}>Overdue Invoices</h3>
-      <p style={{ fontSize: 12, color: "rgba(255,255,255,0.4)", marginTop: 0, marginBottom: 18 }}>
+      <p style={{ fontSize: 12, color: "rgba(var(--ink),0.4)", marginTop: 0, marginBottom: 18 }}>
         Auto-detected from your sales invoices&apos; due dates. Review and send — nothing goes out automatically.
       </p>
 
       {loading ? (
-        <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 13 }}>Loading…</p>
+        <p style={{ color: "rgba(var(--ink),0.4)", fontSize: 13 }}>Loading…</p>
       ) : rows.length === 0 ? (
-        <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 13 }}>No overdue invoices right now. 🎉</p>
+        <p style={{ color: "rgba(var(--ink),0.4)", fontSize: 13 }}>No overdue invoices right now. 🎉</p>
       ) : (
         <div style={{ overflowX: "auto" as const }}>
           <table style={{ width: "100%", borderCollapse: "collapse", fontSize: isMobile ? 12 : 13 }}>
             <thead>
-              <tr style={{ textAlign: "left", color: "rgba(255,255,255,0.4)", fontSize: 11, textTransform: "uppercase" as const }}>
+              <tr style={{ textAlign: "left", color: "rgba(var(--ink),0.4)", fontSize: 11, textTransform: "uppercase" as const }}>
                 <th style={{ padding: "8px 10px" }}>Invoice</th>
                 <th style={{ padding: "8px 10px" }}>Customer</th>
                 <th style={{ padding: "8px 10px" }}>Amount</th>
@@ -375,12 +375,12 @@ function RemindersTab() {
             </thead>
             <tbody>
               {rows.map(row => (
-                <tr key={row.id} style={{ borderTop: "1px solid rgba(255,255,255,0.06)" }}>
+                <tr key={row.id} style={{ borderTop: "1px solid rgba(var(--ink),0.06)" }}>
                   <td style={{ padding: "10px" }}>{row.invoiceNo}</td>
                   <td style={{ padding: "10px" }}>{row.customerName}</td>
                   <td style={{ padding: "10px" }}>{row.total.toLocaleString()}</td>
                   <td style={{ padding: "10px", color: row.daysOverdue >= 30 ? "#f87171" : row.daysOverdue >= 15 ? "#fbbf24" : "#e2e8f0" }}>{row.daysOverdue}d</td>
-                  <td style={{ padding: "10px", color: "rgba(255,255,255,0.4)" }}>
+                  <td style={{ padding: "10px", color: "rgba(var(--ink),0.4)" }}>
                     {row.lastReminderSentAt ? new Date(row.lastReminderSentAt).toLocaleDateString() : "—"}
                   </td>
                   <td style={{ padding: "10px" }}>
@@ -445,14 +445,14 @@ function LowStockTab() {
 
       <Card>
         <h3 style={{ margin: "0 0 4px", fontSize: 16, fontWeight: 700 }}>Set a Reorder Point</h3>
-        <p style={{ fontSize: 12, color: "rgba(255,255,255,0.4)", marginTop: 0, marginBottom: 16 }}>
+        <p style={{ fontSize: 12, color: "rgba(var(--ink),0.4)", marginTop: 0, marginBottom: 16 }}>
           When stock for an item drops to or below this level, you&apos;ll get notified.
         </p>
         <div style={{ marginBottom: 14 }}>
-          <label style={{ display: "block", fontSize: 12, color: "rgba(255,255,255,0.5)", marginBottom: 5 }}>Item</label>
+          <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),0.5)", marginBottom: 5 }}>Item</label>
           <select value={form.itemId} onChange={e => setForm(f => ({ ...f, itemId: e.target.value }))} style={{
-            width: "100%", padding: "9px 12px", borderRadius: 8, border: "1px solid rgba(255,255,255,0.12)",
-            background: "rgba(255,255,255,0.06)", color: "#e2e8f0", fontSize: 13, fontFamily: FONT, outline: "none",
+            width: "100%", padding: "9px 12px", borderRadius: 8, border: "1px solid rgba(var(--ink),0.12)",
+            background: "rgba(var(--ink),0.06)", color: "#e2e8f0", fontSize: 13, fontFamily: FONT, outline: "none",
           }}>
             <option value="">Select an item…</option>
             {items.map(i => <option key={i.id} value={i.id} style={{ color: "#000" }}>{i.name} ({i.code})</option>)}
@@ -466,22 +466,22 @@ function LowStockTab() {
 
         <div style={{ marginTop: 18 }}>
           {rules.map(rule => (
-            <div key={rule.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "10px 12px", borderRadius: 8, background: "rgba(255,255,255,0.04)", marginBottom: 8 }}>
+            <div key={rule.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "10px 12px", borderRadius: 8, background: "rgba(var(--ink),0.04)", marginBottom: 8 }}>
               <div>
                 <div style={{ fontSize: 13, fontWeight: 600 }}>{rule.itemName}</div>
-                <div style={{ fontSize: 11, color: "rgba(255,255,255,0.4)" }}>Alert at ≤ {rule.reorderPoint} · reorder {rule.reorderQty}</div>
+                <div style={{ fontSize: 11, color: "rgba(var(--ink),0.4)" }}>Alert at ≤ {rule.reorderPoint} · reorder {rule.reorderQty}</div>
               </div>
               <Btn variant="danger" onClick={() => deleteRule(rule.id)}>Remove</Btn>
             </div>
           ))}
-          {rules.length === 0 && <p style={{ color: "rgba(255,255,255,0.3)", fontSize: 13 }}>No reorder rules yet</p>}
+          {rules.length === 0 && <p style={{ color: "rgba(var(--ink),0.3)", fontSize: 13 }}>No reorder rules yet</p>}
         </div>
       </Card>
 
       <Card>
         <h3 style={{ margin: "0 0 16px", fontSize: 16, fontWeight: 700 }}>Currently Below Reorder Point</h3>
         {alerts.length === 0 ? (
-          <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 13 }}>Nothing is low on stock right now. 🎉</p>
+          <p style={{ color: "rgba(var(--ink),0.4)", fontSize: 13 }}>Nothing is low on stock right now. 🎉</p>
         ) : (
           <div style={{ display: "flex", flexDirection: "column" as const, gap: 8 }}>
             {alerts.map(a => (
@@ -490,7 +490,7 @@ function LowStockTab() {
                   <span style={{ fontSize: 13, fontWeight: 700 }}>{a.itemName}</span>
                   <span style={{ fontSize: 13, fontWeight: 800, color: "#f87171" }}>{a.currentStock} left</span>
                 </div>
-                <div style={{ fontSize: 11, color: "rgba(255,255,255,0.4)", marginTop: 3 }}>Reorder point: {a.reorderPoint} · Suggested qty: {a.reorderQty}</div>
+                <div style={{ fontSize: 11, color: "rgba(var(--ink),0.4)", marginTop: 3 }}>Reorder point: {a.reorderPoint} · Suggested qty: {a.reorderQty}</div>
               </div>
             ))}
           </div>
@@ -541,15 +541,15 @@ function ReportsTab() {
     <Card>
       {toast && <Toast {...toast} />}
       <h3 style={{ margin: "0 0 4px", fontSize: 16, fontWeight: 700 }}>Scheduled Financial Reports</h3>
-      <p style={{ fontSize: 12, color: "rgba(255,255,255,0.4)", marginTop: 0, marginBottom: 18 }}>
+      <p style={{ fontSize: 12, color: "rgba(var(--ink),0.4)", marginTop: 0, marginBottom: 18 }}>
         A real business summary — sales, purchases, overdue receivables & payables — pulled from your own ledger and emailed on a schedule.
       </p>
 
       <div style={{ marginBottom: 14 }}>
-        <label style={{ display: "block", fontSize: 12, color: "rgba(255,255,255,0.5)", marginBottom: 5 }}>Frequency</label>
+        <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),0.5)", marginBottom: 5 }}>Frequency</label>
         <select value={cfg.frequency} onChange={e => setCfg(c => ({ ...c, frequency: e.target.value as "weekly" | "monthly" }))} style={{
-          width: "100%", maxWidth: 240, padding: "9px 12px", borderRadius: 8, border: "1px solid rgba(255,255,255,0.12)",
-          background: "rgba(255,255,255,0.06)", color: "#e2e8f0", fontSize: 13, fontFamily: FONT, outline: "none",
+          width: "100%", maxWidth: 240, padding: "9px 12px", borderRadius: 8, border: "1px solid rgba(var(--ink),0.12)",
+          background: "rgba(var(--ink),0.06)", color: "#e2e8f0", fontSize: 13, fontFamily: FONT, outline: "none",
         }}>
           <option value="weekly" style={{ color: "#000" }}>Weekly</option>
           <option value="monthly" style={{ color: "#000" }}>Monthly</option>
@@ -559,7 +559,7 @@ function ReportsTab() {
       <Textarea label="Recipients (comma-separated emails)" value={recipientsText} onChange={e => setRecipientsText(e.target.value)} rows={2} placeholder="owner@company.com, accountant@company.com" />
 
       {cfg.lastSentAt && (
-        <p style={{ fontSize: 11, color: "rgba(255,255,255,0.35)", marginBottom: 14 }}>Last sent: {new Date(cfg.lastSentAt).toLocaleString()}</p>
+        <p style={{ fontSize: 11, color: "rgba(var(--ink),0.35)", marginBottom: 14 }}>Last sent: {new Date(cfg.lastSentAt).toLocaleString()}</p>
       )}
 
       <div style={{ display: "flex", gap: 10 }}>
@@ -618,7 +618,7 @@ function WebhooksTab() {
       <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
         <Card>
           <h3 style={{ margin: "0 0 16px", fontSize: 16, fontWeight: 700 }}>Outbound Webhooks</h3>
-          <p style={{ fontSize: 12, color: "rgba(255,255,255,0.4)", marginTop: 0, marginBottom: 14 }}>
+          <p style={{ fontSize: 12, color: "rgba(var(--ink),0.4)", marginTop: 0, marginBottom: 14 }}>
             FinovaOS sends data TO Zapier/Make when business events happen (invoice paid, stock low, PO approved).
           </p>
           <Input label="Webhook Name" value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} placeholder="Low Stock Notifier" />
@@ -628,13 +628,13 @@ function WebhooksTab() {
 
           <div style={{ marginTop: 18 }}>
             {outbound.map(w => (
-              <div key={w.id} style={{ padding: "10px 12px", borderRadius: 8, background: "rgba(255,255,255,0.04)", marginBottom: 8 }}>
+              <div key={w.id} style={{ padding: "10px 12px", borderRadius: 8, background: "rgba(var(--ink),0.04)", marginBottom: 8 }}>
                 <div style={{ display: "flex", justifyContent: "space-between" }}>
                   <span style={{ fontSize: 14, fontWeight: 600 }}>{w.name}</span>
                   <span style={{ fontSize: 11, color: w.active ? "#22c55e" : "#888" }}>{w.active ? "Active" : "Off"}</span>
                 </div>
-                <div style={{ fontSize: 11, color: "rgba(255,255,255,0.35)", marginTop: 3 }}>{w.url.slice(0, 50)}...</div>
-                {w.lastFired && <div style={{ fontSize: 11, color: "rgba(255,255,255,0.3)", marginTop: 3 }}>Last fired: {new Date(w.lastFired).toLocaleString()}</div>}
+                <div style={{ fontSize: 11, color: "rgba(var(--ink),0.35)", marginTop: 3 }}>{w.url.slice(0, 50)}...</div>
+                {w.lastFired && <div style={{ fontSize: 11, color: "rgba(var(--ink),0.3)", marginTop: 3 }}>Last fired: {new Date(w.lastFired).toLocaleString()}</div>}
               </div>
             ))}
           </div>
@@ -643,21 +643,21 @@ function WebhooksTab() {
 
       <Card>
         <h3 style={{ margin: "0 0 16px", fontSize: 16, fontWeight: 700 }}>Inbound Webhooks</h3>
-        <p style={{ fontSize: 12, color: "rgba(255,255,255,0.4)", marginTop: 0, marginBottom: 14 }}>
+        <p style={{ fontSize: 12, color: "rgba(var(--ink),0.4)", marginTop: 0, marginBottom: 14 }}>
           Receive data FROM Zapier/Make/n8n. Use the token URL in your automation tool.
         </p>
         <Btn onClick={createInboundToken} loading={loading}>+ Generate New Token</Btn>
         <div style={{ marginTop: 16 }}>
           {inbound.map(t => (
-            <div key={t.id} style={{ padding: "10px 12px", borderRadius: 8, background: "rgba(255,255,255,0.04)", marginBottom: 8 }}>
+            <div key={t.id} style={{ padding: "10px 12px", borderRadius: 8, background: "rgba(var(--ink),0.04)", marginBottom: 8 }}>
               <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 4 }}>{t.name}</div>
               <div style={{ fontSize: 11, color: "#a78bfa", wordBreak: "break-all" }}>
                 {typeof window !== "undefined" ? window.location.origin : ""}/api/automation/webhooks/inbound?token={t.token}
               </div>
-              <div style={{ fontSize: 11, color: "rgba(255,255,255,0.3)", marginTop: 4 }}>Hits: {t.hitCount}</div>
+              <div style={{ fontSize: 11, color: "rgba(var(--ink),0.3)", marginTop: 4 }}>Hits: {t.hitCount}</div>
             </div>
           ))}
-          {inbound.length === 0 && <p style={{ color: "rgba(255,255,255,0.3)", fontSize: 13 }}>No tokens yet</p>}
+          {inbound.length === 0 && <p style={{ color: "rgba(var(--ink),0.3)", fontSize: 13 }}>No tokens yet</p>}
         </div>
       </Card>
     </div>
@@ -706,7 +706,7 @@ function SheetsTab() {
 
       <Card>
         <h3 style={{ margin: "0 0 4px", fontSize: 16, fontWeight: 700 }}>Connect Google Sheets</h3>
-        <p style={{ fontSize: 12, color: "rgba(255,255,255,0.4)", marginTop: 0, marginBottom: 16 }}>
+        <p style={{ fontSize: 12, color: "rgba(var(--ink),0.4)", marginTop: 0, marginBottom: 16 }}>
           Uses a Google Service Account to write data directly to your spreadsheet.
         </p>
         {status?.configured && (
@@ -722,7 +722,7 @@ function SheetsTab() {
 
       <Card>
         <h3 style={{ margin: "0 0 16px", fontSize: 16, fontWeight: 700 }}>Sync Data</h3>
-        <p style={{ fontSize: 13, color: "rgba(255,255,255,0.5)", marginTop: 0, marginBottom: 20 }}>
+        <p style={{ fontSize: 13, color: "rgba(var(--ink),0.5)", marginTop: 0, marginBottom: 20 }}>
           Push your FinovaOS business data to Google Sheets with one click.
         </p>
         <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
@@ -731,18 +731,18 @@ function SheetsTab() {
             { action: "sync_inventory", label: "Sync Inventory", icon: "📦", desc: "Export inventory items to 'Inventory' sheet" },
             { action: "sync_contacts", label: "Sync Customers", icon: "🏢", desc: "Export all customers to 'Contacts' sheet" },
           ].map(item => (
-            <div key={item.action} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: isMobile ? "12px 10px" : "14px 16px", borderRadius: 10, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)" }}>
+            <div key={item.action} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: isMobile ? "12px 10px" : "14px 16px", borderRadius: 10, background: "rgba(var(--ink),0.04)", border: "1px solid rgba(var(--ink),0.07)" }}>
               <div>
                 <div style={{ fontSize: 14, fontWeight: 600 }}>{item.icon} {item.label}</div>
-                <div style={{ fontSize: 12, color: "rgba(255,255,255,0.4)", marginTop: 3 }}>{item.desc}</div>
+                <div style={{ fontSize: 12, color: "rgba(var(--ink),0.4)", marginTop: 3 }}>{item.desc}</div>
               </div>
               <Btn onClick={() => syncData(item.action)} loading={loading} style={{ flexShrink: 0 }}>Sync Now</Btn>
             </div>
           ))}
         </div>
 
-        <div style={{ marginTop: 20, padding: "14px", borderRadius: 10, background: "rgba(255,255,255,0.03)", fontSize: 12, color: "rgba(255,255,255,0.4)" }}>
-          <div style={{ fontWeight: 600, marginBottom: 6, color: "rgba(255,255,255,0.6)" }}>Setup Instructions</div>
+        <div style={{ marginTop: 20, padding: "14px", borderRadius: 10, background: "rgba(var(--ink),0.03)", fontSize: 12, color: "rgba(var(--ink),0.4)" }}>
+          <div style={{ fontWeight: 600, marginBottom: 6, color: "rgba(var(--ink),0.6)" }}>Setup Instructions</div>
           <ol style={{ margin: 0, paddingLeft: 16, lineHeight: 1.8 }}>
             <li>Go to Google Cloud Console → Service Accounts</li>
             <li>Create a service account and download JSON key</li>

@@ -211,16 +211,16 @@ export default function PayrollPage() {
       .label{font-weight:bold;color:#000}.amt{font-family:monospace}
       .footer{margin-top:40px;text-align:center;font-size:.8em;color:#000}
       .no-print{position:fixed;top:16px;right:16px;display:flex;gap:8px;z-index:999}
-      .no-print button{background:#111;color:#fff;border:none;padding:10px 18px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;box-shadow:0 4px 12px rgba(0,0,0,.2)}
+      .no-print button{background:var(--dk-111111, #111);color:#fff;border:none;padding:10px 18px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;box-shadow:0 4px 12px rgba(0,0,0,.2)}
       @media print{
         body{border:none;margin:0;padding:20mm;max-width:none}
         *{color:#000 !important;background:transparent !important;-webkit-print-color-adjust:exact !important}
-        .row{border-bottom:1px dashed #000}
+        .row{border-bottom:1px dashed var(--dkb-000000, #000)}
         .no-print{display:none}
       }
     </style></head><body>
     <div class="no-print"><button id="print-btn">🖨 Print / Save as PDF</button></div>
-    <div style="text-align:center;margin-bottom:30px;border-bottom:2px solid #000;padding-bottom:10px">
+    <div style="text-align:center;margin-bottom:30px;border-bottom:2px solid var(--dkb-000000, #000);padding-bottom:10px">
     ${companyName ? `<div style="font-weight:bold;font-size:1.15em;margin-bottom:6px">${companyName}</div>` : ""}
     <h1 style="margin:0">Payslip</h1><p style="margin:4px 0 0">Period: ${p.monthYear}</p></div>
     <div class="row"><span class="label">Employee ID:</span><span>${p.employee.employeeId}</span></div>
@@ -257,7 +257,7 @@ export default function PayrollPage() {
   const totalNeg     = payroll.reduce((s, p) => { const b = p.baseSalary + p.allowances - p.deductions - (p.additionalCash||0); return b < 0 ? s + b : s; }, 0);
 
   const panel: React.CSSProperties = { background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 12, padding: 20, fontFamily: ff };
-  const inp:   React.CSSProperties = { width: "100%", background: "rgba(255,255,255,0.05)", border: "1px solid var(--border)", borderRadius: 8, padding: "9px 12px", color: "var(--text-primary)", fontFamily: ff, fontSize: 14, outline: "none", boxSizing: "border-box" };
+  const inp:   React.CSSProperties = { width: "100%", background: "rgba(var(--ink),0.05)", border: "1px solid var(--border)", borderRadius: 8, padding: "9px 12px", color: "var(--text-primary)", fontFamily: ff, fontSize: 14, outline: "none", boxSizing: "border-box" };
   const lbl:   React.CSSProperties = { fontSize: 11, color: "var(--text-muted)", fontWeight: 700, marginBottom: 5, display: "block", textTransform: "uppercase", letterSpacing: 0.5 };
 
   return (
@@ -273,7 +273,7 @@ export default function PayrollPage() {
           <input type="month" value={monthYear} onChange={e => setMonthYear(e.target.value)}
             style={{ ...inp, width: "auto", padding: "8px 14px", fontWeight: 700, color: accent, borderColor: `${accent}44` }} />
           <button onClick={() => setShowPreview(true)}
-            style={{ background: "rgba(255,255,255,0.07)", color: "var(--text-primary)", border: "1px solid var(--border)", borderRadius: 8, padding: "9px 16px", fontFamily: ff, fontSize: 13, fontWeight: 700, cursor: "pointer" }}>
+            style={{ background: "rgba(var(--ink),0.07)", color: "var(--text-primary)", border: "1px solid var(--border)", borderRadius: 8, padding: "9px 16px", fontFamily: ff, fontSize: 13, fontWeight: 700, cursor: "pointer" }}>
             Preview
           </button>
           <button onClick={() => { if (!showPreview) { setShowPreview(true); setTimeout(() => window.print(), 300); } else window.print(); }}
@@ -464,7 +464,7 @@ export default function PayrollPage() {
                     </td>
                     <td style={{ padding: "12px 14px" }}>
                       <div style={{ display: "flex", gap: 6 }}>
-                        <button onClick={() => handlePrintPayslip(p)} style={{ background: "rgba(255,255,255,0.07)", border: "1px solid var(--border)", borderRadius: 6, padding: "4px 10px", fontSize: 12, color: "var(--text-muted)", cursor: "pointer", fontFamily: ff }}>Slip</button>
+                        <button onClick={() => handlePrintPayslip(p)} style={{ background: "rgba(var(--ink),0.07)", border: "1px solid var(--border)", borderRadius: 6, padding: "4px 10px", fontSize: 12, color: "var(--text-muted)", cursor: "pointer", fontFamily: ff }}>Slip</button>
                         <button onClick={() => handleEdit(p)} style={{ background: "transparent", border: "1px solid rgba(99,102,241,0.3)", borderRadius: 6, padding: "4px 10px", fontSize: 12, color: "#818cf8", cursor: "pointer", fontFamily: ff }}>Edit</button>
                         <button onClick={() => handleDelete(p.id)} style={{ background: "transparent", border: "1px solid rgba(248,113,113,0.3)", borderRadius: 6, padding: "4px 10px", fontSize: 12, color: "#f87171", cursor: "pointer", fontFamily: ff }}>Del</button>
                       </div>
@@ -475,7 +475,7 @@ export default function PayrollPage() {
             </tbody>
             {payroll.length > 0 && (
               <tfoot>
-                <tr style={{ borderTop: "2px solid var(--border)", background: "rgba(255,255,255,0.03)" }}>
+                <tr style={{ borderTop: "2px solid var(--border)", background: "rgba(var(--ink),0.03)" }}>
                   <td colSpan={2} style={{ padding: "12px 14px", fontSize: 12, fontWeight: 700, color: "var(--text-muted)", textTransform: "uppercase" }}>Totals</td>
                   <td style={{ padding: "12px 14px", fontSize: 13, fontWeight: 700, textAlign: "right" }}>{fmt(totalBasic)}</td>
                   <td style={{ padding: "12px 14px", fontSize: 13, fontWeight: 700, textAlign: "right", color: "#f87171" }}>-{fmt(totalDed)}</td>
@@ -505,14 +505,14 @@ export default function PayrollPage() {
           {/* Toolbar */}
           <div className="print-toolbar" style={{ display: "flex", width: "100%", maxWidth: 900, justifyContent: "space-between", marginBottom: 18, alignItems: "center" }}>
             <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-              <div style={{ color: "rgba(255,255,255,.5)", fontSize: 11, fontWeight: 700, letterSpacing: ".08em", textTransform: "uppercase", fontFamily: ff }}>Print Preview</div>
-              <div style={{ color: "#fff", fontSize: 15, fontWeight: 700, fontFamily: ff }}>{monthLabel}</div>
+              <div style={{ color: "rgba(var(--ink),.5)", fontSize: 11, fontWeight: 700, letterSpacing: ".08em", textTransform: "uppercase", fontFamily: ff }}>Print Preview</div>
+              <div style={{ color: "var(--ink-solid, #fff)", fontSize: 15, fontWeight: 700, fontFamily: ff }}>{monthLabel}</div>
             </div>
             <div style={{ display: "flex", gap: 8 }}>
               <button onClick={() => window.print()} style={{ background: "linear-gradient(135deg, #22c55e, #16a34a)", color: "#fff", border: "none", borderRadius: 10, padding: "10px 20px", fontFamily: ff, fontSize: 13, fontWeight: 700, cursor: "pointer", boxShadow: "0 6px 20px rgba(34, 197, 94, .35)" }}>
                 🖨️  Print Now
               </button>
-              <button onClick={() => setShowPreview(false)} style={{ background: "rgba(255,255,255,.08)", color: "#fff", border: "1px solid rgba(255,255,255,.14)", borderRadius: 10, padding: "10px 20px", fontFamily: ff, fontSize: 13, fontWeight: 700, cursor: "pointer" }}>
+              <button onClick={() => setShowPreview(false)} style={{ background: "rgba(var(--ink),.08)", color: "var(--ink-solid, #fff)", border: "1px solid rgba(var(--ink),.14)", borderRadius: 10, padding: "10px 20px", fontFamily: ff, fontSize: 13, fontWeight: 700, cursor: "pointer" }}>
                 ✕  Close
               </button>
             </div>
@@ -568,7 +568,7 @@ export default function PayrollPage() {
             boxShadow: "0 30px 80px rgba(0,0,0,.4)", borderRadius: 6, overflow: "hidden",
           }}>
             {/* Accent bar */}
-            <div style={{ height: 6, background: "#0f172a" }} />
+            <div style={{ height: 6, background: "var(--dk-0f172a, #0f172a)" }} />
 
             {/* Header */}
             <div style={{ padding: "32px 40px 24px", borderBottom: "1px solid #e2e8f0" }}>
@@ -623,7 +623,7 @@ export default function PayrollPage() {
                       { h: "Next Month", align: "right" },
                     ].map(({ h, align }) => (
                       <th key={h} style={{
-                        borderBottom: "2px solid #0f172a",
+                        borderBottom: "2px solid var(--dkb-0f172a, #0f172a)",
                         padding: "10px 8px",
                         textAlign: align as any,
                         fontSize: 10,
@@ -660,7 +660,7 @@ export default function PayrollPage() {
                   })}
                 </tbody>
                 <tfoot>
-                  <tr style={{ background: "#0f172a", color: "#fff" }}>
+                  <tr style={{ background: "var(--dk-0f172a, #0f172a)", color: "var(--ink-solid, #fff)" }}>
                     <td colSpan={2} style={{ padding: "12px 8px", textAlign: "right", fontSize: 11, fontWeight: 800, letterSpacing: ".06em", textTransform: "uppercase" }}>Totals</td>
                     <td style={{ padding: "12px 8px", textAlign: "right", fontWeight: 800, fontVariantNumeric: "tabular-nums" }}>{fmt(totalBasic)}</td>
                     <td style={{ padding: "12px 8px", textAlign: "right", fontWeight: 800, fontVariantNumeric: "tabular-nums" }}>-{fmt(totalDed)}</td>
@@ -679,7 +679,7 @@ export default function PayrollPage() {
                 {["Prepared by", "Checked by", "Approved by"].map((label) => (
                   <div key={label} style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
                     <div style={{ height: 56 }} />
-                    <div style={{ width: "100%", borderTop: "1.5px solid #0f172a" }} />
+                    <div style={{ width: "100%", borderTop: "1.5px solid var(--dkb-0f172a, #0f172a)" }} />
                     <div style={{ fontSize: 11, fontWeight: 700, color: "#0f172a", marginTop: 8 }}>{label}</div>
                   </div>
                 ))}

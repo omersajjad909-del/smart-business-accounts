@@ -9,8 +9,8 @@ import { useResponsive } from "@/hooks/useResponsive";
 const bg = "rgba(255,255,255,.03)";
 const border = "rgba(255,255,255,.07)";
 const inp: React.CSSProperties = {
-  width: "100%", background: "rgba(255,255,255,.05)", border: "1px solid rgba(255,255,255,.1)",
-  borderRadius: 8, padding: "9px 12px", color: "#fff", fontSize: 14, boxSizing: "border-box",
+  width: "100%", background: "rgba(var(--ink),.05)", border: "1px solid rgba(var(--ink),.1)",
+  borderRadius: 8, padding: "9px 12px", color: "var(--ink-solid, #fff)", fontSize: 14, boxSizing: "border-box",
 };
 
 const STATUS_FLOW = ["pickup_pending", "washing", "ironing", "ready", "delivered"] as const;
@@ -83,7 +83,7 @@ export default function LaundryPage() {
   }
 
   return (
-    <div style={{ minHeight: "100vh", padding: isMobile ? "15px 14px" : "28px 32px", color: "#fff", fontFamily: hotelFont }}>
+    <div style={{ minHeight: "100vh", padding: isMobile ? "15px 14px" : "28px 32px", color: "var(--ink-solid, #fff)", fontFamily: hotelFont }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24 }}>
         <div>
           <h1 style={{ margin: "0 0 4px", fontSize: 22, fontWeight: 800 }}>🧺 Laundry Management</h1>
@@ -124,7 +124,7 @@ export default function LaundryPage() {
               const sc = STATUS_CONFIG[item.status] || STATUS_CONFIG.pickup_pending;
               const isLast = item.status === "delivered";
               return (
-                <tr key={item.id} style={{ borderBottom: "1px solid rgba(255,255,255,.04)" }}>
+                <tr key={item.id} style={{ borderBottom: "1px solid rgba(var(--ink),.04)" }}>
                   <td style={{ padding: "12px 16px", fontWeight: 600 }}>{item.guest}</td>
                   <td style={{ padding: "12px 16px" }}>
                     <span style={{ background: "rgba(99,102,241,.12)", color: "#a5b4fc", borderRadius: 5, padding: "2px 8px", fontSize: 11, fontWeight: 700 }}>Room {item.room}</span>
@@ -166,7 +166,7 @@ export default function LaundryPage() {
       {/* Modal */}
       {showModal && (
         <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.75)", backdropFilter: "blur(6px)", zIndex: 50, display: "flex", alignItems: "center", justifyContent: "center" }}>
-          <div style={{ background: "#161b27", border: `1px solid ${border}`, borderRadius: 16, padding: 32, width: 460, fontFamily: hotelFont }}>
+          <div style={{ background: "var(--dk-161b27, #161b27)", border: `1px solid ${border}`, borderRadius: 16, padding: 32, width: 460, fontFamily: hotelFont }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
               <h2 style={{ margin: 0, fontSize: 17, fontWeight: 700 }}>{editId ? "✏️ Edit Order" : "🧺 New Laundry Order"}</h2>
               <button onClick={() => setShowModal(false)} style={{ background: "none", border: "none", color: hotelMuted, fontSize: 22, cursor: "pointer" }}>✕</button>

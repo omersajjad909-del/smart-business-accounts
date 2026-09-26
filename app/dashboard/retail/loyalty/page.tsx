@@ -159,11 +159,11 @@ export default function LoyaltyPage() {
   };
 
   return (
-    <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", fontFamily: ff, color: "#fff", minHeight: "100vh" }}>
+    <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", fontFamily: ff, color: "var(--ink-solid, #fff)", minHeight: "100vh" }}>
       <style>{`
-        .lc-row:hover { background: rgba(255,255,255,.03) !important; }
+        .lc-row:hover { background: rgba(var(--ink),.03) !important; }
         .lc-btn:hover { opacity: .8; }
-        .lc-input { background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.1); border-radius: 8px; padding: 8px 12px; color: #fff; font-size: 13px; font-family: ${ff}; outline: none; width: 100%; box-sizing: border-box; }
+        .lc-input { background: rgba(var(--ink),.04); border: 1px solid rgba(var(--ink),.1); border-radius: 8px; padding: 8px 12px; color: #fff; font-size: 13px; font-family: ${ff}; outline: none; width: 100%; box-sizing: border-box; }
         .lc-input:focus { border-color: rgba(99,102,241,.45); }
       `}</style>
 
@@ -171,11 +171,11 @@ export default function LoyaltyPage() {
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 24 }}>
         <div>
           <h1 style={{ fontSize: 22, fontWeight: 800, margin: "0 0 4px" }}>🎁 Loyalty Program</h1>
-          <p style={{ fontSize: 13, color: "rgba(255,255,255,.4)", margin: 0 }}>Register customers, track points &amp; manage redemptions</p>
+          <p style={{ fontSize: 13, color: "rgba(var(--ink),.4)", margin: 0 }}>Register customers, track points &amp; manage redemptions</p>
         </div>
         <div style={{ display: "flex", gap: 10 }}>
           <button onClick={() => { setShowConfig(v => !v); setConfigDraft({ ...config }); }} className="lc-btn"
-            style={{ padding: "9px 18px", borderRadius: 9, border: `1px solid ${showConfig ? "rgba(99,102,241,.4)" : "rgba(255,255,255,.12)"}`, background: showConfig ? "rgba(99,102,241,.15)" : "rgba(255,255,255,.05)", color: showConfig ? "#818cf8" : "rgba(255,255,255,.7)", fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: ff }}>
+            style={{ padding: "9px 18px", borderRadius: 9, border: `1px solid ${showConfig ? "rgba(99,102,241,.4)" : "rgba(var(--ink),.12)"}`, background: showConfig ? "rgba(99,102,241,.15)" : "rgba(var(--ink),.05)", color: showConfig ? "#818cf8" : "rgba(var(--ink),.7)", fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: ff }}>
             ⚙ Settings
           </button>
           <button onClick={() => { setShowRegister(true); setRegForm({ name: "", phone: "" }); setRegError(""); }} className="lc-btn"
@@ -193,8 +193,8 @@ export default function LoyaltyPage() {
           { label: "Total Redeemed", value: `${totalRedeemed.toLocaleString()} pts`, color: "#34d399", icon: "🔄" },
           { label: "Total Customer Spend", value: `Rs. ${totalSpent.toLocaleString()}`, color: "#a5b4fc", icon: "💰" },
         ].map(s => (
-          <div key={s.label} style={{ background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)", borderRadius: 14, padding: isMobile ? "12px 10px" : "18px 20px" }}>
-            <div style={{ fontSize: 13, color: "rgba(255,255,255,.45)", marginBottom: 6 }}>{s.icon} {s.label}</div>
+          <div key={s.label} style={{ background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.07)", borderRadius: 14, padding: isMobile ? "12px 10px" : "18px 20px" }}>
+            <div style={{ fontSize: 13, color: "rgba(var(--ink),.45)", marginBottom: 6 }}>{s.icon} {s.label}</div>
             <div style={{ fontSize: 22, fontWeight: 800, color: s.color }}>{s.value}</div>
           </div>
         ))}
@@ -216,20 +216,20 @@ export default function LoyaltyPage() {
               { label: "Points Expiry (days)", key: "expiryDays", type: "number", hint: "0 = never expire" },
             ].map(f => (
               <div key={f.key}>
-                <label style={{ display: "block", fontSize: 11, color: "rgba(255,255,255,.45)", marginBottom: 5 }}>{f.label}</label>
+                <label style={{ display: "block", fontSize: 11, color: "rgba(var(--ink),.45)", marginBottom: 5 }}>{f.label}</label>
                 <input type={f.type} className="lc-input"
                   value={String((configDraft as Record<string, unknown>)[f.key] ?? "")}
                   onChange={e => setConfigDraft(d => ({ ...d, [f.key]: f.type === "number" ? Number(e.target.value) : e.target.value }))} />
-                <div style={{ fontSize: 10, color: "rgba(255,255,255,.25)", marginTop: 3 }}>{f.hint}</div>
+                <div style={{ fontSize: 10, color: "rgba(var(--ink),.25)", marginTop: 3 }}>{f.hint}</div>
               </div>
             ))}
             <div>
-              <label style={{ display: "block", fontSize: 11, color: "rgba(255,255,255,.45)", marginBottom: 5 }}>Program Status</label>
+              <label style={{ display: "block", fontSize: 11, color: "rgba(var(--ink),.45)", marginBottom: 5 }}>Program Status</label>
               <button onClick={() => setConfigDraft(d => ({ ...d, enabled: !d.enabled }))}
-                style={{ padding: "8px 18px", borderRadius: 8, border: `1.5px solid ${configDraft.enabled ? "rgba(52,211,153,.4)" : "rgba(255,255,255,.15)"}`, background: configDraft.enabled ? "rgba(52,211,153,.12)" : "rgba(255,255,255,.04)", color: configDraft.enabled ? "#34d399" : "rgba(255,255,255,.45)", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: ff }}>
+                style={{ padding: "8px 18px", borderRadius: 8, border: `1.5px solid ${configDraft.enabled ? "rgba(52,211,153,.4)" : "rgba(var(--ink),.15)"}`, background: configDraft.enabled ? "rgba(52,211,153,.12)" : "rgba(var(--ink),.04)", color: configDraft.enabled ? "#34d399" : "rgba(var(--ink),.45)", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: ff }}>
                 {configDraft.enabled ? "✓ Enabled" : "○ Disabled"}
               </button>
-              <div style={{ fontSize: 10, color: "rgba(255,255,255,.25)", marginTop: 3 }}>Toggle loyalty program on/off</div>
+              <div style={{ fontSize: 10, color: "rgba(var(--ink),.25)", marginTop: 3 }}>Toggle loyalty program on/off</div>
             </div>
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
@@ -238,7 +238,7 @@ export default function LoyaltyPage() {
               {savingConfig ? "Saving..." : "Save Settings"}
             </button>
             <button onClick={() => { setShowConfig(false); setConfigDraft({ ...config }); setConfigError(""); }} className="lc-btn"
-              style={{ padding: "9px 18px", borderRadius: 8, border: "1px solid rgba(255,255,255,.1)", background: "transparent", color: "rgba(255,255,255,.5)", fontSize: 13, cursor: "pointer", fontFamily: ff }}>
+              style={{ padding: "9px 18px", borderRadius: 8, border: "1px solid rgba(var(--ink),.1)", background: "transparent", color: "rgba(var(--ink),.5)", fontSize: 13, cursor: "pointer", fontFamily: ff }}>
               Cancel
             </button>
             {configError && (
@@ -256,33 +256,33 @@ export default function LoyaltyPage() {
             <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
           </svg>
           <input value={searchQ} onChange={e => setSearchQ(e.target.value)} placeholder="Search by name, phone, or card no..."
-            style={{ width: "100%", boxSizing: "border-box" as const, paddingLeft: 36, paddingRight: 12, paddingTop: 9, paddingBottom: 9, background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.1)", borderRadius: 9, color: "#fff", fontSize: 13, fontFamily: ff, outline: "none" }} />
+            style={{ width: "100%", boxSizing: "border-box" as const, paddingLeft: 36, paddingRight: 12, paddingTop: 9, paddingBottom: 9, background: "rgba(var(--ink),.04)", border: "1px solid rgba(var(--ink),.1)", borderRadius: 9, color: "var(--ink-solid, #fff)", fontSize: 13, fontFamily: ff, outline: "none" }} />
         </div>
       </div>
 
       {/* Customer Table */}
-      <div style={{ background: "rgba(255,255,255,.02)", border: "1px solid rgba(255,255,255,.07)", borderRadius: 14, overflow: "hidden" }}>
+      <div style={{ background: "rgba(var(--ink),.02)", border: "1px solid rgba(var(--ink),.07)", borderRadius: 14, overflow: "hidden" }}>
         <table style={{ width: "100%", borderCollapse: "collapse" }}>
           <thead>
-            <tr style={{ background: "rgba(255,255,255,.03)" }}>
+            <tr style={{ background: "rgba(var(--ink),.03)" }}>
               {["Customer", "Card No.", "Phone", "Points", "Total Spent", "Last Purchase", "Actions"].map(h => (
-                <th key={h} style={{ textAlign: "left", padding: "11px 16px", fontSize: 11, color: "rgba(255,255,255,.4)", borderBottom: "1px solid rgba(255,255,255,.07)", fontWeight: 700, letterSpacing: ".05em", textTransform: "uppercase" }}>{h}</th>
+                <th key={h} style={{ textAlign: "left", padding: "11px 16px", fontSize: 11, color: "rgba(var(--ink),.4)", borderBottom: "1px solid rgba(var(--ink),.07)", fontWeight: 700, letterSpacing: ".05em", textTransform: "uppercase" }}>{h}</th>
               ))}
             </tr>
           </thead>
           <tbody>
             {loading && (
-              <tr><td colSpan={7} style={{ padding: "40px 0", textAlign: "center", color: "rgba(255,255,255,.3)", fontSize: 13 }}>Loading...</td></tr>
+              <tr><td colSpan={7} style={{ padding: "40px 0", textAlign: "center", color: "rgba(var(--ink),.3)", fontSize: 13 }}>Loading...</td></tr>
             )}
             {!loading && filtered.length === 0 && (
-              <tr><td colSpan={7} style={{ padding: "48px 0", textAlign: "center", color: "rgba(255,255,255,.25)" }}>
+              <tr><td colSpan={7} style={{ padding: "48px 0", textAlign: "center", color: "rgba(var(--ink),.25)" }}>
                 <div style={{ fontSize: 32, marginBottom: 8 }}>🎁</div>
                 <div style={{ fontSize: 13, marginBottom: 4 }}>{searchQ ? "No customers match your search." : "No loyalty customers registered yet."}</div>
-                {!searchQ && <div style={{ fontSize: 12, color: "rgba(255,255,255,.2)" }}>Click "Register Customer" to get started.</div>}
+                {!searchQ && <div style={{ fontSize: 12, color: "rgba(var(--ink),.2)" }}>Click "Register Customer" to get started.</div>}
               </td></tr>
             )}
             {filtered.map(c => (
-              <tr key={c.id} className="lc-row" style={{ borderBottom: "1px solid rgba(255,255,255,.04)", cursor: "pointer" }} onClick={() => setDetailId(c.id)}>
+              <tr key={c.id} className="lc-row" style={{ borderBottom: "1px solid rgba(var(--ink),.04)", cursor: "pointer" }} onClick={() => setDetailId(c.id)}>
                 <td style={{ padding: "13px 16px" }}>
                   <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
                     <div style={{ width: 32, height: 32, borderRadius: "50%", background: "rgba(99,102,241,.2)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 800, color: "#818cf8", flexShrink: 0 }}>{c.name.charAt(0).toUpperCase()}</div>
@@ -290,15 +290,15 @@ export default function LoyaltyPage() {
                   </div>
                 </td>
                 <td style={{ padding: "13px 16px", fontSize: 12, color: "#f59e0b", fontWeight: 700 }}>{c.cardNo || "—"}</td>
-                <td style={{ padding: "13px 16px", fontSize: 13, color: "rgba(255,255,255,.6)" }}>{c.phone}</td>
+                <td style={{ padding: "13px 16px", fontSize: 13, color: "rgba(var(--ink),.6)" }}>{c.phone}</td>
                 <td style={{ padding: "13px 16px" }}>
                   <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
                     <span style={{ fontSize: 14, fontWeight: 800, color: "#f59e0b" }}>{c.points.toLocaleString()}</span>
-                    <span style={{ fontSize: 10, color: "rgba(255,255,255,.3)" }}>pts</span>
+                    <span style={{ fontSize: 10, color: "rgba(var(--ink),.3)" }}>pts</span>
                   </div>
                 </td>
-                <td style={{ padding: "13px 16px", fontSize: 12, color: "rgba(255,255,255,.5)" }}>Rs. {c.totalSpent.toLocaleString()}</td>
-                <td style={{ padding: "13px 16px", fontSize: 12, color: "rgba(255,255,255,.4)" }}>{dateStr(c.lastPurchase)}</td>
+                <td style={{ padding: "13px 16px", fontSize: 12, color: "rgba(var(--ink),.5)" }}>Rs. {c.totalSpent.toLocaleString()}</td>
+                <td style={{ padding: "13px 16px", fontSize: 12, color: "rgba(var(--ink),.4)" }}>{dateStr(c.lastPurchase)}</td>
                 <td style={{ padding: "13px 16px" }} onClick={e => e.stopPropagation()}>
                   <div style={{ display: "flex", gap: 6 }}>
                     <button onClick={() => setDetailId(c.id)} className="lc-btn"
@@ -322,25 +322,25 @@ export default function LoyaltyPage() {
         <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.72)", backdropFilter: "blur(6px)", zIndex: 50, display: "flex", alignItems: "center", justifyContent: "center" }}
           onClick={() => setShowRegister(false)}>
           <div onClick={e => e.stopPropagation()}
-            style={{ background: "#111c30", border: "1px solid rgba(255,255,255,.1)", borderRadius: 18, padding: isMobile ? "15px 14px" : "28px 32px", width: "min(96vw,440px)", fontFamily: ff }}>
+            style={{ background: "var(--dk-111c30, #111c30)", border: "1px solid rgba(var(--ink),.1)", borderRadius: 18, padding: isMobile ? "15px 14px" : "28px 32px", width: "min(96vw,440px)", fontFamily: ff }}>
             <div style={{ fontSize: 17, fontWeight: 800, marginBottom: 6 }}>Register New Customer</div>
-            <div style={{ fontSize: 12, color: "rgba(255,255,255,.4)", marginBottom: 22 }}>A loyalty card number will be auto-generated.</div>
+            <div style={{ fontSize: 12, color: "rgba(var(--ink),.4)", marginBottom: 22 }}>A loyalty card number will be auto-generated.</div>
             {regError && (
               <div style={{ marginBottom: 14, padding: "9px 12px", borderRadius: 8, background: "rgba(239,68,68,.1)", border: "1px solid rgba(239,68,68,.25)", color: "#fca5a5", fontSize: 12 }}>{regError}</div>
             )}
             <div style={{ marginBottom: 16 }}>
-              <label style={{ display: "block", fontSize: 12, color: "rgba(255,255,255,.45)", marginBottom: 6 }}>Full Name *</label>
+              <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),.45)", marginBottom: 6 }}>Full Name *</label>
               <input className="lc-input" placeholder="e.g. Ahmed Ali" value={regForm.name}
                 onChange={e => setRegForm(f => ({ ...f, name: e.target.value }))}
                 onKeyDown={e => e.key === "Enter" && registerCustomer()} autoFocus />
             </div>
             <div style={{ marginBottom: 20 }}>
-              <label style={{ display: "block", fontSize: 12, color: "rgba(255,255,255,.45)", marginBottom: 6 }}>Phone Number *</label>
+              <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),.45)", marginBottom: 6 }}>Phone Number *</label>
               <input className="lc-input" placeholder="e.g. 03001234567" value={regForm.phone}
                 onChange={e => setRegForm(f => ({ ...f, phone: e.target.value }))}
                 onKeyDown={e => e.key === "Enter" && registerCustomer()} />
             </div>
-            <div style={{ padding: "12px 14px", background: "rgba(245,158,11,.07)", border: "1px solid rgba(245,158,11,.18)", borderRadius: 9, marginBottom: 20, fontSize: 12, color: "rgba(255,255,255,.55)" }}>
+            <div style={{ padding: "12px 14px", background: "rgba(245,158,11,.07)", border: "1px solid rgba(245,158,11,.18)", borderRadius: 9, marginBottom: 20, fontSize: 12, color: "rgba(var(--ink),.55)" }}>
               Card will be generated: <span style={{ fontWeight: 700, color: "#f59e0b" }}>{generateCardNo()}</span>
             </div>
             <div style={{ display: "flex", gap: 10 }}>
@@ -349,7 +349,7 @@ export default function LoyaltyPage() {
                 {registering ? "Registering..." : "Register Customer"}
               </button>
               <button onClick={() => setShowRegister(false)} className="lc-btn"
-                style={{ padding: "11px 22px", background: "transparent", border: "1px solid rgba(255,255,255,.1)", borderRadius: 9, color: "rgba(255,255,255,.5)", fontSize: 13, cursor: "pointer", fontFamily: ff }}>
+                style={{ padding: "11px 22px", background: "transparent", border: "1px solid rgba(var(--ink),.1)", borderRadius: 9, color: "rgba(var(--ink),.5)", fontSize: 13, cursor: "pointer", fontFamily: ff }}>
                 Cancel
               </button>
             </div>
@@ -362,30 +362,30 @@ export default function LoyaltyPage() {
         <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.75)", backdropFilter: "blur(6px)", zIndex: 55, display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}
           onClick={() => setDetailId(null)}>
           <div onClick={e => e.stopPropagation()}
-            style={{ background: "#111c30", border: "1px solid rgba(255,255,255,.1)", borderRadius: 18, width: "min(96vw,580px)", maxHeight: "85vh", overflow: "hidden", display: "flex", flexDirection: "column", fontFamily: ff }}>
+            style={{ background: "var(--dk-111c30, #111c30)", border: "1px solid rgba(var(--ink),.1)", borderRadius: 18, width: "min(96vw,580px)", maxHeight: "85vh", overflow: "hidden", display: "flex", flexDirection: "column", fontFamily: ff }}>
             {/* Header */}
-            <div style={{ padding: isMobile ? "12px 10px" : "18px 22px", borderBottom: "1px solid rgba(255,255,255,.08)", display: "flex", justifyContent: "space-between", alignItems: "center", flexShrink: 0 }}>
+            <div style={{ padding: isMobile ? "12px 10px" : "18px 22px", borderBottom: "1px solid rgba(var(--ink),.08)", display: "flex", justifyContent: "space-between", alignItems: "center", flexShrink: 0 }}>
               <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
                 <div style={{ width: 44, height: 44, borderRadius: "50%", background: "rgba(99,102,241,.2)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, fontWeight: 800, color: "#818cf8" }}>
                   {detailCustomer.name.charAt(0).toUpperCase()}
                 </div>
                 <div>
                   <div style={{ fontSize: 17, fontWeight: 800 }}>{detailCustomer.name}</div>
-                  <div style={{ fontSize: 12, color: "rgba(255,255,255,.4)", marginTop: 1 }}>{detailCustomer.phone} · Card: <span style={{ color: "#f59e0b" }}>{detailCustomer.cardNo}</span></div>
+                  <div style={{ fontSize: 12, color: "rgba(var(--ink),.4)", marginTop: 1 }}>{detailCustomer.phone} · Card: <span style={{ color: "#f59e0b" }}>{detailCustomer.cardNo}</span></div>
                 </div>
               </div>
-              <button onClick={() => setDetailId(null)} style={{ background: "none", border: "none", color: "rgba(255,255,255,.4)", fontSize: 22, cursor: "pointer" }}>✕</button>
+              <button onClick={() => setDetailId(null)} style={{ background: "none", border: "none", color: "rgba(var(--ink),.4)", fontSize: 22, cursor: "pointer" }}>✕</button>
             </div>
 
             {/* Stats */}
-            <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr 1fr", gap: 0, borderBottom: "1px solid rgba(255,255,255,.07)", flexShrink: 0 }}>
+            <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr 1fr", gap: 0, borderBottom: "1px solid rgba(var(--ink),.07)", flexShrink: 0 }}>
               {[
                 { label: "Points Balance", value: `${detailCustomer.points.toLocaleString()} pts`, color: "#f59e0b" },
                 { label: "Total Spent", value: `Rs. ${detailCustomer.totalSpent.toLocaleString()}`, color: "#a5b4fc" },
                 { label: "Last Purchase", value: dateStr(detailCustomer.lastPurchase), color: "#34d399" },
               ].map((s, i) => (
-                <div key={s.label} style={{ padding: isMobile ? "12px 10px" : "14px 18px", borderRight: i < 2 ? "1px solid rgba(255,255,255,.06)" : "none" }}>
-                  <div style={{ fontSize: 10, color: "rgba(255,255,255,.35)", marginBottom: 4, textTransform: "uppercase", letterSpacing: ".07em" }}>{s.label}</div>
+                <div key={s.label} style={{ padding: isMobile ? "12px 10px" : "14px 18px", borderRight: i < 2 ? "1px solid rgba(var(--ink),.06)" : "none" }}>
+                  <div style={{ fontSize: 10, color: "rgba(var(--ink),.35)", marginBottom: 4, textTransform: "uppercase", letterSpacing: ".07em" }}>{s.label}</div>
                   <div style={{ fontSize: 16, fontWeight: 800, color: s.color }}>{s.value}</div>
                 </div>
               ))}
@@ -393,17 +393,17 @@ export default function LoyaltyPage() {
 
             {/* History */}
             <div style={{ flex: 1, overflowY: "auto", padding: isMobile ? "12px 10px" : "14px 20px" }}>
-              <div style={{ fontSize: 12, color: "rgba(255,255,255,.4)", marginBottom: 10, fontWeight: 600 }}>Transaction History ({detailCustomer.history.length})</div>
+              <div style={{ fontSize: 12, color: "rgba(var(--ink),.4)", marginBottom: 10, fontWeight: 600 }}>Transaction History ({detailCustomer.history.length})</div>
               {detailCustomer.history.length === 0 ? (
-                <div style={{ textAlign: "center", padding: "28px 0", color: "rgba(255,255,255,.25)", fontSize: 13 }}>No transactions yet</div>
+                <div style={{ textAlign: "center", padding: "28px 0", color: "rgba(var(--ink),.25)", fontSize: 13 }}>No transactions yet</div>
               ) : [...detailCustomer.history].reverse().map((h, i) => (
-                <div key={i} style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 12px", marginBottom: 6, background: "rgba(255,255,255,.02)", border: "1px solid rgba(255,255,255,.05)", borderRadius: 9 }}>
+                <div key={i} style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 12px", marginBottom: 6, background: "rgba(var(--ink),.02)", border: "1px solid rgba(var(--ink),.05)", borderRadius: 9 }}>
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{ fontSize: 12, fontWeight: 700, color: "#e2e8f0" }}>{h.saleRef}</div>
-                    <div style={{ fontSize: 11, color: "rgba(255,255,255,.35)", marginTop: 1 }}>{dateStr(h.date)}</div>
+                    <div style={{ fontSize: 11, color: "rgba(var(--ink),.35)", marginTop: 1 }}>{dateStr(h.date)}</div>
                   </div>
                   <div style={{ textAlign: "right", flexShrink: 0 }}>
-                    <div style={{ fontSize: 11, color: "rgba(255,255,255,.4)" }}>Rs. {(h.amount || 0).toLocaleString()}</div>
+                    <div style={{ fontSize: 11, color: "rgba(var(--ink),.4)" }}>Rs. {(h.amount || 0).toLocaleString()}</div>
                     <div style={{ display: "flex", gap: 8, justifyContent: "flex-end", marginTop: 2 }}>
                       {h.earned > 0 && <span style={{ fontSize: 11, fontWeight: 700, color: "#34d399" }}>+{h.earned} pts</span>}
                       {h.redeemed > 0 && <span style={{ fontSize: 11, fontWeight: 700, color: "#f87171" }}>−{h.redeemed} pts</span>}

@@ -68,17 +68,17 @@ export default function SupplierStatementPage() {
   );
 
   const inputStyle: React.CSSProperties = {
-    background: "rgba(255,255,255,.06)", border: "1px solid rgba(255,255,255,.12)",
-    borderRadius: 8, color: "rgba(255,255,255,.85)", padding: "10px 14px",
+    background: "rgba(var(--ink),.06)", border: "1px solid rgba(var(--ink),.12)",
+    borderRadius: 8, color: "rgba(var(--ink),.85)", padding: "10px 14px",
     fontSize: 13, fontFamily: FONT, outline: "none", width: "100%", boxSizing: "border-box",
   };
   const labelStyle: React.CSSProperties = {
-    fontSize: 10, fontWeight: 700, color: "rgba(255,255,255,.35)",
+    fontSize: 10, fontWeight: 700, color: "rgba(var(--ink),.35)",
     letterSpacing: ".08em", textTransform: "uppercase", marginBottom: 6, display: "block",
   };
 
   return (
-    <div style={{ fontFamily: FONT, color: "rgba(255,255,255,.85)" }}>
+    <div style={{ fontFamily: FONT, color: "rgba(var(--ink),.85)" }}>
 
       {/* ── MODAL ── */}
       {showModal && (
@@ -88,14 +88,14 @@ export default function SupplierStatementPage() {
           display: "flex", alignItems: "center", justifyContent: "center", padding: 24,
         }}>
           <div style={{
-            background: "linear-gradient(145deg,#0f1a35,#0b1225)",
+            background: "linear-gradient(145deg,var(--dk-0f1a35, #0f1a35),var(--dk-0b1225, #0b1225))",
             border: "1px solid rgba(139,92,246,.25)",
             borderRadius: 18, padding: isMobile ? "20px 18px" : "36px 40px", width: "100%", maxWidth: 480,
             boxShadow: "0 32px 80px rgba(0,0,0,.6)", position: "relative",
           }}>
             <button style={{
               position: "absolute", top: 14, right: 16, background: "none", border: "none",
-              color: "rgba(255,255,255,.35)", fontSize: 20, cursor: "pointer", lineHeight: 1,
+              color: "rgba(var(--ink),.35)", fontSize: 20, cursor: "pointer", lineHeight: 1,
               padding: 4, borderRadius: 6, fontFamily: "inherit",
             }} onClick={() => setShowModal(false)}>✕</button>
             <div style={{ marginBottom: 28 }}>
@@ -103,7 +103,7 @@ export default function SupplierStatementPage() {
                 <div style={{ width: 4, height: 24, borderRadius: 2, background: "linear-gradient(180deg,#a78bfa,#8b5cf6)" }}/>
                 <h2 style={{ margin: 0, fontSize: 20, fontWeight: 800 }}>Supplier Statement</h2>
               </div>
-              <p style={{ margin: 0, fontSize: 12, color: "rgba(255,255,255,.3)", paddingLeft: 14 }}>
+              <p style={{ margin: 0, fontSize: 12, color: "rgba(var(--ink),.3)", paddingLeft: 14 }}>
                 Select date range and supplier to generate statement
               </p>
             </div>
@@ -135,28 +135,28 @@ export default function SupplierStatementPage() {
               {selected && (
                 <button onClick={() => { setSelected(null); setSearch(""); }} style={{
                   position: "absolute", right: 10, top: "50%", transform: "translateY(-50%)",
-                  background: "none", border: "none", color: "rgba(255,255,255,.4)", cursor: "pointer", fontSize: 16,
+                  background: "none", border: "none", color: "rgba(var(--ink),.4)", cursor: "pointer", fontSize: 16,
                 }}>×</button>
               )}
               {dropOpen && !selected && (
                 <div style={{
                   position: "absolute", top: "100%", left: 0, right: 0, zIndex: 100,
-                  background: "#0f1a35", border: "1px solid rgba(139,92,246,.3)",
+                  background: "var(--dk-0f1a35, #0f1a35)", border: "1px solid rgba(139,92,246,.3)",
                   borderRadius: 8, marginTop: 4, maxHeight: 200, overflowY: "auto",
                   boxShadow: "0 16px 40px rgba(0,0,0,.5)",
                 }}>
                   {filtered.length === 0 ? (
-                    <div style={{ padding: 14, textAlign: "center", color: "rgba(255,255,255,.25)", fontSize: 12 }}>No suppliers found</div>
+                    <div style={{ padding: 14, textAlign: "center", color: "rgba(var(--ink),.25)", fontSize: 12 }}>No suppliers found</div>
                   ) : filtered.map(s => (
                     <div key={s.id} onMouseDown={() => { setSelected(s); setSearch(""); setDropOpen(false); }} style={{
                       padding: "10px 14px", cursor: "pointer", fontSize: 13,
-                      color: "rgba(255,255,255,.75)", borderBottom: "1px solid rgba(255,255,255,.04)",
+                      color: "rgba(var(--ink),.75)", borderBottom: "1px solid rgba(var(--ink),.04)",
                     }}
                       onMouseEnter={e => e.currentTarget.style.background = "rgba(139,92,246,.15)"}
                       onMouseLeave={e => e.currentTarget.style.background = "transparent"}
                     >
                       <div>{s.name}</div>
-                      {s.phone && <div style={{ fontSize: 11, color: "rgba(255,255,255,.3)" }}>{s.phone}</div>}
+                      {s.phone && <div style={{ fontSize: 11, color: "rgba(var(--ink),.3)" }}>{s.phone}</div>}
                     </div>
                   ))}
                 </div>
@@ -167,8 +167,8 @@ export default function SupplierStatementPage() {
             <button onClick={generate} disabled={!selected} style={{
               width: "100%", padding: 12, borderRadius: 10, border: "none",
               cursor: selected ? "pointer" : "not-allowed",
-              background: selected ? "linear-gradient(135deg,#8b5cf6,#7c3aed)" : "rgba(255,255,255,.08)",
-              color: selected ? "white" : "rgba(255,255,255,.3)",
+              background: selected ? "linear-gradient(135deg,#8b5cf6,#7c3aed)" : "rgba(var(--ink),.08)",
+              color: selected ? "white" : "rgba(var(--ink),.3)",
               fontSize: 14, fontWeight: 700, fontFamily: FONT,
             }}>Generate Statement →</button>
           </div>
@@ -185,8 +185,8 @@ export default function SupplierStatementPage() {
             </div>
             <div style={{ display: "flex", gap: 10 }}>
               <button onClick={() => { setShowModal(true); setStatement(null); }} style={{
-                padding: "8px 18px", borderRadius: 8, border: "1px solid rgba(255,255,255,.12)",
-                cursor: "pointer", background: "rgba(255,255,255,.04)", color: "rgba(255,255,255,.6)",
+                padding: "8px 18px", borderRadius: 8, border: "1px solid rgba(var(--ink),.12)",
+                cursor: "pointer", background: "rgba(var(--ink),.04)", color: "rgba(var(--ink),.6)",
                 fontSize: 12, fontWeight: 600, fontFamily: FONT,
               }}>⟵ Change Supplier</button>
               <button onClick={() => window.print()} style={{
@@ -198,46 +198,46 @@ export default function SupplierStatementPage() {
           </div>
 
           <div id="stmt-printable" style={{
-            background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.08)",
+            background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.08)",
             borderRadius: 16, overflow: "hidden",
           }}>
             {/* Header */}
             <div style={{
               padding: "32px 36px 28px",
               background: "linear-gradient(135deg,rgba(139,92,246,.12) 0%,rgba(109,40,217,.06) 100%)",
-              borderBottom: "1px solid rgba(255,255,255,.08)",
+              borderBottom: "1px solid rgba(var(--ink),.08)",
               display: "flex", justifyContent: "space-between", alignItems: "flex-start",
             }}>
               <div>
-                <div style={{ fontSize: 10, fontWeight: 700, color: "rgba(255,255,255,.3)", letterSpacing: ".1em", textTransform: "uppercase", marginBottom: 6 }}>Supplier Statement</div>
-                <div style={{ fontSize: 22, fontWeight: 900, color: "white", letterSpacing: "-.4px" }}>{selected?.name}</div>
-                {selected?.phone && <div style={{ fontSize: 12, color: "rgba(255,255,255,.35)", marginTop: 4 }}>{selected.phone}</div>}
+                <div style={{ fontSize: 10, fontWeight: 700, color: "rgba(var(--ink),.3)", letterSpacing: ".1em", textTransform: "uppercase", marginBottom: 6 }}>Supplier Statement</div>
+                <div style={{ fontSize: 22, fontWeight: 900, color: "var(--ink-solid, white)", letterSpacing: "-.4px" }}>{selected?.name}</div>
+                {selected?.phone && <div style={{ fontSize: 12, color: "rgba(var(--ink),.35)", marginTop: 4 }}>{selected.phone}</div>}
               </div>
               <div style={{ textAlign: "right" }}>
-                <div style={{ fontSize: 10, color: "rgba(255,255,255,.3)", fontWeight: 600, letterSpacing: ".08em", textTransform: "uppercase", marginBottom: 3 }}>Reporting Period</div>
-                <div style={{ fontSize: 13, fontWeight: 700, color: "rgba(255,255,255,.7)" }}>
-                  {dateFrom} <span style={{ color: "rgba(255,255,255,.25)" }}>—</span> {dateTo}
+                <div style={{ fontSize: 10, color: "rgba(var(--ink),.3)", fontWeight: 600, letterSpacing: ".08em", textTransform: "uppercase", marginBottom: 3 }}>Reporting Period</div>
+                <div style={{ fontSize: 13, fontWeight: 700, color: "rgba(var(--ink),.7)" }}>
+                  {dateFrom} <span style={{ color: "rgba(var(--ink),.25)" }}>—</span> {dateTo}
                 </div>
               </div>
             </div>
 
             {loading ? (
-              <div style={{ padding: "60px 0", textAlign: "center", color: "rgba(255,255,255,.25)", fontSize: 13 }}>Loading statement…</div>
+              <div style={{ padding: "60px 0", textAlign: "center", color: "rgba(var(--ink),.25)", fontSize: 13 }}>Loading statement…</div>
             ) : !statement ? null : (
               <>
-                <div style={{ padding: "12px 24px", background: "rgba(139,92,246,.06)", borderBottom: "1px solid rgba(255,255,255,.06)", display: "flex", justifyContent: "space-between", fontSize: 13, fontWeight: 600 }}>
-                  <span style={{ color: "rgba(255,255,255,.4)" }}>Opening Balance</span>
+                <div style={{ padding: "12px 24px", background: "rgba(139,92,246,.06)", borderBottom: "1px solid rgba(var(--ink),.06)", display: "flex", justifyContent: "space-between", fontSize: 13, fontWeight: 600 }}>
+                  <span style={{ color: "rgba(var(--ink),.4)" }}>Opening Balance</span>
                   <span style={{ color: "#a78bfa" }}>{fmt(statement.openingBalance)}</span>
                 </div>
 
                 <div style={{ overflowX: "auto" }}>
                   <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
                     <thead>
-                      <tr style={{ background: "rgba(255,255,255,.04)", borderBottom: "1px solid rgba(255,255,255,.08)" }}>
+                      <tr style={{ background: "rgba(var(--ink),.04)", borderBottom: "1px solid rgba(var(--ink),.08)" }}>
                         {["Date","Description","Purchase Amount","Payment Made","Balance"].map((h, i) => (
                           <th key={h} style={{
                             padding: "10px 16px", fontSize: 10, fontWeight: 700,
-                            color: "rgba(255,255,255,.35)", letterSpacing: ".08em", textTransform: "uppercase",
+                            color: "rgba(var(--ink),.35)", letterSpacing: ".08em", textTransform: "uppercase",
                             textAlign: i >= 2 ? "right" : "left", whiteSpace: "nowrap",
                           }}>{h}</th>
                         ))}
@@ -245,16 +245,16 @@ export default function SupplierStatementPage() {
                     </thead>
                     <tbody>
                       {statement.transactions.length === 0 ? (
-                        <tr><td colSpan={5} style={{ padding: "50px 0", textAlign: "center", color: "rgba(255,255,255,.2)", fontSize: 13 }}>No transactions in this period</td></tr>
+                        <tr><td colSpan={5} style={{ padding: "50px 0", textAlign: "center", color: "rgba(var(--ink),.2)", fontSize: 13 }}>No transactions in this period</td></tr>
                       ) : statement.transactions.map((tx, i) => (
-                        <tr key={i} style={{ borderBottom: "1px solid rgba(255,255,255,.04)", background: i % 2 === 0 ? "transparent" : "rgba(255,255,255,.012)" }}
+                        <tr key={i} style={{ borderBottom: "1px solid rgba(var(--ink),.04)", background: i % 2 === 0 ? "transparent" : "rgba(var(--ink),.012)" }}
                           onMouseEnter={e => e.currentTarget.style.background = "rgba(139,92,246,.05)"}
                           onMouseLeave={e => e.currentTarget.style.background = i % 2 === 0 ? "transparent" : "rgba(255,255,255,.012)"}
                         >
-                          <td style={{ padding: "10px 16px", color: "rgba(255,255,255,.4)", whiteSpace: "nowrap", fontSize: 12 }}>{tx.date}</td>
-                          <td style={{ padding: "10px 16px", color: "rgba(255,255,255,.7)" }}>{tx.description}</td>
-                          <td style={{ padding: "10px 16px", textAlign: "right", fontWeight: 600, color: tx.debit > 0 ? "#f87171" : "rgba(255,255,255,.18)" }}>{tx.debit > 0 ? fmt(tx.debit) : "—"}</td>
-                          <td style={{ padding: "10px 16px", textAlign: "right", fontWeight: 600, color: tx.credit > 0 ? "#34d399" : "rgba(255,255,255,.18)" }}>{tx.credit > 0 ? fmt(tx.credit) : "—"}</td>
+                          <td style={{ padding: "10px 16px", color: "rgba(var(--ink),.4)", whiteSpace: "nowrap", fontSize: 12 }}>{tx.date}</td>
+                          <td style={{ padding: "10px 16px", color: "rgba(var(--ink),.7)" }}>{tx.description}</td>
+                          <td style={{ padding: "10px 16px", textAlign: "right", fontWeight: 600, color: tx.debit > 0 ? "#f87171" : "rgba(var(--ink),.18)" }}>{tx.debit > 0 ? fmt(tx.debit) : "—"}</td>
+                          <td style={{ padding: "10px 16px", textAlign: "right", fontWeight: 600, color: tx.credit > 0 ? "#34d399" : "rgba(var(--ink),.18)" }}>{tx.credit > 0 ? fmt(tx.credit) : "—"}</td>
                           <td style={{ padding: "10px 16px", textAlign: "right", fontWeight: 800, color: tx.balance >= 0 ? "#a78bfa" : "#f87171" }}>{fmt(tx.balance)}</td>
                         </tr>
                       ))}
@@ -263,7 +263,7 @@ export default function SupplierStatementPage() {
                 </div>
 
                 <div style={{ padding: isMobile ? "12px 11px" : "16px 24px", background: "rgba(139,92,246,.08)", borderTop: "1px solid rgba(139,92,246,.2)", display: "flex", justifyContent: "space-between", fontSize: 15, fontWeight: 800 }}>
-                  <span style={{ color: "rgba(255,255,255,.5)" }}>Closing Balance</span>
+                  <span style={{ color: "rgba(var(--ink),.5)" }}>Closing Balance</span>
                   <span style={{ color: statement.closingBalance >= 0 ? "#a78bfa" : "#f87171" }}>
                     {fmt(statement.closingBalance)} <span style={{ fontSize: 11 }}>{statement.closingBalance >= 0 ? "Dr" : "Cr"}</span>
                   </span>

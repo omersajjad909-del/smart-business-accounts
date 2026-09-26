@@ -101,7 +101,7 @@ const font  = "'Outfit','Inter',sans-serif";
 const panel = { background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 12 };
 
 const inp: React.CSSProperties = {
-  background:  "rgba(255,255,255,.06)",
+  background:  "rgba(var(--ink),.06)",
   border:      "1px solid var(--border)",
   borderRadius: 8,
   padding:     "9px 13px",
@@ -252,7 +252,7 @@ function ViewModal({ ship, onClose }: { ship: Shipment; onClose: () => void }) {
             </div>
             <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
               {[...ship.trackingNotes].reverse().map((tn, i) => (
-                <div key={i} style={{ background: "rgba(255,255,255,.04)", borderRadius: 8, padding: "10px 14px", fontSize: 13 }}>
+                <div key={i} style={{ background: "rgba(var(--ink),.04)", borderRadius: 8, padding: "10px 14px", fontSize: 13 }}>
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
                     <StatusBadge status={tn.status} />
                     <span style={{ color: "var(--text-muted)", fontSize: 11 }}>
@@ -419,7 +419,7 @@ function NewShipmentModal({
                     fontFamily: font,
                     fontWeight: 700,
                     fontSize:   14,
-                    background: selected ? m.bg   : "rgba(255,255,255,.04)",
+                    background: selected ? m.bg   : "rgba(var(--ink),.04)",
                     color:      selected ? m.color : "var(--text-muted)",
                     border:     selected ? `1px solid ${m.border}` : "1px solid var(--border)",
                     transition: "all .15s",
@@ -517,17 +517,17 @@ function BillOfLadingModal({ ship, onClose }: { ship: Shipment; onClose: () => v
       <div id="bl-print-overlay">
         <div style={{ background: "#fff", color: "#000", width: 780, maxHeight: "92vh", overflowY: "auto", borderRadius: 4, fontFamily: "Arial,sans-serif", fontSize: 12 }}>
           {/* Screen-only buttons */}
-          <div style={{ background: "#1e293b", padding: "12px 20px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-            <span style={{ color: "#fff", fontWeight: 700, fontSize: 14 }}>Bill of Lading Preview</span>
+          <div style={{ background: "var(--dk-1e293b, #1e293b)", padding: "12px 20px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+            <span style={{ color: "var(--ink-solid, #fff)", fontWeight: 700, fontSize: 14 }}>Bill of Lading Preview</span>
             <div style={{ display: "flex", gap: 10 }}>
               <button onClick={() => window.print()} style={{ background: "#2563eb", color: "#fff", border: "none", borderRadius: 6, padding: "7px 18px", cursor: "pointer", fontWeight: 600 }}>🖨 Print</button>
-              <button onClick={onClose} style={{ background: "rgba(255,255,255,.1)", color: "#fff", border: "none", borderRadius: 6, padding: "7px 14px", cursor: "pointer" }}>Close</button>
+              <button onClick={onClose} style={{ background: "rgba(var(--ink),.1)", color: "var(--ink-solid, #fff)", border: "none", borderRadius: 6, padding: "7px 14px", cursor: "pointer" }}>Close</button>
             </div>
           </div>
 
           <div id="bl-print" style={{ padding: "20mm 18mm", background: "#fff" }}>
             {/* Header */}
-            <div style={{ textAlign: "center", borderBottom: "3px double #000", paddingBottom: 12, marginBottom: 16 }}>
+            <div style={{ textAlign: "center", borderBottom: "3px double var(--dkb-000000, #000)", paddingBottom: 12, marginBottom: 16 }}>
               <div style={{ fontSize: 22, fontWeight: 900, letterSpacing: 2, textTransform: "uppercase" }}>BILL OF LADING</div>
               <div style={{ fontSize: 11, color: "#555", marginTop: 4 }}>NON-NEGOTIABLE COPY — FOR REFERENCE ONLY</div>
             </div>
@@ -608,7 +608,7 @@ function BillOfLadingModal({ ship, onClose }: { ship: Shipment; onClose: () => v
             <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr 1fr", gap: 20, marginTop: 32 }}>
               {["Shipper's Signature", "Carrier's Signature", "Consignee's Signature"].map(s => (
                 <div key={s}>
-                  <div style={{ borderTop: "1px solid #000", paddingTop: 8, fontSize: 11, color: "#555" }}>{s}</div>
+                  <div style={{ borderTop: "1px solid var(--dkb-000000, #000)", paddingTop: 8, fontSize: 11, color: "#555" }}>{s}</div>
                   <div style={{ marginTop: 24, fontSize: 10, color: "#999" }}>Date: _______________</div>
                 </div>
               ))}
@@ -856,7 +856,7 @@ export default function ShipmentsPage() {
 
                       {/* Incoterm */}
                       <td style={{ padding: "12px 14px" }}>
-                        <span style={{ background: "rgba(255,255,255,.06)", borderRadius: 6, padding: "2px 8px", fontSize: 12, fontWeight: 700 }}>
+                        <span style={{ background: "rgba(var(--ink),.06)", borderRadius: 6, padding: "2px 8px", fontSize: 12, fontWeight: 700 }}>
                           {s.incoterm}
                         </span>
                       </td>

@@ -26,7 +26,7 @@ export default function RestaurantAnalyticsPage() {
   const lowMarginRecipes = data.recipes.filter((recipe) => recipe.margin < 30).length;
 
   return (
-    <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", color: "#fff", fontFamily: restaurantFont, minHeight: "100vh" }}>
+    <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", color: "var(--ink-solid, #fff)", fontFamily: restaurantFont, minHeight: "100vh" }}>
       <div style={{ marginBottom: 24 }}>
         <h1 style={{ fontSize: 24, fontWeight: 800, margin: "0 0 6px" }}>Restaurant Analytics</h1>
         <p style={{ fontSize: 13, color: restaurantMuted, margin: 0 }}>

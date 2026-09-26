@@ -31,7 +31,7 @@ export default function ConstructionAnalyticsPage() {
   }, {});
 
   return (
-    <div style={{ minHeight: "100vh", padding: isMobile ? "15px 14px" : "28px 32px", color: "#fff", fontFamily: constructionFont }}>
+    <div style={{ minHeight: "100vh", padding: isMobile ? "15px 14px" : "28px 32px", color: "var(--ink-solid, #fff)", fontFamily: constructionFont }}>
       <div style={{ marginBottom: 26 }}>
         <h1 style={{ margin: "0 0 6px", fontSize: 24, fontWeight: 800 }}>Construction Analytics</h1>
         <p style={{ margin: 0, fontSize: 13, color: constructionMuted }}>Project burn, site staffing, material consumption, and subcontractor exposure.</p>
@@ -56,7 +56,7 @@ export default function ConstructionAnalyticsPage() {
           <div style={{ fontSize: 15, fontWeight: 800, marginBottom: 14 }}>Site Headcount</div>
           <div style={{ display: "grid", gap: 10 }}>
             {data.sites.map((site) => (
-              <div key={site.id} style={{ display: "flex", justifyContent: "space-between", padding: "10px 12px", borderRadius: 10, background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.05)" }}>
+              <div key={site.id} style={{ display: "flex", justifyContent: "space-between", padding: "10px 12px", borderRadius: 10, background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.05)" }}>
                 <span>{site.name}</span>
                 <span style={{ color: "#60a5fa", fontWeight: 800 }}>{site.workers}</span>
               </div>
@@ -69,7 +69,7 @@ export default function ConstructionAnalyticsPage() {
           <div style={{ fontSize: 15, fontWeight: 800, marginBottom: 14 }}>Material Spend by Site</div>
           <div style={{ display: "grid", gap: 10 }}>
             {Object.entries(materialSpendBySite).sort((a, b) => b[1] - a[1]).map(([site, amount]) => (
-              <div key={site} style={{ display: "flex", justifyContent: "space-between", padding: "10px 12px", borderRadius: 10, background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.05)" }}>
+              <div key={site} style={{ display: "flex", justifyContent: "space-between", padding: "10px 12px", borderRadius: 10, background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.05)" }}>
                 <span>{site}</span>
                 <span style={{ color: "#34d399", fontWeight: 800 }}>Rs. {amount.toLocaleString()}</span>
               </div>

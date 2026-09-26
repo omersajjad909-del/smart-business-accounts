@@ -354,11 +354,11 @@ export default function ProductionOrdersPage() {
   }
 
   return (
-    <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", fontFamily: ff, color: "#fff", minHeight: "100vh" }}>
+    <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", fontFamily: ff, color: "var(--ink-solid, #fff)", minHeight: "100vh" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 26 }}>
         <div>
           <h1 style={{ fontSize: 22, fontWeight: 800, margin: "0 0 4px" }}>Production Orders</h1>
-          <p style={{ fontSize: 13, color: "rgba(255,255,255,.42)", margin: 0 }}>Issue shop-floor production based on BOMs and push completed orders into finished goods.</p>
+          <p style={{ fontSize: 13, color: "rgba(var(--ink),.42)", margin: 0 }}>Issue shop-floor production based on BOMs and push completed orders into finished goods.</p>
         </div>
         <button onClick={() => { setShowModal(true); setFormError(""); }} style={{ padding: "10px 20px", borderRadius: 10, border: "none", background: "#f97316", color: "#fff", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>
           + New Order
@@ -373,7 +373,7 @@ export default function ProductionOrdersPage() {
           { label: "Completed To FG", value: orders.filter((item) => item.status === "completed").length, color: "#22c55e" },
         ].map((card) => (
           <div key={card.label} style={{ background: bg, border: `1px solid ${border}`, borderRadius: 14, padding: isMobile ? "12px 10px" : "18px 20px" }}>
-            <div style={{ fontSize: 12, color: "rgba(255,255,255,.48)", marginBottom: 6 }}>{card.label}</div>
+            <div style={{ fontSize: 12, color: "rgba(var(--ink),.48)", marginBottom: 6 }}>{card.label}</div>
             <div style={{ fontSize: 21, fontWeight: 800, color: card.color }}>{card.value}</div>
           </div>
         ))}
@@ -400,7 +400,7 @@ export default function ProductionOrdersPage() {
               <div style={{ display: "flex", justifyContent: "space-between", gap: 14, alignItems: "flex-start", marginBottom: 12 }}>
                 <div>
                   <div style={{ fontSize: 15, fontWeight: 800 }}>{order.product}</div>
-                  <div style={{ fontSize: 12, color: "rgba(255,255,255,.42)", marginTop: 4 }}>
+                  <div style={{ fontSize: 12, color: "rgba(var(--ink),.42)", marginTop: 4 }}>
                     {order.orderId} • BOM {linkedBom?.version || order.bomVersion || "Not linked"} • Qty {order.completed.toLocaleString()}/{order.quantity.toLocaleString()}
                     {remaining > 0 && order.status !== "cancelled" && (
                       <span style={{ color: "#fbbf24", fontWeight: 700 }}> • {remaining.toLocaleString()} left to make</span>
@@ -418,7 +418,7 @@ export default function ProductionOrdersPage() {
                 </div>
                 <div style={{ fontSize: 11, fontWeight: 800, color: statusColor[order.status] || "#94a3b8" }}>{order.status.replace("_", " ").toUpperCase()}</div>
               </div>
-              <div style={{ fontSize: 12, color: "rgba(255,255,255,.5)", marginBottom: 10 }}>
+              <div style={{ fontSize: 12, color: "rgba(var(--ink),.5)", marginBottom: 10 }}>
                 Due {order.plannedDate || "Not set"} • Assigned {order.assignedTo || "Unassigned"} • {fgCreated ? "Finished goods batch created" : "FG pending"} • Work orders open {incompleteWorkOrders}
               </div>
 
@@ -439,13 +439,13 @@ export default function ProductionOrdersPage() {
                         style={{
                           display: "inline-flex", alignItems: "baseline", gap: 6,
                           padding: "4px 10px", borderRadius: 999, fontSize: 11.5,
-                          background: ahead > 0 ? "rgba(56,189,248,.1)" : "rgba(255,255,255,.04)",
+                          background: ahead > 0 ? "rgba(56,189,248,.1)" : "rgba(var(--ink),.04)",
                           border: `1px solid ${ahead > 0 ? "rgba(56,189,248,.28)" : border}`,
-                          color: "rgba(255,255,255,.65)",
+                          color: "rgba(var(--ink),.65)",
                         }}
                       >
                         {job}
-                        <span style={{ fontFamily: "ui-monospace, monospace", fontWeight: 700, color: "#fff" }}>
+                        <span style={{ fontFamily: "ui-monospace, monospace", fontWeight: 700, color: "var(--ink-solid, #fff)" }}>
                           {qty.toLocaleString()}/{order.quantity.toLocaleString()}
                         </span>
                         {ahead > 0 && (
@@ -464,7 +464,7 @@ export default function ProductionOrdersPage() {
                   })}
                 </div>
               )}
-              <div style={{ background: "rgba(255,255,255,.08)", height: 6, borderRadius: 999, overflow: "hidden", marginBottom: 14 }}>
+              <div style={{ background: "rgba(var(--ink),.08)", height: 6, borderRadius: 999, overflow: "hidden", marginBottom: 14 }}>
                 <div style={{ width: `${progress}%`, height: "100%", background: statusColor[order.status] || "#94a3b8" }} />
               </div>
               <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
@@ -496,7 +496,7 @@ export default function ProductionOrdersPage() {
           );
         })}
         {!orderStore.loading && orders.length === 0 && (
-          <div style={{ background: bg, border: `1px solid ${border}`, borderRadius: 14, padding: 36, textAlign: "center", color: "rgba(255,255,255,.28)" }}>
+          <div style={{ background: bg, border: `1px solid ${border}`, borderRadius: 14, padding: 36, textAlign: "center", color: "rgba(var(--ink),.28)" }}>
             No production orders yet.
           </div>
         )}
@@ -504,54 +504,54 @@ export default function ProductionOrdersPage() {
 
       {showModal && (
         <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.7)", zIndex: 50, display: "flex", alignItems: "center", justifyContent: "center" }}>
-          <div style={{ background: "#161b27", border: `1px solid ${border}`, borderRadius: 16, padding: 30, width: 540, fontFamily: ff }}>
+          <div style={{ background: "var(--dk-161b27, #161b27)", border: `1px solid ${border}`, borderRadius: 16, padding: 30, width: 540, fontFamily: ff }}>
             <h2 style={{ margin: "0 0 20px", fontSize: 18, fontWeight: 700 }}>New Production Order</h2>
             {formError && <div style={{ marginBottom: 14, padding: "10px 12px", borderRadius: 8, background: "rgba(239,68,68,.14)", border: "1px solid rgba(239,68,68,.28)", color: "#fca5a5", fontSize: 12 }}>{formError}</div>}
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
               <div style={{ gridColumn: "span 2" }}>
-                <label style={{ display: "block", fontSize: 12, color: "rgba(255,255,255,.45)", marginBottom: 6 }}>Product</label>
+                <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),.45)", marginBottom: 6 }}>Product</label>
                 <input list="manufacturing-boms" value={form.product} onChange={(e) => setForm((current) => ({ ...current, product: e.target.value }))} style={{ width: "100%", background: bg, border: `1px solid ${border}`, borderRadius: 8, padding: "9px 12px", color: "#fff", boxSizing: "border-box" }} />
                 <datalist id="manufacturing-boms">
                   {boms.map((item) => <option key={item.id} value={item.product} />)}
                 </datalist>
               </div>
               <div style={{ gridColumn: "span 2" }}>
-                <label style={{ display: "block", fontSize: 12, color: "rgba(255,255,255,.45)", marginBottom: 6 }}>Linked BOM</label>
+                <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),.45)", marginBottom: 6 }}>Linked BOM</label>
                 <select value={form.bomId} onChange={(e) => {
                   const selectedBom = boms.find((item) => item.id === e.target.value);
                   setForm((current) => ({ ...current, bomId: e.target.value, product: selectedBom?.product || current.product }));
-                }} style={{ width: "100%", background: "#161b27", border: `1px solid ${border}`, borderRadius: 8, padding: "9px 12px", color: "#fff" }}>
+                }} style={{ width: "100%", background: "var(--dk-161b27, #161b27)", border: `1px solid ${border}`, borderRadius: 8, padding: "9px 12px", color: "var(--ink-solid, #fff)" }}>
                   <option value="">Select BOM</option>
                   {boms.map((item) => <option key={item.id} value={item.id}>{item.product} • {item.version}</option>)}
                 </select>
               </div>
               <div>
-                <label style={{ display: "block", fontSize: 12, color: "rgba(255,255,255,.45)", marginBottom: 6 }}>Quantity</label>
+                <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),.45)", marginBottom: 6 }}>Quantity</label>
                 <input type="number" value={form.quantity} onChange={(e) => setForm((current) => ({ ...current, quantity: Number(e.target.value) }))} style={{ width: "100%", background: bg, border: `1px solid ${border}`, borderRadius: 8, padding: "9px 12px", color: "#fff", boxSizing: "border-box" }} />
               </div>
               <div>
-                <label style={{ display: "block", fontSize: 12, color: "rgba(255,255,255,.45)", marginBottom: 6 }}>Planned Date</label>
+                <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),.45)", marginBottom: 6 }}>Planned Date</label>
                 <input type="date" value={form.plannedDate} onChange={(e) => setForm((current) => ({ ...current, plannedDate: e.target.value }))} style={{ width: "100%", background: bg, border: `1px solid ${border}`, borderRadius: 8, padding: "9px 12px", color: "#fff", boxSizing: "border-box" }} />
               </div>
               <div>
-                <label style={{ display: "block", fontSize: 12, color: "rgba(255,255,255,.45)", marginBottom: 6 }}>Consume from</label>
-                <select value={form.location} onChange={(e) => setForm((current) => ({ ...current, location: e.target.value }))} style={{ width: "100%", background: "#161b27", border: `1px solid ${border}`, borderRadius: 8, padding: "9px 12px", color: "#fff" }}>
+                <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),.45)", marginBottom: 6 }}>Consume from</label>
+                <select value={form.location} onChange={(e) => setForm((current) => ({ ...current, location: e.target.value }))} style={{ width: "100%", background: "var(--dk-161b27, #161b27)", border: `1px solid ${border}`, borderRadius: 8, padding: "9px 12px", color: "var(--ink-solid, #fff)" }}>
                   <option value="MAIN">Main</option>
                   <option value="SHOP">Shop</option>
                 </select>
               </div>
               <div>
-                <label style={{ display: "block", fontSize: 12, color: "rgba(255,255,255,.45)", marginBottom: 6 }}>Assigned To</label>
+                <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),.45)", marginBottom: 6 }}>Assigned To</label>
                 <input value={form.assignedTo} onChange={(e) => setForm((current) => ({ ...current, assignedTo: e.target.value }))} style={{ width: "100%", background: bg, border: `1px solid ${border}`, borderRadius: 8, padding: "9px 12px", color: "#fff", boxSizing: "border-box" }} />
               </div>
               <div style={{ gridColumn: "span 2" }}>
-                <label style={{ display: "block", fontSize: 12, color: "rgba(255,255,255,.45)", marginBottom: 6 }}>Notes</label>
+                <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),.45)", marginBottom: 6 }}>Notes</label>
                 <textarea value={form.notes} onChange={(e) => setForm((current) => ({ ...current, notes: e.target.value }))} rows={4} style={{ width: "100%", background: bg, border: `1px solid ${border}`, borderRadius: 8, padding: "9px 12px", color: "#fff", boxSizing: "border-box", resize: "vertical" }} />
               </div>
             </div>
             <div style={{ display: "flex", gap: 12, marginTop: 18 }}>
               <button onClick={save} style={{ flex: 1, padding: "11px 0", background: "#f97316", border: "none", borderRadius: 8, color: "#fff", fontSize: 14, fontWeight: 700, cursor: "pointer" }}>Create Order</button>
-              <button onClick={() => setShowModal(false)} style={{ padding: "11px 24px", background: "transparent", border: `1px solid ${border}`, borderRadius: 8, color: "rgba(255,255,255,.65)", cursor: "pointer" }}>Cancel</button>
+              <button onClick={() => setShowModal(false)} style={{ padding: "11px 24px", background: "transparent", border: `1px solid ${border}`, borderRadius: 8, color: "rgba(var(--ink),.65)", cursor: "pointer" }}>Cancel</button>
             </div>
           </div>
         </div>
@@ -562,9 +562,9 @@ export default function ProductionOrdersPage() {
           lands, before anything is written. */}
       {runOrder && (
         <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.7)", zIndex: 50, display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }}>
-          <div style={{ background: "#161b27", border: `1px solid ${border}`, borderRadius: 16, padding: 28, width: 620, maxHeight: "90vh", overflowY: "auto", fontFamily: ff }}>
+          <div style={{ background: "var(--dk-161b27, #161b27)", border: `1px solid ${border}`, borderRadius: 16, padding: 28, width: 620, maxHeight: "90vh", overflowY: "auto", fontFamily: ff }}>
             <h2 style={{ margin: "0 0 4px", fontSize: 18, fontWeight: 700 }}>Record production</h2>
-            <div style={{ fontSize: 12.5, color: "rgba(255,255,255,.42)", marginBottom: 18 }}>
+            <div style={{ fontSize: 12.5, color: "rgba(var(--ink),.42)", marginBottom: 18 }}>
               {runOrder.orderId} · {runOrder.product} · {runOrder.completed}/{runOrder.quantity} done
             </div>
 
@@ -580,7 +580,7 @@ export default function ProductionOrdersPage() {
                     "Finished today" on the other read as two different
                     mechanisms, which is why an order spread over a week looked
                     like something the system could not do. */}
-                <label style={{ display: "block", fontSize: 12, color: "rgba(255,255,255,.45)", marginBottom: 6 }}>Finished today</label>
+                <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),.45)", marginBottom: 6 }}>Finished today</label>
                 <input
                   type="number" min={1} value={runQty}
                   onChange={(e) => setRunQty(Math.max(1, Number(e.target.value) || 1))}
@@ -595,7 +595,7 @@ export default function ProductionOrdersPage() {
                 {/* Say what happens to the rest, so a short day is not typed in
                     as a full one — and say it in a way that covers an order
                     running for a week, not just one that slips a day. */}
-                <div style={{ fontSize: 11, color: "rgba(255,255,255,.35)", marginTop: 6, width: 180, lineHeight: 1.6 }}>
+                <div style={{ fontSize: 11, color: "rgba(var(--ink),.35)", marginTop: 6, width: 180, lineHeight: 1.6 }}>
                   {runOrder.completed > 0
                     ? `${runOrder.completed.toLocaleString()} done, ${Math.max(runOrder.quantity - runOrder.completed, 0).toLocaleString()} left of ${runOrder.quantity.toLocaleString()}.`
                     : `Order is for ${runOrder.quantity.toLocaleString()}.`}{" "}
@@ -605,11 +605,11 @@ export default function ProductionOrdersPage() {
                 </div>
               </div>
               <div>
-                <label style={{ display: "block", fontSize: 12, color: "rgba(255,255,255,.45)", marginBottom: 6 }}>Consume from</label>
+                <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),.45)", marginBottom: 6 }}>Consume from</label>
                 <select
                   value={runLocation}
                   onChange={(e) => { setRunLocation(e.target.value); requote(runQty, e.target.value); }}
-                  style={{ width: 180, height: 38, background: "#161b27", border: `1px solid ${border}`, borderRadius: 8, padding: "9px 12px", fontSize: 14, color: "#fff", boxSizing: "border-box" }}
+                  style={{ width: 180, height: 38, background: "var(--dk-161b27, #161b27)", border: `1px solid ${border}`, borderRadius: 8, padding: "9px 12px", fontSize: 14, color: "var(--ink-solid, #fff)", boxSizing: "border-box" }}
                 >
                   {[...new Set([runLocation, ...(runQuote?.availableLocations ?? [])])].map((loc) => (
                     <option key={loc} value={loc}>{loc}</option>
@@ -617,7 +617,7 @@ export default function ProductionOrdersPage() {
                 </select>
               </div>
               <div>
-                <label style={{ display: "block", fontSize: 12, color: "rgba(255,255,255,.45)", marginBottom: 6 }}>Production date</label>
+                <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),.45)", marginBottom: 6 }}>Production date</label>
                 <input
                   type="date" value={runDate}
                   onChange={(e) => setRunDate(e.target.value)}
@@ -626,16 +626,16 @@ export default function ProductionOrdersPage() {
               </div>
             </div>
 
-            {quoting && <div style={{ fontSize: 13, color: "rgba(255,255,255,.4)", padding: "12px 0" }}>Costing this run…</div>}
+            {quoting && <div style={{ fontSize: 13, color: "rgba(var(--ink),.4)", padding: "12px 0" }}>Costing this run…</div>}
 
             {runQuote && !quoting && (
               <>
                 <div style={{ border: `1px solid ${border}`, borderRadius: 12, overflow: "hidden", marginBottom: 14 }}>
                   <table style={{ width: "100%", borderCollapse: "collapse" }}>
                     <thead>
-                      <tr style={{ background: "rgba(255,255,255,.03)" }}>
+                      <tr style={{ background: "rgba(var(--ink),.03)" }}>
                         {["Material", "Needs", "Open stock", "Off the rack", "Cost"].map((h, i) => (
-                          <th key={h} style={{ padding: "10px 14px", fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,.4)", textTransform: "uppercase", letterSpacing: ".05em", textAlign: i === 0 ? "left" : "right" }}>{h}</th>
+                          <th key={h} style={{ padding: "10px 14px", fontSize: 11, fontWeight: 700, color: "rgba(var(--ink),.4)", textTransform: "uppercase", letterSpacing: ".05em", textAlign: i === 0 ? "left" : "right" }}>{h}</th>
                         ))}
                       </tr>
                     </thead>
@@ -652,17 +652,17 @@ export default function ProductionOrdersPage() {
                                 </div>
                               )}
                             </td>
-                            <td style={{ padding: "10px 14px", fontSize: 12.5, textAlign: "right", color: "rgba(255,255,255,.62)" }}>{line.exactQty.toFixed(2)}{line.unit}</td>
-                            <td style={{ padding: "10px 14px", fontSize: 12.5, textAlign: "right", color: line.fromRemnantQty > 0 ? "#34d399" : "rgba(255,255,255,.25)" }}>
+                            <td style={{ padding: "10px 14px", fontSize: 12.5, textAlign: "right", color: "rgba(var(--ink),.62)" }}>{line.exactQty.toFixed(2)}{line.unit}</td>
+                            <td style={{ padding: "10px 14px", fontSize: 12.5, textAlign: "right", color: line.fromRemnantQty > 0 ? "#34d399" : "rgba(var(--ink),.25)" }}>
                               {line.fromRemnantQty > 0 ? `${line.fromRemnantQty.toFixed(2)}${line.unit}` : "—"}
                             </td>
                             <td style={{ padding: "10px 14px", fontSize: 12.5, textAlign: "right", fontWeight: 700 }}>
                               {line.requiredQty}{line.unit}
-                              <div style={{ fontSize: 11, fontWeight: 400, color: short ? "#fca5a5" : "rgba(255,255,255,.35)", marginTop: 3 }}>
+                              <div style={{ fontSize: 11, fontWeight: 400, color: short ? "#fca5a5" : "rgba(var(--ink),.35)", marginTop: 3 }}>
                                 have {line.availableQty}{line.unit}
                               </div>
                             </td>
-                            <td style={{ padding: "10px 14px", fontSize: 12.5, textAlign: "right", color: "rgba(255,255,255,.62)" }}>Rs. {Math.round(line.lineCost).toLocaleString()}</td>
+                            <td style={{ padding: "10px 14px", fontSize: 12.5, textAlign: "right", color: "rgba(var(--ink),.62)" }}>Rs. {Math.round(line.lineCost).toLocaleString()}</td>
                           </tr>
                         );
                       })}
@@ -674,7 +674,7 @@ export default function ProductionOrdersPage() {
                   <div style={{ marginBottom: 14, padding: "12px 14px", borderRadius: 10, background: "rgba(239,68,68,.1)", border: "1px solid rgba(239,68,68,.26)" }}>
                     <div style={{ fontSize: 12.5, color: "#fca5a5", fontWeight: 700, marginBottom: 6 }}>Not enough material in {runLocation} for {runQuote.shortages.length} item(s)</div>
                     {runQuote.shortages.some((l) => (l.elsewhere?.length ?? 0) > 0) && (
-                      <div style={{ fontSize: 12, color: "rgba(255,255,255,.6)", marginBottom: 8, lineHeight: 1.7 }}>
+                      <div style={{ fontSize: 12, color: "rgba(var(--ink),.6)", marginBottom: 8, lineHeight: 1.7 }}>
                         {runQuote.shortages.filter((l) => (l.elsewhere?.length ?? 0) > 0).map((l) => (
                           <div key={l.itemId}>
                             {l.itemName} is in{" "}
@@ -684,7 +684,7 @@ export default function ProductionOrdersPage() {
                         ))}
                       </div>
                     )}
-                    <label style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 12, color: "rgba(255,255,255,.55)", cursor: "pointer" }}>
+                    <label style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 12, color: "rgba(var(--ink),.55)", cursor: "pointer" }}>
                       <input type="checkbox" checked={allowShort} onChange={(e) => setAllowShort(e.target.checked)} />
                       Produce anyway — stock will go negative until the purchase is entered
                     </label>
@@ -699,7 +699,7 @@ export default function ProductionOrdersPage() {
                     )}
                   </div>
                   {!labourList.length && (
-                    <div style={{ fontSize: 12, color: "rgba(255,255,255,.35)", marginBottom: 8 }}>
+                    <div style={{ fontSize: 12, color: "rgba(var(--ink),.35)", marginBottom: 8 }}>
                       No labour added yet — add one on the <a href="/dashboard/manufacturing/labour" style={{ color: "#fb923c", fontWeight: 700 }}>Labour</a> page.
                     </div>
                   )}
@@ -751,17 +751,17 @@ export default function ProductionOrdersPage() {
                             decision, taken with a deliberate click; it has no
                             business being somewhere the keyboard lands on the
                             way past. */}
-                        <button onClick={() => removeLabourRow(index)} tabIndex={-1} title="Remove" style={{ background: "transparent", border: `1px solid ${border}`, borderRadius: 8, color: "rgba(255,255,255,.45)", cursor: "pointer", padding: "7px 0", gridColumn: isMobile ? "1 / -1" : "auto" }}>×</button>
+                        <button onClick={() => removeLabourRow(index)} tabIndex={-1} title="Remove" style={{ background: "transparent", border: `1px solid ${border}`, borderRadius: 8, color: "rgba(var(--ink),.45)", cursor: "pointer", padding: "7px 0", gridColumn: isMobile ? "1 / -1" : "auto" }}>×</button>
                       </div>
                     ))}
                   </div>
                   <datalist id="production-operations">
                     {operationSuggestions.map((operation) => <option key={operation} value={operation} />)}
                   </datalist>
-                  <button id="po-add-worker" onClick={addLabourRow} style={{ marginTop: 8, padding: "6px 12px", borderRadius: 8, background: "rgba(255,255,255,.05)", border: `1px solid ${border}`, color: "rgba(255,255,255,.65)", fontSize: 11.5, fontWeight: 600, cursor: "pointer" }}>
+                  <button id="po-add-worker" onClick={addLabourRow} style={{ marginTop: 8, padding: "6px 12px", borderRadius: 8, background: "rgba(var(--ink),.05)", border: `1px solid ${border}`, color: "rgba(var(--ink),.65)", fontSize: 11.5, fontWeight: 600, cursor: "pointer" }}>
                     + Add worker
                   </button>
-                  <div style={{ fontSize: 11, color: "rgba(255,255,255,.32)", marginTop: 8, lineHeight: 1.7 }}>
+                  <div style={{ fontSize: 11, color: "rgba(var(--ink),.32)", marginTop: 8, lineHeight: 1.7 }}>
                     Assigning workers here charges what&apos;s actually owed to each of them instead of the BOM&apos;s flat labour estimate below.
                     Name the job each row is for — cutting, button, packing. With more than one worker it is required, because
                     rows with no job named are counted as one job. Jobs need not match each other or the run: one can run ahead
@@ -780,7 +780,7 @@ export default function ProductionOrdersPage() {
                     <div style={{ fontSize: 12.5, color: "#fca5a5", fontWeight: 700, marginBottom: 5 }}>
                       Name the job on each row — the boxes marked in red
                     </div>
-                    <div style={{ fontSize: 11.5, color: "rgba(255,255,255,.5)", lineHeight: 1.7 }}>
+                    <div style={{ fontSize: 11.5, color: "rgba(var(--ink),.5)", lineHeight: 1.7 }}>
                       Rows with no job named are counted as one job and added together, so their pieces come
                       out as {(labourPieces?.groups.find((g) => g.operation === "Labour")?.total ?? 0).toLocaleString()} instead
                       of standing on their own. The worker&apos;s name does not settle it — the same person does a
@@ -799,7 +799,7 @@ export default function ProductionOrdersPage() {
                     <div style={{ fontSize: 12.5, color: "#fbbf24", fontWeight: 700, marginBottom: 5 }}>
                       This run finishes {runQty.toLocaleString()} pieces, but {labourPieces.under.map((g) => `${g.operation} is paid for ${g.total.toLocaleString()}`).join("; ")}
                     </div>
-                    <div style={{ fontSize: 11.5, color: "rgba(255,255,255,.5)", lineHeight: 1.7 }}>
+                    <div style={{ fontSize: 11.5, color: "rgba(var(--ink),.5)", lineHeight: 1.7 }}>
                       That is right if the rest of today&apos;s pieces already had that job done in an earlier run —
                       they keep the work done on them and only needed finishing.
                       {" "}If they did not, {runQty.toLocaleString()} is more than was really made: it goes into finished
@@ -825,7 +825,7 @@ export default function ProductionOrdersPage() {
                     saying so is the whole reason the operator can trust the
                     difference is not lost. */}
                 {!jobNamesMissing && labourPieces && labourPieces.over.length > 0 && (
-                  <div style={{ padding: "12px 14px", borderRadius: 12, background: "rgba(56,189,248,.08)", border: "1px solid rgba(56,189,248,.25)", marginBottom: 14, fontSize: 12, color: "rgba(255,255,255,.6)", lineHeight: 1.7 }}>
+                  <div style={{ padding: "12px 14px", borderRadius: 12, background: "rgba(56,189,248,.08)", border: "1px solid rgba(56,189,248,.25)", marginBottom: 14, fontSize: 12, color: "rgba(var(--ink),.6)", lineHeight: 1.7 }}>
                     {labourPieces.over.map((g) => `${g.operation} is paid for ${g.total.toLocaleString()} but only ${runQty.toLocaleString()} finish today, so ${(g.total - runQty).toLocaleString()} stay part-made`).join("; ")}.
                     {" "}They keep the work done on them and finish in a later run — nothing is lost and nobody is paid twice.
                   </div>
@@ -833,20 +833,20 @@ export default function ProductionOrdersPage() {
 
                 <div style={{ padding: "14px 16px", borderRadius: 12, background: "rgba(34,197,94,.08)", border: "1px solid rgba(34,197,94,.22)", marginBottom: 8 }}>
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 8 }}>
-                    <span style={{ fontSize: 12.5, color: "rgba(255,255,255,.5)" }}>Total cost of this run</span>
+                    <span style={{ fontSize: 12.5, color: "rgba(var(--ink),.5)" }}>Total cost of this run</span>
                     <span style={{ fontSize: 18, fontWeight: 800, color: "#22c55e" }}>Rs. {Math.round(labourRows.length ? runQuote.totalCost - runQuote.labourCost + labourTotal : runQuote.totalCost).toLocaleString()}</span>
                   </div>
-                  <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, color: "rgba(255,255,255,.42)" }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, color: "rgba(var(--ink),.42)" }}>
                     <span>Material</span><span>Rs. {Math.round(runQuote.materialCost).toLocaleString()}</span>
                   </div>
                   {runQuote.labourCost > 0 && (
-                    <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, color: "rgba(255,255,255,.42)" }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, color: "rgba(var(--ink),.42)" }}>
                       <span>Labour {labourRows.length ? "(assigned above)" : "(BOM estimate)"}</span>
                       <span>Rs. {Math.round(labourRows.length ? labourTotal : runQuote.labourCost).toLocaleString()}</span>
                     </div>
                   )}
                   {runQuote.overheadCost > 0 && (
-                    <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, color: "rgba(255,255,255,.42)" }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, color: "rgba(var(--ink),.42)" }}>
                       <span>Overhead</span><span>Rs. {Math.round(runQuote.overheadCost).toLocaleString()}</span>
                     </div>
                   )}
@@ -860,12 +860,12 @@ export default function ProductionOrdersPage() {
                       <span>Kept back as open stock</span><span>Rs. {Math.round(runQuote.remnantCreatedCost).toLocaleString()}</span>
                     </div>
                   )}
-                  <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, color: "rgba(255,255,255,.55)", fontWeight: 700, marginTop: 6 }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, color: "rgba(var(--ink),.55)", fontWeight: 700, marginTop: 6 }}>
                     <span>Per unit</span><span>Rs. {runQuote.unitCost.toFixed(2)}</span>
                   </div>
                 </div>
 
-                <div style={{ fontSize: 11.5, color: "rgba(255,255,255,.35)", lineHeight: 1.7, marginBottom: 16 }}>
+                <div style={{ fontSize: 11.5, color: "rgba(var(--ink),.35)", lineHeight: 1.7, marginBottom: 16 }}>
                   Dr Work In Progress → Cr Stock/Inventory, then Dr Finished Goods → Cr Work In Progress.
                   Whole units leave {runLocation}; anything left of the last one moves to Material Remnants
                   instead of being charged to this batch. {runQty} × {runOrder.product} arrives at cost.
@@ -885,7 +885,7 @@ export default function ProductionOrdersPage() {
               >
                 {running ? "Recording…" : "Confirm production"}
               </button>
-              <button onClick={() => { setRunOrder(null); setRunQuote(null); setAllowShort(false); }} style={{ padding: "11px 24px", background: "transparent", border: `1px solid ${border}`, borderRadius: 8, color: "rgba(255,255,255,.65)", cursor: "pointer" }}>Cancel</button>
+              <button onClick={() => { setRunOrder(null); setRunQuote(null); setAllowShort(false); }} style={{ padding: "11px 24px", background: "transparent", border: `1px solid ${border}`, borderRadius: 8, color: "rgba(var(--ink),.65)", cursor: "pointer" }}>Cancel</button>
             </div>
           </div>
         </div>

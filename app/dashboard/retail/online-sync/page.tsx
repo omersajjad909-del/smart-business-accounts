@@ -178,7 +178,7 @@ export default function OnlineSyncPage() {
                     { label: "Orders",    on: store.syncOrders    },
                   ].map(t => (
                     <span key={t.label} style={{ fontSize: 11, fontWeight: 600, padding: "2px 8px", borderRadius: 20,
-                      background: t.on ? "rgba(16,185,129,.1)" : "rgba(255,255,255,.04)",
+                      background: t.on ? "rgba(16,185,129,.1)" : "rgba(var(--ink),.04)",
                       color: t.on ? "#10b981" : "var(--text-muted)",
                       border: `1px solid ${t.on ? "rgba(16,185,129,.28)" : BD}` }}>
                       {t.on ? "✓" : "—"} {t.label}
@@ -213,7 +213,7 @@ export default function OnlineSyncPage() {
       {/* Modal */}
       {showModal && (
         <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.65)", zIndex: 50, display: "flex", alignItems: "center", justifyContent: "center" }}>
-          <div style={{ background: "var(--panel-bg,#1a1d2e)", border: `1px solid ${BD}`, borderRadius: 18, padding: 28, width: 480, maxHeight: "90vh", overflowY: "auto" }}>
+          <div style={{ background: "var(--panel-bg,var(--dk-1a1d2e, #1a1d2e))", border: `1px solid ${BD}`, borderRadius: 18, padding: 28, width: 480, maxHeight: "90vh", overflowY: "auto" }}>
             <h2 style={{ margin: "0 0 20px", fontSize: 17, fontWeight: 800 }}>{editId ? "Edit Store" : "Connect New Store"}</h2>
             <div style={{ display: "grid", gap: 14 }}>
               <div>

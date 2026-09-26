@@ -40,7 +40,7 @@ export default function HospitalAnalyticsPage() {
   ];
 
   return (
-    <div style={{ minHeight: "100vh", padding: isMobile ? "17px 16px" : "28px 32px", color: "#fff", fontFamily: hospitalFont }}>
+    <div style={{ minHeight: "100vh", padding: isMobile ? "17px 16px" : "28px 32px", color: "var(--ink-solid, #fff)", fontFamily: hospitalFont }}>
       <div style={{ marginBottom: 26 }}>
         <h1 style={{ margin: "0 0 6px", fontSize: 24, fontWeight: 800 }}>Healthcare Analytics</h1>
         <p style={{ margin: 0, fontSize: 13, color: hospitalMuted }}>Operational view of case load, department demand, and clinical throughput.</p>
@@ -58,7 +58,7 @@ export default function HospitalAnalyticsPage() {
                     <span style={{ fontSize: 13, color: hospitalMuted }}>{row.label}</span>
                     <span style={{ fontSize: 12, fontWeight: 700, color: row.color }}>{pct}%</span>
                   </div>
-                  <div style={{ height: 10, borderRadius: 999, background: "rgba(255,255,255,.06)", overflow: "hidden" }}>
+                  <div style={{ height: 10, borderRadius: 999, background: "rgba(var(--ink),.06)", overflow: "hidden" }}>
                     <div style={{ width: `${pct}%`, height: "100%", background: row.color }} />
                   </div>
                 </div>
@@ -71,12 +71,12 @@ export default function HospitalAnalyticsPage() {
           <div style={{ fontSize: 15, fontWeight: 800, marginBottom: 14 }}>Department Demand</div>
           <div style={{ display: "grid", gap: 10 }}>
             {Object.entries(departmentLoad).sort((a, b) => b[1] - a[1]).slice(0, 6).map(([dept, count]) => (
-              <div key={dept} style={{ display: "flex", justifyContent: "space-between", padding: isMobile ? "8px 8px" : "10px 12px", borderRadius: 10, background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.05)" }}>
+              <div key={dept} style={{ display: "flex", justifyContent: "space-between", padding: isMobile ? "8px 8px" : "10px 12px", borderRadius: 10, background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.05)" }}>
                 <span style={{ fontSize: 13 }}>{dept}</span>
                 <span style={{ fontSize: 15, fontWeight: 800, color: "#93c5fd" }}>{count}</span>
               </div>
             ))}
-            {Object.keys(departmentLoad).length === 0 && <div style={{ color: "rgba(255,255,255,.28)" }}>No appointment load yet.</div>}
+            {Object.keys(departmentLoad).length === 0 && <div style={{ color: "rgba(var(--ink),.28)" }}>No appointment load yet.</div>}
           </div>
         </div>
       </div>
@@ -86,12 +86,12 @@ export default function HospitalAnalyticsPage() {
           <div style={{ fontSize: 15, fontWeight: 800, marginBottom: 14 }}>Doctor Schedule Pressure</div>
           <div style={{ display: "grid", gap: 10 }}>
             {Object.entries(doctorLoad).sort((a, b) => b[1] - a[1]).slice(0, 6).map(([doctor, count]) => (
-              <div key={doctor} style={{ display: "flex", justifyContent: "space-between", padding: isMobile ? "8px 8px" : "10px 12px", borderRadius: 10, background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.05)" }}>
+              <div key={doctor} style={{ display: "flex", justifyContent: "space-between", padding: isMobile ? "8px 8px" : "10px 12px", borderRadius: 10, background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.05)" }}>
                 <span style={{ fontSize: 13 }}>{doctor}</span>
                 <span style={{ fontSize: 15, fontWeight: 800, color: "#c4b5fd" }}>{count}</span>
               </div>
             ))}
-            {Object.keys(doctorLoad).length === 0 && <div style={{ color: "rgba(255,255,255,.28)" }}>No doctor assignments yet.</div>}
+            {Object.keys(doctorLoad).length === 0 && <div style={{ color: "rgba(var(--ink),.28)" }}>No doctor assignments yet.</div>}
           </div>
         </div>
 
@@ -104,7 +104,7 @@ export default function HospitalAnalyticsPage() {
               { label: "Active prescriptions", value: prescriptions.filter((row) => row.status === "active").length, color: "#22c55e" },
               { label: "Urgent pending labs", value: labs.filter((row) => row.urgent && row.status !== "completed").length, color: "#f97316" },
             ].map((row) => (
-              <div key={row.label} style={{ display: "flex", justifyContent: "space-between", padding: isMobile ? "8px 8px" : "10px 12px", borderRadius: 10, background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.05)" }}>
+              <div key={row.label} style={{ display: "flex", justifyContent: "space-between", padding: isMobile ? "8px 8px" : "10px 12px", borderRadius: 10, background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.05)" }}>
                 <span style={{ fontSize: 13, color: hospitalMuted }}>{row.label}</span>
                 <span style={{ fontSize: 15, fontWeight: 800, color: row.color }}>{row.value}</span>
               </div>

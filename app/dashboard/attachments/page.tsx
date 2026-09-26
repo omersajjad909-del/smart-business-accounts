@@ -176,7 +176,7 @@ export default function AttachmentsPage() {
             </thead>
             <tbody>
               {filtered.map((a, i) => (
-                <tr key={a.id} style={{ background: i % 2 === 1 ? "rgba(255,255,255,0.013)" : "transparent" }}>
+                <tr key={a.id} style={{ background: i % 2 === 1 ? "rgba(var(--ink),0.013)" : "transparent" }}>
                   <td style={td}>
                     <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
                       <span style={{ fontSize: 20 }}>{fileIcon(a.fileType)}</span>

@@ -145,11 +145,11 @@ export default function TradingStockControlPage() {
             <tbody>
               {stock.slice(0, 12).map((row) => (
                 <tr key={row.itemId}>
-                  <td style={{ padding: "12px 16px", borderBottom: "1px solid rgba(255,255,255,.04)", fontWeight: 700 }}>{row.itemName}</td>
-                  <td style={{ padding: "12px 16px", borderBottom: "1px solid rgba(255,255,255,.04)" }}>{row.unit || "-"}</td>
-                  <td style={{ padding: "12px 16px", borderBottom: "1px solid rgba(255,255,255,.04)", color: Number(row.stockQty || 0) <= 5 ? "#f59e0b" : "#38bdf8", fontWeight: 700 }}>{row.stockQty}</td>
-                  <td style={{ padding: "12px 16px", borderBottom: "1px solid rgba(255,255,255,.04)", color: "#34d399", fontWeight: 700 }}>{formatMoney(row.stockValue)}</td>
-                  <td style={{ padding: "10px 16px", borderBottom: "1px solid rgba(255,255,255,.04)" }}>
+                  <td style={{ padding: "12px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", fontWeight: 700 }}>{row.itemName}</td>
+                  <td style={{ padding: "12px 16px", borderBottom: "1px solid rgba(var(--ink),.04)" }}>{row.unit || "-"}</td>
+                  <td style={{ padding: "12px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", color: Number(row.stockQty || 0) <= 5 ? "#f59e0b" : "#38bdf8", fontWeight: 700 }}>{row.stockQty}</td>
+                  <td style={{ padding: "12px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", color: "#34d399", fontWeight: 700 }}>{formatMoney(row.stockValue)}</td>
+                  <td style={{ padding: "10px 16px", borderBottom: "1px solid rgba(var(--ink),.04)" }}>
                     <button onClick={() => { setAdjItem(row); setAdjQty(String(row.stockQty)); setAdjModal(true); }} style={{ fontSize: 11, padding: "4px 10px", borderRadius: 6, background: "rgba(167,139,250,.14)", border: "1px solid rgba(167,139,250,.24)", color: "#a78bfa", cursor: "pointer", fontWeight: 700 }}>Adjust</button>
                   </td>
                 </tr>
@@ -203,7 +203,7 @@ export default function TradingStockControlPage() {
       {/* Stock Adjustment Modal */}
       {adjModal && (
         <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.75)", backdropFilter: "blur(10px)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000, padding: 16 }}>
-          <div style={{ background: "#13161f", border: "1px solid rgba(167,139,250,.25)", borderRadius: 22, padding: 28, width: 500, maxWidth: "95vw", fontFamily: tradingFont, boxShadow: "0 32px 80px rgba(0,0,0,.6)" }}>
+          <div style={{ background: "var(--dk-13161f, #13161f)", border: "1px solid rgba(167,139,250,.25)", borderRadius: 22, padding: 28, width: 500, maxWidth: "95vw", fontFamily: tradingFont, boxShadow: "0 32px 80px rgba(0,0,0,.6)" }}>
 
             {/* Header */}
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 22 }}>
@@ -216,7 +216,7 @@ export default function TradingStockControlPage() {
                 </p>
               </div>
               <button onClick={() => { setAdjModal(false); setAdjItem(null); setAdjQty(""); }}
-                style={{ width: 32, height: 32, borderRadius: "50%", border: "1px solid rgba(255,255,255,.1)", background: "rgba(255,255,255,.05)", color: tradingMuted, fontSize: 16, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                style={{ width: 32, height: 32, borderRadius: "50%", border: "1px solid rgba(var(--ink),.1)", background: "rgba(var(--ink),.05)", color: tradingMuted, fontSize: 16, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>
                 ✕
               </button>
             </div>
@@ -234,7 +234,7 @@ export default function TradingStockControlPage() {
                       <button key={row.itemId}
                         onClick={() => { setAdjItem(row); setAdjQty(String(row.stockQty)); }}
                         style={{ textAlign: "left", padding: isMobile ? "12px 10px" : "14px 16px", borderRadius: 12,
-                          background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.08)",
+                          background: "rgba(var(--ink),.04)", border: "1px solid rgba(var(--ink),.08)",
                           cursor: "pointer", display: "flex", alignItems: "center", gap: 12,
                           transition: "border-color .15s" }}
                         onMouseEnter={e => (e.currentTarget.style.borderColor = "rgba(167,139,250,.5)")}
@@ -272,7 +272,7 @@ export default function TradingStockControlPage() {
                     <div style={{ fontSize: 26, fontWeight: 800, color: "#a78bfa", lineHeight: 1 }}>{adjItem.stockQty}</div>
                   </div>
                   <button onClick={() => { setAdjItem(null); setAdjQty(""); }}
-                    style={{ padding: "6px 10px", borderRadius: 7, border: "1px solid rgba(255,255,255,.1)", background: "transparent", color: tradingMuted, fontSize: 11, cursor: "pointer" }}>
+                    style={{ padding: "6px 10px", borderRadius: 7, border: "1px solid rgba(var(--ink),.1)", background: "transparent", color: tradingMuted, fontSize: 11, cursor: "pointer" }}>
                     ← Change
                   </button>
                 </div>
@@ -284,18 +284,18 @@ export default function TradingStockControlPage() {
                   </label>
                   <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                     <button onClick={() => setAdjQty(q => String(Math.max(0, Number(q || 0) - 1)))}
-                      style={{ width: 40, height: 44, borderRadius: 8, border: "1px solid rgba(255,255,255,.1)", background: "rgba(255,255,255,.05)", color: "#f1f5f9", fontSize: 20, cursor: "pointer", flexShrink: 0 }}>−</button>
+                      style={{ width: 40, height: 44, borderRadius: 8, border: "1px solid rgba(var(--ink),.1)", background: "rgba(var(--ink),.05)", color: "#f1f5f9", fontSize: 20, cursor: "pointer", flexShrink: 0 }}>−</button>
                     <input autoFocus type="number" min={0} value={adjQty} onChange={e => setAdjQty(e.target.value)}
                       style={{ flex: 1, padding: "10px 14px", borderRadius: 10, border: "1.5px solid rgba(167,139,250,.4)", background: "rgba(167,139,250,.08)", color: "#f1f5f9", fontSize: 22, fontWeight: 800, textAlign: "center", outline: "none", fontFamily: tradingFont }} />
                     <button onClick={() => setAdjQty(q => String(Number(q || 0) + 1))}
-                      style={{ width: 40, height: 44, borderRadius: 8, border: "1px solid rgba(255,255,255,.1)", background: "rgba(255,255,255,.05)", color: "#f1f5f9", fontSize: 20, cursor: "pointer", flexShrink: 0 }}>+</button>
+                      style={{ width: 40, height: 44, borderRadius: 8, border: "1px solid rgba(var(--ink),.1)", background: "rgba(var(--ink),.05)", color: "#f1f5f9", fontSize: 20, cursor: "pointer", flexShrink: 0 }}>+</button>
                   </div>
 
                   {/* Quick set buttons */}
                   <div style={{ display: "flex", gap: 6, marginTop: 8 }}>
                     {[0, 5, 10, 25, 50, 100].map(n => (
                       <button key={n} onClick={() => setAdjQty(String(n))}
-                        style={{ flex: 1, padding: "5px 0", borderRadius: 7, border: `1px solid ${adjQty === String(n) ? "rgba(167,139,250,.5)" : "rgba(255,255,255,.08)"}`, background: adjQty === String(n) ? "rgba(167,139,250,.15)" : "transparent", color: adjQty === String(n) ? "#a78bfa" : tradingMuted, fontSize: 11, fontWeight: 700, cursor: "pointer" }}>
+                        style={{ flex: 1, padding: "5px 0", borderRadius: 7, border: `1px solid ${adjQty === String(n) ? "rgba(167,139,250,.5)" : "rgba(var(--ink),.08)"}`, background: adjQty === String(n) ? "rgba(167,139,250,.15)" : "transparent", color: adjQty === String(n) ? "#a78bfa" : tradingMuted, fontSize: 11, fontWeight: 700, cursor: "pointer" }}>
                         {n}
                       </button>
                     ))}
@@ -308,7 +308,7 @@ export default function TradingStockControlPage() {
                   const isUp = diff > 0;
                   const isNone = diff === 0;
                   return (
-                    <div style={{ padding: "12px 16px", borderRadius: 12, background: isNone ? "rgba(255,255,255,.04)" : isUp ? "rgba(52,211,153,.08)" : "rgba(248,113,113,.08)", border: `1px solid ${isNone ? "rgba(255,255,255,.08)" : isUp ? "rgba(52,211,153,.25)" : "rgba(248,113,113,.25)"}`, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                    <div style={{ padding: "12px 16px", borderRadius: 12, background: isNone ? "rgba(var(--ink),.04)" : isUp ? "rgba(52,211,153,.08)" : "rgba(248,113,113,.08)", border: `1px solid ${isNone ? "rgba(var(--ink),.08)" : isUp ? "rgba(52,211,153,.25)" : "rgba(248,113,113,.25)"}`, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                       <span style={{ fontSize: 13, color: tradingMuted }}>
                         {isNone ? "No change — counts match" : isUp ? "Stock will increase by" : "Stock will decrease by"}
                       </span>
@@ -327,7 +327,7 @@ export default function TradingStockControlPage() {
                   <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
                     {REASONS.map(r => (
                       <button key={r} onClick={() => setAdjReason(r)}
-                        style={{ padding: "6px 12px", borderRadius: 8, border: `1px solid ${adjReason === r ? "rgba(167,139,250,.5)" : "rgba(255,255,255,.08)"}`, background: adjReason === r ? "rgba(167,139,250,.15)" : "transparent", color: adjReason === r ? "#a78bfa" : tradingMuted, fontSize: 12, fontWeight: 600, cursor: "pointer" }}>
+                        style={{ padding: "6px 12px", borderRadius: 8, border: `1px solid ${adjReason === r ? "rgba(167,139,250,.5)" : "rgba(var(--ink),.08)"}`, background: adjReason === r ? "rgba(167,139,250,.15)" : "transparent", color: adjReason === r ? "#a78bfa" : tradingMuted, fontSize: 12, fontWeight: 600, cursor: "pointer" }}>
                         {r}
                       </button>
                     ))}
@@ -339,7 +339,7 @@ export default function TradingStockControlPage() {
             {/* Footer */}
             <div style={{ display: "flex", gap: 10, marginTop: 24, justifyContent: "flex-end" }}>
               <button onClick={() => { setAdjModal(false); setAdjItem(null); setAdjQty(""); }}
-                style={{ padding: "10px 20px", borderRadius: 10, border: "1px solid rgba(255,255,255,.1)", background: "transparent", color: tradingMuted, cursor: "pointer", fontSize: 13 }}>
+                style={{ padding: "10px 20px", borderRadius: 10, border: "1px solid rgba(var(--ink),.1)", background: "transparent", color: tradingMuted, cursor: "pointer", fontSize: 13 }}>
                 Cancel
               </button>
               {adjItem && (

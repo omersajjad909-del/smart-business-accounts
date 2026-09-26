@@ -37,12 +37,12 @@ export type RefundTarget = {
 };
 
 const field: React.CSSProperties = {
-  width: "100%", background: "rgba(255,255,255,.05)", border: `1px solid ${border}`,
-  borderRadius: 9, padding: "10px 12px", color: "#fff", fontSize: 14,
+  width: "100%", background: "rgba(var(--ink),.05)", border: `1px solid ${border}`,
+  borderRadius: 9, padding: "10px 12px", color: "var(--ink-solid, #fff)", fontSize: 14,
   fontFamily: "inherit", boxSizing: "border-box",
 };
 const label: React.CSSProperties = {
-  display: "block", fontSize: 12, color: "rgba(255,255,255,.45)", marginBottom: 6,
+  display: "block", fontSize: 12, color: "rgba(var(--ink),.45)", marginBottom: 6,
 };
 
 export function RefundDialog({
@@ -106,9 +106,9 @@ export function RefundDialog({
 
   const row = (name: string, value: number, colour: string, note?: string) => (
     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 12, padding: "5px 0" }}>
-      <span style={{ fontSize: 12.5, color: "rgba(255,255,255,.55)" }}>
+      <span style={{ fontSize: 12.5, color: "rgba(var(--ink),.55)" }}>
         {name}
-        {note && <span style={{ color: "rgba(255,255,255,.3)", marginLeft: 6 }}>{note}</span>}
+        {note && <span style={{ color: "rgba(var(--ink),.3)", marginLeft: 6 }}>{note}</span>}
       </span>
       <span style={{ fontFamily: "ui-monospace, monospace", fontWeight: 700, color: colour, whiteSpace: "nowrap" }}>
         {value.toLocaleString()}
@@ -128,7 +128,7 @@ export function RefundDialog({
         <h2 style={{ margin: "0 0 4px", fontSize: 18, fontWeight: 800 }}>
           {isVoid ? "Void" : "Refund"} {target.label}
         </h2>
-        <div style={{ fontSize: 12.5, color: "rgba(255,255,255,.42)", marginBottom: 18, lineHeight: 1.6 }}>
+        <div style={{ fontSize: 12.5, color: "rgba(var(--ink),.42)", marginBottom: 18, lineHeight: 1.6 }}>
           Sold for {target.saleAmount.toLocaleString()}, supplier owed {target.costAmount.toLocaleString()}.
           A credit note posts against the sale and the supplier payable falls to whatever the airline keeps.
           Nothing is deleted.
@@ -166,7 +166,7 @@ export function RefundDialog({
         </div>
 
         {/* What the two figures actually mean, in the words the desk uses. */}
-        <div style={{ padding: "13px 15px", borderRadius: 12, background: "rgba(255,255,255,.03)", border: `1px solid ${border}`, marginBottom: 14 }}>
+        <div style={{ padding: "13px 15px", borderRadius: 12, background: "rgba(var(--ink),.03)", border: `1px solid ${border}`, marginBottom: 14 }}>
           {row("Passenger gets back", quote.customerRefund, "#fff")}
           {row("Agency keeps", quote.retainedIncome, "#34d399", "service charge")}
           {row("Supplier returns", quote.supplierRefund, "#fff")}
@@ -207,7 +207,7 @@ export function RefundDialog({
           <button
             onClick={onClose}
             disabled={busy}
-            style={{ padding: "11px 22px", background: "transparent", border: `1px solid ${border}`, borderRadius: 9, color: "rgba(255,255,255,.65)", fontSize: 14, fontFamily: "inherit", cursor: "pointer" }}
+            style={{ padding: "11px 22px", background: "transparent", border: `1px solid ${border}`, borderRadius: 9, color: "rgba(var(--ink),.65)", fontSize: 14, fontFamily: "inherit", cursor: "pointer" }}
           >
             Cancel
           </button>

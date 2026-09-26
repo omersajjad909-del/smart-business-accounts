@@ -26,8 +26,8 @@ export default function HelpfulWidget() {
   };
 
   return (
-    <div style={{ borderRadius:16, padding:"20px 22px", background:"rgba(255,255,255,.03)", border:"1px solid rgba(255,255,255,.07)", marginBottom:32, display:"flex", alignItems:"center", justifyContent:"space-between", flexWrap:"wrap", gap:14 }}>
-      <span style={{ fontSize:14, fontWeight:600, color:"rgba(255,255,255,.45)" }}>
+    <div style={{ borderRadius:16, padding:"20px 22px", background:"rgba(var(--ink),.03)", border:"1px solid rgba(var(--ink),.07)", marginBottom:32, display:"flex", alignItems:"center", justifyContent:"space-between", flexWrap:"wrap", gap:14 }}>
+      <span style={{ fontSize:14, fontWeight:600, color:"rgba(var(--ink),.45)" }}>
         {answer === null ? "Was this article helpful?" : "Thanks for the feedback."}
       </span>
 

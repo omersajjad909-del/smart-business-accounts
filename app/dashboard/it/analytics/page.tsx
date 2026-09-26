@@ -58,7 +58,7 @@ export default function ITAnalyticsPage() {
   }));
 
   return (
-    <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", minHeight: "100vh", color: "#fff", fontFamily: itFont }}>
+    <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", minHeight: "100vh", color: "var(--ink-solid, #fff)", fontFamily: itFont }}>
       <div style={{ marginBottom: 24 }}>
         <div style={{ fontSize: 12, color: "#a78bfa", fontWeight: 700, letterSpacing: ".08em", textTransform: "uppercase", marginBottom: 10 }}>IT Analytics</div>
         <h1 style={{ fontSize: 30, fontWeight: 900, margin: "0 0 10px" }}>Delivery health, stack mix, and support pressure</h1>
@@ -88,7 +88,7 @@ export default function ITAnalyticsPage() {
                     <span style={{ fontSize: 13, fontWeight: 700 }}>{stack}</span>
                     <span style={{ fontSize: 12, color: itMuted }}>{count} projects</span>
                   </div>
-                  <div style={{ height: 10, borderRadius: 999, background: "rgba(255,255,255,.05)", overflow: "hidden" }}>
+                  <div style={{ height: 10, borderRadius: 999, background: "rgba(var(--ink),.05)", overflow: "hidden" }}>
                     <div style={{ width: `${pct}%`, height: "100%", borderRadius: 999, background: "linear-gradient(90deg,#8b5cf6,#60a5fa)" }} />
                   </div>
                 </div>
@@ -101,7 +101,7 @@ export default function ITAnalyticsPage() {
           <div style={{ fontSize: 13, color: "#f87171", fontWeight: 800, marginBottom: 16, textTransform: "uppercase", letterSpacing: ".07em" }}>Support Backlog</div>
           <div style={{ display: "grid", gap: 10 }}>
             {supportByStatus.map((row) => (
-              <div key={row.status} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, background: "rgba(255,255,255,.025)", border: "1px solid rgba(255,255,255,.06)", borderRadius: 14, padding: "12px 14px" }}>
+              <div key={row.status} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, background: "rgba(var(--ink),.025)", border: "1px solid rgba(var(--ink),.06)", borderRadius: 14, padding: "12px 14px" }}>
                 <div style={{ fontSize: 14, fontWeight: 700 }}>{row.status}</div>
                 <div style={{ fontSize: 14, fontWeight: 800, color: row.status === "Resolved" || row.status === "Closed" ? "#34d399" : row.status === "Waiting Client" ? "#fbbf24" : "#f87171" }}>{row.count}</div>
               </div>

@@ -163,22 +163,22 @@ export default function UsersPage() {
       <div style={{ padding:32, borderRadius:16, background:"rgba(239,68,68,0.08)", border:"1px solid rgba(239,68,68,0.2)", textAlign:"center" }}>
         <div style={{ fontSize:32, marginBottom:12 }}>⚠️</div>
         <div style={{ fontSize:16, fontWeight:700, color:"#f87171" }}>Access Denied</div>
-        <div style={{ fontSize:13, color:"rgba(255,255,255,0.4)", marginTop:6 }}>Only ADMIN can manage users.</div>
+        <div style={{ fontSize:13, color:"rgba(var(--ink),0.4)", marginTop:6 }}>Only ADMIN can manage users.</div>
       </div>
     </div>
   );
 
   const card: React.CSSProperties = {
     borderRadius:14, padding:"20px 24px",
-    background:"rgba(255,255,255,0.03)",
-    border:"1px solid rgba(255,255,255,0.07)",
+    background:"rgba(var(--ink),0.03)",
+    border:"1px solid rgba(var(--ink),0.07)",
     marginBottom:16,
   };
 
   const inputStyle: React.CSSProperties = {
     width:"100%", padding:"10px 14px", borderRadius:8,
-    background:"rgba(255,255,255,0.05)", border:"1px solid rgba(255,255,255,0.1)",
-    color:"white", fontSize:13, outline:"none", boxSizing:"border-box",
+    background:"rgba(var(--ink),0.05)", border:"1px solid rgba(var(--ink),0.1)",
+    color:"var(--ink-solid, white)", fontSize:13, outline:"none", boxSizing:"border-box",
   };
 
   const btnPrimary: React.CSSProperties = {
@@ -190,8 +190,8 @@ export default function UsersPage() {
 
   const btnGhost: React.CSSProperties = {
     padding:"10px 20px", borderRadius:8,
-    background:"rgba(255,255,255,0.05)", border:"1px solid rgba(255,255,255,0.1)",
-    color:"rgba(255,255,255,0.6)", fontWeight:600, fontSize:13,
+    background:"rgba(var(--ink),0.05)", border:"1px solid rgba(var(--ink),0.1)",
+    color:"rgba(var(--ink),0.6)", fontWeight:600, fontSize:13,
     cursor:"pointer", transition:"all .2s",
   };
 
@@ -201,8 +201,8 @@ export default function UsersPage() {
       {/* Header */}
       <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:24 }}>
         <div>
-          <h1 style={{ fontSize:20, fontWeight:800, color:"white", margin:0, letterSpacing:"-.3px" }}>User Management</h1>
-          <p style={{ fontSize:12, color:"rgba(255,255,255,0.35)", marginTop:4 }}>Manage team members and their access</p>
+          <h1 style={{ fontSize:20, fontWeight:800, color:"var(--ink-solid, white)", margin:0, letterSpacing:"-.3px" }}>User Management</h1>
+          <p style={{ fontSize:12, color:"rgba(var(--ink),0.35)", marginTop:4 }}>Manage team members and their access</p>
         </div>
         {/* Plan + User Count Badge */}
         <div style={{ display:"flex", alignItems:"center", gap:10 }}>
@@ -211,7 +211,7 @@ export default function UsersPage() {
             background: atLimit ? "rgba(248,113,113,0.1)" : "rgba(99,102,241,0.1)",
             border: `1px solid ${atLimit ? "rgba(248,113,113,0.3)" : "rgba(99,102,241,0.25)"}`,
           }}>
-            <div style={{ fontSize:10, fontWeight:700, textTransform:"uppercase", letterSpacing:".06em", color:"rgba(255,255,255,0.4)", marginBottom:2 }}>
+            <div style={{ fontSize:10, fontWeight:700, textTransform:"uppercase", letterSpacing:".06em", color:"rgba(var(--ink),0.4)", marginBottom:2 }}>
               {plan} Plan — Users
             </div>
             <div style={{ fontSize:16, fontWeight:800, color: atLimit ? "#f87171" : "#a5b4fc" }}>
@@ -227,7 +227,7 @@ export default function UsersPage() {
           <span style={{ fontSize:22 }}>🚫</span>
           <div>
             <div style={{ fontWeight:700, color:"#f87171", fontSize:13 }}>User Limit Reached</div>
-            <div style={{ fontSize:12, color:"rgba(255,255,255,0.45)", marginTop:2 }}>
+            <div style={{ fontSize:12, color:"rgba(var(--ink),0.45)", marginTop:2 }}>
               Your <strong style={{ color:"#a5b4fc" }}>{plan}</strong> plan allows max <strong style={{ color:"#a5b4fc" }}>{maxUsers} users</strong>. Upgrade to add more team members.
             </div>
           </div>
@@ -236,7 +236,7 @@ export default function UsersPage() {
 
       {/* Invite User */}
       <div style={card}>
-        <div style={{ fontSize:13, fontWeight:700, color:"rgba(255,255,255,0.7)", marginBottom:14 }}>
+        <div style={{ fontSize:13, fontWeight:700, color:"rgba(var(--ink),0.7)", marginBottom:14 }}>
           Invite Team Member
         </div>
         <div style={{ display:"grid", gridTemplateColumns:"1fr auto auto", gap:10, alignItems:"end" }}>
@@ -275,7 +275,7 @@ export default function UsersPage() {
         {inviteMsg && <div style={{ marginTop:10, fontSize:12, color: inviteMsg.includes("sent") ? "#34d399" : "#f87171" }}>{inviteMsg}</div>}
         {inviteLink && (
           <div style={{ marginTop:12 }}>
-            <div style={{ fontSize:11, fontWeight:600, color:"rgba(255,255,255,0.4)", marginBottom:6 }}>Invite Link</div>
+            <div style={{ fontSize:11, fontWeight:600, color:"rgba(var(--ink),0.4)", marginBottom:6 }}>Invite Link</div>
             <div style={{ display:"flex", gap:8 }}>
               <input value={inviteLink} readOnly style={{ ...inputStyle, flex:1, fontSize:11 }} />
               <button onClick={() => navigator.clipboard.writeText(inviteLink)} style={{ ...btnGhost, fontSize:11, whiteSpace:"nowrap" }}>Copy</button>
@@ -286,7 +286,7 @@ export default function UsersPage() {
 
       {/* Create / Edit User Form */}
       <div style={card}>
-        <div style={{ fontSize:13, fontWeight:700, color:"rgba(255,255,255,0.7)", marginBottom:14 }}>
+        <div style={{ fontSize:13, fontWeight:700, color:"rgba(var(--ink),0.7)", marginBottom:14 }}>
           {editing ? "Edit User" : "Create New User"}
         </div>
 
@@ -332,19 +332,19 @@ export default function UsersPage() {
       <div style={{ ...card, padding:0, overflow:"hidden" }}>
         <table style={{ width:"100%", borderCollapse:"collapse" }}>
           <thead>
-            <tr style={{ borderBottom:"1px solid rgba(255,255,255,0.06)" }}>
+            <tr style={{ borderBottom:"1px solid rgba(var(--ink),0.06)" }}>
               {["Name","Email","Role","Status","Actions"].map((h,i) => (
-                <th key={h} style={{ padding:"12px 16px", textAlign: i===4 ? "right" : "left", fontSize:11, fontWeight:700, color:"rgba(255,255,255,0.35)", textTransform:"uppercase", letterSpacing:".06em" }}>{h}</th>
+                <th key={h} style={{ padding:"12px 16px", textAlign: i===4 ? "right" : "left", fontSize:11, fontWeight:700, color:"rgba(var(--ink),0.35)", textTransform:"uppercase", letterSpacing:".06em" }}>{h}</th>
               ))}
             </tr>
           </thead>
           <tbody>
             {users.length === 0 ? (
-              <tr><td colSpan={5} style={{ padding:32, textAlign:"center", fontSize:13, color:"rgba(255,255,255,0.2)" }}>No users found</td></tr>
+              <tr><td colSpan={5} style={{ padding:32, textAlign:"center", fontSize:13, color:"rgba(var(--ink),0.2)" }}>No users found</td></tr>
             ) : users.map((u) => (
-              <tr key={u.id} style={{ borderBottom:"1px solid rgba(255,255,255,0.04)" }}>
-                <td style={{ padding:"12px 16px", fontSize:13, fontWeight:600, color:"rgba(255,255,255,0.85)" }}>{u.name}</td>
-                <td style={{ padding:"12px 16px", fontSize:12, color:"rgba(255,255,255,0.45)" }}>{u.email}</td>
+              <tr key={u.id} style={{ borderBottom:"1px solid rgba(var(--ink),0.04)" }}>
+                <td style={{ padding:"12px 16px", fontSize:13, fontWeight:600, color:"rgba(var(--ink),0.85)" }}>{u.name}</td>
+                <td style={{ padding:"12px 16px", fontSize:12, color:"rgba(var(--ink),0.45)" }}>{u.email}</td>
                 <td style={{ padding:"12px 16px" }}>
                   <span style={{
                     padding:"3px 10px", borderRadius:20, fontSize:11, fontWeight:700,
@@ -355,8 +355,8 @@ export default function UsersPage() {
                 </td>
                 <td style={{ padding:"12px 16px" }}>
                   <div style={{ display:"flex", alignItems:"center", gap:6 }}>
-                    <div style={{ width:7, height:7, borderRadius:"50%", background: u.active ? "#34d399" : "rgba(255,255,255,0.2)" }}/>
-                    <span style={{ fontSize:12, color:"rgba(255,255,255,0.45)" }}>{u.active ? "Active" : "Disabled"}</span>
+                    <div style={{ width:7, height:7, borderRadius:"50%", background: u.active ? "#34d399" : "rgba(var(--ink),0.2)" }}/>
+                    <span style={{ fontSize:12, color:"rgba(var(--ink),0.45)" }}>{u.active ? "Active" : "Disabled"}</span>
                   </div>
                 </td>
                 <td style={{ padding:"12px 16px", textAlign:"right" }}>

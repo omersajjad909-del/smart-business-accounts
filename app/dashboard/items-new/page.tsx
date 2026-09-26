@@ -16,7 +16,7 @@ const PANEL  = "rgba(255,255,255,0.03)";
 const BORDER = "rgba(255,255,255,0.08)";
 const TEXT   = "#f1f5f9";
 const MUTED  = "rgba(255,255,255,0.45)";
-const INPUT  = { background:"rgba(255,255,255,0.05)", border:`1px solid ${BORDER}`, borderRadius:8, padding:"9px 12px", color:TEXT, fontFamily:FONT, fontSize:13, width:"100%", outline:"none" };
+const INPUT  = { background:"rgba(var(--ink),0.05)", border:`1px solid ${BORDER}`, borderRadius:8, padding:"9px 12px", color:TEXT, fontFamily:FONT, fontSize:13, width:"100%", outline:"none" };
 const SELECT: React.CSSProperties = { ...INPUT, paddingRight:34, appearance:"none", WebkitAppearance:"none", MozAppearance:"none", colorScheme:"dark", cursor:"pointer" };
 const SELECT_ARROW: React.CSSProperties = { position:"absolute", right:12, top:"50%", transform:"translateY(-50%)", pointerEvents:"none", fontSize:10, color:MUTED };
 
@@ -440,13 +440,13 @@ export default function ItemsNewPage() {
               return (
                 <tr key={item.id}
                   style={{ borderBottom:`1px solid ${BORDER}`,
-                    background: idx % 2 === 0 ? "transparent" : "rgba(255,255,255,.01)" }}
+                    background: idx % 2 === 0 ? "transparent" : "rgba(var(--ink),.01)" }}
                   onMouseEnter={e=>(e.currentTarget.style.background="rgba(99,102,241,0.04)")}
                   onMouseLeave={e=>(e.currentTarget.style.background=idx%2===0?"transparent":"rgba(255,255,255,.01)")}>
                   <td style={{ padding:"6px 8px 6px 14px", width:44 }}>
                     {item.imageUrl
                       ? <img src={item.imageUrl} alt="" style={{ width:36, height:36, objectFit:"cover", borderRadius:6, border:`1px solid ${BORDER}`, display:"block" }} />
-                      : <div style={{ width:36, height:36, borderRadius:6, border:`1px dashed ${BORDER}`, background:"rgba(255,255,255,.02)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:14, opacity:.4 }}>🖼</div>
+                      : <div style={{ width:36, height:36, borderRadius:6, border:`1px dashed ${BORDER}`, background:"rgba(var(--ink),.02)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:14, opacity:.4 }}>🖼</div>
                     }
                   </td>
                   <td style={{ padding:"10px 14px", fontFamily:"monospace", fontSize:12, color:ACCENT, fontWeight:700 }}>{item.code}</td>

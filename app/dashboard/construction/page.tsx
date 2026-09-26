@@ -28,7 +28,7 @@ export default function ConstructionOverviewPage() {
   const { summary, projects, subcontractors } = data;
 
   return (
-    <div style={{ minHeight: "100vh", padding: isMobile ? "15px 14px" : "28px 32px", color: "#fff", fontFamily: constructionFont }}>
+    <div style={{ minHeight: "100vh", padding: isMobile ? "15px 14px" : "28px 32px", color: "var(--ink-solid, #fff)", fontFamily: constructionFont }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 20, flexWrap: "wrap", marginBottom: 24 }}>
         <div>
           <h1 style={{ margin: "0 0 6px", fontSize: 26, fontWeight: 800 }}>Construction Command Center</h1>
@@ -68,7 +68,7 @@ export default function ConstructionOverviewPage() {
           <div style={{ fontSize: 15, fontWeight: 800, marginBottom: 14 }}>Project Portfolio</div>
           <div style={{ display: "grid", gap: 10 }}>
             {projects.slice(0, 5).map((project) => (
-              <div key={project.id} style={{ display: "flex", justifyContent: "space-between", padding: "12px 14px", borderRadius: 10, background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.05)" }}>
+              <div key={project.id} style={{ display: "flex", justifyContent: "space-between", padding: "12px 14px", borderRadius: 10, background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.05)" }}>
                 <div>
                   <div style={{ fontSize: 14, fontWeight: 700 }}>{project.name}</div>
                   <div style={{ fontSize: 12, color: constructionMuted }}>{project.client || "No client"} | {project.progress}% progress</div>
@@ -90,7 +90,7 @@ export default function ConstructionOverviewPage() {
               { label: "Contractor payouts", value: `Rs. ${summary.contractorPayments.toLocaleString()}`, color: "#a78bfa" },
               { label: "Live subcontractors", value: subcontractors.filter((row) => row.status === "active").length, color: "#fb923c" },
             ].map((row) => (
-              <div key={row.label} style={{ display: "flex", justifyContent: "space-between", padding: "12px 14px", borderRadius: 10, background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.05)" }}>
+              <div key={row.label} style={{ display: "flex", justifyContent: "space-between", padding: "12px 14px", borderRadius: 10, background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.05)" }}>
                 <span style={{ fontSize: 13, color: constructionMuted }}>{row.label}</span>
                 <span style={{ fontSize: 14, fontWeight: 800, color: row.color }}>{row.value}</span>
               </div>

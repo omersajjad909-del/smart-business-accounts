@@ -11,12 +11,12 @@ const BD = "rgba(255,255,255,0.07)";
 const MODAL_BG = "#12161f";
 
 const inp: React.CSSProperties = {
-  width: "100%", background: "rgba(255,255,255,0.04)", border: `1px solid ${BD}`,
+  width: "100%", background: "rgba(var(--ink),0.04)", border: `1px solid ${BD}`,
   borderRadius: 8, padding: "9px 12px", color: "var(--text-primary)", fontFamily: FF, fontSize: 13,
   boxSizing: "border-box",
 };
-const sel: React.CSSProperties = { ...inp, background: "#161b27" };
-const lbl: React.CSSProperties = { display: "block", fontSize: 11, color: "rgba(255,255,255,0.4)", marginBottom: 5, fontWeight: 500, textTransform: "uppercase", letterSpacing: "0.04em" };
+const sel: React.CSSProperties = { ...inp, background: "var(--dk-161b27, #161b27)" };
+const lbl: React.CSSProperties = { display: "block", fontSize: 11, color: "rgba(var(--ink),0.4)", marginBottom: 5, fontWeight: 500, textTransform: "uppercase", letterSpacing: "0.04em" };
 const card: React.CSSProperties = { background: BG, border: `1px solid ${BD}`, borderRadius: 12, padding: 20, fontFamily: FF };
 
 // ── Status config ──────────────────────────────────────────────────────────────
@@ -255,13 +255,13 @@ export default function LCPage() {
 
   // ── Render ─────────────────────────────────────────────────────────────────
   return (
-    <div style={{ minHeight: "100vh", background: "var(--app-bg,#0d1117)", color: "var(--text-primary,#fff)", fontFamily: FF, padding: isMobile ? "15px 14px" : "28px 32px" }}>
+    <div style={{ minHeight: "100vh", background: "var(--app-bg,var(--dk-0d1117, #0d1117))", color: "var(--text-primary,#fff)", fontFamily: FF, padding: isMobile ? "15px 14px" : "28px 32px" }}>
 
       {/* Header */}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 28 }}>
         <div>
           <h1 style={{ margin: 0, fontSize: 24, fontWeight: 800, letterSpacing: "-0.5px" }}>LC / TT Management</h1>
-          <p style={{ margin: "5px 0 0", color: "var(--text-muted,rgba(255,255,255,0.45))", fontSize: 13 }}>
+          <p style={{ margin: "5px 0 0", color: "var(--text-muted,rgba(var(--ink),0.45))", fontSize: 13 }}>
             Letters of Credit &amp; Telegraphic Transfers for import/export trade finance
           </p>
         </div>
@@ -282,7 +282,7 @@ export default function LCPage() {
         ].map(k => (
           <div key={k.label} style={{ ...card, textAlign: "center" }}>
             <div style={{ fontSize: 26, fontWeight: 800, color: k.color, letterSpacing: "-0.5px" }}>{k.value}</div>
-            <div style={{ fontSize: 11, color: "var(--text-muted,rgba(255,255,255,0.45))", marginTop: 5, fontWeight: 500 }}>{k.label}</div>
+            <div style={{ fontSize: 11, color: "var(--text-muted,rgba(var(--ink),0.45))", marginTop: 5, fontWeight: 500 }}>{k.label}</div>
           </div>
         ))}
       </div>
@@ -300,8 +300,8 @@ export default function LCPage() {
               style={{
                 padding: "7px 14px", borderRadius: 7, fontSize: 12, fontWeight: 600, cursor: "pointer", fontFamily: FF,
                 border: `1px solid ${tab === t ? "#6366f1" : BD}`,
-                background: tab === t ? "rgba(99,102,241,0.15)" : "rgba(255,255,255,0.02)",
-                color: tab === t ? "#a5b4fc" : "rgba(255,255,255,0.5)",
+                background: tab === t ? "rgba(99,102,241,0.15)" : "rgba(var(--ink),0.02)",
+                color: tab === t ? "#a5b4fc" : "rgba(var(--ink),0.5)",
               }}>
               {t === "DOCUMENTS_PRESENTED" ? "Docs Presented" : t}
             </button>
@@ -315,20 +315,20 @@ export default function LCPage() {
         {/* Table */}
         <div style={{ ...card, padding: 0, overflow: "hidden" }}>
           {loading
-            ? <div style={{ padding: 48, textAlign: "center", color: "rgba(255,255,255,0.3)", fontSize: 14 }}>Loading…</div>
+            ? <div style={{ padding: 48, textAlign: "center", color: "rgba(var(--ink),0.3)", fontSize: 14 }}>Loading…</div>
             : (
               <div style={{ overflowX: "auto" }}>
                 <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
                   <thead>
                     <tr style={{ borderBottom: `1px solid ${BD}` }}>
                       {["LC/TT No","Type","Direction","Bank","Beneficiary / Applicant","Amount","Ccy","Issue Date","Expiry","Terms","Status",""].map(h => (
-                        <th key={h} style={{ padding: "13px 14px", textAlign: "left", color: "rgba(255,255,255,0.38)", fontWeight: 500, fontSize: 11, whiteSpace: "nowrap", textTransform: "uppercase", letterSpacing: "0.04em" }}>{h}</th>
+                        <th key={h} style={{ padding: "13px 14px", textAlign: "left", color: "rgba(var(--ink),0.38)", fontWeight: 500, fontSize: 11, whiteSpace: "nowrap", textTransform: "uppercase", letterSpacing: "0.04em" }}>{h}</th>
                       ))}
                     </tr>
                   </thead>
                   <tbody>
                     {filtered.length === 0 && (
-                      <tr><td colSpan={12} style={{ padding: 48, textAlign: "center", color: "rgba(255,255,255,0.2)", fontSize: 14 }}>No records found.</td></tr>
+                      <tr><td colSpan={12} style={{ padding: 48, textAlign: "center", color: "rgba(var(--ink),0.2)", fontSize: 14 }}>No records found.</td></tr>
                     )}
                     {filtered.map(item => {
                       const expDays = daysUntil(item.expiryDate);
@@ -348,19 +348,19 @@ export default function LCPage() {
                           <td style={{ padding: "12px 14px" }}>
                             <span style={{ background: item.direction === "Import" ? "rgba(251,146,60,0.15)" : "rgba(34,197,94,0.15)", color: item.direction === "Import" ? "#fb923c" : "#22c55e", padding: "2px 9px", borderRadius: 20, fontSize: 11, fontWeight: 700 }}>{item.direction}</span>
                           </td>
-                          <td style={{ padding: "12px 14px", color: "rgba(255,255,255,0.7)", maxWidth: 160, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{item.issuingBank}</td>
+                          <td style={{ padding: "12px 14px", color: "rgba(var(--ink),0.7)", maxWidth: 160, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{item.issuingBank}</td>
                           <td style={{ padding: "12px 14px", maxWidth: 180 }}>
                             <div style={{ fontWeight: 500, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{item.beneficiaryName}</div>
-                            {item.applicantName && <div style={{ fontSize: 11, color: "rgba(255,255,255,0.4)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{item.applicantName}</div>}
+                            {item.applicantName && <div style={{ fontSize: 11, color: "rgba(var(--ink),0.4)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{item.applicantName}</div>}
                           </td>
                           <td style={{ padding: "12px 14px", fontWeight: 700, whiteSpace: "nowrap" }}>{fmt(item.amount)}</td>
-                          <td style={{ padding: "12px 14px", color: "rgba(255,255,255,0.5)", fontSize: 12 }}>{item.currency}</td>
-                          <td style={{ padding: "12px 14px", color: "rgba(255,255,255,0.5)", whiteSpace: "nowrap", fontSize: 12 }}>{item.issueDate}</td>
-                          <td style={{ padding: "12px 14px", whiteSpace: "nowrap", fontSize: 12, color: expRed ? "#ef4444" : "rgba(255,255,255,0.5)", fontWeight: expRed ? 700 : 400 }}>
+                          <td style={{ padding: "12px 14px", color: "rgba(var(--ink),0.5)", fontSize: 12 }}>{item.currency}</td>
+                          <td style={{ padding: "12px 14px", color: "rgba(var(--ink),0.5)", whiteSpace: "nowrap", fontSize: 12 }}>{item.issueDate}</td>
+                          <td style={{ padding: "12px 14px", whiteSpace: "nowrap", fontSize: 12, color: expRed ? "#ef4444" : "rgba(var(--ink),0.5)", fontWeight: expRed ? 700 : 400 }}>
                             {item.expiryDate || "—"}
                             {expRed && <span style={{ marginLeft: 4, fontSize: 10 }}>({expDays}d)</span>}
                           </td>
-                          <td style={{ padding: "12px 14px", color: "rgba(255,255,255,0.5)", fontSize: 12, whiteSpace: "nowrap" }}>{terms}</td>
+                          <td style={{ padding: "12px 14px", color: "rgba(var(--ink),0.5)", fontSize: 12, whiteSpace: "nowrap" }}>{terms}</td>
                           <td style={{ padding: "12px 14px" }}>
                             <span style={{ background: `${sc}22`, color: sc, padding: "3px 10px", borderRadius: 20, fontSize: 11, fontWeight: 700, whiteSpace: "nowrap" }}>
                               {STATUS_LABELS[item.status] || item.status}
@@ -386,14 +386,14 @@ export default function LCPage() {
         {/* Detail panel */}
         {selectedItem && (
           <div style={{ ...card, position: "relative", alignSelf: "start" }}>
-            <button onClick={() => setDetail(null)} style={{ position: "absolute", top: 14, right: 14, background: "none", border: "none", color: "rgba(255,255,255,0.4)", fontSize: 18, cursor: "pointer" }}>✕</button>
+            <button onClick={() => setDetail(null)} style={{ position: "absolute", top: 14, right: 14, background: "none", border: "none", color: "rgba(var(--ink),0.4)", fontSize: 18, cursor: "pointer" }}>✕</button>
             <div style={{ display: "flex", gap: 8, marginBottom: 14, flexWrap: "wrap" }}>
               <span style={{ background: selectedItem.type === "LC" ? "rgba(167,139,250,0.15)" : "rgba(56,189,248,0.15)", color: selectedItem.type === "LC" ? "#a78bfa" : "#38bdf8", padding: "3px 12px", borderRadius: 20, fontSize: 12, fontWeight: 700 }}>{selectedItem.type}</span>
               <span style={{ background: selectedItem.direction === "Import" ? "rgba(251,146,60,0.15)" : "rgba(34,197,94,0.15)", color: selectedItem.direction === "Import" ? "#fb923c" : "#22c55e", padding: "3px 12px", borderRadius: 20, fontSize: 12, fontWeight: 700 }}>{selectedItem.direction}</span>
               <span style={{ background: `${STATUS_COLOR[selectedItem.status] || "#6b7280"}22`, color: STATUS_COLOR[selectedItem.status] || "#6b7280", padding: "3px 12px", borderRadius: 20, fontSize: 12, fontWeight: 700 }}>{STATUS_LABELS[selectedItem.status] || selectedItem.status}</span>
             </div>
             <h2 style={{ margin: "0 0 2px", fontSize: 18, fontWeight: 800 }}>{selectedItem.refNo}</h2>
-            <p style={{ margin: "0 0 18px", fontSize: 13, color: "rgba(255,255,255,0.4)" }}>{selectedItem.issuingBank}</p>
+            <p style={{ margin: "0 0 18px", fontSize: 13, color: "rgba(var(--ink),0.4)" }}>{selectedItem.issuingBank}</p>
 
             {[
               ["Beneficiary", selectedItem.beneficiaryName],
@@ -411,29 +411,29 @@ export default function LCPage() {
               ["Bank Charges", selectedItem.bankCharges],
             ].map(([k, v]) => (
               <div key={k} style={{ display: "flex", justifyContent: "space-between", padding: "9px 0", borderBottom: `1px solid ${BD}` }}>
-                <span style={{ color: "rgba(255,255,255,0.4)", fontSize: 12 }}>{k}</span>
+                <span style={{ color: "rgba(var(--ink),0.4)", fontSize: 12 }}>{k}</span>
                 <span style={{ fontSize: 12, fontWeight: 600, textAlign: "right", maxWidth: 200 }}>{v}</span>
               </div>
             ))}
 
             {selectedItem.docsRequired.length > 0 && (
               <div style={{ marginTop: 14 }}>
-                <div style={{ fontSize: 11, color: "rgba(255,255,255,0.38)", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.04em", marginBottom: 8 }}>Documents Required</div>
+                <div style={{ fontSize: 11, color: "rgba(var(--ink),0.38)", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.04em", marginBottom: 8 }}>Documents Required</div>
                 {selectedItem.docsRequired.map(d => (
-                  <div key={d} style={{ fontSize: 12, padding: "4px 0", color: "rgba(255,255,255,0.65)" }}>✓ {d}</div>
+                  <div key={d} style={{ fontSize: 12, padding: "4px 0", color: "rgba(var(--ink),0.65)" }}>✓ {d}</div>
                 ))}
               </div>
             )}
 
             {selectedItem.goodsDesc && (
               <div style={{ marginTop: 14 }}>
-                <div style={{ fontSize: 11, color: "rgba(255,255,255,0.38)", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.04em", marginBottom: 5 }}>Goods Description</div>
-                <div style={{ fontSize: 12, color: "rgba(255,255,255,0.65)", lineHeight: 1.6 }}>{selectedItem.goodsDesc}</div>
+                <div style={{ fontSize: 11, color: "rgba(var(--ink),0.38)", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.04em", marginBottom: 5 }}>Goods Description</div>
+                <div style={{ fontSize: 12, color: "rgba(var(--ink),0.65)", lineHeight: 1.6 }}>{selectedItem.goodsDesc}</div>
               </div>
             )}
 
             {selectedItem.notes && (
-              <div style={{ marginTop: 14, padding: "10px 12px", background: "rgba(255,255,255,0.03)", borderRadius: 8, fontSize: 12, color: "rgba(255,255,255,0.55)", lineHeight: 1.6 }}>
+              <div style={{ marginTop: 14, padding: "10px 12px", background: "rgba(var(--ink),0.03)", borderRadius: 8, fontSize: 12, color: "rgba(var(--ink),0.55)", lineHeight: 1.6 }}>
                 {selectedItem.notes}
               </div>
             )}
@@ -457,7 +457,7 @@ export default function LCPage() {
             {/* Modal header */}
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24 }}>
               <h2 style={{ margin: 0, fontSize: 18, fontWeight: 800 }}>{form.id ? "Edit LC / TT" : "New LC / TT"}</h2>
-              <button onClick={() => setShowModal(false)} style={{ background: "none", border: "none", color: "rgba(255,255,255,0.4)", fontSize: 20, cursor: "pointer" }}>✕</button>
+              <button onClick={() => setShowModal(false)} style={{ background: "none", border: "none", color: "rgba(var(--ink),0.4)", fontSize: 20, cursor: "pointer" }}>✕</button>
             </div>
 
             {formErr && (
@@ -473,8 +473,8 @@ export default function LCPage() {
                     <button key={t} onClick={() => { setF("type", t); if (!form.id) setF("refNo", genRef(t)); }}
                       style={{ flex: 1, padding: "9px 0", borderRadius: 8, fontFamily: FF, fontSize: 13, fontWeight: 700, cursor: "pointer", transition: "all 0.15s",
                         border: `1px solid ${form.type === t ? (t === "LC" ? "#a78bfa" : "#38bdf8") : BD}`,
-                        background: form.type === t ? (t === "LC" ? "rgba(167,139,250,0.15)" : "rgba(56,189,248,0.15)") : "rgba(255,255,255,0.02)",
-                        color: form.type === t ? (t === "LC" ? "#a78bfa" : "#38bdf8") : "rgba(255,255,255,0.45)" }}>
+                        background: form.type === t ? (t === "LC" ? "rgba(167,139,250,0.15)" : "rgba(56,189,248,0.15)") : "rgba(var(--ink),0.02)",
+                        color: form.type === t ? (t === "LC" ? "#a78bfa" : "#38bdf8") : "rgba(var(--ink),0.45)" }}>
                       {t}
                     </button>
                   ))}
@@ -487,8 +487,8 @@ export default function LCPage() {
                     <button key={d} onClick={() => setF("direction", d)}
                       style={{ flex: 1, padding: "9px 0", borderRadius: 8, fontFamily: FF, fontSize: 13, fontWeight: 700, cursor: "pointer", transition: "all 0.15s",
                         border: `1px solid ${form.direction === d ? (d === "Import" ? "#fb923c" : "#22c55e") : BD}`,
-                        background: form.direction === d ? (d === "Import" ? "rgba(251,146,60,0.12)" : "rgba(34,197,94,0.12)") : "rgba(255,255,255,0.02)",
-                        color: form.direction === d ? (d === "Import" ? "#fb923c" : "#22c55e") : "rgba(255,255,255,0.45)" }}>
+                        background: form.direction === d ? (d === "Import" ? "rgba(251,146,60,0.12)" : "rgba(34,197,94,0.12)") : "rgba(var(--ink),0.02)",
+                        color: form.direction === d ? (d === "Import" ? "#fb923c" : "#22c55e") : "rgba(var(--ink),0.45)" }}>
                       {d}
                     </button>
                   ))}
@@ -607,8 +607,8 @@ export default function LCPage() {
                     <button key={doc} onClick={() => toggleDoc(doc)}
                       style={{ padding: "6px 12px", borderRadius: 7, fontSize: 12, fontWeight: 600, cursor: "pointer", fontFamily: FF, transition: "all 0.12s",
                         border: `1px solid ${checked ? "#6366f1" : BD}`,
-                        background: checked ? "rgba(99,102,241,0.15)" : "rgba(255,255,255,0.02)",
-                        color: checked ? "#a5b4fc" : "rgba(255,255,255,0.4)" }}>
+                        background: checked ? "rgba(99,102,241,0.15)" : "rgba(var(--ink),0.02)",
+                        color: checked ? "#a5b4fc" : "rgba(var(--ink),0.4)" }}>
                       {checked ? "✓ " : ""}{doc}
                     </button>
                   );
@@ -629,7 +629,7 @@ export default function LCPage() {
                 {saving ? "Saving…" : form.id ? "Save Changes" : `Create ${form.type}`}
               </button>
               <button onClick={() => setShowModal(false)}
-                style={{ padding: "11px 24px", background: "transparent", border: `1px solid ${BD}`, borderRadius: 9, color: "rgba(255,255,255,0.5)", fontFamily: FF, fontSize: 14, cursor: "pointer" }}>
+                style={{ padding: "11px 24px", background: "transparent", border: `1px solid ${BD}`, borderRadius: 9, color: "rgba(var(--ink),0.5)", fontFamily: FF, fontSize: 14, cursor: "pointer" }}>
                 Cancel
               </button>
             </div>

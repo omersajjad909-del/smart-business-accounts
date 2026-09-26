@@ -64,7 +64,7 @@ function fmt(v: number) { return `Rs. ${v.toLocaleString()}`; }
 function todayIso() { return new Date().toISOString().slice(0, 10); }
 
 const inp: React.CSSProperties = {
-  width: "100%", boxSizing: "border-box", background: "rgba(255,255,255,.05)",
+  width: "100%", boxSizing: "border-box", background: "rgba(var(--ink),.05)",
   border: `1px solid ${BORDER}`, borderRadius: 8, padding: "9px 12px",
   color: "#f1f5f9", fontFamily: FONT, fontSize: 13, outline: "none",
 };
@@ -405,7 +405,7 @@ export default function CnfPage() {
       {/* Modal */}
       {showModal && (
         <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.72)", zIndex: 50, display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }}>
-          <div style={{ background: "#161b27", border: `1px solid ${BORDER}`, borderRadius: 18, padding: 32, width: "100%", maxWidth: 680, maxHeight: "90vh", overflowY: "auto", fontFamily: FONT }}>
+          <div style={{ background: "var(--dk-161b27, #161b27)", border: `1px solid ${BORDER}`, borderRadius: 18, padding: 32, width: "100%", maxWidth: 680, maxHeight: "90vh", overflowY: "auto", fontFamily: FONT }}>
             <h2 style={{ margin: "0 0 22px", fontSize: 18, fontWeight: 800 }}>{editId ? "Edit Job File" : "New Job File"}</h2>
 
             {error && (

@@ -101,7 +101,7 @@ export default function TradeAnalyticsPage() {
           <div style={{ padding: isMobile ? "12px 10px" : "16px 18px", borderBottom: `1px solid ${tradeBorder}`, fontSize: 15, fontWeight: 800 }}>Top Routes</div>
           <div style={{ padding: 18, display: "grid", gap: 10 }}>
             {routeRows.map((row) => (
-              <div key={row.route} style={{ display: "flex", justifyContent: "space-between", padding: "10px 12px", borderRadius: 10, background: "var(--panel-bg)", border: "1px solid rgba(255,255,255,.05)" }}>
+              <div key={row.route} style={{ display: "flex", justifyContent: "space-between", padding: "10px 12px", borderRadius: 10, background: "var(--panel-bg)", border: "1px solid rgba(var(--ink),.05)" }}>
                 <span style={{ fontSize: 13 }}>{row.route}</span>
                 <span style={{ fontSize: 14, fontWeight: 800, color: "#7dd3fc" }}>{row.count}</span>
               </div>
@@ -113,7 +113,7 @@ export default function TradeAnalyticsPage() {
           <div style={{ padding: isMobile ? "12px 10px" : "16px 18px", borderBottom: `1px solid ${tradeBorder}`, fontSize: 15, fontWeight: 800 }}>Customs Status</div>
           <div style={{ padding: 18, display: "grid", gap: 10 }}>
             {statusRows.map((row) => (
-              <div key={row.status} style={{ display: "flex", justifyContent: "space-between", padding: "10px 12px", borderRadius: 10, background: "var(--panel-bg)", border: "1px solid rgba(255,255,255,.05)" }}>
+              <div key={row.status} style={{ display: "flex", justifyContent: "space-between", padding: "10px 12px", borderRadius: 10, background: "var(--panel-bg)", border: "1px solid rgba(var(--ink),.05)" }}>
                 <span style={{ fontSize: 13 }}>{row.status}</span>
                 <span style={{ fontSize: 14, fontWeight: 800, color: "#f59e0b" }}>{row.count}</span>
               </div>
@@ -125,7 +125,7 @@ export default function TradeAnalyticsPage() {
           <div style={{ padding: isMobile ? "12px 10px" : "16px 18px", borderBottom: `1px solid ${tradeBorder}`, fontSize: 15, fontWeight: 800 }}>LC Currency Mix</div>
           <div style={{ padding: 18, display: "grid", gap: 10 }}>
             {lcCurrencyRows.map((row) => (
-              <div key={row.currency} style={{ display: "flex", justifyContent: "space-between", padding: "10px 12px", borderRadius: 10, background: "var(--panel-bg)", border: "1px solid rgba(255,255,255,.05)" }}>
+              <div key={row.currency} style={{ display: "flex", justifyContent: "space-between", padding: "10px 12px", borderRadius: 10, background: "var(--panel-bg)", border: "1px solid rgba(var(--ink),.05)" }}>
                 <span style={{ fontSize: 13 }}>{row.currency}</span>
                 <span style={{ fontSize: 14, fontWeight: 800, color: "#a78bfa" }}>{row.amount.toLocaleString()}</span>
               </div>

@@ -61,7 +61,7 @@ const labelStyle: React.CSSProperties = {
 
 const inputStyle: React.CSSProperties = {
   width: "100%", boxSizing: "border-box",
-  background: "rgba(255,255,255,.05)",
+  background: "rgba(var(--ink),.05)",
   border: "1px solid var(--border)",
   borderRadius: 8, padding: "9px 12px",
   fontSize: 13, color: "var(--text-primary)",

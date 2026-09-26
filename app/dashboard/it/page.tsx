@@ -47,7 +47,7 @@ export default function ITOverviewPage() {
   const { summary, projects } = data;
 
   return (
-    <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", minHeight: "100vh", color: "#fff", fontFamily: itFont }}>
+    <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", minHeight: "100vh", color: "var(--ink-solid, #fff)", fontFamily: itFont }}>
       <div style={{ marginBottom: 26 }}>
         <div style={{ fontSize: 12, color: "#a78bfa", fontWeight: 700, letterSpacing: ".08em", textTransform: "uppercase", marginBottom: 10 }}>IT Company</div>
         <h1 style={{ fontSize: 30, fontWeight: 900, margin: "0 0 10px" }}>Delivery, contracts, and support command center</h1>
@@ -73,10 +73,10 @@ export default function ITOverviewPage() {
               { title: "Contract Control", body: "Retainer, milestone, ya fixed-price agreements active rakhein." },
               { title: "Support & Renewals", body: "Post-delivery tickets, AMC, and SLA commitments manage karein." },
             ].map((step, index) => (
-              <div key={step.title} style={{ background: "rgba(8,12,30,.36)", border: "1px solid rgba(255,255,255,.08)", borderRadius: 16, padding: 16 }}>
+              <div key={step.title} style={{ background: "rgba(8,12,30,.36)", border: "1px solid rgba(var(--ink),.08)", borderRadius: 16, padding: 16 }}>
                 <div style={{ width: 28, height: 28, borderRadius: 999, background: "rgba(139,92,246,.16)", color: "#ddd6fe", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 800, marginBottom: 12 }}>{index + 1}</div>
                 <div style={{ fontSize: 15, fontWeight: 800, marginBottom: 8 }}>{step.title}</div>
-                <div style={{ fontSize: 13, color: "rgba(255,255,255,.62)", lineHeight: 1.55 }}>{step.body}</div>
+                <div style={{ fontSize: 13, color: "rgba(var(--ink),.62)", lineHeight: 1.55 }}>{step.body}</div>
               </div>
             ))}
           </div>
@@ -92,7 +92,7 @@ export default function ITOverviewPage() {
               { href: "/dashboard/it/support", label: "Support Tickets", hint: "Client incidents and SLA queue" },
               { href: "/dashboard/it/analytics", label: "IT Analytics", hint: "Portfolio health and ops mix" },
             ].map((item) => (
-              <Link prefetch={false} key={item.href} href={item.href} style={{ textDecoration: "none", color: "#fff", background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)", borderRadius: 14, padding: isMobile ? "12px 10px" : "14px 16px" }}>
+              <Link prefetch={false} key={item.href} href={item.href} style={{ textDecoration: "none", color: "var(--ink-solid, #fff)", background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.07)", borderRadius: 14, padding: isMobile ? "12px 10px" : "14px 16px" }}>
                 <div style={{ fontSize: 14, fontWeight: 800, marginBottom: 4 }}>{item.label}</div>
                 <div style={{ fontSize: 12, color: itMuted }}>{item.hint}</div>
               </Link>
@@ -108,7 +108,7 @@ export default function ITOverviewPage() {
             {projects.length === 0 ? (
               <div style={{ color: itMuted, fontSize: 13 }}>Projects add karne ke baad yahan portfolio summary show hogi.</div>
             ) : projects.slice(0, 4).map((project) => (
-              <div key={project.id} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, background: "rgba(255,255,255,.025)", border: "1px solid rgba(255,255,255,.06)", borderRadius: 14, padding: "12px 14px" }}>
+              <div key={project.id} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, background: "rgba(var(--ink),.025)", border: "1px solid rgba(var(--ink),.06)", borderRadius: 14, padding: "12px 14px" }}>
                 <div>
                   <div style={{ fontSize: 14, fontWeight: 700 }}>{project.name}</div>
                   <div style={{ fontSize: 12, color: itMuted }}>{project.client} | {project.progress}% progress</div>
@@ -128,7 +128,7 @@ export default function ITOverviewPage() {
               { label: "Critical support", value: `${summary.criticalTickets} unresolved`, tone: "#f87171" },
               { label: "Completed projects", value: `${projects.filter((project) => project.status === "Completed").length} shipped`, tone: "#34d399" },
             ].map((row) => (
-              <div key={row.label} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "rgba(255,255,255,.025)", border: "1px solid rgba(255,255,255,.06)", borderRadius: 14, padding: isMobile ? "12px 10px" : "14px 16px" }}>
+              <div key={row.label} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "rgba(var(--ink),.025)", border: "1px solid rgba(var(--ink),.06)", borderRadius: 14, padding: isMobile ? "12px 10px" : "14px 16px" }}>
                 <span style={{ fontSize: 13, color: itMuted }}>{row.label}</span>
                 <span style={{ fontSize: 14, fontWeight: 800, color: row.tone }}>{row.value}</span>
               </div>

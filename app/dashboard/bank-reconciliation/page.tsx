@@ -258,7 +258,7 @@ export default function BankReconciliationPage() {
                 const top = suggestion.candidates[0];
                 const tone = confidenceTone(top?.confidence || 0);
                 return (
-                  <div key={suggestion.statementId} style={{ border: "1px solid var(--border)", borderRadius: 10, padding: 12, background: "rgba(255,255,255,.025)" }}>
+                  <div key={suggestion.statementId} style={{ border: "1px solid var(--border)", borderRadius: 10, padding: 12, background: "rgba(var(--ink),.025)" }}>
                     <div style={{ display: "flex", justifyContent: "space-between", gap: 12, flexWrap: "wrap" }}>
                       <div style={{ minWidth: 240, flex: 1 }}>
                         <div style={{ fontSize: 13, fontWeight: 800 }}>{suggestion.statementNo} · {currency} {fmt(Math.abs(suggestion.amount))}</div>
