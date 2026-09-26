@@ -115,7 +115,7 @@ export default function Hero() {
           cursor:pointer; text-decoration:none; transition:all .22s;
           backdrop-filter:blur(8px);
         }
-        .cta-ghost:hover { border-color:rgba(var(--ink),.22); background:rgba(var(--ink),.08); color:#fff; transform:translateY(-1px); }
+        .cta-ghost:hover { border-color:rgba(var(--ink),.22); background:rgba(var(--ink),.08); color:var(--ink-solid, #fff); transform:translateY(-1px); }
 
         .stat-pill:hover { background:rgba(var(--ink),.06) !important; transform:translateY(-1px); }
         .stat-pill { transition:all .2s; }

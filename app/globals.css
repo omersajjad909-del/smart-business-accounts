@@ -316,11 +316,14 @@ html:not(.dark) {
   --mk-grad-brand-alt: linear-gradient(135deg, #4f46e5, #7c3aed, #2563eb);
   --mk-grad-soft: linear-gradient(135deg, #4f46e5 0%, #6d28d9 50%, #8b5cf6 100%);
   --mk-grad-warm: linear-gradient(135deg, #d97706, #ea580c);
+  /* Chat launcher while the window is open: a white X needs a solid fill. */
+  --mk-fab-open: #4f46e5;
 }
 .mk-force-dark {
   --mk-page-bg: initial;
   --mk-grad-brand: initial; --mk-grad-brand-alt: initial;
   --mk-grad-soft: initial; --mk-grad-warm: initial;
+  --mk-fab-open: initial;
 }
 
 html,

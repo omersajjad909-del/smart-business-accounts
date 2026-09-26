@@ -175,7 +175,7 @@ const SHARED_CSS = `
     background:linear-gradient(90deg,#818cf8,#6366f1);
     transition:width .25s ease;
   }
-  .fn-link:hover        { color:#fff; }
+  .fn-link:hover        { color:var(--ink-solid, #fff); }
   .fn-link:hover::after { width:100%; }
 
   .fn-feat {
@@ -190,7 +190,7 @@ const SHARED_CSS = `
     background:linear-gradient(90deg,#818cf8,#6366f1);
     transition:width .25s ease;
   }
-  .fn-feat:hover,.fn-feat.open        { color:#fff; }
+  .fn-feat:hover,.fn-feat.open        { color:var(--ink-solid, #fff); }
   .fn-feat:hover::after,.fn-feat.open::after { width:100%; }
 
   .fn-ml {
@@ -199,7 +199,7 @@ const SHARED_CSS = `
     display:flex; align-items:center; gap:7px;
     font-family:'Outfit',sans-serif; transition:all .2s;
   }
-  .fn-ml:hover { color:#fff; padding-left:4px; }
+  .fn-ml:hover { color:var(--ink-solid, #fff); padding-left:4px; }
 
   .fn-hc {
     border-radius:14px; padding:14px; border:1.5px solid rgba(var(--ink),.08);
@@ -214,7 +214,7 @@ const SHARED_CSS = `
     padding:12px 0; border-bottom:1px solid rgba(var(--ink),.07);
     transition:color .2s; font-family:'Outfit',sans-serif;
   }
-  .fn-mob:hover { color:#fff; }
+  .fn-mob:hover { color:var(--ink-solid, #fff); }
 
   .fn-cta {
     display:inline-flex; align-items:center; gap:7px;

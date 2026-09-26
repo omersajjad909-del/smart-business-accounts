@@ -100,7 +100,10 @@ export async function createLemonCheckout(input: LemonCheckoutInput) {
   }
 
   // An explicit coupon the buyer typed, otherwise the store-wide launch code.
-  const autoDiscountCode = env("LEMONSQUEEZY_LAUNCH_DISCOUNT") || null;
+  // The launch offer is monthly-only: yearly already carries 20% off and the
+  // two do not stack (same rule as the Safepay path in app/api/billing/checkout).
+  const autoDiscountCode =
+    input.billingCycle === "YEARLY" ? null : env("LEMONSQUEEZY_LAUNCH_DISCOUNT") || null;
   const discountCode = input.couponCode || autoDiscountCode;
 
   const body = {

@@ -378,7 +378,7 @@ export default function ChatWidget() {
         .cw-input:focus { outline: none; }
         .cw-input::placeholder { color: rgba(var(--ink),var(--ta-22, .22)); }
         .cw-chip { transition: all .18s; cursor: pointer; }
-        .cw-chip:hover { background: rgba(129,140,248,.28) !important; border-color: rgba(129,140,248,.65) !important; color: white !important; transform: translateY(-1px); }
+        .cw-chip:hover { background: rgba(129,140,248,.28) !important; border-color: rgba(129,140,248,.65) !important; color: var(--ink-solid, white) !important; transform: translateY(-1px); }
         ::-webkit-scrollbar { width: 3px; }
         ::-webkit-scrollbar-thumb { background: rgba(99,102,241,.3); border-radius: 99px; }
         @media(max-width:480px){
@@ -393,7 +393,7 @@ export default function ChatWidget() {
         style={{
           position: "fixed", bottom: 24, right: 24, zIndex: 9999,
           width: 58, height: 58, borderRadius: "50%", border: "none", cursor: "pointer",
-          background: open ? "rgba(var(--ink),.1)" : "linear-gradient(135deg,#6366f1,#4f46e5)",
+          background: open ? "var(--mk-fab-open, rgba(255,255,255,.1))" : "linear-gradient(135deg,#6366f1,#4f46e5)",
           boxShadow: open ? "0 4px 16px rgba(0,0,0,.4)" : "0 8px 32px rgba(99,102,241,.55)",
           display: "flex", alignItems: "center", justifyContent: "center",
           transition: "all .3s cubic-bezier(.34,1.56,.64,1)",
@@ -426,20 +426,20 @@ export default function ChatWidget() {
           fontFamily: "'Outfit', sans-serif",
         }}>
 
-          {/* Header */}
-          <div style={{ padding: "14px 18px 13px", background: "linear-gradient(135deg,rgba(40,38,110,.95),rgba(25,22,80,.95))", borderBottom: "1px solid rgba(var(--ink),.07)", flexShrink: 0 }}>
+          {/* Header — indigo in both themes, so its text is always light. */}
+          <div style={{ padding: "14px 18px 13px", background: "linear-gradient(135deg,rgba(40,38,110,.95),rgba(25,22,80,.95))", borderBottom: "1px solid rgba(255,255,255,.07)", flexShrink: 0 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 11 }}>
               <div style={{ width: 40, height: 40, borderRadius: 12, background: "linear-gradient(135deg,#4f46e5,#818cf8)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 19, flexShrink: 0, boxShadow: "0 4px 12px rgba(99,102,241,.4)" }}>🤖</div>
               <div style={{ flex: 1 }}>
-                <div style={{ fontSize: 14, fontWeight: 800, color: "var(--ink-solid, white)", letterSpacing: "-.2px" }}>FinovaOS Support</div>
+                <div style={{ fontSize: 14, fontWeight: 800, color: "white", letterSpacing: "-.2px" }}>FinovaOS Support</div>
                 <div style={{ display: "flex", alignItems: "center", gap: 5, marginTop: 2 }}>
                   <div style={{ width: 7, height: 7, borderRadius: "50%", background: agentReplied ? "#34d399" : escalated ? "#f59e0b" : "#6366f1", animation: "shimmer 2s ease infinite" }} />
-                  <span style={{ fontSize: 11, color: agentReplied ? "var(--tx-34d399, #34d399)" : escalated ? "var(--tx-fbbf24, #fbbf24)" : "var(--tx-818cf8, #818cf8)", fontWeight: 600 }}>
+                  <span style={{ fontSize: 11, color: agentReplied ? "#34d399" : escalated ? "#fbbf24" : "#818cf8", fontWeight: 600 }}>
                     {agentReplied ? "Agent • Online" : escalated ? "Connecting to agent…" : "AI Assistant • Online"}
                   </span>
                 </div>
               </div>
-              <button onClick={() => setOpen(false)} style={{ background: "rgba(var(--ink),.06)", border: "1px solid rgba(var(--ink),.08)", borderRadius: 9, cursor: "pointer", color: "rgba(var(--ink),var(--ta-50, .5))", padding: "6px 8px", display: "flex", alignItems: "center", justifyContent: "center" }}>
+              <button onClick={() => setOpen(false)} aria-label="Close chat" style={{ background: "rgba(255,255,255,.06)", border: "1px solid rgba(255,255,255,.08)", borderRadius: 9, cursor: "pointer", color: "rgba(255,255,255,.6)", padding: "6px 8px", display: "flex", alignItems: "center", justifyContent: "center" }}>
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
               </button>
             </div>
@@ -466,7 +466,7 @@ export default function ChatWidget() {
                         boxShadow: msg.sender === "customer" ? "0 4px 16px rgba(99,102,241,.3)" : "0 2px 8px rgba(0,0,0,.12)",
                       }}>
                         {msg.sender === "customer"
-                          ? <span style={{ fontSize: 13.5, color: "rgba(var(--ink),.92)", lineHeight: 1.75 }}>{msg.text}</span>
+                          ? <span style={{ fontSize: 13.5, color: "rgba(255,255,255,.92)", lineHeight: 1.75 }}>{msg.text}</span>
                           : renderText(msg.text)
                         }
                         {msg.sender === "agent" && (

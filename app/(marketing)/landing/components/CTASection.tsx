@@ -157,7 +157,7 @@ export default function CTASection() {
         .cta-ghost:hover{
           border-color:rgba(var(--ink),.3);
           background:rgba(var(--ink),.09);
-          color:white;transform:translateY(-2px);
+          color:var(--ink-solid, white);transform:translateY(-2px);
         }
       `}</style>
 

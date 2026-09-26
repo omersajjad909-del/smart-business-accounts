@@ -176,11 +176,15 @@ function PlanCard({ plan, billing, prices, pkrPrices, vis, i, currency, planLimi
   const raw      = isCustom ? null : prices[plan.key as keyof Prices];
   const priceUSD = raw ? (billing === "yearly" ? Math.round(raw.yearly / 12) : raw.monthly) : 0;
   const normalUSD= raw ? raw.monthly : 0;
-  const first3USD= Math.round(priceUSD * 0.50); // 50% off
+  // The launch offer (50% off the first 3 months) is monthly-only. Yearly
+  // already carries its own 20% and the two do not stack — the checkout does
+  // not stack them either (app/api/billing/checkout, lib/lemonsqueezy).
+  const yearly   = billing === "yearly";
+  const first3USD= yearly ? priceUSD : Math.round(priceUSD * 0.50);
 
   const pkrPerMonth = rawPkr ? (billing === "yearly" ? Math.round(rawPkr.yearly / 12) : rawPkr.monthly) : 0;
   const pkrNormal   = rawPkr ? rawPkr.monthly : 0;
-  const pkrFirst3   = Math.round(pkrPerMonth * 0.50);
+  const pkrFirst3   = yearly ? pkrPerMonth : Math.round(pkrPerMonth * 0.50);
   const rs = (n: number) => `Rs${Math.round(n).toLocaleString("en-PK")}`;
 
   /** Local list price when there is one, otherwise the converted USD figure. */
@@ -244,9 +248,15 @@ function PlanCard({ plan, billing, prices, pkrPrices, vis, i, currency, planLimi
             {/* Original price + 50% off badge — small row */}
             <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:6 }}>
               <span style={{ fontSize:13, color:"rgba(var(--ink),var(--ta-35, .35))", textDecoration:"line-through" }}>{fmt(normalUSD, pkrNormal)}/mo</span>
-              <span style={{ padding:"2px 8px", borderRadius:6, background:"rgba(249,115,22,.2)", border:"1px solid rgba(249,115,22,.4)", fontSize:10, fontWeight:800, color:"#fb923c" }}>
-                50% OFF × 3 months
-              </span>
+              {yearly ? (
+                <span style={{ padding:"2px 8px", borderRadius:6, background:"rgba(16,185,129,.15)", border:"1px solid rgba(16,185,129,.35)", fontSize:10, fontWeight:800, color:"var(--tx-34d399, #34d399)" }}>
+                  SAVE 20% · BILLED YEARLY
+                </span>
+              ) : (
+                <span style={{ padding:"2px 8px", borderRadius:6, background:"rgba(249,115,22,.2)", border:"1px solid rgba(249,115,22,.4)", fontSize:10, fontWeight:800, color:"#fb923c" }}>
+                  50% OFF × 3 months
+                </span>
+              )}
             </div>
             {/* Discounted price — big */}
             <div style={{ display:"flex", alignItems:"baseline", gap:3, marginBottom:6 }}>
@@ -416,7 +426,9 @@ export default function PricingSection() {
             </span>
           </h2>
           <p style={{fontSize:16,color:"rgba(var(--ink),var(--ta-40, .4))",lineHeight:1.8,maxWidth:480,margin:"0 auto 32px"}}>
-            50% off for your first 3 months. No hidden fees. Cancel anytime.
+            {billing === "yearly"
+              ? "Save 20% with yearly billing. No hidden fees. Cancel anytime."
+              : "50% off your first 3 months on monthly plans. Cancel anytime."}
           </p>
 
           {/* Monthly / Yearly toggle + Currency selector row */}
@@ -432,7 +444,7 @@ export default function PricingSection() {
                 }}>
                   {b === "monthly" ? "Monthly" : "Yearly"}
                   {b === "yearly" && (
-                    <span style={{ marginLeft:6, fontSize:10, fontWeight:800, color: billing==="yearly" ? "var(--tx-fbbf24, #fbbf24)" : "rgba(var(--txr-fbbf24, 251,191,36),.5)", background:"rgba(251,191,36,.12)", padding:"1px 6px", borderRadius:6 }}>
+                    <span style={{ marginLeft:6, fontSize:10, fontWeight:800, color: billing==="yearly" ? "#fde68a" : "rgba(var(--txr-fbbf24, 251,191,36),.5)", background: billing==="yearly" ? "rgba(0,0,0,.18)" : "rgba(251,191,36,.12)", padding:"1px 6px", borderRadius:6 }}>
                       −20%
                     </span>
                   )}

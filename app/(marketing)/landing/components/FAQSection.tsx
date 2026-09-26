@@ -145,7 +145,7 @@ const FAQS = [
   {
     cat: "billing", color: "var(--tx-f97316, #f97316)",
     q: "What does the 50% discount cover?",
-    a: "Your first 3 months are 50% off the regular plan price — on any plan (Starter, Pro, or Enterprise). After 3 months, standard pricing applies. No contracts. Cancel anytime before month 4 if you change your mind.",
+    a: "On monthly billing, your first 3 months are 50% off the regular plan price — on any plan (Starter, Pro, or Enterprise). After 3 months, standard monthly pricing applies. Yearly billing gets 20% off instead; the two offers do not combine. No contracts. Cancel anytime before month 4 if you change your mind.",
   },
   {
     cat: "billing", color: "var(--tx-f97316, #f97316)",
