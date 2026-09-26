@@ -38,7 +38,8 @@ const GROUPS = [
 const PRINT_CSS = `
 @media print {
   @page { size: A4 landscape; margin: 10mm; }
-  .tb-doc, .tb-doc * {
+  /* html.dark .dashboard-root th (globals.css) outranks a bare .tb-doc *, hence the long selectors. */
+  .tb-doc, .tb-doc *, html.dark .dashboard-root .tb-doc th, html.dark .dashboard-root .tb-doc td {
     background: #fff !important; color: #000 !important; border-color: #bbb !important;
     box-shadow: none !important; text-shadow: none !important;
   }
@@ -47,6 +48,9 @@ const PRINT_CSS = `
   .tb-doc .tb-scroll { overflow: visible !important; }
   .tb-doc table { min-width: 0 !important; font-size: 9pt !important; }
   .tb-doc th, .tb-doc td { padding: 4px 6px !important; font-size: 8.5pt !important; }
+  .tb-doc td { white-space: normal !important; }
+  .tb-doc .tb-c-code { width: 70px !important; }
+  .tb-doc .tb-c-num  { width: 11.5% !important; }
   .tb-doc thead { display: table-header-group; }
   .tb-doc tr { break-inside: avoid; }
   .tb-doc .tb-group { border-bottom: 2px solid #000 !important; }
@@ -228,9 +232,9 @@ export default function TrialBalancePage() {
                 <div className="tb-scroll" style={{ overflowX:"auto" }}>
                   <table style={{ width:"100%", minWidth:1040, borderCollapse:"collapse", tableLayout:"fixed", fontSize:12 }}>
                     <colgroup>
-                      <col style={{ width:110 }}/>
+                      <col className="tb-c-code" style={{ width:110 }}/>
                       <col/>
-                      {NUM_COLS.map(k => <col key={k} style={{ width:140 }}/>)}
+                      {NUM_COLS.map(k => <col key={k} className="tb-c-num" style={{ width:140 }}/>)}
                     </colgroup>
                     <thead>
                       <tr>
