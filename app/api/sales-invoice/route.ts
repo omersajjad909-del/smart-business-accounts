@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
-import { baseRate, toBase } from "@/lib/fx";
+import { baseRate } from "@/lib/fx";
 import { writeDispatchStock } from "@/lib/challanStock";
 import { safeDecryptFields, ACCOUNT_PII_FIELDS } from "@/lib/fieldEncrypt";
 import { sanitizeLineMeta } from "@/lib/rateFormula";
@@ -13,6 +13,7 @@ import { ensureOpenPeriod } from "@/lib/financialLock";
 import { requireActiveSubscription } from "@/lib/subscriptionGuard";
 import { logAuditFromReq } from "@/lib/auditLogger";
 import { postCogsVoucher, removeCogsVoucher, type Db } from "@/lib/cogsPosting";
+import { salesInvoiceEntries } from "@/lib/salesPosting";
 import { isFbrEditLocked, FBR_EDIT_LOCK_HOURS } from "@/lib/fbrEInvoice";
 
 // Quantities are weights now, not counts: a kilogram invoice can ask for
@@ -299,30 +300,23 @@ export async function POST(req: NextRequest) {
           transactionType: "INVOICE",
           transactionId: invoice.id,
           currencyId,
-          amountInLocal: total + taxAmount + Number(freight || 0),
-          amountInBase: (total + taxAmount + Number(freight || 0)) * Number(exchangeRate || 1),
+          amountInLocal: total, // already includes tax and freight
+          amountInBase: total * Number(exchangeRate || 1),
           exchangeRate: Number(exchangeRate || 1),
           conversionDate: new Date(date),
         },
       });
     }
 
-    let salesAcc = await prisma.account.findFirst({
-      where: { name: { equals: "Sales", mode: "insensitive" }, companyId },
+    // `total` already includes tax and freight. The ledger is in the company's
+    // own currency, whatever the invoice was raised in — see lib/fx.ts.
+    const siEntries = await salesInvoiceEntries(prisma, {
+      companyId,
+      customerId,
+      total,
+      tax: taxAmount,
+      rate: baseRate(currencyId, exchangeRate),
     });
-
-    if (!salesAcc) {
-      salesAcc = await prisma.account.create({
-        data: { companyId, code: "SALES", name: "Sales", type: "INCOME" },
-      });
-    }
-
-    // The ledger is in the company's own currency, whatever the invoice was
-    // raised in. See lib/fx.ts — computed once so both legs are exactly equal.
-    const invoiceBase = toBase(
-      total + freight + taxAmount,
-      baseRate(currencyId, exchangeRate),
-    );
 
     await prisma.voucher.create({
       data: {
@@ -332,12 +326,7 @@ export async function POST(req: NextRequest) {
         type: "SI",
         date: new Date(date),
         narration: "Sales Invoice",
-        entries: {
-          create: [
-            { companyId, accountId: customerId, amount: invoiceBase },
-            { companyId, accountId: salesAcc.id, amount: -invoiceBase },
-          ],
-        },
+        entries: { create: siEntries },
       },
     });
 
@@ -610,24 +599,18 @@ export async function PUT(req: NextRequest) {
       });
       if (voucher) {
         await tx.voucherEntry.deleteMany({ where: { voucherId: voucher.id } });
-        const salesAcc = await tx.account.findFirst({
-          where: { name: { equals: "Sales", mode: "insensitive" }, companyId },
+        // Same posting as the create path — an edit that changed the rate has
+        // to re-post the ledger at the new one, not leave the old figure.
+        const editedEntries = await salesInvoiceEntries(tx as unknown as Db, {
+          companyId,
+          customerId: _customerId || existing.customerId,
+          total,
+          tax: taxAmount,
+          rate: baseRate(currencyId, exchangeRate),
         });
-        if (salesAcc) {
-          const customerId = _customerId || existing.customerId;
-          // Same conversion as the create path — an edit that changed the rate
-          // has to re-post the ledger at the new one, not leave the old figure.
-          const editedBase = toBase(
-            total + Number(freight) + taxAmount,
-            baseRate(currencyId, exchangeRate),
-          );
-          await tx.voucherEntry.createMany({
-            data: [
-              { voucherId: voucher.id, companyId, accountId: customerId, amount: editedBase },
-              { voucherId: voucher.id, companyId, accountId: salesAcc.id, amount: -editedBase },
-            ],
-          });
-        }
+        await tx.voucherEntry.createMany({
+          data: editedEntries.map((e) => ({ ...e, voucherId: voucher.id })),
+        });
         await tx.voucher.update({
           where: { id: voucher.id },
           data: { date: new Date(date) },
@@ -654,8 +637,8 @@ export async function PUT(req: NextRequest) {
             transactionType: "INVOICE",
             transactionId: id,
             currencyId,
-            amountInLocal: total + taxAmount + Number(freight || 0),
-            amountInBase: (total + taxAmount + Number(freight || 0)) * Number(exchangeRate || 1),
+            amountInLocal: total, // already includes tax and freight
+            amountInBase: total * Number(exchangeRate || 1),
             exchangeRate: Number(exchangeRate || 1),
             conversionDate: new Date(date),
           },

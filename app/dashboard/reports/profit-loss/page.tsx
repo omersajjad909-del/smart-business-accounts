@@ -15,9 +15,9 @@ interface LineItem { name: string; amount: number; }
 interface PLReport {
   // Revenue
   grossSales: number; salesReturns: number; salesDiscounts: number; netSales: number;
-  // COGS
-  openingStock: number; purchases: number; freightInward: number;
-  purchaseDiscounts: number; purchaseReturns: number; closingStock: number; cogs: number;
+  salesLines: LineItem[];
+  // COGS — straight from the cost accounts in the ledger
+  cogsLines: LineItem[]; cogs: number;
   // Gross
   grossProfit: number; grossMarginPct: number;
   // OpEx
@@ -266,7 +266,9 @@ export default function ProfitLossPage() {
 
                 {/* 1. REVENUE */}
                 <Section title="Revenue" color="#60a5fa" icon="💰">
-                  <PLRow label="Gross Sales" amount={r.grossSales} />
+                  {r.salesLines.length > 1
+                    ? r.salesLines.map((e, i) => <PLRow key={i} label={e.name} amount={e.amount} indent />)
+                    : <PLRow label="Gross Sales" amount={r.grossSales} />}
                   {r.salesReturns  > 0 && <PLRow label="— Sales Returns"   amount={r.salesReturns}   variant="deduct" indent />}
                   {r.salesDiscounts > 0 && <PLRow label="— Sales Discounts" amount={r.salesDiscounts}  variant="deduct" indent />}
                   <PLRow label="NET SALES" amount={r.netSales} variant="total" />
@@ -274,12 +276,9 @@ export default function ProfitLossPage() {
 
                 {/* 2. COGS */}
                 <Section title="Cost of Goods Sold — COGS" color="#fb923c" icon="📦">
-                  <PLRow label="Opening Stock"         amount={r.openingStock}      dimZero />
-                  <PLRow label="+ Purchases"           amount={r.purchases}          dimZero />
-                  <PLRow label="+ Freight / Carriage"  amount={r.freightInward}      dimZero />
-                  {r.purchaseDiscounts > 0 && <PLRow label="— Purchase Discounts" amount={r.purchaseDiscounts} variant="deduct" indent />}
-                  {r.purchaseReturns   > 0 && <PLRow label="— Purchase Returns"   amount={r.purchaseReturns}   variant="deduct" indent />}
-                  {r.closingStock > 0 && <PLRow label="— Closing Stock" amount={r.closingStock} variant="deduct" indent />}
+                  {r.cogsLines.length === 0
+                    ? <div style={{ textAlign: "center", padding: "16px 0", color: "rgba(255,255,255,.25)", fontSize: 13 }}>No cost of sales recorded in this period</div>
+                    : r.cogsLines.map((e, i) => <PLRow key={i} label={e.name} amount={e.amount} indent />)}
                   <PLRow label="COST OF GOODS SOLD" amount={r.cogs} variant="total" />
                 </Section>
 

@@ -915,7 +915,9 @@ export async function seedDemoCompany(
     postVoucher(
       { type: "PI", voucherNo: `PI-${1001 + i}`, date, branchId: branchFor(i), narration: `Purchase Invoice PI-${1001 + i} from ${supplier.name}`, invoiceId: invId },
       [
-        [A.PURCHASES, net, 0, `Purchase PI-${1001 + i}`],
+        // Stocked goods go on the balance sheet and are charged to cost only
+        // when sold (the COGS voucher below), as app/api/purchase-invoice does.
+        [stocked ? A.STOCK : A.PURCHASES, net, 0, `Purchase PI-${1001 + i}`],
         [A.TAX_PAYABLE, tax, 0, `Input tax PI-${1001 + i}`],
         [{ id: supplier.id }, 0, total, `Purchase PI-${1001 + i}`],
       ],
@@ -984,12 +986,14 @@ export async function seedDemoCompany(
     const lineCount = 2 + (i % 3);
     const invId = randomUUID();
     let net = 0;
+    let cost = 0;
 
     for (let l = 0; l < lineCount; l++) {
       const it = items[(i * 2 + l) % items.length];
       const qty = Math.max(3, Math.round(6 + jitter(i * 7 + l) * 13));
       const amount = qty * it.rate;
       net += amount;
+      cost += qty * it.purchaseRate;
       salesItems.push({
         id: randomUUID(),
         invoiceId: invId,
@@ -1044,6 +1048,16 @@ export async function seedDemoCompany(
         [A.TAX_PAYABLE, 0, tax, `Output tax SI-${2001 + i}`],
       ],
     );
+    // Cost leg, as lib/cogsPosting.ts posts for every real sale.
+    if (stocked && cost > 0) {
+      postVoucher(
+        { type: "COGS", voucherNo: `SI-${2001 + i}`, date, branchId: branchFor(i), narration: `Cost of goods sold — SI-${2001 + i}`, invoiceId: invId },
+        [
+          [A.PURCHASES, round2(cost), 0, `Cost of goods sold SI-${2001 + i}`],
+          [A.STOCK, 0, round2(cost), `Cost of goods sold SI-${2001 + i}`],
+        ],
+      );
+    }
 
     // Two open quotations so the quotation page is not empty.
     if (i < 2) {

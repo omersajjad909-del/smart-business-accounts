@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { resolveCompanyId } from "@/lib/tenant";
 import { postCogsVoucher } from "@/lib/cogsPosting";
+import { resolveSalesAccountId } from "@/lib/salesPosting";
 import { nextVoucherNo } from "@/lib/inventoryAccounts";
 
 export async function POST(req: NextRequest) {
@@ -63,9 +64,8 @@ export async function POST(req: NextRequest) {
     // ── Step 3: GL Voucher ───────────────────────────────────────────────────
     const saleTotal = total ?? items.reduce((s, i) => s + i.qty * i.rate, 0);
     try {
-      const salesAcc = await prisma.account.findFirst({
-        where: { companyId, name: { contains: "Sales", mode: "insensitive" } },
-      });
+      // Was `name contains "Sales"`, which could pick "Sales Tax Payable".
+      const salesAcc = { id: await resolveSalesAccountId(prisma, companyId) };
       const method = (payMethod || "cash").toLowerCase();
       let debitAcc = await prisma.account.findFirst({
         where: { companyId, name: { contains: method === "card" ? "Card" : "Cash", mode: "insensitive" } },
